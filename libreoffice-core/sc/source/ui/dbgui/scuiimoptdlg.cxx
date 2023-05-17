@@ -28,14 +28,16 @@
 #include <rtl/tencinfo.h>
 #include <imoptdlg.hxx>
 #include <svx/txencbox.hxx>
+#include <o3tl/string_view.hxx>
+#include <utility>
 
 // ScDelimiterTable
 
 class ScDelimiterTable
 {
 public:
-    explicit ScDelimiterTable( const OUString& rDelTab )
-            :   theDelTab ( rDelTab ),
+    explicit ScDelimiterTable( OUString aDelTab )
+            :   theDelTab (std::move( aDelTab )),
                 nDelIdx   ( 0 )
             {}
 
@@ -58,11 +60,11 @@ sal_uInt16 ScDelimiterTable::GetCode( std::u16string_view rDel ) const
         sal_Int32 nIdx {0};
 
         // Check even tokens: start from 0 and then skip 1 token at each iteration
-        if (rDel != theDelTab.getToken( 0, cSep, nIdx ))
-            while (nIdx>0 && rDel != theDelTab.getToken( 1, cSep, nIdx ));
+        if (rDel != o3tl::getToken(theDelTab, 0, cSep, nIdx ))
+            while (nIdx>0 && rDel != o3tl::getToken(theDelTab, 1, cSep, nIdx ));
 
         if (nIdx>0)
-            return static_cast<sal_Unicode>(theDelTab.getToken( 0, cSep, nIdx ).toInt32());
+            return static_cast<sal_Unicode>(o3tl::toInt32(o3tl::getToken(theDelTab, 0, cSep, nIdx )));
     }
 
     return 0;
@@ -77,7 +79,7 @@ OUString ScDelimiterTable::GetDelimiter( sal_Unicode nCode ) const
         do
         {
             sal_Int32 nPrevIdx {nIdx};
-            if (nCode == static_cast<sal_Unicode>(theDelTab.getToken( 1, cSep, nIdx ).toInt32()))
+            if (nCode == static_cast<sal_Unicode>(o3tl::toInt32(o3tl::getToken(theDelTab, 1, cSep, nIdx ))))
                 return theDelTab.getToken( 0, cSep, nPrevIdx );
         }
         while (nIdx>0);
@@ -121,7 +123,6 @@ ScImportOptionsDlg::ScImportOptionsDlg(weld::Window* pParent, bool bAscii,
     , m_xCbFormulas(m_xBuilder->weld_check_button("formulas"))
     , m_xCbQuoteAll(m_xBuilder->weld_check_button("quoteall"))
     , m_xCbFixed(m_xBuilder->weld_check_button("fixedwidth"))
-    , m_xBtnOk(m_xBuilder->weld_button("ok"))
     , m_xLbCharset(new SvxTextEncodingBox(m_xBuilder->weld_combo_box("charsetdropdown")))
     , m_xTvCharset(new SvxTextEncodingTreeView(m_xBuilder->weld_tree_view("charsetlist")))
 {

@@ -53,7 +53,7 @@
 #include <xmloff/DocumentSettingsContext.hxx>
 #include <xmloff/xmluconv.hxx>
 #include <xmloff/xmlmetai.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svtools/sfxecode.hxx>
 #include "xmlEnums.hxx"
 #include "xmlStyleImport.hxx"
@@ -178,65 +178,63 @@ static ErrCode ReadThroughComponent(
     OSL_ENSURE( xStorage.is(), "Need storage!");
     OSL_ENSURE(nullptr != pStreamName, "Please, please, give me a name!");
 
-    if ( xStorage.is() )
+    if ( !xStorage )
+        // TODO/LATER: better error handling
+        return ErrCode(1);
+
+    uno::Reference< io::XStream > xDocStream;
+
+    try
     {
-        uno::Reference< io::XStream > xDocStream;
-
-        try
+        // open stream (and set parser input)
+        OUString sStreamName = OUString::createFromAscii(pStreamName);
+        if ( !xStorage->hasByName( sStreamName ) || !xStorage->isStreamElement( sStreamName ) )
         {
-            // open stream (and set parser input)
-            OUString sStreamName = OUString::createFromAscii(pStreamName);
-            if ( !xStorage->hasByName( sStreamName ) || !xStorage->isStreamElement( sStreamName ) )
-            {
-                // stream name not found! return immediately with OK signal
-                return ERRCODE_NONE;
-            }
-
-            // get input stream
-            xDocStream = xStorage->openStreamElement( sStreamName, embed::ElementModes::READ );
-        }
-        catch (const packages::WrongPasswordException&)
-        {
-            return ERRCODE_SFX_WRONGPASSWORD;
-        }
-        catch (const uno::Exception&)
-        {
-            return ErrCode(1); // TODO/LATER: error handling
+            // stream name not found! return immediately with OK signal
+            return ERRCODE_NONE;
         }
 
-        sal_Int32 nArgs = 0;
-        if (rxGraphicStorageHandler.is())
-            nArgs++;
-        if( _xEmbeddedObjectResolver.is())
-            nArgs++;
-        if ( _xProp.is() )
-            nArgs++;
-
-        uno::Sequence< uno::Any > aFilterCompArgs( nArgs );
-        auto aFilterCompArgsRange = asNonConstRange(aFilterCompArgs);
-
-        nArgs = 0;
-        if (rxGraphicStorageHandler.is())
-            aFilterCompArgsRange[nArgs++] <<= rxGraphicStorageHandler;
-        if( _xEmbeddedObjectResolver.is())
-            aFilterCompArgsRange[ nArgs++ ] <<= _xEmbeddedObjectResolver;
-        if ( _xProp.is() )
-            aFilterCompArgsRange[ nArgs++ ] <<= _xProp;
-
-        // the underlying SvXMLImport implements XFastParser, XImporter, XFastDocumentHandler
-        Reference< XFastParser > xFastParser(
-            rxContext->getServiceManager()->createInstanceWithArgumentsAndContext(_sFilterName, aFilterCompArgs, rxContext),
-            uno::UNO_QUERY_THROW );
-        uno::Reference< XInputStream > xInputStream = xDocStream->getInputStream();
-        // read from the stream
-        return ReadThroughComponent( xInputStream
-                                    ,xModelComponent
-                                    ,rxContext
-                                    ,xFastParser );
+        // get input stream
+        xDocStream = xStorage->openStreamElement( sStreamName, embed::ElementModes::READ );
+    }
+    catch (const packages::WrongPasswordException&)
+    {
+        return ERRCODE_SFX_WRONGPASSWORD;
+    }
+    catch (const uno::Exception&)
+    {
+        return ErrCode(1); // TODO/LATER: error handling
     }
 
-    // TODO/LATER: better error handling
-    return ErrCode(1);
+    sal_Int32 nArgs = 0;
+    if (rxGraphicStorageHandler.is())
+        nArgs++;
+    if( _xEmbeddedObjectResolver.is())
+        nArgs++;
+    if ( _xProp.is() )
+        nArgs++;
+
+    uno::Sequence< uno::Any > aFilterCompArgs( nArgs );
+    auto aFilterCompArgsRange = asNonConstRange(aFilterCompArgs);
+
+    nArgs = 0;
+    if (rxGraphicStorageHandler.is())
+        aFilterCompArgsRange[nArgs++] <<= rxGraphicStorageHandler;
+    if( _xEmbeddedObjectResolver.is())
+        aFilterCompArgsRange[ nArgs++ ] <<= _xEmbeddedObjectResolver;
+    if ( _xProp.is() )
+        aFilterCompArgsRange[ nArgs++ ] <<= _xProp;
+
+    // the underlying SvXMLImport implements XFastParser, XImporter, XFastDocumentHandler
+    Reference< XFastParser > xFastParser(
+        rxContext->getServiceManager()->createInstanceWithArgumentsAndContext(_sFilterName, aFilterCompArgs, rxContext),
+        uno::UNO_QUERY_THROW );
+    uno::Reference< XInputStream > xInputStream = xDocStream->getInputStream();
+    // read from the stream
+    return ReadThroughComponent( xInputStream
+                                ,xModelComponent
+                                ,rxContext
+                                ,xFastParser );
 }
 
 
@@ -414,7 +412,7 @@ bool ORptFilter::implImport( const Sequence< PropertyValue >& rDescriptor )
                 uno::UNO_QUERY);
 
         uno::Reference< lang::XMultiServiceFactory > xReportServiceFactory( m_xReportDefinition, uno::UNO_QUERY);
-        aArgs.getArray()[0] <<= beans::NamedValue("Storage", uno::makeAny(xStorage));
+        aArgs.getArray()[0] <<= beans::NamedValue("Storage", uno::Any(xStorage));
         xEmbeddedObjectResolver.set( xReportServiceFactory->createInstanceWithArguments("com.sun.star.document.ImportEmbeddedObjectResolver",aArgs) , uno::UNO_QUERY);
 
         static constexpr OUStringLiteral s_sOld = u"OldFormat";
@@ -425,20 +423,19 @@ bool ORptFilter::implImport( const Sequence< PropertyValue >& rDescriptor )
             { OUString("PrivateData"),0,    cppu::UnoType<XInterface>::get(),  beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("BaseURI"),    0,    cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("StreamRelPath"), 0, cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 }
         };
         utl::MediaDescriptor aDescriptor(rDescriptor);
         uno::Reference<beans::XPropertySet> xProp = comphelper::GenericPropertySet_CreateInstance(new comphelper::PropertySetInfo(pMap));
         const OUString sVal( aDescriptor.getUnpackedValueOrDefault(utl::MediaDescriptor::PROP_DOCUMENTBASEURL, OUString()) );
         assert(!sVal.isEmpty()); // needed for relative URLs
-        xProp->setPropertyValue("BaseURI", uno::makeAny(sVal));
+        xProp->setPropertyValue("BaseURI", uno::Any(sVal));
         const OUString sHierarchicalDocumentName( aDescriptor.getUnpackedValueOrDefault("HierarchicalDocumentName",OUString()) );
-        xProp->setPropertyValue("StreamRelPath", uno::makeAny(sHierarchicalDocumentName));
+        xProp->setPropertyValue("StreamRelPath", uno::Any(sHierarchicalDocumentName));
 
         uno::Reference<XComponent> xModel = GetModel();
         static constexpr OUStringLiteral s_sMeta = u"meta.xml";
         static constexpr OUStringLiteral s_sStreamName = u"StreamName";
-        xProp->setPropertyValue(s_sStreamName, uno::makeAny(OUString(s_sMeta)));
+        xProp->setPropertyValue(s_sStreamName, uno::Any(OUString(s_sMeta)));
         ErrCode nRet = ReadThroughComponent( xStorage
                                     ,xModel
                                     ,"meta.xml"
@@ -452,16 +449,16 @@ bool ORptFilter::implImport( const Sequence< PropertyValue >& rDescriptor )
 
         try
         {
-            xProp->setPropertyValue(s_sOld,uno::makeAny(!(xStorage->hasByName(s_sMeta) || xStorage->isStreamElement( s_sMeta ))));
+            xProp->setPropertyValue(s_sOld,uno::Any(!(xStorage->hasByName(s_sMeta) || xStorage->isStreamElement( s_sMeta ))));
         }
         catch (const uno::Exception&)
         {
-            xProp->setPropertyValue(s_sOld,uno::makeAny(true));
+            xProp->setPropertyValue(s_sOld,uno::Any(true));
         }
 
         if ( nRet == ERRCODE_NONE )
         {
-            xProp->setPropertyValue(s_sStreamName, uno::makeAny(OUString("settings.xml")));
+            xProp->setPropertyValue(s_sStreamName, uno::Any(OUString("settings.xml")));
             nRet = ReadThroughComponent( xStorage
                                     ,xModel
                                     ,"settings.xml"
@@ -474,7 +471,7 @@ bool ORptFilter::implImport( const Sequence< PropertyValue >& rDescriptor )
         }
         if ( nRet == ERRCODE_NONE )
         {
-            xProp->setPropertyValue(s_sStreamName, uno::makeAny(OUString("styles.xml")));
+            xProp->setPropertyValue(s_sStreamName, uno::Any(OUString("styles.xml")));
             nRet = ReadThroughComponent(xStorage
                                     ,xModel
                                     ,"styles.xml"
@@ -487,7 +484,7 @@ bool ORptFilter::implImport( const Sequence< PropertyValue >& rDescriptor )
 
         if ( nRet == ERRCODE_NONE )
         {
-            xProp->setPropertyValue(s_sStreamName, uno::makeAny(OUString("content.xml")));
+            xProp->setPropertyValue(s_sStreamName, uno::Any(OUString("content.xml")));
             nRet = ReadThroughComponent( xStorage
                                     ,xModel
                                     ,"content.xml"

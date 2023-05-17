@@ -21,8 +21,7 @@
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <osl/diagnose.h>
-#include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace rptxml
 {
@@ -100,7 +99,7 @@ void OXMLFunction::endFastElement(sal_Int32 )
     {
         try
         {
-            m_xFunctions->insertByIndex(m_xFunctions->getCount(),uno::makeAny(m_xFunction));
+            m_xFunctions->insertByIndex(m_xFunctions->getCount(),uno::Any(m_xFunction));
             m_xFunction.clear();
         }catch(uno::Exception&)
         {

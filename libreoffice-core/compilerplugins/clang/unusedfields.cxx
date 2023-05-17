@@ -25,9 +25,7 @@
 #include "compat.hxx"
 #include "check.hxx"
 
-#if CLANG_VERSION >= 110000
 #include "clang/AST/ParentMapContext.h"
-#endif
 
 /**
 This performs two analyses:
@@ -165,8 +163,6 @@ public:
 
 private:
     MyFieldInfo niceName(const FieldDecl*);
-    bool ignoreLocation(SourceLocation loc);
-    bool checkIgnoreLocation(SourceLocation loc);
     void checkTouchedFromOutside(const FieldDecl* fieldDecl, const Expr* memberExpr);
     void checkIfReadFrom(const FieldDecl* fieldDecl, const Expr* memberExpr);
     void checkIfWrittenTo(const FieldDecl* fieldDecl, const Expr* memberExpr);
@@ -186,6 +182,8 @@ private:
 
 void UnusedFields::run()
 {
+    handler.enableTreeWideAnalysisMode();
+
     TraverseDecl(compiler.getASTContext().getTranslationUnitDecl());
 
     if (!isUnitTestMode())
@@ -216,25 +214,25 @@ void UnusedFields::run()
             report(
                 DiagnosticsEngine::Warning,
                 "read %0",
-                compat::getBeginLoc(s.parentRecord))
+                s.parentRecord->getBeginLoc())
                 << s.fieldName;
         for (const MyFieldInfo & s : writeToSet)
             report(
                 DiagnosticsEngine::Warning,
                 "write %0",
-                compat::getBeginLoc(s.parentRecord))
+                s.parentRecord->getBeginLoc())
                 << s.fieldName;
         for (const MyFieldInfo & s : touchedFromOutsideConstructorSet)
             report(
                 DiagnosticsEngine::Warning,
                 "outside-constructor %0",
-                compat::getBeginLoc(s.parentRecord))
+                s.parentRecord->getBeginLoc())
                 << s.fieldName;
         for (const MyFieldInfo & s : touchedFromOutsideSet)
             report(
                 DiagnosticsEngine::Warning,
                 "outside %0",
-                compat::getBeginLoc(s.parentRecord))
+                s.parentRecord->getBeginLoc())
                 << s.fieldName;
     }
 }
@@ -283,46 +281,10 @@ MyFieldInfo UnusedFields::niceName(const FieldDecl* fieldDecl)
     return aInfo;
 }
 
-/**
- * Our need to see everything conflicts with the PCH code in pluginhandler::ignoreLocation,
- * so we have to do this ourselves.
- */
-bool UnusedFields::ignoreLocation(SourceLocation loc)
-{
-    static std::unordered_map<SourceLocation, bool> checkedMap;
-    auto it = checkedMap.find(loc);
-    if (it != checkedMap.end())
-        return it->second;
-    bool ignore = checkIgnoreLocation(loc);
-    checkedMap.emplace(loc, ignore);
-    return ignore;
-}
-
-bool UnusedFields::checkIgnoreLocation(SourceLocation loc)
-{
-    // simplified form of the code in PluginHandler::checkIgnoreLocation
-    SourceLocation expansionLoc = compiler.getSourceManager().getExpansionLoc( loc );
-    if( compiler.getSourceManager().isInSystemHeader( expansionLoc ))
-        return true;
-    PresumedLoc presumedLoc = compiler.getSourceManager().getPresumedLoc( expansionLoc );
-    if( presumedLoc.isInvalid())
-        return true;
-    const char* bufferName = presumedLoc.getFilename();
-    if (bufferName == NULL
-        || loplugin::hasPathnamePrefix(bufferName, SRCDIR "/external/")
-        || loplugin::hasPathnamePrefix(bufferName, WORKDIR "/"))
-        return true;
-    if( loplugin::hasPathnamePrefix(bufferName, BUILDDIR "/")
-        || loplugin::hasPathnamePrefix(bufferName, SRCDIR "/") )
-        return false; // ok
-    return true;
-}
-
-
 bool UnusedFields::VisitFieldDecl( const FieldDecl* fieldDecl )
 {
     fieldDecl = fieldDecl->getCanonicalDecl();
-    if (ignoreLocation( compat::getBeginLoc(fieldDecl) )) {
+    if (ignoreLocation( fieldDecl->getBeginLoc() )) {
         return true;
     }
     // ignore stuff that forms part of the stable URE interface
@@ -387,8 +349,8 @@ bool UnusedFields::isSomeKindOfZero(const Expr* arg)
     // Get the expression contents.
     // This helps us find params which are always initialised with something like "OUString()".
     SourceManager& SM = compiler.getSourceManager();
-    SourceLocation startLoc = compat::getBeginLoc(arg);
-    SourceLocation endLoc = compat::getEndLoc(arg);
+    SourceLocation startLoc = arg->getBeginLoc();
+    SourceLocation endLoc = arg->getEndLoc();
     const char *p1 = SM.getCharacterData( startLoc );
     const char *p2 = SM.getCharacterData( endLoc );
     if (!p1 || !p2 || (p2 - p1) < 0 || (p2 - p1) > 40) {
@@ -424,7 +386,7 @@ bool startswith(const std::string& rStr, const char* pSubStr)
 bool UnusedFields::TraverseCXXConstructorDecl(CXXConstructorDecl* cxxConstructorDecl)
 {
     auto copy = insideMoveOrCopyOrCloneDeclParent;
-    if (!ignoreLocation(compat::getBeginLoc(cxxConstructorDecl)) && cxxConstructorDecl->isThisDeclarationADefinition())
+    if (!ignoreLocation(cxxConstructorDecl->getBeginLoc()) && cxxConstructorDecl->isThisDeclarationADefinition())
     {
         if (cxxConstructorDecl->isCopyOrMoveConstructor())
             insideMoveOrCopyOrCloneDeclParent = cxxConstructorDecl->getParent();
@@ -438,7 +400,7 @@ bool UnusedFields::TraverseCXXMethodDecl(CXXMethodDecl* cxxMethodDecl)
 {
     auto copy1 = insideMoveOrCopyOrCloneDeclParent;
     auto copy2 = insideFunctionDecl;
-    if (!ignoreLocation(compat::getBeginLoc(cxxMethodDecl)) && cxxMethodDecl->isThisDeclarationADefinition())
+    if (!ignoreLocation(cxxMethodDecl->getBeginLoc()) && cxxMethodDecl->isThisDeclarationADefinition())
     {
         if (cxxMethodDecl->isCopyAssignmentOperator()
             || cxxMethodDecl->isMoveAssignmentOperator()
@@ -465,7 +427,7 @@ bool UnusedFields::TraverseFunctionDecl(FunctionDecl* functionDecl)
     auto copy1 = insideStreamOutputOperator;
     auto copy2 = insideFunctionDecl;
     auto copy3 = insideMoveOrCopyOrCloneDeclParent;
-    if (functionDecl->getLocation().isValid() && !ignoreLocation(compat::getBeginLoc(functionDecl)) && functionDecl->isThisDeclarationADefinition())
+    if (functionDecl->getLocation().isValid() && !ignoreLocation(functionDecl->getBeginLoc()) && functionDecl->isThisDeclarationADefinition())
     {
         auto op = functionDecl->getOverloadedOperator();
         if (op == OO_LessLess
@@ -532,7 +494,7 @@ bool UnusedFields::VisitMemberExpr( const MemberExpr* memberExpr )
         return true;
     }
     fieldDecl = fieldDecl->getCanonicalDecl();
-    if (ignoreLocation(compat::getBeginLoc(fieldDecl))) {
+    if (ignoreLocation(fieldDecl->getBeginLoc())) {
         return true;
     }
     // ignore stuff that forms part of the stable URE interface
@@ -774,12 +736,12 @@ void UnusedFields::checkIfReadFrom(const FieldDecl* fieldDecl, const Expr* membe
         report(
              DiagnosticsEngine::Warning,
              "oh dear, what can the matter be?",
-              compat::getBeginLoc(memberExpr))
+              memberExpr->getBeginLoc())
               << memberExpr->getSourceRange();
         report(
              DiagnosticsEngine::Note,
              "parent over here",
-              compat::getBeginLoc(parent))
+              parent->getBeginLoc())
               << parent->getSourceRange();
         parent->dump();
         memberExpr->dump();
@@ -990,7 +952,7 @@ void UnusedFields::checkIfWrittenTo(const FieldDecl* fieldDecl, const Expr* memb
         report(
              DiagnosticsEngine::Warning,
              "oh dear, what can the matter be? writtenTo=%0",
-              compat::getBeginLoc(memberExpr))
+              memberExpr->getBeginLoc())
               << bPotentiallyWrittenTo
               << memberExpr->getSourceRange();
         if (parent)
@@ -998,7 +960,7 @@ void UnusedFields::checkIfWrittenTo(const FieldDecl* fieldDecl, const Expr* memb
             report(
                  DiagnosticsEngine::Note,
                  "parent over here",
-                  compat::getBeginLoc(parent))
+                  parent->getBeginLoc())
                   << parent->getSourceRange();
             parent->dump();
         }
@@ -1106,7 +1068,7 @@ bool UnusedFields::IsPassedByNonConst(const FieldDecl* fieldDecl, const Stmt * c
 // have to do it here
 bool UnusedFields::VisitCXXConstructorDecl( const CXXConstructorDecl* cxxConstructorDecl )
 {
-    if (ignoreLocation( compat::getBeginLoc(cxxConstructorDecl) )) {
+    if (ignoreLocation( cxxConstructorDecl->getBeginLoc() )) {
         return true;
     }
     // ignore stuff that forms part of the stable URE interface
@@ -1139,7 +1101,7 @@ bool UnusedFields::VisitCXXConstructorDecl( const CXXConstructorDecl* cxxConstru
 // have to do it here.
 bool UnusedFields::VisitInitListExpr( const InitListExpr* initListExpr)
 {
-    if (ignoreLocation( compat::getBeginLoc(initListExpr) ))
+    if (ignoreLocation( initListExpr->getBeginLoc() ))
         return true;
 
     QualType varType = initListExpr->getType().getDesugaredType(compiler.getASTContext());
@@ -1165,7 +1127,7 @@ bool UnusedFields::VisitDeclRefExpr( const DeclRefExpr* declRefExpr )
         return true;
     }
     fieldDecl = fieldDecl->getCanonicalDecl();
-    if (ignoreLocation(compat::getBeginLoc(fieldDecl))) {
+    if (ignoreLocation(fieldDecl->getBeginLoc())) {
         return true;
     }
     // ignore stuff that forms part of the stable URE interface

@@ -27,6 +27,7 @@
 #include <uno/lbnames.h>
 #include <uno/mapping.hxx>
 
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/component_context.hxx>
 #include <cppuhelper/implbase.hxx>
@@ -43,6 +44,7 @@
 #include <comphelper/sequence.hxx>
 
 #include <memory>
+#include <utility>
 
 constexpr OUStringLiteral SMGR_SINGLETON = u"/singletons/com.sun.star.lang.theServiceManager";
 constexpr OUStringLiteral TDMGR_SINGLETON = u"/singletons/com.sun.star.reflection.theTypeDescriptionManager";
@@ -113,15 +115,8 @@ void DisposingForwarder::disposing( lang::EventObject const & )
 
 namespace {
 
-struct MutexHolder
-{
-protected:
-    Mutex m_mutex;
-};
-
-
 class ComponentContext
-    : private MutexHolder
+    : private cppu::BaseMutex
     , public WeakComponentImplHelper< XComponentContext,
                                       container::XNameContainer >
 {
@@ -133,8 +128,8 @@ protected:
         Any value;
         bool lateInit;
 
-        ContextEntry( Any const & value_, bool lateInit_ )
-            : value( value_ )
+        ContextEntry( Any value_, bool lateInit_ )
+            : value(std::move( value_ ))
             , lateInit( lateInit_ )
             {}
     };
@@ -184,7 +179,7 @@ void ComponentContext::insertByName(
             /* lateInit_: */
             name.startsWith( "/singletons/" ) &&
             !element.hasValue() );
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     std::pair<t_map::iterator, bool> insertion( m_map.emplace(
         name, entry ) );
     if (! insertion.second)
@@ -196,7 +191,7 @@ void ComponentContext::insertByName(
 
 void ComponentContext::removeByName( OUString const & name )
 {
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     t_map::iterator iFind( m_map.find( name ) );
     if (iFind == m_map.end())
         throw container::NoSuchElementException(
@@ -211,7 +206,7 @@ void ComponentContext::removeByName( OUString const & name )
 void ComponentContext::replaceByName(
     OUString const & name, Any const & element )
 {
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     t_map::iterator iFind( m_map.find( name ) );
     if (iFind == m_map.end())
         throw container::NoSuchElementException(
@@ -240,14 +235,14 @@ Any ComponentContext::getByName( OUString const & name )
 
 Sequence<OUString> ComponentContext::getElementNames()
 {
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     return comphelper::mapKeysToSequence(m_map);
 }
 
 
 sal_Bool ComponentContext::hasByName( OUString const & name )
 {
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     return m_map.find( name ) != m_map.end();
 }
 
@@ -261,14 +256,14 @@ Type ComponentContext::getElementType()
 
 sal_Bool ComponentContext::hasElements()
 {
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     return ! m_map.empty();
 }
 
 
 Any ComponentContext::lookupMap( OUString const & rName )
 {
-    ResettableMutexGuard guard( m_mutex );
+    ResettableMutexGuard guard( m_aMutex );
     t_map::iterator iFind( m_map.find( rName ) );
     if (iFind == m_map.end())
         return Any();
@@ -403,7 +398,7 @@ void ComponentContext::disposing()
             if (rEntry.lateInit)
             {
                 // late init
-                MutexGuard guard( m_mutex );
+                MutexGuard guard( m_aMutex );
                 if (rEntry.lateInit)
                 {
                     rEntry.value.clear(); // release factory
@@ -464,7 +459,7 @@ void ComponentContext::disposing()
 ComponentContext::ComponentContext(
     ContextEntry_Init const * pEntries, sal_Int32 nEntries,
     Reference< XComponentContext > const & xDelegate )
-    : WeakComponentImplHelper( m_mutex ),
+    : WeakComponentImplHelper( m_aMutex ),
       m_xDelegate( xDelegate )
 {
     for ( sal_Int32 nPos = 0; nPos < nEntries; ++nPos )

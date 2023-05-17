@@ -40,6 +40,7 @@
 #include <com/sun/star/sheet/DataImportMode.hpp>
 #include <com/sun/star/table/TableOrientation.hpp>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <memory>
 
@@ -167,7 +168,7 @@ ScXMLDatabaseRangeContext::ScXMLDatabaseRangeContext( ScXMLImport& rImport,
                 case XML_ELEMENT( TABLE, XML_REFRESH_DELAY ):
                 {
                     double fTime;
-                    if (::sax::Converter::convertDuration( fTime, aIter.toString() ))
+                    if (::sax::Converter::convertDuration( fTime, aIter.toView() ))
                         nRefresh = std::max( static_cast<sal_Int32>(fTime * 86400.0), sal_Int32(0) );
                 }
                 break;
@@ -683,12 +684,12 @@ ScXMLSortGroupsContext::ScXMLSortGroupsContext( ScXMLImport& rImport,
                 const OUString &sValue = aIter.toString();
                 if (sValue.getLength() > 8)
                 {
-                    OUString sTemp = sValue.copy(0, 8);
-                    if (sTemp == "UserList")
+                    std::u16string_view sTemp = sValue.subView(0, 8);
+                    if (sTemp == u"UserList")
                     {
                         pDatabaseRangeContext->SetSubTotalsEnabledUserList(true);
-                        sTemp = sValue.copy(8);
-                        pDatabaseRangeContext->SetSubTotalsUserListIndex(static_cast<sal_Int16>(sTemp.toInt32()));
+                        sTemp = sValue.subView(8);
+                        pDatabaseRangeContext->SetSubTotalsUserListIndex(static_cast<sal_Int16>(o3tl::toInt32(sTemp)));
                     }
                     else
                     {

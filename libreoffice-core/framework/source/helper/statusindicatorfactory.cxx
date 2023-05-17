@@ -44,8 +44,8 @@ sal_Int32 StatusIndicatorFactory::m_nInReschedule = 0;  ///< static counter for 
 
 constexpr OUStringLiteral PROGRESS_RESOURCE = u"private:resource/progressbar/progressbar";
 
-StatusIndicatorFactory::StatusIndicatorFactory(const css::uno::Reference< css::uno::XComponentContext >& xContext)
-    : m_xContext          (xContext )
+StatusIndicatorFactory::StatusIndicatorFactory(css::uno::Reference< css::uno::XComponentContext >  xContext)
+    : m_xContext          (std::move(xContext ))
     , m_bAllowReschedule  (false)
     , m_bAllowParentShow  (false)
     , m_bDisableReschedule(false)
@@ -87,6 +87,9 @@ void SAL_CALL StatusIndicatorFactory::initialize(const css::uno::Sequence< css::
        }
     }
 
+#ifdef EMSCRIPTEN
+    m_bDisableReschedule = true;
+#endif
     impl_createProgress();
 }
 
@@ -372,7 +375,7 @@ void StatusIndicatorFactory::implts_makeParentVisibleIfAllowed()
     VclPtr<vcl::Window> pWindow = VCLUnoHelper::GetWindow(xParentWindow);
     if ( pWindow )
     {
-        bool bForceFrontAndFocus(officecfg::Office::Common::View::NewDocumentHandling::ForceFocusAndToFront::get(xContext));
+        bool bForceFrontAndFocus(officecfg::Office::Common::View::NewDocumentHandling::ForceFocusAndToFront::get());
         pWindow->Show(true, bForceFrontAndFocus ? ShowFlags::ForegroundTask : ShowFlags::NONE );
     }
 
@@ -519,6 +522,7 @@ void StatusIndicatorFactory::impl_reschedule(bool bForce)
     if (m_nInReschedule != 0)
         return;
 
+    // coverity[missing_lock: FALSE] - coverity fails to see the aRescheduleGuard ctor as taking a lock
     ++m_nInReschedule;
     aRescheduleGuard.unlock();
     // <- SAFE

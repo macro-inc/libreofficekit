@@ -39,12 +39,10 @@ class Diagram;
 class LayoutNode;
 typedef std::shared_ptr< LayoutNode > LayoutNodePtr;
 class LayoutAtom;
-typedef std::shared_ptr<LayoutAtom> LayoutAtomPtr;
-
+typedef std::shared_ptr< LayoutAtom > LayoutAtomPtr;
 typedef std::map< OUString, css::uno::Reference<css::xml::dom::XDocument> > DiagramDomMap;
-
-typedef std::map<OUString, LayoutAtomPtr> LayoutAtomMap;
-typedef std::map<const dgm::Point*, ShapePtr> PresPointShapeMap;
+typedef std::map< OUString, LayoutAtomPtr > LayoutAtomMap;
+typedef std::map< const svx::diagram::Point*, ShapePtr > PresPointShapeMap;
 
 class DiagramLayout
 {
@@ -68,13 +66,13 @@ public:
         { return mpNode; }
     const LayoutNodePtr & getNode() const
         { return mpNode; }
-    DiagramDataPtr & getSampData()
+    OoxDiagramDataPtr& getSampData()
         { return mpSampData; }
-    const DiagramDataPtr & getSampData() const
+    const OoxDiagramDataPtr& getSampData() const
         { return mpSampData; }
-    DiagramDataPtr & getStyleData()
+    OoxDiagramDataPtr& getStyleData()
         { return mpStyleData; }
-    const DiagramDataPtr & getStyleData() const
+    const OoxDiagramDataPtr& getStyleData() const
         { return mpStyleData; }
     LayoutAtomMap & getLayoutAtomMap()
         { return maLayoutAtomMap; }
@@ -90,8 +88,8 @@ private:
     OUString msTitle;
     OUString msDesc;
     LayoutNodePtr  mpNode;
-    DiagramDataPtr mpSampData;
-    DiagramDataPtr mpStyleData;
+    OoxDiagramDataPtr mpSampData;
+    OoxDiagramDataPtr mpStyleData;
     // TODO
     // catLst
     // clrData
@@ -130,10 +128,10 @@ typedef std::map<OUString,DiagramColor> DiagramColorMap;
 class Diagram
 {
 public:
-    explicit Diagram(const ShapePtr& pShape);
-    void setData( const DiagramDataPtr & pData )
+    explicit Diagram();
+    void setData( OoxDiagramDataPtr& pData )
         { mpData = pData; }
-    const DiagramDataPtr& getData() const
+    const OoxDiagramDataPtr& getData() const
         { return mpData; }
     void setLayout( const DiagramLayoutPtr & pLayout )
         { mpLayout = pLayout; }
@@ -149,11 +147,14 @@ public:
     void addTo( const ShapePtr & pShape );
 
     css::uno::Sequence<css::beans::PropertyValue> getDomsAsPropertyValues() const;
-    const ShapePtr & getShape() const { return mpShape; }
+    oox::core::NamedShapePairs& getDiagramFontHeights() { return maDiagramFontHeights; }
+    void syncDiagramFontHeights();
 
 private:
-    ShapePtr mpShape;
-    DiagramDataPtr                 mpData;
+    // This contains groups of shapes: automatic font size is the same in each group.
+    oox::core::NamedShapePairs maDiagramFontHeights;
+
+    OoxDiagramDataPtr              mpData;
     DiagramLayoutPtr               mpLayout;
     DiagramQStyleMap               maStyles;
     DiagramColorMap                maColors;

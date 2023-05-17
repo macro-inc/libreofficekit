@@ -116,12 +116,12 @@ void Button::dispose()
     Control::dispose();
 }
 
-void Button::SetCommandHandler(const OUString& aCommand)
+void Button::SetCommandHandler(const OUString& aCommand, const css::uno::Reference<css::frame::XFrame>& rFrame)
 {
     maCommand = aCommand;
     SetClickHdl( LINK( this, Button, dispatchCommandHandler) );
 
-    mpButtonData->mpStatusListener = new VclStatusListener<Button>(this, aCommand);
+    mpButtonData->mpStatusListener = new VclStatusListener<Button>(this, rFrame, aCommand);
     mpButtonData->mpStatusListener->startListening();
 }
 
@@ -242,7 +242,7 @@ void Button::ImplDrawAlignedImage(OutputDevice* pDev, Point& rPos,
         // If the button text doesn't fit into it, put it into a tooltip (might happen in sidebar)
         if (GetQuickHelpText()!= aText && mpButtonData->mbGeneratedTooltip)
             SetQuickHelpText("");
-        if (GetQuickHelpText().isEmpty() && textRect.getWidth() > rSize.getWidth())
+        if (GetQuickHelpText().isEmpty() && textRect.getOpenWidth() > rSize.getWidth())
         {
             SetQuickHelpText(aText);
             mpButtonData->mbGeneratedTooltip = true;
@@ -643,6 +643,8 @@ void PushButton::DumpAsPropertyTree(tools::JsonWriter& rJsonWriter)
     Button::DumpAsPropertyTree(rJsonWriter);
     if (GetSymbol() != SymbolType::DONTKNOW)
         rJsonWriter.put("symbol", symbolTypeName(GetSymbol()));
+    if (isToggleButton())
+        rJsonWriter.put("isToggle", true);
 }
 
 IMPL_STATIC_LINK( Button, dispatchCommandHandler, Button*, pButton, void )
@@ -895,6 +897,23 @@ void PushButton::ImplDrawPushButtonContent(OutputDevice *pDev, SystemTextColorFl
             else
                 aColor = rStyleSettings.GetButtonTextColor();
 
+#if defined(MACOSX) || defined(IOS)
+    // tdf#152486 These are the buttons in infobars where the infobar has a custom
+    // background color and on these platforms the buttons blend with
+    // their background.
+    vcl::Window* pParent = GetParent();
+    if (pParent->get_id() == "ExtraButton")
+    {
+        while (pParent && !pParent->IsControlBackground())
+            pParent = pParent->GetParent();
+        if (pParent)
+        {
+            if (aColor.IsBright() && !pParent->GetControlBackground().IsDark())
+                aColor = COL_BLACK;
+        }
+    }
+#endif
+
     pDev->SetTextColor(aColor);
 
     if ( IsEnabled() )
@@ -975,6 +994,9 @@ void PushButton::ImplDrawPushButton(vcl::RenderContext& rRenderContext)
     // adjust style if button should be rendered 'pressed'
     if (mbPressed || mbIsActive)
         nButtonStyle |= DrawButtonFlags::Pressed;
+
+    if (GetStyle() & WB_FLATBUTTON)
+        nButtonStyle |= DrawButtonFlags::Flat;
 
     // TODO: move this to Window class or make it a member !!!
     ControlType aCtrlType = ControlType::Generic;
@@ -1102,8 +1124,6 @@ void PushButton::ImplDrawPushButton(vcl::RenderContext& rRenderContext)
 
         if (GetStyle() & WB_FLATBUTTON)
             aControlValue.m_bFlatButton = true;
-        if (GetStyle() & WB_BEVELBUTTON)
-            aControlValue.mbBevelButton = true;
 
         // draw frame into invisible window to have aInRect modified correctly
         // but do not shift the inner rect for pressed buttons (ie remove DrawButtonFlags::Pressed)
@@ -1124,7 +1144,7 @@ void PushButton::ImplDrawPushButton(vcl::RenderContext& rRenderContext)
         Size aInRectSize(rRenderContext.LogicToPixel(Size(aInRect.GetWidth(), aInRect.GetHeight())));
         aControlValue.mbSingleLine = (aInRectSize.Height() < 2 * aFontSize.Height());
 
-        if ((nState & ControlState::ROLLOVER) || !(GetStyle() & WB_FLATBUTTON)
+        if (!aControlValue.m_bFlatButton || (nState & ControlState::ROLLOVER) || (nState & ControlState::PRESSED)
             || (HasFocus() && mpWindowImpl->mbUseNativeFocus
                 && !IsNativeControlSupported(ControlType::Pushbutton, ControlPart::Focus)))
         {
@@ -1151,8 +1171,7 @@ void PushButton::ImplDrawPushButton(vcl::RenderContext& rRenderContext)
     if (GetStyle() & WB_FLATBUTTON)
     {
         tools::Rectangle aTempRect(aInRect);
-        if (bRollOver)
-            ImplDrawPushButtonFrame(rRenderContext, aTempRect, nButtonStyle);
+        ImplDrawPushButtonFrame(rRenderContext, aTempRect, nButtonStyle);
         aInRect.AdjustLeft(2 );
         aInRect.AdjustTop(2 );
         aInRect.AdjustRight( -2 );
@@ -1543,7 +1562,7 @@ void PushButton::DataChanged( const DataChangedEvent& rDCEvt )
 
 bool PushButton::PreNotify( NotifyEvent& rNEvt )
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE )
+    if( rNEvt.GetType() == NotifyEventType::MOUSEMOVE )
     {
         const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
         if( pMouseEvt && (pMouseEvt->IsEnterWindow() || pMouseEvt->IsLeaveWindow()) )
@@ -2667,7 +2686,7 @@ void RadioButton::DataChanged( const DataChangedEvent& rDCEvt )
 
 bool RadioButton::PreNotify( NotifyEvent& rNEvt )
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE )
+    if( rNEvt.GetType() == NotifyEventType::MOUSEMOVE )
     {
         const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
         if( pMouseEvt && !pMouseEvt->GetButtons() && !pMouseEvt->IsSynthetic() && !pMouseEvt->IsModifierChanged() )
@@ -3548,7 +3567,7 @@ void CheckBox::DataChanged( const DataChangedEvent& rDCEvt )
 
 bool CheckBox::PreNotify( NotifyEvent& rNEvt )
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE )
+    if( rNEvt.GetType() == NotifyEventType::MOUSEMOVE )
     {
         const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
         if( pMouseEvt && !pMouseEvt->GetButtons() && !pMouseEvt->IsSynthetic() && !pMouseEvt->IsModifierChanged() )

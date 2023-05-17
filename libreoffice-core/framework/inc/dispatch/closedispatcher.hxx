@@ -115,9 +115,9 @@ class CloseDispatcher final : public  ::cppu::WeakImplHelper<
             @param  sTarget
                     help us to find the right target for this close operation.
          */
-        CloseDispatcher(const css::uno::Reference< css::uno::XComponentContext >& rxContext  ,
+        CloseDispatcher(css::uno::Reference< css::uno::XComponentContext >        xContext  ,
                         const css::uno::Reference< css::frame::XFrame >&          xFrame ,
-                        const OUString&                                           sTarget);
+                        std::u16string_view                                       sTarget);
 
         /** @short  does nothing real. */
         virtual ~CloseDispatcher() override;
@@ -252,7 +252,7 @@ class CloseDispatcher final : public  ::cppu::WeakImplHelper<
         */
 
         static css::uno::Reference< css::frame::XFrame > static_impl_searchRightTargetFrame(const css::uno::Reference< css::frame::XFrame >& xFrame ,
-                                                                                            const OUString&                           sTarget);
+                                                                                            std::u16string_view                        sTarget);
 
 }; // class CloseDispatcher
 

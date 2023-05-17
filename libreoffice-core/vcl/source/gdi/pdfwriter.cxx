@@ -81,11 +81,12 @@ void PDFWriter::DrawTextLine(
 void PDFWriter::DrawTextArray(
                               const Point& rStartPt,
                               const OUString& rStr,
-                              o3tl::span<const sal_Int32> pDXAry,
+                              KernArraySpan pDXAry,
+                              o3tl::span<const sal_Bool> pKashidaAry,
                               sal_Int32 nIndex,
                               sal_Int32 nLen )
 {
-    xImplementation->drawTextArray( rStartPt, rStr, pDXAry, nIndex, nLen );
+    xImplementation->drawTextArray( rStartPt, rStr, pDXAry, pKashidaAry, nIndex, nLen );
 }
 
 void PDFWriter::DrawStretchText(
@@ -329,14 +330,14 @@ void PDFWriter::DrawJPGBitmap( SvStream& rStreamData, bool bIsTrueColor, const S
     xImplementation->drawJPGBitmap( rStreamData, bIsTrueColor, rSrcSizePixel, rTargetArea, rAlphaMask, rGraphic );
 }
 
-sal_Int32 PDFWriter::CreateLink( const tools::Rectangle& rRect, sal_Int32 nPageNr )
+sal_Int32 PDFWriter::CreateLink(const tools::Rectangle& rRect, sal_Int32 nPageNr, OUString const& rAltText)
 {
-    return xImplementation->createLink( rRect, nPageNr );
+    return xImplementation->createLink(rRect, nPageNr, rAltText);
 }
 
-sal_Int32 PDFWriter::CreateScreen(const tools::Rectangle& rRect, sal_Int32 nPageNr)
+sal_Int32 PDFWriter::CreateScreen(const tools::Rectangle& rRect, sal_Int32 nPageNr, OUString const& rAltText)
 {
-    return xImplementation->createScreen(rRect, nPageNr);
+    return xImplementation->createScreen(rRect, nPageNr, rAltText);
 }
 
 sal_Int32 PDFWriter::RegisterDestReference( sal_Int32 nDestId, const tools::Rectangle& rRect, sal_Int32 nPageNr, DestAreaType eType )
@@ -378,7 +379,7 @@ void PDFWriter::SetLinkPropertyID( sal_Int32 nLinkId, sal_Int32 nPropertyId )
     xImplementation->setLinkPropertyId( nLinkId, nPropertyId );
 }
 
-sal_Int32 PDFWriter::CreateOutlineItem( sal_Int32 nParent, const OUString& rText, sal_Int32 nDestID )
+sal_Int32 PDFWriter::CreateOutlineItem( sal_Int32 nParent, std::u16string_view rText, sal_Int32 nDestID )
 {
     return xImplementation->createOutlineItem( nParent, rText, nDestID );
 }
@@ -388,7 +389,7 @@ void PDFWriter::CreateNote( const tools::Rectangle& rRect, const PDFNote& rNote,
     xImplementation->createNote( rRect, rNote, nPageNr );
 }
 
-sal_Int32 PDFWriter::BeginStructureElement( PDFWriter::StructElement eType, const OUString& rAlias )
+sal_Int32 PDFWriter::BeginStructureElement( PDFWriter::StructElement eType, std::u16string_view rAlias )
 {
     return xImplementation->beginStructureElement( eType, rAlias );
 }
@@ -416,6 +417,11 @@ void PDFWriter::SetStructureAttributeNumerical( enum StructAttribute eAttr, sal_
 void PDFWriter::SetStructureBoundingBox( const tools::Rectangle& rRect )
 {
     xImplementation->setStructureBoundingBox( rRect );
+}
+
+void PDFWriter::SetStructureAnnotIds(::std::vector<sal_Int32> const& rAnnotIds)
+{
+    xImplementation->setStructureAnnotIds(rAnnotIds);
 }
 
 void PDFWriter::SetActualText( const OUString& rText )

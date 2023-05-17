@@ -75,7 +75,7 @@ class FWK_DLLPUBLIC TitleHelper final : private ::cppu::BaseMutex
             @param  xNumbers
                     provides the right string and number for  an untitled component.
          */
-        TitleHelper(const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+        TitleHelper(css::uno::Reference< css::uno::XComponentContext > xContext,
             const css::uno::Reference< css::uno::XInterface >& xOwner,
             const css::uno::Reference< css::frame::XUntitledNumbers >& xNumbers);
 
@@ -140,7 +140,7 @@ class FWK_DLLPUBLIC TitleHelper final : private ::cppu::BaseMutex
 
         void impl_setSubTitle (const css::uno::Reference< css::frame::XTitle >& xSubTitle);
 
-        OUString impl_convertURL2Title(const OUString& sURL);
+        OUString impl_convertURL2Title(std::u16string_view sURL);
 
 
     // member

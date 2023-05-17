@@ -30,6 +30,7 @@ public:
     std::unique_ptr<weld::Button> xAssignPB;
     std::unique_ptr<weld::Button> xAssignComponentPB;
     std::unique_ptr<weld::Button> xDeletePB;
+    std::unique_ptr<weld::Button> xDeleteAllPB;
     std::unique_ptr<weld::TreeView> xEventLB;
     bool                        bReadOnly;
     bool                        bIDEDialogMode;
@@ -46,7 +47,7 @@ private:
     DECL_LINK(ButtonHandler, weld::Button&, void);
 
 public:
-    AssignComponentDialog(weld::Window* pParent, const OUString& rURL);
+    AssignComponentDialog(weld::Window* pParent, OUString aURL);
     virtual ~AssignComponentDialog() override;
 
     const OUString& getURL() const { return maURL; }

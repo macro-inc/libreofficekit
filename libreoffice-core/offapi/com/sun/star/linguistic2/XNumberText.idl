@@ -17,13 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_linguistic2_XNumberText_idl__
-#define __com_sun_star_linguistic2_XNumberText_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
-#include <com/sun/star/lang/Locale.idl>
-#include <com/sun/star/lang/IllegalArgumentException.idl>
-
 module com { module sun { module star { module linguistic2 {
 
 /** This interface allows to spell out numbers and money amounts
@@ -47,6 +40,7 @@ module com { module sun { module star { module linguistic2 {
         <li>eo : Esperanto</li>
         <li>es : Spanish</li>
         <li>et : Estonian</li>
+        <li>fa : Persian (Farsi)</li>
         <li>fi : Finnish</li>
         <li>fr : French</li>
         <li>fr-BE : Belgian French</li>
@@ -70,6 +64,7 @@ module com { module sun { module star { module linguistic2 {
         <li>mr : Marathi</li>
         <li>ms : Malay</li>
         <li>mt : Maltese</li>
+        <li>mul : multiple languages (footnote numbering styles)</li>
         <li>nb : Bokmål (Norwegian)</li>
         <li>nl : Dutch</li>
         <li>nn : Nynorsk (Norwegian)</li>
@@ -130,7 +125,5 @@ interface XNumberText
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

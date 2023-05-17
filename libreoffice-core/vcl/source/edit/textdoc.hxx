@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_VCL_SOURCE_EDIT_TEXTDOC_HXX
-#define INCLUDED_VCL_SOURCE_EDIT_TEXTDOC_HXX
+#pragma once
 
 #include <rtl/ustring.hxx>
 #include <vcl/textdata.hxx>
@@ -72,7 +71,7 @@ class TextNode
     void                CollapseAttribs( sal_Int32 nIndex, sal_Int32 nDelChars );
 
 public:
-                        TextNode( const OUString& rText );
+                        TextNode( OUString aText );
 
     TextNode( const TextNode& ) = delete;
     void operator=( const TextNode& ) = delete;
@@ -83,7 +82,7 @@ public:
     const TextCharAttribList&   GetCharAttribs() const  { return maCharAttribs; }
     TextCharAttribList&         GetCharAttribs()        { return maCharAttribs; }
 
-    void                InsertText( sal_Int32 nPos, const OUString& rText );
+    void                InsertText( sal_Int32 nPos, std::u16string_view rText );
     void                InsertText( sal_Int32 nPos, sal_Unicode c );
     void                RemoveText( sal_Int32 nPos, sal_Int32 nChars );
 
@@ -109,7 +108,7 @@ public:
 
     void                RemoveChars( const TextPaM& rPaM, sal_Int32 nChars );
     TextPaM             InsertText( const TextPaM& rPaM, sal_Unicode c );
-    TextPaM             InsertText( const TextPaM& rPaM, const OUString& rStr );
+    TextPaM             InsertText( const TextPaM& rPaM, std::u16string_view rStr );
 
     TextPaM             InsertParaBreak( const TextPaM& rPaM );
     TextPaM             ConnectParagraphs( TextNode* pLeft, const TextNode* pRight );
@@ -123,7 +122,5 @@ public:
 
     bool            IsValidPaM( const TextPaM& rPaM );
 };
-
-#endif // INCLUDED_VCL_SOURCE_EDIT_TEXTDOC_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

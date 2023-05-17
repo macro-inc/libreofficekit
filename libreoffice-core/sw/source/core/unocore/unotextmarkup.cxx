@@ -19,9 +19,11 @@
 
 #include <unotextmarkup.hxx>
 
+#include <comphelper/servicehelper.hxx>
 #include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <svl/listener.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <SwSmartTagMgr.hxx>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
@@ -50,9 +52,9 @@ struct SwXTextMarkup::Impl
     SwTextNode* m_pTextNode;
     ModelToViewHelper const m_ConversionMap;
 
-    Impl(SwTextNode* const pTextNode, const ModelToViewHelper& rMap)
+    Impl(SwTextNode* const pTextNode, ModelToViewHelper aMap)
         : m_pTextNode(pTextNode)
-        , m_ConversionMap(rMap)
+        , m_ConversionMap(std::move(aMap))
     {
         if(m_pTextNode)
             StartListening(pTextNode->GetNotifier());
@@ -89,10 +91,7 @@ const ModelToViewHelper& SwXTextMarkup::GetConversionMap() const
 
 uno::Reference< container::XStringKeyMap > SAL_CALL SwXTextMarkup::getMarkupInfoContainer()
 {
-    SolarMutexGuard aGuard;
-
-    uno::Reference< container::XStringKeyMap > xProp = new SwXStringKeyMap;
-    return xProp;
+    return new SwXStringKeyMap;
 }
 
 void SAL_CALL SwXTextMarkup::commitTextRangeMarkup(::sal_Int32 nType, const OUString & aIdentifier, const uno::Reference< text::XTextRange> & xRange,
@@ -112,19 +111,17 @@ void SAL_CALL SwXTextMarkup::commitTextRangeMarkup(::sal_Int32 nType, const OUSt
 
         ::sw::XTextRangeToSwPaM(aPam, xRange);
 
-        SwPosition* startPos = aPam.Start();
-        SwPosition* endPos   = aPam.End();
+        auto [startPos, endPos] = aPam.StartEnd(); // SwPosition*
 
-        commitStringMarkup (nType, aIdentifier, startPos->nContent.GetIndex(), endPos->nContent.GetIndex() - startPos->nContent.GetIndex(), xMarkupInfoContainer);
+        commitStringMarkup (nType, aIdentifier, startPos->GetContentIndex(), endPos->GetContentIndex() - startPos->GetContentIndex(), xMarkupInfoContainer);
     }
     else if (auto pCursor = comphelper::getFromUnoTunnel<OTextCursorHelper>(xRangeTunnel))
     {
         SwPaM & rPam(*pCursor->GetPaM());
 
-        SwPosition* startPos = rPam.Start();
-        SwPosition* endPos   = rPam.End();
+        auto [startPos, endPos] = rPam.StartEnd(); // SwPosition*
 
-        commitStringMarkup (nType, aIdentifier, startPos->nContent.GetIndex(), endPos->nContent.GetIndex() - startPos->nContent.GetIndex(), xMarkupInfoContainer);
+        commitStringMarkup (nType, aIdentifier, startPos->GetContentIndex(), endPos->GetContentIndex() - startPos->GetContentIndex(), xMarkupInfoContainer);
     }
 }
 

@@ -17,9 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/base64.hxx>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
@@ -37,6 +38,7 @@
 #include <com/sun/star/text/HoriOrientation.hpp>
 #include <com/sun/star/text/VertOrientation.hpp>
 #include <sax/tools/converter.hxx>
+#include <utility>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
@@ -94,9 +96,9 @@ class XMLTextFrameContextHyperlink_Impl
 
 public:
 
-    inline XMLTextFrameContextHyperlink_Impl( const OUString& rHRef,
-                       const OUString& rName,
-                       const OUString& rTargetFrameName,
+    inline XMLTextFrameContextHyperlink_Impl( OUString aHRef,
+                       OUString aName,
+                       OUString aTargetFrameName,
                        bool bMap );
 
     const OUString& GetHRef() const { return sHRef; }
@@ -106,11 +108,11 @@ public:
 };
 
 inline XMLTextFrameContextHyperlink_Impl::XMLTextFrameContextHyperlink_Impl(
-    const OUString& rHRef, const OUString& rName,
-    const OUString& rTargetFrameName, bool bM ) :
-    sHRef( rHRef ),
-    sName( rName ),
-    sTargetFrameName( rTargetFrameName ),
+    OUString aHRef, OUString aName,
+    OUString aTargetFrameName, bool bM ) :
+    sHRef(std::move( aHRef )),
+    sName(std::move( aName )),
+    sTargetFrameName(std::move( aTargetFrameName )),
     bMap( bM )
 {
 }
@@ -368,6 +370,8 @@ class XMLTextFrameContext_Impl : public SvXMLImportContext
     bool    bCreateFailed : 1;
     bool    bOwnBase64Stream : 1;
     bool    mbMultipleContent : 1; // This context is created based on a multiple content (image)
+    bool    m_isDecorative = false;
+    bool    m_isSplitAllowed = false;
 
     void Create();
 
@@ -678,6 +682,16 @@ void XMLTextFrameContext_Impl::Create()
     if( TextContentAnchorType_AT_PAGE == eAnchorType && nPage > 0 )
     {
         xPropSet->setPropertyValue( "AnchorPageNo", Any(nPage) );
+    }
+
+    if (m_isDecorative && xPropSetInfo->hasPropertyByName("Decorative"))
+    {
+        xPropSet->setPropertyValue("Decorative", uno::Any(true));
+    }
+
+    if (m_isSplitAllowed && xPropSetInfo->hasPropertyByName("IsSplitAllowed"))
+    {
+        xPropSet->setPropertyValue("IsSplitAllowed", uno::Any(true));
     }
 
     if( XML_TEXT_FRAME_OBJECT != nType  &&
@@ -1062,8 +1076,16 @@ XMLTextFrameContext_Impl::XMLTextFrameContext_Impl(
         case XML_ELEMENT(DRAW, XML_NOTIFY_ON_UPDATE_OF_TABLE):
             sTblName = aIter.toString();
             break;
+        case XML_ELEMENT(LO_EXT, XML_DECORATIVE):
+        case XML_ELEMENT(DRAW, XML_DECORATIVE):
+            ::sax::Converter::convertBool(m_isDecorative, aIter.toString());
+            break;
+        case XML_ELEMENT(LO_EXT, XML_MAY_BREAK_BETWEEN_PAGES):
+        case XML_ELEMENT(DRAW, XML_MAY_BREAK_BETWEEN_PAGES):
+            sax::Converter::convertBool(m_isSplitAllowed, aIter.toString());
+            break;
         default:
-            XMLOFF_WARN_UNKNOWN("xmloff", aIter);
+            SAL_INFO("xmloff", "unknown attribute " << SvXMLImport::getPrefixAndNameFromToken(aIter.getToken()) << " value=" << aIter.toString());
         }
     };
 
@@ -1090,8 +1112,8 @@ void XMLTextFrameContext_Impl::endFastElement(sal_Int32 )
           XML_TEXT_FRAME_GRAPHIC == nType) &&
         !xPropSet.is() && !bCreateFailed )
     {
-        OUString sTrimmedChars = maUrlBuffer.makeStringAndClear().trim();
-        if( !sTrimmedChars.isEmpty() )
+        std::u16string_view sTrimmedChars = o3tl::trim(maUrlBuffer);
+        if( !sTrimmedChars.empty() )
         {
             if( !xBase64Stream.is() )
             {
@@ -1128,6 +1150,7 @@ void XMLTextFrameContext_Impl::endFastElement(sal_Int32 )
                     sBase64CharsLeft = sChars.copy( nCharsDecoded );
             }
         }
+        maUrlBuffer.setLength(0);
     }
 
     CreateIfNotThere();
@@ -1287,7 +1310,7 @@ void XMLTextFrameContext_Impl::SetTitle( const OUString& rTitle )
         Reference< XPropertySetInfo > xPropSetInfo = xPropSet->getPropertySetInfo();
         if( xPropSetInfo->hasPropertyByName( "Title" ) )
         {
-            xPropSet->setPropertyValue( "Title", makeAny( rTitle ) );
+            xPropSet->setPropertyValue( "Title", Any( rTitle ) );
         }
     }
 }
@@ -1299,7 +1322,7 @@ void XMLTextFrameContext_Impl::SetDesc( const OUString& rDesc )
         Reference< XPropertySetInfo > xPropSetInfo = xPropSet->getPropertySetInfo();
         if( xPropSetInfo->hasPropertyByName( "Description" ) )
         {
-            xPropSet->setPropertyValue( "Description", makeAny( rDesc ) );
+            xPropSet->setPropertyValue( "Description", Any( rDesc ) );
         }
     }
 }
@@ -1471,7 +1494,7 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > XMLTextFrameContext::c
                     {
                         if( aIter.getToken() == XML_ELEMENT(DRAW, XML_MIME_TYPE) )
                         {
-                            if( aIter.toString() == "application/vnd.sun.star.media" )
+                            if( aIter.toView() == "application/vnd.sun.star.media" )
                                 bMedia = true;
 
                             // leave this loop

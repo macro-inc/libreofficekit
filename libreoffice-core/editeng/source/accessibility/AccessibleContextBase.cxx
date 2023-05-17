@@ -26,7 +26,6 @@
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <com/sun/star/accessibility/IllegalAccessibleComponentStateException.hpp>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -43,27 +42,26 @@ namespace accessibility {
 // internal
 
 AccessibleContextBase::AccessibleContextBase (
-        const uno::Reference<XAccessible>& rxParent,
+        uno::Reference<XAccessible> xParent,
         const sal_Int16 aRole)
     :   WeakComponentImplHelper(m_aMutex),
-        mxParent(rxParent),
+        mxParent(std::move(xParent)),
         meDescriptionOrigin(NotSet),
         meNameOrigin(NotSet),
         mnClientId(0),
         maRole(aRole)
 {
     // Create the state set.
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet  = new ::utl::AccessibleStateSetHelper ();
-    mxStateSet = pStateSet;
+    mnStateSet = 0;
 
     // Set some states.  Don't use the SetState method because no events
     // shall be broadcasted (that is not yet initialized anyway).
-    pStateSet->AddState (AccessibleStateType::ENABLED);
-    pStateSet->AddState (AccessibleStateType::SENSITIVE);
-    pStateSet->AddState (AccessibleStateType::SHOWING);
-    pStateSet->AddState (AccessibleStateType::VISIBLE);
-    pStateSet->AddState (AccessibleStateType::FOCUSABLE);
-    pStateSet->AddState (AccessibleStateType::SELECTABLE);
+    mnStateSet |= AccessibleStateType::ENABLED;
+    mnStateSet |= AccessibleStateType::SENSITIVE;
+    mnStateSet |= AccessibleStateType::SHOWING;
+    mnStateSet |= AccessibleStateType::VISIBLE;
+    mnStateSet |= AccessibleStateType::FOCUSABLE;
+    mnStateSet |= AccessibleStateType::SELECTABLE;
 
     // Create the relation set.
     mxRelationSet = new ::utl::AccessibleRelationSetHelper ();
@@ -73,14 +71,12 @@ AccessibleContextBase::~AccessibleContextBase()
 {
 }
 
-bool AccessibleContextBase::SetState (sal_Int16 aState)
+bool AccessibleContextBase::SetState (sal_Int64 aState)
 {
     ::osl::ClearableMutexGuard aGuard (m_aMutex);
-    ::utl::AccessibleStateSetHelper* pStateSet =
-        static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-    if ((pStateSet != nullptr) && !pStateSet->contains(aState))
+    if (!(mnStateSet & aState))
     {
-        pStateSet->AddState (aState);
+        mnStateSet |= aState;
         // Clear the mutex guard so that it is not locked during calls to
         // listeners.
         aGuard.clear();
@@ -102,14 +98,12 @@ bool AccessibleContextBase::SetState (sal_Int16 aState)
 }
 
 
-bool AccessibleContextBase::ResetState (sal_Int16 aState)
+bool AccessibleContextBase::ResetState (sal_Int64 aState)
 {
     ::osl::ClearableMutexGuard aGuard (m_aMutex);
-    ::utl::AccessibleStateSetHelper* pStateSet =
-        static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-    if ((pStateSet != nullptr) && pStateSet->contains(aState))
+    if (mnStateSet & aState)
     {
-        pStateSet->RemoveState (aState);
+        mnStateSet &= ~aState;
         // Clear the mutex guard so that it is not locked during calls to listeners.
         aGuard.clear();
 
@@ -126,16 +120,10 @@ bool AccessibleContextBase::ResetState (sal_Int16 aState)
 }
 
 
-bool AccessibleContextBase::GetState (sal_Int16 aState)
+bool AccessibleContextBase::GetState (sal_Int64 aState)
 {
     ::osl::MutexGuard aGuard (m_aMutex);
-    ::utl::AccessibleStateSetHelper* pStateSet =
-        static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-    if (pStateSet != nullptr)
-        return pStateSet->contains(aState);
-    else
-        // If there is no state set then return false as a default value.
-        return false;
+    return mnStateSet & aState;
 }
 
 
@@ -175,7 +163,7 @@ uno::Reference< XAccessibleContext> SAL_CALL
 
 /** No children.
 */
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
        AccessibleContextBase::getAccessibleChildCount()
 {
     return 0;
@@ -186,7 +174,7 @@ sal_Int32 SAL_CALL
     an exception for a wrong index.
 */
 uno::Reference<XAccessible> SAL_CALL
-    AccessibleContextBase::getAccessibleChild (sal_Int32 nIndex)
+    AccessibleContextBase::getAccessibleChild (sal_Int64 nIndex)
 {
     ThrowIfDisposed ();
     throw lang::IndexOutOfBoundsException (
@@ -203,29 +191,31 @@ uno::Reference<XAccessible> SAL_CALL
 }
 
 
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
        AccessibleContextBase::getAccessibleIndexInParent()
 {
     ThrowIfDisposed ();
     //  Use a simple but slow solution for now.  Optimize later.
 
     //  Iterate over all the parent's children and search for this object.
-    if (mxParent.is())
+    if (!mxParent.is())
+        //   Return -1 to indicate that this object's parent does not know about the
+        //   object.
+        return -1;
+
+    uno::Reference<XAccessibleContext> xParentContext (
+        mxParent->getAccessibleContext());
+    if (xParentContext.is())
     {
-        uno::Reference<XAccessibleContext> xParentContext (
-            mxParent->getAccessibleContext());
-        if (xParentContext.is())
+        sal_Int64 nChildCount = xParentContext->getAccessibleChildCount();
+        for (sal_Int64 i=0; i<nChildCount; i++)
         {
-            sal_Int32 nChildCount = xParentContext->getAccessibleChildCount();
-            for (sal_Int32 i=0; i<nChildCount; i++)
+            uno::Reference<XAccessible> xChild (xParentContext->getAccessibleChild (i));
+            if (xChild.is())
             {
-                uno::Reference<XAccessible> xChild (xParentContext->getAccessibleChild (i));
-                if (xChild.is())
-                {
-                    uno::Reference<XAccessibleContext> xChildContext = xChild->getAccessibleContext();
-                    if (xChildContext == static_cast<XAccessibleContext*>(this))
-                        return i;
-                }
+                uno::Reference<XAccessibleContext> xChildContext = xChild->getAccessibleContext();
+                if (xChildContext == static_cast<XAccessibleContext*>(this))
+                    return i;
             }
         }
     }
@@ -296,28 +286,19 @@ uno::Reference<XAccessibleRelationSet> SAL_CALL
         SHOWING
         VISIBLE
 */
-uno::Reference<XAccessibleStateSet> SAL_CALL
+sal_Int64 SAL_CALL
     AccessibleContextBase::getAccessibleStateSet()
 {
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet;
-
     if (rBHelper.bDisposed)
     {
         // We are already disposed!
         // Create a new state set that has only set the DEFUNC state.
-        pStateSet = new ::utl::AccessibleStateSetHelper ();
-        pStateSet->AddState (AccessibleStateType::DEFUNC);
+        return AccessibleStateType::DEFUNC;
     }
     else
     {
-        // Create a copy of the state set and return it.
-        pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-
-        if (pStateSet != nullptr)
-            pStateSet = new ::utl::AccessibleStateSetHelper (*pStateSet);
+        return mnStateSet;
     }
-
-    return pStateSet;
 }
 
 

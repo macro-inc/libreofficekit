@@ -27,7 +27,7 @@
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/logging/LogLevel.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
@@ -35,6 +35,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 #include <vector>
 
 namespace drivermanager
@@ -99,11 +100,11 @@ Any SAL_CALL ODriverEnumeration::nextElement(  )
     if ( !hasMoreElements() )
         throwNoSuchElementException();
 
-    return makeAny( *m_aPos++ );
+    return Any( *m_aPos++ );
 }
 
-    namespace {
-
+namespace
+{
     /// an STL functor which ensures that a SdbcDriver described by a DriverAccess is loaded
     struct EnsureDriver
     {
@@ -113,23 +114,23 @@ Any SAL_CALL ODriverEnumeration::nextElement(  )
         const DriverAccess& operator()( const DriverAccess& _rDescriptor ) const
         {
             // we did not load this driver, yet
-            if (!_rDescriptor.xDriver.is())
+            if (_rDescriptor.xDriver.is())
+                return _rDescriptor;
+
+            // we have a factory for it
+            if (_rDescriptor.xComponentFactory.is())
             {
-                // we have a factory for it
-                if (_rDescriptor.xComponentFactory.is())
+                DriverAccess& rDesc = const_cast<DriverAccess&>(_rDescriptor);
+                try
                 {
-                    DriverAccess& rDesc = const_cast<DriverAccess&>(_rDescriptor);
-                    try
-                    {
-                        //load driver
-                        rDesc.xDriver.set(
-                            rDesc.xComponentFactory->createInstanceWithContext(mxContext), css::uno::UNO_QUERY);
-                    }
-                    catch (const Exception&)
-                    {
-                        //failure, abandon driver
-                        rDesc.xComponentFactory.clear();
-                    }
+                    //load driver
+                    rDesc.xDriver.set(
+                        rDesc.xComponentFactory->createInstanceWithContext(mxContext), css::uno::UNO_QUERY);
+                }
+                catch (const Exception&)
+                {
+                    //failure, abandon driver
+                    rDesc.xComponentFactory.clear();
                 }
             }
             return _rDescriptor;
@@ -174,9 +175,8 @@ Any SAL_CALL ODriverEnumeration::nextElement(  )
         }
     };
 
-    }
-
-    static sal_Int32 lcl_getDriverPrecedence( const Reference<XComponentContext>& _rContext, Sequence< OUString >& _rPrecedence )
+#if !ENABLE_FUZZERS
+    sal_Int32 lcl_getDriverPrecedence( const Reference<XComponentContext>& _rContext, Sequence< OUString >& _rPrecedence )
     {
         _rPrecedence.realloc( 0 );
         try
@@ -187,7 +187,7 @@ Any SAL_CALL ODriverEnumeration::nextElement(  )
 
             // one argument for creating the node access: the path to the configuration node
             Sequence< Any > aCreationArgs{ Any(NamedValue(
-                "nodepath", makeAny( OUString("org.openoffice.Office.DataAccess/DriverManager") ) )) };
+                "nodepath", Any( OUString("org.openoffice.Office.DataAccess/DriverManager") ) )) };
 
             // create the node access
             Reference< XNameAccess > xDriverManagerNode(
@@ -210,10 +210,9 @@ Any SAL_CALL ODriverEnumeration::nextElement(  )
 
         return _rPrecedence.getLength();
     }
+#endif
 
-    namespace {
-
-    /// an STL argorithm compatible predicate comparing two DriverAccess instances by their implementation names
+    /// an STL algorithm compatible predicate comparing two DriverAccess instances by their implementation names
     struct CompareDriverAccessByName
     {
 
@@ -223,19 +222,18 @@ Any SAL_CALL ODriverEnumeration::nextElement(  )
         }
     };
 
-    /// and STL argorithm compatible predicate comparing a DriverAccess' impl name to a string
+    /// and an STL algorithm compatible predicate comparing the impl name of a DriverAccess to a string
     struct EqualDriverAccessToName
     {
         OUString m_sImplName;
-        explicit EqualDriverAccessToName(const OUString& _sImplName) : m_sImplName(_sImplName){}
+        explicit EqualDriverAccessToName(OUString _sImplName) : m_sImplName(std::move(_sImplName)){}
 
         bool operator()( const DriverAccess& lhs)
         {
             return lhs.sImplementationName == m_sImplName;
         }
     };
-
-    }
+}
 
 OSDBCDriverManager::OSDBCDriverManager( const Reference< XComponentContext >& _rxContext )
     :OSDBCDriverManager_Base(m_aMutex)

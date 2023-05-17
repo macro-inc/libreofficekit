@@ -25,11 +25,12 @@
 #include <oox/token/relationship.hxx>
 #include <oox/export/utils.hxx>
 #include <drawingml/chart/typegroupconverter.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 
 #include <cstdio>
 #include <limits>
 
-#include <com/sun/star/awt/Gradient.hpp>
+#include <com/sun/star/awt/Gradient2.hpp>
 #include <com/sun/star/chart/XChartDocument.hpp>
 #include <com/sun/star/chart/ChartLegendPosition.hpp>
 #include <com/sun/star/chart/XTwoAxisXSupplier.hpp>
@@ -98,9 +99,8 @@
 #include "ColorPropertySet.hxx"
 
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <svl/numuno.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 #include <set>
@@ -136,8 +136,8 @@ bool isPrimaryAxes(sal_Int32 nIndex)
 class lcl_MatchesRole
 {
 public:
-    explicit lcl_MatchesRole( const OUString & aRole ) :
-            m_aRole( aRole )
+    explicit lcl_MatchesRole( OUString aRole ) :
+            m_aRole(std::move( aRole ))
     {}
 
     bool operator () ( const Reference< chart2::data::XLabeledDataSequence > & xSeq ) const
@@ -481,14 +481,6 @@ static sal_Int32 lcl_generateRandomValue()
     return comphelper::rng::uniform_int_distribution(0, 100000000-1);
 }
 
-static sal_Int32 lcl_getAlphaFromTransparenceGradient(const awt::Gradient& rGradient, bool bStart)
-{
-    // Our alpha is a gray color value.
-    sal_uInt8 nRed = ::Color(ColorTransparency, bStart ? rGradient.StartColor : rGradient.EndColor).GetRed();
-    // drawingML alpha is a percentage on a 0..100000 scale.
-    return (255 - nRed) * oox::drawingml::MAX_PERCENT / 255;
-}
-
 bool DataLabelsRange::empty() const
 {
     return maLabels.empty();
@@ -504,7 +496,7 @@ bool DataLabelsRange::hasLabel(sal_Int32 nIndex) const
     return maLabels.find(nIndex) != maLabels.end();
 }
 
-OUString DataLabelsRange::getRange() const
+const OUString & DataLabelsRange::getRange() const
 {
     return maRange;
 }
@@ -751,9 +743,9 @@ OUString ChartExport::parseFormula( const OUString& rRange )
         uno::Sequence<sheet::FormulaToken> aTokens = xParser->parseFormula( rRange, CellAddress( 0, 0, 0 ) );
         if( xParserProps.is() )
         {
-            xParserProps->setPropertyValue("FormulaConvention", uno::makeAny(css::sheet::AddressConvention::XL_OOX) );
+            xParserProps->setPropertyValue("FormulaConvention", uno::Any(css::sheet::AddressConvention::XL_OOX) );
             // For referencing named ranges correctly with special excel chart syntax.
-            xParserProps->setPropertyValue("RefConventionChartOOXML", uno::makeAny(true) );
+            xParserProps->setPropertyValue("RefConventionChartOOXML", uno::Any(true) );
         }
         aResult = xParser->printFormula( aTokens, CellAddress( 0, 0, 0 ) );
     }
@@ -875,6 +867,8 @@ void ChartExport::WriteChartObj( const Reference< XShape >& xShape, sal_Int32 nI
 
     SetFS( pChart );
     ExportContent();
+    SetFS( pFS );
+    pChart->endDocument();
 }
 
 void ChartExport::InitRangeSegmentationProperties( const Reference< chart2::XChartDocument > & xChartDoc )
@@ -1116,6 +1110,7 @@ void ChartExport::exportAdditionalShapes( const Reference< css::chart::XChartDoc
                 pDrawing->endElement(FSNS(XML_cdr, XML_relSizeAnchor));
             }
             pDrawing->endElement(FSNS(XML_c, XML_userShapes));
+            pDrawing->endDocument();
         }
     }
     catch (const uno::Exception&)
@@ -1908,7 +1903,7 @@ void ChartExport::exportSolidFill(const Reference< XPropertySet >& xPropSet)
     }
     // OOXML has no separate transparence gradient but uses transparency in the gradient stops.
     // So we merge transparency and color and use gradient fill in such case.
-    awt::Gradient aTransparenceGradient;
+    awt::Gradient2 aTransparenceGradient;
     bool bNeedGradientFill(false);
     OUString sFillTransparenceGradientName;
     if (GetProperty(xPropSet, "FillTransparenceGradientName")
@@ -1918,28 +1913,40 @@ void ChartExport::exportSolidFill(const Reference< XPropertySet >& xPropSet)
         uno::Reference< lang::XMultiServiceFactory > xFact( getModel(), uno::UNO_QUERY );
         uno::Reference< container::XNameAccess > xTransparenceGradient(xFact->createInstance("com.sun.star.drawing.TransparencyGradientTable"), uno::UNO_QUERY);
         uno::Any rTransparenceValue = xTransparenceGradient->getByName(sFillTransparenceGradientName);
-        rTransparenceValue >>= aTransparenceGradient;
-        if (aTransparenceGradient.StartColor != aTransparenceGradient.EndColor)
-            bNeedGradientFill = true;
-        else if (aTransparenceGradient.StartColor != 0)
-            nAlpha = lcl_getAlphaFromTransparenceGradient(aTransparenceGradient, true);
+
+        if (basegfx::utils::fillGradient2FromAny(aTransparenceGradient, rTransparenceValue))
+        {
+            basegfx::ColorStops aColorStops;
+            basegfx::utils::fillColorStopsFromAny(aColorStops, rTransparenceValue);
+            basegfx::BColor aSingleColor;
+            bNeedGradientFill = !basegfx::utils::isSingleColor(aColorStops, aSingleColor);
+        }
+
+        if (!bNeedGradientFill && 0 != aTransparenceGradient.StartColor)
+        {
+            // Our alpha is a gray color value.
+            sal_uInt8 nRed(0);
+
+            if (aTransparenceGradient.ColorStops.getLength() > 0)
+            {
+                nRed = static_cast<sal_uInt8>(aTransparenceGradient.ColorStops[0].StopColor.Red * 255.0);
+            }
+            else
+            {
+                nRed = ::Color(ColorTransparency, aTransparenceGradient.StartColor).GetRed();
+            }
+
+            // drawingML alpha is a percentage on a 0..100000 scale.
+            nAlpha = (255 - nRed) * oox::drawingml::MAX_PERCENT / 255;
+        }
     }
     // write XML
     if (bNeedGradientFill)
     {
-        awt::Gradient aPseudoColorGradient;
-        aPseudoColorGradient.XOffset = aTransparenceGradient.XOffset;
-        aPseudoColorGradient.YOffset = aTransparenceGradient.YOffset;
-        aPseudoColorGradient.StartIntensity = 100;
-        aPseudoColorGradient.EndIntensity = 100;
-        aPseudoColorGradient.Angle = aTransparenceGradient.Angle;
-        aPseudoColorGradient.Border = aTransparenceGradient.Border;
-        aPseudoColorGradient.Style = aTransparenceGradient.Style;
-        aPseudoColorGradient.StartColor = nFillColor;
-        aPseudoColorGradient.EndColor = nFillColor;
-        aPseudoColorGradient.StepCount = aTransparenceGradient.StepCount;
+        // no longer create copy/PseudoColorGradient, use new API of
+        // WriteGradientFill to express fix fill color
         mpFS->startElementNS(XML_a, XML_gradFill, XML_rotWithShape, "0");
-        WriteGradientFill(aPseudoColorGradient, aTransparenceGradient);
+        WriteGradientFill(nullptr, nFillColor, &aTransparenceGradient);
         mpFS->endElementNS(XML_a, XML_gradFill);
     }
     else
@@ -2007,23 +2014,34 @@ void ChartExport::exportGradientFill( const Reference< XPropertySet >& xPropSet 
     {
         uno::Reference< container::XNameAccess > xGradient( xFact->createInstance("com.sun.star.drawing.GradientTable"), uno::UNO_QUERY );
         uno::Any rGradientValue = xGradient->getByName( sFillGradientName );
-        awt::Gradient aGradient;
-        if( rGradientValue >>= aGradient )
+        awt::Gradient2 aGradient;
+
+        if (basegfx::utils::fillGradient2FromAny(aGradient, rGradientValue))
         {
-            awt::Gradient aTransparenceGradient;
+            awt::Gradient2 aTransparenceGradient;
             mpFS->startElementNS(XML_a, XML_gradFill);
             OUString sFillTransparenceGradientName;
             if( (xPropSet->getPropertyValue("FillTransparenceGradientName") >>= sFillTransparenceGradientName) && !sFillTransparenceGradientName.isEmpty())
             {
                 uno::Reference< container::XNameAccess > xTransparenceGradient(xFact->createInstance("com.sun.star.drawing.TransparencyGradientTable"), uno::UNO_QUERY);
                 uno::Any rTransparenceValue = xTransparenceGradient->getByName(sFillTransparenceGradientName);
-                rTransparenceValue >>= aTransparenceGradient;
-                WriteGradientFill(aGradient, aTransparenceGradient);
+                basegfx::utils::fillGradient2FromAny(aTransparenceGradient, rTransparenceValue);
+                WriteGradientFill(&aGradient, 0, &aTransparenceGradient);
+            }
+            else if (GetProperty(xPropSet, "FillTransparence") )
+            {
+                // no longer create PseudoTransparencyGradient, use new API of
+                // WriteGradientFill to express fix transparency
+                sal_Int32 nTransparency = 0;
+                mAny >>= nTransparency;
+                // nTransparency is [0..100]%
+                WriteGradientFill(&aGradient, 0, nullptr, nTransparency * 0.01);
             }
             else
             {
-                WriteGradientFill(aGradient, aTransparenceGradient, xPropSet);
+                WriteGradientFill(&aGradient, 0, &aTransparenceGradient);
             }
+
             mpFS->endElementNS(XML_a, XML_gradFill);
         }
     }
@@ -2054,7 +2072,7 @@ void ChartExport::exportDataTable( )
     if (GetProperty(aPropSet, "Outline"))
         mAny >>= bShowOutline;
     if (GetProperty(aPropSet, "Keys"))
-        mAny >>= bShowOutline;
+        mAny >>= bShowKeys;
 
     pFS->startElement(FSNS(XML_c, XML_dTable));
 
@@ -3361,9 +3379,8 @@ void ChartExport::_exportAxis(
         aNumberFormatString = getNumberFormatCode(nKey);
     }
 
-    OString sNumberFormatString = OUStringToOString(aNumberFormatString, RTL_TEXTENCODING_UTF8);
     pFS->singleElement(FSNS(XML_c, XML_numFmt),
-            XML_formatCode, sNumberFormatString.getStr(),
+            XML_formatCode, aNumberFormatString,
             XML_sourceLinked, bLinkedNumFmt ? "1" : "0");
 
     // majorTickMark
@@ -3892,10 +3909,9 @@ void ChartExport::exportDataLabels(
         mAny >>= nKey;
 
         OUString aNumberFormatString = getNumberFormatCode(nKey);
-        OString sNumberFormatString = OUStringToOString(aNumberFormatString, RTL_TEXTENCODING_UTF8);
 
         pFS->singleElement(FSNS(XML_c, XML_numFmt),
-            XML_formatCode, sNumberFormatString,
+            XML_formatCode, aNumberFormatString,
             XML_sourceLinked, ToPsz10(bLinkedNumFmt));
     }
 
@@ -3989,9 +4005,8 @@ void ChartExport::exportDataLabels(
             mAny >>= nKey;
 
             OUString aNumberFormatString = getNumberFormatCode(nKey);
-            OString sNumberFormatString = OUStringToOString(aNumberFormatString, RTL_TEXTENCODING_UTF8);
 
-            pFS->singleElement(FSNS(XML_c, XML_numFmt), XML_formatCode, sNumberFormatString.getStr(),
+            pFS->singleElement(FSNS(XML_c, XML_numFmt), XML_formatCode, aNumberFormatString,
                                XML_sourceLinked, ToPsz10(bLinkedNumFmt));
         }
 

@@ -130,7 +130,7 @@ void SwCharFormats::SetFormatNameAndReindex(SwCharFormat* v, const OUString& sNe
 {
     auto it = find(v);
     erase(it);
-    v->SetName(sNewName);
+    v->SetFormatName(sNewName);
     insert(v);
 }
 

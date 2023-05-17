@@ -1,22 +1,22 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import select_pos
-from uitest.uihelper.common import select_by_text
 from uitest.uihelper.common import change_measurement_unit
-from uitest.uihelper.calc import enter_text_to_cell
-from libreoffice.calc.document import get_cell_by_position
+from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+from uitest.uihelper.common import select_by_text, select_pos
+
 from libreoffice.uno.propertyvalue import mkPropertyValues
-from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file, type_text
 
 from com.sun.star.lang import Locale
 
-#Chart Display Data Labels dialog
 
+# Chart Display Data Labels dialog
 class chartDataLabels(UITestCase):
    def test_chart_data_labels_dialog(self):
     with self.ui_test.load_file(get_url_for_data_file("tdf98390.ods")) as calc_doc:
@@ -45,7 +45,6 @@ class chartDataLabels(UITestCase):
             self.assertFalse(xDataSeries[0].Label.ShowLegendSymbol)
             self.assertEqual(xDataSeries[0].LabelSeparator, " ")
 
-            valueAsNumber = xDialog.getChild("CB_VALUE_AS_NUMBER")
             category = xDialog.getChild("CB_CATEGORY")
             legend = xDialog.getChild("CB_SYMBOL")
             wrapText = xDialog.getChild("CB_WRAP_TEXT")
@@ -137,13 +136,6 @@ class chartDataLabels(UITestCase):
 
             valueAsNumber = xDialog.getChild("CB_VALUE_AS_NUMBER")
             valueAsPercentage = xDialog.getChild("CB_VALUE_AS_PERCENTAGE")
-            category = xDialog.getChild("CB_CATEGORY")
-            legend = xDialog.getChild("CB_SYMBOL")
-            wrapText = xDialog.getChild("CB_WRAP_TEXT")
-            separator = xDialog.getChild("LB_TEXT_SEPARATOR")
-            placement = xDialog.getChild("LB_LABEL_PLACEMENT")
-            degrees = xDialog.getChild("NF_LABEL_DEGREES")
-            textDirection = xDialog.getChild("LB_LABEL_TEXTDIR")
             buttonPercentage = xDialog.getChild("PB_PERCENT_NUMBERFORMAT")
 
             valueAsNumber.executeAction("CLICK", tuple())
@@ -194,18 +186,9 @@ class chartDataLabels(UITestCase):
 
             valueAsNumber = xDialog.getChild("CB_VALUE_AS_NUMBER")
             valueAsPercentage = xDialog.getChild("CB_VALUE_AS_PERCENTAGE")
-            category = xDialog.getChild("CB_CATEGORY")
-            legend = xDialog.getChild("CB_SYMBOL")
-            wrapText = xDialog.getChild("CB_WRAP_TEXT")
-            separator = xDialog.getChild("LB_TEXT_SEPARATOR")
-            placement = xDialog.getChild("LB_LABEL_PLACEMENT")
-            degrees = xDialog.getChild("NF_LABEL_DEGREES")
-            textDirection = xDialog.getChild("LB_LABEL_TEXTDIR")
-            buttonPercentage = xDialog.getChild("PB_PERCENT_NUMBERFORMAT")
 
             self.assertEqual(get_state_as_dict(valueAsNumber)["Selected"], "false")
             self.assertEqual(get_state_as_dict(valueAsPercentage)["Selected"], "true")
-
 
         self.assertFalse(xDataSeries[0].Label.ShowNumber)
         self.assertTrue(xDataSeries[0].Label.ShowNumberInPercent)
@@ -272,7 +255,7 @@ class chartDataLabels(UITestCase):
         self.assertEqual(xDataSeries[0].NumberFormat, xFormat)
 
    def test_tdf136573(self):
-    with self.ui_test.load_file(get_url_for_data_file("dataLabels.ods")) as calc_doc:
+    with self.ui_test.load_file(get_url_for_data_file("dataLabels.ods")):
         xCalcDoc = self.xUITest.getTopFocusWindow()
         gridwin = xCalcDoc.getChild("grid_window")
 

@@ -13,7 +13,7 @@
  manual changes will be rewritten by the next run of update_pch.sh (which presumably
  also fixes all possible problems, so it's usually better to use it).
 
- Generated on 2021-09-28 05:49:06 using:
+ Generated on 2022-08-13 18:01:29 using:
  ./bin/update_pch sw swui --cutoff=3 --exclude:system --include:module --include:local
 
  If after updating build fails, use the following command to locate conflicting headers:
@@ -36,6 +36,7 @@
 #include <initializer_list>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <limits.h>
 #include <limits>
 #include <list>
@@ -55,6 +56,7 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 #include <boost/property_tree/ptree_fwd.hpp>
@@ -75,6 +77,7 @@
 #include <rtl/math.hxx>
 #include <rtl/ref.hxx>
 #include <rtl/strbuf.h>
+#include <rtl/strbuf.hxx>
 #include <rtl/string.h>
 #include <rtl/string.hxx>
 #include <rtl/stringconcat.hxx>
@@ -99,10 +102,11 @@
 #include <vcl/GraphicObject.hxx>
 #include <vcl/IDialogRenderable.hxx>
 #include <vcl/Scanline.hxx>
+#include <vcl/WindowPosSize.hxx>
 #include <vcl/accessibletableprovider.hxx>
 #include <vcl/alpha.hxx>
 #include <vcl/animate/Animation.hxx>
-#include <vcl/animate/AnimationBitmap.hxx>
+#include <vcl/animate/AnimationFrame.hxx>
 #include <vcl/bitmap.hxx>
 #include <vcl/bitmap/BitmapTypes.hxx>
 #include <vcl/bitmapex.hxx>
@@ -114,7 +118,7 @@
 #include <vcl/devicecoordinate.hxx>
 #include <vcl/dllapi.h>
 #include <vcl/dockwin.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/event.hxx>
 #include <vcl/fntstyle.hxx>
 #include <vcl/font.hxx>
@@ -126,7 +130,6 @@
 #include <vcl/headbar.hxx>
 #include <vcl/idle.hxx>
 #include <vcl/image.hxx>
-#include <vcl/keycod.hxx>
 #include <vcl/keycodes.hxx>
 #include <vcl/mapmod.hxx>
 #include <vcl/metaactiontypes.hxx>
@@ -148,6 +151,7 @@
 #include <vcl/rendercontext/SalLayoutFlags.hxx>
 #include <vcl/rendercontext/State.hxx>
 #include <vcl/rendercontext/SystemTextColorFlags.hxx>
+#include <vcl/salgtype.hxx>
 #include <vcl/salnativewidgets.hxx>
 #include <vcl/scopedbitmapaccess.hxx>
 #include <vcl/settings.hxx>
@@ -156,17 +160,19 @@
 #include <vcl/task.hxx>
 #include <vcl/textfilter.hxx>
 #include <vcl/timer.hxx>
-#include <vcl/toolbox.hxx>
+#include <vcl/toolboxid.hxx>
 #include <vcl/transfer.hxx>
 #include <vcl/uitest/factory.hxx>
 #include <vcl/vclenum.hxx>
 #include <vcl/vclptr.hxx>
 #include <vcl/vclreferencebase.hxx>
 #include <vcl/vectorgraphicdata.hxx>
+#include <vcl/virdev.hxx>
 #include <vcl/wall.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/window.hxx>
 #include <vcl/windowstate.hxx>
+#include <vcl/wintypes.hxx>
 #include <vcl/wizardmachine.hxx>
 #endif // PCH_LEVEL >= 2
 #if PCH_LEVEL >= 3
@@ -177,6 +183,7 @@
 #include <basegfx/point/b2ipoint.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
+#include <basegfx/range/Range2D.hxx>
 #include <basegfx/range/b2drange.hxx>
 #include <basegfx/range/basicrange.hxx>
 #include <basegfx/tuple/Tuple2D.hxx>
@@ -203,7 +210,6 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XChild.hpp>
 #include <com/sun/star/container/XEnumeration.hpp>
-#include <com/sun/star/container/XEnumerationAccess.hpp>
 #include <com/sun/star/container/XIndexReplace.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
@@ -235,6 +241,7 @@
 #include <com/sun/star/drawing/DashStyle.hpp>
 #include <com/sun/star/drawing/HatchStyle.hpp>
 #include <com/sun/star/drawing/LineCap.hpp>
+#include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/embed/Aspects.hpp>
 #include <com/sun/star/embed/XStorage.hpp>
 #include <com/sun/star/embed/XVisualObject.hpp>
@@ -251,8 +258,6 @@
 #include <com/sun/star/frame/XTitleChangeBroadcaster.hpp>
 #include <com/sun/star/frame/XUntitledNumbers.hpp>
 #include <com/sun/star/graphic/XPrimitive2D.hpp>
-#include <com/sun/star/i18n/Calendar2.hpp>
-#include <com/sun/star/i18n/NativeNumberXmlAttributes.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
 #include <com/sun/star/i18n/TransliterationModules.hpp>
 #include <com/sun/star/i18n/TransliterationModulesExtra.hpp>
@@ -274,7 +279,6 @@
 #include <com/sun/star/mail/XConnectionListener.hpp>
 #include <com/sun/star/mail/XMailMessage.hpp>
 #include <com/sun/star/rdf/XDocumentMetadataAccess.hpp>
-#include <com/sun/star/rdf/XMetadatable.hpp>
 #include <com/sun/star/script/XStarBasicAccess.hpp>
 #include <com/sun/star/script/provider/XScriptProviderSupplier.hpp>
 #include <com/sun/star/sdbc/XConnection.hpp>
@@ -286,17 +290,14 @@
 #include <com/sun/star/text/RubyAdjust.hpp>
 #include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/text/VertOrientation.hpp>
-#include <com/sun/star/text/XRelativeTextContentInsert.hpp>
-#include <com/sun/star/text/XRelativeTextContentRemove.hpp>
-#include <com/sun/star/text/XTextAppendAndConvert.hpp>
-#include <com/sun/star/text/XTextCopy.hpp>
-#include <com/sun/star/text/XTextRangeCompare.hpp>
+#include <com/sun/star/text/XFootnote.hpp>
+#include <com/sun/star/text/XTextContent.hpp>
+#include <com/sun/star/text/XTextField.hpp>
 #include <com/sun/star/ui/XUIConfigurationManagerSupplier.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
 #include <com/sun/star/uno/Any.h>
 #include <com/sun/star/uno/Any.hxx>
-#include <com/sun/star/uno/Exception.hpp>
 #include <com/sun/star/uno/Reference.h>
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/uno/RuntimeException.hpp>
@@ -321,11 +322,11 @@
 #include <com/sun/star/util/XModifiable2.hpp>
 #include <com/sun/star/view/XPrintJobBroadcaster.hpp>
 #include <com/sun/star/view/XPrintable.hpp>
+#include <comphelper/compbase.hxx>
 #include <comphelper/comphelperdllapi.h>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
-#include <comphelper/servicehelper.hxx>
 #include <comphelper/string.hxx>
 #include <cppu/cppudllapi.h>
 #include <cppu/unotype.hxx>
@@ -338,16 +339,18 @@
 #include <cppuhelper/implbase_ex_post.hxx>
 #include <cppuhelper/implbase_ex_pre.hxx>
 #include <cppuhelper/interfacecontainer.h>
+#include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/weak.hxx>
 #include <cppuhelper/weakagg.hxx>
 #include <cppuhelper/weakref.hxx>
 #include <drawinglayer/attribute/fillgradientattribute.hxx>
 #include <drawinglayer/attribute/sdrfillattribute.hxx>
 #include <drawinglayer/drawinglayerdllapi.h>
+#include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/primitive2d/CommonTypes.hxx>
 #include <drawinglayer/primitive2d/Primitive2DContainer.hxx>
 #include <drawinglayer/primitive2d/Primitive2DVisitor.hxx>
-#include <editeng/adjustitem.hxx>
+#include <drawinglayer/primitive2d/baseprimitive2d.hxx>
 #include <editeng/borderline.hxx>
 #include <editeng/boxitem.hxx>
 #include <editeng/brushitem.hxx>
@@ -356,51 +359,40 @@
 #include <editeng/editstat.hxx>
 #include <editeng/eedata.hxx>
 #include <editeng/fontitem.hxx>
-#include <editeng/forbiddenruleitem.hxx>
-#include <editeng/formatbreakitem.hxx>
 #include <editeng/frmdiritem.hxx>
-#include <editeng/hngpnctitem.hxx>
-#include <editeng/hyphenzoneitem.hxx>
 #include <editeng/keepitem.hxx>
 #include <editeng/langitem.hxx>
 #include <editeng/lrspitem.hxx>
-#include <editeng/lspcitem.hxx>
 #include <editeng/numdef.hxx>
 #include <editeng/numitem.hxx>
-#include <editeng/orphitem.hxx>
 #include <editeng/outliner.hxx>
 #include <editeng/overflowingtxt.hxx>
 #include <editeng/paperinf.hxx>
 #include <editeng/paragraphdata.hxx>
-#include <editeng/paravertalignitem.hxx>
-#include <editeng/pgrditem.hxx>
-#include <editeng/scriptspaceitem.hxx>
 #include <editeng/shaditem.hxx>
 #include <editeng/sizeitem.hxx>
-#include <editeng/spltitem.hxx>
 #include <editeng/svxenum.hxx>
 #include <editeng/svxfont.hxx>
-#include <editeng/tstpitem.hxx>
 #include <editeng/ulspitem.hxx>
-#include <editeng/widwitem.hxx>
 #include <i18nlangtag/i18nlangtagdllapi.h>
 #include <i18nlangtag/lang.h>
 #include <i18nlangtag/languagetag.hxx>
 #include <i18nutil/i18nutildllapi.h>
 #include <i18nutil/paper.hxx>
-#include <i18nutil/transliteration.hxx>
 #include <o3tl/cow_wrapper.hxx>
 #include <o3tl/deleter.hxx>
 #include <o3tl/safeint.hxx>
 #include <o3tl/sorted_vector.hxx>
+#include <o3tl/span.hxx>
+#include <o3tl/string_view.hxx>
 #include <o3tl/strong_int.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <o3tl/underlyingenumvalue.hxx>
 #include <o3tl/unit_conversion.hxx>
 #include <officecfg/Office/Writer.hxx>
 #include <ooo/vba/XHelperInterface.hpp>
-#include <ooo/vba/word/WdSaveFormat.hpp>
 #include <ooo/vba/word/XSection.hpp>
+#include <ooo/vba/word/XWrapFormat.hpp>
 #include <salhelper/salhelperdllapi.h>
 #include <salhelper/simplereferenceobject.hxx>
 #include <sfx2/basedlgs.hxx>
@@ -412,6 +404,7 @@
 #include <sfx2/docfile.hxx>
 #include <sfx2/docfilt.hxx>
 #include <sfx2/filedlghelper.hxx>
+#include <sfx2/frame.hxx>
 #include <sfx2/htmlmode.hxx>
 #include <sfx2/linksrc.hxx>
 #include <sfx2/lnkbase.hxx>
@@ -436,12 +429,9 @@
 #include <svl/itempool.hxx>
 #include <svl/itemset.hxx>
 #include <svl/languageoptions.hxx>
-#include <svl/listener.hxx>
 #include <svl/lstner.hxx>
 #include <svl/macitem.hxx>
-#include <svl/nfkeytab.hxx>
 #include <svl/numformat.hxx>
-#include <svl/ondemand.hxx>
 #include <svl/poolitem.hxx>
 #include <svl/stritem.hxx>
 #include <svl/style.hxx>
@@ -463,8 +453,10 @@
 #include <svx/SvxColorValueSet.hxx>
 #include <svx/XPropertyEntry.hxx>
 #include <svx/autoformathelper.hxx>
+#include <svx/charmap.hxx>
 #include <svx/colorbox.hxx>
 #include <svx/colorwindow.hxx>
+#include <svx/ctredlin.hxx>
 #include <svx/dialmgr.hxx>
 #include <svx/flagsdef.hxx>
 #include <svx/framelinkarray.hxx>
@@ -472,7 +464,6 @@
 #include <svx/pagectrl.hxx>
 #include <svx/rotmodit.hxx>
 #include <svx/sdr/attribute/sdrallfillattributeshelper.hxx>
-#include <svx/svddef.hxx>
 #include <svx/svxdlg.hxx>
 #include <svx/svxdllapi.h>
 #include <svx/swframetypes.hxx>
@@ -502,26 +493,25 @@
 #include <tools/time.hxx>
 #include <tools/toolsdllapi.h>
 #include <tools/urlobj.hxx>
-#include <tools/wintypes.hxx>
 #include <typelib/typeclass.h>
 #include <typelib/typedescription.h>
 #include <typelib/uik.h>
 #include <uno/any2.h>
 #include <uno/data.h>
 #include <uno/sequence2.h>
-#include <unotools/calendarwrapper.hxx>
 #include <unotools/charclass.hxx>
 #include <unotools/configitem.hxx>
 #include <unotools/fontcvt.hxx>
 #include <unotools/fontdefs.hxx>
 #include <unotools/localedatawrapper.hxx>
-#include <unotools/nativenumberwrapper.hxx>
 #include <unotools/options.hxx>
 #include <unotools/pathoptions.hxx>
+#include <unotools/resmgr.hxx>
 #include <unotools/sharedunocomponent.hxx>
 #include <unotools/syslocale.hxx>
-#include <unotools/transliterationwrapper.hxx>
 #include <unotools/unotoolsdllapi.h>
+#include <unotools/viewoptions.hxx>
+#include <unotools/weakref.hxx>
 #include <vbahelper/vbadllapi.h>
 #include <vbahelper/vbahelper.hxx>
 #include <vbahelper/vbahelperinterface.hxx>
@@ -541,6 +531,8 @@
 #include <cmdid.h>
 #include <cnttab.hxx>
 #include <column.hxx>
+#include <condedit.hxx>
+#include <contentindex.hxx>
 #include <dbmgr.hxx>
 #include <doc.hxx>
 #include <docary.hxx>
@@ -564,16 +556,17 @@
 #include <fmtftn.hxx>
 #include <fmtinfmt.hxx>
 #include <fmtornt.hxx>
-#include <fmtpdsc.hxx>
 #include <fmtrfmrk.hxx>
 #include <fmtruby.hxx>
 #include <format.hxx>
+#include <formatcontentcontrol.hxx>
+#include <formatlinebreak.hxx>
+#include <frmatr.hxx>
 #include <frmdlg.hxx>
 #include <frmfmt.hxx>
 #include <frmpage.hxx>
 #include <glossary.hxx>
 #include <hintids.hxx>
-#include <index.hxx>
 #include <label.hxx>
 #include <labimg.hxx>
 #include <macassgn.hxx>
@@ -581,8 +574,10 @@
 #include <ndarr.hxx>
 #include <ndhints.hxx>
 #include <ndindex.hxx>
+#include <ndtxt.hxx>
 #include <ndtyp.hxx>
 #include <node.hxx>
+#include <nodeoffset.hxx>
 #include <num.hxx>
 #include <numberingtypelistbox.hxx>
 #include <numfmtlb.hxx>
@@ -591,6 +586,7 @@
 #include <optload.hxx>
 #include <outline.hxx>
 #include <pagedesc.hxx>
+#include <pam.hxx>
 #include <pardlg.hxx>
 #include <poolfmt.hxx>
 #include <reffld.hxx>
@@ -618,11 +614,10 @@
 #include <tgrditem.hxx>
 #include <tox.hxx>
 #include <toxe.hxx>
+#include <txatbase.hxx>
 #include <uiitems.hxx>
 #include <uitool.hxx>
 #include <undobj.hxx>
-#include <unobaseclass.hxx>
-#include <unotext.hxx>
 #include <unotools.hxx>
 #include <usrpref.hxx>
 #include <view.hxx>

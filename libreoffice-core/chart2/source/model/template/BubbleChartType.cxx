@@ -21,6 +21,7 @@
 #include <PropertyHelper.hxx>
 #include <servicenames_charttypes.hxx>
 #include <CartesianCoordinateSystem.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <AxisIndexDefines.hxx>
 #include <com/sun/star/chart2/AxisType.hpp>
@@ -109,16 +110,21 @@ uno::Reference< util::XCloneable > SAL_CALL BubbleChartType::createClone()
     return uno::Reference< util::XCloneable >( new BubbleChartType( *this ));
 }
 
-// ____ XChartType ____
-Reference< chart2::XCoordinateSystem > SAL_CALL
-    BubbleChartType::createCoordinateSystem( ::sal_Int32 DimensionCount )
+rtl::Reference< ChartType > BubbleChartType::cloneChartType() const
 {
-    Reference< chart2::XCoordinateSystem > xResult(
-        new CartesianCoordinateSystem( DimensionCount ));
+    return new BubbleChartType( *this );
+}
+
+// ____ XChartType ____
+rtl::Reference< ::chart::BaseCoordinateSystem >
+    BubbleChartType::createCoordinateSystem2( sal_Int32 DimensionCount )
+{
+    rtl::Reference< CartesianCoordinateSystem > xResult =
+        new CartesianCoordinateSystem( DimensionCount );
 
     for( sal_Int32 i=0; i<DimensionCount; ++i )
     {
-        Reference< chart2::XAxis > xAxis( xResult->getAxisByDimension( i, MAIN_AXIS_INDEX ) );
+        rtl::Reference< Axis > xAxis = xResult->getAxisByDimension2( i, MAIN_AXIS_INDEX );
         if( !xAxis.is() )
         {
             OSL_FAIL("a created coordinate system should have an axis for each dimension");
@@ -161,13 +167,14 @@ OUString SAL_CALL BubbleChartType::getRoleOfSequenceForSeriesLabel()
 }
 
 // ____ OPropertySet ____
-uno::Any BubbleChartType::GetDefaultValue( sal_Int32 nHandle ) const
+void BubbleChartType::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticBubbleChartTypeDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 // ____ OPropertySet ____

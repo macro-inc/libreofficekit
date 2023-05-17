@@ -814,7 +814,7 @@ bool ListBox::PreNotify( NotifyEvent& rNEvt )
     bool bDone = false;
     if ( mpImplLB )
     {
-        if( ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT ) && ( rNEvt.GetWindow() == mpImplWin ) )
+        if( ( rNEvt.GetType() == NotifyEventType::KEYINPUT ) && ( rNEvt.GetWindow() == mpImplWin ) )
         {
             KeyEvent aKeyEvt = *rNEvt.GetKeyEvent();
             switch( aKeyEvt.GetKeyCode().GetCode() )
@@ -866,12 +866,12 @@ bool ListBox::PreNotify( NotifyEvent& rNEvt )
                 }
             }
         }
-        else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+        else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
         {
             if ( IsInDropDown() && !HasChildPathFocus( true ) )
                 mpFloatWin->EndPopupMode();
         }
-        else if ( (rNEvt.GetType() == MouseNotifyEvent::COMMAND) &&
+        else if ( (rNEvt.GetType() == NotifyEventType::COMMAND) &&
                   (rNEvt.GetCommandEvent()->GetCommand() == CommandEventId::Wheel) &&
                   (rNEvt.GetWindow() == mpImplWin) )
         {
@@ -887,6 +887,20 @@ bool ListBox::PreNotify( NotifyEvent& rNEvt )
             else
             {
                 bDone = false;  // Don't consume this event, let the default handling take it (i.e. scroll the context)
+            }
+        }
+    }
+
+    if (rNEvt.GetType() == NotifyEventType::MOUSEMOVE)
+    {
+        const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
+        if (pMouseEvt && (pMouseEvt->IsEnterWindow() || pMouseEvt->IsLeaveWindow()))
+        {
+            // trigger redraw as mouse over state has changed
+            if (IsNativeControlSupported(ControlType::Listbox, ControlPart::Entire)
+                && !IsNativeControlSupported(ControlType::Listbox, ControlPart::ButtonDown))
+            {
+                GetWindow(GetWindowType::Border)->Invalidate(InvalidateFlags::NoErase);
             }
         }
     }
@@ -1138,6 +1152,28 @@ void ListBox::EnableMultiSelection( bool bMulti )
 bool ListBox::IsMultiSelectionEnabled() const
 {
     return mpImplLB->IsMultiSelectionEnabled();
+}
+
+void ListBox::SetHighlightColor(const Color& rColor)
+{
+    AllSettings aSettings(GetSettings());
+    StyleSettings aStyle(aSettings.GetStyleSettings());
+    aStyle.SetHighlightColor(rColor);
+    aSettings.SetStyleSettings(aStyle);
+    SetSettings(aSettings);
+
+    mpImplLB->SetHighlightColor(rColor);
+}
+
+void ListBox::SetHighlightTextColor(const Color& rColor)
+{
+    AllSettings aSettings(GetSettings());
+    StyleSettings aStyle(aSettings.GetStyleSettings());
+    aStyle.SetHighlightTextColor(rColor);
+    aSettings.SetStyleSettings(aStyle);
+    SetSettings(aSettings);
+
+    mpImplLB->SetHighlightTextColor(rColor);
 }
 
 Size ListBox::CalcMinimumSize() const

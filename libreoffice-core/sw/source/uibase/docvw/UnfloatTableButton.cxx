@@ -36,7 +36,7 @@
 #include <drawinglayer/attribute/fontattribute.hxx>
 #include <drawinglayer/primitive2d/textlayoutdevice.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <basegfx/vector/b2dvector.hxx>
 #include <svl/grabbagitem.hxx>
 #include <doc.hxx>
@@ -140,10 +140,9 @@ void UnfloatTableButton::MouseButtonDown(const MouseEvent& /*rMEvt*/)
         {
             css::uno::Any aVal;
             aGrabBagItem.QueryValue(aVal);
-            const auto xTable = SwXTextTable::CreateXTextTable(pTableFormat);
-            const css::uno::Reference<css::beans::XPropertySet> xSet(xTable, css::uno::UNO_QUERY);
-            assert(xSet);
-            xSet->setPropertyValue(UNO_NAME_TABLE_INTEROP_GRAB_BAG, aVal);
+            const rtl::Reference<SwXTextTable> xTable
+                = SwXTextTable::CreateXTextTable(pTableFormat);
+            xTable->setPropertyValue(UNO_NAME_TABLE_INTEROP_GRAB_BAG, aVal);
         }
     }
 
@@ -174,7 +173,8 @@ void UnfloatTableButton::MouseButtonDown(const MouseEvent& /*rMEvt*/)
     // Move the table outside of the text frame
     SwNodeRange aRange(*pTableNode, SwNodeOffset(0), *pTableNode->EndOfSectionNode(),
                        SwNodeOffset(1));
-    rDoc.getIDocumentContentOperations().MoveNodeRange(aRange, aInsertPos, SwMoveFlags::DEFAULT);
+    rDoc.getIDocumentContentOperations().MoveNodeRange(aRange, aInsertPos.GetNode(),
+                                                       SwMoveFlags::DEFAULT);
 
     // Remove the floating table's frame
     SwFlyFrameFormat* pFrameFormat = pFlyFrame->GetFormat();
@@ -207,7 +207,8 @@ void UnfloatTableButton::PaintButton()
     SwFrameButtonPainter::PaintButton(aSeq, aRect, true);
 
     // Create the text primitive
-    basegfx::BColor aLineColor = SwViewOption::GetHeaderFooterMarkColor().getBColor();
+    basegfx::BColor aLineColor
+        = SwViewOption::GetCurrentViewOptions().GetHeaderFooterMarkColor().getBColor();
     basegfx::B2DVector aFontSize;
     drawinglayer::attribute::FontAttribute aFontAttr
         = drawinglayer::primitive2d::getFontAttributeFromVclFont(aFontSize, m_xVirDev->GetFont(),
@@ -224,14 +225,13 @@ void UnfloatTableButton::PaintButton()
 
     aSeq.push_back(drawinglayer::primitive2d::Primitive2DReference(
         new drawinglayer::primitive2d::TextSimplePortionPrimitive2D(
-            aTextMatrix, m_sLabel, 0, m_sLabel.getLength(), std::vector<double>(), aFontAttr,
-            css::lang::Locale(), aLineColor)));
+            aTextMatrix, m_sLabel, 0, m_sLabel.getLength(), std::vector<double>(), {},
+            std::move(aFontAttr), css::lang::Locale(), aLineColor)));
 
     // Create the processor and process the primitives
     const drawinglayer::geometry::ViewInformation2D aNewViewInfos;
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(
-        drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(*m_xVirDev,
-                                                                         aNewViewInfos));
+        drawinglayer::processor2d::createProcessor2DFromOutputDevice(*m_xVirDev, aNewViewInfos));
 
     pProcessor->process(aSeq);
 

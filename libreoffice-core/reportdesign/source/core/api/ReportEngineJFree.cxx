@@ -40,7 +40,6 @@
 #include <core_resource.hxx>
 
 #include <connectivity/CommonTools.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <sfx2/docfilt.hxx>
 
 namespace reportdesign
@@ -124,7 +123,7 @@ void SAL_CALL OReportEngineJFree::setReportDefinition( const uno::Reference< rep
         ::osl::MutexGuard aGuard(m_aMutex);
         if ( m_xReport != _report )
         {
-            prepareSet(PROPERTY_REPORTDEFINITION, uno::makeAny(m_xReport), uno::makeAny(_report), &l);
+            prepareSet(PROPERTY_REPORTDEFINITION, uno::Any(m_xReport), uno::Any(_report), &l);
             m_xReport = _report;
         }
     }
@@ -164,7 +163,7 @@ OUString OReportEngineJFree::getNewOutputName()
     uno::Reference< beans::XPropertySet> xStorageProp(xTemp,uno::UNO_QUERY);
     if ( xStorageProp.is() )
     {
-        xStorageProp->setPropertyValue( s_sMediaType, uno::makeAny(sMimeType));
+        xStorageProp->setPropertyValue( s_sMediaType, uno::Any(sMimeType));
     }
     m_xReport->storeToStorage(xTemp,aEmpty); // store to temp file because it may contain information which isn't in the database yet.
 
@@ -172,12 +171,14 @@ OUString OReportEngineJFree::getNewOutputName()
     OUString sName = m_xReport->getCaption();
     if ( sName.isEmpty() )
         sName = m_xReport->getName();
+    sFileURL = ::utl::CreateTempURL(sName, false, sExt);
+    if ( sFileURL.isEmpty() )
     {
-        ::utl::TempFile aTestFile(sName, false, &sExt);
+        ::utl::TempFileNamed aTestFile(sName, false, sExt);
         if ( !aTestFile.IsValid() )
         {
             sName = RptResId(RID_STR_REPORT);
-            ::utl::TempFile aFile(sName, false, &sExt);
+            ::utl::TempFileNamed aFile(sName, false, sExt);
             sFileURL = aFile.GetURL();
         }
         else
@@ -189,7 +190,7 @@ OUString OReportEngineJFree::getNewOutputName()
     xStorageProp.set(xOut,uno::UNO_QUERY);
     if ( xStorageProp.is() )
     {
-        xStorageProp->setPropertyValue( s_sMediaType, uno::makeAny(sMimeType));
+        xStorageProp->setPropertyValue( s_sMediaType, uno::Any(sMimeType));
     }
 
     // some meta data

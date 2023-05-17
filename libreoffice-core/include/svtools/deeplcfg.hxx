@@ -36,7 +36,7 @@ public:
     virtual void Notify(const css::uno::Sequence<OUString>& _rPropertyNames) override;
     static SvxDeeplOptions& Get();
 
-    const OUString getAPIUrl() const;
+    const OUString& getAPIUrl() const;
     void setAPIUrl(const OUString& rVal);
 
     const OUString& getAuthKey() const;

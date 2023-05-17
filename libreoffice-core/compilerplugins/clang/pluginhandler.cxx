@@ -13,18 +13,16 @@
 #include <system_error>
 #include <utility>
 
-#include "compat.hxx"
+#include "config_clang.h"
+
 #include "plugin.hxx"
 #include "pluginhandler.hxx"
 
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
 #include <clang/Lex/PPCallbacks.h>
-#include <stdio.h>
-
-#if CLANG_VERSION >= 90000
+#include <llvm/ADT/StringExtras.h>
 #include <llvm/Support/TimeProfiler.h>
-#endif
 
 #if defined _WIN32
 #include <process.h>
@@ -232,19 +230,22 @@ bool PluginHandler::ignoreLocation(SourceLocation loc) {
 
 bool PluginHandler::checkIgnoreLocation(SourceLocation loc)
 {
-#if CLANG_VERSION >= 80000
-    // If a location comes from a PCH, it is not necessary to check it
-    // in every compilation using the PCH, since with Clang we use
-    // -building-pch-with-obj to build a separate precompiled_foo.cxx file
-    // for the PCH, and so it is known that everything in the PCH will
-    // be checked while compiling this file. Skip the checks for all
-    // other files using the PCH.
-    if( !compiler.getSourceManager().isLocalSourceLocation( loc ))
+    // The tree-wide analysis plugins (like unusedmethods) don't want
+    // this logic, they only want to ignore external code
+    if (!treeWideAnalysisMode)
     {
-        if( !compiler.getLangOpts().BuildingPCHWithObjectFile )
-            return true;
+        // If a location comes from a PCH, it is not necessary to check it
+        // in every compilation using the PCH, since with Clang we use
+        // -building-pch-with-obj to build a separate precompiled_foo.cxx file
+        // for the PCH, and so it is known that everything in the PCH will
+        // be checked while compiling this file. Skip the checks for all
+        // other files using the PCH.
+        if( !compiler.getSourceManager().isLocalSourceLocation( loc ))
+        {
+            if( !compiler.getLangOpts().BuildingPCHWithObjectFile )
+                return true;
+        }
     }
-#endif
     SourceLocation expansionLoc = compiler.getSourceManager().getExpansionLoc( loc );
     if( compiler.getSourceManager().isInSystemHeader( expansionLoc ))
         return true;
@@ -314,9 +315,7 @@ void PluginHandler::addSourceModification(SourceRange range)
 
 void PluginHandler::HandleTranslationUnit( ASTContext& context )
 {
-#if CLANG_VERSION >= 90000
     llvm::TimeTraceScope mainTimeScope("LOPluginMain", StringRef(""));
-#endif
     if( context.getDiagnostics().hasErrorOccurred())
         return;
     if (mainFileName.endswith(".ii"))
@@ -330,9 +329,7 @@ void PluginHandler::HandleTranslationUnit( ASTContext& context )
     {
         if( plugins[ i ].object != NULL && !plugins[ i ].disabledRun )
         {
-#if CLANG_VERSION >= 90000
             llvm::TimeTraceScope timeScope("LOPlugin", [&]() { return plugins[i].optionName; });
-#endif
             plugins[ i ].object->run();
         }
     }
@@ -387,27 +384,25 @@ void PluginHandler::HandleTranslationUnit( ASTContext& context )
             report( DiagnosticsEngine::Warning, pathWarning ) << name;
         if( bSkip )
             continue;
-        char* filename = new char[ modifyFile.length() + 100 ];
-        sprintf( filename, "%s.new.%d", modifyFile.c_str(), getpid());
+        auto const filename = modifyFile + ".new." + itostr(getpid());
         std::string error;
         bool bOk = false;
         std::error_code ec;
         std::unique_ptr<raw_fd_ostream> ostream(
-            new raw_fd_ostream(filename, ec, compat::OF_None));
+            new raw_fd_ostream(filename, ec, sys::fs::OF_None));
         if( !ec)
         {
             it->second.write( *ostream );
             ostream->close();
-            if( !ostream->has_error() && rename( filename, modifyFile.c_str()) == 0 )
+            if( !ostream->has_error() && rename( filename.c_str(), modifyFile.c_str()) == 0 )
                 bOk = true;
         }
         else
             error = "error: " + ec.message();
         ostream->clear_error();
-        unlink( filename );
+        unlink( filename.c_str() );
         if( !bOk )
             report( DiagnosticsEngine::Error, "cannot write modified source to %0 (%1)" ) << modifyFile << error;
-        delete[] filename;
     }
 #endif
  }

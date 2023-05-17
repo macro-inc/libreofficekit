@@ -25,17 +25,18 @@
 #include <svl/itemiter.hxx>
 #include <svl/whiter.hxx>
 #include <svx/svxids.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
 namespace chart::wrapper {
 
 ItemConverter::ItemConverter(
-    const uno::Reference< beans::XPropertySet > & rPropertySet,
+    uno::Reference< beans::XPropertySet > xPropertySet,
     SfxItemPool& rItemPool ) :
-        m_xPropertySet( rPropertySet ),
+        m_xPropertySet(std::move( xPropertySet )),
         m_rItemPool( rItemPool )
 {
     resetPropertySet( m_xPropertySet );
@@ -157,7 +158,7 @@ bool ItemConverter::ApplyItemSet( const SfxItemSet & rItemSet )
 
     for (const SfxPoolItem* pItem = aIter.GetCurItem(); pItem; pItem = aIter.NextItem())
     {
-        if( rItemSet.GetItemState( pItem->Which(), false ) == SfxItemState::SET )
+        if( aIter.GetItemState( false ) == SfxItemState::SET )
         {
             if( GetItemProperty( pItem->Which(), aProperty ))
             {
@@ -198,7 +199,8 @@ void ItemConverter::InvalidateUnequalItems( SfxItemSet  &rDestSet, const SfxItem
 
     while (nWhich)
     {
-        if ((rSourceSet.GetItemState(nWhich, true, &pPoolItem) == SfxItemState::SET) &&
+        SfxItemState nSourceItemState = aIter.GetItemState(true, &pPoolItem);
+        if ((nSourceItemState == SfxItemState::SET) &&
             (rDestSet.GetItemState(nWhich, true, &pPoolItem) == SfxItemState::SET))
         {
             if (rSourceSet.Get(nWhich) != rDestSet.Get(nWhich))
@@ -209,7 +211,7 @@ void ItemConverter::InvalidateUnequalItems( SfxItemSet  &rDestSet, const SfxItem
                 }
             }
         }
-        else if( rSourceSet.GetItemState(nWhich, true, &pPoolItem) == SfxItemState::DONTCARE )
+        else if( nSourceItemState == SfxItemState::DONTCARE )
             rDestSet.InvalidateItem(nWhich);
 
         nWhich = aIter.NextWhich ();

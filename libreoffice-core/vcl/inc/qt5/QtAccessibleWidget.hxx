@@ -36,8 +36,7 @@ class XAccessibleTable;
 class QtFrame;
 class QtWidget;
 
-class QtAccessibleWidget final : public QObject,
-                                 public QAccessibleInterface,
+class QtAccessibleWidget final : public QAccessibleInterface,
                                  public QAccessibleActionInterface,
                                  public QAccessibleTextInterface,
                                  public QAccessibleEditableTextInterface,
@@ -45,11 +44,13 @@ class QtAccessibleWidget final : public QObject,
                                  public QAccessibleTableInterface,
                                  public QAccessibleValueInterface
 {
-    Q_OBJECT
-
 public:
     QtAccessibleWidget(const css::uno::Reference<css::accessibility::XAccessible> xAccessible,
                        QObject* pObject);
+
+    void invalidate();
+
+    // QAccessibleInterface
     QWindow* window() const override;
     int childCount() const override;
     int indexOfChild(const QAccessibleInterface* child) const override;
@@ -153,6 +154,15 @@ private:
     css::uno::Reference<css::accessibility::XAccessible> m_xAccessible;
     css::uno::Reference<css::accessibility::XAccessibleContext> getAccessibleContextImpl() const;
     css::uno::Reference<css::accessibility::XAccessibleTable> getAccessibleTableForParent() const;
+
+    template <class Interface> bool accessibleProvidesInterface() const
+    {
+        css::uno::Reference<css::accessibility::XAccessibleContext> xContext
+            = getAccessibleContextImpl();
+        css::uno::Reference<Interface> xInterface(xContext, css::uno::UNO_QUERY);
+        return xInterface.is();
+    }
+
     QObject* m_pObject;
 };
 

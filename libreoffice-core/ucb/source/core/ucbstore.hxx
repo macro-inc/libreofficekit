@@ -21,7 +21,6 @@
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/container/XNamed.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/ucb/XPropertySetRegistryFactory.hpp>
@@ -33,19 +32,19 @@
 #include <com/sun/star/beans/XPropertyAccess.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
-#include <comphelper/interfacecontainer2.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
-#include <cppuhelper/compbase.hxx>
-#include <cppuhelper/basemutex.hxx>
+#include <comphelper/interfacecontainer3.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
+#include <comphelper/compbase.hxx>
+#include <rtl/ref.hxx>
 #include <unordered_map>
 
 
-using UcbStore_Base = cppu::WeakComponentImplHelper <
+using UcbStore_Base = comphelper::WeakComponentImplHelper <
                         css::lang::XServiceInfo,
                         css::ucb::XPropertySetRegistryFactory,
                         css::lang::XInitialization >;
 
-class UcbStore : public cppu::BaseMutex, public UcbStore_Base
+class UcbStore : public UcbStore_Base
 {
     css::uno::Reference< css::uno::XComponentContext >    m_xContext;
     css::uno::Sequence< css::uno::Any >                   m_aInitArgs;
@@ -143,7 +142,7 @@ public:
 
 
 class PropertySetInfo_Impl;
-typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString> PropertyListeners_Impl;
+typedef comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, OUString> PropertyListeners_Impl;
 
 class PersistentPropertySet : public cppu::WeakImplHelper <
     css::lang::XServiceInfo,
@@ -159,8 +158,8 @@ class PersistentPropertySet : public cppu::WeakImplHelper <
     OUString                    m_aKey;
     OUString                    m_aFullKey;
     osl::Mutex                  m_aMutex;
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2>  m_pDisposeEventListeners;
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2>  m_pPropSetChangeListeners;
+    std::unique_ptr<comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>>  m_pDisposeEventListeners;
+    std::unique_ptr<comphelper::OInterfaceContainerHelper3<css::beans::XPropertySetInfoChangeListener>>  m_pPropSetChangeListeners;
     std::unique_ptr<PropertyListeners_Impl>      m_pPropertyChangeListeners;
 
 private:
@@ -172,7 +171,7 @@ private:
 public:
     PersistentPropertySet(
         PropertySetRegistry& rCreator,
-        const OUString& rKey );
+        OUString aKey );
     virtual ~PersistentPropertySet() override;
 
     // XServiceInfo

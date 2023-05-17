@@ -20,6 +20,8 @@
 #ifndef INCLUDED_O3TL_LAZY_UPDATE_HXX
 #define INCLUDED_O3TL_LAZY_UPDATE_HXX
 
+#include <utility>
+
 namespace o3tl
 {
     /** Update output object lazily
@@ -46,7 +48,7 @@ output( myValue.getOutValue() );
      */
     template<typename In, typename Out, typename Func> class LazyUpdate {
     public:
-        LazyUpdate(Func const & func): func_(func), input_(), dirty_(true) {}
+        LazyUpdate(Func func): func_(std::move(func)), input_(), dirty_(true) {}
 
         In const & getInValue() const { return input_; }
 

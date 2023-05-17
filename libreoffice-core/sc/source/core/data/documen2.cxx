@@ -67,6 +67,7 @@
 #include <listenercalls.hxx>
 #include <recursionhelper.hxx>
 #include <lookupcache.hxx>
+#include <rangecache.hxx>
 #include <externalrefmgr.hxx>
 #include <viewdata.hxx>
 #include <viewutil.hxx>
@@ -87,6 +88,8 @@
 #include <listenercontext.hxx>
 #include <datamapper.hxx>
 #include <drwlayer.hxx>
+#include <sharedstringpoolpurge.hxx>
+#include <dociter.hxx>
 #include <config_features.h>
 
 using namespace com::sun::star;
@@ -135,6 +138,7 @@ ScDocument::ScDocument( ScDocumentMode eMode, SfxObjectShell* pDocShell ) :
         nMacroInterpretLevel(0),
         nInterpreterTableOpLevel(0),
         maInterpreterContext( *this, nullptr ),
+        mxScSortedRangeCache(new ScSortedRangeCacheMap),
         nFormulaTrackCount(0),
         eHardRecalcState(HardRecalcState::OFF),
         nVisibleTab( 0 ),
@@ -162,6 +166,7 @@ ScDocument::ScDocument( ScDocumentMode eMode, SfxObjectShell* pDocShell ) :
         bInDtorClear( false ),
         bExpandRefs( false ),
         bDetectiveDirty( false ),
+        bDelayedDeletingBroadcasters( false ),
         bLinkFormulaNeedingCheck( false ),
         nAsianCompression(CharCompressType::Invalid),
         nAsianKerning(SC_ASIANKERNING_INVALID),
@@ -183,6 +188,7 @@ ScDocument::ScDocument( ScDocumentMode eMode, SfxObjectShell* pDocShell ) :
         mbEmbedFontScriptLatin(true),
         mbEmbedFontScriptAsian(true),
         mbEmbedFontScriptComplex(true),
+        mnImagePreferredDPI(0),
         mbTrackFormulasPending(false),
         mbFinalTrackFormulas(false),
         mbDocShellRecalc(false),
@@ -271,11 +277,17 @@ sal_uInt32 ScDocument::GetDocumentID() const
 void ScDocument::StartChangeTracking()
 {
     if (!pChangeTrack)
+    {
         pChangeTrack.reset( new ScChangeTrack( *this ) );
+        if (mpShell)
+            mpShell->SetModified();
+    }
 }
 
 void ScDocument::EndChangeTracking()
 {
+    if (pChangeTrack && mpShell)
+        mpShell->SetModified();
     pChangeTrack.reset();
 }
 
@@ -406,7 +418,14 @@ ScDocument::~ScDocument()
     mpFormulaGroupCxt.reset();
     // Purge unused items if the string pool will be still used (e.g. by undo history).
     if(mpCellStringPool.use_count() > 1)
-        mpCellStringPool->purge();
+    {
+        // Calling purge() may be somewhat expensive with large documents, so
+        // try to delay and compress it for temporary documents.
+        if(IsClipOrUndo())
+            ScGlobal::GetSharedStringPoolPurge().delayedPurge(mpCellStringPool);
+        else
+            mpCellStringPool->purge();
+    }
     mpCellStringPool.reset();
 
     assert( pDelayedFormulaGrouping == nullptr );
@@ -490,6 +509,17 @@ ScNoteEditEngine& ScDocument::GetNoteEngine()
         mpNoteEngine->SetDefaults( std::move(aEEItemSet) );      // edit engine takes ownership
     }
     return *mpNoteEngine;
+}
+
+std::unique_ptr<EditTextObject> ScDocument::CreateSharedStringTextObject( const svl::SharedString& rSS )
+{
+    /* TODO: Add shared string support to the edit engine to make this process
+     * simpler. */
+    ScFieldEditEngine& rEngine = GetEditEngine();
+    rEngine.SetTextCurrentDefaults( rSS.getString());
+    std::unique_ptr<EditTextObject> pObj( rEngine.CreateTextObject());
+    pObj->NormalizeString( GetSharedStringPool());
+    return pObj;
 }
 
 void ScDocument::ResetClip( ScDocument* pSourceDoc, const ScMarkData* pMarks )
@@ -717,6 +747,7 @@ bool ScDocument::MoveTab( SCTAB nOldPos, SCTAB nNewPos, ScProgress* pProgress )
         if (maTabs[nOldPos])
         {
             sc::AutoCalcSwitch aACSwitch(*this, false);
+            sc::DelayDeletingBroadcasters delayDeletingBroadcasters(*this);
 
             SetNoListening( true );
             if (nNewPos == SC_TAB_APPEND || nNewPos >= nTabCount)
@@ -861,6 +892,7 @@ bool ScDocument::CopyTab( SCTAB nOldPos, SCTAB nNewPos, const ScMarkData* pOnlyM
         GetRangeName()->CopyUsedNames( -1, nRealOldPos, nNewPos, *this, *this, bGlobalNamesToLocal);
 
         sc::CopyToDocContext aCopyDocCxt(*this);
+        pDBCollection->CopyToTable(nOldPos, nNewPos);
         maTabs[nOldPos]->CopyToTable(aCopyDocCxt, 0, 0, MaxCol(), MaxRow(), InsertDeleteFlags::ALL,
                 (pOnlyMarked != nullptr), maTabs[nNewPos].get(), pOnlyMarked,
                 false /*bAsLink*/, true /*bColRowFlags*/, bGlobalNamesToLocal, false /*bCopyCaptions*/ );
@@ -991,6 +1023,36 @@ sal_uLong ScDocument::TransferTab( ScDocument& rSrcDoc, SCTAB nSrcPos,
         maTabs[nDestPos]->SetTabNo(nDestPos);
         maTabs[nDestPos]->SetTabBgColor(rSrcDoc.maTabs[nSrcPos]->GetTabBgColor());
 
+        // tdf#66613 - copy existing print ranges and col/row repetitions
+        if (auto aRepeatColRange = rSrcDoc.maTabs[nSrcPos]->GetRepeatColRange())
+        {
+            aRepeatColRange->aStart.SetTab(nDestPos);
+            aRepeatColRange->aEnd.SetTab(nDestPos);
+            maTabs[nDestPos]->SetRepeatColRange(aRepeatColRange);
+        }
+
+        if (auto aRepeatRowRange = rSrcDoc.maTabs[nSrcPos]->GetRepeatRowRange())
+        {
+            aRepeatRowRange->aStart.SetTab(nDestPos);
+            aRepeatRowRange->aEnd.SetTab(nDestPos);
+            maTabs[nDestPos]->SetRepeatRowRange(aRepeatRowRange);
+        }
+
+        if (rSrcDoc.IsPrintEntireSheet(nSrcPos))
+            maTabs[nDestPos]->SetPrintEntireSheet();
+        else
+        {
+            const auto nPrintRangeCount = rSrcDoc.maTabs[nSrcPos]->GetPrintRangeCount();
+            for (auto nPos = 0; nPos < nPrintRangeCount; nPos++)
+            {
+                // Adjust the tab for the print range at the new position
+                ScRange aSrcPrintRange(*rSrcDoc.maTabs[nSrcPos]->GetPrintRange(nPos));
+                aSrcPrintRange.aStart.SetTab(nDestPos);
+                aSrcPrintRange.aEnd.SetTab(nDestPos);
+                maTabs[nDestPos]->AddPrintRange(aSrcPrintRange);
+            }
+        }
+
         if ( !bResultsOnly )
         {
             sc::RefUpdateContext aRefCxt(*this);
@@ -1055,7 +1117,8 @@ sal_uLong ScDocument::TransferTab( ScDocument& rSrcDoc, SCTAB nSrcPos,
                 OUString sSrcCodeName;
                 rSrcDoc.GetCodeName( nSrcPos, sSrcCodeName );
                 OUString sRTLSource;
-                xLib->getByName( sSrcCodeName ) >>= sRTLSource;
+                if (xLib->hasByName( sSrcCodeName ))
+                    xLib->getByName( sSrcCodeName ) >>= sRTLSource;
                 sSource = sRTLSource;
             }
             VBA_InsertModule( *this, nDestPos, sSource );
@@ -1173,13 +1236,47 @@ ScLookupCache & ScDocument::GetLookupCache( const ScRange & rRange, ScInterprete
         pCache = findIt->second.get();
         // The StartListeningArea() call is not thread-safe, as all threads
         // would access the same SvtBroadcaster.
-        osl::MutexGuard guard( mScLookupMutex );
+        std::unique_lock guard( mScLookupMutex );
         StartListeningArea(rRange, false, pCache);
     }
     else
         pCache = (*findIt).second.get();
 
     return *pCache;
+}
+
+ScSortedRangeCache& ScDocument::GetSortedRangeCache( const ScRange & rRange, const ScQueryParam& param,
+                                                     ScInterpreterContext* pContext )
+{
+    assert(mxScSortedRangeCache);
+    ScSortedRangeCache::HashKey key = ScSortedRangeCache::makeHashKey(rRange, param);
+    // This should be created just once for one range, and repeated calls should reuse it, even
+    // between threads (it doesn't make sense to use ScInterpreterContext and have all threads
+    // build their own copy of the same data). So first try read-only access, which should
+    // in most cases be enough.
+    {
+      std::shared_lock guard(mScLookupMutex);
+      auto findIt = mxScSortedRangeCache->aCacheMap.find(key);
+      if( findIt != mxScSortedRangeCache->aCacheMap.end())
+        return *findIt->second;
+    }
+    // Avoid recursive calls because of some cells in the range being dirty and triggering
+    // interpreting, which may call into this again. Threaded calculation makes sure
+    // no cells are dirty. If some cells in the range cannot be interpreted and remain
+    // dirty e.g. because of circular dependencies, create only an invalid empty cache to prevent
+    // a possible recursive deadlock.
+    bool invalid = false;
+    if(!IsThreadedGroupCalcInProgress())
+        if(!InterpretCellsIfNeeded(rRange))
+            invalid = true;
+    std::unique_lock guard(mScLookupMutex);
+    auto [findIt, bInserted] = mxScSortedRangeCache->aCacheMap.emplace(key, nullptr);
+    if (bInserted)
+    {
+        findIt->second = std::make_unique<ScSortedRangeCache>(this, rRange, param, pContext, invalid);
+        StartListeningArea(rRange, false, findIt->second.get());
+    }
+    return *findIt->second;
 }
 
 void ScDocument::RemoveLookupCache( ScLookupCache & rCache )
@@ -1192,21 +1289,40 @@ void ScDocument::RemoveLookupCache( ScLookupCache & rCache )
     auto it(cacheMap.aCacheMap.find(rCache.getRange()));
     if (it != cacheMap.aCacheMap.end())
     {
-        ScLookupCache* pCache = (*it).second.release();
+        std::unique_ptr<ScLookupCache> xCache = std::move(it->second);
         cacheMap.aCacheMap.erase(it);
         assert(!IsThreadedGroupCalcInProgress()); // EndListeningArea() is not thread-safe
-        EndListeningArea(pCache->getRange(), false, &rCache);
+        EndListeningArea(xCache->getRange(), false, &rCache);
         return;
     }
     OSL_FAIL( "ScDocument::RemoveLookupCache: range not found in hash map");
+}
+
+void ScDocument::RemoveSortedRangeCache( ScSortedRangeCache & rCache )
+{
+    // Data changes leading to this should never happen during calculation (they are either
+    // a result of user input or recalc). If it turns out this can be the case, locking is needed
+    // here and also in ScSortedRangeCache::Notify().
+    assert(!IsThreadedGroupCalcInProgress());
+    auto it(mxScSortedRangeCache->aCacheMap.find(rCache.getHashKey()));
+    if (it != mxScSortedRangeCache->aCacheMap.end())
+    {
+        std::unique_ptr<ScSortedRangeCache> xCache = std::move(it->second);
+        mxScSortedRangeCache->aCacheMap.erase(it);
+        assert(!IsThreadedGroupCalcInProgress()); // EndListeningArea() is not thread-safe
+        EndListeningArea(xCache->getRange(), false, &rCache);
+        return;
+    }
+    OSL_FAIL( "ScDocument::RemoveSortedRangeCache: range not found in hash map");
 }
 
 void ScDocument::ClearLookupCaches()
 {
     assert(!IsThreadedGroupCalcInProgress());
     GetNonThreadedContext().mxScLookupCache.reset();
+    mxScSortedRangeCache->aCacheMap.clear();
     // Clear lookup cache in all interpreter-contexts in the (threaded/non-threaded) pools.
-    ScInterpreterContextPool::ClearLookupCaches();
+    ScInterpreterContextPool::ClearLookupCaches(this);
 }
 
 bool ScDocument::IsCellInChangeTrack(const ScAddress &cell,Color *pColCellBorder)
@@ -1234,7 +1350,7 @@ bool ScDocument::IsCellInChangeTrack(const ScAddress &cell,Color *pColCellBorder
                     aRange.aEnd.SetCol( aRange.aStart.Col() );
                 if (ScViewUtil::IsActionShown( *pAction, *pSettings, *this ) )
                 {
-                    if (aRange.In(cell))
+                    if (aRange.Contains(cell))
                     {
                         if (pColCellBorder != nullptr)
                         {
@@ -1254,7 +1370,7 @@ bool ScDocument::IsCellInChangeTrack(const ScAddress &cell,Color *pColCellBorder
                     GetFromRange().MakeRange( *this );
                 if (ScViewUtil::IsActionShown( *pAction, *pSettings, *this ) )
                 {
-                    if (aRange.In(cell))
+                    if (aRange.Contains(cell))
                     {
                         if (pColCellBorder != nullptr)
                         {
@@ -1299,7 +1415,7 @@ void ScDocument::GetCellChangeTrackNote( const ScAddress &aCellPos, OUString &aT
                     aRange.aEnd.SetRow( aRange.aStart.Row() );
                 else if ( eType == SC_CAT_DELETE_COLS )
                     aRange.aEnd.SetCol( aRange.aStart.Col() );
-                if ( aRange.In( aCellPos ) )
+                if ( aRange.Contains( aCellPos ) )
                 {
                     pFound = pAction;       // the last wins
                     switch ( eType )
@@ -1320,7 +1436,7 @@ void ScDocument::GetCellChangeTrackNote( const ScAddress &aCellPos, OUString &aT
                 ScRange aRange =
                     static_cast<const ScChangeActionMove*>(pAction)->
                     GetFromRange().MakeRange( *this );
-                if ( aRange.In( aCellPos ) )
+                if ( aRange.Contains( aCellPos ) )
                 {
                     pFound = pAction;
                 }

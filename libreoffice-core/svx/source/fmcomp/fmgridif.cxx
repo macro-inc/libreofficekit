@@ -55,10 +55,11 @@
 #include <comphelper/types.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/queryinterface.hxx>
+#include <o3tl/safeint.hxx>
 #include <vcl/unohelp.hxx>
 #include <vcl/svapp.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/macros.h>
 
 using namespace ::svxform;
@@ -127,7 +128,7 @@ static vcl::Font ImplCreateFont( const css::awt::FontDescriptor& rDescr )
 
 FmXModifyMultiplexer::FmXModifyMultiplexer( ::cppu::OWeakObject& rSource, ::osl::Mutex& _rMutex )
                     :OWeakSubObject( rSource )
-                    ,OInterfaceContainerHelper2( _rMutex )
+                    ,OInterfaceContainerHelper3( _rMutex )
 {
 }
 
@@ -160,7 +161,7 @@ void FmXModifyMultiplexer::modified(const EventObject& e)
 
 FmXUpdateMultiplexer::FmXUpdateMultiplexer( ::cppu::OWeakObject& rSource, ::osl::Mutex& _rMutex )
                     :OWeakSubObject( rSource )
-                    ,OInterfaceContainerHelper2( _rMutex )
+                    ,OInterfaceContainerHelper3( _rMutex )
 {
 }
 
@@ -192,9 +193,9 @@ sal_Bool FmXUpdateMultiplexer::approveUpdate(const EventObject &e)
     bool bResult = true;
     if (getLength())
     {
-        ::comphelper::OInterfaceIteratorHelper2 aIter(*this);
+        ::comphelper::OInterfaceIteratorHelper3 aIter(*this);
         while ( bResult && aIter.hasMoreElements() )
-            bResult = static_cast< XUpdateListener* >( aIter.next() )->approveUpdate( aMulti );
+            bResult = aIter.next()->approveUpdate( aMulti );
     }
 
     return bResult;
@@ -210,7 +211,7 @@ void FmXUpdateMultiplexer::updated(const EventObject &e)
 
 FmXSelectionMultiplexer::FmXSelectionMultiplexer( ::cppu::OWeakObject& rSource, ::osl::Mutex& _rMutex )
     :OWeakSubObject( rSource )
-    ,OInterfaceContainerHelper2( _rMutex )
+    ,OInterfaceContainerHelper3( _rMutex )
 {
 }
 
@@ -243,7 +244,7 @@ void SAL_CALL FmXSelectionMultiplexer::selectionChanged( const EventObject& _rEv
 
 FmXContainerMultiplexer::FmXContainerMultiplexer( ::cppu::OWeakObject& rSource, ::osl::Mutex& _rMutex )
                         :OWeakSubObject( rSource )
-                        ,OInterfaceContainerHelper2( _rMutex )
+                        ,OInterfaceContainerHelper3( _rMutex )
 {
 }
 
@@ -291,7 +292,7 @@ void FmXContainerMultiplexer::elementReplaced(const ContainerEvent& e)
 
 FmXGridControlMultiplexer::FmXGridControlMultiplexer( ::cppu::OWeakObject& rSource, ::osl::Mutex& _rMutex )
     :OWeakSubObject( rSource )
-    ,OInterfaceContainerHelper2( _rMutex )
+    ,OInterfaceContainerHelper3( _rMutex )
 {
 }
 
@@ -399,7 +400,7 @@ void SAL_CALL FmXGridControl::dispose()
 }
 
 
-OUString FmXGridControl::GetComponentServiceName()
+OUString FmXGridControl::GetComponentServiceName() const
 {
     return "DBGrid";
 }
@@ -1451,10 +1452,10 @@ sal_Bool FmXGridPeer::commit()
         return true;
 
     EventObject aEvt(static_cast< ::cppu::OWeakObject* >(this));
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_aUpdateListeners);
+    ::comphelper::OInterfaceIteratorHelper3 aIter(m_aUpdateListeners);
     bool bCancel = false;
     while (aIter.hasMoreElements() && !bCancel)
-        if ( !static_cast< XUpdateListener* >( aIter.next() )->approveUpdate( aEvt ) )
+        if ( !aIter.next()->approveUpdate( aEvt ) )
             bCancel = true;
 
     if (!bCancel)
@@ -1549,10 +1550,10 @@ Reference< XIndexContainer >  FmXGridPeer::getColumns()
 
 void FmXGridPeer::addColumnListeners(const Reference< XPropertySet >& xCol)
 {
-    static const std::u16string_view aPropsListenedTo[] =
+    static const rtl::OUStringConstExpr aPropsListenedTo[] =
     {
-        u"" FM_PROP_LABEL, u"" FM_PROP_WIDTH, u"" FM_PROP_HIDDEN, u"" FM_PROP_ALIGN,
-        u"" FM_PROP_FORMATKEY
+        FM_PROP_LABEL, FM_PROP_WIDTH, FM_PROP_HIDDEN, FM_PROP_ALIGN,
+        FM_PROP_FORMATKEY
     };
 
     // as not all properties have to be supported by all columns we have to check this
@@ -1560,11 +1561,11 @@ void FmXGridPeer::addColumnListeners(const Reference< XPropertySet >& xCol)
     Reference< XPropertySetInfo > xInfo = xCol->getPropertySetInfo();
     for (size_t i=0; i<SAL_N_ELEMENTS(aPropsListenedTo); ++i)
     {
-        if ( xInfo->hasPropertyByName( OUString(aPropsListenedTo[i]) ) )
+        if ( xInfo->hasPropertyByName( aPropsListenedTo[i] ) )
         {
-            Property aPropDesc = xInfo->getPropertyByName( OUString(aPropsListenedTo[i]) );
+            Property aPropDesc = xInfo->getPropertyByName( aPropsListenedTo[i] );
             if ( 0 != ( aPropDesc.Attributes & PropertyAttribute::BOUND ) )
-                xCol->addPropertyChangeListener( OUString(aPropsListenedTo[i]), this );
+                xCol->addPropertyChangeListener( aPropsListenedTo[i], this );
         }
     }
 }
@@ -1574,16 +1575,16 @@ void FmXGridPeer::removeColumnListeners(const Reference< XPropertySet >& xCol)
 {
     // the same props as in addColumnListeners... linux has problems with global static UStrings, so
     // we have to do it this way...
-    static const std::u16string_view aPropsListenedTo[] =
+    static const rtl::OUStringConstExpr aPropsListenedTo[] =
     {
-        u"" FM_PROP_LABEL, u"" FM_PROP_WIDTH, u"" FM_PROP_HIDDEN, u"" FM_PROP_ALIGN,
-        u"" FM_PROP_FORMATKEY
+        FM_PROP_LABEL, FM_PROP_WIDTH, FM_PROP_HIDDEN, FM_PROP_ALIGN,
+        FM_PROP_FORMATKEY
     };
 
     Reference< XPropertySetInfo >  xInfo = xCol->getPropertySetInfo();
     for (const auto & i : aPropsListenedTo)
-        if (xInfo->hasPropertyByName(OUString(i)))
-            xCol->removePropertyChangeListener(OUString(i), this);
+        if (xInfo->hasPropertyByName(i))
+            xCol->removePropertyChangeListener(i, this);
 }
 
 
@@ -2581,7 +2582,7 @@ Any SAL_CALL FmXGridPeer::getSelection(  )
 {
     VclPtr< FmGridControl > pVclControl = GetAs< FmGridControl >();
     Sequence< Any > aSelectionBookmarks = pVclControl->getSelectionBookmarks();
-    return makeAny(aSelectionBookmarks);
+    return Any(aSelectionBookmarks);
 }
 
 
@@ -2636,7 +2637,7 @@ Sequence< css::util::URL>& FmXGridPeer::getSupportedURLs()
 {
     static Sequence< css::util::URL> aSupported = []()
     {
-        static const char* sSupported[] = {
+        static const rtl::OUStringConstExpr sSupported[] = {
             FMURL_RECORD_MOVEFIRST,
             FMURL_RECORD_MOVEPREV,
             FMURL_RECORD_MOVENEXT,
@@ -2648,7 +2649,7 @@ Sequence< css::util::URL>& FmXGridPeer::getSupportedURLs()
         css::util::URL* pSupported = tmp.getArray();
 
         for ( sal_Int32 i = 0; i < tmp.getLength(); ++i, ++pSupported)
-            pSupported->Complete = OUString::createFromAscii(sSupported[i]);
+            pSupported->Complete = sSupported[i];
 
         // let a css::util::URL-transformer normalize the URLs
         Reference< css::util::XURLTransformer >  xTransformer(
@@ -2784,7 +2785,7 @@ IMPL_LINK(FmXGridPeer, OnExecuteGridSlot, DbGridControlNavigationBarState, nSlot
 
     const std::vector<DbGridControlNavigationBarState>& aSlots = getSupportedGridSlots();
 
-    DBG_ASSERT(static_cast<sal_Int32>(aSlots.size()) == aUrls.getLength(), "FmXGridPeer::OnExecuteGridSlot : inconsistent data returned by getSupportedURLs/getSupportedGridSlots!");
+    DBG_ASSERT(aSlots.size() == o3tl::make_unsigned(aUrls.getLength()), "FmXGridPeer::OnExecuteGridSlot : inconsistent data returned by getSupportedURLs/getSupportedGridSlots!");
 
     for (size_t i=0; i<aSlots.size(); ++i, ++pUrls)
     {

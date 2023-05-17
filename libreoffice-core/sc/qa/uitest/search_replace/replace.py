@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -12,7 +14,7 @@ from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
 class ReplaceTest(UITestCase):
 
     def test_tdf106194(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf106194.ods")) as doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf106194.ods")):
 
             xGridWin = self.xUITest.getTopFocusWindow().getChild("grid_window")
 
@@ -51,5 +53,4 @@ class ReplaceTest(UITestCase):
 
                 xReplaceBtn.executeAction("CLICK", tuple())
 
-
-
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

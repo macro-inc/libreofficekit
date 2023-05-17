@@ -14,7 +14,7 @@ $(eval $(call gb_Library_set_soversion_script,sal,$(SRCDIR)/sal/util/sal.map))
 
 $(eval $(call gb_Library_set_precompiled_header,sal,sal/inc/pch/precompiled_sal))
 
-$(eval $(call gb_Library_set_is_ure_library,sal))
+$(eval $(call gb_Library_set_is_ure_library_or_dependency,sal))
 
 $(eval $(call gb_Library_set_include,sal,\
 	$$(INCLUDE) \
@@ -33,15 +33,17 @@ $(eval $(call gb_Library_add_defs,sal,\
 	-DRTL_OS="\"$(RTL_OS)\"" \
 	-DRTL_ARCH="\"$(RTL_ARCH)\"" \
 	-DSRCDIR="\"$(SRCDIR)\"" \
+    $(call gb_CondLibSalTextenc,-DCOND_LIB_SAL_TEXTENC) \
 ))
 
 $(eval $(call gb_Library_use_libraries,sal,\
-	$(if $(filter ANDROID,$(OS)), \
+	$(if $(filter ANDROID EMSCRIPTEN,$(OS)), \
 		lo-bootstrap \
 	) \
 ))
 
 $(eval $(call gb_Library_use_externals,sal,\
+    dragonbox \
     dtoa \
     valgrind \
     zlib \
@@ -132,29 +134,21 @@ $(eval $(call gb_Library_add_cxxflags,sal,\
 ))
 endif
 
-sal_textenc_code= \
-	sal/textenc/context \
-	sal/textenc/convertbig5hkscs \
-	sal/textenc/converteuctw \
-	sal/textenc/convertgb18030 \
-	sal/textenc/convertisciidevangari \
-	sal/textenc/convertiso2022cn \
-	sal/textenc/convertiso2022jp \
-	sal/textenc/convertiso2022kr \
-	sal/textenc/convertsinglebytetobmpunicode \
-	sal/textenc/tables \
-	sal/textenc/tcvtbyte \
-	sal/textenc/tcvtmb \
-	sal/textenc/tcvtutf7 \
-
-ifeq ($(OS),ANDROID)
+ifeq (,$(call gb_CondLibSalTextenc,$(true)))
 $(eval $(call gb_Library_add_exception_objects,sal,\
-    $(sal_textenc_code) \
-))
-else ifeq ($(DISABLE_DYNLOADING),TRUE)
-
-$(eval $(call gb_Library_add_exception_objects,sal,\
-    $(sal_textenc_code) \
+    sal/textenc/context \
+    sal/textenc/convertbig5hkscs \
+    sal/textenc/converteuctw \
+    sal/textenc/convertgb18030 \
+    sal/textenc/convertisciidevangari \
+    sal/textenc/convertiso2022cn \
+    sal/textenc/convertiso2022jp \
+    sal/textenc/convertiso2022kr \
+    sal/textenc/convertsinglebytetobmpunicode \
+    sal/textenc/tables \
+    sal/textenc/tcvtbyte \
+    sal/textenc/tcvtmb \
+    sal/textenc/tcvtutf7 \
 ))
 endif
 

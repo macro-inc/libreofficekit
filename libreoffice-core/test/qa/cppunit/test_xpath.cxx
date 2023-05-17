@@ -9,7 +9,10 @@
 
 #include <sal/types.h>
 #include <test/xmltesttools.hxx>
-#include <unotest/bootstrapfixturebase.hxx>
+
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/plugin/TestPlugIn.h>
 
 class TestXPath : public CppUnit::TestFixture, public XmlTestTools
 {
@@ -22,15 +25,13 @@ CPPUNIT_TEST_FIXTURE(TestXPath, test_getXPath)
     xmlDocUniquePtr pTable(xmlParseDoc(s_xml));
     CPPUNIT_ASSERT(pTable);
     // Must get existing element content without errors
-    CPPUNIT_ASSERT_ASSERTION_PASS(getXPath(pTable, "/xml/item", ""));
+    CPPUNIT_ASSERT_ASSERTION_PASS(assertXPath(pTable, "/xml/item"));
     // Must error out when getting non-existing element
-    CPPUNIT_ASSERT_ASSERTION_FAIL(getXPath(pTable, "/xml/no_item", ""));
+    CPPUNIT_ASSERT_ASSERTION_FAIL(assertXPath(pTable, "/xml/no_item"));
     // Must get existing attribute value correctly
     CPPUNIT_ASSERT_ASSERTION_PASS(getXPath(pTable, "/xml/item", "attrib"));
     // Must fail when requested non-empty attribute doesn't exist
     CPPUNIT_ASSERT_ASSERTION_FAIL(getXPath(pTable, "/xml/item", "no_attrib"));
-    // Must return empty string if not asking an attribute, regardless what is its content
-    CPPUNIT_ASSERT_EQUAL(OUString(), getXPath(pTable, "/xml/item", ""));
     // Must properly return attribute content
     CPPUNIT_ASSERT_EQUAL(OUString("val"), getXPath(pTable, "/xml/item", "attrib"));
     // Trying to get position of missing child of a node must fail assertion

@@ -96,7 +96,7 @@ public:
         Modifications * modifications);
 
     css::beans::Optional< css::uno::Any >
-    getExternalValue(OUString const & descriptor);
+    getExternalValue(std::u16string_view descriptor);
 
 private:
     Components(const Components&) = delete;
@@ -122,7 +122,7 @@ private:
         OUString const & url, bool recursive);
 
     void parseFileList(
-        int layer, FileParser * parseFile, OUString const & urls,
+        int layer, FileParser * parseFile, std::u16string_view urls,
         bool recordAdditions);
 
     void parseXcdFiles(int layer, OUString const & url);

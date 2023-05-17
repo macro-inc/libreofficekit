@@ -37,6 +37,7 @@
 #include <sfx2/sfxsids.hrc>
 #include <sfx2/viewfrm.hxx>
 #include <tools/debug.hxx>
+#include <utility>
 #include <osl/diagnose.h>
 
 namespace basctl
@@ -59,14 +60,14 @@ constexpr OUStringLiteral aSemi(u";");
 
 LocalizationMgr::LocalizationMgr(
     Shell* pShell,
-    ScriptDocument const& rDocument,
-    OUString const& aLibName,
+    ScriptDocument aDocument,
+    OUString aLibName,
     Reference<XStringResourceManager> const& xStringResourceManager
 ) :
     m_xStringResourceManager(xStringResourceManager),
     m_pShell(pShell),
-    m_aDocument(rDocument),
-    m_aLibName(aLibName)
+    m_aDocument(std::move(aDocument)),
+    m_aLibName(std::move(aLibName))
 { }
 
 bool LocalizationMgr::isLibraryLocalized ()
@@ -975,7 +976,7 @@ void LocalizationMgr::resetResourceForDialog( const Reference< container::XNameC
         return;
 
     // Dialog as control
-    OUString aDummyName;
+    std::u16string_view aDummyName;
     Any aDialogCtrl;
     aDialogCtrl <<= xDialogModel;
     Reference< XStringResourceResolver > xDummyStringResolver;
@@ -1002,7 +1003,7 @@ void LocalizationMgr::setResourceIDsForDialog( const Reference< container::XName
         return;
 
     // Dialog as control
-    OUString aDummyName;
+    std::u16string_view aDummyName;
     Any aDialogCtrl;
     aDialogCtrl <<= xDialogModel;
     Reference< XStringResourceResolver > xDummyStringResolver;
@@ -1084,7 +1085,7 @@ void LocalizationMgr::copyResourceForDialog(
     if( !xDialogModel.is() || !xSourceStringResolver.is() || !xTargetStringResourceManager.is() )
         return;
 
-    OUString aDummyName;
+    std::u16string_view aDummyName;
     Any aDialogCtrl;
     aDialogCtrl <<= xDialogModel;
     implHandleControlResourceProperties

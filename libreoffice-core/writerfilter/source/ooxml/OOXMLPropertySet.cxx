@@ -24,15 +24,17 @@
 #include <com/sun/star/drawing/XShape.hpp>
 #include <sax/tools/converter.hxx>
 #include <tools/color.hxx>
+#include <o3tl/string_view.hxx>
+#include <utility>
 
 namespace writerfilter::ooxml
 {
 using namespace ::std;
 using namespace com::sun::star;
 
-OOXMLProperty::OOXMLProperty(Id id, const OOXMLValue::Pointer_t& pValue,
+OOXMLProperty::OOXMLProperty(Id id, OOXMLValue::Pointer_t pValue,
                              OOXMLProperty::Type_t eType)
-    : mId(id), mpValue(pValue), meType(eType)
+    : mId(id), mpValue(std::move(pValue)), meType(eType)
 {
 }
 
@@ -171,9 +173,8 @@ OOXMLValue * OOXMLValue::clone() const
   class OOXMLBinaryValue
  */
 
-OOXMLBinaryValue::OOXMLBinaryValue(OOXMLBinaryObjectReference::Pointer_t const &
-                                   pBinaryObj)
-: mpBinaryObj(pBinaryObj)
+OOXMLBinaryValue::OOXMLBinaryValue(OOXMLBinaryObjectReference::Pointer_t pBinaryObj)
+: mpBinaryObj(std::move(pBinaryObj))
 {
 }
 
@@ -202,13 +203,13 @@ OOXMLValue * OOXMLBinaryValue::clone() const
   class OOXMLBooleanValue
 */
 
-static bool GetBooleanValue(const char *pValue)
+static bool GetBooleanValue(std::string_view pValue)
 {
-    return !strcmp(pValue, "true")
-           || !strcmp(pValue, "True")
-           || !strcmp(pValue, "1")
-           || !strcmp(pValue, "on")
-           || !strcmp(pValue, "On");
+    return pValue == "true"
+           || pValue == "True"
+           || pValue == "1"
+           || pValue == "on"
+           || pValue == "On";
 }
 
 OOXMLValue::Pointer_t const & OOXMLBooleanValue::Create(bool bValue)
@@ -219,7 +220,7 @@ OOXMLValue::Pointer_t const & OOXMLBooleanValue::Create(bool bValue)
     return bValue ? True : False;
 }
 
-OOXMLValue::Pointer_t const & OOXMLBooleanValue::Create(const char *pValue)
+OOXMLValue::Pointer_t const & OOXMLBooleanValue::Create(std::string_view pValue)
 {
     return Create (GetBooleanValue(pValue));
 }
@@ -259,8 +260,8 @@ OOXMLValue * OOXMLBooleanValue::clone() const
   class OOXMLStringValue
 */
 
-OOXMLStringValue::OOXMLStringValue(const OUString & rStr)
-: mStr(rStr)
+OOXMLStringValue::OOXMLStringValue(OUString sStr)
+: mStr(std::move(sStr))
 {
 }
 
@@ -293,8 +294,8 @@ OOXMLValue * OOXMLStringValue::clone() const
 /*
   class OOXMLInputStreamValue
  */
-OOXMLInputStreamValue::OOXMLInputStreamValue(uno::Reference<io::XInputStream> const & xInputStream)
-: mxInputStream(xInputStream)
+OOXMLInputStreamValue::OOXMLInputStreamValue(uno::Reference<io::XInputStream> xInputStream)
+: mxInputStream(std::move(xInputStream))
 {
 }
 
@@ -430,8 +431,8 @@ string OOXMLPropertySet::toString()
   class OOXMLPropertySetValue
 */
 
-OOXMLPropertySetValue::OOXMLPropertySetValue(const OOXMLPropertySet::Pointer_t& pPropertySet)
-    : mpPropertySet(pPropertySet)
+OOXMLPropertySetValue::OOXMLPropertySetValue(OOXMLPropertySet::Pointer_t pPropertySet)
+    : mpPropertySet(std::move(pPropertySet))
 {
 }
 
@@ -540,8 +541,8 @@ OOXMLHexValue::OOXMLHexValue(sal_uInt32 nValue)
 {
 }
 
-OOXMLHexValue::OOXMLHexValue(const char * pValue)
-: mnValue(rtl_str_toUInt32(pValue, 16))
+OOXMLHexValue::OOXMLHexValue(std::string_view pValue)
+: mnValue(o3tl::toUInt32(pValue, 16))
 {
 }
 
@@ -572,23 +573,23 @@ string OOXMLHexValue::toString() const
 /*
   class OOXMLHexColorValue
 */
-OOXMLHexColorValue::OOXMLHexColorValue(const char * pValue)
+OOXMLHexColorValue::OOXMLHexColorValue(std::string_view pValue)
     : OOXMLHexValue(sal_uInt32(COL_AUTO))
 {
-    if (!strcmp(pValue, "auto"))
+    if (pValue == "auto")
         return;
 
-    mnValue = rtl_str_toUInt32(pValue, 16);
+    mnValue = o3tl::toUInt32(pValue, 16);
 
     // Convert hash-encoded values (like #FF0080)
-    const sal_Int32 nLen = strlen(pValue);
+    const sal_Int32 nLen = pValue.size();
     if ( !mnValue && nLen > 1 && pValue[0] == '#' )
     {
         sal_Int32 nColor(COL_AUTO);
         // Word appears to require strict 6 digit length, else it ignores it
         if ( nLen == 7 )
         {
-            const OUString sHashColor(pValue, nLen, RTL_TEXTENCODING_ASCII_US);
+            const OUString sHashColor(pValue.data(), nLen, RTL_TEXTENCODING_ASCII_US);
             sax::Converter::convertColor( nColor, sHashColor );
         }
         mnValue = nColor;
@@ -597,11 +598,11 @@ OOXMLHexColorValue::OOXMLHexColorValue(const char * pValue)
 
 // OOXMLUniversalMeasureValue
 // ECMA-376 5th ed. Part 1 , 22.9.2.15
-OOXMLUniversalMeasureValue::OOXMLUniversalMeasureValue(const char * pValue, sal_uInt32 npPt)
+OOXMLUniversalMeasureValue::OOXMLUniversalMeasureValue(std::string_view pValue, sal_uInt32 npPt)
 {
-    double val = rtl_str_toDouble(pValue); // will ignore the trailing unit
+    double val = o3tl::toDouble(pValue); // will ignore the trailing unit
 
-    int nLen = strlen(pValue);
+    int nLen = pValue.size();
     if (nLen > 2 &&
         pValue[nLen-2] == 'p' &&
         pValue[nLen-1] == 't')
@@ -656,11 +657,11 @@ string OOXMLUniversalMeasureValue::toString() const
 
 // OOXMLMeasurementOrPercentValue
 // ECMA-376 5th ed. Part 1 , 17.18.107; 17.18.11
-OOXMLMeasurementOrPercentValue::OOXMLMeasurementOrPercentValue(const char * pValue)
+OOXMLMeasurementOrPercentValue::OOXMLMeasurementOrPercentValue(std::string_view pValue)
 {
-    double val = rtl_str_toDouble(pValue); // will ignore the trailing unit
+    double val = o3tl::toDouble(pValue); // will ignore the trailing unit
 
-    int nLen = strlen(pValue);
+    int nLen = pValue.size();
     if (nLen > 1 &&
         pValue[nLen - 1] == '%')
     {
@@ -689,8 +690,8 @@ string OOXMLMeasurementOrPercentValue::toString() const
  */
 
 
-OOXMLShapeValue::OOXMLShapeValue(uno::Reference<drawing::XShape> const & rShape)
-: mrShape(rShape)
+OOXMLShapeValue::OOXMLShapeValue(uno::Reference<drawing::XShape> xShape)
+: mrShape(std::move(xShape))
 {
 }
 
@@ -720,8 +721,8 @@ OOXMLValue * OOXMLShapeValue::clone() const
  */
 
 
-OOXMLStarMathValue::OOXMLStarMathValue( uno::Reference< embed::XEmbeddedObject > const & c )
-: component(c)
+OOXMLStarMathValue::OOXMLStarMathValue( uno::Reference< embed::XEmbeddedObject > c )
+: component(std::move(c))
 {
 }
 

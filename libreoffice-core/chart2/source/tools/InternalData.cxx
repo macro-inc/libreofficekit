@@ -22,6 +22,7 @@
 #include <strings.hrc>
 
 #include <comphelper/sequence.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 
 #ifdef DEBUG_CHART2_TOOLS
@@ -48,11 +49,11 @@ namespace
 {
 struct lcl_NumberedStringGenerator
 {
-    lcl_NumberedStringGenerator( const OUString & rStub, const OUString & rWildcard ) :
+    lcl_NumberedStringGenerator( const OUString & rStub, std::u16string_view rWildcard ) :
             m_aStub( rStub ),
             m_nCounter( 0 ),
             m_nStubStartIndex( rStub.indexOf( rWildcard )),
-            m_nWildcardLength( rWildcard.getLength())
+            m_nWildcardLength( rWildcard.size())
     {
     }
     vector< uno::Any > operator()()
@@ -113,12 +114,12 @@ void InternalData::createDefaultData()
     m_aRowLabels.clear();
     m_aRowLabels.reserve( m_nRowCount );
     generate_n( back_inserter( m_aRowLabels ), m_nRowCount,
-        lcl_NumberedStringGenerator( aRowName, "%ROWNUMBER" ));
+        lcl_NumberedStringGenerator( aRowName, u"%ROWNUMBER" ));
 
     m_aColumnLabels.clear();
     m_aColumnLabels.reserve( m_nColumnCount );
     generate_n( back_inserter( m_aColumnLabels ), m_nColumnCount,
-        lcl_NumberedStringGenerator( aColName, "%COLUMNNUMBER" ));
+        lcl_NumberedStringGenerator( aColName, u"%COLUMNNUMBER" ));
 }
 
 void InternalData::setData( const Sequence< Sequence< double > >& rDataInRows )
@@ -202,7 +203,7 @@ void InternalData::setComplexColumnLabel( sal_Int32 nColumnIndex, vector< uno::A
 {
     if( nColumnIndex < 0 )
         return;
-    if( nColumnIndex >= static_cast< sal_Int32 >( m_aColumnLabels.size() ) )
+    if( o3tl::make_unsigned(nColumnIndex) >= m_aColumnLabels.size() )
     {
         m_aColumnLabels.resize(nColumnIndex+1);
         enlargeData( nColumnIndex+1, 0 );
@@ -216,7 +217,7 @@ void InternalData::setComplexRowLabel( sal_Int32 nRowIndex, vector< uno::Any >&&
 {
     if( nRowIndex < 0 )
         return;
-    if( nRowIndex >= static_cast< sal_Int32 >( m_aRowLabels.size() ) )
+    if( o3tl::make_unsigned(nRowIndex) >= m_aRowLabels.size() )
     {
         m_aRowLabels.resize(nRowIndex+1);
         enlargeData( 0, nRowIndex+1 );

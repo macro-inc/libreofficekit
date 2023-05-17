@@ -57,6 +57,10 @@
 #include <editeng/lrspitem.hxx>
 #include <calbck.hxx>
 #include <frameformats.hxx>
+#include <sortedobjs.hxx>
+#include <anchoredobject.hxx>
+#include <flyfrm.hxx>
+#include <flyfrms.hxx>
 
 using namespace ::com::sun::star::i18n;
 using namespace ::com::sun::star;
@@ -460,8 +464,8 @@ static bool CanSkipOverRedline(
     size_t nStartIndex(rStartIndex);
     size_t nEndIndex(rEndIndex);
     SwPosition const*const pRLEnd(rRedline.End());
-    if (!pRLEnd->nNode.GetNode().IsTextNode() // if fully deleted...
-        || pRLEnd->nContent == pRLEnd->nNode.GetNode().GetTextNode()->Len())
+    if (!pRLEnd->GetNode().IsTextNode() // if fully deleted...
+        || pRLEnd->GetContentIndex() == pRLEnd->GetNode().GetTextNode()->Len())
     {
         // shortcut: nothing follows redline
         // current state is end state
@@ -471,15 +475,15 @@ static bool CanSkipOverRedline(
     // can't compare the SwFont that's stored somewhere, it doesn't have compare
     // operator, so try to recreate the situation with some temp arrays here
     SfxPoolItem const* activeCharAttrsStart[RES_CHRATR_END - RES_CHRATR_BEGIN + 1] = { nullptr, };
-    if (&rStartNode != &pRLEnd->nNode.GetNode())
+    if (rStartNode != pRLEnd->GetNode())
     {   // nodes' attributes are only needed if there are different nodes
         InsertCharAttrs(activeCharAttrsStart, rStartNode.GetSwAttrSet());
     }
     if (SwpHints const*const pStartHints = rStartNode.GetpSwpHints())
     {
         // check hint ends of hints that start before and end within
-        sal_Int32 const nRedlineEnd(&rStartNode == &pRLEnd->nNode.GetNode()
-                ? pRLEnd->nContent.GetIndex()
+        sal_Int32 const nRedlineEnd(rStartNode == pRLEnd->GetNode()
+                ? pRLEnd->GetContentIndex()
                 : rStartNode.Len());
         for ( ; nEndIndex < pStartHints->Count(); ++nEndIndex)
         {
@@ -541,10 +545,10 @@ static bool CanSkipOverRedline(
             }
         }
         assert(nEndIndex == pStartHints->Count() ||
-            pRLEnd->nContent.GetIndex() < pStartHints->GetSortedByEnd(nEndIndex)->GetAnyEnd());
+            pRLEnd->GetContentIndex() < pStartHints->GetSortedByEnd(nEndIndex)->GetAnyEnd());
     }
 
-    if (&rStartNode != &pRLEnd->nNode.GetNode())
+    if (rStartNode != pRLEnd->GetNode())
     {
         nStartIndex = 0;
         nEndIndex = 0;
@@ -556,17 +560,17 @@ static bool CanSkipOverRedline(
         // ... and the charfmt must be *nominally* the same
 
     SfxPoolItem const* activeCharAttrsEnd[RES_CHRATR_END - RES_CHRATR_BEGIN + 1] = { nullptr, };
-    if (&rStartNode != &pRLEnd->nNode.GetNode())
+    if (rStartNode != pRLEnd->GetNode())
     {   // nodes' attributes are only needed if there are different nodes
         InsertCharAttrs(activeCharAttrsEnd,
-                pRLEnd->nNode.GetNode().GetTextNode()->GetSwAttrSet());
+                pRLEnd->GetNode().GetTextNode()->GetSwAttrSet());
     }
 
-    if (SwpHints *const pEndHints = pRLEnd->nNode.GetNode().GetTextNode()->GetpSwpHints())
+    if (SwpHints *const pEndHints = pRLEnd->GetNode().GetTextNode()->GetpSwpHints())
     {
         // check hint starts of hints that start within and end after
 #ifndef NDEBUG
-        sal_Int32 const nRedlineStart(&rStartNode == &pRLEnd->nNode.GetNode()
+        sal_Int32 const nRedlineStart(rStartNode == pRLEnd->GetNode()
                 ? nStartRedline
                 : 0);
 #endif
@@ -577,7 +581,7 @@ static bool CanSkipOverRedline(
             // of the 1st char after the redline; should not cause problems
             // with consecutive delete redlines because those are handed by
             // GetNextRedln() and here we have the last end pos.
-            if (pRLEnd->nContent.GetIndex() < pAttr->GetStart())
+            if (pRLEnd->GetContentIndex() < pAttr->GetStart())
             {
                 break;
             }
@@ -588,7 +592,7 @@ static bool CanSkipOverRedline(
                 continue;
             }
             assert(nRedlineStart <= pAttr->GetStart()); // we wouldn't be here otherwise?
-            if (*pAttr->End() <= pRLEnd->nContent.GetIndex())
+            if (*pAttr->End() <= pRLEnd->GetContentIndex())
             {
                 continue;
             }
@@ -632,7 +636,7 @@ static bool CanSkipOverRedline(
                 default: assert(false);
             }
         }
-        if (&rStartNode != &pRLEnd->nNode.GetNode())
+        if (rStartNode != pRLEnd->GetNode())
         {
             // need to iterate the nEndIndex forward too so the loop in the
             // caller can look for the right ends in the next iteration
@@ -641,7 +645,7 @@ static bool CanSkipOverRedline(
                 SwTextAttr *const pAttr(pEndHints->GetSortedByEnd(nEndIndex));
                 if (!pAttr->End())
                     continue;
-                if (pRLEnd->nContent.GetIndex() < *pAttr->End())
+                if (pRLEnd->GetContentIndex() < *pAttr->End())
                 {
                     break;
                 }
@@ -746,20 +750,20 @@ TextFrameIndex SwAttrIter::GetNextAttr() const
             if (redline.second.first)
             {
                 assert(m_pMergedPara);
-                assert(redline.second.first->End()->nNode.GetIndex() <= m_pMergedPara->pLastNode->GetIndex()
-                    || !redline.second.first->End()->nNode.GetNode().IsTextNode());
+                assert(redline.second.first->End()->GetNodeIndex() <= m_pMergedPara->pLastNode->GetIndex()
+                    || !redline.second.first->End()->GetNode().IsTextNode());
                 if (CanSkipOverRedline(*pTextNode, redline.first, *redline.second.first,
                         nStartIndex, nEndIndex, m_nPosition == redline.first))
                 {   // if current position is start of the redline, must skip!
                     nActRedline += redline.second.second;
-                    if (&redline.second.first->End()->nNode.GetNode() != pTextNode)
+                    if (&redline.second.first->End()->GetNode() != pTextNode)
                     {
-                        pTextNode = redline.second.first->End()->nNode.GetNode().GetTextNode();
-                        nPosition = redline.second.first->End()->nContent.GetIndex();
+                        pTextNode = redline.second.first->End()->GetNode().GetTextNode();
+                        nPosition = redline.second.first->End()->GetContentIndex();
                     }
                     else
                     {
-                        nPosition = redline.second.first->End()->nContent.GetIndex();
+                        nPosition = redline.second.first->End()->GetContentIndex();
                     }
                 }
                 else
@@ -891,9 +895,9 @@ static void lcl_MinMaxNode(SwFrameFormat* pNd, SwMinMaxNodeArgs& rIn)
         return;
     }
 
-    const SwPosition *pPos = rFormatA.GetContentAnchor();
-    OSL_ENSURE(pPos, "Unexpected NULL arguments");
-    if (!pPos || rIn.m_nIndex != pPos->nNode.GetIndex())
+    const SwNode *pAnchorNode = rFormatA.GetAnchorNode();
+    OSL_ENSURE(pAnchorNode, "Unexpected NULL arguments");
+    if (!pAnchorNode || rIn.m_nIndex != pAnchorNode->GetIndex())
         return;
 
     tools::Long nMin, nMax;
@@ -1448,6 +1452,74 @@ sal_uInt16 SwTextFrame::GetScalingOfSelectedText(
     return o3tl::narrowing<sal_uInt16>( nWidth ? ((100 * aIter.GetFnt()->GetTextSize_( aDrawInf ).Height()) / nWidth ) : 0 );
 }
 
+std::vector<SwFlyAtContentFrame*> SwTextFrame::GetSplitFlyDrawObjs() const
+{
+    std::vector<SwFlyAtContentFrame*> aObjs;
+    const SwSortedObjs* pSortedObjs = GetDrawObjs();
+    if (!pSortedObjs)
+    {
+        return aObjs;
+    }
+
+    for (const auto& pSortedObj : *pSortedObjs)
+    {
+        SwFlyFrame* pFlyFrame = pSortedObj->DynCastFlyFrame();
+        if (!pFlyFrame)
+        {
+            continue;
+        }
+
+        if (!pFlyFrame->IsFlySplitAllowed())
+        {
+            continue;
+        }
+
+        aObjs.push_back(static_cast<SwFlyAtContentFrame*>(pFlyFrame));
+    }
+
+    return aObjs;
+}
+
+bool SwTextFrame::HasNonLastSplitFlyDrawObj() const
+{
+    const SwTextFrame* pFollow = GetFollow();
+    if (!pFollow)
+    {
+        return false;
+    }
+
+    if (mnOffset != pFollow->GetOffset())
+    {
+        return false;
+    }
+
+    // At this point we know what we're part of a chain that is an anchor for split fly frames, but
+    // we're not the last one. See if we have a matching fly.
+
+    // Look up the master of the anchor.
+    const SwTextFrame* pAnchor = this;
+    while (pAnchor->IsFollow())
+    {
+        pAnchor = pAnchor->FindMaster();
+    }
+    for (const auto& pFly : pAnchor->GetSplitFlyDrawObjs())
+    {
+        // Nominally all flys are anchored in the master; see if this fly is effectively anchored in
+        // us.
+        SwTextFrame* pFlyAnchor = pFly->FindAnchorCharFrame();
+        if (pFlyAnchor != this)
+        {
+            continue;
+        }
+        if (pFly->GetFollow())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 SwTwips SwTextNode::GetWidthOfLeadingTabs() const
 {
     SwTwips nRet = 0;
@@ -1466,8 +1538,7 @@ SwTwips SwTextNode::GetWidthOfLeadingTabs() const
 
     if ( nIdx > 0 )
     {
-        SwPosition aPos( *this );
-        aPos.nContent += nIdx;
+        SwPosition aPos( *this, nIdx );
 
         // Find the non-follow text frame:
         SwIterator<SwTextFrame, SwTextNode, sw::IteratorMode::UnwrapMulti> aIter(*this);

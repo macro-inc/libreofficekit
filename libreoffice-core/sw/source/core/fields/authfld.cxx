@@ -24,6 +24,7 @@
 #include <comphelper/string.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <o3tl/any.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <tools/urlobj.hxx>
 #include <swtypes.hxx>
@@ -104,13 +105,13 @@ void SwAuthorityFieldType::RemoveField(const SwAuthEntry* pEntry)
     assert(false && "SwAuthorityFieldType::RemoveField: pEntry was not added previously");
 }
 
-SwAuthEntry* SwAuthorityFieldType::AddField(const OUString& rFieldContents)
+SwAuthEntry* SwAuthorityFieldType::AddField(std::u16string_view rFieldContents)
 {
     rtl::Reference<SwAuthEntry> pEntry(new SwAuthEntry);
     sal_Int32 nIdx{ 0 };
     for( sal_Int32 i = 0; i < AUTH_FIELD_END; ++i )
         pEntry->SetAuthorField( static_cast<ToxAuthorityField>(i),
-                        rFieldContents.getToken( 0, TOX_STYLE_DELIMITER, nIdx ));
+                        OUString(o3tl::getToken(rFieldContents, 0, TOX_STYLE_DELIMITER, nIdx )));
 
     for (const auto &rpTemp : m_DataArr)
     {
@@ -449,7 +450,7 @@ void SwAuthorityFieldType::SetSortKeys(sal_uInt16 nKeyCount, SwTOXSortKey  const
 }
 
 SwAuthorityField::SwAuthorityField( SwAuthorityFieldType* pInitType,
-                                    const OUString& rFieldContents )
+                                    std::u16string_view rFieldContents )
     : SwField(pInitType)
     , m_nTempSequencePos( -1 )
     , m_nTempSequencePosRLHidden( -1 )
@@ -500,7 +501,7 @@ OUString SwAuthorityField::ConditionalExpandAuthIdentifier(
         {
             OUString sIdentifier(m_xAuthEntry->GetAuthorField(AUTH_FIELD_IDENTIFIER));
             // tdf#107784 Use title if it's a ooxml citation
-            if (sIdentifier.trim().startsWith("CITATION"))
+            if (o3tl::starts_with(o3tl::trim(sIdentifier), u"CITATION"))
                 return m_xAuthEntry->GetAuthorField(AUTH_FIELD_TITLE);
             else
                 sRet += sIdentifier;
@@ -719,10 +720,10 @@ bool    SwAuthorityField::QueryValue( Any& rAny, sal_uInt16 /*nWhichId*/ ) const
     return false;
 }
 
-static sal_Int32 lcl_Find(const OUString& rFieldName)
+static sal_Int32 lcl_Find(std::u16string_view rFieldName)
 {
     for(sal_Int32 i = 0; i < AUTH_FIELD_END; ++i)
-        if(rFieldName.equalsAscii(aFieldNames[i]))
+        if(o3tl::equalsAscii(rFieldName, aFieldNames[i]))
             return i;
     return -1;
 }
@@ -736,7 +737,7 @@ bool    SwAuthorityField::PutValue( const Any& rAny, sal_uInt16 /*nWhichId*/ )
     if(!(rAny >>= aParam))
         return false;
 
-    OUStringBuffer sBuf;
+    OUStringBuffer sBuf(+AUTH_FIELD_LOCAL_URL);
     comphelper::string::padToLength(sBuf, AUTH_FIELD_LOCAL_URL, TOX_STYLE_DELIMITER);
     OUString sToSet(sBuf.makeStringAndClear());
     for(const PropertyValue& rParam : std::as_const(aParam))

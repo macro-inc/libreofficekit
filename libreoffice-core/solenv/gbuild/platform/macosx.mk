@@ -99,7 +99,7 @@ endef
 
 define gb_LinkTarget__command_dynamiclink
 $(call gb_Helper_abbreviate_dirs,\
-	FILELIST=$(call gb_var2file,$(shell $(gb_MKTEMP)),100, \
+	FILELIST=$(call gb_var2file,$(shell $(gb_MKTEMP)), \
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_target,$(object))) \
 		$(foreach object,$(CXXOBJECTS),$(call gb_CxxObject_get_target,$(object))) \
 		$(foreach object,$(ASMOBJECTS),$(call gb_AsmObject_get_target,$(object))) \
@@ -234,8 +234,7 @@ gb_Library_get_sdk_link_lib = $(gb_Library_get_versionlink_target)
 define gb_Library_Bundle
 $(call gb_Library_Library,$(1))
 $(call gb_LinkTarget_set_targettype,$(call gb_Library_get_linktarget,$(1)),Bundle)
-$(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,$(1))) : \
-	RPATH :=
+$(call gb_Library_get_linktarget_target,$(1)) : RPATH :=
 endef
 
 # Executable class
@@ -348,7 +347,7 @@ gb_UnpackedTarget_TARFILE_LOCATION := $(TARFILE_LOCATION)
 
 # UnoApiHeadersTarget class
 
-ifneq ($(filter TRUE,$(DISABLE_DYNLOADING)),)
+ifeq ($(DISABLE_DYNLOADING),TRUE)
 gb_UnoApiHeadersTarget_select_variant = $(if $(filter udkapi,$(1)),comprehensive,$(2))
 else
 gb_UnoApiHeadersTarget_select_variant = $(2)

@@ -10,21 +10,35 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="rtl::OUString">
     <DisplayString>{*pData}</DisplayString>
-    <StringView>*pData,su</StringView>
+    <StringView>*pData</StringView>
   </Type>
   <Type Name="rtl::OString">
     <DisplayString>{*pData}</DisplayString>
-    <StringView>*pData,s</StringView>
+    <StringView>*pData</StringView>
   </Type>
   <Type Name="_rtl_uString">
     <DisplayString Condition="length == 0">empty</DisplayString>
-    <DisplayString>{buffer,[length]su}</DisplayString>
-    <StringView>buffer,[length]su</StringView>
+    <DisplayString>{buffer,[length]na}</DisplayString>
+    <StringView>buffer,[length]na</StringView>
+    <Expand HideRawView="true">
+      <Item Name="refCount">refCount</Item>
+      <Item Name="length">length</Item>
+      <Item Name="buffer">buffer,[length+1]</Item>
+	</Expand>
   </Type>
   <Type Name="_rtl_String">
     <DisplayString Condition="length == 0">empty</DisplayString>
-    <DisplayString>{buffer,[length]s}</DisplayString>
-    <StringView>buffer,[length]s</StringView>
+    <DisplayString>{buffer,[length]na}</DisplayString>
+    <StringView>buffer,[length]na</StringView>
+    <Expand HideRawView="true">
+      <Item Name="refCount">refCount</Item>
+      <Item Name="length">length</Item>
+      <Item Name="buffer">buffer,[length+1]</Item>
+	</Expand>
+  </Type>
+  <Type Name="rtl::OUStringLiteral &lt; * &gt;">
+    <DisplayString>{str}</DisplayString>
+    <StringView>str</StringView>
   </Type>
   <Type Name="_uno_Any">
     <!--
@@ -85,29 +99,29 @@
     <DisplayString>{mpImpl}</DisplayString>
   </Type>
   <Type Name="Point">
-    <DisplayString>X:{nA}, Y:{nB}</DisplayString>
+    <DisplayString>X:{mnA}, Y:{mnB}</DisplayString>
   </Type>
   <Type Name="Size">
-    <DisplayString>W:{nA}, H:{nB}</DisplayString>
+    <DisplayString>W:{mnA}, H:{mnB}</DisplayString>
   </Type>
   <Type Name="Range">
-    <DisplayString>Min:{nA}, Max:{nB}</DisplayString>
+    <DisplayString>Min:{mnA}, Max:{mnB}</DisplayString>
   </Type>
   <Type Name="Selection">
-    <DisplayString>Min:{nA}, Max:{nB}</DisplayString>
+    <DisplayString>Min:{mnA}, Max:{mnB}</DisplayString>
   </Type>
   <Type Name="Pair">
-    <DisplayString>A:{nA}, B:{nB}</DisplayString>
+    <DisplayString>A:{mnA}, B:{mnB}</DisplayString>
   </Type>
   <Type Name="SwRect">
     <DisplayString>{m_Point}, {m_Size}</DisplayString>
   </Type>
   <Type Name="tools::Rectangle">
-    <DisplayString IncludeView="w">{nRight==-32767?0:(nRight-nLeft+(nLeft>nRight?(-1):(1)))}</DisplayString>
-    <DisplayString IncludeView="h">{nBottom==-32767?0:(nBottom-nTop+(nTop>nBottom?(-1):(1)))}</DisplayString>
-    <DisplayString IncludeView="sz" Condition="nRight==-32767 || nBottom==-32767">empty</DisplayString>
+    <DisplayString IncludeView="w">{mnRight==-32767?0:(mnRight-mnLeft+(mnLeft>mnRight?(-1):(1)))}</DisplayString>
+    <DisplayString IncludeView="h">{mnBottom==-32767?0:(mnBottom-mnTop+(mnTop>mnBottom?(-1):(1)))}</DisplayString>
+    <DisplayString IncludeView="sz" Condition="mnRight==-32767 || mnBottom==-32767">empty</DisplayString>
     <DisplayString IncludeView="sz">{*this,view(w)nd} x {*this,view(h)nd}</DisplayString>
-    <DisplayString>{{ LT=[{nLeft} , {nTop}] RB=[{nRight} , {nBottom}] [{*this,view(sz)}] }}</DisplayString>
+    <DisplayString>{{ LT=[{mnLeft} , {mnTop}] RB=[{mnRight} , {mnBottom}] [{*this,view(sz)}] }}</DisplayString>
   </Type>
   <Type Name="_sal_Sequence">
     <DisplayString Condition="nElements == 0">_sal_Sequence (empty)</DisplayString>
@@ -231,7 +245,7 @@
   <Type Name="SwNodeIndex">
     <DisplayString>{{{*m_pNode}}}</DisplayString>
   </Type>
-  <Type Name="SwIndex">
+  <Type Name="SwContentIndex">
     <DisplayString>{{{m_nIndex}}}</DisplayString>
   </Type>
   <Type Name="SwPosition">
@@ -408,6 +422,22 @@
         <ValueNode>*mProperties[$i]</ValueNode>
       </IndexListItems>
       <Item Name='Type'>maType</Item>
+    </Expand>
+  </Type>
+  <Type Name='writerfilter::rtftok::RTFSprms'>
+    <DisplayString>{{Params: {m_pSprms.pObj->size()}}}</DisplayString>
+    <Expand>
+      <ArrayItems>
+        <Size>m_pSprms.pObj->size()</Size>
+        <ValuePointer>m_pSprms.pObj->_Mypair._Myval2._Myfirst</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name='tools::SvRef&lt;*&gt;'>
+    <DisplayString Condition="pObj!=nullptr">{*pObj}</DisplayString>
+    <DisplayString Condition="pObj==nullptr">nullptr</DisplayString>
+    <Expand>
+      <ExpandedItem Condition="pObj!=nullptr">*pObj</ExpandedItem>
     </Expand>
   </Type>
   <Type Name='SwFrame'>

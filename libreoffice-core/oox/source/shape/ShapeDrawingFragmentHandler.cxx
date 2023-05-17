@@ -7,18 +7,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include "ShapeDrawingFragmentHandler.hxx"
+#include <oox/shape/ShapeDrawingFragmentHandler.hxx>
 
 #include <oox/drawingml/shapegroupcontext.hxx>
 #include <oox/token/namespaces.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 
 namespace oox::shape {
 
-ShapeDrawingFragmentHandler::ShapeDrawingFragmentHandler(oox::core::XmlFilterBase& rFilter, const OUString& rFragmentPath, oox::drawingml::ShapePtr const & pGroupShapePtr)
+ShapeDrawingFragmentHandler::ShapeDrawingFragmentHandler(oox::core::XmlFilterBase& rFilter, const OUString& rFragmentPath, oox::drawingml::ShapePtr pGroupShapePtr)
     : FragmentHandler2(rFilter, rFragmentPath)
-    , mpGroupShapePtr(pGroupShapePtr)
+    , mpGroupShapePtr(std::move(pGroupShapePtr))
 {
 }
 

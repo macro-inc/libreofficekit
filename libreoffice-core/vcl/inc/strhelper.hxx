@@ -35,8 +35,8 @@ namespace psp
     int GetCommandLineTokenCount(const OUString&);
     // returns number of tokens (zero if empty or whitespace only)
 
-    OUString WhitespaceToSpace( const OUString&, bool bProtect = true );
-    OString WhitespaceToSpace(const OString&);
+    OUString WhitespaceToSpace( std::u16string_view, bool bProtect = true );
+    OString WhitespaceToSpace(std::string_view);
     // returns a string with multiple adjacent occurrences of whitespace
     // converted to a single space. if bProtect is sal_True (nonzero), then
     // doublequote, singlequote and singleleftquote protect their respective
@@ -44,12 +44,12 @@ namespace psp
 
 
     // parses the first double in the string; decimal is '.' only
-    inline double StringToDouble( const OUString& rStr )
+    inline double StringToDouble( std::u16string_view rStr )
     {
         return rtl::math::stringToDouble(rStr, u'.', u'\0');
     }
 
-    inline double StringToDouble(const OString& rStr)
+    inline double StringToDouble(std::string_view rStr)
     {
         return rtl::math::stringToDouble(rStr, '.', static_cast<char>(0));
     }

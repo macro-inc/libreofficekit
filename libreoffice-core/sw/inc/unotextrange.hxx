@@ -97,6 +97,17 @@ private:
     class Impl;
     ::sw::UnoImplPtr<Impl> m_pImpl;
 
+    void    SetPositions(SwPaM const& rPam);
+    //TODO: new exception type for protected content
+    /// @throws css::uno::RuntimeException
+    void    DeleteAndInsert(
+                std::u16string_view aText, ::sw::DeleteAndInsertMode eMode);
+    void    Invalidate();
+
+    virtual ~SwXTextRange() override;
+
+public:
+
     enum RangePosition
     {
         RANGE_IN_TEXT,  // "ordinary" css::text::TextRange
@@ -104,17 +115,6 @@ private:
         RANGE_IS_TABLE, // anchor of a table
         RANGE_IS_SECTION, // anchor of a section
     };
-
-    void    SetPositions(SwPaM const& rPam);
-    //TODO: new exception type for protected content
-    /// @throws css::uno::RuntimeException
-    void    DeleteAndInsert(
-                const OUString& rText, const bool bForceExpandHints);
-    void    Invalidate();
-
-    virtual ~SwXTextRange() override;
-
-public:
 
     SwXTextRange(SwPaM const & rPam,
             const css::uno::Reference< css::text::XText > & xParent,
@@ -129,7 +129,7 @@ public:
     bool GetPositions(SwPaM & rToFill,
         ::sw::TextRangeMode eMode = ::sw::TextRangeMode::RequireTextNode) const;
 
-    static css::uno::Reference< css::text::XTextRange > CreateXTextRange(
+    static rtl::Reference< SwXTextRange > CreateXTextRange(
             SwDoc & rDoc,
             const SwPosition& rPos, const SwPosition *const pMark);
 

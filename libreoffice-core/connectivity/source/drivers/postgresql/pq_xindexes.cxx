@@ -43,6 +43,8 @@
 #include <com/sun/star/sdbc/XRow.hpp>
 #include <com/sun/star/sdbc/XParameters.hpp>
 #include <cppuhelper/exc_hlp.hxx>
+#include <o3tl/safeint.hxx>
+#include <utility>
 
 #include "pq_xindexes.hxx"
 #include "pq_xindex.hxx"
@@ -55,7 +57,6 @@ using osl::MutexGuard;
 using com::sun::star::beans::XPropertySet;
 
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 using com::sun::star::uno::UNO_QUERY;
 using com::sun::star::uno::Reference;
 using com::sun::star::uno::Sequence;
@@ -78,11 +79,11 @@ Indexes::Indexes(
         const ::rtl::Reference< comphelper::RefCountedMutex > & refMutex,
         const css::uno::Reference< css::sdbc::XConnection >  & origin,
         ConnectionSettings *pSettings,
-        const OUString &schemaName,
-        const OUString &tableName)
+        OUString schemaName,
+        OUString tableName)
     : Container( refMutex, origin, pSettings,  getStatics().KEY ),
-      m_schemaName( schemaName ),
-      m_tableName( tableName )
+      m_schemaName(std::move( schemaName )),
+      m_tableName(std::move( tableName ))
 {
 }
 
@@ -149,7 +150,7 @@ void Indexes::refresh()
             pIndex->setPropertyValue_NoBroadcast_public(
                 st.IS_CLUSTERED, Any( isClusterd ) );
             pIndex->setPropertyValue_NoBroadcast_public(
-                st.NAME, makeAny( currentIndexName ) );
+                st.NAME, Any( currentIndexName ) );
 
             std::vector< sal_Int32 > seq = parseIntArray( row->getString( C_COLUMNS ) );
             Sequence< OUString > columnNames(seq.size());
@@ -160,10 +161,10 @@ void Indexes::refresh()
             }
 
             pIndex->setPropertyValue_NoBroadcast_public(
-                st.PRIVATE_COLUMN_INDEXES, makeAny( columnNames ));
+                st.PRIVATE_COLUMN_INDEXES, Any( columnNames ));
 
             {
-                m_values.push_back( makeAny( prop ) );
+                m_values.push_back( Any( prop ) );
                 map[ currentIndexName ] = index;
                 ++index;
             }
@@ -235,7 +236,7 @@ void Indexes::dropByIndex( sal_Int32 index )
 
 
     osl::MutexGuard guard( m_xMutex->GetMutex() );
-    if( index < 0 ||  index >= static_cast<sal_Int32>(m_values.size()) )
+    if( index < 0 ||  o3tl::make_unsigned(index) >= m_values.size() )
     {
         throw css::lang::IndexOutOfBoundsException(
             "Indexes: Index out of range (allowed 0 to "

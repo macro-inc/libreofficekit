@@ -20,7 +20,6 @@
 #include "AreaWrapper.hxx"
 #include "Chart2ModelContact.hxx"
 #include <WrappedDirectStateProperty.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -29,6 +28,7 @@
 #include <UserDefinedProperties.hxx>
 
 #include <algorithm>
+#include <utility>
 
 using namespace ::com::sun::star;
 using ::com::sun::star::beans::Property;
@@ -71,8 +71,8 @@ struct StaticAreaWrapperPropertyArray : public rtl::StaticAggregate< Sequence< P
 namespace chart::wrapper
 {
 
-AreaWrapper::AreaWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
-    : m_spChart2ModelContact(spChart2ModelContact)
+AreaWrapper::AreaWrapper(std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
+    : m_spChart2ModelContact(std::move(spChart2ModelContact))
     , m_aEventListenerContainer(m_aMutex)
 {
 }
@@ -132,7 +132,7 @@ void SAL_CALL AreaWrapper::removeEventListener(
 // WrappedPropertySet
 Reference< beans::XPropertySet > AreaWrapper::getInnerPropertySet()
 {
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
     if( xChartDoc.is() )
         return xChartDoc->getPageBackground();
     OSL_FAIL("AreaWrapper::getInnerPropertySet() is NULL");

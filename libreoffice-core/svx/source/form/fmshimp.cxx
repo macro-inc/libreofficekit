@@ -91,7 +91,7 @@
 #include <sfx2/viewsh.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -203,52 +203,52 @@ static const char* aConvertSlots[] =
     "ConvertToNavigationBar"
 };
 
-const std::u16string_view aImgIds[] =
+constexpr rtl::OUStringConstExpr aImgIds[] =
 {
-    u"" RID_SVXBMP_EDITBOX,
-    u"" RID_SVXBMP_BUTTON,
-    u"" RID_SVXBMP_FIXEDTEXT,
-    u"" RID_SVXBMP_LISTBOX,
-    u"" RID_SVXBMP_CHECKBOX,
-    u"" RID_SVXBMP_RADIOBUTTON,
-    u"" RID_SVXBMP_GROUPBOX,
-    u"" RID_SVXBMP_COMBOBOX,
-    u"" RID_SVXBMP_IMAGEBUTTON,
-    u"" RID_SVXBMP_FILECONTROL,
-    u"" RID_SVXBMP_DATEFIELD,
-    u"" RID_SVXBMP_TIMEFIELD,
-    u"" RID_SVXBMP_NUMERICFIELD,
-    u"" RID_SVXBMP_CURRENCYFIELD,
-    u"" RID_SVXBMP_PATTERNFIELD,
-    u"" RID_SVXBMP_IMAGECONTROL,
-    u"" RID_SVXBMP_FORMATTEDFIELD,
-    u"" RID_SVXBMP_SCROLLBAR,
-    u"" RID_SVXBMP_SPINBUTTON,
-    u"" RID_SVXBMP_NAVIGATIONBAR
+    RID_SVXBMP_EDITBOX,
+    RID_SVXBMP_BUTTON,
+    RID_SVXBMP_FIXEDTEXT,
+    RID_SVXBMP_LISTBOX,
+    RID_SVXBMP_CHECKBOX,
+    RID_SVXBMP_RADIOBUTTON,
+    RID_SVXBMP_GROUPBOX,
+    RID_SVXBMP_COMBOBOX,
+    RID_SVXBMP_IMAGEBUTTON,
+    RID_SVXBMP_FILECONTROL,
+    RID_SVXBMP_DATEFIELD,
+    RID_SVXBMP_TIMEFIELD,
+    RID_SVXBMP_NUMERICFIELD,
+    RID_SVXBMP_CURRENCYFIELD,
+    RID_SVXBMP_PATTERNFIELD,
+    RID_SVXBMP_IMAGECONTROL,
+    RID_SVXBMP_FORMATTEDFIELD,
+    RID_SVXBMP_SCROLLBAR,
+    RID_SVXBMP_SPINBUTTON,
+    RID_SVXBMP_NAVIGATIONBAR
 };
 
-const sal_Int16 nObjectTypes[] =
+const SdrObjKind nObjectTypes[] =
 {
-    OBJ_FM_EDIT,
-    OBJ_FM_BUTTON,
-    OBJ_FM_FIXEDTEXT,
-    OBJ_FM_LISTBOX,
-    OBJ_FM_CHECKBOX,
-    OBJ_FM_RADIOBUTTON,
-    OBJ_FM_GROUPBOX,
-    OBJ_FM_COMBOBOX,
-    OBJ_FM_IMAGEBUTTON,
-    OBJ_FM_FILECONTROL,
-    OBJ_FM_DATEFIELD,
-    OBJ_FM_TIMEFIELD,
-    OBJ_FM_NUMERICFIELD,
-    OBJ_FM_CURRENCYFIELD,
-    OBJ_FM_PATTERNFIELD,
-    OBJ_FM_IMAGECONTROL,
-    OBJ_FM_FORMATTEDFIELD,
-    OBJ_FM_SCROLLBAR,
-    OBJ_FM_SPINBUTTON,
-    OBJ_FM_NAVIGATIONBAR
+    SdrObjKind::FormEdit,
+    SdrObjKind::FormButton,
+    SdrObjKind::FormFixedText,
+    SdrObjKind::FormListbox,
+    SdrObjKind::FormCheckbox,
+    SdrObjKind::FormRadioButton,
+    SdrObjKind::FormGroupBox,
+    SdrObjKind::FormCombobox,
+    SdrObjKind::FormImageButton,
+    SdrObjKind::FormFileControl,
+    SdrObjKind::FormDateField,
+    SdrObjKind::FormTimeField,
+    SdrObjKind::FormNumericField,
+    SdrObjKind::FormCurrencyField,
+    SdrObjKind::FormPatternField,
+    SdrObjKind::FormImageControl,
+    SdrObjKind::FormFormattedField,
+    SdrObjKind::FormScrollbar,
+    SdrObjKind::FormSpinButton,
+    SdrObjKind::FormNavigationBar
 };
 
 using namespace ::com::sun::star;
@@ -376,13 +376,13 @@ namespace
 
         if (xModel.is())
         {
-            Any aModel(makeAny(xModel));
+            Any aModel(xModel);
             aModelListeners = xIntrospection->inspect(aModel)->getSupportedListeners();
         }
 
         if (xControl.is())
         {
-            Any aControl(makeAny(xControl));
+            Any aControl(xControl);
             aControlListeners = xIntrospection->inspect(aControl)->getSupportedListeners();
         }
 
@@ -429,32 +429,33 @@ namespace
     }
 
 
-    OUString getServiceNameByControlType(sal_Int16 nType)
+    OUString getServiceNameByControlType(SdrObjKind nType)
     {
         switch (nType)
         {
-            case OBJ_FM_EDIT            : return FM_COMPONENT_TEXTFIELD;
-            case OBJ_FM_BUTTON          : return FM_COMPONENT_COMMANDBUTTON;
-            case OBJ_FM_FIXEDTEXT       : return FM_COMPONENT_FIXEDTEXT;
-            case OBJ_FM_LISTBOX         : return FM_COMPONENT_LISTBOX;
-            case OBJ_FM_CHECKBOX        : return FM_COMPONENT_CHECKBOX;
-            case OBJ_FM_RADIOBUTTON     : return FM_COMPONENT_RADIOBUTTON;
-            case OBJ_FM_GROUPBOX        : return FM_COMPONENT_GROUPBOX;
-            case OBJ_FM_COMBOBOX        : return FM_COMPONENT_COMBOBOX;
-            case OBJ_FM_GRID            : return FM_COMPONENT_GRIDCONTROL;
-            case OBJ_FM_IMAGEBUTTON     : return FM_COMPONENT_IMAGEBUTTON;
-            case OBJ_FM_FILECONTROL     : return FM_COMPONENT_FILECONTROL;
-            case OBJ_FM_DATEFIELD       : return FM_COMPONENT_DATEFIELD;
-            case OBJ_FM_TIMEFIELD       : return FM_COMPONENT_TIMEFIELD;
-            case OBJ_FM_NUMERICFIELD    : return FM_COMPONENT_NUMERICFIELD;
-            case OBJ_FM_CURRENCYFIELD   : return FM_COMPONENT_CURRENCYFIELD;
-            case OBJ_FM_PATTERNFIELD    : return FM_COMPONENT_PATTERNFIELD;
-            case OBJ_FM_HIDDEN          : return FM_COMPONENT_HIDDENCONTROL;
-            case OBJ_FM_IMAGECONTROL    : return FM_COMPONENT_IMAGECONTROL;
-            case OBJ_FM_FORMATTEDFIELD  : return FM_COMPONENT_FORMATTEDFIELD;
-            case OBJ_FM_SCROLLBAR       : return FM_SUN_COMPONENT_SCROLLBAR;
-            case OBJ_FM_SPINBUTTON      : return FM_SUN_COMPONENT_SPINBUTTON;
-            case OBJ_FM_NAVIGATIONBAR   : return FM_SUN_COMPONENT_NAVIGATIONBAR;
+            case SdrObjKind::FormEdit            : return FM_COMPONENT_TEXTFIELD;
+            case SdrObjKind::FormButton          : return FM_COMPONENT_COMMANDBUTTON;
+            case SdrObjKind::FormFixedText       : return FM_COMPONENT_FIXEDTEXT;
+            case SdrObjKind::FormListbox         : return FM_COMPONENT_LISTBOX;
+            case SdrObjKind::FormCheckbox        : return FM_COMPONENT_CHECKBOX;
+            case SdrObjKind::FormRadioButton     : return FM_COMPONENT_RADIOBUTTON;
+            case SdrObjKind::FormGroupBox        : return FM_COMPONENT_GROUPBOX;
+            case SdrObjKind::FormCombobox        : return FM_COMPONENT_COMBOBOX;
+            case SdrObjKind::FormGrid            : return FM_COMPONENT_GRIDCONTROL;
+            case SdrObjKind::FormImageButton     : return FM_COMPONENT_IMAGEBUTTON;
+            case SdrObjKind::FormFileControl     : return FM_COMPONENT_FILECONTROL;
+            case SdrObjKind::FormDateField       : return FM_COMPONENT_DATEFIELD;
+            case SdrObjKind::FormTimeField       : return FM_COMPONENT_TIMEFIELD;
+            case SdrObjKind::FormNumericField    : return FM_COMPONENT_NUMERICFIELD;
+            case SdrObjKind::FormCurrencyField   : return FM_COMPONENT_CURRENCYFIELD;
+            case SdrObjKind::FormPatternField    : return FM_COMPONENT_PATTERNFIELD;
+            case SdrObjKind::FormHidden          : return FM_COMPONENT_HIDDENCONTROL;
+            case SdrObjKind::FormImageControl    : return FM_COMPONENT_IMAGECONTROL;
+            case SdrObjKind::FormFormattedField  : return FM_COMPONENT_FORMATTEDFIELD;
+            case SdrObjKind::FormScrollbar       : return FM_SUN_COMPONENT_SCROLLBAR;
+            case SdrObjKind::FormSpinButton      : return FM_SUN_COMPONENT_SPINBUTTON;
+            case SdrObjKind::FormNavigationBar   : return FM_SUN_COMPONENT_NAVIGATIONBAR;
+            default:;
         }
         return OUString();
     }
@@ -550,7 +551,7 @@ static bool isControlList(const SdrMarkList& rMarkList)
     for (size_t i = 0; i < nMarkCount && bControlList; ++i)
     {
         SdrObject *pObj = rMarkList.GetMark(i)->GetMarkedSdrObj();
-        E3dObject* pAs3DObject = dynamic_cast< E3dObject* >( pObj);
+        E3dObject* pAs3DObject = DynCastE3dObject( pObj);
         // E3dObject's do not contain any 2D-objects (by definition)
         // we need this extra check here : an E3dObject->IsGroupObject says "YES", but an SdrObjListIter working
         // with an E3dObject doesn't give me any Nodes (E3dObject has a sub list, but no members in that list,
@@ -1015,7 +1016,7 @@ void FmXFormShell::GetConversionMenu_Lock(weld::Menu& rNewMenu)
     for (size_t i = 0; i < SAL_N_ELEMENTS(aConvertSlots); ++i)
     {
         // the corresponding image at it
-        rNewMenu.append(OUString::createFromAscii(aConvertSlots[i]), SvxResId(RID_SVXSW_CONVERTMENU[i]), OUString(aImgIds[i]));
+        rNewMenu.append(OUString::createFromAscii(aConvertSlots[i]), SvxResId(RID_SVXSW_CONVERTMENU[i]), aImgIds[i]);
     }
 }
 
@@ -1131,7 +1132,7 @@ bool FmXFormShell::executeControlConversionSlot_Lock(const Reference<XFormCompon
                     // the form container works with FormComponents
                     Reference< XFormComponent> xComponent(xNewModel, UNO_QUERY);
                     DBG_ASSERT(xComponent.is(), "FmXFormShell::executeControlConversionSlot: the new model is no form component !");
-                    Any aNewModel(makeAny(xComponent));
+                    Any aNewModel(xComponent);
                     try
                     {
 
@@ -1268,11 +1269,11 @@ bool FmXFormShell::canConvertCurrentSelectionToControl_Lock(std::string_view rId
         // it's a form
         return false;
 
-    sal_Int16 nObjectType = getControlTypeByObject( xElementInfo );
+    SdrObjKind nObjectType = getControlTypeByObject( xElementInfo );
 
-    if (  ( OBJ_FM_HIDDEN == nObjectType )
-       || ( OBJ_FM_CONTROL == nObjectType )
-       || ( OBJ_FM_GRID == nObjectType )
+    if (  ( SdrObjKind::FormHidden == nObjectType )
+       || ( SdrObjKind::FormControl == nObjectType )
+       || ( SdrObjKind::FormGrid == nObjectType )
        )
         return false;   // those types cannot be converted
 
@@ -1611,7 +1612,7 @@ void FmXFormShell::SetY2KState_Lock(sal_uInt16 n)
             {
                 try
                 {
-                    xSet->setPropertyValue("TwoDigitDateStart", makeAny<sal_uInt16>(n));
+                    xSet->setPropertyValue("TwoDigitDateStart", Any(sal_uInt16(n)));
                 }
                 catch(Exception&)
                 {
@@ -1650,7 +1651,7 @@ void FmXFormShell::SetY2KState_Lock(sal_uInt16 n)
             {
                 try
                 {
-                    xSet->setPropertyValue("TwoDigitDateStart", makeAny<sal_uInt16>(n));
+                    xSet->setPropertyValue("TwoDigitDateStart", Any(sal_uInt16(n)));
                 }
                 catch(Exception&)
                 {
@@ -2160,7 +2161,7 @@ IMPL_LINK(FmXFormShell, OnFoundData_Lock, FmFoundRecordInformation&, rfriWhere, 
     if (impl_checkDisposed_Lock())
         return;
 
-    DBG_ASSERT((rfriWhere.nContext >= 0) && (rfriWhere.nContext < static_cast<sal_Int16>(m_aSearchForms.size())),
+    DBG_ASSERT((rfriWhere.nContext >= 0) && (o3tl::make_unsigned(rfriWhere.nContext) < m_aSearchForms.size()),
         "FmXFormShell::OnFoundData : invalid context!");
     Reference< XForm> xForm( m_aSearchForms.at(rfriWhere.nContext));
     DBG_ASSERT(xForm.is(), "FmXFormShell::OnFoundData : invalid form!");
@@ -2200,7 +2201,7 @@ IMPL_LINK(FmXFormShell, OnFoundData_Lock, FmFoundRecordInformation&, rfriWhere, 
     if (m_xLastGridFound.is() && (m_xLastGridFound != xControlModel))
     {
         Reference< XPropertySet> xOldSet(m_xLastGridFound, UNO_QUERY);
-        xOldSet->setPropertyValue(FM_PROP_ALWAYSSHOWCURSOR, makeAny( false ) );
+        xOldSet->setPropertyValue(FM_PROP_ALWAYSSHOWCURSOR, Any( false ) );
         Reference< XPropertyState> xOldSetState(xOldSet, UNO_QUERY);
         if (xOldSetState.is())
             xOldSetState->setPropertyToDefault(FM_PROP_CURSORCOLOR);
@@ -2220,8 +2221,8 @@ IMPL_LINK(FmXFormShell, OnFoundData_Lock, FmFoundRecordInformation&, rfriWhere, 
         // enable a permanent cursor for the grid so we can see the found text
         Reference< XPropertySet> xModelSet(xControlModel, UNO_QUERY);
         DBG_ASSERT(xModelSet.is(), "FmXFormShell::OnFoundData : invalid control model (no property set) !");
-        xModelSet->setPropertyValue( FM_PROP_ALWAYSSHOWCURSOR, makeAny( true ) );
-        xModelSet->setPropertyValue( FM_PROP_CURSORCOLOR, makeAny( COL_LIGHTRED ) );
+        xModelSet->setPropertyValue( FM_PROP_ALWAYSSHOWCURSOR, Any( true ) );
+        xModelSet->setPropertyValue( FM_PROP_CURSORCOLOR, Any( COL_LIGHTRED ) );
         m_xLastGridFound = xControlModel;
 
         if ( xGrid.is() )
@@ -2243,7 +2244,7 @@ IMPL_LINK(FmXFormShell, OnCanceledNotFound_Lock, FmFoundRecordInformation&, rfri
     if (impl_checkDisposed_Lock())
         return;
 
-    DBG_ASSERT((rfriWhere.nContext >= 0) && (rfriWhere.nContext < static_cast<sal_Int16>(m_aSearchForms.size())),
+    DBG_ASSERT((rfriWhere.nContext >= 0) && (o3tl::make_unsigned(rfriWhere.nContext) < m_aSearchForms.size()),
         "FmXFormShell::OnCanceledNotFound : invalid context!");
     Reference< XForm> xForm( m_aSearchForms.at(rfriWhere.nContext));
     DBG_ASSERT(xForm.is(), "FmXFormShell::OnCanceledNotFound : invalid form!");
@@ -2884,8 +2885,9 @@ void FmXFormShell::impl_collectFormSearchContexts_nothrow_Lock( const Reference<
 
             // and descend
             impl_collectFormSearchContexts_nothrow_Lock(
-                xCurrentAsForm, aNextLevelPrefix.makeStringAndClear(),
+                xCurrentAsForm, aNextLevelPrefix,
                 _out_rForms, _out_rNames);
+            aNextLevelPrefix.setLength(0);
         }
     }
     catch( const Exception& )
@@ -2957,7 +2959,7 @@ static void saveFilter(const Reference< runtime::XFormController >& _rxControlle
     {
 
         xFormAsSet->setPropertyValue(FM_PROP_FILTER, xControllerAsSet->getPropertyValue(FM_PROP_FILTER));
-        xFormAsSet->setPropertyValue(FM_PROP_APPLYFILTER, makeAny( true ) );
+        xFormAsSet->setPropertyValue(FM_PROP_APPLYFILTER, Any( true ) );
     }
     catch (const Exception& )
     {
@@ -3050,8 +3052,8 @@ void FmXFormShell::stopFiltering_Lock(bool bSave)
                     bool bOriginalApplyFlag = aOriginalApplyFlags[ j - rControllers.begin() ];
                     try
                     {
-                        xFormSet->setPropertyValue(FM_PROP_FILTER, makeAny(sOriginalFilter));
-                        xFormSet->setPropertyValue(FM_PROP_APPLYFILTER, makeAny(bOriginalApplyFlag));
+                        xFormSet->setPropertyValue(FM_PROP_FILTER, Any(sOriginalFilter));
+                        xFormSet->setPropertyValue(FM_PROP_APPLYFILTER, Any(bOriginalApplyFlag));
                         xReload->reload();
                     }
                     catch(const Exception&)
@@ -3283,8 +3285,8 @@ void FmXFormShell::CreateExternalView_Lock()
                             Reference< lang::XServiceInfo> xInfo(xCurrentModelSet, UNO_QUERY);
                             if (xInfo.is())
                             {
-                                sal_Int16 nObjectType = getControlTypeByObject(xInfo);
-                                if (OBJ_FM_FORMATTEDFIELD == nObjectType)
+                                SdrObjKind nObjectType = getControlTypeByObject(xInfo);
+                                if (SdrObjKind::FormFormattedField == nObjectType)
                                     sColumnType = FM_COL_FORMATTEDFIELD;
                             }
                         }
@@ -3664,8 +3666,6 @@ void FmXFormShell::smartControlReset( const Reference< XIndexAccess >& _rxModels
         return;
     }
 
-    static constexpr OUStringLiteral sClassIdPropertyName = u"" FM_PROP_CLASSID;
-    static constexpr OUStringLiteral sBoundFieldPropertyName = u"" FM_PROP_BOUNDFIELD;
     sal_Int32 nCount = _rxModels->getCount();
     Reference< XPropertySet > xCurrent;
     Reference< XPropertySetInfo > xCurrentInfo;
@@ -3681,12 +3681,12 @@ void FmXFormShell::smartControlReset( const Reference< XIndexAccess >& _rxModels
         if (!xCurrentInfo.is())
             continue;
 
-        if (xCurrentInfo->hasPropertyByName(sClassIdPropertyName))
+        if (xCurrentInfo->hasPropertyByName(FM_PROP_CLASSID))
         {   // it's a control model
 
             // check if this control is bound to a living database field
-            if (xCurrentInfo->hasPropertyByName(sBoundFieldPropertyName))
-                xCurrent->getPropertyValue(sBoundFieldPropertyName) >>= xBoundField;
+            if (xCurrentInfo->hasPropertyByName(FM_PROP_BOUNDFIELD))
+                xCurrent->getPropertyValue(FM_PROP_BOUNDFIELD) >>= xBoundField;
             else
                 xBoundField.clear();
 

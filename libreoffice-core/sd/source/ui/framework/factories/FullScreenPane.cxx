@@ -20,6 +20,7 @@
 #include "FullScreenPane.hxx"
 #include <vcl/vclevent.hxx>
 #include <vcl/wrkwin.hxx>
+#include <o3tl/string_view.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
@@ -39,23 +40,27 @@ FullScreenPane::FullScreenPane (
     : FrameWindowPane(rxPaneId,nullptr),
       mxComponentContext(rxComponentContext)
 {
-    vcl::Window* pParent = nullptr;
-    mpWorkWindow.reset(VclPtr<WorkWindow>::Create(
+    sal_Int32 nScreenNumber = 1;
+    bool bFullScreen = true;
+    ExtractArguments(rxPaneId, nScreenNumber, bFullScreen);
 
+    vcl::Window* pParent = nullptr;
+    WinBits nStyle = bFullScreen ? 0 : (WB_BORDER | WB_MOVEABLE | WB_SIZEABLE);
+
+    mpWorkWindow.reset(VclPtr<WorkWindow>::Create(
         pParent,
-        0));  // For debugging (non-fullscreen) use WB_BORDER | WB_MOVEABLE | WB_SIZEABLE));
+        nStyle));  // For debugging (non-fullscreen) use WB_BORDER | WB_MOVEABLE | WB_SIZEABLE));
 
     if ( ! rxPaneId.is())
         throw lang::IllegalArgumentException();
-
-    sal_Int32 nScreenNumber = 1;
-    ExtractArguments(rxPaneId, nScreenNumber);
 
     if (!mpWorkWindow)
         return;
 
     // Create a new top-level window that is displayed full screen.
-    mpWorkWindow->ShowFullScreenMode(true, nScreenNumber);
+    if (bFullScreen)
+        mpWorkWindow->ShowFullScreenMode(bFullScreen, nScreenNumber);
+
     // For debugging (non-fullscreen) use mpWorkWindow->SetScreenNumber(nScreenNumber);
     mpWorkWindow->SetMenuBarMode(MenuBarMode::Hide);
     mpWorkWindow->SetBorderStyle(WindowBorderStyle::REMOVEBORDER);
@@ -205,17 +210,22 @@ Reference<rendering::XCanvas> FullScreenPane::CreateCanvas()
 
 void FullScreenPane::ExtractArguments (
     const Reference<XResourceId>& rxPaneId,
-    sal_Int32& rnScreenNumberReturnValue)
+    sal_Int32& rnScreenNumberReturnValue,
+    bool& rbFullScreen)
 {
     // Extract arguments from the resource URL.
     const util::URL aURL = rxPaneId->getFullResourceURL();
     for (sal_Int32 nIndex{ 0 }; nIndex >= 0; )
     {
-        const OUString aToken = aURL.Arguments.getToken(0, '&', nIndex);
-        OUString sValue;
-        if (aToken.startsWith("ScreenNumber=", &sValue))
+        const std::u16string_view aToken = o3tl::getToken(aURL.Arguments, 0, '&', nIndex);
+        std::u16string_view sValue;
+        if (o3tl::starts_with(aToken, u"ScreenNumber=", &sValue))
         {
-            rnScreenNumberReturnValue = sValue.toInt32();
+            rnScreenNumberReturnValue = o3tl::toInt32(sValue);
+        }
+        if (o3tl::starts_with(aToken, u"FullScreen=", &sValue))
+        {
+            rbFullScreen = o3tl::equalsAscii(sValue, "true");
         }
     }
 }

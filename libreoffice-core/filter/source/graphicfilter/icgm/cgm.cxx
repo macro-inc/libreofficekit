@@ -17,9 +17,9 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <com/sun/star/task/XStatusIndicator.hpp>
 #include <o3tl/safeint.hxx>
 #include <osl/endian.h>
+#include <filter/importcgm.hxx>
 #include <tools/stream.hxx>
 #include "bitmap.hxx"
 #include "chart.hxx"
@@ -27,7 +27,7 @@
 #include "outact.hxx"
 #include <memory>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -53,6 +53,7 @@ CGM::CGM(uno::Reference< frame::XModel > const & rModel)
     , mbFirstOutPut(false)
     , mbInDefaultReplacement(false)
     , mnAct4PostReset(0)
+    , mnBitmapInserts(0)
     , mpOutAct(new CGMImpressOutAct(*this, rModel))
     , mpSource(nullptr)
     , mpEndValidSource(nullptr)
@@ -682,7 +683,7 @@ bool CGM::Write( SvStream& rIStm )
 };
 
 // GraphicImport - the exported function
-extern "C" SAL_DLLPUBLIC_EXPORT sal_uInt32
+FILTER_DLLPUBLIC sal_uInt32
 ImportCGM(SvStream& rIn, uno::Reference< frame::XModel > const & rXModel, css::uno::Reference<css::task::XStatusIndicator> const & aXStatInd)
 {
 

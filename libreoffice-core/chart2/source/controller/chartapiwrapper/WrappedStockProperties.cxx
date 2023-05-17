@@ -20,13 +20,15 @@
 #include "WrappedStockProperties.hxx"
 #include "Chart2ModelContact.hxx"
 #include <FastPropertyIdRanges.hxx>
+#include <DataSeries.hxx>
 #include <DiagramHelper.hxx>
 #include <ControllerLockGuard.hxx>
 #include <WrappedProperty.hxx>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <ChartTypeManager.hxx>
+#include <ChartTypeTemplate.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 using ::com::sun::star::uno::Reference;
@@ -41,14 +43,14 @@ class WrappedStockProperty : public WrappedProperty
 {
 public:
     explicit WrappedStockProperty( const OUString& rOuterName
-        , const css::uno::Any& rDefaulValue
-        , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact );
+        , css::uno::Any aDefaultValue
+        , std::shared_ptr<Chart2ModelContact> spChart2ModelContact );
 
     void setPropertyValue( const css::uno::Any& rOuterValue, const css::uno::Reference< css::beans::XPropertySet >& xInnerPropertySet ) const override;
 
     css::uno::Any getPropertyDefault( const css::uno::Reference< css::beans::XPropertyState >& xInnerPropertyState ) const override;
 
-    virtual uno::Reference< chart2::XChartTypeTemplate > getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const Reference< lang::XMultiServiceFactory >& xFactory ) const = 0;
+    virtual rtl::Reference< ::chart::ChartTypeTemplate > getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const rtl::Reference< ::chart::ChartTypeManager >& xFactory ) const = 0;
 
 protected:
     std::shared_ptr< Chart2ModelContact >   m_spChart2ModelContact;
@@ -59,11 +61,11 @@ protected:
 }
 
 WrappedStockProperty::WrappedStockProperty( const OUString& rOuterName
-    , const css::uno::Any& rDefaulValue
-    , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact )
+    , css::uno::Any aDefaultValue
+    , std::shared_ptr<Chart2ModelContact> spChart2ModelContact )
     : WrappedProperty(rOuterName,OUString())
-        , m_spChart2ModelContact(spChart2ModelContact)
-        , m_aDefaultValue(rDefaulValue)
+        , m_spChart2ModelContact(std::move(spChart2ModelContact))
+        , m_aDefaultValue(std::move(aDefaultValue))
 {
 }
 
@@ -75,18 +77,18 @@ void WrappedStockProperty::setPropertyValue( const css::uno::Any& rOuterValue, c
 
     m_aOuterValue = rOuterValue;
 
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     sal_Int32 nDimension = ::chart::DiagramHelper::getDimension( xDiagram );
     if( !(xChartDoc.is() && xDiagram.is() && nDimension==2) )
         return;
 
-    Reference< lang::XMultiServiceFactory > xFactory( xChartDoc->getChartTypeManager(), uno::UNO_QUERY );
+    rtl::Reference< ::chart::ChartTypeManager > xChartTypeManager = xChartDoc->getTypeManager();
     DiagramHelper::tTemplateWithServiceName aTemplateAndService =
-            DiagramHelper::getTemplateForDiagram( xDiagram, xFactory );
+            DiagramHelper::getTemplateForDiagram( xDiagram, xChartTypeManager );
 
-    uno::Reference< chart2::XChartTypeTemplate > xTemplate =
-            getNewTemplate( bNewValue, aTemplateAndService.second, xFactory );
+    rtl::Reference< ::chart::ChartTypeTemplate > xTemplate =
+            getNewTemplate( bNewValue, aTemplateAndService.sServiceName, xChartTypeManager );
 
     if(!xTemplate.is())
         return;
@@ -94,7 +96,7 @@ void WrappedStockProperty::setPropertyValue( const css::uno::Any& rOuterValue, c
     try
     {
         // locked controllers
-        ControllerLockGuardUNO aCtrlLockGuard( m_spChart2ModelContact->getChartModel() );
+        ControllerLockGuardUNO aCtrlLockGuard( m_spChart2ModelContact->getDocumentModel() );
         xTemplate->changeDiagram( xDiagram );
     }
     catch( const uno::Exception & )
@@ -117,7 +119,7 @@ public:
 
     css::uno::Any getPropertyValue( const css::uno::Reference< css::beans::XPropertySet >& xInnerPropertySet ) const override;
 
-    uno::Reference< chart2::XChartTypeTemplate > getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const Reference< lang::XMultiServiceFactory >& xFactory ) const override;
+    rtl::Reference< ::chart::ChartTypeTemplate > getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const rtl::Reference< ::chart::ChartTypeManager >& xFactory ) const override;
 };
 
 }
@@ -129,22 +131,22 @@ WrappedVolumeProperty::WrappedVolumeProperty(const std::shared_ptr<Chart2ModelCo
 
 css::uno::Any WrappedVolumeProperty::getPropertyValue( const css::uno::Reference< css::beans::XPropertySet >& /*xInnerPropertySet*/ ) const
 {
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if( xDiagram.is() && xChartDoc.is() )
     {
-        std::vector< uno::Reference< chart2::XDataSeries > > aSeriesVector(
-            DiagramHelper::getDataSeriesFromDiagram( xDiagram ) );
+        std::vector< rtl::Reference< DataSeries > > aSeriesVector =
+            DiagramHelper::getDataSeriesFromDiagram( xDiagram );
         if( !aSeriesVector.empty() )
         {
-            Reference< lang::XMultiServiceFactory > xFact( xChartDoc->getChartTypeManager(), uno::UNO_QUERY );
+            rtl::Reference< ::chart::ChartTypeManager > xChartTypeManager = xChartDoc->getTypeManager();
             DiagramHelper::tTemplateWithServiceName aTemplateAndService =
-                    DiagramHelper::getTemplateForDiagram( xDiagram, xFact );
+                    DiagramHelper::getTemplateForDiagram( xDiagram, xChartTypeManager );
 
-            if(    aTemplateAndService.second == "com.sun.star.chart2.template.StockVolumeLowHighClose"
-                || aTemplateAndService.second == "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" )
+            if(    aTemplateAndService.sServiceName == "com.sun.star.chart2.template.StockVolumeLowHighClose"
+                || aTemplateAndService.sServiceName == "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" )
                 m_aOuterValue <<= true;
-            else if( !aTemplateAndService.second.isEmpty() || !m_aOuterValue.hasValue() )
+            else if( !aTemplateAndService.sServiceName.isEmpty() || !m_aOuterValue.hasValue() )
                 m_aOuterValue <<= false;
         }
         else if(!m_aOuterValue.hasValue())
@@ -153,9 +155,9 @@ css::uno::Any WrappedVolumeProperty::getPropertyValue( const css::uno::Reference
     return m_aOuterValue;
 }
 
-uno::Reference< chart2::XChartTypeTemplate > WrappedVolumeProperty::getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const Reference< lang::XMultiServiceFactory >& xFactory ) const
+rtl::Reference< ::chart::ChartTypeTemplate > WrappedVolumeProperty::getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const rtl::Reference< ::chart::ChartTypeManager >& xFactory ) const
 {
-    uno::Reference< chart2::XChartTypeTemplate > xTemplate;
+    rtl::Reference< ::chart::ChartTypeTemplate > xTemplate;
 
     if(!xFactory.is())
         return xTemplate;
@@ -163,16 +165,16 @@ uno::Reference< chart2::XChartTypeTemplate > WrappedVolumeProperty::getNewTempla
     if( bNewValue ) //add volume
     {
         if( rCurrentTemplate == "com.sun.star.chart2.template.StockLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockVolumeLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockVolumeLowHighClose" );
         else if( rCurrentTemplate == "com.sun.star.chart2.template.StockOpenLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" );
     }
     else //remove volume
     {
         if( rCurrentTemplate == "com.sun.star.chart2.template.StockVolumeLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockLowHighClose" );
         else if( rCurrentTemplate == "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockOpenLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockOpenLowHighClose" );
     }
     return xTemplate;
 }
@@ -186,7 +188,7 @@ public:
 
     css::uno::Any getPropertyValue( const css::uno::Reference< css::beans::XPropertySet >& xInnerPropertySet ) const override;
 
-    uno::Reference< chart2::XChartTypeTemplate > getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const Reference< lang::XMultiServiceFactory >& xFactory ) const override;
+    rtl::Reference< ::chart::ChartTypeTemplate > getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const rtl::Reference< ChartTypeManager >& xFactory ) const override;
 };
 
 }
@@ -198,22 +200,22 @@ WrappedUpDownProperty::WrappedUpDownProperty(const std::shared_ptr<Chart2ModelCo
 
 css::uno::Any WrappedUpDownProperty::getPropertyValue( const css::uno::Reference< css::beans::XPropertySet >& /*xInnerPropertySet*/ ) const
 {
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if( xDiagram.is() && xChartDoc.is() )
     {
-        std::vector< uno::Reference< chart2::XDataSeries > > aSeriesVector(
-            DiagramHelper::getDataSeriesFromDiagram( xDiagram ) );
+        std::vector< rtl::Reference< DataSeries > > aSeriesVector =
+            DiagramHelper::getDataSeriesFromDiagram( xDiagram );
         if( !aSeriesVector.empty() )
         {
-            Reference< lang::XMultiServiceFactory > xFact( xChartDoc->getChartTypeManager(), uno::UNO_QUERY );
+            rtl::Reference< ::chart::ChartTypeManager > xChartTypeManager = xChartDoc->getTypeManager();
             DiagramHelper::tTemplateWithServiceName aTemplateAndService =
-                    DiagramHelper::getTemplateForDiagram( xDiagram, xFact );
+                    DiagramHelper::getTemplateForDiagram( xDiagram, xChartTypeManager );
 
-            if(    aTemplateAndService.second == "com.sun.star.chart2.template.StockOpenLowHighClose"
-                || aTemplateAndService.second == "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" )
+            if(    aTemplateAndService.sServiceName == "com.sun.star.chart2.template.StockOpenLowHighClose"
+                || aTemplateAndService.sServiceName == "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" )
                 m_aOuterValue <<= true;
-            else if( !aTemplateAndService.second.isEmpty() || !m_aOuterValue.hasValue() )
+            else if( !aTemplateAndService.sServiceName.isEmpty() || !m_aOuterValue.hasValue() )
                 m_aOuterValue <<= false;
         }
         else if(!m_aOuterValue.hasValue())
@@ -221,22 +223,22 @@ css::uno::Any WrappedUpDownProperty::getPropertyValue( const css::uno::Reference
     }
     return m_aOuterValue;
 }
-uno::Reference< chart2::XChartTypeTemplate > WrappedUpDownProperty::getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const Reference< lang::XMultiServiceFactory >& xFactory ) const
+rtl::Reference< ::chart::ChartTypeTemplate > WrappedUpDownProperty::getNewTemplate( bool bNewValue, const OUString& rCurrentTemplate, const rtl::Reference< ChartTypeManager >& xFactory ) const
 {
-    uno::Reference< chart2::XChartTypeTemplate > xTemplate;
+    rtl::Reference< ::chart::ChartTypeTemplate > xTemplate;
     if( bNewValue ) //add open series
     {
         if( rCurrentTemplate == "com.sun.star.chart2.template.StockLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockOpenLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockOpenLowHighClose" );
         else if( rCurrentTemplate == "com.sun.star.chart2.template.StockVolumeLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" );
     }
     else //remove open series
     {
         if( rCurrentTemplate == "com.sun.star.chart2.template.StockOpenLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockLowHighClose" );
         else if( rCurrentTemplate == "com.sun.star.chart2.template.StockVolumeOpenLowHighClose" )
-            xTemplate.set( xFactory->createInstance( "com.sun.star.chart2.template.StockVolumeLowHighClose" ), uno::UNO_QUERY );
+            xTemplate = xFactory->createTemplate( "com.sun.star.chart2.template.StockVolumeLowHighClose" );
     }
     return xTemplate;
 }

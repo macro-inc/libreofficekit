@@ -28,23 +28,19 @@ using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
 PlotterBase::PlotterBase( sal_Int32 nDimensionCount )
-        : m_pShapeFactory(nullptr)
-        , m_nDimension(nDimensionCount)
+        : m_nDimension(nDimensionCount)
         , m_pPosHelper(nullptr)
 {
 }
 
-void PlotterBase::initPlotter(  const uno::Reference< drawing::XShapes >& xLogicTarget
-       , const uno::Reference< drawing::XShapes >& xFinalTarget
-       , const uno::Reference< lang::XMultiServiceFactory >& xShapeFactory
+void PlotterBase::initPlotter(  const rtl::Reference<SvxShapeGroupAnyD>& xLogicTarget
+       , const rtl::Reference<SvxShapeGroupAnyD>& xFinalTarget
        , const OUString& rCID )
 {
-    OSL_PRECOND(xLogicTarget.is()&&xFinalTarget.is()&&xShapeFactory.is(),"no proper initialization parameters");
+    OSL_PRECOND(xLogicTarget.is()&&xFinalTarget.is(),"no proper initialization parameters");
     //is only allowed to be called once
     m_xLogicTarget  = xLogicTarget;
     m_xFinalTarget  = xFinalTarget;
-    m_xShapeFactory = xShapeFactory;
-    m_pShapeFactory = ShapeFactory::getOrCreateShapeFactory(xShapeFactory);
     m_aCID = rCID;
 }
 
@@ -72,22 +68,19 @@ void PlotterBase::setTransformationSceneToScreen( const drawing::HomogenMatrix& 
     m_pPosHelper->setTransformationSceneToScreen( rMatrix );
 }
 
-uno::Reference< drawing::XShapes > PlotterBase::createGroupShape(
-            const uno::Reference< drawing::XShapes >& xTarget
+rtl::Reference<SvxShapeGroupAnyD> PlotterBase::createGroupShape(
+            const rtl::Reference<SvxShapeGroupAnyD>& xTarget
             , const OUString& rName )
 {
-    if(!m_xShapeFactory.is())
-        return nullptr;
-
     if(m_nDimension==2)
     {
         //create and add to target
-        return m_pShapeFactory->createGroup2D( xTarget, rName );
+        return ShapeFactory::createGroup2D( xTarget, rName );
     }
     else
     {
         //create and added to target
-        return m_pShapeFactory->createGroup3D( xTarget, rName );
+        return ShapeFactory::createGroup3D( xTarget, rName );
     }
 }
 

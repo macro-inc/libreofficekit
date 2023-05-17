@@ -106,6 +106,8 @@ public:
 
     void            DrawEntry( const UserDrawEvent& rEvt );
     void            SetBorderStyle( WindowBorderStyle nBorderStyle );
+    void            SetHighlightColor(const Color& rColor);
+    void            SetHighlightTextColor(const Color& rColor);
 
     /**
      * Adds a new separator at the given position n.
@@ -127,7 +129,7 @@ public:
     Size            CalcBlockSize( sal_uInt16 nColumns, sal_uInt16 nLines ) const;
     void            GetMaxVisColumnsAndLines( sal_uInt16& rnCols, sal_uInt16& rnLines ) const;
 
-    void            SetMRUEntries( const OUString& rEntries );
+    void            SetMRUEntries( std::u16string_view rEntries );
     OUString        GetMRUEntries() const;
     void            SetMaxMRUCount( sal_Int32  n );
     sal_Int32       GetMaxMRUCount() const;

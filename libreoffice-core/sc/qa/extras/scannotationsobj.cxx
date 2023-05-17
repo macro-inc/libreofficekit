@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
 #include <test/container/xindexaccess.hxx>
@@ -31,7 +31,7 @@ using namespace css::uno;
 
 namespace sc_apitest {
 
-class ScAnnontationsObj : public CalcUnoApiTest, public apitest::XElementAccess,
+class ScAnnontationsObj : public UnoApiTest, public apitest::XElementAccess,
                                                  public apitest::XEnumerationAccess,
                                                  public apitest::XIndexAccess,
                                                  public apitest::XSheetAnnotations
@@ -40,7 +40,6 @@ public:
     ScAnnontationsObj();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference< uno::XInterface > init() override;
     virtual uno::Reference< sheet::XSheetAnnotations > getAnnotations(tools::Long nIndex) override;
@@ -65,15 +64,11 @@ public:
     CPPUNIT_TEST(testRemoveByIndex);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-
-    uno::Reference< lang::XComponent > mxComponent;
 };
 
 
 ScAnnontationsObj::ScAnnontationsObj()
-       : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+       : UnoApiTest("/sc/qa/extras/testdocuments")
        , XElementAccess(cppu::UnoType<sheet::XSheetAnnotation>::get())
        , XIndexAccess(1)
 {
@@ -101,18 +96,10 @@ uno::Reference< uno::XInterface > ScAnnontationsObj::init()
 
 void ScAnnontationsObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
 
     // get the test file
-    OUString aFileURL;
-    createFileURL(u"ScAnnotationObj.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL);
-}
-
-void ScAnnontationsObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"ScAnnotationObj.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScAnnontationsObj);

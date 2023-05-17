@@ -9,10 +9,7 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
@@ -20,55 +17,29 @@
 #include <com/sun/star/drawing/PointSequenceSequence.hpp>
 #include <com/sun/star/drawing/PolygonKind.hpp>
 #include <com/sun/star/drawing/PolyPolygonBezierCoords.hpp>
+#include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/drawing/ColorMode.hpp>
 
 using namespace ::com::sun::star;
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/oox/qa/unit/data/";
-
 /// oox vml tests.
-class OoxVmlTest : public test::BootstrapFixture, public unotest::MacrosTest
+class OoxVmlTest : public UnoApiTest
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
-    void load(std::u16string_view rURL);
+    OoxVmlTest()
+        : UnoApiTest("/oox/qa/unit/data/")
+    {
+    }
 };
-
-void OoxVmlTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void OoxVmlTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-void OoxVmlTest::load(std::u16string_view rFileName)
-{
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + rFileName;
-    mxComponent = loadFromDesktop(aURL);
-}
 
 CPPUNIT_TEST_FIXTURE(OoxVmlTest, tdf112450_vml_polyline)
 {
     // Load a document with v:polyline shapes. Error was, that the size was set to zero and the
     // points were zero because of missing decode from length with unit.
-    load(u"tdf112450_vml_polyline.docx");
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"tdf112450_vml_polyline.docx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     {
@@ -130,8 +101,8 @@ CPPUNIT_TEST_FIXTURE(OoxVmlTest, tdf137314_vml_rotation_unit_fd)
 {
     // Load a document with a 30deg rotated arc on a drawing canvas. Rotation is given
     // as 1966080fd. Error was, that the vml angle unit "fd" was not converted to Degree100.
-    load(u"tdf137314_vml_rotation_unit_fd.docx");
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"tdf137314_vml_rotation_unit_fd.docx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xGroup(xDrawPage->getByIndex(0), uno::UNO_QUERY);
@@ -152,8 +123,8 @@ CPPUNIT_TEST_FIXTURE(OoxVmlTest, testSpt202ShapeType)
 {
     // Load a document with a groupshape, 2nd child is a <v:shape>, its type has o:spt set to 202
     // (TextBox).
-    load(u"group-spt202.docx");
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"group-spt202.docx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xGroup(xDrawPage->getByIndex(0), uno::UNO_QUERY);
@@ -172,8 +143,8 @@ CPPUNIT_TEST_FIXTURE(OoxVmlTest, testShapeNonAutosizeWithText)
     // Load a document which has a group shape, containing a single child.
     // 17.78 cm is the full group shape width, 19431/64008 is the child shape's relative width inside
     // that, so 5.3975 cm should be the shape width.
-    load(u"shape-non-autosize-with-text.docx");
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"shape-non-autosize-with-text.docx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xGroup(xDrawPage->getByIndex(0), uno::UNO_QUERY);
@@ -187,23 +158,18 @@ CPPUNIT_TEST_FIXTURE(OoxVmlTest, testShapeNonAutosizeWithText)
 
 CPPUNIT_TEST_FIXTURE(OoxVmlTest, testGraphicStroke)
 {
-    load(u"graphic-stroke.pptx");
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"graphic-stroke.pptx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
 
-    uno::Reference<beans::XPropertySet> xShape;
-    for (sal_Int32 i = 0; i < xDrawPage->getCount(); ++i)
-    {
-        uno::Reference<lang::XServiceInfo> xInfo(xDrawPage->getByIndex(i), uno::UNO_QUERY);
-        if (!xInfo->supportsService("com.sun.star.drawing.GraphicObjectShape"))
-        {
-            continue;
-        }
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(1), xDrawPage->getCount());
 
+    uno::Reference<beans::XPropertySet> xShape;
+    uno::Reference<lang::XServiceInfo> xInfo(xDrawPage->getByIndex(0), uno::UNO_QUERY);
+    if (xInfo->supportsService("com.sun.star.drawing.OLE2Shape"))
         xShape.set(xInfo, uno::UNO_QUERY);
-        break;
-    }
+
     CPPUNIT_ASSERT(xShape.is());
 
     drawing::LineStyle eLineStyle{};
@@ -220,10 +186,10 @@ CPPUNIT_TEST_FIXTURE(OoxVmlTest, testWatermark)
     // Given a document with a picture watermark, and the "washout" checkbox is ticked on the Word
     // UI:
     // When loading that document:
-    load(u"watermark.docx");
+    loadFromURL(u"watermark.docx");
 
     // Then make sure the watermark effect is not lost on import:
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xShape(xDrawPage->getByIndex(0), uno::UNO_QUERY);
@@ -234,6 +200,46 @@ CPPUNIT_TEST_FIXTURE(OoxVmlTest, testWatermark)
     // - Actual  : 0
     // i.e. the color mode was STANDARD, not WATERMARK.
     CPPUNIT_ASSERT_EQUAL(drawing::ColorMode_WATERMARK, eMode);
+}
+
+CPPUNIT_TEST_FIXTURE(OoxVmlTest, testWriterFontworkTrimTrue)
+{
+    // The document contains a shape, that will be exported as VML shape to docx. Error was that the
+    // attribute trim was not written out and thus import had treated it as the default 'false' and
+    // had reduced the shape height.
+    loadFromURL(u"tdf153260_VML_trim_export.odt");
+
+    // FIXME: tdf#153183 validation error in OOXML export: Errors: 1
+    // Attribute 'ID' is not allowed to appear in element 'v:shape'.
+    skipValidation();
+    saveAndReload("Office Open XML Text");
+
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XShape> xShape(xDrawPageSupplier->getDrawPage()->getByIndex(0),
+                                           uno::UNO_QUERY);
+
+    // Make sure the shape height is not changed.
+    // Without the fix the test would have failed with expected 4999 actual 1732.
+    awt::Size aSize = xShape->getSize();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4999, aSize.Height, 2);
+}
+
+CPPUNIT_TEST_FIXTURE(OoxVmlTest, testVMLDetectWordArtOnImport)
+{
+    // The document contains a WordArt shape with type other than "fontwork-foo". Error was that
+    // WordArt was not detected and thus shrinking shape to text content was not prevented.
+    loadFromURL(u"tdf153258_VML_import_WordArt_detection.docx");
+
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XShape> xShape(xDrawPageSupplier->getDrawPage()->getByIndex(0),
+                                           uno::UNO_QUERY);
+
+    // Make sure the shape width and height is not changed.
+    awt::Size aSize = xShape->getSize();
+    // Without the fix the test would have failed with expected 7514 actual 1453.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(7514, aSize.Width, 2);
+    // Without the fix the test would have failed with expected 4540 actual 309.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4540, aSize.Height, 2);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

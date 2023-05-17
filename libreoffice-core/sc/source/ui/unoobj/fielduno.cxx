@@ -28,6 +28,7 @@
 #include <editutil.hxx>
 
 #include <svl/hint.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <editeng/eeitem.hxx>
@@ -55,11 +56,10 @@ const SfxItemPropertySet* getDateTimePropertySet()
 {
     static const SfxItemPropertyMapEntry aMapContent[] =
     {
-        { u"" SC_UNONAME_DATETIME, 0, cppu::UnoType<util::DateTime>::get(), 0, 0 },
-        { u"" SC_UNONAME_ISFIXED,  0, cppu::UnoType<bool>::get(),                  0, 0 },
-        { u"" SC_UNONAME_ISDATE,   0, cppu::UnoType<bool>::get(),                  0, 0 },
-        { u"" SC_UNONAME_NUMFMT,   0, cppu::UnoType<sal_Int32>::get(),      0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        {  SC_UNONAME_DATETIME, 0, cppu::UnoType<util::DateTime>::get(), 0, 0 },
+        {  SC_UNONAME_ISFIXED,  0, cppu::UnoType<bool>::get(),                  0, 0 },
+        {  SC_UNONAME_ISDATE,   0, cppu::UnoType<bool>::get(),                  0, 0 },
+        {  SC_UNONAME_NUMFMT,   0, cppu::UnoType<sal_Int32>::get(),      0, 0 },
     };
     static SfxItemPropertySet aMap(aMapContent);
     return &aMap;
@@ -67,11 +67,7 @@ const SfxItemPropertySet* getDateTimePropertySet()
 
 const SfxItemPropertySet* getEmptyPropertySet()
 {
-    static const SfxItemPropertyMapEntry aMapContent[] =
-    {
-        { u"", 0, css::uno::Type(), 0, 0 }
-    };
-    static SfxItemPropertySet aMap(aMapContent);
+    static SfxItemPropertySet aMap({});
     return &aMap;
 }
 
@@ -79,13 +75,12 @@ const SfxItemPropertySet* lcl_GetURLPropertySet()
 {
     static const SfxItemPropertyMapEntry aURLPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ANCTYPE,  0,  cppu::UnoType<text::TextContentAnchorType>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ANCTYPES, 0,  cppu::UnoType<uno::Sequence<text::TextContentAnchorType>>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_REPR,     0,  cppu::UnoType<OUString>::get(),    0, 0},
-        {u"" SC_UNONAME_TARGET,   0,  cppu::UnoType<OUString>::get(),    0, 0},
-        {u"" SC_UNONAME_TEXTWRAP, 0,  cppu::UnoType<text::WrapTextMode>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_URL,      0,  cppu::UnoType<OUString>::get(),    0, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ANCTYPE,  0,  cppu::UnoType<text::TextContentAnchorType>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ANCTYPES, 0,  cppu::UnoType<uno::Sequence<text::TextContentAnchorType>>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_REPR,     0,  cppu::UnoType<OUString>::get(),    0, 0},
+        { SC_UNONAME_TARGET,   0,  cppu::UnoType<OUString>::get(),    0, 0},
+        { SC_UNONAME_TEXTWRAP, 0,  cppu::UnoType<text::WrapTextMode>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_URL,      0,  cppu::UnoType<OUString>::get(),    0, 0},
     };
     static SfxItemPropertySet aURLPropertySet_Impl( aURLPropertyMap_Impl );
     return &aURLPropertySet_Impl;
@@ -95,10 +90,9 @@ const SfxItemPropertySet* lcl_GetHeaderFieldPropertySet()
 {
     static const SfxItemPropertyMapEntry aHeaderFieldPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ANCTYPE,  0,  cppu::UnoType<text::TextContentAnchorType>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ANCTYPES, 0,  cppu::UnoType<uno::Sequence<text::TextContentAnchorType>>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_TEXTWRAP, 0,  cppu::UnoType<text::WrapTextMode>::get(), beans::PropertyAttribute::READONLY, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ANCTYPE,  0,  cppu::UnoType<text::TextContentAnchorType>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ANCTYPES, 0,  cppu::UnoType<uno::Sequence<text::TextContentAnchorType>>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_TEXTWRAP, 0,  cppu::UnoType<text::WrapTextMode>::get(), beans::PropertyAttribute::READONLY, 0 },
     };
     static SfxItemPropertySet aHeaderFieldPropertySet_Impl( aHeaderFieldPropertyMap_Impl );
     return &aHeaderFieldPropertySet_Impl;
@@ -108,11 +102,10 @@ const SfxItemPropertySet* lcl_GetFileFieldPropertySet()
 {
     static const SfxItemPropertyMapEntry aFileFieldPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ANCTYPE,  0,  cppu::UnoType<text::TextContentAnchorType>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ANCTYPES, 0,  cppu::UnoType<uno::Sequence<text::TextContentAnchorType>>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_FILEFORM, 0,  cppu::UnoType<sal_Int16>::get(),        0, 0 },
-        {u"" SC_UNONAME_TEXTWRAP, 0,  cppu::UnoType<text::WrapTextMode>::get(), beans::PropertyAttribute::READONLY, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ANCTYPE,  0,  cppu::UnoType<text::TextContentAnchorType>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ANCTYPES, 0,  cppu::UnoType<uno::Sequence<text::TextContentAnchorType>>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_FILEFORM, 0,  cppu::UnoType<sal_Int16>::get(),        0, 0 },
+        { SC_UNONAME_TEXTWRAP, 0,  cppu::UnoType<text::WrapTextMode>::get(), beans::PropertyAttribute::READONLY, 0 },
     };
     static SfxItemPropertySet aFileFieldPropertySet_Impl( aFileFieldPropertyMap_Impl );
     return &aFileFieldPropertySet_Impl;
@@ -270,9 +263,9 @@ SvxFieldData* ScUnoEditEngine::FindByPos(sal_Int32 nPar, sal_Int32 nPos, sal_Int
 }
 
 ScCellFieldsObj::ScCellFieldsObj(
-    const uno::Reference<text::XTextRange>& xContent,
+    uno::Reference<text::XTextRange> xContent,
     ScDocShell* pDocSh, const ScAddress& rPos) :
-    mxContent(xContent),
+    mxContent(std::move(xContent)),
     pDocShell( pDocSh ),
     aCellPos( rPos )
 {
@@ -355,12 +348,11 @@ uno::Any SAL_CALL ScCellFieldsObj::getByIndex( sal_Int32 nIndex )
     if (!xField.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xField);
+    return uno::Any(xField);
 }
 
 uno::Type SAL_CALL ScCellFieldsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<text::XTextField>::get();
 }
 
@@ -406,7 +398,7 @@ void SAL_CALL ScCellFieldsObj::addRefreshListener( const uno::Reference< util::X
     {
         SolarMutexGuard aGuard;
         if (!mpRefreshListeners)
-            mpRefreshListeners.reset( new comphelper::OInterfaceContainerHelper2(aMutex) );
+            mpRefreshListeners.reset( new comphelper::OInterfaceContainerHelper3<util::XRefreshListener>(aMutex) );
         mpRefreshListeners->addInterface(xListener);
     }
 }
@@ -506,12 +498,11 @@ uno::Any SAL_CALL ScHeaderFieldsObj::getByIndex( sal_Int32 nIndex )
     if (!xField.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xField);
+    return uno::Any(xField);
 }
 
 uno::Type SAL_CALL ScHeaderFieldsObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<text::XTextField>::get();
 }
 
@@ -557,7 +548,7 @@ void SAL_CALL ScHeaderFieldsObj::addRefreshListener( const uno::Reference< util:
     {
         SolarMutexGuard aGuard;
         if (!mpRefreshListeners)
-            mpRefreshListeners.reset(new comphelper::OInterfaceContainerHelper2(aMutex));
+            mpRefreshListeners.reset(new comphelper::OInterfaceContainerHelper3<util::XRefreshListener>(aMutex));
         mpRefreshListeners->addInterface(xListener);
     }
 }
@@ -908,10 +899,10 @@ uno::Any ScEditFieldObj::getPropertyValueDateTime(const OUString& rName)
             {
                 SvxDateField* p = static_cast<SvxDateField*>(pField);
                 if (rName == SC_UNONAME_ISDATE)
-                    return uno::makeAny(true);
+                    return uno::Any(true);
 
                 if (rName == SC_UNONAME_ISFIXED)
-                    return uno::makeAny<sal_Bool>(p->GetType() == SvxDateType::Fix);
+                    return uno::Any(p->GetType() == SvxDateType::Fix);
 
                 if (rName == SC_UNONAME_DATETIME)
                 {
@@ -923,39 +914,39 @@ uno::Any ScEditFieldObj::getPropertyValueDateTime(const OUString& rName)
                     maDateTime.Minutes = 0;
                     maDateTime.Seconds = 0;
                     maDateTime.NanoSeconds = 0;
-                    return uno::makeAny(maDateTime);
+                    return uno::Any(maDateTime);
                 }
 
                 if (rName == SC_UNONAME_NUMFMT)
-                    return uno::makeAny<sal_Int32>(static_cast<sal_Int32>(p->GetFormat()));
+                    return uno::Any(static_cast<sal_Int32>(p->GetFormat()));
             }
             break;
             case text::textfield::Type::TIME:
             {
                 // SvxTimeField doesn't have any attributes.
                 if (rName == SC_UNONAME_ISDATE)
-                    return uno::makeAny(false);
+                    return uno::Any(false);
 
                 if (rName == SC_UNONAME_ISFIXED)
-                    return uno::makeAny(false);
+                    return uno::Any(false);
 
                 if (rName == SC_UNONAME_DATETIME)
                     // This is the best we can do.
-                    return uno::makeAny(maDateTime);
+                    return uno::Any(maDateTime);
 
                 if (rName == SC_UNONAME_NUMFMT)
                     // Same as above.
-                    return uno::makeAny<sal_Int32>(0);
+                    return uno::Any(sal_Int32(0));
             }
             break;
             case text::textfield::Type::EXTENDED_TIME:
             {
                 SvxExtTimeField* p = static_cast<SvxExtTimeField*>(pField);
                 if (rName == SC_UNONAME_ISDATE)
-                    return uno::makeAny(false);
+                    return uno::Any(false);
 
                 if (rName == SC_UNONAME_ISFIXED)
-                    return uno::makeAny<sal_Bool>(p->GetType() == SvxTimeType::Fix);
+                    return uno::Any(p->GetType() == SvxTimeType::Fix);
 
                 if (rName == SC_UNONAME_DATETIME)
                 {
@@ -967,11 +958,11 @@ uno::Any ScEditFieldObj::getPropertyValueDateTime(const OUString& rName)
                     maDateTime.Minutes = aT.GetMin();
                     maDateTime.Seconds = aT.GetSec();
                     maDateTime.NanoSeconds = aT.GetNanoSec();
-                    return uno::makeAny(maDateTime);
+                    return uno::Any(maDateTime);
                 }
 
                 if (rName == SC_UNONAME_NUMFMT)
-                    return uno::makeAny<sal_Int32>(static_cast<sal_Int32>(p->GetFormat()));
+                    return uno::Any(static_cast<sal_Int32>(p->GetFormat()));
             }
             break;
             default:
@@ -981,16 +972,16 @@ uno::Any ScEditFieldObj::getPropertyValueDateTime(const OUString& rName)
     else
     {
         if (rName == SC_UNONAME_ISDATE)
-            return uno::makeAny<sal_Bool>(mbIsDate);
+            return uno::Any(mbIsDate);
 
         if (rName == SC_UNONAME_ISFIXED)
-            return uno::makeAny<sal_Bool>(mbIsFixed);
+            return uno::Any(mbIsFixed);
 
         if (rName == SC_UNONAME_DATETIME)
-            return uno::makeAny(maDateTime);
+            return uno::Any(maDateTime);
 
         if (rName == SC_UNONAME_NUMFMT)
-            return uno::makeAny(mnNumFormat);
+            return uno::Any(mnNumFormat);
     }
 
     throw beans::UnknownPropertyException(rName);
@@ -1039,13 +1030,12 @@ void ScEditFieldObj::setPropertyValueSheet(const OUString& rName, const uno::Any
 }
 
 ScEditFieldObj::ScEditFieldObj(
-    const uno::Reference<text::XTextRange>& rContent,
+    uno::Reference<text::XTextRange> xContent,
     std::unique_ptr<ScEditSource> pEditSrc, sal_Int32 eType, const ESelection& rSel) :
-    ScEditFieldObj_Base(getMutex()),
     pPropSet(nullptr),
     mpEditSource(std::move(pEditSrc)),
     aSelection(rSel),
-    meType(eType), mpContent(rContent), mnNumFormat(0), mbIsDate(false), mbIsFixed(false)
+    meType(eType), mpContent(std::move(xContent)), mnNumFormat(0), mbIsDate(false), mbIsFixed(false)
 {
     switch (meType)
     {
@@ -1219,10 +1209,10 @@ uno::Any SAL_CALL ScEditFieldObj::getPropertyValue( const OUString& aPropertyNam
 {
     SolarMutexGuard aGuard;
     if (aPropertyName == SC_UNONAME_TEXTFIELD_TYPE)
-        return uno::makeAny(meType);
+        return uno::Any(meType);
 
     if (aPropertyName == SC_UNONAME_ANCHOR)
-        return uno::makeAny(mpContent);
+        return uno::Any(mpContent);
 
     if (aPropertyName == SC_UNONAME_ANCTYPE)
     {

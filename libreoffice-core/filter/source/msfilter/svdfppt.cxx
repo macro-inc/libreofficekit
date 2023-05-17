@@ -20,11 +20,11 @@
 #include <sal/config.h>
 
 #include <osl/endian.h>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <unotools/tempfile.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
-#include <math.h>
 #include <editeng/eeitem.hxx>
 #include <editeng/editdata.hxx>
 #include <sot/storage.hxx>
@@ -100,7 +100,6 @@
 #include <editeng/brushitem.hxx>
 #include <editeng/langitem.hxx>
 #include <svx/svdoole2.hxx>
-#include <svx/unoapi.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <com/sun/star/container/XIndexContainer.hpp>
 #include <com/sun/star/drawing/XControlShape.hpp>
@@ -126,7 +125,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <utility>
 #include <rtl/strbuf.hxx>
 #include <tools/time.hxx>
 #include <memory>
@@ -496,7 +494,6 @@ PptSlidePersistEntry::PptSlidePersistEntry() :
     nSlidePersistEndOffset  ( 0 ),
     nBackgroundOffset       ( 0 ),
     nDrawingDgId            ( 0xffffffff ),
-    pBObj                   ( nullptr ),
     ePageKind               ( PPT_MASTERPAGE ),
     bNotesMaster            ( false ),
     bHandoutMaster          ( false ),
@@ -632,7 +629,7 @@ void SdrEscherImport::RecolorGraphic( SvStream& rSt, sal_uInt32 nRecLen, Graphic
     {
         for ( ; i > 0; i-- )
         {
-            sal_uInt32 nPos = rSt.Tell();
+            sal_uInt64 nPos = rSt.Tell();
             sal_uInt16 nChanged;
             rSt.ReadUInt16( nChanged );
             if ( nChanged & 1 )
@@ -731,13 +728,13 @@ void ProcessData::NotifyFreeObj(SdrObject* pObj)
    The parameter pOriginalObj is the object as it was imported by our general escher import, it must either
    be deleted or it can be returned to be inserted into the sdr page.
 */
-SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, SvxMSDffClientData& rClientData, tools::Rectangle& rTextRect, SdrObject* pOriginalObj )
+rtl::Reference<SdrObject> SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, SvxMSDffClientData& rClientData, tools::Rectangle& rTextRect, SdrObject* pOriginalObj )
 {
     if ( dynamic_cast<const SdrObjCustomShape* >(pOriginalObj) !=  nullptr )
         pOriginalObj->SetMergedItem( SdrTextFixedCellHeightItem( true ) );
 
     // we are initializing our return value with the object that was imported by our escher import
-    SdrObject* pRet = pOriginalObj;
+    rtl::Reference<SdrObject> pRet = pOriginalObj;
 
     ProcessData& rData = static_cast<ProcessData&>(rClientData);
     PptSlidePersistEntry& rPersistEntry = rData.rPersistEntry;
@@ -782,7 +779,7 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
 
                     case PPT_PST_RecolorInfoAtom :
                     {
-                        if ( auto pSdrGrafObj = dynamic_cast<SdrGrafObj* >(pRet) )
+                        if ( auto pSdrGrafObj = dynamic_cast<SdrGrafObj* >(pRet.get()) )
                             if ( pSdrGrafObj->HasGDIMetaFile() )
                             {
                                 Graphic aGraphic( pSdrGrafObj->GetGraphic() );
@@ -803,7 +800,6 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                 nPageNum--;
 
             // replacing the object which we will return with a SdrPageObj
-            SdrObject::Free( pRet );
             pRet = new SdrPageObj(
                 *pSdrModel,
                 rObjData.aBoundRect,
@@ -851,10 +847,12 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                 if ( pRet )
                 {
                     bool bDeleteSource = aTextObj.GetOEPlaceHolderAtom() != nullptr;
-                    if ( bDeleteSource  && dynamic_cast<const SdrGrafObj* >(pRet) ==  nullptr     // we are not allowed to get
-                            && dynamic_cast<const SdrObjGroup* >(pRet) ==  nullptr                // grouped placeholder objects
-                                && dynamic_cast<const SdrOle2Obj* >(pRet) ==  nullptr )
-                        SdrObject::Free( pRet );
+                    if ( bDeleteSource  && dynamic_cast<const SdrGrafObj* >(pRet.get()) ==  nullptr     // we are not allowed to get
+                            && dynamic_cast<const SdrObjGroup* >(pRet.get()) ==  nullptr                // grouped placeholder objects
+                                && dynamic_cast<const SdrOle2Obj* >(pRet.get()) ==  nullptr )
+                    {
+                        pRet = nullptr;
+                    }
                 }
                 sal_uInt32 nTextFlags = aTextObj.GetTextFlags();
                 sal_Int32 nTextLeft = GetPropertyValue( DFF_Prop_dxTextLeft, 25 * 3600 );   // 0.25 cm (emu)
@@ -987,18 +985,18 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                     nMinFrameHeight = rTextRect.GetHeight() - ( nTextTop + nTextBottom );
                 }
 
-                SdrObjKind eTextKind = OBJ_RECT;
+                SdrObjKind eTextKind = SdrObjKind::Rectangle;
                 if ( ( aPlaceholderAtom.nPlaceholderId == PptPlaceholder::NOTESSLIDEIMAGE )
                     || ( aPlaceholderAtom.nPlaceholderId == PptPlaceholder::MASTERNOTESSLIDEIMAGE ) )
                 {
                     aTextObj.SetInstance( TSS_Type::Notes );
-                    eTextKind = OBJ_TITLETEXT;
+                    eTextKind = SdrObjKind::TitleText;
                 }
                 else if ( ( aPlaceholderAtom.nPlaceholderId == PptPlaceholder::MASTERNOTESBODYIMAGE )
                     || ( aPlaceholderAtom.nPlaceholderId == PptPlaceholder::NOTESBODY ) )
                 {
                     aTextObj.SetInstance( TSS_Type::Notes );
-                    eTextKind = OBJ_TEXT;
+                    eTextKind = SdrObjKind::Text;
                 }
 
                 TSS_Type nDestinationInstance = aTextObj.GetInstance();
@@ -1036,11 +1034,11 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                 switch ( aTextObj.GetInstance() )
                 {
                     case TSS_Type::PageTitle :
-                    case TSS_Type::Title : eTextKind = OBJ_TITLETEXT; break;
-                    case TSS_Type::Subtitle : eTextKind = OBJ_TEXT; break;
+                    case TSS_Type::Title : eTextKind = SdrObjKind::TitleText; break;
+                    case TSS_Type::Subtitle : eTextKind = SdrObjKind::Text; break;
                     case TSS_Type::Body :
                     case TSS_Type::HalfBody :
-                    case TSS_Type::QuarterBody : eTextKind = OBJ_OUTLINETEXT; bAutoFit = true; break;
+                    case TSS_Type::QuarterBody : eTextKind = SdrObjKind::OutlineText; bAutoFit = true; break;
                     default: break;
                 }
                 if ( aTextObj.GetDestinationInstance() != TSS_Type::TextInShape )
@@ -1048,14 +1046,14 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                     if ( !aTextObj.GetOEPlaceHolderAtom() || aTextObj.GetOEPlaceHolderAtom()->nPlaceholderId == PptPlaceholder::NONE )
                     {
                         aTextObj.SetDestinationInstance( TSS_Type::TextInShape );
-                        eTextKind = OBJ_RECT;
+                        eTextKind = SdrObjKind::Rectangle;
                     }
                 }
-                SdrObject* pTObj = nullptr;
+                rtl::Reference<SdrObject> pTObj;
                 bool bWordWrap = GetPropertyValue(DFF_Prop_WrapText, mso_wrapSquare) != mso_wrapNone;
                 bool bFitShapeToText = ( GetPropertyValue( DFF_Prop_FitTextToShape, 0 ) & 2 ) != 0;
 
-                if ( dynamic_cast<const SdrObjCustomShape* >(pRet) !=  nullptr && ( eTextKind == OBJ_RECT ) )
+                if ( dynamic_cast<const SdrObjCustomShape* >(pRet.get()) !=  nullptr && ( eTextKind == SdrObjKind::Rectangle ) )
                 {
                     bAutoGrowHeight = bFitShapeToText;
                     bAutoGrowWidth = !bWordWrap;
@@ -1064,14 +1062,13 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                 }
                 else
                 {
-                    if ( dynamic_cast<const SdrObjCustomShape* >(pRet) !=  nullptr )
+                    if ( dynamic_cast<const SdrObjCustomShape* >(pRet.get()) !=  nullptr )
                     {
-                        SdrObject::Free( pRet );
                         pRet = nullptr;
                     }
                     pTObj = new SdrRectObj(
                         *pSdrModel,
-                        eTextKind != OBJ_RECT ? eTextKind : OBJ_TEXT);
+                        eTextKind != SdrObjKind::Rectangle ? eTextKind : SdrObjKind::Text);
                     SfxItemSet aSet( pSdrModel->GetItemPool() );
                     if ( !pRet )
                         ApplyAttributes( rSt, aSet, rObjData );
@@ -1105,7 +1102,7 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                     pTObj->SetMergedItem( SdrTextFitToSizeTypeItem(drawing::TextFitToSizeType_AUTOFIT) );
                 }
 
-                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj) ==  nullptr )
+                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj.get()) ==  nullptr )
                 {
                     pTObj->SetMergedItem( makeSdrTextAutoGrowWidthItem( bAutoGrowWidth ) );
                     pTObj->SetMergedItem( makeSdrTextAutoGrowHeightItem( bAutoGrowHeight ) );
@@ -1121,12 +1118,12 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
 
                 if ( nMinFrameHeight < 0 )
                     nMinFrameHeight = 0;
-                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj) ==  nullptr )
+                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj.get()) ==  nullptr )
                     pTObj->SetMergedItem( makeSdrTextMinFrameHeightItem( nMinFrameHeight ) );
 
                 if ( nMinFrameWidth < 0 )
                     nMinFrameWidth = 0;
-                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj) ==  nullptr )
+                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj.get()) ==  nullptr )
                     pTObj->SetMergedItem( makeSdrTextMinFrameWidthItem( nMinFrameWidth ) );
 
                 // set margins at the borders of the textbox
@@ -1136,9 +1133,9 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                 pTObj->SetMergedItem( makeSdrTextLowerDistItem( nTextBottom ) );
                 pTObj->SetMergedItem( SdrTextFixedCellHeightItem( true ) );
 
-                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj) ==  nullptr )
+                if ( dynamic_cast<const SdrObjCustomShape* >(pTObj.get()) ==  nullptr )
                     pTObj->SetSnapRect( rTextRect );
-                pTObj = ReadObjText( &aTextObj, pTObj, rData.pPage );
+                pTObj = ReadObjText( &aTextObj, pTObj.get(), rData.pPage );
 
                 if ( pTObj )
                 {
@@ -1148,9 +1145,9 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                     snaprect of the object. Then we will use
                     ADJUST_CENTER instead of ADJUST_BLOCK.
                     */
-                    if ( dynamic_cast<const SdrObjCustomShape* >(pTObj) ==  nullptr && !bFitShapeToText && !bWordWrap )
+                    if ( dynamic_cast<const SdrObjCustomShape* >(pTObj.get()) ==  nullptr && !bFitShapeToText && !bWordWrap )
                     {
-                        SdrTextObj* pText = dynamic_cast<SdrTextObj*>( pTObj  );
+                        SdrTextObj* pText = DynCastSdrTextObj( pTObj.get()  );
                         if ( pText )
                         {
                             if ( bVerticalText )
@@ -1181,7 +1178,7 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                     Degree100 nAngle = ( rObjData.nSpFlags & ShapeFlag::FlipV ) ? -mnFix16Angle : mnFix16Angle; // #72116# vertical flip -> rotate by using the other way
                     nAngle += nTextRotationAngle;
 
-                    if ( dynamic_cast< const SdrObjCustomShape* >(pTObj) ==  nullptr )
+                    if ( dynamic_cast< const SdrObjCustomShape* >(pTObj.get()) ==  nullptr )
                     {
                         if ( rObjData.nSpFlags & ShapeFlag::FlipV )
                         {
@@ -1194,13 +1191,13 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
                     }
                     if ( pRet )
                     {
-                        SdrObject* pGroup = new SdrObjGroup(*pSdrModel);
-                        pGroup->GetSubList()->NbcInsertObject( pRet );
-                        pGroup->GetSubList()->NbcInsertObject( pTObj );
+                        rtl::Reference<SdrObject> pGroup = new SdrObjGroup(*pSdrModel);
+                        pGroup->GetSubList()->NbcInsertObject( pRet.get() );
+                        pGroup->GetSubList()->NbcInsertObject( pTObj.get() );
                         pRet = pGroup;
                     }
                     else
-                        pRet = pTObj;
+                        pRet = pTObj.get();
                 }
             }
         }
@@ -1256,11 +1253,11 @@ SdrObject* SdrEscherImport::ProcessObj( SvStream& rSt, DffObjData& rObjData, Svx
             for (auto & pPtr : rPersistEntry.xSolverContainer->aCList)
             {
                 if ( rObjData.nShapeId == pPtr->nShapeC )
-                    pPtr->pCObj = pRet;
+                    pPtr->pCObj = pRet.get();
                 else
                 {
-                    SdrObject* pConnectObj = pRet;
-                    if ( pOriginalObj && dynamic_cast< const SdrObjGroup* >(pRet) !=  nullptr )
+                    SdrObject* pConnectObj = pRet.get();
+                    if ( pOriginalObj && dynamic_cast< const SdrObjGroup* >(pRet.get()) !=  nullptr )
                     {   /* check if the original object from the escherimport is part of the group object,
                         if this is the case, we will use the original object to connect to */
                         SdrObjListIter aIter( *pRet, SdrIterMode::DeepWithGroups );
@@ -1798,13 +1795,13 @@ static bool SdrPowerPointOLEDecompress( SvStream& rOutput, SvStream& rInput, sal
 }
 
 // #i32596# - add new parameter <_nCalledByGroup>
-SdrObject* SdrPowerPointImport::ImportOLE( sal_uInt32 nOLEId,
+rtl::Reference<SdrObject> SdrPowerPointImport::ImportOLE( sal_uInt32 nOLEId,
                                            const Graphic& rGraf,
                                            const tools::Rectangle& rBoundRect,
                                            const tools::Rectangle& rVisArea,
                                            const int /*_nCalledByGroup*/ ) const
 {
-    SdrObject* pRet = nullptr;
+    rtl::Reference<SdrObject> pRet;
 
     sal_uInt32 nOldPos = rStCtrl.Tell();
 
@@ -1849,138 +1846,129 @@ SdrObject* SdrPowerPointImport::ImportOLE( sal_uInt32 nOLEId,
 
             rStCtrl.SeekRel( 4 );
 
-            ::utl::TempFile aTmpFile;
-            aTmpFile.EnableKillingFile();
-
-            if ( aTmpFile.IsValid() )
+            ::utl::TempFileFast aTmpFile;
+            SvStream* pDest = aTmpFile.GetStream(StreamMode::READWRITE);
+            if (pDest)
             {
-                SvStream* pDest = aTmpFile.GetStream(StreamMode::TRUNC | StreamMode::WRITE);
-                if (pDest)
-                {
-                    bSuccess = SdrPowerPointOLEDecompress( *pDest, rStCtrl, nLen );
-                }
-                aTmpFile.CloseStream();
+                bSuccess = SdrPowerPointOLEDecompress( *pDest, rStCtrl, nLen );
             }
             if ( bSuccess )
             {
-                SvStream* pDest = aTmpFile.GetStream(StreamMode::READ);
-                Storage* pObjStor = pDest ? new Storage( *pDest, true ) : nullptr;
-                if (pObjStor)
+                pDest->Seek(0);
+                Storage* pObjStor = new Storage(*pDest, false);
+                tools::SvRef<SotStorage> xObjStor( new SotStorage( pObjStor ) );
+                if ( xObjStor.is() && !xObjStor->GetError() )
                 {
-                    tools::SvRef<SotStorage> xObjStor( new SotStorage( pObjStor ) );
-                    if ( xObjStor.is() && !xObjStor->GetError() )
+                    if ( xObjStor->GetClassName() == SvGlobalName() )
                     {
-                        if ( xObjStor->GetClassName() == SvGlobalName() )
-                        {
-                            xObjStor->SetClass( SvGlobalName( pObjStor->GetClassId() ), pObjStor->GetFormat(), pObjStor->GetUserName() );
+                        xObjStor->SetClass( SvGlobalName( pObjStor->GetClassId() ), pObjStor->GetFormat(), pObjStor->GetUserName() );
+                    }
+                    tools::SvRef<SotStorageStream> xSrcTst = xObjStor->OpenSotStream( "\1Ole" );
+                    if ( xSrcTst.is() )
+                    {
+                        sal_uInt8 aTestA[ 10 ];
+                        bool bGetItAsOle = (sizeof(aTestA) == xSrcTst->ReadBytes(aTestA, sizeof(aTestA)));
+                        if ( !bGetItAsOle )
+                        {   // maybe there is a contents stream in here
+                            xSrcTst = xObjStor->OpenSotStream( "Contents", StreamMode::READWRITE | StreamMode::NOCREATE );
+                            bGetItAsOle = (xSrcTst.is() &&
+                                sizeof(aTestA) == xSrcTst->ReadBytes(aTestA, sizeof(aTestA)));
                         }
-                        tools::SvRef<SotStorageStream> xSrcTst = xObjStor->OpenSotStream( "\1Ole" );
-                        if ( xSrcTst.is() )
+                        if ( bGetItAsOle )
                         {
-                            sal_uInt8 aTestA[ 10 ];
-                            bool bGetItAsOle = (sizeof(aTestA) == xSrcTst->ReadBytes(aTestA, sizeof(aTestA)));
-                            if ( !bGetItAsOle )
-                            {   // maybe there is a contents stream in here
-                                xSrcTst = xObjStor->OpenSotStream( "Contents", StreamMode::READWRITE | StreamMode::NOCREATE );
-                                bGetItAsOle = (xSrcTst.is() &&
-                                    sizeof(aTestA) == xSrcTst->ReadBytes(aTestA, sizeof(aTestA)));
-                            }
-                            if ( bGetItAsOle )
+                            OUString aNm;
+                            // if ( nSvxMSDffOLEConvFlags )
                             {
-                                OUString aNm;
-                                // if ( nSvxMSDffOLEConvFlags )
+                                uno::Reference < embed::XStorage > xDestStorage( rOe.pShell->GetStorage() );
+                                uno::Reference < embed::XEmbeddedObject > xObj =
+                                    CheckForConvertToSOObj(nSvxMSDffOLEConvFlags, *xObjStor, xDestStorage, rGraf, rVisArea, maBaseURL);
+                                if( xObj.is() )
                                 {
-                                    uno::Reference < embed::XStorage > xDestStorage( rOe.pShell->GetStorage() );
-                                    uno::Reference < embed::XEmbeddedObject > xObj =
-                                        CheckForConvertToSOObj(nSvxMSDffOLEConvFlags, *xObjStor, xDestStorage, rGraf, rVisArea, maBaseURL);
-                                    if( xObj.is() )
-                                    {
-                                        rOe.pShell->getEmbeddedObjectContainer().InsertEmbeddedObject( xObj, aNm );
+                                    rOe.pShell->getEmbeddedObjectContainer().InsertEmbeddedObject( xObj, aNm );
 
-                                        svt::EmbeddedObjectRef aObj( xObj, rOe.nAspect );
+                                    svt::EmbeddedObjectRef aObj( xObj, rOe.nAspect );
 
-                                        // TODO/LATER: need MediaType for Graphic
-                                        aObj.SetGraphic( rGraf, OUString() );
-                                        pRet = new SdrOle2Obj(
-                                            *pSdrModel,
-                                            aObj,
-                                            aNm,
-                                            rBoundRect);
-                                    }
+                                    // TODO/LATER: need MediaType for Graphic
+                                    aObj.SetGraphic( rGraf, OUString() );
+                                    pRet = new SdrOle2Obj(
+                                        *pSdrModel,
+                                        aObj,
+                                        aNm,
+                                        rBoundRect);
                                 }
-                                if ( !pRet && ( rOe.nType == PPT_PST_ExControl ) )
-                                {
-                                    uno::Reference< frame::XModel > xModel( rOe.pShell->GetModel() );
-                                    PPTConvertOCXControls aPPTConvertOCXControls( this, xModel, m_eCurrentPageKind );
-                                    css::uno::Reference< css::drawing::XShape > xShape;
-                                    if ( aPPTConvertOCXControls.ReadOCXStream( xObjStor, &xShape ) )
-                                        pRet = SdrObject::getSdrObjectFromXShape(xShape);
+                            }
+                            if ( !pRet && ( rOe.nType == PPT_PST_ExControl ) )
+                            {
+                                uno::Reference< frame::XModel > xModel( rOe.pShell->GetModel() );
+                                PPTConvertOCXControls aPPTConvertOCXControls( this, xModel, m_eCurrentPageKind );
+                                css::uno::Reference< css::drawing::XShape > xShape;
+                                if ( aPPTConvertOCXControls.ReadOCXStream( xObjStor, &xShape ) )
+                                    pRet = SdrObject::getSdrObjectFromXShape(xShape);
 
+                            }
+                            if ( !pRet )
+                            {
+                                aNm = rOe.pShell->getEmbeddedObjectContainer().CreateUniqueObjectName();
+
+                                // object is not an own object
+                                const css::uno::Reference < css::embed::XStorage >& rStorage = rOe.pShell->GetStorage();
+                                if (rStorage.is())
+                                {
+                                    tools::SvRef<SotStorage> xTarget = SotStorage::OpenOLEStorage(rStorage, aNm, StreamMode::READWRITE);
+                                    if (xObjStor.is() && xTarget.is())
+                                    {
+                                        xObjStor->CopyTo(xTarget.get());
+                                        if (!xTarget->GetError())
+                                            xTarget->Commit();
+                                    }
+                                    xTarget.clear();
                                 }
-                                if ( !pRet )
+
+                                uno::Reference < embed::XEmbeddedObject > xObj =
+                                    rOe.pShell->getEmbeddedObjectContainer().GetEmbeddedObject( aNm );
+                                if ( xObj.is() )
                                 {
-                                    aNm = rOe.pShell->getEmbeddedObjectContainer().CreateUniqueObjectName();
-
-                                    // object is not an own object
-                                    const css::uno::Reference < css::embed::XStorage >& rStorage = rOe.pShell->GetStorage();
-                                    if (rStorage.is())
+                                    if ( rOe.nAspect != embed::Aspects::MSOLE_ICON )
                                     {
-                                        tools::SvRef<SotStorage> xTarget = SotStorage::OpenOLEStorage(rStorage, aNm, StreamMode::READWRITE);
-                                        if (xObjStor.is() && xTarget.is())
+                                        //TODO/LATER: keep on hacking?!
+                                        // we don't want to be modified
+                                        //xInplaceObj->EnableSetModified( sal_False );
+                                        if ( rVisArea.IsEmpty() )
                                         {
-                                            xObjStor->CopyTo(xTarget.get());
-                                            if (!xTarget->GetError())
-                                                xTarget->Commit();
+                                            MapUnit aMapUnit = VCLUnoHelper::UnoEmbed2VCLMapUnit( xObj->getMapUnit( rOe.nAspect ) );
+                                            Size aSize( OutputDevice::LogicToLogic( aGraphic.GetPrefSize(),
+                                                aGraphic.GetPrefMapMode(), MapMode( aMapUnit ) ) );
+
+                                            awt::Size aSz;
+                                            aSz.Width = aSize.Width();
+                                            aSz.Height = aSize.Height();
+                                            xObj->setVisualAreaSize( rOe.nAspect, aSz );
                                         }
-                                        xTarget.clear();
+                                        else
+                                        {
+                                            awt::Size aSize( rVisArea.GetSize().Width(), rVisArea.GetSize().Height() );
+                                            xObj->setVisualAreaSize( rOe.nAspect, aSize );
+                                        }
+                                        //xInplaceObj->EnableSetModified( sal_True );
                                     }
 
-                                    uno::Reference < embed::XEmbeddedObject > xObj =
-                                        rOe.pShell->getEmbeddedObjectContainer().GetEmbeddedObject( aNm );
-                                    if ( xObj.is() )
-                                    {
-                                        if ( rOe.nAspect != embed::Aspects::MSOLE_ICON )
-                                        {
-                                            //TODO/LATER: keep on hacking?!
-                                            // we don't want to be modified
-                                            //xInplaceObj->EnableSetModified( sal_False );
-                                            if ( rVisArea.IsEmpty() )
-                                            {
-                                                MapUnit aMapUnit = VCLUnoHelper::UnoEmbed2VCLMapUnit( xObj->getMapUnit( rOe.nAspect ) );
-                                                Size aSize( OutputDevice::LogicToLogic( aGraphic.GetPrefSize(),
-                                                    aGraphic.GetPrefMapMode(), MapMode( aMapUnit ) ) );
+                                    svt::EmbeddedObjectRef aObj( xObj, rOe.nAspect );
 
-                                                awt::Size aSz;
-                                                aSz.Width = aSize.Width();
-                                                aSz.Height = aSize.Height();
-                                                xObj->setVisualAreaSize( rOe.nAspect, aSz );
-                                            }
-                                            else
-                                            {
-                                                awt::Size aSize( rVisArea.GetSize().Width(), rVisArea.GetSize().Height() );
-                                                xObj->setVisualAreaSize( rOe.nAspect, aSize );
-                                            }
-                                            //xInplaceObj->EnableSetModified( sal_True );
-                                        }
+                                    // TODO/LATER: need MediaType for Graphic
+                                    aObj.SetGraphic( aGraphic, OUString() );
 
-                                        svt::EmbeddedObjectRef aObj( xObj, rOe.nAspect );
-
-                                        // TODO/LATER: need MediaType for Graphic
-                                        aObj.SetGraphic( aGraphic, OUString() );
-
-                                        pRet = new SdrOle2Obj(
-                                            *pSdrModel,
-                                            aObj,
-                                            aNm,
-                                            rBoundRect);
-                                    }
+                                    pRet = new SdrOle2Obj(
+                                        *pSdrModel,
+                                        aObj,
+                                        aNm,
+                                        rBoundRect);
                                 }
                             }
                         }
                     }
                 }
-                aTmpFile.CloseStream();
             }
+            aTmpFile.CloseStream();
         }
     }
     rStCtrl.Seek( nOldPos );
@@ -2170,7 +2158,7 @@ bool SdrPowerPointImport::ReadFontCollection()
     DffRecordHeader* pEnvHd = aDocRecManager.GetRecordHeader( PPT_PST_Environment );
     if ( pEnvHd )
     {
-        sal_uLong nOldFPos = rStCtrl.Tell(); // remember FilePos for restoring it later
+        sal_uInt64 nOldFPos = rStCtrl.Tell(); // remember FilePos for restoring it later
         pEnvHd->SeekToContent( rStCtrl );
         DffRecordHeader aListHd;
         if ( SeekToRec( rStCtrl, PPT_PST_FontCollection, pEnvHd->GetRecEndFilePos(), &aListHd ) )
@@ -2238,7 +2226,7 @@ SdrOutliner* SdrPowerPointImport::GetDrawOutliner( SdrTextObj const * pSdrText )
 
 SdrObject* SdrPowerPointImport::ReadObjText( PPTTextObj* pTextObj, SdrObject* pSdrObj, SdPageCapsule pPage ) const
 {
-    SdrTextObj* pText = dynamic_cast<SdrTextObj*>( pSdrObj  );
+    SdrTextObj* pText = DynCastSdrTextObj( pSdrObj  );
     if ( pText )
     {
         if ( !ApplyTextObj( pTextObj, pText, pPage, nullptr, nullptr ) )
@@ -2258,7 +2246,7 @@ SdrObject* SdrPowerPointImport::ApplyTextObj( PPTTextObj* pTextObj, SdrTextObj* 
         bool bUndoEnabled = rOutliner.IsUndoEnabled();
         rOutliner.EnableUndo(false);
 
-        if ( ( pText->GetObjInventor() == SdrInventor::Default ) && ( pText->GetObjIdentifier() == OBJ_TITLETEXT ) ) // Outliner-Style for Title-Text object?!? (->of DL)
+        if ( ( pText->GetObjInventor() == SdrInventor::Default ) && ( pText->GetObjIdentifier() == SdrObjKind::TitleText ) ) // Outliner-Style for Title-Text object?!? (->of DL)
             rOutliner.Init( OutlinerMode::TitleObject );             // Outliner reset
 
         bool bOldUpdateMode = rOutliner.SetUpdateLayout( false );
@@ -2360,6 +2348,8 @@ SdrObject* SdrPowerPointImport::ApplyTextObj( PPTTextObj* pTextObj, SdrTextObj* 
                 pPara->GetAttrib( PPT_ParaAttr_BulletOn, nIsBullet2, nDestinationInstance );
                 if ( !nIsBullet2 )
                     aParagraphAttribs.Put( SfxBoolItem( EE_PARA_BULLETSTATE, false ) );
+                else
+                    aParagraphAttribs.Put( SfxInt16Item(EE_PARA_OUTLLEVEL, pPara->mxParaSet->mnDepth));
 
                 if ( !aSelection.nStartPos )    // in PPT empty paragraphs never gets a bullet
                 {
@@ -2381,7 +2371,7 @@ SdrObject* SdrPowerPointImport::ApplyTextObj( PPTTextObj* pTextObj, SdrTextObj* 
 bool SdrPowerPointImport::SeekToDocument( DffRecordHeader* pRecHd ) const
 {
     bool bRet;
-    sal_uLong nOldFPos = rStCtrl.Tell(); // remember FilePos for restoring it should the situation arise
+    sal_uInt64 nOldFPos = rStCtrl.Tell(); // remember FilePos for restoring it, if the situation should happen
     rStCtrl.Seek( m_nDocStreamPos );
     DffRecordHeader aDocHd;
     ReadDffRecordHeader( rStCtrl, aDocHd );
@@ -2908,16 +2898,16 @@ void SdrPowerPointImport::ImportPage( SdrPage* pRet, const PptSlidePersistEntry*
                                                 aShapeHd.SeekToBegOfRecord( rStCtrl );
                                                 sal_Int32 nShapeId;
                                                 aProcessData.pTableRowProperties.reset();
-                                                SdrObject* pObj = ImportObj( rStCtrl, aProcessData, aEmpty, aEmpty, 0, &nShapeId );
+                                                rtl::Reference<SdrObject> pObj = ImportObj( rStCtrl, aProcessData, aEmpty, aEmpty, 0, &nShapeId );
                                                 if ( pObj )
                                                 {
                                                     if ( aProcessData.pTableRowProperties )
-                                                        pObj = CreateTable(pObj, aProcessData.pTableRowProperties.get(), aProcessData.rPersistEntry.xSolverContainer.get(), aProcessData.aBackgroundColoredObjects);
+                                                        pObj = CreateTable(pObj.get(), aProcessData.pTableRowProperties.get(), aProcessData.rPersistEntry.xSolverContainer.get(), aProcessData.aBackgroundColoredObjects);
 
-                                                    pRet->NbcInsertObject( pObj );
+                                                    pRet->NbcInsertObject( pObj.get() );
 
                                                     if( nShapeId )
-                                                        insertShapeId( nShapeId, pObj );
+                                                        insertShapeId( nShapeId, pObj.get() );
                                                 }
                                             }
                                             bool bSuccess = aShapeHd.SeekToEndOfRecord(rStCtrl);
@@ -2942,7 +2932,7 @@ void SdrPowerPointImport::ImportPage( SdrPage* pRet, const PptSlidePersistEntry*
                             {
                                 if (!rSlidePersist.pBObj)
                                 {
-                                    for (auto pObject : aProcessData.aBackgroundColoredObjects)
+                                    for (auto const & pObject : aProcessData.aBackgroundColoredObjects)
                                     {
                                         // The shape wants a background, but the slide doesn't have
                                         // one: default to white.
@@ -2966,15 +2956,15 @@ void SdrPowerPointImport::ImportPage( SdrPage* pRet, const PptSlidePersistEntry*
                                 for (auto & pPtr : rSlidePersist.xSolverContainer->aCList)
                                 {
                                     // check connections to the group object
-                                    if (pPtr->pAObj == rSlidePersist.pBObj)
+                                    if (pPtr->pAObj == rSlidePersist.pBObj.get())
                                         pPtr->pAObj = nullptr;
-                                    if (pPtr->pBObj == rSlidePersist.pBObj)
+                                    if (pPtr->pBObj == rSlidePersist.pBObj.get())
                                         pPtr->pBObj = nullptr;
-                                    if (pPtr->pCObj == rSlidePersist.pBObj)
+                                    if (pPtr->pCObj == rSlidePersist.pBObj.get())
                                         pPtr->pCObj = nullptr;
                                 }
                             }
-                            SdrObject::Free(rSlidePersist.pBObj);
+                            rSlidePersist.pBObj.clear();
                         }
                     }
                 }
@@ -3048,11 +3038,11 @@ sal_uInt16 SdrPowerPointImport::GetMasterPageIndex( sal_uInt16 nPageNum, PptPage
     return nIdx;
 }
 
-SdrObject* SdrPowerPointImport::ImportPageBackgroundObject( const SdrPage& rPage, sal_uInt32& nBgFileOffset )
+rtl::Reference<SdrObject> SdrPowerPointImport::ImportPageBackgroundObject( const SdrPage& rPage, sal_uInt32& nBgFileOffset )
 {
-    SdrObject* pRet = nullptr;
+    rtl::Reference<SdrObject> pRet;
     std::optional<SfxItemSet> pSet;
-    sal_uLong nOldFPos = rStCtrl.Tell(); // remember FilePos for restoring it later
+    sal_uInt64 nOldFPos = rStCtrl.Tell(); // remember FilePos for restoring it later
     DffRecordHeader aPageHd;
     if ( SeekToCurrentPage( &aPageHd ) )
     {   // and now search for the background attributes of the Page
@@ -3190,9 +3180,9 @@ void SdrEscherImport::ImportHeaderFooterContainer( DffRecordHeader const & rHd, 
     }
 }
 
-PPTBuGraEntry::PPTBuGraEntry( Graphic const & rGraphic, sal_uInt32 nInst ) :
+PPTBuGraEntry::PPTBuGraEntry( Graphic aGraphic, sal_uInt32 nInst ) :
     nInstance       ( nInst ),
-    aBuGra          ( rGraphic )  {}
+    aBuGra          (std::move( aGraphic ))  {}
 
 PPTExtParaLevel::PPTExtParaLevel()
 : mnExtParagraphMask( 0 )
@@ -3286,7 +3276,7 @@ PPTExtParaProv::PPTExtParaProv( SdrPowerPointImport& rMan, SvStream& rSt, const 
                             if ( SvxMSDffManager::GetBLIPDirect( rSt, aGraphic ) )
                             {
                                 sal_uInt32 nInstance = aBuGraAtomHd.nRecInstance;
-                                PPTBuGraEntry* pBuGra = new PPTBuGraEntry( aGraphic, nInstance );
+                                PPTBuGraEntry* pBuGra = new PPTBuGraEntry( std::move(aGraphic), nInstance );
                                 size_t n = 0;
                                 size_t nBuGraCount = aBuGraList.size();
                                 if ( nBuGraCount )
@@ -3494,83 +3484,79 @@ bool PPTNumberFormatCreator::ImplGetExtNumberFormat( SdrPowerPointImport const &
             case 0 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_CHARS_LOWER_LETTER );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 1 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_CHARS_UPPER_LETTER );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 2 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ARABIC );
-                rNumberFormat.SetSuffix( ")" );
+                rNumberFormat.SetListFormat("",  ")", nLevel);
             }
             break;
             case 3 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ARABIC );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 4 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ROMAN_LOWER );
-                rNumberFormat.SetSuffix( ")" );
-                rNumberFormat.SetPrefix( "(" );
+                rNumberFormat.SetListFormat("(", ")", nLevel);
             }
             break;
             case 5 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ROMAN_LOWER );
-                rNumberFormat.SetSuffix( ")" );
+                rNumberFormat.SetListFormat("", ")", nLevel);
             }
             break;
             case 6 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ROMAN_LOWER );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 7 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ROMAN_UPPER );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 8 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_CHARS_LOWER_LETTER );
-                rNumberFormat.SetSuffix( ")" );
-                rNumberFormat.SetPrefix( "(" );
+                rNumberFormat.SetListFormat("(", ")", nLevel);
             }
             break;
             case 9 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_CHARS_LOWER_LETTER );
-                rNumberFormat.SetSuffix( ")" );
+                rNumberFormat.SetListFormat("", ")", nLevel);
             }
             break;
             case 10 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_CHARS_UPPER_LETTER );
-                rNumberFormat.SetSuffix( ")" );
-                rNumberFormat.SetPrefix( "(" );
+                rNumberFormat.SetListFormat("(", ")", nLevel);
             }
             break;
             case 11 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_CHARS_UPPER_LETTER );
-                rNumberFormat.SetSuffix( ")" );
+                rNumberFormat.SetListFormat("", ")", nLevel);
             }
             break;
             case 12 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ARABIC );
-                rNumberFormat.SetSuffix( ")" );
-                rNumberFormat.SetPrefix( "(" );
+                rNumberFormat.SetListFormat("(", ")", nLevel);
             }
             break;
             case 13 :
@@ -3581,14 +3567,13 @@ bool PPTNumberFormatCreator::ImplGetExtNumberFormat( SdrPowerPointImport const &
             case 14 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ROMAN_UPPER );
-                rNumberFormat.SetSuffix( ")" );
-                rNumberFormat.SetPrefix( "(" );
+                rNumberFormat.SetListFormat("(", ")", nLevel);
             }
             break;
             case 15 :
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_ROMAN_UPPER );
-                rNumberFormat.SetSuffix( ")" );
+                rNumberFormat.SetListFormat("", ")", nLevel);
             }
             break;
             case 16: // Simplified Chinese.
@@ -3599,7 +3584,7 @@ bool PPTNumberFormatCreator::ImplGetExtNumberFormat( SdrPowerPointImport const &
             case 17: // Simplified Chinese with single-byte period.
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_NUMBER_UPPER_ZH );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 18: // Double byte circle numbers.
@@ -3617,13 +3602,13 @@ bool PPTNumberFormatCreator::ImplGetExtNumberFormat( SdrPowerPointImport const &
             case 22: // Traditional Chinese with single-byte period.
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_NUMBER_UPPER_ZH_TW );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 25: // Bidi Hebrew 2 with ANSI minus symbol.
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_NUMBER_HEBREW );
-                rNumberFormat.SetSuffix( "-" );
+                rNumberFormat.SetListFormat("", "-", nLevel);
             }
             break;
             case 26: // Japanese/Korean.
@@ -3634,7 +3619,7 @@ bool PPTNumberFormatCreator::ImplGetExtNumberFormat( SdrPowerPointImport const &
             case 27: // Japanese/Korean with single-byte period.
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_NUMBER_LOWER_ZH );
-                rNumberFormat.SetSuffix( "." );
+                rNumberFormat.SetListFormat("", ".", nLevel);
             }
             break;
             case 28: // Double-byte Arabic numbers.
@@ -3645,13 +3630,13 @@ bool PPTNumberFormatCreator::ImplGetExtNumberFormat( SdrPowerPointImport const &
             case 29: // Double-byte Arabic numbers with double-byte period.
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_FULL_WIDTH_ARABIC );
-                rNumberFormat.SetSuffix( OUString( u'\xff0e' ) );
+                rNumberFormat.SetListFormat("", OUString(u'\xff0e'), nLevel);
             }
             break;
             case 38: // Japanese with double-byte period.
             {
                 rNumberFormat.SetNumberingType( SVX_NUM_NUMBER_LOWER_ZH ); // No such type. Instead with Lower Chinese Number
-                rNumberFormat.SetSuffix( OUString( u'\xff0e' ) );
+                rNumberFormat.SetListFormat("", OUString(u'\xff0e'), nLevel);
             }
             break;
         }
@@ -4766,11 +4751,6 @@ bool PPTTextParagraphStyleAtomInterpreter::Read( SvStream& rIn, const DffRecordH
     return bValid;
 }
 
-PPTTextParagraphStyleAtomInterpreter::~PPTTextParagraphStyleAtomInterpreter()
-{
-
-}
-
 PPTTextSpecInfo::PPTTextSpecInfo( sal_uInt32 _nCharIdx ) :
     nCharIdx        ( _nCharIdx ),
     nDontKnow       ( 1 )
@@ -5135,22 +5115,21 @@ void PPTStyleTextPropReader::ReadParaProps( SvStream& rIn, const DffRecordHeader
     }
 }
 
-void PPTStyleTextPropReader::ReadCharProps( SvStream& rIn, PPTCharPropSet& aCharPropSet, const OUString& aString,
+void PPTStyleTextPropReader::ReadCharProps( SvStream& rIn, PPTCharPropSet& aCharPropSet, std::u16string_view aString,
                                             sal_uInt32& nCharCount, sal_uInt32 nCharReadCnt,
                                             bool& bTextPropAtom, sal_uInt32 nExtParaPos,
                                             const std::vector< StyleTextProp9 >& aStyleTextProp9,
                                             sal_uInt32& nExtParaFlags, sal_uInt16& nBuBlip,
                                             sal_uInt16& nHasAnm, sal_uInt32& nAnmScheme )
 {
-    sal_uInt32  nMask = 0; //TODO: nMask initialized here to suppress warning for now, see corresponding TODO below
-    sal_uInt16  nDummy16;
-    sal_Int32   nCharsToRead;
-    sal_uInt16  nStringLen = aString.getLength();
+    sal_uInt16 nStringLen = aString.size();
 
+    sal_uInt16 nDummy16;
     rIn.ReadUInt16( nDummy16 );
     nCharCount = (rIn.good()) ? nDummy16 : 0;
     rIn.ReadUInt16( nDummy16 );
-    nCharsToRead = nStringLen - ( nCharReadCnt + nCharCount );
+
+    sal_Int32 nCharsToRead = nStringLen - ( nCharReadCnt + nCharCount );
     if ( nCharsToRead < 0 )
     {
         nCharCount = nStringLen - nCharReadCnt;
@@ -5163,6 +5142,7 @@ void PPTStyleTextPropReader::ReadCharProps( SvStream& rIn, PPTCharPropSet& aChar
     ImplPPTCharPropSet& aSet = *aCharPropSet.mpImplPPTCharPropSet;
 
     // character attributes
+    sal_uInt32 nMask(0);
     rIn.ReadUInt32( nMask );
     if ( static_cast<sal_uInt16>(nMask) )
     {
@@ -5196,7 +5176,7 @@ void PPTStyleTextPropReader::ReadCharProps( SvStream& rIn, PPTCharPropSet& aChar
     }
     if ( nMask & 0x40000 )  // cfColor
     {
-        sal_uInt32 nVal;
+        sal_uInt32 nVal(0);
         rIn.ReadUInt32( nVal );
         if ( !( nVal & 0xff000000 ) )
             nVal = PPT_COLSCHEME_HINTERGRUND;
@@ -5750,27 +5730,24 @@ void PPTPortionObj::ApplyTo(  SfxItemSet& rSet, SdrPowerPointImport& rManager, T
                     const SfxItemSet* pItemSet = pTextObj->GetBackground();
                     if ( pItemSet )
                     {
-                        const SfxPoolItem* pFillStyleItem = nullptr;
-                        pItemSet->GetItemState( XATTR_FILLSTYLE, false, &pFillStyleItem );
+                        const XFillStyleItem* pFillStyleItem = pItemSet->GetItemIfSet( XATTR_FILLSTYLE, false );
                         if ( pFillStyleItem )
                         {
-                            drawing::FillStyle eFillStyle = static_cast<const XFillStyleItem*>(pFillStyleItem)->GetValue();
+                            drawing::FillStyle eFillStyle = pFillStyleItem->GetValue();
                             switch( eFillStyle )
                             {
                                 case drawing::FillStyle_SOLID :
                                 {
-                                    const SfxPoolItem* pFillColorItem = nullptr;
-                                    pItemSet->GetItemState( XATTR_FILLCOLOR, false, &pFillColorItem );
+                                    const XColorItem* pFillColorItem = pItemSet->GetItemIfSet( XATTR_FILLCOLOR, false );
                                     if ( pFillColorItem )
-                                        aDefColor = static_cast<const XColorItem*>(pFillColorItem)->GetColorValue();
+                                        aDefColor = pFillColorItem->GetColorValue();
                                 }
                                 break;
                                 case drawing::FillStyle_GRADIENT :
                                 {
-                                    const SfxPoolItem* pGradientItem = nullptr;
-                                    pItemSet->GetItemState( XATTR_FILLGRADIENT, false, &pGradientItem );
+                                    const XFillGradientItem* pGradientItem = pItemSet->GetItemIfSet( XATTR_FILLGRADIENT, false );
                                     if ( pGradientItem )
-                                        aDefColor = static_cast<const XFillGradientItem*>(pGradientItem)->GetGradientValue().GetStartColor();
+                                        aDefColor = Color(pGradientItem->GetGradientValue().GetColorStops().front().getStopColor());
                                 }
                                 break;
                                 case drawing::FillStyle_HATCH :
@@ -6542,15 +6519,10 @@ PPTTextObj::PPTTextObj( SvStream& rIn, SdrPowerPointImport& rSdrPowerPointImport
         else
             nTextRulerAtomOfs = 0xffffffff;
 
-        sal_uInt32 nInstance = 0;
         switch( rSdrPowerPointImport.m_eCurrentPageKind )
         {
             case PPT_NOTEPAGE :
-                nInstance++;
-                [[fallthrough]];
             case PPT_MASTERPAGE :
-                nInstance++;
-                break;
             case PPT_SLIDEPAGE :
             break;
             default :
@@ -7417,7 +7389,7 @@ static void ApplyCellAttributes( const SdrObject* pObj, Reference< XCell > const
                 {
                     eFS = css::drawing::FillStyle_SOLID;
                     Color aFillColor( pObj->GetMergedItem( XATTR_FILLCOLOR ).GetColorValue() );
-                    xPropSet->setPropertyValue( "FillColor", makeAny( aFillColor ) );
+                    xPropSet->setPropertyValue( "FillColor", Any( aFillColor ) );
                 }
                 break;
             case drawing::FillStyle_GRADIENT :
@@ -7427,8 +7399,8 @@ static void ApplyCellAttributes( const SdrObject* pObj, Reference< XCell > const
 
                     css::awt::Gradient aGradient;
                     aGradient.Style = aXGradient.GetGradientStyle();
-                    aGradient.StartColor = static_cast<sal_Int32>(aXGradient.GetStartColor());
-                    aGradient.EndColor = static_cast<sal_Int32>(aXGradient.GetEndColor());
+                    aGradient.StartColor = static_cast<sal_Int32>(Color(aXGradient.GetColorStops().front().getStopColor()));
+                    aGradient.EndColor = static_cast<sal_Int32>(Color(aXGradient.GetColorStops().back().getStopColor()));
                     aGradient.Angle = static_cast<short>(aXGradient.GetAngle());
                     aGradient.Border = aXGradient.GetBorder();
                     aGradient.XOffset = aXGradient.GetXOffset();
@@ -7450,16 +7422,16 @@ static void ApplyCellAttributes( const SdrObject* pObj, Reference< XCell > const
                     const XFillBitmapItem & rXFillBitmapItem(pObj->GetMergedItem( XATTR_FILLBITMAP ));
                     uno::Reference<graphic::XGraphic> xGraphic = rXFillBitmapItem.GetGraphicObject().GetGraphic().GetXGraphic();
                     uno::Reference<awt::XBitmap> xBitmap(xGraphic, uno::UNO_QUERY);
-                    xPropSet->setPropertyValue("FillBitmap", uno::makeAny(xBitmap));
+                    xPropSet->setPropertyValue("FillBitmap", uno::Any(xBitmap));
 
                     const XFillBmpStretchItem & rStretchItem(pObj->GetMergedItem( XATTR_FILLBMP_STRETCH ));
                     const XFillBmpTileItem & rTileItem(pObj->GetMergedItem( XATTR_FILLBMP_TILE ));
                     if( rTileItem.GetValue() )
-                        xPropSet->setPropertyValue("FillBitmapMode", uno::makeAny(drawing::BitmapMode_REPEAT));
+                        xPropSet->setPropertyValue("FillBitmapMode", uno::Any(drawing::BitmapMode_REPEAT));
                     else if( rStretchItem.GetValue() )
-                        xPropSet->setPropertyValue("FillBitmapMode", uno::makeAny(drawing::BitmapMode_STRETCH));
+                        xPropSet->setPropertyValue("FillBitmapMode", uno::Any(drawing::BitmapMode_STRETCH));
                     else
-                        xPropSet->setPropertyValue("FillBitmapMode", uno::makeAny(drawing::BitmapMode_NO_REPEAT));
+                        xPropSet->setPropertyValue("FillBitmapMode", uno::Any(drawing::BitmapMode_NO_REPEAT));
                 }
             break;
             default:
@@ -7535,9 +7507,12 @@ static void ApplyCellLineAttributes( const SdrObject* pLine, Reference< XTable >
     }
 }
 
-SdrObject* SdrPowerPointImport::CreateTable(SdrObject* pGroup, const sal_uInt32* pTableArry, SvxMSDffSolverContainer* pSolverContainer, std::vector<SdrObject*>& rBackgroundColoredObjects)
+rtl::Reference<SdrObject> SdrPowerPointImport::CreateTable(
+        SdrObject* pGroup, const sal_uInt32* pTableArry,
+        SvxMSDffSolverContainer* pSolverContainer,
+        std::vector<rtl::Reference<SdrObject>>& rBackgroundColoredObjects)
 {
-    SdrObject* pRet = pGroup;
+    rtl::Reference<SdrObject> pRet = pGroup;
 
     sal_uInt32 nRows = pTableArry[ 1 ];
     if (!nRows)
@@ -7569,7 +7544,7 @@ SdrObject* SdrPowerPointImport::CreateTable(SdrObject* pGroup, const sal_uInt32*
     if (aRows.empty())
         return pRet;
 
-    sdr::table::SdrTableObj* pTable = new sdr::table::SdrTableObj(*pSdrModel);
+    rtl::Reference<sdr::table::SdrTableObj> pTable = new sdr::table::SdrTableObj(*pSdrModel);
     pTable->uno_lock();
     Reference< XTable > xTable( pTable->getTable() );
 
@@ -7674,9 +7649,9 @@ SdrObject* SdrPowerPointImport::CreateTable(SdrObject* pGroup, const sal_uInt32*
                 //table when export by us. We should process this
                 //situation when importing.
                 if ( pPtr->pAObj == pGroup )
-                    pPtr->pAObj = pTable;
+                    pPtr->pAObj = pTable.get();
                 if ( pPtr->pBObj == pGroup )
-                    pPtr->pBObj = pTable;
+                    pPtr->pBObj = pTable.get();
             }
         }
         pTable->uno_unlock();
@@ -7690,16 +7665,13 @@ SdrObject* SdrPowerPointImport::CreateTable(SdrObject* pGroup, const sal_uInt32*
             SdrObject* pPartObj = aIter.Next();
             removeShapeId(pPartObj);
             // ofz#41510 make sure rBackgroundColoredObjects doesn't contain deleted objects
-            std::replace(rBackgroundColoredObjects.begin(), rBackgroundColoredObjects.end(), pPartObj, pRet);
+            std::replace(rBackgroundColoredObjects.begin(), rBackgroundColoredObjects.end(), pPartObj, pRet.get());
         }
-
-        SdrObject::Free( pGroup );
     }
     catch( const Exception& )
     {
         pTable->uno_unlock();
-        SdrObject* pObj = pTable;
-        SdrObject::Free( pObj );
+        pTable = nullptr;
     }
 
     return pRet;

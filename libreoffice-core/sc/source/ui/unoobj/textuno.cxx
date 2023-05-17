@@ -31,6 +31,7 @@
 #include <editeng/fhgtitem.hxx>
 #include <editeng/unoprnms.hxx>
 #include <editeng/unofored.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <editeng/unoipset.hxx>
@@ -58,24 +59,20 @@ static const SvxItemPropertySet * lcl_GetHdFtPropertySet()
             SVX_UNOEDIT_FONT_PROPERTIES,
             SVX_UNOEDIT_PARA_PROPERTIES,
             SVX_UNOEDIT_NUMBERING_PROPERTY,    // for completeness of service ParagraphProperties
-            { u"", 0, css::uno::Type(), 0, 0 }
         };
 
         //  modify PropertyMap to include CONVERT_TWIPS flag for font height
         //  (headers/footers are in twips)
 
-        SfxItemPropertyMapEntry* pEntry = aHdFtPropertyMap_Impl;
-        while (!pEntry->aName.isEmpty())
+        for (auto & rEntry : aHdFtPropertyMap_Impl)
         {
-            if ( ( pEntry->nWID == EE_CHAR_FONTHEIGHT ||
-                   pEntry->nWID == EE_CHAR_FONTHEIGHT_CJK ||
-                   pEntry->nWID == EE_CHAR_FONTHEIGHT_CTL ) &&
-                 pEntry->nMemberId == MID_FONTHEIGHT )
+            if ( ( rEntry.nWID == EE_CHAR_FONTHEIGHT ||
+                   rEntry.nWID == EE_CHAR_FONTHEIGHT_CJK ||
+                   rEntry.nWID == EE_CHAR_FONTHEIGHT_CTL ) &&
+                 rEntry.nMemberId == MID_FONTHEIGHT )
             {
-                pEntry->nMemberId |= CONVERT_TWIPS;
+                rEntry.nMemberId |= CONVERT_TWIPS;
             }
-
-            ++pEntry;
         }
 
         return SvxItemPropertySet(aHdFtPropertyMap_Impl, SdrObject::GetGlobalDrawObjectItemPool());
@@ -161,9 +158,9 @@ void ScHeaderFooterContentObj::Init( const EditTextObject* pLeft,
 }
 
 ScHeaderFooterTextData::ScHeaderFooterTextData(
-    uno::WeakReference<sheet::XHeaderFooterContent> const & xContent, ScHeaderFooterPart nP, const EditTextObject* pTextObj) :
+    uno::WeakReference<sheet::XHeaderFooterContent> xContent, ScHeaderFooterPart nP, const EditTextObject* pTextObj) :
     mpTextObj(pTextObj ? pTextObj->Clone() : nullptr),
-    xContentObj( xContent ),
+    xContentObj(std::move( xContent )),
     nPart( nP ),
     bDataValid(false)
 {
@@ -638,10 +635,10 @@ uno::Reference<text::XTextRange> SAL_CALL ScHeaderFooterTextCursor::getEnd()
 
 UNO3_GETIMPLEMENTATION2_IMPL(ScHeaderFooterTextCursor, SvxUnoTextCursor);
 
-ScDrawTextCursor::ScDrawTextCursor( const uno::Reference<text::XText>& xParent,
+ScDrawTextCursor::ScDrawTextCursor( uno::Reference<text::XText> xParent,
                                     const SvxUnoTextBase& rText ) :
     SvxUnoTextCursor( rText ),
-    xParentText( xParent )
+    xParentText(std::move( xParent ))
 
 {
 }
@@ -815,9 +812,9 @@ SvxTextForwarder* ScCellTextData::GetTextForwarder()
         }
 
         ScRefCellValue aCell(rDoc, aCellPos);
-        if (aCell.meType == CELLTYPE_EDIT)
+        if (aCell.getType() == CELLTYPE_EDIT)
         {
-            const EditTextObject* pObj = aCell.mpEditText;
+            const EditTextObject* pObj = aCell.getEditText();
             pEditEngine->SetTextNewDefaults(*pObj, aDefaults);
         }
         else

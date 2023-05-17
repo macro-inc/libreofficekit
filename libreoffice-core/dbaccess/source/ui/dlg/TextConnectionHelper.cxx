@@ -28,18 +28,25 @@
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/mnemonic.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace
 {
 
-OUString lcl_getListEntry(const OUString& rStr, sal_Int32& rIdx)
+OUString lcl_getListEntry(std::u16string_view rStr, sal_Int32& rIdx)
 {
-    const OUString sTkn {rStr.getToken( 0, '\t', rIdx )};
+    const OUString sTkn {o3tl::getToken(rStr, 0, '\t', rIdx )};
     if (rIdx>=0)
     {
-        rIdx = rStr.indexOf('\t', rIdx);
-        if (rIdx>=0 && ++rIdx>=rStr.getLength())
+        size_t nFnd = rStr.find('\t', rIdx);
+        if (nFnd == std::u16string_view::npos)
             rIdx = -1;
+        else
+        {
+            rIdx = nFnd + 1;
+            if (rIdx >= static_cast<sal_Int32>(rStr.size()))
+                rIdx = -1;
+        }
     }
     return sTkn;
 }
@@ -93,24 +100,23 @@ namespace dbaui
         {
             short   nFlag;
             weld::Widget* pFrame;
-        } aSections[] = {
+        } const aSections[] = {
             { TC_EXTENSION,     m_xExtensionHeader.get() },
             { TC_SEPARATORS,    m_xFormatHeader.get() },
             { TC_HEADER,        m_xRowHeader.get() },
-            { TC_CHARSET,       m_xCharSetHeader.get() },
-            { 0, nullptr }
+            { TC_CHARSET,       m_xCharSetHeader.get() }
         };
 
-        for ( size_t section=0; section < SAL_N_ELEMENTS( aSections ) - 1; ++section )
+        for (auto const & section: aSections)
         {
-            if ( ( m_nAvailableSections & aSections[section].nFlag ) != 0 )
+            if ( ( m_nAvailableSections & section.nFlag ) != 0 )
             {
                 // the section is visible, no need to do anything here
                 continue;
             }
 
             // hide all elements from this section
-            aSections[section].pFrame->hide();
+            section.pFrame->hide();
         }
 
         m_xContainer->show();
@@ -350,22 +356,22 @@ namespace dbaui
         return sExtension;
     }
 
-    OUString OTextConnectionHelper::GetSeparator(const weld::ComboBox& rBox, const OUString& rList)
+    OUString OTextConnectionHelper::GetSeparator(const weld::ComboBox& rBox, std::u16string_view rList)
     {
         sal_Unicode const nTok = '\t';
         int nPos(rBox.find_text(rBox.get_active_text()));
 
         if (nPos == -1)
-            return rBox.get_active_text().copy(0);
+            return rBox.get_active_text();
 
         if ( m_xTextSeparator.get() != &rBox || nPos != (rBox.get_count()-1) )
             return OUString(
-                static_cast< sal_Unicode >( rList.getToken((nPos*2)+1, nTok ).toInt32() ));
+                static_cast< sal_Unicode >( o3tl::toInt32(o3tl::getToken(rList, (nPos*2)+1, nTok )) ));
         // somewhat strange ... translates for instance an "32" into " "
         return OUString();
     }
 
-    void OTextConnectionHelper::SetSeparator( weld::ComboBox& rBox, const OUString& rList, const OUString& rVal )
+    void OTextConnectionHelper::SetSeparator( weld::ComboBox& rBox, std::u16string_view rList, const OUString& rVal )
     {
         if (rVal.getLength()==1)
         {
@@ -373,9 +379,9 @@ namespace dbaui
             for(sal_Int32 nIdx {0}; nIdx>=0;)
             {
                 sal_Int32 nPrevIdx {nIdx};
-                if (static_cast<sal_Unicode>(rList.getToken(1, '\t', nIdx).toInt32()) == nVal)
+                if (static_cast<sal_Unicode>(o3tl::toInt32(o3tl::getToken(rList, 1, '\t', nIdx))) == nVal)
                 {
-                    rBox.set_entry_text(rList.getToken(0, '\t', nPrevIdx));
+                    rBox.set_entry_text(OUString(o3tl::getToken(rList,0, '\t', nPrevIdx)));
                     return;
                 }
             }

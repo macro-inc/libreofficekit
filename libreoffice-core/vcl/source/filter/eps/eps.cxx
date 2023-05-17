@@ -39,6 +39,7 @@
 #include <strings.hrc>
 #include <osl/diagnose.h>
 #include <com/sun/star/task/XStatusIndicator.hpp>
+#include <officecfg/Office/Common.hxx>
 
 #include <cstdlib>
 #include <memory>
@@ -200,10 +201,10 @@ private:
 
     void                ImplSetClipRegion( vcl::Region const & rRegion );
     void                ImplBmp( Bitmap const *, Bitmap const *, const Point &, double nWidth, double nHeight );
-    void                ImplText( const OUString& rUniString, const Point& rPos, o3tl::span<const sal_Int32> pDXArry, sal_Int32 nWidth, VirtualDevice const & rVDev );
+    void                ImplText( const OUString& rUniString, const Point& rPos, KernArraySpan pDXArry, o3tl::span<const sal_Bool> pKashidaArry, sal_Int32 nWidth, VirtualDevice const & rVDev );
     void                ImplSetAttrForText( const Point & rPoint );
     void                ImplWriteCharacter( char );
-    void                ImplWriteString( const OString&, VirtualDevice const & rVDev, o3tl::span<const sal_Int32> pDXArry, bool bStretch );
+    void                ImplWriteString( const OString&, VirtualDevice const & rVDev, KernArraySpan pDXArry, bool bStretch );
     void                ImplDefineFont( const char*, const char* );
 
     void                ImplClosePathDraw();
@@ -449,8 +450,13 @@ void PSWriter::ImplWriteProlog( const Graphic* pPreview )
     ImplWriteLong( aSizePoint.Width() );
     ImplWriteLong( aSizePoint.Height() ,PS_RET );
     ImplWriteLine( "%%Pages: 0" );
-    OUString aCreator( "%%Creator: " + utl::ConfigManager::getProductName() + " " +
-                       utl::ConfigManager::getProductVersion() );
+    OUString aCreator;
+    OUString aCreatorOverride = officecfg::Office::Common::Save::Document::GeneratorOverride::get();
+    if( !aCreatorOverride.isEmpty())
+        aCreator = aCreatorOverride;
+    else
+        aCreator = "%%Creator: " + utl::ConfigManager::getProductName() + " " +
+                   utl::ConfigManager::getProductVersion();
     ImplWriteLine( OUStringToOString( aCreator, RTL_TEXTENCODING_UTF8 ).getStr() );
     ImplWriteLine( "%%Title: none" );
     ImplWriteLine( "%%CreationDate: none" );
@@ -742,7 +748,7 @@ void PSWriter::ImplWriteActions( const GDIMetaFile& rMtf, VirtualDevice& rVDev )
                 OUString  aUniStr = pA->GetText().copy( pA->GetIndex(), pA->GetLen() );
                 Point     aPoint( pA->GetPoint() );
 
-                ImplText( aUniStr, aPoint, {}, 0, rVDev );
+                ImplText( aUniStr, aPoint, {}, {}, 0, rVDev );
             }
             break;
 
@@ -758,7 +764,7 @@ void PSWriter::ImplWriteActions( const GDIMetaFile& rMtf, VirtualDevice& rVDev )
                 OUString  aUniStr = pA->GetText().copy( pA->GetIndex(), pA->GetLen() );
                 Point     aPoint( pA->GetPoint() );
 
-                ImplText( aUniStr, aPoint, {}, pA->GetWidth(), rVDev );
+                ImplText( aUniStr, aPoint, {}, {}, pA->GetWidth(), rVDev );
             }
             break;
 
@@ -768,7 +774,7 @@ void PSWriter::ImplWriteActions( const GDIMetaFile& rMtf, VirtualDevice& rVDev )
                 OUString  aUniStr = pA->GetText().copy( pA->GetIndex(), pA->GetLen() );
                 Point     aPoint( pA->GetPoint() );
 
-                ImplText( aUniStr, aPoint, pA->GetDXArray(), 0, rVDev );
+                ImplText( aUniStr, aPoint, pA->GetDXArray(), pA->GetKashidaArray(), 0, rVDev );
             }
             break;
 
@@ -1515,7 +1521,8 @@ void PSWriter::ImplWriteGradient( const tools::PolyPolygon& rPolyPoly, const Gra
     ScopedVclPtrInstance< VirtualDevice > l_pVDev;
     GDIMetaFile     aTmpMtf;
     l_pVDev->SetMapMode( rVDev.GetMapMode() );
-    l_pVDev->AddGradientActions( rPolyPoly.GetBoundRect(), rGradient, aTmpMtf );
+    Gradient aGradient(rGradient);
+    aGradient.AddGradientActions( rPolyPoly.GetBoundRect(), aTmpMtf );
     ImplWriteActions( aTmpMtf, rVDev );
 }
 
@@ -1951,7 +1958,7 @@ void PSWriter::ImplWriteCharacter( char nChar )
     ImplWriteByte( static_cast<sal_uInt8>(nChar), PS_NONE );
 }
 
-void PSWriter::ImplWriteString( const OString& rString, VirtualDevice const & rVDev, o3tl::span<const sal_Int32> pDXArry, bool bStretch )
+void PSWriter::ImplWriteString( const OString& rString, VirtualDevice const & rVDev, KernArraySpan pDXArry, bool bStretch )
 {
     sal_Int32 nLen = rString.getLength();
     if ( !nLen )
@@ -1981,7 +1988,7 @@ void PSWriter::ImplWriteString( const OString& rString, VirtualDevice const & rV
     }
 }
 
-void PSWriter::ImplText( const OUString& rUniString, const Point& rPos, o3tl::span<const sal_Int32> pDXArry, sal_Int32 nWidth, VirtualDevice const & rVDev )
+void PSWriter::ImplText( const OUString& rUniString, const Point& rPos, KernArraySpan pDXArry, o3tl::span<const sal_Bool> pKashidaArry, sal_Int32 nWidth, VirtualDevice const & rVDev )
 {
     if ( rUniString.isEmpty() )
         return;
@@ -2008,7 +2015,7 @@ void PSWriter::ImplText( const OUString& rUniString, const Point& rPos, o3tl::sp
         bool bOldLineColor = bLineColor;
         bLineColor = false;
         std::vector<tools::PolyPolygon> aPolyPolyVec;
-        if ( pVirDev->GetTextOutlines( aPolyPolyVec, rUniString, 0, 0, -1, nWidth, pDXArry ) )
+        if ( pVirDev->GetTextOutlines( aPolyPolyVec, rUniString, 0, 0, -1, nWidth, pDXArry, pKashidaArry ) )
         {
             // always adjust text position to match baseline alignment
             ImplWriteLine( "pum" );
@@ -2029,7 +2036,7 @@ void PSWriter::ImplText( const OUString& rUniString, const Point& rPos, o3tl::sp
     else if ( ( mnTextMode == 1 ) || ( mnTextMode == 2 ) )  // normal text output
     {
         if ( mnTextMode == 2 )  // forcing output one complete text packet, by
-            pDXArry = {};     // ignoring the kerning array
+            pDXArry = {};       // ignoring the kerning array
         ImplSetAttrForText( rPos );
         OString aStr(OUStringToOString(rUniString,
             maFont.GetCharSet()));
@@ -2299,9 +2306,9 @@ void PSWriter::ImplWriteLineInfo( double fLWidth, double fMLimit,
 
 void PSWriter::ImplWriteLineInfo( const LineInfo& rLineInfo )
 {
-    SvtGraphicStroke::DashArray l_aDashArray;
+    std::vector< double > l_aDashArray;
     if ( rLineInfo.GetStyle() == LineStyle::Dash )
-        l_aDashArray.push_back( 2 );
+        l_aDashArray = rLineInfo.GetDotDashArray();
     const double fLWidth(( ( rLineInfo.GetWidth() + 1 ) + ( rLineInfo.GetWidth() + 1 ) ) * 0.5);
     SvtGraphicStroke::JoinType aJoinType(SvtGraphicStroke::joinMiter);
     SvtGraphicStroke::CapType aCapType(SvtGraphicStroke::capButt);

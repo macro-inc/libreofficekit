@@ -24,6 +24,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/table/TableBorder.hpp>
+#include <utility>
 #include "vbapalette.hxx"
 
 using namespace ::com::sun::star;
@@ -86,7 +87,7 @@ private:
             default:
                 return;
         }
-        m_xProps->setPropertyValue( "TableBorder", uno::makeAny(aTableBorder) );
+        m_xProps->setPropertyValue( "TableBorder", uno::Any(aTableBorder) );
     }
 
     bool getBorderLine( table::BorderLine& rBorderLine )
@@ -167,7 +168,7 @@ public:
                 nLineStyle = word::WdLineStyle::wdLineStyleNone;
             }
         }
-        return uno::makeAny( nLineStyle );
+        return uno::Any( nLineStyle );
     }
     void SAL_CALL setLineStyle( const uno::Any& _linestyle ) override
     {
@@ -244,7 +245,7 @@ private:
         return getCount(); // error condition
     }
 public:
-    RangeBorders(  const uno::Reference< table::XCellRange >& xRange,  const uno::Reference< uno::XComponentContext > & xContext, VbaPalette const & rPalette ) : m_xRange( xRange ), m_xContext( xContext ), m_Palette( rPalette )
+    RangeBorders(  uno::Reference< table::XCellRange > xRange,  uno::Reference< uno::XComponentContext > xContext, VbaPalette aPalette ) : m_xRange(std::move( xRange )), m_xContext(std::move( xContext )), m_Palette(std::move( aPalette ))
     {
     }
     // XIndexAccess
@@ -259,7 +260,7 @@ public:
         if ( nIndex >= 0 && nIndex < getCount() )
         {
             uno::Reference< beans::XPropertySet > xProps( m_xRange, uno::UNO_QUERY_THROW );
-            return uno::makeAny( uno::Reference< word::XBorder >( new SwVbaBorder( xProps, m_xContext, supportedIndexTable[ nIndex ] )) );
+            return uno::Any( uno::Reference< word::XBorder >( new SwVbaBorder( xProps, m_xContext, supportedIndexTable[ nIndex ] )) );
         }
         throw lang::IndexOutOfBoundsException();
     }
@@ -288,7 +289,7 @@ class RangeBorderEnumWrapper : public EnumerationHelper_BASE
     uno::Reference<container::XIndexAccess > m_xIndexAccess;
     sal_Int32 nIndex;
 public:
-    explicit RangeBorderEnumWrapper( const uno::Reference< container::XIndexAccess >& xIndexAccess ) : m_xIndexAccess( xIndexAccess ), nIndex( 0 ) {}
+    explicit RangeBorderEnumWrapper( uno::Reference< container::XIndexAccess > xIndexAccess ) : m_xIndexAccess(std::move( xIndexAccess )), nIndex( 0 ) {}
     virtual sal_Bool SAL_CALL hasMoreElements(  ) override
     {
         return ( nIndex < m_xIndexAccess->getCount() );

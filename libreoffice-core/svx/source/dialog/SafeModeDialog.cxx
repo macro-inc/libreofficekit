@@ -11,7 +11,6 @@
 
 #include <osl/file.hxx>
 #include <sfx2/safemode.hxx>
-#include <tools/diagnose_ex.h>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <comphelper/processfactory.hxx>
@@ -23,9 +22,6 @@
 
 #include <com/sun/star/task/OfficeRestartManager.hpp>
 #include <com/sun/star/task/XInteractionHandler.hpp>
-#include <com/sun/star/system/XSystemShellExecute.hpp>
-#include <com/sun/star/system/SystemShellExecuteFlags.hpp>
-#include <com/sun/star/system/SystemShellExecute.hpp>
 
 using namespace css;
 
@@ -54,7 +50,6 @@ SafeModeDialog::SafeModeDialog(weld::Window* pParent)
     , mxBugLink(m_xBuilder->weld_link_button("linkbutton_bugs"))
     , mxUserProfileLink(m_xBuilder->weld_link_button("linkbutton_profile"))
     , mxBtnCreateZip(m_xBuilder->weld_button("btn_create_zip"))
-    , mxExpander(m_xBuilder->weld_expander("expander"))
 {
     m_xDialog->set_centered_on_parent(false);
     mxRadioRestore->connect_toggled(LINK(this, SafeModeDialog, RadioBtnHdl));

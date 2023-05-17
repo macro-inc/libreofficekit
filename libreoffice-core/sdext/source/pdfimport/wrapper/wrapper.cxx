@@ -32,15 +32,13 @@
 #include <osl/diagnose.h>
 #include <rtl/bootstrap.hxx>
 #include <rtl/ustring.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
 
 #include <comphelper/propertysequence.hxx>
+#include <comphelper/string.hxx>
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <com/sun/star/awt/FontDescriptor.hpp>
-#include <com/sun/star/beans/XMaterialHolder.hpp>
 #include <com/sun/star/rendering/PathCapType.hpp>
 #include <com/sun/star/rendering/PathJoinType.hpp>
 #include <com/sun/star/rendering/XPolyPolygon2D.hpp>
@@ -49,8 +47,6 @@
 #include <com/sun/star/geometry/RealRectangle2D.hpp>
 #include <com/sun/star/geometry/RealSize2D.hpp>
 #include <com/sun/star/task/XInteractionHandler.hpp>
-#include <com/sun/star/awt/FontWeight.hpp>
-#include <tools/diagnose_ex.h>
 
 #include <basegfx/point/b2dpoint.hxx>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
@@ -66,9 +62,6 @@
 #include <string_view>
 #include <unordered_map>
 #include <string.h>
-#include <stdlib.h>
-
-#include <rtl/character.hxx>
 
 using namespace com::sun::star;
 
@@ -163,12 +156,12 @@ public:
         m_aFontMap(101)
     {}
 
-    void parseLine( const OString& rLine );
+    void parseLine( std::string_view aLine );
 };
 
 class LineParser {
     Parser  & m_parser;
-    OString m_aLine;
+    std::string_view m_aLine;
 
     static void parseFontFamilyName( FontAttributes& aResult );
     void    readInt32( sal_Int32& o_Value );
@@ -181,7 +174,7 @@ class LineParser {
 public:
     std::size_t m_nCharIndex = 0;
 
-    LineParser(Parser & parser, OString const & line): m_parser(parser), m_aLine(line) {}
+    LineParser(Parser & parser, std::string_view line): m_parser(parser), m_aLine(line) {}
 
     std::string_view readNextToken();
     sal_Int32      readInt32();
@@ -262,25 +255,19 @@ std::string_view LineParser::readNextToken()
 void LineParser::readInt32( sal_Int32& o_Value )
 {
     std::string_view tok = readNextToken();
-    sal_Int64 n = rtl_str_toInt64_WithLength(tok.data(), 10, tok.size());
-    if (n < SAL_MIN_INT32 || n > SAL_MAX_INT32)
-        n = 0;
-    o_Value = n;
+    o_Value = o3tl::toInt32(tok);
 }
 
 sal_Int32 LineParser::readInt32()
 {
     std::string_view tok = readNextToken();
-    sal_Int64 n =rtl_str_toInt64_WithLength(tok.data(), 10, tok.size());
-    if (n < SAL_MIN_INT32 || n > SAL_MAX_INT32)
-        n = 0;
-    return n;
+    return o3tl::toInt32(tok);
 }
 
 void LineParser::readInt64( sal_Int64& o_Value )
 {
     std::string_view tok = readNextToken();
-    o_Value = rtl_str_toInt64_WithLength(tok.data(), 10, tok.size());
+    o_Value = o3tl::toInt64(tok);
 }
 
 void LineParser::readDouble( double& o_Value )
@@ -375,7 +362,7 @@ uno::Reference<rendering::XPolyPolygon2D> LineParser::readPath()
     }
 
     return static_cast<rendering::XLinePolyPolygon2D*>(
-        new basegfx::unotools::UnoPolyPolygon(aResult));
+        new basegfx::unotools::UnoPolyPolygon(std::move(aResult)));
 }
 
 void LineParser::readChar()
@@ -397,7 +384,7 @@ void LineParser::readChar()
     OString aChars;
 
     if (m_nCharIndex != std::string_view::npos)
-        aChars = lcl_unescapeLineFeeds( m_aLine.subView( m_nCharIndex ) );
+        aChars = lcl_unescapeLineFeeds( m_aLine.substr( m_nCharIndex ) );
 
     // chars gobble up rest of line
     m_nCharIndex = std::string_view::npos;
@@ -565,7 +552,7 @@ void LineParser::readFont()
 
     nSize = nSize < 0.0 ? -nSize : nSize;
     // Read FontName. From the current position to the end (any white spaces will be included).
-    aFontName = lcl_unescapeLineFeeds(m_aLine.subView(m_nCharIndex));
+    aFontName = lcl_unescapeLineFeeds(m_aLine.substr(m_nCharIndex));
 
     // name gobbles up rest of line
     m_nCharIndex = std::string_view::npos;
@@ -641,6 +628,10 @@ void LineParser::readFont()
             if (aResult.familyName.getLength() > 7 and aResult.familyName.indexOf(u"+", 6) == 6)
             {
                 aResult.familyName = aResult.familyName.copy(7, aResult.familyName.getLength() - 7);
+                parseFontFamilyName(aResult);
+            }
+            if (aResult.familyName.endsWithIgnoreAsciiCase("-VKana"))
+            {
                 parseFontFamilyName(aResult);
             }
 
@@ -730,9 +721,9 @@ uno::Sequence<beans::PropertyValue> LineParser::readImageImpl()
         uno::UNO_QUERY_THROW );
 
     uno::Sequence<beans::PropertyValue> aSequence( comphelper::InitPropertySequence({
-            { "URL", uno::makeAny(aFileName) },
-            { "InputStream", uno::makeAny( xDataStream ) },
-            { "InputSequence", uno::makeAny(aDataSequence) }
+            { "URL", uno::Any(aFileName) },
+            { "InputStream", uno::Any( xDataStream ) },
+            { "InputSequence", uno::Any(aDataSequence) }
         }));
 
     return aSequence;
@@ -789,7 +780,7 @@ void LineParser::readLink()
 
     m_parser.m_pSink->hyperLink( aBounds,
                         OStringToOUString( lcl_unescapeLineFeeds(
-                                m_aLine.subView(m_nCharIndex) ),
+                                m_aLine.substr(m_nCharIndex) ),
                                 RTL_TEXTENCODING_UTF8 ) );
     // name gobbles up rest of line
     m_nCharIndex = std::string_view::npos;
@@ -822,13 +813,13 @@ void LineParser::readSoftMaskedImage()
     m_parser.m_pSink->drawAlphaMaskedImage( aImage, aMask );
 }
 
-void Parser::parseLine( const OString& rLine )
+void Parser::parseLine( std::string_view aLine )
 {
     OSL_PRECOND( m_pSink,         "Invalid sink" );
     OSL_PRECOND( m_pErr,          "Invalid filehandle" );
     OSL_PRECOND( m_xContext.is(), "Invalid service factory" );
 
-    LineParser lp(*this, rLine);
+    LineParser lp(*this, aLine);
     const std::string_view rCmd = lp.readNextToken();
     const hash_entry* pEntry = PdfKeywordHash::in_word_set( rCmd.data(),
                                                             rCmd.size() );
@@ -1149,7 +1140,8 @@ bool xpdf_ImportFromFile(const OUString& rURL,
                 if ( line.isEmpty() )
                     break;
 
-                aParser.parseLine(line.makeStringAndClear());
+                aParser.parseLine(line);
+                line.setLength(0);
             }
         }
     }

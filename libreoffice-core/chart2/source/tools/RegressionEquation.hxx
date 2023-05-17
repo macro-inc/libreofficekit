@@ -20,15 +20,13 @@
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/util/XCloneable.hpp>
-#include <com/sun/star/util/XModifyBroadcaster.hpp>
-#include <com/sun/star/util/XModifyListener.hpp>
 #include <com/sun/star/chart2/XTitle.hpp>
 
-#include <MutexContainer.hxx>
 #include <OPropertySet.hxx>
 
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/uno3.hxx>
+#include <ModifyListenerHelper.hxx>
 
 namespace chart
 {
@@ -45,7 +43,6 @@ typedef ::cppu::WeakImplHelper<
 }
 
 class RegressionEquation final :
-        public MutexContainer,
         public impl::RegressionEquation_Base,
         public ::property::OPropertySet
 {
@@ -70,7 +67,7 @@ private:
     explicit RegressionEquation( const RegressionEquation & rOther );
 
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
 
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
 
@@ -111,7 +108,7 @@ private:
 
     css::uno::Sequence< css::uno::Reference< css::chart2::XFormattedString > > m_aStrings;
 
-    css::uno::Reference< css::util::XModifyListener > m_xModifyEventForwarder;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
 };
 
 } //  namespace chart

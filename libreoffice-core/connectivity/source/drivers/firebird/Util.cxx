@@ -13,6 +13,7 @@
 
 #include <com/sun/star/sdbc/DataType.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
+#include <o3tl/string_view.hxx>
 
 using namespace ::connectivity;
 
@@ -22,12 +23,12 @@ using namespace ::com::sun::star::uno;
 
 using namespace firebird;
 
-OUString firebird::sanitizeIdentifier(const OUString& rIdentifier)
+OUString firebird::sanitizeIdentifier(std::u16string_view rIdentifier)
 {
-    OUString sRet = rIdentifier.trim();
-    assert(sRet.getLength() <= 31); // Firebird identifiers cannot be longer than this.
+    std::u16string_view sRet = o3tl::trim(rIdentifier);
+    assert(sRet.size() <= 31); // Firebird identifiers cannot be longer than this.
 
-    return sRet;
+    return OUString(sRet);
 }
 
 OUString firebird::StatusVectorToString(const ISC_STATUS_ARRAY& rStatusVector,
@@ -409,22 +410,6 @@ void firebird::freeSQLVAR(XSQLDA* pSqlda)
     }
 }
 
-
-OUString firebird::escapeWith( const OUString& sText, const char aKey, const char aEscapeChar)
-{
-    OUString sRet(sText);
-    sal_Int32 aIndex = 0;
-    for (;;)
-    {
-        aIndex = sRet.indexOf(aKey, aIndex);
-        if ( aIndex <= 0 || aIndex >= sRet.getLength())
-            break;
-        sRet = sRet.replaceAt(aIndex, 1, rtl::OUStringConcatenation(OUStringChar(aEscapeChar) + OUStringChar(aKey))  );
-        aIndex += 2;
-    }
-
-    return sRet;
-}
 
 sal_Int64 firebird::pow10Integer(int nDecimalCount)
 {

@@ -27,6 +27,7 @@
 #include <com/sun/star/document/PrinterIndependentLayout.hpp>
 #include <editeng/outlobj.hxx>
 #include <tools/urlobj.hxx>
+#include <svx/compatflags.hxx>
 #include <svx/svxids.hrc>
 #include <editeng/editeng.hxx>
 #include <editeng/editstat.hxx>
@@ -72,8 +73,10 @@
 #include <sdhtmlfilter.hxx>
 #include <sdpdffilter.hxx>
 #include <framework/FrameworkHelper.hxx>
+#include <o3tl/string_view.hxx>
 
-#include <sfx2/zoomitem.hxx>
+#include <Window.hxx>
+#include <svl/intitem.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -263,10 +266,11 @@ bool DrawDocShell::InitNew( const css::uno::Reference< css::embed::XStorage >& x
 bool DrawDocShell::Load( SfxMedium& rMedium )
 {
     // If this is an ODF file being loaded, then by default, use legacy processing
-    // for tdf#99729 (if required, it will be overridden in *::ReadUserDataSequence())
+    // (if required, it will be overridden in *::ReadUserDataSequence())
     if (IsOwnStorageFormat(rMedium))
     {
-        mpDoc->SetAnchoredTextOverflowLegacy(true);
+        mpDoc->SetCompatibilityFlag(SdrCompatibilityFlag::AnchoredTextOverflowLegacy, true); // for tdf#99729
+        mpDoc->SetCompatibilityFlag(SdrCompatibilityFlag::LegacySingleLineFontwork, true); // for tdf#148000
     }
 
     bool       bRet = false;
@@ -397,6 +401,17 @@ bool DrawDocShell::ImportFrom(SfxMedium &rMedium,
         const_cast<EditEngine&>(rOutl.GetEditEngine()).SetControlWord( nControlWord );
 
         mpDoc->SetSummationOfParagraphs();
+    }
+
+    if (aFilterName == "Impress MS PowerPoint 2007 XML")
+    {
+        // This is a "MS Compact" mode for connectors.
+        // The Libreoffice uses bounding rectangle of connected shapes but
+        // MSO uses snap rectangle when calculate the edge track.
+        mpDoc->SetCompatibilityFlag(SdrCompatibilityFlag::ConnectorUseSnapRect, true);
+
+        // compatibility flag for tdf#148966
+        mpDoc->SetCompatibilityFlag(SdrCompatibilityFlag::IgnoreBreakAfterMultilineField, true);
     }
 
     if (aFilterName == "Impress MS PowerPoint 2007 XML" ||
@@ -698,7 +713,7 @@ SfxStyleSheetBasePool* DrawDocShell::GetStyleSheetPool()
     return mpDoc->GetStyleSheetPool();
 }
 
-void DrawDocShell::GotoBookmark(const OUString& rBookmark)
+void DrawDocShell::GotoBookmark(std::u16string_view rBookmark)
 {
     auto pDrawViewShell = dynamic_cast<DrawViewShell *>( mpViewShell );
     if (!pDrawViewShell)
@@ -710,28 +725,28 @@ void DrawDocShell::GotoBookmark(const OUString& rBookmark)
     sal_uInt16 nPageNumber = SDRPAGE_NOTFOUND;
     SdrObject* pObj = nullptr;
 
-    static const OUStringLiteral sInteraction( u"action?" );
-    if ( rBookmark.match( sInteraction ) )
+    static constexpr std::u16string_view sInteraction( u"action?" );
+    if ( o3tl::starts_with(rBookmark, sInteraction ) )
     {
-        static const OUStringLiteral sJump( u"jump=" );
-        if ( rBookmark.match( sJump, sInteraction.getLength() ) )
+        static constexpr std::u16string_view sJump( u"jump=" );
+        if ( o3tl::starts_with(rBookmark.substr( sInteraction.size() ), sJump ) )
         {
-            OUString aDestination( rBookmark.copy( sInteraction.getLength() + sJump.getLength() ) );
-            if ( aDestination.match( "firstslide" ) )
+            std::u16string_view aDestination( rBookmark.substr( sInteraction.size() + sJump.size() ) );
+            if ( o3tl::starts_with(aDestination, u"firstslide" ) )
             {
                 nPageNumber = 1;
             }
-            else if ( aDestination.match( "lastslide" ) )
+            else if ( o3tl::starts_with(aDestination, u"lastslide" ) )
             {
                 nPageNumber = mpDoc->GetPageCount() - 2;
             }
-            else if ( aDestination.match( "previousslide" ) )
+            else if ( o3tl::starts_with(aDestination, u"previousslide" ) )
             {
                 SdPage* pPage = pDrawViewShell->GetActualPage();
                 nPageNumber = pPage->GetPageNum();
                 nPageNumber = nPageNumber > 2 ? nPageNumber - 2 : SDRPAGE_NOTFOUND;
             }
-            else if ( aDestination.match( "nextslide" ) )
+            else if ( o3tl::starts_with(aDestination, u"nextslide" ) )
             {
                 SdPage* pPage = pDrawViewShell->GetActualPage();
                 nPageNumber = pPage->GetPageNum() + 2;
@@ -834,18 +849,14 @@ void DrawDocShell::GotoBookmark(const OUString& rBookmark)
                 pDrawViewShell->SwitchPage(nSdPgNum);
             }
 
-            if (pDrawViewShell->GetDispatcher())
-            {
-                // show page
-                SvxZoomItem aZoom;
-                aZoom.SetType( SvxZoomType::WHOLEPAGE );
-                pDrawViewShell->GetDispatcher()->ExecuteList(SID_ATTR_ZOOM, SfxCallMode::ASYNCHRON, { &aZoom });
-            }
-
+            // Do UnmarkAll here to stop the Navigator from reselecting the previously marked
+            // entry when a slide entry is selected.
+            pDrawViewShell->GetView()->UnmarkAll();
             if (pObj != nullptr)
             {
-                // select object
-                pDrawViewShell->GetView()->UnmarkAll();
+                // show and select object
+                if (vcl::Window* pWindow = pDrawViewShell->GetActiveWindow())
+                    pDrawViewShell->MakeVisible(pObj->GetSnapRect(), *pWindow);
                 pDrawViewShell->GetView()->MarkObj(
                     pObj,
                     pDrawViewShell->GetView()->GetSdrPageView());
@@ -880,8 +891,8 @@ bool DrawDocShell::SaveAsOwnFormat( SfxMedium& rMedium )
 
         OUString aLayoutName;
 
-        SfxStringItem const * pLayoutItem;
-        if( rMedium.GetItemSet()->GetItemState(SID_TEMPLATE_NAME, false, reinterpret_cast<const SfxPoolItem**>(& pLayoutItem) ) == SfxItemState::SET )
+        SfxStringItem const * pLayoutItem = rMedium.GetItemSet()->GetItemIfSet(SID_TEMPLATE_NAME, false);
+        if( pLayoutItem )
         {
             aLayoutName = pLayoutItem->GetValue();
         }

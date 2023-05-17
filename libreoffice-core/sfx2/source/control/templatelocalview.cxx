@@ -61,7 +61,7 @@ bool ViewFilter_Application::isFilteredExtension(FILTER_APPLICATION filter, std:
     return bRet;
 }
 
-bool ViewFilter_Application::isValid (const OUString &rPath) const
+bool ViewFilter_Application::isValid (std::u16string_view rPath) const
 {
     INetURLObject aUrl(rPath);
     return isFilteredExtension(mApp, aUrl.getExtension());
@@ -580,7 +580,7 @@ bool TemplateLocalView::copyFrom (TemplateContainerItem *pItem, const OUString &
     return false;
 }
 
-bool TemplateLocalView::exportTo(const sal_uInt16 nItemId, const sal_uInt16 nRegionItemId, const OUString &rName)
+bool TemplateLocalView::exportTo(const sal_uInt16 nItemId, const sal_uInt16 nRegionItemId, std::u16string_view rName)
 {
     for (auto const & pRegItem : maRegions)
     {
@@ -841,7 +841,7 @@ BitmapEx TemplateLocalView::scaleImg (const BitmapEx &rImg, tools::Long width, t
         // make the picture fit the given width/height constraints
         double nRatio = std::min(double(width)/double(aSize.Width()), double(height)/double(aSize.Height()));
 
-        aImg.Scale(Size(aSize.Width() * nRatio, aSize.Height() * nRatio));
+        aImg.Scale(nRatio, nRatio);
     }
 
     return aImg;
@@ -870,7 +870,7 @@ void TemplateLocalView::RemoveDefaultTemplateIcon(std::u16string_view rPath)
     }
 }
 
-BitmapEx TemplateLocalView::getDefaultThumbnail( const OUString& rPath )
+BitmapEx TemplateLocalView::getDefaultThumbnail( std::u16string_view rPath )
 {
     BitmapEx aImg;
     INetURLObject aUrl(rPath);

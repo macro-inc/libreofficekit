@@ -23,15 +23,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -103,6 +103,7 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
             "application/x-mspublisher",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
@@ -198,9 +199,9 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
 
         SharedPreferences prefs = getSharedPreferences(EXPLORER_PREFS_KEY, MODE_PRIVATE);
         String recentPref = prefs.getString(RECENT_DOCUMENTS_KEY, "");
-        List<String> recentFileStrings = Arrays.asList(recentPref.split(RECENT_DOCUMENTS_DELIMITER));
+        String[] recentFileStrings = recentPref.split(RECENT_DOCUMENTS_DELIMITER);
 
-        final List<RecentFile> recentFiles = new ArrayList();
+        final List<RecentFile> recentFiles = new ArrayList<>();
         for (String recentFileString : recentFileStrings) {
             Uri uri = Uri.parse(recentFileString);
             String filename = FileUtilities.retrieveDisplayNameForDocumentUri(getContentResolver(), uri);
@@ -250,6 +251,7 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_OPEN_FILECHOOSER && resultCode == RESULT_OK) {
             final Uri fileUri = data.getData();
             openDocument(fileUri);
@@ -258,18 +260,21 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
 
     private void showSystemFilePickerAndOpenFile() {
         Intent intent = new Intent();
-        try {
+        if (Build.VERSION.SDK_INT >= 19) {
             intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-        } catch (ActivityNotFoundException exception) {
+        }
+        else {
             // Intent.ACTION_OPEN_DOCUMENT added in API level 19, but minSdkVersion is currently 16
             intent.setAction(Intent.ACTION_GET_CONTENT);
         }
 
         intent.setType("*/*");
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, SUPPORTED_MIME_TYPES);;
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, SUPPORTED_MIME_TYPES);
 
-        if (intent.resolveActivity(getPackageManager()) != null) {
+        try {
             startActivityForResult(intent, REQUEST_CODE_OPEN_FILECHOOSER);
+        } catch (ActivityNotFoundException e) {
+            Log.w(LOGTAG, "No activity available that can handle the intent to open a document.");
         }
     }
 
@@ -317,19 +322,18 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_about: {
-                AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
-                aboutDialogFragment.show(getSupportFragmentManager(), "AboutDialogFragment");
-            }
-                return true;
-            case R.id.action_settings:
-                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        final int itemId = item.getItemId();
+        if (itemId == R.id.action_about) {
+            AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
+            aboutDialogFragment.show(getSupportFragmentManager(), "AboutDialogFragment");
+            return true;
         }
+        if (itemId == R.id.action_settings) {
+            startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void readPreferences(){
@@ -365,7 +369,7 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
         getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
         String newRecent = fileUri.toString();
-        List<String> recentsList = new ArrayList(Arrays.asList(prefs.getString(RECENT_DOCUMENTS_KEY, "").split(RECENT_DOCUMENTS_DELIMITER)));
+        List<String> recentsList = new ArrayList<>(Arrays.asList(prefs.getString(RECENT_DOCUMENTS_KEY, "").split(RECENT_DOCUMENTS_DELIMITER)));
 
         // remove string if present, so that it doesn't appear multiple times
         recentsList.remove(newRecent);
@@ -394,7 +398,7 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
             //Remove all shortcuts, and apply new ones.
             shortcutManager.removeAllDynamicShortcuts();
 
-            ArrayList<ShortcutInfo> shortcuts = new ArrayList<ShortcutInfo>();
+            ArrayList<ShortcutInfo> shortcuts = new ArrayList<>();
             for (String recentDoc : recentsList) {
                 Uri docUri = Uri.parse(recentDoc);
                 String filename = FileUtilities.retrieveDisplayNameForDocumentUri(getContentResolver(), docUri);
@@ -440,35 +444,28 @@ public class LibreOfficeUIActivity extends AppCompatActivity implements Settings
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        switch (id){
-            case R.id.editFAB:
-                // Intent.ACTION_CREATE_DOCUMENT, used in 'createNewFileDialog' requires SDK version 19
-                if (Build.VERSION.SDK_INT < 19) {
-                    Toast.makeText(this,
-                        getString(R.string.creating_new_files_not_supported), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (isFabMenuOpen) {
-                    collapseFabMenu();
-                } else {
-                    expandFabMenu();
-                }
-                break;
-            case R.id.open_file_view:
-                showSystemFilePickerAndOpenFile();
-                break;
-            case R.id.newWriterFAB:
-                loadNewDocument(DocumentType.WRITER);
-                break;
-            case R.id.newImpressFAB:
-                loadNewDocument(DocumentType.IMPRESS);
-                break;
-            case R.id.newCalcFAB:
-                loadNewDocument(DocumentType.CALC);
-                break;
-            case R.id.newDrawFAB:
-                loadNewDocument(DocumentType.DRAW);
-                break;
+        if (id == R.id.editFAB) {
+            // Intent.ACTION_CREATE_DOCUMENT, used in 'createNewFileDialog' requires SDK version 19
+            if (Build.VERSION.SDK_INT < 19) {
+                Toast.makeText(this,
+                    getString(R.string.creating_new_files_not_supported), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (isFabMenuOpen) {
+                collapseFabMenu();
+            } else {
+                expandFabMenu();
+            }
+        } else if (id == R.id.open_file_view) {
+            showSystemFilePickerAndOpenFile();
+        } else if (id == R.id.newWriterFAB) {
+            loadNewDocument(DocumentType.WRITER);
+        } else if (id == R.id.newImpressFAB) {
+            loadNewDocument(DocumentType.IMPRESS);
+        } else if (id == R.id.newCalcFAB) {
+            loadNewDocument(DocumentType.CALC);
+        } else if (id == R.id.newDrawFAB) {
+            loadNewDocument(DocumentType.DRAW);
         }
     }
 }

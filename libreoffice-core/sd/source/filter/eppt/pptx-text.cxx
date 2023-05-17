@@ -68,6 +68,7 @@ PortionObj::PortionObj(const css::uno::Reference< css::beans::XPropertySet > & r
     , meAsianOrComplexFont(css::beans::PropertyState_AMBIGUOUS_VALUE)
     , meCharEscapement(css::beans::PropertyState_AMBIGUOUS_VALUE)
     , mnCharAttrHard(0)
+    , mnCharColor(0)
     , mnCharAttr(0)
     , mnFont(0)
     , mnAsianOrComplexFont(0xffff)
@@ -651,6 +652,7 @@ ParagraphObj::ParagraphObj(const css::uno::Reference< css::beans::XPropertySet >
     : mnTextSize(0)
     , mbFirstParagraph(false)
     , mbLastParagraph(false)
+    , meBullet(css::beans::PropertyState_AMBIGUOUS_VALUE)
     , mnTextAdjust(0)
     , mnLineSpacing(0)
     , mbFixedLineSpacing(false)
@@ -888,7 +890,7 @@ void ParagraphObj::ImplGetNumberingLevel( PPTExBulletProvider* pBuProv, sal_Int1
 
                     case SVX_NUM_CHAR_SPECIAL :                           // Bullet
                     {
-                        if ( IsStarSymbol(aFontDesc.Name) )
+                        if ( IsOpenSymbol(aFontDesc.Name) )
                         {
                             rtl_TextEncoding eChrSet = aFontDesc.CharSet;
                             cBulletId = msfilter::util::bestFitOpenSymbolToMSFont(cBulletId, eChrSet, aFontDesc.Name);

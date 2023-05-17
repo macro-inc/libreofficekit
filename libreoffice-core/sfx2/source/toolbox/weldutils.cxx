@@ -13,7 +13,7 @@
 #include <sfx2/weldutils.hxx>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/settings.hxx>
-#include <vcl/weld.hxx>
+#include <vcl/weldutils.hxx>
 
 namespace
 {
@@ -110,6 +110,8 @@ ToolbarUnoDispatcher::ToolbarUnoDispatcher(weld::Toolbar& rToolbar, weld::Builde
         CreateController(sCommand);
     }
 
+    rtl::Reference xWidget(new weld::TransportAsXWindow(m_pToolbar, m_pBuilder));
+    m_xImageController = sfx2::sidebar::ControllerFactory::CreateImageController(m_xFrame, xWidget);
     m_aToolbarOptions.AddListenerLink(LINK(this, ToolbarUnoDispatcher, ChangedIconSizeHandler));
 }
 
@@ -158,9 +160,10 @@ IMPL_LINK_NOARG(ToolbarUnoDispatcher, ChangedIconSizeHandler, LinkParamNone*, vo
 
     for (int i = 0, nItems = m_pToolbar->get_n_items(); i < nItems; ++i)
     {
-        OUString sCommand = OUString::fromUtf8(m_pToolbar->get_item_ident(i));
-        auto xImage(vcl::CommandInfoProvider::GetXGraphicForCommand(sCommand, m_xFrame, eSize));
-        m_pToolbar->set_item_image(i, xImage);
+        OString sIdent(m_pToolbar->get_item_ident(i));
+        auto xImage(vcl::CommandInfoProvider::GetXGraphicForCommand(OUString::fromUtf8(sIdent),
+                                                                    m_xFrame, eSize));
+        m_pToolbar->set_item_image(sIdent, xImage);
     }
 
     for (auto const& it : maControllers)
@@ -193,6 +196,7 @@ void ToolbarUnoDispatcher::dispose()
             xComponent->dispose();
     }
 
+    m_xImageController->dispose();
     m_pToolbar->connect_clicked(Link<const OString&, void>());
     m_pToolbar = nullptr;
     m_pBuilder = nullptr;

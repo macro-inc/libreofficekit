@@ -789,7 +789,7 @@ namespace osl_FileBase
         the second only on windows based systems
         the first parameter are a file URL where we want to get the system path of,
         the second parameter is the assumed error of the osl_getSystemPathFromFileURL() function,
-        the third parameter is the assumed result string, the string will only test, if its length is greater 0
+        the third parameter is the assumed result string, the string will only test, if its length is greater than 0
     */
 
     void SystemPath_FileURL::getSystemPathFromFileURL_001_1()
@@ -1716,9 +1716,18 @@ namespace osl_FileStatus
             osl::FileBase::RC nError = rItem.getFileStatus(rFileStatus);
             CPPUNIT_ASSERT_EQUAL(osl::FileBase::E_None, nError);
 
-            CPPUNIT_ASSERT_EQUAL_MESSAGE("test for getAttributes function: ReadOnly, GrpRead, OwnRead, OthRead(UNX version) ",
+            if (geteuid() == 0) // as root, access(W_OK) may be true despite mode
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("test for getAttributes function: (not ReadOnly,) GrpRead, OwnRead, OthRead(UNX version) ",
+                                    static_cast<sal_uInt64>(osl_File_Attribute_GrpRead | osl_File_Attribute_OwnRead | osl_File_Attribute_OthRead),
+                                    rFileStatus.getAttributes());
+            }
+            else
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("test for getAttributes function: ReadOnly, GrpRead, OwnRead, OthRead(UNX version) ",
                                     static_cast<sal_uInt64>(osl_File_Attribute_ReadOnly | osl_File_Attribute_GrpRead | osl_File_Attribute_OwnRead | osl_File_Attribute_OthRead),
                                     rFileStatus.getAttributes());
+            }
         }
 #else // Windows version
         void getAttributes_001()
@@ -1737,9 +1746,18 @@ namespace osl_FileStatus
             osl::FileBase::RC nError = rItem.getFileStatus(rFileStatus);
             CPPUNIT_ASSERT_EQUAL(osl::FileBase::E_None, nError);
 
-            CPPUNIT_ASSERT_EQUAL_MESSAGE("test for getAttributes function: Executable, GrpExe, OwnExe, OthExe, the result is Readonly, Executable, GrpExe, OwnExe, OthExe, it partly not pass(Solaris version)",
+            if (geteuid() == 0) // as root, access(W_OK) may be true despite mode
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("test for getAttributes function: Executable, GrpExe, OwnExe, OthExe, the result is (not Readonly,) Executable, GrpExe, OwnExe, OthExe, it partly not pass(Solaris version)",
+                                    static_cast<sal_uInt64>(osl_File_Attribute_Executable | osl_File_Attribute_GrpExe | osl_File_Attribute_OwnExe | osl_File_Attribute_OthExe),
+                                    rFileStatus.getAttributes());
+            }
+            else
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("test for getAttributes function: Executable, GrpExe, OwnExe, OthExe, the result is Readonly, Executable, GrpExe, OwnExe, OthExe, it partly not pass(Solaris version)",
                                     static_cast<sal_uInt64>(osl_File_Attribute_ReadOnly | osl_File_Attribute_Executable | osl_File_Attribute_GrpExe | osl_File_Attribute_OwnExe | osl_File_Attribute_OthExe),
                                     rFileStatus.getAttributes());
+            }
 #endif
         }
 
@@ -2216,24 +2234,6 @@ namespace osl_File
                                      File::E_NOENT, nError1);
         }
 
-        void open_004()
-        {
-            OUString  aTestFile(aRootURL);
-            concatURL(aTestFile, aTmpName2);
-            File testFile(aTestFile);
-
-            auto nError1 = testFile.open(osl_File_OpenFlag_Create);
-            bool bOK = (nError1 == File::E_ACCES || nError1 == File::E_ROFS);
-#ifdef _WIN32
-            bOK = true;  /// in Windows, you can create file in c:\ any way.
-            testFile.close();
-            deleteTestFile(aTestFile);
-#endif
-
-            CPPUNIT_ASSERT_MESSAGE("test for open function: create an illegal file",
-                                    bOK);
-        }
-
         void open_005()
         {
             File testFile(aTmpName4);
@@ -2278,7 +2278,6 @@ namespace osl_File
             CPPUNIT_TEST(open_001);
             CPPUNIT_TEST(open_002);
             CPPUNIT_TEST(open_003);
-            CPPUNIT_TEST(open_004);
             CPPUNIT_TEST(open_005);
             CPPUNIT_TEST(open_006);
         CPPUNIT_TEST_SUITE_END();
@@ -3278,9 +3277,18 @@ namespace osl_File
             nError1 = rItem.getFileStatus(rFileStatus);
             CPPUNIT_ASSERT_EQUAL(osl::FileBase::E_None, nError1);
 
-            CPPUNIT_ASSERT_EQUAL_MESSAGE("test for setAttributes function: set file attributes and get it to verify.",
+            if (geteuid() == 0) // as root, access(W_OK) may be true despite mode
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("test for setAttributes function: set file attributes and get it to verify.",
+                                    static_cast<sal_uInt64>(osl_File_Attribute_GrpRead | osl_File_Attribute_OwnRead | osl_File_Attribute_OthRead),
+                                    rFileStatus.getAttributes());
+            }
+            else
+            {
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("test for setAttributes function: set file attributes and get it to verify.",
                                     static_cast<sal_uInt64>(osl_File_Attribute_ReadOnly | osl_File_Attribute_GrpRead | osl_File_Attribute_OwnRead | osl_File_Attribute_OthRead),
                                     rFileStatus.getAttributes());
+            }
 #else
             // please see GetFileAttributes
             auto nError2 = File::setAttributes(aTmpName6, osl_File_Attribute_ReadOnly);

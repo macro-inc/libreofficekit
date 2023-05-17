@@ -28,6 +28,7 @@
 
 #include <package/Deflater.hxx>
 #include <comphelper/threadpool.hxx>
+#include <unotools/tempfile.hxx>
 #include "CRC32.hxx"
 #include <atomic>
 
@@ -63,8 +64,8 @@ public:
 
 protected:
     ZipOutputEntryBase(
-        const css::uno::Reference< css::io::XOutputStream >& rxOutStream,
-        const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+        css::uno::Reference< css::io::XOutputStream > xOutStream,
+        css::uno::Reference< css::uno::XComponentContext > xContext,
         ZipEntry& rEntry, ZipPackageStream* pStream, bool bEncrypt, bool checkStream);
 
     // Inherited classes call this with deflated data buffer.
@@ -110,7 +111,7 @@ protected:
 class ZipOutputEntryInThread final : public ZipOutputEntry
 {
     class Task;
-    OUString m_aTempURL;
+    rtl::Reference<utl::TempFileFastService> m_xTempFile;
     std::exception_ptr m_aParallelDeflateException;
     std::atomic<bool>   m_bFinished;
 

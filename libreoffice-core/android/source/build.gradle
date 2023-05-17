@@ -2,21 +2,20 @@ apply plugin: 'com.android.application'
 // buildhost settings - paths and the like
 apply from: 'liboSettings.gradle'
 
-project.ext.set("archivesBaseName", "LibreOfficeViewer")
 allprojects {
     repositories {
-        jcenter()
+        mavenCentral()
         google()
     }
 }
 //build-time dependencies - android plugin for gradle
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:7.2.2'
     }
 }
 
@@ -27,16 +26,12 @@ dependencies {
             "libreoffice.jar",
             "unoloader.jar"
     ])
-    implementation 'com.android.support:design:27.1.1' // also pulls-in corresponding support libraries
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
 
 android {
-    compileSdkVersion 28
-    compileOptions {
-        // silence some java-language features hints
-        sourceCompatibility 6
-    }
+    compileSdkVersion 32
     // uses non-conventional source layout, so need to reconfigure accordingly
     // ToDo move to conventional layout, so stuff can be stripped down.
     sourceSets {
@@ -45,7 +40,6 @@ android {
         main.res.srcDirs = ['res', 'res_generated']
         main.java.srcDirs = ['../Bootstrap/src', 'src/java']
         main.jniLibs.srcDirs = ["${liboJniLibsdir}"]
-        main.jni.srcDirs = [] // don't attempt to build native-lib via gradle
         // the configuration data that might be stripped or not
         fullUI.assets.srcDirs 'assets_fullUI'
         strippedUI.assets.srcDirs 'assets_strippedUI'
@@ -53,7 +47,7 @@ android {
     }
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 32
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -81,7 +75,7 @@ android {
         }
         fullUI.dimension "default"
     }
-    lintOptions {
+    lint {
         // don't error-out on missing translations
         warning 'MissingTranslation'
     }
@@ -181,6 +175,7 @@ task copyAssets(type: Copy) {
                 '**/hfmenubutton.ui',
                 '**/inforeadonlydialog.ui',
                 '**/pbmenubutton.ui',
+                '**/scrollbars.ui',
                 '**/tabbuttons.ui', '**/tabviewbar.ui'
     }
 }

@@ -30,6 +30,7 @@
 #include <compiler.hxx>
 #include <recursionhelper.hxx>
 #include <docsh.hxx>
+#include <editutil.hxx>
 
 #include <SparklineGroup.hxx>
 
@@ -110,9 +111,12 @@ void ScColumn::DeleteBeforeCopyFromClip(
 
         if (nDelFlag & InsertDeleteFlags::CONTENTS)
         {
-            sc::SingleColumnSpanSet aDeletedRows(GetDoc().GetSheetLimits());
-            DeleteCells(*pBlockPos, aRange.mnRow1, aRange.mnRow2, nDelFlag, aDeletedRows);
-            rBroadcastSpans.set(GetDoc(), nTab, nCol, aDeletedRows, true);
+            auto xResult = DeleteCells(*pBlockPos, aRange.mnRow1, aRange.mnRow2, nDelFlag);
+            rBroadcastSpans.set(GetDoc(), nTab, nCol, xResult->aDeletedRows, true);
+
+            for (const auto& rRange : xResult->aFormulaRanges)
+                rCxt.setListeningFormulaSpans(
+                    nTab, nCol, rRange.first, nCol, rRange.second);
         }
 
         if (nDelFlag & InsertDeleteFlags::NOTE)
@@ -201,9 +205,12 @@ void ScColumn::DeleteBeforeCopyFromClip(
 
         if (nDelFlag & InsertDeleteFlags::CONTENTS)
         {
-            sc::SingleColumnSpanSet aDeletedRows(GetDoc().GetSheetLimits());
-            DeleteCells(*pBlockPos, nRow1, nRow2, nDelFlag, aDeletedRows);
-            rBroadcastSpans.set(GetDoc(), nTab, nCol, aDeletedRows, true);
+            auto xResult = DeleteCells(*pBlockPos, nRow1, nRow2, nDelFlag);
+            rBroadcastSpans.set(GetDoc(), nTab, nCol, xResult->aDeletedRows, true);
+
+            for (const auto& rRange : xResult->aFormulaRanges)
+                rCxt.setListeningFormulaSpans(
+                    nTab, nCol, rRange.first, nCol, rRange.second);
         }
 
         if (nDelFlag & InsertDeleteFlags::NOTE)
@@ -255,7 +262,7 @@ void ScColumn::CopyOneCellFromClip( sc::CopyFromClipContext& rCxt, SCROW nRow1, 
 
     if ((nFlags & InsertDeleteFlags::ATTRIB) != InsertDeleteFlags::NONE)
     {
-        if (!rCxt.isSkipEmptyCells() || rSrcCell.meType != CELLTYPE_NONE)
+        if (!rCxt.isSkipEmptyCells() || rSrcCell.getType() != CELLTYPE_NONE)
         {
             const ScPatternAttr* pAttr = (bSameDocPool ? rCxt.getSingleCellPattern(nColOffset) :
                     rCxt.getSingleCellPattern(nColOffset)->PutInPool( &rDocument, rCxt.getClipDoc()));
@@ -273,11 +280,11 @@ void ScColumn::CopyOneCellFromClip( sc::CopyFromClipContext& rCxt, SCROW nRow1, 
     {
         std::vector<sc::CellTextAttr> aTextAttrs(nDestSize, rSrcAttr);
 
-        switch (rSrcCell.meType)
+        switch (rSrcCell.getType())
         {
             case CELLTYPE_VALUE:
             {
-                std::vector<double> aVals(nDestSize, rSrcCell.mfValue);
+                std::vector<double> aVals(nDestSize, rSrcCell.getDouble());
                 pBlockPos->miCellPos =
                     maCells.set(pBlockPos->miCellPos, nRow1, aVals.begin(), aVals.end());
                 pBlockPos->miCellTextAttrPos =
@@ -291,8 +298,8 @@ void ScColumn::CopyOneCellFromClip( sc::CopyFromClipContext& rCxt, SCROW nRow1, 
                 // same document. If not, re-intern shared strings.
                 svl::SharedStringPool* pSharedStringPool = (bSameDocPool ? nullptr : &rDocument.GetSharedStringPool());
                 svl::SharedString aStr = (pSharedStringPool ?
-                        pSharedStringPool->intern( rSrcCell.mpString->getString()) :
-                        *rSrcCell.mpString);
+                        pSharedStringPool->intern( rSrcCell.getSharedString()->getString()) :
+                        *rSrcCell.getSharedString());
 
                 std::vector<svl::SharedString> aStrs(nDestSize, aStr);
                 pBlockPos->miCellPos =
@@ -307,7 +314,7 @@ void ScColumn::CopyOneCellFromClip( sc::CopyFromClipContext& rCxt, SCROW nRow1, 
                 std::vector<EditTextObject*> aStrs;
                 aStrs.reserve(nDestSize);
                 for (size_t i = 0; i < nDestSize; ++i)
-                    aStrs.push_back(rSrcCell.mpEditText->Clone().release());
+                    aStrs.push_back(rSrcCell.getEditText()->Clone().release());
 
                 pBlockPos->miCellPos =
                     maCells.set(pBlockPos->miCellPos, nRow1, aStrs.begin(), aStrs.end());
@@ -321,7 +328,7 @@ void ScColumn::CopyOneCellFromClip( sc::CopyFromClipContext& rCxt, SCROW nRow1, 
                 std::vector<sc::RowSpan> aRanges;
                 aRanges.reserve(1);
                 aRanges.emplace_back(nRow1, nRow2);
-                CloneFormulaCell(*pBlockPos, *rSrcCell.mpFormula, rSrcAttr, aRanges);
+                CloneFormulaCell(*pBlockPos, *rSrcCell.getFormula(), rSrcAttr, aRanges);
             }
             break;
             default:
@@ -478,13 +485,15 @@ namespace {
 class ConvertFormulaToValueHandler
 {
     sc::CellValues maResValues;
+    ScDocument& mrDoc;
     bool mbModified;
 
 public:
-    ConvertFormulaToValueHandler(ScSheetLimits const & rSheetLimits) :
+    ConvertFormulaToValueHandler(ScDocument& rDoc) :
+        mrDoc(rDoc),
         mbModified(false)
     {
-        maResValues.reset(rSheetLimits.GetMaxRowCount());
+        maResValues.reset(mrDoc.GetSheetLimits().GetMaxRowCount());
     }
 
     void operator() ( size_t nRow, const ScFormulaCell* pCell )
@@ -496,7 +505,15 @@ public:
                 maResValues.setValue(nRow, aRes.mfValue);
             break;
             case sc::FormulaResultValue::String:
-                maResValues.setValue(nRow, aRes.maString);
+                if (aRes.mbMultiLine)
+                {
+                    std::unique_ptr<EditTextObject> pObj(mrDoc.CreateSharedStringTextObject(aRes.maString));
+                    maResValues.setValue(nRow, std::move(pObj));
+                }
+                else
+                {
+                    maResValues.setValue(nRow, aRes.maString);
+                }
             break;
             case sc::FormulaResultValue::Error:
             case sc::FormulaResultValue::Invalid:
@@ -528,13 +545,13 @@ void ScColumn::ConvertFormulaToValue(
     sc::SharedFormulaUtil::splitFormulaCellGroups(GetDoc(), maCells, aBounds);
 
     // Parse all formulas within the range and store their results into temporary storage.
-    ConvertFormulaToValueHandler aFunc(GetDoc().GetSheetLimits());
+    ConvertFormulaToValueHandler aFunc(GetDoc());
     sc::ParseFormula(maCells.begin(), maCells, nRow1, nRow2, aFunc);
     if (!aFunc.isModified())
         // No formula cells encountered.
         return;
 
-    DetachFormulaCells(rCxt, nRow1, nRow2, nullptr);
+    DetachFormulaCells(rCxt, nRow1, nRow2);
 
     // Undo storage to hold static values which will get swapped to the cell storage later.
     sc::CellValues aUndoCells;
@@ -2203,7 +2220,17 @@ void ScColumn::CheckIntegrity() const
         throw std::runtime_error(os.str());
     }
 
-    // Add more integrity checks as needed.
+    size_t nCount = std::count_if(maCells.cbegin(), maCells.cend(),
+        [](const auto& blk) { return blk.type == sc::element_type_formula; }
+    );
+
+    if (mnBlkCountFormula != nCount)
+    {
+        std::ostringstream os;
+        os << "incorrect cached formula block count (expected=" << nCount << "; actual="
+            << mnBlkCountFormula << ")";
+        throw std::runtime_error(os.str());
+    }
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

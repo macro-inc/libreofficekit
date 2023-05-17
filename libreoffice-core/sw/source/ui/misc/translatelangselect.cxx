@@ -43,7 +43,7 @@ int SwTranslateLangSelectDlg::selectedLangIdx = -1;
 SwTranslateLangSelectDlg::SwTranslateLangSelectDlg(weld::Window* pParent, SwWrtShell& rSh)
     : GenericDialogController(pParent, "modules/swriter/ui/translationdialog.ui",
                               "LanguageSelectDialog")
-    , rWrtSh(rSh)
+    , m_rWrtSh(rSh)
     , m_xLanguageListBox(m_xBuilder->weld_combo_box("combobox1"))
     , m_xBtnCancel(m_xBuilder->weld_button("cancel"))
     , m_xBtnTranslate(m_xBuilder->weld_button("translate"))
@@ -105,16 +105,14 @@ std::optional<SwLanguageListItem> SwTranslateLangSelectDlg::GetSelectedLanguage(
     return {};
 }
 
-IMPL_LINK(SwTranslateLangSelectDlg, LangSelectHdl, weld::ComboBox&, rBox, void)
+IMPL_STATIC_LINK(SwTranslateLangSelectDlg, LangSelectHdl, weld::ComboBox&, rBox, void)
 {
     const auto selected = rBox.get_active();
     SwTranslateLangSelectDlg::selectedLangIdx = selected;
 }
 
-IMPL_LINK(SwTranslateLangSelectDlg, LangSelectCancelHdl, weld::Button&, rButton, void)
+IMPL_LINK_NOARG(SwTranslateLangSelectDlg, LangSelectCancelHdl, weld::Button&, void)
 {
-    (void)rButton;
-
     // stop translation first
     if (m_bTranslationStarted)
         m_bCancelTranslation = true;
@@ -122,10 +120,8 @@ IMPL_LINK(SwTranslateLangSelectDlg, LangSelectCancelHdl, weld::Button&, rButton,
         m_xDialog->response(RET_CANCEL);
 }
 
-IMPL_LINK(SwTranslateLangSelectDlg, LangSelectTranslateHdl, weld::Button&, rButton, void)
+IMPL_LINK_NOARG(SwTranslateLangSelectDlg, LangSelectTranslateHdl, weld::Button&, void)
 {
-    (void)rButton;
-
     if (SwTranslateLangSelectDlg::selectedLangIdx == -1)
     {
         m_xDialog->response(RET_CANCEL);
@@ -135,13 +131,13 @@ IMPL_LINK(SwTranslateLangSelectDlg, LangSelectTranslateHdl, weld::Button&, rButt
     SvxDeeplOptions& rDeeplOptions = SvxDeeplOptions::Get();
     if (rDeeplOptions.getAPIUrl().isEmpty() || rDeeplOptions.getAuthKey().isEmpty())
     {
-        SAL_WARN("langselectdlg", "API options are not set");
+        SAL_WARN("sw.ui", "SwTranslateLangSelectDlg: API options are not set");
         m_xDialog->response(RET_CANCEL);
         return;
     }
 
     const OString aAPIUrl
-        = OUStringToOString(OUString(rDeeplOptions.getAPIUrl() + "?tag_handling=html"),
+        = OUStringToOString(rtl::Concat2View(rDeeplOptions.getAPIUrl() + "?tag_handling=html"),
                             RTL_TEXTENCODING_UTF8)
               .trim();
     const OString aAuthKey
@@ -152,7 +148,7 @@ IMPL_LINK(SwTranslateLangSelectDlg, LangSelectTranslateHdl, weld::Button&, rButt
     m_bTranslationStarted = true;
 
     SwTranslateHelper::TranslateAPIConfig aConfig({ aAPIUrl, aAuthKey, aTargetLang });
-    SwTranslateHelper::TranslateDocumentCancellable(rWrtSh, aConfig, m_bCancelTranslation);
+    SwTranslateHelper::TranslateDocumentCancellable(m_rWrtSh, aConfig, m_bCancelTranslation);
     m_xDialog->response(RET_OK);
 }
 

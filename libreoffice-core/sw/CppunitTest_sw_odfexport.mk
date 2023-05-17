@@ -23,6 +23,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_odfexport, \
     cppuhelper \
     sal \
 	sfx \
+	subsequenttest \
 	svl \
 	sw \
 	swqahelper \
@@ -31,6 +32,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_odfexport, \
     unotest \
     utl \
     vcl \
+    basegfx \
 ))
 
 $(eval $(call gb_CppunitTest_use_externals,sw_odfexport,\

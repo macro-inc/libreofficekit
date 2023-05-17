@@ -12,12 +12,13 @@
 #include <token.hxx>
 
 #include <sal/log.hxx>
+#include <utility>
 
 namespace sc {
 
 FormulaResultValue::FormulaResultValue() : mfValue(0.0), meType(Invalid), mnError(FormulaError::NONE) {}
 FormulaResultValue::FormulaResultValue( double fValue ) : mfValue(fValue), meType(Value), mnError(FormulaError::NONE) {}
-FormulaResultValue::FormulaResultValue( const svl::SharedString& rStr ) : mfValue(0.0), maString(rStr), meType(String), mnError(FormulaError::NONE) {}
+FormulaResultValue::FormulaResultValue( svl::SharedString aStr, bool bMultiLine ) : mfValue(0.0), maString(std::move(aStr)), mbMultiLine(bMultiLine), meType(String), mnError(FormulaError::NONE) {}
 FormulaResultValue::FormulaResultValue( FormulaError nErr ) : mfValue(0.0), meType(Error), mnError(nErr) {}
 
 }
@@ -51,12 +52,8 @@ ScFormulaResult::ScFormulaResult( const ScFormulaResult & r ) :
             const ScMatrixFormulaCellToken* pMatFormula =
                 r.GetMatrixFormulaCellToken();
             if (pMatFormula)
-            {
                 mpToken = new ScMatrixFormulaCellToken( *pMatFormula);
-                mpToken->IncRef();
-            }
-            else
-                IncrementTokenRef( mpToken);
+            mpToken->IncRef();
         }
     }
     else
@@ -180,7 +177,8 @@ void ScFormulaResult::Assign( const ScFormulaResult & r )
 void ScFormulaResult::SetToken( const formula::FormulaToken* p )
 {
     ResetToDefaults();
-    IncrementTokenRef( p);
+    if (p)
+        p->IncRef();
     // Handle a result obtained from the interpreter to be assigned to a matrix
     // formula cell's ScMatrixFormulaCellToken.
     ScMatrixFormulaCellToken* pMatFormula = GetMatrixFormulaCellTokenNonConst();
@@ -430,7 +428,7 @@ sc::FormulaResultValue ScFormulaResult::GetResult() const
         return sc::FormulaResultValue();
 
     if (isString(sv))
-        return sc::FormulaResultValue(GetString());
+        return sc::FormulaResultValue(GetString(), IsMultiline());
 
     // Invalid
     return sc::FormulaResultValue();

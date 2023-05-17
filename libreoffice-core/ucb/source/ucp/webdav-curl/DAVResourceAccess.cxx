@@ -23,13 +23,13 @@
 
 #include <ucbhelper/simpleauthenticationrequest.hxx>
 #include <comphelper/seekableinput.hxx>
-#include <sal/log.hxx>
 
 #include "DAVAuthListenerImpl.hxx"
 #include "DAVResourceAccess.hxx"
 
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/io/IOException.hpp>
+#include <utility>
 
 using namespace http_dav_ucp;
 using namespace com::sun::star;
@@ -121,15 +121,15 @@ int DAVAuthListener_Impl::authenticate(
 
 // DAVResourceAccess Implementation.
 
+constexpr size_t g_nRedirectLimit = 5;
 
 DAVResourceAccess::DAVResourceAccess(
-    const uno::Reference< uno::XComponentContext > & rContext,
-    rtl::Reference< DAVSessionFactory > const & rSessionFactory,
-    const OUString & rURL )
-: m_aURL( rURL ),
-  m_xSessionFactory( rSessionFactory ),
-  m_xContext( rContext )
-, m_nRedirectLimit( 5 )
+    uno::Reference< uno::XComponentContext > xContext,
+    rtl::Reference< DAVSessionFactory > xSessionFactory,
+    OUString aURL )
+: m_aURL(std::move( aURL )),
+  m_xSessionFactory(std::move( xSessionFactory )),
+  m_xContext(std::move( xContext ))
 {
 }
 
@@ -141,8 +141,7 @@ DAVResourceAccess::DAVResourceAccess( const DAVResourceAccess & rOther )
   m_xSession( rOther.m_xSession ),
   m_xSessionFactory( rOther.m_xSessionFactory ),
   m_xContext( rOther.m_xContext ),
-  m_aRedirectURIs( rOther.m_aRedirectURIs ),
-  m_nRedirectLimit( rOther.m_nRedirectLimit )
+  m_aRedirectURIs( rOther.m_aRedirectURIs )
 {
 }
 
@@ -157,7 +156,6 @@ DAVResourceAccess & DAVResourceAccess::operator=(
     m_xSessionFactory = rOther.m_xSessionFactory;
     m_xContext           = rOther.m_xContext;
     m_aRedirectURIs   = rOther.m_aRedirectURIs;
-    m_nRedirectLimit = rOther.m_nRedirectLimit;
 
     return *this;
 }
@@ -185,9 +183,8 @@ void DAVResourceAccess::OPTIONS(
             m_xSession->OPTIONS( getRequestURI(),
                                   rOptions,
                                   DAVRequestEnvironment(
-                                      getRequestURI(),
                                       new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                      aHeaders, xEnv ) );
+                                      aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -227,9 +224,8 @@ void DAVResourceAccess::PROPFIND(
                                   rPropertyNames,
                                   rResources,
                                   DAVRequestEnvironment(
-                                      getRequestURI(),
                                       new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                      aHeaders, xEnv ) );
+                                      aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -267,9 +263,8 @@ void DAVResourceAccess::PROPFIND(
                                   nDepth,
                                   rResInfo,
                                   DAVRequestEnvironment(
-                                      getRequestURI(),
                                       new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                      aHeaders, xEnv ) ) ;
+                                      aHeaders ) ) ;
         }
         catch (DAVException const& e)
         {
@@ -305,9 +300,8 @@ void DAVResourceAccess::PROPPATCH(
             m_xSession->PROPPATCH( getRequestURI(),
                                    rValues,
                                    DAVRequestEnvironment(
-                                       getRequestURI(),
                                        new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                       aHeaders, xEnv ) );
+                                       aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -345,9 +339,8 @@ void DAVResourceAccess::HEAD(
                               rHeaderNames,
                               rResource,
                               DAVRequestEnvironment(
-                                  getRequestURI(),
                                   new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                  aHeaders, xEnv ) );
+                                  aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -382,10 +375,9 @@ uno::Reference< io::XInputStream > DAVResourceAccess::GET(
 
             xStream = m_xSession->GET( getRequestURI(),
                                        DAVRequestEnvironment(
-                                           getRequestURI(),
                                            new DAVAuthListener_Impl(
                                                xEnv, m_aURL ),
-                                           aHeaders, xEnv ) );
+                                           aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -423,9 +415,8 @@ void DAVResourceAccess::GET(
             m_xSession->GET( getRequestURI(),
                              rStream,
                              DAVRequestEnvironment(
-                                 getRequestURI(),
                                  new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                 aHeaders, xEnv ) );
+                                 aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -464,10 +455,9 @@ uno::Reference< io::XInputStream > DAVResourceAccess::GET(
                                        rHeaderNames,
                                        rResource,
                                        DAVRequestEnvironment(
-                                           getRequestURI(),
                                            new DAVAuthListener_Impl(
                                                xEnv, m_aURL ),
-                                           aHeaders, xEnv ) );
+                                           aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -492,7 +482,6 @@ void DAVResourceAccess::GET0(
 {
     initialize();
 
-    uno::Reference< io::XInputStream > xStream;
     int errorCount = 0;
     bool bRetry;
     do
@@ -509,10 +498,9 @@ void DAVResourceAccess::GET0(
                               rHeaderNames,
                               rResource,
                               DAVRequestEnvironment(
-                                  getRequestURI(),
                                   new DAVAuthListener_Impl(
                                       xEnv, m_aURL ),
-                                  rRequestHeaders, xEnv ) );
+                                  rRequestHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -552,9 +540,8 @@ void DAVResourceAccess::GET(
                              rHeaderNames,
                              rResource,
                              DAVRequestEnvironment(
-                                 getRequestURI(),
                                  new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                 aHeaders, xEnv ) );
+                                 aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -641,9 +628,8 @@ void DAVResourceAccess::PUT(
             m_xSession->PUT( getRequestURI(),
                              xSeekableStream,
                              DAVRequestEnvironment(
-                                 getRequestURI(),
                                  new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                 aHeaders, xEnv ) );
+                                 aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -694,10 +680,9 @@ uno::Reference< io::XInputStream > DAVResourceAccess::POST(
                                         rReferer,
                                         xSeekableStream,
                                         DAVRequestEnvironment(
-                                            getRequestURI(),
                                             new DAVAuthListener_Impl(
                                                 xEnv, m_aURL ),
-                                            aHeaders, xEnv ) );
+                                            aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -757,9 +742,8 @@ void DAVResourceAccess::POST(
                               xSeekableStream,
                               rOutputStream,
                               DAVRequestEnvironment(
-                                  getRequestURI(),
                                   new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                  aHeaders, xEnv ) );
+                                  aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -800,9 +784,8 @@ void DAVResourceAccess::MKCOL(
 
             m_xSession->MKCOL( getRequestURI(),
                                DAVRequestEnvironment(
-                                   getRequestURI(),
                                    new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                   aHeaders, xEnv ) );
+                                   aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -840,9 +823,8 @@ void DAVResourceAccess::COPY(
             m_xSession->COPY( rSourcePath,
                               rDestinationURI,
                               DAVRequestEnvironment(
-                                  getRequestURI(),
                                   new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                  aHeaders, xEnv ),
+                                  aHeaders ),
                               bOverwrite );
         }
         catch (DAVException const& e)
@@ -881,9 +863,8 @@ void DAVResourceAccess::MOVE(
             m_xSession->MOVE( rSourcePath,
                               rDestinationURI,
                               DAVRequestEnvironment(
-                                  getRequestURI(),
                                   new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                  aHeaders, xEnv ),
+                                  aHeaders ),
                               bOverwrite );
         }
         catch (DAVException const& e)
@@ -918,9 +899,8 @@ void DAVResourceAccess::DESTROY(
 
             m_xSession->DESTROY( getRequestURI(),
                                  DAVRequestEnvironment(
-                                     getRequestURI(),
                                      new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                     aHeaders, xEnv ) );
+                                     aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -957,9 +937,8 @@ void DAVResourceAccess::LOCK(
             m_xSession->LOCK( getRequestURI(),
                               inLock,
                               DAVRequestEnvironment(
-                                  getRequestURI(),
                                   new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                  aHeaders, xEnv ) );
+                                  aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -992,9 +971,8 @@ void DAVResourceAccess::UNLOCK(
 
             m_xSession->UNLOCK( getRequestURI(),
                                 DAVRequestEnvironment(
-                                    getRequestURI(),
                                     new DAVAuthListener_Impl( xEnv, m_aURL ),
-                                    aHeaders, xEnv ) );
+                                    aHeaders ) );
         }
         catch (DAVException const& e)
         {
@@ -1115,7 +1093,7 @@ bool DAVResourceAccess::detectRedirectCycle(
     // A practical limit may be 5, due to earlier specifications:
     // <https://tools.ietf.org/html/rfc2068#section-10.3>
     // it can be raised keeping in mind the added net activity.
-    if( static_cast< size_t >( m_nRedirectLimit ) <= m_aRedirectURIs.size() )
+    if( g_nRedirectLimit <= m_aRedirectURIs.size() )
         return true;
 
     // try to detect a cyclical redirection

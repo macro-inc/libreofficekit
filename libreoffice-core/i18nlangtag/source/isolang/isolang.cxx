@@ -273,7 +273,6 @@ IsoLanguageCountryEntry const aImplIsoLangEntries[] =
     { LANGUAGE_SPANISH_NICARAGUA,           "es", "NI", k0    },
     { LANGUAGE_SPANISH_PUERTO_RICO,         "es", "PR", k0    },
     { LANGUAGE_SPANISH_UNITED_STATES,       "es", "US", k0    },
-    { LANGUAGE_SPANISH_LATIN_AMERICA,       "es", ""  , k0    },
     { LANGUAGE_TURKISH,                     "tr", "TR", k0    },
     { LANGUAGE_UKRAINIAN,                   "uk", "UA", k0    },
     { LANGUAGE_VIETNAMESE,                  "vi", "VN", k0    },
@@ -344,7 +343,9 @@ IsoLanguageCountryEntry const aImplIsoLangEntries[] =
     { LANGUAGE_SINDHI,                      "sd", "IN", kSAME },    // Devanagari script
     { LANGUAGE_BELARUSIAN,                  "be", "BY", k0    },
     { LANGUAGE_CATALAN,                     "ca", "ES", k0    },    // Spain (default)
-    { LANGUAGE_CATALAN,                     "ca", "AD", k0    },    // Andorra
+    { LANGUAGE_USER_CATALAN_ANDORRA,        "ca", "AD", k0    },
+    { LANGUAGE_USER_CATALAN_FRANCE,         "ca", "FR", k0    },
+    { LANGUAGE_USER_CATALAN_ITALY,          "ca", "IT", k0    },
     //LANGUAGE_CATALAN_VALENCIAN ca-ES-valencia Bcp47CountryEntry takes precedence
     { LANGUAGE_CATALAN_VALENCIAN,           "ca", "XV", kSAME },    // XV: ISO 3166 user-assigned; old workaround for UI localization only, in case it escaped to document content
     { LANGUAGE_CATALAN_VALENCIAN,          "qcv", "ES", kSAME },    // qcv: ISO 639-3 reserved-for-local-use; old UI localization quirk only, in case it escaped to document content
@@ -489,8 +490,8 @@ IsoLanguageCountryEntry const aImplIsoLangEntries[] =
     { LANGUAGE_LOWER_SORBIAN_GERMANY,      "dsb", "DE", k0    },    // MS maps this to 'wee-DE', which is nonsense. 'WEE' is a SIL code, see http://www.ethnologue.com/14/show_language.asp?code=WEE
     { LANGUAGE_LOWER_SORBIAN_LSO,          "dsb", ""  , k0    },
     { LANGUAGE_OBSOLETE_USER_LOWER_SORBIAN,"dsb", "DE", k0    },
-    { LANGUAGE_OCCITAN_FRANCE,              "oc", "FR", k0    },
-    { LANGUAGE_OBSOLETE_USER_OCCITAN,       "oc", "FR", k0    },
+    { LANGUAGE_OCCITAN_FRANCE,              "oc", "FR", kSAME },
+    { LANGUAGE_OBSOLETE_USER_OCCITAN,       "oc", "FR", LANGUAGE_OCCITAN_FRANCE },
     { LANGUAGE_USER_KURDISH_TURKEY,        "kmr", "TR", kSAME },
     { LANGUAGE_USER_KURDISH_TURKEY,         "ku", "TR", kSAME },
     { LANGUAGE_USER_KURDISH_SYRIA,         "kmr", "SY", kSAME },
@@ -639,7 +640,7 @@ IsoLanguageCountryEntry const aImplIsoLangEntries[] =
     { LANGUAGE_USER_CHURCH_SLAVIC,          "cu", "RU", k0    },
     { LANGUAGE_USER_VENETIAN,              "vec", "IT", k0    },
     { LANGUAGE_USER_ENGLISH_GAMBIA,         "en", "GM", k0    },
-    { LANGUAGE_USER_OCCITAN_ARANESE,        "oc", "ES", k0    },
+    { LANGUAGE_USER_OCCITAN_ARANESE,        "oc", "ES", kSAME },
     { LANGUAGE_USER_ARPITAN_FRANCE,        "frp", "FR", k0    },
     { LANGUAGE_USER_ARPITAN_ITALY,         "frp", "IT", k0    },
     { LANGUAGE_USER_ARPITAN_SWITZERLAND,   "frp", "CH", k0    },
@@ -673,6 +674,12 @@ IsoLanguageCountryEntry const aImplIsoLangEntries[] =
     { LANGUAGE_USER_SESOTHO_LESOTHO,        "st", "LS", k0    },
     { LANGUAGE_USER_KLINGON,               "tlh", ""  , k0    },
     { LANGUAGE_USER_ENGLISH_ISRAEL,         "en", "IL", k0    },
+    { LANGUAGE_USER_PENNSYLVANIA_DUTCH,    "pdc", "US", k0    },
+    { LANGUAGE_USER_PORTUGUESE_MOZAMBIQUE,  "pt", "MZ", k0    },
+    { LANGUAGE_USER_SPANISH_EQUATORIAL_GUINEA, "es", "GQ", k0    },
+    { LANGUAGE_USER_SPANISH_PHILIPPINES,    "es", "PH", k0    },
+    { LANGUAGE_USER_ENGLISH_ANTIGUA_BARBUDA,"en", "AG", k0    },
+    // Add new languages ^^^ there.
     { LANGUAGE_MULTIPLE,                   "mul", ""  , k0    },    // multiple languages, many languages are used
     { LANGUAGE_UNDETERMINED,               "und", ""  , k0    },    // undetermined language, language cannot be identified
     { LANGUAGE_NONE,                       "zxx", ""  , k0    },    // added to ISO 639-2 on 2006-01-11: Used to declare the absence of linguistic information
@@ -753,6 +760,11 @@ IsoLanguageScriptCountryEntry const aImplIsoLangScriptEntries[] =
     { LANGUAGE_BOSNIAN_LATIN_BOSNIA_HERZEGOVINA,    "bs-Latn", "BA", kSAME },   // MS, though Latn is suppress-script
     { LANGUAGE_BOSNIAN_LATIN_LSO,                   "bs-Latn", ""  , LANGUAGE_BOSNIAN_LSO },   // MS, though Latn is suppress-script
     { LANGUAGE_CHINESE_TRADITIONAL_LSO,             "zh-Hant", ""  , k0    },
+    { LANGUAGE_CHINESE_SIMPLIFIED,                  "zh-Hans", "CN", kSAME },   // canonical, but prefer legacy zh-CN
+    { LANGUAGE_CHINESE_TRADITIONAL,                 "zh-Hant", "TW", kSAME },   // canonical, but prefer legacy zh-TW
+    { LANGUAGE_CHINESE_SINGAPORE,                   "zh-Hans", "SG", kSAME },   // canonical, but prefer legacy zh-SG
+    { LANGUAGE_CHINESE_HONGKONG,                    "zh-Hant", "HK", kSAME },   // canonical, but prefer legacy zh-HK
+    { LANGUAGE_CHINESE_MACAU,                       "zh-Hant", "MO", kSAME },   // canonical, but prefer legacy zh-MO
     { LANGUAGE_USER_MANINKAKAN_EASTERN_LATIN,      "emk-Latn", "GN", k0    },
     { LANGUAGE_USER_CREE_PLAINS_LATIN,             "crk-Latn", "CA", k0    },
     { LANGUAGE_USER_CREE_PLAINS_SYLLABICS,         "crk-Cans", "CA", k0    },
@@ -778,11 +790,13 @@ Bcp47CountryEntry const aImplBcp47CountryEntries[] =
     { LANGUAGE_USER_ENGLISH_UK_OED,           "en-GB-oed", "GB", "", LANGUAGE_USER_ENGLISH_UK_OXENDICT },   // grandfathered, deprecated, prefer en-GB-oxendict
     { LANGUAGE_SPANISH_DATED,           "es-ES-u-co-trad", "ES", "es-u-co-trad", k0 },  // RFC6067/CLDR
     { LANGUAGE_SPANISH_DATED,              "es-ES_tradnl", "ES", "", kSAME },           // MS malformed
-    { LANGUAGE_OCCITAN_FRANCE,           "oc-FR-lengadoc", "FR", "oc-lengadoc", kSAME },  // forward compatibility
-    { LANGUAGE_USER_OCCITAN_ARANESE,       "oc-ES-aranes", "ES", "oc-aranes", kSAME },  // forward compatibility
+    { LANGUAGE_OCCITAN_FRANCE,           "oc-FR-lengadoc", "FR", "oc-lengadoc", k0 },
+    { LANGUAGE_USER_OCCITAN_ARANESE,       "oc-ES-aranes", "ES", "oc-aranes", k0 },
 //  { LANGUAGE_YUE_CHINESE_HONGKONG,         "zh-yue-HK", "HK", "", 0 },   // MS reserved, prefer yue-HK; do not add unless LanguageTag::simpleExtract() can handle it to not call liblangtag for rsc!
     { LANGUAGE_YIDDISH,                          "yi-001",   "", "", k0 },  // MS since rev.15, was "yi-Hebr" reserved, "001"="World"
     { LANGUAGE_FRENCH_WEST_INDIES,               "fr-029",   "", "", k0 },  // MS since rev.15, was "Neither defined nor reserved", "029"="Caribbean"
+    { LANGUAGE_SPANISH_LATIN_AMERICA,            "es-419",   "", "", k0 },  // MS reserved since rev.15, "419"="Latin America and the Caribbean"
+    { LANGUAGE_OBSOLETE_USER_SPANISH_LATIN_AMERICA, "es-419", "", "", LANGUAGE_SPANISH_LATIN_AMERICA },
     { LANGUAGE_USER_INTERSLAVIC_LATIN, "art-Latn-x-interslv", "", "", k0 },  // see discussion in tdf#145853
     { LANGUAGE_USER_INTERSLAVIC_CYRILLIC, "art-Cyrl-x-interslv", "", "", k0 },
     { LANGUAGE_DONTKNOW,                    "", "", "", k0 }    // marks end of table
@@ -953,6 +967,16 @@ IsoLangOtherEntry const aImplPrivateUseEntries[] =
 void MsLangId::Conversion::convertLanguageToLocaleImpl( LanguageType nLang,
         css::lang::Locale & rLocale, bool bIgnoreOverride )
 {
+    if (nLang == LANGUAGE_ENGLISH_US)
+    {
+        // Speed-up a gazillion fallback cases, not iterating through
+        // aImplBcp47CountryEntries nor aImplIsoLangScriptEntries.
+        rLocale.Language = "en";
+        rLocale.Country = "US";
+        rLocale.Variant.clear();
+        return;
+    }
+
     const Bcp47CountryEntry* pBcp47EntryOverride = nullptr;
     const IsoLanguageScriptCountryEntry* pScriptEntryOverride = nullptr;
     const IsoLanguageCountryEntry* pEntryOverride = nullptr;
@@ -1456,34 +1480,34 @@ IsoLangGLIBCModifiersEntry const aImplIsoLangGLIBCModifiersEntries[] =
 
 // static
 LanguageType MsLangId::convertUnxByteStringToLanguage(
-        const OString& rString )
+        std::string_view rString )
 {
     OString  aLang;
     OString  aCountry;
     OString  aAtString;
 
-    sal_Int32  nLangSepPos    = rString.indexOf( '_' );
-    sal_Int32  nCountrySepPos = rString.indexOf( '.' );
-    sal_Int32  nAtPos         = rString.indexOf( '@' );
+    size_t  nLangSepPos    = rString.find( '_' );
+    size_t  nCountrySepPos = rString.find( '.' );
+    size_t  nAtPos         = rString.find( '@' );
 
-    if (nCountrySepPos < 0)
+    if (nCountrySepPos == std::string_view::npos)
         nCountrySepPos = nAtPos;
-    if (nCountrySepPos < 0)
-        nCountrySepPos = rString.getLength();
+    if (nCountrySepPos == std::string_view::npos)
+        nCountrySepPos = rString.size();
 
-    if (nAtPos >= 0)
-        aAtString = rString.copy( nAtPos+1 );
+    if (nAtPos != std::string_view::npos)
+        aAtString = OString(rString.substr( nAtPos+1 ));
 
-    if (((nLangSepPos >= 0) && (nLangSepPos > nCountrySepPos)) || (nLangSepPos < 0))
+    if (((nLangSepPos != std::string_view::npos) && (nLangSepPos > nCountrySepPos)) || (nLangSepPos == std::string_view::npos))
     {
         // eg. "el.sun_eu_greek", "tchinese", "es.ISO8859-15"
-        aLang    = rString.copy( 0, nCountrySepPos );
+        aLang    = OString(rString.substr( 0, nCountrySepPos ));
     }
-    else if ( nLangSepPos >= 0 )
+    else if ( nLangSepPos != std::string_view::npos )
     {
         // well formed iso names like "en_US.UTF-8", "sh_BA.ISO8859-2@bosnia"
-        aLang    = rString.copy( 0, nLangSepPos );
-        aCountry = rString.copy( nLangSepPos+1, nCountrySepPos - nLangSepPos - 1);
+        aLang    = OString(rString.substr( 0, nLangSepPos ));
+        aCountry = OString(rString.substr( nLangSepPos+1, nCountrySepPos - nLangSepPos - 1));
     }
 
     //  if there is a glibc modifier, first look for exact match in modifier table

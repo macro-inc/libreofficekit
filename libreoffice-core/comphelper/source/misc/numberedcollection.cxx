@@ -28,7 +28,6 @@ constexpr OUStringLiteral ERRMSG_INVALID_COMPONENT_PARAM = u"NULL as component r
 
 
 NumberedCollection::NumberedCollection()
-    : ::cppu::BaseMutex ()
 {
 }
 
@@ -41,7 +40,7 @@ NumberedCollection::~NumberedCollection()
 void NumberedCollection::setOwner(const css::uno::Reference< css::uno::XInterface >& xOwner)
 {
     // SYNCHRONIZED ->
-    osl::MutexGuard aLock(m_aMutex);
+    std::scoped_lock aLock(m_aMutex);
 
     m_xOwner = xOwner;
 
@@ -52,7 +51,7 @@ void NumberedCollection::setOwner(const css::uno::Reference< css::uno::XInterfac
 void NumberedCollection::setUntitledPrefix(const OUString& sPrefix)
 {
     // SYNCHRONIZED ->
-    osl::MutexGuard aLock(m_aMutex);
+    std::scoped_lock aLock(m_aMutex);
 
     m_sUntitledPrefix = sPrefix;
 
@@ -63,7 +62,7 @@ void NumberedCollection::setUntitledPrefix(const OUString& sPrefix)
 ::sal_Int32 SAL_CALL NumberedCollection::leaseNumber(const css::uno::Reference< css::uno::XInterface >& xComponent)
 {
     // SYNCHRONIZED ->
-    osl::MutexGuard aLock(m_aMutex);
+    std::scoped_lock aLock(m_aMutex);
 
     if ( ! xComponent.is ())
         throw css::lang::IllegalArgumentException(ERRMSG_INVALID_COMPONENT_PARAM, m_xOwner.get(), 1);
@@ -98,10 +97,10 @@ void NumberedCollection::setUntitledPrefix(const OUString& sPrefix)
 void SAL_CALL NumberedCollection::releaseNumber(::sal_Int32 nNumber)
 {
     // SYNCHRONIZED ->
-    osl::MutexGuard aLock(m_aMutex);
+    std::scoped_lock aLock(m_aMutex);
 
     if (nNumber == css::frame::UntitledNumbersConst::INVALID_NUMBER)
-        throw css::lang::IllegalArgumentException ("Special valkud INVALID_NUMBER not allowed as input parameter.", m_xOwner.get(), 1);
+        throw css::lang::IllegalArgumentException ("Special value INVALID_NUMBER not allowed as input parameter.", m_xOwner.get(), 1);
 
     TDeadItemList               lDeadItems;
     TNumberedItemHash::iterator pComponent;
@@ -135,7 +134,7 @@ void SAL_CALL NumberedCollection::releaseNumber(::sal_Int32 nNumber)
 void SAL_CALL NumberedCollection::releaseNumberForComponent(const css::uno::Reference< css::uno::XInterface >& xComponent)
 {
     // SYNCHRONIZED ->
-    osl::MutexGuard aLock(m_aMutex);
+    std::scoped_lock aLock(m_aMutex);
 
     if ( ! xComponent.is ())
         throw css::lang::IllegalArgumentException(ERRMSG_INVALID_COMPONENT_PARAM, m_xOwner.get(), 1);
@@ -157,7 +156,7 @@ void SAL_CALL NumberedCollection::releaseNumberForComponent(const css::uno::Refe
 OUString SAL_CALL NumberedCollection::getUntitledPrefix()
 {
     // SYNCHRONIZED ->
-    osl::MutexGuard aLock(m_aMutex);
+    std::scoped_lock aLock(m_aMutex);
 
     return m_sUntitledPrefix;
 
@@ -179,48 +178,25 @@ OUString SAL_CALL NumberedCollection::getUntitledPrefix()
  */
 ::sal_Int32 NumberedCollection::impl_searchFreeNumber ()
 {
-    // create ordered list of all possible numbers.
-    std::vector< ::sal_Int32 > lPossibleNumbers;
-    ::sal_Int32                  c = static_cast<::sal_Int32>(m_lComponents.size ());
-    ::sal_Int32                  i = 1;
+    // create bitset, where each position represents one possible number.
+    std::vector<bool> aUsedNumbers((m_lComponents.size() * 2) + 1, false);
 
-    // c can't be less than 0 ... otherwise hash.size() has an error :-)
-    // But we need at least n+1 numbers here.
-    c += 1;
-
-    for (i=1; i<=c; ++i)
-        lPossibleNumbers.push_back (i);
-
-    // SYNCHRONIZED ->
+    for (const auto& rPair : m_lComponents)
     {
-        osl::MutexGuard aLock(m_aMutex);
-        TDeadItemList                     lDeadItems;
-
-        for (const auto& [rComponent, rItem] : m_lComponents)
-        {
-            const css::uno::Reference< css::uno::XInterface > xItem = rItem.xItem.get();
-
-            if ( ! xItem.is ())
-            {
-                lDeadItems.push_back(rComponent);
-                continue;
-            }
-
-            std::vector< ::sal_Int32 >::iterator pPossible = std::find(lPossibleNumbers.begin (), lPossibleNumbers.end (), rItem.nNumber);
-            if (pPossible != lPossibleNumbers.end ())
-                lPossibleNumbers.erase (pPossible);
-        }
-
-        impl_cleanUpDeadItems(m_lComponents, lDeadItems);
-
-        // a) non free numbers ... return INVALID_NUMBER
-        if (lPossibleNumbers.empty())
-            return css::frame::UntitledNumbersConst::INVALID_NUMBER;
-
-        // b) return first free number
-        return *(lPossibleNumbers.begin ());
+        // numbers start at 1
+        sal_Int32 pos = rPair.second.nNumber - 1;
+        if (pos >= static_cast<sal_Int32>(aUsedNumbers.size()))
+            aUsedNumbers.resize(pos * 2, false); //  should be rare
+        aUsedNumbers[pos] = true;
     }
-    // <- SYNCHRONIZED
+
+    // a) non free numbers ... return INVALID_NUMBER
+    auto it = std::find(aUsedNumbers.begin(), aUsedNumbers.end(), false);
+    if (it == aUsedNumbers.end())
+        return css::frame::UntitledNumbersConst::INVALID_NUMBER;
+
+    // b) return first free number
+    return it - aUsedNumbers.begin() + 1;
 }
 
 void NumberedCollection::impl_cleanUpDeadItems (      TNumberedItemHash& lItems    ,

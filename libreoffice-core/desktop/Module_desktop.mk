@@ -21,7 +21,7 @@ $(eval $(call gb_Module_add_targets,desktop,\
     $(if $(ENABLE_BREAKPAD), \
         Library_crashreport \
         ) \
-    $(if $(DISABLE_GUI),,Library_spl) \
+    $(if $(or $(DISABLE_GUI),$(ENABLE_WASM_STRIP_SPLASH)),,Library_spl) \
     Package_branding \
     $(if $(CUSTOM_BRAND_DIR),Package_branding_custom) \
     UIConfig_deployment \
@@ -34,26 +34,23 @@ $(eval $(call gb_Module_add_l10n_targets,desktop,\
 ifneq (,$(filter DESKTOP,$(BUILD_TYPE)))
 $(eval $(call gb_Module_add_targets,desktop,\
     Executable_soffice_bin \
-    Executable_unopkg_bin \
+    $(call gb_CondExeUnopkg,Executable_unopkg_bin) \
     $(if $(ENABLE_BREAKPAD),Executable_minidump_upload) \
     Library_migrationoo2 \
     Library_migrationoo3 \
-    Library_unopkgapp \
+    $(call gb_CondExeUnopkg,Library_unopkgapp) \
     Package_scripts \
+    $(if $(ENABLE_PAGEIN), \
+        Pagein_calc \
+        Pagein_common \
+        Pagein_draw \
+        Pagein_impress \
+        Pagein_writer \
+    ) \
+    $(if $(filter-out MACOSX WNT,$(OS)),CustomTarget_soffice) \
 ))
 
-ifneq ($(OS),MACOSX)
-ifneq ($(OS),WNT)
-$(eval $(call gb_Module_add_targets,desktop,\
-    Pagein_calc \
-    Pagein_common \
-    Pagein_draw \
-    Pagein_impress \
-    Pagein_writer \
-    CustomTarget_soffice \
-))
-
-ifeq ($(USING_X11), TRUE)
+ifeq ($(USING_X11),TRUE)
 $(eval $(call gb_Module_add_targets,desktop,\
     Package_sbase_sh \
     Package_scalc_sh \
@@ -64,9 +61,7 @@ $(eval $(call gb_Module_add_targets,desktop,\
     Package_soffice_sh \
 ))
 endif
-endif
-endif
-endif
+endif # DESKTOP
 
 ifeq ($(OS),WNT)
 
@@ -85,8 +80,10 @@ $(eval $(call gb_Module_add_targets,desktop,\
     Executable_sweb \
     Executable_swriter \
     Executable_unoinfo \
-    Executable_unopkg \
-    Executable_unopkg_com \
+    $(call gb_CondExeUnopkg, \
+        Executable_unopkg \
+        Executable_unopkg_com \
+    ) \
     WinResTarget_quickstart \
     WinResTarget_sbase \
     WinResTarget_scalc \
@@ -99,21 +96,15 @@ $(eval $(call gb_Module_add_targets,desktop,\
     WinResTarget_swriter \
 ))
 
-else ifeq ($(OS),MACOSX)
+else ifeq (,$(filter MACOSX ANDROID iOS HAIKU EMSCRIPTEN,$(OS)))
 
-else ifeq ($(OS),ANDROID)
-
-else ifeq ($(OS),iOS)
-
-else ifeq ($(OS),HAIKU)
-
-else
-
+ifeq (,$(filter FUZZERS,$(BUILD_TYPE)))
 $(eval $(call gb_Module_add_targets,desktop,\
     Executable_oosplash \
 ))
-
 endif
+
+endif # $(OS)
 
 ifneq (,$(filter Extension_test-active,$(MAKECMDGOALS)))
 $(eval $(call gb_Module_add_targets,desktop, \
@@ -131,6 +122,14 @@ $(eval $(call gb_Module_add_targets,desktop, \
     Pyuno_passive_python \
     Rdb_passive_generic \
     Rdb_passive_platform \
+))
+endif
+
+ifneq (,$(filter Extension_test-crashextension,$(MAKECMDGOALS)))
+$(eval $(call gb_Module_add_targets,desktop, \
+    Extension_test-crashextension \
+    Library_crashextension \
+    Rdb_crashextension \
 ))
 endif
 

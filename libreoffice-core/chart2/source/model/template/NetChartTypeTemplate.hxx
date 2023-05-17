@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "ChartTypeTemplate.hxx"
+#include <ChartTypeTemplate.hxx>
 #include <StackMode.hxx>
 
 namespace chart
@@ -38,20 +38,21 @@ public:
     virtual ~NetChartTypeTemplate() override;
 
 protected:
-    // ____ XChartTypeTemplate ____
-    virtual sal_Bool SAL_CALL matchesTemplate(
-        const css::uno::Reference< css::chart2::XDiagram >& xDiagram,
-        sal_Bool bAdaptProperties ) override;
-    virtual css::uno::Reference< css::chart2::XChartType > SAL_CALL
-        getChartTypeForNewSeries( const css::uno::Sequence< css::uno::Reference< css::chart2::XChartType > >& aFormerlyUsedChartTypes ) override;
-    virtual void SAL_CALL applyStyle(
-        const css::uno::Reference< css::chart2::XDataSeries >& xSeries,
+    // ____ ChartTypeTemplate ____
+    virtual bool matchesTemplate2(
+        const rtl::Reference< ::chart::Diagram >& xDiagram,
+        bool bAdaptProperties ) override;
+    virtual rtl::Reference< ::chart::ChartType >
+        getChartTypeForNewSeries2( const std::vector<
+            rtl::Reference< ::chart::ChartType > >& aFormerlyUsedChartTypes ) override;
+    virtual void applyStyle2(
+        const rtl::Reference< ::chart::DataSeries >& xSeries,
         ::sal_Int32 nChartTypeGroupIndex,
         ::sal_Int32 nSeriesIndex,
         ::sal_Int32 nSeriesCount ) override;
 
     // ____ ChartTypeTemplate ____
-    virtual css::uno::Reference< css::chart2::XChartType >
+    virtual rtl::Reference< ::chart::ChartType >
                 getChartTypeForIndex( sal_Int32 nChartTypeIndex ) override;
     virtual StackMode getStackMode( sal_Int32 nChartTypeIndex ) const override;
 

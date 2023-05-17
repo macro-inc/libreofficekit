@@ -34,6 +34,7 @@
 #include <formula/opcode.hxx>
 #include <jumpmatrix.hxx>
 #include <rangeseq.hxx>
+#include <rangeutl.hxx>
 #include <externalrefmgr.hxx>
 #include <document.hxx>
 #include <refupdatecontext.hxx>
@@ -365,9 +366,9 @@ FormulaToken* ScRawToken::CreateToken(ScSheetLimits& rLimits) const
         {
             svl::SharedString aSS(sharedstring.mpData, sharedstring.mpDataIgnoreCase);
             if (eOp == ocPush)
-                return new FormulaStringToken(aSS);
+                return new FormulaStringToken(std::move(aSS));
             else
-                return new FormulaStringOpToken(eOp, aSS);
+                return new FormulaStringOpToken(eOp, std::move(aSS));
         }
         case svSingleRef :
             if (eOp == ocPush)
@@ -390,17 +391,17 @@ FormulaToken* ScRawToken::CreateToken(ScSheetLimits& rLimits) const
         case svExternalSingleRef:
             {
                 svl::SharedString aTabName(maExternalName);    // string not interned
-                return new ScExternalSingleRefToken(extref.nFileId, aTabName, extref.aRef.Ref1);
+                return new ScExternalSingleRefToken(extref.nFileId, std::move(aTabName), extref.aRef.Ref1);
             }
         case svExternalDoubleRef:
             {
                 svl::SharedString aTabName(maExternalName);    // string not interned
-                return new ScExternalDoubleRefToken(extref.nFileId, aTabName, extref.aRef);
+                return new ScExternalDoubleRefToken(extref.nFileId, std::move(aTabName), extref.aRef);
             }
         case svExternalName:
             {
                 svl::SharedString aName(maExternalName);         // string not interned
-                return new ScExternalNameToken( extname.nFileId, aName );
+                return new ScExternalNameToken( extname.nFileId, std::move(aName) );
             }
         case svJump :
             return new FormulaJumpToken( eOp, nJump );
@@ -663,8 +664,8 @@ bool ScRefListToken::operator==( const FormulaToken& r ) const
     return p && mbArrayResult == p->IsArrayResult();
 }
 
-ScMatrixToken::ScMatrixToken( const ScMatrixRef& p ) :
-    FormulaToken(formula::svMatrix), pMatrix(p) {}
+ScMatrixToken::ScMatrixToken( ScMatrixRef p ) :
+    FormulaToken(formula::svMatrix), pMatrix(std::move(p)) {}
 
 ScMatrixToken::ScMatrixToken( const ScMatrixToken& ) = default;
 
@@ -718,10 +719,10 @@ FormulaToken* ScMatrixRangeToken::Clone() const
     return new ScMatrixRangeToken(*this);
 }
 
-ScExternalSingleRefToken::ScExternalSingleRefToken( sal_uInt16 nFileId, const svl::SharedString& rTabName, const ScSingleRefData& r ) :
+ScExternalSingleRefToken::ScExternalSingleRefToken( sal_uInt16 nFileId, svl::SharedString aTabName, const ScSingleRefData& r ) :
     FormulaToken( svExternalSingleRef, ocPush),
     mnFileId(nFileId),
-    maTabName(rTabName),
+    maTabName(std::move(aTabName)),
     maSingleRef(r)
 {
 }
@@ -764,10 +765,10 @@ bool ScExternalSingleRefToken::operator ==( const FormulaToken& r ) const
     return maSingleRef == *r.GetSingleRef();
 }
 
-ScExternalDoubleRefToken::ScExternalDoubleRefToken( sal_uInt16 nFileId, const svl::SharedString& rTabName, const ScComplexRefData& r ) :
+ScExternalDoubleRefToken::ScExternalDoubleRefToken( sal_uInt16 nFileId, svl::SharedString aTabName, const ScComplexRefData& r ) :
     FormulaToken( svExternalDoubleRef, ocPush),
     mnFileId(nFileId),
-    maTabName(rTabName),
+    maTabName(std::move(aTabName)),
     maDoubleRef(r)
 {
 }
@@ -830,10 +831,10 @@ bool ScExternalDoubleRefToken::operator ==( const FormulaToken& r ) const
     return maDoubleRef == *r.GetDoubleRef();
 }
 
-ScExternalNameToken::ScExternalNameToken( sal_uInt16 nFileId, const svl::SharedString& rName ) :
+ScExternalNameToken::ScExternalNameToken( sal_uInt16 nFileId, svl::SharedString aName ) :
     FormulaToken( svExternalName, ocPush),
     mnFileId(nFileId),
-    maName(rName)
+    maName(std::move(aName))
 {
 }
 
@@ -976,8 +977,8 @@ bool ScEmptyCellToken::operator==( const FormulaToken& r ) const
         bDisplayedAsString == static_cast< const ScEmptyCellToken & >(r).IsDisplayedAsString();
 }
 
-ScMatrixCellResultToken::ScMatrixCellResultToken( const ScConstMatrixRef& pMat, const formula::FormulaToken* pUL ) :
-    FormulaToken(formula::svMatrixCell), xMatrix(pMat), xUpperLeft(pUL) {}
+ScMatrixCellResultToken::ScMatrixCellResultToken( ScConstMatrixRef pMat, const formula::FormulaToken* pUL ) :
+    FormulaToken(formula::svMatrixCell), xMatrix(std::move(pMat)), xUpperLeft(pUL) {}
 
 ScMatrixCellResultToken::ScMatrixCellResultToken( const ScMatrixCellResultToken& ) = default;
 
@@ -1109,10 +1110,10 @@ void ScMatrixFormulaCellToken::ResetResult()
 }
 
 ScHybridCellToken::ScHybridCellToken(
-    double f, const svl::SharedString & rStr, const OUString & rFormula, bool bEmptyDisplayedAsString ) :
+    double f, const svl::SharedString & rStr, OUString aFormula, bool bEmptyDisplayedAsString ) :
         FormulaToken( formula::svHybridCell ),
         mfDouble( f ), maString( rStr ),
-        maFormula( rFormula ),
+        maFormula(std::move( aFormula )),
         mbEmptyDisplayedAsString( bEmptyDisplayedAsString)
 {
     // caller, make up your mind...
@@ -2484,7 +2485,7 @@ void GetExternalTableData(const ScDocument* pOldDoc, const ScDocument* pNewDoc, 
 bool IsInCopyRange( const ScRange& rRange, const ScDocument* pClipDoc )
 {
     ScClipParam& rClipParam = const_cast<ScDocument*>(pClipDoc)->GetClipParam();
-    return rClipParam.maRanges.In(rRange);
+    return rClipParam.maRanges.Contains(rRange);
 }
 
 bool SkipReference(formula::FormulaToken* pToken, const ScAddress& rPos, const ScDocument& rOldDoc, bool bRangeName, bool bCheckCopyArea)
@@ -3132,7 +3133,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
 
     sc::RefUpdateResult aRes;
     ScAddress aNewPos = rOldPos;
-    bool bCellShifted = rCxt.maRange.In(rOldPos);
+    bool bCellShifted = rCxt.maRange.Contains(rOldPos);
     if (bCellShifted)
     {
         ScAddress aErrorPos( ScAddress::UNINITIALIZED );
@@ -3160,7 +3161,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
                         ScSingleRefData& rRef = *p->GetSingleRef();
                         ScAddress aAbs = rRef.toAbs(*mxSheetLimits, rOldPos);
 
-                        if (rCxt.isDeleted() && aSelectedRange.In(aAbs))
+                        if (rCxt.isDeleted() && aSelectedRange.Contains(aAbs))
                         {
                             // This reference is in the deleted region.
                             setRefDeleted(rRef, rCxt);
@@ -3172,7 +3173,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
                         {
                             // Check if the token has reference to previously deleted region.
                             ScAddress aCheckPos = rRef.toAbs(*mxSheetLimits, aNewPos);
-                            if (rCxt.maRange.In(aCheckPos))
+                            if (rCxt.maRange.Contains(aCheckPos))
                             {
                                 restoreDeletedRef(rRef, rCxt);
                                 aRes.mbValueChanged = true;
@@ -3180,7 +3181,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
                             }
                         }
 
-                        if (rCxt.maRange.In(aAbs))
+                        if (rCxt.maRange.Contains(aAbs))
                         {
                             ScAddress aErrorPos( ScAddress::UNINITIALIZED );
                             if (!aAbs.Move(rCxt.mnColDelta, rCxt.mnRowDelta, rCxt.mnTabDelta, aErrorPos, rCxt.mrDoc))
@@ -3198,7 +3199,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
 
                         if (rCxt.isDeleted())
                         {
-                            if (aSelectedRange.In(aAbs))
+                            if (aSelectedRange.Contains(aAbs))
                             {
                                 // This reference is in the deleted region.
                                 setRefDeleted(rRef, rCxt);
@@ -3226,7 +3227,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
                                     // range means also that the other
                                     // conditions below are not met,
                                     // specifically not the
-                                    // if (rCxt.maRange.In(aAbs))
+                                    // if (rCxt.maRange.Contains(aAbs))
                                     // that is able to update the reference,
                                     // but aSelectedRange does not intersect
                                     // with rCxt.maRange so that can't happen
@@ -3241,7 +3242,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
                         {
                             // Check if the token has reference to previously deleted region.
                             ScRange aCheckRange = rRef.toAbs(*mxSheetLimits, aNewPos);
-                            if (aSelectedRange.In(aCheckRange))
+                            if (aSelectedRange.Contains(aCheckRange))
                             {
                                 // This reference was previously in the deleted region. Restore it.
                                 restoreDeletedRef(rRef, rCxt);
@@ -3271,7 +3272,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnShift( const sc::RefUpdateCon
                             }
                         }
 
-                        if (rCxt.maRange.In(aAbs))
+                        if (rCxt.maRange.Contains(aAbs))
                         {
                             // We shift either by column or by row, not both,
                             // so moving the reference has only to be done in
@@ -3398,17 +3399,17 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnMove(
                         // Additionally, do not update the references from cells within the moved
                         // range as they lead to #REF! errors here. These #REF! cannot by fixed
                         // later in UpdateTranspose().
-                        if (rCxt.mbTransposed && (aOldRange.In(rOldPos) || aOldRange.In(aAbs)))
+                        if (rCxt.mbTransposed && (aOldRange.Contains(rOldPos) || aOldRange.Contains(aAbs)))
                             break;
 
-                        if (aOldRange.In(aAbs))
+                        if (aOldRange.Contains(aAbs))
                         {
                             ScAddress aErrorPos( ScAddress::UNINITIALIZED );
                             if (!aAbs.Move(rCxt.mnColDelta, rCxt.mnRowDelta, rCxt.mnTabDelta, aErrorPos, rCxt.mrDoc))
                                 aAbs = aErrorPos;
                             aRes.mbReferenceModified = true;
                         }
-                        else if (rCxt.maRange.In(aAbs))
+                        else if (rCxt.maRange.Contains(aAbs))
                         {
                             // Referenced cell has been overwritten.
                             aRes.mbValueChanged = true;
@@ -3428,17 +3429,17 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnMove(
                         // Additionally, do not update the references from cells within the moved
                         // range as they lead to #REF! errors here. These #REF! cannot by fixed
                         // later in UpdateTranspose().
-                        if (rCxt.mbTransposed && (aOldRange.In(rOldPos) || aOldRange.In(aAbs)))
+                        if (rCxt.mbTransposed && (aOldRange.Contains(rOldPos) || aOldRange.Contains(aAbs)))
                             break;
 
-                        if (aOldRange.In(aAbs))
+                        if (aOldRange.Contains(aAbs))
                         {
                             ScRange aErrorRange( ScAddress::UNINITIALIZED );
                             if (!aAbs.Move(rCxt.mnColDelta, rCxt.mnRowDelta, rCxt.mnTabDelta, aErrorRange, rCxt.mrDoc))
                                 aAbs = aErrorRange;
                             aRes.mbReferenceModified = true;
                         }
-                        else if (rCxt.maRange.In(aAbs))
+                        else if (rCxt.maRange.Contains(aAbs))
                         {
                             // Referenced range has been entirely overwritten.
                             aRes.mbValueChanged = true;
@@ -3652,7 +3653,7 @@ bool adjustSingleRefInName(
         return false;
     }
 
-    if (!rCxt.maRange.In(rRef.toAbs(rCxt.mrDoc, rPos)))
+    if (!rCxt.maRange.Contains(rRef.toAbs(rCxt.mrDoc, rPos)))
         return false;
 
     bool bChanged = false;
@@ -3886,7 +3887,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceInName(
                             // Sheet references not affected.
                             break;
 
-                        if (rCxt.maRange.In(aAbs))
+                        if (rCxt.maRange.Contains(aAbs))
                         {
                             // This range is entirely within the shifted region.
                             if (adjustDoubleRefInName(rRef, rCxt, rPos))
@@ -4096,10 +4097,10 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceInMovedName( const sc::RefUpdat
 
                         // Do not update the reference in transposed case (cut paste transposed).
                         // The reference will be updated in UpdateTranspose().
-                        if (rCxt.mbTransposed && aOldRange.In(aAbs))
+                        if (rCxt.mbTransposed && aOldRange.Contains(aAbs))
                             break;
 
-                        if (aOldRange.In(aAbs))
+                        if (aOldRange.Contains(aAbs))
                         {
                             ScAddress aErrorPos( ScAddress::UNINITIALIZED );
                             if (!aAbs.Move(rCxt.mnColDelta, rCxt.mnRowDelta, rCxt.mnTabDelta, aErrorPos, rCxt.mrDoc))
@@ -4121,10 +4122,10 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceInMovedName( const sc::RefUpdat
 
                         // Do not update the reference in transposed case (cut paste transposed).
                         // The reference will be updated in UpdateTranspose().
-                        if (rCxt.mbTransposed && aOldRange.In(aAbs))
+                        if (rCxt.mbTransposed && aOldRange.Contains(aAbs))
                             break;
 
-                        if (aOldRange.In(aAbs))
+                        if (aOldRange.Contains(aAbs))
                         {
                             ScRange aErrorRange( ScAddress::UNINITIALIZED );
                             if (!aAbs.Move(rCxt.mnColDelta, rCxt.mnRowDelta, rCxt.mnTabDelta, aErrorRange, rCxt.mrDoc))
@@ -4234,8 +4235,7 @@ sc::RefUpdateResult ScTokenArray::AdjustReferenceOnDeletedTab( const sc::RefUpda
 {
     sc::RefUpdateResult aRes;
     ScAddress aNewPos = rOldPos;
-    if (rCxt.mnDeletePos < rOldPos.Tab())
-        aNewPos.IncTab(-1*rCxt.mnSheets);
+    ScRangeUpdater::UpdateDeleteTab( aNewPos, rCxt);
 
     TokenPointers aPtrs( pCode.get(), nLen, pRPN, nRPN);
     for (size_t j=0; j<2; ++j)
@@ -5347,9 +5347,9 @@ sal_Int32 ScTokenArray::GetWeight() const
                 const auto pComplexRef = (*pRPN[i]).GetDoubleRef();
 
                 // Number of cells referenced divided by 10.
-                const double nNumCellsTerm =
-                    (1 + (pComplexRef->Ref2.Row() - pComplexRef->Ref1.Row())) *
-                    (1 + (pComplexRef->Ref2.Col() - pComplexRef->Ref1.Col())) / 10.;
+                const double nRows = 1 + (pComplexRef->Ref2.Row() - pComplexRef->Ref1.Row());
+                const double nCols = 1 + (pComplexRef->Ref2.Col() - pComplexRef->Ref1.Col());
+                const double nNumCellsTerm = nRows * nCols / 10.0;
 
                 if (nNumCellsTerm + nResult < SAL_MAX_INT32)
                     nResult += nNumCellsTerm;

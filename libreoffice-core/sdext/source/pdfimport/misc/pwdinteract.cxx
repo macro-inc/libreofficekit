@@ -31,9 +31,8 @@
 #include <com/sun/star/task/DocumentPasswordRequest.hpp>
 
 #include <cppuhelper/implbase.hxx>
-#include <osl/mutex.hxx>
 #include <rtl/ref.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 using namespace com::sun::star;
 
@@ -74,7 +73,7 @@ private:
 
 PDFPasswordRequest::PDFPasswordRequest( bool bFirstTry, const OUString& rName ) :
     m_aRequest(
-        uno::makeAny(
+        uno::Any(
             task::DocumentPasswordRequest(
                 OUString(), uno::Reference< uno::XInterface >(),
                 task::InteractionClassification_QUERY,
@@ -128,7 +127,7 @@ private:
     virtual ~UnsupportedEncryptionFormatRequest() override {}
 
     virtual uno::Any SAL_CALL getRequest() override {
-        return uno::makeAny(
+        return uno::Any(
             task::ErrorCodeRequest(
                 OUString(), uno::Reference< uno::XInterface >(),
                 sal_uInt32(ERRCODE_IO_WRONGVERSION)));

@@ -23,7 +23,9 @@
 #include <unotools/localedatawrapper.hxx>
 #include <unotools/syslocale.hxx>
 #include <comphelper/types.hxx>
-#include <tools/diagnose_ex.h>
+#include <tools/debug.hxx>
+#include <comphelper/diagnose_ex.hxx>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/form/FormComponentType.hpp>
 
 
@@ -94,8 +96,8 @@ void OCurrencyModel::implConstruct()
         }
         if (!sCurrencySymbol.isEmpty())
         {
-            m_xAggregateSet->setPropertyValue(PROPERTY_CURRENCYSYMBOL, makeAny(sCurrencySymbol));
-            m_xAggregateSet->setPropertyValue(PROPERTY_CURRSYM_POSITION, makeAny(bPrependCurrencySymbol));
+            m_xAggregateSet->setPropertyValue(PROPERTY_CURRENCYSYMBOL, Any(sCurrencySymbol));
+            m_xAggregateSet->setPropertyValue(PROPERTY_CURRSYM_POSITION, Any(bPrependCurrencySymbol));
         }
     }
     catch(const Exception&)

@@ -12,7 +12,7 @@
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <memory>
 #include <officecfg/Office/UI/Infobar.hxx>
 #include <sfx2/bindings.hxx>
@@ -21,6 +21,7 @@
 #include <sfx2/objface.hxx>
 #include <sfx2/sfxsids.hrc>
 #include <sfx2/viewfrm.hxx>
+#include <utility>
 #include <vcl/image.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
@@ -107,7 +108,7 @@ void SfxInfoBarWindow::SetCloseButtonImage()
 
     const ViewInformation2D aNewViewInfos;
     const std::unique_ptr<BaseProcessor2D> pProcessor(
-        createBaseProcessor2DFromOutputDevice(*xDevice, aNewViewInfos));
+        createProcessor2DFromOutputDevice(*xDevice, aNewViewInfos));
 
     const ::tools::Rectangle aRect(aBtnPos, xDevice->PixelToLogic(aSize));
 
@@ -138,7 +139,8 @@ void SfxInfoBarWindow::SetCloseButtonImage()
     aLine2.append(B2DPoint(aRect.Left(), aRect.Bottom()));
     aCross.append(aLine2);
 
-    aSeq[1] = new PolyPolygonStrokePrimitive2D(aCross, aLineAttribute, StrokeAttribute());
+    aSeq[1]
+        = new PolyPolygonStrokePrimitive2D(std::move(aCross), aLineAttribute, StrokeAttribute());
 
     pProcessor->process(aSeq);
 
@@ -186,12 +188,12 @@ IMPL_LINK_NOARG(ExtraButton, CommandHdl, weld::Button&, void)
     comphelper::dispatchCommand(m_aCommand, css::uno::Sequence<css::beans::PropertyValue>());
 }
 
-SfxInfoBarWindow::SfxInfoBarWindow(vcl::Window* pParent, const OUString& sId,
+SfxInfoBarWindow::SfxInfoBarWindow(vcl::Window* pParent, OUString sId,
                                    const OUString& sPrimaryMessage,
                                    const OUString& sSecondaryMessage, InfobarType ibType,
                                    bool bShowCloseButton)
     : InterimItemWindow(pParent, "sfx/ui/infobar.ui", "InfoBar")
-    , m_sId(sId)
+    , m_sId(std::move(sId))
     , m_eType(ibType)
     , m_bLayingOut(false)
     , m_xImage(m_xBuilder->weld_image("image"))

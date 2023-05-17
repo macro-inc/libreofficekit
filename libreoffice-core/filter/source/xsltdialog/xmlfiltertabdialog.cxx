@@ -21,11 +21,10 @@
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <comphelper/fileurl.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <osl/file.hxx>
-#include <unotools/resmgr.hxx>
 
 #include <strings.hrc>
 #include "xmlfiltertabdialog.hxx"
@@ -225,7 +224,7 @@ bool XMLFilterTabDialog::onOk()
     {
         m_xTabCtrl->set_current_page(sErrorPage);
 
-        OUString aMessage(XsltResId(pErrorId));
+        OUString aMessage(FilterResId(pErrorId));
 
         if( aReplace2.getLength() )
         {

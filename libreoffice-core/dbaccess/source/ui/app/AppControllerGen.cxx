@@ -50,7 +50,7 @@
 #include <sfx2/mailmodelapi.hxx>
 #include <svx/dbaexchange.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <vcl/mnemonic.hxx>
 #include <vcl/svapp.hxx>
@@ -110,7 +110,7 @@ void OApplicationController::convertToView(const OUString& _sName)
             Reference<XPropertySet> xView = ::dbaui::createView(sNewName,xConnection,xSourceObject);
             if ( !xView.is() )
                 throw SQLException(DBA_RES(STR_NO_TABLE_FORMAT_INSIDE),*this, "S1000",0,Any());
-            getContainer()->elementAdded(E_TABLE,sNewName,makeAny(xView));
+            getContainer()->elementAdded(E_TABLE,sNewName,Any(xView));
         }
     }
     catch(const SQLException& )
@@ -168,7 +168,7 @@ void OApplicationController::openDialog( const OUString& _sServiceName )
         // the parent window
         pArgs[nArgPos++] <<= PropertyValue( "ParentWindow",
                                     0,
-                                    makeAny(xWindow),
+                                    Any(xWindow),
                                     PropertyState_DIRECT_VALUE);
 
         // the initial selection
@@ -179,7 +179,7 @@ void OApplicationController::openDialog( const OUString& _sServiceName )
         {
             pArgs[ nArgPos++ ] <<= PropertyValue(
                 "InitialSelection", 0,
-                makeAny( sInitialSelection ), PropertyState_DIRECT_VALUE );
+                Any( sInitialSelection ), PropertyState_DIRECT_VALUE );
         }
 
         SharedConnection xConnection( getConnection() );
@@ -433,7 +433,7 @@ Reference< XComponent > SAL_CALL OApplicationController::loadComponentWithArgume
     Reference< XComponent > xComponent( openElementWithArguments(
         ObjectName,
         lcl_objectType2ElementType( ObjectType ),
-        ForEditing ? E_OPEN_DESIGN : E_OPEN_NORMAL,
+        ForEditing ? ElementOpenMode::Design : ElementOpenMode::Normal,
         ForEditing ? SID_DB_APP_EDIT : SID_DB_APP_OPEN,
         ::comphelper::NamedValueCollection( Arguments )
     ) );
@@ -487,7 +487,7 @@ void OApplicationController::previewChanged( sal_Int32 _nMode )
             if ( nOldMode != _nMode )
             {
                 aLayoutInfo.put( "Preview", _nMode );
-                m_xDataSource->setPropertyValue( PROPERTY_LAYOUTINFORMATION, makeAny( aLayoutInfo.getPropertyValues() ) );
+                m_xDataSource->setPropertyValue( PROPERTY_LAYOUTINFORMATION, Any( aLayoutInfo.getPropertyValues() ) );
             }
         }
         catch ( const Exception& )
@@ -580,10 +580,10 @@ void OApplicationController::onDocumentOpened( const OUString& _rName, const sal
     }
 }
 
-bool OApplicationController::insertHierachyElement(ElementType _eType, const OUString& _sParentFolder, bool _bCollection, const Reference<XContent>& _xContent, bool _bMove)
+bool OApplicationController::insertHierarchyElement(ElementType _eType, const OUString& _sParentFolder, bool _bCollection, const Reference<XContent>& _xContent, bool _bMove)
 {
     Reference<XHierarchicalNameContainer> xNames(getElements(_eType), UNO_QUERY);
-    return dbaui::insertHierachyElement(getFrameWeld()
+    return dbaui::insertHierarchyElement(getFrameWeld()
                            ,getORB()
                            ,xNames
                            ,_sParentFolder
@@ -667,10 +667,10 @@ void OApplicationController::doAction(sal_uInt16 _nId, const ElementOpenMode _eO
     ElementType eType = getContainer()->getElementType();
     ::comphelper::NamedValueCollection aArguments;
     ElementOpenMode eOpenMode = _eOpenMode;
-    if ( eType == E_REPORT && E_OPEN_FOR_MAIL == _eOpenMode )
+    if ( eType == E_REPORT && ElementOpenMode::Mail == _eOpenMode )
     {
         aArguments.put("Hidden",true);
-        eOpenMode = E_OPEN_NORMAL;
+        eOpenMode = ElementOpenMode::Normal;
     }
 
     std::vector< std::pair< OUString ,Reference< XModel > > > aComponents;
@@ -686,7 +686,7 @@ void OApplicationController::doAction(sal_uInt16 _nId, const ElementOpenMode _eO
     }
 
     // special handling for mail, if more than one document is selected attach them all
-    if ( _eOpenMode != E_OPEN_FOR_MAIL )
+    if ( _eOpenMode != ElementOpenMode::Mail )
         return;
 
 

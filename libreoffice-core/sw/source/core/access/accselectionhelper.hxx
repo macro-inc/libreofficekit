@@ -41,32 +41,31 @@ class SwAccessibleSelectionHelper
 
 public:
     SwAccessibleSelectionHelper( SwAccessibleContext& rContext );
-    ~SwAccessibleSelectionHelper();
 
     // XAccessibleSelection
 
     /// @throws css::lang::IndexOutOfBoundsException
     /// @throws css::uno::RuntimeException
     void selectAccessibleChild(
-        sal_Int32 nChildIndex );
+        sal_Int64 nChildIndex );
 
     /// @throws css::lang::IndexOutOfBoundsException
     /// @throws css::uno::RuntimeException
     bool isAccessibleChildSelected(
-        sal_Int32 nChildIndex );
+        sal_Int64 nChildIndex );
     /// @throws css::uno::RuntimeException
     void selectAllAccessibleChildren(  );
     /// @throws css::uno::RuntimeException
-    sal_Int32 getSelectedAccessibleChildCount(  );
+    sal_Int64 getSelectedAccessibleChildCount(  );
     /// @throws css::lang::IndexOutOfBoundsException
     /// @throws css::uno::RuntimeException
     css::uno::Reference< css::accessibility::XAccessible > getSelectedAccessibleChild(
-        sal_Int32 nSelectedChildIndex );
+        sal_Int64 nSelectedChildIndex );
     // index has to be treated as global child index.
     /// @throws css::lang::IndexOutOfBoundsException
     /// @throws css::uno::RuntimeException
     void deselectAccessibleChild(
-        sal_Int32 nChildIndex );
+        sal_Int64 nChildIndex );
 };
 
 #endif

@@ -42,8 +42,7 @@ namespace sd::framework {
 
 ToolBarModule::ToolBarModule (
     const Reference<frame::XController>& rxController)
-    : ToolBarModuleInterfaceBase(m_aMutex),
-      mpBase(nullptr),
+    : mpBase(nullptr),
       mbMainViewSwitchUpdatePending(false)
 {
     // Tunnel through the controller to obtain a ViewShellBase.
@@ -62,31 +61,32 @@ ToolBarModule::ToolBarModule (
     mxConfigurationController->addConfigurationChangeListener(
         this,
         FrameworkHelper::msConfigurationUpdateStartEvent,
-        makeAny(gnConfigurationUpdateStartEvent));
+        Any(gnConfigurationUpdateStartEvent));
     mxConfigurationController->addConfigurationChangeListener(
         this,
         FrameworkHelper::msConfigurationUpdateEndEvent,
-        makeAny(gnConfigurationUpdateEndEvent));
+        Any(gnConfigurationUpdateEndEvent));
     mxConfigurationController->addConfigurationChangeListener(
         this,
         FrameworkHelper::msResourceActivationRequestEvent,
-        makeAny(gnResourceActivationRequestEvent));
+        Any(gnResourceActivationRequestEvent));
     mxConfigurationController->addConfigurationChangeListener(
         this,
         FrameworkHelper::msResourceDeactivationRequestEvent,
-        makeAny(gnResourceDeactivationRequestEvent));
+        Any(gnResourceDeactivationRequestEvent));
 }
 
 ToolBarModule::~ToolBarModule()
 {
 }
 
-void SAL_CALL ToolBarModule::disposing()
+void ToolBarModule::disposing(std::unique_lock<std::mutex>&)
 {
     if (mxConfigurationController.is())
+    {
         mxConfigurationController->removeConfigurationChangeListener(this);
-
-    mxConfigurationController = nullptr;
+        mxConfigurationController = nullptr;
+    }
 }
 
 void SAL_CALL ToolBarModule::notifyConfigurationChange (

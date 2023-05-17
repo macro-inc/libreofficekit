@@ -31,7 +31,7 @@
 #include <osl/file.hxx>
 #include <osl/thread.h>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/tempfile.hxx>
 #include <salhelper/singletonref.hxx>
 #include <comphelper/sequence.hxx>
@@ -41,7 +41,9 @@
 #include "digestcontext.hxx"
 #include "ciphercontext.hxx"
 
+#include <cstddef>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <nss.h>
@@ -69,24 +71,24 @@ namespace
 class InitNSSPrivate
 {
 private:
-    std::unique_ptr<utl::TempFile> m_pTempFileDatabaseDirectory;
+    std::optional<utl::TempFileNamed> m_oTempFileDatabaseDirectory;
 
 public:
     OUString getTempDatabasePath()
     {
-        if (!m_pTempFileDatabaseDirectory)
+        if (!m_oTempFileDatabaseDirectory)
         {
-            m_pTempFileDatabaseDirectory.reset(new utl::TempFile(nullptr, true));
-            m_pTempFileDatabaseDirectory->EnableKillingFile();
+            m_oTempFileDatabaseDirectory.emplace(nullptr, true);
+            m_oTempFileDatabaseDirectory->EnableKillingFile();
         }
-        return m_pTempFileDatabaseDirectory->GetFileName();
+        return m_oTempFileDatabaseDirectory->GetFileName();
     }
 
     void reset()
     {
-        if (m_pTempFileDatabaseDirectory)
+        if (m_oTempFileDatabaseDirectory)
         {
-            m_pTempFileDatabaseDirectory.reset();
+            m_oTempFileDatabaseDirectory.reset();
         }
     }
 };
@@ -222,13 +224,13 @@ const OUString & ONSSInitializer::getMozillaCurrentProfile(const css::uno::Refer
 
     if (xMozillaBootstrap.is())
     {
-        for (int i=0; i<int(SAL_N_ELEMENTS(productTypes)); ++i)
+        for (auto const productTypeIter : productTypes)
         {
-            OUString profile = xMozillaBootstrap->getDefaultProfile(productTypes[i]);
+            OUString profile = xMozillaBootstrap->getDefaultProfile(productTypeIter);
 
             if (!profile.isEmpty())
             {
-                OUString sProfilePath = xMozillaBootstrap->getProfilePath(productTypes[i], profile);
+                OUString sProfilePath = xMozillaBootstrap->getProfilePath(productTypeIter, profile);
                 if (m_sNSSPath.isEmpty())
                 {
                     SAL_INFO("xmlsecurity.xmlsec", "Using Mozilla profile " << sProfilePath);
@@ -262,12 +264,12 @@ css::uno::Sequence<css::xml::crypto::NSSProfile> SAL_CALL ONSSInitializer::getNS
 
     if (xMozillaBootstrap.is())
     {
-        for (int i=0; i<int(SAL_N_ELEMENTS(productTypes)); ++i)
+        for (auto const productTypeIter : productTypes)
         {
             uno::Sequence<OUString> aProductProfileList;
-            xMozillaBootstrap->getProfileList(productTypes[i], aProductProfileList);
+            xMozillaBootstrap->getProfileList(productTypeIter, aProductProfileList);
             for (const auto& sProfile : std::as_const(aProductProfileList))
-                aProfileList.push_back({sProfile, xMozillaBootstrap->getProfilePath(productTypes[i], sProfile), productTypes[i]});
+                aProfileList.push_back({sProfile, xMozillaBootstrap->getProfilePath(productTypeIter, sProfile), productTypeIter});
         }
     }
 
@@ -306,8 +308,8 @@ sal_Bool SAL_CALL ONSSInitializer::getIsNSSinitialized()
     return m_bIsNSSinitialized;
 }
 
-ONSSInitializer::ONSSInitializer(const css::uno::Reference< css::uno::XComponentContext > &rxContext)
-    : m_xContext(rxContext)
+ONSSInitializer::ONSSInitializer(css::uno::Reference< css::uno::XComponentContext > xContext)
+    : m_xContext(std::move(xContext))
 {
 }
 
@@ -405,15 +407,20 @@ bool nsscrypto_initialize(css::uno::Reference<css::uno::XComponentContext> const
             }
             return false;
         }
-        // Initialize and set empty password if needed
-        PK11SlotInfo* pSlot = PK11_GetInternalKeySlot();
-        if (pSlot)
-        {
-            if (PK11_NeedUserInit(pSlot))
-                PK11_InitPin(pSlot, nullptr, nullptr);
-            PK11_FreeSlot(pSlot);
-        }
     }
+
+    // Initialize and set empty password if needed
+    // note: it's possible that the first NSS_InitReadWrite() succeeds by
+    // creating a new DB; in this case it may also be necessary to call
+    // PK11_InitPin()
+    PK11SlotInfo* pSlot = PK11_GetInternalKeySlot();
+    if (pSlot)
+    {
+        if (PK11_NeedUserInit(pSlot))
+            PK11_InitPin(pSlot, nullptr, nullptr);
+        PK11_FreeSlot(pSlot);
+    }
+
     out_nss_init = true;
 
 #ifdef XMLSEC_CRYPTO_NSS

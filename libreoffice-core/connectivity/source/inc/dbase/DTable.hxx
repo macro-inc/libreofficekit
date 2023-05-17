@@ -163,7 +163,7 @@ namespace connectivity::dbase
 
             // css::lang::XUnoTunnel
             virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
-            static css::uno::Sequence< sal_Int8 > getUnoTunnelId();
+            static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
             // XAlterTable
             virtual void SAL_CALL alterColumnByName( const OUString& colName, const css::uno::Reference< css::beans::XPropertySet >& descriptor ) override;
             virtual void SAL_CALL alterColumnByIndex( sal_Int32 index, const css::uno::Reference< css::beans::XPropertySet >& descriptor ) override;
@@ -182,7 +182,7 @@ namespace connectivity::dbase
             virtual void dropColumn(sal_Int32 _nPos) override;
 
             static OUString   getEntry(file::OConnection const * _pConnection, std::u16string_view _sURL );
-            static bool     Drop_Static(const OUString& _sUrl, bool _bHasMemoFields, sdbcx::OCollection* _pIndexes );
+            static bool     Drop_Static(std::u16string_view _sUrl, bool _bHasMemoFields, sdbcx::OCollection* _pIndexes );
 
             virtual void refreshHeader() override;
 

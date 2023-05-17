@@ -35,6 +35,7 @@
 #include <vcl/Scanline.hxx>
 
 #include <bitmap/bmpfast.hxx>
+#include <quartz/cgutils.h>
 #include <quartz/salbmp.h>
 #include <quartz/utils.h>
 #include <bitmap/ScanlineTools.hxx>
@@ -42,7 +43,7 @@
 #ifdef MACOSX
 #include <osx/saldata.hxx>
 #else
-#include "saldatabasic.hxx"
+#include <ios/iosinst.hxx>
 #endif
 
 const unsigned long k32BitRedColorMask   = 0x00ff0000;
@@ -224,7 +225,6 @@ bool QuartzSalBitmap::AllocateUserData()
         switch( mnBits )
         {
         case 1:     mnBytesPerRow = (mnWidth + 7) >> 3; break;
-        case 4:     mnBytesPerRow = (mnWidth + 1) >> 1; break;
         case 8:     mnBytesPerRow = mnWidth; break;
         case 24:    mnBytesPerRow = (mnWidth << 1) + mnWidth; break;
         case 32:    mnBytesPerRow = mnWidth << 2; break;
@@ -370,20 +370,17 @@ static const BitmapPalette& GetDefaultPalette( int mnBits, bool bMonochrome )
     // since all other platforms do so, too.
     static bool bDefPalInit = false;
     static BitmapPalette aDefPalette256;
-    static BitmapPalette aDefPalette16;
     static BitmapPalette aDefPalette2;
     if( ! bDefPalInit )
     {
         bDefPalInit = true;
         aDefPalette256.SetEntryCount( 256 );
-        aDefPalette16.SetEntryCount( 16 );
         aDefPalette2.SetEntryCount( 2 );
 
         // Standard colors
         unsigned int i;
         for( i = 0; i < 16; i++ )
         {
-            aDefPalette16[i] =
             aDefPalette256[i] = BitmapColor( aImplSalSysPalEntryAry[i].mnRed,
                                              aImplSalSysPalEntryAry[i].mnGreen,
                                              aImplSalSysPalEntryAry[i].mnBlue );
@@ -414,7 +411,6 @@ static const BitmapPalette& GetDefaultPalette( int mnBits, bool bMonochrome )
     switch( mnBits )
     {
     case 1: return aDefPalette2;
-    case 4: return aDefPalette16;
     case 8: return aDefPalette256;
     default: break;
     }
@@ -521,48 +517,10 @@ static void CFRTLFree(void* /*info*/, const void* data, size_t /*size*/)
     std::free( const_cast<void*>(data) );
 }
 
-CGImageRef QuartzSalBitmap::CreateWithMask( const QuartzSalBitmap& rMask,
+CGImageRef QuartzSalBitmap::CreateWithMask( const SalBitmap& rMask,
     int nX, int nY, int nWidth, int nHeight ) const
 {
-    CGImageRef xImage( CreateCroppedImage( nX, nY, nWidth, nHeight ) );
-    if( !xImage )
-        return nullptr;
-
-    CGImageRef xMask = rMask.CreateCroppedImage( nX, nY, nWidth, nHeight );
-    if( !xMask )
-        return xImage;
-
-    // CGImageCreateWithMask() only likes masks or greyscale images => convert if needed
-    // TODO: isolate in an extra method?
-    if( !CGImageIsMask(xMask) || rMask.GetBitCount() != 8)//(CGImageGetColorSpace(xMask) != GetSalData()->mxGraySpace) )
-    {
-        const CGRect xImageRect=CGRectMake( 0, 0, nWidth, nHeight );//the rect has no offset
-
-        // create the alpha mask image fitting our image
-        // TODO: is caching the full mask or the subimage mask worth it?
-        int nMaskBytesPerRow = ((nWidth + 3) & ~3);
-        void* pMaskMem = std::malloc( nMaskBytesPerRow * nHeight );
-        CGContextRef xMaskContext = CGBitmapContextCreate( pMaskMem,
-            nWidth, nHeight, 8, nMaskBytesPerRow, GetSalData()->mxGraySpace, kCGImageAlphaNone );
-        CGContextDrawImage( xMaskContext, xImageRect, xMask );
-        CFRelease( xMask );
-        CGDataProviderRef xDataProvider( CGDataProviderCreateWithData( nullptr,
-        pMaskMem, nHeight * nMaskBytesPerRow, &CFRTLFree ) );
-
-        static const CGFloat* pDecode = nullptr;
-        xMask = CGImageMaskCreate( nWidth, nHeight, 8, 8, nMaskBytesPerRow, xDataProvider, pDecode, false );
-        CFRelease( xDataProvider );
-        CFRelease( xMaskContext );
-    }
-
-    if( !xMask )
-        return xImage;
-
-    // combine image and alpha mask
-    CGImageRef xMaskedImage = CGImageCreateWithMask( xImage, xMask );
-    CFRelease( xMask );
-    CFRelease( xImage );
-    return xMaskedImage;
+    return CreateWithSalBitmapAndMask( *this, rMask, nX, nY, nWidth, nHeight );
 }
 
 /** creates an image from the given rectangle, replacing all black pixels
@@ -573,13 +531,14 @@ CGImageRef QuartzSalBitmap::CreateColorMask( int nX, int nY, int nWidth,
     CGImageRef xMask = nullptr;
     if (m_pUserBuffer && (nX + nWidth <= mnWidth) && (nY + nHeight <= mnHeight))
     {
+        auto pSourcePixels = vcl::bitmap::getScanlineTransformer(mnBits, maPalette);
+        // Don't allocate destination buffer if there is no scanline transformer
+        if( !pSourcePixels )
+            return xMask;
+
         const sal_uInt32 nDestBytesPerRow = nWidth << 2;
         std::unique_ptr<sal_uInt32[]> pMaskBuffer(new (std::nothrow) sal_uInt32[ nHeight * nDestBytesPerRow / 4] );
-        sal_uInt32* pDest = pMaskBuffer.get();
-
-        auto pSourcePixels = vcl::bitmap::getScanlineTransformer(mnBits, maPalette);
-
-        if( pMaskBuffer && pSourcePixels )
+        if( pMaskBuffer )
         {
             sal_uInt32 nColor;
             reinterpret_cast<sal_uInt8*>(&nColor)[0] = 0xff;
@@ -588,6 +547,7 @@ CGImageRef QuartzSalBitmap::CreateColorMask( int nX, int nY, int nWidth,
             reinterpret_cast<sal_uInt8*>(&nColor)[3] = nMaskColor.GetBlue();
 
             sal_uInt8* pSource = m_pUserBuffer.get();
+            sal_uInt32* pDest = pMaskBuffer.get();
             // First to nY on y-axis, as that is our starting point (sub-image)
             if( nY )
                 pSource += nY * mnBytesPerRow;

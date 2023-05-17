@@ -150,7 +150,7 @@ bool SdrEditView::ImpDelLayerCheck(SdrObjList const * pOL, SdrLayerID nDelID) co
         SdrObjList* pSubOL = pObj->GetSubList();
 
         // explicitly test for group objects and 3d scenes
-        if(pSubOL && (dynamic_cast<const SdrObjGroup*>(pObj) != nullptr || dynamic_cast< const E3dScene* >(pObj) !=  nullptr))
+        if(pSubOL && (dynamic_cast<const SdrObjGroup*>(pObj) != nullptr || DynCastE3dScene(pObj)))
         {
             if(!ImpDelLayerCheck(pSubOL, nDelID))
             {
@@ -185,16 +185,13 @@ void SdrEditView::ImpDelLayerDelObjs(SdrObjList* pOL, SdrLayerID nDelID)
 
 
         // explicitly test for group objects and 3d scenes
-        if(pSubOL && (dynamic_cast<const SdrObjGroup*>( pObj) != nullptr || dynamic_cast<const E3dScene* >(pObj) !=  nullptr))
+        if(pSubOL && (dynamic_cast<const SdrObjGroup*>( pObj) != nullptr || DynCastE3dScene(pObj)))
         {
             if(ImpDelLayerCheck(pSubOL, nDelID))
             {
                 if( bUndo )
                     AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoDeleteObject(*pObj, true));
                 pOL->RemoveObject(nObjNum);
-
-                if( !bUndo )
-                    SdrObject::Free( pObj );
             }
             else
             {
@@ -208,8 +205,6 @@ void SdrEditView::ImpDelLayerDelObjs(SdrObjList* pOL, SdrLayerID nDelID)
                 if( bUndo )
                     AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoDeleteObject(*pObj, true));
                 pOL->RemoveObject(nObjNum);
-                if( !bUndo )
-                    SdrObject::Free( pObj );
             }
         }
     }
@@ -254,15 +249,13 @@ void SdrEditView::DeleteLayer(const OUString& rName)
                 SdrObjList* pSubOL = pObj->GetSubList();
 
                 // explicitly test for group objects and 3d scenes
-                if(pSubOL && (dynamic_cast<const SdrObjGroup*>(pObj) != nullptr || dynamic_cast<const E3dScene* >(pObj) !=  nullptr))
+                if(pSubOL && (dynamic_cast<const SdrObjGroup*>(pObj) != nullptr || DynCastE3dScene(pObj)))
                 {
                     if(ImpDelLayerCheck(pSubOL, nDelID))
                     {
                         if( bUndo )
                             AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoDeleteObject(*pObj, true));
                         pPage->RemoveObject(nObjNum);
-                        if( !bUndo )
-                            SdrObject::Free(pObj);
                     }
                     else
                     {
@@ -276,8 +269,6 @@ void SdrEditView::DeleteLayer(const OUString& rName)
                         if( bUndo )
                             AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoDeleteObject(*pObj, true));
                         pPage->RemoveObject(nObjNum);
-                        if( !bUndo )
-                            SdrObject::Free(pObj);
                     }
                 }
             }
@@ -288,6 +279,7 @@ void SdrEditView::DeleteLayer(const OUString& rName)
     if( bUndo )
     {
         AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoDeleteLayer(nLayerNum, rLA, *mpModel));
+        // coverity[leaked_storage] - ownership transferred to UndoDeleteLayer
         rLA.RemoveLayer(nLayerNum).release();
         EndUndo();
     }
@@ -676,6 +668,15 @@ void SdrEditView::CheckPossibilities()
             if (pNode1!=nullptr || pNode2!=nullptr) m_bMoveAllowed=false;
         }
     }
+
+    // Don't allow enter Diagrams
+    if (1 == nMarkCount && m_bGrpEnterPossible)
+    {
+        SdrObject* pCandidate(GetMarkedObjectByIndex(0));
+
+        if(nullptr != pCandidate && pCandidate->isDiagram())
+            m_bGrpEnterPossible = false;
+    }
 }
 
 
@@ -753,7 +754,7 @@ std::vector<SdrObject*> SdrEditView::DeleteMarkedList(SdrMarkList const& rMark)
                 SdrObjList*  pOL = pObj->getParentSdrObjListFromSdrObject();
                 const size_t nOrdNum(pObj->GetOrdNumDirect());
 
-                bool bIs3D = dynamic_cast< E3dObject* >(pObj);
+                bool bIs3D = DynCastE3dObject(pObj);
                 // set up a scene updater if object is a 3d object
                 if(bIs3D)
                 {
@@ -783,14 +784,11 @@ std::vector<SdrObject*> SdrEditView::DeleteMarkedList(SdrMarkList const& rMark)
     return ret;
 }
 
-static void lcl_LazyDelete(std::vector<SdrObject*> & rLazyDelete)
+static void lcl_LazyDelete(std::vector<rtl::Reference<SdrObject>> & rLazyDelete)
 {
     // now delete removed scene objects
     while (!rLazyDelete.empty())
-    {
-        SdrObject::Free( rLazyDelete.back() );
         rLazyDelete.pop_back();
-    }
 }
 
 void SdrEditView::DeleteMarkedObj()
@@ -805,7 +803,7 @@ void SdrEditView::DeleteMarkedObj()
     BrkAction();
     BegUndo(SvxResId(STR_EditDelete),GetDescriptionOfMarkedObjects(),SdrRepeatFunc::Delete);
 
-    std::vector<SdrObject*> lazyDeleteObjects;
+    std::vector<rtl::Reference<SdrObject>> lazyDeleteObjects;
     // remove as long as something is selected. This allows to schedule objects for
     // removal for a next run as needed
     while(GetMarkedObjectCount())
@@ -932,16 +930,16 @@ void SdrEditView::CopyMarkedObj()
     for (size_t nm=0; nm<nMarkCount; ++nm) {
         SdrMark* pM=aSourceObjectsForCopy.GetMark(nm);
         SdrObject* pSource(pM->GetMarkedSdrObj());
-        SdrObject* pO(pSource->CloneSdrObject(pSource->getSdrModelFromSdrObject()));
+        rtl::Reference<SdrObject> pO(pSource->CloneSdrObject(pSource->getSdrModelFromSdrObject()));
         if (pO!=nullptr) {
-            pM->GetPageView()->GetObjList()->InsertObjectThenMakeNameUnique(pO, aNameSet);
+            pM->GetPageView()->GetObjList()->InsertObjectThenMakeNameUnique(pO.get(), aNameSet);
 
             if( bUndo )
                 AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoCopyObject(*pO));
 
             SdrMark aME(*pM);
-            aME.SetMarkedSdrObj(pO);
-            aCloneList.AddPair(pM->GetMarkedSdrObj(), pO);
+            aME.SetMarkedSdrObj(pO.get());
+            aCloneList.AddPair(pM->GetMarkedSdrObj(), pO.get());
 
             if (pM->GetUser()==0)
             {
@@ -986,7 +984,6 @@ bool SdrEditView::InsertObjectAtView(SdrObject* pObj, SdrPageView& rPV, SdrInser
         SdrLayerID nLayer=rPV.GetPage()->GetLayerAdmin().GetLayerID(maActualLayer);
         if (nLayer==SDRLAYER_NOTFOUND) nLayer=SdrLayerID(0);
         if (rPV.GetLockedLayers().IsSet(nLayer) || !rPV.GetVisibleLayers().IsSet(nLayer)) {
-            SdrObject::Free( pObj ); // Layer locked or invisible
             return false;
         }
         pObj->NbcSetLayer(nLayer);
@@ -1028,11 +1025,11 @@ void SdrEditView::ReplaceObjectAtView(SdrObject* pOldObj, SdrPageView& rPV, SdrO
     if(IsTextEdit())
     {
 #ifdef DBG_UTIL
-        if(auto pTextObj = dynamic_cast< SdrTextObj* >(pOldObj))
+        if(auto pTextObj = DynCastSdrTextObj(pOldObj))
             if (pTextObj->IsTextEditActive())
                 OSL_ENSURE(false, "OldObject is in TextEdit mode, this has to be ended before replacing it using SdrEndTextEdit (!)");
 
-        if(auto pTextObj = dynamic_cast< SdrTextObj* >(pNewObj))
+        if(auto pTextObj = DynCastSdrTextObj(pNewObj))
             if (pTextObj->IsTextEditActive())
                 OSL_ENSURE(false, "NewObject is in TextEdit mode, this has to be ended before replacing it using SdrEndTextEdit (!)");
 #endif
@@ -1054,9 +1051,6 @@ void SdrEditView::ReplaceObjectAtView(SdrObject* pOldObj, SdrPageView& rPV, SdrO
         MarkObj( pOldObj, &rPV, true /*unmark!*/ );
 
     pOL->ReplaceObject(pNewObj,pOldObj->GetOrdNum());
-
-    if( !bUndo )
-        SdrObject::Free( pOldObj );
 
     if (bMark) MarkObj(pNewObj,&rPV);
 }

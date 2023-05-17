@@ -25,15 +25,13 @@
 #include <ResId.hxx>
 #include <strings.hrc>
 #include <ObjectIdentifier.hxx>
+#include <ChartController.hxx>
+#include <ChartModel.hxx>
 
 #include <cppuhelper/supportsservice.hxx>
 #include <o3tl/safeint.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <vcl/svapp.hxx>
-
-#include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/view/XSelectionSupplier.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
 namespace chart { class ExplicitValueProvider; }
 
@@ -81,7 +79,7 @@ SelectorListBox::~SelectorListBox()
 }
 
 static void lcl_addObjectsToList( const ObjectHierarchy& rHierarchy, const  ObjectIdentifier & rParent, std::vector< ListBoxEntryData >& rEntries
-                          , const sal_Int32 nHierarchyDepth, const Reference< chart2::XChartDocument >& xChartDoc )
+                          , const sal_Int32 nHierarchyDepth, const rtl::Reference<::chart::ChartModel>& xChartDoc )
 {
     ObjectHierarchy::tChildContainer aChildren( rHierarchy.getChildren(rParent) );
     for (auto const& child : aChildren)
@@ -95,9 +93,9 @@ static void lcl_addObjectsToList( const ObjectHierarchy& rHierarchy, const  Obje
     }
 }
 
-void SelectorListBox::SetChartController( const Reference< frame::XController >& xChartController )
+void SelectorListBox::SetChartController( const rtl::Reference< ::chart::ChartController >& xChartController )
 {
-    m_xChartController = xChartController;
+    m_xChartController = xChartController.get();
 }
 
 void SelectorListBox::UpdateChartElementsListAndSelection()
@@ -105,26 +103,20 @@ void SelectorListBox::UpdateChartElementsListAndSelection()
     m_xWidget->clear();
     m_aEntries.clear();
 
-    Reference< frame::XController > xChartController( m_xChartController );
+    rtl::Reference< ::chart::ChartController > xChartController = m_xChartController.get();
     if( xChartController.is() )
     {
-        Reference< view::XSelectionSupplier > xSelectionSupplier( xChartController, uno::UNO_QUERY);
-        ObjectIdentifier aSelectedOID;
-        OUString aSelectedCID;
-        if( xSelectionSupplier.is() )
-        {
-            aSelectedOID = ObjectIdentifier( xSelectionSupplier->getSelection() );
-            aSelectedCID = aSelectedOID.getObjectCID();
-        }
+        ObjectIdentifier aSelectedOID( xChartController->getSelection() );
+        OUString aSelectedCID = aSelectedOID.getObjectCID();
 
-        Reference< chart2::XChartDocument > xChartDoc( xChartController->getModel(), uno::UNO_QUERY );
+        rtl::Reference<::chart::ChartModel> xChartDoc = xChartController->getChartModel();
         ObjectType eType( aSelectedOID.getObjectType() );
         bool bAddSelectionToList = false;
         if ( eType == OBJECTTYPE_DATA_POINT || eType == OBJECTTYPE_DATA_LABEL || eType == OBJECTTYPE_SHAPE )
             bAddSelectionToList = true;
 
         Reference< uno::XInterface > xChartView;
-        Reference< lang::XMultiServiceFactory > xFact( xChartController->getModel(), uno::UNO_QUERY );
+        rtl::Reference< ChartModel > xFact = xChartController->getChartModel();
         if( xFact.is() )
             xChartView = xFact->createInstance( CHART_VIEW_SERVICE_NAME );
         ExplicitValueProvider* pExplicitValueProvider = nullptr; //ExplicitValueProvider::getExplicitValueProvider(xChartView); this creates all visible data points, that's too much
@@ -166,7 +158,8 @@ void SelectorListBox::UpdateChartElementsListAndSelection()
         sal_uInt16 nN=0;
         for (auto const& entry : m_aEntries)
         {
-            m_xWidget->append_text(entry.UIName);
+            // tdf#152087 strip any newlines from the entry
+            m_xWidget->append_text(entry.UIName.replaceAll("\n", " "));
             if ( !bSelectionFound && aSelectedOID == entry.OID )
             {
                 nEntryPosToSelect = nN;
@@ -190,7 +183,7 @@ void SelectorListBox::ReleaseFocus_Impl()
         return;
     }
 
-    Reference< frame::XController > xController( m_xChartController );
+    rtl::Reference< ::chart::ChartController > xController = m_xChartController.get();
     Reference< frame::XFrame > xFrame( xController->getFrame() );
     if ( xFrame.is() && xFrame->getContainerWindow().is() )
         xFrame->getContainerWindow()->setFocus();
@@ -204,9 +197,9 @@ IMPL_LINK(SelectorListBox, SelectHdl, weld::ComboBox&, rComboBox, void)
         if (o3tl::make_unsigned(nPos) < m_aEntries.size())
         {
             ObjectIdentifier aOID = m_aEntries[nPos].OID;
-            Reference< view::XSelectionSupplier > xSelectionSupplier( m_xChartController.get(), uno::UNO_QUERY );
-            if( xSelectionSupplier.is() )
-                xSelectionSupplier->select( aOID.getAny() );
+            rtl::Reference< ::chart::ChartController > xController = m_xChartController.get();
+            if( xController.is() )
+                xController->select( aOID.getAny() );
         }
         ReleaseFocus_Impl();
     }
@@ -291,7 +284,9 @@ void SAL_CALL ElementSelectorToolbarController::statusChanged( const frame::Feat
         {
             Reference< frame::XController > xChartController;
             rEvent.State >>= xChartController;
-            m_apSelectorListBox->SetChartController( xChartController );
+            ::chart::ChartController* pController = dynamic_cast<::chart::ChartController*>(xChartController.get());
+            assert(!xChartController || pController);
+            m_apSelectorListBox->SetChartController( pController );
             m_apSelectorListBox->UpdateChartElementsListAndSelection();
         }
     }

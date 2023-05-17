@@ -30,6 +30,10 @@
 #include "vbaworkbook.hxx"
 
 #include <unordered_map>
+#include <utility>
+
+#include <osl/file.hxx>
+#include <ooo/vba/excel/XApplication.hpp>
 
 using namespace ::com::sun::star;
 using namespace ::ooo::vba;
@@ -48,7 +52,7 @@ static uno::Any ComponentToWindow( const uno::Any& aSource, const uno::Reference
     // !! TODO !! iterate over all controllers
     uno::Reference< frame::XController > xController( xModel->getCurrentController(), uno::UNO_SET_THROW );
     uno::Reference< excel::XWindow > xWin( new ScVbaWindow( lcl_createWorkbookHIParent( xModel, xContext, aApplication ), xContext, xModel, xController ) );
-    return uno::makeAny( xWin );
+    return uno::Any( xWin );
 }
 
 typedef std::vector < uno::Reference< sheet::XSpreadsheetDocument > > Components;
@@ -65,14 +69,14 @@ protected:
 
 public:
     /// @throws uno::RuntimeException
-    WindowComponentEnumImpl( const uno::Reference< uno::XComponentContext >& xContext, Components&& components )
-        :  m_xContext( xContext ), m_components( std::move(components) )
+    WindowComponentEnumImpl( uno::Reference< uno::XComponentContext > xContext, Components&& components )
+        :  m_xContext(std::move( xContext )), m_components( std::move(components) )
     {
         m_it = m_components.begin();
     }
 
     /// @throws uno::RuntimeException
-    explicit WindowComponentEnumImpl( const uno::Reference< uno::XComponentContext >& xContext ) :  m_xContext( xContext )
+    explicit WindowComponentEnumImpl( uno::Reference< uno::XComponentContext > xContext ) :  m_xContext(std::move( xContext ))
     {
         uno::Reference< frame::XDesktop2 > xDesktop = frame::Desktop::create(m_xContext);
         uno::Reference< container::XEnumeration > xComponents = xDesktop->getComponents()->createEnumeration();
@@ -96,7 +100,7 @@ public:
         {
             throw container::NoSuchElementException();
         }
-        return makeAny( *(m_it++) );
+        return css::uno::Any( *(m_it++) );
     }
 };
 
@@ -104,7 +108,7 @@ class WindowEnumImpl : public  WindowComponentEnumImpl
 {
     uno::Any m_aApplication;
 public:
-    WindowEnumImpl( const uno::Reference< uno::XComponentContext >& xContext,  const uno::Any& aApplication ): WindowComponentEnumImpl( xContext ), m_aApplication( aApplication ) {}
+    WindowEnumImpl( const uno::Reference< uno::XComponentContext >& xContext,  uno::Any  aApplication ): WindowComponentEnumImpl( xContext ), m_aApplication(std::move( aApplication )) {}
     virtual uno::Any SAL_CALL nextElement(  ) override
     {
         return ComponentToWindow( WindowComponentEnumImpl::nextElement(), m_xContext, m_aApplication );
@@ -126,8 +130,12 @@ class WindowsAccessImpl : public WindowsAccessImpl_BASE
     Components m_windows;
     NameIndexHash namesToIndices;
 public:
-    explicit WindowsAccessImpl( const uno::Reference< uno::XComponentContext >& xContext ):m_xContext( xContext )
+    explicit WindowsAccessImpl( uno::Reference< uno::XComponentContext > xContext ):m_xContext(std::move( xContext ))
     {
+        css::uno::Reference<css::container::XNameAccess> xNameAccess(m_xContext,
+                                                                     css::uno::UNO_QUERY_THROW);
+        const auto aAppplication = xNameAccess->getByName("Application");
+
         uno::Reference< container::XEnumeration > xEnum = new WindowComponentEnumImpl( m_xContext );
         sal_Int32 nIndex=0;
         while( xEnum->hasMoreElements() )
@@ -137,6 +145,21 @@ public:
             {
                 m_windows.push_back( xNext );
                 uno::Reference< frame::XModel > xModel( xNext, uno::UNO_QUERY_THROW ); // that the spreadsheetdocument is a xmodel is a given
+
+                // tdf#126457 - add workbook name to window titles
+                rtl::Reference<ScVbaWorkbook> workbook(new ScVbaWorkbook(
+                    uno::Reference<XHelperInterface>(aAppplication, uno::UNO_QUERY_THROW),
+                    m_xContext, xModel));
+                const OUString aWorkBookName(workbook->getName());
+                if (!hasByName(aWorkBookName))
+                    namesToIndices[aWorkBookName] = nIndex;
+
+                // tdf#126457 - add file url to window titles
+                OUString sName;
+                ::osl::File::getSystemPathFromFileURL(xModel->getURL(), sName);
+                if (!hasByName(sName))
+                    namesToIndices[sName] = nIndex;
+
                 // !! TODO !! iterate over all controllers
                 uno::Reference< frame::XController > xController( xModel->getCurrentController(), uno::UNO_SET_THROW );
                 uno::Reference< XHelperInterface > xTemp;  // temporary needed for g++ 3.3.5
@@ -164,7 +187,7 @@ public:
         if ( Index < 0
             || o3tl::make_unsigned( Index ) >= m_windows.size() )
             throw lang::IndexOutOfBoundsException();
-        return makeAny( m_windows[ Index ] ); // returns xspreadsheetdoc
+        return css::uno::Any( m_windows[ Index ] ); // returns xspreadsheetdoc
     }
 
     //XElementAccess
@@ -184,7 +207,7 @@ public:
         NameIndexHash::const_iterator it = namesToIndices.find( aName );
         if ( it == namesToIndices.end() )
             throw container::NoSuchElementException();
-        return makeAny( m_windows[ it->second ] );
+        return css::uno::Any( m_windows[ it->second ] );
 
     }
 

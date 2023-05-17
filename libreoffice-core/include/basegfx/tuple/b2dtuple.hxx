@@ -20,7 +20,6 @@
 #pragma once
 
 #include <sal/types.h>
-#include <basegfx/numeric/ftools.hxx>
 #include <basegfx/basegfxdllapi.h>
 #include <basegfx/tuple/Tuple2D.hxx>
 
@@ -60,6 +59,10 @@ namespace basegfx
         */
         B2DTuple(double fX, double fY)
             : Tuple2D(fX, fY)
+        {}
+
+        B2DTuple(Tuple2D<double> const& rTuple)
+            : Tuple2D(rTuple)
         {}
 
         /** Create a copy of a 2D integer Tuple
@@ -117,34 +120,6 @@ namespace basegfx
         return B2DTuple(
             rtl_math_approxEqual(rOld1.getX(), rOld2.getX()) ? rOld1.getX() : (rOld1.getX() + rOld2.getX()) * 0.5,
             rtl_math_approxEqual(rOld1.getY(), rOld2.getY()) ? rOld1.getY() : (rOld1.getY() + rOld2.getY()) * 0.5);
-    }
-
-    inline B2DTuple operator+(const B2DTuple& rTupA, const B2DTuple& rTupB)
-    {
-        B2DTuple aSum(rTupA);
-        aSum += rTupB;
-        return aSum;
-    }
-
-    inline B2DTuple operator-(const B2DTuple& rTupA, const B2DTuple& rTupB)
-    {
-        B2DTuple aSub(rTupA);
-        aSub -= rTupB;
-        return aSub;
-    }
-
-    inline B2DTuple operator/(const B2DTuple& rTupA, const B2DTuple& rTupB)
-    {
-        B2DTuple aDiv(rTupA);
-        aDiv /= rTupB;
-        return aDiv;
-    }
-
-    inline B2DTuple operator*(const B2DTuple& rTupA, const B2DTuple& rTupB)
-    {
-        B2DTuple aMul(rTupA);
-        aMul *= rTupB;
-        return aMul;
     }
 
     inline B2DTuple operator*(const B2DTuple& rTup, double t)

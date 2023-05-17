@@ -21,6 +21,7 @@
 #include "WrappedSeriesOrDiagramProperty.hxx"
 #include <FastPropertyIdRanges.hxx>
 #include <RegressionCurveHelper.hxx>
+#include <RegressionCurveModel.hxx>
 #include <ErrorBar.hxx>
 #include <StatisticsHelper.hxx>
 #include <unonames.hxx>
@@ -31,7 +32,6 @@
 #include <com/sun/star/chart/ErrorBarStyle.hpp>
 #include <com/sun/star/chart/ChartErrorIndicatorType.hpp>
 #include <com/sun/star/chart/ChartRegressionCurveType.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart2/data/XRangeXMLConversion.hpp>
 #include <com/sun/star/chart2/XRegressionCurveContainer.hpp>
 #include <utility>
@@ -126,8 +126,8 @@ uno::Reference< chart2::data::XDataProvider > lcl_getDataProviderFromContact(
     uno::Reference< chart2::data::XDataProvider > xResult;
     if( spChart2ModelContact)
     {
-        uno::Reference< chart2::XChartDocument > xChartDoc(
-            spChart2ModelContact->getChart2Document());
+        rtl::Reference< ChartModel > xChartDoc(
+            spChart2ModelContact->getDocumentModel());
         if( xChartDoc.is())
             xResult.set( xChartDoc->getDataProvider());
     }
@@ -840,9 +840,10 @@ css::chart::ChartRegressionCurveType WrappedRegressionCurvesProperty::getValueFr
 void WrappedRegressionCurvesProperty::setValueToSeries( const Reference< beans::XPropertySet >& xSeriesPropertySet, const css::chart::ChartRegressionCurveType& aNewValue ) const
 {
     uno::Reference< chart2::XRegressionCurveContainer > xRegressionCurveContainer( xSeriesPropertySet, uno::UNO_QUERY );
-    uno::Reference< chart2::XRegressionCurve > xRegressionCurve( xSeriesPropertySet, uno::UNO_QUERY );
-
-    if( xRegressionCurveContainer.is() && xRegressionCurve.is() )
+    if (!xRegressionCurveContainer)
+        return;
+    rtl::Reference< ::chart::RegressionCurveModel> xRegressionCurve = RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegressionCurveContainer );
+    if( xRegressionCurve.is() )
     {
         SvxChartRegress eNewRegressionType = lcl_getRegressionType( aNewValue );
 
@@ -906,7 +907,7 @@ Reference< beans::XPropertySet > WrappedStatisticPropertySetProperty::getValueFr
     {
         case PROPERTY_SET_TYPE_REGRESSION:
             if( xRegCnt.is() )
-                xResult.set( RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegCnt ), uno::UNO_QUERY );
+                xResult = RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegCnt );
             break;
         case PROPERTY_SET_TYPE_ERROR_BAR:
             if( xSeriesPropertySet.is())
@@ -914,7 +915,7 @@ Reference< beans::XPropertySet > WrappedStatisticPropertySetProperty::getValueFr
             break;
         case PROPERTY_SET_TYPE_MEAN_VALUE:
             if( xRegCnt.is() )
-                xResult.set( RegressionCurveHelper::getMeanValueLine( xRegCnt ), uno::UNO_QUERY );
+                xResult = RegressionCurveHelper::getMeanValueLine( xRegCnt );
             break;
     }
 

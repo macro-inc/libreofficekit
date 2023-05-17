@@ -33,7 +33,6 @@
 #include <com/sun/star/embed/StorageWrappedTargetException.hpp>
 #include <com/sun/star/embed/XTransactedObject.hpp>
 #include <com/sun/star/lang/IllegalAccessException.hpp>
-#include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
 #include <com/sun/star/io/IOException.hpp>
 #include <com/sun/star/io/XStream.hpp>
@@ -49,12 +48,15 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/propertyvalue.hxx>
-#include <comphelper/multicontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
+#include <mutex>
 #include <string_view>
 #include <unordered_map>
 
@@ -89,7 +91,7 @@ public:
         return {"com.sun.star.ui.UIConfigurationManager"};
     }
 
-    explicit UIConfigurationManager( const css::uno::Reference< css::uno::XComponentContext > & rxContext );
+    explicit UIConfigurationManager( css::uno::Reference< css::uno::XComponentContext > xContext );
 
     // XComponent
     virtual void SAL_CALL dispose() override;
@@ -111,6 +113,7 @@ public:
     virtual void SAL_CALL insertSettings( const OUString& NewResourceURL, const css::uno::Reference< css::container::XIndexAccess >& aNewData ) override;
     virtual css::uno::Reference< css::uno::XInterface > SAL_CALL getImageManager() override;
     virtual css::uno::Reference< css::ui::XAcceleratorConfiguration > SAL_CALL getShortCutManager() override;
+    virtual css::uno::Reference< css::ui::XAcceleratorConfiguration > SAL_CALL createShortCutManager() override;
     virtual css::uno::Reference< css::uno::XInterface > SAL_CALL getEventsManager() override;
 
     // XUIConfigurationPersistence
@@ -135,8 +138,8 @@ private:
 
     struct UIElementInfo
     {
-        UIElementInfo( const OUString& rResourceURL, const OUString& rUIName ) :
-            aResourceURL( rResourceURL), aUIName( rUIName ) {}
+        UIElementInfo( OUString _aResourceURL, OUString _aUIName ) :
+            aResourceURL(std::move( _aResourceURL)), aUIName(std::move( _aUIName )) {}
         OUString   aResourceURL;
         OUString   aUIName;
     };
@@ -190,8 +193,9 @@ private:
     bool                                                      m_bDisposed;
     OUString                                                  m_aPropUIName;
     css::uno::Reference< css::uno::XComponentContext >        m_xContext;
-    osl::Mutex                                                m_mutex;
-    comphelper::OMultiTypeInterfaceContainerHelper2           m_aListenerContainer;   /// container for ALL Listener
+    std::mutex                                                m_mutex;
+    comphelper::OInterfaceContainerHelper4<css::lang::XEventListener>               m_aEventListeners;
+    comphelper::OInterfaceContainerHelper4<css::ui::XUIConfigurationListener>       m_aConfigListeners;
     rtl::Reference< ImageManager >                            m_xImageManager;
     css::uno::Reference< css::ui::XAcceleratorConfiguration > m_xAccConfig;
 };
@@ -210,20 +214,19 @@ std::u16string_view UIELEMENTTYPENAMES[] =
     u"" UIELEMENTTYPE_TOOLPANEL_NAME
 };
 
-const char       RESOURCEURL_PREFIX[] = "private:resource/";
-const sal_Int32  RESOURCEURL_PREFIX_SIZE = 17;
+constexpr std::u16string_view RESOURCEURL_PREFIX = u"private:resource/";
 
-sal_Int16 RetrieveTypeFromResourceURL( const OUString& aResourceURL )
+sal_Int16 RetrieveTypeFromResourceURL( std::u16string_view aResourceURL )
 {
 
-    if (( aResourceURL.startsWith( RESOURCEURL_PREFIX ) ) &&
-        ( aResourceURL.getLength() > RESOURCEURL_PREFIX_SIZE ))
+    if (( o3tl::starts_with(aResourceURL, RESOURCEURL_PREFIX ) ) &&
+        ( aResourceURL.size() > RESOURCEURL_PREFIX.size() ))
     {
-        OUString aTmpStr     = aResourceURL.copy( RESOURCEURL_PREFIX_SIZE );
-        sal_Int32     nIndex = aTmpStr.indexOf( '/' );
-        if (( nIndex > 0 ) &&  ( aTmpStr.getLength() > nIndex ))
+        std::u16string_view aTmpStr = aResourceURL.substr( RESOURCEURL_PREFIX.size() );
+        size_t nIndex = aTmpStr.find( '/' );
+        if (( nIndex > 0 ) &&  ( aTmpStr.size() > nIndex ))
         {
-            OUString aTypeStr( aTmpStr.copy( 0, nIndex ));
+            std::u16string_view aTypeStr( aTmpStr.substr( 0, nIndex ));
             for ( int i = 0; i < UIElementType::COUNT; i++ )
             {
                 if ( aTypeStr == UIELEMENTTYPENAMES[i] )
@@ -235,14 +238,14 @@ sal_Int16 RetrieveTypeFromResourceURL( const OUString& aResourceURL )
     return UIElementType::UNKNOWN;
 }
 
-OUString RetrieveNameFromResourceURL( const OUString& aResourceURL )
+OUString RetrieveNameFromResourceURL( std::u16string_view aResourceURL )
 {
-    if (( aResourceURL.startsWith( RESOURCEURL_PREFIX ) ) &&
-        ( aResourceURL.getLength() > RESOURCEURL_PREFIX_SIZE ))
+    if (( o3tl::starts_with(aResourceURL, RESOURCEURL_PREFIX ) ) &&
+        ( aResourceURL.size() > RESOURCEURL_PREFIX.size() ))
     {
-        sal_Int32 nIndex = aResourceURL.lastIndexOf( '/' );
-        if (( nIndex > 0 ) && (( nIndex+1 ) < aResourceURL.getLength()))
-            return aResourceURL.copy( nIndex+1 );
+        size_t nIndex = aResourceURL.rfind( '/' );
+        if ( (nIndex > 0) && (nIndex != std::u16string_view::npos) && (( nIndex+1 ) < aResourceURL.size()) )
+            return OUString(aResourceURL.substr( nIndex+1 ));
     }
 
     return OUString();
@@ -299,11 +302,11 @@ void UIConfigurationManager::impl_preloadUIElementTypeList( sal_Int16 nElementTy
                 sal_Int32 nIndex = rElementName.lastIndexOf( '.' );
                 if (( nIndex > 0 ) && ( nIndex < rElementName.getLength() ))
                 {
-                    OUString aExtension( rElementName.copy( nIndex+1 ));
-                    OUString aUIElementName( rElementName.copy( 0, nIndex ));
+                    std::u16string_view aExtension( rElementName.subView( nIndex+1 ));
+                    std::u16string_view aUIElementName( rElementName.subView( 0, nIndex ));
 
-                    if (!aUIElementName.isEmpty() &&
-                        ( aExtension.equalsIgnoreAsciiCase("xml")))
+                    if (!aUIElementName.empty() &&
+                        ( o3tl::equalsIgnoreAsciiCase(aExtension, u"xml")))
                     {
                         aUIElementData.aResourceURL = aResURLPrefix + aUIElementName;
                         aUIElementData.aName        = rElementName;
@@ -668,13 +671,12 @@ void UIConfigurationManager::impl_Initialize()
     }
 }
 
-UIConfigurationManager::UIConfigurationManager( const css::uno::Reference< css::uno::XComponentContext > & rxContext ) :
+UIConfigurationManager::UIConfigurationManager( css::uno::Reference< css::uno::XComponentContext > xContext ) :
       m_bReadOnly( true )
     , m_bModified( false )
     , m_bDisposed( false )
     , m_aPropUIName( "UIName" )
-    , m_xContext( rxContext )
-    , m_aListenerContainer( m_mutex )
+    , m_xContext(std::move( xContext ))
 {
     // Make sure we have a default initialized entry for every layer and user interface element type!
     // The following code depends on this!
@@ -687,7 +689,14 @@ void SAL_CALL UIConfigurationManager::dispose()
     Reference< XComponent > xThis(this);
 
     css::lang::EventObject aEvent( xThis );
-    m_aListenerContainer.disposeAndClear( aEvent );
+    {
+        std::unique_lock aGuard(m_mutex);
+        m_aEventListeners.disposeAndClear( aGuard, aEvent );
+    }
+    {
+        std::unique_lock aGuard(m_mutex);
+        m_aConfigListeners.disposeAndClear( aGuard, aEvent );
+    }
 
     {
         SolarMutexGuard g;
@@ -718,13 +727,15 @@ void SAL_CALL UIConfigurationManager::addEventListener( const Reference< XEventL
             throw DisposedException();
     }
 
-    m_aListenerContainer.addInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aEventListeners.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL UIConfigurationManager::removeEventListener( const Reference< XEventListener >& xListener )
 {
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
-    m_aListenerContainer.removeInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aEventListeners.removeInterface( aGuard, xListener );
 }
 
 // XUIConfigurationManager
@@ -738,13 +749,15 @@ void SAL_CALL UIConfigurationManager::addConfigurationListener( const Reference<
             throw DisposedException();
     }
 
-    m_aListenerContainer.addInterface( cppu::UnoType<XUIConfigurationListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aConfigListeners.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL UIConfigurationManager::removeConfigurationListener( const Reference< css::ui::XUIConfigurationListener >& xListener )
 {
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
-    m_aListenerContainer.removeInterface( cppu::UnoType<XUIConfigurationListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aConfigListeners.removeInterface( aGuard, xListener );
 }
 
 void SAL_CALL UIConfigurationManager::reset()
@@ -1125,6 +1138,11 @@ Reference< XInterface > SAL_CALL UIConfigurationManager::getImageManager()
     return Reference< XInterface >( static_cast<cppu::OWeakObject*>(m_xImageManager.get()), UNO_QUERY );
 }
 
+Reference< XAcceleratorConfiguration > SAL_CALL UIConfigurationManager::createShortCutManager()
+{
+    return DocumentAcceleratorConfiguration::createWithDocumentRoot(m_xContext, m_xDocConfigStorage);
+}
+
 Reference< XAcceleratorConfiguration > SAL_CALL UIConfigurationManager::getShortCutManager()
 {
     // SAFE ->
@@ -1334,33 +1352,21 @@ sal_Bool SAL_CALL UIConfigurationManager::isReadOnly()
 
 void UIConfigurationManager::implts_notifyContainerListener( const ConfigurationEvent& aEvent, NotifyOp eOp )
 {
-    comphelper::OInterfaceContainerHelper2* pContainer = m_aListenerContainer.getContainer( cppu::UnoType<css::ui::XUIConfigurationListener>::get());
-    if ( pContainer == nullptr )
-        return;
-
-    comphelper::OInterfaceIteratorHelper2 pIterator( *pContainer );
-    while ( pIterator.hasMoreElements() )
-    {
-        try
+    std::unique_lock aGuard(m_mutex);
+    m_aConfigListeners.forEach(aGuard, [&eOp, &aEvent](const css::uno::Reference<XUIConfigurationListener>& l) {
+        switch ( eOp )
         {
-            switch ( eOp )
-            {
-                case NotifyOp_Replace:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementReplaced( aEvent );
-                    break;
-                case NotifyOp_Insert:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementInserted( aEvent );
-                    break;
-                case NotifyOp_Remove:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementRemoved( aEvent );
-                    break;
-            }
+            case NotifyOp_Replace:
+                l->elementReplaced( aEvent );
+                break;
+            case NotifyOp_Insert:
+                l->elementInserted( aEvent );
+                break;
+            case NotifyOp_Remove:
+                l->elementRemoved( aEvent );
+                break;
         }
-        catch( const css::uno::RuntimeException& )
-        {
-            pIterator.remove();
-        }
-    }
+    });
 }
 
 }

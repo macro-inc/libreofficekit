@@ -15,6 +15,7 @@
 #include <comphelper/comphelperdllapi.h>
 #include <mutex>
 #include <condition_variable>
+#include <cstddef>
 #include <vector>
 #include <memory>
 
@@ -36,7 +37,7 @@ protected:
     /// once pushed ThreadTasks are destroyed by the pool
     virtual   ~ThreadTask() {}
 public:
-    ThreadTask(const std::shared_ptr<ThreadTaskTag>& pTag);
+    ThreadTask(std::shared_ptr<ThreadTaskTag> pTag);
 };
 
 /// A very basic thread-safe thread pool implementation
@@ -55,9 +56,9 @@ public:
     /// limit to avoid spawning an unnecessarily
     /// large number of threads on high-core boxes.
     /// MAX_CONCURRENCY env. var. controls the cap.
-    static      sal_Int32 getPreferredConcurrency();
+    static      std::size_t getPreferredConcurrency();
 
-    ThreadPool( sal_Int32 nWorkers );
+    ThreadPool( std::size_t nWorkers );
     ~ThreadPool();
 
     /// push a new task onto the work queue

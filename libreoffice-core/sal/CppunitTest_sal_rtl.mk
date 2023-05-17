@@ -20,6 +20,9 @@ $(eval $(call gb_CppunitTest_add_exception_objects,sal_rtl,\
 	sal/qa/rtl/doublelock/rtl_doublelocking \
 	sal/qa/rtl/locale/rtl_locale \
 	sal/qa/rtl/math/test-rtl-math \
+	sal/qa/rtl/math/test-std-math \
+	sal/qa/rtl/ostring/rtl_str \
+	sal/qa/rtl/oustring/rtl_ustr \
 	sal/qa/rtl/oustringbuffer/test_oustringbuffer_appendchar \
 	sal/qa/rtl/oustringbuffer/test_oustringbuffer_appenduninitialized \
 	sal/qa/rtl/oustringbuffer/test_oustringbuffer_assign \
@@ -35,6 +38,7 @@ $(eval $(call gb_CppunitTest_add_exception_objects,sal_rtl,\
 	sal/qa/rtl/strings/test_ostring \
 	sal/qa/rtl/strings/test_ostring_concat \
 	sal/qa/rtl/strings/test_ostring_stringliterals \
+	sal/qa/rtl/strings/test_ostringbuffer \
 	sal/qa/rtl/strings/test_oustring_compare \
 	sal/qa/rtl/strings/test_oustring_concat \
 	sal/qa/rtl/strings/test_oustring_convert \

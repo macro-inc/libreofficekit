@@ -26,7 +26,6 @@
 #include <sfx2/dispatch.hxx>
 #include <sfx2/request.hxx>
 #include <svl/stritem.hxx>
-#include <tools/UnitConversion.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <globstr.hrc>
@@ -48,12 +47,9 @@
 #include <columnspanset.hxx>
 #include <comphelper/lok.hxx>
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
-#include <inputhdl.hxx>
 #include <inputwin.hxx>
 
 #include <memory>
-
-#define IS_EDITMODE() GetViewData().HasEditView( GetViewData().GetActivePart() )
 
 using sc::TwipsToEvenHMM;
 
@@ -165,7 +161,7 @@ void ScCellShell::Execute( SfxRequest& rReq )
     if (nSlot != SID_CURRENTCELL)       // this comes with MouseButtonUp
         pTabViewShell->HideListBox();   // Autofilter-DropDown-Listbox
 
-    if ( IS_EDITMODE() )
+    if ( GetViewData().HasEditView( GetViewData().GetActivePart() ) )
     {
         switch ( nSlot )
         {
@@ -293,7 +289,8 @@ void ScCellShell::Execute( SfxRequest& rReq )
                         pTabViewShell->EnterData( GetViewData().GetCurX(),
                                                   GetViewData().GetCurY(),
                                                   GetViewData().GetTabNo(),
-                                                  aStr );
+                                                  aStr, nullptr,
+                                                  true /*bMatrixExpand*/);
                     }
                     else if (pHdl)
                     {
@@ -361,7 +358,8 @@ void ScCellShell::Execute( SfxRequest& rReq )
                     }
                     else if ( !aString.isEmpty() && ( aString[0] == '=' || aString[0] == '+' || aString[0] == '-' ) )
                     {
-                        pTabViewShell->EnterData( aCursorPos.Col(), aCursorPos.Row(), aCursorPos.Tab(), aString, pData );
+                        pTabViewShell->EnterData( aCursorPos.Col(), aCursorPos.Row(), aCursorPos.Tab(),
+                                aString, pData, true /*bMatrixExpand*/);
                     }
                     else
                     {
@@ -390,7 +388,8 @@ void ScCellShell::Execute( SfxRequest& rReq )
                             pTabViewShell->EnterData( aCursorPos.Col(),
                                                     aCursorPos.Row(),
                                                     aCursorPos.Tab(),
-                                                    aString );
+                                                    aString, nullptr,
+                                                    true /*bMatrixExpand*/);
                             rReq.Done();
                         }
                     }
@@ -600,11 +599,10 @@ void ScCellShell::Execute( SfxRequest& rReq )
                         {
                             OUString aArgName;
                             OUString aArgComment;
-                            const SfxPoolItem* pItem;
-                            if ( pReqArgs->GetItemState( SID_SCENARIOS, true, &pItem ) == SfxItemState::SET )
-                                aArgName = static_cast<const SfxStringItem*>(pItem)->GetValue();
-                            if ( pReqArgs->GetItemState( SID_NEW_TABLENAME, true, &pItem ) == SfxItemState::SET )
-                                aArgComment = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                            if ( const SfxStringItem* pItem = pReqArgs->GetItemIfSet( SID_SCENARIOS ) )
+                                aArgName = pItem->GetValue();
+                            if ( const SfxStringItem* pItem = pReqArgs->GetItemIfSet( SID_NEW_TABLENAME ) )
+                                aArgComment = pItem->GetValue();
 
                             aColor = COL_LIGHTGRAY;        // Default
                             nFlags = ScScenarioFlags::NONE;         // not TwoWay
@@ -649,15 +647,15 @@ void ScCellShell::Execute( SfxRequest& rReq )
         case FID_ROW_HEIGHT:
             {
                 const SfxPoolItem* pRow;
-                const SfxPoolItem* pHeight;
+                const SfxUInt16Item* pHeight;
                 sal_uInt16 nHeight;
 
-                if ( pReqArgs && pReqArgs->HasItem( FID_ROW_HEIGHT, &pHeight ) &&
+                if ( pReqArgs && (pHeight = pReqArgs->GetItemIfSet( FID_ROW_HEIGHT )) &&
                                  pReqArgs->HasItem( FN_PARAM_1, &pRow ) )
                 {
                     std::vector<sc::ColRowSpan> aRanges;
                     SCCOLROW nRow = static_cast<const SfxInt32Item*>(pRow)->GetValue() - 1;
-                    nHeight = static_cast<const SfxUInt16Item*>(pHeight)->GetValue();
+                    nHeight = pHeight->GetValue();
                     ScMarkData& rMark = GetViewData().GetMarkData();
 
                     if ( rMark.IsRowMarked( static_cast<SCROW>(nRow) ) )
@@ -671,9 +669,9 @@ void ScCellShell::Execute( SfxRequest& rReq )
 
                     pTabViewShell->SetWidthOrHeight(false, aRanges, SC_SIZE_DIRECT, o3tl::toTwips(nHeight, o3tl::Length::mm100));
                 }
-                else if ( pReqArgs && pReqArgs->HasItem( FID_ROW_HEIGHT, &pHeight ) )
+                else if ( pReqArgs && (pHeight = pReqArgs->GetItemIfSet( FID_ROW_HEIGHT )) )
                 {
-                    nHeight = static_cast<const SfxUInt16Item*>(pHeight)->GetValue();
+                    nHeight = pHeight->GetValue();
 
                     // #101390#; the value of the macro is in HMM so use convertMm100ToTwip to convert
                     pTabViewShell->SetMarkedWidthOrHeight( false, SC_SIZE_DIRECT,
@@ -755,15 +753,15 @@ void ScCellShell::Execute( SfxRequest& rReq )
         case FID_COL_WIDTH:
             {
                 const SfxPoolItem* pColumn;
-                const SfxPoolItem* pWidth;
+                const SfxUInt16Item* pWidth;
                 sal_uInt16 nWidth;
 
-                if ( pReqArgs && pReqArgs->HasItem( FID_COL_WIDTH, &pWidth ) &&
+                if ( pReqArgs && (pWidth = pReqArgs->GetItemIfSet( FID_COL_WIDTH )) &&
                                  pReqArgs->HasItem( FN_PARAM_1, &pColumn ) )
                 {
                     std::vector<sc::ColRowSpan> aRanges;
                     SCCOLROW nColumn = static_cast<const SfxUInt16Item*>(pColumn)->GetValue() - 1;
-                    nWidth = static_cast<const SfxUInt16Item*>(pWidth)->GetValue();
+                    nWidth = pWidth->GetValue();
                     ScMarkData& rMark = GetViewData().GetMarkData();
 
                     if ( rMark.IsColumnMarked( static_cast<SCCOL>(nColumn) ) )
@@ -777,9 +775,9 @@ void ScCellShell::Execute( SfxRequest& rReq )
 
                     pTabViewShell->SetWidthOrHeight(true, aRanges, SC_SIZE_DIRECT, o3tl::toTwips(nWidth, o3tl::Length::mm100));
                 }
-                else if ( pReqArgs && pReqArgs->HasItem( FID_COL_WIDTH, &pWidth ) )
+                else if ( pReqArgs && (pWidth = pReqArgs->GetItemIfSet( FID_COL_WIDTH )) )
                 {
-                    nWidth = static_cast<const SfxUInt16Item*>(pWidth)->GetValue();
+                    nWidth = pWidth->GetValue();
 
                     // #101390#; the value of the macro is in HMM so use convertMm100ToTwip to convert
                     pTabViewShell->SetMarkedWidthOrHeight( true, SC_SIZE_DIRECT,

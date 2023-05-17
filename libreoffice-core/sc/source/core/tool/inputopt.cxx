@@ -23,7 +23,6 @@
 
 #include <inputopt.hxx>
 #include <global.hxx>
-#include <miscuno.hxx>
 
 using namespace utl;
 using namespace com::sun::star::uno;
@@ -31,25 +30,20 @@ using namespace com::sun::star::uno;
 // ScInputOptions - input options
 
 ScInputOptions::ScInputOptions()
+    : nMoveDir(DIR_BOTTOM)
+    , bMoveSelection(true)
+    , bEnterEdit(false)
+    , bExtendFormat(false)
+    , bRangeFinder(true)
+    , bExpandRefs(false)
+    , mbSortRefUpdate(true)
+    , bMarkHeader(true)
+    , bUseTabCol(false)
+    , bTextWysiwyg(false)
+    , bReplCellsWarn(true)
+    , bLegacyCellSelection(false)
+    , bEnterPasteMode(false)
 {
-    SetDefaults();
-}
-
-void ScInputOptions::SetDefaults()
-{
-    nMoveDir        = DIR_BOTTOM;
-    bMoveSelection  = true;
-    bEnterEdit      = false;
-    bExtendFormat   = false;
-    bRangeFinder    = true;
-    bExpandRefs     = false;
-    mbSortRefUpdate = true;
-    bMarkHeader     = true;
-    bUseTabCol      = false;
-    bTextWysiwyg    = false;
-    bReplCellsWarn  = true;
-    bLegacyCellSelection = false;
-    bEnterPasteMode = false;
 }
 
 //  Config Item containing input options
@@ -65,10 +59,9 @@ constexpr OUStringLiteral CFGPATH_INPUT = u"Office.Calc/Input";
 #define SCINPUTOPT_SORT_REF_UPDATE         6
 #define SCINPUTOPT_MARKHEADER              7
 #define SCINPUTOPT_USETABCOL               8
-#define SCINPUTOPT_TEXTWYSIWYG             9
-#define SCINPUTOPT_REPLCELLSWARN          10
-#define SCINPUTOPT_LEGACY_CELL_SELECTION  11
-#define SCINPUTOPT_ENTER_PASTE_MODE       12
+#define SCINPUTOPT_REPLCELLSWARN           9
+#define SCINPUTOPT_LEGACY_CELL_SELECTION  10
+#define SCINPUTOPT_ENTER_PASTE_MODE       11
 
 Sequence<OUString> ScInputCfg::GetPropertyNames()
 {
@@ -81,7 +74,6 @@ Sequence<OUString> ScInputCfg::GetPropertyNames()
             "UpdateReferenceOnSort",    // SCINPUTOPT_SORT_REF_UPDATE
             "HighlightSelection",       // SCINPUTOPT_MARKHEADER
             "UseTabCol",                // SCINPUTOPT_USETABCOL
-            "UsePrinterMetrics",        // SCINPUTOPT_TEXTWYSIWYG
             "ReplaceCellsWarning",      // SCINPUTOPT_REPLCELLSWARN
             "LegacyCellSelection",      // SCINPUTOPT_LEGACY_CELL_SELECTION
             "EnterPasteMode"};          // SCINPUTOPT_ENTER_PASTE_MODE
@@ -91,64 +83,42 @@ ScInputCfg::ScInputCfg() :
     ConfigItem( CFGPATH_INPUT )
 {
     Sequence<OUString> aNames = GetPropertyNames();
-    Sequence<Any> aValues = GetProperties(aNames);
     EnableNotification(aNames);
-    const Any* pValues = aValues.getConstArray();
+    ReadCfg();
+}
+
+void ScInputCfg::ReadCfg()
+{
+    const Sequence<OUString> aNames = GetPropertyNames();
+    const Sequence<Any> aValues = GetProperties(aNames);
     OSL_ENSURE(aValues.getLength() == aNames.getLength(), "GetProperties failed");
     if(aValues.getLength() != aNames.getLength())
         return;
 
-    for(int nProp = 0; nProp < aNames.getLength(); nProp++)
-    {
-        OSL_ENSURE(pValues[nProp].hasValue(), "property value missing");
-        if(pValues[nProp].hasValue())
-        {
-            sal_Int32 nIntVal = 0;
-            switch(nProp)
-            {
-                case SCINPUTOPT_MOVEDIR:
-                    if ( pValues[nProp] >>= nIntVal )
-                        SetMoveDir( static_cast<sal_uInt16>(nIntVal) );
-                    break;
-                case SCINPUTOPT_MOVESEL:
-                    SetMoveSelection( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_EDTEREDIT:
-                    SetEnterEdit( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_EXTENDFMT:
-                    SetExtendFormat( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_RANGEFIND:
-                    SetRangeFinder( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_EXPANDREFS:
-                    SetExpandRefs( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_SORT_REF_UPDATE:
-                    SetSortRefUpdate(ScUnoHelpFunctions::GetBoolFromAny(pValues[nProp]));
-                    break;
-                case SCINPUTOPT_MARKHEADER:
-                    SetMarkHeader( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_USETABCOL:
-                    SetUseTabCol( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_TEXTWYSIWYG:
-                    SetTextWysiwyg( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_REPLCELLSWARN:
-                    SetReplaceCellsWarn( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_LEGACY_CELL_SELECTION:
-                    SetLegacyCellSelection( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-                case SCINPUTOPT_ENTER_PASTE_MODE:
-                    SetEnterPasteMode( ScUnoHelpFunctions::GetBoolFromAny( pValues[nProp] ) );
-                    break;
-            }
-        }
-    }
+    if (sal_Int32 nVal; aValues[SCINPUTOPT_MOVEDIR] >>= nVal)
+        SetMoveDir(static_cast<sal_uInt16>(nVal));
+    if (bool bVal; aValues[SCINPUTOPT_MOVESEL] >>= bVal)
+        SetMoveSelection(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_EDTEREDIT] >>= bVal)
+        SetEnterEdit(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_EXTENDFMT] >>= bVal)
+        SetExtendFormat(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_RANGEFIND] >>= bVal)
+        SetRangeFinder(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_EXPANDREFS] >>= bVal)
+        SetExpandRefs(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_SORT_REF_UPDATE] >>= bVal)
+        SetSortRefUpdate(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_MARKHEADER] >>= bVal)
+        SetMarkHeader(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_USETABCOL] >>= bVal)
+        SetUseTabCol(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_REPLCELLSWARN] >>= bVal)
+        SetReplaceCellsWarn(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_LEGACY_CELL_SELECTION] >>= bVal)
+        SetLegacyCellSelection(bVal);
+    if (bool bVal; aValues[SCINPUTOPT_ENTER_PASTE_MODE] >>= bVal)
+        SetEnterPasteMode(bVal);
 }
 
 void ScInputCfg::ImplCommit()
@@ -157,68 +127,31 @@ void ScInputCfg::ImplCommit()
     Sequence<Any> aValues(aNames.getLength());
     Any* pValues = aValues.getArray();
 
-    for(int nProp = 0; nProp < aNames.getLength(); nProp++)
-    {
-        switch(nProp)
-        {
-            case SCINPUTOPT_MOVEDIR:
-                pValues[nProp] <<= static_cast<sal_Int32>(GetMoveDir());
-                break;
-            case SCINPUTOPT_MOVESEL:
-                pValues[nProp] <<= GetMoveSelection();
-                break;
-            case SCINPUTOPT_EDTEREDIT:
-                pValues[nProp] <<= GetEnterEdit();
-                break;
-            case SCINPUTOPT_EXTENDFMT:
-                pValues[nProp] <<= GetExtendFormat();
-                break;
-            case SCINPUTOPT_RANGEFIND:
-                pValues[nProp] <<= GetRangeFinder();
-                break;
-            case SCINPUTOPT_EXPANDREFS:
-                pValues[nProp] <<= GetExpandRefs();
-                break;
-            case SCINPUTOPT_SORT_REF_UPDATE:
-                pValues[nProp] <<= GetSortRefUpdate();
-                break;
-            case SCINPUTOPT_MARKHEADER:
-                pValues[nProp] <<= GetMarkHeader();
-                break;
-            case SCINPUTOPT_USETABCOL:
-                pValues[nProp] <<= GetUseTabCol();
-                break;
-            case SCINPUTOPT_TEXTWYSIWYG:
-                pValues[nProp] <<= GetTextWysiwyg();
-                break;
-            case SCINPUTOPT_REPLCELLSWARN:
-                pValues[nProp] <<= GetReplaceCellsWarn();
-                break;
-            case SCINPUTOPT_LEGACY_CELL_SELECTION:
-                pValues[nProp] <<= GetLegacyCellSelection();
-                break;
-            case SCINPUTOPT_ENTER_PASTE_MODE:
-                pValues[nProp] <<= GetEnterPasteMode();
-                break;
-        }
-    }
+    pValues[SCINPUTOPT_MOVEDIR] <<= static_cast<sal_Int32>(GetMoveDir());
+    pValues[SCINPUTOPT_MOVESEL] <<= GetMoveSelection();
+    pValues[SCINPUTOPT_EDTEREDIT] <<= GetEnterEdit();
+    pValues[SCINPUTOPT_EXTENDFMT] <<= GetExtendFormat();
+    pValues[SCINPUTOPT_RANGEFIND] <<= GetRangeFinder();
+    pValues[SCINPUTOPT_EXPANDREFS] <<= GetExpandRefs();
+    pValues[SCINPUTOPT_SORT_REF_UPDATE] <<= GetSortRefUpdate();
+    pValues[SCINPUTOPT_MARKHEADER] <<= GetMarkHeader();
+    pValues[SCINPUTOPT_USETABCOL] <<= GetUseTabCol();
+    pValues[SCINPUTOPT_REPLCELLSWARN] <<= GetReplaceCellsWarn();
+    pValues[SCINPUTOPT_LEGACY_CELL_SELECTION] <<= GetLegacyCellSelection();
+    pValues[SCINPUTOPT_ENTER_PASTE_MODE] <<= GetEnterPasteMode();
     PutProperties(aNames, aValues);
 }
 
 void ScInputCfg::Notify( const Sequence<OUString>& /* aPropertyNames */ )
 {
-    OSL_FAIL("properties have been changed");
+    ReadCfg();
 }
 
 void ScInputCfg::SetOptions( const ScInputOptions& rNew )
 {
     *static_cast<ScInputOptions*>(this) = rNew;
     SetModified();
-}
-
-void ScInputCfg::OptionsChanged()
-{
-    SetModified();
+    Commit();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

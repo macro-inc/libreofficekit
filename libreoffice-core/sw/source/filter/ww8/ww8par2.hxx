@@ -38,8 +38,8 @@ public:
 private:
     WW8DupProperties(const WW8DupProperties&) = delete;
     WW8DupProperties& operator=(const WW8DupProperties&) = delete;
-    SwWW8FltControlStack* pCtrlStck;
-    SfxItemSetFixed<RES_CHRATR_BEGIN, RES_CHRATR_END - 1> aChrSet,aParSet;
+    SwWW8FltControlStack* m_pCtrlStck;
+    SfxItemSetFixed<RES_CHRATR_BEGIN, RES_CHRATR_END - 1> m_aChrSet,m_aParSet;
 };
 
 struct WW8SwFlyPara
@@ -49,8 +49,8 @@ private:
 public:
                 // part 1: directly derived Sw attributes
     sal_Int16 nXPos, nYPos;         // Position
-    sal_Int16 nLeMgn, nRiMgn;       // borders
-    sal_Int16 nUpMgn, nLoMgn;       // borders
+    sal_Int16 nLeftMargin, nRightMargin;       // borders
+    sal_Int16 nUpperMargin, nLowerMargin;       // borders
     sal_Int16 nWidth, nHeight;      // size
     sal_Int16 nNetWidth;
 
@@ -117,14 +117,18 @@ friend class SwWW8ImplReader;
     short ImportUPX(short nLen, bool bPAP, bool bOdd);
 
     void Set1StyleDefaults();
-    void Import1Style(sal_uInt16 nNr);
+    void Import1Style(sal_uInt16 nNr,
+                      std::map<OUString, sal_Int32>& rParaCollisions,
+                      std::map<OUString, sal_Int32>& rCharCollisions);
     void RecursiveReg(sal_uInt16 nNr);
 
     void ImportNewFormatStyles();
     void ScanStyles();
     void ImportOldFormatStyles();
 
-    bool PrepareStyle(SwWW8StyInf &rSI, ww::sti eSti, sal_uInt16 nThisStyle, sal_uInt16 nNextStyle);
+    bool PrepareStyle(SwWW8StyInf &rSI, ww::sti eSti, sal_uInt16 nThisStyle, sal_uInt16 nNextStyle,
+                      std::map<OUString, sal_Int32>& rParaCollisions,
+                      std::map<OUString, sal_Int32>& rCharCollisions);
     void PostStyle(SwWW8StyInf const &rSI, bool bOldNoImp);
 
     WW8RStyle(const WW8RStyle&) = delete;
@@ -159,12 +163,12 @@ private:
     WW8SelBoxInfo& operator=(WW8SelBoxInfo const&) = delete;
 
 public:
-    short nGroupXStart;
-    short nGroupWidth;
-    bool bGroupLocked;
+    short m_nGroupXStart;
+    short m_nGroupWidth;
+    bool m_bGroupLocked;
 
     WW8SelBoxInfo(short nXCenter, short nWidth)
-        : nGroupXStart( nXCenter ), nGroupWidth( nWidth ), bGroupLocked(false)
+        : m_nGroupXStart( nXCenter ), m_nGroupWidth( nWidth ), m_bGroupLocked(false)
     {}
 
     size_t size() const

@@ -15,7 +15,7 @@
 #include <com/sun/star/text/XTextSection.hpp>
 
 #include <vcl/BitmapTools.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <unotools/tempfile.hxx>
 #include <tools/stream.hxx>
 
@@ -38,8 +38,8 @@ void writerFileWithBitmap(OUString const& rURL)
 {
     BitmapEx aBitmapEx = createExampleBitmap();
     SvFileStream aFileStream(rURL, StreamMode::READ | StreamMode::WRITE);
-    vcl::PNGWriter aWriter(aBitmapEx);
-    aWriter.Write(aFileStream);
+    vcl::PngImageWriter aWriter(aFileStream);
+    aWriter.write(aBitmapEx);
     aFileStream.Seek(STREAM_SEEK_TO_BEGIN);
     aFileStream.Close();
 }
@@ -76,7 +76,7 @@ void BaseIndex::testBaseIndexProperties()
         CPPUNIT_ASSERT(xBaseIndex->getPropertyValue(name) >>= xGetTextColumns);
 
         xGetTextColumns->setColumnCount(xGetTextColumns->getColumnCount() + 1);
-        xBaseIndex->setPropertyValue(name, css::uno::makeAny(xGetTextColumns));
+        xBaseIndex->setPropertyValue(name, css::uno::Any(xGetTextColumns));
 
         css::uno::Reference<css::text::XTextColumns> xSetTextColumns;
         CPPUNIT_ASSERT(xBaseIndex->getPropertyValue(name) >>= xSetTextColumns);
@@ -100,7 +100,7 @@ void BaseIndex::testBaseIndexProperties()
         // BackGraphicURL is "set-only" attribute
         CPPUNIT_ASSERT_MESSAGE("Expected RuntimeException wasn't thrown", bOK);
 
-        utl::TempFile aTempFile;
+        utl::TempFileNamed aTempFile;
         aTempFile.EnableKillingFile();
         writerFileWithBitmap(aTempFile.GetURL());
 
@@ -108,7 +108,7 @@ void BaseIndex::testBaseIndexProperties()
         CPPUNIT_ASSERT(xBaseIndex->getPropertyValue("BackGraphic") >>= xGraphic);
         CPPUNIT_ASSERT(!xGraphic.is());
 
-        xBaseIndex->setPropertyValue(name, css::uno::makeAny(aTempFile.GetURL()));
+        xBaseIndex->setPropertyValue(name, css::uno::Any(aTempFile.GetURL()));
 
         CPPUNIT_ASSERT(xBaseIndex->getPropertyValue("BackGraphic") >>= xGraphic);
         CPPUNIT_ASSERT(xGraphic.is());

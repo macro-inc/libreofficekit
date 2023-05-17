@@ -22,7 +22,6 @@
 
 #include <officecfg/Office/Common.hxx>
 #include <svtools/sfxecode.hxx>
-#include <unotools/saveopt.hxx>
 #include <comphelper/genericpropertyset.hxx>
 #include <comphelper/propertysetinfo.hxx>
 #include <comphelper/documentconstants.hxx>
@@ -33,7 +32,6 @@
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/xml/sax/InputSource.hpp>
 #include <com/sun/star/xml/sax/Writer.hpp>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
@@ -49,9 +47,8 @@
 #include <com/sun/star/xml/sax/XFastParser.hpp>
 #include <com/sun/star/packages/zip/ZipIOException.hpp>
 #include <com/sun/star/document/GraphicStorageHandler.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
-#include <xmloff/SchXMLImportHelper.hxx>
 
 using namespace ::com::sun::star;
 
@@ -311,7 +308,7 @@ ErrCode XMLFilter::impl_Import(
 
         // create XPropertySet with extra information for the filter
         /** property map for import info set */
-        comphelper::PropertyMapEntry const aImportInfoMap[] =
+        static comphelper::PropertyMapEntry const aImportInfoMap[] =
         {
             // necessary properties for XML progress bar at load time
             { OUString("ProgressRange"),   0, cppu::UnoType<sal_Int32>::get(),  css::beans::PropertyAttribute::MAYBEVOID, 0},
@@ -322,7 +319,6 @@ ErrCode XMLFilter::impl_Import(
             { OUString("StreamRelPath"),   0, cppu::UnoType<OUString>::get(),   css::beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("StreamName"),      0, cppu::UnoType<OUString>::get(),   css::beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("BuildId"),         0, cppu::UnoType<OUString>::get(),   css::beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 }
         };
         uno::Reference< beans::XPropertySet > xImportInfo(
                     comphelper::GenericPropertySet_CreateInstance(
@@ -451,14 +447,6 @@ ErrCode XMLFilter::impl_ImportStream(
                 {
                     try
                     {
-                        // tdf#117162 reportbuilder expects setDataProvider to be called before ctor
-                        if (m_sDocumentHandler == "com.sun.star.comp.report.ImportDocumentHandler")
-                        {
-                            css::uno::Reference<css::chart2::XChartDocument> xChart(m_xTargetDoc, uno::UNO_QUERY);
-                            if (xChart)
-                                setDataProvider(xChart, OUString());
-                        }
-
                         uno::Sequence< uno::Any > aArgs{
                             uno::Any(beans::NamedValue("DocumentHandler", uno::Any(xFilter))),
                             uno::Any(beans::NamedValue("Model", uno::Any(m_xTargetDoc)))
@@ -580,14 +568,13 @@ ErrCode XMLFilter::impl_Export(
         xGraphicStorageHandler.set(document::GraphicStorageHandler::createWithStorage(m_xContext, xStorage));
 
         // property map for export info set
-        comphelper::PropertyMapEntry const aExportInfoMap[] =
+        static comphelper::PropertyMapEntry const aExportInfoMap[] =
         {
             { OUString("UsePrettyPrinting"), 0, cppu::UnoType<bool>::get(), beans::PropertyAttribute::MAYBEVOID, 0},
             { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(), beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("StreamRelPath"), 0, ::cppu::UnoType<OUString>::get(), beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("StreamName"), 0, ::cppu::UnoType<OUString>::get(), beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("ExportTableNumberList"), 0, cppu::UnoType<bool>::get(), beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 }
         };
 
         uno::Reference< beans::XPropertySet > xInfoSet =

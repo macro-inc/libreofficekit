@@ -33,11 +33,18 @@
 #include <comphelper/storagehelper.hxx>
 
 #include <cppuhelper/queryinterface.hxx>
-#include <cppuhelper/interfacecontainer.h>
 #include <comphelper/mimeconfighelper.hxx>
 
+#include <utility>
+#include <vcl/weld.hxx>
+#include <unotools/resmgr.hxx>
+#include <vcl/stdtext.hxx>
+#include <strings.hrc>
+#include <osl/file.hxx>
+#include <comphelper/DirectoryHelper.hxx>
+
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 
@@ -48,7 +55,7 @@
 using namespace ::com::sun::star;
 
 
-OCommonEmbeddedObject::OCommonEmbeddedObject( const uno::Reference< uno::XComponentContext >& rxContext,
+OCommonEmbeddedObject::OCommonEmbeddedObject( uno::Reference< uno::XComponentContext > xContext,
                                                 const uno::Sequence< beans::NamedValue >& aObjProps )
 : m_bReadOnly( false )
 , m_bDisposed( false )
@@ -56,14 +63,18 @@ OCommonEmbeddedObject::OCommonEmbeddedObject( const uno::Reference< uno::XCompon
 , m_nObjectState( -1 )
 , m_nTargetState( -1 )
 , m_nUpdateMode ( embed::EmbedUpdateModes::ALWAYS_UPDATE )
-, m_xContext( rxContext )
+, m_xContext(std::move( xContext ))
 , m_nMiscStatus( 0 )
 , m_bEmbeddedScriptSupport( true )
 , m_bDocumentRecoverySupport( true )
 , m_bWaitSaveCompleted( false )
 , m_bIsLinkURL( false )
 , m_bLinkTempFileChanged( false )
+, m_pLinkFile( )
+, m_bOleUpdate( false )
+, m_bInHndFunc( false )
 , m_bLinkHasPassword( false )
+, m_aLinkTempFile( )
 , m_bHasClonedSize( false )
 , m_nClonedMapUnit( 0 )
 {
@@ -72,7 +83,7 @@ OCommonEmbeddedObject::OCommonEmbeddedObject( const uno::Reference< uno::XCompon
 
 
 OCommonEmbeddedObject::OCommonEmbeddedObject(
-        const uno::Reference< uno::XComponentContext >& rxContext,
+        uno::Reference< uno::XComponentContext > xContext,
         const uno::Sequence< beans::NamedValue >& aObjProps,
         const uno::Sequence< beans::PropertyValue >& aMediaDescr,
         const uno::Sequence< beans::PropertyValue >& aObjectDescr )
@@ -82,14 +93,18 @@ OCommonEmbeddedObject::OCommonEmbeddedObject(
 , m_nObjectState( embed::EmbedStates::LOADED )
 , m_nTargetState( -1 )
 , m_nUpdateMode ( embed::EmbedUpdateModes::ALWAYS_UPDATE )
-, m_xContext( rxContext )
+, m_xContext(std::move( xContext ))
 , m_nMiscStatus( 0 )
 , m_bEmbeddedScriptSupport( true )
 , m_bDocumentRecoverySupport( true )
 , m_bWaitSaveCompleted( false )
 , m_bIsLinkURL( true )
 , m_bLinkTempFileChanged( false )
+, m_pLinkFile( )
+, m_bOleUpdate( false )
+, m_bInHndFunc( false )
 , m_bLinkHasPassword( false )
+, m_aLinkTempFile( )
 , m_bHasClonedSize( false )
 , m_nClonedMapUnit( 0 )
 {
@@ -124,42 +139,6 @@ void OCommonEmbeddedObject::CommonInit_Impl( const uno::Sequence< beans::NamedVa
 
     if ( m_aClassID.getLength() != 16 /*|| !m_aDocServiceName.getLength()*/ )
         throw uno::RuntimeException(); // something goes really wrong
-
-    // accepted states
-    m_aAcceptedStates = { /* [0] */ embed::EmbedStates::LOADED,
-                          /* [1] */ embed::EmbedStates::RUNNING,
-                          /* [2] */ embed::EmbedStates::INPLACE_ACTIVE,
-                          /* [3] */ embed::EmbedStates::UI_ACTIVE,
-                          /* [4] */ embed::EmbedStates::ACTIVE };
-    assert(m_aAcceptedStates.getLength() == NUM_SUPPORTED_STATES);
-
-
-    // intermediate states
-    // In the following table the first index points to starting state,
-    // the second one to the target state, and the sequence referenced by
-    // first two indexes contains intermediate states, that should be
-    // passed by object to reach the target state.
-    // If the sequence is empty that means that indirect switch from start
-    // state to the target state is forbidden, only if direct switch is possible
-    // the state can be reached.
-
-    m_pIntermediateStatesSeqs[0][2] = { embed::EmbedStates::RUNNING };
-
-    m_pIntermediateStatesSeqs[0][3] = { embed::EmbedStates::RUNNING,
-                                        embed::EmbedStates::INPLACE_ACTIVE };
-
-    m_pIntermediateStatesSeqs[0][4] = {embed::EmbedStates::RUNNING};
-
-    m_pIntermediateStatesSeqs[1][3] = { embed::EmbedStates::INPLACE_ACTIVE };
-
-    m_pIntermediateStatesSeqs[2][0] = { embed::EmbedStates::RUNNING };
-
-    m_pIntermediateStatesSeqs[3][0] = { embed::EmbedStates::INPLACE_ACTIVE,
-                                        embed::EmbedStates::RUNNING };
-
-    m_pIntermediateStatesSeqs[3][1] = { embed::EmbedStates::INPLACE_ACTIVE };
-
-    m_pIntermediateStatesSeqs[4][0] = { embed::EmbedStates::RUNNING };
 
     // verbs table
     for ( auto const & verb : std::as_const(m_aObjectVerbs) )
@@ -225,26 +204,13 @@ void OCommonEmbeddedObject::LinkInit_Impl(
         // task-ID above)
         //
         // open OLE original data as read input file
-        uno::Reference< ucb::XSimpleFileAccess3 > xTempAccess( ucb::SimpleFileAccess::create( m_xContext ) );
-        uno::Reference< io::XInputStream > xInStream( xTempAccess->openFileRead( m_aLinkURL ) );
-
-        if(xInStream.is())
+        if ( comphelper::DirectoryHelper::fileExists( m_aLinkURL ) )
         {
             // create temporary file
-            m_aLinkTempFile = io::TempFile::create(m_xContext);
+            m_aLinkTempFile = io::TempFile::create( m_xContext );
 
-            if(m_aLinkTempFile.is())
-            {
-                // completely copy content of original OLE data
-                uno::Reference < io::XOutputStream > xTempOut = m_aLinkTempFile->getOutputStream();
-                ::comphelper::OStorageHelper::CopyInputToOutput( xInStream, xTempOut );
-                xTempOut->flush();
-                xTempOut->closeOutput();
-
-                // reset flag m_bLinkTempFileChanged, so it will also work for multiple
-                // save op's of the containing file/document
-                m_bLinkTempFileChanged = false;
-            }
+            m_pLinkFile.reset( new FileChangedChecker( m_aLinkURL ) );
+            handleLinkedOLE( CopyBackToOLELink::CopyLinkToTempInit );
         }
     }
 
@@ -377,6 +343,123 @@ void OCommonEmbeddedObject::PostEvent_Impl( const OUString& aEventName )
         if ( m_bDisposed )
             return;
     }
+}
+
+
+static int ShowMsgDialog( TranslateId Msg, const OUString& sFileName )
+{
+    std::locale aResLocale = Translate::Create( "emo" );
+    OUString aMsg  = Translate::get( Msg, aResLocale );
+    OUString aBtn  = Translate::get( BTN_OVERWRITE_TEXT, aResLocale );
+    OUString aTemp = sFileName;
+
+    osl::FileBase::getSystemPathFromFileURL( sFileName, aTemp );
+
+    aMsg = aMsg.replaceFirst( "%{filename}", aTemp );
+    weld::Window* pParent = Application::GetFrameWeld( nullptr );
+
+    std::unique_ptr<weld::MessageDialog> xQueryBox (Application::CreateMessageDialog( pParent,
+        VclMessageType::Warning, VclButtonsType::NONE, aMsg ) );
+    xQueryBox->add_button( aBtn, RET_YES );
+    xQueryBox->add_button( GetStandardText( StandardButtonType::Cancel ), RET_CANCEL );
+    xQueryBox->set_default_response( RET_CANCEL );
+
+    return xQueryBox->run();
+}
+
+
+void OCommonEmbeddedObject::handleLinkedOLE( CopyBackToOLELink eState )
+{
+    // do not refresh and autosave at the same time
+    // when refresh all, then get both Link and Ole Update, in this case ignore OLE-refresh
+    if ( m_bInHndFunc || m_bOleUpdate || !m_aLinkTempFile.is() )
+        return;
+
+    m_bInHndFunc = true;
+
+    bool bLnkFileChg = m_pLinkFile->hasFileChanged( false );
+    bool bTmpFileChg = m_bLinkTempFileChanged;
+
+
+    if ( eState != CopyBackToOLELink::CopyLinkToTempInit && !bLnkFileChg && !bTmpFileChg )
+    {
+        // no changes
+        eState = CopyBackToOLELink::NoCopy;
+    }
+    else if ( ( eState == CopyBackToOLELink::CopyTempToLink ) && bLnkFileChg && !bTmpFileChg )
+    {
+        // Save pressed,  but the Link-file is changed, but not the temp-file
+        // in this case update the object with new link data
+        eState = CopyBackToOLELink::CopyLinkToTempRefresh;
+    }
+    else if ( ( eState == CopyBackToOLELink::CopyTempToLink ) && bLnkFileChg && bTmpFileChg )
+    {
+        // Save pressed,  but the Link-file is changed, question to user for overwrite
+        if ( ShowMsgDialog(STR_OVERWRITE_LINK, m_aLinkURL) == RET_CANCEL )
+            eState = CopyBackToOLELink::NoCopy;
+    }
+    else if ( ( eState == CopyBackToOLELink::CopyLinkToTemp ) && bTmpFileChg )
+    {
+        // Refresh pressed,  but the Temp-file is changed, question to user for overwrite
+        // it is not important it has bLnkFileChg, always overwrite the temp-file
+        if ( ShowMsgDialog( STR_OVERWRITE_TEMP, m_aLinkURL ) == RET_CANCEL )
+            eState = CopyBackToOLELink::NoCopy;
+    }
+
+    auto writeFile = [ this ]( const OUString& SrcName, const OUString& DesName )
+    {
+        uno::Reference < ucb::XSimpleFileAccess2 > xWriteAccess( ucb::SimpleFileAccess::create( m_xContext ) );
+        uno::Reference < ucb::XSimpleFileAccess > xReadAccess( ucb::SimpleFileAccess::create( m_xContext ) );
+
+        try
+        {
+            uno::Reference < io::XInputStream > xInStream( xReadAccess->openFileRead (SrcName ) );
+
+            // This is *needed* since OTempFileService calls OTempFileService::readBytes which
+            // ensures the SvStream mpStream gets/is opened, *but* also sets the mnCachedPos from
+            // OTempFileService which still points to the end-of-file (from write-cc'ing).
+            uno::Reference < io::XSeekable > xSeek( xInStream, uno::UNO_QUERY_THROW );
+            xSeek->seek( 0 );
+
+            xWriteAccess->writeFile( DesName, xInStream );
+            m_bLinkTempFileChanged = false;
+            // store the new timestamp
+            m_pLinkFile->hasFileChanged();
+        }
+        catch ( const uno::Exception& ex )
+        {
+            OUString aMsg;
+            osl::FileBase::getSystemPathFromFileURL( SrcName, aMsg );
+            aMsg = ex.Message + "\n\n" + aMsg;
+            weld::Window* pParent = Application::GetFrameWeld( nullptr );
+            std::unique_ptr<weld::MessageDialog> xQueryBox( Application::CreateMessageDialog( pParent,
+                                                     VclMessageType::Error, VclButtonsType::Ok, aMsg ) );
+
+            xQueryBox->run();
+        }
+    };
+
+    switch ( eState )
+    {
+        case CopyBackToOLELink::NoCopy:
+            break;
+        case CopyBackToOLELink::CopyLinkToTemp: // copy Link-File to Temp-File   (Refresh)
+        case CopyBackToOLELink::CopyLinkToTempInit: //create temp file
+            writeFile( m_aLinkURL, m_aLinkTempFile->getUri() );
+            break;
+        case CopyBackToOLELink::CopyTempToLink: // copy Temp-File to Link-File   (Save)
+            // tdf#141529 if we have a changed copy of the original OLE data we now
+            // need to write it back 'over' the original OLE data
+            writeFile( m_aLinkTempFile->getUri(), m_aLinkURL );
+            break;
+        case CopyBackToOLELink::CopyLinkToTempRefresh: // need a Refresh not save
+            // do nothing
+            break;
+        default:
+            break;
+    }
+
+    m_bInHndFunc = false;
 }
 
 

@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vcl/customweld.hxx>
 #include <vcl/event.hxx>
 #include <vcl/settings.hxx>
@@ -69,7 +70,7 @@ private:
     void                InsertTable();
 
 public:
-    TableWidget(SvxTableToolBoxControl* pControl, const OUString& rCommand);
+    TableWidget(SvxTableToolBoxControl* pControl, OUString aCommand);
 
     virtual void SetDrawingArea(weld::DrawingArea* pDrawingArea) override;
 
@@ -121,9 +122,9 @@ TableWindow::TableWindow(SvxTableToolBoxControl* pControl, weld::Widget* pParent
     mxTableButton->show();
 }
 
-TableWidget::TableWidget(SvxTableToolBoxControl* pControl, const OUString& rCommand)
+TableWidget::TableWidget(SvxTableToolBoxControl* pControl, OUString aCommand)
     : mxControl(pControl)
-    , maCommand(rCommand)
+    , maCommand(std::move(aCommand))
     , nCol(0)
     , nLine(0)
     , mnTableCellWidth(0)
@@ -132,8 +133,7 @@ TableWidget::TableWidget(SvxTableToolBoxControl* pControl, const OUString& rComm
     , mnTableHeight(0)
 {
     const StyleSettings& rStyles = Application::GetSettings().GetStyleSettings();
-    svtools::ColorConfig aColorConfig;
-    aFontColor = aColorConfig.GetColorValue( svtools::FONTCOLOR ).nColor;
+    aFontColor = rStyles.GetLabelTextColor();
     aLineColor = rStyles.GetShadowColor();
     aFillColor = rStyles.GetWindowColor();
     aHighlightFillColor = rStyles.GetHighlightColor();
@@ -462,8 +462,7 @@ ColumnsWidget::ColumnsWidget(SvxColumnsToolBoxControl* pControl, weld::SpinButto
     mrSpinButton.connect_activate(LINK(this, ColumnsWidget, ActivateHdl));
 
     const StyleSettings& rStyles = Application::GetSettings().GetStyleSettings();
-    svtools::ColorConfig aColorConfig;
-    aLineColor = aColorConfig.GetColorValue( svtools::FONTCOLOR ).nColor;
+    aLineColor = rStyles.GetLabelTextColor();
     aHighlightLineColor = rStyles.GetHighlightTextColor();
     aFillColor = rStyles.GetWindowColor();
     aHighlightFillColor = rStyles.GetHighlightColor();

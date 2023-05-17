@@ -38,13 +38,16 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <svl/itemprop.hxx>
+#include <sfx2/docfile.hxx>
 #include <sfx2/frmdescr.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/sfxdlg.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
+#include <utility>
 #include <vcl/window.hxx>
 #include <tools/debug.hxx>
 #include <macroloader.hxx>
+#include <eventsupplier.hxx>
 
 using namespace ::com::sun::star;
 
@@ -67,7 +70,7 @@ class IFrameObject : public ::cppu::WeakImplHelper <
 public:
     /// @throws css::uno::Exception
     /// @throws css::uno::RuntimeException
-    IFrameObject(const css::uno::Reference < css::uno::XComponentContext>& rxContext, const css::uno::Sequence< css::uno::Any >& aArguments);
+    IFrameObject(css::uno::Reference < css::uno::XComponentContext> xContext, const css::uno::Sequence< css::uno::Any >& aArguments);
 
     virtual OUString SAL_CALL getImplementationName() override
     {
@@ -129,7 +132,7 @@ IFrameWindow_Impl::IFrameWindow_Impl( vcl::Window *pParent, bool bHasBorder )
 #define WID_FRAME_MARGIN_WIDTH          7
 #define WID_FRAME_MARGIN_HEIGHT         8
 
-const SfxItemPropertyMapEntry* lcl_GetIFramePropertyMap_Impl()
+o3tl::span<const SfxItemPropertyMapEntry> lcl_GetIFramePropertyMap_Impl()
 {
     static const SfxItemPropertyMapEntry aIFramePropertyMap_Impl[] =
     {
@@ -141,13 +144,12 @@ const SfxItemPropertyMapEntry* lcl_GetIFramePropertyMap_Impl()
         { u"FrameMarginWidth",     WID_FRAME_MARGIN_WIDTH,     cppu::UnoType<sal_Int32>::get(), PROPERTY_UNBOUND, 0 },
         { u"FrameName",            WID_FRAME_NAME,             cppu::UnoType<OUString>::get(), PROPERTY_UNBOUND, 0 },
         { u"FrameURL",             WID_FRAME_URL,              cppu::UnoType<OUString>::get(), PROPERTY_UNBOUND, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     return aIFramePropertyMap_Impl;
 }
 
-IFrameObject::IFrameObject(const uno::Reference < uno::XComponentContext >& rxContext, const css::uno::Sequence< css::uno::Any >& aArguments)
-    : mxContext( rxContext )
+IFrameObject::IFrameObject(uno::Reference < uno::XComponentContext > xContext, const css::uno::Sequence< css::uno::Any >& aArguments)
+    : mxContext(std::move( xContext ))
     , maPropMap( lcl_GetIFramePropertyMap_Impl() )
 {
     if ( aArguments.hasElements() )
@@ -165,39 +167,56 @@ sal_Bool SAL_CALL IFrameObject::load(
         uno::Reference < util::XURLTransformer > xTrans( util::URLTransformer::create( mxContext ) );
         xTrans->parseStrict( aTargetURL );
 
-        if (INetURLObject(aTargetURL.Complete).GetProtocol() == INetProtocol::Macro)
+        INetURLObject aURLObject(aTargetURL.Complete);
+        if (aURLObject.GetProtocol() == INetProtocol::Macro || aURLObject.isSchemeEqualTo(u"vnd.sun.star.script"))
+            return false;
+
+        uno::Reference<frame::XFramesSupplier> xParentFrame = xFrame->getCreator();
+        SfxObjectShell* pDoc = SfxMacroLoader::GetObjectShell(xParentFrame);
+
+        bool bUpdateAllowed(true);
+        if (pDoc)
         {
-            uno::Reference<frame::XFramesSupplier> xParentFrame = xFrame->getCreator();
-            SfxObjectShell* pDoc = SfxMacroLoader::GetObjectShell(xParentFrame);
-            if (pDoc && !pDoc->AdjustMacroMode())
-                return false;
+            comphelper::EmbeddedObjectContainer& rEmbeddedObjectContainer = pDoc->getEmbeddedObjectContainer();
+            bUpdateAllowed = rEmbeddedObjectContainer.getUserAllowsLinkUpdate();
         }
+        if (!bUpdateAllowed)
+            return false;
 
-        DBG_ASSERT( !mxFrame.is(), "Frame already existing!" );
-        VclPtr<vcl::Window> pParent = VCLUnoHelper::GetWindow( xFrame->getContainerWindow() );
-        VclPtr<IFrameWindow_Impl> pWin = VclPtr<IFrameWindow_Impl>::Create( pParent, maFrmDescr.IsFrameBorderOn() );
-        pWin->SetSizePixel( pParent->GetOutputSizePixel() );
-        pWin->SetBackground();
-        pWin->Show();
+        OUString sReferer;
+        if (pDoc && pDoc->HasName())
+            sReferer = pDoc->GetMedium()->GetName();
 
-        uno::Reference < awt::XWindow > xWindow( pWin->GetComponentInterface(), uno::UNO_QUERY );
-        xFrame->setComponent( xWindow, uno::Reference < frame::XController >() );
+        uno::Reference<css::awt::XWindow> xParentWindow(xFrame->getContainerWindow());
 
-        // we must destroy the IFrame before the parent is destroyed
-        xWindow->addEventListener( this );
+        if (!mxFrame.is())
+        {
+            VclPtr<vcl::Window> pParent = VCLUnoHelper::GetWindow(xParentWindow);
+            VclPtr<IFrameWindow_Impl> pWin = VclPtr<IFrameWindow_Impl>::Create( pParent, maFrmDescr.IsFrameBorderOn() );
+            pWin->SetSizePixel( pParent->GetOutputSizePixel() );
+            pWin->SetBackground();
+            pWin->Show();
 
-        mxFrame = frame::Frame::create( mxContext );
-        uno::Reference < awt::XWindow > xWin( pWin->GetComponentInterface(), uno::UNO_QUERY );
-        mxFrame->initialize( xWin );
-        mxFrame->setName( maFrmDescr.GetName() );
+            uno::Reference < awt::XWindow > xWindow( pWin->GetComponentInterface(), uno::UNO_QUERY );
+            xFrame->setComponent( xWindow, uno::Reference < frame::XController >() );
 
-        uno::Reference < frame::XFramesSupplier > xFramesSupplier( xFrame, uno::UNO_QUERY );
-        if ( xFramesSupplier.is() )
-            mxFrame->setCreator( xFramesSupplier );
+            // we must destroy the IFrame before the parent is destroyed
+            xWindow->addEventListener( this );
+
+            mxFrame = frame::Frame::create( mxContext );
+            uno::Reference < awt::XWindow > xWin( pWin->GetComponentInterface(), uno::UNO_QUERY );
+            mxFrame->initialize( xWin );
+            mxFrame->setName( maFrmDescr.GetName() );
+
+            uno::Reference < frame::XFramesSupplier > xFramesSupplier( xFrame, uno::UNO_QUERY );
+            if ( xFramesSupplier.is() )
+                mxFrame->setCreator( xFramesSupplier );
+        }
 
         uno::Sequence < beans::PropertyValue > aProps{
             comphelper::makePropertyValue("PluginMode", sal_Int16(2)),
-            comphelper::makePropertyValue("ReadOnly", true)
+            comphelper::makePropertyValue("ReadOnly", true),
+            comphelper::makePropertyValue("Referer", sReferer)
         };
         uno::Reference < frame::XDispatch > xDisp = mxFrame->queryDispatch( aTargetURL, "_self", 0 );
         if ( xDisp.is() )

@@ -100,8 +100,7 @@ void SvxMenuConfigPage::ListModified()
     pEntries->clear();
 
     for (int i = 0; i < m_xContentsListBox->n_children(); ++i)
-        pEntries->push_back(
-            reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(i).toInt64()));
+        pEntries->push_back(weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(i)));
 
     GetSaveInData()->SetModified();
     GetTopLevelSelection()->SetModified();
@@ -123,7 +122,7 @@ IMPL_LINK(SvxMenuConfigPage, MenuEntriesSizeAllocHdl, const Size&, rSize, void)
 SvxMenuConfigPage::~SvxMenuConfigPage()
 {
     for (int i = 0, nCount = m_xSaveInListBox->get_count(); i < nCount; ++i)
-        delete reinterpret_cast<SaveInData*>(m_xSaveInListBox->get_id(i).toInt64());
+        delete weld::fromId<SaveInData*>(m_xSaveInListBox->get_id(i));
     m_xSaveInListBox->clear();
 }
 
@@ -154,8 +153,7 @@ void SvxMenuConfigPage::UpdateButtonStates()
 
     bool bIsSeparator
         = selection != -1
-          && reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(selection).toInt64())
-                 ->IsSeparator();
+          && weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(selection))->IsSeparator();
     bool bIsValidSelection = (m_xContentsListBox->n_children() != 0 && selection != -1);
 
     m_xMoveUpButton->set_sensitive(bIsValidSelection && selection != 0);
@@ -217,7 +215,7 @@ void SvxMenuConfigPage::DeleteSelectedContent()
 
     // get currently selected menu entry
     SvxConfigEntry* pMenuEntry
-        = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry).toInt64());
+        = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry));
 
     // get currently selected menu
     SvxConfigEntry* pMenu = GetTopLevelSelection();
@@ -243,7 +241,7 @@ void SvxMenuConfigPage::DeleteSelectedContent()
 
 short SvxMenuConfigPage::QueryReset()
 {
-    OUString msg = CuiResId(RID_SVXSTR_CONFIRM_MENU_RESET);
+    OUString msg = CuiResId(RID_CUISTR_CONFIRM_MENU_RESET);
 
     OUString saveInName = m_xSaveInListBox->get_active_text();
 
@@ -268,7 +266,7 @@ void SvxMenuConfigPage::SelectElement()
         rTreeView.bulk_insert_for_each(
             pEntries->size(), [this, &rTreeView, pEntries](weld::TreeIter& rIter, int nIdx) {
                 auto const& entry = (*pEntries)[nIdx];
-                OUString sId(OUString::number(reinterpret_cast<sal_Int64>(entry)));
+                OUString sId(weld::toId(entry));
                 rTreeView.set_id(rIter, sId);
                 InsertEntryIntoUI(entry, rTreeView, rIter, true);
             });
@@ -300,11 +298,11 @@ IMPL_LINK(SvxMenuConfigPage, GearHdl, const OString&, rIdent, void)
         SvxConfigEntry* pMenuData = GetTopLevelSelection();
 
         OUString sCurrentName(SvxConfigPageHelper::stripHotKey(pMenuData->GetName()));
-        OUString sDesc = CuiResId(RID_SVXSTR_LABEL_NEW_NAME);
+        OUString sDesc = CuiResId(RID_CUISTR_LABEL_NEW_NAME);
 
         SvxNameDialog aNameDialog(GetFrameWeld(), sCurrentName, sDesc);
         aNameDialog.set_help_id(HID_SVX_CONFIG_RENAME_MENU);
-        aNameDialog.set_title(CuiResId(RID_SVXSTR_RENAME_MENU));
+        aNameDialog.set_title(CuiResId(RID_CUISTR_RENAME_MENU));
 
         if (aNameDialog.run() == RET_OK)
         {
@@ -360,7 +358,7 @@ IMPL_LINK_NOARG(SvxMenuConfigPage, AddCommandHdl, weld::Button&, void)
     if (nPos == -1)
         return;
     weld::TreeView& rTreeView = m_xContentsListBox->get_widget();
-    SvxConfigEntry* pEntry = reinterpret_cast<SvxConfigEntry*>(rTreeView.get_id(nPos).toInt64());
+    SvxConfigEntry* pEntry = weld::fromId<SvxConfigEntry*>(rTreeView.get_id(nPos));
     InsertEntryIntoUI(pEntry, rTreeView, nPos, true);
 }
 
@@ -386,11 +384,11 @@ IMPL_LINK(SvxMenuConfigPage, InsertHdl, const OString&, rIdent, void)
     else if (rIdent == "insertsubmenu")
     {
         OUString aNewName;
-        OUString aDesc = CuiResId(RID_SVXSTR_SUBMENU_NAME);
+        OUString aDesc = CuiResId(RID_CUISTR_SUBMENU_NAME);
 
         SvxNameDialog aNameDialog(GetFrameWeld(), aNewName, aDesc);
         aNameDialog.set_help_id(HID_SVX_CONFIG_NAME_SUBMENU);
-        aNameDialog.set_title(CuiResId(RID_SVXSTR_ADD_SUBMENU));
+        aNameDialog.set_title(CuiResId(RID_CUISTR_ADD_SUBMENU));
 
         if (aNameDialog.run() == RET_OK)
         {
@@ -431,14 +429,14 @@ IMPL_LINK(SvxMenuConfigPage, ModifyItemHdl, const OString&, rIdent, void)
     {
         int nActEntry = m_xContentsListBox->get_selected_index();
         SvxConfigEntry* pEntry
-            = reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry).toInt64());
+            = weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nActEntry));
 
         OUString aNewName(SvxConfigPageHelper::stripHotKey(pEntry->GetName()));
-        OUString aDesc = CuiResId(RID_SVXSTR_LABEL_NEW_NAME);
+        OUString aDesc = CuiResId(RID_CUISTR_LABEL_NEW_NAME);
 
         SvxNameDialog aNameDialog(GetFrameWeld(), aNewName, aDesc);
         aNameDialog.set_help_id(HID_SVX_CONFIG_RENAME_MENU_ITEM);
-        aNameDialog.set_title(CuiResId(RID_SVXSTR_RENAME_MENU));
+        aNameDialog.set_title(CuiResId(RID_CUISTR_RENAME_MENU));
 
         if (aNameDialog.run() == RET_OK)
         {
@@ -477,7 +475,7 @@ IMPL_LINK_NOARG(SvxMenuConfigPage, ResetMenuHdl, weld::Button&, void)
 
     std::unique_ptr<weld::MessageDialog> xQueryBox(Application::CreateMessageDialog(
         GetFrameWeld(), VclMessageType::Question, VclButtonsType::YesNo,
-        CuiResId(RID_SVXSTR_CONFIRM_RESTORE_DEFAULT_MENU)));
+        CuiResId(RID_CUISTR_CONFIRM_RESTORE_DEFAULT_MENU)));
 
     // Resetting individual top-level menus is not possible at the moment.
     // So we are resetting only if it is a context menu
@@ -531,8 +529,7 @@ IMPL_LINK(SvxMenuConfigPage, ContentContextMenuHdl, const CommandEvent&, rCEvt, 
 
     bool bIsSeparator
         = nSelectIndex != -1
-          && reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nSelectIndex).toInt64())
-                 ->IsSeparator();
+          && weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nSelectIndex))->IsSeparator();
     bool bIsValidSelection = (m_xContentsListBox->n_children() != 0 && nSelectIndex != -1);
 
     std::unique_ptr<weld::Builder> xBuilder(

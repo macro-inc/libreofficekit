@@ -27,14 +27,9 @@ $(eval $(call gb_Library_set_precompiled_header,chartcore,chart2/inc/pch/precomp
 
 $(eval $(call gb_Library_use_externals,chartcore,\
 	boost_headers \
+    epoxy \
 	libxml2 \
 ))
-
-ifeq ($(DISABLE_GUI),)
-$(eval $(call gb_Library_use_externals,chartcore,\
-    epoxy \
-))
-endif
 
 $(eval $(call gb_Library_use_custom_headers,chartcore,\
 	officecfg/registry \
@@ -61,10 +56,9 @@ $(eval $(call gb_Library_use_libraries,chartcore,\
     ucbhelper \
     utl \
     vcl \
-    xo \
 ))
 
-$(eval $(call gb_Library_set_componentfile,chartcore,chart2/source/chartcore))
+$(eval $(call gb_Library_set_componentfile,chartcore,chart2/source/chartcore,services))
 
 # view pieces ...
 $(eval $(call gb_Library_add_exception_objects,chartcore,\
@@ -233,7 +227,6 @@ $(eval $(call gb_Library_add_exception_objects,chartcore,\
     chart2/source/tools/StatisticsHelper \
     chart2/source/tools/ThreeDHelper \
     chart2/source/tools/TitleHelper \
-    chart2/source/tools/TrueGuard \
     chart2/source/tools/UncachedDataSequence \
     chart2/source/tools/UserDefinedProperties \
     chart2/source/tools/WeakListenerAdapter \

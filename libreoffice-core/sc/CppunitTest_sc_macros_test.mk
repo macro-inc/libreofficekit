@@ -19,7 +19,6 @@ $(eval $(call gb_CppunitTest_use_common_precompiled_header,sc_macros_test))
 
 $(eval $(call gb_CppunitTest_add_exception_objects,sc_macros_test, \
     sc/qa/extras/macros-test \
-    sc/qa/extras/vba-macro-test \
 ))
 
 $(eval $(call gb_CppunitTest_use_libraries,sc_macros_test, \
@@ -28,6 +27,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sc_macros_test, \
     cppu \
     cppuhelper \
     drawinglayer \
+    drawinglayercore \
     editeng \
     for \
     forui \
@@ -78,5 +78,9 @@ $(eval $(call gb_CppunitTest_use_vcl,sc_macros_test))
 $(eval $(call gb_CppunitTest_use_rdb,sc_macros_test,services))
 
 $(eval $(call gb_CppunitTest_use_configuration,sc_macros_test))
+
+$(eval $(call gb_CppunitTest_add_arguments,sc_macros_test, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

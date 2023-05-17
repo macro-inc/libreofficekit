@@ -11,7 +11,7 @@ $(eval $(call gb_Library_Library,sc))
 
 $(eval $(call gb_Library_add_sdi_headers,sc,sc/sdi/scslots))
 
-$(eval $(call gb_Library_set_componentfile,sc,sc/util/sc))
+$(eval $(call gb_Library_set_componentfile,sc,sc/util/sc,services))
 
 $(eval $(call gb_Library_set_precompiled_header,sc,sc/inc/pch/precompiled_sc))
 
@@ -64,12 +64,13 @@ $(eval $(call gb_Library_use_externals,sc,orcus-parser))
 endif
 
 $(eval $(call gb_Library_use_libraries,sc,\
-    $(call gb_Helper_optional,AVMEDIA,avmedia) \
+    avmedia \
     basegfx \
     comphelper \
     cppu \
     cppuhelper \
     dbtools \
+    drawinglayercore \
     drawinglayer \
     editeng \
     for \
@@ -178,6 +179,7 @@ $(eval $(call gb_Library_add_exception_objects,sc,\
     sc/source/core/data/poolhelp \
     sc/source/core/data/postit \
     sc/source/core/data/queryevaluator \
+    sc/source/core/data/queryiter \
     sc/source/core/data/refupdatecontext \
     sc/source/core/data/rowheightcontext \
     sc/source/core/data/segmenttree \
@@ -264,6 +266,7 @@ $(eval $(call gb_Library_add_exception_objects,sc,\
     sc/source/core/tool/progress \
     sc/source/core/tool/queryentry \
     sc/source/core/tool/queryparam \
+    sc/source/core/tool/rangecache \
     sc/source/core/tool/rangelst \
     sc/source/core/tool/rangenam \
     sc/source/core/tool/rangeseq \
@@ -279,6 +282,7 @@ $(eval $(call gb_Library_add_exception_objects,sc,\
     sc/source/core/tool/scmatrix \
     sc/source/core/tool/scopetools \
     sc/source/core/tool/sharedformula \
+    sc/source/core/tool/sharedstringpoolpurge \
     sc/source/core/tool/stringutil \
     sc/source/core/tool/stylehelper \
     sc/source/core/tool/subtotal \
@@ -714,13 +718,13 @@ $(call gb_Library_add_exception_objects,sc,\
     sc/source/core/opencl/formulagroupcl \
     sc/source/core/opencl/opbase \
     sc/source/core/opencl/op_financial \
-    sc/source/core/opencl/op_database \
     sc/source/core/opencl/op_math \
     sc/source/core/opencl/op_addin \
     sc/source/core/opencl/op_statistical \
     sc/source/core/opencl/op_array \
     sc/source/core/opencl/op_logical \
     sc/source/core/opencl/op_spreadsheet \
+    sc/source/core/opencl/utils \
 )))
 
 ifeq ($(OS),LINUX)

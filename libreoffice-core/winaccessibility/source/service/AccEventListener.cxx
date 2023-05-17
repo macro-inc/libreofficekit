@@ -63,7 +63,7 @@ void AccEventListener::notifyEvent(const css::accessibility::AccessibleEventObje
             HandleNameChangedEvent(aEvent.NewValue);
             break;
         case AccessibleEventId::DESCRIPTION_CHANGED:
-            HandleDescriptionChangedEvent(aEvent.NewValue);
+            HandleDescriptionChangedEvent();
             break;
         case AccessibleEventId::STATE_CHANGED:
             HandleStateChangedEvent(aEvent.OldValue, aEvent.NewValue);
@@ -85,21 +85,20 @@ void AccEventListener::HandleNameChangedEvent(Any name)
         if (pAccDoc)
         {
             pAgent->UpdateAccName(pAccDoc);
-            pAgent->NotifyAccEvent(UM_EVENT_OBJECT_NAMECHANGE, pAccDoc);
+            pAgent->NotifyAccEvent(UnoMSAAEvent::OBJECT_NAMECHANGE, pAccDoc);
         }
     }
 
     pAgent->UpdateAccName(m_xAccessible.get(), name);
-    pAgent->NotifyAccEvent(UM_EVENT_OBJECT_NAMECHANGE, m_xAccessible.get());
+    pAgent->NotifyAccEvent(UnoMSAAEvent::OBJECT_NAMECHANGE, m_xAccessible.get());
 }
 
 /**
  *  handle the DESCRIPTION_CHANGED event
- *  @param  desc        the new description
  */
-void AccEventListener::HandleDescriptionChangedEvent(Any desc)
+void AccEventListener::HandleDescriptionChangedEvent()
 {
-    pAgent->NotifyAccEvent(UM_EVENT_OBJECT_DESCRIPTIONCHANGE, m_xAccessible.get());
+    pAgent->NotifyAccEvent(UnoMSAAEvent::OBJECT_DESCRIPTIONCHANGE, m_xAccessible.get());
 }
 
 /**
@@ -107,8 +106,7 @@ void AccEventListener::HandleDescriptionChangedEvent(Any desc)
  */
 void AccEventListener::HandleBoundrectChangedEvent()
 {
-    AccObjectManagerAgent::UpdateLocation(m_xAccessible.get());
-    pAgent->NotifyAccEvent(UM_EVENT_BOUNDRECT_CHANGED, m_xAccessible.get());
+    pAgent->NotifyAccEvent(UnoMSAAEvent::BOUNDRECT_CHANGED, m_xAccessible.get());
 }
 
 /**
@@ -117,7 +115,7 @@ void AccEventListener::HandleBoundrectChangedEvent()
 void AccEventListener::HandleVisibleDataChangedEvent()
 {
     pAgent->UpdateValue(m_xAccessible.get());
-    pAgent->NotifyAccEvent(UM_EVENT_VISIBLE_DATA_CHANGED, m_xAccessible.get());
+    pAgent->NotifyAccEvent(UnoMSAAEvent::VISIBLE_DATA_CHANGED, m_xAccessible.get());
 }
 
 /**
@@ -127,7 +125,7 @@ void AccEventListener::HandleVisibleDataChangedEvent()
  */
 void AccEventListener::HandleStateChangedEvent(Any oldValue, Any newValue)
 {
-    short newV, oldV;
+    sal_Int64 newV, oldV;
     if (newValue >>= newV)
     {
         SetComponentState(newV, true);
@@ -143,7 +141,7 @@ void AccEventListener::HandleStateChangedEvent(Any oldValue, Any newValue)
  *  @param  state       new state id
  *  @param  enable      true if state is set, false if state is unset
  */
-void AccEventListener::SetComponentState(short state, bool enable)
+void AccEventListener::SetComponentState(sal_Int64 state, bool enable)
 {
     switch (state)
     {
@@ -165,7 +163,7 @@ void AccEventListener::FireStateFocusedChange(bool enable)
     if (enable)
     {
         pAgent->IncreaseState(m_xAccessible.get(), AccessibleStateType::FOCUSED);
-        pAgent->NotifyAccEvent(UM_EVENT_STATE_FOCUSED, m_xAccessible.get());
+        pAgent->NotifyAccEvent(UnoMSAAEvent::STATE_FOCUSED, m_xAccessible.get());
     }
     else
     {
@@ -178,7 +176,7 @@ void AccEventListener::FireStateFocusedChange(bool enable)
  *  @param state    the state id
  *  @param set      true if state is set, false if state is unset
  */
-void AccEventListener::FireStatePropertyChange(short /*state*/, bool set)
+void AccEventListener::FireStatePropertyChange(sal_Int64 /*state*/, bool set)
 {
     if (set)
     {

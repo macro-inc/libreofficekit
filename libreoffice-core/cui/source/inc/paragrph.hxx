@@ -53,7 +53,6 @@ private:
     // indention
     std::unique_ptr<SvxRelativeField> m_xLeftIndent;
 
-    std::unique_ptr<weld::Label> m_xRightLabel;
     std::unique_ptr<SvxRelativeField> m_xRightIndent;
 
     std::unique_ptr<weld::Label> m_xFLineLabel;
@@ -121,7 +120,9 @@ public:
 
 class SvxParaAlignTabPage : public SfxTabPage
 {
-    static const WhichRangesContainer pAlignRanges;
+    static const WhichRangesContainer pAlignRanges, pSdrAlignRanges;
+
+    bool m_bSdrVertAlign;
 
     SvxParaPrevWindow m_aExampleWin;
 
@@ -144,8 +145,9 @@ class SvxParaAlignTabPage : public SfxTabPage
     //vertical alignment
     std::unique_ptr<weld::Widget> m_xVertAlignFL;
     std::unique_ptr<weld::ComboBox> m_xVertAlignLB;
+    std::unique_ptr<weld::Label> m_xVertAlign;
+    std::unique_ptr<weld::Label> m_xVertAlignSdr;
 
-    std::unique_ptr<weld::Widget> m_xPropertiesFL;
     std::unique_ptr<svx::FrameDirectionListBox>  m_xTextDirectionLB;
 
     DECL_LINK(AlignHdl_Impl, weld::Toggleable&, void);
@@ -164,12 +166,14 @@ public:
     virtual ~SvxParaAlignTabPage() override;
 
     static WhichRangesContainer GetRanges() { return pAlignRanges; }
+    static WhichRangesContainer GetSdrRanges() { return pSdrAlignRanges; }
 
     virtual bool            FillItemSet( SfxItemSet* rSet ) override;
     virtual void            Reset( const SfxItemSet* rSet ) override;
     virtual void            ChangesApplied() override;
 
     void                    EnableJustifyExt();
+    void                    EnableSdrVertAlign();
     virtual void            PageCreated(const SfxAllItemSet& aSet) override;
 };
 
@@ -225,12 +229,17 @@ private:
     // hyphenation
     std::unique_ptr<weld::CheckButton> m_xHyphenBox;
     std::unique_ptr<weld::CheckButton> m_xHyphenNoCapsBox;
+    std::unique_ptr<weld::CheckButton> m_xHyphenNoLastWordBox;
     std::unique_ptr<weld::Label> m_xBeforeText;
     std::unique_ptr<weld::SpinButton> m_xExtHyphenBeforeBox;
     std::unique_ptr<weld::Label> m_xAfterText;
     std::unique_ptr<weld::SpinButton> m_xExtHyphenAfterBox;
     std::unique_ptr<weld::Label> m_xMaxHyphenLabel;
     std::unique_ptr<weld::SpinButton> m_xMaxHyphenEdit;
+    std::unique_ptr<weld::Label> m_xMinWordLabel;
+    std::unique_ptr<weld::SpinButton> m_xMinWordLength;
+    std::unique_ptr<weld::Label> m_xHyphenZoneLabel;
+    std::unique_ptr<SvxRelativeField> m_xHyphenZone;
 
     // pagebreak
     std::unique_ptr<weld::CheckButton> m_xPageBreakBox;

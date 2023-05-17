@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -45,8 +47,7 @@ class tdf64690(UITestCase):
                 replaceterm.executeAction("TYPE", mkPropertyValues({"TEXT":"ABC"}))
 
                 regexp = xDialog.getChild("regexp")
-                if get_state_as_dict(regexp)['Selected'] == 'false':
-                    regexp.executeAction("CLICK", tuple())
+                regexp.executeAction("CLICK", tuple())
                 self.assertEqual("true", get_state_as_dict(regexp)['Selected'])
 
                 selection = xDialog.getChild("selection")
@@ -59,6 +60,10 @@ class tdf64690(UITestCase):
                 # Without the fix in place, this test would have hung here
                 with self.ui_test.execute_blocking_action(replaceall.executeAction, args=('CLICK', ())):
                     pass
+
+                # Deselect regex button, otherwise it might affect other tests
+                regexp.executeAction("CLICK", tuple())
+                self.assertEqual("false", get_state_as_dict(regexp)['Selected'])
 
 
             self.assertEqual("ABCABCABCABC\nABCABCABCABC\n", get_state_as_dict(xEditWin)['Text'])

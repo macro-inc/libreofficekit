@@ -25,6 +25,7 @@
 #include <vcl/bitmap.hxx>
 #include <tools/stream.hxx>
 #include <tools/UnitConversion.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <bitmap/BitmapWriteAccess.hxx>
 
@@ -155,6 +156,18 @@ static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::TextField) == FPDF_FO
 static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::Signature) == FPDF_FORMFIELD_SIGNATURE,
               "PDFFormFieldType::Signature value mismatch");
 
+static_assert(static_cast<int>(vcl::pdf::PDFAnnotAActionType::KeyStroke)
+                  == FPDF_ANNOT_AACTION_KEY_STROKE,
+              "PDFAnnotAActionType::KeyStroke) value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFAnnotAActionType::Format) == FPDF_ANNOT_AACTION_FORMAT,
+              "PDFAnnotAActionType::Format) value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFAnnotAActionType::Validate)
+                  == FPDF_ANNOT_AACTION_VALIDATE,
+              "PDFAnnotAActionType::Validate) value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFAnnotAActionType::Calculate)
+                  == FPDF_ANNOT_AACTION_CALCULATE,
+              "PDFAnnotAActionType::Calculate) value mismatch");
+
 namespace
 {
 /// Callback class to be used with FPDF_SaveWithVersion().
@@ -250,9 +263,12 @@ public:
     std::vector<basegfx::B2DPoint> getAttachmentPoints(size_t nIndex) override;
     std::vector<basegfx::B2DPoint> getLineGeometry() override;
     PDFFormFieldType getFormFieldType(PDFiumDocument* pDoc) override;
-    float getFormFontSize(PDFiumDocument* pDoc) override;
+    float getFontSize(PDFiumDocument* pDoc) override;
     OUString getFormFieldAlternateName(PDFiumDocument* pDoc) override;
     int getFormFieldFlags(PDFiumDocument* pDoc) override;
+    OUString getFormAdditionalActionJavaScript(PDFiumDocument* pDoc,
+                                               PDFAnnotAActionType eEvent) override;
+    OUString getFormFieldValue(PDFiumDocument* pDoc) override;
 };
 
 class PDFiumPageObjectImpl final : public PDFiumPageObject
@@ -388,6 +404,8 @@ public:
     bool hasTransparency() override;
 
     bool hasLinks() override;
+
+    void onAfterLoadPage(PDFiumDocument* pDoc) override;
 };
 
 /// Wrapper around FPDF_FORMHANDLE.
@@ -635,12 +653,12 @@ util::DateTime PDFiumSignatureImpl::getTime()
     OString aM(aTimeBuf.data(), aTimeBuf.size() - 1);
     if (aM.startsWith("D:") && aM.getLength() >= 16)
     {
-        aRet.Year = aM.copy(2, 4).toInt32();
-        aRet.Month = aM.copy(6, 2).toInt32();
-        aRet.Day = aM.copy(8, 2).toInt32();
-        aRet.Hours = aM.copy(10, 2).toInt32();
-        aRet.Minutes = aM.copy(12, 2).toInt32();
-        aRet.Seconds = aM.copy(14, 2).toInt32();
+        aRet.Year = o3tl::toInt32(aM.subView(2, 4));
+        aRet.Month = o3tl::toInt32(aM.subView(6, 2));
+        aRet.Day = o3tl::toInt32(aM.subView(8, 2));
+        aRet.Hours = o3tl::toInt32(aM.subView(10, 2));
+        aRet.Minutes = o3tl::toInt32(aM.subView(12, 2));
+        aRet.Seconds = o3tl::toInt32(aM.subView(14, 2));
     }
     return aRet;
 }
@@ -778,6 +796,12 @@ bool PDFiumPageImpl::hasLinks()
     int nStartPos = 0;
     FPDF_LINK pLinkAnnot = nullptr;
     return FPDFLink_Enumerate(mpPage, &nStartPos, &pLinkAnnot);
+}
+
+void PDFiumPageImpl::onAfterLoadPage(PDFiumDocument* pDoc)
+{
+    auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
+    FORM_OnAfterLoadPage(mpPage, pDocImpl->getFormHandlePointer());
 }
 
 PDFiumPageObjectImpl::PDFiumPageObjectImpl(FPDF_PAGEOBJECT pPageObject)
@@ -1168,11 +1192,11 @@ int PDFiumAnnotationImpl::getFormFieldFlags(PDFiumDocument* pDoc)
     return FPDFAnnot_GetFormFieldFlags(pDocImpl->getFormHandlePointer(), mpAnnotation);
 }
 
-float PDFiumAnnotationImpl::getFormFontSize(PDFiumDocument* pDoc)
+float PDFiumAnnotationImpl::getFontSize(PDFiumDocument* pDoc)
 {
     auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
     float fRet{};
-    if (!FPDFAnnot_GetFormFontSize(pDocImpl->getFormHandlePointer(), mpAnnotation, &fRet))
+    if (!FPDFAnnot_GetFontSize(pDocImpl->getFormHandlePointer(), mpAnnotation, &fRet))
     {
         return 0.0f;
     }
@@ -1193,6 +1217,67 @@ OUString PDFiumAnnotationImpl::getFormFieldAlternateName(PDFiumDocument* pDoc)
         std::unique_ptr<sal_Unicode[]> pText(new sal_Unicode[nSize]);
         unsigned long nStringSize = FPDFAnnot_GetFormFieldAlternateName(
             pDocImpl->getFormHandlePointer(), mpAnnotation,
+            reinterpret_cast<FPDF_WCHAR*>(pText.get()), nSize * 2);
+        assert(nStringSize % 2 == 0);
+        nStringSize /= 2;
+        if (nStringSize > 0)
+        {
+#if defined OSL_BIGENDIAN
+            for (unsigned long i = 0; i != nStringSize; ++i)
+            {
+                pText[i] = OSL_SWAPWORD(pText[i]);
+            }
+#endif
+            aString = OUString(pText.get());
+        }
+    }
+    return aString;
+}
+
+OUString PDFiumAnnotationImpl::getFormFieldValue(PDFiumDocument* pDoc)
+{
+    auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
+    OUString aString;
+    unsigned long nSize
+        = FPDFAnnot_GetFormFieldValue(pDocImpl->getFormHandlePointer(), mpAnnotation, nullptr, 0);
+    assert(nSize % 2 == 0);
+    nSize /= 2;
+    if (nSize > 1)
+    {
+        std::unique_ptr<sal_Unicode[]> pText(new sal_Unicode[nSize]);
+        unsigned long nStringSize
+            = FPDFAnnot_GetFormFieldValue(pDocImpl->getFormHandlePointer(), mpAnnotation,
+                                          reinterpret_cast<FPDF_WCHAR*>(pText.get()), nSize * 2);
+        assert(nStringSize % 2 == 0);
+        nStringSize /= 2;
+        if (nStringSize > 0)
+        {
+#if defined OSL_BIGENDIAN
+            for (unsigned long i = 0; i != nStringSize; ++i)
+            {
+                pText[i] = OSL_SWAPWORD(pText[i]);
+            }
+#endif
+            aString = OUString(pText.get());
+        }
+    }
+    return aString;
+}
+
+OUString PDFiumAnnotationImpl::getFormAdditionalActionJavaScript(PDFiumDocument* pDoc,
+                                                                 PDFAnnotAActionType eEvent)
+{
+    auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
+    OUString aString;
+    unsigned long nSize = FPDFAnnot_GetFormAdditionalActionJavaScript(
+        pDocImpl->getFormHandlePointer(), mpAnnotation, static_cast<int>(eEvent), nullptr, 0);
+    assert(nSize % 2 == 0);
+    nSize /= 2;
+    if (nSize > 1)
+    {
+        std::unique_ptr<sal_Unicode[]> pText(new sal_Unicode[nSize]);
+        unsigned long nStringSize = FPDFAnnot_GetFormAdditionalActionJavaScript(
+            pDocImpl->getFormHandlePointer(), mpAnnotation, static_cast<int>(eEvent),
             reinterpret_cast<FPDF_WCHAR*>(pText.get()), nSize * 2);
         assert(nStringSize % 2 == 0);
         nStringSize /= 2;

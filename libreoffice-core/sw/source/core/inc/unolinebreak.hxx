@@ -23,6 +23,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
+#include <com/sun/star/lang/XUnoTunnel.hpp>
 #include <com/sun/star/text/XTextContent.hpp>
 
 #include <unobaseclass.hxx>
@@ -44,8 +45,7 @@ class SwXLineBreak final
     ~SwXLineBreak() override;
 
 public:
-    static css::uno::Reference<css::text::XTextContent>
-    CreateXLineBreak(SwFormatLineBreak* pLineBreakFormat);
+    static rtl::Reference<SwXLineBreak> CreateXLineBreak(SwFormatLineBreak* pLineBreakFormat);
 
     // XPropertySet
     css::uno::Reference<css::beans::XPropertySetInfo> SAL_CALL getPropertySetInfo() override;

@@ -49,6 +49,8 @@
 
 #include <rtl/ustring.hxx>
 #include <o3tl/deleter.hxx>
+#include <o3tl/string_view.hxx>
+#include <osl/diagnose.h>
 #include <retrieveinputstreamconsumer.hxx>
 #include <drawinglayer/processor2d/objectinfoextractor2d.hxx>
 #include <drawinglayer/primitive2d/objectinfoprimitive2d.hxx>
@@ -56,7 +58,7 @@
 using namespace com::sun::star;
 
 SwGrfNode::SwGrfNode(
-        const SwNodeIndex & rWhere,
+        SwNode & rWhere,
         const OUString& rGrfName,
         const OUString& rFltName,
         const Graphic* pGraphic,
@@ -74,7 +76,7 @@ SwGrfNode::SwGrfNode(
     ReRead(rGrfName, rFltName, pGraphic, false);
 }
 
-SwGrfNode::SwGrfNode( const SwNodeIndex & rWhere,
+SwGrfNode::SwGrfNode( SwNode& rWhere,
                       const GraphicObject& rGrfObj,
                       SwGrfFormatColl *pGrfColl,
                       SwAttrSet const * pAutoAttr ) :
@@ -95,8 +97,8 @@ SwGrfNode::SwGrfNode( const SwNodeIndex & rWhere,
  *
  * @note Does not read/open the image itself!
  */
-SwGrfNode::SwGrfNode( const SwNodeIndex & rWhere,
-                      const OUString& rGrfName,
+SwGrfNode::SwGrfNode( SwNode& rWhere,
+                      std::u16string_view rGrfName,
                       const OUString& rFltName,
                       SwGrfFormatColl *pGrfColl,
                       SwAttrSet const * pAutoAttr ) :
@@ -400,7 +402,7 @@ const GraphicObject* SwGrfNode::GetReplacementGrfObj() const
     return mpReplacementGraphic.get();
 }
 
-SwGrfNode * SwNodes::MakeGrfNode( const SwNodeIndex & rWhere,
+SwGrfNode * SwNodes::MakeGrfNode( SwNode & rWhere,
                                 const OUString& rGrfName,
                                 const OUString& rFltName,
                                 const Graphic* pGraphic,
@@ -419,7 +421,7 @@ SwGrfNode * SwNodes::MakeGrfNode( const SwNodeIndex & rWhere,
     return pNode;
 }
 
-SwGrfNode * SwNodes::MakeGrfNode( const SwNodeIndex & rWhere,
+SwGrfNode * SwNodes::MakeGrfNode( SwNode & rWhere,
                                 const GraphicObject& rGrfObj,
                                 SwGrfFormatColl* pGrfColl )
 {
@@ -562,7 +564,7 @@ bool SwGrfNode::RestorePersistentData()
     return true;
 }
 
-void SwGrfNode::InsertLink( const OUString& rGrfName, const OUString& rFltName )
+void SwGrfNode::InsertLink( std::u16string_view rGrfName, const OUString& rFltName )
 {
     mxLink = new SwBaseLink( SfxLinkUpdateMode::ONCALL, SotClipboardFormatId::GDIMETAFILE, this );
 
@@ -574,9 +576,9 @@ void SwGrfNode::InsertLink( const OUString& rGrfName, const OUString& rFltName )
     if( rFltName == "DDE" )
     {
         sal_Int32 nTmp = 0;
-        const OUString sApp{ rGrfName.getToken( 0, sfx2::cTokenSeparator, nTmp ) };
-        const OUString sTopic{ rGrfName.getToken( 0, sfx2::cTokenSeparator, nTmp ) };
-        const OUString sItem{ rGrfName.copy( nTmp ) };
+        const OUString sApp{ o3tl::getToken(rGrfName, 0, sfx2::cTokenSeparator, nTmp ) };
+        const std::u16string_view sTopic{ o3tl::getToken(rGrfName, 0, sfx2::cTokenSeparator, nTmp ) };
+        const std::u16string_view sItem{ rGrfName.substr( nTmp ) };
         rIDLA.GetLinkManager().InsertDDELink( mxLink.get(), sApp, sTopic, sItem );
     }
     else
@@ -700,7 +702,7 @@ void SwGrfNode::ScaleImageMap()
     }
 }
 
-SwContentNode* SwGrfNode::MakeCopy(SwDoc& rDoc, const SwNodeIndex& rIdx, bool) const
+SwContentNode* SwGrfNode::MakeCopy(SwDoc& rDoc, SwNode& rIdx, bool) const
 {
     // copy formats into the other document
     SwGrfFormatColl* pColl = rDoc.CopyGrfColl( *GetGrfColl() );

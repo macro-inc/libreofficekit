@@ -53,11 +53,11 @@ namespace
 
     int lcl_RelativePosition( const SwPosition& rPos, SwNodeOffset nNode, sal_Int32 nContent )
     {
-        SwNodeOffset nIndex = rPos.nNode.GetIndex();
+        SwNodeOffset nIndex = rPos.GetNodeIndex();
         int nReturn = BEFORE_NODE;
         if( nIndex == nNode )
         {
-            const sal_Int32 nCntIdx = rPos.nContent.GetIndex();
+            const sal_Int32 nCntIdx = rPos.GetContentIndex();
             if( nCntIdx < nContent )
                 nReturn = BEFORE_SAME_NODE;
             else if( nCntIdx == nContent )
@@ -96,8 +96,7 @@ namespace
             : m_pNewContentNode(pNewContentNode), m_nOffset(nOffset) {};
         void operator()(SwPosition& rPos, sal_Int32 nContent) const
         {
-            rPos.nNode = *m_pNewContentNode;
-            rPos.nContent.Assign(const_cast<SwContentNode*>(m_pNewContentNode), nContent + m_nOffset);
+            rPos.Assign(*m_pNewContentNode, nContent + m_nOffset);
         };
     };
     struct LimitUpdater
@@ -109,15 +108,15 @@ namespace
             : m_pNewContentNode(pNewContentNode), m_nLen(nLen), m_nCorrLen(nCorrLen) {};
         void operator()(SwPosition& rPos, sal_Int32 nContent) const
         {
-            rPos.nNode = *m_pNewContentNode;
             if( nContent < m_nCorrLen )
             {
-                rPos.nContent.Assign(const_cast<SwContentNode*>(m_pNewContentNode), std::min( nContent, static_cast<sal_Int32>(m_nLen) ) );
+                nContent = std::min( nContent, static_cast<sal_Int32>(m_nLen) );
             }
             else
             {
-                rPos.nContent -= m_nCorrLen;
+                nContent -= m_nCorrLen;
             }
+            rPos.Assign( *m_pNewContentNode, nContent );
         };
     };
     struct ContentIdxStoreImpl : sw::mark::ContentIdxStore
@@ -201,9 +200,9 @@ namespace
     void lcl_ChkPaM( std::vector<PaMEntry>& rPaMEntries, const SwNodeOffset nNode, const sal_Int32 nContent, SwPaM& rPaM, const bool bGetPoint, bool bSetMark)
     {
         const SwPosition* pPos = &rPaM.GetBound(bGetPoint);
-        if( pPos->nNode.GetIndex() == nNode && pPos->nContent.GetIndex() < nContent )
+        if( pPos->GetNodeIndex() == nNode && pPos->GetContentIndex() < nContent )
         {
-            const PaMEntry aEntry = { &rPaM, bSetMark, pPos->nContent.GetIndex() };
+            const PaMEntry aEntry = { &rPaM, bSetMark, pPos->GetContentIndex() };
             rPaMEntries.push_back(aEntry);
         }
     }
@@ -238,27 +237,27 @@ void ContentIdxStoreImpl::SaveBkmks(SwDoc& rDoc, SwNodeOffset nNode, sal_Int32 n
     {
         const ::sw::mark::IMark* pBkmk = *ppBkmk;
         bool bMarkPosEqual = false;
-        if(pBkmk->GetMarkPos().nNode.GetIndex() == nNode
-            && pBkmk->GetMarkPos().nContent.GetIndex() <= nContent)
+        if(pBkmk->GetMarkPos().GetNodeIndex() == nNode
+            && pBkmk->GetMarkPos().GetContentIndex() <= nContent)
         {
-            if(pBkmk->GetMarkPos().nContent.GetIndex() < nContent)
+            if(pBkmk->GetMarkPos().GetContentIndex() < nContent)
             {
-                const MarkEntry aEntry = { static_cast<tools::Long>(ppBkmk - pMarkAccess->getAllMarksBegin()), false, pBkmk->GetMarkPos().nContent.GetIndex() };
+                const MarkEntry aEntry = { static_cast<tools::Long>(ppBkmk - pMarkAccess->getAllMarksBegin()), false, pBkmk->GetMarkPos().GetContentIndex() };
                 m_aBkmkEntries.push_back(aEntry);
             }
             else // if a bookmark position is equal nContent, the other position
                 bMarkPosEqual = true; // has to decide if it is added to the array
         }
         if(pBkmk->IsExpanded()
-            && pBkmk->GetOtherMarkPos().nNode.GetIndex() == nNode
-            && pBkmk->GetOtherMarkPos().nContent.GetIndex() <= nContent)
+            && pBkmk->GetOtherMarkPos().GetNodeIndex() == nNode
+            && pBkmk->GetOtherMarkPos().GetContentIndex() <= nContent)
         {
             if(bMarkPosEqual)
             { // the other position is before, the (main) position is equal
-                const MarkEntry aEntry = { static_cast<tools::Long>(ppBkmk - pMarkAccess->getAllMarksBegin()), false, pBkmk->GetMarkPos().nContent.GetIndex() };
+                const MarkEntry aEntry = { static_cast<tools::Long>(ppBkmk - pMarkAccess->getAllMarksBegin()), false, pBkmk->GetMarkPos().GetContentIndex() };
                 m_aBkmkEntries.push_back(aEntry);
             }
-            const MarkEntry aEntry = { static_cast<tools::Long>(ppBkmk - pMarkAccess->getAllMarksBegin()), true, pBkmk->GetOtherMarkPos().nContent.GetIndex() };
+            const MarkEntry aEntry = { static_cast<tools::Long>(ppBkmk - pMarkAccess->getAllMarksBegin()), true, pBkmk->GetOtherMarkPos().GetContentIndex() };
             m_aBkmkEntries.push_back(aEntry);
         }
     }
@@ -298,13 +297,13 @@ void ContentIdxStoreImpl::SaveRedlines(SwDoc& rDoc, SwNodeOffset nNode, sal_Int3
         if( nPointPos == BEFORE_SAME_NODE ||
             ( nPointPos == SAME_POSITION && nMarkPos < SAME_POSITION ) )
         {
-            const MarkEntry aEntry = { nIdx, false, pRdl->GetPoint()->nContent.GetIndex() };
+            const MarkEntry aEntry = { nIdx, false, pRdl->GetPoint()->GetContentIndex() };
             m_aRedlineEntries.push_back(aEntry);
         }
         if( pRdl->HasMark() && ( nMarkPos == BEFORE_SAME_NODE ||
             ( nMarkPos == SAME_POSITION && nPointPos < SAME_POSITION ) ) )
         {
-            const MarkEntry aEntry = { nIdx, true, pRdl->GetMark()->nContent.GetIndex() };
+            const MarkEntry aEntry = { nIdx, true, pRdl->GetMark()->GetContentIndex() };
             m_aRedlineEntries.push_back(aEntry);
         }
         ++nIdx;
@@ -344,13 +343,13 @@ void ContentIdxStoreImpl::SaveFlys(SwDoc& rDoc, SwNodeOffset nNode, sal_Int32 nC
         {
             const SwFormatAnchor& rAnchor = pFrameFormat->GetAnchor();
             SwPosition const*const pAPos = rAnchor.GetContentAnchor();
-            if ( pAPos && ( nNode == pAPos->nNode.GetIndex() ) &&
+            if ( pAPos && ( nNode == pAPos->GetNodeIndex() ) &&
                  ( RndStdIds::FLY_AT_PARA == rAnchor.GetAnchorId() ||
                    RndStdIds::FLY_AT_CHAR == rAnchor.GetAnchorId() ) )
             {
                 bool bSkip = false;
                 aSave.m_bOther = false;
-                aSave.m_nContent = pAPos->nContent.GetIndex();
+                aSave.m_nContent = pAPos->GetContentIndex();
                 if ( RndStdIds::FLY_AT_CHAR == rAnchor.GetAnchorId() )
                 {
                     if( nContent <= aSave.m_nContent )
@@ -436,7 +435,7 @@ void ContentIdxStoreImpl::RestoreUnoCursors(updater_t const & rUpdater)
 void ContentIdxStoreImpl::SaveShellCursors(SwDoc& rDoc, SwNodeOffset nNode, sal_Int32 nContent)
 {
     SwCursorShell* pShell = rDoc.GetEditShell();
-    if( !pShell )
+    if (!pShell)
         return;
     for(SwViewShell& rCurShell : pShell->GetRingContainer())
     {

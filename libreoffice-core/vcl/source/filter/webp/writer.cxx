@@ -17,12 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <memory>
 #include <vcl/graph.hxx>
 #include <tools/stream.hxx>
 #include <filter/WebpWriter.hxx>
 #include <vcl/BitmapReadAccess.hxx>
+#include <comphelper/scopeguard.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <webp/encode.h>
 
@@ -32,23 +33,23 @@ static int writerFunction(const uint8_t* data, size_t size, const WebPPicture* p
     return stream->WriteBytes(data, size) == size ? 1 : 0;
 }
 
-static WebPPreset presetToValue(const OUString& preset)
+static WebPPreset presetToValue(std::u16string_view preset)
 {
-    if (preset.equalsIgnoreAsciiCase("picture"))
+    if (o3tl::equalsIgnoreAsciiCase(preset, u"picture"))
         return WEBP_PRESET_PICTURE;
-    if (preset.equalsIgnoreAsciiCase("photo"))
+    if (o3tl::equalsIgnoreAsciiCase(preset, u"photo"))
         return WEBP_PRESET_PHOTO;
-    if (preset.equalsIgnoreAsciiCase("drawing"))
+    if (o3tl::equalsIgnoreAsciiCase(preset, u"drawing"))
         return WEBP_PRESET_DRAWING;
-    if (preset.equalsIgnoreAsciiCase("icon"))
+    if (o3tl::equalsIgnoreAsciiCase(preset, u"icon"))
         return WEBP_PRESET_ICON;
-    if (preset.equalsIgnoreAsciiCase("text"))
+    if (o3tl::equalsIgnoreAsciiCase(preset, u"text"))
         return WEBP_PRESET_TEXT;
     return WEBP_PRESET_DEFAULT;
 }
 
 static bool writeWebp(SvStream& rStream, const BitmapEx& bitmapEx, bool lossless,
-                      const OUString& preset, int quality)
+                      std::u16string_view preset, int quality)
 {
     WebPConfig config;
     if (!WebPConfigInit(&config))
@@ -87,9 +88,7 @@ static bool writeWebp(SvStream& rStream, const BitmapEx& bitmapEx, bool lossless
     picture.width = width;
     picture.height = height;
     picture.use_argb = lossless ? 1 : 0; // libwebp recommends argb only for lossless
-    // This unique_ptr is here just to ensure WebPPictureFree() is called at the end,
-    // it doesn't actually own the data as such.
-    std::unique_ptr<WebPPicture, decltype(&WebPPictureFree)> freePicture(&picture, WebPPictureFree);
+    comphelper::ScopeGuard freePicture([&picture]() { WebPPictureFree(&picture); });
 
     // Apparently libwebp needs the entire image data at once in WebPPicture,
     // so allocate it and copy there.

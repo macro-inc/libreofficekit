@@ -77,7 +77,7 @@
 #include <vcl/svapp.hxx>
 #include <rtl/string.hxx>
 #include <svtools/langtab.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star::beans;
 using namespace ::com::sun::star::frame;
@@ -124,7 +124,7 @@ OUString const & getHelpRootURL()
 {
     static OUString const s_instURL = []()
     {
-        OUString tmp = officecfg::Office::Common::Path::Current::Help::get(comphelper::getProcessComponentContext());
+        OUString tmp = officecfg::Office::Common::Path::Current::Help::get();
         if (tmp.isEmpty())
         {
             // try to determine path from default
@@ -285,7 +285,7 @@ void AppendConfigToken( OUStringBuffer& rURL, bool bQuestionMark )
     rURL.append(utl::ConfigManager::getProductVersion());
 }
 
-static bool GetHelpAnchor_Impl( const OUString& _rURL, OUString& _rAnchor )
+static bool GetHelpAnchor_Impl( std::u16string_view _rURL, OUString& _rAnchor )
 {
     bool bRet = false;
 
@@ -518,7 +518,7 @@ OUString SfxHelp::CreateHelpURL_Impl( const OUString& aCommandURL, const OUStrin
 
         OUStringBuffer aTempURL = aHelpURL;
         AppendConfigToken( aTempURL, true );
-        bHasAnchor = GetHelpAnchor_Impl(aTempURL.makeStringAndClear(), aAnchor);
+        bHasAnchor = GetHelpAnchor_Impl(aTempURL, aAnchor);
     }
 
     AppendConfigToken( aHelpURL, true );
@@ -560,7 +560,7 @@ static SfxHelpWindow_Impl* impl_createHelp(Reference< XFrame2 >& rHelpTask   ,
         if (xProps.is())
             xProps->setPropertyValue(
                 "Title",
-                makeAny(SfxResId(STR_HELP_WINDOW_TITLE)));
+                Any(SfxResId(STR_HELP_WINDOW_TITLE)));
 
         pHelpWindow->setContainerWindow( xParentWindow );
         xParentWindow->setVisible(true);
@@ -961,7 +961,7 @@ static bool impl_showOfflineHelp(const OUString& rURL, weld::Widget* pDialogPare
     if (flatpak::isFlatpak() && !flatpak::createTemporaryHtmlDirectory(&parent)) {
         return false;
     }
-    ::utl::TempFile aTempFile("NewHelp", true, &aExtension, parent, false );
+    ::utl::TempFileNamed aTempFile(u"NewHelp", true, aExtension, parent, false );
 
     SvStream* pStream = aTempFile.GetStream(StreamMode::WRITE);
     pStream->SetStreamCharSet(RTL_TEXTENCODING_UTF8);
@@ -1122,7 +1122,7 @@ bool SfxHelp::Start_Impl(const OUString& rURL, const vcl::Window* pWindow)
                                     static_cast<CFStringRef>(@"https://www.libreoffice.org"),
                                     nullptr),
                                 kLSRolesAll, nullptr);
-        if([static_cast<NSString*>(CFURLGetString(pBrowser)) isEqualToString:@"file:///Applications/Safari.app/"]) {
+        if([static_cast<NSString*>(CFURLGetString(pBrowser)) hasSuffix:@"/Applications/Safari.app/"]) {
             impl_showOnlineHelp(aHelpURL, pWeldWindow);
             return true;
         }
@@ -1291,7 +1291,7 @@ bool SfxHelp::Start_Impl(const OUString& rURL, weld::Widget* pWidget, const OUSt
                                     static_cast<CFStringRef>(@"https://www.libreoffice.org"),
                                     nullptr),
                                 kLSRolesAll, nullptr);
-        if([static_cast<NSString*>(CFURLGetString(pBrowser)) isEqualToString:@"file:///Applications/Safari.app/"]) {
+        if([static_cast<NSString*>(CFURLGetString(pBrowser)) hasSuffix:@"/Applications/Safari.app/"]) {
             impl_showOnlineHelp(aHelpURL, pWidget);
             return true;
         }

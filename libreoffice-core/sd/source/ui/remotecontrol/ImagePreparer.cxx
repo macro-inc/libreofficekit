@@ -25,7 +25,6 @@
 #include <comphelper/propertyvalue.hxx>
 #include <osl/file.hxx>
 #include <rtl/ustrbuf.hxx>
-#include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
 
 #include <com/sun/star/beans/PropertyValue.hpp>
@@ -34,6 +33,7 @@
 #include <com/sun/star/presentation/XSlideShowController.hpp>
 #include <com/sun/star/presentation/XPresentationPage.hpp>
 #include <com/sun/star/text/XTextRange.hpp>
+#include <utility>
 
 using namespace ::sd;
 using namespace ::osl;
@@ -41,10 +41,10 @@ using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
 
 ImagePreparer::ImagePreparer(
-    const uno::Reference<presentation::XSlideShowController>& rxController,
+    uno::Reference<presentation::XSlideShowController> _xController,
     Transmitter *aTransmitter )
  :  Timer("sd ImagePreparer"),
-    xController( rxController ),
+    xController(std::move( _xController )),
     pTransmitter( aTransmitter )
 {
     SAL_INFO( "sdremote", "ImagePreparer - start" );
@@ -88,7 +88,7 @@ void ImagePreparer::sendPreview( sal_uInt32 aSlideNumber )
     ::comphelper::Base64::encode( aStrBuffer, aImageData );
 
     OString aEncodedShortString = OUStringToOString(
-        aStrBuffer.makeStringAndClear(), RTL_TEXTENCODING_UTF8 );
+        aStrBuffer, RTL_TEXTENCODING_UTF8 );
 
     // Start the writing
     OString aBuffer =  "slide_preview\n" +
@@ -249,8 +249,7 @@ OString ImagePreparer::prepareNotes( sal_uInt32 aSlideNumber )
             aRet.insert( i+1, "br/>" );
         }
     }
-    return OUStringToOString(
-        aRet.makeStringAndClear(), RTL_TEXTENCODING_UTF8 );
+    return OUStringToOString( aRet, RTL_TEXTENCODING_UTF8 );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

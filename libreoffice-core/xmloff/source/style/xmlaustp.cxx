@@ -330,6 +330,12 @@ void SvXMLAutoStylePoolP::RegisterNames(
         RegisterName( static_cast<XmlStyleFamily>(pFamilies[n]), pNames[n] );
 }
 
+/// retrieve the names of the properties used in the styles
+css::uno::Sequence<OUString> SvXMLAutoStylePoolP::GetPropertyNames( )
+{
+    return pImpl->GetPropertyNames();
+}
+
 OUString SvXMLAutoStylePoolP::Add( XmlStyleFamily nFamily,
                                    vector< XMLPropertyState >&& rProperties )
 {
@@ -353,7 +359,7 @@ bool SvXMLAutoStylePoolP::Add(OUString& rName, XmlStyleFamily nFamily, const OUS
 }
 
 bool SvXMLAutoStylePoolP::AddNamed( const OUString& rName, XmlStyleFamily nFamily, const OUString& rParent,
-                                    std::vector< XMLPropertyState >&& rProperties )
+                                    std::vector< XMLPropertyState > rProperties )
 
 {
     return pImpl->AddNamed(rName, nFamily, rParent, std::move(rProperties));

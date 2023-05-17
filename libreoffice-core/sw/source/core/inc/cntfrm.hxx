@@ -20,6 +20,7 @@
 #ifndef INCLUDED_SW_SOURCE_CORE_INC_CNTFRM_HXX
 #define INCLUDED_SW_SOURCE_CORE_INC_CNTFRM_HXX
 
+#include <swdllapi.h>
 #include "frame.hxx"
 #include "flowfrm.hxx"
 #include <cshtyp.hxx>
@@ -50,7 +51,11 @@ namespace o3tl {
     template<> struct typed_flags<SwContentFrameInvFlags> : is_typed_flags<SwContentFrameInvFlags, 0xff> {};
 }
 
-class SAL_DLLPUBLIC_RTTI SwContentFrame: public SwFrame, public SwFlowFrame
+/**
+ * SwContentFrame is the layout for content nodes: a common base class for text (paragraph) and
+ * non-text (e.g. graphic) frames.
+ */
+class SW_DLLPUBLIC SwContentFrame: public SwFrame, public SwFlowFrame
 {
     friend void MakeNxt( SwFrame *pFrame, SwFrame *pNxt );    // calls MakePrtArea
 
@@ -102,7 +107,7 @@ public:
     // nMaxHeight is the required height
     // bSplit indicates that the paragraph has to be split
     // bTst indicates that we are currently doing a test formatting
-    virtual bool WouldFit( SwTwips &nMaxHeight, bool &bSplit, bool bTst );
+    virtual bool WouldFit(SwTwips &nMaxHeight, bool &bSplit, bool bTst, bool);
 
     bool MoveFootnoteCntFwd( bool, SwFootnoteBossFrame* ); // called by MoveFwd if content
 

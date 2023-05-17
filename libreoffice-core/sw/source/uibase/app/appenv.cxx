@@ -150,6 +150,9 @@ void SwModule::InsertEnv( SfxRequest& rReq )
     pNewView->AttrChangedNotify(nullptr); // so that SelectShell is being called
     pSh = pNewView->GetWrtShellPtr();
 
+    if (!pSh)
+        return;
+
     OUString aTmp = SwResId(STR_ENV_TITLE) + OUString::number( ++nTitleNo );
     xDocSh->SetTitle( aTmp );
 
@@ -281,7 +284,7 @@ void SwModule::InsertEnv( SfxRequest& rReq )
             if ( pSh->IsCursorInTable() )
             {
                 pSh->SplitNode();
-                pSh->Right( CRSR_SKIP_CHARS, false, 1, false );
+                pSh->Right( SwCursorSkipMode::Chars, false, 1, false );
                 SfxItemSetFixed<RES_PAGEDESC, RES_PAGEDESC> aBreakSet( pSh->GetAttrPool() );
                 aBreakSet.Put( SwFormatPageDesc( pFollow ) );
                 pSh->SetTableAttr( aBreakSet );

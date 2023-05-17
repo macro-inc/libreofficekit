@@ -111,7 +111,7 @@ ScPassHashProtectable::~ScPassHashProtectable()
 class ScTableProtectionImpl
 {
 public:
-    static Sequence<sal_Int8> hashPassword(const OUString& aPassText, ScPasswordHash eHash);
+    static Sequence<sal_Int8> hashPassword(std::u16string_view aPassText, ScPasswordHash eHash);
     static Sequence<sal_Int8> hashPassword(const Sequence<sal_Int8>& rPassHash, ScPasswordHash eHash);
 
     explicit ScTableProtectionImpl(SCSIZE nOptSize);
@@ -155,7 +155,7 @@ private:
     ::std::vector< ScEnhancedProtection > maEnhancedProtection;
 };
 
-Sequence<sal_Int8> ScTableProtectionImpl::hashPassword(const OUString& aPassText, ScPasswordHash eHash)
+Sequence<sal_Int8> ScTableProtectionImpl::hashPassword(std::u16string_view aPassText, ScPasswordHash eHash)
 {
     Sequence<sal_Int8> aHash;
     switch (eHash)
@@ -458,7 +458,7 @@ bool ScTableProtectionImpl::isBlockEditable( const ScRange& rRange ) const
 
     auto lIsEditable = [rRange](const ScEnhancedProtection& rEnhancedProtection) {
         return !rEnhancedProtection.hasSecurityDescriptor()
-            && rEnhancedProtection.maRangeList.is() && rEnhancedProtection.maRangeList->In( rRange)
+            && rEnhancedProtection.maRangeList.is() && rEnhancedProtection.maRangeList->Contains( rRange)
             && !rEnhancedProtection.hasPassword(); // Range is editable if no password is assigned.
     };
     if (std::any_of(maEnhancedProtection.begin(), maEnhancedProtection.end(), lIsEditable))

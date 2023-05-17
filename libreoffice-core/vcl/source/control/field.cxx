@@ -23,6 +23,7 @@
 #include <string_view>
 
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 
 #include <comphelper/string.hxx>
@@ -307,9 +308,10 @@ bool ImplNumericGetValue( const OUString& rStr, sal_Int64& rValue,
     // Convert fractional strings
     if (bFrac) {
         // Convert to fraction
-        sal_Int64 nWholeNum = aStr1.makeStringAndClear().toInt64();
-        sal_Int64 nNum = aStrNum.makeStringAndClear().toInt64();
-        sal_Int64 nDenom = aStrDenom.makeStringAndClear().toInt64();
+        sal_Int64 nWholeNum = o3tl::toInt64(aStr1);
+        aStr1.setLength(0);
+        sal_Int64 nNum = o3tl::toInt64(aStrNum);
+        sal_Int64 nDenom = o3tl::toInt64(aStrDenom);
         if (nDenom == 0) return false; // Division by zero
         double nFrac2Dec = nWholeNum + static_cast<double>(nNum)/nDenom; // Convert to double for floating point precision
         OUStringBuffer aStrFrac;
@@ -336,7 +338,7 @@ bool ImplNumericGetValue( const OUString& rStr, sal_Int64& rValue,
     if (aStr2.getLength() < nDecDigits)
         string::padToLength(aStr2, nDecDigits, '0');
 
-    aStr  = aStr1.makeStringAndClear() + aStr2.makeStringAndClear();
+    aStr = aStr1 + aStr2;
 
     // check range
     nValue = aStr.toInt64();
@@ -366,8 +368,8 @@ bool ImplNumericGetValue( const OUString& rStr, sal_Int64& rValue,
 }
 
 void ImplUpdateSeparatorString( OUString& io_rText,
-                                       const OUString& rOldDecSep, std::u16string_view rNewDecSep,
-                                       const OUString& rOldThSep, std::u16string_view rNewThSep )
+                                       std::u16string_view rOldDecSep, std::u16string_view rNewDecSep,
+                                       std::u16string_view rOldThSep, std::u16string_view rNewThSep )
 {
     OUStringBuffer aBuf( io_rText.getLength() );
     sal_Int32 nIndexDec = 0, nIndexTh = 0, nIndex = 0;
@@ -383,13 +385,13 @@ void ImplUpdateSeparatorString( OUString& io_rText,
         {
             aBuf.append( pBuffer + nIndex, nIndexTh - nIndex );
             aBuf.append( rNewThSep );
-            nIndex = nIndexTh + rOldThSep.getLength();
+            nIndex = nIndexTh + rOldThSep.size();
         }
         else if( nIndexDec != -1 )
         {
             aBuf.append( pBuffer + nIndex, nIndexDec - nIndex );
             aBuf.append( rNewDecSep );
-            nIndex = nIndexDec + rOldDecSep.getLength();
+            nIndex = nIndexDec + rOldDecSep.size();
         }
         else
         {
@@ -401,8 +403,8 @@ void ImplUpdateSeparatorString( OUString& io_rText,
     io_rText = aBuf.makeStringAndClear();
 }
 
-void ImplUpdateSeparators( const OUString& rOldDecSep, std::u16string_view rNewDecSep,
-                                  const OUString& rOldThSep, std::u16string_view rNewThSep,
+void ImplUpdateSeparators( std::u16string_view rOldDecSep, std::u16string_view rNewDecSep,
+                                  std::u16string_view rOldThSep, std::u16string_view rNewThSep,
                                   Edit* pEdit )
 {
     bool bChangeDec = (rOldDecSep != rNewDecSep);
@@ -753,7 +755,7 @@ void NumericFormatter::ImplNewFieldValue( sal_Int64 nNewValue )
     // should be checked and clearly traced (with comment) in order to find out what happens.
 
     Selection aSelection = GetField()->GetSelection();
-    aSelection.Justify();
+    aSelection.Normalize();
     OUString aText = GetField()->GetText();
     // leave it as is if selected until end
     if ( static_cast<sal_Int32>(aSelection.Max()) == aText.getLength() )
@@ -794,13 +796,13 @@ namespace
         nTextLen = OUString(OUString::number(rFormatter.GetMin())).getLength();
         string::padToLength(aBuf, nTextLen, '9');
         Size aMinTextSize = rSpinField.CalcMinimumSizeForText(
-            rFormatter.CreateFieldText(aBuf.toString().toInt64()));
+            rFormatter.CreateFieldText(OUString::unacquired(aBuf).toInt64()));
         aBuf.setLength(0);
 
         nTextLen = OUString(OUString::number(rFormatter.GetMax())).getLength();
         string::padToLength(aBuf, nTextLen, '9');
         Size aMaxTextSize = rSpinField.CalcMinimumSizeForText(
-            rFormatter.CreateFieldText(aBuf.toString().toInt64()));
+            rFormatter.CreateFieldText(OUString::unacquired(aBuf).toInt64()));
         aBuf.setLength(0);
 
         Size aRet(std::max(aMinTextSize.Width(), aMaxTextSize.Width()),
@@ -851,7 +853,7 @@ Size NumericBox::CalcMinimumSize() const
 
 bool NumericBox::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         if ( ImplNumericProcessKeyInput( *rNEvt.GetKeyEvent(), IsStrictFormat(), IsUseThousandSep(), ImplGetLocaleDataWrapper() ) )
             return true;
@@ -862,9 +864,9 @@ bool NumericBox::PreNotify( NotifyEvent& rNEvt )
 
 bool NumericBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();
@@ -928,11 +930,11 @@ static bool ImplMetricProcessKeyInput( const KeyEvent& rKEvt,
     return ImplNumericProcessKeyInput( rKEvt, false, bUseThousandSep, rWrapper );
 }
 
-static OUString ImplMetricGetUnitText(const OUString& rStr)
+static OUString ImplMetricGetUnitText(std::u16string_view rStr)
 {
     // fetch unit text
     OUStringBuffer aStr;
-    for (sal_Int32 i = rStr.getLength()-1; i >= 0; --i)
+    for (sal_Int32 i = static_cast<sal_Int32>(rStr.size())-1; i >= 0; --i)
     {
         sal_Unicode c = rStr[i];
         if ( (c == '\'') || (c == '\"') || (c == '%') || (c == 0x2032) || (c == 0x2033) || unicode::isAlpha(c) || unicode::isControl(c) )
@@ -976,7 +978,7 @@ namespace
     }
 }
 
-static FieldUnit ImplMetricGetUnit(const OUString& rStr)
+static FieldUnit ImplMetricGetUnit(std::u16string_view rStr)
 {
     OUString aStr = ImplMetricGetUnitText(rStr);
     return StringToMetric(aStr);
@@ -1470,7 +1472,7 @@ sal_Int64 MetricField::GetLast( FieldUnit eOutUnit ) const
 
 bool MetricField::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         if ( ImplMetricProcessKeyInput( *rNEvt.GetKeyEvent(), IsUseThousandSep(), ImplGetLocaleDataWrapper() ) )
             return true;
@@ -1481,9 +1483,9 @@ bool MetricField::PreNotify( NotifyEvent& rNEvt )
 
 bool MetricField::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();
@@ -1583,7 +1585,7 @@ Size MetricBox::CalcMinimumSize() const
 
 bool MetricBox::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2()  )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2()  )
     {
         if ( ImplMetricProcessKeyInput( *rNEvt.GetKeyEvent(), IsUseThousandSep(), ImplGetLocaleDataWrapper() ) )
             return true;
@@ -1594,9 +1596,9 @@ bool MetricBox::PreNotify( NotifyEvent& rNEvt )
 
 bool MetricBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();
@@ -1738,7 +1740,7 @@ void CurrencyField::dispose()
 
 bool CurrencyField::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         if ( ImplCurrencyProcessKeyInput( *rNEvt.GetKeyEvent(), IsUseThousandSep(), ImplGetLocaleDataWrapper() ) )
             return true;
@@ -1749,9 +1751,9 @@ bool CurrencyField::PreNotify( NotifyEvent& rNEvt )
 
 bool CurrencyField::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();
@@ -1821,7 +1823,7 @@ void CurrencyBox::dispose()
 
 bool CurrencyBox::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         if ( ImplCurrencyProcessKeyInput( *rNEvt.GetKeyEvent(), IsUseThousandSep(), ImplGetLocaleDataWrapper() ) )
             return true;
@@ -1832,9 +1834,9 @@ bool CurrencyBox::PreNotify( NotifyEvent& rNEvt )
 
 bool CurrencyBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();

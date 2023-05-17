@@ -135,30 +135,30 @@ void EmbeddedObjectContainer::SwitchPersistence( const uno::Reference < embed::X
 
 bool EmbeddedObjectContainer::CommitImageSubStorage()
 {
-    if ( pImpl->mxImageStorage.is() )
+    if ( !pImpl->mxImageStorage )
+        return true;
+
+    try
     {
-        try
+        bool bReadOnlyMode = true;
+        uno::Reference < beans::XPropertySet > xSet(pImpl->mxImageStorage,uno::UNO_QUERY);
+        if ( xSet.is() )
         {
-            bool bReadOnlyMode = true;
-            uno::Reference < beans::XPropertySet > xSet(pImpl->mxImageStorage,uno::UNO_QUERY);
-            if ( xSet.is() )
-            {
-                // get the open mode from the parent storage
-                sal_Int32 nMode = 0;
-                uno::Any aAny = xSet->getPropertyValue("OpenMode");
-                if ( aAny >>= nMode )
-                    bReadOnlyMode = !(nMode & embed::ElementModes::WRITE );
-            } // if ( xSet.is() )
-            if ( !bReadOnlyMode )
-            {
-                uno::Reference< embed::XTransactedObject > xTransact( pImpl->mxImageStorage, uno::UNO_QUERY_THROW );
-                xTransact->commit();
-            }
-        }
-        catch (const uno::Exception&)
+            // get the open mode from the parent storage
+            sal_Int32 nMode = 0;
+            uno::Any aAny = xSet->getPropertyValue("OpenMode");
+            if ( aAny >>= nMode )
+                bReadOnlyMode = !(nMode & embed::ElementModes::WRITE );
+        } // if ( xSet.is() )
+        if ( !bReadOnlyMode )
         {
-            return false;
+            uno::Reference< embed::XTransactedObject > xTransact( pImpl->mxImageStorage, uno::UNO_QUERY_THROW );
+            xTransact->commit();
         }
+    }
+    catch (const uno::Exception&)
+    {
+        return false;
     }
 
     return true;
@@ -969,26 +969,26 @@ bool EmbeddedObjectContainer::RemoveEmbeddedObject( const uno::Reference < embed
     else
         SAL_WARN( "comphelper.container", "Object not found for removal!" );
 
-    if ( xPersist.is() && bKeepToTempStorage )  // #i119941#
-    {
-        // remove replacement image (if there is one)
-        RemoveGraphicStream( aName );
+    if ( !xPersist || !bKeepToTempStorage )  // #i119941#
+        return true;
 
-        // now it's time to remove the storage from the container storage
-        try
-        {
+    // remove replacement image (if there is one)
+    RemoveGraphicStream( aName );
+
+    // now it's time to remove the storage from the container storage
+    try
+    {
 #if OSL_DEBUG_LEVEL > 1
-            // if the object has a persistence and the object is not a link than it must have persistence entry in storage
-            OSL_ENSURE( bIsNotEmbedded || pImpl->mxStorage->hasByName( aName ), "The object has no persistence entry in the storage!" );
+        // if the object has a persistence and the object is not a link than it must have persistence entry in storage
+        OSL_ENSURE( bIsNotEmbedded || pImpl->mxStorage->hasByName( aName ), "The object has no persistence entry in the storage!" );
 #endif
-            if ( xPersist.is() && pImpl->mxStorage->hasByName( aName ) )
-                pImpl->mxStorage->removeElement( aName );
-        }
-        catch (const uno::Exception&)
-        {
-            SAL_WARN( "comphelper.container", "Failed to remove object from storage!" );
-            return false;
-        }
+        if ( xPersist.is() && pImpl->mxStorage->hasByName( aName ) )
+            pImpl->mxStorage->removeElement( aName );
+    }
+    catch (const uno::Exception&)
+    {
+        SAL_WARN( "comphelper.container", "Failed to remove object from storage!" );
+        return false;
     }
 
     return true;
@@ -1158,7 +1158,8 @@ namespace {
 
 }
 
-bool EmbeddedObjectContainer::StoreAsChildren(bool _bOasisFormat,bool _bCreateEmbedded,const uno::Reference < embed::XStorage >& _xStorage)
+bool EmbeddedObjectContainer::StoreAsChildren(bool _bOasisFormat,bool _bCreateEmbedded, bool _bAutoSaveEvent,
+                                              const uno::Reference < embed::XStorage >& _xStorage)
 {
     bool bResult = false;
     try
@@ -1222,7 +1223,7 @@ bool EmbeddedObjectContainer::StoreAsChildren(bool _bOasisFormat,bool _bCreateEm
                 uno::Reference< embed::XEmbedPersist > xPersist( xObj, uno::UNO_QUERY );
                 if ( xPersist.is() )
                 {
-                    uno::Sequence< beans::PropertyValue > aArgs( _bOasisFormat ? 2 : 3 );
+                    uno::Sequence< beans::PropertyValue > aArgs( _bOasisFormat ? 3 : 4 );
                     auto pArgs = aArgs.getArray();
                     pArgs[0].Name = "StoreVisualReplacement";
                     pArgs[0].Value <<= !_bOasisFormat;
@@ -1230,11 +1231,15 @@ bool EmbeddedObjectContainer::StoreAsChildren(bool _bOasisFormat,bool _bCreateEm
                     // if it is an embedded object or the optimized inserting fails the normal inserting should be done
                     pArgs[1].Name = "CanTryOptimization";
                     pArgs[1].Value <<= !_bCreateEmbedded;
+
+                    pArgs[2].Name = "AutoSaveEvent";
+                    pArgs[2].Value <<= _bAutoSaveEvent;
+
                     if ( !_bOasisFormat )
                     {
                         // if object has no cached replacement it will use this one
-                        pArgs[2].Name = "VisualReplacement";
-                        pArgs[2].Value <<= xStream;
+                        pArgs[3].Name = "VisualReplacement";
+                        pArgs[3].Value <<= xStream;
                     }
 
                     try

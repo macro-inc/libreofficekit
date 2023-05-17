@@ -11,6 +11,8 @@
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <rtl/math.h>
 #include <rtl/math.hxx>
+#include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace oox::ppt
 {
@@ -33,11 +35,11 @@ void CommentAuthorList::setValues(const CommentAuthorList& list)
 void Comment::setDateTime(const OUString& sDateTime)
 {
     sal_Int32 nIdx{ 0 };
-    aDateTime.Year = sDateTime.getToken(0, '-', nIdx).toInt32();
-    aDateTime.Month = sDateTime.getToken(0, '-', nIdx).toUInt32();
-    aDateTime.Day = sDateTime.getToken(0, 'T', nIdx).toUInt32();
-    aDateTime.Hours = sDateTime.getToken(0, ':', nIdx).toUInt32();
-    aDateTime.Minutes = sDateTime.getToken(0, ':', nIdx).toUInt32();
+    aDateTime.Year = o3tl::toInt32(o3tl::getToken(sDateTime, 0, '-', nIdx));
+    aDateTime.Month = o3tl::toUInt32(o3tl::getToken(sDateTime, 0, '-', nIdx));
+    aDateTime.Day = o3tl::toUInt32(o3tl::getToken(sDateTime, 0, 'T', nIdx));
+    aDateTime.Hours = o3tl::toUInt32(o3tl::getToken(sDateTime, 0, ':', nIdx));
+    aDateTime.Minutes = o3tl::toUInt32(o3tl::getToken(sDateTime, 0, ':', nIdx));
     double seconds = rtl_math_uStringToDouble(sDateTime.getStr() + nIdx,
                                               sDateTime.getStr() + sDateTime.getLength(), '.', 0,
                                               nullptr, nullptr);
@@ -77,7 +79,7 @@ OUString Comment::getAuthor(const CommentAuthorList& list)
 
 const Comment& CommentList::getCommentAtIndex(int index)
 {
-    if (index >= static_cast<int>(cmLst.size()) || index < 0)
+    if (index < 0 || o3tl::make_unsigned(index) >= cmLst.size())
         throw css::lang::IllegalArgumentException();
 
     return cmLst.at(index);

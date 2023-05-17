@@ -19,8 +19,8 @@
 #include <osl/file.hxx>
 #include <sal/log.hxx>
 #include <sal/main.h>
-#include <tools/diagnose_ex.h>
-#include <vcl/pngwrite.hxx>
+#include <comphelper/diagnose_ex.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/graphicfilter.hxx>
 #include <vcl/filter/pdfdocument.hxx>
@@ -41,18 +41,17 @@ void generatePreview(std::string_view rPdfPath, std::string_view rPngPath)
     OUString aInURL;
     osl::FileBase::getFileURLFromSystemPath(OUString::fromUtf8(rPdfPath), aInURL);
     SvFileStream aInStream(aInURL, StreamMode::READ);
-    WmfExternal* pExtHeader = nullptr;
-    if (rFilter.ImportGraphic(aGraphic, OUString(), aInStream, GRFILTER_FORMAT_DONTKNOW, nullptr,
-                              GraphicFilterImportFlags::NONE, pExtHeader)
+    if (rFilter.ImportGraphic(aGraphic, u"", aInStream, GRFILTER_FORMAT_DONTKNOW, nullptr,
+                              GraphicFilterImportFlags::NONE)
         != ERRCODE_NONE)
         return;
 
     BitmapEx aBitmapEx = aGraphic.GetBitmapEx();
-    vcl::PNGWriter aWriter(aBitmapEx);
     OUString aOutURL;
     osl::FileBase::getFileURLFromSystemPath(OUString::fromUtf8(rPngPath), aOutURL);
     SvFileStream aOutStream(aOutURL, StreamMode::WRITE);
-    aWriter.Write(aOutStream);
+    vcl::PngImageWriter aWriter(aOutStream);
+    aWriter.write(aBitmapEx);
 }
 
 int pdfVerify(int nArgc, char** pArgv)

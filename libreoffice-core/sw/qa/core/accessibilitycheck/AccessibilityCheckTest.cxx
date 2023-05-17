@@ -9,18 +9,28 @@
 
 #include <swmodeltestbase.hxx>
 #include <AccessibilityCheck.hxx>
-#include <unotxdoc.hxx>
-#include <docsh.hxx>
+#include <AccessibilityIssue.hxx>
+#include <OnlineAccessibilityCheck.hxx>
+#include <wrtsh.hxx>
+#include <vcl/scheduler.hxx>
+#include <comphelper/propertysequence.hxx>
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/accessibilitycheck/data/";
+#include <comphelper/scopeguard.hxx>
+#include <officecfg/Office/Common.hxx>
 
 class AccessibilityCheckTest : public SwModelTestBase
 {
+public:
+    AccessibilityCheckTest()
+        : SwModelTestBase("/sw/qa/core/accessibilitycheck/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckDocumentIssues)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "DocumentTest.odt");
+    createSwDoc("DocumentTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -32,7 +42,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckDocumentIssues)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testTableSplitMergeAndAltText)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "AccessibilityTests1.odt");
+    createSwDoc("AccessibilityTests1.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -52,7 +63,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckParagraphIssues)
 {
     // Tests whether formatting issues are detected when the whole paragraph has them instead of
     // some text inside the paragraph
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "ParagraphTest.odt");
+    createSwDoc("ParagraphTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -63,7 +75,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckParagraphIssues)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckBackgroundImage)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "BackgroundImageTest.odt");
+    createSwDoc("BackgroundImageTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -74,7 +87,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckBackgroundImage)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckNewlineSpace)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "NewlineTest.odt");
+    createSwDoc("NewlineTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -86,7 +100,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckNewlineSpace)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckSpacebarSpace)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "SpaceTest.odt");
+    createSwDoc("SpaceTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -97,7 +112,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckSpacebarSpace)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testHyperlinks)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "HyperlinkTest.odt");
+    createSwDoc("HyperlinkTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -109,7 +125,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testHyperlinks)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckHighlightedText)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "HighlightTest.odt");
+    createSwDoc("HighlightTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -118,9 +135,26 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckHighlightedText)
     CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[0]->m_eIssueID);
 }
 
+CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testNumberingCheck)
+{
+    createSwDoc("AccessibilityTests_NumberingCheck.odt");
+    SwDoc* pDoc = getSwDoc();
+    CPPUNIT_ASSERT(pDoc);
+    sw::AccessibilityCheck aCheck(pDoc);
+    aCheck.check();
+    auto& aIssues = aCheck.getIssueCollection().getIssues();
+    CPPUNIT_ASSERT_EQUAL(size_t(5), aIssues.size());
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[0]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[1]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[2]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[3]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[4]->m_eIssueID);
+}
+
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckFakeFootnote)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "FakeFootnoteTest.odt");
+    createSwDoc("FakeFootnoteTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -132,7 +166,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckFakeFootnote)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckFakeCaption)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "FakeCaptionTest.odt");
+    createSwDoc("FakeCaptionTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -143,7 +178,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckFakeCaption)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckTableFormatting)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "TableFormattingTest.odt");
+    createSwDoc("TableFormattingTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -154,7 +190,8 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckTableFormatting)
 
 CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckTabsFormatting)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "TabsTest.odt");
+    createSwDoc("TabsTest.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
     sw::AccessibilityCheck aCheck(pDoc);
     aCheck.check();
@@ -166,19 +203,162 @@ CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testCheckTabsFormatting)
     CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[3]->m_eIssueID);
 }
 
-CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testNumberingCheck)
+namespace
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "AccessibilityTests_NumberingCheck.odt");
+std::vector<std::shared_ptr<sfx::AccessibilityIssue>>
+scanAccessibilityIssuesOnNodes(SwDoc* pDocument)
+{
+    std::vector<std::shared_ptr<sfx::AccessibilityIssue>> aIssues;
+    auto const& pNodes = pDocument->GetNodes();
+    for (SwNodeOffset n(0); n < pNodes.Count(); ++n)
+    {
+        SwNode* pNode = pNodes[n];
+        auto& pCollection = pNode->getAccessibilityCheckStatus().pCollection;
+        if (pCollection)
+        {
+            for (auto& pIssue : pCollection->getIssues())
+            {
+                aIssues.push_back(pIssue);
+            }
+        }
+    }
+    return aIssues;
+}
+
+void checkIssuePosition(std::shared_ptr<sfx::AccessibilityIssue> const& pIssue, int nLine,
+                        sal_Int32 nStart, sal_Int32 nEnd, SwNodeOffset nIndex)
+{
+    auto* pSwIssue = static_cast<sw::AccessibilityIssue*>(pIssue.get());
+
+    OString sFailMessage = OString::Concat("Start doesn't match at line: ")
+                           + OString::Concat(OString::number(nLine));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailMessage.getStr(), nStart, pSwIssue->getStart());
+
+    sFailMessage
+        = OString::Concat("End doesn't match at line: ") + OString::Concat(OString::number(nLine));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailMessage.getStr(), nEnd, pSwIssue->getEnd());
+
+    sFailMessage = OString::Concat("Offset doesn't match at line: ")
+                   + OString::Concat(OString::number(nLine));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(sFailMessage.getStr(), nIndex, pSwIssue->getNode()->GetIndex());
+}
+
+} // end anonymous ns
+
+CPPUNIT_TEST_FIXTURE(AccessibilityCheckTest, testOnlineNodeSplitAppend)
+{
+    // Checks the a11y checker is setting the a11y issues to the nodes
+    // correctly when splitting and appending nodes (through undo), which
+    // happen on editing all the time.
+    // When a node is split, it can happen that both nodes get a11y issues
+    // if the node splits the area of direct formatting.
+
+    createSwDoc("OnlineCheck.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
-    sw::AccessibilityCheck aCheck(pDoc);
-    aCheck.check();
-    auto& aIssues = aCheck.getIssueCollection().getIssues();
-    CPPUNIT_ASSERT_EQUAL(size_t(5), aIssues.size());
-    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[0]->m_eIssueID);
-    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[1]->m_eIssueID);
-    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[2]->m_eIssueID);
-    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[3]->m_eIssueID);
-    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::MANUAL_NUMBERING, aIssues[4]->m_eIssueID);
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    CPPUNIT_ASSERT(pWrtShell);
+
+    // Enable online a11y checker
+    {
+        auto pBatch(comphelper::ConfigurationChanges::create());
+        officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::set(true, pBatch);
+        pBatch->commit();
+    }
+    comphelper::ScopeGuard g([] {
+        auto pBatch(comphelper::ConfigurationChanges::create());
+        officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::set(false, pBatch);
+        pBatch->commit();
+    });
+
+    Scheduler::ProcessEventsToIdle();
+
+    // Check we have 2 a11y issue
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2),
+                         pDoc->getOnlineAccessibilityCheck()->getNumberOfAccessibilityIssues());
+    auto aIssues = scanAccessibilityIssuesOnNodes(pDoc);
+    CPPUNIT_ASSERT_EQUAL(size_t(2), aIssues.size());
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[0]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[1]->m_eIssueID);
+    checkIssuePosition(aIssues[0], __LINE__, 0, 32, SwNodeOffset(9));
+    checkIssuePosition(aIssues[1], __LINE__, 33, 136, SwNodeOffset(9));
+
+    // Position the cursor and hit "enter" (trigger split-node action)
+    pWrtShell->Right(SwCursorSkipMode::Chars, /*bSelect=*/false, 33, /*bBasicCall=*/false);
+    pWrtShell->SplitNode();
+
+    // Check the result
+    CPPUNIT_ASSERT_EQUAL(OUString("He heard quiet steps behind him. "),
+                         getParagraph(1)->getString());
+    CPPUNIT_ASSERT_EQUAL(OUString("That didn't bode well. Who could be following him this late at "
+                                  "night and in this deadbeat part of town?"),
+                         getParagraph(2)->getString());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2),
+                         pDoc->getOnlineAccessibilityCheck()->getNumberOfAccessibilityIssues());
+
+    aIssues = scanAccessibilityIssuesOnNodes(pDoc);
+    CPPUNIT_ASSERT_EQUAL(size_t(2), aIssues.size());
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[0]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[1]->m_eIssueID);
+    checkIssuePosition(aIssues[0], __LINE__, 0, 32, SwNodeOffset(9));
+    checkIssuePosition(aIssues[1], __LINE__, 0, 103, SwNodeOffset(10));
+
+    // Position cursor and split again
+    pWrtShell->Down(/*bSelect*/ false, /*nCount*/ 0);
+    pWrtShell->Right(SwCursorSkipMode::Chars, /*bSelect=*/false, 23, /*bBasicCall=*/false);
+    pWrtShell->SplitNode();
+
+    // Check the result
+    CPPUNIT_ASSERT_EQUAL(OUString("He heard quiet steps behind him. "),
+                         getParagraph(1)->getString());
+    CPPUNIT_ASSERT_EQUAL(OUString("That didn't bode well. "), getParagraph(2)->getString());
+    CPPUNIT_ASSERT_EQUAL(
+        OUString(
+            "Who could be following him this late at night and in this deadbeat part of town?"),
+        getParagraph(3)->getString());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(3),
+                         pDoc->getOnlineAccessibilityCheck()->getNumberOfAccessibilityIssues());
+    aIssues = scanAccessibilityIssuesOnNodes(pDoc);
+    CPPUNIT_ASSERT_EQUAL(size_t(3), aIssues.size());
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[0]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[1]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[2]->m_eIssueID);
+    checkIssuePosition(aIssues[0], __LINE__, 0, 32, SwNodeOffset(9));
+    checkIssuePosition(aIssues[1], __LINE__, 0, 23, SwNodeOffset(10));
+    checkIssuePosition(aIssues[2], __LINE__, 0, 80, SwNodeOffset(11));
+
+    // Undo second change
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+    CPPUNIT_ASSERT_EQUAL(OUString("He heard quiet steps behind him. "),
+                         getParagraph(1)->getString());
+    CPPUNIT_ASSERT_EQUAL(OUString("That didn't bode well. Who could be following him this late at "
+                                  "night and in this deadbeat part of town?"),
+                         getParagraph(2)->getString());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2),
+                         pDoc->getOnlineAccessibilityCheck()->getNumberOfAccessibilityIssues());
+    aIssues = scanAccessibilityIssuesOnNodes(pDoc);
+    CPPUNIT_ASSERT_EQUAL(size_t(2), aIssues.size());
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[0]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[1]->m_eIssueID);
+    checkIssuePosition(aIssues[0], __LINE__, 0, 32, SwNodeOffset(9));
+    checkIssuePosition(aIssues[1], __LINE__, 0, 103, SwNodeOffset(10));
+
+    // Undo first change
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2),
+                         pDoc->getOnlineAccessibilityCheck()->getNumberOfAccessibilityIssues());
+    CPPUNIT_ASSERT_EQUAL(
+        OUString("He heard quiet steps behind him. That didn't bode well. Who could be following "
+                 "him this late at night and in this deadbeat part of town?"),
+        getParagraph(1)->getString());
+    aIssues = scanAccessibilityIssuesOnNodes(pDoc);
+    CPPUNIT_ASSERT_EQUAL(size_t(2), aIssues.size());
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[0]->m_eIssueID);
+    CPPUNIT_ASSERT_EQUAL(sfx::AccessibilityIssueID::TEXT_FORMATTING, aIssues[1]->m_eIssueID);
+    checkIssuePosition(aIssues[0], __LINE__, 0, 32, SwNodeOffset(9));
+    checkIssuePosition(aIssues[1], __LINE__, 33, 136, SwNodeOffset(9));
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

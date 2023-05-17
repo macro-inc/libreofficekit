@@ -31,7 +31,7 @@
 #include <unotools/streamwrap.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/document/XFilter.hpp>
 #include <com/sun/star/document/XImporter.hpp>
@@ -59,19 +59,19 @@ ErrCode SwRTFReader::Read(SwDoc& rDoc, const OUString& /*rBaseURL*/, SwPaM& rPam
     // We want to work in an empty paragraph.
     // Step 1: XTextRange will be updated when content is inserted, so we know
     // the end position.
-    const uno::Reference<text::XTextRange> xInsertPosition
+    const rtl::Reference<SwXTextRange> xInsertPosition
         = SwXTextRange::CreateXTextRange(rDoc, *rPam.GetPoint(), nullptr);
     auto pSttNdIdx = std::make_shared<SwNodeIndex>(rDoc.GetNodes());
     const SwPosition* pPos = rPam.GetPoint();
 
     // Step 2: Split once and remember the node that has been split.
     rDoc.getIDocumentContentOperations().SplitNode(*pPos, false);
-    *pSttNdIdx = pPos->nNode.GetIndex() - 1;
+    *pSttNdIdx = pPos->GetNodeIndex() - 1;
 
     // Step 3: Split again.
     rDoc.getIDocumentContentOperations().SplitNode(*pPos, false);
     auto pSttNdIdx2 = std::make_shared<SwNodeIndex>(rDoc.GetNodes());
-    *pSttNdIdx2 = pPos->nNode.GetIndex();
+    *pSttNdIdx2 = pPos->GetNodeIndex();
 
     // Step 4: Insert all content into the new node
     rPam.Move(fnMoveBackward);
@@ -89,7 +89,7 @@ ErrCode SwRTFReader::Read(SwDoc& rDoc, const OUString& /*rBaseURL*/, SwPaM& rPam
     uno::Reference<lang::XComponent> xDstDoc(pDocShell->GetModel(), uno::UNO_QUERY_THROW);
     xImporter->setTargetDocument(xDstDoc);
 
-    const uno::Reference<text::XTextRange> xInsertTextRange
+    const rtl::Reference<SwXTextRange> xInsertTextRange
         = SwXTextRange::CreateXTextRange(rDoc, *rPam.GetPoint(), nullptr);
 
     uno::Reference<document::XFilter> xFilter(xInterface, uno::UNO_QUERY_THROW);
@@ -97,7 +97,8 @@ ErrCode SwRTFReader::Read(SwDoc& rDoc, const OUString& /*rBaseURL*/, SwPaM& rPam
         { { "InputStream",
             uno::Any(uno::Reference<io::XStream>(new utl::OStreamWrapper(*m_pStream))) },
           { "InsertMode", uno::Any(true) },
-          { "TextInsertModeRange", uno::Any(xInsertTextRange) } }));
+          { "TextInsertModeRange",
+            uno::Any(uno::Reference<text::XTextRange>(xInsertTextRange)) } }));
     auto ret = ERRCODE_NONE;
     try
     {
@@ -124,10 +125,9 @@ ErrCode SwRTFReader::Read(SwDoc& rDoc, const OUString& /*rBaseURL*/, SwPaM& rPam
         {
             // If the PaM points to the first new node, move the PaM to the
             // end of the previous node.
-            if (aPam.GetPoint()->nNode == aNxtIdx)
+            if (aPam.GetPoint()->GetNode() == aNxtIdx.GetNode())
             {
-                aPam.GetPoint()->nNode = *pSttNdIdx;
-                aPam.GetPoint()->nContent.Assign(pTextNode, pTextNode->GetText().getLength());
+                aPam.GetPoint()->Assign(*pTextNode, pTextNode->GetText().getLength());
             }
             // If the first new node isn't empty, convert  the node's text
             // attributes into hints. Otherwise, set the new node's

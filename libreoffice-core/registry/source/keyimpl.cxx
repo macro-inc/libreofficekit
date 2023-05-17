@@ -29,57 +29,40 @@
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <memory>
+#include <utility>
 
 using namespace store;
 
 namespace { char const VALUE_PREFIX[] = "$VL_"; }
 
-
-//  ORegKey()
-
-ORegKey::ORegKey(const OUString& keyName, ORegistry* pReg)
+ORegKey::ORegKey(OUString keyName, ORegistry* pReg)
     : m_refCount(1)
-    , m_name(keyName)
+    , m_name(std::move(keyName))
     , m_bDeleted(false)
     , m_bModified(false)
     , m_pRegistry(pReg)
 {
 }
 
-
-//  ~ORegKey()
-
 ORegKey::~ORegKey()
 {
     SAL_WARN_IF(m_refCount != 0, "registry", "registry::ORegKey::dtor(): refcount not zero.");
 }
-
-
-//  releaseKey
 
 RegError ORegKey::releaseKey(RegKeyHandle hKey)
 {
     return m_pRegistry->releaseKey(hKey);
 }
 
-
-//  createKey
-
 RegError ORegKey::createKey(std::u16string_view keyName, RegKeyHandle* phNewKey)
 {
     return m_pRegistry->createKey(this, keyName, phNewKey);
 }
 
-
-//  openKey
-
 RegError ORegKey::openKey(std::u16string_view keyName, RegKeyHandle* phOpenKey)
 {
     return m_pRegistry->openKey(this, keyName, phOpenKey);
 }
-
-
-//  openSubKeys
 
 RegError ORegKey::openSubKeys(std::u16string_view keyName, RegKeyHandle** phOpenSubKeys, sal_uInt32* pnSubKeys)
 {
@@ -139,9 +122,6 @@ RegError ORegKey::openSubKeys(std::u16string_view keyName, RegKeyHandle** phOpen
     return RegError::NO_ERROR;
 }
 
-
-//  getKeyNames
-
 RegError ORegKey::getKeyNames(std::u16string_view keyName,
                               rtl_uString*** pSubKeyNames,
                               sal_uInt32* pnSubKeys)
@@ -196,24 +176,15 @@ RegError ORegKey::getKeyNames(std::u16string_view keyName,
     return RegError::NO_ERROR;
 }
 
-
-//  closeKey
-
 RegError ORegKey::closeKey(RegKeyHandle hKey)
 {
     return m_pRegistry->closeKey(hKey);
 }
 
-
-//  deleteKey
-
 RegError ORegKey::deleteKey(std::u16string_view keyName)
 {
     return m_pRegistry->deleteKey(this, keyName);
 }
-
-
-//  getValueType
 
 RegError ORegKey::getValueInfo(std::u16string_view valueName, RegValueType* pValueType, sal_uInt32* pValueSize) const
 {
@@ -266,9 +237,6 @@ RegError ORegKey::getValueInfo(std::u16string_view valueName, RegValueType* pVal
 
     return RegError::NO_ERROR;
 }
-
-
-//  setValue
 
 RegError ORegKey::setValue(std::u16string_view valueName, RegValueType vType, RegValue value, sal_uInt32 vSize)
 {
@@ -338,9 +306,6 @@ RegError ORegKey::setValue(std::u16string_view valueName, RegValueType vType, Re
     return RegError::NO_ERROR;
 }
 
-
-//  setLongListValue
-
 RegError ORegKey::setLongListValue(std::u16string_view valueName, sal_Int32 const * pValueList, sal_uInt32 len)
 {
     OStoreStream    rValue;
@@ -392,9 +357,6 @@ RegError ORegKey::setLongListValue(std::u16string_view valueName, sal_Int32 cons
 
     return RegError::NO_ERROR;
 }
-
-
-//  setStringListValue
 
 RegError ORegKey::setStringListValue(
     std::u16string_view valueName, char** pValueList, sal_uInt32 len)
@@ -458,9 +420,6 @@ RegError ORegKey::setStringListValue(
     return RegError::NO_ERROR;
 }
 
-
-//  setUnicodeListValue
-
 RegError ORegKey::setUnicodeListValue(std::u16string_view valueName, sal_Unicode** pValueList, sal_uInt32 len)
 {
     OStoreStream    rValue;
@@ -521,9 +480,6 @@ RegError ORegKey::setUnicodeListValue(std::u16string_view valueName, sal_Unicode
 
     return RegError::NO_ERROR;
 }
-
-
-//  getValue
 
 RegError ORegKey::getValue(std::u16string_view valueName, RegValue value) const
 {
@@ -600,9 +556,6 @@ RegError ORegKey::getValue(std::u16string_view valueName, RegValue value) const
 
     return RegError::NO_ERROR;
 }
-
-
-//  getLongListValue
 
 RegError ORegKey::getLongListValue(std::u16string_view valueName, sal_Int32** pValueList, sal_uInt32* pLen) const
 {
@@ -704,9 +657,6 @@ RegError ORegKey::getLongListValue(std::u16string_view valueName, sal_Int32** pV
     return RegError::NO_ERROR;
 }
 
-
-//  getStringListValue
-
 RegError ORegKey::getStringListValue(std::u16string_view valueName, char*** pValueList, sal_uInt32* pLen) const
 {
     OStoreStream    rValue;
@@ -800,9 +750,6 @@ RegError ORegKey::getStringListValue(std::u16string_view valueName, char*** pVal
     *pValueList = pVList;
     return RegError::NO_ERROR;
 }
-
-
-//  getUnicodeListValue
 
 RegError ORegKey::getUnicodeListValue(std::u16string_view valueName, sal_Unicode*** pValueList, sal_uInt32* pLen) const
 {
@@ -908,9 +855,6 @@ RegError ORegKey::getResolvedKeyName(std::u16string_view keyName,
     resolvedName = getFullPath(keyName);
     return RegError::NO_ERROR;
 }
-
-
-//  countSubKeys()
 
 sal_uInt32 ORegKey::countSubKeys()
 {

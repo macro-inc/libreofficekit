@@ -21,6 +21,7 @@
 #include <PropertyHelper.hxx>
 #include <servicenames_charttypes.hxx>
 #include <CartesianCoordinateSystem.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <AxisIndexDefines.hxx>
 #include <unonames.hxx>
@@ -46,90 +47,57 @@ enum
     PROP_SCATTERCHARTTYPE_SPLINE_ORDER
 };
 
-void lcl_AddPropertiesToVector(
-    std::vector< Property > & rOutProperties )
+::chart::tPropertyValueMap& StaticScatterChartTypeDefaults()
 {
-    rOutProperties.emplace_back( CHART_UNONAME_CURVE_STYLE,
+    static ::chart::tPropertyValueMap aStaticDefaults =
+        []()
+        {
+            ::chart::tPropertyValueMap aOutMap;
+            ::chart::PropertyHelper::setPropertyValueDefault( aOutMap, PROP_SCATTERCHARTTYPE_CURVE_STYLE, chart2::CurveStyle_LINES );
+            ::chart::PropertyHelper::setPropertyValueDefault< sal_Int32 >( aOutMap, PROP_SCATTERCHARTTYPE_CURVE_RESOLUTION, 20 );
+
+            // todo: check whether order 3 means polygons of order 3 or 2. (see
+            // http://www.people.nnov.ru/fractal/Splines/Basis.htm )
+            ::chart::PropertyHelper::setPropertyValueDefault< sal_Int32 >( aOutMap, PROP_SCATTERCHARTTYPE_SPLINE_ORDER, 3 );
+            return aOutMap;
+        }();
+    return aStaticDefaults;
+}
+
+::cppu::OPropertyArrayHelper& StaticScatterChartTypeInfoHelper()
+{
+    static ::cppu::OPropertyArrayHelper aPropHelper(
+        []()
+        {
+            std::vector< css::beans::Property > aProperties {
+                { CHART_UNONAME_CURVE_STYLE,
                   PROP_SCATTERCHARTTYPE_CURVE_STYLE,
                   cppu::UnoType<chart2::CurveStyle>::get(),
                   beans::PropertyAttribute::BOUND
-                  | beans::PropertyAttribute::MAYBEDEFAULT );
-
-    rOutProperties.emplace_back( CHART_UNONAME_CURVE_RESOLUTION,
+                  | beans::PropertyAttribute::MAYBEDEFAULT },
+                { CHART_UNONAME_CURVE_RESOLUTION,
                   PROP_SCATTERCHARTTYPE_CURVE_RESOLUTION,
                   cppu::UnoType<sal_Int32>::get(),
                   beans::PropertyAttribute::BOUND
-                  | beans::PropertyAttribute::MAYBEDEFAULT );
-    rOutProperties.emplace_back( CHART_UNONAME_SPLINE_ORDER,
+                  | beans::PropertyAttribute::MAYBEDEFAULT },
+                { CHART_UNONAME_SPLINE_ORDER,
                   PROP_SCATTERCHARTTYPE_SPLINE_ORDER,
                   cppu::UnoType<sal_Int32>::get(),
                   beans::PropertyAttribute::BOUND
-                  | beans::PropertyAttribute::MAYBEDEFAULT );
+                  | beans::PropertyAttribute::MAYBEDEFAULT } };
+            std::sort( aProperties.begin(), aProperties.end(),
+                         ::chart::PropertyNameLess() );
+            return comphelper::containerToSequence( aProperties );
+        }() );
+    return aPropHelper;
 }
 
-struct StaticScatterChartTypeDefaults_Initializer
+const uno::Reference< beans::XPropertySetInfo >& StaticScatterChartTypeInfo()
 {
-    ::chart::tPropertyValueMap* operator()()
-    {
-        static ::chart::tPropertyValueMap aStaticDefaults;
-        lcl_AddDefaultsToMap( aStaticDefaults );
-        return &aStaticDefaults;
-    }
-private:
-    static void lcl_AddDefaultsToMap( ::chart::tPropertyValueMap & rOutMap )
-    {
-        ::chart::PropertyHelper::setPropertyValueDefault( rOutMap, PROP_SCATTERCHARTTYPE_CURVE_STYLE, chart2::CurveStyle_LINES );
-        ::chart::PropertyHelper::setPropertyValueDefault< sal_Int32 >( rOutMap, PROP_SCATTERCHARTTYPE_CURVE_RESOLUTION, 20 );
-
-        // todo: check whether order 3 means polygons of order 3 or 2. (see
-        // http://www.people.nnov.ru/fractal/Splines/Basis.htm )
-        ::chart::PropertyHelper::setPropertyValueDefault< sal_Int32 >( rOutMap, PROP_SCATTERCHARTTYPE_SPLINE_ORDER, 3 );
-    }
-};
-
-struct StaticScatterChartTypeDefaults : public rtl::StaticAggregate< ::chart::tPropertyValueMap, StaticScatterChartTypeDefaults_Initializer >
-{
-};
-
-struct StaticScatterChartTypeInfoHelper_Initializer
-{
-    ::cppu::OPropertyArrayHelper* operator()()
-    {
-        static ::cppu::OPropertyArrayHelper aPropHelper( lcl_GetPropertySequence() );
-        return &aPropHelper;
-    }
-
-private:
-    static Sequence< Property > lcl_GetPropertySequence()
-    {
-        std::vector< css::beans::Property > aProperties;
-        lcl_AddPropertiesToVector( aProperties );
-
-        std::sort( aProperties.begin(), aProperties.end(),
-                     ::chart::PropertyNameLess() );
-
-        return comphelper::containerToSequence( aProperties );
-    }
-
-};
-
-struct StaticScatterChartTypeInfoHelper : public rtl::StaticAggregate< ::cppu::OPropertyArrayHelper, StaticScatterChartTypeInfoHelper_Initializer >
-{
-};
-
-struct StaticScatterChartTypeInfo_Initializer
-{
-    uno::Reference< beans::XPropertySetInfo >* operator()()
-    {
-        static uno::Reference< beans::XPropertySetInfo > xPropertySetInfo(
-            ::cppu::OPropertySetHelper::createPropertySetInfo(*StaticScatterChartTypeInfoHelper::get() ) );
-        return &xPropertySetInfo;
-    }
-};
-
-struct StaticScatterChartTypeInfo : public rtl::StaticAggregate< uno::Reference< beans::XPropertySetInfo >, StaticScatterChartTypeInfo_Initializer >
-{
-};
+    static uno::Reference< beans::XPropertySetInfo > xPropertySetInfo(
+        ::cppu::OPropertySetHelper::createPropertySetInfo(StaticScatterChartTypeInfoHelper() ) );
+    return xPropertySetInfo;
+}
 
 } // anonymous namespace
 
@@ -154,16 +122,21 @@ uno::Reference< util::XCloneable > SAL_CALL ScatterChartType::createClone()
     return uno::Reference< util::XCloneable >( new ScatterChartType( *this ));
 }
 
-// ____ XChartType ____
-Reference< chart2::XCoordinateSystem > SAL_CALL
-    ScatterChartType::createCoordinateSystem( ::sal_Int32 DimensionCount )
+rtl::Reference< ChartType > ScatterChartType::cloneChartType() const
 {
-    Reference< chart2::XCoordinateSystem > xResult(
-        new CartesianCoordinateSystem( DimensionCount ));
+    return new ScatterChartType( *this );
+}
+
+// ____ XChartType ____
+rtl::Reference< ::chart::BaseCoordinateSystem >
+    ScatterChartType::createCoordinateSystem2( sal_Int32 DimensionCount )
+{
+    rtl::Reference< CartesianCoordinateSystem > xResult =
+        new CartesianCoordinateSystem( DimensionCount );
 
     for( sal_Int32 i=0; i<DimensionCount; ++i )
     {
-        Reference< chart2::XAxis > xAxis( xResult->getAxisByDimension( i, MAIN_AXIS_INDEX ) );
+        rtl::Reference< Axis > xAxis = xResult->getAxisByDimension2( i, MAIN_AXIS_INDEX );
         if( !xAxis.is() )
         {
             OSL_FAIL("a created coordinate system should have an axis for each dimension");
@@ -196,25 +169,26 @@ uno::Sequence< OUString > SAL_CALL ScatterChartType::getSupportedMandatoryRoles(
 }
 
 // ____ OPropertySet ____
-uno::Any ScatterChartType::GetDefaultValue( sal_Int32 nHandle ) const
+void ScatterChartType::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
-    const tPropertyValueMap& rStaticDefaults = *StaticScatterChartTypeDefaults::get();
+    const tPropertyValueMap& rStaticDefaults = StaticScatterChartTypeDefaults();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 // ____ OPropertySet ____
 ::cppu::IPropertyArrayHelper & SAL_CALL ScatterChartType::getInfoHelper()
 {
-    return *StaticScatterChartTypeInfoHelper::get();
+    return StaticScatterChartTypeInfoHelper();
 }
 
 // ____ XPropertySet ____
 uno::Reference< beans::XPropertySetInfo > SAL_CALL ScatterChartType::getPropertySetInfo()
 {
-    return *StaticScatterChartTypeInfo::get();
+    return StaticScatterChartTypeInfo();
 }
 
 OUString SAL_CALL ScatterChartType::getImplementationName()

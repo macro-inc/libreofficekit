@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -21,10 +23,6 @@ class tdf80693(UITestCase):
                 xdistributioncombo = xDialog.getChild("distribution-combo")
                 xparameter1spin = xDialog.getChild("parameter1-spin")
                 xparameter2spin = xDialog.getChild("parameter2-spin")
-                xenableseedcheck = xDialog.getChild("enable-seed-check")
-                xseedspin = xDialog.getChild("seed-spin")
-                xenableroundingcheck = xDialog.getChild("enable-rounding-check")
-                xdecimalplacesspin = xDialog.getChild("decimal-places-spin")
 
                 xcellrangeedit.executeAction("TYPE", mkPropertyValues({"TEXT":"$Sheet1.$A$1:$A$2"}))
                 select_by_text(xdistributioncombo, "Uniform")

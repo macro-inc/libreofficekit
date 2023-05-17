@@ -37,7 +37,6 @@
 
 #include <pattern/window.hxx>
 #include <properties.h>
-#include <stdtypes.h>
 #include <targets.h>
 
 #include <com/sun/star/awt/Toolkit.hpp>
@@ -68,6 +67,7 @@
 
 #include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 #include <comphelper/multicontainer2.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
@@ -78,7 +78,7 @@
 
 #include <toolkit/helper/vclunohelper.hxx>
 #include <unotools/moduleoptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/cmdoptions.hxx>
 #include <vcl/threadex.hxx>
 #include <mutex>
@@ -113,7 +113,7 @@ class XFrameImpl:
 {
 public:
 
-    explicit XFrameImpl(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+    explicit XFrameImpl(css::uno::Reference< css::uno::XComponentContext >  xContext);
 
     /// Initialization function after having acquire()'d.
     void initListeners();
@@ -418,8 +418,8 @@ private:
     typedef std::unordered_map<OUString, css::beans::Property> TPropInfoHash;
     TPropInfoHash m_lProps;
 
-    ListenerHash m_lSimpleChangeListener;
-    ListenerHash m_lVetoChangeListener;
+    comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, OUString> m_lSimpleChangeListener;
+    comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XVetoableChangeListener, OUString> m_lVetoChangeListener;
 
     // hold it weak ... otherwise this helper has to be "killed" explicitly .-)
     css::uno::WeakReference< css::uno::XInterface > m_xBroadcaster;
@@ -452,10 +452,10 @@ private:
                     The value must be different from NULL!
     @onerror    ASSERT in debug version or nothing in release version.
 *//*-*****************************************************************************************************/
-XFrameImpl::XFrameImpl( const css::uno::Reference< css::uno::XComponentContext >& xContext )
+XFrameImpl::XFrameImpl( css::uno::Reference< css::uno::XComponentContext >  xContext )
         : PartialWeakComponentImplHelper(m_aMutex)
         //  init member
-        , m_xContext                  ( xContext )
+        , m_xContext                  (std::move( xContext ))
         , m_aListenerContainer        ( m_aMutex )
         , m_eActiveState              ( E_INACTIVE )
         , m_bIsFrameTop               ( true ) // I think we are top without a parent ... and there is no parent yet!
@@ -765,15 +765,14 @@ void SAL_CALL XFrameImpl::initialize( const css::uno::Reference< css::awt::XWind
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
     SolarMutexResettableGuard aWriteLock;
 
+    // This must be the first call of this method!
+    // We should initialize our object and open it for working.
     if ( m_xContainerWindow.is() )
         throw css::uno::RuntimeException(
                 "XFrameImpl::initialized() is called more than once, which is not useful nor allowed.",
                 static_cast< css::frame::XFrame* >(this));
 
-    // This must be the first call of this method!
-    // We should initialize our object and open it for working.
     // Set the new window.
-    SAL_WARN_IF( m_xContainerWindow.is(), "fwk.frame", "XFrameImpl::initialize(): Leak detected! This state should never occur ..." );
     m_xContainerWindow = xWindow;
 
     // if window is initially visible, we will never get a windowShowing event
@@ -799,8 +798,7 @@ void SAL_CALL XFrameImpl::initialize( const css::uno::Reference< css::awt::XWind
         lcl_enableLayoutManager(xLayoutManager, this);
 
     // create progress helper
-    css::uno::Reference< css::frame::XFrame > xThis (static_cast< css::frame::XFrame* >(this),
-                                                     css::uno::UNO_QUERY_THROW);
+    css::uno::Reference< css::frame::XFrame > xThis (this);
     css::uno::Reference< css::task::XStatusIndicatorFactory > xIndicatorFactory =
         css::task::StatusIndicatorFactory::createWithFrame(m_xContext, xThis,
                                                            false/*DisableReschedule*/, true/*AllowParentShow*/ );
@@ -1475,6 +1473,17 @@ sal_Bool SAL_CALL XFrameImpl::setComponent(const css::uno::Reference< css::awt::
         {
             SolarMutexGuard aWriteLock;
             m_xController = nullptr;
+
+            auto pInterceptionHelper = dynamic_cast<InterceptionHelper*>(m_xDispatchHelper.get());
+            if (pInterceptionHelper)
+            {
+                css::uno::Reference<css::frame::XDispatchProvider> xDispatchProvider = pInterceptionHelper->GetSlave();
+                auto pDispatchProvider = dynamic_cast<DispatchProvider*>(xDispatchProvider.get());
+                if (pDispatchProvider)
+                {
+                    pDispatchProvider->ClearProtocolHandlers();
+                }
+            }
         }
         /* } SAFE */
 
@@ -2860,19 +2869,16 @@ bool XFrameImpl::impl_existsVeto(const css::beans::PropertyChangeEvent& aEvent)
         The used helper is threadsafe and it lives for the whole lifetime of
         our own object.
     */
-    ::comphelper::OInterfaceContainerHelper2* pVetoListener = m_lVetoChangeListener.getContainer(aEvent.PropertyName);
+    ::comphelper::OInterfaceContainerHelper3<css::beans::XVetoableChangeListener>* pVetoListener = m_lVetoChangeListener.getContainer(aEvent.PropertyName);
     if (! pVetoListener)
         return false;
 
-    ::comphelper::OInterfaceIteratorHelper2 pListener(*pVetoListener);
+    ::comphelper::OInterfaceIteratorHelper3 pListener(*pVetoListener);
     while (pListener.hasMoreElements())
     {
         try
         {
-            css::uno::Reference< css::beans::XVetoableChangeListener > xListener(
-                static_cast<css::beans::XVetoableChangeListener*>(pListener.next()),
-                css::uno::UNO_QUERY_THROW);
-            xListener->vetoableChange(aEvent);
+            pListener.next()->vetoableChange(aEvent);
         }
         catch(const css::uno::RuntimeException&)
             { pListener.remove(); }
@@ -2889,19 +2895,16 @@ void XFrameImpl::impl_notifyChangeListener(const css::beans::PropertyChangeEvent
         The used helper is threadsafe and it lives for the whole lifetime of
         our own object.
     */
-    ::comphelper::OInterfaceContainerHelper2* pSimpleListener = m_lSimpleChangeListener.getContainer(aEvent.PropertyName);
+    ::comphelper::OInterfaceContainerHelper3<css::beans::XPropertyChangeListener>* pSimpleListener = m_lSimpleChangeListener.getContainer(aEvent.PropertyName);
     if (! pSimpleListener)
         return;
 
-    ::comphelper::OInterfaceIteratorHelper2 pListener(*pSimpleListener);
+    ::comphelper::OInterfaceIteratorHelper3 pListener(*pSimpleListener);
     while (pListener.hasMoreElements())
     {
         try
         {
-            css::uno::Reference< css::beans::XPropertyChangeListener > xListener(
-                static_cast<css::beans::XVetoableChangeListener*>(pListener.next()),
-                css::uno::UNO_QUERY_THROW);
-            xListener->propertyChange(aEvent);
+            pListener.next()->propertyChange(aEvent);
         }
         catch(const css::uno::RuntimeException&)
             { pListener.remove(); }
@@ -3223,7 +3226,7 @@ void XFrameImpl::impl_setCloser( /*IN*/ const css::uno::Reference< css::frame::X
         css::uno::Reference< css::frame::XLayoutManager > xLayoutManager;
         xFrameProps->getPropertyValue(FRAME_PROPNAME_ASCII_LAYOUTMANAGER) >>= xLayoutManager;
         css::uno::Reference< css::beans::XPropertySet > xLayoutProps(xLayoutManager, css::uno::UNO_QUERY_THROW);
-        xLayoutProps->setPropertyValue(LAYOUTMANAGER_PROPNAME_MENUBARCLOSER, css::uno::makeAny(bState));
+        xLayoutProps->setPropertyValue(LAYOUTMANAGER_PROPNAME_MENUBARCLOSER, css::uno::Any(bState));
     }
     catch(const css::uno::RuntimeException&)
         { throw; }

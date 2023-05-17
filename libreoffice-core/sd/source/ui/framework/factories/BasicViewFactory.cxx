@@ -83,8 +83,7 @@ public:
 //===== ViewFactory ===========================================================
 
 BasicViewFactory::BasicViewFactory ()
-    : BasicViewFactoryInterfaceBase(MutexOwner::maMutex),
-      mpViewShellContainer(new ViewShellContainer()),
+    : mpViewShellContainer(new ViewShellContainer()),
       mpBase(nullptr),
       mpFrameView(nullptr),
       mpWindow(VclPtr<WorkWindow>::Create(nullptr,WB_STDWORK)),
@@ -97,7 +96,7 @@ BasicViewFactory::~BasicViewFactory()
 {
 }
 
-void SAL_CALL BasicViewFactory::disposing()
+void BasicViewFactory::disposing(std::unique_lock<std::mutex>&)
 {
     // Disconnect from the frame view.
     if (mpFrameView != nullptr)
@@ -164,8 +163,7 @@ Reference<XResource> SAL_CALL BasicViewFactory::createResource (
             pDescriptor = CreateView(rxViewId, *pFrame, *pWindow, xPane, pFrameView, bIsCenterPane);
         }
 
-        if (pDescriptor != nullptr)
-            xView = pDescriptor->mxView;
+        xView = pDescriptor->mxView;
 
         mpViewShellContainer->push_back(pDescriptor);
 

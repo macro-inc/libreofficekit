@@ -20,13 +20,14 @@
 #include <AccessiblePageShape.hxx>
 #include <svx/AccessibleShapeInfo.hxx>
 #include <svx/IAccessibleViewForwarder.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/gen.hxx>
 #include <sal/log.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/XMasterPageTarget.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -38,11 +39,11 @@ namespace accessibility {
 //=====  internal  ============================================================
 
 AccessiblePageShape::AccessiblePageShape (
-    const uno::Reference<drawing::XDrawPage>& rxPage,
+    uno::Reference<drawing::XDrawPage> xPage,
     const uno::Reference<XAccessible>& rxParent,
     const AccessibleShapeTreeInfo& rShapeTreeInfo)
     : AccessibleShape (AccessibleShapeInfo (nullptr, rxParent), rShapeTreeInfo),
-      mxPage (rxPage)
+      mxPage (std::move(xPage))
 {
     // The main part of the initialization is done in the init method which
     // has to be called from this constructor's caller.
@@ -54,7 +55,7 @@ AccessiblePageShape::~AccessiblePageShape()
 
 //=====  XAccessibleContext  ==================================================
 
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
        AccessiblePageShape::getAccessibleChildCount()
 {
     return 0;
@@ -64,7 +65,7 @@ sal_Int32 SAL_CALL
     an exception for a wrong index.
 */
 uno::Reference<XAccessible> SAL_CALL
-    AccessiblePageShape::getAccessibleChild( sal_Int32 )
+    AccessiblePageShape::getAccessibleChild( sal_Int64 )
 {
     throw lang::IndexOutOfBoundsException ("page shape has no children",
         static_cast<uno::XWeak*>(this));
@@ -121,8 +122,8 @@ awt::Rectangle SAL_CALL AccessiblePageShape::getBounds()
             aBoundingBox = awt::Rectangle (
                 aBBox.Left(),
                 aBBox.Top(),
-                aBBox.getWidth(),
-                aBBox.getHeight());
+                aBBox.getOpenWidth(),
+                aBBox.getOpenHeight());
         }
         else
             aBoundingBox = awt::Rectangle (

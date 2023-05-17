@@ -45,7 +45,6 @@
 #pragma clang diagnostic ignored "-Winvalid-noreturn"
 #pragma clang diagnostic ignored "-Wmicrosoft"
 #pragma clang diagnostic ignored "-Wnon-pod-varargs"
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
 #endif
 #include <atlbase.h>
 // You may derive a class from CComModule and use it if you want to override
@@ -58,19 +57,6 @@ extern CComModule _Module;
 #include <postwin.h>
 #undef OPAQUE
 
-
-#define ENTER_PROTECTED_BLOCK   \
-    try                         \
-    {
-
-#define LEAVE_PROTECTED_BLOCK   \
-    }                           \
-    catch(...)                  \
-    {                           \
-        return E_FAIL;          \
-    }
-
-#define SAFE_SYSFREESTRING(x) { ::SysFreeString(x); x=NULL; }
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

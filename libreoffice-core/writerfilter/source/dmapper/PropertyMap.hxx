@@ -31,8 +31,10 @@
 #include <memory>
 #include <optional>
 #include <map>
+#include <utility>
 #include <vector>
 #include <set>
+#include <deque>
 
 namespace com::sun::star {
     namespace beans {
@@ -78,7 +80,7 @@ enum GrabBagType
     CHAR_GRAB_BAG
 };
 
-struct RedlineParams : public virtual SvRefBase
+struct RedlineParams : public SvRefBase
 {
     OUString  m_sAuthor;
     OUString  m_sDate;
@@ -98,15 +100,15 @@ private:
     bool          m_bIsDocDefault;
 
 public:
-    PropValue( const css::uno::Any& rValue, GrabBagType i_GrabBagType, bool bDocDefault )
-        : m_aValue( rValue )
+    PropValue( css::uno::Any aValue, GrabBagType i_GrabBagType, bool bDocDefault )
+        : m_aValue(std::move( aValue ))
         , m_GrabBagType( i_GrabBagType )
         , m_bIsDocDefault( bDocDefault )
     {
     }
 
-    PropValue( const css::uno::Any& rValue, GrabBagType i_GrabBagType )
-        : m_aValue( rValue )
+    PropValue( css::uno::Any aValue, GrabBagType i_GrabBagType )
+        : m_aValue(std::move( aValue ))
         , m_GrabBagType( i_GrabBagType )
         , m_bIsDocDefault( false )
     {
@@ -129,7 +131,7 @@ public:
 class PropertyMap;
 typedef tools::SvRef< PropertyMap > PropertyMapPtr;
 
-class PropertyMap : public virtual SvRefBase
+class PropertyMap : public SvRefBase
 {
 private:
     // Cache the property values for the GetPropertyValues() call(s).
@@ -299,7 +301,7 @@ private:
 
     void CopyLastHeaderFooter( bool bFirstPage, DomainMapper_Impl& rDM_Impl );
 
-    static void CopyHeaderFooter( DomainMapper_Impl& rDM_Impl,
+    static void CopyHeaderFooter( const DomainMapper_Impl& rDM_Impl,
                                   const css::uno::Reference< css::beans::XPropertySet >& xPrevStyle,
                                   const css::uno::Reference< css::beans::XPropertySet >& xStyle,
                                   bool bOmitRightHeader = false, bool bOmitLeftHeader = false,
@@ -321,9 +323,6 @@ private:
                                    BorderOffsetFrom eOffsetFrom,
                                    sal_uInt32 nLineWidth,
                                    DomainMapper_Impl& rDM_Impl );
-
-    // Determines if conversion of a given floating table is wanted or not.
-    bool FloatingTableConversion( const DomainMapper_Impl& rDM_Impl, FloatingTableInfo& rInfo );
 
     /// Increases paragraph spacing according to Word 2013+ needs if necessary.
     void HandleIncreasedAnchoredObjectSpacing(DomainMapper_Impl& rDM_Impl);
@@ -411,7 +410,11 @@ public:
     void ClearHeaderFooterLinkToPrevious( bool bHeader, PageType eType );
 };
 
-class ParagraphProperties : public virtual SvRefBase
+void BeforeConvertToTextFrame(std::deque<css::uno::Any>& rFramedRedlines, std::vector<sal_Int32>& redPos, std::vector<sal_Int32>& redLen, std::vector<OUString>& redCell, std::vector<OUString>& redTable);
+
+void AfterConvertToTextFrame(DomainMapper_Impl& rDM_Impl, std::deque<css::uno::Any>& aFramedRedlines, std::vector<sal_Int32>& redPos, std::vector<sal_Int32>& redLen, std::vector<OUString>& redCell, std::vector<OUString>& redTable);
+
+class ParagraphProperties : public SvRefBase
 {
 private:
     bool                                         m_bFrameMode;
@@ -448,7 +451,7 @@ public:
     ParagraphProperties & operator =(ParagraphProperties &&) = default;
 
     // Does not compare the starting/ending range, m_sParaStyleName and m_nDropCapLength
-    bool operator==( const ParagraphProperties& );
+    bool operator==( const ParagraphProperties& ) const;
 
     sal_Int32 GetListId() const          { return m_nListId; }
     void      SetListId( sal_Int32 nId ) { m_nListId = nId; }
@@ -520,6 +523,16 @@ public:
 
 typedef tools::SvRef< ParagraphProperties > ParagraphPropertiesPtr;
 
+class ParagraphPropertiesPropertyMap: public PropertyMap {
+public:
+    ParagraphProperties & props() { return m_props; }
+
+    ParagraphProperties const & props() const { return m_props; }
+
+private:
+    ParagraphProperties m_props;
+};
+
 /*-------------------------------------------------------------------------
     property map of a stylesheet
   -----------------------------------------------------------------------*/
@@ -528,8 +541,7 @@ typedef tools::SvRef< ParagraphProperties > ParagraphPropertiesPtr;
 #define WW_OUTLINE_MIN  sal_Int16( 0 )
 
 class StyleSheetPropertyMap
-    : public PropertyMap
-    , public ParagraphProperties
+    : public ParagraphPropertiesPropertyMap
 {
 private:
     sal_Int16 mnListLevel;
@@ -546,8 +558,7 @@ public:
 };
 
 class ParagraphPropertyMap
-    : public PropertyMap
-    , public ParagraphProperties
+    : public ParagraphPropertiesPropertyMap
 {
 public:
     explicit ParagraphPropertyMap() {}
@@ -566,7 +577,6 @@ public:
         CELL_MAR_BOTTOM,
         TABLE_WIDTH,
         TABLE_WIDTH_TYPE,
-        GAP_HALF,
         LEFT_MARGIN,
         HORI_ORIENT,
         TablePropertyMapTarget_MAX
@@ -605,7 +615,6 @@ struct TableParagraph
     css::uno::Reference<css::text::XTextRange> m_rEndParagraph;
     PropertyMapPtr m_pPropertyMap;
     css::uno::Reference<css::beans::XPropertySet> m_rPropertySet;
-    std::set<OUString> m_aParaOverrideApplied;
 };
 
 typedef std::shared_ptr< std::vector<TableParagraph> > TableParagraphVectorPtr;

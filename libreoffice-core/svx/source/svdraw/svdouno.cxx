@@ -32,10 +32,9 @@
 #include <svx/svdview.hxx>
 #include <svx/svdorect.hxx>
 #include <svx/svdviter.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <rtl/ref.hxx>
 #include <svx/sdrpagewindow.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <o3tl/sorted_vector.hxx>
 
@@ -140,6 +139,7 @@ SdrUnoObj::SdrUnoObj(
 :   SdrRectObj(rSdrModel),
     m_pImpl( new SdrUnoObjDataHolder )
 {
+    osl_atomic_increment(&m_refCount); // prevent deletion during creation
     m_bIsUnoObj = true;
 
     m_pImpl->pEventListener = new SdrControlEventListenerImpl(this);
@@ -147,6 +147,7 @@ SdrUnoObj::SdrUnoObj(
     // only an owner may create independently
     if (!rModelName.isEmpty())
         CreateUnoControlModel(rModelName);
+    osl_atomic_decrement(&m_refCount);
 }
 
 SdrUnoObj::SdrUnoObj( SdrModel& rSdrModel, SdrUnoObj const & rSource)
@@ -249,7 +250,7 @@ void SdrUnoObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
 
 SdrObjKind SdrUnoObj::GetObjIdentifier() const
 {
-    return OBJ_UNO;
+    return SdrObjKind::UNO;
 }
 
 void SdrUnoObj::SetContextWritingMode( const sal_Int16 _nContextWritingMode )
@@ -257,7 +258,7 @@ void SdrUnoObj::SetContextWritingMode( const sal_Int16 _nContextWritingMode )
     try
     {
         uno::Reference< beans::XPropertySet > xModelProperties( GetUnoControlModel(), uno::UNO_QUERY_THROW );
-        xModelProperties->setPropertyValue( "ContextWritingMode", uno::makeAny( _nContextWritingMode ) );
+        xModelProperties->setPropertyValue( "ContextWritingMode", uno::Any( _nContextWritingMode ) );
     }
     catch( const uno::Exception& )
     {
@@ -281,7 +282,7 @@ OUString SdrUnoObj::TakeObjNamePlural() const
     return SvxResId(STR_ObjNamePluralUno);
 }
 
-SdrUnoObj* SdrUnoObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrUnoObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrUnoObj(rTargetModel, *this);
 }

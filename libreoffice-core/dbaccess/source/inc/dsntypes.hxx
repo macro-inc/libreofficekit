@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_DBACCESS_SOURCE_INC_DSNTYPES_HXX
-#define INCLUDED_DBACCESS_SOURCE_INC_DSNTYPES_HXX
+#pragma once
 
 #include <sal/config.h>
 
@@ -124,7 +123,7 @@ public:
     OUString cutPrefix(std::u16string_view _sURL) const;
 
     /// on a given string, return the type prefix
-    OUString getPrefix(const OUString& _sURL) const;
+    OUString getPrefix(std::u16string_view _sURL) const;
 
     /// determines whether there is a driver for the given URL prefix/pattern
     bool    hasDriver( const char* _pAsciiPattern ) const;
@@ -215,7 +214,5 @@ inline ODsnTypeCollection::TypeIterator ODsnTypeCollection::begin() const { retu
 inline ODsnTypeCollection::TypeIterator ODsnTypeCollection::end() const { return ODsnTypeCollection::TypeIterator(this, m_aDsnTypesDisplayNames.size());}
 
 }   // namespace dbaccess
-
-#endif // INCLUDED_DBACCESS_SOURCE_INC_DSNTYPES_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

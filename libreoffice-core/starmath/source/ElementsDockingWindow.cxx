@@ -23,6 +23,8 @@
 #include <strings.hrc>
 #include <smmod.hxx>
 #include <cfgitem.hxx>
+#include <parse.hxx>
+#include <utility>
 #include <view.hxx>
 #include <visitors.hxx>
 #include <document.hxx>
@@ -38,7 +40,6 @@
 #include <vcl/virdev.hxx>
 
 #include <unordered_map>
-#include <utility>
 
 namespace
 {
@@ -451,11 +452,21 @@ const std::vector<TranslateId>& SmElementsControl::categories()
     return s_a5Categories;
 }
 
+struct ElementData
+{
+    OUString maElementSource;
+    OUString maHelpText;
+    ElementData(const OUString& aElementSource, const OUString& aHelpText)
+        : maElementSource(aElementSource)
+        , maHelpText(aHelpText)
+    {
+    }
+};
+
 SmElementsControl::SmElementsControl(std::unique_ptr<weld::IconView> pIconView)
     : mpDocShell(new SmDocShell(SfxModelFlags::EMBEDDED_OBJECT))
     , mnCurrentSetIndex(-1)
     , m_nSmSyntaxVersion(SM_MOD()->GetConfig()->GetDefaultSmSyntaxVersion())
-    , mbVerticalMode(true)
     , mpIconView(std::move(pIconView))
 {
     maParser.reset(starmathdatabase::GetVersionSmParser(m_nSmSyntaxVersion));
@@ -470,14 +481,6 @@ SmElementsControl::~SmElementsControl()
     mpDocShell->DoClose();
 }
 
-void SmElementsControl::setVerticalMode(bool bVerticalMode)
-{
-    if (mbVerticalMode == bVerticalMode)
-        return;
-    mbVerticalMode = bVerticalMode;
-    build();
-}
-
 Color SmElementsControl::GetTextColor()
 {
     const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
@@ -490,22 +493,41 @@ Color SmElementsControl::GetControlBackground()
     return rStyleSettings.GetFieldColor();
 }
 
-struct ElementData
+namespace
 {
-    OUString maElementSource;
-    OUString maHelpText;
-    ElementData(const OUString& aElementSource, const OUString& aHelpText)
-        : maElementSource(aElementSource)
-        , maHelpText(aHelpText)
+    // SmTmpDevice::GetTextColor assumes a fg/bg of svtools::FONTCOLOR/svtools::DOCCOLOR
+    // here replace COL_AUTO with the desired fg color, alternatively could add something
+    // to SmTmpDevice to override its defaults
+    class AutoColorVisitor : public SmDefaultingVisitor
     {
-    }
-};
+    private:
+        Color m_aAutoColor;
+    public:
+        AutoColorVisitor(SmNode* pNode, Color aAutoColor)
+            : m_aAutoColor(aAutoColor)
+        {
+            DefaultVisit(pNode);
+        }
+        virtual void DefaultVisit(SmNode* pNode) override
+        {
+            if (pNode->GetFont().GetColor() == COL_AUTO)
+                pNode->GetFont().SetColor(m_aAutoColor);
+            size_t nNodes = pNode->GetNumSubNodes();
+            for (size_t i = 0; i < nNodes; ++i)
+            {
+                SmNode* pChild = pNode->GetSubNode(i);
+                if (!pChild)
+                    continue;
+                DefaultVisit(pChild);
+            }
+        }
+    };
+}
 
 void SmElementsControl::addElement(const OUString& aElementVisual, const OUString& aElementSource, const OUString& aHelpText)
 {
     std::unique_ptr<SmNode> pNode = maParser->ParseExpression(aElementVisual);
-    VclPtr<VirtualDevice> pDevice(mpIconView->create_virtual_device());
-    pDevice->SetTextRenderModeForResolutionIndependentLayout(true);
+    ScopedVclPtr<VirtualDevice> pDevice(mpIconView->create_virtual_device());
     pDevice->SetMapMode(MapMode(SmMapUnit()));
     pDevice->SetDrawMode(DrawModeFlags::Default);
     pDevice->SetLayoutMode(vcl::text::ComplexTextLayoutFlags::Default);
@@ -518,13 +540,15 @@ void SmElementsControl::addElement(const OUString& aElementVisual, const OUStrin
     pNode->SetSize(Fraction(10,8));
     pNode->Arrange(*pDevice, maFormat);
 
+    AutoColorVisitor(pNode.get(), GetTextColor());
+
     Size aSize = pDevice->LogicToPixel(Size(pNode->GetWidth(), pNode->GetHeight()));
-    aSize.extendBy(10, 0); // Add 5 pixels from both sides to accomodate extending parts of italics
+    aSize.extendBy(10, 0); // Add 5 pixels from both sides to accommodate extending parts of italics
     pDevice->SetOutputSizePixel(aSize);
     SmDrawingVisitor(*pDevice, pDevice->PixelToLogic(Point(5, 0)), pNode.get());
 
     maItemDatas.push_back(std::make_unique<ElementData>(aElementSource, aHelpText));
-    const OUString aId(OUString::number(reinterpret_cast<sal_uInt64>(maItemDatas.back().get())));
+    const OUString aId(weld::toId(maItemDatas.back().get()));
     mpIconView->insert(-1, nullptr, &aId, pDevice, nullptr);
     if (mpIconView->get_item_width() < aSize.Width())
         mpIconView->set_item_width(aSize.Width());
@@ -532,12 +556,12 @@ void SmElementsControl::addElement(const OUString& aElementVisual, const OUStrin
 
 OUString SmElementsControl::GetElementSource(const OUString& itemId)
 {
-    return reinterpret_cast<ElementData*>(itemId.toUInt64())->maElementSource;
+    return weld::fromId<ElementData*>(itemId)->maElementSource;
 }
 
 OUString SmElementsControl::GetElementHelpText(const OUString& itemId)
 {
-    return reinterpret_cast<ElementData*>(itemId.toUInt64())->maHelpText;
+    return weld::fromId<ElementData*>(itemId)->maHelpText;
 }
 
 void SmElementsControl::setElementSetIndex(int nSetIndex)
@@ -550,8 +574,8 @@ void SmElementsControl::setElementSetIndex(int nSetIndex)
 
 void SmElementsControl::addElements(int nCategory)
 {
+    mpIconView->clear(); // tdf#152411 clear before freeze to let gtk a11y drop reference
     mpIconView->freeze();
-    mpIconView->clear();
     mpIconView->set_item_width(0);
     maItemDatas.clear();
 

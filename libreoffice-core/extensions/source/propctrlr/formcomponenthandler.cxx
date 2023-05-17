@@ -100,7 +100,7 @@
 #include <svx/svxids.hrc>
 #include <vcl/graph.hxx>
 #include <vcl/unohelp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/macros.h>
 #include <sal/log.hxx>
 
@@ -322,7 +322,7 @@ namespace pcr
         if ( PROPERTY_ID_IMAGE_URL == nPropId && ( _rValue >>= xGrfObj ) )
         {
             DBG_ASSERT( xGrfObj.is(), "FormComponentPropertyHandler::setPropertyValue() xGrfObj is invalid");
-            m_xComponent->setPropertyValue(PROPERTY_GRAPHIC, uno::makeAny(xGrfObj->getGraphic()));
+            m_xComponent->setPropertyValue(PROPERTY_GRAPHIC, uno::Any(xGrfObj->getGraphic()));
         }
         else if ( PROPERTY_ID_FONT == nPropId )
         {
@@ -721,7 +721,7 @@ namespace pcr
                 break;
             }
 
-            aControlValue = PropertyHandlerComponent::convertToControlValue( _rPropertyName, makeAny( nNormalized ), _rControlValueType );
+            aControlValue = PropertyHandlerComponent::convertToControlValue( _rPropertyName, Any( nNormalized ), _rControlValueType );
         }
         break;
 
@@ -1488,7 +1488,7 @@ namespace pcr
             OSL_PRECOND( _rxInspectorUI.is(), "lcl_rebuildAndResetCommand: invalid BrowserUI!" );
             OSL_PRECOND( _rxHandler.is(), "lcl_rebuildAndResetCommand: invalid handler!" );
             _rxInspectorUI->rebuildPropertyUI( PROPERTY_COMMAND );
-            _rxHandler->setPropertyValue( PROPERTY_COMMAND, makeAny( OUString() ) );
+            _rxHandler->setPropertyValue( PROPERTY_COMMAND, Any( OUString() ) );
         }
     }
 
@@ -2533,7 +2533,7 @@ namespace pcr
             sTemp.append(rQueryName);
             Reference< XNameAccess > xSubQueries(_xQueryNames->getByName(rQueryName),UNO_QUERY);
             if ( xSubQueries.is() )
-                impl_fillQueryNames_throw(xSubQueries,_out_rNames,sTemp.makeStringAndClear());
+                impl_fillQueryNames_throw(xSubQueries,_out_rNames,sTemp);
             else
                 _out_rNames.push_back( sTemp.makeStringAndClear() );
         }
@@ -2633,11 +2633,11 @@ namespace pcr
 
             // initialize the dialog
             Reference< XPropertySet > xDialogProps( xDialog, UNO_QUERY_THROW );
-            xDialogProps->setPropertyValue("QueryComposer", makeAny( xComposer ) );
-            xDialogProps->setPropertyValue("RowSet",        makeAny( m_xComponent ) );
+            xDialogProps->setPropertyValue("QueryComposer", Any( xComposer ) );
+            xDialogProps->setPropertyValue("RowSet",        Any( m_xComponent ) );
             if (auto pTopLevel = impl_getDefaultDialogFrame_nothrow())
-                xDialogProps->setPropertyValue("ParentWindow",  makeAny(pTopLevel->GetXWindow()));
-            xDialogProps->setPropertyValue("Title",         makeAny( sPropertyUIName ) );
+                xDialogProps->setPropertyValue("ParentWindow",  Any(pTopLevel->GetXWindow()));
+            xDialogProps->setPropertyValue("Title",         Any( sPropertyUIName ) );
 
             _rClearBeforeDialog.clear();
             bSuccess = ( xDialog->execute() != 0 );
@@ -2719,18 +2719,15 @@ namespace pcr
             {
                 const SfxItemSet* pResult = aDialog.GetOutputItemSet();
 
-                const SfxPoolItem* pItem = pResult->GetItem( SID_ATTR_NUMBERFORMAT_INFO );
-                const SvxNumberInfoItem* pInfoItem = dynamic_cast< const SvxNumberInfoItem* >( pItem );
-                if (pInfoItem)
+                if (const SvxNumberInfoItem* pInfoItem = pResult->GetItem( SID_ATTR_NUMBERFORMAT_INFO ))
                 {
                     for (sal_uInt32 key : pInfoItem->GetDelFormats())
                         pFormatter->DeleteEntry(key);
                 }
 
-                pItem = nullptr;
-                if ( SfxItemState::SET == pResult->GetItemState( SID_ATTR_NUMBERFORMAT_VALUE, false, &pItem ) )
+                if ( const SfxUInt32Item* pItem = pResult->GetItemIfSet( SID_ATTR_NUMBERFORMAT_VALUE, false ) )
                 {
-                    _out_rNewValue <<= static_cast<sal_Int32>( static_cast< const SfxUInt32Item* >( pItem )->GetValue() );
+                    _out_rNewValue <<= static_cast<sal_Int32>( pItem->GetValue() );
                     bChanged = true;
                 }
             }
@@ -3029,13 +3026,13 @@ namespace pcr
 
         void FormSQLCommandUI::setSQLCommand( const OUString& _rCommand ) const
         {
-            m_xObject->setPropertyValue( PROPERTY_COMMAND, makeAny( _rCommand ) );
+            m_xObject->setPropertyValue( PROPERTY_COMMAND, Any( _rCommand ) );
         }
 
 
         void FormSQLCommandUI::setEscapeProcessing( const bool _bEscapeProcessing ) const
         {
-            m_xObject->setPropertyValue( PROPERTY_ESCAPE_PROCESSING, makeAny( _bEscapeProcessing ) );
+            m_xObject->setPropertyValue( PROPERTY_ESCAPE_PROCESSING, Any( _bEscapeProcessing ) );
         }
 
 
@@ -3129,7 +3126,7 @@ namespace pcr
 
         void ValueListCommandUI::setEscapeProcessing( const bool _bEscapeProcessing ) const
         {
-            m_xObject->setPropertyValue( PROPERTY_LISTSOURCETYPE, makeAny(
+            m_xObject->setPropertyValue( PROPERTY_LISTSOURCETYPE, Any(
                 _bEscapeProcessing ? ListSourceType_SQL : ListSourceType_SQLPASSTHROUGH ) );
         }
 

@@ -26,6 +26,8 @@
 #include "data/numberchar.h"
 #include <comphelper/processfactory.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <o3tl/string_view.hxx>
+#include <cstddef>
 #include <map>
 #include <mutex>
 #include <memory>
@@ -637,7 +639,7 @@ OUString getNumberText(const Locale& rLocale, const OUString& rNumberString,
 OUString NativeNumberSupplierService::getNativeNumberString(const OUString& aNumberString, const Locale& rLocale,
                                                             sal_Int16 nNativeNumberMode,
                                                             Sequence<sal_Int32>* pOffset,
-                                                            const OUString& rNativeNumberParams)
+                                                            std::u16string_view rNativeNumberParams)
 {
     if (!isValidNatNumImpl(rLocale, nNativeNumberMode))
         return aNumberString;
@@ -668,21 +670,21 @@ OUString NativeNumberSupplierService::getNativeNumberString(const OUString& aNum
             { std::u16string_view(u"title"), TITLE }
         };
 
-        sal_Int32 nStripCase = 0;
+        std::size_t nStripCase = 0;
         size_t nCasing;
         for (nCasing = 0; nCasing < SAL_N_ELEMENTS(Casings); ++nCasing)
         {
-            if (rNativeNumberParams.startsWith( Casings[nCasing].aLiteral))
+            if (o3tl::starts_with(rNativeNumberParams, Casings[nCasing].aLiteral))
             {
                 nStripCase = Casings[nCasing].aLiteral.size();
                 break;
             }
         }
 
-        if (nStripCase > 0 && (rNativeNumberParams.getLength() == nStripCase ||
+        if (nStripCase > 0 && (rNativeNumberParams.size() == nStripCase ||
                     rNativeNumberParams[nStripCase++] == ' '))
         {
-            OUString aStr = getNumberText(rLocale, aNumberString, rNativeNumberParams.subView(nStripCase));
+            OUString aStr = getNumberText(rLocale, aNumberString, rNativeNumberParams.substr(nStripCase));
 
             if (!xCharClass.is())
                 xCharClass = CharacterClassification::create(comphelper::getProcessComponentContext());
@@ -691,13 +693,29 @@ OUString NativeNumberSupplierService::getNativeNumberString(const OUString& aNum
             {
                 case CAPITALIZE:
                     return xCharClass->toTitle(aStr, 0, 1, aLocale) +
-                        (aStr.getLength() > 1 ? aStr.copy(1) : OUString());
+                        (aStr.getLength() > 1 ? aStr.subView(1) : u"");
                 case UPPER:
                     return xCharClass->toUpper(aStr, 0, aStr.getLength(), aLocale);
                 case LOWER:
                     return xCharClass->toLower(aStr, 0, aStr.getLength(), aLocale);
                 case TITLE:
-                    return xCharClass->toTitle(aStr, 0, aStr.getLength(), aLocale);
+                {
+                    if ( rLocale.Language == "en" )
+                    {
+                        // title case is common in English, so fix bugs of toTitle():
+                        // not "One Dollar *And* *Twenty-two* Cents", but
+                        // "One Dollar *and* *Twenty-Two* Cents".
+
+                        // Add spaces after hyphens to separate the elements of the
+                        // hyphenated compound words temporarily, allowing their
+                        // capitalization by toTitle()
+                        aStr = aStr.replaceAll("-", "- ");
+                        aStr = xCharClass->toTitle(aStr, 0, aStr.getLength(), aLocale);
+                        return aStr.replaceAll("- ", "-").replaceAll(" And ", " and ");
+                    }
+                    else
+                        return xCharClass->toTitle(aStr, 0, aStr.getLength(), aLocale);
+               }
             }
         }
         else

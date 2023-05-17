@@ -33,11 +33,12 @@
 #include <com/sun/star/mail/XSmtpService.hpp>
 #include <comphelper/processfactory.hxx>
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/settings.hxx>
-#include <vcl/svapp.hxx>
 #include <vcl/weldutils.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <sfx2/passwd.hxx>
 
@@ -77,13 +78,13 @@ OUString CallSaveAsDialog(weld::Window* pParent, OUString& rFilter)
                             for at least one character before the dot
                             and for at least two characters after the dot
 */
-bool CheckMailAddress( const OUString& rMailAddress )
+bool CheckMailAddress( std::u16string_view aMailAddress )
 {
-    const sal_Int32 nPosAt = rMailAddress.indexOf('@');
-    if (nPosAt<0 || rMailAddress.lastIndexOf('@')!=nPosAt)
+    const size_t nPosAt = aMailAddress.find('@');
+    if (nPosAt == std::u16string_view::npos || aMailAddress.rfind('@')!=nPosAt)
         return false;
-    const sal_Int32 nPosDot = rMailAddress.indexOf('.', nPosAt);
-    return !(nPosDot<0 || nPosDot-nPosAt<2 || rMailAddress.getLength()-nPosDot<3);
+    const size_t nPosDot = aMailAddress.find('.', nPosAt);
+    return !(nPosDot==std::u16string_view::npos || nPosDot-nPosAt<2 || aMailAddress.size()-nPosDot<3);
 }
 
 uno::Reference< mail::XSmtpService > ConnectToSmtpServer(
@@ -491,7 +492,7 @@ bool SwAddressPreview::KeyInput( const KeyEvent& rKEvt )
     return bHandled;
 }
 
-void SwAddressPreview::DrawText_Impl(vcl::RenderContext& rRenderContext, const OUString& rAddress,
+void SwAddressPreview::DrawText_Impl(vcl::RenderContext& rRenderContext, std::u16string_view rAddress,
                                      const Point& rTopLeft, const Size& rSize, bool bIsSelected)
 {
     rRenderContext.SetClipRegion(vcl::Region(tools::Rectangle(rTopLeft, rSize)));
@@ -508,7 +509,7 @@ void SwAddressPreview::DrawText_Impl(vcl::RenderContext& rRenderContext, const O
     sal_Int32 nPos = 0;
     do
     {
-        rRenderContext.DrawText(aStart, rAddress.getToken(0, '\n', nPos));
+        rRenderContext.DrawText(aStart, OUString(o3tl::getToken(rAddress, 0, '\n', nPos)));
         aStart.AdjustY(nHeight );
     }
     while (nPos >= 0);
@@ -590,11 +591,11 @@ OUString SwAuthenticator::getPassword(  )
 }
 
 SwConnectionContext::SwConnectionContext(
-        const OUString& rMailServer, sal_Int16 nPort,
-        const OUString& rConnectionType) :
-    m_sMailServer(rMailServer),
+        OUString aMailServer, sal_Int16 nPort,
+        OUString aConnectionType) :
+    m_sMailServer(std::move(aMailServer)),
     m_nPort(nPort),
-    m_sConnectionType(rConnectionType)
+    m_sConnectionType(std::move(aConnectionType))
 {
 }
 
@@ -630,20 +631,20 @@ void SwConnectionListener::disposing(const lang::EventObject& /*aEvent*/)
 {
 }
 
-SwMailTransferable::SwMailTransferable(const OUString& rBody, const OUString& rMimeType) :
+SwMailTransferable::SwMailTransferable(OUString aBody, OUString aMimeType) :
     cppu::WeakComponentImplHelper< datatransfer::XTransferable, beans::XPropertySet >(m_aMutex),
-    m_aMimeType( rMimeType ),
-    m_sBody( rBody ),
+    m_aMimeType(std::move( aMimeType )),
+    m_sBody(std::move( aBody )),
     m_bIsBody( true )
 {
 }
 
-SwMailTransferable::SwMailTransferable(const OUString& rURL,
-                const OUString& rName, const OUString& rMimeType) :
+SwMailTransferable::SwMailTransferable(OUString aURL,
+                OUString aName, OUString aMimeType) :
     cppu::WeakComponentImplHelper< datatransfer::XTransferable, beans::XPropertySet >(m_aMutex),
-    m_aMimeType( rMimeType ),
-    m_aURL(rURL),
-    m_aName( rName ),
+    m_aMimeType(std::move( aMimeType )),
+    m_aURL(std::move(aURL)),
+    m_aName(std::move( aName )),
     m_bIsBody( false )
 {
 }

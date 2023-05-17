@@ -19,7 +19,6 @@
 #ifndef INCLUDED_UNOTOOLS_COMPATIBILITY_HXX
 #define INCLUDED_UNOTOOLS_COMPATIBILITY_HXX
 
-#include <com/sun/star/uno/Sequence.h>
 #include <com/sun/star/uno/Any.hxx>
 #include <unotools/options.hxx>
 #include <unotools/unotoolsdllapi.h>
@@ -27,7 +26,6 @@
 #include <memory>
 #include <vector>
 
-namespace com::sun::star::beans { struct PropertyValue; }
 namespace osl { class Mutex; }
 
 /*-************************************************************************************************************
@@ -48,7 +46,6 @@ class SvtCompatibilityEntry
             Module,
 
             /* Editable list of compatibility options. */
-            UsePrtMetrics,
             AddSpacing,
             AddSpacingAtPages,
             UseOurTabStops,
@@ -132,19 +129,8 @@ class SvtCompatibilityEntry
             setValue(rIdx, css::uno::Any(rValue));
         }
 
-        bool isDefaultEntry() const
-        {
-            return m_bDefaultEntry;
-        }
-
-        void setDefaultEntry( bool rValue )
-        {
-            m_bDefaultEntry = rValue;
-        }
-
     private:
         std::vector<css::uno::Any> m_aPropertyValue;
-        bool                       m_bDefaultEntry;
 };
 
 /*-************************************************************************************************************

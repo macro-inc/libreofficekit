@@ -27,7 +27,6 @@
 #include <com/sun/star/text/XFlatParagraph.hpp>
 #include <com/sun/star/text/XFlatParagraphIterator.hpp>
 #include <svl/listener.hxx>
-#include <tools/solar.h>
 #include "unotextmarkup.hxx"
 #include <nodeoffset.hxx>
 
@@ -50,7 +49,7 @@ class SwXFlatParagraph final
     :   public SwXFlatParagraph_Base
 {
 public:
-    SwXFlatParagraph( SwTextNode& rTextNode, const OUString& aExpandText, const ModelToViewHelper& rConversionMap );
+    SwXFlatParagraph( SwTextNode& rTextNode, OUString aExpandText, const ModelToViewHelper& rConversionMap );
     virtual ~SwXFlatParagraph() override;
 
     // XPropertySet

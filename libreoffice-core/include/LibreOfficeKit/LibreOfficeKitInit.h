@@ -20,7 +20,7 @@
 
 #if defined(__linux__) || defined (__FreeBSD__) || defined(_AIX) ||\
     defined(_WIN32) || defined(__APPLE__) || defined (__NetBSD__) ||\
-    defined (__sun) || defined(__OpenBSD__)
+    defined (__sun) || defined(__OpenBSD__) || defined(__EMSCRIPTEN__)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -259,13 +259,13 @@ typedef int             (LokHookPreInit)  ( const char *install_path, const char
 
 typedef int             (LokHookPreInit2) ( const char *install_path, const char *user_profile_url, LibreOfficeKit** kit);
 
-#if defined(IOS) || defined(ANDROID)
+#if defined(IOS) || defined(ANDROID) || defined(__EMSCRIPTEN__)
 LibreOfficeKit *libreofficekit_hook_2(const char* install_path, const char* user_profile_path);
 #endif
 
 static LibreOfficeKit *lok_init_2( const char *install_path,  const char *user_profile_url )
 {
-#if !defined(IOS) && !defined(ANDROID)
+#if !defined(IOS) && !defined(ANDROID) && !defined(__EMSCRIPTEN__)
     void *dlhandle;
     char *imp_lib;
     LokHookFunction *pSym;

@@ -22,12 +22,14 @@
 #include <oox/token/tokens.hxx>
 #include <oox/helper/progressbar.hxx>
 #include <svl/sharedstringpool.hxx>
+#include <svl/numformat.hxx>
 #include <sal/log.hxx>
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::sheet;
 
 #include <memory>
+#include <utility>
 
 namespace oox::xls {
 
@@ -153,20 +155,41 @@ void applySharedFormulas(
                 pCell = new ScFormulaCell(rDoc.getDoc(), aPos, *pArray);
 
             rDoc.setFormulaCell(aPos, pCell);
-            if (rDoc.getDoc().GetNumberFormat(aPos.Col(), aPos.Row(), aPos.Tab()) % SV_COUNTRY_LANGUAGE_OFFSET == 0)
+            const bool bNeedNumberFormat = ((rDoc.getDoc().GetNumberFormat(
+                            aPos.Col(), aPos.Row(), aPos.Tab()) % SV_COUNTRY_LANGUAGE_OFFSET) == 0);
+            if (bNeedNumberFormat)
                 pCell->SetNeedNumberFormat(true);
 
             if (rDesc.maCellValue.isEmpty())
             {
                 // No cached cell value. Mark it for re-calculation.
                 pCell->SetDirty();
+                // Recalc even if AutoCalc is disabled. Must be after
+                // SetDirty() as it also calls SetDirtyVar().
+                pCell->AddRecalcMode( ScRecalcMode::ONLOAD_ONCE);
                 continue;
             }
 
-            // Set cached formula results. For now, we only use numeric and string-formula
-            // results. Find out how to utilize cached results of other types.
+            // Set cached formula results. For now, we only use boolean,
+            // numeric and string-formula results. Find out how to utilize
+            // cached results of other types.
             switch (rDesc.mnValueType)
             {
+                case XML_b:
+                    // boolean value.
+                    if (bNeedNumberFormat)
+                    {
+                        rDoc.getDoc().SetNumberFormat( aPos,
+                                rDoc.getDoc().GetFormatTable()->GetStandardFormat( SvNumFormatType::LOGICAL));
+                    }
+                    if (rDesc.maCellValue == "1" || rDesc.maCellValue == "0")
+                        pCell->SetResultDouble(rDesc.maCellValue == "1" ? 1.0 : 0.0);
+                    else
+                    {
+                        // Recalc even if AutoCalc is disabled.
+                        pCell->AddRecalcMode( ScRecalcMode::ONLOAD_ONCE);
+                    }
+                break;
                 case XML_n:
                     // numeric value.
                     pCell->SetResultDouble(rDesc.maCellValue.toDouble());
@@ -181,7 +204,7 @@ void applySharedFormulas(
                     {
                         // See applyCellFormulaValues
                         svl::SharedString aSS = rStrPool.intern(rDesc.maCellValue);
-                        pCell->SetResultToken(new formula::FormulaStringToken(aSS));
+                        pCell->SetResultToken(new formula::FormulaStringToken(std::move(aSS)));
                         // If we don't reset dirty, then e.g. disabling macros makes all cells
                         // that use macro functions to show #VALUE!
                         pCell->ResetDirty();
@@ -192,6 +215,9 @@ void applySharedFormulas(
                 default:
                     // Mark it for re-calculation.
                     pCell->SetDirty();
+                    // Recalc even if AutoCalc is disabled. Must be after
+                    // SetDirty() as it also calls SetDirtyVar().
+                    pCell->AddRecalcMode( ScRecalcMode::ONLOAD_ONCE);
             }
         }
     }
@@ -310,7 +336,7 @@ void applyCellFormulaValues(
                 if (bGeneratorKnownGood)
                 {
                     svl::SharedString aSS = rStrPool.intern(rValueStr);
-                    pCell->SetResultToken(new formula::FormulaStringToken(aSS));
+                    pCell->SetResultToken(new formula::FormulaStringToken(std::move(aSS)));
                     pCell->ResetDirty();
                     pCell->SetChanged(false);
                 }
@@ -346,13 +372,13 @@ void processSheetFormulaCells(
 
 FormulaBuffer::SharedFormulaEntry::SharedFormulaEntry(
     const ScAddress& rAddr,
-    const OUString& rTokenStr, sal_Int32 nSharedId ) :
-    maAddress(rAddr), maTokenStr(rTokenStr), mnSharedId(nSharedId) {}
+    OUString aTokenStr, sal_Int32 nSharedId ) :
+    maAddress(rAddr), maTokenStr(std::move(aTokenStr)), mnSharedId(nSharedId) {}
 
 FormulaBuffer::SharedFormulaDesc::SharedFormulaDesc(
     const ScAddress& rAddr, sal_Int32 nSharedId,
-    const OUString& rCellValue, sal_Int32 nValueType ) :
-    maAddress(rAddr), maCellValue(rCellValue), mnSharedId(nSharedId), mnValueType(nValueType) {}
+    OUString aCellValue, sal_Int32 nValueType ) :
+    maAddress(rAddr), maCellValue(std::move(aCellValue)), mnSharedId(nSharedId), mnValueType(nValueType) {}
 
 FormulaBuffer::SheetItem::SheetItem() :
     mpCellFormulas(nullptr),

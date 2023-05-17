@@ -28,7 +28,7 @@
 using namespace svx;
 
 #define DEFAULT_VALUE          0
-#define MAX_DURCH             5670
+#define MAX_DURCH               31680 // tdf#68335: 1584 pt for UX interoperability with Word
 #define MAX_SW                  1709400
 #define MAX_SC_SD               116220200
 #define NEGA_MAXVALUE          -10000000
@@ -74,8 +74,7 @@ void ParaULSpacingWindow::SetUnit(FieldUnit eUnit)
     m_xBelowSpacing->SetFieldUnit(eUnit);
 
     SfxItemPool &rPool = SfxGetpApp()->GetPool();
-    sal_uInt16 nWhich = rPool.GetWhich(SID_ATTR_PARA_ULSPACE);
-    m_eUnit = rPool.GetMetric(nWhich);
+    m_eUnit = rPool.GetMetric(SID_ATTR_PARA_ULSPACE);
 
     m_xAboveSpacing->set_max(m_xAboveSpacing->normalize(MAX_DURCH), MapToFieldUnit(m_eUnit));
     m_xBelowSpacing->set_max(m_xBelowSpacing->normalize(MAX_DURCH), MapToFieldUnit(m_eUnit));
@@ -280,8 +279,7 @@ void ParaLRSpacingWindow::SetUnit(FieldUnit eUnit)
     m_xFLSpacing->SetFieldUnit(eUnit);
 
     SfxItemPool &rPool = SfxGetpApp()->GetPool();
-    sal_uInt16 nWhich = rPool.GetWhich(SID_ATTR_PARA_LRSPACE);
-    m_eUnit = rPool.GetMetric(nWhich);
+    m_eUnit = rPool.GetMetric(SID_ATTR_PARA_LRSPACE);
 }
 
 IMPL_LINK_NOARG(ParaLRSpacingWindow, ModifySpacingHdl, weld::MetricSpinButton&, void)

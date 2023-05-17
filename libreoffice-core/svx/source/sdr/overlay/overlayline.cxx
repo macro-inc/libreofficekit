@@ -20,7 +20,7 @@
 #include <sdr/overlay/overlayline.hxx>
 #include <svx/sdr/overlay/overlaymanager.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonMarkerPrimitive2D.hxx>
 
 
 namespace sdr::overlay
@@ -41,7 +41,7 @@ namespace sdr::overlay
 
                 const drawinglayer::primitive2d::Primitive2DReference aReference(
                     new drawinglayer::primitive2d::PolygonMarkerPrimitive2D(
-                        aLine,
+                        std::move(aLine),
                         aRGBColorA,
                         aRGBColorB,
                         fStripeLengthPixel));

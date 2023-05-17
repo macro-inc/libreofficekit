@@ -22,10 +22,9 @@
 #include <extended/AccessibleGridControlHeader.hxx>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
-#include <com/sun/star/accessibility/AccessibleTableModelChange.hpp>
-#include <com/sun/star/accessibility/AccessibleTableModelChangeType.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <toolkit/helper/convert.hxx>
+#include <utility>
 #include <vcl/accessibletable.hxx>
 #include <vcl/svapp.hxx>
 
@@ -59,11 +58,6 @@ void SAL_CALL AccessibleGridControl::disposing()
         m_xTable->dispose();
         m_xTable.clear();
     }
-    if ( m_xCell.is() )
-    {
-        m_xCell->dispose();
-        m_xCell.clear();
-    }
     if ( m_xRowHeaderBar.is() )
     {
         m_xRowHeaderBar->dispose();
@@ -77,7 +71,7 @@ void SAL_CALL AccessibleGridControl::disposing()
     AccessibleGridControlBase::disposing();
 }
 
-sal_Int32 AccessibleGridControl::implGetAccessibleChildCount()
+sal_Int64 AccessibleGridControl::implGetAccessibleChildCount()
 {
     return m_aTable.GetAccessibleControlCount();
 }
@@ -85,7 +79,7 @@ sal_Int32 AccessibleGridControl::implGetAccessibleChildCount()
 // css::accessibility::XAccessibleContext ---------------------------------------------------------
 
 
-sal_Int32 SAL_CALL AccessibleGridControl::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleGridControl::getAccessibleChildCount()
 {
     SolarMutexGuard aSolarGuard;
     ensureIsAlive();
@@ -94,7 +88,7 @@ sal_Int32 SAL_CALL AccessibleGridControl::getAccessibleChildCount()
 
 
 css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-AccessibleGridControl::getAccessibleChild( sal_Int32 nChildIndex )
+AccessibleGridControl::getAccessibleChild( sal_Int64 nChildIndex )
 {
     SolarMutexGuard aSolarGuard;
 
@@ -239,7 +233,7 @@ AccessibleGridControl::implGetHeaderBar( AccessibleTableControlObjType eObjType 
 }
 
 css::uno::Reference< css::accessibility::XAccessible >
-AccessibleGridControl::implGetFixedChild( sal_Int32 nChildIndex )
+AccessibleGridControl::implGetFixedChild( sal_Int64 nChildIndex )
 {
     css::uno::Reference< css::accessibility::XAccessible > xRet;
     switch( nChildIndex )
@@ -269,23 +263,18 @@ rtl::Reference<AccessibleGridControlTable> AccessibleGridControl::createAccessib
 
 void AccessibleGridControl::commitCellEvent(sal_Int16 _nEventId,const Any& _rNewValue,const Any& _rOldValue)
 {
-    sal_Int32 nChildCount = implGetAccessibleChildCount();
+    sal_Int64 nChildCount = implGetAccessibleChildCount();
     if(nChildCount != 0)
     {
-        for(sal_Int32 i=0;i<nChildCount;i++)
+        for(sal_Int64 i=0;i<nChildCount;i++)
         {
             css::uno::Reference< css::accessibility::XAccessible > xAccessible = getAccessibleChild(i);
             if(css::uno::Reference< css::accessibility::XAccessible >(m_xTable) == xAccessible)
             {
-                std::vector< rtl::Reference<AccessibleGridControlTableCell> >& rCells =
-                    m_xTable->getCellVector();
-                size_t nIndex = m_aTable.GetCurrentRow() * m_aTable.GetColumnCount()
-                              + m_aTable.GetCurrentColumn();
-                if (nIndex < rCells.size() && rCells[nIndex])
-                {
-                    m_xCell = rCells[nIndex];
-                    m_xCell->commitEvent( _nEventId, _rNewValue, _rOldValue );
-                }
+                Reference<XAccessible> xCell = m_xTable->getAccessibleCellAt(
+                    m_aTable.GetCurrentRow(), m_aTable.GetCurrentColumn());
+                AccessibleGridControlTableCell* pCell = static_cast<AccessibleGridControlTableCell*>(xCell.get());
+                pCell->commitEvent(_nEventId, _rNewValue, _rOldValue);
             }
         }
     }
@@ -307,36 +296,9 @@ void AccessibleGridControl::commitTableEvent(sal_Int16 _nEventId,const Any& _rNe
         const sal_Int32 nCurrentCol = m_aTable.GetCurrentColumn();
         css::uno::Reference< css::accessibility::XAccessible > xChild;
         if (nCurrentRow > -1 && nCurrentCol > -1)
-        {
-            sal_Int32 nColumnCount = m_aTable.GetColumnCount();
-            xChild = m_xTable->getAccessibleChild(nCurrentRow * nColumnCount + nCurrentCol);
-        }
+            xChild = m_xTable->getAccessibleCellAt(nCurrentRow, nCurrentCol);
+
         m_xTable->commitEvent(_nEventId, Any(xChild),_rOldValue);
-    }
-    else if(_nEventId == AccessibleEventId::TABLE_MODEL_CHANGED)
-    {
-        AccessibleTableModelChange aChange;
-        if(_rNewValue >>= aChange)
-        {
-            if(aChange.Type == AccessibleTableModelChangeType::DELETE)
-            {
-                std::vector< rtl::Reference<AccessibleGridControlTableCell> >& rCells =
-                    m_xTable->getCellVector();
-                int nColCount = m_aTable.GetColumnCount();
-                // check valid index - entries are inserted lazily
-                size_t const nStart = nColCount * aChange.FirstRow;
-                size_t const nEnd   = nColCount * aChange.LastRow;
-                if (nStart < rCells.size())
-                {
-                    m_xTable->getCellVector().erase(
-                        rCells.begin() + nStart,
-                        rCells.begin() + std::min(rCells.size(), nEnd));
-                }
-                m_xTable->commitEvent(_nEventId,_rNewValue,_rOldValue);
-            }
-            else
-                m_xTable->commitEvent(_nEventId,_rNewValue,_rOldValue);
-        }
     }
     else
         m_xTable->commitEvent(_nEventId,_rNewValue,_rOldValue);
@@ -346,8 +308,8 @@ void AccessibleGridControl::commitTableEvent(sal_Int16 _nEventId,const Any& _rNe
 
 
 AccessibleGridControlAccess::AccessibleGridControlAccess(
-        const css::uno::Reference< css::accessibility::XAccessible >& rxParent, ::vcl::table::IAccessibleTable& rTable )
-    : m_xParent( rxParent )
+        css::uno::Reference< css::accessibility::XAccessible > xParent, ::vcl::table::IAccessibleTable& rTable )
+    : m_xParent(std::move( xParent ))
     , m_pTable( & rTable )
 {
 }

@@ -107,7 +107,7 @@ namespace legacy
 
         SvStream& Store(const SvxFontItem& rItem, SvStream& rStrm, sal_uInt16)
         {
-            const bool bToBats(IsStarSymbol(rItem.GetFamilyName()));
+            const bool bToBats(IsOpenSymbol(rItem.GetFamilyName()));
 
             rStrm.WriteUChar(rItem.GetFamily()).WriteUChar(rItem.GetPitch()).WriteUChar(bToBats ?
                     RTL_TEXTENCODING_SYMBOL :
@@ -557,7 +557,7 @@ namespace legacy
             {
                 Graphic aGraphic;
                 aSerializer.readGraphic(aGraphic);
-                rItem.SetGraphicObject(GraphicObject(aGraphic));
+                rItem.SetGraphicObject(GraphicObject(std::move(aGraphic)));
 
                 if( SVSTREAM_FILEFORMAT_ERROR == rStrm.GetError() )
                 {
@@ -573,7 +573,7 @@ namespace legacy
 
                 // TODO/MBA: how can we get a BaseURL here?!
                 OSL_FAIL("No BaseURL!");
-                OUString aAbs = INetURLObject::GetAbsURL( "", aRel );
+                OUString aAbs = INetURLObject::GetAbsURL( u"", aRel );
                 DBG_ASSERT( !aAbs.isEmpty(), "Invalid URL!" );
                 rItem.SetGraphicLink(aAbs);
             }
@@ -616,7 +616,7 @@ namespace legacy
             {
                 OSL_FAIL("No BaseURL!");
                 // TODO/MBA: how to get a BaseURL?!
-                OUString aRel = INetURLObject::GetRelURL( "", rItem.GetGraphicLink() );
+                OUString aRel = INetURLObject::GetRelURL( u"", rItem.GetGraphicLink() );
                 // UNICODE: rStrm << aRel;
                 rStrm.WriteUniOrByteString(aRel, rStrm.GetStreamCharSet());
             }

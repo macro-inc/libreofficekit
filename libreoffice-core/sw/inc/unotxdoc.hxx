@@ -74,7 +74,7 @@ class SwDoc;
 class SwDocShell;
 class UnoActionContext;
 class SwXBodyText;
-class SwXDrawPage;
+class SwFmDrawPage;
 class SwUnoCursor;
 class SwXDocumentPropertyHelper;
 class SfxViewFrame;
@@ -148,7 +148,7 @@ private:
     SwDocShell*             m_pDocShell;
     bool                    m_bObjectValid;
 
-    rtl::Reference<SwXDrawPage>                                 m_xDrawPage;
+    rtl::Reference<SwFmDrawPage>                                m_xDrawPage;
 
     rtl::Reference<SwXBodyText>                                 m_xBodyText;
     css::uno::Reference< css::uno::XAggregation >               m_xNumFormatAgg;
@@ -228,6 +228,7 @@ public:
 
     //XTextDocument
     virtual css::uno::Reference< css::text::XText >  SAL_CALL getText() override;
+    rtl::Reference< SwXBodyText > getBodyText();
     virtual void SAL_CALL reformat() override;
     virtual css::uno::Reference< css::text::XTextDocument >  SAL_CALL createHiddenClone() override;
     virtual void SAL_CALL startBatchUpdate() override;
@@ -462,16 +463,19 @@ public:
     void executeContentControlEvent(const StringMap& aArguments) override;
 
     /// @see vcl::ITiledRenderable::getCommandValues().
-    void getCommandValues(tools::JsonWriter& rJsonWriter, const OString& rCommand) override;
+    void getCommandValues(tools::JsonWriter& rJsonWriter, std::string_view rCommand) override;
+
+    /// @see vcl::ITiledRenderable::getViewRenderState().
+    OString getViewRenderState() override;
+
+    /// @see vcl::ITiledRenderable::supportsCommand().
+    bool supportsCommand(std::u16string_view rCommand) override;
 
     /// @see vcl::ITiledRenderable::gotoOutline().
     void gotoOutline(tools::JsonWriter& rJsonWriter, int idx) override;
 
     /// @see vcl::ITiledRenderable::createTable().
     void createTable(int row, int col) override;
-
-    /// @see vcl::ITiledRenderable::initialzieAppearanceFlags().
-    void initializeAppearanceFlags() override;
 
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);
@@ -542,9 +546,9 @@ class SwXLinkNameAccessWrapper final : public cppu::WeakImplHelper
 
 public:
     SwXLinkNameAccessWrapper(css::uno::Reference< css::container::XNameAccess >  const & xAccess,
-            const OUString& rLinkDisplayName, const OUString& sSuffix);
+            OUString aLinkDisplayName, OUString  sSuffix);
     SwXLinkNameAccessWrapper(SwXTextDocument& rxDoc,
-            const OUString& rLinkDisplayName, const OUString& sSuffix);
+            OUString aLinkDisplayName, OUString sSuffix);
     virtual ~SwXLinkNameAccessWrapper() override;
 
     //XNameAccess
@@ -587,7 +591,7 @@ class SwXOutlineTarget final : public cppu::WeakImplHelper
     const sal_Int32             m_nOutlineLevel;
 
 public:
-    SwXOutlineTarget(const OUString& rOutlineText, const rtl::OUString &rActualText,
+    SwXOutlineTarget(OUString aOutlineText, OUString aActualText,
                      const sal_Int32 nOutlineLevel);
     virtual ~SwXOutlineTarget() override;
 
@@ -616,7 +620,7 @@ class SwXDrawingObjectTarget final : public cppu::WeakImplHelper
     OUString                    m_sDrawingObjectText;
 
 public:
-    SwXDrawingObjectTarget(const OUString& rDrawingObjectText);
+    SwXDrawingObjectTarget(OUString aDrawingObjectText);
     virtual ~SwXDrawingObjectTarget() override;
 
     //XPropertySet

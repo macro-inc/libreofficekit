@@ -4057,12 +4057,12 @@ void XclImpChChart::Convert( const Reference<XChartDocument>& xChartDoc,
     if(!pChartCollection)
         return;
 
-    ::std::unique_ptr< ::std::vector< ScTokenRef > > xRefTokens( new ::std::vector< ScTokenRef > );
+    std::vector< ScTokenRef > aRefTokens;
     for( const auto& rxSeries : maSeries )
-        rxSeries->FillAllSourceLinks( *xRefTokens );
-    if( !xRefTokens->empty() )
+        rxSeries->FillAllSourceLinks( aRefTokens );
+    if( !aRefTokens.empty() )
     {
-        ::std::unique_ptr< ScChartListener > xListener( new ScChartListener( rObjName, rDoc, std::move(xRefTokens) ) );
+        ::std::unique_ptr< ScChartListener > xListener( new ScChartListener( rObjName, rDoc, std::move(aRefTokens) ) );
         xListener->SetUsed( true );
         xListener->StartListeningTo();
         pChartCollection->insert( xListener.release() );
@@ -4272,7 +4272,7 @@ tools::Rectangle XclImpChartDrawing::CalcAnchorRect( const XclObjAnchor& rAnchor
         static_cast< tools::Long >( static_cast< double >( bDffAnchor ? rAnchor.maFirst.mnRow : rAnchor.mnTY ) / EXC_CHART_TOTALUNITS * maChartRect.GetHeight() + 0.5 ),
         static_cast< tools::Long >( static_cast< double >( bDffAnchor ? rAnchor.maLast.mnCol  : rAnchor.mnRX ) / EXC_CHART_TOTALUNITS * maChartRect.GetWidth()  + 0.5 ),
         static_cast< tools::Long >( static_cast< double >( bDffAnchor ? rAnchor.maLast.mnRow  : rAnchor.mnBY ) / EXC_CHART_TOTALUNITS * maChartRect.GetHeight() + 0.5 ) );
-    aRect.Justify();
+    aRect.Normalize();
     // move shapes into chart area for sheet charts
     if( mbOwnTab )
         aRect.Move( maChartRect.Left(), maChartRect.Top() );

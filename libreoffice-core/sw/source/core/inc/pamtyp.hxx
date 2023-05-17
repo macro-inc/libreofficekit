@@ -23,6 +23,7 @@
 #include <unotools/textsearch.hxx>
 
 #include <memory>
+#include <optional>
 
 class SwpHints;
 struct SwPosition;
@@ -34,8 +35,9 @@ class SwRootFrame;
 class SwNode;
 class SwNodeIndex;
 class SwContentNode;
-class SwIndex;
+class SwContentIndex;
 class SvxSearchItem;
+enum class SwCursorSkipMode;
 
 namespace i18nutil {
     struct SearchOptions2;
@@ -47,29 +49,35 @@ void GoStartDoc( SwPosition*);
 void GoEndDoc( SwPosition*);
 void GoStartSection( SwPosition*);
 void GoEndSection( SwPosition*);
+void GoStartOfSection( SwPosition*);
+void GoEndOfSection( SwPosition*);
 const SwTextAttr* GetFrwrdTextHint( const SwpHints&, size_t&, sal_Int32 );
 const SwTextAttr* GetBkwrdTextHint( const SwpHints&, size_t&, sal_Int32 );
 
-bool GoNext(SwNode* pNd, SwIndex * pIdx, sal_uInt16 nMode );
-bool GoPrevious(SwNode* pNd, SwIndex * pIdx, sal_uInt16 nMode );
+bool GoNext(SwNode* pNd, SwContentIndex * pIdx, SwCursorSkipMode nMode );
+bool GoPrevious(SwNode* pNd, SwContentIndex * pIdx, SwCursorSkipMode nMode );
 SwContentNode* GoNextNds( SwNodeIndex * pIdx, bool );
 SwContentNode* GoPreviousNds( SwNodeIndex * pIdx, bool );
+SwContentNode* GoNextPos( SwPosition * pIdx, bool );
+SwContentNode* GoPreviousPos( SwPosition * pIdx, bool );
 
 // type definitions of functions
-typedef bool (*GoNd)( SwNode*, SwIndex*, sal_uInt16 );
+typedef bool (*GoNd)( SwNode*, SwContentIndex*, SwCursorSkipMode );
 typedef SwContentNode* (*GoNds)( SwNodeIndex*, bool );
+typedef SwContentNode* (*GoPos)( SwPosition*, bool );
 typedef void (*GoDoc)( SwPosition* );
 typedef void (*GoSection)( SwPosition* );
 typedef bool (SwPosition::*CmpOp)( const SwPosition& ) const;
 typedef const SwTextAttr* (*GetHint)( const SwpHints&, size_t&, sal_Int32 );
 typedef bool (utl::TextSearch::*SearchText)( const OUString&, sal_Int32*,
                     sal_Int32*, css::util::SearchResult* );
-typedef void (*MvSection)( SwNodeIndex * );
+typedef void (*MvSection)( SwPosition * );
 
 struct SwMoveFnCollection
 {
     GoNd      fnNd;
     GoNds     fnNds;
+    GoPos     fnPos;
     GoDoc     fnDoc;
     GoSection fnSections;
     CmpOp     fnCmpOp;
@@ -84,8 +92,8 @@ SwContentNode* GetNode(SwPaM&, bool&, SwMoveFnCollection const &,
 
 namespace sw {
 
-    std::unique_ptr<SwPaM> MakeRegion(SwMoveFnCollection const & fnMove,
-            const SwPaM & rOrigRg);
+    void MakeRegion(SwMoveFnCollection const & fnMove,
+            const SwPaM & rOrigRg, std::optional<SwPaM>& rDestinaton);
 
     /// Search.
     bool FindTextImpl(SwPaM & rSearchPam,

@@ -20,8 +20,7 @@
 #ifndef INCLUDED_SVX_XMLEOHLP_HXX
 #define INCLUDED_SVX_XMLEOHLP_HXX
 
-#include <cppuhelper/compbase.hxx>
-#include <osl/mutex.hxx>
+#include <comphelper/compbase.hxx>
 #include <com/sun/star/document/XEmbeddedObjectResolver.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
@@ -30,7 +29,6 @@
 #include <rtl/ref.hxx>
 #include <tools/stream.hxx>
 #include <map>
-#include <memory>
 #include <optional>
 
 enum class SvXMLEmbeddedObjectHelperMode
@@ -45,10 +43,8 @@ class OutputStorageWrapper_Impl;
 
 
 class SVXCORE_DLLPUBLIC SvXMLEmbeddedObjectHelper final :
-    public cppu::WeakComponentImplHelper< css::document::XEmbeddedObjectResolver, css::container::XNameAccess >
+    public comphelper::WeakComponentImplHelper< css::document::XEmbeddedObjectResolver, css::container::XNameAccess >
 {
-    ::osl::Mutex                maMutex;
-
     OUString             maCurContainerStorageName;
 
 
@@ -90,7 +86,7 @@ class SVXCORE_DLLPUBLIC SvXMLEmbeddedObjectHelper final :
                                       ::comphelper::IEmbeddedHelper& rDocPersist,
                                       SvXMLEmbeddedObjectHelperMode eCreateMode );
 
-    virtual void SAL_CALL       disposing() override;
+    virtual void                disposing(std::unique_lock<std::mutex>&) override;
 
 public:
                                 SvXMLEmbeddedObjectHelper(

@@ -102,8 +102,6 @@ public:
     SvxRedlinTable(std::unique_ptr<weld::TreeView> xWriterControl,
                    std::unique_ptr<weld::TreeView> xCalcControl);
 
-    void set_size_request(int nWidth, int nHeight);
-
     weld::TreeView& GetWidget() { return *pTreeView; }
     bool IsSorted() const { return bSorted; }
 
@@ -274,7 +272,6 @@ private:
     bool bEnableClearFormat;
     bool bEnableClearFormatAll;
 
-    weld::Window* m_pDialog;
     std::unique_ptr<weld::Button> m_xAccept;
     std::unique_ptr<weld::Button> m_xReject;
     std::unique_ptr<weld::Button> m_xAcceptAll;
@@ -284,9 +281,8 @@ private:
 
     DECL_DLLPRIVATE_LINK( PbClickHdl, weld::Button&, void );
 
-    void            EnableClearFormatButton(weld::Button&, bool bFlag);
 public:
-    SvxTPView(weld::Container* pParent, weld::Window* pDialog, weld::Builder* pTopLevel);
+    SvxTPView(weld::Container* pParent);
     virtual ~SvxTPView() override;
 
     SvxRedlinTable* GetTableControl() { return m_xViewData.get(); }
@@ -329,15 +325,13 @@ private:
     DECL_DLLPRIVATE_LINK(DeactivatePageHdl, const OString&, bool);
 
 public:
-    SvxAcceptChgCtr(weld::Container* pParent, weld::Window* pDialog, weld::Builder* pTopLevel);
+    SvxAcceptChgCtr(weld::Container* pParent);
     ~SvxAcceptChgCtr();
 
     void            ShowFilterPage();
 
     SvxTPFilter*    GetFilterPage() { return m_xTPFilter.get(); }
     SvxTPView*      GetViewPage() { return m_xTPView.get(); }
-
-    void set_help_id(const OString& rId) { m_xTabCtrl->set_help_id(rId); }
 };
 
 #endif // INCLUDED_SVX_CTREDLIN_HXX

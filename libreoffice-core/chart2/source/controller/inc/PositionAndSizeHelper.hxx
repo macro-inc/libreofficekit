@@ -36,8 +36,8 @@ public:
             , const css::awt::Rectangle& rOldPositionAndSize
             , const css::awt::Rectangle& rPageRectangle );
 
-    static bool moveObject( const OUString& rObjectCID
-            , const css::uno::Reference< css::frame::XModel >& xChartModel
+    static bool moveObject( std::u16string_view rObjectCID
+            , const rtl::Reference<::chart::ChartModel>& xChartModel
             , const css::awt::Rectangle& rNewPositionAndSize
             , const css::awt::Rectangle& rOldPositionAndSize
             , const css::awt::Rectangle& rPageRectangle );

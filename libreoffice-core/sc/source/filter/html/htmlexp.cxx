@@ -24,6 +24,7 @@
 #include <scitems.hxx>
 #include <editeng/eeitem.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <editeng/boxitem.hxx>
 #include <editeng/brushitem.hxx>
@@ -114,7 +115,7 @@ const char ScHTMLExport::sIndentSource[nIndentMax+1] =
 
 #define TAG_ON( tag )       HTMLOutFuncs::Out_AsciiTag( rStrm, tag )
 #define TAG_OFF( tag )      HTMLOutFuncs::Out_AsciiTag( rStrm, tag, false )
-#define OUT_STR( str )      HTMLOutFuncs::Out_String( rStrm, str, eDestEnc, &aNonConvertibleChars )
+#define OUT_STR( str )      HTMLOutFuncs::Out_String( rStrm, str, &aNonConvertibleChars )
 #define OUT_LF()            rStrm.WriteCharPtr( SAL_NEWLINE_STRING ).WriteCharPtr( GetIndentStr() )
 #define TAG_ON_LF( tag )    (TAG_ON( tag ).WriteCharPtr( SAL_NEWLINE_STRING ).WriteCharPtr( GetIndentStr() ))
 #define TAG_OFF_LF( tag )   (TAG_OFF( tag ).WriteCharPtr( SAL_NEWLINE_STRING ).WriteCharPtr( GetIndentStr() ))
@@ -190,15 +191,15 @@ static OString lcl_makeHTMLColorTriplet(const Color& rColor)
     // <font COLOR="#00FF40">hello</font>
     snprintf( buf, 24, "\"#%02X%02X%02X\"", rColor.GetRed(), rColor.GetGreen(), rColor.GetBlue() );
 
-    return OString(buf);
+    return buf;
 }
 
-ScHTMLExport::ScHTMLExport( SvStream& rStrmP, const OUString& rBaseURL, ScDocument* pDocP,
+ScHTMLExport::ScHTMLExport( SvStream& rStrmP, OUString _aBaseURL, ScDocument* pDocP,
                             const ScRange& rRangeP, bool bAllP,
-                            const OUString& rStreamPathP, std::u16string_view rFilterOptions ) :
+                            OUString aStreamPathP, std::u16string_view rFilterOptions ) :
     ScExportBase( rStrmP, pDocP, rRangeP ),
-    aBaseURL( rBaseURL ),
-    aStreamPath( rStreamPathP ),
+    aBaseURL(std::move( _aBaseURL )),
+    aStreamPath(std::move( aStreamPathP )),
     pAppWin( Application::GetDefaultDevice() ),
     nUsedTables( 0 ),
     nIndent( 0 ),
@@ -214,7 +215,6 @@ ScHTMLExport::ScHTMLExport( SvStream& rStrmP, const OUString& rBaseURL, ScDocume
     sIndent[0] = 0;
 
     // set HTML configuration
-    eDestEnc = (pDoc->IsClipOrUndo() ? RTL_TEXTENCODING_UTF8 : SvxHtmlOptions::GetTextEncoding());
     bCopyLocalFileToINet = officecfg::Office::Common::Filter::HTML::Export::LocalGraphic::get();
 
     if (rFilterOptions == u"SkipImages")
@@ -314,7 +314,7 @@ void ScHTMLExport::WriteHeader()
 
     if ( pDoc->IsClipOrUndo() )
     {   // no real DocInfo available, but some META information like charset needed
-        SfxFrameHTMLWriter::Out_DocInfo( rStrm, aBaseURL, nullptr, sIndent, eDestEnc, &aNonConvertibleChars );
+        SfxFrameHTMLWriter::Out_DocInfo( rStrm, aBaseURL, nullptr, sIndent, &aNonConvertibleChars );
     }
     else
     {
@@ -323,7 +323,7 @@ void ScHTMLExport::WriteHeader()
         uno::Reference<document::XDocumentProperties> xDocProps
             = xDPS->getDocumentProperties();
         SfxFrameHTMLWriter::Out_DocInfo( rStrm, aBaseURL, xDocProps,
-            sIndent, eDestEnc, &aNonConvertibleChars );
+            sIndent, &aNonConvertibleChars );
         OUT_LF();
 
         if (!xDocProps->getPrintedBy().isEmpty())
@@ -897,7 +897,7 @@ void ScHTMLExport::WriteCell( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SC
         for ( size_t i = 0; i < ListSize; ++i )
         {
             ScHTMLGraphEntry* pE = &aGraphList[ i ];
-            if ( pE->bInCell && pE->aRange.In( aPos ) )
+            if ( pE->bInCell && pE->aRange.Contains( aPos ) )
             {
                 if ( pE->aRange.aStart == aPos )
                 {
@@ -1089,15 +1089,15 @@ void ScHTMLExport::WriteCell( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SC
     double fVal = 0.0;
     if ( bValueData )
     {
-        switch (aCell.meType)
+        switch (aCell.getType())
         {
             case CELLTYPE_VALUE:
-                fVal = aCell.mfValue;
+                fVal = aCell.getDouble();
                 if ( bCalcAsShown && fVal != 0.0 )
                     fVal = pDoc->RoundValueAsShown( fVal, nFormat );
                 break;
             case CELLTYPE_FORMULA:
-                fVal = aCell.mpFormula->GetValue();
+                fVal = aCell.getFormula()->GetValue();
                 break;
             default:
                 OSL_FAIL( "value data with unsupported cell type" );
@@ -1105,7 +1105,7 @@ void ScHTMLExport::WriteCell( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SC
     }
 
     aStrTD.append(HTMLOutFuncs::CreateTableDataOptionsValNum(bValueData, fVal,
-        nFormat, *pFormatter, eDestEnc, &aNonConvertibleChars));
+        nFormat, *pFormatter, &aNonConvertibleChars));
 
     TAG_ON(aStrTD.makeStringAndClear().getStr());
 
@@ -1147,7 +1147,7 @@ void ScHTMLExport::WriteCell( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SC
                 for (sal_Int32 nPos {0};;)
                 {
                     OString aTmpStr = HTMLOutFuncs::ConvertStringToHTML(
-                        rList.getToken( 0, ';', nPos ), eDestEnc,
+                        rList.getToken( 0, ';', nPos ),
                         &aNonConvertibleChars);
                     aStr.append(aTmpStr);
                     if (nPos<0)
@@ -1179,9 +1179,9 @@ void ScHTMLExport::WriteCell( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SC
 
     OUString aURL;
     bool bWriteHyperLink(false);
-    if (aCell.meType == CELLTYPE_FORMULA)
+    if (aCell.getType() == CELLTYPE_FORMULA)
     {
-        ScFormulaCell* pFCell = aCell.mpFormula;
+        ScFormulaCell* pFCell = aCell.getFormula();
         if (pFCell->IsHyperLinkCell())
         {
             OUString aCellText;
@@ -1192,7 +1192,7 @@ void ScHTMLExport::WriteCell( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SC
 
     if (bWriteHyperLink)
     {
-        OString aURLStr = HTMLOutFuncs::ConvertStringToHTML(aURL, eDestEnc, &aNonConvertibleChars);
+        OString aURLStr = HTMLOutFuncs::ConvertStringToHTML(aURL, &aNonConvertibleChars);
         OString aStr = OOO_STRING_SVTOOLS_HTML_anchor " " OOO_STRING_SVTOOLS_HTML_O_href "=\"" + aURLStr + "\"";
         TAG_ON(aStr.getStr());
     }
@@ -1201,10 +1201,10 @@ void ScHTMLExport::WriteCell( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SC
     bool bFieldText = false;
 
     const Color* pColor;
-    switch (aCell.meType)
+    switch (aCell.getType())
     {
         case CELLTYPE_EDIT :
-            bFieldText = WriteFieldText(aCell.mpEditText);
+            bFieldText = WriteFieldText(aCell.getEditText());
             if ( bFieldText )
                 break;
             [[fallthrough]];
@@ -1287,11 +1287,10 @@ bool ScHTMLExport::WriteFieldText( const EditTextObject* pData )
                 // fields are single characters
                 if ( nEnd == nStart+1 )
                 {
-                    const SfxPoolItem* pItem;
                     SfxItemSet aSet = rEngine.GetAttribs( aSel );
-                    if ( aSet.GetItemState( EE_FEATURE_FIELD, false, &pItem ) == SfxItemState::SET )
+                    if ( const SvxFieldItem* pFieldItem = aSet.GetItemIfSet( EE_FEATURE_FIELD, false ) )
                     {
-                        const SvxFieldData* pField = static_cast<const SvxFieldItem*>(pItem)->GetField();
+                        const SvxFieldData* pField = pFieldItem->GetField();
                         if (const SvxURLField* pURLField = dynamic_cast<const SvxURLField*>(pField))
                         {
                             bUrl = true;
@@ -1314,7 +1313,7 @@ bool ScHTMLExport::WriteFieldText( const EditTextObject* pData )
 }
 
 void ScHTMLExport::CopyLocalFileToINet( OUString& rFileNm,
-        const OUString& rTargetNm )
+        std::u16string_view rTargetNm )
 {
     INetURLObject aFileUrl, aTargetUrl;
     aFileUrl.SetSmartURL( rFileNm );

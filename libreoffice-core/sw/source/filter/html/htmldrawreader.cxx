@@ -98,11 +98,9 @@ void SwHTMLParser::InsertDrawObject( SdrObject* pNewDrawObj,
     }
 
     // set left/right border
-    const SfxPoolItem *pItem;
-    if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_LR_SPACE, true, &pItem ) )
+    if( const SvxLRSpaceItem* pLRItem = rCSS1ItemSet.GetItemIfSet( RES_LR_SPACE ) )
     {
         // maybe flatten the first line indentation
-        const SvxLRSpaceItem *pLRItem = static_cast<const SvxLRSpaceItem *>(pItem);
         SvxLRSpaceItem aLRItem( *pLRItem );
         aLRItem.SetTextFirstLineOffset( 0 );
         if( rCSS1PropInfo.m_bLeftMargin )
@@ -126,10 +124,9 @@ void SwHTMLParser::InsertDrawObject( SdrObject* pNewDrawObj,
     }
 
     // set top/bottom border
-    if( SfxItemState::SET==rCSS1ItemSet.GetItemState( RES_UL_SPACE, true, &pItem ) )
+    if( const SvxULSpaceItem* pULItem = rCSS1ItemSet.GetItemIfSet( RES_UL_SPACE ) )
     {
         // maybe flatten the first line indentation
-        const SvxULSpaceItem *pULItem = static_cast<const SvxULSpaceItem *>(pItem);
         if( rCSS1PropInfo.m_bTopMargin )
         {
             nUpperSpace = pULItem->GetUpper();
@@ -157,7 +154,7 @@ void SwHTMLParser::InsertDrawObject( SdrObject* pNewDrawObj,
         SVX_CSS1_LTYPE_TWIP == rCSS1PropInfo.m_eTopType )
     {
         const SwStartNode *pFlySttNd =
-            m_pPam->GetPoint()->nNode.GetNode().FindFlyStartNode();
+            m_pPam->GetPoint()->GetNode().FindFlyStartNode();
 
         if( pFlySttNd )
         {
@@ -352,12 +349,12 @@ void SwHTMLParser::NewMarquee( HTMLTable *pCurTable )
     m_pMarquee = SdrObjFactory::MakeNewObject(
         *pModel,
         SdrInventor::Default,
-        OBJ_TEXT);
+        SdrObjKind::Text);
 
     if( !m_pMarquee )
         return;
 
-    pPg->InsertObject( m_pMarquee );
+    pPg->InsertObject( m_pMarquee.get() );
 
     if( !aId.isEmpty() )
         InsertBookmark( aId );
@@ -409,7 +406,7 @@ void SwHTMLParser::NewMarquee( HTMLTable *pCurTable )
         0
     };
     SwTextNode const*const pTextNd =
-        m_pPam->GetPoint()->nNode.GetNode().GetTextNode();
+        m_pPam->GetPoint()->GetNode().GetTextNode();
     if( pTextNd )
     {
         const SfxItemSet& rItemSet = pTextNd->GetAnyFormatColl().GetAttrSet();
@@ -511,7 +508,7 @@ void SwHTMLParser::NewMarquee( HTMLTable *pCurTable )
     m_pMarquee->SetLogicRect( tools::Rectangle( 0, 0, aTwipSz.Width(), aTwipSz.Height() ) );
 
     // and insert the object into the document
-    InsertDrawObject( m_pMarquee, aSpace, eVertOri, eHoriOri, aStyleItemSet,
+    InsertDrawObject( m_pMarquee.get(), aSpace, eVertOri, eHoriOri, aStyleItemSet,
                       aPropInfo );
 
     // Register the drawing object at the table. Is a little bit complicated,
@@ -520,12 +517,12 @@ void SwHTMLParser::NewMarquee( HTMLTable *pCurTable )
     // The global pTable also can't be used, because the marquee can also be
     // in a sub-table.
     if( pCurTable && bPercentWidth)
-        RegisterDrawObjectToTable( pCurTable, m_pMarquee, static_cast<sal_uInt8>(nWidth) );
+        RegisterDrawObjectToTable( pCurTable, m_pMarquee.get(), static_cast<sal_uInt8>(nWidth) );
 }
 
 void SwHTMLParser::EndMarquee()
 {
-    OSL_ENSURE( m_pMarquee && OBJ_TEXT==m_pMarquee->GetObjIdentifier(),
+    OSL_ENSURE( m_pMarquee && SdrObjKind::Text==m_pMarquee->GetObjIdentifier(),
             "no marquee or wrong type" );
 
     if( m_bFixMarqueeWidth )
@@ -538,13 +535,13 @@ void SwHTMLParser::EndMarquee()
     }
 
     // insert the collected text
-    static_cast<SdrTextObj*>(m_pMarquee)->SetText( m_aContents );
+    static_cast<SdrTextObj*>(m_pMarquee.get())->SetText( m_aContents );
     m_pMarquee->SetMergedItemSetAndBroadcast( m_pMarquee->GetMergedItemSet() );
 
-    if( m_bFixMarqueeWidth )
+    if (m_bFixMarqueeWidth && !m_bFuzzing)
     {
         // adjust the size to the text
-        static_cast<SdrTextObj*>(m_pMarquee)->FitFrameToTextSize();
+        static_cast<SdrTextObj*>(m_pMarquee.get())->FitFrameToTextSize();
     }
 
     m_aContents.clear();
@@ -553,7 +550,7 @@ void SwHTMLParser::EndMarquee()
 
 void SwHTMLParser::InsertMarqueeText()
 {
-    OSL_ENSURE( m_pMarquee && OBJ_TEXT==m_pMarquee->GetObjIdentifier(),
+    OSL_ENSURE( m_pMarquee && SdrObjKind::Text==m_pMarquee->GetObjIdentifier(),
             "no marquee or wrong type" );
 
     // append the current text part to the text
@@ -562,10 +559,10 @@ void SwHTMLParser::InsertMarqueeText()
 
 void SwHTMLParser::ResizeDrawObject( SdrObject* pObj, SwTwips nWidth )
 {
-    OSL_ENSURE( OBJ_TEXT==pObj->GetObjIdentifier(),
+    OSL_ENSURE( SdrObjKind::Text==pObj->GetObjIdentifier(),
             "no marquee or wrong type" );
 
-    if( OBJ_TEXT!=pObj->GetObjIdentifier() )
+    if( SdrObjKind::Text!=pObj->GetObjIdentifier() )
         return;
 
     // the old size

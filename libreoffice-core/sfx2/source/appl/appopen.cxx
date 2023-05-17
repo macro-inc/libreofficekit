@@ -46,6 +46,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/storagehelper.hxx>
+#include <comphelper/string.hxx>
 #include <comphelper/synchronousdispatch.hxx>
 
 #include <svl/intitem.hxx>
@@ -83,6 +84,7 @@
 #include <sfx2/filedlghelper.hxx>
 #include <sfx2/templatedlg.hxx>
 #include <sfx2/sfxsids.hrc>
+#include <o3tl/string_view.hxx>
 #include <openuriexternally.hxx>
 
 #include <officecfg/Office/ProtocolHandler.hxx>
@@ -256,7 +258,7 @@ ErrCode CheckPasswd_Impl
 
                             if ( aEncryptionData.hasElements() )
                             {
-                                pSet->Put( SfxUnoAnyItem( SID_ENCRYPTIONDATA, uno::makeAny( aEncryptionData ) ) );
+                                pSet->Put( SfxUnoAnyItem( SID_ENCRYPTIONDATA, uno::Any( aEncryptionData ) ) );
 
                                 try
                                 {
@@ -595,7 +597,7 @@ void SfxApplication::OpenDocExec_Impl( SfxRequest& rReq )
         {
             if ( aCommand.startsWith("slot:") )
             {
-                sal_uInt16 nSlotId = static_cast<sal_uInt16>(aCommand.copy(5).toInt32());
+                sal_uInt16 nSlotId = static_cast<sal_uInt16>(o3tl::toInt32(aCommand.subView(5)));
                 if ( nSlotId == SID_OPENDOC )
                     pFileNameItem = nullptr;
             }
@@ -692,7 +694,7 @@ void SfxApplication::OpenDocExec_Impl( SfxRequest& rReq )
                 pHandler->setHandler(xWrappedHandler);
             else
                 pHandler->useDefaultUUIHandler();
-            rReq.AppendItem( SfxUnoAnyItem(SID_INTERACTIONHANDLER,css::uno::makeAny(xHandler)) );
+            rReq.AppendItem( SfxUnoAnyItem(SID_INTERACTIONHANDLER,css::uno::Any(xHandler)) );
 
             // define rules for this handler
             css::uno::Type aInteraction = ::cppu::UnoType<css::task::ErrorCodeRequest>::get();
@@ -776,6 +778,7 @@ void SfxApplication::OpenDocExec_Impl( SfxRequest& rReq )
     }
 
     const SfxStringItem* pFileName = rReq.GetArg<SfxStringItem>(SID_FILE_NAME);
+    assert(pFileName && "SID_FILE_NAME is required");
     OUString aFileName = pFileName->GetValue();
 
     OUString aReferer;
@@ -843,9 +846,18 @@ void SfxApplication::OpenDocExec_Impl( SfxRequest& rReq )
                 return;
             }
 
-            const OUString aTypeName { xTypeDetection->queryTypeByURL( aURL.Main ) };
-            SfxFilterMatcher& rMatcher = SfxGetpApp()->GetFilterMatcher();
-            std::shared_ptr<const SfxFilter> pFilter = rMatcher.GetFilter4EA( aTypeName );
+            std::shared_ptr<const SfxFilter> pFilter{};
+
+            // attempt loading native documents only if they are from a known protocol
+            // it might be sensible to limit the set of protocols even further, but that
+            // may cause regressions, needs further testing
+            // see tdf#136427 for details
+            if (aINetProtocol != INetProtocol::NotValid) {
+                const OUString aTypeName { xTypeDetection->queryTypeByURL( aURL.Main ) };
+                SfxFilterMatcher& rMatcher = SfxGetpApp()->GetFilterMatcher();
+                pFilter = rMatcher.GetFilter4EA( aTypeName );
+            }
+
             if (!pFilter || !lcl_isFilterNativelySupported(*pFilter))
             {
                 // hyperlink does not link to own type => special handling (http, ftp) browser and (other external protocols) OS
@@ -978,7 +990,7 @@ void SfxApplication::OpenDocExec_Impl( SfxRequest& rReq )
         if (!pInteractionItem)
         {
             Reference < task::XInteractionHandler2 > xHdl = task::InteractionHandler::createWithParent( ::comphelper::getProcessComponentContext(), nullptr );
-            rReq.AppendItem( SfxUnoAnyItem(SID_INTERACTIONHANDLER,css::uno::makeAny(xHdl)) );
+            rReq.AppendItem( SfxUnoAnyItem(SID_INTERACTIONHANDLER,css::uno::Any(xHdl)) );
         }
         if (!pMacroExecItem)
             rReq.AppendItem( SfxUInt16Item(SID_MACROEXECMODE,css::document::MacroExecMode::USE_CONFIG) );

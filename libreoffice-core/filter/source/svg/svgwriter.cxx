@@ -37,6 +37,7 @@
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/unointerfacetouniqueidentifiermapper.hxx>
 #include <i18nlangtag/languagetag.hxx>
+#include <o3tl/string_view.hxx>
 #include <svx/svdomedia.hxx>
 
 #include <com/sun/star/container/XEnumerationAccess.hpp>
@@ -218,8 +219,8 @@ void SVGAttributeWriter::AddPaintAttr( const Color& rLineColor, const Color& rFi
 void SVGAttributeWriter::AddGradientDef( const tools::Rectangle& rObjRect, const Gradient& rGradient, OUString& rGradientId )
 {
     if( rObjRect.GetWidth() && rObjRect.GetHeight() &&
-        ( rGradient.GetStyle() == GradientStyle::Linear || rGradient.GetStyle() == GradientStyle::Axial ||
-          rGradient.GetStyle() == GradientStyle::Radial || rGradient.GetStyle() == GradientStyle::Elliptical ) )
+        ( rGradient.GetStyle() == css::awt::GradientStyle_LINEAR || rGradient.GetStyle() == css::awt::GradientStyle_AXIAL ||
+          rGradient.GetStyle() == css::awt::GradientStyle_RADIAL || rGradient.GetStyle() == css::awt::GradientStyle_ELLIPTICAL ) )
     {
         SvXMLElementExport aDesc( mrExport, XML_NAMESPACE_NONE, aXMLElemDefs, true, true );
         Color aStartColor( rGradient.GetStartColor() ), aEndColor( rGradient.GetEndColor() );
@@ -247,7 +248,7 @@ void SVGAttributeWriter::AddGradientDef( const tools::Rectangle& rObjRect, const
             std::unique_ptr< SvXMLElementExport >   apGradient;
             OUString                         aColorStr;
 
-            if( rGradient.GetStyle() == GradientStyle::Linear || rGradient.GetStyle() == GradientStyle::Axial )
+            if( rGradient.GetStyle() == css::awt::GradientStyle_LINEAR || rGradient.GetStyle() == css::awt::GradientStyle_AXIAL )
             {
                 tools::Polygon aLinePoly( 2 );
 
@@ -266,9 +267,9 @@ void SVGAttributeWriter::AddGradientDef( const tools::Rectangle& rObjRect, const
 
                 // write stop values
                 double fBorder = static_cast< double >( rGradient.GetBorder() ) *
-                                ( ( rGradient.GetStyle() == GradientStyle::Axial ) ? 0.005 : 0.01 );
+                                ( ( rGradient.GetStyle() == css::awt::GradientStyle_AXIAL ) ? 0.005 : 0.01 );
 
-                ImplGetColorStr( ( rGradient.GetStyle() == GradientStyle::Axial ) ? aEndColor : aStartColor, aColorStr );
+                ImplGetColorStr( ( rGradient.GetStyle() == css::awt::GradientStyle_AXIAL ) ? aEndColor : aStartColor, aColorStr );
                 mrExport.AddAttribute( XML_NAMESPACE_NONE, aXMLAttrOffset, OUString::number( fBorder ) );
                 mrExport.AddAttribute( XML_NAMESPACE_NONE, aXMLAttrStopColor, aColorStr );
 
@@ -276,7 +277,7 @@ void SVGAttributeWriter::AddGradientDef( const tools::Rectangle& rObjRect, const
                     SvXMLElementExport aDesc2( mrExport, XML_NAMESPACE_NONE, aXMLElemStop, true, true );
                 }
 
-                if( rGradient.GetStyle() == GradientStyle::Axial )
+                if( rGradient.GetStyle() == css::awt::GradientStyle_AXIAL )
                 {
                     ImplGetColorStr( aStartColor, aColorStr );
                     mrExport.AddAttribute( XML_NAMESPACE_NONE, aXMLAttrOffset, OUString::number( 0.5 ) );
@@ -287,7 +288,7 @@ void SVGAttributeWriter::AddGradientDef( const tools::Rectangle& rObjRect, const
                     }
                 }
 
-                if( rGradient.GetStyle() != GradientStyle::Axial )
+                if( rGradient.GetStyle() != css::awt::GradientStyle_AXIAL )
                     fBorder = 0.0;
 
                 ImplGetColorStr( aEndColor, aColorStr );
@@ -302,8 +303,7 @@ void SVGAttributeWriter::AddGradientDef( const tools::Rectangle& rObjRect, const
             {
                 const double    fCenterX = rObjRect.Left() + rObjRect.GetWidth() * rGradient.GetOfsX() * 0.01;
                 const double    fCenterY = rObjRect.Top() + rObjRect.GetHeight() * rGradient.GetOfsY() * 0.01;
-                const double    fRadius = sqrt( static_cast< double >( rObjRect.GetWidth() ) * rObjRect.GetWidth() +
-                                                rObjRect.GetHeight() * rObjRect.GetHeight() ) * 0.5;
+                const double    fRadius = std::hypot(rObjRect.GetWidth(), rObjRect.GetHeight()) * 0.5;
 
                 mrExport.AddAttribute( XML_NAMESPACE_NONE, aXMLAttrGradientUnits, "userSpaceOnUse" );
                 mrExport.AddAttribute( XML_NAMESPACE_NONE, aXMLAttrCX, OUString::number( ImplRound( fCenterX ) ) );
@@ -634,6 +634,11 @@ sal_Int32 SVGTextWriter::setTextPosition(const GDIMetaFile& rMtf, size_t& nCurAc
                 {
                     // Text is found in the inner metafile.
                     bConfigured = true;
+
+                    // nTextFound == 1 is only possible if the inner setTextPosition() had bEmpty ==
+                    // false, adjust our bEmpty accordingly.
+                    bEmpty = false;
+
                     mrActionWriter.StartMask(pA->GetPoint(), pA->GetSize(), pA->GetGradient(),
                                              nWriteFlags, &maTextOpacity);
                 }
@@ -962,143 +967,144 @@ bool SVGTextWriter::nextParagraph()
     mbIsNewListItem = false;
     mbIsListLevelStyleImage = false;
 
-    if( mrParagraphEnumeration.is() && mrParagraphEnumeration->hasMoreElements() )
-    {
-        Reference < XTextContent >  xTextContent( mrParagraphEnumeration->nextElement(), UNO_QUERY_THROW );
-        if( xTextContent.is() )
-        {
-            Reference< XServiceInfo > xServiceInfo( xTextContent, UNO_QUERY_THROW );
-#if OSL_DEBUG_LEVEL > 0
-            OUString sInfo;
-#endif
-            if( xServiceInfo->supportsService( "com.sun.star.text.Paragraph" ) )
-            {
-                mrCurrentTextParagraph.set( xTextContent );
-                Reference< XPropertySet > xPropSet( xTextContent, UNO_QUERY_THROW );
-                Reference< XPropertySetInfo > xPropSetInfo = xPropSet->getPropertySetInfo();
-                if( xPropSetInfo->hasPropertyByName( "NumberingLevel" ) )
-                {
-                    sal_Int16 nListLevel = 0;
-                    if( xPropSet->getPropertyValue( "NumberingLevel" ) >>= nListLevel )
-                    {
-                        mbIsNewListItem = true;
-#if OSL_DEBUG_LEVEL > 0
-                        sInfo = "NumberingLevel: " + OUString::number( nListLevel );
-                        mrExport.AddAttribute( XML_NAMESPACE_NONE, "style", sInfo );
-#endif
-                        Reference< XIndexReplace > xNumRules;
-                        if( xPropSetInfo->hasPropertyByName( "NumberingRules" ) )
-                        {
-                            xPropSet->getPropertyValue( "NumberingRules" ) >>= xNumRules;
-                        }
-                        if( xNumRules.is() && ( nListLevel < xNumRules->getCount() ) )
-                        {
-                            bool bIsNumbered = true;
-                            OUString sNumberingIsNumber("NumberingIsNumber");
-                            if( xPropSetInfo->hasPropertyByName( sNumberingIsNumber ) )
-                            {
-                                if( !(xPropSet->getPropertyValue( sNumberingIsNumber ) >>= bIsNumbered ) )
-                                {
-                                    OSL_FAIL( "numbered paragraph without number info" );
-                                    bIsNumbered = false;
-                                }
-#if OSL_DEBUG_LEVEL > 0
-                                if( bIsNumbered )
-                                {
-                                    sInfo = "true";
-                                    mrExport.AddAttribute( XML_NAMESPACE_NONE, "is-numbered", sInfo );
-                                }
-#endif
-                            }
-                            mbIsNewListItem = bIsNumbered;
+    if( !mrParagraphEnumeration || !mrParagraphEnumeration->hasMoreElements() )
+        return false;
 
+    Reference < XTextContent >  xTextContent( mrParagraphEnumeration->nextElement(), UNO_QUERY_THROW );
+    if( xTextContent.is() )
+    {
+        Reference< XServiceInfo > xServiceInfo( xTextContent, UNO_QUERY_THROW );
+#if OSL_DEBUG_LEVEL > 0
+        OUString sInfo;
+#endif
+        if( xServiceInfo->supportsService( "com.sun.star.text.Paragraph" ) )
+        {
+            mrCurrentTextParagraph.set( xTextContent );
+            Reference< XPropertySet > xPropSet( xTextContent, UNO_QUERY_THROW );
+            Reference< XPropertySetInfo > xPropSetInfo = xPropSet->getPropertySetInfo();
+            if( xPropSetInfo->hasPropertyByName( "NumberingLevel" ) )
+            {
+                sal_Int16 nListLevel = 0;
+                if( xPropSet->getPropertyValue( "NumberingLevel" ) >>= nListLevel )
+                {
+                    mbIsNewListItem = true;
+#if OSL_DEBUG_LEVEL > 0
+                    sInfo = "NumberingLevel: " + OUString::number( nListLevel );
+                    mrExport.AddAttribute( XML_NAMESPACE_NONE, "style", sInfo );
+#endif
+                    Reference< XIndexReplace > xNumRules;
+                    if( xPropSetInfo->hasPropertyByName( "NumberingRules" ) )
+                    {
+                        xPropSet->getPropertyValue( "NumberingRules" ) >>= xNumRules;
+                    }
+                    if( xNumRules.is() && ( nListLevel < xNumRules->getCount() ) )
+                    {
+                        bool bIsNumbered = true;
+                        OUString sNumberingIsNumber("NumberingIsNumber");
+                        if( xPropSetInfo->hasPropertyByName( sNumberingIsNumber ) )
+                        {
+                            if( !(xPropSet->getPropertyValue( sNumberingIsNumber ) >>= bIsNumbered ) )
+                            {
+                                OSL_FAIL( "numbered paragraph without number info" );
+                                bIsNumbered = false;
+                            }
+#if OSL_DEBUG_LEVEL > 0
                             if( bIsNumbered )
                             {
-                                Sequence<PropertyValue> aProps;
-                                if( xNumRules->getByIndex( nListLevel ) >>= aProps )
-                                {
-                                    sal_Int16 eType = NumberingType::CHAR_SPECIAL;
-                                    sal_Unicode cBullet = 0xf095;
-                                    const sal_Int32 nCount = aProps.getLength();
-                                    const PropertyValue* pPropArray = aProps.getConstArray();
-                                    for( sal_Int32 i = 0; i < nCount; ++i )
-                                    {
-                                        const PropertyValue& rProp = pPropArray[i];
-                                        if( rProp.Name == "NumberingType" )
-                                        {
-                                            rProp.Value >>= eType;
-                                        }
-                                        else if( rProp.Name == "BulletChar" )
-                                        {
-                                            OUString sValue;
-                                            rProp.Value >>= sValue;
-                                            if( !sValue.isEmpty() )
-                                            {
-                                                cBullet = sValue[0];
-                                            }
-                                        }
-                                    }
-                                    meNumberingType = eType;
-                                    mbIsListLevelStyleImage = ( NumberingType::BITMAP == meNumberingType );
-                                    if( NumberingType::CHAR_SPECIAL == meNumberingType )
-                                    {
-                                        if( cBullet )
-                                        {
-                                            if( cBullet < ' ' )
-                                            {
-                                                cBullet = 0xF000 + 149;
-                                            }
-                                            mcBulletChar = cBullet;
-#if OSL_DEBUG_LEVEL > 0
-                                            sInfo = OUString::number( static_cast<sal_Int32>(cBullet) );
-                                            mrExport.AddAttribute( XML_NAMESPACE_NONE, "bullet-char", sInfo );
+                                sInfo = "true";
+                                mrExport.AddAttribute( XML_NAMESPACE_NONE, "is-numbered", sInfo );
+                            }
 #endif
-                                        }
+                        }
+                        mbIsNewListItem = bIsNumbered;
 
+                        if( bIsNumbered )
+                        {
+                            Sequence<PropertyValue> aProps;
+                            if( xNumRules->getByIndex( nListLevel ) >>= aProps )
+                            {
+                                sal_Int16 eType = NumberingType::CHAR_SPECIAL;
+                                sal_Unicode cBullet = 0xf095;
+                                const sal_Int32 nCount = aProps.getLength();
+                                const PropertyValue* pPropArray = aProps.getConstArray();
+                                for( sal_Int32 i = 0; i < nCount; ++i )
+                                {
+                                    const PropertyValue& rProp = pPropArray[i];
+                                    if( rProp.Name == "NumberingType" )
+                                    {
+                                        rProp.Value >>= eType;
                                     }
+                                    else if( rProp.Name == "BulletChar" )
+                                    {
+                                        OUString sValue;
+                                        rProp.Value >>= sValue;
+                                        if( !sValue.isEmpty() )
+                                        {
+                                            cBullet = sValue[0];
+                                        }
+                                    }
+                                }
+                                meNumberingType = eType;
+                                mbIsListLevelStyleImage = ( NumberingType::BITMAP == meNumberingType );
+                                if( NumberingType::CHAR_SPECIAL == meNumberingType )
+                                {
+                                    if( cBullet )
+                                    {
+                                        if( cBullet < ' ' )
+                                        {
+                                            cBullet = 0xF000 + 149;
+                                        }
+                                        mcBulletChar = cBullet;
+#if OSL_DEBUG_LEVEL > 0
+                                        sInfo = OUString::number( static_cast<sal_Int32>(cBullet) );
+                                        mrExport.AddAttribute( XML_NAMESPACE_NONE, "bullet-char", sInfo );
+#endif
+                                    }
+
                                 }
                             }
                         }
-
                     }
-                }
 
-                Reference< XEnumerationAccess > xEnumerationAccess( xTextContent, UNO_QUERY_THROW );
-                Reference< XEnumeration > xEnumeration( xEnumerationAccess->createEnumeration(), UNO_SET_THROW );
-                if( xEnumeration.is() && xEnumeration->hasMoreElements() )
-                {
-                    mrTextPortionEnumeration.set( xEnumeration );
                 }
-#if OSL_DEBUG_LEVEL > 0
-                sInfo = "Paragraph";
-#endif
             }
-            else if( xServiceInfo->supportsService( "com.sun.star.text.Table" ) )
+
+            Reference< XEnumerationAccess > xEnumerationAccess( xTextContent, UNO_QUERY_THROW );
+            Reference< XEnumeration > xEnumeration( xEnumerationAccess->createEnumeration(), UNO_SET_THROW );
+            if( xEnumeration.is() && xEnumeration->hasMoreElements() )
             {
-                OSL_FAIL( "SVGTextWriter::nextParagraph: text tables are not handled." );
+                mrTextPortionEnumeration.set( xEnumeration );
+            }
 #if OSL_DEBUG_LEVEL > 0
-                sInfo = "Table";
+            sInfo = "Paragraph";
 #endif
-            }
-            else
-            {
-                OSL_FAIL( "SVGTextWriter::nextParagraph: Unknown text content." );
-                return false;
-            }
+        }
+        else if( xServiceInfo->supportsService( "com.sun.star.text.Table" ) )
+        {
+            OSL_FAIL( "SVGTextWriter::nextParagraph: text tables are not handled." );
 #if OSL_DEBUG_LEVEL > 0
-            mrExport.AddAttribute( XML_NAMESPACE_NONE, "class", sInfo );
-            SvXMLElementExport aParaElem( mrExport, XML_NAMESPACE_NONE, "desc", mbIWS, mbIWS );
+            sInfo = "Table";
 #endif
         }
         else
         {
-            OSL_FAIL( "SVGTextWriter::nextParagraph: no XServiceInfo interface available for text content." );
+            OSL_FAIL( "SVGTextWriter::nextParagraph: Unknown text content." );
             return false;
         }
+#if OSL_DEBUG_LEVEL > 0
+        mrExport.AddAttribute( XML_NAMESPACE_NONE, "class", sInfo );
+        SvXMLElementExport aParaElem( mrExport, XML_NAMESPACE_NONE, "desc", mbIWS, mbIWS );
+#endif
+    }
+    else
+    {
+        OSL_FAIL( "SVGTextWriter::nextParagraph: no XServiceInfo interface available for text content." );
+        return false;
+    }
 
-        const OUString& rParagraphId = implGetValidIDFromInterface( Reference<XInterface>(xTextContent, UNO_QUERY) );
-        if( !rParagraphId.isEmpty() )
-        {
+    const OUString& rParagraphId = implGetValidIDFromInterface( Reference<XInterface>(xTextContent, UNO_QUERY) );
+    if( !rParagraphId.isEmpty() )
+    {
             // if there is id for empty paragraph we need to create a empty text paragraph
             Reference < XTextRange > xRange( xTextContent, UNO_QUERY_THROW );
             if ( xRange.is() && xRange->getString().isEmpty() )
@@ -1112,11 +1118,8 @@ bool SVGTextWriter::nextParagraph()
             {
                 mrExport.AddAttribute( XML_NAMESPACE_NONE, "id", rParagraphId );
             }
-        }
-        return true;
     }
-
-    return false;
+    return true;
 }
 
 
@@ -1124,134 +1127,134 @@ bool SVGTextWriter::nextTextPortion()
 {
     mrCurrentTextPortion.clear();
     mbIsURLField = false;
-    if( mrTextPortionEnumeration.is() && mrTextPortionEnumeration->hasMoreElements() )
+    if( !mrTextPortionEnumeration || !mrTextPortionEnumeration->hasMoreElements() )
+        return false;
+
+    mbIsPlaceholderShape = false;
+    Reference< XPropertySet > xPortionPropSet( mrTextPortionEnumeration->nextElement(), UNO_QUERY );
+    Reference< XPropertySetInfo > xPortionPropInfo( xPortionPropSet->getPropertySetInfo() );
+    Reference < XTextRange > xPortionTextRange( xPortionPropSet, UNO_QUERY);
+    if( !xPortionPropSet || !xPortionPropInfo
+            || !xPortionPropInfo->hasPropertyByName( "TextPortionType" ) )
+        return true;
+
+#if OSL_DEBUG_LEVEL > 0
+    OUString sInfo;
+    OUString sPortionType;
+    if( xPortionPropSet->getPropertyValue( "TextPortionType" ) >>= sPortionType )
     {
-        mbIsPlaceholderShape = false;
-        Reference< XPropertySet > xPortionPropSet( mrTextPortionEnumeration->nextElement(), UNO_QUERY );
-        Reference< XPropertySetInfo > xPortionPropInfo( xPortionPropSet->getPropertySetInfo() );
-        Reference < XTextRange > xPortionTextRange( xPortionPropSet, UNO_QUERY);
-        if( xPortionPropSet.is() && xPortionPropInfo.is()
-                && xPortionPropInfo->hasPropertyByName( "TextPortionType" ) )
+        sInfo = "type: " + sPortionType + "; ";
+    }
+#endif
+    msPageCount = "";
+    msDateTimeType = "";
+    msTextFieldType = "";
+    if( xPortionTextRange.is() )
+    {
+#if OSL_DEBUG_LEVEL > 0
+        sInfo += "content: " + xPortionTextRange->getString() + "; ";
+#endif
+        mrCurrentTextPortion.set( xPortionTextRange );
+
+        Reference < XPropertySet > xRangePropSet( xPortionTextRange, UNO_QUERY );
+        if( xRangePropSet.is() && xRangePropSet->getPropertySetInfo()->hasPropertyByName( "TextField" ) )
         {
-#if OSL_DEBUG_LEVEL > 0
-            OUString sInfo;
-            OUString sPortionType;
-            if( xPortionPropSet->getPropertyValue( "TextPortionType" ) >>= sPortionType )
+            Reference < XTextField > xTextField( xRangePropSet->getPropertyValue( "TextField" ), UNO_QUERY );
+            if( xTextField.is() )
             {
-                sInfo = "type: " + sPortionType + "; ";
-            }
-#endif
-            msPageCount = "";
-            msDateTimeType = "";
-            msTextFieldType = "";
-            if( xPortionTextRange.is() )
-            {
-#if OSL_DEBUG_LEVEL > 0
-                sInfo += "content: " + xPortionTextRange->getString() + "; ";
-#endif
-                mrCurrentTextPortion.set( xPortionTextRange );
+                static const OUStringLiteral sServicePrefix(u"com.sun.star.text.textfield.");
+                static const OUStringLiteral sPresentationServicePrefix(u"com.sun.star.presentation.TextField.");
 
-                Reference < XPropertySet > xRangePropSet( xPortionTextRange, UNO_QUERY );
-                if( xRangePropSet.is() && xRangePropSet->getPropertySetInfo()->hasPropertyByName( "TextField" ) )
+                Reference< XServiceInfo > xService( xTextField, UNO_QUERY );
+                const Sequence< OUString > aServices = xService->getSupportedServiceNames();
+
+                const OUString* pNames = aServices.getConstArray();
+                sal_Int32 nCount = aServices.getLength();
+
+                OUString sFieldName;    // service name postfix of current field
+
+                // search for TextField service name
+                while( nCount-- )
                 {
-                    Reference < XTextField > xTextField( xRangePropSet->getPropertyValue( "TextField" ), UNO_QUERY );
-                    if( xTextField.is() )
+                    if ( pNames->matchIgnoreAsciiCase( sServicePrefix ) )
                     {
-                        static const OUStringLiteral sServicePrefix(u"com.sun.star.text.textfield.");
-                        static const OUStringLiteral sPresentationServicePrefix(u"com.sun.star.presentation.TextField.");
+                        // TextField found => postfix is field type!
+                        sFieldName = pNames->copy( sServicePrefix.getLength() );
+                        break;
+                    }
+                    else if( pNames->startsWith( sPresentationServicePrefix ) )
+                    {
+                        // TextField found => postfix is field type!
+                        sFieldName = pNames->copy( sPresentationServicePrefix.getLength() );
+                        break;
+                    }
 
-                        Reference< XServiceInfo > xService( xTextField, UNO_QUERY );
-                        const Sequence< OUString > aServices = xService->getSupportedServiceNames();
+                    ++pNames;
+                }
 
-                        const OUString* pNames = aServices.getConstArray();
-                        sal_Int32 nCount = aServices.getLength();
-
-                        OUString sFieldName;    // service name postfix of current field
-
-                        // search for TextField service name
-                        while( nCount-- )
-                        {
-                            if ( pNames->matchIgnoreAsciiCase( sServicePrefix ) )
-                            {
-                                // TextField found => postfix is field type!
-                                sFieldName = pNames->copy( sServicePrefix.getLength() );
-                                break;
-                            }
-                            else if( pNames->startsWith( sPresentationServicePrefix ) )
-                            {
-                                // TextField found => postfix is field type!
-                                sFieldName = pNames->copy( sPresentationServicePrefix.getLength() );
-                                break;
-                            }
-
-                            ++pNames;
-                        }
-
-                        msTextFieldType = sFieldName;
+                msTextFieldType = sFieldName;
 #if OSL_DEBUG_LEVEL > 0
-                        sInfo += "text field type: " + sFieldName + "; content: " + xTextField->getPresentation( /* show command: */ false ) + "; ";
+                sInfo += "text field type: " + sFieldName + "; content: " + xTextField->getPresentation( /* show command: */ false ) + "; ";
 #endif
-                        // This case handle Date or Time text field inserted by the user
-                        // on both page/master page. It doesn't handle the standard DateTime field.
-                        if( sFieldName == "DateTime" )
+                // This case handles Date or Time text field inserted by the user
+                // on both page/master page. It doesn't handle the standard DateTime field.
+                if( sFieldName == "DateTime" )
+                {
+                    Reference<XPropertySet> xTextFieldPropSet(xTextField, UNO_QUERY);
+                    if( xTextFieldPropSet.is() )
+                    {
+                        Reference<XPropertySetInfo> xPropSetInfo = xTextFieldPropSet->getPropertySetInfo();
+                        if( xPropSetInfo.is() )
                         {
-                            Reference<XPropertySet> xTextFieldPropSet(xTextField, UNO_QUERY);
-                            if( xTextFieldPropSet.is() )
+                            // The standard DateTime field has no property.
+                            // Trying to get a property value on such field would cause a runtime exception.
+                            // So the hasPropertyByName check is needed.
+                            bool bIsFixed = true;
+                            if( xPropSetInfo->hasPropertyByName("IsFixed") && ( ( xTextFieldPropSet->getPropertyValue( "IsFixed" ) ) >>= bIsFixed ) && !bIsFixed )
                             {
-                                Reference<XPropertySetInfo> xPropSetInfo = xTextFieldPropSet->getPropertySetInfo();
-                                if( xPropSetInfo.is() )
+                                bool bIsDate = true;
+                                if( xPropSetInfo->hasPropertyByName("IsDate") && ( ( xTextFieldPropSet->getPropertyValue( "IsDate" ) ) >>= bIsDate ) )
                                 {
-                                    // The standard DateTime field has no property.
-                                    // Trying to get a property value on such field would cause a runtime exception.
-                                    // So the hasPropertyByName check is needed.
-                                    bool bIsFixed = true;
-                                    if( xPropSetInfo->hasPropertyByName("IsFixed") && ( ( xTextFieldPropSet->getPropertyValue( "IsFixed" ) ) >>= bIsFixed ) && !bIsFixed )
-                                    {
-                                        bool bIsDate = true;
-                                        if( xPropSetInfo->hasPropertyByName("IsDate") && ( ( xTextFieldPropSet->getPropertyValue( "IsDate" ) ) >>= bIsDate ) )
-                                        {
-                                            msDateTimeType = OUString::createFromAscii( bIsDate ? "Date" : "Time" );
-                                        }
-                                    }
+                                    msDateTimeType = OUString::createFromAscii( bIsDate ? "Date" : "Time" );
                                 }
                             }
                         }
-                        if( sFieldName == "DateTime" || sFieldName == "Header"
-                                || sFieldName == "Footer" || sFieldName == "PageNumber"
-                                || sFieldName == "PageName" )
-                        {
-                            mbIsPlaceholderShape = true;
-                        }
-                        else if (sFieldName == "PageCount")
-                        {
-                            msPageCount = xTextField->getPresentation( /* show command: */ false );
-                        }
-                        else
-                        {
-                            mbIsURLField = sFieldName == "URL";
+                    }
+                }
+                if( sFieldName == "DateTime" || sFieldName == "Header"
+                        || sFieldName == "Footer" || sFieldName == "PageNumber"
+                        || sFieldName == "PageName" )
+                {
+                    mbIsPlaceholderShape = true;
+                }
+                else if (sFieldName == "PageCount")
+                {
+                    msPageCount = xTextField->getPresentation( /* show command: */ false );
+                }
+                else
+                {
+                    mbIsURLField = sFieldName == "URL";
 
-                            if( mbIsURLField )
+                    if( mbIsURLField )
+                    {
+                        Reference<XPropertySet> xTextFieldPropSet(xTextField, UNO_QUERY);
+                        if( xTextFieldPropSet.is() )
+                        {
+                            OUString sURL;
+                            if( ( xTextFieldPropSet->getPropertyValue( sFieldName ) ) >>= sURL )
                             {
-                                Reference<XPropertySet> xTextFieldPropSet(xTextField, UNO_QUERY);
-                                if( xTextFieldPropSet.is() )
-                                {
-                                    OUString sURL;
-                                    if( ( xTextFieldPropSet->getPropertyValue( sFieldName ) ) >>= sURL )
-                                    {
 #if OSL_DEBUG_LEVEL > 0
-                                        sInfo += "url: " + mrExport.GetRelativeReference( sURL );
+                                sInfo += "url: " + mrExport.GetRelativeReference( sURL );
 #endif
-                                        msUrl = mrExport.GetRelativeReference( sURL );
-                                        if( !msUrl.isEmpty() )
-                                        {
-                                            implRegisterInterface( xPortionTextRange );
+                                msUrl = mrExport.GetRelativeReference( sURL );
+                                if( !msUrl.isEmpty() )
+                                {
+                                    implRegisterInterface( xPortionTextRange );
 
-                                            const OUString& rTextPortionId = implGetValidIDFromInterface( Reference<XInterface>(xPortionTextRange, UNO_QUERY) );
-                                            if( !rTextPortionId.isEmpty() )
-                                            {
-                                                msHyperlinkIdList += rTextPortionId + " ";
-                                            }
-                                        }
+                                    const OUString& rTextPortionId = implGetValidIDFromInterface( Reference<XInterface>(xPortionTextRange, UNO_QUERY) );
+                                    if( !rTextPortionId.isEmpty() )
+                                    {
+                                        msHyperlinkIdList += rTextPortionId + " ";
                                     }
                                 }
                             }
@@ -1259,16 +1262,14 @@ bool SVGTextWriter::nextTextPortion()
                     }
                 }
             }
-#if OSL_DEBUG_LEVEL > 0
-            mrExport.AddAttribute( XML_NAMESPACE_NONE, "class", "TextPortion" );
-            SvXMLElementExport aPortionElem( mrExport, XML_NAMESPACE_NONE, "desc", mbIWS, mbIWS );
-            mrExport.GetDocHandler()->characters( sInfo );
-#endif
-            return true;
         }
     }
-
-    return false;
+#if OSL_DEBUG_LEVEL > 0
+    mrExport.AddAttribute( XML_NAMESPACE_NONE, "class", "TextPortion" );
+    SvXMLElementExport aPortionElem( mrExport, XML_NAMESPACE_NONE, "desc", mbIWS, mbIWS );
+    mrExport.GetDocHandler()->characters( sInfo );
+#endif
+    return true;
 }
 
 
@@ -1743,21 +1744,18 @@ void SVGTextWriter::implWriteTextPortion( const Point& rPos,
         mrExport.AddAttribute( XML_NAMESPACE_NONE, "id", rTextPortionId );
     }
 
-
     if( mbIsPlaceholderShape )
     {
         OUString sClass = "PlaceholderText";
-        // This case handle Date or Time text field inserted by the user
+        // This case handles Date or Time text field inserted by the user
         // on both page/master page. It doesn't handle the standard DateTime field.
         if( !msDateTimeType.isEmpty() )
         {
-            sClass += " ";
-            sClass += msDateTimeType;
+            sClass += " " + msDateTimeType;
         }
         else if( !msTextFieldType.isEmpty() )
         {
-            sClass += " ";
-            sClass += msTextFieldType;
+            sClass += " " + msTextFieldType;
         }
         mrExport.AddAttribute( XML_NAMESPACE_NONE, "class", sClass );
     }
@@ -2292,9 +2290,15 @@ void SVGActionWriter::ImplWritePattern( const tools::PolyPolygon& rPolyPoly,
 
                 GDIMetaFile aTmpMtf;
                 if( pHatch )
+                {
                     mpVDev->AddHatchActions( rPolyPoly, *pHatch, aTmpMtf );
+                }
                 else if ( pGradient )
-                    mpVDev->AddGradientActions( rPolyPoly.GetBoundRect(), *pGradient, aTmpMtf );
+                {
+                    Gradient aGradient(*pGradient);
+                    aGradient.AddGradientActions( rPolyPoly.GetBoundRect(), aTmpMtf );
+                }
+
                 ImplWriteActions( aTmpMtf, nWriteFlags, "" );
             }
         }
@@ -2310,8 +2314,8 @@ void SVGActionWriter::ImplWritePattern( const tools::PolyPolygon& rPolyPoly,
 void SVGActionWriter::ImplWriteGradientEx( const tools::PolyPolygon& rPolyPoly, const Gradient& rGradient,
                                            sal_uInt32 nWriteFlags)
 {
-    if ( rGradient.GetStyle() == GradientStyle::Linear ||
-         rGradient.GetStyle() == GradientStyle::Axial )
+    if ( rGradient.GetStyle() == css::awt::GradientStyle_LINEAR ||
+         rGradient.GetStyle() == css::awt::GradientStyle_AXIAL )
     {
         ImplWriteGradientLinear( rPolyPoly, rGradient );
     }
@@ -2371,7 +2375,7 @@ void SVGActionWriter::ImplWriteGradientLinear( const tools::PolyPolygon& rPolyPo
             const Color aEndColor = ImplGetColorWithIntensity( rGradient.GetEndColor(), rGradient.GetEndIntensity() );
             double fBorderOffset = rGradient.GetBorder() / 100.0;
             const sal_uInt16 nSteps = rGradient.GetSteps();
-            if( rGradient.GetStyle() == GradientStyle::Linear )
+            if( rGradient.GetStyle() == css::awt::GradientStyle_LINEAR )
             {
                 // Emulate non-smooth gradient
                 if( 0 < nSteps && nSteps < 100 )
@@ -2569,7 +2573,7 @@ void SVGActionWriter::ImplWriteMask(GDIMetaFile& rMtf, const Point& rDestPt, con
 
 
 void SVGActionWriter::ImplWriteText( const Point& rPos, const OUString& rText,
-                                     o3tl::span<const sal_Int32> pDXArray, tools::Long nWidth )
+                                     KernArraySpan pDXArray, tools::Long nWidth )
 {
     const FontMetric aMetric( mpVDev->GetFontMetric() );
 
@@ -2660,7 +2664,7 @@ void SVGActionWriter::ImplWriteText( const Point& rPos, const OUString& rText,
 
 
 void SVGActionWriter::ImplWriteText( const Point& rPos, const OUString& rText,
-                                     o3tl::span<const sal_Int32> pDXArray, tools::Long nWidth,
+                                     KernArraySpan pDXArray, tools::Long nWidth,
                                      Color aTextColor )
 {
     sal_Int32                               nLen = rText.getLength();
@@ -2677,18 +2681,17 @@ void SVGActionWriter::ImplWriteText( const Point& rPos, const OUString& rText,
 
     ImplMap( rPos, aPos );
 
-    std::vector<sal_Int32> aTmpArray(nLen);
+    KernArray aTmpArray;
     // get text sizes
     if( !pDXArray.empty() )
     {
         aNormSize = Size( mpVDev->GetTextWidth( rText ), 0 );
-        memcpy(aTmpArray.data(), pDXArray.data(), nLen * sizeof(sal_Int32));
+        aTmpArray.assign(pDXArray);
     }
     else
     {
         aNormSize = Size( mpVDev->GetTextArray( rText, &aTmpArray ), 0 );
     }
-    sal_Int32* pDX = aTmpArray.data();
 
     // if text is rotated, set transform matrix at new g element
     if( rFont.GetOrientation() )
@@ -2736,7 +2739,7 @@ void SVGActionWriter::ImplWriteText( const Point& rPos, const OUString& rText,
     {
         if( nLen > 1 )
         {
-            aNormSize.setWidth( pDX[ nLen - 2 ] + mpVDev->GetTextWidth( OUString(rText[nLen - 1]) ) );
+            aNormSize.setWidth( aTmpArray[ nLen - 2 ] + mpVDev->GetTextWidth( OUString(rText[nLen - 1]) ) );
 
             if( nWidth && aNormSize.Width() && ( nWidth != aNormSize.Width() ) )
             {
@@ -2744,7 +2747,7 @@ void SVGActionWriter::ImplWriteText( const Point& rPos, const OUString& rText,
                 const double fFactor = static_cast<double>(nWidth) / aNormSize.Width();
 
                 for( i = 0; i < ( nLen - 1 ); i++ )
-                    pDX[ i ] = FRound( pDX[ i ] * fFactor );
+                    aTmpArray.set(i, FRound(aTmpArray[i] * fFactor));
             }
             else
             {
@@ -2780,7 +2783,7 @@ void SVGActionWriter::ImplWriteText( const Point& rPos, const OUString& rText,
                         if( bCont )
                         {
                             // #118796# do NOT access pDXArray, it may be zero (!)
-                            sal_Int32 nDXWidth = pDX[ nCurPos - 1 ];
+                            sal_Int32 nDXWidth = aTmpArray[ nCurPos - 1 ];
                             nDXWidth = ImplMap( nDXWidth );
                             nX = aPos.X() + nDXWidth;
                         }
@@ -3566,7 +3569,7 @@ void SVGActionWriter::ImplWriteActions( const GDIMetaFile& rMtf,
                         }
                     }
 
-                    if(mapCurShape && mapCurShape->maShapePolyPoly.Count() && (aStartArrow.Count() || aEndArrow.Count()))
+                    if (mapCurShape->maShapePolyPoly.Count() && (aStartArrow.Count() || aEndArrow.Count()))
                     {
                         ImplWriteShape( *mapCurShape );
 
@@ -3742,7 +3745,7 @@ void SVGActionWriter::ImplWriteActions( const GDIMetaFile& rMtf,
                     // Both the pattern and the rectangle are embedded in a <defs> element.
                     // The comment content has the following format: "SLIDE_BACKGROUND <background-id>"
                     const OString& sComment = pA->GetComment();
-                    OUString sRefId = "#" + OUString::fromUtf8( sComment.getToken(1, ' ') );
+                    OUString sRefId = "#" + OUString::fromUtf8( o3tl::getToken(sComment, 1, ' ') );
                     mrExport.AddAttribute( XML_NAMESPACE_NONE, aXMLAttrXLinkHRef, sRefId );
 
                     SvXMLElementExport aRefElem( mrExport, XML_NAMESPACE_NONE, "use", true, true );

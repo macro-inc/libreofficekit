@@ -30,6 +30,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 #include <comphelper/sequence.hxx>
 
 using namespace com::sun::star;
@@ -74,21 +75,21 @@ uno::Any jsonToUnoAny(const boost::property_tree::ptree& aTree)
             if (aTypeClass == uno::TypeClass_VOID)
                 aAny.clear();
             else if (aTypeClass == uno::TypeClass_BYTE)
-                aAny <<= static_cast<sal_Int8>(OString(rValue.c_str()).toInt32());
+                aAny <<= static_cast<sal_Int8>(o3tl::toInt32(rValue));
             else if (aTypeClass == uno::TypeClass_BOOLEAN)
                 aAny <<= OString(rValue.c_str()).toBoolean();
             else if (aTypeClass == uno::TypeClass_SHORT)
-                aAny <<= static_cast<sal_Int16>(OString(rValue.c_str()).toInt32());
+                aAny <<= static_cast<sal_Int16>(o3tl::toInt32(rValue));
             else if (aTypeClass == uno::TypeClass_UNSIGNED_SHORT)
-                aAny <<= static_cast<sal_uInt16>(OString(rValue.c_str()).toUInt32());
+                aAny <<= static_cast<sal_uInt16>(o3tl::toUInt32(rValue));
             else if (aTypeClass == uno::TypeClass_LONG)
-                aAny <<= OString(rValue.c_str()).toInt32();
+                aAny <<= o3tl::toInt32(rValue);
             else if (aTypeClass == uno::TypeClass_UNSIGNED_LONG)
-                aAny <<= static_cast<sal_uInt32>(OString(rValue.c_str()).toInt32());
+                aAny <<= static_cast<sal_uInt32>(o3tl::toInt32(rValue));
             else if (aTypeClass == uno::TypeClass_FLOAT)
                 aAny <<= OString(rValue.c_str()).toFloat();
             else if (aTypeClass == uno::TypeClass_DOUBLE)
-                aAny <<= OString(rValue.c_str()).toDouble();
+                aAny <<= o3tl::toDouble(rValue);
             else if (aTypeClass == uno::TypeClass_STRING)
                 aAny <<= OUString::fromUtf8(rValue.c_str());
         }
@@ -158,6 +159,7 @@ void SequenceAsHashMap::operator<<(const css::uno::Sequence< css::uno::Any >& lS
     sal_Int32 c = lSource.getLength();
     sal_Int32 i = 0;
 
+    m_aMap.reserve(c);
     for (i=0; i<c; ++i)
     {
         css::beans::PropertyValue lP;
@@ -203,6 +205,7 @@ void SequenceAsHashMap::operator<<(const css::uno::Sequence< css::beans::Propert
     sal_Int32                        c       = lSource.getLength();
     const css::beans::PropertyValue* pSource = lSource.getConstArray();
 
+    m_aMap.reserve(c);
     for (sal_Int32 i=0; i<c; ++i)
         (*this)[pSource[i].Name] = pSource[i].Value;
 }
@@ -214,6 +217,7 @@ void SequenceAsHashMap::operator<<(const css::uno::Sequence< css::beans::NamedVa
     sal_Int32                     c       = lSource.getLength();
     const css::beans::NamedValue* pSource = lSource.getConstArray();
 
+    m_aMap.reserve(c);
     for (sal_Int32 i=0; i<c; ++i)
         (*this)[pSource[i].Name] = pSource[i].Value;
 }
@@ -229,7 +233,7 @@ void SequenceAsHashMap::operator>>(css::uno::Sequence< css::beans::PropertyValue
                         pThis != end()  ;
                       ++pThis           )
     {
-        pDestination[i].Name  = pThis->first ;
+        pDestination[i].Name  = pThis->first.maString;
         pDestination[i].Value = pThis->second;
         ++i;
     }
@@ -246,7 +250,7 @@ void SequenceAsHashMap::operator>>(css::uno::Sequence< css::beans::NamedValue >&
                         pThis != end()  ;
                       ++pThis           )
     {
-        pDestination[i].Name  = pThis->first ;
+        pDestination[i].Name  = pThis->first.maString;
         pDestination[i].Value = pThis->second;
         ++i;
     }
@@ -280,7 +284,7 @@ bool SequenceAsHashMap::match(const SequenceAsHashMap& rCheck) const
 {
     for (auto const& elem : rCheck)
     {
-        const OUString& sCheckName  = elem.first;
+        const OUString& sCheckName  = elem.first.maString;
         const css::uno::Any&   aCheckValue = elem.second;
         const_iterator         pFound      = find(sCheckName);
 
@@ -297,12 +301,10 @@ bool SequenceAsHashMap::match(const SequenceAsHashMap& rCheck) const
 
 void SequenceAsHashMap::update(const SequenceAsHashMap& rUpdate)
 {
-    for (auto const& elem : rUpdate)
+    m_aMap.reserve(std::max(size(), rUpdate.size()));
+    for (auto const& elem : rUpdate.m_aMap)
     {
-        const OUString& sName  = elem.first;
-        const css::uno::Any&   aValue = elem.second;
-
-        (*this)[sName] = aValue;
+        m_aMap[elem.first] = elem.second;
     }
 }
 
@@ -327,23 +329,23 @@ std::vector<css::beans::PropertyValue> JsonToPropertyValues(const OString& rJson
         else if (rType == "float")
             aValue.Value <<= OString(rValue.c_str()).toFloat();
         else if (rType == "long")
-            aValue.Value <<= OString(rValue.c_str()).toInt32();
+            aValue.Value <<= o3tl::toInt32(rValue);
         else if (rType == "short")
-            aValue.Value <<= sal_Int16(OString(rValue.c_str()).toInt32());
+            aValue.Value <<= sal_Int16(o3tl::toInt32(rValue));
         else if (rType == "unsigned short")
-            aValue.Value <<= sal_uInt16(OString(rValue.c_str()).toUInt32());
+            aValue.Value <<= sal_uInt16(o3tl::toUInt32(rValue));
         else if (rType == "int64")
-            aValue.Value <<= OString(rValue.c_str()).toInt64();
+            aValue.Value <<= o3tl::toInt64(rValue);
         else if (rType == "int32")
-            aValue.Value <<= OString(rValue.c_str()).toInt32();
+            aValue.Value <<= o3tl::toInt32(rValue);
         else if (rType == "int16")
-            aValue.Value <<= sal_Int16(OString(rValue.c_str()).toInt32());
+            aValue.Value <<= sal_Int16(o3tl::toInt32(rValue));
         else if (rType == "uint64")
             aValue.Value <<= OString(rValue.c_str()).toUInt64();
         else if (rType == "uint32")
-            aValue.Value <<= OString(rValue.c_str()).toUInt32();
+            aValue.Value <<= o3tl::toUInt32(rValue);
         else if (rType == "uint16")
-            aValue.Value <<= sal_uInt16(OString(rValue.c_str()).toUInt32());
+            aValue.Value <<= sal_uInt16(o3tl::toUInt32(rValue));
         else if (rType == "[]byte")
         {
             aNodeValue = rPair.second.get_child("value", aNodeNull);

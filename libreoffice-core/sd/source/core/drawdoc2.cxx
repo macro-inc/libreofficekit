@@ -84,7 +84,7 @@ SdrObject* SdDrawDocument::GetObj(std::u16string_view rObjName) const
 
             if( ( pObj->GetName() == rObjName ) ||
                 ( SdrInventor::Default == pObj->GetObjInventor() &&
-                  OBJ_OLE2 == pObj->GetObjIdentifier() &&
+                  SdrObjKind::OLE2 == pObj->GetObjIdentifier() &&
                   rObjName == static_cast< SdrOle2Obj* >( pObj )->GetPersistName() ) )
             {
                 pObjFound = pObj;
@@ -109,7 +109,7 @@ SdrObject* SdDrawDocument::GetObj(std::u16string_view rObjName) const
 
             if( ( pObj->GetName() == rObjName ) ||
                 ( SdrInventor::Default == pObj->GetObjInventor() &&
-                  OBJ_OLE2 == pObj->GetObjIdentifier() &&
+                  SdrObjKind::OLE2 == pObj->GetObjIdentifier() &&
                   rObjName == static_cast< SdrOle2Obj* >( pObj )->GetPersistName() ) )
             {
                 pObjFound = pObj;
@@ -248,7 +248,7 @@ void SdDrawDocument::UpdatePageObjectsInNotes(sal_uInt16 nStartPos)
             for (size_t nObj = 0; nObj < nObjCount; ++nObj)
             {
                 SdrObject* pObj = pPage->GetObj(nObj);
-                if (pObj->GetObjIdentifier() == OBJ_PAGE &&
+                if (pObj->GetObjIdentifier() == SdrObjKind::Page &&
                     pObj->GetObjInventor() == SdrInventor::Default)
                 {
                     // The page object is the preceding page (drawing page)
@@ -264,9 +264,9 @@ void SdDrawDocument::UpdatePageObjectsInNotes(sal_uInt16 nStartPos)
     }
 }
 
-void SdDrawDocument::UpdatePageRelativeURLs(const OUString& rOldName, std::u16string_view rNewName)
+void SdDrawDocument::UpdatePageRelativeURLs(std::u16string_view aOldName, std::u16string_view aNewName)
 {
-    if (rNewName.empty())
+    if (aNewName.empty())
         return;
 
     SfxItemPool& rPool(GetPool());
@@ -282,22 +282,22 @@ void SdDrawDocument::UpdatePageRelativeURLs(const OUString& rOldName, std::u16st
             {
                 OUString aURL = pURLField->GetURL();
 
-                if (!aURL.isEmpty() && (aURL[0] == 35) && (aURL.indexOf(rOldName, 1) == 1))
+                if (!aURL.isEmpty() && (aURL[0] == 35) && (aURL.indexOf(aOldName, 1) == 1))
                 {
-                    if (aURL.getLength() == rOldName.getLength() + 1) // standard page name
+                    if (aURL.getLength() == sal_Int32(aOldName.size() + 1)) // standard page name
                     {
                         aURL = aURL.replaceAt(1, aURL.getLength() - 1, u"") +
-                            rNewName;
+                            aNewName;
                         pURLField->SetURL(aURL);
                     }
                     else
                     {
                         const OUString sNotes(SdResId(STR_NOTES));
-                        if (aURL.getLength() == rOldName.getLength() + 2 + sNotes.getLength()
-                            && aURL.indexOf(sNotes, rOldName.getLength() + 2) == rOldName.getLength() + 2)
+                        if (aURL.getLength() == sal_Int32(aOldName.size()) + 2 + sNotes.getLength()
+                            && aURL.indexOf(sNotes, aOldName.size() + 2) == sal_Int32(aOldName.size() + 2))
                         {
                             aURL = aURL.replaceAt(1, aURL.getLength() - 1, u"") +
-                                rNewName + " " + sNotes;
+                                aNewName + " " + sNotes;
                             pURLField->SetURL(aURL);
                         }
                     }

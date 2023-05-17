@@ -7,16 +7,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
 #include "helper/sorthelper.hxx"
 #include "helper/debughelper.hxx"
 #include "helper/qahelper.hxx"
 
-#include <scdll.hxx>
 #include <postit.hxx>
 #include <sortparam.hxx>
 #include <dbdata.hxx>
-#include <patattr.hxx>
 #include <formulacell.hxx>
 #include <scopetools.hxx>
 #include <globalnames.hxx>
@@ -25,24 +22,18 @@
 #include <scitems.hxx>
 #include <editutil.hxx>
 #include <drwlayer.hxx>
-#include <formulaopt.hxx>
+#include <queryiter.hxx>
 #include <undomanager.hxx>
 
-#include <sal/config.h>
 #include <editeng/wghtitem.hxx>
 #include <editeng/postitem.hxx>
 #include <svx/svdocirc.hxx>
 #include <svx/svdpage.hxx>
 #include <rtl/math.hxx>
 
-class TestSort : public test::BootstrapFixture
+class TestSort : public ScUcalcTestBase
 {
 public:
-    TestSort();
-
-    virtual void setUp() override;
-    virtual void tearDown() override;
-
     void testSort();
     void testSortHorizontal();
     void testSortHorizontalWholeColumn();
@@ -63,6 +54,7 @@ public:
     void testSortOutOfPlaceResult();
     void testSortPartialFormulaGroup();
     void testSortImages();
+    void testQueryBinarySearch();
 
     CPPUNIT_TEST_SUITE(TestSort);
 
@@ -85,42 +77,10 @@ public:
     CPPUNIT_TEST(testSortOutOfPlaceResult);
     CPPUNIT_TEST(testSortPartialFormulaGroup);
     CPPUNIT_TEST(testSortImages);
+    CPPUNIT_TEST(testQueryBinarySearch);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    ScDocShellRef m_xDocShell;
-    ScDocument* m_pDoc;
 };
-
-
-TestSort::TestSort()
-{
-}
-
-void TestSort::setUp()
-{
-    BootstrapFixture::setUp();
-
-    ScDLL::Init();
-
-    m_xDocShell = new ScDocShell(
-        SfxModelFlags::EMBEDDED_OBJECT |
-        SfxModelFlags::DISABLE_EMBEDDED_SCRIPTS |
-        SfxModelFlags::DISABLE_DOCUMENT_RECOVERY);
-    m_xDocShell->SetIsInUcalc();
-    m_xDocShell->DoInitUnitTest();
-
-    m_pDoc = &m_xDocShell->GetDocument();
-}
-
-void TestSort::tearDown()
-{
-    m_xDocShell->DoClose();
-    m_xDocShell.clear();
-
-    test::BootstrapFixture::tearDown();
-}
 
 void TestSort::testSort()
 {
@@ -274,9 +234,9 @@ void TestSort::testSortHorizontal()
         CPPUNIT_ASSERT_MESSAGE("Table output check failed", bSuccess);
     }
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "CONCATENATE(C2;\"-\";D2)", "Wrong formula!");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,0), "CONCATENATE(C3;\"-\";D3)", "Wrong formula!");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,3,0), "CONCATENATE(C4;\"-\";D4)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=CONCATENATE(C2;\"-\";D2)"), m_pDoc->GetFormula(1,1,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=CONCATENATE(C3;\"-\";D3)"), m_pDoc->GetFormula(1,2,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=CONCATENATE(C4;\"-\";D4)"), m_pDoc->GetFormula(1,3,0));
 
     m_pDoc->DeleteTab(0);
 }
@@ -488,7 +448,7 @@ void TestSort::testSortWithFormulaRefs()
         m_pDoc->SetString( 0, i, 0, OUString::createFromAscii(aTextData[i-1]) );
 
     // Insert formulas in A1:A6 on the 2nd sheet.
-    for (size_t i = 0; i < SAL_N_ELEMENTS(aFormulaData); ++i)
+    for (size_t i = 0; i < std::size(aFormulaData); ++i)
         m_pDoc->SetString( 0, i, 1, OUString::createFromAscii(aFormulaData[i]) );
 
     // Sort data in A2:A8 on the 1st sheet. No column header.
@@ -502,7 +462,7 @@ void TestSort::testSortWithFormulaRefs()
 
     m_pDoc->Sort(0, aSortData, false, true, nullptr, nullptr);
 
-    for (size_t i = 0; i < SAL_N_ELEMENTS(aResults); ++i)
+    for (size_t i = 0; i < std::size(aResults); ++i)
     {
         OUString sResult = m_pDoc->GetString(0, i + 1, 0);
         CPPUNIT_ASSERT_EQUAL( OUString::createFromAscii( aResults[i] ), sResult );
@@ -575,9 +535,9 @@ void TestSort::testSortInFormulaGroup()
 
     m_pDoc->InsertTab(0, "sorttest");
 
-    for ( SCROW i = 0; i < SCROW(SAL_N_ELEMENTS( aEntries )); ++i )
-        m_pDoc->SetString( aEntries[i].nCol, aEntries[i].nRow, 0,
-                           OUString::createFromAscii( aEntries[i].pData) );
+    for ( auto const & i: aEntries )
+        m_pDoc->SetString( i.nCol, i.nRow, 0,
+                           OUString::createFromAscii( i.pData) );
 
     ScSortParam aSortData;
     aSortData.nCol1 = 0;
@@ -603,7 +563,7 @@ void TestSort::testSortInFormulaGroup()
         104.0, 104.0
     };
 
-    for ( SCROW i = 0; i < SCROW(SAL_N_ELEMENTS( aEntries )); ++i )
+    for ( SCROW i = 0; i < SCROW(std::size( aEntries )); ++i )
     {
         double val = m_pDoc->GetValue( aEntries[i].nCol, aEntries[i].nRow, 0 );
         CPPUNIT_ASSERT_MESSAGE("Mis-matching value after sort.",
@@ -791,7 +751,7 @@ void TestSort::testSortRefUpdate()
     m_pDoc->SetString(ScAddress(0,0,0), "Header");
 
     double aValues[] = { 4.0, 36.0, 14.0, 29.0, 98.0, 78.0, 0.0, 99.0, 1.0 };
-    size_t nCount = SAL_N_ELEMENTS(aValues);
+    size_t nCount = std::size(aValues);
     for (size_t i = 0; i < nCount; ++i)
         m_pDoc->SetValue(ScAddress(0,i+1,0), aValues[i]);
 
@@ -845,7 +805,7 @@ void TestSort::testSortRefUpdate()
     }
 
     // C2 should now point to A4.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "R[2]C[-2]", "Wrong formula in C2!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C2!", OUString("=R[2]C[-2]"), m_pDoc->GetFormula(2,1,0));
 
     // Undo the sort.
     SfxUndoManager* pUndoMgr = m_pDoc->GetUndoManager();
@@ -868,7 +828,7 @@ void TestSort::testSortRefUpdate()
     }
 
     // C2 should now point to A2.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "RC[-2]", "Wrong formula in C2!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C2!", OUString("=RC[-2]"), m_pDoc->GetFormula(2,1,0));
 
     // Redo.
     pUndoMgr->Redo();
@@ -889,7 +849,7 @@ void TestSort::testSortRefUpdate()
     }
 
     // C2 should now point to A4.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "R[2]C[-2]", "Wrong formula in C2!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C2!", OUString("=R[2]C[-2]"), m_pDoc->GetFormula(2,1,0));
 
     // Undo again.
     pUndoMgr->Undo();
@@ -992,7 +952,7 @@ void TestSort::testSortRefUpdate2()
     // Formulas in column B should still point to their respective left neighbor cell.
     for (SCROW i = 1; i <= 4; ++i)
     {
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,i,0), "RC[-1]", "Wrong formula!");
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=RC[-1]"), m_pDoc->GetFormula(1,i,0));
     }
 
     // Undo and check the result in column B.
@@ -1072,9 +1032,9 @@ void TestSort::testSortRefUpdate3()
     CPPUNIT_ASSERT_EQUAL(12.0, m_pDoc->GetValue(ScAddress(0,5,0)));
 
     // Make sure the formula cells have been adjusted correctly.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,3,0), "A2+A3", "Wrong formula in A4.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "A2+10", "Wrong formula in A5.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "A3+10", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A4.", OUString("=A2+A3"), m_pDoc->GetFormula(0,3,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=A2+10"), m_pDoc->GetFormula(0,4,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=A3+10"), m_pDoc->GetFormula(0,5,0));
 
     // Undo and check the result.
     SfxUndoManager* pUndoMgr = m_pDoc->GetUndoManager();
@@ -1211,17 +1171,17 @@ void TestSort::testSortRefUpdate4_Impl()
         // Make sure the formula cells have been adjusted correctly.
         const char* aCheck[][4] = {
             // Name          Lesson1       Lesson2       Average
-            { "Lesson1.A4", "Lesson1.B4", "Lesson2.B4", "AVERAGE(B2:C2)" },
-            { "Lesson1.A5", "Lesson1.B5", "Lesson2.B5", "AVERAGE(B3:C3)" },
-            { "Lesson1.A6", "Lesson1.B6", "Lesson2.B6", "AVERAGE(B4:C4)" },
-            { "Lesson1.A3", "Lesson1.B3", "Lesson2.B3", "AVERAGE(B5:C5)" },
-            { "Lesson1.A2", "Lesson1.B2", "Lesson2.B2", "AVERAGE(B6:C6)" },
+            { "=Lesson1.A4", "=Lesson1.B4", "=Lesson2.B4", "=AVERAGE(B2:C2)" },
+            { "=Lesson1.A5", "=Lesson1.B5", "=Lesson2.B5", "=AVERAGE(B3:C3)" },
+            { "=Lesson1.A6", "=Lesson1.B6", "=Lesson2.B6", "=AVERAGE(B4:C4)" },
+            { "=Lesson1.A3", "=Lesson1.B3", "=Lesson2.B3", "=AVERAGE(B5:C5)" },
+            { "=Lesson1.A2", "=Lesson1.B2", "=Lesson2.B2", "=AVERAGE(B6:C6)" },
         };
         for (SCROW nRow=0; nRow < static_cast<SCROW>(SAL_N_ELEMENTS(aCheck)); ++nRow)
         {
             for (SCCOL nCol=0; nCol < 4; ++nCol)
             {
-                ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(nCol,nRow+1,0), aCheck[nRow][nCol], OString("Wrong formula in " + OStringChar(char('A'+nCol)) + OString::number(nRow+2) + ".").getStr());
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(OString("Wrong formula in " + OStringChar(char('A'+nCol)) + OString::number(nRow+2) + ".").getStr(), OUString::createFromAscii(aCheck[nRow][nCol]), m_pDoc->GetFormula(nCol,nRow+1,0));
             }
         }
 
@@ -1282,17 +1242,17 @@ void TestSort::testSortRefUpdate4_Impl()
         // Make sure the formula cells have been adjusted correctly.
         const char* aCheck[][4] = {
             // Name          Lesson1       Lesson2       Average
-            { "Lesson1.A6", "Lesson1.B6", "Lesson2.B6", "AVERAGE(B2:C2)" },
-            { "Lesson1.A5", "Lesson1.B5", "Lesson2.B5", "AVERAGE(B3:C3)" },
-            { "Lesson1.A4", "Lesson1.B4", "Lesson2.B4", "AVERAGE(B4:C4)" },
-            { "Lesson1.A3", "Lesson1.B3", "Lesson2.B3", "AVERAGE(B5:C5)" },
-            { "Lesson1.A2", "Lesson1.B2", "Lesson2.B2", "AVERAGE(B6:C6)" },
+            { "=Lesson1.A6", "=Lesson1.B6", "=Lesson2.B6", "=AVERAGE(B2:C2)" },
+            { "=Lesson1.A5", "=Lesson1.B5", "=Lesson2.B5", "=AVERAGE(B3:C3)" },
+            { "=Lesson1.A4", "=Lesson1.B4", "=Lesson2.B4", "=AVERAGE(B4:C4)" },
+            { "=Lesson1.A3", "=Lesson1.B3", "=Lesson2.B3", "=AVERAGE(B5:C5)" },
+            { "=Lesson1.A2", "=Lesson1.B2", "=Lesson2.B2", "=AVERAGE(B6:C6)" },
         };
         for (SCROW nRow=0; nRow < static_cast<SCROW>(SAL_N_ELEMENTS(aCheck)); ++nRow)
         {
             for (SCCOL nCol=0; nCol < 4; ++nCol)
             {
-                ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(nCol,nRow+1,0), aCheck[nRow][nCol], OString("Wrong formula in " + OStringChar(char('A'+nCol)) + OString::number(nRow+2) + ".").getStr());
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(OString("Wrong formula in " + OStringChar(char('A'+nCol)) + OString::number(nRow+2) + ".").getStr(), OUString::createFromAscii(aCheck[nRow][nCol]), m_pDoc->GetFormula(nCol,nRow+1,0));
             }
         }
     }
@@ -1378,14 +1338,14 @@ void TestSort::testSortRefUpdate5()
     // Make sure the formula cells have been adjusted correctly.
     const char* aFormulaCheck[] = {
         // Volatile
-        "TODAY()-$A2",
-        "TODAY()-$A3",
-        "TODAY()-$A4",
-        "TODAY()-$A5",
+        "=TODAY()-$A2",
+        "=TODAY()-$A3",
+        "=TODAY()-$A4",
+        "=TODAY()-$A5",
     };
     for (SCROW nRow=0; nRow < static_cast<SCROW>(SAL_N_ELEMENTS(aFormulaCheck)); ++nRow)
     {
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,nRow+1,0), aFormulaCheck[nRow], OString("Wrong formula in B" + OString::number(nRow+2) + ".").getStr());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(OString("Wrong formula in B" + OString::number(nRow+2) + ".").getStr(), OUString::createFromAscii(aFormulaCheck[nRow]), m_pDoc->GetFormula(1,nRow+1,0));
     }
 
     // Undo and check the result.
@@ -1475,9 +1435,9 @@ void TestSort::testSortRefUpdate6()
     }
 
     // Make sure that the formulas in C2:C4 are not adjusted.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "C1+B2", "Wrong formula!");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,2,0), "C2+B3", "Wrong formula!");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,3,0), "C3+B4", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=C1+B2"), m_pDoc->GetFormula(2,1,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=C2+B3"), m_pDoc->GetFormula(2,2,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=C3+B4"), m_pDoc->GetFormula(2,3,0));
 
     // Undo and check.
     SfxUndoManager* pUndoMgr = m_pDoc->GetUndoManager();
@@ -1609,14 +1569,14 @@ void TestSort::testSortBroadcaster()
         }
 
         // Make sure that the formulas in D1:G2 are not adjusted.
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,0,0), "B1", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,1,0), "B2", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(4,0,0), "$B$1", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(4,1,0), "$B$2", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(5,0,0), "SUM(A1:B1)", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(5,1,0), "SUM(A2:B2)", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(6,0,0), "SUM($A$1:$B$1)", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(6,1,0), "SUM($A$2:$B$2)", "Wrong formula!");
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=B1"), m_pDoc->GetFormula(3,0,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=B2"), m_pDoc->GetFormula(3,1,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=$B$1"), m_pDoc->GetFormula(4,0,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=$B$2"), m_pDoc->GetFormula(4,1,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A1:B1)"), m_pDoc->GetFormula(5,0,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A2:B2)"), m_pDoc->GetFormula(5,1,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM($A$1:$B$1)"), m_pDoc->GetFormula(6,0,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM($A$2:$B$2)"), m_pDoc->GetFormula(6,1,0));
 
         // Enter new value and check that it is broadcasted. First in empty cell.
         m_pDoc->SetString(1,1,0, "16");
@@ -1711,14 +1671,14 @@ void TestSort::testSortBroadcaster()
         }
 
         // Make sure that the formulas in A8:B11 are not adjusted.
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,7,0), "A6", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,7,0), "B6", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,8,0), "$A$6", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,8,0), "$B$6", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,9,0), "SUM(A5:A6)", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,9,0), "SUM(B5:B6)", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,10,0), "SUM($A$5:$A$6)", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,10,0), "SUM($B$5:$B$6)", "Wrong formula!");
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=A6"), m_pDoc->GetFormula(0,7,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=B6"), m_pDoc->GetFormula(1,7,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=$A$6"), m_pDoc->GetFormula(0,8,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=$B$6"), m_pDoc->GetFormula(1,8,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A5:A6)"), m_pDoc->GetFormula(0,9,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(B5:B6)"), m_pDoc->GetFormula(1,9,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM($A$5:$A$6)"), m_pDoc->GetFormula(0,10,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM($B$5:$B$6)"), m_pDoc->GetFormula(1,10,0));
 
         // Enter new value and check that it is broadcasted. First in empty cell.
         m_pDoc->SetString(1,5,0, "16");
@@ -1809,10 +1769,10 @@ void TestSort::testSortBroadcastBroadcaster()
         }
 
         // Make sure that the formulas in B1:C2 are not adjusted.
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,0,0), "A1", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "A2", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,0,0), "B1", "Wrong formula!");
-        ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "B2", "Wrong formula!");
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=A1"), m_pDoc->GetFormula(1,0,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=A2"), m_pDoc->GetFormula(1,1,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=B1"), m_pDoc->GetFormula(2,0,0));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=B2"), m_pDoc->GetFormula(2,1,0));
     }
 
     m_pDoc->DeleteTab(0);
@@ -1987,15 +1947,15 @@ void TestSort::testSortImages()
 
     // Insert graphic in cell B2.
     const tools::Rectangle aOrigRect(1000, 1000, 1200, 1200);
-    SdrCircObj* pObj = new SdrCircObj(*pDrawLayer, SdrCircKind::Full, aOrigRect);
+    rtl::Reference<SdrCircObj> pObj = new SdrCircObj(*pDrawLayer, SdrCircKind::Full, aOrigRect);
     SdrPage* pPage = pDrawLayer->GetPage(0);
     CPPUNIT_ASSERT(pPage);
-    pPage->InsertObject(pObj);
+    pPage->InsertObject(pObj.get());
     // Anchor to cell
     ScDrawLayer::SetCellAnchoredFromPosition(*pObj, *m_pDoc, 0, false);
     // Move to cell B2
     ScAddress aCellPos(1, 1, 0);
-    pDrawLayer->MoveObject(pObj, aCellPos);
+    pDrawLayer->MoveObject(pObj.get(), aCellPos);
 
     std::map<SCROW, std::vector<SdrObject*>> pRowObjects
         = pDrawLayer->GetObjectsAnchoredToRange(aCellPos.Tab(), aCellPos.Col(), aCellPos.Row(), aCellPos.Row());
@@ -2020,6 +1980,270 @@ void TestSort::testSortImages()
     pRowObjects
         = pDrawLayer->GetObjectsAnchoredToRange(aCellPos.Tab(), aCellPos.Col(), aCellPos.Row(), aCellPos.Row());
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pRowObjects[aCellPos.Row()].size());
+
+    m_pDoc->DeleteTab(0);
+}
+
+namespace
+{
+
+class TestQueryIterator
+    : public ScQueryCellIteratorBase< ScQueryCellIteratorAccess::Direct, ScQueryCellIteratorType::Generic >
+{
+    typedef ScQueryCellIteratorBase< ScQueryCellIteratorAccess::Direct, ScQueryCellIteratorType::Generic > Base;
+public:
+    TestQueryIterator( ScDocument& rDocument, ScInterpreterContext& rContext, SCTAB nTable,
+        const ScQueryParam& aParam, bool bMod )
+    : Base( rDocument, rContext, nTable, aParam, bMod )
+    {
+    }
+    using Base::BinarySearch; // make public
+    SCROW GetRow() const { return nRow; }
+};
+
+ScQueryParam makeSearchParam( const ScRange& range, SCCOL col, ScQueryOp op, double value )
+{
+    ScQueryParam param;
+    param.nCol1 = param.nCol2 = col;
+    param.nRow1 = range.aStart.Row();
+    param.nRow2 = range.aEnd.Row();
+    param.nTab = 0;
+    ScQueryEntry& entry = param.GetEntry(0);
+    ScQueryEntry::Item& item = entry.GetQueryItem();
+    entry.bDoQuery = true;
+    entry.eOp = op;
+    item.mfVal = value;
+    item.meType = ScQueryEntry::ByValue;
+    return param;
+}
+
+} // namespace
+
+void TestSort::testQueryBinarySearch()
+{
+    m_pDoc->InsertTab(0, "testQueryBinarySearch");
+
+    const ScAddress formulaAddress( 10, 0, 0 );
+    ScRange range;
+    SCCOL ascendingCol;
+    SCCOL descendingCol;
+    OUString ascendingRangeName;
+    OUString descendingRangeName;
+    {
+        const std::vector<std::vector<const char*>> data = {
+            { "1", "9" },  // 0
+            { "2", "9" },  // 1
+            { "4", "5" },  // 2
+            { "5", "5" },  // 3
+            { "5", "5" },  // 4
+            { "5", "5" },  // 5
+            { "5", "5" },  // 6
+            { "5", "4" },  // 7
+            { "5", "4" },  // 8
+            { "9", "2" },  // 9
+            { "9", "1" },  // 10
+        };
+        ascendingCol = 0;
+        descendingCol = 1;
+        ascendingRangeName = u"$A$1:$A$" + OUString::number(data.size());
+        descendingRangeName = u"$B$1:$B$" + OUString::number(data.size());
+
+        ScAddress pos(0,0,0);
+        range = insertRangeData(m_pDoc, pos, data);
+        CPPUNIT_ASSERT_EQUAL( ScRange( 0, 0, 0, data[ 0 ].size() - 1, data.size() - 1, 0 ), range );
+    }
+
+    {
+        // This should return the last 5.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(5;" + ascendingRangeName + ";1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL( 9.0, m_pDoc->GetValue( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS_EQUAL, 5 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(8), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS, 5 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(2), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_EQUAL, 5 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(8), it.GetRow());
+    }
+
+    {
+        // Descending, this should return the last 5.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(5;" + descendingRangeName + ";-1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL(7.0, m_pDoc->GetValue( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER_EQUAL, 5 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(6), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER, 5 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(1), it.GetRow());
+    }
+
+    {
+        // There's no 6, so this should return the last 5.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(6;" + ascendingRangeName + ";1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL( 9.0, m_pDoc->GetValue( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS_EQUAL, 6 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(8), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS, 6 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(8), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_EQUAL, 6 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(8), it.GetRow());
+    }
+
+    {
+        // Descending, there's no 6, so this should return the last 9.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(6;" + descendingRangeName + ";-1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL( 2.0, m_pDoc->GetValue( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER_EQUAL, 6 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(1), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER, 6 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(1), it.GetRow());
+    }
+
+    {
+        // All values are larger than 0, so there should be no match.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(0;" + ascendingRangeName + ";1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL( FormulaError::NotAvailable, m_pDoc->GetErrCode( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS_EQUAL, 0 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS, 0 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_EQUAL, 0 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
+
+    {
+        // Descending, all values are larger than 0, so this should return the last item.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(0;" + descendingRangeName + ";-1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL( 11.0, m_pDoc->GetValue( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER_EQUAL, 0 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(10), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER, 0 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(10), it.GetRow());
+    }
+
+    {
+        // All values are smaller than 10, so this should return the last item.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(10;" + ascendingRangeName + ";1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL( 11.0, m_pDoc->GetValue( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS_EQUAL, 10 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(10), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_LESS, 10 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(10), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_EQUAL, 10 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(10), it.GetRow());
+    }
+
+    {
+        // Descending, all values are smaller than 10, so there should be no match.
+        m_pDoc->SetFormula( formulaAddress, "=MATCH(10;" + descendingRangeName + ";-1)",
+            formula::FormulaGrammar::GRAM_NATIVE_UI);
+        CPPUNIT_ASSERT_EQUAL( FormulaError::NotAvailable, m_pDoc->GetErrCode( formulaAddress ));
+
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER_EQUAL, 10 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
+    {
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_GREATER, 10 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
+
+    {
+        // Search as ascending but use descending range, will return no match.
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_LESS_EQUAL, 1 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
+
+    {
+        // Search as descending but use ascending range, will return no match.
+        ScQueryParam param = makeSearchParam( range, ascendingCol, SC_GREATER_EQUAL, 9 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( ascendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
+
+    {
+        // SC_EQUAL with descending is considered an error, will return no match.
+        ScQueryParam param = makeSearchParam( range, descendingCol, SC_EQUAL, 9 );
+        TestQueryIterator it( *m_pDoc, m_pDoc->GetNonThreadedContext(), 0, param, false );
+        CPPUNIT_ASSERT(!it.BinarySearch( descendingCol ));
+        CPPUNIT_ASSERT_EQUAL(SCROW(0), it.GetRow());
+    }
 
     m_pDoc->DeleteTab(0);
 }

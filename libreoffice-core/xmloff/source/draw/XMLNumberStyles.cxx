@@ -19,11 +19,13 @@
 
 #include "XMLNumberStylesExport.hxx"
 #include <XMLNumberStylesImport.hxx>
+#include <utility>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmltoken.hxx>
 
+#include <o3tl/string_view.hxx>
 #include <sal/log.hxx>
 
 #include "sdxmlexp_impl.hxx"
@@ -500,7 +502,7 @@ public:
         sal_Int32 nElement,
         const css::uno::Reference< css::xml::sax::XFastAttributeList>& xAttrList,
         SdXMLNumberFormatImportContext* pParent,
-        const SvXMLImportContextRef& rSlaveContext );
+        SvXMLImportContextRef xSlaveContext );
 
     virtual css::uno::Reference< css::xml::sax::XFastContextHandler > SAL_CALL createFastChildContext(
         sal_Int32 nElement, const css::uno::Reference< css::xml::sax::XFastAttributeList >& AttrList ) override;
@@ -519,11 +521,11 @@ SdXMLNumberFormatMemberImportContext::SdXMLNumberFormatMemberImportContext(
     sal_Int32 nElement,
     const css::uno::Reference< css::xml::sax::XFastAttributeList>& xAttrList,
     SdXMLNumberFormatImportContext* pParent,
-    const SvXMLImportContextRef& rSlaveContext )
+    SvXMLImportContextRef xSlaveContext )
 :   SvXMLImportContext(rImport),
     mpParent( pParent ),
     maNumberStyle( SvXMLImport::getNameFromToken(nElement) ),
-    mxSlaveContext( rSlaveContext )
+    mxSlaveContext(std::move( xSlaveContext ))
 {
     mbLong = false;
     mbTextual = false;
@@ -600,7 +602,7 @@ SdXMLNumberFormatImportContext::~SdXMLNumberFormatImportContext()
 {
 }
 
-void SdXMLNumberFormatImportContext::add( std::u16string_view rNumberStyle, bool bLong, bool bTextual, bool bDecimal02, OUString const & rText )
+void SdXMLNumberFormatImportContext::add( std::u16string_view rNumberStyle, bool bLong, bool bTextual, bool bDecimal02, std::u16string_view rText )
 {
     if (mnIndex == 16)
         return;
@@ -612,8 +614,8 @@ void SdXMLNumberFormatImportContext::add( std::u16string_view rNumberStyle, bool
             (pStyleMember->mbLong == bLong) &&
             (pStyleMember->mbTextual == bTextual) &&
             (pStyleMember->mbDecimal02 == bDecimal02) &&
-            ( ( (pStyleMember->mpText == nullptr) && (rText.isEmpty()) ) ||
-              ( pStyleMember->mpText && (rText.equalsAscii( pStyleMember->mpText ) ) ) ) )
+            ( ( (pStyleMember->mpText == nullptr) && (rText.empty()) ) ||
+              ( pStyleMember->mpText && (o3tl::equalsAscii( rText, pStyleMember->mpText ) ) ) ) )
         {
             mnElements[mnIndex++] = static_cast<DataStyleNumber>(nIndex + 1);
             return;

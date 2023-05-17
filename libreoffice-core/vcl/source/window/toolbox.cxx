@@ -18,7 +18,6 @@
  */
 
 #include <vcl/toolbox.hxx>
-#include <vcl/commandinfoprovider.hxx>
 #include <vcl/event.hxx>
 #include <vcl/decoview.hxx>
 #include <vcl/toolkit/floatwin.hxx>
@@ -29,12 +28,11 @@
 #include <vcl/layout.hxx>
 #include <vcl/menu.hxx>
 #include <vcl/settings.hxx>
-#include <vclstatuslistener.hxx>
 #include <vcl/ptrstyle.hxx>
 #include <bitmaps.hlst>
+#include <toolbarvalue.hxx>
 
 #include <tools/poly.hxx>
-#include <svl/imageitm.hxx>
 #include <sal/log.hxx>
 #include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
@@ -324,7 +322,7 @@ void ToolBox::ImplDrawGradientBackground(vcl::RenderContext& rRenderContext)
 
     Gradient g;
     g.SetAngle(Degree10(mbHorz ? 0 : 900));
-    g.SetStyle(GradientStyle::Linear);
+    g.SetStyle(css::awt::GradientStyle_LINEAR);
 
     g.SetStartColor(startCol);
     g.SetEndColor(endCol);
@@ -538,9 +536,9 @@ void ToolBox::ImplErase(vcl::RenderContext& rRenderContext, const tools::Rectang
             rRenderContext.SetLineColor();
             if (bHasOpenPopup)
                 // choose the same color as the popup will use
-                rRenderContext.SetFillColor(rRenderContext.GetSettings().GetStyleSettings().GetFaceGradientColor());
+                rRenderContext.SetFillColor(rRenderContext.GetSettings().GetStyleSettings().GetFaceColor());
             else
-                rRenderContext.SetFillColor(COL_WHITE);
+                rRenderContext.SetFillColor(rRenderContext.GetSettings().GetStyleSettings().GetWindowColor());
 
             rRenderContext.DrawRect(rRect);
             rRenderContext.Pop();
@@ -1143,7 +1141,6 @@ void ToolBox::ImplInitToolBoxData()
     mbDragging            = false;
     mbIsKeyEvent          = false;
     mbChangingHighlight   = false;
-    mbImagesMirrored      = false;
     mbLineSpacing         = false;
     mbIsArranged          = false;
     meButtonType          = ButtonType::SYMBOLONLY;
@@ -1155,10 +1152,6 @@ void ToolBox::ImplInitToolBoxData()
     meTextPosition        = ToolBoxTextPosition::Right;
     mnLastFocusItemId     = ToolBoxItemId(0);
     mnActivateCount       = 0;
-    mnImagesRotationAngle = 0_deg10;
-
-    mpStatusListener = new VclStatusListener<ToolBox>(this, ".uno:ImageOrientation");
-    mpStatusListener->startListening();
 
     mpIdle.reset(new Idle("vcl::ToolBox maIdle update"));
     mpIdle->SetPriority( TaskPriority::RESIZE );
@@ -1321,9 +1314,6 @@ void ToolBox::dispose()
     ImplSVData* pSVData = ImplGetSVData();
     delete pSVData->maCtrlData.mpTBDragMgr;
     pSVData->maCtrlData.mpTBDragMgr = nullptr;
-
-    if (mpStatusListener.is())
-        mpStatusListener->dispose();
 
     mpFloatWin.clear();
 
@@ -2373,8 +2363,8 @@ static void ImplDrawMoreIndicator(vcl::RenderContext& rRenderContext, const tool
 {
     const Image pImage(StockImage::Yes, CHEVRON);
     Size aImageSize = pImage.GetSizePixel();
-    tools::Long x = rRect.Left() + (rRect.getWidth() - aImageSize.Width())/2;
-    tools::Long y = rRect.Top() + (rRect.getHeight() - aImageSize.Height())/2;
+    tools::Long x = rRect.Left() + (rRect.getOpenWidth() - aImageSize.Width())/2;
+    tools::Long y = rRect.Top() + (rRect.getOpenHeight() - aImageSize.Height())/2;
     DrawImageFlags nImageStyle = DrawImageFlags::NONE;
 
     rRenderContext.DrawImage(Point(x,y), pImage, nImageStyle);
@@ -2400,10 +2390,10 @@ static void ImplDrawDropdownArrow(vcl::RenderContext& rRenderContext, const tool
 
     // the assumption is, that the width always specifies the size of the expected arrow.
     const tools::Long nMargin = round(2 * rRenderContext.GetDPIScaleFactor());
-    const tools::Long nSize = rDropDownRect.getWidth() - 2 * nMargin;
+    const tools::Long nSize = rDropDownRect.getOpenWidth() - 2 * nMargin;
     const tools::Long nHalfSize = (nSize + 1) / 2;
-    const tools::Long x = rDropDownRect.Left() + nMargin + (bRotate ? (rDropDownRect.getWidth() - nHalfSize) / 2 : 0);
-    const tools::Long y = rDropDownRect.Top() + nMargin + (rDropDownRect.getHeight() - (bRotate ? nSize : nHalfSize)) / 2;
+    const tools::Long x = rDropDownRect.Left() + nMargin + (bRotate ? (rDropDownRect.getOpenWidth() - nHalfSize) / 2 : 0);
+    const tools::Long y = rDropDownRect.Top() + nMargin + (rDropDownRect.getOpenHeight() - (bRotate ? nSize : nHalfSize)) / 2;
 
     aPoly.SetPoint(Point(x, y), 0);
     if (bRotate) // >
@@ -2671,7 +2661,7 @@ void ToolBox::ImplDrawItem(vcl::RenderContext& rRenderContext, ImplToolItems::si
         }
         else
         {
-            nImageOffX += (nBtnWidth-(bDropDown ? aDropDownRect.getWidth() : 0)+SMALLBUTTON_OFF_NORMAL_X-aImageSize.Width())/2;
+            nImageOffX += (nBtnWidth-(bDropDown ? aDropDownRect.getOpenWidth() : 0)+SMALLBUTTON_OFF_NORMAL_X-aImageSize.Width())/2;
             if ( meTextPosition == ToolBoxTextPosition::Right )
                 nImageOffY += (nBtnHeight-aImageSize.Height())/2;
         }
@@ -2734,7 +2724,7 @@ void ToolBox::ImplDrawItem(vcl::RenderContext& rRenderContext, ImplToolItems::si
             else
             {
                 // center horizontally
-                nTextOffX += (nBtnWidth-(bDropDown ? aDropDownRect.getWidth() : 0)+SMALLBUTTON_OFF_NORMAL_X-aTxtSize.Width() - TB_IMAGETEXTOFFSET)/2;
+                nTextOffX += (nBtnWidth-(bDropDown ? aDropDownRect.getOpenWidth() : 0)+SMALLBUTTON_OFF_NORMAL_X-aTxtSize.Width() - TB_IMAGETEXTOFFSET)/2;
                 // set vertical position
                 nTextOffY += nBtnHeight - aTxtSize.Height();
             }
@@ -3680,7 +3670,7 @@ void ToolBox::RequestHelp( const HelpEvent& rHEvt )
 
 bool ToolBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    if ( rNEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         KeyEvent aKEvt = *rNEvt.GetKeyEvent();
         vcl::KeyCode aKeyCode = aKEvt.GetKeyCode();
@@ -3708,7 +3698,7 @@ bool ToolBox::EventNotify( NotifyEvent& rNEvt )
                 break;
         }
     }
-    else if( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    else if( rNEvt.GetType() == NotifyEventType::GETFOCUS )
     {
         if( rNEvt.GetWindow() == this )
         {
@@ -3756,7 +3746,7 @@ bool ToolBox::EventNotify( NotifyEvent& rNEvt )
             return DockingWindow::EventNotify( rNEvt );
         }
     }
-    else if( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         // deselect
         ImplHideFocus();
@@ -3847,29 +3837,6 @@ void ToolBox::DataChanged( const DataChangedEvent& rDCEvt )
     }
 
     maDataChangedHandler.Call( &rDCEvt );
-}
-
-void ToolBox::statusChanged( const css::frame::FeatureStateEvent& Event )
-{
-    // Update image mirroring/rotation
-    if ( Event.FeatureURL.Complete != ".uno:ImageOrientation" )
-        return;
-
-    SfxImageItem aItem( 1 );
-    aItem.PutValue( Event.State, 0 );
-
-    mbImagesMirrored = aItem.IsMirrored();
-    mnImagesRotationAngle = aItem.GetRotation();
-
-    // update image orientation
-    OUString aModuleName(vcl::CommandInfoProvider::GetModuleIdentifier(mpStatusListener->getFrame()));
-    for (auto const& item : mpData->m_aItems)
-    {
-        if (vcl::CommandInfoProvider::IsMirrored(item.maCommandStr, aModuleName))
-            SetItemImageMirrorMode(item.mnId, mbImagesMirrored);
-        if (vcl::CommandInfoProvider::IsRotated(item.maCommandStr, aModuleName))
-            SetItemImageAngle(item.mnId, mnImagesRotationAngle);
-    }
 }
 
 void ToolBox::SetStyle(WinBits nNewStyle)

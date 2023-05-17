@@ -98,11 +98,11 @@ struct ScIconSetInfo
 
 // FillInfo() computes some info for all cells starting from column 0,
 // but most of the info is needed only for cells in the given columns.
-// Keeping all the info in CellInfo could lead to allocation and initialization
+// Keeping all the info in ScCellInfo could lead to allocation and initialization
 // of MiB's of memory, so split the info needed for all cells to a smaller structure.
-struct BasicCellInfo
+struct ScBasicCellInfo
 {
-    BasicCellInfo()
+    ScBasicCellInfo()
         : nWidth(0)
         , bEmptyCellText(true)
         , bEditEngine(false)    // view-internal
@@ -112,9 +112,9 @@ struct BasicCellInfo
     bool                        bEditEngine : 1;            // output-internal
 };
 
-struct CellInfo
+struct ScCellInfo
 {
-    CellInfo()
+    ScCellInfo()
         : pPatternAttr(nullptr)
         , pConditionSet(nullptr)
         , pDataBar(nullptr)
@@ -139,11 +139,14 @@ struct CellInfo
         , bFilterActive(false)
         , bPrinted(false)       // view-internal
         , bHideGrid(false)      // view-internal
+        , bPivotCollapseButton(false)
+        , bPivotExpandButton(false)
+        , bPivotPopupButtonMulti(false)
     {
     }
 
-    CellInfo(const CellInfo&) = delete;
-    const CellInfo& operator=(const CellInfo&) = delete;
+    ScCellInfo(const ScCellInfo&) = delete;
+    const ScCellInfo& operator=(const ScCellInfo&) = delete;
 
     ScRefCellValue              maCell;
 
@@ -178,6 +181,9 @@ struct CellInfo
     bool                        bFilterActive:1;
     bool                        bPrinted : 1;               // when required (pagebreak mode)
     bool                        bHideGrid : 1;              // output-internal
+    bool                        bPivotCollapseButton : 1;   // dp compact layout collapse button
+    bool                        bPivotExpandButton : 1;     // dp compact layout expand button
+    bool                        bPivotPopupButtonMulti : 1; // dp button with popup arrow for multiple fields
 };
 
 const SCCOL SC_ROTMAX_NONE = SCCOL_MAX;
@@ -188,7 +194,7 @@ struct RowInfo
     RowInfo(const RowInfo&) = delete;
     const RowInfo& operator=(const RowInfo&) = delete;
 
-    CellInfo&           cellInfo(SCCOL nCol)
+    ScCellInfo&         cellInfo(SCCOL nCol)
     {
         assert( nCol >= nStartCol - 1 );
 #ifdef DBG_UTIL
@@ -196,12 +202,12 @@ struct RowInfo
 #endif
         return pCellInfo[ nCol - nStartCol + 1 ];
     }
-    const CellInfo&     cellInfo(SCCOL nCol) const
+    const ScCellInfo&   cellInfo(SCCOL nCol) const
     {
         return const_cast<RowInfo*>(this)->cellInfo(nCol);
     }
 
-    BasicCellInfo&      basicCellInfo(SCCOL nCol)
+    ScBasicCellInfo&    basicCellInfo(SCCOL nCol)
     {
         assert( nCol >= -1 );
 #ifdef DBG_UTIL
@@ -209,7 +215,7 @@ struct RowInfo
 #endif
         return pBasicCellInfo[ nCol + 1 ];
     }
-    const BasicCellInfo& basicCellInfo(SCCOL nCol) const
+    const ScBasicCellInfo& basicCellInfo(SCCOL nCol) const
     {
         return const_cast<RowInfo*>(this)->basicCellInfo(nCol);
     }
@@ -220,8 +226,8 @@ struct RowInfo
 #ifdef DBG_UTIL
         nEndCol = endCol;
 #endif
-        pCellInfo = new CellInfo[ endCol - nStartCol + 1 + 2 ];
-        pBasicCellInfo = new BasicCellInfo[ endCol + 1 + 2 ];
+        pCellInfo = new ScCellInfo[ endCol - nStartCol + 1 + 2 ];
+        pBasicCellInfo = new ScBasicCellInfo[ endCol + 1 + 2 ];
     }
     void                freeCellInfo()
     {
@@ -237,15 +243,16 @@ struct RowInfo
     bool                bAutoFilter:1;
     bool                bPivotButton:1;
     bool                bChanged:1;           // TRUE, if not tested
+    bool                bPivotToggle:1;
 
 private:
-    // This class allocates CellInfo with also one item extra before and after.
+    // This class allocates ScCellInfo with also one item extra before and after.
     // To make handling easier, this is private and access functions take care of adjusting
-    // the array indexes and error-checking. CellInfo is allocated only for a given
-    // range of columns plus one on each side, BasicCellInfo is allocated for columns
+    // the array indexes and error-checking. ScCellInfo is allocated only for a given
+    // range of columns plus one on each side, ScBasicCellInfo is allocated for columns
     // starting from column 0 until the last column given, again plus one on each side.
-    CellInfo*           pCellInfo;
-    BasicCellInfo*      pBasicCellInfo;
+    ScCellInfo*         pCellInfo;
+    ScBasicCellInfo*    pBasicCellInfo;
     SCCOL               nStartCol;
 #ifdef DBG_UTIL
     SCCOL               nEndCol;
@@ -275,8 +282,8 @@ struct ScTableInfo
         mIconSetInfos.push_back(std::move(info));
     }
 private:
-    // These are owned here and not in CellInfo to avoid freeing
-    // memory for every pointer in CellInfo, most of which are nullptr.
+    // These are owned here and not in ScCellInfo to avoid freeing
+    // memory for every pointer in ScCellInfo, most of which are nullptr.
     std::vector<std::unique_ptr<const ScDataBarInfo>> mDataBarInfos;
     std::vector<std::unique_ptr<const ScIconSetInfo>> mIconSetInfos;
 };

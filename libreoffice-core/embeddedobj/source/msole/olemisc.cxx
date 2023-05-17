@@ -31,8 +31,10 @@
 #include <comphelper/multicontainer2.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <osl/diagnose.h>
 
 #include <oleembobj.hxx>
+#include <utility>
 #include "olepersist.hxx"
 
 #include "ownview.hxx"
@@ -42,17 +44,17 @@
 using namespace ::com::sun::star;
 
 
-OleEmbeddedObject::OleEmbeddedObject( const uno::Reference< uno::XComponentContext >& xContext,
+OleEmbeddedObject::OleEmbeddedObject( uno::Reference< uno::XComponentContext > xContext,
                                       const uno::Sequence< sal_Int8 >& aClassID,
-                                      const OUString& aClassName )
+                                      OUString aClassName )
 : m_bReadOnly( false )
 , m_bDisposed( false )
 , m_nObjectState( -1 )
 , m_nTargetState( -1 )
 , m_nUpdateMode ( embed::EmbedUpdateModes::ALWAYS_UPDATE )
-, m_xContext( xContext )
+, m_xContext(std::move( xContext ))
 , m_aClassID( aClassID )
-, m_aClassName( aClassName )
+, m_aClassName(std::move( aClassName ))
 , m_bWaitSaveCompleted( false )
 , m_bNewVisReplInStream( true )
 , m_bStoreLoaded( false )
@@ -75,13 +77,13 @@ OleEmbeddedObject::OleEmbeddedObject( const uno::Reference< uno::XComponentConte
 
 // In case of loading from persistent entry the classID of the object
 // will be retrieved from the entry, during construction it is unknown
-OleEmbeddedObject::OleEmbeddedObject( const uno::Reference< uno::XComponentContext >& xContext, bool bLink )
+OleEmbeddedObject::OleEmbeddedObject( uno::Reference< uno::XComponentContext > xContext, bool bLink )
 : m_bReadOnly( false )
 , m_bDisposed( false )
 , m_nObjectState( -1 )
 , m_nTargetState( -1 )
 , m_nUpdateMode( embed::EmbedUpdateModes::ALWAYS_UPDATE )
-, m_xContext( xContext )
+, m_xContext(std::move( xContext ))
 , m_bWaitSaveCompleted( false )
 , m_bNewVisReplInStream( true )
 , m_bStoreLoaded( false )
@@ -676,11 +678,9 @@ void OleEmbeddedObject::initialize(const uno::Sequence<uno::Any>& rArguments)
         return;
 
     comphelper::SequenceAsHashMap aValues(rArguments[0]);
-    for (const auto& rValue : aValues)
-    {
-        if (rValue.first == "StreamReadOnly")
-            rValue.second >>= m_bStreamReadOnly;
-    }
+    auto it = aValues.find("StreamReadOnly");
+    if (it != aValues.end())
+        it->second >>= m_bStreamReadOnly;
 }
 
 OUString SAL_CALL OleEmbeddedObject::getImplementationName()

@@ -57,7 +57,7 @@
 #include <rtl/process.h>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
-#include <tools/diagnose_ex.h>
+#include <sal/log.hxx>
 #include <uno/current_context.hxx>
 #include <jvmfwk/framework.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -67,6 +67,7 @@
 #include <string.h>
 #include <time.h>
 #include <memory>
+#include <utility>
 #include <vector>
 
 // Properties of the javavm can be put
@@ -419,23 +420,23 @@ void initVMConfiguration(
     try {
         getINetPropsFromConfig(&jvm, xSMgr, xCtx);
     }
-    catch(const css::uno::Exception &) {
-        TOOLS_INFO_EXCEPTION("stoc", "can not get INETProps");
+    catch(const css::uno::Exception & exception) {
+        SAL_INFO("stoc", "can not get INETProps because of " << exception);
     }
 
     try {
         getDefaultLocaleFromConfig(&jvm, xSMgr,xCtx);
     }
-    catch(const css::uno::Exception &) {
-        TOOLS_INFO_EXCEPTION("stoc", "can not get locale");
+    catch(const css::uno::Exception & exception) {
+        SAL_INFO("stoc", "can not get locale because of " << exception);
     }
 
     try
     {
         getJavaPropsFromSafetySettings(&jvm, xSMgr, xCtx);
     }
-    catch(const css::uno::Exception &) {
-        TOOLS_INFO_EXCEPTION("stoc", "couldn't get safety settings");
+    catch(const css::uno::Exception & exception) {
+        SAL_INFO("stoc", "couldn't get safety settings because of " << exception);
     }
 
     *pjvm= jvm;
@@ -470,9 +471,9 @@ private:
 }
 
 JavaVirtualMachine::JavaVirtualMachine(
-    css::uno::Reference< css::uno::XComponentContext > const & rContext):
+    css::uno::Reference< css::uno::XComponentContext > xContext):
     WeakComponentImplHelper(m_aMutex),
-    m_xContext(rContext),
+    m_xContext(std::move(xContext)),
     m_bDisposed(false),
     m_pJavaVm(nullptr),
     m_aAttachGuards(destroyAttachGuards) // TODO check for validity
@@ -623,7 +624,7 @@ JavaVirtualMachine::getJavaVM(css::uno::Sequence< sal_Int8 > const & rProcessId)
                     "JavaVirtualMachine::getJavaVM failed because"
                     " No suitable JRE found!",
                     static_cast< cppu::OWeakObject * >(this));
-                askForRetry(css::uno::makeAny(exc));
+                askForRetry(css::uno::Any(exc));
                 return css::uno::Any();
             }
             else
@@ -644,7 +645,7 @@ JavaVirtualMachine::getJavaVM(css::uno::Sequence< sal_Int8 > const & rProcessId)
                 "JavaVirtualMachine::getJavaVM failed because"
                 " Java settings have changed!",
                 static_cast< cppu::OWeakObject * >(this));
-            askForRetry(css::uno::makeAny(exc));
+            askForRetry(css::uno::Any(exc));
             return css::uno::Any();
         }
         case JFW_E_JAVA_DISABLED:
@@ -659,7 +660,7 @@ JavaVirtualMachine::getJavaVM(css::uno::Sequence< sal_Int8 > const & rProcessId)
             css::java::JavaDisabledException exc(
                 "JavaVirtualMachine::getJavaVM failed because Java is disabled!",
                 static_cast< cppu::OWeakObject * >(this));
-            if( ! askForRetry(css::uno::makeAny(exc)))
+            if( ! askForRetry(css::uno::Any(exc)))
                 return css::uno::Any();
             continue;
         }
@@ -696,7 +697,7 @@ JavaVirtualMachine::getJavaVM(css::uno::Sequence< sal_Int8 > const & rProcessId)
             css::java::JavaVMCreationFailureException exc(
                 "JavaVirtualMachine::getJavaVM failed because Java is defective!",
                 static_cast< cppu::OWeakObject * >(this), 0);
-            askForRetry(css::uno::makeAny(exc));
+            askForRetry(css::uno::Any(exc));
             return css::uno::Any();
         }
         case JFW_E_RUNNING_JVM:
@@ -714,7 +715,7 @@ JavaVirtualMachine::getJavaVM(css::uno::Sequence< sal_Int8 > const & rProcessId)
                 "JavaVirtualMachine::getJavaVM failed because "
                 "Office must be restarted before Java can be used!",
                 static_cast< cppu::OWeakObject * >(this));
-            askForRetry(css::uno::makeAny(exc));
+            askForRetry(css::uno::Any(exc));
             return css::uno::Any();
         }
         default:
@@ -762,15 +763,15 @@ JavaVirtualMachine::getJavaVM(css::uno::Sequence< sal_Int8 > const & rProcessId)
                 " that the requested JavaVM pointer is not available",
                 static_cast< cppu::OWeakObject * >(this));
         }
-        return css::uno::makeAny(reinterpret_cast< sal_IntPtr >(m_pJavaVm));
+        return css::uno::Any(reinterpret_cast< sal_IntPtr >(m_pJavaVm));
     case RETURN_VIRTUALMACHINE:
         OSL_ASSERT(sizeof (sal_Int64) >= sizeof (jvmaccess::VirtualMachine *));
-        return css::uno::makeAny(
+        return css::uno::Any(
             reinterpret_cast< sal_Int64 >(
                 m_xUnoVirtualMachine->getVirtualMachine().get()));
     case RETURN_UNOVIRTUALMACHINE:
         OSL_ASSERT(sizeof (sal_Int64) >= sizeof (jvmaccess::VirtualMachine *));
-        return css::uno::makeAny(
+        return css::uno::Any(
             reinterpret_cast< sal_Int64 >(m_xUnoVirtualMachine.get()));
     }
 }
@@ -1129,7 +1130,7 @@ JavaVirtualMachine::~JavaVirtualMachine()
         }
         catch (css::uno::Exception &)
         {
-            TOOLS_WARN_EXCEPTION( "stoc", "");
+            OSL_FAIL("com.sun.star.uno.Exception caught");
         }
     if (m_xJavaConfiguration.is())
         // We should never get here, but just in case...
@@ -1139,7 +1140,7 @@ JavaVirtualMachine::~JavaVirtualMachine()
         }
         catch (css::uno::Exception &)
         {
-            TOOLS_WARN_EXCEPTION( "stoc", "");
+            OSL_FAIL("com.sun.star.uno.Exception caught");
         }
 }
 
@@ -1209,9 +1210,9 @@ void JavaVirtualMachine::registerConfigChangesListener()
             if (m_xJavaConfiguration.is())
                 m_xJavaConfiguration->addContainerListener(this);
         }
-    }catch(const css::uno::Exception &)
+    }catch(const css::uno::Exception & e)
     {
-        TOOLS_INFO_EXCEPTION("stoc", "could not set up listener for Configuration");
+        SAL_INFO("stoc", "could not set up listener for Configuration because of >" << e << "<");
     }
 }
 
@@ -1275,7 +1276,7 @@ void JavaVirtualMachine::setINetSettingsInVM(bool set_reset)
                 for( auto& prop : Props)
                 {
                     sal_Int32 index= prop.indexOf( '=');
-                    OUString propName= prop.copy( 0, index);
+                    std::u16string_view propName= prop.subView( 0, index);
                     OUString propValue= prop.copy( index + 1);
 
                     if( propName == sFtpProxyHost)
@@ -1338,11 +1339,11 @@ void JavaVirtualMachine::setINetSettingsInVM(bool set_reset)
     }
     catch (css::uno::RuntimeException &)
     {
-        TOOLS_WARN_EXCEPTION( "stoc", "");
+        OSL_FAIL("RuntimeException");
     }
     catch (jvmaccess::VirtualMachine::AttachGuard::CreationException &)
     {
-        TOOLS_WARN_EXCEPTION( "stoc", "");
+        OSL_FAIL("jvmaccess::VirtualMachine::AttachGuard::CreationException");
     }
 }
 

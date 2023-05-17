@@ -28,8 +28,10 @@
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
 #include <drawinglayer/primitive2d/maskprimitive2d.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
+#include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <cmath>
+#include <utility>
 #include <vcl/skia/SkiaHelper.hxx>
 
 using namespace com::sun::star;
@@ -305,13 +307,13 @@ namespace drawinglayer::primitive2d
 
         void SvgGradientHelper::createResult(
             Primitive2DContainer& rContainer,
-            const Primitive2DContainer& rTargetColor,
-            const Primitive2DContainer& rTargetOpacity,
+            Primitive2DContainer aTargetColor,
+            Primitive2DContainer aTargetOpacity,
             const basegfx::B2DHomMatrix& rUnitGradientToObject,
             bool bInvert) const
         {
-            Primitive2DContainer aTargetColorEntries(rTargetColor.maybeInvert(bInvert));
-            Primitive2DContainer aTargetOpacityEntries(rTargetOpacity.maybeInvert(bInvert));
+            Primitive2DContainer aTargetColorEntries(aTargetColor.maybeInvert(bInvert));
+            Primitive2DContainer aTargetOpacityEntries(aTargetOpacity.maybeInvert(bInvert));
 
             if(aTargetColorEntries.empty())
                 return;
@@ -341,14 +343,14 @@ namespace drawinglayer::primitive2d
         }
 
         SvgGradientHelper::SvgGradientHelper(
-            const basegfx::B2DHomMatrix& rGradientTransform,
-            const basegfx::B2DPolyPolygon& rPolyPolygon,
+            basegfx::B2DHomMatrix aGradientTransform,
+            basegfx::B2DPolyPolygon aPolyPolygon,
             SvgGradientEntryVector&& rGradientEntries,
             const basegfx::B2DPoint& rStart,
             bool bUseUnitCoordinates,
             SpreadMethod aSpreadMethod)
-        :   maGradientTransform(rGradientTransform),
-            maPolyPolygon(rPolyPolygon),
+        :   maGradientTransform(std::move(aGradientTransform)),
+            maPolyPolygon(std::move(aPolyPolygon)),
             maGradientEntries(std::move(rGradientEntries)),
             maStart(rStart),
             maSpreadMethod(aSpreadMethod),
@@ -554,7 +556,7 @@ namespace drawinglayer::primitive2d
                         aUnitRange.getMaxX());
                 }
 
-                createResult(rContainer, aTargetColor, aTargetOpacity, aUnitGradientToObject);
+                createResult(rContainer, std::move(aTargetColor), std::move(aTargetOpacity), aUnitGradientToObject);
             }
         }
 
@@ -780,7 +782,7 @@ namespace drawinglayer::primitive2d
                         fMax);
                 }
 
-                createResult(rContainer, aTargetColor, aTargetOpacity, aUnitGradientToObject, true);
+                createResult(rContainer, std::move(aTargetColor), std::move(aTargetOpacity), aUnitGradientToObject, true);
             }
         }
 
@@ -816,22 +818,22 @@ namespace drawinglayer::primitive2d
         {
             const SvgGradientHelper* pSvgGradientHelper = dynamic_cast< const SvgGradientHelper* >(&rPrimitive);
 
-            if(pSvgGradientHelper && SvgGradientHelper::operator==(*pSvgGradientHelper))
-            {
-                const SvgRadialGradientPrimitive2D& rCompare = static_cast< const SvgRadialGradientPrimitive2D& >(rPrimitive);
+            if(!pSvgGradientHelper || !SvgGradientHelper::operator==(*pSvgGradientHelper))
+                return false;
 
-                if(getRadius() == rCompare.getRadius())
+            const SvgRadialGradientPrimitive2D& rCompare = static_cast< const SvgRadialGradientPrimitive2D& >(rPrimitive);
+
+            if(getRadius() == rCompare.getRadius())
+            {
+                if(isFocalSet() == rCompare.isFocalSet())
                 {
-                    if(isFocalSet() == rCompare.isFocalSet())
+                    if(isFocalSet())
                     {
-                        if(isFocalSet())
-                        {
-                            return getFocal() == rCompare.getFocal();
-                        }
-                        else
-                        {
-                            return true;
-                        }
+                        return getFocal() == rCompare.getFocal();
+                    }
+                    else
+                    {
+                        return true;
                     }
                 }
             }
@@ -1060,24 +1062,24 @@ namespace drawinglayer::primitive2d
 
         bool SvgRadialAtomPrimitive2D::operator==(const BasePrimitive2D& rPrimitive) const
         {
-            if(DiscreteMetricDependentPrimitive2D::operator==(rPrimitive))
-            {
-                const SvgRadialAtomPrimitive2D& rCompare = static_cast< const SvgRadialAtomPrimitive2D& >(rPrimitive);
+            if(!DiscreteMetricDependentPrimitive2D::operator==(rPrimitive))
+                return false;
 
-                if(getColorA() == rCompare.getColorA()
-                    && getColorB() == rCompare.getColorB()
-                    && getScaleA() == rCompare.getScaleA()
-                    && getScaleB() == rCompare.getScaleB())
+            const SvgRadialAtomPrimitive2D& rCompare = static_cast< const SvgRadialAtomPrimitive2D& >(rPrimitive);
+
+            if(getColorA() == rCompare.getColorA()
+                && getColorB() == rCompare.getColorB()
+                && getScaleA() == rCompare.getScaleA()
+                && getScaleB() == rCompare.getScaleB())
+            {
+                if(isTranslateSet() && rCompare.isTranslateSet())
                 {
-                    if(isTranslateSet() && rCompare.isTranslateSet())
-                    {
-                        return (getTranslateA() == rCompare.getTranslateA()
-                            && getTranslateB() == rCompare.getTranslateB());
-                    }
-                    else if(!isTranslateSet() && !rCompare.isTranslateSet())
-                    {
-                        return true;
-                    }
+                    return (getTranslateA() == rCompare.getTranslateA()
+                        && getTranslateB() == rCompare.getTranslateB());
+                }
+                else if(!isTranslateSet() && !rCompare.isTranslateSet())
+                {
+                    return true;
                 }
             }
 

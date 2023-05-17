@@ -40,7 +40,7 @@
 
 #include <com/sun/star/uno/Any.h>
 #include <SwStyleNameMapper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <fmtmeta.hxx>
 #include <ndtxt.hxx>
@@ -50,6 +50,7 @@
 #include <osl/diagnose.h>
 
 #include <algorithm>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -164,10 +165,10 @@ SwFormatINetFormat::SwFormatINetFormat()
     , mnVisitedFormatId( 0 )
 {}
 
-SwFormatINetFormat::SwFormatINetFormat( const OUString& rURL, const OUString& rTarget )
+SwFormatINetFormat::SwFormatINetFormat( OUString aURL, OUString aTarget )
     : SfxPoolItem( RES_TXTATR_INETFMT )
-    , msURL( rURL )
-    , msTargetFrame( rTarget )
+    , msURL( std::move(aURL) )
+    , msTargetFrame( std::move(aTarget) )
     , msINetFormatName()
     , msVisitedFormatName()
     , msHyperlinkName()
@@ -386,9 +387,9 @@ bool SwFormatINetFormat::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
     return bRet;
 }
 
-SwFormatRuby::SwFormatRuby( const OUString& rRubyText )
+SwFormatRuby::SwFormatRuby( OUString aRubyText )
     : SfxPoolItem( RES_TXTATR_CJK_RUBY ),
-    m_sRubyText( rRubyText ),
+    m_sRubyText( std::move(aRubyText) ),
     m_pTextAttr( nullptr ),
     m_nCharFormatId( 0 ),
     m_nPosition( 0 ),
@@ -539,10 +540,10 @@ SwFormatMeta::SwFormatMeta(const sal_uInt16 i_nWhich)
             "ERROR: SwFormatMeta: invalid which id!");
 }
 
-SwFormatMeta::SwFormatMeta( std::shared_ptr< ::sw::Meta > const & i_pMeta,
+SwFormatMeta::SwFormatMeta( std::shared_ptr< ::sw::Meta > i_pMeta,
                         const sal_uInt16 i_nWhich )
     : SfxPoolItem( i_nWhich )
-    , m_pMeta( i_pMeta )
+    , m_pMeta( std::move(i_pMeta) )
     , m_pTextAttr( nullptr )
 {
     OSL_ENSURE((RES_TXTATR_META == i_nWhich) || (RES_TXTATR_METAFIELD == i_nWhich),
@@ -653,6 +654,8 @@ SwTextMeta * Meta::GetTextAttr() const
     return m_pFormat ? m_pFormat->GetTextAttr() : nullptr;
 }
 
+void Meta::SetXMeta(rtl::Reference<SwXMeta> const& xMeta)
+{ m_wXMeta = xMeta.get(); }
 
 void Meta::NotifyChangeTextNode(SwTextNode *const pTextNode)
 {
@@ -680,7 +683,7 @@ void Meta::SwClientNotify(const SwModify&, const SfxHint& rHint)
     GetNotifier().Broadcast(SfxHint(SfxHintId::DataChanged));
     if(RES_REMOVE_UNO_OBJECT == pLegacy->GetWhich())
     {   // invalidate cached uno object
-        SetXMeta(uno::Reference<rdf::XMetadatable>(nullptr));
+        SetXMeta(nullptr);
         GetNotifier().Broadcast(SfxHint(SfxHintId::Deinitializing));
     }
 }
@@ -753,7 +756,7 @@ void MetaField::GetPrefixAndSuffix(
     }
 }
 
-sal_uInt32 MetaField::GetNumberFormat(OUString const & rContent) const
+sal_uInt32 MetaField::GetNumberFormat(std::u16string_view aContent) const
 {
     //TODO: this probably lacks treatment for some special cases
     sal_uInt32 nNumberFormat( m_nNumberFormat );
@@ -761,7 +764,7 @@ sal_uInt32 MetaField::GetNumberFormat(OUString const & rContent) const
     if (pTextNode)
     {
         double number;
-        (void) pTextNode->GetDoc().IsNumberFormat( rContent, nNumberFormat, number );
+        (void) pTextNode->GetDoc().IsNumberFormat( aContent, nNumberFormat, number );
     }
     return nNumberFormat;
 }

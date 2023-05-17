@@ -20,7 +20,6 @@
 #include <config_features.h>
 
 #include <DrawViewShell.hxx>
-#include <editeng/outlobj.hxx>
 #include <svx/xgrad.hxx>
 #include <svx/svdpagv.hxx>
 #include <svx/xfillit0.hxx>
@@ -125,7 +124,7 @@ void DrawViewShell::ExecGallery(SfxRequest const & rReq)
         aPnt += Point(pPage->GetLeftBorder(), pPage->GetUpperBorder());
         ::tools::Rectangle aRect (aPnt, aSize);
 
-        SdrGrafObj* pGrafObj = nullptr;
+        rtl::Reference<SdrGrafObj> pGrafObj;
 
         bool bInsertNewObject = true;
 
@@ -139,7 +138,7 @@ void DrawViewShell::ExecGallery(SfxRequest const & rReq)
                 SdrMark* pMark = rMarkList.GetMark(0);
                 SdrObject* pObj = pMark->GetMarkedSdrObj();
 
-                if (pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == OBJ_GRAF)
+                if (pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == SdrObjKind::Graphic)
                 {
                     pGrafObj = static_cast<SdrGrafObj*>(pObj);
 
@@ -148,7 +147,7 @@ void DrawViewShell::ExecGallery(SfxRequest const & rReq)
                         // the empty graphic object gets a new graphic
                         bInsertNewObject = false;
 
-                        SdrGrafObj* pNewGrafObj(pGrafObj->CloneSdrObject(pGrafObj->getSdrModelFromSdrObject()));
+                        rtl::Reference<SdrGrafObj> pNewGrafObj(SdrObject::Clone(*pGrafObj, pGrafObj->getSdrModelFromSdrObject()));
                         pNewGrafObj->SetEmptyPresObj(false);
                         pNewGrafObj->SetOutlinerParaObject(std::nullopt);
                         pNewGrafObj->SetGraphic(aGraphic);
@@ -157,7 +156,7 @@ void DrawViewShell::ExecGallery(SfxRequest const & rReq)
                             " " + SdResId(STR_UNDO_REPLACE);
                         mpDrawView->BegUndo(aStr);
                         SdrPageView* pPV = mpDrawView->GetSdrPageView();
-                        mpDrawView->ReplaceObjectAtView(pGrafObj, *pPV, pNewGrafObj);
+                        mpDrawView->ReplaceObjectAtView(pGrafObj.get(), *pPV, pNewGrafObj.get());
                         mpDrawView->EndUndo();
                     }
                 }
@@ -171,7 +170,7 @@ void DrawViewShell::ExecGallery(SfxRequest const & rReq)
                 aGraphic,
                 aRect);
             SdrPageView* pPV = mpDrawView->GetSdrPageView();
-            mpDrawView->InsertObjectAtView(pGrafObj, *pPV, SdrInsertFlags::SETDEFLAYER);
+            mpDrawView->InsertObjectAtView(pGrafObj.get(), *pPV, SdrInsertFlags::SETDEFLAYER);
         }
     }
     // insert sound
@@ -329,6 +328,7 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                 const SfxUInt32Item* pRed = rReq.GetArg<SfxUInt32Item>(ID_VAL_RED);
                 const SfxUInt32Item* pGreen = rReq.GetArg<SfxUInt32Item>(ID_VAL_GREEN);
                 const SfxUInt32Item* pBlue = rReq.GetArg<SfxUInt32Item>(ID_VAL_BLUE);
+                assert(pName && pRed && pGreen && pBlue && "must be present");
 
                 XGradientListRef pGradientList = GetDoc()->GetGradientList ();
                 ::tools::Long          nCounts        = pGradientList->Count ();
@@ -347,9 +347,18 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                     if (pEntry->GetName () == pName->GetValue ())
                     {
                         XGradient aGradient(pEntry->GetGradient());
+                        basegfx::ColorStops aNewColorStops(aGradient.GetColorStops());
 
-                        if (rReq.GetSlot () == SID_SETGRADSTARTCOLOR) aGradient.SetStartColor (aColor);
-                        else aGradient.SetEndColor (aColor);
+                        if (SID_SETGRADSTARTCOLOR == rReq.GetSlot ())
+                        {
+                            basegfx::utils::replaceStartColor(aNewColorStops, aColor.getBColor());
+                        }
+                        else
+                        {
+                            basegfx::utils::replaceEndColor(aNewColorStops, aColor.getBColor());
+                        }
+
+                        aGradient.SetColorStops(aNewColorStops);
 
                         XFillStyleItem aStyleItem(drawing::FillStyle_GRADIENT);
                         aStyleItem.SetWhich(XATTR_FILLSTYLE);
@@ -364,12 +373,14 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                 if (i >= nCounts)
                 {
                     Color aBlack (0, 0, 0);
-                    XGradient aGradient ((rReq.GetSlot () == SID_SETGRADSTARTCOLOR)
-                                             ? aColor
-                                             : aBlack,
-                                         (rReq.GetSlot () == SID_SETGRADENDCOLOR)
-                                             ? aColor
-                                             : aBlack);
+                    XGradient aGradient (
+                        basegfx::utils::createColorStopsFromStartEndColor(
+                            (rReq.GetSlot () == SID_SETGRADSTARTCOLOR)
+                                             ? aColor.getBColor()
+                                             : aBlack.getBColor(),
+                            (rReq.GetSlot () == SID_SETGRADENDCOLOR)
+                                             ? aColor.getBColor()
+                                             : aBlack.getBColor()));
 
                     GetDoc()->GetGradientList()->Insert(std::make_unique<XGradientEntry>(aGradient, pName->GetValue()));
 
@@ -399,6 +410,7 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                 const SfxUInt32Item* pRed = rReq.GetArg<SfxUInt32Item>(ID_VAL_RED);
                 const SfxUInt32Item* pGreen = rReq.GetArg<SfxUInt32Item>(ID_VAL_GREEN);
                 const SfxUInt32Item* pBlue = rReq.GetArg<SfxUInt32Item>(ID_VAL_BLUE);
+                assert(pName && pRed && pGreen && pBlue && "must be present");
 
                 XHatchListRef pHatchList = GetDoc()->GetHatchList ();
                 ::tools::Long       nCounts     = pHatchList->Count ();
@@ -466,6 +478,7 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                 const SfxUInt32Item* pDashes = rReq.GetArg<SfxUInt32Item>(ID_VAL_DASHES);
                 const SfxUInt32Item* pDashLen = rReq.GetArg<SfxUInt32Item>(ID_VAL_DASHLEN);
                 const SfxUInt32Item* pDistance = rReq.GetArg<SfxUInt32Item>(ID_VAL_DISTANCE);
+                assert(pName && pStyle && pDots && pDotLen && pDashes && pDashLen && pDistance && "must be present");
 
                 if (CHECK_RANGE (sal_Int32(css::drawing::DashStyle_RECT), static_cast<sal_Int32>(pStyle->GetValue()), sal_Int32(css::drawing::DashStyle_ROUNDRELATIVE)))
                 {
@@ -520,6 +533,7 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                 const SfxUInt32Item* pCenterY = rReq.GetArg<SfxUInt32Item>(ID_VAL_CENTER_Y);
                 const SfxUInt32Item* pStart = rReq.GetArg<SfxUInt32Item>(ID_VAL_STARTINTENS);
                 const SfxUInt32Item* pEnd = rReq.GetArg<SfxUInt32Item>(ID_VAL_ENDINTENS);
+                assert(pName && pStyle && pAngle && pBorder && pCenterX && pCenterY && pStart && pEnd && "must be present");
 
                 if (CHECK_RANGE (sal_Int32(css::awt::GradientStyle_LINEAR), static_cast<sal_Int32>(pStyle->GetValue()), sal_Int32(css::awt::GradientStyle_RECT)) &&
                     CHECK_RANGE (0, static_cast<sal_Int32>(pAngle->GetValue ()), 360) &&
@@ -565,10 +579,12 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                     if (i >= nCounts)
                     {
                         Color aBlack (0, 0, 0);
-                        XGradient aGradient (aBlack, aBlack, static_cast<css::awt::GradientStyle>(pStyle->GetValue ()),
-                                             Degree10(pAngle->GetValue () * 10), static_cast<short>(pCenterX->GetValue ()),
-                                             static_cast<short>(pCenterY->GetValue ()), static_cast<short>(pBorder->GetValue ()),
-                                             static_cast<short>(pStart->GetValue ()), static_cast<short>(pEnd->GetValue ()));
+                        XGradient aGradient (
+                            basegfx::utils::createColorStopsFromStartEndColor(aBlack.getBColor(), aBlack.getBColor()),
+                            static_cast<css::awt::GradientStyle>(pStyle->GetValue ()),
+                            Degree10(pAngle->GetValue () * 10), static_cast<short>(pCenterX->GetValue ()),
+                            static_cast<short>(pCenterY->GetValue ()), static_cast<short>(pBorder->GetValue ()),
+                            static_cast<short>(pStart->GetValue ()), static_cast<short>(pEnd->GetValue ()));
 
                         pGradientList->Insert(std::make_unique<XGradientEntry>(aGradient, pName->GetValue()));
                         XFillStyleItem aStyleItem(drawing::FillStyle_GRADIENT);
@@ -602,6 +618,7 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
                 const SfxUInt32Item* pStyle = rReq.GetArg<SfxUInt32Item>(ID_VAL_STYLE);
                 const SfxUInt32Item* pDistance = rReq.GetArg<SfxUInt32Item>(ID_VAL_DISTANCE);
                 const SfxUInt32Item* pAngle = rReq.GetArg<SfxUInt32Item>(ID_VAL_ANGLE);
+                assert(pName && pStyle && pDistance && pAngle && "must be present");
 
                 if (CHECK_RANGE (sal_Int32(css::drawing::HatchStyle_SINGLE), static_cast<sal_Int32>(pStyle->GetValue()), sal_Int32(css::drawing::HatchStyle_TRIPLE)) &&
                     CHECK_RANGE (0, static_cast<sal_Int32>(pAngle->GetValue ()), 360))
@@ -663,9 +680,10 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
             break;
 
         case SID_SELECTGRADIENT :
-            if (pArgs && (pArgs->Count () == 1))
+            if (pArgs && (pArgs->Count() == 1))
             {
                 const SfxStringItem* pName = rReq.GetArg<SfxStringItem>(ID_VAL_INDEX);
+                assert(pName && "must be present");
 
                 XGradientListRef pGradientList = GetDoc()->GetGradientList ();
                 ::tools::Long           nCounts        = pGradientList->Count ();
@@ -700,9 +718,10 @@ void DrawViewShell::AttrExec (SfxRequest &rReq)
             break;
 
         case SID_SELECTHATCH :
-            if (pArgs && pArgs->Count () == 1)
+            if (pArgs && pArgs->Count() == 1)
             {
                 const SfxStringItem* pName = rReq.GetArg<SfxStringItem>(ID_VAL_INDEX);
+                assert(pName && "must be present");
 
                 XHatchListRef pHatchList = GetDoc()->GetHatchList ();
                 ::tools::Long       nCounts     = pHatchList->Count ();
@@ -848,8 +867,8 @@ void DrawViewShell::AttrState (SfxItemSet& rSet)
                         const XGradient         &rGradient         = rFillGradientItem.GetGradientValue ();
 
                         aColor = (rWhatKind.GetValue () == 3)
-                                    ? rGradient.GetStartColor ()
-                                    : rGradient.GetEndColor ();
+                                    ? Color(rGradient.GetColorStops().front().getStopColor())
+                                    : Color(rGradient.GetColorStops().back().getStopColor());
                         break;
                     }
 

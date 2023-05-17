@@ -27,6 +27,7 @@
 #include <xmloff/XMLEventsImportContext.hxx>
 #include <XMLShapePropertySetContext.hxx>
 #include <XMLTextColumnsContext.hxx>
+#include <XMLThemeColorContext.hxx>
 #include <XMLBackgroundImageContext.hxx>
 #include <xmloff/txtprmap.hxx>
 #include <xmloff/xmltypes.hxx>
@@ -80,8 +81,6 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > XMLTextShapePropertySe
     ::std::vector< XMLPropertyState > &rProperties,
     const XMLPropertyState& rProp )
 {
-    SvXMLImportContextRef xContext;
-
     switch( mxMapper->getPropertySetMapper()
                     ->GetEntryContextId( rProp.mnIndex ) )
     {
@@ -90,6 +89,9 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > XMLTextShapePropertySe
                                                    xAttrList, rProp,
                                                    rProperties );
         break;
+
+    case CTF_THEME_COLOR:
+        return new XMLThemeColorContext(GetImport(), nElement, xAttrList, rProp, rProperties);
 
     case CTF_BACKGROUND_URL:
         DBG_ASSERT( rProp.mnIndex >= 3 &&

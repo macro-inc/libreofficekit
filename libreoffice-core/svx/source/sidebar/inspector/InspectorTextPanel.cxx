@@ -20,12 +20,10 @@
 #include <o3tl/safeint.hxx>
 #include <sal/config.h>
 
-#include <string_view>
 #include <svx/dialmgr.hxx>
 
 #include <svx/sidebar/InspectorTextPanel.hxx>
 
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <com/sun/star/awt/FontSlant.hpp>
@@ -57,14 +55,9 @@ InspectorTextPanel::InspectorTextPanel(weld::Widget* pParent)
     mpListBoxStyles->set_column_fixed_widths(aWidths);
 }
 
-static bool GetPropertyValues(const OUString& rPropName, const uno::Any& rAny, OUString& rString)
+static bool GetPropertyValues(std::u16string_view rPropName, const uno::Any& rAny,
+                              OUString& rString)
 {
-    // Hide Asian and Complex properties
-    if (!SvtCJKOptions::IsCJKFontEnabled() && rPropName.indexOf("Asian") != -1)
-        return false;
-    if (!SvtCTLOptions().IsCTLFontEnabled() && rPropName.indexOf("Complex") != -1)
-        return false;
-
     if (bool bValue; rAny >>= bValue)
     {
         rString = SvxResId(bValue ? RID_TRUE : RID_FALSE); // tdf#139136
@@ -79,14 +72,14 @@ static bool GetPropertyValues(const OUString& rPropName, const uno::Any& rAny, O
     }
     else if (tools::Long nValueLong; rAny >>= nValueLong)
     {
-        if (rPropName.indexOf("Color") != -1)
+        if (rPropName.find(u"Color") != std::u16string_view::npos)
             rString = "0x" + OUString::number(nValueLong, 16);
         else
             rString = OUString::number(nValueLong);
     }
     else if (double fValue; rAny >>= fValue)
     {
-        if (rPropName.indexOf("Weight") != -1)
+        if (rPropName.find(u"Weight") != std::u16string_view::npos)
             rString = SvxResId(fValue > 100 ? RID_BOLD : RID_NORMAL);
         else
             rString = OUString::number((round(fValue * 100)) / 100.00);

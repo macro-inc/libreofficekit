@@ -12,9 +12,6 @@ boost_patches :=
 #https://svn.boost.org/trac/boost/ticket/6142
 boost_patches += boost.6142.warnings.patch.1
 
-# https://svn.boost.org/trac/boost/ticket/9903
-boost_patches += boost.utility.Wundef.warnings.patch
-
 boost_patches += boost.noiconv.patch
 boost_patches += boost.between.warning.patch
 boost_patches += boost.fallback.encoding.patch
@@ -28,14 +25,19 @@ boost_patches += boost_1_59_0.property_tree.wreturn-type.patch
 
 boost_patches += clang-cl.patch.0
 
-boost_patches += boost_1_60_0.undef.warning.patch
 boost_patches += boost_1_63_0.undef.warning.patch.1
-
-boost_patches += boost-android-unified.patch.1
 
 boost_patches += windows-no-utf8-locales.patch.0
 
 boost_patches += msvc2017.patch.0
+
+boost_patches += libc++.patch.0
+
+boost_patches += boost-ios.patch.0
+
+# <https://github.com/boostorg/numeric_conversion/pull/25> "Fix ill-formed constant expression
+# errors":
+boost_patches += 0001-Change-mpl-integral_c-to-boost-integral_constant-to-.patch.2
 
 $(eval $(call gb_UnpackedTarball_UnpackedTarball,boost))
 
@@ -46,6 +48,7 @@ $(eval $(call gb_UnpackedTarball_set_patchlevel,boost,3))
 $(eval $(call gb_UnpackedTarball_add_patches,boost,\
 	$(foreach patch,$(boost_patches),external/boost/$(patch)) \
     external/boost/boost-emscripten-noshm.patch.0 \
+    external/boost/boost-emscripten-nowasm.patch.0 \
 ))
 
 # vim: set noet sw=4 ts=4:

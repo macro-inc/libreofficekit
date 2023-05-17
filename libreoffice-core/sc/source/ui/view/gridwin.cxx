@@ -22,6 +22,8 @@
 #include <cstdlib>
 #include <memory>
 #include <editeng/adjustitem.hxx>
+#include <osl/diagnose.h>
+#include <sal/log.hxx>
 #include <sot/storage.hxx>
 #include <editeng/eeitem.hxx>
 #include <editeng/editobj.hxx>
@@ -41,15 +43,14 @@
 #include <vcl/canvastools.hxx>
 #include <vcl/commandevent.hxx>
 #include <vcl/cursor.hxx>
+#include <vcl/dialoghelper.hxx>
 #include <vcl/inputctx.hxx>
-#include <vcl/menu.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/weldutils.hxx>
 #include <sot/formats.hxx>
 #include <comphelper/classids.hxx>
 
-#include <svx/drawitem.hxx>
 #include <svx/svdview.hxx>
 #include <svx/svdocapt.hxx>
 #include <svx/svdpagv.hxx>
@@ -287,7 +288,7 @@ static bool lcl_IsEditableMatrix( ScDocument& rDoc, const ScRange& rRange )
 
     ScRefCellValue aCell(rDoc, rRange.aEnd);
     ScAddress aPos;
-    return (aCell.meType == CELLTYPE_FORMULA && aCell.mpFormula->GetMatrixOrigin(rDoc, aPos) && aPos == rRange.aStart);
+    return (aCell.getType() == CELLTYPE_FORMULA && aCell.getFormula()->GetMatrixOrigin(rDoc, aPos) && aPos == rRange.aStart);
 }
 
 static void lcl_UnLockComment( ScDrawView* pView, const Point& rPos, const ScViewData& rViewData )
@@ -332,9 +333,9 @@ static bool lcl_GetHyperlinkCell(
                 rURL = pPattern->GetItem(ATTR_HYPERLINK).GetValue();
                 bFound = true;
             }
-            else if (rCell.meType == CELLTYPE_EDIT)
+            else if (rCell.getType() == CELLTYPE_EDIT)
                 bFound = true;
-            else if (rCell.meType == CELLTYPE_FORMULA && rCell.mpFormula->IsHyperLinkCell())
+            else if (rCell.getType() == CELLTYPE_FORMULA && rCell.getFormula()->IsHyperLinkCell())
                 bFound = true;
             else
                 return false;                               // other cell
@@ -347,7 +348,7 @@ static bool lcl_GetHyperlinkCell(
 
 //  WB_DIALOGCONTROL needed for UNO-Controls
 ScGridWindow::ScGridWindow( vcl::Window* pParent, ScViewData& rData, ScSplitPos eWhichPos )
-:           Window( pParent, WB_CLIPCHILDREN | WB_DIALOGCONTROL ),
+:           DocWindow( pParent, WB_CLIPCHILDREN | WB_DIALOGCONTROL ),
             DropTargetHelper( this ),
             DragSourceHelper( this ),
             maVisibleRange(rData.GetDocument()),
@@ -490,6 +491,13 @@ IMPL_LINK( ScGridWindow, PopupSpellingHdl, SpellCallbackInfo&, rInfo, void )
         mrViewData.GetDispatcher().Execute( SID_SPELL_DIALOG, SfxCallMode::ASYNCHRON );
     else if (rInfo.nCommand == SpellCallbackCommand::AUTOCORRECT_OPTIONS)
         mrViewData.GetDispatcher().Execute( SID_AUTO_CORRECT_DLG, SfxCallMode::ASYNCHRON );
+    else //IGNOREWORD, ADDTODICTIONARY, WORDLANGUAGE, PARALANGUAGE
+    {
+        // The spelling status of the word has changed. Close the cell to reset the caches
+        ScInputHandler* pHdl = SC_MOD()->GetInputHdl(mrViewData.GetViewShell());
+        if (pHdl)
+            pHdl->EnterHandler();
+    }
 }
 
 namespace {
@@ -637,8 +645,8 @@ public:
 class AutoFilterColorPopupStartAction : public AutoFilterSubMenuAction
 {
 public:
-    AutoFilterColorPopupStartAction(ScGridWindow* p, ScListSubMenuControl* pSubMenu, ScGridWindow::AutoFilterMode eMode)
-        : AutoFilterSubMenuAction(p, pSubMenu, eMode)
+    AutoFilterColorPopupStartAction(ScGridWindow* p, ScListSubMenuControl* pSubMenu)
+        : AutoFilterSubMenuAction(p, pSubMenu, ScGridWindow::AutoFilterMode::Normal)
     {
     }
 
@@ -663,10 +671,6 @@ public:
 
         m_pSubMenu->clearMenuItems();
 
-        std::set<Color> aColors = meMode == ScGridWindow::AutoFilterMode::TextColor
-                                      ? aFilterEntries.getTextColors()
-                                      : aFilterEntries.getBackgroundColors();
-
         XColorListRef xUserColorList;
 
         OUString aPaletteName(officecfg::Office::Common::UserColors::PaletteName::get());
@@ -690,76 +694,86 @@ public:
         pDBData->GetQueryParam(aParam);
         ScQueryEntry* pEntry = aParam.FindEntryByField(rPos.Col(), true);
 
-        for (auto& rColor : aColors)
+        int nMenu = 0;
+        for (auto eMode : {ScGridWindow::AutoFilterMode::BackgroundColor, ScGridWindow::AutoFilterMode::TextColor})
         {
-            bool bActive = false;
+            std::set<Color> aColors = eMode == ScGridWindow::AutoFilterMode::TextColor
+                                          ? aFilterEntries.getTextColors()
+                                          : aFilterEntries.getBackgroundColors();
 
-            if (pEntry)
+            for (auto& rColor : aColors)
             {
-                auto aItem = pEntry->GetQueryItem();
-                if (aItem.maColor == rColor
-                    && ((meMode == ScGridWindow::AutoFilterMode::TextColor
-                         && aItem.meType == ScQueryEntry::ByTextColor)
-                        || (meMode == ScGridWindow::AutoFilterMode::BackgroundColor
-                            && aItem.meType == ScQueryEntry::ByBackgroundColor)))
+                bool bActive = false;
+
+                if (pEntry)
                 {
-                    bActive = true;
-                }
-            }
-
-            const bool bAutoColor = rColor == COL_AUTO;
-
-            // ColorListBox::ShowPreview is similar
-            ScopedVclPtr<VirtualDevice> xDev(m_pSubMenu->create_virtual_device());
-            const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
-            Size aImageSize(rStyleSettings.GetListBoxPreviewDefaultPixelSize());
-            xDev->SetOutputSize(aImageSize);
-            const tools::Rectangle aRect(Point(0, 0), aImageSize);
-
-            if (bAutoColor)
-            {
-                const Color aW(COL_WHITE);
-                const Color aG(0xef, 0xef, 0xef);
-                int nMinDim = std::min(aImageSize.Width(), aImageSize.Height()) + 1;
-                int nCheckSize = nMinDim / 3;
-                xDev->DrawCheckered(aRect.TopLeft(), aRect.GetSize(), std::min(nCheckSize, 8), aW, aG);
-                xDev->SetFillColor();
-            }
-            else
-                xDev->SetFillColor(rColor);
-
-            xDev->SetLineColor(rStyleSettings.GetDisableColor());
-            xDev->DrawRect(aRect);
-
-            if (bAutoColor)
-            {
-                OUString sText = meMode == ScGridWindow::AutoFilterMode::TextColor
-                                     ? ScResId(SCSTR_FILTER_AUTOMATIC_COLOR)
-                                     : ScResId(SCSTR_FILTER_NO_FILL);
-                m_pSubMenu->addMenuCheckItem(sText, bActive, *xDev,
-                                             new AutoFilterColorAction(mpWindow, m_pSubMenu, meMode, rColor));
-            }
-            else
-            {
-                OUString sName;
-
-                bool bFoundColorName = false;
-                if (xUserColorList)
-                {
-                    sal_Int32 nPos = xUserColorList->GetIndexOfColor(rColor);
-                    if (nPos != -1)
+                    auto aItem = pEntry->GetQueryItem();
+                    if (aItem.maColor == rColor
+                        && ((eMode == ScGridWindow::AutoFilterMode::TextColor
+                             && aItem.meType == ScQueryEntry::ByTextColor)
+                            || (eMode == ScGridWindow::AutoFilterMode::BackgroundColor
+                                && aItem.meType == ScQueryEntry::ByBackgroundColor)))
                     {
-                        XColorEntry* pColorEntry = xUserColorList->GetColor(nPos);
-                        sName = pColorEntry->GetName();
-                        bFoundColorName = true;
+                        bActive = true;
                     }
                 }
-                if (!bFoundColorName)
-                    sName = "#" + rColor.AsRGBHexString().toAsciiUpperCase();
 
-                m_pSubMenu->addMenuCheckItem(sName, bActive, *xDev,
-                                             new AutoFilterColorAction(mpWindow, m_pSubMenu, meMode, rColor));
+                const bool bAutoColor = rColor == COL_AUTO;
+
+                // ColorListBox::ShowPreview is similar
+                ScopedVclPtr<VirtualDevice> xDev(m_pSubMenu->create_virtual_device());
+                const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+                Size aImageSize(rStyleSettings.GetListBoxPreviewDefaultPixelSize());
+                xDev->SetOutputSize(aImageSize);
+                const tools::Rectangle aRect(Point(0, 0), aImageSize);
+
+                if (bAutoColor)
+                {
+                    const Color aW(COL_WHITE);
+                    const Color aG(0xef, 0xef, 0xef);
+                    int nMinDim = std::min(aImageSize.Width(), aImageSize.Height()) + 1;
+                    int nCheckSize = nMinDim / 3;
+                    xDev->DrawCheckered(aRect.TopLeft(), aRect.GetSize(), std::min(nCheckSize, 8), aW, aG);
+                    xDev->SetFillColor();
+                }
+                else
+                    xDev->SetFillColor(rColor);
+
+                xDev->SetLineColor(rStyleSettings.GetDisableColor());
+                xDev->DrawRect(aRect);
+
+                if (bAutoColor)
+                {
+                    OUString sText = eMode == ScGridWindow::AutoFilterMode::TextColor
+                                         ? ScResId(SCSTR_FILTER_AUTOMATIC_COLOR)
+                                         : ScResId(SCSTR_FILTER_NO_FILL);
+                    m_pSubMenu->addMenuColorItem(sText, bActive, *xDev, nMenu,
+                                                 new AutoFilterColorAction(mpWindow, m_pSubMenu, eMode, rColor));
+                }
+                else
+                {
+                    OUString sName;
+
+                    bool bFoundColorName = false;
+                    if (xUserColorList)
+                    {
+                        sal_Int32 nPos = xUserColorList->GetIndexOfColor(rColor);
+                        if (nPos != -1)
+                        {
+                            XColorEntry* pColorEntry = xUserColorList->GetColor(nPos);
+                            sName = pColorEntry->GetName();
+                            bFoundColorName = true;
+                        }
+                    }
+                    if (!bFoundColorName)
+                        sName = "#" + rColor.AsRGBHexString().toAsciiUpperCase();
+
+                    m_pSubMenu->addMenuColorItem(sName, bActive, *xDev, nMenu,
+                                                 new AutoFilterColorAction(mpWindow, m_pSubMenu, eMode, rColor));
+                }
             }
+
+            ++nMenu;
         }
 
         m_pSubMenu->resizeToFitMenuItems();
@@ -833,14 +847,10 @@ void ScGridWindow::LaunchAutoFilterMenu(SCCOL nCol, SCROW nRow)
     ScFilterEntries aFilterEntries;
     rDoc.GetFilterEntries(nCol, nRow, nTab, aFilterEntries);
 
-    vcl::ILibreOfficeKitNotifier* pNotifier = nullptr;
-    if (bLOKActive)
-        pNotifier = SfxViewShell::Current();
-
     weld::Window* pPopupParent = GetFrameWeld();
     int nColWidth = ScViewData::ToPixel(rDoc.GetColWidth(nCol, nTab), mrViewData.GetPPTX());
     mpAutoFilterPopup.reset(new ScCheckListMenuControl(pPopupParent, mrViewData,
-                                                       aFilterEntries.mbHasDates, nColWidth, pNotifier));
+                                                       aFilterEntries.mbHasDates, nColWidth));
 
     int nMaxTextWidth = 0;
     if (aFilterEntries.size() <= 10)
@@ -939,7 +949,7 @@ void ScGridWindow::LaunchAutoFilterMenu(SCCOL nCol, SCROW nRow)
                 bSelected = aSelectedString.count(aStringVal) > 0;
             else if (bQueryByNonEmpty)
                 bSelected = false;
-            mpAutoFilterPopup->addMember(aStringVal, aDoubleVal, bSelected);
+            mpAutoFilterPopup->addMember(aStringVal, aDoubleVal, bSelected, it->IsHiddenByFilter());
             aFilterEntries.maStrData.erase(it);
             break;
         }
@@ -949,20 +959,29 @@ void ScGridWindow::LaunchAutoFilterMenu(SCCOL nCol, SCROW nRow)
         const OUString& aStringVal = rEntry.GetString();
         const double aDoubleVal = rEntry.GetValue();
         const double aRDoubleVal = rEntry.GetRoundedValue();
-        bool bSelected = true;
+        bool bSelected = !rEntry.IsHiddenByFilter();
 
         if (!aSelectedValue.empty() || !aSelectedString.empty())
         {
-            if (aDoubleVal == aRDoubleVal)
-                bSelected = aSelectedValue.count(aDoubleVal) > 0 || aSelectedString.count(aStringVal) > 0;
+            if (rEntry.GetStringType() == ScTypedStrData::Value)
+            {
+                if (aDoubleVal == aRDoubleVal)
+                    bSelected = aSelectedValue.count(aDoubleVal) > 0
+                                || aSelectedString.count(aStringVal) > 0;
+                else
+                    bSelected = aSelectedValue.count(aDoubleVal) > 0
+                                || aSelectedValue.count(aRDoubleVal) > 0
+                                || aSelectedString.count(aStringVal) > 0;
+            }
             else
-                bSelected = aSelectedValue.count(aDoubleVal) > 0 || aSelectedValue.count(aRDoubleVal) > 0 || aSelectedString.count(aStringVal) > 0;
+                bSelected = aSelectedString.count(aStringVal) > 0;
         }
 
         if ( rEntry.IsDate() )
-            mpAutoFilterPopup->addDateMember( aStringVal, rEntry.GetValue(), bSelected );
+            mpAutoFilterPopup->addDateMember( aStringVal, rEntry.GetValue(), bSelected, rEntry.IsHiddenByFilter());
         else
-            mpAutoFilterPopup->addMember( aStringVal, aRDoubleVal, bSelected, rEntry.GetStringType() == ScTypedStrData::Value );
+            mpAutoFilterPopup->addMember( aStringVal, aRDoubleVal, bSelected, rEntry.IsHiddenByFilter(),
+                rEntry.GetStringType() == ScTypedStrData::Value );
     }
 
     // Populate the menu.
@@ -973,20 +992,23 @@ void ScGridWindow::LaunchAutoFilterMenu(SCCOL nCol, SCROW nRow)
         ScResId(STR_MENU_SORT_DESC),
         new AutoFilterAction(this, AutoFilterMode::SortDescending));
     mpAutoFilterPopup->addSeparator();
-    mpAutoFilterPopup->addMenuItem(
-        ScResId(SCSTR_TOP10FILTER), new AutoFilterAction(this, AutoFilterMode::Top10));
-    mpAutoFilterPopup->addMenuItem(
-        ScResId(SCSTR_FILTER_EMPTY), new AutoFilterAction(this, AutoFilterMode::Empty));
-    mpAutoFilterPopup->addMenuItem(
-        ScResId(SCSTR_FILTER_NOTEMPTY), new AutoFilterAction(this, AutoFilterMode::NonEmpty));
-    mpAutoFilterPopup->addSeparator();
-    if (ScListSubMenuControl* pSubMenu = mpAutoFilterPopup->addSubMenuItem(ScResId(SCSTR_FILTER_TEXT_COLOR), true, true))
-        pSubMenu->setPopupStartAction(new AutoFilterColorPopupStartAction(this, pSubMenu, AutoFilterMode::TextColor));
-    if (ScListSubMenuControl* pSubMenu = mpAutoFilterPopup->addSubMenuItem(ScResId(SCSTR_FILTER_BACKGROUND_COLOR), true, true))
-        pSubMenu->setPopupStartAction(new AutoFilterColorPopupStartAction(this, pSubMenu, AutoFilterMode::BackgroundColor));
-    mpAutoFilterPopup->addSeparator();
-    mpAutoFilterPopup->addMenuItem(
-        ScResId(SCSTR_STDFILTER), new AutoFilterAction(this, AutoFilterMode::Custom));
+    if (ScListSubMenuControl* pSubMenu = mpAutoFilterPopup->addSubMenuItem(ScResId(SCSTR_FILTER_COLOR), true, true))
+        pSubMenu->setPopupStartAction(new AutoFilterColorPopupStartAction(this, pSubMenu));
+    if (ScListSubMenuControl* pSubMenu = mpAutoFilterPopup->addSubMenuItem(ScResId(SCSTR_FILTER_CONDITION), true, false))
+    {
+        pSubMenu->addMenuItem(
+            ScResId(SCSTR_FILTER_EMPTY), new AutoFilterAction(this, AutoFilterMode::Empty));
+        pSubMenu->addMenuItem(
+            ScResId(SCSTR_FILTER_NOTEMPTY), new AutoFilterAction(this, AutoFilterMode::NonEmpty));
+        pSubMenu->addMenuItem(
+            ScResId(SCSTR_TOP10FILTER), new AutoFilterAction(this, AutoFilterMode::Top10));
+        pSubMenu->addMenuItem(
+            ScResId(SCSTR_BOTTOM10FILTER), new AutoFilterAction(this, AutoFilterMode::Bottom10));
+        pSubMenu->addSeparator();
+        pSubMenu->addMenuItem(
+            ScResId(SCSTR_STDFILTER), new AutoFilterAction(this, AutoFilterMode::Custom));
+        pSubMenu->resizeToFitMenuItems();
+    }
     if (aEntries.size())
         mpAutoFilterPopup->addMenuItem(
             ScResId(SCSTR_CLEAR_FILTER), new AutoFilterAction(this, AutoFilterMode::Clear));
@@ -1159,6 +1181,11 @@ void ScGridWindow::UpdateAutoFilterFromMenu(AutoFilterMode eMode)
                 pEntry->GetQueryItem().meType = ScQueryEntry::ByString;
                 pEntry->GetQueryItem().maString = rPool.intern("10");
             break;
+            case AutoFilterMode::Bottom10:
+                pEntry->eOp = SC_BOTVAL;
+                pEntry->GetQueryItem().meType = ScQueryEntry::ByString;
+                pEntry->GetQueryItem().maString = rPool.intern("10");
+            break;
             case AutoFilterMode::Empty:
                 pEntry->SetQueryByEmpty();
             break;
@@ -1324,7 +1351,6 @@ void ScGridWindow::DoScenarioMenu( const ScRange& rScenRange )
     OUString aCurrent;
     OUString aTabName;
     SCTAB nTabCount = rDoc.GetTableCount();
-    SCTAB nEntryCount = 0;
     for (SCTAB i=nTab+1; i<nTabCount && rDoc.IsScenario(i); i++)
     {
         if (rDoc.HasScenarioRange( i, rScenRange ))
@@ -1333,7 +1359,6 @@ void ScGridWindow::DoScenarioMenu( const ScRange& rScenRange )
                 rFilterBox.append_text(aTabName);
                 if (rDoc.IsActiveScenario(i))
                     aCurrent = aTabName;
-                ++nEntryCount;
             }
     }
     rFilterBox.thaw();
@@ -1359,12 +1384,12 @@ void ScGridWindow::DoScenarioMenu( const ScRange& rScenRange )
     mpFilterBox->EndInit();
 }
 
-void ScGridWindow::LaunchDataSelectMenu( SCCOL nCol, SCROW nRow )
+void ScGridWindow::LaunchDataSelectMenu(const SCCOL nCol, const SCROW nRow)
 {
     mpFilterBox.reset();
 
     ScDocument& rDoc = mrViewData.GetDocument();
-    SCTAB nTab = mrViewData.GetTabNo();
+    const SCTAB nTab = mrViewData.GetTabNo();
     bool bLayoutRTL = rDoc.IsLayoutRTL( nTab );
 
     tools::Long nSizeX  = 0;
@@ -1400,10 +1425,21 @@ void ScGridWindow::LaunchDataSelectMenu( SCCOL nCol, SCROW nRow )
 
     // SetSize later
 
+    const sal_uInt32 nIndex = rDoc.GetAttr(nCol, nRow, nTab, ATTR_VALIDDATA)->GetValue();
+    const ScValidationData* pData = nIndex ? rDoc.GetValidationEntry(nIndex) : nullptr;
+
     bool bEmpty = false;
     std::vector<ScTypedStrData> aStrings; // case sensitive
     // Fill List
     rDoc.GetDataEntries(nCol, nRow, nTab, aStrings, true /* bValidation */);
+
+    // IsIgnoreBlank allows blank values. Don't add empty string unless "Allow Empty Cells"
+    if (pData && !pData->IsIgnoreBlank())
+    {
+        auto lambda = [](const ScTypedStrData& rStr) { return rStr.GetString().isEmpty(); };
+        aStrings.erase(std::remove_if(aStrings.begin(), aStrings.end(), lambda), aStrings.end());
+    }
+
     if (aStrings.empty())
         bEmpty = true;
 
@@ -1418,7 +1454,10 @@ void ScGridWindow::LaunchDataSelectMenu( SCCOL nCol, SCROW nRow )
             EnterWait();
 
         for (const auto& rString : aStrings)
-            rFilterBox.append_text(rString.GetString());
+        {
+            const OUString& rFilterString = rString.GetString();
+            rFilterBox.append_text(rFilterString);
+        }
 
         if (bWait)
             LeaveWait();
@@ -1430,10 +1469,8 @@ void ScGridWindow::LaunchDataSelectMenu( SCCOL nCol, SCROW nRow )
 
     sal_Int32 nSelPos = -1;
 
-    sal_uLong nIndex = rDoc.GetAttr( nCol, nRow, nTab, ATTR_VALIDDATA )->GetValue();
     if ( nIndex )
     {
-        const ScValidationData* pData = rDoc.GetValidationEntry( nIndex );
         if (pData)
         {
             std::unique_ptr<ScTypedStrData> pNew;
@@ -1506,6 +1543,7 @@ void ScGridWindow::FilterSelect( sal_uLong nSel )
             break;
     }
 
+    // coverity[check_after_deref] - could be destroyed by ExecDataSelect
     if (mpFilterBox)
         mpFilterBox->popdown();
 
@@ -1693,71 +1731,6 @@ void ScGridWindow::MouseButtonDown( const MouseEvent& rMEvt )
     nNestedButtonState = ScNestedButtonState::NONE;
 }
 
-bool ScGridWindow::IsCellCoveredByText(SCCOL nPosX, SCROW nPosY, SCTAB nTab, SCCOL &rTextStartPosX)
-{
-    ScDocument& rDoc = mrViewData.GetDocument();
-
-    // find the first non-empty cell (this, or to the left)
-    SCCOL nNonEmptyX = nPosX;
-    for (; nNonEmptyX >= 0; --nNonEmptyX)
-    {
-        ScRefCellValue aCell(rDoc, ScAddress(nNonEmptyX, nPosY, nTab));
-        if (!aCell.isEmpty())
-            break;
-    }
-
-    // the initial cell already contains text
-    if (nNonEmptyX == nPosX)
-    {
-        rTextStartPosX = nNonEmptyX;
-        return true;
-    }
-
-    // to the left, there is no cell that would contain (potentially
-    // overrunning) text
-    if (nNonEmptyX < 0 || rDoc.HasAttrib(nNonEmptyX, nPosY, nTab, nPosX, nPosY, nTab, HasAttrFlags::Merged | HasAttrFlags::Overlapped))
-        return false;
-
-    double nPPTX = mrViewData.GetPPTX();
-    double nPPTY = mrViewData.GetPPTY();
-
-    ScTableInfo aTabInfo;
-    rDoc.FillInfo(aTabInfo, 0, nPosY, nPosX, nPosY, nTab, nPPTX, nPPTY, false, false);
-
-    Fraction aZoomX = mrViewData.GetZoomX();
-    Fraction aZoomY = mrViewData.GetZoomY();
-    ScOutputData aOutputData(GetOutDev(), OUTTYPE_WINDOW, aTabInfo, &rDoc, nTab,
-            0, 0, 0, nPosY, nPosX, nPosY, nPPTX, nPPTY,
-            &aZoomX, &aZoomY);
-
-    MapMode aCurrentMapMode(GetMapMode());
-    SetMapMode(MapMode(MapUnit::MapPixel));
-
-    // obtain the bounding box of the text in first non-empty cell
-    // to the left
-    tools::Rectangle aRect(aOutputData.LayoutStrings(false, false, ScAddress(nNonEmptyX, nPosY, nTab)));
-
-    SetMapMode(aCurrentMapMode);
-
-    // the text does not overrun from the cell
-    if (aRect.IsEmpty())
-        return false;
-
-    SCCOL nTextEndX;
-    SCROW nTextEndY;
-
-    // test the rightmost position of the text bounding box
-    tools::Long nMiddle = (aRect.Top() + aRect.Bottom()) / 2;
-    mrViewData.GetPosFromPixel(aRect.Right(), nMiddle, eWhich, nTextEndX, nTextEndY);
-    if (nTextEndX >= nPosX)
-    {
-        rTextStartPosX = nNonEmptyX;
-        return true;
-    }
-
-    return false;
-}
-
 void ScGridWindow::HandleMouseButtonDown( const MouseEvent& rMEvt, MouseEventState& rState )
 {
     // We have to check if a context menu is shown and we have an UI
@@ -1770,7 +1743,7 @@ void ScGridWindow::HandleMouseButtonDown( const MouseEvent& rMEvt, MouseEventSta
     SfxInPlaceClient* pClient = pViewSh->GetIPClient();
     if ( pClient &&
          pClient->IsObjectInPlaceActive() &&
-         PopupMenu::IsInExecute() )
+         vcl::IsInPopupMenuExecute() )
         return;
 
     aCurMousePos = rMEvt.GetPosPixel();
@@ -1989,11 +1962,18 @@ void ScGridWindow::HandleMouseButtonDown( const MouseEvent& rMEvt, MouseEventSta
             }
         }
 
-        if (pAttr->HasPivotButton() || pAttr->HasPivotPopupButton())
+        if (pAttr->HasPivotButton() || pAttr->HasPivotPopupButton() || pAttr->HasPivotMultiFieldPopupButton())
         {
-            DoPushPivotButton(nPosX, nPosY, rMEvt, pAttr->HasPivotButton(), pAttr->HasPivotPopupButton());
+            DoPushPivotButton(nPosX, nPosY, rMEvt, pAttr->HasPivotButton(),
+                pAttr->HasPivotPopupButton(), pAttr->HasPivotMultiFieldPopupButton());
             rState.mbActivatePart = false;
             return;
+        }
+
+        if (pAttr->HasPivotToggle())
+        {
+            DoPushPivotToggle(nPosX, nPosY, rMEvt);
+            rState.mbActivatePart = false;
         }
 
         //  List Validity drop-down button
@@ -2824,8 +2804,8 @@ static void lcl_InitMouseEvent(css::awt::MouseEvent& rEvent, const MouseEvent& r
 bool ScGridWindow::PreNotify( NotifyEvent& rNEvt )
 {
     bool bDone = false;
-    MouseNotifyEvent nType = rNEvt.GetType();
-    if ( nType == MouseNotifyEvent::MOUSEBUTTONUP || nType == MouseNotifyEvent::MOUSEBUTTONDOWN )
+    NotifyEventType nType = rNEvt.GetType();
+    if ( nType == NotifyEventType::MOUSEBUTTONUP || nType == NotifyEventType::MOUSEBUTTONDOWN )
     {
         vcl::Window* pWindow = rNEvt.GetWindow();
         if (pWindow == this)
@@ -2843,7 +2823,7 @@ bool ScGridWindow::PreNotify( NotifyEvent& rNEvt )
                         lcl_InitMouseEvent( aEvent, *rNEvt.GetMouseEvent() );
                         if ( rNEvt.GetWindow() )
                             aEvent.Source = rNEvt.GetWindow()->GetComponentInterface();
-                        if ( nType == MouseNotifyEvent::MOUSEBUTTONDOWN)
+                        if ( nType == NotifyEventType::MOUSEBUTTONDOWN)
                             bDone = pImp->MousePressed( aEvent );
                         else
                             bDone = pImp->MouseReleased( aEvent );
@@ -2854,7 +2834,7 @@ bool ScGridWindow::PreNotify( NotifyEvent& rNEvt )
     }
     if (bDone)      // event consumed by a listener
     {
-        if ( nType == MouseNotifyEvent::MOUSEBUTTONDOWN )
+        if ( nType == NotifyEventType::MOUSEBUTTONDOWN )
         {
             const MouseEvent* pMouseEvent = rNEvt.GetMouseEvent();
             if ( pMouseEvent->IsRight() && pMouseEvent->GetClicks() == 1 )
@@ -2912,11 +2892,14 @@ void ScGridWindow::Tracking( const TrackingEvent& rTEvt )
     }
     else if ( rTEvt.IsTrackingEnded() )
     {
-        // MouseButtonUp always with matching buttons (eg for test tool, # 63148 #)
-        // The tracking event will indicate if it was completed and not canceled.
-        MouseEvent aUpEvt( rMEvt.GetPosPixel(), rMEvt.GetClicks(),
-                            rMEvt.GetMode(), nButtonDown, rMEvt.GetModifier() );
-        MouseButtonUp( aUpEvt );
+        if (!comphelper::LibreOfficeKit::isActive())
+        {
+            // MouseButtonUp always with matching buttons (eg for test tool, # 63148 #)
+            // The tracking event will indicate if it was completed and not canceled.
+            MouseEvent aUpEvt( rMEvt.GetPosPixel(), rMEvt.GetClicks(),
+                               rMEvt.GetMode(), nButtonDown, rMEvt.GetModifier() );
+            MouseButtonUp( aUpEvt );
+        }
     }
     else
         MouseMove( rMEvt );
@@ -3076,6 +3059,15 @@ void ScGridWindow::Command( const CommandEvent& rCEvt )
             Window::Command(rCEvt);
         return;
     }
+
+    if (nCmd == CommandEventId::GestureZoom)
+    {
+        bool bDone = mrViewData.GetView()->GestureZoomCommand(rCEvt);
+        if (!bDone)
+            Window::Command(rCEvt);
+        return;
+    }
+
     // #i7560# FormulaMode check is below scrolling - scrolling is allowed during formula input
     bool bDisable = pScMod->IsFormulaMode() ||
                     pScMod->IsModalMode(mrViewData.GetSfxDocShell());
@@ -3100,9 +3092,33 @@ void ScGridWindow::Command( const CommandEvent& rCEvt )
     Point aPosPixel = rCEvt.GetMousePosPixel();
     Point aMenuPos = aPosPixel;
 
+    bool bPosIsInEditView = mrViewData.HasEditView(eWhich);
     SCCOL nCellX = -1;
     SCROW nCellY = -1;
     mrViewData.GetPosFromPixel(aPosPixel.X(), aPosPixel.Y(), eWhich, nCellX, nCellY);
+    // GetPosFromPixel ignores the fact that when editing a cell, the cell might grow to cover
+    // other rows/columns. In addition, the mouse might now be outside the edited cell.
+    if (bPosIsInEditView)
+    {
+        if (nCellX >= mrViewData.GetEditViewCol() && nCellX <= mrViewData.GetEditEndCol())
+            nCellX = mrViewData.GetEditViewCol();
+        else
+            bPosIsInEditView = false;
+
+        if (nCellY >= mrViewData.GetEditViewRow() && nCellY <= mrViewData.GetEditEndRow())
+            nCellY = mrViewData.GetEditViewRow();
+        else
+            bPosIsInEditView = false;
+
+        if (!bPosIsInEditView)
+        {
+            // Close the edit view when moving outside of the edited cell
+            // to avoid showing the edit popup, or providing the wrong EditView to spellcheck.
+            ScInputHandler* pHdl = pScMod->GetInputHdl();
+            if (pHdl)
+                pHdl->EnterHandler();
+        }
+    }
 
     bool bSpellError = false;
     SCCOL nColSpellError = nCellX;
@@ -3134,7 +3150,7 @@ void ScGridWindow::Command( const CommandEvent& rCEvt )
             // Find the first string to the left for spell checking in case the current cell is empty.
             ScAddress aPos(nCellX, nCellY, nTab);
             ScRefCellValue aSpellCheckCell(rDoc, aPos);
-            while (aSpellCheckCell.meType == CELLTYPE_NONE)
+            while (!bPosIsInEditView && aSpellCheckCell.getType() == CELLTYPE_NONE)
             {
                 // Loop until we get the first non-empty cell in the row.
                 aPos.IncCol(-1);
@@ -3144,15 +3160,12 @@ void ScGridWindow::Command( const CommandEvent& rCEvt )
                 aSpellCheckCell.assign(rDoc, aPos);
             }
 
-            if (aPos.Col() >= 0 && (aSpellCheckCell.meType == CELLTYPE_STRING || aSpellCheckCell.meType == CELLTYPE_EDIT))
+            if (aPos.Col() >= 0 && (aSpellCheckCell.getType() == CELLTYPE_STRING || aSpellCheckCell.getType() == CELLTYPE_EDIT))
                 nColSpellError = aPos.Col();
 
+            // Is there a misspelled word somewhere in the cell?
+            // A "yes" does not mean that the word under the mouse pointer is wrong though.
             bSpellError = (mpSpellCheckCxt->isMisspelled(nColSpellError, nCellY));
-            if (bSpellError)
-            {
-                // Check and see if a misspelled word is under the mouse pointer.
-                bSpellError = IsSpellErrorAtPos(aPosPixel, nColSpellError, nCellY);
-            }
         }
 
         //  #i18735# First select the item under the mouse pointer.
@@ -3165,8 +3178,15 @@ void ScGridWindow::Command( const CommandEvent& rCEvt )
 
     if ( !bEdit )
     {
-            // Edit cell with spelling errors ?
-        if (bMouse && (GetEditUrl(aPosPixel) || bSpellError))
+        // Edit cell with spelling errors?
+        // tdf#127341 the formerly used GetEditUrl(aPosPixel) additionally
+        // to bSpellError activated EditMode here for right-click on URL
+        // which prevents the regular context-menu from appearing. Since this
+        // is more expected than the context-menu for editing an URL, I removed
+        // this. If this was wanted and can be argued it might be re-activated.
+        // For now, reduce to spelling errors - as the original comment above
+        // suggests.
+        if (bMouse && bSpellError)
         {
             //  GetEditUrlOrError has already moved the Cursor
 
@@ -3209,10 +3229,26 @@ void ScGridWindow::Command( const CommandEvent& rCEvt )
             if (pHdl)
                 pHdl->SetModified();
 
-            Link<SpellCallbackInfo&,void> aLink = LINK( this, ScGridWindow, PopupSpellingHdl );
-            pEditView->ExecuteSpellPopup(aMenuPos, aLink);
+            const OUString sOldText = pHdl ? pHdl->GetEditString() : "";
 
-            bDone = true;
+            // Only done/shown if a misspelled word is actually under the mouse pointer.
+            Link<SpellCallbackInfo&,void> aLink = LINK( this, ScGridWindow, PopupSpellingHdl );
+            bDone = pEditView->ExecuteSpellPopup(aMenuPos, aLink);
+
+            // If the spelling is corrected, stop editing to flush any cached spelling info.
+            // Or, if no misspelled word at this position, and it wasn't initially in edit mode,
+            // then exit the edit mode in order to get the full context popup (not edit popup).
+            if (pHdl && (pHdl->GetEditString() != sOldText
+                         || (!bDone && !bPosIsInEditView)))
+            {
+                pHdl->EnterHandler();
+            }
+
+            if (!bDone && nColSpellError != nCellX)
+            {
+                // NOTE: This call can change the selection, and the view state (edit mode, etc).
+                SelectForContextMenu(aPosPixel, nCellX, nCellY);
+            }
         }
     }
     else if ( !bMouse )
@@ -5138,7 +5174,7 @@ bool ScGridWindow::HitRangeFinder( const Point& rMouse, RfCorner& rCorner,
                 //  search backwards so that the last repainted frame is found
                 --i;
                 ScRangeFindData& rData = pRangeFinder->GetObject(i);
-                if ( rData.aRef.In(aAddr) )
+                if ( rData.aRef.Contains(aAddr) )
                 {
                     if (pIndex)
                         *pIndex = i;
@@ -5190,7 +5226,7 @@ bool ScGridWindow::HitRangeFinder( const Point& rMouse, RfCorner& rCorner,
 
 static void lcl_PaintOneRange( ScDocShell* pDocSh, const ScRange& rRange, sal_uInt16 nEdges )
 {
-    // the range is always properly orientated
+    // the range is always properly oriented
 
     SCCOL nCol1 = rRange.aStart.Col();
     SCROW nRow1 = rRange.aStart.Row();
@@ -5582,7 +5618,7 @@ bool ScGridWindow::GetEditUrl( const Point& rPos,
     tools::Rectangle aLogicEdit = PixelToLogic( aEditRect, aEditMode );
     tools::Long nThisColLogic = aLogicEdit.Right() - aLogicEdit.Left() + 1;
     Size aPaperSize( 1000000, 1000000 );
-    if (aCell.meType == CELLTYPE_FORMULA)
+    if (aCell.getType() == CELLTYPE_FORMULA)
     {
         tools::Long nSizeX  = 0;
         tools::Long nSizeY  = 0;
@@ -5596,17 +5632,17 @@ bool ScGridWindow::GetEditUrl( const Point& rPos,
     pEngine->SetPaperSize( aPaperSize );
 
     std::unique_ptr<EditTextObject> pTextObj;
-    if (aCell.meType == CELLTYPE_EDIT)
+    if (aCell.getType() == CELLTYPE_EDIT)
     {
-        if (aCell.mpEditText)
-            pEngine->SetTextCurrentDefaults(*aCell.mpEditText);
+        if (aCell.getEditText())
+            pEngine->SetTextCurrentDefaults(*aCell.getEditText());
     }
     else  // Not an Edit cell and is a formula cell with 'Hyperlink'
           // function if we have no URL, otherwise it could be a formula
           // cell ( or other type ? ) with a hyperlink associated with it.
     {
         if (sURL.isEmpty())
-            pTextObj = aCell.mpFormula->CreateURLObject();
+            pTextObj = aCell.getFormula()->CreateURLObject();
         else
         {
             OUString aRepres = sURL;
@@ -5614,8 +5650,8 @@ bool ScGridWindow::GetEditUrl( const Point& rPos,
             // TODO: text content of formatted numbers can be different
             if (aCell.hasNumeric())
                 aRepres = OUString::number(aCell.getValue());
-            else if (aCell.meType == CELLTYPE_FORMULA)
-                aRepres = aCell.mpFormula->GetString().getString();
+            else if (aCell.getType() == CELLTYPE_FORMULA)
+                aRepres = aCell.getFormula()->GetString().getString();
 
             pTextObj = ScEditUtil::CreateURLObjectFromURL(rDoc, sURL, aRepres);
         }
@@ -5671,60 +5707,6 @@ bool ScGridWindow::GetEditUrl( const Point& rPos,
         return bRet;
     }
     return false;
-}
-
-bool ScGridWindow::IsSpellErrorAtPos( const Point& rPos, SCCOL nCol1, SCROW nRow )
-{
-    if (!mpSpellCheckCxt)
-        return false;
-
-    SCTAB nTab = mrViewData.GetTabNo();
-    ScDocShell* pDocSh = mrViewData.GetDocShell();
-    ScDocument& rDoc = pDocSh->GetDocument();
-
-    ScAddress aCellPos(nCol1, nRow, nTab);
-    ScRefCellValue aCell(rDoc, aCellPos);
-    if (aCell.meType != CELLTYPE_STRING && aCell.meType != CELLTYPE_EDIT)
-        return false;
-
-    const std::vector<editeng::MisspellRanges>* pRanges = mpSpellCheckCxt->getMisspellRanges(nCol1, nRow);
-    if (!pRanges)
-        return false;
-
-    const ScPatternAttr* pPattern = rDoc.GetPattern(nCol1, nRow, nTab);
-
-    tools::Rectangle aEditRect = mrViewData.GetEditArea(eWhich, nCol1, nRow, this, pPattern, false);
-    if (rPos.Y() < aEditRect.Top())
-        return false;
-
-    std::shared_ptr<ScFieldEditEngine> pEngine = createEditEngine(pDocSh, *pPattern);
-
-    Size aPaperSize(1000000, 1000000);
-    pEngine->SetPaperSize(aPaperSize);
-
-    if (aCell.meType == CELLTYPE_EDIT)
-        pEngine->SetTextCurrentDefaults(*aCell.mpEditText);
-    else
-        pEngine->SetTextCurrentDefaults(aCell.mpString->getString());
-
-    tools::Long nTextWidth = static_cast<tools::Long>(pEngine->CalcTextWidth());
-
-    MapMode aEditMode = mrViewData.GetLogicMode(eWhich);
-    tools::Rectangle aLogicEdit = PixelToLogic(aEditRect, aEditMode);
-    Point aLogicClick = PixelToLogic(rPos, aEditMode);
-
-    aLogicEdit.setWidth(nTextWidth + 1);
-
-    if (!aLogicEdit.Contains(aLogicClick))
-        return false;
-
-    pEngine->SetControlWord(pEngine->GetControlWord() | EEControlBits::ONLINESPELLING);
-    pEngine->SetAllMisspellRanges(*pRanges);
-
-    EditView aTempView(pEngine.get(), this);
-    aTempView.SetOutputArea(aLogicEdit);
-
-    return aTempView.IsWrongSpelledWordAtPos(rPos);
 }
 
 bool ScGridWindow::HasScenarioButton( const Point& rPosPixel, ScRange& rScenRange )
@@ -6397,9 +6379,15 @@ void ScGridWindow::UpdateCursorOverlay()
                 std::vector< basegfx::B2DRange > aRanges;
                 const basegfx::B2DHomMatrix aTransform(GetOutDev()->GetInverseViewTransformation());
 
+                // tdf#143733, tdf#145080 - improve border visibility
+                // constants picked for maximum consistency at 100% and adequate response on zoom
+                // line width = 1.5 at 100% (0.75 left +/- 0.75 right), 50% = 1, 200% = 1.25, 400% = 2.25
+                const double MinSize = 0.25 * GetDPIScaleFactor();
+                double fZoom(mrViewData.GetZoomX() * 0.5);
                 for(const tools::Rectangle & rRA : aPixelRects)
                 {
-                    basegfx::B2DRange aRB(rRA.Left(), rRA.Top(), rRA.Right() + 1, rRA.Bottom() + 1);
+                    basegfx::B2DRange aRB(rRA.Left() - MinSize - fZoom, rRA.Top() - MinSize - fZoom,
+                                          rRA.Right() + MinSize + fZoom, rRA.Bottom() + MinSize + fZoom);
                     aRB.transform(aTransform);
                     aRanges.push_back(aRB);
                 }
@@ -6554,16 +6542,20 @@ void ScGridWindow::UpdateAutoFillOverlay()
     ScDocument& rDoc = mrViewData.GetDocument();
     bool bLayoutRTL = rDoc.IsLayoutRTL( nTab );
 
-    float fScaleFactor = GetDPIScaleFactor();
+   // tdf#143733 tdf#145080 - improve border visibility
+   // constants picked for maximum consistency at 100%
+   // size = 6 at 100% (as before), 50% = 4.5, 200% = 9, 400% = 15
+    const float fScaleFactor = 3 * GetDPIScaleFactor();
+    const double fZoom(3 * mrViewData.GetZoomX());
     // Size should be even
-    Size aFillHandleSize(6 * fScaleFactor, 6 * fScaleFactor);
+    Size aFillHandleSize(fZoom + fScaleFactor, fZoom + fScaleFactor);
 
     Point aFillPos = mrViewData.GetScrPos( nX, nY, eWhich, true );
     tools::Long nSizeXPix;
     tools::Long nSizeYPix;
     mrViewData.GetMergeSizePixel( nX, nY, nSizeXPix, nSizeYPix );
 
-    if (bLayoutRTL)
+    if (bLayoutRTL && !comphelper::LibreOfficeKit::isActive())
         aFillPos.AdjustX( -(nSizeXPix - 2 + (aFillHandleSize.Width() / 2)) );
     else
         aFillPos.AdjustX(nSizeXPix - (aFillHandleSize.Width() / 2) );

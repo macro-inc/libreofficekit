@@ -19,6 +19,7 @@
 
 #include <querycontainer.hxx>
 #include "query.hxx"
+#include <strings.hxx>
 #include <objectnameapproval.hxx>
 #include <veto.hxx>
 
@@ -195,7 +196,7 @@ void SAL_CALL OQueryContainer::appendByDescriptor( const Reference< XPropertySet
     {
         m_eDoingCurrently = AggregateAction::Inserting;
         OAutoActionReset aAutoReset(*this);
-        m_xCommandDefinitions->insertByName(sNewObjectName, makeAny(xCommandDefinitionPart));
+        m_xCommandDefinitions->insertByName(sNewObjectName, Any(xCommandDefinitionPart));
     }
 
     implAppend( sNewObjectName, xNewObject );
@@ -260,7 +261,7 @@ void SAL_CALL OQueryContainer::elementInserted( const css::container::ContainerE
         // insert an own new element
         xNewElement = implCreateWrapper(sElementName);
     }
-    insertByName(sElementName,makeAny(xNewElement));
+    insertByName(sElementName,Any(xNewElement));
 }
 
 void SAL_CALL OQueryContainer::elementRemoved( const css::container::ContainerEvent& _rEvent )
@@ -292,7 +293,7 @@ void SAL_CALL OQueryContainer::elementReplaced( const css::container::ContainerE
         xNewElement = implCreateWrapper(sAccessor);
     }
 
-    replaceByName(sAccessor,makeAny(xNewElement));
+    replaceByName(sAccessor,Any(xNewElement));
 }
 
 Reference< XVeto > SAL_CALL OQueryContainer::approveInsertElement( const ContainerEvent& Event )

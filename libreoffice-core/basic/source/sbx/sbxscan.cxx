@@ -23,7 +23,7 @@
 
 #include <config_features.h>
 
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <unotools/resmgr.hxx>
 #include "sbxconv.hxx"
 #include <rtlproto.hxx>
@@ -48,6 +48,7 @@
 #include <rtl/math.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
+#include <o3tl/string_view.hxx>
 
 
 void ImpGetIntntlSep( sal_Unicode& rcDecimalSep, sal_Unicode& rcThousandSep, sal_Unicode& rcDecimalSepAlt )
@@ -60,21 +61,7 @@ void ImpGetIntntlSep( sal_Unicode& rcDecimalSep, sal_Unicode& rcThousandSep, sal
 }
 
 
-/** NOTE: slightly differs from strchr() in that it does not consider the
-    terminating NULL character to be part of the string and returns bool
-    instead of pointer, if character is 0 returns false.
- */
-static bool ImpStrChr( const sal_Unicode* p, sal_Unicode c )
-{
-    if (!c)
-        return false;
-    while (*p)
-    {
-        if (*p++ == c)
-            return true;
-    }
-    return false;
-}
+static bool ImpStrChr( std::u16string_view str, sal_Unicode c ) { return str.find(c) != std::u16string_view::npos; }
 
 
 // scanning a string according to BASIC-conventions
@@ -135,8 +122,8 @@ ErrCode ImpScan( const OUString& rWSrc, double& nVal, SbxDataType& rType,
             aSearchStr.append(cIntntlDecSepAlt);
         if( bOnlyIntntl )
             aSearchStr.append(cIntntlGrpSep);
-        const sal_Unicode* const pSearchStr = aSearchStr.getStr();
-        const sal_Unicode pDdEe[] = { 'D', 'd', 'E', 'e', 0 };
+        const OUString pSearchStr = aSearchStr.makeStringAndClear();
+        static const OUStringLiteral pDdEe = u"DdEe";
         while( ImpStrChr( pSearchStr, *p ) )
         {
             aBuf.append( *p );
@@ -185,11 +172,10 @@ ErrCode ImpScan( const OUString& rWSrc, double& nVal, SbxDataType& rType,
         if( decsep > 1 || exp > 1 )
             bRes = false;
 
-        OUString aBufStr( aBuf.makeStringAndClear());
         rtl_math_ConversionStatus eStatus = rtl_math_ConversionStatus_Ok;
         sal_Int32 nParseEnd = 0;
-        nVal = rtl::math::stringToDouble( aBufStr, cIntntlDecSep, cIntntlGrpSep, &eStatus, &nParseEnd );
-        if( eStatus != rtl_math_ConversionStatus_Ok || nParseEnd != aBufStr.getLength() )
+        nVal = rtl::math::stringToDouble( aBuf, cIntntlDecSep, cIntntlGrpSep, &eStatus, &nParseEnd );
+        if( eStatus != rtl_math_ConversionStatus_Ok || nParseEnd != aBuf.getLength() )
             bRes = false;
 
         if( !decsep && !exp )
@@ -206,7 +192,7 @@ ErrCode ImpScan( const OUString& rWSrc, double& nVal, SbxDataType& rType,
             eScanType = SbxDOUBLE;
 
         // type detection?
-        const sal_Unicode pTypes[] = { '%', '!', '&', '#', 0 };
+        static const OUStringLiteral pTypes = u"%!&#";
         if( ImpStrChr( pTypes, *p ) )
             p++;
     }
@@ -215,7 +201,7 @@ ErrCode ImpScan( const OUString& rWSrc, double& nVal, SbxDataType& rType,
     {
         p++;
         eScanType = SbxLONG;
-        OUString aCmp( "0123456789ABCDEFabcdef" );
+        OUString aCmp( "0123456789ABCDEF" );
         char base = 16;
         char ndig = 8;
         switch( *p++ )
@@ -232,16 +218,11 @@ ErrCode ImpScan( const OUString& rWSrc, double& nVal, SbxDataType& rType,
             default :
                 bRes = false;
         }
-        const sal_Unicode* const pCmp = aCmp.getStr();
         while( rtl::isAsciiAlphanumeric( *p ) )    /* XXX: really munge all alnum also when error? */
         {
-            sal_Unicode ch = *p;
-            if( ImpStrChr( pCmp, ch ) )
-            {
-                if (ch > 0x60)
-                    ch -= 0x20;     // convert ASCII lower to upper case
+            sal_Unicode ch = rtl::toAsciiUpperCase(*p);
+            if( ImpStrChr( aCmp, ch ) )
                 aBuf.append( ch );
-            }
             else
                 bRes = false;
             p++;
@@ -489,12 +470,12 @@ const VbaFormatInfo pFormatInfoTable[] =
     { VbaFormatType::Null,        std::u16string_view(u""),            NF_INDEX_TABLE_ENTRIES, nullptr }
 };
 
-const VbaFormatInfo* getFormatInfo( const OUString& rFmt )
+const VbaFormatInfo* getFormatInfo( std::u16string_view rFmt )
 {
     const VbaFormatInfo* pInfo = pFormatInfoTable;
     while( pInfo->meType != VbaFormatType::Null )
     {
-        if( rFmt.equalsIgnoreAsciiCase( pInfo->mpVbaFormat ) )
+        if( o3tl::equalsIgnoreAsciiCase( rFmt, pInfo->mpVbaFormat ) )
             break;
         ++pInfo;
     }
@@ -619,7 +600,7 @@ void SbxValue::Format( OUString& rRes, const OUString* pFmt ) const
                      sal_Unicode aBuf[2];
                      aBuf[0] = '0';
                      aBuf[1] = '0' + nMin;
-                     rRes = OUString(aBuf, SAL_N_ELEMENTS(aBuf));
+                     rRes = OUString(aBuf, std::size(aBuf));
                 }
                 else
                 {

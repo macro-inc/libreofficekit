@@ -35,7 +35,7 @@ class SalGraphics;
 class SalBitmap;
 class SalMenu;
 
-struct SalFrameState;
+namespace vcl { class WindowData; }
 struct SalInputContext;
 struct SystemEnvData;
 
@@ -78,8 +78,6 @@ enum class SalFrameStyleFlags
     DIALOG              = 0x00000080,
     // the window containing the intro bitmap, aka splashscreen
     INTRO               = 0x00000100,
-    // partial fullscreen: fullscreen on one monitor of a multimonitor display
-    PARTIAL_FULLSCREEN  = 0x00800000,
     // tdf#144624: don't set icon
     NOICON              = 0x01000000,
     // system child window inside another SalFrame
@@ -126,11 +124,11 @@ public:
                             SalFrame();
     virtual                 ~SalFrame() override;
 
-    SalFrameGeometry        maGeometry = {}; ///< absolute, unmirrored values
+    SalFrameGeometry maGeometry; ///< absolute, unmirrored values
 
     // SalGeometryProvider
-    virtual tools::Long GetWidth() const override { return maGeometry.nWidth; }
-    virtual tools::Long GetHeight() const override { return maGeometry.nHeight; }
+    virtual tools::Long GetWidth() const override { return maGeometry.width(); }
+    virtual tools::Long GetHeight() const override { return maGeometry.height(); }
     virtual bool IsOffScreen() const override { return false; }
 
     // SalGraphics or NULL, but two Graphics for all SalFrames
@@ -146,7 +144,6 @@ public:
     virtual void            SetIcon( sal_uInt16 nIcon ) = 0;
     virtual void            SetRepresentedURL( const OUString& );
     virtual void            SetMenu( SalMenu *pSalMenu ) = 0;
-    virtual void            DrawMenuBar() = 0;
 
     virtual void            SetExtendedFrameStyle( SalExtStyle nExtStyle ) = 0;
 
@@ -159,6 +156,7 @@ public:
     virtual void            SetMinClientSize( tools::Long nWidth, tools::Long nHeight ) = 0;
     virtual void            SetMaxClientSize( tools::Long nWidth, tools::Long nHeight ) = 0;
     virtual void            SetPosSize( tools::Long nX, tools::Long nY, tools::Long nWidth, tools::Long nHeight, sal_uInt16 nFlags ) = 0;
+    static OUString DumpSetPosSize(tools::Long nX, tools::Long nY, tools::Long nWidth, tools::Long nHeight, sal_uInt16 nFlags);
     virtual void            GetClientSize( tools::Long& rWidth, tools::Long& rHeight ) = 0;
     virtual void            GetWorkArea( tools::Rectangle& rRect ) = 0;
     virtual SalFrame*       GetParent() const = 0;
@@ -166,11 +164,11 @@ public:
     SalFrameGeometry        GetGeometry() const;
     const SalFrameGeometry& GetUnmirroredGeometry() const { return maGeometry; }
 
-    virtual void            SetWindowState( const SalFrameState* pState ) = 0;
+    virtual void SetWindowState(const vcl::WindowData*) = 0;
     // return the absolute, unmirrored system frame state
     // if this returns false the structure is uninitialised
     [[nodiscard]]
-    virtual bool            GetWindowState( SalFrameState* pState ) = 0;
+    virtual bool GetWindowState(vcl::WindowData*) = 0;
     virtual void            ShowFullScreen( bool bFullScreen, sal_Int32 nDisplay ) = 0;
     virtual void            PositionByToolkit( const tools::Rectangle&, FloatWinPopupFlags ) {};
 
@@ -301,11 +299,19 @@ public:
     void SetModalHierarchyHdl(const Link<bool, void>& rLink) { m_aModalHierarchyHdl = rLink; }
     void NotifyModalHierarchy(bool bModal) { m_aModalHierarchyHdl.Call(bModal); }
 
+    virtual void            UpdateDarkMode() {}
+
     // Call the callback set; this sometimes necessary for implementation classes
     // that should not know more than necessary about the SalFrame implementation
     // (e.g. input methods, printer update handlers).
     bool                    CallCallback( SalEvent nEvent, const void* pEvent ) const
         { return m_pProc && m_pProc( m_pWindow, nEvent, pEvent ); }
+
+    // Helper method for input method handling: Calculate cursor index in (UTF-16) OUString,
+    // starting at nCursorIndex, moving number of characters (not UTF-16 codepoints) specified
+    // in nOffset, nChars.
+    static Selection        CalcDeleteSurroundingSelection(const OUString& rSurroundingText,
+                                                           sal_Int32 nCursorIndex, int nOffset, int nChars);
 };
 
 #if defined( _WIN32 ) && !defined( HEADLESS_VCLPLUG )

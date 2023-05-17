@@ -29,9 +29,11 @@
 #include <osl/diagnose.h>
 #include <rtl/ustrbuf.hxx>
 #include <rtl/uri.hxx>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <comphelper/sequence.hxx>
 #include <ucbhelper/content.hxx>
+#include <o3tl/string_view.hxx>
 #include <com/sun/star/ucb/ContentCreationException.hpp>
 #include <com/sun/star/uno/DeploymentException.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
@@ -62,7 +64,7 @@ typedef ::cppu::WeakComponentImplHelper<
     deployment::XPackageRegistry, util::XUpdatable > t_helper;
 
 
-class PackageRegistryImpl : private MutexHolder, public t_helper
+class PackageRegistryImpl : private cppu::BaseMutex, public t_helper
 {
     struct ci_string_hash {
         std::size_t operator () ( OUString const & str ) const {
@@ -70,8 +72,8 @@ class PackageRegistryImpl : private MutexHolder, public t_helper
         }
     };
     struct ci_string_equals {
-        bool operator () ( OUString const & str1, std::u16string_view str2 ) const{
-            return str1.equalsIgnoreAsciiCase( str2 );
+        bool operator () ( std::u16string_view str1, std::u16string_view str2 ) const{
+            return o3tl::equalsIgnoreAsciiCase( str1, str2 );
         }
     };
     typedef std::unordered_map<
@@ -97,7 +99,7 @@ protected:
     virtual void SAL_CALL disposing() override;
 
     virtual ~PackageRegistryImpl() override;
-    PackageRegistryImpl() : t_helper( getMutex() ) {}
+    PackageRegistryImpl() : t_helper( m_aMutex ) {}
 
 
 public:
@@ -122,7 +124,7 @@ public:
 
 void PackageRegistryImpl::check()
 {
-    ::osl::MutexGuard guard( getMutex() );
+    ::osl::MutexGuard guard( m_aMutex );
     if (rBHelper.bInDispose || rBHelper.bDisposed) {
         throw lang::DisposedException(
             "PackageRegistry instance has already been disposed!",
@@ -151,12 +153,12 @@ PackageRegistryImpl::~PackageRegistryImpl()
 }
 
 
-OUString normalizeMediaType( OUString const & mediaType )
+OUString normalizeMediaType( std::u16string_view mediaType )
 {
     OUStringBuffer buf;
     sal_Int32 index = 0;
     for (;;) {
-        buf.append( mediaType.getToken( 0, '/', index ).trim() );
+        buf.append( o3tl::trim(o3tl::getToken(mediaType, 0, '/', index )) );
         if (index < 0)
             break;
         buf.append( '/' );
@@ -396,7 +398,7 @@ Reference<deployment::XPackageRegistry> PackageRegistryImpl::create(
                 if (pos < (types.getLength() - 1))
                     buf.append( ", " );
             }
-            dp_misc::TRACE(buf.makeStringAndClear() + "\n\n");
+            dp_misc::TRACE(buf + "\n\n");
         }
         allBackends.insert( that->m_ambiguousBackends.begin(),
                             that->m_ambiguousBackends.end() );
@@ -490,7 +492,7 @@ Reference<deployment::XPackage> PackageRegistryImpl::bindPackage(
                 iFind = m_mediaType2backend.find(
                     normalizeMediaType(
                         // cut parameters:
-                        mediaType.copy( 0, q ) ) );
+                        mediaType.subView( 0, q ) ) );
             }
         }
         if (iFind == m_mediaType2backend.end()) {

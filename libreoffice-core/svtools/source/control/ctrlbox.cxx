@@ -342,7 +342,7 @@ namespace
         gUserItemSz.setHeight(gUserItemSz.Height() * 16);
         gUserItemSz.setHeight(gUserItemSz.Height() / 10);
 
-        size_t nMaxDeviceHeight = SAL_MAX_INT16 / 2; // see limitXCreatePixmap
+        size_t nMaxDeviceHeight = SAL_MAX_INT16 / 16; // see limitXCreatePixmap and be generous wrt up to x16 hidpi
         assert(gUserItemSz.Height() != 0);
         gPreviewsPerDevice = gUserItemSz.Height() == 0 ? 16 : nMaxDeviceHeight / gUserItemSz.Height();
     }
@@ -356,6 +356,8 @@ IMPL_LINK(FontNameBox, SettingsChangedHdl, VclSimpleEvent&, rEvent, void)
     DataChangedEvent* pData = static_cast<DataChangedEvent*>(static_cast<VclWindowEvent&>(rEvent).GetData());
     if (pData->GetType() == DataChangedEventType::SETTINGS)
     {
+        for (auto &rDev : gFontPreviewVirDevs)
+            rDev.disposeAndClear();
         gFontPreviewVirDevs.clear();
         gRenderedFontNames.clear();
         calcCustomItemSize(*m_xComboBox);
@@ -502,9 +504,11 @@ void FontNameBox::Fill( const FontList* pList )
         set_active_or_entry_text(aOldText);
 }
 
+static bool IsRunningUnitTest() { return getenv("LO_TESTNAME") != nullptr; }
+
 void FontNameBox::EnableWYSIWYG(bool bEnable)
 {
-    if (comphelper::LibreOfficeKit::isActive())
+    if (comphelper::LibreOfficeKit::isActive() || IsRunningUnitTest())
         return;
     if (mbWYSIWYG == bEnable)
         return;
@@ -843,7 +847,7 @@ FontStyleBox::FontStyleBox(std::unique_ptr<weld::ComboBox> p)
     m_xComboBox->set_entry_width_chars(std::ceil(nMaxLen / m_xComboBox->get_approximate_digit_width()));
 }
 
-void FontStyleBox::Fill( const OUString& rName, const FontList* pList )
+void FontStyleBox::Fill( std::u16string_view rName, const FontList* pList )
 {
     OUString aOldText = m_xComboBox->get_active_text();
     int nPos = m_xComboBox->get_active();
@@ -1395,16 +1399,14 @@ void SvtLineListBox::ImpGetLine( tools::Long nLine1, tools::Long nLine2, tools::
 }
 
 SvtLineListBox::SvtLineListBox(std::unique_ptr<weld::MenuButton> pControl)
-    : m_xControl(std::move(pControl))
-    , m_xBuilder(Application::CreateBuilder(m_xControl.get(), "svt/ui/linewindow.ui"))
-    , m_xTopLevel(m_xBuilder->weld_widget("line_popup_window"))
+    : WeldToolbarPopup(css::uno::Reference<css::frame::XFrame>(), pControl.get(), "svt/ui/linewindow.ui", "line_popup_window")
+    , m_xControl(std::move(pControl))
     , m_xNoneButton(m_xBuilder->weld_button("none_line_button"))
     , m_xLineSet(new ValueSet(nullptr))
     , m_xLineSetWin(new weld::CustomWeld(*m_xBuilder, "lineset", *m_xLineSet))
     , m_nWidth( 5 )
     , aVirDev(VclPtr<VirtualDevice>::Create())
     , aColor(COL_BLACK)
-    , maPaintCol(COL_BLACK)
 {
     const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
     m_xLineSet->SetStyle(WinBits(WB_FLATVALUESET | WB_NO_DIRECTSELECT | WB_TABSTOP));
@@ -1414,7 +1416,6 @@ SvtLineListBox::SvtLineListBox(std::unique_ptr<weld::MenuButton> pControl)
 
     m_xNoneButton->connect_clicked(LINK(this, SvtLineListBox, NoneHdl));
 
-    m_xTopLevel->connect_focus_in(LINK(this, SvtLineListBox, FocusHdl));
     m_xControl->set_popover(m_xTopLevel.get());
     m_xControl->connect_toggled(LINK(this, SvtLineListBox, ToggleHdl));
 
@@ -1432,11 +1433,9 @@ SvtLineListBox::SvtLineListBox(std::unique_ptr<weld::MenuButton> pControl)
 
     aVirDev->SetLineColor();
     aVirDev->SetMapMode(MapMode(MapUnit::MapTwip));
-
-    UpdatePaintLineColor();
 }
 
-IMPL_LINK_NOARG(SvtLineListBox, FocusHdl, weld::Widget&, void)
+void SvtLineListBox::GrabFocus()
 {
     if (GetSelectEntryStyle() == SvxBorderLineStyle::NONE)
         m_xNoneButton->grab_focus();
@@ -1447,7 +1446,7 @@ IMPL_LINK_NOARG(SvtLineListBox, FocusHdl, weld::Widget&, void)
 IMPL_LINK(SvtLineListBox, ToggleHdl, weld::Toggleable&, rButton, void)
 {
     if (rButton.get_active())
-        FocusHdl(*m_xTopLevel);
+        GrabFocus();
 }
 
 IMPL_LINK_NOARG(SvtLineListBox, NoneHdl, weld::Button&, void)
@@ -1474,25 +1473,6 @@ OUString SvtLineListBox::GetLineStyleName(SvxBorderLineStyle eStyle)
     return sRet;
 }
 
-sal_Int32 SvtLineListBox::GetStylePos( sal_Int32 nListPos ) const
-{
-    sal_Int32 nPos = -1;
-    --nListPos;
-
-    sal_Int32 n = 0;
-    size_t i = 0;
-    size_t nCount = m_vLineList.size();
-    while ( nPos == -1 && i < nCount )
-    {
-        if ( nListPos == n )
-            nPos = static_cast<sal_Int32>(i);
-        n++;
-        i++;
-    }
-
-    return nPos;
-}
-
 void SvtLineListBox::SelectEntry(SvxBorderLineStyle nStyle)
 {
     if (nStyle == SvxBorderLineStyle::NONE)
@@ -1510,28 +1490,17 @@ void SvtLineListBox::InsertEntry(
         rWidthImpl, nStyle, nMinWidth, pColor1Fn, pColor2Fn, pColorDistFn));
 }
 
-void SvtLineListBox::UpdatePaintLineColor()
-{
-    const StyleSettings& rSettings = Application::GetSettings().GetStyleSettings();
-    Color aNewCol(rSettings.GetWindowColor().IsDark() ? rSettings.GetLabelTextColor() : aColor);
-
-    bool bRet = aNewCol != maPaintCol;
-
-    if( bRet )
-        maPaintCol = aNewCol;
-}
-
 void SvtLineListBox::UpdateEntries()
 {
-    UpdatePaintLineColor( );
-
     SvxBorderLineStyle eSelected = GetSelectEntryStyle();
 
     // Remove the old entries
     m_xLineSet->Clear();
 
-    // Add the new entries based on the defined width
+    const StyleSettings& rSettings = Application::GetSettings().GetStyleSettings();
+    Color aFieldColor = rSettings.GetFieldColor();
 
+    // Add the new entries based on the defined width
     sal_uInt16 n = 0;
     sal_uInt16 nCount = m_vLineList.size( );
     while ( n < nCount )
@@ -1541,9 +1510,9 @@ void SvtLineListBox::UpdateEntries()
         ImpGetLine( pData->GetLine1ForWidth( m_nWidth ),
                 pData->GetLine2ForWidth( m_nWidth ),
                 pData->GetDistForWidth( m_nWidth ),
-                GetColorLine1(m_xLineSet->GetItemCount()),
-                GetColorLine2(m_xLineSet->GetItemCount()),
-                GetColorDist(m_xLineSet->GetItemCount()),
+                pData->GetColorLine1(aColor),
+                pData->GetColorLine2(aColor),
+                pData->GetColorDist(aColor, aFieldColor),
                 pData->GetStyle(), aBmp );
         sal_Int16 nItemId = static_cast<sal_Int16>(pData->GetStyle()) + 1;
         m_xLineSet->InsertItem(nItemId, Image(aBmp), GetLineStyleName(pData->GetStyle()));
@@ -1553,36 +1522,6 @@ void SvtLineListBox::UpdateEntries()
     }
 
     m_xLineSet->SetOptimalSize();
-}
-
-Color SvtLineListBox::GetColorLine1( sal_Int32 nPos )
-{
-    sal_Int32 nStyle = GetStylePos( nPos );
-    if (nStyle == -1)
-        return GetPaintColor( );
-    auto& pData = m_vLineList[ nStyle ];
-    return pData->GetColorLine1( GetColor( ) );
-}
-
-Color SvtLineListBox::GetColorLine2( sal_Int32 nPos )
-{
-    sal_Int32 nStyle = GetStylePos(nPos);
-    if (nStyle == -1)
-        return GetPaintColor( );
-    auto& pData = m_vLineList[ nStyle ];
-    return pData->GetColorLine2( GetColor( ) );
-}
-
-Color SvtLineListBox::GetColorDist( sal_Int32 nPos )
-{
-    const StyleSettings& rSettings = Application::GetSettings().GetStyleSettings();
-    Color rResult = rSettings.GetFieldColor();
-
-    sal_Int32 nStyle = GetStylePos( nPos );
-    if (nStyle == -1)
-        return rResult;
-    auto& pData = m_vLineList[ nStyle ];
-    return pData->GetColorDist( GetColor( ), rResult );
 }
 
 IMPL_LINK_NOARG(SvtLineListBox, ValueSelectHdl, ValueSet*, void)
@@ -1617,6 +1556,8 @@ void SvtLineListBox::UpdatePreview()
         const auto nPos = (aVirDev->GetOutputSizePixel().Height() - aImage.GetSizePixel().Height()) / 2;
         aVirDev->Push(vcl::PushFlags::MAPMODE);
         aVirDev->SetMapMode(MapMode(MapUnit::MapPixel));
+        const StyleSettings& rSettings = Application::GetSettings().GetStyleSettings();
+        aVirDev->SetBackground(rSettings.GetFieldColor());
         aVirDev->Erase();
         aVirDev->DrawImage(Point(0, nPos), aImage);
         m_xControl->set_image(aVirDev.get());

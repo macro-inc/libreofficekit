@@ -269,6 +269,50 @@ OUString TDefTableHandler::getThemeColorTypeString(sal_Int32 nType)
     return OUString();
 }
 
+model::ThemeColorType TDefTableHandler::getThemeColorTypeIndex(sal_Int32 nType)
+{
+    switch (nType)
+    {
+        case NS_ooxml::LN_Value_St_ThemeColor_dark1:
+                return model::ThemeColorType::Dark1;
+        case NS_ooxml::LN_Value_St_ThemeColor_light1:
+                return model::ThemeColorType::Light1;
+        case NS_ooxml::LN_Value_St_ThemeColor_dark2:
+                return model::ThemeColorType::Dark2;
+        case NS_ooxml::LN_Value_St_ThemeColor_light2:
+                return model::ThemeColorType::Light2;
+        case NS_ooxml::LN_Value_St_ThemeColor_accent1:
+                return model::ThemeColorType::Accent1;
+        case NS_ooxml::LN_Value_St_ThemeColor_accent2:
+                return model::ThemeColorType::Accent2;
+        case NS_ooxml::LN_Value_St_ThemeColor_accent3:
+                return model::ThemeColorType::Accent3;
+        case NS_ooxml::LN_Value_St_ThemeColor_accent4:
+                return model::ThemeColorType::Accent4;
+        case NS_ooxml::LN_Value_St_ThemeColor_accent5:
+                return model::ThemeColorType::Accent5;
+        case NS_ooxml::LN_Value_St_ThemeColor_accent6:
+                return model::ThemeColorType::Accent6;
+        case NS_ooxml::LN_Value_St_ThemeColor_hyperlink:
+                return model::ThemeColorType::Hyperlink;
+        case NS_ooxml::LN_Value_St_ThemeColor_followedHyperlink:
+                return model::ThemeColorType::FollowedHyperlink;
+        case NS_ooxml::LN_Value_St_ThemeColor_none:
+                return model::ThemeColorType::Unknown;
+        case NS_ooxml::LN_Value_St_ThemeColor_background1:
+                return model::ThemeColorType::Light1;
+        case NS_ooxml::LN_Value_St_ThemeColor_text1:
+                return model::ThemeColorType::Dark1;
+        case NS_ooxml::LN_Value_St_ThemeColor_background2:
+                return model::ThemeColorType::Light2;
+        case NS_ooxml::LN_Value_St_ThemeColor_text2:
+                return model::ThemeColorType::Dark2;
+        default:
+                break;
+    }
+    return model::ThemeColorType::Unknown;
+}
+
 void TDefTableHandler::lcl_attribute(Id rName, Value & rVal)
 {
     sal_Int32 nIntValue = rVal.getInt();
@@ -413,17 +457,17 @@ void TDefTableHandler::lcl_sprm(Sprm & rSprm)
 void TDefTableHandler::fillCellProperties( const ::tools::SvRef< TablePropertyMap >& pCellProperties ) const
 {
     if( !m_aTopBorderLines.empty() )
-        pCellProperties->Insert( PROP_TOP_BORDER, uno::makeAny( m_aTopBorderLines[0] ) );
+        pCellProperties->Insert( PROP_TOP_BORDER, uno::Any( m_aTopBorderLines[0] ) );
     if( !m_aLeftBorderLines.empty() )
-        pCellProperties->Insert( PROP_LEFT_BORDER, uno::makeAny( m_aLeftBorderLines[0] ) );
+        pCellProperties->Insert( PROP_LEFT_BORDER, uno::Any( m_aLeftBorderLines[0] ) );
     if( !m_aBottomBorderLines.empty() )
-        pCellProperties->Insert( PROP_BOTTOM_BORDER, uno::makeAny( m_aBottomBorderLines[0] ) );
+        pCellProperties->Insert( PROP_BOTTOM_BORDER, uno::Any( m_aBottomBorderLines[0] ) );
     if( !m_aRightBorderLines.empty() )
-        pCellProperties->Insert( PROP_RIGHT_BORDER, uno::makeAny( m_aRightBorderLines[0] ) );
+        pCellProperties->Insert( PROP_RIGHT_BORDER, uno::Any( m_aRightBorderLines[0] ) );
     if( !m_aInsideHBorderLines.empty() )
-        pCellProperties->Insert( META_PROP_HORIZONTAL_BORDER, uno::makeAny( m_aInsideHBorderLines[0] ) );
+        pCellProperties->Insert( META_PROP_HORIZONTAL_BORDER, uno::Any( m_aInsideHBorderLines[0] ) );
     if( !m_aInsideVBorderLines.empty() )
-        pCellProperties->Insert( META_PROP_VERTICAL_BORDER, uno::makeAny( m_aInsideVBorderLines[0] ) );
+        pCellProperties->Insert( META_PROP_VERTICAL_BORDER, uno::Any( m_aInsideVBorderLines[0] ) );
 }
 
 

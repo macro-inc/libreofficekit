@@ -22,17 +22,20 @@
 #include <view.hxx>
 #include <cmdid.h>
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/undo/data/";
-
 /// Covers sw/source/core/undo/ fixes.
 class SwCoreUndoTest : public SwModelTestBase
 {
+public:
+    SwCoreUndoTest()
+        : SwModelTestBase("/sw/qa/core/undo/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(SwCoreUndoTest, testTextboxCutSave)
 {
     // Load the document and select all.
-    load(DATA_DIRECTORY, "textbox-cut-save.docx");
+    createSwDoc("textbox-cut-save.docx");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pDocShell = pTextDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
@@ -58,15 +61,13 @@ CPPUNIT_TEST_FIXTURE(SwCoreUndoTest, testTextboxCutSave)
 
 CPPUNIT_TEST_FIXTURE(SwCoreUndoTest, testTextboxCutUndo)
 {
-    load(DATA_DIRECTORY, "textbox-cut-undo.docx");
+    createSwDoc("textbox-cut-undo.docx");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pDocShell = pTextDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
     SwDoc* pDoc = pDocShell->GetDoc();
-    SwView* pView = pDoc->GetDocShell()->GetView();
 
-    pView->GetViewFrame()->GetDispatcher()->Execute(FN_CNTNT_TO_NEXT_FRAME, SfxCallMode::SYNCHRON);
-    pView->StopShellTimer();
+    selectShape(1);
     rtl::Reference<SwTransferable> pTransfer = new SwTransferable(*pWrtShell);
     pTransfer->Cut();
     SwFrameFormats& rSpzFrameFormats = *pDoc->GetSpzFrameFormats();
@@ -87,7 +88,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreUndoTest, testTextboxCutUndo)
 CPPUNIT_TEST_FIXTURE(SwCoreUndoTest, testTableCopyRedline)
 {
     // Given a document with two table cells and redlining enabled:
-    load(DATA_DIRECTORY, "table-copy-redline.odt");
+    createSwDoc("table-copy-redline.odt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pDocShell = pTextDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
@@ -101,6 +102,52 @@ CPPUNIT_TEST_FIXTURE(SwCoreUndoTest, testTableCopyRedline)
 
     // Without the accompanying fix in place, this test would have crashed.
     pWrtShell->Undo();
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreUndoTest, testImagePropsCreateUndoAndModifyDoc)
+{
+    createSwDoc("image-as-character.odt");
+    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+    SwDocShell* pDocShell = pTextDoc->GetDocShell();
+    SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
+    css::uno::Reference<css::beans::XPropertySet> xImage(
+        pTextDoc->getGraphicObjects()->getByName("Image1"), css::uno::UNO_QUERY_THROW);
+
+    CPPUNIT_ASSERT(pTextDoc->isSetModifiedEnabled());
+    CPPUNIT_ASSERT(!pTextDoc->isModified());
+    CPPUNIT_ASSERT(!pWrtShell->GetLastUndoInfo(nullptr, nullptr, nullptr));
+
+    // Check that modifications of the geometry mark document dirty, and create an undo
+
+    xImage->setPropertyValue("RelativeWidth", css::uno::Any(sal_Int16(80)));
+
+    // Without the fix, this would fail
+    CPPUNIT_ASSERT(pTextDoc->isModified());
+    CPPUNIT_ASSERT(pWrtShell->GetLastUndoInfo(nullptr, nullptr, nullptr));
+
+    pWrtShell->Undo();
+    CPPUNIT_ASSERT(!pTextDoc->isModified());
+    CPPUNIT_ASSERT(!pWrtShell->GetLastUndoInfo(nullptr, nullptr, nullptr));
+
+    // Check that modifications of anchor mark document dirty, and create an undo
+
+    xImage->setPropertyValue("AnchorType",
+                             css::uno::Any(css::text::TextContentAnchorType_AT_PARAGRAPH));
+
+    CPPUNIT_ASSERT(pTextDoc->isModified());
+    CPPUNIT_ASSERT(pWrtShell->GetLastUndoInfo(nullptr, nullptr, nullptr));
+
+    pWrtShell->Undo();
+    CPPUNIT_ASSERT(!pTextDoc->isModified());
+    CPPUNIT_ASSERT(!pWrtShell->GetLastUndoInfo(nullptr, nullptr, nullptr));
+
+    // Check that setting the same values do not make it dirty and do not add undo
+
+    xImage->setPropertyValue("RelativeWidth", xImage->getPropertyValue("RelativeWidth"));
+    xImage->setPropertyValue("AnchorType", xImage->getPropertyValue("AnchorType"));
+
+    CPPUNIT_ASSERT(!pTextDoc->isModified());
+    CPPUNIT_ASSERT(!pWrtShell->GetLastUndoInfo(nullptr, nullptr, nullptr));
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

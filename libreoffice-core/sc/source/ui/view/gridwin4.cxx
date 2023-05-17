@@ -44,6 +44,8 @@
 #include <svx/sdr/contact/viewobjectcontact.hxx>
 #include <svx/sdr/contact/viewcontact.hxx>
 #include <tabvwsh.hxx>
+#include <vcl/lineinfo.hxx>
+#include <vcl/sysdata.hxx>
 
 #include <gridwin.hxx>
 #include <viewdata.hxx>
@@ -77,9 +79,6 @@
 #include <vcl/virdev.hxx>
 #include <svx/sdrpaintwindow.hxx>
 #include <drwlayer.hxx>
-#include <columnspanset.hxx>
-#include <docfunc.hxx>
-#include <printfun.hxx>
 
 static void lcl_LimitRect( tools::Rectangle& rRect, const tools::Rectangle& rVisible )
 {
@@ -692,7 +691,7 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
     tools::Long nScrY = aOutputData.nScrY;
 
     const svtools::ColorConfig& rColorCfg = pScMod->GetColorConfig();
-    Color aGridColor( rColorCfg.GetColorValue( svtools::CALCGRID, false ).nColor );
+    Color aGridColor( rColorCfg.GetColorValue( svtools::CALCGRID ).nColor );
     if ( aGridColor == COL_TRANSPARENT )
     {
         //  use view options' grid color only if color config has "automatic" color
@@ -793,7 +792,7 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
     bool bInPlaceVisCursor = false;
     if (bInPlaceEditing)
     {
-        // toggle the cursor off if its on to ensure the cursor invert
+        // toggle the cursor off if it's on to ensure the cursor invert
         // background logic remains valid after the background is cleared on
         // the next cursor flash
         pInPlaceCrsr = pEditView->GetCursor();
@@ -905,6 +904,9 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
         aOutputData.DrawGrid(*pContentDev, bGrid, bPage);
 
     pContentDev->SetMapMode(MapMode(MapUnit::MapPixel));
+
+    //tdf#128258 - draw a dotted line before hidden columns/rows
+    DrawHiddenIndicator(nX1,nY1,nX2,nY2, *pContentDev);
 
     if ( bPageMode )
     {
@@ -1143,7 +1145,7 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
 
                             tools::Rectangle aBackground(aStart, aEnd);
                             if (bLokRTL)
-                                aBackground.Justify();
+                                aBackground.Normalize();
 
                             // Need to draw the background in absolute coords.
                             Point aOrigin = aOriginalMode.GetOrigin();
@@ -1174,7 +1176,9 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
                             // Get top-left offset because of margin and indent.
                             lcl_GetEditAreaTLOffset(nOffsetX, nOffsetY, ScAddress(nCol1, nRow1, nTab), mrViewData, rDoc);
                             aEditRect.AdjustLeft(nOffsetX + 1);
+                            aEditRect.AdjustRight(1);
                             aEditRect.AdjustTop(nOffsetY + 1);
+                            aEditRect.AdjustBottom(1);
 
                             // EditView has an 'output area' which is used to clip the 'paint area' we provide below.
                             // So they need to be in the same coordinates/units. This is tied to the mapmode of the gridwin
@@ -1270,7 +1274,7 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
         // set the correct mapmode
         tools::Rectangle aBackground(aStart, aEnd);
         if (bLokRTL)
-            aBackground.Justify();
+            aBackground.Normalize();
         tools::Rectangle aBGAbs(aBackground);
 
         if (bIsTiledRendering)
@@ -1306,13 +1310,6 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
         // paint the editeng text
         if (bIsTiledRendering)
         {
-            tools::Rectangle aEditRect(aBackground);
-            tools::Long nOffsetX = 0, nOffsetY = 0;
-            // Get top-left offset because of margin and indent.
-            lcl_GetEditAreaTLOffset(nOffsetX, nOffsetY, ScAddress(nCol1, nRow1, mrViewData.GetTabNo()), mrViewData, rDoc);
-            aEditRect.AdjustLeft(nOffsetX + 1);
-            aEditRect.AdjustTop(nOffsetY + 1);
-
             // EditView has an 'output area' which is used to clip the paint area we provide below.
             // So they need to be in the same coordinates/units. This is tied to the mapmode of the gridwin
             // attached to the EditView, so we have to change its mapmode too (temporarily). We save the
@@ -1334,8 +1331,7 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
                 // This is for sending the pixel-aligned twips position of the cursor to the specific views with
                 // the same given zoom level.
                 tools::Rectangle aCursorRect = pEditView->GetEditCursor();
-                Point aCursPos = OutputDevice::LogicToLogic(aCursorRect.TopLeft(),
-                        MapMode(MapUnit::Map100thMM), MapMode(MapUnit::MapTwip));
+                Point aCursPos = o3tl::toTwips(aCursorRect.TopLeft(), o3tl::Length::mm100);
 
                 const MapMode& rDevMM = rDevice.GetMapMode();
                 MapMode aMM(MapUnit::MapTwip);
@@ -1661,13 +1657,16 @@ void ScGridWindow::PaintTile( VirtualDevice& rDevice,
     {
         bool bPrintTwipsMsgs = comphelper::LibreOfficeKit::isCompatFlagSet(
                 comphelper::LibreOfficeKit::Compat::scPrintTwipsMsgs);
-        mpLOKDrawView.reset(bPrintTwipsMsgs ?
-            new ScLOKDrawView(
-                &rDevice,
-                mrViewData) :
-            new FmFormView(
-                *pModel,
-                &rDevice));
+        if (!mpLOKDrawView)
+        {
+            mpLOKDrawView.reset(bPrintTwipsMsgs ?
+                new ScLOKDrawView(
+                    &rDevice,
+                    mrViewData) :
+                new FmFormView(
+                    *pModel,
+                    &rDevice));
+        }
 
         mpLOKDrawView->SetNegativeX(bLayoutRTL);
         mpLOKDrawView->ShowSdrPage(mpLOKDrawView->GetModel()->GetPage(nTab));
@@ -1827,6 +1826,40 @@ void ScGridWindow::CheckNeedsRepaint()
     rBindings.Invalidate( SID_STATUS_SUM );
     rBindings.Invalidate( SID_ATTR_SIZE );
     rBindings.Invalidate( SID_TABLE_CELL );
+}
+
+void ScGridWindow::DrawHiddenIndicator( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, vcl::RenderContext& rRenderContext)
+{
+    ScDocument& rDoc = mrViewData.GetDocument();
+    SCTAB nTab = mrViewData.GetTabNo();
+    const svtools::ColorConfig& rColorCfg = SC_MOD()->GetColorConfig();
+    const svtools::ColorConfigValue aColorValue = rColorCfg.GetColorValue(svtools::CALCHIDDENROWCOL);
+    if (aColorValue.bIsVisible) {
+        rRenderContext.SetLineColor(aColorValue.nColor);
+        LineInfo aLineInfo(LineStyle::Dash, 2);
+        aLineInfo.SetDashCount(0);
+        aLineInfo.SetDotCount(1);
+        aLineInfo.SetDistance(15);
+        // round caps except when running VCL_PLUGIN=gen due to a performance issue
+        // https://bugs.documentfoundation.org/show_bug.cgi?id=128258#c14
+        if (mrViewData.GetActiveWin()->GetSystemData()->toolkit != SystemEnvData::Toolkit::Gen)
+            aLineInfo.SetLineCap(css::drawing::LineCap_ROUND);
+        aLineInfo.SetDotLen(1);
+        for (int i=nX1; i<nX2; i++) {
+            if (rDoc.ColHidden(i,nTab) && (i<rDoc.MaxCol() ? !rDoc.ColHidden(i+1,nTab) : true)) {
+                Point aStart = mrViewData.GetScrPos(i, nY1, eWhich, true );
+                Point aEnd = mrViewData.GetScrPos(i, nY2, eWhich, true );
+                rRenderContext.DrawLine(aStart,aEnd,aLineInfo);
+            }
+        }
+        for (int i=nY1; i<nY2; i++) {
+            if (rDoc.RowHidden(i,nTab) && (i<rDoc.MaxRow() ? !rDoc.RowHidden(i+1,nTab) : true)) {
+                Point aStart = mrViewData.GetScrPos(nX1, i, eWhich, true );
+                Point aEnd = mrViewData.GetScrPos(nX2, i, eWhich, true );
+                rRenderContext.DrawLine(aStart,aEnd,aLineInfo);
+            }
+        }
+    } //visible
 }
 
 void ScGridWindow::DrawPagePreview( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, vcl::RenderContext& rRenderContext)
@@ -2006,13 +2039,16 @@ void ScGridWindow::DrawPagePreview( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, 
                                 //  find right font size for DrawText
                                 aFont.SetFontSize( Size( 0,100 ) );
                                 rRenderContext.SetFont( aFont );
-                                Size aSize100(rRenderContext.GetTextWidth( aThisPageStr ), rRenderContext.GetTextHeight() );
 
-                                //  40% of width or 60% of height
-                                tools::Long nSizeX = 40 * ( aPageEnd.X() - aPageStart.X() ) / aSize100.Width();
-                                tools::Long nSizeY = 60 * ( aPageEnd.Y() - aPageStart.Y() ) / aSize100.Height();
-                                aFont.SetFontSize( Size( 0,std::min(nSizeX,nSizeY) ) );
-                                rRenderContext.SetFont( aFont );
+                                Size aSize100(rRenderContext.GetTextWidth( aThisPageStr ), rRenderContext.GetTextHeight() );
+                                if (aSize100.Width() && aSize100.Height())
+                                {
+                                    //  40% of width or 60% of height
+                                    tools::Long nSizeX = 40 * ( aPageEnd.X() - aPageStart.X() ) / aSize100.Width();
+                                    tools::Long nSizeY = 60 * ( aPageEnd.Y() - aPageStart.Y() ) / aSize100.Height();
+                                    aFont.SetFontSize( Size( 0,std::min(nSizeX,nSizeY) ) );
+                                    rRenderContext.SetFont( aFont );
+                                }
 
                                 //  centered output with DrawText
                                 Size aTextSize(rRenderContext.GetTextWidth( aThisPageStr ), rRenderContext.GetTextHeight() );
@@ -2030,7 +2066,7 @@ void ScGridWindow::DrawPagePreview( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, 
     }
 }
 
-void ScGridWindow::DrawButtons(SCCOL nX1, SCCOL nX2, const ScTableInfo& rTabInfo, OutputDevice* pContentDev, ScLokRTLContext* pLokRTLContext)
+void ScGridWindow::DrawButtons(SCCOL nX1, SCCOL nX2, const ScTableInfo& rTabInfo, OutputDevice* pContentDev, const ScLokRTLContext* pLokRTLContext)
 {
     aComboButton.SetOutputDevice( pContentDev );
 
@@ -2063,7 +2099,7 @@ void ScGridWindow::DrawButtons(SCCOL nX1, SCCOL nX2, const ScTableInfo& rTabInfo
 
             for (nCol=nX1; nCol<=nX2; nCol++)
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
                 //if several columns merged on a row, there should be only one auto button at the end of the columns.
                 //if several rows merged on a column, the button may be in the middle, so "!pInfo->bVOverlapped" should not be used
                 if ( pInfo->bAutoFilter && !pInfo->bHOverlapped )
@@ -2137,13 +2173,13 @@ void ScGridWindow::DrawButtons(SCCOL nX1, SCCOL nX2, const ScTableInfo& rTabInfo
             }
         }
 
-        if ( pRowInfo[nArrY].bPivotButton && pRowInfo[nArrY].bChanged )
+        if ( (pRowInfo[nArrY].bPivotToggle || pRowInfo[nArrY].bPivotButton) && pRowInfo[nArrY].bChanged )
         {
             RowInfo* pThisRowInfo = &pRowInfo[nArrY];
             nRow = pThisRowInfo->nRowNo;
             for (nCol=nX1; nCol<=nX2; nCol++)
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
                 if (pInfo->bHOverlapped || pInfo->bVOverlapped)
                     continue;
 
@@ -2155,12 +2191,22 @@ void ScGridWindow::DrawButtons(SCCOL nX1, SCCOL nX2, const ScTableInfo& rTabInfo
                 tools::Long nPosY = aScrPos.Y();
                 // bLayoutRTL is handled in setBoundingBox
 
-                OUString aStr = rDoc.GetString(nCol, nRow, nTab);
-                aCellBtn.setText(aStr);
+                bool bDrawToggle = pInfo->bPivotCollapseButton || pInfo->bPivotExpandButton;
+                if (!bDrawToggle)
+                {
+                    OUString aStr = rDoc.GetString(nCol, nRow, nTab);
+                    aCellBtn.setText(aStr);
+                }
+
+                sal_uInt16 nIndent = 0;
+                if (const ScIndentItem* pIndentItem = rDoc.GetAttr(nCol, nRow, nTab, ATTR_INDENT))
+                    nIndent = pIndentItem->GetValue();
                 aCellBtn.setBoundingBox(Point(nPosX, nPosY), Size(nSizeX-1, nSizeY-1), bLayoutRTL);
                 aCellBtn.setPopupLeft(false);   // DataPilot popup is always right-aligned for now
                 aCellBtn.setDrawBaseButton(pInfo->bPivotButton);
                 aCellBtn.setDrawPopupButton(pInfo->bPivotPopupButton);
+                aCellBtn.setDrawPopupButtonMulti(pInfo->bPivotPopupButtonMulti);
+                aCellBtn.setDrawToggleButton(bDrawToggle, pInfo->bPivotCollapseButton, nIndent);
                 aCellBtn.setHasHiddenMember(pInfo->bFilterActive);
                 aCellBtn.draw();
             }

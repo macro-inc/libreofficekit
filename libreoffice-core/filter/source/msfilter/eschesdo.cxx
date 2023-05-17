@@ -21,14 +21,14 @@
 #include "eschesdo.hxx"
 #include <o3tl/any.hxx>
 #include <svx/svdobj.hxx>
-#include <svx/unoapi.hxx>
-#include <svx/unoshape.hxx>
 #include <tools/poly.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
-#include <tools/fract.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <svx/fmdpage.hxx>
 #include <com/sun/star/awt/Rectangle.hpp>
+#include <com/sun/star/beans/PropertyValue.hpp>
+#include <com/sun/star/beans/XPropertySet.hpp>
+#include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/text/XText.hpp>
 #include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/drawing/CircleKind.hpp>
@@ -44,13 +44,13 @@ using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::drawing;
 using namespace ::com::sun::star::text;
 using namespace ::com::sun::star::task;
-using namespace ::com::sun::star::style;
+
+constexpr o3tl::Length geUnitsSrc(o3tl::Length::mm100);
+// PowerPoint: 576 dpi, WinWord: 1440 dpi, Excel: 1440 dpi
+constexpr o3tl::Length geUnitsDest(o3tl::Length::twip);
 
 ImplEESdrWriter::ImplEESdrWriter( EscherEx& rEx )
     : mpEscherEx(&rEx)
-    , meUnitsSrc(o3tl::Length::mm100)
-    // PowerPoint: 576 dpi, WinWord: 1440 dpi, Excel: 1440 dpi
-    , meUnitsDest(o3tl::Length::twip)
     , mpPicStrm(nullptr)
     , mpHostAppData(nullptr)
     , mbIsTitlePossible(false)
@@ -62,12 +62,12 @@ ImplEESdrWriter::ImplEESdrWriter( EscherEx& rEx )
 
 Point ImplEESdrWriter::ImplMapPoint( const Point& rPoint )
 {
-    return o3tl::convert( rPoint, meUnitsSrc, meUnitsDest );
+    return o3tl::convert( rPoint, geUnitsSrc, geUnitsDest );
 }
 
 Size ImplEESdrWriter::ImplMapSize( const Size& rSize )
 {
-    Size aRetSize( o3tl::convert( rSize, meUnitsSrc, meUnitsDest ) );
+    Size aRetSize( o3tl::convert( rSize, geUnitsSrc, geUnitsDest ) );
 
     if ( !aRetSize.Width() )
         aRetSize.AdjustWidth( 1 );
@@ -190,7 +190,7 @@ sal_uInt32 ImplEESdrWriter::ImplWriteShape( ImplEESdrObject& rObj,
                 for( sal_uInt32 n = 0, nCnt = xXIndexAccess->getCount();
                         n < nCnt; ++n )
                 {
-                    ImplEESdrObject aObj( *this, *o3tl::doAccess<Reference<XShape>>(
+                    ImplEESdrObject aObj( *o3tl::doAccess<Reference<XShape>>(
                                     xXIndexAccess->getByIndex( n )) );
                     if( aObj.IsValid() )
                     {
@@ -669,14 +669,14 @@ sal_uInt32 ImplEESdrWriter::ImplWriteShape( ImplEESdrObject& rObj,
 
         if( SDRLAYER_NOTFOUND != mpEscherEx->GetHellLayerId() &&
             rObj.ImplGetPropertyValue( "LayerID" ) &&
-            *o3tl::doAccess<sal_uInt16>(rObj.GetUsrAny()) == sal_uInt8(mpEscherEx->GetHellLayerId()) )
+            *o3tl::doAccess<sal_Int16>(rObj.GetUsrAny()) == mpEscherEx->GetHellLayerId().get() )
         {
             aPropOpt.AddOpt( ESCHER_Prop_fPrint, 0x200020 );
         }
 
         {
             tools::Rectangle aRect( rObj.GetRect() );
-            aRect.Justify();
+            aRect.Normalize();
             rObj.SetRect( aRect );
         }
 
@@ -838,7 +838,7 @@ void ImplEESdrWriter::ImplWritePage(
     const sal_uInt32 nShapes = mXShapes->getCount();
     for( sal_uInt32 n = 0; n < nShapes; ++n )
     {
-        ImplEESdrObject aObj( *this, *o3tl::doAccess<Reference<XShape>>(
+        ImplEESdrObject aObj( *o3tl::doAccess<Reference<XShape>>(
                                     mXShapes->getByIndex( n )) );
         if( aObj.IsValid() )
         {
@@ -1011,12 +1011,11 @@ ImplEESdrObject::ImplEESdrObject( ImplEESdrWriter& rEx,
         // why not declare a const parameter if the object will
         // not be modified?
         mXShape.set( const_cast<SdrObject*>(&rObj)->getUnoShape(), UNO_QUERY );
-        Init( rEx );
+        Init();
     }
 }
 
-ImplEESdrObject::ImplEESdrObject( ImplEESdrWriter& rEx,
-                                    const Reference< XShape >& rShape ) :
+ImplEESdrObject::ImplEESdrObject( const Reference< XShape >& rShape ) :
     mXShape( rShape ),
     mnShapeId( 0 ),
     mnTextSize( 0 ),
@@ -1026,7 +1025,7 @@ ImplEESdrObject::ImplEESdrObject( ImplEESdrWriter& rEx,
     mbEmptyPresObj( false ),
     mbOOXML(false)
 {
-    Init( rEx );
+    Init();
 }
 
 
@@ -1137,7 +1136,7 @@ static basegfx::B2DRange getUnrotatedGroupBoundRange(const Reference< XShape >& 
     return aRetval;
 }
 
-void ImplEESdrObject::Init( ImplEESdrWriter& rEx )
+void ImplEESdrObject::Init()
 {
     mXPropSet.set( mXShape, UNO_QUERY );
     if( !mXPropSet.is() )
@@ -1155,7 +1154,7 @@ void ImplEESdrObject::Init( ImplEESdrWriter& rEx )
         const Point aNewP(basegfx::fround(aUnrotatedRange.getMinX()), basegfx::fround(aUnrotatedRange.getMinY()));
         const Size aNewS(basegfx::fround(aUnrotatedRange.getWidth()), basegfx::fround(aUnrotatedRange.getHeight()));
 
-        SetRect(rEx.ImplMapPoint(aNewP), rEx.ImplMapSize(aNewS));
+        SetRect(ImplEESdrWriter::ImplMapPoint(aNewP), ImplEESdrWriter::ImplMapSize(aNewS));
     }
     else
     {
@@ -1163,7 +1162,7 @@ void ImplEESdrObject::Init( ImplEESdrWriter& rEx )
         const Point aOldP(mXShape->getPosition().X, mXShape->getPosition().Y);
         const Size aOldS(mXShape->getSize().Width, mXShape->getSize().Height);
 
-        SetRect(rEx.ImplMapPoint(aOldP), rEx.ImplMapSize(aOldS));
+        SetRect(ImplEESdrWriter::ImplMapPoint(aOldP), ImplEESdrWriter::ImplMapSize(aOldS));
     }
 
     if( ImplGetPropertyValue( "IsPresentationObject" ) )

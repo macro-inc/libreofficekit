@@ -19,6 +19,7 @@
 
 #include <svgstylenode.hxx>
 #include <svgdocument.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 
 namespace svgio::svgreader
@@ -56,7 +57,7 @@ namespace svgio::svgreader
                 {
                     if(!aContent.isEmpty())
                     {
-                        if(aContent.startsWith("text/css"))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"text/css"))
                         {
                             setTextCss(true);
                         }
@@ -70,15 +71,15 @@ namespace svgio::svgreader
             }
         }
 
-        void SvgStyleNode::addCssStyleSheet(const OUString& aSelectors, const SvgStyleAttributes& rNewStyle)
+        void SvgStyleNode::addCssStyleSheet(std::u16string_view aSelectors, const SvgStyleAttributes& rNewStyle)
         {
             // aSelectors: CssStyle selectors, any combination, no comma separations, no spaces at start/end
             // rNewStyle: the already prepared style to register on that name
-            if(aSelectors.isEmpty())
+            if(aSelectors.empty())
                 return;
 
             std::vector< OUString > aSelectorParts;
-            const sal_Int32 nLen(aSelectors.getLength());
+            const sal_Int32 nLen(aSelectors.size());
             sal_Int32 nPos(0);
             OUStringBuffer aToken;
 
@@ -88,7 +89,8 @@ namespace svgio::svgreader
                 const sal_Int32 nInitPos(nPos);
                 copyToLimiter(aSelectors, u' ', nPos, aToken, nLen);
                 skip_char(aSelectors, u' ', nPos, nLen);
-                const OUString aSelectorPart(aToken.makeStringAndClear().trim());
+                const OUString aSelectorPart(o3tl::trim(aToken));
+                aToken.setLength(0);
 
                 if(!aSelectorPart.isEmpty())
                 {
@@ -132,15 +134,15 @@ namespace svgio::svgreader
             const_cast< SvgDocument& >(getDocument()).addSvgStyleAttributesToMapper(aConcatenatedSelector.makeStringAndClear(), rNewStyle);
         }
 
-        void SvgStyleNode::addCssStyleSheet(const OUString& aSelectors, const OUString& aContent)
+        void SvgStyleNode::addCssStyleSheet(std::u16string_view aSelectors, std::u16string_view aContent)
         {
             // aSelectors: possible comma-separated list of CssStyle definitions, no spaces at start/end
             // aContent: the svg style definitions as string
-            if(aSelectors.isEmpty() || aContent.isEmpty())
+            if(aSelectors.empty() || aContent.empty())
                 return;
 
             // comma-separated split (Css abbreviation for same style for multiple selectors)
-            const sal_Int32 nLen(aSelectors.getLength());
+            const sal_Int32 nLen(aSelectors.size());
             sal_Int32 nPos(0);
             OUStringBuffer aToken;
 
@@ -150,7 +152,8 @@ namespace svgio::svgreader
                 copyToLimiter(aSelectors, u',', nPos, aToken, nLen);
                 skip_char(aSelectors, u' ', u',', nPos, nLen);
 
-                const OUString aSingleName(aToken.makeStringAndClear().trim());
+                const OUString aSingleName(o3tl::trim(aToken));
+                aToken.setLength(0);
 
                 // add the current css class only if wasn't previously added
                 auto [aIterator, bIsNew] = maSvgStyleAttributes.try_emplace(aSingleName);
@@ -178,9 +181,9 @@ namespace svgio::svgreader
             }
         }
 
-        void SvgStyleNode::addCssStyleSheet(const OUString& aSelectorsAndContent)
+        void SvgStyleNode::addCssStyleSheet(std::u16string_view aSelectorsAndContent)
         {
-            const sal_Int32 nLen(aSelectorsAndContent.getLength());
+            const sal_Int32 nLen(aSelectorsAndContent.size());
 
             if(!nLen)
                 return;
@@ -196,7 +199,8 @@ namespace svgio::svgreader
                 copyToLimiter(aSelectorsAndContent, u'{', nPos, aToken, nLen);
                 skip_char(aSelectorsAndContent, u' ', u'{', nPos, nLen);
 
-                const OUString aSelectors(aToken.makeStringAndClear().trim());
+                const OUString aSelectors(o3tl::trim(aToken));
+                aToken.setLength(0);
                 OUString aContent;
 
                 if(!aSelectors.isEmpty() && nPos < nLen)
@@ -205,7 +209,8 @@ namespace svgio::svgreader
                     copyToLimiter(aSelectorsAndContent, u'}', nPos, aToken, nLen);
                     skip_char(aSelectorsAndContent, u' ', u'}', nPos, nLen);
 
-                    aContent = aToken.makeStringAndClear().trim();
+                    aContent = o3tl::trim(aToken);
+                    aToken.setLength(0);
                 }
 
                 if(!aSelectors.isEmpty() && !aContent.isEmpty())

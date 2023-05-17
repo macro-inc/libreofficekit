@@ -57,11 +57,13 @@ public:
 
     sal_uInt16  GetGlossaryCnt() const;
     OUString    GetGlossaryName(sal_uInt16);
-    OUString    GetGlossaryShortName(const OUString &rName);
+    OUString    GetGlossaryShortName(std::u16string_view aName);
     OUString    GetGlossaryShortName(sal_uInt16);
 
     bool    Rename( const OUString& rOldShortName, const OUString& rNewShortName,
                         const OUString& rNewName);
+    bool    CopyOrMove( const OUString& rSourceGroupName, OUString& rSourceShortName,
+                        const OUString& rDestGroupName, const OUString& rLongName, bool bMove );
     bool    HasShortName(const OUString &rShortName) const;
     // when NewGlossary is called from Basic then the previously set group should
     // be newly created if applicable.

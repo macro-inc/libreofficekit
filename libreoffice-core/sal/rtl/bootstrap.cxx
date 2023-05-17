@@ -37,13 +37,21 @@
 #include <rtl/uri.hxx>
 #include <sal/log.hxx>
 #include <o3tl/lru_map.hxx>
+#include <o3tl/string_view.hxx>
 
+#include <utility>
 #include <vector>
 #include <algorithm>
+#include <cstddef>
+#include <string_view>
 #include <unordered_map>
 
 #ifdef ANDROID
 #include <osl/detail/android-bootstrap.h>
+#endif
+
+#ifdef EMSCRIPTEN
+#include <osl/detail/emscripten-bootstrap.h>
 #endif
 
 #ifdef IOS
@@ -60,11 +68,11 @@ namespace
 
 struct Bootstrap_Impl;
 
-char const VND_SUN_STAR_PATHNAME[] = "vnd.sun.star.pathname:";
+constexpr std::u16string_view VND_SUN_STAR_PATHNAME = u"vnd.sun.star.pathname:";
 
-bool isPathnameUrl(OUString const & url)
+bool isPathnameUrl(std::u16string_view url)
 {
-    return url.matchIgnoreAsciiCase(VND_SUN_STAR_PATHNAME);
+    return o3tl::matchIgnoreAsciiCase(url, VND_SUN_STAR_PATHNAME);
 }
 
 bool resolvePathnameUrl(OUString * url)
@@ -72,7 +80,7 @@ bool resolvePathnameUrl(OUString * url)
     OSL_ASSERT(url);
     if (!isPathnameUrl(*url) ||
         (osl::FileBase::getFileURLFromSystemPath(
-            url->copy(RTL_CONSTASCII_LENGTH(VND_SUN_STAR_PATHNAME)), *url) ==
+            url->copy(VND_SUN_STAR_PATHNAME.size()), *url) ==
          osl::FileBase::E_None))
     {
         return true;
@@ -81,9 +89,9 @@ bool resolvePathnameUrl(OUString * url)
     return false;
 }
 
-enum LookupMode {
-    LOOKUP_MODE_NORMAL, LOOKUP_MODE_URE_BOOTSTRAP,
-    LOOKUP_MODE_URE_BOOTSTRAP_EXPANSION };
+enum class LookupMode {
+    NORMAL, URE_BOOTSTRAP,
+    URE_BOOTSTRAP_EXPANSION };
 
 struct ExpandRequestLink {
     ExpandRequestLink const * next;
@@ -92,11 +100,11 @@ struct ExpandRequestLink {
 };
 
 OUString expandMacros(
-    Bootstrap_Impl const * file, OUString const & text, LookupMode mode,
+    Bootstrap_Impl const * file, std::u16string_view text, LookupMode mode,
     ExpandRequestLink const * requestStack);
 
 OUString recursivelyExpandMacros(
-    Bootstrap_Impl const * file, OUString const & text, LookupMode mode,
+    Bootstrap_Impl const * file, std::u16string_view text, LookupMode mode,
     Bootstrap_Impl const * requestFile, OUString const & requestKey,
     ExpandRequestLink const * requestStack)
 {
@@ -118,9 +126,9 @@ struct rtl_bootstrap_NameValue
 
     rtl_bootstrap_NameValue()
         {}
-    rtl_bootstrap_NameValue(OUString const & name, OUString const & value )
-        : sName( name ),
-          sValue( value )
+    rtl_bootstrap_NameValue(OUString name, OUString value )
+        : sName(std::move( name )),
+          sValue(std::move( value ))
         {}
 };
 
@@ -223,6 +231,9 @@ static OUString & getIniFileName_Impl()
         // .apk (zip) archive as the /assets/rc file.
         fileName = OUString("vnd.sun.star.pathname:/assets/rc");
         resolvePathnameUrl(&fileName);
+#elif defined(EMSCRIPTEN)
+        fileName = OUString("vnd.sun.star.pathname:/instdir/program/sofficerc");
+        resolvePathnameUrl(&fileName);
 #else
         if (getFromCommandLineArgs("INIFILENAME", &fileName))
         {
@@ -235,14 +246,14 @@ static OUString & getIniFileName_Impl()
             // get rid of a potential executable extension
             OUString progExt = ".bin";
             if (fileName.getLength() > progExt.getLength()
-                && fileName.copy(fileName.getLength() - progExt.getLength()).equalsIgnoreAsciiCase(progExt))
+                && o3tl::equalsIgnoreAsciiCase(fileName.subView(fileName.getLength() - progExt.getLength()), progExt))
             {
                 fileName = fileName.copy(0, fileName.getLength() - progExt.getLength());
             }
 
             progExt = ".exe";
             if (fileName.getLength() > progExt.getLength()
-                && fileName.copy(fileName.getLength() - progExt.getLength()).equalsIgnoreAsciiCase(progExt))
+                && o3tl::equalsIgnoreAsciiCase(fileName.subView(fileName.getLength() - progExt.getLength()), progExt))
             {
                 fileName = fileName.copy(0, fileName.getLength() - progExt.getLength());
             }
@@ -345,8 +356,8 @@ Bootstrap_Impl::Bootstrap_Impl( OUString const & rIniName )
             if (nIndex >= 1)
             {
                 struct rtl_bootstrap_NameValue nameValue;
-                nameValue.sName = OStringToOUString(line.copy(0,nIndex).trim(), RTL_TEXTENCODING_ASCII_US);
-                nameValue.sValue = OStringToOUString(line.copy(nIndex+1).trim(), RTL_TEXTENCODING_UTF8);
+                nameValue.sName = OStringToOUString(o3tl::trim(line.subView(0,nIndex)), RTL_TEXTENCODING_ASCII_US);
+                nameValue.sValue = OStringToOUString(o3tl::trim(line.subView(nIndex+1)), RTL_TEXTENCODING_UTF8);
 
                 SAL_INFO("sal.bootstrap", "pushing: name=" << nameValue.sName << " value=" << nameValue.sValue);
 
@@ -394,7 +405,7 @@ struct FundamentalIniData
         OUString uri;
         ini =
             (get_static_bootstrap_handle()->getValue(
-                "URE_BOOTSTRAP", &uri.pData, nullptr, LOOKUP_MODE_NORMAL, false,
+                "URE_BOOTSTRAP", &uri.pData, nullptr, LookupMode::NORMAL, false,
                 nullptr)
              && resolvePathnameUrl(&uri))
             ? rtl_bootstrap_args_open(uri.pData) : nullptr;
@@ -419,8 +430,8 @@ bool Bootstrap_Impl::getValue(
     LookupMode mode, bool override, ExpandRequestLink const * requestStack)
     const
 {
-    if (mode == LOOKUP_MODE_NORMAL && key == "URE_BOOTSTRAP")
-        mode = LOOKUP_MODE_URE_BOOTSTRAP;
+    if (mode == LookupMode::NORMAL && key == "URE_BOOTSTRAP")
+        mode =  LookupMode::URE_BOOTSTRAP;
 
     if (override && getDirectValue(key, value, mode, requestStack))
         return true;
@@ -449,7 +460,7 @@ bool Bootstrap_Impl::getValue(
         return true;
     }
 
-#ifdef ANDROID
+#if defined ANDROID || defined EMSCRIPTEN
     if (key == "APP_DATA_DIR")
     {
         const char *app_data_dir = lo_get_app_data_dir();
@@ -511,7 +522,7 @@ bool Bootstrap_Impl::getValue(
     if (!override && getDirectValue(key, value, mode, requestStack))
         return true;
 
-    if (mode == LOOKUP_MODE_NORMAL)
+    if (mode == LookupMode::NORMAL)
     {
         FundamentalIniData const & d = FundamentalIni();
         Bootstrap_Impl const * b = static_cast<Bootstrap_Impl const *>(d.ini);
@@ -572,12 +583,12 @@ void Bootstrap_Impl::expandValue(
 {
     rtl_uString_assign(
         value,
-        (mode == LOOKUP_MODE_URE_BOOTSTRAP && isPathnameUrl(text) ?
+        (mode ==  LookupMode::URE_BOOTSTRAP && isPathnameUrl(text) ?
          text :
          recursivelyExpandMacros(
              this, text,
-             (mode == LOOKUP_MODE_URE_BOOTSTRAP ?
-              LOOKUP_MODE_URE_BOOTSTRAP_EXPANSION : mode),
+             (mode ==  LookupMode::URE_BOOTSTRAP ?
+               LookupMode::URE_BOOTSTRAP_EXPANSION : mode),
              requestFile, requestKey, requestStack)).pData);
 }
 
@@ -691,7 +702,7 @@ sal_Bool SAL_CALL rtl_bootstrap_get_from_handle(
             handle = get_static_bootstrap_handle();
 
         found = static_cast< Bootstrap_Impl * >(handle)->getValue(
-            pName, ppValue, pDefault, LOOKUP_MODE_NORMAL, false, nullptr );
+            pName, ppValue, pDefault,  LookupMode::NORMAL, false, nullptr );
     }
 
     return found;
@@ -754,7 +765,7 @@ void SAL_CALL rtl_bootstrap_set (
         }
     }
 
-    SAL_INFO("sal.bootstrap", "explicitly getting: name=" << name << " value=" <<value);
+    SAL_INFO("sal.bootstrap", "explicitly setting: name=" << name << " value=" <<value);
 
     rtl_bootstrap_set_vector.emplace_back(name, value);
 }
@@ -768,7 +779,7 @@ void SAL_CALL rtl_bootstrap_expandMacros_from_handle(
 
     OUString expanded(expandMacros(static_cast< Bootstrap_Impl * >(handle),
                                    OUString::unacquired(macro),
-                                   LOOKUP_MODE_NORMAL, nullptr));
+                                    LookupMode::NORMAL, nullptr));
     rtl_uString_assign(macro, expanded.pData);
 }
 
@@ -803,14 +814,14 @@ int hex(sal_Unicode c)
         c >= 'a' && c <= 'f' ? c - 'a' + 10 : -1;
 }
 
-sal_Unicode read(OUString const & text, sal_Int32 * pos, bool * escaped)
+sal_Unicode read(std::u16string_view text, std::size_t * pos, bool * escaped)
 {
-    OSL_ASSERT(pos && *pos >= 0 && *pos < text.getLength() && escaped);
+    OSL_ASSERT(pos && *pos < text.length() && escaped);
     sal_Unicode c = text[(*pos)++];
     if (c == '\\')
     {
         int n1, n2, n3, n4;
-        if (*pos < text.getLength() - 4 && text[*pos] == 'u' &&
+        if (*pos < text.length() - 4 && text[*pos] == 'u' &&
             ((n1 = hex(text[*pos + 1])) >= 0) &&
             ((n2 = hex(text[*pos + 2])) >= 0) &&
             ((n3 = hex(text[*pos + 3])) >= 0) &&
@@ -822,7 +833,7 @@ sal_Unicode read(OUString const & text, sal_Int32 * pos, bool * escaped)
                 (n1 << 12) | (n2 << 8) | (n3 << 4) | n4);
         }
 
-        if (*pos < text.getLength())
+        if (*pos < text.length())
         {
             *escaped = true;
             return text[(*pos)++];
@@ -844,13 +855,13 @@ OUString lookup(
 }
 
 OUString expandMacros(
-    Bootstrap_Impl const * file, OUString const & text, LookupMode mode,
+    Bootstrap_Impl const * file, std::u16string_view text, LookupMode mode,
     ExpandRequestLink const * requestStack)
 {
-    SAL_INFO("sal.bootstrap", "expandMacros called with: " << text);
+    SAL_INFO("sal.bootstrap", "expandMacros called with: " << OUString(text));
     OUStringBuffer buf(2048);
 
-    for (sal_Int32 i = 0; i < text.getLength();)
+    for (std::size_t i = 0; i < text.length();)
     {
         bool escaped;
         sal_Unicode c = read(text, &i, &escaped);
@@ -860,17 +871,17 @@ OUString expandMacros(
         }
         else
         {
-            if (i < text.getLength() && text[i] == '{')
+            if (i < text.length() && text[i] == '{')
             {
                 ++i;
-                sal_Int32 p = i;
+                std::size_t p = i;
                 sal_Int32 nesting = 0;
                 OUString seg[3];
                 int n = 0;
 
-                while (i < text.getLength())
+                while (i < text.length())
                 {
-                    sal_Int32 j = i;
+                    std::size_t j = i;
                     c = read(text, &i, &escaped);
 
                     if (!escaped)
@@ -883,7 +894,7 @@ OUString expandMacros(
                             case '}':
                                 if (nesting == 0)
                                 {
-                                    seg[n++] = text.copy(p, j - p);
+                                    seg[n++] = text.substr(p, j - p);
                                     goto done;
                                 }
                                 else
@@ -894,7 +905,7 @@ OUString expandMacros(
                             case ':':
                                 if (nesting == 0 && n < 2)
                                 {
-                                    seg[n++] = text.copy(p, j - p);
+                                    seg[n++] = text.substr(p, j - p);
                                     p = i;
                                 }
                                 break;
@@ -950,10 +961,10 @@ OUString expandMacros(
             }
             else
             {
-                OUStringBuffer kbuf(text.getLength());
-                for (; i < text.getLength();)
+                OUStringBuffer kbuf(sal_Int32(text.length()));
+                for (; i < text.length();)
                 {
-                    sal_Int32 j = i;
+                    std::size_t j = i;
                     c = read(text, &j, &escaped);
                     if (!escaped &&
                         (c == ' ' || c == '$' || c == '-' || c == '/' ||

@@ -44,9 +44,6 @@ typedef struct _timeval {
 # include <sys/time.h>
 #endif
 
-#define VIRTUAL_DESKTOP_WIDTH 1024
-#define VIRTUAL_DESKTOP_HEIGHT 768
-
 #ifdef IOS
 #define SvpSalInstance AquaSalInstance
 #endif
@@ -100,8 +97,6 @@ public:
     virtual bool IsCurrentThread() const override;
 };
 
-SalInstance* svp_create_SalInstance();
-
 // NOTE: the functions IsMainThread, DoYield and Wakeup *require* the use of
 // SvpSalYieldMutex; if a subclass uses something else it must override these
 // (Wakeup is only called by SvpSalTimer and SvpSalFrame)
@@ -117,6 +112,7 @@ class VCL_DLLPUBLIC SvpSalInstance : public SalGenericInstance, public SalUserEv
 
     virtual void            TriggerUserEventProcessing() override;
     virtual void            ProcessEvent( SalUserEvent aEvent ) override;
+    bool ImplYield(bool bWait, bool bHandleAllCurrentEvents);
 
 public:
     static SvpSalInstance*  s_pDefaultInstance;

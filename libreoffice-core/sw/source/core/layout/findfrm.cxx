@@ -40,6 +40,8 @@
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <IDocumentSettingAccess.hxx>
+#include <formatflysplit.hxx>
+#include <flyfrms.hxx>
 
 
 /// Searches the first ContentFrame in BodyText below the page.
@@ -307,7 +309,19 @@ static const SwFrame* lcl_FindLayoutFrame( const SwFrame* pFrame, bool bNext )
 {
     const SwFrame* pRet = nullptr;
     if ( pFrame->IsFlyFrame() )
-        pRet = bNext ? static_cast<const SwFlyFrame*>(pFrame)->GetNextLink() : static_cast<const SwFlyFrame*>(pFrame)->GetPrevLink();
+    {
+        auto pFlyFrame = static_cast<const SwFlyFrame*>(pFrame);
+        if (pFlyFrame->IsFlySplitAllowed())
+        {
+            // This is a flow frame, look up the follow/precede.
+            auto pFlyAtContent = static_cast<const SwFlyAtContentFrame*>(pFlyFrame);
+            pRet = bNext ? pFlyAtContent->GetFollow() : pFlyAtContent->GetPrecede();
+        }
+        else
+        {
+            pRet = bNext ? pFlyFrame->GetNextLink() : pFlyFrame->GetPrevLink();
+        }
+    }
     else
         pRet = bNext ? pFrame->GetNext() : pFrame->GetPrev();
 
@@ -337,6 +351,8 @@ const SwLayoutFrame *SwFrame::ImplGetNextLayoutLeaf( bool bFwd ) const
     const SwLayoutFrame *pLayoutFrame = nullptr;
     const SwFrame       *p = nullptr;
     bool bGoingUp = !bFwd;          // false for forward, true for backward
+    // The anchor is this frame, unless we traverse the anchor of a split fly.
+    const SwFrame* pAnchor = this;
     do {
 
          bool bGoingFwdOrBwd = false;
@@ -359,6 +375,21 @@ const SwLayoutFrame *SwFrame::ImplGetNextLayoutLeaf( bool bFwd ) const
                  // I cannot go forward, because there is no next frame.
                  // I'll try to go up:
                  p = pFrame->GetUpper();
+
+                 if (!p && pFrame->IsFlyFrame())
+                 {
+                     const SwFlyFrame* pFlyFrame = pFrame->FindFlyFrame();
+                     if (pFlyFrame->IsFlySplitAllowed())
+                     {
+                         p = const_cast<SwFlyFrame*>(pFlyFrame)->FindAnchorCharFrame();
+                         // Remember the anchor frame, so if we look for the leaf of a frame in a
+                         // split fly (anchored in the master of a text frame, but rendered on the
+                         // next page), we won't return a frame on the next page, rather return
+                         // nullptr.
+                         pAnchor = p;
+                     }
+                 }
+
                  bGoingUp = nullptr != p;
                  if ( !bGoingUp )
                  {
@@ -377,7 +408,7 @@ const SwLayoutFrame *SwFrame::ImplGetNextLayoutLeaf( bool bFwd ) const
     } while( ( p && !p->IsFlowFrame() ) ||
              pFrame == this ||
              nullptr == ( pLayoutFrame = pFrame->IsLayoutFrame() ? static_cast<const SwLayoutFrame*>(pFrame) : nullptr ) ||
-             pLayoutFrame->IsAnLower( this ) );
+             pLayoutFrame->IsAnLower( pAnchor ) );
 
     return pLayoutFrame;
 }
@@ -462,8 +493,8 @@ SwFootnoteBossFrame* SwFrame::FindFootnoteBossFrame( bool bFootnotes )
     SwFrame *pRet = this;
     // Footnote bosses can't exist inside a table; also sections with columns
     // don't contain footnote texts there
-    if( pRet->IsInTab() )
-        pRet = pRet->FindTabFrame();
+    if (SwFrame *pTabFrame = pRet->IsInTab() ? pRet->FindTabFrame() : nullptr)
+        pRet = pTabFrame;
 
     // tdf139336: put the footnotes into the page frame (instead of a column frame)
     // to avoid maximizing the section to the full page.... if:
@@ -1447,9 +1478,10 @@ bool SwFrame::IsMoveable( const SwLayoutFrame* _pLayoutFrame ) const
             {
                 if ( _pLayoutFrame->IsInFly() )
                 {
-                    // if fly frame has a follow (next linked fly frame),
+                    // if fly frame has a follow (next linked fly frame) or can split,
                     // frame is moveable.
-                    if ( const_cast<SwLayoutFrame*>(_pLayoutFrame)->FindFlyFrame()->GetNextLink() )
+                    SwFlyFrame* pFlyFrame = const_cast<SwLayoutFrame*>(_pLayoutFrame)->FindFlyFrame();
+                    if ( pFlyFrame->GetNextLink() || pFlyFrame->IsFlySplitAllowed() )
                     {
                         bRetVal = true;
                     }

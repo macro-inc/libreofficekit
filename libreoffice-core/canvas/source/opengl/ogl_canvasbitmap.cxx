@@ -9,7 +9,9 @@
 
 #include <sal/config.h>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+
+#include <utility>
 
 #include "ogl_canvasbitmap.hxx"
 
@@ -19,9 +21,9 @@ using namespace ::com::sun::star;
 namespace oglcanvas
 {
     CanvasBitmap::CanvasBitmap( const geometry::IntegerSize2D& rSize,
-                                const SpriteCanvasRef&         rDevice,
+                                SpriteCanvasRef                rDevice,
                                 SpriteDeviceHelper&            rDeviceHelper ) :
-        mpDevice( rDevice )
+        mpDevice(std::move( rDevice ))
     {
         ENSURE_OR_THROW( mpDevice.is(),
                          "CanvasBitmap::CanvasBitmap(): Invalid surface or device" );

@@ -45,7 +45,7 @@
 #include <com/sun/star/container/XChild.hpp>
 
 #include <comphelper/types.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/sharedunocomponent.hxx>
 #include <algorithm>
 #include <string_view>
@@ -814,7 +814,7 @@ void collectColumnInformation(const Reference< XConnection>& _xConnection,
     {
         ::utl::SharedUNOComponent< XStatement > xStmt( _xConnection->createStatement() );
         Reference< XPropertySet > xStatementProps( xStmt, UNO_QUERY_THROW );
-        xStatementProps->setPropertyValue( OMetaConnection::getPropMap().getNameByIndex( PROPERTY_ID_ESCAPEPROCESSING ), makeAny( false ) );
+        xStatementProps->setPropertyValue( OMetaConnection::getPropMap().getNameByIndex( PROPERTY_ID_ESCAPEPROCESSING ), Any( false ) );
         Reference< XResultSet > xResult( xStmt->executeQuery( sSelect ), UNO_SET_THROW );
         Reference< XResultSetMetaDataSupplier > xSuppMeta( xResult, UNO_QUERY_THROW );
         Reference< XResultSetMetaData > xMeta( xSuppMeta->getMetaData(), UNO_SET_THROW );
@@ -945,33 +945,19 @@ sal_Int32 DBTypeConversion::convertUnicodeStringToLength( const OUString& _rSour
 
     return nLen;
 }
-static OUString lcl_getReportEngines()
-{
-    return "org.openoffice.Office.DataAccess/ReportEngines";
-}
-
-static OUString lcl_getDefaultReportEngine()
-{
-    return "DefaultReportEngine";
-}
-
-static OUString lcl_getReportEngineNames()
-{
-    return "ReportEngineNames";
-}
 
 OUString getDefaultReportEngineServiceName(const Reference< XComponentContext >& _rxORB)
 {
     ::utl::OConfigurationTreeRoot aReportEngines = ::utl::OConfigurationTreeRoot::createWithComponentContext(
-        _rxORB, lcl_getReportEngines(), -1, ::utl::OConfigurationTreeRoot::CM_READONLY);
+        _rxORB, "org.openoffice.Office.DataAccess/ReportEngines", -1, ::utl::OConfigurationTreeRoot::CM_READONLY);
 
     if ( aReportEngines.isValid() )
     {
         OUString sDefaultReportEngineName;
-        aReportEngines.getNodeValue(lcl_getDefaultReportEngine()) >>= sDefaultReportEngineName;
+        aReportEngines.getNodeValue("DefaultReportEngine") >>= sDefaultReportEngineName;
         if ( !sDefaultReportEngineName.isEmpty() )
         {
-            ::utl::OConfigurationNode aReportEngineNames = aReportEngines.openNode(lcl_getReportEngineNames());
+            ::utl::OConfigurationNode aReportEngineNames = aReportEngines.openNode("ReportEngineNames");
             if ( aReportEngineNames.isValid() )
             {
                 ::utl::OConfigurationNode aReportEngine = aReportEngineNames.openNode(sDefaultReportEngineName);

@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_REGISTRY_SOURCE_REGIMPL_HXX
-#define INCLUDED_REGISTRY_SOURCE_REGIMPL_HXX
+#pragma once
 
 #include <sal/config.h>
 
@@ -40,7 +39,6 @@
     osl::Guard< osl::Mutex > aGuard( mutex );
 
 class ORegKey;
-class RegistryTypeReader;
 
 class ORegistry
 {
@@ -76,11 +74,6 @@ public:
 
     RegError    deleteKey(RegKeyHandle hKey, std::u16string_view keyName);
 
-    RegError    loadKey(RegKeyHandle hKey,
-                        const OUString& regFileName,
-                        bool bWarnings,
-                        bool bReport);
-
     RegError    dumpRegistry(RegKeyHandle hKey) const;
 
     ~ORegistry();
@@ -102,33 +95,9 @@ public:
     friend class ORegKey;
 
 private:
-    RegError    eraseKey(ORegKey* pKey, const OUString& keyName);
+    RegError    eraseKey(ORegKey* pKey, std::u16string_view keyName);
 
     RegError    deleteSubkeysAndValues(ORegKey* pKey);
-
-    static RegError loadAndSaveValue(ORegKey* pTargetKey,
-                                 ORegKey const * pSourceKey,
-                                 const OUString& valueName,
-                                 sal_uInt32 nCut,
-                                 bool bWarnings,
-                                 bool bReport);
-
-    static RegError checkBlop(store::OStoreStream& rValue,
-                          std::u16string_view sTargetPath,
-                          sal_uInt32 srcValueSize,
-                          sal_uInt8 const * pSrcBuffer,
-                          bool bReport);
-
-    static RegError mergeModuleValue(store::OStoreStream& rTargetValue,
-                                 RegistryTypeReader const & reader,
-                                 RegistryTypeReader const & reader2);
-
-    RegError    loadAndSaveKeys(ORegKey* pTargetKey,
-                                ORegKey* pSourceKey,
-                                const OUString& keyName,
-                                sal_uInt32 nCut,
-                                bool bWarnings,
-                                bool bReport);
 
     RegError    dumpValue(const OUString& sPath,
                           const OUString& sName,
@@ -150,7 +119,5 @@ private:
 
     static constexpr OUStringLiteral ROOT { u"/" };
 };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

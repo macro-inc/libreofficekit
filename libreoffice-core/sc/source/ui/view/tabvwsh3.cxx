@@ -516,12 +516,50 @@ void ScTabViewShell::Execute( SfxRequest& rReq )
             break;
 
         case SID_CURRENTTAB:
-            if ( pReqArgs )
             {
-                // sheet for basic is one-based
-                SCTAB nTab = static_cast<const SfxUInt16Item&>(pReqArgs->Get(nSlot)).GetValue() - 1;
-                ScDocument& rDoc = GetViewData().GetDocument();
-                if ( nTab < rDoc.GetTableCount() )
+                SCTAB nTab;
+                ScViewData& rViewData = GetViewData();
+                ScDocument& rDoc = rViewData.GetDocument();
+                SCTAB nTabCount = rDoc.GetTableCount();
+                if ( pReqArgs ) // command from Navigator with nTab
+                {
+                    // sheet for basic is one-based
+                    nTab = static_cast<const SfxUInt16Item&>(pReqArgs->Get(nSlot)).GetValue() - 1;
+                }
+                else            // command from Menu: ask for nTab
+                {
+                    ScAbstractDialogFactory* pFact = ScAbstractDialogFactory::Create();
+
+                    ScopedVclPtr<AbstractScGoToTabDlg> pDlg(pFact->CreateScGoToTabDlg(GetFrameWeld()));
+                    pDlg->SetDescription(
+                        ScResId( STR_DLG_SELECTTABLE_TITLE ),
+                        ScResId( STR_DLG_SELECTTABLE_MASK ),
+                        ScResId( STR_DLG_SELECTTABLE_LBNAME ),
+                        GetStaticInterface()->GetSlot(SID_CURRENTTAB)->GetCommand(), HID_GOTOTABLEMASK, HID_GOTOTABLE );
+
+                    // fill all table names and select current tab
+                    OUString aTabName;
+                    for( nTab = 0; nTab < nTabCount; ++nTab )
+                    {
+                        if( rDoc.IsVisible( nTab ) )
+                        {
+                            rDoc.GetName( nTab, aTabName );
+                            pDlg->Insert( aTabName, rViewData.GetTabNo() == nTab );
+                        }
+                    }
+
+                    if( pDlg->Execute() == RET_OK )
+                    {
+                        if( !rDoc.GetTable( pDlg->GetSelectedEntry(), nTab ) )
+                            nTab = nTabCount;
+                        pDlg.disposeAndClear();
+                    }
+                    else
+                    {
+                        rReq.Ignore();
+                    }
+                }
+                if ( nTab < nTabCount )
                 {
                     SetTabNo( nTab );
                     rBindings.Update( nSlot );
@@ -716,12 +754,12 @@ void ScTabViewShell::Execute( SfxRequest& rReq )
                     //  and can't be changed directly
 
                     const Fraction& rOldY = GetViewData().GetZoomY();
-                    tools::Long nOld = tools::Long(rOldY * 100);
-                    tools::Long nNew;
+                    sal_uInt16 nOld = tools::Long(rOldY * 100);
+                    sal_uInt16 nNew;
                     if (SID_ZOOM_OUT == nSlot)
-                        nNew = std::max(tools::Long(MINZOOM), basegfx::zoomtools::zoomOut(nOld));
+                        nNew = std::max(MINZOOM, basegfx::zoomtools::zoomOut(nOld));
                     else
-                        nNew = std::min(tools::Long(MAXZOOM), basegfx::zoomtools::zoomIn(nOld));
+                        nNew = std::min(MAXZOOM, basegfx::zoomtools::zoomIn(nOld));
                     if ( nNew != nOld)
                     {
                         bool bSyncZoom = SC_MOD()->GetAppOptions().GetSynchronizeZoom();

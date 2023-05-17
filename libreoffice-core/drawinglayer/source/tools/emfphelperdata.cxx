@@ -29,6 +29,7 @@
 #include "emfpstringformat.hxx"
 #include <basegfx/curve/b2dcubicbezier.hxx>
 #include <wmfemfhelper.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokeArrowPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/unifiedtransparenceprimitive2d.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
@@ -79,6 +80,7 @@ namespace emfplushelper
             case EmfPlusRecordTypeDrawRects: return "EmfPlusRecordTypeDrawRects";
             case EmfPlusRecordTypeFillPolygon: return "EmfPlusRecordTypeFillPolygon";
             case EmfPlusRecordTypeDrawLines: return "EmfPlusRecordTypeDrawLines";
+            case EmfPlusRecordTypeFillClosedCurve: return "EmfPlusRecordTypeFillClosedCurve";
             case EmfPlusRecordTypeFillEllipse: return "EmfPlusRecordTypeFillEllipse";
             case EmfPlusRecordTypeDrawEllipse: return "EmfPlusRecordTypeDrawEllipse";
             case EmfPlusRecordTypeFillPie: return "EmfPlusRecordTypeFillPie";
@@ -88,6 +90,7 @@ namespace emfplushelper
             case EmfPlusRecordTypeFillPath: return "EmfPlusRecordTypeFillPath";
             case EmfPlusRecordTypeDrawPath: return "EmfPlusRecordTypeDrawPath";
             case EmfPlusRecordTypeDrawBeziers: return "EmfPlusRecordTypeDrawBeziers";
+            case EmfPlusRecordTypeDrawClosedCurve: return "EmfPlusRecordTypeDrawClosedCurve";
             case EmfPlusRecordTypeDrawImage: return "EmfPlusRecordTypeDrawImage";
             case EmfPlusRecordTypeDrawImagePoints: return "EmfPlusRecordTypeDrawImagePoints";
             case EmfPlusRecordTypeDrawString: return "EmfPlusRecordTypeDrawString";
@@ -490,22 +493,101 @@ namespace emfplushelper
         map[ index ] = state;
     }
 
-    void EmfPlusHelperData::GraphicStatePop(GraphicStateMap& map, sal_Int32 index, wmfemfhelper::PropertyHolder& rState)
+    void EmfPlusHelperData::GraphicStatePop(GraphicStateMap& map, sal_Int32 index)
     {
-        GraphicStateMap::iterator iter = map.find( index );
+        GraphicStateMap::iterator iter = map.find(index);
 
-        if ( iter != map.end() )
+        if (iter != map.end())
         {
             wmfemfhelper::PropertyHolder state = iter->second;
 
             maWorldTransform = state.getTransformation();
-            rState.setClipPolyPolygon( state.getClipPolyPolygon() );
+            if (state.getClipPolyPolygonActive())
+            {
+                SAL_INFO("drawinglayer.emf",
+                        "EMF+\t Restore clipping region to saved in index: " << index);
+                wmfemfhelper::HandleNewClipRegion(state.getClipPolyPolygon(), mrTargetHolders,
+                                                  mrPropertyHolders);
+            }
+            else
+            {
+                SAL_INFO("drawinglayer.emf", "EMF+\t Disable clipping");
+                wmfemfhelper::HandleNewClipRegion(::basegfx::B2DPolyPolygon(), mrTargetHolders,
+                                                  mrPropertyHolders);
+            }
             mappingChanged();
-            SAL_INFO("drawinglayer.emf", "EMF+\t\tStack index: " << index << " found, maWorldTransform: " << maWorldTransform);
+            SAL_INFO("drawinglayer.emf",
+                    "EMF+\t\tStack index: " << index
+                                            << " found, maWorldTransform: " << maWorldTransform);
         }
     }
 
-    void EmfPlusHelperData::EMFPPlusDrawPolygon(const ::basegfx::B2DPolyPolygon& polygon, sal_uInt32 penIndex)
+    drawinglayer::attribute::LineStartEndAttribute
+    EmfPlusHelperData::CreateLineEnd(const sal_Int32 aCap, const float aPenWidth) const
+    {
+        const double pw = mdExtractedYScale * aPenWidth;
+        if (aCap == LineCapTypeSquare)
+        {
+            basegfx::B2DPolygon aCapPolygon(
+                { {-1.0, -1.0}, {1.0, -1.0}, {1.0, 1.0}, {-1.0, 1.0} });
+            aCapPolygon.setClosed(true);
+            return drawinglayer::attribute::LineStartEndAttribute(
+                pw, basegfx::B2DPolyPolygon(aCapPolygon), true);
+        }
+        else if (aCap == LineCapTypeRound)
+        {
+            basegfx::B2DPolygon aCapPolygon(
+                { {-1.0, 1.0}, {1.0, 1.0}, {1.0, 0.0}, {0.9236, -0.3827},
+                  {0.7071, -0.7071}, {0.3827, -0.9236}, {0.0, -1.0}, {-0.3827, -0.9236},
+                  {-0.7071, -0.7071}, {-0.9236, -0.3827}, {-1.0, 0.0} });
+            aCapPolygon.setClosed(true);
+            return drawinglayer::attribute::LineStartEndAttribute(
+                pw, basegfx::B2DPolyPolygon(aCapPolygon), true);
+        }
+        else if (aCap == LineCapTypeTriangle)
+        {
+            basegfx::B2DPolygon aCapPolygon(
+                { {-1.0, 1.0}, {1.0, 1.0}, {1.0, 0.0}, {0.0, -1.0}, {-1.0, 0.0} });
+            aCapPolygon.setClosed(true);
+            return drawinglayer::attribute::LineStartEndAttribute(
+                pw, basegfx::B2DPolyPolygon(aCapPolygon), true);
+        }
+        else if (aCap == LineCapTypeSquareAnchor)
+        {
+            basegfx::B2DPolygon aCapPolygon(
+                { {-1.0, -1.0}, {1.0, -1.0}, {1.0, 1.0}, {-1.0, 1.0} });
+            aCapPolygon.setClosed(true);
+            return drawinglayer::attribute::LineStartEndAttribute(
+                1.5 * pw, basegfx::B2DPolyPolygon(aCapPolygon), true);
+        }
+        else if (aCap == LineCapTypeRoundAnchor)
+        {
+            const basegfx::B2DPolygon aCapPolygon
+                = ::basegfx::utils::createPolygonFromEllipse(::basegfx::B2DPoint(0.0, 0.0), 1.0, 1.0);
+            return drawinglayer::attribute::LineStartEndAttribute(
+                2.0 * pw, basegfx::B2DPolyPolygon(aCapPolygon), true);
+        }
+        else if (aCap == LineCapTypeDiamondAnchor)
+        {
+            basegfx::B2DPolygon aCapPolygon({ {0.0, -1.0}, {1.0, 0.0}, {0.5, 0.5},
+                                              {0.5, 1.0}, {-0.5, 1.0}, {-0.5, 0.5},
+                                              {-1.0, 0.0} });
+            aCapPolygon.setClosed(true);
+            return drawinglayer::attribute::LineStartEndAttribute(
+                2.0 * pw, basegfx::B2DPolyPolygon(aCapPolygon), true);
+        }
+        else if (aCap == LineCapTypeArrowAnchor)
+        {
+            basegfx::B2DPolygon aCapPolygon({ {0.0, -1.0}, {1.0, 1.0}, {-1.0, 1.0} });
+            aCapPolygon.setClosed(true);
+            return drawinglayer::attribute::LineStartEndAttribute(
+                2.0 * pw, basegfx::B2DPolyPolygon(aCapPolygon), true);
+        }
+        return drawinglayer::attribute::LineStartEndAttribute();
+    }
+
+    void EmfPlusHelperData::EMFPPlusDrawPolygon(const ::basegfx::B2DPolyPolygon& polygon,
+                                                sal_uInt32 penIndex)
     {
         const EMFPPen* pen = dynamic_cast<EMFPPen*>(maEMFPObjects[penIndex & 0xff].get());
         SAL_WARN_IF(!pen, "drawinglayer.emf", "emf+ missing pen");
@@ -513,132 +595,73 @@ namespace emfplushelper
         if (!(pen && polygon.count()))
             return;
 
-        // we need a line cap attribute
-        css::drawing::LineCap lineCap = css::drawing::LineCap_BUTT;
-        if (pen->penDataFlags & EmfPlusPenDataStartCap) // additional line cap information
+        const double transformedPenWidth = mdExtractedYScale * pen->penWidth;
+        drawinglayer::attribute::LineAttribute lineAttribute(
+            pen->GetColor().getBColor(), transformedPenWidth, pen->maLineJoin,
+            css::drawing::LineCap_BUTT, //TODO implement PenDataDashedLineCap support here
+            pen->fMiterMinimumAngle);
+
+        drawinglayer::attribute::LineStartEndAttribute aStart;
+        if (pen->penDataFlags & EmfPlusPenDataStartCap)
         {
-            lineCap = static_cast<css::drawing::LineCap>(EMFPPen::lcl_convertStrokeCap(pen->startCap));
-            SAL_WARN_IF(pen->startCap != pen->endCap, "drawinglayer.emf", "emf+ pen uses different start and end cap");
+            if ((pen->penDataFlags & EmfPlusPenDataCustomStartCap)
+                && (pen->customStartCap->polygon.begin()->count() > 1))
+                aStart = drawinglayer::attribute::LineStartEndAttribute(
+                    pen->customStartCap->polygon.getB2DRange().getRange().getX() * mdExtractedXScale
+                        * pen->customStartCap->widthScale * pen->penWidth,
+                    pen->customStartCap->polygon, false);
+            else
+                aStart = EmfPlusHelperData::CreateLineEnd(pen->startCap, pen->penWidth);
         }
 
-        const double transformedPenWidth = mdExtractedYScale * pen->penWidth;
-        drawinglayer::attribute::LineAttribute lineAttribute(pen->GetColor().getBColor(),
-                                                             transformedPenWidth,
-                                                             pen->GetLineJoinType(),
-                                                             lineCap,
-                                                             basegfx::deg2rad(15.0)); // TODO Add MiterLimit support
-        if (!pen->GetColor().IsTransparent())
+        drawinglayer::attribute::LineStartEndAttribute aEnd;
+        if (pen->penDataFlags & EmfPlusPenDataEndCap)
         {
+            if ((pen->penDataFlags & EmfPlusPenDataCustomEndCap)
+                && (pen->customEndCap->polygon.begin()->count() > 1))
+                aEnd = drawinglayer::attribute::LineStartEndAttribute(
+                    pen->customEndCap->polygon.getB2DRange().getRange().getX() * mdExtractedXScale
+                        * pen->customEndCap->widthScale * pen->penWidth,
+                    pen->customEndCap->polygon, false);
+            else
+                aEnd = EmfPlusHelperData::CreateLineEnd(pen->endCap, pen->penWidth);
+        }
+
+        if (pen->GetColor().IsTransparent())
+        {
+            drawinglayer::primitive2d::Primitive2DContainer aContainer;
+            if (aStart.isDefault() && aEnd.isDefault())
+                aContainer.append(drawinglayer::primitive2d::Primitive2DReference(
+                    new drawinglayer::primitive2d::PolyPolygonStrokePrimitive2D(
+                        polygon, lineAttribute, pen->GetStrokeAttribute(mdExtractedXScale))));
+            else
+            {
+                aContainer.resize(polygon.count());
+                for (sal_uInt32 i = 0; i < polygon.count(); i++)
+                    aContainer[i] = drawinglayer::primitive2d::Primitive2DReference(
+                        new drawinglayer::primitive2d::PolygonStrokeArrowPrimitive2D(
+                            polygon.getB2DPolygon(i), lineAttribute,
+                            pen->GetStrokeAttribute(mdExtractedXScale), aStart, aEnd));
+            }
             mrTargetHolders.Current().append(
-                new drawinglayer::primitive2d::PolyPolygonStrokePrimitive2D(
-                    polygon,
-                    lineAttribute,
-                    pen->GetStrokeAttribute(mdExtractedXScale)));
+                new drawinglayer::primitive2d::UnifiedTransparencePrimitive2D(
+                    std::move(aContainer), (255 - pen->GetColor().GetAlpha()) / 255.0));
         }
         else
         {
-            const drawinglayer::primitive2d::Primitive2DReference aPrimitive(
-                        new drawinglayer::primitive2d::PolyPolygonStrokePrimitive2D(
-                            polygon,
-                            lineAttribute,
-                            pen->GetStrokeAttribute(mdExtractedXScale)));
-
-            mrTargetHolders.Current().append(
-                        new drawinglayer::primitive2d::UnifiedTransparencePrimitive2D(
-                            drawinglayer::primitive2d::Primitive2DContainer { aPrimitive },
-                            (255 - pen->GetColor().GetAlpha()) / 255.0));
-        }
-
-        if ((pen->penDataFlags & EmfPlusPenDataCustomStartCap) && (pen->customStartCap->polygon.begin()->count() > 1))
-        {
-            SAL_WARN("drawinglayer.emf", "EMF+\tCustom Start Line Cap");
-            ::basegfx::B2DPolyPolygon startCapPolygon(pen->customStartCap->polygon);
-
-            // get the gradient of the first line in the polypolygon
-            double x1 = polygon.begin()->getB2DPoint(0).getX();
-            double y1 = polygon.begin()->getB2DPoint(0).getY();
-            double x2 = polygon.begin()->getB2DPoint(1).getX();
-            double y2 = polygon.begin()->getB2DPoint(1).getY();
-
-            if ((x2 - x1) != 0)
-            {
-                double gradient = (y2 - y1) / (x2 - x1);
-
-                // now we get the angle that we need to rotate the arrow by
-                double angle = (M_PI / 2) - atan(gradient);
-
-                // rotate the arrow
-                startCapPolygon.transform(basegfx::utils::createRotateB2DHomMatrix(angle));
-            }
-
-            startCapPolygon.transform(maMapTransform);
-
-            basegfx::B2DHomMatrix tran(pen->penWidth, 0.0, polygon.begin()->getB2DPoint(0).getX(),
-                                       0.0, pen->penWidth, polygon.begin()->getB2DPoint(0).getY());
-            startCapPolygon.transform(tran);
-
-            if (pen->customStartCap->mbIsFilled)
-            {
+            if (aStart.isDefault() && aEnd.isDefault())
                 mrTargetHolders.Current().append(
-                            new drawinglayer::primitive2d::PolyPolygonColorPrimitive2D(
-                                startCapPolygon,
-                                pen->GetColor().getBColor()));
-            }
+                    new drawinglayer::primitive2d::PolyPolygonStrokePrimitive2D(
+                        polygon, lineAttribute, pen->GetStrokeAttribute(mdExtractedXScale)));
             else
-            {
-                mrTargetHolders.Current().append(
-                            new drawinglayer::primitive2d::PolyPolygonStrokePrimitive2D(
-                                startCapPolygon,
-                                lineAttribute,
-                                pen->GetStrokeAttribute(maMapTransform.get(1, 1))));
-            }
+                for (sal_uInt32 i = 0; i < polygon.count(); i++)
+                {
+                    mrTargetHolders.Current().append(
+                        new drawinglayer::primitive2d::PolygonStrokeArrowPrimitive2D(
+                            polygon.getB2DPolygon(i), lineAttribute,
+                            pen->GetStrokeAttribute(mdExtractedXScale), aStart, aEnd));
+                }
         }
-
-        if ((pen->penDataFlags & EmfPlusPenDataCustomEndCap) && (pen->customEndCap->polygon.begin()->count() > 1))
-        {
-            SAL_WARN("drawinglayer.emf", "EMF+\tCustom End Line Cap");
-
-            ::basegfx::B2DPolyPolygon endCapPolygon(pen->customEndCap->polygon);
-
-            // get the gradient of the first line in the polypolygon
-            double x1 = polygon.begin()->getB2DPoint(polygon.begin()->count() - 1).getX();
-            double y1 = polygon.begin()->getB2DPoint(polygon.begin()->count() - 1).getY();
-            double x2 = polygon.begin()->getB2DPoint(polygon.begin()->count() - 2).getX();
-            double y2 = polygon.begin()->getB2DPoint(polygon.begin()->count() - 2).getY();
-
-            if ((x2 - x1) != 0)
-            {
-                double gradient = (y2 - y1) / (x2 - x1);
-
-                // now we get the angle that we need to rotate the arrow by
-                double angle = (M_PI / 2) - atan(gradient);
-
-                // rotate the arrow
-                endCapPolygon.transform(basegfx::utils::createRotateB2DHomMatrix(angle));
-            }
-
-            endCapPolygon.transform(maMapTransform);
-            basegfx::B2DHomMatrix tran(pen->penWidth, 0.0, polygon.begin()->getB2DPoint(polygon.begin()->count() - 1).getX(),
-                                       0.0, pen->penWidth, polygon.begin()->getB2DPoint(polygon.begin()->count() - 1).getY());
-            endCapPolygon.transform(tran);
-
-            if (pen->customEndCap->mbIsFilled)
-            {
-                mrTargetHolders.Current().append(
-                            new drawinglayer::primitive2d::PolyPolygonColorPrimitive2D(
-                                endCapPolygon,
-                                pen->GetColor().getBColor()));
-            }
-            else
-            {
-                mrTargetHolders.Current().append(
-                            new drawinglayer::primitive2d::PolyPolygonStrokePrimitive2D(
-                                endCapPolygon,
-                                lineAttribute,
-                                pen->GetStrokeAttribute(maMapTransform.get(1, 1))));
-            }
-        }
-
         mrPropertyHolders.Current().setLineColor(pen->GetColor().getBColor());
         mrPropertyHolders.Current().setLineColorActive(true);
         mrPropertyHolders.Current().setFillColorActive(false);
@@ -782,7 +805,7 @@ namespace emfplushelper
                     SAL_INFO("drawinglayer.emf", "EMF+\t\tUse blend");
 
                     // store the blendpoints in the vector
-                    for (int i = 0; i < brush->blendPoints; i++)
+                    for (sal_uInt32 i = 0; i < brush->blendPoints; i++)
                     {
                         const double aBlendPoint = brush->blendPositions[i];
                         basegfx::BColor aColor;
@@ -798,7 +821,7 @@ namespace emfplushelper
                     SAL_INFO("drawinglayer.emf", "EMF+\t\tUse color blend");
 
                     // store the colorBlends in the vector
-                    for (int i = 0; i < brush->colorblendPoints; i++)
+                    for (sal_uInt32 i = 0; i < brush->colorblendPoints; i++)
                     {
                         const double aBlendPoint = brush->colorblendPositions[i];
                         const basegfx::BColor aColor = brush->colorblendColors[i].getBColor();
@@ -900,6 +923,8 @@ namespace emfplushelper
         mnMmY(0),
         mbMultipart(false),
         mMFlags(0),
+        mdExtractedXScale(1.0),
+        mdExtractedYScale(1.0),
         mrTargetHolders(rTargetHolders),
         mrPropertyHolders(rPropertyHolders),
         bIsGetDCProcessing(false)
@@ -929,14 +954,8 @@ namespace emfplushelper
         }
         case EmfPlusCombineModeIntersect:
         {
-            if (leftPolygon.count())
-            {
-                aClippedPolyPolygon = basegfx::utils::clipPolyPolygonOnPolyPolygon(
-                            leftPolygon,
-                            rightPolygon,
-                            true,
-                            false);
-            }
+            aClippedPolyPolygon = basegfx::utils::clipPolyPolygonOnPolyPolygon(
+                leftPolygon, rightPolygon, true, false);
             break;
         }
         case EmfPlusCombineModeUnion:
@@ -1009,8 +1028,18 @@ namespace emfplushelper
 
             if (bIsGetDCProcessing)
             {
-                SAL_INFO("drawinglayer.emf", "EMF+\t reset the current clipping region for the world space to infinity.");
-                wmfemfhelper::HandleNewClipRegion(::basegfx::B2DPolyPolygon(), mrTargetHolders, mrPropertyHolders);
+                if (aGetDCState.getClipPolyPolygonActive())
+                {
+                    SAL_INFO("drawinglayer.emf", "EMF+\t Restore region to GetDC saved");
+                    wmfemfhelper::HandleNewClipRegion(aGetDCState.getClipPolyPolygon(), mrTargetHolders,
+                                                      mrPropertyHolders);
+                }
+                else
+                {
+                    SAL_INFO("drawinglayer.emf", "EMF+\t Disable clipping");
+                    wmfemfhelper::HandleNewClipRegion(::basegfx::B2DPolyPolygon(), mrTargetHolders,
+                                                      mrPropertyHolders);
+                }
                 bIsGetDCProcessing = false;
             }
             if (type == EmfPlusRecordTypeObject && ((mbMultipart && (flags & 0x7fff) == (mMFlags & 0x7fff)) || (flags & 0x8000)))
@@ -1089,6 +1118,7 @@ namespace emfplushelper
                     case EmfPlusRecordTypeGetDC:
                     {
                         bIsGetDCProcessing = true;
+                        aGetDCState = mrPropertyHolders.Current();
                         SAL_INFO("drawinglayer.emf", "EMF+\tAlready used in svtools wmf/emf filter parser");
                         break;
                     }
@@ -1265,26 +1295,24 @@ namespace emfplushelper
                     }
                     case EmfPlusRecordTypeFillPolygon:
                     {
-                        const sal_uInt8 index = flags & 0xff;
                         sal_uInt32 brushIndexOrColor, points;
 
                         rMS.ReadUInt32(brushIndexOrColor);
                         rMS.ReadUInt32(points);
-                        SAL_INFO("drawinglayer.emf", "EMF+\t FillPolygon in slot: " << index << " points: " << points);
+                        SAL_INFO("drawinglayer.emf", "EMF+\t Points: " << points);
                         SAL_INFO("drawinglayer.emf", "EMF+\t " << ((flags & 0x8000) ? "Color" : "Brush index") << " : 0x" << std::hex << brushIndexOrColor << std::dec);
 
                         EMFPPath path(points, true);
                         path.Read(rMS, flags);
 
                         EMFPPlusFillPolygon(path.GetPolygon(*this), flags & 0x8000, brushIndexOrColor);
-
                         break;
                     }
                     case EmfPlusRecordTypeDrawLines:
                     {
                         sal_uInt32 points;
                         rMS.ReadUInt32(points);
-                        SAL_INFO("drawinglayer.emf", "EMF+\t DrawLines in slot: " << (flags & 0xff) << " points: " << points);
+                        SAL_INFO("drawinglayer.emf", "EMF+\t Points: " << points);
                         EMFPPath path(points, true);
                         path.Read(rMS, flags);
 
@@ -1317,11 +1345,15 @@ namespace emfplushelper
                         rMS.ReadUInt32(aCount);
                         SAL_INFO("drawinglayer.emf", "EMF+\t DrawBeziers slot: " << (flags & 0xff));
                         SAL_INFO("drawinglayer.emf", "EMF+\t Number of points: " << aCount);
-                        SAL_WARN_IF((aCount - 1) % 3 != 0, "drawinglayer.emf", "EMF+\t Bezier Draw not support number of points other than 4, 7, 10, 13, 16...");
+                        SAL_WARN_IF((aCount - 1) % 3 != 0, "drawinglayer.emf",
+                                    "EMF+\t Bezier Draw not support number of points other than 4, 7, "
+                                    "10, 13, 16...");
 
                         if (aCount < 4)
                         {
-                            SAL_WARN("drawinglayer.emf", "EMF+\t Bezier Draw does not support less than 4 points. Number of points: " << aCount);
+                            SAL_WARN("drawinglayer.emf", "EMF+\t Bezier Draw does not support less "
+                                                         "than 4 points. Number of points: "
+                                                             << aCount);
                             break;
                         }
 
@@ -1329,29 +1361,60 @@ namespace emfplushelper
                         // We need to add first starting point
                         aStartPoint = Map(x1, y1);
                         aPolygon.append(aStartPoint);
-
+                        SAL_INFO("drawinglayer.emf",
+                                 "EMF+\t Bezier starting point: " << x1 << "," << y1);
                         for (sal_uInt32 i = 4; i <= aCount; i += 3)
                         {
                             ReadPoint(rMS, x2, y2, flags);
                             ReadPoint(rMS, x3, y3, flags);
                             ReadPoint(rMS, x4, y4, flags);
 
-                            SAL_INFO("drawinglayer.emf", "EMF+\t Bezier points: " << x1 << "," << y1 << " " << x2 << "," << y2 << " " << x3 << "," << y3 << " " << x4 << "," << y4);
+                            SAL_INFO("drawinglayer.emf",
+                                     "EMF+\t Bezier points: " << x2 << "," << y2 << " " << x3 << ","
+                                                              << y3 << " " << x4 << "," << y4);
 
-                            aStartPoint = Map(x1, y1);
                             aControlPointA = Map(x2, y2);
                             aControlPointB = Map(x3, y3);
                             aEndPoint = Map(x4, y4);
-
-                            ::basegfx::B2DCubicBezier cubicBezier(aStartPoint, aControlPointA, aControlPointB, aEndPoint);
-                            cubicBezier.adaptiveSubdivideByDistance(aPolygon, 10.0);
-
-                            EMFPPlusDrawPolygon(::basegfx::B2DPolyPolygon(aPolygon), flags & 0xff);
-
+                            aPolygon.appendBezierSegment(aControlPointA, aControlPointB, aEndPoint);
                             // The ending coordinate of one Bezier curve is the starting coordinate of the next.
-                            x1 = x4;
-                            y1 = y4;
+                            aStartPoint = aEndPoint;
                         }
+                        EMFPPlusDrawPolygon(::basegfx::B2DPolyPolygon(aPolygon), flags & 0xff);
+                        break;
+                    }
+                    case EmfPlusRecordTypeDrawClosedCurve:
+                    case EmfPlusRecordTypeFillClosedCurve:
+                    {
+                        // Silent MSVC warning C4701: potentially uninitialized local variable 'brushIndexOrColor' used
+                        sal_uInt32 brushIndexOrColor = 999, points;
+                        float aTension;
+                        if (type == EmfPlusRecordTypeFillClosedCurve)
+                        {
+                            rMS.ReadUInt32(brushIndexOrColor);
+                            SAL_INFO("drawinglayer.emf",
+                                "EMF+\t Fill Mode: " << (flags & 0x2000 ? "Winding" : "Alternate"));
+                        }
+                        rMS.ReadFloat(aTension);
+                        rMS.ReadUInt32(points);
+                        SAL_WARN("drawinglayer.emf",
+                                 "EMF+\t Tension: " << aTension << " Points: " << points);
+                        SAL_WARN_IF(aTension != 0, "drawinglayer.emf",
+                                    "EMF+\t TODO Add support for tension different than 0");
+                        SAL_INFO("drawinglayer.emf",
+                                 "EMF+\t " << (flags & 0x8000 ? "Color" : "Brush index") << " : 0x"
+                                           << std::hex << brushIndexOrColor << std::dec);
+
+                        EMFPPath path(points, true);
+                        path.Read(rMS, flags);
+                        if (type == EmfPlusRecordTypeFillClosedCurve)
+                            EMFPPlusFillPolygon(path.GetPolygon(*this, /* bMapIt */ true,
+                                                                /*bAddLineToCloseShape */ true),
+                                                flags & 0x8000, brushIndexOrColor);
+                        else
+                            EMFPPlusDrawPolygon(path.GetPolygon(*this, /* bMapIt */ true,
+                                                                /*bAddLineToCloseShape */ true),
+                                                flags & 0xff);
                         break;
                     }
                     case EmfPlusRecordTypeDrawImage:
@@ -1461,11 +1524,11 @@ namespace emfplushelper
                             const basegfx::B2DHomMatrix aTransformMatrix
                                 = maMapTransform
                                 * basegfx::B2DHomMatrix(
-                                    /* Row 0, Column 0 */ aDstSize.getX(),
+                                    /* Row 0, Column 0 */ aDstSize.getWidth(),
                                     /* Row 0, Column 1 */ fShearX,
                                     /* Row 0, Column 2 */ aDstPoint.getX(),
                                     /* Row 1, Column 0 */ fShearY,
-                                    /* Row 1, Column 1 */ aDstSize.getY(),
+                                    /* Row 1, Column 1 */ aDstSize.getHeight(),
                                     /* Row 1, Column 2 */ aDstPoint.getY());
 
                             if (image->type == ImageDataTypeBitmap)
@@ -1477,7 +1540,7 @@ namespace emfplushelper
                                 {
                                     mrTargetHolders.Current().append(
                                         new drawinglayer::primitive2d::BitmapPrimitive2D(
-                                            VCLUnoHelper::CreateVCLXBitmap(aBmp), aTransformMatrix));
+                                            aBmp, aTransformMatrix));
                                 }
                                 else
                                     SAL_WARN("drawinglayer.emf", "EMF+\t warning: empty bitmap");
@@ -1581,7 +1644,7 @@ namespace emfplushelper
                         }
 
                         const basegfx::B2DHomMatrix transformMatrix = basegfx::utils::createScaleTranslateB2DHomMatrix(
-                                    ::basegfx::B2DSize(font->emSize, font->emSize),
+                                    ::basegfx::B2DVector(font->emSize, font->emSize),
                                     ::basegfx::B2DPoint(lx + stringAlignmentHorizontalOffset,
                                                         ly + stringAlignmentVerticalOffset));
 
@@ -1623,6 +1686,7 @@ namespace emfplushelper
                                             0,             // text always starts at 0
                                             stringLength,
                                             std::move(emptyVector),   // EMF-PLUS has no DX-array
+                                            {},
                                             fontAttribute,
                                             locale,
                                             color.getBColor(), // Font Color
@@ -1642,6 +1706,7 @@ namespace emfplushelper
                                             0,             // text always starts at 0
                                             stringLength,
                                             std::move(emptyVector),   // EMF-PLUS has no DX-array
+                                            {},
                                             fontAttribute,
                                             locale,
                                             color.getBColor());
@@ -1748,7 +1813,7 @@ namespace emfplushelper
                         rMS.ReadUInt32(stackIndex);
                         SAL_INFO("drawinglayer.emf", "EMF+\t Restore stack index: " << stackIndex);
 
-                        GraphicStatePop(mGSStack, stackIndex, mrPropertyHolders.Current());
+                        GraphicStatePop(mGSStack, stackIndex);
                         break;
                     }
                     case EmfPlusRecordTypeBeginContainer:
@@ -1795,7 +1860,7 @@ namespace emfplushelper
                         rMS.ReadUInt32(stackIndex);
                         SAL_INFO("drawinglayer.emf", "EMF+\t End Container stack index: " << stackIndex);
 
-                        GraphicStatePop(mGSContainerStack, stackIndex, mrPropertyHolders.Current());
+                        GraphicStatePop(mGSContainerStack, stackIndex);
                         break;
                     }
                     case EmfPlusRecordTypeSetWorldTransform:
@@ -1930,62 +1995,95 @@ namespace emfplushelper
                         break;
                     }
                     case EmfPlusRecordTypeSetClipRect:
-                    {
-                        int combineMode = (flags >> 8) & 0xf;
-
-                        SAL_INFO("drawinglayer.emf", "EMF+\t SetClipRect combine mode: " << combineMode);
-
-                        float dx, dy, dw, dh;
-                        ReadRectangle(rMS, dx, dy, dw, dh);
-                        SAL_INFO("drawinglayer.emf", "EMF+\t RectData: " << dx << "," << dy << " " << dw << "x" << dh);
-                        ::basegfx::B2DPoint mappedPoint1(Map(dx, dy));
-                        ::basegfx::B2DPoint mappedPoint2(Map(dx + dw, dy + dh));
-
-                        ::basegfx::B2DPolyPolygon polyPolygon(
-                                ::basegfx::utils::createPolygonFromRect(
-                                    ::basegfx::B2DRectangle(
-                                        mappedPoint1.getX(),
-                                        mappedPoint1.getY(),
-                                        mappedPoint2.getX(),
-                                        mappedPoint2.getY())));
-
-                        HandleNewClipRegion(combineClip(mrPropertyHolders.Current().getClipPolyPolygon(),
-                                                        combineMode, polyPolygon), mrTargetHolders, mrPropertyHolders);
-                        break;
-                    }
                     case EmfPlusRecordTypeSetClipPath:
-                    {
-                        int combineMode = (flags >> 8) & 0xf;
-                        SAL_INFO("drawinglayer.emf", "EMF+\t SetClipPath combine mode: " << combineMode);
-                        SAL_INFO("drawinglayer.emf", "EMF+\t Path in slot: " << (flags & 0xff));
-
-                        EMFPPath *path = dynamic_cast<EMFPPath*>(maEMFPObjects[flags & 0xff].get());
-                        if (!path)
-                        {
-                            SAL_WARN("drawinglayer.emf", "EMF+\t TODO Unable to find path in slot: " << (flags & 0xff));
-                            break;
-                        }
-
-                        ::basegfx::B2DPolyPolygon& clipPoly(path->GetPolygon(*this));
-
-                        HandleNewClipRegion(combineClip(mrPropertyHolders.Current().getClipPolyPolygon(),
-                                                        combineMode, clipPoly), mrTargetHolders, mrPropertyHolders);
-                        break;
-                    }
                     case EmfPlusRecordTypeSetClipRegion:
                     {
                         int combineMode = (flags >> 8) & 0xf;
-                        SAL_INFO("drawinglayer.emf", "EMF+\t Region in slot: " << (flags & 0xff));
-                        SAL_INFO("drawinglayer.emf", "EMF+\t Combine mode: " << combineMode);
-                        EMFPRegion *region = dynamic_cast<EMFPRegion*>(maEMFPObjects[flags & 0xff].get());
-                        if (!region)
+                        ::basegfx::B2DPolyPolygon polyPolygon;
+                        if (type == EmfPlusRecordTypeSetClipRect)
                         {
-                            SAL_WARN("drawinglayer.emf", "EMF+\t TODO Unable to find region in slot: " << (flags & 0xff));
-                            break;
-                        }
+                            SAL_INFO("drawinglayer.emf", "EMF+\t SetClipRect");
 
-                        HandleNewClipRegion(combineClip(mrPropertyHolders.Current().getClipPolyPolygon(),
-                                                        combineMode, region->regionPolyPolygon), mrTargetHolders, mrPropertyHolders);
+                            float dx, dy, dw, dh;
+                            ReadRectangle(rMS, dx, dy, dw, dh);
+                            SAL_INFO("drawinglayer.emf",
+                                    "EMF+\t RectData: " << dx << "," << dy << " " << dw << "x" << dh);
+                            ::basegfx::B2DPoint mappedPoint1(Map(dx, dy));
+                            ::basegfx::B2DPoint mappedPoint2(Map(dx + dw, dy + dh));
+
+                            polyPolygon
+                                = ::basegfx::B2DPolyPolygon(::basegfx::utils::createPolygonFromRect(
+                                    ::basegfx::B2DRectangle(mappedPoint1.getX(), mappedPoint1.getY(),
+                                                            mappedPoint2.getX(), mappedPoint2.getY())));
+                        }
+                        else if (type == EmfPlusRecordTypeSetClipPath)
+                        {
+                            SAL_INFO("drawinglayer.emf", "EMF+\tSetClipPath " << (flags & 0xff));
+
+                            EMFPPath* path = dynamic_cast<EMFPPath*>(maEMFPObjects[flags & 0xff].get());
+                            if (!path)
+                            {
+                                SAL_WARN("drawinglayer.emf",
+                                        "EMF+\t TODO Unable to find path in slot: " << (flags & 0xff));
+                                break;
+                            }
+                            polyPolygon = path->GetPolygon(*this);
+                        }
+                        else if (type == EmfPlusRecordTypeSetClipRegion)
+                        {
+                            SAL_INFO("drawinglayer.emf", "EMF+\t Region in slot: " << (flags & 0xff));
+                            EMFPRegion* region
+                                = dynamic_cast<EMFPRegion*>(maEMFPObjects[flags & 0xff].get());
+                            if (!region)
+                            {
+                                SAL_WARN(
+                                    "drawinglayer.emf",
+                                    "EMF+\t TODO Unable to find region in slot: " << (flags & 0xff));
+                                break;
+                            }
+                            polyPolygon = region->regionPolyPolygon;
+                        }
+                        SAL_INFO("drawinglayer.emf", "EMF+\t Combine mode: " << combineMode);
+                        ::basegfx::B2DPolyPolygon aClippedPolyPolygon;
+                        if (mrPropertyHolders.Current().getClipPolyPolygonActive())
+                        {
+                            aClippedPolyPolygon
+                                = combineClip(mrPropertyHolders.Current().getClipPolyPolygon(),
+                                            combineMode, polyPolygon);
+                        }
+                        else
+                        {
+                            //Combine with infinity
+                            switch (combineMode)
+                            {
+                                case EmfPlusCombineModeReplace:
+                                case EmfPlusCombineModeIntersect:
+                                {
+                                    aClippedPolyPolygon = polyPolygon;
+                                    break;
+                                }
+                                case EmfPlusCombineModeUnion:
+                                {
+                                    // Disable clipping as the clipping is infinity
+                                    aClippedPolyPolygon = ::basegfx::B2DPolyPolygon();
+                                    break;
+                                }
+                                case EmfPlusCombineModeXOR:
+                                case EmfPlusCombineModeComplement:
+                                {
+                                    //TODO It is not correct and it should be fixed
+                                    aClippedPolyPolygon = polyPolygon;
+                                    break;
+                                }
+                                case EmfPlusCombineModeExclude:
+                                {
+                                    //TODO It is not correct and it should be fixed
+                                    aClippedPolyPolygon = ::basegfx::B2DPolyPolygon();
+                                    break;
+                                }
+                            }
+                        }
+                        HandleNewClipRegion(aClippedPolyPolygon, mrTargetHolders, mrPropertyHolders);
                         break;
                     }
                     case EmfPlusRecordTypeOffsetClip:
@@ -2087,7 +2185,7 @@ namespace emfplushelper
                                 aDXArray.push_back(0);
 
                                 basegfx::B2DHomMatrix transformMatrix = basegfx::utils::createScaleTranslateB2DHomMatrix(
-                                            ::basegfx::B2DSize(font->emSize, font->emSize),
+                                            ::basegfx::B2DVector(font->emSize, font->emSize),
                                             ::basegfx::B2DPoint(charsPosX[pos], charsPosY[pos]));
                                 if (hasMatrix)
                                     transformMatrix *= transform;
@@ -2102,6 +2200,7 @@ namespace emfplushelper
                                                     pos,            // take character at current pos
                                                     aLength,        // use determined length
                                                     std::move(aDXArray),       // generated DXArray
+                                                    {},
                                                     fontAttribute,
                                                     Application::GetSettings().GetLanguageTag().getLocale(),
                                                     color.getBColor(),
@@ -2121,6 +2220,7 @@ namespace emfplushelper
                                                     pos,            // take character at current pos
                                                     aLength,        // use determined length
                                                     std::move(aDXArray),       // generated DXArray
+                                                    {},
                                                     fontAttribute,
                                                     Application::GetSettings().GetLanguageTag().getLocale(),
                                                     color.getBColor());

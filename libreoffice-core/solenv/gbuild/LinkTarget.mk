@@ -36,25 +36,29 @@
 #  gb_LinkTarget_INCLUDE
 #  gb_YaccTarget__command(grammar-file, stem-for-message, source-target, include-target)
 
-# Detect whether symbols should be enabled for the given gbuild target.
-# enable if: no "-TARGET" defined AND [module is enabled OR "TARGET" defined]
-gb_LinkTarget__symbols_enabled = \
- $(and $(if $(filter -$(1),$(ENABLE_SYMBOLS_FOR)),,$(true)),\
-       $(or $(gb_Module_CURRENTMODULE_SYMBOLS_ENABLED),\
-            $(filter $(1),$(ENABLE_SYMBOLS_FOR))))
+# Same happens for the gb_LinkTarget_add_libs calls from RepositoryExternal.mk. But we have no real
+# way to separate for gbuild internal and external gb_LinkTarget_add_libs calls.
+# So this flags these call parameters with an @ postfix. But now these must be filtered out, so this
+# defines that filter, just in case we need to change it because it conflicts with some parameters.
+# FYI: on Windows, gb_Library_use_system_win32_libs also calls gb_LinkTarget_add_libs; easy to miss.
+gb_LinkTarget__syslib = %@
 
 # debug flags, if the LinkTarget is named in the list of libraries of ENABLE_SYMBOLS_FOR
 gb_LinkTarget__get_debugflags= \
-$(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS), \
-$(if $(ENABLE_OPTIMIZED_DEBUG),$(gb_COMPILERDEBUGOPTFLAGS), \
-$(gb_COMPILERNOOPTFLAGS))) \
-$(if $(call gb_LinkTarget__symbols_enabled,$(1)),$(gb_DEBUGINFO_FLAGS))
+    $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS), \
+        $(if $(ENABLE_OPTIMIZED_DEBUG),$(gb_COMPILERDEBUGOPTFLAGS),$(gb_COMPILERNOOPTFLAGS))) \
+    $(if $(call gb_target_symbols_enabled,$(1)),$(gb_DEBUGINFO_FLAGS))
 
+# T_LDFLAGS is just expanded once. Override the flags here, so that the linker and compiler use the same.
+ifeq (EMSCRIPTEN,$(OS))
+gb_LinkTarget__get_debugldflags=$(call gb_LinkTarget__get_debugflags,$1)
+else
 # similar for LDFLAGS, use linker optimization flags in non-debug case,
 # but moreover strip debug from libraries for which debuginfo is not wanted
 # (some libraries reuse .o files from other libraries, notably unittests)
 gb_LinkTarget__get_stripldflags=$(if $(strip $(CFLAGS)$(CXXFLAGS)$(OBJCFLAGS)$(OBJCXXFLAGS)$(LDFLAGS)),,$(gb_LINKERSTRIPDEBUGFLAGS))
-gb_LinkTarget__get_debugldflags=$(if $(call gb_LinkTarget__symbols_enabled,$(1)),$(gb_LINKER_DEBUGINFO_FLAGS),$(gb_LINKEROPTFLAGS) $(call gb_LinkTarget__get_stripldflags,$(1)))
+gb_LinkTarget__get_debugldflags=$(if $(call gb_target_symbols_enabled,$(1)),$(gb_LINKER_DEBUGINFO_FLAGS),$(gb_LINKEROPTFLAGS) $(call gb_LinkTarget__get_stripldflags,$(1)))
+endif
 
 # generic cflags/cxxflags to use (optimization flags, debug flags)
 # user supplied CFLAGS/CXXFLAGS override default debug/optimization flags
@@ -718,7 +722,7 @@ gb_LinkTarget_DEFAULTDEFS := $(gb_GLOBALDEFS)
 .PHONY : $(WORKDIR)/Clean/LinkTarget/%
 $(WORKDIR)/Clean/LinkTarget/% :
 	$(call gb_Output_announce,$(LINKTARGETMAKEFILENAME),$(false),LNK,4)
-	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),200,\
+	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),\
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_target,$(object))) \
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_dep_target,$(object))) \
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_dwo_target,$(object))) \
@@ -757,6 +761,11 @@ $(WORKDIR)/Clean/LinkTarget/% :
 		$(foreach object,$(GENCXXCLROBJECTS),$(call gb_GenCxxClrObject_get_dwo_target,$(object))) \
 		$(call gb_LinkTarget_get_target,$(LINKTARGET)) \
 		$(call gb_LinkTarget_get_dep_target,$(LINKTARGET)) \
+		$(if $(gb_PARTIAL_BUILD),, \
+			$(call gb_LinkTarget_get_dep_libraries_target,$(LINKTARGET)) \
+			$(call gb_LinkTarget_get_dep_externals_target,$(LINKTARGET)) \
+			$(call gb_LinkTarget_get_dep_statics_target,$(LINKTARGET)) \
+			) \
 		$(call gb_LinkTarget_get_headers_target,$(LINKTARGET)) \
 		$(call gb_LinkTarget_get_objects_list,$(LINKTARGET)) \
 		$(call gb_LinkTarget_get_pch_timestamp,$(LINKTARGETMAKEFILENAME)) \
@@ -770,11 +779,11 @@ $(WORKDIR)/Clean/LinkTarget/% :
 # cat the deps of all objects in one file, then we need only open that one file
 # call gb_LinkTarget__command_dep,dep_target,linktargetname
 define gb_LinkTarget__command_dep
-$(call gb_Output_announce,LNK:$(2),$(true),DEP,1)
+$(call gb_Output_announce,LNK:$(2).d,$(true),DEP,1)
 	$(call gb_Trace_StartRange,LNK:$(2),DEP)
 $(call gb_Helper_abbreviate_dirs,\
 	mkdir -p $(dir $(1)) && \
-	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),200,\
+	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),\
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_dep_target,$(object))) \
 		$(foreach object,$(CXXOBJECTS),$(call gb_CxxObject_get_dep_target,$(object))) \
 		$(foreach object,$(OBJCOBJECTS),$(call gb_ObjCObject_get_dep_target,$(object)))\
@@ -788,7 +797,7 @@ $(call gb_Helper_abbreviate_dirs,\
 		$(foreach object,$(GENNASMOBJECTS),$(call gb_GenNasmObject_get_dep_target,$(object))) \
 		$(foreach object,$(GENCXXCLROBJECTS),$(call gb_GenCxxClrObject_get_dep_target,$(object))) \
 		) && \
-	$(call gb_Executable_get_command,concat-deps) $${RESPONSEFILE} > $(1)) && \
+	SYSTEM_BOOST="$(SYSTEM_BOOST)" $(call gb_Executable_get_command,concat-deps) $${RESPONSEFILE} > $(1)) && \
 	rm -f $${RESPONSEFILE}
 	$(call gb_Trace_EndRange,LNK:$(2),DEP)
 
@@ -796,7 +805,7 @@ endef
 
 # call gb_LinkTarget__command_objectlist,linktarget
 define gb_LinkTarget__command_objectlist
-TEMPFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),200,\
+$(file >$(1),\
 	$(foreach object,$(COBJECTS),$(call gb_CObject_get_target,$(object))) \
 	$(foreach object,$(CXXOBJECTS),$(call gb_CxxObject_get_target,$(object))) \
 	$(foreach object,$(OBJCOBJECTS),$(call gb_ObjCObject_get_target,$(object))) \
@@ -810,8 +819,7 @@ TEMPFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),200,\
 	$(foreach object,$(GENNASMOBJECTS),$(call gb_GenNasmObject_get_target,$(object))) \
 	$(foreach object,$(GENCXXCLROBJECTS),$(call gb_GenCxxClrObject_get_target,$(object))) \
 	$(PCHOBJS) \
-	$(foreach extraobjectlist,$(EXTRAOBJECTLISTS),$(shell cat $(extraobjectlist)))) && \
-mv $${TEMPFILE} $(1)
+	$(foreach extraobjectlist,$(EXTRAOBJECTLISTS),$(shell cat $(extraobjectlist))))
 
 endef
 
@@ -839,12 +847,24 @@ $(call gb_LinkTarget_get_target,$(1)) : $(call gb_LinkTarget_get_headers_target,
 
 endef
 
+define gb_LinkTarget__add_linked_libs
+$(call gb_LinkTarget_get_target,$(1)) : LINKED_LIBS += $(2)
+
+endef
+
 # it's not possible to use a pattern rule for files in INSTDIR because
 # it would inevitably conflict with the pattern rule for Package
 # (especially since external libraries are delivered via Package)
 # call gb_LinkTarget__command_impl,linktargettarget,linktargetname
 define gb_LinkTarget__command_impl
 	$(if $(gb_FULLDEPS),
+		$(if $(ENABLE_CUSTOMTARGET_COMPONENTS),$(if $(gb_PARTIAL_BUILD),,
+			$(call gb_LinkTarget__command_dep_libraries,$(call gb_LinkTarget_get_dep_libraries_target,$(2)).tmp,$(2))
+			mv $(call gb_LinkTarget_get_dep_libraries_target,$(2)).tmp $(call gb_LinkTarget_get_dep_libraries_target,$(2))
+			$(call gb_LinkTarget__command_dep_externals,$(call gb_LinkTarget_get_dep_externals_target,$(2)).tmp,$(2))
+			mv $(call gb_LinkTarget_get_dep_externals_target,$(2)).tmp $(call gb_LinkTarget_get_dep_externals_target,$(2))
+			$(call gb_LinkTarget__command_dep_statics,$(call gb_LinkTarget_get_dep_statics_target,$(2)).tmp,$(2))
+			mv $(call gb_LinkTarget_get_dep_statics_target,$(2)).tmp $(call gb_LinkTarget_get_dep_statics_target,$(2))))
 		$(if $(findstring concat-deps,$(2)),,
 			$(call gb_LinkTarget__command_dep,$(call gb_LinkTarget_get_dep_target,$(2)).tmp,$(2))
 			mv $(call gb_LinkTarget_get_dep_target,$(2)).tmp $(call gb_LinkTarget_get_dep_target,$(2))))
@@ -861,7 +881,35 @@ endef
 ifeq ($(gb_FULLDEPS),$(true))
 $(call gb_LinkTarget_get_dep_target,%) : $(call gb_Executable_get_runtime_dependencies,concat-deps)
 	$(call gb_LinkTarget__command_dep,$@,$*)
-endif
+
+$(dir $(call gb_LinkTarget_get_dep_target,%))/.dir :
+	$(if $(wildcard $(dir $@)),,mkdir -p $(dir $@))
+
+ifeq ($(ENABLE_CUSTOMTARGET_COMPONENTS),TRUE)
+ifeq (,$(gb_PARTIAL_BUILD))
+
+define gb_LinkTarget__static_dep_x_template
+
+define gb_LinkTarget__command_dep_$(1)
+$$(call gb_Output_announce,LNK:$$(2).d.$(1),$$(true),DEP,1)
+$$(shell mkdir -p $$(dir $$(1)))
+$$(file >$$(1).tmp,$$(call gb_LinkTarget__get_all_$(1),$$(2)))
+$$(call gb_Helper_replace_if_different_and_touch,$$(1).tmp,$$(1))
+
+endef
+
+$$(call gb_LinkTarget_get_dep_$(1)_target,%) : ;
+	$$(call gb_LinkTarget__command_dep_$(1),$$@,$$*)
+
+endef # gb_LinkTarget__static_dep_x_template
+
+$(eval $(call gb_LinkTarget__static_dep_x_template,libraries))
+$(eval $(call gb_LinkTarget__static_dep_x_template,externals))
+$(eval $(call gb_LinkTarget__static_dep_x_template,statics))
+
+endif # !gb_PARTIAL_BUILD
+endif # ENABLE_CUSTOMTARGET_COMPONENTS
+endif # gb_FULLDEPS
 
 # Ok, this is some dark voodoo: When declaring a linktarget with
 # gb_LinkTarget_LinkTarget we set SELF in the headertarget to name of the
@@ -977,7 +1025,7 @@ $(call gb_LinkTarget_get_target,$(1)) : T_CXXCLRFLAGS := $$(gb_LinkTarget_CXXCLR
 $(call gb_LinkTarget_get_target,$(1)) : T_CXXCLRFLAGS_APPEND :=
 $(call gb_LinkTarget_get_target,$(1)) : DEFS := $$(gb_LinkTarget_DEFAULTDEFS) $(CPPFLAGS)
 $(call gb_LinkTarget_get_target,$(1)) : PCH_DEFS := $$(gb_LinkTarget_DEFAULTDEFS) $(CPPFLAGS)
-$(call gb_LinkTarget_get_target,$(1)) : INCLUDE := $$(gb_LinkTarget_INCLUDE)
+$(call gb_LinkTarget_get_target,$(1)) : INCLUDE := -I$$(SRCDIR)/include $$(gb_LinkTarget_INCLUDE)
 $(call gb_LinkTarget_get_target,$(1)) : T_LDFLAGS := $$(gb_LinkTarget_LDFLAGS) $(call gb_LinkTarget_get_linksearchpath_for_layer,$(3)) $(call gb_LinkTarget__get_ldflags,$(2))
 $(call gb_LinkTarget_get_target,$(1)) : LINKED_LIBS :=
 $(call gb_LinkTarget_get_target,$(1)) : LINKED_STATIC_LIBS :=
@@ -1004,12 +1052,13 @@ $(call gb_LinkTarget_get_target,$(1)) : PLUGIN_WARNINGS_AS_ERRORS :=
 $(call gb_LinkTarget_get_target,$(1)) : EXTERNAL_CODE :=
 $(call gb_LinkTarget_get_target,$(1)) : SOVERSIONSCRIPT :=
 $(call gb_LinkTarget_get_target,$(1)) : COMPILER_TEST :=
-$(call gb_LinkTarget_get_target,$(1)) : T_SYMBOLS := $(if $(call gb_LinkTarget__symbols_enabled,$(2)),$(true),$(false))
+$(call gb_LinkTarget_get_target,$(1)) : T_SYMBOLS := $(if $(call gb_target_symbols_enabled,$(2)),$(true),$(false))
 $(call gb_LinkTarget_get_target,$(1)) : T_FORCE_COMPILE := $(if $(call gb_LinkTarget__force_compile,$(2)),$(true),$(false))
 $(call gb_LinkTarget_get_target,$(1)) : T_CC :=
 $(call gb_LinkTarget_get_target,$(1)) : T_CXX :=
 $(call gb_LinkTarget_get_target,$(1)) : T_USE_LD := $(USE_LD)
 $(call gb_LinkTarget_get_target,$(1)) : T_LTOFLAGS := $(gb_LTOFLAGS)
+$(call gb_LinkTarget_get_target,$(1)) : T_PREJS :=
 
 ifeq ($(gb_FULLDEPS),$(true))
 ifeq (depcache:,$(filter depcache,$(.FEATURES)):$(gb_PARTIAL_BUILD))
@@ -1030,7 +1079,7 @@ $(call gb_LinkTarget_get_dep_target,$(1)) : GENOBJCXXOBJECTS :=
 $(call gb_LinkTarget_get_dep_target,$(1)) : GENNASMOBJECTS :=
 $(call gb_LinkTarget_get_dep_target,$(1)) : GENCXXCLROBJECTS :=
 $(call gb_LinkTarget_get_dep_target,$(1)) : YACCOBJECTS :=
-endif
+endif # gb_FULLDEPS
 
 gb_LinkTarget_CXX_SUFFIX_$(call gb_LinkTarget__get_workdir_linktargetname,$(1)) := cxx
 
@@ -1039,7 +1088,7 @@ $(if $(findstring $(INSTDIR),$(1)),$(call gb_LinkTarget__make_installed_rule,$(1
 
 $(call gb_PrecompiledHeader_generate_timestamp_rule,$(2))
 
-endef
+endef # gb_LinkTarget_LinkTarget
 
 # call gb_LinkTarget_set_soversion_script,linktarget,soversionscript
 define gb_LinkTarget_set_soversion_script
@@ -1102,7 +1151,7 @@ endef
 # call gb_LinkTarget_set_include,linktarget,includes
 define gb_LinkTarget_set_include
 $(call gb_LinkTarget__check_srcdir_paths,$(1),\
-    $(patsubst -I%,%,$(filter -I$(SRCDIR)/%,$(filter-out -I$(WORKDIR)/%,$(2)))))
+    $(patsubst -I%,%,$(filter -I$(SRCDIR)/%,$(filter-out -I$(INSTDIR)/% -I$(WORKDIR)/%,$(2)))))
 $(call gb_LinkTarget_get_target,$(1)) : INCLUDE := $(2)
 
 endef
@@ -1124,7 +1173,14 @@ endef
 define gb_LinkTarget_add_libs
 $(call gb_LinkTarget_get_target,$(1)) : T_LIBS += $(2)
 $(if $(call gb_LinkTarget__is_merged,$(1)),\
-  $(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,merged)) : T_LIBS += $(2))
+  $(call gb_Library_get_linktarget_target,merged) : T_LIBS += $(2))
+ifeq ($(ENABLE_CUSTOMTARGET_COMPONENTS),TRUE)
+$(if $(gb_DEBUG_STATIC),$$(info $$(call gb_LinkTarget__get_all_libraries_var,$(1)) += $(filter-out $(call gb_LinkTarget__get_all_libraries,$(1)),$(patsubst %,$(gb_LinkTarget__syslib),$(2)))))
+$$(eval $$(call gb_LinkTarget__get_all_libraries_var,$(1)) += $(filter-out $(call gb_LinkTarget__get_all_libraries,$(1)),$(patsubst %,$(gb_LinkTarget__syslib),$(2))))
+ifeq (,$(gb_PARTIAL_BUILD))
+$(call gb_LinkTarget_get_target,$(1)) : LINKED_LIBS += $(filter-out $(call gb_LinkTarget__get_all_libraries,$(1)),$(patsubst %,$(gb_LinkTarget__syslib),$(2)))
+endif
+endif
 
 endef
 
@@ -1198,11 +1254,48 @@ define gb_PrintDeps_info
 $(info LibraryDep: $(1) links against $(2))
 endef
 
+# returns $(true), if the target class really calls a linker.
+# call gb_LinkTarget_does_real_link,linktarget
+gb_LinkTarget_does_real_link = $(if $(filter Executable CppunitTest $(if $(DISABLE_DYNLOADING),,Library), \
+    $(call gb_LinkTarget__get_workdir_linktargetclass,$(1))),$(true))
+
 # avoid problem when a module is built partially but other modules that define
 # needed libraries is not yet built: prevent invocation of pattern rule
 # for library with invalid parameters by depending on the header target
 define gb_LinkTarget__lib_dummy_depend
 $(call gb_Library_get_target,$(1)) :| $(call gb_Library_get_headers_target,$(1))
+
+endef
+
+define gb_LinkTarget__generate_all_x_accessors
+gb_LinkTarget__get_all_$(1)_var = $$(call gb_LinkTarget__get_workdir_linktargetname,$$(1))<>ALL_$(2)
+gb_LinkTarget__get_all_$(1) = $$($$(call gb_LinkTarget__get_all_$(1)_var,$$(1)))
+gb_Library__get_all_$(1) = $$($$(call gb_LinkTarget__get_all_$(1)_var,$$(call gb_Library_get_linktarget,$$(1))))
+gb_Executable__get_all_$(1) = $$($$(call gb_LinkTarget__get_all_$(1)_var,$$(call gb_Executable_get_linktarget,$$(1))))
+gb_ExternalProject__get_all_$(1) = $$($$(call gb_LinkTarget__get_all_$(1)_var,$$(call gb_ExternalProject__get_workdir_linktargetname,$$(1))))
+gb_CppunitTest__get_all_$(1) = $$($$(call gb_LinkTarget__get_all_$(1)_var,$$(call gb_CppunitTest__get_workdir_linktargetname,$$(1))))
+
+endef
+
+$(eval $(call gb_LinkTarget__generate_all_x_accessors,libraries,LIBRARIES))
+gb_LinkTarget__filter_lo_libraries = $(filter-out $(gb_LinkTarget__syslib),$(1))
+gb_LinkTarget__get_all_lo_libraries = $(call gb_LinkTarget__filter_lo_libraries,$(call gb_LinkTarget__get_all_libraries,$(1)))
+gb_LinkTarget__filter_sys_libraries = $(filter $(gb_LinkTarget__syslib),$(1))
+gb_LinkTarget__get_all_sys_libraries = $(call gb_LinkTarget__filter_sys_libraries,$(call gb_LinkTarget__get_all_libraries,$(1)))
+$(eval $(call gb_LinkTarget__generate_all_x_accessors,externals,EXTERNALS))
+$(eval $(call gb_LinkTarget__generate_all_x_accessors,statics,STATICS))
+
+# call gb_LinkTarget__register_type,type,linktarget,type list
+define gb_LinkTarget__register_type
+ifeq ($(ENABLE_CUSTOMTARGET_COMPONENTS),TRUE)
+ifeq (,$(DISABLE_DYNLOADING))
+$$(error ENABLE_CUSTOMTARGET_COMPONENTS just works with DISABLE_DYNLOADING)
+endif
+$(foreach type,$(3),$(if $(filter $(type),$(call gb_LinkTarget__get_all_$(1),$(2))),, \
+    $(if $(gb_DEBUG_STATIC),$$(info $(call gb_LinkTarget__get_all_$(1)_var,$(2)) += $(type))) \
+    $$(eval $(call gb_LinkTarget__get_all_$(1)_var,$(2)) += $(type)) \
+))
+endif
 
 endef
 
@@ -1219,20 +1312,37 @@ endif
 
 $(call gb_LinkTarget_get_target,$(1)) : LINKED_LIBS += $(3)
 
+ifeq (,$(DISABLE_DYNLOADING))
 # depend on the exports of the library, not on the library itself
-# for faster incremental builds when the ABI is unchanged
-ifeq ($(DISABLE_DYNLOADING),)
-$(call gb_LinkTarget_get_target,$(1)) : \
-	$(foreach lib,$(3),$(call gb_Library_get_exports_target,$(lib)))
-endif
-$(call gb_LinkTarget_get_headers_target,$(1)) : \
-	$(foreach lib,$(2),$(call gb_Library_get_headers_target,$(lib)))
-$(foreach lib,$(2),$(call gb_LinkTarget__lib_dummy_depend,$(lib)))
+# for faster incremental builds when the ABI is unchanged.
+# export files are created from the library, so this also ensures the library exists.
+$(foreach lib,$(call gb_LinkTarget__filter_lo_libraries,$(3)),$(if $(filter $(lib),$(gb_Library_KNOWNLIBS)), \
+    $$(eval $(call gb_LinkTarget_get_target,$(1)) : $(call gb_Library_get_exports_target,$(lib))) \
+))
 
-endef
+else # DISABLE_DYNLOADING
+# depend on the now-static libraries themself, but only if the target actually links to it
+ifneq (,$(call gb_LinkTarget_does_real_link,$(1)))
+$(call gb_LinkTarget_get_target,$(1)) : T_LIBS += $(call gb_LinkTarget__filter_sys_libraries,$(3))
+$(if $(filter-out Library,gb_LinkTarget__get_workdir_linktargetclass,$(1)), \
+    $(foreach lib,$(call gb_LinkTarget__filter_lo_libraries,$(3)),$(if $(filter $(lib),$(gb_Library_KNOWNLIBS)), \
+        $$(eval $(call gb_LinkTarget_get_target,$(1)) : $(call gb_Library_get_linktarget_target,$(lib))) \
+    )))
+endif
+endif # DISABLE_DYNLOADING
+
+$(call gb_LinkTarget__register_type,libraries,$(1),$(3))
+
+$(foreach lib,$(call gb_LinkTarget__filter_lo_libraries,$(2)),$(if $(filter $(lib),$(gb_Library_KNOWNLIBS)), \
+    $(eval $(call gb_LinkTarget_get_headers_target,$(1)) : $(call gb_Library_get_headers_target,$(lib))) \
+    $(call gb_LinkTarget__lib_dummy_depend,$(lib)) \
+))
+
+endef # gb_LinkTarget__use_libraries
 
 # libraries which are merged but need to be built for gb_BUILD_HELPER_TOOLS
-gb_BUILD_HELPER_LIBS := basegfx \
+gb_BUILD_HELPER_LIBS := $(foreach lib, \
+    basegfx \
 	comphelper \
 	cppu \
 	cppuhelper \
@@ -1246,6 +1356,7 @@ gb_BUILD_HELPER_LIBS := basegfx \
 	ucbhelper \
 	unoidl \
 	xmlreader \
+    , $(call gb_Library__get_workdir_linktargetname,$(lib)))
 
 # tools libmerged depends on, so they link against gb_BUILD_HELPER_LIBS
 gb_BUILD_HELPER_TOOLS := $(foreach exe,\
@@ -1257,12 +1368,12 @@ gb_BUILD_HELPER_TOOLS := $(foreach exe,\
 
 # call gb_LinkTarget__is_build_lib,linktargetname
 define gb_LinkTarget__is_build_lib
-$(if $(filter $(call gb_LinkTarget__get_workdir_linktargetname,$(1)),$(foreach lib,$(gb_BUILD_HELPER_LIBS),$(call gb_Library__get_workdir_linktargetname,$(lib)))),$(true),$(false))
+$(if $(filter $(call gb_LinkTarget__get_workdir_linktargetname,$(1)),$(call gb_BUILD_HELPER_LIBS)),$(true))
 endef
 
 # call gb_LinkTarget__is_build_tool,linktargetname
 define gb_LinkTarget__is_build_tool
-$(if $(filter $(call gb_LinkTarget__get_workdir_linktargetname,$(1)),$(call gb_BUILD_HELPER_TOOLS)),$(true),$(false))
+$(if $(filter $(call gb_LinkTarget__get_workdir_linktargetname,$(1)),$(call gb_BUILD_HELPER_TOOLS)),$(true))
 endef
 
 define gb_LinkTarget__is_merged
@@ -1271,20 +1382,24 @@ endef
 
 # call gb_LinkTarget_use_libraries,linktarget,libs
 define gb_LinkTarget_use_libraries
-ifneq (,$$(filter-out $(gb_Library_KNOWNLIBS),$(2)))
+ifneq (,$$(filter-out $(gb_Library_KNOWNLIBS) $(gb_LinkTarget__syslib),$(2)))
 $$(eval $$(call gb_Output_info,currently known libraries are: $(sort $(gb_Library_KNOWNLIBS)),ALL))
-$$(eval $$(call gb_Output_error,Cannot link against library/libraries $$(filter-out $(gb_Library_KNOWNLIBS),$(2)). Libraries must be registered in Repository.mk or RepositoryExternal.mk))
+$$(eval $$(call gb_Output_error,Cannot link against library/libraries '$$(filter-out $(gb_Library_KNOWNLIBS) $(gb_LinkTarget__syslib),$(2))'. Libraries must be registered in Repository.mk or RepositoryExternal.mk))
+endif
+ifneq (,$$(filter $(2),$(gb_Library_KNOWNPLUGINS)))
+ifneq (,$$(filter $(1),$$(foreach plugin,$(gb_Library_KNOWNPLUGINS),$(call gb_Library__get_workdir_linktargetname,$(plugin)))))
+$$(eval $$(call gb_Output_error,Cannot link against plugin library/libraries '$$(filter $(2),$(gb_Library_KNOWNPLUGINS))'. Only plugins are allowed to do that.))
+endif
 endif
 
-ifeq ($(call gb_LinkTarget__is_build_tool,$(1)),$(true))
+ifeq ($(call gb_LinkTarget__is_build_tool,$(1))$(call gb_LinkTarget__is_build_lib,$(1)),$(true))
 $(call gb_LinkTarget__use_libraries,$(1),$(2),$(2),$(4))
 else
+# $$(3) = Always just depend on non-merged libs. If any dependency is merged, but you aren't, also depend on "merged".
 $(call gb_LinkTarget__use_libraries,$(1),$(2),$(strip \
-	$(if $(filter $(gb_MERGEDLIBS),$(2)), \
-		$(if $(call gb_LinkTarget__is_merged,$(1)), \
-			$(filter $(gb_MERGEDLIBS),$(2)), merged)) \
-	$(filter-out $(gb_MERGEDLIBS),$(2)) \
-	),$(4))
+        $(filter-out $(gb_MERGEDLIBS),$(2)) \
+        $(if $(filter $(gb_MERGEDLIBS),$(2)),$(if $(call gb_LinkTarget__is_merged,$(1)),,merged)) \
+    ),$(4))
 endif
 
 endef
@@ -1303,17 +1418,24 @@ endef
 define gb_LinkTarget_use_static_libraries
 $(call gb_LinkTarget_get_target,$(1)) : LINKED_STATIC_LIBS += $$(if $$(filter-out StaticLibrary,$$(TARGETTYPE)),$(2))
 $(if $(call gb_LinkTarget__is_merged,$(1)),\
-	$(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,merged)) : \
+	$(call gb_Library_get_linktarget_target,merged) : \
 		LINKED_STATIC_LIBS += $$(if $$(filter-out StaticLibrary,$$(TARGETTYPE)),$(2)))
 
-ifeq ($(DISABLE_DYNLOADING),)
-$(call gb_LinkTarget_get_target,$(1)) : $(foreach lib,$(2),$(call gb_StaticLibrary_get_target,$(lib)))
+# depend on the static libraries, but only if the target actually links to it
+ifneq (,$(call gb_LinkTarget_does_real_link,$(1)))
+# make has a size limit for the prerequisites string, which will be exceeded for some larger static links,
+# like soffice.bin, but there seems to be no limit for makefile lines...
+$(foreach lib,$(2), \
+    $$(eval $(call gb_LinkTarget_get_target,$(1)): $(call gb_StaticLibrary_get_linktarget_target,$(lib))))
 endif
+
+$(call gb_LinkTarget__register_type,statics,$(1),$(2))
+
 $(call gb_LinkTarget_get_headers_target,$(1)) : \
 	$(foreach lib,$(2),$(call gb_StaticLibrary_get_headers_target,$(lib)))
 $(foreach lib,$(2),$(call gb_LinkTarget__static_lib_dummy_depend,$(lib)))
 
-endef
+endef # gb_LinkTarget_use_static_libraries
 
 # call gb_LinkTarget_add_cobject,linktarget,sourcefile,cflags,linktargetmakefilename
 define gb_LinkTarget_add_cobject
@@ -1780,8 +1902,10 @@ endef
 
 # call gb_LinkTarget_set_ilibtarget,linktarget,ilibfilename
 define gb_LinkTarget_set_ilibtarget
+ifeq (,$(DISABLE_DYNLOADING))
 $(call gb_LinkTarget_get_clean_target,$(1)) \
 $(call gb_LinkTarget_get_target,$(1)) : ILIBTARGET := $(2)
+endif
 
 endef
 
@@ -1798,7 +1922,7 @@ $(2) : $(call gb_LinkTarget_get_target,$(1))
 		touch -r $$< $$@; \
 	else \
 		rm -f $$<; \
-		echo "ERROR: aux-target missing, library deleted, please try running make again"; \
+		echo "ERROR: aux-target $$@ missing, library deleted, please try running make again"; \
 		false; \
 	fi
 
@@ -1938,7 +2062,8 @@ endef
 # call gb_LinkTarget__reuse_precompiled_header_workarounds,linktarget,pchcxxfile,pchtarget,linktargetmakefilename
 define gb_LinkTarget__reuse_precompiled_header_workarounds
 ifeq ($(COM_IS_CLANG),TRUE)
-$(call gb_LinkTarget_add_defs,$(1),-include $(SRCDIR)/pch/inc/clangfix.hxx)
+$(call gb_LinkTarget_add_defs,$(1),$(gb_CXXFLAGS_include)$(SRCDIR)/pch/inc/clangfix.hxx)
+$(call gb_LinkTarget_add_defs,$(1),$(gb_CXXFLAGS_no_pch_warnings))
 endif
 $(if $(filter precompiled_system,$(3)), $(call gb_LinkTarget_add_defs,$(1),-DBOOST_ALL_NO_LIB))
 endef
@@ -1968,6 +2093,7 @@ endef
 define gb_LinkTarget_use_package
 $(call gb_LinkTarget_get_headers_target,$(1)) :| \
 	$(call gb_Package_get_target,$(strip $(2)))
+$(call gb_Package_get_target,$(strip $(2))): RDEPENDS += $(call gb_LinkTarget__get_workdir_linktargetname,$(1))
 
 endef
 
@@ -2007,10 +2133,15 @@ endef
 # call gb_LinkTarget_use_external,linktarget,external
 define gb_LinkTarget_use_external
 $(if $(filter undefined,$(origin gb_LinkTarget__use_$(2))),\
-  $(error gb_LinkTarget_use_external: unknown external: $(2)),\
-  $(if $(call gb_LinkTarget__is_merged,$(1)),$(call gb_LinkTarget__use_$(2),$(call gb_Library_get_linktarget,merged))) \
+    $(error gb_LinkTarget_use_external: unknown external: $(2)) \
+, \
+    $(if $(gb_PARTIAL_BUILD),,$(if $(call gb_LinkTarget__is_merged,$(1)), \
+        $(call gb_LinkTarget__use_$(2),$(call gb_Library_get_linktarget,merged)))) \
     $(call gb_LinkTarget__use_$(2),$(1)) \
 )
+
+$(call gb_LinkTarget__register_type,externals,$(1),$(2))
+
 endef
 
 # $(call gb_LinkTarget_use_externals,library,externals)
@@ -2061,30 +2192,13 @@ endef
 define gb_LinkTarget_use_clang
 $(call gb_LinkTarget_get_target,$(1)) : T_CC := $(LO_CLANG_CC)
 $(call gb_LinkTarget_get_target,$(1)) : T_CXX := $(LO_CLANG_CXX)
+$(call gb_LinkTarget_get_target,$(1)) : T_USE_CLANG := $(true)
 $(call gb_LinkTarget_get_target,$(1)) : T_USE_LD := $(or $(CLANG_USE_LD),$(USE_LD))
-$(call gb_LinkTarget_get_target,$(1)) : T_LTOFLAGS := $(or $(gb_CLANG_LTOFLAGS),$(gb_LTOFLAGS))
+$(call gb_LinkTarget_get_target,$(1)) : T_LTOFLAGS := $(if $(LO_CLANG_CXX),$(gb_CLANG_LTOFLAGS),$(gb_LTOFLAGS))
 endef
 
-# call gb_LinkTarget_use_glxtest,linktarget,add_libs
-define gb_LinkTarget_use_glxtest
-$(call gb_LinkTarget_use_libraries,$(1),vcl)
-
-ifeq (,$(DISABLE_DYNLOADING))
-$(call gb_LinkTarget_add_libs,$(1),$(DLOPEN_LIBS))
-endif
-
-ifeq (,$(DISABLE_GUI))
-ifeq ($(USING_X11),TRUE)
-$(call gb_LinkTarget_add_libs,$(1),-lX11 $(2))
-$(call gb_LinkTarget_use_static_libraries,$(1),glxtest)
-endif
-endif
-
-endef # gb_LinkTarget_use_glxtest
-
-# call gb_LinkTarget_use_vclmain,linktarget,add_libs
+# call gb_LinkTarget_use_vclmain,linktarget
 define gb_LinkTarget_use_vclmain
-$(call gb_LinkTarget_use_glxtest,$(1),$(2))
 $(call gb_LinkTarget_use_static_libraries,$(1),vclmain)
 
 endef # gb_LinkTarget_use_vclmain
@@ -2092,11 +2206,55 @@ endef # gb_LinkTarget_use_vclmain
 # Used by URE libraries that need to keep binary compatibility.
 # Reset some flags that make sense for our internal libraries but might
 # break public ABI.
-# call gb_LinkTarget_set_is_ure_library,linktarget,,linktargetmakefilename
-define gb_LinkTarget_set_is_ure_library
+# (clang-cl's -Zc:dllexportInlines- would not only be a problem for the URE libraries themselves but
+# also for any libraries they depend on.  While that does not appear to be a problem for -Zc:inline
+# for neither MSVC nor clang-cl, it should not really hurt to also switch that off not only for the
+# URE libraries themselves but also for their dependencies.)
+# call gb_LinkTarget_set_is_ure_library_or_dependency,linktarget,,linktargetmakefilename
+define gb_LinkTarget_set_is_ure_library_or_dependency
 $(call gb_LinkTarget_add_cxxflags,$(1),$(gb_CXXFLAGS_ZCINLINE_OFF))
 ifeq ($(HAVE_DLLEXPORTINLINES),TRUE)
 $(call gb_LinkTarget_add_cxxflags,$(1),-Zc:dllexportInlines)
+endif
+
+endef
+
+gb_LinkTarget__get_plugins_var = $(call gb_LinkTarget__get_workdir_linktargetname,$(1))<>PLUGINS
+gb_LinkTarget__get_plugins = $($(call gb_LinkTarget__get_plugins_var,$(1)))
+gb_Library__get_plugins = $($(call gb_LinkTarget__get_plugins_var,$(call gb_Library_get_linktarget,$(1))))
+
+define gb_LinkTarget__add_plugin
+$(call gb_LinkTarget__get_plugins_var,$(1)) += $(2)
+
+endef
+
+# Instead of setting nodep use gb_LinkTarget__set_plugin_for_nodep
+#
+# call gb_LinkTarget__set_plugin_for,linktarget,loader,nodep
+define gb_LinkTarget__set_plugin_for
+ifeq (,$(filter $(1),$(foreach plugin,$(gb_Library_KNOWNPLUGINS),$(call gb_Library_get_linktarget,$(plugin)))))
+$$(eval $$(call gb_Output_error,Unknown plugin(s) '$(filter $(1),$(foreach plugin,$(gb_Library_KNOWNPLUGINS),$(call gb_Library_get_linktarget,$(plugin))))'. Plugins must be registered in Repository.mk or RepositoryExternal.mk))
+endif
+ifneq (,$(filter $(1),$(foreach lib,$(gb_MERGEDLIBS),$(call gb_Library_get_linktarget,$(lib)))))
+$$(eval $$(call gb_Output_error,Plugins can't be in mergelibs))
+endif
+ifeq ($(call gb_LinkTarget__is_build_tool,$(1)),$(true))
+$$(eval $$(call gb_Output_error,Plugin support for build tools not implemented))
+endif
+
+$(if $(filter $(2),$(gb_Library_KNOWNLOADERS)),,gb_Library_KNOWNLOADERS += $(2))
+$(if $(3),,$(call gb_LinkTarget_use_libraries,$(1),$(2),,$(4)))
+
+endef
+
+# call gb_LinkTarget__set_plugin_for_nodep,linktarget,loader
+gb_LinkTarget__set_plugin_for_nodep = $(call gb_LinkTarget__set_plugin_for,$(1),$(2),$(true))
+
+# call gb_LinkTarget_add_prejs,linktarget,js_file
+define gb_LinkTarget_add_prejs
+ifeq (EMSCRIPTEN,$(OS))
+$(call gb_LinkTarget_get_target,$(1)) : T_PREJS += $(2)
+$(call gb_LinkTarget_get_target,$(1)) : $(2)
 endif
 
 endef

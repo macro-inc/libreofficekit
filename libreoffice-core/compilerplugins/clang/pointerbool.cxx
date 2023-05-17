@@ -16,6 +16,7 @@
 #include <clang/AST/CXXInheritance.h>
 #include "plugin.hxx"
 #include "check.hxx"
+#include "compat.hxx"
 
 /**
   Look for calls where the param is bool but the call-site-arg is pointer.
@@ -114,7 +115,7 @@ bool PointerBool::VisitCallExpr(CallExpr const* callExpr)
         if (arg->getType()->isIntegerType())
         {
             auto ret = getCallValue(arg);
-            if (ret.hasValue() && (ret.getValue() == 1 || ret.getValue() == 0))
+            if (compat::has_value(ret) && (compat::value(ret) == 1 || compat::value(ret) == 0))
                 continue;
             // something like: priv->m_nLOKFeatures & LOK_FEATURE_DOCUMENT_PASSWORD
             if (isa<BinaryOperator>(arg->IgnoreParenImpCasts()))

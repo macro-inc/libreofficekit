@@ -7,35 +7,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
 #include "helper/debughelper.hxx"
 #include "helper/qahelper.hxx"
-#include <markdata.hxx>
-#include <calcconfig.hxx>
 #include <clipparam.hxx>
-#include <compiler.hxx>
-#include <tokenarray.hxx>
-#include <refdata.hxx>
 #include <scopetools.hxx>
 #include <formulacell.hxx>
-#include <docsh.hxx>
 #include <docfunc.hxx>
 #include <inputopt.hxx>
-#include <paramisc.hxx>
 #include <tokenstringcontext.hxx>
 #include <refupdatecontext.hxx>
 #include <dbdata.hxx>
 #include <scmatrix.hxx>
 #include <validat.hxx>
 #include <scitems.hxx>
-#include <patattr.hxx>
 #include <docpool.hxx>
 #include <docoptio.hxx>
-#include <formulaopt.hxx>
 #include <externalrefmgr.hxx>
-#include <scdll.hxx>
 #include <scmod.hxx>
-#include <svl/itemset.hxx>
 #include <undomanager.hxx>
 
 #include <formula/vectortoken.hxx>
@@ -47,6 +35,7 @@
 #include <functional>
 #include <set>
 #include <algorithm>
+#include <vector>
 
 using namespace formula;
 
@@ -197,14 +186,18 @@ public:
 
 }
 
-class TestFormula : public test::BootstrapFixture
+namespace {
+
+struct StrStrCheck {
+    const char* pVal;
+    const char* pRes;
+};
+
+}
+
+class TestFormula : public ScUcalcTestBase
 {
 public:
-    TestFormula();
-
-    virtual void setUp() override;
-    virtual void tearDown() override;
-
     void testFormulaCreateStringFromTokens();
     void testFormulaParseReference();
     void testFetchVectorRefArray();
@@ -252,6 +245,7 @@ public:
     void testTdf97369();
     void testTdf97587();
     void testTdf93415();
+    void testTdf132519();
     void testTdf100818();
     void testMatConcat();
     void testMatConcatReplication();
@@ -269,6 +263,7 @@ public:
     void testRefR1C1WholeRow();
     void testIterations();
     void testInsertColCellStoreEventSwap();
+    void testTdf147398();
     void testFormulaAfterDeleteRows();
     void testMultipleOperations();
     void testFuncCOLUMN();
@@ -316,6 +311,8 @@ public:
     void testFormulaErrorPropagation();
     void testFuncRowsHidden();
     void testFuncSUMIFS();
+    void testFuncCOUNTIFEmpty();
+    void testFuncCOUNTIFSRangeReduce();
     void testFuncRefListArraySUBTOTAL();
     void testFuncJumpMatrixArrayIF();
     void testFuncJumpMatrixArrayOFFSET();
@@ -369,6 +366,7 @@ public:
     CPPUNIT_TEST(testTdf97369);
     CPPUNIT_TEST(testTdf97587);
     CPPUNIT_TEST(testTdf93415);
+    CPPUNIT_TEST(testTdf132519);
     CPPUNIT_TEST(testTdf100818);
     CPPUNIT_TEST(testMatConcat);
     CPPUNIT_TEST(testMatConcatReplication);
@@ -386,6 +384,7 @@ public:
     CPPUNIT_TEST(testRefR1C1WholeRow);
     CPPUNIT_TEST(testIterations);
     CPPUNIT_TEST(testInsertColCellStoreEventSwap);
+    CPPUNIT_TEST(testTdf147398);
     CPPUNIT_TEST(testFormulaAfterDeleteRows);
     CPPUNIT_TEST(testMultipleOperations);
     CPPUNIT_TEST(testFuncCOLUMN);
@@ -433,6 +432,8 @@ public:
     CPPUNIT_TEST(testFormulaErrorPropagation);
     CPPUNIT_TEST(testFuncRowsHidden);
     CPPUNIT_TEST(testFuncSUMIFS);
+    CPPUNIT_TEST(testFuncCOUNTIFEmpty);
+    CPPUNIT_TEST(testFuncCOUNTIFSRangeReduce);
     CPPUNIT_TEST(testFuncRefListArraySUBTOTAL);
     CPPUNIT_TEST(testFuncJumpMatrixArrayIF);
     CPPUNIT_TEST(testFuncJumpMatrixArrayOFFSET);
@@ -440,37 +441,17 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    ScDocShellRef m_xDocShell;
-    ScDocument* m_pDoc;
+    template<size_t DataSize, size_t FormulaSize, int Type>
+    void runTestMATCH(ScDocument* pDoc, const char* aData[DataSize], const StrStrCheck aChecks[FormulaSize]);
+
+    template<size_t DataSize, size_t FormulaSize, int Type>
+    void runTestHorizontalMATCH(ScDocument* pDoc, const char* aData[DataSize], const StrStrCheck aChecks[FormulaSize]);
+
+    void testExtRefFuncT(ScDocument* pDoc, ScDocument& rExtDoc);
+    void testExtRefFuncOFFSET(ScDocument* pDoc, ScDocument& rExtDoc);
+    void testExtRefFuncVLOOKUP(ScDocument* pDoc, ScDocument& rExtDoc);
+    void testExtRefConcat(ScDocument* pDoc, ScDocument& rExtDoc);
 };
-
-TestFormula::TestFormula()
-{
-}
-
-void TestFormula::setUp()
-{
-    BootstrapFixture::setUp();
-
-    ScDLL::Init();
-
-    m_xDocShell = new ScDocShell(
-        SfxModelFlags::EMBEDDED_OBJECT |
-        SfxModelFlags::DISABLE_EMBEDDED_SCRIPTS |
-        SfxModelFlags::DISABLE_DOCUMENT_RECOVERY);
-    m_xDocShell->SetIsInUcalc();
-    m_xDocShell->DoInitUnitTest();
-
-    m_pDoc = &m_xDocShell->GetDocument();
-}
-
-void TestFormula::tearDown()
-{
-    m_xDocShell->DoClose();
-    m_xDocShell.clear();
-
-    test::BootstrapFixture::tearDown();
-}
 
 void TestFormula::testFormulaCreateStringFromTokens()
 {
@@ -655,18 +636,17 @@ void TestFormula::testFormulaParseReference()
     // Make sure the formula input and output match.
     {
         const char* aChecks[] = {
-            "'90''s Music'.B12",
-            "'90''s and 70''s'.$AB$100",
-            "'All Others'.Z$100",
-            "NoQuote.$C111"
+            "='90''s Music'.B12",
+            "='90''s and 70''s'.$AB$100",
+            "='All Others'.Z$100",
+            "=NoQuote.$C111"
         };
 
         for (size_t i = 0; i < SAL_N_ELEMENTS(aChecks); ++i)
         {
             // Use the 'Dummy' sheet for this.
-            OUString aInput = "=" + OUString::createFromAscii(aChecks[i]);
-            m_pDoc->SetString(ScAddress(0,0,0), aInput);
-            ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,0,0), aChecks[i], "Wrong formula");
+            m_pDoc->SetString(ScAddress(0,0,0), OUString::createFromAscii(aChecks[i]));
+            CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString::createFromAscii(aChecks[i]), m_pDoc->GetFormula(0,0,0));
         }
     }
 
@@ -838,32 +818,32 @@ void TestFormula::testFormulaParseReference()
     // Check for reference input conversion to and display string of entire column/row.
     {
         const char* row1048576Checks[][2] = {
-            { "=B:B",           "B:B" },
-            { "=B1:B1048576",   "B:B" },
-            { "=B1:B$1048576",  "B1:B$1048576" },
-            { "=B$1:B1048576",  "B$1:B1048576" },
-            { "=B$1:B$1048576", "B:B" }
+            { "=B:B",           "=B:B" },
+            { "=B1:B1048576",   "=B:B" },
+            { "=B1:B$1048576",  "=B1:B$1048576" },
+            { "=B$1:B1048576",  "=B$1:B1048576" },
+            { "=B$1:B$1048576", "=B:B" }
         };
         const char* row16777216Checks[][2] = {
-            { "=B:B",           "B:B" },
-            { "=B1:B16777216",   "B:B" },
-            { "=B1:B$16777216",  "B1:B$16777216" },
-            { "=B$1:B16777216",  "B$1:B16777216" },
-            { "=B$1:B$16777216", "B:B" }
+            { "=B:B",           "=B:B" },
+            { "=B1:B16777216",   "=B:B" },
+            { "=B1:B$16777216",  "=B1:B$16777216" },
+            { "=B$1:B16777216",  "=B$1:B16777216" },
+            { "=B$1:B$16777216", "=B:B" }
         };
         const char* col1024Checks[][2] = {
-            { "=2:2",           "2:2" },
-            { "=A2:AMJ2",       "2:2" },
-            { "=A2:$AMJ2",      "A2:$AMJ2" },
-            { "=$A2:AMJ2",      "$A2:AMJ2" },
-            { "=$A2:$AMJ2",     "2:2" }
+            { "=2:2",           "=2:2" },
+            { "=A2:AMJ2",       "=2:2" },
+            { "=A2:$AMJ2",      "=A2:$AMJ2" },
+            { "=$A2:AMJ2",      "=$A2:AMJ2" },
+            { "=$A2:$AMJ2",     "=2:2" }
         };
         const char* col16384Checks[][2] = {
-            { "=2:2",           "2:2" },
-            { "=A2:XFD2",       "2:2" },
-            { "=A2:$XFD2",      "A2:$XFD2" },
-            { "=$A2:XFD2",      "$A2:XFD2" },
-            { "=$A2:$XFD2",     "2:2" }
+            { "=2:2",           "=2:2" },
+            { "=A2:XFD2",       "=2:2" },
+            { "=A2:$XFD2",      "=A2:$XFD2" },
+            { "=$A2:XFD2",      "=$A2:XFD2" },
+            { "=$A2:$XFD2",     "=2:2" }
         };
 
         if (m_pDoc->MaxRow() == 1048575)
@@ -872,7 +852,7 @@ void TestFormula::testFormulaParseReference()
             {
                 // Use the 'Dummy' sheet for this.
                 m_pDoc->SetString(ScAddress(0,0,0), OUString::createFromAscii(check[0]));
-                ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,0,0), check[1], "Wrong formula");
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString::createFromAscii(check[1]), m_pDoc->GetFormula(0,0,0));
             }
         }
         else
@@ -881,7 +861,7 @@ void TestFormula::testFormulaParseReference()
             for (const auto& check : row16777216Checks)
             {
                 m_pDoc->SetString(ScAddress(0,0,0), OUString::createFromAscii(check[0]));
-                ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,0,0), check[1], "Wrong formula");
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString::createFromAscii(check[1]), m_pDoc->GetFormula(0,0,0));
             }
         }
         if (m_pDoc->MaxCol() == 1023)
@@ -889,7 +869,7 @@ void TestFormula::testFormulaParseReference()
             for (const auto& check : col1024Checks)
             {
                 m_pDoc->SetString(ScAddress(0,0,0), OUString::createFromAscii(check[0]));
-                ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,0,0), check[1], "Wrong formula");
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString::createFromAscii(check[1]), m_pDoc->GetFormula(0,0,0));
             }
         }
         else
@@ -898,7 +878,7 @@ void TestFormula::testFormulaParseReference()
             for (const auto& check : col16384Checks)
             {
                 m_pDoc->SetString(ScAddress(0,0,0), OUString::createFromAscii(check[0]));
-                ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,0,0), check[1], "Wrong formula");
+                CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString::createFromAscii(check[1]), m_pDoc->GetFormula(0,0,0));
             }
         }
     }
@@ -1342,7 +1322,11 @@ void TestFormula::testFormulaCompiler()
         std::unique_ptr<ScTokenArray> pArray = compileFormula(m_pDoc, OUString::createFromAscii(aTests[i].pInput), aTests[i].eInputGram);
         CPPUNIT_ASSERT_MESSAGE("Token array shouldn't be NULL!", pArray);
 
-        OUString aFormula = toString(*m_pDoc, ScAddress(), *pArray, aTests[i].eOutputGram);
+        ScCompiler aComp(*m_pDoc, ScAddress(), *pArray, aTests[i].eOutputGram);
+        OUStringBuffer aBuf;
+        aComp.CreateStringFromTokenArray(aBuf);
+        OUString aFormula = aBuf.makeStringAndClear();
+
         CPPUNIT_ASSERT_EQUAL(OUString::createFromAscii(aTests[i].pOutput), aFormula);
     }
 }
@@ -1729,8 +1713,8 @@ void TestFormula::testFormulaCompilerImplicitIntersection1NoGroup()
     // Implicit intersection optimization in ScCompiler::HandleIIOpCode() internally changes
     // these to "=COS(A3)" and "=COS(A4)", but these shouldn't be merged into a formula group,
     // otherwise B4's formula would then be "=COS(A2:A6)".
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,0), "COS(A1:A5)", "Formula in B3 has changed.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,3,0), "COS(A1:A5)", "Formula in B4 has changed.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Formula in B3 has changed.", OUString("=COS(A1:A5)"), m_pDoc->GetFormula(1,2,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Formula in B4 has changed.", OUString("=COS(A1:A5)"), m_pDoc->GetFormula(1,3,0));
 
     m_pDoc->DeleteTab(0);
 }
@@ -1857,7 +1841,8 @@ void TestFormula::testFormulaAnnotateTrimOnDoubleRefs()
         std::string aMsgStart = "TestCase#" + std::to_string(nTestIdx + 1) + " : ";
         CPPUNIT_ASSERT_EQUAL_MESSAGE(aMsgStart + "Incorrect formula result", rTestCase.fResult, m_pDoc->GetValue(ScAddress(4, 0, 0)));
 
-        ScTokenArray* pCode = getTokens(*m_pDoc, ScAddress(4, 0, 0));
+        ScFormulaCell* pCell = m_pDoc->GetFormulaCell(ScAddress(4, 0, 0));
+        ScTokenArray* pCode = pCell->GetCode();
         sal_Int32 nLen = pCode->GetCodeLen();
         FormulaToken** pRPNArray = pCode->GetCode();
 
@@ -1891,82 +1876,82 @@ void TestFormula::testFormulaRefUpdate()
     m_pDoc->SetString(ScAddress(2,3,0), "=$A$1"); // C4
 
     ScAddress aPos(2,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A1", "Wrong formula in C3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C3.", OUString("=A1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,3,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$1", "Wrong formula in C4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C4.", OUString("=$A$1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete row 2 to push formula cells up (to C2:C3).
     m_pDoc->DeleteRow(ScRange(0,1,0,m_pDoc->MaxCol(),1,0));
 
     aPos = ScAddress(2,1,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A1", "Wrong formula in C2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C2.", OUString("=A1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$1", "Wrong formula in C3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C3.", OUString("=$A$1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Insert one row at row 2 to move them back.
     m_pDoc->InsertRow(ScRange(0,1,0,m_pDoc->MaxCol(),1,0));
 
     aPos = ScAddress(2,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A1", "Wrong formula in C3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C3.", OUString("=A1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,3,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$1", "Wrong formula in C4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C4.", OUString("=$A$1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Insert 2 rows at row 1 to shift all of A1 and C3:C4 down.
     m_pDoc->InsertRow(ScRange(0,0,0,m_pDoc->MaxCol(),1,0));
 
     aPos = ScAddress(2,4,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A3", "Wrong formula in C5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C5.", OUString("=A3"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,5,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$3", "Wrong formula in C6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C6.", OUString("=$A$3"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete 2 rows at row 1 to shift them back.
     m_pDoc->DeleteRow(ScRange(0,0,0,m_pDoc->MaxCol(),1,0));
 
     aPos = ScAddress(2,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A1", "Wrong formula in C3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C3.", OUString("=A1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,3,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$1", "Wrong formula in C4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C4.", OUString("=$A$1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Insert 3 columns at column B. to shift C3:C4 to F3:F4.
     m_pDoc->InsertCol(ScRange(1,0,0,3,m_pDoc->MaxRow(),0));
 
     aPos = ScAddress(5,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A1", "Wrong formula in F3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in F3.", OUString("=A1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(5,3,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$1", "Wrong formula in F4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in F4.", OUString("=$A$1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete columns B:D to shift them back.
     m_pDoc->DeleteCol(ScRange(1,0,0,3,m_pDoc->MaxRow(),0));
 
     aPos = ScAddress(2,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A1", "Wrong formula in C3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C3.", OUString("=A1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,3,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$1", "Wrong formula in C4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C4.", OUString("=$A$1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Insert cells over A1:A3 to only shift A1 down to A4.
     m_pDoc->InsertRow(ScRange(0,0,0,0,2,0));
 
     aPos = ScAddress(2,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A4", "Wrong formula in C3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C3.", OUString("=A4"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,3,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$4", "Wrong formula in C4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C4.", OUString("=$A$4"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // .. and back.
     m_pDoc->DeleteRow(ScRange(0,0,0,0,2,0));
 
     aPos = ScAddress(2,2,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "A1", "Wrong formula in C3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C3.", OUString("=A1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(2,3,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$A$1", "Wrong formula in C4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in C4.", OUString("=$A$1"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete row 1 which will delete the value cell (A1).
     m_pDoc->DeleteRow(ScRange(0,0,0,m_pDoc->MaxCol(),0,0));
@@ -1995,64 +1980,64 @@ void TestFormula::testFormulaRefUpdate()
     m_pDoc->SetString(ScAddress(0,6,0), "=SUM($B$2:$C$3)");
 
     aPos = ScAddress(0,5,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B2:C3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM(B2:C3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(0,6,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM($B$2:$C$3)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM($B$2:$C$3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Insert a row at row 1.
     m_pDoc->InsertRow(ScRange(0,0,0,m_pDoc->MaxCol(),0,0));
 
     aPos = ScAddress(0,6,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B3:C4)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM(B3:C4)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(0,7,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM($B$3:$C$4)", "Wrong formula in A8.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A8.", OUString("=SUM($B$3:$C$4)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // ... and back.
     m_pDoc->DeleteRow(ScRange(0,0,0,m_pDoc->MaxCol(),0,0));
 
     aPos = ScAddress(0,5,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B2:C3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM(B2:C3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(0,6,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM($B$2:$C$3)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM($B$2:$C$3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Insert columns B:C to shift only the value range.
     m_pDoc->InsertCol(ScRange(1,0,0,2,m_pDoc->MaxRow(),0));
 
     aPos = ScAddress(0,5,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(D2:E3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM(D2:E3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(0,6,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM($D$2:$E$3)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM($D$2:$E$3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // ... and back.
     m_pDoc->DeleteCol(ScRange(1,0,0,2,m_pDoc->MaxRow(),0));
 
     aPos = ScAddress(0,5,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B2:C3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM(B2:C3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(0,6,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM($B$2:$C$3)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM($B$2:$C$3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Insert rows 5:6 to shift the formula cells only.
     m_pDoc->InsertRow(ScRange(0,4,0,m_pDoc->MaxCol(),5,0));
 
     aPos = ScAddress(0,7,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B2:C3)", "Wrong formula in A8.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A8.", OUString("=SUM(B2:C3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(0,8,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM($B$2:$C$3)", "Wrong formula in A9.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A9.", OUString("=SUM($B$2:$C$3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // ... and back.
     m_pDoc->DeleteRow(ScRange(0,4,0,m_pDoc->MaxCol(),5,0));
 
     aPos = ScAddress(0,5,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B2:C3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM(B2:C3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     aPos = ScAddress(0,6,0);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM($B$2:$C$3)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM($B$2:$C$3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Check the values of the formula cells in A6:A7.
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(ScAddress(0,5,0)));
@@ -2109,9 +2094,9 @@ void TestFormula::testFormulaRefUpdateRange()
     m_pDoc->SetString(ScAddress(0,6,0), "=SUM(B2:C5)");
     m_pDoc->SetString(ScAddress(0,7,0), "=SUM($B$2:$C$5)");
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,6,0), "SUM(B2:C5)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM(B2:C5)"), m_pDoc->GetFormula(0,6,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,7,0), "SUM($B$2:$C$5)", "Wrong formula in A8.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A8.", OUString("=SUM($B$2:$C$5)"), m_pDoc->GetFormula(0,7,0));
 
     CPPUNIT_ASSERT_EQUAL(36.0, m_pDoc->GetValue(ScAddress(0,6,0)));
     CPPUNIT_ASSERT_EQUAL(36.0, m_pDoc->GetValue(ScAddress(0,7,0)));
@@ -2119,9 +2104,9 @@ void TestFormula::testFormulaRefUpdateRange()
     // Delete row 3. This should shrink the range references by one row.
     m_pDoc->DeleteRow(ScRange(0,2,0,m_pDoc->MaxCol(),2,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM(B2:C4)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM(B2:C4)"), m_pDoc->GetFormula(0,5,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,6,0), "SUM($B$2:$C$4)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM($B$2:$C$4)"), m_pDoc->GetFormula(0,6,0));
 
     CPPUNIT_ASSERT_EQUAL(28.0, m_pDoc->GetValue(ScAddress(0,5,0)));
     CPPUNIT_ASSERT_EQUAL(28.0, m_pDoc->GetValue(ScAddress(0,6,0)));
@@ -2129,9 +2114,9 @@ void TestFormula::testFormulaRefUpdateRange()
     // Delete row 4 - bottom of range
     m_pDoc->DeleteRow(ScRange(0,3,0,m_pDoc->MaxCol(),3,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "SUM(B2:C3)", "Wrong formula in A5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=SUM(B2:C3)"), m_pDoc->GetFormula(0,4,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM($B$2:$C$3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM($B$2:$C$3)"), m_pDoc->GetFormula(0,5,0));
 
     CPPUNIT_ASSERT_EQUAL(16.0, m_pDoc->GetValue(ScAddress(0,4,0)));
     CPPUNIT_ASSERT_EQUAL(16.0, m_pDoc->GetValue(ScAddress(0,5,0)));
@@ -2139,9 +2124,9 @@ void TestFormula::testFormulaRefUpdateRange()
     // Delete row 2 - top of range
     m_pDoc->DeleteRow(ScRange(0,1,0,m_pDoc->MaxCol(),1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,3,0), "SUM(B2:C2)", "Wrong formula in A4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A4.", OUString("=SUM(B2:C2)"), m_pDoc->GetFormula(0,3,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "SUM($B$2:$C$2)", "Wrong formula in A5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=SUM($B$2:$C$2)"), m_pDoc->GetFormula(0,4,0));
 
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(ScAddress(0,3,0)));
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(ScAddress(0,4,0)));
@@ -2163,9 +2148,9 @@ void TestFormula::testFormulaRefUpdateRange()
     m_pDoc->SetString(ScAddress(0,1,0), "=SUM(C2:F3)");
     m_pDoc->SetString(ScAddress(0,2,0), "=SUM($C$2:$F$3)");
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C2:F3)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C2:F3)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$2:$F$3)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$2:$F$3)"), m_pDoc->GetFormula(0,2,0));
 
     CPPUNIT_ASSERT_EQUAL(36.0, m_pDoc->GetValue(ScAddress(0,1,0)));
     CPPUNIT_ASSERT_EQUAL(36.0, m_pDoc->GetValue(ScAddress(0,2,0)));
@@ -2173,9 +2158,9 @@ void TestFormula::testFormulaRefUpdateRange()
     // Delete column D.
     m_pDoc->DeleteCol(ScRange(3,0,0,3,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C2:E3)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C2:E3)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$2:$E$3)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$2:$E$3)"), m_pDoc->GetFormula(0,2,0));
 
     CPPUNIT_ASSERT_EQUAL(28.0, m_pDoc->GetValue(ScAddress(0,1,0)));
     CPPUNIT_ASSERT_EQUAL(28.0, m_pDoc->GetValue(ScAddress(0,2,0)));
@@ -2183,9 +2168,9 @@ void TestFormula::testFormulaRefUpdateRange()
     // Delete column E - the right edge of reference range.
     m_pDoc->DeleteCol(ScRange(4,0,0,4,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C2:D3)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C2:D3)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$2:$D$3)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$2:$D$3)"), m_pDoc->GetFormula(0,2,0));
 
     CPPUNIT_ASSERT_EQUAL(16.0, m_pDoc->GetValue(ScAddress(0,1,0)));
     CPPUNIT_ASSERT_EQUAL(16.0, m_pDoc->GetValue(ScAddress(0,2,0)));
@@ -2193,9 +2178,9 @@ void TestFormula::testFormulaRefUpdateRange()
     // Delete column C - the left edge of reference range.
     m_pDoc->DeleteCol(ScRange(2,0,0,2,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C2:C3)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C2:C3)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$2:$C$3)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$2:$C$3)"), m_pDoc->GetFormula(0,2,0));
 
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(ScAddress(0,1,0)));
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(ScAddress(0,2,0)));
@@ -2216,58 +2201,58 @@ void TestFormula::testFormulaRefUpdateRange()
     m_pDoc->SetString(ScAddress(0,4,0), "=SUM(C2:D3)");
     m_pDoc->SetString(ScAddress(0,5,0), "=SUM($C$2:$D$3)");
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "SUM(C2:D3)", "Wrong formula in A5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=SUM(C2:D3)"), m_pDoc->GetFormula(0,4,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM($C$2:$D$3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM($C$2:$D$3)"), m_pDoc->GetFormula(0,5,0));
 
     // Insert a column at column C. This should simply shift the reference without expansion.
     m_pDoc->InsertCol(ScRange(2,0,0,2,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "SUM(D2:E3)", "Wrong formula in A5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=SUM(D2:E3)"), m_pDoc->GetFormula(0,4,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM($D$2:$E$3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM($D$2:$E$3)"), m_pDoc->GetFormula(0,5,0));
 
     // Shift it back.
     m_pDoc->DeleteCol(ScRange(2,0,0,2,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "SUM(C2:D3)", "Wrong formula in A5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=SUM(C2:D3)"), m_pDoc->GetFormula(0,4,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM($C$2:$D$3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM($C$2:$D$3)"), m_pDoc->GetFormula(0,5,0));
 
     // Insert at column D. This should expand the reference by one column length.
     m_pDoc->InsertCol(ScRange(3,0,0,3,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "SUM(C2:E3)", "Wrong formula in A5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=SUM(C2:E3)"), m_pDoc->GetFormula(0,4,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM($C$2:$E$3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM($C$2:$E$3)"), m_pDoc->GetFormula(0,5,0));
 
     // Insert at column F. No expansion should occur since the edge expansion is turned off.
     m_pDoc->InsertCol(ScRange(5,0,0,5,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,4,0), "SUM(C2:E3)", "Wrong formula in A5.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A5.", OUString("=SUM(C2:E3)"), m_pDoc->GetFormula(0,4,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM($C$2:$E$3)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM($C$2:$E$3)"), m_pDoc->GetFormula(0,5,0));
 
     // Insert at row 2. No expansion should occur with edge expansion turned off.
     m_pDoc->InsertRow(ScRange(0,1,0,m_pDoc->MaxCol(),1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "SUM(C3:E4)", "Wrong formula in A6.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A6.", OUString("=SUM(C3:E4)"), m_pDoc->GetFormula(0,5,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,6,0), "SUM($C$3:$E$4)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM($C$3:$E$4)"), m_pDoc->GetFormula(0,6,0));
 
     // Insert at row 4 to expand the reference range.
     m_pDoc->InsertRow(ScRange(0,3,0,m_pDoc->MaxCol(),3,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,6,0), "SUM(C3:E5)", "Wrong formula in A7.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A7.", OUString("=SUM(C3:E5)"), m_pDoc->GetFormula(0,6,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,7,0), "SUM($C$3:$E$5)", "Wrong formula in A8.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A8.", OUString("=SUM($C$3:$E$5)"), m_pDoc->GetFormula(0,7,0));
 
     // Insert at row 6. No expansion with edge expansion turned off.
     m_pDoc->InsertRow(ScRange(0,5,0,m_pDoc->MaxCol(),5,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,7,0), "SUM(C3:E5)", "Wrong formula in A8.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A8.", OUString("=SUM(C3:E5)"), m_pDoc->GetFormula(0,7,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,8,0), "SUM($C$3:$E$5)", "Wrong formula in A9.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A9.", OUString("=SUM($C$3:$E$5)"), m_pDoc->GetFormula(0,8,0));
 
     // Clear the range and start over.
     clearRange(m_pDoc, ScRange(0,0,0,20,20,0));
@@ -2285,37 +2270,37 @@ void TestFormula::testFormulaRefUpdateRange()
     m_pDoc->SetString(ScAddress(0,1,0), "=SUM(C6:D7)");
     m_pDoc->SetString(ScAddress(0,2,0), "=SUM($C$6:$D$7)");
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C6:D7)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C6:D7)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$6:$D$7)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$6:$D$7)"), m_pDoc->GetFormula(0,2,0));
 
     // Insert at column E. This should expand the reference range by one column.
     m_pDoc->InsertCol(ScRange(4,0,0,4,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C6:E7)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C6:E7)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$6:$E$7)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$6:$E$7)"), m_pDoc->GetFormula(0,2,0));
 
     // Insert at column C to edge-expand the reference range.
     m_pDoc->InsertCol(ScRange(2,0,0,2,m_pDoc->MaxRow(),0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C6:F7)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C6:F7)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$6:$F$7)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$6:$F$7)"), m_pDoc->GetFormula(0,2,0));
 
     // Insert at row 8 to edge-expand.
     m_pDoc->InsertRow(ScRange(0,7,0,m_pDoc->MaxCol(),7,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C6:F8)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C6:F8)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$6:$F$8)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$6:$F$8)"), m_pDoc->GetFormula(0,2,0));
 
     // Insert at row 6 to edge-expand.
     m_pDoc->InsertRow(ScRange(0,5,0,m_pDoc->MaxCol(),5,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "SUM(C6:F9)", "Wrong formula in A2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A2.", OUString("=SUM(C6:F9)"), m_pDoc->GetFormula(0,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,2,0), "SUM($C$6:$F$9)", "Wrong formula in A3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A3.", OUString("=SUM($C$6:$F$9)"), m_pDoc->GetFormula(0,2,0));
 
     m_pDoc->InsertTab(1, "StickyRange");
 
@@ -2364,41 +2349,41 @@ void TestFormula::testFormulaRefUpdateRange()
 
     // A3:A18 must not result in #REF! anywhere.
     aPos.Set(0,2,1);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B2:B1048576", "Wrong reference in A3 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A3 after insertion.", OUString("=B2:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B2:B$1048576", "Wrong reference in A4 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A4 after insertion.", OUString("=B2:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B2:$B1048576", "Wrong reference in A5 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A5 after insertion.", OUString("=B2:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B2:$B$1048576", "Wrong reference in A6 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A6 after insertion.", OUString("=B2:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$2:B1048576", "Wrong reference in A7 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A7 after insertion.", OUString("=B$2:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$2:B$1048576", "Wrong reference in A8 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A8 after insertion.", OUString("=B$2:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$2:$B1048576", "Wrong reference in A9 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A9 after insertion.", OUString("=B$2:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$2:$B$1048576", "Wrong reference in A10 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A10 after insertion.", OUString("=B$2:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B2:B1048576", "Wrong reference in A11 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A11 after insertion.", OUString("=$B2:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B2:B$1048576", "Wrong reference in A12 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A12 after insertion.", OUString("=$B2:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B2:$B1048576", "Wrong reference in A13 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A13 after insertion.", OUString("=$B2:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B2:$B$1048576", "Wrong reference in A14 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A14 after insertion.", OUString("=$B2:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$2:B1048576", "Wrong reference in A15 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A15 after insertion.", OUString("=$B$2:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$2:B$1048576", "Wrong reference in A16 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A16 after insertion.", OUString("=$B$2:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$2:$B1048576", "Wrong reference in A17 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A17 after insertion.", OUString("=$B$2:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$2:$B$1048576", "Wrong reference in A18 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A18 after insertion.", OUString("=$B$2:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
 
     // A19 reference to one row shifted out should be #REF!
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B#REF!:C#REF!", "Wrong reference in A19 after insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A19 after insertion.", OUString("=B#REF!:C#REF!"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     // A19 enter reference to last row.
     m_pDoc->SetString( aPos, "=B1048576:C1048576");
     aPos.IncRow();
@@ -2409,41 +2394,41 @@ void TestFormula::testFormulaRefUpdateRange()
     // Check sticky bottom references and display of entire column references,
     // now in A2:A17.
     aPos.Set(0,1,1);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:B", "Wrong reference in A2 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A2 after deletion.", OUString("=B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B1:B$1048576", "Wrong reference in A3 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A3 after deletion.", OUString("=B1:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:$B", "Wrong reference in A4 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A4 after deletion.", OUString("=B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B1:$B$1048576", "Wrong reference in A5 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A5 after deletion.", OUString("=B1:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$1:B1048576", "Wrong reference in A6 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A6 after deletion.", OUString("=B$1:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:B", "Wrong reference in A7 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A7 after deletion.", OUString("=B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$1:$B1048576", "Wrong reference in A8 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A8 after deletion.", OUString("=B$1:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:$B", "Wrong reference in A9 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A9 after deletion.", OUString("=B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:B", "Wrong reference in A10 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A10 after deletion.", OUString("=$B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B1:B$1048576", "Wrong reference in A11 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A11 after deletion.", OUString("=$B1:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:$B", "Wrong reference in A12 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A12 after deletion.", OUString("=$B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B1:$B$1048576", "Wrong reference in A13 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A13 after deletion.", OUString("=$B1:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$1:B1048576", "Wrong reference in A14 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A14 after deletion.", OUString("=$B$1:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:B", "Wrong reference in A15 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A15 after deletion.", OUString("=$B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$1:$B1048576", "Wrong reference in A16 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A16 after deletion.", OUString("=$B$1:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:$B", "Wrong reference in A17 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A17 after deletion.", OUString("=$B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
 
     // A18 reference to one last row should be shifted up.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B1048575:C1048575", "Wrong reference in A18 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A18 after deletion.", OUString("=B1048575:C1048575"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
 
     // Insert 4 rows in the middle.
@@ -2453,37 +2438,37 @@ void TestFormula::testFormulaRefUpdateRange()
 
     // References in A2:A17 must still be the same.
     aPos.Set(0,1,1);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:B", "Wrong reference in A2 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A2 after deletion.", OUString("=B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B1:B$1048576", "Wrong reference in A3 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A3 after deletion.", OUString("=B1:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:$B", "Wrong reference in A4 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A4 after deletion.", OUString("=B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B1:$B$1048576", "Wrong reference in A5 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A5 after deletion.", OUString("=B1:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$1:B1048576", "Wrong reference in A6 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A6 after deletion.", OUString("=B$1:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:B", "Wrong reference in A7 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A7 after deletion.", OUString("=B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B$1:$B1048576", "Wrong reference in A8 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A8 after deletion.", OUString("=B$1:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "B:$B", "Wrong reference in A9 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A9 after deletion.", OUString("=B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:B", "Wrong reference in A10 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A10 after deletion.", OUString("=$B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B1:B$1048576", "Wrong reference in A11 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A11 after deletion.", OUString("=$B1:B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:$B", "Wrong reference in A12 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A12 after deletion.", OUString("=$B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B1:$B$1048576", "Wrong reference in A13 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A13 after deletion.", OUString("=$B1:$B$1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$1:B1048576", "Wrong reference in A14 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A14 after deletion.", OUString("=$B$1:B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:B", "Wrong reference in A15 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A15 after deletion.", OUString("=$B:B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B$1:$B1048576", "Wrong reference in A16 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A16 after deletion.", OUString("=$B$1:$B1048576"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "$B:$B", "Wrong reference in A17 after deletion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong reference in A17 after deletion.", OUString("=$B:$B"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     aPos.IncRow();
 
     // Enter values in B1 and B1048576/B16777216 (last row).
@@ -2545,9 +2530,9 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->SetString(ScAddress(1,1,1), "=SUM(Sheet1.B2:C3)");
     m_pDoc->SetString(ScAddress(1,2,1), "=SUM($Sheet1.$B$2:$C$3)");
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,1), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,1), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,1));
 
     // Swap the sheets.
     m_pDoc->MoveTab(0, 1);
@@ -2556,9 +2541,9 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->GetName(1, aName);
     CPPUNIT_ASSERT_EQUAL(OUString("Sheet1"), aName);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,0), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,0));
 
     // Swap back.
     m_pDoc->MoveTab(0, 1);
@@ -2567,9 +2552,9 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->GetName(1, aName);
     CPPUNIT_ASSERT_EQUAL(OUString("Sheet2"), aName);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,1), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,1), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,1));
 
     // Insert a new sheet between the two.
     m_pDoc->InsertTab(1, "Temp");
@@ -2579,30 +2564,30 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->GetName(2, aName);
     CPPUNIT_ASSERT_EQUAL(OUString("Sheet2"), aName);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,2), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,2));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,2), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,2));
 
     // Move the last sheet (Sheet2) to the first position.
     m_pDoc->MoveTab(2, 0);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,0), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,0));
 
     // Move back.
     m_pDoc->MoveTab(0, 2);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,2), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,2));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,2), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,2));
 
     // Move the "Temp" sheet to the last position.
     m_pDoc->MoveTab(1, 2);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,1), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,1), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,1));
 
     // Move back.
     m_pDoc->MoveTab(2, 1);
@@ -2613,9 +2598,9 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->GetName(1, aName);
     CPPUNIT_ASSERT_EQUAL(OUString("Sheet2"), aName);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,1), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,1), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,1));
 
     // Insert a new sheet before the first one.
     m_pDoc->InsertTab(0, "Temp");
@@ -2625,16 +2610,16 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->GetName(2, aName);
     CPPUNIT_ASSERT_EQUAL(OUString("Sheet2"), aName);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,2), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,2));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,2), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,2));
 
     // Delete the temporary sheet.
     m_pDoc->DeleteTab(0);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,1), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,1), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,1));
 
     // Append a bunch of sheets.
     m_pDoc->InsertTab(2, "Temp1");
@@ -2645,9 +2630,9 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->MoveTab(2, 4);
     m_pDoc->MoveTab(3, 2);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,1), "SUM(Sheet1.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(Sheet1.B2:C3)"), m_pDoc->GetFormula(1,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,1), "SUM($Sheet1.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($Sheet1.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,1));
 
     // Delete the temp sheets.
     m_pDoc->DeleteTab(4);
@@ -2659,9 +2644,9 @@ void TestFormula::testFormulaRefUpdateSheets()
     m_pDoc->GetName(0, aName);
     CPPUNIT_ASSERT_EQUAL(OUString("Sheet2"), aName);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "SUM(#REF!.B2:C3)", "Wrong formula in Sheet2.B2.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B2.", OUString("=SUM(#REF!.B2:C3)"), m_pDoc->GetFormula(1,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,0), "SUM($#REF!.$B$2:$C$3)", "Wrong formula in Sheet2.B3.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in Sheet2.B3.", OUString("=SUM($#REF!.$B$2:$C$3)"), m_pDoc->GetFormula(1,2,0));
 
     m_pDoc->DeleteTab(0);
 }
@@ -2694,7 +2679,7 @@ void TestFormula::testFormulaRefUpdateInsertRows()
     CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(1,4,0)));
     CPPUNIT_ASSERT_EQUAL(3.0, m_pDoc->GetValue(ScAddress(1,5,0)));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,6,0), "SUM(B4:B6)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(B4:B6)"), m_pDoc->GetFormula(1,6,0));
 
     // Clear and start over.
     clearSheet(m_pDoc, 0);
@@ -2716,7 +2701,7 @@ void TestFormula::testFormulaRefUpdateInsertRows()
     CPPUNIT_ASSERT_EQUAL_MESSAGE("This formula cell should not be an error.", 0, static_cast<int>(pFC->GetErrCode()));
     ASSERT_DOUBLES_EQUAL(3.0, m_pDoc->GetValue(ScAddress(0,5,0)));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "MAX(A7:A9)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=MAX(A7:A9)"), m_pDoc->GetFormula(0,5,0));
 
     m_pDoc->DeleteTab(0);
 }
@@ -2732,8 +2717,8 @@ void TestFormula::testFormulaRefUpdateSheetsDelete()
     m_pDoc->SetString(ScAddress(4,2,0), "=SUM($Sheet2.A4:$Sheet4.A4)");
     m_pDoc->DeleteTab(1);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(4,1,0), "SUM(Sheet3.A4:Sheet4.A4)", "Wrong Formula");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(4,2,0), "SUM($Sheet3.A4:$Sheet4.A4)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet3.A4:Sheet4.A4)"), m_pDoc->GetFormula(4,1,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet3.A4:$Sheet4.A4)"), m_pDoc->GetFormula(4,2,0));
 
     m_pDoc->InsertTab(1, "Sheet2");
 
@@ -2741,8 +2726,8 @@ void TestFormula::testFormulaRefUpdateSheetsDelete()
     m_pDoc->SetString(ScAddress(5,2,3), "=SUM($Sheet1.A5:$Sheet3.A5)");
     m_pDoc->DeleteTab(2);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(5,1,2), "SUM(Sheet1.A5:Sheet2.A5)", "Wrong Formula");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(5,2,2), "SUM($Sheet1.A5:$Sheet2.A5)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet1.A5:Sheet2.A5)"), m_pDoc->GetFormula(5,1,2));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet1.A5:$Sheet2.A5)"), m_pDoc->GetFormula(5,2,2));
 
     m_pDoc->InsertTab(2, "Sheet3");
 
@@ -2750,8 +2735,8 @@ void TestFormula::testFormulaRefUpdateSheetsDelete()
     m_pDoc->SetString(ScAddress(6,2,3), "=SUM($Sheet1.A6:$Sheet3.A6)");
     m_pDoc->DeleteTabs(0,3);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(6,1,0), "SUM(#REF!.A6:#REF!.A6)", "Wrong Formula");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(6,2,0), "SUM($#REF!.A6:$#REF!.A6)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(#REF!.A6:#REF!.A6)"), m_pDoc->GetFormula(6,1,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($#REF!.A6:$#REF!.A6)"), m_pDoc->GetFormula(6,2,0));
 
     m_pDoc->InsertTab(0, "Sheet1");
     m_pDoc->InsertTab(1, "Sheet2");
@@ -2767,31 +2752,31 @@ void TestFormula::testFormulaRefUpdateSheetsDelete()
 
     m_pDoc->DeleteTab(2);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,1), "SUM(Sheet1.A2:Sheet2.A2)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet1.A2:Sheet2.A2)"), m_pDoc->GetFormula(1,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,1), "SUM(Sheet1.A1:Sheet2.A1)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet1.A1:Sheet2.A1)"), m_pDoc->GetFormula(2,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,1,1), "SUM(Sheet2.A3:Sheet4.A3)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet2.A3:Sheet4.A3)"), m_pDoc->GetFormula(3,1,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,1), "SUM($Sheet1.A2:$Sheet2.A2)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet1.A2:$Sheet2.A2)"), m_pDoc->GetFormula(1,2,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,2,1), "SUM($Sheet1.A1:$Sheet2.A1)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet1.A1:$Sheet2.A1)"), m_pDoc->GetFormula(2,2,1));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,2,1), "SUM($Sheet2.A3:$Sheet4.A3)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet2.A3:$Sheet4.A3)"), m_pDoc->GetFormula(3,2,1));
 
     m_pDoc->DeleteTab(0);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "SUM(Sheet2.A2:Sheet2.A2)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet2.A2:Sheet2.A2)"), m_pDoc->GetFormula(1,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "SUM(Sheet2.A1:Sheet2.A1)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet2.A1:Sheet2.A1)"), m_pDoc->GetFormula(2,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,1,0), "SUM(Sheet2.A3:Sheet4.A3)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM(Sheet2.A3:Sheet4.A3)"), m_pDoc->GetFormula(3,1,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,0), "SUM($Sheet2.A2:$Sheet2.A2)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet2.A2:$Sheet2.A2)"), m_pDoc->GetFormula(1,2,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,2,0), "SUM($Sheet2.A1:$Sheet2.A1)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet2.A1:$Sheet2.A1)"), m_pDoc->GetFormula(2,2,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,2,0), "SUM($Sheet2.A3:$Sheet4.A3)", "Wrong Formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong Formula", OUString("=SUM($Sheet2.A3:$Sheet4.A3)"), m_pDoc->GetFormula(3,2,0));
 
     m_pDoc->DeleteTab(0);
     m_pDoc->DeleteTab(0);
@@ -2845,7 +2830,7 @@ void TestFormula::testFormulaRefUpdateInsertColumns()
     rFunc.InsertCells(ScRange(0,0,0,1,m_pDoc->MaxRow(),0), &aMark, INS_INSCOLS_BEFORE, false, true);
 
     // Now, the original column B has moved to column D.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,3,0), "SUM(D1:D3)", "Wrong formula in D4 after column insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in D4 after column insertion.", OUString("=SUM(D1:D3)"), m_pDoc->GetFormula(3,3,0));
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(3,3,0)));
 
@@ -2856,7 +2841,7 @@ void TestFormula::testFormulaRefUpdateInsertColumns()
     CPPUNIT_ASSERT_EQUAL(OUString("$Formula.$D2"), aSymbol);
 
     // Check that the formula using the name, now in E2, still has the same result.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(4,1,0), "RowRelativeRange", "Wrong formula in E2 after column insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in E2 after column insertion.", OUString("=RowRelativeRange"), m_pDoc->GetFormula(4,1,0));
 
     CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(4,1,0)));
 
@@ -2867,7 +2852,7 @@ void TestFormula::testFormulaRefUpdateInsertColumns()
     CPPUNIT_ASSERT_EQUAL(OUString("$D:$D"), aSymbol);
 
     // Check that the formula using the name, now in E3, still has the same result.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(4,2,0), "SUM(EntireColumn)", "Wrong formula in E3 after column insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in E3 after column insertion.", OUString("=SUM(EntireColumn)"), m_pDoc->GetFormula(4,2,0));
 
     CPPUNIT_ASSERT_EQUAL(12.0, m_pDoc->GetValue(ScAddress(4,2,0)));
 
@@ -2879,7 +2864,7 @@ void TestFormula::testFormulaRefUpdateInsertColumns()
     CPPUNIT_ASSERT_EQUAL(OUString("$2:$2"), aSymbol);
 
     // Check that the formula using the name, now in E4, still has the same result.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(4,3,0), "SUM(EntireRow)", "Wrong formula in E4 after column insertion.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in E4 after column insertion.", OUString("=SUM(EntireRow)"), m_pDoc->GetFormula(4,3,0));
 
     CPPUNIT_ASSERT_EQUAL(4.0, m_pDoc->GetValue(ScAddress(4,3,0)));
 
@@ -2919,10 +2904,10 @@ void TestFormula::testFormulaRefUpdateMove()
     CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(0,10,0));
     CPPUNIT_ASSERT_EQUAL(3.0, m_pDoc->GetValue(0,11,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,8,0), "SUM(D4:D6)", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,9,0), "SUM($D$4:$D$6)", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,10,0), "D5", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,11,0), "$D$6", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(D4:D6)"), m_pDoc->GetFormula(0,8,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM($D$4:$D$6)"), m_pDoc->GetFormula(0,9,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=D5"), m_pDoc->GetFormula(0,10,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=$D$6"), m_pDoc->GetFormula(0,11,0));
 
     // Move A9:A12 to B10:B13.
     bMoved = rFunc.MoveBlock(ScRange(0,8,0,0,11,0), ScAddress(1,9,0), true, false, false, false);
@@ -2935,10 +2920,10 @@ void TestFormula::testFormulaRefUpdateMove()
     CPPUNIT_ASSERT_EQUAL(3.0, m_pDoc->GetValue(1,12,0));
 
     // Displayed formulas should stay the same since the referenced range hasn't moved.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,9,0), "SUM(D4:D6)", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,10,0), "SUM($D$4:$D$6)", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,11,0), "D5", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,12,0), "$D$6", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(D4:D6)"), m_pDoc->GetFormula(1,9,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM($D$4:$D$6)"), m_pDoc->GetFormula(1,10,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=D5"), m_pDoc->GetFormula(1,11,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=$D$6"), m_pDoc->GetFormula(1,12,0));
 
     // The value cells are in D4:D6. Move D4:D5 to the right but leave D6
     // where it is.
@@ -2951,10 +2936,10 @@ void TestFormula::testFormulaRefUpdateMove()
     CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(1,11,0));
     CPPUNIT_ASSERT_EQUAL(3.0, m_pDoc->GetValue(1,12,0));
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,9,0), "SUM(D4:D6)", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,10,0), "SUM($D$4:$D$6)", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,11,0), "E5", "Wrong formula.");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,12,0), "$D$6", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(D4:D6)"), m_pDoc->GetFormula(1,9,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM($D$4:$D$6)"), m_pDoc->GetFormula(1,10,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=E5"), m_pDoc->GetFormula(1,11,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=$D$6"), m_pDoc->GetFormula(1,12,0));
 
     m_pDoc->DeleteTab(0);
 }
@@ -2974,28 +2959,28 @@ void TestFormula::testFormulaRefUpdateMoveUndo()
     // Set formulas with single cell references in A6:A8.
     m_pDoc->SetString(ScAddress(0,5,0), "=A1");
     CPPUNIT_ASSERT_EQUAL(1.0, m_pDoc->GetValue(ScAddress(0,5,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "A1", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=A1"), m_pDoc->GetFormula(0,5,0));
 
     m_pDoc->SetString(ScAddress(0,6,0), "=A1+A2+A3");
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(0,6,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,6,0), "A1+A2+A3", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=A1+A2+A3"), m_pDoc->GetFormula(0,6,0));
 
     m_pDoc->SetString(ScAddress(0,7,0), "=A1+A3+A4");
     CPPUNIT_ASSERT_EQUAL(8.0, m_pDoc->GetValue(ScAddress(0,7,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,7,0), "A1+A3+A4", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=A1+A3+A4"), m_pDoc->GetFormula(0,7,0));
 
     // Set formulas with range references in A10:A12.
     m_pDoc->SetString(ScAddress(0,9,0), "=SUM(A1:A2)");
     CPPUNIT_ASSERT_EQUAL(3.0, m_pDoc->GetValue(ScAddress(0,9,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,9,0), "SUM(A1:A2)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(A1:A2)"), m_pDoc->GetFormula(0,9,0));
 
     m_pDoc->SetString(ScAddress(0,10,0), "=SUM(A1:A3)");
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(0,10,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,10,0), "SUM(A1:A3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(A1:A3)"), m_pDoc->GetFormula(0,10,0));
 
     m_pDoc->SetString(ScAddress(0,11,0), "=SUM(A1:A4)");
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(ScAddress(0,11,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,11,0), "SUM(A1:A4)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(A1:A4)"), m_pDoc->GetFormula(0,11,0));
 
     // Move A1:A3 to C1:C3. Note that A4 remains.
     ScDocFunc& rFunc = m_xDocShell->GetDocFunc();
@@ -3003,22 +2988,22 @@ void TestFormula::testFormulaRefUpdateMoveUndo()
     CPPUNIT_ASSERT(bMoved);
 
     CPPUNIT_ASSERT_EQUAL(1.0, m_pDoc->GetValue(ScAddress(0,5,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "C1", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=C1"), m_pDoc->GetFormula(0,5,0));
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(0,6,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,6,0), "C1+C2+C3", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=C1+C2+C3"), m_pDoc->GetFormula(0,6,0));
 
     CPPUNIT_ASSERT_EQUAL(8.0, m_pDoc->GetValue(ScAddress(0,7,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,7,0), "C1+C3+A4", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=C1+C3+A4"), m_pDoc->GetFormula(0,7,0));
 
     CPPUNIT_ASSERT_EQUAL(3.0, m_pDoc->GetValue(ScAddress(0,9,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,9,0), "SUM(C1:C2)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(C1:C2)"), m_pDoc->GetFormula(0,9,0));
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(0,10,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,10,0), "SUM(C1:C3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(C1:C3)"), m_pDoc->GetFormula(0,10,0));
 
     CPPUNIT_ASSERT_EQUAL(4.0, m_pDoc->GetValue(ScAddress(0,11,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,11,0), "SUM(A1:A4)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(A1:A4)"), m_pDoc->GetFormula(0,11,0));
 
     // Undo the move.
     SfxUndoManager* pUndoMgr = m_pDoc->GetUndoManager();
@@ -3026,22 +3011,22 @@ void TestFormula::testFormulaRefUpdateMoveUndo()
     pUndoMgr->Undo();
 
     CPPUNIT_ASSERT_EQUAL(1.0, m_pDoc->GetValue(ScAddress(0,5,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,5,0), "A1", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=A1"), m_pDoc->GetFormula(0,5,0));
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(0,6,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,6,0), "A1+A2+A3", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=A1+A2+A3"), m_pDoc->GetFormula(0,6,0));
 
     CPPUNIT_ASSERT_EQUAL(8.0, m_pDoc->GetValue(ScAddress(0,7,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,7,0), "A1+A3+A4", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=A1+A3+A4"), m_pDoc->GetFormula(0,7,0));
 
     CPPUNIT_ASSERT_EQUAL(3.0, m_pDoc->GetValue(ScAddress(0,9,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,9,0), "SUM(A1:A2)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(A1:A2)"), m_pDoc->GetFormula(0,9,0));
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(0,10,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,10,0), "SUM(A1:A3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(A1:A3)"), m_pDoc->GetFormula(0,10,0));
 
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(ScAddress(0,11,0)));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,11,0), "SUM(A1:A4)","Wrong formula." );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(A1:A4)"), m_pDoc->GetFormula(0,11,0));
 
     // Make sure the broadcasters are still valid by changing the value of A1.
     m_pDoc->SetValue(ScAddress(0,0,0), 20);
@@ -3345,10 +3330,10 @@ void TestFormula::testFormulaRefUpdateMoveUndo4()
     bGood = checkOutput(m_pDoc, aOutRange, aCheckAfter, "A1:A2 moved to B1:B2");
     CPPUNIT_ASSERT(bGood);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,0,0), "B1", "Wrong formula"); // C1
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "B2", "Wrong formula"); // C2
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,0,0), "B1", "Wrong formula"); // D1
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,1,0), "B2", "Wrong formula"); // D2
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B1"), m_pDoc->GetFormula(2,0,0)); // C1
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B2"), m_pDoc->GetFormula(2,1,0)); // C2
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B1"), m_pDoc->GetFormula(3,0,0)); // D1
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B2"), m_pDoc->GetFormula(3,1,0)); // D2
 
     // Undo the move.
     SfxUndoManager* pUndoMgr = m_pDoc->GetUndoManager();
@@ -3358,10 +3343,10 @@ void TestFormula::testFormulaRefUpdateMoveUndo4()
     bGood = checkOutput(m_pDoc, aOutRange, aCheckInitial, "after undo");
     CPPUNIT_ASSERT(bGood);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,0,0), "B1", "Wrong formula"); // C1
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "B2", "Wrong formula"); // C2
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,0,0), "A1", "Wrong formula"); // D1
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,1,0), "A2", "Wrong formula"); // D2
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B1"), m_pDoc->GetFormula(2,0,0)); // C1
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B2"), m_pDoc->GetFormula(2,1,0)); // C2
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=A1"), m_pDoc->GetFormula(3,0,0)); // D1
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=A2"), m_pDoc->GetFormula(3,1,0)); // D2
 
     // Redo and check.
     pUndoMgr->Redo();
@@ -3369,10 +3354,10 @@ void TestFormula::testFormulaRefUpdateMoveUndo4()
     bGood = checkOutput(m_pDoc, aOutRange, aCheckAfter, "after redo");
     CPPUNIT_ASSERT(bGood);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,0,0), "B1", "Wrong formula"); // C1
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(2,1,0), "B2", "Wrong formula"); // C2
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,0,0), "B1", "Wrong formula"); // D1
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(3,1,0), "B2", "Wrong formula"); // D2
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B1"), m_pDoc->GetFormula(2,0,0)); // C1
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B2"), m_pDoc->GetFormula(2,1,0)); // C2
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B1"), m_pDoc->GetFormula(3,0,0)); // D1
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=B2"), m_pDoc->GetFormula(3,1,0)); // D2
 
     m_pDoc->DeleteTab(0);
 }
@@ -3390,8 +3375,8 @@ void TestFormula::testFormulaRefUpdateMoveToSheet()
     m_pDoc->SetString(ScAddress(1,0,0), "=A1");
     m_pDoc->SetString(ScAddress(1,1,0), "=A2");
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,0,0), "A1", "Wrong formula");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "A2", "Wrong formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=A1"), m_pDoc->GetFormula(1,0,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=A2"), m_pDoc->GetFormula(1,1,0));
 
     CPPUNIT_ASSERT_EQUAL(11.0, m_pDoc->GetValue(ScAddress(1,0,0)));
     CPPUNIT_ASSERT_EQUAL(12.0, m_pDoc->GetValue(ScAddress(1,1,0)));
@@ -3401,21 +3386,21 @@ void TestFormula::testFormulaRefUpdateMoveToSheet()
     bool bMoved = rFunc.MoveBlock(ScRange(0,0,0,0,1,0), ScAddress(1,2,1), true, true, false, true);
     CPPUNIT_ASSERT(bMoved);
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,0,0), "Sheet2.B3", "Wrong formula");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "Sheet2.B4", "Wrong formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=Sheet2.B3"), m_pDoc->GetFormula(1,0,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=Sheet2.B4"), m_pDoc->GetFormula(1,1,0));
 
     // Undo and check again.
     SfxUndoManager* pUndoMgr = m_pDoc->GetUndoManager();
     pUndoMgr->Undo();
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,0,0), "A1", "Wrong formula");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "A2", "Wrong formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=A1"), m_pDoc->GetFormula(1,0,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=A2"), m_pDoc->GetFormula(1,1,0));
 
     // Redo and check.
     pUndoMgr->Redo();
 
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,0,0), "Sheet2.B3", "Wrong formula");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "Sheet2.B4", "Wrong formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=Sheet2.B3"), m_pDoc->GetFormula(1,0,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=Sheet2.B4"), m_pDoc->GetFormula(1,1,0));
 
     m_pDoc->DeleteTab(1);
     m_pDoc->DeleteTab(0);
@@ -3484,7 +3469,7 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftLeft()
 
     aPos.IncCol(-2);
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:E1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:E1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check.
     SfxUndoManager* pUndo = m_pDoc->GetUndoManager();
@@ -3493,7 +3478,7 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftLeft()
     pUndo->Undo();
     aPos.IncCol(2);
     CPPUNIT_ASSERT_EQUAL(15.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:G1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:G1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete columns C:D (left end of the reference).
     bDeleted = rFunc.DeleteCells(ScRange(2,0,0,3,m_pDoc->MaxRow(),0), &aMark, DelCellCmd::CellsLeft, true);
@@ -3501,13 +3486,13 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftLeft()
 
     aPos.IncCol(-2);
     CPPUNIT_ASSERT_EQUAL(12.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:E1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:E1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check again.
     pUndo->Undo();
     aPos.IncCol(2);
     CPPUNIT_ASSERT_EQUAL(15.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:G1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:G1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete columns B:E (overlaps on the left).
     bDeleted = rFunc.DeleteCells(ScRange(1,0,0,4,m_pDoc->MaxRow(),0), &aMark, DelCellCmd::CellsLeft, true);
@@ -3515,13 +3500,13 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftLeft()
 
     aPos.IncCol(-4);
     CPPUNIT_ASSERT_EQUAL(9.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B1:C1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(B1:C1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check again.
     pUndo->Undo();
     aPos.IncCol(4);
     CPPUNIT_ASSERT_EQUAL(15.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:G1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:G1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Start over with a new scenario.
     clearSheet(m_pDoc, 0);
@@ -3540,24 +3525,24 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftLeft()
     CPPUNIT_ASSERT(bDeleted);
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:E1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:E1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check.
     pUndo->Undo();
     CPPUNIT_ASSERT_EQUAL(21.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:H1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:H1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete columns G:I (overlaps on the right).
     bDeleted = rFunc.DeleteCells(ScRange(6,0,0,8,m_pDoc->MaxRow(),0), &aMark, DelCellCmd::CellsLeft, true);
     CPPUNIT_ASSERT(bDeleted);
 
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:F1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:F1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check again.
     pUndo->Undo();
     CPPUNIT_ASSERT_EQUAL(21.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(C1:H1)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(C1:H1)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     m_pDoc->DeleteTab(0);
 }
@@ -3658,7 +3643,7 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftUp()
 
     aPos.IncRow(-2);
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A5)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A5)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check.
     SfxUndoManager* pUndo = m_pDoc->GetUndoManager();
@@ -3667,7 +3652,7 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftUp()
     pUndo->Undo();
     aPos.IncRow(2);
     CPPUNIT_ASSERT_EQUAL(15.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A7)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A7)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete rows 3:4 (top end of the reference).
     bDeleted = rFunc.DeleteCells(ScRange(0,2,0,m_pDoc->MaxCol(),3,0), &aMark, DelCellCmd::CellsUp, true);
@@ -3675,13 +3660,13 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftUp()
 
     aPos.IncRow(-2);
     CPPUNIT_ASSERT_EQUAL(12.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A5)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A5)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check again.
     pUndo->Undo();
     aPos.IncRow(2);
     CPPUNIT_ASSERT_EQUAL(15.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A7)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A7)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete rows 2:5 (overlaps on the top).
     bDeleted = rFunc.DeleteCells(ScRange(0,1,0,m_pDoc->MaxCol(),4,0), &aMark, DelCellCmd::CellsUp, true);
@@ -3689,13 +3674,13 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftUp()
 
     aPos.IncRow(-4);
     CPPUNIT_ASSERT_EQUAL(9.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A2:A3)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A2:A3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check again.
     pUndo->Undo();
     aPos.IncRow(4);
     CPPUNIT_ASSERT_EQUAL(15.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A7)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A7)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Start over with a new scenario.
     clearSheet(m_pDoc, 0);
@@ -3714,24 +3699,24 @@ void TestFormula::testFormulaRefUpdateDeleteAndShiftUp()
     CPPUNIT_ASSERT(bDeleted);
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A5)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A5)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check.
     pUndo->Undo();
     CPPUNIT_ASSERT_EQUAL(21.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A8)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A8)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Delete rows 7:9 (overlaps on the bottom).
     bDeleted = rFunc.DeleteCells(ScRange(0,6,0,m_pDoc->MaxCol(),8,0), &aMark, DelCellCmd::CellsUp, true);
     CPPUNIT_ASSERT(bDeleted);
 
     CPPUNIT_ASSERT_EQUAL(10.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A6)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A6)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     // Undo and check again.
     pUndo->Undo();
     CPPUNIT_ASSERT_EQUAL(21.0, m_pDoc->GetValue(aPos));
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A3:A8)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=SUM(A3:A8)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     m_pDoc->DeleteTab(0);
 }
@@ -4629,7 +4614,7 @@ void TestFormula::testFormulaRefUpdateValidity()
         SC_VALID_LIST, ScConditionMode::Equal, "C2:C4", "", *m_pDoc, ScAddress(0,1,0), "", "",
         m_pDoc->GetGrammar(), m_pDoc->GetGrammar());
 
-    sal_uLong nIndex = m_pDoc->AddValidationEntry(aData);
+    sal_uInt32 nIndex = m_pDoc->AddValidationEntry(aData);
     SfxUInt32Item aItem(ATTR_VALIDDATA, nIndex);
 
     ScPatternAttr aNewAttrs(
@@ -4965,9 +4950,9 @@ void TestFormula::testFuncROW()
     ScMarkData aMark(m_pDoc->GetSheetLimits());
     aMark.SelectOneTable(0);
     rFunc.InsertCells(ScRange(0,3,0,m_pDoc->MaxCol(),3,0), &aMark, INS_INSROWS_BEFORE, false, true);
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(0,1,0), "ROW(A6)", "Wrong formula!");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,1,0), "ROW(B6)", "Wrong formula!");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,2,0), "ROW(B7)", "Wrong formula!");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=ROW(A6)"), m_pDoc->GetFormula(0,1,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=ROW(B6)"), m_pDoc->GetFormula(1,1,0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula!", OUString("=ROW(B7)"), m_pDoc->GetFormula(1,2,0));
 
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(0,1,0)));
     CPPUNIT_ASSERT_EQUAL(6.0, m_pDoc->GetValue(ScAddress(1,1,0)));
@@ -5035,6 +5020,13 @@ void TestFormula::testFuncSUM()
     CPPUNIT_ASSERT_MESSAGE("A2 should be an error.", nErr != FormulaError::NONE);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("A4 should have inherited the same error as A2.",
                            static_cast<int>(nErr), static_cast<int>(m_pDoc->GetErrCode(ScAddress(0,3,0))));
+
+    // Test the dreaded 0.1 + 0.2 - 0.3 != 0.0
+    m_pDoc->SetString(ScAddress(1,0,0), "=SUM(0.1;0.2;-0.3)");
+    CPPUNIT_ASSERT_EQUAL(0.0, m_pDoc->GetValue(ScAddress(1,0,0)));
+    // Also for +/- operators
+    m_pDoc->SetString(ScAddress(1,1,0), "=0.1+0.2-0.3");
+    CPPUNIT_ASSERT_EQUAL(0.0, m_pDoc->GetValue(ScAddress(1,1,0)));
 
     m_pDoc->DeleteTab(0);
 }
@@ -6010,17 +6002,8 @@ void TestFormula::testFuncVLOOKUP()
     m_pDoc->DeleteTab(0);
 }
 
-namespace {
-
-struct StrStrCheck {
-    const char* pVal;
-    const char* pRes;
-};
-
-}
-
 template<size_t DataSize, size_t FormulaSize, int Type>
-static void runTestMATCH(ScDocument* pDoc, const char* aData[DataSize], const StrStrCheck aChecks[FormulaSize])
+void TestFormula::runTestMATCH(ScDocument* pDoc, const char* aData[DataSize], const StrStrCheck aChecks[FormulaSize])
 {
     size_t nDataSize = DataSize;
     for (size_t i = 0; i < nDataSize; ++i)
@@ -6052,7 +6035,7 @@ static void runTestMATCH(ScDocument* pDoc, const char* aData[DataSize], const St
 }
 
 template<size_t DataSize, size_t FormulaSize, int Type>
-static void runTestHorizontalMATCH(ScDocument* pDoc, const char* aData[DataSize], const StrStrCheck aChecks[FormulaSize])
+void TestFormula::runTestHorizontalMATCH(ScDocument* pDoc, const char* aData[DataSize], const StrStrCheck aChecks[FormulaSize])
 {
     size_t nDataSize = DataSize;
     for (size_t i = 0; i < nDataSize; ++i)
@@ -6847,7 +6830,6 @@ void TestFormula::testFormulaMatrixResultUpdate()
 void TestFormula::testExternalRef()
 {
     ScDocShellRef xExtDocSh = new ScDocShell;
-    xExtDocSh->SetIsInUcalc();
     OUString aExtDocName("file:///extdata.fake");
     OUString aExtSh1Name("Data1");
     OUString aExtSh2Name("Data2");
@@ -7022,7 +7004,6 @@ void TestFormula::testExternalRef()
 void TestFormula::testExternalRangeName()
 {
     ScDocShellRef xExtDocSh = new ScDocShell;
-    xExtDocSh->SetIsInUcalc();
     OUString const aExtDocName("file:///extdata.fake");
     SfxMedium* pMed = new SfxMedium(aExtDocName, StreamMode::STD_READWRITE);
     xExtDocSh->DoLoad(pMed);
@@ -7050,7 +7031,7 @@ void TestFormula::testExternalRangeName()
     m_pDoc->DeleteTab(0);
 }
 
-static void testExtRefFuncT(ScDocument* pDoc, ScDocument& rExtDoc)
+void TestFormula::testExtRefFuncT(ScDocument* pDoc, ScDocument& rExtDoc)
 {
     clearRange(pDoc, ScRange(0, 0, 0, 1, 9, 0));
     clearRange(&rExtDoc, ScRange(0, 0, 0, 1, 9, 0));
@@ -7071,7 +7052,7 @@ static void testExtRefFuncT(ScDocument* pDoc, ScDocument& rExtDoc)
     CPPUNIT_ASSERT_MESSAGE("Unexpected result with T.", aRes.isEmpty());
 }
 
-static void testExtRefFuncOFFSET(ScDocument* pDoc, ScDocument& rExtDoc)
+void TestFormula::testExtRefFuncOFFSET(ScDocument* pDoc, ScDocument& rExtDoc)
 {
     clearRange(pDoc, ScRange(0, 0, 0, 1, 9, 0));
     clearRange(&rExtDoc, ScRange(0, 0, 0, 1, 9, 0));
@@ -7084,7 +7065,7 @@ static void testExtRefFuncOFFSET(ScDocument* pDoc, ScDocument& rExtDoc)
     CPPUNIT_ASSERT_EQUAL(1.2, pDoc->GetValue(ScAddress(0,0,0)));
 }
 
-static void testExtRefFuncVLOOKUP(ScDocument* pDoc, ScDocument& rExtDoc)
+void TestFormula::testExtRefFuncVLOOKUP(ScDocument* pDoc, ScDocument& rExtDoc)
 {
     clearRange(pDoc, ScRange(0, 0, 0, 1, 9, 0));
     clearRange(&rExtDoc, ScRange(0, 0, 0, 1, 9, 0));
@@ -7115,7 +7096,7 @@ static void testExtRefFuncVLOOKUP(ScDocument* pDoc, ScDocument& rExtDoc)
     CPPUNIT_ASSERT_EQUAL(OUString("B2"), pDoc->GetString(ScAddress(1,0,0)));
 }
 
-static void testExtRefConcat(ScDocument* pDoc, ScDocument& rExtDoc)
+void TestFormula::testExtRefConcat(ScDocument* pDoc, ScDocument& rExtDoc)
 {
     clearRange(pDoc, ScRange(0, 0, 0, 1, 9, 0));
     clearRange(&rExtDoc, ScRange(0, 0, 0, 1, 9, 0));
@@ -7134,7 +7115,6 @@ static void testExtRefConcat(ScDocument* pDoc, ScDocument& rExtDoc)
 void TestFormula::testExternalRefFunctions()
 {
     ScDocShellRef xExtDocSh = new ScDocShell;
-    xExtDocSh->SetIsInUcalc();
     OUString aExtDocName("file:///extdata.fake");
     SfxMedium* pMed = new SfxMedium(aExtDocName, StreamMode::STD_READWRITE);
     xExtDocSh->DoLoad(pMed);
@@ -7374,37 +7354,37 @@ void TestFormula::testFuncRangeOp()
 
     ScAddress aPos(0,0,0);
     m_pDoc->SetString( aPos, "=SUM(B1:B2:B3)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B1:B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(B1:B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 7.0, m_pDoc->GetValue(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(B1:B3:B2)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B1:B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(B1:B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 7.0, m_pDoc->GetValue(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(B2:B3:B1)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B1:B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(B1:B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 7.0, m_pDoc->GetValue(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(Sheet2.B1:B2:B3)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(Sheet2.B1:B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(Sheet2.B1:B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 56.0, m_pDoc->GetValue(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(B2:B2:Sheet1.B2)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(Sheet1.B2:B2)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(Sheet1.B2:B2)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 2.0, m_pDoc->GetValue(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(B2:B3:Sheet2.B1)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(Sheet1.B1:Sheet2.B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(Sheet1.B1:Sheet2.B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 63.0, m_pDoc->GetValue(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(Sheet1.B1:Sheet2.B2:Sheet3.B3)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(Sheet1.B1:Sheet3.B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(Sheet1.B1:Sheet3.B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 511.0, m_pDoc->GetValue(aPos));
 
     // B1:Sheet2.B2 would be ambiguous, Sheet1.B1:Sheet2.B2 or Sheet2.B1:B2
@@ -7412,17 +7392,17 @@ void TestFormula::testFuncRangeOp()
     // have to be adapted.
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(B1:Sheet2.B2:Sheet3.B3)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(b1:sheet2.b2:Sheet3.B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(b1:sheet2.b2:Sheet3.B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( OUString("#NAME?"), m_pDoc->GetString(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(Sheet1.B1:Sheet3.B2:Sheet2.B3)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(Sheet1.B1:Sheet3.B3)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(Sheet1.B1:Sheet3.B3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 511.0, m_pDoc->GetValue(aPos));
 
     aPos.IncRow();
     m_pDoc->SetString( aPos, "=SUM(B$2:B$2:B2)");
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(B$2:B2)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=SUM(B$2:B2)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_EQUAL( 2.0, m_pDoc->GetValue(aPos));
 
     m_pDoc->DeleteTab(2);
@@ -7644,18 +7624,18 @@ void TestFormula::testFuncTableRef()
     // Set header in column B. Use ScDocFunc to have table column names refreshed.
     rDocFunc.SetStringCell(ScAddress(1,0,0), "NewHeader",true);
     // Verify that formula adapted using the updated table column names.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,5,0), "SUM(table[[#Data];[NewHeader]])", "Wrong formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=SUM(table[[#Data];[NewHeader]])"), m_pDoc->GetFormula(1,5,0));
 
     // Set header in column A to identical string. Internal table column name
     // for B should get a "2" appended.
     rDocFunc.SetStringCell(ScAddress(0,0,0), "NewHeader",true);
     // Verify that formula adapted using the updated table column names.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,5,0), "SUM(table[[#Data];[NewHeader2]])", "Wrong formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=SUM(table[[#Data];[NewHeader2]])"), m_pDoc->GetFormula(1,5,0));
 
     // Set header in column B to empty string, effectively clearing the cell.
     rDocFunc.SetStringCell(ScAddress(1,0,0), "",true);
     // Verify that formula is still using the previous table column name.
-    ASSERT_FORMULA_EQUAL(*m_pDoc, ScAddress(1,5,0), "SUM(table[[#Data];[NewHeader2]])", "Wrong formula");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula", OUString("=SUM(table[[#Data];[NewHeader2]])"), m_pDoc->GetFormula(1,5,0));
 
     // === header-less ===
 
@@ -8897,6 +8877,29 @@ void TestFormula::testTdf93415()
     m_pDoc->DeleteTab(0);
 }
 
+void TestFormula::testTdf132519()
+{
+    CPPUNIT_ASSERT(m_pDoc->InsertTab (0, "Sheet1"));
+
+    ScCalcConfig aConfig;
+    aConfig.SetStringRefSyntax( formula::FormulaGrammar::CONV_XL_R1C1 );
+    m_pDoc->SetCalcConfig(aConfig);
+    m_pDoc->CalcAll();
+
+    m_pDoc->SetString(2, 0, 0, "X");
+    m_pDoc->SetString(1, 0, 0, "=CELL(\"ADDRESS\"; C1)");
+    m_pDoc->SetString(0, 0, 0, "=INDIRECT(B1)");
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: X
+    // - Actual  : #REF!
+    CPPUNIT_ASSERT_EQUAL(OUString("X"), m_pDoc->GetString(0,0,0));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("R1C3"), m_pDoc->GetString(1,0,0));
+
+    m_pDoc->DeleteTab(0);
+}
+
 void TestFormula::testTdf100818()
 {
     CPPUNIT_ASSERT(m_pDoc->InsertTab (0, "Sheet1"));
@@ -9317,6 +9320,94 @@ void TestFormula::testFuncSUMIFS()
     m_pDoc->DeleteTab(0);
 }
 
+// Test that COUNTIF counts properly empty cells if asked to.
+void TestFormula::testFuncCOUNTIFEmpty()
+{
+    sc::AutoCalcSwitch aACSwitch(*m_pDoc, true); // turn auto calc on.
+    m_pDoc->InsertTab(0, "Test");
+
+    // Data in A1:A9.
+    std::vector<std::vector<const char*>> aData = {
+        { "" },
+        { "a" },
+        { "b" },
+        { "c" },
+        { "d" },
+        { "a" },
+        { "" },
+        { "b" },
+        { "c" }
+    };
+
+    insertRangeData(m_pDoc, ScAddress(0,0,0), aData);
+
+    constexpr SCROW maxRow = 20; // so that the unittest is not slow in dbgutil builds
+    SCROW startRow = 0;
+    SCROW endRow = maxRow;
+    SCCOL startCol = 0;
+    SCCOL endCol = 0;
+    // ScSortedRangeCache would normally shrink data range to this.
+    CPPUNIT_ASSERT(m_pDoc->ShrinkToDataArea(0, startCol, startRow, endCol, endRow));
+    CPPUNIT_ASSERT_EQUAL(SCROW(8), endRow);
+
+    // But not if matching empty cells.
+    m_pDoc->SetFormula( ScAddress(10, 0, 0), "=COUNTIFS($A1:$A" + OUString::number(maxRow + 1) + "; \"\")",
+        formula::FormulaGrammar::GRAM_NATIVE_UI);
+    CPPUNIT_ASSERT_EQUAL( double(maxRow + 1 - 7), m_pDoc->GetValue(ScAddress(10, 0, 0)));
+
+    m_pDoc->DeleteTab(0);
+}
+
+// Test that COUNTIFS counts properly empty cells if asked to.
+void TestFormula::testFuncCOUNTIFSRangeReduce()
+{
+    sc::AutoCalcSwitch aACSwitch(*m_pDoc, true); // turn auto calc on.
+    m_pDoc->InsertTab(0, "Test");
+
+    // Data in A1:C9.
+    std::vector<std::vector<const char*>> aData = {
+        { "" },
+        { "a",  "1", "1" },
+        { "b",  "2", "2" },
+        { "c",  "4", "3" },
+        { "d",  "8", "4" },
+        { "a", "16", "5" },
+        { "" },
+        { "b", "", "6" },
+        { "c", "64", "7" }
+    };
+
+    insertRangeData(m_pDoc, ScAddress(0,0,0), aData);
+
+    constexpr SCROW maxRow = 20; // so that the unittest is not slow in dbgutil builds
+    ScRange aSubRange( ScAddress( 0, 0, 0 ), ScAddress( 2, maxRow, 0 ));
+    m_pDoc->GetDataAreaSubrange(aSubRange);
+    // This is the range the data should be reduced to in ScInterpreter::IterateParametersIfs().
+    CPPUNIT_ASSERT_EQUAL( SCROW(1), aSubRange.aStart.Row());
+    CPPUNIT_ASSERT_EQUAL( SCROW(8), aSubRange.aEnd.Row());
+
+    m_pDoc->SetFormula( ScAddress(10, 0, 0), "=COUNTIFS($A1:$A" + OUString::number(maxRow+1)
+        + "; \"\"; $B1:$B" + OUString::number(maxRow+1)
+        + "; \"\"; $C1:$C" + OUString::number(maxRow+1) +"; \"\")",
+        formula::FormulaGrammar::GRAM_NATIVE_UI);
+    // But it should find out that it can't range reduce and must count all the empty rows.
+    CPPUNIT_ASSERT_EQUAL( double(maxRow + 1 - 7), m_pDoc->GetValue(ScAddress(10, 0, 0)));
+
+    // Check also with criteria set as cell references, the middle one resulting in matching
+    // empty cells (which should cause ScInterpreter::IterateParametersIfs() to undo
+    // the range reduction). This should only match the A8-C8 row, but it also shouldn't crash.
+    // Matching empty cells using a cell reference needs a formula to set the cell to
+    // an empty string, plain empty cell wouldn't do, so use K2 for that.
+    m_pDoc->SetFormula( ScAddress(10, 1, 0), "=\"\"", formula::FormulaGrammar::GRAM_NATIVE_UI );
+    m_pDoc->SetFormula( ScAddress(10, 0, 0), "=COUNTIFS($A1:$A" + OUString::number(maxRow+1)
+        + "; A8; $B1:$B" + OUString::number(maxRow+1)
+        + "; K2; $C1:$C" + OUString::number(maxRow+1) + "; C8)",
+        formula::FormulaGrammar::GRAM_NATIVE_UI);
+    CPPUNIT_ASSERT_EQUAL( double(1), m_pDoc->GetValue(ScAddress(10, 0, 0)));
+
+    m_pDoc->DeleteTab(0);
+}
+
 // Test SUBTOTAL with reference lists in array context.
 void TestFormula::testFuncRefListArraySUBTOTAL()
 {
@@ -9555,6 +9646,81 @@ void TestFormula::testInsertColCellStoreEventSwap()
     m_pDoc->DeleteTab(0);
 }
 
+void TestFormula::testTdf147398()
+{
+    m_pDoc->InsertTab(0, "Test");
+
+    m_pDoc->SetString(0, 0, 0, "=SUM(A3:A5)");
+    m_pDoc->SetString(0, 1, 0, "=COUNT(A3:A5)");
+    m_pDoc->SetString(1, 0, 0, "=SUM(B3:B5)");
+    m_pDoc->SetString(1, 1, 0, "=COUNT(B3:B5)");
+    m_pDoc->SetString(2, 0, 0, "=SUM(C3:C5)");
+    m_pDoc->SetString(2, 1, 0, "=COUNT(C3:C5)");
+    m_pDoc->SetString(3, 0, 0, "=SUM(D3:D5)");
+    m_pDoc->SetString(3, 1, 0, "=COUNT(D3:D5)");
+    m_pDoc->SetString(4, 0, 0, "=SUM(E3:E5)");
+    m_pDoc->SetString(4, 1, 0, "=COUNT(E3:E5)");
+
+    m_pDoc->SetString(5, 0, 0, "=SUM(A1:E1)/SUM(A2:E2)");
+
+    m_pDoc->SetValue(ScAddress(0, 2, 0), 50.0);
+    m_pDoc->SetValue(ScAddress(0, 3, 0), 100.0);
+
+    CPPUNIT_ASSERT_EQUAL(150.0, m_pDoc->GetValue(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(75.0, m_pDoc->GetValue(ScAddress(5, 0, 0)));
+
+    m_pDoc->SetValue(ScAddress(1, 2, 0), 150.0);
+    m_pDoc->SetValue(ScAddress(1, 3, 0), 200.0);
+
+    CPPUNIT_ASSERT_EQUAL(150.0, m_pDoc->GetValue(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(350.0, m_pDoc->GetValue(ScAddress(1, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(1, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(125.0, m_pDoc->GetValue(ScAddress(5, 0, 0)));
+
+    m_pDoc->SetValue(ScAddress(2, 2, 0), 250.0);
+    m_pDoc->SetValue(ScAddress(2, 3, 0), 300.0);
+
+    CPPUNIT_ASSERT_EQUAL(150.0, m_pDoc->GetValue(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(350.0, m_pDoc->GetValue(ScAddress(1, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(1, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(550.0, m_pDoc->GetValue(ScAddress(2, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(2, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(175.0, m_pDoc->GetValue(ScAddress(5, 0, 0)));
+
+    m_pDoc->SetValue(ScAddress(3, 2, 0), 350.0);
+    m_pDoc->SetValue(ScAddress(3, 3, 0), 400.0);
+
+    CPPUNIT_ASSERT_EQUAL(150.0, m_pDoc->GetValue(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(350.0, m_pDoc->GetValue(ScAddress(1, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(1, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(550.0, m_pDoc->GetValue(ScAddress(2, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(2, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(750.0, m_pDoc->GetValue(ScAddress(3, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(3, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(225.0, m_pDoc->GetValue(ScAddress(5, 0, 0)));
+
+    m_pDoc->SetValue(ScAddress(4, 2, 0), 450.0);
+    m_pDoc->SetValue(ScAddress(4, 3, 0), 500.0);
+
+    CPPUNIT_ASSERT_EQUAL(150.0, m_pDoc->GetValue(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(350.0, m_pDoc->GetValue(ScAddress(1, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(1, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(550.0, m_pDoc->GetValue(ScAddress(2, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(2, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(750.0, m_pDoc->GetValue(ScAddress(3, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(3, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(950.0, m_pDoc->GetValue(ScAddress(4, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, m_pDoc->GetValue(ScAddress(4, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(275.0, m_pDoc->GetValue(ScAddress(5, 0, 0)));
+
+    m_pDoc->DeleteTab(0);
+}
+
 void TestFormula::testFormulaAfterDeleteRows()
 {
     sc::AutoCalcSwitch aACSwitch(*m_pDoc, true); // turn auto calc on.
@@ -9570,7 +9736,7 @@ void TestFormula::testFormulaAfterDeleteRows()
     m_pDoc->DeleteRow(ScRange(0, 1, 0, m_pDoc->MaxCol(), 69997, 0));
 
     const ScAddress aPos(0, 3, 0);  // A4
-    ASSERT_FORMULA_EQUAL(*m_pDoc, aPos, "SUM(A1:A3)", "Wrong formula in A4.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula in A4.", OUString("=SUM(A1:A3)"), m_pDoc->GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
 
     ASSERT_DOUBLES_EQUAL_MESSAGE("Wrong value at A4", 3.0, m_pDoc->GetValue(aPos));
 }

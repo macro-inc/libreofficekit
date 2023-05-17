@@ -44,11 +44,13 @@
 #include <vcl/vectorgraphicdata.hxx>
 #include <drawinglayer/primitive2d/groupprimitive2d.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
+#include <drawinglayer/converters.hxx>
 #include <svx/sdr/contact/viewcontact.hxx>
 #include <sdr/contact/objectcontactofobjlistpainter.hxx>
 #include <svx/sdr/contact/displayinfo.hxx>
 #include <svx/svdotable.hxx>
 #include <sal/log.hxx>
+#include <osl/diagnose.h>
 #include <comphelper/lok.hxx>
 
 using namespace com::sun::star;
@@ -141,9 +143,9 @@ bool SdrExchangeView::Paste(const OUString& rStr, const Point& rPos, SdrObjList*
     if (pPage!=nullptr) {
         aTextRect.SetSize(pPage->GetSize());
     }
-    SdrRectObj* pObj = new SdrRectObj(
+    rtl::Reference<SdrRectObj> pObj = new SdrRectObj(
         getSdrModelFromSdrView(),
-        OBJ_TEXT,
+        SdrObjKind::Text,
         aTextRect);
 
     pObj->SetLayer(nLayer);
@@ -162,7 +164,7 @@ bool SdrExchangeView::Paste(const OUString& rStr, const Point& rPos, SdrObjList*
     Size aSiz(pObj->GetLogicRect().GetSize());
     MapUnit eMap=mpModel->GetScaleUnit();
     Fraction aMap=mpModel->GetScaleFraction();
-    ImpPasteObject(pObj,*pLst,aPos,aSiz,MapMode(eMap,Point(0,0),aMap,aMap),nOptions);
+    ImpPasteObject(pObj.get(),*pLst,aPos,aSiz,MapMode(eMap,Point(0,0),aMap,aMap),nOptions);
     return true;
 }
 
@@ -181,9 +183,9 @@ bool SdrExchangeView::Paste(SvStream& rInput, EETextFormat eFormat, const Point&
     if (pPage!=nullptr) {
         aTextRect.SetSize(pPage->GetSize());
     }
-    SdrRectObj* pObj = new SdrRectObj(
+    rtl::Reference<SdrRectObj> pObj = new SdrRectObj(
         getSdrModelFromSdrView(),
-        OBJ_TEXT,
+        SdrObjKind::Text,
         aTextRect);
 
     pObj->SetLayer(nLayer);
@@ -202,7 +204,7 @@ bool SdrExchangeView::Paste(SvStream& rInput, EETextFormat eFormat, const Point&
     Size aSiz(pObj->GetLogicRect().GetSize());
     MapUnit eMap=mpModel->GetScaleUnit();
     Fraction aMap=mpModel->GetScaleFraction();
-    ImpPasteObject(pObj,*pLst,aPos,aSiz,MapMode(eMap,Point(0,0),aMap,aMap),nOptions);
+    ImpPasteObject(pObj.get(),*pLst,aPos,aSiz,MapMode(eMap,Point(0,0),aMap,aMap),nOptions);
 
     // b4967543
     if(pObj->GetOutlinerParaObject())
@@ -300,7 +302,7 @@ bool SdrExchangeView::Paste(
         {
             const SdrObject* pSrcOb=pSrcPg->GetObj(nOb);
 
-            SdrObject* pNewObj(pSrcOb->CloneSdrObject(*mpModel));
+            rtl::Reference<SdrObject> pNewObj(pSrcOb->CloneSdrObject(*mpModel));
 
             if (pNewObj!=nullptr)
             {
@@ -322,7 +324,7 @@ bool SdrExchangeView::Paste(
                     const SdrLayerAdmin& rAd = pPg->GetLayerAdmin();
                     SdrLayerID nLayer(0);
 
-                    if(dynamic_cast<const FmFormObj*>( pNewObj) !=  nullptr)
+                    if(dynamic_cast<const FmFormObj*>( pNewObj.get()) !=  nullptr)
                     {
                         // for FormControls, force to form layer
                         nLayer = rAd.GetLayerID(rAd.GetControlLayerName());
@@ -340,7 +342,7 @@ bool SdrExchangeView::Paste(
                     pNewObj->SetLayer(nLayer);
                 }
 
-                pDstLst->InsertObjectThenMakeNameUnique(pNewObj, aNameSet);
+                pDstLst->InsertObjectThenMakeNameUnique(pNewObj.get(), aNameSet);
 
                 if( bUndo )
                     AddUndo(getSdrModelFromSdrView().GetSdrUndoFactory().CreateUndoNewObject(*pNewObj));
@@ -348,11 +350,11 @@ bool SdrExchangeView::Paste(
                 if (bMark) {
                     // Don't already set Markhandles!
                     // That is instead being done by ModelHasChanged in MarkView.
-                    MarkObj(pNewObj,pMarkPV,false,true);
+                    MarkObj(pNewObj.get(),pMarkPV,false,true);
                 }
 
                 // #i13033#
-                aCloneList.AddPair(pSrcOb, pNewObj);
+                aCloneList.AddPair(pSrcOb, pNewObj.get());
             }
             else
             {
@@ -484,8 +486,10 @@ BitmapEx SdrExchangeView::GetMarkedObjBitmapEx(bool bNoVDevIfOneBmpMarked, const
                         pSdrGrafObj->ForceSwapIn();
                     }
 
+                    drawinglayer::primitive2d::Primitive2DContainer xRetval;
+                    pCandidate->GetViewContact().getViewIndependentPrimitive2DContainer(xRetval);
                     xPrimitives[a] = new drawinglayer::primitive2d::GroupPrimitive2D(
-                        pCandidate->GetViewContact().getViewIndependentPrimitive2DContainer());
+                        std::move(xRetval));
                 }
 
                 // get logic range
@@ -503,8 +507,8 @@ BitmapEx SdrExchangeView::GetMarkedObjBitmapEx(bool bNoVDevIfOneBmpMarked, const
 
                     // if we have geometry and it has a range, convert to BitmapEx using
                     // common tooling
-                    aBmp = convertPrimitive2DSequenceToBitmapEx(
-                        xPrimitives,
+                    aBmp = drawinglayer::convertPrimitive2DContainerToBitmapEx(
+                        std::move(xPrimitives),
                         aRange,
                         nMaximumQuadraticPixels,
                         eRangeUnit,
@@ -738,7 +742,7 @@ std::unique_ptr<SdrModel> SdrExchangeView::CreateMarkedObjModel() const
 
     for(SdrObject* pObj : aSdrObjects)
     {
-        SdrObject* pNewObj(nullptr);
+        rtl::Reference<SdrObject> pNewObj;
 
         if(nullptr != dynamic_cast< const SdrPageObj* >(pObj))
         {
@@ -759,10 +763,10 @@ std::unique_ptr<SdrModel> SdrExchangeView::CreateMarkedObjModel() const
             }
         }
 
-        if(nullptr == pNewObj)
+        if(!pNewObj)
         {
             // not cloned yet
-            if(pObj->GetObjIdentifier() == OBJ_OLE2 && nullptr == mpModel->GetPersist())
+            if(pObj->GetObjIdentifier() == SdrObjKind::OLE2 && nullptr == mpModel->GetPersist())
             {
                 // tdf#125520 - former fix was wrong, the SdrModel
                 // has to have a GetPersist() already, see task.
@@ -776,10 +780,10 @@ std::unique_ptr<SdrModel> SdrExchangeView::CreateMarkedObjModel() const
 
         if(pNewObj)
         {
-            pNewPage->InsertObject(pNewObj, SAL_MAX_SIZE);
+            pNewPage->InsertObject(pNewObj.get(), SAL_MAX_SIZE);
 
             // #i13033#
-            aCloneList.AddPair(pObj, pNewObj);
+            aCloneList.AddPair(pObj, pNewObj.get());
         }
     }
 

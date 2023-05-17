@@ -18,11 +18,11 @@
  */
 
 #include <svtools/optionsdrawinglayer.hxx>
-#include <tools/debug.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/settings.hxx>
 #include <officecfg/Office/Common.hxx>
+#include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <mutex>
 
 // #i73602#
@@ -125,6 +125,12 @@ static bool gbAntiAliasing = false;
 static bool gbAllowAAInit = false;
 static bool gbAllowAA = false;
 
+static bool gbAntiAliasingForwardInitial(false);
+static bool gbAntiAliasingForwardLast(true);
+
+static bool gbPixelSnapHairlineForwardInitial(false);
+static bool gbPixelSnapHairlineForwardLast(true);
+
 bool IsAAPossibleOnThisSystem()
 {
     std::scoped_lock aGuard(gaAntiAliasMutex);
@@ -149,7 +155,18 @@ bool IsAntiAliasing()
         }
         bAntiAliasing = gbAntiAliasing;
     }
-    return bAntiAliasing && IsAAPossibleOnThisSystem();
+
+    bAntiAliasing = bAntiAliasing && IsAAPossibleOnThisSystem();
+
+    //
+    if (!gbAntiAliasingForwardInitial || gbAntiAliasingForwardLast != bAntiAliasing)
+    {
+        gbAntiAliasingForwardInitial = true;
+        gbAntiAliasingForwardLast = bAntiAliasing;
+        drawinglayer::geometry::ViewInformation2D::forwardAntiAliasing(bAntiAliasing);
+    }
+
+    return bAntiAliasing;
 }
 
 /**
@@ -167,13 +184,30 @@ void SetAntiAliasing( bool bOn, bool bTemporary )
         officecfg::Office::Common::Drawinglayer::AntiAliasing::set(bOn, batch);
         batch->commit();
     }
+
+    if (!gbAntiAliasingForwardInitial || gbAntiAliasingForwardLast != bOn)
+    {
+        gbAntiAliasingForwardInitial = true;
+        gbAntiAliasingForwardLast = bOn;
+        drawinglayer::geometry::ViewInformation2D::forwardAntiAliasing(bOn);
+    }
+
     gbAntiAliasing = bOn;
 }
 
 
 bool IsSnapHorVerLinesToDiscrete()
 {
-    return IsAntiAliasing() && officecfg::Office::Common::Drawinglayer::SnapHorVerLinesToDiscrete::get();
+    const bool bRetval(IsAntiAliasing() && officecfg::Office::Common::Drawinglayer::SnapHorVerLinesToDiscrete::get());
+
+    if (!gbPixelSnapHairlineForwardInitial || gbPixelSnapHairlineForwardLast != bRetval)
+    {
+        gbPixelSnapHairlineForwardInitial = true;
+        gbPixelSnapHairlineForwardLast = bRetval;
+        drawinglayer::geometry::ViewInformation2D::forwardPixelSnapHairline(bRetval);
+    }
+
+    return bRetval;
 }
 
 bool IsSolidDragCreate()

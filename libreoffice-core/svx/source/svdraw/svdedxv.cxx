@@ -24,6 +24,7 @@
 #include <editeng/editstat.hxx>
 #include <editeng/outlobj.hxx>
 #include <editeng/unotext.hxx>
+#include <o3tl/deleter.hxx>
 #include <svl/itemiter.hxx>
 #include <svl/style.hxx>
 #include <svl/whiter.hxx>
@@ -44,8 +45,11 @@
 #include <vcl/weld.hxx>
 #include <vcl/window.hxx>
 #include <comphelper/lok.hxx>
+#include <basegfx/polygon/b2dpolygontools.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
+#include <drawinglayer/primitive2d/maskprimitive2d.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
+#include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <editeng/outliner.hxx>
 #include <sal/log.hxx>
 #include <sdr/overlay/overlaytools.hxx>
@@ -91,7 +95,7 @@ SdrObjEditView::~SdrObjEditView()
     mpTextEditWin = nullptr; // so there's no ShowCursor in SdrEndTextEdit
     assert(!IsTextEdit());
     if (IsTextEdit())
-        SdrEndTextEdit();
+        suppress_fun_call_w_exception(SdrEndTextEdit());
     mpTextEditOutliner.reset();
     assert(nullptr == mpOldTextEditUndoManager); // should have been reset
 }
@@ -242,13 +246,13 @@ void SdrObjEditView::Notify(SfxBroadcaster& rBC, const SfxHint& rHint)
 void SdrObjEditView::ModelHasChanged()
 {
     SdrGlueEditView::ModelHasChanged();
-    if (mxWeakTextEditObj.is() && !mxWeakTextEditObj->IsInserted())
+    rtl::Reference<SdrTextObj> pTextObj = mxWeakTextEditObj.get();
+    if (pTextObj && !pTextObj->IsInserted())
         SdrEndTextEdit(); // object deleted
     // TextEditObj changed?
     if (!IsTextEdit())
         return;
 
-    SdrTextObj* pTextObj = mxWeakTextEditObj.get();
     if (pTextObj != nullptr)
     {
         size_t nOutlViewCnt = mpTextEditOutliner->GetViewCount();
@@ -270,7 +274,7 @@ void SdrObjEditView::ModelHasChanged()
 
             // add possible GridOffset to up-to-now view-independent EditAreas
             basegfx::B2DVector aGridOffset(0.0, 0.0);
-            if (getPossibleGridOffsetForSdrObject(aGridOffset, pTextObj, GetSdrPageView()))
+            if (getPossibleGridOffsetForSdrObject(aGridOffset, pTextObj.get(), GetSdrPageView()))
             {
                 const Point aOffset(basegfx::fround(aGridOffset.getX()),
                                     basegfx::fround(aGridOffset.getY()));
@@ -387,6 +391,9 @@ void SdrObjEditView::ModelHasChanged()
 
 namespace
 {
+class TextEditFrameOverlayObject;
+class TextEditHighContrastOverlaySelection;
+
 /**
         Helper class to visualize the content of an active EditView as an
         OverlayObject. These objects work with Primitives and are handled
@@ -404,7 +411,9 @@ class TextEditOverlayObject : public sdr::overlay::OverlayObject
 {
 protected:
     /// local access to associated sdr::overlay::OverlaySelection
-    std::unique_ptr<sdr::overlay::OverlaySelection> mxOverlaySelection;
+    std::unique_ptr<sdr::overlay::OverlaySelection> mxOverlayTransparentSelection;
+    std::unique_ptr<TextEditHighContrastOverlaySelection> mxOverlayHighContrastSelection;
+    std::unique_ptr<TextEditFrameOverlayObject> mxOverlayFrame;
 
     /// local definition depends on active OutlinerView
     OutlinerView& mrOutlinerView;
@@ -417,23 +426,17 @@ protected:
     drawinglayer::primitive2d::Primitive2DContainer maTextPrimitives;
     drawinglayer::primitive2d::Primitive2DContainer maLastTextPrimitives;
 
-    /// bitfield
-    bool mbVisualizeSurroundingFrame : 1;
-
     // geometry creation for OverlayObject, can use local *Last* values
     virtual drawinglayer::primitive2d::Primitive2DContainer
     createOverlayObjectPrimitive2DSequence() override;
 
 public:
-    TextEditOverlayObject(const Color& rColor, OutlinerView& rOutlinerView,
-                          bool bVisualizeSurroundingFrame);
+    TextEditOverlayObject(const Color& rColor, OutlinerView& rOutlinerView);
     virtual ~TextEditOverlayObject() override;
 
-    // data read access
-    const sdr::overlay::OverlaySelection* getOverlaySelection() const
-    {
-        return mxOverlaySelection.get();
-    }
+    sdr::overlay::OverlayObject* getOverlaySelection();
+    sdr::overlay::OverlayObject* getOverlayFrame();
+
     const OutlinerView& getOutlinerView() const { return mrOutlinerView; }
 
     /// override to check conditions for last createOverlayObjectPrimitive2DSequence
@@ -444,24 +447,122 @@ public:
     // callback that triggers detecting if something *has* changed
     void checkDataChange(const basegfx::B2DRange& rMinTextEditArea);
     void checkSelectionChange();
+
+    const basegfx::B2DRange& getRange() const { return maRange; }
+    const drawinglayer::primitive2d::Primitive2DContainer& getTextPrimitives() const
+    {
+        return maTextPrimitives;
+    }
 };
+
+class TextEditFrameOverlayObject : public sdr::overlay::OverlayObject
+{
+private:
+    const TextEditOverlayObject& mrTextEditOverlayObject;
+
+    // geometry creation for OverlayObject, can use local *Last* values
+    virtual drawinglayer::primitive2d::Primitive2DContainer
+    createOverlayObjectPrimitive2DSequence() override;
+
+public:
+    TextEditFrameOverlayObject(const TextEditOverlayObject& rTextEditOverlayObject);
+    using sdr::overlay::OverlayObject::objectChange;
+    virtual ~TextEditFrameOverlayObject() override;
+};
+
+class TextEditHighContrastOverlaySelection : public sdr::overlay::OverlayObject
+{
+private:
+    const TextEditOverlayObject& mrTextEditOverlayObject;
+    std::vector<basegfx::B2DRange> maRanges;
+
+    // geometry creation for OverlayObject, can use local *Last* values
+    virtual drawinglayer::primitive2d::Primitive2DContainer
+    createOverlayObjectPrimitive2DSequence() override;
+
+public:
+    TextEditHighContrastOverlaySelection(const TextEditOverlayObject& rTextEditOverlayObject);
+    void setRanges(std::vector<basegfx::B2DRange>&& rNew);
+    virtual ~TextEditHighContrastOverlaySelection() override;
+};
+
+TextEditHighContrastOverlaySelection::TextEditHighContrastOverlaySelection(
+    const TextEditOverlayObject& rTextEditOverlayObject)
+    : OverlayObject(rTextEditOverlayObject.getBaseColor())
+    , mrTextEditOverlayObject(rTextEditOverlayObject)
+{
+    allowAntiAliase(rTextEditOverlayObject.allowsAntiAliase());
+    // use selection colors in HighContrast mode
+    mbHighContrastSelection = true;
+}
+
+void TextEditHighContrastOverlaySelection::setRanges(std::vector<basegfx::B2DRange>&& rNew)
+{
+    if (rNew != maRanges)
+    {
+        maRanges = std::move(rNew);
+        objectChange();
+    }
+}
+
+drawinglayer::primitive2d::Primitive2DContainer
+TextEditHighContrastOverlaySelection::createOverlayObjectPrimitive2DSequence()
+{
+    drawinglayer::primitive2d::Primitive2DContainer aRetval;
+
+    size_t nCount = maRanges.size();
+
+    if (nCount)
+    {
+        basegfx::B2DPolyPolygon aClipPolyPolygon;
+
+        basegfx::BColor aRGBColor(getBaseColor().getBColor());
+
+        for (size_t a = 0; a < nCount; ++a)
+            aClipPolyPolygon.append(basegfx::utils::createPolygonFromRect(maRanges[a]));
+
+        // This is used in high contrast mode, we will render the selection
+        // with the bg forced to the selection Highlight color and the fg color
+        // forced to the HighlightText color
+        aRetval.append(drawinglayer::primitive2d::Primitive2DReference(
+            new drawinglayer::primitive2d::PolyPolygonColorPrimitive2D(
+                basegfx::B2DPolyPolygon(
+                    basegfx::utils::createPolygonFromRect(aClipPolyPolygon.getB2DRange())),
+                aRGBColor)));
+        aRetval.append(mrTextEditOverlayObject.getTextPrimitives());
+        aRetval.append(drawinglayer::primitive2d::Primitive2DReference(
+            new drawinglayer::primitive2d::MaskPrimitive2D(aClipPolyPolygon, std::move(aRetval))));
+    }
+
+    return aRetval;
+}
+
+TextEditHighContrastOverlaySelection::~TextEditHighContrastOverlaySelection()
+{
+    if (getOverlayManager())
+    {
+        getOverlayManager()->remove(*this);
+    }
+}
+
+sdr::overlay::OverlayObject* TextEditOverlayObject::getOverlaySelection()
+{
+    if (mxOverlayTransparentSelection)
+        return mxOverlayTransparentSelection.get();
+    return mxOverlayHighContrastSelection.get();
+}
+
+sdr::overlay::OverlayObject* TextEditOverlayObject::getOverlayFrame()
+{
+    if (!mxOverlayFrame)
+        mxOverlayFrame.reset(new TextEditFrameOverlayObject(*this));
+    return mxOverlayFrame.get();
+}
 
 drawinglayer::primitive2d::Primitive2DContainer
 TextEditOverlayObject::createOverlayObjectPrimitive2DSequence()
 {
     drawinglayer::primitive2d::Primitive2DContainer aRetval;
-
-    /// outer frame visualization
-    if (mbVisualizeSurroundingFrame)
-    {
-        const double fTransparence(SvtOptionsDrawinglayer::GetTransparentSelectionPercent() * 0.01);
-        const sal_uInt16 nPixSiz(getOutlinerView().GetInvalidateMore() - 1);
-
-        aRetval.push_back(new drawinglayer::primitive2d::OverlayRectanglePrimitive(
-            maRange, getBaseColor().getBColor(), fTransparence, std::max(6, nPixSiz - 2), // grow
-            0.0, // shrink
-            0.0));
-    }
 
     // add buffered TextPrimitives
     aRetval.append(maTextPrimitives);
@@ -469,26 +570,68 @@ TextEditOverlayObject::createOverlayObjectPrimitive2DSequence()
     return aRetval;
 }
 
-TextEditOverlayObject::TextEditOverlayObject(const Color& rColor, OutlinerView& rOutlinerView,
-                                             bool bVisualizeSurroundingFrame)
+drawinglayer::primitive2d::Primitive2DContainer
+TextEditFrameOverlayObject::createOverlayObjectPrimitive2DSequence()
+{
+    drawinglayer::primitive2d::Primitive2DContainer aRetval;
+
+    /// outer frame visualization
+    const double fTransparence(SvtOptionsDrawinglayer::GetTransparentSelectionPercent() * 0.01);
+    const sal_uInt16 nPixSiz(mrTextEditOverlayObject.getOutlinerView().GetInvalidateMore() - 1);
+
+    aRetval.push_back(new drawinglayer::primitive2d::OverlayRectanglePrimitive(
+        mrTextEditOverlayObject.getRange(), getBaseColor().getBColor(), fTransparence,
+        std::max(6, nPixSiz - 2), // grow
+        0.0, // shrink
+        0.0));
+
+    return aRetval;
+}
+
+TextEditOverlayObject::TextEditOverlayObject(const Color& rColor, OutlinerView& rOutlinerView)
     : OverlayObject(rColor)
     , mrOutlinerView(rOutlinerView)
-    , mbVisualizeSurroundingFrame(bVisualizeSurroundingFrame)
 {
     // no AA for TextEdit overlay
     allowAntiAliase(false);
 
     // create local OverlaySelection - this is an integral part of EditText
     // visualization
-    std::vector<basegfx::B2DRange> aEmptySelection{};
-    mxOverlaySelection.reset(new sdr::overlay::OverlaySelection(
-        sdr::overlay::OverlayType::Transparent, rColor, std::move(aEmptySelection), true));
+    if (Application::GetSettings().GetStyleSettings().GetHighContrastMode())
+    {
+        mxOverlayHighContrastSelection.reset(new TextEditHighContrastOverlaySelection(*this));
+    }
+    else
+    {
+        std::vector<basegfx::B2DRange> aEmptySelection{};
+        mxOverlayTransparentSelection.reset(new sdr::overlay::OverlaySelection(
+            sdr::overlay::OverlayType::Transparent, rColor, std::move(aEmptySelection), true));
+    }
 }
 
 TextEditOverlayObject::~TextEditOverlayObject()
 {
-    mxOverlaySelection.reset();
+    mxOverlayTransparentSelection.reset();
+    mxOverlayHighContrastSelection.reset();
 
+    if (getOverlayManager())
+    {
+        getOverlayManager()->remove(*this);
+    }
+}
+
+TextEditFrameOverlayObject::TextEditFrameOverlayObject(
+    const TextEditOverlayObject& rTextEditOverlayObject)
+    : OverlayObject(rTextEditOverlayObject.getBaseColor())
+    , mrTextEditOverlayObject(rTextEditOverlayObject)
+{
+    allowAntiAliase(rTextEditOverlayObject.allowsAntiAliase());
+    // use selection colors in HighContrast mode
+    mbHighContrastSelection = true;
+}
+
+TextEditFrameOverlayObject::~TextEditFrameOverlayObject()
+{
     if (getOverlayManager())
     {
         getOverlayManager()->remove(*this);
@@ -579,6 +722,9 @@ void TextEditOverlayObject::checkDataChange(const basegfx::B2DRange& rMinTextEdi
         // refresh this object's visualization
         objectChange();
 
+        if (mxOverlayFrame)
+            mxOverlayFrame->objectChange();
+
         // on data change, always do a SelectionChange, too
         // since the selection is an integral part of text visualization
         checkSelectionChange();
@@ -607,7 +753,10 @@ void TextEditOverlayObject::checkSelectionChange()
             aRect.Right() + aLogicPixel.Width(), aRect.Bottom() + aLogicPixel.Height());
     }
 
-    mxOverlaySelection->setRanges(std::move(aLogicRanges));
+    if (mxOverlayTransparentSelection)
+        mxOverlayTransparentSelection->setRanges(std::move(aLogicRanges));
+    else
+        mxOverlayHighContrastSelection->setRanges(std::move(aLogicRanges));
 }
 } // end of anonymous namespace
 
@@ -855,7 +1004,7 @@ OutlinerView* SdrObjEditView::ImpMakeOutlinerView(vcl::Window* pWin, OutlinerVie
 {
     // background
     Color aBackground(GetTextEditBackgroundColor(*this));
-    SdrTextObj* pText = mxWeakTextEditObj.get();
+    rtl::Reference<SdrTextObj> pText = mxWeakTextEditObj.get();
     bool bTextFrame = pText != nullptr && pText->IsTextFrame();
     bool bContourFrame = pText != nullptr && pText->IsContourTextFrame();
     // create OutlinerView
@@ -913,7 +1062,7 @@ IMPL_LINK(SdrObjEditView, ImpOutlinerStatusEventHdl, EditStatus&, rEditStat, voi
 {
     if (mpTextEditOutliner)
     {
-        SdrTextObj* pTextObj = mxWeakTextEditObj.get();
+        rtl::Reference<SdrTextObj> pTextObj = mxWeakTextEditObj.get();
         if (pTextObj)
         {
             pTextObj->onEditOutlinerStatusEvent(&rEditStat);
@@ -926,7 +1075,7 @@ void SdrObjEditView::ImpChainingEventHdl()
     if (!mpTextEditOutliner)
         return;
 
-    SdrTextObj* pTextObj = mxWeakTextEditObj.get();
+    rtl::Reference<SdrTextObj> pTextObj = mxWeakTextEditObj.get();
     OutlinerView* pOLV = GetTextEditOutlinerView();
     if (pTextObj && pOLV)
     {
@@ -938,16 +1087,16 @@ void SdrObjEditView::ImpChainingEventHdl()
             return;
         }
         // This is true during an underflow-caused overflow (with pEdtOutl->SetText())
-        if (pTextChain->GetNilChainingEvent(pTextObj))
+        if (pTextChain->GetNilChainingEvent(pTextObj.get()))
         {
             return;
         }
 
         // We prevent to trigger further handling of overflow/underflow for pTextObj
-        pTextChain->SetNilChainingEvent(pTextObj, true); // XXX
+        pTextChain->SetNilChainingEvent(pTextObj.get(), true); // XXX
 
         // Save previous selection pos // NOTE: It must be done to have the right CursorEvent in KeyInput
-        pTextChain->SetPreChainingSel(pTextObj, pOLV->GetSelection());
+        pTextChain->SetPreChainingSel(pTextObj.get(), pOLV->GetSelection());
         //maPreChainingSel = new ESelection(pOLV->GetSelection());
 
         // Handling Undo
@@ -981,7 +1130,7 @@ void SdrObjEditView::ImpChainingEventHdl()
         //SdrTextObj *pNextLink = pTextObj->GetNextLinkInChain();
 
         // NOTE: Must be called. Don't let the function return if you set it to true and not reset it
-        pTextChain->SetNilChainingEvent(pTextObj, false);
+        pTextChain->SetNilChainingEvent(pTextObj.get(), false);
     }
     else
     {
@@ -1002,22 +1151,23 @@ IMPL_LINK_NOARG(SdrObjEditView, ImpAfterCutOrPasteChainingEventHdl, LinkParamNon
 
 void SdrObjEditView::ImpMoveCursorAfterChainingEvent(TextChainCursorManager* pCursorManager)
 {
-    if (!mxWeakTextEditObj.is() || !pCursorManager)
-        return;
+    rtl::Reference<SdrTextObj> pTextObj = mxWeakTextEditObj.get();
 
-    SdrTextObj* pTextObj = mxWeakTextEditObj.get();
+    if (!pTextObj || !pCursorManager)
+        return;
 
     // Check if it has links to move it to
     if (!pTextObj || !pTextObj->IsChainable())
         return;
 
     TextChain* pTextChain = pTextObj->GetTextChain();
-    ESelection aNewSel = pTextChain->GetPostChainingSel(pTextObj);
+    ESelection aNewSel = pTextChain->GetPostChainingSel(pTextObj.get());
 
-    pCursorManager->HandleCursorEventAfterChaining(pTextChain->GetCursorEvent(pTextObj), aNewSel);
+    pCursorManager->HandleCursorEventAfterChaining(pTextChain->GetCursorEvent(pTextObj.get()),
+                                                   aNewSel);
 
     // Reset event
-    pTextChain->SetCursorEvent(pTextObj, CursorChainingEvent::NULL_EVENT);
+    pTextChain->SetCursorEvent(pTextObj.get(), CursorChainingEvent::NULL_EVENT);
 }
 
 IMPL_LINK(SdrObjEditView, ImpOutlinerCalcFieldValueHdl, EditFieldInfo*, pFI, void)
@@ -1025,7 +1175,7 @@ IMPL_LINK(SdrObjEditView, ImpOutlinerCalcFieldValueHdl, EditFieldInfo*, pFI, voi
     bool bOk = false;
     OUString& rStr = pFI->GetRepresentation();
     rStr.clear();
-    SdrTextObj* pTextObj = mxWeakTextEditObj.get();
+    rtl::Reference<SdrTextObj> pTextObj = mxWeakTextEditObj.get();
     if (pTextObj != nullptr)
     {
         std::optional<Color> pTxtCol;
@@ -1048,7 +1198,7 @@ IMPL_LINK(SdrObjEditView, ImpOutlinerCalcFieldValueHdl, EditFieldInfo*, pFI, voi
             }
         }
     }
-    Outliner& rDrawOutl = mpModel->GetDrawOutliner(pTextObj);
+    Outliner& rDrawOutl = mpModel->GetDrawOutliner(pTextObj.get());
     Link<EditFieldInfo*, void> aDrawOutlLink = rDrawOutl.GetCalcFieldValueHdl();
     if (!bOk && aDrawOutlLink.IsSet())
     {
@@ -1082,7 +1232,7 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
     // FIXME this encourages all sorts of bad habits and should be removed
     SdrEndTextEdit();
 
-    SdrTextObj* pObj = dynamic_cast<SdrTextObj*>(pObj_);
+    SdrTextObj* pObj = DynCastSdrTextObj(pObj_);
     if (!pObj)
         return false; // currently only possible with text objects
 
@@ -1145,15 +1295,15 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
     {
         mpTextEditWin = pWin;
         mpTextEditPV = pPV;
-        mxWeakTextEditObj.reset(pObj);
+        mxWeakTextEditObj = pObj;
         if (pGivenOutliner)
         {
             mpTextEditOutliner.reset(pGivenOutliner);
             pGivenOutliner = nullptr; // so we don't delete it on the error path
         }
         else
-            mpTextEditOutliner = SdrMakeOutliner(OutlinerMode::TextObject,
-                                                 mxWeakTextEditObj->getSdrModelFromSdrObject());
+            mpTextEditOutliner
+                = SdrMakeOutliner(OutlinerMode::TextObject, pObj->getSdrModelFromSdrObject());
 
         {
             SvtAccessibilityOptions aOptions;
@@ -1170,15 +1320,11 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
         // It is just necessary to make the visualized page known. Set it.
         mpTextEditOutliner->setVisualizedPage(pPV->GetPage());
 
-        mpTextEditOutliner->SetTextObjNoInit(mxWeakTextEditObj.get());
+        rtl::Reference<SdrTextObj> pTextObj = mxWeakTextEditObj.get();
+        mpTextEditOutliner->SetTextObjNoInit(pTextObj.get());
 
-        if (mxWeakTextEditObj->BegTextEdit(*mpTextEditOutliner))
+        if (pTextObj->BegTextEdit(*mpTextEditOutliner))
         {
-            SdrTextObj* pTextObj = mxWeakTextEditObj.get();
-            DBG_ASSERT(pTextObj, "svx::SdrObjEditView::BegTextEdit(), no text object?");
-            if (!pTextObj)
-                return false;
-
             // switch off any running TextAnimations
             pTextObj->SetTextAnimationAllowed(false);
 
@@ -1209,7 +1355,7 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
 
             // add possible GridOffset to up-to-now view-independent EditAreas
             basegfx::B2DVector aGridOffset(0.0, 0.0);
-            if (getPossibleGridOffsetForSdrObject(aGridOffset, pTextObj, pPV))
+            if (getPossibleGridOffsetForSdrObject(aGridOffset, pTextObj.get(), pPV))
             {
                 const Point aOffset(basegfx::fround(aGridOffset.getX()),
                                     basegfx::fround(aGridOffset.getY()));
@@ -1239,10 +1385,9 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
 
                 const Color aHilightColor(SvtOptionsDrawinglayer::getHilightColor());
                 const SdrTextObj* pText = GetTextEditObject();
-                const bool bTextFrame(pText && pText->IsTextFrame());
-                const bool bFitToSize(mpTextEditOutliner->GetControlWord()
-                                      & EEControlBits::STRETCHING);
-                const bool bVisualizeSurroundingFrame(bTextFrame && !bFitToSize);
+                // show for cases like tdf#94223 but not for table cells like tdf#151311
+                const bool bVisualizeSurroundingFrame(
+                    pText && pText->GetObjIdentifier() != SdrObjKind::Table);
                 SdrPageView* pPageView = GetSdrPageView();
 
                 if (pPageView)
@@ -1259,12 +1404,12 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
                             {
                                 std::unique_ptr<TextEditOverlayObject> pNewTextEditOverlayObject(
                                     new TextEditOverlayObject(aHilightColor,
-                                                              *mpTextEditOutlinerView,
-                                                              bVisualizeSurroundingFrame));
+                                                              *mpTextEditOutlinerView));
 
                                 xManager->add(*pNewTextEditOverlayObject);
-                                xManager->add(const_cast<sdr::overlay::OverlaySelection&>(
-                                    *pNewTextEditOverlayObject->getOverlaySelection()));
+                                if (bVisualizeSurroundingFrame)
+                                    xManager->add(*pNewTextEditOverlayObject->getOverlayFrame());
+                                xManager->add(*pNewTextEditOverlayObject->getOverlaySelection());
 
                                 maTEOverlayGroup.append(std::move(pNewTextEditOverlayObject));
                             }
@@ -1414,7 +1559,7 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
     mpTextEditOutliner.reset();
 
     mpTextEditOutlinerView = nullptr;
-    mxWeakTextEditObj.reset(nullptr);
+    mxWeakTextEditObj.clear();
     mpTextEditPV = nullptr;
     mpTextEditWin = nullptr;
     maHdlList.SetMoveOutside(false);
@@ -1425,7 +1570,7 @@ bool SdrObjEditView::SdrBeginTextEdit(SdrObject* pObj_, SdrPageView* pPV, vcl::W
 SdrEndTextEditKind SdrObjEditView::SdrEndTextEdit(bool bDontDeleteReally)
 {
     SdrEndTextEditKind eRet = SdrEndTextEditKind::Unchanged;
-    SdrTextObj* pTEObj = mxWeakTextEditObj.get();
+    rtl::Reference<SdrTextObj> pTEObj = mxWeakTextEditObj.get();
     vcl::Window* pTEWin = mpTextEditWin;
     OutlinerView* pTEOutlinerView = mpTextEditOutlinerView;
     vcl::Cursor* pTECursorBuffer = pTextEditCursorBuffer;
@@ -1487,11 +1632,12 @@ SdrEndTextEditKind SdrObjEditView::SdrEndTextEdit(bool bDontDeleteReally)
         assert(nullptr == mpOldTextEditUndoManager); // cannot be restored!
     }
 
-    if (GetModel() && mxWeakTextEditObj.is())
-    {
-        SdrHint aHint(SdrHintKind::EndEdit, *mxWeakTextEditObj);
-        GetModel()->Broadcast(aHint);
-    }
+    if (GetModel())
+        if (auto pTextEditObj = mxWeakTextEditObj.get())
+        {
+            SdrHint aHint(SdrHintKind::EndEdit, *pTextEditObj);
+            GetModel()->Broadcast(aHint);
+        }
 
     // if new mechanism was used, clean it up. At cleanup no need to check
     // for LibreOfficeKit
@@ -1501,15 +1647,14 @@ SdrEndTextEditKind SdrObjEditView::SdrEndTextEdit(bool bDontDeleteReally)
         maTEOverlayGroup.clear();
     }
 
-    mxWeakTextEditObj.reset(nullptr);
+    mxWeakTextEditObj.clear();
     mpTextEditPV = nullptr;
     mpTextEditWin = nullptr;
-    SdrOutliner* pTEOutliner = mpTextEditOutliner.release();
     mpTextEditOutlinerView = nullptr;
     pTextEditCursorBuffer = nullptr;
     aTextEditArea = tools::Rectangle();
 
-    if (pTEOutliner != nullptr)
+    if (SdrOutliner* pTEOutliner = mpTextEditOutliner.release())
     {
         bool bModified = pTEOutliner->IsModified();
         if (pTEOutlinerView != nullptr)
@@ -1577,7 +1722,7 @@ SdrEndTextEditKind SdrObjEditView::SdrEndTextEdit(bool bDontDeleteReally)
                     && pTEObj->GetObjInventor() == SdrInventor::Default && !bDontDeleteReally)
                 {
                     SdrObjKind eIdent = pTEObj->GetObjIdentifier();
-                    if (eIdent == OBJ_TEXT)
+                    if (eIdent == SdrObjKind::Text)
                     {
                         pDelUndo = GetModel()->GetSdrUndoFactory().CreateUndoDeleteObject(*pTEObj);
                     }
@@ -1663,6 +1808,7 @@ SdrEndTextEditKind SdrObjEditView::SdrEndTextEdit(bool bDontDeleteReally)
         {
             GetMarkedObjectListWriteAccess().SetNameDirty();
         }
+        // coverity[leaked_storage] - if pTEOutliner wasn't deleted it didn't really belong to us
     }
 
     if (pTEObj && !pTEObj->getSdrModelFromSdrObject().isLocked() && pTEObj->GetBroadcaster())
@@ -1690,7 +1836,7 @@ SdrEndTextEditKind SdrObjEditView::SdrEndTextEdit(bool bDontDeleteReally)
 }
 
 // info about TextEdit. Default is false.
-bool SdrObjEditView::IsTextEdit() const { return mxWeakTextEditObj.is(); }
+bool SdrObjEditView::IsTextEdit() const { return mxWeakTextEditObj.get().is(); }
 
 // info about TextEditPageView. Default is 0L.
 SdrPageView* SdrObjEditView::GetTextEditPageView() const { return mpTextEditPV; }
@@ -1714,7 +1860,7 @@ OutlinerView* SdrObjEditView::ImpFindOutlinerView(vcl::Window const* pWin) const
 
 void SdrObjEditView::SetTextEditWin(vcl::Window* pWin)
 {
-    if (!(mxWeakTextEditObj.is() && pWin != nullptr && pWin != mpTextEditWin))
+    if (!(mxWeakTextEditObj.get() && pWin != nullptr && pWin != mpTextEditWin))
         return;
 
     OutlinerView* pNewView = ImpFindOutlinerView(pWin);
@@ -1735,7 +1881,7 @@ void SdrObjEditView::SetTextEditWin(vcl::Window* pWin)
 bool SdrObjEditView::IsTextEditHit(const Point& rHit) const
 {
     bool bOk = false;
-    if (mxWeakTextEditObj.is())
+    if (mxWeakTextEditObj.get())
     {
         tools::Rectangle aEditArea;
         if (OutlinerView* pOLV = mpTextEditOutliner->GetView(0))
@@ -1758,9 +1904,8 @@ bool SdrObjEditView::IsTextEditHit(const Point& rHit) const
 bool SdrObjEditView::IsTextEditFrameHit(const Point& rHit) const
 {
     bool bOk = false;
-    if (mxWeakTextEditObj.is())
+    if (rtl::Reference<SdrTextObj> pText = mxWeakTextEditObj.get())
     {
-        SdrTextObj* pText = mxWeakTextEditObj.get();
         OutlinerView* pOLV = mpTextEditOutliner->GetView(0);
         if (pOLV)
         {
@@ -1790,7 +1935,7 @@ SdrObjEditView::ImpHandleMotionThroughBoxesKeyInput(const KeyEvent& rKEvt, bool*
 {
     *bOutHandled = false;
 
-    SdrTextObj* pTextObj = mxWeakTextEditObj.get();
+    rtl::Reference<SdrTextObj> pTextObj = mxWeakTextEditObj.get();
     if (!pTextObj)
         return nullptr;
 
@@ -1798,7 +1943,7 @@ SdrObjEditView::ImpHandleMotionThroughBoxesKeyInput(const KeyEvent& rKEvt, bool*
         return nullptr;
 
     std::unique_ptr<TextChainCursorManager> pCursorManager(
-        new TextChainCursorManager(this, pTextObj));
+        new TextChainCursorManager(this, pTextObj.get()));
     if (pCursorManager->HandleKeyEvent(rKEvt))
     {
         // Possibly do other stuff here if necessary...
@@ -2082,9 +2227,9 @@ SvtScriptType SdrObjEditView::GetScriptType() const
 
     if (IsTextEdit())
     {
-        if (mxWeakTextEditObj->GetOutlinerParaObject())
-            nScriptType
-                = mxWeakTextEditObj->GetOutlinerParaObject()->GetTextObject().GetScriptType();
+        auto pText = mxWeakTextEditObj.get();
+        if (pText->GetOutlinerParaObject())
+            nScriptType = pText->GetOutlinerParaObject()->GetTextObject().GetScriptType();
 
         if (mpTextEditOutlinerView)
             nScriptType = mpTextEditOutlinerView->GetSelectedScriptType();
@@ -2123,12 +2268,13 @@ void SdrObjEditView::GetAttributes(SfxItemSet& rTargetSet, bool bOnlyHardAttr) c
         DBG_ASSERT(mpTextEditOutliner != nullptr,
                    "SdrObjEditView::GetAttributes(): mpTextEditOutliner=NULL");
 
+        auto pText = mxWeakTextEditObj.get();
         // take care of bOnlyHardAttr(!)
-        if (!bOnlyHardAttr && mxWeakTextEditObj->GetStyleSheet())
-            rTargetSet.Put(mxWeakTextEditObj->GetStyleSheet()->GetItemSet());
+        if (!bOnlyHardAttr && pText->GetStyleSheet())
+            rTargetSet.Put(pText->GetStyleSheet()->GetItemSet());
 
         // add object attributes
-        rTargetSet.Put(mxWeakTextEditObj->GetMergedItemSet());
+        rTargetSet.Put(pText->GetMergedItemSet());
 
         if (mpTextEditOutlinerView)
         {
@@ -2136,7 +2282,7 @@ void SdrObjEditView::GetAttributes(SfxItemSet& rTargetSet, bool bOnlyHardAttr) c
             rTargetSet.Put(mpTextEditOutlinerView->GetAttribs(), false);
         }
 
-        if (GetMarkedObjectCount() == 1 && GetMarkedObjectByIndex(0) == mxWeakTextEditObj.get())
+        if (GetMarkedObjectCount() == 1 && GetMarkedObjectByIndex(0) == pText.get())
         {
             MergeNotPersistAttrFromMarked(rTargetSet);
         }
@@ -2150,7 +2296,8 @@ void SdrObjEditView::GetAttributes(SfxItemSet& rTargetSet, bool bOnlyHardAttr) c
 bool SdrObjEditView::SetAttributes(const SfxItemSet& rSet, bool bReplaceAll)
 {
     bool bRet = false;
-    bool bTextEdit = mpTextEditOutlinerView != nullptr && mxWeakTextEditObj.is();
+    rtl::Reference<SdrTextObj> pTextEditObj = mxWeakTextEditObj.get();
+    bool bTextEdit = mpTextEditOutlinerView != nullptr && pTextEditObj != nullptr;
     bool bAllTextSelected = ImpIsTextEditAllSelected();
     const SfxItemSet* pSet = &rSet;
 
@@ -2211,22 +2358,21 @@ bool SdrObjEditView::SetAttributes(const SfxItemSet& rSet, bool bReplaceAll)
                 if (bUndo)
                 {
                     BegUndo(ImpGetDescriptionString(STR_EditSetAttributes));
-                    AddUndo(
-                        GetModel()->GetSdrUndoFactory().CreateUndoGeoObject(*mxWeakTextEditObj));
+                    AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoGeoObject(*pTextEditObj));
 
                     // If this is a text object also rescue the OutlinerParaObject since
                     // applying attributes to the object may change text layout when
                     // multiple portions exist with multiple formats. If an OutlinerParaObject
                     // really exists and needs to be rescued is evaluated in the undo
                     // implementation itself.
-                    bool bRescueText = mxWeakTextEditObj;
+                    bool bRescueText(pTextEditObj);
 
                     AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoAttrObject(
-                        *mxWeakTextEditObj, false, !bNoEEItems || bRescueText));
+                        *pTextEditObj, false, !bNoEEItems || bRescueText));
                     EndUndo();
                 }
 
-                mxWeakTextEditObj->SetMergedItemSetAndBroadcast(*pSet, bReplaceAll);
+                pTextEditObj->SetMergedItemSetAndBroadcast(*pSet, bReplaceAll);
 
                 FlushComeBackTimer(); // to set ModeHasChanged immediately
             }
@@ -2258,17 +2404,14 @@ bool SdrObjEditView::SetAttributes(const SfxItemSet& rSet, bool bReplaceAll)
                 if (IsUndoEnabled())
                 {
                     BegUndo(ImpGetDescriptionString(STR_EditSetAttributes));
-                    AddUndo(
-                        GetModel()->GetSdrUndoFactory().CreateUndoGeoObject(*mxWeakTextEditObj));
-                    AddUndo(
-                        GetModel()->GetSdrUndoFactory().CreateUndoAttrObject(*mxWeakTextEditObj));
+                    AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoGeoObject(*pTextEditObj));
+                    AddUndo(GetModel()->GetSdrUndoFactory().CreateUndoAttrObject(*pTextEditObj));
                     EndUndo();
                 }
 
-                mxWeakTextEditObj->SetMergedItemSetAndBroadcast(aSet, bReplaceAll);
+                pTextEditObj->SetMergedItemSetAndBroadcast(aSet, bReplaceAll);
 
-                if (GetMarkedObjectCount() == 1
-                    && GetMarkedObjectByIndex(0) == mxWeakTextEditObj.get())
+                if (GetMarkedObjectCount() == 1 && GetMarkedObjectByIndex(0) == pTextEditObj.get())
                 {
                     SetNotPersistAttrToMarked(aSet);
                 }
@@ -2340,37 +2483,37 @@ void SdrObjEditView::SetStyleSheet(SfxStyleSheet* pStyleSheet, bool bDontRemoveH
     SdrGlueEditView::SetStyleSheet(pStyleSheet, bDontRemoveHardAttr);
 }
 
-void SdrObjEditView::AddWindowToPaintView(OutputDevice* pNewWin, vcl::Window* pWindow)
+void SdrObjEditView::AddDeviceToPaintView(OutputDevice& rNewDev, vcl::Window* pWindow)
 {
-    SdrGlueEditView::AddWindowToPaintView(pNewWin, pWindow);
+    SdrGlueEditView::AddDeviceToPaintView(rNewDev, pWindow);
 
-    if (mxWeakTextEditObj.is() && !mbTextEditOnlyOneView
-        && pNewWin->GetOutDevType() == OUTDEV_WINDOW)
+    if (mxWeakTextEditObj.get() && !mbTextEditOnlyOneView
+        && rNewDev.GetOutDevType() == OUTDEV_WINDOW)
     {
-        OutlinerView* pOutlView = ImpMakeOutlinerView(pNewWin->GetOwnerWindow(), nullptr);
+        OutlinerView* pOutlView = ImpMakeOutlinerView(rNewDev.GetOwnerWindow(), nullptr);
         mpTextEditOutliner->InsertView(pOutlView);
     }
 }
 
-void SdrObjEditView::DeleteWindowFromPaintView(OutputDevice* pOldWin)
+void SdrObjEditView::DeleteDeviceFromPaintView(OutputDevice& rOldDev)
 {
-    SdrGlueEditView::DeleteWindowFromPaintView(pOldWin);
+    SdrGlueEditView::DeleteDeviceFromPaintView(rOldDev);
 
-    if (mxWeakTextEditObj.is() && !mbTextEditOnlyOneView
-        && pOldWin->GetOutDevType() == OUTDEV_WINDOW)
+    if (mxWeakTextEditObj.get() && !mbTextEditOnlyOneView
+        && rOldDev.GetOutDevType() == OUTDEV_WINDOW)
     {
         for (size_t i = mpTextEditOutliner->GetViewCount(); i > 0;)
         {
             i--;
             OutlinerView* pOLV = mpTextEditOutliner->GetView(i);
-            if (pOLV && pOLV->GetWindow() == pOldWin->GetOwnerWindow())
+            if (pOLV && pOLV->GetWindow() == rOldDev.GetOwnerWindow())
             {
                 mpTextEditOutliner->RemoveView(i);
             }
         }
     }
 
-    lcl_RemoveTextEditOutlinerViews(this, GetSdrPageView(), pOldWin);
+    lcl_RemoveTextEditOutlinerViews(this, GetSdrPageView(), &rOldDev);
 }
 
 bool SdrObjEditView::IsTextEditInSelectionMode() const
@@ -2531,7 +2674,7 @@ void SdrObjEditView::MarkListHasChanged()
 
     // check for table
     if (pObj && pView && (pObj->GetObjInventor() == SdrInventor::Default)
-        && (pObj->GetObjIdentifier() == OBJ_TABLE))
+        && (pObj->GetObjIdentifier() == SdrObjKind::Table))
     {
         mxSelectionController = sdr::table::CreateTableController(
             *pView, static_cast<const sdr::table::SdrTableObj&>(*pObj), mxLastSelectionController);
@@ -2600,48 +2743,46 @@ sal_uInt16 SdrObjEditView::GetSelectionLevel() const
 }
 
 bool SdrObjEditView::SupportsFormatPaintbrush(SdrInventor nObjectInventor,
-                                              sal_uInt16 nObjectIdentifier)
+                                              SdrObjKind nObjectIdentifier)
 {
     if (nObjectInventor != SdrInventor::Default && nObjectInventor != SdrInventor::E3d)
         return false;
     switch (nObjectIdentifier)
     {
-        case OBJ_NONE:
-        case OBJ_GRUP:
+        case SdrObjKind::NONE:
+        case SdrObjKind::Group:
             return false;
-        case OBJ_LINE:
-        case OBJ_RECT:
-        case OBJ_CIRC:
-        case OBJ_SECT:
-        case OBJ_CARC:
-        case OBJ_CCUT:
-        case OBJ_POLY:
-        case OBJ_PLIN:
-        case OBJ_PATHLINE:
-        case OBJ_PATHFILL:
-        case OBJ_FREELINE:
-        case OBJ_FREEFILL:
-        case OBJ_SPLNLINE:
-        case OBJ_SPLNFILL:
-        case OBJ_TEXT:
-        case OBJ_TITLETEXT:
-        case OBJ_OUTLINETEXT:
-        case OBJ_GRAF:
-        case OBJ_OLE2:
-        case OBJ_TABLE:
+        case SdrObjKind::Line:
+        case SdrObjKind::Rectangle:
+        case SdrObjKind::CircleOrEllipse:
+        case SdrObjKind::CircleSection:
+        case SdrObjKind::CircleArc:
+        case SdrObjKind::CircleCut:
+        case SdrObjKind::Polygon:
+        case SdrObjKind::PolyLine:
+        case SdrObjKind::PathLine:
+        case SdrObjKind::PathFill:
+        case SdrObjKind::FreehandLine:
+        case SdrObjKind::FreehandFill:
+        case SdrObjKind::Text:
+        case SdrObjKind::TitleText:
+        case SdrObjKind::OutlineText:
+        case SdrObjKind::Graphic:
+        case SdrObjKind::OLE2:
+        case SdrObjKind::Table:
             return true;
-        case OBJ_EDGE:
-        case OBJ_CAPTION:
+        case SdrObjKind::Caption:
             return false;
-        case OBJ_PATHPOLY:
-        case OBJ_PATHPLIN:
+        case SdrObjKind::Edge:
+        case SdrObjKind::PathPoly:
+        case SdrObjKind::PathPolyLine:
             return true;
-        case OBJ_PAGE:
-        case OBJ_MEASURE:
-        case OBJ_FRAME:
-        case OBJ_UNO:
+        case SdrObjKind::Page:
+        case SdrObjKind::Measure:
+        case SdrObjKind::OLEPluginFrame:
+        case SdrObjKind::UNO:
             return false;
-        case OBJ_CUSTOMSHAPE:
+        case SdrObjKind::CustomShape:
             return true;
         default:
             return false;
@@ -2655,7 +2796,8 @@ static const WhichRangesContainer& GetFormatRangeImpl(bool bTextOnly)
                    SDRATTR_SHADOW_FIRST, SDRATTR_SHADOW_LAST, SDRATTR_MISC_FIRST,
                    SDRATTR_MISC_LAST, // table cell formats
                    SDRATTR_GRAF_FIRST, SDRATTR_GRAF_LAST, SDRATTR_TABLE_FIRST, SDRATTR_TABLE_LAST,
-                   EE_PARA_START, EE_PARA_END, EE_CHAR_START, EE_CHAR_END>);
+                   SDRATTR_GLOW_FIRST, SDRATTR_GLOW_LAST, SDRATTR_SOFTEDGE_FIRST,
+                   SDRATTR_SOFTEDGE_LAST, EE_PARA_START, EE_PARA_END, EE_CHAR_START, EE_CHAR_END>);
 
     static const WhichRangesContainer gTextOnly(
         svl::Items<SDRATTR_MISC_FIRST, SDRATTR_MISC_LAST, EE_PARA_START, EE_PARA_END, EE_CHAR_START,
@@ -2687,7 +2829,7 @@ void SdrObjEditView::TakeFormatPaintBrush(std::shared_ptr<SfxItemSet>& rFormatSe
     // check for cloning from table cell, in which case we need to copy cell-specific formatting attributes
     const SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
     if (pObj && (pObj->GetObjInventor() == SdrInventor::Default)
-        && (pObj->GetObjIdentifier() == OBJ_TABLE))
+        && (pObj->GetObjIdentifier() == SdrObjKind::Table))
     {
         auto pTable = static_cast<const sdr::table::SdrTableObj*>(pObj);
         if (mxSelectionController.is() && pTable->getActiveCell().is())
@@ -2819,7 +2961,7 @@ void SdrObjEditView::ApplyFormatPaintBrush(SfxItemSet& rFormatSet, bool bNoChara
         }
 
         // now apply character and paragraph formatting to text, if the shape has any
-        SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>(pObj);
+        SdrTextObj* pTextObj = DynCastSdrTextObj(pObj);
         if (pTextObj)
         {
             sal_Int32 nText = pTextObj->getTextCount();
@@ -2856,7 +2998,7 @@ void SdrObjEditView::ApplyFormatPaintBrush(SfxItemSet& rFormatSet, bool bNoChara
     // check for cloning to table cell, in which case we need to copy cell-specific formatting attributes
     SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
     if (pObj && (pObj->GetObjInventor() == SdrInventor::Default)
-        && (pObj->GetObjIdentifier() == OBJ_TABLE))
+        && (pObj->GetObjIdentifier() == SdrObjKind::Table))
     {
         auto pTable = static_cast<sdr::table::SdrTableObj*>(pObj);
         if (pTable->getActiveCell().is() && mxSelectionController.is())

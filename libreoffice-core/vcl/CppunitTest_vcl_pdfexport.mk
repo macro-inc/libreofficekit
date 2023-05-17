@@ -21,6 +21,7 @@ $(eval $(call gb_CppunitTest_use_libraries,vcl_pdfexport, \
 	cppu \
 	cppuhelper \
 	sal \
+	subsequenttest \
 	test \
 	unotest \
 	utl \
@@ -42,6 +43,9 @@ $(eval $(call gb_CppunitTest_use_vcl,vcl_pdfexport))
 $(eval $(call gb_CppunitTest_use_rdb,vcl_pdfexport,services))
 
 $(eval $(call gb_CppunitTest_use_configuration,vcl_pdfexport))
+
+# assert if font/glyph fallback occurs
+$(eval $(call gb_CppunitTest_set_non_application_font_use,vcl_pdfexport,abort))
 
 $(eval $(call gb_CppunitTest_use_more_fonts,vcl_pdfexport))
 

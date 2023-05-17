@@ -330,8 +330,8 @@ int GtkSalDisplay::CaptureMouse( SalFrame* pSFrame )
  * class GtkSalData                                                   *
  **********************************************************************/
 
-GtkSalData::GtkSalData( SalInstance *pInstance )
-    : GenericUnixSalData(pInstance)
+GtkSalData::GtkSalData()
+    : GenericUnixSalData()
 {
     m_pUserEvent = nullptr;
 }
@@ -459,13 +459,30 @@ static GtkStyleProvider* CreateStyleProvider()
       "spinbutton.small-button, spinbutton.small-button entry, spinbutton.small-button button { "
       "padding: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;"
       "border-width: 0; min-height: 0; min-width: 0; }"
+#if GTK_CHECK_VERSION(4, 0, 0)
+      // we basically assumed during dialog design that the frame's were invisible, because
+      // they used to be in the default theme during gtk3
+      "frame { border-style: none; }"
+#endif
       "notebook.overflow > header.top > tabs > tab:checked { "
       "box-shadow: none; padding: 0 0 0 0; margin: 0 0 0 0;"
       "border-image: none; border-image-width: 0 0 0 0;"
       "background-image: none; background-color: transparent;"
       "border-radius: 0 0 0 0; border-width: 0 0 0 0;"
       "border-style: none; border-color: transparent;"
-      "opacity: 0; min-height: 0; min-width: 0; }";
+      "opacity: 0; min-height: 0; min-width: 0; }"
+      // https://css-tricks.com/restart-css-animation/
+      // This animation appears twice with two different names so we can change
+      // the class from "call_attention_1" to "call_attention_2" to restart the
+      // animation
+      "@keyframes shinkandrestore1 { 50% { margin-left: 15px; margin-right: 15px; opacity: 0.5; } }"
+      "@keyframes shinkandrestore2 { 50% { margin-left: 15px; margin-right: 15px; opacity: 0.5; } }"
+      " *.call_attention_1 {"
+      "animation-name: shinkandrestore1; animation-duration: 1s; "
+      "animation-timing-function: linear; animation-iteration-count: 2; }"
+      " *.call_attention_2 {"
+      "animation-name: shinkandrestore2; animation-duration: 1s; "
+      "animation-timing-function: linear; animation-iteration-count: 2; }";
     css_provider_load_from_data(pStyleProvider, data, -1);
     return GTK_STYLE_PROVIDER(pStyleProvider);
 }
@@ -759,8 +776,7 @@ GtkSalTimer::GtkSalTimer()
 
 GtkSalTimer::~GtkSalTimer()
 {
-    GtkInstance *pInstance = static_cast<GtkInstance *>(GetSalData()->m_pInstance);
-    pInstance->RemoveTimer();
+    GetGtkInstance()->RemoveTimer();
     Stop();
 }
 

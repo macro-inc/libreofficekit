@@ -19,10 +19,6 @@
 #ifndef INCLUDED_PACKAGE_INC_ZIPFILE_HXX
 #define INCLUDED_PACKAGE_INC_ZIPFILE_HXX
 
-#include <com/sun/star/packages/zip/ZipException.hpp>
-#include <com/sun/star/packages/zip/ZipIOException.hpp>
-#include <com/sun/star/packages/NoEncryptionException.hpp>
-#include <com/sun/star/packages/WrongPasswordException.hpp>
 #include <com/sun/star/xml/crypto/XCipherContext.hpp>
 #include <com/sun/star/xml/crypto/XDigestContext.hpp>
 
@@ -33,8 +29,7 @@
 #include "HashMaps.hxx"
 #include "EncryptionData.hxx"
 
-#include <memory>
-
+class MemoryByteGrabber;
 namespace com::sun::star {
     namespace uno { class XComponentContext; }
     namespace ucb  { class XProgressHandler; }
@@ -87,17 +82,20 @@ class ZipFile
     sal_Int32 readCEN();
     sal_Int32 findEND();
     void recover();
+    static void readExtraFields(MemoryByteGrabber& aMemGrabber, sal_Int16 nExtraLen,
+                                sal_uInt64& nSize, sal_uInt64& nCompressedSize,
+                                sal_uInt64* nOffset);
 
 public:
 
-    ZipFile( const rtl::Reference<comphelper::RefCountedMutex>& aMutexHolder,
+    ZipFile( rtl::Reference<comphelper::RefCountedMutex> aMutexHolder,
              css::uno::Reference < css::io::XInputStream > const &xInput,
-             const css::uno::Reference < css::uno::XComponentContext > &rxContext,
+             css::uno::Reference < css::uno::XComponentContext > xContext,
              bool bInitialise );
 
-    ZipFile( const rtl::Reference<comphelper::RefCountedMutex>& aMutexHolder,
+    ZipFile( rtl::Reference<comphelper::RefCountedMutex> aMutexHolder,
              css::uno::Reference < css::io::XInputStream > const &xInput,
-             const css::uno::Reference < css::uno::XComponentContext > &rxContext,
+             css::uno::Reference < css::uno::XComponentContext > xContext,
              bool bInitialise,
              bool bForceRecover );
 

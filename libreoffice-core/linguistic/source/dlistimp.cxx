@@ -19,7 +19,6 @@
 
 
 #include <cppuhelper/factory.hxx>
-#include <i18nlangtag/mslangid.hxx>
 #include <osl/file.hxx>
 #include <tools/debug.hxx>
 #include <tools/stream.hxx>
@@ -40,6 +39,7 @@
 #include <unotools/resmgr.hxx>
 #include <unotools/charclass.hxx>
 #include <sal/log.hxx>
+#include <utility>
 
 #include "dlistimp.hxx"
 #include "dicimp.hxx"
@@ -66,14 +66,14 @@ class DicEvtListenerHelper :
         XDictionaryEventListener
     >
 {
-    comphelper::OInterfaceContainerHelper2  aDicListEvtListeners;
+    comphelper::OInterfaceContainerHelper3<XDictionaryListEventListener> aDicListEvtListeners;
     uno::Reference< XDictionaryList >       xMyDicList;
 
     sal_Int16                               nCondensedEvt;
     sal_Int16                               nNumCollectEvtListeners;
 
 public:
-    explicit DicEvtListenerHelper( const uno::Reference< XDictionaryList > &rxDicList );
+    explicit DicEvtListenerHelper( uno::Reference< XDictionaryList > xDicList );
     virtual ~DicEvtListenerHelper() override;
 
     // XEventListener
@@ -99,9 +99,9 @@ public:
 
 
 DicEvtListenerHelper::DicEvtListenerHelper(
-        const uno::Reference< XDictionaryList > &rxDicList ) :
+        uno::Reference< XDictionaryList > xDicList ) :
     aDicListEvtListeners    ( GetLinguMutex() ),
-    xMyDicList              ( rxDicList ),
+    xMyDicList              (std::move( xDicList )),
     nCondensedEvt(0), nNumCollectEvtListeners(0)
 {
 }
@@ -124,7 +124,7 @@ void SAL_CALL DicEvtListenerHelper::disposing( const EventObject& rSource )
 {
     osl::MutexGuard aGuard( GetLinguMutex() );
 
-    uno::Reference< XInterface > xSrc( rSource.Source );
+    uno::Reference< XDictionaryListEventListener > xSrc( rSource.Source, UNO_QUERY );
 
     // remove event object from EventListener list
     if (xSrc.is())
@@ -133,7 +133,7 @@ void SAL_CALL DicEvtListenerHelper::disposing( const EventObject& rSource )
     // if object is a dictionary then remove it from the dictionary list
     // Note: this will probably happen only if someone makes a XDictionary
     // implementation of his own that is also a XComponent.
-    uno::Reference< XDictionary > xDic( xSrc, UNO_QUERY );
+    uno::Reference< XDictionary > xDic( rSource.Source, UNO_QUERY );
     if (xDic.is())
     {
         xMyDicList->removeDictionary( xDic );
@@ -674,13 +674,13 @@ uno::Sequence< OUString > SAL_CALL DicList::getSupportedServiceNames(  )
 
 
 static sal_Int32 lcl_GetToken( OUString &rToken,
-            const OUString &rText, sal_Int32 nPos, const OUString &rDelim )
+            const OUString &rText, sal_Int32 nPos, std::u16string_view rDelim )
 {
     sal_Int32 nRes = -1;
 
     if (rText.isEmpty() ||  nPos >= rText.getLength())
         rToken.clear();
-    else if (rDelim.isEmpty())
+    else if (rDelim.empty())
     {
         rToken = rText;
         if (!rToken.isEmpty())
@@ -691,7 +691,7 @@ static sal_Int32 lcl_GetToken( OUString &rToken,
         sal_Int32 i;
         for (i = nPos; i < rText.getLength(); ++i)
         {
-            if (-1 != rDelim.indexOf( rText[i] ))
+            if (std::string_view::npos != rDelim.find( rText[i] ))
                 break;
         }
 

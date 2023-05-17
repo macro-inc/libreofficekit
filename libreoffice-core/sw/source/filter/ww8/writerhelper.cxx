@@ -50,6 +50,7 @@
 #include "types.hxx"
 #include <svtools/embedhlp.hxx>
 #include <numrule.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <IDocumentDrawModelAccess.hxx>
 #include <IDocumentLayoutAccess.hxx>
@@ -109,43 +110,36 @@ namespace
     {
         ww8::Frames aRet;
 
-        for(const auto& rpFly : rFlys)
+        for(const auto& rFly : rFlys)
         {
-            const SwFrameFormat &rEntry = rpFly->GetFormat();
+            const SwFrameFormat &rEntry = rFly.GetFormat();
 
-            if (const SwPosition* pAnchor = rEntry.GetAnchor().GetContentAnchor())
+            if (const SwNode* pAnchor = rEntry.GetAnchor().GetAnchorNode())
             {
                 // the anchor position will be invalidated by SetRedlineFlags
                 // so set a dummy position and fix it in UpdateFramePositions
-                SwPosition const dummy(SwNodeIndex(
-                            const_cast<SwNodes&>(pAnchor->nNode.GetNodes())));
+                SwPosition const dummy(const_cast<SwNodes&>(pAnchor->GetNodes()));
                 aRet.emplace_back(rEntry, dummy);
             }
             else
             {
-                SwPosition aPos(rpFly->GetNdIndex());
-
-                if (SwTextNode* pTextNd = aPos.nNode.GetNode().GetTextNode())
-                {
-                    aPos.nContent.Assign(pTextNd, 0);
-                }
-
+                SwPosition aPos(rFly.GetNode());
                 aRet.emplace_back(rEntry, aPos);
             }
         }
         return aRet;
     }
 
-    //Utility to test if a frame is anchored at a given node index
+    //Utility to test if a frame is anchored at a given node
     class anchoredto
     {
     private:
-        SwNodeOffset mnNode;
+        const SwNode& mrNode;
     public:
-        explicit anchoredto(SwNodeOffset nNode) : mnNode(nNode) {}
+        explicit anchoredto(const SwNode& rNode) : mrNode(rNode) {}
         bool operator()(const ww8::Frame &rFrame) const
         {
-            return (mnNode == rFrame.GetPosition().nNode.GetNode().GetIndex());
+            return (mrNode == rFrame.GetPosition().GetNode());
         }
     };
 }
@@ -153,9 +147,9 @@ namespace
 namespace ww8
 {
     //For i120928,size conversion before exporting graphic of bullet
-    Frame::Frame(const Graphic &rGrf, const SwPosition &rPos)
+    Frame::Frame(const Graphic &rGrf, SwPosition aPos)
         : mpFlyFrame(nullptr)
-        , maPos(rPos)
+        , maPos(std::move(aPos))
         , meWriterType(eBulletGrf)
         , mpStartFrameContent(nullptr)
         , mbIsInline(true)
@@ -176,9 +170,9 @@ namespace ww8
         maLayoutSize = maSize;
     }
 
-    Frame::Frame(const SwFrameFormat &rFormat, const SwPosition &rPos)
+    Frame::Frame(const SwFrameFormat &rFormat, SwPosition aPos)
         : mpFlyFrame(&rFormat)
-        , maPos(rPos)
+        , maPos(std::move(aPos))
         , meWriterType(eTextBox)
         , mpStartFrameContent(nullptr)
         // #i43447# - move to initialization list
@@ -407,6 +401,18 @@ namespace sw
                     while ((pItem = aIter.NextItem()));
                 }
             }
+//            DeduplicateItems(rItems);
+        }
+
+        void DeduplicateItems(ww8::PoolItems & rItems)
+        {
+            if (rItems.find(RES_CHRATR_WEIGHT) != rItems.end()
+                && rItems.find(RES_CHRATR_CJK_WEIGHT) != rItems.end())
+            {
+                // avoid duplicate w:b element (DOC and DOCX map Western and
+                // CJK the same - inconsistently RTF maps CJK and CTL the same?)
+                rItems.erase(rItems.find(RES_CHRATR_CJK_WEIGHT));
+            }
         }
 
         const SfxPoolItem *SearchPoolItems(const ww8::PoolItems &rItems,
@@ -512,7 +518,7 @@ namespace sw
         {
             ww8::Frames aRet;
             std::copy_if(rFrames.begin(), rFrames.end(),
-                std::back_inserter(aRet), anchoredto(rNode.GetIndex()));
+                std::back_inserter(aRet), anchoredto(rNode));
             return aRet;
         }
 
@@ -589,10 +595,10 @@ namespace sw
                 const SwFrameFormat* pApply = rTable.GetFrameFormat();
                 OSL_ENSURE(pApply, "impossible");
                 if (pApply)
-                    pBreak = &(ItemGet<SvxFormatBreakItem>(*pApply, RES_BREAK));
+                    pBreak = &pApply->GetFormatAttr(RES_BREAK);
             }
             else if (const SwContentNode *pNd = rNd.GetContentNode())
-                pBreak = &(ItemGet<SvxFormatBreakItem>(*pNd, RES_BREAK));
+                pBreak = &pNd->GetAttr(RES_BREAK);
 
             return pBreak && pBreak->GetBreak() == SvxBreak::PageBefore;
         }
@@ -722,21 +728,21 @@ namespace sw
                 SameOpenRedlineType(eType));
             if (aResult != maStack.rend())
             {
-                SwTextNode *const pNode(rPos.nNode.GetNode().GetTextNode());
-                sal_Int32 const nIndex(rPos.nContent.GetIndex());
+                SwTextNode *const pNode(rPos.GetNode().GetTextNode());
+                sal_Int32 const nIndex(rPos.GetContentIndex());
                 // HACK to prevent overlap of field-mark and redline,
                 // which would destroy field-mark invariants when the redline
                 // is hidden: move the redline end one to the left
                 if (pNode && nIndex > 0
                     && pNode->GetText()[nIndex - 1] == CH_TXT_ATR_FIELDEND)
                 {
-                    SwPosition const end(*rPos.nNode.GetNode().GetTextNode(),
+                    SwPosition const end(*rPos.GetNode().GetTextNode(),
                                          nIndex - 1);
                     sw::mark::IFieldmark *const pFieldMark(
                         rPos.GetDoc().getIDocumentMarkAccess()->getFieldmarkAt(end));
                     SAL_WARN_IF(!pFieldMark, "sw.ww8", "expected a field mark");
-                    if (pFieldMark && pFieldMark->GetMarkPos().nNode.GetIndex() == (*aResult)->m_aMkPos.m_nNode.GetIndex()+1
-                        && pFieldMark->GetMarkPos().nContent.GetIndex() < (*aResult)->m_aMkPos.m_nContent)
+                    if (pFieldMark && pFieldMark->GetMarkPos().GetNodeIndex() == (*aResult)->m_aMkPos.m_nNode.GetIndex()+1
+                        && pFieldMark->GetMarkPos().GetContentIndex() < (*aResult)->m_aMkPos.m_nContent)
                     {
                         (*aResult)->SetEndPos(end);
                         return true;
@@ -756,15 +762,15 @@ namespace sw
         void MoveAttrFieldmarkInserted(SwFltPosition& rMkPos, SwFltPosition& rPtPos, const SwPosition& rPos)
         {
             sal_Int32 const nInserted = 2; // CH_TXT_ATR_FIELDSTART, CH_TXT_ATR_FIELDSEP
-            SwNodeOffset nPosNd = rPos.nNode.GetIndex();
-            sal_Int32 nPosCt = rPos.nContent.GetIndex() - nInserted;
+            SwNodeOffset nPosNd = rPos.GetNodeIndex();
+            sal_Int32 nPosCt = rPos.GetContentIndex() - nInserted;
 
             bool const isPoint(rMkPos == rPtPos);
             if ((rMkPos.m_nNode.GetIndex()+1 == nPosNd) &&
                 (nPosCt <= rMkPos.m_nContent))
             {
                 rMkPos.m_nContent += nInserted;
-                SAL_WARN_IF(rMkPos.m_nContent > rPos.nNode.GetNodes()[nPosNd]->GetContentNode()->Len(),
+                SAL_WARN_IF(rMkPos.m_nContent > rPos.GetNodes()[nPosNd]->GetContentNode()->Len(),
                         "sw.ww8", "redline ends after end of line");
                 if (isPoint) // sigh ... important special case...
                 {
@@ -778,7 +784,7 @@ namespace sw
                 (nPosCt < rPtPos.m_nContent))
             {
                 rPtPos.m_nContent += nInserted;
-                SAL_WARN_IF(rPtPos.m_nContent > rPos.nNode.GetNodes()[nPosNd]->GetContentNode()->Len(),
+                SAL_WARN_IF(rPtPos.m_nContent > rPos.GetNodes()[nPosNd]->GetContentNode()->Len(),
                         "sw.ww8", "range ends after end of line");
             }
         }
@@ -812,7 +818,7 @@ namespace sw
                 // the point node may be deleted in AppendRedline, so park
                 // the PaM somewhere safe
                 aRegion.DeleteMark();
-                *aRegion.GetPoint() = SwPosition(SwNodeIndex(mrDoc.GetNodes()));
+                aRegion.GetPoint()->Assign(*mrDoc.GetNodes()[SwNodeOffset(0)]);
                 mrDoc.getIDocumentRedlineAccess().AppendRedline(pNewRedline, true);
                 mrDoc.getIDocumentRedlineAccess().SetRedlineFlags(RedlineFlags::NONE | RedlineFlags::ShowInsert |
                      RedlineFlags::ShowDelete );
@@ -838,7 +844,7 @@ namespace sw
 
         RedlineStack::~RedlineStack()
         {
-            std::sort(maStack.begin(), maStack.end(), CompareRedlines());
+            std::stable_sort(maStack.begin(), maStack.end(), CompareRedlines());
             std::for_each(maStack.begin(), maStack.end(), SetInDocAndDelete(mrDoc));
         }
 
@@ -893,7 +899,7 @@ namespace sw
 
                     if (pFrameFormat != nullptr)
                     {
-                        SwNodeIndex *pIndex = aTable.second;
+                        SwPosition *pIndex = aTable.second;
                         pTable->DelFrames();
                         pTable->MakeOwnFrames(pIndex);
                     }
@@ -905,11 +911,11 @@ namespace sw
         {
             if (!mbHasRoot)
                 return;
-            //Associate this tablenode with this after position, replace an //old
+            //Associate this tablenode with this after position, replace an old
             //node association if necessary
             maTables.emplace(
                     std::unique_ptr<InsertedTableListener>(new InsertedTableListener(rTableNode)),
-                    &(rPaM.GetPoint()->nNode));
+                    rPaM.GetPoint());
         }
     }
 

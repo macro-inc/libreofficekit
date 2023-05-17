@@ -189,15 +189,14 @@ void SwFEShell::InsertRow( sal_uInt16 nCnt, bool bBehind )
 
     // search boxes via the layout
     SwSelBoxes aBoxes;
-    bool bSelectAll = StartsWithTable() && ExtendedSelectedAll();
+    bool bSelectAll = StartsWith_() == StartsWith::Table && ExtendedSelectedAll();
     if (bSelectAll)
     {
         // Set the end of the selection to the last paragraph of the last cell of the table.
         SwPaM* pPaM = getShellCursor(false);
-        SwNode* pNode = pPaM->Start()->nNode.GetNode().FindTableNode()->EndOfSectionNode();
+        SwNode* pNode = pPaM->Start()->GetNode().FindTableNode()->EndOfSectionNode();
         // pNode is the end node of the table, we want the last node before the end node of the last cell.
-        pPaM->End()->nNode = pNode->GetIndex() - 2;
-        pPaM->End()->nContent.Assign(pPaM->End()->nNode.GetNode().GetContentNode(), 0);
+        pPaM->End()->Assign( pNode->GetIndex() - 2 );
     }
     GetTableSel( *this, aBoxes, SwTableSearchType::Row );
 
@@ -285,7 +284,7 @@ bool SwFEShell::DeleteCol()
     SwTableSearchType eSearchType = SwTableSearchType::Col;
 
     // NewModel tables already ExpandColumnSelection, so don't do it here also.
-    const SwContentNode* pContentNd = getShellCursor(false)->GetNode().GetContentNode();
+    const SwContentNode* pContentNd = getShellCursor(false)->GetPointNode().GetContentNode();
     const SwTableNode* pTableNd = pContentNd ? pContentNd->FindTableNode() : nullptr;
     if (pTableNd && pTableNd->GetTable().IsNewModel())
         eSearchType = SwTableSearchType::NONE;
@@ -362,8 +361,8 @@ bool SwFEShell::DeleteRow(bool bCompleteTable)
         // don't need to remove the row frames in Show Changes mode
         if ( !bRecordAndHideChanges )
         {
-            SwEditShell* pEditShell = GetDoc()->GetEditShell();
-            pEditShell->Delete(false);
+            if (SwEditShell* pEditShell = GetDoc()->GetEditShell())
+                pEditShell->Delete(false);
 
             EndAllActionAndCall();
             EndUndo(bCompleteTable ? SwUndoId::UI_TABLE_DELETE : SwUndoId::ROW_DELETE);
@@ -425,6 +424,16 @@ bool SwFEShell::DeleteRow(bool bCompleteTable)
             }
             SwTableBox* pNextBox = pDelLine->FindNextBox( pTableNd->GetTable(),
                                                             pDelBox );
+            // skip deleted lines in Hide Changes mode with enabled change tracking
+            if ( bRecordAndHideChanges )
+            {
+                SwRedlineTable::size_type nRedlinePos = 0;
+                while( pNextBox && pNextBox->GetUpper()->IsDeleted(nRedlinePos) )
+                    pNextBox = pNextBox->GetUpper()->FindNextBox( pTableNd->GetTable(),
+                                    pNextBox->GetUpper()->GetTabBoxes().back() );
+            }
+
+            // skip protected cells
             while( pNextBox &&
                     pNextBox->GetFrameFormat()->GetProtect().IsContentProtected() )
                 pNextBox = pNextBox->FindNextBox( pTableNd->GetTable(), pNextBox );
@@ -437,6 +446,19 @@ bool SwFEShell::DeleteRow(bool bCompleteTable)
                     pDelBox = pDelBox->GetTabLines()[0]->GetTabBoxes()[0];
                 pNextBox = pDelLine->FindPreviousBox( pTableNd->GetTable(),
                                                             pDelBox );
+                // skip previous deleted lines in Hide Changes mode with enabled change tracking
+                if ( bRecordAndHideChanges )
+                {
+                    SwRedlineTable::size_type nRedlinePos = 0;
+                    while( pNextBox && pNextBox->GetUpper()->IsDeleted(nRedlinePos) )
+                    {
+                        pNextBox = pNextBox->GetUpper()->FindPreviousBox( pTableNd->GetTable(),
+                                        pNextBox->GetUpper()->GetTabBoxes()[0] );
+                        nRedlinePos = 0;
+                    }
+                }
+
+                // skip previous protected cells
                 while( pNextBox &&
                         pNextBox->GetFrameFormat()->GetProtect().IsContentProtected() )
                     pNextBox = pNextBox->FindPreviousBox( pTableNd->GetTable(), pNextBox );
@@ -457,15 +479,16 @@ bool SwFEShell::DeleteRow(bool bCompleteTable)
                     pTableCursor->DeleteMark();
 
                     // set start and end of the selection
-                    pTableCursor->GetPoint()->nNode = *pEnd->GetSttNd();
-                    pTableCursor->Move( fnMoveForward, GoInContent );
+                    pTableCursor->GetPoint()->Assign( *pEnd->GetSttNd()->EndOfSectionNode() );
+                    pTableCursor->Move( fnMoveBackward, GoInContent );
                     pTableCursor->SetMark();
-                    pTableCursor->GetPoint()->nNode = *pStt->GetSttNd()->EndOfSectionNode();
+                    pTableCursor->GetPoint()->Assign( *pStt->GetSttNd()->EndOfSectionNode() );
                     pTableCursor->Move( fnMoveBackward, GoInContent );
                     pWrtShell->UpdateCursor();
                 }
 
-                pEditShell->Delete(false);
+                if (pEditShell)
+                    pEditShell->Delete(false);
             }
 
             SwNodeOffset nIdx;
@@ -479,28 +502,41 @@ bool SwFEShell::DeleteRow(bool bCompleteTable)
             if( !pCNd )
                 pCNd = GetDoc()->GetNodes().GoNext( &aIdx );
 
-            if( pCNd )
-            {
-                SwPaM* pPam = GetCursor();
-                pPam->GetPoint()->nNode = aIdx;
-                pPam->GetPoint()->nContent.Assign( pCNd, 0 );
-                pPam->SetMark();            // both want something
-                pPam->DeleteMark();
-            }
-
             // remove row frames in Hide Changes mode (and table frames, if needed)
             if ( bRecordAndHideChanges )
             {
+                // remove all frames of the table, and make them again without the deleted ones
+                // TODO remove only the deleted frames
                 pTableNd->DelFrames();
                 if ( !pTableNd->GetTable().IsDeleted() )
                 {
-                    SwNodeIndex aTableIdx( *pTableNd->EndOfSectionNode(), 1 );
-                    pTableNd->MakeOwnFrames(&aTableIdx);
+                    pTableNd->MakeOwnFrames();
                 }
 
                 EndAllActionAndCall();
+
+                // put cursor
+                SwPaM* pPam = GetCursor();
+                pPam->GetPoint()->Assign( *pCNd, 0 );
+                pPam->SetMark();            // both want something
+                pPam->DeleteMark();
+                if ( SwWrtShell* pWrtShell = dynamic_cast<SwWrtShell*>(this) )
+                {
+                    pWrtShell->UpdateCursor();
+                    // tdf#150578 enable the disabled table toolbar by (zero) cursor moving
+                    pWrtShell->Right( SwCursorSkipMode::Chars, false, 0, false );
+                }
+
                 EndUndo(bCompleteTable ? SwUndoId::UI_TABLE_DELETE : SwUndoId::ROW_DELETE);
                 return true;
+            }
+            else if( pCNd )
+            {
+                // put cursor
+                SwPaM* pPam = GetCursor();
+                pPam->GetPoint()->Assign( *pCNd, 0 );
+                pPam->SetMark();            // both want something
+                pPam->DeleteMark();
             }
         }
 
@@ -523,7 +559,7 @@ TableMergeErr SwFEShell::MergeTab()
     if( IsTableMode() )
     {
         SwShellTableCursor* pTableCursor = GetTableCursor();
-        const SwTableNode* pTableNd = pTableCursor->GetNode().FindTableNode();
+        const SwTableNode* pTableNd = pTableCursor->GetPointNode().FindTableNode();
         if( dynamic_cast< const SwDDETable* >(&pTableNd->GetTable()) != nullptr )
         {
             ErrorHandler::HandleError( ERR_TBLDDECHG_ERROR, GetFrameWeld(GetDoc()->GetDocShell()),
@@ -958,10 +994,10 @@ bool SwFEShell::HasBoxSelection() const
         pPam->Exchange();
     }
     SwNode* pNd;
-    if( pPam->GetPoint()->nNode.GetIndex() -1 ==
-        ( pNd = &pPam->GetNode())->StartOfSectionIndex() &&
-        !pPam->GetPoint()->nContent.GetIndex() &&
-        pPam->GetMark()->nNode.GetIndex() + 1 ==
+    if( pPam->GetPoint()->GetNodeIndex() -1 ==
+        ( pNd = &pPam->GetPointNode())->StartOfSectionIndex() &&
+        !pPam->GetPoint()->GetContentIndex() &&
+        pPam->GetMark()->GetNodeIndex() + 1 ==
         pNd->EndOfSectionIndex())
     {
             SwNodeIndex aIdx( *pNd->EndOfSectionNode(), -1 );
@@ -969,9 +1005,9 @@ bool SwFEShell::HasBoxSelection() const
             if( !pCNd )
             {
                 pCNd = SwNodes::GoPrevious( &aIdx );
-                OSL_ENSURE( pCNd, "no ContentNode in box ??" );
+                assert(pCNd && "no ContentNode in box ??");
             }
-            if( pPam->GetMark()->nContent == pCNd->Len() )
+            if( pPam->GetMark()->GetContentIndex() == pCNd->Len() )
             {
                 if( bChg )
                     pPam->Exchange();
@@ -1103,7 +1139,7 @@ static sal_uInt16 lcl_GetRowNumber( const SwPosition& rPos )
     const SwContentFrame *pFrame;
 
     std::pair<Point, bool> const tmp(aTmpPt, false);
-    pNd = rPos.nNode.GetNode().GetContentNode();
+    pNd = rPos.GetNode().GetContentNode();
     if( nullptr != pNd )
         pFrame = pNd->getLayoutFrame(pNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout(), &rPos, &tmp);
     else
@@ -1388,7 +1424,7 @@ bool SwFEShell::DeleteTableSel()
         // position they'll be set to the old position
         while( !pFrame->IsCellFrame() )
             pFrame = pFrame->GetUpper();
-        ParkCursor( SwNodeIndex( *static_cast<SwCellFrame*>(pFrame)->GetTabBox()->GetSttNd() ));
+        ParkCursor( *static_cast<SwCellFrame*>(pFrame)->GetTabBox()->GetSttNd() );
 
         bRet = GetDoc()->DeleteRowCol( aBoxes );
 
@@ -1929,8 +1965,8 @@ bool SwFEShell::SelTableRowCol( const Point& rPt, const Point* pEnd, bool bRowDr
 
             if ( ppPos[1] )
             {
-                if ( ppPos[1]->nNode.GetNode().StartOfSectionNode() !=
-                     aOldPos.nNode.GetNode().StartOfSectionNode() )
+                if ( ppPos[1]->GetNode().StartOfSectionNode() !=
+                     aOldPos.GetNode().StartOfSectionNode() )
                 {
                     pCursor->SetMark();
                     SwCursorSaveState aSaveState2( *pCursor );

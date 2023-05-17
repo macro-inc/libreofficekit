@@ -120,8 +120,6 @@ namespace sdr::properties
 
 //   SdrTextObj
 
-typedef std::unique_ptr<SdrPathObj, SdrObjectFreeOp> SdrPathObjUniquePtr;
-
 class SVXCORE_DLLPUBLIC SdrTextObj : public SdrAttrObj, public svx::ITextProvider
 {
 private:
@@ -133,7 +131,7 @@ private:
     friend class TextChainFlow;
     friend class EditingTextChainFlow;
 
-    // CustomShapeproperties need to access the "bTextFrame" member:
+    // CustomShapeproperties need to access the "mbTextFrame" member:
     friend class sdr::properties::CustomShapeProperties;
 
 protected:
@@ -165,15 +163,15 @@ private:
 
 protected:
     // The "aRect" is also the rect of RectObj and CircObj.
-    // When bTextFrame=sal_True the text will be formatted into this rect
-    // When bTextFrame=sal_False the text will be centered around its middle
+    // When mbTextFrame=true the text will be formatted into this rect
+    // When mbTextFrame=false the text will be centered around its middle
     tools::Rectangle maRect;
 
     // The GeoStat contains the rotation and shear angles
     GeoStat maGeo;
 
     // this is the active text
-    std::unique_ptr<SdrText> mpText;
+    rtl::Reference<SdrText> mxText;
 
     // This contains the dimensions of the text
     Size maTextSize;
@@ -184,10 +182,10 @@ protected:
     SdrOutliner* mpEditingOutliner;
 
     // Possible values for eTextKind are:
-    //     OBJ_TEXT         regular text frame
-    //     OBJ_TITLETEXT    TitleText for presentations
-    //     OBJ_OUTLINETEXT  OutlineText for presentations
-    // eTextKind only has meaning when bTextFrame=sal_True, since otherwise
+    //     SdrObjKind::Text         regular text frame
+    //     SdrObjKind::TitleText    TitleText for presentations
+    //     SdrObjKind::OutlineText  OutlineText for presentations
+    // eTextKind only has meaning when mbTextFrame=true, since otherwise
     // we're dealing with a labeled graphical object
     SdrObjKind meTextKind;
 
@@ -197,7 +195,7 @@ protected:
     // and maintaining the OutlinerView.
     Point maTextEditOffset;
 
-    virtual SdrObjectUniquePtr getFullDragClone() const override;
+    virtual rtl::Reference<SdrObject> getFullDragClone() const override;
 
 
 public:
@@ -213,9 +211,9 @@ protected:
 
     // For labeled graphical objects bTextFrame is FALSE. The block of text
     // will then be centered horizontally and vertically on aRect.
-    // For bTextFalse=sal_True the text will be formatted into aRect.
+    // For mbTextFrame=true the text will be formatted into aRect.
     // The actual text frame is realized by an SdrRectObj with
-    // bTextFrame=sal_True.
+    // mbTextFrame=true.
     bool mbTextFrame : 1;
     bool mbNoShear : 1; // disable shearing (->graphic+Ole+TextFrame)
     bool mbTextSizeDirty : 1;
@@ -252,7 +250,9 @@ private:
                                        Fraction&        aFitXCorrection ) const;
     void ImpAutoFitText( SdrOutliner& rOutliner ) const;
     void ImpAutoFitText( SdrOutliner& rOutliner, const Size& rShapeSize, bool bIsVerticalWriting ) const;
-    SVX_DLLPRIVATE SdrObjectUniquePtr ImpConvertContainedTextToSdrPathObjs(bool bToPoly) const;
+    void autoFitTextForCompatibility(SdrOutliner& rOutliner, const Size& rShapeSize) const;
+
+    SVX_DLLPRIVATE rtl::Reference<SdrObject> ImpConvertContainedTextToSdrPathObjs(bool bToPoly) const;
     SVX_DLLPRIVATE void ImpRegisterLink();
     SVX_DLLPRIVATE void ImpDeregisterLink();
     SVX_DLLPRIVATE ImpSdrObjTextLinkUserData* GetLinkUserData() const;
@@ -261,12 +261,12 @@ private:
     static void AppendFamilyToStyleName(OUString& styleName, SfxStyleFamily family);
 
     /** Reads the style family from a style name to which the family has been appended. */
-    static SfxStyleFamily ReadFamilyFromStyleName(const OUString& styleName);
+    static SfxStyleFamily ReadFamilyFromStyleName(std::u16string_view styleName);
 
 protected:
     bool ImpCanConvTextToCurve() const;
-    SdrPathObjUniquePtr ImpConvertMakeObj(const basegfx::B2DPolyPolygon& rPolyPolygon, bool bClosed, bool bBezier) const;
-    SdrObjectUniquePtr ImpConvertAddText(SdrObjectUniquePtr pObj, bool bBezier) const;
+    rtl::Reference<SdrPathObj> ImpConvertMakeObj(const basegfx::B2DPolyPolygon& rPolyPolygon, bool bClosed, bool bBezier) const;
+    rtl::Reference<SdrObject> ImpConvertAddText(rtl::Reference<SdrObject> pObj, bool bBezier) const;
     void ImpSetTextStyleSheetListeners();
     static void ImpSetCharStretching(SdrOutliner& rOutliner, const Size& rTextSize, const Size& rShapeSize, Fraction& rFitXCorrection);
     static void ImpJustifyRect(tools::Rectangle& rRect);
@@ -332,7 +332,7 @@ public:
     virtual bool NbcAdjustTextFrameWidthAndHeight(bool bHgt = true, bool bWdt = true);
     virtual bool AdjustTextFrameWidthAndHeight();
     bool IsTextFrame() const { return mbTextFrame; }
-    bool IsOutlText() const { return mbTextFrame && (meTextKind==OBJ_OUTLINETEXT || meTextKind==OBJ_TITLETEXT); }
+    bool IsOutlText() const { return mbTextFrame && (meTextKind==SdrObjKind::OutlineText || meTextKind==SdrObjKind::TitleText); }
     /// returns true if the PPT autofit of text into shape bounds is enabled. implies IsFitToSize()==false!
     bool IsAutoFit() const;
     /// returns true if the old feature for fitting shape content should into shape is enabled. implies IsAutoFit()==false!
@@ -380,7 +380,9 @@ public:
     // FitToSize and Fontwork are not taken into account in GetTextSize()!
     virtual const Size& GetTextSize() const;
     void FitFrameToTextSize();
-    sal_uInt16 GetFontScaleY() const;
+
+    double GetFontScale() const;
+    double GetSpacingScale() const;
 
     // Simultaneously sets the text into the Outliner (possibly
     // the one of the EditOutliner) and sets the PaperSize.
@@ -446,7 +448,7 @@ public:
     virtual void TakeUnrotatedSnapRect(tools::Rectangle& rRect) const;
     virtual OUString TakeObjNameSingul() const override;
     virtual OUString TakeObjNamePlural() const override;
-    virtual SdrTextObj* CloneSdrObject(SdrModel& rTargetModel) const override;
+    virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const override;
     virtual basegfx::B2DPolyPolygon TakeXorPoly() const override;
     virtual basegfx::B2DPolyPolygon TakeContour() const override;
     virtual void RecalcSnapRect() override;
@@ -499,7 +501,7 @@ public:
     virtual bool CalcFieldValue(const SvxFieldItem& rField, sal_Int32 nPara, sal_uInt16 nPos,
         bool bEdit, std::optional<Color>& rpTxtColor, std::optional<Color>& rpFldColor, OUString& rRet) const;
 
-    virtual SdrObjectUniquePtr DoConvertToPolyObj(bool bBezier, bool bAddText) const override;
+    virtual rtl::Reference<SdrObject> DoConvertToPolyObj(bool bBezier, bool bAddText) const override;
 
     void SetTextEditOutliner(SdrOutliner* pOutl) { mpEditingOutliner = pOutl; }
 
@@ -626,6 +628,8 @@ public:
         Also checks for one empty paragraph.
     */
     static bool HasTextImpl( SdrOutliner const * pOutliner );
+
+    virtual bool IsSdrTextObj() const final { return true; }
 
     friend class ::SdrTextObjTest;
 };

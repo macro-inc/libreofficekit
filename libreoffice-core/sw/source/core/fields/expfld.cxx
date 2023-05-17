@@ -58,6 +58,7 @@
 #include <SwStyleNameMapper.hxx>
 #include <unofldmid.h>
 #include <numrule.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::text;
@@ -139,13 +140,12 @@ static SwTextNode* GetFirstTextNode( const SwDoc& rDoc, SwPosition& rPos,
     if ( !pCFrame )
     {
         const SwNodes& rNodes = rDoc.GetNodes();
-        rPos.nNode = *rNodes.GetEndOfContent().StartOfSectionNode();
+        rPos.Assign( *rNodes.GetEndOfContent().StartOfSectionNode() );
         SwContentNode* pCNd;
-        while( nullptr != (pCNd = rNodes.GoNext( &rPos.nNode ) ) &&
+        while( nullptr != (pCNd = rNodes.GoNext( &rPos ) ) &&
                 nullptr == ( pTextNode = pCNd->GetTextNode() ) )
                         ;
         OSL_ENSURE( pTextNode, "Where is the 1. TextNode?" );
-        rPos.nContent.Assign( pTextNode, 0 );
     }
     else if ( !pCFrame->isFrameAreaDefinitionValid() )
     {
@@ -155,7 +155,7 @@ static SwTextNode* GetFirstTextNode( const SwDoc& rDoc, SwPosition& rPos,
     else
     {
         pCFrame->GetModelPositionForViewPoint( &rPos, rPt );
-        pTextNode = rPos.nNode.GetNode().GetTextNode();
+        pTextNode = rPos.GetNode().GetTextNode();
     }
     return pTextNode;
 }
@@ -188,11 +188,10 @@ const SwTextNode* GetBodyTextNode( const SwDoc& rDoc, SwPosition& rPos,
             {
                 OSL_ENSURE( rAnchor.GetContentAnchor(), "no valid position" );
                 rPos = *rAnchor.GetContentAnchor();
-                pTextNode = rPos.nNode.GetNode().GetTextNode();
+                pTextNode = rPos.GetNode().GetTextNode();
                 if ( RndStdIds::FLY_AT_PARA == rAnchor.GetAnchorId() )
                 {
-                    const_cast<SwTextNode*>(pTextNode)->MakeStartIndex(
-                            &rPos.nContent );
+                    rPos.AssignStartIndex(*pTextNode);
                 }
 
                 // do not break yet, might be as well in Header/Footer/Footnote/Fly
@@ -204,7 +203,7 @@ const SwTextNode* GetBodyTextNode( const SwDoc& rDoc, SwPosition& rPos,
             {
                 pLayout->FindPageFrame()->GetContentPosition(
                                                 pLayout->getFrameArea().Pos(), rPos );
-                pTextNode = rPos.nNode.GetNode().GetTextNode();
+                pTextNode = rPos.GetNode().GetTextNode();
             }
         }
         else if( pLayout->IsFootnoteFrame() )
@@ -212,8 +211,7 @@ const SwTextNode* GetBodyTextNode( const SwDoc& rDoc, SwPosition& rPos,
             // get the anchor's node
             const SwTextFootnote* pFootnote = static_cast<const SwFootnoteFrame*>(pLayout)->GetAttr();
             pTextNode = &pFootnote->GetTextNode();
-            rPos.nNode = *pTextNode;
-            rPos.nContent = pFootnote->GetStart();
+            rPos.Assign( *pTextNode, pFootnote->GetStart() );
         }
         else if( pLayout->IsHeaderFrame() || pLayout->IsFooterFrame() )
         {
@@ -240,7 +238,7 @@ const SwTextNode* GetBodyTextNode( const SwDoc& rDoc, SwPosition& rPos,
                 assert(pContentFrame->IsTextFrame());
                 SwTextFrame const*const pFrame(static_cast<SwTextFrame const*>(pContentFrame));
                 rPos = pFrame->MapViewToModelPos(TextFrameIndex(pFrame->GetText().getLength()));
-                pTextNode = rPos.nNode.GetNode().GetTextNode();
+                pTextNode = rPos.GetNode().GetTextNode();
                 assert(pTextNode);
             }
             else
@@ -353,7 +351,7 @@ void SwGetExpField::ChangeExpansion( const SwFrame& rFrame, const SwTextField& r
     SwDoc& rDoc = const_cast<SwDoc&>(pTextNode->GetDoc());
 
     // create index for determination of the TextNode
-    SwPosition aPos( SwNodeIndex( rDoc.GetNodes() ) );
+    SwPosition aPos( rDoc.GetNodes() );
     pTextNode = GetBodyTextNode( rDoc, aPos, rFrame );
 
     // If no layout exists, ChangeExpansion is called for header and
@@ -376,7 +374,7 @@ void SwGetExpField::ChangeExpansion( const SwFrame& rFrame, const SwTextField& r
     SwRootFrame const& rLayout(*rFrame.getRootFrame());
     OUString & rExpand(rLayout.IsHideRedlines() ? m_sExpandRLHidden : m_sExpand);
     // here a page number is needed to sort correctly
-    SetGetExpField aEndField(aPos.nNode, &rField, &aPos.nContent, rFrame.GetPhyPageNum());
+    SetGetExpField aEndField(aPos.GetNode(), &rField, aPos.GetContentIndex(), rFrame.GetPhyPageNum());
     if(GetSubType() & nsSwGetSetExpType::GSE_STRING)
     {
         SwHashTable<HashStr> aHashTable(0);
@@ -508,9 +506,9 @@ bool SwGetExpField::PutValue( const uno::Any& rAny, sal_uInt16 nWhichId )
     return true;
 }
 
-SwSetExpFieldType::SwSetExpFieldType( SwDoc* pDc, const OUString& rName, sal_uInt16 nTyp )
+SwSetExpFieldType::SwSetExpFieldType( SwDoc* pDc, OUString aName, sal_uInt16 nTyp )
     : SwValueFieldType( pDc, SwFieldIds::SetExp ),
-    m_sName( rName ),
+    m_sName( std::move(aName) ),
     m_sDelim( "." ),
     m_nType(nTyp), m_nLevel( UCHAR_MAX ),
     m_bDeleted( false )
@@ -635,7 +633,7 @@ size_t SwSetExpFieldType::GetSeqFieldList(SwSeqFieldList& rList,
             SeqFieldLstElem aNew(
                     pNd->GetExpandText(pLayout),
                     static_cast<SwSetExpField*>(pF->GetField())->GetSeqNumber() );
-            rList.InsertSort( aNew );
+            rList.InsertSort( std::move(aNew) );
         }
     }
     return rList.Count();
@@ -997,13 +995,12 @@ sal_Int32 SwGetExpField::GetReferenceTextPos( const SwFormatField& rFormat, SwDo
         SwAttrSet aSet(rDoc.GetAttrPool(), nIds);
         rTextNode.GetParaAttr(aSet, nRet, nRet+1);
 
-        if( RTL_TEXTENCODING_SYMBOL != static_cast<const SvxFontItem&>(aSet.Get(
-                GetWhichOfScript( RES_CHRATR_FONT, nSrcpt )) ).GetCharSet() )
+        TypedWhichId<SvxFontItem> nFontWhich = GetWhichOfScript( RES_CHRATR_FONT, nSrcpt );
+        if( RTL_TEXTENCODING_SYMBOL != aSet.Get( nFontWhich ).GetCharSet() )
         {
-            LanguageType eLang = static_cast<const SvxLanguageItem&>(aSet.Get(
-                GetWhichOfScript( RES_CHRATR_LANGUAGE, nSrcpt )) ).GetLanguage();
-            LanguageTag aLanguageTag( eLang);
-            CharClass aCC( aLanguageTag);
+            TypedWhichId<SvxLanguageItem> nLangWhich = GetWhichOfScript( RES_CHRATR_LANGUAGE, nSrcpt ) ;
+            LanguageType eLang = aSet.Get(nLangWhich).GetLanguage();
+            CharClass aCC(( LanguageTag(eLang) ));
             sal_Unicode c0 = sNodeText[0];
             bool bIsAlphaNum = aCC.isAlphaNumeric( sNodeText, 0 );
             if( !bIsAlphaNum ||
@@ -1218,14 +1215,14 @@ std::unique_ptr<SwFieldType> SwInputFieldType::Copy() const
 }
 
 SwInputField::SwInputField( SwInputFieldType* pFieldType,
-                            const OUString& rContent,
-                            const OUString& rPrompt,
+                            OUString aContent,
+                            OUString aPrompt,
                             sal_uInt16 nSub,
                             sal_uLong nFormat,
                             bool bIsFormField )
     : SwField( pFieldType, nFormat, LANGUAGE_SYSTEM, false )
-    , maContent(rContent)
-    , maPText(rPrompt)
+    , maContent(std::move(aContent))
+    , maPText(std::move(aPrompt))
     , mnSubType(nSub)
     , mbIsFormField( bIsFormField )
     , mpFormatField( nullptr )
@@ -1357,6 +1354,8 @@ bool SwInputField::QueryValue( uno::Any& rAny, sal_uInt16 nWhichId ) const
     case FIELD_PROP_GRABBAG:
         rAny <<= maGrabBag;
         break;
+    case FIELD_PROP_TITLE:
+        break;
     default:
         assert(false);
     }
@@ -1381,6 +1380,8 @@ bool SwInputField::PutValue( const uno::Any& rAny, sal_uInt16 nWhichId )
         break;
     case FIELD_PROP_GRABBAG:
         rAny >>= maGrabBag;
+        break;
+    case FIELD_PROP_TITLE:
         break;
     default:
         assert(false);

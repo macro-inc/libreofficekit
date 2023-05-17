@@ -21,7 +21,7 @@
 
 #include <sal/main.h>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/extendapplicationenvironment.hxx>
 
 #include <cppuhelper/bootstrap.hxx>
@@ -115,13 +115,13 @@ MyWin::MyWin( vcl::Window* pParent, WinBits nWinStyle ) :
     {
         for( int nY = 0; nY < 256; nY++ )
         {
-            double fRed = 255.0-1.5*sqrt(static_cast<double>(nX*nX+nY*nY));
+            double fRed = 255.0-1.5*std::hypot(nX, nY);
             if( fRed < 0.0 )
                 fRed = 0.0;
-            double fGreen = 255.0-1.5*sqrt(static_cast<double>((255-nX)*(255-nX)+nY*nY));
+            double fGreen = 255.0-1.5*std::hypot(255-nX, nY);
             if( fGreen < 0.0 )
                 fGreen = 0.0;
-            double fBlue = 255.0-1.5*sqrt(static_cast<double>((128-nX)*(128-nX)+(255-nY)*(255-nY)));
+            double fBlue = 255.0-1.5*std::hypot(128-nX, 255-nY);
             if( fBlue < 0.0 )
                 fBlue = 0.0;
             pAcc->SetPixel( nY, nX, BitmapColor( sal_uInt8(fRed), sal_uInt8(fGreen), sal_uInt8(fBlue) ) );
@@ -265,7 +265,7 @@ void MyWin::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle& rR
     Color const aLightGreen(0, 0xff, 0);
     Color const aDarkGreen(0, 0x40, 0);
 
-    Gradient aGradient(GradientStyle::Linear, aBlack, aWhite);
+    Gradient aGradient(css::awt::GradientStyle_LINEAR, aBlack, aWhite);
     aGradient.SetAngle(900_deg10);
     rRenderContext.DrawGradient(tools::Rectangle(Point(1000, 4500),
                                 Size(aPaperSize.Width() - 2000, 500)),

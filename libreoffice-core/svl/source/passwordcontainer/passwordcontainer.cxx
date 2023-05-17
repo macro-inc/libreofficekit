@@ -29,6 +29,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
+#include <o3tl/string_view.hxx>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/task/InteractionHandler.hpp>
 #include <com/sun/star/task/MasterPasswordRequest.hpp>
@@ -165,11 +166,11 @@ static OUString getAsciiLine( const ::rtl::ByteSequence& buf )
 }
 
 
-static ::rtl::ByteSequence getBufFromAsciiLine( const OUString& line )
+static ::rtl::ByteSequence getBufFromAsciiLine( std::u16string_view line )
 {
-    OSL_ENSURE( line.getLength() % 2 == 0, "Wrong syntax!" );
+    OSL_ENSURE( line.size() % 2 == 0, "Wrong syntax!" );
     OString tmpLine = OUStringToOString( line, RTL_TEXTENCODING_ASCII_US );
-    ::rtl::ByteSequence aResult(line.getLength()/2);
+    ::rtl::ByteSequence aResult(line.size()/2);
 
     for( int ind = 0; ind < tmpLine.getLength()/2; ind++ )
     {
@@ -412,26 +413,29 @@ void SAL_CALL PasswordContainer::disposing( const EventObject& )
     }
 }
 
-std::vector< OUString > PasswordContainer::DecodePasswords( const OUString& aLine, const OUString& aIV, const OUString& aMasterPasswd, css::task::PasswordRequestMode mode )
+std::vector< OUString > PasswordContainer::DecodePasswords( std::u16string_view aLine, std::u16string_view aIV, std::u16string_view aMasterPasswd, css::task::PasswordRequestMode mode )
 {
-    if( !aMasterPasswd.isEmpty() )
+    if( !aMasterPasswd.empty() )
     {
         rtlCipher aDecoder = rtl_cipher_create (rtl_Cipher_AlgorithmBF, rtl_Cipher_ModeStream );
         OSL_ENSURE( aDecoder, "Can't create decoder" );
 
         if( aDecoder )
         {
-            OSL_ENSURE( aMasterPasswd.getLength() == RTL_DIGEST_LENGTH_MD5 * 2, "Wrong master password format!" );
+            OSL_ENSURE( aMasterPasswd.size() == RTL_DIGEST_LENGTH_MD5 * 2, "Wrong master password format!" );
 
             unsigned char code[RTL_DIGEST_LENGTH_MD5];
             for( int ind = 0; ind < RTL_DIGEST_LENGTH_MD5; ind++ )
-                code[ ind ] = static_cast<char>(aMasterPasswd.copy( ind*2, 2 ).toUInt32(16));
+                code[ ind ] = static_cast<char>(o3tl::toUInt32(aMasterPasswd.substr( ind*2, 2 ), 16));
 
             unsigned char iv[RTL_DIGEST_LENGTH_MD5] = {0};
-            if (!aIV.isEmpty())
+            if (!aIV.empty())
             {
                 for( int ind = 0; ind < RTL_DIGEST_LENGTH_MD5; ind++ )
-                    iv[ ind ] = static_cast<char>(aIV.copy( ind*2, 2 ).toUInt32(16));
+                {
+                    auto tmp = aIV.substr( ind*2, 2 );
+                    iv[ ind ] = static_cast<char>(rtl_ustr_toInt64_WithLength(tmp.data(), 16, tmp.size()));
+                }
             }
 
             rtlCipherError result = rtl_cipher_init (
@@ -469,9 +473,9 @@ std::vector< OUString > PasswordContainer::DecodePasswords( const OUString& aLin
         "Can't decode!", css::uno::Reference<css::uno::XInterface>(), mode);
 }
 
-OUString PasswordContainer::EncodePasswords(const std::vector< OUString >& lines, const OUString& aIV, const OUString& aMasterPasswd)
+OUString PasswordContainer::EncodePasswords(const std::vector< OUString >& lines, std::u16string_view aIV, std::u16string_view aMasterPasswd)
 {
-    if( !aMasterPasswd.isEmpty() )
+    if( !aMasterPasswd.empty() )
     {
         OString aSeq = OUStringToOString( createIndex( lines ), RTL_TEXTENCODING_UTF8 );
 
@@ -480,17 +484,20 @@ OUString PasswordContainer::EncodePasswords(const std::vector< OUString >& lines
 
         if( aEncoder )
         {
-            OSL_ENSURE( aMasterPasswd.getLength() == RTL_DIGEST_LENGTH_MD5 * 2, "Wrong master password format!" );
+            OSL_ENSURE( aMasterPasswd.size() == RTL_DIGEST_LENGTH_MD5 * 2, "Wrong master password format!" );
 
             unsigned char code[RTL_DIGEST_LENGTH_MD5];
             for( int ind = 0; ind < RTL_DIGEST_LENGTH_MD5; ind++ )
-                code[ ind ] = static_cast<char>(aMasterPasswd.copy( ind*2, 2 ).toUInt32(16));
+                code[ ind ] = static_cast<char>(o3tl::toUInt32(aMasterPasswd.substr( ind*2, 2 ), 16));
 
             unsigned char iv[RTL_DIGEST_LENGTH_MD5] = {0};
-            if (!aIV.isEmpty())
+            if (!aIV.empty())
             {
                 for( int ind = 0; ind < RTL_DIGEST_LENGTH_MD5; ind++ )
-                    iv[ ind ] = static_cast<char>(aIV.copy( ind*2, 2 ).toUInt32(16));
+                {
+                    auto tmp = aIV.substr( ind*2, 2 );
+                    iv[ ind ] = static_cast<char>(rtl_ustr_toInt64_WithLength(tmp.data(), 16, tmp.size()));
+                }
             }
 
             rtlCipherError result = rtl_cipher_init (
@@ -837,12 +844,13 @@ OUString PasswordContainer::RequestPasswordFromUser( PasswordRequestMode aRMode,
 }
 
 // Mangle the key to match an old bug
-static OUString ReencodeAsOldHash(const OUString& rPass)
+static OUString ReencodeAsOldHash(std::u16string_view rPass)
 {
     OUStringBuffer aBuffer;
     for (int ind = 0; ind < RTL_DIGEST_LENGTH_MD5; ++ind)
     {
-        unsigned char i = static_cast<char>(rPass.copy(ind * 2, 2).toUInt32(16));
+        auto tmp = rPass.substr(ind * 2, 2);
+        unsigned char i = static_cast<char>(rtl_ustr_toInt64_WithLength(tmp.data(), 16, tmp.size()));
         aBuffer.append(static_cast< sal_Unicode >('a' + (i >> 4)));
         aBuffer.append(static_cast< sal_Unicode >('a' + (i & 15)));
     }
@@ -1382,7 +1390,7 @@ MasterPasswordRequest_Impl::MasterPasswordRequest_Impl( PasswordRequestMode Mode
     aRequest.Classification = InteractionClassification_ERROR;
     aRequest.Mode = Mode;
 
-    setRequest( makeAny( aRequest ) );
+    setRequest( Any( aRequest ) );
 
     // Fill continuations...
     Sequence< RememberAuthentication > aRememberModes{ RememberAuthentication_NO };

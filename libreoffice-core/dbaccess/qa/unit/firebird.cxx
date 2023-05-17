@@ -15,6 +15,7 @@
 #include <com/sun/star/sdbc/XResultSet.hpp>
 #include <com/sun/star/sdbc/XRow.hpp>
 #include <com/sun/star/sdbc/XStatement.hpp>
+#include <com/sun/star/util/XCloseable.hpp>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::sdb;
@@ -27,10 +28,12 @@ class FirebirdTest
 public:
     void testEmptyDBConnection();
     void testIntegerDatabase();
+    void testTdf132924();
 
     CPPUNIT_TEST_SUITE(FirebirdTest);
     CPPUNIT_TEST(testEmptyDBConnection);
     CPPUNIT_TEST(testIntegerDatabase);
+    CPPUNIT_TEST(testTdf132924);
     CPPUNIT_TEST_SUITE_END();
 };
 
@@ -40,13 +43,14 @@ public:
  */
 void FirebirdTest::testEmptyDBConnection()
 {
-    auto const tmp = createTempCopy(u"firebird_empty.odb");
+    createTempCopy(u"firebird_empty.odb");
     uno::Reference< XOfficeDatabaseDocument > xDocument =
-        getDocumentForUrl(tmp.GetURL());
+        getDocumentForUrl(maTempFile.GetURL());
 
     getConnectionForDocument(xDocument);
 
-    closeDocument(uno::Reference<lang::XComponent>(xDocument, uno::UNO_QUERY));
+    css::uno::Reference<util::XCloseable> xCloseable(mxComponent, css::uno::UNO_QUERY_THROW);
+    xCloseable->close(false);
 }
 
 /**
@@ -55,8 +59,8 @@ void FirebirdTest::testEmptyDBConnection()
  */
 void FirebirdTest::testIntegerDatabase()
 {
-    uno::Reference< XOfficeDatabaseDocument > xDocument =
-        getDocumentForFileName(u"firebird_integer_ods12.odb");
+    loadFromURL(u"firebird_integer_ods12.odb");
+    uno::Reference< XOfficeDatabaseDocument > xDocument(mxComponent, UNO_QUERY_THROW);
 
     uno::Reference< XConnection > xConnection =
         getConnectionForDocument(xDocument);
@@ -87,7 +91,36 @@ void FirebirdTest::testIntegerDatabase()
 
     CPPUNIT_ASSERT(!xResultSet->next()); // Should only be one row
 
-    closeDocument(uno::Reference<lang::XComponent>(xDocument, uno::UNO_QUERY));
+    css::uno::Reference<util::XCloseable> xCloseable(mxComponent, css::uno::UNO_QUERY_THROW);
+    xCloseable->close(false);
+}
+
+void FirebirdTest::testTdf132924()
+{
+    loadFromURL(u"tdf132924.odb");
+    uno::Reference< XOfficeDatabaseDocument > xDocument(mxComponent, UNO_QUERY_THROW);
+    uno::Reference<XConnection> xConnection = getConnectionForDocument(xDocument);
+
+    uno::Reference<XStatement> xStatement = xConnection->createStatement();
+    CPPUNIT_ASSERT(xStatement.is());
+
+    uno::Reference<XResultSet> xResultSet = xStatement->executeQuery("SELECT * FROM AliasTest");
+    CPPUNIT_ASSERT(xResultSet.is());
+    CPPUNIT_ASSERT(xResultSet->next());
+
+    uno::Reference<XRow> xRow(xResultSet, UNO_QUERY);
+    CPPUNIT_ASSERT(xRow.is());
+    uno::Reference<XColumnLocate> xColumnLocate(xRow, UNO_QUERY);
+    CPPUNIT_ASSERT(xColumnLocate.is());
+
+    // Without the fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : The column name 'TestId' is not valid
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(1), xRow->getShort(xColumnLocate->findColumn("TestId")));
+    CPPUNIT_ASSERT_EQUAL(OUString("TestName"), xRow->getString(xColumnLocate->findColumn("TestName")));
+
+    css::uno::Reference<util::XCloseable> xCloseable(mxComponent, css::uno::UNO_QUERY_THROW);
+    xCloseable->close(false);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(FirebirdTest);

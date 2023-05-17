@@ -16,12 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __com_sun_star_drawing_AccessibleImageBullet_idl__
-#define __com_sun_star_drawing_AccessibleImageBullet_idl__
-
-#include <com/sun/star/accessibility/XAccessibleContext.idl>
-#include <com/sun/star/accessibility/XAccessibleComponent.idl>
-#include <com/sun/star/accessibility/XAccessibleEditableText.idl>
 
 
 
@@ -53,7 +47,7 @@ service AccessibleImageBullet
                 within this bullet appears.
             <li>There are no relations.
             <li>The following states are supported by the
-                ::com::sun::star::accessibility::XAccessibleStateSet returned by
+                accessible state bitset returned by
                 ::com::sun::star::accessibility::XAccessibleContext::getAccessibleStateSet().
                 <ul>
                     <li>::com::sun::star::accessibility::AccessibleStateType::DEFUNC
@@ -80,7 +74,5 @@ service AccessibleImageBullet
 
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

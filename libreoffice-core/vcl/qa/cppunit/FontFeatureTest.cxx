@@ -9,6 +9,7 @@
 
 #include <test/bootstrapfixture.hxx>
 #include <config_features.h>
+#include <config_fonts.h>
 #include <cppunit/TestAssert.h>
 
 #include <vcl/font/Feature.hxx>
@@ -24,16 +25,20 @@ public:
     {
     }
 
-    void testGetFontFeatures();
+    void testGetFontFeaturesGraphite();
+    void testGetFontFeaturesOpenType();
+    void testGetFontFeaturesOpenTypeEnum();
     void testParseFeature();
 
     CPPUNIT_TEST_SUITE(FontFeatureTest);
-    CPPUNIT_TEST(testGetFontFeatures);
+    CPPUNIT_TEST(testGetFontFeaturesGraphite);
+    CPPUNIT_TEST(testGetFontFeaturesOpenType);
+    CPPUNIT_TEST(testGetFontFeaturesOpenTypeEnum);
     CPPUNIT_TEST(testParseFeature);
     CPPUNIT_TEST_SUITE_END();
 };
 
-void FontFeatureTest::testGetFontFeatures()
+void FontFeatureTest::testGetFontFeaturesGraphite()
 {
 #if HAVE_MORE_FONTS
     ScopedVclPtrInstance<VirtualDevice> aVDev(*Application::GetDefaultDevice(),
@@ -53,20 +58,13 @@ void FontFeatureTest::testGetFontFeatures()
     std::vector<vcl::font::Feature> rFontFeatures;
     CPPUNIT_ASSERT(aVDev->GetFontFeatures(rFontFeatures));
 
-    // We're interested only in defaults here
-    std::vector<vcl::font::Feature> rDefaultFontFeatures;
     OUString aFeaturesString;
     for (vcl::font::Feature const& rFeature : rFontFeatures)
     {
-        if (rFeature.m_aID.m_aScriptCode == vcl::font::featureCode("DFLT")
-            && rFeature.m_aID.m_aLanguageCode == vcl::font::featureCode("dflt"))
-        {
-            rDefaultFontFeatures.push_back(rFeature);
-            aFeaturesString += vcl::font::featureCodeAsString(rFeature.m_aID.m_aFeatureCode) + " ";
-        }
+        aFeaturesString += vcl::font::featureCodeAsString(rFeature.m_nCode) + " ";
     }
 
-    CPPUNIT_ASSERT_EQUAL(size_t(53), rDefaultFontFeatures.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(53), rFontFeatures.size());
 
     CPPUNIT_ASSERT_EQUAL(OUString("c2sc case dlig fina frac hlig liga lnum "
                                   "locl onum pnum sa01 sa02 sa03 sa04 sa05 "
@@ -79,8 +77,8 @@ void FontFeatureTest::testGetFontFeatures()
 
     // Check C2SC feature
     {
-        vcl::font::Feature& rFeature = rDefaultFontFeatures[0];
-        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("c2sc"), rFeature.m_aID.m_aFeatureCode);
+        vcl::font::Feature& rFeature = rFontFeatures[0];
+        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("c2sc"), rFeature.m_nCode);
 
         vcl::font::FeatureDefinition& rFracFeatureDefinition = rFeature.m_aDefinition;
         CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("c2sc"), rFracFeatureDefinition.getCode());
@@ -93,8 +91,8 @@ void FontFeatureTest::testGetFontFeatures()
 
     // Check FRAC feature
     {
-        vcl::font::Feature& rFeature = rDefaultFontFeatures[4];
-        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("frac"), rFeature.m_aID.m_aFeatureCode);
+        vcl::font::Feature& rFeature = rFontFeatures[4];
+        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("frac"), rFeature.m_nCode);
 
         vcl::font::FeatureDefinition& rFracFeatureDefinition = rFeature.m_aDefinition;
         CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("frac"), rFracFeatureDefinition.getCode());
@@ -124,14 +122,122 @@ void FontFeatureTest::testGetFontFeatures()
 #endif // HAVE_MORE_FONTS
 }
 
+void FontFeatureTest::testGetFontFeaturesOpenType()
+{
+#if HAVE_MORE_FONTS
+    ScopedVclPtrInstance<VirtualDevice> aVDev(*Application::GetDefaultDevice(),
+                                              DeviceFormat::DEFAULT, DeviceFormat::DEFAULT);
+    aVDev->SetOutputSizePixel(Size(10, 10));
+
+    OUString aFontName("Amiri");
+    CPPUNIT_ASSERT(aVDev->IsFontAvailable(aFontName));
+
+    vcl::Font aFont = aVDev->GetFont();
+    aFont.SetFamilyName(aFontName);
+    aFont.SetWeight(FontWeight::WEIGHT_NORMAL);
+    aFont.SetItalic(FontItalic::ITALIC_NORMAL);
+    aFont.SetWidthType(FontWidth::WIDTH_NORMAL);
+    aVDev->SetFont(aFont);
+
+    std::vector<vcl::font::Feature> rFontFeatures;
+    CPPUNIT_ASSERT(aVDev->GetFontFeatures(rFontFeatures));
+
+    OUString aFeaturesString;
+    for (vcl::font::Feature const& rFeature : rFontFeatures)
+        aFeaturesString += vcl::font::featureCodeAsString(rFeature.m_nCode) + " ";
+
+    CPPUNIT_ASSERT_EQUAL(size_t(17), rFontFeatures.size());
+
+    CPPUNIT_ASSERT_EQUAL(OUString("calt calt dnom liga numr pnum ss01 ss02 "
+                                  "ss03 ss04 ss05 ss06 ss07 ss08 kern kern "
+                                  "ss05 "),
+                         aFeaturesString);
+
+    // Check ss01 feature
+    {
+        vcl::font::Feature& rFeature = rFontFeatures[6];
+        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("ss01"), rFeature.m_nCode);
+
+        vcl::font::FeatureDefinition& rFeatureDefinition = rFeature.m_aDefinition;
+        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("ss01"), rFeatureDefinition.getCode());
+        CPPUNIT_ASSERT_EQUAL(OUString("Low Baa dot following a Raa or Waw"),
+                             rFeatureDefinition.getDescription());
+        CPPUNIT_ASSERT_EQUAL(vcl::font::FeatureParameterType::BOOL, rFeatureDefinition.getType());
+
+        CPPUNIT_ASSERT_EQUAL(size_t(0), rFeatureDefinition.getEnumParameters().size());
+    }
+
+    aVDev.disposeAndClear();
+#endif // HAVE_MORE_FONTS
+}
+
+void FontFeatureTest::testGetFontFeaturesOpenTypeEnum()
+{
+#if HAVE_MORE_FONTS
+    ScopedVclPtrInstance<VirtualDevice> aVDev(*Application::GetDefaultDevice(),
+                                              DeviceFormat::DEFAULT, DeviceFormat::DEFAULT);
+    aVDev->SetOutputSizePixel(Size(10, 10));
+
+    OUString aFontName("Reem Kufi");
+    CPPUNIT_ASSERT(aVDev->IsFontAvailable(aFontName));
+
+    vcl::Font aFont = aVDev->GetFont();
+    aFont.SetFamilyName(aFontName);
+    aFont.SetWeight(FontWeight::WEIGHT_NORMAL);
+    aFont.SetItalic(FontItalic::ITALIC_NORMAL);
+    aFont.SetWidthType(FontWidth::WIDTH_NORMAL);
+    aVDev->SetFont(aFont);
+
+    std::vector<vcl::font::Feature> rFontFeatures;
+    CPPUNIT_ASSERT(aVDev->GetFontFeatures(rFontFeatures));
+
+    OUString aFeaturesString;
+    for (vcl::font::Feature const& rFeature : rFontFeatures)
+        aFeaturesString += vcl::font::featureCodeAsString(rFeature.m_nCode) + " ";
+
+    CPPUNIT_ASSERT_EQUAL(size_t(10), rFontFeatures.size());
+
+    CPPUNIT_ASSERT_EQUAL(OUString("aalt case cv01 cv02 cv03 frac ordn sups "
+                                  "zero kern "),
+                         aFeaturesString);
+
+    // Check aalt feature
+    {
+        vcl::font::Feature& rFeature = rFontFeatures[0];
+        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("aalt"), rFeature.m_nCode);
+
+        vcl::font::FeatureDefinition& rFeatureDefinition = rFeature.m_aDefinition;
+        CPPUNIT_ASSERT_EQUAL(vcl::font::featureCode("aalt"), rFeatureDefinition.getCode());
+        CPPUNIT_ASSERT(!rFeatureDefinition.getDescription().isEmpty());
+        CPPUNIT_ASSERT_EQUAL(vcl::font::FeatureParameterType::ENUM, rFeatureDefinition.getType());
+
+        CPPUNIT_ASSERT_EQUAL(size_t(3), rFeatureDefinition.getEnumParameters().size());
+
+        vcl::font::FeatureParameter const& rParameter1 = rFeatureDefinition.getEnumParameters()[0];
+        CPPUNIT_ASSERT_EQUAL(uint32_t(0), rParameter1.getCode());
+        CPPUNIT_ASSERT(!rParameter1.getDescription().isEmpty());
+
+        vcl::font::FeatureParameter const& rParameter2 = rFeatureDefinition.getEnumParameters()[1];
+        CPPUNIT_ASSERT_EQUAL(uint32_t(1), rParameter2.getCode());
+        CPPUNIT_ASSERT(!rParameter2.getDescription().isEmpty());
+
+        vcl::font::FeatureParameter const& rParameter3 = rFeatureDefinition.getEnumParameters()[2];
+        CPPUNIT_ASSERT_EQUAL(uint32_t(2), rParameter3.getCode());
+        CPPUNIT_ASSERT(!rParameter2.getDescription().isEmpty());
+    }
+
+    aVDev.disposeAndClear();
+#endif // HAVE_MORE_FONTS
+}
+
 void FontFeatureTest::testParseFeature()
 {
     { // No font features specified
-        vcl::font::FeatureParser aParser("Font name with no features");
+        vcl::font::FeatureParser aParser(u"Font name with no features");
         CPPUNIT_ASSERT_EQUAL(size_t(0), aParser.getFeatures().size());
     }
     { // One feature specified, no value
-        vcl::font::FeatureParser aParser("Font name:abcd");
+        vcl::font::FeatureParser aParser(u"Font name:abcd");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -139,7 +245,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(1), aFeatures[0].m_nValue);
     }
     { // One feature specified, explicit value
-        vcl::font::FeatureParser aParser("Font name:abcd=5");
+        vcl::font::FeatureParser aParser(u"Font name:abcd=5");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -147,7 +253,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(5), aFeatures[0].m_nValue);
     }
     { // One feature specified, explicit zero value
-        vcl::font::FeatureParser aParser("Font name:abcd=0");
+        vcl::font::FeatureParser aParser(u"Font name:abcd=0");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -155,7 +261,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(0), aFeatures[0].m_nValue);
     }
     { // One feature specified, using plus prefix
-        vcl::font::FeatureParser aParser("Font name:+abcd");
+        vcl::font::FeatureParser aParser(u"Font name:+abcd");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -163,7 +269,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(1), aFeatures[0].m_nValue);
     }
     { // One feature specified, using minus prefix
-        vcl::font::FeatureParser aParser("Font name:-abcd");
+        vcl::font::FeatureParser aParser(u"Font name:-abcd");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -171,7 +277,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(0), aFeatures[0].m_nValue);
     }
     { // One feature specified, with empty character range
-        vcl::font::FeatureParser aParser("Font name:abcd[]");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[]");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -181,7 +287,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with empty character range
-        vcl::font::FeatureParser aParser("Font name:abcd[:]");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[:]");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -191,7 +297,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with start character range
-        vcl::font::FeatureParser aParser("Font name:abcd[3:]");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[3:]");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -201,7 +307,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with end character range
-        vcl::font::FeatureParser aParser("Font name:abcd[:3]");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[:3]");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -211,7 +317,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with character range
-        vcl::font::FeatureParser aParser("Font name:abcd[3:6]");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[3:6]");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -221,7 +327,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(6), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with character range
-        vcl::font::FeatureParser aParser("Font name:abcd[3]");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[3]");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -231,7 +337,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with character range and value
-        vcl::font::FeatureParser aParser("Font name:abcd[3:6]=2");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[3:6]=2");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -241,7 +347,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(6), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with character range and 0 value
-        vcl::font::FeatureParser aParser("Font name:abcd[3:6]=0");
+        vcl::font::FeatureParser aParser(u"Font name:abcd[3:6]=0");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -251,7 +357,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(6), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with character range and minus prefix
-        vcl::font::FeatureParser aParser("Font name:-abcd[3:6]");
+        vcl::font::FeatureParser aParser(u"Font name:-abcd[3:6]");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -261,7 +367,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(6), aFeatures[0].m_nEnd);
     }
     { // One feature specified, with CSS on
-        vcl::font::FeatureParser aParser("Font name:\"abcd\" on");
+        vcl::font::FeatureParser aParser(u"Font name:\"abcd\" on");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -269,7 +375,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(1), aFeatures[0].m_nValue);
     }
     { // One feature specified, with CSS off
-        vcl::font::FeatureParser aParser("Font name:'abcd' off");
+        vcl::font::FeatureParser aParser(u"Font name:'abcd' off");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -277,7 +383,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(0), aFeatures[0].m_nValue);
     }
     { // One feature specified, with CSS value
-        vcl::font::FeatureParser aParser("Font name:\"abcd\" 2");
+        vcl::font::FeatureParser aParser(u"Font name:\"abcd\" 2");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -285,7 +391,7 @@ void FontFeatureTest::testParseFeature()
         CPPUNIT_ASSERT_EQUAL(uint32_t(2), aFeatures[0].m_nValue);
     }
     { // Multiple features specified, no values
-        vcl::font::FeatureParser aParser("Font name:abcd&bcde&efgh");
+        vcl::font::FeatureParser aParser(u"Font name:abcd&bcde&efgh");
         CPPUNIT_ASSERT_EQUAL(size_t(3), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -301,7 +407,7 @@ void FontFeatureTest::testParseFeature()
     {
         // Multiple features specified, explicit values
         // Only 4 char parameter names supported - "toolong" is too long and ignored
-        vcl::font::FeatureParser aParser("Font name:abcd=1&bcde=0&toolong=1&cdef=3");
+        vcl::font::FeatureParser aParser(u"Font name:abcd=1&bcde=0&toolong=1&cdef=3");
         CPPUNIT_ASSERT_EQUAL(size_t(3), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 
@@ -317,7 +423,7 @@ void FontFeatureTest::testParseFeature()
     {
         // Special case - "lang" is parsed specially and access separately not as a feature.
 
-        vcl::font::FeatureParser aParser("Font name:abcd=1&lang=slo");
+        vcl::font::FeatureParser aParser(u"Font name:abcd=1&lang=slo");
         CPPUNIT_ASSERT_EQUAL(size_t(1), aParser.getFeatures().size());
         auto aFeatures = aParser.getFeatures();
 

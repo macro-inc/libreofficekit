@@ -19,6 +19,8 @@
 
 $(eval $(call gb_Library_Library,vclplug_gtk3_kde5))
 
+$(eval $(call gb_Library_set_plugin_for,vclplug_gtk3_kde5,vcl))
+
 # Silence deprecation warnings wholesale as long as vcl/unx/gtk3/*.cxx just
 # forward to vcl/unx/gtk/*.cxx:
 $(eval $(call gb_Library_add_cxxflags,vclplug_gtk3_kde5, \
@@ -59,7 +61,6 @@ $(eval $(call gb_Library_add_libs,vclplug_gtk3_kde5,\
 
 $(eval $(call gb_Library_use_libraries,vclplug_gtk3_kde5,\
     svl \
-    vcl \
     tl \
     utl \
     sot \
@@ -97,6 +98,7 @@ $(eval $(call gb_Library_add_exception_objects,vclplug_gtk3_kde5,\
 	vcl/unx/gtk3_kde5/a11y/gtk3_kde5_atkregistry \
 	vcl/unx/gtk3_kde5/a11y/gtk3_kde5_atkselection \
 	vcl/unx/gtk3_kde5/a11y/gtk3_kde5_atktable \
+	vcl/unx/gtk3_kde5/a11y/gtk3_kde5_atktablecell \
 	vcl/unx/gtk3_kde5/a11y/gtk3_kde5_atktextattributes \
 	vcl/unx/gtk3_kde5/a11y/gtk3_kde5_atktext \
 	vcl/unx/gtk3_kde5/a11y/gtk3_kde5_atkutil \

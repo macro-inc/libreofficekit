@@ -197,13 +197,13 @@ bool FuPoor::KeyInput(const KeyEvent& rKEvt)
                         {
                             SdrObject* pObj = aIter.Next();
 
-                            if(auto pTextObj = dynamic_cast<SdrTextObj *>( pObj ))
+                            if(auto pTextObj = DynCastSdrTextObj( pObj ))
                             {
                                 SdrInventor nInv(pObj->GetObjInventor());
-                                sal_uInt16 nKnd(pObj->GetObjIdentifier());
+                                SdrObjKind nKnd(pObj->GetObjIdentifier());
 
                                 if(SdrInventor::Default == nInv &&
-                                    (OBJ_TITLETEXT == nKnd || OBJ_OUTLINETEXT == nKnd || OBJ_TEXT == nKnd))
+                                    (SdrObjKind::TitleText == nKnd || SdrObjKind::OutlineText == nKnd || SdrObjKind::Text == nKnd))
                                 {
                                     pCandidate = pTextObj;
                                 }
@@ -786,7 +786,7 @@ bool FuPoor::KeyInput(const KeyEvent& rKEvt)
                 SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
 
                 // #i118485# allow TextInput for OLEs, too
-                if( dynamic_cast< const SdrTextObj *>( pObj ) !=  nullptr && pObj->HasTextEdit())
+                if( DynCastSdrTextObj( pObj ) !=  nullptr && pObj->HasTextEdit())
                 {
                     // use common IsSimpleCharInput from the EditEngine.
                     bool bPrintable(EditEngine::IsSimpleCharInput(rKEvt));
@@ -824,12 +824,12 @@ bool FuPoor::KeyInput(const KeyEvent& rKEvt)
                         {
                             SdrObject* pObj = aIter.Next();
 
-                            if(auto pTextObj = dynamic_cast< SdrTextObj *>( pObj ))
+                            if(auto pTextObj = DynCastSdrTextObj( pObj ))
                             {
                                 SdrInventor nInv(pObj->GetObjInventor());
-                                sal_uInt16 nKnd(pObj->GetObjIdentifier());
+                                SdrObjKind nKnd(pObj->GetObjIdentifier());
 
-                                if(SdrInventor::Default == nInv && OBJ_TITLETEXT == nKnd)
+                                if(SdrInventor::Default == nInv && SdrObjKind::TitleText == nKnd)
                                 {
                                     pCandidate = pTextObj;
                                 }
@@ -1009,7 +1009,7 @@ void FuPoor::ReceiveRequest(SfxRequest& /*rReq*/)
 {
 }
 
-SdrObjectUniquePtr FuPoor::CreateDefaultObject(const sal_uInt16, const ::tools::Rectangle& )
+rtl::Reference<SdrObject> FuPoor::CreateDefaultObject(const sal_uInt16, const ::tools::Rectangle& )
 {
     // empty base implementation
     return nullptr;
@@ -1089,10 +1089,10 @@ bool FuPoor::doConstructOrthogonal() const
         const SdrMarkList& rMarkList = mpView->GetMarkedObjectList();
         if (rMarkList.GetMarkCount() == 1)
         {
-            sal_uInt16 aObjIdentifier = rMarkList.GetMark(0)->GetMarkedSdrObj()->GetObjIdentifier();
-            bResizeKeepRatio = aObjIdentifier == OBJ_GRAF ||
-                               aObjIdentifier == OBJ_MEDIA ||
-                               aObjIdentifier == OBJ_OLE2;
+            SdrObjKind aObjIdentifier = rMarkList.GetMark(0)->GetMarkedSdrObj()->GetObjIdentifier();
+            bResizeKeepRatio = aObjIdentifier == SdrObjKind::Graphic ||
+                               aObjIdentifier == SdrObjKind::Media ||
+                               aObjIdentifier == SdrObjKind::OLE2;
         }
     }
     SdrHdl* pHdl = mpView->PickHandle(aMDPos);

@@ -46,7 +46,7 @@ class UUIInteractionHandler:
                                 css::beans::XPropertySet>
 {
 private:
-    std::unique_ptr<UUIInteractionHelper> m_pImpl;
+    UUIInteractionHelper m_pImpl;
 
 public:
     explicit UUIInteractionHandler(css::uno::Reference< css::uno::XComponentContext > const & rxContext);
@@ -113,7 +113,7 @@ public:
         {
             css::uno::Reference<css::awt::XWindow> xWindow;
             rValue >>= xWindow;
-            m_pImpl->SetParentWindow(xWindow);
+            m_pImpl.SetParentWindow(xWindow);
             return;
         }
         throw css::beans::UnknownPropertyException(rPropertyName);
@@ -123,7 +123,7 @@ public:
     {
         if (rPropertyName == "ParentWindow")
         {
-            return uno::Any(m_pImpl->GetParentWindow());
+            return uno::Any(m_pImpl.GetParentWindow());
         }
         throw css::beans::UnknownPropertyException(rPropertyName);
     }
@@ -131,7 +131,7 @@ public:
 
 UUIInteractionHandler::UUIInteractionHandler(
     uno::Reference< uno::XComponentContext > const & rxContext)
-        : m_pImpl(new UUIInteractionHelper(rxContext))
+        : m_pImpl(rxContext)
 {
 }
 
@@ -160,9 +160,6 @@ void SAL_CALL
 UUIInteractionHandler::initialize(
     uno::Sequence< uno::Any > const & rArguments)
 {
-    uno::Reference<uno::XComponentContext> xContext = m_pImpl->getORB();
-    m_pImpl.reset();
-
     // The old-style InteractionHandler service supported a sequence of
     // PropertyValue, while the new-style service now uses constructors to pass
     // in Parent and Context values; for backwards compatibility, keep support
@@ -184,7 +181,8 @@ UUIInteractionHandler::initialize(
         }
     }
 
-    m_pImpl.reset( new UUIInteractionHelper(xContext, xWindow, aContext) );
+    m_pImpl.SetParentWindow(xWindow);
+    m_pImpl.setContext(aContext);
 }
 
 void SAL_CALL
@@ -193,7 +191,7 @@ UUIInteractionHandler::handle(
 {
     try
     {
-        m_pImpl->handleRequest(rRequest);
+        m_pImpl.handleRequest(rRequest);
     }
     catch (uno::RuntimeException const & ex)
     {
@@ -208,7 +206,7 @@ sal_Bool SAL_CALL UUIInteractionHandler::handleInteractionRequest(
 {
     try
     {
-        return m_pImpl->handleRequest( Request );
+        return m_pImpl.handleRequest( Request );
     }
     catch (uno::RuntimeException const & ex)
     {

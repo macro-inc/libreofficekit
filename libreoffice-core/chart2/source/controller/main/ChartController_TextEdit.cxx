@@ -17,18 +17,24 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <ChartController.hxx>
 
 #include <ResId.hxx>
 #include "UndoGuard.hxx"
 #include <DrawViewWrapper.hxx>
 #include <ChartWindow.hxx>
+#include <ChartModel.hxx>
 #include <TitleHelper.hxx>
 #include <ObjectIdentifier.hxx>
 #include <ControllerLockGuard.hxx>
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
 #include <AccessibleTextHelper.hxx>
+#endif
 #include <strings.hrc>
 #include <chartview/DrawModelWrapper.hxx>
+#include <osl/diagnose.h>
 
 #include <svx/svdoutl.hxx>
 #include <svx/svxdlg.hxx>
@@ -121,32 +127,32 @@ bool ChartController::EndTextEdit()
 
     SdrOutliner* pOutliner = m_pDrawViewWrapper->getOutliner();
     OutlinerParaObject* pParaObj = pTextObject->GetOutlinerParaObject();
-    if( pParaObj && pOutliner )
+    if( !pParaObj || !pOutliner )
+        return true;
+
+    pOutliner->SetText( *pParaObj );
+
+    OUString aString = pOutliner->GetText(
+                        pOutliner->GetParagraph( 0 ),
+                        pOutliner->GetParagraphCount() );
+
+    OUString aObjectCID = m_aSelection.getSelectedCID();
+    if ( !aObjectCID.isEmpty() )
     {
-        pOutliner->SetText( *pParaObj );
+        uno::Reference< beans::XPropertySet > xPropSet =
+            ObjectIdentifier::getObjectPropertySet( aObjectCID, getChartModel() );
 
-        OUString aString = pOutliner->GetText(
-                            pOutliner->GetParagraph( 0 ),
-                            pOutliner->GetParagraphCount() );
+        // lock controllers till end of block
+        ControllerLockGuardUNO aCLGuard( getChartModel() );
 
-        OUString aObjectCID = m_aSelection.getSelectedCID();
-        if ( !aObjectCID.isEmpty() )
-        {
-            uno::Reference< beans::XPropertySet > xPropSet =
-                ObjectIdentifier::getObjectPropertySet( aObjectCID, getModel() );
+        TitleHelper::setCompleteString( aString, uno::Reference<
+            css::chart2::XTitle >::query( xPropSet ), m_xCC );
 
-            // lock controllers till end of block
-            ControllerLockGuardUNO aCLGuard( getModel() );
-
-            TitleHelper::setCompleteString( aString, uno::Reference<
-                css::chart2::XTitle >::query( xPropSet ), m_xCC );
-
-            OSL_ENSURE(m_pTextActionUndoGuard, "ChartController::EndTextEdit: no TextUndoGuard!");
-            if (m_pTextActionUndoGuard)
-                m_pTextActionUndoGuard->commit();
-        }
-        m_pTextActionUndoGuard.reset();
+        OSL_ENSURE(m_pTextActionUndoGuard, "ChartController::EndTextEdit: no TextUndoGuard!");
+        if (m_pTextActionUndoGuard)
+            m_pTextActionUndoGuard->commit();
     }
+    m_pTextActionUndoGuard.reset();
     return true;
 }
 
@@ -177,11 +183,10 @@ void ChartController::executeDispatch_InsertSpecialCharacter()
         return;
 
     const SfxItemSet* pSet = pDlg->GetOutputItemSet();
-    const SfxPoolItem* pItem=nullptr;
     OUString aString;
-    if (pSet && pSet->GetItemState(SID_CHARMAP, true, &pItem) == SfxItemState::SET)
-        if (auto pStringItem = dynamic_cast<const SfxStringItem*>(pItem))
-            aString = pStringItem->GetValue();
+    if (pSet)
+        if (const SfxStringItem* pCharMapItem = pSet->GetItemIfSet(SID_CHARMAP))
+            aString = pCharMapItem->GetValue();
 
     OutlinerView* pOutlinerView = m_pDrawViewWrapper->GetTextEditOutlinerView();
     SdrOutliner*  pOutliner = m_pDrawViewWrapper->getOutliner();
@@ -214,10 +219,14 @@ void ChartController::executeDispatch_InsertSpecialCharacter()
 uno::Reference< css::accessibility::XAccessibleContext >
     ChartController::impl_createAccessibleTextContext()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     uno::Reference< css::accessibility::XAccessibleContext > xResult(
         new AccessibleTextHelper( m_pDrawViewWrapper.get() ));
 
     return xResult;
+#else
+    return uno::Reference< css::accessibility::XAccessibleContext >();
+#endif
 }
 
 } //namespace chart

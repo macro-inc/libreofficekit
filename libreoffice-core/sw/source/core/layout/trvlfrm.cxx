@@ -240,18 +240,18 @@ bool SwPageFrame::GetModelPositionForViewPoint( SwPosition *pPos, Point &rPoint,
                 else
                 {
                     assert(pCnt->IsNoTextFrame());
-                    aTextPos = SwPosition( *static_cast<SwNoTextFrame const*>(pCnt)->GetNode() );
+                    aTextPos.Assign( *static_cast<SwNoTextFrame const*>(pCnt)->GetNode() );
                 }
             }
         }
 
-        SwContentNode* pContentNode = aTextPos.nNode.GetNode().GetContentNode();
+        SwContentNode* pContentNode = aTextPos.GetNode().GetContentNode();
         bool bConsiderBackground = true;
         // If the text position is a clickable field, then that should have priority.
         if (pContentNode && pContentNode->IsTextNode())
         {
             SwTextNode* pTextNd = pContentNode->GetTextNode();
-            SwTextAttr* pTextAttr = pTextNd->GetTextAttrForCharAt(aTextPos.nContent.GetIndex(), RES_TXTATR_FIELD);
+            SwTextAttr* pTextAttr = pTextNd->GetTextAttrForCharAt(aTextPos.GetContentIndex(), RES_TXTATR_FIELD);
             if (pTextAttr)
             {
                 const SwField* pField = pTextAttr->GetFormatField().GetField();
@@ -298,14 +298,14 @@ bool SwPageFrame::GetModelPositionForViewPoint( SwPosition *pPos, Point &rPoint,
                     SwRect aTextRect;
                     pTextFrame->GetCharRect(aTextRect, prevTextPos);
 
-                    if (prevTextPos.nContent < pContentNode->Len())
+                    if (prevTextPos.GetContentIndex() < pContentNode->Len())
                     {
                         // aRextRect is just a line on the left edge of the
                         // previous character; to get a better measure from
                         // lcl_getDistance, extend that to a rectangle over
                         // the entire character.
-                        SwPosition const nextTextPos(prevTextPos.nNode,
-                                SwIndex(prevTextPos.nContent, +1));
+                        SwPosition nextTextPos(prevTextPos);
+                        nextTextPos.AdjustContent(+1);
                         SwRect nextTextRect;
                         pTextFrame->GetCharRect(nextTextRect, nextTextPos);
                         SwRectFnSet aRectFnSet(pTextFrame);
@@ -334,7 +334,7 @@ bool SwPageFrame::GetModelPositionForViewPoint( SwPosition *pPos, Point &rPoint,
 
             double nBackDistance = 0;
             bool bValidBackDistance = false;
-            SwContentNode* pBackNd = aBackPos.nNode.GetNode( ).GetContentNode( );
+            SwContentNode* pBackNd = aBackPos.GetNode( ).GetContentNode( );
             if ( pBackNd && bConsiderBackground)
             {
                 // FIXME There are still cases were we don't have the proper node here.
@@ -616,19 +616,17 @@ bool SwFlyFrame::GetModelPositionForViewPoint( SwPosition *pPos, Point &rPoint,
 /** Layout dependent cursor travelling */
 bool SwNoTextFrame::LeftMargin(SwPaM *pPam) const
 {
-    if( &pPam->GetNode() != GetNode() )
+    if( &pPam->GetPointNode() != GetNode() )
         return false;
-    const_cast<SwContentNode*>(GetNode())->
-        MakeStartIndex(&pPam->GetPoint()->nContent);
+    pPam->GetPoint()->AssignStartIndex(*GetNode());
     return true;
 }
 
 bool SwNoTextFrame::RightMargin(SwPaM *pPam, bool) const
 {
-    if( &pPam->GetNode() != GetNode() )
+    if( &pPam->GetPointNode() != GetNode() )
         return false;
-    const_cast<SwContentNode*>(GetNode())->
-        MakeEndIndex(&pPam->GetPoint()->nContent);
+    pPam->GetPoint()->AssignEndIndex(*GetNode());
     return true;
 }
 
@@ -691,7 +689,7 @@ static const SwContentFrame * lcl_MissProtectedFrames( const SwContentFrame *pCn
 static bool lcl_UpDown( SwPaM *pPam, const SwContentFrame *pStart,
                     GetNxtPrvCnt fnNxtPrv, bool bInReadOnly )
 {
-    OSL_ENSURE( FrameContainsNode(*pStart, pPam->GetNode().GetIndex()),
+    OSL_ENSURE( FrameContainsNode(*pStart, pPam->GetPointNode().GetIndex()),
             "lcl_UpDown doesn't work for others." );
 
     const SwContentFrame *pCnt = nullptr;
@@ -701,8 +699,8 @@ static bool lcl_UpDown( SwPaM *pPam, const SwContentFrame *pStart,
     //going down.
     bool bTableSel = false;
     if ( pStart->IsInTab() &&
-        pPam->GetNode().StartOfSectionNode() !=
-        pPam->GetNode( false ).StartOfSectionNode() )
+        pPam->GetPointNode().StartOfSectionNode() !=
+        pPam->GetMarkNode().StartOfSectionNode() )
     {
         bTableSel = true;
         const SwLayoutFrame  *pCell = pStart->GetUpper();
@@ -954,11 +952,10 @@ static bool lcl_UpDown( SwPaM *pPam, const SwContentFrame *pStart,
     {   // set the Point on the Content-Node
         assert(pCnt->IsNoTextFrame());
         SwContentNode *const pCNd = const_cast<SwContentNode*>(static_cast<SwNoTextFrame const*>(pCnt)->GetNode());
-        pPam->GetPoint()->nNode = *pCNd;
         if ( fnNxtPrv == lcl_GetPrvCnt )
-            pCNd->MakeEndIndex( &pPam->GetPoint()->nContent );
+            pPam->GetPoint()->AssignEndIndex(*pCNd);
         else
-            pCNd->MakeStartIndex( &pPam->GetPoint()->nContent );
+            pPam->GetPoint()->AssignStartIndex(*pCNd);
     }
     return true;
 }
@@ -981,7 +978,7 @@ bool SwContentFrame::UnitDown( SwPaM* pPam, const SwTwips, bool bInReadOnly ) co
 sal_uInt16 SwRootFrame::GetCurrPage( const SwPaM *pActualCursor ) const
 {
     OSL_ENSURE( pActualCursor, "got no page cursor" );
-    SwFrame const*const pActFrame = pActualCursor->GetPoint()->nNode.GetNode().
+    SwFrame const*const pActFrame = pActualCursor->GetPoint()->GetNode().
                                     GetContentNode()->getLayoutFrame(this,
                                                     pActualCursor->GetPoint());
     return pActFrame->FindPageFrame()->GetPhyPageNum();
@@ -1874,7 +1871,7 @@ sal_uInt16 SwFrame::GetVirtPageNum() const
 bool SwRootFrame::MakeTableCursors( SwTableCursor& rTableCursor )
 {
     //Find Union-Rects and tables (Follows) of the selection.
-    OSL_ENSURE( rTableCursor.GetContentNode() && rTableCursor.GetContentNode( false ),
+    OSL_ENSURE( rTableCursor.GetPointContentNode() && rTableCursor.GetMarkContentNode(),
             "Tabselection not on Cnt." );
 
     bool bRet = false;
@@ -1895,8 +1892,8 @@ bool SwRootFrame::MakeTableCursors( SwTableCursor& rTableCursor )
     }
 
     // #151012# Made code robust here
-    const SwContentNode* pTmpStartNode = rTableCursor.GetContentNode();
-    const SwContentNode* pTmpEndNode   = rTableCursor.GetContentNode(false);
+    const SwContentNode* pTmpStartNode = rTableCursor.GetPointContentNode();
+    const SwContentNode* pTmpEndNode   = rTableCursor.GetMarkContentNode();
 
     std::pair<Point, bool> tmp(aPtPt, false);
     const SwFrame *const pTmpStartFrame = pTmpStartNode ? pTmpStartNode->getLayoutFrame(this, nullptr, &tmp) : nullptr;
@@ -2021,8 +2018,7 @@ static void Add( SwRegionRects& rRegion, const SwRect& rRect )
  */
 void SwRootFrame::CalcFrameRects(SwShellCursor &rCursor)
 {
-    SwPosition *pStartPos = rCursor.Start(),
-               *pEndPos   = rCursor.End();
+    auto [pStartPos, pEndPos] = rCursor.StartEnd(); // SwPosition*
 
     SwViewShell *pSh = GetCurrShell();
 
@@ -2034,11 +2030,11 @@ void SwRootFrame::CalcFrameRects(SwShellCursor &rCursor)
     SwRegionRects aRegion( !bIgnoreVisArea ?
                            pSh->VisArea() :
                            getFrameArea() );
-    if( !pStartPos->nNode.GetNode().IsContentNode() ||
-        !pStartPos->nNode.GetNode().GetContentNode()->getLayoutFrame(this) ||
-        ( pStartPos->nNode != pEndPos->nNode &&
-          ( !pEndPos->nNode.GetNode().IsContentNode() ||
-            !pEndPos->nNode.GetNode().GetContentNode()->getLayoutFrame(this) ) ) )
+    if( !pStartPos->GetNode().IsContentNode() ||
+        !pStartPos->GetNode().GetContentNode()->getLayoutFrame(this) ||
+        ( pStartPos->GetNode() != pEndPos->GetNode() &&
+          ( !pEndPos->GetNode().IsContentNode() ||
+            !pEndPos->GetNode().GetContentNode()->getLayoutFrame(this) ) ) )
     {
         return;
     }
@@ -2048,11 +2044,11 @@ void SwRootFrame::CalcFrameRects(SwShellCursor &rCursor)
     //First obtain the ContentFrames for the start and the end - those are needed
     //anyway.
     std::pair<Point, bool> tmp(rCursor.GetSttPos(), true);
-    SwContentFrame* pStartFrame = pStartPos->nNode.GetNode().
+    SwContentFrame* pStartFrame = pStartPos->GetNode().
         GetContentNode()->getLayoutFrame(this, pStartPos, &tmp);
 
     tmp.first = rCursor.GetEndPos();
-    SwContentFrame* pEndFrame   = pEndPos->nNode.GetNode().
+    SwContentFrame* pEndFrame   = pEndPos->GetNode().
         GetContentNode()->getLayoutFrame(this, pEndPos, &tmp);
 
     assert(pStartFrame && pEndFrame && "No ContentFrames found.");
@@ -2408,8 +2404,8 @@ void SwRootFrame::CalcFrameRects(SwShellCursor &rCursor)
             //            away (i.e. PostIts, RefMarks, TOXMarks), then at
             //            least set the width of the Cursor.
             if( 1 == aRectFnSet.GetWidth(aTmp) &&
-                pStartPos->nContent.GetIndex() !=
-                pEndPos->nContent.GetIndex() )
+                pStartPos->GetContentIndex() !=
+                pEndPos->GetContentIndex() )
             {
                 OutputDevice* pOut = pSh->GetOut();
                 tools::Long nCursorWidth = pOut->GetSettings().GetStyleSettings().

@@ -17,8 +17,6 @@
 
 #include "clang/Basic/Builtins.h"
 
-#include "config_clang.h"
-
 #include "check.hxx"
 #include "compat.hxx"
 #include "plugin.hxx"
@@ -32,7 +30,7 @@ Expr const * ignoreParenAndTemporaryMaterialization(Expr const * expr) {
         if (e == nullptr) {
             return expr;
         }
-        expr = compat::getSubExpr(e);
+        expr = e->getSubExpr();
     }
 }
 
@@ -65,14 +63,15 @@ QualType reconstructTemplateArgumentType(
     SubstTemplateTypeParmType const * parmType)
 {
     TemplateParameterList const * ps = decl->getTemplateParameters();
-    auto i = std::find(ps->begin(), ps->end(), parmType->getReplacedParameter()->getDecl());
+    auto i = std::find(ps->begin(), ps->end(), compat::getReplacedParameter(parmType));
     if (i == ps->end()) {
         return {};
     }
-    if (ps->size() != specializationType->getNumArgs()) { //TODO
+    auto const args = specializationType->template_arguments();
+    if (ps->size() != args.size()) { //TODO
         return {};
     }
-    TemplateArgument const & arg = specializationType->getArg(i - ps->begin());
+    TemplateArgument const & arg = args[i - ps->begin()];
     if (arg.getKind() != TemplateArgument::Type) {
         return {};
     }
@@ -181,15 +180,24 @@ bool isBoolExpr(Expr const * expr) {
                 (void)op;
                 TemplateDecl const * d
                     = t->getTemplateName().getAsTemplateDecl();
-                if (d == nullptr
-                    || (d->getQualifiedNameAsString()
-                        != "com::sun::star::uno::Sequence")
-                    || t->getNumArgs() != 1
-                    || t->getArg(0).getKind() != TemplateArgument::Type)
-                {
+                if (d == nullptr) {
                     break;
                 }
-                ty = t->getArg(0).getAsType();
+                auto const dc = loplugin::DeclCheck(d->getTemplatedDecl());
+                auto const args = t->template_arguments();
+                if (dc.ClassOrStruct("array").StdNamespace() && args.size() >= 2
+                           && args[0].getKind() == TemplateArgument::Type)
+                {
+                    ty = args[0].getAsType();
+                } else if (dc.Class("Sequence").Namespace("uno").Namespace("star").Namespace("sun")
+                               .Namespace("com").GlobalNamespace()
+                           && args.size() == 1
+                           && args[0].getKind() == TemplateArgument::Type)
+                {
+                    ty = args[0].getAsType();
+                } else {
+                    break;
+                }
             }
             stack.pop();
             if (stack.empty()) {
@@ -253,26 +261,7 @@ public:
 
     bool TraverseBinaryOperator(BinaryOperator * expr);
 
-#if CLANG_VERSION < 110000
-    bool TraverseBinLT(BinaryOperator * expr) { return TraverseBinaryOperator(expr); }
-    bool TraverseBinLE(BinaryOperator * expr) { return TraverseBinaryOperator(expr); }
-    bool TraverseBinGT(BinaryOperator * expr) { return TraverseBinaryOperator(expr); }
-    bool TraverseBinGE(BinaryOperator * expr) { return TraverseBinaryOperator(expr); }
-    bool TraverseBinEQ(BinaryOperator * expr) { return TraverseBinaryOperator(expr); }
-    bool TraverseBinNE(BinaryOperator * expr) { return TraverseBinaryOperator(expr); }
-    bool TraverseBinAssign(BinaryOperator * expr) { return TraverseBinaryOperator(expr); }
-#endif
-
     bool TraverseCompoundAssignOperator(CompoundAssignOperator * expr);
-
-#if CLANG_VERSION < 110000
-    bool TraverseBinAndAssign(CompoundAssignOperator * expr)
-    { return TraverseCompoundAssignOperator(expr); }
-    bool TraverseBinOrAssign(CompoundAssignOperator * expr)
-    { return TraverseCompoundAssignOperator(expr); }
-    bool TraverseBinXorAssign(CompoundAssignOperator * expr)
-    { return TraverseCompoundAssignOperator(expr); }
-#endif
 
     bool TraverseInitListExpr(InitListExpr * expr);
 
@@ -425,9 +414,10 @@ bool ImplicitBoolConversion::TraverseCXXMemberCallExpr(CXXMemberCallExpr * expr)
                         = ct->getTemplateName().getAsTemplateDecl();
                     if (td != nullptr) {
                         //TODO: fix this superficial nonsense check:
-                        if (ct->getNumArgs() >= 1
-                            && ct->getArg(0).getKind() == TemplateArgument::Type
-                            && (loplugin::TypeCheck(ct->getArg(0).getAsType())
+                        auto const args = ct->template_arguments();
+                        if (args.size() >= 1
+                            && args[0].getKind() == TemplateArgument::Type
+                            && (loplugin::TypeCheck(args[0].getAsType())
                                 .AnyBoolean()))
                         {
                             continue;
@@ -613,7 +603,7 @@ bool ImplicitBoolConversion::TraverseCompoundAssignOperator(CompoundAssignOperat
             {
                 report(
                     DiagnosticsEngine::Warning, "mix of %0 and %1 in operator %2",
-                    compat::getBeginLoc(expr->getRHS()))
+                    expr->getRHS()->getBeginLoc())
                     << expr->getLHS()->getType()
                     << expr->getRHS()->IgnoreParenImpCasts()->getType()
                     << expr->getOpcodeStr()
@@ -729,7 +719,7 @@ bool ImplicitBoolConversion::VisitImplicitCastExpr(
                 DiagnosticsEngine::Warning,
                 ("explicit conversion (%0) from %1 to %2 implicitly cast back"
                  " to %3"),
-                compat::getBeginLoc(expr))
+                expr->getBeginLoc())
                 << sub->getCastKindName() << subsub->getType() << sub->getType()
                 << expr->getType() << expr->getSourceRange();
             return true;
@@ -746,7 +736,7 @@ bool ImplicitBoolConversion::VisitImplicitCastExpr(
             report(
                 DiagnosticsEngine::Warning,
                 "implicit conversion (%0) of call argument from %1 to %2",
-                compat::getBeginLoc(expr))
+                expr->getBeginLoc())
                 << expr->getCastKindName() << expr->getSubExpr()->getType()
                 << expr->getType() << expr->getSourceRange();
             return true;
@@ -761,7 +751,7 @@ bool ImplicitBoolConversion::VisitMaterializeTemporaryExpr(
     if (ignoreLocation(expr)) {
         return true;
     }
-    if (auto const sub = dyn_cast<ExplicitCastExpr>(compat::getSubExpr(expr))) {
+    if (auto const sub = dyn_cast<ExplicitCastExpr>(expr->getSubExpr())) {
         auto const subsub = compat::getSubExprAsWritten(sub);
         if (subsub->getType().IgnoreParens() == expr->getType().IgnoreParens()
             && isBool(subsub))
@@ -770,7 +760,7 @@ bool ImplicitBoolConversion::VisitMaterializeTemporaryExpr(
                 DiagnosticsEngine::Warning,
                 ("explicit conversion (%0) from %1 to %2 implicitly converted"
                  " back to %3"),
-                compat::getBeginLoc(expr))
+                expr->getBeginLoc())
                 << sub->getCastKindName() << subsub->getType() << sub->getType()
                 << expr->getType() << expr->getSourceRange();
             return true;
@@ -857,11 +847,12 @@ void ImplicitBoolConversion::checkCXXConstructExpr(
                             = td->getTemplateParameters();
                         auto k = std::find(
                             ps->begin(), ps->end(),
-                            t2->getReplacedParameter()->getDecl());
+                            compat::getReplacedParameter(t2));
                         if (k != ps->end()) {
-                            if (ps->size() == t1->getNumArgs()) { //TODO
-                                TemplateArgument const & arg = t1->getArg(
-                                    k - ps->begin());
+                            auto const args = t1->template_arguments();
+                            if (ps->size() == args.size()) { //TODO
+                                TemplateArgument const & arg = args[
+                                    k - ps->begin()];
                                 if (arg.getKind() == TemplateArgument::Type
                                     && (loplugin::TypeCheck(arg.getAsType())
                                         .AnyBoolean()))
@@ -883,8 +874,9 @@ void ImplicitBoolConversion::reportWarning(ImplicitCastExpr const * expr) {
         if (expr->getCastKind() == CK_ConstructorConversion) {
             auto const t1 = expr->getType();
             if (auto const t2 = t1->getAs<TemplateSpecializationType>()) {
-                assert(t2->getNumArgs() >= 1);
-                auto const a = t2->getArg(0);
+                auto const args = t2->template_arguments();
+                assert(args.size() >= 1);
+                auto const a = args[0];
                 if (a.getKind() == TemplateArgument::Type && a.getAsType()->isBooleanType()
                     && (loplugin::TypeCheck(t1).TemplateSpecializationClass()
                         .ClassOrStruct("atomic").StdNamespace()))
@@ -895,7 +887,7 @@ void ImplicitBoolConversion::reportWarning(ImplicitCastExpr const * expr) {
         }
         report(
             DiagnosticsEngine::Warning,
-            "implicit conversion (%0) from %1 to %2", compat::getBeginLoc(expr))
+            "implicit conversion (%0) from %1 to %2", expr->getBeginLoc())
             << expr->getCastKindName() << expr->getSubExprAsWritten()->getType()
             << expr->getType() << expr->getSourceRange();
     }

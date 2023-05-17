@@ -54,7 +54,6 @@
 #include <com/sun/star/chart2/TickmarkStyle.hpp>
 
 #include <tools/gen.hxx>
-#include <vcl/outdev.hxx>
 #include <filter/msfilter/escherex.hxx>
 
 #include <document.hxx>
@@ -316,7 +315,7 @@ const XclChTypeInfo& XclExpChRoot::GetChartTypeInfo( XclChTypeId eType ) const
     return mxChData->mxTypeInfoProv->GetTypeInfo( eType );
 }
 
-const XclChTypeInfo& XclExpChRoot::GetChartTypeInfo( const OUString& rServiceName ) const
+const XclChTypeInfo& XclExpChRoot::GetChartTypeInfo( std::u16string_view rServiceName ) const
 {
     return mxChData->mxTypeInfoProv->GetTypeInfoFromService( rServiceName );
 }
@@ -714,7 +713,7 @@ void XclExpChEscherFormat::WriteBody( XclExpStream& rStrm )
     // write Escher property container via temporary memory stream
     SvMemoryStream aMemStrm;
     maData.mxEscherSet->Commit( aMemStrm );
-    aMemStrm.Flush();
+    aMemStrm.FlushBuffer();
     aMemStrm.Seek( STREAM_SEEK_TO_BEGIN );
     rStrm.CopyFromStream( aMemStrm );
 }
@@ -990,7 +989,7 @@ sal_uInt16 XclExpChSourceLink::ConvertStringSequence( const Sequence< Reference<
                     // Excel start position of this portion
                     sal_uInt16 nXclPortionStart = mxString->Len();
                     // add portion text to Excel string
-                    XclExpStringHelper::AppendString( *mxString, GetRoot(), aText.copy( nPortionPos, nPortionEnd - nPortionPos ) );
+                    XclExpStringHelper::AppendString( *mxString, GetRoot(), aText.subView( nPortionPos, nPortionEnd - nPortionPos ) );
                     if( nXclPortionStart < mxString->Len() )
                     {
                         // find font index variable dependent on script type
@@ -1040,7 +1039,7 @@ void XclExpChSourceLink::ConvertNumFmt( const ScfPropertySet& rPropSet, bool bPe
     }
 }
 
-void XclExpChSourceLink::AppendString( const OUString& rStr )
+void XclExpChSourceLink::AppendString( std::u16string_view rStr )
 {
     if (!mxString)
         return;
@@ -3303,7 +3302,7 @@ XclExpChChart::XclExpChChart( const XclExpRoot& rRoot,
         Reference< XChartDocument > const & xChartDoc, const tools::Rectangle& rChartRect ) :
     XclExpChGroupBase( XclExpChRoot( rRoot, *this ), EXC_CHFRBLOCK_TYPE_CHART, EXC_ID_CHCHART, 16 )
 {
-    Size aPtSize = OutputDevice::LogicToLogic( rChartRect.GetSize(), MapMode( MapUnit::Map100thMM ), MapMode( MapUnit::MapPoint ) );
+    Size aPtSize = o3tl::convert( rChartRect.GetSize(), o3tl::Length::mm100, o3tl::Length::pt );
     // rectangle is stored in 16.16 fixed-point format
     maRect.mnX = maRect.mnY = 0;
     maRect.mnWidth = static_cast< sal_Int32 >( aPtSize.Width() << 16 );

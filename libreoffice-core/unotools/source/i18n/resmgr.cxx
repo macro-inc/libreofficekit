@@ -23,7 +23,7 @@
 // workdir/UnpackedTarball/boost/boost/locale/format.hpp using "std::auto_ptr<data> d;", but must
 // come very early here in case <memory> is already (indirectly) included earlier:
 #include <config_libcxx.h>
-#if HAVE_LIBCXX
+#if HAVE_LIBCPP
 #define _LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR
 #elif defined _MSC_VER
 #define _HAS_AUTO_PTR_ETC 1
@@ -36,7 +36,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#if defined UNX && !defined MACOSX && !defined IOS && !defined ANDROID
+#if defined UNX && !defined MACOSX && !defined IOS && !defined ANDROID && !defined EMSCRIPTEN
 #   include <libintl.h>
 #endif
 
@@ -51,12 +51,14 @@
 #include <boost/locale.hpp>
 #include <boost/locale/gnu_gettext.hpp>
 
-#include <array>
 #include <unordered_map>
-#include <memory>
 
 #ifdef ANDROID
 #include <osl/detail/android-bootstrap.h>
+#endif
+
+#ifdef EMSCRIPTEN
+#include <osl/detail/emscripten-bootstrap.h>
 #endif
 
 #if defined(_WIN32) && defined(DBG_UTIL)
@@ -94,7 +96,7 @@ namespace
             nCRC >>= 6;
         }
         sKeyId[5] = '\0';
-        return OString(sKeyId);
+        return sKeyId;
     }
 }
 
@@ -129,9 +131,14 @@ namespace Translate
         if (aFind != aCache.end())
             return aFind->second;
         boost::locale::generator gen;
+#if BOOST_VERSION < 108100
         gen.characters(boost::locale::char_facet);
         gen.categories(boost::locale::message_facet | boost::locale::information_facet);
-#if defined(ANDROID)
+#else
+        gen.characters(boost::locale::char_facet_t::char_f);
+        gen.categories(boost::locale::category_t::message | boost::locale::category_t::information);
+#endif
+#if defined(ANDROID) || defined(EMSCRIPTEN)
         OString sPath(OString(lo_get_app_data_dir()) + "/program/resource");
 #else
         OUString uri("$BRAND_BASE_DIR/$BRAND_SHARE_RESOURCE_SUBDIR/");
@@ -148,7 +155,7 @@ namespace Translate
         OString sPath(OUStringToOString(path, eEncoding));
 #endif
         gen.add_messages_path(sPath.getStr());
-#if defined UNX && !defined MACOSX && !defined IOS && !defined ANDROID
+#if defined UNX && !defined MACOSX && !defined IOS && !defined ANDROID && !defined EMSCRIPTEN
         // allow gettext to find these .mo files e.g. so gtk dialogs can use them
         bindtextdomain(aPrefixName.data(), sPath.getStr());
         // tdf#131069 gtk, and anything sane, always wants utf-8 strings as output

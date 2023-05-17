@@ -22,7 +22,6 @@
 
 #include <sal/config.h>
 
-#include <cstddef>
 #include <map>
 #include <vector>
 #include <memory>
@@ -31,7 +30,6 @@
 #include <rtl/textenc.h>
 #include "fltshell.hxx"
 #include <shellio.hxx>
-#include <svl/zforlist.hxx>
 #include <svl/listener.hxx>
 
 class SwDoc;
@@ -86,15 +84,15 @@ namespace sw
         sal_uLong MSDateTimeFormatToSwFormat(OUString& rParams, SvNumberFormatter *pFormatter, LanguageType &rLang, bool bHijri, LanguageType nDocLang);
 
         /*Used to identify if the previous token is AM time field*/
-        bool IsPreviousAM(OUString const & rParams, sal_Int32 nPos);
+        bool IsPreviousAM(std::u16string_view rParams, sal_Int32 nPos);
 
         /*Used to identify if the next token is PM time field*/
-        bool IsNextPM(OUString const & rParams, sal_Int32 nPos);
+        bool IsNextPM(std::u16string_view rParams, sal_Int32 nPos);
 
         /** Used by MSDateTimeFormatToSwFormat to identify AM time fields
 
         */
-        bool IsNotAM(OUString const & rParams, sal_Int32 nPos);
+        bool IsNotAM(std::u16string_view rParams, sal_Int32 nPos);
 
         /** Another function used by MSDateTimeFormatToSwFormat
 
@@ -164,6 +162,10 @@ namespace sw
                 in knowing if the style has either a builtin standard id, or is
                 a user defined style.
 
+                @param rCollisions
+                Cache of previous name collisions to speed up resolution
+                of later duplicates.
+
                 @return
                 The equivalent writer style packaged as a StyleResult to use
                 for this word style.
@@ -173,7 +175,8 @@ namespace sw
                 rName and WW-rName[0..SAL_MAX_INT32], which is both unlikely
                 and impossible.
             */
-            StyleResult GetStyle(const OUString& rName, ww::sti eSti);
+            StyleResult GetStyle(const OUString& rName, ww::sti eSti,
+                                 std::map<OUString, sal_Int32>& rCollisions);
         };
 
         /** Knows which writer style a given word style should be imported as
@@ -221,6 +224,10 @@ namespace sw
                 in knowing if the style has either a builtin standard id, or is
                 a user defined style.
 
+                @param rCollisions
+                Cache of previous name collisions to speed up resolution
+                of later duplicates.
+
                 @return
                 The equivalent writer style packaged as a StyleResult to use
                 for this word style.
@@ -230,7 +237,8 @@ namespace sw
                 rName and WW-rName[0..SAL_MAX_INT32], which is both unlikely
                 and impossible.
             */
-            StyleResult GetStyle(const OUString& rName, ww::sti eSti);
+            StyleResult GetStyle(const OUString& rName, ww::sti eSti,
+                                 std::map<OUString, sal_Int32>& rCollisions);
         };
 
         /** Find suitable names for exporting this font
@@ -245,7 +253,7 @@ namespace sw
         public:
             OUString msPrimary;
             OUString msSecondary;
-            explicit FontMapExport(const OUString &rFontDescription);
+            explicit FontMapExport(std::u16string_view rFontDescription);
         };
 
         class InsertedTableListener final : public SvtListener
@@ -281,7 +289,7 @@ namespace sw
             explicit InsertedTablesManager(const SwDoc &rDoc);
         private:
             bool mbHasRoot;
-            std::map<std::unique_ptr<InsertedTableListener>, SwNodeIndex*> maTables;
+            std::map<std::unique_ptr<InsertedTableListener>, SwPosition*> maTables;
         };
 
         void MoveAttrFieldmarkInserted(SwFltPosition& rMkPos, SwFltPosition& rPtPos, const SwPosition& rPos);

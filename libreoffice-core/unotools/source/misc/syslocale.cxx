@@ -25,13 +25,13 @@
 #include <unotools/syslocale.hxx>
 #include <unotools/syslocaleoptions.hxx>
 #include <comphelper/lok.hxx>
-#include <comphelper/sequence.hxx>
 #include <rtl/tencinfo.h>
 #include <rtl/locale.h>
 #include <osl/thread.h>
 #include <osl/nlsupport.h>
 
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <vector>
 
@@ -42,13 +42,25 @@ namespace {
 
 std::weak_ptr<SvtSysLocale_Impl> g_pSysLocale;
 
+// static
+std::mutex& GetMutex()
+{
+    // #i77768# Due to a static reference in the toolkit lib
+    // we need a mutex that lives longer than the svl library.
+    // Otherwise the dtor would use a destructed mutex!!
+    static std::mutex* persistentMutex(new std::mutex);
+
+    return *persistentMutex;
+}
+
+
 }
 
 class SvtSysLocale_Impl : public utl::ConfigurationListener
 {
 public:
         SvtSysLocaleOptions                    aSysLocaleOptions;
-        std::unique_ptr<LocaleDataWrapper>     pLocaleData;
+        std::optional<LocaleDataWrapper>       moLocaleData;
         std::optional<CharClass>               moCharClass;
 
                                 SvtSysLocale_Impl();
@@ -63,9 +75,9 @@ private:
 
 SvtSysLocale_Impl::SvtSysLocale_Impl()
 {
-    pLocaleData.reset(new LocaleDataWrapper(
+    moLocaleData.emplace(
         aSysLocaleOptions.GetRealLanguageTag(),
-        getDateAcceptancePatternsConfig() ));
+        getDateAcceptancePatternsConfig() );
 
     // listen for further changes
     aSysLocaleOptions.AddListener( this );
@@ -89,14 +101,14 @@ void SvtSysLocale_Impl::ConfigurationChanged( utl::ConfigurationBroadcaster*, Co
          !(nHint & ConfigurationHints::DatePatterns) )
         return;
 
-    MutexGuard aGuard( SvtSysLocale::GetMutex() );
+    std::unique_lock aGuard( GetMutex() );
 
     const LanguageTag& rLanguageTag = aSysLocaleOptions.GetRealLanguageTag();
     if ( nHint & ConfigurationHints::Locale )
     {
         moCharClass.emplace( rLanguageTag );
     }
-    pLocaleData.reset(new LocaleDataWrapper(rLanguageTag, getDateAcceptancePatternsConfig()));
+    moLocaleData.emplace(rLanguageTag, getDateAcceptancePatternsConfig());
 }
 
 std::vector<OUString> SvtSysLocale_Impl::getDateAcceptancePatternsConfig() const
@@ -116,7 +128,7 @@ std::vector<OUString> SvtSysLocale_Impl::getDateAcceptancePatternsConfig() const
 
 SvtSysLocale::SvtSysLocale()
 {
-    MutexGuard aGuard( GetMutex() );
+    std::unique_lock aGuard( GetMutex() );
     pImpl = g_pSysLocale.lock();
     if ( !pImpl )
     {
@@ -127,24 +139,13 @@ SvtSysLocale::SvtSysLocale()
 
 SvtSysLocale::~SvtSysLocale()
 {
-    MutexGuard aGuard( GetMutex() );
+    std::unique_lock aGuard( GetMutex() );
     pImpl.reset();
-}
-
-// static
-Mutex& SvtSysLocale::GetMutex()
-{
-    // #i77768# Due to a static reference in the toolkit lib
-    // we need a mutex that lives longer than the svl library.
-    // Otherwise the dtor would use a destructed mutex!!
-    static Mutex* persistentMutex(new Mutex);
-
-    return *persistentMutex;
 }
 
 const LocaleDataWrapper& SvtSysLocale::GetLocaleData() const
 {
-    return *(pImpl->pLocaleData);
+    return *(pImpl->moLocaleData);
 }
 
 const CharClass& SvtSysLocale::GetCharClass() const
@@ -171,41 +172,6 @@ const LanguageTag& SvtSysLocale::GetUILanguageTag() const
         return comphelper::LibreOfficeKit::getLanguageTag();
 
     return pImpl->aSysLocaleOptions.GetRealUILanguageTag();
-}
-
-// static
-rtl_TextEncoding SvtSysLocale::GetBestMimeEncoding()
-{
-    const char* pCharSet = rtl_getBestMimeCharsetFromTextEncoding(
-            osl_getThreadTextEncoding() );
-    if ( !pCharSet )
-    {
-        // If the system locale is unknown to us, e.g. LC_ALL=xx, match the UI
-        // language if possible.
-        SvtSysLocale aSysLocale;
-        const LanguageTag& rLanguageTag = aSysLocale.GetUILanguageTag();
-        // Converting blindly to Locale and then to rtl_Locale may feed the
-        // 'qlt' to rtl_locale_register() and the underlying system locale
-        // stuff, which doesn't know about it nor about BCP47 in the Variant
-        // field. So use the real language and for non-pure ISO cases hope for
-        // the best... the fallback to UTF-8 should solve these cases nowadays.
-        /* FIXME-BCP47: the script needs to go in here as well, so actually
-         * we'd need some variant fiddling or glibc locale string and tweak
-         * rtl_locale_register() to know about it! But then again the Windows
-         * implementation still wouldn't know anything about it ... */
-        SAL_WARN_IF( !rLanguageTag.isIsoLocale(), "unotools.i18n",
-                "SvtSysLocale::GetBestMimeEncoding - non-ISO UI locale");
-        rtl_Locale * pLocale = rtl_locale_register( rLanguageTag.getLanguage().getStr(),
-                rLanguageTag.getCountry().getStr(), OUString().getStr() );
-        rtl_TextEncoding nEnc = osl_getTextEncodingFromLocale( pLocale );
-        pCharSet = rtl_getBestMimeCharsetFromTextEncoding( nEnc );
-    }
-    rtl_TextEncoding nRet;
-    if ( pCharSet )
-        nRet = rtl_getTextEncodingFromMimeCharset( pCharSet );
-    else
-        nRet = RTL_TEXTENCODING_UTF8;
-    return nRet;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

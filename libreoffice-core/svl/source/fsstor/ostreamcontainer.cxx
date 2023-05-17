@@ -227,28 +227,27 @@ void SAL_CALL OFSStreamContainer::dispose()
 
     lang::EventObject aSource( static_cast< ::cppu::OWeakObject*>( this ) );
     m_aListenersContainer.disposeAndClear( aGuard, aSource );
-    aGuard.lock();
     m_bDisposed = true;
 }
 
 void SAL_CALL OFSStreamContainer::addEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    std::scoped_lock aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( m_bDisposed )
         throw lang::DisposedException();
 
-    m_aListenersContainer.addInterface( xListener );
+    m_aListenersContainer.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL OFSStreamContainer::removeEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    std::scoped_lock aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( m_bDisposed )
         throw lang::DisposedException();
 
-    m_aListenersContainer.removeInterface( xListener );
+    m_aListenersContainer.removeInterface( aGuard, xListener );
 }
 
 

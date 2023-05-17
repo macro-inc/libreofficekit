@@ -442,7 +442,7 @@ void WMFWriter::WMFRecord_Escape( sal_uInt32 nEsc, sal_uInt32 nLen, const sal_In
 /* if return value is true, then a complete unicode string and also a polygon replacement has been written,
     so there is no more action necessary
 */
-bool WMFWriter::WMFRecord_Escape_Unicode( const Point& rPoint, const OUString& rUniStr, o3tl::span<const sal_Int32> pDXAry )
+bool WMFWriter::WMFRecord_Escape_Unicode( const Point& rPoint, const OUString& rUniStr, KernArraySpan pDXAry )
 {
     bool bEscapeUsed = false;
 
@@ -497,7 +497,7 @@ bool WMFWriter::WMFRecord_Escape_Unicode( const Point& rPoint, const OUString& r
                 }
             }
 
-            if ( ( i != nStringLen ) || IsStarSymbol( aSrcFont.GetFamilyName() ) )    // after conversion the characters are not original, so we
+            if ( ( i != nStringLen ) || IsOpenSymbol( aSrcFont.GetFamilyName() ) )    // after conversion the characters are not original, so we
             {                                                                   // will store the unicode string and a polypoly replacement
                 Color aOldFillColor( aSrcFillColor );
                 Color aOldLineColor( aSrcLineColor );
@@ -546,10 +546,10 @@ bool WMFWriter::WMFRecord_Escape_Unicode( const Point& rPoint, const OUString& r
 }
 
 void WMFWriter::WMFRecord_ExtTextOut( const Point& rPoint,
-                                      const OUString& rString,
-                                      o3tl::span<const sal_Int32> pDXAry )
+                                      std::u16string_view rString,
+                                      KernArraySpan pDXAry )
 {
-    sal_Int32 nOriginalTextLen = rString.getLength();
+    sal_Int32 nOriginalTextLen = rString.size();
 
     if ( (nOriginalTextLen <= 1) || pDXAry.empty() )
     {
@@ -561,8 +561,8 @@ void WMFWriter::WMFRecord_ExtTextOut( const Point& rPoint,
     TrueExtTextOut(rPoint, rString, aByteString, pDXAry);
 }
 
-void WMFWriter::TrueExtTextOut( const Point& rPoint, const OUString& rString,
-                                const OString& rByteString, o3tl::span<const sal_Int32> pDXAry )
+void WMFWriter::TrueExtTextOut( const Point& rPoint, std::u16string_view rString,
+                                const OString& rByteString, KernArraySpan pDXAry )
 {
     WriteRecordHeader( 0, W_META_EXTTEXTOUT );
     WritePointYX( rPoint );
@@ -572,7 +572,7 @@ void WMFWriter::TrueExtTextOut( const Point& rPoint, const OUString& rString,
     if ( nNewTextLen & 1 )
         pWMF->WriteUChar( 0 );
 
-    sal_Int32 nOriginalTextLen = rString.getLength();
+    sal_Int32 nOriginalTextLen = rString.size();
     std::unique_ptr<sal_Int16[]> pConvertedDXAry(new sal_Int16[ nOriginalTextLen ]);
     sal_Int32 j = 0;
     pConvertedDXAry[ j++ ] = static_cast<sal_Int16>(ScaleWidth( pDXAry[ 0 ] ));
@@ -1197,7 +1197,7 @@ void WMFWriter::WriteRecords( const GDIMetaFile & rMTF )
 
                 pVirDev->SetFont( aSrcFont );
                 const sal_Int32 nLen = aTemp.getLength();
-                std::vector<sal_Int32> aDXAry;
+                KernArray aDXAry;
                 const sal_Int32 nNormSize = pVirDev->GetTextArray( aTemp, nLen ? &aDXAry : nullptr );
                 if (nLen && nNormSize == 0)
                 {
@@ -1206,7 +1206,7 @@ void WMFWriter::WriteRecords( const GDIMetaFile & rMTF )
                 else
                 {
                     for ( sal_Int32 i = 0; i < ( nLen - 1 ); i++ )
-                        aDXAry[ i ] = aDXAry[ i ] * static_cast<sal_Int32>(pA->GetWidth()) / nNormSize;
+                        aDXAry.set(i, aDXAry[i] * static_cast<sal_Int32>(pA->GetWidth()) / nNormSize);
                     if ( ( nLen <= 1 ) || ( static_cast<sal_Int32>(pA->GetWidth()) == nNormSize ) )
                         aDXAry.clear();
                     aSrcLineInfo = LineInfo();
@@ -1302,7 +1302,8 @@ void WMFWriter::WriteRecords( const GDIMetaFile & rMTF )
                 const MetaGradientAction*   pA = static_cast<const MetaGradientAction*>(pMA);
                 GDIMetaFile                 aTmpMtf;
 
-                pVirDev->AddGradientActions( pA->GetRect(), pA->GetGradient(), aTmpMtf );
+                Gradient aGradient = pA->GetGradient();
+                aGradient.AddGradientActions( pA->GetRect(), aTmpMtf );
                 WriteRecords( aTmpMtf );
             }
             break;

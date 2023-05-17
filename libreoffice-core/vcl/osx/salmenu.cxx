@@ -302,8 +302,8 @@ bool AquaSalMenu::ShowNativePopupMenu(FloatingWindow * pWin, const tools::Rectan
     // in mirrored UI case; best done by actually executing the same code
     sal_uInt16 nArrangeIndex;
     pWin->SetPosPixel( FloatingWindow::ImplCalcPos( pWin, rRect, nFlags, nArrangeIndex ) );
-    displayPopupFrame.origin.x = pWin->ImplGetFrame()->maGeometry.nX - pParentAquaSalFrame->maGeometry.nX + offset;
-    displayPopupFrame.origin.y = pWin->ImplGetFrame()->maGeometry.nY - pParentAquaSalFrame->maGeometry.nY + offset;
+    displayPopupFrame.origin.x = pWin->ImplGetFrame()->maGeometry.x() - pParentAquaSalFrame->maGeometry.x() + offset;
+    displayPopupFrame.origin.y = pWin->ImplGetFrame()->maGeometry.y() - pParentAquaSalFrame->maGeometry.y() + offset;
     pParentAquaSalFrame->VCLToCocoa(displayPopupFrame, false);
 
     // #i111992# if this menu was opened due to a key event, prevent dispatching that yet again
@@ -652,6 +652,9 @@ void AquaSalMenu::SetAccelerator( unsigned /*nPos*/, SalMenuItem* pSalMenuItem, 
             case KEY_EQUAL:
                 nCommandKey='=';
                 break;
+            case KEY_COLON:
+                nCommandKey=':';
+                break;
             case KEY_SEMICOLON:
                 nCommandKey=';';
                 break;
@@ -819,8 +822,8 @@ SAL_WNODEPRECATED_DECLARATIONS_POP
 
     // make coordinates relative to reference frame
     static_cast<AquaSalFrame*>(i_pReferenceFrame)->CocoaToVCL( aRect.origin );
-    aRect.origin.x -= i_pReferenceFrame->maGeometry.nX;
-    aRect.origin.y -= i_pReferenceFrame->maGeometry.nY + aRect.size.height;
+    aRect.origin.x -= i_pReferenceFrame->maGeometry.x();
+    aRect.origin.y -= i_pReferenceFrame->maGeometry.y() + aRect.size.height;
 
     return tools::Rectangle( Point(static_cast<tools::Long>(aRect.origin.x),
                 static_cast<tools::Long>(aRect.origin.y)
@@ -856,7 +859,7 @@ AquaSalMenuItem::AquaSalMenuItem( const SalItemParams* pItemData ) :
 
         // peel mnemonics because on mac there are no such things for menu items
         // Delete CJK-style mnemonics for the dropdown menu of the 'New button' and lower menu of 'File > New'
-        NSString* pString = CreateNSString(MnemonicGenerator::EraseAllMnemonicChars((pItemData->aText)));
+        NSString* pString = CreateNSString(MnemonicGenerator::EraseAllMnemonicChars(pItemData->aText));
         if (pString)
         {
             [mpMenuItem setTitle: pString];

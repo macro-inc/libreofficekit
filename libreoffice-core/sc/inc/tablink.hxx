@@ -43,10 +43,10 @@ private:
     bool bAddUndo:1;
 
 public:
-    ScTableLink( ScDocShell* pDocSh, const OUString& rFile,
-                    const OUString& rFilter, const OUString& rOpt, sal_uLong nRefresh );
-    ScTableLink( SfxObjectShell* pShell, const OUString& rFile,
-                    const OUString& rFilter, const OUString& rOpt, sal_uLong nRefresh );
+    ScTableLink( ScDocShell* pDocSh, OUString aFile,
+                    OUString aFilter, OUString aOpt, sal_Int32 nRefreshDelaySeconds );
+    ScTableLink( SfxObjectShell* pShell, OUString aFile,
+                    OUString aFilter, OUString aOpt, sal_Int32 nRefreshDelaySeconds );
     virtual ~ScTableLink() override;
     virtual void Closed() override;
     virtual ::sfx2::SvBaseLink::UpdateResult DataChanged(
@@ -55,7 +55,7 @@ public:
     virtual void    Edit(weld::Window*, const Link<SvBaseLink&,void>& rEndEditHdl) override;
 
     bool    Refresh(const OUString& rNewFile, const OUString& rNewFilter,
-                    const OUString* pNewOptions /* = NULL */, sal_uLong nNewRefresh );
+                    const OUString* pNewOptions /* = NULL */, sal_Int32 nNewRefreshDelaySeconds );
     void    SetInCreate(bool bSet)      { bInCreate = bSet; }
     void    SetAddUndo(bool bSet)       { bAddUndo = bSet; }
 

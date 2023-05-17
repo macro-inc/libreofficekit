@@ -34,7 +34,7 @@
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b3dpolypolygontools.hxx>
-#include <rtl/ustrbuf.hxx>
+#include <utility>
 
 
 // DrawContact section
@@ -53,10 +53,10 @@ std::unique_ptr<sdr::properties::BaseProperties> E3dExtrudeObj::CreateObjectSpec
 E3dExtrudeObj::E3dExtrudeObj(
     SdrModel& rSdrModel,
     const E3dDefaultAttributes& rDefault,
-    const basegfx::B2DPolyPolygon& rPP,
+    basegfx::B2DPolyPolygon aPP,
     double fDepth)
 :   E3dCompoundObject(rSdrModel),
-    maExtrudePolygon(rPP)
+    maExtrudePolygon(std::move(aPP))
 {
     // since the old class PolyPolygon3D did mirror the given PolyPolygons in Y, do the same here
     basegfx::B2DHomMatrix aMirrorY;
@@ -109,10 +109,10 @@ void E3dExtrudeObj::SetDefaultAttributes(const E3dDefaultAttributes& rDefault)
 
 SdrObjKind E3dExtrudeObj::GetObjIdentifier() const
 {
-    return E3D_EXTRUDEOBJ_ID;
+    return SdrObjKind::E3D_Extrusion;
 }
 
-E3dExtrudeObj* E3dExtrudeObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> E3dExtrudeObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new E3dExtrudeObj(rTargetModel, *this);
 }
@@ -154,7 +154,7 @@ bool E3dExtrudeObj::IsBreakObjPossible()
     return true;
 }
 
-std::unique_ptr<SdrAttrObj,SdrObjectFreeOp> E3dExtrudeObj::GetBreakObj()
+rtl::Reference<SdrAttrObj> E3dExtrudeObj::GetBreakObj()
 {
     basegfx::B3DPolyPolygon aFrontSide;
     basegfx::B3DPolyPolygon aBackSide;
@@ -205,13 +205,13 @@ std::unique_ptr<SdrAttrObj,SdrObjectFreeOp> E3dExtrudeObj::GetBreakObj()
     {
     // create PathObj
         basegfx::B2DPolyPolygon aPoly = TransformToScreenCoor(aBackSide);
-        std::unique_ptr<SdrPathObj,SdrObjectFreeOp> pPathObj(new SdrPathObj(getSdrModelFromSdrObject(), OBJ_PLIN, aPoly));
+        rtl::Reference<SdrPathObj> pPathObj(new SdrPathObj(getSdrModelFromSdrObject(), SdrObjKind::PolyLine, std::move(aPoly)));
 
         SfxItemSet aSet(GetObjectItemSet());
         aSet.Put(XLineStyleItem(css::drawing::LineStyle_SOLID));
         pPathObj->SetMergedItemSet(aSet);
 
-        return std::unique_ptr<SdrAttrObj,SdrObjectFreeOp>(pPathObj.release());
+        return pPathObj;
     }
 
     return nullptr;

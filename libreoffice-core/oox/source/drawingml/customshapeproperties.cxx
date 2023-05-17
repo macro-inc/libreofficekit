@@ -31,6 +31,7 @@
 #include <com/sun/star/drawing/XEnhancedCustomShapeDefaulter.hpp>
 #include <com/sun/star/drawing/XShape.hpp>
 #include <comphelper/sequence.hxx>
+#include <o3tl/string_view.hxx>
 #include <sal/log.hxx>
 
 #include <algorithm>
@@ -47,7 +48,7 @@ CustomShapeProperties::CustomShapeProperties()
 , mbShapeTypeOverride(false)
 , mbMirroredX   ( false )
 , mbMirroredY   ( false )
-, mnTextRotateAngle ( 0 )
+, mnTextPreRotateAngle ( 0 )
 , mnTextCameraZRotateAngle ( 0 )
 , mnArcNum ( 0 )
 {
@@ -97,25 +98,8 @@ bool CustomShapeProperties::representsDefaultShape() const
 
 CustomShapeProperties::PresetDataMap CustomShapeProperties::maPresetDataMap;
 
-static OUString GetConnectorShapeType( sal_Int32 nType )
-{
-    SAL_INFO(
-        "oox.drawingml", "preset: " << nType << " " << XML_straightConnector1);
-
-    OUString sType;
-    switch( nType )
-    {
-        case XML_straightConnector1:
-            sType = "mso-spt32";
-            break;
-        default:
-            break;
-    }
-    return sType;
-}
-
 void CustomShapeProperties::pushToPropSet(
-    const Reference < XPropertySet >& xPropSet, const Reference < XShape > & xShape, const awt::Size &aSize )
+    const Reference < XPropertySet >& xPropSet, const awt::Size &aSize )
 {
     if ( mnShapePresetType >= 0 )
     {
@@ -127,22 +111,7 @@ void CustomShapeProperties::pushToPropSet(
         PropertyMap aPropertyMap;
         PropertySet aPropSet( xPropSet );
 
-        OUString sConnectorShapeType = GetConnectorShapeType( mnShapePresetType );
-
-        if (sConnectorShapeType.getLength() > 0)
-        {
-            SAL_INFO(
-                "oox.drawingml",
-                "connector shape: " << sConnectorShapeType << " ("
-                    << mnShapePresetType << ")");
-            //const uno::Reference < drawing::XShape > xShape( xPropSet, UNO_QUERY );
-            Reference< drawing::XEnhancedCustomShapeDefaulter > xDefaulter( xShape, UNO_QUERY );
-            if( xDefaulter.is() ) {
-                xDefaulter->createCustomShapeDefaults( sConnectorShapeType );
-                aPropertyMap.setProperty( PROP_Type, sConnectorShapeType );
-            }
-        }
-        else if (maPresetDataMap.find(mnShapePresetType) != maPresetDataMap.end())
+        if (maPresetDataMap.find(mnShapePresetType) != maPresetDataMap.end())
         {
             SAL_INFO(
                 "oox.drawingml",
@@ -156,8 +125,10 @@ void CustomShapeProperties::pushToPropSet(
 
         aPropertyMap.setProperty( PROP_MirroredX, mbMirroredX );
         aPropertyMap.setProperty( PROP_MirroredY, mbMirroredY );
-        aPropertyMap.setProperty( PROP_TextPreRotateAngle, mnTextRotateAngle );
+        aPropertyMap.setProperty( PROP_TextPreRotateAngle, mnTextPreRotateAngle );
         aPropertyMap.setProperty( PROP_TextCameraZRotateAngle, mnTextCameraZRotateAngle );
+        if (moTextAreaRotateAngle.has_value())
+            aPropertyMap.setProperty(PROP_TextRotateAngle, moTextAreaRotateAngle.value());
         Sequence< PropertyValue > aSeq = aPropertyMap.makePropertyValueSequence();
         aPropSet.setProperty( PROP_CustomShapeGeometry, aSeq );
 
@@ -182,7 +153,7 @@ void CustomShapeProperties::pushToPropSet(
                             {
                                 if ( adjustmentGuide.maName.getLength() > 3 )
                                 {
-                                    sal_Int32 nAdjustmentIndex = adjustmentGuide.maName.copy( 3 ).toInt32() - 1;
+                                    sal_Int32 nAdjustmentIndex = o3tl::toInt32(adjustmentGuide.maName.subView( 3 )) - 1;
                                     if ( ( nAdjustmentIndex >= 0 ) && ( nAdjustmentIndex < aAdjustmentSeq.getLength() ) )
                                     {
                                         EnhancedCustomShapeAdjustmentValue aAdjustmentVal;
@@ -218,14 +189,18 @@ void CustomShapeProperties::pushToPropSet(
         aPropertyMap.setProperty( PROP_Type, OUString( "ooxml-non-primitive" ));
         aPropertyMap.setProperty( PROP_MirroredX, mbMirroredX );
         aPropertyMap.setProperty( PROP_MirroredY, mbMirroredY );
-        if( mnTextRotateAngle )
-            aPropertyMap.setProperty( PROP_TextPreRotateAngle, mnTextRotateAngle );
+        if( mnTextPreRotateAngle )
+            aPropertyMap.setProperty( PROP_TextPreRotateAngle, mnTextPreRotateAngle );
+        if (moTextAreaRotateAngle.has_value())
+            aPropertyMap.setProperty(PROP_TextRotateAngle, moTextAreaRotateAngle.value());
         // Note 1: If Equations are defined - they are processed using internal div by 360 coordinates
         // while if they are not, standard ooxml coordinates are used.
         // This size specifically affects scaling.
         // Note 2: Width and Height are set to 0 to force scaling to 1.
         awt::Rectangle aViewBox( 0, 0, aSize.Width, aSize.Height );
-        if( !maGuideList.empty() )
+        // tdf#113187 Each ArcTo introduces two additional equations for converting start and swing
+        // angles. They do not count for test for use of standard ooxml coordinates
+        if (maGuideList.size() - 2 * countArcTo() > 0)
             aViewBox = awt::Rectangle( 0, 0, 0, 0 );
         aPropertyMap.setProperty( PROP_ViewBox, aViewBox);
 
@@ -245,10 +220,10 @@ void CustomShapeProperties::pushToPropSet(
 
         aPath.setProperty( PROP_Segments, comphelper::containerToSequence(maSegments) );
 
-        if ( maTextRect.has() ) {
+        if ( maTextRect.has_value() ) {
             Sequence< EnhancedCustomShapeTextFrame > aTextFrames{
-                { /* tl */ { maTextRect.get().l, maTextRect.get().t },
-                  /* br */ { maTextRect.get().r, maTextRect.get().b } }
+                { /* tl */ { maTextRect.value().l, maTextRect.value().t },
+                  /* br */ { maTextRect.value().r, maTextRect.value().b } }
             };
             aPath.setProperty( PROP_TextFrames, aTextFrames);
         }
@@ -317,22 +292,22 @@ void CustomShapeProperties::pushToPropSet(
                 // 4. The unit of angular adjustment values are 6000th degree.
 
                 aHandle.setProperty( PROP_Position, maAdjustHandleList[ i ].pos);
-                if ( maAdjustHandleList[ i ].gdRef1.has() )
+                if ( maAdjustHandleList[ i ].gdRef1.has_value() )
                 {
-                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef1.get() );
+                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef1.value() );
                     if ( nIndex >= 0 )
                         aHandle.setProperty( PROP_RefR, nIndex);
                 }
-                if ( maAdjustHandleList[ i ].gdRef2.has() )
+                if ( maAdjustHandleList[ i ].gdRef2.has_value() )
                 {
-                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef2.get() );
+                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef2.value() );
                     if ( nIndex >= 0 )
                         aHandle.setProperty( PROP_RefAngle, nIndex);
                 }
-                if ( maAdjustHandleList[ i ].min1.has() )
-                    aHandle.setProperty( PROP_RadiusRangeMinimum, maAdjustHandleList[ i ].min1.get());
-                if ( maAdjustHandleList[ i ].max1.has() )
-                    aHandle.setProperty( PROP_RadiusRangeMaximum, maAdjustHandleList[ i ].max1.get());
+                if ( maAdjustHandleList[ i ].min1.has_value() )
+                    aHandle.setProperty( PROP_RadiusRangeMinimum, maAdjustHandleList[ i ].min1.value());
+                if ( maAdjustHandleList[ i ].max1.has_value() )
+                    aHandle.setProperty( PROP_RadiusRangeMaximum, maAdjustHandleList[ i ].max1.value());
 
                 /* TODO: AngleMin & AngleMax
                 if ( maAdjustHandleList[ i ].min2.has() )
@@ -344,28 +319,28 @@ void CustomShapeProperties::pushToPropSet(
             else
             {
                 aHandle.setProperty( PROP_Position, maAdjustHandleList[ i ].pos);
-                if ( maAdjustHandleList[ i ].gdRef1.has() )
+                if ( maAdjustHandleList[ i ].gdRef1.has_value() )
                 {
                     // TODO: PROP_RefX and PROP_RefY are not yet part of our file format,
                     // so the handles will not work after save/reload
-                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef1.get() );
+                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef1.value() );
                     if ( nIndex >= 0 )
                         aHandle.setProperty( PROP_RefX, nIndex);
                 }
-                if ( maAdjustHandleList[ i ].gdRef2.has() )
+                if ( maAdjustHandleList[ i ].gdRef2.has_value() )
                 {
-                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef2.get() );
+                    sal_Int32 nIndex = GetCustomShapeGuideValue( maAdjustmentGuideList, maAdjustHandleList[ i ].gdRef2.value() );
                     if ( nIndex >= 0 )
                         aHandle.setProperty( PROP_RefY, nIndex);
                 }
-                if ( maAdjustHandleList[ i ].min1.has() )
-                    aHandle.setProperty( PROP_RangeXMinimum, maAdjustHandleList[ i ].min1.get());
-                if ( maAdjustHandleList[ i ].max1.has() )
-                    aHandle.setProperty( PROP_RangeXMaximum, maAdjustHandleList[ i ].max1.get());
-                if ( maAdjustHandleList[ i ].min2.has() )
-                    aHandle.setProperty( PROP_RangeYMinimum, maAdjustHandleList[ i ].min2.get());
-                if ( maAdjustHandleList[ i ].max2.has() )
-                    aHandle.setProperty( PROP_RangeYMaximum, maAdjustHandleList[ i ].max2.get());
+                if ( maAdjustHandleList[ i ].min1.has_value() )
+                    aHandle.setProperty( PROP_RangeXMinimum, maAdjustHandleList[ i ].min1.value());
+                if ( maAdjustHandleList[ i ].max1.has_value() )
+                    aHandle.setProperty( PROP_RangeXMaximum, maAdjustHandleList[ i ].max1.value());
+                if ( maAdjustHandleList[ i ].min2.has_value() )
+                    aHandle.setProperty( PROP_RangeYMinimum, maAdjustHandleList[ i ].min2.value());
+                if ( maAdjustHandleList[ i ].max2.has_value() )
+                    aHandle.setProperty( PROP_RangeYMaximum, maAdjustHandleList[ i ].max2.value());
             }
             aHandlesRange[ i ] = aHandle.makePropertyValueSequence();
         }

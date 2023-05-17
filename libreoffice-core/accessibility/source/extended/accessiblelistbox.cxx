@@ -26,7 +26,6 @@
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 
 
 namespace accessibility
@@ -301,7 +300,7 @@ namespace accessibility
 
     // XAccessibleContext
 
-    sal_Int32 SAL_CALL AccessibleListBox::getAccessibleChildCount(  )
+    sal_Int64 SAL_CALL AccessibleListBox::getAccessibleChildCount(  )
     {
         ::comphelper::OExternalLockGuard aGuard( this );
 
@@ -313,7 +312,7 @@ namespace accessibility
         return nCount;
     }
 
-    Reference< XAccessible > SAL_CALL AccessibleListBox::getAccessibleChild( sal_Int32 i )
+    Reference< XAccessible > SAL_CALL AccessibleListBox::getAccessibleChild( sal_Int64 i )
     {
         ::comphelper::OExternalLockGuard aGuard( this );
 
@@ -395,7 +394,7 @@ namespace accessibility
 
     // XAccessibleSelection
 
-    void SAL_CALL AccessibleListBox::selectAccessibleChild( sal_Int32 nChildIndex )
+    void SAL_CALL AccessibleListBox::selectAccessibleChild( sal_Int64 nChildIndex )
     {
         ::comphelper::OExternalLockGuard aGuard( this );
 
@@ -406,9 +405,12 @@ namespace accessibility
         getListBox()->Select( pEntry );
     }
 
-    sal_Bool SAL_CALL AccessibleListBox::isAccessibleChildSelected( sal_Int32 nChildIndex )
+    sal_Bool SAL_CALL AccessibleListBox::isAccessibleChildSelected( sal_Int64 nChildIndex )
     {
         ::comphelper::OExternalLockGuard aGuard( this );
+
+        if (nChildIndex < 0 || nChildIndex >= getAccessibleChildCount())
+            throw IndexOutOfBoundsException();
 
         SvTreeListEntry* pEntry = getListBox()->GetEntry( nChildIndex );
         if ( !pEntry )
@@ -443,14 +445,14 @@ namespace accessibility
         }
     }
 
-    sal_Int32 SAL_CALL AccessibleListBox::getSelectedAccessibleChildCount(  )
+    sal_Int64 SAL_CALL AccessibleListBox::getSelectedAccessibleChildCount(  )
     {
         ::comphelper::OExternalLockGuard aGuard( this );
 
         return getListBox()->GetSelectionCount();
     }
 
-    Reference< XAccessible > SAL_CALL AccessibleListBox::getSelectedAccessibleChild( sal_Int32 nSelectedChildIndex )
+    Reference< XAccessible > SAL_CALL AccessibleListBox::getSelectedAccessibleChild( sal_Int64 nSelectedChildIndex )
     {
         ::comphelper::OExternalLockGuard aGuard( this );
 
@@ -458,7 +460,7 @@ namespace accessibility
             throw IndexOutOfBoundsException();
 
         Reference< XAccessible > xChild;
-        sal_Int32 nSelCount= 0;
+        sal_Int64 nSelCount= 0;
         sal_Int32 nCount = getListBox()->GetLevelChildCount( nullptr );
         for ( sal_Int32 i = 0; i < nCount; ++i )
         {
@@ -479,7 +481,7 @@ namespace accessibility
         return xChild;
     }
 
-    void SAL_CALL AccessibleListBox::deselectAccessibleChild( sal_Int32 nSelectedChildIndex )
+    void SAL_CALL AccessibleListBox::deselectAccessibleChild( sal_Int64 nSelectedChildIndex )
     {
         ::comphelper::OExternalLockGuard aGuard( this );
 
@@ -490,15 +492,15 @@ namespace accessibility
         getListBox()->Select( pEntry, false );
     }
 
-    void AccessibleListBox::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+    void AccessibleListBox::FillAccessibleStateSet( sal_Int64& rStateSet )
     {
         VCLXAccessibleComponent::FillAccessibleStateSet( rStateSet );
         if ( getListBox() && isAlive() )
         {
-            rStateSet.AddState( AccessibleStateType::FOCUSABLE );
-            rStateSet.AddState( AccessibleStateType::MANAGES_DESCENDANTS );
+            rStateSet |= AccessibleStateType::FOCUSABLE;
+            rStateSet |= AccessibleStateType::MANAGES_DESCENDANTS;
             if ( getListBox()->GetSelectionMode() == SelectionMode::Multiple )
-                rStateSet.AddState( AccessibleStateType::MULTI_SELECTABLE );
+                rStateSet |= AccessibleStateType::MULTI_SELECTABLE;
         }
     }
 

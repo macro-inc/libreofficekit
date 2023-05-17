@@ -9,7 +9,6 @@
 
 #include <tools/json_writer.hxx>
 #include <stdio.h>
-#include <algorithm>
 #include <cstring>
 #include <rtl/math.hxx>
 
@@ -275,7 +274,8 @@ void JsonWriter::put(const char* pPropName, std::string_view rPropVal)
     mPos += 4;
 
     // copy and perform escaping
-    for (size_t i = 0; i < rPropVal.size(); ++i)
+    bool bReachedEnd = false;
+    for (size_t i = 0; i < rPropVal.size() && !bReachedEnd; ++i)
     {
         char ch = rPropVal[i];
         switch (ch)
@@ -289,6 +289,9 @@ void JsonWriter::put(const char* pPropName, std::string_view rPropVal)
             case '/':
             case '\\':
                 writeEscapedSequence(ch, mPos);
+                break;
+            case 0:
+                bReachedEnd = true;
                 break;
             case '\xE2': // Special processing of U+2028 and U+2029
                 if (i + 2 < rPropVal.size() && rPropVal[i + 1] == '\x80'
@@ -327,7 +330,11 @@ void JsonWriter::put(const char* pPropName, sal_Int64 nPropVal)
     memcpy(mPos, "\": ", 3);
     mPos += 3;
 
+    // clang-format off
+    SAL_WNODEPRECATED_DECLARATIONS_PUSH // sprintf (macOS 13 SDK)
     mPos += sprintf(mPos, "%" SAL_PRIdINT64, nPropVal);
+    SAL_WNODEPRECATED_DECLARATIONS_POP
+    // clang-format on
 
     validate();
 }

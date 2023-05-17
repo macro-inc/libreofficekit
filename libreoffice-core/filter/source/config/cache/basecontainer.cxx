@@ -21,7 +21,6 @@
 #include "basecontainer.hxx"
 
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
-#include <com/sun/star/document/FilterConfigRefresh.hpp>
 #include <com/sun/star/uno/Type.h>
 #include <comphelper/enumhelper.hxx>
 #include <comphelper/sequence.hxx>
@@ -45,8 +44,7 @@ BaseContainer::~BaseContainer()
 }
 
 
-void BaseContainer::init(const css::uno::Reference< css::uno::XComponentContext >&     rxContext              ,
-                         const OUString&                                        sImplementationName,
+void BaseContainer::init(const OUString&                                        sImplementationName,
                          const css::uno::Sequence< OUString >&                  lServiceNames      ,
                                FilterCache::EItemType                                  eType              )
 {
@@ -56,7 +54,6 @@ void BaseContainer::init(const css::uno::Reference< css::uno::XComponentContext 
     m_sImplementationName = sImplementationName;
     m_lServiceNames       = lServiceNames      ;
     m_eType               = eType              ;
-    m_xRefreshBroadcaster = css::document::FilterConfigRefresh::create(rxContext);
     // <- SAFE
 }
 
@@ -236,12 +233,10 @@ css::uno::Any SAL_CALL BaseContainer::getByName(const OUString& sItem)
     // SAFE ->
     osl::MutexGuard aLock(m_aMutex);
 
-    CacheItem aItem;
     try
     {
         FilterCache* pCache = impl_getWorkingCache();
-        aItem = pCache->getItem(m_eType, sItem);
-        pCache->addStatePropsToItem(m_eType, sItem, aItem); // add implicit props "Finalized"/"Mandatory"
+        aValue = pCache->getItemWithStateProps(m_eType, sItem);
     }
     catch(const css::container::NoSuchElementException&)
     {
@@ -250,10 +245,8 @@ css::uno::Any SAL_CALL BaseContainer::getByName(const OUString& sItem)
     catch(const css::uno::Exception&)
     {
         // TODO invalid cache!? How should it be handled right?
-        aItem.clear();
     }
 
-    aValue <<= aItem.getAsPackedPropertyValueList();
     // <- SAFE
 
     return aValue;
@@ -351,7 +344,7 @@ css::uno::Reference< css::container::XEnumeration > SAL_CALL BaseContainer::crea
 {
     OSL_FAIL("not pure virtual ... but not really implemented .-)");
 
-    return new ::comphelper::OEnumerationByName(this, css::uno::Sequence< OUString >());
+    return new ::comphelper::OEnumerationByName(this, {});
 }
 
 
@@ -366,14 +359,10 @@ css::uno::Reference< css::container::XEnumeration > SAL_CALL BaseContainer::crea
 
     try
     {
-        // convert the given properties first to our internal representation
-        CacheItem lProps;
-        lProps << lProperties;
-
         // search the key names of all items, where its properties match
         // the given ones in its minimum
         FilterCache* pCache = impl_getWorkingCache();
-        lKeys = pCache->getMatchingItemsByProps(m_eType, lProps);
+        lKeys = pCache->getMatchingItemsByProps(m_eType, o3tl::span<const css::beans::NamedValue>( lProperties.getConstArray(), lProperties.getLength() ));
     }
     catch(const css::uno::Exception&)
     {
@@ -394,8 +383,7 @@ css::uno::Reference< css::container::XEnumeration > SAL_CALL BaseContainer::crea
              Further its easier to work directly with the return value
              instead of checking of NULL returns! */
 
-    css::uno::Sequence< OUString > lSubSet = comphelper::containerToSequence(lKeys);
-    return new ::comphelper::OEnumerationByName(this, lSubSet);
+    return new ::comphelper::OEnumerationByName(this, std::move(lKeys));
 }
 
 
@@ -430,18 +418,13 @@ void SAL_CALL BaseContainer::flush()
 
         throw css::lang::WrappedTargetRuntimeException( "Flush rejected by internal container.",
                 static_cast< OWeakObject* >(this),
-                css::uno::makeAny(ex));
+                css::uno::Any(ex));
     }
 
     m_pFlushCache.reset();
 
-    css::uno::Reference< css::util::XRefreshable > xRefreshBroadcaster = m_xRefreshBroadcaster;
-
     aLock.clear();
     // <- SAFE
-
-    if (xRefreshBroadcaster.is())
-        xRefreshBroadcaster->refresh();
 
     // notify listener outside the lock!
     // The used listener helper lives if we live

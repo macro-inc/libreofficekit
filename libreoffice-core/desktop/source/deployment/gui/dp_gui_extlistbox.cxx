@@ -35,8 +35,10 @@
 #include <com/sun/star/system/SystemShellExecute.hpp>
 #include <cppuhelper/weakref.hxx>
 #include <i18nlangtag/languagetag.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <rtl/ustrbuf.hxx>
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/ptrstyle.hxx>
 #include <vcl/svapp.hxx>
@@ -57,7 +59,7 @@ struct FindWeakRef
 {
     const uno::Reference<deployment::XPackage> m_extension;
 
-    explicit FindWeakRef( uno::Reference<deployment::XPackage> const & ext): m_extension(ext) {}
+    explicit FindWeakRef( uno::Reference<deployment::XPackage> ext): m_extension(std::move(ext)) {}
     bool operator () (uno::WeakReference< deployment::XPackage >  const & ref);
 };
 
@@ -354,7 +356,7 @@ void ExtensionBox_Impl::selectEntry( const tools::Long nPos )
             m_vEntries[ m_nActive ]->m_bActive = false;
         }
 
-        if ( ( nPos >= 0 ) && ( nPos < static_cast<tools::Long>(m_vEntries.size()) ) )
+        if ( ( nPos >= 0 ) && ( o3tl::make_unsigned(nPos) < m_vEntries.size() ) )
         {
             m_bHasActive = true;
             m_nActive = nPos;
@@ -623,7 +625,7 @@ bool ExtensionBox_Impl::HandleCursorKey( sal_uInt16 nKeyCode )
 
     if ( nSelect < 0 )
         nSelect = 0;
-    if ( nSelect >= static_cast<tools::Long>(m_vEntries.size()) )
+    if ( o3tl::make_unsigned(nSelect) >= m_vEntries.size() )
         nSelect = m_vEntries.size() - 1;
 
     selectEntry( nSelect );
@@ -732,7 +734,7 @@ bool ExtensionBox_Impl::MouseMove( const MouseEvent& rMEvt )
     bool bOverHyperlink = false;
 
     auto nPos = PointToPos( rMEvt.GetPosPixel() );
-    if ( ( nPos >= 0 ) && ( nPos < static_cast<tools::Long>(m_vEntries.size()) ) )
+    if ( ( nPos >= 0 ) && ( o3tl::make_unsigned(nPos) < m_vEntries.size() ) )
     {
         const auto& rEntry = m_vEntries[nPos];
         bOverHyperlink = !rEntry->m_sPublisher.isEmpty() && rEntry->m_aLinkRect.Contains(rMEvt.GetPosPixel());
@@ -749,7 +751,7 @@ bool ExtensionBox_Impl::MouseMove( const MouseEvent& rMEvt )
 OUString ExtensionBox_Impl::RequestHelp(tools::Rectangle& rRect)
 {
     auto nPos = PointToPos( rRect.TopLeft() );
-    if ( ( nPos >= 0 ) && ( nPos < static_cast<tools::Long>(m_vEntries.size()) ) )
+    if ( ( nPos >= 0 ) && ( o3tl::make_unsigned(nPos) < m_vEntries.size() ) )
     {
         const auto& rEntry = m_vEntries[nPos];
         bool bOverHyperlink = !rEntry->m_sPublisher.isEmpty() && rEntry->m_aLinkRect.Contains(rRect);
@@ -765,39 +767,37 @@ OUString ExtensionBox_Impl::RequestHelp(tools::Rectangle& rRect)
 
 bool ExtensionBox_Impl::MouseButtonDown( const MouseEvent& rMEvt )
 {
-    if ( rMEvt.IsLeft() )
+    if ( !rMEvt.IsLeft() )
+        return false;
+
+    if (rMEvt.IsMod1() && m_bHasActive)
+        selectEntry(ExtensionBox_Impl::ENTRY_NOTFOUND);   // Selecting a not existing entry will deselect the current one
+    else
     {
-        if (rMEvt.IsMod1() && m_bHasActive)
-            selectEntry(ExtensionBox_Impl::ENTRY_NOTFOUND);   // Selecting a not existing entry will deselect the current one
-        else
+        auto nPos = PointToPos( rMEvt.GetPosPixel() );
+
+        if ( ( nPos >= 0 ) && ( o3tl::make_unsigned(nPos) < m_vEntries.size() ) )
         {
-            auto nPos = PointToPos( rMEvt.GetPosPixel() );
-
-            if ( ( nPos >= 0 ) && ( nPos < static_cast<tools::Long>(m_vEntries.size()) ) )
+            const auto& rEntry = m_vEntries[nPos];
+            if (!rEntry->m_sPublisher.isEmpty() && rEntry->m_aLinkRect.Contains(rMEvt.GetPosPixel()))
             {
-                const auto& rEntry = m_vEntries[nPos];
-                if (!rEntry->m_sPublisher.isEmpty() && rEntry->m_aLinkRect.Contains(rMEvt.GetPosPixel()))
+                try
                 {
-                    try
-                    {
-                        css::uno::Reference<css::system::XSystemShellExecute> xSystemShellExecute(
-                            css::system::SystemShellExecute::create(comphelper::getProcessComponentContext()));
-                        //throws css::lang::IllegalArgumentException, css::system::SystemShellExecuteException
-                        xSystemShellExecute->execute(rEntry->m_sPublisherURL, OUString(), css::system::SystemShellExecuteFlags::URIS_ONLY);
-                    }
-                    catch (...)
-                    {
-                    }
-                    return true;
+                    css::uno::Reference<css::system::XSystemShellExecute> xSystemShellExecute(
+                        css::system::SystemShellExecute::create(comphelper::getProcessComponentContext()));
+                    //throws css::lang::IllegalArgumentException, css::system::SystemShellExecuteException
+                    xSystemShellExecute->execute(rEntry->m_sPublisherURL, OUString(), css::system::SystemShellExecuteFlags::URIS_ONLY);
                 }
+                catch (...)
+                {
+                }
+                return true;
             }
-
-            selectEntry( nPos );
         }
-        return true;
-    }
 
-    return false;
+        selectEntry( nPos );
+    }
+    return true;
 }
 
 bool ExtensionBox_Impl::KeyInput(const KeyEvent& rKEvt)
@@ -1108,6 +1108,7 @@ void ExtensionBox_Impl::checkEntries()
                         m_bHasActive = false;
                     }
                     m_vRemovedEntries.push_back(*iIndex);
+                    (*iIndex)->m_xPackage->removeEventListener(m_xRemoveListener);
                     iIndex = m_vEntries.erase(iIndex);
                 }
             }

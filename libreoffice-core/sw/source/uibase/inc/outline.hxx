@@ -32,15 +32,16 @@ class SwChapterNumRules;
 
 class SwOutlineTabDialog final : public SfxTabDialogController
 {
-    static     sal_uInt16    nNumLevel;
+    static     sal_uInt16    s_nNumLevel;
+    static_assert(sizeof(s_nNumLevel) * CHAR_BIT >= MAXLEVEL);
 
-    OUString            aCollNames[MAXLEVEL];
+    OUString            m_aCollNames[MAXLEVEL];
 
-    SwWrtShell&         rWrtSh;
-    std::unique_ptr<SwNumRule>  xNumRule;
-    SwChapterNumRules*  pChapterNumRules;
+    SwWrtShell&         m_rWrtSh;
+    std::unique_ptr<SwNumRule>  m_xNumRule;
+    SwChapterNumRules*  m_pChapterNumRules;
 
-    bool                bModified : 1;
+    bool                m_bModified : 1;
 
     std::unique_ptr<weld::MenuButton> m_xMenuButton;
 
@@ -55,22 +56,22 @@ public:
     SwOutlineTabDialog(weld::Window* pParent, const SfxItemSet* pSwItemSet, SwWrtShell &);
     virtual ~SwOutlineTabDialog() override;
 
-    SwNumRule*          GetNumRule() { return xNumRule.get(); }
+    SwNumRule*          GetNumRule() { return m_xNumRule.get(); }
     sal_uInt16          GetLevel(std::u16string_view rFormatName) const;
-    OUString*           GetCollNames() {return aCollNames;}
+    OUString*           GetCollNames() {return m_aCollNames;}
 
-    static sal_uInt16   GetActNumLevel() {return nNumLevel;}
-    static void         SetActNumLevel(sal_uInt16 nSet) {nNumLevel = nSet;}
+    static sal_uInt16   GetActNumLevel() {return s_nNumLevel;}
+    static void         SetActNumLevel(sal_uInt16 nSet) {s_nNumLevel = nSet;}
 };
 
 class SwOutlineSettingsTabPage final : public SfxTabPage
 {
-    OUString            aNoFormatName;
-    OUString            aSaveCollNames[MAXLEVEL];
-    SwWrtShell*         pSh;
-    SwNumRule*          pNumRule;
-    OUString*           pCollNames;
-    sal_uInt16          nActLevel;
+    OUString            m_aNoFormatName;
+    OUString            m_aSaveCollNames[MAXLEVEL];
+    SwWrtShell*         m_pSh;
+    SwNumRule*          m_pNumRule;
+    OUString*           m_pCollNames;
+    sal_uInt16          m_nActLevel;
     NumberingPreview  m_aPreviewWIN;
 
     std::unique_ptr<weld::TreeView> m_xLevelLB;
@@ -113,8 +114,8 @@ public:
     virtual void        Reset( const SfxItemSet* rSet ) override;
     void SetNumRule(SwNumRule *pRule)
     {
-        pNumRule = pRule;
-        m_aPreviewWIN.SetNumRule(pNumRule);
+        m_pNumRule = pRule;
+        m_aPreviewWIN.SetNumRule(m_pNumRule);
     }
 };
 

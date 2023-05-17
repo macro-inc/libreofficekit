@@ -33,6 +33,7 @@
 #include <com/sun/star/sheet/XSolver.hpp>
 #include <com/sun/star/sheet/XSolverDescription.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
+#include <utility>
 
 using namespace com::sun::star;
 
@@ -57,11 +58,11 @@ struct ScSolverOptionsEntry
 ScSolverOptionsDialog::ScSolverOptionsDialog(weld::Window* pParent,
                         const uno::Sequence<OUString>& rImplNames,
                         const uno::Sequence<OUString>& rDescriptions,
-                        const OUString& rEngine,
+                        OUString aEngine,
                         const uno::Sequence<beans::PropertyValue>& rProperties )
     : GenericDialogController(pParent, "modules/scalc/ui/solveroptionsdialog.ui", "SolverOptionsDialog")
     , maImplNames(rImplNames)
-    , maEngine(rEngine)
+    , maEngine(std::move(aEngine))
     , maProperties(rProperties)
     , m_xLbEngine(m_xBuilder->weld_combo_box("engine"))
     , m_xLbSettings(m_xBuilder->weld_tree_view("settings"))
@@ -129,7 +130,7 @@ const uno::Sequence<beans::PropertyValue>& ScSolverOptionsDialog::GetProperties(
         for (sal_Int32 nEntryPos=0; nEntryPos<nEntryCount; ++nEntryPos)
         {
             uno::Any& rValue = maPropertiesRange[nEntryPos].Value;
-            if (ScSolverOptionsString* pStringItem = reinterpret_cast<ScSolverOptionsString*>(m_xLbSettings->get_id(nEntryPos).toInt64()))
+            if (ScSolverOptionsString* pStringItem = weld::fromId<ScSolverOptionsString*>(m_xLbSettings->get_id(nEntryPos)))
             {
                 if (pStringItem->IsDouble())
                     rValue <<= pStringItem->GetDoubleValue();
@@ -224,7 +225,7 @@ void ScSolverOptionsDialog::FillListBox()
 
                 m_xLbSettings->set_text(nPos, sTxt, 0);
             }
-            m_xLbSettings->set_id(nPos, OUString::number(reinterpret_cast<sal_Int64>(m_aOptions.back().get())));
+            m_xLbSettings->set_id(nPos, weld::toId(m_aOptions.back().get()));
         }
     }
 
@@ -241,7 +242,7 @@ void ScSolverOptionsDialog::EditOption()
     int nEntry = m_xLbSettings->get_selected_index();
     if (nEntry == -1)
         return;
-    ScSolverOptionsString* pStringItem = reinterpret_cast<ScSolverOptionsString*>(m_xLbSettings->get_id(nEntry).toInt64());
+    ScSolverOptionsString* pStringItem = weld::fromId<ScSolverOptionsString*>(m_xLbSettings->get_id(nEntry));
     if (!pStringItem)
         return;
 
@@ -331,7 +332,7 @@ IMPL_LINK_NOARG(ScSolverOptionsDialog, SettingsSelHdl, weld::TreeView&, void)
     int nEntry = m_xLbSettings->get_selected_index();
     if (nEntry != -1)
     {
-        ScSolverOptionsString* pStringItem = reinterpret_cast<ScSolverOptionsString*>(m_xLbSettings->get_id(nEntry).toInt64());
+        ScSolverOptionsString* pStringItem = weld::fromId<ScSolverOptionsString*>(m_xLbSettings->get_id(nEntry));
         if (!pStringItem)
             bCheckbox = true;
     }

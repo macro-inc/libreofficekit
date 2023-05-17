@@ -54,7 +54,7 @@ SwDocStatPage::SwDocStatPage(weld::Container* pPage, weld::DialogController* pCo
     m_xUpdatePB->connect_clicked(LINK(this, SwDocStatPage, UpdateHdl));
     //#111684# is the current view a page preview no SwFEShell can be found -> hide the update button
     SwDocShell* pDocShell = static_cast<SwDocShell*>( SfxObjectShell::Current() );
-    SwFEShell* pFEShell = pDocShell->GetFEShell();
+    SwFEShell* pFEShell = pDocShell ? pDocShell->GetFEShell() : nullptr;
     if(!pFEShell)
     {
         m_xUpdatePB->hide();
@@ -108,17 +108,17 @@ void SwDocStatPage::Update()
 
     SwWait aWait( *pSh->GetDoc()->GetDocShell(), true );
     pSh->StartAction();
-    aDocStat = pSh->GetDoc()->getIDocumentStatistics().GetUpdatedDocStat( false, true );
+    m_aDocStat = pSh->GetDoc()->getIDocumentStatistics().GetUpdatedDocStat( false, true );
     pSh->EndAction();
 
-    SetData(aDocStat);
+    SetData(m_aDocStat);
 }
 
 IMPL_LINK_NOARG(SwDocStatPage, UpdateHdl, weld::Button&, void)
 {
     Update();
     SwDocShell* pDocShell = static_cast<SwDocShell*>( SfxObjectShell::Current());
-    SwFEShell* pFEShell = pDocShell->GetFEShell();
+    SwFEShell* pFEShell = pDocShell ? pDocShell->GetFEShell() : nullptr;
     if (pFEShell)
         m_xLineNo->set_label(OUString::number(pFEShell->GetLineCount()));
 }

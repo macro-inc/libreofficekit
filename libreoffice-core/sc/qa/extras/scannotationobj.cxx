@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xchild.hxx>
 #include <test/lang/xserviceinfo.hxx>
 #include <test/sheet/xsheetannotation.hxx>
@@ -29,7 +29,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScAnnontationObj : public CalcUnoApiTest,
+class ScAnnontationObj : public UnoApiTest,
                          public apitest::XChild,
                          public apitest::XServiceInfo,
                          public apitest::XSheetAnnotation,
@@ -41,7 +41,6 @@ public:
     ScAnnontationObj();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual uno::Reference<sheet::XSheetAnnotation> getAnnotation(table::CellAddress&) override;
@@ -79,13 +78,10 @@ public:
     CPPUNIT_TEST(testGetText);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScAnnontationObj::ScAnnontationObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XServiceInfo("ScAnnotationObj", "com.sun.star.sheet.CellAnnotation")
 {
 }
@@ -124,18 +120,10 @@ uno::Reference<uno::XInterface> ScAnnontationObj::init()
 
 void ScAnnontationObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
 
     // get the test file
-    OUString aFileURL;
-    createFileURL(u"ScAnnotationObj.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL);
-}
-
-void ScAnnontationObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"ScAnnotationObj.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScAnnontationObj);

@@ -68,15 +68,15 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/string.hxx>
 #include <comphelper/types.hxx>
+#include <o3tl/safeint.hxx>
 #include <sal/macros.h>
 #include <svl/numformat.hxx>
-#include <rtl/math.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svl/zforlist.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 
-#include <utility>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -120,7 +120,7 @@ class DBConnector : public ScDPCache::DBConnector
     Date maNullDate;
 
 public:
-    DBConnector(ScDPCache& rCache, const uno::Reference<sdbc::XRowSet>& xRowSet, const Date& rNullDate);
+    DBConnector(ScDPCache& rCache, uno::Reference<sdbc::XRowSet> xRowSet, const Date& rNullDate);
 
     bool isValid() const;
 
@@ -132,8 +132,8 @@ public:
     virtual void finish() override;
 };
 
-DBConnector::DBConnector(ScDPCache& rCache, const uno::Reference<sdbc::XRowSet>& xRowSet, const Date& rNullDate) :
-    mrCache(rCache), mxRowSet(xRowSet), maNullDate(rNullDate)
+DBConnector::DBConnector(ScDPCache& rCache, uno::Reference<sdbc::XRowSet> xRowSet, const Date& rNullDate) :
+    mrCache(rCache), mxRowSet(std::move(xRowSet)), maNullDate(rNullDate)
 {
     Reference<sdbc::XResultSetMetaDataSupplier> xMetaSupp(mxRowSet, UNO_QUERY);
     if (xMetaSupp.is())
@@ -290,13 +290,13 @@ static sheet::DataPilotFieldOrientation lcl_GetDataGetOrientation( const uno::Re
 }
 
 ScDPServiceDesc::ScDPServiceDesc(
-    const OUString& rServ, const OUString& rSrc, const OUString& rNam,
-    const OUString& rUser, const OUString& rPass ) :
-    aServiceName( rServ ),
-    aParSource( rSrc ),
-    aParName( rNam ),
-    aParUser( rUser ),
-    aParPass( rPass ) {}
+    OUString aServ, OUString aSrc, OUString aNam,
+    OUString aUser, OUString aPass ) :
+    aServiceName(std::move( aServ )),
+    aParSource(std::move( aSrc )),
+    aParName(std::move( aNam )),
+    aParUser(std::move( aUser )),
+    aParPass(std::move( aPass )) {}
 
 bool ScDPServiceDesc::operator== ( const ScDPServiceDesc& rOther ) const
 {
@@ -526,7 +526,7 @@ void ScDPObject::CreateOutput()
         return;
 
     bool bFilterButton = IsSheetData() && pSaveData && pSaveData->GetFilterButton();
-    pOutput.reset( new ScDPOutput( pDoc, xSource, aOutRange.aStart, bFilterButton ) );
+    pOutput.reset( new ScDPOutput( pDoc, xSource, aOutRange.aStart, bFilterButton, pSaveData ? pSaveData->GetExpandCollapse() : false ) );
     pOutput->SetHeaderLayout ( mbHeaderLayout );
 
     sal_Int32 nOldRows = nHeaderRows;
@@ -948,7 +948,7 @@ void ScDPObject::RefreshAfterLoad()
         ++nInitial;
 
     if ( nInitial + 1 < nOutRows &&
-        pDoc->IsBlockEmpty( nTab, nFirstCol, nFirstRow + nInitial, nFirstCol, nFirstRow + nInitial ) &&
+        pDoc->IsBlockEmpty( nFirstCol, nFirstRow + nInitial, nFirstCol, nFirstRow + nInitial, nTab ) &&
         aOutRange.aEnd.Col() > nFirstCol )
     {
         nHeaderRows = nInitial;
@@ -1321,7 +1321,7 @@ class FindByName
 {
     OUString maName; // must be all uppercase.
 public:
-    explicit FindByName(const OUString& rName) : maName(rName) {}
+    explicit FindByName(OUString aName) : maName(std::move(aName)) {}
     bool operator() (const ScDPSaveDimension* pDim) const
     {
         // Layout name takes precedence.
@@ -1351,11 +1351,13 @@ public:
     {
         size_t nRank1 = mrDimOrder.size();
         size_t nRank2 = mrDimOrder.size();
-        ScDPSaveData::DimOrderType::const_iterator it1 = mrDimOrder.find(r1.FieldName);
+        ScDPSaveData::DimOrderType::const_iterator it1 = mrDimOrder.find(
+            ScGlobal::getCharClass().uppercase(r1.FieldName));
         if (it1 != mrDimOrder.end())
             nRank1 = it1->second;
 
-        ScDPSaveData::DimOrderType::const_iterator it2 = mrDimOrder.find(r2.FieldName);
+        ScDPSaveData::DimOrderType::const_iterator it2 = mrDimOrder.find(
+            ScGlobal::getCharClass().uppercase(r2.FieldName));
         if (it2 != mrDimOrder.end())
             nRank2 = it2->second;
 
@@ -1401,7 +1403,7 @@ double ScDPObject::GetPivotData(const OUString& rDataFieldName, std::vector<shee
         aFiltersRange[i] = rFilters[i];
 
     uno::Sequence<double> aRes = xDPResults->getFilteredResults(aFilters);
-    if (static_cast<sal_Int32>(nDataIndex) >= aRes.getLength())
+    if (nDataIndex >= o3tl::make_unsigned(aRes.getLength()))
         return std::numeric_limits<double>::quiet_NaN();
 
     return aRes[nDataIndex];
@@ -1456,7 +1458,7 @@ OUString ScDPObject::GetFormattedString(std::u16string_view rDimName, const doub
 
 namespace {
 
-bool dequote( const OUString& rSource, sal_Int32 nStartPos, sal_Int32& rEndPos, OUString& rResult )
+bool dequote( std::u16string_view rSource, sal_Int32 nStartPos, sal_Int32& rEndPos, OUString& rResult )
 {
     // nStartPos has to point to opening quote
 
@@ -1466,7 +1468,7 @@ bool dequote( const OUString& rSource, sal_Int32 nStartPos, sal_Int32& rEndPos, 
     {
         OUStringBuffer aBuffer;
         sal_Int32 nPos = nStartPos + 1;
-        const sal_Int32 nLen = rSource.getLength();
+        const sal_Int32 nLen = rSource.size();
 
         while ( nPos < nLen )
         {
@@ -1504,7 +1506,7 @@ struct ScGetPivotDataFunctionEntry
     sal_Int16         eFunc;
 };
 
-bool parseFunction( const OUString& rList, sal_Int32 nStartPos, sal_Int32& rEndPos, sal_Int16& rFunc )
+bool parseFunction( std::u16string_view rList, sal_Int32 nStartPos, sal_Int32& rEndPos, sal_Int16& rFunc )
 {
     static const ScGetPivotDataFunctionEntry aFunctions[] =
     {
@@ -1526,7 +1528,7 @@ bool parseFunction( const OUString& rList, sal_Int32 nStartPos, sal_Int32& rEndP
         { "StdDevp",    sheet::GeneralFunction2::STDEVP    }
     };
 
-    const sal_Int32 nListLen = rList.getLength();
+    const sal_Int32 nListLen = rList.size();
     while (nStartPos < nListLen && rList[nStartPos] == ' ')
         ++nStartPos;
 
@@ -1538,10 +1540,10 @@ bool parseFunction( const OUString& rList, sal_Int32 nStartPos, sal_Int32& rEndP
         bParsed = dequote( rList, nStartPos, nFuncEnd, aFuncStr );
     else
     {
-        nFuncEnd = rList.indexOf(']', nStartPos);
+        nFuncEnd = rList.find(']', nStartPos);
         if (nFuncEnd >= 0)
         {
-            aFuncStr = rList.copy(nStartPos, nFuncEnd - nStartPos);
+            aFuncStr = rList.substr(nStartPos, nFuncEnd - nStartPos);
             bParsed = true;
         }
     }
@@ -1568,10 +1570,10 @@ bool parseFunction( const OUString& rList, sal_Int32 nStartPos, sal_Int32& rEndP
     return bFound;
 }
 
-bool extractAtStart( const OUString& rList, sal_Int32& rMatched, bool bAllowBracket, sal_Int16* pFunc,
+bool extractAtStart( std::u16string_view rList, sal_Int32& rMatched, bool bAllowBracket, sal_Int16* pFunc,
         OUString& rDequoted )
 {
-    sal_Int32 nMatchList = 0;
+    size_t nMatchList = 0;
     sal_Unicode cFirst = rList[0];
     bool bParsed = false;
     if ( cFirst == '\'' || cFirst == '[' )
@@ -1588,7 +1590,7 @@ bool extractAtStart( const OUString& rList, sal_Int32& rMatched, bool bAllowBrac
             // skip spaces after the opening bracket
 
             sal_Int32 nStartPos = 1;
-            const sal_Int32 nListLen = rList.getLength();
+            const sal_Int32 nListLen = rList.size();
             while (nStartPos < nListLen && rList[nStartPos] == ' ')
                 ++nStartPos;
 
@@ -1619,11 +1621,11 @@ bool extractAtStart( const OUString& rList, sal_Int32& rMatched, bool bAllowBrac
             {
                 // implicit quoting to the closing bracket
 
-                sal_Int32 nClosePos = rList.indexOf(']', nStartPos);
+                sal_Int32 nClosePos = rList.find(']', nStartPos);
                 if (nClosePos >= 0)
                 {
                     sal_Int32 nNameEnd = nClosePos;
-                    sal_Int32 nSemiPos = rList.indexOf(';', nStartPos);
+                    sal_Int32 nSemiPos = rList.find(';', nStartPos);
                     if (nSemiPos >= 0 && nSemiPos < nClosePos && pFunc)
                     {
                         sal_Int32 nFuncEnd = 0;
@@ -1631,7 +1633,7 @@ bool extractAtStart( const OUString& rList, sal_Int32& rMatched, bool bAllowBrac
                             nNameEnd = nSemiPos;
                     }
 
-                    aDequoted = rList.copy(nStartPos, nNameEnd - nStartPos);
+                    aDequoted = rList.substr(nStartPos, nNameEnd - nStartPos);
                     // spaces before the closing bracket or semicolon
                     aDequoted = comphelper::string::stripEnd(aDequoted, ' ');
                     nQuoteEnd = nClosePos + 1;
@@ -1652,7 +1654,7 @@ bool extractAtStart( const OUString& rList, sal_Int32& rMatched, bool bAllowBrac
         // look for following space or end of string
 
         bool bValid = false;
-        if ( sal::static_int_cast<sal_Int32>(nMatchList) >= rList.getLength() )
+        if ( nMatchList >= rList.size() )
             bValid = true;
         else
         {
@@ -2480,6 +2482,34 @@ void ScDPObject::FillLabelData(ScPivotParam& rParam)
     }
 }
 
+void ScDPObject::GetFieldIdsNames(sheet::DataPilotFieldOrientation nOrient, std::vector<tools::Long>& rIndices,
+                                     std::vector<OUString>& rNames)
+{
+    CreateObjects();
+    if (!xSource.is())
+        return;
+
+    uno::Reference<container::XNameAccess> xDimsName = xSource->getDimensions();
+    uno::Reference<container::XIndexAccess> xDims = new ScNameToIndexAccess( xDimsName );
+    tools::Long nDimCount = xDims->getCount();
+    for (tools::Long nDim = 0; nDim < nDimCount; ++nDim)
+    {
+        uno::Reference<uno::XInterface> xIntDim(xDims->getByIndex(nDim), uno::UNO_QUERY);
+        uno::Reference<container::XNamed> xDimName(xIntDim, uno::UNO_QUERY);
+        uno::Reference<beans::XPropertySet> xDimProp(xIntDim, uno::UNO_QUERY);
+
+        sheet::DataPilotFieldOrientation nDimOrient = ScUnoHelpFunctions::GetEnumProperty(
+                            xDimProp, SC_UNO_DP_ORIENTATION,
+                            sheet::DataPilotFieldOrientation_HIDDEN );
+
+        if ( xDimProp.is() && nDimOrient == nOrient)
+        {
+            rIndices.push_back(nDim);
+            rNames.push_back(xDimName->getName());
+        }
+    }
+}
+
 bool ScDPObject::GetHierarchiesNA( sal_Int32 nDim, uno::Reference< container::XNameAccess >& xHiers )
 {
     bool bRet = false;
@@ -3168,8 +3198,8 @@ bool ScDPCollection::NameCaches::remove(const ScDPCache* p)
     return false;
 }
 
-ScDPCollection::DBType::DBType(sal_Int32 nSdbType, const OUString& rDBName, const OUString& rCommand) :
-    mnSdbType(nSdbType), maDBName(rDBName), maCommand(rCommand) {}
+ScDPCollection::DBType::DBType(sal_Int32 nSdbType, OUString aDBName, OUString aCommand) :
+    mnSdbType(nSdbType), maDBName(std::move(aDBName)), maCommand(std::move(aCommand)) {}
 
 bool ScDPCollection::DBType::less::operator() (const DBType& left, const DBType& right) const
 {

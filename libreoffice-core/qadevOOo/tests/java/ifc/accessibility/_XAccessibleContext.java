@@ -20,7 +20,6 @@ package ifc.accessibility;
 import com.sun.star.accessibility.IllegalAccessibleComponentStateException;
 import com.sun.star.accessibility.XAccessible;
 import com.sun.star.accessibility.XAccessibleContext;
-import com.sun.star.accessibility.XAccessibleStateSet;
 import com.sun.star.lang.Locale;
 
 import lib.MultiMethodTest;
@@ -49,7 +48,7 @@ import util.AccessibilityTools;
 public class _XAccessibleContext extends MultiMethodTest {
     private static final String className = "com.sun.star.accessibility.XAccessibleContext";
     public XAccessibleContext oObj = null;
-    private int childCount = 0;
+    private long childCount = 0;
     private XAccessible parent = null;
 
     // temporary while accessibility package is in com.sun.star
@@ -86,13 +85,13 @@ public class _XAccessibleContext extends MultiMethodTest {
         log.println("testing 'getAccessibleChild()'...");
 
         boolean bOK = true;
-        int counter = childCount;
+        long counter = childCount;
 
         if (childCount > 500) {
             counter = 500;
         }
 
-        for (int i = 0; i < counter; i++) {
+        for (long i = 0; i < counter; i++) {
             try {
                 XAccessible ch = oObj.getAccessibleChild(i);
                 XAccessibleContext chAC = ch.getAccessibleContext();
@@ -202,7 +201,7 @@ public class _XAccessibleContext extends MultiMethodTest {
         requiredMethod("getAccessibleParent()");
 
         boolean bOK = true;
-        int idx = oObj.getAccessibleIndexInParent();
+        long idx = oObj.getAccessibleIndexInParent();
 
         XAccessibleContext parentAC = parent.getAccessibleContext();
 
@@ -281,17 +280,15 @@ public class _XAccessibleContext extends MultiMethodTest {
      * Has <b> OK </b> status if the set is not null.
      */
     public void _getAccessibleStateSet() {
-        XAccessibleStateSet set = oObj.getAccessibleStateSet();
+        long set = oObj.getAccessibleStateSet();
         boolean res = true;
         String[] expectedStateNames = (String[]) tEnv.getObjRelation(
                                                 "expectedStateNames");
-        short[] expectedStates = (short[]) tEnv.getObjRelation(
+        long[] expectedStates = (long[]) tEnv.getObjRelation(
                                            "expectedStates");
 
         if ((expectedStateNames != null) && (expectedStates != null)) {
             res = checkStates(expectedStateNames, expectedStates, set);
-        } else {
-            res = set != null;
         }
 
         tRes.tested("getAccessibleStateSet()", res);
@@ -319,12 +316,12 @@ public class _XAccessibleContext extends MultiMethodTest {
     }
 
     protected boolean checkStates(String[] expectedStateNames,
-                                  short[] expectedStates,
-                                  XAccessibleStateSet set) {
+                                  long[] expectedStates,
+                                  long set) {
         boolean works = true;
 
         for (int k = 0; k < expectedStateNames.length; k++) {
-            boolean contains = set.contains(expectedStates[k]);
+            boolean contains = (set & expectedStates[k]) != 0;
 
             if (contains) {
                 log.println("Set contains " + expectedStateNames[k] +

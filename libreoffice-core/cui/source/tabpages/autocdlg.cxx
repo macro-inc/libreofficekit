@@ -19,6 +19,7 @@
 
 #include <i18nutil/unicode.hxx>
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/keycodes.hxx>
 #include <vcl/settings.hxx>
@@ -29,11 +30,9 @@
 #include <unotools/charclass.hxx>
 #include <unotools/collatorwrapper.hxx>
 #include <comphelper/processfactory.hxx>
-#include <comphelper/string.hxx>
 #include <vcl/svapp.hxx>
 #include <sfx2/module.hxx>
 #include <svl/eitem.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <svx/SmartTagMgr.hxx>
@@ -183,14 +182,14 @@ IMPL_LINK_NOARG(OfaAutoCorrDlg, SelectLanguageHdl, weld::ComboBox&, void)
 
 OfaAutocorrOptionsPage::OfaAutocorrOptionsPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet)
     : SfxTabPage(pPage, pController, "cui/ui/acoroptionspage.ui", "AutocorrectOptionsPage", &rSet)
-    , m_sInput(CuiResId(RID_SVXSTR_USE_REPLACE))
-    , m_sDoubleCaps(CuiResId(RID_SVXSTR_CPTL_STT_WORD))
-    , m_sStartCap(CuiResId(RID_SVXSTR_CPTL_STT_SENT))
-    , m_sBoldUnderline(CuiResId(RID_SVXSTR_BOLD_UNDER))
-    , m_sURL(CuiResId(RID_SVXSTR_DETECT_URL))
-    , m_sNoDblSpaces(CuiResId(RID_SVXSTR_NO_DBL_SPACES))
-    , m_sDash(CuiResId(RID_SVXSTR_DASH))
-    , m_sAccidentalCaps(CuiResId(RID_SVXSTR_CORRECT_ACCIDENTAL_CAPS_LOCK))
+    , m_sInput(CuiResId(RID_CUISTR_USE_REPLACE))
+    , m_sDoubleCaps(CuiResId(RID_CUISTR_CPTL_STT_WORD))
+    , m_sStartCap(CuiResId(RID_CUISTR_CPTL_STT_SENT))
+    , m_sBoldUnderline(CuiResId(RID_CUISTR_BOLD_UNDER))
+    , m_sURL(CuiResId(RID_CUISTR_DETECT_URL))
+    , m_sNoDblSpaces(CuiResId(RID_CUISTR_NO_DBL_SPACES))
+    , m_sDash(CuiResId(RID_CUISTR_DASH))
+    , m_sAccidentalCaps(CuiResId(RID_CUISTR_CORRECT_ACCIDENTAL_CAPS_LOCK))
     , m_xCheckLB(m_xBuilder->weld_tree_view("checklist"))
 {
     m_xCheckLB->enable_toggle_buttons(weld::ColumnToggleType::Check);
@@ -352,31 +351,30 @@ enum OfaAutoFmtOptions
 OfaSwAutoFmtOptionsPage::OfaSwAutoFmtOptionsPage(weld::Container* pPage, weld::DialogController* pController,
                                                  const SfxItemSet& rSet )
     : SfxTabPage(pPage, pController, "cui/ui/applyautofmtpage.ui", "ApplyAutoFmtPage", &rSet)
-    , sDeleteEmptyPara(CuiResId(RID_SVXSTR_DEL_EMPTY_PARA))
-    , sUseReplaceTbl(CuiResId(RID_SVXSTR_USE_REPLACE))
-    , sCapitalStartWord(CuiResId(RID_SVXSTR_CPTL_STT_WORD))
-    , sCapitalStartSentence(CuiResId(RID_SVXSTR_CPTL_STT_SENT))
-    , sUserStyle(CuiResId(RID_SVXSTR_USER_STYLE))
-    , sBullet(CuiResId(RID_SVXSTR_BULLET))
-    , sBoldUnder(CuiResId(RID_SVXSTR_BOLD_UNDER))
-    , sNoDblSpaces(CuiResId(RID_SVXSTR_NO_DBL_SPACES))
-    , sCorrectCapsLock(CuiResId(RID_SVXSTR_CORRECT_ACCIDENTAL_CAPS_LOCK))
-    , sDetectURL(CuiResId(RID_SVXSTR_DETECT_URL))
-    , sDash(CuiResId(RID_SVXSTR_DASH))
-    , sRightMargin(CuiResId(RID_SVXSTR_RIGHT_MARGIN))
-    , sNum(CuiResId(RID_SVXSTR_NUM))
-    , sBorder(CuiResId(RID_SVXSTR_BORDER))
-    , sTable(CuiResId(RID_SVXSTR_CREATE_TABLE))
-    , sReplaceTemplates(CuiResId(RID_SVXSTR_REPLACE_TEMPLATES))
-    , sDelSpaceAtSttEnd(CuiResId(RID_SVXSTR_DEL_SPACES_AT_STT_END))
-    , sDelSpaceBetweenLines(CuiResId(RID_SVXSTR_DEL_SPACES_BETWEEN_LINES))
+    , sDeleteEmptyPara(CuiResId(RID_CUISTR_DEL_EMPTY_PARA))
+    , sUseReplaceTbl(CuiResId(RID_CUISTR_USE_REPLACE))
+    , sCapitalStartWord(CuiResId(RID_CUISTR_CPTL_STT_WORD))
+    , sCapitalStartSentence(CuiResId(RID_CUISTR_CPTL_STT_SENT))
+    , sUserStyle(CuiResId(RID_CUISTR_USER_STYLE))
+    , sBullet(CuiResId(RID_CUISTR_BULLET))
+    , sBoldUnder(CuiResId(RID_CUISTR_BOLD_UNDER))
+    , sNoDblSpaces(CuiResId(RID_CUISTR_NO_DBL_SPACES))
+    , sCorrectCapsLock(CuiResId(RID_CUISTR_CORRECT_ACCIDENTAL_CAPS_LOCK))
+    , sDetectURL(CuiResId(RID_CUISTR_DETECT_URL))
+    , sDash(CuiResId(RID_CUISTR_DASH))
+    , sRightMargin(CuiResId(RID_CUISTR_RIGHT_MARGIN))
+    , sNum(CuiResId(RID_CUISTR_NUM))
+    , sBorder(CuiResId(RID_CUISTR_BORDER))
+    , sTable(CuiResId(RID_CUISTR_CREATE_TABLE))
+    , sReplaceTemplates(CuiResId(RID_CUISTR_REPLACE_TEMPLATES))
+    , sDelSpaceAtSttEnd(CuiResId(RID_CUISTR_DEL_SPACES_AT_STT_END))
+    , sDelSpaceBetweenLines(CuiResId(RID_CUISTR_DEL_SPACES_BETWEEN_LINES))
     , nPercent(50)
     , m_xCheckLB(m_xBuilder->weld_tree_view("list"))
     , m_xEditPB(m_xBuilder->weld_button("edit"))
 {
     m_xCheckLB->connect_changed(LINK(this, OfaSwAutoFmtOptionsPage, SelectHdl));
     m_xCheckLB->connect_row_activated(LINK(this, OfaSwAutoFmtOptionsPage, DoubleClickEditHdl));
-    m_xCheckLB->enable_toggle_buttons(weld::ColumnToggleType::Check);
 
     std::vector<int> aWidths
     {
@@ -401,9 +399,9 @@ void OfaSwAutoFmtOptionsPage::CreateEntry(const OUString& rTxt, sal_uInt16 nCol)
 
 OfaSwAutoFmtOptionsPage::~OfaSwAutoFmtOptionsPage()
 {
-    delete reinterpret_cast<ImpUserData*>(m_xCheckLB->get_id(REPLACE_BULLETS).toInt64());
-    delete reinterpret_cast<ImpUserData*>(m_xCheckLB->get_id(APPLY_NUMBERING).toInt64());
-    delete reinterpret_cast<ImpUserData*>(m_xCheckLB->get_id(MERGE_SINGLE_LINE_PARA).toInt64());
+    delete weld::fromId<ImpUserData*>(m_xCheckLB->get_id(REPLACE_BULLETS));
+    delete weld::fromId<ImpUserData*>(m_xCheckLB->get_id(APPLY_NUMBERING));
+    delete weld::fromId<ImpUserData*>(m_xCheckLB->get_id(MERGE_SINGLE_LINE_PARA));
 }
 
 std::unique_ptr<SfxTabPage> OfaSwAutoFmtOptionsPage::Create(weld::Container* pPage, weld::DialogController* pController,
@@ -601,15 +599,15 @@ void OfaSwAutoFmtOptionsPage::Reset( const SfxItemSet* )
     m_xCheckLB->set_toggle(MERGE_SINGLE_LINE_PARA, pOpt->bRightMargin ? TRISTATE_TRUE : TRISTATE_FALSE, CBCOL_FIRST);
 
     ImpUserData* pUserData = new ImpUserData(&sBulletChar, &aBulletFont);
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pUserData)));
+    OUString sId(weld::toId(pUserData));
     m_xCheckLB->set_id(REPLACE_BULLETS, sId);
 
     pUserData = new ImpUserData(&sMargin, nullptr);
-    sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData));
+    sId = weld::toId(pUserData);
     m_xCheckLB->set_id(MERGE_SINGLE_LINE_PARA, sId);
 
     ImpUserData* pUserData2 = new ImpUserData(&sByInputBulletChar, &aByInputBulletFont);
-    sId = OUString::number(reinterpret_cast<sal_Int64>(pUserData2));
+    sId = weld::toId(pUserData2);
     m_xCheckLB->set_id(APPLY_NUMBERING, sId);
 
     m_xCheckLB->thaw();
@@ -632,7 +630,7 @@ IMPL_LINK_NOARG(OfaSwAutoFmtOptionsPage, EditHdl, weld::Button&, void)
     if (nSelEntryPos == REPLACE_BULLETS || nSelEntryPos == APPLY_NUMBERING)
     {
         SvxCharacterMap aMapDlg(GetFrameWeld(), nullptr, nullptr);
-        ImpUserData* pUserData = reinterpret_cast<ImpUserData*>(m_xCheckLB->get_id(nSelEntryPos).toInt64());
+        ImpUserData* pUserData = weld::fromId<ImpUserData*>(m_xCheckLB->get_id(nSelEntryPos));
         aMapDlg.SetCharFont(*pUserData->pFont);
         aMapDlg.SetChar( (*pUserData->pString)[0] );
         if (RET_OK == aMapDlg.run())
@@ -700,7 +698,7 @@ OfaAutocorrReplacePage::OfaAutocorrReplacePage(weld::Container* pPage, weld::Dia
     LanguageTag aLanguageTag( eLastDialogLanguage );
     pCompareClass.reset( new CollatorWrapper( comphelper::getProcessComponentContext() ) );
     pCompareClass->loadDefaultCollator( aLanguageTag.getLocale(), 0 );
-    pCharClass.reset( new CharClass( aLanguageTag ) );
+    pCharClass.reset( new CharClass( std::move(aLanguageTag) ) );
 
     auto nColWidth = m_xReplaceTLB->get_approximate_digit_width() * 32;
     m_aReplaceFixedWidths.push_back(nColWidth);
@@ -770,7 +768,8 @@ bool OfaAutocorrReplacePage::FillItemSet( SfxItemSet* )
             bool bKeepSourceFormatting = newEntry.pUserData == &bHasSelectionText;
             if (bKeepSourceFormatting)
             {
-                pAutoCorrect->PutText(newEntry.sShort, *SfxObjectShell::Current(), eCurrentLang);
+                if (SfxObjectShell* pSh = SfxObjectShell::Current())
+                    pAutoCorrect->PutText(newEntry.sShort, *pSh, eCurrentLang);
                 continue;
             }
 
@@ -810,7 +809,7 @@ void OfaAutocorrReplacePage::RefillReplaceBox(bool bFromReset,
             pArray->push_back(DoubleString(m_xReplaceTLB->get_text(rIter, 0),
                                            m_xReplaceTLB->get_text(rIter, 1)));
             DoubleString& rDouble = pArray->back();
-            rDouble.pUserData = reinterpret_cast<void*>(m_xReplaceTLB->get_id(rIter).toInt64());
+            rDouble.pUserData = weld::fromId<void*>(m_xReplaceTLB->get_id(rIter));
             return false;
         });
     }
@@ -831,7 +830,7 @@ void OfaAutocorrReplacePage::RefillReplaceBox(bool bFromReset,
                 if (!bTextOnly)
                 {
                     // that means: with format info or even with selection text
-                    OUString sId = OUString::number(reinterpret_cast<sal_Int64>(rDouble.pUserData));
+                    OUString sId = weld::toId(rDouble.pUserData);
                     m_xReplaceTLB->set_id(rIter, sId);
                 }
                 m_xReplaceTLB->set_text(rIter, rDouble.sShort, 0);
@@ -857,7 +856,7 @@ void OfaAutocorrReplacePage::RefillReplaceBox(bool bFromReset,
                 if (!bTextOnly)
                 {
                     // that means: with format info or even with selection text
-                    OUString sId = OUString::number(reinterpret_cast<sal_Int64>(m_xTextOnlyCB.get()));
+                    OUString sId = weld::toId(m_xTextOnlyCB.get());
                     m_xReplaceTLB->set_id(rIter, sId);
                 }
                 m_xReplaceTLB->set_text(rIter, elem.GetShort(), 0);
@@ -905,7 +904,7 @@ void OfaAutocorrReplacePage::SetLanguage(LanguageType eSet)
         LanguageTag aLanguageTag( eLastDialogLanguage );
         pCompareClass.reset( new CollatorWrapper( comphelper::getProcessComponentContext() ) );
         pCompareClass->loadDefaultCollator( aLanguageTag.getLocale(), 0 );
-        pCharClass.reset( new CharClass( aLanguageTag ) );
+        pCharClass.reset( new CharClass( std::move(aLanguageTag) ) );
         ModifyHdl(*m_xShortED);
     }
 }
@@ -1065,7 +1064,7 @@ bool OfaAutocorrReplacePage::NewDelHdl(const weld::Widget* pBtn)
             OUString sId;
             if (bKeepSourceFormatting)
             {
-                sId = OUString::number(reinterpret_cast<sal_Int64>(&bHasSelectionText)); // new formatted text
+                sId = weld::toId(&bHasSelectionText); // new formatted text
             }
 
             m_xReplaceTLB->insert(nPos, sEntry, &sId, nullptr, nullptr);
@@ -1551,10 +1550,10 @@ void OfaQuoteTabPage::CreateEntry(weld::TreeView& rCheckLB, const OUString& rTxt
 
 OfaQuoteTabPage::OfaQuoteTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet)
     : SfxTabPage(pPage, pController, "cui/ui/applylocalizedpage.ui", "ApplyLocalizedPage", &rSet)
-    , sNonBrkSpace(CuiResId(RID_SVXSTR_NON_BREAK_SPACE))
-    , sOrdinal(CuiResId(RID_SVXSTR_ORDINAL))
-    , sTransliterateRTL(CuiResId(RID_SVXSTR_OLD_HUNGARIAN))
-    , sAngleQuotes(CuiResId(RID_SVXSTR_ANGLE_QUOTES))
+    , sNonBrkSpace(CuiResId(RID_CUISTR_NON_BREAK_SPACE))
+    , sOrdinal(CuiResId(RID_CUISTR_ORDINAL))
+    , sTransliterateRTL(CuiResId(RID_CUISTR_OLD_HUNGARIAN))
+    , sAngleQuotes(CuiResId(RID_CUISTR_ANGLE_QUOTES))
     , cSglStartQuote(0)
     , cSglEndQuote(0)
     , cStartQuote(0)
@@ -1586,7 +1585,6 @@ OfaQuoteTabPage::OfaQuoteTabPage(weld::Container* pPage, weld::DialogController*
 
     if ( bShowSWOptions )
     {
-        m_xSwCheckLB->enable_toggle_buttons(weld::ColumnToggleType::Check);
         std::vector<int> aWidths
         {
             o3tl::narrowing<int>(m_xSwCheckLB->get_pixel_size(m_xSwCheckLB->get_column_title(0)).Width() * 2),
@@ -1795,7 +1793,7 @@ IMPL_LINK(OfaQuoteTabPage, QuoteHdl, weld::Button&, rBtn, void)
     SvxCharacterMap aMap(GetFrameWeld(), nullptr, nullptr);
     aMap.SetCharFont( OutputDevice::GetDefaultFont(DefaultFontType::LATIN_TEXT,
                         LANGUAGE_ENGLISH_US, GetDefaultFontFlags::OnlyOne ));
-    aMap.set_title(nMode < SGL_END ? CuiResId(RID_SVXSTR_STARTQUOTE)  : CuiResId(RID_SVXSTR_ENDQUOTE));
+    aMap.set_title(nMode < SGL_END ? CuiResId(RID_CUISTR_STARTQUOTE)  : CuiResId(RID_CUISTR_ENDQUOTE));
     sal_UCS4 cDlg;
     SvxAutoCorrect* pAutoCorrect = SvxAutoCorrCfg::Get().GetAutoCorrect();
     LanguageType eLang = Application::GetSettings().GetLanguageTag().getLanguageType();
@@ -2053,7 +2051,7 @@ void OfaAutoCompleteTabPage::Reset( const SfxItemSet*  )
         {
             const OUString* pStr =
                 &(*m_pAutoCompleteList)[n]->GetAutoCompleteString();
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pStr)));
+            OUString sId(weld::toId(pStr));
             m_xLBEntries->append(sId, *pStr);
         }
     }
@@ -2079,7 +2077,7 @@ IMPL_LINK_NOARG(OfaAutoCompleteTabPage, DeleteHdl, weld::Button&, void)
     while (!rows.empty())
     {
         sal_Int32 nPos = rows.back();
-        OUString* pStr = reinterpret_cast<OUString*>(m_xLBEntries->get_id(nPos).toInt64());
+        OUString* pStr = weld::fromId<OUString*>(m_xLBEntries->get_id(nPos));
         m_xLBEntries->remove(nPos);
         editeng::IAutoCompleteString hack(*pStr); // UGLY
         m_pAutoCompleteList->erase(&hack);
@@ -2186,11 +2184,11 @@ struct ImplSmartTagLBUserData
     uno::Reference< smarttags::XSmartTagRecognizer > mxRec;
     sal_Int32 mnSmartTagIdx;
 
-    ImplSmartTagLBUserData( const OUString& rSmartTagType,
-                            uno::Reference< smarttags::XSmartTagRecognizer > const & xRec,
+    ImplSmartTagLBUserData( OUString aSmartTagType,
+                            uno::Reference< smarttags::XSmartTagRecognizer >  xRec,
                             sal_Int32 nSmartTagIdx ) :
-        maSmartTagType( rSmartTagType ),
-        mxRec( xRec ),
+        maSmartTagType(std::move( aSmartTagType )),
+        mxRec(std::move( xRec )),
         mnSmartTagIdx( nSmartTagIdx ) {}
 };
 
@@ -2203,7 +2201,7 @@ void OfaSmartTagOptionsTabPage::ClearListBox()
     const int nCount = m_xSmartTagTypesLB->n_children();
     for (int i = 0; i < nCount; ++i)
     {
-        const ImplSmartTagLBUserData* pUserData = reinterpret_cast<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(i).toInt64());
+        const ImplSmartTagLBUserData* pUserData = weld::fromId<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(i));
         delete pUserData;
     }
 
@@ -2243,7 +2241,7 @@ void OfaSmartTagOptionsTabPage::FillListBox( const SmartTagMgr& rSmartTagMgr )
             const bool bCheck = rSmartTagMgr.IsSmartTagTypeEnabled( aSmartTagType );
             m_xSmartTagTypesLB->set_toggle(nRow, bCheck ? TRISTATE_TRUE : TRISTATE_FALSE);
             m_xSmartTagTypesLB->set_text(nRow, aLBEntry, 0);
-            m_xSmartTagTypesLB->set_id(nRow, OUString::number(reinterpret_cast<sal_Int64>(new ImplSmartTagLBUserData(aSmartTagType, xRec, j))));
+            m_xSmartTagTypesLB->set_id(nRow, weld::toId(new ImplSmartTagLBUserData(aSmartTagType, xRec, j)));
         }
     }
 }
@@ -2253,7 +2251,7 @@ void OfaSmartTagOptionsTabPage::FillListBox( const SmartTagMgr& rSmartTagMgr )
 IMPL_LINK_NOARG(OfaSmartTagOptionsTabPage, ClickHdl, weld::Button&, void)
 {
     const int nPos = m_xSmartTagTypesLB->get_selected_index();
-    const ImplSmartTagLBUserData* pUserData = reinterpret_cast<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(nPos).toInt64());
+    const ImplSmartTagLBUserData* pUserData = weld::fromId<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(nPos));
     uno::Reference< smarttags::XSmartTagRecognizer > xRec = pUserData->mxRec;
     const sal_Int32 nSmartTagIdx = pUserData->mnSmartTagIdx;
 
@@ -2285,7 +2283,7 @@ IMPL_LINK_NOARG(OfaSmartTagOptionsTabPage, SelectHdl, weld::TreeView&, void)
     const int nPos = m_xSmartTagTypesLB->get_selected_index();
     if (nPos == -1)
         return;
-    const ImplSmartTagLBUserData* pUserData = reinterpret_cast<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(nPos).toInt64());
+    const ImplSmartTagLBUserData* pUserData = weld::fromId<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(nPos));
     uno::Reference< smarttags::XSmartTagRecognizer > xRec = pUserData->mxRec;
     const sal_Int32 nSmartTagIdx = pUserData->mnSmartTagIdx;
 
@@ -2315,7 +2313,7 @@ bool OfaSmartTagOptionsTabPage::FillItemSet( SfxItemSet* )
 
     for (int i = 0; i < nCount; ++i)
     {
-        const ImplSmartTagLBUserData* pUserData = reinterpret_cast<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(i).toInt64());
+        const ImplSmartTagLBUserData* pUserData = weld::fromId<ImplSmartTagLBUserData*>(m_xSmartTagTypesLB->get_id(i));
         const bool bChecked = m_xSmartTagTypesLB->get_toggle(i) == TRISTATE_TRUE;
         const bool bIsCurrentlyEnabled = pSmartTagMgr->IsSmartTagTypeEnabled( pUserData->maSmartTagType );
 

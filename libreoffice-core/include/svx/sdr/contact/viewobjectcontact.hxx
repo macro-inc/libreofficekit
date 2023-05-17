@@ -59,6 +59,9 @@ private:
     // possible on-demand calculated GridOffset for non-linear ViewToDevice transformation (calc)
     basegfx::B2DVector                              maGridOffset;
 
+    // used to detect ActionChanged() during primitive construction
+    int                                             mnActionChangedCount;
+
     // This bool gets set when the object gets invalidated by ActionChanged() and
     // can be used from the OC to late-invalidates
     bool                                            mbLazyInvalidate : 1;
@@ -76,7 +79,7 @@ protected:
     // from the ViewContact using ViewContact::getViewIndependentPrimitive2DContainer(), takes care of
     // visibility, handles glue and ghosted.
     // This method will not handle included hierarchies and not check geometric visibility.
-    virtual drawinglayer::primitive2d::Primitive2DContainer createPrimitive2DSequence(const DisplayInfo& rDisplayInfo) const;
+    virtual void createPrimitive2DSequence(const DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const;
 
     // method for flushing Primitive2DContainer for VOC implementations
     void flushPrimitive2DSequence() { mxPrimitive2DSequence.clear(); }
@@ -124,7 +127,7 @@ public:
     virtual void getPrimitive2DSequenceHierarchy(DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const;
 
     // just process the sub-hierarchy, used as tooling from getPrimitive2DSequenceHierarchy
-    drawinglayer::primitive2d::Primitive2DContainer getPrimitive2DSequenceSubHierarchy(DisplayInfo& rDisplayInfo) const;
+    void getPrimitive2DSequenceSubHierarchy(DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const;
 
     // interface to support GridOffset for non-linear ViewToDevice transformation (calc)
     const basegfx::B2DVector& getGridOffset() const;

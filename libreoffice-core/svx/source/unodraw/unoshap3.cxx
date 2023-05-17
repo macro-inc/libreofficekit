@@ -63,7 +63,7 @@ using namespace ::com::sun::star::container;
         aAny <<= Reference< xint >(this)
 
 Svx3DSceneObject::Svx3DSceneObject(SdrObject* pObj, SvxDrawPage* pDrawPage)
-:   SvxShape( pObj, getSvxMapProvider().GetMap(SVXMAP_3DSCENEOBJECT), getSvxMapProvider().GetPropertySet(SVXMAP_3DSCENEOBJECT, SdrObject::GetGlobalDrawObjectItemPool()) )
+:   SvxShapeGroupAnyD( pObj, getSvxMapProvider().GetMap(SVXMAP_3DSCENEOBJECT), getSvxMapProvider().GetPropertySet(SVXMAP_3DSCENEOBJECT, SdrObject::GetGlobalDrawObjectItemPool()) )
 ,   mxPage( pDrawPage )
 {
 }
@@ -116,21 +116,42 @@ void SAL_CALL Svx3DSceneObject::add( const Reference< drawing::XShape >& xShape 
     if(!HasSdrObject() || !mxPage.is() || pShape == nullptr || nullptr != pShape->GetSdrObject() )
         throw uno::RuntimeException();
 
-    SdrObject* pSdrShape = mxPage->CreateSdrObject_( xShape );
-    if( dynamic_cast<const E3dObject* >(pSdrShape) !=  nullptr )
+    rtl::Reference<SdrObject> pSdrShape = mxPage->CreateSdrObject_( xShape );
+    if( DynCastE3dObject(pSdrShape.get()) )
     {
-        GetSdrObject()->GetSubList()->NbcInsertObject( pSdrShape );
-        pShape->Create(pSdrShape, mxPage.get());
+        GetSdrObject()->GetSubList()->NbcInsertObject( pSdrShape.get() );
+        pShape->Create(pSdrShape.get(), mxPage.get());
     }
     else
     {
-        SdrObject::Free( pSdrShape );
+        pSdrShape.clear();
         throw uno::RuntimeException();
     }
 
     GetSdrObject()->getSdrModelFromSdrObject().SetChanged();
 }
 
+void Svx3DSceneObject::addShape( SvxShape& rShape )
+{
+    SolarMutexGuard aGuard;
+
+    if(!HasSdrObject() || !mxPage.is() || nullptr != rShape.GetSdrObject() )
+        throw uno::RuntimeException();
+
+    rtl::Reference<SdrObject> pSdrShape = mxPage->CreateSdrObject_( &rShape );
+    if( DynCastE3dObject(pSdrShape.get()) )
+    {
+        GetSdrObject()->GetSubList()->NbcInsertObject( pSdrShape.get() );
+        rShape.Create(pSdrShape.get(), mxPage.get());
+    }
+    else
+    {
+        pSdrShape.clear();
+        throw uno::RuntimeException();
+    }
+
+    GetSdrObject()->getSdrModelFromSdrObject().SetChanged();
+}
 
 void SAL_CALL Svx3DSceneObject::remove( const Reference< drawing::XShape >& xShape )
 {
@@ -155,8 +176,7 @@ void SAL_CALL Svx3DSceneObject::remove( const Reference< drawing::XShape >& xSha
 
     if( nObjNum < nObjCount )
     {
-        SdrObject* pObject = rList.NbcRemoveObject( nObjNum );
-        SdrObject::Free( pObject );
+        rList.NbcRemoveObject( nObjNum );
     }
     else
     {
@@ -171,7 +191,7 @@ sal_Int32 SAL_CALL Svx3DSceneObject::getCount()
 
     sal_Int32 nRetval = 0;
 
-    if(HasSdrObject() && dynamic_cast<const E3dScene* >(GetSdrObject()) != nullptr && GetSdrObject()->GetSubList())
+    if(HasSdrObject() && DynCastE3dScene(GetSdrObject()) && GetSdrObject()->GetSubList())
         nRetval = GetSdrObject()->GetSubList()->GetObjCount();
     return nRetval;
 }

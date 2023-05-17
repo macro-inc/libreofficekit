@@ -19,7 +19,7 @@
 
 
 #include <osl/diagnose.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <cppcanvas/basegfxfactory.hxx>
 
 #include <basegfx/matrix/b2dhommatrix.hxx>
@@ -48,9 +48,9 @@
 #include "targetpropertiescreator.hxx"
 #include <tools.hxx>
 #include <box2dtools.hxx>
+#include <utility>
 #include <vcl/graphicfilter.hxx>
 #include <svx/svdograf.hxx>
-#include <svx/unoshape.hxx>
 
 using namespace ::com::sun::star;
 
@@ -67,8 +67,8 @@ class SlideImpl : public Slide,
 {
 public:
     SlideImpl( const uno::Reference<drawing::XDrawPage>&         xDrawPage,
-               const uno::Reference<drawing::XDrawPagesSupplier>&    xDrawPages,
-               const uno::Reference<animations::XAnimationNode>& xRootNode,
+               uno::Reference<drawing::XDrawPagesSupplier>       xDrawPages,
+               uno::Reference<animations::XAnimationNode>        xRootNode,
                EventQueue&                                       rEventQueue,
                EventMultiplexer&                                 rEventMultiplexer,
                ScreenUpdater&                                    rScreenUpdater,
@@ -288,8 +288,8 @@ void slideRenderer( SlideImpl const * pSlide, const UnoViewSharedPtr& rView )
 
 
 SlideImpl::SlideImpl( const uno::Reference< drawing::XDrawPage >&           xDrawPage,
-                      const uno::Reference<drawing::XDrawPagesSupplier>&    xDrawPages,
-                      const uno::Reference< animations::XAnimationNode >&   xRootNode,
+                      uno::Reference<drawing::XDrawPagesSupplier>           xDrawPages,
+                      uno::Reference< animations::XAnimationNode >          xRootNode,
                       EventQueue&                                           rEventQueue,
                       EventMultiplexer&                                     rEventMultiplexer,
                       ScreenUpdater&                                        rScreenUpdater,
@@ -308,8 +308,8 @@ SlideImpl::SlideImpl( const uno::Reference< drawing::XDrawPage >&           xDra
                       bool                                                  bIntrinsicAnimationsAllowed,
                       bool                                                  bDisableAnimationZOrder ) :
     mxDrawPage( xDrawPage ),
-    mxDrawPagesSupplier( xDrawPages ),
-    mxRootNode( xRootNode ),
+    mxDrawPagesSupplier(std::move( xDrawPages )),
+    mxRootNode(std::move( xRootNode )),
     mpLayerManager( std::make_shared<LayerManager>(
                         rViewContainer,
                         bDisableAnimationZOrder) ),
@@ -322,7 +322,7 @@ SlideImpl::SlideImpl( const uno::Reference< drawing::XDrawPage >&           xDra
                         xDrawPage)),
     mpSubsettableShapeManager( mpShapeManager ),
     mpBox2DWorld( std::make_shared<box2d::utils::box2DWorld>(
-                        basegfx::B2DSize( getSlideSizeImpl() ) ) ),
+                        basegfx::B2DVector( getSlideSizeImpl() ) ) ),
     maContext( mpSubsettableShapeManager,
                rEventQueue,
                rEventMultiplexer,
@@ -336,7 +336,7 @@ SlideImpl::SlideImpl( const uno::Reference< drawing::XDrawPage >&           xDra
                mpBox2DWorld ),
     mrCursorManager( rCursorManager ),
     maAnimations( maContext,
-                  basegfx::B2DSize( getSlideSizeImpl() ) ),
+                  basegfx::B2DVector( getSlideSizeImpl() ) ),
     maPolygons(std::move(rPolyPolygonVector)),
     maUserPaintColor(aUserPaintColor),
     mdUserPaintStrokeWidth(dUserPaintStrokeWidth),
@@ -570,7 +570,7 @@ SlideBitmapSharedPtr SlideImpl::getCurrentSlideBitmap( const UnoViewSharedPtr& r
 
     SlideBitmapSharedPtr&     rBitmap( aIter->second.at( meAnimationState ));
     const ::basegfx::B2ISize& rSlideSize(
-        getSlideSizePixel( ::basegfx::B2DSize( getSlideSize() ),
+        getSlideSizePixel( ::basegfx::B2DVector( getSlideSize() ),
                            rView ));
 
     // is the bitmap valid (actually existent, and of correct
@@ -920,7 +920,7 @@ void SlideImpl::applyShapeAttributes(
                     extractValue( bVisible,
                                   rShapeProp.Value,
                                   pShape,
-                                  ::basegfx::B2DSize( getSlideSize() ) ))
+                                  basegfx::B2DVector(getSlideSize()) ))
                 {
                     pAttrShape->setVisibility( bVisible );
                 }

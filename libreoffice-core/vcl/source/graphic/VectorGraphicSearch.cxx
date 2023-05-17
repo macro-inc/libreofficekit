@@ -8,6 +8,7 @@
  *
  */
 
+#include <utility>
 #include <vcl/VectorGraphicSearch.hxx>
 
 #include <vcl/filter/PDFiumLibrary.hxx>
@@ -55,8 +56,8 @@ public:
             return aSize;
 
         basegfx::B2DSize aPDFSize = mpPdfDocument->getPageSize(mnPageIndex);
-        aSize = basegfx::B2DSize(convertPointToMm100(aPDFSize.getX()),
-                                 convertPointToMm100(aPDFSize.getY()));
+        aSize = basegfx::B2DSize(convertPointToMm100(aPDFSize.getWidth()),
+                                 convertPointToMm100(aPDFSize.getHeight()));
         return aSize;
     }
 
@@ -158,7 +159,7 @@ public:
         if (nSize <= 0)
             return aRectangles;
 
-        double fPageHeight = getPageSize().getY();
+        double fPageHeight = getPageSize().getHeight();
 
         for (int nCount = 0; nCount < nSize; nCount++)
         {
@@ -191,9 +192,9 @@ public:
     ~Implementation() { mpSearchContext.reset(); }
 };
 
-VectorGraphicSearch::VectorGraphicSearch(Graphic const& rGraphic)
+VectorGraphicSearch::VectorGraphicSearch(Graphic aGraphic)
     : mpImplementation(std::make_unique<VectorGraphicSearch::Implementation>())
-    , maGraphic(rGraphic)
+    , maGraphic(std::move(aGraphic))
 {
 }
 

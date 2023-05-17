@@ -24,9 +24,9 @@
 #include <com/sun/star/io/IOException.hpp>
 
 #include <osl/diagnose.h>
-#include <osl/mutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <rtl/ref.hxx>
+#include <utility>
 
 using namespace ::osl;
 using namespace ::cppu;
@@ -44,7 +44,7 @@ namespace io_acceptor
         public WeakImplHelper< XConnection >
     {
     public:
-        explicit PipeConnection( const OUString &sConnectionDescription);
+        explicit PipeConnection( OUString sConnectionDescription);
 
         virtual sal_Int32 SAL_CALL read( Sequence< sal_Int8 >& aReadBytes, sal_Int32 nBytesToRead ) override;
         virtual void SAL_CALL write( const Sequence< sal_Int8 >& aData ) override;
@@ -59,9 +59,9 @@ namespace io_acceptor
 
     }
 
-    PipeConnection::PipeConnection( const OUString &sConnectionDescription) :
+    PipeConnection::PipeConnection( OUString sConnectionDescription) :
         m_nStatus( 0 ),
-        m_sDescription( sConnectionDescription )
+        m_sDescription(std::move( sConnectionDescription ))
     {
         // make it unique
         m_sDescription += ",uniqueValue=";
@@ -122,9 +122,9 @@ namespace io_acceptor
     /***************
      * PipeAcceptor
      **************/
-    PipeAcceptor::PipeAcceptor( const OUString &sPipeName , const OUString & sConnectionDescription) :
-        m_sPipeName( sPipeName ),
-        m_sConnectionDescription( sConnectionDescription ),
+    PipeAcceptor::PipeAcceptor( OUString sPipeName , OUString sConnectionDescription) :
+        m_sPipeName(std::move( sPipeName )),
+        m_sConnectionDescription(std::move( sConnectionDescription )),
         m_bClosed( false )
     {
     }
@@ -144,7 +144,7 @@ namespace io_acceptor
     {
         Pipe pipe;
         {
-            MutexGuard guard( m_mutex );
+            std::unique_lock guard( m_mutex );
             pipe = m_pipe;
         }
         if( ! pipe.is() )
@@ -177,7 +177,7 @@ namespace io_acceptor
         m_bClosed = true;
         Pipe pipe;
         {
-            MutexGuard guard( m_mutex );
+            std::unique_lock guard( m_mutex );
             pipe = m_pipe;
             m_pipe.clear();
         }

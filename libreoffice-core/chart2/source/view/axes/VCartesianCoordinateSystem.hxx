@@ -27,16 +27,16 @@ class VCartesianCoordinateSystem : public VCoordinateSystem
 {
 public:
     VCartesianCoordinateSystem() = delete;
-    explicit VCartesianCoordinateSystem( const css::uno::Reference< css::chart2::XCoordinateSystem >& xCooSys );
+    explicit VCartesianCoordinateSystem( const rtl::Reference< ::chart::BaseCoordinateSystem >& xCooSys );
     virtual ~VCartesianCoordinateSystem() override;
 
     virtual void createVAxisList(
-            const css::uno::Reference< css::chart2::XChartDocument> &ChartDoc
-            , const css::awt::Size& rFontReferenceSize
-            , const css::awt::Rectangle& rMaximumSpaceForLabels
-            , bool bLimitSpaceForLabels
-            , std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList
-            , css::uno::Reference<css::uno::XComponentContext> const& rComponentContext) override;
+            const rtl::Reference<::chart::ChartModel> &ChartDoc,
+            const css::awt::Size& rFontReferenceSize,
+            const css::awt::Rectangle& rMaximumSpaceForLabels,
+            bool bLimitSpaceForLabels,
+            std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList,
+            css::uno::Reference<css::uno::XComponentContext> const& rComponentContext) override;
 
     virtual void initVAxisInList() override;
     virtual void updateScalesAndIncrementsOnAxes() override;

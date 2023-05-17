@@ -19,7 +19,9 @@
 
 #include <hintids.hxx>
 #include <comphelper/lok.hxx>
+#include <osl/diagnose.h>
 #include <tools/mapunit.hxx>
+#include <tools/UnitConversion.hxx>
 #include <svx/svdhdl.hxx>
 #include <svx/svdtrans.hxx>
 #include <editeng/protitem.hxx>
@@ -90,7 +92,7 @@ namespace sdr::contact
              *
              * @note ONLY based on model data
              */
-            virtual drawinglayer::primitive2d::Primitive2DContainer createViewIndependentPrimitive2DSequence() const override;
+            virtual void createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const override;
 
         public:
             /// basic constructor, used from SdrObject.
@@ -102,10 +104,9 @@ namespace sdr::contact
 
         }
 
-        drawinglayer::primitive2d::Primitive2DContainer VCOfSwFlyDrawObj::createViewIndependentPrimitive2DSequence() const
+        void VCOfSwFlyDrawObj::createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor&) const
         {
             // currently gets not visualized, return empty sequence
-            return drawinglayer::primitive2d::Primitive2DContainer();
         }
 
 } // end of namespace sdr::contact
@@ -141,7 +142,7 @@ SdrInventor SwFlyDrawObj::GetObjInventor() const
 
 SdrObjKind SwFlyDrawObj::GetObjIdentifier() const
 {
-    return SwFlyDrawObjIdentifier;
+    return SdrObjKind::SwFlyDrawObjIdentifier;
 }
 
 // TODO: Need own primitive to get the FlyFrame paint working
@@ -260,7 +261,7 @@ namespace sdr::contact
              *
              * @note ONLY based on model data
              */
-            virtual drawinglayer::primitive2d::Primitive2DContainer createViewIndependentPrimitive2DSequence() const override;
+            virtual void createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const override;
 
         public:
             /// basic constructor, used from SdrObject.
@@ -281,12 +282,12 @@ namespace sdr::contact
 
 namespace sdr::contact
 {
-        drawinglayer::primitive2d::Primitive2DContainer VCOfSwVirtFlyDrawObj::createViewIndependentPrimitive2DSequence() const
+        void VCOfSwVirtFlyDrawObj::createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
         {
-            drawinglayer::primitive2d::Primitive2DContainer xRetval;
             const SdrObject& rReferencedObject = GetSwVirtFlyDrawObj().GetReferencedObj();
 
-            if(dynamic_cast<const SwFlyDrawObj*>( &rReferencedObject) !=  nullptr)
+            // check if it is a SwFlyDrawObj*
+            if (rReferencedObject.GetObjIdentifier() == SdrObjKind::SwFlyDrawObjIdentifier)
             {
                 // create an own specialized primitive which is used as repaint callpoint and HitTest
                 // for HitTest processor (see primitive implementation above)
@@ -299,12 +300,10 @@ namespace sdr::contact
                             GetSwVirtFlyDrawObj(),
                             aOuterRange));
 
-                    xRetval = drawinglayer::primitive2d::Primitive2DContainer { xPrimitive };
+                    rVisitor.visit(xPrimitive);
                 }
             }
-
-            return xRetval;
-        }
+       }
 
 } // end of namespace sdr::contact
 
@@ -313,7 +312,8 @@ basegfx::B2DRange SwVirtFlyDrawObj::getOuterBound() const
     basegfx::B2DRange aOuterRange;
     const SdrObject& rReferencedObject = GetReferencedObj();
 
-    if(dynamic_cast<const SwFlyDrawObj*>( &rReferencedObject) !=  nullptr)
+    // check if it is a SwFlyDrawObj*
+    if (rReferencedObject.GetObjIdentifier() == SdrObjKind::SwFlyDrawObjIdentifier)
     {
         const SwFlyFrame* pFlyFrame = GetFlyFrame();
 
@@ -432,8 +432,7 @@ SwVirtFlyDrawObj::SwVirtFlyDrawObj(
 
 SwVirtFlyDrawObj::~SwVirtFlyDrawObj()
 {
-    if ( getSdrPageFromSdrObject() )    //Withdraw SdrPage the responsibility.
-        getSdrPageFromSdrObject()->RemoveObject( GetOrdNum() );
+    assert (!getSdrPageFromSdrObject() && "should have already been removed");
 }
 
 const SwFrameFormat *SwVirtFlyDrawObj::GetFormat() const
@@ -550,10 +549,11 @@ void SwVirtFlyDrawObj::TakeObjInfo( SdrObjTransformInfoRec& rInfo ) const
 
 void SwVirtFlyDrawObj::SetRect() const
 {
+    auto* pWritableThis = const_cast<SwVirtFlyDrawObj*>(this);
     if ( GetFlyFrame()->getFrameArea().HasArea() )
-        const_cast<SwVirtFlyDrawObj*>(this)->m_aOutRect = GetFlyFrame()->getFrameArea().SVRect();
+        pWritableThis->setOutRectangle(GetFlyFrame()->getFrameArea().SVRect());
     else
-        const_cast<SwVirtFlyDrawObj*>(this)->m_aOutRect = tools::Rectangle();
+        pWritableThis->resetOutRectangle();
 }
 
 const tools::Rectangle& SwVirtFlyDrawObj::GetCurrentBoundRect() const
@@ -640,13 +640,14 @@ void SwVirtFlyDrawObj::NbcMove(const Size& rSiz)
         // working properly. Restore FrameArea and use aOutRect from old FrameArea.
         TransformableSwFrame* pTransformableSwFrame(static_cast<SwFlyFreeFrame*>(GetFlyFrame())->getTransformableSwFrame());
         pTransformableSwFrame->restoreFrameAreas();
-        m_aOutRect = GetFlyFrame()->getFrameArea().SVRect();
+        setOutRectangle(GetFlyFrame()->getFrameArea().SVRect());
     }
 
-    m_aOutRect.Move( rSiz );
+    moveOutRectangle(rSiz.Width(), rSiz.Height());
+
     const Point aOldPos( GetFlyFrame()->getFrameArea().Pos() );
-    const Point aNewPos( m_aOutRect.TopLeft() );
-    const SwRect aFlyRect( m_aOutRect );
+    const Point aNewPos(getOutRectangle().TopLeft());
+    const SwRect aFlyRect(getOutRectangle());
 
     //If the Fly has an automatic align (right or top),
     //so preserve the automatic.
@@ -835,7 +836,7 @@ void SwVirtFlyDrawObj::NbcCrop(const basegfx::B2DPoint& rRef, double fxFact, dou
         // working properly. Restore FrameArea and use aOutRect from old FrameArea.
         TransformableSwFrame* pTransformableSwFrame(static_cast<SwFlyFreeFrame*>(GetFlyFrame())->getTransformableSwFrame());
         pTransformableSwFrame->restoreFrameAreas();
-        m_aOutRect = GetFlyFrame()->getFrameArea().SVRect();
+        setOutRectangle(GetFlyFrame()->getFrameArea().SVRect());
     }
 
     // Compute old and new rect. This will give us the deformation to apply to
@@ -906,8 +907,8 @@ void SwVirtFlyDrawObj::NbcCrop(const basegfx::B2DPoint& rRef, double fxFact, dou
     // Set new frame size
     SwFrameFormat *pFormat = GetFormat();
     SwFormatFrameSize aSz( pFormat->GetFrameSize() );
-    const tools::Long aNewWidth(aNewRect.GetWidth() + (m_aOutRect.GetWidth() - aOldRect.GetWidth()));
-    const tools::Long aNewHeight(aNewRect.GetHeight() + (m_aOutRect.GetHeight() - aOldRect.GetHeight()));
+    const tools::Long aNewWidth(aNewRect.GetWidth() + (getOutRectangle().GetWidth() - aOldRect.GetWidth()));
+    const tools::Long aNewHeight(aNewRect.GetHeight() + (getOutRectangle().GetHeight() - aOldRect.GetHeight()));
     aSz.SetWidth(aNewWidth);
     aSz.SetHeight(aNewHeight);
     pFormat->GetDoc()->SetAttr( aSz, *pFormat );
@@ -945,8 +946,8 @@ void SwVirtFlyDrawObj::NbcCrop(const basegfx::B2DPoint& rRef, double fxFact, dou
         // Create the new TopLeft of the unrotated, cropped object by creating
         // as if re-creating the unrotated geometry
         aNewTopLeft = Point(
-            basegfx::fround(aRotNewCenter.getX() - (0.5 * aNewRect.getWidth())),
-            basegfx::fround(aRotNewCenter.getY() - (0.5 * aNewRect.getHeight())));
+            basegfx::fround(aRotNewCenter.getX() - (0.5 * aNewRect.getOpenWidth())),
+            basegfx::fround(aRotNewCenter.getY() - (0.5 * aNewRect.getOpenHeight())));
     }
 
     // check if we have movement and execute if yes
@@ -980,6 +981,8 @@ void SwVirtFlyDrawObj::NbcResize(const Point& rRef, const Fraction& xFact, const
         GetFlyFrame()->IsFlyFreeFrame() &&
         static_cast< SwFlyFreeFrame* >(GetFlyFrame())->isTransformableSwFrame());
 
+    tools::Rectangle aRectangle;
+
     if(bIsTransformableSwFrame)
     {
         // When we have a change in transformed state, we need to fall back to the
@@ -1004,11 +1007,11 @@ void SwVirtFlyDrawObj::NbcResize(const Point& rRef, const Fraction& xFact, const
         const basegfx::B2DVector aAbsScale(basegfx::absolute(aScale));
 
         // create new modified, but untransformed OutRect
-        m_aOutRect = tools::Rectangle(
+        setOutRectangle(tools::Rectangle(
             basegfx::fround(aCenter.getX() - (0.5 * aAbsScale.getX())),
             basegfx::fround(aCenter.getY() - (0.5 * aAbsScale.getY())),
             basegfx::fround(aCenter.getX() + (0.5 * aAbsScale.getX())),
-            basegfx::fround(aCenter.getY() + (0.5 * aAbsScale.getY())));
+            basegfx::fround(aCenter.getY() + (0.5 * aAbsScale.getY()))));
 
         // restore FrameAreas so that actions below not adapted to new
         // full transformations take the correct actions
@@ -1017,7 +1020,9 @@ void SwVirtFlyDrawObj::NbcResize(const Point& rRef, const Fraction& xFact, const
     }
     else
     {
-        ResizeRect( m_aOutRect, rRef, xFact, yFact );
+        aRectangle = getOutRectangle();
+        ResizeRect(aRectangle, rRef, xFact, yFact);
+        setOutRectangle(aRectangle);
     }
 
     // Position may also change, remember old one. This is now already
@@ -1025,7 +1030,8 @@ void SwVirtFlyDrawObj::NbcResize(const Point& rRef, const Fraction& xFact, const
     Point aOldPos(bUseRightEdge ? GetFlyFrame()->getFrameArea().TopRight() : GetFlyFrame()->getFrameArea().Pos());
 
     // get target size in old coordinate system
-    Size aSz( m_aOutRect.Right() - m_aOutRect.Left() + 1, m_aOutRect.Bottom()- m_aOutRect.Top()  + 1 );
+    aRectangle = getOutRectangle();
+    Size aSz(aRectangle.Right() - aRectangle.Left() + 1, aRectangle.Bottom() - aRectangle.Top() + 1);
 
     // compare with restored FrameArea
     if( aSz != GetFlyFrame()->getFrameArea().SSize() )
@@ -1093,7 +1099,8 @@ void SwVirtFlyDrawObj::NbcResize(const Point& rRef, const Fraction& xFact, const
     }
 
     //Position can also be changed, get new one
-    const Point aNewPos(bUseRightEdge ? m_aOutRect.Right() + 1 : m_aOutRect.Left(), m_aOutRect.Top());
+    aRectangle = getOutRectangle();
+    const Point aNewPos(bUseRightEdge ? aRectangle.Right() + 1 : aRectangle.Left(), aRectangle.Top());
 
     if ( aNewPos == aOldPos )
         return;
@@ -1106,7 +1113,8 @@ void SwVirtFlyDrawObj::NbcResize(const Point& rRef, const Fraction& xFact, const
     const Size aDeltaMove(
             aNewPos.X() - aOldPos.X(),
             aNewPos.Y() - aOldPos.Y());
-    m_aOutRect.Move(-aDeltaMove.Width(), -aDeltaMove.Height());
+
+    moveOutRectangle(-aDeltaMove.Width(), -aDeltaMove.Height());
 
     // Now, move as needed (no empty delta which was a hack anyways)
     if(bIsTransformableSwFrame)
@@ -1114,7 +1122,7 @@ void SwVirtFlyDrawObj::NbcResize(const Point& rRef, const Fraction& xFact, const
         // need to save aOutRect to FrameArea, will be restored to aOutRect in
         // SwVirtFlyDrawObj::NbcMove currently for TransformableSwFrames
         SwFrameAreaDefinition::FrameAreaWriteAccess aFrm(*GetFlyFrame());
-        aFrm.setSwRect(SwRect(m_aOutRect));
+        aFrm.setSwRect(SwRect(getOutRectangle()));
     }
 
     // keep old hack - not clear what happens here
@@ -1182,10 +1190,10 @@ Degree100 SwVirtFlyDrawObj::GetRotateAngle() const
     }
 }
 
-SdrObjectUniquePtr SwVirtFlyDrawObj::getFullDragClone() const
+rtl::Reference<SdrObject> SwVirtFlyDrawObj::getFullDragClone() const
 {
     // call parent
-    SdrObjectUniquePtr pRetval = SdrVirtObj::getFullDragClone();
+    rtl::Reference<SdrObject> pRetval = SdrVirtObj::getFullDragClone();
 
     if(pRetval && GetFlyFrame() && ContainsSwGrfNode())
     {

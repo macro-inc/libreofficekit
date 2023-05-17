@@ -69,7 +69,7 @@
 #include <sal/macros.h>
 #include <sal/types.h>
 #include <vcl/dllapi.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/graph.hxx>
 #include <vcl/image.hxx>
 #include <vcl/keycod.hxx>
@@ -236,7 +236,7 @@
 #include <tools/datetime.hxx>
 #include <tools/debug.hxx>
 #include <tools/degree.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/fontenum.hxx>
 #include <tools/gen.hxx>
 #include <tools/inetmime.hxx>

@@ -28,9 +28,9 @@ namespace oox::drawingml
 OUString getEmbeddedWAVAudioFile(const core::Relations& rRelations, const AttributeList& rAttribs)
 {
     if (rAttribs.getBool(XML_builtIn, false))
-        return rAttribs.getString(XML_name).get();
+        return rAttribs.getStringDefaulted(XML_name);
     else
-        return rRelations.getFragmentPathFromRelId(rAttribs.getString(R_TOKEN(embed)).get());
+        return rRelations.getFragmentPathFromRelId(rAttribs.getStringDefaulted(R_TOKEN(embed)));
 }
 }
 

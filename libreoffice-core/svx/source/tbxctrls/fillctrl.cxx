@@ -19,7 +19,6 @@
 
 #include <sfx2/dispatch.hxx>
 #include <sfx2/objsh.hxx>
-#include <sfx2/viewfrm.hxx>
 #include <sfx2/viewsh.hxx>
 #include <rtl/ustring.hxx>
 #include <vcl/event.hxx>
@@ -276,11 +275,12 @@ void SvxFillToolBoxControl::StateChangedAtToolBoxControl(
                     if(mpFillGradientItem)
                     {
                         const OUString aString( mpFillGradientItem->GetName() );
-                        const SfxObjectShell* pSh = SfxObjectShell::Current();
-
                         mpLbFillAttr->clear();
-                        mpLbFillAttr->set_sensitive(true);
-                        SvxFillAttrBox::Fill(*mpLbFillAttr, pSh->GetItem(SID_GRADIENT_LIST)->GetGradientList());
+                        if (const SfxObjectShell* pSh = SfxObjectShell::Current())
+                        {
+                            mpLbFillAttr->set_sensitive(true);
+                            SvxFillAttrBox::Fill(*mpLbFillAttr, pSh->GetItem(SID_GRADIENT_LIST)->GetGradientList());
+                        }
                         mpLbFillAttr->set_active_text(aString);
                     }
                     else
@@ -300,11 +300,12 @@ void SvxFillToolBoxControl::StateChangedAtToolBoxControl(
                     if(mpHatchItem)
                     {
                         const OUString aString( mpHatchItem->GetName() );
-                        const SfxObjectShell* pSh = SfxObjectShell::Current();
-
                         mpLbFillAttr->clear();
-                        mpLbFillAttr->set_sensitive(true);
-                        SvxFillAttrBox::Fill(*mpLbFillAttr, pSh->GetItem(SID_HATCH_LIST)->GetHatchList());
+                        if (const SfxObjectShell* pSh = SfxObjectShell::Current())
+                        {
+                            mpLbFillAttr->set_sensitive(true);
+                            SvxFillAttrBox::Fill(*mpLbFillAttr, pSh->GetItem(SID_HATCH_LIST)->GetHatchList());
+                        }
                         mpLbFillAttr->set_active_text(aString);
                     }
                     else
@@ -324,11 +325,12 @@ void SvxFillToolBoxControl::StateChangedAtToolBoxControl(
                     if(mpBitmapItem)
                     {
                         const OUString aString( mpBitmapItem->GetName() );
-                        const SfxObjectShell* pSh = SfxObjectShell::Current();
-
                         mpLbFillAttr->clear();
-                        mpLbFillAttr->set_sensitive(true);
-                        SvxFillAttrBox::Fill(*mpLbFillAttr, pSh->GetItem(SID_BITMAP_LIST)->GetBitmapList());
+                        if (const SfxObjectShell* pSh = SfxObjectShell::Current())
+                        {
+                            mpLbFillAttr->set_sensitive(true);
+                            SvxFillAttrBox::Fill(*mpLbFillAttr, pSh->GetItem(SID_BITMAP_LIST)->GetBitmapList());
+                        }
                         mpLbFillAttr->set_active_text(aString);
                     }
                     else
@@ -1080,6 +1082,15 @@ void FillControl::DataChanged(const DataChangedEvent& rDCEvt)
         SetOptimalSize();
     }
     InterimItemWindow::DataChanged(rDCEvt);
+}
+
+void FillControl::GetFocus()
+{
+    // tdf#148047 if the dropdown is active then leave the focus
+    // there and don't grab back to a different widget
+    if (mxToolBoxColor->get_menu_item_active(".uno:FillColor"))
+        return;
+    InterimItemWindow::GetFocus();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

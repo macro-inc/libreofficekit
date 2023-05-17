@@ -24,7 +24,6 @@
 
 #include <editeng/eeitem.hxx>
 #include <editeng/frmdiritem.hxx>
-#include <svl/intitem.hxx>
 #include <svx/sdangitm.hxx>
 
 namespace chart
@@ -36,7 +35,6 @@ SchAlignmentTabPage::SchAlignmentTabPage(weld::Container* pPage, weld::DialogCon
     , m_xFtRotate(m_xBuilder->weld_label("degreeL"))
     , m_xNfRotate(m_xBuilder->weld_metric_spin_button("OrientDegree", FieldUnit::DEGREE))
     , m_xCbStacked(m_xBuilder->weld_check_button("stackedCB"))
-    , m_xFtTextDirection(m_xBuilder->weld_label("textdirL"))
     , m_xFtABCD(m_xBuilder->weld_label("labelABCD"))
     , m_xLbTextDirection(new TextDirectionListBox(m_xBuilder->weld_combo_box("textdirLB")))
     , m_xCtrlDial(new svx::DialControl)
@@ -115,8 +113,8 @@ void SchAlignmentTabPage::Reset(const SfxItemSet* rInAttrs)
     m_xCbStacked->set_active(bStacked);
     StackedToggleHdl(*m_xCbStacked);
 
-    if( rInAttrs->GetItemState(EE_PARA_WRITINGDIR, true, &pItem) == SfxItemState::SET)
-        m_xLbTextDirection->set_active_id(static_cast<const SvxFrameDirectionItem*>(pItem)->GetValue());
+    if( const SvxFrameDirectionItem* pDirectionItem = rInAttrs->GetItemIfSet(EE_PARA_WRITINGDIR) )
+        m_xLbTextDirection->set_active_id(pDirectionItem->GetValue());
 }
 
 } //namespace chart

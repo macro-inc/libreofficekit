@@ -23,6 +23,7 @@
 #include <comphelper/processfactory.hxx>
 #include <editeng/sizeitem.hxx>
 #include <svx/svdlayer.hxx>
+#include <svx/svdograf.hxx>
 #include <sfx2/zoomitem.hxx>
 #include <svx/svdpagv.hxx>
 #include <svl/ptitem.hxx>
@@ -63,7 +64,7 @@
 #include <slideshow.hxx>
 #include <annotationmanager.hxx>
 #include <DrawController.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <LayerTabBar.hxx>
 
 #include <memory>
@@ -128,6 +129,7 @@ DrawViewShell::DrawViewShell( ViewShellBase& rViewShellBase, vcl::Window* pParen
 
     ConfigureAppBackgroundColor();
     SD_MOD()->GetColorConfig().AddListener(this);
+    maViewOptions.mnDocBackgroundColor = SD_MOD()->GetColorConfig().GetColorValue(svtools::DOCCOLOR).nColor;
 }
 
 DrawViewShell::~DrawViewShell()
@@ -555,7 +557,7 @@ void DrawViewShell::GetStatusBarState(SfxItemSet& rSet)
             }
 
             pZoomItem->SetValueSet( nZoomValues );
-            rSet.Put( *pZoomItem );
+            rSet.Put( std::move(pZoomItem) );
         }
     }
     if( SfxItemState::DEFAULT == rSet.GetItemState( SID_ATTR_ZOOMSLIDER ) )

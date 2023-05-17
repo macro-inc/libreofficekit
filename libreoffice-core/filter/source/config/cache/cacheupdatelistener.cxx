@@ -19,22 +19,23 @@
 
 
 #include "cacheupdatelistener.hxx"
+#include "configflush.hxx"
 
 #include <com/sun/star/util/XChangesNotifier.hpp>
 #include <com/sun/star/util/XRefreshable.hpp>
-#include <com/sun/star/document/FilterConfigRefresh.hpp>
 #include <unotools/configpaths.hxx>
 #include <rtl/ustring.hxx>
 #include <comphelper/processfactory.hxx>
+#include <utility>
 
 
 namespace filter::config{
 
 CacheUpdateListener::CacheUpdateListener(FilterCache &rFilterCache,
-                                         const css::uno::Reference< css::uno::XInterface >& xConfigAccess,
+                                         css::uno::Reference< css::uno::XInterface > xConfigAccess,
                                          FilterCache::EItemType eConfigType)
     : m_rCache(rFilterCache)
-    , m_xConfig(xConfigAccess)
+    , m_xConfig(std::move(xConfigAccess))
     , m_eConfigType(eConfigType)
 {
 }
@@ -46,9 +47,9 @@ CacheUpdateListener::~CacheUpdateListener()
 void CacheUpdateListener::startListening()
 {
     // SAFE ->
-    osl::ClearableMutexGuard aLock(m_aMutex);
+    std::unique_lock aLock(m_aMutex);
     css::uno::Reference< css::util::XChangesNotifier > xNotifier(m_xConfig, css::uno::UNO_QUERY);
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE
 
     if (!xNotifier.is())
@@ -62,9 +63,9 @@ void CacheUpdateListener::startListening()
 void CacheUpdateListener::stopListening()
 {
     // SAFE ->
-    osl::ClearableMutexGuard aLock(m_aMutex);
+    std::unique_lock aLock(m_aMutex);
     css::uno::Reference< css::util::XChangesNotifier > xNotifier(m_xConfig, css::uno::UNO_QUERY);
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE
 
     if (!xNotifier.is())
@@ -78,7 +79,7 @@ void CacheUpdateListener::stopListening()
 void SAL_CALL  CacheUpdateListener::changesOccurred(const css::util::ChangesEvent& aEvent)
 {
     // SAFE ->
-    osl::ClearableMutexGuard aLock(m_aMutex);
+    std::unique_lock aLock(m_aMutex);
 
     // disposed ?
     if ( ! m_xConfig.is())
@@ -86,7 +87,7 @@ void SAL_CALL  CacheUpdateListener::changesOccurred(const css::util::ChangesEven
 
     FilterCache::EItemType                             eType = m_eConfigType;
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE
 
     std::vector<OUString> lChangedItems;
@@ -161,9 +162,7 @@ void SAL_CALL  CacheUpdateListener::changesOccurred(const css::util::ChangesEven
     // notify sfx cache about the changed filter cache .-)
     if (bNotifyRefresh)
     {
-        css::uno::Reference< css::uno::XComponentContext > xContext = comphelper::getProcessComponentContext();
-        css::uno::Reference< css::util::XRefreshable > xRefreshBroadcaster =
-            css::document::FilterConfigRefresh::create(xContext);
+        rtl::Reference< ConfigFlush > xRefreshBroadcaster = new ConfigFlush();
         xRefreshBroadcaster->refresh();
     }
 }
@@ -172,7 +171,7 @@ void SAL_CALL  CacheUpdateListener::changesOccurred(const css::util::ChangesEven
 void SAL_CALL CacheUpdateListener::disposing(const css::lang::EventObject& aEvent)
 {
     // SAFE ->
-    osl::MutexGuard aLock(m_aMutex);
+    std::unique_lock aLock(m_aMutex);
     if (aEvent.Source == m_xConfig)
         m_xConfig.clear();
     // <- SAFE

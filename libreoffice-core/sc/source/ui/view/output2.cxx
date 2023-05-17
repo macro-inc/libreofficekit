@@ -47,6 +47,7 @@
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <svl/zformat.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/metric.hxx>
 #include <vcl/outdev.hxx>
@@ -54,6 +55,7 @@
 #include <vcl/settings.hxx>
 #include <vcl/glyphitem.hxx>
 #include <vcl/vcllayout.hxx>
+#include <vcl/glyphitemcache.hxx>
 #include <sal/log.hxx>
 #include <unotools/charclass.hxx>
 #include <osl/diagnose.h>
@@ -121,19 +123,6 @@ class ScDrawStringsVars
     tools::Long                nExpWidth;
 
     ScRefCellValue      maLastCell;
-    struct CachedGlyphsKey
-    {
-        OUString text;
-        VclPtr<OutputDevice> outputDevice;
-        size_t hashValue;
-        CachedGlyphsKey( const OUString& t, const VclPtr<OutputDevice>& dev );
-        bool operator==( const CachedGlyphsKey& other ) const;
-    };
-    struct CachedGlyphsHash
-    {
-        size_t operator()( const CachedGlyphsKey& key ) const { return key.hashValue; }
-    };
-    mutable o3tl::lru_map<CachedGlyphsKey, SalLayoutGlyphs, CachedGlyphsHash> mCachedGlyphs;
     sal_uLong           nValueFormat;
     bool                bLineBreak;
     bool                bRepeat;
@@ -199,7 +188,10 @@ public:
 
     // ScOutputData::LayoutStrings() usually triggers a number of calls that require
     // to lay out the text, which is relatively slow, so cache that operation.
-    const SalLayoutGlyphs*  GetLayoutGlyphs(const OUString& rString) const;
+    const SalLayoutGlyphs*  GetLayoutGlyphs(const OUString& rString) const
+    {
+        return SalLayoutGlyphsCache::self()->GetLayoutGlyphs(pOutput->pFmtDevice, rString);
+    }
 
 private:
     tools::Long        GetMaxDigitWidth();     // in logic units
@@ -226,7 +218,6 @@ ScDrawStringsVars::ScDrawStringsVars(ScOutputData* pData, bool bPTL) :
     nSignWidth( 0 ),
     nDotWidth( 0 ),
     nExpWidth( 0 ),
-    mCachedGlyphs( 1000 ),
     nValueFormat( 0 ),
     bLineBreak  ( false ),
     bRepeat     ( false ),
@@ -317,7 +308,6 @@ void ScDrawStringsVars::SetPattern(
     nSignWidth     = 0;
     nDotWidth      = 0;
     nExpWidth      = 0;
-    mCachedGlyphs.clear();
 
     pPattern = pNew;
     pCondSet = pSet;
@@ -472,7 +462,6 @@ void ScDrawStringsVars::SetPatternSimple( const ScPatternAttr* pNew, const SfxIt
     nSignWidth     = 0;
     nDotWidth      = 0;
     nExpWidth      = 0;
-    mCachedGlyphs.clear();
 
     // Is called, when the font variables do not change (!StringDiffer)
 
@@ -503,8 +492,8 @@ void ScDrawStringsVars::SetPatternSimple( const ScPatternAttr* pNew, const SfxIt
 
 static bool SameValue( const ScRefCellValue& rCell, const ScRefCellValue& rOldCell )
 {
-    return rOldCell.meType == CELLTYPE_VALUE && rCell.meType == CELLTYPE_VALUE &&
-        rCell.mfValue == rOldCell.mfValue;
+    return rOldCell.getType() == CELLTYPE_VALUE && rCell.getType() == CELLTYPE_VALUE &&
+        rCell.getDouble() == rOldCell.getDouble();
 }
 
 bool ScDrawStringsVars::SetText( const ScRefCellValue& rCell )
@@ -603,10 +592,10 @@ void ScDrawStringsVars::RepeatToFill( tools::Long nColWidth )
     if ( nSpaceToFill <= nCharWidth )
         return;
 
-    tools::Long nCharsToInsert = nSpaceToFill / nCharWidth;
-    OUStringBuffer aFill;
+    sal_Int32 nCharsToInsert = nSpaceToFill / nCharWidth;
+    OUStringBuffer aFill(nCharsToInsert);
     comphelper::string::padToLength(aFill, nCharsToInsert, nRepeatChar);
-    aString = aString.replaceAt( nRepeatPos, 0, aFill.makeStringAndClear() );
+    aString = aString.replaceAt( nRepeatPos, 0, aFill );
     TextChanged();
 }
 
@@ -616,14 +605,14 @@ void ScDrawStringsVars::SetTextToWidthOrHash( ScRefCellValue& rCell, tools::Long
     if (bPixelToLogic)
         nWidth = pOutput->mpRefDevice->PixelToLogic(Size(nWidth,0)).Width();
 
-    CellType eType = rCell.meType;
+    CellType eType = rCell.getType();
     if (eType != CELLTYPE_VALUE && eType != CELLTYPE_FORMULA)
         // must be a value or formula cell.
         return;
 
     if (eType == CELLTYPE_FORMULA)
     {
-        ScFormulaCell* pFCell = rCell.mpFormula;
+        ScFormulaCell* pFCell = rCell.getFormula();
         if (pFCell->GetErrCode() != FormulaError::NONE || pOutput->mbShowFormulas)
         {
             SetHashText();      // If the error string doesn't fit, always use "###". Also for "display formulas" (#i116691#)
@@ -788,40 +777,6 @@ tools::Long ScDrawStringsVars::GetExpWidth()
     return nExpWidth;
 }
 
-inline ScDrawStringsVars::CachedGlyphsKey::CachedGlyphsKey( const OUString& t, const VclPtr<OutputDevice>& d )
-    : text( t )
-    , outputDevice( d )
-{
-    hashValue = 0;
-    o3tl::hash_combine( hashValue, outputDevice.get());
-    SvMemoryStream stream;
-    WriteFont( stream, outputDevice->GetFont());
-    o3tl::hash_combine( hashValue, static_cast<const char*>(stream.GetData()), stream.GetSize());
-    o3tl::hash_combine( hashValue, text );
-}
-
-inline bool ScDrawStringsVars::CachedGlyphsKey::operator==( const CachedGlyphsKey& other ) const
-{
-    return hashValue == other.hashValue && outputDevice == other.outputDevice && text == other.text;
-}
-
-const SalLayoutGlyphs* ScDrawStringsVars::GetLayoutGlyphs(const OUString& rString) const
-{
-    const CachedGlyphsKey key( rString, pOutput->pFmtDevice );
-    auto it = mCachedGlyphs.find( key );
-    if( it != mCachedGlyphs.end() && it->second.IsValid())
-        return &it->second;
-    std::unique_ptr<SalLayout> layout = pOutput->pFmtDevice->ImplLayout( rString, 0, rString.getLength(),
-        Point( 0, 0 ), 0, {}, SalLayoutFlags::GlyphItemsOnly );
-    if( layout )
-    {
-        mCachedGlyphs.insert( std::make_pair( key, layout->GetGlyphs()));
-        assert(mCachedGlyphs.find( key ) == mCachedGlyphs.begin()); // newly inserted item is first
-        return &mCachedGlyphs.begin()->second;
-    }
-    return nullptr;
-}
-
 tools::Long ScDrawStringsVars::GetFmtTextWidth( const OUString& rString )
 {
     return pOutput->pFmtDevice->GetTextWidth( rString, 0, -1, nullptr, GetLayoutGlyphs( rString ));
@@ -908,10 +863,10 @@ static void lcl_DoHyperlinkResult( const OutputDevice* pDev, const tools::Rectan
     vcl::PDFExtOutDevData* pPDFData = dynamic_cast< vcl::PDFExtOutDevData* >( pDev->GetExtOutDevData() );
 
     OUString aURL;
-    if (rCell.meType == CELLTYPE_FORMULA)
+    OUString aCellText;
+    if (rCell.getType() == CELLTYPE_FORMULA)
     {
-        ScFormulaCell* pFCell = rCell.mpFormula;
-        OUString aCellText;
+        ScFormulaCell* pFCell = rCell.getFormula();
         if ( pFCell->IsHyperLinkCell() )
             pFCell->GetURLResult( aURL, aCellText );
     }
@@ -919,7 +874,7 @@ static void lcl_DoHyperlinkResult( const OutputDevice* pDev, const tools::Rectan
     if ( !aURL.isEmpty() && pPDFData )
     {
         vcl::PDFExtOutDevBookmarkEntry aBookmark;
-        aBookmark.nLinkId = pPDFData->CreateLink( rRect );
+        aBookmark.nLinkId = pPDFData->CreateLink(rRect, aCellText);
         aBookmark.aBookmark = aURL;
         std::vector< vcl::PDFExtOutDevBookmarkEntry >& rBookmarks = pPDFData->GetBookmarks();
         rBookmarks.push_back( aBookmark );
@@ -928,7 +883,7 @@ static void lcl_DoHyperlinkResult( const OutputDevice* pDev, const tools::Rectan
 
 void ScOutputData::SetSyntaxColor( vcl::Font* pFont, const ScRefCellValue& rCell )
 {
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_VALUE:
             pFont->SetColor(*mxValueColor);
@@ -958,7 +913,7 @@ static void lcl_SetEditColor( EditEngine& rEngine, const Color& rColor )
 void ScOutputData::SetEditSyntaxColor( EditEngine& rEngine, const ScRefCellValue& rCell )
 {
     Color aColor;
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_VALUE:
             aColor = *mxValueColor;
@@ -992,7 +947,7 @@ bool ScOutputData::GetMergeOrigin( SCCOL nX, SCROW nY, SCSIZE nArrY,
     if (!mpDoc->ColHidden(nX, nTab) && nX >= nX1 && nX <= nX2
             && !mpDoc->RowHidden(nY, nTab) && nY >= nY1 && nY <= nY2)
     {
-        CellInfo* pInfo = &pRowInfo[nArrY].cellInfo(nX);
+        ScCellInfo* pInfo = &pRowInfo[nArrY].cellInfo(nX);
         bHOver = pInfo->bHOverlapped;
         bVOver = pInfo->bVOverlapped;
     }
@@ -1436,8 +1391,8 @@ void ScOutputData::GetOutputArea( SCCOL nX, SCSIZE nArrY, tools::Long nPosX, too
 
     //  justify both rectangles for alignment calculation, use with DrawText etc.
 
-    rParam.maAlignRect.Justify();
-    rParam.maClipRect.Justify();
+    rParam.maAlignRect.Normalize();
+    rParam.maClipRect.Normalize();
 }
 
 namespace {
@@ -1529,9 +1484,15 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                 mpDev->GetMapMode().GetMapUnit() == mpRefDevice->GetMapMode().GetMapUnit(),
                 "LayoutStrings: different MapUnits ?!?!" );
 
+    sc::IdleSwitch aIdleSwitch(*mpDoc, false);
+
+    // Try to limit interpreting to only visible cells. Calling e.g. IsValue()
+    // on a formula cell that needs interpreting would call Interpret()
+    // for the entire formula group, which could be large.
+    mpDoc->InterpretCellsIfNeeded( ScRange( nX1, nY1, nTab, nX2, nY2, nTab ));
+
     vcl::PDFExtOutDevData* pPDFData = dynamic_cast< vcl::PDFExtOutDevData* >(mpDev->GetExtOutDevData() );
 
-    sc::IdleSwitch aIdleSwitch(*mpDoc, false);
     ScDrawStringsVars aVars( this, bPixelToLogic );
 
     bool bProgress = false;
@@ -1559,16 +1520,11 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
     const SfxItemSet* pOldCondSet = nullptr;
     SvtScriptType nOldScript = SvtScriptType::NONE;
 
-    // Try to limit interpreting to only visible cells. Calling e.g. IsValue()
-    // on a formula cell that needs interpreting would call Interpret()
-    // for the entire formula group, which could be large.
-    mpDoc->InterpretCellsIfNeeded( ScRange( nX1, nY1, nTab, nX2, nY2, nTab ));
-
     // alternative pattern instances in case we need to modify the pattern
     // before processing the cell value.
     std::vector<std::unique_ptr<ScPatternAttr> > aAltPatterns;
 
-    std::vector<sal_Int32> aDX;
+    KernArray aDX;
     tools::Long nPosY = nScrY;
     for (SCSIZE nArrY=1; nArrY+1<nArrCount; nArrY++)
     {
@@ -1582,7 +1538,7 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
             for (SCCOL nX=nLoopStartX; nX<=nX2; nX++)
             {
                 bool bMergeEmpty = false;
-                const CellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
+                const ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
                 bool bEmpty = nX < nX1 || pThisRowInfo->basicCellInfo(nX).bEmptyCellText;
 
                 SCCOL nCellX = nX;                  // position where the cell really starts
@@ -1676,12 +1632,12 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                         GetVisibleCell( nCellX, nCellY, nTab, aCell );      // get from document
                     if (aCell.isEmpty())
                         bDoCell = false;
-                    else if (aCell.meType == CELLTYPE_EDIT)
+                    else if (aCell.getType() == CELLTYPE_EDIT)
                         bUseEditEngine = true;
                 }
 
                 // Check if this cell is mis-spelled.
-                if (bDoCell && !bUseEditEngine && aCell.meType == CELLTYPE_STRING)
+                if (bDoCell && !bUseEditEngine && aCell.getType() == CELLTYPE_STRING)
                 {
                     if (mpSpellCheckCxt && mpSpellCheckCxt->isMisspelled(nCellX, nCellY))
                         bUseEditEngine = true;
@@ -1691,7 +1647,7 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                 {
                     if ( nCellY == nY && nCellX >= nX1 && nCellX <= nX2 )
                     {
-                        CellInfo& rCellInfo = pThisRowInfo->cellInfo(nCellX);
+                        ScCellInfo& rCellInfo = pThisRowInfo->cellInfo(nCellX);
                         pPattern = rCellInfo.pPatternAttr;
                         pCondSet = rCellInfo.pConditionSet;
 
@@ -1718,13 +1674,12 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                         }
                         else if ( SfxItemSet* pFontSet = mpDoc->GetPreviewFont( nCellX, nCellY, nTab ) )
                         {
-                            const SfxPoolItem* pItem;
-                            if ( pFontSet->GetItemState( ATTR_FONT, true, &pItem ) == SfxItemState::SET )
-                                pAltPattern->GetItemSet().Put( static_cast<const SvxFontItem&>(*pItem) );
-                            if ( pFontSet->GetItemState( ATTR_CJK_FONT, true, &pItem ) == SfxItemState::SET )
-                                pAltPattern->GetItemSet().Put( static_cast<const SvxFontItem&>(*pItem) );
-                            if ( pFontSet->GetItemState( ATTR_CTL_FONT, true, &pItem ) == SfxItemState::SET )
-                                pAltPattern->GetItemSet().Put( static_cast<const SvxFontItem&>(*pItem) );
+                            if ( const SvxFontItem* pItem = pFontSet->GetItemIfSet( ATTR_FONT ) )
+                                pAltPattern->GetItemSet().Put( *pItem );
+                            if ( const SvxFontItem* pItem = pFontSet->GetItemIfSet( ATTR_CJK_FONT ) )
+                                pAltPattern->GetItemSet().Put( *pItem );
+                            if ( const SvxFontItem* pItem = pFontSet->GetItemIfSet( ATTR_CTL_FONT ) )
+                                pAltPattern->GetItemSet().Put( *pItem );
                         }
                         pPattern = pAltPattern;
                     }
@@ -1769,22 +1724,22 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                 }
                 if (bDoCell && !bUseEditEngine)
                 {
-                    bool bFormulaCell = (aCell.meType == CELLTYPE_FORMULA);
+                    bool bFormulaCell = (aCell.getType() == CELLTYPE_FORMULA);
                     if ( bFormulaCell )
-                        lcl_CreateInterpretProgress(bProgress, mpDoc, aCell.mpFormula);
+                        lcl_CreateInterpretProgress(bProgress, mpDoc, aCell.getFormula());
                     if ( aVars.SetText(aCell) )
                         pOldPattern = nullptr;
-                    bUseEditEngine = aVars.HasEditCharacters() || (bFormulaCell && aCell.mpFormula->IsMultilineResult());
+                    bUseEditEngine = aVars.HasEditCharacters() || (bFormulaCell && aCell.getFormula()->IsMultilineResult());
                 }
                 tools::Long nTotalMargin = 0;
                 SvxCellHorJustify eOutHorJust = SvxCellHorJustify::Standard;
                 if (bDoCell && !bUseEditEngine)
                 {
-                    CellType eCellType = aCell.meType;
+                    CellType eCellType = aCell.getType();
                     bCellIsValue = ( eCellType == CELLTYPE_VALUE );
                     if ( eCellType == CELLTYPE_FORMULA )
                     {
-                        ScFormulaCell* pFCell = aCell.mpFormula;
+                        ScFormulaCell* pFCell = aCell.getFormula();
                         bCellIsValue = pFCell->IsRunning() || pFCell->IsValue();
                     }
 
@@ -1904,7 +1859,7 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                 }
                 if (bUseEditEngine)
                 {
-                    //  mark the cell in CellInfo to be drawn in DrawEdit:
+                    //  mark the cell in ScCellInfo to be drawn in DrawEdit:
                     //  Cells to the left are marked directly, cells to the
                     //  right are handled by the flag for nX2
                     SCCOL nMarkX = ( nCellX <= nX2 ) ? nCellX : nX2;
@@ -2154,11 +2109,11 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                                 {
                                     double fMul = GetStretch();
                                     for (size_t i = 0; i < nLen; ++i)
-                                        aDX[i] = static_cast<sal_Int32>(aDX[i] / fMul + 0.5);
+                                        aDX.set(i, static_cast<sal_Int32>(aDX[i] / fMul + 0.5));
                                 }
 
                                 if (bPaint)
-                                    mpDev->DrawTextArray(aDrawTextPos, aShort, aDX);
+                                    mpDev->DrawTextArray(aDrawTextPos, aShort, aDX, {}, 0, nLen);
                             }
                             else
                             {
@@ -2177,7 +2132,7 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
                         }
 
                         // PDF: whole-cell hyperlink from formula?
-                        bool bHasURL = pPDFData && aCell.meType == CELLTYPE_FORMULA && aCell.mpFormula->IsHyperLinkCell();
+                        bool bHasURL = pPDFData && aCell.getType() == CELLTYPE_FORMULA && aCell.getFormula()->IsHyperLinkCell();
                         if (bPaint && bHasURL)
                         {
                             tools::Rectangle aURLRect( aURLStart, aVars.GetTextSize() );
@@ -2228,17 +2183,18 @@ static void lcl_ClearEdit( EditEngine& rEngine )       // text and attributes
     if (rPara.Count())
         rEngine.SetParaAttribs( 0,
                     SfxItemSet( *rPara.GetPool(), rPara.GetRanges() ) );
+    rEngine.EnableSkipOutsideFormat(false);
 }
 
 static bool lcl_SafeIsValue( ScRefCellValue& rCell )
 {
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_VALUE:
             return true;
         case CELLTYPE_FORMULA:
         {
-            ScFormulaCell* pFCell = rCell.mpFormula;
+            ScFormulaCell* pFCell = rCell.getFormula();
             if (pFCell->IsRunning() || pFCell->IsValue())
                 return true;
         }
@@ -2424,9 +2380,9 @@ ScOutputData::DrawEditParam::DrawEditParam(const ScPatternAttr* pPattern, const 
 bool ScOutputData::DrawEditParam::readCellContent(
     const ScDocument* pDoc, bool bShowNullValues, bool bShowFormulas, bool bSyntaxMode, bool bUseStyleColor, bool bForceAutoColor, bool& rWrapFields)
 {
-    if (maCell.meType == CELLTYPE_EDIT)
+    if (maCell.getType() == CELLTYPE_EDIT)
     {
-        const EditTextObject* pData = maCell.mpEditText;
+        const EditTextObject* pData = maCell.getEditText();
         if (pData)
         {
             mpEngine->SetTextCurrentDefaults(*pData);
@@ -2484,18 +2440,17 @@ void ScOutputData::DrawEditParam::setPatternToEngine(bool bUseStyleColor)
     mpPattern->FillEditItemSet( pSet.get(), mpCondSet );
     if ( mpPreviewFontSet )
     {
-        const SfxPoolItem* pItem;
-        if ( mpPreviewFontSet->GetItemState( ATTR_FONT, true, &pItem ) == SfxItemState::SET )
+        if ( const SvxFontItem* pItem = mpPreviewFontSet->GetItemIfSet( ATTR_FONT ) )
         {
             // tdf#125054 adapt WhichID
             pSet->Put(*pItem, EE_CHAR_FONTINFO);
         }
-        if ( mpPreviewFontSet->GetItemState( ATTR_CJK_FONT, true, &pItem ) == SfxItemState::SET )
+        if ( const SvxFontItem* pItem = mpPreviewFontSet->GetItemIfSet( ATTR_CJK_FONT ) )
         {
             // tdf#125054 adapt WhichID
             pSet->Put(*pItem, EE_CHAR_FONTINFO_CJK);
         }
-        if ( mpPreviewFontSet->GetItemState( ATTR_CTL_FONT, true, &pItem ) == SfxItemState::SET )
+        if ( const SvxFontItem* pItem = mpPreviewFontSet->GetItemIfSet( ATTR_CTL_FONT ) )
         {
             // tdf#125054 adapt WhichID
             pSet->Put(*pItem, EE_CHAR_FONTINFO_CTL);
@@ -2583,11 +2538,7 @@ void ScOutputData::DrawEditParam::getEngineSize(ScFieldEditEngine* pEngine, tool
     tools::Long nEngineHeight = pEngine->GetTextHeight();
 
     if (isVerticallyOriented())
-    {
-        tools::Long nTemp = nEngineWidth;
-        nEngineWidth = nEngineHeight;
-        nEngineHeight = nTemp;
-    }
+        std::swap( nEngineWidth, nEngineHeight );
 
     if (meOrient == SvxCellOrientation::Stacked)
         nEngineWidth = nEngineWidth * 11 / 10;
@@ -2603,10 +2554,10 @@ bool ScOutputData::DrawEditParam::hasLineBreak() const
 
 bool ScOutputData::DrawEditParam::isHyperlinkCell() const
 {
-    if (maCell.meType != CELLTYPE_FORMULA)
+    if (maCell.getType() != CELLTYPE_FORMULA)
         return false;
 
-    return maCell.mpFormula->IsHyperLinkCell();
+    return maCell.getFormula()->IsHyperLinkCell();
 }
 
 bool ScOutputData::DrawEditParam::isVerticallyOriented() const
@@ -2741,12 +2692,12 @@ void ScOutputData::DrawEditParam::setAlignmentToEngine()
     }
 
     mpEngine->SetVertical(mbAsianVertical);
-    if (maCell.meType == CELLTYPE_EDIT)
+    if (maCell.getType() == CELLTYPE_EDIT)
     {
         // We need to synchronize the vertical mode in the EditTextObject
         // instance too.  No idea why we keep this state in two separate
         // instances.
-        const EditTextObject* pData = maCell.mpEditText;
+        const EditTextObject* pData = maCell.getEditText();
         if (pData)
             const_cast<EditTextObject*>(pData)->SetVertical(mbAsianVertical);
     }
@@ -2980,6 +2931,10 @@ void ScOutputData::DrawEditStandard(DrawEditParam& rParam)
 
     rParam.setPatternToEngine(mbUseStyleColor);
     rParam.setAlignmentToEngine();
+    // Don't format unnecessary parts if the text will be drawn from top (Standard will
+    // act that way if text doesn't fit, see below).
+    rParam.mpEngine->EnableSkipOutsideFormat(rParam.meVerJust==SvxCellVerJustify::Top
+        || rParam.meVerJust==SvxCellVerJustify::Standard);
 
     //  Read content from cell
 
@@ -3136,7 +3091,7 @@ void ScOutputData::DrawEditStandard(DrawEditParam& rParam)
              rParam.mbBreak && bMarkClipped &&
              ( rParam.mpEngine->GetParagraphCount() > 1 || rParam.mpEngine->GetLineCount(0) > 1 ) )
         {
-            CellInfo* pClipMarkCell = nullptr;
+            ScCellInfo* pClipMarkCell = nullptr;
             if ( bMerged )
             {
                 //  anywhere in the merged area...
@@ -3152,6 +3107,11 @@ void ScOutputData::DrawEditStandard(DrawEditParam& rParam)
             tools::Long nMarkPixel = static_cast<tools::Long>( SC_CLIPMARK_SIZE * mnPPTX );
             if ( aAreaParam.maClipRect.Right() - nMarkPixel > aAreaParam.maClipRect.Left() )
                 aAreaParam.maClipRect.AdjustRight( -nMarkPixel );
+
+            // Standard is normally treated as Bottom, but if text height is clipped, then
+            // Top looks better and also allows using EditEngine::EnableSkipOutsideFormat().
+            if (rParam.meVerJust==SvxCellVerJustify::Standard)
+                rParam.meVerJust=SvxCellVerJustify::Top;
         }
     }
 
@@ -3241,7 +3201,7 @@ void ScOutputData::ShowClipMarks( DrawEditParam& rParam, tools::Long nEngineWidt
         || (rParam.mpEngine->GetParagraphCount() <= 1 && rParam.mpEngine->GetLineCount(0) <= 1))
         return;
 
-    CellInfo* pClipMarkCell = nullptr;
+    ScCellInfo* pClipMarkCell = nullptr;
     if (bMerged)
     {
         //  anywhere in the merged area...
@@ -3977,7 +3937,7 @@ void ScOutputData::DrawEditStacked(DrawEditParam& rParam)
              rParam.mbBreak && bMarkClipped &&
              ( rParam.mpEngine->GetParagraphCount() > 1 || rParam.mpEngine->GetLineCount(0) > 1 ) )
         {
-            CellInfo* pClipMarkCell = nullptr;
+            ScCellInfo* pClipMarkCell = nullptr;
             if ( bMerged )
             {
                 //  anywhere in the merged area...
@@ -4264,7 +4224,7 @@ void ScOutputData::DrawEditAsianVertical(DrawEditParam& rParam)
              !rParam.mbAsianVertical && bMarkClipped &&
              ( rParam.mpEngine->GetParagraphCount() > 1 || rParam.mpEngine->GetLineCount(0) > 1 ) )
         {
-            CellInfo* pClipMarkCell = nullptr;
+            ScCellInfo* pClipMarkCell = nullptr;
             if ( bMerged )
             {
                 //  anywhere in the merged area...
@@ -4419,7 +4379,7 @@ void ScOutputData::DrawEdit(bool bPixelToLogic)
                         if ( nCellY == nY && nCellX >= nX1 && nCellX <= nX2 &&
                              !mpDoc->ColHidden(nCellX, nTab) )
                         {
-                            CellInfo& rCellInfo = pThisRowInfo->cellInfo(nCellX);
+                            ScCellInfo& rCellInfo = pThisRowInfo->cellInfo(nCellX);
                             pPattern = rCellInfo.pPatternAttr;
                             pCondSet = rCellInfo.pConditionSet;
                             aCell = rCellInfo.maCell;
@@ -4562,7 +4522,7 @@ void ScOutputData::DrawRotated(bool bPixelToLogic)
             {
                 if (nX==nX1) nPosX = nInitPosX;                 // positions before nX1 are calculated individually
 
-                const CellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
+                const ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nX);
                 if ( pInfo->nRotateDir != ScRotateDir::NONE )
                 {
                     SCROW nY = pThisRowInfo->nRowNo;
@@ -4731,14 +4691,54 @@ void ScOutputData::DrawRotated(bool bPixelToLogic)
                                 {
                                     eRotMode = pPattern->GetItem(ATTR_ROTATE_MODE, pCondSet).GetValue();
 
-                                    if ( nAttrRotate == 18000_deg100 )
+                                    // tdf#143377 To use the same limits to avoid too big Skew
+                                    // with TextOrientation in Calc, use 1/2 degree here, too.
+                                    // This equals '50' in the notation here (100th degree)
+                                    static const sal_Int32 nMinRad(50);
+
+                                    // bring nAttrRotate to the range [0..36000[
+                                    nAttrRotate = Degree100(((nAttrRotate.get() % 36000) + 36000) % 36000);
+
+                                    // check for to be avoided extreme values and correct
+                                    if (nAttrRotate < Degree100(nMinRad))
+                                    {
+                                        // range [0..50]
+                                        nAttrRotate = Degree100(nMinRad);
                                         eRotMode = SVX_ROTATE_MODE_STANDARD;    // no overflow
+                                    }
+                                    else if (nAttrRotate > Degree100(36000 - nMinRad))
+                                    {
+                                        // range [35950..36000[
+                                        nAttrRotate = Degree100(36000 - nMinRad);
+                                        eRotMode = SVX_ROTATE_MODE_STANDARD;    // no overflow
+                                    }
+                                    else if (nAttrRotate > Degree100(18000 - nMinRad) && (nAttrRotate < Degree100(18000 + nMinRad)))
+                                    {
+                                        // range 50 around 18000, [17950..18050]
+                                        nAttrRotate = (nAttrRotate > Degree100(18000))
+                                            ? Degree100(18000 + nMinRad)
+                                            : Degree100(18000 - nMinRad);
+                                        eRotMode = SVX_ROTATE_MODE_STANDARD;    // no overflow
+                                    }
 
                                     if ( bLayoutRTL )
-                                        nAttrRotate = -nAttrRotate;
+                                    {
+                                        // keep in range [0..36000[
+                                        nAttrRotate = Degree100(36000 - nAttrRotate.get());
+                                    }
 
                                     double nRealOrient = toRadians(nAttrRotate);   // 1/100 degree
                                     nCos = cos( nRealOrient );
+
+                                    // tdf#143377 new strategy: instead of using zero for nSin, which
+                                    // would be the *correct* value, continue with the corrected maximum
+                                    // allowed value which is then *not* zero. This is similar to
+                                    // the behaviour before where (just due to numerical unprecisions)
+                                    // nSin was also not zero (pure coincidence), but very close to it.
+                                    // I checked and tried to make safe all places below that use
+                                    // nSin and divide by it, but there is too much going on and that
+                                    // would not be safe, so rely on the same values as before, but
+                                    // now numerically limited to not get the Skew go havoc
                                     nSin = sin( nRealOrient );
                                 }
                             }
@@ -4768,10 +4768,10 @@ void ScOutputData::DrawRotated(bool bPixelToLogic)
 
                             // read data from cell
 
-                            if (aCell.meType == CELLTYPE_EDIT)
+                            if (aCell.getType() == CELLTYPE_EDIT)
                             {
-                                if (aCell.mpEditText)
-                                    pEngine->SetTextCurrentDefaults(*aCell.mpEditText);
+                                if (aCell.getEditText())
+                                    pEngine->SetTextCurrentDefaults(*aCell.getEditText());
                                 else
                                 {
                                     OSL_FAIL("pData == 0");

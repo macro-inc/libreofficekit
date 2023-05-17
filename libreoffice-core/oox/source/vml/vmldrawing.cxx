@@ -36,8 +36,9 @@
 #include <oox/ole/axcontrol.hxx>
 #include <oox/vml/vmlshape.hxx>
 #include <oox/vml/vmlshapecontainer.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/gen.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace oox::vml {
 
@@ -62,10 +63,10 @@ OUString lclGetShapeId( sal_Int32 nShapeId )
 }
 
 /** Returns the numeric VML shape identifier from its textual representation. */
-sal_Int32 lclGetShapeId( const OUString& rShapeId )
+sal_Int32 lclGetShapeId( std::u16string_view rShapeId )
 {
     // identifier consists of a literal NUL character, a lowercase 's', and the id
-    return ((rShapeId.getLength() >= 3) && (rShapeId[ 0 ] == '\0') && (rShapeId[ 1 ] == 's')) ? rShapeId.copy( 2 ).toInt32() : -1;
+    return ((rShapeId.size() >= 3) && (rShapeId[ 0 ] == '\0') && (rShapeId[ 1 ] == 's')) ? o3tl::toInt32(rShapeId.substr( 2 )) : -1;
 }
 
 } // namespace
@@ -205,7 +206,7 @@ void Drawing::convertAndInsert() const
 
 }
 
-sal_Int32 Drawing::getLocalShapeIndex( const OUString& rShapeId ) const
+sal_Int32 Drawing::getLocalShapeIndex( std::u16string_view rShapeId ) const
 {
     sal_Int32 nShapeId = lclGetShapeId( rShapeId );
     if( nShapeId <= 0 ) return -1;
@@ -275,12 +276,12 @@ Reference< XShape > Drawing::createAndInsertXShape( const OUString& rService,
         else
         {
             Reference< XPropertySet > xPropSet( xShape, UNO_QUERY_THROW );
-            xPropSet->setPropertyValue( "HoriOrient", makeAny( HoriOrientation::NONE ) );
-            xPropSet->setPropertyValue( "VertOrient", makeAny( VertOrientation::NONE ) );
-            xPropSet->setPropertyValue( "HoriOrientPosition", makeAny( rShapeRect.X ) );
-            xPropSet->setPropertyValue( "VertOrientPosition", makeAny( rShapeRect.Y ) );
-            xPropSet->setPropertyValue( "HoriOrientRelation", makeAny( RelOrientation::FRAME ) );
-            xPropSet->setPropertyValue( "VertOrientRelation", makeAny( RelOrientation::FRAME ) );
+            xPropSet->setPropertyValue( "HoriOrient", Any( HoriOrientation::NONE ) );
+            xPropSet->setPropertyValue( "VertOrient", Any( VertOrientation::NONE ) );
+            xPropSet->setPropertyValue( "HoriOrientPosition", Any( rShapeRect.X ) );
+            xPropSet->setPropertyValue( "VertOrientPosition", Any( rShapeRect.Y ) );
+            xPropSet->setPropertyValue( "HoriOrientRelation", Any( RelOrientation::FRAME ) );
+            xPropSet->setPropertyValue( "VertOrientRelation", Any( RelOrientation::FRAME ) );
         }
         xShape->setSize( awt::Size( rShapeRect.Width, rShapeRect.Height ) );
     }

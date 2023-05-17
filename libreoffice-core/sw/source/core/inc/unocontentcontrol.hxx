@@ -52,12 +52,10 @@ class SwXContentControl
                                   css::container::XEnumerationAccess, css::text::XTextContent,
                                   css::text::XText, css::beans::XPropertySet>
 {
-public:
     class Impl;
-
-protected:
     sw::UnoImplPtr<Impl> m_pImpl;
 
+protected:
     void AttachImpl(const css::uno::Reference<css::text::XTextRange>& xTextRange,
                     sal_uInt16 nWhich);
 
@@ -73,19 +71,17 @@ protected:
     SwXContentControl(SwDoc* pDoc);
 
 public:
-    static css::uno::Reference<css::text::XTextContent>
+    static rtl::Reference<SwXContentControl>
     CreateXContentControl(SwContentControl& rContentControl,
                           const css::uno::Reference<css::text::XText>& xParentText = nullptr,
                           std::unique_ptr<const TextRangeList_t>&& pPortions
                           = std::unique_ptr<const TextRangeList_t>());
 
-    static css::uno::Reference<css::text::XTextContent> CreateXContentControl(SwDoc& rDoc);
+    static rtl::Reference<SwXContentControl> CreateXContentControl(SwDoc& rDoc);
 
     /// Initializes params with position of the attribute content (without CH_TXTATR).
     bool SetContentRange(SwTextNode*& rpNode, sal_Int32& rStart, sal_Int32& rEnd) const;
-    css::uno::Reference<css::text::XText> GetParentText() const;
-
-    bool CheckForOwnMemberContentControl(const SwPaM& rPam, const bool bAbsorb);
+    const css::uno::Reference<css::text::XText>& GetParentText() const;
 
     static const css::uno::Sequence<sal_Int8>& getUnoTunnelId();
 

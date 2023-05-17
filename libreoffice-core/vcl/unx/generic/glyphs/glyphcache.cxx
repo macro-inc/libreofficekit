@@ -24,13 +24,12 @@
 #include <unx/freetype_glyphcache.hxx>
 #include <unx/gendata.hxx>
 
-#include <fontinstance.hxx>
+#include <font/LogicalFontInstance.hxx>
 
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
 
 FreetypeManager::FreetypeManager()
-    : m_nMaxFontId(0)
 {
     InitFreetype();
 }
@@ -75,32 +74,6 @@ FreetypeFontInstance::FreetypeFontInstance(const vcl::font::PhysicalFontFace& rP
 
 FreetypeFontInstance::~FreetypeFontInstance()
 {
-}
-
-static hb_blob_t* getFontTable(hb_face_t* /*face*/, hb_tag_t nTableTag, void* pUserData)
-{
-    char pTagName[5];
-    LogicalFontInstance::DecodeOpenTypeTag( nTableTag, pTagName );
-
-    sal_uLong nLength = 0;
-    FreetypeFontInstance* pFontInstance = static_cast<FreetypeFontInstance*>( pUserData );
-    FreetypeFont& rFont = pFontInstance->GetFreetypeFont();
-    const char* pBuffer = reinterpret_cast<const char*>(
-        rFont.GetTable(pTagName, &nLength) );
-
-    hb_blob_t* pBlob = nullptr;
-    if (pBuffer != nullptr)
-        pBlob = hb_blob_create(pBuffer, nLength, HB_MEMORY_MODE_READONLY, nullptr, nullptr);
-
-    return pBlob;
-}
-
-hb_font_t* FreetypeFontInstance::ImplInitHbFont()
-{
-    hb_font_t* pRet = InitHbFont(hb_face_create_for_tables(getFontTable, this, nullptr));
-    assert(mxFreetypeFont);
-    mxFreetypeFont->SetFontVariationsOnHBFont(pRet);
-    return pRet;
 }
 
 bool FreetypeFontInstance::ImplGetGlyphBoundRect(sal_GlyphId nId, tools::Rectangle& rRect, bool bVertical) const

@@ -25,7 +25,6 @@
 #include <tools/long.hxx>
 #include <tools/ref.hxx>
 #include "fontattributes.hxx"
-#include "sft.hxx"
 
 #include <vector>
 
@@ -58,6 +57,7 @@ public:
     tools::Long            GetExternalLeading() const                                      { return mnExtLeading; }
     int             GetSlant() const                                                { return mnSlant; }
     tools::Long            GetMinKashida() const                                           { return mnMinKashida; }
+    tools::Long            GetHangingBaseline() const                                      { return mnHangingBaseline; }
 
     void            SetSlant(int nSlant)                                            { mnSlant=nSlant; }
     void            SetMinKashida( tools::Long nMinKashida )                               { mnMinKashida=nMinKashida; }
@@ -96,12 +96,15 @@ public:
     tools::Long            GetDoubleStrikeoutOffset2() const                               { return mnDStrikeoutOffset2; }
 
     void            ImplInitTextLineSize( const OutputDevice* pDev );
-    void            ImplInitAboveTextLineSize();
+    void            ImplInitAboveTextLineSize( const OutputDevice* pDev );
     void            ImplInitFlags( const OutputDevice* pDev );
     void            ImplCalcLineSpacing(LogicalFontInstance *pFontInstance);
+    void            ImplInitBaselines(LogicalFontInstance *pFontInstance);
 
 private:
-    bool            ShouldUseWinMetrics(const vcl::TTGlobalFontInfo& rInfo) const;
+    bool            ShouldNotUseUnderlineMetrics() const;
+    bool            ImplInitTextLineSizeHarfBuzz(LogicalFontInstance *pFontInstance);
+    bool            ShouldUseWinMetrics(int, int, int, int, int, int) const;
 
     // font instance attributes from the font request
     tools::Long            mnHeight;                   // Font size
@@ -115,6 +118,7 @@ private:
     tools::Long            mnExtLeading;               // External Leading
     int             mnSlant;                    // Slant (Italic/Oblique)
     tools::Long            mnMinKashida;               // Minimal width of kashida (Arabic)
+    tools::Long            mnHangingBaseline;          // Offset of hanging baseline to Romn baseline
 
     // font attributes queried from the font instance
     bool            mbFullstopCentered;

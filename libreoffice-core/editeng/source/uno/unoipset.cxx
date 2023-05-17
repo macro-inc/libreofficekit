@@ -31,7 +31,7 @@
 using namespace ::com::sun::star;
 
 
-SvxItemPropertySet::SvxItemPropertySet( const SfxItemPropertyMapEntry* pMap, SfxItemPool& rItemPool )
+SvxItemPropertySet::SvxItemPropertySet( o3tl::span<const SfxItemPropertyMapEntry> pMap, SfxItemPool& rItemPool )
 :   m_aPropertyMap( pMap ),
     mrItemPool( rItemPool )
 {
@@ -142,7 +142,7 @@ void SvxItemPropertySet::setPropertyValue( const SfxItemPropertyMapEntry* pMap, 
     {
         // Set new item in item set
         pNewItem->SetWhich(pMap->nWID);
-        rSet.Put(*pNewItem);
+        rSet.Put(std::move(pNewItem));
     }
 }
 

@@ -47,8 +47,11 @@
 #include <vcl/svapp.hxx>
 #include "redlnitr.hxx"
 #include <extinput.hxx>
+#include <fmtpdsc.hxx>
+#include <editeng/charhiddenitem.hxx>
 #include <editeng/colritem.hxx>
 #include <editeng/crossedoutitem.hxx>
+#include <editeng/formatbreakitem.hxx>
 #include <editeng/udlnitem.hxx>
 
 using namespace ::com::sun::star;
@@ -62,12 +65,15 @@ private:
     IDocumentMarkAccess const& m_rIDMA;
     bool const m_isHideRedlines;
     sw::FieldmarkMode const m_eFieldmarkMode;
+    bool const m_isHideParagraphBreaks;
     SwPosition const m_Start;
     /// next redline
     SwRedlineTable::size_type m_RedlineIndex;
     /// next fieldmark
-    std::pair<sw::mark::IFieldmark const*, std::unique_ptr<SwPosition>> m_Fieldmark;
+    std::pair<sw::mark::IFieldmark const*, std::optional<SwPosition>> m_Fieldmark;
     std::optional<SwPosition> m_oNextFieldmarkHide;
+    /// previous paragraph break - because m_pStartPos/EndPos are non-owning
+    std::optional<std::pair<SwPosition, SwPosition>> m_oParagraphBreak;
     /// current start/end pair
     SwPosition const* m_pStartPos;
     SwPosition const* m_pEndPos;
@@ -77,13 +83,15 @@ public:
     SwPosition const* GetEndPos() const { return m_pEndPos; }
 
     HideIterator(SwTextNode & rTextNode,
-            bool const isHideRedlines, sw::FieldmarkMode const eMode)
+            bool const isHideRedlines, sw::FieldmarkMode const eMode,
+            sw::ParagraphBreakMode const ePBMode)
         : m_rIDRA(rTextNode.getIDocumentRedlineAccess())
         , m_rIDMA(*rTextNode.getIDocumentMarkAccess())
         , m_isHideRedlines(isHideRedlines)
         , m_eFieldmarkMode(eMode)
+        , m_isHideParagraphBreaks(ePBMode == sw::ParagraphBreakMode::Hidden)
         , m_Start(rTextNode, 0)
-        , m_RedlineIndex(m_rIDRA.GetRedlinePos(rTextNode, RedlineType::Any))
+        , m_RedlineIndex(isHideRedlines ? m_rIDRA.GetRedlinePos(rTextNode, RedlineType::Any) : SwRedlineTable::npos)
         , m_pStartPos(nullptr)
         , m_pEndPos(&m_Start)
     {
@@ -104,22 +112,21 @@ public:
             {
                 SwRangeRedline const*const pRed = m_rIDRA.GetRedlineTable()[m_RedlineIndex];
 
-                if (m_pEndPos->nNode.GetIndex() < pRed->Start()->nNode.GetIndex())
+                if (m_pEndPos->GetNodeIndex() < pRed->Start()->GetNodeIndex())
                     break;
 
                 if (pRed->GetType() != RedlineType::Delete)
                     continue;
 
-                SwPosition const*const pStart(pRed->Start());
-                SwPosition const*const pEnd(pRed->End());
+                auto [pStart, pEnd] = pRed->StartEnd(); // SwPosition*
                 if (*pStart == *pEnd)
                 {   // only allowed while moving (either way?)
 //                  assert(IDocumentRedlineAccess::IsHideChanges(rIDRA.GetRedlineFlags()));
                     continue;
                 }
-                if (pStart->nNode.GetNode().IsTableNode())
+                if (pStart->GetNode().IsTableNode())
                 {
-                    assert(pEnd->nNode == m_Start.nNode && pEnd->nContent.GetIndex() == 0);
+                    assert(pEnd->GetNode() == m_Start.GetNode() && pEnd->GetContentIndex() == 0);
                     continue; // known pathology, ignore it
                 }
                 if (*m_pEndPos <= *pStart)
@@ -137,9 +144,9 @@ public:
             sal_Unicode const magic(m_eFieldmarkMode == sw::FieldmarkMode::ShowResult
                     ? CH_TXT_ATR_FIELDSTART
                     : CH_TXT_ATR_FIELDSEP);
-            SwTextNode* pTextNode = m_pEndPos->nNode.GetNode().GetTextNode();
+            SwTextNode* pTextNode = m_pEndPos->GetNode().GetTextNode();
             sal_Int32 const nPos = pTextNode ? pTextNode->GetText().indexOf(
-                    magic, m_pEndPos->nContent.GetIndex()) : -1;
+                    magic, m_pEndPos->GetContentIndex()) : -1;
             if (nPos != -1)
             {
                 m_oNextFieldmarkHide.emplace(*pTextNode, nPos);
@@ -155,16 +162,15 @@ public:
                 // always hide the CH_TXT_ATR_FIELDSEP for now
                 if (m_eFieldmarkMode == sw::FieldmarkMode::ShowResult)
                 {
-                    m_Fieldmark.second.reset(
-                        new SwPosition(sw::mark::FindFieldSep(*m_Fieldmark.first)));
-                    ++m_Fieldmark.second->nContent;
-                    ++m_oNextFieldmarkHide->nContent; // skip start
+                    m_Fieldmark.second.emplace(
+                        sw::mark::FindFieldSep(*m_Fieldmark.first));
+                    m_Fieldmark.second->AdjustContent(+1);
+                    m_oNextFieldmarkHide->AdjustContent(+1); // skip start
                 }
                 else
                 {
-                    m_Fieldmark.second.reset(
-                        new SwPosition(pFieldmark->GetMarkEnd()));
-                    --m_Fieldmark.second->nContent;
+                    m_Fieldmark.second.emplace(pFieldmark->GetMarkEnd());
+                    m_Fieldmark.second->AdjustContent(-1);
                 }
             }
         }
@@ -187,15 +193,69 @@ public:
         {
             assert(!pNextRedlineHide || *m_oNextFieldmarkHide <= *pNextRedlineHide);
             m_pStartPos = &*m_oNextFieldmarkHide;
-            m_pEndPos = m_Fieldmark.second.get();
+            m_pEndPos = &*m_Fieldmark.second;
             return true;
         }
-        else // nothing
+        else
         {
             assert(!pNextRedlineHide && !m_oNextFieldmarkHide);
-            m_pStartPos = nullptr;
-            m_pEndPos = nullptr;
-            return false;
+            auto const hasHiddenItem = [](auto const& rNode) {
+                auto const& rpSet(rNode.GetAttr(RES_PARATR_LIST_AUTOFMT).GetStyleHandle());
+                return rpSet ? rpSet->Get(RES_CHRATR_HIDDEN).GetValue() : false;
+            };
+            auto const hasBreakBefore = [](SwTextNode const& rNode) {
+                if (rNode.GetAttr(RES_PAGEDESC).GetPageDesc())
+                {
+                    return true;
+                }
+                switch (rNode.GetAttr(RES_BREAK).GetBreak())
+                {
+                    case SvxBreak::ColumnBefore:
+                    case SvxBreak::ColumnBoth:
+                    case SvxBreak::PageBefore:
+                    case SvxBreak::PageBoth:
+                        return true;
+                    default:
+                        break;
+                }
+                return false;
+            };
+            auto const hasBreakAfter = [](SwTextNode const& rNode) {
+                switch (rNode.GetAttr(RES_BREAK).GetBreak())
+                {
+                    case SvxBreak::ColumnAfter:
+                    case SvxBreak::ColumnBoth:
+                    case SvxBreak::PageAfter:
+                    case SvxBreak::PageBoth:
+                        return true;
+                    default:
+                        break;
+                }
+                return false;
+            };
+            if (m_isHideParagraphBreaks
+                && m_pEndPos->GetNode().IsTextNode() // ooo27109-1.sxw
+                // only merge if next node is also text node
+                && m_pEndPos->GetNodes()[m_pEndPos->GetNodeIndex()+1]->IsTextNode()
+                && hasHiddenItem(*m_pEndPos->GetNode().GetTextNode())
+                // no merge if there's a page break on any node
+                && !hasBreakBefore(*m_pEndPos->GetNodes()[m_pEndPos->GetNodeIndex()+1]->GetTextNode())
+                // first node, see SwTextFrame::GetBreak()
+                && !hasBreakAfter(*m_Start.GetNode().GetTextNode()))
+            {
+                m_oParagraphBreak.emplace(
+                    SwPosition(*m_pEndPos->GetNode().GetTextNode(), m_pEndPos->GetNode().GetTextNode()->Len()),
+                    SwPosition(*m_pEndPos->GetNodes()[m_pEndPos->GetNodeIndex()+1]->GetTextNode(), 0));
+                m_pStartPos = &m_oParagraphBreak->first;
+                m_pEndPos = &m_oParagraphBreak->second;
+                return true;
+            }
+            else // nothing
+            {
+                m_pStartPos = nullptr;
+                m_pEndPos = nullptr;
+                return false;
+            }
         }
     }
 };
@@ -223,25 +283,27 @@ CheckParaRedlineMerge(SwTextFrame & rFrame, SwTextNode & rTextNode,
     sal_Int32 nLastEnd(0);
     for (auto iter = HideIterator(rTextNode,
                 rFrame.getRootFrame()->IsHideRedlines(),
-                rFrame.getRootFrame()->GetFieldmarkMode()); iter.Next(); )
+                rFrame.getRootFrame()->GetFieldmarkMode(),
+                rFrame.getRootFrame()->GetParagraphBreakMode());
+            iter.Next(); )
     {
         SwPosition const*const pStart(iter.GetStartPos());
         SwPosition const*const pEnd(iter.GetEndPos());
         bHaveRedlines = true;
-        assert(pNode != &rTextNode || &pStart->nNode.GetNode() == &rTextNode); // detect calls with wrong start node
-        if (pStart->nContent != nLastEnd) // not 0 so we eliminate adjacent deletes
+        assert(pNode != &rTextNode || &pStart->GetNode() == &rTextNode); // detect calls with wrong start node
+        if (pStart->GetContentIndex() != nLastEnd) // not 0 so we eliminate adjacent deletes
         {
-            extents.emplace_back(pNode, nLastEnd, pStart->nContent.GetIndex());
-            mergedText.append(pNode->GetText().subView(nLastEnd, pStart->nContent.GetIndex() - nLastEnd));
+            extents.emplace_back(pNode, nLastEnd, pStart->GetContentIndex());
+            mergedText.append(pNode->GetText().subView(nLastEnd, pStart->GetContentIndex() - nLastEnd));
         }
-        if (&pEnd->nNode.GetNode() != pNode)
+        if (&pEnd->GetNode() != pNode)
         {
             if (pNode == &rTextNode)
             {
                 pNode->SetRedlineMergeFlag(SwNode::Merge::First);
             } // else: was already set before
             int nLevel(0);
-            for (SwNodeOffset j = pNode->GetIndex() + 1; j < pEnd->nNode.GetIndex(); ++j)
+            for (SwNodeOffset j = pNode->GetIndex() + 1; j < pEnd->GetNodeIndex(); ++j)
             {
                 SwNode *const pTmp(pNode->GetNodes()[j]);
                 if (nLevel == 0)
@@ -271,12 +333,12 @@ CheckParaRedlineMerge(SwTextFrame & rFrame, SwTextNode & rTextNode,
             }
             // note: in DelLastPara() case, the end node is not actually merged
             // and is likely a SwTableNode!
-            if (!pEnd->nNode.GetNode().IsTextNode())
+            if (!pEnd->GetNode().IsTextNode())
             {
-                assert(pEnd->nNode != pStart->nNode);
+                assert(pEnd->GetNode() != pStart->GetNode());
                 // must set pNode too because it will mark the last node
                 pNode = nodes.back();
-                assert(pNode == pNode->GetNodes()[pEnd->nNode.GetIndex() - 1]);
+                assert(pNode == pNode->GetNodes()[pEnd->GetNodeIndex() - 1]);
                 if (pNode != &rTextNode)
                 {   // something might depend on last merged one being NonFirst?
                     pNode->SetRedlineMergeFlag(SwNode::Merge::NonFirst);
@@ -285,15 +347,15 @@ CheckParaRedlineMerge(SwTextFrame & rFrame, SwTextNode & rTextNode,
             }
             else
             {
-                pNode = pEnd->nNode.GetNode().GetTextNode();
+                pNode = pEnd->GetNode().GetTextNode();
                 nodes.push_back(pNode);
                 pNode->SetRedlineMergeFlag(SwNode::Merge::NonFirst);
-                nLastEnd = pEnd->nContent.GetIndex();
+                nLastEnd = pEnd->GetContentIndex();
             }
         }
         else
         {
-            nLastEnd = pEnd->nContent.GetIndex();
+            nLastEnd = pEnd->GetContentIndex();
         }
     }
     if (pNode == &rTextNode)
@@ -444,7 +506,7 @@ CheckParaRedlineMerge(SwTextFrame & rFrame, SwTextNode & rTextNode,
 void SwAttrIter::InitFontAndAttrHandler(
         SwTextNode const& rPropsNode,
         SwTextNode const& rTextNode,
-        OUString const& rText,
+        std::u16string_view aText,
         bool const*const pbVertLayout,
         bool const*const pbVertLayoutLRBT)
 {
@@ -514,7 +576,7 @@ void SwAttrIter::InitFontAndAttrHandler(
             m_pFont->GetFontCacheId( m_aFontCacheIds[ nTmp ], m_aFontIdx[ nTmp ], nTmp );
         }
     }
-    while (nChg < TextFrameIndex(rText.getLength()));
+    while (nChg < TextFrameIndex(aText.size()));
 }
 
 void SwAttrIter::CtorInitAttrIter(SwTextNode & rTextNode,
@@ -649,14 +711,16 @@ SwRedlineItr::SwRedlineItr( const SwTextNode& rTextNd, SwFont& rFnt,
     , m_nNdIdx( rTextNd.GetIndex() )
     , m_nFirst( nRed )
     , m_nAct( SwRedlineTable::npos )
+    , m_nStart( COMPLETE_STRING )
+    , m_nEnd( COMPLETE_STRING )
     , m_bOn( false )
     , m_eMode( mode )
 {
     if( pArr )
     {
         assert(pExtInputStart);
-        m_pExt.reset( new SwExtend(*pArr, pExtInputStart->nNode.GetIndex(),
-                                     pExtInputStart->nContent.GetIndex()) );
+        m_pExt.reset( new SwExtend(*pArr, pExtInputStart->GetNodeIndex(),
+                                     pExtInputStart->GetContentIndex()) );
     }
     else
         m_pExt = nullptr;
@@ -749,7 +813,7 @@ short SwRedlineItr::Seek(SwFont& rFnt,
                     {
                         const SfxPoolItem* pItem;
                         if( ( nWhich < RES_CHRATR_END ) &&
-                            ( SfxItemState::SET == m_pSet->GetItemState( nWhich, true, &pItem ) ) )
+                            ( SfxItemState::SET == aIter.GetItemState( true, &pItem ) ) )
                         {
                             SwTextAttr* pAttr = MakeRedlineTextAttr(
                                 const_cast<SwDoc&>(m_rDoc),
@@ -788,9 +852,9 @@ short SwRedlineItr::Seek(SwFont& rFnt,
                 m_rDoc.getIDocumentRedlineAccess().GetRedlineTable()[m_nAct]);
             SwPosition const*const pStart(pRedline->Start());
             if (pRedline->GetType() == RedlineType::Delete
-                && (nNode < pStart->nNode.GetIndex()
-                    || (nNode == pStart->nNode.GetIndex()
-                        && nNew <= pStart->nContent.GetIndex())))
+                && (nNode < pStart->GetNodeIndex()
+                    || (nNode == pStart->GetNodeIndex()
+                        && nNew <= pStart->GetContentIndex())))
             {
                 pRedline->CalcStartEnd(nNode, m_nStart, m_nEnd);
                 break;
@@ -1049,6 +1113,8 @@ void SwExtend::ActualizeFont( SwFont &rFnt, ExtTextInputAttr nAttr )
 {
     if ( nAttr & ExtTextInputAttr::Underline )
         rFnt.SetUnderline( LINESTYLE_SINGLE );
+    else if ( nAttr & ExtTextInputAttr::DoubleUnderline )
+        rFnt.SetUnderline( LINESTYLE_DOUBLE );
     else if ( nAttr & ExtTextInputAttr::BoldUnderline )
         rFnt.SetUnderline( LINESTYLE_BOLD );
     else if ( nAttr & ExtTextInputAttr::DottedUnderline )

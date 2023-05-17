@@ -30,10 +30,13 @@
 #include <vcl/cvtgrf.hxx>
 #include <memory>
 
+#include <com/sun/star/beans/XPropertySet.hpp>
+
 constexpr OUStringLiteral FORMAT_BMP = u"bmp";
 constexpr OUStringLiteral FORMAT_GIF = u"gif";
 constexpr OUStringLiteral FORMAT_JPG = u"jpg";
 constexpr OUStringLiteral FORMAT_PNG = u"png";
+constexpr OUStringLiteral FORMAT_TIF = u"tif";
 constexpr OUStringLiteral FORMAT_WEBP = u"webp";
 
 using namespace com::sun::star;
@@ -55,21 +58,21 @@ Animation XOutBitmap::MirrorAnimation( const Animation& rAnimation, bool bHMirr,
 
         for( sal_uInt16 i = 0, nCount = aNewAnim.Count(); i < nCount; i++ )
         {
-            AnimationBitmap aAnimationBitmap( aNewAnim.Get( i ) );
+            AnimationFrame aAnimationFrame( aNewAnim.Get( i ) );
 
             // mirror the BitmapEx
-            aAnimationBitmap.maBitmapEx.Mirror( nMirrorFlags );
+            aAnimationFrame.maBitmapEx.Mirror( nMirrorFlags );
 
             // Adjust the positions inside the whole bitmap
             if( bHMirr )
-                aAnimationBitmap.maPositionPixel.setX(rGlobalSize.Width() - aAnimationBitmap.maPositionPixel.X() -
-                                       aAnimationBitmap.maSizePixel.Width());
+                aAnimationFrame.maPositionPixel.setX(rGlobalSize.Width() - aAnimationFrame.maPositionPixel.X() -
+                                       aAnimationFrame.maSizePixel.Width());
 
             if( bVMirr )
-                aAnimationBitmap.maPositionPixel.setY(rGlobalSize.Height() - aAnimationBitmap.maPositionPixel.Y() -
-                                       aAnimationBitmap.maSizePixel.Height());
+                aAnimationFrame.maPositionPixel.setY(rGlobalSize.Height() - aAnimationFrame.maPositionPixel.Y() -
+                                       aAnimationFrame.maSizePixel.Height());
 
-            aNewAnim.Replace(aAnimationBitmap, i);
+            aNewAnim.Replace(aAnimationFrame, i);
         }
     }
 
@@ -104,7 +107,8 @@ Graphic XOutBitmap::MirrorGraphic( const Graphic& rGraphic, const BmpMirrorFlags
 ErrCode XOutBitmap::WriteGraphic( const Graphic& rGraphic, OUString& rFileName,
                                  const OUString& rFilterName, const XOutFlags nFlags,
                                  const Size* pMtfSize_100TH_MM,
-                                 const css::uno::Sequence< css::beans::PropertyValue >* pFilterData )
+                                 const css::uno::Sequence< css::beans::PropertyValue >* pFilterData,
+                                 OUString* pMediaType )
 {
     if( rGraphic.GetType() == GraphicType::NONE )
         return ERRCODE_NONE;
@@ -156,8 +160,7 @@ ErrCode XOutBitmap::WriteGraphic( const Graphic& rGraphic, OUString& rFileName,
 
             if (pOStm)
             {
-                auto & rDataContainer = rVectorGraphicDataPtr->getBinaryDataContainer();
-                pOStm->WriteBytes(rDataContainer.getData(), rDataContainer.getSize());
+                rVectorGraphicDataPtr->getBinaryDataContainer().writeToStream(*pOStm);
                 aMedium.Commit();
 
                 if (!aMedium.GetError())
@@ -183,6 +186,7 @@ ErrCode XOutBitmap::WriteGraphic( const Graphic& rGraphic, OUString& rFileName,
 
             case GfxLinkType::NativeJpg: aExt = FORMAT_JPG; break;
             case GfxLinkType::NativePng: aExt = FORMAT_PNG; break;
+            case GfxLinkType::NativeTif: aExt = FORMAT_TIF; break;
             case GfxLinkType::NativeWebp: aExt = FORMAT_WEBP; break;
 
             default:
@@ -197,6 +201,9 @@ ErrCode XOutBitmap::WriteGraphic( const Graphic& rGraphic, OUString& rFileName,
             if( !(nFlags & XOutFlags::DontAddExtension) )
                 aURL.setExtension( aExt );
             rFileName = aURL.GetMainURL( INetURLObject::DecodeMechanism::NONE );
+            if (pMediaType)
+                if (uno::Reference<beans::XPropertySet> xGraphic{ rGraphic.GetXGraphic(), uno::UNO_QUERY })
+                    xGraphic->getPropertyValue("MimeType") >>= *pMediaType;
 
             SfxMedium   aMedium(aURL.GetMainURL(INetURLObject::DecodeMechanism::NONE), StreamMode::WRITE | StreamMode::SHARE_DENYNONE | StreamMode::TRUNC);
             SvStream*   pOStm = aMedium.GetOutStream();
@@ -308,6 +315,8 @@ ErrCode XOutBitmap::WriteGraphic( const Graphic& rGraphic, OUString& rFileName,
             if( !(nFlags & XOutFlags::DontAddExtension) )
                 aURL.setExtension( aExt );
             rFileName = aURL.GetMainURL( INetURLObject::DecodeMechanism::NONE );
+            if (pMediaType)
+                *pMediaType = rFilter.GetExportFormatMediaType(nFilter);
             nErr = ExportGraphic( aGraphic, aURL, rFilter, nFilter, pFilterData );
         }
     }

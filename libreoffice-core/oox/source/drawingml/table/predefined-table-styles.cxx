@@ -202,15 +202,15 @@ static std::map<OUString, sal_Int32> tokens = { { "", XML_dk1 },
                                                 { "Accent5", XML_accent5 },
                                                 { "Accent6", XML_accent6 } };
 
-void setBorderLineType(oox::drawingml::LinePropertiesPtr& pLineProp, sal_Int32 nToken)
+void setBorderLineType(const oox::drawingml::LinePropertiesPtr& pLineProp, sal_Int32 nToken)
 {
-    pLineProp->maLineFill.moFillType.set(nToken);
+    pLineProp->maLineFill.moFillType = nToken;
 }
 
 void insertBorderLine(TableStylePart& aTableStylePart, sal_Int32 nToken,
                       oox::drawingml::LinePropertiesPtr pLineProp)
 {
-    if (pLineProp->maLineFill.moFillType.has())
+    if (pLineProp->maLineFill.moFillType.has_value())
     {
         aTableStylePart.getLineBorders().insert(
             std::pair<sal_Int32, ::oox::drawingml::LinePropertiesPtr>(nToken, pLineProp));
@@ -381,16 +381,16 @@ std::unique_ptr<TableStyle> CreateTableStyle(const OUString& styleId)
 
     // Start to set fill types.
 
-    pTblBgFillProperties->moFillType.set(XML_solidFill);
-    pWholeTblFillProperties->moFillType.set(XML_solidFill);
-    pFirstRowFillProperties->moFillType.set(XML_solidFill);
-    pFirstColFillProperties->moFillType.set(XML_solidFill);
-    pLastRowFillProperties->moFillType.set(XML_solidFill);
-    pLastColFillProperties->moFillType.set(XML_solidFill);
-    pBand1HFillProperties->moFillType.set(XML_solidFill);
-    pBand1VFillProperties->moFillType.set(XML_solidFill);
-    pBand2HFillProperties->moFillType.set(XML_solidFill);
-    pBand2VFillProperties->moFillType.set(XML_solidFill);
+    pTblBgFillProperties->moFillType = XML_solidFill;
+    pWholeTblFillProperties->moFillType = XML_solidFill;
+    pFirstRowFillProperties->moFillType = XML_solidFill;
+    pFirstColFillProperties->moFillType = XML_solidFill;
+    pLastRowFillProperties->moFillType = XML_solidFill;
+    pLastColFillProperties->moFillType = XML_solidFill;
+    pBand1HFillProperties->moFillType = XML_solidFill;
+    pBand1VFillProperties->moFillType = XML_solidFill;
+    pBand2HFillProperties->moFillType = XML_solidFill;
+    pBand2VFillProperties->moFillType = XML_solidFill;
 
     // End to set fill types.
 
@@ -884,6 +884,8 @@ std::unique_ptr<TableStyle> CreateTableStyle(const OUString& styleId)
     // End to handle all style groups.
 
     // Create a TableStyle from handled properties.
+    pTableStyle->getStyleId() = styleId;
+    pTableStyle->getStyleName() = style_name;
 
     pTableStyle->getWholeTbl().getTextColor() = wholeTblTextColor;
     pTableStyle->getFirstRow().getTextColor() = firstRowTextColor;

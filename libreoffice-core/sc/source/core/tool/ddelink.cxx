@@ -24,8 +24,8 @@
 #include <sfx2/linkmgr.hxx>
 #include <sfx2/bindings.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <svl/sharedstringpool.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <ddelink.hxx>
 #include <brdcst.hxx>
@@ -36,17 +36,18 @@
 #include <rangeseq.hxx>
 #include <sc.hrc>
 #include <hints.hxx>
+#include <utility>
 
 
 bool ScDdeLink::bIsInUpdate = false;
 
-ScDdeLink::ScDdeLink( ScDocument& rD, const OUString& rA, const OUString& rT, const OUString& rI,
+ScDdeLink::ScDdeLink( ScDocument& rD, OUString aA, OUString aT, OUString aI,
                         sal_uInt8 nM ) :
     ::sfx2::SvBaseLink(SfxLinkUpdateMode::ALWAYS,SotClipboardFormatId::STRING),
     rDoc( rD ),
-    aAppl( rA ),
-    aTopic( rT ),
-    aItem( rI ),
+    aAppl(std::move( aA )),
+    aTopic(std::move( aT )),
+    aItem(std::move( aI )),
     nMode( nM ),
     bNeedUpdate( false ),
     pResult( nullptr )
@@ -129,7 +130,8 @@ sfx2::SvBaseLink::UpdateResult ScDdeLink::DataChanged(
         return SUCCESS;
 
     OUString aLinkStr;
-    ScByteSequenceToString::GetString( aLinkStr, rValue, osl_getThreadTextEncoding() );
+    if (!(rValue >>= aLinkStr))
+        ScByteSequenceToString::GetString( aLinkStr, rValue, osl_getThreadTextEncoding() );
     aLinkStr = convertLineEnd(aLinkStr, LINEEND_LF);
 
     //  if string ends with line end, discard:
@@ -138,14 +140,13 @@ sfx2::SvBaseLink::UpdateResult ScDdeLink::DataChanged(
     if (nLen && aLinkStr[nLen-1] == '\n')
         aLinkStr = aLinkStr.copy(0, nLen-1);
 
-    OUString aLine;
     SCSIZE nCols = 1;       // empty string -> an empty line
     SCSIZE nRows = 1;
     if (!aLinkStr.isEmpty())
     {
         nRows = static_cast<SCSIZE>(comphelper::string::getTokenCount(aLinkStr, '\n'));
-        aLine = aLinkStr.getToken( 0, '\n' );
-        if (!aLine.isEmpty())
+        std::u16string_view aLine = o3tl::getToken(aLinkStr, 0, '\n' );
+        if (!aLine.empty())
             nCols = static_cast<SCSIZE>(comphelper::string::getTokenCount(aLine, '\t'));
     }
 
@@ -175,13 +176,12 @@ sfx2::SvBaseLink::UpdateResult ScDdeLink::DataChanged(
         else if ( nMode == SC_DDE_ENGLISH )
             nStdFormat = pFormatter->GetStandardIndex(LANGUAGE_ENGLISH_US);
 
-        OUString aEntry;
         for (SCSIZE nR=0; nR<nRows; nR++)
         {
-            aLine = aLinkStr.getToken( static_cast<sal_Int32>(nR), '\n' );
+            std::u16string_view aLine = o3tl::getToken(aLinkStr, static_cast<sal_Int32>(nR), '\n' );
             for (SCSIZE nC=0; nC<nCols; nC++)
             {
-                aEntry = aLine.getToken( static_cast<sal_Int32>(nC), '\t' );
+                OUString aEntry( o3tl::getToken(aLine, static_cast<sal_Int32>(nC), '\t' ) );
                 sal_uInt32 nIndex = nStdFormat;
                 double fVal = double();
                 if ( nMode != SC_DDE_TEXT && pFormatter->IsNumberFormat( aEntry, nIndex, fVal ) )

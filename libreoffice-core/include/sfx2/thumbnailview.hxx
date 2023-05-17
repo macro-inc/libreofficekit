@@ -189,8 +189,6 @@ public:
 
     sal_uInt16 GetItemId( const Point& rPos ) const;
 
-    sal_uInt16 getNextItemId () const;
-
     virtual bool renameItem(ThumbnailViewItem* pItem, const OUString& sNewTitle);
 
     bool isDrawMnemonic() const { return mbDrawMnemonics; }
@@ -238,8 +236,6 @@ public:
 
     static BitmapEx readThumbnail(const OUString &msURL);
 
-    tools::Long ItemHeight() const { return mnItemHeight; };
-
 protected:
 
     virtual bool KeyInput( const KeyEvent& rKEvt ) override;
@@ -256,7 +252,7 @@ protected:
 
     virtual css::uno::Reference< css::accessibility::XAccessible > CreateAccessible() override;
 
-    css::uno::Reference<css::accessibility::XAccessible> getAccessible() const;
+    const css::uno::Reference<css::accessibility::XAccessible> & getAccessible() const;
 
 protected:
 

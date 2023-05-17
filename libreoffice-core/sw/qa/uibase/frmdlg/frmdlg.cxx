@@ -13,17 +13,20 @@
 
 #include <com/sun/star/text/TextContentAnchorType.hpp>
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/uibase/frmdlg/data/";
-
 /// Covers sw/source/uibase/frmdlg/ fixes.
 class SwUibaseFrmdlgTest : public SwModelTestBase
 {
+public:
+    SwUibaseFrmdlgTest()
+        : SwModelTestBase("/sw/qa/uibase/frmdlg/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(SwUibaseFrmdlgTest, testWrappedMathObject)
 {
     // The document includes a Math object with explicit wrapping.
-    load(DATA_DIRECTORY, "wrapped-math-object.docx");
+    createSwDoc("wrapped-math-object.docx");
     uno::Reference<drawing::XShape> xMath = getShape(1);
 
     // Without the accompanying fix in place, this test would have failed with:
@@ -40,13 +43,11 @@ CPPUNIT_TEST_FIXTURE(SwUibaseFrmdlgTest, testAnchorTypeFromStyle)
     createSwDoc();
     uno::Reference<beans::XPropertySet> xGraphics(getStyles("FrameStyles")->getByName("Graphics"),
                                                   uno::UNO_QUERY);
-    xGraphics->setPropertyValue("AnchorType",
-                                uno::makeAny(text::TextContentAnchorType_AS_CHARACTER));
+    xGraphics->setPropertyValue("AnchorType", uno::Any(text::TextContentAnchorType_AS_CHARACTER));
 
     // When inserting an image:
-    OUString aImageURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "image.png";
     uno::Sequence<beans::PropertyValue> aArgs = {
-        comphelper::makePropertyValue("FileName", aImageURL),
+        comphelper::makePropertyValue("FileName", createFileURL(u"image.png")),
     };
     dispatchCommand(mxComponent, ".uno:InsertGraphic", aArgs);
 

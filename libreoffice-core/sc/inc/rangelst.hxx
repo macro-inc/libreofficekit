@@ -40,7 +40,7 @@ public:
     ScRangeList& operator=(const ScRangeList& rList);
     ScRangeList& operator=(ScRangeList&& rList) noexcept;
 
-    ScRefFlags      Parse( const OUString&, const ScDocument&,
+    ScRefFlags      Parse( std::u16string_view, const ScDocument&,
                            formula::FormulaGrammar::AddressConvention eConv = formula::FormulaGrammar::CONV_OOO,
                            SCTAB nDefaultTab = 0, sal_Unicode cDelimiter = 0 );
 
@@ -72,7 +72,7 @@ public:
     bool            operator==( const ScRangeList& ) const;
     bool            operator!=( const ScRangeList& r ) const;
     bool            Intersects( const ScRange& ) const;
-    bool            In( const ScRange& ) const;
+    bool            Contains( const ScRange& ) const;
     sal_uInt64      GetCellCount() const;
     ScAddress       GetTopLeftCorner() const;
 

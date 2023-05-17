@@ -20,6 +20,7 @@
 #include <config_features.h>
 
 #include <dp_interact.h>
+#include <dp_misc.h>
 #include <dp_registry.hxx>
 #include <dp_shared.hxx>
 #include <strings.hrc>
@@ -33,13 +34,14 @@
 #include <rtl/bootstrap.hxx>
 #include <sal/log.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <osl/file.hxx>
 #include <osl/security.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <comphelper/logging.hxx>
 #include <comphelper/sequence.hxx>
+#include <utility>
 #include <xmlscript/xml_helper.hxx>
 #include <svl/inettype.hxx>
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
@@ -84,7 +86,7 @@ namespace {
 struct MatchTempDir
 {
     OUString m_str;
-    explicit MatchTempDir( OUString const & str ) : m_str( str ) {}
+    explicit MatchTempDir( OUString str ) : m_str(std::move( str )) {}
     bool operator () ( ActivePackages::Entries::value_type const & v ) const {
         return v.second.temporaryName.equalsIgnoreAsciiCase( m_str );
     }
@@ -606,9 +608,7 @@ OUString PackageManagerImpl::insertToActivationLayer(
     Reference<XCommandEnvironment> xCmdEnv(
         sourceContent.getCommandEnvironment() );
 
-    OUString baseDir(m_activePackages_expanded);
-    ::utl::TempFile aTemp(&baseDir, false);
-    OUString tempEntry = aTemp.GetURL();
+    OUString tempEntry = ::utl::CreateTempURL(&m_activePackages_expanded, false);
     tempEntry = tempEntry.copy(tempEntry.lastIndexOf('/') + 1);
     OUString destFolder = makeURL( m_activePackages, tempEntry) + "_";
 
@@ -668,7 +668,7 @@ void PackageManagerImpl::insertToActivationLayerDB(
     OUString const & id, ActivePackages::Data const & dbData )
 {
     //access to the database must be guarded. See removePackage
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     m_activePackagesDB->put( id, dbData );
 }
 
@@ -871,7 +871,7 @@ void PackageManagerImpl::removePackage(
     try {
         Reference<deployment::XPackage> xPackage;
         {
-            const ::osl::MutexGuard guard(getMutex());
+            const ::osl::MutexGuard guard(m_aMutex);
             //Check if this extension exist and throw an IllegalArgumentException
             //if it does not
             //If the files of the extension are already removed, or there is a
@@ -1051,7 +1051,7 @@ Reference<deployment::XPackage> PackageManagerImpl::getDeployedPackage(
         xCmdEnv.set( xCmdEnv_ );
 
     try {
-        const ::osl::MutexGuard guard( getMutex() );
+        const ::osl::MutexGuard guard( m_aMutex );
         return getDeployedPackage_( id, fileName, xCmdEnv );
     }
     catch (const RuntimeException &) {
@@ -1089,7 +1089,7 @@ PackageManagerImpl::getDeployedPackages(
         xCmdEnv.set( xCmdEnv_ );
 
     try {
-        const ::osl::MutexGuard guard( getMutex() );
+        const ::osl::MutexGuard guard( m_aMutex );
         return getDeployedPackages_( xCmdEnv );
     }
     catch (const RuntimeException &) {
@@ -1201,7 +1201,7 @@ bool PackageManagerImpl::synchronizeRemovedExtensions(
             //shared repository including the temporary name
             OUString url = makeURL(m_activePackages, elem.second.temporaryName);
             if (bShared)
-                url = makeURLAppendSysPathSegment( url + "_", elem.second.fileName);
+                url = makeURLAppendSysPathSegment( Concat2View(url + "_"), elem.second.fileName);
 
             bool bRemoved = false;
             //Check if the URL to the extension is still the same
@@ -1428,7 +1428,7 @@ Sequence< Reference<deployment::XPackage> > PackageManagerImpl::getExtensionsWit
 
     try
     {
-        const ::osl::MutexGuard guard( getMutex() );
+        const ::osl::MutexGuard guard( m_aMutex );
         // clean up activation layer, scan for zombie temp dirs:
         ActivePackages::Entries id2temp( m_activePackagesDB->getEntries() );
 
@@ -1447,7 +1447,7 @@ Sequence< Reference<deployment::XPackage> > PackageManagerImpl::getExtensionsWit
             //Prepare the URL to the extension
             OUString url = makeURL(m_activePackages, elem.second.temporaryName);
             if (bShared)
-                url = makeURLAppendSysPathSegment( url + "_", elem.second.fileName);
+                url = makeURLAppendSysPathSegment( Concat2View(url + "_"), elem.second.fileName);
 
             Reference<deployment::XPackage> p = m_xRegistry->bindPackage(
                 url, OUString(), false, OUString(), xCmdEnv );

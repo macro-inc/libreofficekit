@@ -7,13 +7,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
-#include <test/xmltesttools.hxx>
+#include <test/unoapixml_test.hxx>
 
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 
 #include <drawinglayer/tools/primitive2dxmldump.hxx>
 #include <rtl/ustring.hxx>
@@ -35,27 +32,13 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Tests for svx/source/table/ code.
-class Test : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class Test : public UnoApiXmlTest
 {
-protected:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    virtual void setUp() override
+    Test()
+        : UnoApiXmlTest("svx/qa/unit/data/")
     {
-        test::BootstrapFixture::setUp();
-        mxDesktop.set(frame::Desktop::create(m_xContext));
     }
-
-    virtual void tearDown() override
-    {
-        if (mxComponent.is())
-        {
-            mxComponent->dispose();
-        }
-        test::BootstrapFixture::tearDown();
-    }
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
 
     drawinglayer::primitive2d::Primitive2DContainer
     renderPageToPrimitives(const uno::Reference<drawing::XDrawPage>& xDrawPage);
@@ -81,12 +64,10 @@ Test::renderPageToPrimitives(const uno::Reference<drawing::XDrawPage>& xDrawPage
 CPPUNIT_TEST_FIXTURE(Test, testTableShadowBlur)
 {
     // Given a document containing a table with a blurry shadow:
-    test::Directories aDirectories;
-    OUString aURL = aDirectories.getURLFromSrc(u"svx/qa/unit/data/table-shadow-blur.pptx");
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"table-shadow-blur.pptx");
 
     // When rendering the table shadow to primitives:
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     drawinglayer::primitive2d::Primitive2DContainer xPrimitiveSequence
@@ -108,13 +89,13 @@ CPPUNIT_TEST_FIXTURE(Test, testTableShadowBlur)
 CPPUNIT_TEST_FIXTURE(Test, testSvxTableControllerSetAttrToSelectedShape)
 {
     // Given a document with a table shape, editing cell text:
-    getComponent() = loadFromDesktop("private:factory/simpress",
-                                     "com.sun.star.presentation.PresentationDocument");
+    mxComponent = loadFromDesktop("private:factory/simpress",
+                                  "com.sun.star.presentation.PresentationDocument");
     uno::Sequence<beans::PropertyValue> aArgs
         = { comphelper::makePropertyValue("Rows", sal_Int32(2)),
             comphelper::makePropertyValue("Columns", sal_Int32(2)) };
     dispatchCommand(mxComponent, ".uno:InsertTable", aArgs);
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     auto pDrawPage = dynamic_cast<SvxDrawPage*>(xDrawPage.get());

@@ -46,13 +46,13 @@ namespace {
 class SvxUnoXPropertyTable : public WeakImplHelper< container::XNameContainer, lang::XServiceInfo >
 {
 private:
-    XPropertyList*  mpList;
+    XPropertyList& mrList;
     sal_Int16 mnWhich;
 
-    tools::Long getCount() const { return mpList ? mpList->Count() : 0; }
+    tools::Long getCount() const { return mrList.Count(); }
     const XPropertyEntry* get(tools::Long index) const;
 public:
-    SvxUnoXPropertyTable( sal_Int16 nWhich, XPropertyList* pList ) noexcept;
+    SvxUnoXPropertyTable( sal_Int16 nWhich, XPropertyList& rList ) noexcept;
 
     /// @throws uno::RuntimeException
     virtual uno::Any getAny( const XPropertyEntry* pEntry ) const = 0;
@@ -81,17 +81,14 @@ public:
 
 }
 
-SvxUnoXPropertyTable::SvxUnoXPropertyTable( sal_Int16 nWhich, XPropertyList* pList ) noexcept
-: mpList( pList ), mnWhich( nWhich )
+SvxUnoXPropertyTable::SvxUnoXPropertyTable( sal_Int16 nWhich, XPropertyList& rList ) noexcept
+: mrList( rList ), mnWhich( nWhich )
 {
 }
 
 const XPropertyEntry* SvxUnoXPropertyTable::get(tools::Long index) const
 {
-    if( mpList )
-        return mpList->Get(index);
-    else
-        return nullptr;
+   return mrList.Get(index);
 }
 
 // XServiceInfo
@@ -105,9 +102,6 @@ void SAL_CALL SvxUnoXPropertyTable::insertByName( const  OUString& aName, const 
 {
     SolarMutexGuard aGuard;
 
-    if( nullptr == mpList )
-        throw lang::IllegalArgumentException();
-
     if( hasByName( aName ) )
         throw container::ElementExistException();
 
@@ -117,7 +111,7 @@ void SAL_CALL SvxUnoXPropertyTable::insertByName( const  OUString& aName, const 
     if (!pNewEntry)
         throw lang::IllegalArgumentException();
 
-    mpList->Insert(std::move(pNewEntry));
+    mrList.Insert(std::move(pNewEntry));
 }
 
 void SAL_CALL SvxUnoXPropertyTable::removeByName( const  OUString& Name )
@@ -133,7 +127,7 @@ void SAL_CALL SvxUnoXPropertyTable::removeByName( const  OUString& Name )
         const XPropertyEntry* pEntry = get(i);
         if (pEntry && aInternalName == pEntry->GetName())
         {
-            mpList->Remove(i);
+            mrList.Remove(i);
             return;
         }
     }
@@ -159,7 +153,7 @@ void SAL_CALL SvxUnoXPropertyTable::replaceByName( const  OUString& aName, const
             if (!pNewEntry)
                 throw lang::IllegalArgumentException();
 
-            mpList->Replace(std::move(pNewEntry), i);
+            mrList.Replace(std::move(pNewEntry), i);
             return;
         }
     }
@@ -212,7 +206,7 @@ sal_Bool SAL_CALL SvxUnoXPropertyTable::hasByName( const  OUString& aName )
 
     OUString aInternalName = SvxUnogetInternalNameForItem(mnWhich, aName);
 
-    const tools::Long nCount = mpList?mpList->Count():0;
+    const tools::Long nCount = mrList.Count();
     tools::Long i;
     for( i = 0; i < nCount; i++ )
     {
@@ -237,7 +231,7 @@ namespace {
 class SvxUnoXColorTable : public SvxUnoXPropertyTable
 {
 public:
-    explicit SvxUnoXColorTable( XPropertyList* pList ) noexcept : SvxUnoXPropertyTable( XATTR_LINECOLOR, pList ) {};
+    explicit SvxUnoXColorTable( XPropertyList& rList ) noexcept : SvxUnoXPropertyTable( XATTR_LINECOLOR, rList ) {};
 
     // SvxUnoXPropertyTable
     virtual uno::Any getAny( const XPropertyEntry* pEntry ) const noexcept override;
@@ -253,9 +247,9 @@ public:
 
 }
 
-uno::Reference< uno::XInterface > SvxUnoXColorTable_createInstance( XPropertyList* pList ) noexcept
+uno::Reference< container::XNameContainer > SvxUnoXColorTable_createInstance( XPropertyList& rList ) noexcept
 {
-    return static_cast<OWeakObject*>(new SvxUnoXColorTable( pList ));
+    return new SvxUnoXColorTable( rList );
 }
 
 // SvxUnoXPropertyTable
@@ -295,7 +289,7 @@ namespace {
 class SvxUnoXLineEndTable : public SvxUnoXPropertyTable
 {
 public:
-    explicit SvxUnoXLineEndTable( XPropertyList* pTable ) noexcept : SvxUnoXPropertyTable( XATTR_LINEEND, pTable ) {};
+    explicit SvxUnoXLineEndTable( XPropertyList& rTable ) noexcept : SvxUnoXPropertyTable( XATTR_LINEEND, rTable ) {};
 
     // SvxUnoXPropertyTable
     virtual uno::Any getAny( const XPropertyEntry* pEntry ) const noexcept override;
@@ -311,9 +305,9 @@ public:
 
 }
 
-uno::Reference< uno::XInterface > SvxUnoXLineEndTable_createInstance( XPropertyList* pTable ) noexcept
+uno::Reference< container::XNameContainer > SvxUnoXLineEndTable_createInstance( XPropertyList& rTable ) noexcept
 {
-    return static_cast<OWeakObject*>(new SvxUnoXLineEndTable( pTable ));
+    return new SvxUnoXLineEndTable( rTable );
 }
 
 // SvxUnoXPropertyTable
@@ -363,7 +357,7 @@ namespace {
 class SvxUnoXDashTable : public SvxUnoXPropertyTable
 {
 public:
-    explicit SvxUnoXDashTable( XPropertyList* pTable ) noexcept : SvxUnoXPropertyTable( XATTR_LINEDASH, pTable ) {};
+    explicit SvxUnoXDashTable( XPropertyList& rTable ) noexcept : SvxUnoXPropertyTable( XATTR_LINEDASH, rTable ) {};
 
     // SvxUnoXPropertyTable
     virtual uno::Any getAny( const XPropertyEntry* pEntry ) const noexcept override;
@@ -379,9 +373,9 @@ public:
 
 }
 
-uno::Reference< uno::XInterface > SvxUnoXDashTable_createInstance( XPropertyList* pTable ) noexcept
+uno::Reference< container::XNameContainer > SvxUnoXDashTable_createInstance( XPropertyList& rTable ) noexcept
 {
-    return static_cast<OWeakObject*>(new SvxUnoXDashTable( pTable ));
+    return new SvxUnoXDashTable( rTable );
 }
 
 // SvxUnoXPropertyTable
@@ -441,7 +435,7 @@ namespace {
 class SvxUnoXHatchTable : public SvxUnoXPropertyTable
 {
 public:
-    explicit SvxUnoXHatchTable( XPropertyList* pTable ) noexcept : SvxUnoXPropertyTable( XATTR_FILLHATCH, pTable ) {};
+    explicit SvxUnoXHatchTable( XPropertyList& rTable ) noexcept : SvxUnoXPropertyTable( XATTR_FILLHATCH, rTable ) {};
 
     // SvxUnoXPropertyTable
     virtual uno::Any getAny( const XPropertyEntry* pEntry ) const noexcept override;
@@ -457,9 +451,9 @@ public:
 
 }
 
-uno::Reference< uno::XInterface > SvxUnoXHatchTable_createInstance( XPropertyList* pTable ) noexcept
+uno::Reference< container::XNameContainer > SvxUnoXHatchTable_createInstance( XPropertyList& rTable ) noexcept
 {
-    return static_cast<OWeakObject*>(new SvxUnoXHatchTable( pTable ));
+    return new SvxUnoXHatchTable( rTable );
 }
 
 // SvxUnoXPropertyTable
@@ -514,7 +508,7 @@ namespace {
 class SvxUnoXGradientTable : public SvxUnoXPropertyTable
 {
 public:
-    explicit SvxUnoXGradientTable( XPropertyList* pTable ) noexcept : SvxUnoXPropertyTable( XATTR_FILLGRADIENT, pTable ) {};
+    explicit SvxUnoXGradientTable( XPropertyList& rTable ) noexcept : SvxUnoXPropertyTable( XATTR_FILLGRADIENT, rTable ) {};
 
     // SvxUnoXPropertyTable
     virtual uno::Any getAny( const XPropertyEntry* pEntry ) const noexcept override;
@@ -530,20 +524,21 @@ public:
 
 }
 
-uno::Reference< uno::XInterface > SvxUnoXGradientTable_createInstance( XPropertyList* pTable ) noexcept
+uno::Reference< container::XNameContainer > SvxUnoXGradientTable_createInstance( XPropertyList& rTable ) noexcept
 {
-    return static_cast<OWeakObject*>(new SvxUnoXGradientTable( pTable ));
+    return new SvxUnoXGradientTable( rTable );
 }
 
 // SvxUnoXPropertyTable
 uno::Any SvxUnoXGradientTable::getAny( const XPropertyEntry* pEntry ) const noexcept
 {
     const XGradient& aXGradient = static_cast<const XGradientEntry*>(pEntry)->GetGradient();
-    awt::Gradient aGradient;
+    awt::Gradient2 aGradient;
 
+    // standard values
     aGradient.Style = aXGradient.GetGradientStyle();
-    aGradient.StartColor = static_cast<sal_Int32>(aXGradient.GetStartColor());
-    aGradient.EndColor = static_cast<sal_Int32>(aXGradient.GetEndColor());
+    // aGradient.StartColor = static_cast<sal_Int32>(Color(aXGradient.GetColorStops().front().getStopColor()));
+    // aGradient.EndColor = static_cast<sal_Int32>(Color(aXGradient.GetColorStops().back().getStopColor()));
     aGradient.Angle = static_cast<short>(aXGradient.GetAngle());
     aGradient.Border = aXGradient.GetBorder();
     aGradient.XOffset = aXGradient.GetXOffset();
@@ -551,6 +546,14 @@ uno::Any SvxUnoXGradientTable::getAny( const XPropertyEntry* pEntry ) const noex
     aGradient.StartIntensity = aXGradient.GetStartIntens();
     aGradient.EndIntensity = aXGradient.GetEndIntens();
     aGradient.StepCount = aXGradient.GetSteps();
+
+    // for compatibility, still set StartColor/EndColor
+    const basegfx::ColorStops& rColorStops(aXGradient.GetColorStops());
+    aGradient.StartColor = static_cast<sal_Int32>(Color(rColorStops.front().getStopColor()));
+    aGradient.EndColor = static_cast<sal_Int32>(Color(rColorStops.back().getStopColor()));
+
+    // fill ColorStops to extended Gradient2
+    basegfx::utils::fillColorStopSequenceFromColorStops(aGradient.ColorStops, rColorStops);
 
     return uno::Any(aGradient);
 }
@@ -561,11 +564,12 @@ std::unique_ptr<XPropertyEntry> SvxUnoXGradientTable::createEntry(const OUString
     if(!(rAny >>= aGradient))
         return std::unique_ptr<XPropertyEntry>();
 
-    XGradient aXGradient;
+    XGradient aXGradient(
+        basegfx::utils::createColorStopsFromStartEndColor(
+            Color(ColorTransparency, aGradient.StartColor).getBColor(),
+            Color(ColorTransparency, aGradient.EndColor).getBColor()));
 
     aXGradient.SetGradientStyle( aGradient.Style );
-    aXGradient.SetStartColor( Color(ColorTransparency, aGradient.StartColor) );
-    aXGradient.SetEndColor( Color(ColorTransparency, aGradient.EndColor) );
     aXGradient.SetAngle( Degree10(aGradient.Angle) );
     aXGradient.SetBorder( aGradient.Border );
     aXGradient.SetXOffset( aGradient.XOffset );
@@ -573,6 +577,12 @@ std::unique_ptr<XPropertyEntry> SvxUnoXGradientTable::createEntry(const OUString
     aXGradient.SetStartIntens( aGradient.StartIntensity );
     aXGradient.SetEndIntens( aGradient.EndIntensity );
     aXGradient.SetSteps( aGradient.StepCount );
+
+    // check if we have a awt::Gradient2 with a ColorStopSequence
+    basegfx::ColorStops aColorStops;
+    basegfx::utils::fillColorStopsFromAny(aColorStops, rAny);
+    if (!aColorStops.empty())
+        aXGradient.SetColorStops(aColorStops);
 
     return std::make_unique<XGradientEntry>(aXGradient, rName);
 }
@@ -599,7 +609,7 @@ namespace {
 class SvxUnoXBitmapTable : public SvxUnoXPropertyTable
 {
 public:
-    explicit SvxUnoXBitmapTable( XPropertyList* pTable ) noexcept : SvxUnoXPropertyTable( XATTR_FILLBITMAP, pTable ) {};
+    explicit SvxUnoXBitmapTable( XPropertyList& rTable ) noexcept : SvxUnoXPropertyTable( XATTR_FILLBITMAP, rTable ) {};
 
     // SvxUnoXPropertyTable
     virtual uno::Any getAny( const XPropertyEntry* pEntry ) const override;
@@ -615,9 +625,9 @@ public:
 
 }
 
-uno::Reference< uno::XInterface > SvxUnoXBitmapTable_createInstance( XPropertyList* pTable ) noexcept
+uno::Reference< container::XNameContainer > SvxUnoXBitmapTable_createInstance( XPropertyList& rTable ) noexcept
 {
-    return static_cast<OWeakObject*>(new SvxUnoXBitmapTable( pTable ));
+    return new SvxUnoXBitmapTable( rTable );
 }
 
 // SvxUnoXPropertyTable
@@ -645,7 +655,7 @@ std::unique_ptr<XPropertyEntry> SvxUnoXBitmapTable::createEntry(const OUString& 
     if (aGraphic.IsNone())
         return nullptr;
 
-    GraphicObject aGraphicObject(aGraphic);
+    GraphicObject aGraphicObject(std::move(aGraphic));
     return std::make_unique<XBitmapEntry>(aGraphicObject, rName);
 }
 

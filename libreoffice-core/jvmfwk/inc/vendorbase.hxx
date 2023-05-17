@@ -59,6 +59,8 @@ OpenJDK at least, but probably not true for Lemotes JDK */
 #else
 #define JFW_PLUGIN_ARCH "mips64el"
 #endif
+#elif defined RISCV64
+#define JFW_PLUGIN_ARCH "riscv64"
 #elif defined S390X
 #define JFW_PLUGIN_ARCH "s390x"
 #elif defined S390
@@ -75,9 +77,11 @@ OpenJDK at least, but probably not true for Lemotes JDK */
 #define JFW_PLUGIN_ARCH "alpha"
 #elif defined AARCH64
 #define JFW_PLUGIN_ARCH "aarch64"
-#else // SPARC, INTEL, POWERPC, MIPS, MIPS64, ARM, IA64, M68K, HPPA, ALPHA
+#elif defined LOONGARCH64
+#define JFW_PLUGIN_ARCH "loongarch64"
+#else // SPARC, INTEL, POWERPC, MIPS, MIPS64, ARM, IA64, M68K, HPPA, ALPHA, LOONGARCH64
 #error unknown platform
-#endif // SPARC, INTEL, POWERPC, MIPS, MIPS64, ARM, IA64, M68K, HPPA, ALPHA
+#endif // SPARC, INTEL, POWERPC, MIPS, MIPS64, ARM, IA64, M68K, HPPA, ALPHA, LOONGARCH64
 
 class MalformedVersionException final : public std::exception
 {
@@ -154,7 +158,7 @@ protected:
        false - the object could not completely initialize. In this case
        it will be discarded by the caller.
     */
-    virtual bool initialize(const std::vector<std::pair<OUString, OUString>>& props);
+    bool initialize(const std::vector<std::pair<OUString, OUString>>& props);
 
     /* returns relative file URLs to the runtime library.
        For example         "/bin/client/jvm.dll"
@@ -163,17 +167,18 @@ protected:
 
     virtual char const* const* getLibraryPaths(int* size) = 0;
 
+    typedef rtl::Reference<VendorBase> (*createInstance_func)();
+    friend rtl::Reference<VendorBase>
+    createInstance(createInstance_func pFunc,
+                   const std::vector<std::pair<OUString, OUString>>& properties);
+
+private:
     OUString m_sVendor;
     OUString m_sVersion;
     OUString m_sHome;
     OUString m_sRuntimeLibrary;
     OUString m_sLD_LIBRARY_PATH;
     OUString m_sArch;
-
-    typedef rtl::Reference<VendorBase> (*createInstance_func)();
-    friend rtl::Reference<VendorBase>
-    createInstance(createInstance_func pFunc,
-                   const std::vector<std::pair<OUString, OUString>>& properties);
 };
 }
 

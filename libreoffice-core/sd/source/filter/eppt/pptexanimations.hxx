@@ -28,6 +28,7 @@
 #include <com/sun/star/uno/Reference.h>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace com::sun::star::animations { class XAnimate; }
@@ -48,9 +49,9 @@ namespace ppt
         css::uno::Reference< css::animations::XAnimationNode > mxNode;
         css::uno::Reference< css::animations::XAnimationNode > mxMaster;
 
-        AfterEffectNode( const css::uno::Reference< css::animations::XAnimationNode >& xNode,
-                         const css::uno::Reference< css::animations::XAnimationNode >& xMaster )
-                         : mxNode( xNode ), mxMaster( xMaster ) {}
+        AfterEffectNode( css::uno::Reference< css::animations::XAnimationNode > xNode,
+                         css::uno::Reference< css::animations::XAnimationNode > xMaster )
+                         : mxNode(std::move( xNode )), mxMaster(std::move( xMaster )) {}
     };
 
     typedef std::shared_ptr< AfterEffectNode > AfterEffectNodePtr;
@@ -74,7 +75,7 @@ class AnimationExporter
     std::vector< AfterEffectNodePtr > maAfterEffectNodes;
     sal_Int32 mnCurrentGroup;
 
-    static void writeZString( SvStream& rStrm, const OUString& rVal );
+    static void writeZString( SvStream& rStrm, std::u16string_view aVal );
     static bool getColorAny( const css::uno::Any& rAny, const sal_Int16 nColorSpace, sal_Int32& rMode, sal_Int32& rA, sal_Int32& rB, sal_Int32& rC );
     static bool exportAnimProperty( SvStream& rStrm, const sal_uInt16 nPropertyId, const css::uno::Any& rAny, const TranslateMode eTranslateMode );
     static void exportAnimPropertyString( SvStream& rStrm, const sal_uInt16 nPropertyId, const OUString& rVal, const TranslateMode eTranslateMode );
@@ -122,8 +123,8 @@ public:
         static bool GetNodeType( const css::uno::Reference< css::animations::XAnimationNode >& xNode, sal_Int16& nType );
         static sal_Int16 GetFillMode( const css::uno::Reference< css::animations::XAnimationNode >& xNode, const sal_Int16 nFillDefault );
         static void GetUserData( const css::uno::Sequence< css::beans::NamedValue >& rUserData, const css::uno::Any ** pAny, std::size_t nLen );
-        static sal_uInt32 TranslatePresetSubType( const sal_uInt32 nPresetClass, const sal_uInt32 nPresetId, const OUString& rPresetSubType );
-        static sal_uInt32 GetPresetID( const OUString& rPreset, sal_uInt32 nAPIPresetClass, bool& bPresetId );
+        static sal_uInt32 TranslatePresetSubType( const sal_uInt32 nPresetClass, const sal_uInt32 nPresetId, std::u16string_view rPresetSubType );
+        static sal_uInt32 GetPresetID( std::u16string_view aPreset, sal_uInt32 nAPIPresetClass, bool& bPresetId );
         static sal_uInt32 GetValueTypeForAttributeName( const OUString& rAttributeName );
 
     static const char* FindTransitionName( const sal_Int16 nType, const sal_Int16 nSubType, const bool bDirection );

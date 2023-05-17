@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from uitest.uihelper.common import select_pos
@@ -11,7 +14,7 @@ from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
 class tdf135693(UITestCase):
 
     def test_tdf135693(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf135693.odt")) as writer_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf135693.odt")):
 
             self.xUITest.getTopFocusWindow()
 

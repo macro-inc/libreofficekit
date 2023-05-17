@@ -7,7 +7,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#define DISABLE_DYNLOADING
 #define NO_CHILD_PROCESSES
 #undef SAL_LOG_INFO
 #undef SAL_LOG_WARN
@@ -18,7 +17,15 @@
 
 #include <config_probes.h>
 
+#include <sal/rtl/strbuf.cxx>
+#if USE_SDT_PROBES
+#undef RTL_LOG_STRING_BITS
+#endif
 #include <sal/rtl/string.cxx>
+#if USE_SDT_PROBES
+#undef RTL_LOG_STRING_BITS
+#endif
+#include <sal/rtl/ustrbuf.cxx>
 #if USE_SDT_PROBES
 #undef RTL_LOG_STRING_BITS
 #endif
@@ -57,10 +64,8 @@
 #include <sal/rtl/hash.cxx>
 #include <sal/rtl/locale.cxx>
 #include <sal/rtl/math.cxx>
-#include <sal/rtl/strbuf.cxx>
 #include <sal/rtl/strimp.cxx>
 #include <sal/rtl/uri.cxx>
-#include <sal/rtl/ustrbuf.cxx>
 #include <sal/textenc/converter.cxx>
 #include <sal/textenc/convertsimple.cxx>
 #include <sal/textenc/handleundefinedunicodetotextchar.cxx>

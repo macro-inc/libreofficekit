@@ -1181,7 +1181,7 @@ const SwFootnoteFrame *SwFootnoteBossFrame::FindFirstFootnote( SwContentFrame co
             if ( pRet )
             {
                 const SwFootnoteBossFrame* pBoss = pRet->GetRef()->FindFootnoteBossFrame();
-                if( pBoss->GetPhyPageNum() != nPageNum ||
+                if( !pBoss || pBoss->GetPhyPageNum() != nPageNum ||
                     nColNum != lcl_ColumnNum( pBoss ) )
                     pRet = nullptr;
             }
@@ -2420,7 +2420,8 @@ void SwFootnoteBossFrame::RearrangeFootnotes( const SwTwips nDeadLine, const boo
     if ( !bLock && bUnlockLastFootnoteFrame &&
          !pLastFootnoteFrame->GetLower() &&
          !pLastFootnoteFrame->IsColLocked() &&
-         !pLastFootnoteFrame->IsBackMoveLocked() )
+         !pLastFootnoteFrame->IsBackMoveLocked() &&
+         !pLastFootnoteFrame->IsDeleteForbidden() )
     {
         pLastFootnoteFrame->Cut();
         SwFrame::DestroyFrame(pLastFootnoteFrame);
@@ -2810,8 +2811,9 @@ bool SwContentFrame::MoveFootnoteCntFwd( bool bMakePage, SwFootnoteBossFrame *pO
         // it into the container.
         // Create also a SectionFrame if currently in an area inside a footnote.
         SwFootnoteFrame* pTmpFootnote = pNewUpper->IsFootnoteFrame() ? static_cast<SwFootnoteFrame*>(pNewUpper) : nullptr;
-        if (!pTmpFootnote && pNewUpper->IsFootnoteContFrame())
+        if (!pTmpFootnote)
         {
+            assert(pNewUpper->IsFootnoteContFrame() && "New Upper not a FootnoteCont");
             SwFootnoteContFrame *pCont = static_cast<SwFootnoteContFrame*>(pNewUpper);
             pTmpFootnote = SwFootnoteContFrame::AppendChained(this, true);
             SwFrame* pNx = pCont->Lower();
@@ -2933,7 +2935,7 @@ SwContentFrame* SwFootnoteFrame::GetRefFromAttr()
 {
     assert(mpAttribute && "invalid Attribute");
     SwTextNode& rTNd = const_cast<SwTextNode&>(mpAttribute->GetTextNode());
-    SwPosition aPos( rTNd, SwIndex( &rTNd, mpAttribute->GetStart() ));
+    SwPosition aPos( rTNd, mpAttribute->GetStart() );
     SwContentFrame* pCFrame = rTNd.getLayoutFrame(getRootFrame(), &aPos);
     return pCFrame;
 }

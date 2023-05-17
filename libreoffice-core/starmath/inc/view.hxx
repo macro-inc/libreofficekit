@@ -37,8 +37,6 @@ class SmPrintUIOptions;
 class SmGraphicAccessible;
 class SmGraphicWidget;
 
-namespace svtools { class ColorConfig; }
-
 class SmGraphicWindow final : public InterimItemWindow
 {
 private:
@@ -161,6 +159,8 @@ private:
     AutoTimer aCaretBlinkTimer;
     rtl::Reference<SmGraphicAccessible> mxAccessible;
     SmViewShell& mrViewShell;
+    double mfLastZoomScale = 0;
+    double mfAccumulatedZoom = 0;
 };
 
 class SmGraphicController final : public SfxControllerItem
@@ -261,14 +261,14 @@ class SmViewShell final : public SfxViewShell
     static Size GetTextLineSize(OutputDevice const & rDevice,
                          const OUString& rLine);
     static Size GetTextSize(OutputDevice const & rDevice,
-                     const OUString& rText,
+                     std::u16string_view rText,
                      tools::Long          MaxWidth);
     static void DrawTextLine(OutputDevice& rDevice,
                       const Point&  rPosition,
                       const OUString& rLine);
     static void DrawText(OutputDevice& rDevice,
                   const Point&  rPosition,
-                  const OUString& rText,
+                  std::u16string_view rText,
                   sal_uInt16        MaxWidth);
 
     virtual SfxPrinter *GetPrinter(bool bCreate = false) override;

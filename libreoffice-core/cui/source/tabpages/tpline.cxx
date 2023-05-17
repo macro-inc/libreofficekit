@@ -413,7 +413,7 @@ bool SvxLineTabPage::FillItemSet( SfxItemSet* rAttrs )
             pOld = GetOldItem( *rAttrs, XATTR_LINESTYLE );
             if ( !pOld || !( *static_cast<const XLineStyleItem*>(pOld) == *pStyleItem ) )
             {
-                rAttrs->Put( *pStyleItem );
+                rAttrs->Put( std::move(pStyleItem) );
                 bModified = true;
             }
         }
@@ -480,7 +480,7 @@ bool SvxLineTabPage::FillItemSet( SfxItemSet* rAttrs )
             pOld = GetOldItem( *rAttrs, XATTR_LINESTART );
             if( pItem && ( !pOld || *pOld != *pItem ) )
             {
-                rAttrs->Put( *pItem );
+                rAttrs->Put( std::move(pItem) );
                 bModified = true;
             }
         }
@@ -497,7 +497,7 @@ bool SvxLineTabPage::FillItemSet( SfxItemSet* rAttrs )
             if( pItem &&
                 ( !pOld || !( *static_cast<const XLineEndItem*>(pOld) == *pItem ) ) )
             {
-                rAttrs->Put( *pItem );
+                rAttrs->Put( std::move(pItem) );
                 bModified = true;
             }
         }
@@ -575,7 +575,7 @@ bool SvxLineTabPage::FillItemSet( SfxItemSet* rAttrs )
 
             if(!pOld || !(*static_cast<const XLineJointItem*>(pOld) == *pNew))
             {
-                rAttrs->Put( *pNew );
+                rAttrs->Put( std::move(pNew) );
                 bModified = true;
             }
         }
@@ -612,7 +612,7 @@ bool SvxLineTabPage::FillItemSet( SfxItemSet* rAttrs )
 
             if(!pOld || !(*static_cast<const XLineCapItem*>(pOld) == *pNew))
             {
-                rAttrs->Put( *pNew );
+                rAttrs->Put( std::move(pNew) );
                 bModified = true;
             }
         }
@@ -785,15 +785,14 @@ void SvxLineTabPage::Reset( const SfxItemSet* rAttrs )
     drawing::LineStyle  eXLS; // drawing::LineStyle_NONE, drawing::LineStyle_SOLID, drawing::LineStyle_DASH
 
     // Line style
-    const SfxPoolItem *pPoolItem;
     tools::Long nSymType=SVX_SYMBOLTYPE_UNKNOWN;
     bool bPrevSym=false;
     bool bEnable=true;
     bool bIgnoreGraphic=false;
     bool bIgnoreSize=false;
-    if(rAttrs->GetItemState(rAttrs->GetPool()->GetWhich(SID_ATTR_SYMBOLTYPE),true,&pPoolItem) == SfxItemState::SET)
+    if(const SfxInt32Item* pSymbolTypeItem = rAttrs->GetItemIfSet(rAttrs->GetPool()->GetWhich(SID_ATTR_SYMBOLTYPE)))
     {
-        nSymType=static_cast<const SfxInt32Item *>(pPoolItem)->GetValue();
+        nSymType = pSymbolTypeItem->GetValue();
     }
 
     if(nSymType == SVX_SYMBOLTYPE_AUTO)
@@ -829,7 +828,7 @@ void SvxLineTabPage::Reset( const SfxItemSet* rAttrs )
             if(m_pSymbolList->GetObjCount())
             {
                 nSymTmp %= m_pSymbolList->GetObjCount(); // Treat list as cyclic!
-                SdrObject *pObj=m_pSymbolList->GetObj(nSymTmp);
+                rtl::Reference<SdrObject> pObj=m_pSymbolList->GetObj(nSymTmp);
                 if(pObj)
                 {
                     // directly clone to target SdrModel
@@ -844,16 +843,16 @@ void SvxLineTabPage::Reset( const SfxItemSet* rAttrs )
                         pObj->SetMergedItemSet(m_rOutAttrs);
                     }
 
-                    pPage->NbcInsertObject(pObj);
+                    pPage->NbcInsertObject(pObj.get());
 
                     // Generate invisible square to give all symbol types a
                     // bitmap size, which is independent from specific glyph
-                    SdrObject* pInvisibleSquare(m_pSymbolList->GetObj(0));
+                    rtl::Reference<SdrObject> pInvisibleSquare(m_pSymbolList->GetObj(0));
 
                     // directly clone to target SdrModel
                     pInvisibleSquare = pInvisibleSquare->CloneSdrObject(*pModel);
 
-                    pPage->NbcInsertObject(pInvisibleSquare);
+                    pPage->NbcInsertObject(pInvisibleSquare.get());
                     pInvisibleSquare->SetMergedItem(XFillTransparenceItem(100));
                     pInvisibleSquare->SetMergedItem(XLineTransparenceItem(100));
 
@@ -869,18 +868,18 @@ void SvxLineTabPage::Reset( const SfxItemSet* rAttrs )
                     bIgnoreGraphic=true;
 
                     aView.UnmarkAll();
-                    pInvisibleSquare=pPage->RemoveObject(1);
-                    SdrObject::Free( pInvisibleSquare);
-                    pObj=pPage->RemoveObject(0);
-                    SdrObject::Free( pObj );
+                    pPage->RemoveObject(1);
+                    pInvisibleSquare.clear();
+                    pPage->RemoveObject(0);
+                    pObj.clear();
                 }
             }
         }
         }
     }
-    if(rAttrs->GetItemState(rAttrs->GetPool()->GetWhich(SID_ATTR_BRUSH),true,&pPoolItem) == SfxItemState::SET)
+    if(const SvxBrushItem* pBrushItem = rAttrs->GetItemIfSet(rAttrs->GetPool()->GetWhich(SID_ATTR_BRUSH)))
     {
-        const Graphic* pGraphic = static_cast<const SvxBrushItem *>(pPoolItem)->GetGraphic();
+        const Graphic* pGraphic = pBrushItem->GetGraphic();
         if( pGraphic )
         {
             if(!bIgnoreGraphic)
@@ -897,9 +896,9 @@ void SvxLineTabPage::Reset( const SfxItemSet* rAttrs )
         }
     }
 
-    if(rAttrs->GetItemState(rAttrs->GetPool()->GetWhich(SID_ATTR_SYMBOLSIZE),true,&pPoolItem) == SfxItemState::SET)
+    if(const SvxSizeItem* pSymbolSizeItem = rAttrs->GetItemIfSet(rAttrs->GetPool()->GetWhich(SID_ATTR_SYMBOLSIZE)))
     {
-        m_aSymbolSize = static_cast<const SvxSizeItem *>(pPoolItem)->GetSize();
+        m_aSymbolSize = pSymbolSizeItem->GetSize();
     }
 
     m_xGridIconSize->set_sensitive(bEnable);
@@ -1456,25 +1455,25 @@ IMPL_LINK_NOARG(SvxLineTabPage, MenuCreateHdl_Impl, weld::Toggleable&, void)
 
         // Generate invisible square to give all symbols a
         // bitmap size, which is independent from specific glyph
-        SdrObject *pInvisibleSquare=m_pSymbolList->GetObj(0);
+        rtl::Reference<SdrObject> pInvisibleSquare=m_pSymbolList->GetObj(0);
 
         // directly clone to target SdrModel
         pInvisibleSquare = pInvisibleSquare->CloneSdrObject(*pModel);
 
-        pPage->NbcInsertObject(pInvisibleSquare);
+        pPage->NbcInsertObject(pInvisibleSquare.get());
         pInvisibleSquare->SetMergedItem(XFillTransparenceItem(100));
         pInvisibleSquare->SetMergedItem(XLineTransparenceItem(100));
 
         for(size_t i=0; i < m_pSymbolList->GetObjCount(); ++i)
         {
-            SdrObject *pObj=m_pSymbolList->GetObj(i);
+            rtl::Reference<SdrObject> pObj=m_pSymbolList->GetObj(i);
             assert(pObj);
 
             // directly clone to target SdrModel
             pObj = pObj->CloneSdrObject(*pModel);
 
             m_aGrfNames.emplace_back("");
-            pPage->NbcInsertObject(pObj);
+            pPage->NbcInsertObject(pObj.get());
             if(m_xSymbolAttr)
             {
                 pObj->SetMergedItemSet(*m_xSymbolAttr);
@@ -1487,8 +1486,8 @@ IMPL_LINK_NOARG(SvxLineTabPage, MenuCreateHdl_Impl, weld::Toggleable&, void)
             BitmapEx aBitmapEx(aView.GetMarkedObjBitmapEx());
             GDIMetaFile aMeta(aView.GetMarkedObjMetaFile());
             aView.UnmarkAll();
-            pObj=pPage->RemoveObject(1);
-            SdrObject::Free(pObj);
+            pPage->RemoveObject(1);
+            pObj.clear();
 
             SvxBmpItemInfo* pInfo = new SvxBmpItemInfo;
             pInfo->pBrushItem.reset(new SvxBrushItem(Graphic(aMeta), GPOS_AREA, SID_ATTR_BRUSH));
@@ -1508,8 +1507,8 @@ IMPL_LINK_NOARG(SvxLineTabPage, MenuCreateHdl_Impl, weld::Toggleable&, void)
             pVD->DrawBitmapEx(Point(), aBitmapEx);
             m_xSymbolsMenu->append(pInfo->sItemId, "", *pVD);
         }
-        pInvisibleSquare=pPage->RemoveObject(0);
-        SdrObject::Free(pInvisibleSquare);
+        pPage->RemoveObject(0);
+        pInvisibleSquare.clear();
 
         if (m_aGrfNames.empty())
             m_xSymbolMB->set_item_sensitive("symbols", false);
@@ -1553,7 +1552,7 @@ IMPL_LINK(SvxLineTabPage, GraphicHdl_Impl, const OString&, rIdent, void)
     }
     else if (rIdent == "file")
     {
-        SvxOpenGraphicDialog aGrfDlg(CuiResId(RID_SVXSTR_EDIT_GRAPHIC), GetFrameWeld());
+        SvxOpenGraphicDialog aGrfDlg(CuiResId(RID_CUISTR_EDIT_GRAPHIC), GetFrameWeld());
         aGrfDlg.EnableLink(false);
         aGrfDlg.AsLink(false);
         if( !aGrfDlg.Execute() )

@@ -20,7 +20,6 @@
 #pragma once
 
 #include <sfx2/objsh.hxx>
-#include <tools/solar.h>
 #include <vcl/weld.hxx>
 
 namespace sfx2 { class DocumentInserter; }
@@ -60,14 +59,14 @@ public:
     virtual ~ScLinkedAreaDlg() override;
 
     void            InitFromOldLink( const OUString& rFile, const OUString& rFilter,
-                                        const OUString& rOptions, const OUString& rSource,
-                                        sal_uLong nRefresh );
+                                        const OUString& rOptions, std::u16string_view rSource,
+                                        sal_Int32 nRefreshDelaySeconds );
 
     OUString       GetURL() const;
     OUString       GetFilter() const;        // may be empty
     OUString       GetOptions() const;       // filter options
     OUString       GetSource() const;        // separated by ";"
-    sal_uLong      GetRefresh() const;       // 0 if disabled
+    sal_Int32      GetRefreshDelaySeconds() const;  // 0 if disabled
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

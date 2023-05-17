@@ -78,7 +78,7 @@ rtl::Reference<SdrPage> SwDPage::CloneSdrPage(SdrModel& rTargetModel) const
     return pClonedSwDPage;
 }
 
-SdrObject*  SwDPage::ReplaceObject( SdrObject* pNewObj, size_t nObjNum )
+rtl::Reference<SdrObject> SwDPage::ReplaceObject( SdrObject* pNewObj, size_t nObjNum )
 {
     SdrObject *pOld = GetObj( nObjNum );
     OSL_ENSURE( pOld, "Oups, Object not replaced" );
@@ -160,6 +160,7 @@ bool SwDPage::RequestHelp( vcl::Window* pWindow, SdrView const * pView,
         SwVirtFlyDrawObj* pDrawObj = dynamic_cast<SwVirtFlyDrawObj*>(pObj);
         OUString sText;
         tools::Rectangle aPixRect;
+        bool bTooltip = false;
         if (pDrawObj)
         {
             SwFlyFrame *pFly = pDrawObj->GetFlyFrame();
@@ -167,7 +168,13 @@ bool SwDPage::RequestHelp( vcl::Window* pWindow, SdrView const * pView,
             aPixRect = pWindow->LogicToPixel(pFly->getFrameArea().SVRect());
 
             const SwFormatURL &rURL = pFly->GetFormat()->GetURL();
-            if( rURL.GetMap() )
+            if (!pFly->GetFormat()->GetObjTooltip().isEmpty())
+            {
+                // Tooltips have priority over URLs.
+                sText = pFly->GetFormat()->GetObjTooltip();
+                bTooltip = true;
+            }
+            else if( rURL.GetMap() )
             {
                 IMapObject *pTmpObj = pFly->GetFormat()->GetIMapObject( aPos, pFly );
                 if( pTmpObj )
@@ -205,7 +212,7 @@ bool SwDPage::RequestHelp( vcl::Window* pWindow, SdrView const * pView,
             MouseEvent aMEvt(pWindow->ScreenToOutputPixel(rEvt.GetMousePosPixel()), 1,
                              MouseEventModifiers::NONE, MOUSE_LEFT);
             pView->PickAnything(aMEvt, SdrMouseEventKind::BUTTONDOWN, aVEvt);
-            if (aVEvt.meEvent == SdrEventKind::ExecuteUrl)
+            if (aVEvt.meEvent == SdrEventKind::ExecuteUrl && aVEvt.mpURLField)
             {
                 sText = aVEvt.mpURLField->GetURL();
                 aPixRect = pWindow->LogicToPixel(aVEvt.mpObj->GetLogicRect());
@@ -216,7 +223,7 @@ bool SwDPage::RequestHelp( vcl::Window* pWindow, SdrView const * pView,
         {
             // #i80029#
             bool bExecHyperlinks = m_pDoc->GetDocShell()->IsReadOnly();
-            if (!bExecHyperlinks)
+            if (!bExecHyperlinks && !bTooltip)
                 sText = SfxHelp::GetURLHelpText(sText);
 
             // then display the help:

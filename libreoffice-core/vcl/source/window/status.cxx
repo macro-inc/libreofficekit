@@ -22,6 +22,7 @@
 #include <comphelper/string.hxx>
 #include <vcl/event.hxx>
 #include <vcl/decoview.hxx>
+#include <vcl/glyphitemcache.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/help.hxx>
 #include <vcl/vcllayout.hxx>
@@ -69,8 +70,20 @@ struct ImplStatusItem
     bool                                mbVisible;
     OUString                            maAccessibleName;
     OUString                            maCommand;
-    std::unique_ptr<SalLayout>          mxLayoutCache;
+    std::optional<SalLayoutGlyphs>      mLayoutGlyphsCache;
+    SalLayoutGlyphs*                    GetTextGlyphs(const OutputDevice* pOutputDevice);
 };
+
+SalLayoutGlyphs* ImplStatusItem::GetTextGlyphs(const OutputDevice* outputDevice)
+{
+    if(!mLayoutGlyphsCache.has_value())
+    {
+        std::unique_ptr<SalLayout> pSalLayout = outputDevice->ImplLayout(
+            maText, 0, -1, Point(0, 0), 0, {}, {}, SalLayoutFlags::GlyphItemsOnly);
+        mLayoutGlyphsCache = pSalLayout ? pSalLayout->GetGlyphs() : SalLayoutGlyphs();
+    }
+    return mLayoutGlyphsCache->IsValid() ? &mLayoutGlyphsCache.value() : nullptr;
+}
 
 static tools::Long ImplCalcProgressWidth( sal_uInt16 nMax, tools::Long nSize )
 {
@@ -389,18 +402,9 @@ void StatusBar::ImplDrawItem(vcl::RenderContext& rRenderContext, bool bOffScreen
     // if the framework code is drawing status, let it do all the work
     if (!(pItem->mnBits & StatusBarItemBits::UserDraw))
     {
-        SalLayout* pLayoutCache = pItem->mxLayoutCache.get();
-
-        if(!pLayoutCache)
-        {
-            // update cache
-            pItem->mxLayoutCache = rRenderContext.ImplLayout(pItem->maText, 0, -1, Point(0, 0), 0, {}, SalLayoutFlags::GlyphItemsOnly);
-            pLayoutCache = pItem->mxLayoutCache.get();
-        }
-
-        const SalLayoutGlyphs glyphs = pLayoutCache ? pLayoutCache->GetGlyphs() : SalLayoutGlyphs();
-        const SalLayoutGlyphs* pGlyphs = pLayoutCache ? &glyphs : nullptr;
-        Size aTextSize(rRenderContext.GetTextWidth(pItem->maText,0,-1,nullptr,pGlyphs), rRenderContext.GetTextHeight());
+        SalLayoutGlyphs* pGlyphs = pItem->GetTextGlyphs(&rRenderContext);
+        Size aTextSize(rRenderContext.GetTextWidth(pItem->maText,0,-1,nullptr,pGlyphs),
+                       rRenderContext.GetTextHeight());
         Point aTextPos = ImplGetItemTextPos(aTextRectSize, aTextSize, pItem->mnBits);
 
         if (bOffScreen)
@@ -827,7 +831,7 @@ void StatusBar::StateChanged( StateChangedType nType )
     //invalidate layout cache
     for (auto & pItem : mvItemList)
     {
-        pItem->mxLayoutCache.reset();
+        pItem->mLayoutGlyphsCache.reset();
     }
 
 }
@@ -854,7 +858,7 @@ void StatusBar::DataChanged( const DataChangedEvent& rDCEvt )
         if( nWidth > pItem->mnWidth + STATUSBAR_OFFSET )
             pItem->mnWidth = nWidth + STATUSBAR_OFFSET;
 
-        pItem->mxLayoutCache.reset();
+        pItem->mLayoutGlyphsCache.reset();
     }
     Size aSize = GetSizePixel();
     // do not disturb current width, since
@@ -1119,6 +1123,22 @@ tools::Long StatusBar::GetItemOffset( sal_uInt16 nItemId ) const
     return 0;
 }
 
+void StatusBar::PaintSelfAndChildrenImmediately()
+{
+    WindowImpl* pWindowImpl = ImplGetWindowImpl();
+    const bool bOrigOverlapWin = pWindowImpl->mbOverlapWin;
+    // Temporarily set mbOverlapWin so that any parent windows of StatusBar
+    // that happen to have accumulated Invalidates are not taken as the root
+    // paint candidate from which to paint the paint hierarchy. So we limit the
+    // paint here to this statusbar and its children, disabling the
+    // optimization to bundle pending paints together and suppressing any
+    // unexpected side effects of entering parent window paint handlers if this
+    // call is not from the primordial thread.
+    pWindowImpl->mbOverlapWin = true;
+    PaintImmediately();
+    pWindowImpl->mbOverlapWin = bOrigOverlapWin;
+}
+
 void StatusBar::SetItemText( sal_uInt16 nItemId, const OUString& rText, int nCharsWidth )
 {
     sal_uInt16 nPos = GetItemPos( nItemId );
@@ -1139,20 +1159,14 @@ void StatusBar::SetItemText( sal_uInt16 nItemId, const OUString& rText, int nCha
     tools::Long nWidth;
     if (nCharsWidth != -1)
     {
-        std::unique_ptr<SalLayout> pSalLayout = GetOutDev()->ImplLayout("0",0,-1,
-            Point(0, 0), 0, {}, SalLayoutFlags::GlyphItemsOnly);
-        const SalLayoutGlyphs glyphs = pSalLayout ? pSalLayout->GetGlyphs() : SalLayoutGlyphs();
-        nWidth = GetTextWidth("0",0,-1,nullptr,pSalLayout ? &glyphs : nullptr);
+        nWidth = GetTextWidth("0",0,-1,nullptr,
+                    SalLayoutGlyphsCache::self()->GetLayoutGlyphs(GetOutDev(),"0"));
         nWidth = nWidth * nCharsWidth + nFudge;
     }
     else
     {
-        std::unique_ptr<SalLayout> pSalLayout = GetOutDev()->ImplLayout(pItem->maText,0,-1,
-            Point(0, 0), 0, {}, SalLayoutFlags::GlyphItemsOnly);
-        const SalLayoutGlyphs glyphs = pSalLayout ? pSalLayout->GetGlyphs() : SalLayoutGlyphs();
-        nWidth = GetTextWidth( pItem->maText,0,-1,nullptr,pSalLayout ? &glyphs : nullptr) + nFudge;
-        // Store the calculated layout.
-        pItem->mxLayoutCache = std::move(pSalLayout);
+        pItem->mLayoutGlyphsCache.reset();
+        nWidth = GetTextWidth( pItem->maText,0,-1,nullptr, pItem->GetTextGlyphs(GetOutDev())) + nFudge;
     }
 
     if( (nWidth > pItem->mnWidth + STATUSBAR_OFFSET) ||
@@ -1168,7 +1182,7 @@ void StatusBar::SetItemText( sal_uInt16 nItemId, const OUString& rText, int nCha
     {
         tools::Rectangle aRect = ImplGetItemRectPos(nPos);
         Invalidate(aRect);
-        PaintImmediately();
+        PaintSelfAndChildrenImmediately();
     }
 }
 
@@ -1213,7 +1227,7 @@ void StatusBar::SetItemData( sal_uInt16 nItemId, void* pNewData )
 
     ImplStatusItem* pItem = mvItemList[ nPos ].get();
     // invalidate cache
-    pItem->mxLayoutCache.reset();
+    pItem->mLayoutGlyphsCache.reset();
     pItem->mpUserData = pNewData;
 
     // call Draw-Item if it's a User-Item
@@ -1222,7 +1236,7 @@ void StatusBar::SetItemData( sal_uInt16 nItemId, void* pNewData )
     {
         tools::Rectangle aRect = ImplGetItemRectPos(nPos);
         Invalidate(aRect, InvalidateFlags::NoErase);
-        PaintImmediately();
+        PaintSelfAndChildrenImmediately();
     }
 }
 
@@ -1251,7 +1265,7 @@ void StatusBar::RedrawItem(sal_uInt16 nItemId)
     {
         tools::Rectangle aRect = ImplGetItemRectPos(nPos);
         Invalidate(aRect);
-        PaintImmediately();
+        PaintSelfAndChildrenImmediately();
     }
 }
 
@@ -1326,7 +1340,7 @@ void StatusBar::StartProgressMode( const OUString& rText )
     if ( IsReallyVisible() )
     {
         Invalidate();
-        PaintImmediately();
+        PaintSelfAndChildrenImmediately();
     }
 }
 
@@ -1347,7 +1361,7 @@ void StatusBar::SetProgressValue( sal_uInt16 nNewPercent )
         if ((nTime_ms - mnLastProgressPaint_ms) > 100)
         {
             Invalidate(maPrgsFrameRect);
-            PaintImmediately();
+            PaintSelfAndChildrenImmediately();
             mnLastProgressPaint_ms = nTime_ms;
         }
     }
@@ -1363,7 +1377,7 @@ void StatusBar::EndProgressMode()
     if ( IsReallyVisible() )
     {
         Invalidate();
-        PaintImmediately();
+        PaintSelfAndChildrenImmediately();
     }
 }
 
@@ -1380,7 +1394,7 @@ void StatusBar::SetText(const OUString& rText)
         {
             Invalidate();
             Window::SetText(rText);
-            PaintImmediately();
+            PaintSelfAndChildrenImmediately();
         }
     }
     else if (mbProgressMode)
@@ -1389,7 +1403,7 @@ void StatusBar::SetText(const OUString& rText)
         if (IsReallyVisible())
         {
             Invalidate();
-            PaintImmediately();
+            PaintSelfAndChildrenImmediately();
         }
     }
     else

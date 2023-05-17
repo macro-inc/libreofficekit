@@ -20,13 +20,14 @@
 #include "VCartesianCoordinateSystem.hxx"
 #include "VCartesianGrid.hxx"
 #include "VCartesianAxis.hxx"
+#include <BaseCoordinateSystem.hxx>
 #include <AxisIndexDefines.hxx>
+#include <Axis.hxx>
 #include <DataTable.hxx>
+#include <Diagram.hxx>
 #include <AxisHelper.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <ChartModel.hxx>
-#include <Diagram.hxx>
-#include <com/sun/star/chart2/XCoordinateSystem.hpp>
 #include <com/sun/star/chart2/data/XTextualDataSequence.hpp>
 #include <com/sun/star/chart2/AxisType.hpp>
 
@@ -60,7 +61,7 @@ private: //member
 
 }
 
-VCartesianCoordinateSystem::VCartesianCoordinateSystem( const Reference< XCoordinateSystem >& xCooSys )
+VCartesianCoordinateSystem::VCartesianCoordinateSystem( const rtl::Reference< BaseCoordinateSystem >& xCooSys )
     : VCoordinateSystem(xCooSys)
 {
 }
@@ -80,7 +81,7 @@ void VCartesianCoordinateSystem::createGridShapes()
     for( sal_Int32 nDimensionIndex=0; nDimensionIndex<3; nDimensionIndex++)
     {
         sal_Int32 nAxisIndex = MAIN_AXIS_INDEX;
-        Reference< XAxis > xAxis( AxisHelper::getAxis( nDimensionIndex, nAxisIndex, m_xCooSysModel ) );
+        rtl::Reference< Axis > xAxis = AxisHelper::getAxis( nDimensionIndex, nAxisIndex, m_xCooSysModel );
         if(!xAxis.is() || !AxisHelper::shouldAxisBeDisplayed( xAxis, m_xCooSysModel ))
             continue;
 
@@ -89,7 +90,7 @@ void VCartesianCoordinateSystem::createGridShapes()
                             , getExplicitIncrement(nDimensionIndex,nAxisIndex) );
         aGrid.set3DWallPositions( m_eLeftWallPos, m_eBackWallPos, m_eBottomPos );
 
-        aGrid.initPlotter(m_xLogicTargetForGrids,m_xFinalTarget,m_xShapeFactory
+        aGrid.initPlotter(m_xLogicTargetForGrids,m_xFinalTarget
             , createCIDForGrid( nDimensionIndex,nAxisIndex ) );
         if(nDimensionCount==2)
             aGrid.setTransformationSceneToScreen( m_aMatrixSceneToScreen );
@@ -99,17 +100,17 @@ void VCartesianCoordinateSystem::createGridShapes()
 }
 
 void VCartesianCoordinateSystem::createVAxisList(
-              const uno::Reference<chart2::XChartDocument> & xChartDoc
-            , const awt::Size& rFontReferenceSize
-            , const awt::Rectangle& rMaximumSpaceForLabels
-            , bool bLimitSpaceForLabels
-            , std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList
-            , uno::Reference<uno::XComponentContext> const& rComponentContext)
+            const rtl::Reference<::chart::ChartModel> & xChartDoc,
+            const awt::Size& rFontReferenceSize,
+            const awt::Rectangle& rMaximumSpaceForLabels,
+            bool bLimitSpaceForLabels,
+            std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList,
+            uno::Reference<uno::XComponentContext> const& rComponentContext)
 {
     // note: using xChartDoc itself as XNumberFormatsSupplier would cause
     // a leak from VCartesianAxis due to cyclic reference
     uno::Reference<util::XNumberFormatsSupplier> const xNumberFormatsSupplier(
-        dynamic_cast<ChartModel&>(*xChartDoc).getNumberFormatsSupplier());
+        xChartDoc->getNumberFormatsSupplier());
 
     m_aAxisMap.clear();
 
@@ -128,19 +129,17 @@ void VCartesianCoordinateSystem::createVAxisList(
         sal_Int32 nMaxAxisIndex = m_xCooSysModel->getMaximumAxisIndexByDimension(nDimensionIndex);
         for( sal_Int32 nAxisIndex = 0; nAxisIndex <= nMaxAxisIndex; nAxisIndex++ )
         {
-            Reference< XAxis > xAxis = getAxisByDimension(nDimensionIndex,nAxisIndex);
+            rtl::Reference< Axis > xAxis = getAxisByDimension(nDimensionIndex,nAxisIndex);
             if(!xAxis.is() || !AxisHelper::shouldAxisBeDisplayed( xAxis, m_xCooSysModel ))
                 continue;
 
-            uno::Reference<chart2::XDiagram> xDiagram(xChartDoc->getFirstDiagram());
-            auto pDiagram = dynamic_cast<Diagram*>(xDiagram.get());
-            assert(pDiagram);
-            AxisProperties aAxisProperties(xAxis, getExplicitCategoriesProvider(), pDiagram->getDataTableRef());
+            rtl::Reference<Diagram> xDiagram(xChartDoc->getFirstChartDiagram());
+            AxisProperties aAxisProperties(xAxis, getExplicitCategoriesProvider(), xDiagram->getDataTableRef());
             aAxisProperties.m_nDimensionIndex = nDimensionIndex;
             aAxisProperties.m_bSwapXAndY = bSwapXAndY;
             aAxisProperties.m_bIsMainAxis = (nAxisIndex==0);
             aAxisProperties.m_bLimitSpaceForLabels = bLimitSpaceForLabels;
-            Reference< XAxis > xCrossingMainAxis( AxisHelper::getCrossingMainAxis( xAxis, m_xCooSysModel ) );
+            rtl::Reference< Axis > xCrossingMainAxis = AxisHelper::getCrossingMainAxis( xAxis, m_xCooSysModel );
             if( xCrossingMainAxis.is() )
             {
                 ScaleData aCrossingScale( xCrossingMainAxis->getScaleData() );
@@ -155,8 +154,8 @@ void VCartesianCoordinateSystem::createVAxisList(
                 aAxisProperties.m_xAxisTextProvider = new TextualDataProvider( m_aSeriesNamesForZAxis );
 
                 //for the z axis copy the positioning properties from the x axis (or from the y axis for swapped coordinate systems)
-                Reference< XAxis > xSisterAxis( AxisHelper::getCrossingMainAxis( xCrossingMainAxis, m_xCooSysModel ) );
-                aAxisProperties.initAxisPositioning( Reference< beans::XPropertySet >( xSisterAxis, uno::UNO_QUERY) );
+                rtl::Reference< Axis > xSisterAxis = AxisHelper::getCrossingMainAxis( xCrossingMainAxis, m_xCooSysModel );
+                aAxisProperties.initAxisPositioning( xSisterAxis );
             }
             aAxisProperties.init(true);
             if(aAxisProperties.m_bDisplayLabels)
@@ -181,16 +180,13 @@ void VCartesianCoordinateSystem::initVAxisInList()
     sal_Int32 nDimensionCount = m_xCooSysModel->getDimension();
     bool bSwapXAndY = getPropertySwapXAndYAxis();
 
-    for (auto const& elem : m_aAxisMap)
+    for (auto const& [nIndexPair, pVAxis] : m_aAxisMap)
     {
-        VAxisBase* pVAxis = elem.second.get();
-        if( pVAxis )
+        if (pVAxis)
         {
-            sal_Int32 nDimensionIndex = elem.first.first;
-            sal_Int32 nAxisIndex = elem.first.second;
+            auto [nDimensionIndex, nAxisIndex] = nIndexPair;
             pVAxis->setExplicitScaleAndIncrement( getExplicitScale( nDimensionIndex, nAxisIndex ), getExplicitIncrement( nDimensionIndex, nAxisIndex ) );
-            pVAxis->initPlotter(m_xLogicTargetForAxes,m_xFinalTarget,m_xShapeFactory
-                , createCIDForAxis( nDimensionIndex, nAxisIndex ) );
+            pVAxis->initPlotter(m_xLogicTargetForAxes, m_xFinalTarget, createCIDForAxis( nDimensionIndex, nAxisIndex ) );
             if(nDimensionCount==2)
                 pVAxis->setTransformationSceneToScreen( m_aMatrixSceneToScreen );
             pVAxis->setScales( getExplicitScales(nDimensionIndex,nAxisIndex), bSwapXAndY );
@@ -206,13 +202,12 @@ void VCartesianCoordinateSystem::updateScalesAndIncrementsOnAxes()
     sal_Int32 nDimensionCount = m_xCooSysModel->getDimension();
     bool bSwapXAndY = getPropertySwapXAndYAxis();
 
-    for (auto const& elem : m_aAxisMap)
+    for (auto const& [nIndexPair, pVAxis] : m_aAxisMap)
     {
-        VAxisBase* pVAxis = elem.second.get();
-        if( pVAxis )
+        if (pVAxis)
         {
-            sal_Int32 nDimensionIndex = elem.first.first;
-            sal_Int32 nAxisIndex = elem.first.second;
+            auto [nDimensionIndex, nAxisIndex] = nIndexPair;
+
             pVAxis->setExplicitScaleAndIncrement( getExplicitScale( nDimensionIndex, nAxisIndex ), getExplicitIncrement( nDimensionIndex, nAxisIndex ) );
             if(nDimensionCount==2)
                 pVAxis->setTransformationSceneToScreen( m_aMatrixSceneToScreen );

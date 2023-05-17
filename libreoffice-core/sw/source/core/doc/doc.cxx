@@ -68,6 +68,8 @@
 #include <pam.hxx>
 #include <ndtxt.hxx>
 #include <swundo.hxx>
+#include <rolbck.hxx>
+#include <UndoAttribute.hxx>
 #include <UndoCore.hxx>
 #include <UndoTable.hxx>
 #include <pagedesc.hxx>
@@ -90,6 +92,7 @@
 
 #include <vector>
 #include <map>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <osl/interlck.h>
 #include <vbahelper/vbaaccesshelper.hxx>
@@ -471,8 +474,8 @@ namespace {
 
 struct PostItField_ : public SetGetExpField
 {
-    PostItField_( const SwNodeIndex& rNdIdx, const SwTextField* pField )
-        : SetGetExpField( rNdIdx, pField, nullptr ) {}
+    PostItField_( const SwNode& rNd, const SwTextField* pField )
+        : SetGetExpField( rNd, pField, std::nullopt ) {}
 
     sal_uInt16 GetPageNo( const StringRangeEnumerator &rRangeEnum,
             const o3tl::sorted_vector< sal_Int32 > &rPossiblePages,
@@ -528,8 +531,7 @@ bool sw_GetPostIts(const IDocumentFieldsAccess& rIDFA, SetGetExpFields* pSrtLst)
         for(auto pField: vFields)
         {
             auto pTextField = pField->GetTextField();
-            SwNodeIndex aIdx(pTextField->GetTextNode());
-            std::unique_ptr<PostItField_> pNew(new PostItField_(aIdx, pTextField));
+            std::unique_ptr<PostItField_> pNew(new PostItField_(pTextField->GetTextNode(), pTextField));
             pSrtLst->insert(std::move(pNew));
 
         }
@@ -625,7 +627,8 @@ OUString UIPages2PhyPages(const OUString& rUIPageRange, const std::map< sal_Int3
             aNumber.append(*pInput++);
         if (!aNumber.isEmpty())
         {
-            sal_Int32 nNumber = aNumber.makeStringAndClear().toInt32();
+            sal_Int32 nNumber = o3tl::toInt32(aNumber);
+            aNumber.setLength(0);
             if (nNumber < nUIPageMin)
                 nNumber = nPhyPageMin-1;
             else if (nNumber > nUIPageMax)
@@ -1114,6 +1117,28 @@ sal_uInt16 SwDoc::GetRefMarks( std::vector<OUString>* pNames ) const
     return nCount;
 }
 
+void SwDoc::DeleteFormatRefMark(const SwFormatRefMark* pFormatRefMark)
+{
+    const SwTextRefMark* pTextRefMark = pFormatRefMark->GetTextRefMark();
+    SwTextNode& rTextNd = const_cast<SwTextNode&>(pTextRefMark->GetTextNode());
+    std::unique_ptr<SwRegHistory> aRegHistory;
+    if (GetIDocumentUndoRedo().DoesUndo())
+    {
+        SwUndoResetAttr* pUndo = new SwUndoResetAttr(SwPosition(rTextNd, pTextRefMark->GetStart()),
+                                                     RES_TXTATR_REFMARK);
+        GetIDocumentUndoRedo().AppendUndo(std::unique_ptr<SwUndo>(pUndo));
+        aRegHistory.reset(new SwRegHistory(rTextNd, &pUndo->GetHistory()));
+        rTextNd.GetpSwpHints()->Register(aRegHistory.get());
+    }
+    rTextNd.DeleteAttribute(const_cast<SwTextRefMark*>(pTextRefMark));
+    if (GetIDocumentUndoRedo().DoesUndo())
+    {
+        if (rTextNd.GetpSwpHints())
+            rTextNd.GetpSwpHints()->DeRegister();
+    }
+    getIDocumentState().SetModified();
+}
+
 static bool lcl_SpellAndGrammarAgain( SwNode* pNd, void* pArgs )
 {
     SwTextNode *pTextNode = pNd->GetTextNode();
@@ -1252,7 +1277,7 @@ void SwDoc::Summary(SwDoc& rExtDoc, sal_uInt8 nLevel, sal_uInt8 nPara, bool bImp
         }
 
         SwNodeRange aRange( *rOutNds[ i ], SwNodeOffset(0), *rOutNds[ i ], nEndOfs );
-        GetNodes().Copy_( aRange, aEndOfDoc );
+        GetNodes().Copy_( aRange, aEndOfDoc.GetNode() );
     }
     const SwTextFormatColls *pColl = rExtDoc.GetTextFormatColls();
     for( SwTextFormatColls::size_type i = 0; i < pColl->size(); ++i )
@@ -1507,14 +1532,12 @@ bool SwDoc::RemoveInvisibleContent()
                         pSectNd->EndOfSectionIndex() + 1 )
                     {
                         // only delete the content
-                        SwContentNode* pCNd = GetNodes().GoNext(
-                                                &aPam.GetPoint()->nNode );
-                        aPam.GetPoint()->nContent.Assign( pCNd, 0 );
+                        SwContentNode* pCNd = GetNodes().GoNext( aPam.GetPoint() );
                         aPam.SetMark();
-                        aPam.GetPoint()->nNode = *pSectNd->EndOfSectionNode();
-                        pCNd = SwNodes::GoPrevious(
-                                                &aPam.GetPoint()->nNode );
-                        aPam.GetPoint()->nContent.Assign( pCNd, pCNd->Len() );
+                        aPam.GetPoint()->Assign( *pSectNd->EndOfSectionNode() );
+                        pCNd = SwNodes::GoPrevious( aPam.GetPoint() );
+                        assert(pCNd); // keep coverity happy
+                        aPam.GetPoint()->SetContent( pCNd->Len() );
 
                         getIDocumentContentOperations().DeleteRange( aPam );
                     }
@@ -1522,7 +1545,7 @@ bool SwDoc::RemoveInvisibleContent()
                     {
                         // delete the whole section
                         aPam.SetMark();
-                        aPam.GetPoint()->nNode = *pSectNd->EndOfSectionNode();
+                        aPam.GetPoint()->Assign( *pSectNd->EndOfSectionNode() );
                         getIDocumentContentOperations().DelFullPara( aPam );
                     }
 
@@ -1607,7 +1630,7 @@ bool SwDoc::ConvertFieldsToText(SwRootFrame const& rLayout)
 
             if (!bSkip)
             {
-                bool bInHeaderFooter = IsInHeaderFooter(SwNodeIndex(*pTextField->GetpTextNode()));
+                bool bInHeaderFooter = IsInHeaderFooter(*pTextField->GetpTextNode());
                 const SwFormatField& rFormatField = pTextField->GetFormatField();
                 const SwField*  pField = rFormatField.GetField();
 
@@ -1636,7 +1659,7 @@ bool SwDoc::ConvertFieldsToText(SwRootFrame const& rLayout)
                     if (pFieldAtEnd && pFieldAtEnd->Which() == RES_TXTATR_INPUTFIELD)
                     {
                         SwPosition &rEndPos = *aInsertPam.GetPoint();
-                        rEndPos.nContent = SwCursorShell::EndOfInputFieldAtPos( *aInsertPam.End() );
+                        rEndPos.SetContent( SwCursorShell::EndOfInputFieldAtPos( *aInsertPam.End() ) );
                     }
                     else
                     {
@@ -1707,7 +1730,7 @@ void SwDoc::AppendUndoForInsertFromDB( const SwPaM& rPam, bool bIsTable )
 {
     if( bIsTable )
     {
-        const SwTableNode* pTableNd = rPam.GetPoint()->nNode.GetNode().FindTableNode();
+        const SwTableNode* pTableNd = rPam.GetPoint()->GetNode().FindTableNode();
         if( pTableNd )
         {
             std::unique_ptr<SwUndoCpyTable> pUndo(new SwUndoCpyTable(*this));
@@ -1741,14 +1764,14 @@ void SwDoc::ChangeTOX(SwTOXBase & rTOX, const SwTOXBase & rNew)
 
 OUString SwDoc::GetPaMDescr(const SwPaM & rPam)
 {
-    if (&rPam.GetNode() == &rPam.GetNode(false))
+    if (&rPam.GetPointNode() == &rPam.GetMarkNode())
     {
-        SwTextNode * pTextNode = rPam.GetNode().GetTextNode();
+        SwTextNode * pTextNode = rPam.GetPointNode().GetTextNode();
 
         if (nullptr != pTextNode)
         {
-            const sal_Int32 nStart = rPam.Start()->nContent.GetIndex();
-            const sal_Int32 nEnd = rPam.End()->nContent.GetIndex();
+            const sal_Int32 nStart = rPam.Start()->GetContentIndex();
+            const sal_Int32 nEnd = rPam.End()->GetContentIndex();
 
             return SwResId(STR_START_QUOTE)
                 + ShortenString(pTextNode->GetText().copy(nStart, nEnd - nStart),
@@ -1802,8 +1825,13 @@ void SwDoc::ChkCondColls()
 uno::Reference< script::vba::XVBAEventProcessor > const &
 SwDoc::GetVbaEventProcessor()
 {
+    return mxVbaEvents;
+}
+
+void SwDoc::SetVbaEventProcessor()
+{
 #if HAVE_FEATURE_SCRIPTING
-    if( !mxVbaEvents.is() && mpDocShell && ooo::vba::isAlienWordDoc( *mpDocShell ) )
+    if (mpDocShell && ooo::vba::isAlienWordDoc(*mpDocShell))
     {
         try
         {
@@ -1816,7 +1844,6 @@ SwDoc::GetVbaEventProcessor()
         }
     }
 #endif
-    return mxVbaEvents;
 }
 
 void SwDoc::SetMissingDictionaries( bool bIsMissing )

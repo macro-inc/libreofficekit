@@ -23,9 +23,8 @@
 #include <com/sun/star/table/XTable.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/stream.hxx>
-#include <tools/UnitConversion.hxx>
 #include <svtools/rtfkeywd.hxx>
 #include <svtools/rtfout.hxx>
 
@@ -143,7 +142,7 @@ void SdrTableRtfExporter::WriteRow( const Reference< XPropertySet >& xRowSet, sa
     }
     mrStrm.WriteCharPtr( OOO_STRING_SVTOOLS_RTF_PARD ).WriteCharPtr( OOO_STRING_SVTOOLS_RTF_PLAIN ).WriteCharPtr( OOO_STRING_SVTOOLS_RTF_INTBL ).WriteCharPtr( SAL_NEWLINE_STRING );
 
-    sal_uLong nStrmPos = mrStrm.Tell();
+    sal_uInt64 nStrmPos = mrStrm.Tell();
     for( sal_Int32 nCol = 0; nCol < nColCount; nCol++ )
     {
         WriteCell( nCol, nRow );

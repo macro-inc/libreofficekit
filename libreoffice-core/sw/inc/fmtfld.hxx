@@ -23,6 +23,8 @@
 #include <cppuhelper/weakref.hxx>
 #include <svl/poolitem.hxx>
 #include <svl/SfxBroadcaster.hxx>
+#include <com/sun/star/text/XTextField.hpp>
+#include <unotools/weakref.hxx>
 
 #include "swdllapi.h"
 #include "calbck.hxx"
@@ -35,43 +37,55 @@ class SwView;
 class SwFieldType;
 class SwDDETable;
 class SwFormatField;
+class SwXTextField;
 class IDocumentRedlineAccess;
-namespace com::sun::star::text { class XTextField; }
 
 namespace sw {
     struct FindFormatForFieldHint final : SfxHint {
         const SwField* m_pField;
         SwFormatField*& m_rpFormat;
-        FindFormatForFieldHint(const SwField* pField, SwFormatField*& rpFormat) : m_pField(pField), m_rpFormat(rpFormat) {};
+        FindFormatForFieldHint(const SwField* pField, SwFormatField*& rpFormat)
+            : SfxHint(SfxHintId::SwFindFormatForField), m_pField(pField), m_rpFormat(rpFormat) {};
     };
     struct FindFormatForPostItIdHint final : SfxHint {
         const sal_uInt32 m_nPostItId;
         SwFormatField*& m_rpFormat;
-        FindFormatForPostItIdHint(const sal_uInt32 nPostItId, SwFormatField*& rpFormat) : m_nPostItId(nPostItId), m_rpFormat(rpFormat) {};
+        FindFormatForPostItIdHint(const sal_uInt32 nPostItId, SwFormatField*& rpFormat)
+            : SfxHint(SfxHintId::SwFindFormatForPostItId), m_nPostItId(nPostItId), m_rpFormat(rpFormat) {};
     };
     struct CollectPostItsHint final : SfxHint {
         std::vector<SwFormatField*>& m_rvFormatFields;
         IDocumentRedlineAccess const& m_rIDRA;
         const bool m_bHideRedlines;
-        CollectPostItsHint(std::vector<SwFormatField*>& rvFormatFields, IDocumentRedlineAccess const& rIDRA, bool bHideRedlines) : m_rvFormatFields(rvFormatFields), m_rIDRA(rIDRA), m_bHideRedlines(bHideRedlines) {};
+        CollectPostItsHint(std::vector<SwFormatField*>& rvFormatFields, IDocumentRedlineAccess const& rIDRA, bool bHideRedlines)
+            : SfxHint(SfxHintId::SwCollectPostIts),
+              m_rvFormatFields(rvFormatFields), m_rIDRA(rIDRA), m_bHideRedlines(bHideRedlines) {};
     };
     struct HasHiddenInformationNotesHint final : SfxHint {
         bool& m_rbHasHiddenInformationNotes;
-        HasHiddenInformationNotesHint(bool& rbHasHiddenInformationNotes) : m_rbHasHiddenInformationNotes(rbHasHiddenInformationNotes) {};
+        HasHiddenInformationNotesHint(bool& rbHasHiddenInformationNotes)
+            : SfxHint(SfxHintId::SwHasHiddenInformationNotes),
+              m_rbHasHiddenInformationNotes(rbHasHiddenInformationNotes) {};
     };
     struct GatherNodeIndexHint final : SfxHint {
         std::vector<SwNodeOffset>& m_rvNodeIndex;
-        GatherNodeIndexHint(std::vector<SwNodeOffset>& rvNodeIndex) : m_rvNodeIndex(rvNodeIndex) {};
+        GatherNodeIndexHint(std::vector<SwNodeOffset>& rvNodeIndex)
+            : SfxHint(SfxHintId::SwGatherNodeIndex),
+              m_rvNodeIndex(rvNodeIndex) {};
     };
     struct GatherRefFieldsHint final : SfxHint {
         std::vector<SwGetRefField*>& m_rvRFields;
         const sal_uInt16 m_nType;
-        GatherRefFieldsHint(std::vector<SwGetRefField*>& rvRFields, const sal_uInt16 nType) : m_rvRFields(rvRFields), m_nType(nType) {};
+        GatherRefFieldsHint(std::vector<SwGetRefField*>& rvRFields, const sal_uInt16 nType)
+            : SfxHint(SfxHintId::SwGatherRefFields),
+              m_rvRFields(rvRFields), m_nType(nType) {};
     };
     struct GatherFieldsHint final : SfxHint {
         const bool m_bCollectOnlyInDocNodes;
         std::vector<SwFormatField*>& m_rvFields;
-        GatherFieldsHint(std::vector<SwFormatField*>& rvFields, bool bCollectOnlyInDocNodes = true) : m_bCollectOnlyInDocNodes(bCollectOnlyInDocNodes), m_rvFields(rvFields) {};
+        GatherFieldsHint(std::vector<SwFormatField*>& rvFields, bool bCollectOnlyInDocNodes = true)
+            : SfxHint(SfxHintId::SwGatherFields),
+              m_bCollectOnlyInDocNodes(bCollectOnlyInDocNodes), m_rvFields(rvFields) {};
     };
     struct GatherDdeTablesHint final : SfxHint {
         std::vector<SwDDETable*>& m_rvTables;
@@ -89,7 +103,7 @@ class SW_DLLPUBLIC SwFormatField final
     friend void InitCore();
     SwFormatField( sal_uInt16 nWhich ); // for default-Attribute
 
-    css::uno::WeakReference<css::text::XTextField> m_wXTextField;
+    unotools::WeakReference<SwXTextField> m_wXTextField;
 
     std::unique_ptr<SwField> mpField;
     SwTextField* mpTextField; // the TextAttribute
@@ -146,10 +160,10 @@ public:
     bool IsFieldInDoc() const;
     bool IsProtect() const;
 
-    SAL_DLLPRIVATE css::uno::WeakReference<css::text::XTextField> const& GetXTextField() const
+    SAL_DLLPRIVATE unotools::WeakReference<SwXTextField> const& GetXTextField() const
             { return m_wXTextField; }
-    SAL_DLLPRIVATE void SetXTextField(css::uno::Reference<css::text::XTextField> const& xTextField)
-            { m_wXTextField = xTextField; }
+    SAL_DLLPRIVATE void SetXTextField(rtl::Reference<SwXTextField> const& xTextField);
+
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 
     void UpdateTextNode(const SfxPoolItem* pOld, const SfxPoolItem* pNew);

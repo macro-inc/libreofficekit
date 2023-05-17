@@ -21,8 +21,8 @@
 
 #include <tools/link.hxx>
 #include <tools/gen.hxx>
+#include <svtools/scrolladaptor.hxx>
 #include <vcl/timer.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/vclptr.hxx>
 
 #include <functional>
@@ -163,12 +163,12 @@ private:
     /** The horizontal scroll bar.  Note that is used but not owned by
         objects of this class.  It is given to the constructor.
     */
-    VclPtr<ScrollBar> mpHorizontalScrollBar;
+    VclPtr<ScrollAdaptor> mpHorizontalScrollBar;
 
     /** The vertical scroll bar.  Note that is used but not owned by
         objects of this class.  It is given to the constructor.
     */
-    VclPtr<ScrollBar> mpVerticalScrollBar;
+    VclPtr<ScrollAdaptor> mpVerticalScrollBar;
 
     /// Relative horizontal position of the visible area in the view.
     double mnHorizontalPosition;
@@ -178,11 +178,6 @@ private:
         when entered while in drag mode leads to a scrolling of the window.
     */
     Size maScrollBorder;
-    /** The only task of this little window is to paint the little square at
-        the bottom right corner left by the two scroll bars (when both are
-        visible).
-    */
-    VclPtr<ScrollBarBox> mpScrollBarFiller;
 
     /** The auto scroll timer is used for keep scrolling the window when the
         mouse reaches its border while dragging a selection.  When the mouse
@@ -234,13 +229,12 @@ private:
     void CalcAutoScrollOffset (const Point& rMouseWindowPosition);
     bool RepeatAutoScroll();
 
-    DECL_LINK(HorizontalScrollBarHandler, ScrollBar*, void);
-    DECL_LINK(VerticalScrollBarHandler, ScrollBar*, void);
+    DECL_LINK(HorizontalScrollBarHandler, weld::Scrollbar&, void);
+    DECL_LINK(VerticalScrollBarHandler, weld::Scrollbar&, void);
     DECL_LINK(AutoScrollTimeoutHandler, Timer *, void);
 
     void PlaceHorizontalScrollBar (const ::tools::Rectangle& aArea);
     void PlaceVerticalScrollBar (const ::tools::Rectangle& aArea);
-    void PlaceFiller (const ::tools::Rectangle& aArea);
 };
 
 } // end of namespace ::sd::slidesorter::controller

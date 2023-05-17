@@ -44,7 +44,6 @@ namespace vcl::font {
 }
 class SalLayout;
 namespace tools { class Rectangle; }
-class FontSubsetInfo;
 class OutputDevice;
 class FreetypeFont;
 struct SystemGraphicsData;
@@ -63,7 +62,6 @@ typedef struct TTGlobalFontInfo_ TTGlobalFontInfo;
 }
 
 typedef sal_Unicode sal_Ucs; // TODO: use sal_UCS4 instead of sal_Unicode
-typedef std::map< sal_Ucs, sal_uInt32 >   Ucs2UIntMap;
 
 // note: if you add any new methods to class SalGraphics using coordinates
 //       make sure they have a corresponding protected pure virtual method
@@ -94,16 +92,6 @@ public:
     bool                        getAntiAlias() const
     {
         return m_bAntiAlias;
-    }
-
-    void setTextRenderModeForResolutionIndependentLayout(bool bNew)
-    {
-        m_bTextRenderModeForResolutionIndependentLayout = bNew;
-    }
-
-    bool getTextRenderModeForResolutionIndependentLayoutEnabled() const
-    {
-        return m_bTextRenderModeForResolutionIndependentLayout;
     }
 
     // public SalGraphics methods, the interface to the independent vcl part
@@ -171,46 +159,6 @@ public:
                                     vcl::font::PhysicalFontCollection*,
                                     const OUString& rFileURL,
                                     const OUString& rFontName ) = 0;
-
-    // CreateFontSubset: a method to get a subset of glyhps of a font
-    // inside a new valid font file
-    // returns true if creation of subset was successful
-    // parameters: rToFile: contains an osl file URL to write the subset to
-    //             pFont: describes from which font to create a subset
-    //             pGlyphIDs: the glyph ids to be extracted
-    //             pEncoding: the character code corresponding to each glyph
-    //             pWidths: the advance widths of the corresponding glyphs (in PS font units)
-    //             nGlyphs: the number of glyphs
-    //             rInfo: additional outgoing information
-    // implementation note: encoding 0 with glyph id 0 should be added implicitly
-    // as "undefined character"
-    virtual bool                CreateFontSubset(
-                                    const OUString& rToFile,
-                                    const vcl::font::PhysicalFontFace* pFont,
-                                    const sal_GlyphId* pGlyphIDs,
-                                    const sal_uInt8* pEncoding,
-                                    sal_Int32* pWidths,
-                                    int nGlyphs,
-                                    FontSubsetInfo& rInfo ) = 0;
-
-    // GetEmbedFontData: gets the font data for a font marked
-    // embeddable by GetDevFontList or NULL in case of error
-    // parameters: pFont: describes the font in question
-    //             pDataLen: out parameter, contains the byte length of the returned buffer
-    virtual const void*         GetEmbedFontData(const vcl::font::PhysicalFontFace* pFont, tools::Long* pDataLen) = 0;
-
-    // free the font data again
-    virtual void                FreeEmbedFontData( const void* pData, tools::Long nDataLen ) = 0;
-
-    // get the same widths as in CreateFontSubset
-    // in case of an embeddable font also fill the mapping
-    // between unicode and glyph id
-    // leave widths vector and mapping untouched in case of failure
-    virtual void                GetGlyphWidths(
-                                    const vcl::font::PhysicalFontFace* pFont,
-                                    bool bVertical,
-                                    std::vector< sal_Int32 >& rWidths,
-                                    Ucs2UIntMap& rUnicodeEnc ) = 0;
 
     virtual std::unique_ptr<GenericSalLayout>
                                 GetTextLayout(int nFallbackLevel) = 0;
@@ -452,6 +400,14 @@ public:
 
     virtual SystemGraphicsData  GetGraphicsData() const = 0;
 
+    // Backends like the svp/gtk ones use cairo and hidpi scale at the surface
+    // but bitmaps aren't hidpi, so if this returns true for the case that the
+    // surface is hidpi then pScaleOut contains the scaling factor. So we can
+    // create larger hires bitmaps which we know will be logically scaled down
+    // by this factor but physically just copied
+    virtual bool ShouldDownscaleIconsAtSurface(double* pScaleOut) const;
+
+
 #if ENABLE_CAIRO_CANVAS
 
     /// Check whether cairo will work
@@ -610,7 +566,12 @@ protected:
                                     const SalBitmap* pAlphaBitmap,
                                     double fAlpha) = 0;
 
-    /// Used e.g. by canvas to know whether to cache the drawing.
+    /// Returns true if the drawTransformedBitmap() call is fast, and so it should
+    /// be used directly without trying to optimize some calls e.g. by calling drawBitmap()
+    /// instead (which is faster for most VCL backends). These optimizations are not
+    /// done unconditionally because they may be counter-productive for some fast VCL backends
+    /// (for example, some OutputDevice optimizations could try access the pixels, which
+    /// would make performance worse for GPU-backed backends).
     /// See also tdf#138068.
     virtual bool hasFastDrawTransformedBitmap() const = 0;
 
@@ -633,15 +594,22 @@ private:
     SalLayoutFlags              m_nLayout; //< 0: mirroring off, 1: mirror x-axis
 
     // for buffering the Mirror-Matrix, see ::getMirror
+    enum class MirrorMode
+    {
+        NONE,
+        Antiparallel,
+        AntiparallelBiDi,
+        BiDi
+    };
+    MirrorMode                  m_eLastMirrorMode;
+    tools::Long                 m_nLastMirrorTranslation;
     basegfx::B2DHomMatrix       m_aLastMirror;
-    tools::Long                 m_aLastMirrorW;
-    tools::Long                 m_nLastMirrorDeviceLTRButBiDiRtlTranslate;
-    bool                        m_bLastMirrorDeviceLTRButBiDiRtlSet;
+
+    MirrorMode GetMirrorMode(const OutputDevice& rOutDev) const;
 
 protected:
     /// flags which hold the SetAntialiasing() value from OutputDevice
     bool                        m_bAntiAlias : 1;
-    bool                        m_bTextRenderModeForResolutionIndependentLayout : 1;
 
     inline tools::Long GetDeviceWidth(const OutputDevice& rOutDev) const;
 
@@ -660,23 +628,6 @@ protected:
 
     std::unique_ptr<vcl::WidgetDrawInterface> m_pWidgetDraw;
     vcl::WidgetDrawInterface* forWidget() { return m_pWidgetDraw ? m_pWidgetDraw.get() : this; }
-
-    static void GetGlyphWidths(const vcl::AbstractTrueTypeFont& rTTF,
-                               const vcl::font::PhysicalFontFace& rFontFace, bool bVertical,
-                               std::vector<sal_Int32>& rWidths, Ucs2UIntMap& rUnicodeEnc);
-
-    static bool CreateTTFfontSubset(vcl::AbstractTrueTypeFont& aTTF, const OString& rSysPath,
-                                    const bool bVertical, const sal_GlyphId* pGlyphIds,
-                                    const sal_uInt8* pEncoding, sal_Int32* pGlyphWidths,
-                                    int nGlyphCount);
-
-    static bool CreateCFFfontSubset(const unsigned char* pFontBytes, int nByteLength,
-                                    const OString& rSysPath, const sal_GlyphId* pGlyphIds,
-                                    const sal_uInt8* pEncoding, sal_Int32* pGlyphWidths,
-                                    int nGlyphCount, FontSubsetInfo& rInfo);
-
-    static void FillFontSubsetInfo(const vcl::TTGlobalFontInfo& rTTInfo, const OUString& pPSName,
-                                   FontSubsetInfo& rInfo);
 };
 
 bool SalGraphics::IsNativeControlSupported(ControlType eType, ControlPart ePart)

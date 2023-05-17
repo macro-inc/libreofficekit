@@ -19,6 +19,8 @@
 
 $(eval $(call gb_Library_Library,vclplug_qt6))
 
+$(eval $(call gb_Library_set_plugin_for,vclplug_qt6,vcl))
+
 $(eval $(call gb_Library_use_custom_headers,vclplug_qt6,vcl/qt6))
 
 $(eval $(call gb_Library_set_include,vclplug_qt6,\
@@ -35,7 +37,6 @@ $(eval $(call gb_Library_add_defs,vclplug_qt6,\
 $(eval $(call gb_Library_use_sdk_api,vclplug_qt6))
 
 $(eval $(call gb_Library_use_libraries,vclplug_qt6,\
-    vcl \
     tl \
     utl \
     sot \
@@ -74,6 +75,7 @@ endif
 
 $(eval $(call gb_Library_add_exception_objects,vclplug_qt6,\
     vcl/qt6/QtAccessibleEventListener \
+    vcl/qt6/QtAccessibleRegistry \
     vcl/qt6/QtAccessibleWidget \
     vcl/qt6/QtBitmap \
     vcl/qt6/QtClipboard \
@@ -104,6 +106,9 @@ $(eval $(call gb_Library_add_exception_objects,vclplug_qt6,\
     vcl/qt6/QtVirtualDevice \
     vcl/qt6/QtWidget \
     vcl/qt6/QtXAccessible \
+    $(if $(USING_X11), \
+        vcl/qt6/QtX11Support \
+    ) \
 ))
 
 ifeq ($(OS),LINUX)

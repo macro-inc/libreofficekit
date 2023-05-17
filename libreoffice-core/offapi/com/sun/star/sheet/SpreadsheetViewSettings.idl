@@ -17,13 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_sheet_SpreadsheetViewSettings_idl__
-#define __com_sun_star_sheet_SpreadsheetViewSettings_idl__
-
-#include <com/sun/star/beans/XPropertySet.idl>
-
-#include <com/sun/star/util/Color.idl>
-
 
 module com {  module sun {  module star {  module sheet {
 
@@ -152,11 +145,16 @@ published service SpreadsheetViewSettings
         com::sun::star::view::DocumentZoomType::BY_VALUE.
     */
     [property] short ZoomValue;
+
+    /** Number of lines shown in the Formula bar
+        Default is 1, maximum value is 25.
+
+        @since LibreOffice 7.4
+    */
+    [optional, property] short FormulaBarHeight;
 };
 
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

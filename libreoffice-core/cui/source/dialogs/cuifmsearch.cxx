@@ -31,6 +31,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/string.hxx>
 #include <svx/svxdlg.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace css::uno;
 using namespace css::i18n;
@@ -159,7 +160,7 @@ FmSearchDialog::~FmSearchDialog()
     m_pSearchEngine.reset();
 }
 
-void FmSearchDialog::Init(const OUString& strVisibleFields, const OUString& sInitialText)
+void FmSearchDialog::Init(std::u16string_view strVisibleFields, const OUString& sInitialText)
 {
     //the initialization of all the Controls
     m_prbSearchForText->connect_toggled(LINK(this, FmSearchDialog, OnToggledSearchRadio));
@@ -203,11 +204,11 @@ void FmSearchDialog::Init(const OUString& strVisibleFields, const OUString& sIni
     m_plbPosition->set_active(MATCHING_ANYWHERE);
 
     // the field listbox
-    if (!strVisibleFields.isEmpty())
+    if (!strVisibleFields.empty())
     {
         sal_Int32 nPos {0};
         do {
-            m_plbField->append_text(strVisibleFields.getToken(0, ';', nPos));
+            m_plbField->append_text(OUString(o3tl::getToken(strVisibleFields, 0, ';', nPos)));
         } while (nPos>=0);
     }
 
@@ -311,15 +312,20 @@ IMPL_LINK(FmSearchDialog, OnClickedSpecialSettings, weld::Button&, rButton, void
     if (m_ppbApproxSettings.get() == &rButton)
     {
         SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();
-        ScopedVclPtr<AbstractSvxSearchSimilarityDialog> pDlg(pFact->CreateSvxSearchSimilarityDialog(m_xDialog.get(), m_pSearchEngine->GetLevRelaxed(), m_pSearchEngine->GetLevOther(),
+
+        VclPtr<AbstractSvxSearchSimilarityDialog> pDlg(pFact->CreateSvxSearchSimilarityDialog(m_xDialog.get(), m_pSearchEngine->GetLevRelaxed(), m_pSearchEngine->GetLevOther(),
                     m_pSearchEngine->GetLevShorter(), m_pSearchEngine->GetLevLonger() ));
-        if (pDlg->Execute() == RET_OK)
+        pDlg->StartExecuteAsync([pDlg, this](sal_Int32 nResult){
+
+        if (nResult == RET_OK)
         {
             m_pSearchEngine->SetLevRelaxed( pDlg->IsRelaxed() );
             m_pSearchEngine->SetLevOther( pDlg->GetOther() );
             m_pSearchEngine->SetLevShorter(pDlg->GetShorter() );
             m_pSearchEngine->SetLevLonger( pDlg->GetLonger() );
         }
+        pDlg->disposeOnce();
+        });
     }
     else if (m_pSoundsLikeCJKSettings.get() == &rButton)
     {

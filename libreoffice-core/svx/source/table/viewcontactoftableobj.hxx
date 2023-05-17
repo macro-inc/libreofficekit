@@ -30,7 +30,8 @@ namespace sdr::contact
         protected:
             // This method is responsible for creating the graphical visualisation data derived ONLY from
             // the model data
-            virtual drawinglayer::primitive2d::Primitive2DContainer createViewIndependentPrimitive2DSequence() const override;
+            virtual void createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const override;
+            virtual ViewObjectContact& CreateObjectSpecificViewObjectContact(ObjectContact& rObjectContact) override;
 
         public:
             // basic constructor, used from SdrObject.

@@ -21,6 +21,7 @@
 #define INCLUDED_OOX_DRAWINGML_DRAWINGMLTYPES_HXX
 
 #include <memory>
+#include <optional>
 #include <string_view>
 
 #include <com/sun/star/awt/Point.hpp>
@@ -31,8 +32,8 @@
 #include <com/sun/star/style/TabAlign.hpp>
 #include <com/sun/star/uno/Reference.hxx>
 #include <o3tl/unit_conversion.hxx>
+#include <docmodel/theme/FormatScheme.hxx>
 #include <oox/dllapi.h>
-#include <oox/helper/helper.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
 
@@ -77,6 +78,7 @@ typedef std::shared_ptr< TextListStyle > TextListStylePtr;
 
 class Shape;
 typedef std::shared_ptr< Shape > ShapePtr;
+typedef std::weak_ptr< Shape > WeakShapePtr;
 
 class Theme;
 typedef std::shared_ptr< Theme > ThemePtr;
@@ -99,6 +101,9 @@ css::awt::Size GetSize2D( const css::uno::Reference< css::xml::sax::XFastAttribu
 
 /** converts the attributes from a CT_RelativeRect to an IntegerRectangle2D */
 css::geometry::IntegerRectangle2D GetRelativeRect( const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttributes );
+
+void fillRelativeRectangle(model::RelativeRectangle& rRelativeRectangle,
+                           const css::uno::Reference<css::xml::sax::XFastAttributeList>& xAttributes);
 
 /** converts EMUs into 1/100th mmm */
 sal_Int32 GetCoordinate( sal_Int32 nValue );
@@ -145,6 +150,8 @@ OOX_DLLPUBLIC const char* GetTextVerticalAdjust( css::drawing::TextVerticalAdjus
 // Converts a Hatch object to an ooxml pattern.
 const char* GetHatchPattern( const css::drawing::Hatch& rHatch );
 
+/// Converts nRotate angle to TextVerticalType string appearing in ooxml
+std::optional<OString> GetTextVerticalType(sal_Int32 nRotateAngle);
 
 // CT_IndexRange
 struct IndexRange {
@@ -227,6 +234,7 @@ struct EmuRectangle : public EmuPoint, public EmuSize
     void         setSize( const EmuSize& rSize ) { static_cast< EmuSize& >( *this ) = rSize; }
 };
 
+model::RectangleAlignment convertToRectangleAlignment(sal_Int32 nToken);
 
 } // namespace oox::drawingml
 

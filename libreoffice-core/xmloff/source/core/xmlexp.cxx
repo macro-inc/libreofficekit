@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <memory>
 #include <sal/config.h>
 #include <sal/log.hxx>
@@ -263,11 +265,11 @@ public:
     bool                                                mbExportTextNumberElement;
     bool                                                mbNullDateInitialized;
 
-    void SetSchemeOf( const OUString& rOrigFileName )
+    void SetSchemeOf( std::u16string_view rOrigFileName )
     {
-        sal_Int32 nSep = rOrigFileName.indexOf(':');
-        if( nSep != -1 )
-            msPackageURIScheme = rOrigFileName.copy( 0, nSep );
+        size_t nSep = rOrigFileName.find(':');
+        if( nSep != std::u16string_view::npos )
+            msPackageURIScheme = rOrigFileName.substr( 0, nSep );
     }
 };
 
@@ -434,11 +436,11 @@ void SvXMLExport::DetermineModelType_()
 
 SvXMLExport::SvXMLExport(
     const uno::Reference< uno::XComponentContext >& xContext,
-    OUString const & implementationName,
+    OUString implementationName,
     sal_Int16 const eDefaultMeasureUnit /*css::util::MeasureUnit*/,
     const enum XMLTokenEnum eClass, SvXMLExportFlags nExportFlags )
 :   mpImpl( new SvXMLExport_Impl ),
-    m_xContext(xContext), m_implementationName(implementationName),
+    m_xContext(xContext), m_implementationName(std::move(implementationName)),
     mxAttrList( new SvXMLAttributeList ),
     mpNamespaceMap( new SvXMLNamespaceMap ),
     mpAuthorIDs( new SvtSecurityMapPersonalInfo ),
@@ -456,16 +458,16 @@ SvXMLExport::SvXMLExport(
 
 SvXMLExport::SvXMLExport(
     const css::uno::Reference< css::uno::XComponentContext >& xContext,
-    OUString const & implementationName,
-    const OUString &rFileName,
+    OUString implementationName,
+    OUString fileName,
     sal_Int16 const eDefaultMeasureUnit /*css::util::MeasureUnit*/,
     const uno::Reference< xml::sax::XDocumentHandler > & rHandler)
 :   mpImpl( new SvXMLExport_Impl ),
-    m_xContext(xContext), m_implementationName(implementationName),
+    m_xContext(xContext), m_implementationName(std::move(implementationName)),
     mxHandler( rHandler ),
     mxExtHandler( rHandler, uno::UNO_QUERY ),
     mxAttrList( new SvXMLAttributeList ),
-    msOrigFileName( rFileName ),
+    msOrigFileName(std::move( fileName )),
     mpNamespaceMap( new SvXMLNamespaceMap ),
     mpAuthorIDs( new SvtSecurityMapPersonalInfo ),
     maUnitConv(xContext, util::MeasureUnit::MM_100TH, eDefaultMeasureUnit, getSaneDefaultVersion()),
@@ -486,20 +488,20 @@ SvXMLExport::SvXMLExport(
 
 SvXMLExport::SvXMLExport(
     const css::uno::Reference< css::uno::XComponentContext >& xContext,
-    OUString const & implementationName,
-    const OUString &rFileName,
+    OUString implementationName,
+    OUString fileName,
     const uno::Reference< xml::sax::XDocumentHandler > & rHandler,
     const Reference< XModel >& rModel,
     FieldUnit const eDefaultFieldUnit,
     SvXMLExportFlags nExportFlag)
 :   mpImpl( new SvXMLExport_Impl ),
-    m_xContext(xContext), m_implementationName(implementationName),
+    m_xContext(xContext), m_implementationName(std::move(implementationName)),
     mxModel( rModel ),
     mxHandler( rHandler ),
     mxExtHandler( rHandler, uno::UNO_QUERY ),
     mxNumberFormatsSupplier (rModel, uno::UNO_QUERY),
     mxAttrList( new SvXMLAttributeList ),
-    msOrigFileName( rFileName ),
+    msOrigFileName(std::move( fileName )),
     mpNamespaceMap( new SvXMLNamespaceMap ),
     mpAuthorIDs( new SvtSecurityMapPersonalInfo ),
     maUnitConv( xContext,
@@ -536,9 +538,9 @@ SvXMLExport::~SvXMLExport()
             {
                 if (mpProgressBarHelper)
                 {
-                    OUString sProgressMax(XML_PROGRESSMAX);
-                    OUString sProgressCurrent(XML_PROGRESSCURRENT);
-                    OUString sRepeat(XML_PROGRESSREPEAT);
+                    static constexpr OUStringLiteral sProgressMax(XML_PROGRESSMAX);
+                    static constexpr OUStringLiteral sProgressCurrent(XML_PROGRESSCURRENT);
+                    static constexpr OUStringLiteral sRepeat(XML_PROGRESSREPEAT);
                     if (xPropertySetInfo->hasPropertyByName(sProgressMax) &&
                         xPropertySetInfo->hasPropertyByName(sProgressCurrent))
                     {
@@ -548,11 +550,11 @@ SvXMLExport::~SvXMLExport()
                         mxExportInfo->setPropertyValue(sProgressCurrent, uno::Any(nProgressCurrent));
                     }
                     if (xPropertySetInfo->hasPropertyByName(sRepeat))
-                        mxExportInfo->setPropertyValue(sRepeat, css::uno::makeAny(mpProgressBarHelper->GetRepeat()));
+                        mxExportInfo->setPropertyValue(sRepeat, css::uno::Any(mpProgressBarHelper->GetRepeat()));
                 }
                 if (mpNumExport && (mnExportFlags & (SvXMLExportFlags::AUTOSTYLES | SvXMLExportFlags::STYLES)))
                 {
-                    OUString sWrittenNumberFormats(XML_WRITTENNUMBERSTYLES);
+                    static constexpr OUStringLiteral sWrittenNumberFormats(XML_WRITTENNUMBERSTYLES);
                     if (xPropertySetInfo->hasPropertyByName(sWrittenNumberFormats))
                     {
                         mxExportInfo->setPropertyValue(sWrittenNumberFormats, Any(mpNumExport->GetWasUsed()));
@@ -697,27 +699,26 @@ void SAL_CALL SvXMLExport::initialize( const uno::Sequence< uno::Any >& aArgumen
 
     uno::Reference< beans::XPropertySetInfo > xPropertySetInfo =
         mxExportInfo->getPropertySetInfo();
-    OUString sPropName(
-            "BaseURI"  );
-    if( xPropertySetInfo->hasPropertyByName(sPropName) )
+    static constexpr OUStringLiteral sBaseURI = u"BaseURI";
+    if( xPropertySetInfo->hasPropertyByName(sBaseURI) )
     {
-        uno::Any aAny = mxExportInfo->getPropertyValue(sPropName);
+        uno::Any aAny = mxExportInfo->getPropertyValue(sBaseURI);
         aAny >>= msOrigFileName;
         mpImpl->msPackageURI = msOrigFileName;
         mpImpl->SetSchemeOf( msOrigFileName );
     }
     OUString sRelPath;
-    sPropName = "StreamRelPath";
-    if( xPropertySetInfo->hasPropertyByName(sPropName) )
+    static constexpr OUStringLiteral sStreamRelPath = u"StreamRelPath";
+    if( xPropertySetInfo->hasPropertyByName(sStreamRelPath) )
     {
-        uno::Any aAny = mxExportInfo->getPropertyValue(sPropName);
+        uno::Any aAny = mxExportInfo->getPropertyValue(sStreamRelPath);
         aAny >>= sRelPath;
     }
     OUString sName;
-    sPropName = "StreamName";
-    if( xPropertySetInfo->hasPropertyByName(sPropName) )
+    static constexpr OUStringLiteral sStreamName = u"StreamName";
+    if( xPropertySetInfo->hasPropertyByName(sStreamName) )
     {
-        uno::Any aAny = mxExportInfo->getPropertyValue(sPropName);
+        uno::Any aAny = mxExportInfo->getPropertyValue(sStreamName);
         aAny >>= sName;
     }
     if( !msOrigFileName.isEmpty() && !sName.isEmpty() )
@@ -1084,17 +1085,17 @@ void SvXMLExport::ImplExportStyles()
     if( ( mnExportFlags & SvXMLExportFlags::CONTENT ) || !mxExportInfo.is() )
         return;
 
-    static OUString sStyleNames( "StyleNames" );
-    static OUString sStyleFamilies( "StyleFamilies" );
+    static constexpr OUStringLiteral sStyleNames( u"StyleNames" );
+    static constexpr OUStringLiteral sStyleFamilies( u"StyleFamilies" );
     uno::Reference< beans::XPropertySetInfo > xPropertySetInfo = mxExportInfo->getPropertySetInfo();
     if ( xPropertySetInfo->hasPropertyByName( sStyleNames ) && xPropertySetInfo->hasPropertyByName( sStyleFamilies ) )
     {
         Sequence<sal_Int32> aStyleFamilies;
         Sequence<OUString> aStyleNames;
         mxAutoStylePool->GetRegisteredNames( aStyleFamilies, aStyleNames );
-        mxExportInfo->setPropertyValue( sStyleNames, makeAny( aStyleNames ) );
+        mxExportInfo->setPropertyValue( sStyleNames, Any( aStyleNames ) );
         mxExportInfo->setPropertyValue( sStyleFamilies,
-                                       makeAny( aStyleFamilies ) );
+                                       Any( aStyleFamilies ) );
     }
 }
 
@@ -1253,7 +1254,6 @@ ErrCode SvXMLExport::exportDoc( enum ::xmloff::token::XMLTokenEnum eClass )
                 { OUString("Class"), 0,
                     ::cppu::UnoType<OUString>::get(),
                       PropertyAttribute::MAYBEVOID, 0},
-                { OUString(), 0, css::uno::Type(), 0, 0 }
             };
             Reference< XPropertySet > xConvPropSet(
                 ::comphelper::GenericPropertySet_CreateInstance(
@@ -1404,7 +1404,7 @@ ErrCode SvXMLExport::exportDoc( enum ::xmloff::token::XMLTokenEnum eClass )
 
 void SvXMLExport::ResetNamespaceMap()
 {
-    mpNamespaceMap.reset( new SvXMLNamespaceMap );
+    mpNamespaceMap->Clear();
 }
 
 OUString const & SvXMLExport::GetSourceShellID() const
@@ -1693,7 +1693,14 @@ XMLPageExport* SvXMLExport::CreatePageExport()
 
 SchXMLExportHelper* SvXMLExport::CreateChartExport()
 {
+// WASM_CHART change
+// TODO: With Chart extracted this cannot really happen since
+// no Chart could've been added at all
+#if !ENABLE_WASM_STRIP_CHART
     return new SchXMLExportHelper(*this, *GetAutoStylePool());
+#else
+    return nullptr;
+#endif
 }
 
 XMLFontAutoStylePool* SvXMLExport::CreateFontAutoStylePool()
@@ -1717,7 +1724,8 @@ void SvXMLExport::GetViewSettingsAndViews(uno::Sequence<beans::PropertyValue>& r
     xViewDataSupplier->setViewData( xIndexAccess ); // make sure we get a newly created sequence
     {
         // tdf#130559: don't export preview view data if active
-        css::uno::ContextLayer layer(comphelper::NewFlagContext("NoPreviewData"));
+        static constexpr OUStringLiteral sNoPreviewData = u"NoPreviewData";
+        css::uno::ContextLayer layer(comphelper::NewFlagContext(sNoPreviewData));
         xIndexAccess = xViewDataSupplier->getViewData();
     }
     bool bAdd = false;

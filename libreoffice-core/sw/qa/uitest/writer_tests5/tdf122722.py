@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict, type_text
@@ -30,14 +33,7 @@ class tdf122722(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "1")
 
-                xEffects = xDialog.getChild("effectslb")
-                xRelief = xDialog.getChild("relieflb")
                 xHidden = xDialog.getChild("hiddencb")
-                xOverline = xDialog.getChild("overlinelb")
-                xStrikeout = xDialog.getChild("strikeoutlb")
-                xUnderline = xDialog.getChild("underlinelb")
-                xEmphasis = xDialog.getChild("emphasislb")
-                xPosition = xDialog.getChild("positionlb")
 
                 xHidden.executeAction("CLICK", tuple())
 
@@ -46,14 +42,7 @@ class tdf122722(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "1")
 
-                xEffects = xDialog.getChild("effectslb")
-                xRelief = xDialog.getChild("relieflb")
                 xHidden = xDialog.getChild("hiddencb")
-                xOverline = xDialog.getChild("overlinelb")
-                xStrikeout = xDialog.getChild("strikeoutlb")
-                xUnderline = xDialog.getChild("underlinelb")
-                xEmphasis = xDialog.getChild("emphasislb")
-                xPosition = xDialog.getChild("positionlb")
 
                 self.assertEqual(get_state_as_dict(xHidden)["Selected"], "true")
                 xHidden.executeAction("CLICK", tuple())

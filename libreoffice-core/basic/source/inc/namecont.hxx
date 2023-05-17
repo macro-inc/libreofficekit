@@ -37,6 +37,7 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/deployment/XPackage.hpp>
+#include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/script/vba/XVBACompatibility.hpp>
 #include <com/sun/star/script/vba/XVBAScriptListener.hpp>
 #include <com/sun/star/util/XChangesNotifier.hpp>
@@ -49,7 +50,7 @@
 #include <cppuhelper/component.hxx>
 #include <cppuhelper/basemutex.hxx>
 #include <rtl/ref.hxx>
-#include <comphelper/listenernotification.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <xmlscript/xmllib_imexp.hxx>
 
 class BasicManager;
@@ -74,8 +75,8 @@ class NameContainer final : public ::cppu::BaseMutex, public NameContainer_BASE
     css::uno::Type mType;
     css::uno::XInterface* mpxEventSource;
 
-    ::comphelper::OInterfaceContainerHelper2 maContainerListeners;
-    ::comphelper::OInterfaceContainerHelper2 maChangesListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::container::XContainerListener> maContainerListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::util::XChangesListener> maChangesListeners;
 
 public:
     NameContainer( const css::uno::Type& rType )
@@ -129,7 +130,7 @@ public:
 class ModifiableHelper
 {
 private:
-    ::comphelper::OInterfaceContainerHelper2   m_aModifyListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::util::XModifyListener> m_aModifyListeners;
     ::cppu::OWeakObject&                m_rEventSource;
     bool                                mbModified;
 
@@ -142,7 +143,7 @@ public:
     }
 
     bool    isModified() const  { return mbModified; }
-            void    setModified( bool _bModified );
+    void    setModified( bool _bModified );
 
     void    addModifyListener( const css::uno::Reference< css::util::XModifyListener >& _rxListener )
     {
@@ -156,21 +157,8 @@ public:
 };
 
 
-typedef ::comphelper::OListenerContainerBase<
-    css::script::vba::XVBAScriptListener,
-    css::script::vba::VBAScriptEvent > VBAScriptListenerContainer_BASE;
-
-class VBAScriptListenerContainer final : public VBAScriptListenerContainer_BASE
-{
-public:
-    explicit VBAScriptListenerContainer( ::osl::Mutex& rMutex );
-
-private:
-    virtual bool implTypedNotify(
-        const css::uno::Reference< css::script::vba::XVBAScriptListener >& rxListener,
-        const css::script::vba::VBAScriptEvent& rEvent ) override;
-};
-
+typedef ::comphelper::OInterfaceContainerHelper3<
+    css::script::vba::XVBAScriptListener > VBAScriptListenerContainer;
 
 class SfxLibrary;
 
@@ -183,7 +171,8 @@ typedef ::cppu::WeakComponentImplHelper<
     css::container::XContainer,
     css::script::XLibraryQueryExecutable,
     css::script::vba::XVBACompatibility,
-    css::lang::XServiceInfo > SfxLibraryContainer_BASE;
+    css::lang::XServiceInfo,
+    css::beans::XPropertySet> SfxLibraryContainer_BASE;
 
 class SfxLibraryContainer
     : public ::cppu::BaseMutex
@@ -194,6 +183,7 @@ class SfxLibraryContainer
     sal_Int32 mnRunningVBAScripts;
     bool mbVBACompat;
     OUString msProjectName;
+    rtl_TextEncoding meVBATextEncoding;
 protected:
     css::uno::Reference< css::uno::XComponentContext >       mxContext;
     css::uno::Reference< css::ucb::XSimpleFileAccess3 >      mxSFI;
@@ -234,7 +224,7 @@ protected:
     void implStoreLibrary( SfxLibrary* pLib,
                             std::u16string_view rName,
                             const css::uno::Reference< css::embed::XStorage >& rStorage,
-                            const OUString& rTargetURL,
+                            std::u16string_view rTargetURL,
                             const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& rToUseSFI,
                             const css::uno::Reference< css::task::XInteractionHandler >& rHandler );
 
@@ -244,7 +234,7 @@ protected:
     // New variant for library export
     void implStoreLibraryIndexFile( SfxLibrary* pLib, const ::xmlscript::LibDescriptor& rLib,
                                     const css::uno::Reference< css::embed::XStorage >& xStorage,
-                                    const OUString& aTargetURL,
+                                    std::u16string_view aTargetURL,
                                     const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& rToUseSFI );
 
     bool implLoadLibraryIndexFile( SfxLibrary* pLib,
@@ -307,10 +297,10 @@ protected:
     void init( const OUString& rInitialDocumentURL,
                const css::uno::Reference< css::embed::XStorage >& _rxInitialStorage );
 
-    virtual const char*    getInfoFileName() const = 0;
-    virtual const char*    getOldInfoFileName() const = 0;
-    virtual const char*    getLibElementFileExtension() const = 0;
-    virtual const char*    getLibrariesDir() const = 0;
+    virtual OUString getInfoFileName() const = 0;
+    virtual OUString getOldInfoFileName() const = 0;
+    virtual OUString getLibElementFileExtension() const = 0;
+    virtual OUString getLibrariesDir() const = 0;
 
     // Handle maLibInfoFileURL and maStorageURL correctly
     void checkStorageURL
@@ -341,6 +331,7 @@ private:
     void init_Impl( const OUString& rInitialDocumentURL,
                     const css::uno::Reference< css::embed::XStorage >& _rxInitialStorage );
     void implScanExtensions();
+    static constexpr OUStringLiteral sVBATextEncodingPropName = u"VBATextEncoding";
 
 public:
     SfxLibraryContainer();
@@ -436,6 +427,26 @@ public:
     virtual void SAL_CALL removeVBAScriptListener(
         const css::uno::Reference< css::script::vba::XVBAScriptListener >& Listener ) override;
     virtual void SAL_CALL broadcastVBAScriptEvent( sal_Int32 nIdentifier, const OUString& rModuleName ) override;
+
+    // css::beans::XPropertySet
+    virtual css::uno::Reference<css::beans::XPropertySetInfo>
+        SAL_CALL getPropertySetInfo() override;
+    virtual void SAL_CALL setPropertyValue(const OUString& aPropertyName,
+                                           const css::uno::Any& aValue) override;
+    virtual css::uno::Any SAL_CALL getPropertyValue(const OUString& PropertyName) override;
+    virtual void SAL_CALL addPropertyChangeListener(
+        const OUString& aPropertyName,
+        const css::uno::Reference<css::beans::XPropertyChangeListener>& xListener) override;
+    virtual void SAL_CALL removePropertyChangeListener(
+        const OUString& aPropertyName,
+        const css::uno::Reference<css::beans::XPropertyChangeListener>& aListener) override;
+    virtual void SAL_CALL addVetoableChangeListener(
+        const OUString& PropertyName,
+        const css::uno::Reference<css::beans::XVetoableChangeListener>& aListener) override;
+    virtual void SAL_CALL removeVetoableChangeListener(
+        const OUString& PropertyName,
+        const css::uno::Reference<css::beans::XVetoableChangeListener>& aListener) override;
+
 };
 
 
@@ -532,8 +543,8 @@ public:
         ModifiableHelper& _rModifiable,
         const css::uno::Type& aType,
         const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xSFI,
-        const OUString& aLibInfoFileURL,
-        const OUString& aStorageURL,
+        OUString aLibInfoFileURL,
+        OUString aStorageURL,
         bool ReadOnly
     );
 

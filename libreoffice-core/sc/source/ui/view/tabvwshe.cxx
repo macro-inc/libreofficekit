@@ -39,7 +39,7 @@
 #include <inputhdl.hxx>
 #include <document.hxx>
 
-OUString ScTabViewShell::GetSelectionText( bool bWholeWord )
+OUString ScTabViewShell::GetSelectionText( bool bWholeWord, bool bOnlyASample )
 {
     OUString aStrSelection;
 
@@ -54,7 +54,7 @@ OUString ScTabViewShell::GetSelectionText( bool bWholeWord )
         if ( GetViewData().GetSimpleArea( aRange ) == SC_MARK_SIMPLE )
         {
             ScDocument& rDoc = GetViewData().GetDocument();
-            if ( bInFormatDialog && aRange.aStart.Row() != aRange.aEnd.Row() )
+            if ( (bOnlyASample || bInFormatDialog) && aRange.aStart.Row() != aRange.aEnd.Row() )
             {
                 // limit range to one data row
                 // (only when  the call comes from a format dialog)
@@ -92,7 +92,8 @@ OUString ScTabViewShell::GetSelectionText( bool bWholeWord )
             }
 
             ScImportExport aObj( rDoc, aRange );
-            aObj.SetFormulas( GetViewData().GetOptions().GetOption( VOPT_FORMULAS ) );
+            // tdf#148437 - if cell contains a formula, overwrite entire content of the cell
+            aObj.SetFormulas(true);
             OUString aExportOUString;
             /* TODO: STRING_TSVC under some circumstances? */
             aObj.ExportString( aExportOUString, SotClipboardFormatId::STRING );
@@ -212,13 +213,10 @@ void ScTabViewShell::InsertURLField( const OUString& rName, const OUString& rURL
     EditView*       pTableView  = pHdl->GetTableView();
     OSL_ENSURE( pTopView || pTableView, "No EditView" );
 
-    // Check if user selected a whole cell by single click,
-    // cell has content, and user didn't change the name/text
-    // of the link something different than the content via the hyperlink dialog.
-    // If true, assign the given hyperlink to the whole content
-    // instead of inserting a duplicate, or appending the url.
-    if (comphelper::LibreOfficeKit::isActive() && !bIsEditMode && !bSelectFirst
-            && pTableView && !sSeltext.isEmpty() && sSeltext == rName)
+    // Check if user selected a whole cell by single click, and cell has content.
+    // tdf#80043 - if true, replace the entire content of the selected cell instead of
+    // inserting a duplicate, or appending the url.
+    if (!bIsEditMode && !bSelectFirst && pTableView && !sSeltext.isEmpty())
     {
         nSelInd = sSeltext.getLength();
         bSelectFirst = true;
@@ -258,12 +256,10 @@ void ScTabViewShell::ExecSearch( SfxRequest& rReq )
     {
         case FID_SEARCH_NOW:
             {
+                const SvxSearchItem* pSearchItem;
                 if ( pReqArgs &&
-                     SfxItemState::SET == pReqArgs->GetItemState(SID_SEARCH_ITEM, false, &pItem) )
+                     (pSearchItem = pReqArgs->GetItemIfSet(SID_SEARCH_ITEM, false)) )
                 {
-                    assert( dynamic_cast<const SvxSearchItem*>( pItem) && "wrong Item" );
-                    const SvxSearchItem* pSearchItem = static_cast<const SvxSearchItem*>(pItem);
-
                     ScGlobal::SetSearchItem( *pSearchItem );
                     SearchAndReplace( pSearchItem, true, rReq.IsAPI() );
                     rReq.Done();
@@ -272,18 +268,20 @@ void ScTabViewShell::ExecSearch( SfxRequest& rReq )
             break;
 
         case SID_SEARCH_ITEM:
-            if (pReqArgs && SfxItemState::SET ==
-                            pReqArgs->GetItemState(SID_SEARCH_ITEM, false, &pItem))
+        {
+            const SvxSearchItem* pSearchItem;
+            if (pReqArgs && (pSearchItem =
+                            pReqArgs->GetItemIfSet(SID_SEARCH_ITEM, false)))
             {
                 // remember search item
-                assert( dynamic_cast<const SvxSearchItem*>( pItem) && "wrong Item" );
-                ScGlobal::SetSearchItem( *static_cast<const SvxSearchItem*>(pItem ));
+                ScGlobal::SetSearchItem( *pSearchItem );
             }
             else
             {
                 OSL_FAIL("SID_SEARCH_ITEM without Parameter");
             }
             break;
+        }
         case FID_SEARCH:
         case FID_REPLACE:
         case FID_REPLACE_ALL:

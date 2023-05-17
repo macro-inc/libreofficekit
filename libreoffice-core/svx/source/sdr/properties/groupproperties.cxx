@@ -29,22 +29,8 @@
 
 namespace sdr::properties
 {
-        // create a new itemset
-        SfxItemSet GroupProperties::CreateObjectSpecificItemSet(SfxItemPool& rPool)
-        {
-            // Groups have in principle no ItemSet. To support methods like
-            // GetMergedItemSet() the local one is used. Thus, all items in the pool
-            // may be used and a pool itemset is created.
-            return SfxItemSet(rPool);
-        }
-
         GroupProperties::GroupProperties(SdrObject& rObj)
-        :   DefaultProperties(rObj)
-        {
-        }
-
-        GroupProperties::GroupProperties(const GroupProperties& rProps, SdrObject& rObj)
-        :   DefaultProperties(rProps, rObj)
+        :   BaseProperties(rObj)
         {
         }
 
@@ -54,28 +40,29 @@ namespace sdr::properties
 
         std::unique_ptr<BaseProperties> GroupProperties::Clone(SdrObject& rObj) const
         {
-            return std::unique_ptr<BaseProperties>(new GroupProperties(*this, rObj));
+            return std::unique_ptr<BaseProperties>(new GroupProperties(rObj));
+        }
+
+        SfxItemSet GroupProperties::CreateObjectSpecificItemSet(SfxItemPool& rPool)
+        {
+            return SfxItemSet(rPool);
         }
 
         const SfxItemSet& GroupProperties::GetObjectItemSet() const
         {
             assert(!"GroupProperties::GetObjectItemSet() should never be called");
-            return DefaultProperties::GetObjectItemSet();
+            abort();
         }
 
         const SfxItemSet& GroupProperties::GetMergedItemSet() const
         {
             // prepare ItemSet
             if(mxItemSet)
-            {
                 // clear local itemset for merge
                 mxItemSet->ClearItem();
-            }
-            else
-            {
+            else if(!mxItemSet)
                 // force local itemset
-                DefaultProperties::GetObjectItemSet();
-            }
+                mxItemSet.emplace(GetSdrObject().GetObjectItemPool());
 
             // collect all ItemSets in mpItemSet
             const SdrObjList* pSub(static_cast<const SdrObjGroup&>(GetSdrObject()).GetSubList());
@@ -90,7 +77,7 @@ namespace sdr::properties
 
                 while(nWhich)
                 {
-                    if(SfxItemState::DONTCARE == rSet.GetItemState(nWhich, false))
+                    if(SfxItemState::DONTCARE == aIter.GetItemState(false))
                     {
                         mxItemSet->InvalidateItem(nWhich);
                     }
@@ -128,7 +115,6 @@ namespace sdr::properties
 
             // Do not call parent here. Group objects do not have local ItemSets
             // where items need to be set.
-            // DefaultProperties::SetMergedItemSet(rSet, bClearAllItems);
         }
 
         void GroupProperties::SetObjectItem(const SfxPoolItem& /*rItem*/)
@@ -193,27 +179,6 @@ namespace sdr::properties
             assert(!"GroupProperties::SetObjectItemSet() should never be called");
         }
 
-        void GroupProperties::ItemSetChanged(const SfxItemSet* /*pSet*/)
-        {
-            assert(!"GroupProperties::ItemSetChanged() should never be called");
-        }
-
-        bool GroupProperties::AllowItemChange(const sal_uInt16 /*nWhich*/, const SfxPoolItem* /*pNewItem*/) const
-        {
-            assert(!"GroupProperties::AllowItemChange() should never be called");
-            return false;
-        }
-
-        void GroupProperties::ItemChange(const sal_uInt16 /*nWhich*/, const SfxPoolItem* /*pNewItem*/)
-        {
-            assert(!"GroupProperties::ItemChange() should never be called");
-        }
-
-        void GroupProperties::PostItemChange(const sal_uInt16 /*nWhich*/)
-        {
-            assert(!"GroupProperties::PostItemChange() should never be called");
-        }
-
         SfxStyleSheet* GroupProperties::GetStyleSheet() const
         {
             SfxStyleSheet* pRetval = nullptr;
@@ -243,7 +208,8 @@ namespace sdr::properties
             return pRetval;
         }
 
-        void GroupProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr)
+        void GroupProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast)
         {
             const SdrObjList* pSub(static_cast<const SdrObjGroup&>(GetSdrObject()).GetSubList());
             OSL_ENSURE(nullptr != pSub, "Children of SdrObject expected (!)");
@@ -251,13 +217,11 @@ namespace sdr::properties
 
             for(size_t a = 0; a < nCount; ++a)
             {
-                pSub->GetObj(a)->SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
+                if(bBroadcast)
+                    pSub->GetObj(a)->SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
+                else
+                    pSub->GetObj(a)->NbcSetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
             }
-        }
-
-        void GroupProperties::ForceDefaultAttributes()
-        {
-            // nothing to do here, groups have no items and thus no default items, too.
         }
 
         void GroupProperties::ForceStyleToHardAttributes()

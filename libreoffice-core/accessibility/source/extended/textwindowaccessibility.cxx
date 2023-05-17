@@ -32,11 +32,11 @@
 #include <extended/textwindowaccessibility.hxx>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/txtattr.hxx>
 #include <vcl/window.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <toolkit/helper/convert.hxx>
 #include <comphelper/sequence.hxx>
 
@@ -79,10 +79,10 @@ void WindowListenerGuard::endListening()
     }
 }
 
-Paragraph::Paragraph(::rtl::Reference< Document > const & rDocument,
+Paragraph::Paragraph(::rtl::Reference< Document > xDocument,
                              Paragraphs::size_type nNumber):
     ParagraphBase(m_aMutex),
-    m_xDocument(rDocument),
+    m_xDocument(std::move(xDocument)),
     m_nNumber(nNumber),
     m_nClientId(0)
 {
@@ -130,7 +130,7 @@ Paragraph::getAccessibleContext()
 }
 
 // virtual
-::sal_Int32 SAL_CALL Paragraph::getAccessibleChildCount()
+sal_Int64 SAL_CALL Paragraph::getAccessibleChildCount()
 {
     checkDisposed();
     return 0;
@@ -138,7 +138,7 @@ Paragraph::getAccessibleContext()
 
 // virtual
 css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-Paragraph::getAccessibleChild(::sal_Int32)
+Paragraph::getAccessibleChild(sal_Int64)
 {
     checkDisposed();
     throw css::lang::IndexOutOfBoundsException(
@@ -156,7 +156,7 @@ Paragraph::getAccessibleParent()
 }
 
 // virtual
-::sal_Int32 SAL_CALL Paragraph::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL Paragraph::getAccessibleIndexInParent()
 {
     checkDisposed();
     return m_xDocument->retrieveParagraphIndex(this);
@@ -192,15 +192,13 @@ SAL_CALL Paragraph::getAccessibleRelationSet()
 }
 
 // virtual
-css::uno::Reference< css::accessibility::XAccessibleStateSet >
-SAL_CALL Paragraph::getAccessibleStateSet()
+sal_Int64 SAL_CALL Paragraph::getAccessibleStateSet()
 {
     checkDisposed();
 
     // FIXME  Notification of changes (STATE_CHANGED) missing when
     // m_rView.IsReadOnly() changes:
-    return new ::utl::AccessibleStateSetHelper(
-        m_xDocument->retrieveParagraphState(this));
+    return m_xDocument->retrieveParagraphState(this);
 }
 
 // virtual
@@ -747,29 +745,21 @@ css::lang::Locale Document::retrieveLocale()
     // happen that this Paragraph lies outside the range from m_aVisibleBegin
     // to m_aVisibleEnd.  In that case, it is neither VISIBLE nor SHOWING:
     ::sal_Int64 nState
-          = (static_cast< ::sal_Int64 >(1)
-             << css::accessibility::AccessibleStateType::ENABLED)
-          | (static_cast< ::sal_Int64 >(1)
-             << css::accessibility::AccessibleStateType::SENSITIVE)
-          | (static_cast< ::sal_Int64 >(1)
-             << css::accessibility::AccessibleStateType::FOCUSABLE)
-          | (static_cast< ::sal_Int64 >(1)
-             << css::accessibility::AccessibleStateType::MULTI_LINE);
+          = css::accessibility::AccessibleStateType::ENABLED
+          | css::accessibility::AccessibleStateType::SENSITIVE
+          | css::accessibility::AccessibleStateType::FOCUSABLE
+          | css::accessibility::AccessibleStateType::MULTI_LINE;
     if (!m_rView.IsReadOnly())
-        nState |= (static_cast< ::sal_Int64 >(1)
-                   << css::accessibility::AccessibleStateType::EDITABLE);
+        nState |= css::accessibility::AccessibleStateType::EDITABLE;
     Paragraphs::iterator aPara(m_xParagraphs->begin()
                                + pParagraph->getNumber());
     if (aPara >= m_aVisibleBegin && aPara < m_aVisibleEnd)
     {
         nState
-            |= (static_cast< ::sal_Int64 >(1)
-                << css::accessibility::AccessibleStateType::VISIBLE)
-            | (static_cast< ::sal_Int64 >(1)
-               << css::accessibility::AccessibleStateType::SHOWING);
+            |= css::accessibility::AccessibleStateType::VISIBLE
+            | css::accessibility::AccessibleStateType::SHOWING;
         if (aPara == m_aFocused)
-            nState |= (static_cast< ::sal_Int64 >(1)
-                       << css::accessibility::AccessibleStateType::FOCUSED);
+            nState |= css::accessibility::AccessibleStateType::FOCUSED;
     }
     return nState;
 };
@@ -1318,7 +1308,7 @@ Document::retrieveParagraphRelationSet( Paragraph const * pParagraph )
 }
 
 // virtual
-::sal_Int32 SAL_CALL Document::getAccessibleChildCount()
+sal_Int64 SAL_CALL Document::getAccessibleChildCount()
 {
     ::comphelper::OExternalLockGuard aGuard(this);
     init();
@@ -1327,7 +1317,7 @@ Document::retrieveParagraphRelationSet( Paragraph const * pParagraph )
 
 // virtual
 css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-Document::getAccessibleChild(::sal_Int32 i)
+Document::getAccessibleChild(sal_Int64 i)
 {
     ::comphelper::OExternalLockGuard aGuard(this);
     init();
@@ -1368,11 +1358,11 @@ Document::getAccessibleAtPoint(css::awt::Point const & rPoint)
     }
     return nullptr;
 }
-void Document::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+void Document::FillAccessibleStateSet( sal_Int64& rStateSet )
 {
     VCLXAccessibleComponent::FillAccessibleStateSet( rStateSet );
     if (!m_rView.IsReadOnly())
-        rStateSet.AddState( css::accessibility::AccessibleStateType::EDITABLE );
+        rStateSet |= css::accessibility::AccessibleStateType::EDITABLE;
 }
 
 void    Document::FillAccessibleRelationSet( utl::AccessibleRelationSetHelper& rRelationSet )
@@ -1532,7 +1522,7 @@ IMPL_LINK(Document, WindowEventHandler, ::VclWindowEvent&, rEvent, void)
             if (!isAlive())
                 break;
             //to enable the PARAGRAPH to get focus for multiline edit
-            ::sal_Int32 count = getAccessibleChildCount();
+            sal_Int64 count = getAccessibleChildCount();
             bool bEmpty = m_aFocused == m_aVisibleEnd && count == 1;
             if ((m_aFocused >= m_aVisibleBegin && m_aFocused < m_aVisibleEnd) || bEmpty)
             {
@@ -1557,7 +1547,7 @@ IMPL_LINK(Document, WindowEventHandler, ::VclWindowEvent&, rEvent, void)
             if (!isAlive())
                 break;
             //to enable the PARAGRAPH to get focus for multiline edit
-            ::sal_Int32 count = getAccessibleChildCount();
+            sal_Int64 count = getAccessibleChildCount();
             bool bEmpty = m_aFocused == m_aVisibleEnd && count == 1;
             if ((m_aFocused >= m_aVisibleBegin && m_aFocused < m_aVisibleEnd) || bEmpty)
             {
@@ -2082,7 +2072,7 @@ void Document::handleSelectionChangeNotification()
         if (xParagraph.is())
         {
             //disable the first event when user types in empty field.
-            ::sal_Int32 count = getAccessibleChildCount();
+            sal_Int64 count = getAccessibleChildCount();
             bool bEmpty = count > 1;
             //if (aIt != m_aFocused)
             if (aIt != m_aFocused && bEmpty)
@@ -2097,9 +2087,9 @@ void Document::handleSelectionChangeNotification()
                 xParagraph->notifyEvent(
                     css::accessibility::AccessibleEventId::
                     CARET_CHANGED,
-                    css::uno::makeAny< ::sal_Int32 >(
+                    css::uno::Any( ::sal_Int32 (
                         nNewLastPara == m_nSelectionLastPara
-                        ? m_nSelectionLastPos : 0),
+                        ? m_nSelectionLastPos : 0)),
                     css::uno::Any(nNewLastPos));
         }
     }
@@ -2216,7 +2206,7 @@ void Document::disposeParagraphs()
 // static
 css::uno::Any Document::mapFontColor(::Color const & rColor)
 {
-    return css::uno::makeAny(rColor.GetRGBColor());
+    return css::uno::Any(rColor.GetRGBColor());
         // FIXME  keep transparency?
 }
 

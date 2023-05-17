@@ -63,7 +63,7 @@ class ScTempDocSource
 {
 private:
     ScTempDocCache& rCache;
-    ScDocument*     pTempDoc;
+    ScDocumentUniquePtr pTempDoc;
 
     static ScDocument*  CreateDocument();       // create and initialize doc
 
@@ -84,11 +84,10 @@ ScDocument* ScTempDocSource::CreateDocument()
 }
 
 ScTempDocSource::ScTempDocSource( ScTempDocCache& rDocCache ) :
-    rCache( rDocCache ),
-    pTempDoc( nullptr )
+    rCache( rDocCache )
 {
     if ( rCache.IsInUse() )
-        pTempDoc = CreateDocument();
+        pTempDoc.reset(CreateDocument());
     else
     {
         rCache.SetInUse( true );
@@ -99,16 +98,14 @@ ScTempDocSource::ScTempDocSource( ScTempDocCache& rDocCache ) :
 
 ScTempDocSource::~ScTempDocSource() COVERITY_NOEXCEPT_FALSE
 {
-    if ( pTempDoc )
-        delete pTempDoc;
-    else
+    if ( !pTempDoc )
         rCache.SetInUse( false );
 }
 
 ScDocument* ScTempDocSource::GetDocument()
 {
     if ( pTempDoc )
-        return pTempDoc;
+        return pTempDoc.get();
     else
         return rCache.GetDocument();
 }
@@ -423,8 +420,14 @@ public:
             mrDocRow++;
         }
         mbArgError = aVisitor.hasArgError();
-        if ( nRowCount && nMaxColCount && !mbOverflow )
-            lcl_AddRef( mrTokenArr, nStartRow, nMaxColCount, nRowCount );
+        if (!mbOverflow)
+        {
+            if (nRowCount && nMaxColCount)
+                lcl_AddRef( mrTokenArr, nStartRow, nMaxColCount, nRowCount );
+            else if (nRowCount == 1 && !nMaxColCount)
+                // Empty Sequence<Sequence<Any>> is omitted argument.
+                mrTokenArr.AddOpCode( ocMissing);
+        }
     }
     bool getOverflow() const { return mbOverflow; }
     bool getArgError() const { return mbArgError; }

@@ -9,6 +9,7 @@
 
 #include <contentcontrolbutton.hxx>
 
+#include <utility>
 #include <vcl/weldutils.hxx>
 #include <vcl/event.hxx>
 #include <vcl/decoview.hxx>
@@ -16,10 +17,10 @@
 #include <edtwin.hxx>
 #include <dview.hxx>
 
-SwContentControlButton::SwContentControlButton(
-    SwEditWin* pEditWin, const std::shared_ptr<SwContentControl>& pContentControl)
+SwContentControlButton::SwContentControlButton(SwEditWin* pEditWin,
+                                               std::shared_ptr<SwContentControl> pContentControl)
     : Control(pEditWin, WB_DIALOGCONTROL)
-    , m_pContentControl(pContentControl)
+    , m_pContentControl(std::move(pContentControl))
 {
     assert(GetParent());
     assert(dynamic_cast<SwEditWin*>(GetParent()));
@@ -70,6 +71,10 @@ void SwContentControlButton::CalcPosAndSize(const SwRect& rPortionPaintArea)
     m_aFramePixel = tools::Rectangle(aBoxPos, aBoxSize);
 
     // Then extend the size with the button area
+    if (m_bRTL)
+    {
+        aBoxPos.AdjustX(-GetParent()->LogicToPixel(rPortionPaintArea.SSize()).Height());
+    }
     aBoxSize.AdjustWidth(GetParent()->LogicToPixel(rPortionPaintArea.SSize()).Height());
 
     if (aBoxPos != GetPosPixel() || aBoxSize != GetSizePixel())
@@ -83,6 +88,8 @@ void SwContentControlButton::MouseButtonDown(const MouseEvent&) { StartPopup(); 
 
 void SwContentControlButton::StartPopup()
 {
+    if (m_xPopup) // tdf#152257 already launched, don't relaunch
+        return;
     LaunchPopup();
     Invalidate();
 }
@@ -111,9 +118,16 @@ void SwContentControlButton::Paint(vcl::RenderContext& rRenderContext, const too
 
     // Draw the button next to the frame
     Point aButtonPos(aFrameRect.TopLeft());
-    aButtonPos.AdjustX(aFrameRect.GetSize().getWidth() - nPadding * 2);
+    if (m_bRTL)
+    {
+        aButtonPos.AdjustX(nPadding * 2);
+    }
+    else
+    {
+        aButtonPos.AdjustX(aFrameRect.GetSize().getWidth() - nPadding * 2);
+    }
     Size aButtonSize(aFrameRect.GetSize());
-    aButtonSize.setWidth(GetSizePixel().getWidth() - aFrameRect.getWidth() - nPadding);
+    aButtonSize.setWidth(GetSizePixel().getWidth() - aFrameRect.getOpenWidth() - nPadding);
     const tools::Rectangle aButtonRect(tools::Rectangle(aButtonPos, aButtonSize));
 
     // Background & border
@@ -152,6 +166,11 @@ WindowHitTest SwContentControlButton::ImplHitTest(const Point& rFramePos)
         return aResult;
     else
     {
+        if (m_bRTL)
+        {
+            return rFramePos.X() <= m_aFramePixel.Left() ? WindowHitTest::Inside
+                                                         : WindowHitTest::Transparent;
+        }
         return rFramePos.X() >= m_aFramePixel.Right() ? WindowHitTest::Inside
                                                       : WindowHitTest::Transparent;
     }

@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xenumeration.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -27,15 +27,13 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScIndexEnumeration_NamedRangesEnumeration : public CalcUnoApiTest,
-                                                  public apitest::XEnumeration
+class ScIndexEnumeration_NamedRangesEnumeration : public UnoApiTest, public apitest::XEnumeration
 {
 public:
     ScIndexEnumeration_NamedRangesEnumeration();
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScIndexEnumeration_NamedRangesEnumeration);
 
@@ -44,19 +42,16 @@ public:
     CPPUNIT_TEST(testNextElement);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScIndexEnumeration_NamedRangesEnumeration::ScIndexEnumeration_NamedRangesEnumeration()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
 uno::Reference<uno::XInterface> ScIndexEnumeration_NamedRangesEnumeration::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     uno::Reference<beans::XPropertySet> xPropertySet(xDoc, uno::UNO_QUERY_THROW);
@@ -76,14 +71,8 @@ uno::Reference<uno::XInterface> ScIndexEnumeration_NamedRangesEnumeration::init(
 
 void ScIndexEnumeration_NamedRangesEnumeration::setUp()
 {
-    CalcUnoApiTest::setUp();
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScIndexEnumeration_NamedRangesEnumeration::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    UnoApiTest::setUp();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScIndexEnumeration_NamedRangesEnumeration);

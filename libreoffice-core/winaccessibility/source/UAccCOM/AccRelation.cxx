@@ -18,16 +18,8 @@
  */
 
 #include "stdafx.h"
-#include "AccRelation.h"
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
+#include "AccRelation.h"
 
 #include <vcl/svapp.hxx>
 
@@ -48,18 +40,18 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_relationType(BSTR * relation
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if (relationType == nullptr)
         return E_INVALIDARG;
 
     int type = relation.RelationType;
-    SAFE_SYSFREESTRING(*relationType);
+    SysFreeString(*relationType);
 
     *relationType = getRelationTypeBSTR(type);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 // Gets what the type of localized relation is.
@@ -67,11 +59,11 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_localizedRelationType(BSTR *
 {
 
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -83,7 +75,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_nTargets(long * nTargets)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if (nTargets == nullptr)
         return E_INVALIDARG;
@@ -92,7 +84,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_nTargets(long * nTargets)
     *nTargets = xTargets.getLength();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -105,7 +97,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_target(long targetIndex, IUn
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if (target == nullptr)
         return E_FAIL;
@@ -128,7 +120,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_target(long targetIndex, IUn
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -142,7 +134,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_targets(long, IUnknown * * t
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(target == nullptr)
@@ -172,7 +164,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccRelation::get_targets(long, IUnknown * * t
     *nTargets = nCount;
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**

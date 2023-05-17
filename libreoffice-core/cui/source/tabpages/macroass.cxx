@@ -19,6 +19,7 @@
 
 #include <macroass.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/string.hxx>
 #include <comphelper/processfactory.hxx>
@@ -70,7 +71,7 @@ static OUString ConvertToUIName_Impl( SvxMacro const *pMacro )
         OUString aEntry = aName.getToken( nCount-1, '.' );
         if ( nCount > 2 )
         {
-            aEntry += "(" + aName.getToken( 0, '.' ) + "." + aName.getToken( nCount-2, '.' ) + ")";
+            aEntry += OUString::Concat("(") + o3tl::getToken(aName, 0, '.' ) + "." + o3tl::getToken(aName, nCount-2, '.' ) + ")";
         }
         return aEntry;
     }
@@ -183,11 +184,12 @@ void SfxMacroTabPage::ActivatePage( const SfxItemSet& )
 
 void SfxMacroTabPage::PageCreated(const SfxAllItemSet& aSet)
 {
-    const SfxPoolItem* pEventsItem;
-    if( !mpImpl->m_bGotEvents && SfxItemState::SET == aSet.GetItemState( SID_EVENTCONFIG, true, &pEventsItem ) )
+    if( mpImpl->m_bGotEvents )
+        return;
+    if( const SfxEventNamesItem* pEventsItem = aSet.GetItemIfSet( SID_EVENTCONFIG ) )
     {
         mpImpl->m_bGotEvents = true;
-        const SfxEventNamesList& rList = static_cast<const SfxEventNamesItem*>(pEventsItem)->GetEvents();
+        const SfxEventNamesList& rList = pEventsItem->GetEvents();
         for ( size_t nNo = 0, nCnt = rList.size(); nNo < nCnt; ++nNo )
         {
             const SfxEventName &rOwn = rList.at(nNo);
@@ -202,11 +204,11 @@ void SfxMacroTabPage::Reset( const SfxItemSet* rSet )
     if( SfxItemState::SET == rSet->GetItemState( GetWhich( aPageRg[0] ), true, &pItem ))
         aTbl = static_cast<const SvxMacroItem*>(pItem)->GetMacroTable();
 
-    const SfxPoolItem* pEventsItem;
-    if( !mpImpl->m_bGotEvents && SfxItemState::SET == rSet->GetItemState( SID_EVENTCONFIG, true, &pEventsItem ) )
+    const SfxEventNamesItem* pEventsItem;
+    if( !mpImpl->m_bGotEvents && (pEventsItem = rSet->GetItemIfSet( SID_EVENTCONFIG ) ) )
     {
         mpImpl->m_bGotEvents = true;
-        const SfxEventNamesList& rList = static_cast<const SfxEventNamesItem*>(pEventsItem)->GetEvents();
+        const SfxEventNamesList& rList = pEventsItem->GetEvents();
         for ( size_t nNo = 0, nCnt = rList.size(); nNo < nCnt; ++nNo )
         {
             const SfxEventName &rOwn = rList.at(nNo);
@@ -219,7 +221,10 @@ void SfxMacroTabPage::Reset( const SfxItemSet* rSet )
     weld::TreeView& rListBox = mpImpl->m_xEventLB->GetListBox();
     std::unique_ptr<weld::TreeIter> xIter(rListBox.make_iterator());
     if (rListBox.get_iter_first(*xIter))
+    {
         rListBox.set_cursor(*xIter);
+        EnableButtons();
+    }
 }
 
 bool SfxMacroTabPage::IsReadOnly() const

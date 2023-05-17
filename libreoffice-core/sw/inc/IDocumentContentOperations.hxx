@@ -148,18 +148,12 @@ public:
     virtual bool DelFullPara(SwPaM&) = 0;
 
     /** complete delete of a given PaM
-
-        #i100466#
-        Add optional parameter <bForceJoinNext>, default value <false>
-        Needed for hiding of deletion redlines
     */
-    virtual bool DeleteAndJoin( SwPaM&,
-        SwDeleteFlags flags = SwDeleteFlags::Default,
-        const bool bForceJoinNext = false ) = 0;
+    virtual bool DeleteAndJoin(SwPaM&, SwDeleteFlags flags = SwDeleteFlags::Default) = 0;
 
     virtual bool MoveRange(SwPaM&, SwPosition&, SwMoveFlags) = 0;
 
-    virtual bool MoveNodeRange(SwNodeRange&, SwNodeIndex&, SwMoveFlags) = 0;
+    virtual bool MoveNodeRange(SwNodeRange&, SwNode&, SwMoveFlags) = 0;
 
     /** Move a range.
     */
@@ -256,6 +250,7 @@ public:
     /** Removes any leading white space from the paragraph
     */
     virtual void RemoveLeadingWhiteSpace(const SwPosition & rPos ) = 0;
+    virtual void RemoveLeadingWhiteSpace(SwPaM& rPaM) = 0;
 
 protected:
     virtual ~IDocumentContentOperations() {};

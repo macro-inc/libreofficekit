@@ -20,8 +20,6 @@
 #include <comphelper/accimplaccess.hxx>
 #include <comphelper/servicehelper.hxx>
 
-#include <string.h>
-
 
 namespace comphelper
 {
@@ -38,7 +36,7 @@ namespace comphelper
     {
     }
 
-    Sequence<sal_Int8> OAccessibleImplementationAccess::getUnoTunnelId()
+    const Sequence<sal_Int8> & OAccessibleImplementationAccess::getUnoTunnelId()
     {
         static const comphelper::UnoIdInit implID;
         return implID.getSeq();

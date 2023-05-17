@@ -28,8 +28,13 @@ enum class SalEvent;
 {
     AquaSalFrame*       mpFrame;
     id mDraggingDestinationHandler;
+    BOOL                mbInLiveResize;
+    BOOL                mbInWindowDidResize;
+    NSTimer*            mpLiveResizeTimer;
 }
 -(id)initWithSalFrame: (AquaSalFrame*)pFrame;
+-(void)clearLiveResizeTimer;
+-(void)dealloc;
 -(BOOL)canBecomeKeyWindow;
 -(void)displayIfNeeded;
 -(void)windowDidBecomeKey: (NSNotification*)pNotification;
@@ -40,6 +45,7 @@ enum class SalEvent;
 -(void)windowDidMiniaturize: (NSNotification*)pNotification;
 -(void)windowDidDeminiaturize: (NSNotification*)pNotification;
 -(BOOL)windowShouldClose: (NSNotification*)pNotification;
+-(void)windowDidChangeBackingProperties:(NSNotification *)pNotification;
 //-(void)willEncodeRestorableState:(NSCoder*)pCoderState;
 //-(void)didDecodeRestorableState:(NSCoder*)pCoderState;
 //-(void)windowWillEnterVersionBrowser:(NSNotification*)pNotification;
@@ -59,6 +65,11 @@ enum class SalEvent;
 
 -(void)registerDraggingDestinationHandler:(id)theHandler;
 -(void)unregisterDraggingDestinationHandler:(id)theHandler;
+
+-(void)endExtTextInput;
+-(void)endExtTextInput:(EndExtTextInputFlags)nFlags;
+
+-(void)windowDidResizeWithTimer:(NSTimer *)pTimer;
 @end
 
 @interface SalFrameView : AquaA11yWrapper <NSTextInputClient>
@@ -79,9 +90,15 @@ enum class SalEvent;
     // #i102807# used by magnify event handler
     NSTimeInterval  mfLastMagnifyTime;
     float           mfMagnifyDeltaSum;
+
+    BOOL            mbInEndExtTextInput;
+    BOOL            mbInCommitMarkedText;
+    NSAttributedString* mpLastMarkedText;
+    BOOL            mbTextInputWantsNonRepeatKeyDown;
 }
 +(void)unsetMouseFrame: (AquaSalFrame*)pFrame;
 -(id)initWithSalFrame: (AquaSalFrame*)pFrame;
+-(void)dealloc;
 -(AquaSalFrame*)getSalFrame;
 -(BOOL)acceptsFirstResponder;
 -(BOOL)acceptsFirstMouse: (NSEvent *)pEvent;
@@ -112,6 +129,7 @@ enum class SalEvent;
 -(BOOL)sendSingleCharacter:(NSEvent*)pEvent;
 -(BOOL)handleKeyDownException:(NSEvent*)pEvent;
 -(void)clearLastEvent;
+-(void)clearLastMarkedText;
 /*
     text action methods
 */
@@ -205,6 +223,10 @@ enum class SalEvent;
 
 -(void)registerDraggingDestinationHandler:(id)theHandler;
 -(void)unregisterDraggingDestinationHandler:(id)theHandler;
+
+-(void)endExtTextInput;
+-(void)endExtTextInput:(EndExtTextInputFlags)nFlags;
+-(void)deleteTextInputWantsNonRepeatKeyDown;
 
 @end
 

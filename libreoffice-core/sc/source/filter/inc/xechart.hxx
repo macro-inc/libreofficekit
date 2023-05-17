@@ -97,7 +97,7 @@ public:
     /** Returns chart type info for a unique chart type identifier. */
     const XclChTypeInfo& GetChartTypeInfo( XclChTypeId eType ) const;
     /** Returns the first fitting chart type info for the passed service name. */
-    const XclChTypeInfo& GetChartTypeInfo( const OUString& rServiceName ) const;
+    const XclChTypeInfo& GetChartTypeInfo( std::u16string_view rServiceName ) const;
 
     /** Returns an info struct about auto formatting for the passed object type. */
     const XclChFormatInfo& GetFormatInfo( XclChObjectType eObjType ) const;
@@ -400,7 +400,7 @@ public:
     /** Converts the number format from the passed property set. */
     void                ConvertNumFmt( const ScfPropertySet& rPropSet, bool bPercent );
 
-    void                AppendString( const OUString& rStr );
+    void                AppendString( std::u16string_view rStr );
 
     /** Returns true, if this source link contains explicit string data. */
     bool         HasString() const { return mxString && !mxString->IsEmpty(); }

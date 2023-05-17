@@ -20,6 +20,7 @@
 #include <string.h>
 #include <cassert>
 #include <memory>
+#include <mutex>
 #include <utility>
 #include <string_view>
 #include <vector>
@@ -91,7 +92,7 @@ namespace {
         catch( const css::uno::Exception &e ) {\
             pThis->bExceptionWasThrown = true; \
             pThis->bRTExceptionWasThrown = true; \
-            pImpl->rtexception = WrappedTargetRuntimeException("Non-runtime UNO exception caught during parse", e.Context, makeAny(e)); \
+            pImpl->rtexception = WrappedTargetRuntimeException("Non-runtime UNO exception caught during parse", e.Context, css::uno::Any(e)); \
         }\
     }\
     ((void)0)
@@ -146,7 +147,7 @@ constexpr OUStringLiteral gsCDATA = u"CDATA";
 class SaxExpatParser_Impl
 {
 public: // module scope
-    Mutex               aMutex;
+    std::mutex aMutex;
     bool m_bEnableDoS; // fdo#60471 thank you Adobe Illustrator
 
     css::uno::Reference< XDocumentHandler >   rDocumentHandler;
@@ -378,7 +379,7 @@ SaxExpatParser::initialize(css::uno::Sequence< css::uno::Any > const& rArguments
         OUString str;
         if ((rArguments[0] >>= str) && "DoSmeplease" == str)
         {
-            MutexGuard guard( m_pImpl->aMutex );
+            std::unique_lock guard( m_pImpl->aMutex );
             m_pImpl->m_bEnableDoS = true;
         }
     }
@@ -412,7 +413,7 @@ public:
 void SaxExpatParser::parseStream(   const InputSource& structSource)
 {
     // Only one text at one time
-    MutexGuard guard( m_pImpl->aMutex );
+    std::unique_lock guard( m_pImpl->aMutex );
 
 
     struct Entity entity;

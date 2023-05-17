@@ -1,5 +1,4 @@
 /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
-/* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 /*
  * This file is part of the LibreOffice project.
  *
@@ -196,7 +195,7 @@ public:
     public:
         FrameAreaWriteAccess(SwFrameAreaDefinition& rTarget) : SwRect(rTarget.getFrameArea()), mrTarget(rTarget) {}
         ~FrameAreaWriteAccess();
-        void setSwRect(const SwRect& rNew) { *reinterpret_cast< SwRect* >(this) = rNew; }
+        void setSwRect(const SwRect& rNew) { *static_cast< SwRect* >(this) = rNew; }
     };
 
     // same helper for FramePrintArea
@@ -211,7 +210,7 @@ public:
     public:
         FramePrintAreaWriteAccess(SwFrameAreaDefinition& rTarget) : SwRect(rTarget.getFramePrintArea()), mrTarget(rTarget) {}
         ~FramePrintAreaWriteAccess();
-        void setSwRect(const SwRect& rNew) { *reinterpret_cast< SwRect* >(this) = rNew; }
+        void setSwRect(const SwRect& rNew) { *static_cast< SwRect* >(this) = rNew; }
     };
 
     // RotateFlyFrame3 - Support for Transformations
@@ -545,10 +544,12 @@ public:
     SwLayoutFrame *GetNextLeaf   ( MakePageType eMakePage );
     SwLayoutFrame *GetNextFootnoteLeaf( MakePageType eMakePage );
     SwLayoutFrame *GetNextSctLeaf( MakePageType eMakePage );
+    SwLayoutFrame *GetNextFlyLeaf( MakePageType eMakePage );
     SwLayoutFrame *GetNextCellLeaf();
     SwLayoutFrame *GetPrevLeaf   ();
     SwLayoutFrame *GetPrevFootnoteLeaf( MakePageType eMakeFootnote );
     SwLayoutFrame *GetPrevSctLeaf();
+    SwLayoutFrame *GetPrevFlyLeaf();
     SwLayoutFrame *GetPrevCellLeaf();
     const SwLayoutFrame *GetLeaf ( MakePageType eMakePage, bool bFwd,
                                  const SwFrame *pAnch ) const;

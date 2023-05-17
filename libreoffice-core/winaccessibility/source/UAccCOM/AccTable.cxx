@@ -21,17 +21,10 @@
  * AccTable.cpp : Implementation of CAccTable.
  */
 #include "stdafx.h"
+#include  <UAccCOM.h>
 #include "AccTable.h"
 
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-#include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
-
+#include <sal/log.hxx>
 #include <vcl/svapp.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
 
@@ -54,7 +47,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_accessibleAt(long row, long col
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(accessible == nullptr)
@@ -96,7 +89,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_accessibleAt(long row, long col
     }
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_cellAt(long row, long column, IUnknown * * cell)
@@ -124,7 +117,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnDescription(long column, 
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(description == nullptr)
@@ -137,13 +130,13 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnDescription(long column, 
     const OUString& ouStr = pRXTable->getAccessibleColumnDescription(column);
     // #CHECK#
 
-    SAFE_SYSFREESTRING(*description);
+    SysFreeString(*description);
     *description = SysAllocString(o3tl::toW(ouStr.getStr()));
     if (*description==nullptr)
         return E_FAIL;
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -157,7 +150,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnExtentAt(long row, long c
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // Check pointer.
     if(nColumnsSpanned == nullptr)
@@ -169,7 +162,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnExtentAt(long row, long c
     *nColumnsSpanned = pRXTable->getAccessibleColumnExtentAt(row, column);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -182,7 +175,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnHeader(IAccessibleTable _
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(accessibleTable == nullptr || startingRowIndex == nullptr)
@@ -220,7 +213,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnHeader(IAccessibleTable _
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -232,7 +225,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nColumns(long * columnCount)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(columnCount == nullptr)
@@ -245,7 +238,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nColumns(long * columnCount)
     *columnCount = pRXTable->getAccessibleColumnCount();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -257,7 +250,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nRows(long * rowCount)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(rowCount == nullptr)
@@ -270,7 +263,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nRows(long * rowCount)
     *rowCount = pRXTable->getAccessibleRowCount();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -282,7 +275,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nSelectedColumns(long * columnC
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(columnCount == nullptr)
@@ -296,7 +289,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nSelectedColumns(long * columnC
     *columnCount = pSelected.getLength();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -308,7 +301,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nSelectedRows(long * rowCount)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(rowCount == nullptr)
@@ -322,7 +315,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nSelectedRows(long * rowCount)
     *rowCount = pSelected.getLength();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -335,7 +328,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowDescription(long row, BSTR *
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(description == nullptr)
@@ -348,13 +341,13 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowDescription(long row, BSTR *
     const OUString& ouStr = pRXTable->getAccessibleRowDescription(row);
     // #CHECK#
 
-    SAFE_SYSFREESTRING(*description);
+    SysFreeString(*description);
     *description = SysAllocString(o3tl::toW(ouStr.getStr()));
     if (*description==nullptr)
         return E_FAIL;
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -368,7 +361,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowExtentAt(long row, long colu
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // Check pointer.
     if(nRowsSpanned == nullptr)
@@ -381,7 +374,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowExtentAt(long row, long colu
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -394,7 +387,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowHeader(IAccessibleTable __RP
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(accessibleTable == nullptr || startingColumnIndex == nullptr)
@@ -432,7 +425,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowHeader(IAccessibleTable __RP
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -445,7 +438,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedRows(long** rows, long*
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(rows == nullptr || nRows == nullptr)
@@ -470,7 +463,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedRows(long** rows, long*
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -495,7 +488,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedColumns(long ** columns
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(columns == nullptr || numColumns == nullptr)
@@ -520,7 +513,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedColumns(long ** columns
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -544,7 +537,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_summary(IUnknown * * accessible
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(accessible == nullptr)
@@ -568,7 +561,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_summary(IUnknown * * accessible
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -581,7 +574,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_isColumnSelected(long column, b
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(isSelected == nullptr)
@@ -594,7 +587,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_isColumnSelected(long column, b
     *isSelected = pRXTable->isAccessibleColumnSelected(column);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -607,7 +600,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_isRowSelected(long row, boolean
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(isSelected == nullptr)
@@ -620,7 +613,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_isRowSelected(long row, boolean
     *isSelected = pRXTable->isAccessibleRowSelected(row);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -634,7 +627,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_isSelected(long row, long colum
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(isSelected == nullptr)
@@ -647,7 +640,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_isSelected(long row, long colum
     *isSelected = pRXTable->isAccessibleSelected(row, column);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -660,7 +653,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::selectRow(long row)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // Check XAccessibleTable reference.
     if(!pRXTable.is())
@@ -684,14 +677,14 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::selectRow(long row)
         lColumnCount = pRXTable->getAccessibleColumnCount();
         for(lCol = 0; lCol < lColumnCount; lCol ++)
         {
-            long lChildIndex = pRXTable->getAccessibleIndex(row, lCol);
-            pRSelection->selectAccessibleChild(lChildIndex);
+            sal_Int64 nChildIndex = pRXTable->getAccessibleIndex(row, lCol);
+            pRSelection->selectAccessibleChild(nChildIndex);
         }
 
         return S_OK;
     }
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -704,7 +697,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::selectColumn(long column)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // Check XAccessibleTable reference.
     if(!pRXTable.is())
@@ -728,15 +721,15 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::selectColumn(long column)
         lRowCount = pRXTable->getAccessibleRowCount();
         for(lRow = 0; lRow < lRowCount; lRow ++)
         {
-            long lChildIndex = pRXTable->getAccessibleIndex(lRow, column);
-            pRSelection->selectAccessibleChild(lChildIndex);
+            sal_Int64 nChildIndex = pRXTable->getAccessibleIndex(lRow, column);
+            pRSelection->selectAccessibleChild(nChildIndex);
         }
 
         return S_OK;
     }
     // End of added.
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -749,7 +742,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::unselectRow(long row)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // Check XAccessibleTable reference.
     if(!pRXTable.is())
@@ -775,15 +768,15 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::unselectRow(long row)
         lColumnCount = pRXTable->getAccessibleColumnCount();
         for(lColumn = 0; lColumn < lColumnCount; lColumn ++)
         {
-            long lChildIndex = pRXTable->getAccessibleIndex(row, lColumn);
-            pRSelection->deselectAccessibleChild(lChildIndex);
+            sal_Int64 nChildIndex = pRXTable->getAccessibleIndex(row, lColumn);
+            pRSelection->deselectAccessibleChild(nChildIndex);
         }
 
         return S_OK;
     }
     // End of added.
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -796,7 +789,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::unselectColumn(long column)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // Check XAccessibleTable reference.
     if(!pRXTable.is())
@@ -823,13 +816,13 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::unselectColumn(long column)
 
         for(lRow = 0; lRow < lRowCount; lRow ++)
         {
-            long lChildIndex = pRXTable->getAccessibleIndex(lRow, column);
-            pRSelection->deselectAccessibleChild(lChildIndex);
+            sal_Int64 nChildIndex = pRXTable->getAccessibleIndex(lRow, column);
+            pRSelection->deselectAccessibleChild(nChildIndex);
         }
         return S_OK;
     }
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -841,7 +834,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::put_XInterface(hyper pXInterface)
 {
     // internal IUNOXWrapper - no mutex meeded
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     CUNOXWrapper::put_XInterface(pXInterface);
     //special query.
@@ -859,7 +852,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::put_XInterface(hyper pXInterface)
         pRXTable = pRXI.get();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 
@@ -872,7 +865,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnIndex(long childIndex, lo
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(columnIndex == nullptr)
@@ -885,7 +878,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_columnIndex(long childIndex, lo
     *columnIndex = pRXTable->getAccessibleColumn(childIndex);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 /**
   * Gets rowIndex of childIndex.
@@ -896,7 +889,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowIndex(long childIndex, long 
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(rowIndex == nullptr)
@@ -909,7 +902,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowIndex(long childIndex, long 
     *rowIndex = pRXTable->getAccessibleRow(childIndex);
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -921,7 +914,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_childIndex(long RowIndex , long
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(childIndex == nullptr)
@@ -931,10 +924,20 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_childIndex(long RowIndex , long
     if(!pRXTable.is())
         return E_FAIL;
 
-    *childIndex = pRXTable->getAccessibleIndex(RowIndex, columnIndex);
+    sal_Int64 nIndex = pRXTable->getAccessibleIndex(RowIndex, columnIndex);
+    if (nIndex > std::numeric_limits<long>::max())
+    {
+        // use -2 when the child index is too large to fit into 32 bit to neither use the
+        // valid index of another child nor -1, which is more commonly used to indicate that
+        // a child is no more inside of a parent or invalid otherwise
+        SAL_WARN("vcl.qt", "CAccTable::get_childIndex: Child index exceeds maximum long value, "
+                           "returning -2.");
+        nIndex = -2;
+    }
+    *childIndex = nIndex;
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_rowColumnExtentsAtIndex(long,
@@ -959,7 +962,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nSelectedChildren(long *childCo
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(childCount == nullptr)
@@ -973,10 +976,17 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_nSelectedChildren(long *childCo
     if(!pRSelection.is())
         return E_FAIL;
 
-    *childCount = pRSelection->getSelectedAccessibleChildCount();
+    sal_Int64 nSelected = pRSelection->getSelectedAccessibleChildCount();
+    if (nSelected > std::numeric_limits<long>::max())
+    {
+        SAL_WARN("iacc2", "CAccTable::get_nSelectedChildren: Selected item count exceeds maximum long value, "
+                          "using max long.");
+        nSelected = std::numeric_limits<long>::max();
+    }
+    *childCount = nSelected;
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 
@@ -997,7 +1007,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedChildren(long, long **c
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(children == nullptr || nChildren == nullptr)
@@ -1011,13 +1021,18 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedChildren(long, long **c
     if(!pRSelection.is())
         return E_FAIL;
 
-    long childCount = pRSelection->getSelectedAccessibleChildCount() ;
+    sal_Int64 nChildCount = pRSelection->getSelectedAccessibleChildCount();
+    if (nChildCount > std::numeric_limits<long>::max())
+    {
+        SAL_WARN("iacc2", "CAccTable::get_selectedChildren: Selected child count exceeds maximum long value, "
+                          "using max long.");
+        nChildCount = std::numeric_limits<long>::max();
+    }
 
-    *nChildren = childCount;
+    *nChildren = nChildCount;
+    *children = static_cast<long*>(CoTaskMemAlloc(nChildCount * sizeof(long)));
 
-    *children = static_cast<long*>(CoTaskMemAlloc(childCount * sizeof(long)));
-
-    for( long i = 0; i< childCount; i++)
+    for( sal_Int64 i = 0; i< nChildCount; i++)
     {
         Reference<XAccessible> pRAcc = pRSelection->getSelectedAccessibleChild(i);
         if(pRAcc.is())
@@ -1026,14 +1041,21 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedChildren(long, long **c
             if( !pRContext.is() )
                 return E_FAIL;
 
-            long childIndex = pRContext->getAccessibleIndexInParent();
-            (*children)[i] = childIndex;
+
+            sal_Int64 nChildIndex =  pRContext->getAccessibleIndexInParent();
+            if (nChildIndex > std::numeric_limits<long>::max())
+            {
+                SAL_WARN("iacc2", "CAccTable::get_selectedChildren: Child index exceeds maximum long value, "
+                                  "using max long.");
+                nChildIndex = std::numeric_limits<long>::max();
+            }
+            (*children)[i] = nChildIndex;
         }
     }
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 
 }
 
@@ -1049,7 +1071,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedCells(IUnknown * * * ce
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if (cells == nullptr || nSelectedCells == nullptr)
         return E_INVALIDARG;
@@ -1061,12 +1083,18 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedCells(IUnknown * * * ce
     if (!xSelection.is())
         return E_FAIL;
 
-    const long nSelected = xSelection->getSelectedAccessibleChildCount();
+    sal_Int64 nSelected = xSelection->getSelectedAccessibleChildCount();
+    if (nSelected > std::numeric_limits<long>::max())
+    {
+        SAL_WARN("iacc2", "CAccTable::get_selectedCells: Selected cell count exceeds maximum long value, "
+                          "using max long.");
+        nSelected = std::numeric_limits<long>::max();
+    }
     *nSelectedCells = nSelected;
 
     *cells = static_cast<IUnknown**>(CoTaskMemAlloc(nSelected * sizeof(IUnknown*)));
 
-    for (long i = 0; i < nSelected; i++)
+    for (sal_Int64 i = 0; i < nSelected; i++)
     {
         Reference<XAccessible> xAcc = xSelection->getSelectedAccessibleChild(i);
         assert(xAcc.is());
@@ -1089,7 +1117,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTable::get_selectedCells(IUnknown * * * ce
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

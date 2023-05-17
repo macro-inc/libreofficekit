@@ -65,7 +65,7 @@ static void NotebookbarAddonValues(
                 {
                     OUString sImage;
                     rProp.Value >>= sImage;
-                    aImage = Image(framework::AddonsOptions().GetImageFromURL(sImage, isBigImage));
+                    aImage = Image(aAddonsItems.GetImageFromURL(sImage, isBigImage));
                 }
             }
             aImageValues.push_back(aImage);
@@ -114,7 +114,7 @@ static OUString lcl_getAppName( vcl::EnumContext::Application eApp )
 static void lcl_setNotebookbarFileName( vcl::EnumContext::Application eApp, const OUString& sFileName )
 {
     std::shared_ptr<comphelper::ConfigurationChanges> aBatch(
-                comphelper::ConfigurationChanges::create( ::comphelper::getProcessComponentContext() ) );
+                comphelper::ConfigurationChanges::create() );
     switch ( eApp )
     {
         case vcl::EnumContext::Application::Writer:
@@ -202,7 +202,6 @@ void SfxNotebookBar::CloseMethod(SystemWindow* pSysWindow)
 {
     if (pSysWindow)
     {
-        RemoveListeners(pSysWindow);
         if(pSysWindow->GetNotebookBar())
             pSysWindow->CloseNotebookBar();
         if (SfxViewFrame::Current())
@@ -222,7 +221,7 @@ void SfxNotebookBar::UnlockNotebookBar()
     m_bLock = false;
 }
 
-bool SfxNotebookBar::IsActive()
+bool SfxNotebookBar::IsActive(bool bConsiderSingleToolbar)
 {
     if (m_bHide)
         return false;
@@ -266,6 +265,9 @@ bool SfxNotebookBar::IsActive()
 
     OUString aActive = comphelper::getString( aAppNode.getNodeValue( "Active" ) );
 
+    if (bConsiderSingleToolbar && aActive == "Single")
+        return true;
+
     if (comphelper::LibreOfficeKit::isActive() && aActive == "notebookbar_online.ui")
         return true;
 
@@ -304,7 +306,7 @@ void SfxNotebookBar::ResetActiveToolbarModeToDefault(vcl::EnumContext::Applicati
     if ( !aAppNode.isValid() )
         return;
 
-    aAppNode.setNodeValue( "Active", makeAny( OUString( "Default" ) ) );
+    aAppNode.setNodeValue( "Active", Any( OUString( "Default" ) ) );
     aAppNode.commit();
 }
 
@@ -432,7 +434,7 @@ bool SfxNotebookBar::StateMethod(SystemWindow* pSysWindow,
 
             if(pView)
             {
-                pNotebookBar->ControlListenerForCurrentController(true);
+                pNotebookBar->SetupListener(true);
             }
         }
 
@@ -441,7 +443,6 @@ bool SfxNotebookBar::StateMethod(SystemWindow* pSysWindow,
     else if (auto pNotebookBar = pSysWindow->GetNotebookBar())
     {
         vcl::Window* pParent = pNotebookBar->GetParent();
-        RemoveListeners(pSysWindow);
         pSysWindow->CloseNotebookBar();
         pParent->Resize();
         SfxNotebookBar::ShowMenubar(true);
@@ -454,7 +455,7 @@ void SfxNotebookBar::RemoveListeners(SystemWindow const * pSysWindow)
 {
     if (auto pNotebookBar = pSysWindow->GetNotebookBar())
     {
-        pNotebookBar->StopListeningAllControllers();
+        pNotebookBar->SetupListener(false);
     }
 }
 

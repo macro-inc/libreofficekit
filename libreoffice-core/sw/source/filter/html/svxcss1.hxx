@@ -20,11 +20,11 @@
 #define INCLUDED_SW_SOURCE_FILTER_HTML_SVXCSS1_HXX
 
 #include <svl/itemset.hxx>
-#include <svx/flagsdef.hxx>
 #include <editeng/svxenum.hxx>
 #include <rtl/textenc.h>
 #include "parcss1.hxx"
 #include <o3tl/typed_flags_set.hxx>
+#include <o3tl/unit_conversion.hxx>
 
 #include <array>
 #include <map>
@@ -136,6 +136,8 @@ public:
 
     SvxCSS1LengthType m_eLeftType, m_eTopType;
     SvxCSS1LengthType m_eWidthType, m_eHeightType;
+    SvxCSS1LengthType m_eLeftMarginType;
+    SvxCSS1LengthType m_eRightMarginType;
 
     SvxCSS1SizeType m_eSizeType;
 
@@ -167,7 +169,7 @@ class SvxCSS1MapEntry
     SvxCSS1PropertyInfo m_aPropInfo;
 
 public:
-    SvxCSS1MapEntry( const SfxItemSet& rItemSet,
+    SvxCSS1MapEntry( SfxItemSet aItemSet,
                      const SvxCSS1PropertyInfo& rProp );
 
     const SfxItemSet& GetItemSet() const { return m_aItemSet; }
@@ -239,7 +241,7 @@ protected:
 public:
 
     SvxCSS1Parser( SfxItemPool& rPool,
-                    const OUString& rBaseURL,
+                    OUString aBaseURL,
                    sal_uInt16 const *pWhichIds, sal_uInt16 nWhichIds );
     virtual ~SvxCSS1Parser() override;
 

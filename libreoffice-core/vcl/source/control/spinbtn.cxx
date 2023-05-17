@@ -349,7 +349,7 @@ void SpinButton::SetRange( const Range& rRange )
 {
     // adjust rage
     Range aRange = rRange;
-    aRange.Justify();
+    aRange.Normalize();
     tools::Long nNewMinRange = aRange.Min();
     tools::Long nNewMaxRange = aRange.Max();
 
@@ -431,7 +431,7 @@ tools::Rectangle* SpinButton::ImplFindPartRect( const Point& rPt )
 
 bool SpinButton::PreNotify( NotifyEvent& rNEvt )
 {
-    if (rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE)
+    if (rNEvt.GetType() == NotifyEventType::MOUSEMOVE)
     {
         const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
         if (pMouseEvt && !pMouseEvt->GetButtons() && !pMouseEvt->IsSynthetic() && !pMouseEvt->IsModifierChanged())

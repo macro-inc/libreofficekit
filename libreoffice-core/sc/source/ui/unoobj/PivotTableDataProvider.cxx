@@ -60,13 +60,12 @@ constexpr OUStringLiteral constIdCategories(u"categories");
 constexpr OUStringLiteral constIdLabel(u"label");
 constexpr OUStringLiteral constIdData(u"data");
 
-const SfxItemPropertyMapEntry* lcl_GetDataProviderPropertyMap()
+o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDataProviderPropertyMap()
 {
     static const SfxItemPropertyMapEntry aDataProviderPropertyMap_Impl[] =
     {
-        { u"" SC_UNONAME_INCLUDEHIDDENCELLS, 0, cppu::UnoType<bool>::get(), 0, 0 },
-        { u"" SC_UNONAME_USE_INTERNAL_DATA_PROVIDER, 0, cppu::UnoType<bool>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_INCLUDEHIDDENCELLS, 0, cppu::UnoType<bool>::get(), 0, 0 },
+        { SC_UNONAME_USE_INTERNAL_DATA_PROVIDER, 0, cppu::UnoType<bool>::get(), 0, 0 },
     };
     return aDataProviderPropertyMap_Impl;
 }
@@ -453,6 +452,8 @@ void PivotTableDataProvider::collectPivotTableData()
 
                                 if (bFound)
                                 {
+                                    assert(pItem && "bHasContinueFlag must be false on this or some preceding element");
+
                                     if (i >= m_aCategoriesRowOrientation.size())
                                         m_aCategoriesRowOrientation.resize(i + 1);
 

@@ -11,6 +11,7 @@
 #include <datamapper.hxx>
 #include <datatransformation.hxx>
 #include <salhelper/thread.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <tools/stream.hxx>
 
@@ -19,7 +20,6 @@
 #include <libxml/xpath.h>
 
 #include <comphelper/string.hxx>
-#include <utility>
 
 namespace sc {
 
@@ -268,8 +268,6 @@ void HTMLDataProvider::Import()
 void HTMLDataProvider::ImportFinished()
 {
     mrDataSource.getDBManager()->WriteToDoc(*mpDoc);
-    mxHTMLFetchThread.clear();
-    mpDoc.reset();
 }
 
 const OUString& HTMLDataProvider::GetURL() const

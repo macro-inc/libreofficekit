@@ -146,9 +146,11 @@ public:
     ErrCode             GetErrorCode() const;
     ErrCode             GetError() const
                         { return GetErrorCode().IgnoreWarning(); }
+    ErrCode             GetWarningError() const;
     ErrCode const &     GetLastStorageCreationState() const;
 
     void                SetError(ErrCode nError);
+    void                SetWarningError(ErrCode nWarningError);
 
     void                CloseInStream();
     void                CloseOutStream();
@@ -251,8 +253,8 @@ public:
     SAL_DLLPRIVATE void DoBackup_Impl();
     SAL_DLLPRIVATE void DoInternalBackup_Impl( const ::ucbhelper::Content& aOriginalContent );
     SAL_DLLPRIVATE void DoInternalBackup_Impl( const ::ucbhelper::Content& aOriginalContent,
-                                                const OUString& aPrefix,
-                                                const OUString& aExtension,
+                                                std::u16string_view aPrefix,
+                                                std::u16string_view aExtension,
                                                 const OUString& aDestDir );
 
     SAL_DLLPRIVATE bool UseBackupToRestore_Impl( ::ucbhelper::Content& aOriginalContent,
@@ -290,11 +292,11 @@ public:
 
     static css::uno::Sequence < css::util::RevisionTag > GetVersionList(
                     const css::uno::Reference< css::embed::XStorage >& xStorage );
-    static OUString CreateTempCopyWithExt( const OUString& aURL );
+    static OUString CreateTempCopyWithExt( std::u16string_view aURL );
     static bool CallApproveHandler(const css::uno::Reference< css::task::XInteractionHandler >& xHandler, const css::uno::Any& rRequest, bool bAllowAbort);
 
     static bool         SetWritableForUserOnly( const OUString& aURL );
-    static sal_uInt32   CreatePasswordToModifyHash( const OUString& aPasswd, bool bWriter );
+    static sal_uInt32   CreatePasswordToModifyHash( std::u16string_view aPasswd, bool bWriter );
 
 private:
     enum class ShowLockResult { NoLock, Succeeded, Try };
@@ -302,8 +304,6 @@ private:
                                             bool bIsLoading, bool bOwnLock, bool bHandleSysLocked);
     enum class MessageDlg { LockFileIgnore, LockFileCorrupt };
     bool                ShowLockFileProblemDialog(MessageDlg nWhichDlg);
-    bool ShowReadOnlyOpenDialog();
-
 };
 
 #endif

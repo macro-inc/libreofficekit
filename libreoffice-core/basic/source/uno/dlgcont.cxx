@@ -33,7 +33,8 @@
 #include <dlgcont.hxx>
 #include <comphelper/fileformat.h>
 #include <comphelper/processfactory.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <xmlscript/xmldlg_imexp.hxx>
@@ -62,10 +63,26 @@ using com::sun::star::uno::Reference;
 
 // Implementation class SfxDialogLibraryContainer
 
-const char* SfxDialogLibraryContainer::getInfoFileName() const { return "dialog"; }
-const char* SfxDialogLibraryContainer::getOldInfoFileName() const { return "dialogs"; }
-const char* SfxDialogLibraryContainer::getLibElementFileExtension() const { return "xdl"; }
-const char* SfxDialogLibraryContainer::getLibrariesDir() const { return "Dialogs"; }
+OUString SfxDialogLibraryContainer::getInfoFileName() const
+{
+    static constexpr OUStringLiteral dialog = u"dialog";
+    return dialog;
+}
+OUString SfxDialogLibraryContainer::getOldInfoFileName() const
+{
+    static constexpr OUStringLiteral dialogs = u"dialogs";
+    return dialogs;
+}
+OUString SfxDialogLibraryContainer::getLibElementFileExtension() const
+{
+    static constexpr OUStringLiteral xdl = u"xdl";
+    return xdl;
+}
+OUString SfxDialogLibraryContainer::getLibrariesDir() const
+{
+    static constexpr OUStringLiteral Dialogs = u"Dialogs";
+    return Dialogs;
+}
 
 // Ctor for service
 SfxDialogLibraryContainer::SfxDialogLibraryContainer()
@@ -467,17 +484,17 @@ Sequence< OUString > SAL_CALL SfxDialogLibraryContainer::getSupportedServiceName
 
 // Ctor
 SfxDialogLibrary::SfxDialogLibrary( ModifiableHelper& _rModifiable,
-                                    const OUString& aName,
+                                    OUString aName,
                                     const Reference< XSimpleFileAccess3 >& xSFI,
                                     SfxDialogLibraryContainer* pParent )
     : SfxLibrary( _rModifiable, cppu::UnoType<XInputStreamProvider>::get(), xSFI )
     , m_pParent( pParent )
-    , m_aName( aName )
+    , m_aName(std::move( aName ))
 {
 }
 
 SfxDialogLibrary::SfxDialogLibrary( ModifiableHelper& _rModifiable,
-                                    const OUString& aName,
+                                    OUString aName,
                                     const Reference< XSimpleFileAccess3 >& xSFI,
                                     const OUString& aLibInfoFileURL,
                                     const OUString& aStorageURL,
@@ -486,7 +503,7 @@ SfxDialogLibrary::SfxDialogLibrary( ModifiableHelper& _rModifiable,
     : SfxLibrary( _rModifiable, cppu::UnoType<XInputStreamProvider>::get(),
                        xSFI, aLibInfoFileURL, aStorageURL, ReadOnly)
     , m_pParent( pParent )
-    , m_aName( aName )
+    , m_aName(std::move( aName ))
 {
 }
 

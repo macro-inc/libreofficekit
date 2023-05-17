@@ -20,10 +20,9 @@
 #pragma once
 
 #include <rtl/ustring.hxx>
-#include <osl/mutex.hxx>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <memory>
+#include <mutex>
 
 namespace com::sun::star {
     namespace container {
@@ -78,7 +77,7 @@ class HierarchyEntry
     OUString m_aServiceSpecifier;
     OUString m_aName;
     OUString m_aPath;
-    ::osl::Mutex    m_aMutex;
+    std::mutex m_aMutex;
     css::uno::Reference< css::uno::XComponentContext >     m_xContext;
     css::uno::Reference< css::lang::XMultiServiceFactory > m_xConfigProvider;
     css::uno::Reference< css::container::XHierarchicalNameAccess >
@@ -93,7 +92,7 @@ private:
     getRootReadAccess();
 
 public:
-    HierarchyEntry( const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+    HierarchyEntry( css::uno::Reference< css::uno::XComponentContext > xContext,
                     HierarchyContentProvider* pProvider,
                     const OUString& rURL );
 

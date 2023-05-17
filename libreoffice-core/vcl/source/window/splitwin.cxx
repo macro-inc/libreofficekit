@@ -1486,9 +1486,9 @@ void SplitWindow::ImplDrawGrip(vcl::RenderContext& rRenderContext, const tools::
     AntialiasingFlags nAA = rRenderContext.GetAntialiasing();
     rRenderContext.SetAntialiasing(nAA | AntialiasingFlags::PixelSnapHairline | AntialiasingFlags::Enable);
 
-    tools::Long nWidth = rRect.getWidth();
+    tools::Long nWidth = rRect.getOpenWidth();
     tools::Long nWidthHalf = nWidth / 2;
-    tools::Long nHeight = rRect.getHeight();
+    tools::Long nHeight = rRect.getOpenHeight();
     tools::Long nHeightHalf = nHeight / 2;
 
     tools::Long nLeft = rRect.Left();
@@ -2023,7 +2023,7 @@ void SplitWindow::Tracking( const TrackingEvent& rTEvt )
 
 bool SplitWindow::PreNotify( NotifyEvent& rNEvt )
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE )
+    if( rNEvt.GetType() == NotifyEventType::MOUSEMOVE )
     {
         const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
         if( pMouseEvt && !pMouseEvt->GetButtons() && !pMouseEvt->IsSynthetic() && !pMouseEvt->IsModifierChanged() )
@@ -2335,9 +2335,7 @@ void SplitWindow::SplitItem( sal_uInt16 nId, tools::Long nNewSize,
     {
         nPos--;
         nDelta *= -1;
-        bool bTemp = bPropSmall;
-        bPropSmall = bPropGreat;
-        bPropGreat = bTemp;
+        std::swap( bPropSmall, bPropGreat );
     }
 
     sal_uInt16          n;

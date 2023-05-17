@@ -137,6 +137,8 @@ def do_replace_image_stock(current, stock):
     stock.text = "go-last"
   elif stock.text == 'gtk-new':
     stock.text = "document-new"
+  elif stock.text == 'gtk-open':
+    stock.text = "document-open"
   elif stock.text == 'gtk-media-stop':
     stock.text = "media-playback-stop"
   elif stock.text == 'gtk-media-play':
@@ -240,6 +242,22 @@ def remove_spin_button_input_purpose(current):
     if input_purpose != None:
       current.remove(input_purpose)
 
+def remove_caps_lock_warning(current):
+  caps_lock_warning = None
+  iscandidate = current.get('class') == "GtkSpinButton" or current.get('class') == "GtkEntry"
+  for child in current:
+    remove_caps_lock_warning(child)
+    if not iscandidate:
+        continue
+    if child.tag == "property":
+      attributes = child.attrib
+      if attributes.get("name") == "caps_lock_warning" or attributes.get("name") == "caps-lock-warning":
+        caps_lock_warning = child
+
+  if iscandidate:
+    if caps_lock_warning != None:
+      current.remove(caps_lock_warning)
+
 def remove_spin_button_max_length(current):
   max_length = None
   isspinbutton = current.get('class') == "GtkSpinButton"
@@ -255,6 +273,22 @@ def remove_spin_button_max_length(current):
   if isspinbutton:
     if max_length != None:
       current.remove(max_length)
+
+def remove_entry_shadow_type(current):
+  shadow_type = None
+  isentry = current.get('class') == "GtkEntry"
+  for child in current:
+    remove_entry_shadow_type(child)
+    if not isentry:
+        continue
+    if child.tag == "property":
+      attributes = child.attrib
+      if attributes.get("name") == "shadow_type" or attributes.get("name") == "shadow-type":
+        shadow_type = child
+
+  if isentry:
+    if shadow_type!= None:
+      current.remove(shadow_type)
 
 def remove_label_pad(current):
   xpad = None
@@ -275,6 +309,21 @@ def remove_label_pad(current):
     current.remove(xpad)
   if ypad != None:
     current.remove(ypad)
+
+def remove_label_angle(current):
+  angle = None
+  islabel = current.get('class') == "GtkLabel"
+  for child in current:
+    remove_label_angle(child)
+    if not islabel:
+        continue
+    if child.tag == "property":
+      attributes = child.attrib
+      if attributes.get("name") == "angle":
+        angle = child
+
+  if angle != None:
+    current.remove(angle)
 
 def remove_track_visited_links(current):
   track_visited_links = None
@@ -319,6 +368,18 @@ def remove_double_buffered(current):
   if double_buffered != None:
     current.remove(double_buffered)
 
+def remove_label_yalign(current):
+  label_yalign = None
+  for child in current:
+    remove_label_yalign(child)
+    if child.tag == "property":
+      attributes = child.attrib
+      if attributes.get("name") == "label_yalign" or attributes.get("name") == "label-yalign":
+        label_yalign = child
+
+  if label_yalign != None:
+    current.remove(label_yalign)
+
 def remove_skip_pager_hint(current):
   skip_pager_hint = None
   for child in current:
@@ -330,6 +391,18 @@ def remove_skip_pager_hint(current):
 
   if skip_pager_hint != None:
     current.remove(skip_pager_hint)
+
+def remove_gravity(current):
+  gravity = None
+  for child in current:
+    remove_gravity(child)
+    if child.tag == "property":
+      attributes = child.attrib
+      if attributes.get("name") == "gravity":
+        gravity = child
+
+  if gravity != None:
+    current.remove(gravity)
 
 def remove_expander_label_fill(current):
   label_fill = None
@@ -523,6 +596,15 @@ def enforce_noshared_adjustments(current, adjustments):
           raise Exception(sys.argv[1] + ': adjustment used more than once', child.text)
         adjustments.add(child.text)
 
+def enforce_no_productname_in_accessible_description(current, adjustments):
+  for child in current:
+    enforce_no_productname_in_accessible_description(child, adjustments)
+    if child.tag == "property":
+      attributes = child.attrib
+      if attributes.get("name") == "AtkObject::accessible-description":
+        if "%PRODUCTNAME" in child.text:
+          raise Exception(sys.argv[1] + ': %PRODUCTNAME used in accessible-description:' , child.text)
+
 with open(sys.argv[1], encoding="utf-8") as f:
   header = f.readline()
   f.seek(0)
@@ -546,20 +628,26 @@ remove_check_button_align(root)
 remove_check_button_relief(root)
 remove_check_button_image_position(root)
 remove_spin_button_input_purpose(root)
+remove_caps_lock_warning(root)
 remove_spin_button_max_length(root)
 remove_track_visited_links(root)
 remove_label_pad(root)
+remove_label_angle(root)
 remove_expander_label_fill(root)
 remove_expander_spacing(root)
 enforce_menubutton_indicator_consistency(root)
 enforce_active_in_group_consistency(root)
 enforce_entry_text_column_id_column_for_gtkcombobox(root)
+remove_entry_shadow_type(root)
 remove_double_buffered(root)
+remove_label_yalign(root)
 remove_skip_pager_hint(root)
+remove_gravity(root)
 remove_toolbutton_focus(root)
 enforce_toolbar_can_focus(root)
 enforce_button_always_show_image(root)
 enforce_noshared_adjustments(root, set())
+enforce_no_productname_in_accessible_description(root, set())
 
 with open(sys.argv[1], 'wb') as o:
   # without encoding='unicode' (and the matching encode("utf8")) we get &#XXXX replacements for non-ascii characters

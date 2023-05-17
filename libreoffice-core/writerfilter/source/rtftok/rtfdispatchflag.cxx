@@ -32,6 +32,93 @@ using namespace com::sun::star;
 
 namespace writerfilter::rtftok
 {
+bool RTFDocumentImpl::dispatchFloatingTableFlag(RTFKeyword nKeyword)
+{
+    if (!m_bBreakWrappedTables)
+    {
+        return false;
+    }
+
+    // Positioned Wrapped Tables
+    OUString aParam;
+    switch (nKeyword)
+    {
+        case RTFKeyword::TPVPARA:
+            aParam = "text";
+            break;
+        case RTFKeyword::TPVMRG:
+            aParam = "margin";
+            break;
+        case RTFKeyword::TPVPG:
+            aParam = "page";
+            break;
+        default:
+            break;
+    }
+    if (!aParam.isEmpty())
+    {
+        putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                           NS_ooxml::LN_CT_TblPPr_vertAnchor, new RTFValue(aParam));
+        return true;
+    }
+    switch (nKeyword)
+    {
+        case RTFKeyword::TPHCOL:
+            aParam = "text";
+            break;
+        case RTFKeyword::TPHMRG:
+            aParam = "margin";
+            break;
+        case RTFKeyword::TPHPG:
+            aParam = "page";
+            break;
+        default:
+            break;
+    }
+    if (!aParam.isEmpty())
+    {
+        putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                           NS_ooxml::LN_CT_TblPPr_horzAnchor, new RTFValue(aParam));
+        return true;
+    }
+    switch (nKeyword)
+    {
+        case RTFKeyword::TPOSYC:
+            aParam = "center";
+            break;
+        case RTFKeyword::TPOSYB:
+            aParam = "bottom";
+            break;
+        default:
+            break;
+    }
+    if (!aParam.isEmpty())
+    {
+        putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                           NS_ooxml::LN_CT_TblPPr_tblpYSpec, new RTFValue(aParam));
+        return true;
+    }
+    switch (nKeyword)
+    {
+        case RTFKeyword::TPOSXC:
+            aParam = "center";
+            break;
+        case RTFKeyword::TPOSXR:
+            aParam = "right";
+            break;
+        default:
+            break;
+    }
+    if (!aParam.isEmpty())
+    {
+        putNestedAttribute(m_aStates.top().getTableRowSprms(), NS_ooxml::LN_CT_TblPrBase_tblpPr,
+                           NS_ooxml::LN_CT_TblPPr_tblpXSpec, new RTFValue(aParam));
+        return true;
+    }
+
+    return false;
+}
+
 RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
 {
     setNeedSect(true);
@@ -442,6 +529,11 @@ RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
         return RTFError::OK;
     }
 
+    if (dispatchFloatingTableFlag(nKeyword))
+    {
+        return RTFError::OK;
+    }
+
     switch (nKeyword)
     {
         case RTFKeyword::FNIL:
@@ -619,22 +711,22 @@ RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
             switch (nKeyword)
             {
                 case RTFKeyword::CLBRDRT:
-                    nParam = NS_ooxml::LN_CT_TcBorders_top;
+                    nSprm = NS_ooxml::LN_CT_TcBorders_top;
                     break;
                 case RTFKeyword::CLBRDRL:
-                    nParam = NS_ooxml::LN_CT_TcBorders_left;
+                    nSprm = NS_ooxml::LN_CT_TcBorders_left;
                     break;
                 case RTFKeyword::CLBRDRB:
-                    nParam = NS_ooxml::LN_CT_TcBorders_bottom;
+                    nSprm = NS_ooxml::LN_CT_TcBorders_bottom;
                     break;
                 case RTFKeyword::CLBRDRR:
-                    nParam = NS_ooxml::LN_CT_TcBorders_right;
+                    nSprm = NS_ooxml::LN_CT_TcBorders_right;
                     break;
                 default:
                     break;
             }
             putNestedSprm(m_aStates.top().getTableCellSprms(), NS_ooxml::LN_CT_TcPrBase_tcBorders,
-                          nParam, pValue);
+                          nSprm, pValue);
             m_aStates.top().setBorderState(RTFBorderState::CELL);
         }
         break;
@@ -649,22 +741,22 @@ RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
             switch (nKeyword)
             {
                 case RTFKeyword::PGBRDRT:
-                    nParam = NS_ooxml::LN_CT_PageBorders_top;
+                    nSprm = NS_ooxml::LN_CT_PageBorders_top;
                     break;
                 case RTFKeyword::PGBRDRL:
-                    nParam = NS_ooxml::LN_CT_PageBorders_left;
+                    nSprm = NS_ooxml::LN_CT_PageBorders_left;
                     break;
                 case RTFKeyword::PGBRDRB:
-                    nParam = NS_ooxml::LN_CT_PageBorders_bottom;
+                    nSprm = NS_ooxml::LN_CT_PageBorders_bottom;
                     break;
                 case RTFKeyword::PGBRDRR:
-                    nParam = NS_ooxml::LN_CT_PageBorders_right;
+                    nSprm = NS_ooxml::LN_CT_PageBorders_right;
                     break;
                 default:
                     break;
             }
             putNestedSprm(m_aStates.top().getSectionSprms(),
-                          NS_ooxml::LN_EG_SectPrContents_pgBorders, nParam, pValue);
+                          NS_ooxml::LN_EG_SectPrContents_pgBorders, nSprm, pValue);
             m_aStates.top().setBorderState(RTFBorderState::PAGE);
         }
         break;
@@ -680,24 +772,24 @@ RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
             switch (nKeyword)
             {
                 case RTFKeyword::BRDRT:
-                    nParam = getParagraphBorder(0);
+                    nSprm = getParagraphBorder(0);
                     break;
                 case RTFKeyword::BRDRL:
-                    nParam = getParagraphBorder(1);
+                    nSprm = getParagraphBorder(1);
                     break;
                 case RTFKeyword::BRDRB:
-                    nParam = getParagraphBorder(2);
+                    nSprm = getParagraphBorder(2);
                     break;
                 case RTFKeyword::BRDRR:
-                    nParam = getParagraphBorder(3);
+                    nSprm = getParagraphBorder(3);
                     break;
                 case RTFKeyword::BRDRBTW:
-                    nParam = getParagraphBorder(4);
+                    nSprm = getParagraphBorder(4);
                     break;
                 default:
                     break;
             }
-            putNestedSprm(m_aStates.top().getParagraphSprms(), NS_ooxml::LN_CT_PrBase_pBdr, nParam,
+            putNestedSprm(m_aStates.top().getParagraphSprms(), NS_ooxml::LN_CT_PrBase_pBdr, nSprm,
                           pValue);
             m_aStates.top().setBorderState(RTFBorderState::PARAGRAPH);
         }
@@ -1023,7 +1115,7 @@ RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
                 {
                     // set default VertOrient before inserting
                     m_aStates.top().getDrawingObject().getPropertySet()->setPropertyValue(
-                        "VertOrient", uno::makeAny(text::VertOrientation::NONE));
+                        "VertOrient", uno::Any(text::VertOrientation::NONE));
                     xShapes->add(m_aStates.top().getDrawingObject().getShape());
                 }
             }
@@ -1141,7 +1233,7 @@ RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
             if (m_aStates.top().getDrawingObject().getPropertySet().is())
                 // Seems this old syntax has no way to specify a custom radius, and this is the default
                 m_aStates.top().getDrawingObject().getPropertySet()->setPropertyValue(
-                    "CornerRadius", uno::makeAny(sal_Int32(83)));
+                    "CornerRadius", uno::Any(sal_Int32(83)));
             break;
         case RTFKeyword::NOWRAP:
             m_aStates.top().getFrame().setSprm(NS_ooxml::LN_CT_FramePr_wrap,
@@ -1241,6 +1333,11 @@ RTFError RTFDocumentImpl::dispatchFlag(RTFKeyword nKeyword)
         {
             if (m_aStates.top().getDestination() == Destination::FIELD)
                 m_aStates.top().setFieldLocked(true);
+        }
+        break;
+        case RTFKeyword::NOBRKWRPTBL:
+        {
+            m_bBreakWrappedTables = true;
         }
         break;
         default:

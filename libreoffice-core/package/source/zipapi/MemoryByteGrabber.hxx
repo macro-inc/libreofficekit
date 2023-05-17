@@ -19,9 +19,7 @@
 #ifndef INCLUDED_PACKAGE_SOURCE_ZIPAPI_MEMORYBYTEGRABBER_HXX
 #define INCLUDED_PACKAGE_SOURCE_ZIPAPI_MEMORYBYTEGRABBER_HXX
 
-#include <com/sun/star/io/XInputStream.hpp>
-#include <com/sun/star/io/XSeekable.hpp>
-#include <string.h>
+#include <com/sun/star/uno/Sequence.h>
 
 class MemoryByteGrabber final
 {
@@ -60,6 +58,16 @@ public:
         nInt16 |= ( mpBuffer[mnCurrent++] & 0xFF ) << 8;
         return nInt16;
     }
+
+    sal_Int16 ReadUInt16()
+    {
+        if (mnCurrent + 2 > mnEnd )
+            return 0;
+        sal_uInt16 nInt16  =  mpBuffer[mnCurrent++] & 0xFF;
+        nInt16 |= ( mpBuffer[mnCurrent++] & 0xFF ) << 8;
+        return nInt16;
+    }
+
     sal_Int32 ReadInt32()
     {
         if (mnCurrent + 4 > mnEnd )
@@ -82,6 +90,38 @@ public:
         nInt32 |= ( mpBuffer [mnCurrent++] & 0xFF ) << 16;
         nInt32 |= ( mpBuffer [mnCurrent++] & 0xFF ) << 24;
         return nInt32;
+    }
+
+    sal_Int64 ReadInt64()
+    {
+        if (mnCurrent + 8 > mnEnd)
+            return 0;
+
+        sal_Int64 nInt64 = mpBuffer[mnCurrent++] & 0xFF;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 8;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 16;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 24;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 32;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 40;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 48;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 56;
+        return nInt64;
+    }
+
+    sal_uInt64 ReadUInt64()
+    {
+        if (mnCurrent + 8 > mnEnd)
+            return 0;
+
+        sal_uInt64 nInt64 = mpBuffer[mnCurrent++] & 0xFF;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 8;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 16;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 24;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 32;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 40;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 48;
+        nInt64 |= static_cast<sal_Int64>(mpBuffer[mnCurrent++] & 0xFF) << 56;
+        return nInt64;
     }
 };
 

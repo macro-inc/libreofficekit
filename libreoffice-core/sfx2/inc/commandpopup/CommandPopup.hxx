@@ -9,13 +9,8 @@
 
 #pragma once
 
-#include <vcl/layout.hxx>
-
-#include <sfx2/dllapi.h>
-#include <sfx2/viewfrm.hxx>
-
+#include <utility>
 #include <vcl/weld.hxx>
-#include <vcl/window.hxx>
 
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/frame/XFrame.hpp>
@@ -31,9 +26,9 @@ struct CurrentEntry final
     OUString m_aCommandURL;
     OUString m_aTooltip;
 
-    CurrentEntry(OUString const& rCommandURL, OUString const& rTooltip)
-        : m_aCommandURL(rCommandURL)
-        , m_aTooltip(rTooltip)
+    CurrentEntry(OUString aCommandURL, OUString aTooltip)
+        : m_aCommandURL(std::move(aCommandURL))
+        , m_aTooltip(std::move(aTooltip))
     {
     }
 };

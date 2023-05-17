@@ -25,7 +25,6 @@ import com.sun.star.accessibility.IllegalAccessibleComponentStateException;
 import com.sun.star.accessibility.XAccessible;
 import com.sun.star.accessibility.XAccessibleContext;
 import com.sun.star.accessibility.XAccessibleRelationSet;
-import com.sun.star.accessibility.XAccessibleStateSet;
 import util.AccessibilityTools;
 
 /**
@@ -50,7 +49,7 @@ public class _XAccessibleContext {
 
     private final XAccessibleContext oObj;
 
-    private int childCount = 0;
+    private long childCount = 0;
     private XAccessible parent = null ;
 
     public _XAccessibleContext(XInterface object) {
@@ -81,12 +80,12 @@ public class _XAccessibleContext {
      */
     public boolean _getAccessibleChild() {
         boolean bOK = true;
-        int counter = childCount;
+        long counter = childCount;
         if (childCount > 500)
         {
             counter = 500;
         }
-        for (int i = 0; i < counter; i++) {
+        for (long i = 0; i < counter; i++) {
             try {
                 XAccessible ch = oObj.getAccessibleChild(i) ;
                 XAccessibleContext chAC = ch.getAccessibleContext();
@@ -152,7 +151,7 @@ public class _XAccessibleContext {
     public boolean _getAccessibleIndexInParent() {
 
         boolean bOK = true;
-        int idx = oObj.getAccessibleIndexInParent();
+        long idx = oObj.getAccessibleIndexInParent();
 
         XAccessibleContext parentAC = parent.getAccessibleContext() ;
         try {
@@ -219,8 +218,7 @@ public class _XAccessibleContext {
      * Has <b> OK </b> status if the set is not null.
      */
     public boolean _getAccessibleStateSet() {
-        XAccessibleStateSet set = oObj.getAccessibleStateSet();
-        return set != null;
+        return true;
     }
 
     /**

@@ -46,7 +46,7 @@
 #include <svl/inethist.hxx>
 #include <vcl/svapp.hxx>
 #include <svx/svxerr.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <editeng/unolingu.hxx>
 #include <unotools/lingucfg.hxx>
@@ -336,7 +336,7 @@ void ScModule::Execute( SfxRequest& rReq )
             {
                 bool bSet;
                 const SfxPoolItem* pItem;
-                if (pReqArgs && pReqArgs->HasItem(FN_PARAM_1, &pItem))
+                if (pReqArgs && SfxItemState::SET == pReqArgs->GetItemState( FN_PARAM_1, true, &pItem ))
                     bSet = static_cast<const SfxBoolItem*>(pItem)->GetValue();
                 else if ( pReqArgs && SfxItemState::SET == pReqArgs->GetItemState( nSlot, true, &pItem ) )
                     bSet = static_cast<const SfxBoolItem*>(pItem)->GetValue();
@@ -392,7 +392,6 @@ void ScModule::Execute( SfxRequest& rReq )
                 bool bNew = !aNewOpts.GetAutoComplete();
                 aNewOpts.SetAutoComplete( bNew );
                 SetAppOptions( aNewOpts );
-                ScInputHandler::SetAutoComplete( bNew );
                 if (pBindings)
                     pBindings->Invalidate( FID_AUTOCOMPLETE );
                 rReq.Done();
@@ -777,7 +776,7 @@ const ScAppOptions& ScModule::GetAppOptions()
     if ( !m_pAppCfg )
         m_pAppCfg.reset( new ScAppCfg );
 
-    return *m_pAppCfg;
+    return m_pAppCfg->GetOptions();
 }
 
 void ScModule::SetDefaultsOptions( const ScDefaultsOptions& rOpt )
@@ -825,7 +824,7 @@ const ScInputOptions& ScModule::GetInputOptions()
     if ( !m_pInputCfg )
         m_pInputCfg.reset( new ScInputCfg );
 
-    return *m_pInputCfg;
+    return m_pInputCfg->GetOptions();
 }
 
 void ScModule::SetPrintOptions( const ScPrintOptions& rOpt )
@@ -841,7 +840,7 @@ const ScPrintOptions& ScModule::GetPrintOptions()
     if ( !m_pPrintCfg )
         m_pPrintCfg.reset( new ScPrintCfg );
 
-    return *m_pPrintCfg;
+    return m_pPrintCfg->GetOptions();
 }
 
 ScNavipiCfg& ScModule::GetNavipiCfg()
@@ -935,7 +934,6 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
     ScTabViewShell*         pViewSh = dynamic_cast<ScTabViewShell*>( SfxViewShell::Current() );
     ScDocShell*             pDocSh  = dynamic_cast<ScDocShell*>( SfxObjectShell::Current() );
     ScDocument*             pDoc    = pDocSh ? &pDocSh->GetDocument() : nullptr;
-    const SfxPoolItem*      pItem   = nullptr;
     bool bRepaint = false;
     bool bUpdateMarks = false;
     bool bUpdateRefDev = false;
@@ -946,50 +944,52 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
 
     //  SfxGetpApp()->SetOptions( rOptSet );
 
+    ScAppOptions aAppOptions = m_pAppCfg->GetOptions();
+
     // No more linguistics
-    if (rOptSet.HasItem(SID_ATTR_METRIC, &pItem))
+    if (const SfxUInt16Item* pItem = rOptSet.GetItemIfSet(SID_ATTR_METRIC))
     {
         PutItem( *pItem );
-        m_pAppCfg->SetAppMetric( static_cast<FieldUnit>(static_cast<const SfxUInt16Item*>(pItem)->GetValue()) );
+        aAppOptions.SetAppMetric( static_cast<FieldUnit>(pItem->GetValue()) );
         bSaveAppOptions = true;
     }
 
-    if (rOptSet.HasItem(SCITEM_USERLIST, &pItem))
+    if (const ScUserListItem* pItem = rOptSet.GetItemIfSet(SCITEM_USERLIST))
     {
-        ScGlobal::SetUserList( static_cast<const ScUserListItem*>(pItem)->GetUserList() );
+        ScGlobal::SetUserList( pItem->GetUserList() );
         bSaveAppOptions = true;
     }
 
-    if (rOptSet.HasItem(SID_SC_OPT_SYNCZOOM, &pItem))
+    if (const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_OPT_SYNCZOOM))
     {
-        m_pAppCfg->SetSynchronizeZoom( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aAppOptions.SetSynchronizeZoom( pItem->GetValue() );
         bSaveAppOptions = true;
     }
 
-    if (rOptSet.HasItem(SID_SC_OPT_KEY_BINDING_COMPAT, &pItem))
+    if (const SfxUInt16Item* pItem = rOptSet.GetItemIfSet(SID_SC_OPT_KEY_BINDING_COMPAT))
     {
-        sal_uInt16 nVal = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
-        ScOptionsUtil::KeyBindingType eOld = m_pAppCfg->GetKeyBindingType();
+        sal_uInt16 nVal = pItem->GetValue();
+        ScOptionsUtil::KeyBindingType eOld = aAppOptions.GetKeyBindingType();
         ScOptionsUtil::KeyBindingType eNew = static_cast<ScOptionsUtil::KeyBindingType>(nVal);
         if (eOld != eNew)
         {
-            m_pAppCfg->SetKeyBindingType(eNew);
+            aAppOptions.SetKeyBindingType(eNew);
             bSaveAppOptions = true;
             ScDocShell::ResetKeyBindings(eNew);
         }
     }
 
     // DefaultsOptions
-    if (rOptSet.HasItem(SID_SCDEFAULTSOPTIONS, &pItem))
+    if (const ScTpDefaultsItem* pItem = rOptSet.GetItemIfSet(SID_SCDEFAULTSOPTIONS))
     {
-        const ScDefaultsOptions& rOpt = static_cast<const ScTpDefaultsItem*>(pItem)->GetDefaultsOptions();
+        const ScDefaultsOptions& rOpt = pItem->GetDefaultsOptions();
         SetDefaultsOptions( rOpt );
     }
 
     // FormulaOptions
-    if (rOptSet.HasItem(SID_SCFORMULAOPTIONS, &pItem))
+    if (const ScTpFormulaItem* pItem = rOptSet.GetItemIfSet(SID_SCFORMULAOPTIONS))
     {
-        const ScFormulaOptions& rOpt = static_cast<const ScTpFormulaItem*>(pItem)->GetFormulaOptions();
+        const ScFormulaOptions& rOpt = pItem->GetFormulaOptions();
 
         if (!m_pFormulaCfg || (*m_pFormulaCfg != rOpt))
             // Formula options have changed. Repaint the column headers.
@@ -1030,9 +1030,9 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
     }
 
     // ViewOptions
-    if (rOptSet.HasItem(SID_SCVIEWOPTIONS, &pItem))
+    if (const ScTpViewItem* pItem = rOptSet.GetItemIfSet(SID_SCVIEWOPTIONS))
     {
-        const ScViewOptions& rNewOpt = static_cast<const ScTpViewItem*>(pItem)->GetViewOptions();
+        const ScViewOptions& rNewOpt = pItem->GetViewOptions();
 
         if ( pViewSh )
         {
@@ -1062,9 +1062,9 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
 
     // GridOptions
     // Evaluate after ViewOptions, as GridOptions is a member of ViewOptions
-    if ( rOptSet.HasItem(SID_ATTR_GRID_OPTIONS,&pItem) )
+    if ( const SvxGridItem* pItem = rOptSet.GetItemIfSet(SID_ATTR_GRID_OPTIONS) )
     {
-        ScGridOptions aNewGridOpt( static_cast<const SvxGridItem&>(*pItem ));
+        ScGridOptions aNewGridOpt( *pItem );
 
         if ( pViewSh )
         {
@@ -1093,9 +1093,9 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
     }
 
     // DocOptions
-    if ( rOptSet.HasItem(SID_SCDOCOPTIONS,&pItem) )
+    if ( const ScTpCalcItem* pItem = rOptSet.GetItemIfSet(SID_SCDOCOPTIONS) )
     {
-        const ScDocOptions& rNewOpt = static_cast<const ScTpCalcItem*>(pItem)->GetDocOptions();
+        const ScDocOptions& rNewOpt = pItem->GetDocOptions();
 
         if ( pDoc )
         {
@@ -1122,9 +1122,9 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
     }
 
     // Set TabDistance after the actual DocOptions
-    if ( rOptSet.HasItem(SID_ATTR_DEFTABSTOP,&pItem) )
+    if ( const SfxUInt16Item* pItem = rOptSet.GetItemIfSet(SID_ATTR_DEFTABSTOP) )
     {
-        sal_uInt16 nTabDist = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        sal_uInt16 nTabDist = pItem->GetValue();
         ScDocOptions aOpt(GetDocOptions());
         aOpt.SetTabDistance(nTabDist);
         SetDocOptions( aOpt );
@@ -1141,9 +1141,9 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
     }
 
     // AutoSpell after the DocOptions (due to being a member)
-    if ( rOptSet.HasItem(SID_AUTOSPELL_CHECK,&pItem) ) // At DocOptions
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_AUTOSPELL_CHECK) ) // At DocOptions
     {
-        bool bDoAutoSpell = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+        bool bDoAutoSpell = pItem->GetValue();
 
         if (pDoc)
         {
@@ -1176,80 +1176,81 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
     }
 
     // InputOptions
-    if ( rOptSet.HasItem(SID_SC_INPUT_SELECTIONPOS,&pItem) )
+    ScInputOptions aInputOptions = m_pInputCfg->GetOptions();
+    if ( const SfxUInt16Item* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_SELECTIONPOS) )
     {
-        m_pInputCfg->SetMoveDir( static_cast<const SfxUInt16Item*>(pItem)->GetValue() );
+        aInputOptions.SetMoveDir( pItem->GetValue() );
         bSaveInputOptions = true;
     }
-    if ( rOptSet.HasItem(SID_SC_INPUT_SELECTION,&pItem) )
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_SELECTION) )
     {
-        m_pInputCfg->SetMoveSelection( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetMoveSelection( pItem->GetValue() );
         bSaveInputOptions = true;
     }
-    if ( rOptSet.HasItem(SID_SC_INPUT_EDITMODE,&pItem) )
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_EDITMODE) )
     {
-        m_pInputCfg->SetEnterEdit( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetEnterEdit( pItem->GetValue() );
         bSaveInputOptions = true;
     }
-    if ( rOptSet.HasItem(SID_SC_INPUT_FMT_EXPAND,&pItem) )
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_FMT_EXPAND) )
     {
-        m_pInputCfg->SetExtendFormat( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetExtendFormat( pItem->GetValue() );
         bSaveInputOptions = true;
     }
-    if ( rOptSet.HasItem(SID_SC_INPUT_RANGEFINDER,&pItem) )
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_RANGEFINDER) )
     {
-        m_pInputCfg->SetRangeFinder( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetRangeFinder( pItem->GetValue() );
         bSaveInputOptions = true;
     }
-    if ( rOptSet.HasItem(SID_SC_INPUT_REF_EXPAND,&pItem) )
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_REF_EXPAND) )
     {
-        m_pInputCfg->SetExpandRefs( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetExpandRefs( pItem->GetValue() );
         bSaveInputOptions = true;
     }
-    if (rOptSet.HasItem(SID_SC_OPT_SORT_REF_UPDATE, &pItem))
+    if (const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_OPT_SORT_REF_UPDATE))
     {
-        m_pInputCfg->SetSortRefUpdate(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+        aInputOptions.SetSortRefUpdate( pItem->GetValue());
         bSaveInputOptions = true;
     }
 
-    if ( rOptSet.HasItem(SID_SC_INPUT_MARK_HEADER,&pItem) )
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_MARK_HEADER) )
     {
-        m_pInputCfg->SetMarkHeader( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetMarkHeader( pItem->GetValue() );
         bSaveInputOptions = true;
         bUpdateMarks = true;
     }
-    if ( rOptSet.HasItem(SID_SC_INPUT_TEXTWYSIWYG,&pItem) )
+    if ( const SfxBoolItem* pItem = rOptSet.GetItemIfSet(SID_SC_INPUT_TEXTWYSIWYG) )
     {
-        bool bNew = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-        if ( bNew != m_pInputCfg->GetTextWysiwyg() )
+        bool bNew = pItem->GetValue();
+        if ( bNew != aInputOptions.GetTextWysiwyg() )
         {
-            m_pInputCfg->SetTextWysiwyg( bNew );
+            aInputOptions.SetTextWysiwyg( bNew );
             bSaveInputOptions = true;
             bUpdateRefDev = true;
         }
     }
-    if( rOptSet.HasItem( SID_SC_INPUT_REPLCELLSWARN, &pItem ) )
+    if( const SfxBoolItem* pItem = rOptSet.GetItemIfSet( SID_SC_INPUT_REPLCELLSWARN ) )
     {
-        m_pInputCfg->SetReplaceCellsWarn( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetReplaceCellsWarn( pItem->GetValue() );
         bSaveInputOptions = true;
     }
 
-    if( rOptSet.HasItem( SID_SC_INPUT_LEGACY_CELL_SELECTION, &pItem ) )
+    if( const SfxBoolItem* pItem = rOptSet.GetItemIfSet( SID_SC_INPUT_LEGACY_CELL_SELECTION ) )
     {
-        m_pInputCfg->SetLegacyCellSelection( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetLegacyCellSelection( pItem->GetValue() );
         bSaveInputOptions = true;
     }
 
-    if( rOptSet.HasItem( SID_SC_INPUT_ENTER_PASTE_MODE, &pItem ) )
+    if( const SfxBoolItem* pItem = rOptSet.GetItemIfSet( SID_SC_INPUT_ENTER_PASTE_MODE ) )
     {
-        m_pInputCfg->SetEnterPasteMode( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
+        aInputOptions.SetEnterPasteMode( pItem->GetValue() );
         bSaveInputOptions = true;
     }
 
     // PrintOptions
-    if ( rOptSet.HasItem(SID_SCPRINTOPTIONS,&pItem) )
+    if ( const ScTpPrintItem* pItem = rOptSet.GetItemIfSet(SID_SCPRINTOPTIONS) )
     {
-        const ScPrintOptions& rNewOpt = static_cast<const ScTpPrintItem*>(pItem)->GetPrintOptions();
+        const ScPrintOptions& rNewOpt = pItem->GetPrintOptions();
         SetPrintOptions( rNewOpt );
 
         // broadcast causes all previews to recalc page numbers
@@ -1257,10 +1258,10 @@ void ScModule::ModifyOptions( const SfxItemSet& rOptSet )
     }
 
     if ( bSaveAppOptions )
-        m_pAppCfg->OptionsChanged();
+        m_pAppCfg->SetOptions(aAppOptions);
 
     if ( bSaveInputOptions )
-        m_pInputCfg->OptionsChanged();
+        m_pInputCfg->SetOptions(aInputOptions);
 
     // Kick off recalculation?
     if (pDoc && bCompileErrorCells)
@@ -1461,11 +1462,11 @@ void ScModule::InputSetSelection( sal_Int32 nStart, sal_Int32 nEnd )
         pHdl->InputSetSelection( nStart, nEnd );
 }
 
-void ScModule::InputReplaceSelection( const OUString& rStr )
+void ScModule::InputReplaceSelection( std::u16string_view aStr )
 {
     ScInputHandler* pHdl = GetInputHdl();
     if (pHdl)
-        pHdl->InputReplaceSelection( rStr );
+        pHdl->InputReplaceSelection( aStr );
 }
 
 void ScModule::InputTurnOffWinEngine()
@@ -2030,9 +2031,7 @@ std::optional<SfxItemSet> ScModule::CreateItemSet( sal_uInt16 nId )
         pRet->Put( ScTpPrintItem( GetPrintOptions() ) );
 
         // TP_GRID
-        std::unique_ptr<SvxGridItem> pSvxGridItem = aViewOpt.CreateGridItem();
-        pRet->Put( *pSvxGridItem );
-        pSvxGridItem.reset();
+        pRet->Put( aViewOpt.CreateGridItem() );
 
         // TP_USERLISTS
         if ( pUL )
@@ -2056,7 +2055,7 @@ std::optional<SfxItemSet> ScModule::CreateItemSet( sal_uInt16 nId )
             aConfig.MergeDocumentSpecific( pDocSh->GetDocument().GetCalcConfig());
             aOptions.SetCalcConfig( aConfig);
         }
-        pRet->Put( ScTpFormulaItem( aOptions ) );
+        pRet->Put( ScTpFormulaItem( std::move(aOptions) ) );
     }
     return pRet;
 }

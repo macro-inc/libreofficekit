@@ -20,7 +20,7 @@
 #define INCLUDED_PACKAGE_INC_CRC32_HXX
 
 #include <com/sun/star/uno/Sequence.h>
-#include <com/sun/star/uno/RuntimeException.hpp>
+#include <com/sun/star/uno/Reference.h>
 
 namespace com::sun::star {
     namespace io { class XInputStream; }
@@ -30,7 +30,6 @@ class CRC32 final
     sal_uInt32 nCRC;
 public:
     CRC32();
-    ~CRC32();
 
     /// @throws css::uno::RuntimeException
     sal_Int64 updateStream (css::uno::Reference < css::io::XInputStream > const & xStream);

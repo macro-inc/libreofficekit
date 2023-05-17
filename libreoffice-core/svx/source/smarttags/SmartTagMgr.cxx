@@ -21,6 +21,7 @@
 
 #include <svx/SmartTagMgr.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <com/sun/star/smarttags/XSmartTagRecognizer.hpp>
 #include <com/sun/star/smarttags/XRangeBasedSmartTagRecognizer.hpp>
@@ -46,8 +47,8 @@ using namespace com::sun::star::uno;
 using namespace com::sun::star::i18n;
 
 
-SmartTagMgr::SmartTagMgr( const OUString& rApplicationName )
-    : maApplicationName( rApplicationName ),
+SmartTagMgr::SmartTagMgr( OUString aApplicationName )
+    : maApplicationName(std::move( aApplicationName )),
       mxContext( ::comphelper::getProcessComponentContext() ),
       mbLabelTextWithSmartTags(true)
 {
@@ -209,7 +210,7 @@ void SmartTagMgr::WriteConfiguration( const bool* pIsLabelTextWithSmartTags,
 
     if ( pIsLabelTextWithSmartTags )
     {
-        const Any aEnabled = makeAny( *pIsLabelTextWithSmartTags );
+        const Any aEnabled( *pIsLabelTextWithSmartTags );
 
         try
         {
@@ -225,7 +226,7 @@ void SmartTagMgr::WriteConfiguration( const bool* pIsLabelTextWithSmartTags,
     {
         Sequence< OUString > aTypes = comphelper::containerToSequence(*pDisabledTypes);
 
-        const Any aNewTypes = makeAny( aTypes );
+        const Any aNewTypes( aTypes );
 
         try
         {
@@ -374,7 +375,7 @@ void SmartTagMgr::LoadLibraries()
 
 void SmartTagMgr::PrepareConfiguration( std::u16string_view rConfigurationGroupName )
 {
-    Any aAny = makeAny(
+    Any aAny(
         OUString::Concat("/org.openoffice.Office.Common/SmartTags/") + rConfigurationGroupName );
     beans::PropertyValue aPathArgument;
     aPathArgument.Name = "nodepath";

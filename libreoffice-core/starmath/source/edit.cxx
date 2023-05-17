@@ -31,8 +31,8 @@
 #include <sfx2/sfxsids.hrc>
 #include <svl/stritem.hxx>
 #include <sfx2/viewfrm.hxx>
-#include <svx/AccessibleTextHelper.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <edit.hxx>
 #include <smmod.hxx>
@@ -40,7 +40,6 @@
 #include <document.hxx>
 #include <cfgitem.hxx>
 #include <smediteng.hxx>
-#include "accessibility.hxx"
 
 using namespace com::sun::star::accessibility;
 using namespace com::sun::star;
@@ -101,6 +100,12 @@ void SmEditTextWindow::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 {
     weld::CustomWidgetController::SetDrawingArea(pDrawingArea);
 
+    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+    Color aBgColor = rStyleSettings.GetWindowColor();
+
+    OutputDevice& rDevice = pDrawingArea->get_ref_device();
+    rDevice.SetBackground(aBgColor);
+
     SetHelpId(HID_SMA_COMMAND_WIN_EDIT);
 
     EnableRTL(false);
@@ -113,6 +118,8 @@ void SmEditTextWindow::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     pEditEngine->InsertView(m_xEditView.get());
 
     m_xEditView->SetOutputArea(mrEditWindow.AdjustScrollBars());
+
+    m_xEditView->SetBackgroundColor(aBgColor);
 
     pDrawingArea->set_cursor(PointerStyle::Text);
 
@@ -307,7 +314,7 @@ bool SmEditTextWindow::KeyInput(const KeyEvent& rKEvt)
     SmModule *pMod = SM_MOD();
     if (pMod && !pMod->GetConfig()->IsAutoCloseBrackets())
         autoClose = false;
-    else if (selected.trim() == "<?>")
+    else if (o3tl::trim(selected) == u"<?>")
         autoClose = true;
     else if (selected.isEmpty() && !aSelection.HasRange())
     {
@@ -666,9 +673,9 @@ void SmEditWindow::SelPrevMark()
 }
 
 // returns true iff 'rText' contains a mark
-static bool HasMark(const OUString& rText)
+static bool HasMark(std::u16string_view rText)
 {
-    return rText.indexOf("<?>") != -1;
+    return rText.find(u"<?>") != std::u16string_view::npos;
 }
 
 ESelection SmEditWindow::GetSelection() const
@@ -719,9 +726,9 @@ void SmEditTextWindow::UpdateStatus(bool bSetDocModified)
     static_cast<SmEditEngine*>(GetEditEngine())->executeZoom(GetEditView());
 }
 
-void SmEditWindow::UpdateStatus(bool bSetDocModified)
+void SmEditWindow::UpdateStatus()
 {
-    mxTextControl->UpdateStatus(bSetDocModified);
+    mxTextControl->UpdateStatus(/*bSetDocModified*/false);
 }
 
 void SmEditWindow::Cut()

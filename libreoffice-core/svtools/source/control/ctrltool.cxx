@@ -24,9 +24,9 @@
 #include <string_view>
 
 #include <tools/debug.hxx>
-#include <tools/fract.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <i18nlangtag/mslangid.hxx>
+#include <utility>
 #include <vcl/outdev.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -35,6 +35,7 @@
 #include <svtools/svtresid.hxx>
 #include <svtools/ctrltool.hxx>
 #include <o3tl/typed_flags_set.hxx>
+#include <o3tl/string_view.hxx>
 #include <comphelper/lok.hxx>
 
 // Standard fontsizes for scalable Fonts
@@ -114,8 +115,8 @@ private:
     ImplFontListFontMetric* mpFirst;
     FontListFontNameType    mnType;
 
-    explicit ImplFontListNameInfo(const OUString& rSearchName)
-        : maSearchName(rSearchName)
+    explicit ImplFontListNameInfo(OUString aSearchName)
+        : maSearchName(std::move(aSearchName))
         , mpFirst(nullptr)
         , mnType(FontListFontNameType::NONE)
     {
@@ -158,16 +159,16 @@ static OUString ImplMakeSearchString(const OUString& rStr)
     return rStr.toAsciiLowerCase();
 }
 
-static OUString ImplMakeSearchStringFromName(const OUString& rStr)
+static OUString ImplMakeSearchStringFromName(std::u16string_view rStr)
 {
     // check for features before alternate font separator
-    if (sal_Int32 nColon = rStr.indexOf(':'); nColon != -1)
-        if (sal_Int32 nSemiColon = rStr.indexOf(';'); nSemiColon == -1 || nColon < nSemiColon)
-            return ImplMakeSearchString(rStr.getToken( 0, ':' ));
-    return ImplMakeSearchString(rStr.getToken( 0, ';' ));
+    if (size_t nColon = rStr.find(':'); nColon != std::u16string_view::npos)
+        if (size_t nSemiColon = rStr.find(';'); nSemiColon == std::u16string_view::npos || nColon < nSemiColon)
+            return ImplMakeSearchString(OUString(o3tl::getToken(rStr, 0, ':' )));
+    return ImplMakeSearchString(OUString(o3tl::getToken(rStr, 0, ';' )));
 }
 
-ImplFontListNameInfo* FontList::ImplFind(const OUString& rSearchName, sal_uInt32* pIndex) const
+ImplFontListNameInfo* FontList::ImplFind(std::u16string_view rSearchName, sal_uInt32* pIndex) const
 {
     // Append if there is no entry in the list or if the entry is larger
     // then the last one. We only compare to the last entry as the list of VCL
@@ -182,7 +183,7 @@ ImplFontListNameInfo* FontList::ImplFind(const OUString& rSearchName, sal_uInt32
     else
     {
         const ImplFontListNameInfo* pCmpData = m_Entries.back().get();
-        sal_Int32 nComp = rSearchName.compareTo( pCmpData->maSearchName );
+        sal_Int32 nComp = rSearchName.compare( pCmpData->maSearchName );
         if (nComp > 0)
         {
             if ( pIndex )
@@ -204,7 +205,7 @@ ImplFontListNameInfo* FontList::ImplFind(const OUString& rSearchName, sal_uInt32
     {
         nMid = (nLow + nHigh) / 2;
         pCompareData = m_Entries[nMid].get();
-        sal_Int32 nComp = rSearchName.compareTo(pCompareData->maSearchName);
+        sal_Int32 nComp = rSearchName.compare(pCompareData->maSearchName);
         if (nComp < 0)
         {
             if ( !nMid )
@@ -226,7 +227,7 @@ ImplFontListNameInfo* FontList::ImplFind(const OUString& rSearchName, sal_uInt32
 
     if ( pIndex )
     {
-        sal_Int32 nComp = rSearchName.compareTo(pCompareData->maSearchName);
+        sal_Int32 nComp = rSearchName.compare(pCompareData->maSearchName);
         if (nComp > 0)
             *pIndex = (nMid+1);
         else
@@ -236,7 +237,7 @@ ImplFontListNameInfo* FontList::ImplFind(const OUString& rSearchName, sal_uInt32
     return const_cast<ImplFontListNameInfo*>(pFoundData);
 }
 
-ImplFontListNameInfo* FontList::ImplFindByName(const OUString& rStr) const
+ImplFontListNameInfo* FontList::ImplFindByName(std::u16string_view rStr) const
 {
     OUString aSearchName = ImplMakeSearchStringFromName(rStr);
     return ImplFind( aSearchName, nullptr );
@@ -451,8 +452,6 @@ OUString FontList::GetStyleName(const FontMetric& rInfo) const
             aStyleName = maNormal;
         else if (aCompareStyleName == "regular")
             aStyleName = maNormal;
-        else if (aCompareStyleName == "medium")
-            aStyleName = maNormal;
         else if (aCompareStyleName == "light")
             aStyleName = maLight;
         else if (aCompareStyleName == "lightitalic")
@@ -482,9 +481,6 @@ OUString FontList::GetStyleName(const FontMetric& rInfo) const
             aStyleName = SvtResId(STR_SVT_STYLE_EXTRALIGHT);
         else if (aCompareStyleName == "extralightitalic")
             aStyleName = SvtResId(STR_SVT_STYLE_EXTRALIGHT_ITALIC);
-        /* Medium is synonym with Normal */
-        else if (aCompareStyleName == "mediumitalic")
-            aStyleName = maNormalItalic;
         else if (aCompareStyleName == "oblique")
             aStyleName = SvtResId(STR_SVT_STYLE_OBLIQUE);
         else if (aCompareStyleName == "semibold")
@@ -710,7 +706,7 @@ FontMetric FontList::Get(const OUString& rName,
     return aInfo;
 }
 
-bool FontList::IsAvailable(const OUString& rName) const
+bool FontList::IsAvailable(std::u16string_view rName) const
 {
     return (ImplFindByName( rName ) != nullptr);
 }
@@ -722,7 +718,7 @@ const FontMetric& FontList::GetFontName(size_t const nFont) const
     return *(m_Entries[nFont]->mpFirst);
 }
 
-sal_Handle FontList::GetFirstFontMetric(const OUString& rName) const
+sal_Handle FontList::GetFirstFontMetric(std::u16string_view rName) const
 {
     ImplFontListNameInfo* pData = ImplFindByName( rName );
     if ( !pData )

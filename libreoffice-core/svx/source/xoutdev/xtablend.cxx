@@ -25,10 +25,11 @@
 
 #include <svx/strings.hrc>
 #include <svx/dialmgr.hxx>
+#include <osl/diagnose.h>
 
 #include <svx/xtable.hxx>
 #include <drawinglayer/attribute/linestartendattribute.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokeArrowPrimitive2D.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
@@ -52,8 +53,7 @@ XLineEndEntry* XLineEndList::GetLineEnd(tools::Long nIndex) const
 
 uno::Reference< container::XNameContainer > XLineEndList::createInstance()
 {
-    return uno::Reference< container::XNameContainer >(
-        SvxUnoXLineEndTable_createInstance( this ), uno::UNO_QUERY );
+    return SvxUnoXLineEndTable_createInstance( *this );
 }
 
 bool XLineEndList::Create()

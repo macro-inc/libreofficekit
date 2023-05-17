@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "ChartType.hxx"
+#include <ChartType.hxx>
 
 namespace chart
 {
@@ -32,18 +32,17 @@ public:
 protected:
     explicit NetChartType_Base( const NetChartType_Base & rOther );
 
-    // ____ XChartType ____
-    virtual css::uno::Reference< css::chart2::XCoordinateSystem > SAL_CALL
-        createCoordinateSystem( ::sal_Int32 DimensionCount ) override;
-
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
 
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
 
     // ____ XPropertySet ____
     virtual css::uno::Reference< css::beans::XPropertySetInfo > SAL_CALL
         getPropertySetInfo() override;
+
+    virtual rtl::Reference< ::chart::BaseCoordinateSystem >
+        createCoordinateSystem2( sal_Int32 DimensionCount ) override;
 };
 
 class NetChartType final : public NetChartType_Base
@@ -58,6 +57,8 @@ public:
         supportsService( const OUString& ServiceName ) override;
     virtual css::uno::Sequence< OUString > SAL_CALL
         getSupportedServiceNames() override;
+
+    virtual rtl::Reference<ChartType> cloneChartType() const override;
 
 private:
     explicit NetChartType( const NetChartType & rOther );

@@ -19,7 +19,8 @@
 #pragma once
 
 #include <svx/svdmodel.hxx>
-
+#include <svx/unopage.hxx>
+#include <svx/unoshape.hxx>
 #include <chartview/chartviewdllapi.hxx>
 
 namespace com::sun::star::lang { class XMultiServiceFactory; }
@@ -34,12 +35,12 @@ class SdrObject;
 namespace chart
 {
 
-class OOO_DLLPUBLIC_CHARTVIEW DrawModelWrapper : private SdrModel
+class OOO_DLLPUBLIC_CHARTVIEW DrawModelWrapper final : private SdrModel
 {
 private:
-    css::uno::Reference< css::drawing::XDrawPage > m_xMainDrawPage;
-    css::uno::Reference< css::drawing::XDrawPage > m_xHiddenDrawPage;
-
+    rtl::Reference<SvxDrawPage> m_xMainDrawPage;
+    rtl::Reference<SvxDrawPage> m_xHiddenDrawPage;
+    rtl::Reference<SfxItemPool> m_xChartItemPool;
     VclPtr<OutputDevice> m_pRefDevice;
 
 public:
@@ -49,14 +50,14 @@ public:
     css::uno::Reference< css::lang::XMultiServiceFactory > getShapeFactory();
 
     // the main page will contain the normal view objects
-    css::uno::Reference< css::drawing::XDrawPage > const & getMainDrawPage();
+    const rtl::Reference<SvxDrawPage> & getMainDrawPage();
     SAL_DLLPRIVATE void clearMainDrawPage();
 
     // the extra page is not visible, but contains some extras like the symbols for data points
-    css::uno::Reference< css::drawing::XDrawPage > const & getHiddenDrawPage();
+    const rtl::Reference<SvxDrawPage> & getHiddenDrawPage();
 
-    static css::uno::Reference< css::drawing::XShapes >
-         getChartRootShape( const css::uno::Reference< css::drawing::XDrawPage>& xPage );
+    static rtl::Reference<SvxShapeGroupAnyD>
+         getChartRootShape( const rtl::Reference<SvxDrawPage>& xPage );
 
     SAL_DLLPRIVATE void lockControllers();
     SAL_DLLPRIVATE void unlockControllers();
@@ -82,7 +83,7 @@ public:
     SdrObject* getNamedSdrObject( const OUString& rName );
     static SdrObject* getNamedSdrObject( const OUString& rName, SdrObjList const * pObjList );
 
-    static bool removeShape( const css::uno::Reference< css::drawing::XShape >& xShape );
+    static bool removeShape( const rtl::Reference<SvxShape>& xShape );
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };

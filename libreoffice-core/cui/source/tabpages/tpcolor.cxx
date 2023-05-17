@@ -49,7 +49,6 @@ SvxColorTabPage::SvxColorTabPage(weld::Container* pPage, weld::DialogController*
     , aXFillAttr( rInAttrs.GetPool() )
     , rXFSet( aXFillAttr.GetItemSet() )
     , eCM( ColorModel::RGB )
-    , m_context(comphelper::getProcessComponentContext())
     , m_xValSetColorList(new SvxColorValueSet(m_xBuilder->weld_scrolled_window("colorsetwin", true)))
     , m_xValSetRecentList(new SvxColorValueSet(nullptr))
     , m_xSelectPalette(m_xBuilder->weld_combo_box("paletteselector"))
@@ -130,7 +129,7 @@ SvxColorTabPage::SvxColorTabPage(weld::Container* pPage, weld::DialogController*
     // disable modify buttons
     // Color palettes can't be modified
     m_xBtnDelete->set_sensitive(false);
-    m_xBtnDelete->set_tooltip_text( CuiResId(RID_SVXSTR_DELETEUSERCOLOR1) );
+    m_xBtnDelete->set_tooltip_text( CuiResId(RID_CUISTR_DELETEUSERCOLOR1) );
 
     m_xMoreColors->set_from_icon_name("cmd/sc_additionsdialog.png");
     m_xMoreColors->connect_clicked(LINK(this, SvxColorTabPage, OnMoreColorsClick));
@@ -205,13 +204,12 @@ void SvxColorTabPage::ActivatePage( const SfxItemSet& )
     if( !pColorList.is() )
         return;
 
-    const SfxPoolItem* pPoolItem = nullptr;
-    if( SfxItemState::SET == rOutAttrs.GetItemState( GetWhich( XATTR_FILLCOLOR ), true, &pPoolItem ) )
+    if( const XFillColorItem* pFillColorItem = rOutAttrs.GetItemIfSet( GetWhich( XATTR_FILLCOLOR ) ) )
     {
         SetColorModel( ColorModel::RGB );
         ChangeColorModel();
 
-        const Color aColor = static_cast<const XFillColorItem*>(pPoolItem)->GetColorValue();
+        const Color aColor = pFillColorItem->GetColorValue();
         svx::NamedThemedColor aThemedColor;
         aThemedColor.m_aColor = aColor;
         ChangeColor( aThemedColor );
@@ -247,17 +245,19 @@ bool SvxColorTabPage::FillItemSet( SfxItemSet* rSet )
        sColorName = "#" + aCurrentColor.m_aColor.AsRGBHexString().toAsciiUpperCase();
     maPaletteManager.AddRecentColor( aCurrentColor.m_aColor, sColorName );
     XFillColorItem aColorItem( sColorName, aCurrentColor.m_aColor );
-    if (aCurrentColor.m_nThemeIndex != -1)
+    model::ThemeColorType eType = model::convertToThemeColorType(aCurrentColor.m_nThemeIndex);
+    if (eType != model::ThemeColorType::Unknown)
     {
-        aColorItem.GetThemeColor().SetThemeIndex(aCurrentColor.m_nThemeIndex);
+        aColorItem.GetThemeColor().setType(eType);
     }
+    aColorItem.GetThemeColor().clearTransformations();
     if (aCurrentColor.m_nLumMod != 10000)
     {
-        aColorItem.GetThemeColor().SetLumMod(aCurrentColor.m_nLumMod);
+        aColorItem.GetThemeColor().addTransformation({model::TransformationType::LumMod, aCurrentColor.m_nLumMod});
     }
     if (aCurrentColor.m_nLumOff != 0)
     {
-        aColorItem.GetThemeColor().SetLumOff(aCurrentColor.m_nLumOff);
+        aColorItem.GetThemeColor().addTransformation({model::TransformationType::LumOff, aCurrentColor.m_nLumOff});
     }
     rSet->Put( aColorItem );
     rSet->Put( XFillStyleItem( drawing::FillStyle_SOLID ) );
@@ -345,7 +345,7 @@ IMPL_LINK_NOARG(SvxColorTabPage, ModifiedHdl_Impl, weld::Entry&, void)
 IMPL_LINK_NOARG(SvxColorTabPage, ClickAddHdl_Impl, weld::Button&, void)
 {
     OUString aNewName( SvxResId( RID_SVXSTR_COLOR ) );
-    OUString aDesc( CuiResId( RID_SVXSTR_DESC_COLOR ) );
+    OUString aDesc( CuiResId( RID_CUISTR_DESC_COLOR ) );
     OUString aName;
 
     tools::Long j = 1;
@@ -384,7 +384,7 @@ IMPL_LINK_NOARG(SvxColorTabPage, ClickAddHdl_Impl, weld::Button&, void)
     {
         m_xSelectPalette->set_active(0);
         SelectPaletteLBHdl(*m_xSelectPalette);
-        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(m_context));
+        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
         css::uno::Sequence< sal_Int32 > aCustomColorList(officecfg::Office::Common::UserColors::CustomColor::get());
         css::uno::Sequence< OUString > aCustomColorNameList(officecfg::Office::Common::UserColors::CustomColorName::get());
         sal_Int32 nSize = aCustomColorList.getLength();
@@ -399,7 +399,7 @@ IMPL_LINK_NOARG(SvxColorTabPage, ClickAddHdl_Impl, weld::Button&, void)
         m_xValSetColorList->InsertItem( nId + 1 , aCurrentColor.m_aColor, aName );
         m_xValSetColorList->SelectItem( nId + 1 );
         m_xBtnDelete->set_sensitive(false);
-        m_xBtnDelete->set_tooltip_text( CuiResId(RID_SVXSTR_DELETEUSERCOLOR2) );
+        m_xBtnDelete->set_tooltip_text( CuiResId(RID_CUISTR_DELETEUSERCOLOR2) );
         ImpColorCountChanged();
     }
 
@@ -434,7 +434,7 @@ IMPL_LINK_NOARG(SvxColorTabPage, ClickDeleteHdl_Impl, weld::Button&, void)
     if (m_xSelectPalette->get_active() != 0 || nPos == VALUESET_ITEM_NOTFOUND)
         return;
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(m_context));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     css::uno::Sequence< sal_Int32 > aCustomColorList(officecfg::Office::Common::UserColors::CustomColor::get());
     auto aCustomColorListRange = asNonConstRange(aCustomColorList);
     css::uno::Sequence< OUString > aCustomColorNameList(officecfg::Office::Common::UserColors::CustomColorName::get());
@@ -460,7 +460,7 @@ IMPL_LINK_NOARG(SvxColorTabPage, ClickDeleteHdl_Impl, weld::Button&, void)
     else
     {
         m_xBtnDelete->set_sensitive(false);
-        m_xBtnDelete->set_tooltip_text( CuiResId(RID_SVXSTR_DELETEUSERCOLOR2) );
+        m_xBtnDelete->set_tooltip_text( CuiResId(RID_CUISTR_DELETEUSERCOLOR2) );
     }
 }
 
@@ -496,7 +496,7 @@ IMPL_LINK_NOARG(SvxColorTabPage, SelectPaletteLBHdl, weld::ComboBox&, void)
     if (nPos != 0)
     {
         m_xBtnDelete->set_sensitive(false);
-        m_xBtnDelete->set_tooltip_text( CuiResId(RID_SVXSTR_DELETEUSERCOLOR1) );
+        m_xBtnDelete->set_tooltip_text( CuiResId(RID_CUISTR_DELETEUSERCOLOR1) );
     }
 
     m_xValSetColorList->Resize();
@@ -539,14 +539,14 @@ IMPL_LINK(SvxColorTabPage, SelectValSetHdl_Impl, ValueSet*, pValSet, void)
         else
         {
             m_xBtnDelete->set_sensitive(false);
-            m_xBtnDelete->set_tooltip_text( CuiResId(RID_SVXSTR_DELETEUSERCOLOR1) );
+            m_xBtnDelete->set_tooltip_text( CuiResId(RID_CUISTR_DELETEUSERCOLOR1) );
         }
     }
     if (pValSet == m_xValSetRecentList.get())
     {
         m_xValSetColorList->SetNoSelection();
         m_xBtnDelete->set_sensitive(false);
-        m_xBtnDelete->set_tooltip_text( CuiResId(RID_SVXSTR_DELETEUSERCOLOR2) );
+        m_xBtnDelete->set_tooltip_text( CuiResId(RID_CUISTR_DELETEUSERCOLOR2) );
     }
 }
 

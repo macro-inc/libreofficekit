@@ -32,6 +32,7 @@
 
 #include <tools/wldcrd.hxx>
 #include <unotools/configpaths.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 namespace framework{
@@ -45,8 +46,8 @@ namespace framework{
     @param      rxContext
                     reference to the uno service manager
 */
-JobData::JobData( const css::uno::Reference< css::uno::XComponentContext >& rxContext )
-    : m_xContext    (rxContext                    )
+JobData::JobData( css::uno::Reference< css::uno::XComponentContext > xContext )
+    : m_xContext    (std::move(xContext                    ))
 {
     // share code for member initialization with defaults!
     impl_reset();
@@ -447,10 +448,10 @@ void JobData::appendEnabledJobsForEvent( const css::uno::Reference< css::uno::XC
     }
 }
 
-bool JobData::hasCorrectContext(const OUString& rModuleIdent) const
+bool JobData::hasCorrectContext(std::u16string_view rModuleIdent) const
 {
     sal_Int32 nContextLen  = m_sContext.getLength();
-    sal_Int32 nModuleIdLen = rModuleIdent.getLength();
+    sal_Int32 nModuleIdLen = rModuleIdent.size();
 
     if ( nContextLen == 0 )
         return true;
@@ -460,7 +461,7 @@ bool JobData::hasCorrectContext(const OUString& rModuleIdent) const
         sal_Int32 nIndex = m_sContext.indexOf( rModuleIdent );
         if ( nIndex >= 0 && ( nIndex+nModuleIdLen <= nContextLen ))
         {
-            OUString sContextModule = m_sContext.copy( nIndex, nModuleIdLen );
+            std::u16string_view sContextModule = m_sContext.subView( nIndex, nModuleIdLen );
             return sContextModule == rModuleIdent;
         }
     }

@@ -32,6 +32,7 @@
 
 #include <osl/time.h>
 #include <sal/log.hxx>
+#include <rtl/uri.hxx>
 #include <rtl/strbuf.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <config_version.h>
@@ -39,7 +40,7 @@
 #include <map>
 #include <optional>
 #include <tuple>
-#include <vector>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -83,9 +84,9 @@ struct DownloadTarget
 {
     uno::Reference<io::XOutputStream> xOutStream;
     ResponseHeaders const& rHeaders;
-    DownloadTarget(uno::Reference<io::XOutputStream> const& i_xOutStream,
+    DownloadTarget(uno::Reference<io::XOutputStream> i_xOutStream,
                    ResponseHeaders const& i_rHeaders)
-        : xOutStream(i_xOutStream)
+        : xOutStream(std::move(i_xOutStream))
         , rHeaders(i_rHeaders)
     {
     }
@@ -94,11 +95,9 @@ struct DownloadTarget
 struct UploadSource
 {
     uno::Sequence<sal_Int8> const& rInData;
-    ResponseHeaders const& rHeaders;
     size_t nPosition;
-    UploadSource(uno::Sequence<sal_Int8> const& i_rInData, ResponseHeaders const& i_rHeaders)
+    UploadSource(uno::Sequence<sal_Int8> const& i_rInData)
         : rInData(i_rInData)
-        , rHeaders(i_rHeaders)
         , nPosition(0)
     {
     }
@@ -186,10 +185,10 @@ private:
     CURL* const m_pCurl;
 
 public:
-    explicit Guard(::std::mutex& rMutex, ::std::vector<CurlOption> const& rOptions,
+    explicit Guard(::std::mutex& rMutex, ::std::vector<CurlOption> aOptions,
                    ::http_dav_ucp::CurlUri const& rURI, CURL* const pCurl)
         : m_Lock(rMutex, ::std::defer_lock)
-        , m_Options(rOptions)
+        , m_Options(std::move(aOptions))
         , m_rURI(rURI)
         , m_pCurl(pCurl)
     {
@@ -304,7 +303,7 @@ static int debug_callback(CURL* handle, curl_infotype type, char* data, size_t s
                 sal_Int32 const len(SAL_N_ELEMENTS("Authorization: ") - 1);
                 tmp = tmp.replaceAt(
                     start + len, end - start - len,
-                    OStringConcatenation(OString::number(end - start - len) + " bytes redacted"));
+                    Concat2View(OString::number(end - start - len) + " bytes redacted"));
             }
             SAL_INFO("ucb.ucp.webdav.curl", "CURLINFO_HEADER_OUT: " << handle << ": " << tmp);
             return 0;
@@ -587,12 +586,12 @@ static auto ExtractRealm(ResponseHeaders const& rHeaders, char const* const pAut
     return buf.makeStringAndClear();
 }
 
-CurlSession::CurlSession(uno::Reference<uno::XComponentContext> const& xContext,
+CurlSession::CurlSession(uno::Reference<uno::XComponentContext> xContext,
                          ::rtl::Reference<DAVSessionFactory> const& rpFactory, OUString const& rURI,
                          uno::Sequence<beans::NamedValue> const& rFlags,
                          ::ucbhelper::InternetProxyDecider const& rProxyDecider)
     : DAVSession(rpFactory)
-    , m_xContext(xContext)
+    , m_xContext(std::move(xContext))
     , m_Flags(rFlags)
     , m_URI(rURI)
     , m_Proxy(rProxyDecider.getProxy(m_URI.GetScheme(), m_URI.GetHost(), m_URI.GetPort()))
@@ -655,7 +654,7 @@ CurlSession::CurlSession(uno::Reference<uno::XComponentContext> const& xContext,
         throw DAVException(DAVException::DAV_SESSION_CREATE,
                            ConnectionEndPointString(m_URI.GetHost(), m_URI.GetPort()));
     }
-    auto const connectTimeout(officecfg::Inet::Settings::ConnectTimeout::get(m_xContext));
+    auto const connectTimeout(officecfg::Inet::Settings::ConnectTimeout::get());
     // default is 300s
     rc = curl_easy_setopt(m_pCurl.get(), CURLOPT_CONNECTTIMEOUT,
                           ::std::max<long>(2L, ::std::min<long>(connectTimeout, 180L)));
@@ -665,7 +664,7 @@ CurlSession::CurlSession(uno::Reference<uno::XComponentContext> const& xContext,
         throw DAVException(DAVException::DAV_SESSION_CREATE,
                            ConnectionEndPointString(m_URI.GetHost(), m_URI.GetPort()));
     }
-    auto const readTimeout(officecfg::Inet::Settings::ReadTimeout::get(m_xContext));
+    auto const readTimeout(officecfg::Inet::Settings::ReadTimeout::get());
     m_nReadTimeout = ::std::max<int>(20, ::std::min<long>(readTimeout, 180)) * 1000;
     // default is infinite
     rc = curl_easy_setopt(m_pCurl.get(), CURLOPT_TIMEOUT, 300L);
@@ -770,7 +769,8 @@ auto CurlSession::abort() -> void
 /// this is just a bunch of static member functions called from CurlSession
 struct CurlProcessor
 {
-    static auto URIReferenceToURI(CurlSession& rSession, OUString const& rURIReference) -> CurlUri;
+    static auto URIReferenceToURI(CurlSession& rSession, std::u16string_view rURIReference)
+        -> CurlUri;
 
     static auto ProcessRequestImpl(
         CurlSession& rSession, CurlUri const& rURI, OUString const& rMethod,
@@ -795,7 +795,7 @@ struct CurlProcessor
              ::std::vector<DAVResourceInfo>* const o_pResourceInfos,
              DAVRequestEnvironment const& rEnv) -> void;
 
-    static auto MoveOrCopy(CurlSession& rSession, OUString const& rSourceURIReference,
+    static auto MoveOrCopy(CurlSession& rSession, std::u16string_view rSourceURIReference,
                            ::std::u16string_view rDestinationURI, DAVRequestEnvironment const& rEnv,
                            bool isOverwrite, char const* pMethod) -> void;
 
@@ -809,19 +809,20 @@ struct CurlProcessor
                        DAVRequestEnvironment const* pEnv) -> void;
 };
 
-auto CurlProcessor::URIReferenceToURI(CurlSession& rSession, OUString const& rURIReference)
+auto CurlProcessor::URIReferenceToURI(CurlSession& rSession, std::u16string_view rURIReference)
     -> CurlUri
 {
     // No need to acquire rSession.m_Mutex because accessed members are const.
     if (rSession.UsesProxy())
     // very odd, but see DAVResourceAccess::getRequestURI() :-/
     {
-        assert(rURIReference.startsWith("http://") || rURIReference.startsWith("https://"));
+        assert(o3tl::starts_with(rURIReference, u"http://")
+               || o3tl::starts_with(rURIReference, u"https://"));
         return CurlUri(rURIReference);
     }
     else
     {
-        assert(rURIReference.startsWith("/"));
+        assert(o3tl::starts_with(rURIReference, u"/"));
         return rSession.m_URI.CloneWithRelativeRefPathAbsolute(rURIReference);
     }
 }
@@ -880,11 +881,8 @@ auto CurlProcessor::ProcessRequestImpl(
     ::std::optional<UploadSource> oUploadSource;
     if (pInData)
     {
-        oUploadSource.emplace(*pInData, rHeaders);
+        oUploadSource.emplace(*pInData);
         rc = curl_easy_setopt(rSession.m_pCurl.get(), CURLOPT_READDATA, &*oUploadSource);
-        assert(rc == CURLE_OK);
-        // libcurl won't upload without setting this
-        rc = curl_easy_setopt(rSession.m_pCurl.get(), CURLOPT_UPLOAD, 1L);
         assert(rc == CURLE_OK);
     }
     rSession.m_ErrorBuffer[0] = '\0';
@@ -966,6 +964,8 @@ auto CurlProcessor::ProcessRequestImpl(
                  "curl_easy_perform failed: " << GetErrorString(rc, rSession.m_ErrorBuffer));
         switch (rc)
         {
+            case CURLE_UNSUPPORTED_PROTOCOL:
+                throw DAVException(DAVException::DAV_UNSUPPORTED);
             case CURLE_COULDNT_RESOLVE_PROXY:
                 throw DAVException(
                     DAVException::DAV_HTTP_LOOKUP,
@@ -1035,7 +1035,8 @@ auto CurlProcessor::ProcessRequestImpl(
             && rHeaders.HeaderFields.back().first.front().startsWith("HTTP"))
         {
             statusLine += ::rtl::OStringToOUString(
-                rHeaders.HeaderFields.back().first.front().trim(), RTL_TEXTENCODING_ASCII_US);
+                ::o3tl::trim(rHeaders.HeaderFields.back().first.front()),
+                RTL_TEXTENCODING_ASCII_US);
         }
         switch (statusCode)
         {
@@ -1204,10 +1205,9 @@ auto CurlProcessor::ProcessRequest(
         OUString UserName;
         OUString PassWord;
         decltype(CURLAUTH_ANY) AuthMask; ///< allowed auth methods
-        Auth(OUString const& rUserName, OUString const& rPassword,
-             decltype(CURLAUTH_ANY) const & rAuthMask)
-            : UserName(rUserName)
-            , PassWord(rPassword)
+        Auth(OUString aUserName, OUString aPassword, decltype(CURLAUTH_ANY) const & rAuthMask)
+            : UserName(std::move(aUserName))
+            , PassWord(std::move(aPassword))
             , AuthMask(rAuthMask)
         {
         }
@@ -1252,6 +1252,7 @@ auto CurlProcessor::ProcessRequest(
         }
     }
     bool isRetry(false);
+    bool isFallbackHTTP10(false);
     int nAuthRequests(0);
     int nAuthRequestsProxy(0);
 
@@ -1475,6 +1476,27 @@ auto CurlProcessor::ProcessRequest(
                     }
                 }
             }
+            else if (rException.getError() == DAVException::DAV_UNSUPPORTED)
+            {
+                // tdf#152493 libcurl can't handle "Transfer-Encoding: chunked"
+                // in HTTP/1.1 100 Continue response.
+                // workaround: if HTTP/1.1 didn't work, try HTTP/1.0
+                // (but fallback only once - to prevent infinite loop)
+                if (isFallbackHTTP10)
+                {
+                    throw DAVException(DAVException::DAV_HTTP_ERROR);
+                }
+                isFallbackHTTP10 = true;
+                // note: this is not reset - future requests to this URI use it!
+                auto rc = curl_easy_setopt(rSession.m_pCurl.get(), CURLOPT_HTTP_VERSION,
+                                           CURL_HTTP_VERSION_1_0);
+                if (rc != CURLE_OK)
+                {
+                    throw DAVException(DAVException::DAV_HTTP_ERROR);
+                }
+                SAL_INFO("ucb.ucp.webdav.curl", "attempting fallback to HTTP/1.0");
+                isRetry = true;
+            }
             if (!isRetry)
             {
                 throw; // everything else: re-throw
@@ -1646,6 +1668,7 @@ auto CurlProcessor::PropFind(
     curl_off_t const len(xSeqOutStream->getWrittenBytes().getLength());
 
     ::std::vector<CurlOption> const options{
+        { CURLOPT_UPLOAD, 1L, nullptr },
         { CURLOPT_CUSTOMREQUEST, "PROPFIND", "CURLOPT_CUSTOMREQUEST" },
         // note: Sharepoint cannot handle "Transfer-Encoding: chunked"
         { CURLOPT_INFILESIZE_LARGE, len, nullptr, CurlOption::Type::CurlOffT }
@@ -1800,6 +1823,7 @@ auto CurlSession::PROPPATCH(OUString const& rURIReference,
     curl_off_t const len(xSeqOutStream->getWrittenBytes().getLength());
 
     ::std::vector<CurlOption> const options{
+        { CURLOPT_UPLOAD, 1L, nullptr },
         { CURLOPT_CUSTOMREQUEST, "PROPPATCH", "CURLOPT_CUSTOMREQUEST" },
         // note: Sharepoint cannot handle "Transfer-Encoding: chunked"
         { CURLOPT_INFILESIZE_LARGE, len, nullptr, CurlOption::Type::CurlOffT }
@@ -1953,8 +1977,10 @@ auto CurlSession::PUT(OUString const& rURIReference,
     // lock m_Mutex after accessing global LockStore to avoid deadlock
 
     // note: Nextcloud 20 cannot handle "Transfer-Encoding: chunked"
-    ::std::vector<CurlOption> const options{ { CURLOPT_INFILESIZE_LARGE, len, nullptr,
-                                               CurlOption::Type::CurlOffT } };
+    ::std::vector<CurlOption> const options{
+        { CURLOPT_UPLOAD, 1L, nullptr }, // libcurl won't upload without setting this
+        { CURLOPT_INFILESIZE_LARGE, len, nullptr, CurlOption::Type::CurlOffT }
+    };
 
     CurlProcessor::ProcessRequest(*this, uri, "PUT", options, &rEnv, ::std::move(pList), nullptr,
                                   &rxInStream, nullptr);
@@ -2057,7 +2083,7 @@ auto CurlSession::MKCOL(OUString const& rURIReference, DAVRequestEnvironment con
                                   nullptr);
 }
 
-auto CurlProcessor::MoveOrCopy(CurlSession& rSession, OUString const& rSourceURIReference,
+auto CurlProcessor::MoveOrCopy(CurlSession& rSession, std::u16string_view rSourceURIReference,
                                ::std::u16string_view const rDestinationURI,
                                DAVRequestEnvironment const& rEnv, bool const isOverwrite,
                                char const* const pMethod) -> void
@@ -2135,6 +2161,7 @@ auto CurlProcessor::Lock(
     }
 
     ::std::vector<CurlOption> const options{
+        { CURLOPT_UPLOAD, 1L, nullptr },
         { CURLOPT_CUSTOMREQUEST, "LOCK", "CURLOPT_CUSTOMREQUEST" },
         // note: Sharepoint cannot handle "Transfer-Encoding: chunked"
         { CURLOPT_INFILESIZE_LARGE, len, nullptr, CurlOption::Type::CurlOffT }

@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <dp_misc.h>
 #include "dp_activepackages.hxx"
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <ucbhelper/content.hxx>
@@ -28,6 +28,7 @@
 #include <com/sun/star/deployment/XPackageManager.hpp>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 namespace dp_manager {
 
@@ -35,7 +36,7 @@ typedef ::cppu::WeakComponentImplHelper<
     css::deployment::XPackageManager > t_pm_helper;
 
 
-class PackageManagerImpl final : private ::dp_misc::MutexHolder, public t_pm_helper
+class PackageManagerImpl final : private cppu::BaseMutex, public t_pm_helper
 {
     css::uno::Reference<css::uno::XComponentContext> m_xComponentContext;
     OUString m_context;
@@ -116,11 +117,10 @@ class PackageManagerImpl final : private ::dp_misc::MutexHolder, public t_pm_hel
 
     virtual ~PackageManagerImpl() override;
     PackageManagerImpl(
-        css::uno::Reference<css::uno::XComponentContext>
-        const & xComponentContext, OUString const & context )
-        : t_pm_helper( getMutex() ),
-          m_xComponentContext( xComponentContext ),
-          m_context( context ),
+        css::uno::Reference<css::uno::XComponentContext> xComponentContext, OUString context )
+        : t_pm_helper( m_aMutex ),
+          m_xComponentContext(std::move( xComponentContext )),
+          m_context(std::move( context )),
           m_readOnly( true )
         {}
 
@@ -213,7 +213,7 @@ public:
 
 inline void PackageManagerImpl::check()
 {
-    ::osl::MutexGuard guard( getMutex() );
+    ::osl::MutexGuard guard( m_aMutex );
     if (rBHelper.bInDispose || rBHelper.bDisposed)
         throw css::lang::DisposedException(
             "PackageManager instance has already been disposed!",

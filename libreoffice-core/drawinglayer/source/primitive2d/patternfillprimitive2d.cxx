@@ -29,6 +29,7 @@
 #include <toolkit/helper/vclunohelper.hxx>
 
 #include <drawinglayer/converters.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 
@@ -147,7 +148,7 @@ namespace drawinglayer::primitive2d
                     {
                         const primitive2d::Primitive2DReference xEmbedRefBitmap(
                             new primitive2d::BitmapPrimitive2D(
-                                VCLUnoHelper::CreateVCLXBitmap(aBitmapEx),
+                                aBitmapEx,
                                 basegfx::B2DHomMatrix()));
                         aContent = primitive2d::Primitive2DContainer { xEmbedRefBitmap };
                     }
@@ -261,10 +262,10 @@ namespace drawinglayer::primitive2d
         }
 
         PatternFillPrimitive2D::PatternFillPrimitive2D(
-            const basegfx::B2DPolyPolygon& rMask,
+            basegfx::B2DPolyPolygon aMask,
             Primitive2DContainer&& rChildren,
             const basegfx::B2DRange& rReferenceRange)
-        :   maMask(rMask),
+        :   maMask(std::move(aMask)),
             maChildren(std::move(rChildren)),
             maReferenceRange(rReferenceRange),
             mnDiscreteWidth(0),
@@ -350,17 +351,12 @@ namespace drawinglayer::primitive2d
             BufferedDecompositionPrimitive2D::get2DDecomposition(rVisitor, rViewInformation);
         }
 
-        sal_Int64 SAL_CALL PatternFillPrimitive2D::estimateUsage()
+        sal_Int64 PatternFillPrimitive2D::estimateUsage()
         {
             size_t nRet(0);
             for (auto& it : getChildren())
-            {
-                uno::Reference<util::XAccounting> const xAcc(it, uno::UNO_QUERY);
-                if (xAcc.is())
-                {
-                    nRet += xAcc->estimateUsage();
-                }
-            }
+                if (it)
+                    nRet += it->estimateUsage();
             return nRet;
         }
 

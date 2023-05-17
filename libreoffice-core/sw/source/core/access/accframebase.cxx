@@ -19,8 +19,6 @@
 
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
-#include <unotools/accessiblestatesethelper.hxx>
-#include <osl/mutex.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
 #include <frmfmt.hxx>
@@ -58,8 +56,7 @@ bool SwAccessibleFrameBase::IsSelected()
     return bRet;
 }
 
-void SwAccessibleFrameBase::GetStates(
-        ::utl::AccessibleStateSetHelper& rStateSet )
+void SwAccessibleFrameBase::GetStates( sal_Int64& rStateSet )
 {
     SwAccessibleContext::GetStates( rStateSet );
 
@@ -69,25 +66,25 @@ void SwAccessibleFrameBase::GetStates(
     if (dynamic_cast<const SwFEShell*>(pVSh))
     {
         // SELECTABLE
-        rStateSet.AddState(AccessibleStateType::SELECTABLE);
+        rStateSet |= AccessibleStateType::SELECTABLE;
         // FOCUSABLE
-        rStateSet.AddState(AccessibleStateType::FOCUSABLE);
+        rStateSet |= AccessibleStateType::FOCUSABLE;
     }
 
     // SELECTED and FOCUSED
     if( IsSelected() )
     {
-        rStateSet.AddState( AccessibleStateType::SELECTED );
+        rStateSet |= AccessibleStateType::SELECTED;
         SAL_WARN_IF(!m_bIsSelected, "sw.a11y", "bSelected out of sync");
         ::rtl::Reference < SwAccessibleContext > xThis( this );
         GetMap()->SetCursorContext( xThis );
 
         vcl::Window *pWin = GetWindow();
         if( pWin && pWin->HasFocus() )
-            rStateSet.AddState( AccessibleStateType::FOCUSED );
+            rStateSet |= AccessibleStateType::FOCUSED;
     }
     if( GetSelectedState() )
-        rStateSet.AddState( AccessibleStateType::SELECTED );
+        rStateSet |= AccessibleStateType::SELECTED;
 }
 
 SwNodeType SwAccessibleFrameBase::GetNodeType( const SwFlyFrame *pFlyFrame )
@@ -127,8 +124,8 @@ SwAccessibleFrameBase::SwAccessibleFrameBase(
     m_bIsSelected( false )
 {
     const SwFrameFormat* pFrameFormat = pFlyFrame->GetFormat();
-    if(pFrameFormat)
-        StartListening(const_cast<SwFrameFormat*>(pFrameFormat)->GetNotifier());
+
+    StartListening(const_cast<SwFrameFormat*>(pFrameFormat)->GetNotifier());
 
     SetName( pFrameFormat->GetName() );
 
@@ -209,35 +206,29 @@ SwAccessibleFrameBase::~SwAccessibleFrameBase()
 
 void SwAccessibleFrameBase::Notify(const SfxHint& rHint)
 {
+    const SwFlyFrame* pFlyFrame = static_cast<const SwFlyFrame*>(GetFrame());
     if(rHint.GetId() == SfxHintId::Dying)
     {
         EndListeningAll();
     }
-    else if (rHint.GetId() == SfxHintId::SwLegacyModify)
+    else if (rHint.GetId() == SfxHintId::SwNameChanged && pFlyFrame)
     {
-        auto pLegacyModifyHint = static_cast<const sw::LegacyModifyHint*>(&rHint);
-        const sal_uInt16 nWhich = pLegacyModifyHint->GetWhich();
-        const SwFlyFrame* pFlyFrame = static_cast<const SwFlyFrame*>(GetFrame());
-        if(nWhich == RES_NAME_CHANGED && pFlyFrame)
+        auto rNameChanged = static_cast<const sw::NameChanged&>(rHint);
+        const SwFrameFormat* pFrameFormat = pFlyFrame->GetFormat();
+
+        const OUString sOldName( GetName() );
+        assert( rNameChanged.m_sOld == sOldName);
+
+        SetName( pFrameFormat->GetName() );
+        assert( rNameChanged.m_sNew == GetName());
+
+        if( sOldName != GetName() )
         {
-            const SwFrameFormat* pFrameFormat = pFlyFrame->GetFormat();
-
-            const OUString sOldName( GetName() );
-            assert( !pLegacyModifyHint->m_pOld ||
-                    static_cast<const SwStringMsgPoolItem *>(pLegacyModifyHint->m_pOld)->GetString() == GetName());
-
-            SetName( pFrameFormat->GetName() );
-            assert( !pLegacyModifyHint->m_pNew ||
-                    static_cast<const SwStringMsgPoolItem *>(pLegacyModifyHint->m_pNew)->GetString() == GetName());
-
-            if( sOldName != GetName() )
-            {
-                AccessibleEventObject aEvent;
-                aEvent.EventId = AccessibleEventId::NAME_CHANGED;
-                aEvent.OldValue <<= sOldName;
-                aEvent.NewValue <<= GetName();
-                FireAccessibleEvent( aEvent );
-            }
+            AccessibleEventObject aEvent;
+            aEvent.EventId = AccessibleEventId::NAME_CHANGED;
+            aEvent.OldValue <<= sOldName;
+            aEvent.NewValue <<= GetName();
+            FireAccessibleEvent( aEvent );
         }
     }
 }
@@ -288,13 +279,13 @@ bool SwAccessibleFrameBase::GetSelectedState( )
     const SwPosition *pPos = rAnchor.GetContentAnchor();
     if( !pPos )
         return false;
-    int nIndex = pPos->nContent.GetIndex();
-    if( pPos->nNode.GetNode().GetTextNode() )
+    int nIndex = pPos->GetContentIndex();
+    if( pPos->GetNode().GetTextNode() )
     {
         SwPaM* pCursor = GetCursor();
         if( pCursor != nullptr )
         {
-            const SwTextNode* pNode = pPos->nNode.GetNode().GetTextNode();
+            const SwTextNode* pNode = pPos->GetNode().GetTextNode();
             SwNodeOffset nHere = pNode->GetIndex();
 
             // iterate over ring
@@ -306,15 +297,15 @@ bool SwAccessibleFrameBase::GetSelectedState( )
                 {
                     // check whether nHere is 'inside' pCursor
                     SwPosition* pStart = pCursor->Start();
-                    SwNodeOffset nStartIndex = pStart->nNode.GetIndex();
+                    SwNodeOffset nStartIndex = pStart->GetNodeIndex();
                     SwPosition* pEnd = pCursor->End();
-                    SwNodeOffset nEndIndex = pEnd->nNode.GetIndex();
+                    SwNodeOffset nEndIndex = pEnd->GetNodeIndex();
                     if( ( nHere >= nStartIndex ) && (nHere <= nEndIndex)  )
                     {
                         if( rAnchor.GetAnchorId() == RndStdIds::FLY_AS_CHAR )
                         {
-                            if( ((nHere == nStartIndex) && (nIndex >= pStart->nContent.GetIndex())) || (nHere > nStartIndex) )
-                                if( ((nHere == nEndIndex) && (nIndex < pEnd->nContent.GetIndex())) || (nHere < nEndIndex) )
+                            if( ((nHere == nStartIndex) && (nIndex >= pStart->GetContentIndex())) || (nHere > nStartIndex) )
+                                if( ((nHere == nEndIndex) && (nIndex < pEnd->GetContentIndex())) || (nHere < nEndIndex) )
                                     return true;
                         }
                         else if( rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PARA )

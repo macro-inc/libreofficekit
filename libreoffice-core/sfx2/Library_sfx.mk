@@ -21,7 +21,11 @@ $(eval $(call gb_Library_Library,sfx))
 
 $(eval $(call gb_Library_add_sdi_headers,sfx,sfx2/sdi/sfxslots))
 
-$(eval $(call gb_Library_set_componentfile,sfx,sfx2/util/sfx))
+$(eval $(call gb_Library_set_componentfile,sfx,sfx2/util/sfx,services))
+
+$(eval $(call gb_Library_add_componentimpls,sfx, \
+    $(if $(ENABLE_WASM_STRIP_RECENT),,extended) \
+))
 
 $(eval $(call gb_Library_set_precompiled_header,sfx,sfx2/inc/pch/precompiled_sfx))
 
@@ -49,6 +53,7 @@ $(eval $(call gb_Library_use_libraries,sfx,\
     comphelper \
     cppu \
     cppuhelper \
+    drawinglayercore \
     drawinglayer \
     fwk \
     i18nlangtag \
@@ -76,9 +81,16 @@ $(eval $(call gb_Library_use_externals,sfx,\
     icui18n \
     icuuc \
     libxml2 \
-    orcus \
-    orcus-parser\
 ))
+
+ifneq ($(ENABLE_WASM_STRIP_RECENT),TRUE)
+$(eval $(call gb_Library_add_exception_objects,sfx,\
+    sfx2/source/dialog/backingcomp \
+    sfx2/source/dialog/backingwindow \
+    sfx2/source/control/recentdocsview \
+    sfx2/source/control/recentdocsviewitem \
+))
+endif
 
 $(eval $(call gb_Library_add_exception_objects,sfx,\
     sfx2/source/accessibility/AccessibilityCheck \
@@ -141,8 +153,6 @@ $(eval $(call gb_Library_add_exception_objects,sfx,\
     sfx2/source/control/msg \
     sfx2/source/control/msgpool \
     sfx2/source/control/objface \
-    sfx2/source/control/recentdocsview \
-    sfx2/source/control/recentdocsviewitem \
     sfx2/source/control/request \
     sfx2/source/control/sfxstatuslistener \
     sfx2/source/control/shell \
@@ -157,10 +167,6 @@ $(eval $(call gb_Library_add_exception_objects,sfx,\
     sfx2/source/control/thumbnailviewitem \
     sfx2/source/control/thumbnailviewacc \
     sfx2/source/control/thumbnailview \
-    sfx2/source/control/emojiviewitem \
-    sfx2/source/control/emojiview \
-    sfx2/source/control/emojicontrol \
-    sfx2/source/control/emojipopup \
     sfx2/source/control/charmapcontrol \
     sfx2/source/control/charwin \
     sfx2/source/control/unoctitm \
@@ -169,8 +175,6 @@ $(eval $(call gb_Library_add_exception_objects,sfx,\
     sfx2/source/devtools/DocumentModelTreeHandler \
     sfx2/source/devtools/ObjectInspectorTreeHandler \
     sfx2/source/dialog/alienwarn \
-    sfx2/source/dialog/backingcomp \
-    sfx2/source/dialog/backingwindow \
     sfx2/source/dialog/basedlgs \
     sfx2/source/dialog/checkin \
     sfx2/source/dialog/dialoghelper \
@@ -200,7 +204,6 @@ $(eval $(call gb_Library_add_exception_objects,sfx,\
     sfx2/source/dialog/tabdlg \
     sfx2/source/dialog/templdlg \
     sfx2/source/dialog/StyleList \
-    sfx2/source/dialog/titledockwin \
     sfx2/source/dialog/tplcitem \
     sfx2/source/dialog/tplpitem \
     sfx2/source/dialog/versdlg \

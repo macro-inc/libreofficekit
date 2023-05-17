@@ -58,6 +58,7 @@
 #include <bookmark.hxx>
 #include <frameformats.hxx>
 #include <memory>
+#include <utility>
 
 OUString SwHistoryHint::GetDescription() const
 {
@@ -609,13 +610,13 @@ SwHistoryBookmark::SwHistoryBookmark(
     , m_aName(rBkmk.GetName())
     , m_bHidden(false)
     , m_nNode(bSavePos ?
-        rBkmk.GetMarkPos().nNode.GetIndex() : SwNodeOffset(0))
+        rBkmk.GetMarkPos().GetNodeIndex() : SwNodeOffset(0))
     , m_nOtherNode(bSaveOtherPos ?
-        rBkmk.GetOtherMarkPos().nNode.GetIndex() : SwNodeOffset(0))
+        rBkmk.GetOtherMarkPos().GetNodeIndex() : SwNodeOffset(0))
     , m_nContent(bSavePos ?
-        rBkmk.GetMarkPos().nContent.GetIndex() : 0)
+        rBkmk.GetMarkPos().GetContentIndex() : 0)
     , m_nOtherContent(bSaveOtherPos ?
-        rBkmk.GetOtherMarkPos().nContent.GetIndex() :0)
+        rBkmk.GetOtherMarkPos().GetContentIndex() :0)
     , m_bSavePos(bSavePos)
     , m_bSaveOtherPos(bSaveOtherPos)
     , m_bHadOtherPos(rBkmk.IsExpanded())
@@ -674,8 +675,7 @@ void SwHistoryBookmark::SetInDoc( SwDoc* pDoc, bool )
         if (pPam && pContentNd)
         {
             pPam->SetMark();
-            pPam->GetMark()->nNode = m_nOtherNode;
-            pPam->GetMark()->nContent.Assign(pContentNd, m_nOtherContent);
+            pPam->GetMark()->Assign(*pContentNd, m_nOtherContent);
         }
     }
     else if(m_bHadOtherPos)
@@ -721,16 +721,16 @@ void SwHistoryBookmark::SetInDoc( SwDoc* pDoc, bool )
 
 bool SwHistoryBookmark::IsEqualBookmark(const ::sw::mark::IMark& rBkmk)
 {
-    return m_nNode == rBkmk.GetMarkPos().nNode.GetIndex()
-        && m_nContent == rBkmk.GetMarkPos().nContent.GetIndex()
+    return m_nNode == rBkmk.GetMarkPos().GetNodeIndex()
+        && m_nContent == rBkmk.GetMarkPos().GetContentIndex()
         && m_aName == rBkmk.GetName();
 }
 
 SwHistoryNoTextFieldmark::SwHistoryNoTextFieldmark(const ::sw::mark::IFieldmark& rFieldMark)
     : SwHistoryHint(HSTRY_NOTEXTFIELDMARK)
     , m_sType(rFieldMark.GetFieldname())
-    , m_nNode(rFieldMark.GetMarkStart().nNode.GetIndex())
-    , m_nContent(rFieldMark.GetMarkStart().nContent.GetIndex())
+    , m_nNode(rFieldMark.GetMarkStart().GetNodeIndex())
+    , m_nContent(rFieldMark.GetMarkStart().GetContentIndex())
 {
 }
 
@@ -774,14 +774,14 @@ SwHistoryTextFieldmark::SwHistoryTextFieldmark(const ::sw::mark::IFieldmark& rFi
     : SwHistoryHint(HSTRY_TEXTFIELDMARK)
     , m_sName(rFieldMark.GetName())
     , m_sType(rFieldMark.GetFieldname())
-    , m_nStartNode(rFieldMark.GetMarkStart().nNode.GetIndex())
-    , m_nStartContent(rFieldMark.GetMarkStart().nContent.GetIndex())
-    , m_nEndNode(rFieldMark.GetMarkEnd().nNode.GetIndex())
-    , m_nEndContent(rFieldMark.GetMarkEnd().nContent.GetIndex())
+    , m_nStartNode(rFieldMark.GetMarkStart().GetNodeIndex())
+    , m_nStartContent(rFieldMark.GetMarkStart().GetContentIndex())
+    , m_nEndNode(rFieldMark.GetMarkEnd().GetNodeIndex())
+    , m_nEndContent(rFieldMark.GetMarkEnd().GetContentIndex())
 {
     SwPosition const sepPos(sw::mark::FindFieldSep(rFieldMark));
-    m_nSepNode = sepPos.nNode.GetIndex();
-    m_nSepContent = sepPos.nContent.GetIndex();
+    m_nSepNode = sepPos.GetNodeIndex();
+    m_nSepContent = sepPos.GetContentIndex();
 }
 
 void SwHistoryTextFieldmark::SetInDoc(SwDoc* pDoc, bool)
@@ -925,9 +925,9 @@ void SwHistorySetAttrSet::SetInDoc( SwDoc* pDoc, bool )
 SwHistoryChangeFlyAnchor::SwHistoryChangeFlyAnchor( SwFrameFormat& rFormat )
     : SwHistoryHint( HSTRY_CHGFLYANCHOR )
     , m_rFormat( rFormat )
-    , m_nOldNodeIndex( rFormat.GetAnchor().GetContentAnchor()->nNode.GetIndex() )
+    , m_nOldNodeIndex( rFormat.GetAnchor().GetAnchorNode()->GetIndex() )
     , m_nOldContentIndex( (RndStdIds::FLY_AT_CHAR == rFormat.GetAnchor().GetAnchorId())
-            ?   rFormat.GetAnchor().GetContentAnchor()->nContent.GetIndex()
+            ?   rFormat.GetAnchor().GetAnchorContentOffset()
             :   COMPLETE_STRING )
 {
 }
@@ -945,17 +945,11 @@ void SwHistoryChangeFlyAnchor::SetInDoc( SwDoc* pDoc, bool )
     SwContentNode* pCNd = pNd->GetContentNode();
     SwPosition aPos( *pNd );
     if ( COMPLETE_STRING != m_nOldContentIndex )
-    {
-        OSL_ENSURE(pCNd, "SwHistoryChangeFlyAnchor: no ContentNode");
-        if (pCNd)
-        {
-            aPos.nContent.Assign( pCNd, m_nOldContentIndex );
-        }
-    }
+        aPos.SetContent( m_nOldContentIndex );
     aTmp.SetAnchor( &aPos );
 
     // so the Layout does not get confused
-    if (!pCNd || !pCNd->getLayoutFrame(pDoc->getIDocumentLayoutAccess().GetCurrentLayout(), nullptr, nullptr))
+    if (!pCNd->getLayoutFrame(pDoc->getIDocumentLayoutAccess().GetCurrentLayout(), nullptr, nullptr))
     {
         m_rFormat.DelFrames();
     }
@@ -1004,10 +998,10 @@ void SwHistoryChangeFlyChain::SetInDoc( SwDoc* pDoc, bool )
 }
 
 // -> #i27615#
-SwHistoryChangeCharFormat::SwHistoryChangeCharFormat(const SfxItemSet & rSet,
-                                     const OUString & sFormat)
+SwHistoryChangeCharFormat::SwHistoryChangeCharFormat(SfxItemSet aSet,
+                                     OUString sFormat)
     : SwHistoryHint(HSTRY_CHGCHARFMT)
-    , m_OldSet(rSet), m_Format(sFormat)
+    , m_OldSet(std::move(aSet)), m_Format(std::move(sFormat))
 {
 }
 
@@ -1165,9 +1159,7 @@ void SwHistory::AddDeleteFly(SwFrameFormat& rFormat, sal_uInt16& rSetPos)
         std::unique_ptr<SwHistoryHint> pHint(new SwHistoryTextFlyCnt( &rFormat ));
         m_SwpHstry.push_back( std::move(pHint) );
 
-        const SwFormatChain* pChainItem;
-        if( SfxItemState::SET == rFormat.GetItemState( RES_CHAIN, false,
-            reinterpret_cast<const SfxPoolItem**>(&pChainItem) ))
+        if( const SwFormatChain* pChainItem = rFormat.GetItemIfSet( RES_CHAIN, false ) )
         {
             assert(RES_FLYFRMFMT == nWh); // not supported on SdrObjects
             if( pChainItem->GetNext() || pChainItem->GetPrev() )

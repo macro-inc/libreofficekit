@@ -11,6 +11,7 @@
 #include <math.h>
 #include <string.h>
 #include <memory>
+#include <utility>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -368,9 +369,9 @@ struct CallbackData
     std::string m_aPayload;
     LOKDocView* m_pDocView;
 
-    CallbackData(int nType, const std::string& rPayload, LOKDocView* pDocView)
+    CallbackData(int nType, std::string aPayload, LOKDocView* pDocView)
         : m_nType(nType),
-          m_aPayload(rPayload),
+          m_aPayload(std::move(aPayload)),
           m_pDocView(pDocView) {}
 };
 
@@ -568,30 +569,28 @@ handleGraphicSelectionOnButtonRelease(LOKDocView* pDocView, GdkEventButton* pEve
         }
     }
 
-    if (priv->m_bInDragGraphicSelection)
+    if (!priv->m_bInDragGraphicSelection)
+        return false;
+
+    g_info("LOKDocView_Impl::signalButton: end of drag graphic selection");
+    priv->m_bInDragGraphicSelection = false;
+
+    GTask* task = g_task_new(pDocView, nullptr, nullptr, nullptr);
+    LOEvent* pLOEvent = new LOEvent(LOK_SET_GRAPHIC_SELECTION);
+    pLOEvent->m_nSetGraphicSelectionType = LOK_SETGRAPHICSELECTION_END;
+    pLOEvent->m_nSetGraphicSelectionX = pixelToTwip(pEvent->x, priv->m_fZoom);
+    pLOEvent->m_nSetGraphicSelectionY = pixelToTwip(pEvent->y, priv->m_fZoom);
+    g_task_set_task_data(task, pLOEvent, LOEvent::destroy);
+
+    g_thread_pool_push(priv->lokThreadPool, g_object_ref(task), &error);
+    if (error != nullptr)
     {
-        g_info("LOKDocView_Impl::signalButton: end of drag graphic selection");
-        priv->m_bInDragGraphicSelection = false;
-
-        GTask* task = g_task_new(pDocView, nullptr, nullptr, nullptr);
-        LOEvent* pLOEvent = new LOEvent(LOK_SET_GRAPHIC_SELECTION);
-        pLOEvent->m_nSetGraphicSelectionType = LOK_SETGRAPHICSELECTION_END;
-        pLOEvent->m_nSetGraphicSelectionX = pixelToTwip(pEvent->x, priv->m_fZoom);
-        pLOEvent->m_nSetGraphicSelectionY = pixelToTwip(pEvent->y, priv->m_fZoom);
-        g_task_set_task_data(task, pLOEvent, LOEvent::destroy);
-
-        g_thread_pool_push(priv->lokThreadPool, g_object_ref(task), &error);
-        if (error != nullptr)
-        {
-            g_warning("Unable to call LOK_SET_GRAPHIC_SELECTION: %s", error->message);
-            g_clear_error(&error);
-        }
-        g_object_unref(task);
-
-        return true;
+        g_warning("Unable to call LOK_SET_GRAPHIC_SELECTION: %s", error->message);
+        g_clear_error(&error);
     }
+    g_object_unref(task);
 
-    return false;
+    return true;
 }
 
 static void
@@ -1487,6 +1486,11 @@ callback (gpointer pData)
     case LOK_CALLBACK_FONTS_MISSING:
     case LOK_CALLBACK_MEDIA_SHAPE:
     case LOK_CALLBACK_EXPORT_FILE:
+    case LOK_CALLBACK_VIEW_RENDER_STATE:
+    case LOK_CALLBACK_APPLICATION_BACKGROUND_COLOR:
+    case LOK_CALLBACK_A11Y_FOCUS_CHANGED:
+    case LOK_CALLBACK_A11Y_CARET_CHANGED:
+    case LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED:
     {
         // TODO: Implement me
         break;
@@ -2811,16 +2815,17 @@ static gboolean timeout_wakeup(void *)
 // integrate our mainloop with LOK's
 static int lok_poll_callback(void*, int timeoutUs)
 {
-    if (timeoutUs)
+    bool bWasEvent(false);
+    if (timeoutUs > 0)
     {
         guint timeout = g_timeout_add(timeoutUs / 1000, timeout_wakeup, nullptr);
-        g_main_context_iteration(nullptr, true);
+        bWasEvent = g_main_context_iteration(nullptr, true);
         g_source_remove(timeout);
     }
     else
-        g_main_context_iteration(nullptr, FALSE);
+        bWasEvent = g_main_context_iteration(nullptr, timeoutUs < 0);
 
-    return 0;
+    return bWasEvent ? 1 : 0;
 }
 
 // thread-safe wakeup of our mainloop

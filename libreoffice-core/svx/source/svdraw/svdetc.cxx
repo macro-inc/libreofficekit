@@ -39,7 +39,6 @@
 #include <svx/xflgrit.hxx>
 #include <svx/svdoole2.hxx>
 #include <svl/itempool.hxx>
-#include <tools/debug.hxx>
 #include <unotools/configmgr.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <unotools/syslocale.hxx>
@@ -94,7 +93,15 @@ SdrGlobalData & GetSdrGlobalData() {
 OLEObjCache::OLEObjCache()
 {
     if (!utl::ConfigManager::IsFuzzing())
+    {
+// This limit is only useful on 32-bit windows, where we can run out of virtual memory (see tdf#95579)
+// For everything else, we are better off keeping it in main memory rather than using our hacky page-out thing
+#if defined _WIN32 && !defined _WIN64
         nSize = officecfg::Office::Common::Cache::DrawingEngine::OLE_Objects::get();
+#else
+        nSize = SAL_MAX_INT32; // effectively disable the page-out mechanism
+#endif
+    }
     else
         nSize = 100;
     pTimer.reset( new AutoTimer( "svx OLEObjCache pTimer UnloadCheck" ) );
@@ -126,7 +133,7 @@ IMPL_LINK_NOARG(OLEObjCache, UnloadCheckHdl, Timer*, void)
         try
         {
             // it is important to get object without reinitialization to avoid reentrance
-            uno::Reference< embed::XEmbeddedObject > xUnloadObj = pUnloadObj->GetObjRef_NoInit();
+            const uno::Reference< embed::XEmbeddedObject > & xUnloadObj = pUnloadObj->GetObjRef_NoInit();
 
             bool bUnload = !xUnloadObj || SdrOle2Obj::CanUnloadRunningObj( xUnloadObj, pUnloadObj->GetAspect() );
 
@@ -272,8 +279,8 @@ bool GetDraftFillColor(const SfxItemSet& rSet, Color& rCol)
         }
         case drawing::FillStyle_GRADIENT: {
             const XGradient& rGrad=rSet.Get(XATTR_FILLGRADIENT).GetGradientValue();
-            Color aCol1(rGrad.GetStartColor());
-            Color aCol2(rGrad.GetEndColor());
+            Color aCol1(Color(rGrad.GetColorStops().front().getStopColor()));
+            Color aCol2(Color(rGrad.GetColorStops().back().getStopColor()));
             const basegfx::BColor aAverageColor(basegfx::average(aCol1.getBColor(), aCol2.getBColor()));
             rCol = Color(aAverageColor);
             bRetval = true;
@@ -344,7 +351,7 @@ std::unique_ptr<SdrOutliner> SdrMakeOutliner(OutlinerMode nOutlinerMode, SdrMode
     return pOutl;
 }
 
-std::vector<Link<SdrObjCreatorParams, SdrObject*>>& ImpGetUserMakeObjHdl()
+std::vector<Link<SdrObjCreatorParams, rtl::Reference<SdrObject>>>& ImpGetUserMakeObjHdl()
 {
     SdrGlobalData& rGlobalData=GetSdrGlobalData();
     return rGlobalData.aUserMakeObjHdl;
@@ -361,7 +368,7 @@ bool SearchOutlinerItems(const SfxItemSet& rSet, bool bInklDefaults, bool* pbOnl
         // For bInklDefaults, the entire Which range is decisive,
         // in other cases only the set items are.
         // Disabled and DontCare are regarded as holes in the Which range.
-        SfxItemState eState=rSet.GetItemState(nWhich);
+        SfxItemState eState=aIter.GetItemState();
         if ((eState==SfxItemState::DEFAULT && bInklDefaults) || eState==SfxItemState::SET) {
             if (nWhich<EE_ITEMS_START || nWhich>EE_ITEMS_END) bOnly=false;
             else bHas=true;
@@ -497,7 +504,7 @@ namespace
             }
             else
             {
-                SdrTextObj* pText = dynamic_cast< SdrTextObj * >(pObj);
+                SdrTextObj* pText = DynCastSdrTextObj(pObj);
 
                 // Exclude zero master page object (i.e. background shape) from color query
                 if(pText

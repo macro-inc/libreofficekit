@@ -11,8 +11,9 @@
 #include <set>
 #include <vector>
 
+#include "config_clang.h"
+
 #include "check.hxx"
-#include "compat.hxx"
 #include "functionaddress.hxx"
 #include "plugin.hxx"
 
@@ -122,7 +123,7 @@ DeclRefExpr const* relevantImplicitCastExpr(ImplicitCastExpr const* expr)
 
 DeclRefExpr const* relevantCXXMemberCallExpr(CXXMemberCallExpr const* expr)
 {
-    StringType t = relevantStringType(compat::getObjectType(expr));
+    StringType t = relevantStringType(expr->getObjectType());
     if (t == StringType::None)
     {
         return nullptr;
@@ -136,7 +137,11 @@ DeclRefExpr const* relevantCXXMemberCallExpr(CXXMemberCallExpr const* expr)
     else if (auto const i = d->getIdentifier())
     {
         auto const n = i->getName();
-        if (n == "endsWith" || n == "isEmpty" || n == "startsWith" || n == "subView")
+        if (n == "endsWith" || n == "isEmpty" || n == "startsWith" || n == "subView"
+            || n == "indexOf" || n == "lastIndexOf" || n == "compareTo" || n == "match"
+            || n == "trim" || n == "toInt32" || n == "toUInt32" || n == "toInt64" || n == "toDouble"
+            || n == "equalsIgnoreAsciiCase" || n == "compareToIgnoreAsciiCase" || n == "getToken"
+            || n == "copy" || n == "equalsAscii" || n == "matchIgnoreAsciiCase")
         {
             good = true;
         }
@@ -182,7 +187,7 @@ SmallVector<DeclRefExpr const*, 2> relevantCXXOperatorCallExpr(CXXOperatorCallEx
         }
         return wrap(relevantDeclRefExpr(e));
     }
-    if (compat::isComparisonOp(expr) || (op == OO_Plus && expr->getNumArgs() == 2))
+    if (expr->isComparisonOp() || (op == OO_Plus && expr->getNumArgs() == 2))
     {
         SmallVector<DeclRefExpr const*, 2> v;
         if (auto const e = relevantDeclRefExpr(expr->getArg(0)))

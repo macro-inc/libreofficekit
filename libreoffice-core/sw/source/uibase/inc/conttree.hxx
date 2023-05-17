@@ -32,6 +32,9 @@
 #include <o3tl/enumarray.hxx>
 #include <o3tl/typed_flags_set.hxx>
 
+#include <svx/sdr/overlay/overlayobject.hxx>
+#include <editsh.hxx>
+
 class SwWrtShell;
 class SwContentType;
 class SwNavigationPI;
@@ -87,16 +90,17 @@ public:
 class SwContentTree final : public SfxListener
 {
     std::unique_ptr<weld::TreeView> m_xTreeView;
-    std::unique_ptr<weld::TreeIter> m_xScratchIter;
     SwContentTreeDropTarget m_aDropTargetHelper;
     SwNavigationPI*     m_pDialog;
     OUString            m_sSpace;
     AutoTimer           m_aUpdTimer;
+    AutoTimer m_aOverlayObjectDelayTimer;
 
     o3tl::enumarray<ContentTypeId,std::unique_ptr<SwContentType>>  m_aActiveContentArr;
     o3tl::enumarray<ContentTypeId,std::unique_ptr<SwContentType>>  m_aHiddenContentArr;
     OUString            m_aContextStrings[CONTEXT_COUNT + 1];
     OUString            m_sInvisible;
+    OUString            m_sSelectedItem;  // last selected item (only bookmarks yet)
 
     SwWrtShell*         m_pHiddenShell;   // dropped Doc
     SwWrtShell*         m_pActiveShell;   // the active or a const. open view
@@ -104,7 +108,7 @@ class SwContentTree final : public SfxListener
 
     std::map< void*, bool > mOutLineNodeMap;
 
-    sal_Int32           m_nActiveBlock;
+    sal_Int32           m_nActiveBlock; // used to restore content types/categories expand state
     sal_Int32           m_nHiddenBlock;
     size_t              m_nEntryCount;
     ContentTypeId       m_nRootType;
@@ -112,19 +116,7 @@ class SwContentTree final : public SfxListener
     sal_uInt8           m_nOutlineLevel;
 
     sal_uInt8           m_nOutlineTracking = 1; // 1 default, 2 focus, 3 off
-    bool m_bTableTracking = true;
-    bool m_bSectionTracking = true;
-    bool m_bFrameTracking = true;
-    bool m_bImageTracking = true;
-    bool m_bOLEobjectTracking = true;
-    bool m_bBookmarkTracking = true;
-    bool m_bHyperlinkTracking = true;
-    bool m_bReferenceTracking = true;
-    bool m_bIndexTracking = true;
-    bool m_bCommentTracking = true;
-    bool m_bDrawingObjectTracking = true;
-    bool m_bFieldTracking = true;
-    bool m_bFootnoteTracking = true;
+    o3tl::enumarray<ContentTypeId, bool> mTrackContentType;
 
     SwOutlineNodes::size_type m_nLastGotoContentWasOutlinePos = SwOutlineNodes::npos;
 
@@ -141,6 +133,22 @@ class SwContentTree final : public SfxListener
 
     bool m_bDocHasChanged = true;
     bool m_bIgnoreDocChange = false; // used to prevent tracking update
+
+    std::unique_ptr<weld::TreeIter> m_xOverlayCompareEntry;
+    std::unique_ptr<sdr::overlay::OverlayObject> m_xOverlayObject;
+
+    void OverlayObject(std::vector<basegfx::B2DRange>&& aRanges = {});
+
+    void BringEntryToAttention(const weld::TreeIter& rEntry);
+    void BringFramesToAttention(const std::vector<const SwFrameFormat*>& rFrameFormats);
+    void BringBookmarksToAttention(const std::vector<OUString>& rNames);
+    void BringURLFieldsToAttention(const SwGetINetAttrs& rINetAttrsArr);
+    void BringReferencesToAttention(std::vector<const SwTextAttr*>& rTextAttrsArr);
+    void BringPostItFieldsToAttention(std::vector<const SwTextAttr*>& rTextAttrsArr);
+    void BringDrawingObjectsToAttention(std::vector<const SdrObject*>& rDrawingObjectsArr);
+    void BringTextFieldsToAttention(std::vector<const SwTextAttr*>& rTextAttrsArr);
+    void BringFootnotesToAttention(std::vector<const SwTextAttr*>& rTextAttrsArr);
+    void BringTypesWithFlowFramesToAttention(const std::vector<const SwNode*>& rNodes);
 
     /**
      * Before any data will be deleted, the last active entry has to be found.
@@ -170,6 +178,7 @@ class SwContentTree final : public SfxListener
     void            ExecuteContextMenuAction(const OString& rSelectedPopupEntry);
 
     void DeleteOutlineSelections();
+    void CopyOutlineSelections();
 
     size_t GetEntryCount() const;
 
@@ -195,6 +204,8 @@ class SwContentTree final : public SfxListener
     DECL_LINK(QueryTooltipHdl, const weld::TreeIter&, OUString);
     DECL_LINK(DragBeginHdl, bool&, bool);
     DECL_LINK(TimerUpdate, Timer *, void);
+    DECL_LINK(OverlayObjectDelayTimerHdl, Timer *, void);
+    DECL_LINK(MouseMoveHdl, const MouseEvent&, bool);
 
 public:
     SwContentTree(std::unique_ptr<weld::TreeView> xTreeView, SwNavigationPI* pDialog);
@@ -230,19 +241,7 @@ public:
     void            SetOutlineLevel(sal_uInt8 nSet);
 
     void            SetOutlineTracking(sal_uInt8 nSet);
-    void            SetTableTracking(bool bSet);
-    void            SetSectionTracking(bool bSet);
-    void            SetFrameTracking(bool bSet);
-    void            SetImageTracking(bool bSet);
-    void            SetOLEobjectTracking(bool bSet);
-    void            SetBookmarkTracking(bool bSet);
-    void            SetHyperlinkTracking(bool bSet);
-    void            SetReferenceTracking(bool bSet);
-    void            SetIndexTracking(bool bSet);
-    void            SetCommentTracking(bool bSet);
-    void            SetDrawingObjectTracking(bool bSet);
-    void            SetFieldTracking(bool bSet);
-    void            SetFootnoteTracking(bool bSet);
+    void            SetContentTypeTracking(ContentTypeId eCntTypeId, bool bSet);
 
     /** Execute commands of the Navigator */
     void            ExecCommand(std::string_view rCmd, bool bModifier);
@@ -261,6 +260,7 @@ public:
 
     void UpdateTracking();
     void SelectOutlinesWithSelection();
+    void SelectContentType(std::u16string_view rContentTypeName);
 
     // return true if it has any children
     bool RequestingChildren(const weld::TreeIter& rParent);
@@ -328,7 +328,7 @@ private:
     std::unique_ptr<SwGlblDocContent>       m_pDocContent;
     std::unique_ptr<sfx2::DocumentInserter> m_pDocInserter;
 
-    static const SfxObjectShell* pShowShell;
+    static const SfxObjectShell* s_pShowShell;
 
     void        InsertRegion( const SwGlblDocContent* _pContent,
                               const css::uno::Sequence< OUString >& _rFiles );
@@ -351,7 +351,7 @@ private:
     void            GotoContent(const SwGlblDocContent*);
     MenuEnableFlags GetEnableFlags() const;
 
-    static void     SetShowShell(const SfxObjectShell*pSet) {pShowShell = pSet;}
+    static void     SetShowShell(const SfxObjectShell*pSet) {s_pShowShell = pSet;}
     DECL_STATIC_LINK(SwGlobalTree, ShowFrameHdl, void*, void);
 
 public:

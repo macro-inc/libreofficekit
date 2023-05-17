@@ -21,12 +21,12 @@
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/rendering/XParametricPolyPolygon2D.hpp>
-#include <cppuhelper/compbase.hxx>
-#include <cppuhelper/basemutex.hxx>
+#include <comphelper/compbase.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
 
 #include <canvas/canvastoolsdllapi.h>
 #include <rtl/ref.hxx>
+#include <utility>
 
 namespace com::sun::star::rendering { class XGraphicDevice; }
 
@@ -35,11 +35,10 @@ namespace com::sun::star::rendering { class XGraphicDevice; }
 
 namespace canvas
 {
-    typedef cppu::WeakComponentImplHelper< css::rendering::XParametricPolyPolygon2D,
+    typedef comphelper::WeakComponentImplHelper< css::rendering::XParametricPolyPolygon2D,
                                            css::lang::XServiceInfo > ParametricPolyPolygon_Base;
 
-    class CANVASTOOLS_DLLPUBLIC ParametricPolyPolygon final : public ::cppu::BaseMutex,
-                                  public ParametricPolyPolygon_Base
+    class CANVASTOOLS_DLLPUBLIC ParametricPolyPolygon final : public ParametricPolyPolygon_Base
     {
     public:
         enum class GradientType
@@ -56,12 +55,12 @@ namespace canvas
          */
         struct Values
         {
-            Values( const ::basegfx::B2DPolygon&                        rGradientPoly,
+            Values( ::basegfx::B2DPolygon                               aGradientPoly,
                     const css::uno::Sequence< css::uno::Sequence< double > >& rColors,
                     const css::uno::Sequence< double >&                 rStops,
                     double                                              nAspectRatio,
                     GradientType                                        eType ) :
-                maGradientPoly( rGradientPoly ),
+                maGradientPoly(std::move( aGradientPoly )),
                 mnAspectRatio( nAspectRatio ),
                 maColors( rColors ),
                 maStops( rStops ),
@@ -92,7 +91,7 @@ namespace canvas
             const css::uno::Sequence< css::uno::Any >& rArgs );
 
         /// Dispose all internal references
-        virtual void SAL_CALL disposing() override;
+        virtual void disposing(std::unique_lock<std::mutex>&) override;
 
         // XParametricPolyPolygon2D
         virtual css::uno::Reference< css::rendering::XPolyPolygon2D > SAL_CALL getOutline( double t ) override;
@@ -129,15 +128,15 @@ namespace canvas
                                                                  double fAspect );
 
         /// Private, because objects can only be created from the static factories
-        ParametricPolyPolygon( const css::uno::Reference<
-                                   css::rendering::XGraphicDevice >&            rDevice,
+        ParametricPolyPolygon( css::uno::Reference<
+                                   css::rendering::XGraphicDevice >             xDevice,
                                const ::basegfx::B2DPolygon&                     rGradientPoly,
                                GradientType                                     eType,
                                const css::uno::Sequence< css::uno::Sequence< double > >&  colors,
                                const css::uno::Sequence< double >&              stops,
                                double                                           nAspectRatio );
-        ParametricPolyPolygon( const css::uno::Reference<
-                                   css::rendering::XGraphicDevice >&            rDevice,
+        ParametricPolyPolygon( css::uno::Reference<
+                                   css::rendering::XGraphicDevice >             xDevice,
                                GradientType                                     eType,
                                const css::uno::Sequence< css::uno::Sequence< double > >&  colors,
                                const css::uno::Sequence< double >&              stops );

@@ -20,14 +20,14 @@
 #pragma once
 
 #include <helper/propertysetcontainer.hxx>
-#include <vcl/menu.hxx>
+#include <com/sun/star/awt/XPopupMenu.hpp>
 #include <com/sun/star/container/XNamed.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XUnoTunnel.hpp>
 #include <com/sun/star/lang/XTypeProvider.hpp>
 
-#define IMPLEMENTATIONNAME_ROOTACTIONTRIGGERCONTAINER   "com.sun.star.comp.ui.RootActionTriggerContainer"
+inline constexpr OUStringLiteral IMPLEMENTATIONNAME_ROOTACTIONTRIGGERCONTAINER = u"com.sun.star.comp.ui.RootActionTriggerContainer";
 
 namespace framework
 {
@@ -40,7 +40,7 @@ class RootActionTriggerContainer final : public PropertySetContainer,
                                     public css::container::XNamed
 {
     public:
-        RootActionTriggerContainer( const Menu* pMenu, const OUString* pMenuIdentifier);
+        RootActionTriggerContainer(css::uno::Reference<css::awt::XPopupMenu> xMenu, const OUString* pMenuIdentifier);
         virtual ~RootActionTriggerContainer() override;
 
         // XInterface
@@ -92,7 +92,7 @@ class RootActionTriggerContainer final : public PropertySetContainer,
         void FillContainer();
 
         bool            m_bContainerCreated;
-        VclPtr<const Menu>  m_pMenu;
+        css::uno::Reference<css::awt::XPopupMenu> m_xMenu;
         const OUString* m_pMenuIdentifier;
 };
 

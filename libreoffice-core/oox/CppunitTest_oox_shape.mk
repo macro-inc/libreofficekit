@@ -22,14 +22,18 @@ $(eval $(call gb_CppunitTest_add_exception_objects,oox_shape, \
 $(eval $(call gb_CppunitTest_use_libraries,oox_shape, \
     comphelper \
     cppu \
+    cppuhelper \
+    docmodel \
     oox \
     sal \
+    subsequenttest \
     svx \
     svxcore \
     tl \
     test \
     unotest \
     utl \
+    basegfx \
 ))
 
 $(eval $(call gb_CppunitTest_use_sdk_api,oox_shape))

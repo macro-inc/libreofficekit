@@ -20,9 +20,10 @@
 #include <StatisticsItemConverter.hxx>
 #include "SchWhichPairs.hxx"
 #include <RegressionCurveHelper.hxx>
+#include <RegressionCurveModel.hxx>
 #include <ErrorBar.hxx>
 #include <StatisticsHelper.hxx>
-
+#include <ChartModel.hxx>
 #include <unonames.hxx>
 
 #include <svl/stritem.hxx>
@@ -31,10 +32,10 @@
 #include <rtl/math.hxx>
 
 #include <com/sun/star/chart2/XInternalDataProvider.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart2/XRegressionCurveContainer.hpp>
 #include <com/sun/star/chart/ErrorBarStyle.hpp>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -107,10 +108,9 @@ uno::Reference< beans::XPropertySet > lcl_getEquationProperties(
     // ensure that a trendline is on
     if( pItemSet )
     {
-        const SfxPoolItem *pPoolItem = nullptr;
-        if( pItemSet->GetItemState( SCHATTR_REGRESSION_TYPE, true, &pPoolItem ) == SfxItemState::SET )
+        if( const SvxChartRegressItem* pRegressionItem = pItemSet->GetItemIfSet( SCHATTR_REGRESSION_TYPE ) )
         {
-            SvxChartRegress eRegress = static_cast< const SvxChartRegressItem * >( pPoolItem )->GetValue();
+            SvxChartRegress eRegress = pRegressionItem->GetValue();
             bEquationExists = ( eRegress != SvxChartRegress::NONE );
         }
     }
@@ -118,8 +118,8 @@ uno::Reference< beans::XPropertySet > lcl_getEquationProperties(
     if( bEquationExists )
     {
         uno::Reference< chart2::XRegressionCurveContainer > xRegCnt( xSeriesPropSet, uno::UNO_QUERY );
-        uno::Reference< chart2::XRegressionCurve > xCurve(
-            ::chart::RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegCnt ));
+        rtl::Reference< ::chart::RegressionCurveModel > xCurve =
+            ::chart::RegressionCurveHelper::getFirstCurveNotMeanValueLine( xRegCnt );
         if( xCurve.is())
         {
             return xCurve->getEquationProperties();
@@ -137,10 +137,9 @@ uno::Reference< beans::XPropertySet > lcl_getCurveProperties(
     // ensure that a trendline is on
     if( pItemSet )
     {
-        const SfxPoolItem *pPoolItem = nullptr;
-        if( pItemSet->GetItemState( SCHATTR_REGRESSION_TYPE, true, &pPoolItem ) == SfxItemState::SET )
+        if( const SvxChartRegressItem* pRegressionItem = pItemSet->GetItemIfSet( SCHATTR_REGRESSION_TYPE ) )
         {
-            SvxChartRegress eRegress = static_cast< const SvxChartRegressItem * >( pPoolItem )->GetValue();
+            SvxChartRegress eRegress = pRegressionItem->GetValue();
             bExists = ( eRegress != SvxChartRegress::NONE );
         }
     }
@@ -192,12 +191,12 @@ void lclConvertToItemSet(SfxItemSet& rItemSet, sal_uInt16 nWhichId, const uno::R
     }
 }
 
-void lclConvertToItemSetDouble(SfxItemSet& rItemSet, sal_uInt16 nWhichId, const uno::Reference<beans::XPropertySet>& xProperties, const OUString& aPropertyID)
+void lclConvertToItemSetDouble(SfxItemSet& rItemSet, TypedWhichId<SvxDoubleItem> nWhichId, const uno::Reference<beans::XPropertySet>& xProperties, const OUString& aPropertyID)
 {
     OSL_ASSERT(xProperties.is());
     if( xProperties.is() )
     {
-        double aValue = static_cast<const SvxDoubleItem&>(rItemSet.Get( nWhichId )).GetValue();
+        double aValue = rItemSet.Get( nWhichId ).GetValue();
         if(xProperties->getPropertyValue( aPropertyID ) >>= aValue)
         {
             rItemSet.Put(SvxDoubleItem( aValue, nWhichId ));
@@ -211,11 +210,11 @@ namespace chart::wrapper
 {
 
 StatisticsItemConverter::StatisticsItemConverter(
-    const uno::Reference< frame::XModel > & xModel,
+    rtl::Reference<::chart::ChartModel> xModel,
     const uno::Reference< beans::XPropertySet > & rPropertySet,
     SfxItemPool& rItemPool ) :
         ItemConverter( rPropertySet, rItemPool ),
-        m_xModel( xModel )
+        m_xModel(std::move( xModel ))
 {
 }
 
@@ -553,18 +552,17 @@ bool StatisticsItemConverter::ApplySpecialItem(
                 rItemSet.Get(SCHATTR_STAT_ERRORBAR_TYPE).GetValue();
             uno::Reference< chart2::data::XDataSource > xErrorBarSource( lcl_GetErrorBar( GetPropertySet(), bYError),
                                                                          uno::UNO_QUERY );
-            uno::Reference< chart2::XChartDocument > xChartDoc( m_xModel, uno::UNO_QUERY );
             uno::Reference< chart2::data::XDataProvider > xDataProvider;
 
-            if( xChartDoc.is())
-                xDataProvider.set( xChartDoc->getDataProvider());
+            if( m_xModel.is())
+                xDataProvider.set( m_xModel->getDataProvider());
             if( xErrorBarSource.is() && xDataProvider.is())
             {
                 OUString aNewRange( static_cast< const SfxStringItem & >( rItemSet.Get( nWhichId )).GetValue());
                 bool bApplyNewRange = false;
 
                 bool bIsPositiveValue( nWhichId == SCHATTR_STAT_RANGE_POS );
-                if( xChartDoc->hasInternalDataProvider())
+                if( m_xModel->hasInternalDataProvider())
                 {
                     if( !aNewRange.isEmpty())
                     {
@@ -664,7 +662,7 @@ void StatisticsItemConverter::FillSpecialItem(
             {
                 double fPos(0.0), fNeg(0.0);
                 lcl_getErrorValues( xErrorBarProp, fPos, fNeg );
-                rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, nWhichId ));
+                rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, SCHATTR_STAT_PERCENT ));
             }
         }
         break;
@@ -678,7 +676,7 @@ void StatisticsItemConverter::FillSpecialItem(
             {
                 double fPos(0.0), fNeg(0.0);
                 lcl_getErrorValues( xErrorBarProp, fPos, fNeg );
-                rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, nWhichId ));
+                rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, SCHATTR_STAT_BIGERROR ));
             }
         }
         break;
@@ -692,7 +690,7 @@ void StatisticsItemConverter::FillSpecialItem(
             {
                 double fPos(0.0), fNeg(0.0);
                 lcl_getErrorValues( xErrorBarProp, fPos, fNeg );
-                rOutItemSet.Put( SvxDoubleItem( fPos, nWhichId ));
+                rOutItemSet.Put( SvxDoubleItem( fPos, SCHATTR_STAT_CONSTPLUS ));
             }
         }
         break;
@@ -706,7 +704,7 @@ void StatisticsItemConverter::FillSpecialItem(
             {
                 double fPos(0.0), fNeg(0.0);
                 lcl_getErrorValues( xErrorBarProp, fPos, fNeg );
-                rOutItemSet.Put( SvxDoubleItem( fNeg, nWhichId ));
+                rOutItemSet.Put( SvxDoubleItem( fNeg, SCHATTR_STAT_CONSTMINUS ));
             }
         }
         break;
@@ -746,14 +744,14 @@ void StatisticsItemConverter::FillSpecialItem(
         case SCHATTR_REGRESSION_EXTRAPOLATE_FORWARD:
         {
             uno::Reference< beans::XPropertySet > xProperties( lcl_getCurveProperties( GetPropertySet(), nullptr ));
-            lclConvertToItemSetDouble(rOutItemSet, nWhichId, xProperties, "ExtrapolateForward");
+            lclConvertToItemSetDouble(rOutItemSet, SCHATTR_REGRESSION_EXTRAPOLATE_FORWARD, xProperties, "ExtrapolateForward");
         }
         break;
 
         case SCHATTR_REGRESSION_EXTRAPOLATE_BACKWARD:
         {
             uno::Reference< beans::XPropertySet > xProperties( lcl_getCurveProperties( GetPropertySet(), nullptr ));
-            lclConvertToItemSetDouble(rOutItemSet, nWhichId, xProperties, "ExtrapolateBackward");
+            lclConvertToItemSetDouble(rOutItemSet, SCHATTR_REGRESSION_EXTRAPOLATE_BACKWARD, xProperties, "ExtrapolateBackward");
         }
         break;
 
@@ -767,7 +765,7 @@ void StatisticsItemConverter::FillSpecialItem(
         case SCHATTR_REGRESSION_INTERCEPT_VALUE:
         {
             uno::Reference< beans::XPropertySet > xProperties( lcl_getCurveProperties( GetPropertySet(), nullptr ));
-            lclConvertToItemSetDouble(rOutItemSet, nWhichId, xProperties, "InterceptValue");
+            lclConvertToItemSetDouble(rOutItemSet, SCHATTR_REGRESSION_INTERCEPT_VALUE, xProperties, "InterceptValue");
         }
         break;
 

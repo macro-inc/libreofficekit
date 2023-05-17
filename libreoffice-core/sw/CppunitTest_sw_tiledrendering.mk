@@ -22,8 +22,10 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_tiledrendering, \
     cppu \
     cppuhelper \
     editeng \
+    docmodel \
     sal \
     sfx \
+    subsequenttest \
     svl \
     svt \
 	svxcore \

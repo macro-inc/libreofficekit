@@ -31,9 +31,12 @@
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/style/XStyle.hpp>
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
+#include <utility>
 #include <xmloff/table/XMLTableImport.hxx>
+#include <xmloff/xmltypes.hxx>
+#include <xmloff/maptype.hxx>
 #include <xmloff/xmlprmap.hxx>
 #include <xmloff/txtimp.hxx>
 #include <xmloff/xmlimp.hxx>
@@ -70,7 +73,7 @@ struct ColumnInfo
 class XMLProxyContext : public SvXMLImportContext
 {
 public:
-    XMLProxyContext( SvXMLImport& rImport, const SvXMLImportContextRef& xParent );
+    XMLProxyContext( SvXMLImport& rImport, SvXMLImportContextRef xParent );
 
     virtual css::uno::Reference< css::xml::sax::XFastContextHandler > SAL_CALL createFastChildContext(
         sal_Int32 nElement, const css::uno::Reference< css::xml::sax::XFastAttributeList >& AttrList ) override;
@@ -88,6 +91,44 @@ struct MergeInfo
 
     MergeInfo( sal_Int32 nStartColumn, sal_Int32 nStartRow, sal_Int32 nColumnSpan, sal_Int32 nRowSpan )
         : mnStartColumn( nStartColumn ), mnStartRow( nStartRow ), mnEndColumn( nStartColumn + nColumnSpan - 1 ), mnEndRow( nStartRow + nRowSpan - 1 ) {};
+};
+
+class XMLCellImportPropertyMapper : public SvXMLImportPropertyMapper
+{
+public:
+    using SvXMLImportPropertyMapper::SvXMLImportPropertyMapper;
+
+    bool handleSpecialItem(
+        XMLPropertyState& rProperty,
+        std::vector< XMLPropertyState >& rProperties,
+        const OUString& rValue,
+        const SvXMLUnitConverter& rUnitConverter,
+        const SvXMLNamespaceMap& /*rNamespaceMap*/) const override
+    {
+        assert(getPropertySetMapper()->GetEntryXMLName(rProperty.mnIndex) == GetXMLToken(XML_BACKGROUND_COLOR));
+        (void)rProperty;
+
+        auto nIndex = getPropertySetMapper()->GetEntryIndex(XML_NAMESPACE_DRAW, GetXMLToken(XML_FILL), 0);
+        XMLPropertyState aFillProperty(nIndex);
+
+        if (IsXMLToken(rValue, XML_TRANSPARENT))
+        {
+            getPropertySetMapper()->importXML(GetXMLToken(XML_NONE), aFillProperty, rUnitConverter);
+            rProperties.push_back(aFillProperty);
+        }
+        else
+        {
+            getPropertySetMapper()->importXML(GetXMLToken(XML_SOLID), aFillProperty, rUnitConverter);
+            rProperties.push_back(aFillProperty);
+
+            nIndex = getPropertySetMapper()->GetEntryIndex(XML_NAMESPACE_DRAW, GetXMLToken(XML_FILL_COLOR), 0);
+            XMLPropertyState aColorProperty(nIndex);
+            getPropertySetMapper()->importXML(rValue, aColorProperty, rUnitConverter);
+            rProperties.push_back(aColorProperty);
+        }
+
+        return false;
+    }
 };
 
 }
@@ -177,9 +218,9 @@ private:
 }
 
 
-XMLProxyContext::XMLProxyContext( SvXMLImport& rImport, const SvXMLImportContextRef& xParent )
+XMLProxyContext::XMLProxyContext( SvXMLImport& rImport, SvXMLImportContextRef xParent )
 : SvXMLImportContext( rImport )
-, mxParent( xParent )
+, mxParent(std::move( xParent ))
 {
 }
 
@@ -215,7 +256,7 @@ XMLTableImport::XMLTableImport( SvXMLImport& rImport, const rtl::Reference< XMLP
     {
         mxCellImportPropertySetMapper = new SvXMLImportPropertyMapper( xCellPropertySetMapper, rImport );
         mxCellImportPropertySetMapper->ChainImportMapper(XMLTextImportHelper::CreateParaExtPropMapper(rImport));
-        mxCellImportPropertySetMapper->ChainImportMapper(new SvXMLImportPropertyMapper(new XMLPropertySetMapper(getCellPropertiesMap(), xFactoryRef, true), rImport));
+        mxCellImportPropertySetMapper->ChainImportMapper(new XMLCellImportPropertyMapper(new XMLPropertySetMapper(getCellPropertiesMap(), xFactoryRef, true), rImport));
     }
 
     rtl::Reference < XMLPropertySetMapper > xRowMapper( new XMLPropertySetMapper( getRowPropertiesMap(), xFactoryRef, false ) );
@@ -244,12 +285,16 @@ void XMLTableImport::addTableTemplate( const OUString& rsStyleName, XMLTableTemp
 {
     auto xPtr = std::make_shared<XMLTableTemplate>();
     xPtr->swap( xTableTemplate );
-    maTableTemplates[rsStyleName] = xPtr;
+    maTableTemplates.emplace_back(rsStyleName, xPtr);
 }
 
 void XMLTableImport::insertTabletemplate(const OUString& rsStyleName, bool bOverwrite)
 {
-    XMLTableTemplateMap::iterator it = maTableTemplates.find(rsStyleName);
+    // FIXME: All templates will be inserted eventually, but
+    // instead of simply iterating them, like in finishStyles(),
+    // we search here by name again and again.
+    auto it = std::find_if(maTableTemplates.begin(), maTableTemplates.end(),
+        [&rsStyleName](const auto& item) { return rsStyleName == item.first; });
     if (it == maTableTemplates.end())
         return;
 
@@ -331,7 +376,7 @@ void XMLTableImport::finishStyles()
             for( const auto& rStyle : *xT ) try
             {
                 const OUString sPropName( rStyle.first );
-                const OUString sStyleName( rStyle.second );
+                const OUString sStyleName( mrImport.GetStyleDisplayName(XmlStyleFamily::TABLE_CELL, rStyle.second) );
                 xTemplate->replaceByName( sPropName, xCellFamily->getByName( sStyleName ) );
             }
             catch( Exception& )

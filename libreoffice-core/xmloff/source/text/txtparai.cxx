@@ -26,7 +26,7 @@
 #include <rtl/ustring.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/text/XTextFrame.hpp>
@@ -41,6 +41,7 @@
 
 #include <sax/tools/converter.hxx>
 
+#include <xmloff/prstylei.hxx>
 #include <xmloff/xmlictxt.hxx>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/xmltoken.hxx>
@@ -1028,7 +1029,7 @@ void XMLIndexMarkImportContext_Impl::ProcessAttribute(
         case XML_ELEMENT(TEXT, XML_ALPHABETICAL_INDEX_MARK):
             if ( aIter.getToken() == XML_ELEMENT(TEXT, XML_STRING_VALUE) )
             {
-                rPropSet->setPropertyValue("AlternativeText", uno::makeAny(aIter.toString()));
+                rPropSet->setPropertyValue("AlternativeText", uno::Any(aIter.toString()));
             }
             // else: ignore!
             break;
@@ -1147,14 +1148,14 @@ void XMLTOCMarkImportContext_Impl::ProcessAttribute(
     {
         case XML_ELEMENT(TEXT, XML_OUTLINE_LEVEL):
         {
-            // ouline level: set Level property
+            // outline level: set Level property
             sal_Int32 nTmp;
             if (::sax::Converter::convertNumber( nTmp, aIter.toView() )
                 && nTmp >= 1
                 && nTmp < GetImport().GetTextImport()->
                                 GetChapterNumbering()->getCount() )
             {
-                rPropSet->setPropertyValue("Level", uno::makeAny(static_cast<sal_Int16>(nTmp - 1)));
+                rPropSet->setPropertyValue("Level", uno::Any(static_cast<sal_Int16>(nTmp - 1)));
             }
             // else: value out of range -> ignore
             break;
@@ -1200,17 +1201,17 @@ void XMLUserIndexMarkImportContext_Impl::ProcessAttribute(
     switch (aIter.getToken())
     {
         case XML_ELEMENT(TEXT, XML_INDEX_NAME):
-            rPropSet->setPropertyValue("UserIndexName", uno::makeAny(aIter.toString()));
+            rPropSet->setPropertyValue("UserIndexName", uno::Any(aIter.toString()));
             break;
         case XML_ELEMENT(TEXT, XML_OUTLINE_LEVEL):
         {
-            // ouline level: set Level property
+            // outline level: set Level property
             sal_Int32 nTmp;
             if (::sax::Converter::convertNumber(
                 nTmp, aIter.toView(), 0,
                GetImport().GetTextImport()->GetChapterNumbering()->getCount()))
             {
-                rPropSet->setPropertyValue("Level", uno::makeAny(static_cast<sal_Int16>(nTmp - 1)));
+                rPropSet->setPropertyValue("Level", uno::Any(static_cast<sal_Int16>(nTmp - 1)));
             }
             // else: value out of range -> ignore
             break;
@@ -1256,19 +1257,19 @@ void XMLAlphaIndexMarkImportContext_Impl::ProcessAttribute(
     switch (aIter.getToken())
     {
         case XML_ELEMENT(TEXT, XML_KEY1):
-            rPropSet->setPropertyValue("PrimaryKey", uno::makeAny(aIter.toString()));
+            rPropSet->setPropertyValue("PrimaryKey", uno::Any(aIter.toString()));
             break;
         case XML_ELEMENT(TEXT, XML_KEY2):
-            rPropSet->setPropertyValue("SecondaryKey", uno::makeAny(aIter.toString()));
+            rPropSet->setPropertyValue("SecondaryKey", uno::Any(aIter.toString()));
             break;
         case XML_ELEMENT(TEXT, XML_KEY1_PHONETIC):
-            rPropSet->setPropertyValue("PrimaryKeyReading", uno::makeAny(aIter.toString()));
+            rPropSet->setPropertyValue("PrimaryKeyReading", uno::Any(aIter.toString()));
             break;
         case XML_ELEMENT(TEXT, XML_KEY2_PHONETIC):
-            rPropSet->setPropertyValue("SecondaryKeyReading", uno::makeAny(aIter.toString()));
+            rPropSet->setPropertyValue("SecondaryKeyReading", uno::Any(aIter.toString()));
             break;
         case XML_ELEMENT(TEXT, XML_STRING_VALUE_PHONETIC):
-            rPropSet->setPropertyValue("TextReading", uno::makeAny(aIter.toString()));
+            rPropSet->setPropertyValue("TextReading", uno::Any(aIter.toString()));
             break;
         case XML_ELEMENT(TEXT, XML_MAIN_ENTRY):
         {
@@ -1278,7 +1279,7 @@ void XMLAlphaIndexMarkImportContext_Impl::ProcessAttribute(
             if (::sax::Converter::convertBool(bTmp, aIter.toView()))
                 bMainEntry = bTmp;
 
-            rPropSet->setPropertyValue("IsMainEntry", uno::makeAny(bMainEntry));
+            rPropSet->setPropertyValue("IsMainEntry", uno::Any(bMainEntry));
             break;
         }
         default:
@@ -1433,6 +1434,7 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > XMLImpSpanContext_Impl
 
     case XML_ELEMENT(FIELD, XML_FIELDMARK):
     case XML_ELEMENT(FIELD, XML_FIELDMARK_START):
+    case XML_ELEMENT(FIELD, XML_FIELDMARK_SEPARATOR):
     case XML_ELEMENT(FIELD, XML_FIELDMARK_END):
         pContext = new XMLTextMarkImportContext(rImport, *rImport.GetTextImport(),
                                                 rHints.GetCrossRefHeadingBookmark());
@@ -1546,7 +1548,7 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > XMLImpSpanContext_Impl
                 rImport, nElement, xAttrList, xShapes );
             pContext = pShapeContext;
             // OD 2004-04-20 #i26791# - keep shape in a text frame hint to
-            // adjust its anchor position, if its at-character anchored
+            // adjust its anchor position, if it's at-character anchored
             Reference < XTextRange > xAnchorPos =
                 rImport.GetTextImport()->GetCursor()->getStart();
             rHints.push_back(
@@ -1674,6 +1676,10 @@ XMLParaContext::XMLParaContext(
                 nStartValue = sal::static_int_cast< sal_Int16 >(aIter.toInt32());
             }
             break;
+        case XML_ELEMENT(LO_EXT, XML_MARKER_STYLE_NAME):
+            if (auto pStyle = rImport.GetTextImport()->FindAutoCharStyle(aIter.toString()))
+                m_aMarkerStyleName = pStyle->GetAutoName();
+            break;
         default:
             XMLOFF_WARN_UNKNOWN("xmloff", aIter);
         }
@@ -1687,10 +1693,19 @@ void XMLParaContext::endFastElement(sal_Int32 )
 {
     rtl::Reference < XMLTextImportHelper > xTxtImport(
         GetImport().GetTextImport());
-    Reference < XTextRange > xCrsrRange( xTxtImport->GetCursorAsRange() );
-    if( !xCrsrRange.is() )
-        return; // Robust (defective file)
-    Reference < XTextRange > xEnd(xCrsrRange->getStart());
+    Reference<XTextRange> xEnd;
+    try
+    {
+        Reference<XTextRange> const xCrsrRange(xTxtImport->GetCursorAsRange());
+        if (!xCrsrRange.is())
+            return; // Robust (defective file)
+        xEnd = xCrsrRange->getStart();
+    }
+    catch (uno::Exception const&)
+    {
+        SAL_INFO("xmloff.text", "XMLParaContext: cursor disposed?");
+        return;
+    }
 
     // if we have an id set for this paragraph, get a cursor for this
     // paragraph and register it with the given identifier
@@ -1709,6 +1724,21 @@ void XMLParaContext::endFastElement(sal_Int32 )
 
     // insert a paragraph break
     xTxtImport->InsertControlCharacter( ControlCharacter::APPEND_PARAGRAPH );
+
+    if (!m_aMarkerStyleName.isEmpty())
+    {
+        if (css::uno::Reference<css::beans::XPropertySet> xPropSet{ xStart, css::uno::UNO_QUERY })
+        {
+            try
+            {
+                xPropSet->setPropertyValue("ListAutoFormat", css::uno::Any(m_aMarkerStyleName));
+            }
+            catch (const css::beans::UnknownPropertyException&)
+            {
+                // no problem
+            }
+        }
+    }
 
     // create a cursor that select the whole last paragraph
     Reference < XTextCursor > xAttrCursor;
@@ -1791,7 +1821,7 @@ void XMLParaContext::endFastElement(sal_Int32 )
                    hasPropertyByName(sNumberingIsNumber))
                 {
                     xPropSet->setPropertyValue
-                        (sNumberingIsNumber, makeAny( false ) );
+                        (sNumberingIsNumber, Any( false ) );
                 }
             }
             if (bIsRestart)
@@ -1804,14 +1834,14 @@ void XMLParaContext::endFastElement(sal_Int32 )
                     hasPropertyByName(sParaIsNumberingRestart))
                 {
                     xPropSet->setPropertyValue
-                        (sParaIsNumberingRestart, makeAny(true));
+                        (sParaIsNumberingRestart, Any(true));
                 }
 
                 if (xPropSet->getPropertySetInfo()->
                     hasPropertyByName(sNumberingStartValue))
                 {
                     xPropSet->setPropertyValue
-                        (sNumberingStartValue, makeAny(nStartValue));
+                        (sNumberingStartValue, Any(nStartValue));
                 }
             }
 
@@ -1820,6 +1850,19 @@ void XMLParaContext::endFastElement(sal_Int32 )
 
     if (m_xHints)
     {
+        bool bSetNoFormatAttr = false;
+        uno::Reference<beans::XPropertySet> xCursorProps(xAttrCursor, uno::UNO_QUERY);
+        if (m_xHints->GetHints().size() > 1 || !m_aMarkerStyleName.isEmpty())
+        {
+            // We have multiple hints, then make try to ask the cursor to not upgrade our character
+            // attributes to paragraph-level formatting, which would lead to incorrect rendering.
+            uno::Reference<beans::XPropertySetInfo> xCursorPropsInfo = xCursorProps->getPropertySetInfo();
+            bSetNoFormatAttr = xCursorPropsInfo->hasPropertyByName("NoFormatAttr");
+        }
+        if (bSetNoFormatAttr)
+        {
+            xCursorProps->setPropertyValue("NoFormatAttr", uno::Any(true));
+        }
         for (const auto & i : m_xHints->GetHints())
         {
             XMLHint_Impl *const pHint = i.get();
@@ -1827,7 +1870,7 @@ void XMLParaContext::endFastElement(sal_Int32 )
             xAttrCursor->gotoRange( pHint->GetEnd(), true );
             switch( pHint->GetType() )
             {
-            case XML_HINT_STYLE:
+            case XMLHintType::XML_HINT_STYLE:
                 {
                     const OUString& rStyleName =
                             static_cast<XMLStyleHint_Impl *>(pHint)->GetStyleName();
@@ -1837,7 +1880,7 @@ void XMLParaContext::endFastElement(sal_Int32 )
                                                       false );
                 }
                 break;
-            case XML_HINT_REFERENCE:
+            case XMLHintType::XML_HINT_REFERENCE:
                 {
                     const OUString& rRefName =
                             static_cast<XMLReferenceHint_Impl *>(pHint)->GetRefName();
@@ -1856,7 +1899,7 @@ void XMLParaContext::endFastElement(sal_Int32 )
                     }
                 }
                 break;
-            case XML_HINT_HYPERLINK:
+            case XMLHintType::XML_HINT_HYPERLINK:
                 {
                     const XMLHyperlinkHint_Impl *pHHint =
                         static_cast<const XMLHyperlinkHint_Impl *>(pHint);
@@ -1870,7 +1913,7 @@ void XMLParaContext::endFastElement(sal_Int32 )
                                               pHHint->GetEventsContext() );
                 }
                 break;
-            case XML_HINT_INDEX_MARK:
+            case XMLHintType::XML_HINT_INDEX_MARK:
                 {
                     Reference<beans::XPropertySet> xMark(
                         static_cast<const XMLIndexMarkHint_Impl *>(pHint)->GetMark());
@@ -1886,7 +1929,7 @@ void XMLParaContext::endFastElement(sal_Int32 )
                     }
                 }
                 break;
-            case XML_HINT_TEXT_FRAME:
+            case XMLHintType::XML_HINT_TEXT_FRAME:
                 {
                     const XMLTextFrameHint_Impl *pFHint =
                         static_cast<const XMLTextFrameHint_Impl *>(pHint);
@@ -1931,7 +1974,7 @@ void XMLParaContext::endFastElement(sal_Int32 )
             /* Core impl. of the unification of drawing objects and
                Writer fly frames (#i26791#)
             */
-            case XML_HINT_DRAW:
+            case XMLHintType::XML_HINT_DRAW:
                 {
                     const XMLDrawHint_Impl *pDHint =
                         static_cast<const XMLDrawHint_Impl*>(pHint);
@@ -1958,6 +2001,10 @@ void XMLParaContext::endFastElement(sal_Int32 )
                 SAL_WARN( "xmloff.text", "What's this" );
                 break;
             }
+        }
+        if (bSetNoFormatAttr)
+        {
+            xCursorProps->setPropertyValue("NoFormatAttr", uno::Any(false));
         }
     }
     m_xHints.reset();

@@ -59,6 +59,7 @@
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <svx/svdotext.hxx>
 #include <editeng/outlobj.hxx>
@@ -596,7 +597,7 @@ bool AnimationImporter::convertAnimationNode( const Reference< XAnimationNode >&
             aEvent.Trigger = EventTrigger::END_EVENT;
             aEvent.Repeat = 0;
 
-            xNode->setBegin( makeAny( aEvent ) );
+            xNode->setBegin( Any( aEvent ) );
         }
 
         // add to after effect nodes for later processing
@@ -854,13 +855,13 @@ void AnimationImporter::fillNode( Reference< XAnimationNode > const & xNode, con
                 sal_Int32 nIndex = 0;
                 while( (nElements--) && (nIndex >= 0) )
                 {
-                    const OUString aToken( aString.getToken( 0, ';', nIndex ) );
+                    const std::u16string_view aToken( o3tl::getToken(aString, 0, ';', nIndex ) );
 
-                    sal_Int32 nPos = aToken.indexOf( ',' );
-                    if( nPos >= 0 )
+                    size_t nPos = aToken.find( ',' );
+                    if( nPos != std::u16string_view::npos )
                     {
-                        pValues->Time = aToken.copy( 0, nPos ).toDouble();
-                        pValues->Progress = aToken.copy( nPos+1 ).toDouble();
+                        pValues->Time = o3tl::toDouble(aToken.substr( 0, nPos ));
+                        pValues->Progress = o3tl::toDouble(aToken.substr( nPos+1 ));
                     }
                     pValues++;
                 }
@@ -1315,7 +1316,7 @@ Any AnimationImporter::implGetColorAny( sal_Int32 nMode, sal_Int32  nA, sal_Int3
             dump( ",%ld", nB );
             dump( ",%ld)", nC );
             Color aColor( static_cast<sal_uInt8>(nA), static_cast<sal_uInt8>(nB), static_cast<sal_uInt8>(nC) );
-            return makeAny( static_cast<sal_Int32>(aColor.GetRGBColor()) );
+            return Any( static_cast<sal_Int32>(aColor.GetRGBColor()) );
         }
     case 1: // hsl
         {
@@ -1325,7 +1326,7 @@ Any AnimationImporter::implGetColorAny( sal_Int32 nMode, sal_Int32  nA, sal_Int3
             Sequence< double > aHSL{ nA * 360.0/255.0,
                                      nB / 255.0,
                                      nC / 255.0 };
-            return makeAny( aHSL );
+            return Any( aHSL );
         }
 
     case 2: // index
@@ -1336,7 +1337,7 @@ Any AnimationImporter::implGetColorAny( sal_Int32 nMode, sal_Int32  nA, sal_Int3
             dump( " [%ld", static_cast<sal_Int32>(aColor.GetRed()) );
             dump( ",%ld", static_cast<sal_Int32>(aColor.GetGreen()) );
             dump( ",%ld])", static_cast<sal_Int32>(aColor.GetBlue()) );
-            return makeAny( static_cast<sal_Int32>(aColor.GetRGBColor()) );
+            return Any( static_cast<sal_Int32>(aColor.GetRGBColor()) );
         }
 
     default:
@@ -1726,7 +1727,7 @@ void AnimationImporter::importCommandContainer( const Atom* pAtom, const Referen
     }
     else if( aParam.startsWith( "playFrom" ) )
     {
-        const OUString aMediaTime( aParam.copy( 9, aParam.getLength() - 10 ) );
+        const std::u16string_view aMediaTime( aParam.subView( 9, aParam.getLength() - 10 ) );
         rtl_math_ConversionStatus eStatus;
         double fMediaTime = ::rtl::math::stringToDouble( aMediaTime, u'.', u',', &eStatus );
         if( eStatus == rtl_math_ConversionStatus_Ok )
@@ -1756,7 +1757,7 @@ void AnimationImporter::importCommandContainer( const Atom* pAtom, const Referen
     if( aParamValue.Value.hasValue() )
     {
         Sequence< NamedValue > aParamSeq( &aParamValue, 1 );
-        xCommand->setParameter( makeAny( aParamSeq ) );
+        xCommand->setParameter( Any( aParamSeq ) );
     }
 }
 
@@ -1873,7 +1874,7 @@ void AnimationImporter::importAnimateScaleContainer( const Atom* pAtom, const Re
             {
                 aPair.First <<= static_cast<double>(fFromX) / 100.0;
                 aPair.Second <<= static_cast<double>(fFromY) / 100.0;
-                xTransform->setFrom( makeAny( aPair ) );
+                xTransform->setFrom( Any( aPair ) );
             }
 
             // 'to' value
@@ -1881,7 +1882,7 @@ void AnimationImporter::importAnimateScaleContainer( const Atom* pAtom, const Re
             {
                 aPair.First <<= static_cast<double>(fToX) / 100.0;
                 aPair.Second <<= static_cast<double>(fToY) / 100.0;
-                xTransform->setTo( makeAny( aPair ) );
+                xTransform->setTo( Any( aPair ) );
             }
 
             // 'by' value
@@ -1893,7 +1894,7 @@ void AnimationImporter::importAnimateScaleContainer( const Atom* pAtom, const Re
                 if( nBits & 2 )
                 {
                     // 'from' value given, import normally
-                    xTransform->setBy( makeAny( aPair ) );
+                    xTransform->setBy( Any( aPair ) );
                 }
                 else
                 {
@@ -1902,7 +1903,7 @@ void AnimationImporter::importAnimateScaleContainer( const Atom* pAtom, const Re
                     // PPT, which exports animateScale effects
                     // with a sole 'by' value, but with the
                     // semantics of a sole 'to' animation
-                    xTransform->setTo( makeAny( aPair ) );
+                    xTransform->setTo( Any( aPair ) );
                 }
             }
 
@@ -1966,13 +1967,13 @@ void AnimationImporter::importAnimateRotationContainer( const Atom* pAtom, const
             mrStCtrl.ReadUInt32( nBits ).ReadFloat( fBy ).ReadFloat( fFrom ).ReadFloat( fTo ).ReadUInt32( nU1 );
 
             if( nBits & 1 )
-                xTransform->setBy( makeAny( static_cast<double>(fBy) ) );
+                xTransform->setBy( Any( static_cast<double>(fBy) ) );
 
             if( nBits & 2 )
-                xTransform->setFrom( makeAny( static_cast<double>(fFrom) ) );
+                xTransform->setFrom( Any( static_cast<double>(fFrom) ) );
 
             if( nBits & 4 )
-                xTransform->setTo( makeAny( static_cast<double>(fTo) ) );
+                xTransform->setTo( Any( static_cast<double>(fTo) ) );
 
 #ifdef DBG_ANIM_LOG
             if( nBits & 1 )
@@ -2057,7 +2058,7 @@ void AnimationImporter::importAnimationValues( const Atom* pAtom, const Referenc
         {
             float fRepeat(0.0);
             mrStCtrl.ReadFloat( fRepeat );
-            xNode->setRepeatCount( (fRepeat < (float(3.40282346638528860e+38))) ? makeAny( static_cast<double>(fRepeat) ) : makeAny( Timing_INDEFINITE ) );
+            xNode->setRepeatCount( (fRepeat < (float(3.40282346638528860e+38))) ? Any( static_cast<double>(fRepeat) ) : Any( Timing_INDEFINITE ) );
 
 #ifdef DBG_ANIM_LOG
             if( (fRepeat < ((float)3.40282346638528860e+38)) )
@@ -2367,7 +2368,7 @@ void AnimationImporter::importAnimationEvents( const Atom* pAtom, const Referenc
                     }
 
                     if( (nBegin != 0) || (aEvent.Trigger == EventTrigger::NONE) )
-                        aEvent.Offset = (nBegin == -1) ? makeAny( Timing_INDEFINITE ) : makeAny( nBegin / 1000.0 );
+                        aEvent.Offset = (nBegin == -1) ? Any( Timing_INDEFINITE ) : Any( nBegin / 1000.0 );
                 }
                 break;
                 case DFF_msofbtAnimateTargetElement:
@@ -2385,7 +2386,7 @@ void AnimationImporter::importAnimationEvents( const Atom* pAtom, const Referenc
                 pChildAtom = Atom::findNextChildAtom( pChildAtom );
             }
 
-            *pEvents = oox::addToSequence( *pEvents, (aEvent.Trigger == EventTrigger::NONE) ? aEvent.Offset : makeAny( aEvent ) );
+            *pEvents = oox::addToSequence( *pEvents, (aEvent.Trigger == EventTrigger::NONE) ? aEvent.Offset : Any( aEvent ) );
         }
 
         pEventAtom = pAtom->findNextChildAtom( DFF_msofbtAnimEvent, pEventAtom );
@@ -2447,7 +2448,7 @@ void AnimationImporter::importAnimationActions( const Atom* pAtom, const Referen
     mrStCtrl.ReadInt32( nU5 );
 
     if( nEndSync == 1 )
-        xNode->setEndSync( makeAny( AnimationEndSync::ALL ) );
+        xNode->setEndSync( Any( AnimationEndSync::ALL ) );
 
 #ifdef DBG_ANIM_LOG
     dump( " concurrent=\"%s\"", nConcurrent == 0 ? "disabled" : (nConcurrent == 1 ? "enabled" : "unknown") );
@@ -2507,7 +2508,7 @@ void AnimationImporter::importTargetElementContainer( const Atom* pAtom, Any& rT
                     if((begin == -1) && (end == -1))
                         break;
 
-                    SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( pSdrObject );
+                    SdrTextObj* pTextObj = DynCastSdrTextObj( pSdrObject );
                     if(!pTextObj)
                         break;
 

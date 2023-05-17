@@ -23,7 +23,7 @@
 #include <vcl/weld.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <dbaccess/dataview.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <vcl/stdtext.hxx>
 #include <framework/titlehelper.hxx>
@@ -370,11 +370,11 @@ namespace
         // #i68216# is the bug which requests to fix the code in Draw which relies on
         //          framework's implementation details
         if ( !!_rFeatureState.sTitle )
-            _out_rStates.push_back( makeAny( *_rFeatureState.sTitle ) );
+            _out_rStates.push_back( Any( *_rFeatureState.sTitle ) );
         if ( !!_rFeatureState.bChecked )
-            _out_rStates.push_back( makeAny( *_rFeatureState.bChecked ) );
+            _out_rStates.push_back( Any( *_rFeatureState.bChecked ) );
         if ( !!_rFeatureState.bInvisible )
-            _out_rStates.push_back( makeAny( Visibility( !*_rFeatureState.bInvisible ) ) );
+            _out_rStates.push_back( Any( Visibility( !*_rFeatureState.bInvisible ) ) );
         if ( _rFeatureState.aValue.hasValue() )
             _out_rStates.push_back( _rFeatureState.aValue );
         if ( _out_rStates.empty() )
@@ -755,7 +755,7 @@ void OGenericUnoController::frameAction(const FrameActionEvent& aEvent)
         m_aCurrentFrame.frameAction( aEvent.Action );
 }
 
-void OGenericUnoController::implDescribeSupportedFeature( const char* _pAsciiCommandURL,
+void OGenericUnoController::implDescribeSupportedFeature( const OUString& _rCommandURL,
         sal_uInt16 _nFeatureId, sal_Int16 _nCommandGroup )
 {
 #ifdef DBG_UTIL
@@ -765,7 +765,7 @@ void OGenericUnoController::implDescribeSupportedFeature( const char* _pAsciiCom
                 "OGenericUnoController::implDescribeSupportedFeature: invalid feature id!" );
 
     ControllerFeature aFeature;
-    aFeature.Command = OUString::createFromAscii( _pAsciiCommandURL );
+    aFeature.Command = _rCommandURL;
     aFeature.nFeatureId = _nFeatureId;
     aFeature.GroupId = _nCommandGroup;
 

@@ -21,6 +21,7 @@
 #include "SchemaRestrictionContext.hxx"
 #include "xformsapi.hxx"
 
+#include <utility>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmlnamespace.hxx>
@@ -38,14 +39,14 @@
 #include <com/sun/star/xsd/DataTypeClass.hpp>
 #include <com/sun/star/xsd/WhiteSpaceTreatment.hpp>
 
+#include <o3tl/string_view.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 
 using com::sun::star::uno::Reference;
 using com::sun::star::uno::Exception;
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 using namespace com::sun::star;
 using com::sun::star::util::Duration;
 using com::sun::star::xml::sax::XFastAttributeList;
@@ -56,10 +57,10 @@ using namespace xmloff::token;
 SchemaRestrictionContext::SchemaRestrictionContext(
     SvXMLImport& rImport,
     Reference<css::xforms::XDataTypeRepository> const & rRepository,
-    const OUString& sTypeName ) :
+    OUString sTypeName ) :
         TokenContext( rImport ),
         mxRepository( rRepository ),
-        msTypeName( sTypeName )
+        msTypeName(std::move( sTypeName ))
 {
     SAL_WARN_IF( !mxRepository.is(), "xmloff", "need repository" );
 }
@@ -103,21 +104,21 @@ typedef Any (*convert_t)( const OUString& );
 
 static Any xforms_string( const OUString& rValue )
 {
-    return makeAny( rValue );
+    return Any( rValue );
 }
 
 static Any xforms_int32( const OUString& rValue )
 {
     sal_Int32 nValue;
     bool bSuccess = ::sax::Converter::convertNumber( nValue, rValue );
-    return bSuccess ? makeAny( nValue ) : Any();
+    return bSuccess ? Any( nValue ) : Any();
 }
 
 static Any xforms_int16( const OUString& rValue )
 {
     sal_Int32 nValue;
     bool bSuccess = ::sax::Converter::convertNumber( nValue, rValue );
-    return bSuccess ? makeAny( static_cast<sal_Int16>( nValue ) ) : Any();
+    return bSuccess ? Any( static_cast<sal_Int16>( nValue ) ) : Any();
 }
 
 static Any xforms_whitespace( const OUString& rValue )
@@ -136,7 +137,7 @@ static Any xforms_double( const OUString& rValue )
 {
     double fValue;
     bool bSuccess = ::sax::Converter::convertDouble( fValue, rValue );
-    return bSuccess ? makeAny( fValue ) : Any();
+    return bSuccess ? Any( fValue ) : Any();
 }
 
 static Any xforms_date( const OUString& rValue )
@@ -150,11 +151,11 @@ static Any xforms_date( const OUString& rValue )
     {
         util::Date aDate;
         aDate.Year = static_cast<sal_uInt16>(
-                     rValue.copy( 0, nPos1 ).toInt32() );
+                     o3tl::toInt32(rValue.subView( 0, nPos1 )) );
         aDate.Month = static_cast<sal_uInt16>(
-                      rValue.copy( nPos1 + 1, nPos2 - nPos1 - 1 ).toInt32() );
+                      o3tl::toInt32(rValue.subView( nPos1 + 1, nPos2 - nPos1 - 1 )) );
         aDate.Day   = static_cast<sal_uInt16>(
-                      rValue.copy( nPos2 + 1 ).toInt32() );
+                      o3tl::toInt32(rValue.subView( nPos2 + 1 )) );
         aAny <<= aDate;
     }
     return aAny;
@@ -164,7 +165,7 @@ static Any xforms_dateTime( const OUString& rValue )
 {
     util::DateTime aDateTime;
     bool const bSuccess = ::sax::Converter::parseDateTime(aDateTime, rValue);
-    return bSuccess ? makeAny( aDateTime ) : Any();
+    return bSuccess ? Any( aDateTime ) : Any();
 }
 
 static Any xforms_time( const OUString& rValue )

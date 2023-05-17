@@ -33,13 +33,13 @@
 #include <sfx2/frame.hxx>
 #include <sfx2/viewsh.hxx>
 
-const WhichRangesContainer SwParagraphNumTabPage::aPageRg(svl::Items<FN_NUMBER_NEWSTART, FN_NUMBER_NEWSTART_AT>);
+const WhichRangesContainer SwParagraphNumTabPage::s_aPageRg(svl::Items<FN_NUMBER_NEWSTART, FN_NUMBER_NEWSTART_AT>);
 
 SwParagraphNumTabPage::SwParagraphNumTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rAttr)
     : SfxTabPage(pPage, pController, "modules/swriter/ui/numparapage.ui", "NumParaPage", &rAttr)
     , msOutlineNumbering(SwResId(STR_OUTLINE_NUMBERING ))
-    , bModified(false)
-    , bCurNumrule(false)
+    , m_bModified(false)
+    , m_bCurNumrule(false)
     , m_xOutlineStartBX(m_xBuilder->weld_widget("boxOUTLINE"))
     , m_xOutlineLvLB(m_xBuilder->weld_combo_box("comboLB_OUTLINE_LEVEL"))
     , m_xNumberStyleBX(m_xBuilder->weld_widget("boxNUMBER_STYLE"))
@@ -61,13 +61,15 @@ SwParagraphNumTabPage::SwParagraphNumTabPage(weld::Container* pPage, weld::Dialo
     m_xRestartParaCountCB->set_state(TRISTATE_FALSE);
     m_xEditNumStyleBtn->set_sensitive(false);
 
-    const SfxPoolItem* pItem;
-    SfxObjectShell* pObjSh;
-    if(SfxItemState::SET == rAttr.GetItemState(SID_HTML_MODE, false, &pItem) ||
-        ( nullptr != ( pObjSh = SfxObjectShell::Current()) &&
-          nullptr != (pItem = pObjSh->GetItem(SID_HTML_MODE))))
+    const SfxUInt16Item* pItem = rAttr.GetItemIfSet(SID_HTML_MODE, false);
+    if (!pItem)
     {
-        const sal_uInt16 nHtmlMode = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if (SfxObjectShell* pObjSh = SfxObjectShell::Current())
+            pItem = pObjSh->GetItem(SID_HTML_MODE);
+    }
+    if(pItem)
+    {
+        const sal_uInt16 nHtmlMode = pItem->GetValue();
 
         if (HTMLMODE_ON & nHtmlMode)
             m_xCountParaFram->hide();
@@ -96,13 +98,13 @@ bool SwParagraphNumTabPage::FillItemSet( SfxItemSet* rSet )
     if (m_xOutlineLvLB->get_value_changed_from_saved())
     {
         const sal_uInt16 aOutlineLv = m_xOutlineLvLB->get_active();
-        const SfxUInt16Item* pOldOutlineLv = static_cast<const SfxUInt16Item*>(GetOldItem( *rSet, SID_ATTR_PARA_OUTLINE_LEVEL));
+        const SfxUInt16Item* pOldOutlineLv = GetOldItem( *rSet, SID_ATTR_PARA_OUTLINE_LEVEL);
         if (pOldOutlineLv)
         {
             std::unique_ptr<SfxUInt16Item> pOutlineLv(pOldOutlineLv->Clone());
             pOutlineLv->SetValue( aOutlineLv );
             rSet->Put(std::move(pOutlineLv));
-            bModified = true;
+            m_bModified = true;
         }
     }
 
@@ -117,14 +119,14 @@ bool SwParagraphNumTabPage::FillItemSet( SfxItemSet* rSet )
             std::unique_ptr<SfxStringItem> pRule(pOldRule->Clone());
             pRule->SetValue(aStyle);
             rSet->Put(std::move(pRule));
-            bModified = true;
+            m_bModified = true;
         }
     }
     if (m_xNewStartCB->get_state_changed_from_saved() ||
         m_xNewStartNumberCB->get_state_changed_from_saved()||
         m_xNewStartNF->get_value_changed_from_saved())
     {
-        bModified = true;
+        m_bModified = true;
         bool bNewStartChecked = TRISTATE_TRUE == m_xNewStartCB->get_state();
         bool bNumberNewStartChecked = TRISTATE_TRUE == m_xNewStartNumberCB->get_state();
         rSet->Put(SfxBoolItem(FN_NUMBER_NEWSTART, bNewStartChecked));
@@ -141,9 +143,9 @@ bool SwParagraphNumTabPage::FillItemSet( SfxItemSet* rSet )
                                 m_xRestartNF->get_value() : 0 ));
         aFormat.SetCountLines(m_xCountParaCB->get_active());
         rSet->Put(aFormat);
-        bModified = true;
+        m_bModified = true;
     }
-    return bModified;
+    return m_bModified;
 }
 
 void SwParagraphNumTabPage::ChangesApplied()
@@ -165,7 +167,7 @@ void SwParagraphNumTabPage::Reset(const SfxItemSet* rSet)
 
     if( eItemState >= SfxItemState::DEFAULT )
     {
-        sal_Int16 nOutlineLv = static_cast<const SfxUInt16Item &>(rSet->Get( GetWhich(SID_ATTR_PARA_OUTLINE_LEVEL) )).GetValue();
+        sal_Int16 nOutlineLv = rSet->Get( GetWhich(SID_ATTR_PARA_OUTLINE_LEVEL) ).GetValue();
         m_xOutlineLvLB->set_active(nOutlineLv) ;
     }
     else
@@ -210,7 +212,7 @@ void SwParagraphNumTabPage::Reset(const SfxItemSet* rSet)
     eItemState = rSet->GetItemState( FN_NUMBER_NEWSTART );
     if(eItemState > SfxItemState::DEFAULT )
     {
-        bCurNumrule = true;
+        m_bCurNumrule = true;
         const SfxBoolItem& rStart = static_cast<const SfxBoolItem&>(rSet->Get(FN_NUMBER_NEWSTART));
 
         m_xNewStartCB->set_state(rStart.GetValue() ? TRISTATE_TRUE : TRISTATE_FALSE );
@@ -253,7 +255,7 @@ void SwParagraphNumTabPage::Reset(const SfxItemSet* rSet)
     m_xRestartParaCountCB->save_state();
     m_xRestartNF->save_value();
 
-    bModified = false;
+    m_bModified = false;
 }
 
 void SwParagraphNumTabPage::DisableOutline()
@@ -341,7 +343,7 @@ void SwParagraphNumTabPage::ExecuteEditNumStyle_Impl(
 
 IMPL_LINK(SwParagraphNumTabPage, StyleHdl_Impl, weld::ComboBox&, rBox, void)
 {
-    bool bEnable = bCurNumrule || rBox.get_active() > 0;
+    bool bEnable = m_bCurNumrule || rBox.get_active() > 0;
     m_xNewStartCB->set_sensitive(bEnable);
     NewStartHdl_Impl(*m_xNewStartCB);
 }

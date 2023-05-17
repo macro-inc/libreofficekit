@@ -18,9 +18,9 @@
  */
 
 #include <sal/config.h>
+#include <o3tl/sprintf.hxx>
 #include <osl/thread.h>
 #include <rtl/math.hxx>
-#include <cstdio>
 
 #include <bitmaps.hlst>
 #include <cmath>
@@ -206,7 +206,6 @@ void GridWindow::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 
 GridDialog::GridDialog(weld::Window* pParent, double* pXValues, double* pYValues, int nValues)
     : GenericDialogController(pParent, "modules/scanner/ui/griddialog.ui", "GridDialog")
-    , m_xOKButton(m_xBuilder->weld_button("ok"))
     , m_xResetTypeBox(m_xBuilder->weld_combo_box("resetTypeCombobox"))
     , m_xResetButton(m_xBuilder->weld_button("resetButton"))
     , m_xGridWindow(new GridWindow)
@@ -446,7 +445,7 @@ void GridWindow::drawGrid(vcl::RenderContext& rRenderContext)
         drawLine(rRenderContext, fX, m_fMinY, fX, m_fMaxY);
         // draw tickmarks
         Point aPt = transform(fX, m_fMinY);
-        std::sprintf(pBuf, "%g", fX);
+        o3tl::sprintf(pBuf, "%g", fX);
         OUString aMark(pBuf, strlen(pBuf), osl_getThreadTextEncoding());
         Size aTextSize(rRenderContext.GetTextWidth(aMark), rRenderContext.GetTextHeight());
         aPt.AdjustX( -(aTextSize.Width() / 2) );
@@ -459,7 +458,7 @@ void GridWindow::drawGrid(vcl::RenderContext& rRenderContext)
         drawLine(rRenderContext, m_fMinX, fY, m_fMaxX, fY);
         // draw tickmarks
         Point aPt = transform(m_fMinX, fY);
-        std::sprintf(pBuf, "%g", fY);
+        o3tl::sprintf(pBuf, "%g", fY);
         OUString aMark(pBuf, strlen(pBuf), osl_getThreadTextEncoding());
         Size aTextSize(rRenderContext.GetTextWidth(aMark), rRenderContext.GetTextHeight());
         aPt.AdjustX( -(aTextSize.Width() + 2) );
@@ -523,32 +522,32 @@ void GridWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangl
 
 bool GridWindow::MouseMove( const MouseEvent& rEvt )
 {
-    if( rEvt.GetButtons() == MOUSE_LEFT && m_nDragIndex != npos )
+    if( rEvt.GetButtons() != MOUSE_LEFT || m_nDragIndex == npos )
+        return false;
+
+    Point aPoint( rEvt.GetPosPixel() );
+
+    if( m_nDragIndex == 0 || m_nDragIndex == m_aHandles.size() - 1)
     {
-        Point aPoint( rEvt.GetPosPixel() );
+        aPoint.setX( m_aHandles[m_nDragIndex].maPos.X() );
+    }
+    else
+    {
+        if(aPoint.X() < m_aGridArea.Left())
+            aPoint.setX( m_aGridArea.Left() );
+        else if(aPoint.X() > m_aGridArea.Right())
+            aPoint.setX( m_aGridArea.Right() );
+    }
 
-        if( m_nDragIndex == 0 || m_nDragIndex == m_aHandles.size() - 1)
-        {
-            aPoint.setX( m_aHandles[m_nDragIndex].maPos.X() );
-        }
-        else
-        {
-            if(aPoint.X() < m_aGridArea.Left())
-                aPoint.setX( m_aGridArea.Left() );
-            else if(aPoint.X() > m_aGridArea.Right())
-                aPoint.setX( m_aGridArea.Right() );
-        }
+    if( aPoint.Y() < m_aGridArea.Top() )
+        aPoint.setY( m_aGridArea.Top() );
+    else if( aPoint.Y() > m_aGridArea.Bottom() )
+        aPoint.setY( m_aGridArea.Bottom() );
 
-        if( aPoint.Y() < m_aGridArea.Top() )
-            aPoint.setY( m_aGridArea.Top() );
-        else if( aPoint.Y() > m_aGridArea.Bottom() )
-            aPoint.setY( m_aGridArea.Bottom() );
-
-        if( aPoint != m_aHandles[m_nDragIndex].maPos )
-        {
-            m_aHandles[m_nDragIndex].maPos = aPoint;
-            Invalidate( m_aGridArea );
-        }
+    if( aPoint != m_aHandles[m_nDragIndex].maPos )
+    {
+        m_aHandles[m_nDragIndex].maPos = aPoint;
+        Invalidate( m_aGridArea );
     }
 
     return false;
@@ -648,7 +647,7 @@ void GridWindow::ChangeMode(ResetType nType)
         {
             for( int i = 0; i < m_nValues; i++ )
             {
-                m_pNewYValues[ i ] = m_fMinY + (m_fMaxY-m_fMinY)*(rtl::math::expm1((m_pXValues[i]-m_fMinX)/(m_fMaxX-m_fMinX)))/(M_E-1.0);
+                m_pNewYValues[ i ] = m_fMinY + (m_fMaxY-m_fMinY)*(std::expm1((m_pXValues[i]-m_fMinX)/(m_fMaxX-m_fMinX)))/(M_E-1.0);
             }
         }
         break;

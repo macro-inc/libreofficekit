@@ -17,6 +17,7 @@
 
 #include <document.hxx>
 
+#include <o3tl/string_view.hxx>
 #include <svl/style.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/frame.hxx>
@@ -77,7 +78,11 @@ IMPL_LINK_NOARG(ScCondFrmtEntry, EntrySelectHdl, const MouseEvent&, bool)
 
 void ScCondFrmtEntry::SetIndex(sal_Int32 nIndex)
 {
-    mxFtCondNr->set_label(maStrCondition + OUString::number(nIndex));
+    OUString sLabel = maStrCondition + OUString::number(nIndex);
+    mxFtCondNr->set_label(sLabel);
+
+    // tdf#124412: uitest
+    mxFtCondition->set_buildable_name(sLabel.toUtf8());
 }
 
 void ScCondFrmtEntry::Select()
@@ -253,26 +258,34 @@ IMPL_LINK(ScConditionFrmtEntry, OnEdChanged, formula::RefEdit&, rRefEdit, void)
     }
 
     ScCompiler aComp( *mpDoc, maPos, mpDoc->GetGrammar() );
+    aComp.SetExtendedErrorDetection( ScCompiler::ExtendedErrorDetection::EXTENDED_ERROR_DETECTION_NAME_BREAK);
     std::unique_ptr<ScTokenArray> ta(aComp.CompileString(aFormula));
 
-    // Error, warn the user
-    if( ta->GetCodeError() != FormulaError::NONE || ( ta->GetLen() == 0 ) )
+    // Error, warn the user if it is not an unknown name.
+    if (ta->GetCodeError() != FormulaError::NoName && (ta->GetCodeError() != FormulaError::NONE || ta->GetLen() == 0))
     {
         rEdit.set_message_type(weld::EntryMessageType::Error);
         mxFtVal->set_label(ScResId(STR_VALID_DEFERROR));
         return;
     }
 
-    // Recognized col/row name or string token, warn the user
-    formula::FormulaToken* token = ta->FirstToken();
-    formula::StackVar t = token->GetType();
-    OpCode op = token->GetOpCode();
-    if( ( op == ocColRowName ) ||
-        ( ( op == ocBad ) && ( t == formula::svString ) )
-      )
+    // Unrecognized name, warn the user; i.e. happens when starting to type and
+    // will go away once a valid name is completed.
+    if (ta->GetCodeError() == FormulaError::NoName)
     {
         rEdit.set_message_type(weld::EntryMessageType::Warning);
         mxFtVal->set_label(ScResId(STR_UNQUOTED_STRING));
+        return;
+    }
+
+    // Generate RPN to detect further errors.
+    if (ta->GetLen() > 0)
+        aComp.CompileTokenArray();
+    // Error, warn the user.
+    if (ta->GetCodeError() != FormulaError::NONE || (ta->GetCodeLen() == 0))
+    {
+        rEdit.set_message_type(weld::EntryMessageType::Error);
+        mxFtVal->set_label(ScResId(STR_VALID_DEFERROR));
         return;
     }
 
@@ -601,11 +614,11 @@ const struct
     { COLORSCALE_FORMULA,    "formula" },
 };
 
-ScColorScaleEntryType getTypeForId(const OUString& sId)
+ScColorScaleEntryType getTypeForId(std::u16string_view sId)
 {
     for (auto& r : TypeIdMap)
     {
-        if (sId.equalsAscii(r.sId))
+        if (o3tl::equalsAscii(sId, r.sId))
             return r.eType;
     }
     assert(false); // The id is not in TypeIdMap - something not in sync?

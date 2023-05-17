@@ -27,8 +27,9 @@
 #include <sfx2/app.hxx>
 #include <sfx2/sfxsids.hrc>
 #include <sfx2/thumbnailview.hxx>
+#include <utility>
 #include <vcl/image.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 using namespace ::com::sun::star;
@@ -73,8 +74,8 @@ bool PagePreviewProvider::NeedsPageObject()
 
 //===== TemplatePreviewProvider ===============================================
 
-TemplatePreviewProvider::TemplatePreviewProvider (const OUString& rsURL)
-    : msURL(rsURL)
+TemplatePreviewProvider::TemplatePreviewProvider (OUString sURL)
+    : msURL(std::move(sURL))
 {
 }
 
@@ -98,8 +99,8 @@ bool TemplatePreviewProvider::NeedsPageObject()
 
 //===== TemplatePageObjectProvider =============================================
 
-TemplatePageObjectProvider::TemplatePageObjectProvider (const OUString& rsURL)
-    : msURL(rsURL)
+TemplatePageObjectProvider::TemplatePageObjectProvider (OUString sURL)
+    : msURL(std::move(sURL))
 {
 }
 

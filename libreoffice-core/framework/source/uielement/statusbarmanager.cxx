@@ -39,6 +39,7 @@
 #include <svtools/statusbarcontroller.hxx>
 #include <tools/debug.hxx>
 
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/status.hxx>
@@ -120,16 +121,15 @@ StatusBarItemBits impl_convertItemStyleToItemBits( sal_Int16 nStyle )
 }
 
 StatusBarManager::StatusBarManager(
-    const uno::Reference< uno::XComponentContext >& rxContext,
-    const uno::Reference< frame::XFrame >& rFrame,
+    uno::Reference< uno::XComponentContext > xContext,
+    uno::Reference< frame::XFrame >  rFrame,
     StatusBar* pStatusBar ) :
     m_bDisposed( false ),
     m_bFrameActionRegistered( false ),
     m_bUpdateControllers( false ),
     m_pStatusBar( pStatusBar ),
-    m_xFrame( rFrame ),
-    m_aListenerContainer( m_mutex ),
-    m_xContext( rxContext )
+    m_xFrame(std::move( rFrame )),
+    m_xContext(std::move( xContext ))
 {
 
     m_xStatusbarControllerFactory = frame::theStatusbarControllerFactory::get(
@@ -177,9 +177,11 @@ void SAL_CALL StatusBarManager::dispose()
 {
     uno::Reference< lang::XComponent > xThis(this );
 
-    lang::EventObject aEvent( xThis );
-    m_aListenerContainer.disposeAndClear( aEvent );
-
+    {
+        lang::EventObject aEvent( xThis );
+        std::unique_lock aGuard(m_mutex);
+        m_aListenerContainer.disposeAndClear( aGuard, aEvent );
+    }
     {
         SolarMutexGuard g;
         if ( m_bDisposed )
@@ -223,12 +225,14 @@ void SAL_CALL StatusBarManager::addEventListener( const uno::Reference< lang::XE
     if ( m_bDisposed )
         throw lang::DisposedException();
 
-    m_aListenerContainer.addInterface( cppu::UnoType<lang::XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aListenerContainer.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL StatusBarManager::removeEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    m_aListenerContainer.removeInterface( cppu::UnoType<lang::XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aListenerContainer.removeInterface( aGuard, xListener );
 }
 
 // XUIConfigurationListener
@@ -300,33 +304,33 @@ void StatusBarManager::CreateControllers()
 
         aPropValue.Name     = "CommandURL";
         aPropValue.Value    <<= aCommandURL;
-        aPropVector.push_back( uno::makeAny( aPropValue ) );
+        aPropVector.push_back( uno::Any( aPropValue ) );
 
         aPropValue.Name     = "ModuleIdentifier";
         aPropValue.Value    <<= OUString();
-        aPropVector.push_back( uno::makeAny( aPropValue ) );
+        aPropVector.push_back( uno::Any( aPropValue ) );
 
         aPropValue.Name     = "Frame";
         aPropValue.Value    <<= m_xFrame;
-        aPropVector.push_back( uno::makeAny( aPropValue ) );
+        aPropVector.push_back( uno::Any( aPropValue ) );
 
         // TODO remove this
         aPropValue.Name     = "ServiceManager";
         aPropValue.Value    <<= uno::Reference<lang::XMultiServiceFactory>(m_xContext->getServiceManager(), uno::UNO_QUERY_THROW);
-        aPropVector.push_back( uno::makeAny( aPropValue ) );
+        aPropVector.push_back( uno::Any( aPropValue ) );
 
         aPropValue.Name     = "ParentWindow";
         aPropValue.Value    <<= xStatusbarWindow;
-        aPropVector.push_back( uno::makeAny( aPropValue ) );
+        aPropVector.push_back( uno::Any( aPropValue ) );
 
         // TODO still needing with the css::ui::XStatusbarItem?
         aPropValue.Name     = "Identifier";
         aPropValue.Value    <<= nId;
-        aPropVector.push_back( uno::makeAny( aPropValue ) );
+        aPropVector.push_back( uno::Any( aPropValue ) );
 
         aPropValue.Name     = "StatusbarItem";
         aPropValue.Value    <<= xStatusbarItem;
-        aPropVector.push_back( uno::makeAny( aPropValue ) );
+        aPropVector.push_back( uno::Any( aPropValue ) );
 
         uno::Sequence< uno::Any > aArgs( comphelper::containerToSequence( aPropVector ) );
 

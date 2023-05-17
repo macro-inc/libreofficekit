@@ -10,13 +10,14 @@
 #pragma once
 
 #include <sfx2/thumbnailview.hxx>
-#include <vcl/image.hxx>
+#include <vcl/bitmapex.hxx>
 
 #include <o3tl/typed_flags_set.hxx>
 
 #include <com/sun/star/util/URL.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 
+class INetURLObject;
 struct ImplSVEvent;
 namespace com::sun::star::frame { class XDispatch; }
 
@@ -62,10 +63,9 @@ public:
     RecentDocsView(std::unique_ptr<weld::ScrolledWindow> xWindow, std::unique_ptr<weld::Menu> xMenu);
     virtual ~RecentDocsView() override;
 
-    void insertItem(const OUString &rURL, const OUString &rTitle, const BitmapEx &rThumbnail, sal_uInt16 nId);
+    void insertItem(const OUString &rURL, const OUString &rTitle, const OUString& rThumbnail, bool isReadOnly, sal_uInt16 nId);
 
     static bool typeMatchesExtension(ApplicationType type, std::u16string_view rExt);
-    static BitmapEx getDefaultThumbnail(const OUString &rURL, bool bCheckEncrypted = true);
 
     ApplicationType mnFileTypes;
 
@@ -80,6 +80,10 @@ public:
     // received on load of recently used file
     void DispatchedLoadRecentUsedFile();
 
+    void clearUnavailableFiles();
+
+    void setFilter(ApplicationType aFilter);
+
 private:
     virtual bool MouseButtonDown( const MouseEvent& rMEvt ) override;
 
@@ -91,7 +95,7 @@ private:
 
     virtual void LoseFocus() override;
 
-    bool isAcceptedFile(const OUString &rURL) const;
+    bool isAcceptedFile(const INetURLObject& rURL) const;
 
     DECL_LINK( ExecuteHdl_Impl, void*, void );
 

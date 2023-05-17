@@ -29,6 +29,7 @@
 #include <ucbhelper/content.hxx>
 #include <svl/filenotation.hxx>
 #include <rtl/strbuf.hxx>
+#include <utility>
 
 namespace dbaui
 {
@@ -39,9 +40,9 @@ using namespace ::svt;
 constexpr OStringLiteral aGroupIdent("dBase III");
 
 
-ODbaseIndexDialog::ODbaseIndexDialog(weld::Window * pParent, const OUString& aDataSrcName)
+ODbaseIndexDialog::ODbaseIndexDialog(weld::Window * pParent, OUString aDataSrcName)
     : GenericDialogController(pParent, "dbaccess/ui/dbaseindexdialog.ui", "DBaseIndexDialog")
-    , m_aDSN(aDataSrcName)
+    , m_aDSN(std::move(aDataSrcName))
     , m_xPB_OK(m_xBuilder->weld_button("ok"))
     , m_xCB_Tables(m_xBuilder->weld_combo_box("table"))
     , m_xIndexes(m_xBuilder->weld_widget("frame"))
@@ -414,7 +415,7 @@ void OTableInfo::WriteInfFile( const OUString& rDSN ) const
     try
     {
         ::ucbhelper::Content aContent(aURL.GetURLNoPass(),Reference<XCommandEnvironment>(), comphelper::getProcessComponentContext());
-        aContent.executeCommand( "delete", makeAny( true ) );
+        aContent.executeCommand( "delete", Any( true ) );
     }
     catch (const Exception& )
     {

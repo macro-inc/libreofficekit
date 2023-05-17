@@ -77,6 +77,7 @@ namespace rtl
 /// @endcond
 
 #ifdef LIBO_INTERNAL_ONLY // "RTL_FAST_STRING"
+
 /**
 A wrapper dressing a string literal as a static-refcount rtl_String.
 
@@ -87,6 +88,7 @@ template<std::size_t N> class SAL_WARN_UNUSED OStringLiteral {
     static_assert(N != 0);
     static_assert(N - 1 <= std::numeric_limits<sal_Int32>::max(), "literal too long");
     friend class OString;
+    friend class OStringConstExpr;
 
 public:
 #if HAVE_CPP_CONSTEVAL
@@ -135,20 +137,53 @@ private:
         static_assert(offsetof(OStringLiteral, str.buffer) == offsetof(OStringLiteral, more.buffer));
     }
 
+    struct Data {
+        Data() = default;
+
+        oslInterlockedCount refCount = 0x40000000; // SAL_STRING_STATIC_FLAG (sal/rtl/strimp.hxx)
+        sal_Int32 length = N - 1;
+        char buffer[N] = {}; //TODO: drop initialization for C++20 (P1331R2)
+    };
+
     union {
         rtl_String str;
-        struct {
-            oslInterlockedCount refCount;
-            sal_Int32 length;
-            char buffer[N];
-        } more =
-            {
-                0x40000000, // SAL_STRING_STATIC_FLAG (sal/rtl/strimp.hxx)
-                N - 1,
-                {} //TODO: drop initialization for C++20 (P1331R2)
-            };
+        Data more = {};
     };
 };
+
+/**
+  This is intended to be used when declaring compile-time-constant structs or arrays
+  that can be initialised from named OStringLiteral e.g.
+
+    constexpr OStringLiteral AAA = u"aaa";
+    constexpr OStringLiteral BBB = u"bbb";
+    constexpr OStringConstExpr FOO[] { AAA, BBB };
+*/
+class OString;
+class OStringConstExpr
+{
+public:
+    template<std::size_t N> constexpr OStringConstExpr(OStringLiteral<N> const & literal):
+        pData(const_cast<rtl_String *>(&literal.str)) {}
+
+    // prevent mis-use
+    template<std::size_t N> constexpr OStringConstExpr(OStringLiteral<N> && literal)
+        = delete;
+
+    // no destructor necessary because we know we are pointing at a compile-time
+    // constant OStringLiteral, which bypasses ref-counting.
+
+    /**
+      make it easier to pass to OStringBuffer and similar without casting/converting
+    */
+    constexpr std::string_view asView() const { return std::string_view(pData->buffer, pData->length); }
+
+    inline operator const OString&() const;
+
+private:
+    rtl_String* pData;
+};
+
 #endif
 
 /* ======================================================================= */
@@ -281,6 +316,15 @@ public:
         rtl_string_newFromStr( &pData, value );
     }
 
+#if __cplusplus > 202002L // C++23 P2266R3 "Simpler implicit move"
+    template< typename T >
+    OString( T&& value, typename libreoffice_internal::NonConstCharArrayDetector< T, libreoffice_internal::Dummy >::Type = libreoffice_internal::Dummy() )
+    {
+        pData = NULL;
+        rtl_string_newFromStr( &pData, value );
+    }
+#endif
+
     /**
       New string from a string literal.
 
@@ -403,8 +447,8 @@ public:
      @overload
      @internal
     */
-    template< typename T >
-    OString( OStringNumber< T >&& n )
+    template< typename T, std::size_t N >
+    OString( StringNumberBase< char, T, N >&& n )
         : OString( n.buf, n.length )
     {}
 #endif
@@ -420,6 +464,22 @@ public:
     {
         rtl_string_release( pData );
     }
+
+#if defined LIBO_INTERNAL_ONLY
+    /** Provides an OString const & passing a storage pointer of an
+        rtl_String * handle.
+        It is more convenient to use C++ OString member functions when dealing
+        with rtl_String * handles.  Using this function avoids unnecessary
+        acquire()/release() calls for a temporary OString object.
+
+        @param ppHandle
+               pointer to storage
+        @return
+               OString const & based on given storage
+    */
+    static OString const & unacquired( rtl_String * const * ppHandle )
+        { return * reinterpret_cast< OString const * >( ppHandle ); }
+#endif
 
     /**
       Assign a new string.
@@ -561,12 +621,12 @@ public:
      @overload
      @internal
     */
-    template< typename T >
-    OString& operator+=( OStringNumber< T >&& n ) & {
+    template< typename T, std::size_t N >
+    OString& operator+=( StringNumberBase< char, T, N >&& n ) & {
         return operator +=(std::string_view(n.buf, n.length));
     }
-    template<typename T> void operator +=(
-        OStringNumber<T> &&) && = delete;
+    template<typename T, std::size_t N> void operator +=(
+        StringNumberBase<char, T, N> &&) && = delete;
 #endif
 
     /**
@@ -710,8 +770,7 @@ public:
 
       The result is true if and only if second string
       represents the same sequence of characters as the first string.
-      The ASCII string must be NULL-terminated and must be greater or
-      equal as length.
+      The ASCII string must be greater or equal as length.
       This function can't be used for language specific comparison.
 
 
@@ -1193,25 +1252,37 @@ public:
     template< typename T >
     friend typename libreoffice_internal::CharPtrDetector< T, bool >::Type operator==( const OString& rStr1, const T& value )
     {
-        return rStr1.compareTo( value ) == 0;
+        return
+            rtl_str_compare_WithLength(
+                rStr1.getStr(), rStr1.getLength(), value, rtl_str_getLength(value))
+            == 0;
     }
 
     template< typename T >
     friend typename libreoffice_internal::NonConstCharArrayDetector< T, bool >::Type operator==( const OString& rStr1, T& value )
     {
-        return rStr1.compareTo( value ) == 0;
+        return
+            rtl_str_compare_WithLength(
+                rStr1.getStr(), rStr1.getLength(), value, rtl_str_getLength(value))
+            == 0;
     }
 
     template< typename T >
     friend typename libreoffice_internal::CharPtrDetector< T, bool >::Type operator==( const T& value, const OString& rStr2 )
     {
-        return rStr2.compareTo( value ) == 0;
+        return
+            rtl_str_compare_WithLength(
+                value, rtl_str_getLength(value), rStr2.getStr(), rStr2.getLength())
+            == 0;
     }
 
     template< typename T >
     friend typename libreoffice_internal::NonConstCharArrayDetector< T, bool >::Type operator==( T& value, const OString& rStr2 )
     {
-        return rStr2.compareTo( value ) == 0;
+        return
+            rtl_str_compare_WithLength(
+                value, rtl_str_getLength(value), rStr2.getStr(), rStr2.getLength())
+            == 0;
     }
 
     /**
@@ -2156,28 +2227,31 @@ public:
     //
     // would not compile):
     template<typename T> [[nodiscard]] static
-    typename std::enable_if_t<
-        ToStringHelper<T>::allowOStringConcat, OStringConcat<OStringConcatMarker, T>>
+    OStringConcat<OStringConcatMarker, T>
     Concat(T const & value) { return OStringConcat<OStringConcatMarker, T>({}, value); }
 
     // This overload is needed so that an argument of type 'char const[N]' ends up as
     // 'OStringConcat<rtl::OStringConcatMarker, char const[N]>' rather than as
     // 'OStringConcat<rtl::OStringConcatMarker, char[N]>':
     template<typename T, std::size_t N> [[nodiscard]] static
-    typename std::enable_if_t<
-        ToStringHelper<T[N]>::allowOStringConcat, OStringConcat<OStringConcatMarker, T[N]>>
+    OStringConcat<OStringConcatMarker, T[N]>
     Concat(T (& value)[N]) { return OStringConcat<OStringConcatMarker, T[N]>({}, value); }
 #endif
 };
 
 #if defined LIBO_INTERNAL_ONLY
-inline bool operator ==(OString const & lhs, OStringConcatenation const & rhs)
+// Can only define this after we define OString
+inline OStringConstExpr::operator const OString &() const { return OString::unacquired(&pData); }
+#endif
+
+#if defined LIBO_INTERNAL_ONLY
+inline bool operator ==(OString const & lhs, StringConcatenation<char> const & rhs)
 { return lhs == std::string_view(rhs); }
-inline bool operator !=(OString const & lhs, OStringConcatenation const & rhs)
+inline bool operator !=(OString const & lhs, StringConcatenation<char> const & rhs)
 { return lhs != std::string_view(rhs); }
-inline bool operator ==(OStringConcatenation const & lhs, OString const & rhs)
+inline bool operator ==(StringConcatenation<char> const & lhs, OString const & rhs)
 { return std::string_view(lhs) == rhs; }
-inline bool operator !=(OStringConcatenation const & lhs, OString const & rhs)
+inline bool operator !=(StringConcatenation<char> const & lhs, OString const & rhs)
 { return std::string_view(lhs) != rhs; }
 #endif
 
@@ -2190,24 +2264,20 @@ inline bool operator !=(OStringConcatenation const & lhs, OString const & rhs)
 */
 template<>
 struct ToStringHelper< OString >
-    {
+{
     static std::size_t length( const OString& s ) { return s.getLength(); }
-    static char* addData( char* buffer, const OString& s ) { return addDataHelper( buffer, s.getStr(), s.getLength()); }
-    static const bool allowOStringConcat = true;
-    static const bool allowOUStringConcat = false;
-    };
+    char* operator()( char* buffer, const OString& s ) const { return addDataHelper( buffer, s.getStr(), s.getLength()); }
+};
 
 /**
  @internal
 */
 template<std::size_t N>
 struct ToStringHelper< OStringLiteral<N> >
-    {
+{
     static constexpr std::size_t length( const OStringLiteral<N>& str ) { return str.getLength(); }
-    static char* addData( char* buffer, const OStringLiteral<N>& str ) { return addDataHelper( buffer, str.getStr(), str.getLength() ); }
-    static const bool allowOStringConcat = true;
-    static const bool allowOUStringConcat = false;
-    };
+    char* operator()( char* buffer, const OStringLiteral<N>& str ) const { return addDataHelper( buffer, str.getStr(), str.getLength() ); }
+};
 
 /**
  @internal
@@ -2284,7 +2354,7 @@ typedef rtlunittest::OString OString;
 #if defined LIBO_INTERNAL_ONLY && !defined RTL_STRING_UNITTEST
 using ::rtl::OString;
 using ::rtl::OStringChar;
-using ::rtl::OStringConcatenation;
+using ::rtl::Concat2View;
 using ::rtl::OStringHash;
 using ::rtl::OStringLiteral;
 #endif
@@ -2302,7 +2372,18 @@ template<>
 struct hash<::rtl::OString>
 {
     std::size_t operator()(::rtl::OString const & s) const
-    { return std::size_t(s.hashCode()); }
+    {
+        if constexpr (sizeof(std::size_t) == 8)
+        {
+            // return a hash that uses the full 64-bit range instead of a 32-bit value
+            size_t n = 0;
+            for (sal_Int32 i = 0, len = s.getLength(); i < len; ++i)
+                n = 31 * n + s[i];
+            return n;
+        }
+        else
+            return std::size_t(s.hashCode());
+    }
 };
 
 }

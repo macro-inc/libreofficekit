@@ -26,7 +26,7 @@
 #include <com/sun/star/sdbc/SQLException.hpp>
 #include <com/sun/star/sdbcx/XColumnsSupplier.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <swmodule.hxx>
 #include <view.hxx>
 
@@ -341,7 +341,6 @@ IMPL_LINK(SwMailMergeGreetingsPage, InsertDataHdl_Impl, weld::Button&, rButton, 
 SwMailBodyDialog::SwMailBodyDialog(weld::Window* pParent)
     : SfxDialogController(pParent, "modules/swriter/ui/mmmailbody.ui", "MailBodyDialog")
     , SwGreetingsHandler(*GetActiveView()->GetMailMergeConfigItem(), *m_xBuilder)
-    , m_xBodyFT(m_xBuilder->weld_label("bodyft"))
     , m_xBodyMLE(m_xBuilder->weld_text_view("bodymle"))
     , m_xOK(m_xBuilder->weld_button("ok"))
 {

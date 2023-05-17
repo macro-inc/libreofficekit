@@ -43,6 +43,7 @@
 #include <unotools/confignode.hxx>
 #include <strings.hxx>
 
+#include <utility>
 #include <vector>
 #include <memory>
 
@@ -58,8 +59,8 @@ namespace {
 
 struct ClassMapEntry {
     ClassMapEntry(
-        OUString const & theClassPath, OUString const & theClassName):
-        classPath(theClassPath), className(theClassName), classLoader(nullptr),
+        OUString theClassPath, OUString theClassName):
+        classPath(std::move(theClassPath)), className(std::move(theClassName)), classLoader(nullptr),
         classObject(nullptr) {}
 
     OUString classPath;
@@ -530,7 +531,7 @@ Any SAL_CALL java_sql_Connection::getWarnings(  )
         aWarning.ErrorCode = aAsException.ErrorCode;
         aWarning.NextException = aAsException.NextException;
 
-        return makeAny( aWarning );
+        return Any( aWarning );
     }
 
     return Any();

@@ -24,13 +24,13 @@
 #include <chartview/ExplicitScaleValues.hxx>
 #include <com/sun/star/drawing/HomogenMatrix.hpp>
 #include <com/sun/star/uno/Sequence.h>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 
 #include <map>
 #include <memory>
 #include <vector>
 
-namespace chart { class ExplicitCategoriesProvider; }
-namespace chart { class ScaleAutomatism; }
 namespace com::sun::star::awt { struct Rectangle; }
 namespace com::sun::star::awt { struct Size; }
 namespace com::sun::star::beans { class XPropertySet; }
@@ -43,7 +43,11 @@ namespace com::sun::star::uno { class XComponentContext; }
 
 namespace chart
 {
-
+class ExplicitCategoriesProvider;
+class ScaleAutomatism;
+class ChartModel;
+class Axis;
+class BaseCoordinateSystem;
 class VAxisBase;
 
 class VCoordinateSystem
@@ -51,15 +55,14 @@ class VCoordinateSystem
 public:
     virtual ~VCoordinateSystem();
 
-    static std::unique_ptr<VCoordinateSystem> createCoordinateSystem( const css::uno::Reference<
-                                css::chart2::XCoordinateSystem >& xCooSysModel );
+    static std::unique_ptr<VCoordinateSystem> createCoordinateSystem( const rtl::Reference<
+                                ::chart::BaseCoordinateSystem >& xCooSysModel );
 
     /// @throws css::uno::RuntimeException
     void initPlottingTargets(
-                  const css::uno::Reference< css::drawing::XShapes >& xLogicTarget
-                , const css::uno::Reference< css::drawing::XShapes >& xFinalTarget
-                , const css::uno::Reference< css::lang::XMultiServiceFactory >& xFactory
-                , css::uno::Reference< css::drawing::XShapes >& xLogicTargetForSeriesBehindAxis );
+                  const rtl::Reference< SvxShapeGroupAnyD >& xLogicTarget
+                , const rtl::Reference< SvxShapeGroupAnyD >& xFinalTarget
+                , rtl::Reference<SvxShapeGroupAnyD>& xLogicTargetForSeriesBehindAxis );
 
     void setParticle( const OUString& rCooSysParticle );
 
@@ -107,19 +110,19 @@ public:
 
     void set3DWallPositions( CuboidPlanePosition eLeftWallPos, CuboidPlanePosition eBackWallPos, CuboidPlanePosition eBottomPos );
 
-    const css::uno::Reference< css::chart2::XCoordinateSystem >&
+    const rtl::Reference< ::chart::BaseCoordinateSystem >&
         getModel() const { return m_xCooSysModel;}
 
     /**
      * Create "view" axis objects 'VAxis' from the coordinate system model.
      */
     virtual void createVAxisList(
-            const css::uno::Reference< css::chart2::XChartDocument> & xChartDoc
-            , const css::awt::Size& rFontReferenceSize
-            , const css::awt::Rectangle& rMaximumSpaceForLabels
-            , bool bLimitSpaceForLabels
-            , std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList
-            , css::uno::Reference<css::uno::XComponentContext> const& rComponentContext);
+            const rtl::Reference<::chart::ChartModel> & xChartDoc,
+            const css::awt::Size& rFontReferenceSize,
+            const css::awt::Rectangle& rMaximumSpaceForLabels,
+            bool bLimitSpaceForLabels,
+            std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList,
+            css::uno::Reference<css::uno::XComponentContext> const& rComponentContext);
 
     virtual void initVAxisInList();
     virtual void updateScalesAndIncrementsOnAxes();
@@ -139,39 +142,35 @@ public:
     void setSeriesNamesForAxis( const css::uno::Sequence< OUString >& rSeriesNames );
 
 protected: //methods
-    VCoordinateSystem( const css::uno::Reference<
-        css::chart2::XCoordinateSystem >& xCooSys );
+    VCoordinateSystem( rtl::Reference< ::chart::BaseCoordinateSystem > xCooSys );
 
-    css::uno::Reference< css::chart2::XAxis >
+    rtl::Reference< ::chart::Axis >
         getAxisByDimension( sal_Int32 nDimensionIndex, sal_Int32 nAxisIndex  ) const;
-    static css::uno::Sequence< css::uno::Reference< css::beans::XPropertySet > >
-        getGridListFromAxis( const css::uno::Reference< css::chart2::XAxis >& xAxis );
+    static std::vector< css::uno::Reference< css::beans::XPropertySet > >
+        getGridListFromAxis( const rtl::Reference< ::chart::Axis >& xAxis );
 
     VAxisBase* getVAxis( sal_Int32 nDimensionIndex, sal_Int32 nAxisIndex );
 
     OUString createCIDForAxis( sal_Int32 nDimensionIndex, sal_Int32 nAxisIndex );
     OUString createCIDForGrid( sal_Int32 nDimensionIndex, sal_Int32 nAxisIndex );
 
-    sal_Int32 getNumberFormatKeyForAxis( const css::uno::Reference<
-                     css::chart2::XAxis >& xAxis
-                     , const css::uno::Reference<
-                     css::chart2::XChartDocument>& xChartDoc);
+    sal_Int32 getNumberFormatKeyForAxis( const rtl::Reference< ::chart::Axis >& xAxis
+                     , const rtl::Reference<::chart::ChartModel>& xChartDoc);
 
 private: //methods
     static void impl_adjustDimension( sal_Int32& rDimensionIndex );
     void impl_adjustDimensionAndIndex( sal_Int32& rDimensionIndex, sal_Int32& rAxisIndex ) const;
 
 protected: //member
-    css::uno::Reference< css::chart2::XCoordinateSystem > m_xCooSysModel;
+    rtl::Reference< ::chart::BaseCoordinateSystem > m_xCooSysModel;
 
     OUString m_aCooSysParticle;
 
     typedef std::pair< sal_Int32, sal_Int32 > tFullAxisIndex; //first index is the dimension, second index is the axis index that indicates whether this is a main or secondary axis
 
-    css::uno::Reference< css::drawing::XShapes >                m_xLogicTargetForGrids;
-    css::uno::Reference< css::drawing::XShapes >                m_xLogicTargetForAxes;
-    css::uno::Reference< css::drawing::XShapes >                m_xFinalTarget;
-    css::uno::Reference< css::lang::XMultiServiceFactory>       m_xShapeFactory;
+    rtl::Reference<SvxShapeGroupAnyD>                m_xLogicTargetForGrids;
+    rtl::Reference<SvxShapeGroupAnyD>                m_xLogicTargetForAxes;
+    rtl::Reference<SvxShapeGroupAnyD>                m_xFinalTarget;
     css::drawing::HomogenMatrix                            m_aMatrixSceneToScreen;
 
     CuboidPlanePosition m_eLeftWallPos;

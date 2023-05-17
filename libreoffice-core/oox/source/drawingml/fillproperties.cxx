@@ -24,9 +24,13 @@
 #include <comphelper/propertyvalue.hxx>
 #include <drawingml/graphicproperties.hxx>
 #include <vcl/graph.hxx>
+#include <vcl/BitmapFilter.hxx>
+#include <vcl/BitmapMonochromeFilter.hxx>
+#include <docmodel/uno/UnoThemeColor.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/awt/Gradient.hpp>
+#include <com/sun/star/awt/Gradient2.hpp>
 #include <com/sun/star/text/GraphicCrop.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/drawing/BitmapMode.hpp>
@@ -185,6 +189,32 @@ Reference< XGraphic > lclGreysScaleGraphic(uno::Reference<graphic::XGraphic> con
     return aReturnGraphic.GetXGraphic();
 }
 
+/// Applies the graphic Black&White (Monochrome) effect with the imported threshold
+Reference<XGraphic> lclApplyBlackWhiteEffect(const BlipFillProperties& aBlipProps,
+                                             const uno::Reference<graphic::XGraphic>& xGraphic)
+{
+    const auto& oBiLevelThreshold = aBlipProps.moBiLevelThreshold;
+    if (oBiLevelThreshold.has_value())
+    {
+        sal_uInt8 nThreshold
+            = static_cast<sal_uInt8>(oBiLevelThreshold.value() * 255 / MAX_PERCENT);
+
+        ::Graphic aGraphic(xGraphic);
+        ::Graphic aReturnGraphic;
+
+        BitmapEx aBitmapEx(aGraphic.GetBitmapEx());
+        AlphaMask aMask(aBitmapEx.GetAlpha());
+
+        BitmapEx aTmpBmpEx(aBitmapEx.GetBitmap());
+        BitmapFilter::Filter(aTmpBmpEx, BitmapMonochromeFilter{ nThreshold });
+
+        aReturnGraphic = ::Graphic(BitmapEx(aTmpBmpEx.GetBitmap(), aMask));
+        aReturnGraphic.setOriginURL(aGraphic.getOriginURL());
+        return aReturnGraphic.GetXGraphic();
+    }
+    return xGraphic;
+}
+
 Reference< XGraphic > lclCheckAndApplyChangeColorTransform(const BlipFillProperties &aBlipProps, uno::Reference<graphic::XGraphic> const & xGraphic,
                                                            const GraphicHelper& rGraphicHelper, const ::Color nPhClr)
 {
@@ -243,7 +273,9 @@ BitmapMode lclGetBitmapMode( sal_Int32 nToken )
         case XML_tile:      return BitmapMode_REPEAT;
         case XML_stretch:   return BitmapMode_STRETCH;
     }
-    return BitmapMode_NO_REPEAT;
+
+    // tdf#128596 Default value is XML_tile for MSO.
+    return BitmapMode_REPEAT;
 }
 
 RectanglePoint lclGetRectanglePoint( sal_Int32 nToken )
@@ -286,80 +318,58 @@ awt::Size lclGetOriginalSize( const GraphicHelper& rGraphicHelper, const Referen
     return aSizeHmm;
 }
 
-/**
- * Looks for a last gradient transition and possibly sets a gradient border
- * based on that.
- */
-void extractGradientBorderFromStops(const GradientFillProperties& rGradientProps,
-                                    const GraphicHelper& rGraphicHelper, ::Color nPhClr,
-                                    awt::Gradient& rGradient)
-{
-    if (rGradientProps.maGradientStops.size() <= 1)
-        return;
-
-    auto it = rGradientProps.maGradientStops.rbegin();
-    double fLastPos = it->first;
-    Color aLastColor = it->second;
-    ++it;
-    double fLastButOnePos = it->first;
-    Color aLastButOneColor = it->second;
-    if (!aLastColor.equals(aLastButOneColor, rGraphicHelper, nPhClr))
-        return;
-
-    // Last transition has the same color, we can map that to a border.
-    rGradient.Border = rtl::math::round((fLastPos - fLastButOnePos) * 100);
-}
-
 } // namespace
 
 void GradientFillProperties::assignUsed( const GradientFillProperties& rSourceProps )
 {
     if( !rSourceProps.maGradientStops.empty() )
         maGradientStops = rSourceProps.maGradientStops;
-    moFillToRect.assignIfUsed( rSourceProps.moFillToRect );
-    moTileRect.assignIfUsed( rSourceProps.moTileRect );
-    moGradientPath.assignIfUsed( rSourceProps.moGradientPath );
-    moShadeAngle.assignIfUsed( rSourceProps.moShadeAngle );
-    moShadeFlip.assignIfUsed( rSourceProps.moShadeFlip );
-    moShadeScaled.assignIfUsed( rSourceProps.moShadeScaled );
-    moRotateWithShape.assignIfUsed( rSourceProps.moRotateWithShape );
+    assignIfUsed( moFillToRect, rSourceProps.moFillToRect );
+    assignIfUsed( moTileRect, rSourceProps.moTileRect );
+    assignIfUsed( moGradientPath, rSourceProps.moGradientPath );
+    assignIfUsed( moShadeAngle, rSourceProps.moShadeAngle );
+    assignIfUsed( moShadeFlip, rSourceProps.moShadeFlip );
+    assignIfUsed( moShadeScaled, rSourceProps.moShadeScaled );
+    assignIfUsed( moRotateWithShape, rSourceProps.moRotateWithShape );
 }
 
 void PatternFillProperties::assignUsed( const PatternFillProperties& rSourceProps )
 {
     maPattFgColor.assignIfUsed( rSourceProps.maPattFgColor );
     maPattBgColor.assignIfUsed( rSourceProps.maPattBgColor );
-    moPattPreset.assignIfUsed( rSourceProps.moPattPreset );
+    assignIfUsed( moPattPreset, rSourceProps.moPattPreset );
 }
 
 void BlipFillProperties::assignUsed( const BlipFillProperties& rSourceProps )
 {
     if(rSourceProps.mxFillGraphic.is())
         mxFillGraphic = rSourceProps.mxFillGraphic;
-    moBitmapMode.assignIfUsed( rSourceProps.moBitmapMode );
-    moFillRect.assignIfUsed( rSourceProps.moFillRect );
-    moTileOffsetX.assignIfUsed( rSourceProps.moTileOffsetX );
-    moTileOffsetY.assignIfUsed( rSourceProps.moTileOffsetY );
-    moTileScaleX.assignIfUsed( rSourceProps.moTileScaleX );
-    moTileScaleY.assignIfUsed( rSourceProps.moTileScaleY );
-    moTileAlign.assignIfUsed( rSourceProps.moTileAlign );
-    moTileFlip.assignIfUsed( rSourceProps.moTileFlip );
-    moRotateWithShape.assignIfUsed( rSourceProps.moRotateWithShape );
-    moColorEffect.assignIfUsed( rSourceProps.moColorEffect );
-    moBrightness.assignIfUsed( rSourceProps.moBrightness );
-    moContrast.assignIfUsed( rSourceProps.moContrast );
+    assignIfUsed( moBitmapMode, rSourceProps.moBitmapMode );
+    assignIfUsed( moFillRect, rSourceProps.moFillRect );
+    assignIfUsed( moTileOffsetX, rSourceProps.moTileOffsetX );
+    assignIfUsed( moTileOffsetY, rSourceProps.moTileOffsetY );
+    assignIfUsed( moTileScaleX, rSourceProps.moTileScaleX );
+    assignIfUsed( moTileScaleY, rSourceProps.moTileScaleY );
+    assignIfUsed( moTileAlign, rSourceProps.moTileAlign );
+    assignIfUsed( moTileFlip, rSourceProps.moTileFlip );
+    assignIfUsed( moRotateWithShape, rSourceProps.moRotateWithShape );
+    assignIfUsed( moColorEffect, rSourceProps.moColorEffect );
+    assignIfUsed( moBrightness, rSourceProps.moBrightness );
+    assignIfUsed( moContrast, rSourceProps.moContrast );
+    assignIfUsed( moBiLevelThreshold, rSourceProps.moBiLevelThreshold );
     maColorChangeFrom.assignIfUsed( rSourceProps.maColorChangeFrom );
     maColorChangeTo.assignIfUsed( rSourceProps.maColorChangeTo );
     maDuotoneColors[0].assignIfUsed( rSourceProps.maDuotoneColors[0] );
     maDuotoneColors[1].assignIfUsed( rSourceProps.maDuotoneColors[1] );
     maEffect.assignUsed( rSourceProps.maEffect );
-    moAlphaModFix.assignIfUsed(rSourceProps.moAlphaModFix);
+    assignIfUsed(moAlphaModFix, rSourceProps.moAlphaModFix);
 }
 
 void FillProperties::assignUsed( const FillProperties& rSourceProps )
 {
-    moFillType.assignIfUsed( rSourceProps.moFillType );
+    assignIfUsed( moFillType, rSourceProps.moFillType );
     maFillColor.assignIfUsed( rSourceProps.maFillColor );
+    assignIfUsed( moUseBgFill, rSourceProps.moUseBgFill );
     maGradientProps.assignUsed( rSourceProps.maGradientProps );
     maPatternProps.assignUsed( rSourceProps.maPatternProps );
     maBlipProps.assignUsed( rSourceProps.maBlipProps );
@@ -368,7 +378,7 @@ void FillProperties::assignUsed( const FillProperties& rSourceProps )
 Color FillProperties::getBestSolidColor() const
 {
     Color aSolidColor;
-    if( moFillType.has() ) switch( moFillType.get() )
+    if( moFillType.has_value() ) switch( moFillType.value() )
     {
         case XML_solidFill:
             aSolidColor = maFillColor;
@@ -394,15 +404,18 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
         const GraphicHelper& rGraphicHelper, sal_Int32 nShapeRotation, ::Color nPhClr, sal_Int16 nPhClrTheme,
         bool bFlipH, bool bFlipV, bool bIsCustomShape) const
 {
-    if( !moFillType.has() )
+    if( !moFillType.has_value() )
         return;
 
     FillStyle eFillStyle = FillStyle_NONE;
-    OSL_ASSERT((moFillType.get() & sal_Int32(0xFFFF0000))==0);
-    switch( moFillType.get() )
+    OSL_ASSERT((moFillType.value() & sal_Int32(0xFFFF0000))==0);
+    switch( moFillType.value() )
     {
         case XML_noFill:
+        {
             eFillStyle = FillStyle_NONE;
+            rPropMap.setProperty(ShapeProperty::FillUseSlideBackground, moUseBgFill.value_or(false));
+        }
         break;
 
         case XML_solidFill:
@@ -413,15 +426,27 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
                 if( maFillColor.hasTransparency() )
                     rPropMap.setProperty( ShapeProperty::FillTransparency, maFillColor.getTransparency() );
 
+                model::ThemeColor aThemeColor;
                 if (aFillColor == nPhClr)
                 {
-                    rPropMap.setProperty(PROP_FillColorTheme, nPhClrTheme);
+                    aThemeColor.setType(model::convertToThemeColorType(nPhClrTheme));
+                    rPropMap.setProperty(PROP_FillColorThemeReference, model::theme::createXThemeColor(aThemeColor));
                 }
-                else if (maFillColor.getTintOrShade() == 0)
+                else
                 {
-                    rPropMap.setProperty(PROP_FillColorTheme, maFillColor.getSchemeColorIndex());
-                    rPropMap.setProperty(PROP_FillColorLumMod, maFillColor.getLumMod());
-                    rPropMap.setProperty(PROP_FillColorLumOff, maFillColor.getLumOff());
+                    aThemeColor.setType(model::convertToThemeColorType(maFillColor.getSchemeColorIndex()));
+                    if (maFillColor.getLumMod() != 10000)
+                        aThemeColor.addTransformation({model::TransformationType::LumMod, maFillColor.getLumMod()});
+                    if (maFillColor.getLumOff() != 0)
+                        aThemeColor.addTransformation({model::TransformationType::LumOff, maFillColor.getLumOff()});
+                    if (maFillColor.getTintOrShade() > 0)
+                        aThemeColor.addTransformation({model::TransformationType::Tint, maFillColor.getTintOrShade()});
+                    if (maFillColor.getTintOrShade() < 0)
+                    {
+                        sal_Int16 nShade = o3tl::narrowing<sal_Int16>(-maFillColor.getTintOrShade());
+                        aThemeColor.addTransformation({model::TransformationType::Shade, nShade});
+                    }
+                    rPropMap.setProperty(PROP_FillColorThemeReference, model::theme::createXThemeColor(aThemeColor));
                 }
 
                 eFillStyle = FillStyle_SOLID;
@@ -432,31 +457,45 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
             // do not create gradient struct if property is not supported...
             if( rPropMap.supportsProperty( ShapeProperty::FillGradient ) )
             {
-                sal_Int32 nEndTrans     = 0;
-                sal_Int32 nStartTrans   = 0;
-                awt::Gradient aGradient;
+                // use awt::Gradient2, prepare ColorStops
+                awt::Gradient2 aGradient;
+                basegfx::ColorStops aColorStops;
+                basegfx::ColorStops aTransparencyStops;
+                bool bContainsTransparency(false);
+
+                // set defaults
                 aGradient.Angle = 900;
                 aGradient.StartIntensity = 100;
                 aGradient.EndIntensity = 100;
+                aGradient.Style = awt::GradientStyle_LINEAR;
 
-                // Old code, values in aGradient overwritten in many cases by newer code below
-                if( maGradientProps.maGradientStops.size() > 1 )
+                // convert to ColorStops, check for contained transparency
+                for (const auto& rCandidate : maGradientProps.maGradientStops)
                 {
-                    aGradient.StartColor = sal_Int32(maGradientProps.maGradientStops.begin()->second.getColor( rGraphicHelper, nPhClr ));
-                    aGradient.EndColor = sal_Int32(maGradientProps.maGradientStops.rbegin()->second.getColor( rGraphicHelper, nPhClr ));
-                    if( maGradientProps.maGradientStops.rbegin()->second.hasTransparency() )
-                        nEndTrans = maGradientProps.maGradientStops.rbegin()->second.getTransparency()*255/100;
-                    if( maGradientProps.maGradientStops.begin()->second.hasTransparency() )
-                        nStartTrans = maGradientProps.maGradientStops.begin()->second.getTransparency()*255/100;
+                    const ::Color aColor(rCandidate.second.getColor(rGraphicHelper, nPhClr));
+                    aColorStops.emplace_back(rCandidate.first, aColor.getBColor());
+                    bContainsTransparency = bContainsTransparency || rCandidate.second.hasTransparency();
+                }
+
+                // if we have transparency, convert to ColorStops
+                if (bContainsTransparency)
+                {
+                    for (const auto& rCandidate : maGradientProps.maGradientStops)
+                    {
+                        const double fTrans(rCandidate.second.getTransparency() * (1.0/100.0));
+                        aTransparencyStops.emplace_back(rCandidate.first, basegfx::BColor(fTrans, fTrans, fTrans));
+                    }
                 }
 
                 // "rotate with shape" set to false -> do not rotate
-                if ( !maGradientProps.moRotateWithShape.get( true ) )
-                    nShapeRotation = 0;
-
-                if( maGradientProps.moGradientPath.has() )
+                if (!maGradientProps.moRotateWithShape.value_or(true))
                 {
-                    IntegerRectangle2D aFillToRect = maGradientProps.moFillToRect.get( IntegerRectangle2D( 0, 0, MAX_PERCENT, MAX_PERCENT ) );
+                    nShapeRotation = 0;
+                }
+
+                if (maGradientProps.moGradientPath.has_value())
+                {
+                    IntegerRectangle2D aFillToRect = maGradientProps.moFillToRect.value_or( IntegerRectangle2D( 0, 0, MAX_PERCENT, MAX_PERCENT ) );
                     sal_Int32 nCenterX = (MAX_PERCENT + aFillToRect.X1 - aFillToRect.X2) / 2;
                     aGradient.XOffset = getLimitedValue<sal_Int16, sal_Int32>(
                         nCenterX / PER_PERCENT, 0, 100);
@@ -464,11 +503,11 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
                     aGradient.YOffset = getLimitedValue<sal_Int16, sal_Int32>(
                         nCenterY / PER_PERCENT, 0, 100);
 
-                    if( maGradientProps.moGradientPath.get() == XML_circle )
+                    if( maGradientProps.moGradientPath.value() == XML_circle )
                     {
                         // Style should be radial at least when the horizontal center is at 50%.
                         // Otherwise import as a linear gradient, because it is the most similar to the MSO radial style.
-                        aGradient.Style = awt::GradientStyle_LINEAR;
+                        // aGradient.Style = awt::GradientStyle_LINEAR;
                         if( aGradient.XOffset == 100 && aGradient.YOffset == 100 )
                             aGradient.Angle = 450;
                         else if( aGradient.XOffset == 0 && aGradient.YOffset == 100 )
@@ -485,266 +524,60 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
                         aGradient.Style = awt::GradientStyle_RECT;
                     }
 
-                    ::std::swap( aGradient.StartColor, aGradient.EndColor );
-                    ::std::swap( nStartTrans, nEndTrans );
-
-                    extractGradientBorderFromStops(maGradientProps, rGraphicHelper, nPhClr,
-                                                   aGradient);
+                    basegfx::utils::reverseColorStops(aColorStops);
+                    basegfx::utils::reverseColorStops(aTransparencyStops);
                 }
                 else if (!maGradientProps.maGradientStops.empty())
                 {
-                    // A copy of the gradient stops for local modification
-                    GradientFillProperties::GradientStopMap aGradientStops(maGradientProps.maGradientStops);
-
-                    // Add a fake gradient stop at 0% and 100% if necessary, so that the gradient always starts
-                    // at 0% and ends at 100%, to make following logic clearer (?).
-                    auto a0 = aGradientStops.find( 0.0 );
-                    if( a0 == aGradientStops.end() )
-                    {
-                        // temp variable required
-                        Color aFirstColor(aGradientStops.begin()->second);
-                        aGradientStops.emplace( 0.0, aFirstColor );
-                    }
-
-                    auto a1 = aGradientStops.find( 1.0 );
-                    if( a1 == aGradientStops.end() )
-                    {
-                        // ditto
-                        Color aLastColor(aGradientStops.rbegin()->second);
-                        aGradientStops.emplace( 1.0, aLastColor );
-                    }
-
-                    // Check if the gradient is symmetric, which we will emulate with an "axial" gradient.
-                    bool bSymmetric(true);
-                    {
-                        GradientFillProperties::GradientStopMap::const_iterator aItA( aGradientStops.begin() );
-                        GradientFillProperties::GradientStopMap::const_iterator aItZ(std::prev(aGradientStops.end()));
-                        assert(aItZ != aGradientStops.end());
-                        while( bSymmetric && aItA->first < aItZ->first )
-                        {
-                            if (!aItA->second.equals(aItZ->second, rGraphicHelper, nPhClr))
-                                bSymmetric = false;
-                            else
-                            {
-                                ++aItA;
-                                aItZ = std::prev(aItZ);
-                            }
-                        }
-                        // Don't be fooled if the middlemost stop isn't at 0.5.
-                        if( bSymmetric && aItA == aItZ && aItA->first != 0.5 )
-                            bSymmetric = false;
-
-                        // If symmetric, do the rest of the logic for just a half.
-                        if( bSymmetric )
-                        {
-                            // aItZ already points to the colour for the middle, but insert a fake stop at the
-                            // exact middle if necessary.
-                            if( aItA->first != aItZ->first )
-                            {
-                                Color aMiddleColor = aItZ->second;
-                                auto a05 = aGradientStops.find( 0.5 );
-
-                                if( a05 != aGradientStops.end() )
-                                    a05->second = aMiddleColor;
-                                else
-                                    aGradientStops.emplace( 0.5, aMiddleColor );
-                            }
-                            // Drop the rest of the stops
-                            while( aGradientStops.rbegin()->first > 0.5 )
-                                aGradientStops.erase( aGradientStops.rbegin()->first );
-                        }
-                    }
-
-                    SAL_INFO("oox.drawingml.gradient", "symmetric: " << (bSymmetric ? "YES" : "NO") <<
-                             ", number of stops: " << aGradientStops.size());
-                    size_t nIndex = 0;
-                    for (auto const& gradientStop : aGradientStops)
-                        SAL_INFO("oox.drawingml.gradient", "  " << nIndex++ << ": " <<
-                                 gradientStop.first << ": " <<
-                                 std::hex << sal_Int32(gradientStop.second.getColor( rGraphicHelper, nPhClr )) << std::dec <<
-                                 "@" << (100 - gradientStop.second.getTransparency()) << "%");
-
-                    // Now estimate the simple LO style gradient (only two stops, at n% and 100%, where n ==
-                    // the "border") that best emulates the gradient between begin() and prior(end()).
-
-                    // First look for the largest segment in the gradient.
-                    GradientFillProperties::GradientStopMap::iterator aIt(aGradientStops.begin());
-                    double nWidestWidth = -1;
-                    GradientFillProperties::GradientStopMap::iterator aWidestSegmentStart;
-                    ++aIt;
-                    while( aIt != aGradientStops.end() )
-                    {
-                        if (aIt->first - std::prev(aIt)->first > nWidestWidth)
-                        {
-                            nWidestWidth = aIt->first - std::prev(aIt)->first;
-                            aWidestSegmentStart = std::prev(aIt);
-                        }
-                        ++aIt;
-                    }
-                    assert( nWidestWidth > 0 );
-
-                    double nBorder = 0;
-                    bool bSwap(false);
-
-                    // Do we have just two segments, and either one is of uniform colour, or three or more
-                    // segments, and the widest one is the first or last one, and is it of uniform colour? If
-                    // so, deduce the border from it, and drop that segment.
-                    if( aGradientStops.size() == 3 &&
-                        aGradientStops.begin()->second.getColor(rGraphicHelper, nPhClr) == std::next(aGradientStops.begin())->second.getColor(rGraphicHelper, nPhClr) &&
-                        aGradientStops.begin()->second.getTransparency() == std::next(aGradientStops.begin())->second.getTransparency())
-                    {
-                        // Two segments, first is uniformly coloured
-                        SAL_INFO("oox.drawingml.gradient", "two segments, first is uniformly coloured");
-                        nBorder = std::next(aGradientStops.begin())->first - aGradientStops.begin()->first;
-                        aGradientStops.erase(aGradientStops.begin());
-                        aWidestSegmentStart = aGradientStops.begin();
-                    }
-                    else if( !bSymmetric &&
-                             aGradientStops.size() == 3 &&
-                             std::next(aGradientStops.begin())->second.getColor(rGraphicHelper, nPhClr) == std::prev(aGradientStops.end())->second.getColor(rGraphicHelper, nPhClr) &&
-                             std::next(aGradientStops.begin())->second.getTransparency() == std::prev(aGradientStops.end())->second.getTransparency())
-                    {
-                        // Two segments, second is uniformly coloured
-                        SAL_INFO("oox.drawingml.gradient", "two segments, second is uniformly coloured");
-                        auto aNext = std::next(aGradientStops.begin());
-                        auto aPrev = std::prev(aGradientStops.end());
-                        assert(aPrev != aGradientStops.end());
-                        nBorder = aPrev->first - aNext->first;
-                        aGradientStops.erase(aNext);
-                        aWidestSegmentStart = aGradientStops.begin();
-                        bSwap = true;
-                        nShapeRotation = 180*60000 - nShapeRotation;
-                    }
-                    else if( !bSymmetric &&
-                             aGradientStops.size() >= 4 &&
-                             aWidestSegmentStart->second.getColor( rGraphicHelper, nPhClr ) == std::next(aWidestSegmentStart)->second.getColor(rGraphicHelper, nPhClr) &&
-                             aWidestSegmentStart->second.getTransparency() == std::next(aWidestSegmentStart)->second.getTransparency() &&
-                             ( aWidestSegmentStart == aGradientStops.begin() ||
-                               std::next(aWidestSegmentStart) == std::prev(aGradientStops.end())))
-                    {
-                        // Not symmetric, three or more segments, the widest is first or last and is uniformly coloured
-                        SAL_INFO("oox.drawingml.gradient", "first or last segment is widest and is uniformly coloured");
-                        nBorder = std::next(aWidestSegmentStart)->first - aWidestSegmentStart->first;
-
-                        // If it's the last segment that is uniformly coloured, rotate the gradient 180
-                        // degrees and swap start and end colours
-                        if (std::next(aWidestSegmentStart) == std::prev(aGradientStops.end()))
-                        {
-                            bSwap = true;
-                            nShapeRotation = 180*60000 - nShapeRotation;
-                        }
-
-                        aGradientStops.erase( aWidestSegmentStart++ );
-
-                        // Look for which is widest now
-                        aIt = std::next(aGradientStops.begin());
-                        nWidestWidth = -1;
-                        while( aIt != aGradientStops.end() )
-                        {
-                            if (aIt->first - std::prev(aIt)->first > nWidestWidth)
-                            {
-                                nWidestWidth = aIt->first - std::prev(aIt)->first;
-                                aWidestSegmentStart = std::prev(aIt);
-                            }
-                            ++aIt;
-                        }
-                    }
-                    SAL_INFO("oox.drawingml.gradient", "widest segment start: " << aWidestSegmentStart->first << ", border: " << nBorder);
-                    assert( (!bSymmetric && !bSwap) || !(bSymmetric && bSwap) );
-
-                    // Now we have a potential border and a largest segment. Use those.
-
-                    aGradient.Style = bSymmetric ? awt::GradientStyle_AXIAL : awt::GradientStyle_LINEAR;
-                    sal_Int32 nShadeAngle = maGradientProps.moShadeAngle.get( 0 );
+                    // aGradient.Style = awt::GradientStyle_LINEAR;
+                    sal_Int32 nShadeAngle = maGradientProps.moShadeAngle.value_or( 0 );
                     // Adjust for flips
                     if ( bFlipH )
                         nShadeAngle = 180*60000 - nShadeAngle;
                     if ( bFlipV )
                         nShadeAngle = -nShadeAngle;
-                    sal_Int32 nDmlAngle = nShadeAngle + nShapeRotation;
+                    const sal_Int32 nDmlAngle = nShadeAngle + nShapeRotation;
                     // convert DrawingML angle (in 1/60000 degrees) to API angle (in 1/10 degrees)
                     aGradient.Angle = static_cast< sal_Int16 >( (8100 - (nDmlAngle / (PER_DEGREE / 10))) % 3600 );
-                    Color aStartColor, aEndColor;
-
-                    // Make a note where the widest segment stops, because we will try to grow it next.
-                    auto aWidestSegmentEnd = std::next(aWidestSegmentStart);
-
-                    // Try to grow the widest segment backwards: if a previous segment has the same
-                    // color, just different transparency, include it.
-                    while (aWidestSegmentStart != aGradientStops.begin())
-                    {
-                        auto it = std::prev(aWidestSegmentStart);
-                        if (it->second.getColor(rGraphicHelper, nPhClr)
-                            != aWidestSegmentStart->second.getColor(rGraphicHelper, nPhClr))
-                        {
-                            break;
-                        }
-
-                        aWidestSegmentStart = it;
-                    }
-
-                    // Try to grow the widest segment forward: if a next segment has the same
-                    // color, just different transparency, include it.
-                    while (aWidestSegmentEnd != std::prev(aGradientStops.end()))
-                    {
-                        auto it = std::next(aWidestSegmentEnd);
-                        if (it->second.getColor(rGraphicHelper, nPhClr)
-                            != aWidestSegmentEnd->second.getColor(rGraphicHelper, nPhClr))
-                        {
-                            break;
-                        }
-
-                        aWidestSegmentEnd = it;
-                    }
-
-                    assert(aWidestSegmentEnd != aGradientStops.end());
-
-                    if( bSymmetric )
-                    {
-                        aStartColor = aWidestSegmentEnd->second;
-                        aEndColor = aWidestSegmentStart->second;
-                        nBorder *= 2;
-                    }
-                    else if( bSwap )
-                    {
-                        aStartColor = aWidestSegmentEnd->second;
-                        aEndColor = aWidestSegmentStart->second;
-                    }
-                    else
-                    {
-                        aStartColor = aWidestSegmentStart->second;
-                        aEndColor = aWidestSegmentEnd->second;
-                    }
-
-                    SAL_INFO("oox.drawingml.gradient", "start color: " << std::hex << sal_Int32(aStartColor.getColor( rGraphicHelper, nPhClr )) << std::dec <<
-                             "@" << (100-aStartColor.getTransparency()) << "%"
-                             ", end color: " << std::hex << sal_Int32(aEndColor.getColor( rGraphicHelper, nPhClr )) << std::dec <<
-                             "@" << (100-aEndColor.getTransparency()) << "%");
-
-                    aGradient.StartColor = sal_Int32(aStartColor.getColor( rGraphicHelper, nPhClr ));
-                    aGradient.EndColor = sal_Int32(aEndColor.getColor( rGraphicHelper, nPhClr ));
-
-                    nStartTrans = aStartColor.hasTransparency() ? aStartColor.getTransparency()*255/100 : 0;
-                    nEndTrans = aEndColor.hasTransparency() ? aEndColor.getTransparency()*255/100 : 0;
-
-                    aGradient.Border = rtl::math::round(100*nBorder);
                 }
+
+                // set ColorStops using UNO API
+                basegfx::utils::fillColorStopSequenceFromColorStops(aGradient.ColorStops, aColorStops);
+
+                // for compatibility, still set StartColor/EndColor
+                // NOTE: All code after adapting to multi color gradients works
+                //       using the ColorSteps, so in principle Start/EndColor might
+                //       be either
+                //        (a) ignored consequently everywhere or
+                //        (b) be set/added consequently everywhere
+                //       since this is - in principle - redundant data.
+                //       Be aware thet e.g. cases like DrawingML::EqualGradients
+                //       and others would have to be identified and adapted (!)
+                //       Since awt::Gradient2 is UNO API data there might
+                //       be cases where just awt::Gradient is transfered, so (b)
+                //       is far better backwards compatible and thus more safe, so
+                //       all changes will make use of additionally using/setting
+                //       these additionally, but will only make use of the given
+                //       ColorSteps if these are not empty, assuming that these
+                //       already contain Start/EndColor.
+                //       In principle that redundancy and that it is conflict-free
+                //       could even be checked and asserted, but consequently using
+                //       (b) methodically should be safe.
+                aGradient.StartColor = static_cast<sal_Int32>(::Color(aColorStops.front().getStopColor()));
+                aGradient.EndColor = static_cast<sal_Int32>(::Color(aColorStops.back().getStopColor()));
 
                 // push gradient or named gradient to property map
-                if( rPropMap.setProperty( ShapeProperty::FillGradient, aGradient ) )
-                    eFillStyle = FillStyle_GRADIENT;
-
-                // push gradient transparency to property map
-                if( nStartTrans != 0 || nEndTrans != 0 )
+                if (rPropMap.setProperty(ShapeProperty::FillGradient, aGradient))
                 {
-                    awt::Gradient aGrad(aGradient);
-                    uno::Any aVal;
-                    aGrad.EndColor = static_cast<sal_Int32>( nEndTrans | nEndTrans << 8 | nEndTrans << 16 );
-                    aGrad.StartColor = static_cast<sal_Int32>( nStartTrans | nStartTrans << 8 | nStartTrans << 16 );
-                    aVal <<= aGrad;
-                    rPropMap.setProperty( ShapeProperty::GradientTransparency, aGrad );
+                    eFillStyle = FillStyle_GRADIENT;
                 }
 
+                // push gradient transparency to property map if it exists
+                if (!aTransparencyStops.empty())
+                {
+                    basegfx::utils::fillColorStopSequenceFromColorStops(aGradient.ColorStops, aTransparencyStops);
+                    rPropMap.setProperty(ShapeProperty::GradientTransparency, aGradient);
+                }
             }
         break;
 
@@ -757,7 +590,7 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
 
                 if (xGraphic.is())
                 {
-                    if (maBlipProps.moColorEffect.get(XML_TOKEN_INVALID) == XML_grayscl)
+                    if (maBlipProps.moColorEffect.value_or(XML_TOKEN_INVALID) == XML_grayscl)
                         xGraphic = lclGreysScaleGraphic(xGraphic);
 
                     if (rPropMap.supportsProperty(ShapeProperty::FillBitmapName) &&
@@ -775,37 +608,38 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
                 if( eFillStyle == FillStyle_BITMAP )
                 {
                     // bitmap mode (single, repeat, stretch)
-                    BitmapMode eBitmapMode = lclGetBitmapMode( maBlipProps.moBitmapMode.get( XML_TOKEN_INVALID ) );
+                    BitmapMode eBitmapMode = lclGetBitmapMode( maBlipProps.moBitmapMode.value_or( XML_TOKEN_INVALID ) );
                     rPropMap.setProperty( ShapeProperty::FillBitmapMode, eBitmapMode );
 
                     // additional settings for repeated bitmap
                     if( eBitmapMode == BitmapMode_REPEAT )
                     {
                         // anchor position inside bitmap
-                        RectanglePoint eRectPoint = lclGetRectanglePoint( maBlipProps.moTileAlign.get( XML_tl ) );
+                        RectanglePoint eRectPoint = lclGetRectanglePoint( maBlipProps.moTileAlign.value_or( XML_tl ) );
                         rPropMap.setProperty( ShapeProperty::FillBitmapRectanglePoint, eRectPoint );
 
                         awt::Size aOriginalSize = lclGetOriginalSize(rGraphicHelper, maBlipProps.mxFillGraphic);
                         if( (aOriginalSize.Width > 0) && (aOriginalSize.Height > 0) )
                         {
                             // size of one bitmap tile (given as 1/1000 percent of bitmap size), convert to 1/100 mm
-                            double fScaleX = maBlipProps.moTileScaleX.get( MAX_PERCENT ) / static_cast< double >( MAX_PERCENT );
+                            double fScaleX = maBlipProps.moTileScaleX.value_or( MAX_PERCENT ) / static_cast< double >( MAX_PERCENT );
                             sal_Int32 nFillBmpSizeX = getLimitedValue< sal_Int32, double >( aOriginalSize.Width * fScaleX, 1, SAL_MAX_INT32 );
                             rPropMap.setProperty( ShapeProperty::FillBitmapSizeX, nFillBmpSizeX );
-                            double fScaleY = maBlipProps.moTileScaleY.get( MAX_PERCENT ) / static_cast< double >( MAX_PERCENT );
+                            double fScaleY = maBlipProps.moTileScaleY.value_or( MAX_PERCENT ) / static_cast< double >( MAX_PERCENT );
                             sal_Int32 nFillBmpSizeY = getLimitedValue< sal_Int32, double >( aOriginalSize.Height * fScaleY, 1, SAL_MAX_INT32 );
                             rPropMap.setProperty( ShapeProperty::FillBitmapSizeY, nFillBmpSizeY );
 
+                            awt::Size aBmpSize(nFillBmpSizeX, nFillBmpSizeY);
                             // offset of the first bitmap tile (given as EMUs), convert to percent
-                            sal_Int16 nTileOffsetX = getDoubleIntervalValue< sal_Int16 >( maBlipProps.moTileOffsetX.get( 0 ) / 3.6 / aOriginalSize.Width, 0, 100 );
+                            sal_Int16 nTileOffsetX = getDoubleIntervalValue< sal_Int16 >(std::round(maBlipProps.moTileOffsetX.value_or( 0 ) / 3.6 / aBmpSize.Width), 0, 100 );
                             rPropMap.setProperty( ShapeProperty::FillBitmapOffsetX, nTileOffsetX );
-                            sal_Int16 nTileOffsetY = getDoubleIntervalValue< sal_Int16 >( maBlipProps.moTileOffsetY.get( 0 ) / 3.6 / aOriginalSize.Height, 0, 100 );
+                            sal_Int16 nTileOffsetY = getDoubleIntervalValue< sal_Int16 >(std::round(maBlipProps.moTileOffsetY.value_or( 0 ) / 3.6 / aBmpSize.Height), 0, 100 );
                             rPropMap.setProperty( ShapeProperty::FillBitmapOffsetY, nTileOffsetY );
                         }
                     }
-                    else if ( eBitmapMode == BitmapMode_STRETCH && maBlipProps.moFillRect.has() )
+                    else if ( eBitmapMode == BitmapMode_STRETCH && maBlipProps.moFillRect.has_value() )
                     {
-                        geometry::IntegerRectangle2D aFillRect( maBlipProps.moFillRect.get() );
+                        geometry::IntegerRectangle2D aFillRect( maBlipProps.moFillRect.value() );
                         awt::Size aOriginalSize( rGraphicHelper.getOriginalSize( xGraphic ) );
                         if ( aOriginalSize.Width && aOriginalSize.Height )
                         {
@@ -840,8 +674,8 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
                     }
                 }
 
-                if (maBlipProps.moAlphaModFix.has())
-                    rPropMap.setProperty(ShapeProperty::FillTransparency, static_cast<sal_Int16>(100 - (maBlipProps.moAlphaModFix.get() / PER_PERCENT)));
+                if (maBlipProps.moAlphaModFix.has_value())
+                    rPropMap.setProperty(ShapeProperty::FillTransparency, static_cast<sal_Int16>(100 - (maBlipProps.moAlphaModFix.value() / PER_PERCENT)));
             }
         break;
 
@@ -850,10 +684,10 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
             if( rPropMap.supportsProperty( ShapeProperty::FillHatch ) )
             {
                 Color aColor( maPatternProps.maPattFgColor );
-                if( aColor.isUsed() && maPatternProps.moPattPreset.has() )
+                if( aColor.isUsed() && maPatternProps.moPattPreset.has_value() )
                 {
                     eFillStyle = FillStyle_HATCH;
-                    rPropMap.setProperty( ShapeProperty::FillHatch, createHatch( maPatternProps.moPattPreset.get(), aColor.getColor( rGraphicHelper, nPhClr ) ) );
+                    rPropMap.setProperty( ShapeProperty::FillHatch, createHatch( maPatternProps.moPattPreset.value(), aColor.getColor( rGraphicHelper, nPhClr ) ) );
                     if( aColor.hasTransparency() )
                         rPropMap.setProperty( ShapeProperty::FillTransparency, aColor.getTransparency() );
 
@@ -889,11 +723,11 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
 
 void GraphicProperties::pushToPropMap( PropertyMap& rPropMap, const GraphicHelper& rGraphicHelper, bool bFlipH, bool bFlipV) const
 {
-    sal_Int16 nBrightness = getLimitedValue< sal_Int16, sal_Int32 >( maBlipProps.moBrightness.get( 0 ) / PER_PERCENT, -100, 100 );
-    sal_Int16 nContrast = getLimitedValue< sal_Int16, sal_Int32 >( maBlipProps.moContrast.get( 0 ) / PER_PERCENT, -100, 100 );
+    sal_Int16 nBrightness = getLimitedValue< sal_Int16, sal_Int32 >( maBlipProps.moBrightness.value_or( 0 ) / PER_PERCENT, -100, 100 );
+    sal_Int16 nContrast = getLimitedValue< sal_Int16, sal_Int32 >( maBlipProps.moContrast.value_or( 0 ) / PER_PERCENT, -100, 100 );
     ColorMode eColorMode = ColorMode_STANDARD;
 
-    switch( maBlipProps.moColorEffect.get( XML_TOKEN_INVALID ) )
+    switch( maBlipProps.moColorEffect.value_or( XML_TOKEN_INVALID ) )
     {
         case XML_biLevel:   eColorMode = ColorMode_MONO;    break;
         case XML_grayscl:   eColorMode = ColorMode_GREYS;   break;
@@ -904,6 +738,17 @@ void GraphicProperties::pushToPropMap( PropertyMap& rPropMap, const GraphicHelpe
         // created transformed graphic
         uno::Reference<graphic::XGraphic> xGraphic = lclCheckAndApplyChangeColorTransform(maBlipProps, maBlipProps.mxFillGraphic, rGraphicHelper, API_RGB_TRANSPARENT);
         xGraphic = lclCheckAndApplyDuotoneTransform(maBlipProps, xGraphic, rGraphicHelper, API_RGB_TRANSPARENT);
+
+        if( eColorMode == ColorMode_MONO )
+        {
+            // ColorMode_MONO is the same with MSO's biLevel with 50000 (50%) threshold,
+            // when threshold isn't 50000 bake the effect instead.
+            if( maBlipProps.moBiLevelThreshold != 50000 )
+            {
+                xGraphic = lclApplyBlackWhiteEffect(maBlipProps, xGraphic);
+                eColorMode = ColorMode_STANDARD;
+            }
+        }
 
         if (eColorMode == ColorMode_STANDARD && nBrightness == 70 && nContrast == -70)
         {
@@ -924,9 +769,9 @@ void GraphicProperties::pushToPropMap( PropertyMap& rPropMap, const GraphicHelpe
         }
 
         // cropping
-        if ( maBlipProps.moClipRect.has() )
+        if ( maBlipProps.moClipRect.has_value() )
         {
-            geometry::IntegerRectangle2D oClipRect( maBlipProps.moClipRect.get() );
+            geometry::IntegerRectangle2D oClipRect( maBlipProps.moClipRect.value() );
             awt::Size aOriginalSize( rGraphicHelper.getOriginalSize( xGraphic ) );
             if ( aOriginalSize.Width && aOriginalSize.Height )
             {
@@ -980,9 +825,9 @@ void GraphicProperties::pushToPropMap( PropertyMap& rPropMap, const GraphicHelpe
             rPropMap.setProperty(PROP_Graphic, xGraphic);
 
 
-        if ( maBlipProps.moAlphaModFix.has() )
+        if ( maBlipProps.moAlphaModFix.has_value() )
         {
-            rPropMap.setProperty(PROP_Transparency, static_cast<sal_Int16>(100 - (maBlipProps.moAlphaModFix.get() / PER_PERCENT)));
+            rPropMap.setProperty(PROP_Transparency, static_cast<sal_Int16>(100 - (maBlipProps.moAlphaModFix.value() / PER_PERCENT)));
         }
     }
     rPropMap.setProperty(PROP_GraphicColorMode, eColorMode);

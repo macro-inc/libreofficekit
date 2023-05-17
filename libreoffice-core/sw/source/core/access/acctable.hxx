@@ -46,21 +46,26 @@ class SwAccessibleTable :
 {
     std::unique_ptr<SwAccessibleTableData_Impl> mpTableData;    // the table's data, protected by SolarMutex
     OUString m_sDesc;
+    typedef std::vector< std::pair<SwAccessibleContext*,
+        css::uno::WeakReference<css::accessibility::XAccessible> > > Cells_t;
+    Cells_t m_vecCellAdd;
+    Cells_t m_vecCellRemove;
+
     const SwSelBoxes *GetSelBoxes() const;
 
     void FireTableChangeEvent( const SwAccessibleTableData_Impl& rTableData );
 
     /** get the SwTableBox* for the given child */
-    const SwTableBox* GetTableBox( sal_Int32 ) const;
+    const SwTableBox* GetTableBox( sal_Int64 ) const;
 
-    bool IsChildSelected( sal_Int32 nChildIndex ) const;
+    bool IsChildSelected( sal_Int64 nChildIndex ) const;
 
-    sal_Int32 GetIndexOfSelectedChild( sal_Int32 nSelectedChildIndex ) const;
+    sal_Int64 GetIndexOfSelectedChild( sal_Int64 nSelectedChildIndex ) const;
 
 protected:
     // Set states for getAccessibleStateSet.
     // This derived class additionally sets MULTISELECTABLE(+)
-    virtual void GetStates( ::utl::AccessibleStateSetHelper& rStateSet ) override;
+    virtual void GetStates( sal_Int64& rStateSet ) override;
 
     virtual ~SwAccessibleTable() override;
 
@@ -150,10 +155,10 @@ public:
         getAccessibleSummary(  ) override;
     virtual sal_Bool SAL_CALL isAccessibleSelected(
             sal_Int32 nRow, sal_Int32 nColumn ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleIndex(
+    virtual sal_Int64 SAL_CALL getAccessibleIndex(
             sal_Int32 nRow, sal_Int32 nColumn ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleRow( sal_Int32 nChildIndex ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleColumn( sal_Int32 nChildIndex ) override;
+    virtual sal_Int32 SAL_CALL getAccessibleRow( sal_Int64 nChildIndex ) override;
+    virtual sal_Int32 SAL_CALL getAccessibleColumn( sal_Int64 nChildIndex ) override;
     // XAccessibleTableSelection
     virtual sal_Bool SAL_CALL selectRow( sal_Int32 row ) override ;
     virtual sal_Bool SAL_CALL selectColumn( sal_Int32 column ) override ;
@@ -193,30 +198,27 @@ public:
     // XAccessibleSelection
 
     virtual void SAL_CALL selectAccessibleChild(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
 
     virtual sal_Bool SAL_CALL isAccessibleChildSelected(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
 
     virtual void SAL_CALL clearAccessibleSelection(  ) override;
 
     virtual void SAL_CALL selectAllAccessibleChildren(  ) override;
 
-    virtual sal_Int32 SAL_CALL getSelectedAccessibleChildCount(  ) override;
+    virtual sal_Int64 SAL_CALL getSelectedAccessibleChildCount(  ) override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getSelectedAccessibleChild(
-        sal_Int32 nSelectedChildIndex ) override;
+        sal_Int64 nSelectedChildIndex ) override;
 
     // index has to be treated as global child index.
     virtual void SAL_CALL deselectAccessibleChild(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
 
     // XAccessibleComponent
     sal_Int32 SAL_CALL getBackground() override;
-    typedef std::vector< std::pair<SwAccessibleContext*,
-        css::uno::WeakReference<css::accessibility::XAccessible> > > Cells_t;
-    Cells_t m_vecCellAdd;
-    Cells_t m_vecCellRemove;
+
     void FireSelectionEvent( );
     void AddSelectionCell(SwAccessibleContext*, bool bAddOrRemove);
 };
@@ -250,11 +252,11 @@ public:
     // XAccessibleContext
 
     /// Return the number of currently visible children.
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
 
     /// Return the specified child or NULL if index is invalid.
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild (sal_Int32 nIndex) override;
+        getAccessibleChild (sal_Int64 nIndex) override;
 
     // XAccessibleTable
 

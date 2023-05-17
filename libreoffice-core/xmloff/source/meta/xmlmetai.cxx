@@ -30,8 +30,10 @@
 #include <com/sun/star/document/XDocumentProperties.hpp>
 #include <comphelper/processfactory.hxx>
 #include <cppuhelper/exc_hlp.hxx>
+#include <o3tl/string_view.hxx>
 #include <rtl/character.hxx>
 #include <rtl/ustrbuf.hxx>
+#include <utility>
 #include <xmloff/xmlmetai.hxx>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/xmltoken.hxx>
@@ -52,7 +54,7 @@ private:
 public:
     XMLDocumentBuilderContext(SvXMLImport& rImport, sal_Int32 nElement,
         const css::uno::Reference< css::xml::sax::XFastAttributeList>& xAttrList,
-        const css::uno::Reference<css::xml::dom::XSAXDocumentBuilder2>& rDocBuilder,
+        css::uno::Reference<css::xml::dom::XSAXDocumentBuilder2> xDocBuilder,
         SvXMLMetaDocumentContext * pTopLevel);
 
     virtual void SAL_CALL characters( const OUString& aChars ) override;
@@ -76,10 +78,10 @@ public:
 
 XMLDocumentBuilderContext::XMLDocumentBuilderContext(SvXMLImport& rImport,
         sal_Int32 /*nElement*/, const uno::Reference<xml::sax::XFastAttributeList>&,
-        const uno::Reference<xml::dom::XSAXDocumentBuilder2>& rDocBuilder,
+        uno::Reference<xml::dom::XSAXDocumentBuilder2> xDocBuilder,
         SvXMLMetaDocumentContext *const pTopLevel)
     : SvXMLImportContext(rImport)
-    , mxDocBuilder(rDocBuilder)
+    , mxDocBuilder(std::move(xDocBuilder))
     , m_pTopLevel(pTopLevel)
 {
 }
@@ -180,9 +182,9 @@ lcl_initGenerator(SvXMLImport & rImport,
 }
 
 SvXMLMetaDocumentContext::SvXMLMetaDocumentContext(SvXMLImport& rImport,
-            const uno::Reference<document::XDocumentProperties>& xDocProps) :
+            uno::Reference<document::XDocumentProperties> xDocProps) :
     SvXMLImportContext( rImport ),
-    mxDocProps(xDocProps),
+    mxDocProps(std::move(xDocProps)),
     mxDocBuilder(
         xml::dom::SAXDocumentBuilder::create(
             comphelper::getProcessComponentContext()))
@@ -227,29 +229,29 @@ uno::Reference< xml::sax::XFastContextHandler > SAL_CALL SvXMLMetaDocumentContex
     return nullptr;
 }
 
-void SvXMLMetaDocumentContext::setBuildId(OUString const& i_rBuildId, const uno::Reference<beans::XPropertySet>& xImportInfo )
+void SvXMLMetaDocumentContext::setBuildId(std::u16string_view i_rBuildId, const uno::Reference<beans::XPropertySet>& xImportInfo )
 {
     OUString sBuildId;
     // skip to second product
-    sal_Int32 nBegin = i_rBuildId.indexOf( ' ' );
-    if ( nBegin != -1 )
+    size_t nBegin = i_rBuildId.find( ' ' );
+    if ( nBegin != std::u16string_view::npos )
     {
         // skip to build information
-        nBegin = i_rBuildId.indexOf( '/', nBegin );
-        if ( nBegin != -1 )
+        nBegin = i_rBuildId.find( '/', nBegin );
+        if ( nBegin != std::u16string_view::npos )
         {
-            sal_Int32 nEnd = i_rBuildId.indexOf( 'm', nBegin );
-            if ( nEnd != -1 )
+            size_t nEnd = i_rBuildId.find( 'm', nBegin );
+            if ( nEnd != std::u16string_view::npos )
             {
                 OUStringBuffer sBuffer(
-                    i_rBuildId.subView( nBegin+1, nEnd-nBegin-1 ) );
+                    i_rBuildId.substr( nBegin+1, nEnd-nBegin-1 ) );
                 static const OUStringLiteral sBuildCompare(
                      u"$Build-"  );
-                nBegin = i_rBuildId.indexOf( sBuildCompare, nEnd );
-                if ( nBegin != -1 )
+                nBegin = i_rBuildId.find( sBuildCompare, nEnd );
+                if ( nBegin != std::u16string_view::npos )
                 {
                     sBuffer.append( '$' );
-                    sBuffer.append( i_rBuildId.subView(nBegin + sBuildCompare.getLength()) );
+                    sBuffer.append( i_rBuildId.substr(nBegin + sBuildCompare.getLength()) );
                     sBuildId = sBuffer.makeStringAndClear();
                 }
             }
@@ -258,15 +260,15 @@ void SvXMLMetaDocumentContext::setBuildId(OUString const& i_rBuildId, const uno:
 
     if ( sBuildId.isEmpty() )
     {
-        if (    i_rBuildId.startsWith("StarOffice 7")
-            ||  i_rBuildId.startsWith("StarSuite 7")
-            ||  i_rBuildId.startsWith("StarOffice 6")
-            ||  i_rBuildId.startsWith("StarSuite 6")
-            ||  i_rBuildId.startsWith("OpenOffice.org 1"))
+        if (    o3tl::starts_with(i_rBuildId, u"StarOffice 7")
+            ||  o3tl::starts_with(i_rBuildId, u"StarSuite 7")
+            ||  o3tl::starts_with(i_rBuildId, u"StarOffice 6")
+            ||  o3tl::starts_with(i_rBuildId, u"StarSuite 6")
+            ||  o3tl::starts_with(i_rBuildId, u"OpenOffice.org 1"))
         {
             sBuildId = "645$8687";
         }
-        else if (i_rBuildId.startsWith("NeoOffice/2"))
+        else if (o3tl::starts_with(i_rBuildId, u"NeoOffice/2"))
         {
             sBuildId = "680$9134"; // fake NeoOffice as OpenOffice.org 2.2 release
         }
@@ -274,12 +276,12 @@ void SvXMLMetaDocumentContext::setBuildId(OUString const& i_rBuildId, const uno:
 
     // "LibreOffice_project" was hard-coded since LO 3.3.0
     // see utl::DocInfoHelper::GetGeneratorString()
-    if (i_rBuildId.indexOf("LibreOffice_project/") != -1)
+    if (i_rBuildId.find(u"LibreOffice_project/") != std::u16string_view::npos)
     {
         OUStringBuffer sNumber;
-        auto const firstSlash = i_rBuildId.indexOf("/");
-        assert(firstSlash != -1);
-        for (sal_Int32 i = firstSlash + 1; i < i_rBuildId.getLength(); ++i)
+        size_t const firstSlash = i_rBuildId.find('/');
+        assert(firstSlash != std::u16string_view::npos);
+        for (size_t i = firstSlash + 1; i < i_rBuildId.size(); ++i)
         {
             if (rtl::isAsciiDigit(i_rBuildId[i]))
             {
@@ -292,7 +294,7 @@ void SvXMLMetaDocumentContext::setBuildId(OUString const& i_rBuildId, const uno:
         }
         if (!sNumber.isEmpty())
         {
-            sBuildId += ";" + sNumber.makeStringAndClear();
+            sBuildId += ";" + sNumber;
         }
     }
 
@@ -307,7 +309,7 @@ void SvXMLMetaDocumentContext::setBuildId(OUString const& i_rBuildId, const uno:
             uno::Reference< beans::XPropertySetInfo > xSetInfo(
                 xImportInfo->getPropertySetInfo());
             if( xSetInfo.is() && xSetInfo->hasPropertyByName( aPropName ) )
-                xImportInfo->setPropertyValue( aPropName, uno::makeAny( sBuildId ) );
+                xImportInfo->setPropertyValue( aPropName, uno::Any( sBuildId ) );
         }
     }
     catch(const uno::Exception&)

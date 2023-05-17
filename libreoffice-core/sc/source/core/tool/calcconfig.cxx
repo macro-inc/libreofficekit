@@ -95,8 +95,6 @@ ScCalcConfig::ScCalcConfig() :
     mbHasStringRefSyntax(false)
 {
     setOpenCLConfigToDefault();
-
-    // SAL _DEBUG(__FILE__ ":" << __LINE__ << ": ScCalcConfig::ScCalcConfig(): " << *this);
 }
 
 void ScCalcConfig::setOpenCLConfigToDefault()
@@ -199,7 +197,7 @@ OUString ScOpCodeSetToSymbolicString(const ScCalcConfig::OpCodeSet& rOpCodes)
         result.append(pOpCodeMap->getSymbol(*i));
     }
 
-    return result.toString();
+    return result.makeStringAndClear();
 }
 
 ScCalcConfig::OpCodeSet ScStringToOpCodeSet(std::u16string_view rOpCodes)
@@ -236,6 +234,7 @@ ScCalcConfig::OpCodeSet ScStringToOpCodeSet(std::u16string_view rOpCodes)
     // HACK: Both unary and binary minus have the same string but different opcodes.
     if( result->find( ocSub ) != result->end())
         result->insert( ocNegSub );
+
     return result;
 }
 

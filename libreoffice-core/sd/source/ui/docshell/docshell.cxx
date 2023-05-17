@@ -61,6 +61,7 @@
 #include <comphelper/lok.hxx>
 #include <DrawViewShell.hxx>
 #include <sdpage.hxx>
+#include <docmodel/theme/Theme.hxx>
 
 using namespace sd;
 #define ShellClass_DrawDocShell
@@ -496,10 +497,10 @@ std::vector<Color> DrawDocShell::GetThemeColors()
     }
 
     SdPage* pPage = pViewShell->getCurrentPage();
-    svx::Theme* pTheme = pPage->getSdrPageProperties().GetTheme();
+    model::Theme* pTheme = pPage->getSdrPageProperties().GetTheme().get();
     if (!pPage->IsMasterPage())
     {
-        pTheme = pPage->TRG_GetMasterPage().getSdrPageProperties().GetTheme();
+        pTheme = pPage->TRG_GetMasterPage().getSdrPageProperties().GetTheme().get();
     }
 
     if (!pTheme)

@@ -35,8 +35,6 @@
 #include <com/sun/star/xml/sax/Writer.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/ShapeCollection.hpp>
-#include <com/sun/star/drawing/BitmapMode.hpp>
-#include <com/sun/star/drawing/RectanglePoint.hpp>
 
 #include <rtl/bootstrap.hxx>
 #include <svx/unopage.hxx>
@@ -49,7 +47,6 @@
 #include <comphelper/sequenceashashmap.hxx>
 #include <i18nlangtag/lang.h>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/streamwrap.hxx>
@@ -65,7 +62,9 @@
 #include <svx/svdmodel.hxx>
 #include <svx/svdxcgv.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <tools/zcodec.hxx>
+#include <rtl/crc.h>
 
 #include <memory>
 #include <string_view>
@@ -665,12 +664,16 @@ bool SVGFilter::implExportImpressOrDraw( const Reference< XOutputStream >& rxOSt
 {
     Reference< XComponentContext >        xContext( ::comphelper::getProcessComponentContext() ) ;
     bool                                  bRet = false;
+    // Instead of writing to rxOStm directly, we write here in case we need
+    // to compress the output later
+    SvMemoryStream                        aTempStm;
 
     if( rxOStm.is() )
     {
         if( !mSelectedPages.empty() && !mMasterPageTargets.empty() )
         {
-            Reference< XDocumentHandler > xDocHandler = implCreateExportDocumentHandler( rxOStm );
+            ::rtl::Reference< ::utl::OStreamWrapper > aTempStmWrapper = new ::utl::OStreamWrapper( aTempStm );
+            Reference< XDocumentHandler > xDocHandler = implCreateExportDocumentHandler( aTempStmWrapper );
 
             if( xDocHandler.is() )
             {
@@ -745,6 +748,38 @@ bool SVGFilter::implExportImpressOrDraw( const Reference< XOutputStream >& rxOSt
             }
         }
     }
+    if ( bRet )
+    {
+        const sal_Int8* aDataPtr = static_cast< const sal_Int8* >( aTempStm.GetData() );
+        sal_uInt32 aDataSize = aTempStm.GetSize();
+        SvMemoryStream aCompressedStm;
+        if ( mbShouldCompress )
+        {
+            sal_uInt32 nUncompressedCRC32
+                = rtl_crc32( 0, aTempStm.GetData(), aTempStm.GetSize() );
+            ZCodec aCodec;
+            aTempStm.Seek( 0 );
+            aCodec.BeginCompression( ZCODEC_DEFAULT_COMPRESSION, /*gzLib*/true );
+            // the inner modify time/filename doesn't really matter in this context because
+            // compressed graphic formats are meant to be opened as is - not to be extracted
+            aCodec.SetCompressionMetadata( "inner", 0, nUncompressedCRC32 );
+            aCodec.Compress( aTempStm, aCompressedStm );
+            sal_uInt32 nTotalIn = static_cast< sal_uInt32 >( aCodec.EndCompression() );
+            if ( aCompressedStm.GetError() || nTotalIn != aDataSize )
+            {
+                bRet = false;
+                return bRet;
+            }
+            else
+            {
+                aDataPtr = static_cast< const sal_Int8* >( aCompressedStm.GetData() );
+                aDataSize = aCompressedStm.GetSize();
+            }
+        }
+
+        Sequence< sal_Int8 > aTempSeq( aDataPtr, aDataSize );
+        rxOStm->writeBytes( aTempSeq );
+    }
     return bRet;
 }
 
@@ -794,44 +829,44 @@ bool SVGFilter::implExportWriterTextGraphic( const Reference< view::XSelectionSu
     Any selection = xSelectionSupplier->getSelection();
     uno::Reference<lang::XServiceInfo> xSelection;
     selection >>= xSelection;
-    if (xSelection.is() && xSelection->supportsService("com.sun.star.text.TextGraphicObject"))
-    {
-        uno::Reference<beans::XPropertySet> xPropertySet(xSelection, uno::UNO_QUERY);
+    if (!xSelection || !xSelection->supportsService("com.sun.star.text.TextGraphicObject"))
+        return true;
 
-        uno::Reference<graphic::XGraphic> xOriginalGraphic;
-        xPropertySet->getPropertyValue("Graphic") >>= xOriginalGraphic;
-        const Graphic aOriginalGraphic(xOriginalGraphic);
+    uno::Reference<beans::XPropertySet> xPropertySet(xSelection, uno::UNO_QUERY);
 
-        uno::Reference<graphic::XGraphic> xTransformedGraphic;
-        xPropertySet->getPropertyValue(
-            mbIsPreview ? OUString("GraphicPreview") : OUString("TransformedGraphic"))
-                >>= xTransformedGraphic;
+    uno::Reference<graphic::XGraphic> xOriginalGraphic;
+    xPropertySet->getPropertyValue("Graphic") >>= xOriginalGraphic;
+    const Graphic aOriginalGraphic(xOriginalGraphic);
 
-        if (!xTransformedGraphic.is())
-            return false;
-        const Graphic aTransformedGraphic(xTransformedGraphic);
-        bool bSameGraphic = aTransformedGraphic == aOriginalGraphic ||
-            aOriginalGraphic.GetChecksum() == aTransformedGraphic.GetChecksum();
-        const Graphic aGraphic = bSameGraphic ? aOriginalGraphic : aTransformedGraphic;
-        uno::Reference<graphic::XGraphic> xGraphic = bSameGraphic ? xOriginalGraphic : xTransformedGraphic;
+    uno::Reference<graphic::XGraphic> xTransformedGraphic;
+    xPropertySet->getPropertyValue(
+        mbIsPreview ? OUString("GraphicPreview") : OUString("TransformedGraphic"))
+            >>= xTransformedGraphic;
 
-        // Calculate size from Graphic
-        Point aPos( OutputDevice::LogicToLogic(aGraphic.GetPrefMapMode().GetOrigin(), aGraphic.GetPrefMapMode(), MapMode(MapUnit::Map100thMM)) );
-        Size  aSize( OutputDevice::LogicToLogic(aGraphic.GetPrefSize(), aGraphic.GetPrefMapMode(), MapMode(MapUnit::Map100thMM)) );
+    if (!xTransformedGraphic.is())
+        return false;
+    const Graphic aTransformedGraphic(xTransformedGraphic);
+    bool bSameGraphic = aTransformedGraphic == aOriginalGraphic ||
+        aOriginalGraphic.GetChecksum() == aTransformedGraphic.GetChecksum();
+    const Graphic aGraphic = bSameGraphic ? aOriginalGraphic : aTransformedGraphic;
+    uno::Reference<graphic::XGraphic> xGraphic = bSameGraphic ? xOriginalGraphic : xTransformedGraphic;
 
-        assert(mSelectedPages.size() == 1);
-        SvxDrawPage* pSvxDrawPage(comphelper::getFromUnoTunnel<SvxDrawPage>(mSelectedPages[0]));
-        if(pSvxDrawPage == nullptr || pSvxDrawPage->GetSdrPage() == nullptr)
-            return false;
+    // Calculate size from Graphic
+    Point aPos( OutputDevice::LogicToLogic(aGraphic.GetPrefMapMode().GetOrigin(), aGraphic.GetPrefMapMode(), MapMode(MapUnit::Map100thMM)) );
+    Size  aSize( OutputDevice::LogicToLogic(aGraphic.GetPrefSize(), aGraphic.GetPrefMapMode(), MapMode(MapUnit::Map100thMM)) );
 
-        SdrGrafObj* pGraphicObj = new SdrGrafObj(pSvxDrawPage->GetSdrPage()->getSdrModelFromSdrPage(), aGraphic, tools::Rectangle( aPos, aSize ));
-        uno::Reference< drawing::XShape > xShape = GetXShapeForSdrObject(pGraphicObj);
-        uno::Reference< XPropertySet > xShapePropSet(xShape, uno::UNO_QUERY);
-        xShapePropSet->setPropertyValue("Graphic", uno::Any(xGraphic));
+    assert(mSelectedPages.size() == 1);
+    SvxDrawPage* pSvxDrawPage(comphelper::getFromUnoTunnel<SvxDrawPage>(mSelectedPages[0]));
+    if(pSvxDrawPage == nullptr || pSvxDrawPage->GetSdrPage() == nullptr)
+        return false;
 
-        maShapeSelection = drawing::ShapeCollection::create(comphelper::getProcessComponentContext());
-        maShapeSelection->add(xShape);
-    }
+    rtl::Reference<SdrGrafObj> pGraphicObj = new SdrGrafObj(pSvxDrawPage->GetSdrPage()->getSdrModelFromSdrPage(), aGraphic, tools::Rectangle( aPos, aSize ));
+    uno::Reference< drawing::XShape > xShape = GetXShapeForSdrObject(pGraphicObj.get());
+    uno::Reference< XPropertySet > xShapePropSet(xShape, uno::UNO_QUERY);
+    xShapePropSet->setPropertyValue("Graphic", uno::Any(xGraphic));
+
+    maShapeSelection = drawing::ShapeCollection::create(comphelper::getProcessComponentContext());
+    maShapeSelection->add(xShape);
 
     return true;
 }
@@ -900,10 +935,14 @@ bool SVGFilter::implExportDocument()
     // #i124608#
     mbExportShapeSelection = mbSinglePage && maShapeSelection.is() && maShapeSelection->getCount();
 
-    if(xDefaultPagePropertySet.is())
+    if (xDefaultPagePropertySet.is())
     {
-        xDefaultPagePropertySet->getPropertyValue( "Width" ) >>= nDocWidth;
-        xDefaultPagePropertySet->getPropertyValue( "Height" ) >>= nDocHeight;
+        sal_Int32 nWidth = 0;
+        sal_Int32 nHeight = 0;
+        if (xDefaultPagePropertySet->getPropertyValue("Width") >>= nWidth)
+            nDocWidth = nWidth;
+        if (xDefaultPagePropertySet->getPropertyValue("Height") >>= nHeight)
+            nDocHeight = nHeight;
     }
 
     if(mbExportShapeSelection)
@@ -2462,18 +2501,19 @@ void SVGFilter::implCreateObjectsFromBackground( const Reference< css::drawing::
 
     GDIMetaFile             aMtf;
 
-    utl::TempFile aFile;
-    aFile.EnableKillingFile();
+    utl::TempFileFast aFile;
+    SvStream* pStream = aFile.GetStream(StreamMode::READWRITE);
 
     Sequence< PropertyValue > aDescriptor{
         comphelper::makePropertyValue("FilterName", OUString( "SVM" )),
-        comphelper::makePropertyValue("URL", aFile.GetURL()),
+        comphelper::makePropertyValue("OutputStream", uno::Reference<XOutputStream>(new utl::OOutputStreamWrapper(*pStream))),
         comphelper::makePropertyValue("ExportOnlyBackground", true)
     };
 
     xExporter->setSourceDocument( Reference< XComponent >( rxDrawPage, UNO_QUERY ) );
     xExporter->filter( aDescriptor );
-    SvmReader aReader( *aFile.GetStream( StreamMode::READ ) );
+    pStream->Seek(0);
+    SvmReader aReader( *pStream );
     aReader.Read( aMtf );
 
     bool bIsBitmap = false;

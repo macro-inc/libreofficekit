@@ -13,11 +13,13 @@ define sw_uiwriter_libraries
     comphelper \
     cppu \
     cppuhelper \
+    docmodel \
     editeng \
     i18nlangtag \
     msword \
     sal \
     sfx \
+    subsequenttest \
     svl \
     svt \
     svxcore \
@@ -49,6 +51,10 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_uiwriter$(1), \
 $(eval $(call gb_CppunitTest_use_externals,sw_uiwriter$(1),\
 	boost_headers \
     libxml2 \
+))
+
+$(eval $(call gb_CppunitTest_use_custom_headers,sw_uiwriter$(1),\
+    officecfg/registry \
 ))
 
 $(eval $(call gb_CppunitTest_set_include,sw_uiwriter$(1),\

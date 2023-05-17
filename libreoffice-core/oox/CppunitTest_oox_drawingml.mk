@@ -22,11 +22,16 @@ $(eval $(call gb_CppunitTest_add_exception_objects,oox_drawingml, \
 $(eval $(call gb_CppunitTest_use_libraries,oox_drawingml, \
     comphelper \
     cppu \
+    cppuhelper \
+    docmodel \
     oox \
     sal \
+    subsequenttest \
     test \
+    tl \
     unotest \
     utl \
+    basegfx \
 ))
 
 $(eval $(call gb_CppunitTest_use_sdk_api,oox_drawingml))
@@ -41,6 +46,12 @@ $(eval $(call gb_CppunitTest_use_custom_headers,oox_drawingml,\
 ))
 
 $(eval $(call gb_CppunitTest_use_configuration,oox_drawingml))
+
+$(eval $(call gb_CppunitTest_use_uiconfigs,oox_drawingml, \
+    modules/simpress \
+    sfx \
+    svt \
+))
 
 $(eval $(call gb_CppunitTest_add_arguments,oox_drawingml, \
     -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \

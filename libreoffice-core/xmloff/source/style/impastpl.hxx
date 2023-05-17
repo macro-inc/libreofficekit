@@ -24,6 +24,7 @@
 #include <rtl/ref.hxx>
 #include <set>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <comphelper/stl_types.hxx>
@@ -62,7 +63,7 @@ public:
 class XMLAutoStylePoolParent
 {
 public:
-    typedef std::vector<std::unique_ptr<XMLAutoStylePoolProperties>> PropertiesListType;
+    typedef std::vector<XMLAutoStylePoolProperties> PropertiesListType;
 
 private:
     OUString msParent;
@@ -70,8 +71,8 @@ private:
 
 public:
 
-    explicit XMLAutoStylePoolParent( const OUString & rParent ) :
-        msParent( rParent )
+    explicit XMLAutoStylePoolParent( OUString aParent ) :
+        msParent(std::move( aParent ))
     {
     }
 
@@ -85,10 +86,7 @@ public:
 
     const OUString& GetParent() const { return msParent; }
 
-    PropertiesListType& GetPropertiesList()
-    {
-        return m_PropertiesList;
-    }
+    const PropertiesListType& GetPropertiesList() const { return m_PropertiesList; }
 
     bool operator< (const XMLAutoStylePoolParent& rOther) const;
 };
@@ -97,8 +95,7 @@ public:
 
 struct XMLAutoStyleFamily
 {
-    typedef std::set<std::unique_ptr<XMLAutoStylePoolParent>,
-        comphelper::UniquePtrValueLess<XMLAutoStylePoolParent>> ParentSetType;
+    typedef std::set<XMLAutoStylePoolParent> ParentSetType;
 
     XmlStyleFamily mnFamily;
     OUString maStrFamilyName;
@@ -112,9 +109,9 @@ struct XMLAutoStyleFamily
     OUString maStrPrefix;
     bool mbAsFamily;
 
-    XMLAutoStyleFamily( XmlStyleFamily nFamily, const OUString& rStrName,
-            const rtl::Reference<SvXMLExportPropertyMapper>& rMapper,
-            const OUString& rStrPrefix, bool bAsFamily );
+    XMLAutoStyleFamily( XmlStyleFamily nFamily, OUString aStrName,
+            rtl::Reference<SvXMLExportPropertyMapper> xMapper,
+            OUString aStrPrefix, bool bAsFamily );
 
     explicit XMLAutoStyleFamily( XmlStyleFamily nFamily );
 
@@ -131,8 +128,7 @@ struct XMLAutoStyleFamily
 class SvXMLAutoStylePoolP_Impl
 {
     // A set that finds and sorts based only on mnFamily
-    typedef std::set<std::unique_ptr<XMLAutoStyleFamily>,
-            comphelper::UniquePtrValueLess<XMLAutoStyleFamily>> FamilySetType;
+    typedef std::set<XMLAutoStyleFamily> FamilySetType;
 
     SvXMLExport& rExport;
     FamilySetType m_FamilySet;
@@ -154,6 +150,9 @@ public:
     void GetRegisteredNames(
         css::uno::Sequence<sal_Int32>& aFamilies,
         css::uno::Sequence<OUString>& aNames );
+
+    /// retrieve the names of the properties used in the styles
+    css::uno::Sequence<OUString> GetPropertyNames();
 
     bool Add(
         OUString& rName, XmlStyleFamily nFamily,

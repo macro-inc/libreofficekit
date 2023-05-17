@@ -53,7 +53,6 @@
 
 #include <comphelper/lok.hxx>
 #include <officecfg/Office/Calc.hxx>
-#include <LibreOfficeKit/LibreOfficeKitEnums.h>
 
 using namespace com::sun::star;
 
@@ -108,17 +107,17 @@ void ScTabView::Init()
         explicitly because the parent frame window is already RTL disabled. */
     pTabControl->EnableRTL( AllSettings::GetLayoutRTL() );
 
-    InitScrollBar( *aHScrollLeft,    aViewData.GetDocument().MaxCol()+1 );
-    InitScrollBar( *aHScrollRight,   aViewData.GetDocument().MaxCol()+1 );
-    InitScrollBar( *aVScrollTop,     aViewData.GetDocument().MaxRow()+1 );
-    InitScrollBar( *aVScrollBottom,  aViewData.GetDocument().MaxRow()+1 );
+    InitScrollBar( *aHScrollLeft,    aViewData.GetDocument().MaxCol()+1, LINK(this, ScTabView, HScrollLeftHdl) );
+    InitScrollBar( *aHScrollRight,   aViewData.GetDocument().MaxCol()+1, LINK(this, ScTabView, HScrollRightHdl) );
+    InitScrollBar( *aVScrollTop,     aViewData.GetDocument().MaxRow()+1, LINK(this, ScTabView, VScrollTopHdl) );
+    InitScrollBar( *aVScrollBottom,  aViewData.GetDocument().MaxRow()+1, LINK(this, ScTabView, VScrollBottomHdl) );
     /*  #i97900# scrollbars remain in correct RTL mode, needed mirroring etc.
         is now handled correctly at the respective places. */
 
     //  Don't show anything here, because still in wrong order
     //  Show is received from UpdateShow during first resize
     //      pTabControl, pGridWin, aHScrollLeft, aVScrollBottom,
-    //      aCornerButton, aScrollBarBox, pHSplitter, pVSplitter
+    //      aCornerButton, pHSplitter, pVSplitter
 
     //      fragment
 
@@ -186,7 +185,7 @@ ScTabView::~ScTabView()
         for (i=0; i<4; i++)
             if (pGridWin[i])
             {
-                pDrawView->DeleteWindowFromPaintView(pGridWin[i]->GetOutDev());
+                pDrawView->DeleteDeviceFromPaintView(*pGridWin[i]->GetOutDev());
             }
 
         pDrawView->HideSdrPage();
@@ -213,7 +212,6 @@ ScTabView::~ScTabView()
         pRowOutline[i].disposeAndClear();
     }
 
-    aScrollBarBox.disposeAndClear();
     aCornerButton.disposeAndClear();
     aTopButton.disposeAndClear();
     aHScrollLeft.disposeAndClear();
@@ -240,7 +238,7 @@ void ScTabView::MakeDrawView( TriState nForceDesignMode )
         if (pGridWin[i])
         {
             if ( SC_SPLIT_BOTTOMLEFT != static_cast<ScSplitPos>(i) )
-                pDrawView->AddWindowToPaintView(pGridWin[i]->GetOutDev(), nullptr);
+                pDrawView->AddDeviceToPaintView(*pGridWin[i]->GetOutDev(), nullptr);
         }
     pDrawView->RecalcScale();
     for (i=0; i<4; i++)
@@ -273,7 +271,7 @@ void ScTabView::DoAddWin( ScGridWindow* pWin )
 {
     if (pDrawView)
     {
-        pDrawView->AddWindowToPaintView(pWin->GetOutDev(), nullptr);
+        pDrawView->AddDeviceToPaintView(*pWin->GetOutDev(), nullptr);
         pWin->DrawLayerCreated();
     }
     pWin->SetAutoSpellContext(mpSpellCheckCxt);
@@ -384,6 +382,7 @@ void ScTabView::UpdateLayerLocks()
         pDrawView->SetLayerLocked( pLayer->GetName(), bProt || bShared );
         pDrawView->SetLayerVisible( pLayer->GetName(), false);
     }
+    pTabControl->SetAddButtonEnabled(aViewData.GetDocument().IsDocEditable());
 }
 
 void ScTabView::DrawDeselectAll()

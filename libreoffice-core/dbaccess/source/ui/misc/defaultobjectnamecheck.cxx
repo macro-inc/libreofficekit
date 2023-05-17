@@ -24,7 +24,6 @@
 
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/sdb/CommandType.hpp>
-#include <com/sun/star/sdb/tools/XConnectionTools.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
 
 #include <connectivity/dbexception.hxx>
@@ -32,7 +31,7 @@
 
 #include <rtl/ustrbuf.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 
 #include <memory>
@@ -68,21 +67,13 @@ namespace dbaui
 
     }
 
-    // HierarchicalNameCheck_Impl
-    struct HierarchicalNameCheck_Impl
-    {
-        Reference< XHierarchicalNameAccess >    xHierarchicalNames;
-        OUString                         sRelativeRoot;
-    };
-
     // HierarchicalNameCheck
     HierarchicalNameCheck::HierarchicalNameCheck( const Reference< XHierarchicalNameAccess >& _rxNames, const OUString& _rRelativeRoot )
-        :m_pImpl( new HierarchicalNameCheck_Impl )
     {
-        m_pImpl->xHierarchicalNames = _rxNames;
-        m_pImpl->sRelativeRoot = _rRelativeRoot;
+        mxHierarchicalNames = _rxNames;
+        msRelativeRoot = _rRelativeRoot;
 
-        if ( !m_pImpl->xHierarchicalNames.is() )
+        if ( !mxHierarchicalNames.is() )
             throw IllegalArgumentException();
     }
 
@@ -95,15 +86,15 @@ namespace dbaui
         try
         {
             OUStringBuffer aCompleteName;
-            if ( !m_pImpl->sRelativeRoot.isEmpty() )
+            if ( !msRelativeRoot.isEmpty() )
             {
-                aCompleteName.append( m_pImpl->sRelativeRoot );
+                aCompleteName.append( msRelativeRoot );
                 aCompleteName.append( "/" );
             }
             aCompleteName.append( _rObjectName );
 
             OUString sCompleteName( aCompleteName.makeStringAndClear() );
-            if ( !m_pImpl->xHierarchicalNames->hasByHierarchicalName( sCompleteName ) )
+            if ( !mxHierarchicalNames->hasByHierarchicalName( sCompleteName ) )
                 return true;
         }
         catch( const Exception& )
@@ -115,26 +106,18 @@ namespace dbaui
         return false;
     }
 
-    // DynamicTableOrQueryNameCheck_Impl
-    struct DynamicTableOrQueryNameCheck_Impl
-    {
-        sal_Int32                   nCommandType;
-        Reference< XObjectNames >   xObjectNames;
-    };
-
     // DynamicTableOrQueryNameCheck
     DynamicTableOrQueryNameCheck::DynamicTableOrQueryNameCheck( const Reference< XConnection >& _rxSdbLevelConnection, sal_Int32 _nCommandType )
-        :m_pImpl( new DynamicTableOrQueryNameCheck_Impl )
     {
         Reference< XConnectionTools > xConnTools( _rxSdbLevelConnection, UNO_QUERY );
         if ( xConnTools.is() )
-            m_pImpl->xObjectNames.set( xConnTools->getObjectNames() );
-        if ( !m_pImpl->xObjectNames.is() )
+            mxObjectNames.set( xConnTools->getObjectNames() );
+        if ( !mxObjectNames.is() )
             throw IllegalArgumentException();
 
         if ( ( _nCommandType != CommandType::QUERY ) && ( _nCommandType != CommandType::TABLE ) )
             throw IllegalArgumentException();
-        m_pImpl->nCommandType = _nCommandType;
+        mnCommandType = _nCommandType;
     }
 
     DynamicTableOrQueryNameCheck::~DynamicTableOrQueryNameCheck()
@@ -145,7 +128,7 @@ namespace dbaui
     {
         try
         {
-            m_pImpl->xObjectNames->checkNameForCreate( m_pImpl->nCommandType, _rObjectName );
+            mxObjectNames->checkNameForCreate( mnCommandType, _rObjectName );
             return true;
         }
         catch( const SQLException& )

@@ -27,6 +27,7 @@
 #include <com/sun/star/embed/FileSystemStorageFactory.hpp>
 #include <com/sun/star/io/IOException.hpp>
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
+#include <com/sun/star/lang/XUnoTunnel.hpp>
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -48,6 +49,7 @@
 
 #include <ucbhelper/content.hxx>
 
+#include <comphelper/bytereader.hxx>
 #include <comphelper/fileformat.h>
 #include <comphelper/hash.hxx>
 #include <comphelper/processfactory.hxx>
@@ -56,6 +58,7 @@
 #include <comphelper/storagehelper.hxx>
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/exc_hlp.hxx>
+#include <o3tl/string_view.hxx>
 
 #if HAVE_FEATURE_GPGME
 # include <context.h>
@@ -172,21 +175,47 @@ void OStorageHelper::CopyInputToOutput(
 {
     static const sal_Int32 nConstBufferSize = 32000;
 
-    sal_Int32 nRead;
-    uno::Sequence < sal_Int8 > aSequence ( nConstBufferSize );
-
-    do
+    uno::Reference< css::lang::XUnoTunnel > xInputTunnel( xInput, uno::UNO_QUERY );
+    comphelper::ByteReader* pByteReader = nullptr;
+    comphelper::ByteWriter* pByteWriter = nullptr;
+    if (xInputTunnel)
+        pByteReader = reinterpret_cast< comphelper::ByteReader* >( xInputTunnel->getSomething( comphelper::ByteReader::getUnoTunnelId() ) );
+    if (pByteReader)
     {
-        nRead = xInput->readBytes ( aSequence, nConstBufferSize );
-        if ( nRead < nConstBufferSize )
-        {
-            uno::Sequence < sal_Int8 > aTempBuf ( aSequence.getConstArray(), nRead );
-            xOutput->writeBytes ( aTempBuf );
-        }
-        else
-            xOutput->writeBytes ( aSequence );
+        uno::Reference< css::lang::XUnoTunnel > xOutputTunnel( xOutput, uno::UNO_QUERY );
+        if (xOutputTunnel)
+            pByteWriter = reinterpret_cast< comphelper::ByteWriter* >( xOutputTunnel->getSomething( comphelper::ByteWriter::getUnoTunnelId() ) );
     }
-    while ( nRead == nConstBufferSize );
+
+    if (pByteWriter)
+    {
+        sal_Int32 nRead;
+        sal_Int8 aTempBuf[ nConstBufferSize ];
+        do
+        {
+            nRead = pByteReader->readSomeBytes ( aTempBuf, nConstBufferSize );
+            pByteWriter->writeBytes ( aTempBuf, nRead );
+        }
+        while ( nRead == nConstBufferSize );
+    }
+    else
+    {
+        sal_Int32 nRead;
+        uno::Sequence < sal_Int8 > aSequence ( nConstBufferSize );
+
+        do
+        {
+            nRead = xInput->readBytes ( aSequence, nConstBufferSize );
+            if ( nRead < nConstBufferSize )
+            {
+                uno::Sequence < sal_Int8 > aTempBuf ( aSequence.getConstArray(), nRead );
+                xOutput->writeBytes ( aTempBuf );
+            }
+            else
+                xOutput->writeBytes ( aSequence );
+        }
+        while ( nRead == nConstBufferSize );
+    }
 }
 
 
@@ -527,9 +556,9 @@ uno::Sequence< beans::NamedValue > OStorageHelper::CreateGpgPackageEncryptionDat
 #endif
 }
 
-bool OStorageHelper::IsValidZipEntryFileName( const OUString& aName, bool bSlashAllowed )
+bool OStorageHelper::IsValidZipEntryFileName( std::u16string_view aName, bool bSlashAllowed )
 {
-    return IsValidZipEntryFileName( aName.getStr(), aName.getLength(), bSlashAllowed );
+    return IsValidZipEntryFileName( aName.data(), aName.size(), bSlashAllowed );
 }
 
 
@@ -561,27 +590,27 @@ bool OStorageHelper::IsValidZipEntryFileName(
 }
 
 
-bool OStorageHelper::PathHasSegment( const OUString& aPath, const OUString& aSegment )
+bool OStorageHelper::PathHasSegment( std::u16string_view aPath, std::u16string_view aSegment )
 {
     bool bResult = false;
-    const sal_Int32 nPathLen = aPath.getLength();
-    const sal_Int32 nSegLen = aSegment.getLength();
+    const size_t nPathLen = aPath.size();
+    const size_t nSegLen = aSegment.size();
 
-    if ( !aSegment.isEmpty() && nPathLen >= nSegLen )
+    if ( !aSegment.empty() && nPathLen >= nSegLen )
     {
-        OUString aEndSegment = "/" + aSegment;
+        OUString aEndSegment = OUString::Concat("/") + aSegment;
         OUString aInternalSegment = aEndSegment + "/";
 
-        if ( aPath.indexOf( aInternalSegment ) >= 0 )
+        if ( aPath.find( aInternalSegment ) != std::u16string_view::npos )
             bResult = true;
 
-        if ( !bResult && aPath.startsWith( aSegment ) )
+        if ( !bResult && o3tl::starts_with(aPath, aSegment ) )
         {
             if ( nPathLen == nSegLen || aPath[nSegLen] == '/' )
                 bResult = true;
         }
 
-        if ( !bResult && nPathLen > nSegLen && aPath.subView( nPathLen - nSegLen - 1, nSegLen + 1 ) == aEndSegment )
+        if ( !bResult && nPathLen > nSegLen && aPath.substr( nPathLen - nSegLen - 1, nSegLen + 1 ) == aEndSegment )
             bResult = true;
     }
 
@@ -606,11 +635,10 @@ void LifecycleProxy::commitStorages()
         });
 }
 
-static void splitPath( std::vector<OUString> &rElems,
-                       const OUString& rPath )
+static void splitPath( std::vector<OUString> &rElems, std::u16string_view rPath )
 {
     for (sal_Int32 i = 0; i >= 0;)
-        rElems.push_back( rPath.getToken( 0, '/', i ) );
+        rElems.push_back( OUString(o3tl::getToken(rPath, 0, '/', i )) );
 }
 
 static uno::Reference< embed::XStorage > LookupStorageAtPath(
@@ -630,7 +658,7 @@ static uno::Reference< embed::XStorage > LookupStorageAtPath(
 
 uno::Reference< embed::XStorage > OStorageHelper::GetStorageAtPath(
         const uno::Reference< embed::XStorage > &xStorage,
-        const OUString& rPath, sal_uInt32 nOpenMode,
+        std::u16string_view rPath, sal_uInt32 nOpenMode,
         LifecycleProxy const &rNastiness )
 {
     std::vector<OUString> aElems;
@@ -640,7 +668,7 @@ uno::Reference< embed::XStorage > OStorageHelper::GetStorageAtPath(
 
 uno::Reference< io::XStream > OStorageHelper::GetStreamAtPath(
         const uno::Reference< embed::XStorage > &xParentStorage,
-        const OUString& rPath, sal_uInt32 nOpenMode,
+        std::u16string_view rPath, sal_uInt32 nOpenMode,
         LifecycleProxy const &rNastiness )
 {
     std::vector<OUString> aElems;

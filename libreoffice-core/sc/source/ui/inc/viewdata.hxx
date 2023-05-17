@@ -329,6 +329,7 @@ private:
     bool                bMoveArea:1;
 
     bool                bGrowing;
+    sal_Int16           nFormulaBarLines;           // Visible lines in the formula bar
 
     tools::Long                m_nLOKPageUpDownOffset;
     tools::Rectangle    maLOKVisibleArea;///< The visible area in the LibreOfficeKit client.
@@ -370,7 +371,7 @@ public:
     void            UpdateInputHandler( bool bForce = false );
 
     void            WriteUserData(OUString& rData);
-    void            ReadUserData(const OUString& rData);
+    void            ReadUserData(std::u16string_view rData);
     void            WriteExtOptions( ScExtDocOptions& rOpt ) const;
     void            ReadExtOptions( const ScExtDocOptions& rOpt );
     void            WriteUserDataSequence(css::uno::Sequence <css::beans::PropertyValue>& rSettings) const;
@@ -466,6 +467,15 @@ public:
 
     double          GetPPTX() const { return nPPTX; }
     double          GetPPTY() const { return nPPTY; }
+
+    void SetFormulaBarLines(sal_Int16 nLines)
+    {
+        // Formula bar must be between 1 and 25 lines (see SpreadsheetViewSettings.idl)
+        nLines = std::max(nLines, static_cast<sal_Int16>(1));
+        nLines = std::min(nLines, static_cast<sal_Int16>(25));
+        nFormulaBarLines = nLines;
+    }
+    sal_Int16 GetFormulaBarLines() const { return nFormulaBarLines; };
 
     ScMarkType      GetSimpleArea( SCCOL& rStartCol, SCROW& rStartRow, SCTAB& rStartTab,
                                     SCCOL& rEndCol, SCROW& rEndRow, SCTAB& rEndTab ) const;

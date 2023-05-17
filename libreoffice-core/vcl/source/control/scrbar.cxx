@@ -19,9 +19,9 @@
 
 #include <vcl/event.hxx>
 #include <vcl/decoview.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/timer.hxx>
 #include <vcl/settings.hxx>
+#include <vcl/toolkit/scrbar.hxx>
 #include <vcl/vclevent.hxx>
 
 #include <sal/log.hxx>
@@ -269,7 +269,7 @@ void ScrollBar::ImplCalc( bool bUpdate )
                      aControlRegion, ControlState::NONE, ImplControlValue(), aBoundingRegion, aTrackRegion ) )
                 maTrackRect = aTrackRegion;
             else
-                maTrackRect = tools::Rectangle::Justify( maBtn1Rect.TopRight(), maBtn2Rect.BottomLeft() );
+                maTrackRect = tools::Rectangle::Normalize( maBtn1Rect.TopRight(), maBtn2Rect.BottomLeft() );
 
             // Check if available space is big enough for thumb ( min thumb size = ScrBar width/height )
             mnThumbPixRange = maTrackRect.Right() - maTrackRect.Left();
@@ -306,7 +306,7 @@ void ScrollBar::ImplCalc( bool bUpdate )
                      aControlRegion, ControlState::NONE, ImplControlValue(), aBoundingRegion, aTrackRegion ) )
                 maTrackRect = aTrackRegion;
             else
-                maTrackRect = tools::Rectangle::Justify( maBtn1Rect.BottomLeft()+Point(0,1), maBtn2Rect.TopRight() );
+                maTrackRect = tools::Rectangle::Normalize( maBtn1Rect.BottomLeft()+Point(0,1), maBtn2Rect.TopRight() );
 
             // Check if available space is big enough for thumb
             mnThumbPixRange = maTrackRect.Bottom() - maTrackRect.Top();
@@ -1118,12 +1118,12 @@ IMPL_LINK_NOARG(ScrollBar, ImplAutoTimerHdl, Timer *, void)
 void ScrollBar::ImplInvert()
 {
     tools::Rectangle aRect( maThumbRect );
-    if( aRect.getWidth() > 4 )
+    if( aRect.GetWidth() > 5 )
     {
         aRect.AdjustLeft(2 );
         aRect.AdjustRight( -2 );
     }
-    if( aRect.getHeight() > 4 )
+    if( aRect.GetHeight() > 5 )
     {
         aRect.AdjustTop(2 );
         aRect.AdjustBottom( -2 );
@@ -1142,7 +1142,8 @@ void ScrollBar::GetFocus()
     }
     ImplInvert(); // react immediately
     mpData->maTimer.SetTimeout( GetSettings().GetStyleSettings().GetCursorBlinkTime() );
-    mpData->maTimer.Start();
+    if (mpData->maTimer.GetTimeout() != STYLE_CURSOR_NOBLINKTIME)
+        mpData->maTimer.Start();
     Control::GetFocus();
 }
 
@@ -1250,7 +1251,7 @@ tools::Rectangle* ScrollBar::ImplFindPartRect( const Point& rPt )
 
 bool ScrollBar::PreNotify( NotifyEvent& rNEvt )
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE )
+    if( rNEvt.GetType() == NotifyEventType::MOUSEMOVE )
     {
         const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
         if( pMouseEvt && !pMouseEvt->GetButtons() && !pMouseEvt->IsSynthetic() && !pMouseEvt->IsModifierChanged() )
@@ -1338,7 +1339,7 @@ void ScrollBar::SetRange( const Range& rRange )
 {
     // Adapt Range
     Range aRange = rRange;
-    aRange.Justify();
+    aRange.Normalize();
     tools::Long nNewMinRange = aRange.Min();
     tools::Long nNewMaxRange = aRange.Max();
 
@@ -1417,6 +1418,11 @@ Size ScrollBar::getCurrentCalcSize() const
     aCtrlRegion.Union(maPage2Rect);
     aCtrlRegion.Union(maThumbRect);
     return aCtrlRegion.GetSize();
+}
+
+bool ScrollBar::Inactive() const
+{
+    return !IsEnabled() || !IsInputEnabled() || IsInModalMode();
 }
 
 void ScrollBarBox::ImplInit(vcl::Window* pParent, WinBits nStyle)

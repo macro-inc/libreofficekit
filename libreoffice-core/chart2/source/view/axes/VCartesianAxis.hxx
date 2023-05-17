@@ -100,7 +100,7 @@ public:
 
     void createDataTableView(std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList,
                              css::uno::Reference<css::util::XNumberFormatsSupplier> const& xNumberFormatsSupplier,
-                             css::uno::Reference<css::chart2::XChartDocument> const& xChartDoc,
+                             rtl::Reference<::chart::ChartModel> const& xChartDoc,
                              css::uno::Reference<css::uno::XComponentContext> const& rComponentContext) override;
 private: //methods
     /**
@@ -120,7 +120,7 @@ private: //methods
      *         method once again to get the text shapes created.
      */
     bool createTextShapes(
-        const css::uno::Reference<css::drawing::XShapes >& xTarget,
+        const rtl::Reference< SvxShapeGroupAnyD >& xTarget,
         TickIter& rTickIter, AxisLabelProperties& rAxisLabelProperties,
         TickFactory2D const * pTickFactory, sal_Int32 nScreenDistanceBetweenTicks );
 
@@ -130,7 +130,7 @@ private: //methods
      * are to be resolved only by adjusting the label tick interval.
      */
     bool createTextShapesSimple(
-        const css::uno::Reference<css::drawing::XShapes >& xTarget,
+        const rtl::Reference< SvxShapeGroupAnyD >& xTarget,
         TickIter& rTickIter, AxisLabelProperties& rAxisLabelProperties,
         TickFactory2D const * pTickFactory );
 

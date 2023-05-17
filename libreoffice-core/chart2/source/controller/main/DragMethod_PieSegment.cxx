@@ -19,15 +19,14 @@
 
 #include "DragMethod_PieSegment.hxx"
 #include <DrawViewWrapper.hxx>
-
+#include <ChartModel.hxx>
 #include <strings.hrc>
 #include <ResId.hxx>
 #include <ObjectIdentifier.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/awt/Point.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 #include <basegfx/matrix/b2dhommatrix.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -38,7 +37,7 @@ using ::basegfx::B2DVector;
 
 DragMethod_PieSegment::DragMethod_PieSegment( DrawViewWrapper& rDrawViewWrapper
                                              , const OUString& rObjectCID
-                                             , const Reference< frame::XModel >& xChartModel )
+                                             , const rtl::Reference<::chart::ChartModel>& xChartModel )
     : DragMethod_Base( rDrawViewWrapper, rObjectCID, xChartModel )
     , m_aStartVector(100.0,100.0)
     , m_fInitialOffset(0.0)
@@ -46,7 +45,7 @@ DragMethod_PieSegment::DragMethod_PieSegment( DrawViewWrapper& rDrawViewWrapper
     , m_aDragDirection(1000.0,1000.0)
     , m_fDragRange( 1.0 )
 {
-    OUString aParameter( ObjectIdentifier::getDragParameterString( m_aObjectCID ) );
+    std::u16string_view aParameter( ObjectIdentifier::getDragParameterString( m_aObjectCID ) );
 
     sal_Int32 nOffsetPercent(0);
     awt::Point aMinimumPosition(0,0);
@@ -112,7 +111,7 @@ bool DragMethod_PieSegment::EndSdrDrag(bool /*bCopy*/)
 
     try
     {
-        Reference< frame::XModel > xChartModel( getChartModel() );
+        rtl::Reference<::chart::ChartModel> xChartModel( getChartModel() );
         if( xChartModel.is() )
         {
             Reference< beans::XPropertySet > xPointProperties(
@@ -128,7 +127,7 @@ bool DragMethod_PieSegment::EndSdrDrag(bool /*bCopy*/)
 
     return true;
 }
-basegfx::B2DHomMatrix DragMethod_PieSegment::getCurrentTransformation()
+basegfx::B2DHomMatrix DragMethod_PieSegment::getCurrentTransformation() const
 {
     basegfx::B2DHomMatrix aRetval;
 
@@ -143,8 +142,8 @@ void DragMethod_PieSegment::createSdrDragEntries()
 
     if( pObj && pPV )
     {
-        const basegfx::B2DPolyPolygon aNewPolyPolygon(pObj->TakeXorPoly());
-        addSdrDragEntry(std::unique_ptr<SdrDragEntry>(new SdrDragEntryPolyPolygon(aNewPolyPolygon)));
+        basegfx::B2DPolyPolygon aNewPolyPolygon(pObj->TakeXorPoly());
+        addSdrDragEntry(std::unique_ptr<SdrDragEntry>(new SdrDragEntryPolyPolygon(std::move(aNewPolyPolygon))));
     }
 }
 } //namespace chart

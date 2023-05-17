@@ -18,6 +18,7 @@
  */
 
 #include "elementimport.hxx"
+#include <utility>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/namespacemap.hxx>
 #include "strings.hxx"
@@ -43,12 +44,13 @@
 
 #include <sax/tools/converter.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
 #include <comphelper/extract.hxx>
 #include <comphelper/types.hxx>
 #include <comphelper/sequence.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <algorithm>
 
@@ -207,7 +209,7 @@ namespace xmloff
         }
 
         if (m_xParentContainer.is())
-            m_xParentContainer->insertByName(m_sName, makeAny(m_xElement));
+            m_xParentContainer->insertByName(m_sName, Any(m_xElement));
 
         LEAVE_LOG_CONTEXT( );
     }
@@ -767,10 +769,10 @@ namespace xmloff
             return;
         }
 
-        const char* pValueProperty = nullptr;
-        const char* pCurrentValueProperty = nullptr;
-        const char* pMinValueProperty = nullptr;
-        const char* pMaxValueProperty = nullptr;
+        OUString pValueProperty;
+        OUString pCurrentValueProperty;
+        OUString pMinValueProperty;
+        OUString pMaxValueProperty;
 
         bool bRetrievedValues = false;
         bool bRetrievedValueLimits = false;
@@ -792,7 +794,7 @@ namespace xmloff
                     if (!bRetrievedValues)
                     {
                         getValuePropertyNames(m_eElementType, nClassId, pCurrentValueProperty, pValueProperty);
-                        if ( !pCurrentValueProperty && !pValueProperty )
+                        if ( pCurrentValueProperty.isEmpty() && pValueProperty.isEmpty() )
                         {
                             SAL_WARN( "xmloff.forms", "OControlImport::StartElement: illegal value property names!" );
                             break;
@@ -800,13 +802,13 @@ namespace xmloff
 
                         bRetrievedValues = true;
                     }
-                    if ( PROPID_VALUE == rValueProps.Handle && !pValueProperty )
+                    if ( PROPID_VALUE == rValueProps.Handle && pValueProperty.isEmpty() )
                     {
                         SAL_WARN( "xmloff.forms", "OControlImport::StartElement: the control does not have a value property!");
                         break;
                     }
 
-                    if ( PROPID_CURRENT_VALUE == rValueProps.Handle && !pCurrentValueProperty )
+                    if ( PROPID_CURRENT_VALUE == rValueProps.Handle && pCurrentValueProperty.isEmpty() )
                     {
                         SAL_WARN( "xmloff.forms", "OControlImport::StartElement: the control does not have a current-value property!");
                         break;
@@ -814,9 +816,9 @@ namespace xmloff
 
                     // transfer the name
                     if (PROPID_VALUE == rValueProps.Handle)
-                        rValueProps.Name = OUString::createFromAscii(pValueProperty);
+                        rValueProps.Name = pValueProperty;
                     else
-                        rValueProps.Name = OUString::createFromAscii(pCurrentValueProperty);
+                        rValueProps.Name = pCurrentValueProperty;
                     bSuccess = true;
                 }
                 break;
@@ -827,7 +829,7 @@ namespace xmloff
                     if (!bRetrievedValueLimits)
                     {
                         getValueLimitPropertyNames(nClassId, pMinValueProperty, pMaxValueProperty);
-                        if ( !pMinValueProperty || !pMaxValueProperty )
+                        if ( pMinValueProperty.isEmpty() || pMaxValueProperty.isEmpty() )
                         {
                             SAL_WARN( "xmloff.forms", "OControlImport::StartElement: illegal value limit property names!" );
                             break;
@@ -835,16 +837,16 @@ namespace xmloff
 
                         bRetrievedValueLimits = true;
                     }
-                    OSL_ENSURE((PROPID_MIN_VALUE != rValueProps.Handle) || pMinValueProperty,
+                    OSL_ENSURE((PROPID_MIN_VALUE != rValueProps.Handle) || !pMinValueProperty.isEmpty(),
                         "OControlImport::StartElement: the control does not have a value property!");
-                    OSL_ENSURE((PROPID_MAX_VALUE != rValueProps.Handle) || pMaxValueProperty,
+                    OSL_ENSURE((PROPID_MAX_VALUE != rValueProps.Handle) || !pMaxValueProperty.isEmpty(),
                         "OControlImport::StartElement: the control does not have a current-value property!");
 
                     // transfer the name
                     if (PROPID_MIN_VALUE == rValueProps.Handle)
-                        rValueProps.Name = OUString::createFromAscii(pMinValueProperty);
+                        rValueProps.Name = pMinValueProperty;
                     else
-                        rValueProps.Name = OUString::createFromAscii(pMaxValueProperty);
+                        rValueProps.Name = pMaxValueProperty;
                     bSuccess = true;
                 }
                 break;
@@ -928,10 +930,10 @@ namespace xmloff
                                  "caught an exception while retrieving the class id!");
         }
 
-        const char* pValueProperty = nullptr;
-        const char* pDefaultValueProperty = nullptr;
+        OUString pValueProperty;
+        OUString pDefaultValueProperty;
         getRuntimeValuePropertyNames(m_eElementType, nClassId, pValueProperty, pDefaultValueProperty);
-        if ( pDefaultValueProperty && pValueProperty )
+        if ( !pDefaultValueProperty.isEmpty() && !pValueProperty.isEmpty() )
         {
             bool bNonDefaultValuePropertyValue = false;
                 // is the "value property" part of the sequence?
@@ -939,9 +941,9 @@ namespace xmloff
             // look up this property in our sequence
             for ( const auto& rCheck : m_aValues )
             {
-                if ( rCheck.Name.equalsAscii( pDefaultValueProperty ) )
+                if ( rCheck.Name == pDefaultValueProperty )
                     bRestoreValuePropertyValue = true;
-                else if ( rCheck.Name.equalsAscii( pValueProperty ) )
+                else if ( rCheck.Name == pValueProperty )
                 {
                     bNonDefaultValuePropertyValue = true;
                     // we need to restore the value property we found here, nothing else
@@ -954,7 +956,7 @@ namespace xmloff
                 // found it -> need to remember (and restore) the "value property value", which is not set explicitly
                 try
                 {
-                    aValuePropertyValue = m_xElement->getPropertyValue( OUString::createFromAscii( pValueProperty ) );
+                    aValuePropertyValue = m_xElement->getPropertyValue( pValueProperty );
                 }
                 catch( const Exception& )
                 {
@@ -969,11 +971,11 @@ namespace xmloff
         OElementImport::endFastElement(nElement);
 
         // restore the "value property value", if necessary
-        if ( bRestoreValuePropertyValue && pValueProperty )
+        if ( bRestoreValuePropertyValue && !pValueProperty.isEmpty() )
         {
             try
             {
-                m_xElement->setPropertyValue( OUString::createFromAscii( pValueProperty ), aValuePropertyValue );
+                m_xElement->setPropertyValue( pValueProperty, aValuePropertyValue );
             }
             catch( const Exception& )
             {
@@ -1286,9 +1288,9 @@ namespace xmloff
         if ( m_xInfo.is() )
         {
             if ( m_xInfo->hasPropertyByName( PROPERTY_SPIN_INCREMENT ) )
-                m_xElement->setPropertyValue( PROPERTY_SPIN_INCREMENT, makeAny( m_nStepSizeValue ) );
+                m_xElement->setPropertyValue( PROPERTY_SPIN_INCREMENT, Any( m_nStepSizeValue ) );
             else if ( m_xInfo->hasPropertyByName( PROPERTY_LINE_INCREMENT ) )
-                m_xElement->setPropertyValue( PROPERTY_LINE_INCREMENT, makeAny( m_nStepSizeValue ) );
+                m_xElement->setPropertyValue( PROPERTY_LINE_INCREMENT, Any( m_nStepSizeValue ) );
         }
     }
 
@@ -1402,7 +1404,7 @@ namespace xmloff
             bHasRichTextProperty = m_xInfo->hasPropertyByName( PROPERTY_RICH_TEXT );
         OSL_ENSURE( bHasRichTextProperty, "OTextLikeImport::EndElement: text:p, but no rich text control?" );
         if ( bHasRichTextProperty )
-            m_xElement->setPropertyValue( PROPERTY_RICH_TEXT, makeAny( true ) );
+            m_xElement->setPropertyValue( PROPERTY_RICH_TEXT, Any( true ) );
         // Note that we do *not* set the RichText property (in case our element has one) to sal_False here
         // since this is the default of this property, anyway.
     }
@@ -1679,9 +1681,9 @@ namespace xmloff
 
     //= OListOptionImport
     OListOptionImport::OListOptionImport(SvXMLImport& _rImport,
-            const OListAndComboImportRef& _rListBox)
+            OListAndComboImportRef _xListBox)
         :SvXMLImportContext(_rImport)
-        ,m_xListBoxImport(_rListBox)
+        ,m_xListBoxImport(std::move(_xListBox))
     {
     }
 
@@ -1730,9 +1732,9 @@ namespace xmloff
 
     //= OComboItemImport
     OComboItemImport::OComboItemImport(SvXMLImport& _rImport,
-            const OListAndComboImportRef& _rListBox)
+            OListAndComboImportRef _xListBox)
         :SvXMLImportContext(_rImport)
-        ,m_xListBoxImport(_rListBox)
+        ,m_xListBoxImport(std::move(_xListBox))
     {
     }
 
@@ -2002,8 +2004,6 @@ namespace xmloff
 
             sal_Int32 nElementStart = 0;
             sal_Int32 nNextSep = 0;
-            sal_Int32 nElementLength;
-            OUString sElement;
             do
             {
                 // extract the current element
@@ -2011,15 +2011,15 @@ namespace xmloff
                     _rValue, nElementStart);
                 if (-1 == nNextSep)
                     nNextSep = nLength;
-                sElement = _rValue.copy(nElementStart, nNextSep - nElementStart);
+                std::u16string_view sElement = _rValue.subView(nElementStart, nNextSep - nElementStart);
 
-                nElementLength = sElement.getLength();
+                size_t nElementLength = sElement.size();
                 // when writing the sequence, we quoted the single elements with " characters
-                OSL_ENSURE( sElement.startsWith("\"") && sElement.endsWith("\""),
+                OSL_ENSURE( o3tl::starts_with(sElement, u"\"") && o3tl::ends_with(sElement, u"\""),
                         "OFormImport::implTranslateStringListProperty: invalid quoted element name.");
-                sElement = sElement.copy(1, nElementLength - 2);
+                sElement = sElement.substr(1, nElementLength - 2);
 
-                aElements.push_back(sElement);
+                aElements.push_back(OUString(sElement));
 
                 // switch to the next element
                 nElementStart = 1 + nNextSep;
@@ -2054,9 +2054,9 @@ namespace xmloff
                 sValue = _rImport.GetAbsoluteReference(sValue);
                 INetURLObject aURL(sValue);
                 if ( aURL.GetProtocol() == INetProtocol::File )
-                    _xElement->setPropertyValue(PROPERTY_DATASOURCENAME,makeAny(sValue));
+                    _xElement->setPropertyValue(PROPERTY_DATASOURCENAME,Any(sValue));
                 else
-                    _xElement->setPropertyValue(PROPERTY_URL,makeAny(sValue)); // the url is the "sdbc:" string
+                    _xElement->setPropertyValue(PROPERTY_URL,Any(sValue)); // the url is the "sdbc:" string
                 break;
             }
             else

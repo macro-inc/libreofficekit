@@ -38,13 +38,13 @@
 #include <fmshimp.hxx>
 #include <o3tl/safeint.hxx>
 #include <sfx2/objitem.hxx>
-#include <sfx2/request.hxx>
 #include <svx/dialmgr.hxx>
 #include <svx/fmshell.hxx>
 #include <svx/fmtools.hxx>
 #include <svx/svxids.hrc>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/settings.hxx>
@@ -140,11 +140,11 @@ OUString FmFilterItems::GetImage() const
 }
 
 FmFilterItem::FmFilterItem( FmFilterItems* pParent,
-                            const OUString& aFieldName,
+                            OUString aFieldName,
                             const OUString& aText,
                             const sal_Int32 _nComponentIndex )
           :FmFilterData(pParent, aText)
-          ,m_aFieldName(aFieldName)
+          ,m_aFieldName(std::move(aFieldName))
           ,m_nComponentIndex( _nComponentIndex )
 {
 }
@@ -925,7 +925,7 @@ IMPL_STATIC_LINK(FmFilterNavigator, CustomGetSizeHdl, weld::TreeView::get_size_a
 
     Size aSize;
 
-    FmFilterData* pData = reinterpret_cast<FmFilterData*>(rId.toUInt64());
+    FmFilterData* pData = weld::fromId<FmFilterData*>(rId);
     OUString sText = pData->GetText();
 
     if (FmFilterItem* pItem = dynamic_cast<FmFilterItem*>(pData))
@@ -967,7 +967,7 @@ IMPL_STATIC_LINK(FmFilterNavigator, CustomRenderHdl, weld::TreeView::render_args
     else
         rRenderContext.SetTextColor(rStyleSettings.GetDialogTextColor());
 
-    FmFilterData* pData = reinterpret_cast<FmFilterData*>(rId.toUInt64());
+    FmFilterData* pData = weld::fromId<FmFilterData*>(rId);
     OUString sText = pData->GetText();
     Point aPos(aRect.TopLeft());
 
@@ -1108,7 +1108,7 @@ void FmFilterNavigator::UpdateContent(const Reference< XIndexAccess > & xControl
 IMPL_LINK(FmFilterNavigator, EditingEntryHdl, const weld::TreeIter&, rIter, bool)
 {
     // returns true to allow editing
-    if (dynamic_cast<const FmFilterItem*>(reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(rIter).toUInt64())))
+    if (dynamic_cast<const FmFilterItem*>(weld::fromId<FmFilterData*>(m_xTreeView->get_id(rIter))))
     {
         m_xEditingCurrently = m_xTreeView->make_iterator(&rIter);
         return true;
@@ -1126,7 +1126,7 @@ IMPL_LINK(FmFilterNavigator, EditedEntryHdl, const IterString&, rIterString, boo
                "FmFilterNavigator::EditedEntry: suspicious entry!");
     m_xEditingCurrently.reset();
 
-    FmFilterData* pData = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(rIter).toUInt64());
+    FmFilterData* pData = weld::fromId<FmFilterData*>(m_xTreeView->get_id(rIter));
 
     DBG_ASSERT(dynamic_cast<const FmFilterItem*>(pData) != nullptr,
                     "FmFilterNavigator::EditedEntry() wrong entry");
@@ -1190,7 +1190,7 @@ sal_Int8 FmFilterNavigator::AcceptDrop( const AcceptDropEvent& rEvt )
     if (!xDropTarget)
         return DND_ACTION_NONE;
 
-    FmFilterData* pData = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(*xDropTarget).toUInt64());
+    FmFilterData* pData = weld::fromId<FmFilterData*>(m_xTreeView->get_id(*xDropTarget));
     FmFormItem* pForm = nullptr;
     if (dynamic_cast<const FmFilterItem*>(pData) !=  nullptr)
     {
@@ -1214,7 +1214,7 @@ namespace
 {
     FmFilterItems* getTargetItems(const weld::TreeView& rTreeView, const weld::TreeIter& rTarget)
     {
-        FmFilterData* pData = reinterpret_cast<FmFilterData*>(rTreeView.get_id(rTarget).toUInt64());
+        FmFilterData* pData = weld::fromId<FmFilterData*>(rTreeView.get_id(rTarget));
         FmFilterItems*  pTargetItems = dynamic_cast<FmFilterItems*>(pData);
         if (!pTargetItems)
             pTargetItems = dynamic_cast<FmFilterItems*>(pData->GetParent());
@@ -1239,8 +1239,11 @@ sal_Int8 FmFilterNavigator::ExecuteDrop( const ExecuteDropEvent& rEvt )
     FmFilterItems* pTargetItems = getTargetItems(*m_xTreeView, *xDropTarget);
     m_xTreeView->unselect_all();
     std::unique_ptr<weld::TreeIter> xEntry = FindEntry(pTargetItems);
-    m_xTreeView->select(*xEntry);
-    m_xTreeView->set_cursor(*xEntry);
+    if (xEntry)
+    {
+        m_xTreeView->select(*xEntry);
+        m_xTreeView->set_cursor(*xEntry);
+    }
 
     insertFilterItem(m_aControlExchange->getDraggedEntries(),pTargetItems,DND_ACTION_COPY == rEvt.mnAction);
 
@@ -1253,7 +1256,7 @@ IMPL_LINK_NOARG(FmFilterNavigator, SelectHdl, weld::TreeView&, void)
     if (!m_xTreeView->get_selected(xIter.get()))
         return;
 
-    FmFilterData* pData = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(*xIter).toUInt64());
+    FmFilterData* pData = weld::fromId<FmFilterData*>(m_xTreeView->get_id(*xIter));
 
     FmFormItem* pFormItem = nullptr;
     if (FmFilterItem* pItem = dynamic_cast<FmFilterItem*>(pData))
@@ -1310,7 +1313,7 @@ std::unique_ptr<weld::TreeIter> FmFilterNavigator::FindEntry(const FmFilterData*
         return nullptr;
     do
     {
-        FmFilterData* pEntryItem = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(*xEntry).toUInt64());
+        FmFilterData* pEntryItem = weld::fromId<FmFilterData*>(m_xTreeView->get_id(*xEntry));
         if (pEntryItem == pItem)
             return xEntry;
     }
@@ -1319,14 +1322,14 @@ std::unique_ptr<weld::TreeIter> FmFilterNavigator::FindEntry(const FmFilterData*
     return nullptr;
 }
 
-void FmFilterNavigator::Insert(FmFilterData* pItem, int nPos)
+void FmFilterNavigator::Insert(const FmFilterData* pItem, int nPos)
 {
     const FmParentData* pParent = pItem->GetParent() ? pItem->GetParent() : m_pModel.get();
 
     // insert the item
     std::unique_ptr<weld::TreeIter> xParentEntry = FindEntry(pParent);
 
-    OUString sId(OUString::number(reinterpret_cast<sal_uIntPtr>(pItem)));
+    OUString sId(weld::toId(pItem));
     std::unique_ptr<weld::TreeIter> xRet(m_xTreeView->make_iterator());
     m_xTreeView->insert(xParentEntry.get(), nPos, &pItem->GetText(), &sId,
                         nullptr, nullptr, false, xRet.get());
@@ -1369,7 +1372,7 @@ FmFormItem* FmFilterNavigator::getSelectedFilterItems(::std::vector<FmFilterItem
     bool bFoundSomething = false;
 
     m_xTreeView->selected_foreach([this, &bHandled, &bFoundSomething, &pFirstItem, &_rItemList](weld::TreeIter& rEntry) {
-        FmFilterData* pFilterEntry = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(rEntry).toInt64());
+        FmFilterData* pFilterEntry = weld::fromId<FmFilterData*>(m_xTreeView->get_id(rEntry));
         FmFilterItem* pFilter = dynamic_cast<FmFilterItem*>(pFilterEntry);
         if (pFilter)
         {
@@ -1475,7 +1478,7 @@ IMPL_LINK(FmFilterNavigator, PopupMenuHdl, const CommandEvent&, rEvt, bool)
 
             ::std::vector<FmFilterData*> aSelectList;
             m_xTreeView->selected_foreach([this, &aSelectList](weld::TreeIter& rEntry) {
-                FmFilterData* pFilterEntry = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(rEntry).toInt64());
+                FmFilterData* pFilterEntry = weld::fromId<FmFilterData*>(m_xTreeView->get_id(rEntry));
 
                 // don't delete forms
                 FmFormItem* pForm = dynamic_cast<FmFormItem*>(pFilterEntry);
@@ -1505,7 +1508,7 @@ IMPL_LINK(FmFilterNavigator, PopupMenuHdl, const CommandEvent&, rEvt, bool)
                 xContextMenu->remove("delete");
             }
 
-            FmFilterData* pFilterEntry = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(*xClicked).toInt64());
+            FmFilterData* pFilterEntry = weld::fromId<FmFilterData*>(m_xTreeView->get_id(*xClicked));
             auto pFilterItem = dynamic_cast<FmFilterItem*>(pFilterEntry);
             bool bEdit = pFilterItem &&
                 m_xTreeView->is_selected(*xClicked) && m_xTreeView->count_selected_rows() == 1;
@@ -1697,7 +1700,7 @@ void FmFilterNavigator::DeleteSelection()
     std::vector<FmFilterData*> aEntryList;
 
     m_xTreeView->selected_foreach([this, &aEntryList](weld::TreeIter& rEntry) {
-        FmFilterData* pFilterEntry = reinterpret_cast<FmFilterData*>(m_xTreeView->get_id(rEntry).toInt64());
+        FmFilterData* pFilterEntry = weld::fromId<FmFilterData*>(m_xTreeView->get_id(rEntry));
 
         if (dynamic_cast<FmFilterItem*>(pFilterEntry))
         {

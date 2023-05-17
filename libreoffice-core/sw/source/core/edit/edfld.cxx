@@ -35,7 +35,6 @@
 #include <swundo.hxx>
 #include <dbmgr.hxx>
 #include <hints.hxx>
-#include <calbck.hxx>
 #include <fieldhint.hxx>
 #include <DocumentSettingManager.hxx>
 #include <IDocumentContentOperations.hxx>
@@ -216,7 +215,7 @@ void SwEditShell::UpdateOneField(SwField &rField)
 
         if ( !pCursor->IsMultiSelection() && !pCursor->HasMark())
         {
-            pTextField = GetTextFieldAtPos( pCursor->Start(), true );
+            pTextField = GetTextFieldAtPos(pCursor->Start(), ::sw::GetTextAttrMode::Default);
 
             if (!pTextField) // #i30221#
                 pTextField = lcl_FindInputField( GetDoc(), rField);
@@ -252,16 +251,16 @@ void SwEditShell::UpdateOneField(SwField &rField)
 
                 // Search for SwTextField ...
                 while(  bOkay
-                     && pCurStt->nContent != pCurEnd->nContent
+                     && pCurStt->GetContentIndex() != pCurEnd->GetContentIndex()
                      && (sw::FindAttrImpl(aPam, aFieldHint, fnMoveForward, aCurPam, true, GetLayout())
                           || sw::FindAttrImpl(aPam, aAnnotationFieldHint, fnMoveForward, aCurPam, false, GetLayout())
                           || sw::FindAttrImpl(aPam, aInputFieldHint, fnMoveForward, aCurPam, false, GetLayout())))
                 {
                     // if only one PaM has more than one field  ...
-                    if( aPam.Start()->nContent != pCurStt->nContent )
+                    if( aPam.Start()->GetContentIndex() != pCurStt->GetContentIndex() )
                         bOkay = false;
 
-                    pTextField = GetTextFieldAtPos( pCurStt, true );
+                    pTextField = GetTextFieldAtPos(pCurStt, ::sw::GetTextAttrMode::Default);
                     if( nullptr != pTextField )
                     {
                         pFormatField = const_cast<SwFormatField*>(&pTextField->GetFormatField());
@@ -276,7 +275,7 @@ void SwEditShell::UpdateOneField(SwField &rField)
                                                            pMsgHint, false);
                     }
                     // The search area is reduced by the found area:
-                    ++pCurStt->nContent;
+                    pCurStt->AdjustContent(+1);
                 }
             }
 

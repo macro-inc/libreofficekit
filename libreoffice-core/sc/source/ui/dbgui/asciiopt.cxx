@@ -21,9 +21,10 @@
 #include <asciiopt.hxx>
 #include <comphelper/string.hxx>
 #include <osl/thread.h>
+#include <o3tl/string_view.hxx>
 
-const char pStrFix[] = "FIX";
-const char pStrMrg[] = "MRG";
+constexpr std::u16string_view pStrFix = u"FIX";
+constexpr std::u16string_view pStrMrg = u"MRG";
 
 ScAsciiOptions::ScAsciiOptions() :
     bFixedLen       ( false ),
@@ -56,21 +57,21 @@ void ScAsciiOptions::SetColumnInfo( const ScCsvExpDataVec& rDataVec )
     }
 }
 
-static OUString lcl_decodeSepString( const OUString & rSepNums, bool & o_bMergeFieldSeps )
+static OUString lcl_decodeSepString( std::u16string_view rSepNums, bool & o_bMergeFieldSeps )
 {
-    if ( rSepNums.isEmpty() )
+    if ( rSepNums.empty() )
         return OUString();
 
     OUStringBuffer aFieldSeps;
     sal_Int32 nPos = 0;
     do
     {
-        const OUString aCode = rSepNums.getToken( 0, '/', nPos );
+        const std::u16string_view aCode = o3tl::getToken(rSepNums, 0, '/', nPos );
         if ( aCode == pStrMrg )
             o_bMergeFieldSeps = true;
         else
         {
-            sal_Int32 nVal = aCode.toInt32();
+            sal_Int32 nVal = o3tl::toInt32(aCode);
             if ( nVal )
                 aFieldSeps.append(sal_Unicode(nVal));
         }
@@ -83,16 +84,16 @@ static OUString lcl_decodeSepString( const OUString & rSepNums, bool & o_bMergeF
 // The options string must not contain semicolons (because of the pick list),
 // use comma as separator.
 
-void ScAsciiOptions::ReadFromString( const OUString& rString )
+void ScAsciiOptions::ReadFromString( std::u16string_view rString )
 {
-    sal_Int32 nPos = rString.isEmpty() ? -1 : 0;
+    sal_Int32 nPos = rString.empty() ? -1 : 0;
 
     // Token 0: Field separator.
     if ( nPos >= 0 )
     {
         bFixedLen = bMergeFieldSeps = false;
 
-        const OUString aToken = rString.getToken(0, ',', nPos);
+        const std::u16string_view aToken = o3tl::getToken(rString, 0, ',', nPos);
         if ( aToken == pStrFix )
             bFixedLen = true;
         aFieldSeps = lcl_decodeSepString( aToken, bMergeFieldSeps);
@@ -101,53 +102,53 @@ void ScAsciiOptions::ReadFromString( const OUString& rString )
     // Token 1: Text separator.
     if ( nPos >= 0 )
     {
-        const sal_Int32 nVal = rString.getToken(0, ',', nPos).toInt32();
+        const sal_Int32 nVal = o3tl::toInt32(o3tl::getToken(rString, 0, ',', nPos));
         cTextSep = static_cast<sal_Unicode>(nVal);
     }
 
     // Token 2: Text encoding.
     if ( nPos >= 0 )
     {
-        eCharSet = ScGlobal::GetCharsetValue( rString.getToken(0, ',', nPos) );
+        eCharSet = ScGlobal::GetCharsetValue( o3tl::getToken(rString, 0, ',', nPos) );
     }
 
     // Token 3: Number of start row.
     if ( nPos >= 0 )
     {
-        nStartRow = rString.getToken(0, ',', nPos).toInt32();
+        nStartRow = o3tl::toInt32(o3tl::getToken(rString, 0, ',', nPos));
     }
 
     // Token 4: Column info.
     if ( nPos >= 0 )
     {
-        const OUString aToken = rString.getToken(0, ',', nPos);
+        const std::u16string_view aToken = o3tl::getToken(rString, 0, ',', nPos);
         const sal_Int32 nInfoCount = comphelper::string::getTokenCount(aToken, '/')/2;
         mvColStart.resize(nInfoCount);
         mvColFormat.resize(nInfoCount);
         sal_Int32 nP = 0;
         for (sal_Int32 nInfo=0; nInfo<nInfoCount; ++nInfo)
         {
-            mvColStart[nInfo]  = aToken.getToken(0, '/', nP).toInt32();
-            mvColFormat[nInfo] = static_cast<sal_uInt8>(aToken.getToken(0, '/', nP).toInt32());
+            mvColStart[nInfo]  = o3tl::toInt32(o3tl::getToken(aToken, 0, '/', nP));
+            mvColFormat[nInfo] = static_cast<sal_uInt8>(o3tl::toInt32(o3tl::getToken(aToken, 0, '/', nP)));
         }
     }
 
     // Token 5: Language.
     if (nPos >= 0)
     {
-        eLang = static_cast<LanguageType>(rString.getToken(0, ',', nPos).toInt32());
+        eLang = static_cast<LanguageType>(o3tl::toInt32(o3tl::getToken(rString, 0, ',', nPos)));
     }
 
     // Token 6: Import quoted field as text.
     if (nPos >= 0)
     {
-        bQuotedFieldAsText = rString.getToken(0, ',', nPos) == "true";
+        bQuotedFieldAsText = o3tl::getToken(rString, 0, ',', nPos) == u"true";
     }
 
     // Token 7: Detect special numbers.
     if (nPos >= 0)
     {
-        bDetectSpecialNumber = rString.getToken(0, ',', nPos) == "true";
+        bDetectSpecialNumber = o3tl::getToken(rString, 0, ',', nPos) == u"true";
     }
     else
         bDetectSpecialNumber = true;    // default of versions that didn't add the parameter
@@ -155,7 +156,7 @@ void ScAsciiOptions::ReadFromString( const OUString& rString )
     // Token 8: used for "Save as shown" in export options
     if ( nPos >= 0 )
     {
-        bSaveAsShown = rString.getToken(0, ',', nPos) == "true";
+        bSaveAsShown = o3tl::getToken(rString, 0, ',', nPos) == u"true";
     }
     else
         bSaveAsShown = true;    // default value
@@ -163,7 +164,7 @@ void ScAsciiOptions::ReadFromString( const OUString& rString )
     // Token 9: used for "Save cell formulas" in export options
     if ( nPos >= 0 )
     {
-        bSaveFormulas = rString.getToken(0, ',', nPos) == "true";
+        bSaveFormulas = o3tl::getToken(rString, 0, ',', nPos) == u"true";
     }
     else
         bSaveFormulas = false;
@@ -171,7 +172,7 @@ void ScAsciiOptions::ReadFromString( const OUString& rString )
     // Token 10: Boolean for Trim spaces.
     if (nPos >= 0)
     {
-        bRemoveSpace = rString.getToken(0, ',', nPos) == "true";
+        bRemoveSpace = o3tl::getToken(rString, 0, ',', nPos) == u"true";
     }
     else
         bRemoveSpace = false;
@@ -180,14 +181,14 @@ void ScAsciiOptions::ReadFromString( const OUString& rString )
     // Does not need to be evaluated here but may be present.
     if (nPos >= 0)
     {
-        rString.getToken(0, ',', nPos);
+        o3tl::getToken(rString, 0, ',', nPos);
     }
 
     // Token 12: evaluate formulas.
     if (nPos >= 0)
     {
         // If present, defaults to "false".
-        bEvaluateFormulas = rString.getToken(0, ',', nPos) == "true";
+        bEvaluateFormulas = o3tl::getToken(rString, 0, ',', nPos) == u"true";
     }
     else
         bEvaluateFormulas = true;   // default of versions that didn't add the parameter

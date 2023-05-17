@@ -98,13 +98,29 @@ constexpr sal_Int64 MulDiv(I n, sal_Int64 m, sal_Int64 d, bool& bOverflow, sal_I
 template <typename I, std::enable_if_t<std::is_integral_v<I>, int> = 0>
 constexpr sal_Int64 MulDivSaturate(I n, sal_Int64 m, sal_Int64 d)
 {
-    if (!isBetween(n, (SAL_MIN_INT64 + d / 2) / m, (SAL_MAX_INT64 - d / 2) / m))
+    if (sal_Int64 d_2 = d / 2; !isBetween(n, (SAL_MIN_INT64 + d_2) / m, (SAL_MAX_INT64 - d_2) / m))
     {
-        if (m > d && !isBetween(n, SAL_MIN_INT64 / m * d + d / 2, SAL_MAX_INT64 / m * d - d / 2))
-            return n > 0 ? SAL_MAX_INT64 : SAL_MIN_INT64; // saturate
-        return (n >= 0 ? n + d / 2 : n - d / 2) / d * m; // divide before multiplication
+        if (n >= 0)
+        {
+            if (m > d && std::make_unsigned_t<I>(n) > sal_uInt64(SAL_MAX_INT64 / m * d - d_2))
+                return SAL_MAX_INT64; // saturate
+            return saturating_add<sal_uInt64>(n, d_2) / d * m; // divide before multiplication
+        }
+        else if constexpr (std::is_signed_v<I>) // n < 0; don't compile for unsigned n
+        {
+            if (m > d && n < SAL_MIN_INT64 / m * d + d_2)
+                return SAL_MIN_INT64; // saturate
+            return saturating_sub<sal_Int64>(n, d_2) / d * m; // divide before multiplication
+        }
     }
     return MulDiv(n, m, d);
+}
+
+template <class M, class N> constexpr std::common_type_t<M, N> asserting_gcd(M m, N n)
+{
+    auto ret = std::gcd(m, n);
+    assert(ret != 0);
+    return ret;
 }
 
 // Packs integral multiplier and divisor for conversion from one unit to another
@@ -113,8 +129,8 @@ struct m_and_d
     sal_Int64 m; // multiplier
     sal_Int64 d; // divisor
     constexpr m_and_d(sal_Int64 _m, sal_Int64 _d)
-        : m(_m / std::gcd(_m, _d)) // make sure to use smallest quotients here because
-        , d(_d / std::gcd(_m, _d)) // they will be multiplied when building final table
+        : m(_m / asserting_gcd(_m, _d)) // make sure to use smallest quotients here because
+        , d(_d / asserting_gcd(_m, _d)) // they will be multiplied when building final table
     {
         assert(_m > 0 && _d > 0);
     }
@@ -134,7 +150,7 @@ template <int N> constexpr auto prepareMDArray(const m_and_d (&mdBase)[N])
             assert(mdBase[i].m < SAL_MAX_INT64 / mdBase[j].d);
             assert(mdBase[i].d < SAL_MAX_INT64 / mdBase[j].m);
             const sal_Int64 m = mdBase[i].m * mdBase[j].d, d = mdBase[i].d * mdBase[j].m;
-            const sal_Int64 g = std::gcd(m, d);
+            const sal_Int64 g = asserting_gcd(m, d);
             a[i][j] = m / g;
             a[j][i] = d / g;
         }
@@ -172,7 +188,7 @@ constexpr m_and_d mdBaseLen[] = {
     { 254 * 210, 10 * 1440 }, // ch => mm
     { 254 * 312, 10 * 1440 }, // line => mm
 };
-static_assert(SAL_N_ELEMENTS(mdBaseLen) == static_cast<int>(Length::count),
+static_assert(std::size(mdBaseLen) == static_cast<int>(Length::count),
               "mdBaseL must have an entry for each unit in o3tl::Length");
 
 // The resulting multipliers and divisors array

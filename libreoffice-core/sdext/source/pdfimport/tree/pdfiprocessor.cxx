@@ -33,7 +33,7 @@
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/utils/canvastools.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
-#include <vcl/svapp.hxx>
+#include <i18nutil/unicode.hxx>
 
 using namespace com::sun::star;
 
@@ -317,7 +317,7 @@ void PDFIProcessor::drawGlyphs( const OUString&             rGlyphs,
 
 void PDFIProcessor::endText()
 {
-    TextElement* pText = dynamic_cast<TextElement*>(m_pCurElement);
+    TextElement* pText = m_pCurElement->dynCastAsTextElement();
     if( pText )
         m_pCurElement = pText->Parent;
 }
@@ -637,9 +637,9 @@ static bool lr_tb_sort( std::unique_ptr<Element> const & pLeft, std::unique_ptr<
     // of the same order as font height whereas the real paint area
     // of text is usually smaller
     double fudge_factor_left = 0.0, fudge_factor_right = 0.0;
-    if( dynamic_cast< TextElement* >(pLeft.get()) )
+    if( pLeft->dynCastAsTextElement() )
         fudge_factor_left = 0.1;
-    if (dynamic_cast< TextElement* >(pRight.get()))
+    if( pRight->dynCastAsTextElement() )
         fudge_factor_right = 0.1;
 
     // Allow negative height
@@ -695,20 +695,17 @@ void PDFIProcessor::sortElements(Element* pEle)
     pEle->Children.sort(lr_tb_sort);
 }
 
-// helper method: get a mirrored string
-OUString PDFIProcessor::mirrorString( const OUString& i_rString )
+/* Produce mirrored-image for each code point which has the Bidi_Mirrored property, within a string.
+   This need to be done in forward order.
+*/
+OUString PDFIProcessor::SubstituteBidiMirrored(const OUString& rString)
 {
-    const sal_Int32 nLen = i_rString.getLength();
-    OUStringBuffer aMirror( nLen );
+    const sal_Int32 nLen = rString.getLength();
+    OUStringBuffer aMirror(nLen);
 
-    sal_Int32 i = 0;
-    while(i < nLen)
-    {
-        // read one code point
-        const sal_uInt32 nCodePoint = i_rString.iterateCodePoints( &i );
-
-        // and append it mirrored
-        aMirror.appendUtf32( GetMirroredChar(nCodePoint) );
+    for (sal_Int32 i = 0; i < nLen;) {
+        const sal_uInt32 nCodePoint = rString.iterateCodePoints(&i);
+        aMirror.appendUtf32(unicode::GetMirroredChar(nCodePoint));
     }
     return aMirror.makeStringAndClear();
 }

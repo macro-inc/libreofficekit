@@ -11,7 +11,11 @@
 
 $(eval $(call gb_Library_Library,WinUserInfoBe))
 
-$(eval $(call gb_Library_set_componentfile,WinUserInfoBe,extensions/source/config/WinUserInfo/WinUserInfoBe))
+$(eval $(call gb_Library_set_componentfile,WinUserInfoBe,extensions/source/config/WinUserInfo/WinUserInfoBe,services))
+
+$(eval $(call gb_Library_use_custom_headers,WinUserInfoBe,\
+    officecfg/registry \
+))
 
 $(eval $(call gb_Library_use_sdk_api,WinUserInfoBe))
 

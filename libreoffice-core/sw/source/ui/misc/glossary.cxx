@@ -22,6 +22,7 @@
 #include <o3tl/any.hxx>
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
+#include <vcl/transfer.hxx>
 #include <vcl/weld.hxx>
 #include <svl/stritem.hxx>
 #include <svl/macitem.hxx>
@@ -176,6 +177,117 @@ IMPL_LINK(SwGlossaryDlg, TextFilterHdl, OUString&, rTest, bool)
     return true;
 }
 
+class SwGlossaryDropTarget : public DropTargetHelper
+{
+private:
+    weld::TreeView& m_rTreeView;
+    SwGlossaryHdl* m_pGlosHdl;
+
+    virtual sal_Int8 AcceptDrop(const AcceptDropEvent& rEvt) override
+    {
+        weld::TreeView* pSource = m_rTreeView.get_drag_source();
+        if (!pSource || pSource != &m_rTreeView)
+            return DND_ACTION_NONE;
+
+        std::unique_ptr<weld::TreeIter> xSelected(pSource->make_iterator());
+        bool bSelected = pSource->get_selected(xSelected.get());
+        if (!bSelected)
+            return DND_ACTION_NONE;
+
+        while (pSource->get_iter_depth(*xSelected))
+            (void)pSource->iter_parent(*xSelected);
+
+        GroupUserData* pSrcRootData = weld::fromId<GroupUserData*>(pSource->get_id(*xSelected));
+        GroupUserData* pDestRootData = nullptr;
+
+        std::unique_ptr<weld::TreeIter> xDestEntry(m_rTreeView.make_iterator());
+        bool bEntry = m_rTreeView.get_dest_row_at_pos(rEvt.maPosPixel, xDestEntry.get(), true);
+        if (bEntry)
+        {
+            while (m_rTreeView.get_iter_depth(*xDestEntry))
+                (void)m_rTreeView.iter_parent(*xDestEntry);
+            pDestRootData = weld::fromId<GroupUserData*>(m_rTreeView.get_id(*xDestEntry));
+        }
+        if (pDestRootData == pSrcRootData)
+            return DND_ACTION_NONE;
+        sal_uInt8 nRet = DND_ACTION_COPY;
+        const bool bCheckForMove = rEvt.mnAction & DND_ACTION_MOVE;
+        if (bCheckForMove && !pSrcRootData->bReadonly)
+            nRet |= DND_ACTION_MOVE;
+        return nRet;
+    }
+
+    virtual sal_Int8 ExecuteDrop(const ExecuteDropEvent& rEvt) override
+    {
+        weld::TreeView* pSource = m_rTreeView.get_drag_source();
+        if (!pSource)
+            return DND_ACTION_NONE;
+
+        std::unique_ptr<weld::TreeIter> xDestEntry(m_rTreeView.make_iterator());
+        bool bEntry = m_rTreeView.get_dest_row_at_pos(rEvt.maPosPixel, xDestEntry.get(), true);
+        if (!bEntry)
+            return DND_ACTION_NONE;
+
+        std::unique_ptr<weld::TreeIter> xSelected(pSource->make_iterator());
+        bool bSelected = pSource->get_selected(xSelected.get());
+        if (!bSelected)
+            return DND_ACTION_NONE;
+
+        std::unique_ptr<weld::TreeIter> xSrcParent(pSource->make_iterator(xSelected.get()));
+        while (pSource->get_iter_depth(*xSrcParent))
+            (void)pSource->iter_parent(*xSrcParent);
+
+        std::unique_ptr<weld::TreeIter> xDestParent(pSource->make_iterator(xDestEntry.get()));
+        while (pSource->get_iter_depth(*xDestParent))
+            (void)pSource->iter_parent(*xDestParent);
+
+        GroupUserData* pSrcParent = weld::fromId<GroupUserData*>(pSource->get_id(*xSrcParent));
+        GroupUserData* pDestParent = weld::fromId<GroupUserData*>(m_rTreeView.get_id(*xDestParent));
+
+        if (pDestParent != pSrcParent)
+        {
+            weld::WaitObject aBusy(&m_rTreeView);
+
+            OUString sSourceGroup = pSrcParent->sGroupName
+                + OUStringChar(GLOS_DELIM)
+                + OUString::number(pSrcParent->nPathIdx);
+
+            m_pGlosHdl->SetCurGroup(sSourceGroup);
+            OUString sTitle(pSource->get_text(*xSelected));
+            OUString sShortName(pSource->get_id(*xSelected));
+
+            OUString sDestName = pDestParent->sGroupName
+                + OUStringChar(GLOS_DELIM)
+                + OUString::number(pDestParent->nPathIdx);
+
+            bool bIsMove = rEvt.mnAction & DND_ACTION_MOVE;
+
+            const bool bRet = m_pGlosHdl->CopyOrMove(sSourceGroup, sShortName,
+                            sDestName, sTitle, bIsMove);
+
+            if(bRet)
+            {
+                m_rTreeView.insert(xDestParent.get(), -1, &sTitle, &sShortName,
+                                       nullptr, nullptr, false, nullptr);
+                if (bIsMove)
+                {
+                    pSource->remove(*xSelected);
+                }
+            }
+        }
+
+        return DND_ACTION_NONE;
+    }
+
+public:
+    SwGlossaryDropTarget(weld::TreeView& rTreeView, SwGlossaryHdl* pGlosHdl)
+        : DropTargetHelper(rTreeView.get_drop_target())
+        , m_rTreeView(rTreeView)
+        , m_pGlosHdl(pGlosHdl)
+    {
+    }
+};
+
 SwGlossaryDlg::SwGlossaryDlg(SfxViewFrame const * pViewFrame,
                              SwGlossaryHdl * pGlosHdl, SwWrtShell *pWrtShell)
     : SfxDialogController(pViewFrame->GetFrameWeld(), "modules/swriter/ui/autotext.ui", "AutoTextDialog")
@@ -221,6 +333,11 @@ SwGlossaryDlg::SwGlossaryDlg(SfxViewFrame const * pViewFrame,
     m_xCategoryBox->connect_row_activated(LINK(this, SwGlossaryDlg, NameDoubleClick));
     m_xCategoryBox->connect_changed(LINK(this, SwGlossaryDlg, GrpSelect));
     m_xCategoryBox->connect_key_press(LINK(this, SwGlossaryDlg, KeyInputHdl));
+
+    m_xDropTarget.reset(new SwGlossaryDropTarget(*m_xCategoryBox, pGlosHdl));
+    rtl::Reference<TransferDataContainer> xHelper(new TransferDataContainer);
+    m_xCategoryBox->enable_drag_source(xHelper, DND_ACTION_COPYMOVE);
+
     m_xBibBtn->connect_clicked(LINK(this,SwGlossaryDlg,BibHdl));
 
     m_xInsertBtn->connect_clicked(LINK(this,SwGlossaryDlg,InsertHdl));
@@ -250,7 +367,7 @@ OUString getCurrentGlossary()
     const OUString sTemp{ ::GetCurrGlosGroup() };
 
     // the zeroth path is not being recorded!
-    if (sTemp.getToken(1, GLOS_DELIM).startsWith("0"))
+    if (o3tl::starts_with(o3tl::getToken(sTemp, 1, GLOS_DELIM), u"0"))
         return sTemp.getToken(0, GLOS_DELIM);
 
     return sTemp;
@@ -274,7 +391,7 @@ IMPL_LINK(SwGlossaryDlg, GrpSelect, weld::TreeView&, rBox, void)
     }
     else
         pParent = xEntry.get();
-    GroupUserData* pGroupData = reinterpret_cast<GroupUserData*>(rBox.get_id(*pParent).toInt64());
+    GroupUserData* pGroupData = weld::fromId<GroupUserData*>(rBox.get_id(*pParent));
     ::SetCurrGlosGroup(pGroupData->sGroupName
         + OUStringChar(GLOS_DELIM)
         + OUString::number(pGroupData->nPathIdx));
@@ -545,14 +662,14 @@ IMPL_LINK(SwGlossaryDlg, MenuHdl, const OString&, rItemIdent, void)
         aSet.Put( aItem );
         aSet.Put( SwMacroAssignDlg::AddEvents( MACASSGN_AUTOTEXT ) );
 
-        const SfxPoolItem* pItem;
+        const SvxMacroItem* pMacroItem;
         SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();
         ScopedVclPtr<SfxAbstractDialog> pMacroDlg(pFact->CreateEventConfigDialog(m_xDialog.get(), aSet,
             m_pShell->GetView().GetViewFrame()->GetFrame().GetFrameInterface() ));
         if ( pMacroDlg && pMacroDlg->Execute() == RET_OK &&
-            SfxItemState::SET == pMacroDlg->GetOutputItemSet()->GetItemState( RES_FRMMACRO, false, &pItem ) )
+            (pMacroItem = pMacroDlg->GetOutputItemSet()->GetItemIfSet( RES_FRMMACRO, false )) )
         {
-            const SvxMacroTableDtor& rTable = static_cast<const SvxMacroItem*>(pItem)->GetMacroTable();
+            const SvxMacroTableDtor& rTable = pMacroItem->GetMacroTable();
             m_pGlossaryHdl->SetMacros( m_xShortNameEdit->get_text(),
                                         rTable.Get( SvMacroItemId::SwStartInsGlossary ),
                                         rTable.Get( SvMacroItemId::SwEndInsGlossary ) );
@@ -654,7 +771,7 @@ IMPL_LINK_NOARG(SwGlossaryDlg, BibHdl, weld::Button&, void)
                 {
                     if (!m_xCategoryBox->get_iter_depth(*xEntry))
                     {
-                        GroupUserData* pGroupData = reinterpret_cast<GroupUserData*>(m_xCategoryBox->get_id(*xEntry).toInt64());
+                        GroupUserData* pGroupData = weld::fromId<GroupUserData*>(m_xCategoryBox->get_id(*xEntry));
                         const OUString sGroup = pGroupData->sGroupName
                             + OUStringChar(GLOS_DELIM)
                             + OUString::number(pGroupData->nPathIdx);
@@ -694,7 +811,7 @@ void SwGlossaryDlg::Init()
     const size_t nCnt = m_pGlossaryHdl->GetGroupCnt();
     std::unique_ptr<weld::TreeIter> xSelEntry;
     const OUString sSelStr(::GetCurrGlosGroup().getToken(0, GLOS_DELIM));
-    const sal_Int32 nSelPath = ::GetCurrGlosGroup().getToken(1, GLOS_DELIM).toInt32();
+    const sal_Int32 nSelPath = o3tl::toInt32(o3tl::getToken(::GetCurrGlosGroup(), 1, GLOS_DELIM));
     // #i66304# - "My AutoText" comes from mytexts.bau, but should be translated
     static const OUStringLiteral sMyAutoTextEnglish(u"My AutoText");
     const OUString sMyAutoTextTranslated(SwResId(STR_MY_AUTOTEXT));
@@ -714,7 +831,7 @@ void SwGlossaryDlg::Init()
         std::unique_ptr<weld::TreeIter> xEntry = m_xCategoryBox->make_iterator();
         m_xCategoryBox->append(xEntry.get());
         m_xCategoryBox->set_text(*xEntry, sTitle, 0);
-        const sal_Int32 nPath = sGroupName.getToken( 0, GLOS_DELIM, nIdx ).toInt32();
+        const sal_Int32 nPath = o3tl::toInt32(o3tl::getToken(sGroupName, 0, GLOS_DELIM, nIdx ));
 
         GroupUserData* pData = new GroupUserData;
         pData->sGroupName = sName;
@@ -722,7 +839,7 @@ void SwGlossaryDlg::Init()
         pData->bReadonly = m_pGlossaryHdl->IsReadOnly(&sGroupName);
         m_xGroupData.emplace_back(pData);
 
-        m_xCategoryBox->set_id(*xEntry, OUString::number(reinterpret_cast<sal_Int64>(pData)));
+        m_xCategoryBox->set_id(*xEntry, weld::toId(pData));
         if (sSelStr == pData->sGroupName && nSelPath == nPath)
             xSelEntry = m_xCategoryBox->make_iterator(xEntry.get());
 
@@ -750,7 +867,7 @@ void SwGlossaryDlg::Init()
             {
                 if (!m_xCategoryBox->get_iter_depth(*xSearch))
                 {
-                    GroupUserData* pData = reinterpret_cast<GroupUserData*>(m_xCategoryBox->get_id(*xSearch).toInt64());
+                    GroupUserData* pData = weld::fromId<GroupUserData*>(m_xCategoryBox->get_id(*xSearch));
                     if (!pData->bReadonly)
                     {
                         xSelEntry = std::move(xSearch);
@@ -763,7 +880,7 @@ void SwGlossaryDlg::Init()
         if (!xSelEntry)
         {
             xSelEntry = std::move(xSearch);
-            if (!m_xCategoryBox->get_iter_first(*xSelEntry))
+            if (!xSelEntry || !m_xCategoryBox->get_iter_first(*xSelEntry))
                 xSelEntry.reset();
         }
     }
@@ -850,7 +967,7 @@ OUString SwGlossaryDlg::GetCurrGrpName() const
     {
         if (m_xCategoryBox->get_iter_depth(*xEntry))
             m_xCategoryBox->iter_parent(*xEntry);
-        GroupUserData* pGroupData = reinterpret_cast<GroupUserData*>(m_xCategoryBox->get_id(*xEntry).toInt64());
+        GroupUserData* pGroupData = weld::fromId<GroupUserData*>(m_xCategoryBox->get_id(*xEntry));
         return pGroupData->sGroupName + OUStringChar(GLOS_DELIM) + OUString::number(pGroupData->nPathIdx);
     }
     return OUString();

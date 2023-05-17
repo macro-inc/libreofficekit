@@ -40,6 +40,8 @@
 #include <osl/file.hxx>
 #include <sal/log.hxx>
 
+#include <mutex>
+
 using namespace com::sun::star::lang;
 using namespace com::sun::star::uri;
 using namespace com::sun::star::uno;
@@ -167,7 +169,7 @@ CommandLineEvent CheckOfficeURI(/* in,out */ OUString& arg, CommandLineEvent cur
     }
     if (nURIlen < 0)
         nURIlen = rest2.getLength();
-    auto const uri = rest2.copy(0, nURIlen);
+    auto const uri = rest2.subView(0, nURIlen);
     if (INetURLObject(uri).GetProtocol() == INetProtocol::Macro) {
         // Let the "Open" machinery process the full command URI (leading to failure, by intention,
         // as the "Open" machinery does not know about those command URI schemes):
@@ -198,8 +200,8 @@ CommandLineEvent CheckWebQuery(/* in,out */ OUString& arg, CommandLineEvent curE
     if (!arg.endsWithIgnoreAsciiCase(".iqy"))
         return curEvt;
 
-    static osl::Mutex aMutex;
-    osl::MutexGuard aGuard(aMutex);
+    static std::mutex aMutex;
+    std::lock_guard aGuard(aMutex);
 
     try
     {
@@ -227,7 +229,7 @@ CommandLineEvent CheckWebQuery(/* in,out */ OUString& arg, CommandLineEvent curE
         if (!SkipNewline(pPos))
             return curEvt;
 
-        OStringBuffer aResult(static_cast<unsigned int>(nRead));
+        OStringBuffer aResult(nRead);
         do
         {
             const char* pPos1 = pPos;
@@ -242,7 +244,7 @@ CommandLineEvent CheckWebQuery(/* in,out */ OUString& arg, CommandLineEvent curE
 
         stream.Close();
 
-        arg = OStringToOUString(aResult.makeStringAndClear(), osl_getThreadTextEncoding());
+        arg = OStringToOUString(aResult, osl_getThreadTextEncoding());
         return CommandLineEvent::ForceNew;
     }
     catch (...)
@@ -258,8 +260,6 @@ CommandLineEvent CheckWebQuery(/* in,out */ OUString& arg, CommandLineEvent curE
 CommandLineArgs::Supplier::Exception::Exception() {}
 
 CommandLineArgs::Supplier::Exception::Exception(Exception const &) {}
-
-CommandLineArgs::Supplier::Exception::~Exception() {}
 
 CommandLineArgs::Supplier::Exception &
 CommandLineArgs::Supplier::Exception::operator =(Exception const &)

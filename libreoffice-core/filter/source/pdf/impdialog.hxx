@@ -20,6 +20,7 @@
 #pragma once
 
 #include <sfx2/tabdlg.hxx>
+#include <sfx2/passwd.hxx>
 #include <svx/AccessibilityCheckDialog.hxx>
 
 #include <vcl/pdfwriter.hxx>
@@ -59,7 +60,6 @@ class ImpPDFTabLinksPage;
 class ImpPDFTabDialog final : public SfxTabDialogController
 {
     css::uno::Reference<css::lang::XComponent> mrDoc;
-    weld::Window* mpParent;
 
     FilterConfigItem            maConfigItem;
     FilterConfigItem            maConfigI18N;
@@ -84,8 +84,10 @@ class ImpPDFTabDialog final : public SfxTabDialogController
     sal_Int32                   mnPDFTypeSelection;
     bool                        mbPDFUACompliance;
     bool                        mbExportNotes;
+    bool                        mbExportNotesInMargin;
     bool                        mbViewPDF;
     bool                        mbUseReferenceXObject;
+    bool                        mbUseReferenceXObjectUserSelection = false;
     bool                        mbExportNotesPages;
     bool                        mbExportOnlyNotesPages;
     bool                        mbUseTransitionEffects;
@@ -96,6 +98,7 @@ class ImpPDFTabDialog final : public SfxTabDialogController
     bool                        mbExportFormFields;
     bool                        mbAllowDuplicateFieldNames;
     bool                        mbExportBookmarks;
+    bool                        mbExportBookmarksUserSelection = true;
     bool                        mbExportHiddenSlides;
     bool                        mbSinglePageSheets;
     sal_Int32                   mnOpenBookmarkLevels;
@@ -109,6 +112,7 @@ class ImpPDFTabDialog final : public SfxTabDialogController
     bool                        mbDisplayPDFDocumentTitle;
     sal_Int32                   mnMagnification;
     sal_Int32                   mnInitialView;
+    sal_Int32                   mnInitialViewUserSelection;
     sal_Int32                   mnZoom;
     sal_Int32                   mnInitialPage;
 
@@ -161,6 +165,7 @@ public:
 
     Sequence< PropertyValue >   GetFilterData();
 
+    ImpPDFTabOpnFtrPage*        getOpenPage() const;
     ImpPDFTabSecurityPage*      getSecurityPage() const;
     ImpPDFTabLinksPage*         getLinksPage() const;
     ImpPDFTabGeneralPage*       getGeneralPage() const;
@@ -185,7 +190,6 @@ class ImpPDFTabGeneralPage : public SfxTabPage
     std::unique_ptr<weld::RadioButton> mxRbRange;
     std::unique_ptr<weld::RadioButton> mxRbSelection;
     std::unique_ptr<weld::Entry> mxEdPages;
-    std::unique_ptr<weld::Label> mxSelectedSheets;
     std::unique_ptr<weld::RadioButton> mxRbLosslessCompression;
     std::unique_ptr<weld::RadioButton> mxRbJPEGCompression;
     std::unique_ptr<weld::Widget> mxQualityFrame;
@@ -204,6 +208,7 @@ class ImpPDFTabGeneralPage : public SfxTabPage
     std::unique_ptr<weld::CheckButton> mxCbExportHiddenSlides;
     std::unique_ptr<weld::CheckButton> mxCbSinglePageSheets;
     std::unique_ptr<weld::CheckButton> mxCbExportNotes;
+    std::unique_ptr<weld::CheckButton> mxCbExportNotesInMargin;
     std::unique_ptr<weld::CheckButton> mxCbViewPDF;
     std::unique_ptr<weld::CheckButton> mxCbUseReferenceXObject;
     std::unique_ptr<weld::CheckButton> mxCbExportNotesPages;
@@ -250,6 +255,8 @@ public:
 /// Class tab page viewer
 class ImpPDFTabOpnFtrPage : public SfxTabPage
 {
+    friend class ImpPDFTabGeneralPage;
+
     bool                        mbUseCTLFont;
 
     std::unique_ptr<weld::RadioButton> mxRbOpnPageOnly;
@@ -272,6 +279,7 @@ class ImpPDFTabOpnFtrPage : public SfxTabPage
     DECL_LINK(ToggleRbMagnHdl, weld::Toggleable&, void);
 
     void                        ToggleRbPgLyContinueFacingHdl();
+    void ToggleInitialView(ImpPDFTabDialog & rParent);
 
 public:
     ImpPDFTabOpnFtrPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet);
@@ -280,7 +288,7 @@ public:
     static std::unique_ptr<SfxTabPage> Create( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet* rAttrSet );
 
     void                        GetFilterConfigItem( ImpPDFTabDialog* paParent);
-    void                        SetFilterConfigItem( const ImpPDFTabDialog* paParent );
+    void                        SetFilterConfigItem(ImpPDFTabDialog* pParent);
 };
 
 /// Class tab page viewer
@@ -345,6 +353,9 @@ class ImpPDFTabSecurityPage : public SfxTabPage
     std::unique_ptr<weld::CheckButton> mxCbEnableCopy;
     std::unique_ptr<weld::CheckButton> mxCbEnableAccessibility;
     std::unique_ptr<weld::Label> mxPasswordTitle;
+
+    std::shared_ptr< SfxPasswordDialog > mpPasswordDialog;
+    std::shared_ptr< weld::MessageDialog > mpUnsupportedMsgDialog;
 
     DECL_LINK(ClickmaPbSetPwdHdl, weld::Button&, void);
 

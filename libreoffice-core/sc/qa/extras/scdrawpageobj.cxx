@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/helper/shape.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xindexaccess.hxx>
@@ -31,7 +31,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScDrawPageObj : public CalcUnoApiTest,
+class ScDrawPageObj : public UnoApiTest,
                       public apitest::XElementAccess,
                       public apitest::XIndexAccess,
                       public apitest::XServiceInfo,
@@ -43,7 +43,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScDrawPageObj);
 
@@ -68,13 +67,10 @@ public:
     CPPUNIT_TEST(testAddRemove);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScDrawPageObj::ScDrawPageObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<drawing::XShape>::get())
     , XIndexAccess(2)
     , XServiceInfo("ScPageObj", "com.sun.star.sheet.SpreadsheetDrawPage")
@@ -83,7 +79,7 @@ ScDrawPageObj::ScDrawPageObj()
 
 uno::Reference<uno::XInterface> ScDrawPageObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     uno::Reference<drawing::XDrawPagesSupplier> xDPS(xDoc, uno::UNO_QUERY_THROW);
     uno::Reference<drawing::XDrawPages> xDP(xDPS->getDrawPages(), uno::UNO_SET_THROW);
     xDP->insertNewByIndex(0);
@@ -93,32 +89,26 @@ uno::Reference<uno::XInterface> ScDrawPageObj::init()
     uno::Reference<drawing::XShapes> xShapes(xDrawPage, uno::UNO_QUERY_THROW);
 
     uno::Reference<drawing::XShape> xRectangle0(
-        apitest::helper::shape::createRectangle(m_xComponent, 7500, 5000, 5000, 3500),
+        apitest::helper::shape::createRectangle(mxComponent, 7500, 5000, 5000, 3500),
         uno::UNO_SET_THROW);
     xShapes->add(xRectangle0);
     uno::Reference<drawing::XShape> xRectangle1(
-        apitest::helper::shape::createRectangle(m_xComponent, 5000, 5000, 5000, 5500),
+        apitest::helper::shape::createRectangle(mxComponent, 5000, 5000, 5000, 5500),
         uno::UNO_SET_THROW);
     xShapes->add(xRectangle1);
 
     // needed for XShapeGrouper tests
     setDrawPage(xDrawPage);
     // needed for XShapes tests
-    setShape(apitest::helper::shape::createLine(m_xComponent, 7500, 10000, 5000, 3500));
+    setShape(apitest::helper::shape::createLine(mxComponent, 7500, 10000, 5000, 3500));
     return xDrawPage;
 }
 
 void ScDrawPageObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScDrawPageObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDrawPageObj);

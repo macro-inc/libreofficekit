@@ -17,60 +17,89 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <osl/module.hxx>
+// Th current high-level preprocessor structure is:
+//
+// if !HAVE_FEATURE_UI
+//   => STATIC_SAL_INSTANCE
+// else
+//   ? !STATIC_SAL_INSTANCE
+//   ? UNIX_DESKTOP_DETECT
+// endif
+//
+// ENABLE_HEADLESS just signifies the use of the SVP plugin!
 
-#include <rtl/bootstrap.hxx>
-#include <rtl/process.h>
-#include <sal/log.hxx>
-
-#include <salframe.hxx>
-#include <salinst.hxx>
+#include <config_features.h>
 #include <config_vclplug.h>
-#include <desktop/crashreport.hxx>
-
-#include <headless/svpinst.hxx>
-#ifndef _WIN32
-#include <printerinfomanager.hxx>
-#include <unx/desktops.hxx>
-
-#include <unistd.h>
-#else
-#include <saldatabasic.hxx>
-#include <o3tl/char16_t2wchar_t.hxx>
-#include <Windows.h>
-#endif
 
 #include <cstdio>
+#include <desktop/crashreport.hxx>
+#include <rtl/bootstrap.hxx>
+#include <rtl/process.h>
+#include <salinst.hxx>
+#include <sal/log.hxx>
+#include <svdata.hxx>
+#include <vcl/svapp.hxx>
 
-#ifdef ANDROID
+#if HAVE_FEATURE_UI
+#if USING_X11
+#define UNIX_DESKTOP_DETECT 1
+#include <unx/desktops.hxx>
+#else
+#define UNIX_DESKTOP_DETECT 0
+#endif
+#endif
+
+#if defined(DISABLE_DYNLOADING) || !HAVE_FEATURE_UI
+#define STATIC_SAL_INSTANCE 1
+extern "C" SalInstance* create_SalInstance();
+#else
+#define STATIC_SAL_INSTANCE 0
+#include <osl/module.hxx>
+#endif
+
+#if defined(iOS)
+#include <premac.h>
+#include <UIKit/UIKit.h>
+#include <postmac.h>
+
+#elif defined(ANDROID)
 #include <android/androidinst.hxx>
 #endif
 
-#if USING_X11
-#define DESKTOPDETECT
-#endif
-#if ENABLE_HEADLESS
-#define HEADLESS_VCLPLUG
+#if defined(_WIN32)
+#include <o3tl/char16_t2wchar_t.hxx>
+#include <salframe.hxx>
+#include <Windows.h>
+#else
+#include <unistd.h>
 #endif
 
-extern "C" {
-typedef SalInstance*(*salFactoryProc)();
-}
+#if ENABLE_HEADLESS
+#include <headless/svpdata.hxx>
+#include <headless/svpinst.hxx>
+#endif
 
 namespace {
 
-#ifndef DISABLE_DYNLOADING
-oslModule pCloseModule = nullptr;
+#if ENABLE_HEADLESS
+SalInstance* svp_create_SalInstance()
+{
+    SvpSalInstance* pInstance = new SvpSalInstance(std::make_unique<SvpSalYieldMutex>());
+    new SvpSalData();
+    return pInstance;
+}
 #endif
+
+#if HAVE_FEATURE_UI
+
+#if !STATIC_SAL_INSTANCE
+oslModule pCloseModule = nullptr;
+
+extern "C" typedef SalInstance* (*salFactoryProc)();
 
 SalInstance* tryInstance( const OUString& rModuleBase, bool bForce = false )
 {
-#ifdef DISABLE_DYNLOADING
-    (void)rModuleBase;
-    (void)bForce;
-    return create_SalInstance();
-#else // !DISABLE_DYNLOADING
-#ifdef HEADLESS_VCLPLUG
+#if ENABLE_HEADLESS
     if (rModuleBase == "svp")
         return svp_create_SalInstance();
 #endif
@@ -134,12 +163,14 @@ SalInstance* tryInstance( const OUString& rModuleBase, bool bForce = false )
 
     // coverity[leaked_storage] - this is on purpose
     return pInst;
-#endif // !DISABLE_DYNLOADING
 }
+#endif // !STATIC_SAL_INSTANCE
 
-#ifdef DESKTOPDETECT
+#if UNIX_DESKTOP_DETECT
 #ifndef DISABLE_DYNLOADING
 extern "C" typedef DesktopType Fn_get_desktop_environment();
+#else
+extern "C" DesktopType get_desktop_environment();
 #endif
 
 DesktopType lcl_get_desktop_environment()
@@ -165,11 +196,9 @@ DesktopType lcl_get_desktop_environment()
     return ret;
 }
 
-SalInstance* autodetect_plugin()
+#if !STATIC_SAL_INSTANCE
+const char* const* autodetect_plugin_list()
 {
-#ifdef DISABLE_DYNLOADING
-    return nullptr;
-#else // !DISABLE_DYNLOADING
     static const char* const pKDEFallbackList[] =
     {
 #if ENABLE_KF5
@@ -178,27 +207,38 @@ SalInstance* autodetect_plugin()
 #if ENABLE_GTK3_KDE5
         "gtk3_kde5",
 #endif
-        "gtk3", "gen", nullptr
+#if ENABLE_GTK3
+        "gtk3",
+#endif
+#if ENABLE_GEN
+        "gen",
+#endif
+        nullptr
     };
 
     static const char* const pStandardFallbackList[] =
     {
-        "gtk3", "gen", nullptr
+#if ENABLE_GTK3
+        "gtk3",
+#endif
+#if ENABLE_GEN
+        "gen",
+#endif
+        nullptr
     };
 
-#ifdef HEADLESS_VCLPLUG
+#if ENABLE_HEADLESS
     static const char* const pHeadlessFallbackList[] =
     {
-        "svp", nullptr
+        "svp",
+        nullptr
     };
 #endif
 
-    SalInstance* pInst = nullptr;
     DesktopType desktop = lcl_get_desktop_environment();
     const char * const * pList = pStandardFallbackList;
-    int nListEntry = 0;
 
-#ifdef HEADLESS_VCLPLUG
+#if ENABLE_HEADLESS
     // no server at all: dummy plugin
     if ( desktop == DESKTOP_NONE )
         pList = pHeadlessFallbackList;
@@ -212,21 +252,13 @@ SalInstance* autodetect_plugin()
     else if (desktop == DESKTOP_PLASMA5 || desktop == DESKTOP_LXQT)
         pList = pKDEFallbackList;
 
-    while( pList[nListEntry] && pInst == nullptr )
-    {
-        OUString aTry( OUString::createFromAscii( pList[nListEntry] ) );
-        pInst = tryInstance( aTry );
-        SAL_INFO_IF(
-            pInst, "vcl.plugadapt",
-            "plugin autodetection: " << pList[nListEntry]);
-        nListEntry++;
-    }
-    return pInst;
-#endif // !DISABLE_DYNLOADING
+    return pList;
 }
-#endif // DESKTOPDETECT
+#endif // !STATIC_SAL_INSTANCE
+#endif // UNIX_DESKTOP_DETECT
 
-#ifdef HEADLESS_VCLPLUG
+#endif // HAVE_FEATURE_UI
+
 // HACK to obtain Application::IsHeadlessModeEnabled early on, before
 // Application::EnableHeadlessMode has potentially been called:
 bool IsHeadlessModeRequested()
@@ -244,51 +276,76 @@ bool IsHeadlessModeRequested()
     }
     return false;
 }
-#endif
 
 } // anonymous namespace
 
 SalInstance *CreateSalInstance()
 {
-    SalInstance *pInst = nullptr;
     OUString aUsePlugin;
     rtl::Bootstrap::get("SAL_USE_VCLPLUGIN", aUsePlugin);
-    SAL_INFO_IF(!aUsePlugin.isEmpty(), "vcl", "Requested VCL plugin: " << aUsePlugin);
-#ifdef HEADLESS_VCLPLUG
+    SAL_INFO_IF(!aUsePlugin.isEmpty(), "vcl.plugadapt", "Requested VCL plugin: " << aUsePlugin);
+
     if (Application::IsBitmapRendering() || (aUsePlugin.isEmpty() && IsHeadlessModeRequested()))
         aUsePlugin = "svp";
-#endif
 
     if (aUsePlugin == "svp")
     {
         Application::EnableBitmapRendering();
-#ifndef HEADLESS_VCLPLUG
+#if ENABLE_HEADLESS
+        return svp_create_SalInstance();
+#else
         aUsePlugin.clear();
 #endif
     }
 
+#if STATIC_SAL_INSTANCE
+    return create_SalInstance();
+
+#else // !STATIC_SAL_INSTANCE
+    SalInstance *pInst = nullptr;
+
     if( !aUsePlugin.isEmpty() )
         pInst = tryInstance( aUsePlugin, true );
 
-#ifdef DESKTOPDETECT
-    if( ! pInst )
-        pInst = autodetect_plugin();
+#if UNIX_DESKTOP_DETECT
+    const char* const* pPluginList = pInst ? nullptr : autodetect_plugin_list();
+    for (int i = 0; !pInst && pPluginList[i]; ++i)
+    {
+        pInst = tryInstance(OUString::createFromAscii(pPluginList[i]));
+        SAL_INFO_IF(pInst, "vcl.plugadapt", "plugin autodetection: " << pPluginList[i]);
+    }
 #endif
 
     // fallback, try everything
     static const char* const pPlugin[] = {
 #ifdef _WIN32
-        "win"
-#else
-#ifdef MACOSX
-        "osx"
-#else
-        "gtk3", "kf5", "gen"
+        "win",
+#elif defined(MACOSX)
+        "osx",
+#else // !_WIN32 && !MACOSX
+#if ENABLE_GTK3
+        "gtk3",
 #endif
+#if ENABLE_KF5
+        "kf5",
 #endif
-     };
+#if ENABLE_GTK3_KDE5
+        "gtk3_kde5",
+#endif
+#if ENABLE_GEN
+        "gen",
+#endif
+#if ENABLE_QT5
+        "qt5",
+#endif
+#if ENABLE_QT6
+        "qt6",
+#endif
+#endif // !_WIN32 && !MACOSX
+        nullptr
+    };
 
-    for ( int i = 0; !pInst && i != SAL_N_ELEMENTS(pPlugin); ++i )
+    for (int i = 0; !pInst && pPlugin[i]; ++i)
         pInst = tryInstance( OUString::createFromAscii( pPlugin[ i ] ) );
 
     if( ! pInst )
@@ -297,19 +354,14 @@ SalInstance *CreateSalInstance()
         _exit( 1 );
     }
 
-    // acquire SolarMutex
-    pInst->AcquireYieldMutex();
-
     return pInst;
+#endif // !STATIC_SAL_INSTANCE
 }
 
 void DestroySalInstance( SalInstance *pInst )
 {
-    // release SolarMutex
-    pInst->ReleaseYieldMutexAll();
-
     delete pInst;
-#ifndef DISABLE_DYNLOADING
+#if !STATIC_SAL_INSTANCE
     if( pCloseModule )
         osl_unloadModule( pCloseModule );
 #endif
@@ -317,8 +369,8 @@ void DestroySalInstance( SalInstance *pInst )
 
 void SalAbort( const OUString& rErrorText, bool bDumpCore )
 {
-    if (GetSalData()->m_pInstance)
-        GetSalData()->m_pInstance->BeforeAbort(rErrorText, bDumpCore);
+    if (GetSalInstance())
+        GetSalInstance()->BeforeAbort(rErrorText, bDumpCore);
 
 #if defined _WIN32
     if( rErrorText.isEmpty() )
@@ -334,10 +386,12 @@ void SalAbort( const OUString& rErrorText, bool bDumpCore )
         RaiseException( 0, EXCEPTION_NONCONTINUABLE, 0, nullptr );
         FatalAppExitW( 0, o3tl::toW(rErrorText.getStr()) );
     }
-#else
+#else // !_WIN32
 #if defined ANDROID
     OUString aError(rErrorText.isEmpty() ? "Unspecified application error" : rErrorText);
     LOGE("SalAbort: '%s'", OUStringToOString(aError, osl_getThreadTextEncoding()).getStr());
+#elif defined(iOS)
+    NSLog(@"SalAbort: %s", OUStringToOString(rErrorText, osl_getThreadTextEncoding()).getStr());
 #else
     if( rErrorText.isEmpty() )
         std::fprintf( stderr, "Unspecified Application Error\n" );
@@ -351,12 +405,14 @@ void SalAbort( const OUString& rErrorText, bool bDumpCore )
         abort();
     else
         _exit(1);
-#endif
+#endif // !_WIN32
 }
 
 const OUString& SalGetDesktopEnvironment()
 {
-#ifdef _WIN32
+#if !HAVE_FEATURE_UI
+    static OUString aDesktopEnvironment("headless");
+#elif defined(_WIN32)
     static OUString aDesktopEnvironment( "Windows" );
 #elif defined(MACOSX)
     static OUString aDesktopEnvironment( "MacOSX" );
@@ -364,7 +420,9 @@ const OUString& SalGetDesktopEnvironment()
     static OUString aDesktopEnvironment("WASM");
 #elif defined(ANDROID)
     static OUString aDesktopEnvironment("android");
-#elif USING_X11
+#elif defined(iOS)
+    static OUString aDesktopEnvironment("iOS");
+#elif UNIX_DESKTOP_DETECT
     // Order to match desktops.hxx' DesktopType
     static const char * const desktop_strings[] = {
         "none", "unknown", "GNOME", "UNITY",
@@ -381,20 +439,7 @@ const OUString& SalGetDesktopEnvironment()
     return aDesktopEnvironment;
 }
 
-SalData::SalData() :
-    m_pInstance(nullptr),
-    m_pPIManager(nullptr)
-{
-}
-
-SalData::~SalData() COVERITY_NOEXCEPT_FALSE
-{
-#if (defined UNX && !defined MACOSX)
-    psp::PrinterInfoManager::release();
-#endif
-}
-
-#if defined( _WIN32 ) && !defined( HEADLESS_VCLPLUG )
+#ifdef _WIN32
 bool HasAtHook()
 {
     BOOL bIsRunning = FALSE;

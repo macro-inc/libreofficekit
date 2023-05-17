@@ -21,6 +21,7 @@
 
 #include <strings.hrc>
 #include <dp_backend.h>
+#include <dp_misc.h>
 #include <dp_ucb.h>
 #include "dp_parceldesc.hxx"
 #include <rtl/uri.hxx>
@@ -30,6 +31,7 @@
 #include <com/sun/star/script/provider/theMasterScriptProviderFactory.hpp>
 #include <com/sun/star/xml/sax/Parser.hpp>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 
 
 using namespace ::dp_misc;
@@ -70,7 +72,7 @@ class BackendImpl : public ::dp_registry::backend::PackageRegistryBackend
     public:
         PackageImpl(
             ::rtl::Reference<BackendImpl> const & myBackend,
-            OUString const & url, OUString const & libType, bool bRemoved,
+            OUString const & url, OUString libType, bool bRemoved,
             OUString const & identifier);
         // XPackage
         virtual OUString SAL_CALL getDescription() override;
@@ -134,11 +136,11 @@ OUString BackendImpl::PackageImpl::getLicenseText()
 
 BackendImpl::PackageImpl::PackageImpl(
     ::rtl::Reference<BackendImpl> const & myBackend,
-    OUString const & url, OUString const & libType, bool bRemoved,
+    OUString const & url, OUString  libType, bool bRemoved,
     OUString const & identifier)
     : Package( myBackend, url, OUString(), OUString(),
                myBackend->m_xTypeInfo, bRemoved, identifier),
-      m_descr(libType)
+      m_descr(std::move(libType))
 {
     initPackageHandler();
 
@@ -355,7 +357,7 @@ void BackendImpl::PackageImpl::processPackage_(
     if (doRegisterPackage)
     {
         // will throw if it fails
-        m_xNameCntrPkgHandler->insertByName( m_url, makeAny( Reference< XPackage >(this) ) );
+        m_xNameCntrPkgHandler->insertByName( m_url, Any( Reference< XPackage >(this) ) );
 
     }
     else // revokePackage()

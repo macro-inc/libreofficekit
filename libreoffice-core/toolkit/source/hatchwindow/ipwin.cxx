@@ -203,7 +203,7 @@ Point SvResizeHelper::GetTrackPosPixel( const tools::Rectangle & rRect ) const
     // which handle has been touched
     Point aPos;
     tools::Rectangle aRect( rRect );
-    aRect.Justify();
+    aRect.Normalize();
     // only because of EMPTY_RECT
     Point aBR = aOuter.BottomRight();
     Point aTR = aOuter.TopRight();
@@ -402,7 +402,7 @@ bool SvResizeHelper::SelectRelease( vcl::Window * pWin, const Point & rPos,
     if( -1 != nGrab )
     {
         rOutPosSize = GetTrackRectPixel( rPos );
-        rOutPosSize.Justify();
+        rOutPosSize.Normalize();
         nGrab = -1;
         pWin->ReleaseMouse();
         pWin->HideTracking();
@@ -596,7 +596,7 @@ void SvResizeWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Rect
 
 bool SvResizeWindow::PreNotify( NotifyEvent& rEvt )
 {
-    if ( rEvt.GetType() == MouseNotifyEvent::GETFOCUS && !m_bActive )
+    if ( rEvt.GetType() == NotifyEventType::GETFOCUS && !m_bActive )
     {
         m_bActive = true;
         m_pWrapper->Activated();
@@ -607,7 +607,7 @@ bool SvResizeWindow::PreNotify( NotifyEvent& rEvt )
 
 bool SvResizeWindow::EventNotify( NotifyEvent& rEvt )
 {
-    if ( rEvt.GetType() == MouseNotifyEvent::LOSEFOCUS && m_bActive )
+    if ( rEvt.GetType() == NotifyEventType::LOSEFOCUS && m_bActive )
     {
         bool bHasFocus = HasChildPathFocus(true);
         if ( !bHasFocus )

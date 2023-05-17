@@ -57,7 +57,7 @@ bool Window::PreNotify( NotifyEvent& rNEvt )
 
     if ( !bDone )
     {
-        if( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+        if( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         {
             bool bCompoundFocusChanged = false;
             if ( mpWindowImpl->mbCompoundControl && !mpWindowImpl->mbCompoundControlHasFocus && HasChildPathFocus() )
@@ -69,7 +69,7 @@ bool Window::PreNotify( NotifyEvent& rNEvt )
             if ( bCompoundFocusChanged || ( rNEvt.GetWindow() == this ) )
                 CallEventListeners( VclEventId::WindowGetFocus );
         }
-        else if( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+        else if( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
         {
             bool bCompoundFocusChanged = false;
             if ( mpWindowImpl->mbCompoundControl && mpWindowImpl->mbCompoundControlHasFocus && !HasChildPathFocus() )
@@ -116,7 +116,7 @@ bool Window::EventNotify( NotifyEvent& rNEvt )
     {
         const bool bDockingSupportCrippled = !StyleSettings::GetDockingFloatsSupported();
 
-        if ( rNEvt.GetType() == MouseNotifyEvent::MOUSEBUTTONDOWN )
+        if ( rNEvt.GetType() == NotifyEventType::MOUSEBUTTONDOWN )
         {
             const MouseEvent* pMEvt = rNEvt.GetMouseEvent();
             bool bHit = pWrapper->GetDragArea().Contains( pMEvt->GetPosPixel() );
@@ -136,7 +136,7 @@ bool Window::EventNotify( NotifyEvent& rNEvt )
                 }
             }
         }
-        else if ( rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE )
+        else if ( rNEvt.GetType() == NotifyEventType::MOUSEMOVE )
         {
             const MouseEvent* pMEvt = rNEvt.GetMouseEvent();
             bool bHit = pWrapper->GetDragArea().Contains( pMEvt->GetPosPixel() );
@@ -159,7 +159,7 @@ bool Window::EventNotify( NotifyEvent& rNEvt )
                 return true;
             }
         }
-        else if( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+        else if( rNEvt.GetType() == NotifyEventType::KEYINPUT )
         {
             const vcl::KeyCode& rKey = rNEvt.GetKeyEvent()->GetKeyCode();
             if (rKey.GetCode() == KEY_F10 && rKey.GetModifier() &&
@@ -183,7 +183,7 @@ bool Window::EventNotify( NotifyEvent& rNEvt )
     if ( (GetStyle() & (WB_DIALOGCONTROL | WB_NODIALOGCONTROL)) == WB_DIALOGCONTROL )
     {
         // if the parent also has dialog control activated, the parent takes over control
-        if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) || (rNEvt.GetType() == MouseNotifyEvent::KEYUP) )
+        if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) || (rNEvt.GetType() == NotifyEventType::KEYUP) )
         {
             // ScGridWindow has WB_DIALOGCONTROL set, so pressing tab in ScCheckListMenuControl won't
             // get processed here by the toplevel DockingWindow of ScCheckListMenuControl by
@@ -191,13 +191,13 @@ bool Window::EventNotify( NotifyEvent& rNEvt )
             bool bTopLevelFloatingWindow = (pWrapper && pWrapper->IsFloatingMode());
             if (ImplIsOverlapWindow() || parentNotDialogControl(this) || bTopLevelFloatingWindow)
             {
-                bRet = ImplDlgCtrl( *rNEvt.GetKeyEvent(), rNEvt.GetType() == MouseNotifyEvent::KEYINPUT );
+                bRet = ImplDlgCtrl( *rNEvt.GetKeyEvent(), rNEvt.GetType() == NotifyEventType::KEYINPUT );
             }
         }
-        else if ( (rNEvt.GetType() == MouseNotifyEvent::GETFOCUS) || (rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS) )
+        else if ( (rNEvt.GetType() == NotifyEventType::GETFOCUS) || (rNEvt.GetType() == NotifyEventType::LOSEFOCUS) )
         {
-            ImplDlgCtrlFocusChanged( rNEvt.GetWindow(), rNEvt.GetType() == MouseNotifyEvent::GETFOCUS );
-            if ( (rNEvt.GetWindow() == this) && (rNEvt.GetType() == MouseNotifyEvent::GETFOCUS) &&
+            ImplDlgCtrlFocusChanged( rNEvt.GetWindow(), rNEvt.GetType() == NotifyEventType::GETFOCUS );
+            if ( (rNEvt.GetWindow() == this) && (rNEvt.GetType() == NotifyEventType::GETFOCUS) &&
                  !(GetStyle() & WB_TABSTOP) && !(mpWindowImpl->mnDlgCtrlFlags & DialogControlFlags::WantFocus) )
             {
                 vcl::Window* pFirstChild = ImplGetDlgWindow( 0, GetDlgWindowType::First );
@@ -224,7 +224,11 @@ void Window::CallEventListeners( VclEventId nEvent, void* pData )
 
     Application::ImplCallEventListeners( aEvent );
 
-    if ( xWindow->isDisposed() )
+    // if we have ObjectDying, then the bIsDisposed flag has already been set,
+    // but we still need to let listeners know.
+    const bool bIgnoreDisposed = nEvent == VclEventId::ObjectDying;
+
+    if ( !bIgnoreDisposed && xWindow->isDisposed() )
         return;
 
     // If maEventListeners is empty, the XVCLWindow has not yet been initialized.
@@ -240,9 +244,9 @@ void Window::CallEventListeners( VclEventId nEvent, void* pData )
         mpWindowImpl->mnEventListenersIteratingCount++;
         auto& rWindowImpl = *mpWindowImpl;
         comphelper::ScopeGuard aGuard(
-            [&rWindowImpl, &xWindow]()
+            [&rWindowImpl, &xWindow, &bIgnoreDisposed]()
             {
-                if (!xWindow->isDisposed())
+                if (bIgnoreDisposed || !xWindow->isDisposed())
                 {
                     rWindowImpl.mnEventListenersIteratingCount--;
                     if (rWindowImpl.mnEventListenersIteratingCount == 0)
@@ -252,7 +256,7 @@ void Window::CallEventListeners( VclEventId nEvent, void* pData )
         );
         for ( const Link<VclWindowEvent&,void>& rLink : aCopy )
         {
-            if (xWindow->isDisposed()) break;
+            if (!bIgnoreDisposed && xWindow->isDisposed()) break;
             // check this hasn't been removed in some re-enterancy scenario fdo#47368
             if( rWindowImpl.maEventListenersDeleted.find(rLink) == rWindowImpl.maEventListenersDeleted.end() )
                 rLink.Call( aEvent );
@@ -262,7 +266,7 @@ void Window::CallEventListeners( VclEventId nEvent, void* pData )
     while ( xWindow )
     {
 
-        if ( xWindow->isDisposed() )
+        if ( !bIgnoreDisposed && xWindow->isDisposed() )
             return;
 
         auto& rWindowImpl = *xWindow->mpWindowImpl;
@@ -273,9 +277,9 @@ void Window::CallEventListeners( VclEventId nEvent, void* pData )
             // we use an iterating counter/flag and a set of deleted Link's to avoid O(n^2) behaviour
             rWindowImpl.mnChildEventListenersIteratingCount++;
             comphelper::ScopeGuard aGuard(
-                [&rWindowImpl, &xWindow]()
+                [&rWindowImpl, &xWindow, &bIgnoreDisposed]()
                 {
-                    if (!xWindow->isDisposed())
+                    if (bIgnoreDisposed || !xWindow->isDisposed())
                     {
                         rWindowImpl.mnChildEventListenersIteratingCount--;
                         if (rWindowImpl.mnChildEventListenersIteratingCount == 0)
@@ -285,7 +289,7 @@ void Window::CallEventListeners( VclEventId nEvent, void* pData )
             );
             for ( const Link<VclWindowEvent&,void>& rLink : aCopy )
             {
-                if (xWindow->isDisposed())
+                if (!bIgnoreDisposed && xWindow->isDisposed())
                     return;
                 // Check this hasn't been removed in some re-enterancy scenario fdo#47368.
                 if( rWindowImpl.maChildEventListenersDeleted.find(rLink) == rWindowImpl.maChildEventListenersDeleted.end() )
@@ -293,7 +297,7 @@ void Window::CallEventListeners( VclEventId nEvent, void* pData )
             }
         }
 
-        if ( xWindow->isDisposed() )
+        if ( !bIgnoreDisposed && xWindow->isDisposed() )
             return;
 
         xWindow = xWindow->GetParent();
@@ -377,7 +381,7 @@ static MouseEvent ImplTranslateMouseEvent( const MouseEvent& rE, vcl::Window con
 
 void Window::ImplNotifyKeyMouseCommandEventListeners( NotifyEvent& rNEvt )
 {
-    if( rNEvt.GetType() == MouseNotifyEvent::COMMAND )
+    if( rNEvt.GetType() == NotifyEventType::COMMAND )
     {
         const CommandEvent* pCEvt = rNEvt.GetCommandEvent();
         if ( pCEvt->GetCommand() != CommandEventId::ContextMenu )
@@ -419,7 +423,7 @@ void Window::ImplNotifyKeyMouseCommandEventListeners( NotifyEvent& rNEvt )
 
     VclPtr<vcl::Window> xWindow = this;
 
-    if( rNEvt.GetType() == MouseNotifyEvent::MOUSEMOVE )
+    if( rNEvt.GetType() == NotifyEventType::MOUSEMOVE )
     {
         if ( mpWindowImpl->mbCompoundControl || ( rNEvt.GetWindow() == this ) )
         {
@@ -432,7 +436,7 @@ void Window::ImplNotifyKeyMouseCommandEventListeners( NotifyEvent& rNEvt )
             }
         }
     }
-    else if( rNEvt.GetType() == MouseNotifyEvent::MOUSEBUTTONUP )
+    else if( rNEvt.GetType() == NotifyEventType::MOUSEBUTTONUP )
     {
         if ( mpWindowImpl->mbCompoundControl || ( rNEvt.GetWindow() == this ) )
         {
@@ -445,7 +449,7 @@ void Window::ImplNotifyKeyMouseCommandEventListeners( NotifyEvent& rNEvt )
             }
         }
     }
-    else if( rNEvt.GetType() == MouseNotifyEvent::MOUSEBUTTONDOWN )
+    else if( rNEvt.GetType() == NotifyEventType::MOUSEBUTTONDOWN )
     {
         if ( mpWindowImpl->mbCompoundControl || ( rNEvt.GetWindow() == this ) )
         {
@@ -458,12 +462,12 @@ void Window::ImplNotifyKeyMouseCommandEventListeners( NotifyEvent& rNEvt )
             }
         }
     }
-    else if( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+    else if( rNEvt.GetType() == NotifyEventType::KEYINPUT )
     {
         if ( mpWindowImpl->mbCompoundControl || ( rNEvt.GetWindow() == this ) )
             CallEventListeners( VclEventId::WindowKeyInput, const_cast<KeyEvent *>(rNEvt.GetKeyEvent()) );
     }
-    else if( rNEvt.GetType() == MouseNotifyEvent::KEYUP )
+    else if( rNEvt.GetType() == NotifyEventType::KEYUP )
     {
         if ( mpWindowImpl->mbCompoundControl || ( rNEvt.GetWindow() == this ) )
             CallEventListeners( VclEventId::WindowKeyUp, const_cast<KeyEvent *>(rNEvt.GetKeyEvent()) );
@@ -546,11 +550,11 @@ void Window::ImplCallMove()
         }
 
         SalFrameGeometry g = mpWindowImpl->mpFrame->GetGeometry();
-        mpWindowImpl->maPos = Point( g.nX, g.nY );
+        mpWindowImpl->maPos = Point(g.x(), g.y());
         if( pParentFrame )
         {
             g = pParentFrame->GetGeometry();
-            mpWindowImpl->maPos -= Point( g.nX, g.nY );
+            mpWindowImpl->maPos -= Point(g.x(), g.y());
         }
         // the client window and all its subclients have the same position as the borderframe
         // this is important for floating toolbars where the borderwindow is a floating window
@@ -656,7 +660,7 @@ void Window::ImplCallFocusChangeActivate( vcl::Window* pNewOverlapWindow,
 } /* namespace vcl */
 
 
-NotifyEvent::NotifyEvent( MouseNotifyEvent nEventType, vcl::Window* pWindow,
+NotifyEvent::NotifyEvent( NotifyEventType nEventType, vcl::Window* pWindow,
                           const void* pEvent )
 {
     mpWindow    = pWindow;

@@ -18,10 +18,10 @@
  */
 
 #include <memory>
+#include <utility>
 #include <worksheethelper.hxx>
 
 #include <algorithm>
-#include <utility>
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/drawing/XDrawPageSupplier.hpp>
@@ -209,7 +209,7 @@ class WorksheetGlobals : public WorkbookHelper, public IWorksheetProgress
 public:
     explicit            WorksheetGlobals(
                             const WorkbookHelper& rHelper,
-                            const ISegmentProgressBarRef& rxProgressBar,
+                            ISegmentProgressBarRef xProgressBar,
                             WorksheetType eSheetType,
                             SCTAB nSheet );
 
@@ -403,7 +403,7 @@ private:
 
 constexpr OUStringLiteral gaSheetCellRanges( u"com.sun.star.sheet.SheetCellRanges" ); /// Service name for a SheetCellRanges object.
 
-WorksheetGlobals::WorksheetGlobals( const WorkbookHelper& rHelper, const ISegmentProgressBarRef& rxProgressBar, WorksheetType eSheetType, SCTAB nSheet ) :
+WorksheetGlobals::WorksheetGlobals( const WorkbookHelper& rHelper, ISegmentProgressBarRef xProgressBar, WorksheetType eSheetType, SCTAB nSheet ) :
     WorkbookHelper( rHelper ),
     mrMaxApiPos( rHelper.getAddressConverter().getMaxApiAddress() ),
     maUsedArea( SCCOL_MAX, SCROW_MAX, nSheet, -1, -1, nSheet ), // Set start address to largest possible value, and end address to smallest
@@ -415,7 +415,7 @@ WorksheetGlobals::WorksheetGlobals( const WorkbookHelper& rHelper, const ISegmen
     maSheetSett( *this ),
     maPageSett( *this ),
     maSheetViewSett( *this ),
-    mxProgressBar( rxProgressBar ),
+    mxProgressBar(std::move( xProgressBar )),
     mbFastRowProgress( false ),
     meSheetType( eSheetType ),
     mxSheet(getSheetFromDoc( nSheet )),
@@ -749,9 +749,7 @@ void WorksheetGlobals::setBaseColumnWidth( sal_Int32 nWidth )
     if( !mbHasDefWidth && (nWidth > 0) )
     {
         // #i3006# add 5 pixels padding to the width
-        const UnitConverter& rUnitConv = getUnitConverter();
-        maDefColModel.mfWidth = rUnitConv.scaleFromMm100(
-            rUnitConv.scaleToMm100( nWidth, Unit::Digit ) + rUnitConv.scaleToMm100( 5, Unit::ScreenX ), Unit::Digit );
+        maDefColModel.mfWidth = nWidth + getUnitConverter().scaleValue( 5, Unit::ScreenX, Unit::Digit );
     }
 }
 
@@ -940,9 +938,6 @@ void WorksheetGlobals::finalizeWorksheetImport()
 {
     lclUpdateProgressBar( mxRowProgress, 1.0 );
     maSheetData.finalizeImport();
-    // assumes getTables().finalizeImport ( which creates the DatabaseRanges )
-    // has been called already
-    getTables().applyAutoFilters();
 
     getCondFormats().finalizeImport();
     lclUpdateProgressBar( mxFinalProgress, 0.25 );
@@ -1056,7 +1051,7 @@ void WorksheetGlobals::insertHyperlink( const ScAddress& rAddress, const OUStrin
     ScDocumentImport& rDoc = getDocImport();
     ScRefCellValue aCell(rDoc.getDoc(), rAddress);
 
-    if (aCell.meType == CELLTYPE_STRING || aCell.meType == CELLTYPE_EDIT)
+    if (aCell.getType() == CELLTYPE_STRING || aCell.getType() == CELLTYPE_EDIT)
     {
         OUString aStr = aCell.getString(&rDoc.getDoc());
         ScFieldEditEngine& rEE = rDoc.getDoc().GetEditEngine();
@@ -1210,12 +1205,8 @@ void WorksheetGlobals::convertColumns()
 void WorksheetGlobals::convertColumns( OutlineLevelVec& orColLevels,
         const ValueRange& rColRange, const ColumnModel& rModel )
 {
-    // column width: convert 'number of characters' to column width in 1/100 mm
-    sal_Int32 nWidth = getUnitConverter().scaleToMm100( rModel.mfWidth, Unit::Digit );
-
-    // macro sheets have double width
-    if( meSheetType == WorksheetType::Macro )
-        nWidth *= 2;
+    // column width: convert 'number of characters' to column width in twips
+    sal_Int32 nWidth = std::round(getUnitConverter().scaleValue( rModel.mfWidth, Unit::Digit, Unit::Twip ));
 
     SCTAB nTab = getSheetIndex();
     ScDocument& rDoc = getScDocument();
@@ -1224,9 +1215,13 @@ void WorksheetGlobals::convertColumns( OutlineLevelVec& orColLevels,
 
     if( nWidth > 0 )
     {
+        // macro sheets have double width
+        if( meSheetType == WorksheetType::Macro )
+            nWidth *= 2;
+
         for( SCCOL nCol = nStartCol; nCol <= nEndCol; ++nCol )
         {
-            rDoc.SetColWidthOnly(nCol, nTab, o3tl::toTwips(nWidth, o3tl::Length::mm100));
+            rDoc.SetColWidthOnly(nCol, nTab, nWidth);
         }
     }
 
@@ -1271,9 +1266,9 @@ void WorksheetGlobals::convertRows(OutlineLevelVec& orRowLevels, const ValueRang
                                    const RowModel& rModel,
                                    const std::vector<sc::ColRowSpan>& rSpans, double fDefHeight)
 {
-    // row height: convert points to row height in 1/100 mm
+    // row height: convert points to row height in twips
     double fHeight = (rModel.mfHeight >= 0.0) ? rModel.mfHeight : fDefHeight;
-    sal_Int32 nHeight = getUnitConverter().scaleToMm100( fHeight, Unit::Point );
+    sal_Int32 nHeight = std::round(o3tl::toTwips( fHeight, o3tl::Length::pt ));
     SCROW nStartRow = rRowRange.mnFirst;
     SCROW nEndRow = rRowRange.mnLast;
     SCTAB nTab = getSheetIndex();
@@ -1281,8 +1276,7 @@ void WorksheetGlobals::convertRows(OutlineLevelVec& orRowLevels, const ValueRang
     {
         /* always import the row height, ensures better layout */
         ScDocument& rDoc = getScDocument();
-        rDoc.SetRowHeightOnly(nStartRow, nEndRow, nTab,
-                              o3tl::toTwips(nHeight, o3tl::Length::mm100));
+        rDoc.SetRowHeightOnly(nStartRow, nEndRow, nTab, nHeight);
         if(rModel.mbCustomHeight)
             rDoc.SetManualHeight( nStartRow, nEndRow, nTab, true );
     }
@@ -1381,7 +1375,18 @@ void WorksheetGlobals::finalizeDrawings()
         Needed if the imported document is inserted as "OLE object from file"
         and thus does not provide an OLE size property by itself. */
     if( (maShapeBoundingBox.Width > 0) || (maShapeBoundingBox.Height > 0) )
-        extendUsedArea( getCellRangeFromRectangle( maShapeBoundingBox ) );
+    {
+        ScRange aRange(getCellRangeFromRectangle(maShapeBoundingBox));
+        if (aRange.aStart.Col() < 0)
+            aRange.aStart.SetCol(0);
+        if (aRange.aStart.Row() < 0)
+            aRange.aStart.SetRow(0);
+        if (aRange.aEnd.Col() < 0)
+            aRange.aEnd.SetCol(0);
+        if (aRange.aEnd.Row() < 0)
+            aRange.aEnd.SetRow(0);
+        extendUsedArea(aRange);
+    }
 
     // if no used area is set, default to A1
     if( maUsedArea.aStart.Col() > maUsedArea.aEnd.Col() )
@@ -1591,12 +1596,16 @@ void WorksheetHelper::setCellFormulaValue(
     getFormulaBuffer().setCellFormulaValue(rAddress, rValueStr, nCellType);
 }
 
-void WorksheetHelper::putRichString( const ScAddress& rAddress, RichString& rString, const oox::xls::Font* pFirstPortionFont )
+void WorksheetHelper::putRichString( const ScAddress& rAddress, RichString& rString, const oox::xls::Font* pFirstPortionFont, bool bSingleLine )
 {
     ScEditEngineDefaulter& rEE = getEditEngine();
 
+    rEE.SetSingleLine(bSingleLine);
+
     // The cell will own the text object instance returned from convert().
     getDocImport().setEditCell(rAddress, rString.convert(rEE, pFirstPortionFont));
+
+    rEE.SetSingleLine(false);
 }
 
 void WorksheetHelper::putFormulaTokens( const ScAddress& rAddress, const ApiTokenSequence& rTokens )

@@ -19,20 +19,22 @@
 
 #include <RangeHighlighter.hxx>
 #include <WeakListenerAdapter.hxx>
+#include <ChartModel.hxx>
 #include <ChartModelHelper.hxx>
 #include <DataSourceHelper.hxx>
 #include <ObjectIdentifier.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
+#include <Diagram.hxx>
 
 #include <com/sun/star/chart2/ScaleData.hpp>
 #include <com/sun/star/chart2/XAxis.hpp>
 #include <com/sun/star/chart2/XDataSeries.hpp>
 #include <com/sun/star/chart/ErrorBarStyle.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/view/XSelectionSupplier.hpp>
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/color.hxx>
 
 using namespace ::com::sun::star;
@@ -68,9 +70,9 @@ namespace chart
 {
 
 RangeHighlighter::RangeHighlighter(
-    const Reference< view::XSelectionSupplier > & xSelectionSupplier ) :
-        impl::RangeHighlighter_Base( m_aMutex ),
-        m_xSelectionSupplier( xSelectionSupplier ),
+    const rtl::Reference< ChartModel > & xChartModel ) :
+        m_xSelectionSupplier(xChartModel->getCurrentController(), uno::UNO_QUERY),
+        m_xChartModel( xChartModel ),
         m_nAddedListenerCount( 0 ),
         m_bIncludeHiddenCells(true)
 {
@@ -88,17 +90,14 @@ Sequence< chart2::data::HighlightedRange > SAL_CALL RangeHighlighter::getSelecte
 void RangeHighlighter::determineRanges()
 {
     m_aSelectedRanges.realloc( 0 );
+    if( !m_xChartModel.is())
+        return;
     if( !m_xSelectionSupplier.is())
         return;
 
     try
     {
-        Reference< frame::XController > xController( m_xSelectionSupplier, uno::UNO_QUERY );
-        Reference< frame::XModel > xChartModel;
-        if( xController.is())
-            xChartModel.set( xController->getModel());
-
-        m_bIncludeHiddenCells = ChartModelHelper::isIncludeHiddenCells( xChartModel );
+        m_bIncludeHiddenCells = ChartModelHelper::isIncludeHiddenCells( m_xChartModel );
 
         uno::Any aSelection( m_xSelectionSupplier->getSelection());
         const uno::Type& rType = aSelection.getValueType();
@@ -113,7 +112,7 @@ void RangeHighlighter::determineRanges()
             {
                 ObjectType eObjectType = ObjectIdentifier::getObjectType( aCID );
                 sal_Int32 nIndex = ObjectIdentifier::getIndexFromParticleOrCID( aCID );
-                Reference< chart2::XDataSeries > xDataSeries( ObjectIdentifier::getDataSeriesForCID( aCID, xChartModel ) );
+                rtl::Reference< DataSeries > xDataSeries( ObjectIdentifier::getDataSeriesForCID( aCID, m_xChartModel ) );
                 if( eObjectType == OBJECTTYPE_LEGEND_ENTRY )
                 {
                     OUString aParentParticel( ObjectIdentifier::getFullParentParticle( aCID ) );
@@ -135,7 +134,7 @@ void RangeHighlighter::determineRanges()
                 {
                     // select error bar ranges, or data series, if the style is
                     // not set to FROM_DATA
-                    fillRangesForErrorBars( ObjectIdentifier::getObjectPropertySet( aCID, xChartModel ), xDataSeries );
+                    fillRangesForErrorBars( ObjectIdentifier::getObjectPropertySet( aCID, m_xChartModel ), xDataSeries );
                     return;
                 }
                 else if( xDataSeries.is() )
@@ -147,7 +146,7 @@ void RangeHighlighter::determineRanges()
                 else if( eObjectType == OBJECTTYPE_AXIS )
                 {
                     // Axis (Categories)
-                    Reference< chart2::XAxis > xAxis( ObjectIdentifier::getObjectPropertySet( aCID, xChartModel ), uno::UNO_QUERY );
+                    Reference< chart2::XAxis > xAxis( ObjectIdentifier::getObjectPropertySet( aCID, m_xChartModel ), uno::UNO_QUERY );
                     if( xAxis.is())
                     {
                         fillRangesForCategories( xAxis );
@@ -161,7 +160,7 @@ void RangeHighlighter::determineRanges()
                     )
                 {
                     // Diagram
-                    Reference< chart2::XDiagram > xDia( ObjectIdentifier::getDiagramForCID( aCID, xChartModel ) );
+                    rtl::Reference< ::chart::Diagram > xDia( ObjectIdentifier::getDiagramForCID( aCID, m_xChartModel ) );
                     if( xDia.is())
                     {
                         fillRangesForDiagram( xDia );
@@ -183,8 +182,7 @@ void RangeHighlighter::determineRanges()
         else
         {
             //if nothing is selected select all ranges
-            Reference< chart2::XChartDocument > xChartDoc( xChartModel, uno::UNO_QUERY_THROW );
-            fillRangesForDiagram( xChartDoc->getFirstDiagram() );
+            fillRangesForDiagram( m_xChartModel->getFirstChartDiagram() );
             return;
         }
     }
@@ -194,7 +192,7 @@ void RangeHighlighter::determineRanges()
     }
 }
 
-void RangeHighlighter::fillRangesForDiagram( const Reference< chart2::XDiagram > & xDiagram )
+void RangeHighlighter::fillRangesForDiagram( const rtl::Reference< Diagram > & xDiagram )
 {
     Sequence< OUString > aSelectedRanges( DataSourceHelper::getUsedDataRanges( xDiagram ));
     m_aSelectedRanges.realloc( aSelectedRanges.getLength());
@@ -265,19 +263,15 @@ void RangeHighlighter::fillRangesForCategories( const Reference< chart2::XAxis >
                     defaultPreferredColor );
 }
 
-void RangeHighlighter::fillRangesForDataPoint( const Reference< uno::XInterface > & xDataSeries, sal_Int32 nIndex )
+void RangeHighlighter::fillRangesForDataPoint( const rtl::Reference< DataSeries > & xDataSeries, sal_Int32 nIndex )
 {
     if( !xDataSeries.is())
         return;
 
-    Reference< chart2::data::XDataSource > xSource( xDataSeries, uno::UNO_QUERY );
-    if( !xSource.is() )
-        return;
-
     Color nPreferredColor = defaultPreferredColor;
     std::vector< chart2::data::HighlightedRange > aHilightedRanges;
-    const Sequence< Reference< chart2::data::XLabeledDataSequence > > aLSeqSeq( xSource->getDataSequences());
-    for( Reference< chart2::data::XLabeledDataSequence > const & labelDataSeq : aLSeqSeq )
+    const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > & aLSeqSeq( xDataSeries->getDataSequences2());
+    for( uno::Reference< chart2::data::XLabeledDataSequence > const & labelDataSeq : aLSeqSeq )
     {
         Reference< chart2::data::XDataSequence > xLabel( labelDataSeq->getLabel());
         Reference< chart2::data::XDataSequence > xValues( labelDataSeq->getValues());
@@ -307,7 +301,8 @@ void SAL_CALL RangeHighlighter::addSelectionChangeListener( const Reference< vie
 
     if( m_nAddedListenerCount == 0 )
         startListening();
-    rBHelper.addListener( cppu::UnoType<decltype(xListener)>::get(), xListener);
+    std::unique_lock g(m_aMutex);
+    maSelectionChangeListeners.addInterface( g, xListener);
     ++m_nAddedListenerCount;
 
     //bring the new listener up to the current state
@@ -317,7 +312,8 @@ void SAL_CALL RangeHighlighter::addSelectionChangeListener( const Reference< vie
 
 void SAL_CALL RangeHighlighter::removeSelectionChangeListener( const Reference< view::XSelectionChangeListener >& xListener )
 {
-    rBHelper.removeListener( cppu::UnoType<decltype(xListener)>::get(), xListener );
+    std::unique_lock g(m_aMutex);
+    maSelectionChangeListeners.removeInterface( g, xListener );
     --m_nAddedListenerCount;
     if( m_nAddedListenerCount == 0 )
         stopListening();
@@ -335,16 +331,16 @@ void SAL_CALL RangeHighlighter::selectionChanged( const lang::EventObject& /*aEv
 
 void RangeHighlighter::fireSelectionEvent()
 {
-    ::cppu::OInterfaceContainerHelper* pIC = rBHelper.getContainer(
-        cppu::UnoType< view::XSelectionChangeListener >::get() );
-    if( pIC )
+    std::unique_lock g(m_aMutex);
+    if( maSelectionChangeListeners.getLength(g) )
     {
         lang::EventObject aEvent( static_cast< lang::XComponent* >( this ) );
-        ::cppu::OInterfaceIteratorHelper aIt( *pIC );
-        while( aIt.hasMoreElements() )
-        {
-            static_cast< view::XSelectionChangeListener* >( aIt.next() )->selectionChanged( aEvent );
-        }
+        maSelectionChangeListeners.forEach(g,
+            [&aEvent](const css::uno::Reference<view::XSelectionChangeListener>& xListener)
+            {
+                xListener->selectionChanged(aEvent);
+            }
+        );
     }
 }
 
@@ -382,7 +378,7 @@ void RangeHighlighter::stopListening()
 
 // ____ WeakComponentImplHelperBase ____
 // is called when dispose() is called at this component
-void SAL_CALL RangeHighlighter::disposing()
+void RangeHighlighter::disposing(std::unique_lock<std::mutex>&)
 {
     // @todo: remove listener. Currently the controller shows an assertion
     // because it is already disposed

@@ -33,7 +33,7 @@
 
 void SwEditShell::DeleteSel(SwPaM& rPam, bool const isArtificialSelection, bool *const pUndo)
 {
-    bool bSelectAll = StartsWithTable() && ExtendedSelectedAll();
+    bool bSelectAll = StartsWith_() != SwCursorShell::StartsWith::None && ExtendedSelectedAll();
     // only for selections
     if (!rPam.HasMark()
         || (*rPam.GetPoint() == *rPam.GetMark()
@@ -47,9 +47,9 @@ void SwEditShell::DeleteSel(SwPaM& rPam, bool const isArtificialSelection, bool 
     // 1. Point and Mark are in one box, delete selection as usual
     // 2. Point and Mark are in different boxes, search all selected boxes and delete content
     // 3. Point and Mark are at the document start and end, Point is in a table: delete selection as usual
-    if( rPam.GetNode().FindTableNode() &&
-        rPam.GetNode().StartOfSectionNode() !=
-        rPam.GetNode(false).StartOfSectionNode() && !bSelectAll )
+    if( rPam.GetPointNode().FindTableNode() &&
+        rPam.GetPointNode().StartOfSectionNode() !=
+        rPam.GetMarkNode().StartOfSectionNode() && !bSelectAll )
     {
         // group the Undo in the table
         if( pUndo && !*pUndo )
@@ -61,9 +61,9 @@ void SwEditShell::DeleteSel(SwPaM& rPam, bool const isArtificialSelection, bool 
         const SwPosition* pEndSelPos = rPam.End();
         do {
             aDelPam.SetMark();
-            SwNode& rNd = aDelPam.GetNode();
+            SwNode& rNd = aDelPam.GetPointNode();
             const SwNode& rEndNd = *rNd.EndOfSectionNode();
-            if( pEndSelPos->nNode.GetIndex() <= rEndNd.GetIndex() )
+            if( pEndSelPos->GetNodeIndex() <= rEndNd.GetIndex() )
             {
                 *aDelPam.GetPoint() = *pEndSelPos;
                 pEndSelPos = nullptr;     // misuse a pointer as a flag
@@ -71,7 +71,7 @@ void SwEditShell::DeleteSel(SwPaM& rPam, bool const isArtificialSelection, bool 
             else
             {
                 // then go to the end of the selection
-                aDelPam.GetPoint()->nNode = rEndNd;
+                aDelPam.GetPoint()->Assign(rEndNd);
                 aDelPam.Move( fnMoveBackward, GoInContent );
             }
             // skip protected boxes
@@ -100,17 +100,16 @@ void SwEditShell::DeleteSel(SwPaM& rPam, bool const isArtificialSelection, bool 
             // Selection starts at the first para of the first cell, but we
             // want to delete the table node before the first cell as well.
             while (SwTableNode const* pTableNode =
-                pNewPam->Start()->nNode.GetNode().StartOfSectionNode()->FindTableNode())
+                pNewPam->Start()->GetNode().StartOfSectionNode()->FindTableNode())
             {
-                pNewPam->Start()->nNode = *pTableNode;
+                pNewPam->Start()->Assign(*pTableNode);
             }
             // tdf#133990 ensure section is included in SwUndoDelete
             while (SwSectionNode const* pSectionNode =
-                pNewPam->Start()->nNode.GetNode().StartOfSectionNode()->FindSectionNode())
+                pNewPam->Start()->GetNode().StartOfSectionNode()->FindSectionNode())
             {
-                pNewPam->Start()->nNode = *pSectionNode;
+                pNewPam->Start()->Assign(*pSectionNode);
             }
-            pNewPam->Start()->nContent.Assign(nullptr, 0);
             pPam = &*pNewPam;
         }
         // delete everything
@@ -253,8 +252,8 @@ bool SwEditShell::Copy( SwEditShell& rDestShell )
         if( bFirstMove )
         {
             // Store start position of the new area
-            aSttNdIdx = pPos->nNode.GetIndex()-1;
-            nSttCntIdx = pPos->nContent.GetIndex();
+            aSttNdIdx = pPos->GetNodeIndex()-1;
+            nSttCntIdx = pPos->GetContentIndex();
             bFirstMove = false;
         }
 
@@ -273,8 +272,7 @@ bool SwEditShell::Copy( SwEditShell& rDestShell )
     {
         SwPaM* pCursor = rDestShell.GetCursor();
         pCursor->SetMark();
-        pCursor->GetPoint()->nNode = aSttNdIdx.GetIndex()+1;
-        pCursor->GetPoint()->nContent.Assign( pCursor->GetContentNode(),nSttCntIdx);
+        pCursor->GetPoint()->Assign( aSttNdIdx.GetIndex()+1, nSttCntIdx );
         pCursor->Exchange();
     }
     else
@@ -288,10 +286,10 @@ bool SwEditShell::Copy( SwEditShell& rDestShell )
     {
         for(SwPaM& rCmp : rDestShell.GetCursor()->GetRingContainer())
         {
-            OSL_ENSURE( rCmp.GetPoint()->nContent.GetIdxReg()
-                        == rCmp.GetContentNode(), "Point in wrong Node" );
-            OSL_ENSURE( rCmp.GetMark()->nContent.GetIdxReg()
-                        == rCmp.GetContentNode(false), "Mark in wrong Node" );
+            OSL_ENSURE( rCmp.GetPoint()->GetContentNode()
+                        == rCmp.GetPointContentNode(), "Point in wrong Node" );
+            OSL_ENSURE( rCmp.GetMark()->GetContentNode()
+                        == rCmp.GetMarkContentNode(), "Mark in wrong Node" );
         }
     }
 #endif
@@ -317,7 +315,7 @@ bool SwEditShell::Replace( const OUString& rNewStr, bool bRegExpRplc )
     CurrShell aCurr( this );
 
     bool bRet = false;
-    if( !HasReadonlySel() )
+    if (!HasReadonlySel(true))
     {
         StartAllAction();
         GetDoc()->GetIDocumentUndoRedo().StartUndo(SwUndoId::EMPTY, nullptr);

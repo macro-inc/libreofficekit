@@ -238,7 +238,7 @@ void EMFWriter::ImplWritePlusFillPolygonRecord( const tools::Polygon& rPoly, sal
 
 bool EMFWriter::WriteEMF(const GDIMetaFile& rMtf)
 {
-    const sal_uLong nHeaderPos = m_rStm.Tell();
+    const sal_uInt64 nHeaderPos = m_rStm.Tell();
 
     maVDev->EnableOutput( false );
     maVDev->SetMapMode( rMtf.GetPrefMapMode() );
@@ -302,7 +302,7 @@ bool EMFWriter::WriteEMF(const GDIMetaFile& rMtf)
     ImplEndRecord();
 
     // write header
-    const sal_uLong nEndPos = m_rStm.Tell(); m_rStm.Seek( nHeaderPos );
+    const sal_uInt64 nEndPos = m_rStm.Tell(); m_rStm.Seek( nHeaderPos );
 
     m_rStm.WriteUInt32( 0x00000001 ).WriteUInt32( 108 )   //use [MS-EMF 2.2.11] HeaderExtension2 Object
             .WriteInt32( 0 ).WriteInt32( 0 ).WriteInt32( aMtfSizePix.Width() - 1 ).WriteInt32( aMtfSizePix.Height() - 1 )
@@ -813,7 +813,7 @@ void EMFWriter::ImplWriteBmpRecord( const Bitmap& rBmp, const Point& rPt,
     m_rStm.WriteInt32( 0 ).WriteInt32( 0 ).WriteInt32( aBmpSizePixel.Width() ).WriteInt32( aBmpSizePixel.Height() );
 
     // write offset positions and sizes later
-    const sal_uLong nOffPos = m_rStm.Tell();
+    const sal_uInt64 nOffPos = m_rStm.Tell();
     m_rStm.SeekRel( 16 );
 
     m_rStm.WriteUInt32( 0 ).WriteInt32( ( RasterOp::Xor == maVDev->GetRasterOp() && WIN_SRCCOPY == nROP ) ? WIN_SRCINVERT : nROP );
@@ -851,7 +851,7 @@ void EMFWriter::ImplWriteBmpRecord( const Bitmap& rBmp, const Point& rPt,
 
     m_rStm.WriteBytes( aMemStm.GetData(), nDIBSize );
 
-    const sal_uLong nEndPos = m_rStm.Tell();
+    const sal_uInt64 nEndPos = m_rStm.Tell();
     m_rStm.Seek( nOffPos );
     m_rStm.WriteUInt32( 80 ).WriteUInt32( nHeaderSize + nPalSize );
     m_rStm.WriteUInt32( 80 + nHeaderSize + nPalSize ).WriteUInt32( nImageSize );
@@ -861,7 +861,7 @@ void EMFWriter::ImplWriteBmpRecord( const Bitmap& rBmp, const Point& rPt,
 
 }
 
-void EMFWriter::ImplWriteTextRecord( const Point& rPos, const OUString& rText, o3tl::span<const sal_Int32> pDXArray, sal_uInt32 nWidth )
+void EMFWriter::ImplWriteTextRecord( const Point& rPos, const OUString& rText, KernArraySpan pDXArray, sal_uInt32 nWidth )
 {
     sal_Int32 nLen = rText.getLength(), i;
 
@@ -869,8 +869,8 @@ void EMFWriter::ImplWriteTextRecord( const Point& rPos, const OUString& rText, o
         return;
 
     sal_uInt32  nNormWidth;
-    std::vector<sal_Int32> aOwnArray;
-    o3tl::span<const sal_Int32> pDX;
+    KernArray aOwnArray;
+    KernArraySpan pDX;
 
     // get text sizes
     if( !pDXArray.empty() )
@@ -892,13 +892,13 @@ void EMFWriter::ImplWriteTextRecord( const Point& rPos, const OUString& rText, o
         {
             if (!pDXArray.empty())
             {
-                aOwnArray.insert(aOwnArray.begin(), pDXArray.begin(), pDXArray.end());
+                aOwnArray.assign(pDXArray);
                 pDX = aOwnArray;
             }
             const double fFactor = static_cast<double>(nWidth) / nNormWidth;
 
             for( i = 0; i < ( nLen - 1 ); i++ )
-                aOwnArray[ i ] = FRound( aOwnArray[ i ] * fFactor );
+                aOwnArray.set(i, FRound(aOwnArray[i] * fFactor));
         }
     }
 
@@ -1170,7 +1170,8 @@ void EMFWriter::ImplWrite( const GDIMetaFile& rMtf )
                 const MetaGradientAction*   pA = static_cast<const MetaGradientAction*>(pAction);
                 GDIMetaFile                 aTmpMtf;
 
-                maVDev->AddGradientActions( pA->GetRect(), pA->GetGradient(), aTmpMtf );
+                Gradient aGradient = pA->GetGradient();
+                aGradient.AddGradientActions( pA->GetRect(), aTmpMtf );
                 ImplWrite( aTmpMtf );
             }
             break;

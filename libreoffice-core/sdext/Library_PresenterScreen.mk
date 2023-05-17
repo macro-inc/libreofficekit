@@ -9,7 +9,7 @@
 
 $(eval $(call gb_Library_Library,PresenterScreen))
 
-$(eval $(call gb_Library_set_componentfile,PresenterScreen,sdext/source/presenter/presenter))
+$(eval $(call gb_Library_set_componentfile,PresenterScreen,sdext/source/presenter/presenter,services))
 
 $(eval $(call gb_Library_set_precompiled_header,PresenterScreen,sdext/inc/pch/precompiled_PresenterScreen))
 
@@ -20,10 +20,10 @@ $(eval $(call gb_Library_use_externals,PresenterScreen,\
 $(eval $(call gb_Library_use_sdk_api,PresenterScreen))
 
 $(eval $(call gb_Library_use_libraries,PresenterScreen,\
+    comphelper \
     cppu \
     cppuhelper \
     sal \
-    tl \
     vcl \
 ))
 

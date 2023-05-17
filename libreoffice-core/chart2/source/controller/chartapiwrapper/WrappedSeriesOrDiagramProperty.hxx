@@ -21,8 +21,10 @@
 #include <WrappedProperty.hxx>
 #include "Chart2ModelContact.hxx"
 #include <DiagramHelper.hxx>
+#include <DataSeries.hxx>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace com::sun::star::chart2 { class XDataSeries; }
@@ -46,10 +48,10 @@ public:
     virtual void setValueToSeries( const css::uno::Reference< css::beans::XPropertySet >& xSeriesPropertySet, const PROPERTYTYPE & aNewValue ) const =0;
 
     explicit WrappedSeriesOrDiagramProperty( const OUString& rName, const css::uno::Any& rDefaulValue
-        , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact
+        , std::shared_ptr<Chart2ModelContact> spChart2ModelContact
         , tSeriesOrDiagramPropertyType ePropertyType )
             : WrappedProperty(rName,OUString())
-            , m_spChart2ModelContact(spChart2ModelContact)
+            , m_spChart2ModelContact(std::move(spChart2ModelContact))
             , m_aOuterValue(rDefaulValue)
             , m_aDefaultValue(rDefaulValue)
             , m_ePropertyType( ePropertyType )
@@ -63,11 +65,11 @@ public:
         if( m_ePropertyType == DIAGRAM &&
             m_spChart2ModelContact )
         {
-            std::vector< css::uno::Reference< css::chart2::XDataSeries > > aSeriesVector(
-                ::chart::DiagramHelper::getDataSeriesFromDiagram( m_spChart2ModelContact->getChart2Diagram() ) );
+            std::vector< rtl::Reference< DataSeries > > aSeriesVector =
+                ::chart::DiagramHelper::getDataSeriesFromDiagram( m_spChart2ModelContact->getDiagram() );
             for (auto const& series : aSeriesVector)
             {
-                PROPERTYTYPE aCurValue = getValueFromSeries( css::uno::Reference< css::beans::XPropertySet >::query(series) );
+                PROPERTYTYPE aCurValue = getValueFromSeries( series );
                 if( !bHasDetectableInnerValue )
                     rValue = aCurValue;
                 else
@@ -90,15 +92,11 @@ public:
         if( m_ePropertyType == DIAGRAM &&
             m_spChart2ModelContact )
         {
-            std::vector< css::uno::Reference< css::chart2::XDataSeries > > aSeriesVector(
-                ::chart::DiagramHelper::getDataSeriesFromDiagram( m_spChart2ModelContact->getChart2Diagram() ) );
+            std::vector< rtl::Reference< DataSeries > > aSeriesVector =
+                ::chart::DiagramHelper::getDataSeriesFromDiagram( m_spChart2ModelContact->getDiagram() );
             for (auto const& series : aSeriesVector)
             {
-                css::uno::Reference< css::beans::XPropertySet > xSeriesPropertySet(series, css::uno::UNO_QUERY);
-                if( xSeriesPropertySet.is() )
-                {
-                    setValueToSeries( xSeriesPropertySet, aNewValue );
-                }
+                setValueToSeries( series, aNewValue );
             }
         }
     }

@@ -22,9 +22,10 @@
 
 #include <xmloff/SettingsExportHelper.hxx>
 #include <xmloff/xmltoken.hxx>
+#include <rtl/ref.hxx>
 #include <sal/log.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/base64.hxx>
 #include <comphelper/extract.hxx>
 
@@ -38,7 +39,7 @@
 #include <com/sun/star/util/DateTime.hpp>
 #include <com/sun/star/formula/SymbolDescriptor.hpp>
 #include <com/sun/star/document/PrinterIndependentLayout.hpp>
-#include <com/sun/star/document/IndexedPropertyValues.hpp>
+#include <comphelper/indexedpropertyvalues.hxx>
 #include <xmloff/XMLSettingsExportContext.hxx>
 #include "xmlenums.hxx"
 
@@ -284,7 +285,7 @@ void XMLSettingsExportHelper::exportSymbolDescriptors(
                     const uno::Sequence < formula::SymbolDescriptor > &rProps,
                     const OUString& rName) const
 {
-    uno::Reference< container::XIndexContainer > xBox = document::IndexedPropertyValues::create(m_rContext.GetComponentContext());
+    rtl::Reference< comphelper::IndexedPropertyValuesContainer > xBox = new comphelper::IndexedPropertyValuesContainer();
 
     static const OUStringLiteral sName     ( u"Name" );
     static const OUStringLiteral sExportName ( u"ExportName" );
@@ -326,7 +327,7 @@ void XMLSettingsExportHelper::exportSymbolDescriptors(
         pSymbol[XML_SYMBOL_DESCRIPTOR_CHARACTER].Name       = sCharacter;
         pSymbol[XML_SYMBOL_DESCRIPTOR_CHARACTER].Value  <<= pDescriptor->nCharacter;
 
-        xBox->insertByIndex(nIndex, uno::makeAny( aSequence ));
+        xBox->insertByIndex(nIndex, uno::Any( aSequence ));
     }
 
     exportIndexAccess( xBox, rName );
@@ -419,7 +420,7 @@ void XMLSettingsExportHelper::exportForbiddenCharacters(
     if( !xForbChars.is() || !xLocales.is() )
         return;
 
-    uno::Reference< container::XIndexContainer > xBox = document::IndexedPropertyValues::create(m_rContext.GetComponentContext());
+    rtl::Reference< comphelper::IndexedPropertyValuesContainer > xBox = new comphelper::IndexedPropertyValuesContainer();
     const uno::Sequence< lang::Locale > aLocales( xLocales->getLocales() );
 
     /* FIXME-BCP47: this stupid and counterpart in
@@ -453,7 +454,7 @@ void XMLSettingsExportHelper::exportForbiddenCharacters(
             pForChar[XML_FORBIDDEN_CHARACTER_BEGIN_LINE].Value <<= aChars.beginLine;
             pForChar[XML_FORBIDDEN_CHARACTER_END_LINE].Name    = sEndLine;
             pForChar[XML_FORBIDDEN_CHARACTER_END_LINE].Value <<= aChars.endLine;
-            xBox->insertByIndex(nPos++, uno::makeAny( aSequence ));
+            xBox->insertByIndex(nPos++, uno::Any( aSequence ));
         }
     }
 

@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <map>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/sdb/XSingleSelectQueryAnalyzer.hpp>
@@ -49,8 +50,8 @@ namespace dbaccess
         {
         }
 
-        SelectColumnDescription( sal_Int32 _nPosition, sal_Int32 _nType, sal_Int32 _nScale,bool _bNullable, const OUString& _rDefaultValue )
-            :sDefaultValue( _rDefaultValue )
+        SelectColumnDescription( sal_Int32 _nPosition, sal_Int32 _nType, sal_Int32 _nScale, bool _bNullable, OUString _sDefaultValue )
+            :sDefaultValue(std::move( _sDefaultValue ))
             ,nPosition( _nPosition )
             ,nType( _nType )
             ,nScale( _nScale )
@@ -63,7 +64,7 @@ namespace dbaccess
     // the elements of _rxQueryColumns must have the properties PROPERTY_REALNAME and PROPERTY_TABLENAME
     void getColumnPositions(const css::uno::Reference< css::container::XNameAccess >& _rxQueryColumns,
                             const css::uno::Sequence< OUString >& _rColumnNames,
-                            const OUString& _rsUpdateTableName,
+                            std::u16string_view _rsUpdateTableName,
                             SelectColumnsMetaData& o_rColumnNames /* out */,
                             bool i_bAppendTableName = false);
 
@@ -142,8 +143,8 @@ namespace dbaccess
 
         virtual ~OKeySet() override;
     public:
-        OKeySet(const connectivity::OSQLTable& _xTable,
-                const OUString& _rUpdateTableName,
+        OKeySet(connectivity::OSQLTable _aTable,
+                OUString _sUpdateTableName,
                 const css::uno::Reference< css::sdb::XSingleSelectQueryAnalyzer >& _xComposer,
                 const ORowSetValueVector& _aParameterValueForCache,
                 sal_Int32 i_nMaxRows,

@@ -115,7 +115,8 @@ class SvxAreaTabDialog final : public SfxTabDialogController
     void                SavePalettes();
 
 public:
-    SvxAreaTabDialog(weld::Window* pParent, const SfxItemSet* pAttr, SdrModel* pModel, bool bShadow);
+    SvxAreaTabDialog(weld::Window* pParent, const SfxItemSet* pAttr, SdrModel* pModel, bool bShadow,
+                     bool bSlideBackground);
 
     void                SetNewColorList( XColorListRef const & pColorList )
                             { mpNewColorList = pColorList; }
@@ -168,6 +169,9 @@ class SvxTransparenceTabPage : public SfxTabPage
     std::unique_ptr<weld::CustomWeld> m_xCtlBitmapPreview;
     std::unique_ptr<weld::CustomWeld> m_xCtlXRectPreview;
 
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops maColorStops;
+
     DECL_LINK(ClickTransOffHdl_Impl, weld::Toggleable&, void);
     DECL_LINK(ClickTransLinearHdl_Impl, weld::Toggleable&, void);
     DECL_LINK(ClickTransGradientHdl_Impl, weld::Toggleable&, void );
@@ -182,6 +186,9 @@ class SvxTransparenceTabPage : public SfxTabPage
 
     bool InitPreview ( const SfxItemSet& rSet );
     void InvalidatePreview (bool bEnable = true );
+
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops createColorStops();
 
 public:
     SvxTransparenceTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInAttrs);
@@ -241,6 +248,7 @@ protected:
     std::unique_ptr<weld::Toggleable> m_xBtnHatch;
     std::unique_ptr<weld::Toggleable> m_xBtnBitmap;
     std::unique_ptr<weld::Toggleable> m_xBtnPattern;
+    std::unique_ptr<weld::Toggleable> m_xBtnUseBackground;
 
     void SetOptimalSize(weld::DialogController* pController);
 
@@ -260,10 +268,14 @@ private:
     DeactivateRC DeactivatePage_Impl( SfxItemSet* pSet );
 
 public:
-    SvxAreaTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInAttrs);
+    SvxAreaTabPage(weld::Container* pPage, weld::DialogController* pController,
+                   const SfxItemSet& rInAttrs, bool bSlideBackground = false);
     virtual ~SvxAreaTabPage() override;
 
     static std::unique_ptr<SfxTabPage> Create( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet* );
+    static std::unique_ptr<SfxTabPage>
+    CreateWithSlideBackground(weld::Container* pPage, weld::DialogController* pController,
+                              const SfxItemSet*);
     static WhichRangesContainer GetRanges() { return pAreaRanges; }
 
     virtual bool FillItemSet( SfxItemSet* ) override;
@@ -279,7 +291,7 @@ public:
     void    SetBitmapList( XBitmapListRef const & pBmpLst) { m_pBitmapList = pBmpLst; }
     void    SetPatternList( XPatternListRef const &pPtrnLst ) { m_pPatternList = pPtrnLst; }
     virtual void PageCreated(const SfxAllItemSet& aSet) override;
-    void    CreatePage(sal_Int32 nId, SfxTabPage* pTab);
+    void    CreatePage(sal_Int32 nId, SfxTabPage& rTab);
     void    SetColorChgd( ChangeType* pIn ) { m_pnColorListState = pIn; }
     void    SetGrdChgd( ChangeType* pIn ) { m_pnGradientListState = pIn; }
     void    SetHtchChgd( ChangeType* pIn ) { m_pnHatchingListState = pIn; }
@@ -355,6 +367,9 @@ private:
     XFillAttrSetItem    m_aXFillAttr;
     SfxItemSet&         m_rXFSet;
 
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops m_aColorStops;
+
     SvxXRectPreview m_aCtlPreview;
     std::unique_ptr<weld::ComboBox> m_xLbGradientType;
     std::unique_ptr<weld::Label> m_xFtCenter;
@@ -393,6 +408,9 @@ private:
 
     void SetControlState_Impl( css::awt::GradientStyle eXGS );
     sal_Int32 SearchGradientList(std::u16string_view rGradientName);
+
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops createColorStops();
 
 public:
     SvxGradientTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInAttrs);
@@ -641,8 +659,6 @@ private:
 
     Color               aPreviousColor;
     svx::NamedThemedColor aCurrentColor;
-
-    css::uno::Reference< css::uno::XComponentContext > m_context;
 
     PaletteManager maPaletteManager;
     SvxXRectPreview m_aCtlPreviewOld;

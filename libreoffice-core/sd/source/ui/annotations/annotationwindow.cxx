@@ -77,7 +77,7 @@ void AnnotationTextWindow::Paint(vcl::RenderContext& rRenderContext, const ::too
     if (!bHighContrast)
     {
         rRenderContext.DrawGradient(::tools::Rectangle(Point(0,0), rRenderContext.PixelToLogic(aSize)),
-                                    Gradient(GradientStyle::Linear, mrContents.maColorLight, mrContents.maColor));
+                                    Gradient(css::awt::GradientStyle_LINEAR, mrContents.maColorLight, mrContents.maColor));
     }
 
     DoPaint(rRenderContext, rRect);
@@ -188,14 +188,12 @@ void AnnotationTextWindow::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     rDevice.SetBackground(aBgColor);
 
     Size aOutputSize(rDevice.PixelToLogic(aSize));
-    aSize = aOutputSize;
-    aSize.setHeight(aSize.Height());
 
     EditView* pEditView = GetEditView();
     pEditView->setEditViewCallbacks(this);
 
     EditEngine* pEditEngine = GetEditEngine();
-    pEditEngine->SetPaperSize(aSize);
+    pEditEngine->SetPaperSize(aOutputSize);
     pEditEngine->SetRefDevice(&rDevice);
 
     pEditView->SetOutputArea(::tools::Rectangle(Point(0, 0), aOutputSize));

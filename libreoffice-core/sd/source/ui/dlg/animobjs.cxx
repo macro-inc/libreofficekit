@@ -403,7 +403,7 @@ IMPL_LINK( AnimationWindow, ClickGetObjectHdl, weld::Button&, rBtn, void )
 IMPL_LINK( AnimationWindow, ClickRemoveBitmapHdl, weld::Button&, rBtn, void )
 {
     SdPage*     pPage = pMyDoc->GetSdPage(0, PageKind::Standard);
-    SdrObject*  pObject;
+    rtl::Reference<SdrObject> pObject;
 
     // tdf#95298 check m_nCurrentFrame for EMPTY_FRAMELIST to avoid out-of-bound array access
     if (&rBtn == m_xBtnRemoveBitmap.get() && EMPTY_FRAMELIST  != m_nCurrentFrame)
@@ -417,7 +417,7 @@ IMPL_LINK( AnimationWindow, ClickRemoveBitmapHdl, weld::Button&, rBtn, void )
         {
             pObject = pPage->RemoveObject(m_nCurrentFrame);
             DBG_ASSERT(pObject, "Clone not found during deletion");
-            SdrObject::Free( pObject );
+            pObject.clear();
             pPage->RecalcObjOrdNums();
         }
 
@@ -445,7 +445,7 @@ IMPL_LINK( AnimationWindow, ClickRemoveBitmapHdl, weld::Button&, rBtn, void )
                 {
                     pObject = pPage->RemoveObject( i );
                     DBG_ASSERT(pObject, "Clone not found during deletion");
-                    SdrObject::Free( pObject );
+                    pObject.clear();
                     //pPage->RecalcObjOrdNums();
                 }
             }
@@ -507,7 +507,7 @@ void AnimationWindow::UpdateControl(bool const bDisableCtrls)
     // tdf#95298 check m_nCurrentFrame for EMPTY_FRAMELIST to avoid out-of-bound array access
     if (!m_FrameList.empty() && EMPTY_FRAMELIST != m_nCurrentFrame)
     {
-        BitmapEx & rBmp(m_FrameList[m_nCurrentFrame].first);
+        BitmapEx aBmp(m_FrameList[m_nCurrentFrame].first);
 
         SdPage* pPage = pMyDoc->GetSdPage(0, PageKind::Standard);
         SdrObject *const pObject = pPage->GetObj(m_nCurrentFrame);
@@ -529,10 +529,10 @@ void AnimationWindow::UpdateControl(bool const bDisableCtrls)
                 : sd::OUTPUT_DRAWMODE_COLOR );
             pVD->Erase();
             pObject->SingleObjectPainter( *pVD );
-            rBmp = pVD->GetBitmapEx( aObjRect.TopLeft(), aObjSize );
+            aBmp = pVD->GetBitmapEx( aObjRect.TopLeft(), aObjSize );
         }
 
-        m_xCtlDisplay->SetBitmapEx(&rBmp);
+        m_xCtlDisplay->SetBitmapEx(&aBmp);
     }
     else
     {
@@ -707,10 +707,10 @@ void AnimationWindow::AddObj (::sd::View& rView )
         SdrObject*          pObject = pMark->GetMarkedSdrObj();
         SdAnimationInfo*    pAnimInfo = SdDrawDocument::GetAnimationInfo( pObject );
         SdrInventor         nInv = pObject->GetObjInventor();
-        sal_uInt16          nId = pObject->GetObjIdentifier();
+        SdrObjKind          nId = pObject->GetObjIdentifier();
 
         // Animated Bitmap (GIF)
-        if( nInv == SdrInventor::Default && nId == OBJ_GRAF && static_cast<SdrGrafObj*>( pObject )->IsAnimated() )
+        if( nInv == SdrInventor::Default && nId == SdrObjKind::Graphic && static_cast<SdrGrafObj*>( pObject )->IsAnimated() )
         {
             const SdrGrafObj*   pGrafObj = static_cast<SdrGrafObj*>(pObject);
             Graphic             aGraphic( pGrafObj->GetTransformedGraphic() );
@@ -725,7 +725,7 @@ void AnimationWindow::AddObj (::sd::View& rView )
 
                 for( sal_uInt16 i = 0; i < nCount; i++ )
                 {
-                    const AnimationBitmap& rAnimationBitmap = aAnimation.Get( i );
+                    const AnimationFrame& rAnimationFrame = aAnimation.Get( i );
 
                     // LoopCount
                     if( i == 0 )
@@ -738,12 +738,12 @@ void AnimationWindow::AddObj (::sd::View& rView )
                             m_xLbLoopCount->set_active_text(OUString::number( nLoopCount ) );
                     }
 
-                    ::tools::Long nTime = rAnimationBitmap.mnWait;
+                    ::tools::Long nTime = rAnimationFrame.mnWait;
                     ::tools::Time aTime( 0, 0, nTime / 100, nTime % 100 );
                     size_t nIndex = m_nCurrentFrame + 1;
                     m_FrameList.insert(
                             m_FrameList.begin() + nIndex,
-                            ::std::make_pair(rAnimationBitmap.maBitmapEx, aTime));
+                            ::std::make_pair(rAnimationFrame.maBitmapEx, aTime));
 
                     // increment => next one inserted after this one
                     ++m_nCurrentFrame;
@@ -773,7 +773,7 @@ void AnimationWindow::AddObj (::sd::View& rView )
 
                 // Clone
                 pPage->InsertObject(
-                    pSnapShot->CloneSdrObject(pPage->getSdrModelFromSdrPage()),
+                    pSnapShot->CloneSdrObject(pPage->getSdrModelFromSdrPage()).get(),
                     m_nCurrentFrame);
             }
             bAnimObj = true;
@@ -797,9 +797,9 @@ void AnimationWindow::AddObj (::sd::View& rView )
     {
         SdrMark*    pMark   = rMarkList.GetMark(0);
         SdrObject*  pObject = pMark->GetMarkedSdrObj();
-        SdrObject* pClone(pObject->CloneSdrObject(pPage->getSdrModelFromSdrPage()));
+        rtl::Reference<SdrObject> pClone(pObject->CloneSdrObject(pPage->getSdrModelFromSdrPage()));
         size_t nIndex = m_nCurrentFrame + 1;
-        pPage->InsertObject(pClone, nIndex);
+        pPage->InsertObject(pClone.get(), nIndex);
     }
     // several objects: group the clones
     else if (nMarkCount > 1)
@@ -821,25 +821,25 @@ void AnimationWindow::AddObj (::sd::View& rView )
                 ++m_nCurrentFrame;
 
                 pPage->InsertObject(
-                    pObject->CloneSdrObject(pPage->getSdrModelFromSdrPage()),
+                    pObject->CloneSdrObject(pPage->getSdrModelFromSdrPage()).get(),
                     m_nCurrentFrame);
             }
             bAnimObj = true; // that we don't change again
         }
         else
         {
-            SdrObjGroup* pCloneGroup = new SdrObjGroup(rView.getSdrModelFromSdrView());
+            rtl::Reference<SdrObjGroup> pCloneGroup = new SdrObjGroup(rView.getSdrModelFromSdrView());
             SdrObjList*  pObjList    = pCloneGroup->GetSubList();
 
             for (size_t nObject= 0; nObject < nMarkCount; ++nObject)
             {
                 pObjList->InsertObject(
                     rMarkList.GetMark(nObject)->GetMarkedSdrObj()->CloneSdrObject(
-                        pPage->getSdrModelFromSdrPage()));
+                        pPage->getSdrModelFromSdrPage()).get());
             }
 
             size_t nIndex = m_nCurrentFrame + 1;
-            pPage->InsertObject(pCloneGroup, nIndex);
+            pPage->InsertObject(pCloneGroup.get(), nIndex);
         }
     }
 
@@ -960,32 +960,32 @@ void AnimationWindow::CreateAnimObj (::sd::View& rView )
             }
 
             // find LoopCount (number of passes)
-            AnimationBitmap aAnimationBitmap;
+            AnimationFrame aAnimationFrame;
             sal_uInt32 nLoopCount = 0;
             sal_Int32 nPos = m_xLbLoopCount->get_active();
 
             if( nPos != -1 && nPos != m_xLbLoopCount->get_count() - 1 ) // endless
                 nLoopCount = m_xLbLoopCount->get_active_text().toUInt32();
 
-            aAnimationBitmap.maBitmapEx = rBitmapEx;
-            aAnimationBitmap.maPositionPixel = aPt;
-            aAnimationBitmap.maSizePixel = aBitmapSize;
-            aAnimationBitmap.mnWait = nTime;
-            aAnimationBitmap.meDisposal = Disposal::Back;
-            aAnimationBitmap.mbUserInput = false;
+            aAnimationFrame.maBitmapEx = rBitmapEx;
+            aAnimationFrame.maPositionPixel = aPt;
+            aAnimationFrame.maSizePixel = aBitmapSize;
+            aAnimationFrame.mnWait = nTime;
+            aAnimationFrame.meDisposal = Disposal::Back;
+            aAnimationFrame.mbUserInput = false;
 
-            aAnimation.Insert( aAnimationBitmap );
+            aAnimation.Insert( aAnimationFrame );
             aAnimation.SetDisplaySizePixel( aMaxSizePix );
             aAnimation.SetLoopCount( nLoopCount );
         }
 
-        SdrGrafObj* pGrafObj = new SdrGrafObj(
+        rtl::Reference<SdrGrafObj> pGrafObj = new SdrGrafObj(
             rView.getSdrModelFromSdrView(),
             Graphic(aAnimation));
         const Point aOrg( aWindowCenter.X() - ( aMaxSizeLog.Width() >> 1 ), aWindowCenter.Y() - ( aMaxSizeLog.Height() >> 1 ) );
 
         pGrafObj->SetLogicRect( ::tools::Rectangle( aOrg, aMaxSizeLog ) );
-        rView.InsertObjectAtView( pGrafObj, *pPV, SdrInsertFlags::SETDEFLAYER);
+        rView.InsertObjectAtView( pGrafObj.get(), *pPV, SdrInsertFlags::SETDEFLAYER);
     }
     else
     {
@@ -1054,7 +1054,7 @@ void AnimationWindow::CreateAnimObj (::sd::View& rView )
         if(pTargetSdPage)
         {
             // create animation group
-            SdrObjGroup* pGroup   = new SdrObjGroup(rView.getSdrModelFromSdrView());
+            rtl::Reference<SdrObjGroup> pGroup   = new SdrObjGroup(rView.getSdrModelFromSdrView());
             SdrObjList*  pObjList = pGroup->GetSubList();
 
             for (size_t i = 0; i < nCount; ++i)
@@ -1062,9 +1062,9 @@ void AnimationWindow::CreateAnimObj (::sd::View& rView )
                 // the clone remains in the animation; we insert a clone of the
                 // clone into the group
                 pClone = pPage->GetObj(i);
-                SdrObject* pCloneOfClone(pClone->CloneSdrObject(pTargetSdPage->getSdrModelFromSdrPage()));
+                rtl::Reference<SdrObject> pCloneOfClone(pClone->CloneSdrObject(pTargetSdPage->getSdrModelFromSdrPage()));
                 //SdrObject* pCloneOfClone = pPage->GetObj(i)->Clone();
-                pObjList->InsertObject(pCloneOfClone);
+                pObjList->InsertObject(pCloneOfClone.get());
             }
 
             // until now the top left corner of the group is in the window center;
@@ -1077,14 +1077,6 @@ void AnimationWindow::CreateAnimObj (::sd::View& rView )
             // #i42894# create needed SMIL stuff and move child objects to page directly (see
             // comments at EffectMigration::CreateAnimatedGroup why this has to be done).
             EffectMigration::CreateAnimatedGroup(*pGroup, *pTargetSdPage);
-
-            // #i42894# if that worked, delete the group again
-            if(!pGroup->GetSubList()->GetObjCount())
-            {
-                // always use SdrObject::Free(...) for SdrObjects (!)
-                SdrObject* pTemp(pGroup);
-                SdrObject::Free(pTemp);
-            }
         }
     }
 

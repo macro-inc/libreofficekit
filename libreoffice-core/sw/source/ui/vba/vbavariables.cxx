@@ -36,7 +36,7 @@ static uno::Reference< container::XIndexAccess > createVariablesAccess( const un
         [&xParent, &xContext, &xUserDefined](const beans::PropertyValue& rProp) -> uno::Reference< word::XVariable > {
             return uno::Reference< word::XVariable > ( new SwVbaVariable( xParent, xContext, xUserDefined, rProp.Name ) ); });
 
-    uno::Reference< container::XIndexAccess > xVariables( new XNamedObjectCollectionHelper< word::XVariable >( aVariables ) );
+    uno::Reference< container::XIndexAccess > xVariables( new XNamedObjectCollectionHelper< word::XVariable >( std::move(aVariables) ) );
     return xVariables;
 }
 
@@ -73,7 +73,7 @@ SwVbaVariables::Add( const OUString& rName, const uno::Any& rValue )
     uno::Reference< beans::XPropertyContainer > xPropertyContainer( mxUserDefined, uno::UNO_QUERY_THROW );
     xPropertyContainer->addProperty( rName, beans::PropertyAttribute::MAYBEVOID | beans::PropertyAttribute::REMOVABLE, aValue );
 
-    return uno::makeAny( uno::Reference< word::XVariable >( new SwVbaVariable( getParent(), mxContext, mxUserDefined, rName ) ) );
+    return uno::Any( uno::Reference< word::XVariable >( new SwVbaVariable( getParent(), mxContext, mxUserDefined, rName ) ) );
 }
 
 OUString

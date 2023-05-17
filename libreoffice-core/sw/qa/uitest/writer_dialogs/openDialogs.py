@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -11,7 +13,8 @@ from uitest.uihelper.testDialog import testDialog
 
 dialogs = [
     {"command": ".uno:OpenRemote", "closeButton": "cancel"},
-    {"command": ".uno:NewDoc", "closeButton": "close"},
+    #{"command": ".uno:NewDoc", "closeButton": "close"},
+        # tested in sw/qa/uitest/writer_tests2/tdf146375.py
     {"command": ".uno:SaveAsTemplate", "closeButton": "cancel"},
     #{"command": ".uno:ExportToPDF", "closeButton": "cancel", "skipTestOK": True},
         # tested in sw/qa/uitest/writer_tests4/exportToPDF.py
@@ -36,7 +39,8 @@ dialogs = [
         # tested in sw/qa/uitest/writer_tests2/exchangeDatabase.py
     # {"command": ".uno:InsertBreak", "closeButton": "cancel"},
         # tested in uitest/writer_tests/insertBreakDialog.py
-    {"command": ".uno:InsertObject", "closeButton": "cancel"},
+    # {"command": ".uno:InsertObject", "closeButton": "cancel"},
+        # tested in sw/qa/uitest/writer_tests4/tdf148395.py
     # {"command": ".uno:InsertSection", "closeButton": "cancel"},
         # tested in sw/qa/uitest/writer_tests7/tdf140863.py
     {"command": ".uno:InsertFrame", "closeButton": "cancel"},
@@ -46,8 +50,8 @@ dialogs = [
         # dialog opens but is not recognised by execute_dialog_through_command
     # {"command": ".uno:InsertBookmark", "closeButton": "close"},
         # tested in sw/qa/uitest/writer_tests2/bookmark.py
-    # {"command": ".uno:InsertReferenceField", "closeButton": "close"},
-        # dialog not closed
+    # {"command": ".uno:InsertReferenceField", "closeButton": "cancel"},
+        # Tested in sw/qa/uitest/writer_tests7/tdf135938.py
     # {"command": ".uno:InsertSymbol", "closeButton": "cancel"},
         # tested in sw/qa/uitest/writer_tests3/specialCharacter.py
     # {"command": ".uno:InsertFootnoteDialog", "closeButton": "cancel"},

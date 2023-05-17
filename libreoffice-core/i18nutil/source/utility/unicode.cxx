@@ -24,8 +24,10 @@
 #include <i18nutil/unicode.hxx>
 #include <sal/log.hxx>
 #include <unicode/numfmt.h>
+#include <unicode/uchar.h>
 #include "unicode_data.h"
 #include <rtl/character.hxx>
+#include <o3tl/string_view.hxx>
 #include <memory>
 
 // Workaround for glibc braindamage:
@@ -93,6 +95,11 @@ unicode::getUnicodeDirection( const sal_Unicode ch ) {
             ? UnicodeDirectionBlockValue[address]
             : UnicodeDirectionValue[((address - UnicodeDirectionNumberBlock) << 8) + (ch & 0xff)];
     return r;
+}
+
+sal_uInt32 unicode::GetMirroredChar(sal_uInt32 nChar) {
+    nChar = u_charMirror(nChar);
+    return nChar;
 }
 
 #define bit(name)   (1U << name)
@@ -187,6 +194,37 @@ sal_Int16 unicode::getScriptClassFromUScriptCode(UScriptCode eScript)
     else
         nRet = scriptTypes[eScript];
     return nRet;
+}
+
+sal_Int16 unicode::getScriptClassFromLanguageTag( const LanguageTag& rLanguageTag )
+{
+    static UScriptCode nMaxScript = static_cast<UScriptCode>(u_getIntPropertyMaxValue(UCHAR_SCRIPT));
+    constexpr int32_t nBuf = 42;
+    UScriptCode aBuf[nBuf];
+    if (rLanguageTag.hasScript())
+    {
+        aBuf[0] = static_cast<UScriptCode>(u_getPropertyValueEnum( UCHAR_SCRIPT,
+                OUStringToOString( rLanguageTag.getScript(), RTL_TEXTENCODING_ASCII_US).getStr()));
+    }
+    else
+    {
+        OUString aName;
+        if (rLanguageTag.getCountry().isEmpty())
+            aName = rLanguageTag.getLanguage();
+        else
+            aName = rLanguageTag.getLanguage() + "-" + rLanguageTag.getCountry();
+        UErrorCode status = U_ZERO_ERROR;
+        const int32_t nScripts = uscript_getCode(
+                OUStringToOString( aName, RTL_TEXTENCODING_ASCII_US).getStr(),
+                aBuf, nBuf, &status);
+        // U_BUFFER_OVERFLOW_ERROR would be set with too many scripts for buffer
+        // and required capacity returned, but really..
+        if (nScripts == 0 || !U_SUCCESS(status))
+            return css::i18n::ScriptType::LATIN;
+    }
+    if (aBuf[0] > nMaxScript)
+        return css::i18n::ScriptType::COMPLEX;
+    return getScriptClassFromUScriptCode( aBuf[0]);
 }
 
 OString unicode::getExemplarLanguageForUScriptCode(UScriptCode eScript)
@@ -796,6 +834,14 @@ OString unicode::getExemplarLanguageForUScriptCode(UScriptCode eScript)
             sRet = "sq-Vith";   // macrolanguage code
             break;
 #endif
+#if (U_ICU_VERSION_MAJOR_NUM >= 72)
+        case USCRIPT_KAWI:
+            sRet = "mis-Kawi";  // Uncoded with script
+            break;
+        case USCRIPT_NAG_MUNDARI:
+            sRet = "unr-Nagm";
+            break;
+#endif
     }
     return sRet;
 }
@@ -1019,7 +1065,7 @@ OUString ToggleUnicodeCodepoint::StringToReplace()
         sIn = maInput.toString();
     while( nUPlus != -1 )
     {
-        nUnicode = sIn.copy(0, nUPlus).toUInt32(16);
+        nUnicode = o3tl::toUInt32(sIn.subView(0, nUPlus), 16);
         //prevent creating control characters or invalid Unicode values
         if( !rtl::isUnicodeCodePoint(nUnicode) || nUnicode < 0x20  )
             maInput = sIn.subView(nUPlus);
@@ -1062,7 +1108,7 @@ OUString ToggleUnicodeCodepoint::ReplacementString()
         }
         while( nUPlus > 0 )
         {
-            nUnicode = sIn.copy(0, nUPlus).toUInt32(16);
+            nUnicode = o3tl::toUInt32(sIn.subView(0, nUPlus), 16);
             output.appendUtf32( nUnicode );
 
             sIn = sIn.copy(nUPlus+2);
@@ -1085,7 +1131,7 @@ OUString ToggleUnicodeCodepoint::ReplacementString()
             output.append( aTmp );
         }
     }
-    return output.toString();
+    return output.makeStringAndClear();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

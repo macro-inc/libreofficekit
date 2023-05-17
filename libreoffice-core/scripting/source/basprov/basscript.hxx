@@ -22,6 +22,7 @@
 #include <bcholder.hxx>
 #include <com/sun/star/script/provider/XScript.hpp>
 #include <com/sun/star/document/XScriptInvocationContext.hpp>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/proparrhlp.hxx>
 #include <comphelper/propertycontainer.hxx>
@@ -42,7 +43,7 @@ namespace basprov
 
 
     class BasicScriptImpl : public BasicScriptImpl_BASE, public SfxListener,
-                                public ::scripting_helper::OMutexHolder,
+                                public cppu::BaseMutex,
                                 public ::scripting_helper::OBroadcastHelperHolder,
                                 public ::comphelper::OPropertyContainer,
                                 public ::comphelper::OPropertyArrayUsageHelper< BasicScriptImpl >
@@ -66,12 +67,12 @@ namespace basprov
 
     public:
         BasicScriptImpl(
-            const OUString& funcName,
-            SbMethodRef const & xMethod
+            OUString funcName,
+            SbMethodRef xMethod
         );
         BasicScriptImpl(
-            const OUString& funcName,
-            SbMethodRef const & xMethod,
+            OUString funcName,
+            SbMethodRef xMethod,
             BasicManager& documentBasicManager,
             const css::uno::Reference< css::document::XScriptInvocationContext >& documentScriptContext
         );

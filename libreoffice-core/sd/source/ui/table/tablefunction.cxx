@@ -35,7 +35,7 @@
 #include <sfx2/request.hxx>
 #include <sfx2/sidebar/Sidebar.hxx>
 #include <svl/style.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <tablefunction.hxx>
 #include <DrawViewShell.hxx>
@@ -66,7 +66,8 @@ static void apply_table_style( SdrTableObj* pObj, SdrModel const * pModel, const
     if( !(pModel && pObj) )
         return;
 
-    Reference< XNameAccess > xPool( dynamic_cast< XNameAccess* >( pModel->GetStyleSheetPool() ) );
+    Reference< XNameAccess > xPool(
+        static_cast< cppu::OWeakObject* >( pModel->GetStyleSheetPool() ), css::uno::UNO_QUERY );
     if( !xPool.is() )
         return;
 
@@ -118,10 +119,10 @@ static void InsertTableImpl(const DrawViewShell* pShell,
         }
         else
         {
-            if( aMaxSize.Height() > aWinRect.getHeight() )
-                aMaxSize.setHeight( aWinRect.getHeight() );
-            if( aMaxSize.Width() > aWinRect.getWidth() )
-                aMaxSize.setWidth( aWinRect.getWidth() );
+            if( aMaxSize.Height() > aWinRect.getOpenHeight() )
+                aMaxSize.setHeight( aWinRect.getOpenHeight() );
+            if( aMaxSize.Width() > aWinRect.getOpenWidth() )
+                aMaxSize.setWidth( aWinRect.getOpenWidth() );
         }
 
         if( aSize.Width() > aMaxSize.getWidth() )
@@ -141,18 +142,18 @@ static void InsertTableImpl(const DrawViewShell* pShell,
         aRect = ::tools::Rectangle(aPos, aSize);
     }
 
-    sdr::table::SdrTableObj* pObj = new sdr::table::SdrTableObj(
+    rtl::Reference<sdr::table::SdrTableObj> pObj = new sdr::table::SdrTableObj(
         *pShell->GetDoc(), // TTTT should be reference
         aRect,
         nColumns,
         nRows);
     pObj->NbcSetStyleSheet( pShell->GetDoc()->GetDefaultStyleSheet(), true );
-    apply_table_style( pObj, pShell->GetDoc(), sTableStyle );
+    apply_table_style( pObj.get(), pShell->GetDoc(), sTableStyle );
     SdrPageView* pPV = pView->GetSdrPageView();
 
     // #i123359# if an object is to be replaced/manipulated it may be that it is in text edit mode,
     // so to be on the safe side call SdrEndTextEdit here
-    SdrTextObj* pCheckForTextEdit = dynamic_cast< SdrTextObj* >(pPickObj);
+    SdrTextObj* pCheckForTextEdit = DynCastSdrTextObj(pPickObj);
 
     if(pCheckForTextEdit && pCheckForTextEdit->IsInEditMode())
     {
@@ -166,15 +167,15 @@ static void InsertTableImpl(const DrawViewShell* pShell,
         if(pPage && pPage->IsPresObj(pPickObj))
         {
             pObj->SetUserCall( pPickObj->GetUserCall() );
-            pPage->InsertPresObj( pObj, PresObjKind::Table );
+            pPage->InsertPresObj( pObj.get(), PresObjKind::Table );
         }
     }
 
     pShell->GetParentWindow()->GrabFocus();
     if( pPickObj )
-        pView->ReplaceObjectAtView(pPickObj, *pPV, pObj );
+        pView->ReplaceObjectAtView(pPickObj, *pPV, pObj.get() );
     else
-        pView->InsertObjectAtView(pObj, *pPV, SdrInsertFlags::SETDEFLAYER);
+        pView->InsertObjectAtView(pObj.get(), *pPV, SdrInsertFlags::SETDEFLAYER);
 }
 
 void DrawViewShell::FuTable(SfxRequest& rReq)
@@ -234,7 +235,7 @@ void DrawViewShell::FuTable(SfxRequest& rReq)
     {
         // First make sure that the sidebar is visible
         GetViewFrame()->ShowChildWindow(SID_SIDEBAR);
-        ::sfx2::sidebar::Sidebar::ShowPanel(
+        ::sfx2::sidebar::Sidebar::TogglePanel(
             u"SdTableDesignPanel",
             GetViewFrame()->GetFrame().GetFrameInterface());
 
@@ -274,15 +275,15 @@ void CreateTableFromRTF( SvStream& rStream, SdDrawDocument* pModel )
 
     Size aSize( 200, 200 );
     ::tools::Rectangle aRect (Point(), aSize);
-    sdr::table::SdrTableObj* pObj = new sdr::table::SdrTableObj(
+    rtl::Reference<sdr::table::SdrTableObj> pObj = new sdr::table::SdrTableObj(
         *pModel,
         aRect,
         1,
         1);
     pObj->NbcSetStyleSheet( pModel->GetDefaultStyleSheet(), true );
-    apply_table_style( pObj, pModel, OUString() );
+    apply_table_style( pObj.get(), pModel, OUString() );
 
-    pPage->NbcInsertObject( pObj );
+    pPage->NbcInsertObject( pObj.get() );
 
     sdr::table::ImportAsRTF( rStream, *pObj );
 }

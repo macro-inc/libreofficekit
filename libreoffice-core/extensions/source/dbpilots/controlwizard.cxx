@@ -19,7 +19,7 @@
 
 #include "controlwizard.hxx"
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/sdbcx/XTablesSupplier.hpp>
 #include <com/sun/star/sdb/DatabaseContext.hpp>
@@ -150,7 +150,6 @@ namespace dbp
         m_xFormDatasource = m_xBuilder->weld_label("datasource");
         m_xFormDatasourceLabel = m_xBuilder->weld_label("datasourcelabel");
         m_xFormTable = m_xBuilder->weld_label("formtable");
-        m_xFormTableLabel = m_xBuilder->weld_label("formtablelabel");
 
         const OControlWizardContext& rContext = getContext();
         if ( rContext.bEmbedded )
@@ -411,7 +410,7 @@ namespace dbp
             }
             else
             {
-                m_aContext.xForm->setPropertyValue("ActiveConnection", makeAny( _rxConn ) );
+                m_aContext.xForm->setPropertyValue("ActiveConnection", Any( _rxConn ) );
             }
         }
         catch(const Exception&)
@@ -527,7 +526,7 @@ namespace dbp
 
                             // not interested in any results, only in the fields
                             Reference< XPropertySet > xStatementProps(xStatement, UNO_QUERY);
-                            xStatementProps->setPropertyValue("MaxRows", makeAny(sal_Int32(0)));
+                            xStatementProps->setPropertyValue("MaxRows", Any(sal_Int32(0)));
 
                             // TODO: think about handling local SQLExceptions here ...
                             Reference< XColumnsSupplier >  xSupplyCols(xStatement->executeQuery(), UNO_QUERY);
@@ -585,7 +584,7 @@ namespace dbp
             if ( !xHandler.is() )
                 return false;
 
-            Reference< XInteractionRequest > xRequest = new OInteractionRequest(makeAny(aContext));
+            Reference< XInteractionRequest > xRequest = new OInteractionRequest(Any(aContext));
             try
             {
                 xHandler->handle(xRequest);
@@ -613,7 +612,7 @@ namespace dbp
                 OUString sControlLabel(_pSettings->sControlLabel);
                 m_aContext.xObjectModel->setPropertyValue(
                     "Label",
-                    makeAny(sControlLabel)
+                    Any(sControlLabel)
                 );
             }
         }

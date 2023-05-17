@@ -26,10 +26,13 @@ $(eval $(call gb_CppunitTest_use_libraries,sd_uimpress,\
     cppcanvas \
     cppu \
     cppuhelper \
+    docmodel \
     drawinglayer \
+    drawinglayercore \
     editeng \
     i18nlangtag \
     i18nutil \
+    icg \
     msfilter \
     oox \
     sal \

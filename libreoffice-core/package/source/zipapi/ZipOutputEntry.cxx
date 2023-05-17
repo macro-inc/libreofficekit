@@ -21,8 +21,6 @@
 
 #include <com/sun/star/io/TempFile.hpp>
 #include <com/sun/star/packages/zip/ZipConstants.hpp>
-#include <com/sun/star/ucb/SimpleFileAccess.hpp>
-#include <com/sun/star/ucb/XSimpleFileAccess3.hpp>
 
 #include <osl/diagnose.h>
 
@@ -30,10 +28,10 @@
 #include <ThreadedDeflater.hxx>
 #include <ZipEntry.hxx>
 #include <ZipFile.hxx>
-#include <ZipPackageBuffer.hxx>
 #include <ZipPackageStream.hxx>
 
 #include <algorithm>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace com::sun::star::io;
@@ -43,14 +41,14 @@ using namespace com::sun::star::packages::zip::ZipConstants;
 /** This class is used to deflate Zip entries
  */
 ZipOutputEntryBase::ZipOutputEntryBase(
-        const css::uno::Reference< css::io::XOutputStream >& rxOutput,
-        const uno::Reference< uno::XComponentContext >& rxContext,
+        css::uno::Reference< css::io::XOutputStream > xOutput,
+        uno::Reference< uno::XComponentContext > xContext,
         ZipEntry& rEntry,
         ZipPackageStream* pStream,
         bool bEncrypt,
         bool checkStream)
-: m_xContext(rxContext)
-, m_xOutStream(rxOutput)
+: m_xContext(std::move(xContext))
+, m_xOutStream(std::move(xOutput))
 , m_pCurrentEntry(&rEntry)
 , m_nDigested(0)
 , m_pCurrentStream(pStream)
@@ -250,18 +248,10 @@ ZipOutputEntryInThread::ZipOutputEntryInThread(
 
 void ZipOutputEntryInThread::createBufferFile()
 {
-    assert(!m_xOutStream.is() && m_aTempURL.isEmpty() &&
+    assert(!m_xOutStream && !m_xTempFile &&
            "should only be called in the threaded mode where there is no existing stream yet");
-    uno::Reference < beans::XPropertySet > xTempFileProps(
-            io::TempFile::create(m_xContext),
-            uno::UNO_QUERY_THROW );
-    xTempFileProps->setPropertyValue("RemoveFile", uno::makeAny(false));
-    uno::Any aUrl = xTempFileProps->getPropertyValue( "Uri" );
-    aUrl >>= m_aTempURL;
-    assert(!m_aTempURL.isEmpty());
-
-    uno::Reference < ucb::XSimpleFileAccess3 > xTempAccess(ucb::SimpleFileAccess::create(m_xContext));
-    m_xOutStream = xTempAccess->openFileWrite(m_aTempURL);
+    m_xTempFile = new utl::TempFileFastService;
+    m_xOutStream = m_xTempFile->getOutputStream();
 }
 
 void ZipOutputEntryInThread::closeBufferFile()
@@ -272,15 +262,13 @@ void ZipOutputEntryInThread::closeBufferFile()
 
 void ZipOutputEntryInThread::deleteBufferFile()
 {
-    assert(!m_xOutStream.is() && !m_aTempURL.isEmpty());
-    uno::Reference < ucb::XSimpleFileAccess3 > xAccess(ucb::SimpleFileAccess::create(m_xContext));
-    xAccess->kill(m_aTempURL);
+    assert(!m_xOutStream.is() && m_xTempFile);
+    m_xTempFile.clear();
 }
 
 uno::Reference< io::XInputStream > ZipOutputEntryInThread::getData() const
 {
-    uno::Reference < ucb::XSimpleFileAccess3 > xTempAccess(ucb::SimpleFileAccess::create(m_xContext));
-    return xTempAccess->openFileRead(m_aTempURL);
+    return m_xTempFile->getInputStream();
 }
 
 class ZipOutputEntryInThread::Task : public comphelper::ThreadTask
@@ -290,10 +278,10 @@ class ZipOutputEntryInThread::Task : public comphelper::ThreadTask
 
 public:
     Task( const std::shared_ptr<comphelper::ThreadTaskTag>& pTag, ZipOutputEntryInThread *pEntry,
-          const uno::Reference< io::XInputStream >& xInStream )
+          uno::Reference< io::XInputStream > xInStream )
         : comphelper::ThreadTask(pTag)
         , mpEntry(pEntry)
-        , mxInStream(xInStream)
+        , mxInStream(std::move(xInStream))
     {}
 
 private:
@@ -314,7 +302,7 @@ private:
             {
                 if (mpEntry->m_xOutStream.is())
                     mpEntry->closeBufferFile();
-                if (!mpEntry->m_aTempURL.isEmpty())
+                if (mpEntry->m_xTempFile)
                     mpEntry->deleteBufferFile();
             }
             catch (uno::Exception const&)

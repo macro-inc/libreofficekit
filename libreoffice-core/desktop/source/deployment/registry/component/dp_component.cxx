@@ -19,6 +19,7 @@
 
 
 #include <strings.hrc>
+#include <dp_misc.h>
 #include <dp_shared.hxx>
 #include <dp_backend.h>
 #include <dp_platform.hxx>
@@ -32,9 +33,11 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <ucbhelper/content.hxx>
 #include <comphelper/sequence.hxx>
+#include <utility>
 #include <xmlscript/xml_helper.hxx>
 #include <svl/inettype.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/deployment/DeploymentException.hpp>
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
@@ -80,7 +83,7 @@ std::vector<OUString> getCmdBootstrapVariables()
 }
 
 bool jarManifestHeaderPresent(
-    OUString const & url, OUString const & name,
+    OUString const & url, std::u16string_view name,
     Reference<XCommandEnvironment> const & xCmdEnv )
 {
     OUString buf = "vnd.sun.star.zip://"
@@ -141,7 +144,7 @@ class BackendImpl : public ::dp_registry::backend::PackageRegistryBackend
             ::rtl::Reference<PackageRegistryBackend> const & myBackend,
             OUString const & url, OUString const & name,
             Reference<deployment::XPackageTypeInfo> const & xPackageType,
-            OUString const & loader, bool bRemoved,
+            OUString loader, bool bRemoved,
             OUString const & identifier);
     };
     friend class ComponentPackageImpl;
@@ -209,7 +212,7 @@ class BackendImpl : public ::dp_registry::backend::PackageRegistryBackend
             ::rtl::Reference<PackageRegistryBackend> const & myBackend,
             OUString const & url, OUString const & name,
             Reference<deployment::XPackageTypeInfo> const & xPackageType,
-            bool bRemoved, OUString const & identifier, OUString const& rPlatform);
+            bool bRemoved, OUString const & identifier, OUString platform);
 
     private:
         BackendImpl * getMyBackend() const;
@@ -333,11 +336,11 @@ BackendImpl::ComponentPackageImpl::ComponentPackageImpl(
     ::rtl::Reference<PackageRegistryBackend> const & myBackend,
     OUString const & url, OUString const & name,
     Reference<deployment::XPackageTypeInfo> const & xPackageType,
-    OUString const & loader, bool bRemoved,
+    OUString loader, bool bRemoved,
     OUString const & identifier)
     : Package( myBackend, url, name, name /* display-name */,
                xPackageType, bRemoved, identifier),
-      m_loader( loader ),
+      m_loader(std::move( loader )),
       m_registered( Reg::Uninit )
 {}
 
@@ -352,7 +355,7 @@ BackendImpl::ComponentPackageImpl::getRDB() const
     //would otherwise cause problems when copying the rdbs.
     //See  http://qa.openoffice.org/issues/show_bug.cgi?id=99257
     {
-        const ::osl::MutexGuard guard( getMutex() );
+        const ::osl::MutexGuard guard( m_aMutex );
         if (!that->bSwitchedRdbFiles)
         {
             that->bSwitchedRdbFiles = true;
@@ -618,7 +621,7 @@ Reference<deployment::XPackage> BackendImpl::bindPackage_(
             else if (title.endsWithIgnoreAsciiCase(".jar"))
             {
                 if (jarManifestHeaderPresent(
-                        url, "RegistrationClassName", xCmdEnv ))
+                        url, u"RegistrationClassName", xCmdEnv ))
                     mediaType = "application/vnd.sun.star.uno-component;type=Java";
                 if (mediaType.isEmpty())
                     mediaType = "application/vnd.sun.star.uno-typelibrary;type=Java";
@@ -733,7 +736,7 @@ void BackendImpl::unorc_verify_init(
 {
     if (transientMode())
         return;
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     if ( m_unorc_inited)
         return;
 
@@ -745,12 +748,12 @@ void BackendImpl::unorc_verify_init(
             xCmdEnv, false /* no throw */ ))
     {
         OUString line;
-        if (readLine( &line, "UNO_JAVA_CLASSPATH=", ucb_content,
+        if (readLine( &line, u"UNO_JAVA_CLASSPATH=", ucb_content,
                       RTL_TEXTENCODING_UTF8 ))
         {
             sal_Int32 index = sizeof ("UNO_JAVA_CLASSPATH=") - 1;
             do {
-                OUString token( line.getToken( 0, ' ', index ).trim() );
+                OUString token( o3tl::trim(o3tl::getToken(line, 0, ' ', index )) );
                 if (!token.isEmpty())
                 {
                     if (create_ucb_content(
@@ -767,11 +770,11 @@ void BackendImpl::unorc_verify_init(
             }
             while (index >= 0);
         }
-        if (readLine( &line, "UNO_TYPES=", ucb_content,
+        if (readLine( &line, u"UNO_TYPES=", ucb_content,
                       RTL_TEXTENCODING_UTF8 )) {
             sal_Int32 index = sizeof ("UNO_TYPES=") - 1;
             do {
-                OUString token( line.getToken( 0, ' ', index ).trim() );
+                OUString token( o3tl::trim(o3tl::getToken(line, 0, ' ', index )) );
                 if (!token.isEmpty())
                 {
                     if (token[ 0 ] == '?')
@@ -790,7 +793,7 @@ void BackendImpl::unorc_verify_init(
             }
             while (index >= 0);
         }
-        if (readLine( &line, "UNO_SERVICES=", ucb_content,
+        if (readLine( &line, u"UNO_SERVICES=", ucb_content,
                       RTL_TEXTENCODING_UTF8 ))
         {
             // The UNO_SERVICES line always has the BNF form
@@ -836,7 +839,7 @@ void BackendImpl::unorc_verify_init(
                 &ucb_content,
                 makeURL( getCachePath(), getPlatformString() + "rc"),
                 xCmdEnv, false /* no throw */ )) {
-            if (readLine( &line, "UNO_SERVICES=", ucb_content,
+            if (readLine( &line, u"UNO_SERVICES=", ucb_content,
                           RTL_TEXTENCODING_UTF8 )) {
                 m_nativeRDB_orig = line.copy(
                     sizeof ("UNO_SERVICES=?$ORIGIN/") - 1 );
@@ -972,7 +975,7 @@ void BackendImpl::addToUnoRc( RcItem kind, OUString const & url_,
                               Reference<XCommandEnvironment> const & xCmdEnv )
 {
     const OUString rcterm( dp_misc::makeRcTerm(url_) );
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     unorc_verify_init( xCmdEnv );
     std::deque<OUString> & rSet = getRcItemList(kind);
     if (std::find( rSet.begin(), rSet.end(), rcterm ) == rSet.end()) {
@@ -989,7 +992,7 @@ void BackendImpl::removeFromUnoRc(
     Reference<XCommandEnvironment> const & xCmdEnv )
 {
     const OUString rcterm( dp_misc::makeRcTerm(url_) );
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     unorc_verify_init( xCmdEnv );
     std::deque<OUString> & aRcItemList = getRcItemList(kind);
     aRcItemList.erase(std::remove(aRcItemList.begin(), aRcItemList.end(), rcterm), aRcItemList.end());
@@ -1003,7 +1006,7 @@ bool BackendImpl::hasInUnoRc(
     RcItem kind, OUString const & url_ )
 {
     const OUString rcterm( dp_misc::makeRcTerm(url_) );
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     std::deque<OUString> const & rSet = getRcItemList(kind);
     return std::find( rSet.begin(), rSet.end(), rcterm ) != rSet.end();
 }
@@ -1020,14 +1023,14 @@ css::uno::Reference< css::uno::XComponentContext > BackendImpl::getRootContext()
 
 void BackendImpl::releaseObject( OUString const & id )
 {
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     m_backendObjects.erase( id );
 }
 
 
 Reference<XInterface> BackendImpl::getObject( OUString const & id )
 {
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     const t_string2object::const_iterator iFind( m_backendObjects.find( id ) );
     if (iFind == m_backendObjects.end())
         return Reference<XInterface>();
@@ -1039,7 +1042,7 @@ Reference<XInterface> BackendImpl::getObject( OUString const & id )
 Reference<XInterface> BackendImpl::insertObject(
     OUString const & id, Reference<XInterface> const & xObject )
 {
-    const ::osl::MutexGuard guard( getMutex() );
+    const ::osl::MutexGuard guard( m_aMutex );
     const std::pair<t_string2object::iterator, bool> insertion(
         m_backendObjects.emplace( id, xObject ) );
     return insertion.first->second;
@@ -1302,10 +1305,10 @@ BackendImpl::ComponentPackageImpl::isRegistered_(
                     {
                         //try to match only the file name
                         OUString thisUrl(getURL());
-                        OUString thisFileName(thisUrl.copy(thisUrl.lastIndexOf('/')));
+                        std::u16string_view thisFileName(thisUrl.subView(thisUrl.lastIndexOf('/')));
 
-                        OUString locationFileName(location.copy(location.lastIndexOf('/')));
-                        if (locationFileName.equalsIgnoreAsciiCase(thisFileName))
+                        std::u16string_view locationFileName(location.subView(location.lastIndexOf('/')));
+                        if (o3tl::equalsIgnoreAsciiCase(locationFileName, thisFileName))
                             bAmbiguousComponentName = true;
                     }
                 }
@@ -1373,7 +1376,7 @@ void BackendImpl::ComponentPackageImpl::processPackage_(
         impreg->registerImplementation(m_loader, url, rdb);
         // Only write to unorc after successful registration; it may fail if
         // there is no suitable java
-        if (m_loader == "com.sun.star.loader.Java2" && !jarManifestHeaderPresent(url, "UNO-Type-Path", xCmdEnv))
+        if (m_loader == "com.sun.star.loader.Java2" && !jarManifestHeaderPresent(url, u"UNO-Type-Path", xCmdEnv))
         {
             that->addToUnoRc(RCITEM_JAR_TYPELIB, url, xCmdEnv);
             data.javaTypeLibrary = true;
@@ -1494,7 +1497,7 @@ void BackendImpl::TypelibraryPackageImpl::processPackage_(
                     "/singletons"
                     "/com.sun.star.reflection.theTypeDescriptionManager"),
                 css::uno::UNO_QUERY_THROW)->insert(
-                    css::uno::makeAny(expandUnoRcUrl(url)));
+                    css::uno::Any(expandUnoRcUrl(url)));
         }
 
         that->addToUnoRc( m_jarFile ? RCITEM_JAR_TYPELIB : RCITEM_RDB_TYPELIB,
@@ -1512,7 +1515,7 @@ void BackendImpl::TypelibraryPackageImpl::processPackage_(
                     "/singletons"
                     "/com.sun.star.reflection.theTypeDescriptionManager"),
                 css::uno::UNO_QUERY_THROW)->remove(
-                    css::uno::makeAny(expandUnoRcUrl(url)));
+                    css::uno::Any(expandUnoRcUrl(url)));
         }
     }
 }
@@ -1521,9 +1524,9 @@ BackendImpl::OtherPlatformPackageImpl::OtherPlatformPackageImpl(
     ::rtl::Reference<PackageRegistryBackend> const & myBackend,
     OUString const & url, OUString const & name,
     Reference<deployment::XPackageTypeInfo> const & xPackageType,
-    bool bRemoved, OUString const & identifier, OUString const& rPlatform)
+    bool bRemoved, OUString const & identifier, OUString platform)
     : Package(myBackend, url, name, name, xPackageType, bRemoved, identifier)
-    , m_aPlatform(rPlatform)
+    , m_aPlatform(std::move(platform))
 {
     OSL_PRECOND(bRemoved, "this class can only be used for removing packages!");
 }
@@ -1668,13 +1671,13 @@ void BackendImpl::ComponentsPackageImpl::processPackage_(
             // supporting the extended XSet semantics:
             css::uno::Sequence< css::beans::NamedValue > args
             {
-                { "uri", css::uno::makeAny(expandUnoRcUrl(url)) },
-                { "component-context", css::uno::makeAny(context) }
+                { "uri", css::uno::Any(expandUnoRcUrl(url)) },
+                { "component-context", css::uno::Any(context) }
             };
             css::uno::Reference< css::container::XSet > smgr(
                 that->getRootContext()->getServiceManager(),
                 css::uno::UNO_QUERY_THROW);
-            smgr->insert(css::uno::makeAny(args));
+            smgr->insert(css::uno::Any(args));
         }
         that->addToUnoRc(RCITEM_COMPONENTS, url, xCmdEnv);
     } else { // revoke
@@ -1682,11 +1685,11 @@ void BackendImpl::ComponentsPackageImpl::processPackage_(
         if (!startup) {
             // This relies on the root component context's service manager
             // supporting the extended XSet semantics:
-            css::uno::Sequence< css::beans::NamedValue > args { { "uri", css::uno::makeAny(expandUnoRcUrl(url)) } };
+            css::uno::Sequence< css::beans::NamedValue > args { { "uri", css::uno::Any(expandUnoRcUrl(url)) } };
             css::uno::Reference< css::container::XSet > smgr(
                 that->getRootContext()->getServiceManager(),
                 css::uno::UNO_QUERY_THROW);
-            smgr->remove(css::uno::makeAny(args));
+            smgr->remove(css::uno::Any(args));
         }
         that->releaseObject(url);
         that->revokeEntryFromDb(url); // in case it got added with old code

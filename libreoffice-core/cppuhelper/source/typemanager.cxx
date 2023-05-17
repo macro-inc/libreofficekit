@@ -17,6 +17,7 @@
 #include <set>
 #include <stack>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/container/NoSuchElementException.hpp>
@@ -47,12 +48,12 @@
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/file.hxx>
-#include <osl/mutex.hxx>
 #include <rtl/ref.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
 #include <sal/macros.h>
 #include <sal/types.h>
+#include <o3tl/string_view.hxx>
 
 #include <unoidl/unoidl.hxx>
 
@@ -81,8 +82,8 @@ class SimpleTypeDescription:
 {
 public:
     SimpleTypeDescription(
-        css::uno::TypeClass typeClass, OUString const & name):
-        typeClass_(typeClass), name_(name)
+        css::uno::TypeClass typeClass, OUString name):
+        typeClass_(typeClass), name_(std::move(name))
     {}
 
 private:
@@ -104,8 +105,8 @@ class SequenceTypeDescription:
 public:
     SequenceTypeDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name, OUString const & componentType):
-        manager_(manager), name_(name), componentType_(componentType)
+        OUString name, OUString componentType):
+        manager_(manager), name_(std::move(name)), componentType_(std::move(componentType))
     { assert(manager.is()); }
 
 private:
@@ -147,9 +148,9 @@ class ModuleDescription:
 public:
     ModuleDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::ModuleEntity > const & entity):
-        manager_(manager), name_(name), entity_(entity)
+        manager_(manager), name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -198,9 +199,9 @@ EnumTypeDescription_Base;
 class EnumTypeDescription: public EnumTypeDescription_Base {
 public:
     EnumTypeDescription(
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::EnumTypeEntity > const & entity):
-        EnumTypeDescription_Base(entity->isPublished()), name_(name),
+        EnumTypeDescription_Base(entity->isPublished()), name_(std::move(name)),
         entity_(entity)
     { assert(entity.is()); }
 
@@ -256,10 +257,10 @@ class PlainStructTypeDescription: public PlainStructTypeDescription_Base {
 public:
     PlainStructTypeDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::PlainStructTypeEntity > const & entity):
         PlainStructTypeDescription_Base(entity->isPublished()),
-        manager_(manager), name_(name), entity_(entity)
+        manager_(manager), name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -332,8 +333,8 @@ class ParameterizedMemberTypeDescription:
 {
 public:
     explicit ParameterizedMemberTypeDescription(
-        OUString const & typeParameterName):
-        typeParameterName_(typeParameterName)
+        OUString typeParameterName):
+        typeParameterName_(std::move(typeParameterName))
     {}
 
 private:
@@ -358,11 +359,11 @@ class PolymorphicStructTypeTemplateDescription:
 public:
     PolymorphicStructTypeTemplateDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::PolymorphicStructTypeTemplateEntity > const &
             entity):
         PolymorphicStructTypeTemplateDescription_Base(entity->isPublished()),
-        manager_(manager), name_(name), entity_(entity)
+        manager_(manager), name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -449,11 +450,11 @@ class InstantiatedPolymorphicStructTypeDescription:
 public:
     InstantiatedPolymorphicStructTypeDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::PolymorphicStructTypeTemplateEntity > const &
             entity,
         std::vector< OUString >&& arguments):
-        manager_(manager), name_(name), entity_(entity), arguments_(std::move(arguments))
+        manager_(manager), name_(std::move(name)), entity_(entity), arguments_(std::move(arguments))
     {
         assert(manager.is());
         assert(entity.is());
@@ -552,10 +553,10 @@ class ExceptionTypeDescription: public ExceptionTypeDescription_Base {
 public:
     ExceptionTypeDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::ExceptionTypeEntity > const & entity):
         ExceptionTypeDescription_Base(entity->isPublished()), manager_(manager),
-        name_(name), entity_(entity)
+        name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -618,10 +619,10 @@ class AttributeDescription:
 public:
     AttributeDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
-        unoidl::InterfaceTypeEntity::Attribute const & attribute,
+        OUString name,
+        unoidl::InterfaceTypeEntity::Attribute  attribute,
         sal_Int32 position):
-        manager_(manager), name_(name), attribute_(attribute),
+        manager_(manager), name_(std::move(name)), attribute_(std::move(attribute)),
         position_(position)
     { assert(manager.is()); }
 
@@ -704,9 +705,9 @@ class MethodParameter:
 public:
     MethodParameter(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        unoidl::InterfaceTypeEntity::Method::Parameter const & parameter,
+        unoidl::InterfaceTypeEntity::Method::Parameter parameter,
         sal_Int32 position):
-        manager_(manager), parameter_(parameter), position_(position)
+        manager_(manager), parameter_(std::move(parameter)), position_(position)
     { assert(manager.is()); }
 
 private:
@@ -752,9 +753,9 @@ class MethodDescription:
 public:
     MethodDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
-        unoidl::InterfaceTypeEntity::Method const & method, sal_Int32 position):
-        manager_(manager), name_(name), method_(method), position_(position)
+        OUString name,
+        unoidl::InterfaceTypeEntity::Method method, sal_Int32 position):
+        manager_(manager), name_(std::move(name)), method_(std::move(method)), position_(position)
     { assert(manager.is()); }
 
 private:
@@ -863,7 +864,7 @@ void BaseOffset::calculateBases(
     for (const auto & i : bases) {
         calculate(
             css::uno::Reference< css::reflection::XInterfaceTypeDescription2 >(
-                resolveTypedefs(css::uno::makeAny(i)),
+                resolveTypedefs(css::uno::Any(i)),
                 css::uno::UNO_QUERY_THROW));
     }
 }
@@ -886,10 +887,10 @@ class InterfaceTypeDescription: public InterfaceTypeDescription_Base {
 public:
     InterfaceTypeDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::InterfaceTypeEntity > const & entity):
         InterfaceTypeDescription_Base(entity->isPublished()), manager_(manager),
-        name_(name), entity_(entity)
+        name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -1061,9 +1062,9 @@ ConstantGroupDescription_Base;
 class ConstantGroupDescription: public ConstantGroupDescription_Base {
 public:
     ConstantGroupDescription(
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::ConstantGroupEntity > const & entity):
-        ConstantGroupDescription_Base(entity->isPublished()), name_(name),
+        ConstantGroupDescription_Base(entity->isPublished()), name_(std::move(name)),
         entity_(entity)
     { assert(entity.is()); }
 
@@ -1107,10 +1108,10 @@ class TypedefDescription: public TypedefDescription_Base {
 public:
     TypedefDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::TypedefEntity > const & entity):
         TypedefDescription_Base(entity->isPublished()), manager_(manager),
-        name_(name), entity_(entity)
+        name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -1137,10 +1138,9 @@ class ConstructorParameter:
 public:
     ConstructorParameter(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        unoidl::SingleInterfaceBasedServiceEntity::Constructor::Parameter
-            const & parameter,
+        unoidl::SingleInterfaceBasedServiceEntity::Constructor::Parameter parameter,
         sal_Int32 position):
-        manager_(manager), parameter_(parameter), position_(position)
+        manager_(manager), parameter_(std::move(parameter)), position_(position)
     { assert(manager.is()); }
 
 private:
@@ -1178,9 +1178,8 @@ class ConstructorDescription:
 public:
     ConstructorDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        unoidl::SingleInterfaceBasedServiceEntity::Constructor const &
-            constructor):
-        manager_(manager), constructor_(constructor)
+        unoidl::SingleInterfaceBasedServiceEntity::Constructor constructor):
+        manager_(manager), constructor_(std::move(constructor))
     { assert(manager.is()); }
 
 private:
@@ -1246,11 +1245,11 @@ class SingleInterfaceBasedServiceDescription:
 public:
     SingleInterfaceBasedServiceDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::SingleInterfaceBasedServiceEntity > const &
             entity):
         SingleInterfaceBasedServiceDescription_Base(entity->isPublished()),
-        manager_(manager), name_(name), entity_(entity)
+        manager_(manager), name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -1350,8 +1349,8 @@ class PropertyDescription:
 public:
     PropertyDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        unoidl::AccumulationBasedServiceEntity::Property const & property):
-        manager_(manager), property_(property)
+        unoidl::AccumulationBasedServiceEntity::Property property):
+        manager_(manager), property_(std::move(property))
     { assert(manager.is()); }
 
 private:
@@ -1384,11 +1383,11 @@ class AccumulationBasedServiceDescription:
 public:
     AccumulationBasedServiceDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::AccumulationBasedServiceEntity > const &
             entity):
         AccumulationBasedServiceDescription_Base(entity->isPublished()),
-        manager_(manager), name_(name), entity_(entity)
+        manager_(manager), name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -1553,10 +1552,10 @@ class InterfaceBasedSingletonDescription:
 public:
     InterfaceBasedSingletonDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::InterfaceBasedSingletonEntity > const & entity):
         InterfaceBasedSingletonDescription_Base(entity->isPublished()),
-        manager_(manager), name_(name), entity_(entity)
+        manager_(manager), name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -1597,10 +1596,10 @@ class ServiceBasedSingletonDescription:
 public:
     ServiceBasedSingletonDescription(
         rtl::Reference< cppuhelper::TypeManager > const & manager,
-        OUString const & name,
+        OUString name,
         rtl::Reference< unoidl::ServiceBasedSingletonEntity > const & entity):
         ServiceBasedSingletonDescription_Base(entity->isPublished()),
-        manager_(manager), name_(name), entity_(entity)
+        manager_(manager), name_(std::move(name)), entity_(entity)
     { assert(manager.is()); assert(entity.is()); }
 
 private:
@@ -1654,7 +1653,7 @@ private:
     { return !positions_.empty(); }
 
     virtual css::uno::Any SAL_CALL nextElement() override
-    { return css::uno::makeAny(nextTypeDescription()); }
+    { return css::uno::Any(nextTypeDescription()); }
 
     virtual css::uno::Reference< css::reflection::XTypeDescription > SAL_CALL
     nextTypeDescription() override;
@@ -1665,16 +1664,16 @@ private:
 
     struct Position {
         Position(
-            OUString const & thePrefix,
+            OUString thePrefix,
             rtl::Reference< unoidl::MapCursor > const & theCursor):
-            prefix(thePrefix), cursor(theCursor)
+            prefix(std::move(thePrefix)), cursor(theCursor)
         { assert(theCursor.is()); }
 
         Position(
-            OUString const & thePrefix,
+            OUString thePrefix,
             rtl::Reference< unoidl::ConstantGroupEntity > const &
                 theConstantGroup):
-            prefix(thePrefix), constantGroup(theConstantGroup),
+            prefix(std::move(thePrefix)), constantGroup(theConstantGroup),
             constantGroupIndex(constantGroup->getMembers().begin())
         { assert(theConstantGroup.is()); }
 
@@ -1832,33 +1831,27 @@ cppuhelper::TypeManager::TypeManager():
 
 css::uno::Any cppuhelper::TypeManager::find(OUString const & name) {
     //TODO: caching? (here or in unoidl::Manager?)
-    struct Simple {
-        std::u16string_view name;
-        css::uno::TypeClass typeClass;
-    };
-    static Simple const simple[] = {
-        { std::u16string_view(u"void"), css::uno::TypeClass_VOID },
-        { std::u16string_view(u"boolean"), css::uno::TypeClass_BOOLEAN },
-        { std::u16string_view(u"byte"), css::uno::TypeClass_BYTE },
-        { std::u16string_view(u"short"), css::uno::TypeClass_SHORT },
-        { std::u16string_view(u"unsigned short"),
-          css::uno::TypeClass_UNSIGNED_SHORT },
-        { std::u16string_view(u"long"), css::uno::TypeClass_LONG },
-        { std::u16string_view(u"unsigned long"), css::uno::TypeClass_UNSIGNED_LONG },
-        { std::u16string_view(u"hyper"), css::uno::TypeClass_HYPER },
-        { std::u16string_view(u"unsigned hyper"),
-          css::uno::TypeClass_UNSIGNED_HYPER },
-        { std::u16string_view(u"float"), css::uno::TypeClass_FLOAT },
-        { std::u16string_view(u"double"), css::uno::TypeClass_DOUBLE },
-        { std::u16string_view(u"char"), css::uno::TypeClass_CHAR },
-        { std::u16string_view(u"string"), css::uno::TypeClass_STRING },
-        { std::u16string_view(u"type"), css::uno::TypeClass_TYPE },
-        { std::u16string_view(u"any"), css::uno::TypeClass_ANY } };
-    for (std::size_t i = 0; i != SAL_N_ELEMENTS(simple); ++i) {
-        if (name == simple[i].name) {
-            return css::uno::makeAny<
-                css::uno::Reference< css::reflection::XTypeDescription > >(
-                    new SimpleTypeDescription(simple[i].typeClass, name));
+    static constexpr std::pair<std::u16string_view, css::uno::TypeClass> const simple[] = {
+        { u"void", css::uno::TypeClass_VOID },
+        { u"boolean", css::uno::TypeClass_BOOLEAN },
+        { u"byte", css::uno::TypeClass_BYTE },
+        { u"short", css::uno::TypeClass_SHORT },
+        { u"unsigned short", css::uno::TypeClass_UNSIGNED_SHORT },
+        { u"long", css::uno::TypeClass_LONG },
+        { u"unsigned long", css::uno::TypeClass_UNSIGNED_LONG },
+        { u"hyper", css::uno::TypeClass_HYPER },
+        { u"unsigned hyper", css::uno::TypeClass_UNSIGNED_HYPER },
+        { u"float", css::uno::TypeClass_FLOAT },
+        { u"double", css::uno::TypeClass_DOUBLE },
+        { u"char", css::uno::TypeClass_CHAR },
+        { u"string", css::uno::TypeClass_STRING },
+        { u"type", css::uno::TypeClass_TYPE },
+        { u"any", css::uno::TypeClass_ANY } };
+    for (const auto& [ rName, rTypeClass ] : simple) {
+        if (name == rName) {
+            return css::uno::Any(
+                css::uno::Reference< css::reflection::XTypeDescription >(
+                    new SimpleTypeDescription(rTypeClass, name)));
         }
     }
     if (name.startsWith("[]")) {
@@ -1885,12 +1878,12 @@ css::uno::Any cppuhelper::TypeManager::find(OUString const & name) {
             case unoidl::Entity::SORT_ENUM_TYPE:
                 return getEnumMember(
                     static_cast< unoidl::EnumTypeEntity * >(ent.get()),
-                    name.copy(i + 1));
+                    name.subView(i + 1));
             case unoidl::Entity::SORT_CONSTANT_GROUP:
                 return getConstant(
                     parent,
                     static_cast< unoidl::ConstantGroupEntity * >(ent.get()),
-                    name.copy(i + 1));
+                    name.subView(i + 1));
             default:
                 break;
             }
@@ -2029,10 +2022,10 @@ cppuhelper::TypeManager::createTypeDescriptionEnumeration(
         depth == css::reflection::TypeDescriptionSearchDepth_INFINITE);
 }
 
-void cppuhelper::TypeManager::init(OUString const & rdbUris) {
+void cppuhelper::TypeManager::init(std::u16string_view rdbUris) {
     for (sal_Int32 i = 0; i != -1;) {
-        OUString uri(rdbUris.getToken(0, ' ', i));
-        if (uri.isEmpty()) {
+        std::u16string_view uri(o3tl::getToken(rdbUris, 0, ' ', i));
+        if (uri.empty()) {
             continue;
         }
         bool optional;
@@ -2047,21 +2040,21 @@ void cppuhelper::TypeManager::init(OUString const & rdbUris) {
 }
 
 void cppuhelper::TypeManager::readRdbDirectory(
-    OUString const & uri, bool optional)
+    std::u16string_view uri, bool optional)
 {
-    osl::Directory dir(uri);
+    osl::Directory dir = OUString(uri);
     switch (dir.open()) {
     case osl::FileBase::E_None:
         break;
     case osl::FileBase::E_NOENT:
         if (optional) {
-            SAL_INFO("cppuhelper", "Ignored optional " << uri);
+            SAL_INFO("cppuhelper", "Ignored optional " << OUString(uri));
             return;
         }
         [[fallthrough]];
     default:
         throw css::uno::DeploymentException(
-            "Cannot open directory " + uri,
+            OUString::Concat("Cannot open directory ") + uri,
             static_cast< cppu::OWeakObject * >(this));
     }
     for (;;) {
@@ -2074,17 +2067,17 @@ void cppuhelper::TypeManager::readRdbDirectory(
 }
 
 void cppuhelper::TypeManager::readRdbFile(
-    OUString const & uri, bool optional)
+    std::u16string_view uri, bool optional)
 {
     try {
-        manager_->addProvider(uri);
+        manager_->addProvider(OUString(uri));
     } catch (unoidl::NoSuchFileException &) {
         if (!optional) {
             throw css::uno::DeploymentException(
-                uri + ": no such file",
+                OUString::Concat(uri) + ": no such file",
                 static_cast< cppu::OWeakObject * >(this));
         }
-        SAL_INFO("cppuhelper", "Ignored optional " << uri);
+        SAL_INFO("cppuhelper", "Ignored optional " << OUString(uri));
     } catch (unoidl::FileFormatException & e) {
             throw css::uno::DeploymentException(
                 ("unoidl::FileFormatException for <" + e.getUri() + ">: "
@@ -2097,10 +2090,10 @@ css::uno::Any cppuhelper::TypeManager::getSequenceType(
     OUString const & name)
 {
     assert(name.startsWith("[]"));
-    return css::uno::makeAny<
-        css::uno::Reference< css::reflection::XTypeDescription > >(
+    return css::uno::Any(
+        css::uno::Reference< css::reflection::XTypeDescription >(
             new SequenceTypeDescription(
-                this, name, name.copy(std::strlen("[]"))));
+                this, name, name.copy(std::strlen("[]")))));
 }
 
 css::uno::Any cppuhelper::TypeManager::getInstantiatedStruct(
@@ -2147,30 +2140,30 @@ css::uno::Any cppuhelper::TypeManager::getInstantiatedStruct(
     {
         return css::uno::Any();
     }
-    return css::uno::makeAny<
-        css::uno::Reference< css::reflection::XTypeDescription > >(
+    return css::uno::Any(
+        css::uno::Reference< css::reflection::XTypeDescription >(
             new InstantiatedPolymorphicStructTypeDescription(
-                this, name, ent2, std::move(args)));
+                this, name, ent2, std::move(args))));
 }
 
 css::uno::Any cppuhelper::TypeManager::getInterfaceMember(
-    OUString const & name, sal_Int32 separator)
+    std::u16string_view name, std::size_t separator)
 {
-    assert(name.indexOf("::") == separator && separator != -1);
+    assert(name.find(u"::") == separator && separator != std::u16string_view::npos);
     css::uno::Reference< css::reflection::XInterfaceTypeDescription2 > ifc(
-        resolveTypedefs(find(name.copy(0, separator))), css::uno::UNO_QUERY);
+        resolveTypedefs(find(OUString(name.substr(0, separator)))), css::uno::UNO_QUERY);
     if (!ifc.is()) {
         return css::uno::Any();
     }
-    OUString member(name.copy(separator + std::strlen("::")));
+    std::u16string_view member = name.substr(separator + std::strlen("::"));
     const css::uno::Sequence<
         css::uno::Reference<
             css::reflection::XInterfaceMemberTypeDescription > > mems(
                 ifc->getMembers());
     for (const auto & m : mems) {
         if (m->getMemberName() == member) {
-            return css::uno::makeAny<
-                css::uno::Reference< css::reflection::XTypeDescription > >(m);
+            return css::uno::Any(
+                css::uno::Reference< css::reflection::XTypeDescription >(m));
         }
     }
     return css::uno::Any();
@@ -2182,87 +2175,87 @@ css::uno::Any cppuhelper::TypeManager::getNamed(
     assert(entity.is());
     switch (entity->getSort()) {
     case unoidl::Entity::SORT_MODULE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new ModuleDescription(
                     this, name,
-                    static_cast< unoidl::ModuleEntity * >(entity.get())));
+                    static_cast< unoidl::ModuleEntity * >(entity.get()))));
     case unoidl::Entity::SORT_ENUM_TYPE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new EnumTypeDescription(
                     name,
-                    static_cast< unoidl::EnumTypeEntity * >(entity.get())));
+                    static_cast< unoidl::EnumTypeEntity * >(entity.get()))));
     case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new PlainStructTypeDescription(
                     this, name,
                     static_cast< unoidl::PlainStructTypeEntity * >(
-                        entity.get())));
+                        entity.get()))));
     case unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new PolymorphicStructTypeTemplateDescription(
                     this, name,
                     static_cast<
                         unoidl::PolymorphicStructTypeTemplateEntity * >(
-                            entity.get())));
+                            entity.get()))));
     case unoidl::Entity::SORT_EXCEPTION_TYPE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new ExceptionTypeDescription(
                     this, name,
                     static_cast< unoidl::ExceptionTypeEntity * >(
-                        entity.get())));
+                        entity.get()))));
     case unoidl::Entity::SORT_INTERFACE_TYPE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new InterfaceTypeDescription(
                     this, name,
                     static_cast< unoidl::InterfaceTypeEntity * >(
-                        entity.get())));
+                        entity.get()))));
     case unoidl::Entity::SORT_TYPEDEF:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new TypedefDescription(
                     this, name,
-                    static_cast< unoidl::TypedefEntity * >(entity.get())));
+                    static_cast< unoidl::TypedefEntity * >(entity.get()))));
     case unoidl::Entity::SORT_CONSTANT_GROUP:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new ConstantGroupDescription(
                     name,
                     static_cast< unoidl::ConstantGroupEntity * >(
-                        entity.get())));
+                        entity.get()))));
     case unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new SingleInterfaceBasedServiceDescription(
                     this, name,
                     static_cast< unoidl::SingleInterfaceBasedServiceEntity * >(
-                        entity.get())));
+                        entity.get()))));
     case unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new AccumulationBasedServiceDescription(
                     this, name,
                     static_cast< unoidl::AccumulationBasedServiceEntity * >(
-                        entity.get())));
+                        entity.get()))));
     case unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new InterfaceBasedSingletonDescription(
                     this, name,
                     static_cast< unoidl::InterfaceBasedSingletonEntity * >(
-                        entity.get())));
+                        entity.get()))));
     case unoidl::Entity::SORT_SERVICE_BASED_SINGLETON:
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
                 new ServiceBasedSingletonDescription(
                     this, name,
                     static_cast< unoidl::ServiceBasedSingletonEntity * >(
-                        entity.get())));
+                        entity.get()))));
     default:
         for (;;) { std::abort(); } // this cannot happen
     }
@@ -2270,26 +2263,26 @@ css::uno::Any cppuhelper::TypeManager::getNamed(
 
 css::uno::Any cppuhelper::TypeManager::getEnumMember(
     rtl::Reference< unoidl::EnumTypeEntity > const & entity,
-    OUString const & member)
+    std::u16string_view member)
 {
     auto i = std::find_if(entity->getMembers().begin(), entity->getMembers().end(),
         [&member](const unoidl::EnumTypeEntity::Member& rMember) { return rMember.name == member; });
     if (i != entity->getMembers().end())
-        return css::uno::makeAny(i->value);
+        return css::uno::Any(i->value);
     return css::uno::Any();
 }
 
 css::uno::Any cppuhelper::TypeManager::getConstant(
-    OUString const & constantGroupName,
+    std::u16string_view constantGroupName,
     rtl::Reference< unoidl::ConstantGroupEntity > const & entity,
-    OUString const & member)
+    std::u16string_view member)
 {
     auto i = std::find_if(entity->getMembers().begin(), entity->getMembers().end(),
         [&member](const unoidl::ConstantGroupEntity::Member& rMember) { return rMember.name == member; });
     if (i != entity->getMembers().end())
-        return css::uno::makeAny<
-            css::uno::Reference< css::reflection::XTypeDescription > >(
-                new ConstantDescription(constantGroupName, *i));
+        return css::uno::Any(
+            css::uno::Reference< css::reflection::XTypeDescription >(
+                new ConstantDescription(OUString(constantGroupName), *i)));
     return css::uno::Any();
 }
 

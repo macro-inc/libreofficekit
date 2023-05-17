@@ -51,22 +51,22 @@ class SW_DLLPUBLIC SwGrfNode final: public SwNoTextNode
     css::uno::Reference<css::io::XInputStream> mxInputStream;
     bool mbIsStreamReadOnly;
 
-    SwGrfNode( const SwNodeIndex& rWhere,
+    SwGrfNode( SwNode& rWhere,
                const OUString& rGrfName, const OUString& rFltName,
                const Graphic* pGraphic,
                SwGrfFormatColl* pGrfColl,
                SwAttrSet const * pAutoAttr );
     ///< Ctor for reading (SW/G) without graphics.
-    SwGrfNode( const SwNodeIndex& rWhere,
-               const OUString& rGrfName, const OUString& rFltName,
+    SwGrfNode( SwNode& rWhere,
+               std::u16string_view rGrfName, const OUString& rFltName,
                SwGrfFormatColl* pGrfColl,
                SwAttrSet const * pAutoAttr );
-    SwGrfNode( const SwNodeIndex& rWhere,
+    SwGrfNode( SwNode& rWhere,
                const GraphicObject& rGrfObj,
                SwGrfFormatColl* pGrfColl,
                SwAttrSet const * pAutoAttr );
 
-    void InsertLink( const OUString& rGrfName, const OUString& rFltName );
+    void InsertLink( std::u16string_view rGrfName, const OUString& rFltName );
 
     /// allow reaction on change of content of GraphicObject, so always call
     /// when GraphicObject content changes
@@ -83,9 +83,9 @@ public:
     void TriggerGraphicArrived();
 
     /// wrappers for non-const calls at GraphicObject
-    void StartGraphicAnimation(OutputDevice* pOut, const Point& rPt, const Size& rSz, tools::Long nExtraData, OutputDevice* pFirstFrameOutDev)
-    { maGrfObj.StartAnimation(*pOut, rPt, rSz, nExtraData, pFirstFrameOutDev); }
-    void StopGraphicAnimation(const OutputDevice* pOut, tools::Long nExtraData) { maGrfObj.StopAnimation(pOut, nExtraData); }
+    void StartGraphicAnimation(OutputDevice* pOut, const Point& rPt, const Size& rSz, tools::Long nRendererId, OutputDevice* pFirstFrameOutDev)
+    { maGrfObj.StartAnimation(*pOut, rPt, rSz, nRendererId, pFirstFrameOutDev); }
+    void StopGraphicAnimation(const OutputDevice* pOut, tools::Long nRendererId) { maGrfObj.StopAnimation(pOut, nRendererId); }
 
     virtual Size GetTwipSize() const override;
     void SetTwipSize( const Size& rSz );
@@ -107,7 +107,7 @@ public:
     void SetScaleImageMap( bool b )      { mbScaleImageMap = b; }
 
     /// in ndcopy.cxx
-    virtual SwContentNode* MakeCopy(SwDoc&, const SwNodeIndex&, bool bNewFrames) const override;
+    virtual SwContentNode* MakeCopy(SwDoc&, SwNode&, bool bNewFrames) const override;
 
     /** Re-read in case graphic was not OK. The current one
        gets replaced by the new one. */

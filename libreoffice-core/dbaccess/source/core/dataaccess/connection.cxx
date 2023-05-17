@@ -24,6 +24,7 @@
 #include "connection.hxx"
 #include "datasource.hxx"
 #include <strings.hrc>
+#include <strings.hxx>
 #include <core_resource.hxx>
 #include <statement.hxx>
 #include <preparedstatement.hxx>
@@ -38,7 +39,7 @@
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <connectivity/dbtools.hxx>
 #include <connectivity/dbmetadata.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/sequence.hxx>
 #include <comphelper/types.hxx>
@@ -629,7 +630,7 @@ Reference< XInterface > SAL_CALL OConnection::createInstance( const OUString& _s
             if ( aFind == m_aSupportServices.end() )
             {
                 Reference<XConnection> xMy(this);
-                Sequence<Any> aArgs{ Any(NamedValue("ActiveConnection",makeAny(xMy))) };
+                Sequence<Any> aArgs{ Any(NamedValue("ActiveConnection",Any(xMy))) };
                 aFind = m_aSupportServices.emplace(
                                _sServiceSpecifier,
                                m_aContext->getServiceManager()->createInstanceWithArgumentsAndContext(_sServiceSpecifier, aArgs, m_aContext)

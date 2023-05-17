@@ -24,7 +24,8 @@
 
 #include <cppuhelper/implbase.hxx>
 #include <o3tl/safeint.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 #include "element.hxx"
 #include "document.hxx"
@@ -78,10 +79,10 @@ namespace DOM
         }
     }
 
-    CElementListImpl::CElementListImpl(::rtl::Reference<CElement> const& pElement,
+    CElementListImpl::CElementListImpl(::rtl::Reference<CElement> pElement,
             ::osl::Mutex & rMutex,
             std::u16string_view rName, OUString const*const pURI)
-        : m_pElement(pElement)
+        : m_pElement(std::move(pElement))
         , m_rMutex(rMutex)
         , m_pName(lcl_initXmlString(rName))
         , m_pURI(pURI ? lcl_initXmlString(*pURI) : nullptr)

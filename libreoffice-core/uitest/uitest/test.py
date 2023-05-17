@@ -7,14 +7,15 @@
 
 import time
 import threading
+import os.path
 from contextlib import contextmanager
-from uitest.config import DEFAULT_SLEEP
-from uitest.config import MAX_WAIT
 from uitest.uihelper.common import get_state_as_dict
 
 from com.sun.star.uno import RuntimeException
 
 from libreoffice.uno.eventlistener import EventListener
+
+DEFAULT_SLEEP = 0.1
 
 class UITest(object):
 
@@ -50,60 +51,50 @@ class UITest(object):
             time.sleep(DEFAULT_SLEEP)
 
     def wait_until_child_is_available(self, childName):
-        time_ = 0
-
-        while time_ < MAX_WAIT:
+        while True:
             xDialog = self._xUITest.getTopFocusWindow()
             if childName in xDialog.getChildren():
                 return xDialog.getChild(childName)
             else:
-                time_ += DEFAULT_SLEEP
                 time.sleep(DEFAULT_SLEEP)
 
-        raise Exception("Child not found: " + childName)
-
     def wait_until_property_is_updated(self, element, propertyName, value):
-        time_ = 0
-        while time_ < MAX_WAIT:
+        while True:
             if get_state_as_dict(element)[propertyName] == value:
                 return
             else:
-                time_ += DEFAULT_SLEEP
                 time.sleep(DEFAULT_SLEEP)
 
-        raise Exception("Property not updated: " + childName)
+    def wait_until_file_is_available(self, fileName):
+        while True:
+            if os.path.isfile(fileName):
+                return
+            else:
+                time.sleep(DEFAULT_SLEEP)
 
     @contextmanager
     def wait_until_component_loaded(self):
         with EventListener(self._xContext, "OnLoad") as event:
             yield
-            time_ = 0
-            while time_ < MAX_WAIT:
+            while True:
                 if event.executed:
                     frames = self.get_frames()
                     if len(frames) == 1:
                         self.get_desktop().setActiveFrame(frames[0])
                     time.sleep(DEFAULT_SLEEP)
                     return
-                time_ += DEFAULT_SLEEP
                 time.sleep(DEFAULT_SLEEP)
-
-        raise Exception("Component not loaded")
 
     def load_component_from_url(self, url, eventName="OnLoad"):
         with EventListener(self._xContext, eventName) as event:
             component =  self.get_desktop().loadComponentFromURL(url, "_default", 0, tuple())
-            time_ = 0
-            while time_ < MAX_WAIT:
+            while True:
                 if event.executed:
                     frames = self.get_frames()
                     #activate the newest frame
                     self.get_desktop().setActiveFrame(frames[-1])
                     return component
-                time_ += DEFAULT_SLEEP
                 time.sleep(DEFAULT_SLEEP)
-
-        raise Exception("Document not loaded")
 
     # Calls UITest.close_doc at exit
     @contextmanager
@@ -113,6 +104,19 @@ class UITest(object):
         finally:
             self.close_doc()
 
+    # Resets the setting to the old value at exit
+    @contextmanager
+    def set_config(self, path, new_value):
+        xChanges = self._xContext.ServiceManager.createInstanceWithArgumentsAndContext('com.sun.star.configuration.ReadWriteAccess', ("",), self._xContext)
+        try:
+            old_value = xChanges.getByHierarchicalName(path)
+            xChanges.replaceByHierarchicalName(path, new_value)
+            xChanges.commitChanges()
+            yield
+        finally:
+            xChanges.replaceByHierarchicalName(path, old_value)
+            xChanges.commitChanges()
+
     # Calls UITest.close_doc at exit
     @contextmanager
     def load_empty_file(self, app):
@@ -120,7 +124,6 @@ class UITest(object):
             yield self.load_component_from_url("private:factory/s" + app, "OnNew")
         finally:
             self.close_doc()
-
 
     # Calls UITest.close_dialog_through_button at exit
     @contextmanager
@@ -133,6 +136,11 @@ class UITest(object):
                     xDialog = self._xUITest.getTopFocusWindow()
                     try:
                         yield xDialog
+                    except:
+                        if not close_button:
+                            if 'cancel' in xDialog.getChildren():
+                                self.close_dialog_through_button(xDialog.getChild("cancel"))
+                        raise
                     finally:
                         if close_button:
                             self.close_dialog_through_button(xDialog.getChild(close_button))
@@ -152,8 +160,7 @@ class UITest(object):
 
         with EventListener(self._xContext, event_name) as event:
             ui_object.executeAction(action, parameters)
-            time_ = 0
-            while time_ < MAX_WAIT:
+            while True:
                 if event.executed:
                     xDialog = self._xUITest.getTopFocusWindow()
                     try:
@@ -162,9 +169,7 @@ class UITest(object):
                         if close_button:
                             self.close_dialog_through_button(xDialog.getChild(close_button))
                     return
-                time_ += DEFAULT_SLEEP
                 time.sleep(DEFAULT_SLEEP)
-        raise Exception("Dialog not executed for: " + action)
 
     def _handle_crash_reporter(self):
         xCrashReportDlg = self._xUITest.getTopFocusWindow()
@@ -192,8 +197,7 @@ class UITest(object):
 
         with EventListener(self._xContext, "OnNew") as event:
             xBtn.executeAction("CLICK", tuple())
-            time_ = 0
-            while time_ < MAX_WAIT:
+            while True:
                 if event.executed:
                     frames = self.get_frames()
                     self.get_desktop().setActiveFrame(frames[0])
@@ -203,10 +207,7 @@ class UITest(object):
                     finally:
                         self.close_doc()
                     return
-                time_ += DEFAULT_SLEEP
                 time.sleep(DEFAULT_SLEEP)
-
-        raise Exception("Failure doc in start center")
 
     def close_dialog_through_button(self, button):
         with EventListener(self._xContext, "DialogClosed" ) as event:
@@ -252,20 +253,21 @@ class UITest(object):
         thread = threading.Thread(target=action, args=args)
         with EventListener(self._xContext, ["DialogExecute", "ModelessDialogExecute", "ModelessDialogVisible"], printNames=printNames) as event:
             thread.start()
-            time_ = 0
-            # we are not necessarily opening a dialog, so wait much longer
-            while time_ < 10 * MAX_WAIT:
+            while True:
                 if event.executed:
                     xDialog = self._xUITest.getTopFocusWindow()
                     try:
                         yield xDialog
+                    except:
+                        if not close_button:
+                            if 'cancel' in xDialog.getChildren():
+                                self.close_dialog_through_button(xDialog.getChild("cancel"))
+                        raise
                     finally:
                         if close_button:
                             self.close_dialog_through_button(xDialog.getChild(close_button))
                         thread.join()
                     return
-                time_ += DEFAULT_SLEEP
                 time.sleep(DEFAULT_SLEEP)
-        raise Exception("Did not execute a dialog for a blocking action")
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

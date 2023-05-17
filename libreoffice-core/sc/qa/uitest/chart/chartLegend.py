@@ -1,22 +1,22 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import select_pos
 from uitest.uihelper.common import change_measurement_unit
-from uitest.uihelper.calc import enter_text_to_cell
-from libreoffice.calc.document import get_cell_by_position
+from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+
 from libreoffice.uno.propertyvalue import mkPropertyValues
-from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file, type_text
 
-#Chart Display Legend dialog
 
+# Chart Display Legend dialog
 class chartLegend(UITestCase):
    def test_chart_display_legend_dialog(self):
-    with self.ui_test.load_file(get_url_for_data_file("tdf98390.ods")) as calc_doc:
+    with self.ui_test.load_file(get_url_for_data_file("tdf98390.ods")):
       xCalcDoc = self.xUITest.getTopFocusWindow()
       gridwin = xCalcDoc.getChild("grid_window")
 
@@ -27,9 +27,6 @@ class chartLegend(UITestCase):
       xSeriesObj =  xChartMain.getChild("CID/D=0:CS=0:CT=0:Series=0")
       with self.ui_test.execute_dialog_through_action(xSeriesObj, "COMMAND", mkPropertyValues({"COMMAND": "InsertMenuLegend"})) as xDialog:
         left = xDialog.getChild("left")
-        right = xDialog.getChild("right")
-        top = xDialog.getChild("top")
-        bottom = xDialog.getChild("bottom")
 
         left.executeAction("CLICK", tuple())
 
@@ -75,7 +72,7 @@ class chartLegend(UITestCase):
 
    def test_legends_move_with_arrows_keys(self):
 
-    with self.ui_test.load_file(get_url_for_data_file("dataLabels.ods")) as calc_doc:
+    with self.ui_test.load_file(get_url_for_data_file("dataLabels.ods")):
       xCalcDoc = self.xUITest.getTopFocusWindow()
       gridwin = xCalcDoc.getChild("grid_window")
 
@@ -101,5 +98,28 @@ class chartLegend(UITestCase):
       with self.ui_test.execute_dialog_through_action(xLegends, "COMMAND", mkPropertyValues({"COMMAND": "TransformDialog"})) as xDialog:
         self.assertEqual("4.51", get_state_as_dict(xDialog.getChild("MTR_FLD_POS_X"))['Value'])
         self.assertEqual("1.44", get_state_as_dict(xDialog.getChild("MTR_FLD_POS_Y"))['Value'])
+
+   def test_Tdf147394(self):
+
+    with self.ui_test.load_file(get_url_for_data_file("dataLabels.ods")) as calc_doc:
+      xCalcDoc = self.xUITest.getTopFocusWindow()
+      gridwin = xCalcDoc.getChild("grid_window")
+
+      gridwin.executeAction("SELECT", mkPropertyValues({"OBJECT": "Object 1"}))
+      gridwin.executeAction("ACTIVATE", tuple())
+      xChartMainTop = self.xUITest.getTopFocusWindow()
+      xChartMain = xChartMainTop.getChild("chart_window")
+
+      xLegend = calc_doc.Sheets[0].Charts[0].getEmbeddedObject().getFirstDiagram().Legend
+      self.assertTrue(xLegend.Show)
+
+      # Select the legends
+      xLegends = xChartMain.getChild("CID/D=0:Legend=")
+      xLegends.executeAction("SELECT", tuple())
+
+      # Without the fix in place, this test would have crashed here
+      xChartMain.executeAction("TYPE", mkPropertyValues({"KEYCODE": "DELETE"}))
+
+      self.assertFalse(xLegend.Show)
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

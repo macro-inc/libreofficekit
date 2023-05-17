@@ -34,7 +34,7 @@
 #include <osl/file.hxx>
 #include <rtl/bootstrap.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <comphelper/processfactory.hxx>
 #include <unotools/ucbhelper.hxx>
@@ -84,7 +84,7 @@ void Desktop::InitApplicationServiceManager()
     comphelper::setProcessServiceFactory(sm);
 }
 
-void Desktop::RegisterServices(Reference< XComponentContext > const & context)
+void Desktop::RegisterServices()
 {
     if( m_bServicesRegistered )
         return;
@@ -100,7 +100,7 @@ void Desktop::RegisterServices(Reference< XComponentContext > const & context)
 
     // read accept string from configuration
     OUString conDcpCfg(
-        officecfg::Setup::Office::ooSetupConnectionURL::get(context));
+        officecfg::Setup::Office::ooSetupConnectionURL::get());
     if (!conDcpCfg.isEmpty()) {
         createAcceptor(conDcpCfg);
     }
@@ -245,11 +245,11 @@ void Desktop::CreateTemporaryDirectory()
     }
 
     // create new current temporary directory
-    OUString aTempPath = ::utl::TempFile::SetTempNameBaseDirectory( aTempBaseURL );
+    OUString aTempPath = ::utl::SetTempNameBaseDirectory( aTempBaseURL );
     if ( aTempPath.isEmpty()
          && ::osl::File::getTempDirURL( aTempBaseURL ) == osl::FileBase::E_None )
     {
-        aTempPath = ::utl::TempFile::SetTempNameBaseDirectory( aTempBaseURL );
+        aTempPath = ::utl::SetTempNameBaseDirectory( aTempBaseURL );
     }
 
     // set new current temporary directory

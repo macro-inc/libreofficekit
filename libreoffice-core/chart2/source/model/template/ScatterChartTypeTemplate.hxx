@@ -18,16 +18,14 @@
  */
 #pragma once
 
-#include "ChartTypeTemplate.hxx"
+#include <ChartTypeTemplate.hxx>
 #include <OPropertySet.hxx>
-#include <MutexContainer.hxx>
 #include <comphelper/uno3.hxx>
 
 namespace chart
 {
 
 class ScatterChartTypeTemplate :
-        public MutexContainer,
         public ChartTypeTemplate,
         public ::property::OPropertySet
 {
@@ -47,30 +45,30 @@ public:
 
 protected:
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const override;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const override;
     virtual ::cppu::IPropertyArrayHelper & SAL_CALL getInfoHelper() override;
 
     // ____ XPropertySet ____
     virtual css::uno::Reference< css::beans::XPropertySetInfo > SAL_CALL
         getPropertySetInfo() override;
 
-    // ____ XChartTypeTemplate ____
+    // ____ ChartTypeTemplate ____
     virtual sal_Bool SAL_CALL supportsCategories() override;
-    virtual sal_Bool SAL_CALL matchesTemplate(
-        const css::uno::Reference< css::chart2::XDiagram >& xDiagram,
-        sal_Bool bAdaptProperties ) override;
-    virtual css::uno::Reference< css::chart2::XChartType > SAL_CALL
-        getChartTypeForNewSeries( const css::uno::Sequence<
-            css::uno::Reference< css::chart2::XChartType > >& aFormerlyUsedChartTypes ) override;
-    virtual css::uno::Reference< css::chart2::XDataInterpreter > SAL_CALL getDataInterpreter() override;
-    virtual void SAL_CALL applyStyle(
-        const css::uno::Reference< css::chart2::XDataSeries >& xSeries,
+    virtual bool matchesTemplate2(
+        const rtl::Reference< ::chart::Diagram >& xDiagram,
+        bool bAdaptProperties ) override;
+    virtual rtl::Reference< ::chart::ChartType >
+        getChartTypeForNewSeries2( const std::vector<
+            rtl::Reference< ::chart::ChartType > >& aFormerlyUsedChartTypes ) override;
+    virtual rtl::Reference< ::chart::DataInterpreter > getDataInterpreter2() override;
+    virtual void applyStyle2(
+        const rtl::Reference< ::chart::DataSeries >& xSeries,
         ::sal_Int32 nChartTypeGroupIndex,
         ::sal_Int32 nSeriesIndex,
         ::sal_Int32 nSeriesCount ) override;
 
     // ____ ChartTypeTemplate ____
-    virtual css::uno::Reference< css::chart2::XChartType >
+    virtual rtl::Reference< ::chart::ChartType >
                 getChartTypeForIndex( sal_Int32 nChartTypeIndex ) override;
     virtual sal_Int32 getDimension() const override;
     virtual StackMode getStackMode( sal_Int32 nChartTypeIndex ) const override;

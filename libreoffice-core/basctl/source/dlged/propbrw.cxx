@@ -37,7 +37,7 @@
 #include <svx/svditer.hxx>
 #include <svx/svdview.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/layout.hxx>
 #include <vcl/stdtext.hxx>
 #include <vcl/weld.hxx>
@@ -137,7 +137,7 @@ void PropBrw::ImplReCreateController()
             ::cppu::ContextEntry_Init( "ContextDocument", Any( m_xContextDocument ) )
         };
         Reference< XComponentContext > xInspectorContext(
-            ::cppu::createComponentContext( aHandlerContextInfo, SAL_N_ELEMENTS( aHandlerContextInfo ), xOwnContext ) );
+            ::cppu::createComponentContext( aHandlerContextInfo, std::size( aHandlerContextInfo ), xOwnContext ) );
 
         // create a property browser controller
         Reference< XMultiComponentFactory > xFactory( xInspectorContext->getServiceManager(), UNO_SET_THROW );

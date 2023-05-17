@@ -228,7 +228,8 @@ void ScHeaderControl::Paint( vcl::RenderContext& /*rRenderContext*/, const tools
 
     Color aTextColor = rStyleSettings.GetButtonTextColor();
     Color aSelTextColor = rStyleSettings.GetHighlightTextColor();
-    Color aAFilterTextColor = COL_LIGHTBLUE;    // color of filtered row numbers
+    Color aAFilterTextColor = rStyleSettings.GetButtonTextColor();
+    aAFilterTextColor.Merge(COL_LIGHTBLUE, bDark ? 150 : 10); // color of filtered row numbers
     aNormFont.SetColor( aTextColor );
     aAutoFilterFont.SetColor(aAFilterTextColor);
     if ( bHighContrast )
@@ -621,14 +622,14 @@ void ScHeaderControl::Paint( vcl::RenderContext& /*rRenderContext*/, const tools
     }
 }
 
-SCCOLROW ScHeaderControl::GetMousePos( const MouseEvent& rMEvt, bool& rBorder ) const
+SCCOLROW ScHeaderControl::GetMousePos(const Point& rPos, bool& rBorder) const
 {
     bool        bFound = false;
     SCCOLROW    nPos = GetPos();
     SCCOLROW    nHitNo = nPos;
     SCCOLROW    nEntryNo = 1 + nPos;
     tools::Long    nScrPos;
-    tools::Long    nMousePos = bVertical ? rMEvt.GetPosPixel().Y() : rMEvt.GetPosPixel().X();
+    tools::Long    nMousePos = bVertical ? rPos.Y() : rPos.X();
     tools::Long    nDif;
     Size    aSize = GetOutputSizePixel();
     tools::Long    nWinSize = bVertical ? aSize.Height() : aSize.Width();
@@ -709,7 +710,7 @@ void ScHeaderControl::MouseButtonDown( const MouseEvent& rMEvt )
     SelectWindow();
 
     bool bIsBorder;
-    SCCOLROW nHitNo = GetMousePos( rMEvt, bIsBorder );
+    SCCOLROW nHitNo = GetMousePos(rMEvt.GetPosPixel(), bIsBorder);
     if (!IsSelectionAllowed(nHitNo))
         return;
     if ( ! rMEvt.IsLeft() )
@@ -721,8 +722,7 @@ void ScHeaderControl::MouseButtonDown( const MouseEvent& rMEvt )
         SCTAB nTab = pTabView->GetViewData().GetTabNo();
         if( !rMEvt.IsShift() )
             pTabView->DoneRefMode( rMEvt.IsMod1() );
-        ScTabViewShell* pViewSh = dynamic_cast<ScTabViewShell*>(SfxViewShell::Current());
-        ScDocument& rDoc = pViewSh->GetViewData().GetDocument();
+        ScDocument& rDoc = pTabView->GetViewData().GetDocument();
         if( !bVertical )
         {
             pTabView->InitRefMode( nHitNo, 0, nTab, SC_REFTYPE_REF );
@@ -869,10 +869,9 @@ void ScHeaderControl::MouseMove( const MouseEvent& rMEvt )
         if( !pTabView )
             return;
         bool bTmp;
-        SCCOLROW nHitNo = GetMousePos( rMEvt, bTmp );
+        SCCOLROW nHitNo = GetMousePos(rMEvt.GetPosPixel(), bTmp);
         SCTAB nTab = pTabView->GetViewData().GetTabNo();
-        ScTabViewShell* pViewSh = dynamic_cast<ScTabViewShell*>(SfxViewShell::Current());
-        ScDocument& rDoc = pViewSh->GetViewData().GetDocument();
+        ScDocument& rDoc = pTabView->GetViewData().GetDocument();
         if( !bVertical )
             pTabView->UpdateRef( nHitNo, rDoc.MaxRow(), nTab );
         else
@@ -898,7 +897,7 @@ void ScHeaderControl::MouseMove( const MouseEvent& rMEvt )
     else
     {
         bool bIsBorder;
-        (void)GetMousePos( rMEvt, bIsBorder );
+        (void)GetMousePos(rMEvt.GetPosPixel(), bIsBorder);
 
         if ( bIsBorder && rMEvt.GetButtons()==0 && ResizeAllowed() )
             SetPointer( bVertical ? PointerStyle::VSizeBar : PointerStyle::HSizeBar );
@@ -944,9 +943,8 @@ void ScHeaderControl::Command( const CommandEvent& rCEvt )
                 if ( rViewData.HasEditView( rViewData.GetActivePart() ) )
                     SC_MOD()->InputEnterHandler();  // always end edit mode
 
-                MouseEvent aMEvt( rCEvt.GetMousePosPixel() );
                 bool bBorder;
-                SCCOLROW nPos = GetMousePos( aMEvt, bBorder );
+                SCCOLROW nPos = GetMousePos(rCEvt.GetMousePosPixel(), bBorder );
                 if (!IsSelectionAllowed(nPos))
                     // Selecting this cell is not allowed, neither is context menu.
                     return;

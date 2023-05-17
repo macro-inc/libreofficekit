@@ -21,6 +21,7 @@
 #include <sfx2/viewfrm.hxx>
 #include <svx/ruler.hxx>
 #include <editeng/lrspitem.hxx>
+#include <o3tl/safeint.hxx>
 #include <svl/srchitem.hxx>
 #include <svl/stritem.hxx>
 #include <sfx2/request.hxx>
@@ -49,8 +50,8 @@
 #include <vcl/uitest/logger.hxx>
 #include <vcl/uitest/eventdescription.hxx>
 
-sal_uInt16  SwView::m_nMoveType = NID_PGE;
-sal_Int32 SwView::m_nActMark = 0;
+sal_uInt16  SwView::s_nMoveType = NID_PGE;
+sal_Int32 SwView::s_nActMark = 0;
 
 using namespace ::com::sun::star::uno;
 
@@ -306,12 +307,9 @@ void SwView::CreateScrollbar( bool bHori )
     ppScrollbar = VclPtr<SwScrollbar>::Create( pMDI, bHori );
     UpdateScrollbars();
     if(bHori)
-        ppScrollbar->SetScrollHdl( LINK( this, SwView, EndScrollHdl ));
+        ppScrollbar->SetScrollHdl( LINK( this, SwView, HoriScrollHdl ));
     else
-        ppScrollbar->SetScrollHdl( LINK( this, SwView, ScrollHdl ));
-    ppScrollbar->SetEndScrollHdl( LINK( this, SwView, EndScrollHdl ));
-
-    ppScrollbar->EnableDrag();
+        ppScrollbar->SetScrollHdl( LINK( this, SwView, VertScrollHdl ));
 
     if(GetWindow())
         InvalidateBorder();
@@ -327,43 +325,49 @@ IMPL_LINK( SwView, MoveNavigationHdl, void*, p, void )
         return;
     const bool bNext = *pbNext;
     SwWrtShell& rSh = GetWrtShell();
-    if ( NID_SRCH_REP != m_nMoveType)
+    if ( NID_SRCH_REP != s_nMoveType)
     {
         if ( rSh.GetDrawView()->IsTextEdit() )
             rSh.EndTextEdit();
         if ( IsDrawMode() )
             LeaveDrawCreate();
     }
-    if ( NID_POSTIT != m_nMoveType && m_pPostItMgr )
+    if ( NID_POSTIT != s_nMoveType && m_pPostItMgr )
     {
         sw::annotation::SwAnnotationWin* pActiveSidebarWin = m_pPostItMgr->GetActiveSidebarWin();
         if (pActiveSidebarWin)
             pActiveSidebarWin->SwitchToFieldPos();
     }
-    if (NID_RECENCY != m_nMoveType && NID_PGE != m_nMoveType && NID_SRCH_REP != m_nMoveType)
+    if (NID_RECENCY != s_nMoveType && NID_PGE != s_nMoveType && NID_SRCH_REP != s_nMoveType)
         rSh.addCurrentPosition();
-    switch( m_nMoveType )
+    switch( s_nMoveType )
     {
         case NID_PGE:
         {
-            if (USHRT_MAX == rSh.GetNextPrevPageNum(bNext))
+            tools::Long nYPos;
+            SwVisiblePageNumbers aVisiblePageNumbers;
+            rSh.GetFirstLastVisPageNumbers(aVisiblePageNumbers);
+            if ((bNext && aVisiblePageNumbers.nLastPhy + 1 > rSh.GetPageCnt()) ||
+                (!bNext && aVisiblePageNumbers.nFirstPhy == 1))
             {
-                const Point aPt(GetVisArea().Left(),
-                                rSh.GetPagePos(bNext ? 1 : rSh.GetPageCnt()).Y());
-                Point aAlPt(AlignToPixel(aPt) );
-                // If there is a difference, has been truncated --> then add one pixel,
-                // so that no residue of the previous page is visible.
-                if(aPt.Y() != aAlPt.Y())
-                    aAlPt.AdjustY(3 * GetEditWin().PixelToLogic(Size(0, 1)).Height());
-                SetVisArea(aAlPt);
+                nYPos = rSh.GetPagePos(bNext ? 1 : rSh.GetPageCnt()).Y();
                 SvxSearchDialogWrapper::SetSearchLabel(bNext ? SearchLabel::EndWrapped :
                                                                SearchLabel::StartWrapped);
             }
             else
             {
-                bNext ? PhyPageDown() : PhyPageUp();
+                auto nPage = bNext ? aVisiblePageNumbers.nLastPhy + 1 :
+                                     aVisiblePageNumbers.nFirstPhy - 1;
+                nYPos = rSh.GetPagePos(nPage).Y();
                 SvxSearchDialogWrapper::SetSearchLabel(SearchLabel::Empty);
             }
+            const Point aPt(GetVisArea().Left(), nYPos);
+            Point aAlPt(AlignToPixel(aPt));
+            // If there is a difference, has been truncated --> then add one pixel,
+            // so that no residue of the previous page is visible.
+            if(aPt.Y() != aAlPt.Y())
+                aAlPt.AdjustY(3 * GetEditWin().PixelToLogic(Size(0, 1)).Height());
+            SetVisArea(aAlPt);
         }
         break;
         case NID_TBL :
@@ -378,9 +382,9 @@ IMPL_LINK( SwView, MoveNavigationHdl, void*, p, void )
         case NID_OLE:
         {
             GotoObjFlags eType = GotoObjFlags::FlyFrame;
-            if(m_nMoveType == NID_GRF)
+            if(s_nMoveType == NID_GRF)
                 eType = GotoObjFlags::FlyGrf;
-            else if(m_nMoveType == NID_OLE)
+            else if(s_nMoveType == NID_OLE)
                 eType = GotoObjFlags::FlyOLE;
             bool bSuccess = bNext ?
                     rSh.GotoNextFly(eType) :
@@ -399,7 +403,7 @@ IMPL_LINK( SwView, MoveNavigationHdl, void*, p, void )
         case NID_DRW:
         {
             bool bSuccess = rSh.GotoObj(bNext,
-                    m_nMoveType == NID_DRW ?
+                    s_nMoveType == NID_DRW ?
                         GotoObjFlags::DrawSimple :
                         GotoObjFlags::DrawControl);
             if(bSuccess)
@@ -503,23 +507,23 @@ IMPL_LINK( SwView, MoveNavigationHdl, void*, p, void )
 
                 if(bNext)
                 {
-                    m_nActMark++;
-                    if (m_nActMark >= MAX_MARKS || m_nActMark >= static_cast<sal_Int32>(vNavMarkNames.size()))
+                    s_nActMark++;
+                    if (s_nActMark >= MAX_MARKS || s_nActMark >= static_cast<sal_Int32>(vNavMarkNames.size()))
                     {
-                        m_nActMark = 0;
+                        s_nActMark = 0;
                         SvxSearchDialogWrapper::SetSearchLabel( SearchLabel::ReminderEndWrapped );
                     }
                 }
                 else
                 {
-                    m_nActMark--;
-                    if (m_nActMark < 0 || m_nActMark >= static_cast<sal_Int32>(vNavMarkNames.size()))
+                    s_nActMark--;
+                    if (s_nActMark < 0 || o3tl::make_unsigned(s_nActMark) >= vNavMarkNames.size())
                     {
-                        m_nActMark = vNavMarkNames.size()-1;
+                        s_nActMark = vNavMarkNames.size()-1;
                         SvxSearchDialogWrapper::SetSearchLabel( SearchLabel::ReminderStartWrapped );
                     }
                 }
-                rSh.GotoMark(vNavMarkNames[m_nActMark]);
+                rSh.GotoMark(vNavMarkNames[s_nActMark]);
             }
             else
                 SvxSearchDialogWrapper::SetSearchLabel( SearchLabel::NavElementNotFound );
@@ -530,6 +534,7 @@ IMPL_LINK( SwView, MoveNavigationHdl, void*, p, void )
         {
             if (m_pPostItMgr->HasNotes())
             {
+                rSh.EnterStdMode();
                 m_pPostItMgr->AssureStdModeAtShell();
                 m_pPostItMgr->SetActiveSidebarWin(nullptr);
                 GetEditWin().GrabFocus();
@@ -607,7 +612,7 @@ IMPL_LINK( SwView, MoveNavigationHdl, void*, p, void )
             bNext ? rSh.GetNavigationMgr().goForward() : rSh.GetNavigationMgr().goBack();
             break;
     }
-    if (NID_POSTIT != m_nMoveType)
+    if (NID_POSTIT != s_nMoveType)
         m_pEditWin->GrabFocus();
     delete pbNext;
 }
@@ -701,17 +706,17 @@ IMPL_LINK( SwView, ExecRulerClick, Ruler *, pRuler, void )
 
 sal_uInt16 SwView::GetMoveType()
 {
-    return m_nMoveType;
+    return s_nMoveType;
 }
 
 void SwView::SetMoveType(sal_uInt16 nSet)
 {
-    m_nMoveType = nSet;
+    s_nMoveType = nSet;
 }
 
 void SwView::SetActMark(sal_Int32 nSet)
 {
-    m_nActMark = nSet;
+    s_nActMark = nSet;
 }
 
 void SwView::ShowHScrollbar(bool bShow)
@@ -723,7 +728,7 @@ void SwView::ShowHScrollbar(bool bShow)
 bool SwView::IsHScrollbarVisible()const
 {
     assert(m_pHScrollbar && "Scrollbar invalid");
-    return m_pHScrollbar->IsVisible( false ) || m_pHScrollbar->IsAuto();
+    return m_pHScrollbar->IsScrollbarVisible(false) || m_pHScrollbar->IsAuto();
 }
 
 void SwView::ShowVScrollbar(bool bShow)
@@ -735,7 +740,7 @@ void SwView::ShowVScrollbar(bool bShow)
 bool SwView::IsVScrollbarVisible()const
 {
     assert(m_pVScrollbar && "Scrollbar invalid");
-    return m_pVScrollbar->IsVisible( false );
+    return m_pVScrollbar->IsScrollbarVisible(false);
 }
 
 void SwView::EnableHScrollbar(bool bEnable)

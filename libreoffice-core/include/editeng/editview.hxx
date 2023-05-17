@@ -20,14 +20,13 @@
 #ifndef INCLUDED_EDITENG_EDITVIEW_HXX
 #define INCLUDED_EDITENG_EDITVIEW_HXX
 
-#include <config_options.h>
 #include <memory>
 #include <com/sun/star/i18n/WordType.hpp>
 
 #include <i18nlangtag/lang.h>
 #include <tools/color.hxx>
 #include <tools/gen.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/vclptr.hxx>
 #include <editeng/editstat.hxx>
 #include <editeng/flditem.hxx>
@@ -96,7 +95,6 @@ enum class ScrollRangeCheck
 class EDITENG_DLLPUBLIC EditViewCallbacks
 {
 public:
-    EditViewCallbacks() {}
     virtual ~EditViewCallbacks();
 
     // call this when text visualization changed in any way. It
@@ -161,6 +159,10 @@ private:
 
                     EditView( const EditView& ) = delete;
     EditView&       operator=( const EditView& ) = delete;
+
+    // counts how many characters take unfolded fields
+    // bCanOverflow - count field length without trim to the selected pos
+    sal_Int32       countFieldsOffsetSum(sal_Int32 nPara, sal_Int32 nPo, bool bCanOverflow) const;
 
 public:
                     EditView( EditEngine* pEng, vcl::Window* pWindow );
@@ -306,7 +308,7 @@ public:
 
     bool            IsCursorAtWrongSpelledWord();
     bool            IsWrongSpelledWordAtPos( const Point& rPosPixel, bool bMarkIfWrong = false );
-    void            ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbackInfo&,void>& rCallBack);
+    bool            ExecuteSpellPopup(const Point& rPosPixel, const Link<SpellCallbackInfo&,void>& rCallBack);
     OUString        SpellIgnoreWord();
 
     void                InsertField( const SvxFieldItem& rFld );
@@ -318,6 +320,10 @@ public:
     /// Select and return the field at the current cursor position
     const SvxFieldData* GetFieldAtCursor() const;
     void SelectFieldAtCursor();
+    /// Converts position in paragraph to logical position without unfolding fields
+    sal_Int32       GetPosNoField(sal_Int32 nPara, sal_Int32 nPos) const;
+    /// Converts logical position in paragraph to position with unfolded fields
+    sal_Int32       GetPosWithField(sal_Int32 nPara, sal_Int32 nPos) const;
 
     void            SetInvalidateMore( sal_uInt16 nPixel );
     sal_uInt16      GetInvalidateMore() const;

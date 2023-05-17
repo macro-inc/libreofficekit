@@ -28,12 +28,13 @@
 #include <com/sun/star/task/XInteractionHandler2.hpp>
 #include <com/sun/star/task/XInteractionRequest.hpp>
 
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <cppuhelper/implbase.hxx>
 
 #include <toolkit/helper/vclunohelper.hxx>
 #include <vcl/wrkwin.hxx>
 #include <vcl/svapp.hxx>
+#include <mutex>
 
 namespace com::sun::star::uno {
     class XComponentContext;
@@ -56,10 +57,9 @@ inline void closedialogs(SystemWindow& rTopLevel, bool bCloseRoot)
 // If there are dialog children open on exit then veto termination,
 // close the topmost dialog and retry termination.
 class WarningDialogsParent final :
-    public cppu::WeakComponentImplHelper<css::frame::XTerminateListener>
+    public comphelper::WeakComponentImplHelper<css::frame::XTerminateListener>
 {
 private:
-    osl::Mutex m_aLock;
     VclPtr<WorkWindow> m_xWin;
     css::uno::Reference<css::awt::XWindow> m_xInterface;
 
@@ -72,12 +72,12 @@ private:
         if (!m_xWin)
             return;
         SolarMutexGuard aSolarGuard;
-        closedialogs(dynamic_cast<SystemWindow&>(*m_xWin), false);
+        closedialogs(*m_xWin, false);
     }
 
 public:
 
-    using cppu::WeakComponentImplHelperBase::disposing;
+    using comphelper::WeakComponentImplHelperBase::disposing;
     virtual void SAL_CALL disposing(const css::lang::EventObject&) override
     {
     }
@@ -96,7 +96,6 @@ public:
 
 public:
     WarningDialogsParent()
-        : cppu::WeakComponentImplHelper<css::frame::XTerminateListener>(m_aLock)
     {
         SolarMutexGuard aSolarGuard;
         m_xWin = VclPtr<WorkWindow>::Create(nullptr, WB_STDWORK);
@@ -154,7 +153,7 @@ public:
 class PreventDuplicateInteraction final :
                                   public ::cppu::WeakImplHelper<css::lang::XInitialization, css::task::XInteractionHandler2>
 {
-    mutable ::osl::Mutex m_aLock;
+    mutable std::mutex m_aLock;
 
     // structs, types etc.
     public:
@@ -253,7 +252,7 @@ class PreventDuplicateInteraction final :
 
             @threadsafe not necessary
         */
-        PreventDuplicateInteraction(const css::uno::Reference< css::uno::XComponentContext >& rxContext);
+        PreventDuplicateInteraction(css::uno::Reference< css::uno::XComponentContext > xContext);
 
 
         /**

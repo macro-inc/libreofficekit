@@ -20,7 +20,7 @@
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <fmtcol.hxx>
 #include <hints.hxx>
 #include <doc.hxx>
@@ -333,7 +333,7 @@ SwXMLTextStyleContext_Impl::Finish( bool bOverwrite )
 
         try
         {
-            xPropSet->setPropertyValue(UNO_NAME_PARA_STYLE_CONDITIONS, uno::makeAny(aSeq));
+            xPropSet->setPropertyValue(UNO_NAME_PARA_STYLE_CONDITIONS, uno::Any(aSeq));
         }
         catch (uno::Exception const&)
         {
@@ -473,7 +473,7 @@ void SwXMLCellStyleContext::AddDataFormat()
     if (aIter != GetProperties().end())
         aIter->maValue <<= nNumberFormat;
     else
-        GetProperties().push_back(XMLPropertyState(nIndex, makeAny(nNumberFormat)));
+        GetProperties().push_back(XMLPropertyState(nIndex, Any(nNumberFormat)));
 }
 
 void SwXMLCellStyleContext::FillPropertySet(const css::uno::Reference<css::beans::XPropertySet>& rPropSet)
@@ -525,7 +525,7 @@ SvXMLImportContext *SwXMLItemSetStyleContext_Impl::CreateItemSetContext(
 
     SvXMLImportContext *pContext = nullptr;
 
-    SwDoc* pDoc = SwImport::GetDocFromXMLImport( GetSwImport() );
+    SwDoc* pDoc = GetSwImport().getDoc();
 
     SfxItemPool& rItemPool = pDoc->GetAttrPool();
     switch( GetFamily() )
@@ -615,7 +615,7 @@ void SwXMLItemSetStyleContext_Impl::ConnectPageDesc()
         return;
     m_bPageDescConnected = true;
 
-    SwDoc *pDoc = SwImport::GetDocFromXMLImport( GetSwImport() );
+    SwDoc *pDoc = GetSwImport().getDoc();
 
     // #i40788# - first determine the display name of the page style,
     // then map this name to the corresponding user interface name.
@@ -643,13 +643,11 @@ void SwXMLItemSetStyleContext_Impl::ConnectPageDesc()
         m_oItemSet.emplace( rItemPool, aTableSetRange );
     }
 
-    const SfxPoolItem *pItem;
     std::unique_ptr<SwFormatPageDesc> pFormatPageDesc;
-    if( SfxItemState::SET == m_oItemSet->GetItemState( RES_PAGEDESC, false,
-                                                &pItem ) )
+    if( const SwFormatPageDesc* pItem = m_oItemSet->GetItemIfSet( RES_PAGEDESC, false ) )
     {
-         if( static_cast<const SwFormatPageDesc *>(pItem)->GetPageDesc() != pPageDesc )
-            pFormatPageDesc.reset(new SwFormatPageDesc( *static_cast<const SwFormatPageDesc *>(pItem) ));
+         if( pItem->GetPageDesc() != pPageDesc )
+            pFormatPageDesc.reset(new SwFormatPageDesc( *pItem ));
     }
     else
         pFormatPageDesc.reset(new SwFormatPageDesc());
@@ -657,7 +655,7 @@ void SwXMLItemSetStyleContext_Impl::ConnectPageDesc()
     if( pFormatPageDesc )
     {
         pFormatPageDesc->RegisterToPageDesc( *pPageDesc );
-        m_oItemSet->Put( *pFormatPageDesc );
+        m_oItemSet->Put( std::move(pFormatPageDesc) );
     }
 }
 
@@ -675,7 +673,7 @@ bool SwXMLItemSetStyleContext_Impl::ResolveDataStyleName()
         {
             if( !m_oItemSet )
             {
-                SwDoc *pDoc = SwImport::GetDocFromXMLImport( GetSwImport() );
+                SwDoc *pDoc = GetSwImport().getDoc();
 
                 SfxItemPool& rItemPool = pDoc->GetAttrPool();
                 m_oItemSet.emplace( rItemPool, aTableBoxSetRange );
@@ -1008,7 +1006,7 @@ void SwXMLImport::FinishStyles()
 void SwXMLImport::UpdateTextCollConditions( SwDoc *pDoc )
 {
     if( !pDoc )
-        pDoc = SwImport::GetDocFromXMLImport( *this );
+        pDoc = getDoc();
 
     const SwTextFormatColls& rColls = *pDoc->GetTextFormatColls();
     const size_t nCount = rColls.size();

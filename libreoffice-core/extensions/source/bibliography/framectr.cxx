@@ -18,12 +18,14 @@
  */
 
 #include <comphelper/types.hxx>
+#include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
 #include "framectr.hxx"
 #include "datman.hxx"
 #include <toolkit/helper/vclunohelper.hxx>
 #include "bibconfig.hxx"
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
 #include <comphelper/processfactory.hxx>
@@ -42,7 +44,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <sot/exchange.hxx>
 #include <sot/formats.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/weld.hxx>
 #include <osl/mutex.hxx>
 
@@ -145,9 +147,9 @@ void BibFrameCtrl_Impl::disposing( const lang::EventObject& /*Source*/ )
         pController->getFrame()->removeFrameActionListener( this );
 }
 
-BibFrameController_Impl::BibFrameController_Impl( const uno::Reference< awt::XWindow > & xComponent,
+BibFrameController_Impl::BibFrameController_Impl( uno::Reference< awt::XWindow > xComponent,
                                                 BibDataManager* pDataManager)
-    :m_xWindow( xComponent )
+    :m_xWindow(std::move( xComponent ))
     ,m_xDatMan( pDataManager )
 {
     m_bDisposing = false;
@@ -393,10 +395,11 @@ void BibFrameController_Impl::dispatch(const util::URL& _rURL, const uno::Sequen
         {
             try
             {
-                uno::Sequence< beans::PropertyValue > aNewDataSource(2);
-                beans::PropertyValue* pProps = aNewDataSource.getArray();
-                pProps[0].Value <<= OUString();
-                pProps[1].Value <<= aURL;
+                uno::Sequence< beans::PropertyValue > aNewDataSource
+                {
+                    comphelper::makePropertyValue( {}, OUString() ),
+                    comphelper::makePropertyValue( {}, aURL )
+                };
                 ChangeDataSource(aNewDataSource);
             }
             catch(const Exception&)

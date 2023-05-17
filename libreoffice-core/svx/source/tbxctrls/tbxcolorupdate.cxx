@@ -25,7 +25,9 @@
 #include <svx/xlineit0.hxx>
 #include <svx/xlndsit.hxx>
 
+#include <utility>
 #include <vcl/commandinfoprovider.hxx>
+#include <vcl/gdimtf.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/toolbox.hxx>
 #include <vcl/virdev.hxx>
@@ -37,16 +39,16 @@
 
 namespace svx
 {
-    ToolboxButtonColorUpdaterBase::ToolboxButtonColorUpdaterBase(bool bWideButton, const OUString& rCommandLabel,
-                                                                 const OUString& rCommandURL,
-                                                                 const css::uno::Reference<css::frame::XFrame>& rFrame)
+    ToolboxButtonColorUpdaterBase::ToolboxButtonColorUpdaterBase(bool bWideButton, OUString aCommandLabel,
+                                                                 OUString aCommandURL,
+                                                                 css::uno::Reference<css::frame::XFrame> xFrame)
         : mbWideButton(bWideButton)
         , mbWasHiContrastMode(Application::GetSettings().GetStyleSettings().GetHighContrastMode())
         , maCurColor(COL_TRANSPARENT)
         , meImageType(vcl::ImageType::Size16)
-        , maCommandLabel(rCommandLabel)
-        , maCommandURL(rCommandURL)
-        , mxFrame(rFrame)
+        , maCommandLabel(std::move(aCommandLabel))
+        , maCommandURL(std::move(aCommandURL))
+        , mxFrame(std::move(xFrame))
     {
     }
 
@@ -101,15 +103,21 @@ namespace svx
 
     void VclToolboxButtonColorUpdater::SetImage(VirtualDevice* pVirDev)
     {
-        mpTbx->SetItemImage(mnBtnId, Image(pVirDev->GetBitmapEx(Point(0,0), maBmpSize)));
+        GDIMetaFile* pMtf = pVirDev->GetConnectMetaFile();
+
+        assert(pMtf && "should have been set in ToolboxButtonColorUpdaterBase::Update");
+
+        pMtf->Stop();
+        pMtf->WindStart();
+
+        Graphic aGraphic(*pMtf);
+
+        mpTbx->SetItemImage(mnBtnId, Image(aGraphic.GetXGraphic()));
     }
 
     VclPtr<VirtualDevice> VclToolboxButtonColorUpdater::CreateVirtualDevice() const
     {
-        auto xRet = VclPtr<VirtualDevice>::Create(*mpTbx->GetOutDev(),
-            DeviceFormat::DEFAULT, DeviceFormat::DEFAULT);
-        xRet->SetBackground(mpTbx->GetControlBackground());
-        return xRet;
+        return VclPtr<VirtualDevice>::Create(*mpTbx->GetOutDev());
     }
 
     vcl::ImageType VclToolboxButtonColorUpdater::GetImageSize() const
@@ -170,6 +178,16 @@ namespace svx
         ScopedVclPtr<VirtualDevice> pVirDev(CreateVirtualDevice());
         pVirDev->SetOutputSizePixel(aItemSize);
         maBmpSize = aItemSize;
+
+        std::unique_ptr<GDIMetaFile> xMetaFile;
+        if (RecordVirtualDevice())
+        {
+            xMetaFile.reset(new GDIMetaFile);
+            xMetaFile->SetPrefSize(pVirDev->GetOutputSize());
+            xMetaFile->SetPrefMapMode(pVirDev->GetMapMode());
+            xMetaFile->Record(pVirDev.get());
+            pVirDev->EnableOutput(false);
+        }
 
         if (maBmpSize.Width() == maBmpSize.Height())
             // tdf#84985 align color bar with icon bottom edge; integer arithmetic e.g. 26 - 26/4 <> 26 * 3/4

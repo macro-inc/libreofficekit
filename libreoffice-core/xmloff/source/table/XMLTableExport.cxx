@@ -34,7 +34,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmlprmap.hxx>
@@ -46,6 +46,7 @@
 #include <xmloff/prhdlfac.hxx>
 #include <xmloff/txtprmap.hxx>
 #include "table.hxx"
+#include <xmlprop.hxx>
 
 using namespace ::xmloff::token;
 using namespace ::com::sun::star::uno;
@@ -60,14 +61,14 @@ using namespace ::com::sun::star::style;
 #define CMAP(name,prefix,token,type,context) MAP_(name,prefix,token,type|XML_TYPE_PROP_TABLE_COLUMN,context)
 #define RMAP(name,prefix,token,type,context) MAP_(name,prefix,token,type|XML_TYPE_PROP_TABLE_ROW,context)
 #define CELLMAP(name,prefix,token,type,context) MAP_(name,prefix,token,type|XML_TYPE_PROP_TABLE_CELL,context)
-#define MAP_END { nullptr, 0, XML_EMPTY, 0, 0, SvtSaveOptions::ODFSVER_010, false }
+#define MAP_END { nullptr }
 
 const XMLPropertyMapEntry* getColumnPropertiesMap()
 {
     static const XMLPropertyMapEntry aXMLColumnProperties[] =
     {
-        CMAP( "Width",          XML_NAMESPACE_STYLE,    XML_COLUMN_WIDTH,               XML_TYPE_MEASURE,   0 ),
-        CMAP( "OptimalWidth",   XML_NAMESPACE_STYLE,    XML_USE_OPTIMAL_COLUMN_WIDTH,   XML_TYPE_BOOL, 0 ),
+        CMAP( PROP_Width,          XML_NAMESPACE_STYLE,    XML_COLUMN_WIDTH,               XML_TYPE_MEASURE,   0 ),
+        CMAP( PROP_OptimalWidth,   XML_NAMESPACE_STYLE,    XML_USE_OPTIMAL_COLUMN_WIDTH,   XML_TYPE_BOOL, 0 ),
         MAP_END
     };
 
@@ -78,9 +79,9 @@ const XMLPropertyMapEntry* getRowPropertiesMap()
 {
     static const XMLPropertyMapEntry aXMLRowProperties[] =
     {
-        RMAP( "Height",         XML_NAMESPACE_STYLE, XML_ROW_HEIGHT,                    XML_TYPE_MEASURE,   0 ),
-        RMAP( "MinHeight",      XML_NAMESPACE_STYLE, XML_MIN_ROW_HEIGHT,                XML_TYPE_MEASURE,   0 ),
-        RMAP( "OptimalHeight",  XML_NAMESPACE_STYLE, XML_USE_OPTIMAL_ROW_HEIGHT,        XML_TYPE_BOOL, 0 ),
+        RMAP( PROP_Height,         XML_NAMESPACE_STYLE, XML_ROW_HEIGHT,                    XML_TYPE_MEASURE,   0 ),
+        RMAP( PROP_MinHeight,      XML_NAMESPACE_STYLE, XML_MIN_ROW_HEIGHT,                XML_TYPE_MEASURE,   0 ),
+        RMAP( PROP_OptimalHeight,  XML_NAMESPACE_STYLE, XML_USE_OPTIMAL_ROW_HEIGHT,        XML_TYPE_BOOL, 0 ),
         MAP_END
     };
 
@@ -91,7 +92,19 @@ const XMLPropertyMapEntry* getCellPropertiesMap()
 {
     static const XMLPropertyMapEntry aXMLCellProperties[] =
     {
-        CELLMAP( "RotateAngle",     XML_NAMESPACE_STYLE, XML_ROTATION_ANGLE,         XML_SD_TYPE_CELL_ROTATION_ANGLE,   0),
+        CELLMAP( PROP_RotateAngle,     XML_NAMESPACE_STYLE, XML_ROTATION_ANGLE,         XML_SD_TYPE_CELL_ROTATION_ANGLE,   0),
+        CELLMAP( PROP_TextVerticalAdjust, XML_NAMESPACE_STYLE, XML_VERTICAL_ALIGN,      XML_SD_TYPE_VERTICAL_ALIGN|MID_FLAG_SPECIAL_ITEM_EXPORT, 0),
+        CELLMAP( PROP_BackColor,       XML_NAMESPACE_FO,    XML_BACKGROUND_COLOR,       XML_TYPE_COLORTRANSPARENT|MID_FLAG_SPECIAL_ITEM, 0),
+        CELLMAP( PROP_LeftBorder,      XML_NAMESPACE_FO,    XML_BORDER,                 XML_TYPE_BORDER|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARALLBORDER),
+        CELLMAP( PROP_LeftBorder,      XML_NAMESPACE_FO,    XML_BORDER_LEFT,            XML_TYPE_BORDER|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARLEFTBORDER),
+        CELLMAP( PROP_RightBorder,     XML_NAMESPACE_FO,    XML_BORDER_RIGHT,           XML_TYPE_BORDER|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARRIGHTBORDER),
+        CELLMAP( PROP_TopBorder,       XML_NAMESPACE_FO,    XML_BORDER_TOP,             XML_TYPE_BORDER|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARTOPBORDER),
+        CELLMAP( PROP_BottomBorder,    XML_NAMESPACE_FO,    XML_BORDER_BOTTOM,          XML_TYPE_BORDER|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARBOTTOMBORDER),
+        CELLMAP( PROP_TextLeftDistance, XML_NAMESPACE_FO,   XML_PADDING,                XML_TYPE_MEASURE|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARALLBORDERDISTANCE),
+        CELLMAP( PROP_TextLeftDistance, XML_NAMESPACE_FO,   XML_PADDING_LEFT,           XML_TYPE_MEASURE|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARLEFTBORDERDISTANCE),
+        CELLMAP( PROP_TextRightDistance, XML_NAMESPACE_FO,  XML_PADDING_RIGHT,          XML_TYPE_MEASURE|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARRIGHTBORDERDISTANCE),
+        CELLMAP( PROP_TextUpperDistance, XML_NAMESPACE_FO,  XML_PADDING_TOP,            XML_TYPE_MEASURE|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARTOPBORDERDISTANCE),
+        CELLMAP( PROP_TextLowerDistance, XML_NAMESPACE_FO,  XML_PADDING_BOTTOM,         XML_TYPE_MEASURE|MID_FLAG_SPECIAL_ITEM_EXPORT, CTF_CHARBOTTOMBORDERDISTANCE),
         MAP_END
     };
 
@@ -190,7 +203,7 @@ XMLTableExport::XMLTableExport(SvXMLExport& rExp, const rtl::Reference< SvXMLExp
     {
         mxCellExportPropertySetMapper = xExportPropertyMapper;
         mxCellExportPropertySetMapper->ChainExportMapper(XMLTextParagraphExport::CreateParaExtPropMapper(rExp));
-        mxCellExportPropertySetMapper->ChainExportMapper(new SvXMLExportPropertyMapper(new XMLPropertySetMapper(getCellPropertiesMap(), xFactoryRef, true)));
+        mxCellExportPropertySetMapper->ChainExportMapper(new XMLCellExportPropertyMapper(new XMLPropertySetMapper(getCellPropertiesMap(), xFactoryRef, true)));
     }
 
     mxRowExportPropertySetMapper = new SvXMLExportPropertyMapper( new XMLPropertySetMapper( getRowPropertiesMap(), xFactoryRef, true ) );
@@ -585,14 +598,24 @@ void XMLTableExport::exportTableTemplates()
             SvtSaveOptions::ODFSaneDefaultVersion eVersion = mrExport.getSaneDefaultVersion();
 
             Reference< XStyle > xTableStyle( xTableFamily->getByIndex( nIndex ), UNO_QUERY_THROW );
-            if( !xTableStyle->isInUse() )
+            Reference<XPropertySet> xTableStylePropSet( xTableStyle, UNO_QUERY_THROW );
+            bool bPhysical = false;
+
+            try
+            {
+                xTableStylePropSet->getPropertyValue("IsPhysical") >>= bPhysical;
+            }
+            catch(const Exception&)
+            {
+            }
+
+            if (!xTableStyle->isInUse() && !bPhysical)
                 continue;
 
             const TableStyleElement* pElements;
             if (mbWriter)
             {
                 mrExport.AddAttribute(XML_NAMESPACE_TABLE, XML_NAME, xTableStyle->getName());
-                Reference<XPropertySet> xTableStylePropSet(xTableStyle, UNO_QUERY_THROW);
                 pElements = getWriterSpecificTableStyleAttributes();
                 while(pElements->meElement != XML_TOKEN_END)
                 {
@@ -617,9 +640,9 @@ void XMLTableExport::exportTableTemplates()
                     // tdf#106780 historically this wrong attribute was used
                     // for the name; write it if extended because LO < 5.3 can
                     // read only text:style-name, not the correct table:name
-                    mrExport.AddAttribute(XML_NAMESPACE_TEXT, XML_STYLE_NAME, GetExport().EncodeStyleName( xTableStyle->getName() ) );
+                    mrExport.AddAttribute(XML_NAMESPACE_TEXT, XML_STYLE_NAME, xTableStyle->getName());
                 }
-                mrExport.AddAttribute(XML_NAMESPACE_TABLE, XML_NAME, GetExport().EncodeStyleName(xTableStyle->getName()));
+                mrExport.AddAttribute(XML_NAMESPACE_TABLE, XML_NAME, xTableStyle->getName());
             }
 
             SvXMLElementExport tableTemplate( mrExport, XML_NAMESPACE_TABLE, XML_TABLE_TEMPLATE, true, true );

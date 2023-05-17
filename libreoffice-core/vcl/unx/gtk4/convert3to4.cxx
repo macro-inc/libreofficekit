@@ -15,6 +15,7 @@
 #include <comphelper/processfactory.hxx>
 #include <unx/gtk/gtkdata.hxx>
 #include <vcl/builder.hxx>
+#include <cairo/cairo-gobject.h>
 #include "convert3to4.hxx"
 
 namespace
@@ -164,7 +165,7 @@ MenuEntry ConvertMenu(css::uno::Reference<css::xml::dom::XNode>& xMenuSection,
 
         auto xNextChild = xChild->getNextSibling();
 
-        auto xCurrentMenuSection = xMenuSection;
+        auto xSavedMenuSection = xMenuSection;
 
         if (xChild->getNodeName() == "object")
         {
@@ -187,7 +188,7 @@ MenuEntry ConvertMenu(css::uno::Reference<css::xml::dom::XNode>& xMenuSection,
                     = xDoc->createElement("section");
                 xMenuSection->getParentNode()->appendChild(xSection);
                 xMenuSection = xSection;
-                xCurrentMenuSection = xMenuSection;
+                xSavedMenuSection = xMenuSection;
             }
             else if (sClass == "GtkMenu")
             {
@@ -208,7 +209,8 @@ MenuEntry ConvertMenu(css::uno::Reference<css::xml::dom::XNode>& xMenuSection,
                     = xDoc->createElement("section");
                 xSubMenu->appendChild(xSection);
 
-                xMenuSection = xSubMenu;
+                xMenuSection = xSection;
+                xSavedMenuSection = xMenuSection;
             }
         }
 
@@ -223,7 +225,7 @@ MenuEntry ConvertMenu(css::uno::Reference<css::xml::dom::XNode>& xMenuSection,
 
         if (xChild->getNodeName() == "object")
         {
-            xMenuSection = xCurrentMenuSection;
+            xMenuSection = xSavedMenuSection;
 
             auto xDoc = xChild->getOwnerDocument();
 
@@ -451,6 +453,13 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
                 xPropertyLabel = xChild;
             }
 
+            if (sName == "modal")
+            {
+                OUString sParentClass = GetParentObjectType(xChild);
+                if (sParentClass == "GtkPopover")
+                    xName->setNodeValue("autohide");
+            }
+
             if (sName == "visible")
                 bHasVisible = true;
 
@@ -538,17 +547,16 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
                     xRemoveList.push_back(xChild);
             }
 
+            if (sName == "has-frame")
+            {
+                if (GetParentObjectType(xChild) == "GtkSpinButton")
+                    xRemoveList.push_back(xChild);
+            }
+
             if (sName == "toolbar-style")
             {
                 // is there an equivalent for this ?
                 xRemoveList.push_back(xChild);
-            }
-
-            if (sName == "homogeneous")
-            {
-                // e.g. the buttonbox in xml filter dialog
-                if (GetParentObjectType(xChild) == "GtkButtonBox")
-                    xRemoveList.push_back(xChild);
             }
 
             if (sName == "shadow-type")
@@ -625,6 +633,7 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
             {
                 if (GetParentObjectType(xChild) == "GtkLinkButton"
                     || GetParentObjectType(xChild) == "GtkMenuButton"
+                    || GetParentObjectType(xChild) == "GtkToggleButton"
                     || GetParentObjectType(xChild) == "GtkButton")
                 {
                     // TODO expand into a GtkLabel child with alignment on that instead
@@ -749,6 +758,15 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
             {
                 xRemoveList.push_back(xChild);
             }
+
+            if (sName == "AtkObject::accessible-description")
+                xName->setNodeValue("description");
+
+            if (sName == "AtkObject::accessible-name")
+                xName->setNodeValue("label");
+
+            if (sName == "AtkObject::accessible-role")
+                xName->setNodeValue("accessible-role");
         }
         else if (xChild->getNodeName() == "child")
         {
@@ -766,7 +784,6 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
                 }
                 else if (sName == "accessible")
                 {
-                    // TODO what's the replacement for this going to be?
                     xRemoveList.push_back(xChild);
                 }
             }
@@ -874,15 +891,48 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
 
             xRemoveList.push_back(xChild);
         }
-        else if (xChild->getNodeName() == "accessibility")
-        {
-            // TODO <relation type="labelled-by" target="pagenumcb"/> -> <relation name="labelled-by">pagenumcb</relation>
-            xRemoveList.push_back(xChild);
-        }
         else if (xChild->getNodeName() == "accelerator")
         {
             // TODO is anything like this supported anymore in .ui files
             xRemoveList.push_back(xChild);
+        }
+        else if (xChild->getNodeName() == "relation")
+        {
+            auto xDoc = xChild->getOwnerDocument();
+
+            css::uno::Reference<css::xml::dom::XNamedNodeMap> xMap = xChild->getAttributes();
+            css::uno::Reference<css::xml::dom::XNode> xType = xMap->getNamedItem("type");
+            if (xType->getNodeValue() == "label-for")
+            {
+                // there will be a matching labelled-by which should be sufficient in the gtk4 world
+                xRemoveList.push_back(xChild);
+            }
+            if (xType->getNodeValue() == "controlled-by")
+            {
+                // there will be a matching controller-for converted to -> controls
+                // which should be sufficient in the gtk4 world
+                xRemoveList.push_back(xChild);
+            }
+            else
+            {
+                css::uno::Reference<css::xml::dom::XNode> xTarget = xMap->getNamedItem("target");
+
+                css::uno::Reference<css::xml::dom::XText> xValue
+                    = xDoc->createTextNode(xTarget->getNodeValue());
+                xChild->appendChild(xValue);
+
+                css::uno::Reference<css::xml::dom::XAttr> xName = xDoc->createAttribute("name");
+                if (xType->getNodeValue() == "controller-for")
+                    xName->setValue("controls");
+                else
+                    xName->setValue(xType->getNodeValue());
+
+                css::uno::Reference<css::xml::dom::XElement> xElem(xChild,
+                                                                   css::uno::UNO_QUERY_THROW);
+                xElem->setAttributeNode(xName);
+                xElem->removeAttribute("type");
+                xElem->removeAttribute("target");
+            }
         }
 
         auto xNextChild = xChild->getNextSibling();
@@ -928,6 +978,7 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
 
                 // <property name="menu-model">
                 xChild->appendChild(CreateProperty(xDoc, "menu-model", sId));
+                xChild->appendChild(CreateProperty(xDoc, "has-arrow", "False"));
                 xChild->appendChild(CreateProperty(xDoc, "visible", "False"));
             }
         }
@@ -988,11 +1039,11 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
                     || sClass == "GtkFrame" || sClass == "GtkGrid" || sClass == "GtkImage"
                     || sClass == "GtkLabel" || sClass == "GtkMenuButton" || sClass == "GtkNotebook"
                     || sClass == "GtkOverlay" || sClass == "GtkPaned" || sClass == "GtkProgressBar"
-                    || sClass == "GtkScrolledWindow" || sClass == "GtkSeparator"
-                    || sClass == "GtkSpinButton" || sClass == "GtkSpinner"
-                    || sClass == "GtkTextView" || sClass == "GtkTreeView" || sClass == "GtkViewport"
-                    || sClass == "GtkLinkButton" || sClass == "GtkToggleButton"
-                    || sClass == "GtkButtonBox")
+                    || sClass == "GtkScrolledWindow" || sClass == "GtkScrollbar"
+                    || sClass == "GtkSeparator" || sClass == "GtkSpinButton"
+                    || sClass == "GtkSpinner" || sClass == "GtkTextView" || sClass == "GtkTreeView"
+                    || sClass == "GtkViewport" || sClass == "GtkLinkButton"
+                    || sClass == "GtkToggleButton" || sClass == "GtkButtonBox")
 
                 {
                     auto xVisible = CreateProperty(xDoc, "visible", "False");
@@ -1303,6 +1354,50 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
                 auto xVisible = CreateProperty(xDoc, "visible", "False");
                 insertAsFirstChild(xChild, xVisible);
             }
+            else if (sClass == "AtkObject")
+            {
+                css::uno::Reference<css::xml::dom::XNode> xParentObject = xNode->getParentNode();
+                css::uno::Reference<css::xml::dom::XElement> xAccessibility
+                    = xDoc->createElement("accessibility");
+                xParentObject->insertBefore(xAccessibility, xNode);
+
+                // move the converted old AtkObject:: properties into a new accessibility parent
+                css::uno::Reference<css::xml::dom::XNode> xRole;
+                for (css::uno::Reference<css::xml::dom::XNode> xCurrent = xChild->getFirstChild();
+                     xCurrent.is(); xCurrent = xChild->getFirstChild())
+                {
+                    if (css::uno::Reference<css::xml::dom::XNamedNodeMap> xCurrentMap
+                        = xCurrent->getAttributes())
+                    {
+                        css::uno::Reference<css::xml::dom::XNode> xName
+                            = xCurrentMap->getNamedItem("name");
+                        OUString sName(xName->getNodeValue());
+                        if (sName == "accessible-role")
+                        {
+                            xRole = xCurrent;
+                        }
+                    }
+
+                    xAccessibility->appendChild(xChild->removeChild(xCurrent));
+                }
+
+                if (xRole)
+                {
+                    auto xRoleText = xRole->getFirstChild();
+                    if (xRoleText.is())
+                    {
+                        OUString sText = xRoleText->getNodeValue();
+                        // don't really know what the right solution here should be, but "static" isn't
+                        // a role that exists in gtk4, nothing seems to match exactly, but maybe "alert"
+                        // is a useful place to land for now
+                        if (sText == "static")
+                            xRoleText->setNodeValue("alert");
+                    }
+                    // move out of accessibility section to property section
+                    xParentObject->insertBefore(xRole->getParentNode()->removeChild(xRole),
+                                                xAccessibility);
+                }
+            }
 
             // only create the child box for GtkButton/GtkToggleButton
             if (bChildAlwaysShowImage)
@@ -1316,7 +1411,7 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
                 // for GtkMenuButton if this is a gearmenu with just an icon
                 // then "icon-name" is used for the indicator and there is
                 // expected to be no text. If there is a GtkPicture then treat
-                // this like a GtkButton and presumably its a ToggleMenuButton
+                // this like a GtkButton and presumably it's a ToggleMenuButton
                 // and the relocation of contents happens in the builder
                 if (sClass == "GtkMenuButton")
                 {
@@ -1415,6 +1510,13 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
                 }
             }
         }
+        else if (xChild->getNodeName() == "items")
+        {
+            // gtk4-4.6.7 won't set an active item if the active item
+            // property precedes the list of combobox items so if we
+            // have "items" move them to the start
+            insertAsFirstChild(xNode, xNode->removeChild(xChild));
+        }
 
         xChild = xNextChild;
     }
@@ -1425,24 +1527,19 @@ ConvertResult Convert3To4(const css::uno::Reference<css::xml::dom::XNode>& xNode
     for (auto& xRemove : xRemoveList)
         xNode->removeChild(xRemove);
 
-    // https://gitlab.gnome.org/GNOME/gtk/-/issues/4041 double encode ampersands if use-underline is used
-    if (gtk_check_version(4, 3, 2) != nullptr)
-    {
-        if (xPropertyLabel)
-        {
-            auto xLabelText = xPropertyLabel->getFirstChild();
-            if (xLabelText.is())
-            {
-                OString sText = xLabelText->getNodeValue().toUtf8();
-                gchar* pText = g_markup_escape_text(sText.getStr(), sText.getLength());
-                xLabelText->setNodeValue(OUString(pText, strlen(pText), RTL_TEXTENCODING_UTF8));
-                g_free(pText);
-            }
-        }
-    }
-
     return ConvertResult(bChildCanFocus, bHasVisible, bHasIconSize, bAlwaysShowImage, bUseUnderline,
                          bVertOrientation, bXAlign, eImagePos, xPropertyLabel, xPropertyIconName);
+}
+
+std::once_flag cairo_surface_type_flag;
+
+void ensure_cairo_surface_type()
+{
+    // cairo_gobject_surface_get_type needs to be called at least once for
+    // g_type_from_name to be able to resolve "CairoSurface". In gtk3 there was fallback
+    // mechanism to attempt to resolve such "missing" types which is not in place for
+    // gtk4 so ensure it can be found explicitly
+    std::call_once(cairo_surface_type_flag, []() { cairo_gobject_surface_get_type(); });
 }
 }
 
@@ -1463,7 +1560,7 @@ void builder_add_from_gtk3_file(GtkBuilder* pBuilder, const OUString& rUri)
     css::uno::Reference<css::beans::XPropertySet> xTempFile(css::io::TempFile::create(xContext),
                                                             css::uno::UNO_QUERY_THROW);
     css::uno::Reference<css::io::XStream> xTempStream(xTempFile, css::uno::UNO_QUERY_THROW);
-    xTempFile->setPropertyValue("RemoveFile", css::uno::makeAny(false));
+    xTempFile->setPropertyValue("RemoveFile", css::uno::Any(false));
 
     // serialize it back to xml
     css::uno::Reference<css::xml::sax::XSAXSerializable> xSerializer(xDocument,
@@ -1474,6 +1571,8 @@ void builder_add_from_gtk3_file(GtkBuilder* pBuilder, const OUString& rUri)
     xSerializer->serialize(
         css::uno::Reference<css::xml::sax::XDocumentHandler>(xWriter, css::uno::UNO_QUERY_THROW),
         css::uno::Sequence<css::beans::StringPair>());
+
+    ensure_cairo_surface_type();
 
     // feed it to GtkBuilder
     css::uno::Reference<css::io::XSeekable> xTempSeek(xTempStream, css::uno::UNO_QUERY_THROW);
@@ -1487,7 +1586,7 @@ void builder_add_from_gtk3_file(GtkBuilder* pBuilder, const OUString& rUri)
         if (!nRead)
             break;
         // fprintf(stderr, "text is %s\n", reinterpret_cast<const gchar*>(bytes.getArray()));
-        auto rc = gtk_builder_add_from_string(
+        bool rc = gtk_builder_add_from_string(
             pBuilder, reinterpret_cast<const gchar*>(bytes.getArray()), nRead, &err);
         if (!rc)
         {

@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbalistformat.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include <ooo/vba/word/WdListApplyTo.hpp>
 #include <ooo/vba/word/WdDefaultListBehavior.hpp>
@@ -41,7 +42,7 @@
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaListFormat::SwVbaListFormat( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< text::XTextRange >& xTextRange ) : SwVbaListFormat_BASE( rParent, rContext ), mxTextRange( xTextRange )
+SwVbaListFormat::SwVbaListFormat( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< text::XTextRange >  xTextRange ) : SwVbaListFormat_BASE( rParent, rContext ), mxTextRange(std::move( xTextRange ))
 {
 }
 
@@ -83,16 +84,16 @@ void SAL_CALL SwVbaListFormat::ApplyListTemplate( const css::uno::Reference< wor
         if( isFirstElement )
         {
             bool isNumberingRestart = !bContinuePreviousList;
-            xProps->setPropertyValue("ParaIsNumberingRestart", uno::makeAny( isNumberingRestart ) );
+            xProps->setPropertyValue("ParaIsNumberingRestart", uno::Any( isNumberingRestart ) );
             if( isNumberingRestart )
             {
-                xProps->setPropertyValue("NumberingStartValue", uno::makeAny( sal_Int16(1) ) );
+                xProps->setPropertyValue("NumberingStartValue", uno::Any( sal_Int16(1) ) );
             }
             isFirstElement = false;
         }
         else
         {
-            xProps->setPropertyValue("ParaIsNumberingRestart", uno::makeAny( false ) );
+            xProps->setPropertyValue("ParaIsNumberingRestart", uno::Any( false ) );
         }
         rListTemplate.applyListTemplate( xProps );
     }
@@ -145,13 +146,14 @@ void SAL_CALL SwVbaListFormat::ConvertNumbersToText(  )
     addParagraphsToList(mxTextRange, aParagraphs);
 
     // in reverse order, to get proper label strings
-    for (auto it = aParagraphs.rbegin(); it != aParagraphs.rend(); ++it)
+    for (auto iter = aParagraphs.rbegin(); iter != aParagraphs.rend(); ++iter)
     {
-        if (bool bNumber; ((*it)->getPropertyValue("NumberingIsNumber") >>= bNumber) && bNumber)
+        auto& rPropertySet = *iter;
+        if (bool bNumber; (rPropertySet->getPropertyValue("NumberingIsNumber") >>= bNumber) && bNumber)
         {
-            css::uno::Reference<css::text::XTextRange> xRange(*it, css::uno::UNO_QUERY_THROW);
+            css::uno::Reference<css::text::XTextRange> xRange(rPropertySet, css::uno::UNO_QUERY_THROW);
             OUString sLabelString;
-            (*it)->getPropertyValue("ListLabelString") >>= sLabelString;
+            rPropertySet->getPropertyValue("ListLabelString") >>= sLabelString;
             // sal_Int16 nAdjust = SAL_MAX_INT16; // TODO?
             sal_Int16 nNumberingType = SAL_MAX_INT16; // css::style::NumberingType
             sal_Int16 nPositionAndSpaceMode = SAL_MAX_INT16;
@@ -170,9 +172,9 @@ void SAL_CALL SwVbaListFormat::ConvertNumbersToText(  )
 
             {
                 sal_uInt16 nLevel = SAL_MAX_UINT16;
-                (*it)->getPropertyValue("NumberingLevel") >>= nLevel;
+                rPropertySet->getPropertyValue("NumberingLevel") >>= nLevel;
                 css::uno::Reference<css::container::XIndexAccess> xNumberingRules;
-                (*it)->getPropertyValue("NumberingRules") >>= xNumberingRules;
+                rPropertySet->getPropertyValue("NumberingRules") >>= xNumberingRules;
                 comphelper::SequenceAsHashMap aLevelRule(xNumberingRules->getByIndex(nLevel));
 
                 // See offapi/com/sun/star/text/NumberingLevel.idl
@@ -278,19 +280,18 @@ void SAL_CALL SwVbaListFormat::ConvertNumbersToText(  )
                     // TODO: css::style::NumberingType::BITMAP
                 }
 
-                (*it)->setPropertyValue("ParaLeftMargin", css::uno::Any(nIndentAt));
-                (*it)->setPropertyValue("ParaFirstLineIndent", css::uno::Any(nFirstLineIndent));
+                rPropertySet->setPropertyValue("ParaLeftMargin", css::uno::Any(nIndentAt));
+                rPropertySet->setPropertyValue("ParaFirstLineIndent", css::uno::Any(nFirstLineIndent));
                 if (nLabelFollowedBy == SvxNumberFormat::LabelFollowedBy::LISTTAB)
                 {
                     css::uno::Sequence<css::style::TabStop> stops;
-                    (*it)->getPropertyValue("ParaTabStops") >>= stops;
+                    rPropertySet->getPropertyValue("ParaTabStops") >>= stops;
                     css::style::TabStop tabStop{};
                     tabStop.Position = nListtabStopPosition;
                     tabStop.Alignment = com::sun::star::style::TabAlign::TabAlign_LEFT;
                     tabStop.FillChar = ' ';
-                    (*it)->setPropertyValue(
-                        "ParaTabStops",
-                        css::uno::Any(comphelper::combineSequences({ tabStop }, stops)));
+                    rPropertySet->setPropertyValue("ParaTabStops",
+                                    css::uno::Any(comphelper::combineSequences({ tabStop }, stops)));
                     // FIXME: What if added tap stop is greater than already defined ones?
                 }
             }
@@ -298,9 +299,12 @@ void SAL_CALL SwVbaListFormat::ConvertNumbersToText(  )
             {
                 continue; // for now, keep such lists as is
             }
+
             // In case of higher outline levels, each assignment of empty value just sets level 1
-            while ((*it)->getPropertyValue("NumberingRules") != css::uno::Any())
-                (*it)->setPropertyValue("NumberingRules", css::uno::Any());
+            while (rPropertySet->getPropertyValue("NumberingRules") != css::uno::Any())
+            {
+                rPropertySet->setPropertyValue("NumberingRules", css::uno::Any());
+            }
         }
     }
 }

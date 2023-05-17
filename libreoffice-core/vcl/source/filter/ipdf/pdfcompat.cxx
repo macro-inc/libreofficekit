@@ -9,6 +9,7 @@
 
 #include <pdf/pdfcompat.hxx>
 
+#include <o3tl/string_view.hxx>
 #include <vcl/filter/PDFiumLibrary.hxx>
 #include <sal/log.hxx>
 
@@ -31,8 +32,8 @@ bool isCompatible(SvStream& rInStream, sal_uInt64 nPos, sal_uInt64 nSize)
         || aFirstBytes[3] != 'F' || aFirstBytes[4] != '-')
         return false;
 
-    sal_Int32 nMajor = OString(char(aFirstBytes[5])).toInt32();
-    sal_Int32 nMinor = OString(char(aFirstBytes[7])).toInt32();
+    sal_Int32 nMajor = o3tl::toInt32(std::string_view(reinterpret_cast<char*>(&aFirstBytes[5]), 1));
+    sal_Int32 nMinor = o3tl::toInt32(std::string_view(reinterpret_cast<char*>(&aFirstBytes[7]), 1));
     return !(nMajor > 1 || (nMajor == 1 && nMinor > 6));
 }
 
@@ -98,14 +99,12 @@ BinaryDataContainer createBinaryDataContainer(SvStream& rStream)
 
     const sal_uInt32 nStreamLength = aMemoryStream.TellEnd();
 
-    auto aPdfData = std::make_unique<std::vector<sal_uInt8>>(nStreamLength);
-
     aMemoryStream.Seek(STREAM_SEEK_TO_BEGIN);
-    aMemoryStream.ReadBytes(aPdfData->data(), aPdfData->size());
+    BinaryDataContainer aPdfData(aMemoryStream, nStreamLength);
     if (aMemoryStream.GetError())
         return {};
 
-    return { std::move(aPdfData) };
+    return aPdfData;
 }
 
 } // end vcl::filter::ipdf namespace

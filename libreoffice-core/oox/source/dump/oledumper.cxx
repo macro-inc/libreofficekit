@@ -24,6 +24,7 @@
 #include <oox/dump/oledumper.hxx>
 
 #include <rtl/tencinfo.h>
+#include <o3tl/string_view.hxx>
 #include <oox/ole/vbainputstream.hxx>
 
 #ifdef DBG_UTIL
@@ -1826,14 +1827,14 @@ void VbaContainerStorageObject::implDumpStorage( const StorageRef& rxStrg, const
         OleStorageObject( *this, rxStrg, rSysPath ).dump();
 }
 
-bool VbaContainerStorageObject::isFormStorage( const OUString& rStrgPath ) const
+bool VbaContainerStorageObject::isFormStorage( std::u16string_view rStrgPath ) const
 {
-    if( (rStrgPath.getLength() >= 3) && (rStrgPath[ 0 ] == 'i') )
+    if( (rStrgPath.size() >= 3) && (rStrgPath[ 0 ] == 'i') )
     {
-        OUString aId = rStrgPath.copy( 1 );
-        if( (aId.getLength() == 2) && (aId[ 0 ] == '0') )
-            aId = aId.copy( 1 );
-        sal_Int32 nId = aId.toInt32();
+        std::u16string_view aId = rStrgPath.substr( 1 );
+        if( (aId.size() == 2) && (aId[ 0 ] == '0') )
+            aId = aId.substr( 1 );
+        sal_Int32 nId = o3tl::toInt32(aId);
         if( (nId > 0) && (std::u16string_view(OUString::number( nId )) == aId) )
             for (auto const& siteInfo : maFormData.maSiteInfos)
                 if( siteInfo.mnId == nId )

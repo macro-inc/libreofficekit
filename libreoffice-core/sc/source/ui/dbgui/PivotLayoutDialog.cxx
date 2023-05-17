@@ -22,6 +22,7 @@
 #include <scmod.hxx>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/sheet/DataPilotFieldOrientation.hpp>
@@ -30,8 +31,8 @@
 using namespace css::uno;
 using namespace css::sheet;
 
-ScItemValue::ScItemValue(OUString const & aName, SCCOL nColumn, PivotFunc nFunctionMask) :
-    maName(aName),
+ScItemValue::ScItemValue(OUString aName, SCCOL nColumn, PivotFunc nFunctionMask) :
+    maName(std::move(aName)),
     maFunctionData(nColumn, nFunctionMask),
     mpOriginalItemValue(this)
 {}
@@ -91,6 +92,7 @@ ScPivotLayoutDialog::ScPivotLayoutDialog(
     , mxCheckIdentifyCategories(m_xBuilder->weld_check_button("check-identify-categories"))
     , mxCheckTotalRows(m_xBuilder->weld_check_button("check-total-rows"))
     , mxCheckDrillToDetail(m_xBuilder->weld_check_button("check-drill-to-details"))
+    , mxCheckExpandCollapse(m_xBuilder->weld_check_button("check-show-expand-collapse"))
     , mxSourceRadioNamedRange(m_xBuilder->weld_radio_button("source-radio-named-range"))
     , mxSourceRadioSelection(m_xBuilder->weld_radio_button("source-radio-selection"))
     , mxSourceListBox(m_xBuilder->weld_combo_box("source-list"))
@@ -108,8 +110,6 @@ ScPivotLayoutDialog::ScPivotLayoutDialog(
     , mxSourceLabel(mxSourceFrame->weld_label_widget())
     , mxDestFrame(m_xBuilder->weld_frame("frame1"))
     , mxDestLabel(mxDestFrame->weld_label_widget())
-    , mxOptions(m_xBuilder->weld_expander("options"))
-    , mxMore(m_xBuilder->weld_expander("more"))
 {
     // Source UI
     Link<weld::Toggleable&,void> aLink2 = LINK(this, ScPivotLayoutDialog, ToggleSource);
@@ -169,11 +169,13 @@ ScPivotLayoutDialog::ScPivotLayoutDialog(
     {
         mxCheckAddFilter->set_active(false);
         mxCheckDrillToDetail->set_active(false);
+        mxCheckExpandCollapse->set_active(false);
     }
     else
     {
         mxCheckAddFilter->set_active(pSaveData->GetFilterButton());
         mxCheckDrillToDetail->set_active(pSaveData->GetDrillDown());
+        mxCheckExpandCollapse->set_active(pSaveData->GetExpandCollapse());
     }
 
     mxCheckIgnoreEmptyRows->set_active(maPivotParameters.bIgnoreEmptyRows);
@@ -495,7 +497,7 @@ void ScPivotLayoutDialog::ApplyChanges()
             ScDPObject *pDPObj = nullptr;
             // FIXME: if the new range overlaps with the old one, the table actually doesn't move
             // and shouldn't therefore be deleted
-            if ( ( ( rOldRange != aDestinationRange ) && !rOldRange.In( aDestinationRange ) )
+            if ( ( ( rOldRange != aDestinationRange ) && !rOldRange.Contains( aDestinationRange ) )
                  || bToNewSheet )
             {
                 pDPObj = mrDocument.GetDPAtCursor( maPivotParameters.nCol, maPivotParameters.nRow, maPivotParameters.nTab);
@@ -521,6 +523,7 @@ void ScPivotLayoutDialog::ApplySaveData(ScDPSaveData& rSaveData)
     rSaveData.SetRowGrand(mxCheckTotalRows->get_active());
     rSaveData.SetFilterButton(mxCheckAddFilter->get_active());
     rSaveData.SetDrillDown(mxCheckDrillToDetail->get_active());
+    rSaveData.SetExpandCollapse(mxCheckExpandCollapse->get_active());
 
     Reference<XDimensionsSupplier> xSource = maPivotTableObject.GetSource();
 

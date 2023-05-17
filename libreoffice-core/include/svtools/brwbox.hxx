@@ -37,19 +37,19 @@
 
 class BrowserColumn;
 class BrowserHeader;
-class ScrollBar;
+class ScrollAdaptor;
 class MeasureStatusBar;
 
 namespace svt {
     class BrowseBoxImpl;
 }
 
-namespace utl {
-    class AccessibleStateSetHelper;
-}
-
 namespace vcl {
     class IAccessibleFactory;
+}
+
+namespace weld {
+    class Scrollbar;
 }
 
 #define BROWSER_INVALIDID           SAL_MAX_UINT16
@@ -137,7 +137,6 @@ public:
 };
 
 class BrowseBox;
-class ScrollBarBox;
 class BrowserMouseEvent;
 
 class BrowserDataWin final
@@ -147,7 +146,6 @@ class BrowserDataWin final
 {
 public:
     VclPtr<BrowserHeader> pHeaderBar;     // only for BrowserMode::HEADERBAR_NEW
-    VclPtr<ScrollBarBox>  pCornerWin;     // Window in the corner btw the ScrollBars
     bool            bInDtor;
     AutoTimer       aMouseTimer;    // recalls MouseMove on dragging out
     MouseEvent      aRepeatEvt;     // a MouseEvent to repeat
@@ -272,11 +270,14 @@ public:
 
 private:
     VclPtr<BrowserDataWin> pDataWin;       // window to display data rows
-    VclPtr<ScrollBar>      pVScroll;       // vertical scrollbar
-    VclPtr<ScrollBar>      aHScroll;       // horizontal scrollbar
+    VclPtr<ScrollAdaptor>  pVScroll;       // vertical scrollbar
+    VclPtr<ScrollAdaptor>  aHScroll;       // horizontal scrollbar
     VclPtr<MeasureStatusBar> aStatusBarHeight; // statusbar, just to measure its height
 
     tools::Long     m_nDataRowHeight; // height of a single data-row
+    tools::Long     m_nCornerHeight; // height of scrollbox corner
+    tools::Long     m_nCornerWidth; // width of scrollbox corner
+    tools::Long     m_nActualCornerWidth; // size of scrollbox corner
     sal_uInt16      nTitleLines;    // number of lines in title row
     sal_uLong       nControlAreaWidth; // width of fixed area beneath hscroll
     bool            bColumnCursor;  // single columns and fields selectable
@@ -363,7 +364,8 @@ private:
 
     SVT_DLLPRIVATE void            ColumnInserted( sal_uInt16 nPos );
 
-    DECL_DLLPRIVATE_LINK(    ScrollHdl, ScrollBar*, void );
+    DECL_DLLPRIVATE_LINK(VertScrollHdl, weld::Scrollbar&, void);
+    DECL_DLLPRIVATE_LINK(HorzScrollHdl, weld::Scrollbar&, void);
     DECL_DLLPRIVATE_LINK(    StartDragHdl, HeaderBar*, void );
 
     SVT_DLLPRIVATE tools::Long GetFrozenWidth() const;
@@ -387,6 +389,8 @@ protected:
     ::vcl::IAccessibleFactory&   getAccessibleFactory();
 
 protected:
+    bool                m_bNavigationBar;
+
     sal_uInt16          ColCount() const;
 
     // software plug for database access
@@ -803,13 +807,13 @@ public:
     /** Fills the StateSet with all states (except DEFUNC and SHOWING, done by
         the accessible object), depending on the specified object type. */
     virtual void FillAccessibleStateSet(
-            ::utl::AccessibleStateSetHelper& rStateSet,
+            sal_Int64& rStateSet,
             AccessibleBrowseBoxObjType eObjType ) const override;
 
     /** Fills the StateSet with all states for one cell (except DEFUNC and SHOWING, done by
         the accessible object). */
     virtual void FillAccessibleStateSetForCell(
-            ::utl::AccessibleStateSetHelper& _rStateSet,
+            sal_Int64& _rStateSet,
             sal_Int32 _nRow, sal_uInt16 _nColumn ) const override;
 
     /** Sets focus to current cell of the data table. */

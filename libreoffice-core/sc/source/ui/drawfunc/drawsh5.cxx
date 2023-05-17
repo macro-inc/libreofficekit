@@ -30,8 +30,10 @@
 #include <svx/svdouno.hxx>
 #include <svx/extrusionbar.hxx>
 #include <svx/fontworkbar.hxx>
+#include <svx/svdogrp.hxx>
 #include <sfx2/docfile.hxx>
 #include <osl/diagnose.h>
+#include <svx/diagram/IDiagramHelper.hxx>
 
 #include <com/sun/star/form/FormButtonType.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -44,7 +46,6 @@
 #include <docsh.hxx>
 #include <undotab.hxx>
 #include <drwlayer.hxx>
-#include <userdat.hxx>
 #include <drtxtob.hxx>
 #include <memory>
 
@@ -272,6 +273,40 @@ void ScDrawShell::ExecDrawFunc( SfxRequest& rReq )
             pView->LeaveOneGroup();
             break;
 
+        case SID_REGENERATE_DIAGRAM:
+        case SID_EDIT_DIAGRAM:
+            {
+                const SdrMarkList& rMarkList = pView->GetMarkedObjectList();
+
+                if (1 == rMarkList.GetMarkCount())
+                {
+                    SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
+
+                    // Support advanced DiagramHelper
+                    if(nullptr != pObj && pObj->isDiagram())
+                    {
+                        if(SID_REGENERATE_DIAGRAM == nSlotId)
+                        {
+                            pView->UnmarkAll();
+                            pObj->getDiagramHelper()->reLayout(*static_cast<SdrObjGroup*>(pObj));
+                            pView->MarkObj(pObj, pView->GetSdrPageView());
+                        }
+                        else // SID_EDIT_DIAGRAM
+                        {
+                            VclAbstractDialogFactory* pFact = VclAbstractDialogFactory::Create();
+                            vcl::Window* pWin = rViewData.GetActiveWin();
+                            ScopedVclPtr<VclAbstractDialog> pDlg = pFact->CreateDiagramDialog(
+                                pWin ? pWin->GetFrameWeld() : nullptr,
+                                *static_cast<SdrObjGroup*>(pObj));
+                            pDlg->Execute();
+                        }
+                    }
+                }
+
+                rReq.Done();
+            }
+            break;
+
         case SID_MIRROR_HORIZONTAL:
         case SID_FLIP_HORIZONTAL:
             pView->MirrorAllMarkedHorizontal();
@@ -490,9 +525,9 @@ void ScDrawShell::ExecDrawFunc( SfxRequest& rReq )
                             if (aName != pSelected->GetName())
                             {
                                 // handle name change
-                                const sal_uInt16 nObjType(pSelected->GetObjIdentifier());
+                                const SdrObjKind nObjType(pSelected->GetObjIdentifier());
 
-                                if (OBJ_GRAF == nObjType && aName.isEmpty())
+                                if (SdrObjKind::Graphic == nObjType && aName.isEmpty())
                                 {
                                     //  graphics objects must have names
                                     //  (all graphics are supposed to be in the navigator)
@@ -507,7 +542,7 @@ void ScDrawShell::ExecDrawFunc( SfxRequest& rReq )
                                 //  An undo action for renaming is missing in svdraw (99363).
                                 //  For OLE objects (which can be identified using the persist name),
                                 //  ScUndoRenameObject can be used until there is a common action for all objects.
-                                if(OBJ_OLE2 == nObjType)
+                                if(SdrObjKind::OLE2 == nObjType)
                                 {
                                     const OUString aPersistName = static_cast<SdrOle2Obj*>(pSelected)->GetPersistName();
 
@@ -616,7 +651,7 @@ IMPL_LINK( ScDrawShell, NameObjectHdl, AbstractSvxObjectNameDialog&, rDialog, bo
     if ( !aName.isEmpty() && pModel )
     {
         SCTAB nDummyTab;
-        if ( pModel->GetNamedObject( aName, 0, nDummyTab ) )
+        if ( pModel->GetNamedObject( aName, SdrObjKind::NONE, nDummyTab ) )
         {
             // existing object found -> name invalid
             return false;

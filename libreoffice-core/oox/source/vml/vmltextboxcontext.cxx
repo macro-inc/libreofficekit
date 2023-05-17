@@ -25,6 +25,8 @@
 #include <oox/token/tokens.hxx>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
+#include <utility>
 
 namespace oox::vml {
 
@@ -33,12 +35,12 @@ using ::oox::core::ContextHandler2Helper;
 using ::oox::core::ContextHandlerRef;
 
 TextPortionContext::TextPortionContext( ContextHandler2Helper const & rParent,
-        TextBox& rTextBox, TextParagraphModel const & rParagraph, const TextFontModel& rParentFont,
+        TextBox& rTextBox, TextParagraphModel aParagraph, TextFontModel  aParentFont,
         sal_Int32 nElement, const AttributeList& rAttribs ) :
     ContextHandler2( rParent ),
     mrTextBox( rTextBox ),
-    maParagraph( rParagraph ),
-    maFont( rParentFont ),
+    maParagraph(std::move( aParagraph )),
+    maFont(std::move( aParentFont )),
     mnInitialPortions( rTextBox.getPortionCount() )
 {
     switch( nElement )
@@ -71,16 +73,16 @@ TextPortionContext::TextPortionContext( ContextHandler2Helper const & rParent,
         break;
         case OOX_TOKEN(dml, blip):
             {
-                OptValue<OUString> oRelId = rAttribs.getString(R_TOKEN(embed));
-                if (oRelId.has())
-                    mrTextBox.mrTypeModel.moGraphicPath = getFragmentPathFromRelId(oRelId.get());
+                std::optional<OUString> oRelId = rAttribs.getString(R_TOKEN(embed));
+                if (oRelId.has_value())
+                    mrTextBox.mrTypeModel.moGraphicPath = getFragmentPathFromRelId(oRelId.value());
             }
         break;
         case VML_TOKEN(imagedata):
             {
-                OptValue<OUString> oRelId = rAttribs.getString(R_TOKEN(id));
-                if (oRelId.has())
-                    mrTextBox.mrTypeModel.moGraphicPath = getFragmentPathFromRelId(oRelId.get());
+                std::optional<OUString> oRelId = rAttribs.getString(R_TOKEN(id));
+                if (oRelId.has_value())
+                    mrTextBox.mrTypeModel.moGraphicPath = getFragmentPathFromRelId(oRelId.value());
             }
         break;
         case XML_span:
@@ -180,50 +182,50 @@ TextBoxContext::TextBoxContext( ContextHandler2Helper const & rParent, TextBox& 
     ContextHandler2( rParent ),
     mrTextBox( rTextBox )
 {
-    if( rAttribs.getString( XML_insetmode ).get() != "auto" )
+    if( rAttribs.getStringDefaulted( XML_insetmode ) != "auto" )
     {
-        OUString inset = rAttribs.getString( XML_inset ).get();
-        OUString value;
-        OUString remainingStr;
+        OUString inset = rAttribs.getStringDefaulted( XML_inset );
+        std::u16string_view value;
+        std::u16string_view remainingStr;
 
         ConversionHelper::separatePair( value, remainingStr, inset, ',' );
         rTextBox.borderDistanceLeft = ConversionHelper::decodeMeasureToHmm( graphicHelper,
-            value.isEmpty() ? "0.1in" : value, 0, false, false );
+            value.empty() ? u"0.1in" : value, 0, false, false );
 
         inset = remainingStr;
         ConversionHelper::separatePair( value, remainingStr, inset, ',' );
         rTextBox.borderDistanceTop = ConversionHelper::decodeMeasureToHmm( graphicHelper,
-            value.isEmpty() ? "0.05in" : value, 0, false, false );
+            value.empty() ? u"0.05in" : value, 0, false, false );
 
         inset = remainingStr;
         ConversionHelper::separatePair( value, remainingStr, inset, ',' );
         rTextBox.borderDistanceRight = ConversionHelper::decodeMeasureToHmm( graphicHelper,
-            value.isEmpty() ? "0.1in" : value, 0, false, false );
+            value.empty() ? u"0.1in" : value, 0, false, false );
 
         inset = remainingStr;
         ConversionHelper::separatePair( value, remainingStr, inset, ',' );
         rTextBox.borderDistanceBottom = ConversionHelper::decodeMeasureToHmm( graphicHelper,
-            value.isEmpty() ? "0.05in" : value, 0, false, false );
+            value.empty() ? u"0.05in" : value, 0, false, false );
 
         rTextBox.borderDistanceSet = true;
     }
 
-    OUString sStyle = rAttribs.getString( XML_style, OUString() );
+    OUString sStyle = rAttribs.getStringDefaulted( XML_style);
     sal_Int32 nIndex = 0;
     while( nIndex >= 0 )
     {
-        OUString aName, aValue;
-        if( ConversionHelper::separatePair( aName, aValue, sStyle.getToken( 0, ';', nIndex ), ':' ) )
+        std::u16string_view aName, aValue;
+        if( ConversionHelper::separatePair( aName, aValue, o3tl::getToken(sStyle, 0, ';', nIndex ), ':' ) )
         {
-            if( aName == "layout-flow" )      rTextBox.maLayoutFlow = aValue;
-            else if (aName == "mso-fit-shape-to-text")
+            if( aName == u"layout-flow" )      rTextBox.maLayoutFlow = aValue;
+            else if (aName == u"mso-fit-shape-to-text")
                 rTextBox.mrTypeModel.mbAutoHeight = true;
-            else if (aName == "mso-layout-flow-alt")
+            else if (aName == u"mso-layout-flow-alt")
                 rTextBox.mrTypeModel.maLayoutFlowAlt = aValue;
-            else if (aName == "mso-next-textbox")
+            else if (aName == u"mso-next-textbox")
                 rTextBox.msNextTextbox = aValue;
             else
-                SAL_WARN("oox", "unhandled style property: " << aName);
+                SAL_WARN("oox", "unhandled style property: " << OUString(aName));
         }
     }
 }

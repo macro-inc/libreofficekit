@@ -10,16 +10,9 @@
 #include <sal/config.h>
 
 #include <string_view>
-
-#include <test/bootstrapfixture.hxx>
+#include <test/unoapixml_test.hxx>
 
 #include <sal/macros.h>
-#include <test/xmltesttools.hxx>
-#include <unotest/macros_test.hxx>
-#include <unotools/mediadescriptor.hxx>
-#include <com/sun/star/frame/XStorable.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
-#include <comphelper/processfactory.hxx>
 #include <unotools/syslocaleoptions.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -49,13 +42,13 @@ bool isValidBitmapId(const OUString& sId)
     return std::regex_match(sId.toUtf8().getStr(), aRegEx);
 }
 
-BitmapChecksum getBitmapChecksumFromId(const OUString& sId)
+BitmapChecksum getBitmapChecksumFromId(std::u16string_view sId)
 {
-    sal_Int32 nStart = sId.indexOf("(") + 1;
-    sal_Int32 nCount = sId.indexOf(")") - nStart;
-    bool bIsValidRange = nStart > 0 && nCount > 0;
+    size_t nStart = sId.find(u"(") + 1;
+    size_t nCount = sId.find(u")") - nStart;
+    bool bIsValidRange = nStart > 0 && nStart != std::u16string_view::npos && nCount > 0;
     CPPUNIT_ASSERT(bIsValidRange);
-    OUString sChecksum = sId.copy( nStart, nCount );
+    OUString sChecksum( sId.substr( nStart, nCount ) );
     return sChecksum.toUInt64();
 }
 
@@ -73,88 +66,18 @@ bool isValidTiledBackgroundId(const OUString& sId)
 
 }
 
-class SdSVGFilterTest : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class SdSVGFilterTest : public UnoApiXmlTest
 {
-    class Resetter
-    {
-    private:
-        std::function<void ()> m_Func;
-
-    public:
-        Resetter(std::function<void ()> const& rFunc)
-            : m_Func(rFunc)
-        {
-        }
-        ~Resetter()
-        {
-            try
-            {
-                m_Func();
-            }
-            catch (...) // has to be reliable
-            {
-                CPPUNIT_FAIL("resetter failed with exception");
-            }
-        }
-    };
-
-    uno::Reference<lang::XComponent> mxComponent;
-    utl::TempFile maTempFile;
-
-protected:
-    void load(std::u16string_view pDir, const char* pName)
-    {
-        return loadURL(m_directories.getURLFromSrc(pDir) + OUString::createFromAscii(pName), pName);
-    }
-
-    void loadURL(OUString const& rURL, const char* pName)
-    {
-        if (mxComponent.is())
-            mxComponent->dispose();
-        // Output name early, so in the case of a hang, the name of the hanging input file is visible.
-        if (pName)
-            std::cout << pName << ",";
-        mxComponent = loadFromDesktop(rURL);
-    }
-
-    void save()
-    {
-        uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-        utl::MediaDescriptor aMediaDescriptor;
-        aMediaDescriptor["FilterName"] <<= OUString("impress_svg_Export");
-        xStorable->storeToURL(maTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-    }
-
 public:
     SdSVGFilterTest()
+        : UnoApiXmlTest("/sd/qa/unit/data/odp/")
     {
-        maTempFile.EnableKillingFile();
-    }
-
-    virtual void setUp() override
-    {
-        test::BootstrapFixture::setUp();
-
-        mxDesktop.set(css::frame::Desktop::create(comphelper::getComponentContext(getMultiServiceFactory())));
-    }
-
-    virtual void tearDown() override
-    {
-        if (mxComponent.is())
-            mxComponent->dispose();
-
-        test::BootstrapFixture::tearDown();
-    }
-
-    void executeExport(const char* pName)
-    {
-        load( u"/sd/qa/unit/data/odp/", pName );
-        save();
     }
 
     void testSVGExportTextDecorations()
     {
-        executeExport( "svg-export-text-decorations.odp" );
+        loadFromURL(u"svg-export-text-decorations.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);
@@ -176,7 +99,8 @@ public:
 
     void testSVGExportJavascriptURL()
     {
-        executeExport("textbox-link-javascript.odp");
+        loadFromURL(u"textbox-link-javascript.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);
@@ -190,7 +114,8 @@ public:
 
     void testSVGExportSlideCustomBackground()
     {
-        executeExport("slide-custom-background.odp");
+        loadFromURL(u"slide-custom-background.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);
@@ -200,7 +125,8 @@ public:
 
     void testSVGExportTextFieldsInMasterPage()
     {
-        executeExport("text-fields.odp");
+        loadFromURL(u"text-fields.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);
@@ -223,7 +149,8 @@ public:
 
     void testSVGExportEmbeddedVideo()
     {
-        executeExport("slide-video-thumbnail.odp");
+        loadFromURL(u"slide-video-thumbnail.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);
@@ -253,7 +180,8 @@ public:
 
     void testSVGExportSlideBitmapBackground()
     {
-        executeExport("slide-bitmap-background.odp");
+        loadFromURL(u"slide-bitmap-background.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);
@@ -281,7 +209,8 @@ public:
 
     void testSVGExportSlideTileBitmapBackground()
     {
-        executeExport("slide-tile-background.odp");
+        loadFromURL(u"slide-tile-background.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);
@@ -345,7 +274,8 @@ public:
         aSettings.SetLanguageTag(aLangISO, true);
         Application::SetSettings(aSettings);
 
-        executeExport("text-fields.odp");
+        loadFromURL(u"text-fields.odp");
+        save("impress_svg_Export");
 
         xmlDocUniquePtr svgDoc = parseXml(maTempFile);
         CPPUNIT_ASSERT(svgDoc);

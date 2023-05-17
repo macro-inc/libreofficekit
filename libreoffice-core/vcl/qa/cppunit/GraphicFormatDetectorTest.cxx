@@ -19,6 +19,7 @@
 #include <graphic/DetectorTools.hxx>
 
 #include <tools/stream.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace css;
 
@@ -34,6 +35,7 @@ class GraphicFormatDetectorTest : public test::BootstrapFixtureBase
     void testDetectMET();
     void testDetectBMP();
     void testDetectWMF();
+    void testDetectWMZ();
     void testDetectPCX();
     void testDetectJPG();
     void testDetectPNG();
@@ -48,6 +50,8 @@ class GraphicFormatDetectorTest : public test::BootstrapFixtureBase
     void testDetectPDF();
     void testDetectEPS();
     void testDetectWEBP();
+    void testDetectEMF();
+    void testDetectEMZ();
     void testMatchArray();
     void testCheckArrayForMatchingStrings();
 
@@ -55,6 +59,7 @@ class GraphicFormatDetectorTest : public test::BootstrapFixtureBase
     CPPUNIT_TEST(testDetectMET);
     CPPUNIT_TEST(testDetectBMP);
     CPPUNIT_TEST(testDetectWMF);
+    CPPUNIT_TEST(testDetectWMZ);
     CPPUNIT_TEST(testDetectPCX);
     CPPUNIT_TEST(testDetectJPG);
     CPPUNIT_TEST(testDetectPNG);
@@ -69,6 +74,8 @@ class GraphicFormatDetectorTest : public test::BootstrapFixtureBase
     CPPUNIT_TEST(testDetectPDF);
     CPPUNIT_TEST(testDetectEPS);
     CPPUNIT_TEST(testDetectWEBP);
+    CPPUNIT_TEST(testDetectEMF);
+    CPPUNIT_TEST(testDetectEMZ);
     CPPUNIT_TEST(testMatchArray);
     CPPUNIT_TEST(testCheckArrayForMatchingStrings);
     CPPUNIT_TEST_SUITE_END();
@@ -110,13 +117,28 @@ void GraphicFormatDetectorTest::testDetectWMF()
     vcl::GraphicFormatDetector aDetector(aFileStream, "WMF");
 
     CPPUNIT_ASSERT(aDetector.detect());
-    CPPUNIT_ASSERT(aDetector.checkWMForEMF());
+    CPPUNIT_ASSERT(aDetector.checkWMF());
 
     aFileStream.Seek(aDetector.mnStreamPosition);
 
     OUString rFormatExtension;
     CPPUNIT_ASSERT(vcl::peekGraphicFormat(aFileStream, rFormatExtension, false));
     CPPUNIT_ASSERT_EQUAL(OUString("WMF"), rFormatExtension);
+}
+
+void GraphicFormatDetectorTest::testDetectWMZ()
+{
+    SvFileStream aFileStream(getFullUrl(u"TypeDetectionExample.wmz"), StreamMode::READ);
+    vcl::GraphicFormatDetector aDetector(aFileStream, "WMZ");
+
+    CPPUNIT_ASSERT(aDetector.detect());
+    CPPUNIT_ASSERT(aDetector.checkWMF());
+
+    aFileStream.Seek(aDetector.mnStreamPosition);
+
+    OUString rFormatExtension;
+    CPPUNIT_ASSERT(vcl::peekGraphicFormat(aFileStream, rFormatExtension, false));
+    CPPUNIT_ASSERT_EQUAL(OUString("WMZ"), rFormatExtension);
 }
 
 void GraphicFormatDetectorTest::testDetectPCX()
@@ -272,7 +294,7 @@ void GraphicFormatDetectorTest::testDetectSVG()
 void GraphicFormatDetectorTest::testDetectSVGZ()
 {
     SvFileStream aFileStream(getFullUrl(u"TypeDetectionExample.svgz"), StreamMode::READ);
-    vcl::GraphicFormatDetector aDetector(aFileStream, "SVG");
+    vcl::GraphicFormatDetector aDetector(aFileStream, "SVGZ");
 
     CPPUNIT_ASSERT(aDetector.detect());
     CPPUNIT_ASSERT(aDetector.checkSVG());
@@ -281,7 +303,7 @@ void GraphicFormatDetectorTest::testDetectSVGZ()
 
     OUString rFormatExtension;
     CPPUNIT_ASSERT(vcl::peekGraphicFormat(aFileStream, rFormatExtension, false));
-    CPPUNIT_ASSERT_EQUAL(OUString("SVG"), rFormatExtension);
+    CPPUNIT_ASSERT_EQUAL(OUString("SVGZ"), rFormatExtension);
 }
 
 void GraphicFormatDetectorTest::testDetectPDF()
@@ -329,6 +351,36 @@ void GraphicFormatDetectorTest::testDetectWEBP()
     CPPUNIT_ASSERT_EQUAL(OUString("WEBP"), rFormatExtension);
 }
 
+void GraphicFormatDetectorTest::testDetectEMF()
+{
+    SvFileStream aFileStream(getFullUrl(u"TypeDetectionExample.emf"), StreamMode::READ);
+    vcl::GraphicFormatDetector aDetector(aFileStream, "EMF");
+
+    CPPUNIT_ASSERT(aDetector.detect());
+    CPPUNIT_ASSERT(aDetector.checkEMF());
+
+    aFileStream.Seek(aDetector.mnStreamPosition);
+
+    OUString rFormatExtension;
+    CPPUNIT_ASSERT(vcl::peekGraphicFormat(aFileStream, rFormatExtension, false));
+    CPPUNIT_ASSERT_EQUAL(OUString("EMF"), rFormatExtension);
+}
+
+void GraphicFormatDetectorTest::testDetectEMZ()
+{
+    SvFileStream aFileStream(getFullUrl(u"TypeDetectionExample.emz"), StreamMode::READ);
+    vcl::GraphicFormatDetector aDetector(aFileStream, "EMZ");
+
+    CPPUNIT_ASSERT(aDetector.detect());
+    CPPUNIT_ASSERT(aDetector.checkEMF());
+
+    aFileStream.Seek(aDetector.mnStreamPosition);
+
+    OUString rFormatExtension;
+    CPPUNIT_ASSERT(vcl::peekGraphicFormat(aFileStream, rFormatExtension, false));
+    CPPUNIT_ASSERT_EQUAL(OUString("EMZ"), rFormatExtension);
+}
+
 void GraphicFormatDetectorTest::testMatchArray()
 {
     std::string aString("<?xml version=\"1.0\" standalone=\"no\"?>\n"
@@ -344,24 +396,24 @@ void GraphicFormatDetectorTest::testMatchArray()
     pMatchPointer = vcl::matchArrayWithString(pCompleteStringPointer, nCheckSize, "<?xml");
     CPPUNIT_ASSERT(pMatchPointer != nullptr);
     CPPUNIT_ASSERT_EQUAL(0, int(pMatchPointer - pCompleteStringPointer));
-    CPPUNIT_ASSERT_EQUAL(true, OString(pMatchPointer).startsWith("<?xml"));
+    CPPUNIT_ASSERT_EQUAL(true, o3tl::starts_with(pMatchPointer, "<?xml"));
 
     // Check middle of the input string
     pMatchPointer = vcl::matchArrayWithString(aString.c_str(), nCheckSize, "version");
     CPPUNIT_ASSERT(pMatchPointer != nullptr);
     CPPUNIT_ASSERT_EQUAL(6, int(pMatchPointer - pCompleteStringPointer));
-    CPPUNIT_ASSERT_EQUAL(true, OString(pMatchPointer).startsWith("version"));
+    CPPUNIT_ASSERT_EQUAL(true, o3tl::starts_with(pMatchPointer, "version"));
 
     pMatchPointer = vcl::matchArrayWithString(aString.c_str(), nCheckSize, "<svg");
     CPPUNIT_ASSERT(pMatchPointer != nullptr);
     CPPUNIT_ASSERT_EQUAL(38, int(pMatchPointer - pCompleteStringPointer));
-    CPPUNIT_ASSERT_EQUAL(true, OString(pMatchPointer).startsWith("<svg"));
+    CPPUNIT_ASSERT_EQUAL(true, o3tl::starts_with(pMatchPointer, "<svg"));
 
     // Check end of the input string
     pMatchPointer = vcl::matchArrayWithString(aString.c_str(), nCheckSize, "/svg>");
     CPPUNIT_ASSERT(pMatchPointer != nullptr);
     CPPUNIT_ASSERT_EQUAL(119, int(pMatchPointer - pCompleteStringPointer));
-    CPPUNIT_ASSERT_EQUAL(true, OString(pMatchPointer).startsWith("/svg>"));
+    CPPUNIT_ASSERT_EQUAL(true, o3tl::starts_with(pMatchPointer, "/svg>"));
 
     // Check that non-existing search string
     pMatchPointer = vcl::matchArrayWithString(aString.c_str(), nCheckSize, "none");

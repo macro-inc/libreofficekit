@@ -56,7 +56,7 @@
 #include <swabstdlg.hxx>
 #include <swwrtshitem.hxx>
 
-#include <ndtxt.hxx>
+#include <sfx2/dispatch.hxx>
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::lang;
@@ -134,17 +134,17 @@ std::optional<SfxItemSet> SwModule::CreateItemSet( sal_uInt16 nId )
 
         using namespace ::com::sun::star::i18n::ScriptType;
 
-        Any aLang = aLinguCfg.GetProperty("DefaultLocale");
+        Any aLang = aLinguCfg.GetProperty(u"DefaultLocale");
         aLang >>= aLocale;
         nLang = MsLangId::resolveSystemLanguageByScriptType(LanguageTag::convertToLanguageType( aLocale, false), LATIN);
         aRet.Put(SvxLanguageItem(nLang, SID_ATTR_LANGUAGE));
 
-        aLang = aLinguCfg.GetProperty("DefaultLocale_CJK");
+        aLang = aLinguCfg.GetProperty(u"DefaultLocale_CJK");
         aLang >>= aLocale;
         nLang = MsLangId::resolveSystemLanguageByScriptType(LanguageTag::convertToLanguageType( aLocale, false), ASIAN);
         aRet.Put(SvxLanguageItem(nLang, SID_ATTR_CHAR_CJK_LANGUAGE));
 
-        aLang = aLinguCfg.GetProperty("DefaultLocale_CTL");
+        aLang = aLinguCfg.GetProperty(u"DefaultLocale_CTL");
         aLang >>= aLocale;
         nLang = MsLangId::resolveSystemLanguageByScriptType(LanguageTag::convertToLanguageType( aLocale, false), COMPLEX);
         aRet.Put(SvxLanguageItem(nLang, SID_ATTR_CHAR_CTL_LANGUAGE));
@@ -228,15 +228,12 @@ void SwModule::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet )
     SwViewOption aViewOpt = *GetUsrPref(!bTextDialog);
     SwMasterUsrPref* pPref = bTextDialog ? m_pUsrPref.get() : m_pWebUsrPref.get();
 
-    const SfxPoolItem* pItem;
     SfxBindings *pBindings = pAppView ? &pAppView->GetViewFrame()->GetBindings()
                                  : nullptr;
 
     // Interpret the page Documentview
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_DOCDISP, false, &pItem ))
+    if( const SwDocDisplayItem* pDocDispItem = rSet.GetItemIfSet( FN_PARAM_DOCDISP, false ))
     {
-        const SwDocDisplayItem* pDocDispItem = static_cast<const SwDocDisplayItem*>(pItem);
-
         if(!aViewOpt.IsViewMetaChars())
         {
             if(     (!aViewOpt.IsTab( true ) &&  pDocDispItem->m_bTab) ||
@@ -260,62 +257,69 @@ void SwModule::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet )
     }
 
     // Elements - interpret Item
-    bool bFlag = true;
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_ELEM, false, &pItem ) )
+    bool bReFoldOutlineFolding = false;
+    if( const SwElemItem* pElemItem = rSet.GetItemIfSet( FN_PARAM_ELEM, false ) )
     {
-        const SwElemItem* pElemItem = static_cast<const SwElemItem*>(pItem);
         pElemItem->FillViewOptions( aViewOpt );
 
-        SwWrtShell* pWrtShell = GetActiveWrtShell();
-        bFlag = pWrtShell->GetViewOptions()->IsShowOutlineContentVisibilityButton();
-        bool bTreatSubsChanged = aViewOpt.IsTreatSubOutlineLevelsAsContent()
-                != pWrtShell->GetViewOptions()->IsTreatSubOutlineLevelsAsContent();
-        if (bFlag && (!aViewOpt.IsShowOutlineContentVisibilityButton() || bTreatSubsChanged))
+        // Outline-folding options
+        if (SwWrtShell* pWrtShell = GetActiveWrtShell())
         {
-            // outline mode options have change which require to show all content
-            pWrtShell->MakeAllFoldedOutlineContentVisible();
-
-            if (bTreatSubsChanged)
-                bFlag = false; // folding method changed, set bFlag false to refold below
+            bool bIsOutlineFoldingOn = pWrtShell->GetViewOptions()->IsShowOutlineContentVisibilityButton();
+            bool bTreatSubsChanged = aViewOpt.IsTreatSubOutlineLevelsAsContent()
+                    != pWrtShell->GetViewOptions()->IsTreatSubOutlineLevelsAsContent();
+            if (bIsOutlineFoldingOn &&
+                    (!aViewOpt.IsShowOutlineContentVisibilityButton() || bTreatSubsChanged))
+            {
+                // Outline-folding options have change which require to show all content.
+                // Either outline-folding is being switched off or outline-folding is currently on
+                // and the treat subs option has changed.
+                pWrtShell->GetView().GetViewFrame()->GetDispatcher()->Execute(FN_SHOW_OUTLINECONTENTVISIBILITYBUTTON);
+                if (bTreatSubsChanged)
+                    bReFoldOutlineFolding = true; // folding method changed, set flag to refold below
+            }
+            else
+            {
+                // Refold needs to be done when outline-folding is being turned on or off
+                bReFoldOutlineFolding =
+                        pWrtShell->GetViewOptions()->IsShowOutlineContentVisibilityButton() !=
+                        aViewOpt.IsShowOutlineContentVisibilityButton();
+            }
         }
     }
 
-    if( SfxItemState::SET == rSet.GetItemState(SID_ATTR_METRIC, false, &pItem ) )
+    if( const SfxUInt16Item* pMetricItem = rSet.GetItemIfSet(SID_ATTR_METRIC, false ) )
     {
         SfxGetpApp()->SetOptions(rSet);
-        PutItem(*pItem);
-        const SfxUInt16Item* pMetricItem = static_cast<const SfxUInt16Item*>(pItem);
+        PutItem(*pMetricItem);
         ::SetDfltMetric(static_cast<FieldUnit>(pMetricItem->GetValue()), !bTextDialog);
     }
-    if( SfxItemState::SET == rSet.GetItemState(SID_ATTR_APPLYCHARUNIT,
-                                                    false, &pItem ) )
+    if( const SfxBoolItem* pCharItem = rSet.GetItemIfSet(SID_ATTR_APPLYCHARUNIT,
+                                                    false ) )
     {
         SfxGetpApp()->SetOptions(rSet);
-        const SfxBoolItem* pCharItem = static_cast<const SfxBoolItem*>(pItem);
         ::SetApplyCharUnit(pCharItem->GetValue(), !bTextDialog);
     }
 
-    if( SfxItemState::SET == rSet.GetItemState(FN_HSCROLL_METRIC, false, &pItem ) )
+    if( const SfxUInt16Item* pMetricItem = rSet.GetItemIfSet(FN_HSCROLL_METRIC, false ) )
     {
-        const SfxUInt16Item* pMetricItem = static_cast<const SfxUInt16Item*>(pItem);
         FieldUnit eUnit = static_cast<FieldUnit>(pMetricItem->GetValue());
         pPref->SetHScrollMetric(eUnit);
         if(pAppView)
             pAppView->ChangeTabMetric(eUnit);
     }
 
-    if( SfxItemState::SET == rSet.GetItemState(FN_VSCROLL_METRIC, false, &pItem ) )
+    if( const SfxUInt16Item* pMetricItem = rSet.GetItemIfSet(FN_VSCROLL_METRIC, false ) )
     {
-        const SfxUInt16Item* pMetricItem = static_cast<const SfxUInt16Item*>(pItem);
         FieldUnit eUnit = static_cast<FieldUnit>(pMetricItem->GetValue());
         pPref->SetVScrollMetric(eUnit);
         if(pAppView)
             pAppView->ChangeVRulerMetric(eUnit);
     }
 
-    if( SfxItemState::SET == rSet.GetItemState(SID_ATTR_DEFTABSTOP, false, &pItem ) )
+    if( const SfxUInt16Item* pItem = rSet.GetItemIfSet(SID_ATTR_DEFTABSTOP, false ) )
     {
-        sal_uInt16 nTabDist = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        sal_uInt16 nTabDist = pItem->GetValue();
         pPref->SetDefTabInMm100(convertTwipToMm100(nTabDist));
         if(pAppView)
         {
@@ -333,10 +337,8 @@ void SwModule::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet )
     }
 
     // Interpret page Grid Settings
-    if( SfxItemState::SET == rSet.GetItemState( SID_ATTR_GRID_OPTIONS, false, &pItem ))
+    if( const SvxGridItem* pGridItem = rSet.GetItemIfSet( SID_ATTR_GRID_OPTIONS, false ))
     {
-        const SvxGridItem* pGridItem = static_cast<const SvxGridItem*>(pItem);
-
         aViewOpt.SetSnap( pGridItem->GetUseGridSnap() );
         aViewOpt.SetSynchronize(pGridItem->GetSynchronize());
         if( aViewOpt.IsGridVisible() != pGridItem->GetGridVisible() )
@@ -359,20 +361,18 @@ void SwModule::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet )
     }
 
     // Interpret Writer Printer Options
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_ADDPRINTER, false, &pItem ))
+    if( const SwAddPrinterItem* pAddPrinterAttr = rSet.GetItemIfSet( FN_PARAM_ADDPRINTER, false ) )
     {
         SwPrintOptions* pOpt = GetPrtOptions(!bTextDialog);
         if (pOpt)
         {
-            const SwAddPrinterItem* pAddPrinterAttr = static_cast<const SwAddPrinterItem*>(pItem);
             *pOpt = *pAddPrinterAttr;
         }
-
     }
 
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_SHADOWCURSOR, false, &pItem ))
+    if( const SwShadowCursorItem* pItem = rSet.GetItemIfSet( FN_PARAM_SHADOWCURSOR, false ))
     {
-        static_cast<const SwShadowCursorItem*>(pItem)->FillViewOptions( aViewOpt );
+        pItem->FillViewOptions( aViewOpt );
         if(pBindings)
             pBindings->Invalidate(FN_SHADOWCURSOR);
     }
@@ -388,9 +388,9 @@ void SwModule::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet )
             rWrtSh.AlignAllFormulasToBaseline();
     }
 
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_CRSR_IN_PROTECTED, false, &pItem ))
+    if( const SfxBoolItem* pItem = rSet.GetItemIfSet( FN_PARAM_CRSR_IN_PROTECTED, false ))
     {
-        aViewOpt.SetCursorInProtectedArea(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+        aViewOpt.SetCursorInProtectedArea(pItem->GetValue());
     }
 
     // set elements for the current view and shell
@@ -400,8 +400,14 @@ void SwModule::ApplyItemSet( sal_uInt16 nId, const SfxItemSet& rSet )
     if (SfxItemState::SET != rSet.GetItemState(FN_PARAM_ELEM, false))
         return;
 
-    if (!bFlag)
-        GetActiveWrtShell()->MakeAllFoldedOutlineContentVisible(false);
+    if (bReFoldOutlineFolding)
+    {
+        if (SwWrtShell* pWrtShell = GetActiveWrtShell())
+        {
+            pWrtShell->GetView().GetViewFrame()->GetDispatcher()->Execute(FN_SHOW_OUTLINECONTENTVISIBILITYBUTTON);
+            pWrtShell->GetView().GetViewFrame()->GetDispatcher()->Execute(FN_SHOW_OUTLINECONTENTVISIBILITYBUTTON);
+        }
+    }
 }
 
 std::unique_ptr<SfxTabPage> SwModule::CreateTabPage( sal_uInt16 nId, weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet )

@@ -56,12 +56,14 @@ protected:
     // Count of chars and spaces on the line
     TextFrameIndex mnLineLength;
     SwTwips mnAscent;      // Maximum ascender
+    SwTwips mnHangingBaseline;
 
     SwLinePortion();
 private:
     PortionType mnWhichPor;       // Who's who?
     bool m_bJoinBorderWithPrev;
     bool m_bJoinBorderWithNext;
+    SwTwips m_nExtraBlankWidth = 0;    // width of spaces after the break
 
     void Truncate_();
 
@@ -82,6 +84,10 @@ public:
     SwTwips PrtWidth() const { return Width(); }
     void AddPrtWidth( const SwTwips nNew ) { Width( Width() + nNew ); }
     void SubPrtWidth( const SwTwips nNew ) { Width( Width() - nNew ); }
+    SwTwips ExtraBlankWidth() const { return m_nExtraBlankWidth; }
+    void ExtraBlankWidth(const SwTwips nNew) { m_nExtraBlankWidth = nNew; }
+    SwTwips GetHangingBaseline() const { return mnHangingBaseline; }
+    void SetHangingBaseline( const SwTwips nNewBaseline ) { mnHangingBaseline = nNewBaseline; }
 
     // Insert methods
     virtual SwLinePortion *Insert( SwLinePortion *pPortion );
@@ -173,7 +179,10 @@ public:
     void SetJoinBorderWithPrev( const bool bJoinPrev ) { m_bJoinBorderWithPrev = bJoinPrev; }
     void SetJoinBorderWithNext( const bool bJoinNext ) { m_bJoinBorderWithNext = bJoinNext; }
 
-    virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
+    virtual void dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                           TextFrameIndex& rOffset) const;
+    void dumpAsXmlAttributes(xmlTextWriterPtr writer, std::u16string_view rText,
+                             TextFrameIndex nOffset) const;
 };
 
 inline SwLinePortion &SwLinePortion::operator=(const SwLinePortion &rPortion)
@@ -181,9 +190,11 @@ inline SwLinePortion &SwLinePortion::operator=(const SwLinePortion &rPortion)
     *static_cast<SwPosSize*>(this) = rPortion;
     mnLineLength = rPortion.mnLineLength;
     mnAscent = rPortion.mnAscent;
+    mnHangingBaseline = rPortion.mnHangingBaseline;
     mnWhichPor = rPortion.mnWhichPor;
     m_bJoinBorderWithPrev = rPortion.m_bJoinBorderWithPrev;
     m_bJoinBorderWithNext = rPortion.m_bJoinBorderWithNext;
+    m_nExtraBlankWidth = rPortion.m_nExtraBlankWidth;
     return *this;
 }
 
@@ -192,9 +203,11 @@ inline SwLinePortion::SwLinePortion(const SwLinePortion &rPortion) :
     mpNextPortion( nullptr ),
     mnLineLength( rPortion.mnLineLength ),
     mnAscent( rPortion.mnAscent ),
+    mnHangingBaseline( rPortion.mnHangingBaseline ),
     mnWhichPor( rPortion.mnWhichPor ),
     m_bJoinBorderWithPrev( rPortion.m_bJoinBorderWithPrev ),
-    m_bJoinBorderWithNext( rPortion.m_bJoinBorderWithNext )
+    m_bJoinBorderWithNext( rPortion.m_bJoinBorderWithNext ),
+    m_nExtraBlankWidth(rPortion.m_nExtraBlankWidth)
 {
 }
 

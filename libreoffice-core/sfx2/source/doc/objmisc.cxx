@@ -20,13 +20,14 @@
 #include <config_features.h>
 
 #include <tools/inetmsg.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svl/eitem.hxx>
 #include <svl/stritem.hxx>
 #include <svl/intitem.hxx>
 #include <svtools/svparser.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <com/sun/star/awt/XTopWindow.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -45,8 +46,6 @@
 #include <com/sun/star/uri/XVndSunStarScriptUrl.hpp>
 #include <com/sun/star/util/XModifiable.hpp>
 
-#include <toolkit/helper/vclunohelper.hxx>
-
 #include <com/sun/star/uno/Reference.h>
 #include <com/sun/star/uno/Any.h>
 #include <com/sun/star/task/ErrorCodeRequest.hpp>
@@ -62,6 +61,7 @@
 
 #include <basic/basmgr.hxx>
 #include <basic/sberrors.hxx>
+#include <utility>
 #include <vcl/weld.hxx>
 #include <basic/sbx.hxx>
 #include <svtools/sfxecode.hxx>
@@ -98,6 +98,7 @@
 #include <workwin.hxx>
 #include <sfx2/sfxdlg.hxx>
 #include <sfx2/infobar.hxx>
+#include <sfx2/sfxbasemodel.hxx>
 #include <openflag.hxx>
 #include "objstor.hxx"
 #include <appopen.hxx>
@@ -508,9 +509,16 @@ bool SfxObjectShell::SwitchToShared( bool bShared, bool bSave )
             {
                 // TODO/LATER: currently the application guards against the reentrance problem
                 SetModified(); // the modified flag has to be set to let the document be stored with the shared flag
-                const SfxPoolItem* pItem = pViewFrame->GetBindings().ExecuteSynchron( HasName() ? SID_SAVEDOC : SID_SAVEASDOC );
-                const SfxBoolItem* pResult = dynamic_cast<const SfxBoolItem*>( pItem  );
-                bResult = ( pResult && pResult->GetValue() );
+                try
+                {
+                    // Do *not* use dispatch mechanism in this place - we don't want others (extensions etc.) to intercept this.
+                    pImpl->pBaseModel->store();
+                    bResult = true;
+                }
+                catch (...)
+                {
+                    bResult = false;
+                }
             }
         }
 
@@ -978,7 +986,7 @@ void SfxObjectShell::CheckEncryption_Impl( const uno::Reference< task::XInteract
         css::task::ErrorCodeRequest aErrorCode;
         aErrorCode.ErrCode = sal_uInt32(ERRCODE_SFX_INCOMPLETE_ENCRYPTION);
 
-        SfxMedium::CallApproveHandler( xHandler, uno::makeAny( aErrorCode ), false );
+        SfxMedium::CallApproveHandler( xHandler, uno::Any( aErrorCode ), false );
         pImpl->m_bIncomplEncrWarnShown = true;
     }
 
@@ -1265,8 +1273,8 @@ void SfxObjectShell::CancelTransfers()
 
 
 AutoReloadTimer_Impl::AutoReloadTimer_Impl(
-    const OUString& rURL, sal_uInt32 nTime, SfxObjectShell* pSh )
-    : Timer("sfx2 AutoReloadTimer_Impl"), aUrl( rURL ), pObjSh( pSh )
+    OUString _aURL, sal_uInt32 nTime, SfxObjectShell* pSh )
+    : Timer("sfx2 AutoReloadTimer_Impl"), aUrl(std::move( _aURL )), pObjSh( pSh )
 {
     SetTimeout( nTime );
 }
@@ -1406,7 +1414,7 @@ ErrCode SfxObjectShell::CallXScript( const Reference< XInterface >& _rxScriptCon
         {
             Reference< provider::XScriptProviderFactory > xScriptProviderFactory =
                 provider::theMasterScriptProviderFactory::get( ::comphelper::getProcessComponentContext() );
-            xScriptProvider.set( xScriptProviderFactory->createScriptProvider( makeAny( _rxScriptContext ) ), UNO_SET_THROW );
+            xScriptProvider.set( xScriptProviderFactory->createScriptProvider( Any( _rxScriptContext ) ), UNO_SET_THROW );
         }
 
         // ry to protect the invocation context's undo manager (if present), just in case the script tampers with it
@@ -1420,7 +1428,7 @@ ErrCode SfxObjectShell::CallXScript( const Reference< XInterface >& _rxScriptCon
             if ( xProps.is() )
             {
                 Sequence< uno::Any > aArgs{ *pCaller };
-                xProps->setPropertyValue("Caller", uno::makeAny( aArgs ) );
+                xProps->setPropertyValue("Caller", uno::Any( aArgs ) );
             }
         }
         aRet = xScript->invoke( aParams, aOutParamIndex, aOutParam );
@@ -1470,8 +1478,8 @@ void SfxHeaderAttributes_Impl::SetAttribute( const SvKeyValue& rKV )
     if( rKV.GetKey().equalsIgnoreAsciiCase("refresh") && !rKV.GetValue().isEmpty() )
     {
         sal_Int32 nIdx{ 0 };
-        const sal_Int32 nTime{ aValue.getToken( 0, ';', nIdx ).toInt32() };
-        const OUString aURL{ comphelper::string::strip(aValue.getToken( 0, ';', nIdx ), ' ') };
+        const sal_Int32 nTime{ o3tl::toInt32(o3tl::getToken(aValue, 0, ';', nIdx )) };
+        const OUString aURL{ comphelper::string::strip(o3tl::getToken(aValue, 0, ';', nIdx ), ' ') };
         uno::Reference<document::XDocumentProperties> xDocProps(
             pDoc->getDocProperties());
         if( aURL.startsWithIgnoreAsciiCase( "url=" ) )
@@ -1834,7 +1842,7 @@ bool SfxObjectShell_Impl::hasTrustedScriptingSignature( bool bAllowUIToAddAuthor
                             aRequest.DocumentSignatureInformation = aInfo;
                             aRequest.DocumentVersion = aVersion;
                             aRequest.Classification = task::InteractionClassification_QUERY;
-                            bResult = SfxMedium::CallApproveHandler( xInteraction, uno::makeAny( aRequest ), true );
+                            bResult = SfxMedium::CallApproveHandler( xInteraction, uno::Any( aRequest ), true );
                         }
                     }
                 }
@@ -1875,8 +1883,7 @@ bool SfxObjectShell::isEditDocLocked() const
         return false;
     if (!officecfg::Office::Common::Misc::AllowEditReadonlyDocs::get())
         return true;
-    comphelper::NamedValueCollection aArgs(xModel->getArgs2( { "LockEditDoc" } ));
-    return aArgs.getOrDefault("LockEditDoc", false);
+    return comphelper::NamedValueCollection::getOrDefault(xModel->getArgs2( { "LockEditDoc" } ), u"LockEditDoc", false);
 }
 
 bool SfxObjectShell::isContentExtractionLocked() const
@@ -1884,8 +1891,7 @@ bool SfxObjectShell::isContentExtractionLocked() const
     Reference<XModel3> xModel = GetModel();
     if (!xModel.is())
         return false;
-    comphelper::NamedValueCollection aArgs(xModel->getArgs2( { "LockContentExtraction" } ));
-    return aArgs.getOrDefault("LockContentExtraction", false);
+    return comphelper::NamedValueCollection::getOrDefault(xModel->getArgs2( { "LockContentExtraction" } ), u"LockContentExtraction", false);
 }
 
 bool SfxObjectShell::isExportLocked() const
@@ -1893,8 +1899,7 @@ bool SfxObjectShell::isExportLocked() const
     Reference<XModel3> xModel = GetModel();
     if (!xModel.is())
         return false;
-    comphelper::NamedValueCollection aArgs(xModel->getArgs2( { "LockExport" } ));
-    return aArgs.getOrDefault("LockExport", false);
+    return comphelper::NamedValueCollection::getOrDefault(xModel->getArgs2( { "LockExport" } ), u"LockExport", false);
 }
 
 bool SfxObjectShell::isPrintLocked() const
@@ -1902,8 +1907,7 @@ bool SfxObjectShell::isPrintLocked() const
     Reference<XModel3> xModel = GetModel();
     if (!xModel.is())
         return false;
-    comphelper::NamedValueCollection aArgs(xModel->getArgs2( { "LockPrint" } ));
-    return aArgs.getOrDefault("LockPrint", false);
+    return comphelper::NamedValueCollection::getOrDefault(xModel->getArgs2( { "LockPrint" } ), u"LockPrint", false);
 }
 
 bool SfxObjectShell::isSaveLocked() const
@@ -1911,8 +1915,7 @@ bool SfxObjectShell::isSaveLocked() const
     Reference<XModel3> xModel = GetModel();
     if (!xModel.is())
         return false;
-    comphelper::NamedValueCollection aArgs(xModel->getArgs2( { "LockSave" } ));
-    return aArgs.getOrDefault("LockSave", false);
+    return comphelper::NamedValueCollection::getOrDefault(xModel->getArgs2( { "LockSave" } ), u"LockSave", false);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

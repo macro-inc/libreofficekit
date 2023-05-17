@@ -70,8 +70,7 @@ public:
     FontWidth           GetWidthType() const;
     TextAlign           GetAlignment() const;
     rtl_TextEncoding    GetCharSet() const;
-
-    bool                IsSymbolFont() const;
+    FontEmphasisMark    GetEmphasisMarkStyle() const;
 
     void                SetFamilyName( const OUString& rFamilyName );
     void                SetStyleName( const OUString& rStyleName );
@@ -83,8 +82,6 @@ public:
     void                SetWidthType( FontWidth );
     void                SetAlignment( TextAlign );
     void                SetCharSet( rtl_TextEncoding );
-
-    void                SetSymbolFlag( bool );
 
     // Device dependent functions
     int                 GetQuality() const;
@@ -132,6 +129,9 @@ public:
     void                SetKerning( FontKerning nKerning );
     FontKerning         GetKerning() const;
     bool                IsKerning() const;
+    void                SetFixKerning(const short nSpacing);
+    short               GetFixKerning() const;
+    bool                IsFixKerning() const;
 
     void                SetOutline( bool bOutline );
     bool                IsOutline() const;
@@ -159,6 +159,10 @@ public:
     bool                operator!=( const Font& rFont ) const
                             { return !(Font::operator==( rFont )); }
     bool                IsSameInstance( const Font& ) const;
+    bool                EqualIgnoreColor( const Font& ) const;
+
+    // Compute value usable as hash.
+    size_t              GetHashValueIgnoreColor() const;
 
     friend VCL_DLLPUBLIC SvStream&  ::ReadFont( SvStream& rIStm, vcl::Font& );
     friend VCL_DLLPUBLIC SvStream&  ::WriteFont( SvStream& rOStm, const vcl::Font& );

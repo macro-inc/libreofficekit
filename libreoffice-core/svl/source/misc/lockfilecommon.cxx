@@ -18,8 +18,6 @@
  */
 
 
-#include <stdio.h>
-
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/io/WrongFormatException.hpp>
 
@@ -28,6 +26,7 @@
 #include <osl/socket.hxx>
 #include <osl/file.hxx>
 #include <o3tl/enumrange.hxx>
+#include <o3tl/sprintf.hxx>
 
 #include <rtl/ustring.hxx>
 #include <rtl/strbuf.hxx>
@@ -41,14 +40,15 @@
 #include <salhelper/linkhelper.hxx>
 
 #include <svl/lockfilecommon.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
 namespace svt {
 
 
-LockFileCommon::LockFileCommon(const OUString& aLockFileURL)
-    : m_aURL(aLockFileURL)
+LockFileCommon::LockFileCommon(OUString aLockFileURL)
+    : m_aURL(std::move(aLockFileURL))
 {
 }
 
@@ -70,10 +70,10 @@ void LockFileCommon::SetURL(const OUString& aURL)
 
 
 OUString LockFileCommon::GenerateOwnLockFileURL(
-    const OUString& aOrigURL, std::u16string_view aPrefix)
+    std::u16string_view aOrigURL, std::u16string_view aPrefix)
 {
     INetURLObject aURL = ResolveLinks(INetURLObject(aOrigURL));
-    aURL.setName(OUStringConcatenation(aPrefix + aURL.GetLastName() + "%23" /*'#'*/));
+    aURL.setName(Concat2View(aPrefix + aURL.GetLastName() + "%23" /*'#'*/));
     return aURL.GetMainURL(INetURLObject::DecodeMechanism::NONE);
 }
 
@@ -163,7 +163,7 @@ OUString LockFileCommon::ParseName( const uno::Sequence< sal_Int8 >& aBuffer, sa
         }
     }
 
-    return OStringToOUString( aResult.makeStringAndClear(), RTL_TEXTENCODING_UTF8 );
+    return OStringToOUString( aResult, RTL_TEXTENCODING_UTF8 );
 }
 
 
@@ -209,7 +209,7 @@ OUString LockFileCommon::GetCurrentLocalTime()
             {
                 char pDateTime[sizeof("65535.65535.-32768 65535:65535")];
                     // reserve enough space for hypothetical max length
-                sprintf( pDateTime, "%02" SAL_PRIuUINT32 ".%02" SAL_PRIuUINT32 ".%4" SAL_PRIdINT32 " %02" SAL_PRIuUINT32 ":%02" SAL_PRIuUINT32, sal_uInt32(aDateTime.Day), sal_uInt32(aDateTime.Month), sal_Int32(aDateTime.Year), sal_uInt32(aDateTime.Hours), sal_uInt32(aDateTime.Minutes) );
+                o3tl::sprintf( pDateTime, "%02" SAL_PRIuUINT32 ".%02" SAL_PRIuUINT32 ".%4" SAL_PRIdINT32 " %02" SAL_PRIuUINT32 ":%02" SAL_PRIuUINT32, sal_uInt32(aDateTime.Day), sal_uInt32(aDateTime.Month), sal_Int32(aDateTime.Year), sal_uInt32(aDateTime.Hours), sal_uInt32(aDateTime.Minutes) );
                 aTime = OUString::createFromAscii( pDateTime );
             }
         }

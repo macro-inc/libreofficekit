@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -155,7 +157,16 @@ void SvxSearchCharSet::DrawChars_Impl(vcl::RenderContext& rRenderContext, int n1
 
     Size aOutputSize(GetOutputSizePixel());
 
+    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+    const Color aWindowTextColor(rStyleSettings.GetFieldTextColor());
+    Color aHighlightColor(rStyleSettings.GetHighlightColor());
+    Color aHighlightTextColor(rStyleSettings.GetHighlightTextColor());
+    Color aFaceColor(rStyleSettings.GetFaceColor());
+    Color aLightColor(rStyleSettings.GetLightColor());
+    Color aShadowColor(rStyleSettings.GetShadowColor());
+
     int i;
+    rRenderContext.SetLineColor(aShadowColor);
     for (i = 1; i < COLUMN_COUNT; ++i)
     {
         rRenderContext.DrawLine(Point(nX * i + m_nXGap, 0),
@@ -166,13 +177,6 @@ void SvxSearchCharSet::DrawChars_Impl(vcl::RenderContext& rRenderContext, int n1
         rRenderContext.DrawLine(Point(0, nY * i + m_nYGap),
                                 Point(aOutputSize.Width(), nY * i + m_nYGap));
     }
-    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
-    const Color aWindowTextColor(rStyleSettings.GetFieldTextColor());
-    Color aHighlightColor(rStyleSettings.GetHighlightColor());
-    Color aHighlightTextColor(rStyleSettings.GetHighlightTextColor());
-    Color aFaceColor(rStyleSettings.GetFaceColor());
-    Color aLightColor(rStyleSettings.GetLightColor());
-    Color aShadowColor(rStyleSettings.GetShadowColor());
 
     int nTextHeight = rRenderContext.GetTextHeight();
     tools::Rectangle aBoundRect;
@@ -303,9 +307,7 @@ void SvxSearchCharSet::RecalculateFont(vcl::RenderContext& rRenderContext)
     nX = aSize.Width() / COLUMN_COUNT;
     nY = aSize.Height() / ROW_COUNT;
 
-    //scrollbar settings -- error
-    int nLastRow = (nCount - 1 + COLUMN_COUNT) / COLUMN_COUNT;
-    mxScrollArea->vadjustment_configure(mxScrollArea->vadjustment_get_value(), 0, nLastRow, 1, ROW_COUNT - 1, ROW_COUNT);
+    UpdateScrollRange();
 
     // rearrange CharSet element in sync with nX- and nY-multiples
     Size aDrawSize(nX * COLUMN_COUNT, nY * ROW_COUNT);
@@ -313,6 +315,13 @@ void SvxSearchCharSet::RecalculateFont(vcl::RenderContext& rRenderContext)
     m_nYGap = (aSize.Height() - aDrawSize.Height()) / 2;
 
     mbRecalculateFont = false;
+}
+
+void SvxSearchCharSet::UpdateScrollRange()
+{
+    //scrollbar settings
+    int nLastRow = (nCount - 1 + COLUMN_COUNT) / COLUMN_COUNT;
+    mxScrollArea->vadjustment_configure(mxScrollArea->vadjustment_get_value(), 0, nLastRow, 1, ROW_COUNT - 1, ROW_COUNT);
 }
 
 void SvxSearchCharSet::SelectIndex(int nNewIndex, bool bFocus)
@@ -394,7 +403,9 @@ svx::SvxShowCharSetItem* SvxSearchCharSet::ImplGetItem( int _nPos )
     ItemsMap::iterator aFind = m_aItems.find(_nPos);
     if ( aFind == m_aItems.end() )
     {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         OSL_ENSURE(m_xAccessible.is(), "Who wants to create a child of my table without a parent?");
+#endif
         auto xItem = std::make_shared<svx::SvxShowCharSetItem>(*this,
             m_xAccessible.get(), sal::static_int_cast< sal_uInt16 >(_nPos));
         aFind = m_aItems.emplace(_nPos, xItem).first;

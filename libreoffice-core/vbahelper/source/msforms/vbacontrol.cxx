@@ -60,6 +60,7 @@
 #include <svx/svdobj.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace ooo::vba;
@@ -125,8 +126,8 @@ ScVbaControlListener::disposing( const lang::EventObject& )
 
 //ScVbaControl
 
-ScVbaControl::ScVbaControl( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< ::uno::XInterface >& xControl,  const css::uno::Reference< css::frame::XModel >& xModel, std::unique_ptr<ov::AbstractGeometryAttributes> pGeomHelper )
-    : ControlImpl_BASE( xParent, xContext ), m_xControl( xControl ), m_xModel( xModel )
+ScVbaControl::ScVbaControl( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, uno::Reference< ::uno::XInterface > xControl, css::uno::Reference< css::frame::XModel > xModel, std::unique_ptr<ov::AbstractGeometryAttributes> pGeomHelper )
+    : ControlImpl_BASE( xParent, xContext ), m_xControl(std::move( xControl )), m_xModel(std::move( xModel ))
 {
     //add listener
     m_xEventListener.set( new ScVbaControlListener( this ) );
@@ -305,7 +306,7 @@ ScVbaControl::getControlSource()
             uno::Reference< beans::XPropertySet > xProps( xBindable->getValueBinding(), uno::UNO_QUERY_THROW );
             table::CellAddress aAddress;
             xProps->getPropertyValue( "BoundCell" ) >>= aAddress;
-            xConvertor->setPropertyValue( "Address" , uno::makeAny( aAddress ) );
+            xConvertor->setPropertyValue( "Address" , uno::Any( aAddress ) );
             xConvertor->getPropertyValue( "XLA1Representation" ) >>= sControlSource;
         }
         catch(const uno::Exception&)
@@ -369,7 +370,7 @@ ScVbaControl::getRowSource()
             uno::Reference< beans::XPropertySet > xProps( xListSink->getListEntrySource(), uno::UNO_QUERY_THROW );
             table::CellRangeAddress aAddress;
             xProps->getPropertyValue( "CellRange" ) >>= aAddress;
-            xConvertor->setPropertyValue( "Address" , uno::makeAny( aAddress ) );
+            xConvertor->setPropertyValue( "Address" , uno::Any( aAddress ) );
             xConvertor->getPropertyValue( "XLA1Representation" ) >>= sRowSource;
         }
         catch(const uno::Exception&)
@@ -397,7 +398,7 @@ ScVbaControl::getName()
 void SAL_CALL
 ScVbaControl::setName( const OUString& _name )
 {
-    m_xProps->setPropertyValue( "Name" , uno::makeAny( _name ) );
+    m_xProps->setPropertyValue( "Name" , uno::Any( _name ) );
     }
 
 OUString SAL_CALL
@@ -411,7 +412,7 @@ ScVbaControl::getControlTipText()
 void SAL_CALL
 ScVbaControl::setControlTipText( const OUString& rsToolTip )
 {
-    m_xProps->setPropertyValue( "HelpText" , uno::makeAny( rsToolTip ) );
+    m_xProps->setPropertyValue( "HelpText" , uno::Any( rsToolTip ) );
 }
 
 OUString SAL_CALL ScVbaControl::getTag()
@@ -465,11 +466,11 @@ PointerStyles const styles[] = {
 static tools::Long lcl_loPointerToMsoPointer( PointerStyle eType )
 {
     tools::Long nRet = msforms::fmMousePointer::fmMousePointerDefault;
-    for ( int i = 0; i < int(SAL_N_ELEMENTS( styles )); ++i )
+    for ( auto const & i: styles )
     {
-        if ( styles[ i ].loPointStyle == eType )
+        if ( i.loPointStyle == eType )
         {
-            nRet = styles[ i ].msoPointerStyle;
+            nRet = i.msoPointerStyle;
             break;
         }
     }
@@ -479,11 +480,11 @@ static tools::Long lcl_loPointerToMsoPointer( PointerStyle eType )
 static PointerStyle lcl_msoPointerToLOPointer( tools::Long msoPointerStyle )
 {
     PointerStyle aPointer( PointerStyle::Arrow );
-    for ( int i = 0; i < int(SAL_N_ELEMENTS( styles )); ++i )
+    for ( auto const & i: styles )
     {
-        if ( styles[ i ].msoPointerStyle == msoPointerStyle )
+        if ( i.msoPointerStyle == msoPointerStyle )
         {
-            aPointer = styles[ i ].loPointStyle;
+            aPointer = i.loPointStyle;
             break;
         }
     }
@@ -509,7 +510,7 @@ void SAL_CALL ScVbaControl::fireEvent( const script::ScriptEvent& rEvt )
     uno::Reference< script::XScriptListener > xScriptListener( xServiceManager->createInstanceWithContext( "ooo.vba.EventListener" , mxContext ), uno::UNO_QUERY_THROW );
 
     uno::Reference< beans::XPropertySet > xProps( xScriptListener, uno::UNO_QUERY_THROW );
-    xProps->setPropertyValue( "Model" , uno::makeAny( m_xModel ) );
+    xProps->setPropertyValue( "Model" , uno::Any( m_xModel ) );
 
     // handling for sheet control
     uno::Reference< msforms::XControl > xThisControl( this );
@@ -715,7 +716,7 @@ void ScVbaControl::setBackColor( sal_Int32 nBackColor )
     {
         nBackColor = nSysCols[ col & 0x0FF];
     }
-    m_xProps->setPropertyValue( "BackgroundColor" , uno::makeAny( XLRGBToOORGB( nBackColor ) ) );
+    m_xProps->setPropertyValue( "BackgroundColor" , uno::Any( XLRGBToOORGB( nBackColor ) ) );
 }
 
 bool ScVbaControl::getAutoSize() const
@@ -746,7 +747,7 @@ bool ScVbaControl::getLocked()
 
 void ScVbaControl::setLocked( bool bLocked )
 {
-    m_xProps->setPropertyValue( "ReadOnly" , uno::makeAny( bLocked ) );
+    m_xProps->setPropertyValue( "ReadOnly" , uno::Any( bLocked ) );
 }
 
 namespace {
@@ -755,7 +756,7 @@ class ControlProviderImpl : public cppu::WeakImplHelper< XControlProvider, css::
 {
     uno::Reference< uno::XComponentContext > m_xCtx;
 public:
-    explicit ControlProviderImpl( const uno::Reference< uno::XComponentContext >& xCtx ) : m_xCtx( xCtx ) {}
+    explicit ControlProviderImpl( uno::Reference< uno::XComponentContext > xCtx ) : m_xCtx(std::move( xCtx )) {}
     virtual uno::Reference< msforms::XControl > SAL_CALL createControl( const uno::Reference< drawing::XControlShape >& xControl, const uno::Reference< frame::XModel >& xDocOwner ) override;
 
     //  XServiceInfo

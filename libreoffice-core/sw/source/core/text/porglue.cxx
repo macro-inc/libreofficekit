@@ -54,7 +54,7 @@ bool SwGluePortion::GetExpText( const SwTextSizeInfo &rInf, OUString &rText ) co
     if( GetLen() && rInf.OnWin() &&
         rInf.GetOpt().IsBlank() && rInf.IsNoSymbol() )
     {
-        OUStringBuffer aBuf;
+        OUStringBuffer aBuf(GetLen().get());
         comphelper::string::padToLength(aBuf, sal_Int32(GetLen()), CH_BULLET);
         rText = aBuf.makeStringAndClear();
         return true;
@@ -69,8 +69,9 @@ void SwGluePortion::Paint( const SwTextPaintInfo &rInf ) const
 
     if( rInf.GetFont()->IsPaintBlank() )
     {
-        OUStringBuffer aBuf;
-        comphelper::string::padToLength(aBuf, GetFixWidth() / sal_Int32(GetLen()), ' ');
+        const sal_Int32 nCount = GetFixWidth() / sal_Int32(GetLen());
+        OUStringBuffer aBuf(nCount);
+        comphelper::string::padToLength(aBuf, nCount, ' ');
         OUString aText(aBuf.makeStringAndClear());
         SwTextPaintInfo aInf( rInf, &aText );
         aInf.DrawText(*this, TextFrameIndex(aText.getLength()), true);
@@ -128,6 +129,18 @@ void SwGluePortion::Join( SwGluePortion *pVictim )
     delete pVictim;
 }
 
+void SwGluePortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                              TextFrameIndex& nOffset) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwGluePortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("fix-width"), BAD_CAST(OString::number(m_nFixWidth).getStr()));
+
+    (void)xmlTextWriterEndElement(pWriter);
+}
+
 /**
  * We're expecting a frame-local SwRect!
  */
@@ -142,6 +155,18 @@ SwFixPortion::SwFixPortion()
        : SwGluePortion(0), m_nFix(0)
 {
     SetWhichPor( PortionType::Fix );
+}
+
+void SwFixPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText, TextFrameIndex& nOffset) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwFixPortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("fix"),
+                                      BAD_CAST(OString::number(m_nFix).getStr()));
+
+    (void)xmlTextWriterEndElement(pWriter);
 }
 
 SwMarginPortion::SwMarginPortion()

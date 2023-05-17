@@ -11,6 +11,7 @@
 #include <svtools/HtmlWriter.hxx>
 #include <tools/stream.hxx>
 #include <sal/log.hxx>
+#include <svtools/htmlout.hxx>
 
 HtmlWriter::HtmlWriter(SvStream& rStream, std::string_view rNamespace) :
     mrStream(rStream),
@@ -52,7 +53,7 @@ void HtmlWriter::start(const OString& aElement)
     }
 
     mrStream.WriteChar('<');
-    mrStream.WriteOString(OStringConcatenation(maNamespace + aElement));
+    mrStream.WriteOString(Concat2View(maNamespace + aElement));
     mbElementOpen = true;
 }
 
@@ -107,7 +108,7 @@ void HtmlWriter::end()
             }
         }
         mrStream.WriteCharPtr("</");
-        mrStream.WriteOString(OStringConcatenation(maNamespace + maElementStack.back()));
+        mrStream.WriteOString(Concat2View(maNamespace + maElementStack.back()));
         mrStream.WriteCharPtr(">");
         if (mbPrettyPrint)
             mrStream.WriteCharPtr("\n");
@@ -127,7 +128,7 @@ void HtmlWriter::writeAttribute(SvStream& rStream, std::string_view aAttribute, 
     rStream.WriteOString(aAttribute);
     rStream.WriteChar('=');
     rStream.WriteChar('"');
-    rStream.WriteOString(aValue);
+    HTMLOutFuncs::Out_String(rStream, OStringToOUString(aValue, RTL_TEXTENCODING_UTF8));
     rStream.WriteChar('"');
 }
 

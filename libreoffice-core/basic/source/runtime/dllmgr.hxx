@@ -20,7 +20,7 @@
 #pragma once
 
 #include <sal/config.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <memory>
 
 class SbxArray;
@@ -33,7 +33,9 @@ public:
 
     SbiDllMgr();
 
+#if defined(_WIN32) && !defined(_ARM64_)
     ~SbiDllMgr();
+#endif
 
     ErrCode Call(
         std::u16string_view function, std::u16string_view library,

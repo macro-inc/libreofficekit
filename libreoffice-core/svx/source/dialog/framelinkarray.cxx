@@ -29,6 +29,7 @@
 #include <svx/sdr/primitive2d/sdrframeborderprimitive2d.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <basegfx/polygon/b2dpolygonclipper.hxx>
+// #include <basegfx/numeric/ftools.hxx>
 
 //#define OPTICAL_CHECK_CLIPRANGE_FOR_MERGED_CELL
 #ifdef OPTICAL_CHECK_CLIPRANGE_FOR_MERGED_CELL
@@ -54,10 +55,10 @@ private:
         const basegfx::B2DRange& rRange ) const;
 
 public:
-    tools::Long                mnAddLeft;
-    tools::Long                mnAddRight;
-    tools::Long                mnAddTop;
-    tools::Long                mnAddBottom;
+    sal_Int32                mnAddLeft;
+    sal_Int32                mnAddRight;
+    sal_Int32                mnAddTop;
+    sal_Int32                mnAddBottom;
 
     SvxRotateMode       meRotMode;
     double              mfOrientation;
@@ -89,9 +90,9 @@ public:
     void                MirrorSelfX();
 
     basegfx::B2DHomMatrix CreateCoordinateSystemSingleCell(
-        const Array& rArray, size_t nCol, size_t nRow ) const;
+        const Array& rArray, sal_Int32 nCol, sal_Int32 nRow ) const;
     basegfx::B2DHomMatrix CreateCoordinateSystemMergedCell(
-        const Array& rArray, size_t nColLeft, size_t nRowTop, size_t nColRight, size_t nRowBottom ) const;
+        const Array& rArray, sal_Int32 nColLeft, sal_Int32 nRowTop, sal_Int32 nColRight, sal_Int32 nRowBottom ) const;
 };
 
 }
@@ -110,27 +111,47 @@ basegfx::B2DHomMatrix Cell::HelperCreateB2DHomMatrixFromB2DRange(
 
     if (IsRotated() && SvxRotateMode::SVX_ROTATE_MODE_STANDARD != meRotMode )
     {
-        // when rotated, adapt values. Get Skew (cos/sin == 1/tan)
-        const double fSkew(aY.getY() * (cos(mfOrientation) / sin(mfOrientation)));
+        // tdf#143377 We need to limit applying Skew to geometry since the closer
+        // we get to 0.0 or PI the more sin(mfOrientation) will get to zero and the
+        // huger the Skew effect will be. For that, use an epsilon-radius of 1/2
+        // degree around the dangerous points 0.0 and PI.
 
-        switch (meRotMode)
+        // Snap to modulo to [0.0 .. 2PI[ to make compare easier
+        const double fSnapped(::basegfx::snapToZeroRange(mfOrientation, M_PI * 2.0));
+
+        // As a compromise, allow up to 1/2 degree
+        static const double fMinAng(M_PI/360.0);
+
+        // Check if Skew makes sense or would be too huge
+        const bool bForbidSkew(
+            fSnapped < fMinAng || // range [0.0 .. fMinAng]
+            fSnapped > (M_PI * 2.0) - fMinAng || // range [PI-fMinAng .. 2PI[
+            fabs(fSnapped - M_PI) < fMinAng); // range [PI-fMinAng .. PI+fMinAng]
+
+        if(!bForbidSkew)
         {
-        case SvxRotateMode::SVX_ROTATE_MODE_TOP:
-            // shear Y-Axis
-            aY.setX(-fSkew);
-            break;
-        case SvxRotateMode::SVX_ROTATE_MODE_CENTER:
-            // shear origin half, Y full
-            aOrigin.setX(aOrigin.getX() + (fSkew * 0.5));
-            aY.setX(-fSkew);
-            break;
-        case SvxRotateMode::SVX_ROTATE_MODE_BOTTOM:
-            // shear origin full, Y full
-            aOrigin.setX(aOrigin.getX() + fSkew);
-            aY.setX(-fSkew);
-            break;
-        default: // SvxRotateMode::SVX_ROTATE_MODE_STANDARD, already excluded above
-            break;
+            // when rotated, adapt values. Get Skew (cos/sin == 1/tan)
+            const double fSkew(aY.getY() * (cos(mfOrientation) / sin(mfOrientation)));
+
+            switch (meRotMode)
+            {
+            case SvxRotateMode::SVX_ROTATE_MODE_TOP:
+                // shear Y-Axis
+                aY.setX(-fSkew);
+                break;
+            case SvxRotateMode::SVX_ROTATE_MODE_CENTER:
+                // shear origin half, Y full
+                aOrigin.setX(aOrigin.getX() + (fSkew * 0.5));
+                aY.setX(-fSkew);
+                break;
+            case SvxRotateMode::SVX_ROTATE_MODE_BOTTOM:
+                // shear origin full, Y full
+                aOrigin.setX(aOrigin.getX() + fSkew);
+                aY.setX(-fSkew);
+                break;
+            default: // SvxRotateMode::SVX_ROTATE_MODE_STANDARD, already excluded above
+                break;
+            }
         }
     }
 
@@ -139,7 +160,7 @@ basegfx::B2DHomMatrix Cell::HelperCreateB2DHomMatrixFromB2DRange(
 }
 
 basegfx::B2DHomMatrix Cell::CreateCoordinateSystemSingleCell(
-    const Array& rArray, size_t nCol, size_t nRow) const
+    const Array& rArray, sal_Int32 nCol, sal_Int32 nRow) const
 {
     const Point aPoint( rArray.GetColPosition( nCol ), rArray.GetRowPosition( nRow ) );
     const Size aSize( rArray.GetColWidth( nCol, nCol ) + 1, rArray.GetRowHeight( nRow, nRow ) + 1 );
@@ -149,7 +170,7 @@ basegfx::B2DHomMatrix Cell::CreateCoordinateSystemSingleCell(
 }
 
 basegfx::B2DHomMatrix Cell::CreateCoordinateSystemMergedCell(
-    const Array& rArray, size_t nColLeft, size_t nRowTop, size_t nColRight, size_t nRowBottom) const
+    const Array& rArray, sal_Int32 nColLeft, sal_Int32 nRowTop, sal_Int32 nColRight, sal_Int32 nRowBottom) const
 {
     basegfx::B2DRange aRange( rArray.GetB2DRange(
         nColLeft, nRowTop, nColRight, nRowBottom ) );
@@ -197,7 +218,7 @@ void Cell::MirrorSelfX()
 }
 
 
-static void lclRecalcCoordVec( std::vector<tools::Long>& rCoords, const std::vector<tools::Long>& rSizes )
+static void lclRecalcCoordVec( std::vector<sal_Int32>& rCoords, const std::vector<sal_Int32>& rSizes )
 {
     DBG_ASSERT( rCoords.size() == rSizes.size() + 1, "lclRecalcCoordVec - inconsistent vectors" );
     auto aCIt = rCoords.begin();
@@ -208,11 +229,11 @@ static void lclRecalcCoordVec( std::vector<tools::Long>& rCoords, const std::vec
     }
 }
 
-static void lclSetMergedRange( CellVec& rCells, size_t nWidth, size_t nFirstCol, size_t nFirstRow, size_t nLastCol, size_t nLastRow )
+static void lclSetMergedRange( CellVec& rCells, sal_Int32 nWidth, sal_Int32 nFirstCol, sal_Int32 nFirstRow, sal_Int32 nLastCol, sal_Int32 nLastRow )
 {
-    for( size_t nCol = nFirstCol; nCol <= nLastCol; ++nCol )
+    for( sal_Int32 nCol = nFirstCol; nCol <= nLastCol; ++nCol )
     {
-        for( size_t nRow = nFirstRow; nRow <= nLastRow; ++nRow )
+        for( sal_Int32 nRow = nFirstRow; nRow <= nLastRow; ++nRow )
         {
             Cell& rCell = rCells[ nRow * nWidth + nCol ];
             rCell.mbMergeOrig = false;
@@ -230,58 +251,58 @@ const Cell OBJ_CELL_NONE;
 struct ArrayImpl
 {
     CellVec             maCells;
-    std::vector<tools::Long>   maWidths;
-    std::vector<tools::Long>   maHeights;
-    mutable std::vector<tools::Long>     maXCoords;
-    mutable std::vector<tools::Long>     maYCoords;
-    size_t              mnWidth;
-    size_t              mnHeight;
-    size_t              mnFirstClipCol;
-    size_t              mnFirstClipRow;
-    size_t              mnLastClipCol;
-    size_t              mnLastClipRow;
+    std::vector<sal_Int32>   maWidths;
+    std::vector<sal_Int32>   maHeights;
+    mutable std::vector<sal_Int32>     maXCoords;
+    mutable std::vector<sal_Int32>     maYCoords;
+    sal_Int32           mnWidth;
+    sal_Int32           mnHeight;
+    sal_Int32           mnFirstClipCol;
+    sal_Int32           mnFirstClipRow;
+    sal_Int32           mnLastClipCol;
+    sal_Int32           mnLastClipRow;
     mutable bool        mbXCoordsDirty;
     mutable bool        mbYCoordsDirty;
     bool                mbMayHaveCellRotation;
 
-    explicit            ArrayImpl( size_t nWidth, size_t nHeight );
+    explicit            ArrayImpl( sal_Int32 nWidth, sal_Int32 nHeight );
 
-    bool         IsValidPos( size_t nCol, size_t nRow ) const
+    bool         IsValidPos( sal_Int32 nCol, sal_Int32 nRow ) const
                             { return (nCol < mnWidth) && (nRow < mnHeight); }
-    size_t       GetIndex( size_t nCol, size_t nRow ) const
+    sal_Int32       GetIndex( sal_Int32 nCol, sal_Int32 nRow ) const
                             { return nRow * mnWidth + nCol; }
 
-    const Cell&         GetCell( size_t nCol, size_t nRow ) const;
-    Cell&               GetCellAcc( size_t nCol, size_t nRow );
+    const Cell&         GetCell( sal_Int32 nCol, sal_Int32 nRow ) const;
+    Cell&               GetCellAcc( sal_Int32 nCol, sal_Int32 nRow );
 
-    size_t              GetMergedFirstCol( size_t nCol, size_t nRow ) const;
-    size_t              GetMergedFirstRow( size_t nCol, size_t nRow ) const;
-    size_t              GetMergedLastCol( size_t nCol, size_t nRow ) const;
-    size_t              GetMergedLastRow( size_t nCol, size_t nRow ) const;
+    sal_Int32              GetMergedFirstCol( sal_Int32 nCol, sal_Int32 nRow ) const;
+    sal_Int32              GetMergedFirstRow( sal_Int32 nCol, sal_Int32 nRow ) const;
+    sal_Int32              GetMergedLastCol( sal_Int32 nCol, sal_Int32 nRow ) const;
+    sal_Int32              GetMergedLastRow( sal_Int32 nCol, sal_Int32 nRow ) const;
 
-    const Cell&         GetMergedOriginCell( size_t nCol, size_t nRow ) const;
-    const Cell&         GetMergedLastCell( size_t nCol, size_t nRow ) const;
+    const Cell&         GetMergedOriginCell( sal_Int32 nCol, sal_Int32 nRow ) const;
+    const Cell&         GetMergedLastCell( sal_Int32 nCol, sal_Int32 nRow ) const;
 
-    bool                IsMergedOverlappedLeft( size_t nCol, size_t nRow ) const;
-    bool                IsMergedOverlappedRight( size_t nCol, size_t nRow ) const;
-    bool                IsMergedOverlappedTop( size_t nCol, size_t nRow ) const;
-    bool                IsMergedOverlappedBottom( size_t nCol, size_t nRow ) const;
+    bool                IsMergedOverlappedLeft( sal_Int32 nCol, sal_Int32 nRow ) const;
+    bool                IsMergedOverlappedRight( sal_Int32 nCol, sal_Int32 nRow ) const;
+    bool                IsMergedOverlappedTop( sal_Int32 nCol, sal_Int32 nRow ) const;
+    bool                IsMergedOverlappedBottom( sal_Int32 nCol, sal_Int32 nRow ) const;
 
-    bool                IsInClipRange( size_t nCol, size_t nRow ) const;
-    bool                IsColInClipRange( size_t nCol ) const;
-    bool                IsRowInClipRange( size_t nRow ) const;
+    bool                IsInClipRange( sal_Int32 nCol, sal_Int32 nRow ) const;
+    bool                IsColInClipRange( sal_Int32 nCol ) const;
+    bool                IsRowInClipRange( sal_Int32 nRow ) const;
 
-    bool                OverlapsClipRange( size_t nFirstCol, size_t nFirstRow, size_t nLastCol, size_t nLastRow ) const;
+    bool                OverlapsClipRange( sal_Int32 nFirstCol, sal_Int32 nFirstRow, sal_Int32 nLastCol, sal_Int32 nLastRow ) const;
 
-    size_t       GetMirrorCol( size_t nCol ) const { return mnWidth - nCol - 1; }
+    sal_Int32           GetMirrorCol( sal_Int32 nCol ) const { return mnWidth - nCol - 1; }
 
-    tools::Long                GetColPosition( size_t nCol ) const;
-    tools::Long                GetRowPosition( size_t nRow ) const;
+    sal_Int32           GetColPosition( sal_Int32 nCol ) const;
+    sal_Int32           GetRowPosition( sal_Int32 nRow ) const;
 
     bool                HasCellRotation() const;
 };
 
-ArrayImpl::ArrayImpl( size_t nWidth, size_t nHeight ) :
+ArrayImpl::ArrayImpl( sal_Int32 nWidth, sal_Int32 nHeight ) :
     mnWidth( nWidth ),
     mnHeight( nHeight ),
     mnFirstClipCol( 0 ),
@@ -300,88 +321,88 @@ ArrayImpl::ArrayImpl( size_t nWidth, size_t nHeight ) :
     maYCoords.resize( mnHeight + 1, 0 );
 }
 
-const Cell& ArrayImpl::GetCell( size_t nCol, size_t nRow ) const
+const Cell& ArrayImpl::GetCell( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return IsValidPos( nCol, nRow ) ? maCells[ GetIndex( nCol, nRow ) ] : OBJ_CELL_NONE;
 }
 
-Cell& ArrayImpl::GetCellAcc( size_t nCol, size_t nRow )
+Cell& ArrayImpl::GetCellAcc( sal_Int32 nCol, sal_Int32 nRow )
 {
     static Cell aDummy;
     return IsValidPos( nCol, nRow ) ? maCells[ GetIndex( nCol, nRow ) ] : aDummy;
 }
 
-size_t ArrayImpl::GetMergedFirstCol( size_t nCol, size_t nRow ) const
+sal_Int32 ArrayImpl::GetMergedFirstCol( sal_Int32 nCol, sal_Int32 nRow ) const
 {
-    size_t nFirstCol = nCol;
+    sal_Int32 nFirstCol = nCol;
     while( (nFirstCol > 0) && GetCell( nFirstCol, nRow ).mbOverlapX ) --nFirstCol;
     return nFirstCol;
 }
 
-size_t ArrayImpl::GetMergedFirstRow( size_t nCol, size_t nRow ) const
+sal_Int32 ArrayImpl::GetMergedFirstRow( sal_Int32 nCol, sal_Int32 nRow ) const
 {
-    size_t nFirstRow = nRow;
+    sal_Int32 nFirstRow = nRow;
     while( (nFirstRow > 0) && GetCell( nCol, nFirstRow ).mbOverlapY ) --nFirstRow;
     return nFirstRow;
 }
 
-size_t ArrayImpl::GetMergedLastCol( size_t nCol, size_t nRow ) const
+sal_Int32 ArrayImpl::GetMergedLastCol( sal_Int32 nCol, sal_Int32 nRow ) const
 {
-    size_t nLastCol = nCol + 1;
+    sal_Int32 nLastCol = nCol + 1;
     while( (nLastCol < mnWidth) && GetCell( nLastCol, nRow ).mbOverlapX ) ++nLastCol;
     return nLastCol - 1;
 }
 
-size_t ArrayImpl::GetMergedLastRow( size_t nCol, size_t nRow ) const
+sal_Int32 ArrayImpl::GetMergedLastRow( sal_Int32 nCol, sal_Int32 nRow ) const
 {
-    size_t nLastRow = nRow + 1;
+    sal_Int32 nLastRow = nRow + 1;
     while( (nLastRow < mnHeight) && GetCell( nCol, nLastRow ).mbOverlapY ) ++nLastRow;
     return nLastRow - 1;
 }
 
-const Cell& ArrayImpl::GetMergedOriginCell( size_t nCol, size_t nRow ) const
+const Cell& ArrayImpl::GetMergedOriginCell( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return GetCell( GetMergedFirstCol( nCol, nRow ), GetMergedFirstRow( nCol, nRow ) );
 }
 
-const Cell& ArrayImpl::GetMergedLastCell( size_t nCol, size_t nRow ) const
+const Cell& ArrayImpl::GetMergedLastCell( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return GetCell( GetMergedLastCol( nCol, nRow ), GetMergedLastRow( nCol, nRow ) );
 }
 
-bool ArrayImpl::IsMergedOverlappedLeft( size_t nCol, size_t nRow ) const
+bool ArrayImpl::IsMergedOverlappedLeft( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     const Cell& rCell = GetCell( nCol, nRow );
     return rCell.mbOverlapX || (rCell.mnAddLeft > 0);
 }
 
-bool ArrayImpl::IsMergedOverlappedRight( size_t nCol, size_t nRow ) const
+bool ArrayImpl::IsMergedOverlappedRight( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return GetCell( nCol + 1, nRow ).mbOverlapX || (GetCell( nCol, nRow ).mnAddRight > 0);
 }
 
-bool ArrayImpl::IsMergedOverlappedTop( size_t nCol, size_t nRow ) const
+bool ArrayImpl::IsMergedOverlappedTop( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     const Cell& rCell = GetCell( nCol, nRow );
     return rCell.mbOverlapY || (rCell.mnAddTop > 0);
 }
 
-bool ArrayImpl::IsMergedOverlappedBottom( size_t nCol, size_t nRow ) const
+bool ArrayImpl::IsMergedOverlappedBottom( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return GetCell( nCol, nRow + 1 ).mbOverlapY || (GetCell( nCol, nRow ).mnAddBottom > 0);
 }
 
-bool ArrayImpl::IsColInClipRange( size_t nCol ) const
+bool ArrayImpl::IsColInClipRange( sal_Int32 nCol ) const
 {
     return (mnFirstClipCol <= nCol) && (nCol <= mnLastClipCol);
 }
 
-bool ArrayImpl::IsRowInClipRange( size_t nRow ) const
+bool ArrayImpl::IsRowInClipRange( sal_Int32 nRow ) const
 {
     return (mnFirstClipRow <= nRow) && (nRow <= mnLastClipRow);
 }
 
-bool ArrayImpl::OverlapsClipRange( size_t nFirstCol, size_t nFirstRow, size_t nLastCol, size_t nLastRow ) const
+bool ArrayImpl::OverlapsClipRange( sal_Int32 nFirstCol, sal_Int32 nFirstRow, sal_Int32 nLastCol, sal_Int32 nLastRow ) const
 {
     if(nLastCol < mnFirstClipCol)
         return false;
@@ -398,12 +419,12 @@ bool ArrayImpl::OverlapsClipRange( size_t nFirstCol, size_t nFirstRow, size_t nL
     return true;
 }
 
-bool ArrayImpl::IsInClipRange( size_t nCol, size_t nRow ) const
+bool ArrayImpl::IsInClipRange( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return IsColInClipRange( nCol ) && IsRowInClipRange( nRow );
 }
 
-tools::Long ArrayImpl::GetColPosition( size_t nCol ) const
+sal_Int32 ArrayImpl::GetColPosition( sal_Int32 nCol ) const
 {
     if( mbXCoordsDirty )
     {
@@ -413,7 +434,7 @@ tools::Long ArrayImpl::GetColPosition( size_t nCol ) const
     return maXCoords[ nCol ];
 }
 
-tools::Long ArrayImpl::GetRowPosition( size_t nRow ) const
+sal_Int32 ArrayImpl::GetRowPosition( sal_Int32 nRow ) const
 {
     if( mbYCoordsDirty )
     {
@@ -442,26 +463,26 @@ namespace {
 class MergedCellIterator
 {
 public:
-    explicit            MergedCellIterator( const Array& rArray, size_t nCol, size_t nRow );
+    explicit            MergedCellIterator( const Array& rArray, sal_Int32 nCol, sal_Int32 nRow );
 
     bool         Is() const { return (mnCol <= mnLastCol) && (mnRow <= mnLastRow); }
-    size_t       Col() const { return mnCol; }
-    size_t       Row() const { return mnRow; }
+    sal_Int32       Col() const { return mnCol; }
+    sal_Int32       Row() const { return mnRow; }
 
     MergedCellIterator& operator++();
 
 private:
-    size_t              mnFirstCol;
-    size_t              mnFirstRow;
-    size_t              mnLastCol;
-    size_t              mnLastRow;
-    size_t              mnCol;
-    size_t              mnRow;
+    sal_Int32              mnFirstCol;
+    sal_Int32              mnFirstRow;
+    sal_Int32              mnLastCol;
+    sal_Int32              mnLastRow;
+    sal_Int32              mnCol;
+    sal_Int32              mnRow;
 };
 
 }
 
-MergedCellIterator::MergedCellIterator( const Array& rArray, size_t nCol, size_t nRow )
+MergedCellIterator::MergedCellIterator( const Array& rArray, sal_Int32 nCol, sal_Int32 nRow )
 {
     DBG_ASSERT( rArray.IsMerged( nCol, nRow ), "svx::frame::MergedCellIterator::MergedCellIterator - not in merged range" );
     rArray.GetMergedRange( mnFirstCol, mnFirstRow, mnLastCol, mnLastRow, nCol, nRow );
@@ -505,27 +526,27 @@ Array::~Array()
 }
 
 // array size and column/row indexes
-void Array::Initialize( size_t nWidth, size_t nHeight )
+void Array::Initialize( sal_Int32 nWidth, sal_Int32 nHeight )
 {
     mxImpl.reset( new ArrayImpl( nWidth, nHeight ) );
 }
 
-size_t Array::GetColCount() const
+sal_Int32 Array::GetColCount() const
 {
     return mxImpl->mnWidth;
 }
 
-size_t Array::GetRowCount() const
+sal_Int32 Array::GetRowCount() const
 {
     return mxImpl->mnHeight;
 }
 
-size_t Array::GetCellCount() const
+sal_Int32 Array::GetCellCount() const
 {
     return mxImpl->maCells.size();
 }
 
-size_t Array::GetCellIndex( size_t nCol, size_t nRow, bool bRTL ) const
+sal_Int32 Array::GetCellIndex( sal_Int32 nCol, sal_Int32 nRow, bool bRTL ) const
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "GetCellIndex" );
     if (bRTL)
@@ -534,43 +555,43 @@ size_t Array::GetCellIndex( size_t nCol, size_t nRow, bool bRTL ) const
 }
 
 // cell border styles
-void Array::SetCellStyleLeft( size_t nCol, size_t nRow, const Style& rStyle )
+void Array::SetCellStyleLeft( sal_Int32 nCol, sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetCellStyleLeft" );
     CELLACC( nCol, nRow ).SetStyleLeft(rStyle);
 }
 
-void Array::SetCellStyleRight( size_t nCol, size_t nRow, const Style& rStyle )
+void Array::SetCellStyleRight( sal_Int32 nCol, sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetCellStyleRight" );
     CELLACC( nCol, nRow ).SetStyleRight(rStyle);
 }
 
-void Array::SetCellStyleTop( size_t nCol, size_t nRow, const Style& rStyle )
+void Array::SetCellStyleTop( sal_Int32 nCol, sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetCellStyleTop" );
     CELLACC( nCol, nRow ).SetStyleTop(rStyle);
 }
 
-void Array::SetCellStyleBottom( size_t nCol, size_t nRow, const Style& rStyle )
+void Array::SetCellStyleBottom( sal_Int32 nCol, sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetCellStyleBottom" );
     CELLACC( nCol, nRow ).SetStyleBottom(rStyle);
 }
 
-void Array::SetCellStyleTLBR( size_t nCol, size_t nRow, const Style& rStyle )
+void Array::SetCellStyleTLBR( sal_Int32 nCol, sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetCellStyleTLBR" );
     CELLACC( nCol, nRow ).SetStyleTLBR(rStyle);
 }
 
-void Array::SetCellStyleBLTR( size_t nCol, size_t nRow, const Style& rStyle )
+void Array::SetCellStyleBLTR( sal_Int32 nCol, sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetCellStyleBLTR" );
     CELLACC( nCol, nRow ).SetStyleBLTR(rStyle);
 }
 
-void Array::SetCellStyleDiag( size_t nCol, size_t nRow, const Style& rTLBR, const Style& rBLTR )
+void Array::SetCellStyleDiag( sal_Int32 nCol, sal_Int32 nRow, const Style& rTLBR, const Style& rBLTR )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetCellStyleDiag" );
     Cell& rCell = CELLACC( nCol, nRow );
@@ -578,35 +599,35 @@ void Array::SetCellStyleDiag( size_t nCol, size_t nRow, const Style& rTLBR, cons
     rCell.SetStyleBLTR(rBLTR);
 }
 
-void Array::SetColumnStyleLeft( size_t nCol, const Style& rStyle )
+void Array::SetColumnStyleLeft( sal_Int32 nCol, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COL( nCol, "SetColumnStyleLeft" );
-    for( size_t nRow = 0; nRow < mxImpl->mnHeight; ++nRow )
+    for( sal_Int32 nRow = 0; nRow < mxImpl->mnHeight; ++nRow )
         SetCellStyleLeft( nCol, nRow, rStyle );
 }
 
-void Array::SetColumnStyleRight( size_t nCol, const Style& rStyle )
+void Array::SetColumnStyleRight( sal_Int32 nCol, const Style& rStyle )
 {
     DBG_FRAME_CHECK_COL( nCol, "SetColumnStyleRight" );
-    for( size_t nRow = 0; nRow < mxImpl->mnHeight; ++nRow )
+    for( sal_Int32 nRow = 0; nRow < mxImpl->mnHeight; ++nRow )
         SetCellStyleRight( nCol, nRow, rStyle );
 }
 
-void Array::SetRowStyleTop( size_t nRow, const Style& rStyle )
+void Array::SetRowStyleTop( sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_ROW( nRow, "SetRowStyleTop" );
-    for( size_t nCol = 0; nCol < mxImpl->mnWidth; ++nCol )
+    for( sal_Int32 nCol = 0; nCol < mxImpl->mnWidth; ++nCol )
         SetCellStyleTop( nCol, nRow, rStyle );
 }
 
-void Array::SetRowStyleBottom( size_t nRow, const Style& rStyle )
+void Array::SetRowStyleBottom( sal_Int32 nRow, const Style& rStyle )
 {
     DBG_FRAME_CHECK_ROW( nRow, "SetRowStyleBottom" );
-    for( size_t nCol = 0; nCol < mxImpl->mnWidth; ++nCol )
+    for( sal_Int32 nCol = 0; nCol < mxImpl->mnWidth; ++nCol )
         SetCellStyleBottom( nCol, nRow, rStyle );
 }
 
-void Array::SetCellRotation(size_t nCol, size_t nRow, SvxRotateMode eRotMode, double fOrientation)
+void Array::SetCellRotation(sal_Int32 nCol, sal_Int32 nRow, SvxRotateMode eRotMode, double fOrientation)
 {
     DBG_FRAME_CHECK_COLROW(nCol, nRow, "SetCellRotation");
     Cell& rTarget = CELLACC(nCol, nRow);
@@ -632,7 +653,7 @@ bool Array::HasCellRotation() const
     return mxImpl->HasCellRotation();
 }
 
-const Style& Array::GetCellStyleLeft( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleLeft( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // outside clipping rows or overlapped in merged cells: invisible
     if( !mxImpl->IsRowInClipRange( nRow ) || mxImpl->IsMergedOverlappedLeft( nCol, nRow ) )
@@ -650,7 +671,7 @@ const Style& Array::GetCellStyleLeft( size_t nCol, size_t nRow ) const
     return std::max( ORIGCELL( nCol, nRow ).GetStyleLeft(), ORIGCELL( nCol - 1, nRow ).GetStyleRight() );
 }
 
-const Style& Array::GetCellStyleRight( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleRight( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // outside clipping rows or overlapped in merged cells: invisible
     if( !mxImpl->IsRowInClipRange( nRow ) || mxImpl->IsMergedOverlappedRight( nCol, nRow ) )
@@ -668,7 +689,7 @@ const Style& Array::GetCellStyleRight( size_t nCol, size_t nRow ) const
     return std::max( ORIGCELL( nCol, nRow ).GetStyleRight(), ORIGCELL( nCol + 1, nRow ).GetStyleLeft() );
 }
 
-const Style& Array::GetCellStyleTop( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleTop( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // outside clipping columns or overlapped in merged cells: invisible
     if( !mxImpl->IsColInClipRange( nCol ) || mxImpl->IsMergedOverlappedTop( nCol, nRow ) )
@@ -686,7 +707,7 @@ const Style& Array::GetCellStyleTop( size_t nCol, size_t nRow ) const
     return std::max( ORIGCELL( nCol, nRow ).GetStyleTop(), ORIGCELL( nCol, nRow - 1 ).GetStyleBottom() );
 }
 
-const Style& Array::GetCellStyleBottom( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleBottom( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // outside clipping columns or overlapped in merged cells: invisible
     if( !mxImpl->IsColInClipRange( nCol ) || mxImpl->IsMergedOverlappedBottom( nCol, nRow ) )
@@ -704,74 +725,74 @@ const Style& Array::GetCellStyleBottom( size_t nCol, size_t nRow ) const
     return std::max( ORIGCELL( nCol, nRow ).GetStyleBottom(), ORIGCELL( nCol, nRow + 1 ).GetStyleTop() );
 }
 
-const Style& Array::GetCellStyleTLBR( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleTLBR( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return CELL( nCol, nRow ).GetStyleTLBR();
 }
 
-const Style& Array::GetCellStyleBLTR( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleBLTR( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     return CELL( nCol, nRow ).GetStyleBLTR();
 }
 
-const Style& Array::GetCellStyleTL( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleTL( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // not in clipping range: always invisible
     if( !mxImpl->IsInClipRange( nCol, nRow ) )
         return OBJ_STYLE_NONE;
     // return style only for top-left cell
-    size_t nFirstCol = mxImpl->GetMergedFirstCol( nCol, nRow );
-    size_t nFirstRow = mxImpl->GetMergedFirstRow( nCol, nRow );
+    sal_Int32 nFirstCol = mxImpl->GetMergedFirstCol( nCol, nRow );
+    sal_Int32 nFirstRow = mxImpl->GetMergedFirstRow( nCol, nRow );
     return ((nCol == nFirstCol) && (nRow == nFirstRow)) ?
         CELL( nFirstCol, nFirstRow ).GetStyleTLBR() : OBJ_STYLE_NONE;
 }
 
-const Style& Array::GetCellStyleBR( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleBR( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // not in clipping range: always invisible
     if( !mxImpl->IsInClipRange( nCol, nRow ) )
         return OBJ_STYLE_NONE;
     // return style only for bottom-right cell
-    size_t nLastCol = mxImpl->GetMergedLastCol( nCol, nRow );
-    size_t nLastRow = mxImpl->GetMergedLastRow( nCol, nRow );
+    sal_Int32 nLastCol = mxImpl->GetMergedLastCol( nCol, nRow );
+    sal_Int32 nLastRow = mxImpl->GetMergedLastRow( nCol, nRow );
     return ((nCol == nLastCol) && (nRow == nLastRow)) ?
         CELL( mxImpl->GetMergedFirstCol( nCol, nRow ), mxImpl->GetMergedFirstRow( nCol, nRow ) ).GetStyleTLBR() : OBJ_STYLE_NONE;
 }
 
-const Style& Array::GetCellStyleBL( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleBL( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // not in clipping range: always invisible
     if( !mxImpl->IsInClipRange( nCol, nRow ) )
         return OBJ_STYLE_NONE;
     // return style only for bottom-left cell
-    size_t nFirstCol = mxImpl->GetMergedFirstCol( nCol, nRow );
-    size_t nLastRow = mxImpl->GetMergedLastRow( nCol, nRow );
+    sal_Int32 nFirstCol = mxImpl->GetMergedFirstCol( nCol, nRow );
+    sal_Int32 nLastRow = mxImpl->GetMergedLastRow( nCol, nRow );
     return ((nCol == nFirstCol) && (nRow == nLastRow)) ?
         CELL( nFirstCol, mxImpl->GetMergedFirstRow( nCol, nRow ) ).GetStyleBLTR() : OBJ_STYLE_NONE;
 }
 
-const Style& Array::GetCellStyleTR( size_t nCol, size_t nRow ) const
+const Style& Array::GetCellStyleTR( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     // not in clipping range: always invisible
     if( !mxImpl->IsInClipRange( nCol, nRow ) )
         return OBJ_STYLE_NONE;
     // return style only for top-right cell
-    size_t nFirstRow = mxImpl->GetMergedFirstRow( nCol, nRow );
-    size_t nLastCol = mxImpl->GetMergedLastCol( nCol, nRow );
+    sal_Int32 nFirstRow = mxImpl->GetMergedFirstRow( nCol, nRow );
+    sal_Int32 nLastCol = mxImpl->GetMergedLastCol( nCol, nRow );
     return ((nCol == nLastCol) && (nRow == nFirstRow)) ?
         CELL( mxImpl->GetMergedFirstCol( nCol, nRow ), nFirstRow ).GetStyleBLTR() : OBJ_STYLE_NONE;
 }
 
 // cell merging
-void Array::SetMergedRange( size_t nFirstCol, size_t nFirstRow, size_t nLastCol, size_t nLastRow )
+void Array::SetMergedRange( sal_Int32 nFirstCol, sal_Int32 nFirstRow, sal_Int32 nLastCol, sal_Int32 nLastRow )
 {
     DBG_FRAME_CHECK_COLROW( nFirstCol, nFirstRow, "SetMergedRange" );
     DBG_FRAME_CHECK_COLROW( nLastCol, nLastRow, "SetMergedRange" );
 #if OSL_DEBUG_LEVEL >= 2
     {
         bool bFound = false;
-        for( size_t nCurrCol = nFirstCol; !bFound && (nCurrCol <= nLastCol); ++nCurrCol )
-            for( size_t nCurrRow = nFirstRow; !bFound && (nCurrRow <= nLastRow); ++nCurrRow )
+        for( sal_Int32 nCurrCol = nFirstCol; !bFound && (nCurrCol <= nLastCol); ++nCurrCol )
+            for( sal_Int32 nCurrRow = nFirstRow; !bFound && (nCurrRow <= nLastRow); ++nCurrRow )
                 bFound = CELL( nCurrCol, nCurrRow ).IsMerged();
         DBG_FRAME_CHECK( !bFound, "SetMergedRange", "overlapping merged ranges" );
     }
@@ -780,7 +801,7 @@ void Array::SetMergedRange( size_t nFirstCol, size_t nFirstRow, size_t nLastCol,
         lclSetMergedRange( mxImpl->maCells, mxImpl->mnWidth, nFirstCol, nFirstRow, nLastCol, nLastRow );
 }
 
-void Array::SetAddMergedLeftSize( size_t nCol, size_t nRow, tools::Long nAddSize )
+void Array::SetAddMergedLeftSize( sal_Int32 nCol, sal_Int32 nRow, sal_Int32 nAddSize )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetAddMergedLeftSize" );
     DBG_FRAME_CHECK( mxImpl->GetMergedFirstCol( nCol, nRow ) == 0, "SetAddMergedLeftSize", "additional border inside array" );
@@ -788,7 +809,7 @@ void Array::SetAddMergedLeftSize( size_t nCol, size_t nRow, tools::Long nAddSize
         CELLACC( aIt.Col(), aIt.Row() ).mnAddLeft = nAddSize;
 }
 
-void Array::SetAddMergedRightSize( size_t nCol, size_t nRow, tools::Long nAddSize )
+void Array::SetAddMergedRightSize( sal_Int32 nCol, sal_Int32 nRow, sal_Int32 nAddSize )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetAddMergedRightSize" );
     DBG_FRAME_CHECK( mxImpl->GetMergedLastCol( nCol, nRow ) + 1 == mxImpl->mnWidth, "SetAddMergedRightSize", "additional border inside array" );
@@ -796,7 +817,7 @@ void Array::SetAddMergedRightSize( size_t nCol, size_t nRow, tools::Long nAddSiz
         CELLACC( aIt.Col(), aIt.Row() ).mnAddRight = nAddSize;
 }
 
-void Array::SetAddMergedTopSize( size_t nCol, size_t nRow, tools::Long nAddSize )
+void Array::SetAddMergedTopSize( sal_Int32 nCol, sal_Int32 nRow, sal_Int32 nAddSize )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetAddMergedTopSize" );
     DBG_FRAME_CHECK( mxImpl->GetMergedFirstRow( nCol, nRow ) == 0, "SetAddMergedTopSize", "additional border inside array" );
@@ -804,7 +825,7 @@ void Array::SetAddMergedTopSize( size_t nCol, size_t nRow, tools::Long nAddSize 
         CELLACC( aIt.Col(), aIt.Row() ).mnAddTop = nAddSize;
 }
 
-void Array::SetAddMergedBottomSize( size_t nCol, size_t nRow, tools::Long nAddSize )
+void Array::SetAddMergedBottomSize( sal_Int32 nCol, sal_Int32 nRow, sal_Int32 nAddSize )
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "SetAddMergedBottomSize" );
     DBG_FRAME_CHECK( mxImpl->GetMergedLastRow( nCol, nRow ) + 1 == mxImpl->mnHeight, "SetAddMergedBottomSize", "additional border inside array" );
@@ -812,21 +833,21 @@ void Array::SetAddMergedBottomSize( size_t nCol, size_t nRow, tools::Long nAddSi
         CELLACC( aIt.Col(), aIt.Row() ).mnAddBottom = nAddSize;
 }
 
-bool Array::IsMerged( size_t nCol, size_t nRow ) const
+bool Array::IsMerged( sal_Int32 nCol, sal_Int32 nRow ) const
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "IsMerged" );
     return CELL( nCol, nRow ).IsMerged();
 }
 
-void Array::GetMergedOrigin( size_t& rnFirstCol, size_t& rnFirstRow, size_t nCol, size_t nRow ) const
+void Array::GetMergedOrigin( sal_Int32& rnFirstCol, sal_Int32& rnFirstRow, sal_Int32 nCol, sal_Int32 nRow ) const
 {
     DBG_FRAME_CHECK_COLROW( nCol, nRow, "GetMergedOrigin" );
     rnFirstCol = mxImpl->GetMergedFirstCol( nCol, nRow );
     rnFirstRow = mxImpl->GetMergedFirstRow( nCol, nRow );
 }
 
-void Array::GetMergedRange( size_t& rnFirstCol, size_t& rnFirstRow,
-        size_t& rnLastCol, size_t& rnLastRow, size_t nCol, size_t nRow ) const
+void Array::GetMergedRange( sal_Int32& rnFirstCol, sal_Int32& rnFirstRow,
+        sal_Int32& rnLastCol, sal_Int32& rnLastRow, sal_Int32 nCol, sal_Int32 nRow ) const
 {
     GetMergedOrigin( rnFirstCol, rnFirstRow, nCol, nRow );
     rnLastCol = mxImpl->GetMergedLastCol( nCol, nRow );
@@ -834,7 +855,7 @@ void Array::GetMergedRange( size_t& rnFirstCol, size_t& rnFirstRow,
 }
 
 // clipping
-void Array::SetClipRange( size_t nFirstCol, size_t nFirstRow, size_t nLastCol, size_t nLastRow )
+void Array::SetClipRange( sal_Int32 nFirstCol, sal_Int32 nFirstRow, sal_Int32 nLastCol, sal_Int32 nLastRow )
 {
     DBG_FRAME_CHECK_COLROW( nFirstCol, nFirstRow, "SetClipRange" );
     DBG_FRAME_CHECK_COLROW( nLastCol, nLastRow, "SetClipRange" );
@@ -845,120 +866,109 @@ void Array::SetClipRange( size_t nFirstCol, size_t nFirstRow, size_t nLastCol, s
 }
 
 // cell coordinates
-void Array::SetXOffset( tools::Long nXOffset )
+void Array::SetXOffset( sal_Int32 nXOffset )
 {
     mxImpl->maXCoords[ 0 ] = nXOffset;
     mxImpl->mbXCoordsDirty = true;
 }
 
-void Array::SetYOffset( tools::Long nYOffset )
+void Array::SetYOffset( sal_Int32 nYOffset )
 {
     mxImpl->maYCoords[ 0 ] = nYOffset;
     mxImpl->mbYCoordsDirty = true;
 }
 
-void Array::SetColWidth( size_t nCol, tools::Long nWidth )
+void Array::SetColWidth( sal_Int32 nCol, sal_Int32 nWidth )
 {
     DBG_FRAME_CHECK_COL( nCol, "SetColWidth" );
     mxImpl->maWidths[ nCol ] = nWidth;
     mxImpl->mbXCoordsDirty = true;
 }
 
-void Array::SetRowHeight( size_t nRow, tools::Long nHeight )
+void Array::SetRowHeight( sal_Int32 nRow, sal_Int32 nHeight )
 {
     DBG_FRAME_CHECK_ROW( nRow, "SetRowHeight" );
     mxImpl->maHeights[ nRow ] = nHeight;
     mxImpl->mbYCoordsDirty = true;
 }
 
-void Array::SetAllColWidths( tools::Long nWidth )
+void Array::SetAllColWidths( sal_Int32 nWidth )
 {
     std::fill( mxImpl->maWidths.begin(), mxImpl->maWidths.end(), nWidth );
     mxImpl->mbXCoordsDirty = true;
 }
 
-void Array::SetAllRowHeights( tools::Long nHeight )
+void Array::SetAllRowHeights( sal_Int32 nHeight )
 {
     std::fill( mxImpl->maHeights.begin(), mxImpl->maHeights.end(), nHeight );
     mxImpl->mbYCoordsDirty = true;
 }
 
-tools::Long Array::GetColPosition( size_t nCol ) const
+sal_Int32 Array::GetColPosition( sal_Int32 nCol ) const
 {
     DBG_FRAME_CHECK_COL_1( nCol, "GetColPosition" );
     return mxImpl->GetColPosition( nCol );
 }
 
-tools::Long Array::GetRowPosition( size_t nRow ) const
+sal_Int32 Array::GetRowPosition( sal_Int32 nRow ) const
 {
     DBG_FRAME_CHECK_ROW_1( nRow, "GetRowPosition" );
     return mxImpl->GetRowPosition( nRow );
 }
 
-tools::Long Array::GetColWidth( size_t nFirstCol, size_t nLastCol ) const
+sal_Int32 Array::GetColWidth( sal_Int32 nFirstCol, sal_Int32 nLastCol ) const
 {
     DBG_FRAME_CHECK_COL( nFirstCol, "GetColWidth" );
     DBG_FRAME_CHECK_COL( nLastCol, "GetColWidth" );
     return GetColPosition( nLastCol + 1 ) - GetColPosition( nFirstCol );
 }
 
-tools::Long Array::GetRowHeight( size_t nFirstRow, size_t nLastRow ) const
+sal_Int32 Array::GetRowHeight( sal_Int32 nFirstRow, sal_Int32 nLastRow ) const
 {
     DBG_FRAME_CHECK_ROW( nFirstRow, "GetRowHeight" );
     DBG_FRAME_CHECK_ROW( nLastRow, "GetRowHeight" );
     return GetRowPosition( nLastRow + 1 ) - GetRowPosition( nFirstRow );
 }
 
-tools::Long Array::GetWidth() const
+sal_Int32 Array::GetWidth() const
 {
     return GetColPosition( mxImpl->mnWidth ) - GetColPosition( 0 );
 }
 
-tools::Long Array::GetHeight() const
+sal_Int32 Array::GetHeight() const
 {
     return GetRowPosition( mxImpl->mnHeight ) - GetRowPosition( 0 );
 }
 
-basegfx::B2DRange Array::GetCellRange( size_t nCol, size_t nRow, bool bExpandMerged ) const
+basegfx::B2DRange Array::GetCellRange( sal_Int32 nCol, sal_Int32 nRow ) const
 {
-    if(bExpandMerged)
+    // get the Range of the fully expanded cell (if merged)
+    const sal_Int32 nFirstCol(mxImpl->GetMergedFirstCol( nCol, nRow ));
+    const sal_Int32 nFirstRow(mxImpl->GetMergedFirstRow( nCol, nRow ));
+    const sal_Int32 nLastCol(mxImpl->GetMergedLastCol( nCol, nRow ));
+    const sal_Int32 nLastRow(mxImpl->GetMergedLastRow( nCol, nRow ));
+    const Point aPoint( GetColPosition( nFirstCol ), GetRowPosition( nFirstRow ) );
+    const Size aSize( GetColWidth( nFirstCol, nLastCol ) + 1, GetRowHeight( nFirstRow, nLastRow ) + 1 );
+    tools::Rectangle aRect(aPoint, aSize);
+
+    // adjust rectangle for partly visible merged cells
+    const Cell& rCell = CELL( nCol, nRow );
+
+    if( rCell.IsMerged() )
     {
-        // get the Range of the fully expanded cell (if merged)
-        const size_t nFirstCol(mxImpl->GetMergedFirstCol( nCol, nRow ));
-        const size_t nFirstRow(mxImpl->GetMergedFirstRow( nCol, nRow ));
-        const size_t nLastCol(mxImpl->GetMergedLastCol( nCol, nRow ));
-        const size_t nLastRow(mxImpl->GetMergedLastRow( nCol, nRow ));
-        const Point aPoint( GetColPosition( nFirstCol ), GetRowPosition( nFirstRow ) );
-        const Size aSize( GetColWidth( nFirstCol, nLastCol ) + 1, GetRowHeight( nFirstRow, nLastRow ) + 1 );
-        tools::Rectangle aRect(aPoint, aSize);
-
-        // adjust rectangle for partly visible merged cells
-        const Cell& rCell = CELL( nCol, nRow );
-
-        if( rCell.IsMerged() )
-        {
-            // not *sure* what exactly this is good for,
-            // it is just a hard set extension at merged cells,
-            // probably *should* be included in the above extended
-            // GetColPosition/GetColWidth already. This might be
-            // added due to GetColPosition/GetColWidth not working
-            // correctly over PageChanges (if used), but not sure.
-            aRect.AdjustLeft( -(rCell.mnAddLeft) );
-            aRect.AdjustRight(rCell.mnAddRight );
-            aRect.AdjustTop( -(rCell.mnAddTop) );
-            aRect.AdjustBottom(rCell.mnAddBottom );
-        }
-
-        return vcl::unotools::b2DRectangleFromRectangle(aRect);
+        // not *sure* what exactly this is good for,
+        // it is just a hard set extension at merged cells,
+        // probably *should* be included in the above extended
+        // GetColPosition/GetColWidth already. This might be
+        // added due to GetColPosition/GetColWidth not working
+        // correctly over PageChanges (if used), but not sure.
+        aRect.AdjustLeft( -(rCell.mnAddLeft) );
+        aRect.AdjustRight(rCell.mnAddRight );
+        aRect.AdjustTop( -(rCell.mnAddTop) );
+        aRect.AdjustBottom(rCell.mnAddBottom );
     }
-    else
-    {
-        const Point aPoint( GetColPosition( nCol ), GetRowPosition( nRow ) );
-        const Size aSize( GetColWidth( nCol, nCol ) + 1, GetRowHeight( nRow, nRow ) + 1 );
-        const tools::Rectangle aRect(aPoint, aSize);
 
-        return vcl::unotools::b2DRectangleFromRectangle(aRect);
-    }
+    return vcl::unotools::b2DRectangleFromRectangle(aRect);
 }
 
 // return output range of given row/col range in logical coordinates
@@ -976,7 +986,7 @@ void Array::MirrorSelfX()
     CellVec aNewCells;
     aNewCells.reserve( GetCellCount() );
 
-    size_t nCol, nRow;
+    sal_Int32 nCol, nRow;
     for( nRow = 0; nRow < mxImpl->mnHeight; ++nRow )
     {
         for( nCol = 0; nCol < mxImpl->mnWidth; ++nCol )
@@ -991,8 +1001,8 @@ void Array::MirrorSelfX()
         {
             if( CELL( nCol, nRow ).mbMergeOrig )
             {
-                size_t nLastCol = mxImpl->GetMergedLastCol( nCol, nRow );
-                size_t nLastRow = mxImpl->GetMergedLastRow( nCol, nRow );
+                sal_Int32 nLastCol = mxImpl->GetMergedLastCol( nCol, nRow );
+                sal_Int32 nLastRow = mxImpl->GetMergedLastRow( nCol, nRow );
                 lclSetMergedRange( aNewCells, mxImpl->mnWidth,
                     mxImpl->GetMirrorCol( nLastCol ), nRow,
                     mxImpl->GetMirrorCol( nCol ), nLastRow );
@@ -1009,8 +1019,8 @@ void Array::MirrorSelfX()
 static void HelperCreateHorizontalEntry(
     const Array& rArray,
     const Style& rStyle,
-    size_t col,
-    size_t row,
+    sal_Int32 col,
+    sal_Int32 row,
     const basegfx::B2DPoint& rOrigin,
     const basegfx::B2DVector& rX,
     const basegfx::B2DVector& rY,
@@ -1056,8 +1066,8 @@ static void HelperCreateHorizontalEntry(
 static void HelperCreateVerticalEntry(
     const Array& rArray,
     const Style& rStyle,
-    size_t col,
-    size_t row,
+    sal_Int32 col,
+    sal_Int32 row,
     const basegfx::B2DPoint& rOrigin,
     const basegfx::B2DVector& rX,
     const basegfx::B2DVector& rY,
@@ -1138,10 +1148,10 @@ static void HelperCreateTLBREntry(
     const basegfx::B2DPoint& rOrigin,
     const basegfx::B2DVector& rX,
     const basegfx::B2DVector& rY,
-    size_t nColLeft,
-    size_t nColRight,
-    size_t nRowTop,
-    size_t nRowBottom,
+    sal_Int32 nColLeft,
+    sal_Int32 nColRight,
+    sal_Int32 nRowTop,
+    sal_Int32 nRowBottom,
     const Color* pForceColor,
     const basegfx::B2DRange* pClipRange)
 {
@@ -1188,10 +1198,10 @@ static void HelperCreateBLTREntry(
     const basegfx::B2DPoint& rOrigin,
     const basegfx::B2DVector& rX,
     const basegfx::B2DVector& rY,
-    size_t nColLeft,
-    size_t nColRight,
-    size_t nRowTop,
-    size_t nRowBottom,
+    sal_Int32 nColLeft,
+    sal_Int32 nColRight,
+    sal_Int32 nRowTop,
+    sal_Int32 nRowBottom,
     const Color* pForceColor,
     const basegfx::B2DRange* pClipRange)
 {
@@ -1232,7 +1242,7 @@ static void HelperCreateBLTREntry(
 }
 
 drawinglayer::primitive2d::Primitive2DContainer Array::CreateB2DPrimitiveRange(
-    size_t nFirstCol, size_t nFirstRow, size_t nLastCol, size_t nLastRow,
+    sal_Int32 nFirstCol, sal_Int32 nFirstRow, sal_Int32 nLastCol, sal_Int32 nLastRow,
     const Color* pForceColor ) const
 {
     DBG_FRAME_CHECK_COLROW( nFirstCol, nFirstRow, "CreateB2DPrimitiveRange" );
@@ -1258,22 +1268,22 @@ drawinglayer::primitive2d::Primitive2DContainer Array::CreateB2DPrimitiveRange(
     // Checked usages, this method is used in Calc EditView/Print/Export stuff and
     // in UI (Dialog), not for Writer Tables and Draw/Impress tables. All usages
     // seem okay with this change, so I will add it.
-    const size_t nStartRow(nFirstRow > 0 ? nFirstRow - 1 : nFirstRow);
-    const size_t nEndRow(nLastRow < GetRowCount() - 1 ? nLastRow + 1 : nLastRow);
-    const size_t nStartCol(nFirstCol > 0 ? nFirstCol - 1 : nFirstCol);
-    const size_t nEndCol(nLastCol < GetColCount() - 1 ? nLastCol + 1 : nLastCol);
+    const sal_Int32 nStartRow(nFirstRow > 0 ? nFirstRow - 1 : nFirstRow);
+    const sal_Int32 nEndRow(nLastRow < GetRowCount() - 1 ? nLastRow + 1 : nLastRow);
+    const sal_Int32 nStartCol(nFirstCol > 0 ? nFirstCol - 1 : nFirstCol);
+    const sal_Int32 nEndCol(nLastCol < GetColCount() - 1 ? nLastCol + 1 : nLastCol);
 
     // prepare SdrFrameBorderDataVector
     std::shared_ptr<drawinglayer::primitive2d::SdrFrameBorderDataVector> aData(
         std::make_shared<drawinglayer::primitive2d::SdrFrameBorderDataVector>());
 
     // remember for which merged cells crossed lines were already created. To
-    // do so, hold the size_t cell index in a set for fast check
-    std::set< size_t > aMergedCells;
+    // do so, hold the sal_Int32 cell index in a set for fast check
+    std::set< sal_Int32 > aMergedCells;
 
-    for (size_t nRow(nStartRow); nRow <= nEndRow; ++nRow)
+    for (sal_Int32 nRow(nStartRow); nRow <= nEndRow; ++nRow)
     {
-        for (size_t nCol(nStartCol); nCol <= nEndCol; ++nCol)
+        for (sal_Int32 nCol(nStartCol); nCol <= nEndCol; ++nCol)
         {
             // get Cell and CoordinateSystem (*only* for this Cell, do *not* expand for
             // merged cells (!)), check if used (non-empty vectors)
@@ -1365,9 +1375,9 @@ drawinglayer::primitive2d::Primitive2DContainer Array::CreateB2DPrimitiveRange(
                 {
                     // first check if this merged cell was already handled. To do so,
                     // calculate and use the index of the TopLeft cell
-                    size_t nColLeft(nCol), nRowTop(nRow), nColRight(nCol), nRowBottom(nRow);
+                    sal_Int32 nColLeft(nCol), nRowTop(nRow), nColRight(nCol), nRowBottom(nRow);
                     GetMergedRange(nColLeft, nRowTop, nColRight, nRowBottom, nCol, nRow);
-                    const size_t nIndexOfMergedCell(mxImpl->GetIndex(nColLeft, nRowTop));
+                    const sal_Int32 nIndexOfMergedCell(mxImpl->GetIndex(nColLeft, nRowTop));
 
                     if(aMergedCells.end() == aMergedCells.find(nIndexOfMergedCell))
                     {

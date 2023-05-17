@@ -21,6 +21,7 @@
 #include <sal/macros.h>
 #include "lngopt.hxx"
 #include <linguistic/misc.hxx>
+#include <o3tl/safeint.hxx>
 #include <tools/debug.hxx>
 #include <unotools/lingucfg.hxx>
 
@@ -124,7 +125,8 @@ OUString LinguOptions::GetName( sal_Int32 nWID )
 
     OUString aRes;
 
-    if (0 <= nWID && nWID < sal_Int32(SAL_N_ELEMENTS(aWID_Name)) && aWID_Name[ nWID ].nWID == nWID)
+    if (0 <= nWID && o3tl::make_unsigned(nWID) < SAL_N_ELEMENTS(aWID_Name)
+        && aWID_Name[ nWID ].nWID == nWID)
         aRes = aWID_Name[nWID].aPropertyName;
     else
         OSL_FAIL("lng : unknown WID");
@@ -134,7 +136,7 @@ OUString LinguOptions::GetName( sal_Int32 nWID )
 
 
 //! map must be sorted by first entry in alphabetical increasing order.
-static const SfxItemPropertyMapEntry* lcl_GetLinguProps()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetLinguProps()
 {
     static const SfxItemPropertyMapEntry aLinguProps[] =
     {
@@ -178,7 +180,6 @@ static const SfxItemPropertyMapEntry* lcl_GetLinguProps()
                 cppu::UnoType<bool>::get(),            0, 0 },
         { UPN_IS_WRAP_REVERSE,            UPH_IS_WRAP_REVERSE,
                 cppu::UnoType<bool>::get(),            0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     return aLinguProps;
 }
@@ -192,16 +193,10 @@ LinguProps::LinguProps() :
 
 void LinguProps::launchEvent( const PropertyChangeEvent &rEvt ) const
 {
-    comphelper::OInterfaceContainerHelper2 *pContainer =
+    comphelper::OInterfaceContainerHelper3<XPropertyChangeListener> *pContainer =
             aPropListeners.getContainer( rEvt.PropertyHandle );
     if (pContainer)
-    {
-        comphelper::OInterfaceIteratorHelper2 aIt( *pContainer );
-        while (aIt.hasMoreElements())
-        {
-            static_cast< XPropertyChangeListener* >( aIt.next() )->propertyChange( rEvt );
-        }
-    }
+        pContainer->notifyEach( &XPropertyChangeListener::propertyChange, rEvt );
 }
 
 Reference< XPropertySetInfo > SAL_CALL LinguProps::getPropertySetInfo()

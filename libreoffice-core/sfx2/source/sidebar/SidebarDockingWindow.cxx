@@ -22,17 +22,15 @@
 #include <sidebar/PanelDescriptor.hxx>
 
 #include <comphelper/dispatchcommand.hxx>
+#include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
 #include <sfx2/bindings.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/viewfrm.hxx>
-#include <sfx2/viewsh.hxx>
 #include <svtools/acceleratorexecute.hxx>
 #include <tools/gen.hxx>
-#include <tools/json_writer.hxx>
 #include <vcl/event.hxx>
-#include <comphelper/lok.hxx>
-#include <LibreOfficeKit/LibreOfficeKitEnums.h>
+#include <osl/diagnose.h>
 
 #include <boost/property_tree/json_parser.hpp>
 
@@ -138,8 +136,8 @@ SfxChildAlignment SidebarDockingWindow::CheckAlignment (
 
 bool SidebarDockingWindow::EventNotify(NotifyEvent& rEvent)
 {
-    MouseNotifyEvent nType = rEvent.GetType();
-    if (MouseNotifyEvent::KEYINPUT == nType)
+    NotifyEventType nType = rEvent.GetType();
+    if (NotifyEventType::KEYINPUT == nType)
     {
         const vcl::KeyCode& rKeyCode = rEvent.GetKeyEvent()->GetKeyCode();
         switch (rKeyCode.GetCode())
@@ -183,7 +181,7 @@ bool SidebarDockingWindow::EventNotify(NotifyEvent& rEvent)
             return true;
         }
     }
-    else if (MouseNotifyEvent::MOUSEBUTTONDOWN == nType)
+    else if (NotifyEventType::MOUSEBUTTONDOWN == nType)
     {
         const MouseEvent *mEvt = rEvent.GetMouseEvent();
         if (mEvt->IsLeft())
@@ -193,7 +191,7 @@ bool SidebarDockingWindow::EventNotify(NotifyEvent& rEvent)
                 mbIsReadyToDrag = true;
         }
     }
-    else if (MouseNotifyEvent::MOUSEMOVE == nType)
+    else if (NotifyEventType::MOUSEMOVE == nType)
     {
         const MouseEvent *mEvt = rEvent.GetMouseEvent();
         tools::Rectangle aGrip = mpSidebarController->GetDeckDragArea();

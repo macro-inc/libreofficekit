@@ -24,7 +24,6 @@
 #include <fmtfld.hxx>
 #include <txtfld.hxx>
 #include <expfld.hxx>
-#include <pam.hxx>
 #include <docfld.hxx>
 #include <ndtxt.hxx>
 
@@ -60,8 +59,7 @@ SwInputFieldList::SwInputFieldList( SwEditShell* pShell, bool bBuildTmpLst )
             maTmpLst.insert(pTextField);
         else
         {
-            SwNodeIndex aIdx(pTextField->GetTextNode());
-            std::unique_ptr<SetGetExpField> pNew(new SetGetExpField(aIdx, pTextField));
+            std::unique_ptr<SetGetExpField> pNew(new SetGetExpField(pTextField->GetTextNode(), pTextField));
             mpSrtLst->insert(std::move(pNew));
         }
     }
@@ -136,8 +134,7 @@ bool SwInputFieldList::BuildSortLst()
         auto it = maTmpLst.find(pTextField);
         if(maTmpLst.end() == it)
         {
-            SwNodeIndex aIdx(pTextField->GetTextNode());
-            std::unique_ptr<SetGetExpField> pNew(new SetGetExpField(aIdx, pTextField ));
+            std::unique_ptr<SetGetExpField> pNew(new SetGetExpField(pTextField->GetTextNode(), pTextField ));
             mpSrtLst->insert(std::move(pNew));
         }
         else

@@ -23,6 +23,7 @@
 
 #include <sax/tools/converter.hxx>
 
+#include <utility>
 #include <xmloff/xmlprmap.hxx>
 
 #include <SchXMLExport.hxx>
@@ -45,6 +46,7 @@
 #include <xmloff/SchXMLSeriesHelper.hxx>
 #include <rtl/math.hxx>
 #include <o3tl/sorted_vector.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <limits>
 #include <vector>
@@ -99,7 +101,7 @@
 #include <com/sun/star/embed/XVisualObject.hpp>
 #include <com/sun/star/container/XChild.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "MultiPropertySetHandler.hxx"
 #include "PropertyMap.hxx"
 
@@ -371,8 +373,8 @@ css::chart2::RelativePosition lcl_getCustomLabelPosition(
 class lcl_MatchesRole
 {
 public:
-    explicit lcl_MatchesRole( const OUString & aRole ) :
-            m_aRole( aRole )
+    explicit lcl_MatchesRole( OUString aRole ) :
+            m_aRole(std::move( aRole ))
     {}
 
     bool operator () ( const Reference< chart2::data::XLabeledDataSequence > & xSeq ) const
@@ -772,7 +774,7 @@ struct lcl_SequenceToMapElement
             nIndex = aRangeRep.toInt32();
         }
         else if( rContent.first.is()) //has labels
-            nIndex = rContent.first->getSourceRangeRepresentation().copy( sizeof("label ")).toInt32();
+            nIndex = o3tl::toInt32(rContent.first->getSourceRangeRepresentation().subView( sizeof("label ")));
         return std::make_pair(nIndex, rContent);
     }
 };
@@ -1491,7 +1493,7 @@ void SchXMLExportHelper_Impl::parseDocument( Reference< chart::XChartDocument > 
         aPropertyStates.clear();
     }
 
-    // Data table
+    // Export data table element and properties
     if (xNewDiagram.is() && nCurrentODFVersion & SvtSaveOptions::ODFSVER_EXTENDED)
     {
         auto xDataTable = xNewDiagram->getDataTable();
@@ -1587,6 +1589,7 @@ void SchXMLExportHelper_Impl::parseDocument( Reference< chart::XChartDocument > 
                 // not the XShapes object used here. Thus the shapes have to be
                 // exported one by one
                 rtl::Reference< XMLShapeExport > rShapeExport = mrExport.GetShapeExport();
+                css::uno::Sequence<OUString> aAutoStylePropNames = mrAutoStylePool.GetPropertyNames();
                 Reference< drawing::XShape > xShape;
                 const sal_Int32 nShapeCount( mxAdditionalShapes->getCount());
                 for( sal_Int32 nShapeId = 0; nShapeId < nShapeCount; nShapeId++ )
@@ -1596,7 +1599,7 @@ void SchXMLExportHelper_Impl::parseDocument( Reference< chart::XChartDocument > 
                     if( ! xShape.is())
                         continue;
 
-                    rShapeExport->collectShapeAutoStyles( xShape );
+                    rShapeExport->collectShapeAutoStyles( xShape, aAutoStylePropNames );
                 }
             }
         }
@@ -2387,10 +2390,10 @@ void SchXMLExportHelper_Impl::exportAxis(
             if (sChartType == u"com.sun.star.chart.BarDiagram" || sChartType == u"com.sun.star.chart.StockDiagram")
             {
                 if (!bShiftedCatPos)
-                    rAxisProps->setPropertyValue("MajorOrigin", uno::makeAny(0.0));
+                    rAxisProps->setPropertyValue("MajorOrigin", uno::Any(0.0));
             }
             else if (bShiftedCatPos)
-                rAxisProps->setPropertyValue("MajorOrigin", uno::makeAny(0.5));
+                rAxisProps->setPropertyValue("MajorOrigin", uno::Any(0.5));
         }
 
         lcl_exportNumberFormat( "NumberFormat", rAxisProps, mrExport );
@@ -2647,10 +2650,10 @@ void lcl_createDataLabelProperties(
         OUString sAPIName;
         sal_uInt16 nNameSpace; // from include/xmloff/xmlnamespace.hxx
         OUString sLocalName;
-        API2ODFMapItem(const OUString& sAPI, const sal_uInt16 nNS, const OUString& sLocal)
-            : sAPIName(sAPI)
+        API2ODFMapItem(OUString sAPI, const sal_uInt16 nNS, OUString sLocal)
+            : sAPIName(std::move(sAPI))
             , nNameSpace(nNS)
-            , sLocalName(sLocal)
+            , sLocalName(std::move(sLocal))
         {
         }
     };
@@ -3125,7 +3128,7 @@ void SchXMLExportHelper_Impl::exportRegressionCurve(
 
         // Add service name (which is regression type)
         sal_Int32 nIndex = GetPropertySetMapper()->FindEntryIndex(XML_SCH_CONTEXT_SPECIAL_REGRESSION_TYPE);
-        XMLPropertyState property(nIndex,  uno::makeAny(aService));
+        XMLPropertyState property(nIndex,  uno::Any(aService));
         aPropertyStates.push_back(property);
 
         Reference< beans::XPropertySet > xEquationProperties;

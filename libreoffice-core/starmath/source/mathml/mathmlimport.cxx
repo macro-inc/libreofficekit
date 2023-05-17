@@ -58,7 +58,8 @@ one go*/
 #include <xmloff/xmlmetai.hxx>
 #include <svx/dialmgr.hxx>
 #include <svx/strings.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <mathmlattr.hxx>
 #include <xparsmlbase.hxx>
@@ -116,8 +117,7 @@ ErrCode SmXMLImportWrapper::Import(SfxMedium& rMedium)
         SfxItemSet* pSet = rMedium.GetItemSet();
         if (pSet)
         {
-            const SfxUnoAnyItem* pItem
-                = static_cast<const SfxUnoAnyItem*>(pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL));
+            const SfxUnoAnyItem* pItem = pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL);
             if (pItem)
                 pItem->GetValue() >>= xStatusIndicator;
         }
@@ -126,7 +126,7 @@ ErrCode SmXMLImportWrapper::Import(SfxMedium& rMedium)
             bEmbedded = true;
     }
 
-    comphelper::PropertyMapEntry aInfoMap[]
+    static const comphelper::PropertyMapEntry aInfoMap[]
         = { { OUString("PrivateData"), 0, cppu::UnoType<XInterface>::get(),
               beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(),
@@ -134,8 +134,7 @@ ErrCode SmXMLImportWrapper::Import(SfxMedium& rMedium)
             { OUString("StreamRelPath"), 0, ::cppu::UnoType<OUString>::get(),
               beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("StreamName"), 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 } };
+              beans::PropertyAttribute::MAYBEVOID, 0 } };
     uno::Reference<beans::XPropertySet> xInfoSet(
         comphelper::GenericPropertySet_CreateInstance(new comphelper::PropertySetInfo(aInfoMap)));
 
@@ -144,7 +143,7 @@ ErrCode SmXMLImportWrapper::Import(SfxMedium& rMedium)
     // needed for relative URLs; but it's OK to import e.g. MathML from the
     // clipboard without one
     SAL_INFO_IF(baseURI.isEmpty(), "starmath", "SmXMLImportWrapper: no base URL");
-    xInfoSet->setPropertyValue("BaseURI", makeAny(baseURI));
+    xInfoSet->setPropertyValue("BaseURI", Any(baseURI));
 
     sal_Int32 nSteps = 3;
     if (!(rMedium.IsStorage()))
@@ -168,15 +167,15 @@ ErrCode SmXMLImportWrapper::Import(SfxMedium& rMedium)
             OUString aName("dummyObjName");
             if (rMedium.GetItemSet())
             {
-                const SfxStringItem* pDocHierarchItem = static_cast<const SfxStringItem*>(
-                    rMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME));
+                const SfxStringItem* pDocHierarchItem
+                    = rMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME);
                 if (pDocHierarchItem)
                     aName = pDocHierarchItem->GetValue();
             }
 
             if (!aName.isEmpty())
             {
-                xInfoSet->setPropertyValue("StreamRelPath", makeAny(aName));
+                xInfoSet->setPropertyValue("StreamRelPath", Any(aName));
             }
         }
 
@@ -374,7 +373,7 @@ ErrCode SmXMLImportWrapper::ReadThroughComponent(const uno::Reference<embed::XSt
         // set Base URL
         if (rPropSet.is())
         {
-            rPropSet->setPropertyValue("StreamName", makeAny(sStreamName));
+            rPropSet->setPropertyValue("StreamName", Any(sStreamName));
         }
 
         Reference<io::XInputStream> xStream = xEventsStream->getInputStream();
@@ -1521,7 +1520,7 @@ void SmXMLSpaceContext_Impl::startFastElement(
         switch (aIter.getToken())
         {
             case XML_WIDTH:
-                if (!ParseMathMLAttributeLengthValue(sValue.trim(), aLV)
+                if (!ParseMathMLAttributeLengthValue(o3tl::trim(sValue), aLV)
                     || !lcl_CountBlanks(aLV, &nWide, &nNarrow))
                     SAL_WARN("starmath", "ignore mspace's width: " << sValue);
                 break;
@@ -2293,7 +2292,7 @@ uno::Reference<xml::sax::XFastContextHandler> SmXMLRowContext_Impl::createFastCh
 
     if (!xContext)
     {
-        //Hmm, unrecognized for this level, check to see if its
+        //Hmm, unrecognized for this level, check to see if it's
         //an element that can have an implicit schema around it
         xContext = SmXMLDocContext_Impl::createFastChildContext(nElement, xAttrList);
     }

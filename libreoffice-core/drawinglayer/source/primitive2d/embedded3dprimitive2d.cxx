@@ -21,11 +21,12 @@
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/color/bcolor.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/geometry/viewinformation3d.hxx>
 #include <processor3d/shadow3dextractor.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -35,8 +36,6 @@ namespace drawinglayer::primitive2d
 {
         bool Embedded3DPrimitive2D::impGetShadow3D() const
         {
-            std::unique_lock aGuard( m_aMutex );
-
             // create on demand
             if(!mbShadow3DChecked && !getChildren3D().empty())
             {
@@ -64,21 +63,21 @@ namespace drawinglayer::primitive2d
         {
             // use info to create a yellow 2d rectangle, similar to empty 3d scenes and/or groups
             const basegfx::B2DRange aLocal2DRange(getB2DRange(rViewInformation));
-            const basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aLocal2DRange));
+            basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aLocal2DRange));
             const basegfx::BColor aYellow(1.0, 1.0, 0.0);
-            rContainer.push_back(new PolygonHairlinePrimitive2D(aOutline, aYellow));
+            rContainer.push_back(new PolygonHairlinePrimitive2D(std::move(aOutline), aYellow));
         }
 
         Embedded3DPrimitive2D::Embedded3DPrimitive2D(
-            const primitive3d::Primitive3DContainer& rxChildren3D,
-            const basegfx::B2DHomMatrix& rObjectTransformation,
-            const geometry::ViewInformation3D& rViewInformation3D,
+            primitive3d::Primitive3DContainer aChildren3D,
+            basegfx::B2DHomMatrix aObjectTransformation,
+            geometry::ViewInformation3D aViewInformation3D,
             const basegfx::B3DVector& rLightNormal,
             double fShadowSlant,
             const basegfx::B3DRange& rScene3DRange)
-        :   mxChildren3D(rxChildren3D),
-            maObjectTransformation(rObjectTransformation),
-            maViewInformation3D(rViewInformation3D),
+        :   mxChildren3D(std::move(aChildren3D)),
+            maObjectTransformation(std::move(aObjectTransformation)),
+            maViewInformation3D(std::move(aViewInformation3D)),
             maLightNormal(rLightNormal),
             mfShadowSlant(fShadowSlant),
             maScene3DRange(rScene3DRange),

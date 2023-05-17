@@ -66,7 +66,6 @@
 #include <pagefrm.hxx>
 #include <svl/eitem.hxx>
 #include <svl/lngmisc.hxx>
-#include <docary.hxx>
 #include <swtable.hxx>
 #include <tox.hxx>
 #include <doctxm.hxx>
@@ -233,8 +232,7 @@ void GetSelectableFromAny(uno::Reference<uno::XInterface> const& xIfc,
             pBox = pCell->FindBox(pTable, pBox);
             if (pBox)
             {
-                SwPosition const aPos(*pBox->GetSttNd());
-                SwPaM aPam(aPos);
+                SwPaM aPam(*pBox->GetSttNd());
                 aPam.Move(fnMoveForward, GoInNode);
                 o_rpPaM = lcl_createPamCopy(aPam);
             }
@@ -281,8 +279,8 @@ GetNestedTextContent(SwTextNode const & rTextNode, sal_Int32 const nIndex,
         bool const bParent)
 {
     // these should be unambiguous because of the dummy character
-    SwTextNode::GetTextAttrMode const eMode( bParent
-        ? SwTextNode::PARENT : SwTextNode::EXPAND );
+    auto const eMode( bParent
+        ? ::sw::GetTextAttrMode::Parent : ::sw::GetTextAttrMode::Expand );
     SwTextAttr *const pMetaTextAttr =
         rTextNode.GetTextAttrAt(nIndex, RES_TXTATR_META, eMode);
     SwTextAttr *const pMetaFieldTextAttr =
@@ -330,7 +328,7 @@ static uno::Any GetParaListAutoFormat(SwTextNode const& rNode)
             props.emplace_back(pEntry->aName, value);
         }
     }
-    return uno::makeAny(comphelper::containerToSequence(props));
+    return uno::Any(comphelper::containerToSequence(props));
 }
 
 // Read the special properties of the cursor
@@ -350,7 +348,7 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
                 const SwTextNode * pTmpNode = pNode;
 
                 if (!pTmpNode)
-                    pTmpNode = rPam.GetNode().GetTextNode();
+                    pTmpNode = rPam.GetPointNode().GetTextNode();
 
                 bool bRet = false;
 
@@ -370,7 +368,7 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
                 const SwTextNode * pTmpNode = pNode;
 
                 if (!pTmpNode)
-                    pTmpNode = rPam.GetNode().GetTextNode();
+                    pTmpNode = rPam.GetPointNode().GetTextNode();
 
                 OUString sRet;
                 if ( pTmpNode && pTmpNode->GetNum() )
@@ -387,7 +385,7 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
                 const SwTextNode * pTmpNode = pNode;
 
                 if (!pTmpNode)
-                    pTmpNode = rPam.GetNode().GetTextNode();
+                    pTmpNode = rPam.GetPointNode().GetTextNode();
 
                 sal_Int16 nRet = -1;
                 if ( pTmpNode )
@@ -450,7 +448,7 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
                 break;
             }
             // a multi selection is not considered
-            const SwTextNode* pTextNd = rPam.GetNode().GetTextNode();
+            const SwTextNode* pTextNd = rPam.GetPointNode().GetTextNode();
             if ( pTextNd && pTextNd->IsInList() )
             {
                 switch (rEntry.nWID)
@@ -536,10 +534,10 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         case FN_UNO_DOCUMENT_INDEX_MARK:
         {
             std::vector<SwTextAttr *> marks;
-            if (rPam.GetNode().IsTextNode())
+            if (rPam.GetPointNode().IsTextNode())
             {
-                marks = rPam.GetNode().GetTextNode()->GetTextAttrsAt(
-                    rPam.GetPoint()->nContent.GetIndex(), RES_TXTATR_TOXMARK);
+                marks = rPam.GetPointNode().GetTextNode()->GetTextAttrsAt(
+                    rPam.GetPoint()->GetContentIndex(), RES_TXTATR_TOXMARK);
             }
             if (!marks.empty())
             {
@@ -580,9 +578,9 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         {
             const SwPosition *pPos = rPam.Start();
             const SwTextNode *pTextNd =
-                rPam.GetDoc().GetNodes()[pPos->nNode.GetIndex()]->GetTextNode();
+                rPam.GetDoc().GetNodes()[pPos->GetNodeIndex()]->GetTextNode();
             const SwTextAttr* pTextAttr = pTextNd
-                ? pTextNd->GetFieldTextAttrAt( pPos->nContent.GetIndex(), true )
+                ? pTextNd->GetFieldTextAttrAt(pPos->GetContentIndex(), ::sw::GetTextAttrMode::Default)
                 : nullptr;
             if ( pTextAttr != nullptr )
             {
@@ -601,7 +599,7 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         case FN_UNO_TEXT_TABLE:
         case FN_UNO_CELL:
         {
-            SwStartNode* pSttNode = rPam.GetNode().StartOfSectionNode();
+            SwStartNode* pSttNode = rPam.GetPointNode().StartOfSectionNode();
             SwStartNodeType eType = pSttNode->GetStartNodeType();
             if(SwTableBoxStartNode == eType)
             {
@@ -629,14 +627,14 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         break;
         case FN_UNO_TEXT_FRAME:
         {
-            SwStartNode* pSttNode = rPam.GetNode().StartOfSectionNode();
+            SwStartNode* pSttNode = rPam.GetPointNode().StartOfSectionNode();
             SwStartNodeType eType = pSttNode->GetStartNodeType();
 
             SwFrameFormat* pFormat;
             if(eType == SwFlyStartNode && nullptr != (pFormat = pSttNode->GetFlyFormat()))
             {
                 // Create a wrapper only for text frames, not for graphic or OLE nodes.
-                if (pAny && !rPam.GetNode().IsNoTextNode())
+                if (pAny && !rPam.GetPointNode().IsNoTextNode())
                 {
                     uno::Reference<XTextFrame> const xFrame(
                         SwXTextFrame::CreateXTextFrame(*pFormat->GetDoc(), pFormat));
@@ -664,7 +662,7 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         break;
         case FN_UNO_TEXT_PARAGRAPH:
         {
-            SwTextNode* pTextNode = rPam.GetPoint()->nNode.GetNode().GetTextNode();
+            SwTextNode* pTextNode = rPam.GetPoint()->GetNode().GetTextNode();
             if (pTextNode)
             {
                 if (pAny)
@@ -680,9 +678,9 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         case FN_UNO_ENDNOTE:
         case FN_UNO_FOOTNOTE:
         {
-            SwTextAttr *const pTextAttr = rPam.GetNode().IsTextNode() ?
-                rPam.GetNode().GetTextNode()->GetTextAttrForCharAt(
-                    rPam.GetPoint()->nContent.GetIndex(), RES_TXTATR_FTN) : nullptr;
+            SwTextAttr *const pTextAttr = rPam.GetPointNode().IsTextNode() ?
+                rPam.GetPointNode().GetTextNode()->GetTextAttrForCharAt(
+                    rPam.GetPoint()->GetContentIndex(), RES_TXTATR_FTN) : nullptr;
             if(pTextAttr)
             {
                 const SwFormatFootnote& rFootnote = pTextAttr->GetFootnote();
@@ -706,10 +704,10 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         case FN_UNO_REFERENCE_MARK:
         {
             std::vector<SwTextAttr *> marks;
-            if (rPam.GetNode().IsTextNode())
+            if (rPam.GetPointNode().IsTextNode())
             {
-                marks = rPam.GetNode().GetTextNode()->GetTextAttrsAt(
-                            rPam.GetPoint()->nContent.GetIndex(), RES_TXTATR_REFMARK);
+                marks = rPam.GetPointNode().GetTextNode()->GetTextAttrsAt(
+                            rPam.GetPoint()->GetContentIndex(), RES_TXTATR_REFMARK);
             }
             if (!marks.empty())
             {
@@ -728,9 +726,9 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         break;
         case FN_UNO_NESTED_TEXT_CONTENT:
         {
-            uno::Reference<XTextContent> const xRet(rPam.GetNode().IsTextNode()
-                ? GetNestedTextContent(*rPam.GetNode().GetTextNode(),
-                    rPam.GetPoint()->nContent.GetIndex(), false)
+            uno::Reference<XTextContent> const xRet(rPam.GetPointNode().IsTextNode()
+                ? GetNestedTextContent(*rPam.GetPointNode().GetTextNode(),
+                    rPam.GetPoint()->GetContentIndex(), false)
                 : nullptr);
             if (xRet.is())
             {
@@ -748,12 +746,12 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
         case FN_UNO_CHARFMT_SEQUENCE:
         {
 
-            SwTextNode *const pTextNode = rPam.GetNode().GetTextNode();
-            if (&rPam.GetNode() == &rPam.GetNode(false)
+            SwTextNode *const pTextNode = rPam.GetPointNode().GetTextNode();
+            if (&rPam.GetPointNode() == &rPam.GetMarkNode()
                 && pTextNode && pTextNode->GetpSwpHints())
             {
-                sal_Int32 nPaMStart = rPam.Start()->nContent.GetIndex();
-                sal_Int32 nPaMEnd = rPam.End()->nContent.GetIndex();
+                sal_Int32 nPaMStart = rPam.Start()->GetContentIndex();
+                sal_Int32 nPaMEnd = rPam.End()->GetContentIndex();
                 Sequence< OUString> aCharStyles;
                 SwpHints* pHints = pTextNode->GetpSwpHints();
                 for( size_t nAttr = 0; nAttr < pHints->Count(); ++nAttr )
@@ -811,7 +809,7 @@ bool getCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry
 
 sal_Int16 IsNodeNumStart(SwPaM const & rPam, PropertyState& eState)
 {
-    const SwTextNode* pTextNd = rPam.GetNode().GetTextNode();
+    const SwTextNode* pTextNd = rPam.GetPointNode().GetTextNode();
     // correction: check, if restart value is set at the text node and use
     // new method <SwTextNode::GetAttrListRestartValue()> to retrieve the value
     if ( pTextNd && pTextNd->GetNumRule() && pTextNd->IsListRestart() &&
@@ -966,12 +964,12 @@ void  getNumberingProperty(SwPaM& rPam, PropertyState& eState, Any * pAny )
 
 void GetCurPageStyle(SwPaM const & rPaM, OUString &rString)
 {
-    if (!rPaM.GetContentNode())
+    if (!rPaM.GetPointContentNode())
         return; // TODO: is there an easy way to get it for tables/sections?
     SwRootFrame* pLayout = rPaM.GetDoc().getIDocumentLayoutAccess().GetCurrentLayout();
     // Consider the position inside the content node, since the node may span over multiple pages
     // with different page styles.
-    SwContentFrame* pFrame = rPaM.GetContentNode()->getLayoutFrame(pLayout, rPaM.GetPoint());
+    SwContentFrame* pFrame = rPaM.GetPointContentNode()->getLayoutFrame(pLayout, rPaM.GetPoint());
     if(pFrame)
     {
         const SwPageFrame* pPage = pFrame->FindPageFrame();
@@ -1026,10 +1024,17 @@ void resetCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry, SwPaM& rPam
 void InsertFile(SwUnoCursor* pUnoCursor, const OUString& rURL,
     const uno::Sequence< beans::PropertyValue >& rOptions)
 {
-    if (SwTextNode const*const pTextNode = pUnoCursor->GetPoint()->nNode.GetNode().GetTextNode())
+    if (SwTextNode const*const pTextNode = pUnoCursor->GetPoint()->GetNode().GetTextNode())
     {
-        if (pTextNode->GetTextAttrAt(pUnoCursor->GetPoint()->nContent.GetIndex(),
-                                     RES_TXTATR_CONTENTCONTROL, SwTextNode::PARENT))
+        // TODO: check meta field here too in case it ever grows a 2nd char
+        if (pTextNode->GetTextAttrAt(pUnoCursor->GetPoint()->GetContentIndex(),
+                RES_TXTATR_INPUTFIELD, ::sw::GetTextAttrMode::Parent))
+        {
+            throw uno::RuntimeException("cannot insert file inside input field");
+        }
+
+        if (pTextNode->GetTextAttrAt(pUnoCursor->GetPoint()->GetContentIndex(),
+                RES_TXTATR_CONTENTCONTROL, ::sw::GetTextAttrMode::Parent))
         {
             throw uno::RuntimeException("cannot insert file inside content controls");
         }
@@ -1140,8 +1145,8 @@ void InsertFile(SwUnoCursor* pUnoCursor, const OUString& rURL,
     if(pUnoCursor->HasMark())
         rDoc.getIDocumentContentOperations().DeleteAndJoin(*pUnoCursor);
 
-    SwNodeIndex aSave(  pUnoCursor->GetPoint()->nNode, -1 );
-    sal_Int32 nContent = pUnoCursor->GetPoint()->nContent.GetIndex();
+    SwNodeIndex aSave(  pUnoCursor->GetPoint()->GetNode(), -1 );
+    sal_Int32 nContent = pUnoCursor->GetPoint()->GetContentIndex();
 
     ErrCode nErrno = pRdr->Read( *pRead );   // and paste the document
 
@@ -1149,12 +1154,12 @@ void InsertFile(SwUnoCursor* pUnoCursor, const OUString& rURL,
     {
         ++aSave;
         pUnoCursor->SetMark();
-        pUnoCursor->GetMark()->nNode = aSave;
+        pUnoCursor->GetMark()->Assign( aSave );
 
         SwContentNode* pCntNode = aSave.GetNode().GetContentNode();
         if( !pCntNode )
             nContent = 0;
-        pUnoCursor->GetMark()->nContent.Assign( pCntNode, nContent );
+        pUnoCursor->GetMark()->SetContent( nContent );
     }
 }
 
@@ -1163,12 +1168,12 @@ void InsertFile(SwUnoCursor* pUnoCursor, const OUString& rURL,
 bool DocInsertStringSplitCR(
         SwDoc &rDoc,
         const SwPaM &rNewCursor,
-        const OUString &rText,
+        std::u16string_view rText,
         const bool bForceExpandHints )
 {
     bool bOK = true;
 
-    for (sal_Int32 i = 0; i < rText.getLength(); ++i)
+    for (size_t i = 0; i < rText.size(); ++i)
     {
         sal_Unicode const ch(rText[i]);
         if (linguistic::IsControlChar(ch)
@@ -1187,7 +1192,7 @@ bool DocInsertStringSplitCR(
     // grouping done in InsertString is intended for typing, not API calls
     ::sw::GroupUndoGuard const undoGuard(rDoc.GetIDocumentUndoRedo());
     SwTextNode* const pTextNd =
-        rNewCursor.GetPoint()->nNode.GetNode().GetTextNode();
+        rNewCursor.GetPoint()->GetNode().GetTextNode();
     if (!pTextNd)
     {
         SAL_INFO("sw.uno", "DocInsertStringSplitCR: need a text node");
@@ -1197,16 +1202,16 @@ bool DocInsertStringSplitCR(
     sal_Int32 nStartIdx = 0;
     const sal_Int32 nMaxLength = COMPLETE_STRING - pTextNd->GetText().getLength();
 
-    sal_Int32 nIdx = rText.indexOf( '\r', nStartIdx );
-    if( ( nIdx == -1 && nMaxLength < rText.getLength() ) ||
-        ( nIdx != -1 && nMaxLength < nIdx ) )
+    size_t nIdx = rText.find( '\r', nStartIdx );
+    if( ( nIdx == std::u16string_view::npos && nMaxLength < sal_Int32(rText.size()) ) ||
+        ( nIdx != std::u16string_view::npos && nMaxLength < sal_Int32(nIdx) ) )
     {
         nIdx = nMaxLength;
     }
-    while (nIdx != -1 )
+    while (nIdx != std::u16string_view::npos )
     {
-        OSL_ENSURE( nIdx - nStartIdx >= 0, "index negative!" );
-        aText = rText.copy( nStartIdx, nIdx - nStartIdx );
+        OSL_ENSURE( sal_Int32(nIdx) - nStartIdx >= 0, "index negative!" );
+        aText = rText.substr( nStartIdx, nIdx - nStartIdx );
         if (!aText.isEmpty() &&
             !rDoc.getIDocumentContentOperations().InsertString( rNewCursor, aText, nInsertFlags ))
         {
@@ -1219,9 +1224,9 @@ bool DocInsertStringSplitCR(
             bOK = false;
         }
         nStartIdx = nIdx + 1;
-        nIdx = rText.indexOf( '\r', nStartIdx );
+        nIdx = rText.find( '\r', nStartIdx );
     }
-    aText = rText.copy( nStartIdx );
+    aText = rText.substr( nStartIdx );
     if (!aText.isEmpty() &&
         !rDoc.getIDocumentContentOperations().InsertString( rNewCursor, aText, nInsertFlags ))
     {
@@ -1253,29 +1258,43 @@ void makeRedline( SwPaM const & rPaM,
         throw lang::IllegalArgumentException();
 
     //todo: what about REDLINE_FMTCOLL?
-    comphelper::SequenceAsHashMap aPropMap( rRedlineProperties );
     std::size_t nAuthor = 0;
     OUString sAuthor;
-    if( aPropMap.getValue("RedlineAuthor") >>= sAuthor )
-        nAuthor = rRedlineAccess.InsertRedlineAuthor(sAuthor);
-
     OUString sComment;
-    SwRedlineData aRedlineData( eType, nAuthor );
-    if( aPropMap.getValue("RedlineComment") >>= sComment )
-        aRedlineData.SetComment( sComment );
-
     ::util::DateTime aStamp;
-    if( aPropMap.getValue("RedlineDateTime") >>= aStamp )
+    uno::Sequence< beans::PropertyValue > aRevertProperties;
+    bool bIsMoved = false;
+    bool bFoundComment = false;
+    bool bFoundStamp = false;
+    bool bFoundRevertProperties = false;
+    for (const css::beans::PropertyValue & rProp : rRedlineProperties )
     {
-        aRedlineData.SetTimeStamp( DateTime( aStamp));
+        if (rProp.Name == "RedlineAuthor")
+        {
+            if( rProp.Value >>= sAuthor )
+                nAuthor = rRedlineAccess.InsertRedlineAuthor(sAuthor);
+        }
+        else if (rProp.Name == "RedlineComment")
+            bFoundComment = rProp.Value >>= sComment;
+        else if (rProp.Name == "RedlineDateTime")
+            bFoundStamp = rProp.Value >>= aStamp;
+        else if (rProp.Name == "RedlineRevertProperties")
+            bFoundRevertProperties = rProp.Value >>= aRevertProperties;
+        else if (rProp.Name == "RedlineMoved")
+            rProp.Value >>= bIsMoved;
     }
+
+    SwRedlineData aRedlineData( eType, nAuthor );
+    if( bFoundComment )
+        aRedlineData.SetComment( sComment );
+    if( bFoundStamp )
+        aRedlineData.SetTimeStamp( DateTime( aStamp));
 
     std::unique_ptr<SwRedlineExtraData_FormatColl> xRedlineExtraData;
 
     // Read the 'Redline Revert Properties' from the parameters
-    uno::Sequence< beans::PropertyValue > aRevertProperties;
     // Check if the value exists
-    if ( aPropMap.getValue("RedlineRevertProperties") >>= aRevertProperties )
+    if ( bFoundRevertProperties )
     {
         int nMap = 0;
         // Make sure that paragraph format gets its own map, otherwise e.g. fill attributes are not preserved.
@@ -1336,8 +1355,8 @@ void makeRedline( SwPaM const & rPaM,
             if (!aWhichPairs.empty())
             {
                 sal_uInt16 nStylePoolId = USHRT_MAX;
-                OUString sParaStyleName;
-                SfxItemSet aItemSet(rDoc.GetAttrPool(), aWhichPairs);
+                OUString sParaStyleName, sUIStyle;
+                SfxItemSet aItemSet(rDoc.GetAttrPool(), std::move(aWhichPairs));
 
                 for (size_t i = 0; i < aEntries.size(); ++i)
                 {
@@ -1368,7 +1387,11 @@ void makeRedline( SwPaM const & rPaM,
                 if (eType == RedlineType::ParagraphFormat && sParaStyleName.isEmpty())
                     nStylePoolId = RES_POOLCOLL_STANDARD;
 
-                xRedlineExtraData.reset(new SwRedlineExtraData_FormatColl( sParaStyleName, nStylePoolId, &aItemSet ));
+                // tdf#149747 Get UI style name from programmatic style name
+                SwStyleNameMapper::FillUIName(sParaStyleName, sUIStyle,
+                                              SwGetPoolIdFromName::TxtColl);
+                xRedlineExtraData.reset(new SwRedlineExtraData_FormatColl(
+                    sUIStyle.isEmpty() ? sParaStyleName : sUIStyle, nStylePoolId, &aItemSet));
             }
             else if (eType == RedlineType::ParagraphFormat)
                 xRedlineExtraData.reset(new SwRedlineExtraData_FormatColl( "", RES_POOLCOLL_STANDARD, nullptr ));
@@ -1378,8 +1401,7 @@ void makeRedline( SwPaM const & rPaM,
     SwRangeRedline* pRedline = new SwRangeRedline( aRedlineData, rPaM );
 
     // set IsMoved bit of the redline to show and handle moved text
-    bool bIsMoved;
-    if( (aPropMap.getValue("RedlineMoved") >>= bIsMoved) && bIsMoved )
+    if( bIsMoved )
         pRedline->SetMoved();
 
     RedlineFlags nPrevMode = rRedlineAccess.GetRedlineFlags( );
@@ -1430,7 +1452,7 @@ void makeTableRowRedline( SwTableLine& rTableLine,
             pDoc->getIDocumentContentOperations().InsertString( aPaM,
                     OUStringChar(CH_TXT_TRACKED_DUMMY_CHAR) );
             aPaM.SetMark();
-            aPaM.GetMark()->nContent.Assign(aPaM.GetContentNode(), 0);
+            aPaM.GetMark()->SetContent(0);
             makeRedline(aPaM, RedlineType::TableRowInsert == eType
                     ? u"Insert"
                     : u"Delete", rRedlineProperties);

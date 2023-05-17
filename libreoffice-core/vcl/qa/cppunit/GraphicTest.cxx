@@ -84,6 +84,7 @@ private:
     void testLoadPCX();
     void testLoadEPS();
     void testLoadWEBP();
+    void testLoadSVGZ();
 
     void testAvailableThreaded();
     void testColorChangeToTransparent();
@@ -123,6 +124,7 @@ private:
     CPPUNIT_TEST(testLoadPCX);
     CPPUNIT_TEST(testLoadEPS);
     CPPUNIT_TEST(testLoadWEBP);
+    CPPUNIT_TEST(testLoadSVGZ);
 
     CPPUNIT_TEST(testAvailableThreaded);
     CPPUNIT_TEST(testColorChangeToTransparent);
@@ -165,7 +167,7 @@ void createBitmapAndExportForType(SvStream& rStream, std::u16string_view sType, 
     uno::Sequence<beans::PropertyValue> aFilterData;
     GraphicFilter& rGraphicFilter = GraphicFilter::GetGraphicFilter();
     sal_uInt16 nFilterFormat = rGraphicFilter.GetExportFormatNumberForShortName(sType);
-    rGraphicFilter.ExportGraphic(aBitmapEx, "none", rStream, nFilterFormat, &aFilterData);
+    rGraphicFilter.ExportGraphic(aBitmapEx, u"none", rStream, nFilterFormat, &aFilterData);
 
     rStream.Seek(STREAM_SEEK_TO_BEGIN);
 }
@@ -254,9 +256,8 @@ Graphic loadGraphic(std::u16string_view const& rFilename)
     GraphicFilter& rGraphicFilter = GraphicFilter::GetGraphicFilter();
 
     Graphic aGraphic;
-    CPPUNIT_ASSERT_EQUAL(
-        ERRCODE_NONE,
-        rGraphicFilter.ImportGraphic(aGraphic, OUString(), aFileStream, GRFILTER_FORMAT_DONTKNOW));
+    CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, rGraphicFilter.ImportGraphic(aGraphic, u"", aFileStream,
+                                                                    GRFILTER_FORMAT_DONTKNOW));
     return aGraphic;
 }
 
@@ -340,7 +341,7 @@ void GraphicTest::testUnloadedGraphicWmf()
     Graphic aGraphic(aBitmapEx);
     aGraphic.SetPrefSize(Size(99, 99));
     aGraphic.SetPrefMapMode(MapMode(MapUnit::Map100thMM));
-    rGraphicFilter.ExportGraphic(aGraphic, "none", aStream, nFilterFormat);
+    rGraphicFilter.ExportGraphic(aGraphic, u"none", aStream, nFilterFormat);
     aStream.Seek(STREAM_SEEK_TO_BEGIN);
 
     // Now lazy-load this WMF data, with a custom preferred size of 42x42.
@@ -404,11 +405,11 @@ void GraphicTest::testWMFRoundtrip()
     Graphic aGraphic = rGraphicFilter.ImportUnloadedGraphic(aStream);
 
     // Save as WMF.
-    utl::TempFile aTempFile;
+    utl::TempFileNamed aTempFile;
     aTempFile.EnableKillingFile();
     sal_uInt16 nFormat = rGraphicFilter.GetExportFormatNumberForShortName(u"WMF");
     SvStream& rOutStream = *aTempFile.GetStream(StreamMode::READWRITE);
-    rGraphicFilter.ExportGraphic(aGraphic, OUString(), rOutStream, nFormat);
+    rGraphicFilter.ExportGraphic(aGraphic, u"", rOutStream, nFormat);
 
     // Check if we preserved the WMF data perfectly.
     sal_uInt64 nActualSize = rOutStream.TellEnd();
@@ -466,15 +467,14 @@ void GraphicTest::testWMFWithEmfPlusRoundtrip()
     for (bool useConvertMetafile : { false, true })
     {
         // Save as WMF.
-        utl::TempFile aTempFile;
-        aTempFile.EnableKillingFile();
+        utl::TempFileNamed aTempFile;
         SvStream& rOutStream = *aTempFile.GetStream(StreamMode::READWRITE);
         if (useConvertMetafile)
             ConvertGraphicToWMF(aGraphic, rOutStream, nullptr);
         else
         {
             sal_uInt16 nFormat = rGraphicFilter.GetExportFormatNumberForShortName(u"WMF");
-            rGraphicFilter.ExportGraphic(aGraphic, OUString(), rOutStream, nFormat);
+            rGraphicFilter.ExportGraphic(aGraphic, u"", rOutStream, nFormat);
         }
         CPPUNIT_ASSERT_EQUAL(nExpectedSize, rOutStream.TellEnd());
 
@@ -504,32 +504,34 @@ void GraphicTest::testEmfToWmfConversion()
     SvFileStream aStream(aURL, StreamMode::READ);
     Graphic aGraphic;
     // This similar to an application/x-openoffice-wmf mime type in manifest.xml in the ODF case.
-    sal_uInt16 nFormat = aGraphicFilter.GetImportFormatNumberForShortName(u"WMF");
+    sal_uInt16 nFormatEMF = aGraphicFilter.GetImportFormatNumberForShortName(u"EMF");
     CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE,
-                         aGraphicFilter.ImportGraphic(aGraphic, OUString(), aStream, nFormat));
-    CPPUNIT_ASSERT_EQUAL(VectorGraphicDataType::Wmf, aGraphic.getVectorGraphicData()->getType());
+                         aGraphicFilter.ImportGraphic(aGraphic, u"", aStream, nFormatEMF));
+    CPPUNIT_ASSERT_EQUAL(VectorGraphicDataType::Emf, aGraphic.getVectorGraphicData()->getType());
 
     // Save as WMF.
     sal_uInt16 nFilterType = aGraphicFilter.GetExportFormatNumberForShortName(u"WMF");
     SvMemoryStream aGraphicStream;
-    CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, aGraphicFilter.ExportGraphic(aGraphic, OUString(),
-                                                                    aGraphicStream, nFilterType));
+    CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE,
+                         aGraphicFilter.ExportGraphic(aGraphic, u"", aGraphicStream, nFilterType));
     aGraphicStream.Seek(0);
     vcl::GraphicFormatDetector aDetector(aGraphicStream, OUString());
     CPPUNIT_ASSERT(aDetector.detect());
-    CPPUNIT_ASSERT(aDetector.checkWMForEMF());
+    CPPUNIT_ASSERT(aDetector.checkWMF());
 
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: WMF
     // - Actual  : EMF
     // i.e. EMF data was requested to be converted to WMF, but the output was still EMF.
-    CPPUNIT_ASSERT_EQUAL(OUString("WMF"), aDetector.msDetectedFormat);
+    CPPUNIT_ASSERT_EQUAL(OUString("WMF"),
+                         vcl::getImportFormatShortName(aDetector.getMetadata().mnFormat));
 
     // Import the WMF result and check for traces of EMF+ in it.
     Graphic aWmfGraphic;
     aGraphicStream.Seek(0);
-    CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, aGraphicFilter.ImportGraphic(aWmfGraphic, OUString(),
-                                                                    aGraphicStream, nFormat));
+    sal_uInt16 nFormatWMF = aGraphicFilter.GetImportFormatNumberForShortName(u"WMF");
+    CPPUNIT_ASSERT_EQUAL(
+        ERRCODE_NONE, aGraphicFilter.ImportGraphic(aWmfGraphic, u"", aGraphicStream, nFormatWMF));
     int nCommentCount = 0;
     for (size_t i = 0; i < aWmfGraphic.GetGDIMetaFile().GetActionSize(); ++i)
     {
@@ -1322,6 +1324,15 @@ void GraphicTest::testLoadWEBP()
     CPPUNIT_ASSERT_EQUAL(GraphicType::Bitmap, aGraphic.GetType());
     CPPUNIT_ASSERT_EQUAL(tools::Long(10), aGraphic.GetSizePixel().Width());
     CPPUNIT_ASSERT_EQUAL(tools::Long(10), aGraphic.GetSizePixel().Height());
+}
+
+void GraphicTest::testLoadSVGZ()
+{
+    Graphic aGraphic = loadGraphic(u"TypeDetectionExample.svgz");
+    CPPUNIT_ASSERT_EQUAL(GraphicType::Bitmap, aGraphic.GetType());
+    const auto[scalingX, scalingY] = getDPIScaling();
+    CPPUNIT_ASSERT_EQUAL(tools::Long(100 * scalingX), aGraphic.GetSizePixel().Width());
+    CPPUNIT_ASSERT_EQUAL(tools::Long(100 * scalingY), aGraphic.GetSizePixel().Height());
 }
 
 void GraphicTest::testAvailableThreaded()

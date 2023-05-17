@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xenumeration.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -49,14 +49,13 @@ struct RGBColor
 };
 }
 
-class ScUniqueCellFormatsEnumeration : public CalcUnoApiTest, public apitest::XEnumeration
+class ScUniqueCellFormatsEnumeration : public UnoApiTest, public apitest::XEnumeration
 {
 public:
     ScUniqueCellFormatsEnumeration();
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScUniqueCellFormatsEnumeration);
 
@@ -67,19 +66,18 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    uno::Reference<lang::XComponent> m_xComponent;
     void changeColor(const uno::Reference<sheet::XSpreadsheet>& xSheet, const OUString& sRangeName,
                      const RGBColor& rgb);
 };
 
 ScUniqueCellFormatsEnumeration::ScUniqueCellFormatsEnumeration()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
 uno::Reference<uno::XInterface> ScUniqueCellFormatsEnumeration::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
@@ -102,14 +100,8 @@ uno::Reference<uno::XInterface> ScUniqueCellFormatsEnumeration::init()
 
 void ScUniqueCellFormatsEnumeration::setUp()
 {
-    CalcUnoApiTest::setUp();
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScUniqueCellFormatsEnumeration::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    UnoApiTest::setUp();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 void ScUniqueCellFormatsEnumeration::changeColor(const uno::Reference<sheet::XSpreadsheet>& xSheet,

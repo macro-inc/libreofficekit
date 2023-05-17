@@ -51,7 +51,7 @@
 #include <comphelper/mimeconfighelper.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 
 #include <targetstatecontrol.hxx>
@@ -286,7 +286,7 @@ bool OleEmbeddedObject::TryToConvertToOOo( const uno::Reference< io::XStream >& 
             {
                 // create the model
                 uno::Sequence< uno::Any > aArguments{ uno::Any(
-                    beans::NamedValue( "EmbeddedObject", uno::makeAny( true ))) };
+                    beans::NamedValue( "EmbeddedObject", uno::Any( true ))) };
 
                 uno::Reference< util::XCloseable > xDocument( m_xContext->getServiceManager()->createInstanceWithArgumentsAndContext( aDocServiceName, aArguments, m_xContext ), uno::UNO_QUERY_THROW );
                 uno::Reference< frame::XLoadable > xLoadable( xDocument, uno::UNO_QUERY_THROW );
@@ -681,10 +681,10 @@ namespace
         const css::uno::Reference< css::uno::XComponentContext >& xContext,
         const css::uno::Reference< css::io::XStream >& xObjectStream )
     {
-        uno::Reference <beans::XPropertySet> xNativeTempFile(
+        uno::Reference <io::XTempFile> xNativeTempFile(
             io::TempFile::create(xContext),
-            uno::UNO_QUERY_THROW);
-        uno::Reference < io::XStream > xStream(xNativeTempFile, uno::UNO_QUERY_THROW);
+            uno::UNO_SET_THROW);
+        uno::Reference < io::XStream > xStream(xNativeTempFile);
 
         uno::Sequence< uno::Any > aArgs{ uno::Any(xObjectStream),
                                          uno::Any(true) }; // do not create copy
@@ -706,7 +706,7 @@ namespace
         };
 
         bool bCopied = false;
-        for (size_t i = 0; i < SAL_N_ELEMENTS(aStreamNames) && !bCopied; ++i)
+        for (size_t i = 0; i < std::size(aStreamNames) && !bCopied; ++i)
         {
             uno::Reference<io::XStream> xEmbeddedFile;
             try
@@ -775,10 +775,8 @@ namespace
 
         if (bCopied)
         {
-            xNativeTempFile->setPropertyValue("RemoveFile",
-                uno::makeAny(false));
-            uno::Any aUrl = xNativeTempFile->getPropertyValue("Uri");
-            aUrl >>= rUrl;
+            xNativeTempFile->setRemoveFile(false);
+            rUrl = xNativeTempFile->getUri();
 
             xNativeTempFile.clear();
 
@@ -789,8 +787,7 @@ namespace
         }
         else
         {
-            xNativeTempFile->setPropertyValue("RemoveFile",
-                uno::makeAny(true));
+            xNativeTempFile->setRemoveFile(true);
         }
 
         return xStream;

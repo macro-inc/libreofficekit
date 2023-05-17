@@ -171,6 +171,16 @@ bool ObjectContact::isOutputToPDFFile() const
     return false;
 }
 
+bool ObjectContact::isExportTaggedPDF() const
+{
+    return false;
+}
+
+::vcl::PDFExtOutDevData const* ObjectContact::GetPDFExtOutDevData() const
+{
+    return nullptr;
+}
+
 // gray display mode
 bool ObjectContact::isDrawModeGray() const
 {

@@ -92,7 +92,7 @@ ODesignView::ODesignView(   vcl::Window* pParent,
     ,m_pCurrentView(nullptr)
     ,m_aMarkIdle("reportdesign ODesignView Mark Idle")
     ,m_eMode( DlgEdMode::Select )
-    ,m_eActObj( OBJ_NONE )
+    ,m_eActObj( SdrObjKind::NONE )
     ,m_aGridSizeCoarse( 1000, 1000 )    // #i93595# 100TH_MM changed to grid using coarse 1 cm grid
     ,m_aGridSizeFine( 250, 250 )        // and a 0,25 cm subdivision for better visualisation
     ,m_bDeleted( false )
@@ -136,7 +136,7 @@ void ODesignView::dispose()
     if ( m_xAddField )
     {
         SvtViewOptions aDlgOpt( EViewType::Window, UID_RPT_RPT_APP_VIEW );
-        aDlgOpt.SetWindowState(OStringToOUString(m_xAddField->getDialog()->get_window_state(WindowStateMask::All), RTL_TEXTENCODING_ASCII_US));
+        aDlgOpt.SetWindowState(OStringToOUString(m_xAddField->getDialog()->get_window_state(vcl::WindowDataMask::All), RTL_TEXTENCODING_ASCII_US));
 
         if (m_xAddField->getDialog()->get_visible())
             m_xAddField->response(RET_CANCEL);
@@ -146,7 +146,7 @@ void ODesignView::dispose()
     if ( m_xReportExplorer )
     {
         SvtViewOptions aDlgOpt(EViewType::Window, OStringToOUString(m_xReportExplorer->get_help_id(), RTL_TEXTENCODING_UTF8));
-        aDlgOpt.SetWindowState(OStringToOUString(m_xReportExplorer->getDialog()->get_window_state(WindowStateMask::All), RTL_TEXTENCODING_ASCII_US));
+        aDlgOpt.SetWindowState(OStringToOUString(m_xReportExplorer->getDialog()->get_window_state(vcl::WindowDataMask::All), RTL_TEXTENCODING_ASCII_US));
 
         if (m_xReportExplorer->getDialog()->get_visible())
             m_xReportExplorer->response(RET_CANCEL);
@@ -184,7 +184,7 @@ bool ODesignView::PreNotify( NotifyEvent& rNEvt )
     bool bRet = ODataView::PreNotify(rNEvt); // 1 := has to be handled here
     switch(rNEvt.GetType())
     {
-        case MouseNotifyEvent::KEYINPUT:
+        case NotifyEventType::KEYINPUT:
         {
             if ( m_pPropWin && m_pPropWin->HasChildPathFocus() )
                 return false;
@@ -287,7 +287,7 @@ void ODesignView::SetMode( DlgEdMode _eNewMode )
 {
     m_eMode = _eNewMode;
     if ( m_eMode == DlgEdMode::Select )
-        m_eActObj = OBJ_NONE;
+        m_eActObj = SdrObjKind::NONE;
 
     m_aScrollWindow->SetMode(_eNewMode);
 }
@@ -413,7 +413,7 @@ IMPL_LINK_NOARG( ODesignView, SplitHdl, SplitWindow*, void )
     }
 }
 
-void ODesignView::SelectAll(const sal_uInt16 _nObjectType)
+void ODesignView::SelectAll(const SdrObjKind _nObjectType)
 {
      m_aScrollWindow->SelectAll(_nObjectType);
 }

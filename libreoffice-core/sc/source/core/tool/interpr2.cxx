@@ -41,6 +41,7 @@
 #include <dpobject.hxx>
 #include <tokenarray.hxx>
 #include <globalnames.hxx>
+#include <stlpool.hxx>
 #include <stlsheet.hxx>
 #include <dpcache.hxx>
 
@@ -535,11 +536,7 @@ void ScInterpreter::ScNetWorkdays( bool bOOXML_Version )
         size_t nRef = 0;
         bool bReverse = ( nDate1 > nDate2 );
         if ( bReverse )
-        {
-            sal_uInt32 nTemp = nDate1;
-            nDate1 = nDate2;
-            nDate2 = nTemp;
-        }
+            std::swap( nDate1, nDate2 );
         size_t nMax = nSortArray.size();
         while ( nDate1 <= nDate2 )
         {
@@ -965,20 +962,55 @@ void ScInterpreter::RoundNumber( rtl_math_RoundingMode eMode )
         fVal = ::rtl::math::round( GetDouble(), 0, eMode );
     else
     {
-        sal_Int16 nDec = GetInt16();
-        double fX = GetDouble();
+        const sal_Int16 nDec = GetInt16();
+        const double fX = GetDouble();
         if (nGlobalError == FormulaError::NONE)
         {
+            // A quite aggressive approach with 12 significant digits.
+            // However, using 14 or some other doesn't work because other
+            // values may fail, like =ROUNDDOWN(2-5E-015;13) would produce
+            // 2 (another example in tdf#124286).
+            constexpr sal_Int16 kSigDig = 12;
+
             if ( ( eMode == rtl_math_RoundingMode_Down ||
                    eMode == rtl_math_RoundingMode_Up ) &&
-                 nDec < 12 && fmod( fX, 1.0 ) != 0.0 )
+                 nDec < kSigDig && fmod( fX, 1.0 ) != 0.0 )
+
             {
-                // tdf124286 : round to 12 significant digits before rounding
+                // tdf124286 : round to significant digits before rounding
                 //             down or up to avoid unexpected rounding errors
                 //             caused by decimal -> binary -> decimal conversion
-                double fRes;
-                RoundSignificant( fX, 12, fRes );
-                fVal = ::rtl::math::round( fRes, nDec, eMode );
+
+                double fRes = fX;
+                // Similar to RoundSignificant() but omitting the back-scaling
+                // and interim integer rounding before the final rounding,
+                // which would result in double rounding. Instead, adjust the
+                // decimals and round into integer part before scaling back.
+                const double fTemp = floor( log10( std::abs(fRes))) + 1.0 - kSigDig;
+                // Avoid inaccuracy of negative powers of 10.
+                if (fTemp < 0.0)
+                    fRes *= pow(10.0, -fTemp);
+                else
+                    fRes /= pow(10.0, fTemp);
+                if (std::isfinite(fRes))
+                {
+                    // fRes is now at a decimal normalized scale.
+                    // Truncate up-rounding to opposite direction for values
+                    // like 0.0600000000000005 =ROUNDUP(8.06-8;2) that here now
+                    // is 600000000000.005 and otherwise would yield 0.07
+                    if (eMode == rtl_math_RoundingMode_Up)
+                        fRes = ::rtl::math::approxFloor(fRes);
+                    fVal = ::rtl::math::round( fRes, nDec + fTemp, eMode );
+                    if (fTemp < 0.0)
+                        fVal /= pow(10.0, -fTemp);
+                    else
+                        fVal *= pow(10.0, fTemp);
+                }
+                else
+                {
+                    // Overflow. Let our round() decide if and how to round.
+                    fVal = ::rtl::math::round( fX, nDec, eMode );
+                }
             }
             else
                 fVal = ::rtl::math::round( fX, nDec, eMode );
@@ -1004,8 +1036,21 @@ void ScInterpreter::ScRoundUp()
 
 void ScInterpreter::RoundSignificant( double fX, double fDigits, double &fRes )
 {
-    double fTemp = ::rtl::math::approxFloor( log10( std::abs(fX) ) ) + 1.0 - fDigits;
-    fRes = ::rtl::math::round( pow(10.0, -fTemp ) * fX ) * pow( 10.0, fTemp );
+    double fTemp = floor( log10( std::abs(fX) ) ) + 1.0 - fDigits;
+    double fIn = fX;
+    // Avoid inaccuracy of negative powers of 10.
+    if (fTemp < 0.0)
+        fIn *= pow(10.0, -fTemp);
+    else
+        fIn /= pow(10.0, fTemp);
+    // For very large fX there might be an overflow in fIn resulting in
+    // non-finite. rtl::math::round() handles that and it will be propagated as
+    // usual.
+    fRes = ::rtl::math::round(fIn);
+    if (fTemp < 0.0)
+        fRes /= pow(10.0, -fTemp);
+    else
+        fRes *= pow(10.0, fTemp);
 }
 
 // tdf#105931
@@ -1445,7 +1490,7 @@ void ScInterpreter::ScIRR()
         }
         else
         {
-            ScValueIterator aValIter(mrDoc, aRange, mnSubTotalFlags);
+            ScValueIterator aValIter(mrContext, aRange, mnSubTotalFlags);
             bool bLoop = aValIter.GetFirst(fValue, nIterError);
             while (bLoop && nIterError == FormulaError::NONE)
             {
@@ -1553,7 +1598,7 @@ void ScInterpreter::ScMIRR()
         }
         else
         {
-            ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags );
+            ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags );
             double fCellValue;
             FormulaError nIterError = FormulaError::NONE;
 
@@ -1871,7 +1916,7 @@ void ScInterpreter::ScPDuration()
         if ( fFuture <= 0.0 || fPresent <= 0.0 || fRate <= 0.0 )
             PushIllegalArgument();
         else
-            PushDouble( std::log( fFuture / fPresent ) / rtl::math::log1p( fRate ) );
+            PushDouble( std::log( fFuture / fPresent ) / std::log1p( fRate ) );
     }
 }
 
@@ -1896,11 +1941,11 @@ double ScInterpreter::ScGetPMT(double fRate, double fNper, double fPv,
     else
     {
         if (bPayInAdvance) // payment in advance
-            fPayment = (fFv + fPv * exp( fNper * ::rtl::math::log1p(fRate) ) ) * fRate /
-                (std::expm1( (fNper + 1) * ::rtl::math::log1p(fRate) ) - fRate);
+            fPayment = (fFv + fPv * exp( fNper * ::std::log1p(fRate) ) ) * fRate /
+                (std::expm1( (fNper + 1) * ::std::log1p(fRate) ) - fRate);
         else  // payment in arrear
-            fPayment = (fFv + fPv * exp(fNper * ::rtl::math::log1p(fRate) ) ) * fRate /
-                std::expm1( fNper * ::rtl::math::log1p(fRate) );
+            fPayment = (fFv + fPv * exp(fNper * ::std::log1p(fRate) ) ) * fRate /
+                std::expm1( fNper * ::std::log1p(fRate) );
     }
     return -fPayment;
 }
@@ -1983,9 +2028,9 @@ void ScInterpreter::ScNper()
         PushDouble(-(fPV + fFV)/fPmt);
     else if (bPayInAdvance)
         PushDouble(log(-(fRate*fFV-fPmt*(1.0+fRate))/(fRate*fPV+fPmt*(1.0+fRate)))
-                  / rtl::math::log1p(fRate));
+                  / std::log1p(fRate));
     else
-        PushDouble(log(-(fRate*fFV-fPmt)/(fRate*fPV+fPmt)) / rtl::math::log1p(fRate));
+        PushDouble(log(-(fRate*fFV-fPmt)/(fRate*fPV+fPmt)) / std::log1p(fRate));
 }
 
 bool ScInterpreter::RateIteration( double fNper, double fPayment, double fPv,
@@ -2596,48 +2641,62 @@ void ScInterpreter::ScCurrent()
 void ScInterpreter::ScStyle()
 {
     sal_uInt8 nParamCount = GetByte();
-    if (nParamCount >= 1 && nParamCount <= 3)
+    if (!MustHaveParamCount(nParamCount, 1, 3))
+        return;
+
+    OUString aStyle2;                           // Style after timer
+    if (nParamCount >= 3)
+        aStyle2 = GetString().getString();
+    tools::Long nTimeOut = 0;                          // timeout
+    if (nParamCount >= 2)
+        nTimeOut = static_cast<tools::Long>(GetDouble()*1000.0);
+    OUString aStyle1 = GetString().getString(); // Style for immediate
+
+    if (nTimeOut < 0)
+        nTimeOut = 0;
+
+    // Execute request to apply style
+    if ( !mrDoc.IsClipOrUndo() )
     {
-        OUString aStyle2;                           // Template after timer
-        if (nParamCount >= 3)
-            aStyle2 = GetString().getString();
-        tools::Long nTimeOut = 0;                          // timeout
-        if (nParamCount >= 2)
-            nTimeOut = static_cast<tools::Long>(GetDouble()*1000.0);
-        OUString aStyle1 = GetString().getString(); // Template for immediate
-
-        if (nTimeOut < 0)
-            nTimeOut = 0;
-
-        // Execute request to apply template
-        if ( !mrDoc.IsClipOrUndo() )
+        SfxObjectShell* pShell = mrDoc.GetDocumentShell();
+        if (pShell)
         {
-            SfxObjectShell* pShell = mrDoc.GetDocumentShell();
-            if (pShell)
+            // Normalize style names right here, making sure that character case is correct,
+            // and that we only apply anything when there's something to apply
+            auto pPool = mrDoc.GetStyleSheetPool();
+            if (!aStyle1.isEmpty())
             {
-                // notify object shell directly!
-                bool bNotify = true;
-                if (aStyle2.isEmpty())
-                {
-                    const ScStyleSheet* pStyle = mrDoc.GetStyle(aPos.Col(), aPos.Row(), aPos.Tab());
+                if (auto pNewStyle = pPool->FindAutoStyle(aStyle1))
+                    aStyle1 = pNewStyle->GetName();
+                else
+                    aStyle1.clear();
+            }
+            if (!aStyle2.isEmpty())
+            {
+                if (auto pNewStyle = pPool->FindAutoStyle(aStyle2))
+                    aStyle2 = pNewStyle->GetName();
+                else
+                    aStyle2.clear();
+            }
+            // notify object shell directly!
+            if (!aStyle1.isEmpty() || !aStyle2.isEmpty())
+            {
+                const ScStyleSheet* pStyle = mrDoc.GetStyle(aPos.Col(), aPos.Row(), aPos.Tab());
 
-                    if (pStyle && pStyle->GetName() == aStyle1)
-                        bNotify = false;
-                }
-
+                const bool bNotify = !pStyle
+                                     || (!aStyle1.isEmpty() && pStyle->GetName() != aStyle1)
+                                     || (!aStyle2.isEmpty() && pStyle->GetName() != aStyle2);
                 if (bNotify)
                 {
                     ScRange aRange(aPos);
-                    ScAutoStyleHint aHint( aRange, aStyle1, nTimeOut, aStyle2 );
-                    pShell->Broadcast( aHint );
+                    ScAutoStyleHint aHint(aRange, aStyle1, nTimeOut, aStyle2);
+                    pShell->Broadcast(aHint);
                 }
             }
         }
-
-        PushDouble(0.0);
     }
-    else
-        PushIllegalParameter();
+
+    PushDouble(0.0);
 }
 
 static ScDdeLink* lcl_GetDdeLink( const sfx2::LinkManager* pLinkMgr,
@@ -3033,10 +3092,8 @@ void ScInterpreter::ScRoman()
                 sal_Int32 nPad = nDigit % 5;
                 if (nPad)
                 {
-                    OUStringBuffer aBuf(aRoman);
-                    comphelper::string::padToLength(aBuf, aBuf.getLength() + nPad,
+                    comphelper::string::padToLength(aRoman, aRoman.getLength() + nPad,
                         pChars[nIndex]);
-                    aRoman = aBuf.makeStringAndClear();
                 }
                 nVal %= pValues[ nIndex ];
             }
@@ -3466,7 +3523,7 @@ void ScInterpreter::ScBahtText()
         if( fBaht > 0.0 )
             aBlock.insert( 0, UTF8_TH_1E6 );
 
-        aText.insert(0, aBlock.makeStringAndClear());
+        aText.insert(0, aBlock);
     }
     if (!aText.isEmpty())
         aText.append( UTF8_TH_BAHT );
@@ -3486,7 +3543,7 @@ void ScInterpreter::ScBahtText()
     if( bMinus )
         aText.insert( 0, UTF8_TH_MINUS );
 
-    PushString( OStringToOUString(aText.makeStringAndClear(), RTL_TEXTENCODING_UTF8) );
+    PushString( OStringToOUString(aText, RTL_TEXTENCODING_UTF8) );
 }
 
 void ScInterpreter::ScGetPivotData()

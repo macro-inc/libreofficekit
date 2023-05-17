@@ -20,9 +20,11 @@
 #ifndef INCLUDED_COMPHELPER_SCOPEGUARD_HXX
 #define INCLUDED_COMPHELPER_SCOPEGUARD_HXX
 
-#include <sal/log.hxx>
-#include <com/sun/star/uno/Exception.hpp>
+#include <sal/config.h>
 
+#include <utility>
+
+#include <o3tl/deleter.hxx>
 
 // For some reason, Android buildbot issues -Werror like this:
 //   In file included from
@@ -60,18 +62,7 @@ public:
     {
         if (m_bDismissed)
             return;
-        try
-        {
-            m_func();
-        }
-        catch (css::uno::Exception& exc)
-        {
-            SAL_WARN("comphelper", "UNO exception occurred: " << exc);
-        }
-        catch (...)
-        {
-            SAL_WARN("comphelper", "unknown exception occurred!");
-        }
+        suppress_fun_call_w_exception(m_func());
     }
 
     /** Dismisses the scope guard, i.e. the function won't

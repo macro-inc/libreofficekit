@@ -17,6 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cstddef>
+
 #include <TDatabaseMetaDataBase.hxx>
 #include <RowFunctionParser.hxx>
 
@@ -139,11 +143,11 @@ Reference< XResultSet > SAL_CALL ODatabaseMetaDataBase::getTypeInfo(  )
                 ::connectivity::ODatabaseMetaDataResultSet::ORow aRow;
                 aRow.push_back(ODatabaseMetaDataResultSet::getEmptyValue());
                 const sal_Int32* pType = pTypes;
-                for (sal_Int32 i = 1; i <= sal_Int32(SAL_N_ELEMENTS(pTypes)); ++i,++pType)
+                for (std::size_t i = 1; i <= std::size(pTypes); ++i,++pType)
                 {
                     ORowSetValue aValue;
                     aValue.fill(i,*pType,xRow);
-                    aRow.push_back(new ORowSetValueDecorator(aValue));
+                    aRow.push_back(new ORowSetValueDecorator(std::move(aValue)));
                 }
 
                 std::vector<std::shared_ptr<ExpressionNode>>::iterator aIter = aConditions.begin();

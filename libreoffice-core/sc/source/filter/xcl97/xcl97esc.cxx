@@ -29,7 +29,6 @@
 #include <svx/svdotext.hxx>
 #include <svx/svdobj.hxx>
 #include <svx/svdoole2.hxx>
-#include <svx/unoapi.hxx>
 #include <unotools/tempfile.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <svx/sdasitm.hxx>
@@ -67,22 +66,19 @@ using ::com::sun::star::io::XOutputStream;
 using ::com::sun::star::script::ScriptEventDescriptor;
 using ::com::sun::star::script::XEventAttacherManager;
 
-XclEscherExGlobal::XclEscherExGlobal( const XclExpRoot& rRoot ) :
-    XclExpRoot( rRoot )
+XclEscherExGlobal::XclEscherExGlobal( const XclExpRoot& rRoot )
+    : XclExpRoot(rRoot)
+    , mpPicStrm(nullptr)
 {
     SetBaseURI( GetMedium().GetBaseURL( true ) );
 }
 
 SvStream* XclEscherExGlobal::ImplQueryPictureStream()
 {
-    mxPicTempFile.reset( new ::utl::TempFile );
-    if( mxPicTempFile->IsValid() )
-    {
-        mxPicTempFile->EnableKillingFile();
-        mxPicStrm = ::utl::UcbStreamHelper::CreateStream( mxPicTempFile->GetURL(), StreamMode::STD_READWRITE );
-        mxPicStrm->SetEndian( SvStreamEndian::LITTLE );
-    }
-    return mxPicStrm.get();
+    mxPicTempFile.reset( new ::utl::TempFileFast );
+    mpPicStrm = mxPicTempFile->GetStream( StreamMode::READWRITE );
+    mpPicStrm->SetEndian( SvStreamEndian::LITTLE );
+    return mpPicStrm;
 }
 
 XclEscherEx::XclEscherEx( const XclExpRoot& rRoot, XclExpObjectManager& rObjMgr, SvStream& rStrm, const XclEscherEx* pParent ) :
@@ -166,7 +162,7 @@ namespace {
 bool lcl_IsFontwork( const SdrObject* pObj )
 {
     bool bIsFontwork = false;
-    if( pObj->GetObjIdentifier() == OBJ_CUSTOMSHAPE )
+    if( pObj->GetObjIdentifier() == SdrObjKind::CustomShape )
     {
         static const OUStringLiteral aTextPath = u"TextPath";
         const SdrCustomShapeGeometryItem& rGeometryItem =
@@ -202,9 +198,9 @@ EscherExHostAppData* XclEscherEx::StartShape( const Reference< XShape >& rxShape
     else
     {
         pCurrXclObj = nullptr;
-        sal_uInt16 nObjType = pObj->GetObjIdentifier();
+        SdrObjKind nObjType = pObj->GetObjIdentifier();
 
-        if( nObjType == OBJ_OLE2 )
+        if( nObjType == SdrObjKind::OLE2 )
         {
             // no OLE objects in embedded drawings (chart shapes)
             if( mbIsRootDff )
@@ -228,7 +224,7 @@ EscherExHostAppData* XclEscherEx::StartShape( const Reference< XShape >& rxShape
             else
                 pCurrXclObj = new XclObjAny( mrObjMgr, rxShape, &GetDoc() );
         }
-        else if( nObjType == OBJ_UNO )
+        else if( nObjType == SdrObjKind::UNO )
         {
             //added for exporting OCX control
             Reference< XPropertySet > xPropSet( rxShape, UNO_QUERY );
@@ -279,8 +275,8 @@ EscherExHostAppData* XclEscherEx::StartShape( const Reference< XShape >& rxShape
                         pAnchor->SetFlags( *pObj );
                         pCurrAppData->SetClientAnchor( pAnchor );
                     }
-                    const SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( pObj  );
-                    if( pTextObj && !lcl_IsFontwork( pTextObj ) && (pObj->GetObjIdentifier() != OBJ_CAPTION) )
+                    const SdrTextObj* pTextObj = DynCastSdrTextObj( pObj  );
+                    if( pTextObj && !lcl_IsFontwork( pTextObj ) && (pObj->GetObjIdentifier() != SdrObjKind::Caption) )
                     {
                         const OutlinerParaObject* pParaObj = pTextObj->GetOutlinerParaObject();
                         if( pParaObj )
@@ -310,8 +306,8 @@ EscherExHostAppData* XclEscherEx::StartShape( const Reference< XShape >& rxShape
         //for OCX control import from MS office file,we need keep the id value as MS office file.
         //GetOldRoot().pObjRecs->Add( pCurrXclObj ) statement has generated the id value as obj id rule;
         //but we trick it here.
-        sal_uInt16 nObjType = pObj->GetObjIdentifier();
-        if( nObjType == OBJ_UNO && pCurrXclObj )
+        SdrObjKind nObjType = pObj->GetObjIdentifier();
+        if( nObjType == SdrObjKind::UNO && pCurrXclObj )
         {
             Reference< XPropertySet > xPropSet( rxShape, UNO_QUERY );
             Any aAny;
@@ -434,8 +430,7 @@ std::unique_ptr<XclExpTbxControlObj> XclEscherEx::CreateTBXCtrlObj( Reference< X
     ::std::unique_ptr< XclExpTbxControlObj > xTbxCtrl( new XclExpTbxControlObj( mrObjMgr, xShape, pChildAnchor ) );
     if( xTbxCtrl->GetObjType() == EXC_OBJTYPE_UNKNOWN )
         xTbxCtrl.reset();
-
-    if (xTbxCtrl)
+    else
     {
         // find attached macro
         Reference< XControlModel > xCtrlModel = XclControlHelper::GetControlModel( xShape );

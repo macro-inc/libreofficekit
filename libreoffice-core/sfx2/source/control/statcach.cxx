@@ -27,7 +27,6 @@
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <comphelper/servicehelper.hxx>
-#include <cppuhelper/weak.hxx>
 #include <svl/eitem.hxx>
 #include <svl/intitem.hxx>
 #include <svl/stritem.hxx>
@@ -42,15 +41,16 @@
 #include <unoctitm.hxx>
 #include <sfx2/msgpool.hxx>
 #include <sfx2/viewfrm.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::util;
 
-BindDispatch_Impl::BindDispatch_Impl( const css::uno::Reference< css::frame::XDispatch > & rDisp, const css::util::URL& rURL, SfxStateCache *pStateCache, const SfxSlot* pS )
-    : xDisp( rDisp )
-    , aURL( rURL )
+BindDispatch_Impl::BindDispatch_Impl( css::uno::Reference< css::frame::XDispatch > _xDisp, css::util::URL _aURL, SfxStateCache *pStateCache, const SfxSlot* pS )
+    : xDisp(std::move( _xDisp ))
+    , aURL(std::move( _aURL ))
     , pCache( pStateCache )
     , pSlot( pS )
 {

@@ -26,7 +26,6 @@
 #include <svx/svditer.hxx>
 #include <svx/xdef.hxx>
 #include <svx/xfillit0.hxx>
-#include <svx/svdmodel.hxx>
 
 using namespace com::sun::star;
 
@@ -39,21 +38,6 @@ namespace sdr::properties
 
         BaseProperties::~BaseProperties()
         {
-        }
-
-        void BaseProperties::applyDefaultStyleSheetFromSdrModel()
-        {
-            SfxStyleSheet* pDefaultStyleSheet(GetSdrObject().getSdrModelFromSdrObject().GetDefaultStyleSheet());
-
-            // tdf#118139 Only do this when StyleSheet really differs. It may e.g.
-            // be the case that nullptr == pDefaultStyleSheet and there is none set yet,
-            // so indeed no need to set it (needed for some strange old MSWord2003
-            // documents with CustomShape-'Group' and added Text-Frames, see task description)
-            if(pDefaultStyleSheet != GetStyleSheet())
-            {
-                // do not delete hard attributes when setting dsefault Style
-                SetStyleSheet(pDefaultStyleSheet, true);
-            }
         }
 
         const SdrObject& BaseProperties::GetSdrObject() const
@@ -126,25 +110,27 @@ namespace sdr::properties
             const sal_uInt32 nCount(rChange.GetRectangleCount());
 
             // invalidate all new rectangles
-            if(auto pObjGroup = dynamic_cast<SdrObjGroup*>( &GetSdrObject() ))
+            SdrObject* pObj = &GetSdrObject();
+            if (pObj->GetObjIdentifier() == SdrObjKind::Group)
             {
+                SdrObjGroup* pObjGroup = static_cast<SdrObjGroup*>(pObj);
                 SdrObjListIter aIter(pObjGroup, SdrIterMode::DeepNoGroups);
 
                 while(aIter.IsMore())
                 {
-                    SdrObject* pObj = aIter.Next();
-                    pObj->BroadcastObjectChange();
+                    SdrObject* pChildObj = aIter.Next();
+                    pChildObj->BroadcastObjectChange();
                 }
             }
             else
             {
-                GetSdrObject().BroadcastObjectChange();
+                pObj->BroadcastObjectChange();
             }
 
             // also send the user calls
             for(sal_uInt32 a(0); a < nCount; a++)
             {
-                GetSdrObject().SendUserCall(SdrUserCallType::ChangeAttr, rChange.GetRectangle(a));
+                pObj->SendUserCall(SdrUserCallType::ChangeAttr, rChange.GetRectangle(a));
             }
         }
 

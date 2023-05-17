@@ -20,6 +20,7 @@
 #include <memory>
 #include <hintids.hxx>
 
+#include <utility>
 #include <vcl/font.hxx>
 #include <editeng/brushitem.hxx>
 #include <editeng/numitem.hxx>
@@ -186,7 +187,7 @@ static void lcl_SetRuleChgd( SwTextNode& rNd, sal_uInt8 nLevel )
 SwNumFormat::SwNumFormat() :
     SvxNumberFormat(SVX_NUM_ARABIC),
     SwClient( nullptr ),
-    m_pVertOrient(new SwFormatVertOrient( 0, text::VertOrientation::NONE))
+    m_aVertOrient( 0, text::VertOrientation::NONE )
     ,m_cGrfBulletCP(USHRT_MAX)//For i120928,record the cp info of graphic within bullet
 {
 }
@@ -194,7 +195,7 @@ SwNumFormat::SwNumFormat() :
 SwNumFormat::SwNumFormat( const SwNumFormat& rFormat) :
     SvxNumberFormat(rFormat),
     SwClient( rFormat.GetRegisteredInNonConst() ),
-    m_pVertOrient(new SwFormatVertOrient( 0, rFormat.GetVertOrient()))
+    m_aVertOrient( 0, rFormat.GetVertOrient() )
     ,m_cGrfBulletCP(rFormat.m_cGrfBulletCP)//For i120928,record the cp info of graphic within bullet
 {
     sal_Int16 eMyVertOrient = rFormat.GetVertOrient();
@@ -204,7 +205,7 @@ SwNumFormat::SwNumFormat( const SwNumFormat& rFormat) :
 
 SwNumFormat::SwNumFormat(const SvxNumberFormat& rNumFormat, SwDoc* pDoc)
     : SvxNumberFormat(rNumFormat)
-    , m_pVertOrient(new SwFormatVertOrient( 0, rNumFormat.GetVertOrient()))
+    , m_aVertOrient( 0, rNumFormat.GetVertOrient() )
     , m_cGrfBulletCP(USHRT_MAX)
 {
     sal_Int16 eMyVertOrient = rNumFormat.GetVertOrient();
@@ -319,7 +320,7 @@ void    SwNumFormat::SetGraphicBrush( const SvxBrushItem* pBrushItem, const Size
     const sal_Int16* pOrient)
 {
     if(pOrient)
-        m_pVertOrient->SetVertOrient( *pOrient );
+        m_aVertOrient.SetVertOrient( *pOrient );
     SvxNumberFormat::SetGraphicBrush( pBrushItem, pSize, pOrient);
 }
 
@@ -355,16 +356,16 @@ const SwFormatVertOrient*      SwNumFormat::GetGraphicOrientation() const
         return nullptr;
     else
     {
-        m_pVertOrient->SetVertOrient(eOrient);
-        return m_pVertOrient.get();
+        const_cast<SwFormatVertOrient&>(m_aVertOrient).SetVertOrient(eOrient);
+        return &m_aVertOrient;
     }
 }
 
-SwNumRule::SwNumRule( const OUString& rNm,
+SwNumRule::SwNumRule( OUString aNm,
                       const SvxNumberFormat::SvxNumPositionAndSpaceMode eDefaultNumberFormatPositionAndSpaceMode,
                       SwNumRuleType eType )
   : mpNumRuleMap(nullptr),
-    msName( rNm ),
+    msName( std::move(aNm) ),
     meRuleType( eType ),
     mnPoolFormatId( USHRT_MAX ),
     mnPoolHelpId( USHRT_MAX ),
@@ -649,7 +650,6 @@ OUString SwNumRule::MakeNumString( const SwNodeNum& rNum, bool bInclStrings ) co
 
 OUString SwNumRule::MakeNumString( const SwNumberTree::tNumberVector & rNumVector,
                                  const bool bInclStrings,
-                                 const bool bOnlyArabic,
                                  const unsigned int _nRestrictToThisLevel,
                                  SwNumRule::Extremities* pExtremities,
                                  LanguageType nLang ) const
@@ -673,7 +673,7 @@ OUString SwNumRule::MakeNumString( const SwNumberTree::tNumberVector & rNumVecto
     if (rMyNFormat.GetNumberingType() == SVX_NUM_NUMBER_NONE)
     {
         if (!rMyNFormat.HasListFormat())
-            return OUString();
+            return bInclStrings ? rMyNFormat.GetPrefix() + rMyNFormat.GetSuffix() : OUString();
 
         // If numbering is disabled for this level we should emit just prefix/suffix
         // Remove everything between first %1% and last %n% (including markers)
@@ -711,12 +711,7 @@ OUString SwNumRule::MakeNumString( const SwNumberTree::tNumberVector & rNumVecto
                 }
             }
             else if (rNumVector[i])
-            {
-                if (bOnlyArabic)
-                    sReplacement = OUString::number(rNumVector[i]);
-                else
-                    sReplacement = Get(i).GetNumStr(rNumVector[i], aLocale);
-            }
+                sReplacement = Get(i).GetNumStr(rNumVector[i], aLocale);
             else
                 sReplacement = "0";        // all 0 level are a 0
 
@@ -761,12 +756,7 @@ OUString SwNumRule::MakeNumString( const SwNumberTree::tNumberVector & rNumVecto
             }
 
             if (rNumVector[i])
-            {
-                if (bOnlyArabic)
-                    aStr.append(rNumVector[i]);
-                else
-                    aStr.append(rNFormat.GetNumStr(rNumVector[i], aLocale));
-            }
+                aStr.append(rNFormat.GetNumStr(rNumVector[i], aLocale));
             else
                 aStr.append("0");        // all 0 level are a 0
             if (i != nLevel && !aStr.isEmpty())
@@ -775,7 +765,7 @@ OUString SwNumRule::MakeNumString( const SwNumberTree::tNumberVector & rNumVecto
 
         // The type doesn't have any number, so don't append
         // the post-/prefix string
-        if (bInclStrings && !bOnlyArabic &&
+        if (bInclStrings &&
             SVX_NUM_CHAR_SPECIAL != rMyNFormat.GetNumberingType() &&
             SVX_NUM_BITMAP != rMyNFormat.GetNumberingType())
         {
@@ -831,7 +821,7 @@ OUString SwNumRule::MakeRefNumString( const SwNodeNum& rNodeNum,
             {
                 Extremities aExtremities;
                 OUString aPrevStr = MakeNumString( pWorkingNodeNum->GetNumberVector(),
-                                                 true, false, MAXLEVEL,
+                                                 true, MAXLEVEL,
                                                  &aExtremities);
                 sal_Int32 nStrip = 0;
                 while ( nStrip < aExtremities.nPrefixChars )
@@ -967,6 +957,9 @@ SvxNumRule SwNumRule::MakeSvxNumRule() const
 
 void SwNumRule::SetInvalidRule(bool bFlag)
 {
+    if (mbInvalidRuleFlag == bFlag)
+        return;
+
     if (bFlag)
     {
         o3tl::sorted_vector< SwList* > aLists;
@@ -1158,6 +1151,29 @@ void SwNumRule::SetGrabBagItem(const uno::Any& rVal)
         mpGrabBagItem = std::make_shared<SfxGrabBagItem>();
 
     mpGrabBagItem->PutValue(rVal, 0);
+}
+
+bool SwNumRule::HasContinueList() const
+{
+    // In case all text nodes are after each other, then we won't have a later list that wants to
+    // continue us.
+    SwNodeOffset nIndex(0);
+    for (size_t i = 0; i < maTextNodeList.size(); ++i)
+    {
+        SwTextNode* pNode = maTextNodeList[i];
+        if (i > 0)
+        {
+            if (pNode->GetIndex() != nIndex + 1)
+            {
+                // May have a continue list.
+                return true;
+            }
+        }
+        nIndex = pNode->GetIndex();
+    }
+
+    // Definitely won't have a continue list.
+    return false;
 }
 
 namespace numfunc
@@ -1506,7 +1522,7 @@ namespace numfunc
             return true;
         }
 
-        SwTextNode* pTextNode = pCursor->GetNode().GetTextNode();
+        SwTextNode* pTextNode = pCursor->GetPointNode().GetTextNode();
         if (!pTextNode)
         {
             return true;

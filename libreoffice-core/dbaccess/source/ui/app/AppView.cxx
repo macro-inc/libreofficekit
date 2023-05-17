@@ -19,7 +19,7 @@
 
 #include "AppView.hxx"
 #include <strings.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/event.hxx>
 #include <vcl/weld.hxx>
 #include <com/sun/star/sdbcx/XTablesSupplier.hpp>
@@ -174,7 +174,7 @@ bool OApplicationView::PreNotify( NotifyEvent& rNEvt )
 {
     switch(rNEvt.GetType())
     {
-        case MouseNotifyEvent::KEYINPUT:
+        case NotifyEventType::KEYINPUT:
         {
             const KeyEvent* pKeyEvent = rNEvt.GetKeyEvent();
             // give the pane the chance to intercept mnemonic accelerators

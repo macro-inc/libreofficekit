@@ -28,13 +28,15 @@
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/io/XSeekable.hpp>
 #include <com/sun/star/task/XInteractionHandler.hpp>
+#include <o3tl/string_view.hxx>
 #include <tools/wldcrd.hxx>
 #include <sal/log.hxx>
 #include <framework/interaction.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <comphelper/fileurl.hxx>
 #include <comphelper/sequence.hxx>
+#include <utility>
 
 #define DEBUG_TYPE_DETECTION 0
 
@@ -54,8 +56,7 @@ TypeDetection::TypeDetection(const css::uno::Reference< css::uno::XComponentCont
    , m_bCancel(false)
 {
     css::frame::Desktop::create(m_xContext)->addTerminateListener(m_xTerminateListener);
-    BaseContainer::init(rxContext                                     ,
-                        "com.sun.star.comp.filter.config.TypeDetection"   ,
+    BaseContainer::init("com.sun.star.comp.filter.config.TypeDetection"   ,
                         { "com.sun.star.document.TypeDetection" },
                         FilterCache::E_TYPE                           );
 }
@@ -125,7 +126,7 @@ namespace {
  * In each category, rank them from strictly-structured to
  * loosely-structured.
  */
-int getFlatTypeRank(const OUString& rType)
+int getFlatTypeRank(std::u16string_view rType)
 {
     // List formats from more complex to less complex.
     // TODO: Add more.
@@ -283,11 +284,11 @@ int getFlatTypeRank(const OUString& rType)
         "math_MathType_3x", // MathType equation embedded in Word doc.
     };
 
-    size_t n = SAL_N_ELEMENTS(ranks);
+    size_t n =  std::size(ranks);
 
     for (size_t i = 0; i < n; ++i)
     {
-        if (rType.equalsAscii(ranks[i]))
+        if (o3tl::equalsAscii(rType, ranks[i]))
             return n - i - 1;
     }
 
@@ -345,7 +346,7 @@ class FindByType
 {
     OUString maType;
 public:
-    explicit FindByType(const OUString& rType) : maType(rType) {}
+    explicit FindByType(OUString aType) : maType(std::move(aType)) {}
     bool operator() (const FlatDetectionInfo& rInfo) const
     {
         return rInfo.sType == maType;
@@ -495,9 +496,9 @@ void TypeDetection::impl_checkResultsAndAddBestFilter(utl::MediaDescriptor& rDes
             // That can disturb our "load on demand feature". But we have no other chance!
             cache.load(FilterCache::E_CONTAINS_FILTERS);
 
-            CacheItem lIProps;
-            lIProps[PROPNAME_DOCUMENTSERVICE] <<= sDocumentService;
-            lIProps[PROPNAME_TYPE           ] <<= sRealType;
+            css::beans::NamedValue lIProps[] {
+                { PROPNAME_DOCUMENTSERVICE, uno::Any(sDocumentService) },
+                { PROPNAME_TYPE, uno::Any(sRealType) } };
             std::vector<OUString> lFilters = cache.getMatchingItemsByProps(FilterCache::E_FILTER, lIProps);
 
             aLock.clear();
@@ -576,8 +577,8 @@ void TypeDetection::impl_checkResultsAndAddBestFilter(utl::MediaDescriptor& rDes
         // That can disturb our "load on demand feature". But we have no other chance!
         cache.load(FilterCache::E_CONTAINS_FILTERS);
 
-        CacheItem lIProps;
-        lIProps[PROPNAME_TYPE] <<= sType;
+        css::beans::NamedValue lIProps[] {
+            { PROPNAME_TYPE, uno::Any(sType) } };
         std::vector<OUString> lFilters = cache.getMatchingItemsByProps(FilterCache::E_FILTER, lIProps);
 
         aLock.clear();
@@ -670,8 +671,8 @@ bool TypeDetection::impl_getPreselectionForType(
 
         // otherwise we must know, if it matches to the given URL really.
         // especially if it matches by its extension or pattern registration.
-        std::vector<OUString> lExtensions(comphelper::sequenceToContainer< std::vector<OUString> >(aType[PROPNAME_EXTENSIONS].get<css::uno::Sequence<OUString> >() ));
-        std::vector<OUString> lURLPattern(comphelper::sequenceToContainer< std::vector<OUString> >(aType[PROPNAME_URLPATTERN].get<css::uno::Sequence<OUString> >() ));
+        const css::uno::Sequence<OUString> lExtensions = aType[PROPNAME_EXTENSIONS].get<css::uno::Sequence<OUString> >();
+        const css::uno::Sequence<OUString> lURLPattern = aType[PROPNAME_URLPATTERN].get<css::uno::Sequence<OUString> >();
 
         for (auto const& extension : lExtensions)
         {
@@ -735,8 +736,8 @@ void TypeDetection::impl_getPreselectionForDocumentService(
         auto & cache = GetTheFilterCache();
         cache.load(FilterCache::E_CONTAINS_FILTERS);
 
-        CacheItem lIProps;
-        lIProps[PROPNAME_DOCUMENTSERVICE] <<= sPreSelDocumentService;
+        css::beans::NamedValue lIProps[] {
+            { PROPNAME_DOCUMENTSERVICE, css::uno::Any(sPreSelDocumentService) } };
         lFilters = cache.getMatchingItemsByProps(FilterCache::E_FILTER, lIProps);
         // <- SAFE --------------------------
     }

@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include <o3tl/sorted_vector.hxx>
 #include <osl/file.hxx>
 #include <rtl/ustring.hxx>
 
@@ -85,11 +86,11 @@ namespace fileaccess
         public:
 
             explicit TaskHandling(
-                const css::uno::Reference< css::ucb::XCommandEnvironment >&  xCommandEnv )
+                css::uno::Reference< css::ucb::XCommandEnvironment > xCommandEnv )
                 : m_bHandled( false ),
                   m_nErrorCode( TASKHANDLER_NO_ERROR ),
                   m_nMinorCode( TASKHANDLER_NO_ERROR ),
-                  m_xCommandEnvironment( xCommandEnv )
+                  m_xCommandEnvironment( std::move(xCommandEnv) )
             {
             }
 
@@ -182,27 +183,19 @@ namespace fileaccess
             inline const sal_Int16& getAttributes() const;
 
             // The set* functions are declared const, because the key of "this" stays intact
-            inline void setValue( const css::uno::Any& theValue ) const;
+            inline void setValue( css::uno::Any theValue ) const;
             inline void setState( const css::beans::PropertyState& theState ) const;
         };
 
-        struct eMyProperty
+        struct MyPropertyLess
         {
             bool operator()( const MyProperty& rKey1, const MyProperty& rKey2 ) const
             {
-                return rKey1.getPropertyName() == rKey2.getPropertyName();
+                return rKey1.getPropertyName() < rKey2.getPropertyName();
             }
         };
 
-        struct hMyProperty
-        {
-            size_t operator()( const MyProperty& rName ) const
-            {
-                return rName.getPropertyName().hashCode();
-            }
-        };
-
-        typedef std::unordered_set< MyProperty,hMyProperty,eMyProperty > PropertySet;
+        typedef o3tl::sorted_vector< MyProperty, MyPropertyLess > PropertySet;
 
         class UnqPathData
         {

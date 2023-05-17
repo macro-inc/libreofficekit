@@ -1,25 +1,22 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import select_pos
-from uitest.uihelper.common import select_by_text
-from uitest.uihelper.calc import enter_text_to_cell
+from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+
 from libreoffice.calc.document import get_cell_by_position
 from libreoffice.uno.propertyvalue import mkPropertyValues
-from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file, type_text
 
-#Bug 35020 - Find and Replace changes case of sheet name in formulas
 
+# Bug 35020 - Find and Replace changes case of sheet name in formulas
 class tdf35020(UITestCase):
    def test_tdf39959_find_replace_all_sheets(self):
         with self.ui_test.load_file(get_url_for_data_file("tdf35020.ods")) as calc_doc:
-            xCalcDoc = self.xUITest.getTopFocusWindow()
-            gridwin = xCalcDoc.getChild("grid_window")
-
             with self.ui_test.execute_modeless_dialog_through_command(".uno:SearchDialog", close_button="close") as xDialog:
                 searchterm = xDialog.getChild("searchterm")
                 searchterm.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
@@ -30,7 +27,7 @@ class tdf35020(UITestCase):
                 allsheets = xDialog.getChild("allsheets")
                 allsheets.executeAction("CLICK", tuple())
                 calcsearchin = xDialog.getChild("calcsearchin")
-                select_by_text(calcsearchin, "Formulas")
+                self.assertEqual("Formulas", get_state_as_dict(calcsearchin)['SelectEntryText'])
                 replaceall = xDialog.getChild("replaceall")
                 replaceall.executeAction("CLICK", tuple())
 

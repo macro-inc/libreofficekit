@@ -84,17 +84,10 @@ public:
     bool GetIncludeHidden() const { return m_bIncludeHidden; }
     void SetIncludeHidden( bool bVal ) { m_bIncludeHidden = bVal; }
 
-    void Reset()
-    {
-        m_sFont.clear();
-        m_eCRLF_Flag = GetSystemLineEnd();
-        m_eCharSet = ::osl_getThreadTextEncoding();
-        m_nLanguage = LANGUAGE_SYSTEM;
-        m_bIncludeBOM = true;
-        m_bIncludeHidden = true;
-    }
+    void Reset();
+
     // for the automatic conversion (mail/news/...)
-    void ReadUserData( const OUString& );
+    void ReadUserData( std::u16string_view );
     void WriteUserData( OUString& ) const;
 
     SwAsciiOptions() { Reset(); }
@@ -163,13 +156,13 @@ public:
     // Initial reading. Document is created only at Read(...)
     // or in case it is given, into that.
     // Special case for Load with Sw3Reader.
-    SwReader( SfxMedium&, const OUString& rFilename, SwDoc *pDoc = nullptr );
+    SwReader( SfxMedium&, OUString aFilename, SwDoc *pDoc = nullptr );
 
     // Read into existing document.
     // Document and position in document are taken from SwPaM.
-    SwReader( SvStream&, const OUString& rFilename, const OUString& rBaseURL, SwPaM& );
-    SwReader( SfxMedium&, const OUString& rFilename, SwPaM& );
-    SwReader( const css::uno::Reference < css::embed::XStorage >&, const OUString& rFilename, SwPaM& );
+    SwReader( SvStream&, OUString aFilename, const OUString& rBaseURL, SwPaM& );
+    SwReader( SfxMedium&, OUString aFilename, SwPaM& );
+    SwReader( css::uno::Reference < css::embed::XStorage > , OUString aFilename, SwPaM& );
 
     // The only export interface is SwReader::Read(...)!!!
     ErrCode Read( const Reader& );
@@ -328,12 +321,14 @@ public:
 
     sal_uInt16 GetCount() const;                        // Get count text modules.
     sal_uInt16 GetIndex( const OUString& ) const;       // Get index of short names.
-    sal_uInt16 GetLongIndex( const OUString& ) const;   // Get index of long names.
+    sal_uInt16 GetLongIndex( std::u16string_view ) const;   // Get index of long names.
     OUString GetShortName( sal_uInt16 ) const;          // Get short name for index.
     OUString GetLongName( sal_uInt16 ) const;           // Get long name for index.
 
     bool   Delete( sal_uInt16 );
     void   Rename( sal_uInt16, const OUString*, const OUString* );
+    ErrCode const & CopyBlock( SwTextBlocks const & rSource, OUString& rSrcShort,
+                                    const OUString& rLong );
 
     bool   BeginGetDoc( sal_uInt16 );   // Read text modules.
     void   EndGetDoc();                     // Release text modules.
@@ -520,14 +515,14 @@ public:
     SwWriter( SvStream&, SwDoc & );
     SwWriter( SvStream&, SwPaM &, bool bWriteAll = false );
 
-    SwWriter( const css::uno::Reference < css::embed::XStorage >&, SwDoc& );
+    SwWriter( css::uno::Reference < css::embed::XStorage > , SwDoc& );
 
     SwWriter( SfxMedium&, SwCursorShell &, bool bWriteAll );
     SwWriter( SfxMedium&, SwDoc & );
 };
 
 typedef Reader* (*FnGetReader)();
-typedef void (*FnGetWriter)(const OUString&, const OUString& rBaseURL, WriterRef&);
+typedef void (*FnGetWriter)(std::u16string_view, const OUString& rBaseURL, WriterRef&);
 ErrCode SaveOrDelMSVBAStorage( SfxObjectShell&, SotStorage&, bool, const OUString& );
 ErrCode GetSaveWarningOfMSVBAStorage( SfxObjectShell &rDocS );
 
@@ -546,7 +541,7 @@ struct SwReaderWriterEntry
     Reader* GetReader();
 
     /// Get access to the writer.
-    void GetWriter( const OUString& rNm, const OUString& rBaseURL, WriterRef& xWrt ) const;
+    void GetWriter( std::u16string_view rNm, const OUString& rBaseURL, WriterRef& xWrt ) const;
 };
 
 namespace SwReaderWriter
@@ -558,13 +553,13 @@ namespace SwReaderWriter
     Reader* GetReader( const OUString& rFltName );
 
     /// Return writer based on the name.
-    SW_DLLPUBLIC void GetWriter( const OUString& rFltName, const OUString& rBaseURL, WriterRef& xWrt );
+    SW_DLLPUBLIC void GetWriter( std::u16string_view rFltName, const OUString& rBaseURL, WriterRef& xWrt );
 }
 
-void GetRTFWriter( const OUString&, const OUString&, WriterRef& );
-void GetASCWriter(const OUString&, const OUString&, WriterRef&);
-void GetHTMLWriter( const OUString&, const OUString&, WriterRef& );
-void GetXMLWriter( const OUString&, const OUString&, WriterRef& );
+void GetRTFWriter( std::u16string_view, const OUString&, WriterRef& );
+void GetASCWriter( std::u16string_view, const OUString&, WriterRef&);
+void GetHTMLWriter( std::u16string_view, const OUString&, WriterRef& );
+void GetXMLWriter( std::u16string_view, const OUString&, WriterRef& );
 
 #endif
 

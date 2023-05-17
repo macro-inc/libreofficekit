@@ -39,7 +39,7 @@ namespace framework{
                     any external process e.g. the office bean) we save and restore the window state of it
                     corresponding to the document service factory. That means: one instance of this class will be
                     a listener on one frame which container window was created by ourself.
-                    We listen for frame action events and every time a component will deattached from a frame
+                    We listen for frame action events and every time a component will detached from a frame
                     we store its current position and size to the configuration. Every time a new component is
                     attached to a frame first time(!) we restore this information again.
 
@@ -72,7 +72,7 @@ class PersistentWindowState final : public  ::cppu::WeakImplHelper<
     public:
 
         // ctor/dtor
-                 PersistentWindowState(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+                 PersistentWindowState(css::uno::Reference< css::uno::XComponentContext > xContext);
         virtual ~PersistentWindowState(                                                                   ) override;
 
         // XInitialization

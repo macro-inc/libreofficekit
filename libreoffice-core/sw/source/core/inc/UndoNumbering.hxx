@@ -39,7 +39,7 @@ public:
     SwUndoInsNum( const SwNumRule& rOldRule, const SwNumRule& rNewRule,
                   const SwDoc& rDoc, SwUndoId nUndoId = SwUndoId::INSFMTATTR );
     SwUndoInsNum( const SwPosition& rPos, const SwNumRule& rRule,
-                            const OUString& rReplaceRule );
+                            OUString aReplaceRule );
 
     virtual ~SwUndoInsNum() override;
 
@@ -113,7 +113,7 @@ class SwUndoNumOrNoNum final : public SwUndo
     bool mbNewNum, mbOldNum;
 
 public:
-    SwUndoNumOrNoNum( const SwNodeIndex& rIdx, bool mbOldNum,
+    SwUndoNumOrNoNum( const SwNode& rIdx, bool mbOldNum,
                       bool mbNewNum );
 
     virtual void UndoImpl( ::sw::UndoRedoContext & ) override;

@@ -13,7 +13,7 @@ $(eval $(call gb_Module_add_l10n_targets,extensions,\
 	AllLangMoTarget_pcr \
 ))
 
-ifneq ($(filter-out iOS ANDROID,$(OS)),)
+ifeq (,$(DISABLE_DYNLOADING))
 $(eval $(call gb_Module_add_targets,extensions,\
 	Library_abp \
 	Library_scn \
@@ -56,6 +56,7 @@ $(eval $(call gb_Module_add_targets,extensions,\
 endif
 
 ifneq (,$(filter DESKTOP,$(BUILD_TYPE)))
+ifeq (,$(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS))
 $(eval $(call gb_Module_add_targets,extensions,\
 	Library_updatefeed \
 ))
@@ -71,6 +72,7 @@ $(eval $(call gb_Module_add_check_targets,extensions,\
     CppunitTest_extensions_test_update \
 ))
 endif
+endif # !ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS
 endif
 
 # ifeq ($(OS),MACOSX)

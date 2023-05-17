@@ -66,7 +66,7 @@ bool VCLXAccessibleMenuBar::IsFocused()
 
 IMPL_LINK( VCLXAccessibleMenuBar, WindowEventListener, VclWindowEvent&, rEvent, void )
 {
-    OSL_ENSURE( rEvent.GetWindow(), "VCLXAccessibleMenuBar::WindowEventListener: no window!" );
+    assert( rEvent.GetWindow() );
     if ( !rEvent.GetWindow()->IsAccessibilityEventsSuppressed() || ( rEvent.GetId() == VclEventId::ObjectDying ) )
     {
         ProcessWindowEvent( rEvent );
@@ -134,11 +134,11 @@ Sequence< OUString > VCLXAccessibleMenuBar::getSupportedServiceNames()
 // XAccessibleContext
 
 
-sal_Int32 VCLXAccessibleMenuBar::getAccessibleIndexInParent(  )
+sal_Int64 VCLXAccessibleMenuBar::getAccessibleIndexInParent(  )
 {
     OExternalLockGuard aGuard( this );
 
-    sal_Int32 nIndexInParent = -1;
+    sal_Int64 nIndexInParent = -1;
 
     if ( m_pMenu )
     {

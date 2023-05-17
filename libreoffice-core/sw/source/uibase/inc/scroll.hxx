@@ -18,38 +18,31 @@
  */
 #pragma once
 
-#include <vcl/scrbar.hxx>
+#include <svtools/scrolladaptor.hxx>
 
-class SwScrollbar final : public ScrollBar
+class SwScrollbar final : public ScrollAdaptor
 {
-    Size    aDocSz;
-    bool    bHori       :1;     // horizontal = salTrue, otherwise vertical
-    bool    bAuto       :1;     // for scrolling mode
-    bool    bVisible    :1;     // show/hide should only set this flag
-    bool    bSizeSet    :1;     // was the size already set?
+    Size    m_aDocSz;
+    bool    m_bAuto       :1;     // for scrolling mode
+    bool    m_bVisible    :1;     // show/hide should only set this flag
+    bool    m_bSizeSet    :1;     // was the size already set?
 
     void    AutoShow();
-
-    using Window::Hide;
-    using Window::IsVisible;
 
 public:
     void    ExtendedShow( bool bVisible = true );
     void    SetPosSizePixel( const Point& rNewPos, const Size& rNewSize ) override;
-    bool    IsVisible(bool bReal) const { return bReal ? ScrollBar::IsVisible() : bVisible; }
+    bool    IsScrollbarVisible(bool bReal) const { return bReal ? ScrollAdaptor::IsVisible() : m_bVisible; }
 
         // changing of document size
     void    DocSzChgd(const Size &rNewSize);
         // changing of visible region
     void    ViewPortChgd(const tools::Rectangle &rRectangle);
-        // what is it??
-    bool    IsHoriScroll() const { return bHori; }
 
     void    SetAuto(bool bSet);
-    bool    IsAuto() const { return bAuto;}
+    bool    IsAuto() const { return m_bAuto;}
 
     SwScrollbar(vcl::Window *pParent, bool bHori );
-    virtual ~SwScrollbar() override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

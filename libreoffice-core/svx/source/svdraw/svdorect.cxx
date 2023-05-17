@@ -28,7 +28,6 @@
 #include <svx/strings.hrc>
 #include <sdr/properties/rectangleproperties.hxx>
 #include <sdr/contact/viewcontactofsdrrectobj.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <tools/debug.hxx>
 #include <vcl/ptrstyle.hxx>
 #include <osl/diagnose.h>
@@ -77,8 +76,8 @@ SdrRectObj::SdrRectObj(
     SdrObjKind eNewTextKind)
 :   SdrTextObj(rSdrModel, eNewTextKind)
 {
-    DBG_ASSERT(meTextKind == OBJ_TEXT ||
-               meTextKind == OBJ_OUTLINETEXT || meTextKind == OBJ_TITLETEXT,
+    DBG_ASSERT(meTextKind == SdrObjKind::Text ||
+               meTextKind == SdrObjKind::OutlineText || meTextKind == SdrObjKind::TitleText,
                "SdrRectObj::SdrRectObj(SdrObjKind) can only be applied to text frames.");
     m_bClosedObj=true;
 }
@@ -89,8 +88,8 @@ SdrRectObj::SdrRectObj(
     const tools::Rectangle& rRect)
 :   SdrTextObj(rSdrModel, eNewTextKind, rRect)
 {
-    DBG_ASSERT(meTextKind == OBJ_TEXT ||
-               meTextKind == OBJ_OUTLINETEXT || meTextKind == OBJ_TITLETEXT,
+    DBG_ASSERT(meTextKind == SdrObjKind::Text ||
+               meTextKind == SdrObjKind::OutlineText || meTextKind == SdrObjKind::TitleText,
                "SdrRectObj::SdrRectObj(SdrObjKind,...) can only be applied to text frames.");
     m_bClosedObj=true;
 }
@@ -173,7 +172,7 @@ SdrObjKind SdrRectObj::GetObjIdentifier() const
 {
     if (IsTextFrame())
         return meTextKind;
-    else return OBJ_RECT;
+    else return SdrObjKind::Rectangle;
 }
 
 void SdrRectObj::TakeUnrotatedSnapRect(tools::Rectangle& rRect) const
@@ -245,7 +244,7 @@ OUString SdrRectObj::TakeObjNamePlural() const
     return SvxResId(pResId);
 }
 
-SdrRectObj* SdrRectObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrRectObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrRectObj(rTargetModel, *this);
 }
@@ -430,7 +429,7 @@ basegfx::B2DPolyPolygon SdrRectObj::TakeCreatePoly(const SdrDragStat& rDrag) con
 {
     tools::Rectangle aRect1;
     rDrag.TakeCreateRect(aRect1);
-    aRect1.Justify();
+    aRect1.Normalize();
 
     basegfx::B2DPolyPolygon aRetval;
     aRetval.append(ImpCalcXPoly(aRect1,GetEckenradius()).getB2DPolygon());
@@ -525,7 +524,7 @@ SdrGluePoint SdrRectObj::GetCornerGluePoint(sal_uInt16 nPosNum) const
     return aGP;
 }
 
-SdrObjectUniquePtr SdrRectObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
+rtl::Reference<SdrObject> SdrRectObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
 {
     XPolygon aXP(ImpCalcXPoly(maRect,GetEckenradius()));
     { // TODO: this is only for the moment, until we have the new TakeContour()
@@ -535,7 +534,7 @@ SdrObjectUniquePtr SdrRectObj::DoConvertToPolyObj(bool bBezier, bool bAddText) c
 
     basegfx::B2DPolyPolygon aPolyPolygon(aXP.getB2DPolygon());
     aPolyPolygon.removeDoublePoints();
-    SdrObjectUniquePtr pRet;
+    rtl::Reference<SdrObject> pRet;
 
     // small correction: Do not create something when no fill and no line. To
     // be sure to not damage something with non-text frames, do this only

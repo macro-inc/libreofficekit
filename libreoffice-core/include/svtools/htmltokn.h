@@ -22,6 +22,7 @@
 #include <svtools/svtdllapi.h>
 #include <sal/types.h>
 #include <stdexcept>
+#include <string_view>
 
 namespace rtl {
     class OUString;
@@ -30,13 +31,13 @@ enum class HtmlOptionId;
 enum class HtmlTokenId : sal_Int16;
 
 // search the char for the CharName
-sal_Unicode GetHTMLCharName( const rtl::OUString& rName );
+sal_Unicode GetHTMLCharName( std::u16string_view rName );
 
 // search the TokenID for the token
-SVT_DLLPUBLIC HtmlTokenId GetHTMLToken( const rtl::OUString& rName );
+SVT_DLLPUBLIC HtmlTokenId GetHTMLToken( std::u16string_view rName );
 
 // search the TokenId for an attribute token
-HtmlOptionId GetHTMLOption( const rtl::OUString& rName );
+HtmlOptionId GetHTMLOption( std::u16string_view rName );
 
 // search the 24-bit color for a color name (not found = SAL_MAX_UINT32)
 SVT_DLLPUBLIC sal_uInt32 GetHTMLColor( const rtl::OUString& rName );
@@ -57,6 +58,8 @@ enum class HtmlTokenId : sal_Int16
     AREA, // Netscape 2.0
     BASE, // HTML 3.0
     COMMENT,
+    CDATA,
+    DUMMY, // so ONOFF_START is even
     DOCTYPE,
     EMBED, // Netscape 2.0            ignore </EMBED>
     HORZRULE,                      // ignore </HR>

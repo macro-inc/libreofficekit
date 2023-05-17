@@ -34,6 +34,7 @@
 #include <unotools/syslocale.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <rtl/ustrbuf.hxx>
+#include <utility>
 
 #ifdef DBG_UTIL
 namespace {
@@ -62,11 +63,11 @@ static DbgStyleSheetReferences aDbgStyleSheetReferences;
 
 SfxStyleSheetModifiedHint::SfxStyleSheetModifiedHint
 (
-    const OUString&     rOldName,
+    OUString            aOldName,
     SfxStyleSheetBase&  rStyleSheet     // Remains with the caller
 )
 :   SfxStyleSheetHint( SfxHintId::StyleSheetModified, rStyleSheet ),
-    aName( rOldName )
+    aName(std::move( aOldName ))
 {}
 
 
@@ -117,7 +118,7 @@ SfxStyleSheetBase::SfxStyleSheetBase( const OUString& rName, SfxStyleSheetBasePo
 }
 
 SfxStyleSheetBase::SfxStyleSheetBase( const SfxStyleSheetBase& r )
-    : comphelper::OWeakTypeObject(r)
+    : WeakImplHelper()
     , m_pPool( r.m_pPool )
     , nFamily( r.nFamily )
     , aName( r.aName )
@@ -384,12 +385,12 @@ struct DoesStyleMatchStyleSheetPredicate final : public svl::StyleSheetPredicate
 
 }
 
-SfxStyleSheetIterator::SfxStyleSheetIterator(SfxStyleSheetBasePool *pBase,
+SfxStyleSheetIterator::SfxStyleSheetIterator(const SfxStyleSheetBasePool *pBase,
                                              SfxStyleFamily eFam, SfxStyleSearchBits n)
-    : pCurrentStyle(nullptr)
+    : pBasePool(pBase)
+    , pCurrentStyle(nullptr)
     , mnCurrentPosition(0)
 {
-    pBasePool=pBase;
     nSearchFamily=eFam;
     bSearchUsed=false;
     if( (( n & SfxStyleSearchBits::AllVisible ) != SfxStyleSearchBits::AllVisible )
@@ -563,7 +564,7 @@ SfxStyleSheetBasePool::SfxStyleSheetBasePool( SfxItemPool& r ) :
 
 SfxStyleSheetBasePool::SfxStyleSheetBasePool( const SfxStyleSheetBasePool& r ) :
     SfxBroadcaster( r ),
-    comphelper::OWeakTypeObject(r),
+    WeakImplHelper(),
     pImpl(new SfxStyleSheetBasePool_Impl),
     rPool(r.rPool)
 {
@@ -689,7 +690,7 @@ SfxStyleSheetBasePool& SfxStyleSheetBasePool::operator+=( const SfxStyleSheetBas
 
 SfxStyleSheetBase* SfxStyleSheetBasePool::Find(const OUString& rName,
                                                SfxStyleFamily eFamily,
-                                               SfxStyleSearchBits eMask)
+                                               SfxStyleSearchBits eMask) const
 {
     SfxStyleSheetIterator aIter(this, eFamily, eMask);
     return aIter.Find(rName);
@@ -885,10 +886,7 @@ SfxUnoStyleSheet::SfxUnoStyleSheet( const OUString& _rName, const SfxStyleSheetB
 
 SfxUnoStyleSheet* SfxUnoStyleSheet::getUnoStyleSheet( const css::uno::Reference< css::style::XStyle >& xStyle )
 {
-    SfxUnoStyleSheet* pRet = dynamic_cast< SfxUnoStyleSheet* >( xStyle.get() );
-    if( !pRet )
-        pRet = comphelper::getFromUnoTunnel<SfxUnoStyleSheet>(xStyle);
-    return pRet;
+    return comphelper::getFromUnoTunnel<SfxUnoStyleSheet>(xStyle);
 }
 
 /**

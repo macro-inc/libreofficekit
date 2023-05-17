@@ -31,11 +31,13 @@
 #include "CRowSetDataColumn.hxx"
 #include "RowSetCache.hxx"
 #include <strings.hrc>
+#include <strings.hxx>
 #include <core_resource.hxx>
 #include <tablecontainer.hxx>
 
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
+#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/sdb/CommandType.hpp>
 #include <com/sun/star/sdb/DatabaseContext.hpp>
 #include <com/sun/star/sdb/ErrorCondition.hpp>
@@ -68,7 +70,7 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <o3tl/safeint.hxx>
 #include <unotools/syslocale.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace utl;
 using namespace dbaccess;
@@ -423,7 +425,7 @@ sal_Int64 SAL_CALL ORowSet::getSomething( const Sequence< sal_Int8 >& rId )
     return comphelper::getSomethingImpl(rId, this);
 }
 
-Sequence< sal_Int8 > ORowSet::getUnoTunnelId()
+const Sequence< sal_Int8 > & ORowSet::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit s_Id;
     return s_Id.getSeq();
@@ -616,7 +618,7 @@ void SAL_CALL ORowSet::close(  )
         MutexGuard aGuard( m_aMutex );
         ::connectivity::checkDisposed(ORowSet_BASE1::rBHelper.bDisposed);
     }
-    // additionals things to set
+    // additional things to set
     freeResources( true );
 }
 
@@ -972,7 +974,7 @@ void SAL_CALL ORowSet::deleteRow(  )
 
     // this call position the cache indirect
     Any aBookmarkToDelete( m_aBookmark );
-    positionCache( MOVE_NONE );
+    positionCache( CursorMoveDirection::Current );
     sal_Int32 nDeletePosition = m_pCache->getRow();
 
     notifyRowSetAndClonesRowDelete( aBookmarkToDelete );
@@ -1019,7 +1021,7 @@ void ORowSet::implCancelRowUpdates( bool _bNotifyModified )
     if ( m_bNew || m_nResultSetConcurrency == ResultSetConcurrency::READ_ONLY )
         throwFunctionSequenceException(*this);
 
-    positionCache( MOVE_NONE );
+    positionCache( CursorMoveDirection::Current );
 
     ORowSetRow aOldValues;
     if ( !m_bModified && _bNotifyModified && !m_aCurrentRow.isNull() )
@@ -1091,13 +1093,13 @@ void ORowSet::notifyAllListenersRowChanged(::osl::ResettableMutexGuard& _rGuard,
 bool ORowSet::notifyAllListenersCursorBeforeMove(::osl::ResettableMutexGuard& _rGuard)
 {
     EventObject aEvt(*m_pMySelf);
-    std::vector< Reference< XInterface > > aListenerSeq = m_aApproveListeners.getElements();
+    std::vector< Reference< css::sdb::XRowSetApproveListener > > aListenerSeq = m_aApproveListeners.getElements();
     _rGuard.clear();
     bool bCheck = std::all_of(aListenerSeq.rbegin(), aListenerSeq.rend(),
-        [&aEvt](Reference<XInterface>& rxItem) {
+        [&aEvt](Reference<css::sdb::XRowSetApproveListener>& rxItem) {
             try
             {
-                return static_cast<bool>(static_cast<XRowSetApproveListener*>(rxItem.get())->approveCursorMove(aEvt));
+                return static_cast<bool>(rxItem->approveCursorMove(aEvt));
             }
             catch( RuntimeException& )
             {
@@ -1110,13 +1112,13 @@ bool ORowSet::notifyAllListenersCursorBeforeMove(::osl::ResettableMutexGuard& _r
 
 void ORowSet::notifyAllListenersRowBeforeChange(::osl::ResettableMutexGuard& _rGuard,const RowChangeEvent &aEvt)
 {
-    std::vector< Reference< XInterface > > aListenerSeq = m_aApproveListeners.getElements();
+    std::vector< Reference< css::sdb::XRowSetApproveListener > > aListenerSeq = m_aApproveListeners.getElements();
     _rGuard.clear();
     bool bCheck = std::all_of(aListenerSeq.rbegin(), aListenerSeq.rend(),
-        [&aEvt](Reference<XInterface>& rxItem) {
+        [&aEvt](Reference<css::sdb::XRowSetApproveListener>& rxItem) {
             try
             {
-                return static_cast<bool>(static_cast<XRowSetApproveListener*>(rxItem.get())->approveRowChange(aEvt));
+                return static_cast<bool>(rxItem->approveRowChange(aEvt));
             }
             catch( RuntimeException& )
             {
@@ -1169,12 +1171,12 @@ void SAL_CALL ORowSet::moveToInsertRow(  )
     ORowSetRow aOldValues;
     if ( rowDeleted() )
     {
-        positionCache( MOVE_FORWARD );
+        positionCache( CursorMoveDirection::Forward );
         m_pCache->next();
         setCurrentRow( true, false, aOldValues, aGuard);
     }
     else
-        positionCache( MOVE_NONE );
+        positionCache( CursorMoveDirection::Current );
 
     // check before because the resultset could be empty
     if  (   !m_bBeforeFirst
@@ -1224,7 +1226,7 @@ void ORowSet::impl_setDataColumnsWriteable_throw()
         dataColumn->getPropertyValue(PROPERTY_ISREADONLY) >>= bReadOnly;
         *aReadIter = bReadOnly;
 
-        dataColumn->setPropertyValue(PROPERTY_ISREADONLY,makeAny(false));
+        dataColumn->setPropertyValue(PROPERTY_ISREADONLY,Any(false));
         ++aReadIter;
     }
 }
@@ -1235,7 +1237,7 @@ void ORowSet::impl_restoreDataColumnsWriteable_throw()
     TDataColumns::const_iterator aIter = m_aDataColumns.begin();
     for (bool readOnlyDataColumn : m_aReadOnlyDataColumns)
     {
-        (*aIter)->setPropertyValue(PROPERTY_ISREADONLY, makeAny(readOnlyDataColumn) );
+        (*aIter)->setPropertyValue(PROPERTY_ISREADONLY, Any(readOnlyDataColumn) );
         ++aIter;
     }
     m_aReadOnlyDataColumns.clear();
@@ -1263,7 +1265,7 @@ void SAL_CALL ORowSet::moveToCurrentRow(  )
     if ( !notifyAllListenersCursorBeforeMove( aGuard ) )
         return;
 
-    positionCache( MOVE_NONE_REFRESH );
+    positionCache( CursorMoveDirection::CurrentRefresh );
 
     ORowSetNotifier aNotifier( this );
 
@@ -1517,13 +1519,13 @@ void ORowSet::approveExecution()
     ::osl::MutexGuard aGuard( m_aColumnsMutex );
     EventObject aEvt(*this);
 
-    OInterfaceIteratorHelper2 aApproveIter( m_aApproveListeners );
+    OInterfaceIteratorHelper3 aApproveIter( m_aApproveListeners );
     while ( aApproveIter.hasMoreElements() )
     {
-        Reference< XRowSetApproveListener > xListener( static_cast< XRowSetApproveListener* >( aApproveIter.next() ) );
+        Reference< XRowSetApproveListener > xListener( aApproveIter.next() );
         try
         {
-            if ( xListener.is() && !xListener->approveRowSetChange( aEvt ) )
+            if ( !xListener->approveRowSetChange( aEvt ) )
                 throw RowSetVetoException();
         }
         catch ( const DisposedException& e )
@@ -1614,8 +1616,8 @@ void ORowSet::setStatementResultSetType( const Reference< XPropertySet >& _rxSta
         }
     }
 
-    _rxStatement->setPropertyValue( PROPERTY_RESULTSETTYPE, makeAny( nResultSetType ) );
-    _rxStatement->setPropertyValue( PROPERTY_RESULTSETCONCURRENCY, makeAny( nResultSetConcurrency ) );
+    _rxStatement->setPropertyValue( PROPERTY_RESULTSETTYPE, Any( nResultSetType ) );
+    _rxStatement->setPropertyValue( PROPERTY_RESULTSETCONCURRENCY, Any( nResultSetConcurrency ) );
 }
 
 void ORowSet::impl_ensureStatement_throw()
@@ -1642,8 +1644,8 @@ void ORowSet::impl_ensureStatement_throw()
         // set the result set type and concurrency
         try
         {
-            xStatementProps->setPropertyValue( PROPERTY_USEBOOKMARKS, makeAny( true ) );
-            xStatementProps->setPropertyValue( PROPERTY_MAXROWS, makeAny( m_nMaxRows ) );
+            xStatementProps->setPropertyValue( PROPERTY_USEBOOKMARKS, Any( true ) );
+            xStatementProps->setPropertyValue( PROPERTY_MAXROWS, Any( m_nMaxRows ) );
 
             setStatementResultSetType( xStatementProps, m_nResultSetType, m_nResultSetConcurrency );
         }
@@ -1739,7 +1741,7 @@ void ORowSet::impl_initializeColumnSettings_nothrow( const Reference< XPropertyS
         }
         if ( !nFormatKey && m_xNumberFormatTypes.is() )
             nFormatKey = ::dbtools::getDefaultNumberFormat( _rxTemplateColumn, m_xNumberFormatTypes, SvtSysLocale().GetLanguageTag().getLocale() );
-        _rxRowSetColumn->setPropertyValue( PROPERTY_NUMBERFORMAT, makeAny( nFormatKey ) );
+        _rxRowSetColumn->setPropertyValue( PROPERTY_NUMBERFORMAT, Any( nFormatKey ) );
     }
     catch(Exception&)
     {
@@ -1871,7 +1873,7 @@ void ORowSet::execute_NoApprove_NoNewConn(ResettableMutexGuard& _rClearForNotifi
                         aNames.push_back(sName);
                         m_aDataColumns.push_back(pColumn.get());
 
-                        pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_ISREADONLY,makeAny(rKeyColumns.find(i+1) != rKeyColumns.end()));
+                        pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_ISREADONLY,Any(rKeyColumns.find(i+1) != rKeyColumns.end()));
 
                         try
                         {
@@ -1880,10 +1882,10 @@ void ORowSet::execute_NoApprove_NoNewConn(ResettableMutexGuard& _rClearForNotifi
                                 nFormatKey = ::dbtools::getDefaultNumberFormat(pColumn,m_xNumberFormatTypes,aLocale);
 
 
-                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_NUMBERFORMAT,makeAny(nFormatKey));
-                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_RELATIVEPOSITION,makeAny(sal_Int32(i+1)));
-                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_WIDTH,makeAny(sal_Int32(227)));
-                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_ALIGN,makeAny(sal_Int32(0)));
+                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_NUMBERFORMAT,Any(nFormatKey));
+                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_RELATIVEPOSITION,Any(sal_Int32(i+1)));
+                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_WIDTH,Any(sal_Int32(227)));
+                            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_ALIGN,Any(sal_Int32(0)));
                             pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_HIDDEN, css::uno::Any(false));
                         }
                         catch(Exception&)
@@ -1971,7 +1973,7 @@ void ORowSet::execute_NoApprove_NoNewConn(ResettableMutexGuard& _rClearForNotifi
                         });
                     aColumns->emplace_back(pColumn);
 
-                    pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_ISREADONLY,makeAny(rKeyColumns.find(i) != rKeyColumns.end()));
+                    pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_ISREADONLY,Any(rKeyColumns.find(i) != rKeyColumns.end()));
 
                     if(sColumnLabel.isEmpty())
                     {
@@ -2069,7 +2071,7 @@ Reference< XResultSet > SAL_CALL ORowSet::createResultSet(  )
     if(m_xStatement.is())
     {
         rtl::Reference<ORowSetClone> pClone = new ORowSetClone( m_aContext, *this, m_pMutex );
-        m_aClones.emplace_back(static_cast<cppu::OWeakObject*>(pClone.get()));
+        m_aClones.emplace_back(css::uno::Reference< css::uno::XWeak >(pClone));
         return pClone;
     }
     return Reference< XResultSet >();
@@ -2699,7 +2701,7 @@ void ORowSet::checkUpdateConditions(sal_Int32 columnIndex)
     if ( m_aCurrentRow.isNull() )
         ::dbtools::throwSQLException( DBA_RES( RID_STR_INVALID_CURSOR_STATE ), StandardSQLState::INVALID_CURSOR_STATE, *this );
 
-    if ( columnIndex <= 0 || sal_Int32((*m_aCurrentRow)->size()) <= columnIndex )
+    if ( columnIndex <= 0 || (*m_aCurrentRow)->size() <= o3tl::make_unsigned(columnIndex) )
         ::dbtools::throwSQLException( DBA_RES( RID_STR_INVALID_INDEX ), StandardSQLState::INVALID_DESCRIPTOR_INDEX, *this );
 }
 
@@ -2795,7 +2797,7 @@ ORowSetClone::ORowSetClone( const Reference<XComponentContext>& _rContext, ORowS
             xColumn->getPropertyValue(PROPERTY_NUMBERFORMAT) >>= nFormatKey;
             if(!nFormatKey && xColumn.is() && m_xNumberFormatTypes.is())
                 nFormatKey = ::dbtools::getDefaultNumberFormat(xColumn,m_xNumberFormatTypes,aLocale);
-            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_NUMBERFORMAT,makeAny(nFormatKey));
+            pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_NUMBERFORMAT,Any(nFormatKey));
             pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_RELATIVEPOSITION,xColumn->getPropertyValue(PROPERTY_RELATIVEPOSITION));
             pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_WIDTH,xColumn->getPropertyValue(PROPERTY_WIDTH));
             pColumn->setFastPropertyValue_NoBroadcast(PROPERTY_ID_HIDDEN,xColumn->getPropertyValue(PROPERTY_HIDDEN));
@@ -2901,7 +2903,7 @@ void ORowSetClone::close()
     return *::comphelper::OPropertyArrayUsageHelper<ORowSetClone>::getArrayHelper();
 }
 
-Sequence< sal_Int8 > ORowSetClone::getUnoTunnelId()
+const Sequence< sal_Int8 > & ORowSetClone::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();

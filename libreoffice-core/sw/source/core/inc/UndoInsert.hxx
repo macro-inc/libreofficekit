@@ -25,11 +25,12 @@
 #include <undobj.hxx>
 #include <svx/svdtypes.hxx>
 #include <rtl/ustring.hxx>
+#include <vcl/graph.hxx>
 #include <swtypes.hxx>
+#include <ndindex.hxx>
 #include <IDocumentContentOperations.hxx>
 #include <optional>
 
-class Graphic;
 class SwGrfNode;
 class SwUndoDelete;
 class SwUndoFormatAttr;
@@ -41,7 +42,7 @@ enum class MirrorGraph;
 class SwUndoInsert final : public SwUndo, private SwUndoSaveContent
 {
     /// start of Content in UndoNodes for Redo
-    std::unique_ptr<SwNodeIndex> m_pUndoNodeIndex;
+    std::optional<SwNodeIndex> m_oUndoNodeIndex;
     std::optional<OUString> maText;
     std::optional<OUString> maUndoText;
     std::unique_ptr<SwRedlineData> m_pRedlData;
@@ -59,14 +60,14 @@ class SwUndoInsert final : public SwUndo, private SwUndoSaveContent
 
     SwDoc * m_pDoc;
 
-    void Init(const SwNodeIndex & rNode);
+    void Init(const SwNode & rNode);
     std::optional<OUString> GetTextFromDoc() const;
 
 public:
-    SwUndoInsert( const SwNodeIndex& rNode, sal_Int32 nContent, sal_Int32 nLen,
+    SwUndoInsert( const SwNode& rNode, sal_Int32 nContent, sal_Int32 nLen,
                   const SwInsertFlags nInsertFlags,
                   bool bWDelim = true );
-    SwUndoInsert( const SwNodeIndex& rNode );
+    SwUndoInsert( const SwNode& rNode );
     virtual ~SwUndoInsert() override;
 
     virtual void UndoImpl( ::sw::UndoRedoContext & ) override;
@@ -135,9 +136,10 @@ private:
     std::unique_ptr<Impl> m_pImpl;
 };
 
+/// Handles the undo/redo of the 'Replace...' context menu item for an image.
 class SwUndoReRead final : public SwUndo
 {
-    std::unique_ptr<Graphic> mpGraphic;
+    std::optional<Graphic> moGraphic;
     std::optional<OUString> maNm;
     std::optional<OUString> maFltr;
     SwNodeOffset mnPosition;
@@ -184,12 +186,12 @@ class SwUndoInsertLabel final : public SwUndo
     bool m_bCopyBorder        :1;
 
 public:
-    SwUndoInsertLabel( const SwLabelType eTyp, const OUString &rText,
+    SwUndoInsertLabel( const SwLabelType eTyp, OUString rText,
     // #i39983# the separator is drawn with a character style
-                        const OUString& rSeparator,
-                        const OUString& rNumberSeparator, //#i61007# order of captions
+                        OUString aSeparator,
+                        OUString aNumberSeparator, //#i61007# order of captions
                         const bool bBefore, const sal_uInt16 nId,
-                        const OUString& rCharacterStyle,
+                        OUString aCharacterStyle,
                         const bool bCpyBrd,
                         const SwDoc* pDoc );
     virtual ~SwUndoInsertLabel() override;

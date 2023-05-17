@@ -13,7 +13,7 @@
     <p>Third Party Code Additional copyright notices and license terms applicable to portions of the Software can be
     found <a href="#thirdparty">below</a> in this document.</p>
     <p>All trademarks and registered trademarks mentioned herein are the property of their respective owners.</p>
-    <p>Copyright © 2000–2022 LibreOffice contributors. All rights reserved.</p>
+    <p>Copyright © 2000–2023 LibreOffice contributors. All rights reserved.</p>
     <p>This product is based on OpenOffice.org. Portions of this software are copyright © 2000-2011, Oracle and/or its
     affiliates.</p>
     <p>This product has been created by The Document Foundation, incorporating many modifications from different
@@ -52,18 +52,6 @@
     <h1 style="text-align: center;"><a id="thirdparty" name="thirdparty">Third Party Code Additional Copyright
     Notices and License Terms</a></h1>
     <h1><a id="a__Libraries" name="a__Libraries">Libraries</a></h1>
-    <div class="APR">
-        <h2>Apache Portable Runtime (APR)</h2>
-        <p>The following software may be included in this product: Apache Portable Runtime (APR).
-        Use of any of this software is governed by the terms of the license below:</p>
-        <p><a href="#a__Apache_License_version_2_0">Jump to Apache License Version 2.0</a></p>
-    </div>
-    <div class="SERF">
-        <h2>Apache Serf</h2>
-        <p>The following software may be included in this product: Apache Serf.
-        Use of any of this software is governed by the terms of the license below:</p>
-        <p><a href="#a__Apache_License_version_2_0">Jump to Apache License Version 2.0</a></p>
-    </div>
     <div class="BSH">
         <h2>beanshell</h2>
         <p>The following software may be included in this product: beanshell. Use of any of this software is governed
@@ -973,6 +961,12 @@
         WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF LIABILITY, ARISING OUT OF OR IN
         CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</p>
     </div>
+    <div class="ORCUS">
+        <h2>liborcus</h2>
+        <p>The following software may be included in this product: liborcus. Use of any of this software is governed
+        by the terms of the license below:</p>
+        <p><a href="#a__MPL_version_2">Jump to MPL Version 2.0</a></p>
+    </div>
     <div class="MSPUB">
         <h2>libmspub</h2>
         <p>The following software may be included in this product: libmspub. Use of any of this software is governed by
@@ -1488,20 +1482,6 @@
         OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
         DAMAGE.</p>
     </div>
-    <div class="NEON">
-        <h2>neon</h2>
-        <p>The following software may be included in this product: neon. Use of any of this software is governed by the
-        terms of the license below:</p>
-        <p>neon is Copyright (C) 1999-2007 Joe Orton &lt;joe@manyfish.co.uk&gt;<br />
-        Portions are:<br />
-        Copyright (C) 1999-2000 Tommi Komulainen &lt;Tommi.Komulainen@iki.fi&gt;<br />
-        Copyright (C) 1999-2000 Peter Boos &lt;pedib@colorfullife.com&gt;<br />
-        Copyright (C) 1991, 1995, 1996, 1997 Free Software Foundation, Inc.<br />
-        Copyright (C) 2004 Aleix Conchillo Flaque &lt;aleix@member.fsf.org&gt;<br />
-        Copyright (C) 2004 Jiang Lei &lt;tristone@deluxe.ocn.ne.jp&gt;<br />
-        Copyright (C) 2004-2005 Vladimir Berezniker @ http://public.xdi.org/=vmpn</p>
-        <p><a href="#a__LGPL_version_2_1">Jump to LGPL Version 2.1</a></p>
-    </div>
     <div class="NSS" >
         <h2>Network Security Services (NSS)</h2>
         <p>The following software may be included in this product: Network Security Services (NSS). Use of any of this
@@ -1545,78 +1525,7 @@
         <h2>OpenSSL</h2>
         <p>The following software may be included in this product: OpenSSL. Use of any of this software is governed by
         the terms of the license below:</p>
-        <p>The OpenSSL toolkit stays under a dual license, i.e. both the conditions of the OpenSSL License and the
-        original SSLeay license apply to the toolkit.</p>
-        <p>See below for the actual license texts. Actually both licenses are BSD-style Open Source licenses. In case
-        of any license issues related to OpenSSL please contact openssl-core@openssl.org.</p>
-        <h3>OpenSSL License</h3>
-        <p>Copyright (c) 1998-2007 The OpenSSL Project. All rights reserved.</p>
-        <p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-        the following conditions are met:</p>
-        <ol>
-            <li>Redistribution of source code must retain the above copyright notice, this list of conditions and the
-            following disclaimer.</li>
-            <li>Redistribution in binary form must reproduce the above copyright notice, this list of conditions and
-            the following disclaimer in the documentation and/or other materials provided with the distribution. </li>
-            <li>All advertising materials mentioning features or use of this software must display the following
-            acknowledgment: "This product includes software developed by the OpenSSL Project for use in the OpenSSL
-            Toolkit. (<a href="http://www.openssl.org/">http://www.openssl.org/</a>)" </li>
-            <li>The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to endorse or promote products
-            derived from this software without prior written permission. For written permission, please contact
-            openssl-core@openssl.org. </li>
-            <li>Products derived from this software may not be called "OpenSSL" nor may "OpenSSL" appear in their names
-            without prior written permission of the OpenSSL Project. </li>
-            <li>Redistribution of any form whatsoever must retain the following acknowledgment: "This product includes
-            software developed by the OpenSSL Project for use in the OpenSSL Toolkit (<a href=
-            "http://www.openssl.org/">http://www.openssl.org/</a>)" </li>
-        </ol>
-        <p>THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
-        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-        ARE DISCLAIMED. IN NO EVENT SHALL THE OpenSSL PROJECT OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-        INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-        ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
-        <p>This product includes cryptographic software written by Eric Young (eay@cryptsoft.com). This product
-        includes software written by Tim Hudson (tjh@cryptsoft.com).</p>
-        <h3>Original SSLeay License</h3>
-        <p>Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com) All rights reserved.</p>
-        <p>This package is an SSL implementation written by Eric Young (<a href=
-        "mailto:eay@cryptsoft.com">eay@cryptsoft.com</a>).<br />
-        The implementation was written so as to conform with Netscapes SSL.</p>
-        <p>This library is free for commercial and non-commercial use as long as the following conditions are aheared
-        to. The following conditions apply to all code found in this distribution, be it the RC4, RSA, lhash, DES,
-        etc., code; not just the SSL code. The SSL documentation included with this distribution is covered by the same
-        copyright terms except that the holder is Tim Hudson (tjh@cryptsoft.com).</p>
-        <p>Copyright remains Eric Young's, and as such any Copyright notices in the code are not to be removed. If this
-        package is used in a product, Eric Young should be given attribution as the author of the parts of the library
-        used. This can be in the form of a textual message at program startup or in documentation (online or textual)
-        provided with the package.</p>
-        <p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that
-        the following conditions are met:</p>
-        <ol>
-            <li>Redistribution of source code must retain the copyright notice, this list of conditions and the
-            following disclaimer.</li>
-            <li>Redistribution in binary form must reproduce the above copyright notice, this list of conditions and
-            the following disclaimer in the documentation and/or other materials provided with the distribution. </li>
-            <li>All advertising materials mentioning features or use of this software must display the following
-            acknowledgment: "This product includes cryptographic software written by Eric Young (eay@cryptsoft.com)"
-            The word 'cryptographic' can be left out if the routines from the library being used are not cryptographic
-            related :-). </li>
-            <li>If you include any Windows specific code (or a derivative thereof) from the apps directory (application
-            code) you must include an acknowledgment: "This product includes software written by Tim Hudson
-            (tjh@cryptsoft.com)" </li>
-        </ol>
-        <p>THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-        LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
-        NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-        OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-        USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-        THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
-        <p>The license and distribution terms for any publicly available version or derivative of this code cannot be
-        changed. i.e. this code cannot simply be copied and put under another distribution license [including the GNU
-        Public License.]</p>
+        <p><a href="#a__Apache_License_version_2_0">Jump to Apache License Version 2.0</a></p>
     </div>
     <div class="PDFIUM">
         <h2>PDFium</h2>
@@ -1882,6 +1791,27 @@
         PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
         WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</p>
     </div>
+    <h2>Dragonbox</h2>
+    <p>The following software may be included in this product: Dragonbox.</p>
+    <p>Dragonbox code is covered by the following license:</p>
+    <p><a href="#a__Apache_License_version_2_0">Jump to Apache License Version 2.0</a></p>
+    <blockquote>
+        <p>--- LLVM Exceptions to the Apache 2.0 License ----</p>
+
+        <p>As an exception, if, as a result of your compiling your source code, portions
+        of this Software are embedded into an Object form of such source code, you
+        may redistribute such embedded portions in such Object form without complying
+        with the conditions of Sections 4(a), 4(b) and 4(d) of the License.</p>
+
+        <p>In addition, if you combine or link compiled forms of this Software with
+        software that is licensed under the GPLv2 ("Combined Software") and if a
+        court of competent jurisdiction determines that the patent provision (Section
+        3), the indemnity provision (Section 9) or other Section of the License
+        conflicts with the conditions of the GPLv2, you may retroactively and
+        prospectively choose to deem waived or otherwise exclude such Section(s) of
+        the License, but only in their entirety and only with respect to the Combined
+        Software.</p>
+    </blockquote>
     <h2>dtoa</h2>
     <p>The following software may be included in this product: dtoa.</p>
     <p>dtoa code is covered by the MIT license:</p>
@@ -1901,6 +1831,33 @@
     REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
     OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.</p>
     </blockquote>
+
+    <h2>libfixmath</h2>
+    <p>The following software may be included in this product: libfixmath.</p>
+    <p>libfixmath code is covered by the MIT license:</p>
+    <blockquote>
+    <p>libfixmath is Copyright (c) 2011-2021 Flatmush &lt;Flatmush@gmail.com&gt;,
+    Petteri Aimonen &lt;Petteri.Aimonen@gmail.com&gt;, &amp; libfixmath AUTHORS</p>
+
+    <p>Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:</p>
+
+    <p>The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.</p>
+
+    <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.</p>
+    </blockquote>
+
     <h2>Random123: a Library of Counter-Based Random Number Generators</h2>
     <p>The following software may be included in this product: Random123: a Library of Counter-Based Random Number
     Generators. Use of any of this software is governed by the terms of the license below:</p>
@@ -2293,19 +2250,6 @@
     <hr />
     <h1><a id="a__Extensions" name="a__Extensions">Extensions</a></h1>
     <p>Only third party extensions are listed here whose source code is not in the LibreOffice tree.</p>
-    <div class="CT2N">
-        <h2>Convert Text to Number</h2>
-        <p>The following software may be included in this product: Convert Text to Number. Use of any of this software is
-        governed by the terms of the license below:</p>
-        <p>Copyright (C) 2008/2009 - Cor Nouws</p>
-        <p><a href="#a__LGPL_version_3">Jump to LGPL Version 3</a></p>
-    </div>
-    <div class="LANGUAGETOOL">
-        <h2>LanguageTool Grammar Checker</h2>
-        <p>The following software may be included in this product: LanguageTool Grammar Checker. Use of any of this
-        software is governed by the terms of the license below:</p>
-        <p><a href="#a__LGPL_version_3">Jump to LGPL Version 3</a></p>
-    </div>
     <div class="NUMBERTEXT"><!-- FIXME: license_*.xsl written in XSLT 1.0 matches this when LIBNUMBERTEXT is defined -->
         <h2>Numbertext</h2>
         <p>The following software may be included in this product: Numbertext. Use of any of this software is governed
@@ -2522,45 +2466,6 @@
         <p>Except as contained in this notice, the name of Tavmjong Bah shall not be used in advertising or otherwise
         to promote the sale, use or other dealings in this Font Software without prior written authorization from
         Tavmjong Bah. For further information, contact: tavmjong @ free . fr.</p>
-        <h2>EmojiOne Color</h2>
-        <h3>Licenses</h3>
-        <ul>
-            <li>Copyright 2016 Brad Erickson CC-BY-4.0/MIT</li>
-            <li>Copyright 2015 Ranks.com Inc. CC-BY-4.0</li>
-            <li>Copyright 2013 Joe Loughry and Terence Eden MIT</li>
-        </ul>
-        <h4>Artwork</h4>
-        <ul>
-            <li>Applies to SVG files and TTF font files</li>
-            <li>License: Creative Commons Attribution 4.0 International</li>
-            <li>Human Readable License: <a href=
-            "http://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</a></li>
-            <li>Complete Legal Terms: <a href=
-            "http://creativecommons.org/licenses/by/4.0/legalcode">http://creativecommons.org/licenses/by/4.0/legalcode</a></li>
-        </ul>
-        <h4>Source Code</h4>
-        <ul>
-            <li>Applies to everything else</li>
-            <li>License: MIT</li>
-            <li>Complete Legal Terms: http://opensource.org/licenses/MIT</li>
-        </ul>
-        <h4>EmojiOne License</h4>
-        <p>The SVG files of the <a href="http://emojione.com/">EmojiOne</a> project have been modified to create the
-        fallback emoji glyphs and used as-is for the SVGinOT color glyphs. Files are stored in
-        <code>assets/emojione-svg</code>.</p>
-        <ul>
-            <li>Source: https://github.com/Ranks/emojione</li>
-            <li>Art License: Creative Commons Attribution 4.0 International</li>
-        </ul>
-        <p>Please review the specific attribution requirements for commercial use of EmojiOne graphics:
-        <a href="http://emojione.com/licensing/">http://emojione.com/licensing/</a></p>
-        <h4>Power Symbol License</h4>
-        <p>The SVG files from the <a href="http://unicodepowersymbol.com/">Unicode Power Symbol</a> project have been
-        modified to create B&amp;W Power Symbol glyphs. Files are stored in <code>assets/svg-bw</code>.</p>
-        <ul>
-            <li>Source: <a href="https://github.com/jloughry/Unicode">https://github.com/jloughry/Unicode</a></li>
-            <li>Art License: MIT</li>
-        </ul>
         <h2>Gentium</h2>
         <p>The following software may be included in this product: Gentium fonts. Use of any of this software is
         governed by the terms of the license below:</p>
@@ -2569,12 +2474,6 @@
         <p>This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is copied below,
         and is also available with a FAQ at: <a href="http://scripts.sil.org/OFL">http://scripts.sil.org/OFL</a></p>
         <p><a href="#a__SIL_Open_Font_License__version_1_1">Jump to SIL Open Font License, Version 1.1</a></p>
-        <div class="no_mpl_subset">
-            <h2>KACST</h2>
-            <p>KACST fonts are free fonts donated by King Abdulaziz City For Science And Technology (KACST) under GPL.</p>
-            <p>KACST holds the copyright of the included Arabic font which is donated under GPL by KACST.</p>
-            <p><a href="#a__GPL_version_2">Jump to GPL Version 2</a></p>
-        </div>
         <h2>Karla</h2>
         <p>The following software may be included in this product: Karla fonts. Use of any of this software is governed
         by the terms of the license below:</p>
@@ -2719,6 +2618,10 @@
         <p>Copyright (c) 12/2012 - 2019</p>
         <p>This Font Software is licensed under the SIL Open Font License, Version 1.1 as shown below.</p>
         <p><a href="#a__SIL_Open_Font_License__version_1_1">Jump to SIL Open Font License, Version 1.1</a></p>
+        <h2>Open Sans</h2>
+        <p>Copyright 2020 The Open Sans Project Authors (https://github.com/googlefonts/opensans)</p>
+        <p>This Font Software is licensed under the SIL Open Font License, Version 1.1 as shown below.</p>
+        <p><a href="#a__SIL_Open_Font_License__version_1_1">Jump to SIL Open Font License, Version 1.1</a></p>
         <h2>Reem Kufi</h2>
         <p>The following software may be included in this product: Reem Kufi fonts. Use of any of this software is
         governed by the terms of the license below:</p>
@@ -2735,28 +2638,10 @@
         "Scheherazade" and "SIL". This license is copied below, and is also available with a FAQ at:
         <a href="http://scripts.sil.org/OFL">http://scripts.sil.org/OFL</a></p>
         <p><a href="#a__SIL_Open_Font_License__version_1_1">Jump to SIL Open Font License, Version 1.1</a></p>
-        <h2>Source Code Pro</h2>
-        <p>The following software may be included in this product: Source Code Pro fonts. Use of any of this software
-        is governed by the terms of the license below:</p>
-        <p>Copyright 2010, 2012 Adobe Systems Incorporated (<a href="http://www.adobe.com/">http://www.adobe.com/</a>),
-        with Reserved Font Name 'Source'. All Rights Reserved. Source is a trademark of Adobe Systems Incorporated in
-        the United States and/or other countries.</p>
-        <p>This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is copied below,
-        and is also available with a FAQ at: <a href="http://scripts.sil.org/OFL">http://scripts.sil.org/OFL</a></p>
-        <p><a href="#a__SIL_Open_Font_License__version_1_1">Jump to SIL Open Font License, Version 1.1</a></p>
         <h2>Source Sans Pro</h2>
         <p>The following software may be included in this product: Source Sans Pro fonts. Use of any of this software
         is governed by the terms of the license below:</p>
         <p>Copyright 2010, 2012 Adobe Systems Incorporated (<a href="http://www.adobe.com/">http://www.adobe.com/</a>),
-        with Reserved Font Name 'Source'. All Rights Reserved. Source is a trademark of Adobe Systems Incorporated in
-        the United States and/or other countries.</p>
-        <p>This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is copied below,
-        and is also available with a FAQ at: <a href="http://scripts.sil.org/OFL">http://scripts.sil.org/OFL</a></p>
-        <p><a href="#a__SIL_Open_Font_License__version_1_1">Jump to SIL Open Font License, Version 1.1</a></p>
-        <h2>Source Serif Pro</h2>
-        <p>The following software may be included in this product: Source Serif Pro fonts. Use of any of this software
-        is governed by the terms of the license below:</p>
-        <p>Copyright 2014 Adobe Systems Incorporated (<a href="http://www.adobe.com/">http://www.adobe.com/</a>),
         with Reserved Font Name 'Source'. All Rights Reserved. Source is a trademark of Adobe Systems Incorporated in
         the United States and/or other countries.</p>
         <p>This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is copied below,
@@ -2921,6 +2806,12 @@
         "https://gerrit.libreoffice.org/plugins/gitiles/dictionaries/+/master/cs_CZ/README_en.txt">Appendix A</a></p>
         <p>The thesaurus is generated automatically via a script by Jan Holesovsky &lt;kendy@collabora.com&gt;, based
         on idea of Zdenek Zabokrtsky - big thanks!</p>
+        <h2>Central Kurdish</h2>
+        <h3>Spelling dictionary</h3>
+        <p>Author: Sina Ahmadi &lt;ahmadi.sina@outlook.com&gt;<br />The following software may be included in this product: Central Kurdish spelling dictionary. Use of any of this
+        software is governed by the terms of the license below:</p>
+        <p>Creative Commons <a href="#a__CC-BY-SA_4_0">CC-BY-SA</a></p>
+        <p>The source CKB dictionary is available from <a href="https://github.com/sinaahmadi/KurdishHunspell">Kurdish Hunspell</a> project.</p>
         <h2>Croatian</h2>
         <h3>Spelling dictionary</h3>
         <p>The following software may be included in this product: Croatian spelling dictionary. Use of any of this
@@ -4051,6 +3942,16 @@
         <p>The following software may be included in this product: Thai spelling dictionary. Use of any of this
         software is governed by the terms of the license below:</p>
         <p><a href="#a__LGPL_version_2_1">Jump to LGPL Version 2.1</a></p>
+        <h3>Hyphenation patterns</h3>
+        <p>The following software may be included in this product: Thai hyphenation patterns. Use of any of this
+        software is governed by the terms of the license below:</p>
+        <p><a href="#a__LPPL">Jump to LPPL</a></p>
+        <p>Origin:</p>
+        <p>These Thai hyphenation patterns are based on word list from LibThai project,
+        manually hyphenated to be processed with patgen, plus additional processing,
+        by tex-hyphen project, and then converted for libhyphen using its
+        substrings.pl script.</p>
+        <p>Author: Theppitak Karoonboonyanan &lt;theppitak@gmail.com&gt;</p>
         <h2>Tibetan</h2>
         <h3>Spelling dictionary</h3>
         <p>The following software may be included in this product: Classical Tibetan syllable spellchecker for

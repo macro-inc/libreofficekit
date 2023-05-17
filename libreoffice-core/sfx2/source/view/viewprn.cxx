@@ -26,14 +26,13 @@
 #include <comphelper/propertyvalue.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <sal/log.hxx>
-#include <svl/itempool.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <svtools/prnsetup.hxx>
 #include <svl/flagitem.hxx>
 #include <svl/stritem.hxx>
 #include <svl/eitem.hxx>
-#include <sfx2/app.hxx>
 #include <unotools/useroptions.hxx>
 #include <tools/datetime.hxx>
 #include <sfx2/bindings.hxx>
@@ -81,8 +80,8 @@ class SfxPrinterController : public vcl::PrinterController, public SfxListener
 
 public:
     SfxPrinterController( const VclPtr<Printer>& i_rPrinter,
-                          const Any& i_rComplete,
-                          const Any& i_rSelection,
+                          Any i_Complete,
+                          Any i_Selection,
                           const Any& i_rViewProp,
                           const Reference< view::XRenderable >& i_xRender,
                           bool i_bApi, bool i_bDirect,
@@ -100,8 +99,8 @@ public:
 };
 
 SfxPrinterController::SfxPrinterController( const VclPtr<Printer>& i_rPrinter,
-                                            const Any& i_rComplete,
-                                            const Any& i_rSelection,
+                                            Any i_Complete,
+                                            Any i_Selection,
                                             const Any& i_rViewProp,
                                             const Reference< view::XRenderable >& i_xRender,
                                             bool i_bApi, bool i_bDirect,
@@ -109,8 +108,8 @@ SfxPrinterController::SfxPrinterController( const VclPtr<Printer>& i_rPrinter,
                                             const uno::Sequence< beans::PropertyValue >& rProps
                                           )
     : PrinterController(i_rPrinter, pView ? pView->GetFrameWeld() : nullptr)
-    , maCompleteSelection( i_rComplete )
-    , maSelection( i_rSelection )
+    , maCompleteSelection(std::move( i_Complete ))
+    , maSelection(std::move( i_Selection ))
     , mxRenderable( i_xRender )
     , mpLastPrinter( nullptr )
     , mpViewShell( pView )
@@ -163,9 +162,9 @@ SfxPrinterController::SfxPrinterController( const VclPtr<Printer>& i_rPrinter,
     }
 
     // set some job parameters
-    setValue( "IsApi", makeAny( i_bApi ) );
-    setValue( "IsDirect", makeAny( i_bDirect ) );
-    setValue( "IsPrinter", makeAny( true ) );
+    setValue( "IsApi", Any( i_bApi ) );
+    setValue( "IsDirect", Any( i_bDirect ) );
+    setValue( "IsPrinter", Any( true ) );
     setValue( "View", i_rViewProp );
 }
 
@@ -470,9 +469,7 @@ void SfxViewShell::SetPrinter_Impl( VclPtr<SfxPrinter>& pNewPrinter )
     SfxPrinter *pDocPrinter = GetPrinter();
 
     // Evaluate Printer Options
-    sal_uInt16 nWhich = GetPool().GetWhich(SID_PRINTER_CHANGESTODOC);
-    const SfxFlagItem *pFlagItem = nullptr;
-    pDocPrinter->GetOptions().GetItemState( nWhich, false, reinterpret_cast<const SfxPoolItem**>(&pFlagItem) );
+    const SfxFlagItem *pFlagItem = pDocPrinter->GetOptions().GetItemIfSet( SID_PRINTER_CHANGESTODOC, false );
     bool bOriToDoc = pFlagItem && (static_cast<SfxPrinterChangeFlags>(pFlagItem->GetValue()) & SfxPrinterChangeFlags::CHG_ORIENTATION);
     bool bSizeToDoc = pFlagItem && (static_cast<SfxPrinterChangeFlags>(pFlagItem->GetValue()) & SfxPrinterChangeFlags::CHG_SIZE);
 
@@ -581,8 +578,8 @@ void SfxViewShell::StartPrint( const uno::Sequence < beans::PropertyValue >& rPr
         aSelection = xSupplier->getSelection();
     else
         aSelection <<= GetObjectShell()->GetModel();
-    Any aComplete( makeAny( GetObjectShell()->GetModel() ) );
-    Any aViewProp( makeAny( xController ) );
+    Any aComplete( Any( GetObjectShell()->GetModel() ) );
+    Any aViewProp( xController );
     VclPtr<Printer> aPrt;
 
     const beans::PropertyValue* pVal = std::find_if(rProps.begin(), rProps.end(),
@@ -607,10 +604,14 @@ void SfxViewShell::StartPrint( const uno::Sequence < beans::PropertyValue >& rPr
                                                                                ));
     pImpl->m_xPrinterController = xNewController;
 
-    SfxObjectShell *pObjShell = GetObjectShell();
-    xNewController->setValue( "JobName",
-                        makeAny( pObjShell->GetTitle(1) ) );
-    xNewController->setPrinterModified( mbPrinterSettingsModified );
+    // When no JobName was specified via com::sun::star::view::PrintOptions::JobName ,
+    // use the document title as default job name
+    css::beans::PropertyValue* pJobNameVal = xNewController->getValue("JobName");
+    if (!pJobNameVal)
+    {
+        xNewController->setValue("JobName", Any(GetObjectShell()->GetTitle(1)));
+        xNewController->setPrinterModified(mbPrinterSettingsModified);
+    }
 }
 
 void SfxViewShell::ExecPrint( const uno::Sequence < beans::PropertyValue >& rProps, bool bIsAPI, bool bIsDirect )

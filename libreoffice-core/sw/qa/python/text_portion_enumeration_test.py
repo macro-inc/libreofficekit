@@ -1514,7 +1514,7 @@ class TextPortionEnumerationTest(unittest.TestCase):
         name2 = self.mkname("toxmark")
         name3 = self.mkname("bookmark")
         name4 = self.mkname("frame")
-        name5 = self.mkname("url")
+        # name5 = self.mkname("url")
         name6 = self.mkname("ruby")
         name7 = self.mkname("refmark")
         name8 = self.mkname("toxmark")
@@ -3271,7 +3271,7 @@ class TextPortionEnumerationTest(unittest.TestCase):
         try:
             if i_comp:
                 i_comp.close(True)
-        except Exception as e:
+        except Exception:
             pass
 
     def test_load_store(self):
@@ -3295,7 +3295,6 @@ class TextPortionEnumerationTest(unittest.TestCase):
             self.close(xComp)
 
     def checkloadmeta(self, xTextDoc):
-        xText = xTextDoc.getText()
         print("Checking meta(-field)s in loaded test document...")
         root = TreeNode()
         root.appendchild(RubyNode("ruby1")
@@ -3365,7 +3364,6 @@ class TextPortionEnumerationTest(unittest.TestCase):
             self.close(xComp)
 
     def checkloadxmlid(self, xTextDoc):
-        xText = xTextDoc.getText()
         xRepo = xTextDoc.getRDFRepository()
 
         print("Checking bookmarks in loaded test document...")
@@ -3491,7 +3489,7 @@ class TextPortionEnumerationTest(unittest.TestCase):
         return "{}{}".format(prefix, self.__class__.count)
 
     def mkid(self, prefix):
-        id = self.mkname(prefix)
+        self.mkname(prefix)
         return StringPair("content.xml", self.mkname(prefix))
 
     def mkid_(self, id):

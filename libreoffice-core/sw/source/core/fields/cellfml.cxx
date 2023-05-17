@@ -44,9 +44,11 @@
 #include <ndindex.hxx>
 #include <frameformats.hxx>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <svl/numformat.hxx>
+#include <utility>
 
 namespace
 {
@@ -109,17 +111,16 @@ double SwTableBox::GetValue( SwTableCalcPara& rCalcPara ) const
                 // will be removed from stack at the end.
         SwDoc* pDoc = GetFrameFormat()->GetDoc();
 
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == GetFrameFormat()->GetItemState(
-                                RES_BOXATR_FORMULA, false, &pItem ) )
+        if( const SwTableBoxFormula* pFormulaItem = GetFrameFormat()->GetItemIfSet(
+                                RES_BOXATR_FORMULA, false ) )
         {
             rCalcPara.m_rCalc.SetCalcError( SwCalcError::NONE ); // reset status
-            if( !static_cast<const SwTableBoxFormula*>(pItem)->IsValid() )
+            if( !pFormulaItem->IsValid() )
             {
                 // calculate
                 const SwTable* pTmp = rCalcPara.m_pTable;
                 rCalcPara.m_pTable = &pBox->GetSttNd()->FindTableNode()->GetTable();
-                const_cast<SwTableBoxFormula*>(static_cast<const SwTableBoxFormula*>(pItem))->Calc( rCalcPara, nRet );
+                const_cast<SwTableBoxFormula*>(pFormulaItem)->Calc( rCalcPara, nRet );
 
                 if( !rCalcPara.IsStackOverflow() )
                 {
@@ -136,11 +137,11 @@ double SwTableBox::GetValue( SwTableCalcPara& rCalcPara ) const
                 nRet = GetFrameFormat()->GetTableBoxValue().GetValue();
             break;
         }
-        else if( SfxItemState::SET == pBox->GetFrameFormat()->GetItemState(
-                                RES_BOXATR_VALUE, false, &pItem ) )
+        else if( const SwTableBoxValue* pBoxValueItem = pBox->GetFrameFormat()->GetItemIfSet(
+                                RES_BOXATR_VALUE, false ) )
         {
             rCalcPara.m_rCalc.SetCalcError( SwCalcError::NONE ); // reset status
-            nRet = static_cast<const SwTableBoxValue*>(pItem)->GetValue();
+            nRet = pBoxValueItem->GetValue();
             break;
         }
 
@@ -320,8 +321,8 @@ bool SwTableCalcPara::CalcWithStackOverflow()
     return !m_rCalc.IsCalcError();
 }
 
-SwTableFormula::SwTableFormula( const OUString& rFormula )
-: m_sFormula( rFormula )
+SwTableFormula::SwTableFormula( OUString aFormula )
+: m_sFormula( std::move(aFormula) )
 , m_eNmType( EXTRNL_NAME )
 , m_bValidValue( false )
 {
@@ -471,7 +472,7 @@ void SwTableFormula::RelBoxNmsToPtr( const SwTable& rTable, OUStringBuffer& rNew
     {
         const SwTableBox *pRelLastBox = lcl_RelToBox( rTable, pBox, *pLastBox );
         if ( pRelLastBox )
-            rNewStr.append(reinterpret_cast<sal_PtrDiff>(pRelLastBox));
+            rNewStr.append(reinterpret_cast<sal_IntPtr>(pRelLastBox));
         else
             rNewStr.append("0");
         rNewStr.append(":");
@@ -480,7 +481,7 @@ void SwTableFormula::RelBoxNmsToPtr( const SwTable& rTable, OUStringBuffer& rNew
 
     const SwTableBox *pRelFirstBox = lcl_RelToBox( rTable, pBox, rFirstBox );
     if ( pRelFirstBox )
-        rNewStr.append(reinterpret_cast<sal_PtrDiff>(pRelFirstBox));
+        rNewStr.append(reinterpret_cast<sal_IntPtr>(pRelFirstBox));
     else
         rNewStr.append("0");
 
@@ -565,13 +566,13 @@ void SwTableFormula::BoxNmsToPtr( const SwTable& rTable, OUStringBuffer& rNewStr
     if( pLastBox )
     {
         pBox = rTable.GetTableBox( *pLastBox );
-        rNewStr.append(OUString::number(reinterpret_cast<sal_PtrDiff>(pBox)) +
+        rNewStr.append(OUString::number(reinterpret_cast<sal_IntPtr>(pBox)) +
                     ":");
         rFirstBox = rFirstBox.copy( pLastBox->getLength()+1 );
     }
 
     pBox = rTable.GetTableBox( rFirstBox );
-    rNewStr.append(reinterpret_cast<sal_PtrDiff>(pBox))
+    rNewStr.append(reinterpret_cast<sal_IntPtr>(pBox))
             .append(rFirstBox[ rFirstBox.getLength()-1 ]); // get label for the box
 }
 
@@ -754,7 +755,7 @@ const SwTable* SwTableFormula::FindTable( SwDoc& rDoc, std::u16string_view rNm )
         SwFrameFormat* pFormat = rTableFormats[ --nFormatCnt ];
         // if we are called from Sw3Writer, a number is dependent on the format name
         SwTableBox* pFBox;
-        if ( rNm == pFormat->GetName().getToken(0, 0x0a) &&
+        if ( rNm == o3tl::getToken(pFormat->GetName(), 0, 0x0a) &&
             nullptr != ( pTmpTable = SwTable::FindTable( pFormat ) ) &&
             nullptr != (pFBox = pTmpTable->GetTabSortBoxes()[0] ) &&
             pFBox->GetSttNd() &&
@@ -789,7 +790,7 @@ static sal_Int32 lcl_GetLongBoxNum( OUString& rStr )
     }
     else
     {
-        nRet = rStr.copy( 0, nPos ).toInt32();
+        nRet = o3tl::toInt32(rStr.subView( 0, nPos ));
         rStr = rStr.copy( nPos+1 );
     }
     return nRet;
@@ -1230,9 +1231,9 @@ void SwTableFormula::SplitMergeBoxNm_( const SwTable& rTable, OUStringBuffer& rN
     }
 
     if( pLastBox )
-        rNewStr.append(OUString::number(reinterpret_cast<sal_PtrDiff>(pEndBox)) + ":");
+        rNewStr.append(OUString::number(reinterpret_cast<sal_IntPtr>(pEndBox)) + ":");
 
-    rNewStr.append(reinterpret_cast<sal_PtrDiff>(pSttBox))
+    rNewStr.append(reinterpret_cast<sal_IntPtr>(pSttBox))
             .append(rFirstBox[ rFirstBox.getLength()-1] );
 }
 

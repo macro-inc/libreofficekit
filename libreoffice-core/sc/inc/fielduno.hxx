@@ -20,7 +20,6 @@
 #pragma once
 
 #include "address.hxx"
-#include "mutexhlp.hxx"
 
 #include <svl/lstner.hxx>
 #include <editeng/editdata.hxx>
@@ -33,15 +32,13 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/util/XRefreshable.hpp>
 #include <com/sun/star/util/DateTime.hpp>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/servicehelper.hxx>
-#include <cppuhelper/component.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <osl/mutex.hxx>
 
 #include <memory>
-
-namespace comphelper { class OInterfaceContainerHelper2; }
 
 class ScEditSource;
 class SvxFieldItem;
@@ -64,7 +61,7 @@ private:
     ScAddress               aCellPos;
     std::unique_ptr<ScEditSource> mpEditSource;
     /// List of refresh listeners.
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2> mpRefreshListeners;
+    std::unique_ptr<comphelper::OInterfaceContainerHelper3<css::util::XRefreshListener>> mpRefreshListeners;
     /// mutex to lock the InterfaceContainerHelper
     osl::Mutex              aMutex;
 
@@ -73,7 +70,7 @@ private:
 
 public:
     ScCellFieldsObj(
-        const css::uno::Reference<css::text::XTextRange>& xContent,
+        css::uno::Reference<css::text::XTextRange> xContent,
         ScDocShell* pDocSh, const ScAddress& rPos);
     virtual ~ScCellFieldsObj() override;
 
@@ -118,7 +115,7 @@ private:
     std::unique_ptr<ScEditSource> mpEditSource;
 
     /// List of refresh listeners.
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2> mpRefreshListeners;
+    std::unique_ptr<comphelper::OInterfaceContainerHelper3<css::util::XRefreshListener>> mpRefreshListeners;
     /// mutex to lock the InterfaceContainerHelper
     osl::Mutex                  aMutex;
 
@@ -160,12 +157,12 @@ public:
  * Generic UNO wrapper for edit engine's field item in cells, headers, and
  * footers.
  */
-typedef cppu::WeakComponentImplHelper<
+typedef comphelper::WeakComponentImplHelper<
                             css::text::XTextField,
                             css::beans::XPropertySet,
                             css::lang::XUnoTunnel,
                             css::lang::XServiceInfo> ScEditFieldObj_Base;
-class ScEditFieldObj final : public ScMutexHelper, public ScEditFieldObj_Base
+class ScEditFieldObj final : public ScEditFieldObj_Base
 {
     ScEditFieldObj() = delete;
     ScEditFieldObj(const ScEditFieldObj&) = delete;
@@ -200,7 +197,7 @@ private:
 
 public:
     ScEditFieldObj(
-        const css::uno::Reference<css::text::XTextRange>& rContent,
+        css::uno::Reference<css::text::XTextRange> xContent,
         std::unique_ptr<ScEditSource> pEditSrc, sal_Int32 eType, const ESelection& rSel);
     virtual ~ScEditFieldObj() override;
 

@@ -58,14 +58,19 @@ class DataChangedEvent;
 class Accelerator;
 class Help;
 class OutputDevice;
-namespace vcl { class Window; }
-namespace vcl { class KeyCode; }
+namespace vcl {
+    class KeyCode;
+    class ILibreOfficeKitNotifier;
+    class Window;
+}
+
 class NotifyEvent;
 class KeyEvent;
 class MouseEvent;
-class GestureEvent;
+class GestureEventPan;
 struct ImplSVEvent;
 struct ConvertData;
+namespace basegfx { class SystemDependentDataManager; }
 
 namespace com::sun::star::uno {
     class XComponentContext;
@@ -80,8 +85,6 @@ namespace com::sun::star::awt {
     class XWindow;
 }
 
-// helper needed by SalLayout implementations as well as svx/source/dialog/svxbmpnumbalueset.cxx
-VCL_DLLPUBLIC sal_UCS4 GetMirroredChar( sal_UCS4 );
 VCL_DLLPUBLIC sal_UCS4 GetLocalizedChar( sal_UCS4, LanguageType );
 
 enum class SystemWindowFlags {
@@ -752,7 +755,8 @@ public:
     */
     static ImplSVEvent *        PostMouseEvent( VclEventId nEvent, vcl::Window *pWin, MouseEvent const * pMouseEvent );
 
-    static ImplSVEvent* PostGestureEvent(VclEventId nEvent, vcl::Window* pWin, GestureEvent const * pGestureEvent);
+    static ImplSVEvent* PostGestureEvent(VclEventId nEvent, vcl::Window* pWin,
+                                         GestureEventPan const * pGestureEvent);
 
     /** Remove mouse and keypress events from a window... any also zoom and scroll events
      if the platform supports it.
@@ -829,6 +833,12 @@ public:
     */
     static OutputDevice*        GetDefaultDevice();
 
+    /** access the DataManager for buffering system-dependent data
+
+     @returns the global instance of the SystemDependentDataManager
+    */
+    static basegfx::SystemDependentDataManager& GetSystemDependentDataManager();
+
     /** Get the first top-level window of the application.
 
      @returns Pointer to top-level window (a Window object)
@@ -904,6 +914,13 @@ public:
     */
     static OUString             GetAppName();
 
+    /**
+     * Get the OS version based on the OS specific implementation.
+     *
+     * @return OUString version string or "-" in case of problems
+     */
+    static OUString             GetOSVersion();
+
     /** Get useful OS, Hardware and configuration information,
      * cf. Help->About, and User-Agent
      * bSelection = 0 to return all info, 1 for environment only,
@@ -918,7 +935,7 @@ public:
 
      @returns true if the PNG could be loaded, otherwise returns false.
     */
-    static bool                 LoadBrandBitmap (const char* pName, BitmapEx &rBitmap);
+    static bool                 LoadBrandBitmap (std::u16string_view pName, BitmapEx &rBitmap);
 
     ///@}
 
@@ -1319,6 +1336,12 @@ public:
     */
     static void                 EndAllPopups();
 
+    /** Returns true, if the VCL plugin runs on the system event loop.
+     *
+     *  AKA the VCL plugin can't handle nested event loops, like WASM or mobile.
+     */
+    static bool IsOnSystemEventLoop();
+
     ///@}
 
     // For vclbootstrapprotector:
@@ -1329,7 +1352,8 @@ public:
     static std::unique_ptr<weld::Builder> CreateInterimBuilder(vcl::Window* pParent, const OUString &rUIFile, bool bAllowCycleFocusOut, sal_uInt64 nLOKWindowId = 0);
 
     static weld::MessageDialog* CreateMessageDialog(weld::Widget* pParent, VclMessageType eMessageType,
-                                                    VclButtonsType eButtonType, const OUString& rPrimaryMessage);
+                                                    VclButtonsType eButtonType, const OUString& rPrimaryMessage,
+                                                    const ILibreOfficeKitNotifier* pNotifier = nullptr);
 
     static weld::Window* GetFrameWeld(const css::uno::Reference<css::awt::XWindow>& rWindow);
 
@@ -1341,6 +1365,8 @@ public:
                               const OUString& rAction,
                               const std::vector<vcl::LOKPayloadItem>& rPayload = std::vector<vcl::LOKPayloadItem>()) const override;
     virtual void libreOfficeKitViewCallback(int nType, const char* pPayload) const override;
+    virtual void notifyInvalidation(tools::Rectangle const *) const override;
+
 
 private:
     DECL_DLLPRIVATE_STATIC_LINK( Application, PostEventHandler, void*, void );

@@ -63,8 +63,14 @@ public:
 
     void swapCells( std::vector<ScFormulaCell*>& rCells )
     {
-        // Remove duplicate before the swap.
-        std::sort(maCells.begin(), maCells.end());
+        // Remove duplicate before the swap. Take care to sort them by tab,col,row before sorting by pointer,
+        // as many calc algorithms perform better if cells are processed in this order.
+        std::sort(maCells.begin(), maCells.end(), [](const ScFormulaCell* cell1, const ScFormulaCell* cell2)
+            {
+                if( cell1->aPos != cell2->aPos )
+                    return cell1->aPos < cell2->aPos;
+                return cell1 < cell2;
+            });
         std::vector<ScFormulaCell*>::iterator it = std::unique(maCells.begin(), maCells.end());
         maCells.erase(it, maCells.end());
 
@@ -244,7 +250,7 @@ void FormulaGroupAreaListener::collectFormulaCells(
         // http://bugs.documentfoundation.org/attachment.cgi?id=114042
         // Apparently this was fixed in the meantime, let's assume and get the
         // assert bat out to hit us if it wasn't.
-        assert(!"something is still messing up the formula goup and block size length");
+        assert(!"something is still messing up the formula group and block size length");
     }
 
     ScFormulaCell* const * ppEnd = pp + mnGroupLen;

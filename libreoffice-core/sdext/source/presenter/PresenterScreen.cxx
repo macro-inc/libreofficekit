@@ -37,6 +37,7 @@
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <sal/log.hxx>
 
@@ -63,8 +64,8 @@ namespace {
     {
     public:
         PresenterScreenListener (
-            const css::uno::Reference<css::uno::XComponentContext>& rxContext,
-            const css::uno::Reference<css::frame::XModel2>& rxModel);
+            css::uno::Reference<css::uno::XComponentContext> xContext,
+            css::uno::Reference<css::frame::XModel2> xModel);
         PresenterScreenListener(const PresenterScreenListener&) = delete;
         PresenterScreenListener& operator=(const PresenterScreenListener&) = delete;
 
@@ -164,11 +165,11 @@ Any SAL_CALL PresenterScreenJob::execute(
 namespace {
 
 PresenterScreenListener::PresenterScreenListener (
-    const css::uno::Reference<css::uno::XComponentContext>& rxContext,
-    const css::uno::Reference<css::frame::XModel2>& rxModel)
+    css::uno::Reference<css::uno::XComponentContext> xContext,
+    css::uno::Reference<css::frame::XModel2> xModel)
     : PresenterScreenListenerInterfaceBase(m_aMutex),
-      mxModel(rxModel),
-      mxComponentContext(rxContext)
+      mxModel(std::move(xModel)),
+      mxComponentContext(std::move(xContext))
 {
 }
 
@@ -238,9 +239,9 @@ void SAL_CALL PresenterScreenListener::disposing (const css::lang::EventObject&)
 
 PresenterScreen::PresenterScreen (
     const Reference<XComponentContext>& rxContext,
-    const css::uno::Reference<css::frame::XModel2>& rxModel)
+    css::uno::Reference<css::frame::XModel2> xModel)
     : PresenterScreenInterfaceBase(m_aMutex),
-      mxModel(rxModel),
+      mxModel(std::move(xModel)),
       mxContextWeak(rxContext)
 {
 }
@@ -260,6 +261,19 @@ bool PresenterScreen::isPresenterScreenEnabled(const css::uno::Reference<css::un
             >>= dEnablePresenterScreen;
         return dEnablePresenterScreen;
 }
+
+bool PresenterScreen::isPresenterScreenFullScreen(const css::uno::Reference<css::uno::XComponentContext>& rxContext)
+{
+    bool dPresenterScreenFullScreen = true;
+    PresenterConfigurationAccess aConfiguration (
+        rxContext,
+        "/org.openoffice.Office.Impress/",
+        PresenterConfigurationAccess::READ_ONLY);
+    aConfiguration.GetConfigurationNode("Misc/Start/PresenterScreenFullScreen")
+        >>= dPresenterScreenFullScreen;
+    return dPresenterScreenFullScreen;
+}
+
 void SAL_CALL PresenterScreen::disposing()
 {
     Reference<XConfigurationController> xCC (mxConfigurationControllerWeak);
@@ -323,7 +337,7 @@ void PresenterScreen::InitializePresenterScreen()
         mxConfigurationControllerWeak = xCC;
 
         Reference<drawing::framework::XResourceId> xMainPaneId(
-            GetMainPaneId(xPresentation));
+            GetMainPaneId(xPresentation, xContext));
         // An empty reference means that the presenter screen can
         // not or must not be displayed.
         if ( ! xMainPaneId.is())
@@ -451,17 +465,19 @@ sal_Int32 PresenterScreen::GetPresenterScreenNumber (
             // There is either only one screen or the full screen
             // presentation spans all available screens.  The presenter
             // screen is shown only when a special flag in the configuration
-            // is set.
+            // is set or when the presenter screen will be shown as
+            // non-full screen window
             Reference<XComponentContext> xContext (mxContextWeak);
             PresenterConfigurationAccess aConfiguration (
                 xContext,
                 "/org.openoffice.Office.PresenterScreen/",
                 PresenterConfigurationAccess::READ_ONLY);
             bool bStartAlways (false);
+            bool bPresenterScreenFullScreen = isPresenterScreenFullScreen(xContext);
             if (aConfiguration.GetConfigurationNode(
                 "Presenter/StartAlways") >>= bStartAlways)
             {
-                if (bStartAlways)
+                if (bStartAlways || !bPresenterScreenFullScreen)
                     return GetPresenterScreenFromScreen(nScreenNumber);
             }
             return -1;
@@ -505,7 +521,8 @@ sal_Int32 PresenterScreen::GetPresenterScreenFromScreen( sal_Int32 nPresentation
 }
 
 Reference<drawing::framework::XResourceId> PresenterScreen::GetMainPaneId (
-    const Reference<presentation::XPresentation2>& rxPresentation) const
+    const Reference<presentation::XPresentation2>& rxPresentation,
+    const Reference<XComponentContext>& xContext) const
 {
     // A negative value means that the presentation spans all available
     // displays.  That leaves no room for the presenter.
@@ -513,10 +530,16 @@ Reference<drawing::framework::XResourceId> PresenterScreen::GetMainPaneId (
     if (nScreen < 0)
         return nullptr;
 
+    auto fullScreenStr = isPresenterScreenFullScreen(xContext)
+        ? OUString("true")
+        : OUString("false");
+
     return ResourceId::create(
         Reference<XComponentContext>(mxContextWeak),
         PresenterHelper::msFullScreenPaneURL
-                + "?FullScreen=true&ScreenNumber="
+                + "?FullScreen="
+                + fullScreenStr
+                + "&ScreenNumber="
                 + OUString::number(nScreen));
 }
 

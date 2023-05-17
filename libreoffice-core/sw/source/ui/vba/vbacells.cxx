@@ -20,6 +20,7 @@
 #include "vbacell.hxx"
 #include "vbarow.hxx"
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
@@ -32,7 +33,7 @@ class CellsEnumWrapper : public EnumerationHelper_BASE
     sal_Int32 nIndex;
 
 public:
-    explicit CellsEnumWrapper( const uno::Reference< container::XIndexAccess >& xIndexAccess ) : mxIndexAccess( xIndexAccess ), nIndex( 0 )
+    explicit CellsEnumWrapper( uno::Reference< container::XIndexAccess > xIndexAccess ) : mxIndexAccess(std::move( xIndexAccess )), nIndex( 0 )
     {
     }
     virtual sal_Bool SAL_CALL hasMoreElements(  ) override
@@ -64,7 +65,7 @@ private:
 
 public:
     /// @throws css::uno::RuntimeException
-    CellCollectionHelper( const css::uno::Reference< ov::XHelperInterface >& xParent, const css::uno::Reference< css::uno::XComponentContext > & xContext, const css::uno::Reference< css::text::XTextTable >& xTextTable, sal_Int32 nLeft, sal_Int32 nTop, sal_Int32 nRight, sal_Int32 nBottom ): mxParent( xParent ), mxContext( xContext ), mxTextTable( xTextTable ), mnLeft( nLeft ), mnTop( nTop ), mnRight( nRight ), mnBottom( nBottom )
+    CellCollectionHelper( css::uno::Reference< ov::XHelperInterface > xParent, css::uno::Reference< css::uno::XComponentContext > xContext, css::uno::Reference< css::text::XTextTable >  xTextTable, sal_Int32 nLeft, sal_Int32 nTop, sal_Int32 nRight, sal_Int32 nBottom ): mxParent(std::move( xParent )), mxContext(std::move( xContext )), mxTextTable(std::move( xTextTable )), mnLeft( nLeft ), mnTop( nTop ), mnRight( nRight ), mnBottom( nBottom )
     {
     }
 
@@ -82,7 +83,7 @@ public:
             for( sal_Int32 col = mnLeft; col <= mnRight; col++ )
             {
                 if( Index == ( ( row - mnTop ) * ( mnRight - mnLeft + 1 ) + ( col - mnLeft ) ) )
-                    return uno::makeAny( uno::Reference< word::XCell >( new SwVbaCell( mxParent, mxContext, mxTextTable, col, row ) ) );
+                    return uno::Any( uno::Reference< word::XCell >( new SwVbaCell( mxParent, mxContext, mxTextTable, col, row ) ) );
             }
         }
         throw css::lang::IndexOutOfBoundsException();

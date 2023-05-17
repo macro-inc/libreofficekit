@@ -28,17 +28,18 @@ private:
 
     void InclusionDirective(
         SourceLocation HashLoc, Token const & IncludeTok, StringRef,
-        bool IsAngled, CharSourceRange FilenameRange, FileEntry const * File,
-        StringRef SearchPath, StringRef, clang::Module const *
-#if CLANG_VERSION >= 70000
-        , SrcMgr::CharacteristicKind
+        bool IsAngled, CharSourceRange FilenameRange,
+#if CLANG_VERSION >= 150000
+        Optional<FileEntryRef> File,
+#else
+        FileEntry const * File,
 #endif
-        ) override
+        StringRef SearchPath, StringRef, clang::Module const *, SrcMgr::CharacteristicKind) override
     {
         if (ignoreLocation(HashLoc)) {
             return;
         }
-        if (File == nullptr) { // in case of "fatal error: '...' file not found"
+        if (!File) { // in case of "fatal error: '...' file not found"
             return;
         }
         if (IncludeTok.getIdentifierInfo()->getPPKeywordID() != tok::pp_include)

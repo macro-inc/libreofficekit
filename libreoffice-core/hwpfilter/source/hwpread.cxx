@@ -108,7 +108,7 @@ bool FieldCode::Read(HWPFile & hwpf)
 
     if( type[0] == 3 && type[1] == 2 ){ /* It must create a format as created date. */
           DateCode *pDate = new DateCode;
-          for (int i = 0 ; i < static_cast<int>(len3_); i++) {
+          for (uint i = 0 ; i < len3_; i++) {
                 if(str3[i] == 0 ) break;
                 if( i >= DATE_SIZE ) break;
                 pDate->format[i] = str3[i];
@@ -223,7 +223,6 @@ bool TxtBox::Read(HWPFile & hwpf)
     if (hh != dummy || CH_TEXT_BOX != dummy) {
         return hwpf.SetState(HWP_InvalidFileFormat);
     }
-    hwpf.AddBox(this);
     hwpf.Read2b(&style.cap_len, 1);
     hwpf.Read2b(&dummy1, 1);
     unsigned short next;
@@ -404,7 +403,6 @@ bool Picture::Read(HWPFile & hwpf)
     if (hh != dummy || CH_PICTURE != dummy) {
         return hwpf.SetState(HWP_InvalidFileFormat);
     }
-    hwpf.AddBox(this);
 
     hwpf.Read4b(follow_block_size);
 
@@ -548,7 +546,6 @@ bool Line::Read(HWPFile & hwpf)
     if (hh != dummy || CH_LINE != dummy) {
         return hwpf.SetState(HWP_InvalidFileFormat);
     }
-    hwpf.AddBox(this);
 
     style.boxnum = fboxnum++;
     zorder = zindex++;

@@ -20,7 +20,6 @@
 #ifndef INCLUDED_XMLOFF_DASHSTYLE_HXX
 #define INCLUDED_XMLOFF_DASHSTYLE_HXX
 
-#include <config_options.h>
 #include <rtl/ustring.hxx>
 #include <xmloff/dllapi.h>
 
@@ -39,7 +38,6 @@ class XMLOFF_DLLPUBLIC XMLDashStyleImport
 
 public:
     XMLDashStyleImport( SvXMLImport& rImport );
-    ~XMLDashStyleImport();
 
     void importXML(
         const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttrList,
@@ -54,7 +52,6 @@ class XMLOFF_DLLPUBLIC XMLDashStyleExport
 
 public:
     XMLDashStyleExport( SvXMLExport& rExport );
-    ~XMLDashStyleExport();
 
     void exportXML( const OUString& rStrName,
                         const css::uno::Any& rValue );

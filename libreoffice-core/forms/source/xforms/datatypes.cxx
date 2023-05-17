@@ -30,6 +30,7 @@
 #include <tools/datetime.hxx>
 #include <rtl/math.hxx>
 #include <sal/log.hxx>
+#include <utility>
 
 
 namespace xforms
@@ -38,7 +39,6 @@ namespace xforms
 
     using ::com::sun::star::uno::Reference;
     using ::com::sun::star::uno::Any;
-    using ::com::sun::star::uno::makeAny;
     using ::com::sun::star::util::Date;
     using ::com::sun::star::util::Time;
     using ::com::sun::star::util::DateTime;
@@ -53,11 +53,11 @@ namespace xforms
     using namespace ::frm;
     U_NAMESPACE_USE
 
-    OXSDDataType::OXSDDataType( const OUString& _rName, sal_Int16 _nTypeClass )
+    OXSDDataType::OXSDDataType( OUString _aName, sal_Int16 _nTypeClass )
         :OXSDDataType_PBase( m_aBHelper )
         ,m_bIsBasic( true )
         ,m_nTypeClass( _nTypeClass )
-        ,m_sName( _rName )
+        ,m_sName(std::move( _aName ))
         ,m_nWST( WhiteSpaceTreatment::Preserve )
         ,m_bPatternMatcherDirty( true )
     {
@@ -111,7 +111,7 @@ namespace xforms
     void SAL_CALL OXSDDataType::setName( const OUString& aName )
     {
         // TODO: check the name for conflicts in the repository
-        setFastPropertyValue( PROPERTY_ID_NAME, makeAny(aName) );
+        setFastPropertyValue( PROPERTY_ID_NAME, Any(aName) );
         SAL_WARN_IF( m_sName != aName, "forms.misc", "OXSDDataType::setName: inconsistency!" );
     }
 
@@ -124,7 +124,7 @@ namespace xforms
 
     void SAL_CALL OXSDDataType::setPattern( const OUString& _pattern )
     {
-        setFastPropertyValue( PROPERTY_ID_XSD_PATTERN, makeAny(_pattern) );
+        setFastPropertyValue( PROPERTY_ID_XSD_PATTERN, Any(_pattern) );
         SAL_WARN_IF( m_sPattern != _pattern, "forms.misc", "OXSDDataType::setPattern: inconsistency!" );
     }
 
@@ -137,7 +137,7 @@ namespace xforms
 
     void SAL_CALL OXSDDataType::setWhiteSpaceTreatment( sal_Int16 _whitespacetreatment )
     {
-        setFastPropertyValue( PROPERTY_ID_XSD_WHITESPACE, makeAny(_whitespacetreatment) );
+        setFastPropertyValue( PROPERTY_ID_XSD_WHITESPACE, Any(_whitespacetreatment) );
         SAL_WARN_IF( m_nWST != _whitespacetreatment, "forms.misc", "OXSDDataType::setWhiteSpaceTreatment: inconsistency!" );
     }
 
@@ -156,7 +156,7 @@ namespace xforms
 
     sal_Bool OXSDDataType::validate( const OUString& sValue )
     {
-        return bool(_validate( sValue ));
+        return bool(!_validate( sValue ));
     }
 
 
@@ -403,7 +403,7 @@ namespace xforms
         rtl_math_ConversionStatus eStatus;
         sal_Int32 nEnd;
         double f = ::rtl::math::stringToDouble(
-            rValue, '.', u'\0', &eStatus, &nEnd );
+            rValue.replace(',','.'), '.', u'\0', &eStatus, &nEnd );
 
         // error checking...
         bool bReturn = false;

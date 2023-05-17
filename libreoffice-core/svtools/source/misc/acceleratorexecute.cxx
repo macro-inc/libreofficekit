@@ -32,11 +32,13 @@
 #include <com/sun/star/util/URLTransformer.hpp>
 #include <cppuhelper/implbase.hxx>
 
+#include <utility>
 #include <vcl/evntpost.hxx>
 #include <sal/log.hxx>
 #include <vcl/lok.hxx>
-#include <osl/mutex.hxx>
 #include <rtl/ref.hxx>
+
+#include <comphelper/lok.hxx>
 
 namespace svt
 {
@@ -75,9 +77,9 @@ class AsyncAccelExec : public cppu::WeakImplHelper<css::lang::XEventListener>
         /** @short  allow creation of instances of this class
                     by using our factory only!
          */
-        AsyncAccelExec(const css::uno::Reference<css::lang::XComponent>& xFrame,
-                                      const css::uno::Reference< css::frame::XDispatch >& xDispatch,
-                                      const css::util::URL& rURL);
+        AsyncAccelExec(css::uno::Reference<css::lang::XComponent> xFrame,
+                                      css::uno::Reference< css::frame::XDispatch > xDispatch,
+                                      css::util::URL aURL);
 
         DECL_LINK(impl_ts_asyncCallback, LinkParamNone*, void);
 };
@@ -104,7 +106,7 @@ void AcceleratorExecute::init(const css::uno::Reference< css::uno::XComponentCon
                               const css::uno::Reference< css::frame::XFrame >&              xEnv )
 {
     // SAFE -> ----------------------------------
-    ::osl::ResettableMutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     // take over the uno service manager
     m_xContext = rxContext;
@@ -115,19 +117,19 @@ void AcceleratorExecute::init(const css::uno::Reference< css::uno::XComponentCon
     m_xDispatcher.set(xEnv, css::uno::UNO_QUERY);
     if (!m_xDispatcher.is())
     {
-        aLock.clear();
+        aLock.unlock();
         // <- SAFE ------------------------------
 
         css::uno::Reference< css::frame::XDispatchProvider > xDispatcher(css::frame::Desktop::create(rxContext), css::uno::UNO_QUERY_THROW);
 
         // SAFE -> ------------------------------
-        aLock.reset();
+        aLock.lock();
 
         m_xDispatcher  = xDispatcher;
         bDesktopIsUsed = true;
     }
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE ----------------------------------
 
     // open all needed configuration objects
@@ -153,13 +155,13 @@ void AcceleratorExecute::init(const css::uno::Reference< css::uno::XComponentCon
     }
 
     // SAFE -> ------------------------------
-    aLock.reset();
+    aLock.lock();
 
     m_xGlobalCfg = xGlobalCfg;
     m_xModuleCfg = xModuleCfg;
     m_xDocCfg    = xDocCfg   ;
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE ----------------------------------
 }
 
@@ -183,11 +185,11 @@ bool AcceleratorExecute::execute(const css::awt::KeyEvent& aAWTKey)
     }
 
     // SAFE -> ----------------------------------
-    osl::ClearableMutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     css::uno::Reference< css::frame::XDispatchProvider > xProvider = m_xDispatcher;
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE ----------------------------------
 
     // convert command in URL structure
@@ -261,13 +263,13 @@ OUString AcceleratorExecute::findCommand(const css::awt::KeyEvent& aKey)
 OUString AcceleratorExecute::impl_ts_findCommand(const css::awt::KeyEvent& aKey)
 {
     // SAFE -> ----------------------------------
-    osl::ClearableMutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     css::uno::Reference< css::ui::XAcceleratorConfiguration > xGlobalCfg = m_xGlobalCfg;
     css::uno::Reference< css::ui::XAcceleratorConfiguration > xModuleCfg = m_xModuleCfg;
     css::uno::Reference< css::ui::XAcceleratorConfiguration > xDocCfg    = m_xDocCfg   ;
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE ----------------------------------
 
     OUString sCommand;
@@ -406,6 +408,27 @@ css::uno::Reference< css::ui::XAcceleratorConfiguration > AcceleratorExecute::st
     return xAccCfg;
 }
 
+css::uno::Reference<css::ui::XAcceleratorConfiguration> AcceleratorExecute::lok_createNewAcceleratorConfiguration(const css::uno::Reference< css::uno::XComponentContext >& rxContext, OUString sModule)
+{
+    css::uno::Reference< css::ui::XModuleUIConfigurationManagerSupplier > xUISupplier(css::ui::theModuleUIConfigurationManagerSupplier::get(rxContext));
+
+    try
+    {
+        css::uno::Reference<css::ui::XUIConfigurationManager> xUIManager = xUISupplier->getUIConfigurationManager(sModule);
+
+        // Return new short cut manager in case current view's language is different from previous ones.
+        return xUIManager->createShortCutManager();
+    }
+    catch(const css::container::NoSuchElementException&)
+    {}
+
+    return css::uno::Reference<css::ui::XAcceleratorConfiguration>();
+}
+
+void AcceleratorExecute::lok_setModuleConfig(css::uno::Reference<css::ui::XAcceleratorConfiguration> acceleratorConfig)
+{
+    this->m_xModuleCfg = acceleratorConfig;
+}
 
 css::uno::Reference< css::ui::XAcceleratorConfiguration > AcceleratorExecute::st_openDocConfig(const css::uno::Reference< css::frame::XModel >& xModel)
 {
@@ -423,32 +446,32 @@ css::uno::Reference< css::ui::XAcceleratorConfiguration > AcceleratorExecute::st
 css::uno::Reference< css::util::XURLTransformer > AcceleratorExecute::impl_ts_getURLParser()
 {
     // SAFE -> ----------------------------------
-    ::osl::ResettableMutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     if (m_xURLParser.is())
         return m_xURLParser;
     css::uno::Reference< css::uno::XComponentContext > xContext = m_xContext;
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE ----------------------------------
 
     css::uno::Reference< css::util::XURLTransformer > xParser =  css::util::URLTransformer::create( xContext );
 
     // SAFE -> ----------------------------------
-    aLock.reset();
+    aLock.lock();
     m_xURLParser = xParser;
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE ----------------------------------
 
     return xParser;
 }
 
-AsyncAccelExec::AsyncAccelExec(const css::uno::Reference<css::lang::XComponent>& xFrame,
-                               const css::uno::Reference<css::frame::XDispatch>& xDispatch,
-                               const css::util::URL& rURL)
-    : m_xFrame(xFrame)
-    , m_xDispatch(xDispatch)
-    , m_aURL(rURL)
+AsyncAccelExec::AsyncAccelExec(css::uno::Reference<css::lang::XComponent> xFrame,
+                               css::uno::Reference<css::frame::XDispatch> xDispatch,
+                               css::util::URL aURL)
+    : m_xFrame(std::move(xFrame))
+    , m_xDispatch(std::move(xDispatch))
+    , m_aURL(std::move(aURL))
     , m_aAsyncCallback(LINK(this, AsyncAccelExec, impl_ts_asyncCallback))
 {
     acquire();

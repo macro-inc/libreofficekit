@@ -36,6 +36,7 @@
 #include <comphelper/sequenceashashmap.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/enumhelper.hxx>
+#include <utility>
 
 namespace {
 
@@ -60,7 +61,7 @@ private:
 
 public:
 
-    explicit ModuleManager(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+    explicit ModuleManager(css::uno::Reference< css::uno::XComponentContext >  xContext);
 
     ModuleManager(const ModuleManager&) = delete;
     ModuleManager& operator=(const ModuleManager&) = delete;
@@ -123,8 +124,8 @@ private:
     OUString implts_identify(const css::uno::Reference< css::uno::XInterface >& xComponent);
 };
 
-ModuleManager::ModuleManager(const css::uno::Reference< css::uno::XComponentContext >& xContext)
-    : m_xContext(xContext)
+ModuleManager::ModuleManager(css::uno::Reference< css::uno::XComponentContext >  xContext)
+    : m_xContext(std::move(xContext))
 {
     m_xCFG.set( comphelper::ConfigurationHelper::openConfig(
                 m_xContext, "/org.openoffice.Setup/Office/Factories",
@@ -233,7 +234,7 @@ void SAL_CALL ModuleManager::replaceByName(const OUString& sName ,
     {
         // let "NoSuchElementException" out ! We support the same API ...
         // and without a flush() at the end all changed data before will be ignored !
-        xModule->replaceByName(prop.first, prop.second);
+        xModule->replaceByName(prop.first.maString, prop.second);
     }
 
     ::comphelper::ConfigurationHelper::flush(xCfg);
@@ -261,7 +262,7 @@ css::uno::Any SAL_CALL ModuleManager::getByName(const OUString& sName)
         lProps[sPropName] = xModule->getByName(sPropName);
     }
 
-    return css::uno::makeAny(lProps.getAsConstPropertyValueList());
+    return css::uno::Any(lProps.getAsConstPropertyValueList());
 }
 
 css::uno::Sequence< OUString > SAL_CALL ModuleManager::getElementNames()
@@ -301,7 +302,7 @@ css::uno::Reference< css::container::XEnumeration > SAL_CALL ModuleManager::crea
         {
             ::comphelper::SequenceAsHashMap lModuleProps = getByName(rModuleName);
             if (lModuleProps.match(lSearchProps))
-                lResult.push_back(css::uno::makeAny(lModuleProps.getAsConstPropertyValueList()));
+                lResult.push_back(css::uno::Any(lModuleProps.getAsConstPropertyValueList()));
         }
         catch(const css::uno::Exception&)
         {

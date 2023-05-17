@@ -36,6 +36,10 @@
 #include <quartz/salgdi.h>
 #include <quartz/utils.h>
 
+#if HAVE_FEATURE_SKIA
+#include <vcl/skia/SkiaHelper.hxx>
+#endif
+
 #define WHEEL_EVENT_FACTOR 1.5
 
 static sal_uInt16 ImplGetModifierMask( unsigned int nMask )
@@ -165,9 +169,12 @@ static AquaSalFrame* getMouseContainerFrame()
 -(id)initWithSalFrame: (AquaSalFrame*)pFrame
 {
     mDraggingDestinationHandler = nil;
+    mbInLiveResize = NO;
+    mbInWindowDidResize = NO;
+    mpLiveResizeTimer = nil;
     mpFrame = pFrame;
-    NSRect aRect = { { static_cast<CGFloat>(pFrame->maGeometry.nX), static_cast<CGFloat>(pFrame->maGeometry.nY) },
-                     { static_cast<CGFloat>(pFrame->maGeometry.nWidth), static_cast<CGFloat>(pFrame->maGeometry.nHeight) } };
+    NSRect aRect = { { static_cast<CGFloat>(pFrame->maGeometry.x()), static_cast<CGFloat>(pFrame->maGeometry.y()) },
+                     { static_cast<CGFloat>(pFrame->maGeometry.width()), static_cast<CGFloat>(pFrame->maGeometry.height()) } };
     pFrame->VCLToCocoa( aRect );
     NSWindow* pNSWindow = [super initWithContentRect: aRect
                                  styleMask: mpFrame->getStyleMask()
@@ -203,6 +210,22 @@ static AquaSalFrame* getMouseContainerFrame()
     [pNSWindow setDepthLimit: NSWindowDepthTwentyfourBitRGB];
 
     return static_cast<SalFrameWindow *>(pNSWindow);
+}
+
+-(void)clearLiveResizeTimer
+{
+    if ( mpLiveResizeTimer )
+    {
+        [mpLiveResizeTimer invalidate];
+        [mpLiveResizeTimer release];
+        mpLiveResizeTimer = nil;
+    }
+}
+
+-(void)dealloc
+{
+    [self clearLiveResizeTimer];
+    [super dealloc];
 }
 
 -(AquaSalFrame*)getSalFrame
@@ -254,6 +277,12 @@ static AquaSalFrame* getMouseContainerFrame()
                                             SalFrameStyleFlags::SIZEABLE|
                                             SalFrameStyleFlags::CLOSEABLE;
 
+        // Reset dark mode colors in HITheme controls after printing
+        // In dark mode, after an NSPrintOperation has completed, macOS draws
+        // HITheme controls with light mode colors so reset all dark mode
+        // colors when an NSWindow gains focus.
+        mpFrame->UpdateDarkMode();
+
         if( mpFrame->mpMenu )
             mpFrame->mpMenu->setMainMenu();
         else if( ! mpFrame->mpParent &&
@@ -265,12 +294,20 @@ static AquaSalFrame* getMouseContainerFrame()
         mpFrame->CallCallback( SalEvent::GetFocus, nullptr );
         mpFrame->SendPaintEvent(); // repaint controls as active
     }
+
+    // Prevent the same native input method popup that was cancelled in a
+    // previous call to [self windowDidResignKey:] from reappearing
+    [self endExtTextInput];
 }
 
 -(void)windowDidResignKey: (NSNotification*)pNotification
 {
     (void)pNotification;
     SolarMutexGuard aGuard;
+
+    // Commit any uncommitted text and cancel the native input method session
+    // whenever a window loses focus like in Safari, Firefox, and Excel
+    [self endExtTextInput];
 
     if( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
     {
@@ -305,12 +342,100 @@ static AquaSalFrame* getMouseContainerFrame()
     (void)pNotification;
     SolarMutexGuard aGuard;
 
+    if ( mbInWindowDidResize )
+        return;
+
+    mbInWindowDidResize = YES;
+
     if( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
     {
         mpFrame->UpdateFrameGeometry();
         mpFrame->CallCallback( SalEvent::Resize, nullptr );
-        mpFrame->SendPaintEvent();
+
+        bool bInLiveResize = [self inLiveResize];
+        ImplSVData* pSVData = ImplGetSVData();
+        assert( pSVData );
+        if ( pSVData )
+        {
+            const bool bWasLiveResize = pSVData->mpWinData->mbIsLiveResize;
+            if ( bWasLiveResize != bInLiveResize )
+            {
+                pSVData->mpWinData->mbIsLiveResize = bInLiveResize;
+                Scheduler::Wakeup();
+            }
+        }
+
+        if ( bInLiveResize || mbInLiveResize )
+        {
+            mbInLiveResize = bInLiveResize;
+
+#if HAVE_FEATURE_SKIA
+            // Related: tdf#152703 Eliminate empty window with Skia/Metal while resizing
+            // The window will clear its background so when Skia/Metal is
+            // enabled, explicitly flush the Skia graphics to the window
+            // during live resizing or else nothing will be drawn until after
+            // live resizing has ended.
+            // Also, flushing during [self windowDidResize:] eliminates flicker
+            // by forcing this window's SkSurface to recreate its underlying
+            // CAMetalLayer with the new size. Flushing in
+            // [self displayIfNeeded] does not eliminate flicker so apparently
+            // [self windowDidResize:] is called earlier.
+            if ( SkiaHelper::isVCLSkiaEnabled() )
+            {
+                AquaSalGraphics* pGraphics = mpFrame->mpGraphics;
+                if ( pGraphics )
+                    pGraphics->Flush();
+            }
+#endif
+
+            // tdf#152703 Force relayout during live resizing of window
+            // During a live resize, macOS floods the application with
+            // windowDidResize: notifications so sending a paint event does
+            // not trigger redrawing with the new size.
+            // Instead, force relayout by dispatching all pending internal
+            // events and firing any pending timers.
+            // Also, Application::Reschedule() can potentially display a
+            // modal dialog which will cause a hang so temporarily disable
+            // live resize by clamping the window's minimum and maximum sizes
+            // to the current frame size which in Application::Reschedule().
+            NSRect aFrame = [self frame];
+            NSSize aMinSize = [self minSize];
+            NSSize aMaxSize = [self maxSize];
+            [self setMinSize:aFrame.size];
+            [self setMaxSize:aFrame.size];
+            Application::Reschedule( true );
+            [self setMinSize:aMinSize];
+            [self setMaxSize:aMaxSize];
+
+            if ( mbInLiveResize )
+            {
+                // tdf#152703 Force repaint after live resizing ends
+                // Repost this notification so that this selector will be called
+                // at least once after live resizing ends
+                if ( !mpLiveResizeTimer )
+                {
+                    mpLiveResizeTimer = [NSTimer scheduledTimerWithTimeInterval:0.1f target:self selector:@selector(windowDidResizeWithTimer:) userInfo:pNotification repeats:YES];
+                    if ( mpLiveResizeTimer )
+                    {
+                        [mpLiveResizeTimer retain];
+
+                        // The timer won't fire without a call to
+                        // Application::Reschedule() unless we copy the fix for
+                        // #i84055# from vcl/osx/saltimer.cxx and add the timer
+                        // to the NSEventTrackingRunLoopMode run loop mode
+                        [[NSRunLoop currentRunLoop] addTimer:mpLiveResizeTimer forMode:NSEventTrackingRunLoopMode];
+                    }
+                }
+            }
+        }
+        else
+        {
+            [self clearLiveResizeTimer];
+            mpFrame->SendPaintEvent();
+        }
     }
+
+    mbInWindowDidResize = NO;
 }
 
 -(void)windowDidMiniaturize: (NSNotification*)pNotification
@@ -348,7 +473,7 @@ static AquaSalFrame* getMouseContainerFrame()
     if( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
     {
         // #i84461# end possible input
-        mpFrame->CallCallback( SalEvent::EndExtTextInput, nullptr );
+        [self endExtTextInput];
         if( AquaSalFrame::isAlive( mpFrame ) )
         {
             mpFrame->CallCallback( SalEvent::Close, nullptr );
@@ -380,6 +505,27 @@ static AquaSalFrame* getMouseContainerFrame()
         return;
     mpFrame->mbFullScreen = false;
     (void)pNotification;
+}
+
+-(void)windowDidChangeBackingProperties:(NSNotification *)pNotification
+{
+    (void)pNotification;
+#if HAVE_FEATURE_SKIA
+    SolarMutexGuard aGuard;
+
+    sal::aqua::resetWindowScaling();
+
+    if( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
+    {
+        // tdf#147342 Notify Skia that the window's backing properties changed
+        if ( SkiaHelper::isVCLSkiaEnabled() )
+        {
+            AquaSalGraphics* pGraphics = mpFrame->mpGraphics;
+            if ( pGraphics )
+                pGraphics->WindowBackingPropertiesChanged();
+        }
+    }
+#endif
 }
 
 -(void)dockMenuItemTriggered: (id)sender
@@ -437,6 +583,24 @@ static AquaSalFrame* getMouseContainerFrame()
     mDraggingDestinationHandler = nil;
 }
 
+-(void)endExtTextInput
+{
+    [self endExtTextInput:EndExtTextInputFlags::Complete];
+}
+
+-(void)endExtTextInput:(EndExtTextInputFlags)nFlags
+{
+    SalFrameView *pView = static_cast<SalFrameView*>([self firstResponder]);
+    if (pView && [pView isKindOfClass:[SalFrameView class]])
+        [pView endExtTextInput:nFlags];
+}
+
+-(void)windowDidResizeWithTimer:(NSTimer *)pTimer
+{
+    if ( pTimer )
+        [self windowDidResize:[pTimer userInfo]];
+}
+
 @end
 
 @implementation SalFrameView
@@ -452,15 +616,29 @@ static AquaSalFrame* getMouseContainerFrame()
     {
         mDraggingDestinationHandler = nil;
         mpFrame = pFrame;
+        mpLastEvent = nil;
         mMarkedRange = NSMakeRange(NSNotFound, 0);
         mSelectedRange = NSMakeRange(NSNotFound, 0);
         mpReferenceWrapper = nil;
         mpMouseEventListener = nil;
         mpLastSuperEvent = nil;
+        mfLastMagnifyTime = 0.0;
+
+        mbInEndExtTextInput = NO;
+        mbInCommitMarkedText = NO;
+        mpLastMarkedText = nil;
+        mbTextInputWantsNonRepeatKeyDown = NO;
     }
 
-    mfLastMagnifyTime = 0.0;
     return self;
+}
+
+-(void)dealloc
+{
+    [self clearLastEvent];
+    [self clearLastMarkedText];
+
+    [super dealloc];
 }
 
 -(AquaSalFrame*)getSalFrame
@@ -473,7 +651,7 @@ static AquaSalFrame* getMouseContainerFrame()
     if( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
     {
         // FIXME: does this leak the returned NSCursor of getCurrentCursor ?
-        const NSRect aRect = { NSZeroPoint, NSMakeSize( mpFrame->maGeometry.nWidth, mpFrame->maGeometry.nHeight) };
+        const NSRect aRect = { NSZeroPoint, NSMakeSize(mpFrame->maGeometry.width(), mpFrame->maGeometry.height()) };
         [self addCursorRect: aRect cursor: mpFrame->getCurrentCursor()];
     }
 }
@@ -502,9 +680,9 @@ static AquaSalFrame* getMouseContainerFrame()
 
 -(void)drawRect: (NSRect)aRect
 {
-    AquaSalInstance *pInstance = GetSalData()->mpInstance;
-    assert(pInstance);
-    if (!pInstance)
+    ImplSVData* pSVData = ImplGetSVData();
+    assert( pSVData );
+    if ( !pSVData )
         return;
 
     SolarMutexGuard aGuard;
@@ -512,10 +690,10 @@ static AquaSalFrame* getMouseContainerFrame()
         return;
 
     const bool bIsLiveResize = [self inLiveResize];
-    const bool bWasLiveResize = pInstance->mbIsLiveResize;
+    const bool bWasLiveResize = pSVData->mpWinData->mbIsLiveResize;
     if (bWasLiveResize != bIsLiveResize)
     {
-        pInstance->mbIsLiveResize = bIsLiveResize;
+        pSVData->mpWinData->mbIsLiveResize = bIsLiveResize;
         Scheduler::Wakeup();
     }
 
@@ -600,13 +778,13 @@ static AquaSalFrame* getMouseContainerFrame()
 
         SalMouseEvent aEvent;
         aEvent.mnTime   = pDispatchFrame->mnLastEventTime;
-        aEvent.mnX      = static_cast<tools::Long>(aPt.x) - pDispatchFrame->maGeometry.nX;
-        aEvent.mnY      = static_cast<tools::Long>(aPt.y) - pDispatchFrame->maGeometry.nY;
+        aEvent.mnX = static_cast<tools::Long>(aPt.x) - pDispatchFrame->maGeometry.x();
+        aEvent.mnY = static_cast<tools::Long>(aPt.y) - pDispatchFrame->maGeometry.y();
         aEvent.mnButton = nButton;
         aEvent.mnCode   =  aEvent.mnButton | nModMask;
 
         if( AllSettings::GetLayoutRTL() )
-            aEvent.mnX = pDispatchFrame->maGeometry.nWidth-1-aEvent.mnX;
+            aEvent.mnX = pDispatchFrame->maGeometry.width() - 1 - aEvent.mnX;
 
         pDispatchFrame->CallCallback( nEvent, &aEvent );
     }
@@ -760,14 +938,14 @@ static AquaSalFrame* getMouseContainerFrame()
 
         SalWheelMouseEvent aEvent;
         aEvent.mnTime           = mpFrame->mnLastEventTime;
-        aEvent.mnX              = static_cast<tools::Long>(aPt.x) - mpFrame->maGeometry.nX;
-        aEvent.mnY              = static_cast<tools::Long>(aPt.y) - mpFrame->maGeometry.nY;
+        aEvent.mnX = static_cast<tools::Long>(aPt.x) - mpFrame->maGeometry.x();
+        aEvent.mnY = static_cast<tools::Long>(aPt.y) - mpFrame->maGeometry.y();
         aEvent.mnCode           = ImplGetModifierMask( mpFrame->mnLastModifierFlags );
         aEvent.mnCode           |= KEY_MOD1; // we want zooming, no scrolling
         aEvent.mbDeltaIsPixel   = true;
 
         if( AllSettings::GetLayoutRTL() )
-            aEvent.mnX = mpFrame->maGeometry.nWidth-1-aEvent.mnX;
+            aEvent.mnX = mpFrame->maGeometry.width() - 1 - aEvent.mnX;
 
         aEvent.mnDelta = nDeltaZ;
         aEvent.mnNotchDelta = (nDeltaZ >= 0) ? +1 : -1;
@@ -817,13 +995,13 @@ static AquaSalFrame* getMouseContainerFrame()
 
         SalWheelMouseEvent aEvent;
         aEvent.mnTime           = mpFrame->mnLastEventTime;
-        aEvent.mnX              = static_cast<tools::Long>(aPt.x) - mpFrame->maGeometry.nX;
-        aEvent.mnY              = static_cast<tools::Long>(aPt.y) - mpFrame->maGeometry.nY;
+        aEvent.mnX = static_cast<tools::Long>(aPt.x) - mpFrame->maGeometry.x();
+        aEvent.mnY = static_cast<tools::Long>(aPt.y) - mpFrame->maGeometry.y();
         aEvent.mnCode           = ImplGetModifierMask( mpFrame->mnLastModifierFlags );
         aEvent.mbDeltaIsPixel   = true;
 
         if( AllSettings::GetLayoutRTL() )
-            aEvent.mnX = mpFrame->maGeometry.nWidth-1-aEvent.mnX;
+            aEvent.mnX = mpFrame->maGeometry.width() - 1 - aEvent.mnX;
 
         if( dX != 0.0 )
         {
@@ -876,13 +1054,13 @@ static AquaSalFrame* getMouseContainerFrame()
 
         SalWheelMouseEvent aEvent;
         aEvent.mnTime         = mpFrame->mnLastEventTime;
-        aEvent.mnX            = static_cast<tools::Long>(aPt.x) - mpFrame->maGeometry.nX;
-        aEvent.mnY            = static_cast<tools::Long>(aPt.y) - mpFrame->maGeometry.nY;
+        aEvent.mnX = static_cast<tools::Long>(aPt.x) - mpFrame->maGeometry.x();
+        aEvent.mnY = static_cast<tools::Long>(aPt.y) - mpFrame->maGeometry.y();
         aEvent.mnCode         = ImplGetModifierMask( mpFrame->mnLastModifierFlags );
         aEvent.mbDeltaIsPixel = false;
 
         if( AllSettings::GetLayoutRTL() )
-            aEvent.mnX = mpFrame->maGeometry.nWidth-1-aEvent.mnX;
+            aEvent.mnX = mpFrame->maGeometry.width() - 1 - aEvent.mnX;
 
         if( dX != 0.0 )
         {
@@ -922,7 +1100,11 @@ static AquaSalFrame* getMouseContainerFrame()
 
     if( AquaSalFrame::isAlive( mpFrame ) )
     {
-        mpLastEvent = pEvent;
+        // Retain the event as it will be released sometime before a key up
+        // event is dispatched
+        [self clearLastEvent];
+        mpLastEvent = [pEvent retain];
+
         mbInKeyInput = true;
         mbNeedSpecialKeyHandle = false;
         mbKeyHandled = false;
@@ -932,8 +1114,57 @@ static AquaSalFrame* getMouseContainerFrame()
 
         if( ! [self handleKeyDownException: pEvent] )
         {
+            sal_uInt16 nKeyCode = ImplMapKeyCode( [pEvent keyCode] );
+            if ( nKeyCode == KEY_DELETE && mbTextInputWantsNonRepeatKeyDown )
+            {
+                // tdf#42437 Enable press-and-hold special character input method
+                // Emulate the press-and-hold behavior of the TextEdit
+                // application by deleting the marked text when only the
+                // Delete key is pressed and keep the marked text when the
+                // Backspace key or Fn-Delete keys are pressed.
+                if ( [pEvent keyCode] == 51 )
+                {
+                    [self deleteTextInputWantsNonRepeatKeyDown];
+                }
+                else
+                {
+                    [self unmarkText];
+                    mbKeyHandled = true;
+                    mbInKeyInput = false;
+                }
+
+                [self endExtTextInput];
+                return;
+            }
+
             NSArray* pArray = [NSArray arrayWithObject: pEvent];
             [self interpretKeyEvents: pArray];
+
+            // Handle repeat key events by explicitly inserting the text if
+            // -[NSResponder interpretKeyEvents:] does not insert or mark any
+            // text. Note: do not do this step if there is uncommitted text.
+            // Related: tdf#42437 Skip special press-and-hold handling for action keys
+            // Pressing and holding action keys such as arrow keys must not be
+            // handled like pressing and holding a character key as it will
+            // insert unexpected text.
+            if ( !mbKeyHandled && !mpLastMarkedText && mpLastEvent && [mpLastEvent type] == NSEventTypeKeyDown && [mpLastEvent isARepeat] )
+            {
+                NSString *pChars = [mpLastEvent characters];
+                if ( pChars )
+                    [self insertText:pChars replacementRange:NSMakeRange( 0, [pChars length] )];
+            }
+            // tdf#42437 Enable press-and-hold special character input method
+            // Emulate the press-and-hold behavior of the TextEdit application
+            // by committing an empty string for key down events dispatched
+            // while the special character input method popup is displayed.
+            else if ( mpLastMarkedText && mbTextInputWantsNonRepeatKeyDown && mpLastEvent && [mpLastEvent type] == NSEventTypeKeyDown && ![mpLastEvent isARepeat] )
+            {
+                // If the escape or return key is pressed, unmark the text to
+                // skip deletion of marked text
+                if ( nKeyCode == KEY_ESCAPE || nKeyCode == KEY_RETURN )
+                    [self unmarkText];
+                [self insertText:[NSString string] replacementRange:NSMakeRange( NSNotFound, 0 )];
+            }
         }
 
         mbInKeyInput = false;
@@ -978,10 +1209,22 @@ static AquaSalFrame* getMouseContainerFrame()
 
     SolarMutexGuard aGuard;
 
+    [self deleteTextInputWantsNonRepeatKeyDown];
+
+    // Ignore duplicate events that are sometimes posted during cancellation
+    // of the native input method session. This usually happens when
+    // [self endExtTextInput] is called from [self windowDidBecomeKey:] and,
+    // if the native input method popup, that was cancelled in a
+    // previous call to [self windowDidResignKey:], has reappeared. In such
+    // cases, the native input context posts the reappearing popup's
+    // uncommitted text.
+    if (mbInEndExtTextInput && !mbInCommitMarkedText)
+        return;
+
     if( AquaSalFrame::isAlive( mpFrame ) )
     {
         NSString* pInsert = nil;
-        if( [aString isMemberOfClass: [NSAttributedString class]] )
+        if( [aString isKindOfClass: [NSAttributedString class]] )
             pInsert = [aString string];
         else
             pInsert = aString;
@@ -1054,9 +1297,13 @@ static AquaSalFrame* getMouseContainerFrame()
                 mpFrame->CallCallback( SalEvent::EndExtTextInput, nullptr );
 
         }
-        mbKeyHandled = true;
         [self unmarkText];
     }
+
+    // Mark event as handled even if the frame isn't valid like is done in
+    // [self setMarkedText:selectedRange:replacementRange:] and
+    // [self doCommandBySelector:]
+    mbKeyHandled = true;
 }
 
 -(void)insertTab: (id)aSender
@@ -1527,16 +1774,26 @@ static AquaSalFrame* getMouseContainerFrame()
     // of the keyboard viewer. For unknown reasons having no marked range
     // in this case causes a crash. So we say we have a marked range anyway
     // This is a hack, since it is not understood what a) causes that crash
-    // and b) why we should have a marked range at this point.
+    // and b) why we should have a marked range at this point. Stop the native
+    // input method popup from appearing in the bottom left corner of the
+    // screen by returning the marked range if is valid when called outside of
+    // mbInKeyInput. If a zero length range is returned, macOS won't call
+    // [self firstRectForCharacterRange:actualRange:] for any newly appended
+    // uncommitted text.
     if( ! mbInKeyInput )
-        return NSMakeRange( 0, 0 );
+        return mMarkedRange.location != NSNotFound ? mMarkedRange : NSMakeRange( 0, 0 );
 
     return [self hasMarkedText] ? mMarkedRange : NSMakeRange( NSNotFound, 0 );
 }
 
 - (NSRange)selectedRange
 {
-    return mSelectedRange;
+    // tdf#42437 Enable press-and-hold special character input method
+    // Always return a valid range location. If the range location is
+    // NSNotFound, -[NSResponder interpretKeyEvents:] will not call
+    // [self firstRectForCharacterRange:actualRange:] and will not display the
+    // special character input method popup.
+    return ( mSelectedRange.location == NSNotFound ? NSMakeRange( 0, 0 ) : mSelectedRange );
 }
 
 - (void)setMarkedText:(id)aString selectedRange:(NSRange)selRange replacementRange:(NSRange)replacementRange
@@ -1545,28 +1802,53 @@ static AquaSalFrame* getMouseContainerFrame()
 
     SolarMutexGuard aGuard;
 
+    [self deleteTextInputWantsNonRepeatKeyDown];
+
     if( ![aString isKindOfClass:[NSAttributedString class]] )
         aString = [[[NSAttributedString alloc] initWithString:aString] autorelease];
-    NSRange rangeToReplace = [self hasMarkedText] ? [self markedRange] : [self selectedRange];
-    if( rangeToReplace.location == NSNotFound )
-    {
-        mMarkedRange = NSMakeRange( selRange.location, [aString length] );
-        mSelectedRange = NSMakeRange( selRange.location, selRange.length );
-    }
-    else
-    {
-        mMarkedRange = NSMakeRange( rangeToReplace.location, [aString length] );
-        mSelectedRange = NSMakeRange( rangeToReplace.location + selRange.location, selRange.length );
-    }
+
+    // Reset cached state
+    [self unmarkText];
 
     int len = [aString length];
     SalExtTextInputEvent aInputEvent;
     if( len > 0 ) {
+        // Set the marked and selected ranges to the marked text and selected
+        // range parameters
+        mMarkedRange = NSMakeRange( 0, [aString length] );
+        if (selRange.location == NSNotFound || selRange.location >= mMarkedRange.length)
+             mSelectedRange = NSMakeRange( NSNotFound, 0 );
+        else
+             mSelectedRange = NSMakeRange( selRange.location, selRange.location + selRange.length > mMarkedRange.length ? mMarkedRange.length - selRange.location : selRange.length );
+
+        // If we are going to post uncommitted text, cache the string parameter
+        // as is needed in both [self endExtTextInput] and
+        // [self attributedSubstringForProposedRange:actualRange:]
+        mpLastMarkedText = [aString retain];
+
         NSString *pString = [aString string];
         OUString aInsertString( GetOUString( pString ) );
         std::vector<ExtTextInputAttr> aInputFlags( std::max( 1, len ), ExtTextInputAttr::NONE );
+        int nSelectionStart = (mSelectedRange.location == NSNotFound ? len : mSelectedRange.location);
+        int nSelectionEnd = (mSelectedRange.location == NSNotFound ? len : mSelectedRange.location + selRange.length);
         for ( int i = 0; i < len; i++ )
         {
+            // Highlight all characters in the selected range. Normally
+            // uncommitted text is underlined but when an item is selected in
+            // the native input method popup or selecting a subblock of
+            // uncommitted text using the left or right arrow keys, the
+            // selection range is set and the selected range is either
+            // highlighted like in Excel or is bold underlined like in
+            // Safari. Highlighting the selected range was chosen because
+            // using bold and double underlines can get clipped making the
+            // selection range indistinguishable from the rest of the
+            // uncommitted text.
+            if (i >= nSelectionStart && i < nSelectionEnd)
+            {
+                aInputFlags[i] = ExtTextInputAttr::Highlight;
+                continue;
+            }
+
             unsigned int nUnderlineValue;
             NSRange effectiveRange;
 
@@ -1578,10 +1860,10 @@ static AquaSalFrame* getMouseContainerFrame()
                 aInputFlags[i] = ExtTextInputAttr::Underline;
                 break;
             case NSUnderlineStyleThick:
-                aInputFlags[i] = ExtTextInputAttr::Underline | ExtTextInputAttr::Highlight;
+                aInputFlags[i] = ExtTextInputAttr::BoldUnderline;
                 break;
             case NSUnderlineStyleDouble:
-                aInputFlags[i] = ExtTextInputAttr::BoldUnderline;
+                aInputFlags[i] = ExtTextInputAttr::DoubleUnderline;
                 break;
             default:
                 aInputFlags[i] = ExtTextInputAttr::Highlight;
@@ -1590,7 +1872,8 @@ static AquaSalFrame* getMouseContainerFrame()
         }
 
         aInputEvent.maText = aInsertString;
-        aInputEvent.mnCursorPos = selRange.location;
+        aInputEvent.mnCursorPos = nSelectionStart;
+        aInputEvent.mnCursorFlags = 0;
         aInputEvent.mpTextAttr = aInputFlags.data();
         mpFrame->CallCallback( SalEvent::ExtTextInput, static_cast<void *>(&aInputEvent) );
     } else {
@@ -1606,6 +1889,8 @@ static AquaSalFrame* getMouseContainerFrame()
 
 - (void)unmarkText
 {
+    [self clearLastMarkedText];
+
     mSelectedRange = mMarkedRange = NSMakeRange(NSNotFound, 0);
 }
 
@@ -1650,7 +1935,22 @@ static AquaSalFrame* getMouseContainerFrame()
 
 -(void)clearLastEvent
 {
-    mpLastEvent = nil;
+    if (mpLastEvent)
+    {
+        [mpLastEvent release];
+        mpLastEvent = nil;
+    }
+}
+
+-(void)clearLastMarkedText
+{
+    if (mpLastMarkedText)
+    {
+        [mpLastMarkedText release];
+        mpLastMarkedText = nil;
+    }
+
+    mbTextInputWantsNonRepeatKeyDown = NO;
 }
 
 - (NSRect)firstRectForCharacterRange:(NSRange)aRange actualRange:(NSRangePointer)actualRange
@@ -1661,17 +1961,90 @@ static AquaSalFrame* getMouseContainerFrame()
 
     SolarMutexGuard aGuard;
 
+    // tdf#42437 Enable press-and-hold special character input method
+    // Some text entry controls, such as Writer comments or the cell editor in
+    // Calc's Formula Bar, need to have an input method session open or else
+    // the returned position won't be anywhere near the text cursor. So,
+    // dispatch an empty SalEvent::ExtTextInput event, fetch the position,
+    // and then dispatch a SalEvent::EndExtTextInput event.
+    NSString *pNewMarkedText = nullptr;
+    NSString *pChars = [mpLastEvent characters];
+    bool bNeedsExtTextInput = ( pChars && mbInKeyInput && !mpLastMarkedText && mpLastEvent && [mpLastEvent type] == NSEventTypeKeyDown && [mpLastEvent isARepeat] );
+    if ( bNeedsExtTextInput )
+    {
+        // tdf#154708 Preserve selection for repeating Shift-arrow on Japanese keyboard
+        // Skip the posting of SalEvent::ExtTextInput and
+        // SalEvent::EndExtTextInput events for private use area characters.
+        NSUInteger nLen = [pChars length];
+        unichar pBuf[ nLen + 1 ];
+        NSUInteger nBufLen = 0;
+        for ( NSUInteger i = 0; i < nLen; i++ )
+        {
+            unichar aChar = [pChars characterAtIndex:i];
+            if ( aChar >= 0xf700 && aChar < 0xf780 )
+                continue;
+
+            pBuf[nBufLen++] = aChar;
+        }
+        pBuf[nBufLen] = 0;
+
+        pNewMarkedText = [NSString stringWithCharacters:pBuf length:nBufLen];
+        if (!pNewMarkedText || ![pNewMarkedText length])
+            bNeedsExtTextInput = false;
+    }
+
+    if ( bNeedsExtTextInput )
+    {
+        SalExtTextInputEvent aInputEvent;
+        aInputEvent.maText.clear();
+        aInputEvent.mnCursorPos = 0;
+        aInputEvent.mnCursorFlags = 0;
+        aInputEvent.mpTextAttr = nullptr;
+        if ( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
+            mpFrame->CallCallback( SalEvent::ExtTextInput, static_cast<void *>(&aInputEvent) );
+    }
+
     SalExtTextInputPosEvent aPosEvent;
-    mpFrame->CallCallback( SalEvent::ExtTextInputPos, static_cast<void *>(&aPosEvent) );
+    if ( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
+        mpFrame->CallCallback( SalEvent::ExtTextInputPos, static_cast<void *>(&aPosEvent) );
+
+    if ( bNeedsExtTextInput )
+    {
+        if ( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
+            mpFrame->CallCallback( SalEvent::EndExtTextInput, nullptr );
+
+        // tdf#42437 Enable press-and-hold special character input method
+        // Emulate the press-and-hold behavior of the TextEdit application by
+        // setting the marked text to the last key down event's characters. The
+        // characters will already have been committed by the special character
+        // input method so set the mbTextInputWantsNonRepeatKeyDown flag to
+        // indicate that the characters need to be deleted if the input method
+        // replaces the committed characters.
+        if ( pNewMarkedText )
+        {
+            [self unmarkText];
+            mpLastMarkedText = [[NSAttributedString alloc] initWithString:pNewMarkedText];
+            mSelectedRange = mMarkedRange = NSMakeRange( 0, [mpLastMarkedText length] );
+            mbTextInputWantsNonRepeatKeyDown = YES;
+        }
+    }
 
     NSRect rect;
 
-    rect.origin.x = aPosEvent.mnX + mpFrame->maGeometry.nX;
-    rect.origin.y =   aPosEvent.mnY + mpFrame->maGeometry.nY + 4; // add some space for underlines
-    rect.size.width = aPosEvent.mnWidth;
-    rect.size.height = aPosEvent.mnHeight;
+    if ( mpFrame && AquaSalFrame::isAlive( mpFrame ) )
+    {
+        rect.origin.x = aPosEvent.mnX + mpFrame->maGeometry.x();
+        rect.origin.y = aPosEvent.mnY + mpFrame->maGeometry.y() + 4; // add some space for underlines
+        rect.size.width = aPosEvent.mnWidth;
+        rect.size.height = aPosEvent.mnHeight;
 
-    mpFrame->VCLToCocoa( rect );
+        mpFrame->VCLToCocoa( rect );
+    }
+    else
+    {
+        rect = NSMakeRect( aPosEvent.mnX, aPosEvent.mnY, aPosEvent.mnWidth, aPosEvent.mnHeight );
+    }
+
     return rect;
 }
 
@@ -1750,6 +2123,97 @@ static AquaSalFrame* getMouseContainerFrame()
 {
     (void)theHandler;
     mDraggingDestinationHandler = nil;
+}
+
+-(void)endExtTextInput
+{
+    [self endExtTextInput:EndExtTextInputFlags::Complete];
+}
+
+-(void)endExtTextInput:(EndExtTextInputFlags)nFlags
+{
+    // Prevent recursion from any additional [self insertText:] calls that
+    // may be called when cancelling the native input method session
+    if (mbInEndExtTextInput)
+        return;
+
+    mbInEndExtTextInput = YES;
+
+    SolarMutexGuard aGuard;
+
+    NSTextInputContext *pInputContext = [NSTextInputContext currentInputContext];
+    if (pInputContext)
+    {
+        // Cancel the native input method session
+        [pInputContext discardMarkedText];
+
+        // Commit any uncommitted text. Note: when the delete key is used to
+        // remove all uncommitted characters, the marked range will be zero
+        // length but a SalEvent::EndExtTextInput must still be dispatched.
+        if (mpLastMarkedText && [mpLastMarkedText length] && mMarkedRange.location != NSNotFound && mpFrame && AquaSalFrame::isAlive(mpFrame))
+        {
+            // If there is any marked text, SalEvent::EndExtTextInput may leave
+            // the cursor hidden so commit the marked text to force the cursor
+            // to be visible.
+            mbInCommitMarkedText = YES;
+            if (nFlags & EndExtTextInputFlags::Complete)
+            {
+                // Retain the last marked text as it will be released in
+                // [self insertText:replacementText:]
+                NSAttributedString *pText = [mpLastMarkedText retain];
+                [self insertText:pText replacementRange:NSMakeRange(0, [mpLastMarkedText length])];
+                [pText release];
+            }
+            else
+            {
+                [self insertText:[NSString string] replacementRange:NSMakeRange(0, 0)];
+            }
+            mbInCommitMarkedText = NO;
+        }
+
+        [self unmarkText];
+
+        // If a different view is the input context's client, commit that
+        // view's uncommitted text as well
+        id<NSTextInputClient> pClient = [pInputContext client];
+        if (pClient != self)
+        {
+            SalFrameView *pView = static_cast<SalFrameView*>(pClient);
+            if ([pView isKindOfClass:[SalFrameView class]])
+                [pView endExtTextInput];
+            else
+                [pClient unmarkText];
+        }
+    }
+
+    mbInEndExtTextInput = NO;
+}
+
+-(void)deleteTextInputWantsNonRepeatKeyDown
+{
+    SolarMutexGuard aGuard;
+
+    // tdf#42437 Enable press-and-hold special character input method
+    // Emulate the press-and-hold behavior of the TextEdit application by
+    // dispatching backspace events to delete any marked characters. The
+    // special character input method commits the marked characters so we must
+    // delete the marked characters before the input method calls
+    // [self insertText:replacementRange:].
+    if (mbTextInputWantsNonRepeatKeyDown)
+    {
+        if ( mpLastMarkedText )
+        {
+            NSString *pChars = [mpLastMarkedText string];
+            if ( pChars )
+            {
+                NSUInteger nLength = [pChars length];
+                for ( NSUInteger i = 0; i < nLength; i++ )
+                    [self deleteBackward:self];
+            }
+        }
+
+        [self unmarkText];
+    }
 }
 
 @end

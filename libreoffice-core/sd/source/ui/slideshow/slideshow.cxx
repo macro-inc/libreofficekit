@@ -104,7 +104,7 @@ namespace {
     };
 }
 
-static const SfxItemPropertyMapEntry* ImplGetPresentationPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> ImplGetPresentationPropertyMap()
 {
     // NOTE: First member must be sorted
     static const SfxItemPropertyMapEntry aPresentationPropertyMap_Impl[] =
@@ -124,7 +124,6 @@ static const SfxItemPropertyMapEntry* ImplGetPresentationPropertyMap()
         { u"Pause",                    ATTR_PRESENT_PAUSE_TIMEOUT,     ::cppu::UnoType<sal_Int32>::get(),    0, 0 },
         { u"StartWithNavigator",       ATTR_PRESENT_NAVIGATOR,         cppu::UnoType<bool>::get(),                0, 0 },
         { u"UsePen",                   ATTR_PRESENT_PEN,               cppu::UnoType<bool>::get(),                0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
 
     return aPresentationPropertyMap_Impl;
@@ -132,8 +131,7 @@ static const SfxItemPropertyMapEntry* ImplGetPresentationPropertyMap()
 
 
 SlideShow::SlideShow( SdDrawDocument* pDoc )
-: SlideshowBase( m_aMutex )
-, maPropSet(ImplGetPresentationPropertyMap(), SdrObject::GetGlobalDrawObjectItemPool())
+: maPropSet(ImplGetPresentationPropertyMap(), SdrObject::GetGlobalDrawObjectItemPool())
 , mbIsInStartup(false)
 , mpDoc( pDoc )
 , mpCurrentViewShellBase( nullptr )
@@ -737,13 +735,12 @@ void SAL_CALL SlideShow::end()
                     pDrawViewShell->SwitchPage( static_cast<sal_uInt16>(xController->getRestoreSlide()) );
                 else
                 {
-                    Reference<XDrawView> xDrawView (
-                        Reference<XWeak>(&mpCurrentViewShellBase->GetDrawController()), UNO_QUERY);
-                    if (xDrawView.is())
-                        xDrawView->setCurrentPage(
-                            Reference<XDrawPage>(
-                                mpDoc->GetSdPage(xController->getRestoreSlide(), PageKind::Standard)->getUnoPage(),
-                                UNO_QUERY));
+                    DrawController& rDrawController =
+                        mpCurrentViewShellBase->GetDrawController();
+                    rDrawController.setCurrentPage(
+                        Reference<XDrawPage>(
+                            mpDoc->GetSdPage(xController->getRestoreSlide(), PageKind::Standard)->getUnoPage(),
+                            UNO_QUERY));
                 }
             }
 
@@ -886,7 +883,7 @@ Reference< XSlideShowController > SAL_CALL SlideShow::getController(  )
 
 // XComponent
 
-void SAL_CALL SlideShow::disposing()
+void SlideShow::disposing(std::unique_lock<std::mutex>&)
 {
     SolarMutexGuard aGuard;
 
@@ -1017,12 +1014,12 @@ void SlideShow::pause( bool bPause )
     }
 }
 
-bool SlideShow::swipe(const CommandSwipeData& rSwipeData)
+bool SlideShow::swipe(const CommandGestureSwipeData& rSwipeData)
 {
     return mxController.is() && mxController->swipe(rSwipeData);
 }
 
-bool SlideShow::longpress(const CommandLongPressData& rLongPressData)
+bool SlideShow::longpress(const CommandGestureLongPressData& rLongPressData)
 {
     return mxController.is() && mxController->longpress(rLongPressData);
 }

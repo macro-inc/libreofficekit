@@ -31,7 +31,7 @@
 #include <basic/sbmeth.hxx>
 #include <basic/sbmod.hxx>
 #include <com/sun/star/script/XLibraryContainer2.hpp>
-
+#include <sal/log.hxx>
 #include <sfx2/app.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/frame.hxx>
@@ -142,6 +142,9 @@ void MacroChooser::StoreMacroDescription()
 
 void MacroChooser::RestoreMacroDescription()
 {
+    // The following call is a workaround to ensure the last used macro is scrolled to in kf5
+    m_xDialog->resize_to_request();
+
     EntryDescriptor aDesc;
     if (Shell* pShell = GetShell())
     {
@@ -152,13 +155,6 @@ void MacroChooser::RestoreMacroDescription()
     {
         if (ExtraData* pData = basctl::GetExtraData())
             aDesc = pData->GetLastEntryDescriptor();
-    }
-
-    // No valid EntryDescriptor found
-    if (aDesc.GetMethodName().isEmpty())
-    {
-        m_xMacroNameEdit->select_region(0, 0);
-        return;
     }
 
     m_xBasicBox->SetCurrentEntry(aDesc);
@@ -299,7 +295,11 @@ void MacroChooser::DeleteMacro()
 SbMethod* MacroChooser::CreateMacro()
 {
     SbMethod* pMethod = nullptr;
-    m_xBasicBox->get_cursor(m_xBasicBoxIter.get());
+    if (!m_xBasicBox->get_cursor(m_xBasicBoxIter.get()) && !m_xBasicBox->get_iter_first(*m_xBasicBoxIter))
+    {
+        SAL_WARN("basctl.basicide", "neither cursor set nor root entry to use as fallback");
+        return nullptr;
+    }
     EntryDescriptor aDesc = m_xBasicBox->GetEntryDescriptor(m_xBasicBoxIter.get());
     const ScriptDocument& aDocument( aDesc.GetDocument() );
     OSL_ENSURE( aDocument.isAlive(), "MacroChooser::CreateMacro: no document!" );
@@ -478,8 +478,9 @@ IMPL_LINK_NOARG(MacroChooser, MacroSelectHdl, weld::TreeView&, void)
 
 IMPL_LINK_NOARG(MacroChooser, BasicSelectHdl, weld::TreeView&, void)
 {
-    m_xBasicBox->get_cursor(m_xBasicBoxIter.get());
-    SbModule* pModule = m_xBasicBox->FindModule(m_xBasicBoxIter.get());
+    SbModule* pModule = nullptr;
+    if (m_xBasicBox->get_cursor(m_xBasicBoxIter.get()))
+        pModule = m_xBasicBox->FindModule(m_xBasicBoxIter.get());
     m_xMacroBox->clear();
     if (pModule)
     {
@@ -618,7 +619,11 @@ IMPL_LINK(MacroChooser, ButtonHdl, weld::Button&, rButton, void)
     }
     else if (&rButton == m_xEditButton.get() || &rButton == m_xDelButton.get() || &rButton == m_xNewButton.get())
     {
-        m_xBasicBox->get_cursor(m_xBasicBoxIter.get());
+        if (!m_xBasicBox->get_cursor(m_xBasicBoxIter.get()) && !m_xBasicBox->get_iter_first(*m_xBasicBoxIter))
+        {
+            SAL_WARN("basctl.basicide", "neither cursor set nor root entry to use as fallback");
+            return;
+        }
         EntryDescriptor aDesc = m_xBasicBox->GetEntryDescriptor(m_xBasicBoxIter.get());
         const ScriptDocument& aDocument( aDesc.GetDocument() );
         DBG_ASSERT( aDocument.isAlive(), "MacroChooser::ButtonHdl: no document, or document is dead!" );
@@ -701,7 +706,11 @@ IMPL_LINK(MacroChooser, ButtonHdl, weld::Button&, rButton, void)
     }
     else if (&rButton == m_xAssignButton.get())
     {
-        m_xBasicBox->get_cursor(m_xBasicBoxIter.get());
+        if (!m_xBasicBox->get_cursor(m_xBasicBoxIter.get()) && !m_xBasicBox->get_iter_first(*m_xBasicBoxIter))
+        {
+            SAL_WARN("basctl.basicide", "neither cursor set nor root entry to use as fallback");
+            return;
+        }
         EntryDescriptor aDesc = m_xBasicBox->GetEntryDescriptor(m_xBasicBoxIter.get());
         const ScriptDocument& aDocument( aDesc.GetDocument() );
         DBG_ASSERT( aDocument.isAlive(), "MacroChooser::ButtonHdl: no document, or document is dead!" );
@@ -722,20 +731,28 @@ IMPL_LINK(MacroChooser, ButtonHdl, weld::Button&, rButton, void)
         if (m_xDocumentFrame.is())
             aInternalSet.Put(SfxUnoFrameItem(SID_FILLFRAME, m_xDocumentFrame));
 
-        SfxRequest aRequest(SID_CONFIG, SfxCallMode::SYNCHRON, Args, aInternalSet);
+        SfxRequest aRequest(SID_CONFIGACCEL, SfxCallMode::SYNCHRON, Args, aInternalSet);
         aRequest.AppendItem( aItem );
         SfxGetpApp()->ExecuteSlot( aRequest );
     }
     else if (&rButton == m_xNewLibButton.get())
     {
-        m_xBasicBox->get_cursor(m_xBasicBoxIter.get());
+        if (!m_xBasicBox->get_cursor(m_xBasicBoxIter.get()) && !m_xBasicBox->get_iter_first(*m_xBasicBoxIter))
+        {
+            SAL_WARN("basctl.basicide", "neither cursor set nor root entry to use as fallback");
+            return;
+        }
         EntryDescriptor aDesc = m_xBasicBox->GetEntryDescriptor(m_xBasicBoxIter.get());
         const ScriptDocument& aDocument( aDesc.GetDocument() );
         createLibImpl(m_xDialog.get(), aDocument, nullptr, m_xBasicBox.get());
     }
     else if (&rButton == m_xNewModButton.get())
     {
-        m_xBasicBox->get_cursor(m_xBasicBoxIter.get());
+        if (!m_xBasicBox->get_cursor(m_xBasicBoxIter.get()) && !m_xBasicBox->get_iter_first(*m_xBasicBoxIter))
+        {
+            SAL_WARN("basctl.basicide", "neither cursor set nor root entry to use as fallback");
+            return;
+        }
         EntryDescriptor aDesc = m_xBasicBox->GetEntryDescriptor(m_xBasicBoxIter.get());
         const ScriptDocument& aDocument( aDesc.GetDocument() );
         const OUString& aLibName( aDesc.GetLibName() );
@@ -746,7 +763,7 @@ IMPL_LINK(MacroChooser, ButtonHdl, weld::Button&, rButton, void)
         StoreMacroDescription();
 
         m_xBasicBox->get_selected(m_xBasicBoxIter.get());
-        auto xDlg(std::make_shared<OrganizeDialog>(m_xDialog.get(), 0));
+        auto xDlg(std::make_shared<OrganizeDialog>(m_xDialog.get(), nullptr, 0));
         weld::DialogController::runAsync(xDlg, [this](sal_Int32 nRet) {
             if (nRet == RET_OK) // not only closed
             {

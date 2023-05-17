@@ -28,7 +28,6 @@
 #include <sal/log.hxx>
 #include <fmtclds.hxx>
 #include <fmtfsize.hxx>
-#include <fmthdft.hxx>
 #include <pagefrm.hxx>
 #include <pagedesc.hxx>
 #include <swtable.hxx>
@@ -180,7 +179,7 @@ void SwPageDesc::Mirror()
     aSet.Put( m_Master.GetPaperBin() );
     aSet.Put( m_Master.GetULSpace() );
     aSet.Put( m_Master.GetBox() );
-    aSet.Put( *m_Master.makeBackgroundBrushItem() );
+    aSet.Put( m_Master.makeBackgroundBrushItem() );
     aSet.Put( m_Master.GetShadow() );
     aSet.Put( m_Master.GetCol() );
     aSet.Put( m_Master.GetFrameDir() );

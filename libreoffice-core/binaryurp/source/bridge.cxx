@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/bridge/InvalidProtocolChangeException.hpp>
@@ -129,7 +130,7 @@ AttachThread::~AttachThread() {
 class PopOutgoingRequest {
 public:
     PopOutgoingRequest(
-        OutgoingRequests & requests, rtl::ByteSequence const & tid,
+        OutgoingRequests & requests, rtl::ByteSequence tid,
         OutgoingRequest const & request);
 
     ~PopOutgoingRequest();
@@ -146,9 +147,9 @@ private:
 };
 
 PopOutgoingRequest::PopOutgoingRequest(
-    OutgoingRequests & requests, rtl::ByteSequence const & tid,
+    OutgoingRequests & requests, rtl::ByteSequence tid,
     OutgoingRequest const & request):
-    requests_(requests), tid_(tid), cleared_(false)
+    requests_(requests), tid_(std::move(tid)), cleared_(false)
 {
     requests_.push(tid_, request);
 }
@@ -172,11 +173,11 @@ struct Bridge::SubStub {
 };
 
 Bridge::Bridge(
-    rtl::Reference< BridgeFactory > const & factory, OUString const & name,
+    rtl::Reference< BridgeFactory > const & factory, OUString name,
     css::uno::Reference< css::connection::XConnection > const & connection,
-    css::uno::Reference< css::bridge::XInstanceProvider > const & provider):
-    factory_(factory), name_(name), connection_(connection),
-    provider_(provider),
+    css::uno::Reference< css::bridge::XInstanceProvider > provider):
+    factory_(factory), name_(std::move(name)), connection_(connection),
+    provider_(std::move(provider)),
     binaryUno_(UNO_LB_UNO),
     cppToBinaryMapping_(CPPU_CURRENT_LANGUAGE_BINDING_NAME, UNO_LB_UNO),
     binaryToCppMapping_(UNO_LB_UNO, CPPU_CURRENT_LANGUAGE_BINDING_NAME),
@@ -201,13 +202,14 @@ Bridge::Bridge(
         throw css::uno::RuntimeException("URP: no C++ UNO mapping");
     }
     passive_.set();
+    // coverity[uninit_member] - random_ is set in due course by the reader_ thread's state machine
 }
 
 void Bridge::start() {
     rtl::Reference r(new Reader(this));
     rtl::Reference w(new Writer(this));
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         assert(
             state_ == STATE_INITIAL && threadPool_ == nullptr && !writer_.is() &&
             !reader_.is());
@@ -237,7 +239,7 @@ void Bridge::terminate(bool final) {
         bool joinW;
         Listeners ls;
         {
-            osl::ClearableMutexGuard g(mutex_);
+            std::unique_lock g(mutex_);
             switch (state_) {
             case STATE_INITIAL: // via ~Bridge -> dispose -> terminate
             case STATE_FINAL:
@@ -246,10 +248,10 @@ void Bridge::terminate(bool final) {
                 break;
             case STATE_TERMINATED:
                 if (final) {
-                    g.clear();
+                    g.unlock();
                     terminated_.wait();
                     {
-                        osl::MutexGuard g2(mutex_);
+                        std::lock_guard g2(mutex_);
                         tp = threadPool_;
                         threadPool_ = nullptr;
                         if (reader_.is()) {
@@ -309,7 +311,7 @@ void Bridge::terminate(bool final) {
         uno_threadpool_dispose(tp);
         Stubs s;
         {
-            osl::MutexGuard g(mutex_);
+            std::lock_guard g(mutex_);
             s.swap(stubs_);
         }
         for (auto & stub : s)
@@ -340,7 +342,7 @@ void Bridge::terminate(bool final) {
         uno_threadpool_destroy(tp);
     }
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         if (final) {
             threadPool_ = nullptr;
         }
@@ -361,14 +363,14 @@ BinaryAny Bridge::mapCppToBinaryAny(css::uno::Any const & cppAny) {
 }
 
 uno_ThreadPool Bridge::getThreadPool() {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     checkDisposed();
     assert(threadPool_ != nullptr);
     return threadPool_;
 }
 
 rtl::Reference< Writer > Bridge::getWriter() {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     checkDisposed();
     assert(writer_.is());
     return writer_;
@@ -392,7 +394,7 @@ css::uno::UnoInterfaceReference Bridge::registerIncomingInterface(
         } else {
             obj.set(new Proxy(this, oid, type), SAL_NO_ACQUIRE);
             {
-                osl::MutexGuard g(mutex_);
+                std::lock_guard g(mutex_);
                 assert(proxies_ < std::numeric_limits< std::size_t >::max());
                 ++proxies_;
             }
@@ -419,7 +421,7 @@ OUString Bridge::registerOutgoingInterface(
     if (!Proxy::isProxy(this, object, &oid)) {
         binaryUno_.get()->pExtEnv->getObjectIdentifier(
             binaryUno_.get()->pExtEnv, &oid.pData, object.get());
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         Stubs::iterator i(stubs_.find(oid));
         Stub newStub;
         Stub * stub = i == stubs_.end() ? &newStub : &i->second;
@@ -458,7 +460,7 @@ css::uno::UnoInterfaceReference Bridge::findStub(
     OUString const & oid, css::uno::TypeDescription const & type)
 {
     assert(!oid.isEmpty() && type.is());
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     Stubs::iterator i(stubs_.find(oid));
     if (i != stubs_.end()) {
         Stub::iterator j(i->second.find(type));
@@ -484,7 +486,7 @@ void Bridge::releaseStub(
     css::uno::UnoInterfaceReference obj;
     bool unused;
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         Stubs::iterator i(stubs_.find(oid));
         if (i == stubs_.end()) {
             throw css::uno::RuntimeException("URP: release unknown stub");
@@ -538,7 +540,7 @@ void Bridge::freeProxy(Proxy & proxy) {
     }
     bool unused;
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         assert(proxies_ > 0);
         --proxies_;
         unused = becameUnused();
@@ -547,7 +549,7 @@ void Bridge::freeProxy(Proxy & proxy) {
 }
 
 void Bridge::incrementCalls(bool normalCall) noexcept {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     assert(calls_ < std::numeric_limits< std::size_t >::max());
     ++calls_;
     normalCall_ |= normalCall;
@@ -556,7 +558,7 @@ void Bridge::incrementCalls(bool normalCall) noexcept {
 void Bridge::decrementCalls() {
     bool unused;
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         assert(calls_ > 0);
         --calls_;
         unused = becameUnused();
@@ -565,7 +567,7 @@ void Bridge::decrementCalls() {
 }
 
 void Bridge::incrementActiveCalls() noexcept {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     assert(
         activeCalls_ <= calls_ &&
         activeCalls_ < std::numeric_limits< std::size_t >::max());
@@ -574,7 +576,7 @@ void Bridge::incrementActiveCalls() noexcept {
 }
 
 void Bridge::decrementActiveCalls() noexcept {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     assert(activeCalls_ <= calls_ && activeCalls_ > 0);
     --activeCalls_;
     if (activeCalls_ == 0) {
@@ -824,19 +826,19 @@ bool Bridge::isProtocolPropertiesRequest(
 }
 
 void Bridge::setCurrentContextMode() {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     currentContextMode_ = true;
 }
 
 bool Bridge::isCurrentContextMode() {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     return currentContextMode_;
 }
 
 Bridge::~Bridge() {
 #if OSL_DEBUG_LEVEL > 0
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         SAL_WARN_IF(
             state_ == STATE_STARTED || state_ == STATE_TERMINATED, "binaryurp",
             "undisposed bridge \"" << name_ <<"\" in state " << state_
@@ -925,7 +927,7 @@ void Bridge::addEventListener(
 {
     assert(xListener.is());
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         assert(state_ != STATE_INITIAL);
         if (state_ == STATE_STARTED) {
             listeners_.push_back(xListener);
@@ -939,7 +941,7 @@ void Bridge::addEventListener(
 void Bridge::removeEventListener(
     css::uno::Reference< css::lang::XEventListener > const & aListener)
 {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     Listeners::iterator i(
         std::find(listeners_.begin(), listeners_.end(), aListener));
     if (i != listeners_.end()) {
@@ -991,7 +993,7 @@ void Bridge::makeReleaseCall(
     // its own:
     static auto const tid = [] {
             static sal_Int8 const id[] = {'r', 'e', 'l', 'e', 'a', 's', 'e', 'h', 'a', 'c', 'k'};
-            return rtl::ByteSequence(id, SAL_N_ELEMENTS(id));
+            return rtl::ByteSequence(id, std::size(id));
         }();
     sendRequest(
         tid, oid, type,

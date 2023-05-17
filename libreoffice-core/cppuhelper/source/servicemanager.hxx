@@ -14,7 +14,9 @@
 #include <cassert>
 #include <unordered_map>
 #include <memory>
+#include <mutex>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -29,7 +31,6 @@
 #include <com/sun/star/uno/Reference.hxx>
 #include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
-#include <osl/mutex.hxx>
 #include <rtl/ustring.hxx>
 
 namespace com::sun::star::lang {
@@ -71,32 +72,30 @@ public:
 
         struct Implementation {
             Implementation(
-                OUString const & theName, OUString const & theLoader,
-                OUString const & theUri, OUString const & theEnvironment,
-                OUString const & theConstructorName,
-                OUString const & thePrefix,
+                OUString theName, OUString theLoader,
+                OUString theUri, OUString theEnvironment,
+                OUString theConstructorName,
+                OUString thePrefix,
                 bool theIsSingleInstance,
-                css::uno::Reference< css::uno::XComponentContext > const &
-                    theAlienContext,
-                OUString const & theRdbFile):
-                name(theName), loader(theLoader), uri(theUri), environment(theEnvironment),
-                constructorName(theConstructorName), prefix(thePrefix),
+                css::uno::Reference< css::uno::XComponentContext > theAlienContext,
+                OUString theRdbFile):
+                name(std::move(theName)), loader(std::move(theLoader)), uri(std::move(theUri)), environment(std::move(theEnvironment)),
+                constructorName(std::move(theConstructorName)), prefix(std::move(thePrefix)),
                 isSingleInstance(theIsSingleInstance),
-                alienContext(theAlienContext), rdbFile(theRdbFile),
+                alienContext(std::move(theAlienContext)), rdbFile(std::move(theRdbFile)),
                 constructorFn(nullptr), status(STATUS_NEW), dispose(true)
             {}
 
             Implementation(
-                OUString const & theName,
+                OUString theName,
                 css::uno::Reference< css::lang::XSingleComponentFactory >
                     const & theFactory1,
                 css::uno::Reference< css::lang::XSingleServiceFactory > const &
                     theFactory2,
-                css::uno::Reference< css::lang::XComponent > const &
-                    theComponent):
-                name(theName), isSingleInstance(false), constructorFn(nullptr),
+                css::uno::Reference< css::lang::XComponent > theComponent):
+                name(std::move(theName)), isSingleInstance(false), constructorFn(nullptr),
                 factory1(theFactory1), factory2(theFactory2),
-                component(theComponent), status(STATUS_LOADED), dispose(true)
+                component(std::move(theComponent)), status(STATUS_LOADED), dispose(true)
             { assert(theFactory1.is() || theFactory2.is()); }
 
             Implementation(const Implementation&) = delete;
@@ -146,7 +145,7 @@ public:
             css::uno::Reference< css::lang::XComponent > component;
             Status status;
 
-            osl::Mutex mutex;
+            std::mutex mutex;
             css::uno::Reference<css::uno::XInterface> singleInstance;
             css::uno::Reference< css::lang::XComponent > disposeInstance;
             bool dispose;
@@ -193,7 +192,7 @@ public:
     using ServiceManagerBase::acquire;
     using ServiceManagerBase::release;
 
-    void init(OUString const & rdbUris);
+    void init(std::u16string_view rdbUris);
 
     void setContext(
         css::uno::Reference< css::uno::XComponentContext > const & context)
@@ -315,7 +314,7 @@ private:
     void removeEventListenerFromComponent(
         css::uno::Reference< css::lang::XComponent > const & component);
 
-    void readRdbDirectory(OUString const & uri, bool optional);
+    void readRdbDirectory(std::u16string_view uri, bool optional);
 
     void readRdbFile(OUString const & uri, bool optional);
 

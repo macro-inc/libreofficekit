@@ -13,7 +13,6 @@
 #include <rtl/uuid.h>
 #include <rtl/string.hxx>
 #include <rtl/ustring.hxx>
-#include <rtl/ustring.hxx>
 #include <algorithm>
 #include <stdio.h>
 #include <cctype>
@@ -44,9 +43,9 @@ private:
         return (gethex(high) << 4) + gethex(low);
     }
 
-    void parse(OString const& rString)
+    void parse(std::string_view rString)
     {
-        if (rString.getLength() != 38)
+        if (rString.size() != 38)
             return;
 
         if (rString[0] != '{' || rString[37] != '}' || rString[9] != '-' || rString[14] != '-'
@@ -105,7 +104,7 @@ public:
     Guid() { maGuidArray.fill(0); }
 
     /// parse the GUID from the string
-    Guid(OString const& rString)
+    Guid(std::string_view rString)
     {
         maGuidArray.fill(0);
         parse(rString);

@@ -22,7 +22,6 @@
 #include <o3tl/deleter.hxx>
 #include <o3tl/sorted_vector.hxx>
 #include <svl/itemset.hxx>
-#include <tools/solar.h>
 #include <vcl/keycod.hxx>
 #include <tox.hxx>
 
@@ -160,7 +159,7 @@ class SwHistorySetRefMark final : public SwHistoryHint
 public:
     SwHistorySetRefMark( const SwTextRefMark* pTextHt, SwNodeOffset nNode );
     virtual void SetInDoc( SwDoc* pDoc, bool bTmpSet ) override;
-
+    const OUString& GetRefName() {return m_RefName;}
 };
 
 class SwHistorySetTOXMark final : public SwHistoryHint
@@ -344,7 +343,7 @@ class SwHistoryChangeCharFormat final : public SwHistoryHint
     const OUString m_Format;
 
 public:
-    SwHistoryChangeCharFormat( const SfxItemSet& rSet, const OUString & sFormat);
+    SwHistoryChangeCharFormat( SfxItemSet aSet, OUString  sFormat);
     virtual void SetInDoc( SwDoc* pDoc, bool bTmpSet ) override;
 
 };

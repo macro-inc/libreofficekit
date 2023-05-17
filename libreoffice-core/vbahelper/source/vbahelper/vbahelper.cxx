@@ -62,14 +62,16 @@
 #include <basic/sbmod.hxx>
 #include <basic/sbuno.hxx>
 #include <basic/sberrors.hxx>
+#include <o3tl/unit_conversion.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sfx2/viewsh.hxx>
 #include <sal/log.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
 #include <vcl/syswin.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
 #include <vbahelper/vbahelper.hxx>
 
@@ -111,7 +113,7 @@ getTypeConverter( const uno::Reference< uno::XComponentContext >& xContext )
 const uno::Any&
 aNULL()
 {
-    static  uno::Any aNULLL = uno::makeAny( uno::Reference< uno::XInterface >() );
+    static  uno::Any aNULLL{ uno::Reference< uno::XInterface >() };
     return aNULLL;
 }
 
@@ -323,7 +325,7 @@ OORGBToXLRGB( const uno::Any& aCol )
     sal_Int32 nCol(0);
     aCol >>= nCol;
     nCol = OORGBToXLRGB( nCol );
-    return uno::makeAny( nCol );
+    return uno::Any( nCol );
 }
 uno::Any
 XLRGBToOORGB(  const uno::Any& aCol )
@@ -331,7 +333,7 @@ XLRGBToOORGB(  const uno::Any& aCol )
     sal_Int32 nCol(0);
     aCol >>= nCol;
     nCol = XLRGBToOORGB( nCol );
-    return uno::makeAny( nCol );
+    return uno::Any( nCol );
 }
 
 void PrintOutHelper( SfxViewShell const * pViewShell, const uno::Any& From, const uno::Any& To, const uno::Any& Copies, const uno::Any& Preview, const uno::Any& /*ActivePrinter*/, const uno::Any& /*PrintToFile*/, const uno::Any& Collate, const uno::Any& PrToFileName, bool bUseSelection  )
@@ -606,34 +608,21 @@ OUString VBAToRegexp(const OUString &rIn)
     return sResult.makeStringAndClear( );
 }
 
-double getPixelTo100thMillimeterConversionFactor( const css::uno::Reference< css::awt::XDevice >& xDevice, bool bVertical)
+static double getPixelToMeterConversionFactor( const css::uno::Reference< css::awt::XDevice >& xDevice, bool bVertical)
 {
-    double fConvertFactor = 1.0;
-    if( bVertical )
-    {
-        fConvertFactor = xDevice->getInfo().PixelPerMeterY/100000;
-    }
-    else
-    {
-        fConvertFactor = xDevice->getInfo().PixelPerMeterX/100000;
-    }
-    return fConvertFactor;
+    return bVertical ? xDevice->getInfo().PixelPerMeterY : xDevice->getInfo().PixelPerMeterX;
 }
 
 double PointsToPixels( const css::uno::Reference< css::awt::XDevice >& xDevice, double fPoints, bool bVertical)
 {
-    double fConvertFactor = getPixelTo100thMillimeterConversionFactor( xDevice, bVertical );
-    return convertPointToMm100(fPoints) * fConvertFactor;
+    double fConvertFactor = getPixelToMeterConversionFactor( xDevice, bVertical );
+    return o3tl::convert(fPoints, o3tl::Length::pt, o3tl::Length::m) * fConvertFactor;
 }
 double PixelsToPoints( const css::uno::Reference< css::awt::XDevice >& xDevice, double fPixels, bool bVertical)
 {
-    double fConvertFactor = getPixelTo100thMillimeterConversionFactor( xDevice, bVertical );
-    return convertMm100ToPoint(fPixels / fConvertFactor);
+    double fConvertFactor = getPixelToMeterConversionFactor( xDevice, bVertical );
+    return o3tl::convert(fPixels / fConvertFactor, o3tl::Length::m, o3tl::Length::pt);
 }
-
-sal_Int32 PointsToHmm(double fPoints) { return std::round(convertPointToMm100(fPoints)); }
-
-double HmmToPoints(sal_Int32 nHmm) { return convertMm100ToPoint<double>(nHmm); }
 
 ConcreteXShapeGeometryAttributes::ConcreteXShapeGeometryAttributes( const css::uno::Reference< css::drawing::XShape >& xShape )
 {
@@ -904,7 +893,7 @@ double UserFormGeometryHelper::implGetSize( bool bHeight, bool bOuter ) const
         if( const vcl::Window* pWindow = VCLUnoHelper::GetWindow( mxWindow ) )
         {
             tools::Rectangle aOuterRect = pWindow->GetWindowExtentsRelative( nullptr );
-            aSizePixel = awt::Size( aOuterRect.getWidth(), aOuterRect.getHeight() );
+            aSizePixel = awt::Size( aOuterRect.getOpenWidth(), aOuterRect.getOpenHeight() );
         }
     }
 
@@ -931,8 +920,8 @@ void UserFormGeometryHelper::implSetSize( double fSize, bool bHeight, bool bOute
             if( !aOuterRect.IsEmpty() )
             {
                 awt::Rectangle aInnerRect = mxWindow->getPosSize();
-                sal_Int32 nDecorWidth = aOuterRect.getWidth() - aInnerRect.Width;
-                sal_Int32 nDecorHeight = aOuterRect.getHeight() - aInnerRect.Height;
+                sal_Int32 nDecorWidth = aOuterRect.getOpenWidth() - aInnerRect.Width;
+                sal_Int32 nDecorHeight = aOuterRect.getOpenHeight() - aInnerRect.Height;
                 aSizePixel.Width = ::std::max< sal_Int32 >( aSizePixel.Width - nDecorWidth, 1 );
                 aSizePixel.Height = ::std::max< sal_Int32 >( aSizePixel.Height - nDecorHeight, 1 );
             }
@@ -979,8 +968,8 @@ void ConcreteXShapeGeometryAttributes::setWidth( double nWidth)
 }
 
 
-ShapeHelper::ShapeHelper( const css::uno::Reference< css::drawing::XShape >& _xShape)
-    : xShape( _xShape )
+ShapeHelper::ShapeHelper( css::uno::Reference< css::drawing::XShape > _xShape)
+    : xShape(std::move( _xShape ))
 {
     if( !xShape.is() )
         throw css::uno::RuntimeException( "No valid shape for helper" );

@@ -24,7 +24,6 @@
 #include <ReportController.hxx>
 #include <UITools.hxx>
 #include <reportformula.hxx>
-#include <com/sun/star/report/XReportDefinition.hpp>
 #include <com/sun/star/report/XFixedText.hpp>
 #include <com/sun/star/report/XFixedLine.hpp>
 #include <com/sun/star/report/XFormattedField.hpp>
@@ -38,6 +37,7 @@
 #include <comphelper/containermultiplexer.hxx>
 #include <cppuhelper/basemutex.hxx>
 #include <comphelper/SelectionMultiplex.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/commandevent.hxx>
@@ -62,7 +62,7 @@ static OUString lcl_getImageId(const uno::Reference< report::XReportComponent>& 
     if ( uno::Reference< report::XFixedText>(_xElement,uno::UNO_QUERY).is() )
         sId = RID_SVXBMP_FM_FIXEDTEXT;
     else if ( xFixedLine.is() )
-        sId = xFixedLine->getOrientation() ? std::u16string_view(u"" RID_SVXBMP_INSERT_VFIXEDLINE) : std::u16string_view(u"" RID_SVXBMP_INSERT_HFIXEDLINE);
+        sId = xFixedLine->getOrientation() ? OUString(RID_SVXBMP_INSERT_VFIXEDLINE) : OUString(RID_SVXBMP_INSERT_HFIXEDLINE);
     else if ( uno::Reference< report::XFormattedField>(_xElement,uno::UNO_QUERY).is() )
         sId = RID_SVXBMP_FM_EDIT;
     else if ( uno::Reference< report::XImageControl>(_xElement,uno::UNO_QUERY).is() )
@@ -97,8 +97,6 @@ static OUString lcl_getName(const uno::Reference< beans::XPropertySet>& _xElemen
     return sName.makeStringAndClear();
 }
 
-namespace {
-
 class NavigatorTree : public ::cppu::BaseMutex
                     , public reportdesign::ITraverseReport
                     , public comphelper::OSelectionChangeListener
@@ -115,7 +113,7 @@ class NavigatorTree : public ::cppu::BaseMutex
         ::rtl::Reference< comphelper::OContainerListenerAdapter>    m_pContainerListener;
         NavigatorTree*                                              m_pTree;
     public:
-        UserData(NavigatorTree* pTree, const uno::Reference<uno::XInterface>& xContent);
+        UserData(NavigatorTree* pTree, uno::Reference<uno::XInterface> xContent);
         virtual ~UserData() override;
 
         const uno::Reference< uno::XInterface >& getContent() const { return m_xContent; }
@@ -138,7 +136,7 @@ class NavigatorTree : public ::cppu::BaseMutex
     ::rtl::Reference< comphelper::OPropertyChangeMultiplexer>                   m_pReportListener;
     ::rtl::Reference< comphelper::OSelectionChangeMultiplexer>                  m_pSelectionListener;
 
-    void insertEntry(const OUString& rName, const weld::TreeIter* pParent, const OUString& rImageId, int nPosition, UserData* pData, weld::TreeIter& rRet);
+    void insertEntry(const OUString& rName, const weld::TreeIter* pParent, const OUString& rImageId, int nPosition, const UserData* pData, weld::TreeIter& rRet);
 
     void traverseSection(const uno::Reference<report::XSection>& xSection, const weld::TreeIter* pParent, const OUString& rImageId, int nPosition = -1);
     void traverseFunctions(const uno::Reference< report::XFunctions>& xFunctions, const weld::TreeIter* pParent);
@@ -206,8 +204,6 @@ public:
     }
 };
 
-}
-
 NavigatorTree::NavigatorTree(std::unique_ptr<weld::TreeView> xTreeView, OReportController& rController)
     : OPropertyChangeListener(m_aMutex)
     , m_xTreeView(std::move(xTreeView))
@@ -234,7 +230,7 @@ NavigatorTree::NavigatorTree(std::unique_ptr<weld::TreeView> xTreeView, OReportC
 NavigatorTree::~NavigatorTree()
 {
     m_xTreeView->all_foreach([this](weld::TreeIter& rIter) {
-        UserData* pData = reinterpret_cast<UserData*>(m_xTreeView->get_id(rIter).toInt64());
+        UserData* pData = weld::fromId<UserData*>(m_xTreeView->get_id(rIter));
         delete pData;
         return false;
     });
@@ -269,7 +265,7 @@ IMPL_LINK(NavigatorTree, CommandHdl, const CommandEvent&, rEvt, bool)
     {
     case CommandEventId::ContextMenu:
         {
-            UserData* pData = reinterpret_cast<UserData*>(m_xTreeView->get_selected_id().toInt64());
+            UserData* pData = weld::fromId<UserData*>(m_xTreeView->get_selected_id());
             if (!pData)
                 break;
 
@@ -338,7 +334,7 @@ IMPL_LINK_NOARG(NavigatorTree, OnEntrySelDesel, weld::TreeView&, void)
         bool bEntry = m_xTreeView->get_cursor(xEntry.get());
         uno::Any aSelection;
         if (bEntry && m_xTreeView->is_selected(*xEntry))
-            aSelection <<= reinterpret_cast<UserData*>(m_xTreeView->get_id(*xEntry).toInt64())->getContent();
+            aSelection <<= weld::fromId<UserData*>(m_xTreeView->get_id(*xEntry))->getContent();
         m_rController.select(aSelection);
         m_pSelectionListener->unlock();
     }
@@ -380,9 +376,9 @@ void NavigatorTree::_selectionChanged( const lang::EventObject& aEvent )
 }
 
 void NavigatorTree::insertEntry(const OUString& rName, const weld::TreeIter* pParent, const OUString& rImageId,
-                                int nPosition, UserData* pData, weld::TreeIter& rRet)
+                                int nPosition, const UserData* pData, weld::TreeIter& rRet)
 {
-    OUString sId = pData ? OUString::number(reinterpret_cast<sal_Int64>(pData)) : OUString();
+    OUString sId = pData ? weld::toId(pData) : OUString();
     m_xTreeView->insert(pParent, nPosition, &rName, &sId, nullptr, nullptr, false, &rRet);
     if (!rImageId.isEmpty())
         m_xTreeView->set_image(rRet, rImageId);
@@ -431,7 +427,7 @@ bool NavigatorTree::find(const uno::Reference<uno::XInterface>& xContent, weld::
     if (xContent.is())
     {
         m_xTreeView->all_foreach([this, &xContent, &bRet, &rRet](weld::TreeIter& rIter) {
-            UserData* pData = reinterpret_cast<UserData*>(m_xTreeView->get_id(rIter).toInt64());
+            UserData* pData = weld::fromId<UserData*>(m_xTreeView->get_id(rIter));
             if (pData->getContent() == xContent)
             {
                 m_xTreeView->copy_iterator(rIter, rRet);
@@ -648,7 +644,7 @@ void NavigatorTree::_elementReplaced( const container::ContainerEvent& _rEvent )
     bool bEntry = find(xProp, *xEntry);
     if (bEntry)
     {
-        UserData* pData = reinterpret_cast<UserData*>(m_xTreeView->get_id(*xEntry).toInt64());
+        UserData* pData = weld::fromId<UserData*>(m_xTreeView->get_id(*xEntry));
         xProp.set(_rEvent.Element,uno::UNO_QUERY);
         pData->setContent(xProp);
         OUString sName;
@@ -673,15 +669,15 @@ void NavigatorTree::removeEntry(const weld::TreeIter& rEntry, bool bRemove)
         removeEntry(*xChild, false);
         bChild = m_xTreeView->iter_next_sibling(*xChild);
     }
-    delete reinterpret_cast<UserData*>(m_xTreeView->get_id(rEntry).toInt64());
+    delete weld::fromId<UserData*>(m_xTreeView->get_id(rEntry));
     if (bRemove)
         m_xTreeView->remove(rEntry);
 }
 
-NavigatorTree::UserData::UserData(NavigatorTree* pTree,const uno::Reference<uno::XInterface>& xContent)
+NavigatorTree::UserData::UserData(NavigatorTree* pTree,uno::Reference<uno::XInterface> xContent)
     : OPropertyChangeListener(m_aMutex)
     , OContainerListener(m_aMutex)
-    , m_xContent(xContent)
+    , m_xContent(std::move(xContent))
     , m_pTree(pTree)
 {
     uno::Reference<beans::XPropertySet> xProp(m_xContent,uno::UNO_QUERY);
@@ -788,20 +784,10 @@ void NavigatorTree::UserData::_disposing(const lang::EventObject& _rSource)
     m_pTree->_disposing( _rSource );
 }
 
-class ONavigatorImpl
-{
-public:
-    ONavigatorImpl(OReportController& rController, weld::Builder& rBuilder);
-    ONavigatorImpl(const ONavigatorImpl&) = delete;
-    ONavigatorImpl& operator=(const ONavigatorImpl&) = delete;
-
-    uno::Reference< report::XReportDefinition>  m_xReport;
-    std::unique_ptr<NavigatorTree>              m_xNavigatorTree;
-};
-
-ONavigatorImpl::ONavigatorImpl(OReportController& rController, weld::Builder& rBuilder)
-    : m_xReport(rController.getReportDefinition())
-    , m_xNavigatorTree(std::make_unique<NavigatorTree>(rBuilder.weld_tree_view("treeview"), rController))
+ONavigator::ONavigator(weld::Window* pParent, OReportController& rController)
+    : GenericDialogController(pParent, "modules/dbreport/ui/floatingnavigator.ui", "FloatingNavigator")
+    , m_xReport(rController.getReportDefinition())
+    , m_xNavigatorTree(std::make_unique<NavigatorTree>(m_xBuilder->weld_tree_view("treeview"), rController))
 {
     reportdesign::OReportVisitor aVisitor(m_xNavigatorTree.get());
     aVisitor.start(m_xReport);
@@ -810,13 +796,7 @@ ONavigatorImpl::ONavigatorImpl(OReportController& rController, weld::Builder& rB
         m_xNavigatorTree->expand_row(*xScratch);
     lang::EventObject aEvent(rController);
     m_xNavigatorTree->_selectionChanged(aEvent);
-}
-
-ONavigator::ONavigator(weld::Window* pParent, OReportController& rController)
-    : GenericDialogController(pParent, "modules/dbreport/ui/floatingnavigator.ui", "FloatingNavigator")
-{
-    m_pImpl.reset(new ONavigatorImpl(rController, *m_xBuilder));
-    m_pImpl->m_xNavigatorTree->grab_focus();
+    m_xNavigatorTree->grab_focus();
 
     m_xDialog->connect_container_focus_changed(LINK(this, ONavigator, FocusChangeHdl));
 }
@@ -828,7 +808,7 @@ ONavigator::~ONavigator()
 IMPL_LINK_NOARG(ONavigator, FocusChangeHdl, weld::Container&, void)
 {
     if (m_xDialog->has_toplevel_focus())
-        m_pImpl->m_xNavigatorTree->grab_focus();
+        m_xNavigatorTree->grab_focus();
 }
 
 } // rptui

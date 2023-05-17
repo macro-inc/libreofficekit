@@ -19,9 +19,9 @@ namespace dbahsql::utils
 {
 OUString convertToUTF8(std::string_view original);
 
-OUString getTableNameFromStmt(const OUString& sSql);
+OUString getTableNameFromStmt(std::u16string_view sSql);
 
-void ensureFirebirdTableLength(const OUString& sName);
+void ensureFirebirdTableLength(std::u16string_view sName);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

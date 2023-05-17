@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/safeint.hxx>
 #include <rtl/ref.hxx>
 
 #include <xmloff/xmlprmap.hxx>
@@ -75,8 +76,7 @@ XMLPropertySetMapperEntry_Impl::XMLPropertySetMapperEntry_Impl(
     const XMLPropertyMapEntry& rMapEntry,
     const rtl::Reference< XMLPropertyHandlerFactory >& rFactory ) :
     sXMLAttributeName( GetXMLToken(rMapEntry.meXMLName) ),
-    sAPIPropertyName( OUString(rMapEntry.msApiName, rMapEntry.nApiNameLength,
-                               RTL_TEXTENCODING_ASCII_US ) ),
+    sAPIPropertyName( rMapEntry.getApiName() ),
     nType( rMapEntry.mnType ),
     nXMLNameSpace( rMapEntry.mnNameSpace ),
     nContextId( rMapEntry.mnContextId ),
@@ -111,7 +111,7 @@ XMLPropertySetMapper::XMLPropertySetMapper(
 
     if (mpImpl->mbOnlyExportMappings)
     {
-        while( pIter->msApiName )
+        while( !pIter->IsEnd() )
         {
             if (!pIter->mbImportOnly)
             {
@@ -123,7 +123,7 @@ XMLPropertySetMapper::XMLPropertySetMapper(
     }
     else
     {
-        while( pIter->msApiName )
+        while( !pIter->IsEnd() )
         {
             XMLPropertySetMapperEntry_Impl aEntry( *pIter, rFactory );
             mpImpl->maMapEntries.push_back( aEntry );
@@ -158,32 +158,32 @@ sal_Int32 XMLPropertySetMapper::GetEntryCount() const
 
 sal_uInt32 XMLPropertySetMapper::GetEntryFlags( sal_Int32 nIndex ) const
 {
-    assert((0 <= nIndex) && (nIndex < static_cast<sal_Int32>(mpImpl->maMapEntries.size())));
+    assert((0 <= nIndex) && (o3tl::make_unsigned(nIndex) < mpImpl->maMapEntries.size()));
     return mpImpl->maMapEntries[nIndex].nType & ~MID_FLAG_MASK;
 }
 
 sal_uInt32 XMLPropertySetMapper::GetEntryType( sal_Int32 nIndex ) const
 {
-    assert((0 <= nIndex) && (nIndex < static_cast<sal_Int32>(mpImpl->maMapEntries.size())));
+    assert((0 <= nIndex) && (o3tl::make_unsigned(nIndex) < mpImpl->maMapEntries.size()));
     sal_uInt32 nType = mpImpl->maMapEntries[nIndex].nType;
     return nType;
 }
 
 sal_uInt16 XMLPropertySetMapper::GetEntryNameSpace( sal_Int32 nIndex ) const
 {
-    assert((0 <= nIndex) && (nIndex < static_cast<sal_Int32>(mpImpl->maMapEntries.size())));
+    assert((0 <= nIndex) && (o3tl::make_unsigned(nIndex) < mpImpl->maMapEntries.size()));
     return mpImpl->maMapEntries[nIndex].nXMLNameSpace;
 }
 
 const OUString& XMLPropertySetMapper::GetEntryXMLName( sal_Int32 nIndex ) const
 {
-    assert((0 <= nIndex) && (nIndex < static_cast<sal_Int32>(mpImpl->maMapEntries.size())));
+    assert((0 <= nIndex) && (o3tl::make_unsigned(nIndex) < mpImpl->maMapEntries.size()));
     return mpImpl->maMapEntries[nIndex].sXMLAttributeName;
 }
 
 const OUString& XMLPropertySetMapper::GetEntryAPIName( sal_Int32 nIndex ) const
 {
-    assert((0 <= nIndex) && (nIndex < static_cast<sal_Int32>(mpImpl->maMapEntries.size())));
+    assert((0 <= nIndex) && (o3tl::make_unsigned(nIndex) < mpImpl->maMapEntries.size()));
     return mpImpl->maMapEntries[nIndex].sAPIPropertyName;
 }
 
@@ -196,13 +196,13 @@ sal_Int16 XMLPropertySetMapper::GetEntryContextId( sal_Int32 nIndex ) const
 SvtSaveOptions::ODFSaneDefaultVersion
 XMLPropertySetMapper::GetEarliestODFVersionForExport(sal_Int32 const nIndex) const
 {
-    assert((0 <= nIndex) && (nIndex < static_cast<sal_Int32>(mpImpl->maMapEntries.size())));
+    assert((0 <= nIndex) && (o3tl::make_unsigned(nIndex) < mpImpl->maMapEntries.size()));
     return mpImpl->maMapEntries[nIndex].nEarliestODFVersionForExport;
 }
 
 const XMLPropertyHandler* XMLPropertySetMapper::GetPropertyHandler( sal_Int32 nIndex ) const
 {
-    assert((0 <= nIndex) && (nIndex < static_cast<sal_Int32>(mpImpl->maMapEntries.size())));
+    assert((0 <= nIndex) && (o3tl::make_unsigned(nIndex) < mpImpl->maMapEntries.size()));
     return mpImpl->maMapEntries[nIndex].pHdl;
 }
 
@@ -355,6 +355,12 @@ void XMLPropertySetMapper::RemoveEntry( sal_Int32 nIndex )
     vector < XMLPropertySetMapperEntry_Impl >::iterator aEIter = mpImpl->maMapEntries.begin();
     std::advance(aEIter, nIndex);
     mpImpl->maMapEntries.erase( aEIter );
+}
+
+void XMLPropertySetMapper::GetEntryAPINames( o3tl::sorted_vector<OUString>& rNames) const
+{
+     for (const XMLPropertySetMapperEntry_Impl& rMapEntry : mpImpl->maMapEntries)
+         rNames.insert(rMapEntry.sAPIPropertyName);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

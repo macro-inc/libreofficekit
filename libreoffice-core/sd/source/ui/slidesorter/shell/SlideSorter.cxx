@@ -35,7 +35,6 @@
 #include <Window.hxx>
 
 #include <tools/debug.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 
@@ -70,17 +69,15 @@ private:
 std::shared_ptr<SlideSorter> SlideSorter::CreateSlideSorter(
     ViewShell& rViewShell,
     sd::Window* pContentWindow,
-    ScrollBar* pHorizontalScrollBar,
-    ScrollBar* pVerticalScrollBar,
-    ScrollBarBox* pScrollBarBox)
+    ScrollAdaptor* pHorizontalScrollBar,
+    ScrollAdaptor* pVerticalScrollBar)
 {
     std::shared_ptr<SlideSorter> pSlideSorter(
         new SlideSorter(
             rViewShell,
             pContentWindow,
             pHorizontalScrollBar,
-            pVerticalScrollBar,
-            pScrollBarBox),
+            pVerticalScrollBar),
         o3tl::default_delete<SlideSorter>());
     pSlideSorter->Init();
     return pSlideSorter;
@@ -102,16 +99,14 @@ std::shared_ptr<SlideSorter> SlideSorter::CreateSlideSorter (
 SlideSorter::SlideSorter (
     ViewShell& rViewShell,
     sd::Window* pContentWindow,
-    ScrollBar* pHorizontalScrollBar,
-    ScrollBar* pVerticalScrollBar,
-    ScrollBarBox* pScrollBarBox)
+    ScrollAdaptor* pHorizontalScrollBar,
+    ScrollAdaptor* pVerticalScrollBar)
     : mbIsValid(false),
       mpViewShell(&rViewShell),
       mpViewShellBase(&rViewShell.GetViewShellBase()),
       mpContentWindow(pContentWindow),
       mpHorizontalScrollBar(pHorizontalScrollBar),
       mpVerticalScrollBar(pVerticalScrollBar),
-      mpScrollBarBox(pScrollBarBox),
       mpProperties(std::make_shared<controller::Properties>()),
       mpTheme(std::make_shared<view::Theme>(mpProperties))
 {
@@ -124,9 +119,8 @@ SlideSorter::SlideSorter (
       mpViewShell(nullptr),
       mpViewShellBase(&rBase),
       mpContentWindow(VclPtr<ContentWindow>::Create(rParentWindow,*this )),
-      mpHorizontalScrollBar(VclPtr<ScrollBar>::Create(&rParentWindow,WinBits(WB_HSCROLL | WB_DRAG))),
-      mpVerticalScrollBar(VclPtr<ScrollBar>::Create(&rParentWindow,WinBits(WB_VSCROLL | WB_DRAG))),
-      mpScrollBarBox(VclPtr<ScrollBarBox>::Create(&rParentWindow)),
+      mpHorizontalScrollBar(VclPtr<ScrollAdaptor>::Create(&rParentWindow, true)),
+      mpVerticalScrollBar(VclPtr<ScrollAdaptor>::Create(&rParentWindow, false)),
       mpProperties(std::make_shared<controller::Properties>()),
       mpTheme(std::make_shared<view::Theme>(mpProperties))
 {
@@ -161,7 +155,7 @@ void SlideSorter::Init()
 
     vcl::Window* pParentWindow = pContentWindow->GetParent();
     if (pParentWindow != nullptr)
-        pParentWindow->SetBackground(Wallpaper());
+        pParentWindow->SetBackground(Application::GetSettings().GetStyleSettings().GetFaceColor());
     pContentWindow->SetBackground(Wallpaper());
     pContentWindow->SetViewOrigin (Point(0,0));
     // We do our own scrolling while dragging a page selection.
@@ -195,7 +189,6 @@ SlideSorter::~SlideSorter()
 
     mpHorizontalScrollBar.reset();
     mpVerticalScrollBar.reset();
-    mpScrollBarBox.reset();
 }
 
 model::SlideSorterModel& SlideSorter::GetModel() const

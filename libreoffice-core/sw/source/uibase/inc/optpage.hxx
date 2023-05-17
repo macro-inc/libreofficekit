@@ -54,7 +54,6 @@ class SwContentOptPage final : public SfxTabPage
     std::unique_ptr<weld::ComboBox> m_xMetricLB;
 
     std::unique_ptr<weld::CheckButton> m_xShowInlineTooltips;
-    std::unique_ptr<weld::Label> m_xOutlineLabel;
     std::unique_ptr<weld::CheckButton> m_xShowOutlineContentVisibilityButton;
     std::unique_ptr<weld::CheckButton> m_xTreatSubOutlineLevelsAsContent;
     std::unique_ptr<weld::CheckButton> m_xShowChangesInMargin;
@@ -76,9 +75,9 @@ public:
 // TabPage printer settings additions
 class SwAddPrinterTabPage final : public SfxTabPage
 {
-    OUString sNone;
-    bool bAttrModified;
-    bool bPreview;
+    OUString m_sNone;
+    bool m_bAttrModified;
+    bool m_bPreview;
 
     std::unique_ptr<weld::CheckButton>  m_xGrfCB;
     std::unique_ptr<weld::CheckButton>  m_xCtrlFieldCB;
@@ -142,10 +141,6 @@ class SwStdFontTabPage final : public SfxTabPage
     bool    m_bIdxDefault     :1;
     bool    m_bSetIdxDefault  :1;
     bool    m_bDisposePrinter :1;
-
-    bool    m_bListHeightDefault    :1;
-    bool    m_bLabelHeightDefault   :1;
-    bool    m_bIndexHeightDefault     :1;
 
     sal_uInt8 m_nFontGroup; //fontcfg.hxx: FONT_GROUP_[STANDARD|CJK|CTL]
 
@@ -272,11 +267,11 @@ class SwMarkPreview final : public weld::CustomWidgetController
     Color m_aTextCol;    // text
     Color m_aPrintAreaCol; // frame for print area
 
-    tools::Rectangle aPage;
-    tools::Rectangle aLeftPagePrtArea;
-    tools::Rectangle aRightPagePrtArea;
+    tools::Rectangle m_aPage;
+    tools::Rectangle m_aLeftPagePrtArea;
+    tools::Rectangle m_aRightPagePrtArea;
 
-    sal_uInt16 nMarkPos;
+    sal_uInt16 m_nMarkPos;
 
     virtual void Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle&) override;
     void PaintPage(vcl::RenderContext& rRenderContext, const tools::Rectangle &rRect);
@@ -288,7 +283,7 @@ public:
     virtual ~SwMarkPreview() override;
 
     void SetColor(const Color& rCol) { m_aMarkCol = rCol; }
-    void SetMarkPos(sal_uInt16 nPos) { nMarkPos = nPos; }
+    void SetMarkPos(sal_uInt16 nPos) { m_nMarkPos = nPos; }
 };
 
 // redlining options
@@ -348,7 +343,7 @@ public:
     virtual void Reset( const SfxItemSet* rSet ) override;
 
 private:
-    bool bAttrModified;
+    bool m_bAttrModified;
 
     std::unique_ptr<weld::CheckButton> m_xTest1CBox;
     std::unique_ptr<weld::CheckButton> m_xTest2CBox;

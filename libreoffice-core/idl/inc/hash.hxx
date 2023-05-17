@@ -20,19 +20,19 @@
 #ifndef INCLUDED_IDL_INC_HASH_HXX
 #define INCLUDED_IDL_INC_HASH_HXX
 
-#include <rtl/ustring.hxx>
-#include <tools/ref.hxx>
+#include <rtl/string.hxx>
 #include <tools/solar.h>
 #include <unordered_map>
 #include <memory>
+#include <utility>
 
 class SvStringHashEntry
 {
     OString     aName;
     sal_uLong   nValue;
 public:
-    SvStringHashEntry( const OString& rName )
-        : aName(rName)
+    SvStringHashEntry( OString aName_ )
+        : aName(std::move(aName_))
         , nValue(0)
     {
     }

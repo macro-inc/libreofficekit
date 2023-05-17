@@ -39,8 +39,8 @@
 #include <svl/intitem.hxx>
 #include <svl/stritem.hxx>
 #include <memory>
-#include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::lang;
@@ -75,9 +75,9 @@ FileDialogFlags lcl_map_mode_to_flags(const sfx2::DocumentInserter::Mode mode)
 
 namespace sfx2 {
 
-DocumentInserter::DocumentInserter(weld::Window* pParent, const OUString& rFactory, const Mode mode)
+DocumentInserter::DocumentInserter(weld::Window* pParent, OUString sFactory, const Mode mode)
     : m_pParent                 ( pParent )
-    , m_sDocFactory             ( rFactory )
+    , m_sDocFactory             (std::move( sFactory ))
     , m_nDlgFlags               ( lcl_map_mode_to_flags(mode) )
     , m_nError                  ( ERRCODE_NONE )
 {
@@ -111,18 +111,18 @@ std::unique_ptr<SfxMedium> DocumentInserter::CreateMedium(char const*const pFall
                 m_pURLList[0], SFX_STREAM_READONLY,
                 SfxGetpApp()->GetFilterMatcher().GetFilter4FilterName( m_sFilter ), m_xItemSet ));
         pMedium->UseInteractionHandler( true );
-        std::unique_ptr<SfxFilterMatcher> pMatcher;
+        std::optional<SfxFilterMatcher> pMatcher;
         if ( !m_sDocFactory.isEmpty() )
-            pMatcher.reset(new SfxFilterMatcher(m_sDocFactory));
+            pMatcher.emplace(m_sDocFactory);
         else
-            pMatcher.reset(new SfxFilterMatcher());
+            pMatcher.emplace();
 
         std::shared_ptr<const SfxFilter> pFilter;
         ErrCode nError = pMatcher->DetectFilter( *pMedium, pFilter );
         // tdf#101813 hack: check again if it's a global document
         if (ERRCODE_NONE != nError && pFallbackHack)
         {
-            pMatcher.reset(new SfxFilterMatcher(OUString::createFromAscii(pFallbackHack)));
+            pMatcher.emplace(OUString::createFromAscii(pFallbackHack));
             nError = pMatcher->DetectFilter( *pMedium, pFilter );
         }
         if ( nError == ERRCODE_NONE && pFilter )

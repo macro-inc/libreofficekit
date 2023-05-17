@@ -67,7 +67,7 @@ AtkListener::~AtkListener()
 
 static AtkStateType mapState( const uno::Any &rAny )
 {
-    sal_Int16 nState = accessibility::AccessibleStateType::INVALID;
+    sal_Int64 nState = accessibility::AccessibleStateType::INVALID;
     rAny >>= nState;
     return mapAtkState( nState );
 }
@@ -133,10 +133,9 @@ void AtkListener::updateChildList(
 {
     m_aChildList.clear();
 
-    uno::Reference< accessibility::XAccessibleStateSet > xStateSet = pContext->getAccessibleStateSet();
-    if( !xStateSet.is()
-        || xStateSet->contains(accessibility::AccessibleStateType::DEFUNC)
-        || xStateSet->contains(accessibility::AccessibleStateType::MANAGES_DESCENDANTS) )
+    sal_Int64 nStateSet = pContext->getAccessibleStateSet();
+    if( (nStateSet & accessibility::AccessibleStateType::DEFUNC)
+        || (nStateSet & accessibility::AccessibleStateType::MANAGES_DESCENDANTS) )
         return;
 
     css::uno::Reference<css::accessibility::XAccessibleContext3> xContext3(pContext, css::uno::UNO_QUERY);
@@ -146,9 +145,10 @@ void AtkListener::updateChildList(
     }
     else
     {
-        sal_Int32 nChildren = pContext->getAccessibleChildCount();
+        sal_Int64 nChildren = pContext->getAccessibleChildCount();
+        assert(o3tl::make_unsigned(nChildren) < m_aChildList.max_size());
         m_aChildList.resize(nChildren);
-        for(sal_Int32 n = 0; n < nChildren; n++)
+        for(sal_Int64 n = 0; n < nChildren; n++)
         {
             try
             {
@@ -156,7 +156,7 @@ void AtkListener::updateChildList(
             }
             catch (lang::IndexOutOfBoundsException const&)
             {
-                sal_Int32 nChildren2 = pContext->getAccessibleChildCount();
+                sal_Int64 nChildren2 = pContext->getAccessibleChildCount();
                 assert(nChildren2 <= n && "consistency?");
                 m_aChildList.resize(std::min(nChildren2, n));
                 break;
@@ -395,7 +395,7 @@ void printNotifyEvent( const accessibility::AccessibleEventObject& rEvent )
     {
         case accessibility::AccessibleEventId::STATE_CHANGED:
         {
-            sal_Int16 nState;
+            sal_Int64 nState;
             if (rEvent.OldValue >>= nState)
                 os << "  * old state = " << getOrUnknown(aStates, nState);
             if (rEvent.NewValue >>= nState)
@@ -487,7 +487,6 @@ void AtkListener::notifyEvent( const accessibility::AccessibleEventObject& aEven
 
         case accessibility::AccessibleEventId::BOUNDRECT_CHANGED:
 
-#ifdef HAS_ATKRECTANGLE
             if( ATK_IS_COMPONENT( atk_obj ) )
             {
                 AtkRectangle rect;
@@ -499,12 +498,10 @@ void AtkListener::notifyEvent( const accessibility::AccessibleEventObject& aEven
                                            &rect.height,
                                            ATK_XY_SCREEN );
 
-                g_signal_emit_by_name( atk_obj, "bounds_changed", &rect );
+                g_signal_emit_by_name( atk_obj, "bounds-changed", &rect );
             }
             else
-                g_warning( "bounds_changed event for object not implementing AtkComponent\n");
-#endif
-
+                g_warning( "bounds-changed event for object not implementing AtkComponent\n");
             break;
 
         case accessibility::AccessibleEventId::VISIBLE_DATA_CHANGED:
@@ -566,34 +563,27 @@ void AtkListener::notifyEvent( const accessibility::AccessibleEventObject& aEven
         }
         case accessibility::AccessibleEventId::TEXT_CHANGED:
         {
-            // TESTME: and remove this comment:
             // cf. comphelper/source/misc/accessibletexthelper.cxx (implInitTextChangedEvent)
             accessibility::TextSegment aDeletedText;
             accessibility::TextSegment aInsertedText;
 
-            // TODO: when GNOME starts to send "update" kind of events, change
-            // we need to re-think this implementation as well
             if( aEvent.OldValue >>= aDeletedText )
             {
-                /* Remember the text segment here to be able to return removed text in get_text().
-                 * This is clearly a hack to be used until appropriate API exists in atk to pass
-                 * the string value directly or we find a compelling reason to start caching the
-                 * UTF-8 converted strings in the atk wrapper object.
-                 */
-
-                g_object_set_data( G_OBJECT(atk_obj), "ooo::text_changed::delete", &aDeletedText);
-
-                g_signal_emit_by_name( atk_obj, "text_changed::delete",
+                const OString aDeletedTextUtf8 = OUStringToOString(aDeletedText.SegmentText, RTL_TEXTENCODING_UTF8);
+                g_signal_emit_by_name( atk_obj, "text-remove",
                                        static_cast<gint>(aDeletedText.SegmentStart),
-                                       static_cast<gint>( aDeletedText.SegmentEnd - aDeletedText.SegmentStart ) );
+                                       static_cast<gint>(aDeletedText.SegmentEnd - aDeletedText.SegmentStart),
+                                       g_strdup(aDeletedTextUtf8.getStr()));
 
-                g_object_steal_data( G_OBJECT(atk_obj), "ooo::text_changed::delete" );
             }
-
             if( aEvent.NewValue >>= aInsertedText )
-                g_signal_emit_by_name( atk_obj, "text_changed::insert",
+            {
+                const OString aInsertedTextUtf8 = OUStringToOString(aInsertedText.SegmentText, RTL_TEXTENCODING_UTF8);
+                g_signal_emit_by_name( atk_obj, "text-insert",
                                        static_cast<gint>(aInsertedText.SegmentStart),
-                                       static_cast<gint>( aInsertedText.SegmentEnd - aInsertedText.SegmentStart ) );
+                                       static_cast<gint>(aInsertedText.SegmentEnd - aInsertedText.SegmentStart),
+                                       g_strdup(aInsertedTextUtf8.getStr()));
+            }
             break;
         }
 
@@ -632,29 +622,24 @@ void AtkListener::notifyEvent( const accessibility::AccessibleEventObject& aEven
             sal_Int32 nRowsChanged = aChange.LastRow - aChange.FirstRow + 1;
             sal_Int32 nColumnsChanged = aChange.LastColumn - aChange.FirstColumn + 1;
 
-            static const struct {
-                    const char *row;
-                    const char *col;
-            } aSignalNames[] =
-            {
-                { nullptr, nullptr }, // dummy
-                { "row_inserted", "column_inserted" }, // INSERT = 1
-                { "row_deleted", "column_deleted" } // DELETE = 2
-            };
             switch( aChange.Type )
             {
-                case accessibility::AccessibleTableModelChangeType::INSERT:
-                case accessibility::AccessibleTableModelChangeType::DELETE:
-                    if( nRowsChanged > 0 )
-                        g_signal_emit_by_name( G_OBJECT( atk_obj ),
-                                               aSignalNames[aChange.Type].row,
-                                               aChange.FirstRow, nRowsChanged );
-                    if( nColumnsChanged > 0 )
-                        g_signal_emit_by_name( G_OBJECT( atk_obj ),
-                                               aSignalNames[aChange.Type].col,
-                                               aChange.FirstColumn, nColumnsChanged );
+                case accessibility::AccessibleTableModelChangeType::COLUMNS_INSERTED:
+                    g_signal_emit_by_name(G_OBJECT(atk_obj), "column-inserted",
+                                          aChange.FirstColumn, nColumnsChanged);
                     break;
-
+                case accessibility::AccessibleTableModelChangeType::COLUMNS_REMOVED:
+                    g_signal_emit_by_name(G_OBJECT(atk_obj), "column-deleted",
+                                          aChange.FirstColumn, nColumnsChanged);
+                    break;
+                case accessibility::AccessibleTableModelChangeType::ROWS_INSERTED:
+                    g_signal_emit_by_name(G_OBJECT(atk_obj), "row-inserted",
+                                          aChange.FirstRow, nRowsChanged);
+                    break;
+                case accessibility::AccessibleTableModelChangeType::ROWS_REMOVED:
+                    g_signal_emit_by_name(G_OBJECT(atk_obj), "row-deleted",
+                                          aChange.FirstRow, nRowsChanged);
+                    break;
                 case accessibility::AccessibleTableModelChangeType::UPDATE:
                     // This is not really a model change, is it ?
                     break;

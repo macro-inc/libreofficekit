@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "DataInterpreter.hxx"
+#include <DataInterpreter.hxx>
 
 namespace chart
 {
@@ -30,15 +30,15 @@ public:
     virtual ~BubbleDataInterpreter() override;
 
 protected:
-    // ____ XDataInterpreter ____
-    virtual css::chart2::InterpretedData SAL_CALL interpretDataSource(
+    // ____ DataInterpreter ____
+    virtual InterpretedData interpretDataSource(
         const css::uno::Reference< css::chart2::data::XDataSource >& xSource,
         const css::uno::Sequence< css::beans::PropertyValue >& aArguments,
-        const css::uno::Sequence< css::uno::Reference< css::chart2::XDataSeries > >& aSeriesToReUse ) override;
-    virtual css::chart2::InterpretedData SAL_CALL reinterpretDataSeries(
-        const css::chart2::InterpretedData& aInterpretedData ) override;
-    virtual sal_Bool SAL_CALL isDataCompatible(
-        const css::chart2::InterpretedData& aInterpretedData ) override;
+        const std::vector< rtl::Reference< ::chart::DataSeries > >& aSeriesToReUse ) override;
+    virtual InterpretedData reinterpretDataSeries(
+        const InterpretedData& aInterpretedData ) override;
+    virtual bool isDataCompatible(
+        const InterpretedData& aInterpretedData ) override;
 };
 
 } // namespace chart

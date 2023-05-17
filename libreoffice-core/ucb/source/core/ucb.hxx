@@ -22,13 +22,12 @@
 
 #include <com/sun/star/ucb/CheckinArgument.hpp>
 #include <com/sun/star/ucb/XUniversalContentBroker.hpp>
-#include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/util/XChangesListener.hpp>
 #include <com/sun/star/util/XChangesNotifier.hpp>
 
+#include <comphelper/interfacecontainer3.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <osl/mutex.hxx>
 #include "providermap.hxx"
@@ -36,8 +35,6 @@
 
 #include <memory>
 
-
-namespace comphelper { class OInterfaceContainerHelper2; }
 
 namespace com::sun::star::ucb {
     class XCommandInfo;
@@ -139,8 +136,8 @@ private:
     void configureUcb();
 
     bool getContentProviderData(
-            const OUString & rKey1,
-            const OUString & rKey2,
+            std::u16string_view rKey1,
+            std::u16string_view rKey2,
             ucbhelper::ContentProviderDataList & rListToFill);
 
     void prepareAndRegister( const ucbhelper::ContentProviderDataList& rData);
@@ -154,7 +151,7 @@ private:
     css::uno::Sequence< css::uno::Any > m_aArguments;
     ProviderMap_Impl m_aProviders;
     osl::Mutex m_aMutex;
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2> m_pDisposeEventListeners;
+    std::unique_ptr<comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>> m_pDisposeEventListeners;
     sal_Int32 m_nCommandId;
 };
 

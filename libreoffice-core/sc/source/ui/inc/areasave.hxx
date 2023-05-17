@@ -20,7 +20,6 @@
 #pragma once
 
 #include <address.hxx>
-#include <tools/solar.h>
 
 #include <memory>
 #include <vector>
@@ -36,7 +35,7 @@ private:
     OUString aOptions;
     OUString aSourceArea;
     ScRange aDestArea;
-    sal_uLong nRefresh;
+    sal_Int32 nRefreshDelaySeconds;
 
 public:
     ScAreaLinkSaver( const ScAreaLink& rSource );

@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_VCL_INC_WIN_SALDATA_HXX
-#define INCLUDED_VCL_INC_WIN_SALDATA_HXX
+#pragma once
 
 #include <config_features.h>
 
@@ -28,6 +27,7 @@
 #include <svdata.hxx>
 #include <salwtype.hxx>
 
+#include <systools/win32/comtools.hxx>
 #include <tools/long.hxx>
 
 #include <win/wincomp.hxx>
@@ -61,7 +61,7 @@ struct SalIcon
     SalIcon *pNext;
 };
 
-class SalData
+class SalData : public sal::systools::CoInitializeGuard
 {
 public:
     SalData();
@@ -111,7 +111,6 @@ public:
     bool                    mbObjClassInit;         // is SALOBJECTCLASS initialised
     bool                    mbInPalChange;          // is in WM_QUERYNEWPALETTE
     DWORD                   mnAppThreadId;          // Id from Application-Thread
-    BOOL                    mbScrSvrEnabled;        // ScreenSaver enabled
     SalIcon*                mpFirstIcon;            // icon cache, points to first icon, NULL if none
     TempFontItem*           mpSharedTempFontItem;   // LibreOffice shared fonts
     TempFontItem*           mpOtherTempFontItem;    // other temporary fonts (embedded?)
@@ -131,9 +130,6 @@ public:
     std::unique_ptr<SkiaControlsCache> m_pSkiaControlsCache;
 #endif
 };
-
-inline void SetSalData( SalData* pData ) { ImplGetSVData()->mpSalData = pData; }
-inline SalData* GetSalData() { return ImplGetSVData()->mpSalData; }
 
 struct SalShlData
 {
@@ -297,7 +293,5 @@ inline WinSalObject* GetSalObjWindowPtr( HWND hWnd )
 {
     return reinterpret_cast<WinSalObject*>(GetWindowLongPtrW( hWnd, SAL_OBJECT_THIS ));
 }
-
-#endif // INCLUDED_VCL_INC_WIN_SALDATA_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

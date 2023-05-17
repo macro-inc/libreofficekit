@@ -83,16 +83,16 @@ static void lcl_SetChartParameters( const uno::Reference< chart2::data::XDataRec
     uno::Sequence< beans::PropertyValue > aArgs{
         beans::PropertyValue(
             "CellRangeRepresentation", -1,
-            uno::makeAny( rRanges ), beans::PropertyState_DIRECT_VALUE ),
+            uno::Any( rRanges ), beans::PropertyState_DIRECT_VALUE ),
         beans::PropertyValue(
             "HasCategories", -1,
-            uno::makeAny( bHasCategories ), beans::PropertyState_DIRECT_VALUE ),
+            uno::Any( bHasCategories ), beans::PropertyState_DIRECT_VALUE ),
         beans::PropertyValue(
             "FirstCellAsLabel", -1,
-            uno::makeAny( bFirstCellAsLabel ), beans::PropertyState_DIRECT_VALUE ),
+            uno::Any( bFirstCellAsLabel ), beans::PropertyState_DIRECT_VALUE ),
         beans::PropertyValue(
             "DataRowSource", -1,
-            uno::makeAny( eDataRowSource ), beans::PropertyState_DIRECT_VALUE )
+            uno::Any( eDataRowSource ), beans::PropertyState_DIRECT_VALUE )
     };
     xReceiver->setArguments( aArgs );
 }
@@ -108,7 +108,7 @@ bool ScDocument::HasChartAtPoint( SCTAB nTab, const Point& rPos, OUString& rName
         SdrObject* pObject = aIter.Next();
         while (pObject)
         {
-            if ( pObject->GetObjIdentifier() == OBJ_OLE2 &&
+            if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 &&
                  pObject->GetCurrentBoundRect().Contains(rPos) )
             {
                 // also Chart-Objects that are not in the Collection
@@ -152,7 +152,7 @@ uno::Reference< chart2::XChartDocument > ScDocument::GetChartByName( std::u16str
             SdrObject* pObject = aIter.Next();
             while (pObject)
             {
-                if ( pObject->GetObjIdentifier() == OBJ_OLE2 &&
+                if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 &&
                         static_cast<SdrOle2Obj*>(pObject)->GetPersistName() == rChartName )
                 {
                     xReturn.set( ScChartHelper::GetChartFromSdrObject( pObject ) );
@@ -219,7 +219,7 @@ void ScDocument::GetOldChartParameters( std::u16string_view rName,
         SdrObject* pObject = aIter.Next();
         while (pObject)
         {
-            if ( pObject->GetObjIdentifier() == OBJ_OLE2 &&
+            if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 &&
                     static_cast<SdrOle2Obj*>(pObject)->GetPersistName() == rName )
             {
                 uno::Reference< chart2::XChartDocument > xChartDoc( ScChartHelper::GetChartFromSdrObject( pObject ) );
@@ -266,7 +266,7 @@ void ScDocument::UpdateChartArea( const OUString& rChartName,
         SdrObject* pObject = aIter.Next();
         while (pObject)
         {
-            if ( pObject->GetObjIdentifier() == OBJ_OLE2 &&
+            if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 &&
                     static_cast<SdrOle2Obj*>(pObject)->GetPersistName() == rChartName )
             {
                 uno::Reference< chart2::XChartDocument > xChartDoc( ScChartHelper::GetChartFromSdrObject( pObject ) );
@@ -362,6 +362,9 @@ void ScDocument::UpdateChart( const OUString& rChartName )
 
 void ScDocument::RestoreChartListener( const OUString& rName )
 {
+    if (!pChartListenerCollection)
+        return;
+
     // Read the data ranges from the chart object, and start listening to those ranges again
     // (called when a chart is saved, because then it might be swapped out and stop listening itself).
 
@@ -496,7 +499,7 @@ void ScDocument::SetChartRangeList( std::u16string_view rChartName,
         SdrObject* pObject = aIter.Next();
         while (pObject)
         {
-            if ( pObject->GetObjIdentifier() == OBJ_OLE2 &&
+            if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 &&
                     static_cast<SdrOle2Obj*>(pObject)->GetPersistName() == rChartName )
             {
                 uno::Reference< chart2::XChartDocument > xChartDoc( ScChartHelper::GetChartFromSdrObject( pObject ) );
@@ -551,7 +554,7 @@ uno::Reference< embed::XEmbeddedObject >
         SdrObject* pObject = aIter.Next();
         while (pObject)
         {
-            if ( pObject->GetObjIdentifier() == OBJ_OLE2 )
+            if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 )
             {
                 SdrOle2Obj * pOleObject ( dynamic_cast< SdrOle2Obj * >( pObject ));
                 if( pOleObject &&
@@ -592,7 +595,7 @@ void ScDocument::UpdateChartListenerCollection()
 
         for (SdrObject* pObject = aIter.Next(); pObject; pObject = aIter.Next())
         {
-            if ( pObject->GetObjIdentifier() != OBJ_OLE2 )
+            if ( pObject->GetObjIdentifier() != SdrObjKind::OLE2 )
                 continue;
 
             OUString aObjName = static_cast<SdrOle2Obj*>(pObject)->GetPersistName();

@@ -469,6 +469,7 @@ public:
 
     void sendShape( Token_t Element );
     bool isShapeSent( ) const { return m_bShapeSent; }
+    bool isDMLGroupShape() const;
 
 protected:
     virtual void lcl_startFastElement(Token_t Element, const css::uno::Reference< css::xml::sax::XFastAttributeList > & Attribs) override;
@@ -620,10 +621,12 @@ public:
 
     void att_paraId(const OOXMLValue::Pointer_t& pValue);
     void att_done(const OOXMLValue::Pointer_t& pValue);
+    void att_paraIdParent(const OOXMLValue::Pointer_t& pValue);
 
 private:
     OUString m_sParaId;
     bool m_bDone = false;
+    OUString m_sParentId {};
 };
 
 }

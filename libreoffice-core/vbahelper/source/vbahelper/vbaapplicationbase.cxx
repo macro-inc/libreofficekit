@@ -42,6 +42,7 @@
 #include "vbacommandbars.hxx"
 
 #include <o3tl/hash_combine.hxx>
+#include <o3tl/string_view.hxx>
 #include <unordered_map>
 
 using namespace ::com::sun::star;
@@ -74,9 +75,8 @@ public:
     static double GetNow()
     {
         DateTime aNow( DateTime::SYSTEM );
-        Date aRefDate( 1,1,1900 );
+        Date aRefDate(1899'12'30);
         tools::Long nDiffDays = aNow - aRefDate;
-        nDiffDays += 2; // Change VisualBasic: 1.Jan.1900 == 2
 
         tools::Long nDiffSeconds = aNow.GetHour() * 3600 + aNow.GetMin() * 60 + aNow.GetSec();
         return static_cast<double>(nDiffDays) + static_cast<double>(nDiffSeconds)/double(24*3600);
@@ -126,7 +126,7 @@ IMPL_LINK_NOARG(VbaTimer, MacroCallHdl, Timer *, void)
     // must be the last call in the method since it deletes the timer
     try
     {
-        m_xBase->OnTime( uno::makeAny( m_aTimerInfo.second.first ), m_aTimerInfo.first, uno::makeAny( m_aTimerInfo.second.second ), uno::makeAny( false ) );
+        m_xBase->OnTime( uno::Any( m_aTimerInfo.second.first ), m_aTimerInfo.first, uno::Any( m_aTimerInfo.second.second ), uno::Any( false ) );
     } catch( uno::Exception& )
     {}
 }
@@ -319,7 +319,7 @@ VbaApplicationBase::CommandBars( const uno::Any& aIndex )
     uno::Reference< XCommandBars > xCommandBars( new ScVbaCommandBars( this, mxContext, uno::Reference< container::XIndexAccess >(), getCurrentDocument() ) );
     if( aIndex.hasValue() )
         return xCommandBars->Item( aIndex, uno::Any() );
-    return uno::makeAny( xCommandBars );
+    return uno::Any( xCommandBars );
 }
 
 OUString SAL_CALL
@@ -332,7 +332,7 @@ uno::Any SAL_CALL VbaApplicationBase::Run( const OUString& MacroName, const uno:
 {
     OUString aMacroName = MacroName.trim();
     if( aMacroName.startsWith("!") )
-        aMacroName = aMacroName.copy(1).trim();
+        aMacroName = o3tl::trim(aMacroName.subView(1));
 
     uno::Reference< frame::XModel > xModel;
     SbMethod* pMeth = StarBASIC::GetActiveMethod();
@@ -409,9 +409,7 @@ void SAL_CALL VbaApplicationBase::OnTime( const uno::Any& aEarliestTime, const O
 
 float SAL_CALL VbaApplicationBase::CentimetersToPoints( float Centimeters )
 {
-    // i cm = 28.35 points
-    static const float rate = 28.35f;
-    return ( Centimeters * rate );
+    return o3tl::convert(Centimeters, o3tl::Length::cm, o3tl::Length::pt);
 }
 
 uno::Any SAL_CALL VbaApplicationBase::getVBE()

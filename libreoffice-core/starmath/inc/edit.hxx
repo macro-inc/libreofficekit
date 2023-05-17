@@ -21,7 +21,6 @@
 
 #include <svx/weldeditview.hxx>
 #include <vcl/idle.hxx>
-#include <vcl/transfer.hxx>
 
 class SmDocShell;
 class SmViewShell;
@@ -32,11 +31,6 @@ class DataChangedEvent;
 class SmCmdBoxWindow;
 class CommandEvent;
 class Timer;
-
-namespace svtools
-{
-class ColorConfig;
-}
 
 void SmGetLeftSelectionPart(const ESelection& rSelection, sal_Int32& nPara, sal_uInt16& nPos);
 
@@ -118,7 +112,7 @@ public:
 
     ESelection GetSelection() const;
     void SetSelection(const ESelection& rSel);
-    void UpdateStatus(bool bSetDocModified);
+    void UpdateStatus();
 
     bool IsEmpty() const;
     bool IsSelected() const;

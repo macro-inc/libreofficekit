@@ -25,19 +25,11 @@
 
 #include <stdio.h>
 #include "StdAfx2.h"
+#include <so_activex.h>
 #include "SOActiveX.h"
 #include "SODispatchInterceptor.h"
 #include "com_uno_helper.h"
 #include <sal/macros.h>
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-#include <so_activex.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP SODispatchInterceptor::InterfaceSupportsErrorInfo(REFIID riid)
 {
@@ -46,13 +38,9 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP SODispatchInterceptor::InterfaceSupportsErrorI
         &IID_ISODispatchInterceptor,
     };
 
-    for (std::size_t i=0;i<SAL_N_ELEMENTS(arr);i++)
+    for (auto const &i : arr)
     {
-#ifdef _MSC_VER
-        if (InlineIsEqualGUID(*arr[i],riid))
-#else
-        if (::ATL::InlineIsEqualGUID(*arr[i],riid))
-#endif
+        if (InlineIsEqualGUID(*i,riid))
             return S_OK;
     }
     return S_FALSE;

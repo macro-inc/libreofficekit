@@ -28,13 +28,13 @@
 #include <connectivity/dbconversion.hxx>
 #include <o3tl/any.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <svl/numuno.hxx>
 #include <vcl/keycodes.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <tools/debug.hxx>
 #include <i18nlangtag/languagetag.hxx>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/sdbc/DataType.hpp>
 #include <com/sun/star/util/NumberFormat.hpp>
 #include <com/sun/star/util/Date.hpp>
@@ -121,7 +121,7 @@ Reference< XNumberFormatsSupplier > StandardFormatsSupplier::get( const Referenc
             // somebody used the small time frame where the mutex was not locked to create and set
             // the supplier
             return xSupplier;
-        s_xDefaultFormatsSupplier = pSupplier;
+        s_xDefaultFormatsSupplier = css::uno::Reference<css::uno::XWeak>(pSupplier);
     }
     return pSupplier;
 }
@@ -379,7 +379,7 @@ void OFormattedModel::setPropertyToDefaultByHandle(sal_Int32 nHandle)
         Reference<XNumberFormatsSupplier>  xSupplier = calcDefaultFormatsSupplier();
         DBG_ASSERT(m_xAggregateSet.is(), "OFormattedModel::setPropertyToDefaultByHandle(FORMATSSUPPLIER) : have no aggregate !");
         if (m_xAggregateSet.is())
-            m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, makeAny(xSupplier));
+            m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, Any(xSupplier));
     }
     else
         OEditBaseModel::setPropertyToDefaultByHandle(nHandle);
@@ -400,7 +400,7 @@ Any OFormattedModel::getPropertyDefaultByHandle( sal_Int32 nHandle ) const
     if (nHandle == PROPERTY_ID_FORMATSSUPPLIER)
     {
         Reference<XNumberFormatsSupplier>  xSupplier = calcDefaultFormatsSupplier();
-        return makeAny(xSupplier);
+        return Any(xSupplier);
     }
     else
         return OEditBaseModel::getPropertyDefaultByHandle(nHandle);
@@ -571,7 +571,7 @@ void OFormattedModel::onConnectedDbColumn( const Reference< XInterface >& _rxFor
                     }
                 }
                 aSupplier >>= m_xOriginalFormatter;
-                m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, makeAny(xSupplier));
+                m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, Any(xSupplier));
                 m_xAggregateSet->setPropertyValue(PROPERTY_FORMATKEY, aFmtKey);
                 // Adapt the NumericFalg to my bound field
                 if (xField.is())
@@ -599,7 +599,7 @@ void OFormattedModel::onConnectedDbColumn( const Reference< XInterface >& _rxFor
                 }
                 else
                     m_bNumeric = m_bOriginalNumeric;
-                setPropertyValue(PROPERTY_TREATASNUMERIC, makeAny(m_bNumeric));
+                setPropertyValue(PROPERTY_TREATASNUMERIC, Any(m_bNumeric));
                 OSL_VERIFY( aFmtKey >>= nFormatKey );
             }
         }
@@ -616,9 +616,9 @@ void OFormattedModel::onDisconnectedDbColumn()
     OEditBaseModel::onDisconnectedDbColumn();
     if (m_xOriginalFormatter.is())
     {   // Our aggregated model does not hold any Format information
-        m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, makeAny(m_xOriginalFormatter));
+        m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, Any(m_xOriginalFormatter));
         m_xAggregateSet->setPropertyValue(PROPERTY_FORMATKEY, Any());
-        setPropertyValue(PROPERTY_TREATASNUMERIC, makeAny(m_bOriginalNumeric));
+        setPropertyValue(PROPERTY_TREATASNUMERIC, Any(m_bOriginalNumeric));
         m_xOriginalFormatter = nullptr;
     }
     m_nKeyType   = NumberFormat::UNDEFINED;
@@ -790,8 +790,8 @@ void OFormattedModel::read(const Reference<XObjectInputStream>& _rxInStream)
     }
     if ((nKey != -1) && m_xAggregateSet.is())
     {
-                m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, makeAny(xSupplier));
-                m_xAggregateSet->setPropertyValue(PROPERTY_FORMATKEY, makeAny(nKey));
+                m_xAggregateSet->setPropertyValue(PROPERTY_FORMATSSUPPLIER, Any(xSupplier));
+                m_xAggregateSet->setPropertyValue(PROPERTY_FORMATKEY, Any(nKey));
     }
     else
     {
@@ -809,38 +809,38 @@ sal_uInt16 OFormattedModel::getPersistenceFlags() const
 bool OFormattedModel::commitControlValueToDbColumn( bool /*_bPostReset*/ )
 {
     Any aControlValue( m_xAggregateFastSet->getFastPropertyValue( getValuePropertyAggHandle() ) );
-    if ( aControlValue != m_aSaveValue )
-    {
-        // empty string + EmptyIsNull = void
-        if  (   !aControlValue.hasValue()
-            ||  (   ( aControlValue.getValueType().getTypeClass() == TypeClass_STRING )
-                &&  getString( aControlValue ).isEmpty()
-                &&  m_bEmptyIsNull
-                )
+    if ( aControlValue == m_aSaveValue )
+        return true;
+
+    // empty string + EmptyIsNull = void
+    if  (   !aControlValue.hasValue()
+        ||  (   ( aControlValue.getValueType().getTypeClass() == TypeClass_STRING )
+            &&  getString( aControlValue ).isEmpty()
+            &&  m_bEmptyIsNull
             )
-            m_xColumnUpdate->updateNull();
-        else
+        )
+        m_xColumnUpdate->updateNull();
+    else
+    {
+        try
         {
-            try
+            double f = 0.0;
+            if ( aControlValue.getValueType().getTypeClass() == TypeClass_DOUBLE || (aControlValue >>= f)) // #i110323
             {
-                double f = 0.0;
-                if ( aControlValue.getValueType().getTypeClass() == TypeClass_DOUBLE || (aControlValue >>= f)) // #i110323
-                {
-                    DBTypeConversion::setValue( m_xColumnUpdate, m_aNullDate, getDouble( aControlValue ), m_nKeyType );
-                }
-                else
-                {
-                    DBG_ASSERT( aControlValue.getValueType().getTypeClass() == TypeClass_STRING, "OFormattedModel::commitControlValueToDbColumn: invalid value type!" );
-                    m_xColumnUpdate->updateString( getString( aControlValue ) );
-                }
+                DBTypeConversion::setValue( m_xColumnUpdate, m_aNullDate, getDouble( aControlValue ), m_nKeyType );
             }
-            catch(const Exception&)
+            else
             {
-                return false;
+                DBG_ASSERT( aControlValue.getValueType().getTypeClass() == TypeClass_STRING, "OFormattedModel::commitControlValueToDbColumn: invalid value type!" );
+                m_xColumnUpdate->updateString( getString( aControlValue ) );
             }
         }
-        m_aSaveValue = aControlValue;
+        catch(const Exception&)
+        {
+            return false;
+        }
     }
+    m_aSaveValue = aControlValue;
     return true;
 }
 

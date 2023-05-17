@@ -44,7 +44,7 @@
 
 using namespace ::com::sun::star;
 
-const WhichRangesContainer SwWrapTabPage::m_aWrapPageRg(svl::Items<
+const WhichRangesContainer SwWrapTabPage::s_aWrapPageRg(svl::Items<
     RES_LR_SPACE, RES_UL_SPACE,
     RES_PRINT, RES_PRINT,
     RES_PROTECT, RES_SURROUND
@@ -129,8 +129,7 @@ void SwWrapTabPage::Reset(const SfxItemSet *rSet)
         m_xWrapOutlineCB->show();
         m_xWrapOutsideCB->show();
 
-        m_xWrapTransparentCB->set_active( 0 == static_cast<const SfxInt16Item&>(rSet->Get(
-                                        FN_DRAW_WRAP_DLG)).GetValue() );
+        m_xWrapTransparentCB->set_active( 0 == rSet->Get(FN_DRAW_WRAP_DLG).GetValue() );
         m_xWrapTransparentCB->save_state();
     }
     else
@@ -380,9 +379,9 @@ void SwWrapTabPage::ActivatePage(const SfxItemSet& rSet)
     m_nAnchorId = rAnch.GetAnchorId();
     bool bEnable = (m_nAnchorId != RndStdIds::FLY_AS_CHAR);
 
-    if (!m_bDrawMode)
+    SwWrtShell* pSh = m_bFormat ? ::GetActiveWrtShell() : m_pWrtSh;
+    if (pSh && !m_bDrawMode)
     {
-        SwWrtShell* pSh = m_bFormat ? ::GetActiveWrtShell() : m_pWrtSh;
         SwFlyFrameAttrMgr aMgr( m_bNew, pSh, GetItemSet() );
         SvxSwFrameValidation aVal;
 

@@ -43,8 +43,9 @@
 #include <comphelper/sequence.hxx>
 #include <comphelper/types.hxx>
 #include <cppuhelper/exc_hlp.hxx>
+#include <o3tl/safeint.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 #include <algorithm>
@@ -203,7 +204,7 @@ void OInterfaceContainer::clonedFrom(const OInterfaceContainer& _cloneSource)
         {
             Reference< XCloneable > xCloneable( xSourceHierarchy->getByIndex( i ), UNO_QUERY_THROW );
             Reference< XInterface > xClone( xCloneable->createClone() );
-            insertByIndex( i, makeAny( xClone ) );
+            insertByIndex( i, Any( xClone ) );
         }
     }
     catch (const RuntimeException&)
@@ -437,7 +438,7 @@ void SAL_CALL OInterfaceContainer::readEvents(const Reference<XObjectInputStream
         {
             Reference< XInterface > xAsIFace( item, UNO_QUERY );    // important to normalize this...
             Reference< XPropertySet > xAsSet( xAsIFace, UNO_QUERY );
-            m_xEventAttacher->attach( i++, xAsIFace, makeAny( xAsSet ) );
+            m_xEventAttacher->attach( i++, xAsIFace, Any( xAsSet ) );
         }
     }
 }
@@ -488,8 +489,8 @@ namespace
             {
                 try
                 {
-                    xObjProps->setPropertyValue( PROPERTY_NAME, makeAny( ResourceManager::loadString(RID_STR_CONTROL_SUBSTITUTED_NAME) ) );
-                    xObjProps->setPropertyValue( PROPERTY_TAG, makeAny( ResourceManager::loadString(RID_STR_CONTROL_SUBSTITUTED_EPXPLAIN) ) );
+                    xObjProps->setPropertyValue( PROPERTY_NAME, Any( ResourceManager::loadString(RID_STR_CONTROL_SUBSTITUTED_NAME) ) );
+                    xObjProps->setPropertyValue( PROPERTY_TAG, Any( ResourceManager::loadString(RID_STR_CONTROL_SUBSTITUTED_EPXPLAIN) ) );
                 }
                 catch(const Exception&)
                 {
@@ -560,7 +561,7 @@ void SAL_CALL OInterfaceContainer::read( const Reference< XObjectInputStream >& 
                 }
                 catch( const Exception& )
                 {
-                    SAL_WARN("forms.misc", "OInterfaceContainerHelper2::read: reading succeeded, but not inserting!" );
+                    SAL_WARN("forms.misc", "OInterfaceContainerHelper3::read: reading succeeded, but not inserting!" );
                     // create a placeholder
                     xElement.set(lcl_createPlaceHolder( m_xContext ), css::uno::UNO_QUERY);
                     if ( !xElement.is() )
@@ -722,7 +723,7 @@ sal_Int32 OInterfaceContainer::getCount()
 
 Any OInterfaceContainer::getByIndex(sal_Int32 _nIndex)
 {
-    if (_nIndex < 0 || (_nIndex >= static_cast<sal_Int32>(m_aItems.size())))
+    if (_nIndex < 0 || (o3tl::make_unsigned(_nIndex) >= m_aItems.size()))
         throw IndexOutOfBoundsException();
 
     return m_aItems[_nIndex]->queryInterface( m_aElementType );
@@ -812,7 +813,7 @@ void OInterfaceContainer::implInsert(sal_Int32 _nIndex, const Reference< XProper
     if ( bHandleEvents )
     {
         m_xEventAttacher->insertEntry(_nIndex);
-        m_xEventAttacher->attach( _nIndex, pElementMetaData->xInterface, makeAny( _rxElement ) );
+        m_xEventAttacher->attach( _nIndex, pElementMetaData->xInterface, Any( _rxElement ) );
     }
 
     // notify derived classes
@@ -915,7 +916,7 @@ void SAL_CALL OInterfaceContainer::insertByIndex( sal_Int32 _nIndex, const Any& 
 
 void OInterfaceContainer::implReplaceByIndex( const sal_Int32 _nIndex, const Any& _rNewElement, ::osl::ClearableMutexGuard& _rClearBeforeNotify )
 {
-    OSL_PRECOND( ( _nIndex >= 0 ) && ( _nIndex < static_cast<sal_Int32>(m_aItems.size()) ), "OInterfaceContainer::implReplaceByIndex: precondition not met (index)!" );
+    OSL_PRECOND( ( _nIndex >= 0 ) && ( o3tl::make_unsigned(_nIndex) < m_aItems.size() ), "OInterfaceContainer::implReplaceByIndex: precondition not met (index)!" );
 
     // approve the new object
     std::unique_ptr< ElementDescription > aElementMetaData( createElementMetaData() );
@@ -976,7 +977,7 @@ void OInterfaceContainer::implReplaceByIndex( const sal_Int32 _nIndex, const Any
     {
         m_xEventAttacher->insertEntry( _nIndex );
         m_xEventAttacher->attach(_nIndex, aElementMetaData->xInterface,
-                                 makeAny(aElementMetaData->xPropertySet));
+                                 Any(aElementMetaData->xPropertySet));
     }
 
     ContainerEvent aReplaceEvent;
@@ -991,7 +992,7 @@ void OInterfaceContainer::implReplaceByIndex( const sal_Int32 _nIndex, const Any
 
 void OInterfaceContainer::implCheckIndex( const sal_Int32 _nIndex )
 {
-    if (_nIndex < 0 || _nIndex >= static_cast<sal_Int32>(m_aItems.size()))
+    if (_nIndex < 0 || o3tl::make_unsigned(_nIndex) >= m_aItems.size())
         throw IndexOutOfBoundsException();
 }
 
@@ -1008,7 +1009,7 @@ void SAL_CALL OInterfaceContainer::replaceByIndex(sal_Int32 _nIndex, const Any& 
 
 void OInterfaceContainer::implRemoveByIndex( const sal_Int32 _nIndex, ::osl::ClearableMutexGuard& _rClearBeforeNotify )
 {
-    OSL_PRECOND( ( _nIndex >= 0 ) && ( _nIndex < static_cast<sal_Int32>(m_aItems.size()) ), "OInterfaceContainer::implRemoveByIndex: precondition not met (index)!" );
+    OSL_PRECOND( ( _nIndex >= 0 ) && ( o3tl::make_unsigned(_nIndex) < m_aItems.size() ), "OInterfaceContainer::implRemoveByIndex: precondition not met (index)!" );
 
     OInterfaceArray::iterator i = m_aItems.begin() + _nIndex;
     css::uno::Reference<css::uno::XInterface>  xElement(*i);
@@ -1079,7 +1080,7 @@ void SAL_CALL OInterfaceContainer::insertByName(const OUString& _rName, const An
         _rElement >>= xElementProps;
         approveNewElement( xElementProps, aElementMetaData.get() );
 
-        xElementProps->setPropertyValue( PROPERTY_NAME, makeAny( _rName ) );
+        xElementProps->setPropertyValue( PROPERTY_NAME, Any( _rName ) );
     }
     catch( const IllegalArgumentException& )
     {
@@ -1115,7 +1116,7 @@ void SAL_CALL OInterfaceContainer::replaceByName(const OUString& Name, const Any
         if (!hasProperty(PROPERTY_NAME, xSet))
             lcl_throwIllegalArgumentException();
 
-        xSet->setPropertyValue(PROPERTY_NAME, makeAny(Name));
+        xSet->setPropertyValue(PROPERTY_NAME, Any(Name));
     }
 
     // determine the element pos

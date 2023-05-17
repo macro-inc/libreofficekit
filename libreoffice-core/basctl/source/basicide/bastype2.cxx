@@ -25,7 +25,7 @@
 #include <bitmaps.hlst>
 #include <iderid.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svtools/imagemgr.hxx>
 #include <com/sun/star/script/XLibraryContainerPassword.hpp>
 #include <com/sun/star/frame/ModuleManager.hpp>
@@ -41,6 +41,7 @@
 #include <com/sun/star/script/vba/XVBAModuleInfo.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/container/XNamed.hpp>
+#include <utility>
 
 namespace basctl
 {
@@ -87,12 +88,12 @@ Entry::~Entry()
 { }
 
 DocumentEntry::DocumentEntry (
-    ScriptDocument const& rDocument,
+    ScriptDocument aDocument,
     LibraryLocation eLocation,
     EntryType eType
 ) :
     Entry(eType),
-    m_aDocument(rDocument),
+    m_aDocument(std::move(aDocument)),
     m_eLocation(eLocation)
 {
     OSL_ENSURE( m_aDocument.isValid(), "DocumentEntry::DocumentEntry: illegal document!" );
@@ -104,10 +105,10 @@ DocumentEntry::~DocumentEntry()
 LibEntry::LibEntry (
     ScriptDocument const& rDocument,
     LibraryLocation eLocation,
-    OUString const& rLibName
+    OUString aLibName
 ) :
     DocumentEntry(rDocument, eLocation, OBJ_TYPE_LIBRARY),
-    m_aLibName(rLibName)
+    m_aLibName(std::move(aLibName))
 { }
 
 LibEntry::~LibEntry()
@@ -120,38 +121,38 @@ EntryDescriptor::EntryDescriptor () :
 { }
 
 EntryDescriptor::EntryDescriptor (
-    ScriptDocument const& rDocument,
+    ScriptDocument aDocument,
     LibraryLocation eLocation,
-    OUString const& rLibName,
-    OUString const& rLibSubName,
-    OUString const& rName,
+    OUString aLibName,
+    OUString aLibSubName,
+    OUString aName,
     EntryType eType
 ) :
-    m_aDocument(rDocument),
+    m_aDocument(std::move(aDocument)),
     m_eLocation(eLocation),
-    m_aLibName(rLibName),
-    m_aLibSubName(rLibSubName),
-    m_aName(rName),
+    m_aLibName(std::move(aLibName)),
+    m_aLibSubName(std::move(aLibSubName)),
+    m_aName(std::move(aName)),
     m_eType(eType)
 {
     OSL_ENSURE( m_aDocument.isValid(), "EntryDescriptor::EntryDescriptor: invalid document!" );
 }
 
 EntryDescriptor::EntryDescriptor (
-    ScriptDocument const& rDocument,
+    ScriptDocument aDocument,
     LibraryLocation eLocation,
-    OUString const& rLibName,
-    OUString const& rLibSubName,
-    OUString const& rName,
-    OUString const& rMethodName,
+    OUString aLibName,
+    OUString aLibSubName,
+    OUString aName,
+    OUString aMethodName,
     EntryType eType
 ) :
-    m_aDocument(rDocument),
+    m_aDocument(std::move(aDocument)),
     m_eLocation(eLocation),
-    m_aLibName(rLibName),
-    m_aLibSubName(rLibSubName),
-    m_aName(rName),
-    m_aMethodName(rMethodName),
+    m_aLibName(std::move(aLibName)),
+    m_aLibSubName(std::move(aLibSubName)),
+    m_aName(std::move(aName)),
+    m_aMethodName(std::move(aMethodName)),
     m_eType(eType)
 {
     OSL_ENSURE( m_aDocument.isValid(), "EntryDescriptor::EntryDescriptor: invalid document!" );
@@ -176,7 +177,7 @@ SbTreeListBox::~SbTreeListBox()
     bool bValidIter = m_xControl->get_iter_first(*m_xScratchIter);
     while (bValidIter)
     {
-        Entry* pBasicEntry = reinterpret_cast<Entry*>(m_xControl->get_id(*m_xScratchIter).toInt64());
+        Entry* pBasicEntry = weld::fromId<Entry*>(m_xControl->get_id(*m_xScratchIter));
         delete pBasicEntry;
         bValidIter = m_xControl->iter_next(*m_xScratchIter);
     }
@@ -577,7 +578,7 @@ void SbTreeListBox::RemoveEntry(const weld::TreeIter& rIter)
     }
 
     // removing the associated user data
-    Entry* pBasicEntry = reinterpret_cast<Entry*>(m_xControl->get_id(rIter).toInt64());
+    Entry* pBasicEntry = weld::fromId<Entry*>(m_xControl->get_id(rIter));
     delete pBasicEntry;
     // removing the entry
     m_xControl->remove(rIter);
@@ -604,7 +605,7 @@ bool SbTreeListBox::FindEntry(std::u16string_view rText, EntryType eType, weld::
     bool bValidIter = m_xControl->iter_children(rIter);
     while (bValidIter)
     {
-        Entry* pBasicEntry = reinterpret_cast<Entry*>(m_xControl->get_id(rIter).toInt64());
+        Entry* pBasicEntry = weld::fromId<Entry*>(m_xControl->get_id(rIter));
         assert(pBasicEntry && "FindEntry: no Entry ?!");
         if (pBasicEntry->GetType() == eType && rText == m_xControl->get_text(rIter))
             return true;
@@ -654,7 +655,7 @@ void SbTreeListBox::AddEntry(
     std::unique_ptr<weld::TreeIter> xScratch = pRet ? nullptr : m_xControl->make_iterator();
     if (!pRet)
         pRet = xScratch.get();
-    OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(rUserData.release())));
+    OUString sId(weld::toId(rUserData.release()));
     m_xControl->insert(pParent, -1, &rText, &sId, nullptr, nullptr, bChildrenOnDemand, pRet);
     m_xControl->set_image(*pRet, rImage);
 }

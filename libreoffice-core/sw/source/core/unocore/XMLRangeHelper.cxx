@@ -20,7 +20,7 @@
 #include "XMLRangeHelper.hxx"
 #include <rtl/character.hxx>
 #include <rtl/ustrbuf.hxx>
-
+#include <o3tl/string_view.hxx>
 #include <algorithm>
 
 namespace
@@ -102,7 +102,7 @@ void lcl_getXMLStringForCell( const /*::chart::*/XMLRangeHelper::Cell & rCell, O
 }
 
 void lcl_getSingleCellAddressFromXMLString(
-    const OUString& rXMLString,
+    std::u16string_view rXMLString,
     sal_Int32 nStartPos, sal_Int32 nEndPos,
     /*::chart::*/XMLRangeHelper::Cell & rOutCell )
 {
@@ -110,7 +110,7 @@ void lcl_getSingleCellAddressFromXMLString(
     static const sal_Unicode aDollar( '$' );
     static const sal_Unicode aLetterA( 'A' );
 
-    OUString aCellStr = rXMLString.copy( nStartPos, nEndPos - nStartPos + 1 ).toAsciiUpperCase();
+    OUString aCellStr = OUString(rXMLString.substr( nStartPos, nEndPos - nStartPos + 1 )).toAsciiUpperCase();
     const sal_Unicode* pStrArray = aCellStr.getStr();
     sal_Int32 nLength = aCellStr.getLength();
     sal_Int32 i = nLength - 1, nColumn = 0;
@@ -118,7 +118,7 @@ void lcl_getSingleCellAddressFromXMLString(
     // parse number for row
     while( rtl::isAsciiDigit( pStrArray[ i ] ) && i >= 0 )
         i--;
-    rOutCell.nRow = (aCellStr.copy( i + 1 )).toInt32() - 1;
+    rOutCell.nRow = (o3tl::toInt32(aCellStr.subView( i + 1 ))) - 1;
     // a dollar in XML means absolute (whereas in UI it means relative)
     if( pStrArray[ i ] == aDollar )
     {

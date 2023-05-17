@@ -42,13 +42,11 @@ AxisPositionsTabPage::AxisPositionsTabPage(weld::Container* pPage, weld::DialogC
     , m_xLB_CrossesAt(m_xBuilder->weld_combo_box("LB_CROSSES_OTHER_AXIS_AT"))
     , m_xED_CrossesAt(m_xBuilder->weld_formatted_spin_button("EDT_CROSSES_OTHER_AXIS_AT"))
     , m_xED_CrossesAtCategory(m_xBuilder->weld_combo_box( "EDT_CROSSES_OTHER_AXIS_AT_CATEGORY"))
-    , m_xCB_AxisBetweenCategories(m_xBuilder->weld_check_button("CB_AXIS_BETWEEN_CATEGORIES"))
     , m_xFL_Position(m_xBuilder->weld_frame("FL_POSITION"))
     , m_xRB_On(m_xBuilder->weld_radio_button("RB_ON"))
     , m_xRB_Between(m_xBuilder->weld_radio_button("RB_BETWEEN"))
     , m_xFL_Labels(m_xBuilder->weld_frame("FL_LABELS"))
     , m_xLB_PlaceLabels(m_xBuilder->weld_combo_box("LB_PLACE_LABELS"))
-    , m_xED_LabelDistance(m_xBuilder->weld_formatted_spin_button("EDT_AXIS_LABEL_DISTANCE"))
     , m_xCB_TicksInner(m_xBuilder->weld_check_button("CB_TICKS_INNER"))
     , m_xCB_TicksOuter(m_xBuilder->weld_check_button("CB_TICKS_OUTER"))
     , m_xCB_MinorInner(m_xBuilder->weld_check_button("CB_MINOR_INNER"))
@@ -100,8 +98,8 @@ bool AxisPositionsTabPage::FillItemSet(SfxItemSet* rOutAttrs)
         rOutAttrs->Put( SfxInt32Item( SCHATTR_AXIS_LABEL_POSITION, nLabelPos ));
 
     // tick marks
-    tools::Long nTicks=0;
-    tools::Long nMinorTicks=0;
+    sal_Int32 nTicks=0;
+    sal_Int32 nMinorTicks=0;
 
     if(m_xCB_MinorInner->get_active())
         nMinorTicks|=CHAXIS_MARK_INNER;
@@ -142,13 +140,12 @@ void AxisPositionsTabPage::Reset(const SfxItemSet* rInAttrs)
     }
 
     //fill controls
-    const SfxPoolItem *pPoolItem = nullptr;
 
     //axis line
-    if(rInAttrs->GetItemState(SCHATTR_AXIS_POSITION,true, &pPoolItem)== SfxItemState::SET)
+    if(SfxInt32Item const * pPositionItem = rInAttrs->GetItemIfSet(SCHATTR_AXIS_POSITION))
     {
         bool bZero = false;
-        sal_Int32 nPos = static_cast< const SfxInt32Item * >( pPoolItem )->GetValue();
+        sal_Int32 nPos = pPositionItem->GetValue();
         if(nPos==0)
         {
             //switch to value
@@ -162,11 +159,12 @@ void AxisPositionsTabPage::Reset(const SfxItemSet* rInAttrs)
             m_xLB_CrossesAt->set_active( nPos );
         CrossesAtSelectHdl( *m_xLB_CrossesAt );
 
-        if( rInAttrs->GetItemState(SCHATTR_AXIS_POSITION_VALUE,true, &pPoolItem)== SfxItemState::SET || bZero )
+        const SvxDoubleItem* pPosValueItem;
+        if( (pPosValueItem = rInAttrs->GetItemIfSet(SCHATTR_AXIS_POSITION_VALUE)) || bZero )
         {
             double fCrossover = 0.0;
             if( !bZero )
-                fCrossover = static_cast<const SvxDoubleItem*>(pPoolItem)->GetValue();
+                fCrossover = pPosValueItem->GetValue();
             if( m_bCrossingAxisIsCategoryAxis )
                 m_xED_CrossesAtCategory->set_active( static_cast<sal_uInt16>(::rtl::math::round(fCrossover-1.0)) );
             else
@@ -188,9 +186,10 @@ void AxisPositionsTabPage::Reset(const SfxItemSet* rInAttrs)
     }
 
     // shifted category position
-    if (m_bSupportCategoryPositioning && rInAttrs->GetItemState(SCHATTR_AXIS_SHIFTED_CATEGORY_POSITION, true, &pPoolItem) == SfxItemState::SET)
+    const SfxBoolItem* pCatPosItem;
+    if (m_bSupportCategoryPositioning && (pCatPosItem = rInAttrs->GetItemIfSet(SCHATTR_AXIS_SHIFTED_CATEGORY_POSITION)))
     {
-        if (static_cast<const SfxBoolItem*>(pPoolItem)->GetValue())
+        if (pCatPosItem->GetValue())
             m_xRB_Between->set_active(true);
         else
             m_xRB_On->set_active(true);
@@ -199,9 +198,9 @@ void AxisPositionsTabPage::Reset(const SfxItemSet* rInAttrs)
         m_xFL_Position->hide();
 
     // Labels
-    if( rInAttrs->GetItemState( SCHATTR_AXIS_LABEL_POSITION, false, &pPoolItem ) == SfxItemState::SET )
+    if( const SfxInt32Item* pLabelPosItem = rInAttrs->GetItemIfSet( SCHATTR_AXIS_LABEL_POSITION, false) )
     {
-        sal_Int32 nPos = static_cast< const SfxInt32Item * >( pPoolItem )->GetValue();
+        sal_Int32 nPos = pLabelPosItem->GetValue();
         if( nPos < m_xLB_PlaceLabels->get_count() )
             m_xLB_PlaceLabels->set_active( nPos );
     }
@@ -211,10 +210,10 @@ void AxisPositionsTabPage::Reset(const SfxItemSet* rInAttrs)
 
     // Tick marks
     tools::Long nTicks = 0, nMinorTicks = 0;
-    if (rInAttrs->GetItemState(SCHATTR_AXIS_TICKS,true, &pPoolItem)== SfxItemState::SET)
-        nTicks = static_cast<const SfxInt32Item*>(pPoolItem)->GetValue();
-    if (rInAttrs->GetItemState(SCHATTR_AXIS_HELPTICKS,true, &pPoolItem)== SfxItemState::SET)
-        nMinorTicks = static_cast<const SfxInt32Item*>(pPoolItem)->GetValue();
+    if (const SfxInt32Item* pTicksItem = rInAttrs->GetItemIfSet(SCHATTR_AXIS_TICKS))
+        nTicks = pTicksItem->GetValue();
+    if (const SfxInt32Item* pHelpTicksItem = rInAttrs->GetItemIfSet(SCHATTR_AXIS_HELPTICKS))
+        nMinorTicks = pHelpTicksItem->GetValue();
 
     m_xCB_TicksInner->set_active(bool(nTicks&CHAXIS_MARK_INNER));
     m_xCB_TicksOuter->set_active(bool(nTicks&CHAXIS_MARK_OUTER));
@@ -222,9 +221,9 @@ void AxisPositionsTabPage::Reset(const SfxItemSet* rInAttrs)
     m_xCB_MinorOuter->set_active(bool(nMinorTicks&CHAXIS_MARK_OUTER));
 
     // Tick position
-    if( rInAttrs->GetItemState( SCHATTR_AXIS_MARK_POSITION, false, &pPoolItem ) == SfxItemState::SET )
+    if( const SfxInt32Item* pMarkPosItem = rInAttrs->GetItemIfSet( SCHATTR_AXIS_MARK_POSITION, false) )
     {
-        sal_Int32 nPos = static_cast< const SfxInt32Item * >( pPoolItem )->GetValue();
+        sal_Int32 nPos = pMarkPosItem->GetValue();
         if( nPos < m_xLB_PlaceTicks->get_count() )
             m_xLB_PlaceTicks->set_active( nPos );
     }
@@ -261,10 +260,9 @@ void AxisPositionsTabPage::SetNumFormatter( SvNumberFormatter* pFormatter )
     rCrossFormatter.SetFormatter(m_pNumFormatter);
     rCrossFormatter.UseInputStringForFormatting();
 
-    const SfxPoolItem *pPoolItem = nullptr;
-    if( GetItemSet().GetItemState( SCHATTR_AXIS_CROSSING_MAIN_AXIS_NUMBERFORMAT, true, &pPoolItem ) == SfxItemState::SET )
+    if( const SfxUInt32Item* pNumFormatItem = GetItemSet().GetItemIfSet(SCHATTR_AXIS_CROSSING_MAIN_AXIS_NUMBERFORMAT) )
     {
-        sal_uLong nFmt = static_cast<const SfxUInt32Item*>(pPoolItem)->GetValue();
+        sal_uLong nFmt = pNumFormatItem->GetValue();
         rCrossFormatter.SetFormatKey(nFmt);
     }
 }

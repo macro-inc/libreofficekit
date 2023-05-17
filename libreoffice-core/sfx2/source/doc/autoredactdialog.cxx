@@ -18,6 +18,7 @@
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <unotools/viewoptions.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 
@@ -29,8 +30,7 @@ int TargetsTable::GetRowByTargetName(std::u16string_view sName)
 {
     for (int i = 0, nCount = m_xControl->n_children(); i < nCount; ++i)
     {
-        RedactionTarget* pTarget
-            = reinterpret_cast<RedactionTarget*>(m_xControl->get_id(i).toInt64());
+        RedactionTarget* pTarget = weld::fromId<RedactionTarget*>(m_xControl->get_id(i));
         if (pTarget->sName == sName)
         {
             return i;
@@ -122,7 +122,7 @@ void TargetsTable::InsertTarget(RedactionTarget* pTarget)
 
     // Add to the end
     int nRow = m_xControl->n_children();
-    m_xControl->append(OUString::number(reinterpret_cast<sal_Int64>(pTarget)), pTarget->sName);
+    m_xControl->append(weld::toId(pTarget), pTarget->sName);
     m_xControl->set_text(nRow, getTypeName(pTarget->sType), 1);
     m_xControl->set_text(nRow, sContent, 2);
     m_xControl->set_text(
@@ -138,7 +138,7 @@ RedactionTarget* TargetsTable::GetTargetByName(std::u16string_view sName)
     if (nEntry == -1)
         return nullptr;
 
-    return reinterpret_cast<RedactionTarget*>(m_xControl->get_id(nEntry).toInt64());
+    return weld::fromId<RedactionTarget*>(m_xControl->get_id(nEntry));
 }
 
 OUString TargetsTable::GetNameProposal() const
@@ -147,13 +147,12 @@ OUString TargetsTable::GetNameProposal() const
     sal_Int32 nHighestTargetId = 0;
     for (int i = 0, nCount = m_xControl->n_children(); i < nCount; ++i)
     {
-        RedactionTarget* pTarget
-            = reinterpret_cast<RedactionTarget*>(m_xControl->get_id(i).toInt64());
+        RedactionTarget* pTarget = weld::fromId<RedactionTarget*>(m_xControl->get_id(i));
         const OUString& sName = pTarget->sName;
         sal_Int32 nIndex = 0;
-        if (sName.getToken(0, ' ', nIndex) == sDefaultTargetName)
+        if (o3tl::getToken(sName, 0, ' ', nIndex) == sDefaultTargetName)
         {
-            sal_Int32 nCurrTargetId = sName.getToken(0, ' ', nIndex).toInt32();
+            sal_Int32 nCurrTargetId = o3tl::toInt32(o3tl::getToken(sName, 0, ' ', nIndex));
             nHighestTargetId = std::max<sal_Int32>(nHighestTargetId, nCurrTargetId);
         }
     }
@@ -269,8 +268,7 @@ IMPL_LINK_NOARG(SfxAutoRedactDialog, EditHdl, weld::Button&, void)
     }
 
     // Get the redaction target to be edited
-    RedactionTarget* pTarget
-        = reinterpret_cast<RedactionTarget*>(m_xTargetsBox->get_id(nSelectedRow).toInt64());
+    RedactionTarget* pTarget = weld::fromId<RedactionTarget*>(m_xTargetsBox->get_id(nSelectedRow));
 
     // Construct and run the edit target dialog
     SfxAddTargetDialog aEditTargetDialog(getDialog(), pTarget->sName, pTarget->sType,
@@ -317,7 +315,12 @@ IMPL_LINK_NOARG(SfxAutoRedactDialog, EditHdl, weld::Button&, void)
     // And sync the targets box row with the actual target data
     m_xTargetsBox->setRowData(nSelectedRow, pTarget);
 }
-
+IMPL_LINK_NOARG(SfxAutoRedactDialog, DoubleClickEditHdl, weld::TreeView&, bool)
+{
+    if (m_xEditBtn->get_sensitive())
+        m_xEditBtn->clicked();
+    return true;
+}
 IMPL_LINK_NOARG(SfxAutoRedactDialog, DeleteHdl, weld::Button&, void)
 {
     std::vector<int> aSelectedRows = m_xTargetsBox->get_selected_rows();
@@ -522,7 +525,6 @@ SfxAutoRedactDialog::SfxAutoRedactDialog(weld::Window* pParent)
     : SfxDialogController(pParent, "sfx/ui/autoredactdialog.ui", "AutoRedactDialog")
     , m_bIsValidState(true)
     , m_bTargetsCopied(false)
-    , m_xRedactionTargetsLabel(m_xBuilder->weld_label("labelRedactionTargets"))
     , m_xTargetsBox(new TargetsTable(m_xBuilder->weld_tree_view("targets")))
     , m_xLoadBtn(m_xBuilder->weld_button("btnLoadTargets"))
     , m_xSaveBtn(m_xBuilder->weld_button("btnSaveTargets"))
@@ -576,6 +578,7 @@ SfxAutoRedactDialog::SfxAutoRedactDialog(weld::Window* pParent)
     m_xAddBtn->connect_clicked(LINK(this, SfxAutoRedactDialog, AddHdl));
     m_xEditBtn->connect_clicked(LINK(this, SfxAutoRedactDialog, EditHdl));
     m_xDeleteBtn->connect_clicked(LINK(this, SfxAutoRedactDialog, DeleteHdl));
+    m_xTargetsBox->connect_row_activated(LINK(this, SfxAutoRedactDialog, DoubleClickEditHdl));
 }
 
 SfxAutoRedactDialog::~SfxAutoRedactDialog()
@@ -611,7 +614,7 @@ SfxAutoRedactDialog::~SfxAutoRedactDialog()
         // Store the dialog data
         SvtViewOptions aDlgOpt(EViewType::Dialog,
                                OStringToOUString(m_xDialog->get_help_id(), RTL_TEXTENCODING_UTF8));
-        aDlgOpt.SetUserItem("UserItem", css::uno::makeAny(sUserDataStr));
+        aDlgOpt.SetUserItem("UserItem", css::uno::Any(sUserDataStr));
 
         if (!m_bTargetsCopied)
             clearTargets();
@@ -725,7 +728,7 @@ SfxAddTargetDialog::SfxAddTargetDialog(weld::Window* pParent, const OUString& sN
     if (eTargetType == RedactionTargetType::REDACTION_TARGET_PREDEFINED)
     {
         SelectTypeHdl(*m_xPredefContent);
-        m_xPredefContent->set_active(sContent.getToken(0, ';').toInt32());
+        m_xPredefContent->set_active(o3tl::toInt32(o3tl::getToken(sContent, 0, ';')));
     }
     else
     {

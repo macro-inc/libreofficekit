@@ -22,7 +22,10 @@
 
 #include <SelectionHelper.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
 #include <ThreeDHelper.hxx>
 #include <defines.hxx>
@@ -30,8 +33,6 @@
 
 #include <svx/scene3d.hxx>
 #include <basegfx/matrix/b3dhommatrix.hxx>
-#include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <svx/sdr/contact/viewcontactofe3dscene.hxx>
 #include <drawinglayer/geometry/viewinformation3d.hxx>
@@ -44,7 +45,7 @@ using ::com::sun::star::uno::Reference;
 
 DragMethod_RotateDiagram::DragMethod_RotateDiagram( DrawViewWrapper& rDrawViewWrapper
         , const OUString& rObjectCID
-        , const Reference< frame::XModel >& xChartModel
+        , const rtl::Reference<::chart::ChartModel>& xChartModel
         , RotationDirection eRotationDirection )
     : DragMethod_Base( rDrawViewWrapper, rObjectCID, xChartModel, ActionDescriptionProvider::ActionType::Rotate )
     , m_pScene(nullptr)
@@ -72,20 +73,19 @@ DragMethod_RotateDiagram::DragMethod_RotateDiagram( DrawViewWrapper& rDrawViewWr
 
     m_aWireframePolyPolygon = m_pScene->CreateWireframe();
 
-    uno::Reference< chart2::XDiagram > xDiagram( ChartModelHelper::findDiagram(getChartModel()) );
-    uno::Reference< beans::XPropertySet > xDiagramProperties( xDiagram, uno::UNO_QUERY );
-    if( !xDiagramProperties.is() )
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram(getChartModel());
+    if( !xDiagram.is() )
         return;
 
-    ThreeDHelper::getRotationFromDiagram( xDiagramProperties
+    ThreeDHelper::getRotationFromDiagram( xDiagram
         , m_nInitialHorizontalAngleDegree, m_nInitialVerticalAngleDegree );
 
-    ThreeDHelper::getRotationAngleFromDiagram( xDiagramProperties
+    ThreeDHelper::getRotationAngleFromDiagram( xDiagram
         , m_fInitialXAngleRad, m_fInitialYAngleRad, m_fInitialZAngleRad );
 
     if( ChartTypeHelper::isSupportingRightAngledAxes(
         DiagramHelper::getChartTypeByIndex( xDiagram, 0 ) ) )
-        xDiagramProperties->getPropertyValue("RightAngledAxes") >>= m_bRightAngledAxes;
+        xDiagram->getPropertyValue("RightAngledAxes") >>= m_bRightAngledAxes;
     if(m_bRightAngledAxes)
     {
         if( m_eRotationDirection==ROTATIONDIRECTION_Z )
@@ -160,12 +160,12 @@ bool DragMethod_RotateDiagram::EndSdrDrag(bool /*bCopy*/)
         if(m_bRightAngledAxes)
             ThreeDHelper::adaptRadAnglesForRightAngledAxes( fResultX, fResultY );
 
-        ThreeDHelper::setRotationAngleToDiagram( uno::Reference< beans::XPropertySet >( ChartModelHelper::findDiagram( getChartModel() ), uno::UNO_QUERY )
+        ThreeDHelper::setRotationAngleToDiagram( ChartModelHelper::findDiagram( getChartModel() )
             , fResultX, fResultY, fResultZ );
     }
     else
     {
-        ThreeDHelper::setRotationToDiagram( ( uno::Reference< beans::XPropertySet >( ChartModelHelper::findDiagram( getChartModel() ), uno::UNO_QUERY ) )
+        ThreeDHelper::setRotationToDiagram( ChartModelHelper::findDiagram( getChartModel() )
             , m_nInitialHorizontalAngleDegree+m_nAdditionalHorizontalAngleDegree, m_nInitialVerticalAngleDegree+m_nAdditionalVerticalAngleDegree );
     }
 
@@ -216,7 +216,7 @@ void DragMethod_RotateDiagram::CreateOverlayGeometry(
 
     std::unique_ptr<sdr::overlay::OverlayPolyPolygonStripedAndFilled> pNew(
         new sdr::overlay::OverlayPolyPolygonStripedAndFilled(
-            aPolyPolygon));
+            std::move(aPolyPolygon)));
 
     insertNewlyCreatedOverlayObjectForSdrDragMethod(
         std::move(pNew),

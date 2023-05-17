@@ -24,15 +24,15 @@
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <cppuhelper/implbase2.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <comphelper/sequence.hxx>
 #include <com/sun/star/xml/sax/XParser.hpp>
 #include <com/sun/star/xml/sax/Parser.hpp>
 #include <com/sun/star/xml/sax/InputSource.hpp>
 #include <svgdocumenthandler.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ref.hxx>
 
 #include <svgvisitor.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -50,7 +50,7 @@ namespace svgio::svgreader
                              uno::Reference<xml::sax::XDocumentHandler> const & xSvgDocHdl);
         public:
             explicit XSvgParser(
-                uno::Reference< uno::XComponentContext > const & context);
+                uno::Reference< uno::XComponentContext > context);
             XSvgParser(const XSvgParser&) = delete;
             XSvgParser& operator=(const XSvgParser&) = delete;
 
@@ -72,8 +72,8 @@ namespace svgio::svgreader
         }
 
         XSvgParser::XSvgParser(
-            uno::Reference< uno::XComponentContext > const & context):
-            context_(context)
+            uno::Reference< uno::XComponentContext > context):
+            context_(std::move(context))
         {
         }
 
@@ -141,7 +141,7 @@ namespace svgio::svgreader
                 OSL_ENSURE(false, "Invalid stream (!)");
             }
 
-            return comphelper::containerToSequence(aRetval);
+            return aRetval.toSequence();
         }
 
         uno::Any SAL_CALL XSvgParser::getDrawCommands(

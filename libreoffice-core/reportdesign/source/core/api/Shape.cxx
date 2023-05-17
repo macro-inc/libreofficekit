@@ -19,8 +19,8 @@
 #include <Shape.hxx>
 
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
-#include <svx/unoshape.hxx>
+#include <svx/svdobj.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <strings.hxx>
 #include <strings.hrc>
@@ -28,6 +28,7 @@
 #include <Tools.hxx>
 #include <FormatCondition.hxx>
 #include <ReportHelperImpl.hxx>
+#include <utility>
 
 namespace reportdesign
 {
@@ -58,13 +59,13 @@ OShape::OShape(uno::Reference< uno::XComponentContext > const & _xContext)
 OShape::OShape(uno::Reference< uno::XComponentContext > const & _xContext
                ,const uno::Reference< lang::XMultiServiceFactory>& _xFactory
                ,uno::Reference< drawing::XShape >& _xShape
-               ,const OUString& _sServiceName)
+               ,OUString _sServiceName)
 :ShapeBase(m_aMutex)
 ,ShapePropertySet(_xContext,IMPLEMENTS_PROPERTY_SET,lcl_getShapeOptionals())
 ,m_aProps(m_aMutex,static_cast< container::XContainer*>( this ),_xContext)
 ,m_nZOrder(0)
 ,m_bOpaque(false)
-,m_sServiceName(_sServiceName)
+,m_sServiceName(std::move(_sServiceName))
 {
     m_aProps.aComponent.m_sName  = RptResId(RID_STR_SHAPE);
     m_aProps.aComponent.m_xFactory = _xFactory;
@@ -297,7 +298,7 @@ uno::Reference< util::XCloneable > SAL_CALL OShape::createClone(  )
         SdrObject* pObject = SdrObject::getSdrObjectFromXShape( xSource );
         if ( pObject )
         {
-            SdrObject* pClone(pObject->CloneSdrObject(pObject->getSdrModelFromSdrObject()));
+            rtl::Reference<SdrObject> pClone(pObject->CloneSdrObject(pObject->getSdrModelFromSdrObject()));
             if ( pClone )
             {
                 xSet.set(pClone->getUnoShape(),uno::UNO_QUERY_THROW );
@@ -418,7 +419,7 @@ OUString SAL_CALL OShape::getShapeType(  )
 void SAL_CALL OShape::setZOrder( ::sal_Int32 _zorder )
 {
     ::osl::MutexGuard aGuard(m_aMutex);
-    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_ZORDER,uno::makeAny(_zorder));
+    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_ZORDER,uno::Any(_zorder));
     set(PROPERTY_ZORDER,_zorder,m_nZOrder);
 }
 
@@ -443,7 +444,7 @@ drawing::HomogenMatrix3 SAL_CALL OShape::getTransformation()
 
 void SAL_CALL OShape::setTransformation( const drawing::HomogenMatrix3& _transformation )
 {
-    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_TRANSFORMATION,uno::makeAny(_transformation));
+    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_TRANSFORMATION,uno::Any(_transformation));
     set(PROPERTY_TRANSFORMATION,_transformation,m_Transformation);
 }
 
@@ -457,7 +458,7 @@ OUString SAL_CALL OShape::getCustomShapeEngine()
 
 void SAL_CALL OShape::setCustomShapeEngine( const OUString& _customshapeengine )
 {
-    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_CUSTOMSHAPEENGINE,uno::makeAny(_customshapeengine));
+    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_CUSTOMSHAPEENGINE,uno::Any(_customshapeengine));
     set(PROPERTY_CUSTOMSHAPEENGINE,_customshapeengine,m_CustomShapeEngine);
 }
 
@@ -470,7 +471,7 @@ OUString SAL_CALL OShape::getCustomShapeData()
 
 void SAL_CALL OShape::setCustomShapeData( const OUString& _customshapedata )
 {
-    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_CUSTOMSHAPEDATA,uno::makeAny(_customshapedata));
+    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_CUSTOMSHAPEDATA,uno::Any(_customshapedata));
     set(PROPERTY_CUSTOMSHAPEDATA,_customshapedata,m_CustomShapeData);
 }
 
@@ -483,7 +484,7 @@ uno::Sequence< beans::PropertyValue > SAL_CALL OShape::getCustomShapeGeometry()
 
 void SAL_CALL OShape::setCustomShapeGeometry( const uno::Sequence< beans::PropertyValue >& _customshapegeometry )
 {
-    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_CUSTOMSHAPEGEOMETRY,uno::makeAny(_customshapegeometry));
+    m_aProps.aComponent.m_xProperty->setPropertyValue(PROPERTY_CUSTOMSHAPEGEOMETRY,uno::Any(_customshapegeometry));
     set(PROPERTY_CUSTOMSHAPEGEOMETRY,_customshapegeometry,m_CustomShapeGeometry);
 }
 

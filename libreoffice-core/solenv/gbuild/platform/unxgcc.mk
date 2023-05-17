@@ -39,13 +39,16 @@ gb_OSDEFS := \
 gb_CFLAGS := \
 	$(gb_CFLAGS_COMMON) \
 	-fPIC \
-	-Wdeclaration-after-statement \
 	-Wshadow \
 
 # At least libstdc++ needs -pthread when including various C++ headers like <thread>, see
 # <https://gcc.gnu.org/onlinedocs/gcc-8.3.0/libstdc++/manual/manual/using.html
 # #manual.intro.using.flags>:
 ifneq ($(HAVE_LIBSTDCPP),)
+gb_CXX_LINKFLAGS := -pthread
+endif
+# libc++ needs it too
+ifneq ($(HAVE_LIBCPP),)
 gb_CXX_LINKFLAGS := -pthread
 endif
 
@@ -65,9 +68,12 @@ gb_LinkTarget_LDFLAGS += \
 	-Wl,--sysroot=$(SYSBASE)
 endif
 
+ifeq (,$(DISABLE_DYNLOADING))
 gb_LinkTarget_LDFLAGS += \
 	-Wl,-rpath-link,$(SYSBASE)/lib:$(SYSBASE)/usr/lib \
 	-Wl,-z,combreloc \
+
+endif
 
 ifeq ($(HAVE_LD_HASH_STYLE),TRUE)
 gb_LinkTarget_LDFLAGS += \
@@ -99,6 +105,22 @@ gb_LinkTarget__RPATHS := \
 gb_LinkTarget_CFLAGS := $(gb_CFLAGS)
 gb_LinkTarget_CXXFLAGS := $(gb_CXXFLAGS)
 
+gb_LinkTarget__cmd_lockfile = $(if $(LOCKFILE),$(LOCKFILE),$(call gb_Executable_get_command,lockfile))
+gb_LinkTarget__Lock := $(WORKDIR)/LinkTarget/link.lock
+
+# No newline or space before endef!
+define gb_LinkTarget__WantLock
+$(if $(strip $(and \
+    $(call gb_CondExeLockfile,$(true)), \
+    $(filter-out Executable/lockfile,$(1)), \
+    $(if $(filter FUZZERS,$(BUILD_TYPE)),,$(DISABLE_DYNLOADING)), \
+    $(filter CppunitTest Executable,$(TARGETTYPE)) \
+    )),$(true))
+endef
+
+# In theory would need to track, if any of the linked objects is C++ code, so for the static build we assume yes :-(
+gb_LinkTarget__NeedsCxxLinker = $(if $(CXXOBJECTS)$(GENCXXOBJECTS)$(EXTRAOBJECTLISTS)$(filter-out XTRUE,X$(ENABLE_RUNTIME_OPTIMIZATIONS)$(DISABLE_DYNLOADING)),$(true))
+
 # note that `cat $(extraobjectlist)` is needed to build with older gcc versions, e.g. 4.1.2 on SLED10
 # we want to use @$(extraobjectlist) in the long run
 # link with C compiler if there are no C++ files (pyuno_wrapper depends on this)
@@ -107,14 +129,20 @@ gb_LinkTarget_CXXFLAGS := $(gb_CXXFLAGS)
 # libclang_rt.ubsan_cxx-x86_64.a, and oosplash links against sal but itself only
 # contains .c sources:
 define gb_LinkTarget__command_dynamiclink
+$(if $(call gb_LinkTarget__WantLock,$2), \
+   echo "$(call gb_Output_announce_str,$(2): wait for lock at $$(date -u),$(true),LNK,5)" ; \
+   $(gb_LinkTarget__cmd_lockfile) -r -1 $(gb_LinkTarget__Lock) ;  \
+   echo "$(call gb_Output_announce_str,$(2): got link lock at $$(date -u),$(true),LNK,5)" ; \
+)
+	+$(if $(filter EMSCRIPTEN,$(OS)),unset PYTHONWARNINGS ;) \
 $(call gb_Helper_abbreviate_dirs,\
-	$(if $(CXXOBJECTS)$(GENCXXOBJECTS)$(EXTRAOBJECTLISTS)$(filter-out XTRUE,X$(ENABLE_RUNTIME_OPTIMIZATIONS)),$(or $(T_CXX),$(gb_CXX)) $(gb_CXX_LINKFLAGS),$(or $(T_CC),$(gb_CC))) \
+	$(if $(call gb_LinkTarget__NeedsCxxLinker),$(or $(T_CXX),$(gb_CXX)) $(gb_CXX_LINKFLAGS),$(or $(T_CC),$(gb_CC))) \
 		$(if $(filter Library CppunitTest,$(TARGETTYPE)),$(gb_Library_TARGETTYPEFLAGS)) \
 		$(T_LTOFLAGS) \
 		$(if $(SOVERSIONSCRIPT),-Wl$(COMMA)--soname=$(notdir $(1)) \
 			-Wl$(COMMA)--version-script=$(SOVERSIONSCRIPT)) \
 		$(subst \d,$$,$(RPATH)) \
-		$(T_USE_LD) $(T_LDFLAGS) \
+		$(T_USE_LD) $(T_LDFLAGS) $(foreach pre_js,$(T_PREJS), --pre-js $(pre_js)) \
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_target,$(object))) \
 		$(foreach object,$(CXXOBJECTS),$(call gb_CxxObject_get_target,$(object))) \
 		$(foreach object,$(ASMOBJECTS),$(call gb_AsmObject_get_target,$(object))) \
@@ -124,36 +152,46 @@ $(call gb_Helper_abbreviate_dirs,\
 		$(foreach extraobjectlist,$(EXTRAOBJECTLISTS),`cat $(extraobjectlist)`) \
 		$(if $(filter TRUE,$(DISABLE_DYNLOADING)), \
 		    -Wl$(COMMA)--start-group \
-		    -Wl$(COMMA)-Bstatic \
-		    $(patsubst lib%.a,-l%,$(patsubst lib%.so,-l%,$(patsubst %.$(gb_Library_UDK_MAJORVER),%,$(foreach lib,$(LINKED_LIBS),$(call gb_Library_get_filename,$(lib)))))) \
-		    $(foreach lib,$(LINKED_STATIC_LIBS),$(call gb_StaticLibrary_get_target,$(lib))) \
-		    $(T_LIBS) \
-		    -Wl$(COMMA)-Bdynamic \
-		    $(if $(CXXOBJECTS)$(GENCXXOBJECTS)$(EXTRAOBJECTLISTS)$(filter-out XTRUE,X$(ENABLE_RUNTIME_OPTIMIZATIONS)),$(T_STDLIBS_CXX)) \
+			$(shell echo -n \
+				$(patsubst lib%.a,-l%,$(patsubst lib%.so,-l%,$(patsubst %.$(gb_Library_UDK_MAJORVER),%,$(foreach lib,$(LINKED_LIBS),$(call gb_Library_get_filename,$(lib)))))) \
+				$(foreach lib,$(LINKED_STATIC_LIBS),$(call gb_StaticLibrary_get_target,$(lib))) \
+				$(patsubst $(gb_LinkTarget__syslib),%,$(T_LIBS)) \
+				$(if $(call gb_LinkTarget__NeedsCxxLinker),$(T_STDLIBS_CXX)) \
+				| tee $@.linkdeps) \
 		    -Wl$(COMMA)--end-group \
-		    , \
+		, \
 		    -Wl$(COMMA)--start-group \
 		    $(foreach lib,$(LINKED_STATIC_LIBS),$(call gb_StaticLibrary_get_target,$(lib))) \
 		    $(T_LIBS) \
-		    $(if $(CXXOBJECTS)$(GENCXXOBJECTS)$(EXTRAOBJECTLISTS)$(filter-out XTRUE,X$(ENABLE_RUNTIME_OPTIMIZATIONS)),$(T_STDLIBS_CXX)) \
+		    $(if $(call gb_LinkTarget__NeedsCxxLinker),$(T_STDLIBS_CXX)) \
 		    -Wl$(COMMA)--end-group \
 		    -Wl$(COMMA)--no-as-needed \
 		    $(patsubst lib%.a,-l%,$(patsubst lib%.so,-l%,$(patsubst %.$(gb_Library_UDK_MAJORVER),%,$(foreach lib,$(LINKED_LIBS),$(call gb_Library_get_filename,$(lib)))))) \
                 ) \
 		-o $(1) \
-	$(if $(SOVERSIONSCRIPT),&& ln -sf ../../program/$(notdir $(1)) $(ILIBTARGET)))
-	$(if $(filter Library,$(TARGETTYPE)), $(call gb_Helper_abbreviate_dirs,\
-		$(READELF) -d $(1) | grep SONAME > $(WORKDIR)/LinkTarget/$(2).exports.tmp; \
-		$(NM) $(gb_LTOPLUGINFLAGS) --dynamic --extern-only --defined-only --format=posix $(1) \
-			| cut -d' ' -f1-2 \
-			>> $(WORKDIR)/LinkTarget/$(2).exports.tmp && \
-		$(call gb_Helper_replace_if_different_and_touch,$(WORKDIR)/LinkTarget/$(2).exports.tmp, \
-			$(WORKDIR)/LinkTarget/$(2).exports,$(1))))
+	$(if $(SOVERSIONSCRIPT),&& ln -sf ../../program/$(notdir $(1)) $(ILIBTARGET)) \
+	$(if $(call gb_LinkTarget__WantLock,$(2)),; RC=$$? ; rm -f $(gb_LinkTarget__Lock); if test $$RC -ne 0; then exit $$RC; fi))
+
+$(if $(filter Library,$(TARGETTYPE)), $(call gb_Helper_abbreviate_dirs,\
+    $(READELF) -d $(1) | grep SONAME > $(WORKDIR)/LinkTarget/$(2).exports.tmp; \
+    $(NM) $(gb_LTOPLUGINFLAGS) --dynamic --extern-only --defined-only --format=posix $(1) \
+        | cut -d' ' -f1-2 >> $(WORKDIR)/LinkTarget/$(2).exports.tmp && \
+    $(call gb_Helper_replace_if_different_and_touch,$(WORKDIR)/LinkTarget/$(2).exports.tmp, \
+        $(WORKDIR)/LinkTarget/$(2).exports,$(1))))
+$(if $(and $(filter CppunitTest Executable,$(TARGETTYPE)),$(filter EMSCRIPTEN,$(OS))), \
+$(if $(filter TRUE,$(ENABLE_QT5)), \
+    sed -e 's/@APPNAME@/$(subst $(gb_Executable_EXT),,$(notdir $(1)))/' $(QT5_PLATFORMS_SRCDIR)/wasm_shell.html > $(dir $(1))qt_$(notdir $(1)); \
+    cp $(QT5_PLATFORMS_SRCDIR)/qtlogo.svg $(QT5_PLATFORMS_SRCDIR)/qtloader.js $(dir $(1)) ; \
+) \
+    cp $(call gb_CustomTarget_get_workdir,static/emscripten_fs_image)/soffice.data $(dir $(1))/soffice.data ; \
+    cp $(call gb_CustomTarget_get_workdir,static/emscripten_fs_image)/soffice.data.js.metadata $(dir $(1))/soffice.data.js.metadata \
+)
 endef
 
 define gb_LinkTarget__command_staticlink
 $(call gb_Helper_abbreviate_dirs,\
 	rm -f $(1) && \
+	$(if $(filter EMSCRIPTEN,$(OS)),unset PYTHONWARNINGS ;) \
 	$(gb_AR) $(gb_LTOPLUGINFLAGS) -rsu $(1) \
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_target,$(object))) \
 		$(foreach object,$(CXXOBJECTS),$(call gb_CxxObject_get_target,$(object))) \
@@ -385,7 +423,7 @@ endef
 gb_UIMenubarTarget_UIMenubarTarget_platform :=
 
 # Python
-gb_Python_PRECOMMAND := $(gb_Helper_set_ld_path) PYTHONHOME="$(INSTDIR)/program/python-core-$(PYTHON_VERSION)" PYTHONPATH="$${PYPATH:+$$PYPATH:}$(INSTDIR)/program/python-core-$(PYTHON_VERSION)/lib:$(INSTDIR)/program/python-core-$(PYTHON_VERSION)/lib/lib-dynload"
+gb_Python_PRECOMMAND := PYTHONHOME="$(INSTDIR)/program/python-core-$(PYTHON_VERSION)" PYTHONPATH="$${PYPATH:+$$PYPATH:}$(INSTDIR)/program/python-core-$(PYTHON_VERSION)/lib:$(INSTDIR)/program/python-core-$(PYTHON_VERSION)/lib/lib-dynload"
 gb_Python_INSTALLED_EXECUTABLE := /bin/sh $(INSTROOT)/program/python
 # this is passed to gdb as executable when running tests
 gb_Python_INSTALLED_EXECUTABLE_GDB := $(INSTROOT)/program/python.bin

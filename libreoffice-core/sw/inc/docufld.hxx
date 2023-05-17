@@ -313,15 +313,15 @@ class SW_DLLPUBLIC SwHiddenTextField final : public SwField
 public:
     SwHiddenTextField( SwHiddenTextFieldType*,
                      bool   bConditional,
-                     const OUString& rCond,
+                     OUString aCond,
                      const OUString& rText,
                      bool   bHidden,
                      SwFieldTypesEnum nSubType = SwFieldTypesEnum::HiddenText);
 
     SwHiddenTextField( SwHiddenTextFieldType*,
-                      const OUString& rCond,
-                      const OUString& rTrue,
-                      const OUString& rFalse,
+                      OUString aCond,
+                      OUString aTrue,
+                      OUString aFalse,
                       SwFieldTypesEnum nSubType = SwFieldTypesEnum::HiddenText);
 
     virtual OUString    GetFieldName() const override;
@@ -330,7 +330,7 @@ public:
 
     void         SetValue(bool bHidden)  { m_bIsHidden = bHidden; }
     static OUString     GetColumnName(const OUString& rName);
-    static OUString     GetDBName(const OUString& rName, SwDoc& rDoc);
+    static OUString     GetDBName(std::u16string_view rName, SwDoc& rDoc);
 
     /// Condition
     virtual void        SetPar1(const OUString& rStr) override;
@@ -345,7 +345,7 @@ public:
     virtual bool        QueryValue( css::uno::Any& rVal, sal_uInt16 nWhich ) const override;
     virtual bool        PutValue( const css::uno::Any& rVal, sal_uInt16 nWhich ) override;
 
-    static void         ParseIfFieldDefinition(const OUString& aFieldDefinition,
+    static void         ParseIfFieldDefinition(std::u16string_view aFieldDefinition,
                                                OUString& rCondition,
                                                OUString& rTrue,
                                                OUString& rFalse);
@@ -367,7 +367,7 @@ class SwHiddenParaField final : public SwField
     bool m_bIsHidden;
 public:
     /// Direct input, delete old value.
-    SwHiddenParaField(SwHiddenParaFieldType*, const OUString& rCond);
+    SwHiddenParaField(SwHiddenParaFieldType*, OUString aCond);
 
     virtual OUString    ExpandImpl(SwRootFrame const* pLayout) const override;
     virtual std::unique_ptr<SwField> Copy() const override;
@@ -403,8 +403,8 @@ class SW_DLLPUBLIC SwMacroField final : public SwField
 
 public:
     /// Direct input, delete old value.
-    SwMacroField( SwMacroFieldType*, const OUString& rLibAndName,
-                  const OUString& rText);
+    SwMacroField( SwMacroFieldType*, OUString aLibAndName,
+                  OUString aText);
 
     const OUString&  GetMacro() const { return m_aMacro; }
     OUString         GetLibName() const;
@@ -456,18 +456,22 @@ class SW_DLLPUBLIC SwPostItField final : public SwField
     std::optional<OutlinerParaObject> mpText;
     rtl::Reference<SwTextAPIObject> m_xTextObject;
     sal_uInt32 m_nPostItId;
+    sal_uInt32 m_nParentId;
+    sal_uInt32 m_nParaId;
 
 public:
     static sal_uInt32 s_nLastPostItId;
 
     SwPostItField( SwPostItFieldType*,
-                   const OUString& rAuthor,
-                   const OUString& rText,
-                   const OUString& rInitials,
-                   const OUString& rName,
+                   OUString aAuthor,
+                   OUString aText,
+                   OUString aInitials,
+                   OUString aName,
                    const DateTime& rDate,
                    const bool bResolved = false,
-                   const sal_uInt32 nPostItId = 0);
+                   const sal_uInt32 nPostItId = 0,
+                   const sal_uInt32 nParentId = 0,
+                   const sal_uInt32 nParaId = 0);
 
     SwPostItField(const SwPostItField&) = delete;
     SwPostItField* operator=(const SwPostItField&) = delete;
@@ -482,6 +486,10 @@ public:
     tools::Time GetTime() const                 { return tools::Time(m_aDateTime.GetTime()); }
     sal_uInt32 GetPostItId() const             { return m_nPostItId; }
     void SetPostItId(const sal_uInt32 nPostItId = 0);
+    sal_uInt32 GetParentId() const             { return m_nParentId; }
+    void SetParentId(const sal_uInt32 nParentId);
+    sal_uInt32 GetParaId() const               { return m_nParaId; }
+    void SetParaId(const sal_uInt32 nParaId);
 
     /// Author
     virtual OUString        GetPar1() const override;
@@ -667,7 +675,7 @@ class SwJumpEditField final : public SwField
     OUString m_sHelp;
 public:
     SwJumpEditField( SwJumpEditFieldType*, sal_uInt32 nFormat,
-                     const OUString& sText, const OUString& sHelp );
+                     OUString sText, OUString sHelp );
 
     virtual OUString    ExpandImpl(SwRootFrame const* pLayout) const override;
     virtual std::unique_ptr<SwField> Copy() const override;
@@ -704,8 +712,8 @@ class SW_DLLPUBLIC SwScriptField final : public SwField
     bool    m_bCodeURL; ///< Code contains URL of a script.
 
 public:
-    SwScriptField( SwScriptFieldType*, const OUString& rType,
-                   const OUString& rCode, bool bURL );
+    SwScriptField( SwScriptFieldType*, OUString aType,
+                   OUString aCode, bool bURL );
 
     virtual OUString        GetDescription() const override;
 

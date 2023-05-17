@@ -192,12 +192,28 @@ static RTFValue::Pointer_t getDefaultSPRM(Id const id, Id nStyleType)
             case NS_ooxml::LN_CT_Ind_right:
             case NS_ooxml::LN_CT_Ind_firstLine:
                 return new RTFValue(0);
-
             case NS_ooxml::LN_CT_Spacing_lineRule:
                 return new RTFValue(NS_ooxml::LN_Value_doc_ST_LineSpacingRule_auto);
             case NS_ooxml::LN_CT_Spacing_line:
                 // presumably this means 100%, cf. static const int nSingleLineSpacing = 240;
                 return new RTFValue(240);
+            case NS_ooxml::LN_CT_NumPr_numId:
+                return new RTFValue(0);
+            case NS_ooxml::LN_CT_PrBase_pBdr:
+            { // tdf#150382 default all paragraph borders to none
+                RTFSprms attributes;
+                RTFSprms sprms;
+                for (int i = 0; i < 4; ++i)
+                {
+                    auto const nBorder = getParagraphBorder(i);
+                    RTFSprms aAttributes;
+                    RTFSprms aSprms;
+                    aAttributes.set(NS_ooxml::LN_CT_Border_val,
+                                    new RTFValue(NS_ooxml::LN_Value_ST_Border_none));
+                    sprms.set(nBorder, new RTFValue(aAttributes, aSprms));
+                }
+                return new RTFValue(attributes, sprms);
+            }
 
             default:
                 break;

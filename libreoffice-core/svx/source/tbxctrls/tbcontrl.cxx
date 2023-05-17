@@ -26,6 +26,7 @@
 #include <svl/numformat.hxx>
 #include <svl/poolitem.hxx>
 #include <svl/itemset.hxx>
+#include <svl/itempool.hxx>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/event.hxx>
 #include <vcl/toolbox.hxx>
@@ -103,6 +104,8 @@
 #include <comphelper/lok.hxx>
 #include <tools/json_writer.hxx>
 
+#include <editeng/editeng.hxx>
+
 #define MAX_MRU_FONTNAME_ENTRIES    5
 
 #define COMBO_WIDTH_IN_CHARS        18
@@ -117,13 +120,26 @@ using namespace ::com::sun::star::lang;
 
 namespace
 {
+struct ScriptInfo
+{
+    tools::Long textWidth;
+    SvtScriptType scriptType;
+    sal_Int32 changePos;
+    ScriptInfo(SvtScriptType scrptType, sal_Int32 position)
+        : textWidth(0)
+        , scriptType(scrptType)
+        , changePos(position)
+    {
+    }
+};
+
 class SvxStyleBox_Base
 {
 public:
-    SvxStyleBox_Base(std::unique_ptr<weld::ComboBox> xWidget, const OUString& rCommand, SfxStyleFamily eFamily,
+    SvxStyleBox_Base(std::unique_ptr<weld::ComboBox> xWidget, OUString  rCommand, SfxStyleFamily eFamily,
                      const Reference<XDispatchProvider>& rDispatchProvider,
-                     const Reference<XFrame>& _xFrame,const OUString& rClearFormatKey,
-                     const OUString& rMoreKey, bool bInSpecialMode, SvxStyleToolBoxControl& rCtrl);
+                     const Reference<XFrame>& _xFrame, OUString aClearFormatKey,
+                     OUString aMoreKey, bool bInSpecialMode, SvxStyleToolBoxControl& rCtrl);
 
     virtual ~SvxStyleBox_Base()
     {
@@ -186,6 +202,10 @@ public:
     virtual bool DoKeyInput(const KeyEvent& rKEvt);
 
 private:
+    std::optional<SvxFont> m_oFont;
+    std::optional<SvxFont> m_oCJKFont;
+    std::optional<SvxFont> m_oCTLFont;
+
     DECL_LINK(SelectHdl, weld::ComboBox&, void);
     DECL_LINK(KeyInputHdl, const KeyEvent&, bool);
     DECL_LINK(ActivateHdl, weld::ComboBox&, bool);
@@ -198,6 +218,8 @@ private:
     void CalcOptimalExtraUserWidth(vcl::RenderContext& rRenderContext);
 
     void Select(bool bNonTravelSelect);
+
+    tools::Rectangle CalcBoundRect(vcl::RenderContext& rRenderContext, const OUString &rStyleName, std::vector<ScriptInfo>& rScriptChanges, double fRatio = 1);
 
 protected:
     SvxStyleToolBoxControl& m_rCtrl;
@@ -220,9 +242,8 @@ protected:
 
     void            ReleaseFocus();
     static Color    TestColorsVisible(const Color &FontCol, const Color &BackCol);
-    static void     UserDrawEntry(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect, const OUString &rStyleName);
+    void            UserDrawEntry(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect, const tools::Rectangle& rTextRect, const OUString &rStyleName, const std::vector<ScriptInfo>& rScriptChanges);
     void            SetupEntry(vcl::RenderContext& rRenderContext, sal_Int32 nItem, const tools::Rectangle& rRect, std::u16string_view rStyleName, bool bIsNotSelected);
-    static bool     AdjustFontForItemHeight(OutputDevice& rDevice, tools::Rectangle const & rTextRect, tools::Long nHeight);
     DECL_LINK(MenuSelectHdl, const OString&, void);
     DECL_STATIC_LINK(SvxStyleBox_Base, ShowMoreHdl, void*, void);
 };
@@ -329,6 +350,8 @@ protected:
                                          ".uno:CharEndPreviewFontName",
                                          aArgs );
     }
+
+    bool            CheckFontIsAvailable(std::u16string_view fontname);
     void            CheckAndMarkUnknownFont();
 
 public:
@@ -457,6 +480,7 @@ private:
     std::unique_ptr<weld::CustomWeld> mxFrameSetWin;
     std::vector<std::pair<BitmapEx, OUString>> aImgVec;
     bool                        bParagraphMode;
+    bool                        m_bIsWriter;
 
     void InitImageList();
     void CalcSizeValueSet();
@@ -835,12 +859,12 @@ class SfxStyleControllerItem_Impl : public SfxStatusListener
 #define ITEM_HEIGHT 30
 
 SvxStyleBox_Base::SvxStyleBox_Base(std::unique_ptr<weld::ComboBox> xWidget,
-                                   const OUString& rCommand,
+                                   OUString aCommand,
                                    SfxStyleFamily eFamily,
                                    const Reference< XDispatchProvider >& rDispatchProvider,
                                    const Reference< XFrame >& _xFrame,
-                                   const OUString& rClearFormatKey,
-                                   const OUString& rMoreKey,
+                                   OUString _aClearFormatKey,
+                                   OUString _aMoreKey,
                                    bool bInSpec, SvxStyleToolBoxControl& rCtrl)
     : m_rCtrl(rCtrl)
     , m_xMenuBuilder(Application::CreateBuilder(nullptr, "svx/ui/stylemenu.ui"))
@@ -852,9 +876,9 @@ SvxStyleBox_Base::SvxStyleBox_Base(std::unique_ptr<weld::ComboBox> xWidget,
     , bRelease( true )
     , m_xDispatchProvider( rDispatchProvider )
     , m_xFrame(_xFrame)
-    , m_aCommand( rCommand )
-    , aClearFormatKey( rClearFormatKey )
-    , aMoreKey( rMoreKey )
+    , m_aCommand(std::move( aCommand ))
+    , aClearFormatKey(std::move( _aClearFormatKey ))
+    , aMoreKey(std::move( _aMoreKey ))
     , bInSpecialMode( bInSpec )
 {
     m_xWidget->connect_changed(LINK(this, SvxStyleBox_Base, SelectHdl));
@@ -1087,23 +1111,6 @@ void SvxStyleBox_Impl::DataChanged( const DataChangedEvent& rDCEvt )
     InterimItemWindow::DataChanged( rDCEvt );
 }
 
-bool SvxStyleBox_Base::AdjustFontForItemHeight(OutputDevice& rDevice, tools::Rectangle const & rTextRect, tools::Long nHeight)
-{
-    if (rTextRect.Bottom() > nHeight)
-    {
-        // the text does not fit, adjust the font size
-        double ratio = static_cast< double >( nHeight ) / rTextRect.Bottom();
-        vcl::Font aFont(rDevice.GetFont());
-        Size aPixelSize(aFont.GetFontSize());
-        aPixelSize.setWidth( aPixelSize.Width() * ratio );
-        aPixelSize.setHeight( aPixelSize.Height() * ratio );
-        aFont.SetFontSize(aPixelSize);
-        rDevice.SetFont(aFont);
-        return true;
-    }
-    return false;
-}
-
 void SvxStyleBox_Impl::SetOptimalSize()
 {
     // set width in chars low so the size request will not be overridden
@@ -1115,23 +1122,223 @@ void SvxStyleBox_Impl::SetOptimalSize()
     SetSizePixel(get_preferred_size());
 }
 
-void SvxStyleBox_Base::UserDrawEntry(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect, const OUString &rStyleName)
+namespace
+{
+std::vector<ScriptInfo> CheckScript(const OUString &rStyleName)
+{
+    assert(!rStyleName.isEmpty()); // must have a preview text here!
+
+    std::vector<ScriptInfo> aScriptChanges;
+
+    auto aEditEngine = EditEngine(nullptr);
+    aEditEngine.SetText(rStyleName);
+
+    auto aScript = aEditEngine.GetScriptType({ 0, 0, 0, 0 });
+    for (sal_Int32 i = 1; i <= rStyleName.getLength(); i++)
+    {
+        auto aNextScript = aEditEngine.GetScriptType({ 0, i, 0, i });
+        if (aNextScript != aScript || i == rStyleName.getLength())
+            aScriptChanges.emplace_back(aScript, i);
+        aScript = aNextScript;
+    }
+
+    return aScriptChanges;
+}
+}
+
+tools::Rectangle SvxStyleBox_Base::CalcBoundRect(vcl::RenderContext& rRenderContext, const OUString &rStyleName, std::vector<ScriptInfo>& rScriptChanges, double fRatio)
+{
+    tools::Rectangle aTextRect;
+
+    SvtScriptType aScript;
+    sal_uInt16 nIdx = 0;
+    sal_Int32 nStart = 0;
+    sal_Int32 nEnd;
+    size_t nCnt = rScriptChanges.size();
+
+    if (nCnt)
+    {
+        nEnd = rScriptChanges[nIdx].changePos;
+        aScript = rScriptChanges[nIdx].scriptType;
+    }
+    else
+    {
+        nEnd = rStyleName.getLength();
+        aScript = SvtScriptType::LATIN;
+    }
+
+    do
+    {
+        auto oFont = (aScript == SvtScriptType::ASIAN) ?
+                         m_oCJKFont :
+                         ((aScript == SvtScriptType::COMPLEX) ?
+                             m_oCTLFont :
+                             m_oFont);
+
+        rRenderContext.Push(vcl::PushFlags::FONT);
+
+        if (oFont)
+            rRenderContext.SetFont(*oFont);
+
+        if (fRatio != 1)
+        {
+            vcl::Font aFont(rRenderContext.GetFont());
+            Size aPixelSize(aFont.GetFontSize());
+            aPixelSize.setWidth(aPixelSize.Width() * fRatio);
+            aPixelSize.setHeight(aPixelSize.Height() * fRatio);
+            aFont.SetFontSize(aPixelSize);
+            rRenderContext.SetFont(aFont);
+        }
+
+        tools::Rectangle aRect;
+        rRenderContext.GetTextBoundRect(aRect, rStyleName, nStart, nStart, nEnd - nStart);
+        aTextRect = aTextRect.Union(aRect);
+
+        tools::Long nWidth = rRenderContext.GetTextWidth(rStyleName, nStart, nEnd - nStart);
+
+        rRenderContext.Pop();
+
+        if (nIdx >= rScriptChanges.size())
+            break;
+
+        rScriptChanges[nIdx++].textWidth = nWidth;
+
+        if (nEnd < rStyleName.getLength() && nIdx < nCnt)
+        {
+            nStart = nEnd;
+            nEnd = rScriptChanges[nIdx].changePos;
+            aScript = rScriptChanges[nIdx].scriptType;
+        }
+        else
+            break;
+    }
+    while(true);
+
+    return aTextRect;
+}
+
+void SvxStyleBox_Base::UserDrawEntry(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect, const tools::Rectangle& rTextRect, const OUString &rStyleName, const std::vector<ScriptInfo>& rScriptChanges)
 {
     // IMG_TXT_DISTANCE in ilstbox.hxx is 6, then 1 is added as
     // nBorder, and we are adding 1 in order to look better when
     // italics is present
     const int nLeftDistance = 8;
 
-    tools::Rectangle aTextRect;
-    rRenderContext.GetTextBoundRect(aTextRect, rStyleName);
-
     Point aPos(rRect.TopLeft());
     aPos.AdjustX(nLeftDistance );
 
-    if (!AdjustFontForItemHeight(rRenderContext, aTextRect, rRect.GetHeight()))
-        aPos.AdjustY((rRect.GetHeight() - aTextRect.Bottom() ) / 2);
+    double fRatio = 1;
+    if (rTextRect.Bottom() > rRect.GetHeight())
+        fRatio = static_cast<double>(rRect.GetHeight()) / rTextRect.Bottom();
+    else
+        aPos.AdjustY((rRect.GetHeight() - rTextRect.Bottom()) / 2);
 
-    rRenderContext.DrawText(aPos, rStyleName);
+    SvtScriptType aScript;
+    sal_uInt16 nIdx = 0;
+    sal_Int32 nStart = 0;
+    sal_Int32 nEnd;
+    size_t nCnt = rScriptChanges.size();
+
+    if (nCnt)
+    {
+        nEnd = rScriptChanges[nIdx].changePos;
+        aScript = rScriptChanges[nIdx].scriptType;
+    }
+    else
+    {
+        nEnd = rStyleName.getLength();
+        aScript = SvtScriptType::LATIN;
+    }
+
+
+    do
+    {
+        auto oFont = (aScript == SvtScriptType::ASIAN) ?
+                         m_oCJKFont :
+                         ((aScript == SvtScriptType::COMPLEX) ?
+                             m_oCTLFont :
+                             m_oFont);
+
+        rRenderContext.Push(vcl::PushFlags::FONT);
+
+        if (oFont)
+            rRenderContext.SetFont(*oFont);
+
+        if (fRatio != 1)
+        {
+            vcl::Font aFont(rRenderContext.GetFont());
+            Size aPixelSize(aFont.GetFontSize());
+            aPixelSize.setWidth(aPixelSize.Width() * fRatio);
+            aPixelSize.setHeight(aPixelSize.Height() * fRatio);
+            aFont.SetFontSize(aPixelSize);
+            rRenderContext.SetFont(aFont);
+        }
+
+        rRenderContext.DrawText(aPos, rStyleName, nStart, nEnd - nStart);
+
+        rRenderContext.Pop();
+
+        aPos.AdjustX(rScriptChanges[nIdx++].textWidth * fRatio);
+        if (nEnd < rStyleName.getLength() && nIdx < nCnt)
+        {
+            nStart = nEnd;
+            nEnd = rScriptChanges[nIdx].changePos;
+            aScript = rScriptChanges[nIdx].scriptType;
+        }
+        else
+            break;
+    }
+    while(true);
+}
+
+static bool GetWhich(const SfxItemSet& rSet, sal_uInt16 nSlot, sal_uInt16& rWhich)
+{
+    rWhich = rSet.GetPool()->GetWhich(nSlot);
+    return rSet.GetItemState(rWhich) >= SfxItemState::DEFAULT;
+}
+
+static bool SetFont(const SfxItemSet& rSet, sal_uInt16 nSlot, SvxFont& rFont)
+{
+    sal_uInt16 nWhich;
+    if (GetWhich(rSet, nSlot, nWhich))
+    {
+        const auto& rFontItem = static_cast<const SvxFontItem&>(rSet.Get(nWhich));
+        rFont.SetFamilyName(rFontItem.GetFamilyName());
+        rFont.SetStyleName(rFontItem.GetStyleName());
+        return true;
+    }
+    return false;
+}
+
+static bool SetFontSize(vcl::RenderContext& rRenderContext, const SfxItemSet& rSet, sal_uInt16 nSlot, SvxFont& rFont)
+{
+    sal_uInt16 nWhich;
+    if (GetWhich(rSet, nSlot, nWhich))
+    {
+        const auto& rFontHeightItem = static_cast<const SvxFontHeightItem&>(rSet.Get(nWhich));
+        SfxObjectShell *pShell = SfxObjectShell::Current();
+        Size aFontSize(0, rFontHeightItem.GetHeight());
+        Size aPixelSize(rRenderContext.LogicToPixel(aFontSize, MapMode(pShell->GetMapUnit())));
+        rFont.SetFontSize(aPixelSize);
+        return true;
+    }
+    return false;
+}
+
+static void SetFontStyle(const SfxItemSet& rSet, sal_uInt16 nPosture, sal_uInt16 nWeight, SvxFont& rFont)
+{
+    sal_uInt16 nWhich;
+    if (GetWhich(rSet, nPosture, nWhich))
+    {
+        const auto& rItem = static_cast<const SvxPostureItem&>(rSet.Get(nWhich));
+        rFont.SetItalic(rItem.GetPosture());
+    }
+
+    if (GetWhich(rSet, nWeight, nWhich))
+    {
+        const auto& rItem = static_cast<const SvxWeightItem&>(rSet.Get(nWhich));
+        rFont.SetWeight(rItem.GetWeight());
+    }
 }
 
 void SvxStyleBox_Base::SetupEntry(vcl::RenderContext& rRenderContext, sal_Int32 nItem, const tools::Rectangle& rRect, std::u16string_view rStyleName, bool bIsNotSelected)
@@ -1158,15 +1365,16 @@ void SvxStyleBox_Base::SetupEntry(vcl::RenderContext& rRenderContext, sal_Int32 
         return;
 
     SfxObjectShell *pShell = SfxObjectShell::Current();
-    SfxStyleSheetBasePool* pPool = pShell->GetStyleSheetPool();
-    SfxStyleSheetBase* pStyle = nullptr;
+    if (!pShell)
+        return;
 
-    if ( pPool )
-    {
-        pStyle = pPool->First(eStyleFamily);
-        while (pStyle && pStyle->GetName() != rStyleName)
-            pStyle = pPool->Next();
-    }
+    SfxStyleSheetBasePool* pPool = pShell->GetStyleSheetPool();
+    if (!pPool)
+        return;
+
+    SfxStyleSheetBase* pStyle = pPool->First(eStyleFamily);
+    while (pStyle && pStyle->GetName() != rStyleName)
+        pStyle = pPool->Next();
 
     if (!pStyle )
         return;
@@ -1174,67 +1382,88 @@ void SvxStyleBox_Base::SetupEntry(vcl::RenderContext& rRenderContext, sal_Int32 
     std::optional<SfxItemSet> const pItemSet(pStyle->GetItemSetForPreview());
     if (!pItemSet) return;
 
-    const SvxFontItem * const pFontItem =
-        pItemSet->GetItem<SvxFontItem>(SID_ATTR_CHAR_FONT);
-    const SvxFontHeightItem * const pFontHeightItem =
-        pItemSet->GetItem<SvxFontHeightItem>(SID_ATTR_CHAR_FONTHEIGHT);
-
-    if ( !(pFontItem && pFontHeightItem) )
-        return;
-
-    Size aFontSize( 0, pFontHeightItem->GetHeight() );
-    Size aPixelSize(rRenderContext.LogicToPixel(aFontSize, MapMode(pShell->GetMapUnit())));
-
-    // setup the font properties
     SvxFont aFont;
-    aFont.SetFamilyName(pFontItem->GetFamilyName());
-    aFont.SetStyleName(pFontItem->GetStyleName());
-    aFont.SetFontSize(aPixelSize);
+    SvxFont aCJKFont;
+    SvxFont aCTLFont;
 
-    const SfxPoolItem *pItem = pItemSet->GetItem( SID_ATTR_CHAR_WEIGHT );
-    if ( pItem )
-        aFont.SetWeight( static_cast< const SvxWeightItem* >( pItem )->GetWeight() );
+    SetFontStyle(*pItemSet, SID_ATTR_CHAR_POSTURE, SID_ATTR_CHAR_WEIGHT, aFont);
+    SetFontStyle(*pItemSet, SID_ATTR_CHAR_CJK_POSTURE, SID_ATTR_CHAR_CJK_WEIGHT, aCJKFont);
+    SetFontStyle(*pItemSet, SID_ATTR_CHAR_CTL_POSTURE, SID_ATTR_CHAR_CTL_WEIGHT, aCTLFont);
 
-    pItem = pItemSet->GetItem( SID_ATTR_CHAR_POSTURE );
+    const SfxPoolItem *pItem = pItemSet->GetItem( SID_ATTR_CHAR_CONTOUR );
     if ( pItem )
-        aFont.SetItalic( static_cast< const SvxPostureItem* >( pItem )->GetPosture() );
-
-    pItem = pItemSet->GetItem( SID_ATTR_CHAR_CONTOUR );
-    if ( pItem )
-        aFont.SetOutline( static_cast< const SvxContourItem* >( pItem )->GetValue() );
+    {
+        auto aVal = static_cast< const SvxContourItem* >( pItem )->GetValue();
+        aFont.SetOutline(aVal);
+        aCJKFont.SetOutline(aVal);
+        aCTLFont.SetOutline(aVal);
+    }
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_SHADOWED );
     if ( pItem )
-        aFont.SetShadow( static_cast< const SvxShadowedItem* >( pItem )->GetValue() );
+    {
+        auto aVal = static_cast< const SvxShadowedItem* >( pItem )->GetValue();
+        aFont.SetShadow(aVal);
+        aCJKFont.SetShadow(aVal);
+        aCTLFont.SetShadow(aVal);
+    }
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_RELIEF );
     if ( pItem )
-        aFont.SetRelief( static_cast< const SvxCharReliefItem* >( pItem )->GetValue() );
+    {
+        auto aVal = static_cast< const SvxCharReliefItem* >( pItem )->GetValue();
+        aFont.SetRelief(aVal);
+        aCJKFont.SetRelief(aVal);
+        aCTLFont.SetRelief(aVal);
+    }
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_UNDERLINE );
     if ( pItem )
-        aFont.SetUnderline( static_cast< const SvxUnderlineItem* >( pItem )->GetLineStyle() );
+    {
+        auto aVal = static_cast<const SvxUnderlineItem*>(pItem)->GetLineStyle();
+        aFont.SetUnderline(aVal);
+        aCJKFont.SetUnderline(aVal);
+        aCTLFont.SetUnderline(aVal);
+    }
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_OVERLINE );
     if ( pItem )
-        aFont.SetOverline( static_cast< const SvxOverlineItem* >( pItem )->GetValue() );
+    {
+        auto aVal = static_cast< const SvxOverlineItem* >( pItem )->GetValue();
+        aFont.SetOverline(aVal);
+        aCJKFont.SetOverline(aVal);
+        aCTLFont.SetOverline(aVal);
+    }
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_STRIKEOUT );
     if ( pItem )
-        aFont.SetStrikeout( static_cast< const SvxCrossedOutItem* >( pItem )->GetStrikeout() );
+    {
+        auto aVal = static_cast< const SvxCrossedOutItem* >( pItem )->GetStrikeout();
+        aFont.SetStrikeout(aVal);
+        aCJKFont.SetStrikeout(aVal);
+        aCTLFont.SetStrikeout(aVal);
+    }
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_CASEMAP );
     if ( pItem )
-        aFont.SetCaseMap(static_cast<const SvxCaseMapItem*>(pItem)->GetCaseMap());
+    {
+        auto aVal = static_cast<const SvxCaseMapItem*>(pItem)->GetCaseMap();
+        aFont.SetCaseMap(aVal);
+        aCJKFont.SetCaseMap(aVal);
+        aCTLFont.SetCaseMap(aVal);
+    }
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_EMPHASISMARK );
     if ( pItem )
-        aFont.SetEmphasisMark( static_cast< const SvxEmphasisMarkItem* >( pItem )->GetEmphasisMark() );
+    {
+        auto aVal = static_cast< const SvxEmphasisMarkItem* >( pItem )->GetEmphasisMark();
+        aFont.SetEmphasisMark(aVal);
+        aCJKFont.SetEmphasisMark(aVal);
+        aCTLFont.SetEmphasisMark(aVal);
+    }
 
     // setup the device & draw
     Color aFontCol = COL_AUTO, aBackCol = COL_AUTO;
-
-    rRenderContext.SetFont(aFont);
 
     pItem = pItemSet->GetItem( SID_ATTR_CHAR_COLOR );
     // text color, when nothing is selected
@@ -1276,6 +1505,18 @@ void SvxStyleBox_Base::SetupEntry(vcl::RenderContext& rRenderContext, sal_Int32 
     // set text color
     if ( aFontCol != COL_AUTO )
         rRenderContext.SetTextColor(aFontCol);
+
+    if (SetFont(*pItemSet, SID_ATTR_CHAR_FONT, aFont) &&
+        SetFontSize(rRenderContext, *pItemSet, SID_ATTR_CHAR_FONTHEIGHT, aFont))
+        m_oFont = aFont;
+
+    if (SetFont(*pItemSet, SID_ATTR_CHAR_CJK_FONT, aCJKFont) &&
+        SetFontSize(rRenderContext, *pItemSet, SID_ATTR_CHAR_CJK_FONTHEIGHT, aCJKFont))
+        m_oCJKFont = aCJKFont;
+
+    if (SetFont(*pItemSet, SID_ATTR_CHAR_CTL_FONT, aCTLFont) &&
+        SetFontSize(rRenderContext, *pItemSet, SID_ATTR_CHAR_CTL_FONTHEIGHT, aCTLFont))
+        m_oCTLFont = aCTLFont;
 }
 
 IMPL_LINK(SvxStyleBox_Base, CustomRenderHdl, weld::ComboBox::render_args, aPayload, void)
@@ -1292,8 +1533,9 @@ IMPL_LINK(SvxStyleBox_Base, CustomRenderHdl, weld::ComboBox::render_args, aPaylo
     rRenderContext.Push(vcl::PushFlags::FILLCOLOR | vcl::PushFlags::FONT | vcl::PushFlags::TEXTCOLOR);
 
     SetupEntry(rRenderContext, nIndex, rRect, aStyleName, !bSelected);
-
-    UserDrawEntry(rRenderContext, rRect, aStyleName);
+    auto aScriptChanges = CheckScript(aStyleName);
+    auto aTextRect = CalcBoundRect(rRenderContext, aStyleName, aScriptChanges);
+    UserDrawEntry(rRenderContext, rRect, aTextRect, aStyleName, aScriptChanges);
 
     rRenderContext.Pop();
 }
@@ -1321,14 +1563,18 @@ void SvxStyleBox_Base::CalcOptimalExtraUserWidth(vcl::RenderContext& rRenderCont
     {
         OUString sStyleName(get_text(i));
 
+        if (sStyleName.isEmpty())
+            continue;
+
         rRenderContext.Push(vcl::PushFlags::FILLCOLOR | vcl::PushFlags::FONT | vcl::PushFlags::TEXTCOLOR);
         SetupEntry(rRenderContext, i, tools::Rectangle(0, 0, RECT_MAX, ITEM_HEIGHT), sStyleName, true);
-        tools::Rectangle aTextRectForActualFont;
-        rRenderContext.GetTextBoundRect(aTextRectForActualFont, sStyleName);
-        if (AdjustFontForItemHeight(rRenderContext, aTextRectForActualFont, ITEM_HEIGHT))
+        auto aScriptChanges = CheckScript(sStyleName);
+        tools::Rectangle aTextRectForActualFont = CalcBoundRect(rRenderContext, sStyleName, aScriptChanges);
+        if (aTextRectForActualFont.Bottom() > ITEM_HEIGHT)
         {
-            //Font didn't fit, so it was changed, refetch with final font size
-            rRenderContext.GetTextBoundRect(aTextRectForActualFont, sStyleName);
+            //Font didn't fit, re-calculate with adjustment ratio.
+            double fRatio = static_cast<double>(ITEM_HEIGHT) / aTextRectForActualFont.Bottom();
+            aTextRectForActualFont = CalcBoundRect(rRenderContext, sStyleName, aScriptChanges, fRatio);
         }
         rRenderContext.Pop();
 
@@ -1363,6 +1609,9 @@ Color SvxStyleBox_Base::TestColorsVisible(const Color &FontCol, const Color &Bac
 
 IMPL_LINK(SvxStyleBox_Base, DumpAsPropertyTreeHdl, tools::JsonWriter&, rJsonWriter, void)
 {
+    if (!m_xWidget)
+        return;
+
     {
         auto entriesNode = rJsonWriter.startNode("entries");
         for (int i = 0, nEntryCount = m_xWidget->get_count(); i < nEntryCount; ++i)
@@ -1508,16 +1757,21 @@ void SvxFontNameBox_Base::FillList()
     m_xWidget->select_entry_region(nStartPos, nEndPos);
 }
 
+bool SvxFontNameBox_Base::CheckFontIsAvailable(std::u16string_view fontname)
+{
+    lcl_GetDocFontList(&pFontList, this);
+    return pFontList && pFontList->IsAvailable(fontname);
+}
+
 void SvxFontNameBox_Base::CheckAndMarkUnknownFont()
 {
     if (mbCheckingUnknownFont) //tdf#117537 block rentry
         return;
     mbCheckingUnknownFont = true;
     OUString fontname = m_xWidget->get_active_text();
-    lcl_GetDocFontList( &pFontList, this );
-    // If the font is unknown, show it in italic.
+    // tdf#154680 If a font is set and that font is unknown, show it in italic.
     vcl::Font font = m_xWidget->get_entry_font();
-    if( pFontList != nullptr && pFontList->IsAvailable( fontname ))
+    if (fontname.isEmpty() || CheckFontIsAvailable(fontname))
     {
         if( font.GetItalic() != ITALIC_NONE )
         {
@@ -1759,22 +2013,22 @@ IMPL_LINK(SvxFontNameBox_Base, DumpAsPropertyTreeHdl, tools::JsonWriter&, rJsonW
     rJsonWriter.put("command", ".uno:CharFontName");
 }
 
-ColorWindow::ColorWindow(const OUString& rCommand,
-                         std::shared_ptr<PaletteManager> const & rPaletteManager,
+ColorWindow::ColorWindow(OUString  rCommand,
+                         std::shared_ptr<PaletteManager> xPaletteManager,
                          ColorStatus&               rColorStatus,
                          sal_uInt16                 nSlotId,
                          const Reference< XFrame >& rFrame,
                          const MenuOrToolMenuButton& rMenuButton,
-                         TopLevelParentFunction const& rTopLevelParentFunction,
-                         ColorSelectFunction const & rColorSelectFunction)
+                         TopLevelParentFunction  aTopLevelParentFunction,
+                         ColorSelectFunction  aColorSelectFunction)
     : WeldToolbarPopup(rFrame, rMenuButton.get_widget(), "svx/ui/colorwindow.ui", "palette_popup_window")
     , theSlotId(nSlotId)
-    , maCommand(rCommand)
+    , maCommand(std::move(rCommand))
     , maMenuButton(rMenuButton)
-    , mxPaletteManager(rPaletteManager)
+    , mxPaletteManager(std::move(xPaletteManager))
     , mrColorStatus(rColorStatus)
-    , maTopLevelParentFunction(rTopLevelParentFunction)
-    , maColorSelectFunction(rColorSelectFunction)
+    , maTopLevelParentFunction(std::move(aTopLevelParentFunction))
+    , maColorSelectFunction(std::move(aColorSelectFunction))
     , mxColorSet(new SvxColorValueSet(m_xBuilder->weld_scrolled_window("colorsetwin", true)))
     , mxRecentColorSet(new SvxColorValueSet(nullptr))
     , mxPaletteListBox(m_xBuilder->weld_combo_box("palette_listbox"))
@@ -2122,10 +2376,6 @@ ColorStatus::ColorStatus() :
 {
 }
 
-ColorStatus::~ColorStatus()
-{
-}
-
 void ColorStatus::statusChanged( const css::frame::FeatureStateEvent& rEvent )
 {
     Color aColor( COL_TRANSPARENT );
@@ -2177,7 +2427,13 @@ SvxFrameWindow_Impl::SvxFrameWindow_Impl(SvxFrameToolBoxControl* pControl, weld:
     , mxFrameSet(new SvxFrmValueSet_Impl)
     , mxFrameSetWin(new weld::CustomWeld(*m_xBuilder, "valueset", *mxFrameSet))
     , bParagraphMode(false)
+    , m_bIsWriter(false)
 {
+
+    // check whether the document is Writer or not
+    if (Reference<lang::XServiceInfo> xSI{ m_xFrame->getController()->getModel(), UNO_QUERY })
+        m_bIsWriter = xSI->supportsService("com.sun.star.text.TextDocument");
+
     mxFrameSet->SetStyle(WB_ITEMBORDER | WB_DOUBLEBORDER | WB_3DLOOK | WB_NO_DIRECTSELECT);
     AddStatusListener(".uno:BorderReducedMode");
     InitImageList();
@@ -2193,15 +2449,22 @@ SvxFrameWindow_Impl::SvxFrameWindow_Impl(SvxFrameToolBoxControl* pControl, weld:
 
     sal_uInt16 i = 0;
 
-    for ( i=1; i<11; i++ )
+    // diagonal borders available only for Calc.
+    // Therefore, Calc uses 10 border types while
+    // Writer uses 8 of them - for a single cell.
+    for ( i=1; i < (m_bIsWriter ? 9 : 11); i++ )
         mxFrameSet->InsertItem(i, Image(aImgVec[i-1].first), aImgVec[i-1].second);
 
     //bParagraphMode should have been set in StateChanged
     if ( !bParagraphMode )
-        for ( i = 11; i < 16; i++ )
+        // when multiple cell selected:
+        // Writer has 12 border types and Calc has 15 of them.
+        for ( i = (m_bIsWriter ? 9 : 11); i < (m_bIsWriter ? 13 : 16); i++ )
             mxFrameSet->InsertItem(i, Image(aImgVec[i-1].first), aImgVec[i-1].second);
 
-    mxFrameSet->SetColCount( 5 );
+    // adjust frame column for Writer
+    sal_uInt16 colCount = m_bIsWriter ? 4 : 5;
+    mxFrameSet->SetColCount( colCount );
     mxFrameSet->SetSelectHdl( LINK( this, SvxFrameWindow_Impl, SelectHdl ) );
     CalcSizeValueSet();
 
@@ -2258,6 +2521,17 @@ IMPL_LINK_NOARG(SvxFrameWindow_Impl, SelectHdl, ValueSet*, void)
     // tdf#48622, tdf#145828 use correct default to create intended 0.75pt
     // cell border using the border formatting tool in the standard toolbar
     theDefLine.GuessLinesWidths(theDefLine.GetBorderLineStyle(), SvxBorderLineWidth::Thin);
+
+    // nSel has 15 cases which means 15 border
+    // types for Calc. But Writer uses only 12
+    // of them - when diagonal borders excluded.
+    if (m_bIsWriter)
+    {
+        // add appropriate increments
+        // to match the correct borders.
+        if (nSel > 8) { nSel += 2; }
+        else if (nSel > 4) { nSel++; }
+    }
 
     switch ( nSel )
     {
@@ -2371,6 +2645,7 @@ IMPL_LINK_NOARG(SvxFrameWindow_Impl, SelectHdl, ValueSet*, void)
         mxControl->dispatchCommand( ".uno:SetBorderStyle", aArgs );
     }
 
+    // coverity[ check_after_deref : FALSE]
     if (mxFrameSet)
     {
         /* #i33380# Moved the following line above the Dispatch() call.
@@ -2416,18 +2691,19 @@ void SvxFrameWindow_Impl::statusChanged( const css::frame::FeatureStateEvent& rE
     if(!mxFrameSet->GetItemCount())
         return;
 
-    bool bTableMode = ( mxFrameSet->GetItemCount() == 15 );
+    // set 12 border types for Writer, otherwise 15 for Calc.
+    bool bTableMode = ( mxFrameSet->GetItemCount() == static_cast<size_t>(m_bIsWriter ? 12 : 15) );
     bool bResize    = false;
 
     if ( bTableMode && bParagraphMode )
     {
-        for ( sal_uInt16 i = 11; i < 16; i++ )
+        for ( sal_uInt16 i = (m_bIsWriter ? 9 : 11); i < (m_bIsWriter ? 13 : 16); i++ )
             mxFrameSet->RemoveItem(i);
         bResize = true;
     }
     else if ( !bTableMode && !bParagraphMode )
     {
-        for ( sal_uInt16 i = 11; i < 16; i++ )
+        for ( sal_uInt16 i = (m_bIsWriter ? 9 : 11); i < (m_bIsWriter ? 13 : 16); i++ )
             mxFrameSet->InsertItem(i, Image(aImgVec[i-1].first), aImgVec[i-1].second);
         bResize = true;
     }
@@ -2450,25 +2726,53 @@ void SvxFrameWindow_Impl::CalcSizeValueSet()
 
 void SvxFrameWindow_Impl::InitImageList()
 {
-    aImgVec = {
-        {BitmapEx(RID_SVXBMP_FRAME1), SvxResId(RID_SVXSTR_TABLE_PRESET_NONE)},
-        {BitmapEx(RID_SVXBMP_FRAME2), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYLEFT)},
-        {BitmapEx(RID_SVXBMP_FRAME3), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYRIGHT)},
-        {BitmapEx(RID_SVXBMP_FRAME4), SvxResId(RID_SVXSTR_PARA_PRESET_LEFTRIGHT)},
-        {BitmapEx(RID_SVXBMP_FRAME14), SvxResId(RID_SVXSTR_PARA_PRESET_DIAGONALDOWN)}, // diagonal down border
+    if (m_bIsWriter)
+    {
+        // Writer-specific aImgVec.
+        // Since Writer doesn't have diagonal borders,
+        // we have to use 12 border types here.
+        aImgVec = {
+            {BitmapEx(RID_SVXBMP_FRAME1), SvxResId(RID_SVXSTR_TABLE_PRESET_NONE)},
+            {BitmapEx(RID_SVXBMP_FRAME2), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYLEFT)},
+            {BitmapEx(RID_SVXBMP_FRAME3), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYRIGHT)},
+            {BitmapEx(RID_SVXBMP_FRAME4), SvxResId(RID_SVXSTR_PARA_PRESET_LEFTRIGHT)},
 
-        {BitmapEx(RID_SVXBMP_FRAME5), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYTOP)},
-        {BitmapEx(RID_SVXBMP_FRAME6), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYTBOTTOM)},
-        {BitmapEx(RID_SVXBMP_FRAME7), SvxResId(RID_SVXSTR_PARA_PRESET_TOPBOTTOM)},
-        {BitmapEx(RID_SVXBMP_FRAME8), SvxResId(RID_SVXSTR_TABLE_PRESET_ONLYOUTER)},
-        {BitmapEx(RID_SVXBMP_FRAME13), SvxResId(RID_SVXSTR_PARA_PRESET_DIAGONALUP)}, // diagonal up border
+            {BitmapEx(RID_SVXBMP_FRAME5), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYTOP)},
+            {BitmapEx(RID_SVXBMP_FRAME6), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYTBOTTOM)},
+            {BitmapEx(RID_SVXBMP_FRAME7), SvxResId(RID_SVXSTR_PARA_PRESET_TOPBOTTOM)},
+            {BitmapEx(RID_SVXBMP_FRAME8), SvxResId(RID_SVXSTR_TABLE_PRESET_ONLYOUTER)},
 
-        {BitmapEx(RID_SVXBMP_FRAME9), SvxResId(RID_SVXSTR_PARA_PRESET_TOPBOTTOMHORI)},
-        {BitmapEx(RID_SVXBMP_FRAME10), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERHORI)},
-        {BitmapEx(RID_SVXBMP_FRAME11), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERVERI)},
-        {BitmapEx(RID_SVXBMP_FRAME12), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERALL)},
-        {BitmapEx(RID_SVXBMP_FRAME15), SvxResId(RID_SVXSTR_PARA_PRESET_CRISSCROSS)} // criss-cross border
-    };
+            {BitmapEx(RID_SVXBMP_FRAME9), SvxResId(RID_SVXSTR_PARA_PRESET_TOPBOTTOMHORI)},
+            {BitmapEx(RID_SVXBMP_FRAME10), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERHORI)},
+            {BitmapEx(RID_SVXBMP_FRAME11), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERVERI)},
+            {BitmapEx(RID_SVXBMP_FRAME12), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERALL)}
+        };
+    }
+    else
+    {
+        // Calc has diagonal borders feature.
+        // Therefore use additional 3 diagonal border types,
+        // which make border types 15 in total.
+        aImgVec = {
+            {BitmapEx(RID_SVXBMP_FRAME1), SvxResId(RID_SVXSTR_TABLE_PRESET_NONE)},
+            {BitmapEx(RID_SVXBMP_FRAME2), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYLEFT)},
+            {BitmapEx(RID_SVXBMP_FRAME3), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYRIGHT)},
+            {BitmapEx(RID_SVXBMP_FRAME4), SvxResId(RID_SVXSTR_PARA_PRESET_LEFTRIGHT)},
+            {BitmapEx(RID_SVXBMP_FRAME14), SvxResId(RID_SVXSTR_PARA_PRESET_DIAGONALDOWN)}, // diagonal down border
+
+            {BitmapEx(RID_SVXBMP_FRAME5), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYTOP)},
+            {BitmapEx(RID_SVXBMP_FRAME6), SvxResId(RID_SVXSTR_PARA_PRESET_ONLYTBOTTOM)},
+            {BitmapEx(RID_SVXBMP_FRAME7), SvxResId(RID_SVXSTR_PARA_PRESET_TOPBOTTOM)},
+            {BitmapEx(RID_SVXBMP_FRAME8), SvxResId(RID_SVXSTR_TABLE_PRESET_ONLYOUTER)},
+            {BitmapEx(RID_SVXBMP_FRAME13), SvxResId(RID_SVXSTR_PARA_PRESET_DIAGONALUP)}, // diagonal up border
+
+            {BitmapEx(RID_SVXBMP_FRAME9), SvxResId(RID_SVXSTR_PARA_PRESET_TOPBOTTOMHORI)},
+            {BitmapEx(RID_SVXBMP_FRAME10), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERHORI)},
+            {BitmapEx(RID_SVXBMP_FRAME11), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERVERI)},
+            {BitmapEx(RID_SVXBMP_FRAME12), SvxResId(RID_SVXSTR_TABLE_PRESET_OUTERALL)},
+            {BitmapEx(RID_SVXBMP_FRAME15), SvxResId(RID_SVXSTR_PARA_PRESET_CRISSCROSS)} // criss-cross border
+        };
+    }
 }
 
 static Color lcl_mediumColor( Color aMain, Color /*aDefault*/ )
@@ -3442,14 +3746,10 @@ void SvxColorToolBoxControl::execute(sal_Int16 /*nSelectModifier*/)
         case SID_ATTR_CHAR_COLOR2 :
             aCommand    = ".uno:CharColorExt";
             break;
-
-        case SID_ATTR_CHAR_COLOR_BACKGROUND :
-            aCommand    = ".uno:CharBackgroundExt";
-            break;
     }
 
     auto aArgs( comphelper::InitPropertySequence( {
-        { m_aCommandURL.copy(5), css::uno::makeAny(aColor) }
+        { m_aCommandURL.copy(5), css::uno::Any(aColor) }
     } ) );
     dispatchCommand( aCommand, aArgs );
 
@@ -3546,7 +3846,7 @@ VclPtr<vcl::Window> SvxFrameToolBoxControl::createVclPopupWindow( vcl::Window* p
     if ( m_aCommandURL == ".uno:LineStyle" )
     {
         mxInterimPopover = VclPtr<InterimToolbarPopup>::Create(getFrameInterface(), pParent,
-            std::make_unique<SvxLineWindow_Impl>(this, pParent->GetFrameWeld()));
+            std::make_unique<SvxLineWindow_Impl>(this, pParent->GetFrameWeld()), true);
 
         mxInterimPopover->Show();
 
@@ -3556,7 +3856,7 @@ VclPtr<vcl::Window> SvxFrameToolBoxControl::createVclPopupWindow( vcl::Window* p
     }
 
     mxInterimPopover = VclPtr<InterimToolbarPopup>::Create(getFrameInterface(), pParent,
-        std::make_unique<SvxFrameWindow_Impl>(this, pParent->GetFrameWeld()));
+        std::make_unique<SvxFrameWindow_Impl>(this, pParent->GetFrameWeld()), true);
 
     mxInterimPopover->Show();
 
@@ -3923,17 +4223,26 @@ void ColorListBox::SetSlotId(sal_uInt16 nSlotId, bool bShowNoneButton)
     createColorWindow();
 }
 
-ColorListBox::ColorListBox(std::unique_ptr<weld::MenuButton> pControl, TopLevelParentFunction const& rTopLevelParentFunction)
+ColorListBox::ColorListBox(std::unique_ptr<weld::MenuButton> pControl,
+                           TopLevelParentFunction aTopLevelParentFunction,
+                           const ColorListBox* pCache)
     : m_xButton(std::move(pControl))
     , m_aColorWrapper(this)
     , m_aAutoDisplayColor(Application::GetSettings().GetStyleSettings().GetDialogColor())
     , m_nSlotId(0)
     , m_bShowNoneButton(false)
-    , m_aTopLevelParentFunction(rTopLevelParentFunction)
+    , m_aTopLevelParentFunction(std::move(aTopLevelParentFunction))
 {
     m_xButton->connect_toggled(LINK(this, ColorListBox, ToggleHdl));
     m_aSelectedColor = svx::NamedThemedColor::FromNamedColor(GetAutoColor(m_nSlotId));
-    LockWidthRequest();
+    if (!pCache)
+        LockWidthRequest(CalcBestWidthRequest());
+    else
+    {
+        LockWidthRequest(pCache->m_xButton->get_size_request().Width());
+        m_xPaletteManager.reset(pCache->m_xPaletteManager->Clone());
+        m_xPaletteManager->SetColorSelectFunction(std::ref(m_aColorWrapper));
+    }
     ShowPreview(m_aSelectedColor.ToNamedColor());
 }
 
@@ -4015,7 +4324,7 @@ void ColorListBox::Selected(const svx::NamedThemedColor& rColor)
 //to avoid the box resizing every time the color is changed to
 //the optimal size of the individual color, get the longest
 //standard color and stick with that as the size for all
-void ColorListBox::LockWidthRequest()
+int ColorListBox::CalcBestWidthRequest()
 {
     NamedColor aLongestColor;
     tools::Long nMaxStandardColorTextWidth = 0;
@@ -4031,7 +4340,12 @@ void ColorListBox::LockWidthRequest()
         }
     }
     ShowPreview(aLongestColor);
-    m_xButton->set_size_request(m_xButton->get_preferred_size().Width(), -1);
+    return m_xButton->get_preferred_size().Width();
+}
+
+void ColorListBox::LockWidthRequest(int nWidth)
+{
+    m_xButton->set_size_request(nWidth, -1);
 }
 
 void ColorListBox::ShowPreview(const NamedColor &rColor)
@@ -4075,10 +4389,10 @@ MenuOrToolMenuButton::MenuOrToolMenuButton(weld::MenuButton* pMenuButton)
 {
 }
 
-MenuOrToolMenuButton::MenuOrToolMenuButton(weld::Toolbar* pToolbar, const OString& rIdent)
+MenuOrToolMenuButton::MenuOrToolMenuButton(weld::Toolbar* pToolbar, OString aIdent)
     : m_pMenuButton(nullptr)
     , m_pToolbar(pToolbar)
-    , m_aIdent(rIdent)
+    , m_aIdent(std::move(aIdent))
     , m_pControl(nullptr)
     , m_nId(0)
 {

@@ -23,6 +23,7 @@
 #include <com/sun/star/script/BasicErrorException.hpp>
 #include <com/sun/star/view/XSelectionSupplier.hpp>
 #include <basic/sberrors.hxx>
+#include <utility>
 #include "vbachartobject.hxx"
 #include "vbachartobjects.hxx"
 
@@ -31,7 +32,7 @@ using namespace ::ooo::vba;
 
 constexpr OUStringLiteral PERSIST_NAME(u"PersistName");
 
-ScVbaChartObject::ScVbaChartObject( const css::uno::Reference< ov::XHelperInterface >& _xParent, const css::uno::Reference< css::uno::XComponentContext >& _xContext, const css::uno::Reference< css::table::XTableChart >& _xTableChart, const css::uno::Reference< css::drawing::XDrawPageSupplier >& _xDrawPageSupplier ) : ChartObjectImpl_BASE( _xParent, _xContext ), xTableChart( _xTableChart ), xDrawPageSupplier( _xDrawPageSupplier )
+ScVbaChartObject::ScVbaChartObject( const css::uno::Reference< ov::XHelperInterface >& _xParent, const css::uno::Reference< css::uno::XComponentContext >& _xContext, css::uno::Reference< css::table::XTableChart >  _xTableChart, css::uno::Reference< css::drawing::XDrawPageSupplier >  _xDrawPageSupplier ) : ChartObjectImpl_BASE( _xParent, _xContext ), xTableChart(std::move( _xTableChart )), xDrawPageSupplier(std::move( _xDrawPageSupplier ))
 {
         xDrawPage = xDrawPageSupplier->getDrawPage();
         xEmbeddedObjectSupplier.set( xTableChart, uno::UNO_QUERY_THROW );
@@ -114,7 +115,7 @@ ScVbaChartObject::Activate()
         // the XModel owner
         //uno::Reference< view::XSelectionSupplier > xSelectionSupplier( getXModel().getCurrentController());
         uno::Reference< view::XSelectionSupplier > xSelectionSupplier( getCurrentExcelDoc(mxContext)->getCurrentController(), uno::UNO_QUERY_THROW );
-        xSelectionSupplier->select(uno::makeAny(xShape));
+        xSelectionSupplier->select(uno::Any(xShape));
     }
     catch (uno::Exception& )
     {

@@ -26,29 +26,40 @@
 #include <docsh.hxx>
 #include <cmdid.h>
 #include <officecfg/Office/Common.hxx>
+#include <unotools/configmgr.hxx>
 
 namespace sw
 {
-WeakContentNodeContainer::WeakContentNodeContainer(SwContentNode* pNode)
+WeakNodeContainer::WeakNodeContainer(SwNode* pNode)
     : m_pNode(pNode)
 {
     if (m_pNode)
     {
-        EndListeningAll();
-        StartListening(m_pNode->GetNotifier());
+        auto* pBroadcast = dynamic_cast<sw::BroadcastingModify*>(m_pNode);
+        if (pBroadcast)
+        {
+            EndListeningAll();
+            StartListening(pBroadcast->GetNotifier());
+        }
+        else
+        {
+            m_pNode = nullptr;
+        }
     }
 }
 
-WeakContentNodeContainer::~WeakContentNodeContainer() { EndListeningAll(); }
+WeakNodeContainer::~WeakNodeContainer() { EndListeningAll(); }
 
-bool WeakContentNodeContainer::isAlive()
+bool WeakNodeContainer::isAlive()
 {
+    if (!m_pNode)
+        return false;
     if (!HasBroadcaster())
         m_pNode = nullptr;
     return m_pNode;
 }
 
-SwContentNode* WeakContentNodeContainer::getNode()
+SwNode* WeakNodeContainer::getNode()
 {
     if (isAlive())
         return m_pNode;
@@ -58,20 +69,27 @@ SwContentNode* WeakContentNodeContainer::getNode()
 OnlineAccessibilityCheck::OnlineAccessibilityCheck(SwDoc& rDocument)
     : m_rDocument(rDocument)
     , m_aAccessibilityCheck(&m_rDocument)
-    , m_pPreviousNode(nullptr)
     , m_nPreviousNodeIndex(-1)
     , m_nAccessibilityIssues(0)
+    , m_bInitialCheck(false)
+    , m_bOnlineCheckStatus(
+          !utl::ConfigManager::IsFuzzing()
+              ? officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::get()
+              : false)
 {
 }
 
-void OnlineAccessibilityCheck::updateNodeStatus(SwContentNode* pContentNode)
+void OnlineAccessibilityCheck::updateNodeStatus(SwNode* pNode)
 {
+    if (!pNode->IsContentNode() && !pNode->IsTableNode())
+        return;
+
     m_nAccessibilityIssues = 0;
 
-    auto it = m_aNodes.find(pContentNode);
+    auto it = m_aNodes.find(pNode);
     if (it == m_aNodes.end())
     {
-        m_aNodes.emplace(pContentNode, std::make_unique<WeakContentNodeContainer>(pContentNode));
+        m_aNodes.emplace(pNode, std::make_unique<WeakNodeContainer>(pNode));
     }
 
     for (auto iterator = m_aNodes.begin(); iterator != m_aNodes.end();)
@@ -106,13 +124,13 @@ void OnlineAccessibilityCheck::updateStatusbar()
         pBindings->Invalidate(FN_STAT_ACCESSIBILITY_CHECK);
 }
 
-void OnlineAccessibilityCheck::runCheck(SwContentNode* pContentNode)
+void OnlineAccessibilityCheck::runAccessibilityCheck(SwNode* pNode)
 {
     m_aAccessibilityCheck.getIssueCollection().clear();
 
-    m_aAccessibilityCheck.checkNode(pContentNode);
+    m_aAccessibilityCheck.checkNode(pNode);
 
-    for (SwFrameFormat* const& pFrameFormat : pContentNode->GetAnchoredFlys())
+    for (SwFrameFormat* const& pFrameFormat : pNode->GetAnchoredFlys())
     {
         SdrObject* pObject = pFrameFormat->FindSdrObject();
         if (pObject)
@@ -121,33 +139,97 @@ void OnlineAccessibilityCheck::runCheck(SwContentNode* pContentNode)
 
     auto aCollection = m_aAccessibilityCheck.getIssueCollection();
 
-    pContentNode->getAccessibilityCheckStatus().pCollection
+    pNode->getAccessibilityCheckStatus().pCollection
         = std::make_unique<sfx::AccessibilityIssueCollection>(aCollection);
-
-    updateNodeStatus(pContentNode);
-    updateStatusbar();
 }
 
-void OnlineAccessibilityCheck::update(const SwPosition& rNewPos)
+void OnlineAccessibilityCheck::runDocumentLevelAccessibilityCheck()
+{
+    m_aAccessibilityCheck.getIssueCollection().clear();
+    m_aAccessibilityCheck.checkDocumentProperties();
+    auto aCollection = m_aAccessibilityCheck.getIssueCollection();
+    m_pDocumentAccessibilityIssues
+        = std::make_unique<sfx::AccessibilityIssueCollection>(aCollection);
+}
+
+void OnlineAccessibilityCheck::initialCheck()
+{
+    if (m_bInitialCheck)
+        return;
+
+    runDocumentLevelAccessibilityCheck();
+
+    auto const& pNodes = m_rDocument.GetNodes();
+    for (SwNodeOffset n(0); n < pNodes.Count(); ++n)
+    {
+        SwNode* pNode = pNodes[n];
+        if (pNode)
+        {
+            runAccessibilityCheck(pNode);
+            updateNodeStatus(pNode);
+        }
+    }
+
+    updateStatusbar();
+
+    m_bInitialCheck = true;
+}
+
+void OnlineAccessibilityCheck::updateCheckerActivity()
 {
     bool bOnlineCheckStatus
         = officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::get();
 
-    if (!bOnlineCheckStatus)
+    if (bOnlineCheckStatus != m_bOnlineCheckStatus)
+    {
+        m_pPreviousNode.reset();
+        m_nPreviousNodeIndex = SwNodeOffset(-1);
+        m_bInitialCheck = false; // force initial check
+
+        if (!bOnlineCheckStatus)
+        {
+            clearAccessibilityIssuesFromAllNodes(); // cleanup all accessibility check data on nodes
+            m_nAccessibilityIssues = -1;
+        }
+        else
+        {
+            m_nAccessibilityIssues = 0;
+        }
+
+        m_bOnlineCheckStatus = bOnlineCheckStatus;
+
+        updateStatusbar();
+    }
+}
+
+void OnlineAccessibilityCheck::update(const SwPosition& rNewPos)
+{
+    updateCheckerActivity();
+
+    if (!m_bOnlineCheckStatus)
         return;
 
+    initialCheck();
+
+    lookForPreviousNodeAndUpdate(rNewPos);
+}
+
+void OnlineAccessibilityCheck::lookForPreviousNodeAndUpdate(const SwPosition& rNewPos)
+{
     auto nCurrenNodeIndex = rNewPos.GetNodeIndex();
-    if (!rNewPos.GetNode().IsContentNode())
+    auto* pCurrentNode = &rNewPos.GetNode();
+
+    if (!pCurrentNode->IsContentNode() && !pCurrentNode->IsTableNode())
         return;
 
-    auto* pCurrentNode = rNewPos.GetNode().GetContentNode();
+    auto pCurrentWeak = std::make_unique<WeakNodeContainer>(pCurrentNode);
+    if (!pCurrentWeak->isAlive())
+        return;
 
     // Check if previous node was deleted
-    if (!HasBroadcaster())
+    if (!m_pPreviousNode || !m_pPreviousNode->isAlive())
     {
-        EndListeningAll();
-        StartListening(pCurrentNode->GetNotifier());
-        m_pPreviousNode = pCurrentNode;
+        m_pPreviousNode = std::move(pCurrentWeak);
         m_nPreviousNodeIndex = nCurrenNodeIndex;
         return;
     }
@@ -156,37 +238,66 @@ void OnlineAccessibilityCheck::update(const SwPosition& rNewPos)
     if (nCurrenNodeIndex == m_nPreviousNodeIndex)
         return;
 
-    // Check previous node is valid
+    // Check if previous node is valid
     if (m_nPreviousNodeIndex < SwNodeOffset(0)
-        || m_nPreviousNodeIndex >= rNewPos.GetNode().GetNodes().Count())
+        || m_nPreviousNodeIndex >= pCurrentNode->GetNodes().Count())
     {
-        EndListeningAll();
-        StartListening(pCurrentNode->GetNotifier());
-        m_pPreviousNode = pCurrentNode;
+        m_pPreviousNode = std::move(pCurrentWeak);
         m_nPreviousNodeIndex = nCurrenNodeIndex;
         return;
     }
 
     // Get the real previous node from index
-    SwNode* pNode = rNewPos.GetNode().GetNodes()[m_nPreviousNodeIndex];
+    SwNode* pNode = pCurrentNode->GetNodes()[m_nPreviousNodeIndex];
 
-    if (pNode && pNode->IsContentNode())
+    if (pNode && (pNode->IsContentNode() || pNode->IsTableNode()))
     {
-        auto* pContentNode = pNode->GetContentNode();
-
-        runCheck(pContentNode);
+        runAccessibilityCheck(pNode);
+        updateNodeStatus(pNode);
+        updateStatusbar();
 
         // Assign previous node and index
-        EndListeningAll();
-        StartListening(pCurrentNode->GetNotifier());
-        m_pPreviousNode = pCurrentNode;
+        m_pPreviousNode = std::move(pCurrentWeak);
         m_nPreviousNodeIndex = nCurrenNodeIndex;
     }
     else
     {
-        m_pPreviousNode = nullptr;
+        m_pPreviousNode.reset();
         m_nPreviousNodeIndex = SwNodeOffset(-1);
     }
+}
+
+void OnlineAccessibilityCheck::clearAccessibilityIssuesFromAllNodes()
+{
+    auto const& pNodes = m_rDocument.GetNodes();
+    for (SwNodeOffset n(0); n < pNodes.Count(); ++n)
+    {
+        SwNode* pNode = pNodes[n];
+        if (pNode)
+        {
+            pNode->getAccessibilityCheckStatus().reset();
+        }
+    }
+
+    m_aNodes.clear();
+    updateStatusbar();
+}
+
+void OnlineAccessibilityCheck::resetAndQueue(SwNode* pNode)
+{
+    if (utl::ConfigManager::IsFuzzing())
+        return;
+
+    bool bOnlineCheckStatus
+        = officecfg::Office::Common::Accessibility::OnlineAccessibilityCheck::get();
+    if (!bOnlineCheckStatus)
+        return;
+
+    pNode->getAccessibilityCheckStatus().reset();
+    m_aNodes.erase(pNode);
+    runAccessibilityCheck(pNode);
+    updateNodeStatus(pNode);
+    updateStatusbar();
 }
 
 } // end sw

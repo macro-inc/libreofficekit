@@ -45,7 +45,6 @@
 #include <drawingml/chart/typegroupmodel.hxx>
 #include <drawingml/fillproperties.hxx>
 #include <oox/core/xmlfilterbase.hxx>
-#include <oox/helper/containerhelper.hxx>
 #include <oox/helper/modelobjecthelper.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
@@ -125,17 +124,17 @@ void lclConvertLabelFormatting( PropertySet& rPropSet, ObjectFormatter& rFormatt
     bool bHasAnyElement = true;
     if (bMSO2007Doc)
     {
-        bHasAnyElement = rDataLabel.moaSeparator.has() || rDataLabel.monLabelPos.has() ||
-            rDataLabel.mobShowCatName.has() || rDataLabel.mobShowLegendKey.has() ||
-            rDataLabel.mobShowPercent.has() || rDataLabel.mobShowSerName.has() ||
-            rDataLabel.mobShowVal.has();
+        bHasAnyElement = rDataLabel.moaSeparator.has_value() || rDataLabel.monLabelPos.has_value() ||
+            rDataLabel.mobShowCatName.has_value() || rDataLabel.mobShowLegendKey.has_value() ||
+            rDataLabel.mobShowPercent.has_value() || rDataLabel.mobShowSerName.has_value() ||
+            rDataLabel.mobShowVal.has_value();
     }
 
-    bool bShowValue   = !rDataLabel.mbDeleted && rDataLabel.mobShowVal.get( !bMSO2007Doc );
-    bool bShowPercent = !rDataLabel.mbDeleted && rDataLabel.mobShowPercent.get( !bMSO2007Doc ) && (rTypeInfo.meTypeCategory == TYPECATEGORY_PIE);
-    bool bShowCateg   = !rDataLabel.mbDeleted && rDataLabel.mobShowCatName.get( !bMSO2007Doc );
-    bool bShowSerName = !rDataLabel.mbDeleted && rDataLabel.mobShowSerName.get( !bMSO2007Doc );
-    bool bShowSymbol  = !rDataLabel.mbDeleted && rDataLabel.mobShowLegendKey.get( !bMSO2007Doc );
+    bool bShowValue   = !rDataLabel.mbDeleted && rDataLabel.mobShowVal.value_or( !bMSO2007Doc );
+    bool bShowPercent = !rDataLabel.mbDeleted && rDataLabel.mobShowPercent.value_or( !bMSO2007Doc ) && (rTypeInfo.meTypeCategory == TYPECATEGORY_PIE);
+    bool bShowCateg   = !rDataLabel.mbDeleted && rDataLabel.mobShowCatName.value_or( !bMSO2007Doc );
+    bool bShowSerName = !rDataLabel.mbDeleted && rDataLabel.mobShowSerName.value_or( !bMSO2007Doc );
+    bool bShowSymbol  = !rDataLabel.mbDeleted && rDataLabel.mobShowLegendKey.value_or( !bMSO2007Doc );
 
     // tdf#132174, tdf#136650: the inner data table has no own cell number format.
     if( bHasInternalData && bShowValue && !bShowPercent )
@@ -161,18 +160,18 @@ void lclConvertLabelFormatting( PropertySet& rPropSet, ObjectFormatter& rFormatt
     // data label separator (do not overwrite series separator, if no explicit point separator is present)
     // Set the data label separator to "new line" if the value is shown as percentage with a category name,
     // just like in MS-Office. In any other case the default separator will be a semicolon.
-    if( bShowPercent && !bShowValue && ( bDataSeriesLabel || rDataLabel.moaSeparator.has() ) )
-        rPropSet.setProperty( PROP_LabelSeparator, rDataLabel.moaSeparator.get( "\n" ) );
-    else if( bDataSeriesLabel || rDataLabel.moaSeparator.has() )
-        rPropSet.setProperty( PROP_LabelSeparator, rDataLabel.moaSeparator.get( "; " ) );
+    if( bShowPercent && !bShowValue && ( bDataSeriesLabel || rDataLabel.moaSeparator.has_value() ) )
+        rPropSet.setProperty( PROP_LabelSeparator, rDataLabel.moaSeparator.value_or( "\n" ) );
+    else if( bDataSeriesLabel || rDataLabel.moaSeparator.has_value() )
+        rPropSet.setProperty( PROP_LabelSeparator, rDataLabel.moaSeparator.value_or( "; " ) );
 
     // data label placement (do not overwrite series placement, if no explicit point placement is present)
-    if( !(bDataSeriesLabel || rDataLabel.monLabelPos.has()) )
+    if( !(bDataSeriesLabel || rDataLabel.monLabelPos.has_value()) )
         return;
 
     namespace csscd = ::com::sun::star::chart::DataLabelPlacement;
     sal_Int32 nPlacement = -1;
-    switch( rDataLabel.monLabelPos.get( XML_TOKEN_INVALID ) )
+    switch( rDataLabel.monLabelPos.value_or( XML_TOKEN_INVALID ) )
     {
         case XML_outEnd:    nPlacement = csscd::OUTSIDE;        break;
         case XML_inEnd:     nPlacement = csscd::INSIDE;         break;
@@ -198,46 +197,46 @@ void importBorderProperties( PropertySet& rPropSet, Shape& rShape, const Graphic
 {
     LineProperties& rLP = rShape.getLineProperties();
     // no fill has the same effect as no border so skip it
-    if (rLP.maLineFill.moFillType.get() == XML_noFill)
+    if (rLP.maLineFill.moFillType.has_value() && rLP.maLineFill.moFillType.value() == XML_noFill)
         return;
 
-    if (rLP.moLineWidth.has())
+    if (rLP.moLineWidth.has_value())
     {
-        sal_Int32 nWidth = convertEmuToHmm(rLP.moLineWidth.get());
-        rPropSet.setProperty(PROP_LabelBorderWidth, uno::makeAny(nWidth));
-        rPropSet.setProperty(PROP_LabelBorderStyle, uno::makeAny(drawing::LineStyle_SOLID));
+        sal_Int32 nWidth = convertEmuToHmm(rLP.moLineWidth.value());
+        rPropSet.setProperty(PROP_LabelBorderWidth, uno::Any(nWidth));
+        rPropSet.setProperty(PROP_LabelBorderStyle, uno::Any(drawing::LineStyle_SOLID));
     }
     const Color& aColor = rLP.maLineFill.maFillColor;
     ::Color nColor = aColor.getColor(rGraphicHelper);
-    rPropSet.setProperty(PROP_LabelBorderColor, uno::makeAny(nColor));
+    rPropSet.setProperty(PROP_LabelBorderColor, uno::Any(nColor));
 }
 
 void importFillProperties( PropertySet& rPropSet, Shape& rShape, const GraphicHelper& rGraphicHelper, ModelObjectHelper& rModelObjHelper )
 {
     FillProperties& rFP = rShape.getFillProperties();
 
-    if (rFP.moFillType.has() && rFP.moFillType.get() == XML_solidFill)
+    if (rFP.moFillType.has_value() && rFP.moFillType.value() == XML_solidFill)
     {
         rPropSet.setProperty(PROP_LabelFillStyle, drawing::FillStyle_SOLID);
 
         const Color& aColor = rFP.maFillColor;
         ::Color nColor = aColor.getColor(rGraphicHelper);
-        rPropSet.setProperty(PROP_LabelFillColor, uno::makeAny(nColor));
+        rPropSet.setProperty(PROP_LabelFillColor, uno::Any(nColor));
     }
-    else if(rFP.moFillType.has() && rFP.moFillType.get() == XML_pattFill)
+    else if(rFP.moFillType.has_value() && rFP.moFillType.value() == XML_pattFill)
     {
         rPropSet.setProperty(PROP_LabelFillStyle, drawing::FillStyle_HATCH);
         rPropSet.setProperty(PROP_LabelFillBackground, true);
 
         Color aHatchColor( rFP.maPatternProps.maPattFgColor );
-        drawing::Hatch aHatch = createHatch(rFP.maPatternProps.moPattPreset.get(), aHatchColor.getColor(rGraphicHelper, 0));
+        drawing::Hatch aHatch = createHatch(rFP.maPatternProps.moPattPreset.value(), aHatchColor.getColor(rGraphicHelper, 0));
 
         OUString sHatchName = rModelObjHelper.insertFillHatch(aHatch);
         rPropSet.setProperty(PROP_LabelFillHatchName, sHatchName);
 
         const Color& aColor = rFP.maPatternProps.maPattBgColor;
         ::Color nColor = aColor.getColor(rGraphicHelper);
-        rPropSet.setProperty(PROP_LabelFillColor, uno::makeAny(nColor));
+        rPropSet.setProperty(PROP_LabelFillColor, uno::Any(nColor));
     }
 
 }
@@ -320,9 +319,9 @@ void DataLabelConverter::convertFromModel( const Reference< XDataSeries >& rxDat
             if( nParagraphs > 1 )
                 nSequenceSize += nParagraphs - 1;
 
-            OptValue< OUString > oaLabelText;
-            OptValue< OUString > oaCellRange;
-            if (mrModel.mobShowDataLabelsRange.get(false))
+            std::optional< OUString > oaLabelText;
+            std::optional< OUString > oaCellRange;
+            if (mrModel.mobShowDataLabelsRange.value_or(false))
             {
                 const DataSourceModel* pLabelSource = mrModel.mrParent.mpLabelsSource;
                 if (pLabelSource && pLabelSource->mxDataSeq.is())
@@ -331,7 +330,10 @@ void DataLabelConverter::convertFromModel( const Reference< XDataSeries >& rxDat
                     const auto& rLabelMap = pLabelSource->mxDataSeq->maData;
                     const auto& rKV = rLabelMap.find(mrModel.mnIndex);
                     if (rKV != rLabelMap.end())
-                        rKV->second >>= oaLabelText.use();
+                    {
+                        oaLabelText.emplace();
+                        rKV->second >>= *oaLabelText;
+                    }
                 }
             }
 
@@ -351,15 +353,14 @@ void DataLabelConverter::convertFromModel( const Reference< XDataSeries >& rxDat
                     convertTextProperty( aPropertySet, getFormatter(), mrModel.mxText->mxTextBody );
                     pRun->getTextCharacterProperties().pushToPropSet( aPropertySet, getFilter() );
 
-                    TextField* pField = nullptr;
-                    if( ( pField = dynamic_cast< TextField* >( pRun.get() ) ) )
+                    if (TextField* pField = dynamic_cast<TextField*>(pRun.get()))
                     {
                         DataPointCustomLabelFieldType eType = lcl_ConvertFieldNameToFieldEnum( pField->getType() );
 
-                        if (eType == DataPointCustomLabelFieldType::DataPointCustomLabelFieldType_CELLRANGE && oaCellRange.has())
+                        if (eType == DataPointCustomLabelFieldType::DataPointCustomLabelFieldType_CELLRANGE && oaCellRange.has_value())
                         {
-                            xCustomLabel->setCellRange( oaCellRange.get() );
-                            xCustomLabel->setString( oaLabelText.get() );
+                            xCustomLabel->setCellRange( oaCellRange.value() );
+                            xCustomLabel->setString( oaLabelText.value_or("") );
                             xCustomLabel->setDataLabelsRange( true );
                         }
                         else
@@ -368,7 +369,7 @@ void DataLabelConverter::convertFromModel( const Reference< XDataSeries >& rxDat
                         xCustomLabel->setFieldType( eType );
                         xCustomLabel->setGuid( pField->getUuid() );
                     }
-                    else if( pRun )
+                    else
                     {
                         xCustomLabel->setString( pRun->getText() );
                         xCustomLabel->setFieldType( DataPointCustomLabelFieldType::DataPointCustomLabelFieldType_TEXT );
@@ -385,7 +386,7 @@ void DataLabelConverter::convertFromModel( const Reference< XDataSeries >& rxDat
                 }
             }
 
-            aPropSet.setProperty( PROP_CustomLabelFields, makeAny( aSequence ) );
+            aPropSet.setProperty( PROP_CustomLabelFields, Any( aSequence ) );
             convertTextProperty(aPropSet, getFormatter(), mrModel.mxText->mxTextBody);
         }
     }
@@ -666,16 +667,16 @@ void TrendlineConverter::convertFromModel( const Reference< XDataSeries >& rxDat
             aPropSet.setProperty( PROP_MovingAveragePeriod, mrModel.mnPeriod );
 
             // Intercept
-            bool hasIntercept = mrModel.mfIntercept.has();
+            bool hasIntercept = mrModel.mfIntercept.has_value();
             aPropSet.setProperty( PROP_ForceIntercept, hasIntercept);
             if (hasIntercept)
-                aPropSet.setProperty( PROP_InterceptValue,  mrModel.mfIntercept.get());
+                aPropSet.setProperty( PROP_InterceptValue,  mrModel.mfIntercept.value());
 
             // Extrapolation
-            if (mrModel.mfForward.has())
-                aPropSet.setProperty( PROP_ExtrapolateForward, mrModel.mfForward.get() );
-            if (mrModel.mfBackward.has())
-                aPropSet.setProperty( PROP_ExtrapolateBackward, mrModel.mfBackward.get() );
+            if (mrModel.mfForward.has_value())
+                aPropSet.setProperty( PROP_ExtrapolateForward, mrModel.mfForward.value() );
+            if (mrModel.mfBackward.has_value())
+                aPropSet.setProperty( PROP_ExtrapolateBackward, mrModel.mfBackward.value() );
 
             // trendline formatting
             getFormatter().convertFrameFormatting( aPropSet, mrModel.mxShapeProp, OBJECTTYPE_TRENDLINE );
@@ -723,13 +724,14 @@ void DataPointConverter::convertFromModel( const Reference< XDataSeries >& rxDat
         PropertySet aPropSet( rxDataSeries->getDataPointByIndex( mrModel.mnIndex ) );
 
         // data point marker
-        if( mrModel.monMarkerSymbol.differsFrom( rSeries.mnMarkerSymbol ) || mrModel.monMarkerSize.differsFrom( rSeries.mnMarkerSize ) )
-            rTypeGroup.convertMarker( aPropSet, mrModel.monMarkerSymbol.get( rSeries.mnMarkerSymbol ),
-                    mrModel.monMarkerSize.get( rSeries.mnMarkerSize ), mrModel.mxMarkerProp );
+        if( ( mrModel.monMarkerSymbol.has_value() && mrModel.monMarkerSymbol.value() != rSeries.mnMarkerSymbol ) ||
+            ( mrModel.monMarkerSize.has_value() && mrModel.monMarkerSize.value() != rSeries.mnMarkerSize ) )
+            rTypeGroup.convertMarker( aPropSet, mrModel.monMarkerSymbol.value_or( rSeries.mnMarkerSymbol ),
+                    mrModel.monMarkerSize.value_or( rSeries.mnMarkerSize ), mrModel.mxMarkerProp );
 
         // data point pie explosion
-        if( mrModel.monExplosion.differsFrom( rSeries.mnExplosion ) )
-            rTypeGroup.convertPieExplosion( aPropSet, mrModel.monExplosion.get() );
+        if( mrModel.monExplosion.has_value() && mrModel.monExplosion.value() != rSeries.mnExplosion )
+            rTypeGroup.convertPieExplosion( aPropSet, mrModel.monExplosion.value() );
 
         // point formatting
         if( mrModel.mxShapeProp.is() )
@@ -836,7 +838,7 @@ Reference< XDataSeries > SeriesConverter::createDataSeries( const TypeGroupConve
     rTypeGroup.convertLineSmooth( aSeriesProp, mrModel.mbSmooth );
 #endif
     // 3D bar style (not possible to set at chart type -> set at all series)
-    rTypeGroup.convertBarGeometry( aSeriesProp, mrModel.monShape.get( rTypeGroup.getModel().mnShape ) );
+    rTypeGroup.convertBarGeometry( aSeriesProp, mrModel.monShape.value_or( rTypeGroup.getModel().mnShape ) );
     // pie explosion (restricted to [0%,100%] in Chart2)
     rTypeGroup.convertPieExplosion( aSeriesProp, mrModel.mnExplosion );
 

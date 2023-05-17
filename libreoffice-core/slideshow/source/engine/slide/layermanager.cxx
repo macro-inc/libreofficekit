@@ -18,13 +18,14 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <basegfx/range/b1drange.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <cppcanvas/canvas.hxx>
 
 #include <functional>
 #include <algorithm>
+#include <utility>
 
 #include "layermanager.hxx"
 
@@ -541,8 +542,8 @@ namespace slideshow::internal
             class DummyLayer : public ViewLayer
             {
             public:
-                explicit DummyLayer( const ::cppcanvas::CanvasSharedPtr& rCanvas ) :
-                    mpCanvas( rCanvas )
+                explicit DummyLayer( ::cppcanvas::CanvasSharedPtr xCanvas ) :
+                    mpCanvas(std::move( xCanvas ))
                 {
                 }
 

@@ -29,7 +29,7 @@
 #include <string_view>
 
 #include <o3tl/string_view.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <com/sun/star/beans/IllegalTypeException.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
@@ -71,6 +71,7 @@
 #include <ucbhelper/contentidentifier.hxx>
 #include <ucbhelper/propertyvalueset.hxx>
 #include <ucbhelper/macros.hxx>
+#include <utility>
 
 #include "tdoc_content.hxx"
 #include "tdoc_resultset.hxx"
@@ -116,7 +117,7 @@ rtl::Reference<Content> Content::create(
                              aProps ) )
         return nullptr;
 
-    return new Content( rxContext, pProvider, Identifier, aProps );
+    return new Content( rxContext, pProvider, Identifier, std::move(aProps) );
 }
 
 
@@ -144,9 +145,9 @@ Content::Content(
             const uno::Reference< uno::XComponentContext > & rxContext,
             ContentProvider * pProvider,
             const uno::Reference< ucb::XContentIdentifier > & Identifier,
-            const ContentProperties & rProps )
+            ContentProperties aProps )
 : ContentImplHelper( rxContext, pProvider, Identifier ),
-  m_aProps( rProps ),
+  m_aProps(std::move( aProps )),
   m_eState( PERSISTENT ),
   m_pProvider( pProvider )
 {
@@ -337,7 +338,7 @@ uno::Any SAL_CALL Content::execute(
         if ( !( aCommand.Argument >>= Properties ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -357,7 +358,7 @@ uno::Any SAL_CALL Content::execute(
         if ( !( aCommand.Argument >>= aProperties ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -368,7 +369,7 @@ uno::Any SAL_CALL Content::execute(
         if ( !aProperties.hasElements() )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "No properties!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -404,7 +405,7 @@ uno::Any SAL_CALL Content::execute(
         if ( !( aCommand.Argument >>= aOpenCommand ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -424,7 +425,7 @@ uno::Any SAL_CALL Content::execute(
         if ( ( eType != FOLDER ) && ( eType != STREAM ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( ucb::UnsupportedCommandException(
+                uno::Any( ucb::UnsupportedCommandException(
                                 "insert command only supported by "
                                 "folders and streams!",
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
@@ -439,7 +440,7 @@ uno::Any SAL_CALL Content::execute(
             if ( aParentUri.isDocument() )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny( ucb::UnsupportedCommandException(
+                    uno::Any( ucb::UnsupportedCommandException(
                                     "insert command not supported by "
                                     "streams that are direct children "
                                     "of document root!",
@@ -454,7 +455,7 @@ uno::Any SAL_CALL Content::execute(
         if ( !( aCommand.Argument >>= aArg ) )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -480,7 +481,7 @@ uno::Any SAL_CALL Content::execute(
             if ( ( eType != FOLDER ) && ( eType != STREAM ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny( ucb::UnsupportedCommandException(
+                    uno::Any( ucb::UnsupportedCommandException(
                                     "delete command only supported by "
                                     "folders and streams!",
                                     static_cast< cppu::OWeakObject * >(
@@ -526,7 +527,7 @@ uno::Any SAL_CALL Content::execute(
             if ( ( eType != FOLDER ) && ( eType != DOCUMENT ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny( ucb::UnsupportedCommandException(
+                    uno::Any( ucb::UnsupportedCommandException(
                                     "transfer command only supported "
                                     "by folders and documents!",
                                     static_cast< cppu::OWeakObject * >(
@@ -541,7 +542,7 @@ uno::Any SAL_CALL Content::execute(
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -564,7 +565,7 @@ uno::Any SAL_CALL Content::execute(
             if ( ( eType != FOLDER ) && ( eType != DOCUMENT ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny( ucb::UnsupportedCommandException(
+                    uno::Any( ucb::UnsupportedCommandException(
                                     "createNewContent command only "
                                     "supported by folders and "
                                     "documents!",
@@ -580,7 +581,7 @@ uno::Any SAL_CALL Content::execute(
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Wrong argument type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -597,7 +598,7 @@ uno::Any SAL_CALL Content::execute(
 
 
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             Environment );
@@ -892,7 +893,21 @@ uno::Reference< sdbc::XRow > Content::getPropertyValues(
             else if ( rProp.Name == "CreatableContentsInfo" )
             {
                 xRow->appendObject(
-                    rProp, uno::makeAny( rData.getCreatableContentsInfo() ) );
+                    rProp, uno::Any( rData.getCreatableContentsInfo() ) );
+            }
+            else if ( rProp.Name == "DateModified" )
+            {
+                // DateModified is only supported by streams.
+                ContentType eType = rData.getType();
+                if ( eType == STREAM )
+                {
+                    xRow->appendObject(
+                        rProp,
+                        uno::Any(
+                            pProvider->queryStreamDateModified( rContentId ) ) );
+                }
+                else
+                    xRow->appendVoid( rProp );
             }
             else if ( rProp.Name == "Storage" )
             {
@@ -901,7 +916,7 @@ uno::Reference< sdbc::XRow > Content::getPropertyValues(
                 if ( eType == FOLDER )
                     xRow->appendObject(
                         rProp,
-                        uno::makeAny(
+                        uno::Any(
                             pProvider->queryStorageClone( rContentId ) ) );
                 else
                     xRow->appendVoid( rProp );
@@ -913,7 +928,7 @@ uno::Reference< sdbc::XRow > Content::getPropertyValues(
                 if ( eType == DOCUMENT )
                     xRow->appendObject(
                         rProp,
-                        uno::makeAny(
+                        uno::Any(
                             pProvider->queryDocumentModel( rContentId ) ) );
                 else
                     xRow->appendVoid( rProp );
@@ -992,7 +1007,19 @@ uno::Reference< sdbc::XRow > Content::getPropertyValues(
                 cppu::UnoType<uno::Sequence< ucb::ContentInfo >>::get(),
                 beans::PropertyAttribute::BOUND
                 | beans::PropertyAttribute::READONLY ),
-            uno::makeAny( rData.getCreatableContentsInfo() ) );
+            uno::Any( rData.getCreatableContentsInfo() ) );
+
+        // DateModified is only supported by streams.
+        if ( eType == STREAM )
+        {
+            xRow->appendObject(
+                beans::Property( "DateModified",
+                          -1,
+                          cppu::UnoType<css::util::DateTime>::get(),
+                          beans::PropertyAttribute::BOUND
+                            | beans::PropertyAttribute::READONLY ),
+                uno::Any( pProvider->queryStreamDateModified( rContentId ) ) );
+        }
 
         // Storage is only supported by folders.
         if ( eType == FOLDER )
@@ -1002,7 +1029,7 @@ uno::Reference< sdbc::XRow > Content::getPropertyValues(
                           cppu::UnoType<embed::XStorage>::get(),
                           beans::PropertyAttribute::BOUND
                             | beans::PropertyAttribute::READONLY ),
-                uno::makeAny( pProvider->queryStorageClone( rContentId ) ) );
+                uno::Any( pProvider->queryStorageClone( rContentId ) ) );
 
         // DocumentModel is only supported by documents.
         if ( eType == DOCUMENT )
@@ -1012,7 +1039,7 @@ uno::Reference< sdbc::XRow > Content::getPropertyValues(
                           cppu::UnoType<frame::XModel>::get(),
                           beans::PropertyAttribute::BOUND
                             | beans::PropertyAttribute::READONLY ),
-                uno::makeAny(
+                uno::Any(
                     pProvider->queryDocumentModel( rContentId ) ) );
 
         // Append all Additional Core Properties.
@@ -1323,7 +1350,7 @@ uno::Any Content::open(
 
         uno::Reference< ucb::XDynamicResultSet > xSet
             = new DynamicResultSet( m_xContext, this, rArg );
-        return uno::makeAny( xSet );
+        return uno::Any( xSet );
     }
     else
     {
@@ -1336,7 +1363,7 @@ uno::Any Content::open(
         {
             // Currently(?) unsupported.
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( ucb::UnsupportedOpenModeException(
+                uno::Any( ucb::UnsupportedOpenModeException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     sal_Int16( rArg.Mode ) ) ),
@@ -1463,7 +1490,7 @@ uno::Any Content::open(
                 else
                 {
                     ucbhelper::cancelCommandExecution(
-                        uno::makeAny(
+                        uno::Any(
                             ucb::UnsupportedDataSinkException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
@@ -1518,7 +1545,7 @@ void Content::insert( const uno::Reference< io::XInputStream >& xData,
         if ( !xData.is() )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( ucb::MissingInputStreamException(
+                uno::Any( ucb::MissingInputStreamException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
                 xEnv );
@@ -1541,7 +1568,7 @@ void Content::insert( const uno::Reference< io::XInputStream >& xData,
             if ( hasData( aNewUri ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny( ucb::NameClashException(
+                    uno::Any( ucb::NameClashException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     task::InteractionClassification_ERROR,
@@ -1573,7 +1600,7 @@ void Content::insert( const uno::Reference< io::XInputStream >& xData,
                 if ( nTry == 1000 )
                 {
                     ucbhelper::cancelCommandExecution(
-                        uno::makeAny(
+                        uno::Any(
                             ucb::UnsupportedNameClashException(
                                 "Unable to resolve name clash!",
                                 static_cast< cppu::OWeakObject * >( this ),
@@ -1597,7 +1624,7 @@ void Content::insert( const uno::Reference< io::XInputStream >& xData,
             if ( hasData( aNewUri ) )
             {
                 ucbhelper::cancelCommandExecution(
-                    uno::makeAny(
+                    uno::Any(
                         ucb::UnsupportedNameClashException(
                             OUString(),
                             static_cast< cppu::OWeakObject * >( this ),
@@ -1663,7 +1690,7 @@ void Content::destroy( bool bDeletePhysical,
     if ( m_eState != PERSISTENT )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 "Not persistent!",
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1798,7 +1825,7 @@ void Content::transfer(
     if ( m_eState != PERSISTENT )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::UnsupportedCommandException(
+            uno::Any( ucb::UnsupportedCommandException(
                                 "Not persistent!",
                                 static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1811,7 +1838,7 @@ void Content::transfer(
     {
         // Invalid length (to short).
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::InteractiveBadTransferURLException(
+            uno::Any( ucb::InteractiveBadTransferURLException(
                             OUString(),
                             static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1825,7 +1852,7 @@ void Content::transfer(
     {
         // Invalid scheme.
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( ucb::InteractiveBadTransferURLException(
+            uno::Any( ucb::InteractiveBadTransferURLException(
                             OUString(),
                             static_cast< cppu::OWeakObject * >( this ) ) ),
             xEnv );
@@ -1837,7 +1864,7 @@ void Content::transfer(
     if ( !aSourceUri.isValid() )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( lang::IllegalArgumentException(
+            uno::Any( lang::IllegalArgumentException(
                                 "Invalid source URI! Syntax!",
                                 static_cast< cppu::OWeakObject * >( this ),
                                 -1 ) ),
@@ -1848,7 +1875,7 @@ void Content::transfer(
     if ( aSourceUri.isRoot() || aSourceUri.isDocument() )
     {
         ucbhelper::cancelCommandExecution(
-            uno::makeAny( lang::IllegalArgumentException(
+            uno::Any( lang::IllegalArgumentException(
                                 "Invalid source URI! Must describe a folder or stream!",
                                 static_cast< cppu::OWeakObject * >( this ),
                                 -1 ) ),
@@ -1897,7 +1924,7 @@ void Content::transfer(
                 if ( xStorage->isStreamElement( aSourceUri.getDecodedName() ) )
                 {
                     ucbhelper::cancelCommandExecution(
-                        uno::makeAny( lang::IllegalArgumentException(
+                        uno::Any( lang::IllegalArgumentException(
                                         "Invalid source URI! "
                                         "Streams cannot be created as "
                                         "children of document root!",
@@ -1926,7 +1953,7 @@ void Content::transfer(
         if ( !bOK )
         {
             ucbhelper::cancelCommandExecution(
-                uno::makeAny( lang::IllegalArgumentException(
+                uno::Any( lang::IllegalArgumentException(
                                     "Invalid source URI! Unable to determine source type!",
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -2235,7 +2262,7 @@ bool Content::storeData( const uno::Reference< io::XInputStream >& xData,
             // its contents will be lost on save of the document!!!
             xPropSet->setPropertyValue(
                 "MediaType",
-                uno::makeAny(
+                uno::Any(
                     OUString(                        // @@@ better mediatype
                         "application/binary"  ) ) );
         }

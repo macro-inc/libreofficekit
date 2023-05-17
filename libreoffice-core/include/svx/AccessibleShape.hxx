@@ -52,7 +52,6 @@ namespace com::sun::star {
     namespace accessibility { class XAccessibleEventListener; }
     namespace accessibility { class XAccessibleHyperlink; }
     namespace accessibility { class XAccessibleRelationSet; }
-    namespace accessibility { class XAccessibleStateSet; }
     namespace beans { struct PropertyValue; }
     namespace document { struct EventObject; }
     namespace drawing { class XShape; }
@@ -131,22 +130,22 @@ public:
 //=====  XAccessibleSelection  ============================================
 
     virtual void SAL_CALL selectAccessibleChild(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
 
     virtual sal_Bool SAL_CALL isAccessibleChildSelected(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
 
     virtual void SAL_CALL clearAccessibleSelection(  ) override;
 
     virtual void SAL_CALL selectAllAccessibleChildren(  ) override;
 
-    virtual sal_Int32 SAL_CALL getSelectedAccessibleChildCount(  ) override;
+    virtual sal_Int64 SAL_CALL getSelectedAccessibleChildCount(  ) override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getSelectedAccessibleChild(
-        sal_Int32 nSelectedChildIndex ) override;
+        sal_Int64 nSelectedChildIndex ) override;
 
     virtual void SAL_CALL deselectAccessibleChild(
-        sal_Int32 nSelectedChildIndex ) override;
+        sal_Int64 nSelectedChildIndex ) override;
 
     // ====== XAccessibleExtendedAttributes =====================================
     virtual css::uno::Any SAL_CALL getExtendedAttributes() override ;
@@ -178,7 +177,7 @@ public:
             The returned flag indicates whether the specified state has been
             changed (<TRUE/>), i.e. it has formerly not been set.
     */
-    virtual bool SetState (sal_Int16 aState) override;
+    virtual bool SetState (sal_Int64 aState) override;
 
     /** Reset the specified state.  If the state is <const>FOCUSED</const>
         then, additionally to the inherited functionality, the focus
@@ -192,7 +191,7 @@ public:
             The returned flag indicates whether the specified state has been
             changed (<TRUE/>), i.e. it has formerly been set.
     */
-    virtual bool ResetState (sal_Int16 aState) override;
+    virtual bool ResetState (sal_Int64 aState) override;
 
     /** Return the state of the specified state.  Take the
         <const>FOCUSED</const> state from the accessible edit engine.
@@ -205,13 +204,13 @@ public:
             entity that manages the state set.
 
     */
-    bool GetState (sal_Int16 aState);
+    bool GetState (sal_Int64 aState);
 
 
     //=====  XAccessibleContext  ==============================================
 
     /// Return the number of currently visible children.
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleChildCount() override;
 
     /** Return the specified child.
@@ -225,16 +224,15 @@ public:
     */
     virtual css::uno::Reference<
             css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild (sal_Int32 nIndex) override;
+        getAccessibleChild (sal_Int64 nIndex) override;
 
 
     /// Return the set of current states.
-    virtual css::uno::Reference<
-            css::accessibility::XAccessibleStateSet> SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleStateSet() override;
 
     /// Return this objects index among the parents children.
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleIndexInParent() override;
 
     //=====  XAccessibleComponent  ============================================
@@ -413,7 +411,7 @@ protected:
     /// @throws css::uno::RuntimeException
     OUString
        GetFullAccessibleName(AccessibleShape *shape);
-    virtual OUString GetStyle();
+    virtual OUString GetStyle() const;
     /** Update the <const>OPAQUE</const> and <const>SELECTED</const> state.
     */
     void UpdateStates();

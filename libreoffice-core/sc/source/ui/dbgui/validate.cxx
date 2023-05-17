@@ -27,6 +27,7 @@
 #include <svl/eitem.hxx>
 #include <svl/intitem.hxx>
 #include <sfx2/app.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <scresid.hxx>
 #include <strings.hrc>
@@ -101,12 +102,12 @@ ScValidationDlg::ScValidationDlg(weld::Window* pParent, const SfxItemSet* pArgSe
     }
 }
 
-void ScValidationDlg::EndDialog()
+void ScValidationDlg::EndDialog(int nResponse)
 {
     // tdf#137215 ensure original modality of true is restored before dialog loop ends
     if (m_bOwnRefHdlr)
         RemoveRefDlg(true);
-    ScValidationDlgBase::EndDialog();
+    ScValidationDlgBase::EndDialog(nResponse);
 }
 
 ScValidationDlg::~ScValidationDlg()
@@ -288,15 +289,15 @@ ScConditionMode lclGetCondModeFromPos( sal_uInt16 nLbPos )
     @descr  Keeps all empty strings.
     Example: abc\ndef\n\nghi -> "abc";"def";"";"ghi".
     @param rFmlaStr  (out-param) The converted formula string. */
-void lclGetFormulaFromStringList( OUString& rFmlaStr, const OUString& rStringList, sal_Unicode cFmlaSep )
+void lclGetFormulaFromStringList( OUString& rFmlaStr, std::u16string_view rStringList, sal_Unicode cFmlaSep )
 {
     rFmlaStr.clear();
-    if (!rStringList.isEmpty())
+    if (!rStringList.empty())
     {
         sal_Int32 nIdx {0};
         do
         {
-            OUString aToken {rStringList.getToken( 0, '\n', nIdx )};
+            OUString aToken {o3tl::getToken(rStringList, 0, '\n', nIdx )};
             ScGlobal::AddQuotes( aToken, '"' );
             rFmlaStr = ScGlobal::addToken(rFmlaStr, aToken, cFmlaSep);
         }
@@ -424,41 +425,37 @@ std::unique_ptr<SfxTabPage> ScTPValidationValue::Create(weld::Container* pPage, 
 
 void ScTPValidationValue::Reset( const SfxItemSet* rArgSet )
 {
-    const SfxPoolItem* pItem;
-
     sal_uInt16 nLbPos = SC_VALIDDLG_ALLOW_ANY;
-    if( rArgSet->GetItemState( FID_VALID_MODE, true, &pItem ) == SfxItemState::SET )
-        nLbPos = lclGetPosFromValMode( static_cast< ScValidationMode >(
-            static_cast< const SfxUInt16Item* >( pItem )->GetValue() ) );
+    if( const SfxUInt16Item* pItem = rArgSet->GetItemIfSet( FID_VALID_MODE ) )
+        nLbPos = lclGetPosFromValMode( static_cast< ScValidationMode >( pItem->GetValue() ) );
     m_xLbAllow->set_active( nLbPos );
 
     nLbPos = SC_VALIDDLG_DATA_EQUAL;
-    if( rArgSet->GetItemState( FID_VALID_CONDMODE, true, &pItem ) == SfxItemState::SET )
-        nLbPos = lclGetPosFromCondMode( static_cast< ScConditionMode >(
-            static_cast< const SfxUInt16Item* >( pItem )->GetValue() ) );
+    if( const SfxUInt16Item* pItem = rArgSet->GetItemIfSet( FID_VALID_CONDMODE ) )
+        nLbPos = lclGetPosFromCondMode( static_cast< ScConditionMode >( pItem->GetValue() ) );
     m_xLbValue->set_active( nLbPos );
 
     // *** check boxes ***
     bool bCheck = true;
-    if( rArgSet->GetItemState( FID_VALID_BLANK, true, &pItem ) == SfxItemState::SET )
-        bCheck = static_cast< const SfxBoolItem* >( pItem )->GetValue();
+    if( const SfxBoolItem* pItem = rArgSet->GetItemIfSet( FID_VALID_BLANK ) )
+        bCheck = pItem->GetValue();
     m_xCbAllow->set_active( bCheck );
 
     sal_Int32 nListType = ValidListType::UNSORTED;
-    if( rArgSet->GetItemState( FID_VALID_LISTTYPE, true, &pItem ) == SfxItemState::SET )
-        nListType = static_cast< const SfxInt16Item* >( pItem )->GetValue();
+    if( const SfxInt16Item* pItem = rArgSet->GetItemIfSet( FID_VALID_LISTTYPE ) )
+        nListType = pItem->GetValue();
     m_xCbShow->set_active( nListType != ValidListType::INVISIBLE );
     m_xCbSort->set_active( nListType == ValidListType::SORTEDASCENDING );
 
     // *** formulas ***
     OUString aFmlaStr;
-    if ( rArgSet->GetItemState( FID_VALID_VALUE1, true, &pItem ) == SfxItemState::SET )
-        aFmlaStr = static_cast< const SfxStringItem* >( pItem )->GetValue();
+    if ( const SfxStringItem* pItem = rArgSet->GetItemIfSet( FID_VALID_VALUE1 ) )
+        aFmlaStr = pItem->GetValue();
     SetFirstFormula( aFmlaStr );
 
     aFmlaStr.clear();
-    if ( rArgSet->GetItemState( FID_VALID_VALUE2, true, &pItem ) == SfxItemState::SET )
-        aFmlaStr = static_cast< const SfxStringItem* >( pItem )->GetValue();
+    if ( const SfxStringItem* pItem = rArgSet->GetItemIfSet( FID_VALID_VALUE2 ) )
+        aFmlaStr = pItem->GetValue();
     SetSecondFormula( aFmlaStr );
 
     SelectHdl( *m_xLbAllow );
@@ -694,11 +691,10 @@ IMPL_LINK_NOARG(ScTPValidationValue, CheckHdl, weld::Toggleable&, void)
 // Input Help Page
 
 ScTPValidationHelp::ScTPValidationHelp(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rArgSet)
-    : SfxTabPage(pPage, pController, IS_MOBILE ? OUString("modules/scalc/ui/validationhelptabpage-mobile.ui")
-            : OUString("modules/scalc/ui/validationhelptabpage.ui"), "ValidationHelpTabPage", &rArgSet)
+    : SfxTabPage(pPage, pController, "modules/scalc/ui/validationhelptabpage.ui", "ValidationHelpTabPage", &rArgSet)
     , m_xTsbHelp(m_xBuilder->weld_check_button("tsbhelp"))
     , m_xEdtTitle(m_xBuilder->weld_entry("title"))
-    , m_xEdInputHelp(m_xBuilder->weld_text_view("inputhelp"))
+    , m_xEdInputHelp(m_xBuilder->weld_text_view("inputhelp_text"))
 {
     m_xEdInputHelp->set_size_request(m_xEdInputHelp->get_approximate_digit_width() * 40, m_xEdInputHelp->get_height_rows(13));
 }
@@ -715,20 +711,18 @@ std::unique_ptr<SfxTabPage> ScTPValidationHelp::Create(weld::Container* pPage, w
 
 void ScTPValidationHelp::Reset( const SfxItemSet* rArgSet )
 {
-    const SfxPoolItem* pItem;
-
-    if ( rArgSet->GetItemState( FID_VALID_SHOWHELP, true, &pItem ) == SfxItemState::SET )
-        m_xTsbHelp->set_state( static_cast<const SfxBoolItem*>(pItem)->GetValue() ? TRISTATE_TRUE : TRISTATE_FALSE );
+    if ( const SfxBoolItem* pItem = rArgSet->GetItemIfSet( FID_VALID_SHOWHELP ) )
+        m_xTsbHelp->set_state( pItem->GetValue() ? TRISTATE_TRUE : TRISTATE_FALSE );
     else
         m_xTsbHelp->set_state( TRISTATE_FALSE );
 
-    if ( rArgSet->GetItemState( FID_VALID_HELPTITLE, true, &pItem ) == SfxItemState::SET )
-        m_xEdtTitle->set_text( static_cast<const SfxStringItem*>(pItem)->GetValue() );
+    if ( const SfxStringItem* pItem = rArgSet->GetItemIfSet( FID_VALID_HELPTITLE ) )
+        m_xEdtTitle->set_text( pItem->GetValue() );
     else
         m_xEdtTitle->set_text( OUString() );
 
-    if ( rArgSet->GetItemState( FID_VALID_HELPTEXT, true, &pItem ) == SfxItemState::SET )
-        m_xEdInputHelp->set_text( static_cast<const SfxStringItem*>(pItem)->GetValue() );
+    if ( const SfxStringItem* pItem = rArgSet->GetItemIfSet( FID_VALID_HELPTEXT ) )
+        m_xEdInputHelp->set_text( pItem->GetValue() );
     else
         m_xEdInputHelp->set_text( OUString() );
 }
@@ -748,8 +742,7 @@ ScTPValidationError::ScTPValidationError(weld::Container* pPage, weld::DialogCon
                                          const SfxItemSet& rArgSet)
 
     :   SfxTabPage      ( pPage, pController,
-                          IS_MOBILE ? OUString("modules/scalc/ui/erroralerttabpage-mobile.ui")
-                                : OUString("modules/scalc/ui/erroralerttabpage.ui"), "ErrorAlertTabPage",
+                          "modules/scalc/ui/erroralerttabpage.ui", "ErrorAlertTabPage",
                           &rArgSet )
     , m_xTsbShow(m_xBuilder->weld_check_button("tsbshow"))
     , m_xLbAction(m_xBuilder->weld_combo_box("actionCB"))
@@ -784,25 +777,23 @@ std::unique_ptr<SfxTabPage> ScTPValidationError::Create(weld::Container* pPage, 
 
 void ScTPValidationError::Reset( const SfxItemSet* rArgSet )
 {
-    const SfxPoolItem* pItem;
-
-    if ( rArgSet->GetItemState( FID_VALID_SHOWERR, true, &pItem ) == SfxItemState::SET )
-        m_xTsbShow->set_state( static_cast<const SfxBoolItem*>(pItem)->GetValue() ? TRISTATE_TRUE : TRISTATE_FALSE );
+    if ( const SfxBoolItem* pItem = rArgSet->GetItemIfSet( FID_VALID_SHOWERR ) )
+        m_xTsbShow->set_state( pItem->GetValue() ? TRISTATE_TRUE : TRISTATE_FALSE );
     else
         m_xTsbShow->set_state( TRISTATE_TRUE );   // check by default
 
-    if ( rArgSet->GetItemState( FID_VALID_ERRSTYLE, true, &pItem ) == SfxItemState::SET )
-        m_xLbAction->set_active( static_cast<const SfxUInt16Item*>(pItem)->GetValue() );
+    if ( const SfxUInt16Item* pItem = rArgSet->GetItemIfSet( FID_VALID_ERRSTYLE ) )
+        m_xLbAction->set_active( pItem->GetValue() );
     else
         m_xLbAction->set_active( 0 );
 
-    if ( rArgSet->GetItemState( FID_VALID_ERRTITLE, true, &pItem ) == SfxItemState::SET )
-        m_xEdtTitle->set_text( static_cast<const SfxStringItem*>(pItem)->GetValue() );
+    if ( const SfxStringItem* pItem = rArgSet->GetItemIfSet( FID_VALID_ERRTITLE ) )
+        m_xEdtTitle->set_text( pItem->GetValue() );
     else
         m_xEdtTitle->set_text( OUString() );
 
-    if ( rArgSet->GetItemState( FID_VALID_ERRTEXT, true, &pItem ) == SfxItemState::SET )
-        m_xEdError->set_text( static_cast<const SfxStringItem*>(pItem)->GetValue() );
+    if ( const SfxStringItem* pItem = rArgSet->GetItemIfSet( FID_VALID_ERRTEXT ) )
+        m_xEdError->set_text( pItem->GetValue() );
     else
         m_xEdError->set_text( OUString() );
 

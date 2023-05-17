@@ -19,6 +19,7 @@
 #include "xmlTable.hxx"
 #include "xmlfilter.hxx"
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmlstyle.hxx>
@@ -35,8 +36,7 @@
 #include <com/sun/star/report/XShape.hpp>
 #include <com/sun/star/report/XFixedLine.hpp>
 #include <osl/diagnose.h>
-#include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <numeric>
 
@@ -60,10 +60,10 @@ namespace rptxml
 
 OXMLTable::OXMLTable( ORptFilter& rImport
                 ,const Reference< XFastAttributeList > & _xAttrList
-                ,const uno::Reference< report::XSection >& _xSection
+                ,uno::Reference< report::XSection > _xSection
                 )
 :SvXMLImportContext( rImport )
-,m_xSection(_xSection)
+,m_xSection(std::move(_xSection))
 ,m_nColSpan(1)
 ,m_nRowSpan(0)
 ,m_nRowIndex(0)

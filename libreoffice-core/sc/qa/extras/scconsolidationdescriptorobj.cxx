@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/xconsolidationdescriptor.hxx>
 
 #include <com/sun/star/lang/XComponent.hpp>
@@ -23,14 +23,13 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScConsolidationDescriptorObj : public CalcUnoApiTest, public apitest::XConsolidationDescriptor
+class ScConsolidationDescriptorObj : public UnoApiTest, public apitest::XConsolidationDescriptor
 {
 public:
     ScConsolidationDescriptorObj();
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScConsolidationDescriptorObj);
 
@@ -49,13 +48,10 @@ public:
     CPPUNIT_TEST(testSetInsertLinks);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScConsolidationDescriptorObj::ScConsolidationDescriptorObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -69,15 +65,9 @@ uno::Reference<uno::XInterface> ScConsolidationDescriptorObj::init()
 
 void ScConsolidationDescriptorObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScConsolidationDescriptorObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScConsolidationDescriptorObj);

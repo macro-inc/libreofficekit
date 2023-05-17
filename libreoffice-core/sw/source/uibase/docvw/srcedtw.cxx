@@ -33,7 +33,6 @@
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/textview.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/ptrstyle.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/viewfrm.hxx>
@@ -44,6 +43,7 @@
 #include <editeng/flstitem.hxx>
 #include <vcl/metric.hxx>
 #include <svtools/ctrltool.hxx>
+#include <svtools/scrolladaptor.hxx>
 #include <tools/time.hxx>
 #include <swmodule.hxx>
 #include <docsh.hxx>
@@ -67,7 +67,7 @@ struct TextPortion
 
 typedef std::vector<TextPortion> TextPortions;
 
-static void lcl_Highlight(const OUString& rSource, TextPortions& aPortionList)
+static void lcl_Highlight(std::u16string_view aSource, TextPortions& aPortionList)
 {
     const sal_Unicode cOpenBracket = '<';
     const sal_Unicode cCloseBracket= '>';
@@ -79,15 +79,15 @@ static void lcl_Highlight(const OUString& rSource, TextPortions& aPortionList)
     const sal_Unicode cLF          = 0x0a;
     const sal_Unicode cCR          = 0x0d;
 
-    const sal_uInt16 nStrLen = rSource.getLength();
-    sal_uInt16 nInsert = 0;         // number of inserted portions
-    sal_uInt16 nActPos = 0;         // position, where '<' was found
-    sal_uInt16 nPortStart = USHRT_MAX;  // for the TextPortion
-    sal_uInt16 nPortEnd  =  0;
+    const sal_Int32 nStrLen = aSource.size();
+    sal_Int32 nInsert = 0;         // number of inserted portions
+    sal_Int32 nActPos = 0;         // position, where '<' was found
+    sal_Int32 nPortStart = SAL_MAX_INT32;  // for the TextPortion
+    sal_Int32 nPortEnd  =  0;
     TextPortion aText;
     while(nActPos < nStrLen)
     {
-        if((nActPos < nStrLen - 2) && (rSource[nActPos] == cOpenBracket))
+        if((nActPos < nStrLen - 2) && (aSource[nActPos] == cOpenBracket))
         {
             svtools::ColorConfigEntry eFoundType = svtools::HTMLUNKNOWN;
             // insert 'empty' portion
@@ -102,13 +102,13 @@ static void lcl_Highlight(const OUString& rSource, TextPortions& aPortionList)
                 aPortionList.push_back( aText );
                 nInsert++;
             }
-            sal_Unicode cFollowFirst = rSource[nActPos + 1];
-            sal_Unicode cFollowNext = rSource[nActPos + 2];
+            sal_Unicode cFollowFirst = aSource[nActPos + 1];
+            sal_Unicode cFollowNext = aSource[nActPos + 2];
             if(cExclamation == cFollowFirst)
             {
                 // "<!" SGML or comment
                 if(cMinus == cFollowNext &&
-                    nActPos < nStrLen - 3 && cMinus == rSource[nActPos + 3])
+                    nActPos < nStrLen - 3 && cMinus == aSource[nActPos + 3])
                 {
                     eFoundType = svtools::HTMLCOMMENT;
                 }
@@ -129,7 +129,7 @@ static void lcl_Highlight(const OUString& rSource, TextPortions& aPortionList)
                 sal_uInt16 nSrchPos = nActPos;
                 while(++nSrchPos < nStrLen - 1)
                 {
-                    sal_Unicode cNext = rSource[nSrchPos];
+                    sal_Unicode cNext = aSource[nSrchPos];
                     if( cNext == cSpace ||
                         cNext == cTab   ||
                         cNext == cLF    ||
@@ -143,33 +143,25 @@ static void lcl_Highlight(const OUString& rSource, TextPortions& aPortionList)
                 if(nSrchPos > nActPos + 1)
                 {
                     // some string was found
-                    OUString sToken = rSource.copy(nActPos + 1, nSrchPos - nActPos - 1 );
+                    OUString sToken( aSource.substr(nActPos + 1, nSrchPos - nActPos - 1 ) );
                     sToken = sToken.toAsciiUpperCase();
                     HtmlTokenId nToken = ::GetHTMLToken(sToken);
                     if(nToken != HtmlTokenId::NONE)
                     {
-                        // Token was found
                         eFoundType = svtools::HTMLKEYWORD;
                         nPortEnd = nSrchPos;
                         nPortStart = nActPos;
                     }
                     else
-                    {
-                        // what was that?
-                        SAL_WARN(
-                            "sw.level2",
-                            "Token " << sToken
-                                << " not recognised!");
-                    }
-
+                        SAL_WARN("sw", "HTML token " << sToken << " not recognised!");
                 }
             }
             // now we still have to look for '>'
             if(svtools::HTMLUNKNOWN != eFoundType)
             {
                 bool bFound = false;
-                for(sal_uInt16 i = nPortEnd; i < nStrLen; i++)
-                    if(cCloseBracket == rSource[i])
+                for(sal_Int32 i = nPortEnd; i < nStrLen; i++)
+                    if(cCloseBracket == aSource[i])
                     {
                         bFound = true;
                         nPortEnd = i;
@@ -210,25 +202,25 @@ class SwSrcEditWindow::ChangesListener:
     public cppu::WeakImplHelper< css::beans::XPropertiesChangeListener >
 {
 public:
-    explicit ChangesListener(SwSrcEditWindow & editor): editor_(editor) {}
+    explicit ChangesListener(SwSrcEditWindow & editor): m_Editor(editor) {}
 
 private:
     virtual ~ChangesListener() override {}
 
     virtual void SAL_CALL disposing(css::lang::EventObject const &) override
     {
-        osl::MutexGuard g(editor_.mutex_);
-        editor_.m_xNotifier.clear();
+        std::unique_lock g(m_Editor.mutex_);
+        m_Editor.m_xNotifier.clear();
     }
 
     virtual void SAL_CALL propertiesChange(
         css::uno::Sequence< css::beans::PropertyChangeEvent > const &) override
     {
         SolarMutexGuard g;
-        editor_.SetFont();
+        m_Editor.SetFont();
     }
 
-    SwSrcEditWindow & editor_;
+    SwSrcEditWindow & m_Editor;
 };
 
 SwSrcEditWindow::SwSrcEditWindow( vcl::Window* pParent, SwSrcView* pParentView ) :
@@ -257,7 +249,7 @@ SwSrcEditWindow::SwSrcEditWindow( vcl::Window* pParent, SwSrcView* pParentView )
         officecfg::Office::Common::Font::SourceViewFont::get(),
         css::uno::UNO_QUERY_THROW);
     {
-        osl::MutexGuard g(mutex_);
+        std::unique_lock g(mutex_);
         m_xNotifier = n;
     }
     n->addPropertiesChangeListener({ "FontHeight", "FontName" }, m_xListener);
@@ -272,7 +264,7 @@ void SwSrcEditWindow::dispose()
 {
     css::uno::Reference< css::beans::XMultiPropertySet > n;
     {
-        osl::MutexGuard g(mutex_);
+        std::unique_lock g(mutex_);
         n = m_xNotifier;
     }
     if (n.is()) {
@@ -498,15 +490,14 @@ void SwSrcEditWindow::CreateTextEngine()
     m_pOutWin->Show();
 
     // create Scrollbars
-    m_pHScrollbar = VclPtr<ScrollBar>::Create(this, WB_3DLOOK |WB_HSCROLL|WB_DRAG);
+    m_pHScrollbar = VclPtr<ScrollAdaptor>::Create(this, true);
     m_pHScrollbar->EnableRTL( false );
-    m_pHScrollbar->SetScrollHdl(LINK(this, SwSrcEditWindow, ScrollHdl));
+    m_pHScrollbar->SetScrollHdl(LINK(this, SwSrcEditWindow, HorzScrollHdl));
     m_pHScrollbar->Show();
 
-    m_pVScrollbar = VclPtr<ScrollBar>::Create(this, WB_3DLOOK |WB_VSCROLL|WB_DRAG);
+    m_pVScrollbar = VclPtr<ScrollAdaptor>::Create(this, false);
     m_pVScrollbar->EnableRTL( false );
-    m_pVScrollbar->SetScrollHdl(LINK(this, SwSrcEditWindow, ScrollHdl));
-    m_pHScrollbar->EnableDrag();
+    m_pVScrollbar->SetScrollHdl(LINK(this, SwSrcEditWindow, VertScrollHdl));
     m_pVScrollbar->Show();
 
     m_pTextEngine.reset(new ExtTextEngine);
@@ -563,22 +554,21 @@ void SwSrcEditWindow::InitScrollBars()
 
 }
 
-IMPL_LINK(SwSrcEditWindow, ScrollHdl, ScrollBar*, pScroll, void)
+IMPL_LINK_NOARG(SwSrcEditWindow, HorzScrollHdl, weld::Scrollbar&, void)
 {
-    if(pScroll == m_pVScrollbar)
-    {
-        tools::Long nDiff = m_pTextView->GetStartDocPos().Y() - pScroll->GetThumbPos();
-        GetTextView()->Scroll( 0, nDiff );
-        m_pTextView->ShowCursor( false );
-        pScroll->SetThumbPos( m_pTextView->GetStartDocPos().Y() );
-    }
-    else
-    {
-        tools::Long nDiff = m_pTextView->GetStartDocPos().X() - pScroll->GetThumbPos();
-        GetTextView()->Scroll( nDiff, 0 );
-        m_pTextView->ShowCursor( false );
-        pScroll->SetThumbPos( m_pTextView->GetStartDocPos().X() );
-    }
+    tools::Long nDiff = m_pTextView->GetStartDocPos().X() - m_pHScrollbar->GetThumbPos();
+    GetTextView()->Scroll( nDiff, 0 );
+    m_pTextView->ShowCursor( false );
+    m_pHScrollbar->SetThumbPos( m_pTextView->GetStartDocPos().X() );
+    GetSrcView()->GetViewFrame()->GetBindings().Invalidate( SID_TABLE_CELL );
+}
+
+IMPL_LINK_NOARG(SwSrcEditWindow, VertScrollHdl, weld::Scrollbar&, void)
+{
+    tools::Long nDiff = m_pTextView->GetStartDocPos().Y() - m_pVScrollbar->GetThumbPos();
+    GetTextView()->Scroll( 0, nDiff );
+    m_pTextView->ShowCursor( false );
+    m_pVScrollbar->SetThumbPos( m_pTextView->GetStartDocPos().Y() );
     GetSrcView()->GetViewFrame()->GetBindings().Invalidate( SID_TABLE_CELL );
 }
 
@@ -662,10 +652,10 @@ void SwSrcEditWindow::DoSyntaxHighlight( sal_uInt16 nPara )
 
 }
 
-void SwSrcEditWindow::ImpDoHighlight( const OUString& rSource, sal_uInt16 nLineOff )
+void SwSrcEditWindow::ImpDoHighlight( std::u16string_view aSource, sal_uInt16 nLineOff )
 {
     TextPortions aPortionList;
-    lcl_Highlight(rSource, aPortionList);
+    lcl_Highlight(aSource, aPortionList);
 
     size_t nCount = aPortionList.size();
     if ( !nCount )
@@ -699,8 +689,8 @@ void SwSrcEditWindow::ImpDoHighlight( const OUString& rSource, sal_uInt16 nLineO
                 r.nStart = nLastEnd;
             }
             nLastEnd = r.nEnd+1;
-            if ( ( i == (nCount-1) ) && ( r.nEnd < rSource.getLength() ) )
-                r.nEnd = rSource.getLength();
+            if ( ( i == (nCount-1) ) && ( r.nEnd < aSource.size() ) )
+                r.nEnd = aSource.size();
         }
     }
 

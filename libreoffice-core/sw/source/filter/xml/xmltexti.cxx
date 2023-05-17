@@ -21,6 +21,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/propertyvalue.hxx>
+#include <comphelper/servicehelper.hxx>
 #include <com/sun/star/embed/EmbeddedObjectCreator.hpp>
 #include <com/sun/star/embed/OOoEmbeddedObjectFactory.hpp>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
@@ -62,7 +63,6 @@
 #include <svl/urihelper.hxx>
 #include <sfx2/frmdescr.hxx>
 #include <tools/globname.hxx>
-#include <tools/UnitConversion.hxx>
 
 #include <algorithm>
 #include <utility>
@@ -179,7 +179,7 @@ bool SwXMLTextImportHelper::IsInHeaderFooter() const
     SAL_WARN_IF(!pTextCursor, "sw.uno", "SwXTextCursor missing");
     SwDoc *pDoc = pTextCursor ? pTextCursor->GetDoc() : nullptr;
 
-    return pDoc && pDoc->IsInHeaderFooter( pTextCursor->GetPaM()->GetPoint()->nNode );
+    return pDoc && pDoc->IsInHeaderFooter( pTextCursor->GetPaM()->GetPoint()->GetNode() );
 }
 
 static SwOLENode *lcl_GetOLENode( const SwFrameFormat *pFrameFormat )
@@ -220,7 +220,7 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertOLEObject(
     assert(xCursorTunnel.is() && "missing XUnoTunnel for Cursor");
     OTextCursorHelper* pTextCursor = comphelper::getFromUnoTunnel<OTextCursorHelper>(xCursorTunnel);
     SAL_WARN_IF(!pTextCursor, "sw.uno", "SwXTextCursor missing");
-    SwDoc *pDoc = SwImport::GetDocFromXMLImport( rImport );
+    SwDoc *pDoc = static_cast<SwXMLImport&>(rImport).getDoc();
 
     SfxItemSetFixed<RES_FRMATR_BEGIN, RES_FRMATR_END> aItemSet( pDoc->GetAttrPool() );
     Size aTwipSize( 0, 0 );
@@ -337,8 +337,8 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertOLEObject(
             pOLENd->SetOLESizeInvalid( true );
     }
 
-    xPropSet.set(SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
-                *pDoc, pFrameFormat), uno::UNO_QUERY);
+    xPropSet = SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
+                *pDoc, pFrameFormat);
     if( pDoc->getIDocumentDrawModelAccess().GetDrawModel() )
     {
         // req for z-order
@@ -522,7 +522,7 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertOOoLink(
     assert(xCursorTunnel.is() && "missing XUnoTunnel for Cursor");
     OTextCursorHelper* pTextCursor = comphelper::getFromUnoTunnel<OTextCursorHelper>(xCursorTunnel);
     OSL_ENSURE( pTextCursor, "SwXTextCursor missing" );
-    SwDoc *pDoc = SwImport::GetDocFromXMLImport( rImport );
+    SwDoc *pDoc = static_cast<SwXMLImport&>(rImport).getDoc();
 
     SfxItemSetFixed<RES_FRMATR_BEGIN, RES_FRMATR_END> aItemSet( pDoc->GetAttrPool() );
     Size aTwipSize( 0, 0 );
@@ -580,8 +580,8 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertOOoLink(
 
             // TODO/LATER: in future may need a way to set replacement image url to the link ( may be even to the object ), needs oasis cws???
 
-            xPropSet.set(SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
-                            *pDoc, pFrameFormat), uno::UNO_QUERY);
+            xPropSet = SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
+                            *pDoc, pFrameFormat);
             if( pDoc->getIDocumentDrawModelAccess().GetDrawModel() )
             {
                 SwXFrame::GetOrCreateSdrObject(*
@@ -618,7 +618,7 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertApplet(
     SfxItemSetFixed<RES_FRMATR_BEGIN, RES_FRMATR_END> aItemSet( pDoc->GetAttrPool() );
     lcl_putHeightAndWidth( aItemSet, nHeight, nWidth);
 
-    SwApplet_Impl aAppletImpl ( aItemSet );
+    SwApplet_Impl aAppletImpl ( std::move(aItemSet) );
 
     OUString sCodeBase;
     if( !rHRef.isEmpty() )
@@ -636,8 +636,8 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertApplet(
         pDoc->getIDocumentContentOperations().InsertEmbObject( *pTextCursor->GetPaM(),
         ::svt::EmbeddedObjectRef(aAppletImpl.GetApplet(), embed::Aspects::MSOLE_CONTENT),
         &aAppletImpl.GetItemSet());
-    xPropSet.set(SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
-                *pDoc, pFrameFormat), uno::UNO_QUERY);
+    xPropSet = SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
+                *pDoc, pFrameFormat);
     if( pDoc->getIDocumentDrawModelAccess().GetDrawModel() )
     {
         // req for z-order
@@ -696,10 +696,10 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertPlugin(
             {
                 if( bValidURL )
                     xSet->setPropertyValue("PluginURL",
-                        makeAny( aURLObj.GetMainURL( INetURLObject::DecodeMechanism::NONE ) ) );
+                        Any( aURLObj.GetMainURL( INetURLObject::DecodeMechanism::NONE ) ) );
                 if( bValidMimeType )
                     xSet->setPropertyValue("PluginMimeType",
-                        makeAny( rMimeType ) );
+                        Any( rMimeType ) );
             }
 
             SwFrameFormat *const pFrameFormat =
@@ -707,8 +707,8 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertPlugin(
                     *pTextCursor->GetPaM(),
                     ::svt::EmbeddedObjectRef(xObj, embed::Aspects::MSOLE_CONTENT),
                     &aItemSet);
-            xPropSet.set(SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
-                            *pDoc, pFrameFormat), uno::UNO_QUERY);
+            xPropSet = SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
+                            *pDoc, pFrameFormat);
             if( pDoc->getIDocumentDrawModelAccess().GetDrawModel() )
             {
                 SwXFrame::GetOrCreateSdrObject(*
@@ -830,30 +830,30 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertFloatingFra
                     GetXMLImport().NotifyMacroEventRead();
 
                 xSet->setPropertyValue("FrameURL",
-                    makeAny( rHRef ) );
+                    Any( sHRef ) );
 
                 xSet->setPropertyValue("FrameName",
-                    makeAny( rName ) );
+                    Any( rName ) );
 
                 if ( eScrollMode == ScrollingMode::Auto )
                     xSet->setPropertyValue("FrameIsAutoScroll",
-                        makeAny( true ) );
+                        Any( true ) );
                 else
                     xSet->setPropertyValue("FrameIsScrollingMode",
-                        makeAny( eScrollMode == ScrollingMode::Yes ) );
+                        Any( eScrollMode == ScrollingMode::Yes ) );
 
                 if ( bIsBorderSet )
                     xSet->setPropertyValue("FrameIsBorder",
-                        makeAny( bHasBorder ) );
+                        Any( bHasBorder ) );
                 else
                     xSet->setPropertyValue("FrameIsAutoBorder",
-                        makeAny( true ) );
+                        Any( true ) );
 
                 xSet->setPropertyValue("FrameMarginWidth",
-                    makeAny( sal_Int32( aMargin.Width() ) ) );
+                    Any( sal_Int32( aMargin.Width() ) ) );
 
                 xSet->setPropertyValue("FrameMarginHeight",
-                    makeAny( sal_Int32( aMargin.Height() ) ) );
+                    Any( sal_Int32( aMargin.Height() ) ) );
             }
 
             SwFrameFormat *const pFrameFormat =
@@ -861,8 +861,8 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertFloatingFra
                     *pTextCursor->GetPaM(),
                     ::svt::EmbeddedObjectRef(xObj, embed::Aspects::MSOLE_CONTENT),
                     &aItemSet);
-            xPropSet.set(SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
-                            *pDoc, pFrameFormat), uno::UNO_QUERY);
+            xPropSet = SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
+                            *pDoc, pFrameFormat);
             if( pDoc->getIDocumentDrawModelAccess().GetDrawModel() )
             {
                 // req for z-order
@@ -919,14 +919,14 @@ void SwXMLTextImportHelper::endAppletOrPlugin(
     OUString aParaName("AppletCommands");
     try
     {
-        xSet->setPropertyValue( aParaName, makeAny( aCommandSequence ) );
+        xSet->setPropertyValue( aParaName, Any( aCommandSequence ) );
     }
     catch ( uno::Exception& )
     {
         aParaName = "PluginCommands";
         try
         {
-            xSet->setPropertyValue( aParaName, makeAny( aCommandSequence ) );
+            xSet->setPropertyValue( aParaName, Any( aCommandSequence ) );
         }
         catch ( uno::Exception& )
         {

@@ -22,9 +22,111 @@
 
 #include <tools/stream.hxx>
 #include <vector>
-
+#include <vcl/mapmod.hxx>
+#include <tools/gen.hxx>
+#include <optional>
+#include <vcl/graphic/GraphicMetadata.hxx>
 namespace vcl
 {
+static inline OUString getImportFormatShortName(GraphicFileFormat nFormat)
+{
+    const char* pKeyName = nullptr;
+
+    switch (nFormat)
+    {
+        case GraphicFileFormat::BMP:
+            pKeyName = "BMP";
+            break;
+        case GraphicFileFormat::GIF:
+            pKeyName = "GIF";
+            break;
+        case GraphicFileFormat::JPG:
+            pKeyName = "JPG";
+            break;
+        case GraphicFileFormat::PCD:
+            pKeyName = "PCD";
+            break;
+        case GraphicFileFormat::PCX:
+            pKeyName = "PCX";
+            break;
+        case GraphicFileFormat::PNG:
+            pKeyName = "PNG";
+            break;
+        case GraphicFileFormat::XBM:
+            pKeyName = "XBM";
+            break;
+        case GraphicFileFormat::XPM:
+            pKeyName = "XPM";
+            break;
+        case GraphicFileFormat::PBM:
+            pKeyName = "PBM";
+            break;
+        case GraphicFileFormat::PGM:
+            pKeyName = "PGM";
+            break;
+        case GraphicFileFormat::PPM:
+            pKeyName = "PPM";
+            break;
+        case GraphicFileFormat::RAS:
+            pKeyName = "RAS";
+            break;
+        case GraphicFileFormat::TGA:
+            pKeyName = "TGA";
+            break;
+        case GraphicFileFormat::PSD:
+            pKeyName = "PSD";
+            break;
+        case GraphicFileFormat::EPS:
+            pKeyName = "EPS";
+            break;
+        case GraphicFileFormat::TIF:
+            pKeyName = "TIF";
+            break;
+        case GraphicFileFormat::DXF:
+            pKeyName = "DXF";
+            break;
+        case GraphicFileFormat::MET:
+            pKeyName = "MET";
+            break;
+        case GraphicFileFormat::PCT:
+            pKeyName = "PCT";
+            break;
+        case GraphicFileFormat::SVM:
+            pKeyName = "SVM";
+            break;
+        case GraphicFileFormat::WMF:
+            pKeyName = "WMF";
+            break;
+        case GraphicFileFormat::EMF:
+            pKeyName = "EMF";
+            break;
+        case GraphicFileFormat::SVG:
+            pKeyName = "SVG";
+            break;
+        case GraphicFileFormat::WMZ:
+            pKeyName = "WMZ";
+            break;
+        case GraphicFileFormat::EMZ:
+            pKeyName = "EMZ";
+            break;
+        case GraphicFileFormat::SVGZ:
+            pKeyName = "SVGZ";
+            break;
+        case GraphicFileFormat::WEBP:
+            pKeyName = "WEBP";
+            break;
+        case GraphicFileFormat::MOV:
+            pKeyName = "MOV";
+            break;
+        case GraphicFileFormat::PDF:
+            pKeyName = "PDF";
+            break;
+        default:
+            assert(false);
+    }
+
+    return OUString::createFromAscii(pKeyName);
+}
 /***
  * This function is has two modes:
  * - determine the file format when bTest = false
@@ -49,15 +151,14 @@ public:
     sal_uInt64 mnStreamPosition;
     sal_uInt64 mnStreamLength;
 
-    OUString msDetectedFormat;
-
-    GraphicFormatDetector(SvStream& rStream, OUString const& rFormatExtension);
+    GraphicFormatDetector(SvStream& rStream, OUString aFormatExtension, bool bExtendedInfo = false);
 
     bool detect();
 
     bool checkMET();
     bool checkBMP();
-    bool checkWMForEMF();
+    bool checkWMF();
+    bool checkEMF();
     bool checkPCX();
     bool checkTIF();
     bool checkGIF();
@@ -69,7 +170,9 @@ public:
     bool checkEPS();
     bool checkDXF();
     bool checkPCT();
-    bool checkPBMorPGMorPPM();
+    bool checkPBM();
+    bool checkPGM();
+    bool checkPPM();
     bool checkRAS();
     bool checkXPM();
     bool checkXBM();
@@ -78,6 +181,23 @@ public:
     bool checkMOV();
     bool checkPDF();
     bool checkWEBP();
+    const GraphicMetadata& getMetadata();
+
+private:
+    /**
+     * @brief Checks whether mrStream needs to be uncompressed and returns a pointer to the
+     * to aUncompressedBuffer or a pointer to maFirstBytes if it doesn't need to be uncompressed
+     *
+     * @param aUncompressedBuffer the buffer to hold the uncompressed data
+     * @param nSize the amount of bytes to uncompress
+     * @param nRetSize the amount of bytes actually uncompressed
+     * @return sal_uInt8* a pointer to maFirstBytes or aUncompressed buffer
+     */
+    sal_uInt8* checkAndUncompressBuffer(sal_uInt8* aUncompressedBuffer, sal_uInt32 nSize,
+                                        sal_uInt64& nDecompressedSize);
+    bool mbExtendedInfo;
+    bool mbWasCompressed;
+    GraphicMetadata maMetadata;
 };
 }
 

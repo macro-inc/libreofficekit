@@ -33,11 +33,16 @@
 #include <drawinglayer/attribute/sdrlineattribute.hxx>
 #include <drawinglayer/attribute/sdrshadowattribute.hxx>
 #include <drawinglayer/primitive2d/sdrdecompositiontools2d.hxx>
+#include <drawinglayer/primitive2d/structuretagprimitive2d.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
+#include <svx/sdr/contact/viewobjectcontactofsdrobj.hxx>
+#include <svx/sdr/contact/objectcontact.hxx>
+#include <svx/svdpage.hxx>
 #include <svx/framelink.hxx>
 #include <svx/framelinkarray.hxx>
 #include <svx/sdooitm.hxx>
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <o3tl/unit_conversion.hxx>
 #include <svx/xfltrit.hxx>
@@ -66,9 +71,9 @@ namespace drawinglayer::primitive2d
 
         public:
             SdrCellPrimitive2D(
-                const basegfx::B2DHomMatrix& rTransform,
+                basegfx::B2DHomMatrix aTransform,
                 const attribute::SdrFillTextAttribute& rSdrFTAttribute)
-            :   maTransform(rTransform),
+            :   maTransform(std::move(aTransform)),
                 maSdrFTAttribute(rSdrFTAttribute)
             {
             }
@@ -150,6 +155,21 @@ namespace drawinglayer::primitive2d
 
 namespace sdr::contact
 {
+
+    namespace {
+        class ViewObjectContactOfTableObj : public ViewObjectContactOfSdrObj
+        {
+            public:
+                ViewObjectContactOfTableObj(ObjectContact& rObjectContact, ViewContact& rViewContact)
+                    : ViewObjectContactOfSdrObj(rObjectContact, rViewContact)
+                {
+                }
+
+            protected:
+                virtual void createPrimitive2DSequence(DisplayInfo const& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const override;
+        };
+    } // namespace
+
         static svx::frame::Style impGetLineStyle(
             const sdr::table::TableLayouter& rLayouter,
             sal_Int32 nX,
@@ -201,9 +221,11 @@ namespace sdr::contact
             return svx::frame::Style();
         }
 
-        drawinglayer::primitive2d::Primitive2DContainer ViewContactOfTableObj::createViewIndependentPrimitive2DSequence() const
+        static void createPrimitive2DSequenceImpl(
+                sdr::table::SdrTableObj const& rTableObj,
+                bool const isTaggedPDF,
+                drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor)
         {
-            const sdr::table::SdrTableObj& rTableObj = static_cast<const sdr::table::SdrTableObj&>(GetSdrObject());
             const uno::Reference< css::table::XTable > xTable = rTableObj.getTable();
 
             if(xTable.is())
@@ -216,6 +238,7 @@ namespace sdr::contact
                 const sal_Int32 nRowCount(xTable->getRowCount());
                 const sal_Int32 nColCount(xTable->getColumnCount());
                 const sal_Int32 nAllCount(nRowCount * nColCount);
+                SdrPage const*const pPage(rTableObj.getSdrPageFromSdrObject());
 
                 if(nAllCount)
                 {
@@ -229,7 +252,7 @@ namespace sdr::contact
                     // GetGeoRect() to not trigger any calculations. It's the unrotated geometry.
                     const basegfx::B2DRange aObjectRange = vcl::unotools::b2DRectangleFromRectangle(rTableObj.GetGeoRect());
 
-                    // To create the CellBorderPrimitives, use the tolling from svx::frame::Array
+                    // To create the CellBorderPrimitives, use the tooling from svx::frame::Array
                     // which is capable of creating the needed visualization. Fill it during the
                     // anyways needed run over the table.
                     svx::frame::Array aArray;
@@ -240,11 +263,13 @@ namespace sdr::contact
                     // create single primitives per cell
                     for(aCellPos.mnRow = 0; aCellPos.mnRow < nRowCount; aCellPos.mnRow++)
                     {
+                        drawinglayer::primitive2d::Primitive2DContainer row;
                         // add RowHeight to CellBorderArray for primitive creation
                         aArray.SetRowHeight(aCellPos.mnRow, rTableLayouter.getRowHeight(aCellPos.mnRow));
 
                         for(aCellPos.mnCol = 0; aCellPos.mnCol < nColCount; aCellPos.mnCol++)
                         {
+                            drawinglayer::primitive2d::Primitive2DContainer cell;
                             // add ColWidth to CellBorderArray for primitive creation, only
                             // needs to be done in the 1st run
                             if(0 == aCellPos.mnRow)
@@ -323,7 +348,7 @@ namespace sdr::contact
                                         const drawinglayer::primitive2d::Primitive2DReference xCellReference(
                                             new drawinglayer::primitive2d::SdrCellPrimitive2D(
                                                 aCellMatrix, aAttribute));
-                                        aRetval.append(xCellReference);
+                                        cell.append(xCellReference);
                                     }
 
                                     // Create cell primitive without text.
@@ -346,7 +371,34 @@ namespace sdr::contact
                                     aRetvalForShadow.append(xCellReference);
                                 }
                             }
+                            if (isTaggedPDF && pPage)
+                            {
+                                // heuristic: if there's a special formatting on
+                                // first row, assume that it's a header row
+                                auto const eType(
+                                   aCellPos.mnRow == 0 && rTableObj.getTableStyleSettings().mbUseFirstRow
+                                       ? vcl::PDFWriter::TableHeader
+                                       : vcl::PDFWriter::TableData);
+                                cell = drawinglayer::primitive2d::Primitive2DContainer {
+                                    new drawinglayer::primitive2d::StructureTagPrimitive2D(
+                                        eType,
+                                        pPage->IsMasterPage(),
+                                        false,
+                                        std::move(cell)) };
+                            }
+                            row.append(cell);
                         }
+
+                        if (isTaggedPDF && pPage)
+                        {
+                            row = drawinglayer::primitive2d::Primitive2DContainer {
+                                new drawinglayer::primitive2d::StructureTagPrimitive2D(
+                                    vcl::PDFWriter::TableRow,
+                                    pPage->IsMasterPage(),
+                                    false,
+                                    std::move(row)) };
+                        }
+                        aRetval.append(row);
                     }
 
                     // now create all CellBorderPrimitives
@@ -396,38 +448,44 @@ namespace sdr::contact
                         aRetvalForShadow.append(new drawinglayer::primitive2d::TransformPrimitive2D(
                             aTransform, std::move(aCellBorderPrimitives)));
                     }
-                }
 
-                if(!aRetval.empty())
-                {
-                    // check and create evtl. shadow for created content
-                    const SfxItemSet& rObjectItemSet = rTableObj.GetMergedItemSet();
-                    const drawinglayer::attribute::SdrShadowAttribute aNewShadowAttribute(
-                        drawinglayer::primitive2d::createNewSdrShadowAttribute(rObjectItemSet));
-
-                    if(!aNewShadowAttribute.isDefault())
+                    if(!aRetval.empty())
                     {
-                        bool bDirectShadow
-                            = rObjectItemSet.Get(SDRATTR_SHADOW, /*bSrchInParent=*/false)
-                                  .GetValue();
-                        if (bDirectShadow)
+                        // check and create evtl. shadow for created content
+                        const SfxItemSet& rObjectItemSet = rTableObj.GetMergedItemSet();
+                        const drawinglayer::attribute::SdrShadowAttribute aNewShadowAttribute(
+                            drawinglayer::primitive2d::createNewSdrShadowAttribute(rObjectItemSet));
+
+                        if(!aNewShadowAttribute.isDefault())
                         {
-                            // Shadow as direct formatting: no shadow for text, to be compatible
-                            // with PowerPoint.
-                            basegfx::B2DHomMatrix aMatrix;
-                            aRetval = drawinglayer::primitive2d::createEmbeddedShadowPrimitive(
-                                std::move(aRetval), aNewShadowAttribute, aMatrix, &aRetvalForShadow);
-                        }
-                        else
-                        {
-                            // Shadow as style: shadow for text, to be backwards-compatible.
-                            aRetval = drawinglayer::primitive2d::createEmbeddedShadowPrimitive(
-                                std::move(aRetval), aNewShadowAttribute);
+                            // pass in table's transform and scale matrix, to
+                            // correctly scale and align shadows
+                            const basegfx::B2DHomMatrix aTransformScaleMatrix
+                                    = basegfx::utils::createScaleTranslateB2DHomMatrix(
+                                        aObjectRange.getRange(), aObjectRange.getMinimum());
+
+                            bool bDirectShadow
+                                    = rObjectItemSet.Get(SDRATTR_SHADOW, /*bSrchInParent=*/false)
+                                    .GetValue();
+                            if (bDirectShadow)
+                            {
+                                // Shadow as direct formatting: no shadow for text, to be compatible
+                                // with PowerPoint.
+                                aRetval = drawinglayer::primitive2d::createEmbeddedShadowPrimitive(
+                                    std::move(aRetval), aNewShadowAttribute, aTransformScaleMatrix,
+                                    &aRetvalForShadow);
+                            }
+                            else
+                            {
+                                // Shadow as style: shadow for text, to be backwards-compatible.
+                                aRetval = drawinglayer::primitive2d::createEmbeddedShadowPrimitive(
+                                    std::move(aRetval), aNewShadowAttribute, aTransformScaleMatrix);
+                            }
                         }
                     }
                 }
 
-                return aRetval;
+                rVisitor.visit(std::move(aRetval));
             }
             else
             {
@@ -447,8 +505,40 @@ namespace sdr::contact
                     drawinglayer::primitive2d::createHiddenGeometryPrimitives2D(
                         aObjectMatrix));
 
-                return drawinglayer::primitive2d::Primitive2DContainer { xReference };
+                rVisitor.visit(xReference);
             }
+        }
+
+        void ViewObjectContactOfTableObj::createPrimitive2DSequence(
+                DisplayInfo const& rDisplayInfo,
+                drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
+        {
+            bool const isTaggedPDF(GetObjectContact().isExportTaggedPDF());
+            if (isTaggedPDF)
+            {
+                // this will be unbuffered and contain structure tags
+                const sdr::table::SdrTableObj& rTableObj =
+                    static_cast<const sdr::table::SdrTableObj&>(*GetViewContact().TryToGetSdrObject());
+                return createPrimitive2DSequenceImpl(rTableObj, true, rVisitor);
+            }
+            else
+            {
+                // call it via the base class - this is supposed to be buffered
+                return sdr::contact::ViewObjectContactOfSdrObj::createPrimitive2DSequence(rDisplayInfo, rVisitor);
+            }
+        }
+
+        void ViewContactOfTableObj::createViewIndependentPrimitive2DSequence(
+                drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
+        {
+            const sdr::table::SdrTableObj& rTableObj =
+                static_cast<const sdr::table::SdrTableObj&>(GetSdrObject());
+            return createPrimitive2DSequenceImpl(rTableObj, false, rVisitor);
+        }
+
+        ViewObjectContact& ViewContactOfTableObj::CreateObjectSpecificViewObjectContact(ObjectContact& rObjectContact)
+        {
+            return *new ViewObjectContactOfTableObj(rObjectContact, *this);
         }
 
         ViewContactOfTableObj::ViewContactOfTableObj(sdr::table::SdrTableObj& rTableObj)

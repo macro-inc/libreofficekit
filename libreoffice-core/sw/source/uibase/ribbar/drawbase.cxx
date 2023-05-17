@@ -248,20 +248,20 @@ bool SwDrawBase::MouseButtonUp(const MouseEvent& rMEvt)
     {
         const SdrObjKind nDrawMode = m_pWin->GetSdrDrawMode();
         //objects with multiple point may end at the start position
-        bool bMultiPoint = OBJ_PLIN     == nDrawMode ||
-                           OBJ_POLY     == nDrawMode ||
-                           OBJ_PATHLINE == nDrawMode ||
-                           OBJ_PATHFILL == nDrawMode ||
-                           OBJ_FREELINE == nDrawMode ||
-                           OBJ_FREEFILL == nDrawMode;
-        if(rMEvt.IsRight() || (aPnt == m_aStartPos && !bMultiPoint))
+        bool bMultiPoint = SdrObjKind::PolyLine     == nDrawMode ||
+                           SdrObjKind::Polygon     == nDrawMode ||
+                           SdrObjKind::PathLine == nDrawMode ||
+                           SdrObjKind::PathFill == nDrawMode ||
+                           SdrObjKind::FreehandLine == nDrawMode ||
+                           SdrObjKind::FreehandFill == nDrawMode;
+        if(rMEvt.IsRight())
         {
             m_pSh->BreakCreate();
             m_pView->LeaveDrawCreate();
         }
         else
         {
-            if (OBJ_NONE == nDrawMode)
+            if (SdrObjKind::NONE == nDrawMode)
             {
                 SwRewriter aRewriter;
 
@@ -269,8 +269,13 @@ bool SwDrawBase::MouseButtonUp(const MouseEvent& rMEvt)
                 m_pSh->StartUndo(SwUndoId::INSERT, &aRewriter);
             }
 
-            m_pSh->EndCreate(SdrCreateCmd::ForceEnd);
-            if (OBJ_NONE == nDrawMode)   // Text border inserted
+            bool didCreate = m_pSh->EndCreate(SdrCreateCmd::ForceEnd);
+            if(!didCreate && !bMultiPoint)
+            {
+                CreateDefaultObjectAtPosWithSize(aPnt, Size(1000, 1000));
+            }
+
+            if (SdrObjKind::NONE == nDrawMode)   // Text border inserted
             {
                 uno::Reference< frame::XDispatchRecorder > xRecorder =
                     m_pSh->GetView().GetViewFrame()->GetBindings().GetRecorder();
@@ -298,7 +303,7 @@ bool SwDrawBase::MouseButtonUp(const MouseEvent& rMEvt)
                         m_pSh->SetFlyFrameAttr( aSet );
                 }
             }
-            if (m_pWin->GetSdrDrawMode() == OBJ_NONE)
+            if (m_pWin->GetSdrDrawMode() == SdrObjKind::NONE)
             {
                 m_pSh->EndUndo();
             }
@@ -523,6 +528,21 @@ void SwDrawBase::CreateDefaultObject()
     m_pSh->CreateDefaultShape(m_pWin->GetSdrDrawMode(), aRect, m_nSlotId);
 }
 
+void SwDrawBase::CreateDefaultObjectAtPosWithSize(Point aPos, Size aSize)
+{
+    aPos.AdjustX(-sal_Int32(aSize.getWidth() / 2));
+    aPos.AdjustY(-sal_Int32(aSize.getHeight() / 2));
+
+    SdrView* sdrView =  m_pView->GetDrawView();
+    SdrPageView *pPV = sdrView->GetSdrPageView();
+
+    if(sdrView->IsSnapEnabled())
+        aPos = sdrView->GetSnapPos(aPos, pPV);
+
+    ::tools::Rectangle aNewObjectRectangle(aPos, aSize);
+    m_pSh->CreateDefaultShape(m_pWin->GetSdrDrawMode(), aNewObjectRectangle, m_nSlotId);
+}
+
 Point  SwDrawBase::GetDefaultCenterPos() const
 {
     Size aDocSz(m_pSh->GetDocSize());
@@ -535,7 +555,11 @@ Point  SwDrawBase::GetDefaultCenterPos() const
     }
 
     Point aCenter = aVisArea.Center();
-    if (aVisArea.Width() > aDocSz.Width())
+    // To increase the chance that aCenter actually falls somewhere on a page (rather than on the
+    // background between pages), keep it centered horizontally for the "Single-page view"
+    // (GetViewLayoutColumns() == 1) and "Book view" (GetViewLayoutColumns() == 2) cases that
+    // display the pages centered on the background:
+    if (aVisArea.Width() > aDocSz.Width() && m_pSh->GetViewOptions()->GetViewLayoutColumns() == 0)
         aCenter.setX(aDocSz.Width() / 2 + aVisArea.Left());
     if (aVisArea.Height() > aDocSz.Height())
         aCenter.setY(aDocSz.Height() / 2 + aVisArea.Top());

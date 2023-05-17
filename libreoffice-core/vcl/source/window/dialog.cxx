@@ -36,6 +36,7 @@
 #include <window.h>
 #include <accel.hxx>
 #include <brdwin.hxx>
+#include <salinst.hxx>
 
 #include <rtl/bootstrap.hxx>
 #include <rtl/strbuf.hxx>
@@ -658,7 +659,7 @@ bool Dialog::EventNotify( NotifyEvent& rNEvt )
     bool bRet = SystemWindow::EventNotify( rNEvt );
     if ( !bRet )
     {
-        if ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+        if ( rNEvt.GetType() == NotifyEventType::KEYINPUT )
         {
             const KeyEvent* pKEvt = rNEvt.GetKeyEvent();
             vcl::KeyCode    aKeyCode = pKEvt->GetKeyCode();
@@ -675,7 +676,7 @@ bool Dialog::EventNotify( NotifyEvent& rNEvt )
                 return true;
             }
         }
-        else if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+        else if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         {
             // make sure the dialog is still modal
             // changing focus between application frames may
@@ -925,7 +926,20 @@ bool Dialog::ImplStartExecute()
     if (bModal)
     {
         if (bKitActive && !GetLOKNotifier())
+        {
+#ifdef IOS
+            // gh#5908 handle pasting disallowed clipboard contents on iOS
+            // When another app owns the current clipboard contents, pasting
+            // will display a "allow or disallow" dialog. If the disallow
+            // option is selected, the data from the UIPasteboard will be
+            // garbage and we will find ourselves here. Since calling
+            // SetLOKNotifier() with a nullptr aborts in an assert(), fix
+            // the crash by failing gracefully.
+            return false;
+#else
             SetLOKNotifier(mpDialogImpl->m_aInstallLOKNotifierHdl.Call(nullptr));
+#endif
+        }
 
         switch ( Application::GetDialogCancelMode() )
         {
@@ -944,6 +958,12 @@ bool Dialog::ImplStartExecute()
                     break;
                 else
                     SAL_WARN("lok.dialog", "Dialog \"" << ImplGetDialogText(this) << "\" is being synchronously executed over an existing synchronously executing dialog.");
+            }
+
+            if (SalInstance::IsRunningUnitTest())
+            { // helps starbasic unit tests show their errors
+                std::cerr << "Dialog \"" << ImplGetDialogText(this)
+                          << "\"cancelled in silent mode";
             }
 
             SAL_INFO(
@@ -998,7 +1018,7 @@ bool Dialog::ImplStartExecute()
 
     css::uno::Reference< css::uno::XComponentContext > xContext(
         comphelper::getProcessComponentContext());
-    bool bForceFocusAndToFront(officecfg::Office::Common::View::NewDocumentHandling::ForceFocusAndToFront::get(xContext));
+    bool bForceFocusAndToFront(officecfg::Office::Common::View::NewDocumentHandling::ForceFocusAndToFront::get());
     ShowFlags showFlags = bForceFocusAndToFront ? ShowFlags::ForegroundTask : ShowFlags::NONE;
     Show(true, showFlags);
 
@@ -1011,9 +1031,9 @@ bool Dialog::ImplStartExecute()
     aObject.EventName = "DialogExecute";
     xEventBroadcaster->documentEventOccured(aObject);
     if (bModal)
-        UITestLogger::getInstance().log(OUStringConcatenation("Open Modal " + get_id()));
+        UITestLogger::getInstance().log(Concat2View("Open Modal " + get_id()));
     else
-        UITestLogger::getInstance().log(OUStringConcatenation("Open Modeless " + get_id()));
+        UITestLogger::getInstance().log(Concat2View("Open Modeless " + get_id()));
 
     bool bTunnelingEnabled = mpDialogImpl->m_bLOKTunneling;
     if (comphelper::LibreOfficeKit::isActive() && bTunnelingEnabled)
@@ -1124,7 +1144,8 @@ void Dialog::EndDialog( tools::Long nResult )
     {
         if(const vcl::ILibreOfficeKitNotifier* pNotifier = GetLOKNotifier())
         {
-            pNotifier->notifyWindow(GetLOKWindowId(), "close");
+            if (mpDialogImpl->m_bLOKTunneling)
+                pNotifier->notifyWindow(GetLOKWindowId(), "close");
             ReleaseLOKNotifier();
         }
     }
@@ -1158,6 +1179,7 @@ void Dialog::EndDialog( tools::Long nResult )
     if ( mpDialogImpl->mbStartedModal )
         ImplEndExecuteModal();
 
+    // coverity[check_after_deref] - ImplEndExecuteModal might trigger destruction of mpDialogImpl
     if ( mpDialogImpl && mpDialogImpl->maEndCtx.isSet() )
     {
         auto fn = std::move(mpDialogImpl->maEndCtx.maEndDialogFn);

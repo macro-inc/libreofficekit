@@ -142,8 +142,6 @@ public:
     /** The active table has the focus or is currently edited */
     const sdr::table::CellRef& getActiveCell() const;
 
-    CellRef getCell(const CellPos& rPos) const;
-
     void setActiveCell( const sdr::table::CellPos& rPos );
     void getActiveCellPos( sdr::table::CellPos& rPos ) const;
     sal_Int32 getColumnCount() const;
@@ -206,7 +204,7 @@ public:
     virtual bool AdjustTextFrameWidthAndHeight() override;
     virtual OUString TakeObjNameSingul() const override;
     virtual OUString TakeObjNamePlural() const override;
-    virtual SdrTableObj* CloneSdrObject(SdrModel& rTargetModel) const override;
+    virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const override;
     virtual void RecalcSnapRect() override;
     virtual const tools::Rectangle& GetSnapRect() const override;
     virtual void NbcSetSnapRect(const tools::Rectangle& rRect) override;
@@ -258,16 +256,13 @@ public:
     /// Next time layouting would be done, skip it (to layout at the end of multiple actions).
     void SetSkipChangeLayout(bool bSkipChangeLayout);
 
-    /** Tries to get table height if rows with sizes less then the minimum size were expanded
-
-        (i.e. Table height layouted without fitting to an area)
-        Helper for OOXML import
-     */
-    sal_Int32 getHeightWithoutFitting();
+    void LayoutTableHeight(tools::Rectangle& rArea, bool bFit);
 
     virtual void onEditOutlinerStatusEvent( EditStatus* pEditStatus ) override;
 
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const override;
+
+    const TableLayouter& getTableLayouter() const;
 
 private:
     void init( sal_Int32 nColumns, sal_Int32 nRows );
@@ -280,11 +275,6 @@ private:
     virtual void RestoreGeoData(const SdrObjGeoData& rGeo) override;
 
     SdrOutliner* GetCellTextEditOutliner( const sdr::table::Cell& rCell ) const;
-
-    // For the ViewContactOfTableObj to build the primitive representation, it is necessary to access the
-    // TableLayouter for position and attribute information
-    friend class sdr::contact::ViewContactOfTableObj;
-    const TableLayouter& getTableLayouter() const;
 
     tools::Rectangle   maLogicRect;
     rtl::Reference<SdrTableObjImpl> mpImpl;

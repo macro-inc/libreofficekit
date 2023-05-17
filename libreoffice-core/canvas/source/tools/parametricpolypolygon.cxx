@@ -27,6 +27,7 @@
 #include <com/sun/star/rendering/XGraphicDevice.hpp>
 
 #include <parametricpolypolygon.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -147,10 +148,8 @@ namespace canvas
             colors, stops, fAspectRatio );
     }
 
-    void SAL_CALL ParametricPolyPolygon::disposing()
+    void ParametricPolyPolygon::disposing(std::unique_lock<std::mutex>&)
     {
-        ::osl::MutexGuard aGuard( m_aMutex );
-
         mxDevice.clear();
     }
 
@@ -174,7 +173,7 @@ namespace canvas
 
     uno::Reference< rendering::XColorSpace > SAL_CALL ParametricPolyPolygon::getColorSpace()
     {
-        ::osl::MutexGuard aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
 
         return mxDevice.is() ? mxDevice->getDeviceColorSpace() : uno::Reference< rendering::XColorSpace >();
     }
@@ -199,14 +198,13 @@ namespace canvas
     {
     }
 
-    ParametricPolyPolygon::ParametricPolyPolygon( const uno::Reference< rendering::XGraphicDevice >&    rDevice,
+    ParametricPolyPolygon::ParametricPolyPolygon( uno::Reference< rendering::XGraphicDevice >           xDevice,
                                                   const ::basegfx::B2DPolygon&                          rGradientPoly,
                                                   GradientType                                          eType,
                                                   const uno::Sequence< uno::Sequence< double > >&       rColors,
                                                   const uno::Sequence< double >&                        rStops,
                                                   double                                                nAspectRatio ) :
-        ParametricPolyPolygon_Base( m_aMutex ),
-        mxDevice( rDevice ),
+        mxDevice(std::move( xDevice )),
         maValues( rGradientPoly,
                   rColors,
                   rStops,
@@ -215,12 +213,11 @@ namespace canvas
     {
     }
 
-    ParametricPolyPolygon::ParametricPolyPolygon( const uno::Reference< rendering::XGraphicDevice >&    rDevice,
+    ParametricPolyPolygon::ParametricPolyPolygon( uno::Reference< rendering::XGraphicDevice >           xDevice,
                                                   GradientType                                          eType,
                                                   const uno::Sequence< uno::Sequence< double > >&       rColors,
                                                   const uno::Sequence< double >&                        rStops ) :
-        ParametricPolyPolygon_Base( m_aMutex ),
-        mxDevice( rDevice ),
+        mxDevice(std::move( xDevice )),
         maValues( ::basegfx::B2DPolygon(),
                   rColors,
                   rStops,
@@ -231,7 +228,7 @@ namespace canvas
 
     ParametricPolyPolygon::Values ParametricPolyPolygon::getValues() const
     {
-        ::osl::MutexGuard aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
 
         return maValues;
     }

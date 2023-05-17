@@ -33,8 +33,6 @@
 #include <drawview.hxx>
 #include <editeng/adjustitem.hxx>
 
-#include <math.h>
-
 using namespace com::sun::star;
 
 FuConstCustomShape::FuConstCustomShape(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawView* pViewP, SdrModel* pDoc, const SfxRequest& rReq )
@@ -97,7 +95,7 @@ bool FuConstCustomShape::MouseButtonUp(const MouseEvent& rMEvt)
 
 void FuConstCustomShape::Activate()
 {
-    pView->SetCurrentObj( OBJ_CUSTOMSHAPE );
+    pView->SetCurrentObj( SdrObjKind::CustomShape );
 
     aNewPointer = PointerStyle::DrawRect;
     aOldPointer = pWindow->GetPointer();
@@ -114,9 +112,9 @@ void FuConstCustomShape::Deactivate()
 }
 
 // Create default drawing objects via keyboard
-SdrObjectUniquePtr FuConstCustomShape::CreateDefaultObject(const sal_uInt16 /* nID */, const tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstCustomShape::CreateDefaultObject(const sal_uInt16 /* nID */, const tools::Rectangle& rRectangle)
 {
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         *pDrDoc,
         pView->GetCurrentObjInventor(),
         pView->GetCurrentObjIdentifier()));

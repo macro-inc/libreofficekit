@@ -31,8 +31,8 @@ public:
                             static SfxPoolItem* CreateDefault();
 
                             SvxColorListItem();
-                            SvxColorListItem( XColorListRef const & pTable,
-                                    sal_uInt16 nWhich  );
+                            SvxColorListItem( XColorListRef pTable,
+                                    TypedWhichId<SvxColorListItem> nWhich  );
                             SvxColorListItem( const SvxColorListItem& );
 
     virtual bool GetPresentation( SfxItemPresentation ePres,
@@ -56,8 +56,8 @@ public:
                             static SfxPoolItem* CreateDefault();
 
                             SvxGradientListItem();
-                            SvxGradientListItem( XGradientListRef const & pList,
-                                    sal_uInt16 nWhich  );
+                            SvxGradientListItem( XGradientListRef pList,
+                                    TypedWhichId<SvxGradientListItem> nWhich  );
                             SvxGradientListItem( const SvxGradientListItem& );
 
     virtual bool GetPresentation( SfxItemPresentation ePres,
@@ -80,8 +80,8 @@ class SAL_WARN_UNUSED SVXCORE_DLLPUBLIC SvxHatchListItem final : public SfxPoolI
 public:
                             static SfxPoolItem* CreateDefault();
                             SvxHatchListItem();
-                            SvxHatchListItem( XHatchListRef const & pList,
-                                    sal_uInt16 nWhich  );
+                            SvxHatchListItem( XHatchListRef pList,
+                                    TypedWhichId<SvxHatchListItem> nWhich  );
                             SvxHatchListItem( const SvxHatchListItem& );
 
     virtual bool GetPresentation( SfxItemPresentation ePres,
@@ -105,8 +105,8 @@ public:
                             static SfxPoolItem* CreateDefault();
 
                             SvxBitmapListItem();
-                            SvxBitmapListItem( XBitmapListRef const & pBL,
-                                    sal_uInt16 nWhich  );
+                            SvxBitmapListItem( XBitmapListRef pBL,
+                                    TypedWhichId<SvxBitmapListItem> nWhich  );
                             SvxBitmapListItem( const SvxBitmapListItem& );
 
     virtual bool GetPresentation( SfxItemPresentation ePres,
@@ -130,8 +130,8 @@ public:
                             static SfxPoolItem* CreateDefault();
 
                             SvxPatternListItem();
-                            SvxPatternListItem( XPatternListRef const & pBL,
-                                   sal_uInt16 nWhich   );
+                            SvxPatternListItem( XPatternListRef pBL,
+                                   TypedWhichId<SvxPatternListItem> nWhich   );
                             SvxPatternListItem( const SvxPatternListItem& );
 
     virtual bool GetPresentation( SfxItemPresentation ePres,
@@ -154,8 +154,8 @@ public:
                             static SfxPoolItem* CreateDefault();
 
                             SvxDashListItem();
-                            SvxDashListItem( XDashListRef const & pList,
-                                    sal_uInt16 nWhich  );
+                            SvxDashListItem( XDashListRef pList,
+                                    TypedWhichId<SvxDashListItem> nWhich  );
                             SvxDashListItem( const SvxDashListItem& );
 
     virtual bool GetPresentation( SfxItemPresentation ePres,
@@ -179,8 +179,8 @@ public:
                             static SfxPoolItem* CreateDefault();
 
                             SvxLineEndListItem();
-                            SvxLineEndListItem( XLineEndListRef const & pList,
-                                    sal_uInt16 nWhich  );
+                            SvxLineEndListItem( XLineEndListRef pList,
+                                    TypedWhichId<SvxLineEndListItem> nWhich  );
                             SvxLineEndListItem( const SvxLineEndListItem& );
 
     virtual bool GetPresentation( SfxItemPresentation ePres,

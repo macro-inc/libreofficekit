@@ -39,6 +39,7 @@
 #include <comphelper/random.hxx>
 #include <cppuhelper/bootstrap.hxx>
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/vclmain.hxx>
@@ -92,7 +93,7 @@ class DemoRenderer
             maColorBlack( vcl::unotools::colorToStdColorSpaceSequence( COL_BLACK) ),
             maColorRed( vcl::unotools::colorToStdColorSpaceSequence( COL_RED) ),
             mxCanvas(xCanvas),
-            mxDevice( xDevice )
+            mxDevice(std::move( xDevice ))
         {
             // Geometry init
             geometry::AffineMatrix2D aUnit( 1,0, 0,
@@ -208,7 +209,7 @@ class DemoRenderer
         {
             const double SCALE=7.0;
             const char hilbert[] = "urdrrulurulldluuruluurdrurddldrrruluurdrurddldrddlulldrdldrrurd";
-            int nLength = SAL_N_ELEMENTS( hilbert );
+            int nLength = std::size( hilbert );
 
             uno::Sequence< geometry::RealPoint2D > aPoints( nLength );
             auto pPoints = aPoints.getArray();

@@ -22,6 +22,7 @@
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
 #include <o3tl/any.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <miscuno.hxx>
@@ -170,9 +171,15 @@ sal_Int32 ScUnoHelpFunctions::GetEnumFromAny( const uno::Any& aAny )
 void ScUnoHelpFunctions::SetOptionalPropertyValue(
     const Reference<beans::XPropertySet>& rPropSet, const char* pPropName, const Any& rVal )
 {
+    SetOptionalPropertyValue(rPropSet, OUString::createFromAscii(pPropName), rVal);
+}
+
+void ScUnoHelpFunctions::SetOptionalPropertyValue(
+    const Reference<beans::XPropertySet>& rPropSet, const OUString& sPropName, const Any& rVal )
+{
     try
     {
-        rPropSet->setPropertyValue(OUString::createFromAscii(pPropName), rVal);
+        rPropSet->setPropertyValue(sPropName, rVal);
     }
     catch (const beans::UnknownPropertyException&)
     {
@@ -180,10 +187,10 @@ void ScUnoHelpFunctions::SetOptionalPropertyValue(
     }
 }
 
-ScIndexEnumeration::ScIndexEnumeration(const uno::Reference<container::XIndexAccess>& rInd,
-                                       const OUString& rServiceName) :
-    xIndex( rInd ),
-    sServiceName(rServiceName),
+ScIndexEnumeration::ScIndexEnumeration(uno::Reference<container::XIndexAccess> xInd,
+                                       OUString aServiceName) :
+    xIndex(std::move( xInd )),
+    sServiceName(std::move(aServiceName)),
     nPos( 0 )
 {
 }
@@ -231,9 +238,9 @@ css::uno::Sequence< OUString >
     return { sServiceName };
 }
 
-ScNameToIndexAccess::ScNameToIndexAccess( const css::uno::Reference<
-                                            css::container::XNameAccess>& rNameObj ) :
-    xNameAccess( rNameObj )
+ScNameToIndexAccess::ScNameToIndexAccess( css::uno::Reference<
+                                            css::container::XNameAccess> xNameObj ) :
+    xNameAccess(std::move( xNameObj ))
 {
     //! test for XIndexAccess interface at rNameObj, use that instead!
 

@@ -9,7 +9,11 @@
 
 #include <memory>
 #include <sortkeydlg.hxx>
+#include <comphelper/lok.hxx>
 #include <vcl/svapp.hxx>
+
+#include <scresid.hxx>
+#include <strings.hrc>
 
 ScSortKeyItem::ScSortKeyItem(weld::Container* pParent)
     : m_xBuilder(Application::CreateBuilder(pParent, "modules/scalc/ui/sortkey.ui"))
@@ -17,11 +21,15 @@ ScSortKeyItem::ScSortKeyItem(weld::Container* pParent)
     , m_xLbSort(m_xBuilder->weld_combo_box("sortlb"))
     , m_xBtnUp(m_xBuilder->weld_radio_button("up"))
     , m_xBtnDown(m_xBuilder->weld_radio_button("down"))
+    , m_xLabel(m_xBuilder->weld_label("lbColRow"))
     , m_pParent(pParent)
 {
     // tdf#136155 let the other elements in the dialog determine the width of the
     // combobox
     m_xLbSort->set_size_request(m_xLbSort->get_approximate_digit_width() * 12, -1);
+    // keep the UI static when switching the labels
+    const sal_Int32 nChars = std::max( ScResId(SCSTR_COLUMN).getLength(), ScResId(SCSTR_ROW).getLength() ) + 2; // +2 to avoid cut-off labels on kf5/gen
+    m_xLabel->set_size_request( m_xLabel->get_approximate_digit_width() * nChars, -1);
 }
 
 ScSortKeyItem::~ScSortKeyItem()
@@ -58,10 +66,13 @@ void ScSortKeyWindow::AddSortKey( sal_uInt16 nItemNumber )
     pSortKeyItem->m_xFrame->set_label(aLine);
 
     // for ui-testing. Distinguish the sort keys
-    if ( m_aSortKeyItems.size() > 0 )
+    if (!comphelper::LibreOfficeKit::isActive())
     {
-        pSortKeyItem->m_xLbSort->set_buildable_name(
-            pSortKeyItem->m_xLbSort->get_buildable_name() + OString::number(m_aSortKeyItems.size() + 1));
+        if ( m_aSortKeyItems.size() > 0 )
+        {
+            pSortKeyItem->m_xLbSort->set_buildable_name(
+                pSortKeyItem->m_xLbSort->get_buildable_name() + OString::number(m_aSortKeyItems.size() + 1));
+        }
     }
 
     m_aSortKeyItems.push_back(std::unique_ptr<ScSortKeyItem>(pSortKeyItem));

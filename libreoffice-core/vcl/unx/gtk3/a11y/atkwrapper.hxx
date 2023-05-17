@@ -39,6 +39,7 @@ namespace com::sun::star::accessibility {
     class XAccessibleMultiLineText;
     class XAccessibleSelection;
     class XAccessibleTable;
+    class XAccessibleTableSelection;
     class XAccessibleText;
     class XAccessibleTextMarkup;
     class XAccessibleTextAttributes;
@@ -47,7 +48,8 @@ namespace com::sun::star::accessibility {
 
 struct AtkObjectWrapper
 {
-    AtkObject aParent;
+    GtkWidgetAccessible aParent;
+
     AtkObject* mpOrig;  //if we're a GtkDrawingArea acting as a custom LibreOffice widget, this is the toolkit default impl
     AtkObject* mpSysObjChild; //if we're a container for a sysobj, then this is the sysobj native gtk AtkObject
 
@@ -63,6 +65,7 @@ struct AtkObjectWrapper
         mpMultiLineText;
     css::uno::Reference<css::accessibility::XAccessibleSelection> mpSelection;
     css::uno::Reference<css::accessibility::XAccessibleTable> mpTable;
+    css::uno::Reference<css::accessibility::XAccessibleTableSelection> mpTableSelection;
     css::uno::Reference<css::accessibility::XAccessibleText> mpText;
     css::uno::Reference<css::accessibility::XAccessibleTextMarkup> mpTextMarkup;
     css::uno::Reference<css::accessibility::XAccessibleTextAttributes>
@@ -94,7 +97,7 @@ void                   atk_object_wrapper_set_role(AtkObjectWrapper* wrapper, sa
 
 void                   atk_object_wrapper_dispose(AtkObjectWrapper* wrapper);
 
-AtkStateType mapAtkState( sal_Int16 nState );
+AtkStateType mapAtkState( sal_Int64 nState );
 
 AtkRelation*           atk_object_wrapper_relation_new(const css::accessibility::AccessibleRelation& rRelation);
 
@@ -105,6 +108,7 @@ void                   hypertextIfaceInit(AtkHypertextIface *iface);
 void                   imageIfaceInit(AtkImageIface *iface);
 void                   selectionIfaceInit(AtkSelectionIface *iface);
 void                   tableIfaceInit(AtkTableIface *iface);
+void                   tablecellIfaceInit(AtkTableCellIface *iface);
 void                   textIfaceInit(AtkTextIface *iface);
 void                   valueIfaceInit(AtkValueIface *iface);
 

@@ -128,21 +128,45 @@ $(if $(3),$(call gb_Output_error,gb_Library_set_soversion_script: too many argum
 $(call gb_Library__set_soversion_script_platform,$(1),$(2))
 endef
 
+gb_Library__get_component_var = $(call gb_Library__get_workdir_linktargetname,$(1))<>COMPONENTFILE
+gb_Library__get_component = $($(call gb_Library__get_component_var,$(1)))
+
 # The dependency from workdir component target to outdir library should ensure
 # that gb_CppunitTest_use_component can transitively depend on the library.
 # But the component target also must be delivered; use the target
 # gb_Library_get_exports_target for that purpose, since it is already
 # the "final" target of the Library...
+#
+# call gb_Library_set_componentfile,library,componentfile,rdb
 define gb_Library_set_componentfile
 $(call gb_ComponentTarget_ComponentTarget,$(2),\
 	$(call gb_Library__get_componentprefix,$(gb_Library__get_name)),\
-	$(call gb_Library_get_runtime_filename,$(gb_Library__get_name)))
+	$(call gb_Library_get_runtime_filename,$(gb_Library__get_name)),$(3))
 $(call gb_Library_get_exports_target,$(gb_Library__get_name)) :| \
 	$(call gb_ComponentTarget_get_target,$(2))
 $(call gb_ComponentTarget_get_target,$(2)) :| \
 	$(call gb_Library_get_target,$(gb_Library__get_name))
 $(call gb_Library_get_clean_target,$(gb_Library__get_name)) : \
 	$(call gb_ComponentTarget_get_clean_target,$(2))
+
+$(if $(call gb_Library__get_component,$(1)),$(error Can't have multiple component files per library))
+$(eval $(call gb_Library__get_component_var,$(1)) = $(2))
+
+endef
+
+# The implid is appended to the component file, separated by a dot.
+#
+# call gb_Library_add_componentimpl,library,implid
+define gb_Library_add_componentimpl
+$(if $(call gb_Library__get_component,$(1)),, \
+    $(error Set gb_Library_set_componentfile before using gb_Library_add_componentimpl))
+$(call gb_ComponentTarget_add_componentimpl,$(call gb_Library__get_component,$(1)),$(2))
+
+endef
+
+# call gb_Library_add_componentimpls,library,implids
+define gb_Library_add_componentimpls
+$(foreach comp,$(2),$(call gb_Library_add_componentimpl,$(1),$(comp)))
 endef
 
 gb_Library__get_name = $(if $(filter $(1),$(gb_MERGEDLIBS)),merged,$(1))
@@ -172,6 +196,23 @@ gb_Library__COMPONENTPREFIXES := \
 gb_Library_get_runtime_filename = $(call gb_Library_get_filename,$(1))
 gb_Library_get_runtime_filename_for_build = $(call gb_Library_get_filename_for_build,$(1))
 
+# instead of setting nodep use gb_Library_set_plugin_for_nodep
+#
+# call gb_Library_set_plugin_for,library,loader,nodep
+define gb_Library_set_plugin_for
+ifneq (,$$(filter-out $(gb_Library_KNOWNPLUGINS),$(1)))
+$$(eval $$(call gb_Output_info,currently known plugins are: $(sort $(gb_Library_KNOWNPLUGINS)),ALL))
+$$(eval $$(call gb_Output_error,Unknown plugin(s) '$$(filter-out $(gb_Library_KNOWNPLUGINS),$(1)))'. Plugins must be registered in Repository.mk or RepositoryExternal.mk))
+endif
+
+$(call gb_Library_get_linktarget_target,$(2)) : PLUGINS += $(1)
+$(eval $(call gb_LinkTarget__add_plugin,$(call gb_Library_get_linktarget,$(2)),$(1)))
+$(eval $(call gb_LinkTarget__set_plugin_for,$(call gb_Library_get_linktarget,$(1)),$(2),$(3),Library_$(1)))
+endef
+
+# call gb_Library_set_plugin_for_nodep,library,loader
+gb_Library_set_plugin_for_nodep = $(call gb_Library_set_plugin_for,$(1),$(2),$(true))
+
 # forward the call to the gb_LinkTarget implementation
 # (note: because the function name is in $(1), the other args are shifted by 1)
 define gb_Library__forward_to_Linktarget
@@ -181,7 +222,6 @@ endef
 
 # copy pasta for forwarding: this could be (and was) done more elegantly, but
 # these here can be found by both git grep and ctags
-gb_Library_add_cobject = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Library_add_cobject = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Library_add_cobjects = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Library_add_cxxobject = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
@@ -250,8 +290,7 @@ gb_Library_set_external_code = $(call gb_Library__forward_to_Linktarget,$(0),$(1
 gb_Library_set_generated_cxx_suffix = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Library_use_clang = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Library_set_clang_precompiled_header = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
-gb_Library_use_glxtest = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Library_use_vclmain = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
-gb_Library_set_is_ure_library = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
+gb_Library_set_is_ure_library_or_dependency = $(call gb_Library__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 
 # vim: set noet sw=4:

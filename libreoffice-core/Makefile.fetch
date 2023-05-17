@@ -101,8 +101,6 @@ $(WORKDIR)/download: $(BUILDDIR)/config_$(gb_Side).mk $(SRCDIR)/download.lst $(S
 	@date >> $(fetch_LOGFILE)
 	$(foreach item, \
 		$(call fetch_Optional,ABW,ABW_TARBALL) \
-		$(call fetch_Optional,APR,APR_TARBALL) \
-		$(call fetch_Optional,APR,APR_UTIL_TARBALL) \
 		$(call fetch_Optional,BOOST,BOOST_TARBALL) \
 		$(call fetch_Optional,BOX2D,BOX2D_TARBALL) \
 		$(call fetch_Optional,BREAKPAD,BREAKPAD_TARBALL) \
@@ -112,11 +110,11 @@ $(WORKDIR)/download: $(BUILDDIR)/config_$(gb_Side).mk $(SRCDIR)/download.lst $(S
 		$(call fetch_Optional,CAIRO,PIXMAN_TARBALL) \
 		$(call fetch_Optional,CDR,CDR_TARBALL) \
 		$(call fetch_Optional,CLUCENE,CLUCENE_TARBALL) \
+		$(call fetch_Optional,DRAGONBOX,DRAGONBOX_TARBALL) \
 		DTOA_TARBALL \
 		$(call fetch_Optional,LIBCMIS,LIBCMIS_TARBALL) \
 		$(call fetch_Optional,COINMP,COINMP_TARBALL) \
 		$(call fetch_Optional,CPPUNIT,CPPUNIT_TARBALL) \
-		$(call fetch_Optional,CT2N,CT2N_TARBALL) \
 		$(call fetch_Optional,CURL,CURL_TARBALL) \
 		$(call fetch_Optional,EBOOK,EBOOK_TARBALL) \
 		$(call fetch_Optional,EPM,EPM_TARBALL) \
@@ -148,7 +146,6 @@ $(WORKDIR)/download: $(BUILDDIR)/config_$(gb_Side).mk $(SRCDIR)/download.lst $(S
 		$(call fetch_Optional,JFREEREPORT,JFREEREPORT_LIBXML_TARBALL) \
 		$(call fetch_Optional,JFREEREPORT,JFREEREPORT_SAC_TARBALL) \
 		$(call fetch_Optional,LIBJPEG_TURBO,LIBJPEG_TURBO_TARBALL) \
-		$(call fetch_Optional,LANGUAGETOOL,LANGUAGETOOL_TARBALL) \
 		$(call fetch_Optional,LCMS2,LCMS2_TARBALL) \
 		$(call fetch_Optional,LIBATOMIC_OPS,LIBATOMIC_OPS_TARBALL) \
 		$(call fetch_Optional,LIBASSUAN,LIBASSUAN_TARBALL) \
@@ -180,22 +177,18 @@ $(WORKDIR)/download: $(BUILDDIR)/config_$(gb_Side).mk $(SRCDIR)/download.lst $(S
 		$(call fetch_Optional,MORE_FONTS,FONT_LIBERATION_NARROW_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_LIBERATION_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_LINLIBERTINEG_TARBALL) \
-		$(call fetch_Optional,MORE_FONTS,FONT_SOURCECODE_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_SOURCESANS_TARBALL) \
-		$(call fetch_Optional,MORE_FONTS,FONT_SOURCESERIF_TARBALL) \
-		$(call fetch_Optional,MORE_FONTS,FONT_EMOJIONE_COLOR_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_NOTO_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_CULMUS_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_LIBRE_HEBREW_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_ALEF_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_AMIRI_TARBALL) \
-		$(call fetch_Optional,MORE_FONTS,FONT_KACST_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_REEM_TARBALL) \
 		$(call fetch_Optional,MORE_FONTS,FONT_SCHEHERAZADE_TARBALL) \
+		$(call fetch_Optional,MORE_FONTS,FONT_OPEN_SANS_TARBALL) \
 		$(call fetch_Optional,MSPUB,MSPUB_TARBALL) \
 		$(call fetch_Optional,MWAW,MWAW_TARBALL) \
 		$(call fetch_Optional,MYTHES,MYTHES_TARBALL) \
-		$(call fetch_Optional,NEON,NEON_TARBALL) \
 		$(call fetch_Optional,NSS,NSS_TARBALL) \
 		$(call fetch_Optional_pack,NUMBERTEXT_EXTENSION_PACK) \
 		$(call fetch_Optional,ODFGEN,ODFGEN_TARBALL) \
@@ -215,11 +208,9 @@ $(WORKDIR)/download: $(BUILDDIR)/config_$(gb_Side).mk $(SRCDIR)/download.lst $(S
 		$(call fetch_Optional,REVENGE,REVENGE_TARBALL) \
 		$(call fetch_Optional,RHINO,RHINO_TARBALL) \
 		$(call fetch_Optional,RHINO,SWING_TARBALL) \
-		$(call fetch_Optional,SERF,SERF_TARBALL) \
 		$(call fetch_Optional,SKIA,SKIA_TARBALL) \
 		$(call fetch_Optional,STAROFFICE,STAROFFICE_TARBALL) \
 		$(if $(filter WNT,$(OS)),TWAIN_DSM_TARBALL) \
-		$(call fetch_Optional,UCPP,UCPP_TARBALL) \
 		$(call fetch_Optional,VISIO,VISIO_TARBALL) \
 		$(call fetch_Optional,WPD,WPD_TARBALL) \
 		$(call fetch_Optional,WPG,WPG_TARBALL) \

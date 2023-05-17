@@ -25,7 +25,6 @@
 #include <poolfmt.hxx>
 #include <fmtcol.hxx>
 #include <unomap.hxx>
-//#include <unostyle.hxx>
 #include <unosett.hxx>
 #include <unoprnms.hxx>
 #include <ftninfo.hxx>
@@ -37,7 +36,6 @@
 #include <docsh.hxx>
 #include <docary.hxx>
 #include <docstyle.hxx>
-#include <fmtclds.hxx>
 #include <editeng/brushitem.hxx>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <com/sun/star/text/FootnoteNumbering.hpp>
@@ -47,7 +45,6 @@
 #include <com/sun/star/awt/XBitmap.hpp>
 #include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
-#include <com/sun/star/style/VerticalAlignment.hpp>
 #include <o3tl/any.hxx>
 #include <o3tl/enumarray.hxx>
 #include <tools/UnitConversion.hxx>
@@ -73,7 +70,6 @@
 #include <svl/listener.hxx>
 #include <paratr.hxx>
 #include <sal/log.hxx>
-#include <numeric>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -118,19 +114,18 @@ static const SfxItemPropertySet* GetFootnoteSet()
 {
     static const SfxItemPropertyMapEntry aFootnoteMap_Impl[] =
     {
-        { u"" UNO_NAME_ANCHOR_CHAR_STYLE_NAME,WID_ANCHOR_CHARACTER_STYLE, ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_BEGIN_NOTICE,          WID_BEGIN_NOTICE,       ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_CHAR_STYLE_NAME,       WID_CHARACTER_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_END_NOTICE,            WID_END_NOTICE ,        ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_FOOTNOTE_COUNTING,     WID_FOOTNOTE_COUNTING,  ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_NUMBERING_TYPE,        WID_NUMBERING_TYPE,     ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
-        { u"" UNO_NAME_PAGE_STYLE_NAME,       WID_PAGE_STYLE,         ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_PARA_STYLE_NAME,       WID_PARAGRAPH_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_POSITION_END_OF_DOC,   WID_POSITION_END_OF_DOC,cppu::UnoType<bool>::get(), PROPERTY_NONE,         0},
-        { u"" UNO_NAME_PREFIX,                WID_PREFIX,             ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_START_AT,              WID_START_AT ,          ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
-        { u"" UNO_NAME_SUFFIX,                WID_SUFFIX,             ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { UNO_NAME_ANCHOR_CHAR_STYLE_NAME,WID_ANCHOR_CHARACTER_STYLE, ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_BEGIN_NOTICE,          WID_BEGIN_NOTICE,       ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_CHAR_STYLE_NAME,       WID_CHARACTER_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_END_NOTICE,            WID_END_NOTICE ,        ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_FOOTNOTE_COUNTING,     WID_FOOTNOTE_COUNTING,  ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_NUMBERING_TYPE,        WID_NUMBERING_TYPE,     ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
+        { UNO_NAME_PAGE_STYLE_NAME,       WID_PAGE_STYLE,         ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_PARA_STYLE_NAME,       WID_PARAGRAPH_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_POSITION_END_OF_DOC,   WID_POSITION_END_OF_DOC,cppu::UnoType<bool>::get(), PROPERTY_NONE,         0},
+        { UNO_NAME_PREFIX,                WID_PREFIX,             ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_START_AT,              WID_START_AT ,          ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
+        { UNO_NAME_SUFFIX,                WID_SUFFIX,             ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
     };
     static const SfxItemPropertySet aFootnoteSet_Impl(aFootnoteMap_Impl);
     return &aFootnoteSet_Impl;
@@ -140,15 +135,14 @@ static const SfxItemPropertySet* GetEndnoteSet()
 {
     static const SfxItemPropertyMapEntry aEndnoteMap_Impl[] =
     {
-        { u"" UNO_NAME_ANCHOR_CHAR_STYLE_NAME,WID_ANCHOR_CHARACTER_STYLE, ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_CHAR_STYLE_NAME,       WID_CHARACTER_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_NUMBERING_TYPE,        WID_NUMBERING_TYPE,     ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
-        { u"" UNO_NAME_PAGE_STYLE_NAME,       WID_PAGE_STYLE,         ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_PARA_STYLE_NAME,       WID_PARAGRAPH_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_PREFIX,                WID_PREFIX,     ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_START_AT,              WID_START_AT ,          ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
-        { u"" UNO_NAME_SUFFIX,                WID_SUFFIX,     ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { UNO_NAME_ANCHOR_CHAR_STYLE_NAME,WID_ANCHOR_CHARACTER_STYLE, ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_CHAR_STYLE_NAME,       WID_CHARACTER_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_NUMBERING_TYPE,        WID_NUMBERING_TYPE,     ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
+        { UNO_NAME_PAGE_STYLE_NAME,       WID_PAGE_STYLE,         ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_PARA_STYLE_NAME,       WID_PARAGRAPH_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_PREFIX,                WID_PREFIX,     ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_START_AT,              WID_START_AT ,          ::cppu::UnoType<sal_Int16>::get(), PROPERTY_NONE,         0},
+        { UNO_NAME_SUFFIX,                WID_SUFFIX,     ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
     };
     static const SfxItemPropertySet aEndnoteSet_Impl(aEndnoteMap_Impl);
     return &aEndnoteSet_Impl;
@@ -158,13 +152,12 @@ static const SfxItemPropertySet* GetNumberingRulesSet()
 {
     static const SfxItemPropertyMapEntry aNumberingRulesMap_Impl[] =
     {
-        { u"" UNO_NAME_IS_ABSOLUTE_MARGINS,       WID_IS_ABS_MARGINS, cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
-        { u"" UNO_NAME_IS_AUTOMATIC,              WID_IS_AUTOMATIC,   cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
-        { u"" UNO_NAME_IS_CONTINUOUS_NUMBERING,   WID_CONTINUOUS,     cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
-        { u"" UNO_NAME_NAME,                      WID_RULE_NAME   ,   ::cppu::UnoType<OUString>::get(), PropertyAttribute::READONLY,     0},
-        { u"" UNO_NAME_NUMBERING_IS_OUTLINE,      WID_IS_OUTLINE, cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
-        { u"" UNO_NAME_DEFAULT_LIST_ID,           WID_DEFAULT_LIST_ID, ::cppu::UnoType<OUString>::get(), PropertyAttribute::READONLY, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { UNO_NAME_IS_ABSOLUTE_MARGINS,       WID_IS_ABS_MARGINS, cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
+        { UNO_NAME_IS_AUTOMATIC,              WID_IS_AUTOMATIC,   cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
+        { UNO_NAME_IS_CONTINUOUS_NUMBERING,   WID_CONTINUOUS,     cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
+        { UNO_NAME_NAME,                      WID_RULE_NAME   ,   ::cppu::UnoType<OUString>::get(), PropertyAttribute::READONLY,     0},
+        { UNO_NAME_NUMBERING_IS_OUTLINE,      WID_IS_OUTLINE, cppu::UnoType<bool>::get(),            PROPERTY_NONE,     0},
+        { UNO_NAME_DEFAULT_LIST_ID,           WID_DEFAULT_LIST_ID, ::cppu::UnoType<OUString>::get(), PropertyAttribute::READONLY, 0},
     };
     static const SfxItemPropertySet  aNumberingRulesSet_Impl( aNumberingRulesMap_Impl );
     return &aNumberingRulesSet_Impl;
@@ -174,18 +167,17 @@ static const SfxItemPropertySet* GetLineNumberingSet()
 {
     static const SfxItemPropertyMapEntry aLineNumberingMap_Impl[] =
     {
-        { u"" UNO_NAME_CHAR_STYLE_NAME,         WID_CHARACTER_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_COUNT_EMPTY_LINES,       WID_COUNT_EMPTY_LINES , cppu::UnoType<bool>::get(),PROPERTY_NONE,     0},
-        { u"" UNO_NAME_COUNT_LINES_IN_FRAMES,   WID_COUNT_LINES_IN_FRAMES, cppu::UnoType<bool>::get(),PROPERTY_NONE,     0},
-        { u"" UNO_NAME_DISTANCE,                WID_DISTANCE       ,    ::cppu::UnoType<sal_Int32>::get(),PROPERTY_NONE,     0},
-        { u"" UNO_NAME_IS_ON,                   WID_NUM_ON,             cppu::UnoType<bool>::get()  ,          PROPERTY_NONE,     0},
-        { u"" UNO_NAME_INTERVAL,                WID_INTERVAL  ,       ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
-        { u"" UNO_NAME_SEPARATOR_TEXT,          WID_SEPARATOR_TEXT,   ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
-        { u"" UNO_NAME_NUMBER_POSITION,         WID_NUMBER_POSITION,    ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
-        { u"" UNO_NAME_NUMBERING_TYPE,          WID_NUMBERING_TYPE ,    ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
-        { u"" UNO_NAME_RESTART_AT_EACH_PAGE,    WID_RESTART_AT_EACH_PAGE, cppu::UnoType<bool>::get()  ,          PROPERTY_NONE,     0},
-        { u"" UNO_NAME_SEPARATOR_INTERVAL,      WID_SEPARATOR_INTERVAL, ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { UNO_NAME_CHAR_STYLE_NAME,         WID_CHARACTER_STYLE,    ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_COUNT_EMPTY_LINES,       WID_COUNT_EMPTY_LINES , cppu::UnoType<bool>::get(),PROPERTY_NONE,     0},
+        { UNO_NAME_COUNT_LINES_IN_FRAMES,   WID_COUNT_LINES_IN_FRAMES, cppu::UnoType<bool>::get(),PROPERTY_NONE,     0},
+        { UNO_NAME_DISTANCE,                WID_DISTANCE       ,    ::cppu::UnoType<sal_Int32>::get(),PROPERTY_NONE,     0},
+        { UNO_NAME_IS_ON,                   WID_NUM_ON,             cppu::UnoType<bool>::get()  ,          PROPERTY_NONE,     0},
+        { UNO_NAME_INTERVAL,                WID_INTERVAL  ,       ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
+        { UNO_NAME_SEPARATOR_TEXT,          WID_SEPARATOR_TEXT,   ::cppu::UnoType<OUString>::get(), PROPERTY_NONE,     0},
+        { UNO_NAME_NUMBER_POSITION,         WID_NUMBER_POSITION,    ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
+        { UNO_NAME_NUMBERING_TYPE,          WID_NUMBERING_TYPE ,    ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
+        { UNO_NAME_RESTART_AT_EACH_PAGE,    WID_RESTART_AT_EACH_PAGE, cppu::UnoType<bool>::get()  ,          PROPERTY_NONE,     0},
+        { UNO_NAME_SEPARATOR_INTERVAL,      WID_SEPARATOR_INTERVAL, ::cppu::UnoType<sal_Int16>::get(),PROPERTY_NONE,     0},
     };
     static const SfxItemPropertySet aLineNumberingSet_Impl(aLineNumberingMap_Impl);
     return &aLineNumberingSet_Impl;
@@ -244,24 +236,14 @@ static SwPageDesc* lcl_GetPageDesc(SwDoc* pDoc, const uno::Any& aValue)
 }
 
 // Numbering
-const o3tl::enumarray<SvxAdjust, unsigned short> aSvxToUnoAdjust
+const o3tl::enumarray<SvxAdjust, sal_Int16> aSvxToUnoAdjust
 {
     text::HoriOrientation::LEFT,   //3
     text::HoriOrientation::RIGHT,  //1
-    USHRT_MAX,
+    sal_Int16(-1),
     text::HoriOrientation::CENTER, //2
-    USHRT_MAX,
-    USHRT_MAX
-};
-
-const unsigned short aUnoToSvxAdjust[] =
-{
-    USHRT_MAX,
-    static_cast<unsigned short>(SvxAdjust::Right),       // 1
-    static_cast<unsigned short>(SvxAdjust::Center),      // 3
-    static_cast<unsigned short>(SvxAdjust::Left),        // 0
-    USHRT_MAX,
-    USHRT_MAX
+    sal_Int16(-1),
+    sal_Int16(-1)
 };
 
 OUString SwXFootnoteProperties::getImplementationName()
@@ -1138,7 +1120,6 @@ void SwXNumberingRules::replaceByIndex(sal_Int32 nIndex, const uno::Any& rElemen
         {
             SwNumFormat aFormat(aNumRule.Get( i ));
             if (!m_sNewCharStyleNames[i].isEmpty() &&
-                m_sNewCharStyleNames[i] != UNO_NAME_CHARACTER_FORMAT_NONE &&
                 (!aFormat.GetCharFormat() || aFormat.GetCharFormat()->GetName()!= m_sNewCharStyleNames[i]))
             {
                 SwCharFormat* pCharFormat = nullptr;
@@ -1542,14 +1523,20 @@ void SwXNumberingRules::SetPropertiesToNumFormat(
         {
             sal_Int16 nValue = text::HoriOrientation::NONE;
             rProp.Value >>= nValue;
-            if (nValue > text::HoriOrientation::NONE &&
-                nValue <= text::HoriOrientation::LEFT &&
-                USHRT_MAX != aUnoToSvxAdjust[nValue])
-            {
-                aFormat.SetNumAdjust(static_cast<SvxAdjust>(aUnoToSvxAdjust[nValue]));
-            }
-            else
+            switch (nValue) {
+            case text::HoriOrientation::RIGHT:
+                aFormat.SetNumAdjust(SvxAdjust::Right);
+                break;
+            case text::HoriOrientation::CENTER:
+                aFormat.SetNumAdjust(SvxAdjust::Center);
+                break;
+            case text::HoriOrientation::LEFT:
+                aFormat.SetNumAdjust(SvxAdjust::Left);
+                break;
+            default:
                 bWrongArg = true;
+                break;
+            }
         }
         else if (rProp.Name == UNO_NAME_PARENT_NUMBERING)
         {
@@ -1578,10 +1565,11 @@ void SwXNumberingRules::SetPropertiesToNumFormat(
             OUString sCharFormatName;
             SwStyleNameMapper::FillUIName( uTmp, sCharFormatName, SwGetPoolIdFromName::ChrFmt );
             SwDoc *const pLocalDoc = pDocShell ? pDocShell->GetDoc() : pDoc;
-            if (sCharFormatName == UNO_NAME_CHARACTER_FORMAT_NONE)
+            if (sCharFormatName.isEmpty())
             {
-                rCharStyleName = aInvalidStyle;
+                rCharStyleName.clear();
                 aFormat.SetCharFormat(nullptr);
+                aFormat.SetCharFormatName("");
             }
             else if (pLocalDoc)
             {

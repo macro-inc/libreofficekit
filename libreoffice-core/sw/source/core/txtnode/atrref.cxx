@@ -22,16 +22,24 @@
 #include <hintids.hxx>
 #include <hints.hxx>
 #include <txtrfmrk.hxx>
+#include <unorefmark.hxx>
+#include <utility>
+#include <sfx2/viewsh.hxx>
+#include <tools/json_writer.hxx>
+#include <LibreOfficeKit/LibreOfficeKitEnums.h>
+#include <comphelper/lok.hxx>
+#include <doc.hxx>
+#include <ndtxt.hxx>
 
 SwFormatRefMark::~SwFormatRefMark( )
 {
 }
 
-SwFormatRefMark::SwFormatRefMark( const OUString& rName )
+SwFormatRefMark::SwFormatRefMark( OUString aName )
     : SfxPoolItem(RES_TXTATR_REFMARK)
     , sw::BroadcastingModify()
     , m_pTextAttr(nullptr)
-    , m_aRefName(rName)
+    , m_aRefName(std::move(aName))
 {
 }
 
@@ -42,6 +50,9 @@ SwFormatRefMark::SwFormatRefMark( const SwFormatRefMark& rAttr )
     , m_aRefName(rAttr.m_aRefName)
 {
 }
+
+void SwFormatRefMark::SetXRefMark(rtl::Reference<SwXReferenceMark> const& xMark)
+{ m_wXReferenceMark = xMark.get(); }
 
 bool SwFormatRefMark::operator==( const SfxPoolItem& rAttr ) const
 {
@@ -61,7 +72,7 @@ void SwFormatRefMark::SwClientNotify(const SwModify&, const SfxHint& rHint)
     auto pLegacy = static_cast<const sw::LegacyModifyHint*>(&rHint);
     CallSwClientNotify(rHint);
     if(RES_REMOVE_UNO_OBJECT == pLegacy->GetWhich())
-        SetXRefMark(css::uno::Reference<css::text::XTextContent>(nullptr));
+        SetXRefMark(nullptr);
 }
 
 void SwFormatRefMark::InvalidateRefMark()
@@ -92,6 +103,27 @@ SwTextRefMark::SwTextRefMark( SwFormatRefMark& rAttr,
     }
     SetDontMoveAttr( true );
     SetOverlapAllowedAttr( true );
+}
+
+SwTextRefMark::~SwTextRefMark()
+{
+    if (!comphelper::LibreOfficeKit::isActive() || GetTextNode().GetDoc().IsClipBoard())
+        return;
+
+    SfxViewShell* pViewShell = SfxViewShell::Current();
+    if (!pViewShell)
+        return;
+
+    OUString fieldCommand = GetRefMark().GetRefName();
+    tools::JsonWriter aJson;
+    aJson.put("commandName", ".uno:DeleteField");
+    aJson.put("success", true);
+    {
+        auto result = aJson.startNode("result");
+        aJson.put("DeleteField", fieldCommand);
+    }
+
+    pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_UNO_COMMAND_RESULT, aJson.extractData());
 }
 
 const sal_Int32* SwTextRefMark::GetEnd() const

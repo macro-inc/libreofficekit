@@ -340,6 +340,7 @@ private:
     bool            mbInSelect : 1;
     bool            mbMirrored : 1;
     bool            mbScrollAlwaysEnabled : 1;
+    bool            mbSheets;
 
     Link<TabBar*,void>              maSelectHdl;
     Link<TabBar*,void>              maSplitHdl;
@@ -347,7 +348,7 @@ private:
     size_t          maCurrentItemList;
 
     using Window::ImplInit;
-    SVT_DLLPRIVATE void            ImplInit( WinBits nWinStyle );
+    SVT_DLLPRIVATE void            ImplInit( WinBits nWinStyle, bool bSheets );
     SVT_DLLPRIVATE void            ImplInitSettings( bool bFont, bool bBackground );
     SVT_DLLPRIVATE void            ImplGetColors(const StyleSettings& rStyleSettings,
                                                  Color& rFaceColor, Color& rFaceTextColor,
@@ -382,7 +383,7 @@ public:
     static const sal_uInt16 APPEND;
     static const sal_uInt16 PAGE_NOT_FOUND;
 
-                    TabBar( vcl::Window* pParent, WinBits nWinStyle );
+                    TabBar(vcl::Window* pParent, WinBits nWinStyle, bool bSheets = false);
     virtual         ~TabBar() override;
     virtual void    dispose() override;
 
@@ -496,6 +497,7 @@ public:
     void            SetSelectHdl( const Link<TabBar*,void>& rLink ) { maSelectHdl = rLink; }
     void            SetSplitHdl( const Link<TabBar*,void>& rLink ) { maSplitHdl = rLink; }
     void            SetScrollAreaContextHdl( const Link<const CommandEvent&,void>& rLink ) { maScrollAreaContextHdl = rLink; }
+    void            SetAddButtonEnabled(bool bAddButtonEnabled);
 
     // accessibility
     virtual css::uno::Reference<css::accessibility::XAccessible> CreateAccessible() override;

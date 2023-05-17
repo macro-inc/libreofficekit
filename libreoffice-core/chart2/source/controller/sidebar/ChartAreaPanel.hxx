@@ -57,6 +57,7 @@ public:
     virtual void setFillStyleAndGradient(const XFillStyleItem* pStyleItem, const XFillGradientItem& rGradientItem) override;
     virtual void setFillStyleAndHatch(const XFillStyleItem* pStyleItem, const XFillHatchItem& rHatchItem) override;
     virtual void setFillStyleAndBitmap(const XFillStyleItem* pStyleItem, const XFillBitmapItem& rBitmapItem) override;
+    virtual void setFillUseBackground(const XFillStyleItem* pStyleItem, const XFillUseSlideBackgroundItem& rItem) override;
 
     virtual void updateData() override;
     virtual void modelInvalid() override;
@@ -67,12 +68,12 @@ public:
 
 private:
 
-    css::uno::Reference<css::frame::XModel> mxModel;
+    rtl::Reference<::chart::ChartModel> mxModel;
     css::uno::Reference<css::util::XModifyListener> mxListener;
     rtl::Reference<ChartSidebarSelectionListener> mxSelectionListener;
 
     void Initialize();
-    void doUpdateModel(css::uno::Reference<css::frame::XModel> xModel);
+    void doUpdateModel(rtl::Reference<::chart::ChartModel> xModel);
 
     bool mbUpdate;
     bool mbModelValid;

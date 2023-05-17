@@ -9,7 +9,6 @@
 
 #include <vcl/filter/pdfdocument.hxx>
 #include <pdf/pdfcompat.hxx>
-#include <config_features.h>
 
 #include <map>
 #include <memory>
@@ -20,6 +19,7 @@
 
 #include <comphelper/scopeguard.hxx>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <rtl/character.hxx>
 #include <rtl/strbuf.hxx>
 #include <rtl/string.hxx>
@@ -116,7 +116,7 @@ sal_uInt32 PDFDocument::GetNextSignature()
         if (!rValue.startsWith(aPrefix))
             continue;
 
-        nRet = std::max(nRet, rValue.copy(aPrefix.getLength()).toUInt32());
+        nRet = std::max(nRet, o3tl::toUInt32(rValue.subView(aPrefix.getLength())));
     }
 
     return nRet + 1;
@@ -140,7 +140,7 @@ sal_Int32 PDFDocument::WriteSignatureObject(const OUString& rDescription, bool b
     // Reserve space for the PKCS#7 object.
     OStringBuffer aContentFiller(MAX_SIGNATURE_CONTENT_LENGTH);
     comphelper::string::padToLength(aContentFiller, MAX_SIGNATURE_CONTENT_LENGTH, '0');
-    aSigBuffer.append(aContentFiller.makeStringAndClear());
+    aSigBuffer.append(aContentFiller);
     aSigBuffer.append(">\n/Type/Sig/SubFilter");
     if (bAdES)
         aSigBuffer.append("/ETSI.CAdES.detached");
@@ -165,7 +165,7 @@ sal_Int32 PDFDocument::WriteSignatureObject(const OUString& rDescription, bool b
     // should be enough.
     OStringBuffer aByteRangeFiller;
     comphelper::string::padToLength(aByteRangeFiller, 100, ' ');
-    aSigBuffer.append(aByteRangeFiller.makeStringAndClear());
+    aSigBuffer.append(aByteRangeFiller);
     // Finish the Sig obj.
     aSigBuffer.append(" /Filter/Adobe.PPKMS");
 
@@ -177,7 +177,7 @@ sal_Int32 PDFDocument::WriteSignatureObject(const OUString& rDescription, bool b
     }
 
     aSigBuffer.append(" >>\nendobj\n\n");
-    m_aEditBuffer.WriteOString(aSigBuffer.toString());
+    m_aEditBuffer.WriteOString(aSigBuffer);
 
     return nSignatureId;
 }
@@ -270,13 +270,13 @@ sal_Int32 PDFDocument::WriteAppearanceObject(tools::Rectangle& rSignatureRectang
         assert(pPage && "aContentStreams is only filled if there was a pPage");
         OStringBuffer aBuffer;
         aCopier.copyPageResources(pPage, aBuffer);
-        aEditBuffer.WriteOString(aBuffer.makeStringAndClear());
+        aEditBuffer.WriteOString(aBuffer);
     }
 
     aEditBuffer.WriteCharPtr("/BBox[0 0 ");
-    aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getWidth()));
+    aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getOpenWidth()));
     aEditBuffer.WriteCharPtr(" ");
-    aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getHeight()));
+    aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getOpenHeight()));
     aEditBuffer.WriteCharPtr("]\n/Length ");
 
     // Add the object to the doc-level edit buffer and update the offset.
@@ -330,9 +330,9 @@ sal_Int32 PDFDocument::WriteAnnotObject(PDFObjectElement const& rFirstPage, sal_
     m_aEditBuffer.WriteCharPtr(" 0 obj\n");
     m_aEditBuffer.WriteCharPtr("<</Type/Annot/Subtype/Widget/F 132\n");
     m_aEditBuffer.WriteCharPtr("/Rect[0 0 ");
-    m_aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getWidth()));
+    m_aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getOpenWidth()));
     m_aEditBuffer.WriteCharPtr(" ");
-    m_aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getHeight()));
+    m_aEditBuffer.WriteOString(OString::number(rSignatureRectangle.getOpenHeight()));
     m_aEditBuffer.WriteCharPtr("]\n");
     m_aEditBuffer.WriteCharPtr("/FT/Sig\n");
     m_aEditBuffer.WriteCharPtr("/P ");
@@ -348,7 +348,7 @@ sal_Int32 PDFDocument::WriteAnnotObject(PDFObjectElement const& rFirstPage, sal_
     m_aEditBuffer.WriteUInt32AsString(nSignatureId);
     m_aEditBuffer.WriteCharPtr(" 0 R\n");
     m_aEditBuffer.WriteCharPtr("/AP<<\n/N ");
-    m_aEditBuffer.WriteUInt32AsString(nAppearanceId);
+    m_aEditBuffer.WriteInt32AsString(nAppearanceId);
     m_aEditBuffer.WriteCharPtr(" 0 R\n>>\n");
     m_aEditBuffer.WriteCharPtr(">>\nendobj\n\n");
 
@@ -811,7 +811,7 @@ void PDFDocument::WriteXRef(sal_uInt64 nXRefOffset, PDFReferenceElement const* p
                 aBuffer.append(" 65535 f \n");
             else
                 aBuffer.append(" 00000 n \n");
-            m_aEditBuffer.WriteOString(aBuffer.toString());
+            m_aEditBuffer.WriteOString(aBuffer);
         }
 
         // Write the trailer.
@@ -957,7 +957,7 @@ bool PDFDocument::Sign(const uno::Reference<security::XCertificate>& xCertificat
     assert(aCMSHexBuffer.getLength() <= MAX_SIGNATURE_CONTENT_LENGTH);
 
     m_aEditBuffer.Seek(nSignatureContentOffset);
-    m_aEditBuffer.WriteOString(aCMSHexBuffer.toString());
+    m_aEditBuffer.WriteOString(aCMSHexBuffer);
 
     return true;
 }
@@ -2094,7 +2094,7 @@ OUString PDFDocument::DecodeHexStringUTF16BE(PDFHexStringElement const& rElement
     {
         return {};
     }
-    OUStringBuffer buf(static_cast<unsigned int>(encoded.size() - 2));
+    OUStringBuffer buf(encoded.size() - 2);
     for (size_t i = 2; i < encoded.size(); i += 2)
     {
         buf.append(sal_Unicode((static_cast<sal_uInt16>(encoded[i]) << 8) | encoded[i + 1]));
@@ -2170,7 +2170,8 @@ bool PDFNumberElement::Read(SvStream& rStream)
         {
             rStream.SeekRel(-1);
             m_nLength = rStream.Tell() - m_nOffset;
-            m_fValue = aBuf.makeStringAndClear().toDouble();
+            m_fValue = o3tl::toDouble(aBuf);
+            aBuf.setLength(0);
             SAL_INFO("vcl.filter", "PDFNumberElement::Read: m_fValue is '" << m_fValue << "'");
             return true;
         }
@@ -3247,6 +3248,18 @@ size_t PDFObjectParser::parse(PDFElement* pParsingElement, size_t nStartIndex, i
         }
         else if (auto pReference = dynamic_cast<PDFReferenceElement*>(pCurrentElement))
         {
+            // Handle previously stored number
+            if (aNumbers.size() > 2)
+            {
+                aNumbers.resize(aNumbers.size() - 2);
+                if (pParsingArray)
+                {
+                    for (auto& pNumber : aNumbers)
+                        pParsingArray->PushBack(pNumber);
+                }
+                aNumbers.clear();
+            }
+
             if (pParsingArray)
             {
                 pParsingArray->PushBack(pReference);
@@ -3267,6 +3280,17 @@ size_t PDFObjectParser::parse(PDFElement* pParsingElement, size_t nStartIndex, i
         }
         else if (auto pLiteralString = dynamic_cast<PDFLiteralStringElement*>(pCurrentElement))
         {
+            // Handle previously stored number
+            if (!aNumbers.empty())
+            {
+                if (pParsingArray)
+                {
+                    for (auto& pNumber : aNumbers)
+                        pParsingArray->PushBack(pNumber);
+                }
+                aNumbers.clear();
+            }
+
             if (pParsingArray)
             {
                 pParsingArray->PushBack(pLiteralString);
@@ -3284,6 +3308,17 @@ size_t PDFObjectParser::parse(PDFElement* pParsingElement, size_t nStartIndex, i
         }
         else if (auto pBoolean = dynamic_cast<PDFBooleanElement*>(pCurrentElement))
         {
+            // Handle previously stored number
+            if (!aNumbers.empty())
+            {
+                if (pParsingArray)
+                {
+                    for (auto& pNumber : aNumbers)
+                        pParsingArray->PushBack(pNumber);
+                }
+                aNumbers.clear();
+            }
+
             if (pParsingArray)
             {
                 pParsingArray->PushBack(pBoolean);
@@ -3301,6 +3336,17 @@ size_t PDFObjectParser::parse(PDFElement* pParsingElement, size_t nStartIndex, i
         }
         else if (auto pHexString = dynamic_cast<PDFHexStringElement*>(pCurrentElement))
         {
+            // Handle previously stored number
+            if (!aNumbers.empty())
+            {
+                if (pParsingArray)
+                {
+                    for (auto& pNumber : aNumbers)
+                        pParsingArray->PushBack(pNumber);
+                }
+                aNumbers.clear();
+            }
+
             if (pParsingArray)
             {
                 pParsingArray->PushBack(pHexString);

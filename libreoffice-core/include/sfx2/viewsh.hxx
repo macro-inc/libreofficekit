@@ -29,10 +29,9 @@
 #include <sfx2/shell.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <vcl/IDialogRenderable.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <vcl/vclptr.hxx>
-#include <LibreOfficeKit/LibreOfficeKitTypes.h>
 #include <editeng/outliner.hxx>
 #include <functional>
 #include <unordered_set>
@@ -54,14 +53,15 @@ class SfxModule;
 class SfxViewFrame;
 class Printer;
 class SfxPrinter;
-class Menu;
 class NotifyEvent;
 class SfxInPlaceClient;
 class SfxLokCallbackInterface;
+class LOKDocumentFocusListener;
 class SfxStoringHelper;
 namespace rtl { class OStringBuffer; }
 namespace vcl { class PrinterController; }
 
+namespace com::sun::star::awt{ class XPopupMenu; }
 namespace com::sun::star::beans { struct PropertyValue; }
 namespace com::sun::star::datatransfer::clipboard { class XClipboardListener; }
 namespace com::sun::star::datatransfer::clipboard { class XClipboardNotifier; }
@@ -71,7 +71,7 @@ namespace com::sun::star::frame { class XModel; }
 namespace com::sun::star::ui { class XContextMenuInterceptor; }
 namespace com::sun::star::ui { struct ContextMenuExecuteEvent; }
 namespace com::sun::star::view { class XRenderable; }
-
+namespace tools { class Rectangle; }
 
 enum class SfxPrinterChangeFlags
 {
@@ -126,20 +126,20 @@ enum class LOKDeviceFormFactor
 class SfxViewFactory;
 #define SFX_DECL_VIEWFACTORY(Class) \
 private: \
-    static SfxViewFactory *pFactory; \
+    static SfxViewFactory *s_pFactory; \
 public: \
     static SfxViewShell  *CreateInstance(SfxViewFrame *pFrame, SfxViewShell *pOldView); \
     static void           RegisterFactory( SfxInterfaceId nPrio ); \
-    static SfxViewFactory*Factory() { return pFactory; } \
+    static SfxViewFactory*Factory() { return s_pFactory; } \
     static void           InitFactory()
 
 #define SFX_IMPL_NAMED_VIEWFACTORY(Class, AsciiViewName) \
-    SfxViewFactory* Class::pFactory; \
+    SfxViewFactory* Class::s_pFactory; \
     SfxViewShell* Class::CreateInstance(SfxViewFrame *pFrame, SfxViewShell *pOldView) \
     { return new Class(pFrame, pOldView); } \
     void Class::RegisterFactory( SfxInterfaceId nPrio ) \
     { \
-        pFactory = new SfxViewFactory(&CreateInstance,nPrio,AsciiViewName);\
+        s_pFactory = new SfxViewFactory(&CreateInstance,nPrio,AsciiViewName);\
         InitFactory(); \
     } \
     void Class::InitFactory()
@@ -170,7 +170,11 @@ friend class SfxPrinterController;
     LanguageTag                 maLOKLanguageTag;
     LanguageTag                 maLOKLocale;
     LOKDeviceFormFactor         maLOKDeviceFormFactor;
+    bool                        mbLOKAccessibilityEnabled;
+    rtl::Reference<LOKDocumentFocusListener>   mpLOKDocumentFocusListener;
     std::unordered_set<OUString>    mvLOKBlockedCommandList;
+    OUString maLOKTimezone;
+    bool maLOKIsTimezoneSet;
 
     /// Used to set the DocId at construction time. See SetCurrentDocId.
     static ViewShellDocId       mnCurrentDocId;
@@ -207,6 +211,9 @@ private:
     /// SfxInterface initializer.
     static void InitInterface_Impl();
 
+    LOKDocumentFocusListener& GetLOKDocumentFocusListener();
+    const LOKDocumentFocusListener& GetLOKDocumentFocusListener() const;
+
 public:
 
                                 SfxViewShell( SfxViewFrame *pFrame, SfxViewShellFlags nFlags );
@@ -231,9 +238,10 @@ public:
      * Initialize is called after the frame has been loaded and the controller
      * has been set.  By the time this is called the document has been fully
      * imported.
+     * @param bOnlyASample used by some dialogs to avoid constructing monster strings e.g. in calc
      */
     virtual bool                PrepareClose( bool bUI = true );
-    virtual OUString            GetSelectionText( bool bCompleteWords = false );
+    virtual OUString            GetSelectionText( bool bCompleteWords = false, bool bOnlyASample = false );
     virtual bool                HasSelection( bool bText = true ) const;
     virtual SdrView*            GetDrawView() const;
 
@@ -304,8 +312,13 @@ public:
     void                        SetController( SfxBaseController* pController );
     css::uno::Reference<css::frame::XController> GetController() const;
 
-    bool                        TryContextMenuInterception( const Menu& rIn, const OUString& rMenuIdentifier, VclPtr<Menu>& rpOut, css::ui::ContextMenuExecuteEvent aEvent );
-    bool                        TryContextMenuInterception( Menu& rMenu, const OUString& rMenuIdentifier, css::ui::ContextMenuExecuteEvent aEvent );
+    bool                        TryContextMenuInterception(const css::uno::Reference<css::awt::XPopupMenu>& rIn,
+                                                           const OUString& rMenuIdentifier,
+                                                           css::uno::Reference<css::awt::XPopupMenu>& rOut,
+                                                           css::ui::ContextMenuExecuteEvent aEvent);
+    bool                        TryContextMenuInterception(const css::uno::Reference<css::awt::XPopupMenu>&,
+                                                           const OUString& rMenuIdentifier,
+                                                           css::ui::ContextMenuExecuteEvent aEvent);
 
     void                        ExecPrint( const css::uno::Sequence < css::beans::PropertyValue >&, bool, bool );
     // Like ExecPrint(), but only sets up for printing. Use Printer::ExecutePrintJob() and Printer::FinishPrintJob() afterwards.
@@ -381,6 +394,8 @@ public:
     /// Get the DocId used by Mobile LOKit to load multiple documents.
     ViewShellDocId GetDocId() const override;
 
+    /// ILibreOfficeKitNotifier. Emits a LOK_CALLBACK_INVALIDATE_TILES.
+    virtual void notifyInvalidation(tools::Rectangle const *) const override;
     /// See OutlinerViewShell::NotifyOtherViews().
     void NotifyOtherViews(int nType, const OString& rKey, const OString& rPayload) override;
     /// See OutlinerViewShell::NotifyOtherView().
@@ -396,6 +411,23 @@ public:
     void SetLOKLanguageTag(const OUString& rBcp47LanguageTag);
     /// Get the LibreOfficeKit language of this view.
     const LanguageTag& GetLOKLanguageTag() const { return maLOKLanguageTag; }
+    /// Enable/Disable LibreOfficeKit AT support for this view.
+    void SetLOKAccessibilityState(bool bEnabled);
+
+    /// Get the LibreOfficeKit timezone of this view. See @SetLOKTimezone.
+    std::pair<bool, OUString> GetLOKTimezone() const
+    {
+        return { maLOKIsTimezoneSet, maLOKTimezone };
+    }
+
+    /// Set the LibreOfficeKit timezone of this view.
+    /// @isSet true to use @rTimezone, even if it's empty. Otherwise, no timezone.
+    /// @rTimezone the value to set (which could be empty).
+    void SetLOKTimezone(bool isSet, const OUString& rTimezone)
+    {
+        maLOKIsTimezoneSet = isSet;
+        maLOKTimezone = rTimezone;
+    }
 
     /// Set the LibreOfficeKit locale of this view.
     void SetLOKLocale(const OUString& rBcp47LanguageTag);
@@ -417,6 +449,9 @@ public:
     bool isBlockedCommand(OUString command);
 
     void SetStoringHelper(std::shared_ptr<SfxStoringHelper> xHelper) { m_xHelper = xHelper; }
+
+    OUString getA11yFocusedParagraph() const;
+    int getA11yCaretPosition() const;
 };
 
 

@@ -48,7 +48,7 @@
 #include <svtools/strings.hrc>
 #include <unotools/moduleoptions.hxx>
 #include <sot/exchange.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <tabvwsh.hxx>
 #include <scmod.hxx>
@@ -240,13 +240,13 @@ void ScTabViewShell::ActivateObject(SdrOle2Obj* pObj, sal_Int32 nVerb)
                         uno::Reference < embed::XComponentSupplier > xSup( xObj, uno::UNO_QUERY_THROW );
                         uno::Reference< chart2::data::XDataReceiver > xDataReceiver(
                             xSup->getComponent(), uno::UNO_QUERY_THROW );
-                        uno::Reference< chart2::data::XRangeHighlighter > xRangeHightlighter(
+                        uno::Reference< chart2::data::XRangeHighlighter > xRangeHighlighter(
                             xDataReceiver->getRangeHighlighter());
-                        if (xRangeHightlighter.is())
+                        if (xRangeHighlighter.is())
                         {
                             uno::Reference< view::XSelectionChangeListener > xListener(
                                 new ScChartRangeSelectionListener( this ));
-                            xRangeHightlighter->addSelectionChangeListener( xListener );
+                            xRangeHighlighter->addSelectionChangeListener( xListener );
                         }
                         uno::Reference<awt::XRequestCallback> xPopupRequest(xDataReceiver->getPopupRequest());
                         if (xPopupRequest.is())
@@ -289,7 +289,7 @@ ErrCode ScTabViewShell::DoVerb(sal_Int32 nVerb)
     if (rMarkList.GetMarkCount() == 1)
     {
         SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
-        if (pObj->GetObjIdentifier() == OBJ_OLE2)
+        if (pObj->GetObjIdentifier() == SdrObjKind::OLE2)
             pOle2Obj = static_cast<SdrOle2Obj*>(pObj);
     }
 
@@ -436,7 +436,7 @@ void ScTabViewShell::ExecDrawIns(SfxRequest& rReq)
             {
                 OUString sAdditionsTag = "";
 
-                const SfxStringItem* pStringArg = rReq.GetArg<SfxStringItem>(SID_ADDITIONS_TAG);
+                const SfxStringItem* pStringArg = rReq.GetArg<SfxStringItem>(FN_PARAM_ADDITIONS_TAG);
                 if (pStringArg)
                     sAdditionsTag = pStringArg->GetValue();
 
@@ -467,9 +467,9 @@ void ScTabViewShell::ExecDrawIns(SfxRequest& rReq)
                             SdrMark* pMark = rMarkList.GetMark(0);
                             SdrObject* pObj = pMark->GetMarkedSdrObj();
 
-                            sal_uInt16 nSdrObjKind = pObj->GetObjIdentifier();
+                            SdrObjKind nSdrObjKind = pObj->GetObjIdentifier();
 
-                            if (nSdrObjKind == OBJ_OLE2)
+                            if (nSdrObjKind == SdrObjKind::OLE2)
                             {
                                 if ( static_cast<SdrOle2Obj*>(pObj)->GetObjRef().is() )
                                 {
@@ -507,7 +507,7 @@ void ScTabViewShell::ExecDrawIns(SfxRequest& rReq)
                     if(pPageView)
                     {
                         svx::ODataAccessDescriptor aDescriptor(pDescriptorItem->GetValue());
-                        SdrObjectUniquePtr pNewDBField = pDrView->CreateFieldControl(aDescriptor);
+                        rtl::Reference<SdrObject> pNewDBField = pDrView->CreateFieldControl(aDescriptor);
 
                         if(pNewDBField)
                         {
@@ -539,7 +539,7 @@ void ScTabViewShell::ExecDrawIns(SfxRequest& rReq)
                                 }
                             }
 
-                            pView->InsertObjectAtView(pNewDBField.release(), *pPageView);
+                            pView->InsertObjectAtView(pNewDBField.get(), *pPageView);
                         }
                     }
                 }
@@ -712,6 +712,9 @@ bool ScTabViewShell::IsSignatureLineSigned()
 void ScTabViewShell::ExecuteUndo(SfxRequest& rReq)
 {
     SfxShell* pSh = GetViewData().GetDispatcher().GetShell(0);
+    if (!pSh)
+        return;
+
     ScUndoManager* pUndoManager = static_cast<ScUndoManager*>(pSh->GetUndoManager());
 
     const SfxItemSet* pReqArgs = rReq.GetArgs();
@@ -812,7 +815,11 @@ void ScTabViewShell::ExecuteUndo(SfxRequest& rReq)
 void ScTabViewShell::GetUndoState(SfxItemSet &rSet)
 {
     SfxShell* pSh = GetViewData().GetDispatcher().GetShell(0);
-    ScUndoManager* pUndoManager = static_cast<ScUndoManager*>(pSh->GetUndoManager());
+    if (!pSh)
+        return;
+
+    SfxUndoManager* pUndoManager = pSh->GetUndoManager();
+    ScUndoManager* pScUndoManager = dynamic_cast<ScUndoManager*>(pUndoManager);
 
     SfxWhichIter aIter(rSet);
     sal_uInt16 nWhich = aIter.FirstWhich();
@@ -841,41 +848,53 @@ void ScTabViewShell::GetUndoState(SfxItemSet &rSet)
 
             case SID_UNDO:
             {
-                if (pUndoManager->GetUndoActionCount())
+                if (pScUndoManager)
                 {
-                    const SfxUndoAction* pAction = pUndoManager->GetUndoAction();
-                    SfxViewShell *pViewSh = GetViewShell();
-                    if (pViewSh && pAction->GetViewShellId() != pViewSh->GetViewShellId()
-                        && !pUndoManager->IsViewUndoActionIndependent(this, o3tl::temporary(sal_uInt16())))
+                    if (pScUndoManager->GetUndoActionCount())
                     {
-                        rSet.Put(SfxUInt32Item(SID_UNDO, static_cast<sal_uInt32>(SID_REPAIRPACKAGE)));
+                        const SfxUndoAction* pAction = pScUndoManager->GetUndoAction();
+                        SfxViewShell *pViewSh = GetViewShell();
+                        if (pViewSh && pAction->GetViewShellId() != pViewSh->GetViewShellId()
+                            && !pScUndoManager->IsViewUndoActionIndependent(this, o3tl::temporary(sal_uInt16())))
+                        {
+                            rSet.Put(SfxUInt32Item(SID_UNDO, static_cast<sal_uInt32>(SID_REPAIRPACKAGE)));
+                        }
+                        else
+                        {
+                            rSet.Put( SfxStringItem( SID_UNDO, SvtResId(STR_UNDO)+pScUndoManager->GetUndoActionComment() ) );
+                        }
                     }
                     else
-                    {
-                        rSet.Put( SfxStringItem( SID_UNDO, SvtResId(STR_UNDO)+pUndoManager->GetUndoActionComment() ) );
-                    }
+                        rSet.DisableItem( SID_UNDO );
                 }
                 else
-                    rSet.DisableItem( SID_UNDO );
+                    // get state from sfx view frame
+                    GetViewFrame()->GetSlotState( nWhich, nullptr, &rSet );
                 break;
             }
             case SID_REDO:
             {
-                if (pUndoManager->GetRedoActionCount())
+                if (pScUndoManager)
                 {
-                    const SfxUndoAction* pAction = pUndoManager->GetRedoAction();
-                    SfxViewShell *pViewSh = GetViewShell();
-                    if (pViewSh && pAction->GetViewShellId() != pViewSh->GetViewShellId())
+                    if (pScUndoManager->GetRedoActionCount())
                     {
-                        rSet.Put(SfxUInt32Item(SID_REDO, static_cast<sal_uInt32>(SID_REPAIRPACKAGE)));
+                        const SfxUndoAction* pAction = pScUndoManager->GetRedoAction();
+                        SfxViewShell *pViewSh = GetViewShell();
+                        if (pViewSh && pAction->GetViewShellId() != pViewSh->GetViewShellId())
+                        {
+                            rSet.Put(SfxUInt32Item(SID_REDO, static_cast<sal_uInt32>(SID_REPAIRPACKAGE)));
+                        }
+                        else
+                        {
+                            rSet.Put(SfxStringItem(SID_REDO, SvtResId(STR_REDO) + pScUndoManager->GetRedoActionComment()));
+                        }
                     }
                     else
-                    {
-                        rSet.Put(SfxStringItem(SID_REDO, SvtResId(STR_REDO) + pUndoManager->GetRedoActionComment()));
-                    }
+                        rSet.DisableItem( SID_REDO );
                 }
                 else
-                    rSet.DisableItem( SID_REDO );
+                    // get state from sfx view frame
+                    GetViewFrame()->GetSlotState( nWhich, nullptr, &rSet );
                 break;
             }
             default:

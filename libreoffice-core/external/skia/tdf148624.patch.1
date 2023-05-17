@@ -25,12 +25,12 @@ Date:   Thu Jun 16 11:29:08 2022 -0400
     Reviewed-by: Michael Ludwig <michaelludwig@google.com>
     Commit-Queue: Greg Daniel <egdaniel@google.com>
 
-diff --git a/src/gpu/ops/StrokeTessellateOp.cpp b/src/gpu/ops/StrokeTessellateOp.cpp
-index e9f1c77136..5564d99185 100644
---- a/src/gpu/ops/StrokeTessellateOp.cpp
-+++ b/src/gpu/ops/StrokeTessellateOp.cpp
-@@ -210,7 +210,12 @@ void StrokeTessellateOp::prePrepareTessellator(GrTessellationShader::ProgramArgs
-         fStencilProgram = GrTessellationShader::MakeProgram(args, fTessellator->shader(), pipeline,
+diff --git a/src/gpu/ganesh/ops/StrokeTessellateOp.cpp b/src/gpu/ganesh/ops/StrokeTessellateOp.cpp
+index 8f47441eb9..de8153cd0f 100644
+--- a/src/gpu/ganesh/ops/StrokeTessellateOp.cpp
++++ b/src/gpu/ganesh/ops/StrokeTessellateOp.cpp
+@@ -179,7 +179,12 @@ void StrokeTessellateOp::prePrepareTessellator(GrTessellationShader::ProgramArgs
+         fStencilProgram = GrTessellationShader::MakeProgram(args, fTessellationShader, pipeline,
                                                              &kMarkStencil);
          fillStencil = &kTestAndResetStencil;
 -        args.fXferBarrierFlags = GrXferBarrierFlags::kNone;
@@ -42,12 +42,12 @@ index e9f1c77136..5564d99185 100644
 +        // general Skia use.
      }
  
-     fFillProgram = GrTessellationShader::MakeProgram(args, fTessellator->shader(), pipeline,
-diff --git a/src/gpu/vk/GrVkPipelineStateBuilder.cpp b/src/gpu/vk/GrVkPipelineStateBuilder.cpp
-index 51c8a47f4c..90476250b2 100644
---- a/src/gpu/vk/GrVkPipelineStateBuilder.cpp
-+++ b/src/gpu/vk/GrVkPipelineStateBuilder.cpp
-@@ -280,6 +280,10 @@ GrVkPipelineState* GrVkPipelineStateBuilder::finalize(const GrProgramDesc& desc,
+     fFillProgram = GrTessellationShader::MakeProgram(args, fTessellationShader, pipeline,
+diff --git a/src/gpu/ganesh/vk/GrVkPipelineStateBuilder.cpp b/src/gpu/ganesh/vk/GrVkPipelineStateBuilder.cpp
+index 54bc7f857a..0d61b8c4cb 100644
+--- a/src/gpu/ganesh/vk/GrVkPipelineStateBuilder.cpp
++++ b/src/gpu/ganesh/vk/GrVkPipelineStateBuilder.cpp
+@@ -279,6 +279,10 @@ GrVkPipelineState* GrVkPipelineStateBuilder::finalize(const GrProgramDesc& desc,
          }
      }
  

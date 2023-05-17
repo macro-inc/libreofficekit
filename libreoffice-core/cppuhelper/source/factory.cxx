@@ -29,6 +29,7 @@
 #include <rtl/unload.h>
 
 #include <cppuhelper/propshlp.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
@@ -42,6 +43,7 @@
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 
 #include <memory>
+#include <utility>
 
 
 using namespace osl;
@@ -65,14 +67,14 @@ class OSingleFactoryHelper
 public:
     OSingleFactoryHelper(
         const Reference<XMultiServiceFactory > & rServiceManager,
-        const OUString & rImplementationName_,
+        OUString aImplementationName_,
         ComponentInstantiation pCreateFunction_,
         ComponentFactoryFunc fptr,
         const Sequence< OUString > * pServiceNames_ )
         : xSMgr( rServiceManager )
         , pCreateFunction( pCreateFunction_ )
         , m_fptr( fptr )
-        , aImplementationName( rImplementationName_ )
+        , aImplementationName(std::move( aImplementationName_ ))
         {
             if( pServiceNames_ )
                 aServiceNames = *pServiceNames_;
@@ -709,7 +711,7 @@ Reference< XInterface > ORegistryFactoryHelper::createModuleFactory()
     {
         aActivatorUrl = xActivatorKey->getAsciiValue();
 
-        aActivatorName = aActivatorUrl.getToken(0, ':');
+        aActivatorName = o3tl::getToken(aActivatorUrl, 0, ':');
 
         Reference<XRegistryKey > xLocationKey = xImplementationKey->openKey(
             "/UNO/LOCATION" );
@@ -732,11 +734,11 @@ Reference< XInterface > ORegistryFactoryHelper::createModuleFactory()
             sal_Int32 nPos = aLocation.indexOf("://");
             if( nPos != -1 )
             {
-                aActivatorName = aLocation.copy( 0, nPos );
-                if( aActivatorName == "java" )
-                    aActivatorName = "com.sun.star.loader.Java";
-                else if( aActivatorName == "module" )
-                    aActivatorName = "com.sun.star.loader.SharedLibrary";
+                aActivatorName = aLocation.subView( 0, nPos );
+                if( aActivatorName == u"java" )
+                    aActivatorName = u"com.sun.star.loader.Java";
+                else if( aActivatorName == u"module" )
+                    aActivatorName = u"com.sun.star.loader.SharedLibrary";
                 aLocation = aLocation.copy( nPos + 3 );
             }
         }

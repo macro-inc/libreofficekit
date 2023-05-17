@@ -23,10 +23,7 @@
 #include <com/sun/star/xml/AttributeData.hpp>
 
 #include "swqahelperdllapi.h"
-#include <test/bootstrapfixture.hxx>
-#include <test/xmltesttools.hxx>
-#include <test/testinteractionhandler.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapixml_test.hxx>
 #include <unotools/tempfile.hxx>
 
 #include <doc.hxx>
@@ -60,28 +57,9 @@
     CPPUNIT_TEST_SUITE_REGISTRATION(TestName); \
     void TestName::verify()
 
-#define DECLARE_SW_EXPORTONLY_TEST(TestName, filename, password, BaseClass) \
-    class TestName : public BaseClass { \
-        protected:\
-    virtual OUString getTestName() override { return #TestName; } \
-        public:\
-    CPPUNIT_TEST_SUITE(TestName); \
-    CPPUNIT_TEST(Load_Reload_Verify); \
-    CPPUNIT_TEST_SUITE_END(); \
-    \
-    void Load_Reload_Verify() {\
-        executeLoadReloadVerify(filename, password);\
-    }\
-    void verify() override;\
-    }; \
-    CPPUNIT_TEST_SUITE_REGISTRATION(TestName); \
-    void TestName::verify()
-
 #define DECLARE_OOXMLEXPORT_TEST(TestName, filename) DECLARE_SW_ROUNDTRIP_TEST(TestName, filename, nullptr, Test)
-#define DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(TestName, filename) DECLARE_SW_EXPORTONLY_TEST(TestName, filename, nullptr, Test)
 #define DECLARE_RTFEXPORT_TEST(TestName, filename) DECLARE_SW_ROUNDTRIP_TEST(TestName, filename, nullptr, Test)
 #define DECLARE_ODFEXPORT_TEST(TestName, filename) DECLARE_SW_ROUNDTRIP_TEST(TestName, filename, nullptr, Test)
-#define DECLARE_ODFEXPORT_EXPORTONLY_TEST(TestName, filename) DECLARE_SW_EXPORTONLY_TEST(TestName, filename, nullptr, Test)
 #define DECLARE_FODFEXPORT_TEST(TestName, filename) DECLARE_SW_ROUNDTRIP_TEST(TestName, filename, nullptr, Test)
 #define DECLARE_WW8EXPORT_TEST(TestName, filename) DECLARE_SW_ROUNDTRIP_TEST(TestName, filename, nullptr, Test)
 
@@ -102,6 +80,7 @@
     CPPUNIT_TEST_SUITE_REGISTRATION(TestName); \
     void TestName::verify()
 
+class SwXTextDocument;
 namespace vcl
 {
 namespace pdf
@@ -111,28 +90,16 @@ class PDFiumDocument;
 }
 
 /// Base class for filter tests loading or roundtripping a document, then asserting the document model.
-class SWQAHELPER_DLLPUBLIC SwModelTestBase : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class SWQAHELPER_DLLPUBLIC SwModelTestBase : public UnoApiXmlTest
 {
 private:
-    OUString maFilterOptions;
-    OUString maImportFilterOptions;
-    OUString maImportFilterName;
-
-protected:
-    css::uno::Reference< css::lang::XComponent > mxComponent;
-
-    rtl::Reference<TestInteractionHandler> xInteractionHandler;
-
-    xmlBufferPtr mpXmlBuffer;
-    const OUString mpTestDocumentPath;
-    const char* mpFilter;
-
-    sal_uInt32 mnStartTime;
-    utl::TempFile maTempFile;
-    SvMemoryStream maMemory; ///< Underlying memory for parsed PDF files.
     bool mbExported; ///< Does maTempFile already contain something useful?
 
 protected:
+    xmlBufferPtr mpXmlBuffer;
+    const char* mpFilter;
+
+    sal_uInt32 mnStartTime;
 
     virtual OUString getTestName() { return OUString(); }
 
@@ -140,26 +107,7 @@ protected:
     void paste(std::u16string_view aFilename, css::uno::Reference<css::text::XTextRange> const& xTextRange);
 
 public:
-    void setFilterOptions(const OUString &rFilterOptions)
-    {
-        maFilterOptions = rFilterOptions;
-    }
-
-    void setImportFilterOptions(const OUString &rFilterOptions)
-    {
-        maImportFilterOptions = rFilterOptions;
-    }
-
-    void setImportFilterName(const OUString &rFilterName)
-    {
-        maImportFilterName = rFilterName;
-    }
-
     SwModelTestBase(const OUString& pTestDocumentPath = OUString(), const char* pFilter = "");
-
-    void setUp() override;
-
-    void tearDown() override;
 
 protected:
     /**
@@ -199,13 +147,6 @@ protected:
     }
 
     /**
-     * Override this function if interested in skipping import test for this file
-     */
-     virtual bool mustTestImportOf(const char* /* filename */) const
-     {
-        return true;
-     }
-    /**
      * Override this function if some special filename-specific setup is needed
      */
     virtual std::unique_ptr<Resetter> preTest(const char* /*filename*/)
@@ -234,16 +175,15 @@ protected:
         return false;
     }
 
-protected:
     void dumpLayout(const css::uno::Reference< css::lang::XComponent > & rComponent);
 
     void discardDumpedLayout();
 
     void calcLayout();
 
-    /// Get the length of the whole document.
+    /// Get the length of the whole document. @deprecated why use this?
     int getLength() const;
-
+    /// Get the body text of the whole document.
     OUString getBodyText() const;
 
     /// Get a family of styles, see com.sun.star.style.StyleFamilies for possible values.
@@ -326,6 +266,9 @@ protected:
     /// Get shape (counted from 1)
     css::uno::Reference<css::drawing::XShape> getShape(int number);
 
+    /// Select shape (counted from 1)
+    void selectShape(int number);
+
     /// Get shape by name
     css::uno::Reference<css::drawing::XShape> getShapeByName(std::u16string_view aName);
 
@@ -334,28 +277,10 @@ protected:
 
     void header();
 
-    void load(std::u16string_view pDir, const char* pName, const char* pPassword = nullptr)
-    {
-        return loadURLWithComponent(m_directories.getURLFromSrc(pDir) + OUString::createFromAscii(pName),
-                                    "com.sun.star.text.TextDocument", pName, pPassword);
-    }
-
-    void load_web(std::u16string_view pDir, const char* pName, const char* pPassword = nullptr)
-    {
-        return loadURLWithComponent(m_directories.getURLFromSrc(pDir) + OUString::createFromAscii(pName),
-                                    "com.sun.star.text.WebDocument", pName, pPassword);
-    }
-
-    void setTestInteractionHandler(const char* pPassword, std::vector<beans::PropertyValue>& rFilterOptions);
-
-    void loadURLWithComponent(OUString const& rURL, OUString const& rComponent, const char* pName, const char* pPassword);
-
-    void loadURL(OUString const& rURL, const char* pName, const char* pPassword = nullptr);
-
-    void reload(const char* pFilter, const char* filename, const char* pPassword = nullptr);
+    void reload(const char* pFilter, const char* pName, const char* pPassword = nullptr);
 
     /// Save the loaded document to a tempfile. Can be used to check the resulting docx/odt directly as a ZIP file.
-    void save(const OUString& aFilterName, utl::TempFile& rTempFile);
+    void save(const OUString& aFilterName, const char* pName = nullptr, const char* pPassword = nullptr);
 
     /// Combines load() and save().
     void loadAndSave(const char* pName);
@@ -372,23 +297,11 @@ protected:
     int getShapes() const;
 
     /**
-     * Given that some problem doesn't affect the result in the importer, we
-     * test the resulting file directly, by opening the zip file, parsing an
-     * xml stream, and asserting an XPath expression. This method returns the
-     * xml stream, so that you can do the asserting.
-     */
-    xmlDocUniquePtr parseExport(const OUString& rStreamName = OUString("word/document.xml"));
-
-    /**
      * Returns an xml stream of an exported file.
      * To be used when the exporter doesn't create zip archives, but single files
      * (like Flat ODF Export)
      */
     xmlDocUniquePtr parseExportedFile();
-
-    std::unique_ptr<SvStream> parseExportStream(const OUString& url, const OUString& rStreamName);
-
-    xmlDocUniquePtr parseExportInternal(const OUString& url, const OUString& rStreamName);
 
     /**
      * Helper method to return nodes represented by rXPath.
@@ -399,21 +312,50 @@ protected:
      * Creates a new document to be used with the internal sw/ API.
      *
      * Examples:
-     * SwDoc* pDoc = createSwDoc();
-     * SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "test.fodt");
+     * createSwDoc();
+     * createSwDoc("test.fodt");
+     * createSwDoc("test.fodt", "test");
      */
-    SwDoc* createSwDoc(
-        std::u16string_view rDataDirectory = std::u16string_view(), const char* pName = nullptr);
+    void createSwDoc(const char* pName = nullptr, const char* pPassword = nullptr);
 
     /**
      * As createSwDoc except a Web Document in Browse Mode
      */
-    SwDoc* createSwWebDoc(
-        std::u16string_view rDataDirectory = std::u16string_view(), const char* pName = nullptr);
+    void createSwWebDoc(const char* pName = nullptr);
 
-    void StoreToTempFile(const OUString& rFilterName);
+    /**
+     * As createSwDoc except a Global Document
+     */
+    void createSwGlobalDoc(const char* pName = nullptr);
 
-    std::unique_ptr<vcl::pdf::PDFiumDocument> LoadPdfFromTempFile();
+    /**
+     * Gets SwDoc from loaded component
+     */
+    SwDoc* getSwDoc();
+
+    /**
+     * Gets SwDocShell from loaded component
+     */
+    SwDocShell* getSwDocShell();
+
+    /**
+     * Wraps a reqif-xhtml fragment into an XHTML file, so an XML parser can
+     * parse it.
+     */
+    void WrapReqifFromTempFile(SvMemoryStream& rStream);
+
+    void WrapFromTempFile(SvMemoryStream& rStream);
+
+    bool isExported(){ return mbExported; }
+
+private:
+    void loadURL(OUString const& rURL, const char* pName, const char* pPassword);
+
+    void load(const char* pName, const char* pPassword = nullptr)
+    {
+        return loadURL(createFileURL(OUString::createFromAscii(pName)), pName, pPassword);
+
+    }
 };
 
 /**
@@ -440,15 +382,6 @@ inline void assertBorderEqual(
 
 #define CPPUNIT_ASSERT_BORDER_EQUAL(aExpected, aActual) \
         assertBorderEqual( aExpected, aActual, CPPUNIT_SOURCELINE() ) \
-
-inline std::ostream& operator<<(std::ostream& rStrm, const Color& rColor)
-{
-    rStrm << "Color: R:" << static_cast<int>(rColor.GetRed())
-          << " G:" << static_cast<int>(rColor.GetGreen())
-          << " B:" << static_cast<int>(rColor.GetBlue())
-          << " A:" << static_cast<int>(255 - rColor.GetAlpha());
-    return rStrm;
-}
 
 #endif // INCLUDED_SW_QA_INC_SWMODELTESTBASE_HXX
 

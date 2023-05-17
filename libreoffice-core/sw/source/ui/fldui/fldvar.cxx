@@ -33,6 +33,7 @@
 #include <calc.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zformat.hxx>
+#include <o3tl/string_view.hxx>
 #include <strings.hrc>
 
 #define USER_DATA_VERSION_1 "1"
@@ -57,8 +58,8 @@ SwFieldVarPage::SwFieldVarPage(weld::Container* pPage, weld::DialogController* p
     , m_xSeparatorED(m_xBuilder->weld_entry("separator"))
     , m_xNewPB(m_xBuilder->weld_button("apply"))
     , m_xDelPB(m_xBuilder->weld_button("delete"))
-    , nOldFormat(0)
-    , bInit(true)
+    , m_nOldFormat(0)
+    , m_bInit(true)
 {
     FillFieldSelect(*m_xTypeLB);
     m_xSelectionLB->make_sorted();
@@ -70,8 +71,8 @@ SwFieldVarPage::SwFieldVarPage(weld::Container* pPage, weld::DialogController* p
     m_xSelectionLB->set_size_request(nWidth, nHeight);
     m_xFormatLB->set_size_request(nWidth, nHeight/2);
 
-    sOldValueFT = m_xValueFT->get_label();
-    sOldNameFT = m_xNameFT->get_label();
+    m_sOldValueFT = m_xValueFT->get_label();
+    m_sOldNameFT = m_xNameFT->get_label();
 
     for (sal_uInt16 i = 1; i <= MAXLEVEL; i++)
         m_xChapterLevelLB->append_text(OUString::number(i));
@@ -79,6 +80,14 @@ SwFieldVarPage::SwFieldVarPage(weld::Container* pPage, weld::DialogController* p
     m_xChapterLevelLB->set_active(0);
     //enable 'active' language selection
     m_xNumFormatLB->SetShowLanguageControl(true);
+
+    // uitests
+    m_xTypeLB->set_buildable_name(m_xTypeLB->get_buildable_name() + "-var");
+    m_xNameED->set_buildable_name(m_xNameED->get_buildable_name() + "-var");
+    m_xValueED->set_buildable_name(m_xValueED->get_buildable_name() + "-var");
+    m_xNumFormatLB->set_buildable_name(m_xNumFormatLB->get_buildable_name() + "-var");
+    m_xSelectionLB->set_buildable_name(m_xSelectionLB->get_buildable_name() + "-var");
+    m_xFormatLB->set_buildable_name(m_xFormatLB->get_buildable_name() + "-var");
 }
 
 SwFieldVarPage::~SwFieldVarPage()
@@ -149,10 +158,10 @@ void SwFieldVarPage::Reset(const SfxItemSet* )
     {
         OUString sUserData = GetUserData();
         sal_Int32 nIdx{ 0 };
-        if(!IsRefresh() && sUserData.getToken(0, ';', nIdx).equalsIgnoreAsciiCase(USER_DATA_VERSION_1))
+        if(!IsRefresh() && o3tl::equalsIgnoreAsciiCase(o3tl::getToken(sUserData, 0, ';', nIdx), u"" USER_DATA_VERSION_1))
         {
-            OUString sVal = sUserData.getToken(0, ';', nIdx);
-            sal_uInt16 nVal = o3tl::narrowing<sal_uInt16>(sVal.toInt32());
+            std::u16string_view sVal = o3tl::getToken(sUserData, 0, ';', nIdx);
+            sal_uInt16 nVal = o3tl::narrowing<sal_uInt16>(o3tl::toInt32(sVal));
             if (USHRT_MAX != nVal)
             {
                 for (sal_Int32 i = 0, nEntryCount = m_xTypeLB->n_children(); i < nEntryCount; i++)
@@ -172,7 +181,7 @@ void SwFieldVarPage::Reset(const SfxItemSet* )
     {
         m_xSelectionLB->save_value();
         m_xFormatLB->save_value();
-        nOldFormat = m_xNumFormatLB->GetFormat();
+        m_nOldFormat = m_xNumFormatLB->GetFormat();
         m_xNameED->save_value();
         m_xValueED->save_value();
         m_xInvisibleCB->save_state();
@@ -197,7 +206,7 @@ IMPL_LINK_NOARG(SwFieldVarPage, TypeHdl, weld::TreeView&, void)
 
     if (nOld != GetTypeSel() || nOld == -1)
     {
-        bInit = true;
+        m_bInit = true;
         if (nOld != -1)
         {
             m_xNameED->set_text(OUString());
@@ -208,7 +217,7 @@ IMPL_LINK_NOARG(SwFieldVarPage, TypeHdl, weld::TreeView&, void)
         UpdateSubType();    // initialise selection-listboxes
     }
 
-    bInit = false;
+    m_bInit = false;
 }
 
 IMPL_LINK( SwFieldVarPage, SubTypeListBoxHdl, weld::TreeView&, rBox, void )
@@ -225,7 +234,7 @@ void SwFieldVarPage::SubTypeHdl(const weld::TreeView* pBox)
     if (nSelPos != -1)
         nSelData = m_xSelectionLB->get_id(nSelPos).toUInt32();
 
-    if (IsFieldEdit() && (!pBox || bInit))
+    if (IsFieldEdit() && (!pBox || m_bInit))
     {
         if (nTypeId != SwFieldTypesEnum::Formel)
             m_xNameED->set_text(GetFieldMgr().GetCurFieldPar1());
@@ -233,10 +242,10 @@ void SwFieldVarPage::SubTypeHdl(const weld::TreeView* pBox)
         m_xValueED->set_text(GetFieldMgr().GetCurFieldPar2());
     }
 
-    if (m_xNameFT->get_label() != sOldNameFT)
-        m_xNameFT->set_label(sOldNameFT);
-    if (m_xValueFT->get_label() != sOldValueFT)
-        m_xValueFT->set_label(sOldValueFT);
+    if (m_xNameFT->get_label() != m_sOldNameFT)
+        m_xNameFT->set_label(m_sOldNameFT);
+    if (m_xValueFT->get_label() != m_sOldValueFT)
+        m_xValueFT->set_label(m_sOldValueFT);
 
     FillFormatLB(nTypeId);
 
@@ -258,7 +267,7 @@ void SwFieldVarPage::SubTypeHdl(const weld::TreeView* pBox)
             {
                 if (!IsFieldEdit())
                 {
-                    if (pBox || (bInit && !IsRefresh()))    // only when interacting via mouse
+                    if (pBox || (m_bInit && !IsRefresh()))    // only when interacting via mouse
                     {
                         m_xNameED->set_text(pType->GetName());
 
@@ -411,7 +420,7 @@ void SwFieldVarPage::SubTypeHdl(const weld::TreeView* pBox)
                             m_xNumFormatLB->select(0);
                         }
                     }
-                    if (GetCurField() && IsFieldEdit() && (!pBox || bInit) )
+                    if (GetCurField() && IsFieldEdit() && (!pBox || m_bInit) )
                         m_xValueED->set_text(static_cast<SwSetExpField*>(GetCurField())->GetPromptText());
                 }
                 else    // USERFLD
@@ -532,7 +541,7 @@ void SwFieldVarPage::SubTypeHdl(const weld::TreeView* pBox)
 
 IMPL_LINK(SwFieldVarPage, SubTypeInsertHdl, weld::TreeView&, rBox, bool)
 {
-    if (!bInit)
+    if (!m_bInit)
     {
         SwFieldTypesEnum nTypeId = static_cast<SwFieldTypesEnum>(m_xTypeLB->get_id(GetTypeSel()).toUInt32());
         if (nTypeId == SwFieldTypesEnum::Formel)
@@ -997,8 +1006,15 @@ IMPL_LINK(SwFieldVarPage, TBClickHdl, weld::Button&, rBox, void)
                 {
                     if (nNumFormatPos != -1)
                     {
-                        sal_uLong nNumberFormat = nNumFormatPos == 0 ? 0 : m_xNumFormatLB->GetFormat();
-                        if (nNumberFormat)
+                        // The first listbox entry is Text and second is
+                        // Formula and both are SAL_MAX_UINT32 :-/ but only if
+                        // not another yet unlisted of Additional Formats was
+                        // selected that may claim the top position :-/
+                        sal_uInt32 nNumberFormat = m_xNumFormatLB->GetFormat();
+                        const bool bText = (nNumFormatPos == 0 && nNumberFormat == SAL_MAX_UINT32);
+                        if (bText)
+                            nNumberFormat = 0;
+                        if (nNumberFormat && nNumberFormat != SAL_MAX_UINT32)
                         {   // Switch language to office-language because Kalkulator expects
                             // String in office format and it should be fed into dialog like
                             // that
@@ -1006,7 +1022,7 @@ IMPL_LINK(SwFieldVarPage, TBClickHdl, weld::Button&, rBox, void)
                         }
                         static_cast<SwUserFieldType*>(pType)->SetContent(m_xValueED->get_text(), nNumberFormat);
                         static_cast<SwUserFieldType*>(pType)->SetType(
-                            nNumFormatPos == 0 ? nsSwGetSetExpType::GSE_STRING : nsSwGetSetExpType::GSE_EXPR );
+                                bText ? nsSwGetSetExpType::GSE_STRING : nsSwGetSetExpType::GSE_EXPR );
                     }
                 }
                 else
@@ -1040,8 +1056,16 @@ IMPL_LINK(SwFieldVarPage, TBClickHdl, weld::Button&, rBox, void)
 
                     if (nNumFormatPos != -1)
                     {
-                        aType.SetType(nNumFormatPos == 0 ? nsSwGetSetExpType::GSE_STRING : nsSwGetSetExpType::GSE_EXPR);
-                        aType.SetContent( sValue, nNumFormatPos == 0 ? 0 : m_xNumFormatLB->GetFormat() );
+                        // The first listbox entry is Text and second is
+                        // Formula and both are SAL_MAX_UINT32 :-/ but only if
+                        // not another yet unlisted of Additional Formats was
+                        // selected that may claim the top position :-/
+                        sal_uInt32 nNumberFormat = m_xNumFormatLB->GetFormat();
+                        const bool bText = (nNumFormatPos == 0 && nNumberFormat == SAL_MAX_UINT32);
+                        if (bText)
+                            nNumberFormat = 0;
+                        aType.SetType(bText ? nsSwGetSetExpType::GSE_STRING : nsSwGetSetExpType::GSE_EXPR);
+                        aType.SetContent( sValue, nNumberFormat );
                         m_xSelectionLB->append_text(sName);
                         m_xSelectionLB->select_text(sName);
                         GetFieldMgr().InsertFieldType( aType ); // Userfld new
@@ -1201,7 +1225,7 @@ bool SwFieldVarPage::FillItemSet(SfxItemSet* )
         m_xValueED->get_value_changed_from_saved() ||
         m_xSelectionLB->get_value_changed_from_saved() ||
         m_xFormatLB->get_value_changed_from_saved() ||
-        nOldFormat != m_xNumFormatLB->GetFormat() ||
+        m_nOldFormat != m_xNumFormatLB->GetFormat() ||
         m_xInvisibleCB->get_state_changed_from_saved() ||
         m_xChapterLevelLB->get_value_changed_from_saved() ||
         m_xSeparatorED->get_value_changed_from_saved())

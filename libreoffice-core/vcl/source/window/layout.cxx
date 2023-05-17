@@ -9,6 +9,23 @@
 
 #include <sal/config.h>
 
+// Needed since LLVM 15 libc++ (hence the ignored -Wunused-macros for older libc++) when
+// #include <boost/multi_array.hpp> below includes Boost 1.79.0
+// workdir/UnpackedTarball/boost/boost/functional.hpp using std::unary_function, but must
+// come very early here in case <functional> is already (indirectly) included earlier:
+#include <config_libcxx.h>
+#if HAVE_LIBCPP
+#if defined __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-macros"
+#endif
+// [-loplugin:reservedid]:
+#define _LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION
+#if defined __clang__
+#pragma clang diagnostic pop
+#endif
+#endif
+
 #include <string_view>
 
 #include <config_features.h>
@@ -19,6 +36,7 @@
 #include <o3tl/enumrange.hxx>
 #include <o3tl/string_view.hxx>
 #include <tools/stream.hxx>
+#include <utility>
 #include <vcl/builder.hxx>
 #include <vcl/toolkit/button.hxx>
 #include <vcl/cvtgrf.hxx>
@@ -26,7 +44,7 @@
 #include <vcl/help.hxx>
 #include <vcl/toolkit/dialog.hxx>
 #include <vcl/layout.hxx>
-#include <vcl/scrbar.hxx>
+#include <vcl/toolkit/scrbar.hxx>
 #include <vcl/stdtext.hxx>
 #include <vcl/split.hxx>
 #include <vcl/svapp.hxx>
@@ -1487,7 +1505,7 @@ const vcl::Window *VclFrame::get_label_widget() const
 {
     if (m_pLabel)
         return m_pLabel;
-    assert(GetChildCount() == 2);
+    assert(GetChildCount() <= 2);
     //The label widget is normally the first (of two) children
     const WindowImpl* pWindowImpl = ImplGetWindowImpl();
     if (pWindowImpl->mpFirstChild == pWindowImpl->mpLastChild) //no label exists
@@ -1791,6 +1809,11 @@ void VclExpander::DumpAsPropertyTree(tools::JsonWriter& rJsonWriter)
     rJsonWriter.put("type", "expander");
 }
 
+FactoryFunction VclExpander::GetUITestFactory() const
+{
+    return ExpanderUIObject::create;
+}
+
 IMPL_LINK( VclExpander, ClickHdl, CheckBox&, rBtn, void )
 {
     vcl::Window *pChild = get_child();
@@ -1800,7 +1823,7 @@ IMPL_LINK( VclExpander, ClickHdl, CheckBox&, rBtn, void )
         queue_resize();
         Dialog* pResizeDialog = m_bResizeTopLevel ? GetParentDialog() : nullptr;
         if (pResizeDialog)
-            pResizeDialog->setOptimalLayoutSize();
+            pResizeDialog->setOptimalLayoutSize(true);
     }
     maExpandedHdl.Call(*this);
 }
@@ -2084,7 +2107,7 @@ bool VclScrolledWindow::set_property(const OString &rKey, const OUString &rValue
 bool VclScrolledWindow::EventNotify(NotifyEvent& rNEvt)
 {
     bool bDone = false;
-    if ( rNEvt.GetType() == MouseNotifyEvent::COMMAND )
+    if ( rNEvt.GetType() == NotifyEventType::COMMAND )
     {
         const CommandEvent& rCEvt = *rNEvt.GetCommandEvent();
         if ( rCEvt.GetCommand() == CommandEventId::Wheel )
@@ -2114,6 +2137,55 @@ void VclScrolledWindow::Paint(vcl::RenderContext& rRenderContext, const tools::R
     const auto nBorderWidth = (aRect.GetWidth() - aContentRect.GetWidth()) / 2;
     SAL_WARN_IF(nBorderWidth > m_nBorderWidth, "vcl.layout", "desired border at paint " <<
                 nBorderWidth << " is larger than expected " << m_nBorderWidth);
+}
+
+namespace {
+void lcl_dumpScrollbar(::tools::JsonWriter& rJsonWriter, ScrollBar& rScrollBar)
+{
+    rJsonWriter.put("lower", rScrollBar.GetRangeMin());
+    rJsonWriter.put("upper", rScrollBar.GetRangeMax());
+    rJsonWriter.put("step_increment", rScrollBar.GetLineSize());
+    rJsonWriter.put("page_increment", rScrollBar.GetPageSize());
+    rJsonWriter.put("value", rScrollBar.GetThumbPos());
+    rJsonWriter.put("page_size", rScrollBar.GetVisibleSize());
+}
+};
+
+void VclScrolledWindow::DumpAsPropertyTree(::tools::JsonWriter& rJsonWriter)
+{
+    VclBin::DumpAsPropertyTree(rJsonWriter);
+
+    rJsonWriter.put("user_managed_scrolling", m_bUserManagedScrolling);
+
+    {
+        auto aVertical = rJsonWriter.startNode("vertical");
+
+        ScrollBar& rScrollBar = getVertScrollBar();
+        lcl_dumpScrollbar(rJsonWriter, rScrollBar);
+
+        WinBits nWinBits = GetStyle();
+        if (nWinBits & WB_VSCROLL)
+            rJsonWriter.put("policy", "always");
+        else if (nWinBits & WB_AUTOVSCROLL)
+            rJsonWriter.put("policy", "auto");
+        else
+            rJsonWriter.put("policy", "never");
+    }
+
+    {
+        auto aHorizontal = rJsonWriter.startNode("horizontal");
+
+        ScrollBar& rScrollBar = getHorzScrollBar();
+        lcl_dumpScrollbar(rJsonWriter, rScrollBar);
+
+        WinBits nWinBits = GetStyle();
+        if (nWinBits & WB_HSCROLL)
+            rJsonWriter.put("policy", "always");
+        else if (nWinBits & WB_AUTOHSCROLL)
+            rJsonWriter.put("policy", "auto");
+        else
+            rJsonWriter.put("policy", "never");
+    }
 }
 
 void VclViewport::setAllocation(const Size &rAllocation)
@@ -2406,7 +2478,7 @@ MessageDialog::MessageDialog(vcl::Window* pParent, WinBits nStyle)
 }
 
 MessageDialog::MessageDialog(vcl::Window* pParent,
-    const OUString &rMessage,
+    OUString aMessage,
     VclMessageType eMessageType,
     VclButtonsType eButtonsType)
     : Dialog(pParent, WB_MOVEABLE | WB_3DLOOK | WB_CLOSEABLE)
@@ -2417,7 +2489,7 @@ MessageDialog::MessageDialog(vcl::Window* pParent,
     , m_pImage(nullptr)
     , m_pPrimaryMessage(nullptr)
     , m_pSecondaryMessage(nullptr)
-    , m_sPrimaryString(rMessage)
+    , m_sPrimaryString(std::move(aMessage))
 {
     SetType(WindowType::MESSBOX);
     create_owned_areas();
@@ -2986,10 +3058,17 @@ void VclDrawingArea::DumpAsPropertyTree(tools::JsonWriter& rJsonWriter)
     rJsonWriter.put("type", "drawingarea");
 
     ScopedVclPtrInstance<VirtualDevice> pDevice;
-    pDevice->SetOutputSize( GetSizePixel() );
-    tools::Rectangle aRect(Point(0,0), GetSizePixel());
+    OutputDevice* pRefDevice = GetOutDev();
+    Size aRenderSize(pRefDevice->PixelToLogic(GetOutputSizePixel()));
+    Size aOutputSize = GetSizePixel();
+    pDevice->SetOutputSize(aRenderSize);
+    tools::Rectangle aRect(Point(0,0), aRenderSize);
+
     Paint(*pDevice, aRect);
-    BitmapEx aImage = pDevice->GetBitmapEx( Point(0,0), GetSizePixel() );
+
+    BitmapEx aImage = pDevice->GetBitmapEx(Point(0,0), aRenderSize);
+    aImage.Scale(aOutputSize);
+
     SvMemoryStream aOStm(65535, 65535);
     if(GraphicConverter::Export(aOStm, aImage, ConvertDataFormat::PNG) == ERRCODE_NONE)
     {

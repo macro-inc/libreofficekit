@@ -35,10 +35,12 @@
 #include <svx/svdotext.hxx>
 #include <svx/svdograf.hxx>
 #include <svx/sdmetitm.hxx>
+#include <utility>
 #include <vcl/cvtgrf.hxx>
 #include <filter/msfilter/msdffimp.hxx>
 #include <filter/msfilter/util.hxx>
 #include <filter/msfilter/escherex.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
@@ -58,9 +60,9 @@ using namespace com::sun::star;
 const sal_Int32 Tag_Container = 44444;
 const sal_Int32 Tag_Commit = 44445;
 
-VMLExport::VMLExport( ::sax_fastparser::FSHelperPtr const & pSerializer, VMLTextExport* pTextExport )
+VMLExport::VMLExport( ::sax_fastparser::FSHelperPtr pSerializer, VMLTextExport* pTextExport )
     : EscherEx( std::make_shared<EscherExGlobal>(), nullptr, /*bOOXML=*/true )
-    , m_pSerializer( pSerializer )
+    , m_pSerializer(std::move( pSerializer ))
     , m_pTextExport( pTextExport )
     , m_eHOri( 0 )
     , m_eVOri( 0 )
@@ -87,8 +89,6 @@ void VMLExport::SetFS( const ::sax_fastparser::FSHelperPtr& pSerializer )
 
 VMLExport::~VMLExport()
 {
-    delete mpOutStrm;
-    mpOutStrm = nullptr;
 }
 
 void VMLExport::OpenContainer( sal_uInt16 nEscherContainer, int nRecInstance )
@@ -140,14 +140,14 @@ sal_uInt32 VMLExport::EnterGroup( const OUString& rShapeName, const tools::Recta
     pAttrList->add( XML_id, ShapeIdString( nShapeId ) );
 
     if ( rShapeName.getLength() )
-        pAttrList->add( XML_alt, OUStringToOString( rShapeName, RTL_TEXTENCODING_UTF8 ) );
+        pAttrList->add( XML_alt, rShapeName );
 
     bool rbAbsolutePos = true;
     //editAs
     OUString rEditAs = EscherEx::GetEditAs();
     if (!rEditAs.isEmpty())
     {
-        pAttrList->add(XML_editas, OUStringToOString( rEditAs, RTL_TEXTENCODING_UTF8 ));
+        pAttrList->add(XML_editas, rEditAs);
         rbAbsolutePos = false;
     }
 
@@ -197,17 +197,17 @@ void VMLExport::AddShape( sal_uInt32 nShapeType, ShapeFlag nShapeFlags, sal_uInt
     else
     {
         // A watermark object - store the optional shape ID
-        m_pShapeAttrList->add( XML_id, OUStringToOString(m_pSdrObject->GetName(), RTL_TEXTENCODING_UTF8) );
+        m_pShapeAttrList->add( XML_id, m_pSdrObject->GetName() );
         // also ('o:spid')
         m_pShapeAttrList->addNS( XML_o, XML_spid, m_sShapeId );
     }
 }
 
-bool VMLExport::IsWaterMarkShape(const OUString& rStr)
+bool VMLExport::IsWaterMarkShape(std::u16string_view rStr)
 {
-     if (rStr.isEmpty() )  return false;
+     if (rStr.empty() )  return false;
 
-     return rStr.match("PowerPlusWaterMarkObject") || rStr.match("WordPictureWatermark");
+     return o3tl::starts_with(rStr, u"PowerPlusWaterMarkObject") || o3tl::starts_with(rStr, u"WordPictureWatermark");
 }
 
 void VMLExport::OverrideShapeIDGen(bool bOverrideShapeIdGen, const OString& sShapeIDPrefix)
@@ -389,7 +389,7 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
                 nPaddingY += pItem->GetValue();
 
             tools::Rectangle aRect( rRect );
-            aRect.setHeight( aRect.getHeight() + nPaddingY );
+            aRect.setHeight( aRect.getOpenHeight() + nPaddingY );
             AddRectangleDimensions( m_ShapeStyle, aRect );
         }
         else
@@ -675,41 +675,32 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
                         if (!pSdrGrafObj->getSignatureLineId().isEmpty())
                         {
                             pAttrListSignatureLine->add(
-                                XML_id, OUStringToOString(pSdrGrafObj->getSignatureLineId(),
-                                                          RTL_TEXTENCODING_UTF8));
+                                XML_id, pSdrGrafObj->getSignatureLineId());
                         }
                         if (!pSdrGrafObj->getSignatureLineSuggestedSignerName().isEmpty())
                         {
                             pAttrListSignatureLine->add(
                                 FSNS(XML_o, XML_suggestedsigner),
-                                OUStringToOString(
-                                    pSdrGrafObj->getSignatureLineSuggestedSignerName(),
-                                    RTL_TEXTENCODING_UTF8));
+                                pSdrGrafObj->getSignatureLineSuggestedSignerName());
                         }
                         if (!pSdrGrafObj->getSignatureLineSuggestedSignerTitle().isEmpty())
                         {
                             pAttrListSignatureLine->add(
                                 FSNS(XML_o, XML_suggestedsigner2),
-                                OUStringToOString(
-                                    pSdrGrafObj->getSignatureLineSuggestedSignerTitle(),
-                                    RTL_TEXTENCODING_UTF8));
+                                pSdrGrafObj->getSignatureLineSuggestedSignerTitle());
                         }
                         if (!pSdrGrafObj->getSignatureLineSuggestedSignerEmail().isEmpty())
                         {
                             pAttrListSignatureLine->add(
                                 FSNS(XML_o, XML_suggestedsigneremail),
-                                OUStringToOString(
-                                    pSdrGrafObj->getSignatureLineSuggestedSignerEmail(),
-                                    RTL_TEXTENCODING_UTF8));
+                                pSdrGrafObj->getSignatureLineSuggestedSignerEmail());
                         }
                         if (!pSdrGrafObj->getSignatureLineSigningInstructions().isEmpty())
                         {
                             pAttrListSignatureLine->add(XML_signinginstructionsset, "t");
                             pAttrListSignatureLine->add(
                                 FSNS(XML_o, XML_signinginstructions),
-                                OUStringToOString(
-                                    pSdrGrafObj->getSignatureLineSigningInstructions(),
-                                    RTL_TEXTENCODING_UTF8));
+                                pSdrGrafObj->getSignatureLineSigningInstructions());
                         }
                         pAttrListSignatureLine->add(
                             XML_showsigndate,
@@ -726,17 +717,8 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
                         const uno::Reference<graphic::XGraphic>& xGraphic
                             = pSdrGrafObj->getSignatureLineUnsignedGraphic();
                         Graphic aGraphic(xGraphic);
-
-                        BitmapChecksum nChecksum = aGraphic.GetChecksum();
-                        OUString aImageId = m_pTextExport->FindRelId(nChecksum);
-                        if (aImageId.isEmpty())
-                        {
-                            OUString aFileName;
-                            aImageId = m_pTextExport->GetDrawingML().WriteImage(aGraphic, false, &aFileName);
-                            m_pTextExport->CacheRelId(nChecksum, aImageId, aFileName);
-                        }
-                        pAttrList->add(FSNS(XML_r, XML_id),
-                                       OUStringToOString(aImageId, RTL_TEXTENCODING_UTF8));
+                        OUString aImageId = m_pTextExport->GetDrawingML().WriteImage(aGraphic, false);
+                        pAttrList->add(FSNS(XML_r, XML_id), aImageId);
                         imageData = true;
                     }
                     else if (rProps.GetOpt(ESCHER_Prop_fillBlip, aStruct) && m_pTextExport)
@@ -749,17 +731,8 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
                         aStream.Seek(0);
                         Graphic aGraphic;
                         GraphicConverter::Import(aStream, aGraphic);
-
-                        BitmapChecksum nChecksum = aGraphic.GetChecksum();
-                        OUString aImageId = m_pTextExport->FindRelId(nChecksum);
-                        if (aImageId.isEmpty())
-                        {
-                            OUString aFileName;
-                            aImageId = m_pTextExport->GetDrawingML().WriteImage(aGraphic, false, &aFileName);
-                            m_pTextExport->CacheRelId(nChecksum, aImageId, aFileName);
-                        }
-                        pAttrList->add(FSNS(XML_r, XML_id),
-                                       OUStringToOString(aImageId, RTL_TEXTENCODING_UTF8));
+                        OUString aImageId = m_pTextExport->GetDrawingML().WriteImage(aGraphic, false);
+                        pAttrList->add(FSNS(XML_r, XML_id), aImageId);
                         imageData = true;
                     }
 
@@ -970,7 +943,7 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
                         rtl::Reference<sax_fastparser::FastAttributeList> pAttrList = FastSerializerHelper::createAttrList();
                         pAttrList->add(XML_on, "t");
                         pAttrList->add(XML_fitshape, "t");
-                        pAttrList->add(XML_string, OUStringToOString(aTextPathString, RTL_TEXTENCODING_UTF8));
+                        pAttrList->add(XML_string, aTextPathString);
                         EscherPropSortStruct aFont;
                         OUString aStyle;
                         if (rProps.GetOpt(ESCHER_Prop_gtextFont, aFont))
@@ -987,11 +960,13 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
                             OUString aSize = OUString::number(nSizeF);
                             aStyle += ";font-size:" + aSize + "pt";
                         }
-                        if (IsWaterMarkShape(m_pSdrObject->GetName()))
-                            pAttrList->add(XML_trim, "t");
+                        // tdf#153260. LO renders all Fontwork shapes as if trim="t" is set. Default
+                        // value is "f". So always write out "t", otherwise import will reduce the
+                        // shape height as workaround for "f".
+                        pAttrList->add(XML_trim, "t");
 
                         if (!aStyle.isEmpty())
-                            pAttrList->add(XML_style, OUStringToOString(aStyle, RTL_TEXTENCODING_UTF8));
+                            pAttrList->add(XML_style, aStyle);
                         m_pSerializer->singleElementNS(XML_v, XML_textpath, pAttrList);
                     }
 
@@ -1026,7 +1001,7 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
                     OUString idStr = SvxMSDffManager::MSDFFReadZString(aStream, opt.nProp.size(), true);
                     aStream.Seek(0);
                     if (!IsWaterMarkShape(m_pSdrObject->GetName()) && !m_bSkipwzName)
-                         m_pShapeAttrList->add(XML_ID, OUStringToOString(idStr, RTL_TEXTENCODING_UTF8));
+                         m_pShapeAttrList->add(XML_ID, idStr);
 
                     bAlreadyWritten[ESCHER_Prop_wzName] = true;
                 }
@@ -1034,22 +1009,21 @@ void VMLExport::Commit( EscherPropertyContainer& rProps, const tools::Rectangle&
             default:
 #if OSL_DEBUG_LEVEL > 0
                 const size_t opt_nProp_size(opt.nProp.size());
-                const sal_uInt8 opt_nProp_empty(0);
-                fprintf( stderr, "TODO VMLExport::Commit(), unimplemented id: %d, value: %" SAL_PRIuUINT32 ", data: [%zu, %p]\n",
-                        nId,
-                        opt.nPropValue,
-                        opt_nProp_size,
-                        0 == opt_nProp_size ? &opt_nProp_empty : opt.nProp.data());
+                SAL_WARN( "oox.vml", "TODO VMLExport::Commit(), unimplemented id: " << nId
+                        << ", value: " << opt.nPropValue
+                        << ", data: [" << opt_nProp_size << "]");
                 if ( opt.nProp.size() )
                 {
                     const sal_uInt8 *pIt = opt.nProp.data();
-                    fprintf( stderr, "    ( " );
+                    OStringBuffer buf;
+                    buf.append( "    ( " );
                     for ( int nCount = opt.nProp.size(); nCount; --nCount )
                     {
-                        fprintf( stderr, "%02x ", *pIt );
+                        buf.append( static_cast<sal_Int32>(*pIt), 16 ).append(' ');
                         ++pIt;
                     }
-                    fprintf( stderr, ")\n" );
+                    buf.append( ")" );
+                    SAL_WARN("oox.vml", std::string_view(buf));
                 }
 #endif
                 break;
@@ -1164,13 +1138,13 @@ static std::vector<OString> lcl_getShapeTypes()
     SvFileStream aStream(aPath, StreamMode::READ);
     if (aStream.GetError() != ERRCODE_NONE)
         SAL_WARN("oox", "failed to open vml-shape-types");
-    OString aLine;
+    OStringBuffer aLine;
     bool bNotDone = aStream.ReadLine(aLine);
     while (bNotDone)
     {
         // Filter out comments.
-        if (!aLine.startsWith("/"))
-            aRet.push_back(aLine);
+        if (!o3tl::starts_with(aLine, "/"))
+            aRet.push_back(OString(aLine));
         bNotDone = aStream.ReadLine(aLine);
     }
     return aRet;
@@ -1179,12 +1153,15 @@ static std::vector<OString> lcl_getShapeTypes()
 static bool lcl_isTextBox(const SdrObject* pSdrObject)
 {
     uno::Reference<beans::XPropertySet> xPropertySet(const_cast<SdrObject*>(pSdrObject)->getUnoShape(), uno::UNO_QUERY);
-    if (xPropertySet.is())
-    {
-        uno::Reference<beans::XPropertySetInfo> xPropertySetInfo = xPropertySet->getPropertySetInfo();
-        return xPropertySetInfo->hasPropertyByName("TextBox") && xPropertySet->getPropertyValue("TextBox").get<bool>();
-    }
-    return false;
+    if (!xPropertySet.is())
+        return false;
+    uno::Reference<beans::XPropertySetInfo> xPropertySetInfo = xPropertySet->getPropertySetInfo();
+    if (!xPropertySetInfo->hasPropertyByName("TextBox"))
+       return false;
+    css::uno::Any aTextBox(xPropertySet->getPropertyValue("TextBox"));
+    if (!aTextBox.hasValue())
+       return false;
+    return aTextBox.get<bool>();
 }
 
 static OUString lcl_getAnchorIdFromGrabBag(const SdrObject* pSdrObject)
@@ -1388,7 +1365,7 @@ sal_Int32 VMLExport::StartShape()
 
     if (!m_pSdrObject->getHyperlink().isEmpty())
         m_pShapeAttrList->add(
-            XML_href, OUStringToOString(m_pSdrObject->getHyperlink(), RTL_TEXTENCODING_UTF8));
+            XML_href, m_pSdrObject->getHyperlink());
 
     m_pShapeAttrList->addNS(XML_o, XML_allowincell, m_IsFollowingTextFlow ? "t" : "f");
 
@@ -1397,7 +1374,7 @@ sal_Int32 VMLExport::StartShape()
 
     OUString sAnchorId = lcl_getAnchorIdFromGrabBag(m_pSdrObject);
     if (!sAnchorId.isEmpty())
-        m_pShapeAttrList->addNS(XML_wp14, XML_anchorId, OUStringToOString(sAnchorId, RTL_TEXTENCODING_UTF8));
+        m_pShapeAttrList->addNS(XML_wp14, XML_anchorId, sAnchorId);
 
     if ( nShapeElement >= 0 && !m_pShapeAttrList->hasAttribute( XML_type ) && bReferToShapeType )
     {
@@ -1414,7 +1391,7 @@ sal_Int32 VMLExport::StartShape()
     OString const textboxStyle(m_TextboxStyle.makeStringAndClear());
 
     // now check if we have some editeng text (not associated textbox) and we have a text exporter registered
-    const SdrTextObj* pTxtObj = dynamic_cast<const SdrTextObj*>( m_pSdrObject );
+    const SdrTextObj* pTxtObj = DynCastSdrTextObj( m_pSdrObject );
     if (pTxtObj && m_pTextExport && msfilter::util::HasTextBoxContent(m_nShapeType) && !IsWaterMarkShape(m_pSdrObject->GetName()) && !lcl_isTextBox(m_pSdrObject))
     {
         std::optional<OutlinerParaObject> pParaObj;
@@ -1465,14 +1442,10 @@ void VMLExport::EndShape( sal_Int32 nShapeElement )
         if (xPropertySetInfo->hasPropertyByName("CustomShapeGeometry"))
         {
             // In this case a DrawingML DOCX was imported.
-            comphelper::SequenceAsHashMap aCustomShapeProperties(
-                xPropertySet->getPropertyValue("CustomShapeGeometry"));
-            if (aCustomShapeProperties.find("TextPreRotateAngle") != aCustomShapeProperties.end())
-            {
-                sal_Int32 nTextRotateAngle = aCustomShapeProperties["TextPreRotateAngle"].get<sal_Int32>();
-                if (nTextRotateAngle == -270)
-                    bBottomToTop = true;
-            }
+            auto aAny = xPropertySet->getPropertyValue("WritingMode");
+            sal_Int16 nWritingMode;
+            if ((aAny >>= nWritingMode) && nWritingMode == text::WritingMode2::BT_LR)
+                bBottomToTop = true;
         }
         else
         {

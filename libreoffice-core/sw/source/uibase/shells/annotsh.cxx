@@ -31,6 +31,7 @@
 #include <sfx2/objface.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/bindings.hxx>
+#include <sfx2/dispatch.hxx>
 #include <sfx2/request.hxx>
 #include <editeng/eeitem.hxx>
 #include <editeng/flstitem.hxx>
@@ -223,8 +224,9 @@ void SwAnnotationShell::Exec( SfxRequest &rReq )
         case FN_GROW_FONT_SIZE:
         case FN_SHRINK_FONT_SIZE:
         {
-            const SvxFontListItem* pFontListItem = static_cast< const SvxFontListItem* >
-                    ( SfxObjectShell::Current()->GetItem( SID_ATTR_CHAR_FONTLIST ) );
+            const SfxObjectShell* pObjSh = SfxObjectShell::Current();
+            const SvxFontListItem* pFontListItem = static_cast<const SvxFontListItem*>
+                    (pObjSh ? pObjSh->GetItem(SID_ATTR_CHAR_FONTLIST) : nullptr);
             const FontList* pFontList = pFontListItem ? pFontListItem->GetFontList() : nullptr;
             pOLV->GetEditView().ChangeFontSize( nSlot == FN_GROW_FONT_SIZE, pFontList );
         }
@@ -423,7 +425,7 @@ void SwAnnotationShell::Exec( SfxRequest &rReq )
             const SfxPoolItem* pItem = nullptr;
             if (pNewAttrs)
                 pNewAttrs->GetItemState(nSlot, false, &pItem );
-            if (pPostItMgr->GetActiveSidebarWin()->GetLayoutStatus()!=SwPostItHelper::DELETED)
+            if (pItem && pPostItMgr->GetActiveSidebarWin()->GetLayoutStatus()!=SwPostItHelper::DELETED)
                 pOLV->InsertText(static_cast<const SfxStringItem *>(pItem)->GetValue());
             break;
         }
@@ -449,6 +451,7 @@ void SwAnnotationShell::Exec( SfxRequest &rReq )
             break;
         }
         case SID_CHAR_DLG_EFFECT:
+        case SID_CHAR_DLG_POSITION:
         case SID_CHAR_DLG:
         {
             const SfxItemSet* pArgs = rReq.GetArgs();
@@ -473,6 +476,10 @@ void SwAnnotationShell::Exec( SfxRequest &rReq )
                 if (nSlot == SID_CHAR_DLG_EFFECT)
                 {
                     pDlg->SetCurPageId("fonteffects");
+                }
+                if (nSlot == SID_CHAR_DLG_POSITION)
+                {
+                    pDlg->SetCurPageId("position");
                 }
                 else if (pItem)
                 {
@@ -554,8 +561,8 @@ void SwAnnotationShell::Exec( SfxRequest &rReq )
                 aAttr( *aNewAttr.GetPool() );
 
             SvxAdjust nAdjust = SvxAdjust::Left;
-            if( SfxItemState::SET == aEditAttr.GetItemState(EE_PARA_JUST, true, &pPoolItem ) )
-                nAdjust = static_cast<const SvxAdjustItem*>(pPoolItem)->GetAdjust();
+            if( const SvxAdjustItem* pAdjustItem = aEditAttr.GetItemIfSet(EE_PARA_JUST ) )
+                nAdjust = pAdjustItem->GetAdjust();
 
             if( bLeftToRight )
             {
@@ -578,6 +585,15 @@ void SwAnnotationShell::Exec( SfxRequest &rReq )
     {
         aNewAttr.Put(pNewAttrs->Get(nWhich).CloneSetWhich(nEEWhich));
     }
+    else if (nEEWhich == EE_CHAR_COLOR)
+    {
+        m_rView.GetViewFrame()->GetDispatcher()->Execute(SID_CHAR_DLG_EFFECT);
+    }
+    else if (nEEWhich == EE_CHAR_KERNING)
+    {
+        m_rView.GetViewFrame()->GetDispatcher()->Execute(SID_CHAR_DLG_POSITION);
+    }
+
 
     tools::Rectangle aOutRect = pOLV->GetOutputArea();
     if (tools::Rectangle() != aOutRect && aNewAttr.Count())
@@ -733,8 +749,7 @@ void SwAnnotationShell::GetState(SfxItemSet& rSet)
                     else if (nWhich==SID_ATTR_PARA_ADJUST_BLOCK)
                         eAdjust = SvxAdjust::Block;
 
-                    const SfxPoolItem *pAdjust = nullptr;
-                    aEditAttr.GetItemState( EE_PARA_JUST, false, &pAdjust);
+                    const SvxAdjustItem *pAdjust = aEditAttr.GetItemIfSet( EE_PARA_JUST, false );
 
                     if( !pAdjust || IsInvalidItem( pAdjust ))
                     {
@@ -742,7 +757,7 @@ void SwAnnotationShell::GetState(SfxItemSet& rSet)
                     }
                     else
                     {
-                        if ( eAdjust == static_cast<const SvxAdjustItem*>(pAdjust)->GetAdjust())
+                        if ( eAdjust == pAdjust->GetAdjust())
                             rSet.Put( SfxBoolItem( nWhich, true ));
                         else
                             rSet.InvalidateItem( nWhich );
@@ -764,8 +779,7 @@ void SwAnnotationShell::GetState(SfxItemSet& rSet)
                     else if (nWhich==SID_ATTR_PARA_LINESPACE_20)
                         nLSpace = 200;
 
-                    const SfxPoolItem *pLSpace = nullptr;
-                    aEditAttr.GetItemState( EE_PARA_SBL, false, &pLSpace );
+                    const SvxLineSpacingItem *pLSpace = aEditAttr.GetItemIfSet( EE_PARA_SBL, false );
 
                     if( !pLSpace || IsInvalidItem( pLSpace ))
                     {
@@ -773,7 +787,7 @@ void SwAnnotationShell::GetState(SfxItemSet& rSet)
                     }
                     else
                     {
-                        if( nLSpace == static_cast<const SvxLineSpacingItem*>(pLSpace)->GetPropLineSpace() )
+                        if( nLSpace == pLSpace->GetPropLineSpace() )
                             rSet.Put( SfxBoolItem( nWhich, true ));
                         else
                         {
@@ -1269,7 +1283,7 @@ void SwAnnotationShell::ExecLingu(SfxRequest &rReq)
         case SID_THES:
         {
             OUString aReplaceText;
-            const SfxStringItem* pItem2 = rReq.GetArg<SfxStringItem>(SID_THES);
+            const SfxStringItem* pItem2 = rReq.GetArg(FN_PARAM_THES_WORD_REPLACE);
             if (pItem2)
                 aReplaceText = pItem2->GetValue();
             if (!aReplaceText.isEmpty())
@@ -1723,19 +1737,17 @@ void SwAnnotationShell::InsertSymbol(SfxRequest& rReq)
     OutlinerView* pOLV = pPostItMgr->GetActiveSidebarWin()->GetOutlinerView();
 
     const SfxItemSet *pArgs = rReq.GetArgs();
-    const SfxPoolItem* pItem = nullptr;
+    const SfxStringItem* pCharMapItem = nullptr;
     if( pArgs )
-        pArgs->GetItemState(GetPool().GetWhich(SID_CHARMAP), false, &pItem);
+        pCharMapItem = pArgs->GetItemIfSet(SID_CHARMAP, false);
 
     OUString sSym;
     OUString sFontName;
-    if ( pItem )
+    if ( pCharMapItem )
     {
-        sSym = static_cast<const SfxStringItem*>(pItem)->GetValue();
-        const SfxPoolItem* pFtItem = nullptr;
-        pArgs->GetItemState( GetPool().GetWhich(SID_ATTR_SPECIALCHAR), false, &pFtItem);
-
-        if (const SfxStringItem* pFontItem = dynamic_cast<const SfxStringItem*>(pFtItem))
+        sSym = pCharMapItem->GetValue();
+        const SfxStringItem* pFontItem = pArgs->GetItemIfSet( SID_ATTR_SPECIALCHAR, false);
+        if (pFontItem)
             sFontName = pFontItem->GetValue();
     }
 
@@ -1752,9 +1764,11 @@ void SwAnnotationShell::InsertSymbol(SfxRequest& rReq)
         }
         else
         {
-            aSetDlgFont.reset(static_cast<SvxFontItem*>(aSet.Get( GetWhichOfScript(
+            TypedWhichId<SvxFontItem> nFontWhich =
+                GetWhichOfScript(
                         SID_ATTR_CHAR_FONT,
-                        SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) )).Clone()));
+                        SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ) );
+            aSetDlgFont.reset(aSet.Get(nFontWhich).Clone());
         }
 
         if (sFontName.isEmpty())
@@ -1832,7 +1846,7 @@ void SwAnnotationShell::InsertSymbol(SfxRequest& rReq)
     pOutliner->SetUpdateLayout(true);
     pOLV->ShowCursor();
 
-    rReq.AppendItem( SfxStringItem( GetPool().GetWhich(SID_CHARMAP), sSym ) );
+    rReq.AppendItem( SfxStringItem( SID_CHARMAP, sSym ) );
     if(!aFont.GetFamilyName().isEmpty())
         rReq.AppendItem( SfxStringItem( SID_ATTR_SPECIALCHAR, aFont.GetFamilyName() ) );
     rReq.Done();

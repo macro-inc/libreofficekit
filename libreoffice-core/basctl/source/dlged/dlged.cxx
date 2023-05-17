@@ -43,7 +43,6 @@
 #include <svx/svdpagv.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <vcl/print.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/svapp.hxx>
 #include <xmlscript/xml_helper.hxx>
 #include <xmlscript/xmldlg_imexp.hxx>
@@ -195,7 +194,7 @@ DlgEditor::DlgEditor (
     ,pFunc(new DlgEdFuncSelect(*this))
     ,rLayout(rLayout_)
     ,eMode( DlgEditor::SELECT )
-    ,eActObj( OBJ_DLG_PUSHBUTTON )
+    ,eActObj( SdrObjKind::BasicDialogPushButton )
     ,bFirstDraw(false)
     ,bCreateOK(true)
     ,bDialogModelChanged(false)
@@ -237,14 +236,12 @@ DlgEditor::DlgEditor (
     SetDialog(xDialogModel);
 }
 
-
 DlgEditor::~DlgEditor()
 {
     aMarkIdle.Stop();
 
     ::comphelper::disposeComponent( m_xControlContainer );
 }
-
 
 Reference< awt::XControlContainer > const & DlgEditor::GetWindowControlContainer()
 {
@@ -253,15 +250,13 @@ Reference< awt::XControlContainer > const & DlgEditor::GetWindowControlContainer
     return m_xControlContainer;
 }
 
-
-void DlgEditor::SetScrollBars( ScrollBar* pHS, ScrollBar* pVS )
+void DlgEditor::SetScrollBars(ScrollAdaptor* pHS, ScrollAdaptor* pVS)
 {
     pHScroll = pHS;
     pVScroll = pVS;
 
     InitScrollBars();
 }
-
 
 void DlgEditor::InitScrollBars()
 {
@@ -347,8 +342,8 @@ void DlgEditor::SetDialog( const uno::Reference< container::XNameContainer >& xU
     pDlgEdForm = new DlgEdForm(*pDlgEdModel, *this);
     uno::Reference< awt::XControlModel > xDlgMod( m_xUnoControlDialogModel , uno::UNO_QUERY );
     pDlgEdForm->SetUnoControlModel(xDlgMod);
-    static_cast<DlgEdPage*>(pDlgEdModel->GetPage(0))->SetDlgEdForm( pDlgEdForm );
-    pDlgEdModel->GetPage(0)->InsertObject( pDlgEdForm );
+    static_cast<DlgEdPage*>(pDlgEdModel->GetPage(0))->SetDlgEdForm( pDlgEdForm.get() );
+    pDlgEdModel->GetPage(0)->InsertObject( pDlgEdForm.get() );
     AdjustPageSize();
     pDlgEdForm->SetRectFromProps();
     pDlgEdForm->UpdateTabIndices();     // for backward compatibility
@@ -387,11 +382,11 @@ void DlgEditor::SetDialog( const uno::Reference< container::XNameContainer >& xU
             Any aCtrl = m_xUnoControlDialogModel->getByName( indexToName.second );
             Reference< css::awt::XControlModel > xCtrlModel;
             aCtrl >>= xCtrlModel;
-            DlgEdObj* pCtrlObj = new DlgEdObj(*pDlgEdModel);
+            rtl::Reference<DlgEdObj> pCtrlObj = new DlgEdObj(*pDlgEdModel);
             pCtrlObj->SetUnoControlModel( xCtrlModel );
-            pCtrlObj->SetDlgEdForm( pDlgEdForm );
-            pDlgEdForm->AddChild( pCtrlObj );
-            pDlgEdModel->GetPage(0)->InsertObject( pCtrlObj );
+            pCtrlObj->SetDlgEdForm( pDlgEdForm.get() );
+            pDlgEdForm->AddChild( pCtrlObj.get() );
+            pDlgEdModel->GetPage(0)->InsertObject( pCtrlObj.get() );
             pCtrlObj->SetRectFromProps();
             pCtrlObj->UpdateStep();
             pCtrlObj->StartListening();
@@ -405,7 +400,7 @@ void DlgEditor::SetDialog( const uno::Reference< container::XNameContainer >& xU
 
 void DlgEditor::ResetDialog ()
 {
-    DlgEdForm* pOldDlgEdForm = pDlgEdForm;
+    DlgEdForm* pOldDlgEdForm = pDlgEdForm.get();
     DlgEdPage* pPage = static_cast<DlgEdPage*>(pDlgEdModel->GetPage(0));
     SdrPageView* pPgView = pDlgEdView->GetSdrPageView();
     bool bWasMarked = pDlgEdView->IsObjMarked( pOldDlgEdForm );
@@ -417,7 +412,7 @@ void DlgEditor::ResetDialog ()
     pPage->SetDlgEdForm( nullptr );
     SetDialog( m_xUnoControlDialogModel );
     if( bWasMarked )
-        pDlgEdView->MarkObj( pDlgEdForm, pPgView );
+        pDlgEdView->MarkObj( pDlgEdForm.get(), pPgView );
 }
 
 
@@ -555,8 +550,9 @@ void DlgEditor::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle
     // #i79128# ...and use correct OutDev for that
     if (pTargetPaintWindow)
     {
+        Color maBackColor = rRenderContext.GetSettings().GetStyleSettings().GetLightColor();
         OutputDevice& rTargetOutDev = pTargetPaintWindow->GetTargetOutputDevice();
-        rTargetOutDev.DrawWallpaper(aPaintRect, Wallpaper(COL_WHITE));
+        rTargetOutDev.DrawWallpaper(aPaintRect, Wallpaper(maBackColor));
     }
 
     // do paint (unbuffered) and mark repaint end
@@ -608,12 +604,12 @@ void DlgEditor::SetInsertObj(SdrObjKind eObj)
 void DlgEditor::CreateDefaultObject()
 {
     // create object by factory
-    SdrObject* pObj = SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj = SdrObjFactory::MakeNewObject(
         *pDlgEdModel,
         pDlgEdView->GetCurrentObjInventor(),
         pDlgEdView->GetCurrentObjIdentifier());
 
-    DlgEdObj* pDlgEdObj = dynamic_cast<DlgEdObj*>(pObj);
+    DlgEdObj* pDlgEdObj = dynamic_cast<DlgEdObj*>(pObj.get());
     if (!pDlgEdObj)
         return;
 
@@ -789,7 +785,7 @@ void DlgEditor::Copy()
         Sequence< Any > aSeqData
         {
             aNoResourceDialogModelBytesAny,
-            makeAny(aCombinedData)
+            Any(aCombinedData)
         };
 
         pTrans = new DlgEdTransferableImpl( m_ClipboardDataFlavorsResource, aSeqData );
@@ -797,7 +793,7 @@ void DlgEditor::Copy()
     else
     {
         // No resource, support only old format
-        pTrans = new DlgEdTransferableImpl( m_ClipboardDataFlavors , { makeAny(DialogModelBytes) } );
+        pTrans = new DlgEdTransferableImpl( m_ClipboardDataFlavors , { Any(DialogModelBytes) } );
     }
     SolarMutexReleaser aReleaser;
     xClipboard->setContents( pTrans , pTrans );
@@ -919,9 +915,9 @@ void DlgEditor::Paste()
         Reference< util::XCloneable > xClone( xCM, uno::UNO_QUERY );
         Reference< awt::XControlModel > xCtrlModel( xClone->createClone(), uno::UNO_QUERY );
 
-        DlgEdObj* pCtrlObj = new DlgEdObj(*pDlgEdModel);
-        pCtrlObj->SetDlgEdForm(pDlgEdForm);         // set parent form
-        pDlgEdForm->AddChild(pCtrlObj);             // add child to parent form
+        rtl::Reference<DlgEdObj> pCtrlObj = new DlgEdObj(*pDlgEdModel);
+        pCtrlObj->SetDlgEdForm(pDlgEdForm.get());         // set parent form
+        pDlgEdForm->AddChild(pCtrlObj.get());             // add child to parent form
         pCtrlObj->SetUnoControlModel( xCtrlModel ); // set control model
 
         // set new name
@@ -955,7 +951,7 @@ void DlgEditor::Paste()
         m_xUnoControlDialogModel->insertByName( aOUniqueName , aCtrlModel );
 
         // insert object into drawing page
-        pDlgEdModel->GetPage(0)->InsertObject( pCtrlObj );
+        pDlgEdModel->GetPage(0)->InsertObject( pCtrlObj.get() );
         pCtrlObj->SetRectFromProps();
         pCtrlObj->UpdateStep();
         pDlgEdForm->UpdateTabOrderAndGroups();
@@ -963,7 +959,7 @@ void DlgEditor::Paste()
 
         // mark object
         SdrPageView* pPgView = pDlgEdView->GetSdrPageView();
-        pDlgEdView->MarkObj( pCtrlObj, pPgView, false, true);
+        pDlgEdView->MarkObj( pCtrlObj.get(), pPgView, false, true);
     }
 
     // center marked objects in dialog editor form

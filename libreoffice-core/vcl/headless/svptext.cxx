@@ -20,7 +20,6 @@
 #include <sal/config.h>
 
 #include <sal/types.h>
-#include <unotools/configmgr.hxx>
 #include <vcl/fontcharmap.hxx>
 #include <basegfx/range/b2ibox.hxx>
 #include <headless/svpgdi.hxx>
@@ -63,40 +62,8 @@ bool SvpSalGraphics::AddTempDevFont( vcl::font::PhysicalFontCollection* pFontCol
     return m_aTextRenderImpl.AddTempDevFont(pFontCollection, rFileURL, rFontName);
 }
 
-bool SvpSalGraphics::CreateFontSubset(
-    const OUString& rToFile,
-    const vcl::font::PhysicalFontFace* pFont,
-    const sal_GlyphId* pGlyphIds,
-    const sal_uInt8* pEncoding,
-    sal_Int32* pWidths,
-    int nGlyphCount,
-    FontSubsetInfo& rInfo)
-{
-    return m_aTextRenderImpl.CreateFontSubset(rToFile, pFont, pGlyphIds, pEncoding, pWidths, nGlyphCount, rInfo);
-}
-
-const void* SvpSalGraphics::GetEmbedFontData(const vcl::font::PhysicalFontFace* pFont, tools::Long* pDataLen)
-{
-    return m_aTextRenderImpl.GetEmbedFontData(pFont, pDataLen);
-}
-
-void SvpSalGraphics::FreeEmbedFontData( const void* pData, tools::Long nLen )
-{
-    m_aTextRenderImpl.FreeEmbedFontData(pData, nLen);
-}
-
-void SvpSalGraphics::GetGlyphWidths( const vcl::font::PhysicalFontFace* pFont,
-                                   bool bVertical,
-                                   std::vector< sal_Int32 >& rWidths,
-                                   Ucs2UIntMap& rUnicodeEnc )
-{
-    m_aTextRenderImpl.GetGlyphWidths(pFont, bVertical, rWidths, rUnicodeEnc);
-}
-
 std::unique_ptr<GenericSalLayout> SvpSalGraphics::GetTextLayout(int nFallbackLevel)
 {
-    if (utl::ConfigManager::IsFuzzing())
-        return nullptr;
     return m_aTextRenderImpl.GetTextLayout(nFallbackLevel);
 }
 

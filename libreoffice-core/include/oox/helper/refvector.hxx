@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <sal/types.h>
@@ -124,7 +125,7 @@ private:
     struct ForEachFunctor
     {
         FunctorType         maFunctor;
-        explicit            ForEachFunctor( const FunctorType& rFunctor ) : maFunctor( rFunctor ) {}
+        explicit            ForEachFunctor( FunctorType aFunctor ) : maFunctor(std::move( aFunctor )) {}
         void                operator()( const value_type& rxValue ) { if( rxValue.get() ) maFunctor( *rxValue ); }
     };
 
@@ -133,7 +134,7 @@ private:
     {
         FunctorType         maFunctor;
         sal_Int32           mnIndex;
-        explicit            ForEachFunctorWithIndex( const FunctorType& rFunctor ) : maFunctor( rFunctor ), mnIndex( 0 ) {}
+        explicit            ForEachFunctorWithIndex( FunctorType aFunctor ) : maFunctor(std::move( aFunctor )), mnIndex( 0 ) {}
         void                operator()( const value_type& rxValue ) {
             if( rxValue.get() ) maFunctor( mnIndex, *rxValue );
             ++mnIndex;
@@ -151,7 +152,7 @@ private:
     const value_type*   getRef( sal_Int32 nIndex ) const
                         {
                             return ((0 <= nIndex) && (static_cast< size_type >( nIndex ) < this->size())) ?
-                                &(*this)[ static_cast< size_type >( nIndex ) ] : 0;
+                                &(*this)[ static_cast< size_type >( nIndex ) ] : nullptr;
                         }
 };
 

@@ -28,7 +28,7 @@
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <connectivity/dbtools.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <helpids.h>
 #include <RelationDesignView.hxx>
 #include <JoinController.hxx>
@@ -309,7 +309,7 @@ void ORelationTableView::AddTabWin(const OUString& _rComposedName, const OUStrin
         if ( m_pAccessible )
             m_pAccessible->notifyAccessibleEvent(   AccessibleEventId::CHILD,
                                                     Any(),
-                                                    makeAny(pNewTabWin->GetAccessible()));
+                                                    Any(pNewTabWin->GetAccessible()));
     }
     else
     {

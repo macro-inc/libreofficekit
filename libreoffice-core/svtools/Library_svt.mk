@@ -21,7 +21,7 @@ $(eval $(call gb_Library_Library,svt))
 
 $(eval $(call gb_Library_set_precompiled_header,svt,svtools/inc/pch/precompiled_svt))
 
-$(eval $(call gb_Library_set_componentfile,svt,svtools/util/svt))
+$(eval $(call gb_Library_set_componentfile,svt,svtools/util/svt,services))
 
 $(eval $(call gb_Library_use_custom_headers,svt,\
 	officecfg/registry \
@@ -44,6 +44,7 @@ $(eval $(call gb_Library_use_libraries,svt,\
     comphelper \
     cppu \
     cppuhelper \
+    drawinglayercore \
     i18nlangtag \
     i18nutil \
     $(if $(ENABLE_JAVA), \
@@ -64,6 +65,7 @@ $(eval $(call gb_Library_use_externals,svt,\
     icui18n \
     icuuc \
     icu_headers \
+    libxml2 \
 ))
 
 $(eval $(call gb_Library_add_exception_objects,svt,\
@@ -99,6 +101,7 @@ $(eval $(call gb_Library_add_exception_objects,svt,\
     svtools/source/control/inettbc \
     svtools/source/control/ruler \
     svtools/source/control/scriptedtext \
+    svtools/source/control/scrolladaptor \
     svtools/source/control/tabbar \
     svtools/source/control/toolbarmenu \
     svtools/source/control/valueacc \
@@ -144,14 +147,6 @@ $(eval $(call gb_Library_add_exception_objects,svt,\
     svtools/source/svrtf/rtfkeywd \
     svtools/source/svrtf/rtfout \
     svtools/source/svrtf/svparser \
-    svtools/source/table/defaultinputhandler \
-    svtools/source/table/gridtablerenderer \
-    svtools/source/table/tablecontrol \
-    svtools/source/table/tablecontrol_impl \
-    svtools/source/table/tabledatawindow \
-    svtools/source/table/mousefunction \
-    svtools/source/table/cellvalueconversion \
-    svtools/source/table/tablegeometry \
     svtools/source/uno/addrtempuno \
     svtools/source/uno/fpicker \
     svtools/source/uno/framestatuslistener \
@@ -160,12 +155,8 @@ $(eval $(call gb_Library_add_exception_objects,svt,\
     svtools/source/uno/popupmenucontrollerbase \
     svtools/source/uno/popupwindowcontroller \
     svtools/source/uno/statusbarcontroller \
-    svtools/source/uno/svtxgridcontrol \
     svtools/source/uno/toolboxcontroller \
-    svtools/source/uno/unocontroltablemodel \
-    svtools/source/uno/unogridcolumnfacade \
     svtools/source/uno/unoevent \
-    svtools/source/uno/unoiface \
     svtools/source/uno/unoimap \
     svtools/source/uno/wizard/unowizard \
     svtools/source/uno/wizard/wizardpagecontroller \

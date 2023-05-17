@@ -18,7 +18,7 @@
 
 $(eval $(call gb_Library_Library,svgio))
 
-$(eval $(call gb_Library_set_componentfile,svgio,svgio/svgio))
+$(eval $(call gb_Library_set_componentfile,svgio,svgio/svgio,services))
 
 $(eval $(call gb_Library_set_include,svgio,\
     $$(INCLUDE) \
@@ -33,11 +33,13 @@ $(eval $(call gb_Library_use_sdk_api,svgio))
 
 $(eval $(call gb_Library_use_libraries,svgio,\
     basegfx \
+    drawinglayercore \
     drawinglayer \
     comphelper \
     cppu \
     cppuhelper \
     sal \
+    salhelper \
     tk \
     tl \
     sax \

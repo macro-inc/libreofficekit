@@ -20,7 +20,7 @@
 #include <oox/vml/vmltextbox.hxx>
 
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/awt/FontWeight.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/TextHorizontalAdjust.hpp>
@@ -30,6 +30,7 @@
 #include <com/sun/star/style/ParagraphAdjust.hpp>
 #include <comphelper/sequence.hxx>
 #include <comphelper/sequenceashashmap.hxx>
+#include <utility>
 
 namespace oox::vml {
 
@@ -39,10 +40,10 @@ TextFontModel::TextFontModel()
 {
 }
 
-TextPortionModel::TextPortionModel( const TextParagraphModel& rParagraph, const TextFontModel& rFont, const OUString& rText ) :
-    maParagraph( rParagraph ),
-    maFont( rFont ),
-    maText( rText )
+TextPortionModel::TextPortionModel( TextParagraphModel aParagraph, TextFontModel aFont, OUString aText ) :
+    maParagraph(std::move( aParagraph )),
+    maFont(std::move( aFont )),
+    maText(std::move( aText ))
 {
 }
 
@@ -86,47 +87,47 @@ void TextBox::convert(const uno::Reference<drawing::XShape>& xShape) const
         std::vector<beans::PropertyValue> aPropVec;
         const TextParagraphModel& rParagraph = portion.maParagraph;
         const TextFontModel& rFont = portion.maFont;
-        if (rFont.moName.has())
+        if (rFont.moName.has_value())
         {
             aPropertyValue.Name = "CharFontName";
-            aPropertyValue.Value <<= rFont.moName.get();
+            aPropertyValue.Value <<= rFont.moName.value();
             aPropVec.push_back(aPropertyValue);
 
             aPropertyValue.Name = "CharFontNameAsian";
-            aPropertyValue.Value <<= rFont.moNameAsian.get();
+            aPropertyValue.Value <<= rFont.moNameAsian.value_or("");
             aPropVec.push_back(aPropertyValue);
 
             aPropertyValue.Name = "CharFontNameComplex";
-            aPropertyValue.Value <<= rFont.moNameComplex.get();
+            aPropertyValue.Value <<= rFont.moNameComplex.value_or("");
             aPropVec.push_back(aPropertyValue);
         }
-        if (rFont.mobBold.has())
+        if (rFont.mobBold.has_value())
         {
             aPropertyValue.Name = "CharWeight";
-            aPropertyValue.Value <<= rFont.mobBold.get() ? awt::FontWeight::BOLD : awt::FontWeight::NORMAL;
+            aPropertyValue.Value <<= rFont.mobBold.value() ? awt::FontWeight::BOLD : awt::FontWeight::NORMAL;
             aPropVec.push_back(aPropertyValue);
         }
-        if (rFont.monSize.has())
+        if (rFont.monSize.has_value())
         {
             aPropertyValue.Name = "CharHeight";
-            aPropertyValue.Value <<= double(rFont.monSize.get()) / 2.;
+            aPropertyValue.Value <<= double(rFont.monSize.value()) / 2.;
             aPropVec.push_back(aPropertyValue);
         }
-        if (rFont.monSpacing.has())
+        if (rFont.monSpacing.has_value())
         {
             aPropertyValue.Name = "CharKerning";
             // Value is not converted to mm100: SvxKerningItem::PutValue() gets
             // called with nMemberId = 0, so no mm100 -> twips conversion will
             // be done there.
-            aPropertyValue.Value <<= sal_Int16(rFont.monSpacing.get());
+            aPropertyValue.Value <<= sal_Int16(rFont.monSpacing.value());
             aPropVec.push_back(aPropertyValue);
         }
-        if (rParagraph.moParaAdjust.has())
+        if (rParagraph.moParaAdjust.has_value())
         {
             style::ParagraphAdjust eAdjust = style::ParagraphAdjust_LEFT;
-            if (rParagraph.moParaAdjust.get() == "center")
+            if (rParagraph.moParaAdjust.value() == "center")
                 eAdjust = style::ParagraphAdjust_CENTER;
-            else if (rParagraph.moParaAdjust.get() == "right")
+            else if (rParagraph.moParaAdjust.value() == "right")
                 eAdjust = style::ParagraphAdjust_RIGHT;
 
             aPropertyValue.Name = "ParaAdjust";
@@ -138,24 +139,24 @@ void TextBox::convert(const uno::Reference<drawing::XShape>& xShape) const
         // because it will only  be applied to the entire shape, and not per-paragraph.
         if (sParaStyle.isEmpty() )
         {
-            if ( rParagraph.moParaStyleName.has() )
-                sParaStyle = rParagraph.moParaStyleName.get();
+            if ( rParagraph.moParaStyleName.has_value() )
+                sParaStyle = rParagraph.moParaStyleName.value();
             if ( bAmbiguousStyle )
                 bAmbiguousStyle = false; // both empty parastyle and ambiguous can only be true at the first paragraph
             else
-                bAmbiguousStyle = rParagraph.moParaStyleName.has(); // ambiguous if both default and specified style used.
+                bAmbiguousStyle = rParagraph.moParaStyleName.has_value(); // ambiguous if both default and specified style used.
         }
         else if ( !bAmbiguousStyle )
         {
-            if ( !rParagraph.moParaStyleName.has() )
+            if ( !rParagraph.moParaStyleName.has_value() )
                 bAmbiguousStyle = true; // ambiguous if both specified and default style used.
-            else if ( rParagraph.moParaStyleName.get() != sParaStyle )
+            else if ( rParagraph.moParaStyleName.value() != sParaStyle )
                 bAmbiguousStyle = true; // ambiguous if two different styles specified.
         }
-        if (rFont.moColor.has())
+        if (rFont.moColor.has_value())
         {
             aPropertyValue.Name = "CharColor";
-            aPropertyValue.Value <<= rFont.moColor.get().toUInt32(16);
+            aPropertyValue.Value <<= rFont.moColor.value().toUInt32(16);
             aPropVec.push_back(aPropertyValue);
         }
         xTextAppend->appendTextPortion(portion.maText, comphelper::containerToSequence(aPropVec));
@@ -168,7 +169,7 @@ void TextBox::convert(const uno::Reference<drawing::XShape>& xShape) const
         uno::Reference<beans::XPropertySet> xPropertySet(xShape, uno::UNO_QUERY_THROW);
         aGrabBag.update( xPropertySet->getPropertyValue("CharInteropGrabBag") );
         aGrabBag["mso-pStyle"] <<= sParaStyle;
-        xPropertySet->setPropertyValue("CharInteropGrabBag", uno::makeAny(aGrabBag.getAsConstPropertyValueList()));
+        xPropertySet->setPropertyValue("CharInteropGrabBag", uno::Any(aGrabBag.getAsConstPropertyValueList()));
     }
     catch (const uno::Exception&)
     {
@@ -194,9 +195,9 @@ void TextBox::convert(const uno::Reference<drawing::XShape>& xShape) const
     // As a result, we need to set horizontal adjustment here to 'right',
     // that will result in vertical 'top' after writing mode is applied,
     // which matches the VML behavior.
-    xProperties->setPropertyValue("TextHorizontalAdjust", uno::makeAny(drawing::TextHorizontalAdjust_RIGHT));
+    xProperties->setPropertyValue("TextHorizontalAdjust", uno::Any(drawing::TextHorizontalAdjust_RIGHT));
 
-    xProperties->setPropertyValue( "TextWritingMode", uno::makeAny( text::WritingMode_TB_RL ) );
+    xProperties->setPropertyValue( "TextWritingMode", uno::Any( text::WritingMode_TB_RL ) );
 }
 
 } // namespace oox::vml

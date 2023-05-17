@@ -75,6 +75,8 @@ void RegressionCurveCalculator::setRegressionProperties(
     sal_Int32   aPeriod,
     sal_Int32   nMovingType )
 {
+    if( aPeriod < 0 )
+        throw lang::IllegalArgumentException("aPeriod may not be < 0", static_cast<cppu::OWeakObject*>(this), 3);
     mDegree = aDegree;
     mForceIntercept = aForceIntercept;
     mInterceptValue = aInterceptValue;
@@ -98,9 +100,7 @@ OUString RegressionCurveCalculator::getFormattedString(
         {   // round fNumber to *pStringLength characters
             const sal_Int32 nMinDigit = 6; // minimum significant digits for General format
             sal_Int32 nSignificantDigit = ( *pStringLength <= nMinDigit ? nMinDigit : *pStringLength );
-            aResult = OStringToOUString(
-                        ::rtl::math::doubleToString( fNumber, rtl_math_StringFormat_G1, nSignificantDigit, '.', true ),
-                                        RTL_TEXTENCODING_ASCII_US );
+            aResult = ::rtl::math::doubleToUString( fNumber, rtl_math_StringFormat_G1, nSignificantDigit, '.', true );
             // count characters different from significant digits (decimal separator, scientific notation)
             sal_Int32 nExtraChar = aResult.getLength() - *pStringLength;
             if ( nExtraChar > 0 && *pStringLength > nMinDigit )
@@ -108,9 +108,7 @@ OUString RegressionCurveCalculator::getFormattedString(
                 nSignificantDigit = *pStringLength - nExtraChar;
                 if ( nSignificantDigit < nMinDigit )
                     nSignificantDigit = nMinDigit;
-                aResult = OStringToOUString(
-                    ::rtl::math::doubleToString( fNumber, rtl_math_StringFormat_G1, nSignificantDigit, '.', true ),
-                                            RTL_TEXTENCODING_ASCII_US );
+                aResult = ::rtl::math::doubleToUString( fNumber, rtl_math_StringFormat_G1, nSignificantDigit, '.', true );
             }
             fNumber = ::rtl::math::stringToDouble( aResult, '.', ',' );
         }
@@ -121,9 +119,7 @@ OUString RegressionCurveCalculator::getFormattedString(
         sal_Int32 nStringLength = 4;  // default length
         if ( pStringLength )
             nStringLength = *pStringLength;
-        aResult = OStringToOUString(
-                      ::rtl::math::doubleToString( fNumber, rtl_math_StringFormat_G1, nStringLength, '.', true ),
-                      RTL_TEXTENCODING_ASCII_US );
+        aResult = ::rtl::math::doubleToUString( fNumber, rtl_math_StringFormat_G1, nStringLength, '.', true );
     }
     return aResult;
 }

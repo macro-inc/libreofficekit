@@ -31,8 +31,8 @@
 #include <editeng/udlnitem.hxx>
 #include <editeng/wghtitem.hxx>
 #include <o3tl/unit_conversion.hxx>
+#include <osl/diagnose.h>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <svtools/scriptedtext.hxx>
 #include <svx/framelink.hxx>
 #include <vcl/settings.hxx>
@@ -50,6 +50,8 @@
 #include <scresid.hxx>
 #include <document.hxx>
 #include <viewdata.hxx>
+#include <svtools/colorcfg.hxx>
+#include <scmod.hxx>
 
 #define FRAME_OFFSET 4
 
@@ -246,7 +248,7 @@ void ScAutoFmtPreview::DrawString(vcl::RenderContext& rRenderContext, size_t nCo
 
     Size aStrSize;
     sal_uInt16 nFmtIndex = GetFormatIndex( nCol, nRow );
-    const basegfx::B2DRange cellRange(maArray.GetCellRange( nCol, nRow, true ));
+    const basegfx::B2DRange cellRange(maArray.GetCellRange( nCol, nRow ));
     Point aPos(basegfx::fround(cellRange.getMinX()), basegfx::fround(cellRange.getMinY()));
     sal_uInt16 nRightX = 0;
     bool bJustify = pCurData->GetIncludeJustify();
@@ -370,7 +372,7 @@ void ScAutoFmtPreview::DrawBackground(vcl::RenderContext& rRenderContext)
             rRenderContext.SetLineColor();
             rRenderContext.SetFillColor( pItem->GetColor() );
 
-            const basegfx::B2DRange aCellRange(maArray.GetCellRange( nCol, nRow, true ));
+            const basegfx::B2DRange aCellRange(maArray.GetCellRange( nCol, nRow ));
             rRenderContext.DrawRect(
                 tools::Rectangle(
                     basegfx::fround(aCellRange.getMinX()), basegfx::fround(aCellRange.getMinY()),
@@ -497,7 +499,7 @@ void ScAutoFmtPreview::DoPaint(vcl::RenderContext& rRenderContext)
 
     Size aWndSize(GetOutputSizePixel());
     vcl::Font aFont(aVD->GetFont());
-    Color aBackCol(rRenderContext.GetSettings().GetStyleSettings().GetWindowColor());
+    const Color& aBackCol = SC_MOD()->GetColorConfig().GetColorValue( ::svtools::DOCCOLOR ).nColor;
     tools::Rectangle aRect(Point(), aWndSize);
 
     aFont.SetTransparent( true );

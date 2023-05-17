@@ -41,7 +41,7 @@ class SW_DLLPUBLIC ConditionEdit
 {
     std::unique_ptr<weld::Entry> m_xControl;
     ConditionEditDropTarget m_aDropTargetHelper;
-    bool bBrackets, bEnableDrop;
+    bool m_bBrackets, m_bEnableDrop;
 
 public:
     ConditionEdit(std::unique_ptr<weld::Entry> xControl);
@@ -61,10 +61,13 @@ public:
     void hide() { m_xControl->hide(); }
     weld::Entry& get_widget() { return *m_xControl; }
 
-    void ShowBrackets(bool bShow) { bBrackets = bShow; }
-    bool GetBrackets() const { return bBrackets; }
-    void SetDropEnable(bool bFlag) { bEnableDrop = bFlag; }
-    bool GetDropEnable() const { return bEnableDrop; }
+    OString get_buildable_name() const { return m_xControl->get_buildable_name(); }
+    void set_buildable_name(const OString& rId) { m_xControl->set_buildable_name(rId); }
+
+    void ShowBrackets(bool bShow) { m_bBrackets = bShow; }
+    bool GetBrackets() const { return m_bBrackets; }
+    void SetDropEnable(bool bFlag) { m_bEnableDrop = bFlag; }
+    bool GetDropEnable() const { return m_bEnableDrop; }
 };
 
 #endif

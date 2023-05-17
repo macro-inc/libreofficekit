@@ -24,11 +24,12 @@
 
 #include <com/sun/star/task/InteractionHandler.hpp>
 #include <com/sun/star/task/XInteractionAbort.hpp>
+#include <utility>
 
 namespace sfx2 {
 
-PreventDuplicateInteraction::PreventDuplicateInteraction(const css::uno::Reference< css::uno::XComponentContext >& rxContext)
-    : m_xContext(rxContext)
+PreventDuplicateInteraction::PreventDuplicateInteraction(css::uno::Reference< css::uno::XComponentContext > xContext)
+    : m_xContext(std::move(xContext))
 {
 }
 
@@ -39,7 +40,7 @@ PreventDuplicateInteraction::~PreventDuplicateInteraction()
 void PreventDuplicateInteraction::setHandler(const css::uno::Reference< css::task::XInteractionHandler >& xHandler)
 {
     // SAFE ->
-    osl::MutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
     m_xWarningDialogsParent.reset();
     m_xHandler = xHandler;
     // <- SAFE
@@ -54,7 +55,7 @@ void PreventDuplicateInteraction::useDefaultUUIHandler()
         m_xContext, m_xWarningDialogsParent->GetDialogParent()), css::uno::UNO_QUERY_THROW);
 
     // SAFE ->
-    osl::MutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
     m_xHandler = xHandler;
     // <- SAFE
 }
@@ -63,7 +64,7 @@ css::uno::Any SAL_CALL PreventDuplicateInteraction::queryInterface( const css::u
 {
     if ( aType.equals( cppu::UnoType<XInteractionHandler2>::get() ) )
     {
-        osl::MutexGuard aLock(m_aLock);
+        std::unique_lock aLock(m_aLock);
         css::uno::Reference< css::task::XInteractionHandler2 > xHandler( m_xHandler, css::uno::UNO_QUERY );
         if ( !xHandler.is() )
             return css::uno::Any();
@@ -77,7 +78,7 @@ void SAL_CALL PreventDuplicateInteraction::handle(const css::uno::Reference< css
     bool          bHandleIt = true;
 
     // SAFE ->
-    osl::ClearableMutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     auto pIt = std::find_if(m_lInteractionRules.begin(), m_lInteractionRules.end(),
         [&aRequest](const InteractionInfo& rInfo) { return aRequest.isExtractableTo(rInfo.m_aInteraction); });
@@ -92,7 +93,7 @@ void SAL_CALL PreventDuplicateInteraction::handle(const css::uno::Reference< css
 
     css::uno::Reference< css::task::XInteractionHandler > xHandler = m_xHandler;
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE
 
     if ( bHandleIt && xHandler.is() )
@@ -120,7 +121,7 @@ sal_Bool SAL_CALL PreventDuplicateInteraction::handleInteractionRequest( const c
     bool      bHandleIt = true;
 
     // SAFE ->
-    osl::ClearableMutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     auto pIt = std::find_if(m_lInteractionRules.begin(), m_lInteractionRules.end(),
         [&aRequest](const InteractionInfo& rInfo) { return aRequest.isExtractableTo(rInfo.m_aInteraction); });
@@ -137,7 +138,7 @@ sal_Bool SAL_CALL PreventDuplicateInteraction::handleInteractionRequest( const c
     OSL_ENSURE( xHandler.is() || !m_xHandler.is(),
         "PreventDuplicateInteraction::handleInteractionRequest: inconsistency!" );
 
-    aLock.clear();
+    aLock.unlock();
     // <- SAFE
 
     if ( bHandleIt && xHandler.is() )
@@ -163,7 +164,7 @@ sal_Bool SAL_CALL PreventDuplicateInteraction::handleInteractionRequest( const c
 void PreventDuplicateInteraction::addInteractionRule(const PreventDuplicateInteraction::InteractionInfo& aInteractionInfo)
 {
     // SAFE ->
-    osl::MutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     auto pIt = std::find_if(m_lInteractionRules.begin(), m_lInteractionRules.end(),
         [&aInteractionInfo](const InteractionInfo& rInfo) { return rInfo.m_aInteraction == aInteractionInfo.m_aInteraction; });
@@ -183,7 +184,7 @@ bool PreventDuplicateInteraction::getInteractionInfo(const css::uno::Type&      
                                                            PreventDuplicateInteraction::InteractionInfo* pReturn     ) const
 {
     // SAFE ->
-    osl::MutexGuard aLock(m_aLock);
+    std::unique_lock aLock(m_aLock);
 
     auto pIt = std::find_if(m_lInteractionRules.begin(), m_lInteractionRules.end(),
         [&aInteraction](const InteractionInfo& rInfo) { return rInfo.m_aInteraction == aInteraction; });

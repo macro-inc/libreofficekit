@@ -44,9 +44,11 @@ SwUnoCursor::~SwUnoCursor()
     while( GetNext() != this )
     {
         Ring* pNxt = GetNextInRing();
+        // coverity[deref_arg] - the delete moves a new entry into GetNext()
         pNxt->MoveTo(nullptr); // remove from chain
         delete pNxt;       // and delete
     }
+    // coverity[deref_arg] - GetNext() is not a use after free at this point
 }
 
 bool SwUnoCursor::IsReadOnlyAvailable() const
@@ -71,12 +73,12 @@ bool SwUnoCursor::IsSelOvr( SwCursorSelOverFlags eFlags )
     {
         SwDoc& rDoc = GetDoc();
         SwNodeIndex aOldIdx( *rDoc.GetNodes()[ GetSavePos()->nNode ] );
-        SwNodeIndex& rPtIdx = GetPoint()->nNode;
+        SwPosition& rPtPos = *GetPoint();
         SwStartNode *pOldSttNd = aOldIdx.GetNode().StartOfSectionNode(),
-                    *pNewSttNd = rPtIdx.GetNode().StartOfSectionNode();
+                    *pNewSttNd = rPtPos.GetNode().StartOfSectionNode();
         if( pOldSttNd != pNewSttNd )
         {
-            bool bMoveDown = GetSavePos()->nNode < rPtIdx.GetIndex();
+            bool bMoveDown = GetSavePos()->nNode < rPtPos.GetNodeIndex();
             bool bValidPos = false;
 
             // search the correct surrounded start node - which the index
@@ -85,15 +87,15 @@ bool SwUnoCursor::IsSelOvr( SwCursorSelOverFlags eFlags )
                 pOldSttNd = pOldSttNd->StartOfSectionNode();
 
             // is the new index inside this surrounded section?
-            if( rPtIdx > *pOldSttNd &&
-                rPtIdx < pOldSttNd->EndOfSectionIndex() )
+            if( rPtPos.GetNode() > *pOldSttNd &&
+                rPtPos.GetNode() < *pOldSttNd->EndOfSectionNode() )
             {
                 // check if it a valid move inside this section
                 // (only over SwSection's !)
                 const SwStartNode* pInvalidNode;
                 do {
                     pInvalidNode = nullptr;
-                    pNewSttNd = rPtIdx.GetNode().StartOfSectionNode();
+                    pNewSttNd = rPtPos.GetNode().StartOfSectionNode();
 
                     const SwStartNode *pSttNd = pNewSttNd, *pEndNd = pOldSttNd;
                     if( pSttNd->EndOfSectionIndex() >
@@ -113,20 +115,20 @@ bool SwUnoCursor::IsSelOvr( SwCursorSelOverFlags eFlags )
                     {
                         if( bMoveDown )
                         {
-                            rPtIdx.Assign( *pInvalidNode->EndOfSectionNode(), 1 );
+                            rPtPos.Assign( *pInvalidNode->EndOfSectionNode(), 1 );
 
-                            if( !rPtIdx.GetNode().IsContentNode() &&
-                                ( !rDoc.GetNodes().GoNextSection( &rPtIdx ) ||
-                                  rPtIdx > pOldSttNd->EndOfSectionIndex() ) )
+                            if( !rPtPos.GetNode().IsContentNode() &&
+                                ( !rDoc.GetNodes().GoNextSection( &rPtPos ) ||
+                                  rPtPos.GetNode() > *pOldSttNd->EndOfSectionNode() ) )
                                 break;
                         }
                         else
                         {
-                            rPtIdx.Assign( *pInvalidNode, -1 );
+                            rPtPos.Assign( *pInvalidNode, -1 );
 
-                            if( !rPtIdx.GetNode().IsContentNode() &&
-                                ( !SwNodes::GoPrevSection( &rPtIdx ) ||
-                                  rPtIdx < *pOldSttNd ) )
+                            if( !rPtPos.GetNode().IsContentNode() &&
+                                ( !SwNodes::GoPrevSection( &rPtPos ) ||
+                                  rPtPos.GetNode() < *pOldSttNd ) )
                                 break;
                         }
                     }
@@ -137,13 +139,13 @@ bool SwUnoCursor::IsSelOvr( SwCursorSelOverFlags eFlags )
 
             if( bValidPos )
             {
-                SwContentNode* pCNd = GetContentNode();
-                GetPoint()->nContent.Assign( pCNd, (pCNd && !bMoveDown) ? pCNd->Len() : 0);
+                SwContentNode* pCNd = GetPointContentNode();
+                GetPoint()->SetContent( (pCNd && !bMoveDown) ? pCNd->Len() : 0);
             }
             else
             {
-                rPtIdx = GetSavePos()->nNode;
-                GetPoint()->nContent.Assign( GetContentNode(), GetSavePos()->nContent );
+                rPtPos.Assign( GetSavePos()->nNode );
+                GetPoint()->SetContent( GetSavePos()->nContent );
                 return true;
             }
         }
@@ -171,10 +173,10 @@ bool SwUnoTableCursor::IsSelOvr( SwCursorSelOverFlags eFlags )
     bool bRet = SwUnoCursor::IsSelOvr( eFlags );
     if( !bRet )
     {
-        const SwTableNode* pTNd = GetPoint()->nNode.GetNode().FindTableNode();
+        const SwTableNode* pTNd = GetPoint()->GetNode().FindTableNode();
         bRet = !(pTNd == GetDoc().GetNodes()[ GetSavePos()->nNode ]->
                 FindTableNode() && (!HasMark() ||
-                pTNd == GetMark()->nNode.GetNode().FindTableNode() ));
+                pTNd == GetMark()->GetNode().FindTableNode() ));
     }
     return bRet;
 }
@@ -183,9 +185,9 @@ void SwUnoTableCursor::MakeBoxSels()
 {
     const SwContentNode* pCNd;
     bool bMakeTableCursors = true;
-    if( GetPoint()->nNode.GetIndex() && GetMark()->nNode.GetIndex() &&
-            nullptr != ( pCNd = GetContentNode() ) && pCNd->getLayoutFrame( pCNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() ) &&
-            nullptr != ( pCNd = GetContentNode(false) ) && pCNd->getLayoutFrame( pCNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() ) )
+    if( GetPoint()->GetNodeIndex() && GetMark()->GetNodeIndex() &&
+            nullptr != ( pCNd = GetPointContentNode() ) && pCNd->getLayoutFrame( pCNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() ) &&
+            nullptr != ( pCNd = GetMarkContentNode() ) && pCNd->getLayoutFrame( pCNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout() ) )
         bMakeTableCursors = GetDoc().getIDocumentLayoutAccess().GetCurrentLayout()->MakeTableCursors( *this );
 
     if ( !bMakeTableCursors )
@@ -203,7 +205,7 @@ void SwUnoTableCursor::MakeBoxSels()
         if (!GetSelectedBoxesCount())
         {
             const SwTableBox* pBox;
-            const SwNode* pBoxNd = GetPoint()->nNode.GetNode().FindTableBoxStartNode();
+            const SwNode* pBoxNd = GetPoint()->GetNode().FindTableBoxStartNode();
             const SwTableNode* pTableNd = pBoxNd ? pBoxNd->FindTableNode() : nullptr;
             if( pTableNd && nullptr != ( pBox = pTableNd->GetTable().GetTableBox( pBoxNd->GetIndex() )) )
                 InsertBox( *pBox );

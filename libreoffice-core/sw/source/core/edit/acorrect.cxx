@@ -35,7 +35,6 @@
 #include <com/sun/star/linguistic2/XHyphenatedWord.hpp>
 #include <osl/diagnose.h>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 
 #include <editeng/acorrcfg.hxx>
 #include <IDocumentRedlineAccess.hxx>
@@ -133,7 +132,7 @@ void SwAutoCorrDoc::DeleteSelImpl(SwPaM & rDelPam)
         // Shell-Cursr-Ring !!
         // ??? is that really necessary - this should never join nodes, so Update should be enough?
 //        PaMIntoCursorShellRing aTmp( rEditSh, rCursor, rDelPam );
-        assert(rDelPam.GetPoint()->nNode == rDelPam.GetMark()->nNode);
+        assert(rDelPam.GetPoint()->GetNode() == rDelPam.GetMark()->GetNode());
         pDoc->getIDocumentContentOperations().DeleteAndJoin( rDelPam );
     }
     else
@@ -144,7 +143,7 @@ void SwAutoCorrDoc::DeleteSelImpl(SwPaM & rDelPam)
 
 bool SwAutoCorrDoc::Delete( sal_Int32 nStt, sal_Int32 nEnd )
 {
-    SwTextNode const*const pTextNd = m_rCursor.GetNode().GetTextNode();
+    SwTextNode const*const pTextNd = m_rCursor.GetPointNode().GetTextNode();
     SwTextFrame const*const pFrame(static_cast<SwTextFrame const*>(
                 pTextNd->getLayoutFrame(m_rEditSh.GetLayout())));
     assert(pFrame);
@@ -159,7 +158,7 @@ bool SwAutoCorrDoc::Delete( sal_Int32 nStt, sal_Int32 nEnd )
 
 bool SwAutoCorrDoc::Insert( sal_Int32 nPos, const OUString& rText )
 {
-    SwTextNode const*const pTextNd = m_rCursor.GetNode().GetTextNode();
+    SwTextNode const*const pTextNd = m_rCursor.GetPointNode().GetTextNode();
     SwTextFrame const*const pFrame(static_cast<SwTextFrame const*>(
                 pTextNd->getLayoutFrame(m_rEditSh.GetLayout())));
     assert(pFrame);
@@ -194,7 +193,7 @@ bool SwAutoCorrDoc::ReplaceRange( sal_Int32 nPos, sal_Int32 nSourceLength, const
     //        for (ranges.begin() + 1; ranges.end(); )
     //            DeleteImpl(*it)
 
-    SwTextNode * const pNd = m_rCursor.GetNode().GetTextNode();
+    SwTextNode * const pNd = m_rCursor.GetPointNode().GetTextNode();
     if ( !pNd )
     {
         return false;
@@ -206,8 +205,8 @@ bool SwAutoCorrDoc::ReplaceRange( sal_Int32 nPos, sal_Int32 nSourceLength, const
     std::pair<SwTextNode *, sal_Int32> const pos(pFrame->MapViewToModel(TextFrameIndex(nPos)));
 
     SwPaM* pPam = &m_rCursor;
-    if (pPam->GetPoint()->nNode != *pos.first
-        || pPam->GetPoint()->nContent != pos.second)
+    if (pPam->GetPoint()->GetNode() != *pos.first
+        || pPam->GetPoint()->GetContentIndex() != pos.second)
     {
         pPam = new SwPaM(*pos.first, pos.second);
     }
@@ -251,8 +250,8 @@ bool SwAutoCorrDoc::ReplaceRange( sal_Int32 nPos, sal_Int32 nSourceLength, const
                 PaMIntoCursorShellRing aTmp( m_rEditSh, m_rCursor, *pPam );
 
                 pPam->SetMark();
-                pPam->GetPoint()->nContent = std::min<sal_Int32>(
-                    pos.first->GetText().getLength(), pos.second + nSourceLength);
+                pPam->GetPoint()->SetContent( std::min<sal_Int32>(
+                    pos.first->GetText().getLength(), pos.second + nSourceLength) );
                 pDoc->getIDocumentContentOperations().ReplaceRange( *pPam, rText, false );
                 pPam->Exchange();
                 pPam->DeleteMark();
@@ -261,8 +260,8 @@ bool SwAutoCorrDoc::ReplaceRange( sal_Int32 nPos, sal_Int32 nSourceLength, const
         else
         {
             pPam->SetMark();
-            pPam->GetPoint()->nContent = std::min<sal_Int32>(
-                pos.first->GetText().getLength(), pos.second + nSourceLength);
+            pPam->GetPoint()->SetContent( std::min<sal_Int32>(
+                pos.first->GetText().getLength(), pos.second + nSourceLength) );
             pDoc->getIDocumentContentOperations().ReplaceRange( *pPam, rText, false );
             pPam->Exchange();
             pPam->DeleteMark();
@@ -288,7 +287,7 @@ bool SwAutoCorrDoc::ReplaceRange( sal_Int32 nPos, sal_Int32 nSourceLength, const
 void SwAutoCorrDoc::SetAttr( sal_Int32 nStt, sal_Int32 nEnd, sal_uInt16 nSlotId,
                                         SfxPoolItem& rItem )
 {
-    SwTextNode const*const pTextNd = m_rCursor.GetNode().GetTextNode();
+    SwTextNode const*const pTextNd = m_rCursor.GetPointNode().GetTextNode();
     SwTextFrame const*const pFrame(static_cast<SwTextFrame const*>(
                 pTextNd->getLayoutFrame(m_rEditSh.GetLayout())));
     assert(pFrame);
@@ -313,7 +312,7 @@ void SwAutoCorrDoc::SetAttr( sal_Int32 nStt, sal_Int32 nEnd, sal_uInt16 nSlotId,
 
 bool SwAutoCorrDoc::SetINetAttr( sal_Int32 nStt, sal_Int32 nEnd, const OUString& rURL )
 {
-    SwTextNode const*const pTextNd = m_rCursor.GetNode().GetTextNode();
+    SwTextNode const*const pTextNd = m_rCursor.GetPointNode().GetTextNode();
     SwTextFrame const*const pFrame(static_cast<SwTextFrame const*>(
                 pTextNd->getLayoutFrame(m_rEditSh.GetLayout())));
     assert(pFrame);
@@ -339,15 +338,15 @@ OUString const* SwAutoCorrDoc::GetPrevPara(bool const bAtNormalPos)
 {
     OUString const* pStr(nullptr);
 
-    if( bAtNormalPos || !m_pIndex )
+    if( bAtNormalPos || !m_oIndex )
     {
-        m_pIndex.reset(new SwNodeIndex(m_rCursor.GetPoint()->nNode));
+        m_oIndex.emplace(m_rCursor.GetPoint()->GetNode());
     }
-    sw::GotoPrevLayoutTextFrame(*m_pIndex, m_rEditSh.GetLayout());
+    sw::GotoPrevLayoutTextFrame(*m_oIndex, m_rEditSh.GetLayout());
 
     SwTextFrame const* pFrame(nullptr);
-    for (SwTextNode * pTextNd = m_pIndex->GetNode().GetTextNode();
-             pTextNd; pTextNd = m_pIndex->GetNode().GetTextNode())
+    for (SwTextNode * pTextNd = m_oIndex->GetNode().GetTextNode();
+             pTextNd; pTextNd = m_oIndex->GetNode().GetTextNode())
     {
         pFrame = static_cast<SwTextFrame const*>(
                 pTextNd->getLayoutFrame(m_rEditSh.GetLayout()));
@@ -355,7 +354,7 @@ OUString const* SwAutoCorrDoc::GetPrevPara(bool const bAtNormalPos)
         {
             break;
         }
-        sw::GotoPrevLayoutTextFrame(*m_pIndex, m_rEditSh.GetLayout());
+        sw::GotoPrevLayoutTextFrame(*m_oIndex, m_rEditSh.GetLayout());
     }
     if (pFrame && !pFrame->GetText().isEmpty() &&
         0 == pFrame->GetTextNodeForParaProps()->GetAttrOutlineLevel())
@@ -378,7 +377,7 @@ bool SwAutoCorrDoc::ChgAutoCorrWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
 
     // Found a beginning of a paragraph or a Blank,
     // search for the word Kuerzel (Shortcut) in the Auto
-    SwTextNode* pTextNd = m_rCursor.GetNode().GetTextNode();
+    SwTextNode* pTextNd = m_rCursor.GetPointNode().GetTextNode();
     OSL_ENSURE( pTextNd, "where is the TextNode?" );
 
     bool bRet = false;
@@ -431,7 +430,7 @@ bool SwAutoCorrDoc::ChgAutoCorrWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
                 }
                 else if (!ranges.empty())
                 {
-                    assert(ranges.front()->GetPoint()->nNode == ranges.front()->GetMark()->nNode);
+                    assert(ranges.front()->GetPoint()->GetNode() == ranges.front()->GetMark()->GetNode());
                     pDoc->getIDocumentContentOperations().ReplaceRange(
                             *ranges.front(), pFnd->GetLong(), false);
                     for (auto it = ranges.begin() + 1; it != ranges.end(); ++it)
@@ -445,7 +444,7 @@ bool SwAutoCorrDoc::ChgAutoCorrWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
                 // pTextNd may become invalid when change tracking is on and Edit -> Track Changes -> Show == OFF.
                 // ReplaceRange shows changes, this moves deleted nodes from special section to document.
                 // Then Show mode is disabled again. As a result pTextNd may be invalidated.
-                pTextNd = m_rCursor.GetNode().GetTextNode();
+                pTextNd = m_rCursor.GetPointNode().GetTextNode();
             }
         }
         else
@@ -459,9 +458,9 @@ bool SwAutoCorrDoc::ChgAutoCorrWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
 
                 if( pPara )
                 {
-                    OSL_ENSURE( !m_pIndex, "who has not deleted his Index?" );
-                    m_pIndex.reset(new SwNodeIndex( m_rCursor.GetPoint()->nNode ));
-                    sw::GotoPrevLayoutTextFrame(*m_pIndex, m_rEditSh.GetLayout());
+                    OSL_ENSURE( !m_oIndex, "who has not deleted his Index?" );
+                    m_oIndex.emplace(m_rCursor.GetPoint()->GetNode());
+                    sw::GotoPrevLayoutTextFrame(*m_oIndex, m_rEditSh.GetLayout());
                 }
 
                 SwDoc* pAutoDoc = aTBlks.GetDoc();
@@ -472,16 +471,15 @@ bool SwAutoCorrDoc::ChgAutoCorrWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
                 const SwTableNode* pTableNd = pContentNd->FindTableNode();
                 if( pTableNd )
                 {
-                    aCpyPam.GetPoint()->nContent.Assign( nullptr, 0 );
-                    aCpyPam.GetPoint()->nNode = *pTableNd;
+                    aCpyPam.GetPoint()->Assign( *pTableNd );
                 }
                 aCpyPam.SetMark();
 
                 // then until the end of the Nodes Array
-                aCpyPam.GetPoint()->nNode.Assign( pAutoDoc->GetNodes().GetEndOfContent(), -1 );
-                pContentNd = aCpyPam.GetContentNode();
-                aCpyPam.GetPoint()->nContent.Assign(
-                       pContentNd, pContentNd ? pContentNd->Len() : 0);
+                aCpyPam.GetPoint()->Assign( pAutoDoc->GetNodes().GetEndOfContent(), SwNodeOffset(-1) );
+                pContentNd = aCpyPam.GetPointContentNode();
+                if (pContentNd)
+                    aCpyPam.GetPoint()->SetContent( pContentNd->Len() );
 
                 SwDontExpandItem aExpItem;
                 aExpItem.SaveDontExpandItems( *aPam.GetPoint() );
@@ -492,8 +490,8 @@ bool SwAutoCorrDoc::ChgAutoCorrWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
 
                 if( pPara )
                 {
-                    sw::GotoNextLayoutTextFrame(*m_pIndex, m_rEditSh.GetLayout());
-                    pTextNd = m_pIndex->GetNode().GetTextNode();
+                    sw::GotoNextLayoutTextFrame(*m_oIndex, m_rEditSh.GetLayout());
+                    pTextNd = m_oIndex->GetNode().GetTextNode();
                 }
                 bRet = true;
             }
@@ -516,7 +514,7 @@ bool SwAutoCorrDoc::TransliterateRTLWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
     if( m_bUndoIdInitialized )
         m_bUndoIdInitialized = true;
 
-    SwTextNode* pTextNd = m_rCursor.GetNode().GetTextNode();
+    SwTextNode* pTextNd = m_rCursor.GetPointNode().GetTextNode();
     OSL_ENSURE( pTextNd, "where is the TextNode?" );
 
     bool bRet = false;
@@ -565,10 +563,21 @@ bool SwAutoCorrDoc::TransliterateRTLWord( sal_Int32& rSttPos, sal_Int32 nEndPos,
         if (pFormatter && !sWord.isEmpty())
         {
             const Color* pColor = nullptr;
-            // Send text as NatNum12 prefix
-            OUString sPrefix("[NatNum12 " + sDisambiguatedWord.makeStringAndClear() + "]0");
+
+            // Send text as NatNum12 prefix: "word" -> "[NatNum12 word]0"
+
+            // Closing bracket doesn't allowed in NatNum parameters, remove it from transliteration:
+            // "[word]" -> "[NatNum12 [word]0"
+            bool bHasBracket = sWord.endsWith("]");
+            if ( !bHasBracket )
+                sDisambiguatedWord.append("]");
+            OUString sPrefix("[NatNum12 " + sDisambiguatedWord + "0");
             if (pFormatter->GetPreviewString(sPrefix, 0, sConverted, &pColor, LANGUAGE_USER_HUNGARIAN_ROVAS))
+            {
+                if ( bHasBracket )
+                    sConverted = sConverted + "]";
                 bRet = true;
+            }
         }
 
         SwPaM aPam(pFrame->MapViewToModelPos(TextFrameIndex(rSttPos)),
@@ -589,7 +598,7 @@ void SwAutoCorrDoc::SaveCpltSttWord( ACFlags nFlag, sal_Int32 nPos,
                                             const OUString& rExceptWord,
                                             sal_Unicode cChar )
 {
-    SwNodeOffset nNode = m_pIndex ? m_pIndex->GetIndex() : m_rCursor.GetPoint()->nNode.GetIndex();
+    SwNodeOffset nNode = m_oIndex ? m_oIndex->GetIndex() : m_rCursor.GetPoint()->GetNodeIndex();
     LanguageType eLang = GetLanguage(nPos);
     m_rEditSh.GetDoc()->SetAutoCorrExceptWord( std::make_unique<SwAutoCorrExceptWord>( nFlag,
                                         nNode, nPos, rExceptWord, cChar, eLang ));
@@ -599,7 +608,7 @@ LanguageType SwAutoCorrDoc::GetLanguage( sal_Int32 nPos ) const
 {
     LanguageType eRet = LANGUAGE_SYSTEM;
 
-    SwTextNode* pNd = m_rCursor.GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextNode* pNd = m_rCursor.GetPoint()->GetNode().GetTextNode();
 
     if( pNd )
     {
@@ -617,7 +626,7 @@ void SwAutoCorrExceptWord::CheckChar( const SwPosition& rPos, sal_Unicode cChr )
 {
     // test only if this is an improvement.
     // If yes, then add the word to the list.
-    if (m_cChar == cChr && rPos.nNode.GetIndex() == m_nNode && rPos.nContent.GetIndex() == m_nContent)
+    if (m_cChar == cChr && rPos.GetNodeIndex() == m_nNode && rPos.GetContentIndex() == m_nContent)
     {
         // get the current autocorrection:
         SvxAutoCorrect* pACorr = SvxAutoCorrCfg::Get().GetAutoCorrect();
@@ -633,7 +642,7 @@ void SwAutoCorrExceptWord::CheckChar( const SwPosition& rPos, sal_Unicode cChr )
 bool SwAutoCorrExceptWord::CheckDelChar( const SwPosition& rPos )
 {
     bool bRet = false;
-    if (!m_bDeleted && rPos.nNode.GetIndex() == m_nNode && rPos.nContent.GetIndex() == m_nContent)
+    if (!m_bDeleted && rPos.GetNodeIndex() == m_nNode && rPos.GetContentIndex() == m_nContent)
         m_bDeleted = bRet = true;
     return bRet;
 }
@@ -644,12 +653,12 @@ SwDontExpandItem::~SwDontExpandItem()
 
 void SwDontExpandItem::SaveDontExpandItems( const SwPosition& rPos )
 {
-    const SwTextNode* pTextNd = rPos.nNode.GetNode().GetTextNode();
+    const SwTextNode* pTextNd = rPos.GetNode().GetTextNode();
     if( pTextNd )
     {
         m_pDontExpandItems.reset( new SfxItemSet( const_cast<SwDoc&>(pTextNd->GetDoc()).GetAttrPool(),
                                             aCharFormatSetRange ) );
-        const sal_Int32 n = rPos.nContent.GetIndex();
+        const sal_Int32 n = rPos.GetContentIndex();
         if (!pTextNd->GetParaAttr( *m_pDontExpandItems, n, n,
                                 n != pTextNd->GetText().getLength() ))
         {
@@ -660,11 +669,11 @@ void SwDontExpandItem::SaveDontExpandItems( const SwPosition& rPos )
 
 void SwDontExpandItem::RestoreDontExpandItems( const SwPosition& rPos )
 {
-    SwTextNode* pTextNd = rPos.nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNd = rPos.GetNode().GetTextNode();
     if( !pTextNd )
         return;
 
-    const sal_Int32 nStart = rPos.nContent.GetIndex();
+    const sal_Int32 nStart = rPos.GetContentIndex();
     if( nStart == pTextNd->GetText().getLength() )
         pTextNd->FormatToTextAttr( pTextNd );
 

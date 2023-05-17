@@ -19,7 +19,16 @@
 
 $(eval $(call gb_Library_Library,xo))
 
-$(eval $(call gb_Library_set_componentfile,xo,xmloff/util/xo))
+$(eval $(call gb_Library_set_componentfile,xo,xmloff/util/xo,services))
+
+$(eval $(call gb_Library_add_componentimpls,xo, \
+    $(if $(ENABLE_WASM_STRIP_CHART),,chart) \
+    draw \
+    $(if $(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS),, \
+        impress \
+        writer \
+    ) \
+))
 
 $(eval $(call gb_Library_set_precompiled_header,xo,xmloff/inc/pch/precompiled_xo))
 
@@ -46,16 +55,19 @@ $(eval $(call gb_Library_use_libraries,xo,\
     comphelper \
     cppu \
     cppuhelper \
+    docmodel \
     i18nlangtag \
     sal \
     salhelper \
-	sax \
+    sax \
     svl \
     tl \
     utl \
     vcl \
 ))
 
+# WASM_CHART change
+ifneq ($(ENABLE_WASM_STRIP_CHART),TRUE)
 $(eval $(call gb_Library_add_exception_objects,xo,\
     xmloff/source/chart/ColorPropertySet \
     xmloff/source/chart/PropertyMaps \
@@ -88,6 +100,10 @@ $(eval $(call gb_Library_add_exception_objects,xo,\
     xmloff/source/chart/XMLTextOrientationHdl \
     xmloff/source/chart/contexts \
     xmloff/source/chart/transporttypes \
+))
+endif
+
+$(eval $(call gb_Library_add_exception_objects,xo,\
     xmloff/source/core/DocumentSettingsContext \
     xmloff/source/core/DomBuilderContext \
     xmloff/source/core/DomExport \
@@ -235,6 +251,7 @@ $(eval $(call gb_Library_add_exception_objects,xo,\
     xmloff/source/style/XMLPageExport \
     xmloff/source/style/XMLPercentOrMeasurePropertyHandler \
     xmloff/source/style/XMLRectangleMembersHandler \
+    xmloff/source/style/XMLThemeContext \
     xmloff/source/style/adjushdl \
     xmloff/source/style/backhdl \
     xmloff/source/style/bordrhdl \
@@ -324,6 +341,8 @@ $(eval $(call gb_Library_add_exception_objects,xo,\
     xmloff/source/text/XMLTextCharStyleNamesElementExport \
     xmloff/source/text/XMLTextColumnsContext \
     xmloff/source/text/XMLTextColumnsExport \
+    xmloff/source/text/XMLThemeColorContext \
+    xmloff/source/text/XMLThemeColorExport \
     xmloff/source/text/XMLTextFrameContext \
     xmloff/source/text/XMLTextFrameHyperlinkContext \
     xmloff/source/text/XMLTextHeaderFooterContext \

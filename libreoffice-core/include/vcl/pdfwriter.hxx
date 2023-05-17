@@ -105,8 +105,8 @@ public:
 
     enum class Orientation { Portrait, Inherit };
 
-    // in case the below enum is added PDF_1_6 PDF_1_7, please add them just after PDF_1_5
-    enum class PDFVersion { PDF_1_2, PDF_1_3, PDF_1_4, PDF_1_5, PDF_1_6, PDF_A_1, PDF_A_2, PDF_A_3 };//i59651, PDF/A-1b & -1a, only -1b implemented for now
+    // in case the below enum is added PDF_2_0, please add just after PDF_1_7
+    enum class PDFVersion { PDF_1_2, PDF_1_3, PDF_1_4, PDF_1_5, PDF_1_6, PDF_1_7, PDF_A_1, PDF_A_2, PDF_A_3 };//i59651, PDF/A-1b & -1a, only -1b implemented for now
     // for the meaning of DestAreaType please look at PDF Reference Manual
     // version 1.4 section 8.2.1, page 475
     enum class DestAreaType { XYZ, FitRectangle };
@@ -127,7 +127,7 @@ public:
         Table, TableRow, TableHeader, TableData,
 
         // inline level elements
-        Span, Quote, Note, Reference, BibEntry, Code, Link,
+        Span, Quote, Note, Reference, BibEntry, Code, Link, Annot,
 
         // illustration elements
         Figure, Formula, Form
@@ -135,10 +135,13 @@ public:
 
     enum StructAttribute
     {
+        // Artifacts
+        Type, Subtype,
+
         Placement, WritingMode, SpaceBefore, SpaceAfter, StartIndent, EndIndent,
         TextIndent, TextAlign, Width, Height, BlockAlign, InlineAlign,
         LineHeight, BaselineShift, TextDecorationType, ListNumbering,
-        RowSpan, ColSpan,
+        RowSpan, ColSpan, Scope, Role,
 
         // link destination is an artificial attribute that sets
         // the link annotation ID of a Link element
@@ -158,6 +161,9 @@ public:
     {
         Invalid,
         NONE,
+        // Artifacts
+        Pagination, Layout, Page, Background,
+        Header, Footer, Watermark,
         // Placement
         Block, Inline, Before, After, Start, End,
         // WritingMode
@@ -172,6 +178,10 @@ public:
         Normal,
         // TextDecorationType
         Underline, Overline, LineThrough,
+        // Scope
+        Row, Column, Both,
+        // Role
+        Rb, Cb, Pb, Tv,
         // ListNumbering
         Disc, Circle, Square, Decimal, UpperRoman, LowerRoman, UpperAlpha, LowerAlpha
     };
@@ -397,7 +407,9 @@ public:
                   Password( false ),
                   FileSelect( false ),
                   MaxLen( 0 ),
-                  Format( FormatType::Text )
+                  Format( FormatType::Text ),
+                  DecimalAccuracy ( 0 ),
+                  PrependCurrencySymbol( false )
         {}
 
         virtual std::shared_ptr<AnyWidget> Clone() const override
@@ -761,7 +773,8 @@ The following structure describes the permissions used in PDF security
                                       FontLineStyle eUnderline,
                                       FontLineStyle eOverline );
     void                DrawTextArray( const Point& rStartPt, const OUString& rStr,
-                                       o3tl::span<const sal_Int32> pDXAry,
+                                       KernArraySpan aKernArray,
+                                       o3tl::span<const sal_Bool> pKashidaAry,
                                        sal_Int32 nIndex,
                                        sal_Int32 nLen );
     void                DrawStretchText( const Point& rStartPt, sal_uLong nWidth,
@@ -914,10 +927,10 @@ The following structure describes the permissions used in PDF security
     the link id (to be used in SetLinkDest, SetLinkURL) or
     -1 if page id does not exist
     */
-    sal_Int32           CreateLink( const tools::Rectangle& rRect, sal_Int32 nPageNr );
+    sal_Int32 CreateLink(const tools::Rectangle& rRect, sal_Int32 nPageNr, OUString const& rAltText);
 
     /// Creates a screen annotation.
-    sal_Int32 CreateScreen(const tools::Rectangle& rRect, sal_Int32 nPageNr);
+    sal_Int32 CreateScreen(const tools::Rectangle& rRect, sal_Int32 nPageNr, OUString const& rAltText);
 
     /** creates a destination which is not intended to be referred to by a link, but by a public destination Id.
 
@@ -1014,7 +1027,7 @@ The following structure describes the permissions used in PDF security
         @returns
         the outline item id of the new item
     */
-    sal_Int32 CreateOutlineItem( sal_Int32 nParent, const OUString& rText, sal_Int32 nDestID );
+    sal_Int32 CreateOutlineItem( sal_Int32 nParent, std::u16string_view rText, sal_Int32 nDestID );
 
     /** Create a new note on a page
 
@@ -1073,7 +1086,7 @@ The following structure describes the permissions used in PDF security
     @returns
     the new structure element's id for use in SetCurrentStructureElement
      */
-     sal_Int32 BeginStructureElement( enum StructElement eType, const OUString& rAlias );
+     sal_Int32 BeginStructureElement( enum StructElement eType, std::u16string_view rAlias );
     /** end the current logical structure element
 
     Close the current structure element. The current element's
@@ -1135,6 +1148,11 @@ The following structure describes the permissions used in PDF security
     the new bounding box for the structural element
      */
     void SetStructureBoundingBox( const tools::Rectangle& rRect );
+
+    /** set the annotations that should be referenced as children of the
+        current structural element.
+     */
+    void SetStructureAnnotIds(::std::vector<sal_Int32> const& rAnnotIds);
 
     /** set the ActualText attribute of a structural element
 
@@ -1213,8 +1231,6 @@ The following structure describes the permissions used in PDF security
     /// Get current date/time in PDF D:YYYYMMDDHHMMSS form.
     static OString GetDateTime();
 };
-
-VCL_DLLPUBLIC void escapeStringXML( const OUString& rStr, OUString &rValue);
 
 }
 

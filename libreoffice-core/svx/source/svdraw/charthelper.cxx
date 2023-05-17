@@ -18,18 +18,17 @@
  */
 
 #include <svx/charthelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
 #include <com/sun/star/lang/XUnoTunnel.hpp>
 #include <com/sun/star/util/XUpdatable2.hpp>
 #include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <comphelper/processfactory.hxx>
-#include <com/sun/star/graphic/PrimitiveFactory2D.hpp>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
+#include <sdr/primitive2d/primitivefactory2d.hxx>
 
 using namespace ::com::sun::star;
 
@@ -61,7 +60,10 @@ drawinglayer::primitive2d::Primitive2DContainer ChartHelper::tryToGetChartConten
     if (!rXModel.is())
         return aRetval;
 
+    // don't broadcast until we're finished building, more efficient
+    rXModel->lockControllers();
     updateChart(rXModel);
+    rXModel->unlockControllers();
 
     try
     {
@@ -71,10 +73,6 @@ drawinglayer::primitive2d::Primitive2DContainer ChartHelper::tryToGetChartConten
         if(xShapeAccess->getCount())
         {
             const sal_Int32 nShapeCount(xShapeAccess->getCount());
-            const uno::Reference< uno::XComponentContext > xContext(::comphelper::getProcessComponentContext());
-            const uno::Reference< graphic::XPrimitiveFactory2D > xPrimitiveFactory =
-                graphic::PrimitiveFactory2D::create( xContext );
-
             const uno::Sequence< beans::PropertyValue > aParams;
             uno::Reference< drawing::XShape > xShape;
 
@@ -84,12 +82,10 @@ drawinglayer::primitive2d::Primitive2DContainer ChartHelper::tryToGetChartConten
 
                 if(xShape.is())
                 {
-                    const drawinglayer::primitive2d::Primitive2DSequence aNew(
-                            xPrimitiveFactory->createPrimitivesFromXShape(
-                                xShape,
-                                aParams));
-
-                    aRetval.append(aNew);
+                    PrimitiveFactory2D::createPrimitivesFromXShape(
+                        xShape,
+                        aParams,
+                        aRetval);
                 }
             }
         }
@@ -125,9 +121,9 @@ void ChartHelper::AdaptDefaultsForChart(
         if (uno::Reference< beans::XPropertySet > xPageProp = xChartDoc->getPageBackground())
         {
             // set background to transparent (none)
-            xPageProp->setPropertyValue("FillStyle", uno::makeAny(drawing::FillStyle_NONE));
+            xPageProp->setPropertyValue("FillStyle", uno::Any(drawing::FillStyle_NONE));
             // set no border
-            xPageProp->setPropertyValue("LineStyle", uno::makeAny(drawing::LineStyle_NONE));
+            xPageProp->setPropertyValue("LineStyle", uno::Any(drawing::LineStyle_NONE));
         }
     }
     catch( const uno::Exception & )

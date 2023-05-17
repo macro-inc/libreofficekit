@@ -31,6 +31,7 @@
 #include <sfx2/sfxsids.hrc>
 #include <svtools/langtab.hxx>
 #include <svx/langbox.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/settings.hxx>
@@ -52,9 +53,9 @@ bool localesAreEqual( const Locale& rLocaleLeft, const Locale& rLocaleRight )
     return bRet;
 }
 
-ManageLanguageDialog::ManageLanguageDialog(weld::Window* pParent, std::shared_ptr<LocalizationMgr> const & xLMgr)
+ManageLanguageDialog::ManageLanguageDialog(weld::Window* pParent, std::shared_ptr<LocalizationMgr> xLMgr)
     : GenericDialogController(pParent, "modules/BasicIDE/ui/managelanguages.ui", "ManageLanguagesDialog")
-    , m_xLocalizationMgr(xLMgr)
+    , m_xLocalizationMgr(std::move(xLMgr))
     , m_sDefLangStr(IDEResId(RID_STR_DEF_LANG))
     , m_sCreateLangStr(IDEResId(RID_STR_CREATE_LANG))
     , m_xLanguageLB(m_xBuilder->weld_tree_view("treeview"))
@@ -113,7 +114,7 @@ void ManageLanguageDialog::FillLanguageBox()
                 sLanguage += " " + m_sDefLangStr;
             }
             LanguageEntry* pEntry = new LanguageEntry(pLocale[i], bIsDefault);
-            m_xLanguageLB->append(OUString::number(reinterpret_cast<sal_Int64>(pEntry)), sLanguage);
+            m_xLanguageLB->append(weld::toId(pEntry), sLanguage);
         }
     }
     else
@@ -125,7 +126,7 @@ void ManageLanguageDialog::ClearLanguageBox()
     const sal_Int32 nCount = m_xLanguageLB->n_children();
     for (sal_Int32 i = 0; i < nCount; ++i)
     {
-        LanguageEntry* pEntry = reinterpret_cast<LanguageEntry*>(m_xLanguageLB->get_id(i).toInt64());
+        LanguageEntry* pEntry = weld::fromId<LanguageEntry*>(m_xLanguageLB->get_id(i));
         delete pEntry;
     }
     m_xLanguageLB->clear();
@@ -166,7 +167,7 @@ IMPL_LINK_NOARG(ManageLanguageDialog, DeleteHdl, weld::Button&, void)
     for (int i = 0; i < nCount; ++i)
     {
         const sal_Int32 nSelPos = aSelection[i];
-        LanguageEntry* pEntry = reinterpret_cast<LanguageEntry*>(m_xLanguageLB->get_id(nSelPos).toInt64());
+        LanguageEntry* pEntry = weld::fromId<LanguageEntry*>(m_xLanguageLB->get_id(nSelPos));
         if ( pEntry )
             aLocaleSeqRange[i] = pEntry->m_aLocale;
     }
@@ -185,7 +186,7 @@ IMPL_LINK_NOARG(ManageLanguageDialog, DeleteHdl, weld::Button&, void)
 IMPL_LINK_NOARG(ManageLanguageDialog, MakeDefHdl, weld::Button&, void)
 {
     const sal_Int32 nPos = m_xLanguageLB->get_selected_index();
-    LanguageEntry* pSelectEntry = reinterpret_cast<LanguageEntry*>(m_xLanguageLB->get_id(nPos).toInt64());
+    LanguageEntry* pSelectEntry = weld::fromId<LanguageEntry*>(m_xLanguageLB->get_id(nPos));
     if (pSelectEntry && !pSelectEntry->m_bIsDefault)
     {
         // set new default entry
@@ -213,9 +214,9 @@ IMPL_LINK_NOARG(ManageLanguageDialog, SelectHdl, weld::TreeView&, void)
 
 // class SetDefaultLanguageDialog -----------------------------------------------
 
-SetDefaultLanguageDialog::SetDefaultLanguageDialog(weld::Window* pParent, std::shared_ptr<LocalizationMgr> const & xLMgr)
+SetDefaultLanguageDialog::SetDefaultLanguageDialog(weld::Window* pParent, std::shared_ptr<LocalizationMgr> xLMgr)
     : GenericDialogController(pParent, "modules/BasicIDE/ui/defaultlanguage.ui", "DefaultLanguageDialog")
-    , m_xLocalizationMgr(xLMgr)
+    , m_xLocalizationMgr(std::move(xLMgr))
     , m_xLanguageFT(m_xBuilder->weld_label("defaultlabel"))
     , m_xLanguageLB(m_xBuilder->weld_tree_view("entries"))
     , m_xCheckLangFT(m_xBuilder->weld_label("checkedlabel"))

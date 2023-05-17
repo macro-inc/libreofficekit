@@ -9,7 +9,7 @@
 
 $(eval $(call gb_Library_Library,scfilt))
 
-$(eval $(call gb_Library_set_componentfile,scfilt,sc/util/scfilt))
+$(eval $(call gb_Library_set_componentfile,scfilt,sc/util/scfilt,services))
 
 $(eval $(call gb_Library_set_include,scfilt,\
 	-I$(SRCDIR)/sc/source/core/inc \
@@ -44,6 +44,7 @@ $(eval $(call gb_Library_use_libraries,scfilt,\
 	cppu \
 	cppuhelper \
 	drawinglayer \
+	docmodel \
 	editeng \
 	for \
 	msfilter \

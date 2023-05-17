@@ -19,7 +19,6 @@
 
 
 #include <cppuhelper/supportsservice.hxx>
-#include <comphelper/interfacecontainer2.hxx>
 
 #include <com/sun/star/util/CloseVetoException.hpp>
 #include <com/sun/star/util/XCloseBroadcaster.hpp>
@@ -31,6 +30,7 @@
 #include <com/sun/star/frame/DoubleInitializationException.hpp>
 #include <com/sun/star/embed/Actions.hpp>
 #include <com/sun/star/embed/XActionsApproval.hpp>
+#include <utility>
 
 #include "instancelocker.hxx"
 
@@ -73,7 +73,6 @@ void SAL_CALL OInstanceLocker::dispose()
 
     lang::EventObject aSource( static_cast< ::cppu::OWeakObject* >(this) );
     m_aListenersContainer.disposeAndClear( aGuard, aSource );
-    aGuard.lock();
     if ( m_xLockListener.is() )
     {
         auto tmp = std::move(m_xLockListener);
@@ -88,18 +87,18 @@ void SAL_CALL OInstanceLocker::dispose()
 
 void SAL_CALL OInstanceLocker::addEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    std::scoped_lock aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     if ( m_bDisposed )
         throw lang::DisposedException(); // TODO
 
-    m_aListenersContainer.addInterface( xListener );
+    m_aListenersContainer.addInterface( aGuard, xListener );
 }
 
 
 void SAL_CALL OInstanceLocker::removeEventListener( const uno::Reference< lang::XEventListener >& xListener )
 {
-    std::scoped_lock aGuard( m_aMutex );
-    m_aListenersContainer.removeInterface( xListener );
+    std::unique_lock aGuard( m_aMutex );
+    m_aListenersContainer.removeInterface( aGuard, xListener );
 }
 
 // XInitialization
@@ -190,13 +189,13 @@ uno::Sequence< OUString > SAL_CALL OInstanceLocker::getSupportedServiceNames()
 // OLockListener
 
 
-OLockListener::OLockListener( const uno::WeakReference< lang::XComponent >& xWrapper,
-                    const uno::Reference< uno::XInterface >& xInstance,
+OLockListener::OLockListener( uno::WeakReference< lang::XComponent > xWrapper,
+                    uno::Reference< uno::XInterface > xInstance,
                     sal_Int32 nMode,
-                    const uno::Reference< embed::XActionsApproval >& rApproval )
-: m_xInstance( xInstance )
-, m_xApproval( rApproval )
-, m_xWrapper( xWrapper )
+                    uno::Reference< embed::XActionsApproval > xApproval )
+: m_xInstance(std::move( xInstance ))
+, m_xApproval(std::move( xApproval ))
+, m_xWrapper(std::move( xWrapper ))
 , m_bDisposed( false )
 , m_bInitialized( false )
 , m_nMode( nMode )

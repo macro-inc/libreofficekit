@@ -18,7 +18,9 @@ $(eval $(call gb_Executable_use_api,htmlfuzzer,\
 ))
 
 $(eval $(call gb_Executable_use_externals,htmlfuzzer,\
-	$(fuzzer_externals) \
+    $(fuzzer_externals) \
+    epubgen \
+    revenge \
 ))
 
 $(eval $(call gb_Executable_set_include,htmlfuzzer,\
@@ -33,10 +35,8 @@ $(eval $(call gb_Executable_use_libraries,htmlfuzzer,\
 ))
 
 $(eval $(call gb_Executable_use_static_libraries,htmlfuzzer,\
-    findsofficepath \
-    ulingu \
+    $(fuzzer_statics) \
     fuzzer_writer \
-    fuzzerstubs \
 ))
 
 $(eval $(call gb_Executable_add_exception_objects,htmlfuzzer,\

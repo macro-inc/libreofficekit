@@ -54,6 +54,7 @@
 #include <vcl/skia/SkiaHelper.hxx>
 
 #include <salinst.hxx>
+#include <graphic/Manager.hxx>
 #include <salframe.hxx>
 #include <salsys.hxx>
 #include <svdata.hxx>
@@ -69,6 +70,7 @@
 #include <com/sun/star/uno/Reference.h>
 #include <com/sun/star/awt/XToolkit.hpp>
 #include <comphelper/lok.hxx>
+#include <comphelper/threadpool.hxx>
 #include <comphelper/solarmutex.hxx>
 #include <osl/process.h>
 
@@ -127,7 +129,7 @@ struct ImplPostEventData
     MouseEvent      maMouseEvent;
     VclEventId      mnEvent;
     KeyEvent        maKeyEvent;
-    GestureEvent    maGestureEvent;
+    GestureEventPan maGestureEvent;
 
     ImplPostEventData(VclEventId nEvent, vcl::Window* pWin, const KeyEvent& rKeyEvent)
         : mpWin(pWin)
@@ -141,7 +143,7 @@ struct ImplPostEventData
         , maMouseEvent(rMouseEvent)
         , mnEvent(nEvent)
     {}
-    ImplPostEventData(VclEventId nEvent, vcl::Window* pWin, const GestureEvent& rGestureEvent)
+    ImplPostEventData(VclEventId nEvent, vcl::Window* pWin, const GestureEventPan& rGestureEvent)
         : mpWin(pWin)
         , mnEventId(nullptr)
         , mnEvent(nEvent)
@@ -319,6 +321,7 @@ void Application::notifyWindow(vcl::LOKWindowId /*nLOKWindowId*/,
                                const OUString& /*rAction*/,
                                const std::vector<vcl::LOKPayloadItem>& /*rPayload = std::vector<LOKPayloadItem>()*/) const
 {
+    SAL_WARN("vcl", "Invoked not implemented method: Application::notifyWindow");
 }
 
 void Application::libreOfficeKitViewCallback(int nType, const char* pPayload) const
@@ -332,6 +335,9 @@ void Application::libreOfficeKitViewCallback(int nType, const char* pPayload) co
     }
 }
 
+void Application::notifyInvalidation(tools::Rectangle const* /*pRect*/) const
+{
+}
 
 namespace
 {
@@ -441,8 +447,17 @@ void Application::Execute()
         pSVData->maAppData.mpEventTestingIdle->Start();
     }
 
-    while ( !pSVData->maAppData.mbAppQuit )
-        Application::Yield();
+    int nExitCode = 0;
+    if (!pSVData->mpDefInst->DoExecute(nExitCode))
+    {
+        if (Application::IsOnSystemEventLoop())
+        {
+            SAL_WARN("vcl.schedule", "Can't omit DoExecute when running on system event loop!");
+            std::abort();
+        }
+        while (!pSVData->maAppData.mbAppQuit)
+            Application::Yield();
+    }
 
     pSVData->maAppData.mbInAppExecute = false;
 
@@ -476,13 +491,24 @@ static bool ImplYield(bool i_bWait, bool i_bAllEvents)
 
 bool Application::Reschedule( bool i_bAllEvents )
 {
+    static const bool bAbort = Application::IsOnSystemEventLoop();
+    if (bAbort)
+    {
+        SAL_WARN("vcl.schedule", "Application::Reschedule(" << i_bAllEvents << ")");
+        std::abort();
+    }
     return ImplYield(false, i_bAllEvents);
+}
+
+bool Application::IsOnSystemEventLoop()
+{
+    return ImplGetSVData()->maAppData.m_bUseSystemLoop;
 }
 
 void Scheduler::ProcessEventsToIdle()
 {
     int nSanity = 1;
-    while( Application::Reschedule( true ) )
+    while (ImplYield(false, true))
     {
         if (0 == ++nSanity % 1000)
         {
@@ -530,12 +556,19 @@ SAL_DLLPUBLIC_EXPORT void unit_lok_process_events_to_idle()
 
 void Application::Yield()
 {
+    static const bool bAbort = Application::IsOnSystemEventLoop();
+    if (bAbort)
+    {
+        SAL_WARN("vcl.schedule", "Application::Yield()");
+        std::abort();
+    }
     ImplYield(true, false);
 }
 
 IMPL_STATIC_LINK_NOARG( ImplSVAppData, ImplQuitMsg, void*, void )
 {
     assert(ImplGetSVData()->maAppData.mbAppQuit);
+    ImplGetSVData()->mpDefInst->DoQuit();
 }
 
 void Application::Quit()
@@ -863,7 +896,8 @@ ImplSVEvent * Application::PostKeyEvent( VclEventId nEvent, vcl::Window *pWin, K
     return nEventId;
 }
 
-ImplSVEvent* Application::PostGestureEvent(VclEventId nEvent, vcl::Window* pWin, GestureEvent const * pGestureEvent)
+ImplSVEvent* Application::PostGestureEvent(VclEventId nEvent, vcl::Window* pWin,
+                                           GestureEventPan const * pGestureEvent)
 {
     const SolarMutexGuard aGuard;
     ImplSVEvent * nEventId = nullptr;
@@ -875,7 +909,7 @@ ImplSVEvent* Application::PostGestureEvent(VclEventId nEvent, vcl::Window* pWin,
         aTransformedPosition.AdjustX(pWin->GetOutOffXPixel());
         aTransformedPosition.AdjustY(pWin->GetOutOffYPixel());
 
-        const GestureEvent aGestureEvent(
+        const GestureEventPan aGestureEvent(
             sal_Int32(aTransformedPosition.X()),
             sal_Int32(aTransformedPosition.Y()),
             pGestureEvent->meEventType,
@@ -919,7 +953,7 @@ bool Application::LOKHandleMouseEvent(VclEventId nEvent, vcl::Window* pWindow, c
     {
         case VclEventId::WindowMouseMove:
             aMouseEvent.mnButton = 0;
-            bSuccess = ImplLOKHandleMouseEvent(pWindow, MouseNotifyEvent::MOUSEMOVE, false,
+            bSuccess = ImplLOKHandleMouseEvent(pWindow, NotifyEventType::MOUSEMOVE, false,
                                                aMouseEvent.mnX, aMouseEvent.mnY,
                                                aMouseEvent.mnTime, aMouseEvent.mnCode,
                                                ImplGetMouseMoveMode(&aMouseEvent),
@@ -928,7 +962,7 @@ bool Application::LOKHandleMouseEvent(VclEventId nEvent, vcl::Window* pWindow, c
 
         case VclEventId::WindowMouseButtonDown:
             aMouseEvent.mnButton = pEvent->GetButtons();
-            bSuccess = ImplLOKHandleMouseEvent(pWindow, MouseNotifyEvent::MOUSEBUTTONDOWN, false,
+            bSuccess = ImplLOKHandleMouseEvent(pWindow, NotifyEventType::MOUSEBUTTONDOWN, false,
                                                aMouseEvent.mnX, aMouseEvent.mnY,
                                                aMouseEvent.mnTime,
 #ifdef MACOSX
@@ -944,7 +978,7 @@ bool Application::LOKHandleMouseEvent(VclEventId nEvent, vcl::Window* pWindow, c
 
         case VclEventId::WindowMouseButtonUp:
             aMouseEvent.mnButton = pEvent->GetButtons();
-            bSuccess = ImplLOKHandleMouseEvent(pWindow, MouseNotifyEvent::MOUSEBUTTONUP, false,
+            bSuccess = ImplLOKHandleMouseEvent(pWindow, NotifyEventType::MOUSEBUTTONUP, false,
                                                aMouseEvent.mnX, aMouseEvent.mnY,
                                                aMouseEvent.mnTime,
 #ifdef MACOSX
@@ -1137,7 +1171,20 @@ vcl::Window* Application::GetFocusWindow()
 
 OutputDevice* Application::GetDefaultDevice()
 {
-    return ImplGetDefaultWindow()->GetOutDev();
+    vcl::Window* pWindow = ImplGetDefaultWindow();
+    if (pWindow != nullptr)
+    {
+        return pWindow->GetOutDev();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+basegfx::SystemDependentDataManager& Application::GetSystemDependentDataManager()
+{
+    return ImplGetSystemDependentDataManager();
 }
 
 vcl::Window* Application::GetFirstTopLevelWindow()
@@ -1221,9 +1268,19 @@ static OUString Localize(TranslateId aId, const bool bLocalize)
         return Translate::get(aId, Translate::Create("vcl", LanguageTag("en-US")));
 }
 
-OUString Application::GetHWOSConfInfo(const int bSelection, const bool bLocalize)
+OUString Application::GetOSVersion()
 {
     ImplSVData* pSVData = ImplGetSVData();
+    OUString aVersion;
+    if (pSVData && pSVData->mpDefInst)
+        aVersion = pSVData->mpDefInst->getOSVersion();
+    else
+        aVersion = "-";
+    return aVersion;
+}
+
+OUString Application::GetHWOSConfInfo(const int bSelection, const bool bLocalize)
+{
     OUStringBuffer aDetails;
 
     const auto appendDetails = [&aDetails](std::u16string_view sep, auto&& val) {
@@ -1236,11 +1293,7 @@ OUString Application::GetHWOSConfInfo(const int bSelection, const bool bLocalize
         appendDetails(u"; ", Localize(SV_APP_CPUTHREADS, bLocalize)
                                 + OUString::number(std::thread::hardware_concurrency()));
 
-        OUString aVersion;
-        if ( pSVData && pSVData->mpDefInst )
-            aVersion = pSVData->mpDefInst->getOSVersion();
-        else
-            aVersion = "-";
+        OUString aVersion = GetOSVersion();
 
         appendDetails(u"; ", Localize(SV_APP_OSVERSION, bLocalize) + aVersion);
     }
@@ -1267,7 +1320,7 @@ OUString Application::GetHWOSConfInfo(const int bSelection, const bool bLocalize
 #endif
             appendDetails(u"", Localize(SV_APP_DEFAULT, bLocalize));
 
-#if (defined LINUX || defined _WIN32 || defined MACOSX || defined __FreeBSD__)
+#if (defined LINUX || defined _WIN32 || defined MACOSX || defined __FreeBSD__ || defined EMSCRIPTEN)
         appendDetails(u"; ", SV_APP_VCLBACKEND + GetToolkitName());
 #endif
     }
@@ -1343,7 +1396,7 @@ tools::Rectangle Application::GetScreenPosSizePixel( unsigned int nScreen )
         return tools::Rectangle();
     }
     tools::Rectangle aRect = pSys->GetDisplayScreenPosSizePixel(nScreen);
-    if (aRect.getHeight() == 0)
+    if (aRect.GetHeight() == 0)
         SAL_WARN("vcl", "Requesting screen size/pos for screen #" << nScreen << " returned 0 height.");
     return aRect;
 }
@@ -1819,6 +1872,25 @@ void dumpState(rtl::OStringBuffer &rState)
 
         pWin = Application::GetNextTopLevelWindow( pWin );
     }
+
+    vcl::graphic::Manager::get().dumpState(rState);
+
+    pSVData->dumpState(rState);
+}
+
+void trimMemory(int nTarget)
+{
+    if (nTarget >= 1000)
+    {
+        ImplSVData* pSVData = ImplGetSVData();
+        if (!pSVData) // shutting down
+            return;
+        pSVData->dropCaches();
+        vcl::graphic::Manager::get().dropCache();
+        // TODO: ideally - free up any deeper dirtied thread stacks.
+        // comphelper::ThreadPool::getSharedOptimalPool().shutdown();
+    }
+    // else for now caches re-fill themselves as/when used.
 }
 
 } // namespace lok, namespace vcl

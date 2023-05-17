@@ -31,7 +31,7 @@
 #include <o3tl/any.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/datetime.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ustring.hxx>
 #include <osl/diagnose.h>
 #include <ucbhelper/contentidentifier.hxx>
@@ -64,7 +64,7 @@ bool UCB_DeleteFile( const OUString& rURL )
         ucbhelper::Content aTempContent( rURL,
                                 css::uno::Reference< css::ucb::XCommandEnvironment >(),
                                 comphelper::getProcessComponentContext() );
-        aTempContent.executeCommand("delete", css::uno::makeAny( true ) );
+        aTempContent.executeCommand("delete", css::uno::Any( true ) );
         bRemoved = true;
     }
     catch( css::uno::Exception& )
@@ -75,7 +75,7 @@ bool UCB_DeleteFile( const OUString& rURL )
     return bRemoved;
 }
 
-bool UCB_MoveFile( const OUString& rURL, const OUString& rNewURL )
+bool UCB_MoveFile( const OUString& rURL, std::u16string_view rNewURL )
 {
     bool bCopyCompleted = true;
     try
@@ -104,7 +104,7 @@ bool UCB_MoveFile( const OUString& rURL, const OUString& rNewURL )
     return bCopyCompleted;
 }
 
-bool UCB_IsCaseSensitiveFileName( const OUString& rURL )
+bool UCB_IsCaseSensitiveFileName( std::u16string_view rURL )
 {
     bool bCaseSensitive;
     try

@@ -33,6 +33,7 @@
 #include <formula/compiler.hxx>
 #include <svl/sharedstringpool.hxx>
 #include <memory>
+#include <utility>
 
 namespace formula
 {
@@ -93,17 +94,14 @@ sal_uInt8 FormulaToken::GetParamCount() const
         return 0;       // parameters and specials
                         // ocIf... jump commands not for FAP, have cByte then
 //2do: bool parameter whether FAP or not?
-    else if ( GetByte() )
+    else if (GetByte())
         return GetByte();   // all functions, also ocExternal and ocMacro
-    else if (SC_OPCODE_START_BIN_OP <= eOp && eOp < SC_OPCODE_STOP_BIN_OP)
-        return 2;           // binary
-    else if ((SC_OPCODE_START_UN_OP <= eOp && eOp < SC_OPCODE_STOP_UN_OP)
-            || eOp == ocPercentSign)
-        return 1;           // unary
+    else if (SC_OPCODE_START_BIN_OP <= eOp && eOp < SC_OPCODE_STOP_BIN_OP && eOp != ocAnd && eOp != ocOr)
+        return 2;           // binary operators, compiler checked; OR and AND legacy but are functions
+    else if ((SC_OPCODE_START_UN_OP <= eOp && eOp < SC_OPCODE_STOP_UN_OP) || eOp == ocPercentSign)
+        return 1;           // unary operators, compiler checked
     else if (SC_OPCODE_START_NO_PAR <= eOp && eOp < SC_OPCODE_STOP_NO_PAR)
         return 0;           // no parameter
-    else if (SC_OPCODE_START_1_PAR <= eOp && eOp < SC_OPCODE_STOP_1_PAR)
-        return 1;           // one parameter
     else if (FormulaCompiler::IsOpCodeJumpCommand( eOp ))
         return 1;           // only the condition counts as parameter
     else
@@ -175,7 +173,7 @@ void FormulaToken::SetByte( sal_uInt8 )
 ParamClass FormulaToken::GetInForceArray() const
 {
     // ok to be called for any derived class
-    return ParamClass::Unknown;
+    return (eOp == ocPush && eType == svMatrix) ? ParamClass::ForceArrayReturn : ParamClass::Unknown;
 }
 
 void FormulaToken::SetInForceArray( ParamClass )
@@ -510,6 +508,13 @@ FormulaToken* FormulaTokenArray::FirstRPNToken() const
     if (!pRPN || nRPN == 0)
         return nullptr;
     return pRPN[0];
+}
+
+FormulaToken* FormulaTokenArray::LastRPNToken() const
+{
+    if (!pRPN || nRPN == 0)
+        return nullptr;
+    return pRPN[nRPN - 1];
 }
 
 bool FormulaTokenArray::HasReferences() const
@@ -942,68 +947,68 @@ void FormulaTokenArray::AddRecalcMode( ScRecalcMode nBits )
 
 bool FormulaTokenArray::HasMatrixDoubleRefOps() const
 {
-    if ( pRPN && nRPN )
+    if ( !pRPN || !nRPN )
+        return false;
+
+    // RPN-Interpreter simulation.
+    // Simply assumes a double as return value of each function.
+    std::unique_ptr<FormulaToken*[]> pStack(new FormulaToken* [nRPN]);
+    FormulaToken* pResult = new FormulaDoubleToken( 0.0 );
+    short sp = 0;
+    for ( auto t: RPNTokens() )
     {
-        // RPN-Interpreter simulation.
-        // Simply assumes a double as return value of each function.
-        std::unique_ptr<FormulaToken*[]> pStack(new FormulaToken* [nRPN]);
-        FormulaToken* pResult = new FormulaDoubleToken( 0.0 );
-        short sp = 0;
-        for ( auto t: RPNTokens() )
+        OpCode eOp = t->GetOpCode();
+        sal_uInt8 nParams = t->GetParamCount();
+        switch ( eOp )
         {
-            OpCode eOp = t->GetOpCode();
-            sal_uInt8 nParams = t->GetParamCount();
-            switch ( eOp )
+            case ocAdd :
+            case ocSub :
+            case ocMul :
+            case ocDiv :
+            case ocPow :
+            case ocPower :
+            case ocAmpersand :
+            case ocEqual :
+            case ocNotEqual :
+            case ocLess :
+            case ocGreater :
+            case ocLessEqual :
+            case ocGreaterEqual :
             {
-                case ocAdd :
-                case ocSub :
-                case ocMul :
-                case ocDiv :
-                case ocPow :
-                case ocPower :
-                case ocAmpersand :
-                case ocEqual :
-                case ocNotEqual :
-                case ocLess :
-                case ocGreater :
-                case ocLessEqual :
-                case ocGreaterEqual :
+                for ( sal_uInt8 k = nParams; k; k-- )
                 {
-                    for ( sal_uInt8 k = nParams; k; k-- )
+                    if ( sp >= k && pStack[sp-k]->GetType() == svDoubleRef )
                     {
-                        if ( sp >= k && pStack[sp-k]->GetType() == svDoubleRef )
-                        {
-                            pResult->Delete();
-                            return true;
-                        }
+                        pResult->Delete();
+                        return true;
                     }
                 }
-                break;
-                default:
-                {
-                    // added to avoid warnings
-                }
             }
-            if ( eOp == ocPush || lcl_IsReference( eOp, t->GetType() )  )
-                pStack[sp++] = t;
-            else if (FormulaCompiler::IsOpCodeJumpCommand( eOp ))
-            {   // ignore Jumps, pop previous Result (Condition)
-                if ( sp )
-                    --sp;
-            }
-            else
-            {   // pop parameters, push result
-                sp = sal::static_int_cast<short>( sp - nParams );
-                if ( sp < 0 )
-                {
-                    SAL_WARN("formula.core", "FormulaTokenArray::HasMatrixDoubleRefOps: sp < 0" );
-                    sp = 0;
-                }
-                pStack[sp++] = pResult;
+            break;
+            default:
+            {
+                // added to avoid warnings
             }
         }
-        pResult->Delete();
+        if ( eOp == ocPush || lcl_IsReference( eOp, t->GetType() )  )
+            pStack[sp++] = t;
+        else if (FormulaCompiler::IsOpCodeJumpCommand( eOp ))
+        {   // ignore Jumps, pop previous Result (Condition)
+            if ( sp )
+                --sp;
+        }
+        else
+        {   // pop parameters, push result
+            sp = sal::static_int_cast<short>( sp - nParams );
+            if ( sp < 0 )
+            {
+                SAL_WARN("formula.core", "FormulaTokenArray::HasMatrixDoubleRefOps: sp < 0" );
+                sp = 0;
+            }
+            pStack[sp++] = pResult;
+        }
     }
+    pResult->Delete();
 
     return false;
 }
@@ -1534,23 +1539,23 @@ inline bool isWhitespace( OpCode eOp ) { return eOp == ocSpaces || eOp == ocWhit
 
 bool FormulaTokenArray::MayReferenceFollow()
 {
-    if ( pCode && nLen > 0 )
+    if ( !pCode || nLen <= 0 )
+        return false;
+
+    // ignore trailing spaces
+    sal_uInt16 i = nLen - 1;
+    while (i > 0 && isWhitespace( pCode[i]->GetOpCode()))
     {
-        // ignore trailing spaces
-        sal_uInt16 i = nLen - 1;
-        while (i > 0 && isWhitespace( pCode[i]->GetOpCode()))
+        --i;
+    }
+    if (i > 0 || !isWhitespace( pCode[i]->GetOpCode()))
+    {
+        OpCode eOp = pCode[i]->GetOpCode();
+        if ( (SC_OPCODE_START_BIN_OP <= eOp && eOp < SC_OPCODE_STOP_BIN_OP ) ||
+             (SC_OPCODE_START_UN_OP <= eOp && eOp < SC_OPCODE_STOP_UN_OP ) ||
+             eOp == SC_OPCODE_OPEN || eOp == SC_OPCODE_SEP )
         {
-            --i;
-        }
-        if (i > 0 || !isWhitespace( pCode[i]->GetOpCode()))
-        {
-            OpCode eOp = pCode[i]->GetOpCode();
-            if ( (SC_OPCODE_START_BIN_OP <= eOp && eOp < SC_OPCODE_STOP_BIN_OP ) ||
-                 (SC_OPCODE_START_UN_OP <= eOp && eOp < SC_OPCODE_STOP_UN_OP ) ||
-                 eOp == SC_OPCODE_OPEN || eOp == SC_OPCODE_SEP )
-            {
-                return true;
-            }
+            return true;
         }
     }
     return false;
@@ -1615,8 +1620,8 @@ FormulaTokenIterator::Item::Item(const FormulaTokenArray* pArray, short pc, shor
 }
 
 FormulaTokenIterator::FormulaTokenIterator( const FormulaTokenArray& rArr )
+    : maStack{ FormulaTokenIterator::Item(&rArr, -1, SHRT_MAX) }
 {
-    Push( &rArr );
 }
 
 FormulaTokenIterator::~FormulaTokenIterator()
@@ -1780,26 +1785,26 @@ FormulaToken* FormulaTokenArrayPlainIterator::GetNextReferenceRPN()
 
 FormulaToken* FormulaTokenArrayPlainIterator::GetNextReferenceOrName()
 {
-    if( mpFTA->GetArray() )
+    if( !mpFTA->GetArray() )
+        return nullptr;
+
+    while ( mnIndex < mpFTA->GetLen() )
     {
-        while ( mnIndex < mpFTA->GetLen() )
+        FormulaToken* t = mpFTA->GetArray()[ mnIndex++ ];
+        switch( t->GetType() )
         {
-            FormulaToken* t = mpFTA->GetArray()[ mnIndex++ ];
-            switch( t->GetType() )
+            case svSingleRef:
+            case svDoubleRef:
+            case svIndex:
+            case svExternalSingleRef:
+            case svExternalDoubleRef:
+            case svExternalName:
+                return t;
+            default:
             {
-                case svSingleRef:
-                case svDoubleRef:
-                case svIndex:
-                case svExternalSingleRef:
-                case svExternalDoubleRef:
-                case svExternalName:
-                    return t;
-                default:
-                {
-                    // added to avoid warnings
-                }
-             }
-        }
+                // added to avoid warnings
+            }
+         }
     }
     return nullptr;
 }
@@ -1926,8 +1931,8 @@ bool FormulaTypedDoubleToken::operator==( const FormulaToken& r ) const
     return FormulaDoubleToken::operator==( r ) && mnType == r.GetDoubleType();
 }
 
-FormulaStringToken::FormulaStringToken( const svl::SharedString& r ) :
-    FormulaToken( svString ), maString( r )
+FormulaStringToken::FormulaStringToken( svl::SharedString r ) :
+    FormulaToken( svString ), maString(std::move( r ))
 {
 }
 
@@ -1954,8 +1959,8 @@ bool FormulaStringToken::operator==( const FormulaToken& r ) const
     return FormulaToken::operator==( r ) && maString == r.GetString();
 }
 
-FormulaStringOpToken::FormulaStringOpToken( OpCode e, const svl::SharedString& r ) :
-    FormulaByteToken( e, 0, svString, ParamClass::Unknown ), maString( r ) {}
+FormulaStringOpToken::FormulaStringOpToken( OpCode e, svl::SharedString r ) :
+    FormulaByteToken( e, 0, svString, ParamClass::Unknown ), maString(std::move( r )) {}
 
 FormulaStringOpToken::FormulaStringOpToken( const FormulaStringOpToken& r ) :
     FormulaByteToken( r ), maString( r.maString ) {}

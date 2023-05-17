@@ -21,6 +21,7 @@
 
 #include <drawinglayer/drawinglayerdllapi.h>
 
+#include <drawinglayer/primitive2d/baseprimitive2d.hxx>
 #include <drawinglayer/primitive2d/CommonTypes.hxx>
 #include <drawinglayer/primitive2d/Primitive2DVisitor.hxx>
 
@@ -34,7 +35,7 @@ class ViewInformation2D;
 
 namespace drawinglayer::primitive2d
 {
-class SAL_WARN_UNUSED DRAWINGLAYER_DLLPUBLIC Primitive2DContainer final
+class SAL_WARN_UNUSED DRAWINGLAYERCORE_DLLPUBLIC Primitive2DContainer final
     : public std::deque<Primitive2DReference>,
       public Primitive2DDecompositionVisitor
 {
@@ -57,24 +58,21 @@ public:
         : deque(std::move(other))
     {
     }
-    Primitive2DContainer(const std::deque<Primitive2DReference>& other)
-        : deque(other)
-    {
-    }
     Primitive2DContainer(std::initializer_list<Primitive2DReference> init)
         : deque(init)
     {
     }
-    template <class Iter>
-    Primitive2DContainer(Iter first, Iter last)
-        : deque(first, last)
-    {
-    }
+    Primitive2DContainer(
+        const css::uno::Sequence<css::uno::Reference<css::graphic::XPrimitive2D>>&);
+    Primitive2DContainer(const std::deque<css::uno::Reference<css::graphic::XPrimitive2D>>&);
 
-    virtual void append(const Primitive2DReference&) override;
-    virtual void append(const Primitive2DContainer& rSource) override;
-    virtual void append(Primitive2DContainer&& rSource) override;
-    void append(const Primitive2DSequence& rSource);
+    virtual void visit(const Primitive2DReference& rSource) override { append(rSource); }
+    virtual void visit(const Primitive2DContainer& rSource) override { append(rSource); }
+    virtual void visit(Primitive2DContainer&& rSource) override { append(std::move(rSource)); }
+
+    void append(const Primitive2DReference&);
+    void append(const Primitive2DContainer& rSource);
+    void append(Primitive2DContainer&& rSource);
     Primitive2DContainer& operator=(const Primitive2DContainer& r)
     {
         deque::operator=(r);
@@ -88,7 +86,9 @@ public:
     bool operator==(const Primitive2DContainer& rB) const;
     bool operator!=(const Primitive2DContainer& rB) const { return !operator==(rB); }
     basegfx::B2DRange getB2DRange(const geometry::ViewInformation2D& aViewInformation) const;
-    Primitive2DContainer maybeInvert(bool bInvert = false) const;
+    Primitive2DContainer maybeInvert(bool bInvert = false);
+
+    css::uno::Sequence<css::uno::Reference<css::graphic::XPrimitive2D>> toSequence() const;
 };
 
 } // end of namespace drawinglayer::primitive2d

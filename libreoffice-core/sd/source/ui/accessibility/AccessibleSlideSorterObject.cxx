@@ -34,7 +34,6 @@
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <sal/log.hxx>
 
 #include <sdpage.hxx>
@@ -54,8 +53,7 @@ AccessibleSlideSorterObject::AccessibleSlideSorterObject(
     const Reference<XAccessible>& rxParent,
     ::sd::slidesorter::SlideSorter& rSlideSorter,
     sal_uInt16 nPageNumber)
-    : AccessibleSlideSorterObjectBase(::sd::MutexOwner::maMutex),
-      mxParent(rxParent),
+    : mxParent(rxParent),
       mnPageNumber(nPageNumber),
       mrSlideSorter(rSlideSorter),
       mnClientId(0)
@@ -86,10 +84,8 @@ void AccessibleSlideSorterObject::FireAccessibleEvent (
     }
 }
 
-void SAL_CALL AccessibleSlideSorterObject::disposing()
+void AccessibleSlideSorterObject::disposing(std::unique_lock<std::mutex>&)
 {
-    const SolarMutexGuard aSolarGuard;
-
     // Send a disposing to all listeners.
     if (mnClientId != 0)
     {
@@ -109,13 +105,13 @@ Reference<XAccessibleContext> SAL_CALL
 
 //===== XAccessibleContext ====================================================
 
-sal_Int32 SAL_CALL AccessibleSlideSorterObject::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleSlideSorterObject::getAccessibleChildCount()
 {
     ThrowIfDisposed();
     return 0;
 }
 
-Reference<XAccessible> SAL_CALL AccessibleSlideSorterObject::getAccessibleChild (sal_Int32 )
+Reference<XAccessible> SAL_CALL AccessibleSlideSorterObject::getAccessibleChild (sal_Int64 )
 {
     ThrowIfDisposed();
     throw lang::IndexOutOfBoundsException();
@@ -127,19 +123,19 @@ Reference<XAccessible> SAL_CALL AccessibleSlideSorterObject::getAccessibleParent
     return mxParent;
 }
 
-sal_Int32 SAL_CALL AccessibleSlideSorterObject::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleSlideSorterObject::getAccessibleIndexInParent()
 {
     ThrowIfDisposed();
     const SolarMutexGuard aSolarGuard;
-    sal_Int32 nIndexInParent(-1);
+    sal_Int64 nIndexInParent(-1);
 
     if (mxParent.is())
     {
         Reference<XAccessibleContext> xParentContext (mxParent->getAccessibleContext());
         if (xParentContext.is())
         {
-            sal_Int32 nChildCount (xParentContext->getAccessibleChildCount());
-            for (sal_Int32 i=0; i<nChildCount; ++i)
+            sal_Int64 nChildCount (xParentContext->getAccessibleChildCount());
+            for (sal_Int64 i=0; i<nChildCount; ++i)
                 if (xParentContext->getAccessibleChild(i).get()
                     == static_cast<XAccessible*>(this))
                 {
@@ -183,33 +179,33 @@ Reference<XAccessibleRelationSet> SAL_CALL
     return Reference<XAccessibleRelationSet>();
 }
 
-Reference<XAccessibleStateSet> SAL_CALL
+sal_Int64 SAL_CALL
     AccessibleSlideSorterObject::getAccessibleStateSet()
 {
     ThrowIfDisposed();
     const SolarMutexGuard aSolarGuard;
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet = new ::utl::AccessibleStateSetHelper();
+    sal_Int64 nStateSet = 0;
 
     if (mxParent.is())
     {
         // Unconditional states.
-        pStateSet->AddState(AccessibleStateType::SELECTABLE);
-        pStateSet->AddState(AccessibleStateType::FOCUSABLE);
-        pStateSet->AddState(AccessibleStateType::ENABLED);
-        pStateSet->AddState(AccessibleStateType::VISIBLE);
-        pStateSet->AddState(AccessibleStateType::SHOWING);
-        pStateSet->AddState(AccessibleStateType::ACTIVE);
-        pStateSet->AddState(AccessibleStateType::SENSITIVE);
+        nStateSet |= AccessibleStateType::SELECTABLE;
+        nStateSet |= AccessibleStateType::FOCUSABLE;
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::VISIBLE;
+        nStateSet |= AccessibleStateType::SHOWING;
+        nStateSet |= AccessibleStateType::ACTIVE;
+        nStateSet |= AccessibleStateType::SENSITIVE;
 
         // Conditional states.
         if (mrSlideSorter.GetController().GetPageSelector().IsPageSelected(mnPageNumber))
-            pStateSet->AddState(AccessibleStateType::SELECTED);
+            nStateSet |= AccessibleStateType::SELECTED;
         if (mrSlideSorter.GetController().GetFocusManager().GetFocusedPageIndex() == mnPageNumber)
             if (mrSlideSorter.GetController().GetFocusManager().IsFocusShowing())
-                pStateSet->AddState(AccessibleStateType::FOCUSED);
+                nStateSet |= AccessibleStateType::FOCUSED;
     }
 
-    return pStateSet;
+    return nStateSet;
 }
 
 lang::Locale SAL_CALL AccessibleSlideSorterObject::getLocale()
@@ -236,7 +232,7 @@ void SAL_CALL AccessibleSlideSorterObject::addAccessibleEventListener(
     if (!rxListener.is())
         return;
 
-    const osl::MutexGuard aGuard(maMutex);
+    const std::unique_lock aGuard(m_aMutex);
 
     if (IsDisposed())
     {
@@ -258,7 +254,7 @@ void SAL_CALL AccessibleSlideSorterObject::removeAccessibleEventListener(
     if (!(rxListener.is() && mnClientId))
         return;
 
-    const osl::MutexGuard aGuard(maMutex);
+    const std::unique_lock aGuard(m_aMutex);
 
     sal_Int32 nListenerCount = comphelper::AccessibleEventNotifier::removeEventListener( mnClientId, rxListener );
     if ( !nListenerCount )
@@ -404,7 +400,7 @@ uno::Sequence< OUString> SAL_CALL
 
 void AccessibleSlideSorterObject::ThrowIfDisposed()
 {
-    if (rBHelper.bDisposed || rBHelper.bInDispose)
+    if (m_bDisposed)
     {
         SAL_WARN("sd", "Calling disposed object. Throwing exception:");
         throw lang::DisposedException ("object has been already disposed",
@@ -414,7 +410,7 @@ void AccessibleSlideSorterObject::ThrowIfDisposed()
 
 bool AccessibleSlideSorterObject::IsDisposed() const
 {
-    return (rBHelper.bDisposed || rBHelper.bInDispose);
+    return m_bDisposed;
 }
 
 SdPage* AccessibleSlideSorterObject::GetPage() const

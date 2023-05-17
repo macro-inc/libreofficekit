@@ -24,9 +24,8 @@
 #include "tp_3D_SceneAppearance.hxx"
 #include "tp_3D_SceneIllumination.hxx"
 #include <ChartModelHelper.hxx>
-#include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/chart2/XDiagram.hpp>
-#include <com/sun/star/frame/XModel.hpp>
+#include <ChartModel.hxx>
+#include <Diagram.hxx>
 
 namespace chart
 {
@@ -36,12 +35,12 @@ using namespace ::com::sun::star::chart2;
 
 sal_uInt16 View3DDialog::m_nLastPageId = 0;
 
-View3DDialog::View3DDialog(weld::Window* pParent, const uno::Reference< frame::XModel > & xChartModel)
+View3DDialog::View3DDialog(weld::Window* pParent, const rtl::Reference<::chart::ChartModel> & xChartModel)
     : GenericDialogController(pParent, "modules/schart/ui/3dviewdialog.ui", "3DViewDialog")
     , m_aControllerLocker(xChartModel)
     , m_xTabControl(m_xBuilder->weld_notebook("tabcontrol"))
 {
-    uno::Reference< beans::XPropertySet > xSceneProperties( ChartModelHelper::findDiagram( xChartModel ), uno::UNO_QUERY );
+    rtl::Reference< Diagram > xSceneProperties = ChartModelHelper::findDiagram( xChartModel );
 
     m_xTabControl->append_page("geometry", SchResId(STR_PAGE_PERSPECTIVE));
     m_xGeometry.reset(new ThreeD_SceneGeometry_TabPage(m_xTabControl->get_page("geometry"), xSceneProperties, m_aControllerLocker));

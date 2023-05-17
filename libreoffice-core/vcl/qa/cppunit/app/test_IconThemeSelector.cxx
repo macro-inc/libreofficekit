@@ -106,8 +106,8 @@ IconThemeSelectorTest::ThemeIsOverriddenByHighContrastMode()
     s.SetUseHighContrastTheme(true);
     std::vector<vcl::IconThemeInfo> themes = GetFakeInstalledThemes();
     OUString selected = s.SelectIconTheme(themes, "breeze");
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("'breeze' theme is overridden by high contrast mode",
-            OUString("sifr"), selected);
+    bool sifr = selected.startsWith("sifr");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("'breeze' theme is overridden by high contrast mode", true, sifr);
     s.SetUseHighContrastTheme(false);
     selected = s.SelectIconTheme(themes, "breeze");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("'breeze' theme is no longer overridden by high contrast mode",
@@ -148,7 +148,7 @@ IconThemeSelectorTest::FallbackThemeIsReturnedForEmptyInput()
     vcl::IconThemeSelector s;
     OUString selected = s.SelectIconTheme(std::vector<vcl::IconThemeInfo>(), "colibre");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("fallback is returned for empty input",
-            OUString(vcl::IconThemeSelector::FALLBACK_ICON_THEME_ID), selected);
+            OUString(vcl::IconThemeSelector::FALLBACK_LIGHT_ICON_THEME_ID), selected);
 }
 
 void

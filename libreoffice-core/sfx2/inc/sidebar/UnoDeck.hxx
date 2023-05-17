@@ -28,7 +28,7 @@ class SfxUnoDeck final : public cppu::WeakImplHelper<css::ui::XDeck>
 
 public:
 
-    SfxUnoDeck(const css::uno::Reference<css::frame::XFrame>& , const OUString&);
+    SfxUnoDeck(css::uno::Reference<css::frame::XFrame>, OUString );
 
     virtual OUString SAL_CALL getId() override;
 
@@ -54,8 +54,8 @@ private:
 
     const OUString mDeckId;
 
-    sal_Int32 GetMaxOrderIndex(sfx2::sidebar::ResourceManager::DeckContextDescriptorContainer aDecks);
-    sal_Int32 GetMinOrderIndex(sfx2::sidebar::ResourceManager::DeckContextDescriptorContainer aDecks);
+    sal_Int32 GetMaxOrderIndex(const sfx2::sidebar::ResourceManager::DeckContextDescriptorContainer& rDecks);
+    sal_Int32 GetMinOrderIndex(const sfx2::sidebar::ResourceManager::DeckContextDescriptorContainer& rDecks);
 
 };
 

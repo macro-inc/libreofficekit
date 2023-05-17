@@ -23,15 +23,15 @@
 #include <comphelper/propertyvalue.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/mutex.hxx>
+#include <svtools/imagemgr.hxx>
 #include <svtools/popupmenucontrollerbase.hxx>
 #include <tools/urlobj.hxx>
-#include <toolkit/awt/vclxmenu.hxx>
 #include <unotools/historyoptions.hxx>
-#include <vcl/menu.hxx>
-#include <vcl/svapp.hxx>
-#include <vcl/image.hxx>
+#include <vcl/commandinfoprovider.hxx>
+#include <vcl/graph.hxx>
 #include <vcl/settings.hxx>
-#include <svtools/imagemgr.hxx>
+#include <vcl/svapp.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace css;
 using namespace com::sun::star::uno;
@@ -93,7 +93,7 @@ private:
     void fillPopupMenu( css::uno::Reference< css::awt::XPopupMenu > const & rPopupMenu );
     void executeEntry( sal_Int32 nIndex );
 
-    std::vector< OUString >   m_aRecentFilesItems;
+    std::vector<std::pair<OUString, bool>>   m_aRecentFilesItems;
     bool                      m_bDisabled : 1;
     bool                      m_bShowToolbarEntries;
 };
@@ -116,20 +116,37 @@ RecentFilesMenuController::RecentFilesMenuController( const uno::Reference< uno:
     }
 }
 
+void InsertItem(const css::uno::Reference<css::awt::XPopupMenu>& rPopupMenu,
+                const OUString& rCommand,
+                const css::uno::Reference<css::frame::XFrame>& rFrame)
+{
+    sal_uInt16 nItemId = rPopupMenu->getItemCount() + 1;
+
+    if (rFrame.is())
+    {
+        OUString aModuleName(vcl::CommandInfoProvider::GetModuleIdentifier(rFrame));
+        auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(rCommand, aModuleName);
+        OUString aLabel(vcl::CommandInfoProvider::GetPopupLabelForCommand(aProperties));
+        OUString aTooltip(vcl::CommandInfoProvider::GetTooltipForCommand(rCommand, aProperties, rFrame));
+        css::uno::Reference<css::graphic::XGraphic> xGraphic(vcl::CommandInfoProvider::GetXGraphicForCommand(rCommand, rFrame));
+
+        rPopupMenu->insertItem(nItemId, aLabel, 0, -1);
+        rPopupMenu->setItemImage(nItemId, xGraphic, false);
+        rPopupMenu->setHelpText(nItemId, aTooltip);
+    }
+    else
+        rPopupMenu->insertItem(nItemId, OUString(), 0, -1);
+
+    rPopupMenu->setCommand(nItemId, rCommand);
+}
+
+
 // private function
 void RecentFilesMenuController::fillPopupMenu( Reference< css::awt::XPopupMenu > const & rPopupMenu )
 {
-    VCLXPopupMenu* pPopupMenu    = static_cast<VCLXPopupMenu *>(comphelper::getFromUnoTunnel<VCLXMenu>( rPopupMenu ));
-    PopupMenu*     pVCLPopupMenu = nullptr;
-
     SolarMutexGuard aSolarMutexGuard;
 
     resetPopupMenu( rPopupMenu );
-    if ( pPopupMenu )
-        pVCLPopupMenu = static_cast<PopupMenu *>(pPopupMenu->GetMenu());
-
-    if ( !pVCLPopupMenu )
-        return;
 
     std::vector< SvtHistoryOptions::HistoryItem > aHistoryList = SvtHistoryOptions::GetList( EHistoryType::PickList );
 
@@ -141,7 +158,7 @@ void RecentFilesMenuController::fillPopupMenu( Reference< css::awt::XPopupMenu >
         for ( int i = 0; i < nPickListMenuItems; i++ )
         {
             const SvtHistoryOptions::HistoryItem& rPickListEntry = aHistoryList[i];
-            m_aRecentFilesItems.push_back( rPickListEntry.sURL );
+            m_aRecentFilesItems.emplace_back(rPickListEntry.sURL, rPickListEntry.isReadOnly);
         }
     }
 
@@ -175,7 +192,7 @@ void RecentFilesMenuController::fillPopupMenu( Reference< css::awt::XPopupMenu >
 
             // Abbreviate URL
             OUString   aMenuTitle;
-            INetURLObject   aURL( m_aRecentFilesItems[i] );
+            INetURLObject const aURL(m_aRecentFilesItems[i].first);
             OUString aTipHelpText( aURL.getFSysPath( FSysStyle::Detect ) );
 
             if ( aURL.GetProtocol() == INetProtocol::File )
@@ -191,53 +208,49 @@ void RecentFilesMenuController::fillPopupMenu( Reference< css::awt::XPopupMenu >
 
             aMenuShortCut.append( aMenuTitle );
 
-            pVCLPopupMenu->InsertItem( sal_uInt16( i+1 ), aMenuShortCut.makeStringAndClear() );
+            rPopupMenu->insertItem(sal_uInt16( i+1 ), aMenuShortCut.makeStringAndClear(), 0, -1);
 
             if ( bIsIconsAllowed ) {
                 // tdf#146219: don't use SvFileInformationManager::GetImageId,
                 // which needs to access the URL to detect if it's a directory
                 BitmapEx aThumbnail(SvFileInformationManager::GetFileImageId(aURL));
-                pVCLPopupMenu->SetItemImage(sal_uInt16 ( i+1 ), Image(aThumbnail));
+                rPopupMenu->setItemImage(sal_uInt16(i + 1), Graphic(aThumbnail).GetXGraphic(), false);
             }
 
-            pVCLPopupMenu->SetTipHelpText( sal_uInt16( i+1 ), aTipHelpText );
-            pVCLPopupMenu->SetItemCommand( sal_uInt16( i+1 ), aURLString );
+            rPopupMenu->setTipHelpText(sal_uInt16(i + 1), aTipHelpText);
+            rPopupMenu->setCommand(sal_uInt16(i + 1), aURLString);
         }
 
-        pVCLPopupMenu->InsertSeparator();
+        rPopupMenu->insertSeparator(-1);
         // Clear List menu entry
-        pVCLPopupMenu->InsertItem( sal_uInt16( nCount + 1 ),
-                                   FwkResId(STR_CLEAR_RECENT_FILES) );
-        pVCLPopupMenu->SetItemCommand( sal_uInt16( nCount + 1 ),
-                                       CMD_CLEAR_LIST );
-        pVCLPopupMenu->SetHelpText( sal_uInt16( nCount + 1 ),
-                                    FwkResId(STR_CLEAR_RECENT_FILES_HELP) );
+        rPopupMenu->insertItem(sal_uInt16(nCount + 1), FwkResId(STR_CLEAR_RECENT_FILES), 0, -1);
+        rPopupMenu->setCommand(sal_uInt16(nCount + 1), CMD_CLEAR_LIST);
+        rPopupMenu->setHelpText(sal_uInt16(nCount + 1), FwkResId(STR_CLEAR_RECENT_FILES_HELP));
 
         // Open remote menu entry
         if ( m_bShowToolbarEntries )
         {
-            pVCLPopupMenu->InsertSeparator();
-            pVCLPopupMenu->InsertItem( CMD_OPEN_AS_TEMPLATE, m_xFrame );
-            pVCLPopupMenu->InsertItem( CMD_OPEN_REMOTE, m_xFrame );
+            rPopupMenu->insertSeparator(-1);
+            InsertItem(rPopupMenu, CMD_OPEN_AS_TEMPLATE, m_xFrame);
+            InsertItem(rPopupMenu, CMD_OPEN_REMOTE, m_xFrame);
         }
     }
     else
     {
         if ( m_bShowToolbarEntries )
         {
-            pVCLPopupMenu->InsertItem( CMD_OPEN_AS_TEMPLATE, m_xFrame );
-            pVCLPopupMenu->InsertItem( CMD_OPEN_REMOTE, m_xFrame );
+            InsertItem(rPopupMenu, CMD_OPEN_AS_TEMPLATE, m_xFrame);
+            InsertItem(rPopupMenu, CMD_OPEN_REMOTE, m_xFrame);
         }
         else
         {
             // Add InsertSeparator(), otherwise it will display
             // the first item icon of recent files instead of displaying no icon.
-            pVCLPopupMenu->InsertSeparator();
+            rPopupMenu->insertSeparator(-1);
             // No recent documents => insert "no documents" string
-            pVCLPopupMenu->InsertItem( 1, FwkResId(STR_NODOCUMENT) );
             // Do not disable it, otherwise the Toolbar controller and MenuButton
             // will display SV_RESID_STRING_NOSELECTIONPOSSIBLE instead of STR_NODOCUMENT
-            pVCLPopupMenu->SetItemBits( 1, pVCLPopupMenu->GetItemBits( 1 ) | MenuItemBits::NOSELECT );
+            rPopupMenu->insertItem(1, FwkResId(STR_NODOCUMENT), static_cast<sal_Int16>(MenuItemBits::NOSELECT), -1);
         }
     }
 }
@@ -257,7 +270,12 @@ void RecentFilesMenuController::executeEntry( sal_Int32 nIndex )
         // Type detection needs to know which app we are opening it from.
         comphelper::makePropertyValue("DocumentService", m_aModuleName)
     };
-    dispatchCommand( m_aRecentFilesItems[ nIndex ], aArgsList, "_default" );
+    if (m_aRecentFilesItems[nIndex].second) // tdf#149170 only add if true
+    {
+        aArgsList.realloc(aArgsList.size()+1);
+        aArgsList.getArray()[aArgsList.size()-1] = comphelper::makePropertyValue("ReadOnly", true);
+    }
+    dispatchCommand(m_aRecentFilesItems[nIndex].first, aArgsList, "_default");
 }
 
 // XEventListener
@@ -369,14 +387,14 @@ void SAL_CALL RecentFilesMenuController::dispatch(
         return;
 
     sal_Int32 nAddArgs = aURL.Complete.indexOf( '&', nEntryPos );
-    OUString aEntryArg;
+    std::u16string_view aEntryArg;
 
     if ( nAddArgs < 0 )
-        aEntryArg = aURL.Complete.copy( nEntryPos );
+        aEntryArg = aURL.Complete.subView( nEntryPos );
     else
-        aEntryArg = aURL.Complete.copy( nEntryPos, nAddArgs-nEntryPos );
+        aEntryArg = aURL.Complete.subView( nEntryPos, nAddArgs-nEntryPos );
 
-    sal_Int32 nEntry = aEntryArg.toInt32();
+    sal_Int32 nEntry = o3tl::toInt32(aEntryArg);
     executeEntry( nEntry );
 }
 

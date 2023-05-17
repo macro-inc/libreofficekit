@@ -18,10 +18,11 @@
  */
 
 #include <osl/mutex.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/wrkwin.hxx>
 #include <unotools/pathoptions.hxx>
@@ -36,7 +37,6 @@
 #include <com/sun/star/beans/IllegalTypeException.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/beans/PropertyExistException.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/beans/XPropertyContainer.hpp>
 #include <com/sun/star/beans/StringPair.hpp>
@@ -76,6 +76,7 @@
 #include <unotools/ucbhelper.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <ucbhelper/content.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <sfx2/sfxresid.hxx>
 #include <sfxurlrelocator.hxx>
@@ -164,8 +165,8 @@ class TplTaskEnvironment : public ::cppu::WeakImplHelper< ucb::XCommandEnvironme
     uno::Reference< task::XInteractionHandler >               m_xInteractionHandler;
 
 public:
-    explicit TplTaskEnvironment( const uno::Reference< task::XInteractionHandler>& rxInteractionHandler )
-                                : m_xInteractionHandler( rxInteractionHandler )
+    explicit TplTaskEnvironment( uno::Reference< task::XInteractionHandler> xInteractionHandler )
+                                : m_xInteractionHandler(std::move( xInteractionHandler ))
                             {}
 
     virtual uno::Reference<task::XInteractionHandler> SAL_CALL getInteractionHandler() override
@@ -213,24 +214,24 @@ class SfxDocTplService_Impl
                                               bool  bFsysFolder,
                                               Content   &rNewFolder );
 
-    static bool             CreateNewUniqueFolderWithPrefix( const OUString& aPath,
+    static bool             CreateNewUniqueFolderWithPrefix( std::u16string_view aPath,
                                                                 const OUString& aPrefix,
                                                                 OUString& aNewFolderName,
                                                                 OUString& aNewFolderURL,
                                                                 Content& aNewFolder );
-    static OUString         CreateNewUniqueFileWithPrefix( const OUString& aPath,
+    static OUString         CreateNewUniqueFileWithPrefix( std::u16string_view aPath,
                                                                 const OUString& aPrefix,
                                                                 const OUString& aExt );
 
-    std::vector< beans::StringPair > ReadUINamesForTemplateDir_Impl( const OUString& aUserPath );
-    bool                    UpdateUINamesForTemplateDir_Impl( const OUString& aUserPath,
+    std::vector< beans::StringPair > ReadUINamesForTemplateDir_Impl( std::u16string_view aUserPath );
+    bool                    UpdateUINamesForTemplateDir_Impl( std::u16string_view aUserPath,
                                                                   const OUString& aGroupName,
                                                                   const OUString& aNewFolderName );
-    bool                    ReplaceUINamesForTemplateDir_Impl( const OUString& aUserPath,
+    bool                    ReplaceUINamesForTemplateDir_Impl( std::u16string_view aUserPath,
                                                                   const OUString& aFsysGroupName,
                                                                   std::u16string_view aOldGroupName,
                                                                   const OUString& aNewGroupName );
-    void                    RemoveUINamesForTemplateDir_Impl( const OUString& aUserPath,
+    void                    RemoveUINamesForTemplateDir_Impl( std::u16string_view aUserPath,
                                                                   std::u16string_view aGroupName );
     bool                    WriteUINamesForTemplateDir_Impl( std::u16string_view aUserPath,
                                                                 const std::vector< beans::StringPair >& aUINames );
@@ -322,7 +323,7 @@ class DocTemplates_EntryData_Impl
     bool            mbUpdateLink    : 1;
 
 public:
-   explicit             DocTemplates_EntryData_Impl( const OUString& rTitle );
+   explicit             DocTemplates_EntryData_Impl( OUString aTitle );
 
     void                setInUse() { mbInUse = true; }
     void                setHierarchy( bool bInHierarchy ) { mbInHierarchy = bInHierarchy; }
@@ -355,7 +356,7 @@ class GroupData_Impl
     bool            mbInHierarchy   : 1;
 
 public:
-    explicit            GroupData_Impl( const OUString& rTitle );
+    explicit            GroupData_Impl( OUString aTitle );
 
     void                setInUse() { mbInUse = true; }
     void                setHierarchy( bool bInHierarchy ) { mbInHierarchy = bInHierarchy; }
@@ -418,7 +419,7 @@ void SfxDocTplService_Impl::init_Impl()
     if ( !bIsInitialized )
     {
         if ( createFolder( maRootURL, true, false, maRootContent )
-          && setProperty( maRootContent, aTemplVersPropName, uno::makeAny( aTemplVers ) ) )
+          && setProperty( maRootContent, aTemplVersPropName, uno::Any( aTemplVers ) ) )
             bIsInitialized = true;
 
         bNeedsUpdate = true;
@@ -486,13 +487,9 @@ const char* TEMPLATE_SHORT_NAMES_ARY[] =
     "officorr",
     "offimisc",
     "personal",
-    "forms",
-    "finance",
-    "educate",
-    "layout",
     "presnt",
-    "misc",
-    "labels"
+    "draw",
+    "l10n",
 };
 
 void SfxDocTplService_Impl::readFolderList()
@@ -552,7 +549,7 @@ void SfxDocTplService_Impl::getDirList()
     for (auto& rTemplateDir : asNonConstRange(maTemplateDirs))
     {
         aURL.SetSmartProtocol( INetProtocol::File );
-        aURL.SetURL( aDirs.getToken( 0, C_DELIM, nIdx ) );
+        aURL.SetURL( o3tl::getToken(aDirs, 0, C_DELIM, nIdx ) );
         rTemplateDir = aURL.GetMainURL( INetURLObject::DecodeMechanism::NONE );
 
         if ( xExpander.is() )
@@ -706,7 +703,7 @@ bool SfxDocTplService_Impl::addEntry( Content& rParentFolder,
         try
         {
             rParentFolder.insertNewContent( TYPE_LINK, { TITLE, IS_FOLDER, TARGET_URL }, aValues, aLink );
-            setProperty( aLink, PROPERTY_TYPE, makeAny( rType ) );
+            setProperty( aLink, PROPERTY_TYPE, Any( rType ) );
             bAddedEntry = true;
         }
         catch( Exception& )
@@ -774,7 +771,7 @@ bool SfxDocTplService_Impl::createFolder( const OUString& rNewFolderURL,
 }
 
 
-bool SfxDocTplService_Impl::CreateNewUniqueFolderWithPrefix( const OUString& aPath,
+bool SfxDocTplService_Impl::CreateNewUniqueFolderWithPrefix( std::u16string_view aPath,
                                                                 const OUString& aPrefix,
                                                                 OUString& aNewFolderName,
                                                                 OUString& aNewFolderURL,
@@ -827,7 +824,7 @@ bool SfxDocTplService_Impl::CreateNewUniqueFolderWithPrefix( const OUString& aPa
 }
 
 
-OUString SfxDocTplService_Impl::CreateNewUniqueFileWithPrefix( const OUString& aPath,
+OUString SfxDocTplService_Impl::CreateNewUniqueFileWithPrefix( std::u16string_view aPath,
                                                                         const OUString& aPrefix,
                                                                         const OUString& aExt )
 {
@@ -888,7 +885,7 @@ bool SfxDocTplService_Impl::removeContent( Content& rContent )
     bool bRemoved = false;
     try
     {
-        Any aArg = makeAny( true );
+        Any aArg( true );
 
         rContent.executeCommand( COMMAND_DELETE, aArg );
         bRemoved = true;
@@ -1132,7 +1129,7 @@ void SfxDocTplService_Impl::doUpdate()
                 if ( Content::create( pGroup->getHierarchyURL(), maCmdEnv, comphelper::getProcessComponentContext(), aGroup ) )
                     setProperty( aGroup,
                                  TARGET_DIR_URL,
-                                 makeAny( pGroup->getTargetURL() ) );
+                                 Any( pGroup->getTargetURL() ) );
 
                 size_t nCount = pGroup->count();
                 for ( size_t i=0; i<nCount; i++ )
@@ -1167,7 +1164,7 @@ void SfxDocTplService_Impl::doUpdate()
 }
 
 
-std::vector< beans::StringPair > SfxDocTplService_Impl::ReadUINamesForTemplateDir_Impl( const OUString& aUserPath )
+std::vector< beans::StringPair > SfxDocTplService_Impl::ReadUINamesForTemplateDir_Impl( std::u16string_view aUserPath )
 {
     INetURLObject aLocObj( aUserPath );
     aLocObj.insertName( u"groupuinames.xml", false,
@@ -1193,7 +1190,7 @@ std::vector< beans::StringPair > SfxDocTplService_Impl::ReadUINamesForTemplateDi
 }
 
 
-bool SfxDocTplService_Impl::UpdateUINamesForTemplateDir_Impl( const OUString& aUserPath,
+bool SfxDocTplService_Impl::UpdateUINamesForTemplateDir_Impl( std::u16string_view aUserPath,
                                                                   const OUString& aGroupName,
                                                                   const OUString& aNewFolderName )
 {
@@ -1213,7 +1210,7 @@ bool SfxDocTplService_Impl::UpdateUINamesForTemplateDir_Impl( const OUString& aU
 }
 
 
-bool SfxDocTplService_Impl::ReplaceUINamesForTemplateDir_Impl( const OUString& aUserPath,
+bool SfxDocTplService_Impl::ReplaceUINamesForTemplateDir_Impl( std::u16string_view aUserPath,
                                                                   const OUString& aDefaultFsysGroupName,
                                                                   std::u16string_view aOldGroupName,
                                                                   const OUString& aNewGroupName )
@@ -1239,7 +1236,7 @@ bool SfxDocTplService_Impl::ReplaceUINamesForTemplateDir_Impl( const OUString& a
 }
 
 
-void SfxDocTplService_Impl::RemoveUINamesForTemplateDir_Impl( const OUString& aUserPath,
+void SfxDocTplService_Impl::RemoveUINamesForTemplateDir_Impl( std::u16string_view aUserPath,
                                                                   std::u16string_view aGroupName )
 {
     std::vector< beans::StringPair > aUINames = ReadUINamesForTemplateDir_Impl( aUserPath );
@@ -1285,8 +1282,13 @@ bool SfxDocTplService_Impl::WriteUINamesForTemplateDir_Impl( std::u16string_view
         } catch( uno::Exception& )
         {}
 
-        uno::Reference < ucb::XSimpleFileAccess3 > xAccess(ucb::SimpleFileAccess::create(mxContext));
-        xAccess->writeFile(OUString::Concat(aUserPath) + "groupuinames.xml", xTempFile->getInputStream());
+        Content aTargetContent( OUString(aUserPath), maCmdEnv, comphelper::getProcessComponentContext() );
+        Content aSourceContent( xTempFile->getUri(), maCmdEnv, comphelper::getProcessComponentContext() );
+        aTargetContent.transferContent( aSourceContent,
+                                        InsertOperation::Copy,
+                                        "groupuinames.xml",
+                                        ucb::NameClash::OVERWRITE,
+                                        "text/xml" );
 
         bResult = true;
     }
@@ -1334,7 +1336,7 @@ OUString SfxDocTplService_Impl::CreateNewGroupFsys( const OUString& rGroupName, 
         }
 
         // Now set the target url for this group and we are done
-        Any aValue = makeAny( aResultURL );
+        Any aValue( aResultURL );
 
         if ( ! setProperty( aGroup, TARGET_DIR_URL, aValue ) )
         {
@@ -1416,7 +1418,7 @@ bool SfxDocTplService_Impl::addGroup( const OUString& rGroupName )
     }
 
     // Now set the target url for this group and we are done
-    Any aValue = makeAny( aNewFolderURL );
+    Any aValue( aNewFolderURL );
 
     if ( ! setProperty( aNewGroup, TARGET_DIR_URL, aValue ) )
     {
@@ -1523,7 +1525,7 @@ bool SfxDocTplService_Impl::removeGroup( std::u16string_view rGroupName )
                       || !::utl::UCBContentHelper::Exists( aGroupTargetURL ) )
                     {
                         RemoveUINamesForTemplateDir_Impl( aGeneralTempPath, rGroupName );
-                        setProperty( aGroup, aPropName, uno::makeAny( OUString() ) );
+                        setProperty( aGroup, aPropName, uno::Any( OUString() ) );
                     }
                 }
             }
@@ -1918,7 +1920,7 @@ bool SfxDocTplService_Impl::addTemplate( const OUString& rGroupName,
             uno::Any aProperty;
             bool bReadOnly = false;
             if ( getProperty( aResultContent, aPropertyName, aProperty ) && ( aProperty >>= bReadOnly ) && bReadOnly )
-                setProperty( aResultContent, aPropertyName, uno::makeAny( false ) );
+                setProperty( aResultContent, aPropertyName, uno::Any( false ) );
         }
     }
     catch ( ContentCreationException& )
@@ -2512,12 +2514,12 @@ void SfxDocTplService_Impl::updateData( DocTemplates_EntryData_Impl const *pData
 
     if ( pData->getUpdateType() )
     {
-        setProperty( aTemplate, PROPERTY_TYPE, makeAny( pData->getType() ) );
+        setProperty( aTemplate, PROPERTY_TYPE, Any( pData->getType() ) );
     }
 
     if ( pData->getUpdateLink() )
     {
-        setProperty( aTemplate, TARGET_URL, makeAny( pData->getTargetURL() ) );
+        setProperty( aTemplate, TARGET_URL, Any( pData->getTargetURL() ) );
     }
 }
 
@@ -2535,7 +2537,7 @@ void SfxDocTplService_Impl::addGroupToHierarchy( GroupData_Impl *pGroup )
 
     if ( createFolder( aNewGroupURL, false, false, aGroup ) )
     {
-        setProperty( aGroup, TARGET_DIR_URL, makeAny( pGroup->getTargetURL() ) );
+        setProperty( aGroup, TARGET_DIR_URL, Any( pGroup->getTargetURL() ) );
         pGroup->setHierarchyURL( aNewGroupURL );
 
         size_t nCount = pGroup->count();
@@ -2559,8 +2561,8 @@ void SfxDocTplService_Impl::removeFromHierarchy( GroupData_Impl const *pGroup )
 }
 
 
-GroupData_Impl::GroupData_Impl( const OUString& rTitle )
-     : maTitle(rTitle), mbInUse(false), mbInHierarchy(false)
+GroupData_Impl::GroupData_Impl( OUString aTitle )
+     : maTitle(std::move(aTitle)), mbInUse(false), mbInHierarchy(false)
 {
 }
 
@@ -2617,8 +2619,8 @@ DocTemplates_EntryData_Impl* GroupData_Impl::addEntry( const OUString& rTitle,
 }
 
 
-DocTemplates_EntryData_Impl::DocTemplates_EntryData_Impl( const OUString& rTitle )
-     : maTitle(rTitle), mbInHierarchy(false), mbInUse(false), mbUpdateType(false), mbUpdateLink(false)
+DocTemplates_EntryData_Impl::DocTemplates_EntryData_Impl( OUString aTitle )
+     : maTitle(std::move(aTitle)), mbInHierarchy(false), mbInUse(false), mbUpdateType(false), mbUpdateLink(false)
 {
 }
 
@@ -2636,8 +2638,8 @@ bool SfxURLRelocator_Impl::propertyCanContainOfficeDir(
 }
 
 
-SfxURLRelocator_Impl::SfxURLRelocator_Impl( const uno::Reference< XComponentContext > & xContext )
-: mxContext( xContext )
+SfxURLRelocator_Impl::SfxURLRelocator_Impl( uno::Reference< XComponentContext > xContext )
+: mxContext(std::move( xContext ))
 {
 }
 

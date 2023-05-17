@@ -23,6 +23,7 @@
 #include <basegfx/vector/b2dvector.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
+#include <osl/diagnose.h>
 
 namespace sdr::overlay
 {
@@ -89,7 +90,8 @@ namespace sdr::overlay
             mbIsVisible(true),
             mbIsHittable(true),
             mbAllowsAnimation(false),
-            mbAllowsAntiAliase(true)
+            mbAllowsAntiAliase(true),
+            mbHighContrastSelection(false)
         {
         }
 

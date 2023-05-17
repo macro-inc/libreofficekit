@@ -23,7 +23,7 @@
 
 #include <basic/sbxvar.hxx>
 #include <i18nlangtag/lang.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 #include <memory>
 #include <vector>
@@ -36,6 +36,7 @@ class SbxBasicFormater;
 struct SbxAppData
 {
     ErrCode eErrCode; // Error code
+    OUString aErrorMsg; // Error message for $ARG
     SbxVariableRef m_aGlobErr; // Global error object
     std::vector<SbxFactory*> m_Factories; // these are owned by fields in SbiGlobals
     tools::SvRef<SvRefBase> mrImplRepository;

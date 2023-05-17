@@ -24,7 +24,7 @@
 
  *************************************************************************/
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/embed/InvalidStorageException.hpp>
 #include <com/sun/star/embed/StorageWrappedTargetException.hpp>
@@ -600,6 +600,11 @@ ContentProvider::queryDocumentModel( const OUString & rUri ) const
     OSL_ENSURE( xModel.is(),
                 "ContentProvider::queryDocumentModel - no model!" );
     return xModel;
+}
+
+
+css::util::DateTime ContentProvider::queryStreamDateModified(OUString const & uri) const {
+    return m_xDocsMgr->queryStreamDateModified(uri);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

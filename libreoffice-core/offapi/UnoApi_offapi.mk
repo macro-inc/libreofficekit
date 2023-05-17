@@ -19,7 +19,6 @@
 
 $(eval $(call gb_UnoApi_UnoApi,offapi))
 
-$(eval $(call gb_UnoApi_package_idlfiles,offapi))
 
 $(eval $(call gb_UnoApi_use_api,offapi,\
     udkapi \
@@ -1368,6 +1367,7 @@ $(eval $(call gb_UnoApi_add_idlfiles_noheader,offapi,com/sun/star/text,\
 	GlobalSettings \
 	IllustrationsIndex \
 	InContentMetadata \
+	LineBreak \
 	LineNumberingProperties \
 	MailMerge \
 	NumberingLevel \
@@ -1655,7 +1655,6 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/accessibility,\
 	XAccessibleMultiLineText \
 	XAccessibleRelationSet \
 	XAccessibleSelection \
-	XAccessibleStateSet \
 	XAccessibleTable \
     XAccessibleTableSelection \
 	XAccessibleText \
@@ -1719,6 +1718,8 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/awt,\
 	AdjustmentEvent \
 	AdjustmentType \
 	CharSet \
+	ColorStop \
+	ColorStopSequence \
 	Command \
 	DeviceCapability \
 	DeviceInfo \
@@ -1742,6 +1743,7 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/awt,\
 	FontWeight \
 	FontWidth \
 	Gradient \
+	Gradient2 \
 	GradientStyle \
 	ImageDrawMode \
 	ImageAlign \
@@ -2013,7 +2015,6 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/chart2,\
 	DataPointLabel \
 	FillBitmap \
 	IncrementData \
-	InterpretedData \
 	LegendPosition \
 	LightSource \
 	PieChartOffsetMode \
@@ -2038,7 +2039,6 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/chart2,\
 	XColorScheme \
 	XCoordinateSystem \
 	XCoordinateSystemContainer \
-	XDataInterpreter \
 	XDataProviderAccess \
 	XDataPointCustomLabelField \
 	XDataSeries \
@@ -2060,7 +2060,6 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/chart2,\
 	XTimeBased \
 	XTitle \
 	XTitled \
-	XTransformation \
 ))
 $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/chart2/data,\
 	DataSequenceRole \
@@ -2305,6 +2304,7 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/drawing,\
 	EnhancedCustomShapeSegmentCommand \
 	EnhancedCustomShapeTextFrame \
 	EnhancedCustomShapeTextPathMode \
+    EnhancedCustomShapeMetalType \
 	EscapeDirection \
 	FillStyle \
 	FlagSequence \
@@ -2922,6 +2922,8 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/media,\
 	XFrameGrabber \
 	XManager \
 	XPlayer \
+	XPlayerListener \
+	XPlayerNotifier \
 	XPlayerWindow \
 	ZoomLevel \
 ))
@@ -3646,6 +3648,13 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/system,\
 	XSimpleMailMessage2 \
 	XSystemShellExecute \
 ))
+
+$(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/system/windows,\
+	JumpList \
+	JumpListItem \
+	XJumpList \
+))
+
 $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/table,\
 	BorderLine \
 	BorderLine2 \
@@ -4159,6 +4168,7 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/util,\
 	XAtomServer \
 	XBinaryDataContainer \
 	XBroadcaster \
+	XCacheInfo \
 	XCancellable \
 	XChainable \
 	XChangesBatch \
@@ -4169,6 +4179,8 @@ $(eval $(call gb_UnoApi_add_idlfiles,offapi,com/sun/star/util,\
 	XCloseBroadcaster \
 	XCloseListener \
 	XCloseable \
+	XTheme \
+	XThemeColor \
 	XDataEditor \
 	XDataEditorListener \
 	XFlushListener \

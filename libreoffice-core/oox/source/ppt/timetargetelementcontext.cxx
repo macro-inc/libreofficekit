@@ -31,6 +31,7 @@
 #include <oox/core/xmlfilterbase.hxx>
 #include <com/sun/star/io/XInputStream.hpp>
 #include <avmedia/mediaitem.hxx>
+#include <utility>
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::xml::sax;
@@ -66,14 +67,14 @@ namespace oox::ppt {
                 case PPT_TOKEN( subSp ):
                     bTargetSet = true;
                     maShapeTarget.mnType = XML_subSp;
-                    maShapeTarget.msSubShapeId = rAttribs.getString( XML_spid, OUString() );
+                    maShapeTarget.msSubShapeId = rAttribs.getStringDefaulted( XML_spid);
                     return this;
                 case PPT_TOKEN( graphicEl ):
                     return this; // needs a:dgm for the target
                 case A_TOKEN( dgm ):
                     bTargetSet = true;
                     maShapeTarget.mnType = XML_dgm;
-                    maShapeTarget.msSubShapeId = rAttribs.getString( XML_id, OUString() );
+                    maShapeTarget.msSubShapeId = rAttribs.getStringDefaulted( XML_id);
                     return this;
                 case PPT_TOKEN( oleChartEl ):
                     bTargetSet = true;
@@ -100,9 +101,9 @@ namespace oox::ppt {
 
     }
 
-    TimeTargetElementContext::TimeTargetElementContext( FragmentHandler2 const & rParent, const AnimTargetElementPtr & pValue )
+    TimeTargetElementContext::TimeTargetElementContext( FragmentHandler2 const & rParent, AnimTargetElementPtr pValue )
         : FragmentHandler2( rParent ),
-            mpTarget( pValue )
+            mpTarget(std::move( pValue ))
     {
         OSL_ENSURE( mpTarget, "no valid target passed" );
     }
@@ -118,7 +119,7 @@ namespace oox::ppt {
         case PPT_TOKEN( inkTgt ):
         {
             mpTarget->mnType = XML_inkTgt;
-            OUString aId = rAttribs.getString( XML_spid, OUString() );
+            OUString aId = rAttribs.getStringDefaulted( XML_spid);
             if( !aId.isEmpty() )
             {
                 mpTarget->msValue = aId;
@@ -148,7 +149,7 @@ namespace oox::ppt {
         case PPT_TOKEN( spTgt ):
         {
             mpTarget->mnType = XML_spTgt;
-            OUString aId = rAttribs.getString( XML_spid, OUString() );
+            OUString aId = rAttribs.getStringDefaulted( XML_spid);
             mpTarget->msValue = aId;
             return new ShapeTargetElementContext( *this, mpTarget->maShapeTarget );
         }

@@ -634,7 +634,7 @@ bool FloatingWindow::EventNotify( NotifyEvent& rNEvt )
     bool bRet = SystemWindow::EventNotify( rNEvt );
     if ( !bRet )
     {
-        if ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT )
+        if ( rNEvt.GetType() == NotifyEventType::KEYINPUT )
         {
             const KeyEvent* pKEvt = rNEvt.GetKeyEvent();
             vcl::KeyCode    aKeyCode = pKEvt->GetKeyCode();
@@ -794,6 +794,21 @@ void FloatingWindow::StartPopupMode( const tools::Rectangle& rRect, FloatWinPopu
     mpImplData->maPos = ImplCalcPos(this, rRect, nFlags, nArrangeIndex, &mpImplData->maLOKTwipsPos);
     SetPosPixel( mpImplData->maPos );
     ImplGetFrame()->PositionByToolkit(rRect, nFlags);
+
+    /*
+    tdf#140762 tdf#152671 Make dock win visible before showing popup
+
+    Make them visible again *before* starting popup mode for the floating
+    window.  This e.g. makes NVDA announce popups in the toolbar or the Calc
+    autofilter dropdown.
+    */
+    if (nFlags & FloatWinPopupFlags::MakeClientWindowVisibleBeforePopup)
+    {
+        if (vcl::Window* pClientWindow = ImplGetClientWindow())
+        {
+            pClientWindow->Show(true, ShowFlags::NoFocusChange | ShowFlags::NoActivate);
+        }
+    }
 
     // set data and display window
     // convert maFloatRect to absolute device coordinates

@@ -16,13 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __ooo_vba_word_XDocument_idl__
-#define __ooo_vba_word_XDocument_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
-#include <ooo/vba/XHelperInterface.idl>
-#include <ooo/vba/word/XRange.idl>
-#include <com/sun/star/script/XInvocation.idl>
 
 module ooo {  module vba {  module word {
 
@@ -32,6 +25,7 @@ interface XDocument
     interface XConnectable;
 
     [attribute, readonly] XRange Content;
+    [attribute, readonly] XWindow ActiveWindow;
     [attribute] any AttachedTemplate;
     [attribute] long ProtectionType;
     [attribute] boolean UpdateStylesOnOpen;
@@ -53,6 +47,7 @@ interface XDocument
     any Tables( [in] any Index );
     any Fields( [in] any Index );
     any Shapes( [in] any Index );
+    void Select();
     any Sections( [in] any Index );
     void Activate();
     any PageSetup();
@@ -72,8 +67,6 @@ interface XDocument
 };
 
 }; }; };
-
-#endif
 
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

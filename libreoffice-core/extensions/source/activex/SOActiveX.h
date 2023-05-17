@@ -29,14 +29,7 @@
 
 #include <atlctl.h>
 
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include <so_activex.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
 
 class SODispatchInterceptor;
 
@@ -81,7 +74,7 @@ protected:
     CComPtr<IDispatch>      mpDispFrame;
     CComPtr<IDispatch>      mpInstanceLocker;
     CComPtr<IDispatch>      mpDispWin;
-    OLECHAR const *         mCurFileUrl;
+    CComBSTR                mCurFileUrl;
     BOOL                    mbLoad;
     BOOL                    mbViewOnly;
     WNDCLASSW               mPWinClass;

@@ -24,8 +24,7 @@
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <sfx2/passwd.hxx>
-#include <unotools/resmgr.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sfx2/objsh.hxx>
 #include <svx/AccessibilityCheckDialog.hxx>
 
@@ -43,11 +42,6 @@
 #include <com/sun/star/beans/XMaterialHolder.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 
-static OUString PDFFilterResId(TranslateId aId)
-{
-    return Translate::get(aId, Translate::Create("flt"));
-}
-
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
 
@@ -59,7 +53,6 @@ ImpPDFTabDialog::ImpPDFTabDialog(weld::Window* pParent, const Sequence< Property
     const Reference< XComponent >& rxDoc)
     : SfxTabDialogController(pParent, "filter/ui/pdfoptionsdialog.ui", "PdfOptionsDialog"),
     mrDoc(rxDoc),
-    mpParent(pParent),
     maConfigItem( u"Office.Common/Filter/PDF/Export/", &rFilterData ),
     maConfigI18N( u"Office.Common/I18N/CTL/" ),
     mbIsPresentation( false ),
@@ -75,6 +68,7 @@ ImpPDFTabDialog::ImpPDFTabDialog(weld::Window* pParent, const Sequence< Property
     mbUseTaggedPDF( false ),
     mbUseTaggedPDFUserSelection( false ),
     mbExportNotes( true ),
+    mbExportNotesInMargin( false ),
     mbViewPDF( false ),
     mbUseReferenceXObject( false ),
     mbExportNotesPages( false ),
@@ -99,7 +93,7 @@ ImpPDFTabDialog::ImpPDFTabDialog(weld::Window* pParent, const Sequence< Property
     mbOpenInFullScreenMode( false ),
     mbDisplayPDFDocumentTitle( false ),
     mnMagnification( 0 ),
-    mnInitialView( 0 ),
+    mnInitialView( 1 ),
     mnZoom( 0 ),
     mnInitialPage( 1 ),
     mnPageLayout( 0 ),
@@ -199,9 +193,12 @@ ImpPDFTabDialog::ImpPDFTabDialog(weld::Window* pParent, const Sequence< Property
         mbExportOnlyNotesPages = maConfigItem.ReadBool( "ExportOnlyNotesPages", false );
     }
     mbExportNotes = maConfigItem.ReadBool( "ExportNotes", false );
+    if (mbIsWriter)
+        mbExportNotesInMargin = maConfigItem.ReadBool( "ExportNotesInMargin", false );
     mbViewPDF = maConfigItem.ReadBool( "ViewPDFAfterExport", false );
 
     mbExportBookmarks = maConfigItem.ReadBool( "ExportBookmarks", true );
+    mbExportBookmarksUserSelection = mbExportBookmarks;
     if ( mbIsPresentation )
         mbExportHiddenSlides = maConfigItem.ReadBool( "ExportHiddenSlides", false );
     if ( mbIsSpreadsheet )
@@ -228,6 +225,7 @@ ImpPDFTabDialog::ImpPDFTabDialog(weld::Window* pParent, const Sequence< Property
     mbDisplayPDFDocumentTitle = maConfigItem.ReadBool( "DisplayPDFDocumentTitle", true );
 
     mnInitialView = maConfigItem.ReadInt32( "InitialView", 0 );
+    mnInitialViewUserSelection = mnInitialView;
     mnMagnification = maConfigItem.ReadInt32( "Magnification", 0 );
     mnZoom = maConfigItem.ReadInt32( "Zoom", 100 );
     mnPageLayout = maConfigItem.ReadInt32( "PageLayout", 0 );
@@ -291,6 +289,15 @@ ImpPDFTabSecurityPage* ImpPDFTabDialog::getSecurityPage() const
     return nullptr;
 }
 
+ImpPDFTabOpnFtrPage * ImpPDFTabDialog::getOpenPage() const
+{
+    SfxTabPage* pOpenPage = GetTabPage("initialview");
+    if (pOpenPage)
+    {
+        return static_cast<ImpPDFTabOpnFtrPage*>(pOpenPage);
+    }
+    return nullptr;
+}
 
 ImpPDFTabLinksPage* ImpPDFTabDialog::getLinksPage() const
 {
@@ -328,7 +335,11 @@ IMPL_LINK_NOARG(ImpPDFTabDialog, OkHdl, weld::Button&, void)
             sfx::AccessibilityIssueCollection aCollection = pShell->runAccessibilityCheck();
             if (!aCollection.getIssues().empty())
             {
-                mpAccessibilityCheckDialog = std::make_shared<svx::AccessibilityCheckDialog>(mpParent, aCollection);
+                mpAccessibilityCheckDialog = std::make_shared<svx::AccessibilityCheckDialog>(
+                    m_xDialog.get(), aCollection, [pShell]() -> sfx::AccessibilityIssueCollection {
+                        return pShell->runAccessibilityCheck();
+                    });
+                mpAccessibilityCheckDialog->getDialog()->set_modal(true);
                 weld::DialogController::runAsync(mpAccessibilityCheckDialog, [this](sal_Int32 retValue){
                     m_xDialog->response(retValue);
                 });
@@ -355,6 +366,8 @@ ImpPDFTabDialog::~ImpPDFTabDialog()
     maConfigI18N.WriteModifiedConfig();
     if (mpAccessibilityCheckDialog)
     {
+        // restore set_modal to its original state
+        mpAccessibilityCheckDialog->getDialog()->set_modal(false);
         mpAccessibilityCheckDialog->response(RET_CANCEL);
     }
 }
@@ -422,6 +435,8 @@ Sequence< PropertyValue > ImpPDFTabDialog::GetFilterData()
         maConfigItem.WriteBool( "ExportOnlyNotesPages", mbExportOnlyNotesPages );
     }
     maConfigItem.WriteBool( "ExportNotes", mbExportNotes );
+    if (mbIsWriter)
+        maConfigItem.WriteBool( "ExportNotesInMargin", mbExportNotesInMargin );
     maConfigItem.WriteBool( "ViewPDFAfterExport", mbViewPDF );
 
     maConfigItem.WriteBool( "ExportBookmarks", mbExportBookmarks );
@@ -505,7 +520,6 @@ ImpPDFTabGeneralPage::ImpPDFTabGeneralPage(weld::Container* pPage, weld::DialogC
     , mxRbRange(m_xBuilder->weld_radio_button("range"))
     , mxRbSelection(m_xBuilder->weld_radio_button("selection"))
     , mxEdPages(m_xBuilder->weld_entry("pages"))
-    , mxSelectedSheets(m_xBuilder->weld_label("selectedsheets"))
     , mxRbLosslessCompression(m_xBuilder->weld_radio_button("losslesscompress"))
     , mxRbJPEGCompression(m_xBuilder->weld_radio_button("jpegcompress"))
     , mxQualityFrame(m_xBuilder->weld_widget("qualityframe"))
@@ -524,6 +538,7 @@ ImpPDFTabGeneralPage::ImpPDFTabGeneralPage(weld::Container* pPage, weld::DialogC
     , mxCbExportHiddenSlides(m_xBuilder->weld_check_button("hiddenpages"))
     , mxCbSinglePageSheets(m_xBuilder->weld_check_button("singlepagesheets"))
     , mxCbExportNotes(m_xBuilder->weld_check_button("comments"))
+    , mxCbExportNotesInMargin(m_xBuilder->weld_check_button("commentsinmargin"))
     , mxCbViewPDF(m_xBuilder->weld_check_button("viewpdf"))
     , mxCbUseReferenceXObject(m_xBuilder->weld_check_button("usereferencexobject"))
     , mxCbExportNotesPages(m_xBuilder->weld_check_button("notes"))
@@ -564,6 +579,7 @@ void ImpPDFTabGeneralPage::SetFilterConfigItem(ImpPDFTabDialog* pParent)
     mbIsWriter = pParent->mbIsWriter;
     mbIsSpreadsheet = pParent->mbIsSpreadsheet;
 
+    mxCbExportNotesInMargin->set_sensitive( mbIsWriter );
     mxCbExportEmptyPages->set_sensitive( mbIsWriter );
     mxCbExportPlaceholders->set_sensitive( mbIsWriter );
 
@@ -614,6 +630,7 @@ void ImpPDFTabGeneralPage::SetFilterConfigItem(ImpPDFTabDialog* pParent)
         mxCbTaggedPDF->set_active(pParent->mbUseTaggedPDFUserSelection);
     else
         mbUseTaggedPDFUserSelection = pParent->mbUseTaggedPDFUserSelection;
+    mxCbExportBookmarks->set_active(pParent->mbExportBookmarksUserSelection);
     TogglePDFVersionOrUniversalAccessibilityHandle(*mxCbPDFA);
 
     mxCbExportFormFields->set_active(pParent->mbExportFormFields);
@@ -623,9 +640,9 @@ void ImpPDFTabGeneralPage::SetFilterConfigItem(ImpPDFTabDialog* pParent)
     mxCbAllowDuplicateFieldNames->set_active( pParent->mbAllowDuplicateFieldNames );
     mxFormsFrame->set_sensitive(pParent->mbExportFormFields);
 
-    mxCbExportBookmarks->set_active( pParent->mbExportBookmarks );
 
     mxCbExportNotes->set_active( pParent->mbExportNotes );
+    mxCbExportNotesInMargin->set_active( pParent->mbExportNotesInMargin );
     if (comphelper::LibreOfficeKit::isActive())
     {
         mxCbViewPDF->hide();
@@ -679,10 +696,12 @@ void ImpPDFTabGeneralPage::SetFilterConfigItem(ImpPDFTabDialog* pParent)
     {
         // tdf#54908 Make selection active if there is a selection in Writer's version
         mxRbSelection->set_active( bSelectionPresent );
+        mxCbExportNotesInMargin->set_active(pParent->mbExportNotesInMargin);
     }
     else
     {
         mxCbExportPlaceholders->set_active(false);
+        mxCbExportNotesInMargin->set_active(false);
     }
     mxCbExportEmptyPages->set_active(!pParent->mbIsSkipEmptyPages);
     mxCbExportPlaceholders->set_active(pParent->mbIsExportPlaceholders);
@@ -702,6 +721,8 @@ void ImpPDFTabGeneralPage::GetFilterConfigItem( ImpPDFTabDialog* pParent )
     pParent->mbReduceImageResolution = mxCbReduceImageResolution->get_active();
     pParent->mnMaxImageResolution = mxCoReduceImageResolution->get_active_text().toInt32();
     pParent->mbExportNotes = mxCbExportNotes->get_active();
+    if (mbIsWriter)
+        pParent->mbExportNotesInMargin = mxCbExportNotesInMargin->get_active();
     pParent->mbViewPDF = mxCbViewPDF->get_active();
     pParent->mbUseReferenceXObject = mxCbUseReferenceXObject->get_active();
     if ( mbIsPresentation )
@@ -751,6 +772,11 @@ void ImpPDFTabGeneralPage::GetFilterConfigItem( ImpPDFTabDialog* pParent )
 
     if (!bIsPDFA && !bIsPDFUA)
         mbUseTaggedPDFUserSelection = pParent->mbUseTaggedPDF;
+    if (!bIsPDFUA)
+    {
+        pParent->mbExportBookmarksUserSelection = pParent->mbExportBookmarks;
+        pParent->mbUseReferenceXObjectUserSelection = pParent->mbUseReferenceXObject;
+    }
 
     pParent->mbUseTaggedPDFUserSelection = mbUseTaggedPDFUserSelection;
     pParent->mbExportFormFields = mxCbExportFormFields->get_active();
@@ -873,12 +899,12 @@ IMPL_LINK_NOARG(ImpPDFTabGeneralPage, TogglePDFVersionOrUniversalAccessibilityHa
         mxCbTaggedPDF->set_active(true);
 
         // if a password was set, inform the user that this will not be used
-        if (pSecPage && pSecPage->hasPassword())
+        if (bIsPDFA && pSecPage && pSecPage->hasPassword())
         {
             mxPasswordUnusedWarnDialog =
                 std::shared_ptr<weld::MessageDialog>(Application::CreateMessageDialog(m_xContainer.get(),
                                                       VclMessageType::Warning, VclButtonsType::Ok,
-                                                      PDFFilterResId(STR_WARN_PASSWORD_PDFA)));
+                                                      FilterResId(STR_WARN_PASSWORD_PDFA)));
             mxPasswordUnusedWarnDialog->runAsync(mxPasswordUnusedWarnDialog, [] (sal_uInt32){ });
         }
     }
@@ -886,6 +912,39 @@ IMPL_LINK_NOARG(ImpPDFTabGeneralPage, TogglePDFVersionOrUniversalAccessibilityHa
     {
         // restore the users values of subordinate controls
         mxCbTaggedPDF->set_active(mbUseTaggedPDFUserSelection);
+    }
+
+    if (bIsPDFUA)
+    {
+        if (mxCbExportBookmarks->get_sensitive())
+        {
+            if (mpParent)
+            {
+                mpParent->mbExportBookmarksUserSelection = mxCbExportBookmarks->get_active();
+            }
+            mxCbExportBookmarks->set_active(true);
+        }
+        if (mxCbUseReferenceXObject->get_sensitive())
+        {
+            if (mpParent)
+            {
+                mpParent->mbUseReferenceXObjectUserSelection = mxCbUseReferenceXObject->get_active();
+            }
+            mxCbUseReferenceXObject->set_active(false);
+        }
+    }
+    else if (mpParent)
+    {
+        mxCbExportBookmarks->set_active(mpParent->mbExportBookmarksUserSelection);
+        mxCbUseReferenceXObject->set_active(mpParent->mbUseReferenceXObjectUserSelection);
+    }
+    mxCbExportBookmarks->set_sensitive(!bIsPDFUA);
+    mxCbUseReferenceXObject->set_sensitive(!bIsPDFUA);
+
+    ImpPDFTabOpnFtrPage *const pOpenPage(mpParent ? mpParent->getOpenPage() : nullptr);
+    if (pOpenPage)
+    {
+        pOpenPage->ToggleInitialView(*mpParent);
     }
 
     // PDF/A doesn't allow launch action, so enable/disable the selection on the Link page
@@ -937,6 +996,10 @@ void ImpPDFTabOpnFtrPage::GetFilterConfigItem( ImpPDFTabDialog* pParent  )
         pParent->mnInitialView = 1;
     else if( mxRbOpnThumbs->get_active() )
         pParent->mnInitialView = 2;
+    if (!pParent->mbPDFUACompliance)
+    {
+        pParent->mnInitialViewUserSelection = pParent->mnInitialView;
+    }
 
     pParent->mnMagnification = 0;
     if( mxRbMagnFitWin->get_active() )
@@ -964,7 +1027,7 @@ void ImpPDFTabOpnFtrPage::GetFilterConfigItem( ImpPDFTabDialog* pParent  )
     pParent->mbFirstPageLeft = mbUseCTLFont && mxCbPgLyFirstOnLeft->get_active();
 }
 
-void ImpPDFTabOpnFtrPage::SetFilterConfigItem( const  ImpPDFTabDialog* pParent )
+void ImpPDFTabOpnFtrPage::SetFilterConfigItem(ImpPDFTabDialog *const pParent)
 {
     mbUseCTLFont = pParent->mbUseCTLFont;
     switch( pParent->mnPageLayout )
@@ -1034,6 +1097,52 @@ void ImpPDFTabOpnFtrPage::SetFilterConfigItem( const  ImpPDFTabDialog* pParent )
         mxCbPgLyFirstOnLeft->set_active(pParent->mbFirstPageLeft);
         ToggleRbPgLyContinueFacingHdl();
     }
+
+    // The call from ImpPDFTabGeneralPage::SetFilterConfigItem() did not init
+    // the radio buttons correctly becuse ImpPDFTabOpnFtrPage did not yet exist.
+    ToggleInitialView(*pParent);
+}
+
+void ImpPDFTabOpnFtrPage::ToggleInitialView(ImpPDFTabDialog & rParent)
+{
+    bool const bIsPDFUA(rParent.getGeneralPage()->IsPdfUaSelected());
+    if (bIsPDFUA)
+    {   // only allow Outline for PDF/UA
+        if (mxRbOpnOutline->get_sensitive())
+        {
+            if (mxRbOpnPageOnly->get_active())
+            {
+                rParent.mnInitialViewUserSelection = 0;
+            }
+            else if (mxRbOpnOutline->get_active())
+            {
+                rParent.mnInitialViewUserSelection = 1;
+            }
+            else if (mxRbOpnThumbs->get_active())
+            {
+                rParent.mnInitialViewUserSelection = 2;
+            }
+            mxRbOpnOutline->set_active(true);
+        }
+    }
+    else
+    {
+        switch (rParent.mnInitialViewUserSelection)
+        {
+            case 0:
+                mxRbOpnPageOnly->set_active(true);
+                break;
+            case 1:
+                mxRbOpnOutline->set_active(true);
+                break;
+            case 2:
+                mxRbOpnThumbs->set_active(true);
+                break;
+        }
+    }
+    mxRbOpnPageOnly->set_sensitive(!bIsPDFUA);
+    mxRbOpnThumbs->set_sensitive(!bIsPDFUA);
+    mxRbOpnOutline->set_sensitive(!bIsPDFUA);
 }
 
 IMPL_LINK_NOARG(ImpPDFTabOpnFtrPage, ToggleRbPgLyContinueFacingHdl, weld::Toggleable&, void)
@@ -1129,10 +1238,10 @@ void ImpPDFTabViewerPage::SetFilterConfigItem( const  ImpPDFTabDialog* pParent )
 /// The Security preferences tab page
 ImpPDFTabSecurityPage::ImpPDFTabSecurityPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& i_rCoreSet)
     : SfxTabPage(pPage, pController, "filter/ui/pdfsecuritypage.ui", "PdfSecurityPage", &i_rCoreSet)
-    , msUserPwdTitle( PDFFilterResId( STR_PDF_EXPORT_UDPWD ) )
+    , msUserPwdTitle( FilterResId( STR_PDF_EXPORT_UDPWD ) )
     , mbHaveOwnerPassword( false )
     , mbHaveUserPassword( false )
-    , msOwnerPwdTitle( PDFFilterResId( STR_PDF_EXPORT_ODPWD ) )
+    , msOwnerPwdTitle( FilterResId( STR_PDF_EXPORT_ODPWD ) )
     , mxPbSetPwd(m_xBuilder->weld_button("setpassword"))
     , mxUserPwdSet(m_xBuilder->weld_widget("userpwdset"))
     , mxUserPwdUnset(m_xBuilder->weld_widget("userpwdunset"))
@@ -1161,6 +1270,10 @@ ImpPDFTabSecurityPage::ImpPDFTabSecurityPage(weld::Container* pPage, weld::Dialo
 
 ImpPDFTabSecurityPage::~ImpPDFTabSecurityPage()
 {
+    if (mpPasswordDialog)
+        mpPasswordDialog->response(RET_CANCEL);
+    if (mpUnsupportedMsgDialog)
+        mpUnsupportedMsgDialog->response(RET_CANCEL);
 }
 
 std::unique_ptr<SfxTabPage> ImpPDFTabSecurityPage::Create(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet* rAttrSet)
@@ -1251,51 +1364,70 @@ void ImpPDFTabSecurityPage::SetFilterConfigItem( const  ImpPDFTabDialog* pParent
 
 IMPL_LINK_NOARG(ImpPDFTabSecurityPage, ClickmaPbSetPwdHdl, weld::Button&, void)
 {
-    SfxPasswordDialog aPwdDialog(m_xContainer.get(), &msUserPwdTitle);
-    aPwdDialog.SetMinLen(0);
-    aPwdDialog.ShowMinLengthText(false);
-    aPwdDialog.ShowExtras( SfxShowExtras::CONFIRM | SfxShowExtras::PASSWORD2 | SfxShowExtras::CONFIRM2 );
-    aPwdDialog.set_title(msStrSetPwd);
-    aPwdDialog.SetGroup2Text(msOwnerPwdTitle);
-    aPwdDialog.AllowAsciiOnly();
-    if (aPwdDialog.run() == RET_OK)  // OK issued get password and set it
-    {
-        OUString aUserPW(aPwdDialog.GetPassword());
-        OUString aOwnerPW(aPwdDialog.GetPassword2());
+    if(mpPasswordDialog)
+        mpPasswordDialog->response(RET_CANCEL);
 
-        mbHaveUserPassword = !aUserPW.isEmpty();
-        mbHaveOwnerPassword = !aOwnerPW.isEmpty();
+    mpPasswordDialog = std::make_shared<SfxPasswordDialog>(m_xContainer.get(), &msUserPwdTitle);
 
-        mxPreparedPasswords = vcl::PDFWriter::InitEncryption( aOwnerPW, aUserPW );
-        if (!mxPreparedPasswords.is()) {
-            OUString msg;
-            ErrorHandler::GetErrorString(ERRCODE_IO_NOTSUPPORTED, msg); //TODO: handle failure
-            std::unique_ptr<weld::MessageDialog>(
-                Application::CreateMessageDialog(
-                    GetFrameWeld(), VclMessageType::Error, VclButtonsType::Ok, msg))
-                ->run();
-            return;
-        }
+    mpPasswordDialog->SetMinLen(0);
+    mpPasswordDialog->ShowMinLengthText(false);
+    mpPasswordDialog->ShowExtras( SfxShowExtras::CONFIRM | SfxShowExtras::PASSWORD2 | SfxShowExtras::CONFIRM2 );
+    mpPasswordDialog->set_title(msStrSetPwd);
+    mpPasswordDialog->SetGroup2Text(msOwnerPwdTitle);
+    mpPasswordDialog->AllowAsciiOnly();
 
-        if( mbHaveOwnerPassword )
+    mpPasswordDialog->PreRun();
+
+    weld::DialogController::runAsync(mpPasswordDialog, [this](sal_Int32 response){
+        if (response == RET_OK)
         {
-            maPreparedOwnerPassword = comphelper::OStorageHelper::CreatePackageEncryptionData( aOwnerPW );
+            OUString aUserPW(mpPasswordDialog->GetPassword());
+            OUString aOwnerPW(mpPasswordDialog->GetPassword2());
+
+            mbHaveUserPassword = !aUserPW.isEmpty();
+            mbHaveOwnerPassword = !aOwnerPW.isEmpty();
+
+            mxPreparedPasswords = vcl::PDFWriter::InitEncryption( aOwnerPW, aUserPW );
+            if (!mxPreparedPasswords.is())
+            {
+                OUString msg;
+                ErrorHandler::GetErrorString(ERRCODE_IO_NOTSUPPORTED, msg); //TODO: handle failure
+                mpUnsupportedMsgDialog = std::shared_ptr<weld::MessageDialog>(
+                Application::CreateMessageDialog(
+                    GetFrameWeld(), VclMessageType::Error, VclButtonsType::Ok, msg));
+
+                mpUnsupportedMsgDialog->runAsync(mpUnsupportedMsgDialog, [](sal_Int32){ });
+                return;
+            }
+
+            if( mbHaveOwnerPassword )
+                maPreparedOwnerPassword = comphelper::OStorageHelper::CreatePackageEncryptionData( aOwnerPW );
+            else
+                maPreparedOwnerPassword = Sequence< NamedValue >();
         }
-        else
-            maPreparedOwnerPassword = Sequence< NamedValue >();
-    }
-    enablePermissionControls();
+        if (response != RET_CANCEL)
+            enablePermissionControls();
+        mpPasswordDialog.reset();
+    });
 }
 
 void ImpPDFTabSecurityPage::enablePermissionControls()
 {
     bool bIsPDFASel = false;
+    bool bIsPDFUASel = false;
     ImpPDFTabDialog* pParent = static_cast<ImpPDFTabDialog*>(GetDialogController());
     ImpPDFTabGeneralPage* pGeneralPage = pParent ? pParent->getGeneralPage() : nullptr;
     if (pGeneralPage)
     {
         bIsPDFASel = pGeneralPage->IsPdfaSelected();
+        bIsPDFUASel = pGeneralPage->IsPdfUaSelected();
     }
+    // ISO 14289-1:2014, Clause: 7.16
+    if (bIsPDFUASel)
+    {
+        mxCbEnableAccessibility->set_active(true);
+    }
+    mxCbEnableAccessibility->set_sensitive(!bIsPDFUASel);
     if (bIsPDFASel)
     {
         mxUserPwdPdfa->show();
@@ -1500,19 +1632,19 @@ ImplErrorDialog::ImplErrorDialog(weld::Window* pParent, const std::set<vcl::PDFW
         switch(error)
         {
         case vcl::PDFWriter::Warning_Transparency_Omitted_PDFA:
-            m_xErrors->append(PDFFilterResId(STR_WARN_TRANSP_PDFA), PDFFilterResId(STR_WARN_TRANSP_PDFA_SHORT), "dialog-warning");
+            m_xErrors->append(FilterResId(STR_WARN_TRANSP_PDFA), FilterResId(STR_WARN_TRANSP_PDFA_SHORT), "dialog-warning");
             break;
         case vcl::PDFWriter::Warning_Transparency_Omitted_PDF13:
-            m_xErrors->append(PDFFilterResId(STR_WARN_TRANSP_VERSION), PDFFilterResId(STR_WARN_TRANSP_VERSION_SHORT), "dialog-warning");
+            m_xErrors->append(FilterResId(STR_WARN_TRANSP_VERSION), FilterResId(STR_WARN_TRANSP_VERSION_SHORT), "dialog-warning");
             break;
         case vcl::PDFWriter::Warning_FormAction_Omitted_PDFA:
-            m_xErrors->append(PDFFilterResId(STR_WARN_FORMACTION_PDFA), PDFFilterResId(STR_WARN_FORMACTION_PDFA_SHORT), "dialog-warning");
+            m_xErrors->append(FilterResId(STR_WARN_FORMACTION_PDFA), FilterResId(STR_WARN_FORMACTION_PDFA_SHORT), "dialog-warning");
             break;
         case vcl::PDFWriter::Warning_Transparency_Converted:
-            m_xErrors->append(PDFFilterResId(STR_WARN_TRANSP_CONVERTED), PDFFilterResId(STR_WARN_TRANSP_CONVERTED_SHORT), "dialog-warning");
+            m_xErrors->append(FilterResId(STR_WARN_TRANSP_CONVERTED), FilterResId(STR_WARN_TRANSP_CONVERTED_SHORT), "dialog-warning");
             break;
         case vcl::PDFWriter::Error_Signature_Failed:
-            m_xErrors->append(PDFFilterResId(STR_ERR_PDF_EXPORT_ABORTED), PDFFilterResId(STR_ERR_SIGNATURE_FAILED), "dialog-error");
+            m_xErrors->append(FilterResId(STR_ERR_PDF_EXPORT_ABORTED), FilterResId(STR_ERR_SIGNATURE_FAILED), "dialog-error");
             break;
         default:
             break;

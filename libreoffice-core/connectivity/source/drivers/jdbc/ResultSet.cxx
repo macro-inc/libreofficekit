@@ -514,7 +514,7 @@ css::uno::Any SAL_CALL java_sql_ResultSet::getWarnings(  )
     if( out )
     {
         java_sql_SQLWarning_BASE        warn_base( t.pEnv, out );
-        return makeAny(
+        return Any(
             static_cast< css::sdbc::SQLException >(
                 java_sql_SQLWarning(warn_base,*this)));
     }
@@ -873,25 +873,41 @@ void java_sql_ResultSet::setFetchSize(sal_Int32 _par0)
 
 ::cppu::IPropertyArrayHelper* java_sql_ResultSet::createArrayHelper( ) const
 {
-    Sequence< Property > aProps(5);
-    Property* pProperties = aProps.getArray();
-    sal_Int32 nPos = 0;
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_CURSORNAME),
-        PROPERTY_ID_CURSORNAME, cppu::UnoType<OUString>::get(), PropertyAttribute::READONLY);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHDIRECTION),
-        PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHSIZE),
-        PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETCONCURRENCY),
-        PROPERTY_ID_RESULTSETCONCURRENCY, cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETTYPE),
-        PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY);
-
-    return new ::cppu::OPropertyArrayHelper(aProps);
+    return new ::cppu::OPropertyArrayHelper
+    {
+        {
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_CURSORNAME),
+                PROPERTY_ID_CURSORNAME,
+                cppu::UnoType<OUString>::get(),
+                PropertyAttribute::READONLY
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHDIRECTION),
+                PROPERTY_ID_FETCHDIRECTION,
+                cppu::UnoType<sal_Int32>::get(),
+                0
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHSIZE),
+                PROPERTY_ID_FETCHSIZE,
+                cppu::UnoType<sal_Int32>::get(),
+                0
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETCONCURRENCY),
+                PROPERTY_ID_RESULTSETCONCURRENCY,
+                cppu::UnoType<sal_Int32>::get(),
+                PropertyAttribute::READONLY
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETTYPE),
+                PROPERTY_ID_RESULTSETTYPE,
+                cppu::UnoType<sal_Int32>::get(),
+                PropertyAttribute::READONLY
+            }
+        }
+    };
 }
 
 ::cppu::IPropertyArrayHelper & java_sql_ResultSet::getInfoHelper()

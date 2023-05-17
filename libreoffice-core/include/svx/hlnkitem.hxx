@@ -62,15 +62,15 @@ class SVX_DLLPUBLIC SvxHyperlinkItem final : public SfxPoolItem
 public:
     static SfxPoolItem* CreateDefault();
 
-    SvxHyperlinkItem( sal_uInt16 _nWhich = SID_HYPERLINK_GETLINK ):
+    SvxHyperlinkItem( TypedWhichId<SvxHyperlinkItem> _nWhich = SID_HYPERLINK_GETLINK ):
                 SfxPoolItem(_nWhich) { eType = HLINK_DEFAULT; nMacroEvents=HyperDialogEvent::NONE; };
     SvxHyperlinkItem( const SvxHyperlinkItem& rHyperlinkItem );
-    SvxHyperlinkItem( sal_uInt16 nWhich, const OUString& rName, const OUString& rURL,
-                                    const OUString& rTarget, const OUString& rIntName,
+    SvxHyperlinkItem( TypedWhichId<SvxHyperlinkItem> nWhich, OUString aName, OUString aURL,
+                                    OUString aTarget, OUString aIntName,
                                     SvxLinkInsertMode eTyp,
                                     HyperDialogEvent nEvents,
                                     SvxMacroTableDtor const *pMacroTbl,
-                                    const OUString& rReplacementText = OUString());
+                                    OUString aReplacementText = OUString());
 
     virtual bool             operator==( const SfxPoolItem& ) const override;
     virtual SvxHyperlinkItem* Clone( SfxItemPool *pPool = nullptr ) const override;

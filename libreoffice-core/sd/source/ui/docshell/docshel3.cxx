@@ -38,6 +38,7 @@
 #include <com/sun/star/i18n/TextConversionOption.hpp>
 #include <sfx2/notebookbar/SfxNotebookBar.hxx>
 #include <editeng/editeng.hxx>
+#include <osl/diagnose.h>
 
 #include <sdmod.hxx>
 #include <drawdoc.hxx>
@@ -121,7 +122,7 @@ static void lcl_setLanguage( const SdDrawDocument *pDoc, std::u16string_view rLa
         for( size_t nObj = 0; nObj < nObjCount; ++nObj )
         {
             SdrObject *pObj = pPage->GetObj( nObj );
-            if (pObj->GetObjIdentifier() != OBJ_PAGE)
+            if (pObj->GetObjIdentifier() != SdrObjKind::Page)
                 lcl_setLanguageForObj( pObj, nLang, bLanguageNone );
         }
     }
@@ -244,7 +245,7 @@ void DrawDocShell::Execute( SfxRequest& rReq )
         {
             const SvxColorListItem* pColItem = GetItem( SID_COLOR_TABLE );
             const XColorListRef& pList = pColItem->GetColorList();
-            rReq.SetReturnValue( OfaRefItem<XColorList>( SID_GET_COLORLIST, pList ) );
+            rReq.SetReturnValue( OfaXColorListItem( SID_GET_COLORLIST, pList ) );
         }
         break;
 

@@ -72,9 +72,10 @@ struct AutoFormatSwBlob
 /// Struct with version numbers of the Items
 struct ScAfVersions : public AutoFormatVersions
 {
-public:
+private:
     AutoFormatSwBlob swVersions;
 
+public:
     ScAfVersions();
 
     void Load( SvStream& rStream, sal_uInt16 nVer );
@@ -163,7 +164,7 @@ public:
 
     const ScNumFormatAbbrev&    GetNumFormat( sal_uInt16 nIndex ) const;
 
-    bool                        IsEqualData( sal_uInt16 nIndex1, sal_uInt16 nIndex2 ) const;
+    bool                        HasSameData( sal_uInt16 nIndex1, sal_uInt16 nIndex2 ) const;
 
     void                        FillToItemSet( sal_uInt16 nIndex, SfxItemSet& rItemSet, const ScDocument& rDoc ) const;
     void                        GetFromItemSet( sal_uInt16 nIndex, const SfxItemSet& rItemSet, const ScNumFormatAbbrev& rNumFormat );

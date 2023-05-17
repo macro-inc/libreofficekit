@@ -65,7 +65,7 @@ public:
                   SvxGraphicPosition ePos, sal_uInt16 nWhich );
     SvxBrushItem( const GraphicObject& rGraphicObj,
                   SvxGraphicPosition ePos, sal_uInt16 nWhich );
-    SvxBrushItem( const OUString& rLink, const OUString& rFilter,
+    SvxBrushItem( OUString  rLink, OUString aFilter,
                   SvxGraphicPosition ePos, sal_uInt16 nWhich );
     SvxBrushItem( const SvxBrushItem& );
     SvxBrushItem(SvxBrushItem&&);
@@ -92,7 +92,6 @@ public:
     void            SetColor( const Color& rCol)    { aColor = rCol; }
 
     const Color&    GetFiltColor() const             { return aFilterColor; }
-    Color&          GetFiltColor()                   { return aFilterColor; }
     void            SetFiltColor( const Color& rCol) { aFilterColor = rCol; }
 
     SvxGraphicPosition  GetGraphicPos() const       { return eGraphicPos; }

@@ -113,6 +113,23 @@ public:
     static css::uno::Sequence< css::beans::PropertyValue >
         GenerateNewModifyPasswordInfo( std::u16string_view aPassword );
 
+    /** This helper function converts a grab-bagged password, e.g. the
+        trackChanges password which has no complete inner equivalent to
+        the inner format. The result sequence contains the hash and the
+        algorithm-related info to use e.g. in IsModifyPasswordCorrect().
+
+        @param aInfo
+            The sequence containing the hash and the algorithm-related info
+            according to the OOXML origin, used by grab-bagging.
+
+        @return
+            The sequence containing the hash and the algorithm-related info
+            in the inner format.
+      */
+
+    static css::uno::Sequence< css::beans::PropertyValue > ConvertPasswordInfo(
+        const css::uno::Sequence< css::beans::PropertyValue >& aInfo );
+
     static css::uno::Sequence<css::beans::PropertyValue>
     GenerateNewModifyPasswordInfoOOXML(std::u16string_view aPassword);
 
@@ -145,8 +162,7 @@ public:
             The hash represented by sal_uInt32
       */
 
-    static sal_uInt32 GetWordHashAsUINT32(
-                const OUString& aString );
+    static sal_uInt32 GetWordHashAsUINT32( std::u16string_view aString );
 
 
     /** This helper function generates the hash code based on the algorithm
@@ -223,7 +239,7 @@ public:
      */
     static css::uno::Sequence<sal_Int8> GetOoxHashAsSequence(
             const OUString& rPassword,
-            const OUString& rSaltValue,
+            std::u16string_view rSaltValue,
             sal_uInt32 nSpinCount,
             comphelper::Hash::IterCount eIterCount,
              std::u16string_view rAlgorithmName);
@@ -269,7 +285,7 @@ public:
      */
     static OUString GetOoxHashAsBase64(
             const OUString& rPassword,
-            const OUString& rSaltValue,
+            std::u16string_view rSaltValue,
             sal_uInt32 nSpinCount,
             comphelper::Hash::IterCount eIterCount,
             std::u16string_view rAlgorithmName);
@@ -332,7 +348,7 @@ public:
       */
 
     static css::uno::Sequence< sal_Int8 > GenerateStd97Key(
-                const OUString& aPassword,
+                std::u16string_view aPassword,
                 const css::uno::Sequence< sal_Int8 >& aDocId );
 
 

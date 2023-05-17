@@ -20,6 +20,7 @@
 #include <sal/config.h>
 
 #include <map>
+#include <utility>
 #include <vector>
 
 #include <config_feature_desktop.h>
@@ -168,16 +169,16 @@ void impl_executeSearch( const css::uno::Reference< css::uno::XComponentContext 
                   | TransliterationFlags::IGNORE_KASHIDA_CTL;
 
     auto aArgs( comphelper::InitPropertySequence( {
-        { "SearchItem.SearchString", css::uno::makeAny( sFindText ) },
+        { "SearchItem.SearchString", css::uno::Any( sFindText ) },
         // Related tdf#102506: make Find Bar Ctrl+F searching by value by default
-        { "SearchItem.CellType", css::uno::makeAny( sal_Int16(SvxSearchCellType::VALUE) ) },
-        { "SearchItem.Backward", css::uno::makeAny( aSearchBackwards ) },
-        { "SearchItem.SearchFlags", css::uno::makeAny( sal_Int32(0) ) },
-        { "SearchItem.TransliterateFlags", css::uno::makeAny( static_cast<sal_Int32>(nFlags) ) },
-        { "SearchItem.Command", css::uno::makeAny( static_cast<sal_Int16>(aFindAll ?SvxSearchCmd::FIND_ALL : SvxSearchCmd::FIND ) ) },
-        { "SearchItem.AlgorithmType", css::uno::makeAny( sal_Int16(css::util::SearchAlgorithms_ABSOLUTE) ) },
-        { "SearchItem.AlgorithmType2", css::uno::makeAny( sal_Int16(css::util::SearchAlgorithms2::ABSOLUTE) ) },
-        { "SearchItem.SearchFormatted", css::uno::makeAny( bSearchFormatted ) }
+        { "SearchItem.CellType", css::uno::Any( sal_Int16(SvxSearchCellType::VALUE) ) },
+        { "SearchItem.Backward", css::uno::Any( aSearchBackwards ) },
+        { "SearchItem.SearchFlags", css::uno::Any( sal_Int32(0) ) },
+        { "SearchItem.TransliterateFlags", css::uno::Any( static_cast<sal_Int32>(nFlags) ) },
+        { "SearchItem.Command", css::uno::Any( static_cast<sal_Int16>(aFindAll ?SvxSearchCmd::FIND_ALL : SvxSearchCmd::FIND ) ) },
+        { "SearchItem.AlgorithmType", css::uno::Any( sal_Int16(css::util::SearchAlgorithms_ABSOLUTE) ) },
+        { "SearchItem.AlgorithmType2", css::uno::Any( sal_Int16(css::util::SearchAlgorithms2::ABSOLUTE) ) },
+        { "SearchItem.SearchFormatted", css::uno::Any( bSearchFormatted ) }
     } ) );
 
     css::uno::Reference< css::frame::XDispatchProvider > xDispatchProvider(xFrame, css::uno::UNO_QUERY);
@@ -192,13 +193,13 @@ void impl_executeSearch( const css::uno::Reference< css::uno::XComponentContext 
 }
 
 FindTextFieldControl::FindTextFieldControl( vcl::Window* pParent,
-    css::uno::Reference< css::frame::XFrame > const & xFrame,
-    const css::uno::Reference< css::uno::XComponentContext >& xContext) :
+    css::uno::Reference< css::frame::XFrame > xFrame,
+    css::uno::Reference< css::uno::XComponentContext > xContext) :
     InterimItemWindow(pParent, "svx/ui/findbox.ui", "FindBox"),
     m_nAsyncGetFocusId(nullptr),
     m_xWidget(m_xBuilder->weld_combo_box("find")),
-    m_xFrame(xFrame),
-    m_xContext(xContext),
+    m_xFrame(std::move(xFrame)),
+    m_xContext(std::move(xContext)),
     m_pAcc(svt::AcceleratorExecute::createAcceleratorHelper())
 {
     InitControlBase(m_xWidget.get());
@@ -295,22 +296,29 @@ IMPL_LINK(FindTextFieldControl, KeyInputHdl, const KeyEvent&, rKeyEvent, bool)
             }
         }
     }
-    // Select text in the search box when Ctrl-F pressed
-    else if ( bMod1 && nCode == KEY_F )
-        m_xWidget->select_entry_region(0, -1);
-
-    // Execute the search when Ctrl-G, F3 and Shift-RETURN pressed (in addition to ActivateHdl condition which handles bare RETURN)
-    else if ( (bMod1 && KEY_G == nCode) || (bShift && KEY_RETURN == nCode) || (KEY_F3 == nCode) )
-    {
-        ActivateFind(bShift);
-        bRet = true;
-    }
     else
     {
         auto awtKey = svt::AcceleratorExecute::st_VCLKey2AWTKey(rKeyEvent.GetKeyCode());
         const OUString aCommand(m_pAcc->findCommand(awtKey));
-        if (aCommand == ".uno:SearchDialog")
+
+        // Select text in the search box when Ctrl-F pressed
+        if ( bMod1 && nCode == KEY_F )
+            m_xWidget->select_entry_region(0, -1);
+        // Execute the search when Ctrl-G, F3 and Shift-RETURN pressed (in addition to ActivateHdl condition which handles bare RETURN)
+        else if ( (bMod1 && KEY_G == nCode) || (bShift && KEY_RETURN == nCode) || (KEY_F3 == nCode) )
+        {
+            ActivateFind(bShift);
+            bRet = true;
+        }
+        else if (aCommand == ".uno:SearchDialog")
             bRet = m_pAcc->execute(awtKey);
+
+        // find-shortcut called with focus already in find
+        if (aCommand == "vnd.sun.star.findbar:FocusToFindbar")
+        {
+            m_xWidget->call_attention_to();
+            bRet = true;
+        }
     }
 
     return bRet || ChildKeyInput(rKeyEvent);

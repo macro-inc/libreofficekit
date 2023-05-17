@@ -18,10 +18,10 @@
 #include <com/sun/star/sdbc/XResultSetMetaData.hpp>
 #include <dbdocutl.hxx>
 #include <datamapper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <comphelper/processfactory.hxx>
-#include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace css;
 using namespace ::com::sun::star::beans;

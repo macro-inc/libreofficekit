@@ -9,6 +9,8 @@
 
 $(eval $(call gb_Library_Library,scui))
 
+$(eval $(call gb_Library_set_plugin_for,scui,sc))
+
 $(eval $(call gb_Library_set_include,scui,\
 	-I$(SRCDIR)/sc/source/core/inc \
 	-I$(SRCDIR)/sc/source/filter/inc \
@@ -55,7 +57,6 @@ $(eval $(call gb_Library_use_libraries,scui,\
 	$(call gb_Helper_optional,OPENCL, \
 		opencl) \
 	sal \
-	sc \
 	sfx \
 	sot \
 	svl \
@@ -94,6 +95,7 @@ $(eval $(call gb_Library_add_exception_objects,scui,\
     sc/source/ui/miscdlgs/delcldlg \
     sc/source/ui/miscdlgs/delcodlg \
     sc/source/ui/miscdlgs/filldlg \
+    sc/source/ui/miscdlgs/gototabdlg \
     sc/source/ui/miscdlgs/groupdlg \
     sc/source/ui/miscdlgs/inscldlg \
     sc/source/ui/miscdlgs/inscodlg \

@@ -71,7 +71,7 @@ public:
     SwFlyFrameAttrMgr( bool bNew, SwWrtShell* pSh, Frmmgr_Type nType, const SvGlobalName* pName );
 
     //CopyCtor for dialogs to check the metrics
-    SwFlyFrameAttrMgr( bool bNew, SwWrtShell *pSh, const SfxItemSet &rSet );
+    SwFlyFrameAttrMgr( bool bNew, SwWrtShell *pSh, SfxItemSet aSet );
 
     void                SetAnchor(RndStdIds eId);
     inline RndStdIds    GetAnchor()  const;
@@ -115,7 +115,7 @@ public:
 
     // check and change metrics
     void                ValidateMetrics(SvxSwFrameValidation& rVal,
-                            const SwPosition* pToCharContentPos,
+                            const SwFormatAnchor* pToCharContentPos,
                             bool bOnlyPercentRefValue = false);
 
     void                DelAttr(sal_uInt16 nId);

@@ -38,12 +38,13 @@
 #include <osl/file.hxx>
 #include <osl/process.h>
 
+#include <rtl/character.hxx>
 #include <rtl/string.h>
 #include <rtl/ustring.h>
 #include <sal/log.hxx>
 
 #include <osl/module.h>
-
+#include <comphelper/scopeguard.hxx>
 #include <tools/debug.hxx>
 #include <o3tl/enumarray.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
@@ -93,10 +94,13 @@
 # define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#include <dwmapi.h>
 #include <shobjidl.h>
 #include <propkey.h>
 #include <propvarutil.h>
 #include <shellapi.h>
+#include <uxtheme.h>
+#include <Vssym32.h>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -122,82 +126,61 @@ const unsigned int WM_USER_SYSTEM_WINDOW_ACTIVATED = RegisterWindowMessageW(L"SY
 bool WinSalFrame::mbInReparent = false;
 
 // Macros for support of WM_UNICHAR & Keyman 6.0
-//#define Uni_UTF32ToSurrogate1(ch)   (((unsigned long) (ch) - 0x10000) / 0x400 + 0xD800)
-#define Uni_UTF32ToSurrogate2(ch)   ((static_cast<tools::ULong>(ch) - 0x10000) % 0x400 + 0xDC00)
 #define Uni_SupplementaryPlanesStart    0x10000
 
-static void UpdateFrameGeometry( HWND hWnd, WinSalFrame* pFrame );
+static void UpdateFrameGeometry(WinSalFrame* pFrame);
 static void SetMaximizedFrameGeometry( HWND hWnd, WinSalFrame* pFrame, RECT* pParentRect = nullptr );
 
-static void ImplSaveFrameState( WinSalFrame* pFrame )
+static void SetGeometrySize(vcl::WindowPosSize& rWinPosSize, const Size& rSize)
 {
-    // save position, size and state for GetWindowState()
-    if ( !pFrame->mbFullScreen )
+    rWinPosSize.setWidth(rSize.Width() < 0 ? 0 : rSize.Width());
+    rWinPosSize.setHeight(rSize.Height() < 0 ? 0 : rSize.Height());
+}
+
+// If called with UpdateFrameGeometry, it must be called after it, as UpdateFrameGeometry
+// updates the geometry depending on the old state!
+void WinSalFrame::UpdateFrameState()
+{
+    // don't overwrite restore state in fullscreen mode
+    if (isFullScreen())
+        return;
+
+    const bool bVisible = (GetWindowStyle(mhWnd) & WS_VISIBLE);
+    if (IsIconic(mhWnd))
     {
-        bool bVisible = (GetWindowStyle( pFrame->mhWnd ) & WS_VISIBLE) != 0;
-        if ( IsIconic( pFrame->mhWnd ) )
-        {
-            pFrame->maState.mnState |= WindowStateState::Minimized;
-            if ( bVisible )
-                pFrame->mnShowState = SW_SHOWMAXIMIZED;
-        }
-        else if ( IsZoomed( pFrame->mhWnd ) )
-        {
-            pFrame->maState.mnState &= ~WindowStateState::Minimized;
-            pFrame->maState.mnState |= WindowStateState::Maximized;
-            if ( bVisible )
-                pFrame->mnShowState = SW_SHOWMAXIMIZED;
-            pFrame->mbRestoreMaximize = true;
-
-            WINDOWPLACEMENT aPlacement;
-            aPlacement.length = sizeof(aPlacement);
-            if( GetWindowPlacement( pFrame->mhWnd, &aPlacement ) )
-            {
-                RECT aRect = aPlacement.rcNormalPosition;
-                RECT aRect2 = aRect;
-                AdjustWindowRectEx( &aRect2, GetWindowStyle( pFrame->mhWnd ),
-                                    FALSE,  GetWindowExStyle( pFrame->mhWnd ) );
-                tools::Long nTopDeco = abs( aRect.top - aRect2.top );
-                tools::Long nLeftDeco = abs( aRect.left - aRect2.left );
-                tools::Long nBottomDeco = abs( aRect.bottom - aRect2.bottom );
-                tools::Long nRightDeco = abs( aRect.right - aRect2.right );
-
-                pFrame->maState.mnX      = aRect.left + nLeftDeco;
-                pFrame->maState.mnY      = aRect.top + nTopDeco;
-                pFrame->maState.mnWidth  = aRect.right - aRect.left - nLeftDeco - nRightDeco;
-                pFrame->maState.mnHeight = aRect.bottom - aRect.top - nTopDeco - nBottomDeco;
-            }
-        }
-        else
-        {
-            RECT aRect;
-            GetWindowRect( pFrame->mhWnd, &aRect );
-
-            // to be consistent with Unix, the frame state is without(!) decoration
-            RECT aRect2 = aRect;
-            AdjustWindowRectEx( &aRect2, GetWindowStyle( pFrame->mhWnd ),
-                            FALSE,     GetWindowExStyle( pFrame->mhWnd ) );
-            tools::Long nTopDeco = abs( aRect.top - aRect2.top );
-            tools::Long nLeftDeco = abs( aRect.left - aRect2.left );
-            tools::Long nBottomDeco = abs( aRect.bottom - aRect2.bottom );
-            tools::Long nRightDeco = abs( aRect.right - aRect2.right );
-
-            pFrame->maState.mnState &= ~WindowStateState(WindowStateState::Minimized | WindowStateState::Maximized);
-            // subtract decoration
-            pFrame->maState.mnX      = aRect.left+nLeftDeco;
-            pFrame->maState.mnY      = aRect.top+nTopDeco;
-            pFrame->maState.mnWidth  = aRect.right-aRect.left-nLeftDeco-nRightDeco;
-            pFrame->maState.mnHeight = aRect.bottom-aRect.top-nTopDeco-nBottomDeco;
-            if ( bVisible )
-                pFrame->mnShowState = SW_SHOWNORMAL;
-            pFrame->mbRestoreMaximize = false;
-        }
+        m_eState &= ~vcl::WindowState(vcl::WindowState::Normal | vcl::WindowState::Maximized);
+        m_eState |= vcl::WindowState::Minimized;
+        if (bVisible)
+            mnShowState = SW_SHOWMINIMIZED;
+    }
+    else if (IsZoomed(mhWnd))
+    {
+        m_eState &= ~vcl::WindowState(vcl::WindowState::Minimized | vcl::WindowState::Normal);
+        m_eState |= vcl::WindowState::Maximized;
+        if (bVisible)
+            mnShowState = SW_SHOWMAXIMIZED;
+        mbRestoreMaximize = true;
+    }
+    else
+    {
+        m_eState &= ~vcl::WindowState(vcl::WindowState::Minimized | vcl::WindowState::Maximized);
+        m_eState |= vcl::WindowState::Normal;
+        if (bVisible)
+            mnShowState = SW_SHOWNORMAL;
+        mbRestoreMaximize = false;
     }
 }
 
 // if pParentRect is set, the workarea of the monitor that contains pParentRect is returned
 void ImplSalGetWorkArea( HWND hWnd, RECT *pRect, const RECT *pParentRect )
 {
+    if (Application::IsHeadlessModeEnabled()) {
+        pRect->left = 0;
+        pRect->top = 0;
+        pRect->right = VIRTUAL_DESKTOP_WIDTH;
+        pRect->bottom = VIRTUAL_DESKTOP_HEIGHT;
+        return;
+    }
     // check if we or our parent is fullscreen, then the taskbar should be ignored
     bool bIgnoreTaskbar = false;
     WinSalFrame* pFrame = GetWindowPtr( hWnd );
@@ -276,6 +259,60 @@ void ImplSalGetWorkArea( HWND hWnd, RECT *pRect, const RECT *pParentRect )
             }
         }
     }
+}
+
+namespace {
+
+enum PreferredAppMode
+{
+    AllowDark = 1,
+    ForceDark = 2,
+    ForceLight = 3
+};
+
+}
+
+static void UpdateDarkMode(HWND hWnd)
+{
+    static bool bOSSupportsDarkMode = OSSupportsDarkMode();
+    if (!bOSSupportsDarkMode)
+        return;
+
+    HINSTANCE hUxthemeLib = LoadLibraryExW(L"uxtheme.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    if (!hUxthemeLib)
+        return;
+
+    typedef PreferredAppMode(WINAPI* SetPreferredAppMode_t)(PreferredAppMode);
+    auto SetPreferredAppMode = reinterpret_cast<SetPreferredAppMode_t>(GetProcAddress(hUxthemeLib, MAKEINTRESOURCEA(135)));
+    if (SetPreferredAppMode)
+    {
+        switch (MiscSettings::GetDarkMode())
+        {
+            case 0:
+                SetPreferredAppMode(AllowDark);
+                break;
+            case 1:
+                SetPreferredAppMode(ForceLight);
+                break;
+            case 2:
+                SetPreferredAppMode(ForceDark);
+                break;
+        }
+    }
+
+    BOOL bDarkMode = UseDarkMode();
+
+    typedef void(WINAPI* AllowDarkModeForWindow_t)(HWND, BOOL);
+    auto AllowDarkModeForWindow = reinterpret_cast<AllowDarkModeForWindow_t>(GetProcAddress(hUxthemeLib, MAKEINTRESOURCEA(133)));
+    if (AllowDarkModeForWindow)
+        AllowDarkModeForWindow(hWnd, bDarkMode);
+
+    FreeLibrary(hUxthemeLib);
+
+    if (!AllowDarkModeForWindow)
+        return;
+
+    DwmSetWindowAttribute(hWnd, 20, &bDarkMode, sizeof(bDarkMode));
 }
 
 SalFrame* ImplSalCreateFrame( WinSalInstance* pInst,
@@ -481,12 +518,10 @@ SalFrame* ImplSalCreateFrame( WinSalInstance* pInst,
     // determine output size and state
     RECT aRect;
     GetClientRect( hWnd, &aRect );
-    pFrame->mnWidth  = aRect.right;
-    pFrame->mnHeight = aRect.bottom;
-    ImplSaveFrameState( pFrame );
     pFrame->mbDefPos = true;
 
-    UpdateFrameGeometry( hWnd, pFrame );
+    UpdateFrameGeometry(pFrame);
+    pFrame->UpdateFrameState();
 
     if( pFrame->mnShowState == SW_SHOWMAXIMIZED )
     {
@@ -758,27 +793,21 @@ static void ImplSalCalcFullScreenSize( const WinSalFrame* pFrame,
 
     try
     {
+        tools::Rectangle aRect;
         sal_Int32 nMonitors = Application::GetScreenCount();
         if( (pFrame->mnDisplay >= 0) && (pFrame->mnDisplay < nMonitors) )
         {
-            tools::Rectangle aRect = Application::GetScreenPosSizePixel( pFrame->mnDisplay );
-            nScreenX = aRect.Left();
-            nScreenY = aRect.Top();
-            nScreenDX = aRect.GetWidth();
-            nScreenDY = aRect.GetHeight();
+            aRect = Application::GetScreenPosSizePixel(pFrame->mnDisplay);
         }
         else
         {
-            tools::Rectangle aCombined = Application::GetScreenPosSizePixel( 0 );
-            for( sal_Int32 i = 1 ; i < nMonitors ; i++ )
-            {
-                aCombined.Union( Application::GetScreenPosSizePixel( i ) );
-            }
-            nScreenX  = aCombined.Left();
-            nScreenY  = aCombined.Top();
-            nScreenDX = aCombined.GetWidth();
-            nScreenDY = aCombined.GetHeight();
+            for (sal_Int32 i = 0; i < nMonitors; i++)
+                aRect.Union(Application::GetScreenPosSizePixel(i));
         }
+        nScreenX = aRect.Left();
+        nScreenY = aRect.Top();
+        nScreenDX = aRect.GetWidth();
+        nScreenDY = aRect.GetHeight();
     }
     catch( Exception& )
     {
@@ -831,9 +860,8 @@ WinSalFrame::WinSalFrame()
     mhDefIMEContext     = nullptr;
     mpLocalGraphics     = nullptr;
     mpThreadGraphics    = nullptr;
+    m_eState = vcl::WindowState::Normal;
     mnShowState         = SW_SHOWNORMAL;
-    mnWidth             = 0;
-    mnHeight            = 0;
     mnMinWidth          = 0;
     mnMinHeight         = 0;
     mnMaxWidth          = SHRT_MAX;
@@ -846,7 +874,6 @@ WinSalFrame::WinSalFrame()
     mbFixBorder         = false;
     mbSizeBorder        = false;
     mbFullScreenCaption = false;
-    mbFullScreen        = false;
     mbPresentation      = false;
     mbInShow            = false;
     mbRestoreMaximize   = false;
@@ -893,14 +920,14 @@ void WinSalFrame::updateScreenNumber()
     {
         const std::vector<WinSalSystem::DisplayMonitor>& rMonitors =
             pSys->getMonitors();
-        Point aPoint( maGeometry.nX, maGeometry.nY );
+        Point aPoint(maGeometry.pos());
         size_t nMon = rMonitors.size();
         for( size_t i = 0; i < nMon; i++ )
         {
             if( rMonitors[i].m_aArea.Contains( aPoint ) )
             {
                 mnDisplay = static_cast<sal_Int32>(i);
-                maGeometry.nDisplayScreenNumber = static_cast<unsigned int>(i);
+                maGeometry.setScreen(static_cast<unsigned int>(i));
             }
         }
     }
@@ -1048,8 +1075,10 @@ void WinSalFrame::ReleaseGraphics( SalGraphics* pGraphics )
 
 bool WinSalFrame::PostEvent(std::unique_ptr<ImplSVEvent> pData)
 {
-    bool const ret = PostMessageW(mhWnd, SAL_MSG_USEREVENT, 0, reinterpret_cast<LPARAM>(pData.release()));
+    bool const ret = PostMessageW(mhWnd, SAL_MSG_USEREVENT, 0, reinterpret_cast<LPARAM>(pData.get()));
     SAL_WARN_IF(!ret, "vcl", "ERROR: PostMessage() failed!");
+    if (ret)
+        pData.release();
     return ret;
 }
 
@@ -1085,11 +1114,6 @@ void WinSalFrame::SetMenu( SalMenu* pSalMenu )
     WinSalMenu* pWMenu = static_cast<WinSalMenu*>(pSalMenu);
     if( pSalMenu && pWMenu->mbMenuBar )
         ::SetMenu( mhWnd, pWMenu->mhMenu );
-}
-
-void WinSalFrame::DrawMenuBar()
-{
-    ::DrawMenuBar( mhWnd );
 }
 
 static HWND ImplGetParentHwnd( HWND hWnd )
@@ -1272,10 +1296,22 @@ void WinSalFrame::SetPosSize( tools::Long nX, tools::Long nY, tools::Long nWidth
     nWidth  = aWinRect.right - aWinRect.left + 1;
     nHeight = aWinRect.bottom - aWinRect.top + 1;
 
-    if ( !(nPosSize & SWP_NOMOVE) && ::GetParent( mhWnd ) )
+    HWND hWndParent = ImplGetParentHwnd(mhWnd);
+    // For dialogs (WS_POPUP && WS_DLGFRAME), we need to find the "real" parent,
+    // in case multiple dialogs are stacked on each other
+    // (we don't want to position the second dialog relative to the first one, but relative to the main window)
+    if ( (GetWindowStyle( mhWnd ) & WS_POPUP) &&  (GetWindowStyle( mhWnd ) & WS_DLGFRAME) ) // mhWnd is a dialog
+    {
+        while ( hWndParent && (GetWindowStyle( hWndParent ) & WS_POPUP) &&  (GetWindowStyle( hWndParent ) & WS_DLGFRAME) )
+        {
+            hWndParent = ::ImplGetParentHwnd( hWndParent );
+        }
+    }
+
+    if ( !(nPosSize & SWP_NOMOVE) && hWndParent )
     {
             RECT aParentRect;
-            GetClientRect( ImplGetParentHwnd( mhWnd ), &aParentRect );
+            GetClientRect( hWndParent, &aParentRect );
             if( AllSettings::GetLayoutRTL() )
                 nX = (aParentRect.right - aParentRect.left) - nWidth-1 - nX;
 
@@ -1286,18 +1322,17 @@ void WinSalFrame::SetPosSize( tools::Long nX, tools::Long nY, tools::Long nWidth
                 aPt.x = nX;
                 aPt.y = nY;
 
-                HWND parentHwnd = ImplGetParentHwnd( mhWnd );
-                WinSalFrame* pParentFrame = GetWindowPtr( parentHwnd );
+                WinSalFrame* pParentFrame = GetWindowPtr( hWndParent );
                 if ( pParentFrame && pParentFrame->mnShowState == SW_SHOWMAXIMIZED )
                 {
                     // #i42485#: parent will be shown maximized in which case
                     // a ClientToScreen uses the wrong coordinates (i.e. those from the restore pos)
                     // so use the (already updated) frame geometry for the transformation
-                    aPt.x +=  pParentFrame->maGeometry.nX;
-                    aPt.y +=  pParentFrame->maGeometry.nY;
+                    aPt.x +=  pParentFrame->maGeometry.x();
+                    aPt.y +=  pParentFrame->maGeometry.y();
                 }
                 else
-                    ClientToScreen( parentHwnd, &aPt );
+                    ClientToScreen( hWndParent, &aPt );
 
                 nX = aPt.x;
                 nY = aPt.y;
@@ -1330,17 +1365,17 @@ void WinSalFrame::SetPosSize( tools::Long nX, tools::Long nY, tools::Long nWidth
     {
         // center window
 
-        HWND hWndParent = ::GetParent( mhWnd );
+        HWND hWndParent2 = ::GetParent( mhWnd );
         // Search for TopLevel Frame
-        while ( hWndParent && (GetWindowStyle( hWndParent ) & WS_CHILD) )
-            hWndParent = ::GetParent( hWndParent );
+        while ( hWndParent2 && (GetWindowStyle( hWndParent2 ) & WS_CHILD) )
+            hWndParent2 = ::GetParent( hWndParent2 );
         // if the Window has a Parent, then center the window to
         // the parent, in the other case to the screen
-        if ( hWndParent && !IsIconic( hWndParent ) &&
-             (GetWindowStyle( hWndParent ) & WS_VISIBLE) )
+        if ( hWndParent2 && !IsIconic( hWndParent2 ) &&
+             (GetWindowStyle( hWndParent2 ) & WS_VISIBLE) )
         {
             RECT aParentRect;
-            GetWindowRect( hWndParent, &aParentRect );
+            GetWindowRect( hWndParent2, &aParentRect );
             int nParentWidth    = aParentRect.right-aParentRect.left;
             int nParentHeight   = aParentRect.bottom-aParentRect.top;
 
@@ -1419,7 +1454,7 @@ void WinSalFrame::SetPosSize( tools::Long nX, tools::Long nY, tools::Long nWidth
 
     SetWindowPos( mhWnd, HWND_TOP, nX, nY, static_cast<int>(nWidth), static_cast<int>(nHeight), nPosFlags  );
 
-    UpdateFrameGeometry( mhWnd, this );
+    UpdateFrameGeometry(this);
 
     // Notification -- really ???
     if( nEvent != SalEvent::NONE )
@@ -1569,11 +1604,11 @@ void WinSalFrame::GetWorkArea( tools::Rectangle &rRect )
 
 void WinSalFrame::GetClientSize( tools::Long& rWidth, tools::Long& rHeight )
 {
-    rWidth  = maGeometry.nWidth;
-    rHeight = maGeometry.nHeight;
+    rWidth  = maGeometry.width();
+    rHeight = maGeometry.height();
 }
 
-void WinSalFrame::SetWindowState( const SalFrameState* pState )
+void WinSalFrame::SetWindowState(const vcl::WindowData* pState)
 {
     // Check if the window fits into the screen, in case the screen
     // resolution changed
@@ -1609,24 +1644,24 @@ void WinSalFrame::SetWindowState( const SalFrameState* pState )
     tools::Long nRightDeco = abs( aWinRect.right - aRect2.right );
 
     // adjust window position/size to fit the screen
-    if ( !(pState->mnMask & (WindowStateMask::X | WindowStateMask::Y)) )
+    if ( !(pState->mask() & vcl::WindowDataMask::Pos) )
         nPosSize |= SWP_NOMOVE;
-    if ( !(pState->mnMask & (WindowStateMask::Width | WindowStateMask::Height)) )
+    if ( !(pState->mask() & vcl::WindowDataMask::Size) )
         nPosSize |= SWP_NOSIZE;
-    if ( pState->mnMask & WindowStateMask::X )
-        nX = static_cast<int>(pState->mnX) - nLeftDeco;
+    if ( pState->mask() & vcl::WindowDataMask::X )
+        nX = static_cast<int>(pState->x()) - nLeftDeco;
     else
         nX = aWinRect.left;
-    if ( pState->mnMask & WindowStateMask::Y )
-        nY = static_cast<int>(pState->mnY) - nTopDeco;
+    if ( pState->mask() & vcl::WindowDataMask::Y )
+        nY = static_cast<int>(pState->y()) - nTopDeco;
     else
         nY = aWinRect.top;
-    if ( pState->mnMask & WindowStateMask::Width )
-        nWidth = static_cast<int>(pState->mnWidth) + nLeftDeco + nRightDeco;
+    if ( pState->mask() & vcl::WindowDataMask::Width )
+        nWidth = static_cast<int>(pState->width()) + nLeftDeco + nRightDeco;
     else
         nWidth = aWinRect.right-aWinRect.left;
-    if ( pState->mnMask & WindowStateMask::Height )
-        nHeight = static_cast<int>(pState->mnHeight) + nTopDeco + nBottomDeco;
+    if ( pState->mask() & vcl::WindowDataMask::Height )
+        nHeight = static_cast<int>(pState->height()) + nTopDeco + nBottomDeco;
     else
         nHeight = aWinRect.bottom-aWinRect.top;
 
@@ -1652,41 +1687,40 @@ void WinSalFrame::SetWindowState( const SalFrameState* pState )
     GetWindowPlacement( mhWnd, &aPlacement );
 
     // set State
-    bool bVisible = (GetWindowStyle( mhWnd ) & WS_VISIBLE) != 0;
+    const bool bIsMinimized = IsIconic(mhWnd);
+    const bool bIsMaximized = IsZoomed(mhWnd);
+    const bool bVisible = (GetWindowStyle(mhWnd) & WS_VISIBLE);
     bool bUpdateHiddenFramePos = false;
     if ( !bVisible )
     {
         aPlacement.showCmd = SW_HIDE;
 
-        if ( mbOverwriteState )
+        if (mbOverwriteState && (pState->mask() & vcl::WindowDataMask::State))
         {
-            if ( pState->mnMask & WindowStateMask::State )
+            if (pState->state() & vcl::WindowState::Minimized)
+                mnShowState = SW_SHOWMINIMIZED;
+            else if (pState->state() & vcl::WindowState::Maximized)
             {
-                if ( pState->mnState & WindowStateState::Minimized )
-                    mnShowState = SW_SHOWMINIMIZED;
-                else if ( pState->mnState & WindowStateState::Maximized )
-                {
-                    mnShowState = SW_SHOWMAXIMIZED;
-                    bUpdateHiddenFramePos = true;
-                }
-                else if ( pState->mnState & WindowStateState::Normal )
-                    mnShowState = SW_SHOWNORMAL;
+                mnShowState = SW_SHOWMAXIMIZED;
+                bUpdateHiddenFramePos = true;
             }
+            else if (pState->state() & vcl::WindowState::Normal)
+                mnShowState = SW_SHOWNORMAL;
         }
     }
     else
     {
-        if ( pState->mnMask & WindowStateMask::State )
+        if ( pState->mask() & vcl::WindowDataMask::State )
         {
-            if ( pState->mnState & WindowStateState::Minimized )
+            if ( pState->state() & vcl::WindowState::Minimized )
             {
-                if ( pState->mnState & WindowStateState::Maximized )
+                if ( pState->state() & vcl::WindowState::Maximized )
                     aPlacement.flags |= WPF_RESTORETOMAXIMIZED;
                 aPlacement.showCmd = SW_SHOWMINIMIZED;
             }
-            else if ( pState->mnState & WindowStateState::Maximized )
+            else if ( pState->state() & vcl::WindowState::Maximized )
                 aPlacement.showCmd = SW_SHOWMAXIMIZED;
-            else if ( pState->mnState & WindowStateState::Normal )
+            else if ( pState->state() & vcl::WindowState::Normal )
                 aPlacement.showCmd = SW_RESTORE;
         }
     }
@@ -1694,8 +1728,7 @@ void WinSalFrame::SetWindowState( const SalFrameState* pState )
     // if a window is neither minimized nor maximized or need not be
     // positioned visibly (that is in visible state), do not use
     // SetWindowPlacement since it calculates including the TaskBar
-    if ( !IsIconic( mhWnd ) && !IsZoomed( mhWnd ) &&
-         (!bVisible || (aPlacement.showCmd == SW_RESTORE)) )
+    if (!bIsMinimized && !bIsMaximized && (!bVisible || (aPlacement.showCmd == SW_RESTORE)))
     {
         if( bUpdateHiddenFramePos )
         {
@@ -1708,7 +1741,7 @@ void WinSalFrame::SetWindowState( const SalFrameState* pState )
             // the window will not be maximized (and the size updated) before show()
             SetMaximizedFrameGeometry( mhWnd, this, &aStateRect );
             SetWindowPos( mhWnd, nullptr,
-                          maGeometry.nX, maGeometry.nY, maGeometry.nWidth, maGeometry.nHeight,
+                          maGeometry.x(), maGeometry.y(), maGeometry.width(), maGeometry.height(),
                           SWP_NOZORDER | SWP_NOACTIVATE | nPosSize );
         }
         else
@@ -1732,20 +1765,12 @@ void WinSalFrame::SetWindowState( const SalFrameState* pState )
         mbDefPos = false; // window was positioned
 }
 
-bool WinSalFrame::GetWindowState( SalFrameState* pState )
+bool WinSalFrame::GetWindowState(vcl::WindowData* pState)
 {
-    if ( maState.mnWidth && maState.mnHeight )
-    {
-        *pState = maState;
-        // #94144# allow Minimize again, should be masked out when read from configuration
-        // 91625 - Don't save minimize
-        //if ( !(pState->mnState & WindowStateState::Maximized) )
-        if ( !(pState->mnState & (WindowStateState::Minimized | WindowStateState::Maximized)) )
-            pState->mnState |= WindowStateState::Normal;
-        return true;
-    }
-
-    return false;
+    pState->setPosSize(maGeometry.posSize());
+    pState->setState(m_eState);
+    pState->setMask(vcl::WindowDataMask::PosSizeState);
+    return true;
 }
 
 void WinSalFrame::SetScreenNumber( unsigned int nNewScreen )
@@ -1759,7 +1784,7 @@ void WinSalFrame::SetScreenNumber( unsigned int nNewScreen )
         if( nNewScreen < nMon )
         {
             Point aOldMonPos, aNewMonPos( rMonitors[nNewScreen].m_aArea.TopLeft() );
-            Point aCurPos( maGeometry.nX, maGeometry.nY );
+            Point aCurPos(maGeometry.pos());
             for( size_t i = 0; i < nMon; i++ )
             {
                 if( rMonitors[i].m_aArea.Contains( aCurPos ) )
@@ -1769,9 +1794,9 @@ void WinSalFrame::SetScreenNumber( unsigned int nNewScreen )
                 }
             }
             mnDisplay = nNewScreen;
-            maGeometry.nDisplayScreenNumber = nNewScreen;
-            SetPosSize( aNewMonPos.X() + (maGeometry.nX - aOldMonPos.X()),
-                        aNewMonPos.Y() + (maGeometry.nY - aOldMonPos.Y()),
+            maGeometry.setScreen(nNewScreen);
+            SetPosSize( aNewMonPos.X() + (maGeometry.x() - aOldMonPos.X()),
+                        aNewMonPos.Y() + (maGeometry.y() - aOldMonPos.Y()),
                         0, 0,
                         SAL_FRAME_POSSIZE_X | SAL_FRAME_POSSIZE_Y );
         }
@@ -1806,16 +1831,16 @@ void WinSalFrame::SetApplicationID( const OUString &rApplicationID )
     }
 }
 
-void WinSalFrame::ShowFullScreen( bool bFullScreen, sal_Int32 nDisplay )
+void WinSalFrame::ShowFullScreen(const bool bFullScreen, const sal_Int32 nDisplay)
 {
-    if ( (mbFullScreen == bFullScreen) && (!bFullScreen || (mnDisplay == nDisplay)) )
+    if ((isFullScreen() == bFullScreen) && (!bFullScreen || (mnDisplay == nDisplay)))
         return;
 
-    mbFullScreen = bFullScreen;
     mnDisplay = nDisplay;
 
     if ( bFullScreen )
     {
+        m_eState |= vcl::WindowState::FullScreen;
         // to hide the Windows taskbar
         DWORD nExStyle = GetWindowExStyle( mhWnd );
         if ( nExStyle & WS_EX_TOOLWINDOW )
@@ -1846,6 +1871,7 @@ void WinSalFrame::ShowFullScreen( bool bFullScreen, sal_Int32 nDisplay )
     }
     else
     {
+        m_eState &= ~vcl::WindowState::FullScreen;
         // when the ShowState has to be reset, hide the window first to
         // reduce flicker
         bool bVisible = (GetWindowStyle( mhWnd ) & WS_VISIBLE) != 0;
@@ -1893,20 +1919,15 @@ void WinSalFrame::StartPresentation( bool bStart )
 
     mbPresentation = bStart;
 
-    SalData* pSalData = GetSalData();
     if ( bStart )
     {
-        // turn off screen-saver when in Presentation mode
-        SystemParametersInfoW( SPI_GETSCREENSAVEACTIVE, 0,
-                              &(pSalData->mbScrSvrEnabled), 0 );
-        if ( pSalData->mbScrSvrEnabled )
-            SystemParametersInfoW( SPI_SETSCREENSAVEACTIVE, FALSE, nullptr, 0 );
+        // turn off screen-saver / power saving when in Presentation mode
+        SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
     }
     else
     {
-        // turn on screen-saver
-        if ( pSalData->mbScrSvrEnabled )
-            SystemParametersInfoW( SPI_SETSCREENSAVEACTIVE, pSalData->mbScrSvrEnabled, nullptr, 0 );
+        // turn on screen-saver / power saving back
+        SetThreadExecutionState(ES_CONTINUOUS);
     }
 }
 
@@ -2039,103 +2060,104 @@ void WinSalFrame::SetPointer( PointerStyle ePointerStyle )
 
     static o3tl::enumarray<PointerStyle, ImplPtrData> aImplPtrTab =
     {
+    // [-loplugin:redundantfcast]:
     ImplPtrData{ nullptr, IDC_ARROW, 0 },                       // POINTER_ARROW
-    { nullptr, nullptr, SAL_RESID_POINTER_NULL },               // POINTER_NULL
-    { nullptr, IDC_WAIT, 0 },                                   // POINTER_WAIT
-    { nullptr, IDC_IBEAM, 0 },                                  // POINTER_TEXT
-    { nullptr, IDC_HELP, 0 },                                   // POINTER_HELP
-    { nullptr, IDC_CROSS, 0 },                                  // POINTER_CROSS
-    { nullptr, IDC_SIZEALL, 0 },                                // POINTER_MOVE
-    { nullptr, IDC_SIZENS, 0 },                                 // POINTER_NSIZE
-    { nullptr, IDC_SIZENS, 0 },                                 // POINTER_SSIZE
-    { nullptr, IDC_SIZEWE, 0 },                                 // POINTER_WSIZE
-    { nullptr, IDC_SIZEWE, 0 },                                 // POINTER_ESIZE
-    { nullptr, IDC_SIZENWSE, 0 },                               // POINTER_NWSIZE
-    { nullptr, IDC_SIZENESW, 0 },                               // POINTER_NESIZE
-    { nullptr, IDC_SIZENESW, 0 },                               // POINTER_SWSIZE
-    { nullptr, IDC_SIZENWSE, 0 },                               // POINTER_SESIZE
-    { nullptr, IDC_SIZENS, 0 },                                 // POINTER_WINDOW_NSIZE
-    { nullptr, IDC_SIZENS, 0 },                                 // POINTER_WINDOW_SSIZE
-    { nullptr, IDC_SIZEWE, 0 },                                 // POINTER_WINDOW_WSIZE
-    { nullptr, IDC_SIZEWE, 0 },                                 // POINTER_WINDOW_ESIZE
-    { nullptr, IDC_SIZENWSE, 0 },                               // POINTER_WINDOW_NWSIZE
-    { nullptr, IDC_SIZENESW, 0 },                               // POINTER_WINDOW_NESIZE
-    { nullptr, IDC_SIZENESW, 0 },                               // POINTER_WINDOW_SWSIZE
-    { nullptr, IDC_SIZENWSE, 0 },                               // POINTER_WINDOW_SESIZE
-    { nullptr, IDC_SIZEWE, 0 },                                 // POINTER_HSPLIT
-    { nullptr, IDC_SIZENS, 0 },                                 // POINTER_VSPLIT
-    { nullptr, IDC_SIZEWE, 0 },                                 // POINTER_HSIZEBAR
-    { nullptr, IDC_SIZENS, 0 },                                 // POINTER_VSIZEBAR
-    { nullptr, IDC_HAND, 0 },                                   // POINTER_HAND
-    { nullptr, IDC_HAND, 0 },                                   // POINTER_REFHAND
-    { nullptr, IDC_PEN, 0 },                                    // POINTER_PEN
-    { nullptr, nullptr, SAL_RESID_POINTER_MAGNIFY },            // POINTER_MAGNIFY
-    { nullptr, nullptr, SAL_RESID_POINTER_FILL },               // POINTER_FILL
-    { nullptr, nullptr, SAL_RESID_POINTER_ROTATE },             // POINTER_ROTATE
-    { nullptr, nullptr, SAL_RESID_POINTER_HSHEAR },             // POINTER_HSHEAR
-    { nullptr, nullptr, SAL_RESID_POINTER_VSHEAR },             // POINTER_VSHEAR
-    { nullptr, nullptr, SAL_RESID_POINTER_MIRROR },             // POINTER_MIRROR
-    { nullptr, nullptr, SAL_RESID_POINTER_CROOK },              // POINTER_CROOK
-    { nullptr, nullptr, SAL_RESID_POINTER_CROP },               // POINTER_CROP
-    { nullptr, nullptr, SAL_RESID_POINTER_MOVEPOINT },          // POINTER_MOVEPOINT
-    { nullptr, nullptr, SAL_RESID_POINTER_MOVEBEZIERWEIGHT },   // POINTER_MOVEBEZIERWEIGHT
-    { nullptr, nullptr, SAL_RESID_POINTER_MOVEDATA },           // POINTER_MOVEDATA
-    { nullptr, nullptr, SAL_RESID_POINTER_COPYDATA },           // POINTER_COPYDATA
-    { nullptr, nullptr, SAL_RESID_POINTER_LINKDATA },           // POINTER_LINKDATA
-    { nullptr, nullptr, SAL_RESID_POINTER_MOVEDATALINK },       // POINTER_MOVEDATALINK
-    { nullptr, nullptr, SAL_RESID_POINTER_COPYDATALINK },       // POINTER_COPYDATALINK
-    { nullptr, nullptr, SAL_RESID_POINTER_MOVEFILE },           // POINTER_MOVEFILE
-    { nullptr, nullptr, SAL_RESID_POINTER_COPYFILE },           // POINTER_COPYFILE
-    { nullptr, nullptr, SAL_RESID_POINTER_LINKFILE },           // POINTER_LINKFILE
-    { nullptr, nullptr, SAL_RESID_POINTER_MOVEFILELINK },       // POINTER_MOVEFILELINK
-    { nullptr, nullptr, SAL_RESID_POINTER_COPYFILELINK },       // POINTER_COPYFILELINK
-    { nullptr, nullptr, SAL_RESID_POINTER_MOVEFILES },          // POINTER_MOVEFILES
-    { nullptr, nullptr, SAL_RESID_POINTER_COPYFILES },          // POINTER_COPYFILES
-    { nullptr, IDC_NO, 0 },                                     // POINTER_NOTALLOWED
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_LINE },          // POINTER_DRAW_LINE
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_RECT },          // POINTER_DRAW_RECT
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_POLYGON },       // POINTER_DRAW_POLYGON
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_BEZIER },        // POINTER_DRAW_BEZIER
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_ARC },           // POINTER_DRAW_ARC
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_PIE },           // POINTER_DRAW_PIE
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_CIRCLECUT },     // POINTER_DRAW_CIRCLECUT
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_ELLIPSE },       // POINTER_DRAW_ELLIPSE
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_FREEHAND },      // POINTER_DRAW_FREEHAND
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_CONNECT },       // POINTER_DRAW_CONNECT
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_TEXT },          // POINTER_DRAW_TEXT
-    { nullptr, nullptr, SAL_RESID_POINTER_DRAW_CAPTION },       // POINTER_DRAW_CAPTION
-    { nullptr, nullptr, SAL_RESID_POINTER_CHART },              // POINTER_CHART
-    { nullptr, nullptr, SAL_RESID_POINTER_DETECTIVE },          // POINTER_DETECTIVE
-    { nullptr, nullptr, SAL_RESID_POINTER_PIVOT_COL },          // POINTER_PIVOT_COL
-    { nullptr, nullptr, SAL_RESID_POINTER_PIVOT_ROW },          // POINTER_PIVOT_ROW
-    { nullptr, nullptr, SAL_RESID_POINTER_PIVOT_FIELD },        // POINTER_PIVOT_FIELD
-    { nullptr, nullptr, SAL_RESID_POINTER_CHAIN },              // POINTER_CHAIN
-    { nullptr, nullptr, SAL_RESID_POINTER_CHAIN_NOTALLOWED },   // POINTER_CHAIN_NOTALLOWED
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_N },       // POINTER_AUTOSCROLL_N
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_S },       // POINTER_AUTOSCROLL_S
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_W },       // POINTER_AUTOSCROLL_W
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_E },       // POINTER_AUTOSCROLL_E
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NW },      // POINTER_AUTOSCROLL_NW
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NE },      // POINTER_AUTOSCROLL_NE
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_SW },      // POINTER_AUTOSCROLL_SW
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_SE },      // POINTER_AUTOSCROLL_SE
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NS },      // POINTER_AUTOSCROLL_NS
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_WE },      // POINTER_AUTOSCROLL_WE
-    { nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NSWE },    // POINTER_AUTOSCROLL_NSWE
-    { nullptr, nullptr, SAL_RESID_POINTER_TEXT_VERTICAL },      // POINTER_TEXT_VERTICAL
-    { nullptr, nullptr, SAL_RESID_POINTER_PIVOT_DELETE },       // POINTER_PIVOT_DELETE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_NULL },    // POINTER_NULL
+    ImplPtrData{ nullptr, IDC_WAIT, 0 },                        // POINTER_WAIT
+    ImplPtrData{ nullptr, IDC_IBEAM, 0 },                       // POINTER_TEXT
+    ImplPtrData{ nullptr, IDC_HELP, 0 },                        // POINTER_HELP
+    ImplPtrData{ nullptr, IDC_CROSS, 0 },                       // POINTER_CROSS
+    ImplPtrData{ nullptr, IDC_SIZEALL, 0 },                     // POINTER_MOVE
+    ImplPtrData{ nullptr, IDC_SIZENS, 0 },                      // POINTER_NSIZE
+    ImplPtrData{ nullptr, IDC_SIZENS, 0 },                      // POINTER_SSIZE
+    ImplPtrData{ nullptr, IDC_SIZEWE, 0 },                      // POINTER_WSIZE
+    ImplPtrData{ nullptr, IDC_SIZEWE, 0 },                      // POINTER_ESIZE
+    ImplPtrData{ nullptr, IDC_SIZENWSE, 0 },                    // POINTER_NWSIZE
+    ImplPtrData{ nullptr, IDC_SIZENESW, 0 },                    // POINTER_NESIZE
+    ImplPtrData{ nullptr, IDC_SIZENESW, 0 },                    // POINTER_SWSIZE
+    ImplPtrData{ nullptr, IDC_SIZENWSE, 0 },                    // POINTER_SESIZE
+    ImplPtrData{ nullptr, IDC_SIZENS, 0 },                      // POINTER_WINDOW_NSIZE
+    ImplPtrData{ nullptr, IDC_SIZENS, 0 },                      // POINTER_WINDOW_SSIZE
+    ImplPtrData{ nullptr, IDC_SIZEWE, 0 },                      // POINTER_WINDOW_WSIZE
+    ImplPtrData{ nullptr, IDC_SIZEWE, 0 },                      // POINTER_WINDOW_ESIZE
+    ImplPtrData{ nullptr, IDC_SIZENWSE, 0 },                    // POINTER_WINDOW_NWSIZE
+    ImplPtrData{ nullptr, IDC_SIZENESW, 0 },                    // POINTER_WINDOW_NESIZE
+    ImplPtrData{ nullptr, IDC_SIZENESW, 0 },                    // POINTER_WINDOW_SWSIZE
+    ImplPtrData{ nullptr, IDC_SIZENWSE, 0 },                    // POINTER_WINDOW_SESIZE
+    ImplPtrData{ nullptr, IDC_SIZEWE, 0 },                      // POINTER_HSPLIT
+    ImplPtrData{ nullptr, IDC_SIZENS, 0 },                      // POINTER_VSPLIT
+    ImplPtrData{ nullptr, IDC_SIZEWE, 0 },                      // POINTER_HSIZEBAR
+    ImplPtrData{ nullptr, IDC_SIZENS, 0 },                      // POINTER_VSIZEBAR
+    ImplPtrData{ nullptr, IDC_HAND, 0 },                        // POINTER_HAND
+    ImplPtrData{ nullptr, IDC_HAND, 0 },                        // POINTER_REFHAND
+    ImplPtrData{ nullptr, IDC_PEN, 0 },                         // POINTER_PEN
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MAGNIFY }, // POINTER_MAGNIFY
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_FILL },    // POINTER_FILL
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_ROTATE },  // POINTER_ROTATE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_HSHEAR },  // POINTER_HSHEAR
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_VSHEAR },  // POINTER_VSHEAR
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MIRROR },  // POINTER_MIRROR
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_CROOK },   // POINTER_CROOK
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_CROP },    // POINTER_CROP
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MOVEPOINT }, // POINTER_MOVEPOINT
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MOVEBEZIERWEIGHT }, // POINTER_MOVEBEZIERWEIGHT
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MOVEDATA }, // POINTER_MOVEDATA
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_COPYDATA }, // POINTER_COPYDATA
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_LINKDATA }, // POINTER_LINKDATA
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MOVEDATALINK }, // POINTER_MOVEDATALINK
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_COPYDATALINK }, // POINTER_COPYDATALINK
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MOVEFILE }, // POINTER_MOVEFILE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_COPYFILE }, // POINTER_COPYFILE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_LINKFILE }, // POINTER_LINKFILE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MOVEFILELINK }, // POINTER_MOVEFILELINK
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_COPYFILELINK }, // POINTER_COPYFILELINK
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_MOVEFILES }, // POINTER_MOVEFILES
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_COPYFILES }, // POINTER_COPYFILES
+    ImplPtrData{ nullptr, IDC_NO, 0 },                          // POINTER_NOTALLOWED
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_LINE }, // POINTER_DRAW_LINE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_RECT }, // POINTER_DRAW_RECT
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_POLYGON }, // POINTER_DRAW_POLYGON
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_BEZIER }, // POINTER_DRAW_BEZIER
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_ARC }, // POINTER_DRAW_ARC
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_PIE }, // POINTER_DRAW_PIE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_CIRCLECUT }, // POINTER_DRAW_CIRCLECUT
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_ELLIPSE }, // POINTER_DRAW_ELLIPSE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_FREEHAND }, // POINTER_DRAW_FREEHAND
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_CONNECT }, // POINTER_DRAW_CONNECT
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_TEXT }, // POINTER_DRAW_TEXT
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DRAW_CAPTION }, // POINTER_DRAW_CAPTION
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_CHART },   // POINTER_CHART
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_DETECTIVE }, // POINTER_DETECTIVE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_PIVOT_COL }, // POINTER_PIVOT_COL
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_PIVOT_ROW }, // POINTER_PIVOT_ROW
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_PIVOT_FIELD }, // POINTER_PIVOT_FIELD
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_CHAIN },   // POINTER_CHAIN
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_CHAIN_NOTALLOWED }, // POINTER_CHAIN_NOTALLOWED
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_N }, // POINTER_AUTOSCROLL_N
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_S }, // POINTER_AUTOSCROLL_S
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_W }, // POINTER_AUTOSCROLL_W
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_E }, // POINTER_AUTOSCROLL_E
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NW }, // POINTER_AUTOSCROLL_NW
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NE }, // POINTER_AUTOSCROLL_NE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_SW }, // POINTER_AUTOSCROLL_SW
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_SE }, // POINTER_AUTOSCROLL_SE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NS }, // POINTER_AUTOSCROLL_NS
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_WE }, // POINTER_AUTOSCROLL_WE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_AUTOSCROLL_NSWE }, // POINTER_AUTOSCROLL_NSWE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_TEXT_VERTICAL }, // POINTER_TEXT_VERTICAL
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_PIVOT_DELETE }, // POINTER_PIVOT_DELETE
 
      // #i32329#
-    { nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_S },       // POINTER_TAB_SELECT_S
-    { nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_E },       // POINTER_TAB_SELECT_E
-    { nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_SE },      // POINTER_TAB_SELECT_SE
-    { nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_W },       // POINTER_TAB_SELECT_W
-    { nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_SW },      // POINTER_TAB_SELECT_SW
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_S }, // POINTER_TAB_SELECT_S
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_E }, // POINTER_TAB_SELECT_E
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_SE }, // POINTER_TAB_SELECT_SE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_W }, // POINTER_TAB_SELECT_W
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_TAB_SELECT_SW }, // POINTER_TAB_SELECT_SW
 
-    { nullptr, nullptr, SAL_RESID_POINTER_HIDEWHITESPACE },     // POINTER_HIDEWHITESPACE
-    { nullptr, nullptr, SAL_RESID_POINTER_SHOWWHITESPACE },     // POINTER_UNHIDEWHITESPACE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_HIDEWHITESPACE }, // POINTER_HIDEWHITESPACE
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_SHOWWHITESPACE }, // POINTER_UNHIDEWHITESPACE
 
-    { nullptr, nullptr, SAL_RESID_POINTER_FATCROSS }            // POINTER_FATCROSS
+    ImplPtrData{ nullptr, nullptr, SAL_RESID_POINTER_FATCROSS } // POINTER_FATCROSS
     };
 
     // Mousepointer loaded ?
@@ -2497,6 +2519,9 @@ OUString WinSalFrame::GetKeyName( sal_uInt16 nKeyCode )
             case KEY_EQUAL:
                 cSVCode  = '=';
                 break;
+            case KEY_COLON:
+                cSVCode = ':';
+                break;
             case KEY_SEMICOLON:
                 cSVCode = ';';
                 break;
@@ -2620,6 +2645,15 @@ void WinSalFrame::UpdateSettings( AllSettings& rSettings )
 
     StyleSettings aStyleSettings = rSettings.GetStyleSettings();
 
+    // High contrast
+    HIGHCONTRAST hc;
+    hc.cbSize = sizeof( HIGHCONTRAST );
+    if( SystemParametersInfoW( SPI_GETHIGHCONTRAST, hc.cbSize, &hc, 0 )
+            && (hc.dwFlags & HCF_HIGHCONTRASTON) )
+        aStyleSettings.SetHighContrastMode( true );
+    else
+        aStyleSettings.SetHighContrastMode( false );
+
     aStyleSettings.SetScrollBarSize( GetSystemMetrics( SM_CXVSCROLL ) );
     aStyleSettings.SetSpinSize( GetSystemMetrics( SM_CXVSCROLL ) );
     UINT blinkTime = GetCaretBlinkTime();
@@ -2631,30 +2665,157 @@ void WinSalFrame::UpdateSettings( AllSettings& rSettings )
     aStyleSettings.SetActiveBorderColor( ImplWinColorToSal( GetSysColor( COLOR_ACTIVEBORDER ) ) );
     aStyleSettings.SetDeactiveBorderColor( ImplWinColorToSal( GetSysColor( COLOR_INACTIVEBORDER ) ) );
     aStyleSettings.SetDeactiveColor( ImplWinColorToSal( GetSysColor( COLOR_GRADIENTINACTIVECAPTION ) ) );
-    aStyleSettings.SetFaceColor( ImplWinColorToSal( GetSysColor( COLOR_3DFACE ) ) );
-    aStyleSettings.SetInactiveTabColor( aStyleSettings.GetFaceColor() );
+
+    Color aControlTextColor;
+    Color aMenuBarTextColor;
+    Color aMenuBarRolloverTextColor;
+    Color aHighlightTextColor = ImplWinColorToSal(GetSysColor(COLOR_HIGHLIGHTTEXT));
+
+    BOOL bFlatMenus = FALSE;
+    SystemParametersInfoW( SPI_GETFLATMENU, 0, &bFlatMenus, 0);
+    if( bFlatMenus )
+    {
+        aStyleSettings.SetUseFlatMenus( true );
+        // flat borders for our controls etc. as well in this mode (ie, no 3d borders)
+        // this is not active in the classic style appearance
+        aStyleSettings.SetUseFlatBorders( true );
+    }
+    else
+    {
+        aStyleSettings.SetUseFlatMenus( false );
+        aStyleSettings.SetUseFlatBorders( false );
+    }
+
+    if( bFlatMenus )
+    {
+        aStyleSettings.SetMenuHighlightColor( ImplWinColorToSal( GetSysColor( COLOR_MENUHILIGHT ) ) );
+        aStyleSettings.SetMenuBarRolloverColor( ImplWinColorToSal( GetSysColor( COLOR_MENUHILIGHT ) ) );
+        aStyleSettings.SetMenuBorderColor( ImplWinColorToSal( GetSysColor( COLOR_3DSHADOW ) ) );
+    }
+    else
+    {
+        aStyleSettings.SetMenuHighlightColor( ImplWinColorToSal( GetSysColor( COLOR_HIGHLIGHT ) ) );
+        aStyleSettings.SetMenuBarRolloverColor( ImplWinColorToSal( GetSysColor( COLOR_HIGHLIGHT ) ) );
+        aStyleSettings.SetMenuBorderColor( ImplWinColorToSal( GetSysColor( COLOR_3DLIGHT ) ) );
+    }
+
+    const bool bUseDarkMode(UseDarkMode());
+
+    OUString sThemeName(!bUseDarkMode ? u"colibre" : u"colibre_dark");
+    aStyleSettings.SetPreferredIconTheme(sThemeName, bUseDarkMode);
+
+    if (bUseDarkMode)
+    {
+        SetWindowTheme(mhWnd, L"Explorer", nullptr);
+
+        HTHEME hTheme = OpenThemeData(nullptr, L"ItemsView");
+        COLORREF color;
+        GetThemeColor(hTheme, 0, 0, TMT_FILLCOLOR, &color);
+        aStyleSettings.SetFaceColor( ImplWinColorToSal( color ) );
+        aStyleSettings.SetWindowColor( ImplWinColorToSal( color ) );
+        GetThemeColor(hTheme, 0, 0, TMT_TEXTCOLOR, &color);
+        aStyleSettings.SetWindowTextColor( ImplWinColorToSal( color ) );
+        aStyleSettings.SetToolTextColor( ImplWinColorToSal( color ) );
+        GetThemeColor(hTheme, 0, 0, TMT_SHADOWCOLOR, &color);
+        aStyleSettings.SetShadowColor( ImplWinColorToSal( color ) );
+        GetThemeColor(hTheme, 0, 0, TMT_DKSHADOW3D, &color);
+        aStyleSettings.SetDarkShadowColor( ImplWinColorToSal( color ) );
+        CloseThemeData(hTheme);
+
+        hTheme = OpenThemeData(mhWnd, L"Button");
+        GetThemeColor(hTheme, BP_PUSHBUTTON, MBI_NORMAL, TMT_TEXTCOLOR, &color);
+        aControlTextColor = ImplWinColorToSal(color);
+        GetThemeColor(hTheme, BP_CHECKBOX, MBI_NORMAL, TMT_TEXTCOLOR, &color);
+        aStyleSettings.SetRadioCheckTextColor( ImplWinColorToSal( color ) );
+        CloseThemeData(hTheme);
+
+        SetWindowTheme(mhWnd, nullptr, nullptr);
+
+        hTheme = OpenThemeData(mhWnd, L"Menu");
+        GetThemeColor(hTheme, MENU_POPUPITEM, MBI_NORMAL, TMT_TEXTCOLOR, &color);
+        aStyleSettings.SetMenuTextColor( ImplWinColorToSal( color ) );
+        aMenuBarTextColor = ImplWinColorToSal( color );
+        aMenuBarRolloverTextColor = ImplWinColorToSal( color );
+        CloseThemeData(hTheme);
+
+        aStyleSettings.SetActiveTabColor( aStyleSettings.GetWindowColor() );
+        hTheme = OpenThemeData(mhWnd, L"Toolbar");
+        GetThemeColor(hTheme, 0, 0, TMT_FILLCOLOR, &color);
+        aStyleSettings.SetInactiveTabColor( ImplWinColorToSal( color ) );
+        // see ImplDrawNativeControl for dark mode
+        aStyleSettings.SetMenuBarColor( aStyleSettings.GetWindowColor() );
+        CloseThemeData(hTheme);
+
+        if (hTheme = OpenThemeData(mhWnd, L"Textstyle"))
+        {
+            GetThemeColor(hTheme, TEXT_HYPERLINKTEXT, TS_HYPERLINK_NORMAL, TMT_TEXTCOLOR, &color);
+            aStyleSettings.SetLinkColor(ImplWinColorToSal(color));
+            CloseThemeData(hTheme);
+        }
+
+        // tdf#148448 pick a warning color more likely to be readable as a
+        // background in a dark theme
+        aStyleSettings.SetWarningColor(Color(0xf5, 0x79, 0x00));
+    }
+    else
+    {
+        aStyleSettings.SetFaceColor( ImplWinColorToSal( GetSysColor( COLOR_3DFACE ) ) );
+        aStyleSettings.SetWindowColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOW ) ) );
+        aStyleSettings.SetWindowTextColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOWTEXT ) ) );
+        aStyleSettings.SetToolTextColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOWTEXT ) ) );
+        aStyleSettings.SetShadowColor( ImplWinColorToSal( GetSysColor( COLOR_3DSHADOW ) ) );
+        aStyleSettings.SetDarkShadowColor( ImplWinColorToSal( GetSysColor( COLOR_3DDKSHADOW ) ) );
+        aControlTextColor = ImplWinColorToSal(GetSysColor(COLOR_BTNTEXT));
+        aStyleSettings.SetRadioCheckTextColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOWTEXT ) ) );
+        aStyleSettings.SetMenuTextColor( ImplWinColorToSal( GetSysColor( COLOR_MENUTEXT ) ) );
+        aMenuBarTextColor = ImplWinColorToSal( GetSysColor( COLOR_MENUTEXT ) );
+        aMenuBarRolloverTextColor = aHighlightTextColor;
+        if( bFlatMenus )
+            aStyleSettings.SetMenuBarColor( ImplWinColorToSal( GetSysColor( COLOR_MENUBAR ) ) );
+        else
+            aStyleSettings.SetMenuBarColor( ImplWinColorToSal( GetSysColor( COLOR_MENU ) ) );
+        aStyleSettings.SetActiveTabColor( aStyleSettings.GetWindowColor() );
+        aStyleSettings.SetInactiveTabColor( aStyleSettings.GetFaceColor() );
+    }
+
+    if ( std::optional<Color> aColor = aStyleSettings.GetPersonaMenuBarTextColor() )
+    {
+        aMenuBarTextColor = *aColor;
+        aMenuBarRolloverTextColor = *aColor;
+    }
+
+    aStyleSettings.SetMenuBarTextColor( aMenuBarTextColor );
+    aStyleSettings.SetMenuBarRolloverTextColor( aMenuBarRolloverTextColor );
+
     aStyleSettings.SetLightColor( ImplWinColorToSal( GetSysColor( COLOR_3DHILIGHT ) ) );
     aStyleSettings.SetLightBorderColor( ImplWinColorToSal( GetSysColor( COLOR_3DLIGHT ) ) );
-    aStyleSettings.SetShadowColor( ImplWinColorToSal( GetSysColor( COLOR_3DSHADOW ) ) );
-    aStyleSettings.SetDarkShadowColor( ImplWinColorToSal( GetSysColor( COLOR_3DDKSHADOW ) ) );
     aStyleSettings.SetHelpColor( ImplWinColorToSal( GetSysColor( COLOR_INFOBK ) ) );
     aStyleSettings.SetHelpTextColor( ImplWinColorToSal( GetSysColor( COLOR_INFOTEXT ) ) );
 
-    Color aControlTextColor(ImplWinColorToSal(GetSysColor(COLOR_BTNTEXT)));
-
+    aStyleSettings.SetWorkspaceColor(aStyleSettings.GetFaceColor());
     aStyleSettings.SetDialogColor(aStyleSettings.GetFaceColor());
     aStyleSettings.SetDialogTextColor(aControlTextColor);
 
-    aStyleSettings.SetDefaultButtonTextColor(aControlTextColor);
+    Color aHighlightButtonTextColor = aStyleSettings.GetHighContrastMode() ?
+        aHighlightTextColor : aControlTextColor;
+
+    if (aStyleSettings.GetHighContrastMode())
+    {
+        Color aLinkColor(ImplWinColorToSal(GetSysColor(COLOR_HOTLIGHT)));
+        aStyleSettings.SetLinkColor(aLinkColor);
+        aStyleSettings.SetVisitedLinkColor(aLinkColor);
+    }
+
+    aStyleSettings.SetDefaultButtonTextColor(aHighlightButtonTextColor);
     aStyleSettings.SetButtonTextColor(aControlTextColor);
-    aStyleSettings.SetDefaultActionButtonTextColor(aControlTextColor);
+    aStyleSettings.SetDefaultActionButtonTextColor(aHighlightButtonTextColor);
     aStyleSettings.SetActionButtonTextColor(aControlTextColor);
     aStyleSettings.SetFlatButtonTextColor(aControlTextColor);
-    aStyleSettings.SetDefaultButtonRolloverTextColor(aControlTextColor);
-    aStyleSettings.SetButtonRolloverTextColor(aControlTextColor);
-    aStyleSettings.SetDefaultActionButtonRolloverTextColor(aControlTextColor);
-    aStyleSettings.SetActionButtonRolloverTextColor(aControlTextColor);
-    aStyleSettings.SetFlatButtonRolloverTextColor(aControlTextColor);
+    aStyleSettings.SetDefaultButtonRolloverTextColor(aHighlightButtonTextColor);
+    aStyleSettings.SetButtonRolloverTextColor(aHighlightButtonTextColor);
+    aStyleSettings.SetDefaultActionButtonRolloverTextColor(aHighlightButtonTextColor);
+    aStyleSettings.SetActionButtonRolloverTextColor(aHighlightButtonTextColor);
+    aStyleSettings.SetFlatButtonRolloverTextColor(aHighlightButtonTextColor);
     aStyleSettings.SetDefaultButtonPressedRolloverTextColor(aControlTextColor);
     aStyleSettings.SetButtonPressedRolloverTextColor(aControlTextColor);
     aStyleSettings.SetDefaultActionButtonPressedRolloverTextColor(aControlTextColor);
@@ -2665,19 +2826,17 @@ void WinSalFrame::UpdateSettings( AllSettings& rSettings )
     aStyleSettings.SetTabRolloverTextColor(aControlTextColor);
     aStyleSettings.SetTabHighlightTextColor(aControlTextColor);
 
-    aStyleSettings.SetRadioCheckTextColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOWTEXT ) ) );
     aStyleSettings.SetGroupTextColor( aStyleSettings.GetRadioCheckTextColor() );
     aStyleSettings.SetLabelTextColor( aStyleSettings.GetRadioCheckTextColor() );
-    aStyleSettings.SetWindowColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOW ) ) );
-    aStyleSettings.SetActiveTabColor( aStyleSettings.GetWindowColor() );
-    aStyleSettings.SetWindowTextColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOWTEXT ) ) );
-    aStyleSettings.SetToolTextColor( ImplWinColorToSal( GetSysColor( COLOR_WINDOWTEXT ) ) );
     aStyleSettings.SetFieldColor( aStyleSettings.GetWindowColor() );
+    aStyleSettings.SetListBoxWindowBackgroundColor( aStyleSettings.GetWindowColor() );
     aStyleSettings.SetFieldTextColor( aStyleSettings.GetWindowTextColor() );
     aStyleSettings.SetFieldRolloverTextColor( aStyleSettings.GetFieldTextColor() );
+    aStyleSettings.SetListBoxWindowTextColor( aStyleSettings.GetFieldTextColor() );
     aStyleSettings.SetHighlightColor( ImplWinColorToSal( GetSysColor( COLOR_HIGHLIGHT ) ) );
-    aStyleSettings.SetHighlightTextColor( ImplWinColorToSal( GetSysColor( COLOR_HIGHLIGHTTEXT ) ) );
-    aStyleSettings.SetMenuHighlightColor( aStyleSettings.GetHighlightColor() );
+    aStyleSettings.SetHighlightTextColor(aHighlightTextColor);
+    aStyleSettings.SetListBoxWindowHighlightColor( aStyleSettings.GetHighlightColor() );
+    aStyleSettings.SetListBoxWindowHighlightTextColor( aStyleSettings.GetHighlightTextColor() );
     aStyleSettings.SetMenuHighlightTextColor( aStyleSettings.GetHighlightTextColor() );
 
     ImplSVData* pSVData = ImplGetSVData();
@@ -2685,62 +2844,19 @@ void WinSalFrame::UpdateSettings( AllSettings& rSettings )
     pSVData->maNWFData.mnMenuFormatBorderY = 0;
     pSVData->maNWFData.maMenuBarHighlightTextColor = COL_TRANSPARENT;
     GetSalData()->mbThemeMenuSupport = false;
-    if (officecfg::Office::Common::Accessibility::AutoDetectSystemHC::get())
-    {
-        aStyleSettings.SetShadowColor( ImplWinColorToSal( GetSysColor( COLOR_ACTIVEBORDER ) ) );
-        aStyleSettings.SetWorkspaceColor( ImplWinColorToSal( GetSysColor( COLOR_MENU ) ) );
-    }
     aStyleSettings.SetMenuColor( ImplWinColorToSal( GetSysColor( COLOR_MENU ) ) );
-    aStyleSettings.SetMenuBarColor( aStyleSettings.GetMenuColor() );
-    aStyleSettings.SetMenuBarRolloverColor( aStyleSettings.GetHighlightColor() );
-    aStyleSettings.SetMenuBorderColor( aStyleSettings.GetLightBorderColor() ); // overridden below for flat menus
-    aStyleSettings.SetUseFlatBorders( false );
-    aStyleSettings.SetUseFlatMenus( false );
-    aStyleSettings.SetMenuTextColor( ImplWinColorToSal( GetSysColor( COLOR_MENUTEXT ) ) );
-    if ( std::optional<Color> aColor = aStyleSettings.GetPersonaMenuBarTextColor() )
-    {
-        aStyleSettings.SetMenuBarTextColor( *aColor );
-        aStyleSettings.SetMenuBarRolloverTextColor( *aColor );
-    }
-    else
-    {
-        aStyleSettings.SetMenuBarTextColor( ImplWinColorToSal( GetSysColor( COLOR_MENUTEXT ) ) );
-        aStyleSettings.SetMenuBarRolloverTextColor( ImplWinColorToSal( GetSysColor( COLOR_HIGHLIGHTTEXT ) ) );
-    }
     aStyleSettings.SetMenuBarHighlightTextColor(aStyleSettings.GetMenuHighlightTextColor());
     aStyleSettings.SetActiveColor( ImplWinColorToSal( GetSysColor( COLOR_ACTIVECAPTION ) ) );
     aStyleSettings.SetActiveTextColor( ImplWinColorToSal( GetSysColor( COLOR_CAPTIONTEXT ) ) );
     aStyleSettings.SetDeactiveColor( ImplWinColorToSal( GetSysColor( COLOR_INACTIVECAPTION ) ) );
     aStyleSettings.SetDeactiveTextColor( ImplWinColorToSal( GetSysColor( COLOR_INACTIVECAPTIONTEXT ) ) );
-    BOOL bFlatMenus = FALSE;
-    SystemParametersInfoW( SPI_GETFLATMENU, 0, &bFlatMenus, 0);
-    if( bFlatMenus )
-    {
-        aStyleSettings.SetUseFlatMenus( true );
-        aStyleSettings.SetMenuBarColor( ImplWinColorToSal( GetSysColor( COLOR_MENUBAR ) ) );
-        aStyleSettings.SetMenuHighlightColor( ImplWinColorToSal( GetSysColor( COLOR_MENUHILIGHT ) ) );
-        aStyleSettings.SetMenuBarRolloverColor( ImplWinColorToSal( GetSysColor( COLOR_MENUHILIGHT ) ) );
-        aStyleSettings.SetMenuBorderColor( ImplWinColorToSal( GetSysColor( COLOR_3DSHADOW ) ) );
 
-        // flat borders for our controls etc. as well in this mode (ie, no 3d borders)
-        // this is not active in the classic style appearance
-        aStyleSettings.SetUseFlatBorders( true );
-    }
     aStyleSettings.SetCheckedColorSpecialCase( );
 
     // caret width
     DWORD nCaretWidth = 2;
     if( SystemParametersInfoW( SPI_GETCARETWIDTH, 0, &nCaretWidth, 0 ) )
         aStyleSettings.SetCursorSize( nCaretWidth );
-
-    // High contrast
-    HIGHCONTRAST hc;
-    hc.cbSize = sizeof( HIGHCONTRAST );
-    if( SystemParametersInfoW( SPI_GETHIGHCONTRAST, hc.cbSize, &hc, 0 )
-            && (hc.dwFlags & HCF_HIGHCONTRASTON) )
-        aStyleSettings.SetHighContrastMode( true );
-    else
-        aStyleSettings.SetHighContrastMode( false );
 
     // Query Fonts
     vcl::Font    aMenuFont = aStyleSettings.GetMenuFont();
@@ -2858,7 +2974,7 @@ SalFrame::SalPointerState WinSalFrame::GetPointerState()
     POINT pt;
     GetCursorPos( &pt );
 
-    aState.maPos = Point( pt.x - maGeometry.nX, pt.y - maGeometry.nY );
+    aState.maPos = Point(pt.x - maGeometry.x(), pt.y - maGeometry.y());
     return aState;
 }
 
@@ -2991,6 +3107,11 @@ void WinSalFrame::EndSetClipRegion()
         if( SetWindowRgn( mhWnd, hRegion, TRUE ) == 0 )
             DeleteObject( hRegion );
     }
+}
+
+void WinSalFrame::UpdateDarkMode()
+{
+    ::UpdateDarkMode(mhWnd);
 }
 
 static bool ImplHandleMouseMsg( HWND hWnd, UINT nMsg,
@@ -3161,7 +3282,7 @@ static bool ImplHandleMouseMsg( HWND hWnd, UINT nMsg,
             UpdateWindow( hWnd );
 
         if( AllSettings::GetLayoutRTL() )
-            aMouseEvt.mnX = pFrame->maGeometry.nWidth-1-aMouseEvt.mnX;
+            aMouseEvt.mnX = pFrame->maGeometry.width() - 1 - aMouseEvt.mnX;
 
         nRet = pFrame->CallCallback( nEvent, &aMouseEvt );
         if ( nMsg == WM_MOUSEMOVE )
@@ -3244,7 +3365,7 @@ static bool ImplHandleWheelMsg( HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lPar
             aWheelEvt.mnCode |= KEY_MOD2;
 
         if( AllSettings::GetLayoutRTL() )
-            aWheelEvt.mnX = pFrame->maGeometry.nWidth-1-aWheelEvt.mnX;
+            aWheelEvt.mnX = pFrame->maGeometry.width() - 1 - aWheelEvt.mnX;
 
         nRet = pFrame->CallCallback( SalEvent::WheelMouse, &aWheelEvt );
     }
@@ -3355,6 +3476,22 @@ static void UnsetAltIfAltGr(SalKeyEvent& rKeyEvt, sal_uInt16 nModCode)
     }
 }
 
+// tdf#152404 Commit uncommitted text before dispatching key shortcuts. In
+// certain cases such as pressing Control-Alt-C in a Writer document while
+// there is uncommitted text will call WinSalFrame::EndExtTextInput() which
+// will dispatch a SalEvent::EndExtTextInput event. Writer's handler for that
+// event will delete the uncommitted text and then insert the committed text
+// but LibreOffice will crash when deleting the uncommitted text because
+// deletion of the text also removes and deletes the newly inserted comment.
+static void FlushIMBeforeShortCut(WinSalFrame* pFrame, SalEvent nEvent, sal_uInt16 nModCode)
+{
+    if (pFrame->mbCandidateMode && nEvent == SalEvent::KeyInput
+        && (nModCode & (KEY_MOD1 | KEY_MOD2)))
+    {
+        pFrame->EndExtTextInput(EndExtTextInputFlags::Complete);
+    }
+}
+
 static bool ImplHandleKeyMsg( HWND hWnd, UINT nMsg,
                               WPARAM wParam, LPARAM lParam, LRESULT& rResult )
 {
@@ -3445,6 +3582,7 @@ static bool ImplHandleKeyMsg( HWND hWnd, UINT nMsg,
         aKeyEvt.mnRepeat    = nRepeat;
 
         UnsetAltIfAltGr(aKeyEvt, nModCode);
+        FlushIMBeforeShortCut(pFrame, SalEvent::KeyInput, nModCode);
 
         nLastChar = 0;
         nLastVKChar = 0;
@@ -3475,7 +3613,7 @@ static bool ImplHandleKeyMsg( HWND hWnd, UINT nMsg,
              nLastVKChar = 0;
              pFrame->CallCallback( SalEvent::KeyInput, &aKeyEvt );
              pFrame->CallCallback( SalEvent::KeyUp, &aKeyEvt );
-             wParam = static_cast<sal_Unicode>(Uni_UTF32ToSurrogate2( wParam ));
+             wParam = rtl::getLowSurrogate( wParam );
         }
 
         aKeyEvt.mnCharCode = static_cast<sal_Unicode>(wParam);
@@ -3600,6 +3738,7 @@ static bool ImplHandleKeyMsg( HWND hWnd, UINT nMsg,
                 aKeyEvt.mnRepeat    = nRepeat;
 
                 UnsetAltIfAltGr(aKeyEvt, nModCode);
+                FlushIMBeforeShortCut(pFrame, nEvent, nModCode);
 
                 bIgnoreCharMsg = bCharPeek;
                 bool nRet = pFrame->CallCallback( nEvent, &aKeyEvt );
@@ -3874,32 +4013,24 @@ static void SetMaximizedFrameGeometry( HWND hWnd, WinSalFrame* pFrame, RECT* pPa
     ImplSalGetWorkArea( hWnd, &aRect, pParentRect );
 
     // a maximized window has no other borders than the caption
-    pFrame->maGeometry.nLeftDecoration = pFrame->maGeometry.nRightDecoration = pFrame->maGeometry.nBottomDecoration = 0;
-    pFrame->maGeometry.nTopDecoration = pFrame->mbCaption ? GetSystemMetrics( SM_CYCAPTION ) : 0;
+    pFrame->maGeometry.setDecorations(0, pFrame->mbCaption ? GetSystemMetrics(SM_CYCAPTION) : 0, 0, 0);
 
-    aRect.top += pFrame->maGeometry.nTopDecoration;
-    pFrame->maGeometry.nX = aRect.left;
-    pFrame->maGeometry.nY = aRect.top;
-    pFrame->maGeometry.nWidth = aRect.right - aRect.left;
-    pFrame->maGeometry.nHeight = aRect.bottom - aRect.top;
+    aRect.top += pFrame->maGeometry.topDecoration();
+    pFrame->maGeometry.setPos({ aRect.left, aRect.top });
+    SetGeometrySize(pFrame->maGeometry, { aRect.right - aRect.left, aRect.bottom - aRect.top });
 }
 
-static void UpdateFrameGeometry( HWND hWnd, WinSalFrame* pFrame )
+static void UpdateFrameGeometry(WinSalFrame* pFrame)
 {
     if( !pFrame )
         return;
+    const HWND hWnd = pFrame->mhWnd;
 
     RECT aRect;
     GetWindowRect( hWnd, &aRect );
-    pFrame->maGeometry.nX = 0;
-    pFrame->maGeometry.nY = 0;
-    pFrame->maGeometry.nWidth = 0;
-    pFrame->maGeometry.nHeight = 0;
-    pFrame->maGeometry.nLeftDecoration = 0;
-    pFrame->maGeometry.nTopDecoration = 0;
-    pFrame->maGeometry.nRightDecoration = 0;
-    pFrame->maGeometry.nBottomDecoration = 0;
-    pFrame->maGeometry.nDisplayScreenNumber = 0;
+    pFrame->maGeometry.setPosSize({ 0, 0 }, { 0, 0 });
+    pFrame->maGeometry.setDecorations(0, 0, 0, 0);
+    pFrame->maGeometry.setScreen(0);
 
     if ( IsIconic( hWnd ) )
         return;
@@ -3909,13 +4040,9 @@ static void UpdateFrameGeometry( HWND hWnd, WinSalFrame* pFrame )
     aPt.y=0;
     ClientToScreen(hWnd, &aPt);
     int cx = aPt.x - aRect.left;
-    pFrame->maGeometry.nTopDecoration = aPt.y - aRect.top;
 
-    pFrame->maGeometry.nLeftDecoration = cx;
-    pFrame->maGeometry.nRightDecoration = cx;
-
-    pFrame->maGeometry.nX = aPt.x;
-    pFrame->maGeometry.nY = aPt.y;
+    pFrame->maGeometry.setDecorations(cx, aPt.y - aRect.top, cx, 0);
+    pFrame->maGeometry.setPos({ aPt.x, aPt.y });
 
     RECT aInnerRect;
     GetClientRect( hWnd, &aInnerRect );
@@ -3925,34 +4052,20 @@ static void UpdateFrameGeometry( HWND hWnd, WinSalFrame* pFrame )
         aPt.x=aInnerRect.right;
         aPt.y=aInnerRect.top;
         ClientToScreen(hWnd, &aPt);
-        pFrame->maGeometry.nRightDecoration = aRect.right - aPt.x;
+        pFrame->maGeometry.setRightDecoration(aRect.right - aPt.x);
     }
     if( aInnerRect.bottom ) // may be zero if window was not shown yet
-        pFrame->maGeometry.nBottomDecoration += aRect.bottom - aPt.y - aInnerRect.bottom;
+        pFrame->maGeometry.setBottomDecoration(aRect.bottom - aPt.y - aInnerRect.bottom);
     else
         // bottom border is typically the same as left/right
-        pFrame->maGeometry.nBottomDecoration = pFrame->maGeometry.nLeftDecoration;
+        pFrame->maGeometry.setBottomDecoration(pFrame->maGeometry.leftDecoration());
 
     int nWidth  = aRect.right - aRect.left
-        - pFrame->maGeometry.nRightDecoration - pFrame->maGeometry.nLeftDecoration;
+        - pFrame->maGeometry.rightDecoration() - pFrame->maGeometry.leftDecoration();
     int nHeight = aRect.bottom - aRect.top
-        - pFrame->maGeometry.nBottomDecoration - pFrame->maGeometry.nTopDecoration;
-    // clamp to zero
-    pFrame->maGeometry.nHeight = nHeight < 0 ? 0 : nHeight;
-    pFrame->maGeometry.nWidth = nWidth < 0 ? 0 : nWidth;
+        - pFrame->maGeometry.bottomDecoration() - pFrame->maGeometry.topDecoration();
+    SetGeometrySize(pFrame->maGeometry, { nWidth, nHeight });
     pFrame->updateScreenNumber();
-}
-
-static void ImplCallMoveHdl( HWND hWnd )
-{
-    WinSalFrame* pFrame = GetWindowPtr( hWnd );
-    if ( pFrame )
-    {
-        pFrame->CallCallback( SalEvent::Move, nullptr );
-        // to avoid doing Paint twice by VCL and SAL
-        //if ( IsWindowVisible( hWnd ) && !pFrame->mbInShow )
-        //    UpdateWindow( hWnd );
-    }
 }
 
 static void ImplCallClosePopupsHdl( HWND hWnd )
@@ -3964,103 +4077,116 @@ static void ImplCallClosePopupsHdl( HWND hWnd )
     }
 }
 
-static void ImplHandleMoveMsg( HWND hWnd )
+static void ImplCallMoveHdl(HWND hWnd)
 {
-    WinSalFrame* pFrame = ProcessOrDeferMessage( hWnd, SAL_MSG_POSTMOVE );
-    if ( pFrame )
+    WinSalFrame* pFrame = ProcessOrDeferMessage(hWnd, SAL_MSG_POSTMOVE);
+    if (!pFrame)
+        return;
+
+    pFrame->CallCallback(SalEvent::Move, nullptr);
+
+    ImplSalYieldMutexRelease();
+}
+
+static void ImplHandleMoveMsg(HWND hWnd, LPARAM lParam)
+{
+    WinSalFrame* pFrame = GetWindowPtr( hWnd );
+    if (!pFrame)
+        return;
+
+    UpdateFrameGeometry(pFrame);
+
+#ifdef NDEBUG
+    (void) lParam;
+#endif
+    assert(IsIconic(hWnd) || (pFrame->maGeometry.x() == static_cast<sal_Int16>(LOWORD(lParam))));
+    assert(IsIconic(hWnd) || (pFrame->maGeometry.y() == static_cast<sal_Int16>(HIWORD(lParam))));
+
+    if (GetWindowStyle(hWnd) & WS_VISIBLE)
+        pFrame->mbDefPos = false;
+
+    // protect against recursion
+    if (!pFrame->mbInMoveMsg)
     {
-        UpdateFrameGeometry( hWnd, pFrame );
-
-        if ( GetWindowStyle( hWnd ) & WS_VISIBLE )
-            pFrame->mbDefPos = false;
-
-        // protect against recursion
-        if ( !pFrame->mbInMoveMsg )
-        {
-            // adjust window again for FullScreenMode
-            pFrame->mbInMoveMsg = true;
-            if ( pFrame->mbFullScreen )
-                ImplSalFrameFullScreenPos( pFrame );
-            pFrame->mbInMoveMsg = false;
-        }
-
-        // save state
-        ImplSaveFrameState( pFrame );
-
-        // Call Hdl
-        //#93851 if we call this handler, VCL floating windows are not updated correctly
-        ImplCallMoveHdl( hWnd );
-
-        ImplSalYieldMutexRelease();
+        // adjust window again for FullScreenMode
+        pFrame->mbInMoveMsg = true;
+        if (pFrame->isFullScreen())
+            ImplSalFrameFullScreenPos(pFrame);
+        pFrame->mbInMoveMsg = false;
     }
+
+    pFrame->UpdateFrameState();
+
+    ImplCallMoveHdl(hWnd);
 }
 
 static void ImplCallSizeHdl( HWND hWnd )
 {
-    // as Windows can send these messages also, we have to use
-    // the Solar semaphore
     WinSalFrame* pFrame = ProcessOrDeferMessage( hWnd, SAL_MSG_POSTCALLSIZE );
-    if ( pFrame )
-    {
-        pFrame->CallCallback( SalEvent::Resize, nullptr );
-        // to avoid double Paints by VCL and SAL
-        if ( IsWindowVisible( hWnd ) && !pFrame->mbInShow )
-            UpdateWindow( hWnd );
+    if (!pFrame)
+        return;
 
-        ImplSalYieldMutexRelease();
-    }
+    pFrame->CallCallback(SalEvent::Resize, nullptr);
+    // to avoid double Paints by VCL and SAL
+    if (IsWindowVisible(hWnd) && !pFrame->mbInShow)
+        UpdateWindow(hWnd);
+
+    ImplSalYieldMutexRelease();
 }
 
-static void ImplHandleSizeMsg( HWND hWnd, WPARAM wParam, LPARAM lParam )
+static void ImplHandleSizeMsg(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    if ( (wParam != SIZE_MAXSHOW) && (wParam != SIZE_MAXHIDE) )
-    {
-        WinSalFrame* pFrame = GetWindowPtr( hWnd );
-        if ( pFrame )
-        {
-            UpdateFrameGeometry( hWnd, pFrame );
+    if ((wParam == SIZE_MAXSHOW) || (wParam == SIZE_MAXHIDE))
+        return;
 
-            pFrame->mnWidth  = static_cast<LONG>(LOWORD(lParam));
-            pFrame->mnHeight = static_cast<LONG>(HIWORD(lParam));
-            // save state
-            ImplSaveFrameState( pFrame );
-            // Call Hdl
-            ImplCallSizeHdl( hWnd );
+    WinSalFrame* pFrame = GetWindowPtr(hWnd);
+    if (!pFrame)
+        return;
 
-            WinSalTimer* pTimer = static_cast<WinSalTimer*>( ImplGetSVData()->maSchedCtx.mpSalTimer );
-            if ( pTimer )
-                pTimer->SetForceRealTimer( true );
-        }
-    }
+    UpdateFrameGeometry(pFrame);
+
+#ifdef NDEBUG
+    (void) lParam;
+#endif
+    assert(pFrame->maGeometry.width() == static_cast<sal_Int16>(LOWORD(lParam)));
+    assert(pFrame->maGeometry.height() == static_cast<sal_Int16>(HIWORD(lParam)));
+
+    pFrame->UpdateFrameState();
+
+    ImplCallSizeHdl(hWnd);
+
+    WinSalTimer* pTimer = static_cast<WinSalTimer*>(ImplGetSVData()->maSchedCtx.mpSalTimer);
+    if (pTimer)
+        pTimer->SetForceRealTimer(true);
 }
 
 static void ImplHandleFocusMsg( HWND hWnd )
 {
     WinSalFrame* pFrame = ProcessOrDeferMessage( hWnd, SAL_MSG_POSTFOCUS );
-    if ( pFrame )
+    if (!pFrame)
+        return;
+    const ::comphelper::ScopeGuard aScopeGuard([](){ ImplSalYieldMutexRelease(); });
+
+    if (WinSalFrame::mbInReparent)
+        return;
+
+    const bool bGotFocus = ::GetFocus() == hWnd;
+    if (bGotFocus)
     {
-        if ( !WinSalFrame::mbInReparent )
+        if (IsWindowVisible(hWnd) && !pFrame->mbInShow)
+            UpdateWindow(hWnd);
+
+        // do we support IME?
+        if (pFrame->mbIME && pFrame->mhDefIMEContext)
         {
-            bool bGotFocus = ::GetFocus() == hWnd;
-            if ( bGotFocus )
-            {
-                if ( IsWindowVisible( hWnd ) && !pFrame->mbInShow )
-                    UpdateWindow( hWnd );
-
-                // do we support IME?
-                if ( pFrame->mbIME && pFrame->mhDefIMEContext )
-                {
-                    UINT nImeProps = ImmGetProperty( GetKeyboardLayout( 0 ), IGP_PROPERTY );
-
-                    pFrame->mbSpezIME = (nImeProps & IME_PROP_SPECIAL_UI) != 0;
-                    pFrame->mbAtCursorIME = (nImeProps & IME_PROP_AT_CARET) != 0;
-                    pFrame->mbHandleIME = !pFrame->mbSpezIME;
-                }
-            }
-            pFrame->CallCallback( bGotFocus ? SalEvent::GetFocus : SalEvent::LoseFocus, nullptr );
+            UINT nImeProps = ImmGetProperty(GetKeyboardLayout(0), IGP_PROPERTY);
+            pFrame->mbSpezIME = (nImeProps & IME_PROP_SPECIAL_UI) != 0;
+            pFrame->mbAtCursorIME = (nImeProps & IME_PROP_AT_CARET) != 0;
+            pFrame->mbHandleIME = !pFrame->mbSpezIME;
         }
-        ImplSalYieldMutexRelease();
     }
+
+    pFrame->CallCallback(bGotFocus ? SalEvent::GetFocus : SalEvent::LoseFocus, nullptr);
 }
 
 static void ImplHandleCloseMsg( HWND hWnd )
@@ -4111,23 +4237,23 @@ static void ImplHandleSettingsChangeMsg( HWND hWnd, UINT nMsg,
             aSalShlData.mnWheelScrollLines = ImplSalGetWheelScrollLines();
         else if( wParam == SPI_SETWHEELSCROLLCHARS )
             aSalShlData.mnWheelScrollChars = ImplSalGetWheelScrollChars();
+        UpdateDarkMode(hWnd);
+        GetSalData()->mbThemeChanged = true;
     }
 
     if ( WM_SYSCOLORCHANGE == nMsg && GetSalData()->mhDitherPal )
         ImplUpdateSysColorEntries();
 
     WinSalFrame* pFrame = ProcessOrDeferMessage( hWnd, 0, 0, DeferPolicy::Blocked );
-    if ( pFrame )
-    {
-        if ( (nMsg == WM_DISPLAYCHANGE) || (nMsg == WM_WININICHANGE) )
-        {
-            if ( pFrame->mbFullScreen )
-                ImplSalFrameFullScreenPos( pFrame );
-        }
+    if (!pFrame)
+        return;
 
-        pFrame->CallCallback( nSalEvent, nullptr );
-        ImplSalYieldMutexRelease();
-    }
+    if (((nMsg == WM_DISPLAYCHANGE) || (nMsg == WM_WININICHANGE)) && pFrame->isFullScreen())
+        ImplSalFrameFullScreenPos(pFrame);
+
+    pFrame->CallCallback(nSalEvent, nullptr);
+
+    ImplSalYieldMutexRelease();
 }
 
 static void ImplHandleUserEvent( HWND hWnd, LPARAM lParam )
@@ -4144,25 +4270,22 @@ static void ImplHandleForcePalette( HWND hWnd )
 {
     SalData*    pSalData = GetSalData();
     HPALETTE    hPal = pSalData->mhDitherPal;
-    if ( hPal )
-    {
-        WinSalFrame* pFrame = ProcessOrDeferMessage( hWnd, SAL_MSG_FORCEPALETTE );
-        if ( pFrame && pFrame->mpLocalGraphics && pFrame->mpLocalGraphics->getHDC() )
-        {
-            WinSalGraphics* pGraphics = pFrame->mpLocalGraphics;
-            if (pGraphics->getDefPal())
-            {
-                if (pGraphics->setPalette(hPal, FALSE) != GDI_ERROR)
-                {
-                    InvalidateRect( hWnd, nullptr, FALSE );
-                    UpdateWindow( hWnd );
-                    pFrame->CallCallback( SalEvent::DisplayChanged, nullptr );
-                }
-            }
-        }
-        if ( pFrame )
-            ImplSalYieldMutexRelease();
-    }
+    if (!hPal)
+        return;
+
+    WinSalFrame* pFrame = ProcessOrDeferMessage(hWnd, SAL_MSG_FORCEPALETTE);
+    if (!pFrame)
+        return;
+    const ::comphelper::ScopeGuard aScopeGuard([](){ ImplSalYieldMutexRelease(); });
+
+    WinSalGraphics* pGraphics = pFrame->mpLocalGraphics;
+    if (!pGraphics || !pGraphics->getHDC() || !pGraphics->getDefPal()
+            || (pGraphics->setPalette(hPal, FALSE) == GDI_ERROR))
+        return;
+
+    InvalidateRect(hWnd, nullptr, FALSE);
+    UpdateWindow(hWnd);
+    pFrame->CallCallback(SalEvent::DisplayChanged, nullptr);
 }
 
 static LRESULT ImplHandlePalette( bool bFrame, HWND hWnd, UINT nMsg,
@@ -4322,7 +4445,7 @@ static bool ImplHandleMinMax( HWND hWnd, LPARAM lParam )
         {
             MINMAXINFO* pMinMax = reinterpret_cast<MINMAXINFO*>(lParam);
 
-            if ( pFrame->mbFullScreen )
+            if (pFrame->isFullScreen())
             {
                 int         nX;
                 int         nY;
@@ -4805,7 +4928,7 @@ static bool ImplHandleSysCommand( HWND hWnd, WPARAM wParam, LPARAM lParam )
 
     WPARAM nCommand = wParam & 0xFFF0;
 
-    if ( pFrame->mbFullScreen )
+    if (pFrame->isFullScreen())
     {
         bool    bMaximize = IsZoomed( pFrame->mhWnd );
         bool    bMinimize = IsIconic( pFrame->mhWnd );
@@ -5212,7 +5335,7 @@ static bool ImplHandleAppCommand( HWND hWnd, LPARAM lParam, LRESULT & nRet )
         const Point aPoint;
         CommandMediaData aMediaData(nCommand);
         CommandEvent aCEvt( aPoint, CommandEventId::Media, false, &aMediaData );
-        NotifyEvent aNCmdEvt( MouseNotifyEvent::COMMAND, pWindow, &aCEvt );
+        NotifyEvent aNCmdEvt( NotifyEventType::COMMAND, pWindow, &aCEvt );
 
         if ( !ImplCallPreNotify( aNCmdEvt ) )
         {
@@ -5506,6 +5629,9 @@ static LRESULT CALLBACK SalFrameWndProc( HWND hWnd, UINT nMsg, WPARAM wParam, LP
         if ( pFrame != nullptr )
         {
             SetWindowPtr( hWnd, pFrame );
+
+            UpdateDarkMode(hWnd);
+
             // Set HWND already here, as data might be used already
             // when messages are being sent by CreateWindow()
             pFrame->mhWnd = hWnd;
@@ -5638,12 +5764,15 @@ static LRESULT CALLBACK SalFrameWndProc( HWND hWnd, UINT nMsg, WPARAM wParam, LP
             break;
 
         case WM_MOVE:
+            ImplHandleMoveMsg(hWnd, lParam);
+            rDef = false;
+            break;
         case SAL_MSG_POSTMOVE:
-            ImplHandleMoveMsg( hWnd );
+            ImplCallMoveHdl(hWnd);
             rDef = false;
             break;
         case WM_SIZE:
-            ImplHandleSizeMsg( hWnd, wParam, lParam );
+            ImplHandleSizeMsg(hWnd, wParam, lParam);
             rDef = false;
             break;
         case SAL_MSG_POSTCALLSIZE:

@@ -99,6 +99,9 @@ SvXMLEnumMapEntry<sal_uInt16> const aXML_WritingDirection_Enum[] =
     { XML_RL,       text::WritingMode2::RL_TB },
     { XML_TB,       text::WritingMode2::TB_RL },
 
+    // vertical as clockwise 90deg rotation, for OOXML vert="vert"
+    { XML_TB_RL90,     text::WritingMode2::TB_RL90 },
+
     { XML_TOKEN_INVALID, 0 }
 };
 
@@ -466,6 +469,11 @@ std::unique_ptr<XMLPropertyHandler> XMLPropertyHandlerFactory::CreatePropertyHan
         case XML_TYPE_TEXT_VERTICAL_POS:
             pPropHdl.reset(new XMLConstantsPropertyHandler( pXML_VertPos_Enum, XML_TOKEN_INVALID ));
         break;
+        case XML_TYPE_TEXT_OVERFLOW_BEHAVIOR:
+            // auto-create-new-frame isn't properly implemented yet. It just means don't clip.
+            pPropHdl.reset(new XMLNamedBoolPropertyHdl(GetXMLToken(XML_CLIP),
+                                                       GetXMLToken(XML_AUTO_CREATE_NEW_FRAME)));
+            break;
 
     }
 

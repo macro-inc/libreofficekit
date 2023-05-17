@@ -33,6 +33,7 @@ $(eval $(call gb_Module_add_targets,wizards,\
 	Package_sfdatabases \
 	Package_sfdialogs \
 	Package_sfdocuments \
+	Package_sfunittests \
 	Package_sfwidgets \
 	Package_standard \
 	Package_template \

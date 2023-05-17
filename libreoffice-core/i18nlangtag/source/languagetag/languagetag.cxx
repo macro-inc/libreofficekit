@@ -18,7 +18,7 @@
 #include <sal/log.hxx>
 #include <osl/file.hxx>
 #include <rtl/locale.h>
-#include <tools/long.hxx>
+#include <o3tl/string_view.hxx>
 #include <algorithm>
 #include <map>
 #include <mutex>
@@ -34,6 +34,10 @@
 
 #ifdef ANDROID
 #include <osl/detail/android-bootstrap.h>
+#endif
+
+#ifdef EMSCRIPTEN
+#include <osl/detail/emscripten-bootstrap.h>
 #endif
 
 using namespace com::sun::star;
@@ -85,9 +89,9 @@ static const KnownTagSet & getKnowns()
 namespace {
 struct compareIgnoreAsciiCaseLess
 {
-    bool operator()( const OUString& r1, std::u16string_view r2 ) const
+    bool operator()( std::u16string_view r1, std::u16string_view r2 ) const
     {
-        return r1.compareToIgnoreAsciiCase( r2) < 0;
+        return o3tl::compareToIgnoreAsciiCase(r1, r2) < 0;
     }
 };
 typedef ::std::map< OUString, LanguageTag::ImplPtr, compareIgnoreAsciiCaseLess > MapBcp47;
@@ -215,7 +219,7 @@ void LiblangtagDataRef::teardown()
 
 void LiblangtagDataRef::setupDataPath()
 {
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(EMSCRIPTEN)
     maDataPath = OString(lo_get_app_data_dir()) + "/share/liblangtag";
 #else
     // maDataPath is assumed to be empty here.
@@ -852,7 +856,7 @@ LanguageTag::ImplPtr LanguageTag::registerImpl() const
     std::unique_lock aGuard( theMutex());
 
 #if OSL_DEBUG_LEVEL > 0
-    static tools::Long nRunning = 0;
+    static long nRunning = 0;
     // Entering twice here is ok, which is needed for fallback init in
     // getKnowns() in canonicalize() via pImpl->convertBcp47ToLocale() below,
     // everything else is suspicious.
@@ -961,7 +965,7 @@ LanguageTag::ImplPtr LanguageTag::registerImpl() const
                         // May have involved canonicalize(), so compare with
                         // pImpl->maBcp47 instead of maBcp47!
                         aBcp47 = LanguageTagImpl::convertToBcp47(
-                                MsLangId::Conversion::convertLanguageToLocale( pImpl->mnLangID ));
+                                MsLangId::Conversion::convertLanguageToLocale( pImpl->mnLangID, true));
                         bInsert = (aBcp47 == pImpl->maBcp47);
                     }
                 }
@@ -1352,7 +1356,7 @@ void LanguageTagImpl::convertLocaleToBcp47()
         // locale via LanguageTag::convertToBcp47(LanguageType) and
         // LanguageTag::convertToLocale(LanguageType) would instantiate another
         // LanguageTag.
-        maLocale = MsLangId::Conversion::convertLanguageToLocale( LANGUAGE_SYSTEM );
+        maLocale = MsLangId::Conversion::convertLanguageToLocale( LANGUAGE_SYSTEM, false);
     }
     if (maLocale.Language.isEmpty())
     {
@@ -1496,7 +1500,7 @@ void LanguageTagImpl::convertLangToLocale()
         mbInitializedLangID = true;
     }
     // Resolve system here! The original is remembered as mbSystemLocale.
-    maLocale = MsLangId::Conversion::convertLanguageToLocale( mnLangID );
+    maLocale = MsLangId::Conversion::convertLanguageToLocale( mnLangID, false);
     mbInitializedLocale = true;
 }
 
@@ -1532,7 +1536,7 @@ void LanguageTag::convertFromRtlLocale()
     if (maLocale.Variant.isEmpty())
         return;
 
-    OString aStr = OUStringToOString(maLocale.Language, RTL_TEXTENCODING_UTF8) + "_" + OUStringToOString(OUStringConcatenation(maLocale.Country + maLocale.Variant),
+    OString aStr = OUStringToOString(maLocale.Language, RTL_TEXTENCODING_UTF8) + "_" + OUStringToOString(Concat2View(maLocale.Country + maLocale.Variant),
             RTL_TEXTENCODING_UTF8);
     /* FIXME: let liblangtag parse this entirely with
      * lt_tag_convert_from_locale() but that needs a patch to pass the
@@ -2828,9 +2832,9 @@ css::lang::Locale LanguageTag::convertToLocaleWithFallback( const OUString& rBcp
 
 
 // static
-LanguageType LanguageTag::convertToLanguageTypeWithFallback( const css::lang::Locale& rLocale, bool bResolveSystem )
+LanguageType LanguageTag::convertToLanguageTypeWithFallback( const css::lang::Locale& rLocale )
 {
-    if (rLocale.Language.isEmpty() && !bResolveSystem)
+    if (rLocale.Language.isEmpty())
         return LANGUAGE_SYSTEM;
 
     return LanguageTag( rLocale).makeFallback().getLanguageType();
@@ -2838,7 +2842,8 @@ LanguageType LanguageTag::convertToLanguageTypeWithFallback( const css::lang::Lo
 
 
 // static
-bool LanguageTag::isValidBcp47( const OUString& rString, OUString* o_pCanonicalized, bool bDisallowPrivate )
+bool LanguageTag::isValidBcp47( const OUString& rString, OUString* o_pCanonicalized,
+        LanguageTag::PrivateUse ePrivateUse )
 {
     bool bValid = false;
 
@@ -2865,30 +2870,37 @@ bool LanguageTag::isValidBcp47( const OUString& rString, OUString* o_pCanonicali
         if (pTag)
         {
             bValid = true;
-            if (bDisallowPrivate)
+            if (ePrivateUse != PrivateUse::ALLOW)
             {
-                const lt_string_t* pPrivate = lt_tag_get_privateuse( aVar.mpLangtag);
-                if (pPrivate && lt_string_length( pPrivate) > 0)
-                    bValid = false;
-                else
+                do
                 {
+                    const char* pLang = nullptr;
                     const lt_lang_t* pLangT = lt_tag_get_language( aVar.mpLangtag);
                     if (pLangT)
                     {
-                        const char* pLang = lt_lang_get_tag( pLangT);
-                        if (pLang && strcmp( pLang, I18NLANGTAG_QLT) == 0)
+                        pLang = lt_lang_get_tag( pLangT);
+                        if (pLang && strcmp( pLang, I18NLANGTAG_QLT_ASCII) == 0)
                         {
-                            // Disallow 'qlt' privateuse code to prevent
+                            // Disallow 'qlt' localuse code to prevent
                             // confusion with our internal usage.
                             bValid = false;
+                            break;
                         }
                     }
+                    if (ePrivateUse == PrivateUse::ALLOW_ART_X && pLang && strcmp( pLang, "art") == 0)
+                    {
+                        // Allow anything 'art' which includes 'art-x-...' and 'art-Latn-x-...'.
+                        break;
+                    }
+                    const lt_string_t* pPrivate = lt_tag_get_privateuse( aVar.mpLangtag);
+                    if (pPrivate && lt_string_length( pPrivate) > 0)
+                        bValid = false;
                 }
+                while (false);
             }
             if (o_pCanonicalized)
                 *o_pCanonicalized = OUString::createFromAscii( pTag);
             free( pTag);
-            return bValid;
         }
     }
     else

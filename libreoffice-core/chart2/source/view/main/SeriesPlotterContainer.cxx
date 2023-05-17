@@ -17,16 +17,21 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cstddef>
+
 #include "SeriesPlotterContainer.hxx"
 
 #include <ChartView.hxx>
 #include <Diagram.hxx>
+#include <ChartType.hxx>
 #include <DataSeries.hxx>
 #include <ChartModel.hxx>
 #include <ChartTypeHelper.hxx>
 #include <ObjectIdentifier.hxx>
 #include <DiagramHelper.hxx>
-
+#include <Axis.hxx>
 #include <AxisIndexDefines.hxx>
 #include <DataSeriesHelper.hxx>
 #include <ExplicitCategoriesProvider.hxx>
@@ -34,12 +39,11 @@
 
 #include <com/sun/star/chart/ChartAxisPosition.hpp>
 #include <com/sun/star/chart2/AxisType.hpp>
-#include <com/sun/star/chart2/XDataSeriesContainer.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 
 #include <comphelper/classids.hxx>
 #include <servicenames_charttypes.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -77,7 +81,7 @@ std::vector<LegendEntryProvider*> SeriesPlotterContainer::getLegendEntryProvider
 
 VCoordinateSystem* SeriesPlotterContainer::findInCooSysList(
     const std::vector<std::unique_ptr<VCoordinateSystem>>& rVCooSysList,
-    const uno::Reference<XCoordinateSystem>& xCooSys)
+    const rtl::Reference<BaseCoordinateSystem>& xCooSys)
 {
     for (auto& pVCooSys : rVCooSysList)
     {
@@ -103,7 +107,7 @@ VCoordinateSystem* SeriesPlotterContainer::getCooSysForPlotter(
 
 VCoordinateSystem* SeriesPlotterContainer::addCooSysToList(
     std::vector<std::unique_ptr<VCoordinateSystem>>& rVCooSysList,
-    const uno::Reference<XCoordinateSystem>& xCooSys, ChartModel& rChartModel)
+    const rtl::Reference<BaseCoordinateSystem>& xCooSys, ChartModel& rChartModel)
 {
     VCoordinateSystem* pExistingVCooSys
         = SeriesPlotterContainer::findInCooSysList(rVCooSysList, xCooSys);
@@ -116,7 +120,7 @@ VCoordinateSystem* SeriesPlotterContainer::addCooSysToList(
         return nullptr;
 
     OUString aCooSysParticle(
-        ObjectIdentifier::createParticleForCoordinateSystem(xCooSys, rChartModel));
+        ObjectIdentifier::createParticleForCoordinateSystem(xCooSys, &rChartModel));
     pVCooSys->setParticle(aCooSysParticle);
 
     pVCooSys->setExplicitCategoriesProvider(new ExplicitCategoriesProvider(xCooSys, rChartModel));
@@ -126,7 +130,7 @@ VCoordinateSystem* SeriesPlotterContainer::addCooSysToList(
 
 void SeriesPlotterContainer::initializeCooSysAndSeriesPlotter(ChartModel& rChartModel)
 {
-    uno::Reference<XDiagram> xDiagram(rChartModel.getFirstDiagram());
+    rtl::Reference<Diagram> xDiagram = rChartModel.getFirstChartDiagram();
     if (!xDiagram.is())
         return;
 
@@ -150,16 +154,15 @@ void SeriesPlotterContainer::initializeCooSysAndSeriesPlotter(ChartModel& rChart
     sal_Int32 n3DRelativeHeight = 100;
     try
     {
-        uno::Reference<beans::XPropertySet> xDiaProp(xDiagram, uno::UNO_QUERY_THROW);
-        xDiaProp->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= bSortByXValues;
-        xDiaProp->getPropertyValue("ConnectBars") >>= bConnectBars;
-        xDiaProp->getPropertyValue("GroupBarsPerAxis") >>= bGroupBarsPerAxis;
-        xDiaProp->getPropertyValue("IncludeHiddenCells") >>= bIncludeHiddenCells;
-        xDiaProp->getPropertyValue("StartingAngle") >>= nStartingAngle;
+        xDiagram->getPropertyValue(CHART_UNONAME_SORT_BY_XVALUES) >>= bSortByXValues;
+        xDiagram->getPropertyValue("ConnectBars") >>= bConnectBars;
+        xDiagram->getPropertyValue("GroupBarsPerAxis") >>= bGroupBarsPerAxis;
+        xDiagram->getPropertyValue("IncludeHiddenCells") >>= bIncludeHiddenCells;
+        xDiagram->getPropertyValue("StartingAngle") >>= nStartingAngle;
 
         if (nDimensionCount == 3)
         {
-            xDiaProp->getPropertyValue("3DRelativeHeight") >>= n3DRelativeHeight;
+            xDiagram->getPropertyValue("3DRelativeHeight") >>= n3DRelativeHeight;
         }
     }
     catch (const uno::Exception&)
@@ -176,17 +179,12 @@ void SeriesPlotterContainer::initializeCooSysAndSeriesPlotter(ChartModel& rChart
     // - add plotter to coordinate systems
 
     //iterate through all coordinate systems
-    uno::Reference<XCoordinateSystemContainer> xCooSysContainer(xDiagram, uno::UNO_QUERY);
-    OSL_ASSERT(xCooSysContainer.is());
-    if (!xCooSysContainer.is())
-        return;
     uno::Reference<XColorScheme> xColorScheme(xDiagram->getDefaultColorScheme());
-    uno::Sequence<uno::Reference<XCoordinateSystem>> aCooSysList(
-        xCooSysContainer->getCoordinateSystems());
+    auto& rCooSysList = xDiagram->getBaseCoordinateSystems();
     sal_Int32 nGlobalSeriesIndex = 0; //for automatic symbols
-    for (sal_Int32 nCS = 0; nCS < aCooSysList.getLength(); ++nCS)
+    for (std::size_t nCS = 0; nCS < rCooSysList.size(); ++nCS)
     {
-        uno::Reference<XCoordinateSystem> xCooSys(aCooSysList[nCS]);
+        rtl::Reference<BaseCoordinateSystem> xCooSys(rCooSysList[nCS]);
         VCoordinateSystem* pVCooSys
             = SeriesPlotterContainer::addCooSysToList(m_rVCooSysList, xCooSys, rChartModel);
         // Let's check whether the secondary Y axis is visible
@@ -194,8 +192,7 @@ void SeriesPlotterContainer::initializeCooSysAndSeriesPlotter(ChartModel& rChart
         {
             if (xCooSys->getMaximumAxisIndexByDimension(1) > 0)
             {
-                Reference<beans::XPropertySet> xAxisProp(xCooSys->getAxisByDimension(1, 1),
-                                                         uno::UNO_QUERY);
+                rtl::Reference<Axis> xAxisProp = xCooSys->getAxisByDimension2(1, 1);
                 xAxisProp->getPropertyValue("Show") >>= bSecondaryYaxisVisible;
             }
         }
@@ -204,34 +201,25 @@ void SeriesPlotterContainer::initializeCooSysAndSeriesPlotter(ChartModel& rChart
             TOOLS_WARN_EXCEPTION("chart2", "");
         }
         //iterate through all chart types in the current coordinate system
-        uno::Reference<XChartTypeContainer> xChartTypeContainer(xCooSys, uno::UNO_QUERY);
-        OSL_ASSERT(xChartTypeContainer.is());
-        if (!xChartTypeContainer.is())
-            continue;
-        uno::Sequence<uno::Reference<XChartType>> aChartTypeList(
-            xChartTypeContainer->getChartTypes());
-        for (sal_Int32 nT = 0; nT < aChartTypeList.getLength(); ++nT)
+        std::vector<rtl::Reference<ChartType>> aChartTypeList(xCooSys->getChartTypes2());
+        for (std::size_t nT = 0; nT < aChartTypeList.size(); ++nT)
         {
-            uno::Reference<XChartType> xChartType(aChartTypeList[nT]);
+            rtl::Reference<ChartType> xChartType(aChartTypeList[nT]);
             if (nDimensionCount == 3
                 && xChartType->getChartType().equalsIgnoreAsciiCase(
                        CHART2_SERVICE_NAME_CHARTTYPE_PIE))
             {
-                uno::Reference<beans::XPropertySet> xPropertySet(xChartType, uno::UNO_QUERY);
-                if (xPropertySet.is())
+                try
                 {
-                    try
-                    {
-                        sal_Int32 n3DRelativeHeightOldValue(100);
-                        uno::Any aAny = xPropertySet->getPropertyValue("3DRelativeHeight");
-                        aAny >>= n3DRelativeHeightOldValue;
-                        if (n3DRelativeHeightOldValue != n3DRelativeHeight)
-                            xPropertySet->setPropertyValue("3DRelativeHeight",
-                                                           uno::Any(n3DRelativeHeight));
-                    }
-                    catch (const uno::Exception&)
-                    {
-                    }
+                    sal_Int32 n3DRelativeHeightOldValue(100);
+                    uno::Any aAny = xChartType->getPropertyValue("3DRelativeHeight");
+                    aAny >>= n3DRelativeHeightOldValue;
+                    if (n3DRelativeHeightOldValue != n3DRelativeHeight)
+                        xChartType->setPropertyValue("3DRelativeHeight",
+                                                     uno::Any(n3DRelativeHeight));
+                }
+                catch (const uno::Exception&)
+                {
                 }
             }
 
@@ -257,21 +245,14 @@ void SeriesPlotterContainer::initializeCooSysAndSeriesPlotter(ChartModel& rChart
             if (pVCooSys)
                 pVCooSys->addMinimumAndMaximumSupplier(pPlotter);
 
-            uno::Reference<XDataSeriesContainer> xDataSeriesContainer(xChartType, uno::UNO_QUERY);
-            OSL_ASSERT(xDataSeriesContainer.is());
-            if (!xDataSeriesContainer.is())
-                continue;
-
             sal_Int32 zSlot = -1;
             sal_Int32 xSlot = -1;
             sal_Int32 ySlot = -1;
-            uno::Sequence<uno::Reference<XDataSeries>> aSeriesList(
-                xDataSeriesContainer->getDataSeries());
-            for (sal_Int32 nS = 0; nS < aSeriesList.getLength(); ++nS)
+            const std::vector<rtl::Reference<DataSeries>>& aSeriesList
+                = xChartType->getDataSeries2();
+            for (std::size_t nS = 0; nS < aSeriesList.size(); ++nS)
             {
-                uno::Reference<XDataSeries> const& xDataSeries = aSeriesList[nS];
-                if (!xDataSeries.is())
-                    continue;
+                rtl::Reference<DataSeries> const& xDataSeries = aSeriesList[nS];
                 if (!bIncludeHiddenCells && !DataSeriesHelper::hasUnhiddenData(xDataSeries))
                     continue;
 
@@ -378,7 +359,7 @@ void SeriesPlotterContainer::initAxisUsageList(const Date& rNullDate)
     // there should only be one coordinate system per diagram).
     for (auto& pVCooSys : m_rVCooSysList)
     {
-        uno::Reference<XCoordinateSystem> xCooSys = pVCooSys->getModel();
+        rtl::Reference<BaseCoordinateSystem> xCooSys = pVCooSys->getModel();
         sal_Int32 nDimCount = xCooSys->getDimension();
         bool bComplexCategoryAllowed = ChartTypeHelper::isSupportingComplexCategory(
             AxisHelper::getChartTypeByIndex(xCooSys, 0));
@@ -392,7 +373,7 @@ void SeriesPlotterContainer::initAxisUsageList(const Date& rNullDate)
             const sal_Int32 nMaxAxisIndex = xCooSys->getMaximumAxisIndexByDimension(nDimIndex);
             for (sal_Int32 nAxisIndex = 0; nAxisIndex <= nMaxAxisIndex; ++nAxisIndex)
             {
-                uno::Reference<XAxis> xAxis = xCooSys->getAxisByDimension(nDimIndex, nAxisIndex);
+                rtl::Reference<Axis> xAxis = xCooSys->getAxisByDimension2(nDimIndex, nAxisIndex);
 
                 if (!xAxis.is())
                     continue;
@@ -471,7 +452,7 @@ void SeriesPlotterContainer::setNumberFormatsFromAxes()
         if (pVCooSys)
         {
             AxesNumberFormats aAxesNumberFormats;
-            const uno::Reference<XCoordinateSystem>& xCooSys = pVCooSys->getModel();
+            const rtl::Reference<BaseCoordinateSystem>& xCooSys = pVCooSys->getModel();
             sal_Int32 nDimensionCount = xCooSys->getDimension();
             for (sal_Int32 nDimensionIndex = 0; nDimensionIndex < nDimensionCount;
                  ++nDimensionIndex)
@@ -482,9 +463,8 @@ void SeriesPlotterContainer::setNumberFormatsFromAxes()
                 {
                     try
                     {
-                        Reference<beans::XPropertySet> xAxisProp(
-                            xCooSys->getAxisByDimension(nDimensionIndex, nAxisIndex),
-                            uno::UNO_QUERY);
+                        rtl::Reference<Axis> xAxisProp
+                            = xCooSys->getAxisByDimension2(nDimensionIndex, nAxisIndex);
                         if (xAxisProp.is())
                         {
                             sal_Int32 nNumberFormatKey(0);
@@ -528,10 +508,9 @@ void SeriesPlotterContainer::doAutoScaling(ChartModel& rChartModel)
     for (sal_Int32 nAxisIndex = 0; nAxisIndex <= m_nMaxAxisIndex; ++nAxisIndex)
     {
         // - first do autoscale for all x and z scales (because they are treated independent)
-        for (auto& axisUsage : m_aAxisUsageList)
+        for (auto & [ rAxis, rAxisUsage ] : m_aAxisUsageList)
         {
-            AxisUsage& rAxisUsage = axisUsage.second;
-
+            (void)rAxis;
             rAxisUsage.prepareAutomaticAxisScaling(rAxisUsage.aAutoScaling, 0, nAxisIndex);
             rAxisUsage.prepareAutomaticAxisScaling(rAxisUsage.aAutoScaling, 2, nAxisIndex);
 
@@ -547,10 +526,9 @@ void SeriesPlotterContainer::doAutoScaling(ChartModel& rChartModel)
         }
 
         // - second do autoscale for the dependent y scales (the coordinate systems are prepared with x and z scales already )
-        for (auto& axisUsage : m_aAxisUsageList)
+        for (auto & [ rAxis, rAxisUsage ] : m_aAxisUsageList)
         {
-            AxisUsage& rAxisUsage = axisUsage.second;
-
+            (void)rAxis;
             rAxisUsage.prepareAutomaticAxisScaling(rAxisUsage.aAutoScaling, 1, nAxisIndex);
 
             ExplicitScaleData aExplicitScale;
@@ -574,23 +552,23 @@ void SeriesPlotterContainer::AdaptScaleOfYAxisWithoutAttachedSeries(ChartModel& 
     //issue #i80518#
     for (sal_Int32 nAxisIndex = 0; nAxisIndex <= m_nMaxAxisIndex; nAxisIndex++)
     {
-        for (auto& axisUsage : m_aAxisUsageList)
+        for (auto & [ rAxis, rAxisUsage ] : m_aAxisUsageList)
         {
-            AxisUsage& rAxisUsage = axisUsage.second;
+            (void)rAxis;
             std::vector<VCoordinateSystem*> aVCooSysList_Y
                 = rAxisUsage.getCoordinateSystems(1, nAxisIndex);
             if (aVCooSysList_Y.empty())
                 continue;
 
-            uno::Reference<XDiagram> xDiagram(rModel.getFirstDiagram());
+            rtl::Reference<Diagram> xDiagram(rModel.getFirstChartDiagram());
             if (!xDiagram.is())
                 continue;
 
             bool bSeriesAttachedToThisAxis = false;
             sal_Int32 nAttachedAxisIndex = -1;
             {
-                std::vector<Reference<XDataSeries>> aSeriesVector(
-                    DiagramHelper::getDataSeriesFromDiagram(xDiagram));
+                std::vector<rtl::Reference<DataSeries>> aSeriesVector
+                    = DiagramHelper::getDataSeriesFromDiagram(xDiagram);
                 for (auto const& series : aSeriesVector)
                 {
                     sal_Int32 nCurrentIndex = DataSeriesHelper::getAttachedAxisIndex(series);
@@ -678,9 +656,9 @@ void SeriesPlotterContainer::AdaptScaleOfYAxisWithoutAttachedSeries(ChartModel& 
     //correct origin for y main axis (the origin is where the other main axis crosses)
     sal_Int32 nAxisIndex = 0;
     sal_Int32 nDimensionIndex = 1;
-    for (auto& axisUsage : m_aAxisUsageList)
+    for (auto & [ rAxis, rAxisUsage ] : m_aAxisUsageList)
     {
-        AxisUsage& rAxisUsage = axisUsage.second;
+        (void)rAxis;
         std::vector<VCoordinateSystem*> aVCooSysList
             = rAxisUsage.getCoordinateSystems(nDimensionIndex, nAxisIndex);
         size_t nC;
@@ -691,10 +669,10 @@ void SeriesPlotterContainer::AdaptScaleOfYAxisWithoutAttachedSeries(ChartModel& 
             ExplicitIncrementData aExplicitIncrement(
                 aVCooSysList[nC]->getExplicitIncrement(nDimensionIndex, nAxisIndex));
 
-            Reference<chart2::XCoordinateSystem> xCooSys(aVCooSysList[nC]->getModel());
-            Reference<XAxis> xAxis(xCooSys->getAxisByDimension(nDimensionIndex, nAxisIndex));
-            Reference<beans::XPropertySet> xCrossingMainAxis(
-                AxisHelper::getCrossingMainAxis(xAxis, xCooSys), uno::UNO_QUERY);
+            rtl::Reference<BaseCoordinateSystem> xCooSys(aVCooSysList[nC]->getModel());
+            rtl::Reference<Axis> xAxis = xCooSys->getAxisByDimension2(nDimensionIndex, nAxisIndex);
+            rtl::Reference<Axis> xCrossingMainAxis
+                = AxisHelper::getCrossingMainAxis(xAxis, xCooSys);
 
             if (xCrossingMainAxis.is())
             {
@@ -762,6 +740,6 @@ drawing::Direction3D SeriesPlotterContainer::getPreferredAspectRatio()
     return aPreferredAspectRatio;
 }
 
-} //end chart namespace
+} //end chart2 namespace
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

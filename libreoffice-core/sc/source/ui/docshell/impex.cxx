@@ -26,6 +26,7 @@
 #include <sal/log.hxx>
 #include <unotools/charclass.hxx>
 #include <osl/module.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <global.hxx>
 #include <docsh.hxx>
@@ -63,6 +64,7 @@
 #include <editeng/editobj.hxx>
 #include <svl/numformat.hxx>
 #include <rtl/character.hxx>
+#include <rtl/math.hxx>
 #include <sax/tools/converter.hxx>
 
 #include <memory>
@@ -286,14 +288,24 @@ bool ScImportExport::ExportData( const OUString& rMimeType,
                                  css::uno::Any & rValue )
 {
     SvMemoryStream aStrm;
+    SotClipboardFormatId fmtId = SotExchange::GetFormatIdFromMimeType(rMimeType);
+    if (fmtId == SotClipboardFormatId::STRING)
+        aStrm.SetStreamCharSet(RTL_TEXTENCODING_UNICODE);
     // mba: no BaseURL for data exchange
-    if( ExportStream( aStrm, OUString(),
-                SotExchange::GetFormatIdFromMimeType( rMimeType ) ))
+    if (ExportStream(aStrm, OUString(), fmtId))
     {
-        aStrm.WriteUChar( 0 );
-        rValue <<= css::uno::Sequence< sal_Int8 >(
-                                        static_cast<sal_Int8 const *>(aStrm.GetData()),
-                                        aStrm.TellEnd() );
+        if (fmtId == SotClipboardFormatId::STRING)
+        {
+            assert(aStrm.TellEnd() % sizeof(sal_Unicode) == 0);
+            rValue <<= OUString(static_cast<const sal_Unicode*>(aStrm.GetData()),
+                                aStrm.TellEnd() / sizeof(sal_Unicode));
+        }
+        else
+        {
+            aStrm.WriteUChar(0);
+            rValue <<= css::uno::Sequence<sal_Int8>(static_cast<sal_Int8 const*>(aStrm.GetData()),
+                                                    aStrm.TellEnd());
+        }
         return true;
     }
     return false;
@@ -469,7 +481,7 @@ bool ScImportExport::ExportStream( SvStream& rStrm, const OUString& rBaseURL, So
             WriteUnicodeOrByteString( rStrm, aAppName, true );
             WriteUnicodeOrByteString( rStrm, aDocName, true );
             WriteUnicodeOrByteString( rStrm, aRefName, true );
-            WriteUnicodeOrByteString( rStrm, "calc:extref", true );
+            WriteUnicodeOrByteString( rStrm, u"calc:extref", true );
             if ( rStrm.GetStreamCharSet() == RTL_TEXTENCODING_UNICODE )
                 rStrm.WriteUInt16( 0 );
             else
@@ -491,17 +503,17 @@ bool ScImportExport::ExportStream( SvStream& rStrm, const OUString& rBaseURL, So
     return false;
 }
 
-void ScImportExport::WriteUnicodeOrByteString( SvStream& rStrm, const OUString& rString, bool bZero )
+void ScImportExport::WriteUnicodeOrByteString( SvStream& rStrm, std::u16string_view rString, bool bZero )
 {
     rtl_TextEncoding eEnc = rStrm.GetStreamCharSet();
     if ( eEnc == RTL_TEXTENCODING_UNICODE )
     {
         if ( !lcl_IsEndianSwap( rStrm ) )
-            rStrm.WriteBytes(rString.getStr(), rString.getLength() * sizeof(sal_Unicode));
+            rStrm.WriteBytes(rString.data(), rString.size() * sizeof(sal_Unicode));
         else
         {
-            const sal_Unicode* p = rString.getStr();
-            const sal_Unicode* const pStop = p + rString.getLength();
+            const sal_Unicode* p = rString.data();
+            const sal_Unicode* const pStop = p + rString.size();
             while ( p < pStop )
             {
                 rStrm.WriteUInt16( *p );
@@ -579,6 +591,11 @@ void ScImportExport::SetNoEndianSwap( SvStream& rStrm )
 #endif
 }
 
+static inline bool lcl_isFieldEnd( sal_Unicode c, const sal_Unicode* pSeps )
+{
+    return !c || ScGlobal::UnicodeStrChr( pSeps, c);
+}
+
 namespace {
 
 enum QuoteType
@@ -613,7 +630,7 @@ static QuoteType lcl_isFieldEndQuote( const sal_Unicode* p, const sal_Unicode* p
     const bool bBlankSep = (p[1] == cBlank && !rcDetectSep && p[2] && p[2] != cBlank);
     while (p[1] == cBlank)
         ++p;
-    if (!p[1] || ScGlobal::UnicodeStrChr( pSeps, p[1]))
+    if (lcl_isFieldEnd( p[1], pSeps))
         return FIELDEND_QUOTE;
     // Extended separator detection after a closing quote (with or without
     // blanks). Note that nQuotes is incremented *after* the call so is not yet
@@ -710,9 +727,30 @@ enum class DoubledQuoteMode
 
 }
 
-static const sal_Unicode* lcl_ScanString( const sal_Unicode* p, OUString& rString,
+/** Scan for a quoted string.
+
+    Precondition: initial current position *p is a cStr quote.
+
+    For DoubledQuoteMode::ESCAPE, if after the closing quote there is a field
+    end (with or without trailing blanks and as determined by
+    lcl_isFieldEndQuote()), then the content is appended to rField with quotes
+    processed and removed. Else if no field end after the quoted string was
+    detected, nothing is appended and processing continues and is repeated
+    until the next quote. If no closing quote at a field end was found at all,
+    nothing is appended and the initial position is returned and caller has to
+    decide, usually just taking all as literal data.
+
+    For DoubledQuoteMode::KEEP_ALL, the string up to and including the closing
+    quote is appended to rField and the next position returned, regardless
+    whether there is a field separator following or not.
+
+ */
+static const sal_Unicode* lcl_ScanString( const sal_Unicode* p, OUString& rField,
             const sal_Unicode* pSeps, sal_Unicode cStr, DoubledQuoteMode eMode, bool& rbOverflowCell )
 {
+    OUString aString;
+    bool bClosingQuote = (eMode == DoubledQuoteMode::KEEP_ALL);
+    const sal_Unicode* const pStart = p;
     if (eMode != DoubledQuoteMode::KEEP_ALL)
         p++;    //! jump over opening quote
     bool bCont;
@@ -722,8 +760,19 @@ static const sal_Unicode* lcl_ScanString( const sal_Unicode* p, OUString& rStrin
         const sal_Unicode* p0 = p;
         for( ;; )
         {
-            if( !*p )
-                break;
+            if (!*p)
+            {
+                // Encountering end of data after an opening quote is not a
+                // quoted string, ReadCsvLine() concatenated lines with '\n'
+                // for a properly quoted embedded linefeed.
+                if (eMode == DoubledQuoteMode::KEEP_ALL)
+                    // Caller would append that data anyway, so we can do it
+                    // already here.
+                    break;
+
+                return pStart;
+            }
+
             if( *p == cStr )
             {
                 if ( *++p != cStr )
@@ -733,7 +782,10 @@ static const sal_Unicode* lcl_ScanString( const sal_Unicode* p, OUString& rStrin
                     {
                         sal_Unicode cDetectSep = 0xffff;    // No separator detection here.
                         if (lcl_isFieldEndQuote( p-1, pSeps, cDetectSep) == FIELDEND_QUOTE)
+                        {
+                            bClosingQuote = true;
                             break;
+                        }
                         else
                             continue;
                     }
@@ -759,10 +811,17 @@ static const sal_Unicode* lcl_ScanString( const sal_Unicode* p, OUString& rStrin
         }
         if ( p0 < p )
         {
-            if (!lcl_appendLineData( rString, p0, ((eMode != DoubledQuoteMode::KEEP_ALL && (*p || *(p-1) == cStr)) ? p-1 : p)))
+            if (!lcl_appendLineData( aString, p0, ((eMode != DoubledQuoteMode::KEEP_ALL && (*p || *(p-1) == cStr)) ? p-1 : p)))
                 rbOverflowCell = true;
         }
     } while ( bCont );
+
+    if (!bClosingQuote)
+        return pStart;
+
+    if (!aString.isEmpty())
+        rField += aString;
+
     return p;
 }
 
@@ -885,20 +944,15 @@ static const sal_Unicode* lcl_ScanSylkFormula( const sal_Unicode* p,
     return p;
 }
 
-static void lcl_DoubleEscapeChar( OUString& rString, sal_Unicode cStr )
-{
-    sal_Int32 n = 0;
-    while( ( n = rString.indexOf( cStr, n ) ) != -1 )
-    {
-        rString = rString.replaceAt( n, 0, rtl::OUStringChar(cStr) );
-        n += 2;
-    }
-}
-
 static void lcl_WriteString( SvStream& rStrm, OUString& rString, sal_Unicode cQuote, sal_Unicode cEsc )
 {
     if (cEsc)
-        lcl_DoubleEscapeChar( rString, cEsc );
+    {
+        // the goal is to replace cStr by cStr+cStr
+        OUString strFrom(cEsc);
+        OUString strTo = strFrom + strFrom;
+        rString = rString.replaceAll(strFrom, strTo);
+    }
 
     if (cQuote)
     {
@@ -908,7 +962,7 @@ static void lcl_WriteString( SvStream& rStrm, OUString& rString, sal_Unicode cQu
     ScImportExport::WriteUnicodeOrByteString( rStrm, rString );
 }
 
-static void lcl_WriteSimpleString( SvStream& rStrm, const OUString& rString )
+static void lcl_WriteSimpleString( SvStream& rStrm, std::u16string_view rString )
 {
     ScImportExport::WriteUnicodeOrByteString( rStrm, rString );
 }
@@ -928,7 +982,7 @@ bool ScImportExport::Text2Doc( SvStream& rStrm )
     SCROW nStartRow = aRange.aStart.Row();
     SCCOL nEndCol = aRange.aEnd.Col();
     SCROW nEndRow = aRange.aEnd.Row();
-    sal_uLong  nOldPos = rStrm.Tell();
+    sal_uInt64 nOldPos = rStrm.Tell();
     rStrm.StartReadingUnicodeText( rStrm.GetStreamCharSet() );
     bool   bData = !bSingle;
     if( !bSingle)
@@ -953,18 +1007,16 @@ bool ScImportExport::Text2Doc( SvStream& rStrm )
             {
                 aCell.clear();
                 const sal_Unicode* q = p;
-                while (*p && *p != cSep)
+                if (*p == cStr)
                 {
-                    // Always look for a pairing quote and ignore separator in between.
-                    while (*p && *p == cStr)
-                        q = p = lcl_ScanString( p, aCell, pSeps, cStr, mode, bOverflowCell );
-                    // All until next separator or quote.
-                    while (*p && *p != cSep && *p != cStr)
-                        ++p;
-                    if (!lcl_appendLineData( aCell, q, p))
-                        bOverflowCell = true;   // display warning on import
-                    q = p;
+                    // Look for a pairing quote.
+                    q = p = lcl_ScanString( p, aCell, pSeps, cStr, mode, bOverflowCell );
                 }
+                // All until next separator.
+                while (*p && *p != cSep)
+                    ++p;
+                if (!lcl_appendLineData( aCell, q, p))
+                    bOverflowCell = true;   // display warning on import
                 if (*p)
                     ++p;
                 if (rDoc.ValidCol(nCol) && rDoc.ValidRow(nRow) )
@@ -1256,8 +1308,8 @@ static bool lcl_PutString(
         {
             using namespace ::com::sun::star;
             bool bSecondCal = false;
-            sal_uInt16 nDay  = static_cast<sal_uInt16>(rStr.copy( nStart[nDP], nEnd[nDP]+1-nStart[nDP] ).toInt32());
-            sal_uInt16 nYear = static_cast<sal_uInt16>(rStr.copy( nStart[nYP], nEnd[nYP]+1-nStart[nYP] ).toInt32());
+            sal_uInt16 nDay  = static_cast<sal_uInt16>(o3tl::toInt32(rStr.subView( nStart[nDP], nEnd[nDP]+1-nStart[nDP] )));
+            sal_uInt16 nYear = static_cast<sal_uInt16>(o3tl::toInt32(rStr.subView( nStart[nYP], nEnd[nYP]+1-nStart[nYP] )));
             OUString aMStr = rStr.copy( nStart[nMP], nEnd[nMP]+1-nStart[nMP] );
             sal_Int16 nMonth = static_cast<sal_Int16>(aMStr.toInt32());
             if (!nMonth)
@@ -1322,11 +1374,11 @@ static bool lcl_PutString(
                 // time fields to zero (ICU calendar instance defaults to current date/time)
                 nHour = nMinute = nSecond = 0;
                 if (nFound > 3)
-                    nHour = static_cast<sal_Int16>(rStr.copy( nStart[3], nEnd[3]+1-nStart[3]).toInt32());
+                    nHour = static_cast<sal_Int16>(o3tl::toInt32(rStr.subView( nStart[3], nEnd[3]+1-nStart[3])));
                 if (nFound > 4)
-                    nMinute = static_cast<sal_Int16>(rStr.copy( nStart[4], nEnd[4]+1-nStart[4]).toInt32());
+                    nMinute = static_cast<sal_Int16>(o3tl::toInt32(rStr.subView( nStart[4], nEnd[4]+1-nStart[4])));
                 if (nFound > 5)
-                    nSecond = static_cast<sal_Int16>(rStr.copy( nStart[5], nEnd[5]+1-nStart[5]).toInt32());
+                    nSecond = static_cast<sal_Int16>(o3tl::toInt32(rStr.subView( nStart[5], nEnd[5]+1-nStart[5])));
                 // do not use calendar's milliseconds, to avoid fractional part truncation
                 double fFrac = 0.0;
                 if (nFound > 6)
@@ -1582,6 +1634,7 @@ bool ScImportExport::ExtText2Doc( SvStream& rStrm )
     // Determine range for Undo.
     // We don't need this during import of a file to a new sheet or document...
     bool bDetermineRange = bUndo;
+    bool bColumnsAreDetermined = false;
 
     // Row heights don't need to be adjusted on the fly if EndPaste() is called
     // afterwards, which happens only if bDetermineRange. This variable also
@@ -1590,7 +1643,7 @@ bool ScImportExport::ExtText2Doc( SvStream& rStrm )
 
     bool bQuotedAsText = pExtOptions && pExtOptions->IsQuotedAsText();
 
-    sal_uLong nOriginalStreamPos = rStrm.Tell();
+    sal_uInt64 nOriginalStreamPos = rStrm.Tell();
 
     SCROW nFirstUpdateRowHeight = SCROW_MAX;
     SCROW nLastUpdateRowHeight = -1;
@@ -1612,7 +1665,8 @@ bool ScImportExport::ExtText2Doc( SvStream& rStrm )
                 break;  // for
             }
 
-            EmbeddedNullTreatment( aLine);
+            if (!bDetermineRange)
+                EmbeddedNullTreatment( aLine);
 
             sal_Int32 nLineLen = aLine.getLength();
             SCCOL nCol = nStartCol;
@@ -1621,19 +1675,23 @@ bool ScImportExport::ExtText2Doc( SvStream& rStrm )
             {
                 if (bDetermineRange)
                 {
-                    // Yes, the check is nCol<=rDoc.MaxCol()+1, +1 because it
-                    // is only an overflow if there is really data following to
-                    // be put behind the last column, which doesn't happen if
-                    // info is SC_COL_SKIP.
-                    for (i=0; i < nInfoCount && nCol <= rDoc.MaxCol()+1; ++i)
+                    if (!bColumnsAreDetermined)
                     {
-                        const sal_uInt8 nFmt = pColFormat[i];
-                        if (nFmt != SC_COL_SKIP)        // otherwise don't increment nCol either
+                        // Yes, the check is nCol<=rDoc.MaxCol()+1, +1 because it
+                        // is only an overflow if there is really data following to
+                        // be put behind the last column, which doesn't happen if
+                        // info is SC_COL_SKIP.
+                        for (i=0; i < nInfoCount && nCol <= rDoc.MaxCol()+1; ++i)
                         {
-                            if (nCol > rDoc.MaxCol())
-                                bOverflowCol = true;    // display warning on import
-                            ++nCol;
+                            const sal_uInt8 nFmt = pColFormat[i];
+                            if (nFmt != SC_COL_SKIP)        // otherwise don't increment nCol either
+                            {
+                                if (nCol > rDoc.MaxCol())
+                                    bOverflowCol = true;    // display warning on import
+                                ++nCol;
+                            }
                         }
+                        bColumnsAreDetermined = true;
                     }
                 }
                 else
@@ -1743,7 +1801,7 @@ bool ScImportExport::ExtText2Doc( SvStream& rStrm )
             aRange.aEnd.SetRow( nRow );
 
             if ( !mbApi && nStartCol != nEndCol &&
-                 !rDoc.IsBlockEmpty( nTab, nStartCol + 1, nStartRow, nEndCol, nRow ) )
+                 !rDoc.IsBlockEmpty( nStartCol + 1, nStartRow, nEndCol, nRow, nTab ) )
             {
                 ScReplaceWarnBox aBox(ScDocShell::GetActiveDialogParent());
                 if (aBox.run() != RET_YES)
@@ -1792,41 +1850,10 @@ void ScImportExport::EmbeddedNullTreatment( OUString & rStr )
 
     // The normal case is no embedded NULL, check first before de-/allocating
     // ustring stuff.
-    const sal_Unicode cNull = 0;
-    sal_Int32 i;
-    if ((i = rStr.indexOf( cNull)) >= 0)
+    sal_Unicode cNull = 0;
+    if (sal_Int32 pos = rStr.indexOf(cNull); pos >= 0)
     {
-        // Do not use OUString::replaceAll(...,""), in case of repeated null
-        // bytes that reallocates for each and for massive amounts takes
-        // ~endless. See tdf#147421 with 3577016 trailing null-bytes.
-        const sal_Int32 nLen = rStr.getLength();
-        OUStringBuffer aBuf( nLen);
-        sal_Int32 s = 0;
-        sal_Unicode const * const p = rStr.getStr();
-        do
-        {
-            // Append good substring.
-            aBuf.append( p + s, i - s);
-            // Skip all cNull.
-            while (++i < nLen && *(p+i) == cNull)
-                ;
-            // Find next cNull after good if characters left, else end.
-            if (i < nLen)
-            {
-                s = i;
-                i = rStr.indexOf( cNull, i);
-            }
-            else
-            {
-                s = nLen;
-            }
-        }
-        while (0 <= i && i < nLen);
-        // Append good trailing substring, if any.
-        if (s < nLen)
-            aBuf.append( p + s, nLen - s);
-
-        rStr = aBuf.makeStringAndClear();
+        rStr = rStr.replaceAll(std::u16string_view(&cNull, 1), u"", pos);
     }
 }
 
@@ -1853,7 +1880,7 @@ const sal_Unicode* ScImportExport::ScanNextFieldFromString( const sal_Unicode* p
         rbIsQuoted = true;
         const sal_Unicode* p1;
         p1 = p = lcl_ScanString( p, rField, pSeps, cStr, DoubledQuoteMode::ESCAPE, rbOverflowCell );
-        while ( *p && !ScGlobal::UnicodeStrChr( pSeps, *p ) )
+        while (!lcl_isFieldEnd( *p, pSeps))
             p++;
         // Append remaining unquoted and undelimited data (dirty, dirty) to
         // this field.
@@ -1874,7 +1901,7 @@ const sal_Unicode* ScImportExport::ScanNextFieldFromString( const sal_Unicode* p
     else                        // up to delimiter
     {
         const sal_Unicode* p0 = p;
-        while ( *p && !ScGlobal::UnicodeStrChr( pSeps, *p ) )
+        while (!lcl_isFieldEnd( *p, pSeps))
             p++;
         const sal_Unicode* ptrim_i = p0;
         const sal_Unicode* ptrim_f = p;  // [ptrim_i,ptrim_f) is cell data after trimming
@@ -1892,7 +1919,7 @@ const sal_Unicode* ScImportExport::ScanNextFieldFromString( const sal_Unicode* p
     }
     if ( bMergeSeps )           // skip following delimiters
     {
-        while ( *p && ScGlobal::UnicodeStrChr( pSeps, *p ) )
+        while (*p && ScGlobal::UnicodeStrChr( pSeps, *p))
             p++;
     }
     return p;
@@ -1965,13 +1992,13 @@ bool ScImportExport::Doc2Text( SvStream& rStrm )
                 SvNumberFormatter* pFormatter = rDoc.GetFormatTable();
 
                 ScRefCellValue aCell(rDoc, aPos, blockPos[ nCol - nStartCol ]);
-                switch (aCell.meType)
+                switch (aCell.getType())
                 {
                     case CELLTYPE_FORMULA:
                     {
                         if (bFormulas)
                         {
-                            aCellStr = aCell.mpFormula->GetFormula();
+                            aCellStr = aCell.getFormula()->GetFormula();
                             if( aCellStr.indexOf( cSep ) != -1 )
                                 lcl_WriteString( rStrm, aCellStr, cStr, cStr );
                             else
@@ -2034,9 +2061,13 @@ bool ScImportExport::Doc2Text( SvStream& rStrm )
                     }
                 }
                 if( nCol < nEndCol )
-                    lcl_WriteSimpleString( rStrm, OUString(cSep) );
+                    lcl_WriteSimpleString( rStrm, rtl::OUStringChar(cSep) );
             }
-            WriteUnicodeOrByteEndl( rStrm );
+            // Do not append a line feed for one single cell.
+            // NOTE: this Doc2Text() is only called for clipboard via
+            // ScImportExport::ExportStream().
+            if (nStartRow != nEndRow || nStartCol != nEndCol)
+                WriteUnicodeOrByteEndl( rStrm );
             if( rStrm.GetError() != ERRCODE_NONE )
                 break;
             if( nSizeLimit && rStrm.Tell() > nSizeLimit )
@@ -2061,7 +2092,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
     SCROW nStartRow = aRange.aStart.Row();
     SCCOL nEndCol = aRange.aEnd.Col();
     SCROW nEndRow = aRange.aEnd.Row();
-    sal_uLong nOldPos = rStrm.Tell();
+    sal_uInt64 nOldPos = rStrm.Tell();
     bool bData = !bSingle;
     ::std::vector< sal_uInt32 > aFormats;
 
@@ -2072,7 +2103,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
     {
         OUString aLine;
         OUString aText;
-        OString aByteLine;
+        OStringBuffer aByteLine;
         SCCOL nCol = nStartCol;
         SCROW nRow = nStartRow;
         SCCOL nRefCol = nCol;
@@ -2105,7 +2136,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
                         case 'X':
                         {
                             bInvalidCol = false;
-                            bool bFail = o3tl::checked_add<SCCOL>(OUString(p).toInt32(), nStartCol - 1, nCol);
+                            bool bFail = o3tl::checked_add<SCCOL>(o3tl::toInt32(std::u16string_view(p)), nStartCol - 1, nCol);
                             if (bFail || nCol < 0 || rDoc.MaxCol() < nCol)
                             {
                                 SAL_WARN("sc.ui","ScImportExport::Sylk2Doc - ;X invalid nCol=" << nCol);
@@ -2117,7 +2148,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
                         case 'Y':
                         {
                             bInvalidRow = false;
-                            bool bFail = o3tl::checked_add(OUString(p).toInt32(), nStartRow - 1, nRow);
+                            bool bFail = o3tl::checked_add(o3tl::toInt32(std::u16string_view(p)), nStartRow - 1, nRow);
                             if (bFail || nRow < 0 || nMaxImportRow < nRow)
                             {
                                 SAL_WARN("sc.ui","ScImportExport::Sylk2Doc - ;Y invalid nRow=" << nRow);
@@ -2129,7 +2160,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
                         case 'C':
                         {
                             bInvalidRefCol = false;
-                            bool bFail = o3tl::checked_add<SCCOL>(OUString(p).toInt32(), nStartCol - 1, nRefCol);
+                            bool bFail = o3tl::checked_add<SCCOL>(o3tl::toInt32(std::u16string_view(p)), nStartCol - 1, nRefCol);
                             if (bFail || nRefCol < 0 || rDoc.MaxCol() < nRefCol)
                             {
                                 SAL_WARN("sc.ui","ScImportExport::Sylk2Doc - ;C invalid nRefCol=" << nRefCol);
@@ -2141,7 +2172,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
                         case 'R':
                         {
                             bInvalidRefRow = false;
-                            bool bFail = o3tl::checked_add(OUString(p).toInt32(), nStartRow - 1, nRefRow);
+                            bool bFail = o3tl::checked_add(o3tl::toInt32(std::u16string_view(p)), nStartRow - 1, nRefRow);
                             if (bFail || nRefRow < 0 || nMaxImportRow < nRefRow)
                             {
                                 SAL_WARN("sc.ui","ScImportExport::Sylk2Doc - ;R invalid nRefRow=" << nRefRow);
@@ -2266,7 +2297,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
                         case 'X':
                         {
                             bInvalidCol = false;
-                            bool bFail = o3tl::checked_add<SCCOL>(OUString(p).toInt32(), nStartCol - 1, nCol);
+                            bool bFail = o3tl::checked_add<SCCOL>(o3tl::toInt32(std::u16string_view(p)), nStartCol - 1, nCol);
                             if (bFail || nCol < 0 || rDoc.MaxCol() < nCol)
                             {
                                 SAL_WARN("sc.ui","ScImportExport::Sylk2Doc - ;X invalid nCol=" << nCol);
@@ -2278,7 +2309,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
                         case 'Y':
                         {
                             bInvalidRow = false;
-                            bool bFail = o3tl::checked_add(OUString(p).toInt32(), nStartRow - 1, nRow);
+                            bool bFail = o3tl::checked_add(o3tl::toInt32(std::u16string_view(p)), nStartRow - 1, nRow);
                             if (bFail || nRow < 0 || nMaxImportRow < nRow)
                             {
                                 SAL_WARN("sc.ui","ScImportExport::Sylk2Doc - ;Y invalid nRow=" << nRow);
@@ -2313,7 +2344,7 @@ bool ScImportExport::Sylk2Doc( SvStream& rStrm )
                     if( nCol > nEndCol )
                         nEndCol = nCol;
                 }
-                if ( 0 <= nFormat && nFormat < static_cast<sal_Int32>(aFormats.size()) && !bInvalidCol && !bInvalidRow )
+                if ( 0 <= nFormat && o3tl::make_unsigned(nFormat) < aFormats.size() && !bInvalidCol && !bInvalidRow )
                 {
                     sal_uInt32 nKey = aFormats[nFormat];
                     rDoc.ApplyAttr( nCol, nRow, aRange.aStart.Tab(),
@@ -2388,7 +2419,7 @@ bool ScImportExport::Doc2Sylk( SvStream& rStrm )
     SCROW nEndRow = aRange.aEnd.Row();
     OUString aCellStr;
     OUString aValStr;
-    lcl_WriteSimpleString( rStrm, "ID;PCALCOOO32" );
+    lcl_WriteSimpleString( rStrm, u"ID;PCALCOOO32" );
     WriteUnicodeOrByteEndl( rStrm );
 
     for (nRow = nStartRow; nRow <= nEndRow; nRow++)
@@ -2401,7 +2432,7 @@ bool ScImportExport::Doc2Sylk( SvStream& rStrm )
             SCROW r = nRow - nStartRow + 1;
             SCCOL c = nCol - nStartCol + 1;
             ScRefCellValue aCell(rDoc, ScAddress(nCol, nRow, aRange.aStart.Tab()));
-            CellType eType = aCell.meType;
+            CellType eType = aCell.getType();
             switch( eType )
             {
                 case CELLTYPE_FORMULA:
@@ -2445,7 +2476,7 @@ bool ScImportExport::Doc2Sylk( SvStream& rStrm )
                 checkformula:
                     if( bForm )
                     {
-                        const ScFormulaCell* pFCell = aCell.mpFormula;
+                        const ScFormulaCell* pFCell = aCell.getFormula();
                         switch ( pFCell->GetMatrixFlag() )
                         {
                             case ScMatrixMode::Reference :
@@ -2512,7 +2543,7 @@ bool ScImportExport::Doc2Sylk( SvStream& rStrm )
             }
         }
     }
-    lcl_WriteSimpleString( rStrm, OUString( 'E' ) );
+    lcl_WriteSimpleString( rStrm, rtl::OUStringChar( 'E' ) );
     WriteUnicodeOrByteEndl( rStrm );
     return rStrm.GetError() == ERRCODE_NONE;
 }
@@ -2718,6 +2749,8 @@ Label_RetryWithNewSep:
 
     if (bEmbeddedLineBreak)
     {
+        sal_Int32 nFirstLineLength = aStr.getLength();
+        sal_uInt64 nFirstLineStreamPos = rStream.Tell();
         sal_uInt32 nLine = 0;
 
         const sal_Unicode* pSeps = rFieldSeparators.getStr();
@@ -2750,6 +2783,8 @@ Label_RetryWithNewSep:
                             ++nQuotes;
                             bFieldStart = false;
                             eQuoteState = FIELDSTART_QUOTE;
+                            nFirstLineLength = aStr.getLength();
+                            nFirstLineStreamPos = rStream.Tell();
                         }
                         // Do not detect a FIELDSTART_QUOTE if not in
                         // bFieldStart mode, in which case for unquoted content
@@ -2790,6 +2825,8 @@ Label_RetryWithNewSep:
                         nQuotes = 1;
                         eQuoteState = FIELDSTART_QUOTE;
                         bFieldStart = false;
+                        nFirstLineLength = aStr.getLength();
+                        nFirstLineStreamPos = rStream.Tell();
                     }
                     else if (eQuoteState == FIELDEND_QUOTE)
                     {
@@ -2813,6 +2850,11 @@ Label_RetryWithNewSep:
                 // nArbitraryLineLengthLimit (or nMaxSourceLines below) we
                 // split a string right between a doubled quote pair.
                 break;
+            else if (eQuoteState == DONTKNOW_QUOTE)
+                // A single unescaped quote somewhere in a quote started
+                // field, most likely that was not meant to have embedded
+                // linefeeds either.
+                break;
             else if (++nLine >= nMaxSourceLines && nMaxSourceLines > 0)
                 // Unconditionally increment nLine even if nMaxSourceLines==0
                 // so it can be observed in debugger.
@@ -2822,8 +2864,16 @@ Label_RetryWithNewSep:
                 nLastOffset = aStr.getLength();
                 OUString aNext;
                 rStream.ReadUniOrByteStringLine(aNext, rStream.GetStreamCharSet(), nArbitraryLineLengthLimit);
-                aStr += "\n" + aNext;
+                if (!rStream.eof())
+                    aStr += "\n" + aNext;
             }
+        }
+        if (nQuotes & 1)
+        {
+            // No closing quote at all. A single quote at field start => no
+            // embedded linefeeds for that field, take only first logical line.
+            aStr = aStr.copy( 0, nFirstLineLength);
+            rStream.Seek( nFirstLineStreamPos);
         }
     }
     return aStr;

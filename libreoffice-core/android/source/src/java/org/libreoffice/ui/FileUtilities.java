@@ -63,7 +63,7 @@ public class FileUtilities {
         mExtnMap.put(".vsdx", DRAWING);
         mExtnMap.put(".pub", DRAWING);
         mExtnMap.put(".ppt",  IMPRESS);
-        // mExtnMap.put(".pps",  IMPRESS);
+        mExtnMap.put(".pps",  IMPRESS);
         mExtnMap.put(".xls",  CALC);
 
         // MS templates
@@ -74,7 +74,7 @@ public class FileUtilities {
         // OOXML
         mExtnMap.put(".docx", DOC);
         mExtnMap.put(".pptx", IMPRESS);
-        // mExtnMap.put(".ppsx", IMPRESS);
+        mExtnMap.put(".ppsx", IMPRESS);
         mExtnMap.put(".xlsx", CALC);
 
         // OOXML templates
@@ -134,9 +134,9 @@ public class FileUtilities {
         Cursor cursor = null;
         try {
             String[] columns = {OpenableColumns.DISPLAY_NAME};
-            cursor = resolver.query(docUri, columns, null, null);
+            cursor = resolver.query(docUri, columns, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
-                displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                displayName = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
             }
         } catch (SecurityException e) {
             // thrown e.g. when Uri has become invalid, e.g. corresponding file has been deleted

@@ -10,45 +10,55 @@
 #pragma once
 
 #include "opbase.hxx"
+#include "utils.hxx"
 
 namespace sc::opencl {
 
-class OpAnd: public Normal
+/// Implements OpAnd, OpOr, OpXor.
+class OpLogicalBinaryOperator : public Normal
 {
-public:
-    virtual void GenSlidingWindowFunction(std::stringstream &ss,
+    virtual void GenSlidingWindowFunction(outputstream &ss,
             const std::string &sSymName, SubArguments &vSubArguments) override;
-    virtual std::string BinFuncName() const override { return "And"; }
     virtual bool canHandleMultiVector() const override { return true; }
+    /// The C operator implementing the function.
+    virtual const char* openclOperator() const = 0;
 };
 
-class OpOr: public Normal
+class OpAnd: public OpLogicalBinaryOperator
 {
 public:
-    virtual void GenSlidingWindowFunction(std::stringstream &ss,
+    virtual void GenSlidingWindowFunction(outputstream &ss,
             const std::string &sSymName, SubArguments &vSubArguments) override;
-    virtual std::string BinFuncName() const override { return "Or"; }
-    virtual bool canHandleMultiVector() const override { return true; }
+    virtual std::string BinFuncName() const override { return "And"; }
+    virtual const char* openclOperator() const override { return "&&"; };
 };
+
+class OpOr: public OpLogicalBinaryOperator
+{
+public:
+    virtual std::string BinFuncName() const override { return "Or"; }
+    virtual const char* openclOperator() const override { return "||"; };
+};
+
 class OpNot: public Normal
 {
 public:
-    virtual void GenSlidingWindowFunction(std::stringstream &ss,
+    virtual void GenSlidingWindowFunction(outputstream &ss,
             const std::string &sSymName, SubArguments &vSubArguments) override;
     virtual std::string BinFuncName() const override { return "Not"; }
 };
-class OpXor: public Normal
+
+class OpXor: public OpLogicalBinaryOperator
 {
 public:
-    virtual void GenSlidingWindowFunction(std::stringstream &ss,
-            const std::string &sSymName, SubArguments &vSubArguments) override;
     virtual std::string BinFuncName() const override { return "Xor"; }
-    virtual bool canHandleMultiVector() const override { return true; }
+    virtual const char* openclOperator() const override { return "^"; };
 };
+
 class OpIf:public Normal
 {
 public:
-    virtual void GenSlidingWindowFunction(std::stringstream &ss,
+    virtual void GenSlidingWindowFunction(outputstream &ss,
             const std::string &sSymName, SubArguments &vSubArguments) override;
     virtual std::string BinFuncName() const override { return "IF"; }
 };

@@ -237,12 +237,10 @@ void FuInsertFile::DoExecute( SfxRequest& rReq )
     else
     {
         const SfxStringItem* pFileName = rReq.GetArg<SfxStringItem>(ID_VAL_DUMMY0);
-        const SfxStringItem* pFilterName = rReq.GetArg<SfxStringItem>(ID_VAL_DUMMY1);
-
-        aFile = pFileName->GetValue ();
-
-        if( pFilterName )
-            aFilterName = pFilterName->GetValue ();
+        assert(pFileName && "must be present");
+        aFile = pFileName->GetValue();
+        if (const SfxStringItem* pFilterName = rReq.GetArg<SfxStringItem>(ID_VAL_DUMMY1))
+            aFilterName = pFilterName->GetValue();
     }
 
     mpDocSh->SetWaitCursor( true );
@@ -466,7 +464,7 @@ void FuInsertFile::InsTextOrRTFinDrMode(SfxMedium* pMedium)
             SdrObject* pObj = mpView->GetTextEditObject();
             if( pObj &&
                 pObj->GetObjInventor()   == SdrInventor::Default &&
-                pObj->GetObjIdentifier() == OBJ_TITLETEXT &&
+                pObj->GetObjIdentifier() == SdrObjKind::TitleText &&
                 aOutliner.GetParagraphCount() > 1 )
             {
                 // in title objects, only one paragraph is allowed
@@ -488,15 +486,15 @@ void FuInsertFile::InsTextOrRTFinDrMode(SfxMedium* pMedium)
         }
         else
         {
-            SdrRectObj* pTO = new SdrRectObj(
+            rtl::Reference<SdrRectObj> pTO = new SdrRectObj(
                 mpView->getSdrModelFromSdrView(),
-                OBJ_TEXT);
+                SdrObjKind::Text);
             pTO->SetOutlinerParaObject(std::move(pOPO));
 
             const bool bUndo = mpView->IsUndoEnabled();
             if( bUndo )
                 mpView->BegUndo(SdResId(STR_UNDO_INSERT_TEXTFRAME));
-            pPage->InsertObject(pTO);
+            pPage->InsertObject(pTO.get());
 
             /* can be bigger as the maximal allowed size:
                limit object size if necessary */

@@ -17,6 +17,7 @@
 #include <sfx2/sidebar/ResourceManager.hxx>
 #include <sfx2/sidebar/SidebarController.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <algorithm>
@@ -24,8 +25,8 @@
 using namespace css;
 using namespace ::sfx2::sidebar;
 
-SfxUnoDecks::SfxUnoDecks(const uno::Reference<frame::XFrame>& rFrame):
-xFrame(rFrame)
+SfxUnoDecks::SfxUnoDecks(uno::Reference<frame::XFrame> _xFrame):
+xFrame(std::move(_xFrame))
 {
 }
 
@@ -129,8 +130,6 @@ uno::Any SAL_CALL SfxUnoDecks::getByIndex( sal_Int32 Index )
 // XElementAccess
 uno::Type SAL_CALL SfxUnoDecks::getElementType()
 {
-    SolarMutexGuard aGuard;
-
     return uno::Type();
 }
 

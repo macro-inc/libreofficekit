@@ -32,6 +32,7 @@
 #include <editeng/lrspitem.hxx>
 #include <editeng/udlnitem.hxx>
 #include <editeng/escapementitem.hxx>
+#include <editeng/pmdlitem.hxx>
 #include <sfx2/htmlmode.hxx>
 #include <editeng/scripttypeitem.hxx>
 #include <editeng/frmdiritem.hxx>
@@ -496,10 +497,10 @@ void SwTextShell::ExecParaAttrArgs(SfxRequest &rReq)
                 {
                     rSh.StartAction();
                     rSh.StartUndo( SwUndoId::START );
-                    if ( SfxItemState::SET == aSet.GetItemState(HINT_END,false,&pItem) )
+                    if ( const SfxStringItem* pHintItem = aSet.GetItemIfSet(HINT_END,false) )
                     {
-                        if ( !static_cast<const SfxStringItem*>(pItem)->GetValue().isEmpty() )
-                            rSh.ReplaceDropText(static_cast<const SfxStringItem*>(pItem)->GetValue());
+                        if ( !pHintItem->GetValue().isEmpty() )
+                            rSh.ReplaceDropText(pHintItem->GetValue());
                     }
                     rSh.SetAttrSet(*pDlg->GetOutputItemSet());
                     rSh.EndUndo( SwUndoId::END );

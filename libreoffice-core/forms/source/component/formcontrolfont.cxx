@@ -28,6 +28,7 @@
 #include <toolkit/helper/emptyfontdescriptor.hxx>
 #include <com/sun/star/awt/FontRelief.hpp>
 #include <com/sun/star/awt/FontEmphasisMark.hpp>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 
 
 namespace frm
@@ -275,7 +276,7 @@ namespace frm
 
         case PROPERTY_ID_FONT:
         {
-            Any aWorkAroundGccLimitation = makeAny( m_aFont );
+            Any aWorkAroundGccLimitation( m_aFont );
             bModified = tryPropertyValue( _rConvertedValue, _rOldValue, _rValue, aWorkAroundGccLimitation, cppu::UnoType<decltype(m_aFont)>::get() );
         }
         break;
@@ -449,7 +450,7 @@ namespace frm
 
             // then set that as the actual property - will eventually call
             // this method recursively again...
-            (rBase.*pSet)(PROPERTY_ID_FONT, makeAny(font));
+            (rBase.*pSet)(PROPERTY_ID_FONT, Any(font));
 #ifndef NDEBUG
             // verify that the nHandle property has the new value
             Any tmp;
@@ -519,7 +520,7 @@ namespace frm
         {
             EmptyFontDescriptor aEmpty;
             if ( PROPERTY_ID_FONT == _nHandle )
-                return makeAny( FontDescriptor(aEmpty) );
+                return Any( FontDescriptor(aEmpty) );
             return lcl_extractFontDescriptorAggregate( _nHandle, aEmpty );
         }
 

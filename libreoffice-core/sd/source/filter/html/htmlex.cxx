@@ -23,6 +23,7 @@
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 
+#include <rtl/xmlencode.hxx>
 #include <sal/log.hxx>
 #include <rtl/tencinfo.h>
 #include <comphelper/processfactory.hxx>
@@ -34,6 +35,7 @@
 #include <com/sun/star/frame/XStorable.hpp>
 #include <sfx2/frmhtmlw.hxx>
 #include <sfx2/progress.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <svx/svditer.hxx>
@@ -63,7 +65,7 @@
 #include <svtools/sfxecode.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <drawdoc.hxx>
 #include <DrawDocShell.hxx>
@@ -288,10 +290,10 @@ OUString HtmlState::SetLink( const OUString& aLink, const OUString& aTarget )
 
     if (!aLink.isEmpty())
     {
-        aStr += "<a href=\"" + aLink;
+        aStr += "<a href=\"" + rtl::encodeForXml(aLink);
         if (!aTarget.isEmpty())
         {
-            aStr += "\" target=\"" + aTarget;
+            aStr += "\" target=\"" + rtl::encodeForXml(aTarget);
         }
         aStr += "\">";
         mbLink = true;
@@ -342,11 +344,11 @@ constexpr OUStringLiteral gaHTMLExtension = u"" STR_HTMLEXP_DEFAULT_EXTENSION;
 
 // constructor for the html export helper classes
 HtmlExport::HtmlExport(
-    const OUString& aPath,
+    OUString aPath,
     const Sequence< PropertyValue >& rParams,
     SdDrawDocument* pExpDoc,
     sd::DrawDocShell* pDocShell )
-    :   maPath( aPath ),
+    :   maPath(std::move( aPath )),
         mpDoc(pExpDoc),
         mpDocSh( pDocShell ),
         meMode( PUBLISH_SINGLE_DOCUMENT ),
@@ -684,7 +686,7 @@ void HtmlExport::ExportSingleDocument()
     // close page
     aStr.append("</body>\r\n</html>");
 
-    WriteHtml(maDocFileName, false, aStr.makeStringAndClear());
+    WriteHtml(maDocFileName, false, aStr);
 
     pOutliner->Clear();
     ResetProgress();
@@ -1028,7 +1030,7 @@ SdrTextObj* HtmlExport::GetLayoutTextObject(SdrPage const * pPage)
     {
         SdrObject* pObject = pPage->GetObj(nObject);
         if (pObject->GetObjInventor() == SdrInventor::Default &&
-            pObject->GetObjIdentifier() == OBJ_OUTLINETEXT)
+            pObject->GetObjIdentifier() == SdrObjKind::OutlineText)
         {
             pResult = static_cast<SdrTextObj*>(pObject);
             break;
@@ -1062,11 +1064,8 @@ OUString HtmlExport::DocumentMetadata() const
         xDocProps.set(xDPS->getDocumentProperties());
     }
 
-    OUString aNonConvertableCharacters;
-
     SfxFrameHTMLWriter::Out_DocInfo(aStream, maDocFileName, xDocProps,
-            "  ", RTL_TEXTENCODING_UTF8,
-            &aNonConvertableCharacters);
+            "  ");
 
     const sal_uInt64 nLen = aStream.GetSize();
     OSL_ENSURE(nLen < o3tl::make_unsigned(SAL_MAX_INT32), "Stream can't fit in OString");
@@ -1130,7 +1129,7 @@ bool HtmlExport::CreateHtmlTextForPresPages()
         // close page
         aStr.append("</body>\r\n</html>");
 
-        bOk = WriteHtml(maTextFiles[nSdPage], false, aStr.makeStringAndClear());
+        bOk = WriteHtml(maTextFiles[nSdPage], false, aStr);
 
         if (mpProgress)
             mpProgress->SetState(++mnPagesWritten);
@@ -1207,12 +1206,12 @@ OUString HtmlExport::CreateTextForPage(SdrOutliner* pOutliner, SdPage const * pP
         {
             case PresObjKind::NONE:
             {
-                if (pObject->GetObjIdentifier() == OBJ_GRUP)
+                if (pObject->GetObjIdentifier() == SdrObjKind::Group)
                 {
                     SdrObjGroup* pObjectGroup = static_cast<SdrObjGroup*>(pObject);
                     WriteObjectGroup(aStr, pObjectGroup, pOutliner, rBackgroundColor, false);
                 }
-                else if (pObject->GetObjIdentifier() == OBJ_TABLE)
+                else if (pObject->GetObjIdentifier() == SdrObjKind::Table)
                 {
                     SdrTableObj* pTableObject = static_cast<SdrTableObj*>(pObject);
                     WriteTable(aStr, pTableObject, pOutliner, rBackgroundColor);
@@ -1286,7 +1285,7 @@ void HtmlExport::WriteObjectGroup(OUStringBuffer& aStr, SdrObjGroup const * pObj
     while (aGroupIterator.IsMore())
     {
         SdrObject* pCurrentObject = aGroupIterator.Next();
-        if (pCurrentObject->GetObjIdentifier() == OBJ_GRUP)
+        if (pCurrentObject->GetObjIdentifier() == SdrObjKind::Group)
         {
             SdrObjGroup* pCurrentGroupObject = static_cast<SdrObjGroup*>(pCurrentObject);
             WriteObjectGroup(aStr, pCurrentGroupObject, pOutliner, rBackgroundColor, bHeadLine);
@@ -1850,7 +1849,7 @@ bool HtmlExport::CreateHtmlForPresPages()
                     {
                         // a circle?
                         if (pObject->GetObjInventor() == SdrInventor::Default &&
-                            pObject->GetObjIdentifier() == OBJ_CIRC  &&
+                            pObject->GetObjIdentifier() == SdrObjKind::CircleOrEllipse  &&
                             bIsSquare )
                         {
                             aStr.append(CreateHTMLCircleArea(aRect.GetWidth() / 2,
@@ -1860,9 +1859,9 @@ bool HtmlExport::CreateHtmlForPresPages()
                         }
                         // a polygon?
                         else if (pObject->GetObjInventor() == SdrInventor::Default &&
-                                 (pObject->GetObjIdentifier() == OBJ_PATHLINE ||
-                                  pObject->GetObjIdentifier() == OBJ_PLIN ||
-                                  pObject->GetObjIdentifier() == OBJ_POLY))
+                                 (pObject->GetObjIdentifier() == SdrObjKind::PathLine ||
+                                  pObject->GetObjIdentifier() == SdrObjKind::PolyLine ||
+                                  pObject->GetObjIdentifier() == SdrObjKind::Polygon))
                         {
                             aStr.append(CreateHTMLPolygonArea(static_cast<SdrPathObj*>(pObject)->GetPathPoly(), Size(-pPage->GetLeftBorder(), -pPage->GetUpperBorder()), fLogicToPixel, aHRef));
                         }
@@ -1882,7 +1881,8 @@ bool HtmlExport::CreateHtmlForPresPages()
 
         aStr.append("</body>\r\n</html>");
 
-        bOk = WriteHtml(maHTMLFiles[nSdPage], false, aStr.makeStringAndClear());
+        bOk = WriteHtml(maHTMLFiles[nSdPage], false, aStr);
+        aStr.setLength(0);
 
         if (mpProgress)
             mpProgress->SetState(++mnPagesWritten);
@@ -2016,7 +2016,7 @@ bool HtmlExport::CreateContentPage()
 
     aStr.append("</body>\r\n</html>");
 
-    bool bOk = WriteHtml(maIndex, false, aStr.makeStringAndClear());
+    bool bOk = WriteHtml(maIndex, false, aStr);
 
     if (mpProgress)
         mpProgress->SetState(++mnPagesWritten);
@@ -2051,7 +2051,7 @@ bool HtmlExport::CreateNotesPages()
         aStr.append("</body>\r\n</html>");
 
         OUString aFileName("note" + OUString::number(nSdPage));
-        bOk = WriteHtml(aFileName, true, aStr.makeStringAndClear());
+        bOk = WriteHtml(aFileName, true, aStr);
 
         if (mpProgress)
             mpProgress->SetState(++mnPagesWritten);
@@ -2112,7 +2112,8 @@ bool HtmlExport::CreateOutlinePages()
         aStr.append("</body>\r\n</html>");
 
         OUString aFileName("outline" + OUString::number(nPage));
-        bOk = WriteHtml(aFileName, true, aStr.makeStringAndClear());
+        bOk = WriteHtml(aFileName, true, aStr);
+        aStr.setLength(0);
 
         if (mpProgress)
             mpProgress->SetState(++mnPagesWritten);
@@ -2362,7 +2363,7 @@ bool HtmlExport::CreateFrames()
     aStr.append(RESTOHTML(STR_HTMLEXP_NOFRAMES));
     aStr.append("\r\n</noframes>\r\n</frameset>\r\n</html>");
 
-    bool bOk = WriteHtml(maFramePage, false, aStr.makeStringAndClear());
+    bool bOk = WriteHtml(maFramePage, false, aStr);
 
     if (mpProgress)
         mpProgress->SetState(++mnPagesWritten);
@@ -2484,7 +2485,8 @@ bool HtmlExport::CreateNavBarFrames()
 
         OUString aFileName("navbar" + OUString::number(nFile));
 
-        bOk = WriteHtml(aFileName, true, aStr.makeStringAndClear());
+        bOk = WriteHtml(aFileName, true, aStr);
+        aStr.setLength(0);
 
         if (mpProgress)
             mpProgress->SetState(++mnPagesWritten);
@@ -2499,7 +2501,7 @@ bool HtmlExport::CreateNavBarFrames()
 
         bOk = WriteHtml(
             "navbar3", true,
-            OUStringConcatenation(
+            Concat2View(
                 gaHTMLHeader + CreateMetaCharset() + "  <title>"
                 + StringToHTMLString(maPageNames[0]) + "</title>\r\n</head>\r\n" + CreateBodyTag()
                 + CreateLink(u"JavaScript:parent.ExpandOutline()", aButton)
@@ -2518,7 +2520,7 @@ bool HtmlExport::CreateNavBarFrames()
 
         bOk = WriteHtml(
             "navbar4", true,
-            OUStringConcatenation(
+            Concat2View(
                 gaHTMLHeader + CreateMetaCharset() + "  <title>"
                 + StringToHTMLString(maPageNames[0]) + "</title>\r\n</head>\r\n" + CreateBodyTag()
                 + CreateLink(u"JavaScript:parent.CollapseOutline()", aButton)
@@ -2809,7 +2811,7 @@ OUString HtmlExport::CreateHTMLRectArea( const ::tools::Rectangle& rRect,
 OUString HtmlExport::StringToHTMLString( const OUString& rString )
 {
     SvMemoryStream aMemStm;
-    HTMLOutFuncs::Out_String( aMemStm, rString, RTL_TEXTENCODING_UTF8 );
+    HTMLOutFuncs::Out_String( aMemStm, rString );
     aMemStm.WriteChar( char(0) );
     sal_Int32 nLength = strlen(static_cast<char const *>(aMemStm.GetData()));
     return OUString( static_cast<char const *>(aMemStm.GetData()), nLength, RTL_TEXTENCODING_UTF8 );
@@ -2842,11 +2844,11 @@ bool HtmlExport::CopyScript( std::u16string_view rPath, const OUString& rSource,
 
     if( pIStm )
     {
-        OString aLine;
+        OStringBuffer aLine;
 
         while( pIStm->ReadLine( aLine ) )
         {
-            aScriptBuf.appendAscii( aLine.getStr() );
+            aScriptBuf.appendAscii( aLine.getStr(), aLine.getLength() );
             if( bUnix )
             {
                 aScriptBuf.append("\n");
@@ -2950,7 +2952,7 @@ bool HtmlExport::CreateImageFileList()
         aStr.append("\r\n");
     }
 
-    bool bOk = WriteHtml("picture.txt", false, aStr.makeStringAndClear());
+    bool bOk = WriteHtml("picture.txt", false, aStr);
 
     if (mpProgress)
         mpProgress->SetState(++mnPagesWritten);

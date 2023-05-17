@@ -21,7 +21,7 @@
 #include <rtl/ustrbuf.hxx>
 #include <rtl/ref.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/lang/NoSupportException.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
 #include <com/sun/star/ucb/IllegalIdentifierException.hpp>
@@ -32,9 +32,8 @@
 #include <com/sun/star/io/XActiveDataSink.hpp>
 #include <com/sun/star/ucb/NameClash.hpp>
 #include <comphelper/fileurl.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 #include "filglob.hxx"
 #include "filid.hxx"
 #include "filrow.hxx"
@@ -54,16 +53,48 @@ using namespace com::sun::star::ucb;
 #define THROW_WHERE ""
 #endif
 
-typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString>
-    PropertyListeners_impl;
-
 class fileaccess::PropertyListeners
-    : public PropertyListeners_impl
 {
+    typedef comphelper::OInterfaceContainerHelper4<beans::XPropertiesChangeListener> ContainerHelper;
+    std::unordered_map<OUString, ContainerHelper> m_aMap;
+
 public:
-    explicit PropertyListeners( ::osl::Mutex& aMutex )
-        : PropertyListeners_impl( aMutex )
+    void disposeAndClear(std::unique_lock<std::mutex>& rGuard, const lang::EventObject& rEvt)
     {
+        // create a copy, because do not fire event in a guarded section
+        std::unordered_map<OUString, ContainerHelper> tempMap = std::move(m_aMap);
+        for (auto& rPair : tempMap)
+            rPair.second.disposeAndClear(rGuard, rEvt);
+    }
+    void addInterface(std::unique_lock<std::mutex>& rGuard, const OUString& rKey, const uno::Reference<beans::XPropertiesChangeListener>& rListener)
+    {
+        m_aMap[rKey].addInterface(rGuard, rListener);
+    }
+    void removeInterface(std::unique_lock<std::mutex>& rGuard, const OUString& rKey, const uno::Reference<beans::XPropertiesChangeListener>& rListener)
+    {
+        // search container with id rKey
+        auto iter = m_aMap.find(rKey);
+        // container found?
+        if (iter != m_aMap.end())
+            iter->second.removeInterface(rGuard, rListener);
+    }
+    std::vector< OUString > getContainedTypes(std::unique_lock<std::mutex>& rGuard) const
+    {
+        std::vector<OUString> aInterfaceTypes;
+        aInterfaceTypes.reserve(m_aMap.size());
+        for (const auto& rPair : m_aMap)
+            // are interfaces added to this container?
+            if (rPair.second.getLength(rGuard))
+                // yes, put the type in the array
+                aInterfaceTypes.push_back(rPair.first);
+        return aInterfaceTypes;
+    }
+    comphelper::OInterfaceContainerHelper4<beans::XPropertiesChangeListener>* getContainer(std::unique_lock<std::mutex>& , const OUString& rKey)
+    {
+        auto iter = m_aMap.find(rKey);
+        if (iter != m_aMap.end())
+            return &iter->second;
+        return nullptr;
     }
 };
 
@@ -78,10 +109,10 @@ public:
 // Private Constructor for just inserted Contents
 
 BaseContent::BaseContent( TaskManager* pMyShell,
-                          const OUString& parentName,
+                          OUString parentName,
                           bool bFolder )
     : m_pMyShell( pMyShell ),
-      m_aUncPath( parentName ),
+      m_aUncPath(std::move( parentName )),
       m_bFolder( bFolder ),
       m_nState( JustInserted )
 {
@@ -94,10 +125,10 @@ BaseContent::BaseContent( TaskManager* pMyShell,
 
 BaseContent::BaseContent( TaskManager* pMyShell,
                           const Reference< XContentIdentifier >& xContentIdentifier,
-                          const OUString& aUncPath )
+                          OUString aUncPath )
     : m_pMyShell( pMyShell ),
       m_xContentIdentifier( xContentIdentifier ),
-      m_aUncPath( aUncPath ),
+      m_aUncPath(std::move( aUncPath )),
       m_bFolder( false ),
       m_nState( FullFeatured )
 {
@@ -123,23 +154,18 @@ BaseContent::~BaseContent( )
 void SAL_CALL
 BaseContent::addEventListener( const Reference< lang::XEventListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( ! m_pDisposeEventListeners )
-        m_pDisposeEventListeners.reset(
-            new comphelper::OInterfaceContainerHelper2( m_aEventListenerMutex ) );
-
-    m_pDisposeEventListeners->addInterface( Listener );
+    m_aDisposeEventListeners.addInterface( aGuard, Listener );
 }
 
 
 void SAL_CALL
 BaseContent::removeEventListener( const Reference< lang::XEventListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( m_pDisposeEventListeners )
-        m_pDisposeEventListeners->removeInterface( Listener );
+    m_aDisposeEventListeners.removeInterface( aGuard, Listener );
 }
 
 
@@ -147,32 +173,19 @@ void SAL_CALL
 BaseContent::dispose()
 {
     lang::EventObject aEvt;
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2> pDisposeEventListeners;
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2> pContentEventListeners;
-    std::unique_ptr<comphelper::OInterfaceContainerHelper2> pPropertySetInfoChangeListeners;
-    std::unique_ptr<PropertyListeners> pPropertyListener;
+    aEvt.Source = static_cast< XContent* >( this );
 
-    {
-        osl::MutexGuard aGuard( m_aMutex );
-        aEvt.Source = static_cast< XContent* >( this );
+    std::unique_lock aGuard( m_aMutex );
 
-        pDisposeEventListeners = std::move(m_pDisposeEventListeners);
-        pContentEventListeners = std::move(m_pContentEventListeners);
-        pPropertySetInfoChangeListeners = std::move(m_pPropertySetInfoChangeListeners);
-        pPropertyListener = std::move(m_pPropertyListener);
-    }
+    std::unique_ptr<PropertyListeners> pPropertyListener = std::move(m_pPropertyListener);
 
-    if ( pDisposeEventListeners && pDisposeEventListeners->getLength() )
-        pDisposeEventListeners->disposeAndClear( aEvt );
-
-    if ( pContentEventListeners && pContentEventListeners->getLength() )
-        pContentEventListeners->disposeAndClear( aEvt );
+    m_aDisposeEventListeners.disposeAndClear( aGuard, aEvt );
+    m_aContentEventListeners.disposeAndClear( aGuard, aEvt );
 
     if( pPropertyListener )
-        pPropertyListener->disposeAndClear( aEvt );
+        pPropertyListener->disposeAndClear( aGuard, aEvt );
 
-    if( pPropertySetInfoChangeListeners )
-        pPropertySetInfoChangeListeners->disposeAndClear( aEvt );
+    m_aPropertySetInfoChangeListeners.disposeAndClear( aGuard, aEvt );
 }
 
 //  XServiceInfo
@@ -329,20 +342,20 @@ BaseContent::addPropertiesChangeListener(
     if( ! Listener.is() )
         return;
 
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if( ! m_pPropertyListener )
-        m_pPropertyListener.reset( new PropertyListeners( m_aEventListenerMutex ) );
+        m_pPropertyListener.reset( new PropertyListeners );
 
 
     if( !PropertyNames.hasElements() )
-        m_pPropertyListener->addInterface( OUString(),Listener );
+        m_pPropertyListener->addInterface( aGuard, OUString(),Listener );
     else
     {
         Reference< beans::XPropertySetInfo > xProp = m_pMyShell->info_p( m_aUncPath );
         for( const auto& rName : PropertyNames )
             if( xProp->hasPropertyByName( rName ) )
-                m_pPropertyListener->addInterface( rName,Listener );
+                m_pPropertyListener->addInterface( aGuard, rName,Listener );
     }
 }
 
@@ -354,15 +367,15 @@ BaseContent::removePropertiesChangeListener( const Sequence< OUString >& Propert
     if( ! Listener.is() )
         return;
 
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if( ! m_pPropertyListener )
         return;
 
     for( const auto& rName : PropertyNames )
-        m_pPropertyListener->removeInterface( rName,Listener );
+        m_pPropertyListener->removeInterface( aGuard, rName,Listener );
 
-    m_pPropertyListener->removeInterface( OUString(), Listener );
+    m_pPropertyListener->removeInterface( aGuard, OUString(), Listener );
 }
 
 
@@ -423,14 +436,9 @@ void SAL_CALL
 BaseContent::addContentEventListener(
     const Reference< XContentEventListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( ! m_pContentEventListeners )
-        m_pContentEventListeners.reset(
-            new comphelper::OInterfaceContainerHelper2( m_aEventListenerMutex ) );
-
-
-    m_pContentEventListeners->addInterface( Listener );
+    m_aContentEventListeners.addInterface( aGuard, Listener );
 }
 
 
@@ -438,10 +446,9 @@ void SAL_CALL
 BaseContent::removeContentEventListener(
     const Reference< XContentEventListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( m_pContentEventListeners )
-        m_pContentEventListeners->removeInterface( Listener );
+    m_aContentEventListeners.removeInterface( aGuard, Listener );
 }
 
 
@@ -543,11 +550,9 @@ void SAL_CALL
 BaseContent::addPropertySetInfoChangeListener(
     const Reference< beans::XPropertySetInfoChangeListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
-    if( ! m_pPropertySetInfoChangeListeners )
-        m_pPropertySetInfoChangeListeners.reset( new comphelper::OInterfaceContainerHelper2( m_aEventListenerMutex ) );
+    std::unique_lock aGuard( m_aMutex );
 
-    m_pPropertySetInfoChangeListeners->addInterface( Listener );
+    m_aPropertySetInfoChangeListeners.addInterface( aGuard, Listener );
 }
 
 
@@ -555,10 +560,9 @@ void SAL_CALL
 BaseContent::removePropertySetInfoChangeListener(
     const Reference< beans::XPropertySetInfoChangeListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if( m_pPropertySetInfoChangeListeners )
-        m_pPropertySetInfoChangeListeners->removeInterface( Listener );
+    m_aPropertySetInfoChangeListeners.removeInterface( aGuard, Listener );
 }
 
 
@@ -891,7 +895,7 @@ BaseContent::deleteContent( sal_Int32 nMyCommandIdentifier )
 
     if( m_pMyShell->remove( nMyCommandIdentifier,m_aUncPath ) )
     {
-        osl::MutexGuard aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
         m_nState |= Deleted;
     }
 }
@@ -1035,7 +1039,7 @@ void BaseContent::insert( sal_Int32 nMyCommandIdentifier,
 
             XInteractionRequestImpl aRequestImpl(
                     rtl::Uri::decode(
-                        getTitle(m_aUncPath),
+                        OUString(getTitle(m_aUncPath)),
                         rtl_UriDecodeWithCharset,
                         RTL_TEXTENCODING_UTF8),
                     static_cast<cppu::OWeakObject*>(this),
@@ -1068,7 +1072,7 @@ void BaseContent::insert( sal_Int32 nMyCommandIdentifier,
     m_pMyShell->registerNotifier( m_aUncPath,this );
     m_pMyShell->insertDefaultProperties( m_aUncPath );
 
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
     m_nState = FullFeatured;
 }
 
@@ -1083,80 +1087,80 @@ void BaseContent::endTask( sal_Int32 CommandId )
 std::optional<ContentEventNotifier>
 BaseContent::cDEL()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     m_nState |= Deleted;
 
-    if( !m_pContentEventListeners )
+    if( m_aContentEventListeners.getLength(aGuard) == 0 )
         return {};
 
     return ContentEventNotifier( m_pMyShell,
                                   this,
                                   m_xContentIdentifier,
-                                  m_pContentEventListeners->getElements() );
+                                  m_aContentEventListeners.getElements(aGuard) );
 }
 
 
 std::optional<ContentEventNotifier>
 BaseContent::cEXC( const OUString& aNewName )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     Reference< XContentIdentifier > xOldRef = m_xContentIdentifier;
     m_aUncPath = aNewName;
     m_xContentIdentifier = new FileContentIdentifier( aNewName );
 
-    if( !m_pContentEventListeners )
+    if( m_aContentEventListeners.getLength(aGuard) == 0 )
         return {};
     return ContentEventNotifier( m_pMyShell,
                                   this,
                                   m_xContentIdentifier,
                                   xOldRef,
-                                  m_pContentEventListeners->getElements() );
+                                  m_aContentEventListeners.getElements(aGuard) );
 }
 
 
 std::optional<ContentEventNotifier>
 BaseContent::cCEL()
 {
-    osl::MutexGuard aGuard( m_aMutex );
-    if( !m_pContentEventListeners )
+    std::unique_lock aGuard( m_aMutex );
+    if( m_aContentEventListeners.getLength(aGuard) == 0 )
         return {};
     return ContentEventNotifier( m_pMyShell,
                                       this,
                                       m_xContentIdentifier,
-                                      m_pContentEventListeners->getElements() );
+                                      m_aContentEventListeners.getElements(aGuard) );
 }
 
 std::optional<PropertySetInfoChangeNotifier>
 BaseContent::cPSL()
 {
-    osl::MutexGuard aGuard( m_aMutex );
-    if( !m_pPropertySetInfoChangeListeners  )
+    std::unique_lock aGuard( m_aMutex );
+    if( m_aPropertySetInfoChangeListeners.getLength(aGuard) == 0  )
         return {};
-    return PropertySetInfoChangeNotifier( this, m_pPropertySetInfoChangeListeners->getElements() );
+    return PropertySetInfoChangeNotifier( this, m_aPropertySetInfoChangeListeners.getElements(aGuard) );
 }
 
 
 std::optional<PropertyChangeNotifier>
 BaseContent::cPCL()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if (!m_pPropertyListener)
         return {};
 
-    const std::vector< OUString > seqNames = m_pPropertyListener->getContainedTypes();
+    const std::vector< OUString > seqNames = m_pPropertyListener->getContainedTypes(aGuard);
     if( seqNames.empty() )
         return {};
 
     ListenerMap listener;
     for( const auto& rName : seqNames )
     {
-        comphelper::OInterfaceContainerHelper2* pContainer = m_pPropertyListener->getContainer(rName);
+        comphelper::OInterfaceContainerHelper4<beans::XPropertiesChangeListener>* pContainer = m_pPropertyListener->getContainer(aGuard, rName);
         if (!pContainer)
             continue;
-        listener[rName] = pContainer->getElements();
+        listener[rName] = pContainer->getElements(aGuard);
     }
 
     return PropertyChangeNotifier( this, std::move(listener) );

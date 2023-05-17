@@ -115,11 +115,11 @@ OUString lcl_makeStringFromBigint(std::vector<sal_uInt8>&& aBytes)
     return sRet.makeStringAndClear();
 }
 
-OUString lcl_putDot(const OUString& sNum, sal_Int32 nScale)
+OUString lcl_putDot(std::u16string_view sNum, sal_Int32 nScale)
 {
     // e.g. sNum = "0", nScale = 2 -> "0.00"
     OUStringBuffer sBuf{ sNum };
-    sal_Int32 nNullsToAppend = nScale - sNum.getLength() + 1;
+    sal_Int32 nNullsToAppend = nScale - sNum.size() + 1;
     for (sal_Int32 i = 0; i < nNullsToAppend; ++i)
         sBuf.insert(0, "0");
 
@@ -165,9 +165,8 @@ OUString HsqlRowInputStream::readUTF(sal_Int32 nUTFLen)
     sal_Int32 nStrLen = 0;
     while (nCount < nUTFLen)
     {
-        unsigned char cIn = 0;
-        m_pStream->ReadUChar(cIn);
-        sal_uInt8 c = reinterpret_cast<sal_uInt8&>(cIn);
+        sal_uInt8 c = 0;
+        m_pStream->ReadUChar(c);
         sal_uInt8 char2, char3;
         switch (c >> 4)
         {
@@ -193,8 +192,7 @@ OUString HsqlRowInputStream::readUTF(sal_Int32 nUTFLen)
                     throw WrongFormatException();
                 }
 
-                m_pStream->ReadUChar(cIn);
-                char2 = reinterpret_cast<sal_uInt8&>(cIn);
+                m_pStream->ReadUChar(char2);
                 if ((char2 & 0xC0) != 0x80)
                 {
                     throw WrongFormatException();
@@ -211,10 +209,8 @@ OUString HsqlRowInputStream::readUTF(sal_Int32 nUTFLen)
                     throw WrongFormatException();
                 }
 
-                m_pStream->ReadUChar(cIn);
-                char2 = reinterpret_cast<sal_uInt8&>(cIn);
-                m_pStream->ReadUChar(cIn);
-                char3 = reinterpret_cast<sal_uInt8&>(cIn);
+                m_pStream->ReadUChar(char2);
+                m_pStream->ReadUChar(char3);
 
                 if (((char2 & 0xC0) != 0x80) || ((char3 & 0xC0) != 0x80))
                 {
@@ -234,9 +230,8 @@ OUString HsqlRowInputStream::readUTF(sal_Int32 nUTFLen)
 
 bool HsqlRowInputStream::checkNull()
 {
-    unsigned char cIn = 0;
-    m_pStream->ReadUChar(cIn);
-    sal_uInt8 nNull = reinterpret_cast<sal_uInt8&>(cIn);
+    sal_uInt8 nNull = 0;
+    m_pStream->ReadUChar(nNull);
     return nNull == 0;
 }
 
@@ -262,28 +257,28 @@ std::vector<Any> HsqlRowInputStream::readOneRow(const std::vector<ColumnDefiniti
             case DataType::CHAR:
             case DataType::VARCHAR:
             case DataType::LONGVARCHAR:
-                aData.push_back(makeAny(readString()));
+                aData.push_back(Any(readString()));
                 break;
             case DataType::TINYINT:
             case DataType::SMALLINT:
             {
                 sal_Int16 value = 0;
                 m_pStream->ReadInt16(value);
-                aData.push_back(makeAny(value));
+                aData.push_back(Any(value));
             }
             break;
             case DataType::INTEGER:
             {
                 sal_Int32 value = 0;
                 m_pStream->ReadInt32(value);
-                aData.push_back(makeAny(value));
+                aData.push_back(Any(value));
             }
             break;
             case DataType::BIGINT:
             {
                 sal_Int64 value = 0;
                 m_pStream->ReadInt64(value);
-                aData.push_back(makeAny(value));
+                aData.push_back(Any(value));
             }
             break;
             case DataType::REAL:
@@ -293,7 +288,7 @@ std::vector<Any> HsqlRowInputStream::readOneRow(const std::vector<ColumnDefiniti
                 double value = 0;
                 m_pStream->ReadDouble(value);
                 // FIXME double is not necessarily 4 bytes
-                aData.push_back(makeAny(value));
+                aData.push_back(Any(value));
             }
             break;
             case DataType::NUMERIC:
@@ -311,7 +306,7 @@ std::vector<Any> HsqlRowInputStream::readOneRow(const std::vector<ColumnDefiniti
 
                 OUString sNum = lcl_makeStringFromBigint(std::move(aBytes));
                 Sequence<Any> result{ Any(lcl_putDot(sNum, nScale)), Any(nScale) };
-                aData.push_back(makeAny(result));
+                aData.push_back(Any(result));
             }
             break;
             case DataType::DATE:
@@ -324,7 +319,7 @@ std::vector<Any> HsqlRowInputStream::readOneRow(const std::vector<ColumnDefiniti
 
                 css::util::Date loDate(asDate.day(), asDate.month(),
                                        asDate.year()); // day, month, year
-                aData.push_back(makeAny(loDate));
+                aData.push_back(Any(loDate));
             }
             break;
             case DataType::TIME:
@@ -343,7 +338,7 @@ std::vector<Any> HsqlRowInputStream::readOneRow(const std::vector<ColumnDefiniti
                 const sal_uInt16 nMins = valueInSecs / 60;
                 const sal_uInt16 nSecs = valueInSecs % 60;
                 css::util::Time time((value % 1000) * 1000000, nSecs, nMins, nHours, true);
-                aData.push_back(makeAny(time));
+                aData.push_back(Any(time));
             }
             break;
             case DataType::TIMESTAMP:
@@ -366,14 +361,14 @@ std::vector<Any> HsqlRowInputStream::readOneRow(const std::vector<ColumnDefiniti
                 dateTime.Day = asDate.day();
                 dateTime.Month = asDate.month();
                 dateTime.Year = asDate.year();
-                aData.push_back(makeAny(dateTime));
+                aData.push_back(Any(dateTime));
             }
             break;
             case DataType::BOOLEAN:
             {
                 sal_uInt8 nBool = 0;
                 m_pStream->ReadUChar(nBool);
-                aData.push_back(makeAny(static_cast<bool>(nBool)));
+                aData.push_back(Any(static_cast<bool>(nBool)));
             }
             break;
             case DataType::OTHER:
@@ -388,7 +383,7 @@ std::vector<Any> HsqlRowInputStream::readOneRow(const std::vector<ColumnDefiniti
 
                 Sequence<sal_Int8> aBytes(nSize);
                 m_pStream->ReadBytes(aBytes.getArray(), nSize);
-                aData.push_back(makeAny(aBytes));
+                aData.push_back(Any(aBytes));
             }
             break;
 

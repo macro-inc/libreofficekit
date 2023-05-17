@@ -17,7 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <memory>
 #include <sal/config.h>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
@@ -65,6 +64,7 @@
 #include <IDocumentDrawModelAccess.hxx>
 #include <pam.hxx>
 #include <ndtxt.hxx>
+#include <flyfrms.hxx>
 
 bool SwFlowFrame::s_bMoveBwdJump = false;
 
@@ -396,7 +396,7 @@ sal_uInt8 SwFlowFrame::BwdMoveNecessary( const SwPageFrame *pPage, const SwRect 
                     if ( rFormat.GetAnchor().GetAnchorId() == RndStdIds::FLY_AT_PARA )
                     {
                         // The index of the other one can be retrieved using the anchor attribute.
-                        SwNodeOffset nTmpIndex = rFormat.GetAnchor().GetContentAnchor()->nNode.GetIndex();
+                        SwNodeOffset nTmpIndex = rFormat.GetAnchor().GetAnchorNode()->GetIndex();
                         // Now we're going to check whether the current paragraph before
                         // the anchor of the displacing object sits in the text. If this
                         // is the case, we don't try to evade it.
@@ -877,6 +877,18 @@ SwLayoutFrame *SwFrame::GetLeaf( MakePageType eMakePage, bool bFwd )
 
     if ( bInSct )
         return bFwd ? GetNextSctLeaf( eMakePage ) : GetPrevSctLeaf();
+
+    if (IsInFly() && FindFlyFrame()->IsFlySplitAllowed())
+    {
+        if (bFwd)
+        {
+            return GetNextFlyLeaf(eMakePage);
+        }
+        else
+        {
+            return GetPrevFlyLeaf();
+        }
+    }
 
     return bFwd ? GetNextLeaf( eMakePage ) : GetPrevLeaf();
 }
@@ -1738,6 +1750,11 @@ SwTwips SwFlowFrame::GetUpperSpaceAmountConsideredForPrevFrameAndPageGrid() cons
 {
     SwTwips nUpperSpaceAmountConsideredForPrevFrameAndPageGrid = 0;
 
+    if (!m_rThis.GetUpper() || !m_rThis.GetUpper()->GetFormat())
+    {
+        return nUpperSpaceAmountConsideredForPrevFrameAndPageGrid;
+    }
+
     if ( !m_rThis.GetUpper()->GetFormat()->getIDocumentSettingAccess().get(DocumentSettingId::USE_FORMER_OBJECT_POS) )
     {
         nUpperSpaceAmountConsideredForPrevFrameAndPageGrid =
@@ -2339,6 +2356,7 @@ bool SwFlowFrame::MoveBwd( bool &rbReformat )
         else
         {
             const SwFrame *pCol = m_rThis.FindColFrame();
+            assert(pCol);
             bool bGoOn = true;
             bool bJump = false;
             do

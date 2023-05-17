@@ -45,7 +45,7 @@ protected:
     virtual ~VCLXAccessibleEdit() override = default;
 
     virtual void                ProcessWindowEvent( const VclWindowEvent& rVclWindowEvent ) override;
-    virtual void                FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet ) override;
+    virtual void                FillAccessibleStateSet( sal_Int64& rStateSet ) override;
     sal_Int16                   implGetAccessibleRole();
 
     // OCommonAccessibleText
@@ -66,8 +66,8 @@ public:
     virtual css::uno::Sequence< OUString > SAL_CALL getSupportedServiceNames() override;
 
     // XAccessibleContext
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount(  ) override;
-    virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int32 i ) override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount(  ) override;
+    virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int64 i ) override;
     virtual sal_Int16 SAL_CALL getAccessibleRole(  ) override;
 
     // XAccessibleAction

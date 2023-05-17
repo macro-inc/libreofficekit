@@ -29,6 +29,8 @@
 #include <com/sun/star/drawing/MeasureTextVertPos.hpp>
 #include <com/sun/star/drawing/CircleKind.hpp>
 
+#include <docmodel/theme/FormatScheme.hxx>
+
 #include <editeng/boxitem.hxx>
 #include <editeng/eeitem.hxx>
 #include <editeng/lineitem.hxx>
@@ -42,6 +44,8 @@
 #include <unotools/localedatawrapper.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
+
+#include <svl/grabbagitem.hxx>
 
 #include <svx/strings.hrc>
 #include <svx/dialmgr.hxx>
@@ -93,6 +97,7 @@
 #include <svx/sxmtritm.hxx>
 #include <svx/sxmuitm.hxx>
 #include <svx/xcolit.hxx>
+#include <svx/RectangleAlignmentItem.hxx>
 #include <sxoneitm.hxx>
 #include <sxopitm.hxx>
 #include <sxreaitm.hxx>
@@ -104,6 +109,7 @@
 #include <sxsiitm.hxx>
 #include <sxsoitm.hxx>
 #include <sxtraitm.hxx>
+#include <editeng/frmdiritem.hxx>
 #include <libxml/xmlwriter.h>
 
 using namespace ::com::sun::star;
@@ -132,6 +138,7 @@ SdrItemPool::SdrItemPool(
     rPoolDefaults[SDRATTR_SHADOWSIZEY       -SDRATTR_START]=new SdrMetricItem(SDRATTR_SHADOWSIZEY, 100000);
     rPoolDefaults[SDRATTR_SHADOWTRANSPARENCE-SDRATTR_START]=new SdrPercentItem(SDRATTR_SHADOWTRANSPARENCE, 0);
     rPoolDefaults[SDRATTR_SHADOWBLUR        -SDRATTR_START]=new SdrMetricItem(SDRATTR_SHADOWBLUR, 0);
+    rPoolDefaults[SDRATTR_SHADOWALIGNMENT   -SDRATTR_START]=new SvxRectangleAlignmentItem(SDRATTR_SHADOWALIGNMENT, model::RectangleAlignment::Unset);
     rPoolDefaults[SDRATTR_SHADOW3D          -SDRATTR_START]=new SfxVoidItem(SDRATTR_SHADOW3D    );
     rPoolDefaults[SDRATTR_SHADOWPERSP       -SDRATTR_START]=new SfxVoidItem(SDRATTR_SHADOWPERSP );
     rPoolDefaults[SDRATTR_CAPTIONTYPE      -SDRATTR_START]=new SdrCaptionTypeItem      ;
@@ -170,6 +177,7 @@ SdrItemPool::SdrItemPool(
     rPoolDefaults[SDRATTR_TEXT_CHAINNEXTNAME    -SDRATTR_START]=new SfxStringItem(SDRATTR_TEXT_CHAINNEXTNAME, "");
     rPoolDefaults[SDRATTR_TEXT_USEFIXEDCELLHEIGHT -SDRATTR_START]=new SdrTextFixedCellHeightItem;
     rPoolDefaults[SDRATTR_TEXT_WORDWRAP         -SDRATTR_START]=new SdrOnOffItem(SDRATTR_TEXT_WORDWRAP, true);
+    rPoolDefaults[SDRATTR_TEXT_CLIPVERTOVERFLOW-SDRATTR_START]=new SdrOnOffItem(SDRATTR_TEXT_CLIPVERTOVERFLOW, false);
     rPoolDefaults[SDRATTR_EDGEKIND         -SDRATTR_START]=new SdrEdgeKindItem;
     rPoolDefaults[SDRATTR_EDGENODE1HORZDIST-SDRATTR_START]=new SdrEdgeNode1HorzDistItem(nDefEdgeDist);
     rPoolDefaults[SDRATTR_EDGENODE1VERTDIST-SDRATTR_START]=new SdrEdgeNode1VertDistItem(nDefEdgeDist);
@@ -325,6 +333,7 @@ SdrItemPool::SdrItemPool(
     rPoolDefaults[ SDRATTR_TABLE_BORDER_TLBR - SDRATTR_START ] = new SvxLineItem( SDRATTR_TABLE_BORDER_TLBR );
     rPoolDefaults[ SDRATTR_TABLE_BORDER_BLTR - SDRATTR_START ] = new SvxLineItem( SDRATTR_TABLE_BORDER_BLTR );
     rPoolDefaults[ SDRATTR_TABLE_TEXT_ROTATION - SDRATTR_START ] = new SvxTextRotateItem(0_deg10, SDRATTR_TABLE_TEXT_ROTATION);
+    rPoolDefaults[ SDRATTR_TABLE_GRABBAG - SDRATTR_START ] = new SfxGrabBagItem(SDRATTR_TABLE_GRABBAG);
 
     rPoolDefaults[ SDRATTR_GLOW_RADIUS - SDRATTR_START ] = new SdrMetricItem(SDRATTR_GLOW_RADIUS, 0);
     rPoolDefaults[ SDRATTR_GLOW_COLOR - SDRATTR_START ] = new XColorItem(SDRATTR_GLOW_COLOR, aNullCol);
@@ -334,6 +343,8 @@ SdrItemPool::SdrItemPool(
 
     rPoolDefaults[SDRATTR_TEXTCOLUMNS_NUMBER - SDRATTR_START] = new SfxInt16Item(SDRATTR_TEXTCOLUMNS_NUMBER, 1);
     rPoolDefaults[SDRATTR_TEXTCOLUMNS_SPACING - SDRATTR_START] = new SdrMetricItem(SDRATTR_TEXTCOLUMNS_SPACING, 0);
+
+    rPoolDefaults[SDRATTR_WRITINGMODE2 - SDRATTR_START] = new SvxFrameDirectionItem(SvxFrameDirection::Horizontal_LR_TB, SDRATTR_WRITINGMODE2);
 
     // set own ItemInfos
     mpLocalItemInfos[SDRATTR_SHADOW-SDRATTR_START]._nSID=SID_ATTR_FILL_SHADOW;
@@ -358,6 +369,8 @@ SdrItemPool::SdrItemPool(
 
     mpLocalItemInfos[SDRATTR_TEXTCOLUMNS_NUMBER - SDRATTR_START]._nSID = 0 /*TODO*/;
     mpLocalItemInfos[SDRATTR_TEXTCOLUMNS_SPACING - SDRATTR_START]._nSID = 0 /*TODO*/;
+
+    mpLocalItemInfos[SDRATTR_WRITINGMODE2 - SDRATTR_START]._nSID = 0 /*TODO*/;
 
     // it's my own creation level, set Defaults and ItemInfos
     SetDefaults(mpLocalPoolDefaults);
@@ -441,6 +454,7 @@ OUString SdrItemPool::GetItemName(sal_uInt16 nWhich)
         case XATTR_FILLBMP_POSOFFSETX   : pResId = SIP_XA_FILLBMP_POSOFFSETX;break;
         case XATTR_FILLBMP_POSOFFSETY   : pResId = SIP_XA_FILLBMP_POSOFFSETY;break;
         case XATTR_FILLBACKGROUND       : pResId = SIP_XA_FILLBACKGROUND;break;
+        case XATTR_FILLUSESLIDEBACKGROUND: pResId = SIP_XA_FILLUSESLIDEBACKGROUND;break;
 
         case XATTRSET_FILL             : pResId = SIP_XATTRSET_FILL;break;
 
@@ -716,7 +730,7 @@ SdrScaleItem* SdrScaleItem::Clone(SfxItemPool * /*pPool*/) const
 
 SdrOnOffItem* SdrOnOffItem::Clone(SfxItemPool* /*pPool*/) const
 {
-    return new SdrOnOffItem(Which(),GetValue());
+    return new SdrOnOffItem(TypedWhichId<SdrOnOffItem>(Which()),GetValue());
 }
 
 OUString SdrOnOffItem::GetValueTextByVal(bool bVal) const
@@ -751,7 +765,7 @@ void SdrOnOffItem::dumpAsXml(xmlTextWriterPtr pWriter) const
 
 SdrYesNoItem* SdrYesNoItem::Clone(SfxItemPool* /*pPool*/) const
 {
-    return new SdrYesNoItem(Which(),GetValue());
+    return new SdrYesNoItem(TypedWhichId<SdrYesNoItem>(Which()),GetValue());
 }
 
 OUString SdrYesNoItem::GetValueTextByVal(bool bVal) const
@@ -773,7 +787,7 @@ bool SdrYesNoItem::GetPresentation(SfxItemPresentation ePres,
 
 SdrPercentItem* SdrPercentItem::Clone(SfxItemPool* /*pPool*/) const
 {
-    return new SdrPercentItem(Which(),GetValue());
+    return new SdrPercentItem(TypedWhichId<SdrPercentItem>(Which()),GetValue());
 }
 
 bool SdrPercentItem::GetPresentation(
@@ -807,7 +821,7 @@ void SdrPercentItem::dumpAsXml(xmlTextWriterPtr pWriter) const
 
 SdrAngleItem* SdrAngleItem::Clone(SfxItemPool* /*pPool*/) const
 {
-    return new SdrAngleItem(Which(),GetValue());
+    return new SdrAngleItem(TypedWhichId<SdrAngleItem>(Which()),GetValue());
 }
 
 bool SdrAngleItem::GetPresentation(
@@ -872,7 +886,7 @@ bool SdrAngleItem::GetPresentation(
 
 SdrMetricItem* SdrMetricItem::Clone(SfxItemPool* /*pPool*/) const
 {
-    return new SdrMetricItem(Which(),GetValue());
+    return new SdrMetricItem(TypedWhichId<SdrMetricItem>(Which()),GetValue());
 }
 
 bool SdrMetricItem::HasMetrics() const
@@ -1601,7 +1615,7 @@ SdrMeasureTextHPosItem* SdrMeasureTextHPosItem::Clone(SfxItemPool* /*pPool*/) co
 
 sal_uInt16 SdrMeasureTextHPosItem::GetValueCount() const { return 4; }
 
-OUString SdrMeasureTextHPosItem::GetValueTextByPos(sal_uInt16 nPos)
+const OUString & SdrMeasureTextHPosItem::GetValueTextByPos(sal_uInt16 nPos)
 {
     static std::array<OUString, 4> aMeasureTextHPosItem
     {

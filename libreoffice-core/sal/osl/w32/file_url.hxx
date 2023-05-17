@@ -21,7 +21,7 @@
 #define INCLUDED_SAL_OSL_W32_FILE_URL_HXX
 
 #include <sal/types.h>
-#include <rtl/ustring.h>
+#include <rtl/ustring.hxx>
 #include <osl/file.h>
 #include <osl/mutex.hxx>
 
@@ -47,21 +47,14 @@
 #define MAX_LONG_PATH 32767
 
 DWORD IsValidFilePath (
-    rtl_uString *  path,
+    const OUString&  path,
     DWORD          dwFlags,
-    rtl_uString ** corrected
-);
-
-DWORD GetCaseCorrectPathName (
-    LPCWSTR lpszShortPath,  // file name
-    LPWSTR  lpszLongPath,   // path buffer
-    sal_uInt32 cchBuffer,   // size of path buffer
-    bool bCheckExistence
+    OUString* corrected
 );
 
 oslFileError osl_getSystemPathFromFileURL_ (
-    rtl_uString * strURL,
-    rtl_uString ** pustrPath,
+    const OUString& strURL,
+    rtl_uString** pustrPath,
     bool bAllowRelative
 );
 

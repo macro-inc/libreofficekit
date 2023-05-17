@@ -24,12 +24,11 @@
 #include <strings.hrc>
 #include <classes/fwkresid.hxx>
 
+#include <com/sun/star/awt/MenuItemStyle.hpp>
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 
-#include <toolkit/awt/vclxmenu.hxx>
-#include <vcl/menu.hxx>
 #include <vcl/svapp.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <osl/mutex.hxx>
@@ -80,17 +79,12 @@ HeaderMenuController::~HeaderMenuController()
 // private function
 void HeaderMenuController::fillPopupMenu( const Reference< css::frame::XModel >& rModel, Reference< css::awt::XPopupMenu > const & rPopupMenu )
 {
-    VCLXPopupMenu*       pPopupMenu        = static_cast<VCLXPopupMenu *>(comphelper::getFromUnoTunnel<VCLXMenu>( rPopupMenu ));
-    PopupMenu*           pVCLPopupMenu     = nullptr;
-
     SolarMutexGuard aSolarMutexGuard;
 
     resetPopupMenu( rPopupMenu );
-    if ( pPopupMenu )
-        pVCLPopupMenu = static_cast<PopupMenu *>(pPopupMenu->GetMenu());
 
     Reference< XStyleFamiliesSupplier > xStyleFamiliesSupplier( rModel, UNO_QUERY );
-    if ( !(pVCLPopupMenu && xStyleFamiliesSupplier.is()))
+    if (!xStyleFamiliesSupplier.is())
         return;
 
     Reference< XNameAccess > xStyleFamilies = xStyleFamiliesSupplier->getStyleFamilies();
@@ -141,17 +135,15 @@ void HeaderMenuController::fillPopupMenu( const Reference< css::frame::XModel >&
                         else
                             aStrBuf.append( "false" );
                         OUString aCommand( aStrBuf.makeStringAndClear() );
-                        pVCLPopupMenu->InsertItem( nId, aDisplayName, MenuItemBits::CHECKABLE );
+                        rPopupMenu->insertItem(nId, aDisplayName, css::awt::MenuItemStyle::CHECKABLE, nCount);
                         if ( !bFirstItemInserted )
                         {
                             bFirstItemInserted = true;
                             bFirstChecked      = bHeaderIsOn;
                         }
 
-                        pVCLPopupMenu->SetItemCommand( nId, aCommand );
-
-                        if ( bHeaderIsOn )
-                            pVCLPopupMenu->CheckItem( nId );
+                        rPopupMenu->setCommand(nId, aCommand);
+                        rPopupMenu->checkItem(nId, bHeaderIsOn);
                         ++nId;
 
                         // Check if all entries have the same state
@@ -166,7 +158,7 @@ void HeaderMenuController::fillPopupMenu( const Reference< css::frame::XModel >&
             if ( bAllOneState && ( nCount > 1 ))
             {
                 // Insert special item for all command
-                pVCLPopupMenu->InsertItem( ALL_MENUITEM_ID, FwkResId(STR_MENU_HEADFOOTALL), MenuItemBits::NONE, OString(), 0 );
+                rPopupMenu->insertItem(ALL_MENUITEM_ID, FwkResId(STR_MENU_HEADFOOTALL), 0, 0);
 
                 OUStringBuffer aStrBuf( aCmd );
                 aStrBuf.append( "?On:bool=" );
@@ -177,8 +169,8 @@ void HeaderMenuController::fillPopupMenu( const Reference< css::frame::XModel >&
                 else
                     aStrBuf.append( "false" );
 
-                pVCLPopupMenu->SetItemCommand( 1, aStrBuf.makeStringAndClear() );
-                pVCLPopupMenu->InsertSeparator(OString(), 1);
+                rPopupMenu->setCommand(1, aStrBuf.makeStringAndClear());
+                rPopupMenu->insertSeparator(1);
             }
         }
     }

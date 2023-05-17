@@ -21,7 +21,7 @@
 
 /*
 Look for places where we are using cow_wrapper, but we are calling a const method on the impl object
-with a non-const pointer, which means we will unnnecessarily trigger a copy.
+with a non-const pointer, which means we will unnecessarily trigger a copy.
 */
 
 namespace
@@ -53,28 +53,61 @@ bool Cow_Wrapper::VisitCXXMemberCallExpr(const CXXMemberCallExpr* memberCallExpr
     if (!methodDecl || !methodDecl->isConst())
         return true;
 
-    auto operatorCallExpr = dyn_cast<CXXOperatorCallExpr>(
-        compat::IgnoreImplicit(memberCallExpr->getImplicitObjectArgument()));
-    if (!operatorCallExpr)
-        return true;
-    if (operatorCallExpr->getOperator() != OO_Arrow)
-        return true;
-    auto arrowMethodDecl = dyn_cast_or_null<CXXMethodDecl>(operatorCallExpr->getDirectCallee());
-    if (!arrowMethodDecl)
-        return true;
-    if (arrowMethodDecl->isConst())
-        return true;
-    auto dc = loplugin::DeclCheck(arrowMethodDecl->getParent())
-                  .Class("cow_wrapper")
-                  .Namespace("o3tl")
-                  .GlobalNamespace();
-    if (!dc)
+    auto expr = memberCallExpr->getImplicitObjectArgument()->IgnoreImplicit()->IgnoreParens();
+    auto operatorCallExpr = dyn_cast<CXXOperatorCallExpr>(expr);
+
+    if (operatorCallExpr && operatorCallExpr->getOperator() == OO_Arrow)
+    {
+        auto arrowMethodDecl = dyn_cast_or_null<CXXMethodDecl>(operatorCallExpr->getDirectCallee());
+        if (!arrowMethodDecl)
+            return true;
+        if (arrowMethodDecl->isConst())
+            return true;
+        auto dc = loplugin::DeclCheck(arrowMethodDecl->getParent())
+                      .Class("cow_wrapper")
+                      .Namespace("o3tl")
+                      .GlobalNamespace();
+        if (!dc)
+            return true;
+    }
+    else if (operatorCallExpr)
+    {
+        auto methodDecl2 = dyn_cast_or_null<CXXMethodDecl>(operatorCallExpr->getDirectCallee());
+        if (!methodDecl2)
+            return true;
+        auto dc = loplugin::DeclCheck(methodDecl2->getParent())
+                      .Class("cow_wrapper")
+                      .Namespace("o3tl")
+                      .GlobalNamespace();
+        if (!dc)
+            return true;
+    }
+    else if (auto callExpr = dyn_cast<CallExpr>(expr))
+    {
+        if (!isa<ImplicitCastExpr>(callExpr->getCallee())) // std::as_const shows up as this
+            return true;
+        if (callExpr->getNumArgs() < 1)
+            return true;
+        auto arg0 = dyn_cast<CXXOperatorCallExpr>(callExpr->getArg(0));
+        if (!arg0)
+            return true;
+        auto starMethodDecl = dyn_cast_or_null<CXXMethodDecl>(arg0->getDirectCallee());
+        if (!starMethodDecl)
+            return true;
+        auto dc = loplugin::DeclCheck(starMethodDecl->getParent())
+                      .Class("cow_wrapper")
+                      .Namespace("o3tl")
+                      .GlobalNamespace();
+        if (!dc)
+            return true;
+    }
+    else
         return true;
 
     report(DiagnosticsEngine::Warning,
            "calling const method on o3tl::cow_wrapper impl class via non-const pointer, rather use "
            "std::as_const to prevent triggering an unnecessary copy",
-           compat::getBeginLoc(memberCallExpr))
+           memberCallExpr->getBeginLoc())
         << memberCallExpr->getSourceRange();
     return true;
 }

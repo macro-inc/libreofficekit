@@ -1077,9 +1077,8 @@ void dumpInteropGrabBagAsElement(const uno::Sequence< beans::PropertyValue>& aIn
 {
     (void)xmlTextWriterStartElement(xmlWriter, BAD_CAST( "InteropGrabBag" ));
 
-    sal_Int32 nLength = aInteropGrabBag.getLength();
-    for (sal_Int32 i = 0; i < nLength; ++i)
-        dumpPropertyValueAsElement(aInteropGrabBag[i], xmlWriter);
+    for (const auto& item: aInteropGrabBag)
+        dumpPropertyValueAsElement(item, xmlWriter);
 
     (void)xmlTextWriterEndElement( xmlWriter );
 }
@@ -1957,7 +1956,7 @@ OUString XShapeDumper::dump(const uno::Reference<drawing::XShapes>& xPageShapes,
     (void)xmlTextWriterEndDocument( xmlWriter );
     xmlFreeTextWriter( xmlWriter );
 
-    return OUString::fromUtf8(aString.makeStringAndClear());
+    return OUString::fromUtf8(aString);
 }
 
 OUString XShapeDumper::dump(const uno::Reference<drawing::XShape>& xPageShapes, bool bDumpInteropProperties)
@@ -1981,7 +1980,7 @@ OUString XShapeDumper::dump(const uno::Reference<drawing::XShape>& xPageShapes, 
     (void)xmlTextWriterEndDocument( xmlWriter );
     xmlFreeTextWriter( xmlWriter );
 
-    return OUString::fromUtf8(aString.makeStringAndClear());
+    return OUString::fromUtf8(aString);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

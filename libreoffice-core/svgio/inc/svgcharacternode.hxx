@@ -45,7 +45,7 @@ namespace svgio::svgreader
         public:
             SvgTextPositions();
 
-            void parseTextPositionAttributes(SVGToken aSVGToken, const OUString& aContent);
+            void parseTextPositionAttributes(SVGToken aSVGToken, std::u16string_view aContent);
 
             /// X content
             const SvgNumberVector& getX() const { return maX; }
@@ -123,7 +123,7 @@ namespace svgio::svgreader
             OUString           maText;
 
             /// local helpers
-            rtl::Reference<drawinglayer::primitive2d::TextSimplePortionPrimitive2D> createSimpleTextPrimitive(
+            rtl::Reference<drawinglayer::primitive2d::BasePrimitive2D> createSimpleTextPrimitive(
                 SvgTextPosition& rSvgTextPosition,
                 const SvgStyleAttributes& rSvgStyleAttributes) const;
             void decomposeTextWithStyle(
@@ -135,13 +135,12 @@ namespace svgio::svgreader
             SvgCharacterNode(
                 SvgDocument& rDocument,
                 SvgNode* pParent,
-                const OUString& rText);
+                OUString aText);
             virtual ~SvgCharacterNode() override;
 
             virtual const SvgStyleAttributes* getSvgStyleAttributes() const override;
             void decomposeText(drawinglayer::primitive2d::Primitive2DContainer& rTarget, SvgTextPosition& rSvgTextPosition) const;
             void whiteSpaceHandling();
-            void addGap();
             void concatenate(std::u16string_view rText);
 
             /// Text content

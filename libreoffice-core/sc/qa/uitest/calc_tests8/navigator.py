@@ -1,7 +1,11 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from libreoffice.uno.propertyvalue import mkPropertyValues
@@ -136,7 +140,9 @@ class navigator(UITestCase):
             # Use return to update the current cell
             xColumn.executeAction("TYPE", mkPropertyValues({"KEYCODE":"RETURN"}))
 
+            self.ui_test.wait_until_property_is_updated(xColumn, "Value", "2")
             self.assertEqual(get_state_as_dict(xColumn)['Value'], '2')
+            self.ui_test.wait_until_property_is_updated(xRow, "Value", "2")
             self.assertEqual(get_state_as_dict(xRow)['Value'], '2')
 
             self.assertEqual(get_state_as_dict(xGridWin)["CurrentRow"], "1")
@@ -165,3 +171,4 @@ class navigator(UITestCase):
 
             self.xUITest.executeCommand(".uno:Sidebar")
 
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

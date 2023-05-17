@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbapane.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include "vbaview.hxx"
 
@@ -24,8 +25,8 @@ using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
 SwVbaPane::SwVbaPane( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext,
-    const uno::Reference< frame::XModel >& xModel ) :
-    SwVbaPane_BASE( rParent, rContext ), mxModel( xModel )
+    uno::Reference< frame::XModel > xModel ) :
+    SwVbaPane_BASE( rParent, rContext ), mxModel(std::move( xModel ))
 {
 }
 
@@ -36,7 +37,7 @@ SwVbaPane::~SwVbaPane()
 uno::Any SAL_CALL
 SwVbaPane::View()
 {
-    return uno::makeAny( uno::Reference< word::XView >( new SwVbaView( this,  mxContext, mxModel ) ) );
+    return uno::Any( uno::Reference< word::XView >( new SwVbaView( this,  mxContext, mxModel ) ) );
 }
 
 void SAL_CALL

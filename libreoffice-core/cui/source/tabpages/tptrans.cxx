@@ -119,11 +119,8 @@ void SvxTransparenceTabPage::ModifiedTrgrHdl_Impl(const weld::ComboBox* pControl
     }
 
     // preview
-    sal_uInt8 nStartCol = static_cast<sal_uInt8>((static_cast<sal_uInt16>(m_xMtrTrgrStartValue->get_value(FieldUnit::PERCENT)) * 255) / 100);
-    sal_uInt8 nEndCol = static_cast<sal_uInt8>((static_cast<sal_uInt16>(m_xMtrTrgrEndValue->get_value(FieldUnit::PERCENT)) * 255) / 100);
     XGradient aTmpGradient(
-                Color(nStartCol, nStartCol, nStartCol),
-                Color(nEndCol, nEndCol, nEndCol),
+                createColorStops(),
                 static_cast<css::awt::GradientStyle>(m_xLbTrgrGradientType->get_active()),
                 Degree10(static_cast<sal_Int16>(m_xMtrTrgrAngle->get_value(FieldUnit::DEGREE)) * 10),
                 static_cast<sal_uInt16>(m_xMtrTrgrCenterX->get_value(FieldUnit::PERCENT)),
@@ -290,11 +287,8 @@ bool SvxTransparenceTabPage::FillItemSet(SfxItemSet* rAttrs)
             || m_xMtrTrgrStartValue->get_value_changed_from_saved()
             || m_xMtrTrgrEndValue->get_value_changed_from_saved())
         {
-            sal_uInt8 nStartCol = static_cast<sal_uInt8>((static_cast<sal_uInt16>(m_xMtrTrgrStartValue->get_value(FieldUnit::PERCENT)) * 255) / 100);
-            sal_uInt8 nEndCol = static_cast<sal_uInt8>((static_cast<sal_uInt16>(m_xMtrTrgrEndValue->get_value(FieldUnit::PERCENT)) * 255) / 100);
             XGradient aTmpGradient(
-                        Color(nStartCol, nStartCol, nStartCol),
-                        Color(nEndCol, nEndCol, nEndCol),
+                        createColorStops(),
                         static_cast<css::awt::GradientStyle>(m_xLbTrgrGradientType->get_active()),
                         Degree10(static_cast<sal_Int16>(m_xMtrTrgrAngle->get_value(FieldUnit::DEGREE)) * 10),
                         static_cast<sal_uInt16>(m_xMtrTrgrCenterX->get_value(FieldUnit::PERCENT)),
@@ -323,9 +317,10 @@ bool SvxTransparenceTabPage::FillItemSet(SfxItemSet* rAttrs)
     // disable unused XFillFloatTransparenceItem
     if(bSwitchOffGradient && (bGradActive || bGradUsed))
     {
-        XGradient aGrad(COL_BLACK, COL_WHITE);
-        aGrad.SetStartIntens(100);
-        aGrad.SetEndIntens(100);
+        // XGradient() default already creates [COL_BLACK, COL_WHITE] with same defaults
+        // XGradient() default also sets the Start/EndIntensity to 100 already
+        XGradient aGrad;
+
         XFillFloatTransparenceItem aItem(aGrad);
         aItem.SetEnabled(false);
         rAttrs->Put(aItem);
@@ -347,31 +342,39 @@ bool SvxTransparenceTabPage::FillItemSet(SfxItemSet* rAttrs)
 
 void SvxTransparenceTabPage::Reset(const SfxItemSet* rAttrs)
 {
-    const SfxPoolItem* pGradientItem = nullptr;
-    SfxItemState eStateGradient(rAttrs->GetItemState(XATTR_FILLFLOATTRANSPARENCE, true, &pGradientItem));
+    const XFillFloatTransparenceItem* pGradientItem =
+        rAttrs->GetItemIfSet(XATTR_FILLFLOATTRANSPARENCE);
+    bool bGradActive = (pGradientItem && pGradientItem->IsEnabled());
     if(!pGradientItem)
         pGradientItem = &rAttrs->Get(XATTR_FILLFLOATTRANSPARENCE);
-    bool bGradActive = (eStateGradient == SfxItemState::SET && static_cast<const XFillFloatTransparenceItem*>(pGradientItem)->IsEnabled());
 
-    const SfxPoolItem* pLinearItem = nullptr;
-    SfxItemState eStateLinear(rAttrs->GetItemState(XATTR_FILLTRANSPARENCE, true, &pLinearItem));
+    const XFillTransparenceItem* pLinearItem =
+        rAttrs->GetItemIfSet(XATTR_FILLTRANSPARENCE);
+    bool bLinearActive = (pLinearItem && pLinearItem->GetValue() != 0);
     if(!pLinearItem)
         pLinearItem = &rAttrs->Get(XATTR_FILLTRANSPARENCE);
-    bool bLinearActive = (eStateLinear == SfxItemState::SET && static_cast<const XFillTransparenceItem*>(pLinearItem)->GetValue() != 0);
 
     // transparence gradient
-    const XGradient& rGradient = static_cast<const XFillFloatTransparenceItem*>(pGradientItem)->GetGradientValue();
+    const XGradient& rGradient = pGradientItem->GetGradientValue();
     css::awt::GradientStyle eXGS(rGradient.GetGradientStyle());
     m_xLbTrgrGradientType->set_active(sal::static_int_cast< sal_Int32 >(eXGS));
     m_xMtrTrgrAngle->set_value(rGradient.GetAngle().get() / 10, FieldUnit::DEGREE);
     m_xMtrTrgrBorder->set_value(rGradient.GetBorder(), FieldUnit::PERCENT);
     m_xMtrTrgrCenterX->set_value(rGradient.GetXOffset(), FieldUnit::PERCENT);
     m_xMtrTrgrCenterY->set_value(rGradient.GetYOffset(), FieldUnit::PERCENT);
-    m_xMtrTrgrStartValue->set_value(static_cast<sal_uInt16>(((static_cast<sal_uInt16>(rGradient.GetStartColor().GetRed()) + 1) * 100) / 255), FieldUnit::PERCENT);
-    m_xMtrTrgrEndValue->set_value(static_cast<sal_uInt16>(((static_cast<sal_uInt16>(rGradient.GetEndColor().GetRed()) + 1) * 100) / 255), FieldUnit::PERCENT);
+    const Color aStart(rGradient.GetColorStops().front().getStopColor());
+    const Color aEnd(rGradient.GetColorStops().back().getStopColor());
+    m_xMtrTrgrStartValue->set_value(static_cast<sal_uInt16>(((static_cast<sal_uInt16>(aStart.GetRed()) + 1) * 100) / 255), FieldUnit::PERCENT);
+    m_xMtrTrgrEndValue->set_value(static_cast<sal_uInt16>(((static_cast<sal_uInt16>(aEnd.GetRed()) + 1) * 100) / 255), FieldUnit::PERCENT);
+
+    // MCGR: preserve in-between ColorStops if given
+    if (rGradient.GetColorStops().size() > 2)
+        maColorStops = basegfx::ColorStops(rGradient.GetColorStops().begin() + 1, rGradient.GetColorStops().end() - 1);
+    else
+        maColorStops.clear();
 
     // linear transparence
-    sal_uInt16 nTransp = static_cast<const XFillTransparenceItem*>(pLinearItem)->GetValue();
+    sal_uInt16 nTransp = pLinearItem->GetValue();
     m_xMtrTransparent->set_value(bLinearActive ? nTransp : 50, FieldUnit::PERCENT);
     ModifyTransparentHdl_Impl(*m_xMtrTransparent);
 
@@ -503,6 +506,24 @@ void SvxTransparenceTabPage::InvalidatePreview (bool bEnable)
             m_xCtlXRectPreview->set_sensitive(false);
         m_xCtlXRectPreview->queue_draw();
     }
+}
+
+basegfx::ColorStops SvxTransparenceTabPage::createColorStops()
+{
+    basegfx::ColorStops aColorStops;
+    const sal_uInt8 nStartCol(static_cast<sal_uInt8>((static_cast<sal_uInt16>(m_xMtrTrgrStartValue->get_value(FieldUnit::PERCENT)) * 255) / 100));
+    const sal_uInt8 nEndCol(static_cast<sal_uInt8>((static_cast<sal_uInt16>(m_xMtrTrgrEndValue->get_value(FieldUnit::PERCENT)) * 255) / 100));
+
+    aColorStops.emplace_back(0.0, Color(nStartCol, nStartCol, nStartCol).getBColor());
+
+    if(!maColorStops.empty())
+    {
+        aColorStops.insert(aColorStops.begin(), maColorStops.begin(), maColorStops.end());
+    }
+
+    aColorStops.emplace_back(1.0, Color(nEndCol, nEndCol, nEndCol).getBColor());
+
+    return aColorStops;
 }
 
 void SvxTransparenceTabPage::PageCreated(const SfxAllItemSet& aSet)

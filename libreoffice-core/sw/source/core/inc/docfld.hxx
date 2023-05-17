@@ -26,9 +26,10 @@
 #include <IMark.hxx>
 #include <o3tl/sorted_vector.hxx>
 #include <memory>
+#include <optional>
 
 class SwTextField;
-class SwIndex;
+class SwContentIndex;
 class SwNodeIndex;
 class SwContentFrame;
 class SwSectionNode;
@@ -65,11 +66,11 @@ class SetGetExpField
         } m_eSetGetExpFieldType;
 
 public:
-    SetGetExpField( const SwNodeIndex& rNdIdx, const SwTextField* pField = nullptr,
-                    const SwIndex* pIdx = nullptr,
+    SetGetExpField( const SwNode& rNd, const SwTextField* pField = nullptr,
+                    std::optional<sal_Int32> oContentIdx = std::nullopt,
                     sal_uInt16 nPageNumber = 0);
 
-    SetGetExpField( const SwNodeIndex& rNdIdx, const SwTextINetFormat& rINet );
+    SetGetExpField( const SwNode& rNd, const SwTextINetFormat& rINet );
 
     SetGetExpField( const SwSectionNode& rSectNode,
                     const SwPosition* pPos = nullptr,
@@ -81,7 +82,7 @@ public:
 
     SetGetExpField( const SwTableBox& rTableBox  );
 
-    SetGetExpField( const SwNodeIndex& rNdIdx, const SwTextTOXMark& rTOX );
+    SetGetExpField( const SwNode& rNd, const SwTextTOXMark& rTOX );
 
     SetGetExpField( const SwPosition& rPos );
 
@@ -121,7 +122,7 @@ class SetGetExpFields : public o3tl::sorted_vector<std::unique_ptr<SetGetExpFiel
 struct HashStr final : public SwHash
 {
     OUString aSetStr;
-    HashStr( const OUString& rName, const OUString& rText, HashStr* );
+    HashStr( const OUString& rName, OUString aText, HashStr* );
 };
 
 struct SwCalcFieldType final : public SwHash
@@ -134,7 +135,7 @@ struct SwCalcFieldType final : public SwHash
 };
 
 // search for the string that was saved under rName in the hash table
-OUString LookString( SwHashTable<HashStr> const & rTable, std::u16string_view rName );
+OUString LookString( SwHashTable<HashStr> const & rTable, const OUString& rName );
 
 const int GETFLD_ALL        = 3;        // combine flags via OR
 const int GETFLD_CALC       = 1;

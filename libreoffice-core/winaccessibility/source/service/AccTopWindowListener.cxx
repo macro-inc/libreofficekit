@@ -77,7 +77,7 @@ void AccTopWindowListener::HandleWindowOpened( css::accessibility::XAccessible* 
         if (role == css::accessibility::AccessibleRole::POPUP_MENU ||
                 role == css::accessibility::AccessibleRole::MENU )
         {
-            accManagerAgent.NotifyAccEvent(UM_EVENT_MENUPOPUPSTART, pAccessible);
+            accManagerAgent.NotifyAccEvent(UnoMSAAEvent::MENUPOPUPSTART, pAccessible);
         }
 
         if (role == css::accessibility::AccessibleRole::FRAME ||
@@ -85,7 +85,7 @@ void AccTopWindowListener::HandleWindowOpened( css::accessibility::XAccessible* 
                 role == css::accessibility::AccessibleRole::WINDOW ||
                 role == css::accessibility::AccessibleRole::ALERT)
         {
-            accManagerAgent.NotifyAccEvent(UM_EVENT_SHOW, pAccessible);
+            accManagerAgent.NotifyAccEvent(UnoMSAAEvent::SHOW, pAccessible);
         }
     }
 }
@@ -158,9 +158,8 @@ void AccTopWindowListener::AddAllListeners(css::accessibility::XAccessible* pAcc
         }
     }
 
-
-    int count = pAccessibleContext->getAccessibleChildCount();
-    for (int i=0;i<count;i++)
+    sal_Int64 nCount = pAccessibleContext->getAccessibleChildCount();
+    for (sal_Int64 i = 0; i < nCount; i++)
     {
         Reference<css::accessibility::XAccessible> mxAccessible
         = pAccessibleContext->getAccessibleChild(i);
@@ -214,7 +213,7 @@ void AccTopWindowListener::windowClosed( const css::lang::EventObject& e )
         if (role == css::accessibility::AccessibleRole::POPUP_MENU ||
                 role == css::accessibility::AccessibleRole::MENU)
         {
-            accManagerAgent.NotifyAccEvent(UM_EVENT_MENUPOPUPEND, pAccessible);
+            accManagerAgent.NotifyAccEvent(UnoMSAAEvent::MENUPOPUPEND, pAccessible);
         }
     }
 

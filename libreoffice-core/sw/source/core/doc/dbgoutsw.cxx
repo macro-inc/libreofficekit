@@ -41,7 +41,6 @@
 #include <SwNodeNum.hxx>
 #include <dbgoutsw.hxx>
 #include <frameformats.hxx>
-#include <iostream>
 #include <cstdio>
 
 static OString aDbgOutResult;
@@ -71,13 +70,7 @@ static OUString lcl_dbg_out_SvPtrArr(const T & rArr)
 
 const char * dbg_out(const void * pVoid)
 {
-    char sBuffer[1024];
-
-    sprintf(sBuffer, "%p", pVoid);
-
-    OUString aTmpStr(sBuffer, strlen(sBuffer), RTL_TEXTENCODING_ASCII_US);
-
-    return dbg_out(aTmpStr);
+    return dbg_out(OUString::number(reinterpret_cast<sal_uIntPtr>(pVoid), 16));
 }
 
 const char * dbg_out(std::u16string_view aStr)
@@ -318,11 +311,11 @@ static OUString lcl_dbg_out(const SwPosition & rPos)
 {
     OUString aStr =
         "( " +
-        OUString::number(sal_Int32(rPos.nNode.GetIndex())) +
+        OUString::number(sal_Int32(rPos.GetNodeIndex())) +
         ", " +
-        OUString::number(rPos.nContent.GetIndex()) +
+        OUString::number(rPos.GetContentIndex()) +
         ": " +
-        OUString::number(reinterpret_cast<sal_IntPtr>(rPos.nContent.GetIdxReg()), 16) +
+        OUString::number(reinterpret_cast<sal_IntPtr>(rPos.GetContentNode()), 16) +
         " )";
 
     return aStr;
@@ -387,11 +380,8 @@ const char * dbg_out(const SwRect & rRect)
 
 static OUString lcl_dbg_out(const SwFrameFormat & rFrameFormat)
 {
-    char sBuffer[256];
-    sprintf(sBuffer, "%p", &rFrameFormat);
-
     OUString aResult = "[ " +
-        OUString(sBuffer, strlen(sBuffer), RTL_TEXTENCODING_ASCII_US) +
+        OUString::number(reinterpret_cast<sal_uIntPtr>(&rFrameFormat), 16) +
         "(" +
         rFrameFormat.GetName() + ")";
 
@@ -422,9 +412,9 @@ static OUString lcl_AnchoredFrames(const SwNode & rNode)
              i != pFrameFormats->end(); ++i)
         {
             const SwFormatAnchor & rAnchor = (*i)->GetAnchor();
-            const SwPosition * pPos = rAnchor.GetContentAnchor();
+            const SwNode * pPos = rAnchor.GetAnchorNode();
 
-            if (pPos && &pPos->nNode.GetNode() == &rNode)
+            if (pPos && *pPos == rNode)
             {
                 if (! bFirst)
                     aResult.append(", ");
@@ -482,9 +472,6 @@ static OUString lcl_dbg_out_NumType(sal_Int16 nType)
 
 static OUString lcl_dbg_out(const SwNode & rNode)
 {
-    char aBuffer[128];
-    sprintf(aBuffer, "%p", &rNode);
-
     OUString aTmpStr = "<node "
         "index=\"" +
         OUString::number(sal_Int32(rNode.GetIndex())) +
@@ -496,7 +483,7 @@ static OUString lcl_dbg_out(const SwNode & rNode)
         OUString::number(sal_Int32( rNode.GetNodeType() ) ) +
         "\""
         " pointer=\"" +
-        OUString(aBuffer, strlen(aBuffer), RTL_TEXTENCODING_ASCII_US) +
+        OUString::number(reinterpret_cast<sal_uIntPtr>(&rNode), 16) +
         "\">";
 
     const SwTextNode * pTextNode = rNode.GetTextNode();
@@ -524,13 +511,12 @@ static OUString lcl_dbg_out(const SwNode & rNode)
             aTmpStr += "</number><rule>" +
                 pNumRule->GetName();
 
-            const SfxPoolItem * pItem = nullptr;
+            const SwNumRuleItem * pItem = nullptr;
 
-            if (pAttrSet && SfxItemState::SET ==
-                pAttrSet->GetItemState(RES_PARATR_NUMRULE, false, &pItem))
+            if (pAttrSet &&
+                (pItem = pAttrSet->GetItemIfSet(RES_PARATR_NUMRULE, false)))
             {
-                aTmpStr += "(" +
-                    static_cast<const SwNumRuleItem *>(pItem)->GetValue() + ")*";
+                aTmpStr += "(" + pItem->GetValue() + ")*";
             }
 
             const SwNumFormat * pNumFormat = nullptr;
@@ -595,7 +581,7 @@ static OUString lcl_dbg_out(const SwNode & rNode)
     {
         aTmpStr += "<start end=\"";
 
-        const SwStartNode * pStartNode = dynamic_cast<const SwStartNode *> (&rNode);
+        const SwStartNode * pStartNode = rNode.GetStartNode();
         if (pStartNode != nullptr)
             aTmpStr += OUString::number(sal_Int32(pStartNode->EndOfSectionNode()->GetIndex()));
 
@@ -734,9 +720,7 @@ static OUString lcl_dbg_out(const SwNumRuleTable & rTable)
 
         aResult.append(rTable[n]->GetName());
 
-        char sBuffer[256];
-        sprintf(sBuffer, "(%p)", rTable[n]);
-        aResult.appendAscii(sBuffer);
+        aResult.append("(" + OUString::number(reinterpret_cast<sal_uIntPtr>(rTable[n]), 16) + ")");
     }
 
     aResult.append("]");

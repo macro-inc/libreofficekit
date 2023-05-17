@@ -19,6 +19,7 @@
 #pragma once
 
 // helper classes
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/propshlp.hxx>
 
 // interfaces and types
@@ -26,14 +27,15 @@
 #include <com/sun/star/beans/XPropertyState.hpp>
 #include <com/sun/star/beans/XMultiPropertyStates.hpp>
 #include <com/sun/star/style/XStyleSupplier.hpp>
+#include "charttoolsdllapi.hxx"
 
 #include <map>
-#include "charttoolsdllapi.hxx"
 
 namespace property
 {
 
 class OOO_DLLPUBLIC_CHARTTOOLS OPropertySet :
+    protected cppu::BaseMutex,
     public ::cppu::OBroadcastHelper,
     // includes beans::XPropertySet, XMultiPropertySet and XFastPropertySet
     public ::cppu::OPropertySetHelper,
@@ -45,22 +47,25 @@ class OOO_DLLPUBLIC_CHARTTOOLS OPropertySet :
     public css::style::XStyleSupplier
 {
 public:
-    OPropertySet( ::osl::Mutex & rMutex );
+    OPropertySet();
     virtual ~OPropertySet();
 
 protected:
-    explicit OPropertySet( const OPropertySet & rOther, ::osl::Mutex & rMutex );
+    explicit OPropertySet( const OPropertySet & rOther );
 
     void SetNewValuesExplicitlyEvenIfTheyEqualDefault();
 
     /** implement this method to provide default values for all properties
         supporting defaults.  If a property does not have a default value, you
         may throw an UnknownPropertyException.
+        We pass the any by reference because this code is very hot and doing
+        it this way is cheaper than the two step process of constructing a new
+        any and then assigning to via a return value.
 
         @throws css::beans::UnknownPropertyException
         @throws css::uno::RuntimeException
      */
-    virtual css::uno::Any GetDefaultValue( sal_Int32 nHandle ) const = 0;
+    virtual void GetDefaultValue( sal_Int32 nHandle, css::uno::Any& rAny ) const = 0;
 
     /** The InfoHelper table contains all property names and types of
         this object.
@@ -141,6 +146,7 @@ protected:
      */
     virtual void firePropertyChangeEvent();
 
+public:
     // Interfaces
 
     // ____ XInterface ____
@@ -216,9 +222,6 @@ private:
                                    const css::uno::Any & rValue );
 
     bool SetStyle( const css::uno::Reference< css::style::XStyle > & xStyle );
-
-    /// reference to mutex of class deriving from here
-    ::osl::Mutex &   m_rMutex;
 
     bool m_bSetNewValuesExplicitlyEvenIfTheyEqualDefault;
     typedef std::map< sal_Int32, css::uno::Any > tPropertyMap;

@@ -178,6 +178,11 @@ const sal_uInt8 cFieldStart = 0x13;
 const sal_uInt8 cFieldSep = 0x14;
 const sal_uInt8 cFieldEnd = 0x15;
 
+namespace ooxml
+{
+class OOXMLDocument;
+}
+
 /**
    Handler for a stream.
  */
@@ -202,7 +207,7 @@ public:
     /// The current section is the last one in this body text.
     virtual void markLastSectionGroup(){};
 
-    virtual void setDocumentReference(void* pDocument) = 0;
+    virtual void setDocumentReference(writerfilter::ooxml::OOXMLDocument* pDocument) = 0;
 
     /**
        Receives start mark for group with the same paragraph properties.
@@ -232,6 +237,13 @@ public:
     virtual void startShape(css::uno::Reference<css::drawing::XShape> const& xShape) = 0;
 
     virtual void endShape() = 0;
+
+    /**
+      Receives a text-box-content.
+     */
+    virtual void startTextBoxContent() = 0;
+
+    virtual void endTextBoxContent() = 0;
 
     /**
        Receives 8-bit per character text.
@@ -300,6 +312,9 @@ public:
 
     /// Receives end mark for glossary document entry.
     virtual void endGlossaryEntry() = 0;
+
+    /// Receives identifier for node entry.
+    virtual void checkId(const sal_Int32 nId) = 0;
 
     virtual void commentProps(const OUString& /*sId*/, const CommentProperties& /*rProps*/) {}
 

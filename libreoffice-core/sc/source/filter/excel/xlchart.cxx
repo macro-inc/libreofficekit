@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <xlchart.hxx>
 
 #include <com/sun/star/container/XNameContainer.hpp>
@@ -37,6 +38,7 @@
 #include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
+#include <o3tl/string_view.hxx>
 #include <sal/macros.h>
 #include <sal/mathconf.h>
 #include <svl/itemset.hxx>
@@ -528,10 +530,10 @@ const XclChTypeInfo& XclChTypeInfoProvider::GetTypeInfoFromRecId( sal_uInt16 nRe
     return GetTypeInfo( EXC_CHTYPEID_UNKNOWN );
 }
 
-const XclChTypeInfo& XclChTypeInfoProvider::GetTypeInfoFromService( const OUString& rServiceName ) const
+const XclChTypeInfo& XclChTypeInfoProvider::GetTypeInfoFromService( std::u16string_view rServiceName ) const
 {
     for(auto const &rIt : spTypeInfos)
-        if( rServiceName.equalsAscii( rIt.mpcServiceName ) )
+        if( o3tl::equalsAscii( rServiceName, rIt.mpcServiceName ) )
             return rIt;
     OSL_FAIL( "XclChTypeInfoProvider::GetTypeInfoFromService - unknown service name" );
     return GetTypeInfo( EXC_CHTYPEID_UNKNOWN );
@@ -539,11 +541,11 @@ const XclChTypeInfo& XclChTypeInfoProvider::GetTypeInfoFromService( const OUStri
 
 // Property helpers ===========================================================
 
-XclChObjectTable::XclChObjectTable(uno::Reference<lang::XMultiServiceFactory> const & xFactory,
-        const OUString& rServiceName, const OUString& rObjNameBase ) :
-    mxFactory( xFactory ),
-    maServiceName( rServiceName ),
-    maObjNameBase( rObjNameBase ),
+XclChObjectTable::XclChObjectTable(uno::Reference<lang::XMultiServiceFactory> xFactory,
+        OUString aServiceName, OUString aObjNameBase ) :
+    mxFactory(std::move( xFactory )),
+    maServiceName(std::move( aServiceName )),
+    maObjNameBase(std::move( aObjNameBase )),
     mnIndex( 0 )
 {
 }
@@ -956,7 +958,7 @@ void XclChPropSetHelper::WriteLineProperties(
     uno::Any aDashNameAny;
     if( eApiStyle == drawing::LineStyle_DASH )
     {
-        OUString aDashName = rDashTable.InsertObject( uno::makeAny( aApiDash ) );
+        OUString aDashName = rDashTable.InsertObject( uno::Any( aApiDash ) );
         if( !aDashName.isEmpty() )
             aDashNameAny <<= aDashName;
     }

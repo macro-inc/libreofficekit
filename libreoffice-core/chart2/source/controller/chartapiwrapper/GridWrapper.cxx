@@ -21,6 +21,7 @@
 #include <AxisHelper.hxx>
 #include "Chart2ModelContact.hxx"
 #include <AxisIndexDefines.hxx>
+#include <BaseCoordinateSystem.hxx>
 
 #include <LinePropertiesHelper.hxx>
 #include <UserDefinedProperties.hxx>
@@ -29,7 +30,8 @@
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <algorithm>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -71,8 +73,8 @@ struct StaticGridWrapperPropertyArray : public rtl::StaticAggregate< Sequence< P
 namespace chart::wrapper
 {
 
-GridWrapper::GridWrapper(tGridType eType, const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
-    : m_spChart2ModelContact(spChart2ModelContact)
+GridWrapper::GridWrapper(tGridType eType, std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
+    : m_spChart2ModelContact(std::move(spChart2ModelContact))
     , m_aEventListenerContainer(m_aMutex)
     , m_eType(eType)
 {
@@ -131,8 +133,8 @@ Reference< beans::XPropertySet > GridWrapper::getInnerPropertySet()
     Reference< beans::XPropertySet > xRet;
     try
     {
-        Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
-        uno::Reference< XCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemByIndex( xDiagram, 0 /*nCooSysIndex*/ ) );
+        rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
+        rtl::Reference< BaseCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemByIndex( xDiagram, 0 /*nCooSysIndex*/ ) );
 
         sal_Int32 nDimensionIndex = 1;
         bool bSubGrid = false;

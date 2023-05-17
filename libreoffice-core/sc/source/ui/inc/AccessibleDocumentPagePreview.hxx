@@ -64,16 +64,14 @@ public:
     ///=====  XAccessibleContext  ==============================================
 
     /// Return the number of currently visible children.
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
 
     /// Return the specified child or NULL if index is invalid.
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild(sal_Int32 nIndex) override;
+        getAccessibleChild(sal_Int64 nIndex) override;
 
     /// Return the set of current states.
-    virtual css::uno::Reference<
-            css::accessibility::XAccessibleStateSet> SAL_CALL
-        getAccessibleStateSet() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
 
     virtual OUString SAL_CALL getAccessibleName() override;
     ///=====  XServiceInfo  ====================================================
@@ -122,8 +120,7 @@ private:
     rtl::Reference<ScAccessiblePageHeader> mpHeader;
     rtl::Reference<ScAccessiblePageHeader> mpFooter;
 
-    bool IsDefunc(
-        const css::uno::Reference<css::accessibility::XAccessibleStateSet>& rxParentStates);
+    bool IsDefunc(sal_Int64 nParentStates);
 
     ScNotesChildren* GetNotesChildren();
     ScShapeChildren* GetShapeChildren();

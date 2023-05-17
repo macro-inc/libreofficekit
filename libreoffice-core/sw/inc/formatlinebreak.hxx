@@ -24,10 +24,12 @@
 #include "calbck.hxx"
 
 #include <cppuhelper/weakref.hxx>
+#include <unotools/weakref.hxx>
 #include <com/sun/star/text/XTextContent.hpp>
 
 class SwDoc;
 class SwTextLineBreak;
+class SwXLineBreak;
 
 /// Defines the location of a line break text wrapping restart.
 enum class SwLineBreakClear
@@ -46,7 +48,7 @@ class SW_DLLPUBLIC SwFormatLineBreak final : public SfxEnumItem<SwLineBreakClear
     /// The SwTextAttr that knows the position of the line break in the doc model.
     SwTextLineBreak* m_pTextAttr;
 
-    css::uno::WeakReference<css::text::XTextContent> m_wXLineBreak;
+    unotools::WeakReference<SwXLineBreak> m_wXLineBreak;
 
     SwFormatLineBreak& operator=(const SwFormatLineBreak& rLineBreak) = delete;
 
@@ -67,25 +69,13 @@ public:
 
     sal_uInt16 GetValueCount() const override;
 
-    void InvalidateLineBreak();
-
     css::uno::Reference<css::text::XTextRange> GetAnchor() const;
 
     void SetTextLineBreak(SwTextLineBreak* pTextAttr) { m_pTextAttr = pTextAttr; }
 
-    const SwTextLineBreak* GetTextLineBreak() const { return m_pTextAttr; }
+    unotools::WeakReference<SwXLineBreak> const& GetXTextContent() const { return m_wXLineBreak; }
 
-    SwTextLineBreak* GetTextLineBreak() { return m_pTextAttr; }
-
-    css::uno::WeakReference<css::text::XTextContent> const& GetXTextContent() const
-    {
-        return m_wXLineBreak;
-    }
-
-    void SetXLineBreak(css::uno::Reference<css::text::XTextContent> const& xLineBreak)
-    {
-        m_wXLineBreak = xLineBreak;
-    }
+    void SetXLineBreak(rtl::Reference<SwXLineBreak> const& xLineBreak);
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };

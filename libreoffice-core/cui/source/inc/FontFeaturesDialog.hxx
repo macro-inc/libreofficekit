@@ -22,34 +22,45 @@ struct FontFeatureItem
 {
     FontFeatureItem(weld::Widget* pParent)
         : m_aFeatureCode(0)
-        , m_nDefault(0)
+        , m_nDefault(-1)
         , m_xBuilder(Application::CreateBuilder(pParent, "cui/ui/fontfragment.ui"))
         , m_xContainer(m_xBuilder->weld_widget("fontentry"))
         , m_xText(m_xBuilder->weld_label("label"))
         , m_xCombo(m_xBuilder->weld_combo_box("combo"))
         , m_xCheck(m_xBuilder->weld_check_button("check"))
     {
+        m_xCheck->connect_toggled(LINK(this, FontFeatureItem, CheckBoxToggledHdl));
     }
 
     sal_uInt32 m_aFeatureCode;
-    sal_uInt32 m_nDefault;
+    sal_Int32 m_nDefault;
+    weld::TriStateEnabled m_aTriStateEnabled;
+    Link<weld::Toggleable&, void> m_aToggleHdl;
     std::unique_ptr<weld::Builder> m_xBuilder;
     std::unique_ptr<weld::Widget> m_xContainer;
     std::unique_ptr<weld::Label> m_xText;
     std::unique_ptr<weld::ComboBox> m_xCombo;
     std::unique_ptr<weld::CheckButton> m_xCheck;
+
+private:
+    DECL_LINK(CheckBoxToggledHdl, weld::Toggleable&, void);
 };
 
 class FontFeaturesDialog : public weld::GenericDialogController
 {
 private:
-    std::vector<FontFeatureItem> m_aFeatureItems;
+    std::vector<std::unique_ptr<FontFeatureItem>> m_aFeatureItems;
     OUString m_sFontName;
     OUString m_sResultFontName;
 
     SvxFontPrevWindow m_aPreviewWindow;
     std::unique_ptr<weld::ScrolledWindow> m_xContentWindow;
+    std::unique_ptr<weld::Container> m_xContentBox;
     std::unique_ptr<weld::Container> m_xContentGrid;
+    std::unique_ptr<weld::Container> m_xStylisticSetsBox;
+    std::unique_ptr<weld::Container> m_xStylisticSetsGrid;
+    std::unique_ptr<weld::Container> m_xCharacterVariantsBox;
+    std::unique_ptr<weld::Container> m_xCharacterVariantsGrid;
     std::unique_ptr<weld::CustomWeld> m_xPreviewWindow;
 
     void initialize();
@@ -62,7 +73,7 @@ private:
     DECL_LINK(CheckBoxToggledHdl, weld::Toggleable&, void);
 
 public:
-    FontFeaturesDialog(weld::Window* pParent, OUString const& rFontName);
+    FontFeaturesDialog(weld::Window* pParent, OUString aFontName);
     ~FontFeaturesDialog() override;
     virtual short run() override;
 

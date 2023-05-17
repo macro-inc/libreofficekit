@@ -59,7 +59,7 @@ private:
     basegfx::B2DPolyPolygon aB2DPolyPolygon;
 
 public:
-    XLineEndEntry(const basegfx::B2DPolyPolygon& rB2DPolyPolygon, const OUString& rName);
+    XLineEndEntry(basegfx::B2DPolyPolygon aB2DPolyPolygon, const OUString& rName);
     XLineEndEntry(const XLineEndEntry& rOther);
 
     const basegfx::B2DPolyPolygon& GetLineEnd() const
@@ -163,7 +163,7 @@ protected:
     bool                mbListDirty;
     bool                mbEmbedInDocument;
 
-    XPropertyList(XPropertyListType t, const OUString& rPath, const OUString& rReferer);
+    XPropertyList(XPropertyListType t, OUString aPath, OUString aReferer);
     bool isValidIdx(tools::Long nIndex) const;
     virtual BitmapEx CreateBitmapForUI(tools::Long nIndex) = 0;
 
@@ -215,7 +215,7 @@ public:
                                                const OUString& rReferer);
     // as above but initializes name as expected
     static XPropertyListRef CreatePropertyListFromURL(XPropertyListType t,
-                                                       const OUString & rUrl);
+                                                       std::u16string_view rUrl);
 
     // helper accessors
     static inline XDashListRef AsDashList(
@@ -273,7 +273,7 @@ private:
     OUString            maStringSolidLine;
     OUString            maStringNoLine;
 
-    static BitmapEx ImpCreateBitmapForXDash(const XDash* pDash);
+    static double ImpGetDefaultLineThickness();
     virtual BitmapEx CreateBitmapForUI(tools::Long nIndex) override;
 
 public:
@@ -290,6 +290,8 @@ public:
     // creates a bitmap fitting in size and style to the ones you get by
     // using GetUiBitmap for existing entries.
     BitmapEx const & GetBitmapForUISolidLine() const;
+
+    static BitmapEx CreateBitmapForXDash(const XDash* pDash, double fLineThickness);
 
     // Special calls to get the translated strings for the UI entry for no
     // line style (XLINE_NONE) and solid line style (XLINE_SOLID) for dialogs

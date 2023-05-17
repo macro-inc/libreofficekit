@@ -18,8 +18,6 @@
  */
 #pragma once
 
-#include <libxml/xmlwriter.h>
-
 #include <scriptinfo.hxx>
 
 #include <swrect.hxx>
@@ -243,7 +241,8 @@ public:
                            const SwLinePortion* _pDontConsiderPortion = nullptr,
                            const bool _bNoFlyCntPorAndLinePor = false ) const;
 
-    void dumpAsXml(xmlTextWriterPtr pWriter) const override;
+    void dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                   TextFrameIndex& nOffset) const override;
 };
 
 /// Collection of SwLineLayout instances, represents the paragraph text in Writer layout.
@@ -287,8 +286,8 @@ public:
     const SwRepaint& GetRepaint() const { return m_aRepaint; }
     SwCharRange& GetReformat() { return m_aReformat; }
     const SwCharRange& GetReformat() const { return m_aReformat; }
-    tools::Long& GetDelta() { return m_nDelta; }
-    const tools::Long& GetDelta() const { return m_nDelta; }
+    void SetDelta(tools::Long nDelta) { m_nDelta = nDelta; }
+    tools::Long GetDelta() const { return m_nDelta; }
     SwScriptInfo& GetScriptInfo() { return m_aScriptInfo; }
     const SwScriptInfo& GetScriptInfo() const { return m_aScriptInfo; }
 
@@ -326,7 +325,8 @@ public:
 
     const SwDropPortion *FindDropPortion() const;
 
-    void dumpAsXml(xmlTextWriterPtr pWriter) const override;
+    void dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                   TextFrameIndex& nOffset) const override;
 };
 
 inline void SwParaPortion::ResetPreps()

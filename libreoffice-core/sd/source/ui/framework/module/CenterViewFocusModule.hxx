@@ -19,10 +19,8 @@
 
 #pragma once
 
-#include <MutexOwner.hxx>
-
 #include <com/sun/star/drawing/framework/XConfigurationChangeListener.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 
 namespace com::sun::star::drawing::framework
 {
@@ -40,7 +38,7 @@ class ViewShellBase;
 
 namespace sd::framework
 {
-typedef ::cppu::WeakComponentImplHelper<css::drawing::framework::XConfigurationChangeListener>
+typedef comphelper::WeakComponentImplHelper<css::drawing::framework::XConfigurationChangeListener>
     CenterViewFocusModuleInterfaceBase;
 
 /** This module waits for new views to be created for the center pane and
@@ -48,14 +46,14 @@ typedef ::cppu::WeakComponentImplHelper<css::drawing::framework::XConfigurationC
     we are moving away from the shell stack this module may become obsolete
     or has to be modified.
 */
-class CenterViewFocusModule : private sd::MutexOwner, public CenterViewFocusModuleInterfaceBase
+class CenterViewFocusModule final : public CenterViewFocusModuleInterfaceBase
 {
 public:
     explicit CenterViewFocusModule(
         css::uno::Reference<css::frame::XController> const& rxController);
     virtual ~CenterViewFocusModule() override;
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // XConfigurationChangeListener
 

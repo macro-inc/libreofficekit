@@ -72,21 +72,22 @@ namespace sdr::properties
             return std::unique_ptr<BaseProperties>(new MeasureProperties(*this, rObj));
         }
 
-        void MeasureProperties::ItemSetChanged(const SfxItemSet* pSet)
+        void MeasureProperties::ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich)
         {
             SdrMeasureObj& rObj = static_cast<SdrMeasureObj&>(GetSdrObject());
 
             // call parent
-            TextProperties::ItemSetChanged(pSet);
+            TextProperties::ItemSetChanged(aChangedItems, nDeletedWhich);
 
             // local changes
             rObj.SetTextDirty();
         }
 
-        void MeasureProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr)
+        void MeasureProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast)
         {
             // call parent (always first thing to do, may create the SfxItemSet)
-            TextProperties::SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
+            TextProperties::SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr, bBroadcast);
 
             // local changes
             // get access to dimension line object

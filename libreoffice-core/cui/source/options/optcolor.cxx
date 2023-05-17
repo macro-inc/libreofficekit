@@ -34,7 +34,8 @@
 #include <dialmgr.hxx>
 #include "optcolor.hxx"
 #include <strings.hrc>
-
+#include <svtools/miscopt.hxx>
+#include <officecfg/Office/Common.hxx>
 using namespace ::com::sun::star;
 using namespace ::svtools;
 
@@ -106,6 +107,7 @@ const vEntryInfo[] =
     { Group_General, IDS_CB(unvisitedlinks) },
     { Group_General, IDS_CB(visitedlinks) },
     { Group_General, IDS(autospellcheck) },
+    { Group_General, IDS(grammarcheck) },
     { Group_General, IDS(smarttags) },
     { Group_General, IDS_CB(shadows) },
 
@@ -127,6 +129,7 @@ const vEntryInfo[] =
     { Group_Calc,    IDS(brk) },
     { Group_Calc,    IDS(brkmanual) },
     { Group_Calc,    IDS(brkauto) },
+    { Group_Calc,    IDS_CB(hiddencolrow) },
     { Group_Calc,    IDS(det) },
     { Group_Calc,    IDS(deterror) },
     { Group_Calc,    IDS(ref) },
@@ -157,6 +160,36 @@ const vEntryInfo[] =
     #undef IDS
 };
 
+// Maps the names of default color schemes to the corresponding TranslateId
+const std::map<OUString, OUString> &getColorSchemes()
+{
+    static std::map<OUString, OUString> const vColorSchemes = {
+        {"COLOR_SCHEME_LIBREOFFICE_AUTOMATIC", CuiResId(RID_COLOR_SCHEME_LIBREOFFICE_AUTOMATIC)},
+    };
+    return vColorSchemes;
+};
+
+// If the color scheme name has a translated string, then return the translation
+// Or else simply return the input string
+// For non-translatable color schemes, the ID and the name are the same
+OUString lcl_SchemeIdToTranslatedName(const OUString& sSchemeId)
+{
+    auto it = getColorSchemes().find(sSchemeId);
+    if (it != getColorSchemes().end())
+        return it->second;
+    return sSchemeId;
+}
+
+// Given a translated color scheme name, return the scheme ID used in the UI.xcu file
+// For non-translatable color schemes, the ID and the name are the same
+OUString lcl_TranslatedNameToSchemeId(const OUString& sName)
+{
+    for (auto it = getColorSchemes().begin(); it != getColorSchemes().end(); ++it)
+        if (it->second == sName)
+            return it->first;
+    return sName;
+}
+
 // ColorConfigWindow_Impl
 
 class ColorConfigWindow_Impl
@@ -170,6 +203,7 @@ public:
                   Link<weld::Widget&,void> const&,
                   weld::ScrolledWindow& rScroll);
     void Update(EditableColorConfig const*, EditableExtendedColorConfig const*);
+    void UpdateEntries();
     void ClickHdl(EditableColorConfig*, const weld::Toggleable&);
     void ColorHdl(EditableColorConfig*, EditableExtendedColorConfig*, const ColorListBox*);
 
@@ -206,20 +240,18 @@ private:
 
     // Entry -- a color config entry:
     // text (checkbox) + color list box
-    class Entry
+    struct Entry
     {
-    public:
         Entry(weld::Window* pTopLevel, weld::Builder& rBuilder, const char* pTextWidget, const char* pColorWidget,
-              const Color& rColor, int nCheckBoxLabelOffset, bool bCheckBox, bool bShow);
-    public:
+              const Color& rColor, int nCheckBoxLabelOffset, const ColorListBox* pCache, bool bCheckBox, bool bShow);
         void SetText(const OUString& rLabel) { dynamic_cast<weld::Label&>(*m_xText).set_label(rLabel); }
         int get_height_request() const
         {
             return std::max(m_xText->get_preferred_size().Height(),
                             m_xColorList->get_widget().get_preferred_size().Height());
         }
-        void Hide ();
-    public:
+        void Hide();
+
         void SetLinks(Link<weld::Toggleable&,void> const&,
                       Link<ColorListBox&,void> const&,
                       Link<weld::Widget&,void> const&);
@@ -227,10 +259,10 @@ private:
         void Update (ExtendedColorConfigValue const&);
         void ColorChanged (ColorConfigValue&);
         void ColorChanged (ExtendedColorConfigValue&);
-    public:
+
         bool Is(const weld::Toggleable* pBox) const { return m_xText.get() == pBox; }
         bool Is(const ColorListBox* pBox) const { return m_xColorList.get() == pBox; }
-    private:
+
         // checkbox (CheckBox) or simple text (FixedText)
         std::unique_ptr<weld::Widget> m_xText;
         // color list box
@@ -282,9 +314,10 @@ ColorConfigWindow_Impl::Chapter::Chapter(weld::Builder& rBuilder, const char* pL
 // ColorConfigWindow_Impl::Entry
 ColorConfigWindow_Impl::Entry::Entry(weld::Window* pTopLevel, weld::Builder& rBuilder,
                                      const char* pTextWidget, const char* pColorWidget,
-                                     const Color& rColor,
-                                     int nCheckBoxLabelOffset, bool bCheckBox, bool bShow)
-    : m_xColorList(new ColorListBox(rBuilder.weld_menu_button(pColorWidget), [pTopLevel]{ return pTopLevel; }))
+                                     const Color& rColor, int nCheckBoxLabelOffset,
+                                     const ColorListBox* pCache, bool bCheckBox, bool bShow)
+    : m_xColorList(new ColorListBox(rBuilder.weld_menu_button(pColorWidget),
+                                    [pTopLevel]{ return pTopLevel; }, pCache))
     , m_aDefaultColor(rColor)
 {
     if (bCheckBox)
@@ -402,16 +435,20 @@ void ColorConfigWindow_Impl::CreateEntries()
         m_nCheckBoxLabelOffset = aCheckSize.Width() - aFixedSize.Width();
     }
 
+    const ColorListBox* pCache = nullptr;
+
     // creating entries
     vEntries.reserve(ColorConfigEntryCount);
-    for (size_t i = 0; i < SAL_N_ELEMENTS(vEntryInfo); ++i)
+    for (size_t i = 0; i < std::size(vEntryInfo); ++i)
     {
         vEntries.push_back(std::make_shared<Entry>(m_pTopLevel, *m_xBuilder,
             vEntryInfo[i].pText, vEntryInfo[i].pColor,
             ColorConfig::GetDefaultColor(static_cast<ColorConfigEntry>(i)),
-            m_nCheckBoxLabelOffset,
+            m_nCheckBoxLabelOffset, pCache,
             vEntryInfo[i].bCheckBox,
             aModulesInstalled[vEntryInfo[i].eGroup]));
+        if (!pCache)
+            pCache = vEntries.back()->m_xColorList.get();
     }
 
     // extended entries
@@ -443,7 +480,7 @@ void ColorConfigWindow_Impl::CreateEntries()
                 aExtConfig.GetComponentColorConfigValue(sComponentName, i);
             vEntries.push_back(std::make_shared<Entry>(m_pTopLevel, *vExtBuilders.back(),
                 "label", "button", aColorEntry.getDefaultColor(),
-                m_nCheckBoxLabelOffset, false, true));
+                m_nCheckBoxLabelOffset, pCache, false, true));
             vEntries.back()->SetText(aColorEntry.getDisplayName());
         }
     }
@@ -488,6 +525,16 @@ void ColorConfigWindow_Impl::Update (
             vEntries[i]->Update(
                 pExtConfig->GetComponentColorConfigValue(sComponentName, k)
             );
+    }
+}
+
+void ColorConfigWindow_Impl::UpdateEntries()
+{
+    for (unsigned i = 0; i != ColorConfigEntryCount; ++i)
+    {
+        ColorConfigEntry const aEntry = static_cast<ColorConfigEntry>(i);
+        Color aColor = ColorConfig::GetDefaultColor(aEntry);
+        vEntries[i]->m_xColorList->SetAutoDisplayColor(aColor);
     }
 }
 
@@ -590,6 +637,7 @@ public:
     void SetConfig (EditableColorConfig& rConfig) { pColorConfig = &rConfig; }
     void SetExtendedConfig (EditableExtendedColorConfig& rConfig) { pExtColorConfig = &rConfig; }
     void Update();
+    void UpdateEntries();
     tools::Long GetScrollPosition() const
     {
         return m_xVScroll->vadjustment_get_value();
@@ -631,6 +679,11 @@ void ColorConfigCtrl_Impl::Update ()
 {
     DBG_ASSERT(pColorConfig, "Configuration not set");
     m_xScrollWindow->Update(pColorConfig, pExtColorConfig);
+}
+
+void ColorConfigCtrl_Impl::UpdateEntries()
+{
+    m_xScrollWindow->UpdateEntries();
 }
 
 IMPL_LINK(ColorConfigCtrl_Impl, ClickHdl, weld::Toggleable&, rBox, void)
@@ -689,19 +742,20 @@ SvxColorOptionsTabPage::SvxColorOptionsTabPage(weld::Container* pPage, weld::Dia
     : SfxTabPage(pPage, pController, "cui/ui/optappearancepage.ui", "OptAppearancePage", &rCoreSet)
     , bFillItemSetCalled(false)
     , m_nSizeAllocEventId(nullptr)
+    , m_xAutoColorLB(m_xBuilder->weld_combo_box("autocolorlb"))
     , m_xColorSchemeLB(m_xBuilder->weld_combo_box("colorschemelb"))
     , m_xSaveSchemePB(m_xBuilder->weld_button("save"))
     , m_xDeleteSchemePB(m_xBuilder->weld_button("delete"))
     , m_xColorConfigCT(new ColorConfigCtrl_Impl(pController->getDialog(), *m_xBuilder))
     , m_xTable(m_xBuilder->weld_widget("table"))
     , m_xOnFT(m_xBuilder->weld_label("on"))
-    , m_xElementFT(m_xBuilder->weld_label("uielements"))
     , m_xColorFT(m_xBuilder->weld_label("colorsetting"))
     , m_rWidget1(m_xColorConfigCT->GetWidget1())
     , m_rWidget2(m_xColorConfigCT->GetWidget2())
 {
     m_xColorSchemeLB->make_sorted();
     m_xColorSchemeLB->connect_changed(LINK(this, SvxColorOptionsTabPage, SchemeChangedHdl_Impl));
+    m_xAutoColorLB->connect_changed(LINK(this, SvxColorOptionsTabPage, onAutoColorChanged));
     Link<weld::Button&,void> aLk = LINK(this, SvxColorOptionsTabPage, SaveDeleteHdl_Impl );
     m_xSaveSchemePB->connect_clicked(aLk);
     m_xDeleteSchemePB->connect_clicked(aLk);
@@ -776,14 +830,16 @@ void SvxColorOptionsTabPage::Reset( const SfxItemSet* )
     pExtColorConfig.reset(new EditableExtendedColorConfig);
     m_xColorConfigCT->SetExtendedConfig(*pExtColorConfig);
 
+    m_xAutoColorLB->set_active( MiscSettings::GetAppColorMode() );
+
     OUString sUser = GetUserData();
     //has to be called always to speed up accessibility tools
     m_xColorConfigCT->SetScrollPosition(sUser.toInt32());
     m_xColorSchemeLB->clear();
     const uno::Sequence< OUString >  aSchemes = pColorConfig->GetSchemeNames();
     for(const OUString& s : aSchemes)
-        m_xColorSchemeLB->append_text(s);
-    m_xColorSchemeLB->set_active_text(pColorConfig->GetCurrentSchemeName());
+        m_xColorSchemeLB->append_text(lcl_SchemeIdToTranslatedName(s));
+    m_xColorSchemeLB->set_active_text(lcl_SchemeIdToTranslatedName(pColorConfig->GetCurrentSchemeName()));
     m_xColorSchemeLB->save_value();
     m_xDeleteSchemePB->set_sensitive( aSchemes.getLength() > 1 );
     UpdateColorConfig();
@@ -802,10 +858,21 @@ void SvxColorOptionsTabPage::UpdateColorConfig()
     m_xColorConfigCT->Update();
 }
 
+IMPL_LINK_NOARG(SvxColorOptionsTabPage, onAutoColorChanged, weld::ComboBox&, void)
+{
+    MiscSettings::SetAppColorMode( m_xAutoColorLB->get_active() );
+
+    m_xColorConfigCT->UpdateEntries();
+
+    pColorConfig->LoadScheme(lcl_TranslatedNameToSchemeId(m_xColorSchemeLB->get_active_text()));
+    pExtColorConfig->LoadScheme(lcl_TranslatedNameToSchemeId(m_xColorSchemeLB->get_active_text()));
+    UpdateColorConfig();
+}
+
 IMPL_LINK(SvxColorOptionsTabPage, SchemeChangedHdl_Impl, weld::ComboBox&, rBox, void)
 {
-    pColorConfig->LoadScheme(rBox.get_active_text());
-    pExtColorConfig->LoadScheme(rBox.get_active_text());
+    pColorConfig->LoadScheme(lcl_TranslatedNameToSchemeId(rBox.get_active_text()));
+    pExtColorConfig->LoadScheme(lcl_TranslatedNameToSchemeId(rBox.get_active_text()));
     UpdateColorConfig();
 }
 
@@ -817,9 +884,9 @@ IMPL_LINK(SvxColorOptionsTabPage, SaveDeleteHdl_Impl, weld::Button&, rButton, vo
 
         SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();
         ScopedVclPtr<AbstractSvxNameDialog> aNameDlg(pFact->CreateSvxNameDialog(GetFrameWeld(),
-                            sName, CuiResId(RID_SVXSTR_COLOR_CONFIG_SAVE2) ));
+                            sName, CuiResId(RID_CUISTR_COLOR_CONFIG_SAVE2) ));
         aNameDlg->SetCheckNameHdl( LINK(this, SvxColorOptionsTabPage, CheckNameHdl_Impl));
-        aNameDlg->SetText(CuiResId(RID_SVXSTR_COLOR_CONFIG_SAVE1));
+        aNameDlg->SetText(CuiResId(RID_CUISTR_COLOR_CONFIG_SAVE1));
         aNameDlg->SetHelpId(HID_OPTIONS_COLORCONFIG_SAVE_SCHEME);
         aNameDlg->SetCheckNameHdl( LINK(this, SvxColorOptionsTabPage, CheckNameHdl_Impl));
         if(RET_OK == aNameDlg->Execute())
@@ -837,8 +904,8 @@ IMPL_LINK(SvxColorOptionsTabPage, SaveDeleteHdl_Impl, weld::Button&, rButton, vo
         DBG_ASSERT(m_xColorSchemeLB->get_count() > 1, "don't delete the last scheme");
         std::unique_ptr<weld::MessageDialog> xQuery(Application::CreateMessageDialog(GetFrameWeld(),
                                                     VclMessageType::Question, VclButtonsType::YesNo,
-                                                    CuiResId(RID_SVXSTR_COLOR_CONFIG_DELETE)));
-        xQuery->set_title(CuiResId(RID_SVXSTR_COLOR_CONFIG_DELETE_TITLE));
+                                                    CuiResId(RID_CUISTR_COLOR_CONFIG_DELETE)));
+        xQuery->set_title(CuiResId(RID_CUISTR_COLOR_CONFIG_DELETE_TITLE));
         if (RET_YES == xQuery->run())
         {
             OUString sDeleteScheme(m_xColorSchemeLB->get_active_text());

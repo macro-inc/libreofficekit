@@ -25,16 +25,17 @@
 #include <services.hxx>
 
 #include <com/sun/star/awt/LineEndFormat.hpp>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/form/FormComponentType.hpp>
 #include <com/sun/star/text/WritingMode2.hpp>
 #include <com/sun/star/style/VerticalAlignment.hpp>
 
 #include <comphelper/guarding.hxx>
 #include <comphelper/servicehelper.hxx>
-#include <svl/itempool.hxx>
 #include <toolkit/awt/vclxdevice.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <tools/debug.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <editeng/editstat.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/svapp.hxx>
@@ -63,7 +64,9 @@ namespace frm
         m_nClassId = FormComponentType::TEXTFIELD;
 
         getPropertyDefaultByHandle( PROPERTY_ID_DEFAULTCONTROL          ) >>= m_sDefaultControl;
-        getPropertyDefaultByHandle( PROPERTY_ID_BORDER                  ) >>= m_nBorder;
+        // Default to 'flat' instead of '3D Look' for form controls, but don't change
+        // getPropertyDefaultByHandle, see tdf#152974
+        m_nBorder = 2;
         getPropertyDefaultByHandle( PROPERTY_ID_ENABLED                 ) >>= m_bEnabled;
         getPropertyDefaultByHandle( PROPERTY_ID_ENABLEVISIBLE           ) >>= m_bEnableVisible;
         getPropertyDefaultByHandle( PROPERTY_ID_HARDLINEBREAKS          ) >>= m_bHardLineBreaks;
@@ -449,7 +452,9 @@ namespace frm
         }
     }
 
-
+    // note tdf#152974, we can't simply change a default here because properties
+    // that match the default are not exported, so for compatibility these
+    // can't be changed without some sort of solution for that
     Any ORichTextModel::getPropertyDefaultByHandle( sal_Int32 _nHandle ) const
     {
         Any aDefault;
@@ -558,7 +563,7 @@ namespace frm
     }
 
 
-    Sequence<sal_Int8> ORichTextModel::getUnoTunnelId()
+    const Sequence<sal_Int8> & ORichTextModel::getUnoTunnelId()
     {
         static const comphelper::UnoIdInit aId;
         return aId.getSeq();

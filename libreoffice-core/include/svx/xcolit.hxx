@@ -22,39 +22,36 @@
 
 #include <tools/color.hxx>
 #include <editeng/colritem.hxx>
+#include <docmodel/theme/ThemeColor.hxx>
 
 #include <svx/svxdllapi.h>
 #include <svx/xit.hxx>
 
 class XColorList;
 
-
-
 class SVXCORE_DLLPUBLIC XColorItem : public NameOrIndex
 {
     Color   aColor;
-    SvxThemeColor maThemeColor;
+    model::ThemeColor maThemeColor;
 
 public:
             static SfxPoolItem* CreateDefault();
             XColorItem() {}
-            XColorItem(sal_uInt16 nWhich, sal_Int32 nIndex, const Color& rTheColor);
+            XColorItem(TypedWhichId<XColorItem> nWhich, sal_Int32 nIndex, const Color& rTheColor);
+            XColorItem(TypedWhichId<XColorItem> nWhich, const Color& rTheColor);
+            XColorItem(TypedWhichId<XColorItem> nWhich, const OUString& rName, const Color& rTheColor);
+            XColorItem(const XColorItem& rItem);
 
     virtual bool QueryValue( css::uno::Any& rVal, sal_uInt8 nMemberId = 0 ) const override;
     virtual bool PutValue( const css::uno::Any& rVal, sal_uInt8 nMemberId ) override;
-
-            XColorItem(sal_uInt16 nWhich, const Color& rTheColor);
-            XColorItem(sal_uInt16 nWhich, const OUString& rName, const Color& rTheColor);
-            XColorItem(const XColorItem& rItem);
-
     virtual bool            operator==(const SfxPoolItem& rItem) const override;
     virtual XColorItem* Clone(SfxItemPool* pPool = nullptr) const override;
 
     const Color&    GetColorValue() const;
     void            SetColorValue(const Color& rNew) { aColor = rNew; Detach(); }
 
-    SvxThemeColor& GetThemeColor() { return maThemeColor; }
-    const SvxThemeColor& GetThemeColor() const { return maThemeColor; }
+    model::ThemeColor& GetThemeColor() { return maThemeColor; }
+    const model::ThemeColor& GetThemeColor() const { return maThemeColor; }
 
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };

@@ -14,6 +14,7 @@
 
 #include <basegfx/numeric/ftools.hxx>
 #include <comphelper/propertyvalue.hxx>
+#include <docmodel/theme/FormatScheme.hxx>
 
 #include <algorithm>
 
@@ -21,23 +22,24 @@ namespace oox::drawingml {
 
 void EffectGlowProperties ::assignUsed(const EffectGlowProperties& rSourceProps)
 {
-    moGlowRad.assignIfUsed( rSourceProps.moGlowRad );
+    assignIfUsed( moGlowRad, rSourceProps.moGlowRad );
     moGlowColor.assignIfUsed( rSourceProps.moGlowColor );
 }
 
 void EffectSoftEdgeProperties::assignUsed(const EffectSoftEdgeProperties& rSourceProps)
 {
-    moRad.assignIfUsed(rSourceProps.moRad);
+    assignIfUsed(moRad, rSourceProps.moRad);
 }
 
 void EffectShadowProperties::assignUsed(const EffectShadowProperties& rSourceProps)
 {
-    moShadowDist.assignIfUsed( rSourceProps.moShadowDist );
-    moShadowDir.assignIfUsed( rSourceProps.moShadowDir );
-    moShadowSx.assignIfUsed( rSourceProps.moShadowSx );
-    moShadowSy.assignIfUsed( rSourceProps.moShadowSy );
+    assignIfUsed( moShadowDist, rSourceProps.moShadowDist );
+    assignIfUsed( moShadowDir, rSourceProps.moShadowDir );
+    assignIfUsed( moShadowSx, rSourceProps.moShadowSx );
+    assignIfUsed( moShadowSy, rSourceProps.moShadowSy );
     moShadowColor.assignIfUsed( rSourceProps.moShadowColor );
-    moShadowBlur.assignIfUsed( rSourceProps.moShadowBlur );
+    assignIfUsed( moShadowBlur, rSourceProps.moShadowBlur );
+    assignIfUsed( moShadowAlignment, rSourceProps.moShadowAlignment );
 
 }
 
@@ -105,6 +107,9 @@ void EffectProperties::pushToPropMap( PropertyMap& rPropMap,
             rPropMap.setProperty( PROP_ShadowColor, it->moColor.getColor(rGraphicHelper ) );
             rPropMap.setProperty( PROP_ShadowTransparence, it->moColor.getTransparency());
             rPropMap.setProperty( PROP_ShadowBlur, convertEmuToHmm(nAttrBlur));
+            rPropMap.setProperty(
+                PROP_ShadowAlignment,
+                static_cast<sal_Int32>(maShadow.moShadowAlignment.value_or(model::RectangleAlignment::Bottom)));
 
         }
     }

@@ -27,6 +27,7 @@
 #include <com/sun/star/embed/EmbedStates.hpp>
 #include <com/sun/star/embed/Aspects.hpp>
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
+#include <osl/diagnose.h>
 #include <sot/storage.hxx>
 #include <tools/debug.hxx>
 #include <sal/log.hxx>
@@ -46,7 +47,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <string_view>
 
 using namespace ::osl;
 using namespace ::cppu;
@@ -68,7 +68,7 @@ class OutputStorageWrapper_Impl : public ::cppu::WeakImplHelper<XOutputStream>
 {
     std::mutex    maMutex;
     Reference < XOutputStream > xOut;
-    TempFile aTempFile;
+    TempFileFast aTempFile;
     bool bStreamClosed : 1;
     SvStream* pStream;
 
@@ -87,7 +87,6 @@ OutputStorageWrapper_Impl::OutputStorageWrapper_Impl()
     : bStreamClosed( false )
     , pStream(nullptr)
 {
-    aTempFile.EnableKillingFile();
     pStream = aTempFile.GetStream( StreamMode::READWRITE );
     xOut = new OOutputStreamWrapper( *pStream );
 }
@@ -120,14 +119,12 @@ void SAL_CALL OutputStorageWrapper_Impl::closeOutput()
 }
 
 SvXMLEmbeddedObjectHelper::SvXMLEmbeddedObjectHelper() :
-    WeakComponentImplHelper< XEmbeddedObjectResolver, XNameAccess >( maMutex ),
     mpDocPersist( nullptr ),
     meCreateMode( SvXMLEmbeddedObjectHelperMode::Read )
 {
 }
 
 SvXMLEmbeddedObjectHelper::SvXMLEmbeddedObjectHelper( ::comphelper::IEmbeddedHelper& rDocPersist, SvXMLEmbeddedObjectHelperMode eCreateMode ) :
-    WeakComponentImplHelper< XEmbeddedObjectResolver, XNameAccess >( maMutex ),
     mpDocPersist( nullptr ),
     meCreateMode( SvXMLEmbeddedObjectHelperMode::Read )
 {
@@ -138,11 +135,12 @@ SvXMLEmbeddedObjectHelper::~SvXMLEmbeddedObjectHelper()
 {
 }
 
-void SAL_CALL SvXMLEmbeddedObjectHelper::disposing()
+void SvXMLEmbeddedObjectHelper::disposing(std::unique_lock<std::mutex>&)
 {
     if( mxTempStorage.is() )
     {
         mxTempStorage->dispose();
+        mxTempStorage.clear();
     }
 }
 
@@ -379,7 +377,7 @@ void SvXMLEmbeddedObjectHelper::ImplReadObject(
                 uno::Reference< beans::XPropertySet > xProps( xStm, uno::UNO_QUERY_THROW );
                 xProps->setPropertyValue(
                     "MediaType",
-                    uno::makeAny( OUString( "application/vnd.sun.star.oleobject" ) ) );
+                    uno::Any( OUString( "application/vnd.sun.star.oleobject" ) ) );
 
                 xStm->getOutputStream()->closeOutput();
             }
@@ -439,7 +437,7 @@ OUString SvXMLEmbeddedObjectHelper::ImplInsertEmbeddedObjectURL(
 
         SvGlobalName aClassId, *pClassId = nullptr;
         sal_Int32 nPos = aObjectStorageName.lastIndexOf( '!' );
-        if( -1 != nPos && aClassId.MakeId( aObjectStorageName.copy( nPos+1 ) ) )
+        if( -1 != nPos && aClassId.MakeId( aObjectStorageName.subView( nPos+1 ) ) )
         {
             aObjectStorageName = aObjectStorageName.copy( 0, nPos );
             pClassId = &aClassId;
@@ -546,7 +544,7 @@ rtl::Reference<SvXMLEmbeddedObjectHelper> SvXMLEmbeddedObjectHelper::Create(
 
 OUString SAL_CALL SvXMLEmbeddedObjectHelper::resolveEmbeddedObjectURL(const OUString& rURL)
 {
-    MutexGuard          aGuard( maMutex );
+    std::unique_lock          aGuard( m_aMutex );
 
     OUString sRet;
     try
@@ -571,7 +569,7 @@ OUString SAL_CALL SvXMLEmbeddedObjectHelper::resolveEmbeddedObjectURL(const OUSt
 Any SAL_CALL SvXMLEmbeddedObjectHelper::getByName(
         const OUString& rURLStr )
 {
-    MutexGuard          aGuard( maMutex );
+    std::unique_lock          aGuard( m_aMutex );
     Any aRet;
     if( SvXMLEmbeddedObjectHelperMode::Read == meCreateMode )
     {
@@ -672,7 +670,7 @@ Sequence< OUString > SAL_CALL SvXMLEmbeddedObjectHelper::getElementNames()
 
 sal_Bool SAL_CALL SvXMLEmbeddedObjectHelper::hasByName( const OUString& rURLStr )
 {
-    MutexGuard          aGuard( maMutex );
+    std::unique_lock          aGuard( m_aMutex );
     if( SvXMLEmbeddedObjectHelperMode::Read == meCreateMode )
     {
         return true;
@@ -694,7 +692,7 @@ sal_Bool SAL_CALL SvXMLEmbeddedObjectHelper::hasByName( const OUString& rURLStr 
 // XNameAccess
 Type SAL_CALL SvXMLEmbeddedObjectHelper::getElementType()
 {
-    MutexGuard          aGuard( maMutex );
+    std::unique_lock          aGuard( m_aMutex );
     if( SvXMLEmbeddedObjectHelperMode::Read == meCreateMode )
         return cppu::UnoType<XOutputStream>::get();
     else
@@ -703,7 +701,7 @@ Type SAL_CALL SvXMLEmbeddedObjectHelper::getElementType()
 
 sal_Bool SAL_CALL SvXMLEmbeddedObjectHelper::hasElements()
 {
-    MutexGuard          aGuard( maMutex );
+    std::unique_lock          aGuard( m_aMutex );
     if( SvXMLEmbeddedObjectHelperMode::Read == meCreateMode )
     {
         return true;

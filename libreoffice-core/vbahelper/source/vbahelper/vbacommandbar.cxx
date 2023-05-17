@@ -23,16 +23,17 @@
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <ooo/vba/office/MsoBarType.hpp>
 #include <sal/log.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace ooo::vba;
 
 ScVbaCommandBar::ScVbaCommandBar( const uno::Reference< ov::XHelperInterface >& xParent,
                                   const uno::Reference< uno::XComponentContext >& xContext,
-                                  VbaCommandBarHelperRef const & pHelper,
-                                  const uno::Reference< container::XIndexAccess >& xBarSettings,
-                                  const OUString& sResourceUrl, bool bIsMenu )
-   : CommandBar_BASE( xParent, xContext ), pCBarHelper( pHelper ), m_xBarSettings( xBarSettings ), m_sResourceUrl( sResourceUrl ), m_bIsMenu( bIsMenu )
+                                  VbaCommandBarHelperRef  pHelper,
+                                  uno::Reference< container::XIndexAccess > xBarSettings,
+                                  OUString sResourceUrl, bool bIsMenu )
+   : CommandBar_BASE( xParent, xContext ), pCBarHelper(std::move( pHelper )), m_xBarSettings(std::move( xBarSettings )), m_sResourceUrl(std::move( sResourceUrl )), m_bIsMenu( bIsMenu )
 {
 }
 
@@ -72,7 +73,7 @@ void SAL_CALL
 ScVbaCommandBar::setName( const OUString& _name )
 {
     uno::Reference< beans::XPropertySet > xPropertySet( m_xBarSettings, uno::UNO_QUERY_THROW );
-    xPropertySet->setPropertyValue( "UIName" , uno::makeAny( _name ) );
+    xPropertySet->setPropertyValue( "UIName" , uno::Any( _name ) );
 
     pCBarHelper->ApplyTempChange( m_sResourceUrl, m_xBarSettings );
 }
@@ -154,7 +155,7 @@ ScVbaCommandBar::Controls( const uno::Any& aIndex )
     {
         return xCommandBarControls->Item( aIndex, uno::Any() );
     }
-    return uno::makeAny( xCommandBarControls );
+    return uno::Any( xCommandBarControls );
 }
 
 sal_Int32 SAL_CALL
@@ -170,7 +171,7 @@ uno::Any SAL_CALL
 ScVbaCommandBar::FindControl( const uno::Any& /*aType*/, const uno::Any& /*aId*/, const uno::Any& /*aTag*/, const uno::Any& /*aVisible*/, const uno::Any& /*aRecursive*/ )
 {
     // alwayse fail to find control
-    return uno::makeAny( uno::Reference< XCommandBarControl > () );
+    return uno::Any( uno::Reference< XCommandBarControl > () );
 }
 
 OUString
@@ -193,9 +194,9 @@ ScVbaCommandBar::getServiceNames()
 VbaDummyCommandBar::VbaDummyCommandBar(
         const uno::Reference< ov::XHelperInterface >& xParent,
         const uno::Reference< uno::XComponentContext >& xContext,
-        const OUString& rName ) :
+        OUString sName ) :
     CommandBar_BASE( xParent, xContext ),
-    maName( rName )
+    maName(std::move( sName ))
 {
 }
 

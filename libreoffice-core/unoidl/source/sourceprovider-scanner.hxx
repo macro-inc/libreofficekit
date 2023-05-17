@@ -14,6 +14,7 @@
 #include <cassert>
 #include <map>
 #include <set>
+#include <utility>
 #include <vector>
 
 #include <rtl/ref.hxx>

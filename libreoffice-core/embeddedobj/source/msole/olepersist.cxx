@@ -41,7 +41,6 @@
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 #include <com/sun/star/io/IOException.hpp>
 
-#include <comphelper/processfactory.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <comphelper/mimeconfighelper.hxx>
 #include <comphelper/classids.hxx>
@@ -89,14 +88,13 @@ OUString GetNewTempFileURL_Impl( const uno::Reference< uno::XComponentContext >&
 
     OUString aResult;
 
-    uno::Reference < beans::XPropertySet > xTempFile(
+    uno::Reference < io::XTempFile > xTempFile(
             io::TempFile::create(xContext),
-            uno::UNO_QUERY_THROW );
+            uno::UNO_SET_THROW );
 
     try {
-        xTempFile->setPropertyValue("RemoveFile", uno::makeAny( false ) );
-        uno::Any aUrl = xTempFile->getPropertyValue("Uri");
-        aUrl >>= aResult;
+        xTempFile->setRemoveFile( false );
+        aResult = xTempFile->getUri();
     }
     catch ( const uno::Exception& )
     {
@@ -163,16 +161,14 @@ static OUString GetNewFilledTempFile_Impl( const uno::Reference< embed::XOptimiz
 
     try
     {
-        uno::Reference < beans::XPropertySet > xTempFile(
+        uno::Reference < io::XTempFile > xTempFile(
                 io::TempFile::create(xContext),
-                uno::UNO_QUERY );
-        uno::Reference < io::XStream > xTempStream( xTempFile, uno::UNO_QUERY_THROW );
+                uno::UNO_SET_THROW );
 
-        xParentStorage->copyStreamElementData( aEntryName, xTempStream );
+        xParentStorage->copyStreamElementData( aEntryName, xTempFile );
 
-        xTempFile->setPropertyValue("RemoveFile", uno::makeAny( false ) );
-        uno::Any aUrl = xTempFile->getPropertyValue("Uri");
-        aUrl >>= aResult;
+        xTempFile->setRemoveFile( false );
+        aResult = xTempFile->getUri();
     }
     catch( const uno::RuntimeException& )
     {
@@ -192,7 +188,7 @@ static OUString GetNewFilledTempFile_Impl( const uno::Reference< embed::XOptimiz
 static void SetStreamMediaType_Impl( const uno::Reference< io::XStream >& xStream, const OUString& aMediaType )
 {
     uno::Reference< beans::XPropertySet > xPropSet( xStream, uno::UNO_QUERY_THROW );
-    xPropSet->setPropertyValue("MediaType", uno::makeAny( aMediaType ) );
+    xPropSet->setPropertyValue("MediaType", uno::Any( aMediaType ) );
 }
 #endif
 
@@ -200,7 +196,7 @@ static void LetCommonStoragePassBeUsed_Impl( const uno::Reference< io::XStream >
 {
     uno::Reference< beans::XPropertySet > xPropSet( xStream, uno::UNO_QUERY_THROW );
     xPropSet->setPropertyValue("UseCommonStoragePasswordEncryption",
-                                uno::makeAny( true ) );
+                                uno::Any( true ) );
 }
 #ifdef _WIN32
 
@@ -489,9 +485,9 @@ void OleEmbeddedObject::InsertVisualCache_Impl( const uno::Reference< io::XStrea
     // insert the result file as replacement image
     OUString aCacheName = "\002OlePres000";
     if ( xNameContainer->hasByName( aCacheName ) )
-        xNameContainer->replaceByName( aCacheName, uno::makeAny( xTempFile ) );
+        xNameContainer->replaceByName( aCacheName, uno::Any( xTempFile ) );
     else
-        xNameContainer->insertByName( aCacheName, uno::makeAny( xTempFile ) );
+        xNameContainer->insertByName( aCacheName, uno::Any( xTempFile ) );
 
     uno::Reference< embed::XTransactedObject > xTransacted( xNameContainer, uno::UNO_QUERY_THROW );
     xTransacted->commit();

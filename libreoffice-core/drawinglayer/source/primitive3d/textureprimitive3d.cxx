@@ -20,6 +20,8 @@
 #include <primitive3d/textureprimitive3d.hxx>
 #include <drawinglayer/primitive3d/drawinglayer_primitivetypes3d.hxx>
 #include <basegfx/color/bcolor.hxx>
+#include <basegfx/utils/gradienttools.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -91,7 +93,13 @@ namespace drawinglayer::primitive3d
             {
                 // create TransparenceTexturePrimitive3D with fixed transparence as replacement
                 const basegfx::BColor aGray(getTransparence(), getTransparence(), getTransparence());
-                const attribute::FillGradientAttribute aFillGradient(attribute::GradientStyle::Linear, 0.0, 0.0, 0.0, 0.0, aGray, aGray);
+
+                // create ColorStops with StartColor == EndColor == aGray
+                const basegfx::ColorStops aColorStops {
+                    basegfx::ColorStop(0.0, aGray),
+                    basegfx::ColorStop(1.0, aGray) };
+
+                const attribute::FillGradientAttribute aFillGradient(css::awt::GradientStyle_LINEAR, 0.0, 0.0, 0.0, 0.0, aColorStops);
                 const Primitive3DReference xRef(new TransparenceTexturePrimitive3D(aFillGradient, getChildren(), getTextureSize()));
                 return { xRef };
             }
@@ -108,13 +116,13 @@ namespace drawinglayer::primitive3d
 
 
         GradientTexturePrimitive3D::GradientTexturePrimitive3D(
-            const attribute::FillGradientAttribute& rGradient,
+            attribute::FillGradientAttribute aGradient,
             const Primitive3DContainer& rChildren,
             const basegfx::B2DVector& rTextureSize,
             bool bModulate,
             bool bFilter)
         :   TexturePrimitive3D(rChildren, rTextureSize, bModulate, bFilter),
-            maGradient(rGradient)
+            maGradient(std::move(aGradient))
         {
         }
 

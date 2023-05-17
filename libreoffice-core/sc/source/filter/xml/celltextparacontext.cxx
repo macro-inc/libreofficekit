@@ -13,7 +13,7 @@
 
 #include <comphelper/string.hxx>
 #include <xmloff/xmlnamespace.hxx>
-#include <xmloff/xmltkmap.hxx>
+#include <xmloff/xmltoken.hxx>
 
 using namespace com::sun::star;
 using namespace xmloff::token;
@@ -63,16 +63,28 @@ uno::Reference< xml::sax::XFastContextHandler > SAL_CALL ScXMLCellTextParaContex
             return new ScXMLCellFieldURLContext(GetScImport(), *this);
         case XML_ELEMENT( TEXT, XML_RUBY ):
             return new ScXMLCellTextRubyContext(GetScImport(), *this);
+        case XML_ELEMENT(TEXT, XML_TAB):
+            maContent += "\t";
+            break;
+        case XML_ELEMENT(TEXT, XML_LINE_BREAK):
+            maContent += "\x0a";
+            break;
+        case XML_ELEMENT(TEXT, XML_BOOKMARK):
+        case XML_ELEMENT(TEXT, XML_BOOKMARK_START):
+        case XML_ELEMENT(TEXT, XML_BOOKMARK_END):
+            // TODO: ooo95423-1 [file.ods] and tdf#116079-3 have these bookmarks.
+            // Is this valid, and how can we prevent losing these?
+            break;
         default:
-            ;
+            SAL_WARN("sc","unknown text element["<<nElement<<"]["<<SvXMLImport::getNameFromToken(nElement )<<"] lost");
     }
 
     return nullptr;
 }
 
-void ScXMLCellTextParaContext::PushSpan(const OUString& rSpan, const OUString& rStyleName)
+void ScXMLCellTextParaContext::PushSpan(std::u16string_view aSpan, const OUString& rStyleName)
 {
-    mrParentCxt.PushParagraphSpan(rSpan, rStyleName);
+    mrParentCxt.PushParagraphSpan(aSpan, rStyleName);
 }
 
 void ScXMLCellTextParaContext::PushFieldSheetName(const OUString& rStyleName)
@@ -332,7 +344,7 @@ void ScXMLCellFieldSContext::PushSpaces()
     if (mnCount > 0)
     {
         if (mnCount == 1)
-            mrParentCxt.PushSpan(" ", maStyleName);
+            mrParentCxt.PushSpan(u" ", maStyleName);
         else
         {
             OUStringBuffer aBuf( mnCount);

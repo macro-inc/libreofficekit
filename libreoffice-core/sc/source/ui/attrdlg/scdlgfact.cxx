@@ -290,6 +290,16 @@ bool AbstractScShowTabDlg_Impl::StartExecuteAsync(VclAbstractDialog::AsyncContex
     return weld::DialogController::runAsync(m_xDlg, rCtx.maEndDialogFn);
 }
 
+short AbstractScGoToTabDlg_Impl::Execute()
+{
+    return m_xDlg->run();
+}
+
+bool AbstractScGoToTabDlg_Impl::StartExecuteAsync(VclAbstractDialog::AsyncContext &rCtx)
+{
+    return weld::DialogController::runAsync(m_xDlg, rCtx.maEndDialogFn);
+}
+
 short AbstractScSortWarningDlg_Impl::Execute()
 {
     return m_xDlg->run();
@@ -654,9 +664,9 @@ OUString AbstractScSelEntryDlg_Impl::GetSelectedEntry() const
 
 void AbstractScLinkedAreaDlg_Impl::InitFromOldLink( const OUString& rFile, const OUString& rFilter,
                                         const OUString& rOptions, const OUString& rSource,
-                                        sal_uLong nRefresh )
+                                        sal_Int32 nRefreshDelaySeconds )
 {
-    m_xDlg->InitFromOldLink( rFile, rFilter, rOptions, rSource, nRefresh);
+    m_xDlg->InitFromOldLink( rFile, rFilter, rOptions, rSource, nRefreshDelaySeconds);
 }
 
 OUString  AbstractScLinkedAreaDlg_Impl::GetURL()
@@ -679,9 +689,9 @@ OUString  AbstractScLinkedAreaDlg_Impl::GetSource()
     return m_xDlg->GetSource();
 }
 
-sal_uLong AbstractScLinkedAreaDlg_Impl::GetRefresh()
+sal_Int32 AbstractScLinkedAreaDlg_Impl::GetRefreshDelaySeconds()
 {
-    return m_xDlg->GetRefresh();
+    return m_xDlg->GetRefreshDelaySeconds();
 }
 
 std::unique_ptr<ScConditionalFormatList> AbstractScCondFormatManagerDlg_Impl::GetConditionalFormatList()
@@ -852,6 +862,23 @@ std::vector<sal_Int32> AbstractScShowTabDlg_Impl::GetSelectedRows() const
 OUString AbstractScShowTabDlg_Impl::GetEntry(sal_Int32 nPos) const
 {
     return m_xDlg->GetEntry(nPos);
+}
+
+void AbstractScGoToTabDlg_Impl::Insert( const OUString& rString, bool bSelected )
+{
+    m_xDlg->Insert(rString, bSelected);
+}
+
+void    AbstractScGoToTabDlg_Impl::SetDescription(
+                const OUString& rTitle, const OUString& rEntryLabel, const OUString& rListLabel,
+                const OString& rDlgHelpId, const OString& rEnHelpId, const OString& rLbHelpId )
+{
+    m_xDlg->SetDescription( rTitle, rEntryLabel, rListLabel, rDlgHelpId, rEnHelpId, rLbHelpId );
+}
+
+OUString AbstractScGoToTabDlg_Impl::GetSelectedEntry() const
+{
+    return m_xDlg->GetSelectedEntry();
 }
 
 short AbstractScStringInputDlg_Impl::Execute()
@@ -1196,6 +1223,11 @@ VclPtr<AbstractScNewScenarioDlg> ScAbstractDialogFactory_Impl::CreateScNewScenar
 VclPtr<AbstractScShowTabDlg> ScAbstractDialogFactory_Impl::CreateScShowTabDlg(weld::Window* pParent)
 {
     return VclPtr<AbstractScShowTabDlg_Impl>::Create(std::make_shared<ScShowTabDlg>(pParent));
+}
+
+VclPtr<AbstractScGoToTabDlg> ScAbstractDialogFactory_Impl::CreateScGoToTabDlg(weld::Window* pParent)
+{
+    return VclPtr<AbstractScGoToTabDlg_Impl>::Create(std::make_shared<ScGoToTabDlg>(pParent));
 }
 
 VclPtr<AbstractScStringInputDlg> ScAbstractDialogFactory_Impl::CreateScStringInputDlg(weld::Window* pParent,

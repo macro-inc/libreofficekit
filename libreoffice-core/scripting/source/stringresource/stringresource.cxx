@@ -33,9 +33,12 @@
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
+#include <rtl/ref.hxx>
 #include <rtl/tencinfo.h>
 #include <rtl/ustrbuf.hxx>
 #include <tools/urlobj.hxx>
+#include <unotools/tempfile.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <sal/log.hxx>
 
@@ -50,18 +53,6 @@ using namespace ::com::sun::star::container;
 
 namespace stringresource
 {
-
-
-// mutex
-
-
-::osl::Mutex& getMutex()
-{
-    static ::osl::Mutex s_aMutex;
-
-    return s_aMutex;
-}
-
 
 // StringResourceImpl
 
@@ -78,7 +69,6 @@ StringResourceImpl::StringResourceImpl( const Reference< XComponentContext >& rx
     , m_pCurrentLocaleItem( nullptr )
     , m_pDefaultLocaleItem( nullptr )
     , m_bDefaultModified( false )
-    , m_aListenerContainer( getMutex() )
     , m_bModified( false )
     , m_bReadOnly( false )
     , m_nNextUniqueNumericId( UNIQUE_NUMBER_NEEDS_INITIALISATION )
@@ -116,8 +106,8 @@ void StringResourceImpl::addModifyListener( const Reference< XModifyListener >& 
     if( !aListener.is() )
         throw RuntimeException();
 
-    ::osl::MutexGuard aGuard( getMutex() );
-    m_aListenerContainer.addInterface( Reference<XInterface>( aListener, UNO_QUERY ) );
+    std::unique_lock aGuard( m_aMutex );
+    m_aListenerContainer.addInterface( aGuard, aListener );
 }
 
 void StringResourceImpl::removeModifyListener( const Reference< XModifyListener >& aListener )
@@ -125,8 +115,8 @@ void StringResourceImpl::removeModifyListener( const Reference< XModifyListener 
     if( !aListener.is() )
         throw RuntimeException();
 
-    ::osl::MutexGuard aGuard( getMutex() );
-    m_aListenerContainer.removeInterface( Reference<XInterface>( aListener, UNO_QUERY ) );
+    std::unique_lock aGuard( m_aMutex );
+    m_aListenerContainer.removeInterface( aGuard, aListener );
 }
 
 
@@ -155,13 +145,13 @@ OUString StringResourceImpl::implResolveString
 
 OUString StringResourceImpl::resolveString( const OUString& ResourceID )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     return implResolveString( ResourceID, m_pCurrentLocaleItem );
 }
 
 OUString StringResourceImpl::resolveStringForLocale( const OUString& ResourceID, const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     LocaleItem* pLocaleItem = getItemForLocale( locale, false );
     return implResolveString( ResourceID, pLocaleItem );
 }
@@ -180,14 +170,14 @@ bool StringResourceImpl::implHasEntryForId( const OUString& ResourceID, LocaleIt
 
 sal_Bool StringResourceImpl::hasEntryForId( const OUString& ResourceID )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     return implHasEntryForId( ResourceID, m_pCurrentLocaleItem );
 }
 
 sal_Bool StringResourceImpl::hasEntryForIdAndLocale( const OUString& ResourceID,
     const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     LocaleItem* pLocaleItem = getItemForLocale( locale, false );
     return implHasEntryForId( ResourceID, pLocaleItem );
 }
@@ -216,20 +206,20 @@ Sequence< OUString > StringResourceImpl::implGetResourceIDs( LocaleItem* pLocale
 Sequence< OUString > StringResourceImpl::getResourceIDsForLocale
     ( const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     LocaleItem* pLocaleItem = getItemForLocale( locale, false );
     return implGetResourceIDs( pLocaleItem );
 }
 
 Sequence< OUString > StringResourceImpl::getResourceIDs(  )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     return implGetResourceIDs( m_pCurrentLocaleItem );
 }
 
 Locale StringResourceImpl::getCurrentLocale()
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     Locale aRetLocale;
     if( m_pCurrentLocaleItem != nullptr )
@@ -239,7 +229,7 @@ Locale StringResourceImpl::getCurrentLocale()
 
 Locale StringResourceImpl::getDefaultLocale(  )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     Locale aRetLocale;
     if( m_pDefaultLocaleItem != nullptr )
@@ -249,7 +239,7 @@ Locale StringResourceImpl::getDefaultLocale(  )
 
 Sequence< Locale > StringResourceImpl::getLocales(  )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     sal_Int32 nSize = m_aLocaleItemVector.size();
     Sequence< Locale > aLocalSeq( nSize );
@@ -280,11 +270,9 @@ sal_Bool StringResourceImpl::isReadOnly()
     return m_bReadOnly;
 }
 
-void StringResourceImpl::implSetCurrentLocale( const Locale& locale,
+void StringResourceImpl::implSetCurrentLocale( std::unique_lock<std::mutex>& rGuard, const Locale& locale,
     bool FindClosestMatch, bool bUseDefaultIfNoMatch )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
-
     LocaleItem* pLocaleItem = nullptr;
     if( FindClosestMatch )
         pLocaleItem = getClosestMatchItemForLocale( locale );
@@ -300,18 +288,19 @@ void StringResourceImpl::implSetCurrentLocale( const Locale& locale,
         m_pCurrentLocaleItem = pLocaleItem;
 
         // Only notify without modifying
-        implNotifyListeners();
+        implNotifyListeners(rGuard);
     }
 }
 
 void StringResourceImpl::setCurrentLocale( const Locale& locale, sal_Bool FindClosestMatch )
 {
-    implSetCurrentLocale( locale, FindClosestMatch, false/*bUseDefaultIfNoMatch*/ );
+    std::unique_lock aGuard( m_aMutex );
+    implSetCurrentLocale( aGuard, locale, FindClosestMatch, false/*bUseDefaultIfNoMatch*/ );
 }
 
 void StringResourceImpl::setDefaultLocale( const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceImpl::setDefaultLocale(): Read only" );
 
     LocaleItem* pLocaleItem = getItemForLocale( locale, true );
@@ -325,11 +314,11 @@ void StringResourceImpl::setDefaultLocale( const Locale& locale )
 
         m_pDefaultLocaleItem = pLocaleItem;
         m_bDefaultModified = true;
-        implModified();
+        implModified(aGuard);
     }
 }
 
-void StringResourceImpl::implSetString( const OUString& ResourceID,
+void StringResourceImpl::implSetString( std::unique_lock<std::mutex>& rGuard, const OUString& ResourceID,
     const OUString& Str, LocaleItem* pLocaleItem )
 {
     if( !(pLocaleItem != nullptr && loadLocale( pLocaleItem )) )
@@ -347,26 +336,26 @@ void StringResourceImpl::implSetString( const OUString& ResourceID,
     }
     rHashMap[ ResourceID ] = Str;
     pLocaleItem->m_bModified = true;
-    implModified();
+    implModified(rGuard);
 }
 
 void StringResourceImpl::setString( const OUString& ResourceID, const OUString& Str )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceImpl::setString(): Read only" );
-    implSetString( ResourceID, Str, m_pCurrentLocaleItem );
+    implSetString( aGuard, ResourceID, Str, m_pCurrentLocaleItem );
 }
 
 void StringResourceImpl::setStringForLocale
     ( const OUString& ResourceID, const OUString& Str, const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceImpl::setStringForLocale(): Read only" );
     LocaleItem* pLocaleItem = getItemForLocale( locale, false );
-    implSetString( ResourceID, Str, pLocaleItem );
+    implSetString( aGuard, ResourceID, Str, pLocaleItem );
 }
 
-void StringResourceImpl::implRemoveId( const OUString& ResourceID, LocaleItem* pLocaleItem )
+void StringResourceImpl::implRemoveId( std::unique_lock<std::mutex>& rGuard, const OUString& ResourceID, LocaleItem* pLocaleItem )
 {
     if( pLocaleItem != nullptr && loadLocale( pLocaleItem ) )
     {
@@ -378,28 +367,28 @@ void StringResourceImpl::implRemoveId( const OUString& ResourceID, LocaleItem* p
         }
         rHashMap.erase( it );
         pLocaleItem->m_bModified = true;
-        implModified();
+        implModified(rGuard);
     }
 }
 
 void StringResourceImpl::removeId( const OUString& ResourceID )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceImpl::removeId(): Read only" );
-    implRemoveId( ResourceID, m_pCurrentLocaleItem );
+    implRemoveId( aGuard, ResourceID, m_pCurrentLocaleItem );
 }
 
 void StringResourceImpl::removeIdForLocale( const OUString& ResourceID, const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceImpl::removeIdForLocale(): Read only" );
     LocaleItem* pLocaleItem = getItemForLocale( locale, false );
-    implRemoveId( ResourceID, pLocaleItem );
+    implRemoveId( aGuard, ResourceID, pLocaleItem );
 }
 
 void StringResourceImpl::newLocale( const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceImpl::newLocale(): Read only" );
 
     if( getItemForLocale( locale, false ) != nullptr )
@@ -453,12 +442,12 @@ void StringResourceImpl::newLocale( const Locale& locale )
         m_bDefaultModified = true;
     }
 
-    implModified();
+    implModified(aGuard);
 }
 
 void StringResourceImpl::removeLocale( const Locale& locale )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceImpl::removeLocale(): Read only" );
 
     LocaleItem* pRemoveItem = getItemForLocale( locale, true );
@@ -514,7 +503,7 @@ void StringResourceImpl::removeLocale( const Locale& locale )
 
     m_aLocaleItemVector.erase( it );
 
-    implModified();
+    implModified(aGuard);
 }
 
 void StringResourceImpl::implScanIdForNumber( const OUString& ResourceID )
@@ -605,31 +594,22 @@ LocaleItem* StringResourceImpl::getClosestMatchItemForLocale( const Locale& loca
     return pRetItem;
 }
 
-void StringResourceImpl::implModified()
+void StringResourceImpl::implModified(std::unique_lock<std::mutex>& rGuard)
 {
     m_bModified = true;
-    implNotifyListeners();
+    implNotifyListeners(rGuard);
 }
 
-void StringResourceImpl::implNotifyListeners()
+void StringResourceImpl::implNotifyListeners(std::unique_lock<std::mutex>& rGuard)
 {
     EventObject aEvent;
     aEvent.Source = static_cast< XInterface* >( static_cast<OWeakObject*>(this) );
-
-    ::comphelper::OInterfaceIteratorHelper2 it( m_aListenerContainer );
-    while( it.hasMoreElements() )
-    {
-        Reference< XInterface > xIface = it.next();
-        Reference< XModifyListener > xListener( xIface, UNO_QUERY );
-        try
+    m_aListenerContainer.forEach(rGuard,
+        [&aEvent](const css::uno::Reference<XModifyListener>& xListener)
         {
-            xListener->modified( aEvent );
+            xListener->modified(aEvent);
         }
-        catch(RuntimeException&)
-        {
-            it.remove();
-        }
-    }
+    );
 }
 
 
@@ -688,7 +668,7 @@ Sequence< OUString > StringResourcePersistenceImpl::getSupportedServiceNames(  )
 constexpr OUStringLiteral aNameBaseDefaultStr = u"strings";
 
 void StringResourcePersistenceImpl::implInitializeCommonParameters
-    ( const Sequence< Any >& aArguments )
+    ( std::unique_lock<std::mutex>& rGuard, const Sequence< Any >& aArguments )
 {
     bool bReadOnlyOk = (aArguments[1] >>= m_bReadOnly);
     if( !bReadOnlyOk )
@@ -719,7 +699,7 @@ void StringResourcePersistenceImpl::implInitializeCommonParameters
 
     implScanLocales();
 
-    implSetCurrentLocale( aCurrentLocale, true/*FindClosestMatch*/, true/*bUseDefaultIfNoMatch*/ );
+    implSetCurrentLocale( rGuard, aCurrentLocale, true/*FindClosestMatch*/, true/*bUseDefaultIfNoMatch*/ );
 }
 
 
@@ -827,7 +807,7 @@ void StringResourcePersistenceImpl::store()
 
 sal_Bool StringResourcePersistenceImpl::isModified(  )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     return m_bModified;
 }
@@ -840,7 +820,7 @@ void StringResourcePersistenceImpl::setComment( const OUString& Comment )
 void StringResourcePersistenceImpl::storeToStorage( const Reference< XStorage >& Storage,
     const OUString& NameBase, const OUString& Comment )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     implStoreAtStorage( NameBase, Comment, Storage, false/*bUsedForStore*/, true/*bStoreAll*/ );
 }
@@ -891,10 +871,10 @@ void StringResourcePersistenceImpl::implStoreAtStorage
             if ( xProps.is() )
             {
                 OUString aPropName("MediaType");
-                xProps->setPropertyValue( aPropName, uno::makeAny( OUString("text/plain") ) );
+                xProps->setPropertyValue( aPropName, uno::Any( OUString("text/plain") ) );
 
                 aPropName = "UseCommonStoragePasswordEncryption";
-                xProps->setPropertyValue( aPropName, uno::makeAny( true ) );
+                xProps->setPropertyValue( aPropName, uno::Any( true ) );
             }
 
             Reference< io::XOutputStream > xOutputStream = xElementStream->getOutputStream();
@@ -947,7 +927,7 @@ void StringResourcePersistenceImpl::storeToURL( const OUString& URL,
     const OUString& NameBase, const OUString& Comment,
     const Reference< css::task::XInteractionHandler >& Handler )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     Reference< ucb::XSimpleFileAccess3 > xFileAccess = ucb::SimpleFileAccess::create(m_xContext);
     if( xFileAccess.is() && Handler.is() )
@@ -958,7 +938,7 @@ void StringResourcePersistenceImpl::storeToURL( const OUString& URL,
 
 void StringResourcePersistenceImpl::implKillRemovedLocaleFiles
 (
-    const OUString& Location,
+    std::u16string_view Location,
     const OUString& aNameBase,
     const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xFileAccess
 )
@@ -981,7 +961,7 @@ void StringResourcePersistenceImpl::implKillRemovedLocaleFiles
 
 void StringResourcePersistenceImpl::implKillChangedDefaultFiles
 (
-    const OUString& Location,
+    std::u16string_view Location,
     const OUString& aNameBase,
     const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xFileAccess
 )
@@ -1000,7 +980,7 @@ void StringResourcePersistenceImpl::implKillChangedDefaultFiles
 
 void StringResourcePersistenceImpl::implStoreAtLocation
 (
-    const OUString& Location,
+    std::u16string_view Location,
     const OUString& aNameBase,
     const OUString& aComment,
     const Reference< ucb::XSimpleFileAccess3 >& xFileAccess,
@@ -1068,12 +1048,11 @@ void StringResourcePersistenceImpl::implStoreAtLocation
 
 class BinaryOutput
 {
-    Reference< XComponentContext >          m_xContext;
-    Reference< XInterface >                 m_xTempFile;
+    rtl::Reference< utl::TempFileFastService > m_xTempFile;
     Reference< io::XOutputStream >          m_xOutputStream;
 
 public:
-    explicit BinaryOutput( Reference< XComponentContext > const & xContext );
+    explicit BinaryOutput();
 
     const Reference< io::XOutputStream >& getOutputStream() const
         { return m_xOutputStream; }
@@ -1091,11 +1070,10 @@ public:
     void writeString( const OUString& aStr );
 };
 
-BinaryOutput::BinaryOutput( Reference< XComponentContext > const & xContext )
-        : m_xContext( xContext )
+BinaryOutput::BinaryOutput()
 {
-    m_xTempFile = io::TempFile::create( m_xContext );
-    m_xOutputStream.set( m_xTempFile, UNO_QUERY_THROW );
+    m_xTempFile = new utl::TempFileFastService;
+    m_xOutputStream = m_xTempFile;
 }
 
 template< class T >
@@ -1150,18 +1128,10 @@ Sequence< ::sal_Int8 > BinaryOutput::closeAndGetData()
 
     m_xOutputStream->closeOutput();
 
-    Reference< io::XSeekable> xSeekable( m_xTempFile, UNO_QUERY );
-    if( !xSeekable.is() )
-        return aRetSeq;
+    sal_Int32 nSize = static_cast<sal_Int32>(m_xTempFile->getPosition());
 
-    sal_Int32 nSize = static_cast<sal_Int32>(xSeekable->getPosition());
-
-    Reference< io::XInputStream> xInputStream( m_xTempFile, UNO_QUERY );
-    if( !xInputStream.is() )
-        return aRetSeq;
-
-    xSeekable->seek( 0 );
-    sal_Int32 nRead = xInputStream->readBytes( aRetSeq, nSize );
+    m_xTempFile->seek( 0 );
+    sal_Int32 nRead = m_xTempFile->readBytes( aRetSeq, nSize );
     OSL_ENSURE( nRead == nSize, "BinaryOutput::closeAndGetData: nRead != nSize" );
 
     return aRetSeq;
@@ -1197,7 +1167,7 @@ Sequence< ::sal_Int8 > BinaryOutput::closeAndGetData()
 
 Sequence< sal_Int8 > StringResourcePersistenceImpl::exportBinary(  )
 {
-    BinaryOutput aOut( m_xContext );
+    BinaryOutput aOut;
 
     sal_Int32 nLocaleCount = m_aLocaleItemVector.size();
     std::vector<Sequence< sal_Int8 >> aLocaleDataSeq(nLocaleCount);
@@ -1211,7 +1181,7 @@ Sequence< sal_Int8 > StringResourcePersistenceImpl::exportBinary(  )
             if( m_pDefaultLocaleItem == pLocaleItem.get() )
                 iDefault = iLocale;
 
-            BinaryOutput aLocaleOut( m_xContext );
+            BinaryOutput aLocaleOut;
             implWriteLocaleBinary( pLocaleItem.get(), aLocaleOut );
 
             aLocaleDataSeq[iLocale] = aLocaleOut.closeAndGetData();
@@ -1276,14 +1246,13 @@ namespace {
 class BinaryInput
 {
     Sequence< sal_Int8 >                    m_aData;
-    Reference< XComponentContext >          m_xContext;
 
     const sal_Int8*                         m_pData;
     sal_Int32                               m_nCurPos;
     sal_Int32                               m_nSize;
 
 public:
-    BinaryInput( const Sequence< ::sal_Int8 >& aData, Reference< XComponentContext > const & xContext );
+    BinaryInput( const Sequence< ::sal_Int8 >& aData );
 
     Reference< io::XInputStream > getInputStreamForSection( sal_Int32 nSize );
 
@@ -1299,9 +1268,8 @@ public:
 
 }
 
-BinaryInput::BinaryInput( const Sequence< ::sal_Int8 >& aData, Reference< XComponentContext > const & xContext )
+BinaryInput::BinaryInput( const Sequence< ::sal_Int8 >& aData )
         : m_aData( aData )
-        , m_xContext( xContext )
 {
     m_pData = m_aData.getConstArray();
     m_nCurPos = 0;
@@ -1313,15 +1281,11 @@ Reference< io::XInputStream > BinaryInput::getInputStreamForSection( sal_Int32 n
     Reference< io::XInputStream > xIn;
     if( m_nCurPos + nSize <= m_nSize )
     {
-        Reference< io::XOutputStream > xTempOut( io::TempFile::create(m_xContext), UNO_QUERY_THROW );
+        rtl::Reference< utl::TempFileFastService > xTempOut = new utl::TempFileFastService;
         Sequence< sal_Int8 > aSection( m_pData + m_nCurPos, nSize );
         xTempOut->writeBytes( aSection );
-
-        Reference< io::XSeekable> xSeekable( xTempOut, UNO_QUERY );
-        if( xSeekable.is() )
-            xSeekable->seek( 0 );
-
-        xIn.set( xTempOut, UNO_QUERY );
+        xTempOut->seek( 0 );
+        xIn = xTempOut;
     }
     else
         OSL_FAIL( "BinaryInput::getInputStreamForSection(): Read past end" );
@@ -1418,7 +1382,7 @@ void StringResourcePersistenceImpl::importBinary( const Sequence< ::sal_Int8 >& 
     while( nOldLocaleCount > 0 );
 
     // Import data
-    BinaryInput aIn( Data, m_xContext );
+    BinaryInput aIn( Data );
 
     aIn.readInt16(); // version
     sal_Int32 nLocaleCount = aIn.readInt16();
@@ -1445,7 +1409,7 @@ void StringResourcePersistenceImpl::importBinary( const Sequence< ::sal_Int8 >& 
         Reference< io::XInputStream > xInput = aIn.getInputStreamForSection( nSize );
         if( xInput.is() )
         {
-            LocaleItem* pLocaleItem = new LocaleItem( aLocale );
+            LocaleItem* pLocaleItem = new LocaleItem( std::move(aLocale) );
             if( iDefault == i )
                 pUseAsDefaultItem = pLocaleItem;
             m_aLocaleItemVector.emplace_back( pLocaleItem );
@@ -1460,17 +1424,17 @@ void StringResourcePersistenceImpl::importBinary( const Sequence< ::sal_Int8 >& 
 
 // Private helper methods
 
-static bool checkNamingSceme( const OUString& aName, const OUString& aNameBase,
+static bool checkNamingSceme( std::u16string_view aName, std::u16string_view aNameBase,
                        Locale& aLocale )
 {
     bool bSuccess = false;
 
-    sal_Int32 nNameLen = aName.getLength();
-    sal_Int32 nNameBaseLen = aNameBase.getLength();
+    size_t nNameLen = aName.size();
+    size_t nNameBaseLen = aNameBase.size();
 
     // Name has to start with NameBase followed
     // by a '_' and at least one more character
-    if( aName.startsWith( aNameBase ) && nNameBaseLen < nNameLen-1 &&
+    if( o3tl::starts_with(aName, aNameBase) && nNameBaseLen < nNameLen-1 &&
         aName[nNameBaseLen] == '_' )
     {
         bSuccess = true;
@@ -1480,23 +1444,23 @@ static bool checkNamingSceme( const OUString& aName, const OUString& aNameBase,
          * violate the naming scheme in use. */
 
         sal_Int32 iStart = nNameBaseLen + 1;
-        sal_Int32 iNext_ = aName.indexOf( '_', iStart );
-        if( iNext_ != -1 && iNext_ < nNameLen-1 )
+        size_t iNext_ = aName.find( '_', iStart );
+        if( iNext_ != std::u16string_view::npos && iNext_ < nNameLen-1 )
         {
-            aLocale.Language = aName.copy( iStart, iNext_ - iStart );
+            aLocale.Language = aName.substr( iStart, iNext_ - iStart );
 
             iStart = iNext_ + 1;
-            iNext_ = aName.indexOf( '_', iStart );
-            if( iNext_ != -1 && iNext_ < nNameLen-1 )
+            iNext_ = aName.find( '_', iStart );
+            if( iNext_ != std::u16string_view::npos && iNext_ < nNameLen-1 )
             {
-                aLocale.Country = aName.copy( iStart, iNext_ - iStart );
-                aLocale.Variant = aName.copy( iNext_ + 1 );
+                aLocale.Country = aName.substr( iStart, iNext_ - iStart );
+                aLocale.Variant = aName.substr( iNext_ + 1 );
             }
             else
-                aLocale.Country = aName.copy( iStart );
+                aLocale.Country = aName.substr( iStart );
         }
         else
-            aLocale.Language = aName.copy( iStart );
+            aLocale.Language = aName.substr( iStart );
     }
     return bSuccess;
 }
@@ -1534,7 +1498,7 @@ void StringResourcePersistenceImpl::implScanLocaleNames( const Sequence< OUStrin
 
             if( checkNamingSceme( aPureName, m_aNameBase, aLocale ) )
             {
-                LocaleItem* pLocaleItem = new LocaleItem( aLocale, false );
+                LocaleItem* pLocaleItem = new LocaleItem( std::move(aLocale), false );
                 m_aLocaleItemVector.emplace_back( pLocaleItem );
 
                 if( m_pCurrentLocaleItem == nullptr )
@@ -1639,7 +1603,7 @@ OUString StringResourcePersistenceImpl::implGetFileNameForLocaleItem
 
 OUString StringResourcePersistenceImpl::implGetPathForLocaleItem
     ( LocaleItem const * pLocaleItem, const OUString& aNameBase,
-      const OUString& aLocation, bool bDefaultFile )
+      std::u16string_view aLocation, bool bDefaultFile )
 {
     OUString aFileName = implGetFileNameForLocaleItem( pLocaleItem, aNameBase );
     INetURLObject aInetObj( aLocation );
@@ -2078,7 +2042,7 @@ Sequence< OUString > StringResourceWithStorageImpl::getSupportedServiceNames(  )
 
 void StringResourceWithStorageImpl::initialize( const Sequence< Any >& aArguments )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( aArguments.getLength() != 5 )
     {
@@ -2095,7 +2059,7 @@ void StringResourceWithStorageImpl::initialize( const Sequence< Any >& aArgument
         throw IllegalArgumentException( "StringResourceWithStorageImpl::initialize: invalid storage", Reference< XInterface >(), 0 );
     }
 
-    implInitializeCommonParameters( aArguments );
+    implInitializeCommonParameters( aGuard, aArguments );
 }
 
 
@@ -2197,7 +2161,7 @@ sal_Int32 StringResourceWithStorageImpl::getUniqueNumericId(  )
 // XStringResourcePersistence
 void StringResourceWithStorageImpl::store()
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceWithStorageImpl::store(): Read only" );
 
     bool bStoreAll = m_bStorageChanged;
@@ -2248,7 +2212,7 @@ void StringResourceWithStorageImpl::storeAsStorage( const Reference< XStorage >&
 
 void StringResourceWithStorageImpl::setStorage( const Reference< XStorage >& Storage )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     if( !Storage.is() )
     {
@@ -2353,7 +2317,7 @@ Sequence< OUString > StringResourceWithLocationImpl::getSupportedServiceNames(  
 
 void StringResourceWithLocationImpl::initialize( const Sequence< Any >& aArguments )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( aArguments.getLength() != 6 )
     {
@@ -2385,7 +2349,7 @@ void StringResourceWithLocationImpl::initialize( const Sequence< Any >& aArgumen
         throw IllegalArgumentException( "StringResourceWithStorageImpl::initialize: invalid type", Reference< XInterface >(), 5 );
     }
 
-    implInitializeCommonParameters( aArguments );
+    implInitializeCommonParameters( aGuard, aArguments );
 }
 
 
@@ -2487,7 +2451,7 @@ sal_Int32 StringResourceWithLocationImpl::getUniqueNumericId(  )
 // XStringResourcePersistence
 void StringResourceWithLocationImpl::store()
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceWithLocationImpl::store(): Read only" );
 
     bool bStoreAll = m_bLocationChanged;
@@ -2495,7 +2459,7 @@ void StringResourceWithLocationImpl::store()
     if( !m_bModified && !bStoreAll )
         return;
 
-    Reference< ucb::XSimpleFileAccess3 > xFileAccess = getFileAccess();
+    Reference< ucb::XSimpleFileAccess3 > xFileAccess = getFileAccessImpl();
     implStoreAtLocation( m_aLocation, m_aNameBase, m_aComment,
         xFileAccess, true/*bUsedForStore*/, bStoreAll );
     m_bModified = false;
@@ -2541,7 +2505,7 @@ void StringResourceWithLocationImpl::storeAsURL( const OUString& URL )
 
 void StringResourceWithLocationImpl::setURL( const OUString& URL )
 {
-    ::osl::MutexGuard aGuard( getMutex() );
+    std::unique_lock aGuard( m_aMutex );
     implCheckReadOnly( "StringResourceWithLocationImpl::setURL(): Read only" );
 
     sal_Int32 nLen = URL.getLength();
@@ -2554,7 +2518,7 @@ void StringResourceWithLocationImpl::setURL( const OUString& URL )
 
     // Delete files at old location
     implStoreAtLocation( m_aLocation, m_aNameBase, m_aComment,
-        getFileAccess(), false/*bUsedForStore*/, false/*bStoreAll*/, true/*bKillAll*/ );
+        getFileAccessImpl(), false/*bUsedForStore*/, false/*bStoreAll*/, true/*bKillAll*/ );
 
     m_aLocation = URL;
     m_bLocationChanged = true;
@@ -2567,7 +2531,7 @@ void StringResourceWithLocationImpl::setURL( const OUString& URL )
 // Scan locale properties files
 void StringResourceWithLocationImpl::implScanLocales()
 {
-    const Reference< ucb::XSimpleFileAccess3 > xFileAccess = getFileAccess();
+    const Reference< ucb::XSimpleFileAccess3 > xFileAccess = getFileAccessImpl();
     if( xFileAccess.is() && xFileAccess->isFolder( m_aLocation ) )
     {
         Sequence< OUString > aContentSeq = xFileAccess->getFolderContents( m_aLocation, false );
@@ -2580,7 +2544,7 @@ bool StringResourceWithLocationImpl::implLoadLocale( LocaleItem* pLocaleItem )
 {
     bool bSuccess = false;
 
-    const Reference< ucb::XSimpleFileAccess3 > xFileAccess = getFileAccess();
+    const Reference< ucb::XSimpleFileAccess3 > xFileAccess = getFileAccessImpl();
     if( xFileAccess.is() )
     {
         OUString aCompleteFileName =
@@ -2603,10 +2567,8 @@ bool StringResourceWithLocationImpl::implLoadLocale( LocaleItem* pLocaleItem )
     return bSuccess;
 }
 
-const Reference< ucb::XSimpleFileAccess3 > & StringResourceWithLocationImpl::getFileAccess()
+const Reference< ucb::XSimpleFileAccess3 > & StringResourceWithLocationImpl::getFileAccessImpl()
 {
-    ::osl::MutexGuard aGuard( getMutex() );
-
     if( !m_xSFI.is() )
     {
         m_xSFI = ucb::SimpleFileAccess::create(m_xContext);

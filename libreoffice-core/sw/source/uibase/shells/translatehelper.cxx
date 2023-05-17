@@ -16,6 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+#include <config_wasm_strip.h>
 #include <wrtsh.hxx>
 #include <pam.hxx>
 #include <node.hxx>
@@ -44,7 +45,7 @@ OString ExportPaMToHTML(SwPaM* pCursor, bool bReplacePTag)
     SolarMutexGuard gMutex;
     OString aResult;
     WriterRef xWrt;
-    GetHTMLWriter(OUString("NoLineLimit,SkipHeaderFooter,NoPrettyPrint"), OUString(), xWrt);
+    GetHTMLWriter(u"NoLineLimit,SkipHeaderFooter,NoPrettyPrint", OUString(), xWrt);
     if (pCursor != nullptr)
     {
         SvMemoryStream aMemoryStream;
@@ -52,7 +53,7 @@ OString ExportPaMToHTML(SwPaM* pCursor, bool bReplacePTag)
         ErrCode nError = aWriter.Write(xWrt);
         if (nError.IsError())
         {
-            SAL_WARN("translatehelper", "failed to export selection to HTML");
+            SAL_WARN("sw.ui", "ExportPaMToHTML: failed to export selection to HTML");
             return {};
         }
         aResult
@@ -95,6 +96,7 @@ void PasteHTMLToPaM(SwWrtShell& rWrtSh, SwPaM* pCursor, const OString& rData, bo
     }
 }
 
+#if !ENABLE_WASM_STRIP_EXTRA
 void TranslateDocument(SwWrtShell& rWrtSh, const TranslateAPIConfig& rConfig)
 {
     bool bCancel = false;
@@ -115,10 +117,10 @@ void TranslateDocumentCancellable(SwWrtShell& rWrtSh, const TranslateAPIConfig& 
     }
 
     auto const& pNodes = rWrtSh.GetNodes();
-    auto pPoint = SwPosition(*m_pCurrentPam->GetPoint());
-    auto pMark = SwPosition(*m_pCurrentPam->GetMark());
-    auto startNode = bHasSelection ? pPoint.nNode.GetIndex() : SwNodeOffset(0);
-    auto endNode = bHasSelection ? pMark.nNode.GetIndex() : pNodes.Count() - 1;
+    SwPosition aPoint = *m_pCurrentPam->GetPoint();
+    SwPosition aMark = *m_pCurrentPam->GetMark();
+    auto startNode = bHasSelection ? aPoint.nNode.GetIndex() : SwNodeOffset(0);
+    auto endNode = bHasSelection ? aMark.nNode.GetIndex() : pNodes.Count() - 1;
 
     sal_Int32 nCount(0);
     sal_Int32 nProgress(0);
@@ -134,7 +136,7 @@ void TranslateDocumentCancellable(SwWrtShell& rWrtSh, const TranslateAPIConfig& 
     }
 
     SfxViewFrame* pFrame = SfxViewFrame::Current();
-    uno::Reference<frame::XFrame> xFrame = pFrame->GetFrame().GetFrameInterface();
+    uno::Reference<frame::XFrame> xFrame(pFrame ? pFrame->GetFrame().GetFrameInterface() : nullptr);
     uno::Reference<task::XStatusIndicatorFactory> xProgressFactory(xFrame, uno::UNO_QUERY);
     uno::Reference<task::XStatusIndicator> xStatusIndicator;
 
@@ -172,18 +174,18 @@ void TranslateDocumentCancellable(SwWrtShell& rWrtSh, const TranslateAPIConfig& 
                 if (startNode == endNode)
                 {
                     cursor->SetMark();
-                    cursor->GetPoint()->nContent = pPoint.nContent;
-                    cursor->GetMark()->nContent = pMark.nContent;
+                    cursor->GetPoint()->nContent = aPoint.nContent;
+                    cursor->GetMark()->nContent = aMark.nContent;
                 }
                 else if (n == startNode)
                 {
                     cursor->SetMark();
-                    cursor->GetPoint()->nContent = std::min(pPoint.nContent, pMark.nContent);
+                    cursor->GetPoint()->nContent = std::min(aPoint.nContent, aMark.nContent);
                 }
                 else if (n == endNode)
                 {
                     cursor->SetMark();
-                    cursor->GetMark()->nContent = pMark.nContent;
+                    cursor->GetMark()->nContent = aMark.nContent;
                     cursor->GetPoint()->nContent = 0;
                 }
             }
@@ -212,4 +214,5 @@ void TranslateDocumentCancellable(SwWrtShell& rWrtSh, const TranslateAPIConfig& 
     if (xStatusIndicator.is())
         xStatusIndicator->end();
 }
+#endif // !ENABLE_WASM_STRIP_EXTRA
 }

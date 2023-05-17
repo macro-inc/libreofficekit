@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_SW_INC_IGRAMMARCONTACT_HXX
-#define INCLUDED_SW_INC_IGRAMMARCONTACT_HXX
+#pragma once
 
 #include <SwGrammarMarkUp.hxx>
 #include <svl/listener.hxx>
@@ -91,7 +90,5 @@ GrammarContact* getGrammarContactFor(const SwTextNode&);
 void finishGrammarCheckFor(SwTextNode&);
 
 } // end sw
-
-#endif // INCLUDED_SW_INC_IGRAMMARCONTACT_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -38,8 +38,7 @@ bool IsFootnoteDeleted(IDocumentRedlineAccess const& rIDRA,
         SwTextFootnote const& rTextFootnote)
 {
     SwRedlineTable::size_type tmp;
-    SwPosition const pos(const_cast<SwTextNode&>(rTextFootnote.GetTextNode()),
-            rTextFootnote.GetStart());
+    SwPosition const pos(rTextFootnote.GetTextNode(), rTextFootnote.GetStart());
     SwRangeRedline const*const pRedline(rIDRA.GetRedline(pos, &tmp));
     return (pRedline
         && pRedline->GetType() == RedlineType::Delete
@@ -57,13 +56,13 @@ bool CompareSwFootnoteIdxs::operator()(SwTextFootnote* const& lhs, SwTextFootnot
     return ( nIdxLHS == nIdxRHS && lhs->GetStart() < rhs->GetStart() ) || nIdxLHS < nIdxRHS;
 }
 
-void SwFootnoteIdxs::UpdateFootnote( const SwNodeIndex& rStt )
+void SwFootnoteIdxs::UpdateFootnote( const SwNode& rStt )
 {
     if( empty() )
         return;
 
     // Get the NodesArray using the first foot note's StartIndex
-    SwDoc& rDoc = rStt.GetNode().GetDoc();
+    SwDoc& rDoc = const_cast<SwDoc&>(rStt.GetDoc());
     if( rDoc.IsInReading() )
         return ;
     SwTextFootnote* pTextFootnote;
@@ -135,7 +134,7 @@ void SwFootnoteIdxs::UpdateFootnote( const SwNodeIndex& rStt )
         if (SeekEntry( *pChapterStartHidden, &nPos ) && nPos)
         {
             // Step forward until the Index is not the same anymore
-            const SwNode* pCmpNd = &rStt.GetNode();
+            const SwNode* pCmpNd = &rStt;
             while( nPos && pCmpNd == &((*this)[ --nPos ]->GetTextNode()) )
                 ;
             ++nPos;
@@ -406,7 +405,7 @@ void SwFootnoteIdxs::UpdateAllFootnote()
             aLayout->UpdateFootnoteNums();
 }
 
-SwTextFootnote* SwFootnoteIdxs::SeekEntry( const SwNodeIndex& rPos, size_t* pFndPos ) const
+SwTextFootnote* SwFootnoteIdxs::SeekEntry( const SwNode& rPos, size_t* pFndPos ) const
 {
     SwNodeOffset nIdx = rPos.GetIndex();
 

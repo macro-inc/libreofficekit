@@ -105,7 +105,7 @@ const SwTable& SwEditShell::InsertTable( const SwInsertTableOptions& rInsTableOp
     StartAllAction();
     SwPosition* pPos = GetCursor()->GetPoint();
 
-    bool bEndUndo = 0 != pPos->nContent.GetIndex();
+    bool bEndUndo = 0 != pPos->GetContentIndex();
     if( bEndUndo )
     {
         StartUndo( SwUndoId::START );
@@ -151,7 +151,7 @@ bool SwEditShell::TableToText( sal_Unicode cCh )
     SwWait aWait( *GetDoc()->GetDocShell(), true );
     SwPaM* pCursor = GetCursor();
     const SwTableNode* pTableNd =
-            GetDoc()->IsIdxInTable( pCursor->GetPoint()->nNode );
+            SwDoc::IsInTable( pCursor->GetPoint()->GetNode() );
     if (!pTableNd)
         return false;
 
@@ -172,8 +172,7 @@ bool SwEditShell::TableToText( sal_Unicode cCh )
     // move current Cursor out of the listing area
     SwNodeIndex aTabIdx( *pTableNd );
     pCursor->DeleteMark();
-    pCursor->GetPoint()->nNode = *pTableNd->EndOfSectionNode();
-    pCursor->GetPoint()->nContent.Assign( nullptr, 0 );
+    pCursor->GetPoint()->Assign(*pTableNd->EndOfSectionNode());
     // move sPoint and Mark out of the area!
     pCursor->SetMark();
     pCursor->DeleteMark();
@@ -183,13 +182,11 @@ bool SwEditShell::TableToText( sal_Unicode cCh )
     bool bRet = ConvertTableToText( pTableNd, cCh );
     EndUndo();
     //End  for bug #i119954#
-    pCursor->GetPoint()->nNode = aTabIdx;
+    pCursor->GetPoint()->Assign(aTabIdx);
 
-    SwContentNode* pCNd = pCursor->GetContentNode();
+    SwContentNode* pCNd = pCursor->GetPointContentNode();
     if( !pCNd )
         pCursor->Move( fnMoveForward, GoInContent );
-    else
-        pCursor->GetPoint()->nContent.Assign( pCNd, 0 );
 
     EndAllAction();
     return bRet;
@@ -205,8 +202,8 @@ bool SwEditShell::IsTextToTableAvailable() const
             bOnlyText = true;
 
             // check if selection is in listing
-            SwNodeOffset nStt = rPaM.Start()->nNode.GetIndex(),
-                         nEnd = rPaM.End()->nNode.GetIndex();
+            SwNodeOffset nStt = rPaM.Start()->GetNodeIndex(),
+                         nEnd = rPaM.End()->GetNodeIndex();
 
             for( ; nStt <= nEnd; ++nStt )
                 if( !GetDoc()->GetNodes()[ nStt ]->IsTextNode() )
@@ -231,7 +228,7 @@ void SwEditShell::InsertDDETable( const SwInsertTableOptions& rInsTableOpts,
 
     StartAllAction();
 
-    bool bEndUndo = 0 != pPos->nContent.GetIndex();
+    bool bEndUndo = 0 != pPos->GetContentIndex();
     if( bEndUndo )
     {
         StartUndo( SwUndoId::START );
@@ -396,11 +393,10 @@ bool SwEditShell::IsTableBoxTextFormat() const
         return false;
 
     sal_uInt32 nFormat = 0;
-    const SfxPoolItem* pItem;
-    if( SfxItemState::SET == pBox->GetFrameFormat()->GetAttrSet().GetItemState(
-        RES_BOXATR_FORMAT, true, &pItem ))
+    if( const SwTableBoxNumFormat* pItem = pBox->GetFrameFormat()->GetAttrSet().GetItemIfSet(
+        RES_BOXATR_FORMAT ))
     {
-        nFormat = static_cast<const SwTableBoxNumFormat*>(pItem)->GetValue();
+        nFormat = pItem->GetValue();
         return GetDoc()->GetNumberFormatter()->IsTextFormat( nFormat );
     }
 
@@ -441,7 +437,7 @@ OUString SwEditShell::GetTableBoxText() const
 void SwEditShell::SplitTable( SplitTable_HeadlineOption eMode )
 {
     SwPaM *pCursor = GetCursor();
-    if( pCursor->GetNode().FindTableNode() )
+    if( pCursor->GetPointNode().FindTableNode() )
     {
         StartAllAction();
         GetDoc()->GetIDocumentUndoRedo().StartUndo(SwUndoId::EMPTY, nullptr);
@@ -458,7 +454,7 @@ bool SwEditShell::MergeTable( bool bWithPrev )
 {
     bool bRet = false;
     SwPaM *pCursor = GetCursor();
-    if( pCursor->GetNode().FindTableNode() )
+    if( pCursor->GetPointNode().FindTableNode() )
     {
         StartAllAction();
         GetDoc()->GetIDocumentUndoRedo().StartUndo(SwUndoId::EMPTY, nullptr);
@@ -476,7 +472,7 @@ bool SwEditShell::CanMergeTable( bool bWithPrev, bool* pChkNxtPrv ) const
 {
     bool bRet = false;
     const SwPaM *pCursor = GetCursor();
-    const SwTableNode* pTableNd = pCursor->GetNode().FindTableNode();
+    const SwTableNode* pTableNd = pCursor->GetPointNode().FindTableNode();
     if( pTableNd && dynamic_cast< const SwDDETable* >(&pTableNd->GetTable()) ==  nullptr)
     {
         bool bNew = pTableNd->GetTable().IsNewModel();

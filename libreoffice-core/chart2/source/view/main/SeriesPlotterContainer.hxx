@@ -21,14 +21,9 @@
 #include <VSeriesPlotter.hxx>
 #include <BaseCoordinateSystem.hxx>
 #include "AxisUsage.hxx"
-#include <rtl/ref.hxx>
-#include <com/sun/star/chart2/XAxis.hpp>
-#include <com/sun/star/chart2/XCoordinateSystem.hpp>
 
 namespace chart
 {
-typedef std::vector<std::unique_ptr<VSeriesPlotter>> SeriesPlottersType;
-
 /** This class is a container of `SeriesPlotter` objects (such as `PieChart`
  *  instances). It is used for initializing coordinate systems, axes and scales
  *  of all series plotters which belongs to the container.
@@ -111,7 +106,10 @@ public:
     void setNumberFormatsFromAxes();
     css::drawing::Direction3D getPreferredAspectRatio();
 
-    SeriesPlottersType& getSeriesPlotterList() { return m_aSeriesPlotterList; }
+    std::vector<std::unique_ptr<VSeriesPlotter>>& getSeriesPlotterList()
+    {
+        return m_aSeriesPlotterList;
+    }
     std::vector<std::unique_ptr<VCoordinateSystem>>& getCooSysList() { return m_rVCooSysList; }
     std::vector<LegendEntryProvider*> getLegendEntryProviderList();
 
@@ -121,22 +119,19 @@ public:
                                    bool bHasComplexCategories);
 
     static VCoordinateSystem*
-    addCooSysToList(std::vector<std::unique_ptr<VCoordinateSystem>>& rVCooSysList,
-                    const css::uno::Reference<css::chart2::XCoordinateSystem>& xCooSys,
-                    ChartModel& rChartModel);
-
-    static VCoordinateSystem*
     getCooSysForPlotter(const std::vector<std::unique_ptr<VCoordinateSystem>>& rVCooSysList,
                         MinimumAndMaximumSupplier* pMinimumAndMaximumSupplier);
-
+    static VCoordinateSystem*
+    addCooSysToList(std::vector<std::unique_ptr<VCoordinateSystem>>& rVCooSysList,
+                    const rtl::Reference<BaseCoordinateSystem>& xCooSys, ChartModel& rChartModel);
     static VCoordinateSystem*
     findInCooSysList(const std::vector<std::unique_ptr<VCoordinateSystem>>& rVCooSysList,
-                     const css::uno::Reference<css::chart2::XCoordinateSystem>& xCooSys);
+                     const rtl::Reference<BaseCoordinateSystem>& xCooSys);
 
 private:
     /** A vector of series plotters.
      */
-    SeriesPlottersType m_aSeriesPlotterList;
+    std::vector<std::unique_ptr<VSeriesPlotter>> m_aSeriesPlotterList;
 
     /** A vector of coordinate systems.
      */
@@ -145,7 +140,7 @@ private:
     /** A map whose key is a `XAxis` interface and the related value is
      *  an object of `AxisUsage` type.
      */
-    std::map<css::uno::Reference<css::chart2::XAxis>, AxisUsage> m_aAxisUsageList;
+    std::map<rtl::Reference<Axis>, AxisUsage> m_aAxisUsageList;
 
     /**
      * Max axis index of all dimensions.  Currently this can be either 0 or 1
@@ -160,6 +155,6 @@ private:
     sal_Int32 m_nDefaultDateNumberFormat;
 };
 
-} //end chart namespace
+} //end chart2 namespace
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

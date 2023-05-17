@@ -22,6 +22,7 @@
 #include <unotools/pathoptions.hxx>
 #include <unotools/transliterationwrapper.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 #include <swtypes.hxx>
 #include <swmodule.hxx>
 #include <shellio.hxx>
@@ -143,7 +144,9 @@ bool SwGlossaryList::GetShortName(std::u16string_view rLongName,
     else if(1 < nCount)
     {
         SwView *pView  = ::GetActiveView();
-        SwGlossDecideDlg aDlg(pView ? pView->GetFrameWeld() : nullptr);
+        if (!pView)
+            return bRet;
+        SwGlossDecideDlg aDlg(pView->GetFrameWeld());
         OUString sTitle = aDlg.get_title() + " " + aTripleStrings.front().sBlock;
         aDlg.set_title(sTitle);
 
@@ -251,7 +254,7 @@ void SwGlossaryList::Update()
         {
             OUString sGrpName = pGlossaries->GetGroupName(i);
             const size_t nPath = static_cast<size_t>(
-                sGrpName.getToken(1, GLOS_DELIM).toInt32());
+                o3tl::toInt32(o3tl::getToken(sGrpName, 1, GLOS_DELIM)));
             if( nPath < rPathArr.size() )
             {
                 std::unique_ptr<AutoTextGroup> pGroup(new AutoTextGroup);
@@ -259,7 +262,7 @@ void SwGlossaryList::Update()
 
                 FillGroup(pGroup.get(), pGlossaries);
                 OUString sName = rPathArr[nPath] + "/" +
-                    pGroup->sName.getToken(0, GLOS_DELIM) + sExt;
+                    o3tl::getToken(pGroup->sName, 0, GLOS_DELIM) + sExt;
                 FStatHelper::GetModifiedDateTimeOfFile( sName,
                                                 &pGroup->aDateModified,
                                                 &pGroup->aDateModified );
@@ -298,7 +301,7 @@ void SwGlossaryList::Update()
 
                     m_aGroupArr.push_back(std::unique_ptr<AutoTextGroup>(pFound));
                 }
-                else if( pFound->aDateModified < rDT )
+                else if( pFound->aDateModified != rDT )
                 {
                     FillGroup(pFound, pGlossaries);
                     pFound->aDateModified = rDT;
@@ -311,12 +314,12 @@ void SwGlossaryList::Update()
                 // maybe remove deleted groups
                 AutoTextGroup* pGroup = m_aGroupArr[i].get();
                 const size_t nGroupPath = static_cast<size_t>(
-                    pGroup->sName.getToken( 1, GLOS_DELIM).toInt32());
+                    o3tl::toInt32(o3tl::getToken(pGroup->sName, 1, GLOS_DELIM)));
                 // Only the groups will be checked which are registered
                 // for the current subpath.
                 if( nGroupPath == nPath )
                 {
-                    OUString sCompareGroup = pGroup->sName.getToken(0, GLOS_DELIM);
+                    std::u16string_view sCompareGroup = o3tl::getToken(pGroup->sName, 0, GLOS_DELIM);
                     bool bFound = std::any_of(aFoundGroupNames.begin(), aFoundGroupNames.end(),
                         [&sCompareGroup](const OUString& rGroupName) { return sCompareGroup == rGroupName; });
 

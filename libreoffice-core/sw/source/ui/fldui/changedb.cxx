@@ -19,14 +19,13 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/sdb/DatabaseContext.hpp>
 #include <com/sun/star/sdb/CommandType.hpp>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/sequence.hxx>
 #include <sfx2/viewfrm.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <view.hxx>
 #include <wrtsh.hxx>
@@ -45,7 +44,7 @@ using namespace ::com::sun::star::uno;
 SwChangeDBDlg::SwChangeDBDlg(SwView const & rVw)
     : SfxDialogController(rVw.GetViewFrame()->GetFrameWeld(), "modules/swriter/ui/exchangedatabases.ui",
                           "ExchangeDatabasesDialog")
-    , pSh(rVw.GetWrtShellPtr())
+    , m_pSh(rVw.GetWrtShellPtr())
     , m_xUsedDBTLB(m_xBuilder->weld_tree_view("inuselb"))
     , m_xAvailDBTLB(new SwDBTreeList(m_xBuilder->weld_tree_view("availablelb")))
     , m_xAddDBPB(m_xBuilder->weld_button("browse"))
@@ -57,10 +56,10 @@ SwChangeDBDlg::SwChangeDBDlg(SwView const & rVw)
     m_xUsedDBTLB->set_size_request(nWidth, nHeight);
     m_xAvailDBTLB->set_size_request(nWidth, nHeight);
 
-    m_xAvailDBTLB->SetWrtShell(*pSh);
+    m_xAvailDBTLB->SetWrtShell(*m_pSh);
     FillDBPopup();
 
-    ShowDBName(pSh->GetDBData());
+    ShowDBName(m_pSh->GetDBData());
     m_xDefineBT->connect_clicked(LINK(this, SwChangeDBDlg, ButtonHdl));
     m_xAddDBPB->connect_clicked(LINK(this, SwChangeDBDlg, AddDBHdl));
 
@@ -79,7 +78,7 @@ void SwChangeDBDlg::FillDBPopup()
 {
     Reference< XComponentContext > xContext( ::comphelper::getProcessComponentContext() );
     Reference<XDatabaseContext> xDBContext = DatabaseContext::create(xContext);
-    const SwDBData& rDBData = pSh->GetDBData();
+    const SwDBData& rDBData = m_pSh->GetDBData();
     m_xAvailDBTLB->Select(rDBData.sDataSource, rDBData.sCommand, u"");
     TreeSelect();
 
@@ -87,7 +86,7 @@ void SwChangeDBDlg::FillDBPopup()
     auto aAllDBNames = comphelper::sequenceToContainer<std::vector<OUString>>(aDBNames);
 
     std::vector<OUString> aDBNameList;
-    pSh->GetAllUsedDB( aDBNameList, &aAllDBNames );
+    m_pSh->GetAllUsedDB( aDBNameList, &aAllDBNames );
 
     size_t nCount = aDBNameList.size();
     m_xUsedDBTLB->clear();
@@ -95,7 +94,7 @@ void SwChangeDBDlg::FillDBPopup()
 
     for(size_t k = 0; k < nCount; k++)
     {
-        std::unique_ptr<weld::TreeIter> xLast = Insert(aDBNameList[k].getToken(0, ';'));
+        std::unique_ptr<weld::TreeIter> xLast = Insert(o3tl::getToken(aDBNameList[k], 0, ';'));
         if (!xFirst)
             xFirst = std::move(xLast);
     }
@@ -108,15 +107,15 @@ void SwChangeDBDlg::FillDBPopup()
     }
 }
 
-std::unique_ptr<weld::TreeIter> SwChangeDBDlg::Insert(const OUString& rDBName)
+std::unique_ptr<weld::TreeIter> SwChangeDBDlg::Insert(std::u16string_view rDBName)
 {
     sal_Int32 nIdx{ 0 };
-    const OUString sDBName(rDBName.getToken(0, DB_DELIM, nIdx));
-    const OUString sTableName(rDBName.getToken(0, DB_DELIM, nIdx));
-    OUString sUserData = rDBName.getToken(0, DB_DELIM, nIdx);
+    const OUString sDBName(o3tl::getToken(rDBName, 0, DB_DELIM, nIdx));
+    const OUString sTableName(o3tl::getToken(rDBName, 0, DB_DELIM, nIdx));
+    OUString sUserData( o3tl::getToken(rDBName, 0, DB_DELIM, nIdx) );
     sal_Int32 nCommandType = sUserData.toInt32();
 
-    OUString rToInsert ( nCommandType ? std::u16string_view(u"" RID_BMP_DBQUERY) : std::u16string_view(u"" RID_BMP_DBTABLE) );
+    const OUString & rToInsert ( nCommandType ? RID_BMP_DBQUERY : RID_BMP_DBTABLE );
 
     std::unique_ptr<weld::TreeIter> xIter(m_xUsedDBTLB->make_iterator());
     if (m_xUsedDBTLB->get_iter_first(*xIter))
@@ -184,7 +183,7 @@ void SwChangeDBDlg::UpdateFields()
         return false;
     });
 
-    pSh->StartAllAction();
+    m_pSh->StartAllAction();
     OUString sTableName;
     OUString sColumnName;
     sal_Bool bIsTable = false;
@@ -196,8 +195,8 @@ void SwChangeDBDlg::UpdateFields()
         + OUString::number(bIsTable
                             ? CommandType::TABLE
                             : CommandType::QUERY);
-    pSh->ChangeDBFields( aDBNames, sTemp);
-    pSh->EndAllAction();
+    m_pSh->ChangeDBFields( aDBNames, sTemp);
+    m_pSh->EndAllAction();
 }
 
 IMPL_LINK_NOARG(SwChangeDBDlg, ButtonHdl, weld::Button&, void)
@@ -209,8 +208,8 @@ IMPL_LINK_NOARG(SwChangeDBDlg, ButtonHdl, weld::Button&, void)
     aData.sDataSource = m_xAvailDBTLB->GetDBName(sTableName, sColumnName, &bIsTable);
     aData.sCommand = sTableName;
     aData.nCommandType = bIsTable ? 0 : 1;
-    pSh->ChgDBData(aData);
-    ShowDBName(pSh->GetDBData());
+    m_pSh->ChgDBData(aData);
+    ShowDBName(m_pSh->GetDBData());
     m_xDialog->response(RET_OK);
 }
 

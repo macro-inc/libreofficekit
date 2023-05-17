@@ -25,15 +25,15 @@
 #include <GraphicPropertyItemConverter.hxx>
 #include <DataPointItemConverter.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
+#include <Diagram.hxx>
+#include <DataSeries.hxx>
 #include <TitleHelper.hxx>
 #include <TitleItemConverter.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <chartview/ExplicitValueProvider.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/chart2/XDataSeries.hpp>
 #include <com/sun/star/chart2/XTitle.hpp>
-#include <com/sun/star/util/XNumberFormatsSupplier.hpp>
-#include <com/sun/star/chart2/XAxis.hpp>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -43,20 +43,20 @@ using ::com::sun::star::uno::Sequence;
 namespace chart::wrapper {
 
 AllAxisItemConverter::AllAxisItemConverter(
-    const uno::Reference< frame::XModel > & xChartModel,
+    const rtl::Reference<::chart::ChartModel> & xChartModel,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
     const awt::Size* pRefSize )
         : MultipleItemConverter( rItemPool )
 {
-    Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-    const Sequence< Reference< XAxis > > aElementList( AxisHelper::getAllAxesOfDiagram( xDiagram ) );
-    for( Reference< XAxis > const & axis : aElementList )
+    rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+    const std::vector< rtl::Reference< Axis > > aElementList = AxisHelper::getAllAxesOfDiagram( xDiagram );
+    for( rtl::Reference< Axis > const & axis : aElementList )
     {
-        uno::Reference< beans::XPropertySet > xObjectProperties(axis, uno::UNO_QUERY);
+        uno::Reference< beans::XPropertySet > xObjectProperties(axis);
         m_aConverters.emplace_back( new ::chart::wrapper::AxisItemConverter(
             xObjectProperties, rItemPool, rDrawModel,
-            uno::Reference< chart2::XChartDocument >( xChartModel, uno::UNO_QUERY ), nullptr, nullptr,
+            xChartModel, nullptr, nullptr,
             pRefSize));
     }
 }
@@ -72,13 +72,13 @@ const WhichRangesContainer& AllAxisItemConverter::GetWhichPairs() const
 }
 
 AllGridItemConverter::AllGridItemConverter(
-    const uno::Reference< frame::XModel > & xChartModel,
+    const rtl::Reference<::chart::ChartModel> & xChartModel,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
     const uno::Reference< lang::XMultiServiceFactory > & xNamedPropertyContainerFactory )
         : MultipleItemConverter( rItemPool )
 {
-    Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
+    rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
     const Sequence< Reference< beans::XPropertySet > > aElementList( AxisHelper::getAllGrids( xDiagram ) );
     for( Reference< beans::XPropertySet > const & xObjectProperties : aElementList )
     {
@@ -99,27 +99,26 @@ const WhichRangesContainer& AllGridItemConverter::GetWhichPairs() const
 }
 
 AllDataLabelItemConverter::AllDataLabelItemConverter(
-    const uno::Reference< frame::XModel > & xChartModel,
+    const rtl::Reference<::chart::ChartModel> & xChartModel,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
     const uno::Reference< lang::XMultiServiceFactory > & xNamedPropertyContainerFactory )
         : MultipleItemConverter( rItemPool )
 {
-    std::vector< uno::Reference< chart2::XDataSeries > > aSeriesList(
-        ::chart::ChartModelHelper::getDataSeries( xChartModel ));
+    std::vector< rtl::Reference< DataSeries > > aSeriesList =
+        ::chart::ChartModelHelper::getDataSeries( xChartModel );
 
     for (auto const& series : aSeriesList)
     {
-        uno::Reference< beans::XPropertySet > xObjectProperties(series, uno::UNO_QUERY);
         uno::Reference< uno::XComponentContext> xContext;//do not need Context for label properties
 
-        sal_Int32 nNumberFormat=ExplicitValueProvider::getExplicitNumberFormatKeyForDataLabel( xObjectProperties );
+        sal_Int32 nNumberFormat=ExplicitValueProvider::getExplicitNumberFormatKeyForDataLabel( series );
         sal_Int32 nPercentNumberFormat=ExplicitValueProvider::getExplicitPercentageNumberFormatKeyForDataLabel(
-                xObjectProperties,uno::Reference< util::XNumberFormatsSupplier >(xChartModel, uno::UNO_QUERY));
+                series,xChartModel);
 
         m_aConverters.emplace_back(
             new ::chart::wrapper::DataPointItemConverter(
-                xChartModel, xContext, xObjectProperties, series, rItemPool, rDrawModel,
+                xChartModel, xContext, series, series, rItemPool, rDrawModel,
                 xNamedPropertyContainerFactory, GraphicObjectType::FilledDataPoint,
                 nullptr, true, false, 0, true, nNumberFormat, nPercentNumberFormat));
     }
@@ -136,7 +135,7 @@ const WhichRangesContainer& AllDataLabelItemConverter::GetWhichPairs() const
 }
 
 AllTitleItemConverter::AllTitleItemConverter(
-    const uno::Reference< frame::XModel > & xChartModel,
+    const rtl::Reference<::chart::ChartModel> & xChartModel,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
     const uno::Reference< lang::XMultiServiceFactory > & xNamedPropertyContainerFactory )
@@ -165,18 +164,17 @@ const WhichRangesContainer& AllTitleItemConverter::GetWhichPairs() const
 }
 
 AllSeriesStatisticsConverter::AllSeriesStatisticsConverter(
-    const uno::Reference< frame::XModel > & xChartModel,
+    const rtl::Reference<::chart::ChartModel> & xChartModel,
     SfxItemPool& rItemPool )
         : MultipleItemConverter( rItemPool )
 {
-    std::vector< uno::Reference< chart2::XDataSeries > > aSeriesList(
-        ::chart::ChartModelHelper::getDataSeries( xChartModel ));
+    std::vector< rtl::Reference< DataSeries > > aSeriesList =
+        ::chart::ChartModelHelper::getDataSeries( xChartModel );
 
     for (auto const& series : aSeriesList)
     {
-        uno::Reference< beans::XPropertySet > xObjectProperties(series, uno::UNO_QUERY);
         m_aConverters.emplace_back( new ::chart::wrapper::StatisticsItemConverter(
-                                     xChartModel, xObjectProperties, rItemPool ));
+                                     xChartModel, series, rItemPool ));
     }
 }
 

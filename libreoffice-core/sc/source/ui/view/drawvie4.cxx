@@ -92,7 +92,7 @@ void ScDrawView::BeginDrag( vcl::Window* pWindow, const Point& rStartPos )
     aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
     // maSize is set in ScDrawTransferObj ctor
 
-    rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pModel), pDocSh, aObjDesc );
+    rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pModel), pDocSh, std::move(aObjDesc) );
 
     pTransferObj->SetDrawPersist( aDragShellRef.get() );    // keep persist for ole objects alive
     pTransferObj->SetDragSource( this );               // copies selection
@@ -210,8 +210,8 @@ void getOleSourceRanges(const SdrMarkList& rMarkList, bool& rAnyOle, bool& rOneO
         if ( !pObj )
             continue;
 
-        sal_uInt16 nSdrObjKind = pObj->GetObjIdentifier();
-        if (nSdrObjKind == OBJ_OLE2)
+        SdrObjKind nSdrObjKind = pObj->GetObjIdentifier();
+        if (nSdrObjKind == SdrObjKind::OLE2)
         {
             rAnyOle = true;
             rOneOle = (nCount == 1);
@@ -226,7 +226,7 @@ void getOleSourceRanges(const SdrMarkList& rMarkList, bool& rAnyOle, bool& rOneO
             SdrObject* pSubObj = aIter.Next();
             while (pSubObj)
             {
-                if ( pSubObj->GetObjIdentifier() == OBJ_OLE2 )
+                if ( pSubObj->GetObjIdentifier() == SdrObjKind::OLE2 )
                 {
                     rAnyOle = true;
                     // rOneOle remains false - a group isn't treated like a single OLE object
@@ -361,7 +361,7 @@ void ScDrawView::DoCopy()
     aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
     // maSize is set in ScDrawTransferObj ctor
 
-    rtl::Reference<ScDrawTransferObj> pTransferObj(new ScDrawTransferObj( std::move(pModel), pDocSh, aObjDesc ));
+    rtl::Reference<ScDrawTransferObj> pTransferObj(new ScDrawTransferObj( std::move(pModel), pDocSh, std::move(aObjDesc) ));
 
     if ( ScGlobal::xDrawClipDocShellRef.is() )
     {
@@ -395,7 +395,7 @@ uno::Reference<datatransfer::XTransferable> ScDrawView::CopyToTransferable()
     aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
     // maSize is set in ScDrawTransferObj ctor
 
-    rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pModel), pDocSh, aObjDesc );
+    rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pModel), pDocSh, std::move(aObjDesc) );
 
     if ( ScGlobal::xDrawClipDocShellRef.is() )
     {
@@ -438,10 +438,10 @@ void ScDrawView::SetMarkedOriginalSize()
     for (size_t i=0; i<nCount; ++i)
     {
         SdrObject* pObj = rMarkList.GetMark(i)->GetMarkedSdrObj();
-        sal_uInt16 nIdent = pObj->GetObjIdentifier();
+        SdrObjKind nIdent = pObj->GetObjIdentifier();
         bool bDo = false;
         Size aOriginalSize;
-        if (nIdent == OBJ_OLE2)
+        if (nIdent == SdrObjKind::OLE2)
         {
             // TODO/LEAN: working with visual area can switch object to running state
             uno::Reference < embed::XEmbeddedObject > xObj = static_cast<SdrOle2Obj*>(pObj)->GetObjRef();
@@ -473,7 +473,7 @@ void ScDrawView::SetMarkedOriginalSize()
                 }
             }
         }
-        else if (nIdent == OBJ_GRAF)
+        else if (nIdent == SdrObjKind::Graphic)
         {
             const Graphic& rGraphic = static_cast<SdrGrafObj*>(pObj)->GetGraphic();
 
@@ -565,7 +565,7 @@ void ScDrawView::FitToCellSize()
     }
 
     pUndoGroup->AddAction( std::make_unique<SdrUndoGeoObj>( *pObj ) );
-    if (pObj->GetObjIdentifier() == OBJ_CUSTOMSHAPE)
+    if (pObj->GetObjIdentifier() == SdrObjKind::CustomShape)
         pObj->AdjustToMaxRect(aCellRect);
     else
         pObj->SetSnapRect(aCellRect);

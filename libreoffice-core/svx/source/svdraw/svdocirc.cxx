@@ -105,10 +105,10 @@ SdrCircKind ToSdrCircKind(SdrObjKind eKind)
 {
     switch (eKind)
     {
-        case OBJ_CIRC: return SdrCircKind::Full;
-        case OBJ_SECT: return SdrCircKind::Section;
-        case OBJ_CARC: return SdrCircKind::Arc;
-        case OBJ_CCUT: return SdrCircKind::Cut;
+        case SdrObjKind::CircleOrEllipse: return SdrCircKind::Full;
+        case SdrObjKind::CircleSection: return SdrCircKind::Section;
+        case SdrObjKind::CircleArc: return SdrCircKind::Arc;
+        case SdrObjKind::CircleCut: return SdrCircKind::Cut;
         default: assert(false);
     }
     return SdrCircKind::Full;
@@ -179,13 +179,13 @@ SdrObjKind SdrCircObj::GetObjIdentifier() const
 {
     switch (meCircleKind)
     {
-    case SdrCircKind::Full: return OBJ_CIRC;
-    case SdrCircKind::Section: return OBJ_SECT;
-    case SdrCircKind::Cut: return OBJ_CCUT;
-    case SdrCircKind::Arc: return OBJ_CARC;
+    case SdrCircKind::Full: return SdrObjKind::CircleOrEllipse;
+    case SdrCircKind::Section: return SdrObjKind::CircleSection;
+    case SdrCircKind::Cut: return SdrObjKind::CircleCut;
+    case SdrCircKind::Arc: return SdrObjKind::CircleArc;
     default: assert(false);
     }
-    return OBJ_CIRC;
+    return SdrObjKind::CircleOrEllipse;
 }
 
 bool SdrCircObj::PaintNeedsXPolyCirc() const
@@ -369,7 +369,7 @@ OUString SdrCircObj::TakeObjNamePlural() const
     return SvxResId(pID);
 }
 
-SdrCircObj* SdrCircObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrCircObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrCircObj(rTargetModel, *this);
 }
@@ -631,7 +631,7 @@ OUString SdrCircObj::getSpecialDragComment(const SdrDragStat& rDrag) const
 void ImpCircUser::SetCreateParams(SdrDragStat const & rStat)
 {
     rStat.TakeCreateRect(aR);
-    aR.Justify();
+    aR.Normalize();
     aCenter=aR.Center();
     nWdt=aR.Right()-aR.Left();
     nHgt=aR.Bottom()-aR.Top();
@@ -694,7 +694,7 @@ bool SdrCircObj::BegCreate(SdrDragStat& rStat)
 {
     rStat.SetOrtho4Possible();
     tools::Rectangle aRect1(rStat.GetStart(), rStat.GetNow());
-    aRect1.Justify();
+    aRect1.Normalize();
     rStat.SetActionRect(aRect1);
     maRect = aRect1;
     ImpSetCreateParams(rStat);
@@ -807,11 +807,11 @@ PointerStyle SdrCircObj::GetCreatePointer() const
     return PointerStyle::Cross;
 }
 
-void SdrCircObj::NbcMove(const Size& aSiz)
+void SdrCircObj::NbcMove(const Size& aSize)
 {
-    maRect.Move(aSiz);
-    m_aOutRect.Move(aSiz);
-    maSnapRect.Move(aSiz);
+    maRect.Move(aSize);
+    moveOutRectangle(aSize.Width(), aSize.Height());
+    maSnapRect.Move(aSize);
     SetXPolyDirty();
     SetBoundAndSnapRectsDirty(true);
 }
@@ -1137,11 +1137,11 @@ void SdrCircObj::ImpSetCircInfoToAttr()
     ImpSetAttrToCircInfo();
 }
 
-SdrObjectUniquePtr SdrCircObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
+rtl::Reference<SdrObject> SdrCircObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
 {
     const bool bFill(meCircleKind != SdrCircKind::Arc);
     const basegfx::B2DPolygon aCircPolygon(ImpCalcXPolyCirc(meCircleKind, maRect, nStartAngle, nEndAngle));
-    SdrObjectUniquePtr pRet = ImpConvertMakeObj(basegfx::B2DPolyPolygon(aCircPolygon), bFill, bBezier);
+    rtl::Reference<SdrObject> pRet = ImpConvertMakeObj(basegfx::B2DPolyPolygon(aCircPolygon), bFill, bBezier);
 
     if(bAddText)
     {

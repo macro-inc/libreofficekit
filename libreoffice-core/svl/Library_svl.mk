@@ -30,7 +30,7 @@ $(eval $(call gb_Library_use_externals,svl,\
     libxml2 \
 ))
 
-$(eval $(call gb_Library_set_componentfile,svl,svl/util/svl))
+$(eval $(call gb_Library_set_componentfile,svl,svl/util/svl,services))
 
 $(eval $(call gb_Library_set_include,svl,\
     -I$(SRCDIR)/svl/source/inc \
@@ -132,7 +132,6 @@ $(eval $(call gb_Library_add_exception_objects,svl,\
     svl/source/items/legacyitem \
     svl/source/items/macitem \
     svl/source/items/poolcach \
-    svl/source/items/poolio \
     svl/source/items/poolitem \
     svl/source/items/ptitem \
     svl/source/items/rectitem \

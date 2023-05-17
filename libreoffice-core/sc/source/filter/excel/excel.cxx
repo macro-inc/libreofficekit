@@ -22,8 +22,10 @@
 #include <sfx2/sfxsids.hrc>
 #include <sot/storage.hxx>
 #include <sot/exchange.hxx>
+#include <svl/intitem.hxx>
 #include <filter/msfilter/classids.hxx>
 #include <tools/globname.hxx>
+#include <com/sun/star/document/UpdateDocMode.hpp>
 #include <com/sun/star/packages/XPackageEncryption.hpp>
 #include <com/sun/star/ucb/ContentCreationException.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
@@ -50,13 +52,13 @@
 
 using namespace css;
 
-static void lcl_getListOfStreams(SotStorage * pStorage, comphelper::SequenceAsHashMap& aStreamsData, const OUString& sPrefix)
+static void lcl_getListOfStreams(SotStorage * pStorage, comphelper::SequenceAsHashMap& aStreamsData, std::u16string_view sPrefix)
 {
     SvStorageInfoList aElements;
     pStorage->FillInfoList(&aElements);
     for (const auto & aElement : aElements)
     {
-        OUString sStreamFullName = sPrefix.getLength() ? sPrefix + "/" + aElement.GetName() : aElement.GetName();
+        OUString sStreamFullName = sPrefix.size() ? OUString::Concat(sPrefix) + "/" + aElement.GetName() : aElement.GetName();
         if (aElement.IsStorage())
         {
             tools::SvRef<SotStorage> xSubStorage = pStorage->OpenSotStorage(aElement.GetName(), StreamMode::STD_READ | StreamMode::SHARE_DENYALL);
@@ -97,7 +99,7 @@ static tools::SvRef<SotStorage> lcl_DRMDecrypt(const SfxMedium& rMedium, const t
     }
 
     comphelper::SequenceAsHashMap aStreamsData;
-    lcl_getListOfStreams(rStorage.get(), aStreamsData, "");
+    lcl_getListOfStreams(rStorage.get(), aStreamsData, u"");
 
     try {
         uno::Sequence<beans::NamedValue> aStreams = aStreamsData.getAsConstNamedValueList();
@@ -131,7 +133,7 @@ static tools::SvRef<SotStorage> lcl_DRMDecrypt(const SfxMedium& rMedium, const t
 
         // Set the media descriptor data
         uno::Sequence<beans::NamedValue> aEncryptionData = xPackageEncryption->createEncryptionData("");
-        rMedium.GetItemSet()->Put(SfxUnoAnyItem(SID_ENCRYPTIONDATA, uno::makeAny(aEncryptionData)));
+        rMedium.GetItemSet()->Put(SfxUnoAnyItem(SID_ENCRYPTIONDATA, uno::Any(aEncryptionData)));
     }
     catch (const std::exception&)
     {
@@ -266,7 +268,7 @@ static ErrCode lcl_ExportExcelBiff( SfxMedium& rMedium, ScDocument *pDocument,
         {
             uno::Reference<uno::XComponentContext> xComponentContext(comphelper::getProcessComponentContext());
             uno::Sequence<uno::Any> aArguments{
-                uno::makeAny(beans::NamedValue("Binary", uno::makeAny(true))) };
+                uno::Any(beans::NamedValue("Binary", uno::Any(true))) };
             xPackageEncryption.set(
                 xComponentContext->getServiceManager()->createInstanceWithArgumentsAndContext(
                     "com.sun.star.comp.oox.crypto." + sCryptoType, aArguments, xComponentContext), uno::UNO_QUERY);
@@ -389,7 +391,7 @@ static ErrCode lcl_ExportExcelBiff( SfxMedium& rMedium, ScDocument *pDocument,
         xEncryptedRootStrg->Commit();
 
         // Restore encryption data
-        rMedium.GetItemSet()->Put(SfxUnoAnyItem(SID_ENCRYPTIONDATA, uno::makeAny(aEncryptionData)));
+        rMedium.GetItemSet()->Put(SfxUnoAnyItem(SID_ENCRYPTIONDATA, uno::Any(aEncryptionData)));
     }
 
     return eRet;
@@ -445,13 +447,15 @@ extern "C" SAL_DLLPUBLIC_EXPORT bool TestImportXLS(SvStream& rStream)
     ScDLL::Init();
     SfxMedium aMedium;
     css::uno::Reference<css::io::XInputStream> xStm(new utl::OInputStreamWrapper(rStream));
-    aMedium.GetItemSet()->Put(SfxUnoAnyItem(SID_INPUTSTREAM, css::uno::makeAny(xStm)));
+    aMedium.GetItemSet()->Put(SfxUnoAnyItem(SID_INPUTSTREAM, css::uno::Any(xStm)));
+    aMedium.GetItemSet()->Put(SfxUInt16Item(SID_UPDATEDOCMODE, css::document::UpdateDocMode::NO_UPDATE));
 
     ScDocShellRef xDocShell = new ScDocShell(SfxModelFlags::EMBEDDED_OBJECT |
                                              SfxModelFlags::DISABLE_EMBEDDED_SCRIPTS |
                                              SfxModelFlags::DISABLE_DOCUMENT_RECOVERY);
 
     xDocShell->DoInitNew();
+    xDocShell->SetInitialLinkUpdate(&aMedium);
 
     ScDocument& rDoc = xDocShell->GetDocument();
 

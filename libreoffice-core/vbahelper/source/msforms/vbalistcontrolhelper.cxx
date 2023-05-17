@@ -18,6 +18,7 @@
  */
 
 #include "vbalistcontrolhelper.hxx"
+#include <utility>
 #include <vector>
 #include <vbahelper/vbapropvalue.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -36,7 +37,7 @@ private:
     uno::Any m_pvarColumn;
 
 public:
-    ListPropListener( const uno::Reference< beans::XPropertySet >& xProps, const uno::Any& pvargIndex, const uno::Any& pvarColumn );
+    ListPropListener( uno::Reference< beans::XPropertySet > xProps, uno::Any  pvargIndex, uno::Any varColumn );
     virtual ~ListPropListener() { };
     virtual void setValueEvent( const css::uno::Any& value ) override;
     virtual css::uno::Any getValueEvent() override;
@@ -44,7 +45,7 @@ public:
 
 }
 
-ListPropListener::ListPropListener( const uno::Reference< beans::XPropertySet >& xProps, const uno::Any& pvargIndex, const uno::Any& pvarColumn ) : m_xProps( xProps ), m_pvargIndex( pvargIndex ), m_pvarColumn( pvarColumn )
+ListPropListener::ListPropListener( uno::Reference< beans::XPropertySet > xProps, uno::Any vargIndex, uno::Any varColumn ) : m_xProps(std::move( xProps )), m_pvargIndex(std::move( vargIndex )), m_pvarColumn(std::move( varColumn ))
 {
 }
 
@@ -129,7 +130,7 @@ ListControlHelper::AddItem( const uno::Any& pvargItem, const uno::Any& pvargInde
         std::copy(sVec.begin(), sVec.end(), std::next(sList.getArray(), nIndex));
     }
 
-    m_xProps->setPropertyValue( "StringItemList", uno::makeAny( sList ) );
+    m_xProps->setPropertyValue( "StringItemList", uno::Any( sList ) );
 }
 
 void
@@ -155,7 +156,7 @@ ListControlHelper::removeItem( const uno::Any& index )
         comphelper::removeElementAt(sList, nIndex);
     }
 
-    m_xProps->setPropertyValue( "StringItemList", uno::makeAny( sList ) );
+    m_xProps->setPropertyValue( "StringItemList", uno::Any( sList ) );
 }
 
 void
@@ -163,7 +164,7 @@ ListControlHelper::Clear(  )
 {
     // urk, setValue doesn't seem to work !!
     //setValue( uno::makeAny( sal_Int16() ) );
-    m_xProps->setPropertyValue( "StringItemList", uno::makeAny( uno::Sequence< OUString >() ) );
+    m_xProps->setPropertyValue( "StringItemList", uno::Any( uno::Sequence< OUString >() ) );
 }
 
 void
@@ -184,7 +185,7 @@ ListControlHelper::getListCount()
 uno::Any
 ListControlHelper::List( const ::uno::Any& pvargIndex, const uno::Any& pvarColumn )
 {
-    return uno::makeAny( uno::Reference< XPropValue > ( new ScVbaPropValue( new ListPropListener( m_xProps, pvargIndex, pvarColumn ) ) ) );
+    return uno::Any( uno::Reference< XPropValue > ( new ScVbaPropValue( new ListPropListener( m_xProps, pvargIndex, pvarColumn ) ) ) );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

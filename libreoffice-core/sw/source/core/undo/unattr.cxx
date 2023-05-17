@@ -37,6 +37,8 @@
 #include <doc.hxx>
 #include <IDocumentLayoutAccess.hxx>
 #include <IDocumentRedlineAccess.hxx>
+#include <IDocumentState.hxx>
+#include <IDocumentUndoRedo.hxx>
 #include <IShellCursorSupplier.hxx>
 #include <docary.hxx>
 #include <swcrsr.hxx>
@@ -55,6 +57,7 @@
 #include <charfmt.hxx>
 #include <calbck.hxx>
 #include <frameformats.hxx>
+#include <editsh.hxx>
 
 SwUndoFormatAttrHelper::SwUndoFormatAttrHelper(SwFormat& rFormat, bool bSvDrwPt)
     : SwClient(&rFormat)
@@ -89,6 +92,24 @@ void SwUndoFormatAttrHelper::SwClientNotify(const SwModify&, const SfxHint& rHin
             for(auto pItem = aIter.GetCurItem(); pItem; pItem = aIter.NextItem())
                 m_pUndo->PutAttr(*pItem, rDoc);
         }
+    }
+}
+
+SwDocModifyAndUndoGuard::SwDocModifyAndUndoGuard(SwFormat& format)
+    : doc(format.GetName().isEmpty() ? nullptr : format.GetDoc())
+    , helper(doc ? new SwUndoFormatAttrHelper(format) : nullptr)
+{
+}
+
+SwDocModifyAndUndoGuard::~SwDocModifyAndUndoGuard()
+{
+    if (helper && helper->GetUndo())
+    {
+        // helper tracks changes, even when DoesUndo is false, to detect modified state
+        if (doc->GetIDocumentUndoRedo().DoesUndo())
+            doc->GetIDocumentUndoRedo().AppendUndo(helper->ReleaseUndo());
+
+        doc->getIDocumentState().SetModified();
     }
 }
 
@@ -141,7 +162,8 @@ void SwUndoFormatAttr::Init( const SwFormat & rFormat )
                                ->FindTableNode()->GetIndex();
             }
         } else if (dynamic_cast<const SwSectionFormat*>(&rFormat)) {
-            m_nNodeIndex = rFormat.GetContent().GetContentIdx()->GetIndex();
+            if (auto pContentIndex = rFormat.GetContent().GetContentIdx())
+                m_nNodeIndex = pContentIndex->GetIndex();
         } else if(auto pBoxFormat = dynamic_cast<const SwTableBoxFormat*>(&rFormat))
         {
             auto pTableBox = pBoxFormat->GetTableBox();
@@ -248,10 +270,10 @@ SwFormat* SwUndoFormatAttr::GetFormat( const SwDoc& rDoc )
     case RES_DRAWFRMFMT:
     case RES_FLYFRMFMT:
         {
-            SwFormat * pFormat = rDoc.GetSpzFrameFormats()->FindFormatByName(m_sFormatName);
-            if (pFormat)
-                return pFormat;
-            pFormat = rDoc.GetFrameFormats()->FindFormatByName(m_sFormatName);
+            auto it = rDoc.GetSpzFrameFormats()->findByTypeAndName( m_nFormatWhich, m_sFormatName );
+            if( it != rDoc.GetSpzFrameFormats()->typeAndNameEnd() )
+                return *it;
+            SwFormat* pFormat = rDoc.GetFrameFormats()->FindFormatByName(m_sFormatName);
             if (pFormat)
                 return pFormat;
         }
@@ -282,7 +304,7 @@ void SwUndoFormatAttr::RepeatImpl(::sw::RepeatContext & rContext)
     switch ( m_nFormatWhich ) {
     case RES_GRFFMTCOLL: {
         SwNoTextNode *const pNd =
-            rContext.GetRepeatPaM().GetNode().GetNoTextNode();
+            rContext.GetRepeatPaM().GetPointNode().GetNoTextNode();
         if( pNd ) {
             rDoc.SetAttr( pFormat->GetAttrSet(), *pNd->GetFormatColl() );
         }
@@ -293,7 +315,7 @@ void SwUndoFormatAttr::RepeatImpl(::sw::RepeatContext & rContext)
     case RES_CONDTXTFMTCOLL:
     {
         SwTextNode *const pNd =
-            rContext.GetRepeatPaM().GetNode().GetTextNode();
+            rContext.GetRepeatPaM().GetPointNode().GetTextNode();
         if( pNd ) {
             rDoc.SetAttr( pFormat->GetAttrSet(), *pNd->GetFormatColl() );
         }
@@ -305,7 +327,7 @@ void SwUndoFormatAttr::RepeatImpl(::sw::RepeatContext & rContext)
         // Steps: search in all FlyFrameFormats for the FlyContent attribute
         // and validate if the cursor is in the respective section
         SwFrameFormat *const pFly =
-            rContext.GetRepeatPaM().GetNode().GetFlyFormat();
+            rContext.GetRepeatPaM().GetPointNode().GetFlyFormat();
         if( pFly ) {
             // Bug 43672: do not set all attributes!
             if (SfxItemState::SET ==
@@ -361,18 +383,18 @@ void SwUndoFormatAttr::SaveFlyAnchor( const SwFormat * pFormat, bool bSvDrwPt )
 
     const SwFormatAnchor& rAnchor =
         m_oOldSet->Get( RES_ANCHOR, false );
-    if( !rAnchor.GetContentAnchor() )
+    if( !rAnchor.GetAnchorNode() )
         return;
 
     sal_Int32 nContent = 0;
     switch( rAnchor.GetAnchorId() ) {
     case RndStdIds::FLY_AS_CHAR:
     case RndStdIds::FLY_AT_CHAR:
-        nContent = rAnchor.GetContentAnchor()->nContent.GetIndex();
+        nContent = rAnchor.GetAnchorContentOffset();
         [[fallthrough]];
     case RndStdIds::FLY_AT_PARA:
     case RndStdIds::FLY_AT_FLY:
-        m_nNodeIndex = rAnchor.GetContentAnchor()->nNode.GetIndex();
+        m_nNodeIndex = rAnchor.GetAnchorNode()->GetIndex();
         break;
     default:
         return;
@@ -409,8 +431,8 @@ bool SwUndoFormatAttr::RestoreFlyAnchor(::sw::UndoRedoContext & rContext)
         SwPosition aPos( *pNd );
         if ((RndStdIds::FLY_AS_CHAR == rAnchor.GetAnchorId()) ||
             (RndStdIds::FLY_AT_CHAR == rAnchor.GetAnchorId())) {
-            aPos.nContent.Assign( static_cast<SwTextNode*>(pNd), rAnchor.GetPageNum() );
-            if ( aPos.nContent.GetIndex() > pNd->GetTextNode()->GetText().getLength()) {
+            aPos.SetContent( rAnchor.GetPageNum() );
+            if ( aPos.GetContentIndex() > pNd->GetTextNode()->GetText().getLength()) {
                 // #i35443# - invalid position.
                 // Thus, anchor attribute not restored
                 return false;
@@ -444,10 +466,9 @@ bool SwUndoFormatAttr::RestoreFlyAnchor(::sw::UndoRedoContext & rContext)
         // Unfortunately, this not only destroys the Frames but also the format.
         // To prevent that, first detach the connection between attribute and
         // format.
-        const SwPosition *pPos = rOldAnch.GetContentAnchor();
-        SwTextNode *pTextNode = static_cast<SwTextNode*>(&pPos->nNode.GetNode());
+        SwTextNode *pTextNode = static_cast<SwTextNode*>(rOldAnch.GetAnchorNode());
         OSL_ENSURE( pTextNode->HasHints(), "Missing FlyInCnt-Hint." );
-        const sal_Int32 nIdx = pPos->nContent.GetIndex();
+        const sal_Int32 nIdx = rOldAnch.GetAnchorContentOffset();
         SwTextAttr * const pHint =
             pTextNode->GetTextAttrForCharAt( nIdx, RES_TXTATR_FLYCNT );
         assert(pHint && "Missing Hint.");
@@ -488,11 +509,10 @@ bool SwUndoFormatAttr::RestoreFlyAnchor(::sw::UndoRedoContext & rContext)
     }
 
     if (RndStdIds::FLY_AS_CHAR == aNewAnchor.GetAnchorId()) {
-        const SwPosition* pPos = aNewAnchor.GetContentAnchor();
-        SwTextNode* pTextNd = pPos->nNode.GetNode().GetTextNode();
+        SwTextNode* pTextNd = aNewAnchor.GetAnchorNode()->GetTextNode();
         OSL_ENSURE( pTextNd, "no Text Node at position." );
         SwFormatFlyCnt aFormat( pFrameFormat );
-        pTextNd->InsertItem( aFormat, pPos->nContent.GetIndex(), 0 );
+        pTextNd->InsertItem( aFormat, aNewAnchor.GetAnchorContentOffset(), 0 );
     }
 
     if (RES_DRAWFRMFMT != pFrameFormat->Which())
@@ -552,8 +572,8 @@ SwUndoResetAttr::SwUndoResetAttr( const SwPosition& rPos, sal_uInt16 nFormatId )
     , m_pHistory( new SwHistory )
     , m_nFormatId( nFormatId )
 {
-    m_nSttNode = m_nEndNode = rPos.nNode.GetIndex();
-    m_nSttContent = m_nEndContent = rPos.nContent.GetIndex();
+    m_nSttNode = m_nEndNode = rPos.GetNodeIndex();
+    m_nSttContent = m_nEndContent = rPos.GetContentIndex();
 }
 
 SwUndoResetAttr::~SwUndoResetAttr()
@@ -570,10 +590,12 @@ void SwUndoResetAttr::UndoImpl(::sw::UndoRedoContext & rContext)
     if ((RES_CONDTXTFMTCOLL == m_nFormatId) &&
         (m_nSttNode == m_nEndNode) && (m_nSttContent == m_nEndContent)) {
         SwTextNode* pTNd = rDoc.GetNodes()[ m_nSttNode ]->GetTextNode();
-        if( pTNd ) {
-            SwIndex aIdx( pTNd, m_nSttContent );
-            pTNd->DontExpandFormat( aIdx, false );
-        }
+        if( pTNd )
+            pTNd->DontExpandFormat( m_nSttContent, false );
+    }
+    else if (m_nFormatId == RES_TXTATR_REFMARK)
+    {
+        rDoc.GetEditShell()->SwViewShell::UpdateFields();
     }
 
     AddUndoRedoPaM(rContext);
@@ -600,8 +622,7 @@ void SwUndoResetAttr::RedoImpl(::sw::UndoRedoContext & rContext)
     {
         SwTOXMarks aArr;
         SwNodeIndex aIdx( rDoc.GetNodes(), m_nSttNode );
-        SwPosition aPos( aIdx, SwIndex( aIdx.GetNode().GetContentNode(),
-                                        m_nSttContent ));
+        SwPosition aPos( aIdx, aIdx.GetNode().GetContentNode(), m_nSttContent );
 
         sal_uInt16 nCnt = SwDoc::GetCurTOXMark( aPos, aArr );
         if( nCnt ) {
@@ -622,6 +643,27 @@ void SwUndoResetAttr::RedoImpl(::sw::UndoRedoContext & rContext)
             // found one, thus delete it
             if( nCnt-- ) {
                 rDoc.DeleteTOXMark( aArr[ nCnt ] );
+            }
+        }
+    }
+    break;
+    case RES_TXTATR_REFMARK:
+    {
+        SfxItemPool::Item2Range aRange = rDoc.GetAttrPool().GetItemSurrogates(RES_TXTATR_REFMARK);
+        SwHistoryHint* pHistoryHint = GetHistory()[0];
+        if (pHistoryHint && HSTRY_SETREFMARKHNT == pHistoryHint->Which())
+        {
+            for (const SfxPoolItem* pItem : aRange)
+            {
+                assert(dynamic_cast<const SwFormatRefMark*>(pItem));
+                const auto pFormatRefMark = static_cast<const SwFormatRefMark*>(pItem);
+                if (static_cast<SwHistorySetRefMark*>(pHistoryHint)->GetRefName() ==
+                        pFormatRefMark->GetRefName())
+                {
+                    rDoc.DeleteFormatRefMark(pFormatRefMark);
+                    rDoc.GetEditShell()->SwViewShell::UpdateFields();
+                    break;
+                }
             }
         }
     }
@@ -673,10 +715,10 @@ SwUndoAttr::SwUndoAttr( const SwPaM& rRange, const SfxPoolItem& rAttr,
     }
 }
 
-SwUndoAttr::SwUndoAttr( const SwPaM& rRange, const SfxItemSet& rSet,
+SwUndoAttr::SwUndoAttr( const SwPaM& rRange, SfxItemSet aSet,
                         const SetAttrMode nFlags )
     : SwUndo( SwUndoId::INSATTR, &rRange.GetDoc() ), SwUndRng( rRange )
-    , m_AttrSet( rSet )
+    , m_AttrSet(std::move( aSet ))
     , m_pHistory( new SwHistory )
     , m_nNodeIndex( NODE_OFFSET_MAX )
     , m_nInsertFlags( nFlags )
@@ -711,7 +753,7 @@ void SwUndoAttr::SaveRedlineData( const SwPaM& rPam, bool bIsContent )
 
     SetRedlineFlags( rDoc.getIDocumentRedlineAccess().GetRedlineFlags() );
     if ( bIsContent ) {
-        m_nNodeIndex = rPam.GetPoint()->nNode.GetIndex();
+        m_nNodeIndex = rPam.GetPoint()->GetNodeIndex();
     }
 }
 
@@ -725,10 +767,9 @@ void SwUndoAttr::UndoImpl(::sw::UndoRedoContext & rContext)
         SwPaM aPam(pDoc->GetNodes().GetEndOfContent());
         if ( NODE_OFFSET_MAX != m_nNodeIndex ) {
             aPam.DeleteMark();
-            aPam.GetPoint()->nNode = m_nNodeIndex;
-            aPam.GetPoint()->nContent.Assign( aPam.GetContentNode(), m_nSttContent );
+            aPam.GetPoint()->Assign( m_nNodeIndex, m_nSttContent );
             aPam.SetMark();
-            ++aPam.GetPoint()->nContent;
+            aPam.GetPoint()->AdjustContent(+1);
             pDoc->getIDocumentRedlineAccess().DeleteRedline(aPam, false, RedlineType::Any);
         } else {
             // remove all format redlines, will be recreated if needed
@@ -750,7 +791,8 @@ void SwUndoAttr::UndoImpl(::sw::UndoRedoContext & rContext)
     m_pHistory->SetTmpEnd( m_pHistory->Count() );
 
     // set cursor onto Undo area
-    AddUndoRedoPaM(rContext);
+    if (!(m_nInsertFlags & SetAttrMode::NO_CURSOR_CHANGE))
+        AddUndoRedoPaM(rContext);
 }
 
 void SwUndoAttr::RepeatImpl(::sw::RepeatContext & rContext)
@@ -767,10 +809,9 @@ void SwUndoAttr::RepeatImpl(::sw::RepeatContext & rContext)
     }
 }
 
-void SwUndoAttr::RedoImpl(::sw::UndoRedoContext & rContext)
+void SwUndoAttr::redoAttribute(SwPaM& rPam, sw::UndoRedoContext & rContext)
 {
     SwDoc & rDoc = rContext.GetDoc();
-    SwPaM & rPam = AddUndoRedoPaM(rContext);
 
     // Restore pointer to char format from name
     if (!m_aChrFormatName.isEmpty())
@@ -803,6 +844,21 @@ void SwUndoAttr::RedoImpl(::sw::UndoRedoContext & rContext)
         rDoc.getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld );
     } else {
         rDoc.getIDocumentContentOperations().InsertItemSet( rPam, m_AttrSet, m_nInsertFlags );
+    }
+}
+
+void SwUndoAttr::RedoImpl(sw::UndoRedoContext & rContext)
+{
+    if (m_nInsertFlags & SetAttrMode::NO_CURSOR_CHANGE)
+    {
+        SwPaM aPam(rContext.GetDoc().GetNodes().GetEndOfContent());
+        SetPaM(aPam, false);
+        redoAttribute(aPam, rContext);
+    }
+    else
+    {
+        SwPaM& rPam = AddUndoRedoPaM(rContext);
+        redoAttribute(rPam, rContext);
     }
 }
 
@@ -850,10 +906,11 @@ void SwUndoAttr::RemoveIdx( SwDoc& rDoc )
 SwUndoDefaultAttr::SwUndoDefaultAttr( const SfxItemSet& rSet, const SwDoc& rDoc )
     : SwUndo( SwUndoId::SETDEFTATTR, &rDoc )
 {
-    const SfxPoolItem* pItem;
-    if( SfxItemState::SET == rSet.GetItemState( RES_PARATR_TABSTOP, false, &pItem ) ) {
+    const SvxTabStopItem* pItem = rSet.GetItemIfSet( RES_PARATR_TABSTOP, false );
+    if( pItem )
+    {
         // store separately, because it may change!
-        m_pTabStop.reset(&pItem->Clone()->StaticWhichCast(RES_PARATR_TABSTOP));
+        m_pTabStop.reset(pItem->Clone());
         if ( 1 != rSet.Count() ) { // are there more attributes?
             m_oOldSet.emplace( rSet );
         }
@@ -936,11 +993,11 @@ void SwUndoMoveLeftMargin::RepeatImpl(::sw::RepeatContext & rContext)
 }
 
 SwUndoChangeFootNote::SwUndoChangeFootNote(
-    const SwPaM& rRange, const OUString& rText,
+    const SwPaM& rRange, OUString aText,
         bool const bIsEndNote)
     : SwUndo( SwUndoId::CHGFTN, &rRange.GetDoc() ), SwUndRng( rRange )
     , m_pHistory( new SwHistory() )
-    , m_Text( rText )
+    , m_Text(std::move( aText ))
     , m_bEndNote( bIsEndNote )
 {
 }
@@ -1029,8 +1086,8 @@ void SwUndoEndNoteInfo::RedoImpl(::sw::UndoRedoContext & rContext)
 
 SwUndoDontExpandFormat::SwUndoDontExpandFormat( const SwPosition& rPos )
     : SwUndo( SwUndoId::DONTEXPAND, &rPos.GetDoc() )
-    , m_nNodeIndex( rPos.nNode.GetIndex() )
-    , m_nContentIndex( rPos.nContent.GetIndex() )
+    , m_nNodeIndex( rPos.GetNodeIndex() )
+    , m_nContentIndex( rPos.GetContentIndex() )
 {
 }
 
@@ -1040,8 +1097,7 @@ void SwUndoDontExpandFormat::UndoImpl(::sw::UndoRedoContext & rContext)
     SwDoc *const pDoc = & rContext.GetDoc();
 
     SwPosition& rPos = *pPam->GetPoint();
-    rPos.nNode = m_nNodeIndex;
-    rPos.nContent.Assign( rPos.nNode.GetNode().GetContentNode(), m_nContentIndex);
+    rPos.Assign( m_nNodeIndex, m_nContentIndex );
     pDoc->DontExpandFormat( rPos, false );
 }
 
@@ -1051,8 +1107,7 @@ void SwUndoDontExpandFormat::RedoImpl(::sw::UndoRedoContext & rContext)
     SwDoc *const pDoc = & rContext.GetDoc();
 
     SwPosition& rPos = *pPam->GetPoint();
-    rPos.nNode = m_nNodeIndex;
-    rPos.nContent.Assign( rPos.nNode.GetNode().GetContentNode(), m_nContentIndex);
+    rPos.Assign( m_nNodeIndex, m_nContentIndex );
     pDoc->DontExpandFormat( rPos );
 }
 

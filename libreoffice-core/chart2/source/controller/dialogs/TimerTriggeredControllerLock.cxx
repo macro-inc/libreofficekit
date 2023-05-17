@@ -17,17 +17,18 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <com/sun/star/frame/XModel.hpp>
 #include <TimerTriggeredControllerLock.hxx>
 #include <ControllerLockGuard.hxx>
+#include <ChartModel.hxx>
+#include <utility>
 
 namespace chart
 {
 using namespace ::com::sun::star;
 
 TimerTriggeredControllerLock::TimerTriggeredControllerLock(
-    const uno::Reference<frame::XModel>& xModel)
-    : m_xModel(xModel)
+    rtl::Reference<::chart::ChartModel> xModel)
+    : m_xModel(std::move(xModel))
     , m_aTimer("chart2 TimerTriggeredControllerLock")
 {
     m_aTimer.SetTimeout(4 * EDIT_UPDATEDATA_TIMEOUT);

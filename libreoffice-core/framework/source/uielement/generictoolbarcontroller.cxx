@@ -27,11 +27,12 @@
 #include <com/sun/star/frame/ControlCommand.hpp>
 
 #include <comphelper/propertyvalue.hxx>
+#include <svl/imageitm.hxx>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/svapp.hxx>
-#include <vcl/toolbox.hxx>
 #include <vcl/weld.hxx>
 #include <tools/urlobj.hxx>
+#include <toolkit/helper/vclunohelper.hxx>
 #include <strings.hrc>
 #include <classes/fwkresid.hxx>
 
@@ -44,7 +45,7 @@ using namespace ::com::sun::star::frame::status;
 namespace framework
 {
 
-static bool isEnumCommand( const OUString& rCommand )
+static bool isEnumCommand( std::u16string_view rCommand )
 {
     INetURLObject aURL( rCommand );
 
@@ -52,7 +53,7 @@ static bool isEnumCommand( const OUString& rCommand )
            ( aURL.GetURLPath().indexOf( '.' ) != -1);
 }
 
-static OUString getEnumCommand( const OUString& rCommand )
+static OUString getEnumCommand( std::u16string_view rCommand )
 {
     INetURLObject aURL( rCommand );
 
@@ -74,7 +75,7 @@ static OUString getMasterCommand( const OUString& rCommand )
         sal_Int32 nIndex = aURL.GetURLPath().indexOf( '.' );
         if ( nIndex )
         {
-            aURL.SetURLPath( aURL.GetURLPath().copy( 0, nIndex ) );
+            aURL.SetURLPath( aURL.GetURLPath().subView( 0, nIndex ) );
             aMasterCommand = aURL.GetMainURL( INetURLObject::DecodeMechanism::NONE );
         }
     }
@@ -90,6 +91,7 @@ GenericToolbarController::GenericToolbarController( const Reference< XComponentC
     ,   m_xToolbar( pToolbar )
     ,   m_nID( nID )
     ,   m_bEnumCommand( isEnumCommand( aCommand ))
+    ,   m_bMirrored( false )
     ,   m_bMadeInvisible( false )
     ,   m_aEnumCommand( getEnumCommand( aCommand ))
 {
@@ -188,6 +190,7 @@ void GenericToolbarController::statusChanged( const FeatureStateEvent& Event )
 
         bool        bValue;
         OUString    aStrValue;
+        SfxImageItem aImageItem;
 
         if ( Event.State >>= bValue )
         {
@@ -197,6 +200,13 @@ void GenericToolbarController::statusChanged( const FeatureStateEvent& Event )
         else if ( Event.State >>= aStrValue )
         {
             m_pToolbar->set_item_label(sId, aStrValue);
+        }
+        else if ( aImageItem.PutValue( Event.State, 0 ) && aImageItem.IsMirrored() != m_bMirrored )
+        {
+            m_pToolbar->set_item_image_mirrored(sId, aImageItem.IsMirrored());
+            auto xGraphic(vcl::CommandInfoProvider::GetXGraphicForCommand(m_aCommandURL, m_xFrame, m_pToolbar->get_icon_size()));
+            m_pToolbar->set_item_image(sId, xGraphic);
+            m_bMirrored = !m_bMirrored;
         }
         else
             m_pToolbar->set_item_active(sId, false);
@@ -218,6 +228,7 @@ void GenericToolbarController::statusChanged( const FeatureStateEvent& Event )
     ItemStatus      aItemState;
     Visibility      aItemVisibility;
     ControlCommand  aControlCommand;
+    SfxImageItem    aImageItem;
 
     if (( Event.State >>= bValue ) && !m_bEnumCommand )
     {
@@ -293,6 +304,15 @@ void GenericToolbarController::statusChanged( const FeatureStateEvent& Event )
         if ( m_bMadeInvisible )
             m_xToolbar->ShowItem( m_nID );
     }
+    else if ( aImageItem.PutValue( Event.State, 0 ) && aImageItem.IsMirrored() != m_bMirrored )
+    {
+        m_xToolbar->SetItemImageMirrorMode( m_nID, aImageItem.IsMirrored() );
+        Image aImage( vcl::CommandInfoProvider::GetImageForCommand( m_aCommandURL, m_xFrame, m_xToolbar->GetImageSize() ));
+        m_xToolbar->SetItemImage( m_nID, aImage );
+        m_bMirrored = !m_bMirrored;
+        if ( m_bMadeInvisible )
+            m_xToolbar->ShowItem( m_nID );
+    }
     else if ( m_bMadeInvisible )
         m_xToolbar->ShowItem( m_nID );
 
@@ -316,6 +336,99 @@ IMPL_STATIC_LINK( GenericToolbarController, ExecuteHdl_Impl, void*, p, void )
    }
 
    delete pExecuteInfo;
+}
+
+ImageOrientationController::ImageOrientationController(const Reference<XComponentContext>& rContext,
+                                                       const Reference<XFrame>& rFrame,
+                                                       const Reference<css::awt::XWindow>& rParentWindow,
+                                                       const OUString& rModuleName)
+    : ToolboxController(rContext, rFrame, ".uno:ImageOrientation")
+    , m_nRotationAngle(0_deg10)
+    , m_bMirrored(false)
+{
+    m_sModuleName = rModuleName;
+    m_xParentWindow = rParentWindow;
+    initialize({});
+    if (!m_pToolbar)
+        VCLUnoHelper::GetWindow(getParent())->AddEventListener(LINK(this, ImageOrientationController, WindowEventListener));
+}
+
+void ImageOrientationController::dispose()
+{
+    ToolboxController::dispose();
+    VclPtr<vcl::Window> pWindow = VCLUnoHelper::GetWindow(getParent());
+    if (pWindow)
+        pWindow->RemoveEventListener(LINK(this, ImageOrientationController, WindowEventListener));
+}
+
+IMPL_LINK(ImageOrientationController, WindowEventListener, VclWindowEvent&, rWindowEvent, void)
+{
+    if (m_bDisposed || rWindowEvent.GetId() != VclEventId::ToolboxItemAdded)
+        return;
+
+    ToolBox* pToolBox = static_cast<ToolBox*>(rWindowEvent.GetWindow());
+    ToolBoxItemId nItemId = pToolBox->GetItemId(reinterpret_cast<sal_IntPtr>(rWindowEvent.GetData()));
+    OUString aCommand = pToolBox->GetItemCommand(nItemId);
+
+    if (vcl::CommandInfoProvider::IsMirrored(aCommand, getModuleName()))
+        pToolBox->SetItemImageMirrorMode(nItemId, m_bMirrored);
+    if (vcl::CommandInfoProvider::IsRotated(aCommand, getModuleName()))
+        pToolBox->SetItemImageAngle(nItemId, m_nRotationAngle);
+}
+
+void ImageOrientationController::statusChanged(const css::frame::FeatureStateEvent& rEvent)
+{
+    if (m_bDisposed)
+        throw DisposedException();
+
+    SfxImageItem aItem;
+    aItem.PutValue(rEvent.State, 0);
+
+    if (m_bMirrored == aItem.IsMirrored() && m_nRotationAngle == aItem.GetRotation())
+        return;
+
+    m_bMirrored = aItem.IsMirrored();
+    m_nRotationAngle = aItem.GetRotation();
+
+    if (m_pToolbar)
+    {
+        for (int i = 0, nCount = m_pToolbar->get_n_items(); i < nCount; ++i)
+        {
+            OString aCommand = m_pToolbar->get_item_ident(i);
+            if (vcl::CommandInfoProvider::IsMirrored(OUString::fromUtf8(aCommand), getModuleName()))
+            {
+                m_pToolbar->set_item_image_mirrored(aCommand, m_bMirrored);
+                auto xGraphic(vcl::CommandInfoProvider::GetXGraphicForCommand(
+                    OUString::fromUtf8(aCommand), m_xFrame, m_pToolbar->get_icon_size()));
+                m_pToolbar->set_item_image(aCommand, xGraphic);
+            }
+        }
+    }
+    else
+    {
+        ToolBox* pToolBox = static_cast<ToolBox*>(VCLUnoHelper::GetWindow(getParent()));
+        for (ToolBox::ImplToolItems::size_type i = 0; i < pToolBox->GetItemCount(); ++i)
+        {
+            ToolBoxItemId nItemId = pToolBox->GetItemId(i);
+            OUString aCommand = pToolBox->GetItemCommand(nItemId);
+            bool bModified = false;
+            if (vcl::CommandInfoProvider::IsMirrored(aCommand, getModuleName()))
+            {
+                pToolBox->SetItemImageMirrorMode(nItemId, m_bMirrored);
+                bModified = true;
+            }
+            if (vcl::CommandInfoProvider::IsRotated(aCommand, getModuleName()))
+            {
+                pToolBox->SetItemImageAngle(nItemId, m_nRotationAngle);
+                bModified = true;
+            }
+            if (bModified)
+            {
+                Image aImage(vcl::CommandInfoProvider::GetImageForCommand(aCommand, m_xFrame, pToolBox->GetImageSize()));
+                pToolBox->SetItemImage(nItemId, aImage);
+            }
+        }
+    }
 }
 
 } // namespace

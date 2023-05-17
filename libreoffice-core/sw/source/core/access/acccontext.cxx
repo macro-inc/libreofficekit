@@ -21,16 +21,13 @@
 #include <swtypes.hxx>
 
 #include <com/sun/star/accessibility/XAccessible.hpp>
-#include <com/sun/star/accessibility/XAccessibleStateSet.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
-#include <osl/mutex.hxx>
 #include <sal/log.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <i18nlangtag/languagetag.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <viewsh.hxx>
 #include <crsrsh.hxx>
@@ -442,9 +439,11 @@ void SwAccessibleContext::InvalidateFocus_()
 
 void SwAccessibleContext::FireAccessibleEvent( AccessibleEventObject& rEvent )
 {
-    OSL_ENSURE( GetFrame(), "fire event for disposed frame?" );
     if( !GetFrame() )
+    {
+        SAL_WARN("sw.a11y", "SwAccessibleContext::FireAccessibleEvent called for already disposed frame?");
         return;
+    }
 
     if( !rEvent.Source.is() )
     {
@@ -464,7 +463,7 @@ void SwAccessibleContext::FireVisibleDataEvent()
     FireAccessibleEvent( aEvent );
 }
 
-void SwAccessibleContext::FireStateChangedEvent( sal_Int16 nState,
+void SwAccessibleContext::FireStateChangedEvent( sal_Int64 nState,
                                                  bool bNewState )
 {
     AccessibleEventObject aEvent;
@@ -478,35 +477,34 @@ void SwAccessibleContext::FireStateChangedEvent( sal_Int16 nState,
     FireAccessibleEvent( aEvent );
 }
 
-void SwAccessibleContext::GetStates(
-        ::utl::AccessibleStateSetHelper& rStateSet )
+void SwAccessibleContext::GetStates( sal_Int64& rStateSet )
 {
     SolarMutexGuard aGuard;
 
     // SHOWING
     if (m_isShowingState)
-        rStateSet.AddState( AccessibleStateType::SHOWING );
+        rStateSet |= AccessibleStateType::SHOWING;
 
     // EDITABLE
     if (m_isEditableState)
     //Set editable state to graphic and other object when the document is editable
     {
-        rStateSet.AddState( AccessibleStateType::EDITABLE );
-        rStateSet.AddState( AccessibleStateType::RESIZABLE );
-        rStateSet.AddState( AccessibleStateType::MOVEABLE );
+        rStateSet |= AccessibleStateType::EDITABLE;
+        rStateSet |= AccessibleStateType::RESIZABLE;
+        rStateSet |= AccessibleStateType::MOVEABLE;
     }
     // ENABLED
-    rStateSet.AddState( AccessibleStateType::ENABLED );
+    rStateSet |= AccessibleStateType::ENABLED;
 
     // OPAQUE
     if (m_isOpaqueState)
-        rStateSet.AddState( AccessibleStateType::OPAQUE );
+        rStateSet |= AccessibleStateType::OPAQUE;
 
     // VISIBLE
-    rStateSet.AddState( AccessibleStateType::VISIBLE );
+    rStateSet |= AccessibleStateType::VISIBLE;
 
     if (m_isDefuncState)
-        rStateSet.AddState( AccessibleStateType::DEFUNC );
+        rStateSet |= AccessibleStateType::DEFUNC;
 }
 
 bool SwAccessibleContext::IsEditableState()
@@ -520,9 +518,14 @@ bool SwAccessibleContext::IsEditableState()
     return bRet;
 }
 
+bool SwAccessibleContext::IsDisposed() const
+{
+    return !(GetFrame() && GetMap());
+}
+
 void SwAccessibleContext::ThrowIfDisposed()
 {
-    if (!(GetFrame() && GetMap()))
+    if (IsDisposed())
     {
         throw lang::DisposedException("object is nonfunctional",
                 static_cast<cppu::OWeakObject*>(this));
@@ -566,7 +569,7 @@ uno::Reference< XAccessibleContext > SAL_CALL
     return xRet;
 }
 
-sal_Int32 SAL_CALL SwAccessibleContext::getAccessibleChildCount()
+sal_Int64 SAL_CALL SwAccessibleContext::getAccessibleChildCount()
 {
     SolarMutexGuard aGuard;
 
@@ -576,11 +579,14 @@ sal_Int32 SAL_CALL SwAccessibleContext::getAccessibleChildCount()
 }
 
 uno::Reference< XAccessible> SAL_CALL
-    SwAccessibleContext::getAccessibleChild( sal_Int32 nIndex )
+    SwAccessibleContext::getAccessibleChild( sal_Int64 nIndex )
 {
     SolarMutexGuard aGuard;
 
     ThrowIfDisposed();
+
+    if (nIndex < 0 || nIndex >= getAccessibleChildCount())
+        throw lang::IndexOutOfBoundsException();
 
     const SwAccessibleChild aChild( GetChild( *(GetMap()), nIndex ) );
     if( !aChild.IsValid() )
@@ -692,7 +698,7 @@ uno::Reference< XAccessible> SAL_CALL SwAccessibleContext::getAccessibleParent()
     return getAccessibleParentImpl();
 }
 
-sal_Int32 SAL_CALL SwAccessibleContext::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL SwAccessibleContext::getAccessibleIndexInParent()
 {
     SolarMutexGuard aGuard;
 
@@ -701,7 +707,7 @@ sal_Int32 SAL_CALL SwAccessibleContext::getAccessibleIndexInParent()
     const SwFrame *pUpper = GetParent();
     OSL_ENSURE( pUpper != nullptr || m_isDisposing, "no upper found" );
 
-    sal_Int32 nIndex = -1;
+    sal_Int64 nIndex = -1;
     if( pUpper )
     {
         ::rtl::Reference < SwAccessibleContext > xAccImpl(
@@ -732,22 +738,20 @@ uno::Reference< XAccessibleRelationSet> SAL_CALL
     return xRet;
 }
 
-uno::Reference<XAccessibleStateSet> SAL_CALL
-    SwAccessibleContext::getAccessibleStateSet()
+sal_Int64 SAL_CALL SwAccessibleContext::getAccessibleStateSet()
 {
     SolarMutexGuard aGuard;
 
     ThrowIfDisposed();
 
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet =
-        new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if (m_isSelectedInDoc)
-        pStateSet->AddState( AccessibleStateType::SELECTED );
+        nStateSet |= AccessibleStateType::SELECTED;
 
-    GetStates( *pStateSet );
+    GetStates( nStateSet );
 
-    return pStateSet;
+    return nStateSet;
 }
 
 lang::Locale SAL_CALL SwAccessibleContext::getLocale()

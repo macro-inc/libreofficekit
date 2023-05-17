@@ -9,11 +9,10 @@
 
 #include <algorithm>
 #include <memory>
-#include <string_view>
 #include <swmodeltestbase.hxx>
 
 #include <com/sun/star/awt/FontSlant.hpp>
-#include <com/sun/star/awt/Gradient.hpp>
+#include <com/sun/star/awt/Gradient2.hpp>
 #include <com/sun/star/container/XIndexReplace.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
 #include <com/sun/star/drawing/PointSequenceSequence.hpp>
@@ -51,6 +50,8 @@
 #include <svl/PasswordHelper.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <vcl/filter/PDFiumLibrary.hxx>
+#include <comphelper/scopeguard.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 
 #include <docufld.hxx> // for SwHiddenTextField::ParseIfFieldDefinition() method call
 #include <unoprnms.hxx>
@@ -62,65 +63,35 @@
 #include <docsh.hxx>
 #include <IDocumentLayoutAccess.hxx>
 #include <rootfrm.hxx>
+#include <o3tl/string_view.hxx>
 
 class Test : public SwModelTestBase
 {
 public:
     Test() : SwModelTestBase("/sw/qa/extras/odfexport/data/", "writer8") {}
 
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        // Only test import of .odt document
-        return OString(filename).endsWith(".odt");
-    }
-
     bool mustValidate(const char* /*filename*/) const override
     {
         return true;
     }
-
-    virtual std::unique_ptr<Resetter> preTest(const char* pFilename) override
-    {
-        if (pFilename == std::string_view("fdo58949.docx"))
-        {
-            std::unique_ptr<Resetter> pResetter(new Resetter(
-                [] () {
-                    std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
-                            comphelper::ConfigurationChanges::create());
-                    officecfg::Office::Common::Filter::Microsoft::Import::MathTypeToMath::set(true, pBatch);
-                    return pBatch->commit();
-                }));
-
-            std::shared_ptr<comphelper::ConfigurationChanges> pBatch(comphelper::ConfigurationChanges::create());
-            officecfg::Office::Common::Filter::Microsoft::Import::MathTypeToMath::set(false, pBatch);
-            pBatch->commit();
-            return pResetter;
-        }
-        if (pFilename == std::string_view("2_MathType3.docx"))
-        {
-            std::unique_ptr<Resetter> pResetter(new Resetter(
-                [this] () {
-                    mpFilter = "writer8";
-                    std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
-                            comphelper::ConfigurationChanges::create());
-                    officecfg::Office::Common::Cache::Writer::OLE_Objects::set(20, pBatch);
-                    return pBatch->commit();
-                }));
-            mpFilter = "OpenDocument Text Flat XML"; // doesn't happen with ODF package
-            std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
-                    comphelper::ConfigurationChanges::create());
-            officecfg::Office::Common::Cache::Writer::OLE_Objects::set(1, pBatch);
-            pBatch->commit();
-            return pResetter;
-        }
-        return nullptr;
-    }
 };
 
-DECLARE_ODFEXPORT_TEST(testMathObjectFlatExport, "2_MathType3.docx")
+CPPUNIT_TEST_FIXTURE(Test, testMathObjectFlatExport)
 {
+    comphelper::ScopeGuard g([this]() {
+        mpFilter = "writer8";
+        std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
+            comphelper::ConfigurationChanges::create());
+        officecfg::Office::Common::Cache::Writer::OLE_Objects::set(20, pBatch);
+        return pBatch->commit();
+    });
+    mpFilter = "OpenDocument Text Flat XML"; // doesn't happen with ODF package
+    std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
+        comphelper::ConfigurationChanges::create());
+    officecfg::Office::Common::Cache::Writer::OLE_Objects::set(1, pBatch);
+    pBatch->commit();
+    loadAndReload("2_MathType3.docx");
+
     uno::Reference<util::XModifiable> xModifiable(mxComponent, uno::UNO_QUERY);
     CPPUNIT_ASSERT(!xModifiable->isModified());
     // see preTest(), set the OLE cache to 1 for this test
@@ -158,7 +129,7 @@ static void testTdf43569_CheckIfFieldParse()
         OUString paramTrue;
         OUString paramFalse;
 
-        SwHiddenTextField::ParseIfFieldDefinition("IF A B C", paramCondition, paramTrue, paramFalse);
+        SwHiddenTextField::ParseIfFieldDefinition(u"IF A B C", paramCondition, paramTrue, paramFalse);
 
         CPPUNIT_ASSERT_EQUAL(OUString("A"), paramCondition);
         CPPUNIT_ASSERT_EQUAL(OUString("B"), paramTrue);
@@ -170,7 +141,7 @@ static void testTdf43569_CheckIfFieldParse()
         OUString paramTrue;
         OUString paramFalse;
 
-        SwHiddenTextField::ParseIfFieldDefinition("  IF AAA BBB CCC  ", paramCondition, paramTrue, paramFalse);
+        SwHiddenTextField::ParseIfFieldDefinition(u"  IF AAA BBB CCC  ", paramCondition, paramTrue, paramFalse);
 
         CPPUNIT_ASSERT_EQUAL(OUString("AAA"), paramCondition);
         CPPUNIT_ASSERT_EQUAL(OUString("BBB"), paramTrue);
@@ -182,7 +153,7 @@ static void testTdf43569_CheckIfFieldParse()
         OUString paramTrue;
         OUString paramFalse;
 
-        SwHiddenTextField::ParseIfFieldDefinition("  IF AAA \"BBB\" \"CCC\"  ", paramCondition, paramTrue, paramFalse);
+        SwHiddenTextField::ParseIfFieldDefinition(u"  IF AAA \"BBB\" \"CCC\"  ", paramCondition, paramTrue, paramFalse);
 
         CPPUNIT_ASSERT_EQUAL(OUString("AAA"), paramCondition);
         CPPUNIT_ASSERT_EQUAL(OUString("BBB"), paramTrue);
@@ -195,7 +166,7 @@ static void testTdf43569_CheckIfFieldParse()
         OUString paramTrue;
         OUString paramFalse;
 
-        SwHiddenTextField::ParseIfFieldDefinition("  IF A A A \"B B B\" \"C C C\"  ", paramCondition, paramTrue, paramFalse);
+        SwHiddenTextField::ParseIfFieldDefinition(u"  IF A A A \"B B B\" \"C C C\"  ", paramCondition, paramTrue, paramFalse);
 
         CPPUNIT_ASSERT_EQUAL(OUString("A A A"), paramCondition);
         CPPUNIT_ASSERT_EQUAL(OUString("B B B"), paramTrue);
@@ -208,7 +179,7 @@ static void testTdf43569_CheckIfFieldParse()
         OUString paramTrue;
         OUString paramFalse;
 
-        SwHiddenTextField::ParseIfFieldDefinition("IF A1 A2 A3 \"B1 B2 \" \" C1 C2\"  ", paramCondition, paramTrue, paramFalse);
+        SwHiddenTextField::ParseIfFieldDefinition(u"IF A1 A2 A3 \"B1 B2 \" \" C1 C2\"  ", paramCondition, paramTrue, paramFalse);
 
         CPPUNIT_ASSERT_EQUAL(OUString("A1 A2 A3"), paramCondition);
         CPPUNIT_ASSERT_EQUAL(OUString("B1 B2 "), paramTrue);
@@ -221,7 +192,7 @@ static void testTdf43569_CheckIfFieldParse()
         OUString paramTrue;
         OUString paramFalse;
 
-        SwHiddenTextField::ParseIfFieldDefinition("IF condition \"\" \"\"  ", paramCondition, paramTrue, paramFalse);
+        SwHiddenTextField::ParseIfFieldDefinition(u"IF condition \"\" \"\"  ", paramCondition, paramTrue, paramFalse);
 
         CPPUNIT_ASSERT_EQUAL(OUString("condition"), paramCondition);
         CPPUNIT_ASSERT_EQUAL(OUString(""), paramTrue);
@@ -232,8 +203,9 @@ static void testTdf43569_CheckIfFieldParse()
 // Input document contains only one IF-field,
 // and it should be imported as com.sun.star.text.TextField.ConditionalText in any case,
 // instead of insertion of the pair of two field-marks: <field:fieldmark-start> + <field:fieldmark-end>.
-DECLARE_ODFEXPORT_TEST(testTdf43569, "tdf43569_conditionalfield.doc")
+CPPUNIT_TEST_FIXTURE(Test, testTdf43569)
 {
+    loadAndReload("tdf43569_conditionalfield.doc");
     // check if our parser is valid
     testTdf43569_CheckIfFieldParse();
 
@@ -246,14 +218,16 @@ DECLARE_ODFEXPORT_TEST(testTdf43569, "tdf43569_conditionalfield.doc")
     CPPUNIT_ASSERT(xFields->hasMoreElements());
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf130314, "tdf130314.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf130314)
 {
+    loadAndReload("tdf130314.docx");
     // Without the fix in place, this test would have hung
     CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testTdf133487, "MadeByLO7.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf133487)
 {
+    loadAndReload("MadeByLO7.odt");
     CPPUNIT_ASSERT_EQUAL(3, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
@@ -268,8 +242,9 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testTdf133487, "MadeByLO7.odt")
     assertXPath(pXmlDoc, "/office:document-content/office:automatic-styles/style:style[@style:name = /office:document-content/office:body/office:text/text:p[3]/draw:custom-shape[@draw:z-index = '1']/attribute::draw:style-name]/style:graphic-properties", "run-through", "foreground");
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testTdf141467, "Formcontrol needs high z-index.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf141467)
 {
+    loadAndReload("Formcontrol needs high z-index.odt");
     CPPUNIT_ASSERT_EQUAL(2, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
@@ -299,8 +274,9 @@ DECLARE_ODFEXPORT_TEST(testTdf139126, "tdf139126.odt")
     CPPUNIT_ASSERT_EQUAL(OUString("** Expression is faulty **"), xE2->getString());
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf125877, "tdf95806.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf125877)
 {
+    loadAndReload("tdf95806.docx");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     uno::Reference<text::XTextTablesSupplier> xSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xTables(xSupplier->getTextTables(), uno::UNO_QUERY);
@@ -314,6 +290,16 @@ DECLARE_ODFEXPORT_TEST(testTdf125877, "tdf95806.docx")
     uno::Reference<text::XTextFramesSupplier> xTextFramesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xIndexAccess(xTextFramesSupplier->getTextFrames(), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_Int32(1), xIndexAccess->getCount());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf150149)
+{
+    loadAndReload("tdf150149.fodt");
+    CPPUNIT_ASSERT_EQUAL(1, getPages());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+    // This was 0 (lost table header in multi-column section)
+    assertXPath(pXmlDoc, "//table:table-header-rows", 1);
+    assertXPath(pXmlDoc, "//table:table-header-rows/table:table-row/table:table-cell", 3);
 }
 
 DECLARE_ODFEXPORT_TEST(testTdf103567, "tdf103567.odt")
@@ -353,8 +339,9 @@ DECLARE_ODFEXPORT_TEST(testTdf103567, "tdf103567.odt")
     CPPUNIT_ASSERT_EQUAL(sal_Int32( 408), rect.Height);
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testUserFieldDecl, "user-field-decl.odt")
+CPPUNIT_TEST_FIXTURE(Test, testUserFieldDecl)
 {
+    loadAndReload("user-field-decl.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
     // Without the accompanying fix in place, this test would have failed with 'Expected: 2;
@@ -363,8 +350,9 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testUserFieldDecl, "user-field-decl.odt")
     assertXPath(pXmlDoc, "//style:header/text:user-field-decls/text:user-field-decl", 2);
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testUserFieldDeclFly, "user-field-decl-fly.odt")
+CPPUNIT_TEST_FIXTURE(Test, testUserFieldDeclFly)
 {
+    loadAndReload("user-field-decl-fly.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
@@ -391,17 +379,17 @@ DECLARE_ODFEXPORT_TEST(testFramebackgrounds, "framebackgrounds.odt")
     //Frame 2
     xTextFrame = getShape(2);
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_SOLID, getProperty<drawing::FillStyle>(xTextFrame, "FillStyle"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x006600), Color(ColorTransparency, getProperty<util::Color>(xTextFrame, "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x006600), getProperty<Color>(xTextFrame, "FillColor"));
     CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(xTextFrame, "FillTransparence"));
     //Frame 3
     xTextFrame = getShape(3);
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_SOLID, getProperty<drawing::FillStyle>(xTextFrame, "FillStyle"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x006600), Color(ColorTransparency, getProperty<util::Color>(xTextFrame, "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x006600), getProperty<Color>(xTextFrame, "FillColor"));
     CPPUNIT_ASSERT_EQUAL(sal_Int32(45), getProperty<sal_Int32>(xTextFrame, "FillTransparence"));
     //Frame 4
     xTextFrame = getShape(4);
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_SOLID, getProperty<drawing::FillStyle>(xTextFrame, "FillStyle"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x579D1C), Color(ColorTransparency, getProperty<util::Color>(xTextFrame, "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x579D1C), getProperty<Color>(xTextFrame, "FillColor"));
     aGradientxTextFrame = getProperty<awt::Gradient>(xTextFrame, "FillTransparenceGradient");
     CPPUNIT_ASSERT_EQUAL(css::awt::GradientStyle_LINEAR, aGradientxTextFrame.Style);
     //Frame 5
@@ -490,8 +478,9 @@ DECLARE_ODFEXPORT_TEST(testFramebackgrounds, "framebackgrounds.odt")
     aGradientxTextFrame = getProperty<awt::Gradient>(xTextFrame, "FillTransparenceGradient");
     CPPUNIT_ASSERT_EQUAL(css::awt::GradientStyle_LINEAR, aGradientxTextFrame.Style);
 
-    if (xmlDocUniquePtr pXmlDoc = parseExport("content.xml"))
+    if (isExported())
     {
+        xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
         // check that there are 3 background-image elements
         assertXPath(pXmlDoc, "//style:style[@style:parent-style-name='Frame' and @style:family='graphic']/style:graphic-properties[@draw:fill='bitmap']/style:background-image[@style:repeat='stretch']", 3);
         // tdf#90640: check that one of them is 55% opaque
@@ -514,8 +503,9 @@ DECLARE_SW_ROUNDTRIP_TEST(testSHA1Wrong, "sha1_wrong.odt", "10123456789012345678
     getParagraph(1, "012");
 }
 
-DECLARE_ODFEXPORT_TEST(testOOoxmlEmbedded, "oooxml_embedded.sxw")
+CPPUNIT_TEST_FIXTURE(Test, testOOoxmlEmbedded)
 {
+    loadAndReload("oooxml_embedded.sxw");
     uno::Reference<text::XTextEmbeddedObjectsSupplier> xTEOSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XNameAccess> xAccess(xTEOSupplier->getEmbeddedObjects());
     uno::Sequence<OUString> aSeq(xAccess->getElementNames());
@@ -581,15 +571,17 @@ DECLARE_ODFEXPORT_TEST(testTdf140437, "tdf140437.odt")
     CPPUNIT_ASSERT(xFields->hasMoreElements());
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf131621, "tdf131621.ott")
+CPPUNIT_TEST_FIXTURE(Test, testTdf131621)
 {
+    loadAndReload("tdf131621.ott");
     CPPUNIT_ASSERT_EQUAL(12, getShapes());
     //Crash test, Check number of pages
     CPPUNIT_ASSERT_EQUAL( 1, getPages() );
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf135144, "tdf135144.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf135144)
 {
+    loadAndReload("tdf135144.docx");
     //Crashes at import time after roundtrip
     CPPUNIT_ASSERT_EQUAL(3, getPages());
     CPPUNIT_ASSERT_EQUAL(4, getShapes());
@@ -629,8 +621,9 @@ DECLARE_ODFEXPORT_TEST(testFdo38244, "fdo38244.odt")
     CPPUNIT_ASSERT_EQUAL(OUString("M"), getProperty<OUString>(xPropertySet, "Initials"));
 }
 
-DECLARE_ODFEXPORT_TEST(testSenderInitials, "sender-initials.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testSenderInitials)
 {
+    loadAndReload("sender-initials.fodt");
     // Test sender-initial properties (both annotation metadata and text field)
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
@@ -661,21 +654,22 @@ DECLARE_ODFEXPORT_TEST(testResolvedComment, "resolved-comment.odt")
     CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xPropertySet, "Resolved"));
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf92379, "tdf92379.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf92379)
 {
+    loadAndReload("tdf92379.fodt");
     // frame style fo:background-color was not imported
     uno::Reference<container::XNameAccess> xStyles(getStyles("FrameStyles"));
     uno::Reference<beans::XPropertySet> xStyle(xStyles->getByName("encarts"),
             uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(Color(0xffcc99), Color(ColorTransparency, getProperty<sal_Int32>(xStyle, "BackColorRGB")));
+    CPPUNIT_ASSERT_EQUAL(Color(0xffcc99), getProperty<Color>(xStyle, "BackColorRGB"));
     CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(xStyle, "BackColorTransparency"));
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_SOLID, getProperty<drawing::FillStyle>(xStyle, "FillStyle"));
-    CPPUNIT_ASSERT_EQUAL(Color(0xffcc99), Color(ColorTransparency, getProperty<sal_Int32>(xStyle, "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0xffcc99), getProperty<Color>(xStyle, "FillColor"));
     CPPUNIT_ASSERT_EQUAL(sal_Int16(0), getProperty<sal_Int16>(xStyle, "FillTransparence"));
 
     uno::Reference<beans::XPropertySet> xFrameStyle2(xStyles->getByName("Untitled1"),
             uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(COL_WHITE, Color(ColorTransparency, getProperty<sal_Int32>(xFrameStyle2, "BackColorRGB")));
+    CPPUNIT_ASSERT_EQUAL(COL_WHITE, getProperty<Color>(xFrameStyle2, "BackColorRGB"));
     CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xFrameStyle2, "BackTransparent"));
     CPPUNIT_ASSERT_EQUAL(sal_Int32(100), getProperty<sal_Int32>(xFrameStyle2, "BackColorTransparency"));
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_NONE, getProperty<drawing::FillStyle>(xFrameStyle2, "FillStyle"));
@@ -683,8 +677,9 @@ DECLARE_ODFEXPORT_TEST(testTdf92379, "tdf92379.fodt")
 //    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xffffff), getProperty<sal_Int32>(xFrameStyle2, "FillColor"));
 //    CPPUNIT_ASSERT_EQUAL(sal_Int16(100), getProperty<sal_Int16>(xFrameStyle2, "FillTransparence"));
 
-    if (xmlDocUniquePtr pXmlDoc = parseExport("styles.xml"))
+    if (isExported())
     {
+        xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
         // check that fo:background-color attribute is exported properly
         assertXPath(pXmlDoc, "//style:style[@style:family='graphic' and @style:name='encarts']/style:graphic-properties[@fo:background-color='#ffcc99']", 1);
         assertXPath(pXmlDoc, "//style:style[@style:family='graphic' and @style:name='Untitled1']/style:graphic-properties[@fo:background-color='transparent']", 1);
@@ -695,44 +690,45 @@ DECLARE_ODFEXPORT_TEST(testTdf92379, "tdf92379.fodt")
     uno::Reference<container::XNameAccess> xParaStyles(getStyles("ParagraphStyles"));
     uno::Reference<beans::XPropertySet> xStyle1(xParaStyles->getByName(
             "Titre Avis expert"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(Color(0x661900), Color(ColorTransparency, getProperty<sal_Int32>(xStyle1, "ParaBackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x661900), getProperty<Color>(xStyle1, "ParaBackColor"));
     CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xStyle1, "ParaBackTransparent"));
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_SOLID, getProperty<drawing::FillStyle>(xStyle1, "FillStyle"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x661900), Color(ColorTransparency, getProperty<sal_Int32>(xStyle1, "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x661900), getProperty<Color>(xStyle1, "FillColor"));
     CPPUNIT_ASSERT_EQUAL(sal_Int16(0), getProperty<sal_Int16>(xStyle1, "FillTransparence"));
-    CPPUNIT_ASSERT_EQUAL(COL_WHITE, Color(ColorTransparency, getProperty<sal_Int32>(xStyle1, "CharColor")));
+    CPPUNIT_ASSERT_EQUAL(COL_WHITE, getProperty<Color>(xStyle1, "CharColor"));
 
     uno::Reference<beans::XPropertySet> xStyle2(xParaStyles->getByName(
             "Avis expert questions"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(COL_TRANSPARENT, Color(ColorTransparency, getProperty<sal_Int32>(xStyle2, "ParaBackColor")));
+    CPPUNIT_ASSERT_EQUAL(COL_TRANSPARENT, getProperty<Color>(xStyle2, "ParaBackColor"));
     CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xStyle2, "ParaBackTransparent"));
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_NONE, getProperty<drawing::FillStyle>(xStyle2, "FillStyle"));
 // unfortunately this is actually the pool default value, which would be hard to fix - but it isn't a problem because style is NONE
 //    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xffffff), getProperty<sal_Int32>(xStyle2, "FillColor"));
 //    CPPUNIT_ASSERT_EQUAL(sal_Int16(100), getProperty<sal_Int16>(xStyle2, "FillTransparence"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x661900), Color(ColorTransparency, getProperty<sal_Int32>(xStyle2, "CharColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x661900), getProperty<Color>(xStyle2, "CharColor"));
 
     uno::Reference<beans::XPropertySet> xStyle31(xParaStyles->getByName(
             "avis expert questions non cadres"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(Color(0x801900), Color(ColorTransparency, getProperty<sal_Int32>(xStyle31, "ParaBackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x801900), getProperty<Color>(xStyle31, "ParaBackColor"));
     CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xStyle31, "ParaBackTransparent"));
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_SOLID, getProperty<drawing::FillStyle>(xStyle31, "FillStyle"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x801900), Color(ColorTransparency, getProperty<sal_Int32>(xStyle31, "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x801900), getProperty<Color>(xStyle31, "FillColor"));
     CPPUNIT_ASSERT_EQUAL(sal_Int16(0), getProperty<sal_Int16>(xStyle31, "FillTransparence"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x661900), Color(ColorTransparency, getProperty<sal_Int32>(xStyle31, "CharColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x661900), getProperty<Color>(xStyle31, "CharColor"));
 
     uno::Reference<beans::XPropertySet> xStyle32(xParaStyles->getByName(
             "Avis expert rXponses"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(COL_TRANSPARENT, Color(ColorTransparency, getProperty<sal_Int32>(xStyle32, "ParaBackColor")));
+    CPPUNIT_ASSERT_EQUAL(COL_TRANSPARENT, getProperty<Color>(xStyle32, "ParaBackColor"));
     CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xStyle32, "ParaBackTransparent"));
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_NONE, getProperty<drawing::FillStyle>(xStyle32, "FillStyle"));
 // unfortunately this is actually the pool default value, which would be hard to fix - but it isn't a problem because style is NONE
 //    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xffffff), getProperty<sal_Int32>(xStyle32, "FillColor"));
 //    CPPUNIT_ASSERT_EQUAL(sal_Int16(100), getProperty<sal_Int16>(xStyle32, "FillTransparence"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x461900), Color(ColorTransparency, getProperty<sal_Int32>(xStyle32, "CharColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x461900), getProperty<Color>(xStyle32, "CharColor"));
 
-    if (xmlDocUniquePtr pXmlDoc = parseExport("styles.xml"))
+    if (isExported())
     {
+        xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
         // check that fo:background-color attribute is exported properly
         assertXPath(pXmlDoc, "//style:style[@style:family='paragraph' and @style:display-name='Titre Avis expert']/style:paragraph-properties[@fo:background-color='#661900']", 1);
         assertXPath(pXmlDoc, "//style:style[@style:family='paragraph' and @style:display-name='Avis expert questions']/style:paragraph-properties[@fo:background-color='transparent']", 1);
@@ -757,8 +753,8 @@ DECLARE_ODFEXPORT_TEST(testFdo79358, "fdo79358.odt")
         getProperty< uno::Reference<container::XIndexReplace> >(xTOCProps,
             "LevelParagraphStyles"));
     uno::Sequence<OUString> seq { "Heading" };
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(seq), xLevels->getByIndex(1));
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(uno::Sequence<OUString>()), xLevels->getByIndex(2));
+    CPPUNIT_ASSERT_EQUAL(uno::Any(seq), xLevels->getByIndex(1));
+    CPPUNIT_ASSERT_EQUAL(uno::Any(uno::Sequence<OUString>()), xLevels->getByIndex(2));
 }
 
 DECLARE_ODFEXPORT_TEST(testFirstHeaderFooter, "first-header-footer.odt")
@@ -791,21 +787,37 @@ DECLARE_ODFEXPORT_TEST(testTextframeGradient, "textframe-gradient.odt")
 
     uno::Reference<beans::XPropertySet> xFrame(xIndexAccess->getByIndex(0), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_GRADIENT, getProperty<drawing::FillStyle>(xFrame, "FillStyle"));
-    awt::Gradient aGradient = getProperty<awt::Gradient>(xFrame, "FillGradient");
-    CPPUNIT_ASSERT_EQUAL(Color(0xC0504D), Color(ColorTransparency, aGradient.StartColor));
-    CPPUNIT_ASSERT_EQUAL(Color(0xD99594), Color(ColorTransparency, aGradient.EndColor));
+    awt::Gradient2 aGradient = getProperty<awt::Gradient2>(xFrame, "FillGradient");
+
+    // MCGR: Use the completely imported gradient to check for correctness
+    basegfx::ColorStops aColorStops;
+    basegfx::utils::fillColorStopsFromGradient2(aColorStops, aGradient);
+
+    CPPUNIT_ASSERT_EQUAL(size_t(2), aColorStops.size());
+    CPPUNIT_ASSERT(basegfx::fTools::equal(aColorStops[0].getStopOffset(), 0.0));
+    CPPUNIT_ASSERT_EQUAL(aColorStops[0].getStopColor(), basegfx::BColor(0.75294117647058822, 0.31372549019607843, 0.30196078431372547));
+    CPPUNIT_ASSERT(basegfx::fTools::equal(aColorStops[1].getStopOffset(), 1.0));
+    CPPUNIT_ASSERT_EQUAL(aColorStops[1].getStopColor(), basegfx::BColor(0.85098039215686272, 0.58431372549019611, 0.58039215686274515));
     CPPUNIT_ASSERT_EQUAL(awt::GradientStyle_AXIAL, aGradient.Style);
 
     xFrame.set(xIndexAccess->getByIndex(1), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(drawing::FillStyle_GRADIENT, getProperty<drawing::FillStyle>(xFrame, "FillStyle"));
-    aGradient = getProperty<awt::Gradient>(xFrame, "FillGradient");
-    CPPUNIT_ASSERT_EQUAL(COL_BLACK, Color(ColorTransparency, aGradient.StartColor));
-    CPPUNIT_ASSERT_EQUAL(Color(0x666666), Color(ColorTransparency, aGradient.EndColor));
+    aGradient = getProperty<awt::Gradient2>(xFrame, "FillGradient");
+
+    // MCGR: Use the completely imported gradient to check for correctness
+    basegfx::utils::fillColorStopsFromGradient2(aColorStops, aGradient);
+
+    CPPUNIT_ASSERT_EQUAL(size_t(2), aColorStops.size());
+    CPPUNIT_ASSERT(basegfx::fTools::equal(aColorStops[0].getStopOffset(), 0.0));
+    CPPUNIT_ASSERT_EQUAL(aColorStops[0].getStopColor(), basegfx::BColor(0.0, 0.0, 0.0));
+    CPPUNIT_ASSERT(basegfx::fTools::equal(aColorStops[1].getStopOffset(), 1.0));
+    CPPUNIT_ASSERT_EQUAL(aColorStops[1].getStopColor(), basegfx::BColor(0.40000000000000002, 0.40000000000000002, 0.40000000000000002));
     CPPUNIT_ASSERT_EQUAL(awt::GradientStyle_AXIAL, aGradient.Style);
 }
 
-DECLARE_ODFEXPORT_TEST(testDuplicateCrossRefHeadingBookmark, "CrossRefHeadingBookmark.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testDuplicateCrossRefHeadingBookmark)
 {
+    loadAndReload("CrossRefHeadingBookmark.fodt");
     // the file contains invalid duplicate heading cross reference bookmarks
     // but we have to round trip them, tdf#94804
 
@@ -897,18 +909,30 @@ DECLARE_ODFEXPORT_TEST(testTdf115815, "tdf115815.odt")
     CPPUNIT_ASSERT_EQUAL(OUString("Lorem "), sTextBeforeAnnotation);
 }
 
-DECLARE_ODFEXPORT_TEST(testFdo58949, "fdo58949.docx")
+CPPUNIT_TEST_FIXTURE(Test, testFdo58949)
 {
+    comphelper::ScopeGuard g([]() {
+        std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
+            comphelper::ConfigurationChanges::create());
+        officecfg::Office::Common::Filter::Microsoft::Import::MathTypeToMath::set(true, pBatch);
+        pBatch->commit();
+    });
+
+    std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
+        comphelper::ConfigurationChanges::create());
+    officecfg::Office::Common::Filter::Microsoft::Import::MathTypeToMath::set(false, pBatch);
+    pBatch->commit();
+    loadAndReload("fdo58949.docx");
+
     /*
      * The problem was that the exporter didn't insert "Obj102" to the
      * resulting zip file. No idea how to check for "broken" (missing OLE data
      * and replacement image) OLE objects using UNO, so we'll check the zip file directly.
      */
 
-    utl::TempFile aTempFile;
-    save("writer8", aTempFile);
+    save("writer8");
 
-    uno::Sequence<uno::Any> aArgs{ uno::Any(aTempFile.GetURL()) };
+    uno::Sequence<uno::Any> aArgs{ uno::Any(maTempFile.GetURL()) };
     uno::Reference<container::XNameAccess> xNameAccess(m_xSFactory->createInstanceWithArguments("com.sun.star.packages.zip.ZipFileAccess", aArgs), uno::UNO_QUERY);
     const css::uno::Sequence<OUString> aNames(xNameAccess->getElementNames());
     // The exported document must have three objects named ObjNNN. The names are assigned in
@@ -931,8 +955,9 @@ DECLARE_ODFEXPORT_TEST(testFdo58949, "fdo58949.docx")
     CPPUNIT_ASSERT_EQUAL(3, nMatches);
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf134987, "tdf134987.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf134987)
 {
+    loadAndReload("tdf134987.docx");
     uno::Reference<text::XTextEmbeddedObjectsSupplier> xTEOSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XNameAccess> xAccess(xTEOSupplier->getEmbeddedObjects());
     uno::Sequence<OUString> aSeq(xAccess->getElementNames());
@@ -955,7 +980,7 @@ DECLARE_ODFEXPORT_TEST(testTdf134987, "tdf134987.docx")
     }
     // checking second object (chart)
     {
-        uno::Reference<document::XEmbeddedObjectSupplier> xEOSupplier(xAccess->getByName("Object2"), uno::UNO_QUERY);
+        uno::Reference<document::XEmbeddedObjectSupplier> xEOSupplier(xAccess->getByName("Diagram 1"), uno::UNO_QUERY);
         uno::Reference<lang::XComponent> xObj(xEOSupplier->getEmbeddedObject());
         CPPUNIT_ASSERT(xObj.is());
 
@@ -969,7 +994,7 @@ DECLARE_ODFEXPORT_TEST(testTdf134987, "tdf134987.docx")
     }
     // checking third object (chart)
     {
-        uno::Reference<document::XEmbeddedObjectSupplier> xEOSupplier(xAccess->getByName("Object3"), uno::UNO_QUERY);
+        uno::Reference<document::XEmbeddedObjectSupplier> xEOSupplier(xAccess->getByName("Diagram 2"), uno::UNO_QUERY);
         uno::Reference<lang::XComponent> xObj(xEOSupplier->getEmbeddedObject());
         CPPUNIT_ASSERT(xObj.is());
 
@@ -1045,7 +1070,7 @@ DECLARE_ODFEXPORT_TEST(testCharacterBorder, "charborder.odt")
 
         // Shadow
         const table::ShadowFormat aShadow = getProperty<table::ShadowFormat>(xSet,"ParaShadowFormat");
-        CPPUNIT_ASSERT_EQUAL(sal_Int32(0), aShadow.Color);
+        CPPUNIT_ASSERT_EQUAL(COL_BLACK, Color(ColorTransparency, aShadow.Color));
         CPPUNIT_ASSERT_EQUAL(false, static_cast<bool>(aShadow.IsTransparent));
         CPPUNIT_ASSERT_EQUAL(table::ShadowLocation(0), aShadow.Location);
         CPPUNIT_ASSERT_EQUAL(sal_Int16(0), aShadow.ShadowWidth);
@@ -1116,7 +1141,7 @@ DECLARE_ODFEXPORT_TEST(testCharacterBorder, "charborder.odt")
             table::BorderLine2(0xFF3333,0,37,0,14,37),     // Top (fine dashed line)
             table::BorderLine2(0x99FF66,26,26,53,11,106),  // Bottom
             table::BorderLine2(0x6666FF,9,26,9,12,71),     // Left
-            table::BorderLine2(0,0,0,0,0,0)                // Right
+            table::BorderLine2(0,0,0,0,table::BorderLineStyle::NONE,0) // Right
         };
 
         sal_Int32 aDistances[4] = { 400 /*Top*/, 300 /*Bottom*/, 250 /*Left*/, 0 /*Right*/ };
@@ -1142,7 +1167,7 @@ DECLARE_ODFEXPORT_TEST(testCharacterBorder, "charborder.odt")
 
         // Shadow
         const table::ShadowFormat aShadow = getProperty<table::ShadowFormat>(xSet,"CharShadowFormat");
-        CPPUNIT_ASSERT_EQUAL(sal_Int32(0), aShadow.Color);
+        CPPUNIT_ASSERT_EQUAL(COL_BLACK, Color(ColorTransparency, aShadow.Color));
         CPPUNIT_ASSERT_EQUAL(false, static_cast<bool>(aShadow.IsTransparent));
         CPPUNIT_ASSERT_EQUAL(table::ShadowLocation(3), aShadow.Location);
         CPPUNIT_ASSERT_EQUAL(sal_Int16(79), aShadow.ShadowWidth);
@@ -1171,8 +1196,9 @@ DECLARE_ODFEXPORT_TEST(testCharacterBorder, "charborder.odt")
     }
 }
 
-DECLARE_ODFEXPORT_TEST(testProtectionKey, "protection-key.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testProtectionKey)
 {
+    loadAndReload("protection-key.fodt");
     OUString const password("1012345678901234567890123456789012345678901234567890");
 
     // check 1 invalid OOo legacy password and 3 valid ODF 1.2 passwords
@@ -1193,8 +1219,9 @@ DECLARE_ODFEXPORT_TEST(testProtectionKey, "protection-key.fodt")
 
     // we can't assume that the user entered the password; check that we
     // round-trip the password as-is
-    if (xmlDocUniquePtr pXmlDoc = parseExport("content.xml"))
+    if (isExported())
     {
+        xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
         assertXPath(pXmlDoc, "//text:section[@text:name='Section0' and @text:protected='true' and @text:protection-key='vbnhxyBKtPHCA1wB21zG1Oha8ZA=']");
         assertXPath(pXmlDoc, "//text:section[@text:name='Section1' and @text:protected='true' and @text:protection-key='nLHas0RIwepGDaH4c2hpyIUvIS8=']");
         assertXPath(pXmlDoc, "//text:section[@text:name='Section2' and @text:protected='true' and @text:protection-key-digest-algorithm='http://www.w3.org/2000/09/xmldsig#sha256' and @text:protection-key='1tnJohagR2T0yF/v69hLPuumSTsj32CumW97nkKGuSQ=']");
@@ -1202,8 +1229,9 @@ DECLARE_ODFEXPORT_TEST(testProtectionKey, "protection-key.fodt")
     }
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf128188, "footnote-collect-at-end-of-section.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf128188)
 {
+    loadAndReload("footnote-collect-at-end-of-section.fodt");
     SwDoc *const pDoc = dynamic_cast<SwXTextDocument&>(*mxComponent).GetDocShell()->GetDoc();
     CPPUNIT_ASSERT(pDoc);
     SwFootnoteIdxs const& rFootnotes(pDoc->GetFootnoteIdxs());
@@ -1235,8 +1263,9 @@ DECLARE_ODFEXPORT_TEST(testFdo43807, "fdo43807.odt")
     CPPUNIT_ASSERT_EQUAL(OUString("User Defined Drop Caps"),getProperty<OUString>(xSet,"DropCapCharStyleName"));
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf103091, "tdf103091.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf103091)
 {
+    loadAndReload("tdf103091.fodt");
     // check that all conditional paragraph style conditions are imported
     uno::Reference<container::XNameAccess> xParaStyles(getStyles("ParagraphStyles"));
     uno::Reference<beans::XPropertySet> xStyle1(xParaStyles->getByName(
@@ -1245,61 +1274,61 @@ DECLARE_ODFEXPORT_TEST(testTdf103091, "tdf103091.fodt")
 
     CPPUNIT_ASSERT_EQUAL(sal_Int32(28), conditions.getLength());
     CPPUNIT_ASSERT_EQUAL(OUString("TableHeader"), conditions[0].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Addressee")), conditions[0].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Addressee")), conditions[0].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("Table"), conditions[1].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Bibliography 1")), conditions[1].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Bibliography 1")), conditions[1].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("Frame"), conditions[2].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Bibliography Heading")), conditions[2].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Bibliography Heading")), conditions[2].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("Section"), conditions[3].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Caption")), conditions[3].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Caption")), conditions[3].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("Footnote"), conditions[4].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Salutation")), conditions[4].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Salutation")), conditions[4].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("Endnote"), conditions[5].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 1")), conditions[5].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 1")), conditions[5].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("Header"), conditions[6].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 2")), conditions[6].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 2")), conditions[6].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("Footer"), conditions[7].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 3")), conditions[7].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 3")), conditions[7].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel1"), conditions[8].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 4")), conditions[8].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 4")), conditions[8].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel2"), conditions[9].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 5")), conditions[9].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 5")), conditions[9].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel3"), conditions[10].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 6")), conditions[10].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 6")), conditions[10].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel4"), conditions[11].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 7")), conditions[11].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 7")), conditions[11].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel5"), conditions[12].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 8")), conditions[12].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 8")), conditions[12].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel6"), conditions[13].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 9")), conditions[13].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 9")), conditions[13].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel7"), conditions[14].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents 10")), conditions[14].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents 10")), conditions[14].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel8"), conditions[15].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Contents Heading")), conditions[15].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Contents Heading")), conditions[15].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel9"), conditions[16].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Standard")), conditions[16].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Standard")), conditions[16].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("OutlineLevel10"), conditions[17].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Drawing")), conditions[17].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Drawing")), conditions[17].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel1"), conditions[18].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Endnote")), conditions[18].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Endnote")), conditions[18].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel2"), conditions[19].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("First line indent")), conditions[19].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("First line indent")), conditions[19].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel3"), conditions[20].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Footer")), conditions[20].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Footer")), conditions[20].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel4"), conditions[21].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Footer left")), conditions[21].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Footer left")), conditions[21].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel5"), conditions[22].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Footer right")), conditions[22].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Footer right")), conditions[22].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel6"), conditions[23].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Footnote")), conditions[23].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Footnote")), conditions[23].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel7"), conditions[24].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Frame contents")), conditions[24].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Frame contents")), conditions[24].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel8"), conditions[25].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Hanging indent")), conditions[25].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Hanging indent")), conditions[25].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel9"), conditions[26].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Header")), conditions[26].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Header")), conditions[26].Value);
     CPPUNIT_ASSERT_EQUAL(OUString("NumberingLevel10"), conditions[27].Name);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(OUString("Header left")), conditions[27].Value);
+    CPPUNIT_ASSERT_EQUAL(uno::Any(OUString("Header left")), conditions[27].Value);
 }
 
 DECLARE_ODFEXPORT_TEST(testTextframeTransparentShadow, "textframe-transparent-shadow.odt")
@@ -1405,9 +1434,12 @@ DECLARE_ODFEXPORT_TEST(testTextboxRoundedCorners, "textbox-rounded-corners.odt")
     CPPUNIT_ASSERT_EQUAL(OUString("a"), xCell->getString());
 
     // Table inside a textbox should be in the extension namespace.
-    if (xmlDocUniquePtr pXmlDoc = parseExport("content.xml"))
+    if (isExported())
+    {
+        xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
         // This failed, as draw:custom-shape had a table:table child.
         assertXPath(pXmlDoc, "//draw:custom-shape/loext:table", "name", "Table1");
+    }
 }
 
 // test that import whitespace collapsing is compatible with old docs
@@ -1814,19 +1846,20 @@ DECLARE_ODFEXPORT_TEST(testBtlrFrame, "btlr-frame.odt")
     CPPUNIT_ASSERT(pFlyFrame);
     CPPUNIT_ASSERT(pFlyFrame->IsVertLRBT());
 
-    if (!mbExported)
+    if (!isExported())
         // Not yet exported, don't modify the doc model for test purposes.
         return;
 
     // Make sure that btlr -> tbrl transition clears the "BT" flag.
-    xTextFrame->setPropertyValue("WritingMode", uno::makeAny(text::WritingMode2::TB_LR));
+    xTextFrame->setPropertyValue("WritingMode", uno::Any(text::WritingMode2::TB_LR));
     pFlyFrame = dynamic_cast<SwFlyFrame*>(rAnchored[0]);
     CPPUNIT_ASSERT(pFlyFrame);
     CPPUNIT_ASSERT(!pFlyFrame->IsVertLRBT());
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf129520, "tdf129520.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf129520)
 {
+    loadAndReload("tdf129520.docx");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     CPPUNIT_ASSERT_EQUAL(OUString("M"), getParagraph(1)->getString());
 
@@ -1951,8 +1984,9 @@ DECLARE_ODFEXPORT_TEST(testMasterPageWithDrawingPage, "sw_hatch.odt")
     CPPUNIT_ASSERT_EQUAL(sal_Int16(0), getProperty<sal_Int16>(xStyle, "FillTransparence"));
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testPageStyleBackgroundFullSizeOOo, "pagestyle_background_ooo33.odt")
+CPPUNIT_TEST_FIXTURE(Test, testPageStyleBackgroundFullSizeOOo)
 {
+    loadAndReload("pagestyle_background_ooo33.odt");
     CPPUNIT_ASSERT_EQUAL(3, getPages());
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
     // Standard
@@ -2008,8 +2042,9 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testPageStyleBackgroundFullSizeOOo, "pagestyle
         "]/style:drawing-page-properties", "fill-image-ref-point", "top-left");
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testPageStyleBackgroundFullSizeLO64, "pagestyle_background_lo64.odt")
+CPPUNIT_TEST_FIXTURE(Test, testPageStyleBackgroundFullSizeLO64)
 {
+    loadAndReload("pagestyle_background_lo64.odt");
     CPPUNIT_ASSERT_EQUAL(6, getPages());
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
     // Standard
@@ -2116,8 +2151,9 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testPageStyleBackgroundFullSizeLO64, "pagestyl
         "]/style:drawing-page-properties", "opacity", "100%");
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testPageStyleBackgroundFullSizeLO70, "pagestyle_background_lo70.odt")
+CPPUNIT_TEST_FIXTURE(Test, testPageStyleBackgroundFullSizeLO70)
 {
+    loadAndReload("pagestyle_background_lo70.odt");
     CPPUNIT_ASSERT_EQUAL(6, getPages());
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
     // Standard
@@ -2224,8 +2260,9 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testPageStyleBackgroundFullSizeLO70, "pagestyl
         "]/style:drawing-page-properties", "opacity", "100%");
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testFillBitmapUnused, "fillbitmap3.odt")
+CPPUNIT_TEST_FIXTURE(Test, testFillBitmapUnused)
 {
+    loadAndReload("fillbitmap3.odt");
     CPPUNIT_ASSERT_EQUAL(4, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // nav_5f_home and all its references are completely gone
@@ -2292,9 +2329,9 @@ DECLARE_ODFEXPORT_TEST(testCellUserDefineAttr, "userdefattr-tablecell.odt")
     uno::Reference<table::XCell> const xCellA1(xTable->getCellByName("A1"), uno::UNO_SET_THROW);
     uno::Reference<table::XCell> const xCellB1(xTable->getCellByName("B1"), uno::UNO_SET_THROW);
     uno::Reference<table::XCell> const xCellC1(xTable->getCellByName("C1"), uno::UNO_SET_THROW);
-    getUserDefineAttribute(uno::makeAny(xCellA1), "proName", "v1");
-    getUserDefineAttribute(uno::makeAny(xCellB1), "proName", "v2");
-    getUserDefineAttribute(uno::makeAny(xCellC1), "proName", "v3");
+    getUserDefineAttribute(uno::Any(xCellA1), "proName", "v1");
+    getUserDefineAttribute(uno::Any(xCellB1), "proName", "v2");
+    getUserDefineAttribute(uno::Any(xCellC1), "proName", "v3");
 }
 
 DECLARE_ODFEXPORT_TEST(testEmbeddedPdf, "embedded-pdf.odt")
@@ -2317,7 +2354,7 @@ DECLARE_ODFEXPORT_TEST(testEmbeddedPdf, "embedded-pdf.odt")
     // This was image/x-vclgraphic, not exposing the info that the image is a PDF one.
     CPPUNIT_ASSERT_EQUAL(OUString("application/pdf"), getProperty<OUString>(xGraphic, "MimeType"));
 
-    if (mbExported)
+    if (isExported())
     {
         uno::Sequence<uno::Any> aArgs{ uno::Any(maTempFile.GetURL()) };
         uno::Reference<container::XNameAccess> xNameAccess(m_xSFactory->createInstanceWithArguments("com.sun.star.packages.zip.ZipFileAccess", aArgs), uno::UNO_QUERY);
@@ -2347,12 +2384,10 @@ DECLARE_ODFEXPORT_TEST(testTableStyles1, "table_styles_1.odt")
     uno::Reference<beans::XPropertySet> xCell1Style;
     xCellFamily->getByName("Test style.1") >>= xCell1Style;
 
-    sal_Int64 nInt64 = 0xF0F0F0;
     sal_Int32 nInt32 = 0xF0F0F0;
     table::BorderLine2 oBorder;
 
-    xCell1Style->getPropertyValue("BackColor") >>= nInt64;
-    CPPUNIT_ASSERT_EQUAL(sal_Int64(0xCC0000), nInt64);
+    CPPUNIT_ASSERT_EQUAL(Color(0xCC0000), getProperty<Color>(xCell1Style, "BackColor"));
     xCell1Style->getPropertyValue("WritingMode") >>= nInt32;
     CPPUNIT_ASSERT_EQUAL(sal_Int32(4), nInt32);
     xCell1Style->getPropertyValue("VertOrient") >>= nInt32;
@@ -2370,11 +2405,11 @@ DECLARE_ODFEXPORT_TEST(testTableStyles1, "table_styles_1.odt")
     xCell1Style->getPropertyValue("RightBorder") >>= oBorder;
     CPPUNIT_ASSERT_EQUAL(sal_Int32(0), oBorder.Color);
     xCell1Style->getPropertyValue("LeftBorder") >>= oBorder;
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), oBorder.Color);
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, Color(ColorTransparency, oBorder.Color));
     xCell1Style->getPropertyValue("TopBorder") >>= oBorder;
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), oBorder.Color);
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, Color(ColorTransparency, oBorder.Color));
     xCell1Style->getPropertyValue("BottomBorder") >>= oBorder;
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), oBorder.Color);
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, Color(ColorTransparency, oBorder.Color));
 }
 
 DECLARE_ODFEXPORT_TEST(testTableStyles2, "table_styles_2.odt")
@@ -2393,7 +2428,6 @@ DECLARE_ODFEXPORT_TEST(testTableStyles2, "table_styles_2.odt")
     bool bBool = true;
     sal_Int16 nInt16 = 0xF0;
     sal_Int32 nInt32 = 0xF0F0F0;
-    sal_Int64 nInt64 = 0xF0F0F0;
     OUString sString;
     awt::FontSlant eCharPosture;
 
@@ -2401,8 +2435,7 @@ DECLARE_ODFEXPORT_TEST(testTableStyles2, "table_styles_2.odt")
     xTableStyle->getByName("first-row-start-column") >>= xCell1Style;
     xCell1Style->getPropertyValue("ParaAdjust") >>= nInt32;
     CPPUNIT_ASSERT_EQUAL(sal_Int32(0), nInt32);
-    xCell1Style->getPropertyValue("CharColor") >>= nInt64;
-    CPPUNIT_ASSERT_EQUAL(sal_Int64(0xFF6600), nInt64);
+    CPPUNIT_ASSERT_EQUAL(Color(0xFF6600), getProperty<Color>(xCell1Style, "CharColor"));
     xCell1Style->getPropertyValue("CharContoured") >>= bBool;
     CPPUNIT_ASSERT_EQUAL(false, bBool);
     xCell1Style->getPropertyValue("CharShadowed") >>= bBool;
@@ -2466,8 +2499,7 @@ DECLARE_ODFEXPORT_TEST(testTableStyles2, "table_styles_2.odt")
     xTableStyle->getByName("first-row") >>= xCell1Style;
     xCell1Style->getPropertyValue("ParaAdjust") >>= nInt32;
     CPPUNIT_ASSERT_EQUAL(sal_Int32(3), nInt32);
-    xCell1Style->getPropertyValue("CharColor") >>= nInt64;
-    CPPUNIT_ASSERT_EQUAL(sal_Int64(0x9900FF), nInt64);
+    CPPUNIT_ASSERT_EQUAL(Color(0x9900FF), getProperty<Color>(xCell1Style, "CharColor"));
     xCell1Style->getPropertyValue("CharContoured") >>= bBool;
     CPPUNIT_ASSERT_EQUAL(true, bBool);
     xCell1Style->getPropertyValue("CharShadowed") >>= bBool;
@@ -2527,8 +2559,7 @@ DECLARE_ODFEXPORT_TEST(testTableStyles2, "table_styles_2.odt")
     xTableStyle->getByName("first-row-even-column") >>= xCell1Style;
     xCell1Style->getPropertyValue("ParaAdjust") >>= nInt32;
     CPPUNIT_ASSERT_EQUAL(sal_Int32(1), nInt32);
-    xCell1Style->getPropertyValue("CharColor") >>= nInt64;
-    CPPUNIT_ASSERT_EQUAL(sal_Int64(0), nInt64);
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(xCell1Style, "CharColor"));
     xCell1Style->getPropertyValue("CharContoured") >>= bBool;
     CPPUNIT_ASSERT_EQUAL(true, bBool);
     xCell1Style->getPropertyValue("CharShadowed") >>= bBool;
@@ -2585,8 +2616,9 @@ DECLARE_ODFEXPORT_TEST(testTableStyles2, "table_styles_2.odt")
     CPPUNIT_ASSERT_EQUAL(sal_Int16(2), nInt16);
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testTableStyles3, "table_styles_3.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTableStyles3)
 {
+    loadAndReload("table_styles_3.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // This test checks if default valued attributes aren't exported.
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
@@ -2647,7 +2679,7 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testTableStyles3, "table_styles_3.odt")
 
 CPPUNIT_TEST_FIXTURE(Test, testTableStyles4)
 {
-    load(mpTestDocumentPath, "table_styles_4.odt");
+    createSwDoc("table_styles_4.odt");
     // Test if loaded styles overwrite existing styles
     uno::Reference<style::XStyleFamiliesSupplier> XFamiliesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XNameAccess> xFamilies(XFamiliesSupplier->getStyleFamilies());
@@ -2656,11 +2688,12 @@ CPPUNIT_TEST_FIXTURE(Test, testTableStyles4)
     uno::Reference<beans::XPropertySet> xCell1Style;
 
     xTableStyle->getByName("first-row-start-column") >>= xCell1Style;
-    CPPUNIT_ASSERT_EQUAL(Color(0x00ff00), Color(ColorTransparency, getProperty<sal_Int32>(xCell1Style, "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x00ff00), getProperty<Color>(xCell1Style, "BackColor"));
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testTableStyles5, "table_styles_5.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTableStyles5)
 {
+    loadAndReload("table_styles_5.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Test if cell styles doesn't have a style:parent-style-name attribute.
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
@@ -2684,6 +2717,18 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testTableStyles5, "table_styles_5.odt")
 
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testTdf145226)
+{
+    loadAndReload("tdf145226.fodt");
+    CPPUNIT_ASSERT_EQUAL(1, getPages());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+
+    assertXPathNoAttribute(pXmlDoc, "/office:document-content/office:body/office:text/table:table/table:table-row[1]", "style-name");
+    assertXPathNoAttribute(pXmlDoc, "/office:document-content/office:body/office:text/table:table/table:table-row[2]", "style-name");
+    assertXPathNoAttribute(pXmlDoc, "/office:document-content/office:body/office:text/table:table/table:table-row[3]", "style-name");
+    assertXPathNoAttribute(pXmlDoc, "/office:document-content/office:body/office:text/table:table/table:table-row[4]", "style-name");
+}
+
 DECLARE_ODFEXPORT_TEST(testTdf101710, "tdf101710.odt")
 {
     CPPUNIT_ASSERT_EQUAL(1, getPages());
@@ -2692,20 +2737,22 @@ DECLARE_ODFEXPORT_TEST(testTdf101710, "tdf101710.odt")
     CPPUNIT_ASSERT_EQUAL(sal_uInt32(10104), getProperty<sal_uInt32>(xStyle, "NumberFormat"));
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf129568, "tdf129568.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf129568)
 {
+    loadAndReload("tdf129568.fodt");
     // Test that export doesn't fail, and that style is imported and in use.
     uno::Reference<style::XStyle> xStyle(getStyles("CellStyles")->getByName("Default Style.1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT(xStyle->isInUse());
-    CPPUNIT_ASSERT_EQUAL(Color(0xffff00), Color(ColorTransparency, getProperty<sal_Int32>(xStyle, "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0xffff00), getProperty<Color>(xStyle, "BackColor"));
 }
 
-DECLARE_ODFEXPORT_TEST(testTdf129568ui, "tdf129568-ui.fodt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf129568ui)
 {
+    loadAndReload("tdf129568-ui.fodt");
     // Same as above, but styles referenced by UI name.
     uno::Reference<style::XStyle> xStyle(getStyles("CellStyles")->getByName("Default Style.1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT(xStyle->isInUse());
-    CPPUNIT_ASSERT_EQUAL(Color(0xffff00), Color(ColorTransparency, getProperty<sal_Int32>(xStyle, "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0xffff00), getProperty<Color>(xStyle, "BackColor"));
 }
 
 DECLARE_ODFEXPORT_TEST(testTdf132642_keepWithNextTable, "tdf132642_keepWithNextTable.odt")
@@ -2715,8 +2762,9 @@ DECLARE_ODFEXPORT_TEST(testTdf132642_keepWithNextTable, "tdf132642_keepWithNextT
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Row splits over 2 pages", 2, getPages());
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testImageMimetype, "image-mimetype.odt")
+CPPUNIT_TEST_FIXTURE(Test, testImageMimetype)
 {
+    loadAndReload("image-mimetype.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Test that the loext:mimetype attribute is written for exported images, tdf#109202
@@ -2725,462 +2773,6 @@ DECLARE_ODFEXPORT_EXPORTONLY_TEST(testImageMimetype, "image-mimetype.odt")
     assertXPath(pXmlDoc, "/office:document-content/office:body/office:text/text:p/draw:frame/draw:image[@draw:mime-type='image/svg+xml']");
 }
 
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testEmbeddedFontProps, "embedded-font-props.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-#if !defined(MACOSX)
-    // Test that font style/weight of embedded fonts is exposed.
-    // Test file is a normal ODT, except EmbedFonts is set to true in settings.xml.
-    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
-    // These failed, the attributes were missing.
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[1]", "font-style", "normal");
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[1]", "font-weight", "normal");
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[2]", "font-style", "normal");
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[2]", "font-weight", "bold");
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[3]", "font-style", "italic");
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[3]", "font-weight", "normal");
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[4]", "font-style", "italic");
-    assertXPath(pXmlDoc, "//style:font-face[@style:name='Liberation Serif']/svg:font-face-src/svg:font-face-uri[4]", "font-weight", "bold");
-#endif
-}
-
-DECLARE_ODFEXPORT_TEST(testTdf100492, "tdf100492.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(2, getShapes());
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<drawing::XShape> xShape = getShape(1);
-    CPPUNIT_ASSERT(xShape.is());
-
-    // Save the first shape to a SVG
-    uno::Reference<drawing::XGraphicExportFilter> xGraphicExporter = drawing::GraphicExportFilter::create(comphelper::getProcessComponentContext());
-    uno::Reference<lang::XComponent> xSourceDoc(xShape, uno::UNO_QUERY);
-    xGraphicExporter->setSourceDocument(xSourceDoc);
-
-    SvMemoryStream aStream;
-    uno::Reference<io::XOutputStream> xOutputStream(new utl::OStreamWrapper(aStream));
-    uno::Sequence<beans::PropertyValue> aDescriptor( comphelper::InitPropertySequence({
-            { "OutputStream", uno::Any(xOutputStream) },
-            { "FilterName", uno::Any(OUString("SVG")) }
-        }));
-    xGraphicExporter->filter(aDescriptor);
-    aStream.Seek(STREAM_SEEK_TO_BEGIN);
-
-    // TODO: Disabled. Parsing of SVG gives just root node without any children.
-    // Reason of such behavior unclear. So XPATH assert fails.
-
-    // Parse resulting SVG as XML file.
-    // xmlDocUniquePtr pXmlDoc = parseXmlStream(&aStream);
-
-    // Check amount of paths required to draw an arrow.
-    // Since there are still some empty paths in output test can fail later. There are just two
-    // really used and visible paths.
-    //assertXPath(pXmlDoc, "/svg/path", 4);
-}
-
-DECLARE_ODFEXPORT_TEST(testTdf77961, "tdf77961.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<container::XNameAccess> xStyles(getStyles("PageStyles"));
-    uno::Reference<beans::XPropertySet> xStyle(xStyles->getByName("Standard"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL( false , getProperty<bool>(xStyle, "GridDisplay"));
-    CPPUNIT_ASSERT_EQUAL( false , getProperty<bool>(xStyle, "GridPrint"));
-}
-
-DECLARE_ODFEXPORT_TEST(testReferenceLanguage, "referencelanguage.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(2, getPages());
-    // Test loext:reference-language attribute of reference fields
-    // (used from LibreOffice 6.1, and proposed for next ODF)
-    OUString const aFieldTexts[] = { "A 2", "Az Isten", "Az 50-esek",
-        "A 2018-asok", "Az egyebek", "A fejezetek",
-        u"Az „Őseinket...”", "a 2",
-        "Az v", "az 1", "Az e)", "az 1",
-        "Az (5)", "az 1", "A 2", "az 1" };
-    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
-    // update "A (4)" to "Az (5)"
-    uno::Reference<util::XRefreshable>(xTextFieldsSupplier->getTextFields(), uno::UNO_QUERY_THROW)->refresh();
-
-    uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
-    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
-
-    uno::Any aHu = uno::makeAny(OUString("Hu"));
-    uno::Any ahu = uno::makeAny(OUString("hu"));
-    for (size_t i = 0; i < SAL_N_ELEMENTS(aFieldTexts); i++)
-    {
-        uno::Any aField = xFields->nextElement();
-        uno::Reference<lang::XServiceInfo> xServiceInfo(aField, uno::UNO_QUERY);
-        if (xServiceInfo->supportsService("com.sun.star.text.textfield.GetReference"))
-        {
-            uno::Reference<beans::XPropertySet> xPropertySet(aField, uno::UNO_QUERY);
-            uno::Any aLang = xPropertySet->getPropertyValue("ReferenceFieldLanguage");
-            CPPUNIT_ASSERT_EQUAL(true, aLang == aHu || aLang == ahu);
-            uno::Reference<text::XTextContent> xField(aField, uno::UNO_QUERY);
-            CPPUNIT_ASSERT_EQUAL(aFieldTexts[i], xField->getAnchor()->getString());
-        }
-    }
-}
-
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(testRubyPosition, "ruby-position.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
-
-    assertXPath(pXmlDoc, "//style:style[@style:family='ruby']/style:ruby-properties[@loext:ruby-position='inter-character']", 1);
-    assertXPath(pXmlDoc, "//style:style[@style:family='ruby']/style:ruby-properties[@style:ruby-position='below']", 1);
-}
-
-DECLARE_ODFEXPORT_TEST(testAllowOverlap, "allow-overlap.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(2, getShapes());
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<drawing::XShape> xShape = getShape(1);
-    // Without the accompanying fix in place, this test would have failed with:
-    // - Expression: !getProperty<bool>(xShape, "AllowOverlap")
-    // i.e. the custom AllowOverlap=false shape property was lost on import/export.
-    CPPUNIT_ASSERT(!getProperty<bool>(xShape, "AllowOverlap"));
-    xShape = getShape(2);
-    CPPUNIT_ASSERT(!getProperty<bool>(xShape, "AllowOverlap"));
-}
-
-DECLARE_ODFEXPORT_TEST(testSignatureLineProperties, "signatureline-properties.fodt")
-{
-    uno::Reference<drawing::XShape> xShape = getShape(1);
-    CPPUNIT_ASSERT(xShape.is());
-
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xShape, "IsSignatureLine"));
-    CPPUNIT_ASSERT_EQUAL(OUString("{3C24159B-3B98-4F60-AB52-00E7721758E9}"),
-                         getProperty<OUString>(xShape, "SignatureLineId"));
-    CPPUNIT_ASSERT_EQUAL(OUString("John Doe"),
-                         getProperty<OUString>(xShape, "SignatureLineSuggestedSignerName"));
-    CPPUNIT_ASSERT_EQUAL(OUString("Farmer"),
-                         getProperty<OUString>(xShape, "SignatureLineSuggestedSignerTitle"));
-    CPPUNIT_ASSERT_EQUAL(OUString("john@farmers.org"),
-                         getProperty<OUString>(xShape, "SignatureLineSuggestedSignerEmail"));
-    CPPUNIT_ASSERT_EQUAL(OUString("Please farm here."),
-                         getProperty<OUString>(xShape, "SignatureLineSigningInstructions"));
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xShape, "SignatureLineCanAddComment"));
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xShape, "SignatureLineShowSignDate"));
-
-    // tdf#130917 This needs to be always set when importing a doc, ooxml export expects it.
-    uno::Reference<graphic::XGraphic> xUnsignedGraphic;
-    uno::Reference<beans::XPropertySet> xProps(xShape, uno::UNO_QUERY);
-    xProps->getPropertyValue("SignatureLineUnsignedImage") >>= xUnsignedGraphic;
-    CPPUNIT_ASSERT_EQUAL(true, xUnsignedGraphic.is());
-}
-
-DECLARE_ODFEXPORT_TEST(testQrCodeGenProperties, "qrcode-properties.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getShapes());
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<drawing::XShape> xShape = getShape(1);
-    CPPUNIT_ASSERT(xShape.is());
-
-    css::drawing::BarCode aBarCode = getProperty<css::drawing::BarCode>(xShape, "BarCodeProperties");
-
-    CPPUNIT_ASSERT_EQUAL(OUString("www.libreoffice.org"),
-                         aBarCode.Payload);
-    CPPUNIT_ASSERT_EQUAL(css::drawing::BarCodeErrorCorrection::LOW,
-                         aBarCode.ErrorCorrection);
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(5),
-                         aBarCode.Border);
-}
-
-DECLARE_ODFEXPORT_TEST(testChapterNumberingNewLine, "chapter-number-new-line.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<text::XChapterNumberingSupplier> xNumberingSupplier(mxComponent, uno::UNO_QUERY);
-    uno::Reference<container::XIndexAccess> xNumberingRules = xNumberingSupplier->getChapterNumberingRules();
-    comphelper::SequenceAsHashMap hashMap(xNumberingRules->getByIndex(0));
-
-    //This failed Actual Value was LISTTAB instead of NEWLINE
-    CPPUNIT_ASSERT_EQUAL(
-        sal_Int16(SvxNumberFormat::NEWLINE), hashMap["LabelFollowedBy"].get<sal_Int16>());
-}
-
-DECLARE_ODFEXPORT_TEST(testSpellOutNumberingTypes, "spellout-numberingtypes.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    // ordinal indicator, ordinal and cardinal number numbering styles (from LibreOffice 6.1)
-    OUString const aFieldTexts[] = { "1st", "Erste", "Eins",  "1.", "Premier", "Un", u"1ᵉʳ", "First", "One" };
-    // fallback for old platforms without std::codecvt and std::regex supports
-    OUString const aFieldTextFallbacks[] = { "Ordinal-number 1", "Ordinal 1", "1" };
-    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
-    // update text field content
-    uno::Reference<util::XRefreshable>(xTextFieldsSupplier->getTextFields(), uno::UNO_QUERY_THROW)->refresh();
-
-    uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
-    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
-
-    for (size_t i = 0; i < SAL_N_ELEMENTS(aFieldTexts); i++)
-    {
-        uno::Any aField = xFields->nextElement();
-        uno::Reference<lang::XServiceInfo> xServiceInfo(aField, uno::UNO_QUERY);
-        if (xServiceInfo->supportsService("com.sun.star.text.textfield.PageNumber"))
-        {
-            uno::Reference<text::XTextContent> xField(aField, uno::UNO_QUERY);
-            CPPUNIT_ASSERT_EQUAL(true, aFieldTexts[i].equals(xField->getAnchor()->getString()) ||
-                           aFieldTextFallbacks[i%3].equals(xField->getAnchor()->getString()));
-        }
-    }
-}
-
-// MAILMERGE Add conditional to expand / collapse bookmarks
-DECLARE_ODFEXPORT_TEST(tdf101856_overlapped, "tdf101856_overlapped.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    // get bookmark interface
-    uno::Reference<text::XBookmarksSupplier> xBookmarksSupplier(mxComponent, uno::UNO_QUERY);
-    uno::Reference<container::XIndexAccess> xBookmarksByIdx(xBookmarksSupplier->getBookmarks(), uno::UNO_QUERY);
-    uno::Reference<container::XNameAccess> xBookmarksByName = xBookmarksSupplier->getBookmarks();
-
-    // check: we have 2 bookmarks
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), xBookmarksByIdx->getCount());
-    CPPUNIT_ASSERT(xBookmarksByName->hasByName("BookmarkNonHidden"));
-    CPPUNIT_ASSERT(xBookmarksByName->hasByName("BookmarkHidden"));
-
-    // <text:bookmark-start text:name="BookmarkNonHidden"/>
-    uno::Reference<beans::XPropertySet> xBookmark1(xBookmarksByName->getByName("BookmarkNonHidden"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(OUString(""), getProperty<OUString>(xBookmark1, UNO_NAME_BOOKMARK_CONDITION));
-    CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xBookmark1, UNO_NAME_BOOKMARK_HIDDEN));
-
-    // <text:bookmark-start text:name="BookmarkHidden"/>
-    uno::Reference<beans::XPropertySet> xBookmark2(xBookmarksByName->getByName("BookmarkHidden"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(OUString(""), getProperty<OUString>(xBookmark2, UNO_NAME_BOOKMARK_CONDITION));
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xBookmark2, UNO_NAME_BOOKMARK_HIDDEN));
-}
-
-// MAILMERGE Add conditional to expand / collapse bookmarks
-DECLARE_ODFEXPORT_TEST(tdf101856, "tdf101856.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    // get bookmark interface
-    uno::Reference<text::XBookmarksSupplier> xBookmarksSupplier(mxComponent, uno::UNO_QUERY);
-    uno::Reference<container::XIndexAccess> xBookmarksByIdx(xBookmarksSupplier->getBookmarks(), uno::UNO_QUERY);
-    uno::Reference<container::XNameAccess> xBookmarksByName = xBookmarksSupplier->getBookmarks();
-
-    // check: we have 2 bookmarks
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(5), xBookmarksByIdx->getCount());
-    CPPUNIT_ASSERT(xBookmarksByName->hasByName("BookmarkVisible"));
-    CPPUNIT_ASSERT(xBookmarksByName->hasByName("BookmarkHidden"));
-    CPPUNIT_ASSERT(xBookmarksByName->hasByName("BookmarkVisibleWithCondition"));
-    CPPUNIT_ASSERT(xBookmarksByName->hasByName("BookmarkNotHiddenWithCondition"));
-    CPPUNIT_ASSERT(xBookmarksByName->hasByName("BookmarkHiddenWithCondition"));
-
-    // <text:bookmark-start text:name="BookmarkVisible"/>
-    uno::Reference<beans::XPropertySet> xBookmark1(xBookmarksByName->getByName("BookmarkVisible"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(OUString(""), getProperty<OUString>(xBookmark1, UNO_NAME_BOOKMARK_CONDITION));
-    CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xBookmark1, UNO_NAME_BOOKMARK_HIDDEN));
-
-    // <text:bookmark-start text:name="BookmarkHidden" loext:condition="" loext:hidden="true"/>
-    uno::Reference<beans::XPropertySet> xBookmark2(xBookmarksByName->getByName("BookmarkHidden"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(OUString(""), getProperty<OUString>(xBookmark2, UNO_NAME_BOOKMARK_CONDITION));
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xBookmark2, UNO_NAME_BOOKMARK_HIDDEN));
-
-    // <text:bookmark-start text:name="BookmarkVisibleWithCondition" loext:condition="0==1" loext:hidden="true"/>
-    uno::Reference<beans::XPropertySet> xBookmark3(xBookmarksByName->getByName("BookmarkVisibleWithCondition"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(OUString("0==1"), getProperty<OUString>(xBookmark3, UNO_NAME_BOOKMARK_CONDITION));
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xBookmark3, UNO_NAME_BOOKMARK_HIDDEN));
-
-    // <text:bookmark-start text:name="BookmarkNotHiddenWithCondition" loext:condition="1==1" loext:hidden="false"/>
-    //
-    // The following test doesn't work, while during output in the case of loext:hidden="false".
-    // no additional parameters are written. Implementation should be reviewed.
-    //
-//    uno::Reference<beans::XPropertySet> xBookmark4(xBookmarksByName->getByName("BookmarkNotHiddenWithCondition"), uno::UNO_QUERY);
-//    CPPUNIT_ASSERT_EQUAL(OUString("1==1"), getProperty<OUString>(xBookmark4, UNO_NAME_BOOKMARK_CONDITION));
-//    CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xBookmark4, UNO_NAME_BOOKMARK_HIDDEN));
-
-    // <text:bookmark-start text:name="BookmarkHiddenWithCondition" loext:condition="1==1" loext:hidden="true"/>
-    uno::Reference<beans::XPropertySet> xBookmark5(xBookmarksByName->getByName("BookmarkHiddenWithCondition"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(OUString("1==1"), getProperty<OUString>(xBookmark5, UNO_NAME_BOOKMARK_CONDITION));
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xBookmark5, UNO_NAME_BOOKMARK_HIDDEN));
-}
-
-DECLARE_ODFEXPORT_TEST(tdf118502, "tdf118502.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getShapes());
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<drawing::XShape> xShape = getShape(1);
-    // Make sure the replacement graphic is still there
-    // (was gone because the original graphic was not recognized during load)
-    auto xReplacementGraphic
-        = getProperty<uno::Reference<graphic::XGraphic>>(xShape, "ReplacementGraphic");
-    CPPUNIT_ASSERT(xReplacementGraphic.is());
-}
-
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(tdf99631, "tdf99631.docx")
-{
-    // check import of VisualArea settings of the embedded XLSX OLE objects
-    xmlDocUniquePtr pXmlDoc = parseExport("Object 1/settings.xml");
-    assertXPathContent(pXmlDoc, "//config:config-item[@config:name='VisibleAreaWidth']", "4516");
-    assertXPathContent(pXmlDoc, "//config:config-item[@config:name='VisibleAreaHeight']", "903");
-
-    xmlDocUniquePtr pXmlDoc2 = parseExport("Object 2/settings.xml");
-    assertXPathContent(pXmlDoc2, "//config:config-item[@config:name='VisibleAreaWidth']", "4516");
-    assertXPathContent(pXmlDoc2, "//config:config-item[@config:name='VisibleAreaHeight']", "1355");
-}
-
-DECLARE_ODFEXPORT_TEST(tdf128504, "tdf128504.docx")
-{
-    uno::Reference<text::XTextRange> xPara = getParagraph(6);
-    uno::Reference<beans::XPropertySet> xRun(getRun(xPara,1), uno::UNO_QUERY);
-    OUString unVisitedStyleName = getProperty<OUString>(xRun, "UnvisitedCharStyleName");
-    CPPUNIT_ASSERT(!unVisitedStyleName.equalsIgnoreAsciiCase("Internet Link"));
-    OUString visitedStyleName = getProperty<OUString>(xRun, "VisitedCharStyleName");
-    CPPUNIT_ASSERT(!visitedStyleName.equalsIgnoreAsciiCase("Visited Internet Link"));
-}
-
-DECLARE_ODFEXPORT_TEST(tdf121658, "tdf121658.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<container::XNameAccess> xParaStyles(getStyles("ParagraphStyles"));
-    uno::Reference<beans::XPropertySet> xStyle1(xParaStyles->getByName(
-            "Standard"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xStyle1, "ParaHyphenationNoCaps"));
-}
-
-DECLARE_ODFEXPORT_TEST(testArabicZeroNumbering, "arabic-zero-numbering.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    auto xNumberingRules
-        = getProperty<uno::Reference<container::XIndexAccess>>(getParagraph(1), "NumberingRules");
-    comphelper::SequenceAsHashMap aMap(xNumberingRules->getByIndex(0));
-    // Without the accompanying fix in place, this test would have failed with:
-    // - Expected: 64
-    // - Actual  : 4
-    // i.e. numbering type was ARABIC, not ARABIC_ZERO.
-    CPPUNIT_ASSERT_EQUAL(o3tl::narrowing<sal_uInt16>(style::NumberingType::ARABIC_ZERO),
-                         aMap["NumberingType"].get<sal_uInt16>());
-}
-
-DECLARE_ODFEXPORT_TEST(testArabicZero3Numbering, "arabic-zero3-numbering.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    auto xNumberingRules
-        = getProperty<uno::Reference<container::XIndexAccess>>(getParagraph(1), "NumberingRules");
-    comphelper::SequenceAsHashMap aMap(xNumberingRules->getByIndex(0));
-    // Without the accompanying fix in place, this test would have failed with:
-    // - Expected: 65
-    // - Actual  : 4
-    // i.e. numbering type was ARABIC, not ARABIC_ZERO3.
-    CPPUNIT_ASSERT_EQUAL(o3tl::narrowing<sal_uInt16>(style::NumberingType::ARABIC_ZERO3),
-                         aMap["NumberingType"].get<sal_uInt16>());
-}
-
-DECLARE_ODFEXPORT_TEST(testArabicZero4Numbering, "arabic-zero4-numbering.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    auto xNumberingRules
-        = getProperty<uno::Reference<container::XIndexAccess>>(getParagraph(1), "NumberingRules");
-    comphelper::SequenceAsHashMap aMap(xNumberingRules->getByIndex(0));
-    // Without the accompanying fix in place, this test would have failed with:
-    // - Expected: 66
-    // - Actual  : 4
-    // i.e. numbering type was ARABIC, not ARABIC_ZERO4.
-    CPPUNIT_ASSERT_EQUAL(o3tl::narrowing<sal_uInt16>(style::NumberingType::ARABIC_ZERO4),
-                         aMap["NumberingType"].get<sal_uInt16>());
-}
-
-DECLARE_ODFEXPORT_TEST(testArabicZero5Numbering, "arabic-zero5-numbering.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    auto xNumberingRules
-        = getProperty<uno::Reference<container::XIndexAccess>>(getParagraph(1), "NumberingRules");
-    comphelper::SequenceAsHashMap aMap(xNumberingRules->getByIndex(0));
-    // Without the accompanying fix in place, this test would have failed with:
-    // - Expected: 67
-    // - Actual  : 4
-    // i.e. numbering type was ARABIC, not ARABIC_ZERO5.
-    CPPUNIT_ASSERT_EQUAL(o3tl::narrowing<sal_uInt16>(style::NumberingType::ARABIC_ZERO5),
-                         aMap["NumberingType"].get<sal_uInt16>());
-}
-
-DECLARE_ODFEXPORT_TEST(testRovasNumbering, "rovas-numbering.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    auto xNumberingRules
-        = getProperty<uno::Reference<container::XIndexAccess>>(getParagraph(1), "NumberingRules");
-    comphelper::SequenceAsHashMap aMap(xNumberingRules->getByIndex(0));
-    // Without the accompanying fix in place, this test would have failed with:
-    // - Expected: 68
-    // - Actual  : 4
-    // i.e. numbering type was ARABIC, not SZEKELY_ROVAS.
-    CPPUNIT_ASSERT_EQUAL(o3tl::narrowing<sal_uInt16>(style::NumberingType::SZEKELY_ROVAS),
-                         aMap["NumberingType"].get<sal_uInt16>());
-}
-
-DECLARE_ODFEXPORT_TEST(testPageContentTop, "page-content-top.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getShapes());
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<beans::XPropertySet> xShape(getShape(1), uno::UNO_QUERY);
-    sal_Int16 nExpected = text::RelOrientation::PAGE_PRINT_AREA_TOP;
-    CPPUNIT_ASSERT_EQUAL(nExpected, getProperty<sal_Int16>(xShape, "VertOrientRelation"));
-}
-
-DECLARE_ODFEXPORT_TEST(testPageContentBottom, "page-content-bottom.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getShapes());
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<beans::XPropertySet> xShape(getShape(1), uno::UNO_QUERY);
-    sal_Int16 nExpected = text::RelOrientation::PAGE_PRINT_AREA_BOTTOM;
-    CPPUNIT_ASSERT_EQUAL(nExpected, getProperty<sal_Int16>(xShape, "VertOrientRelation"));
-}
-
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(tdf124470, "tdf124470TableAndEmbeddedUsedFonts.odt")
-{
-    // Table styles were exported out of place, inside font-face-decls.
-    // Without the fix in place, this will fail already in ODF validation:
-    // "content.xml[2,2150]:  Error: tag name "style:style" is not allowed. Possible tag names are: <font-face>"
-
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-
-    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
-
-    assertXPath(pXmlDoc, "/office:document-content/office:font-face-decls/style:style", 0);
-    assertXPath(pXmlDoc, "/office:document-content/office:automatic-styles/style:style[@style:family='table']", 1);
-    assertXPath(pXmlDoc, "/office:document-content/office:automatic-styles/style:style[@style:family='table-column']", 2);
-    assertXPath(pXmlDoc, "/office:document-content/office:automatic-styles/style:style[@style:family='paragraph']", 1);
-}
-
-DECLARE_ODFEXPORT_EXPORTONLY_TEST(tdf135942, "nestedTableInFooter.odt")
-{
-    // All table autostyles should be collected, including nested, and must not crash.
-
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-
-    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
-
-    assertXPath(pXmlDoc, "/office:document-styles/office:automatic-styles/style:style[@style:family='table']", 2);
-}
-
-CPPUNIT_TEST_FIXTURE(Test, tdf150927)
-{
-    // Similar to tdf135942
-
-    loadAndReload("table-in-frame-in-table-in-header-base.odt");
-    // All table autostyles should be collected, including nested, and must not crash.
-
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-
-    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
-
-    assertXPath(pXmlDoc, "/office:document-styles/office:automatic-styles/style:style[@style:family='table']", 2);
-}
-
-DECLARE_ODFEXPORT_TEST(testGutterLeft, "gutter-left.odt")
-{
-    CPPUNIT_ASSERT_EQUAL(1, getPages());
-    uno::Reference<beans::XPropertySet> xPageStyle;
-    getStyles("PageStyles")->getByName("Standard") >>= xPageStyle;
-    sal_Int32 nGutterMargin{};
-    xPageStyle->getPropertyValue("GutterMargin") >>= nGutterMargin;
-    // Without the accompanying fix in place, this test would have failed with:
-    // - Expected: 1270
-    // - Actual  : 0
-    // i.e. gutter margin was lost.
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1270), nGutterMargin);
-}
 
 CPPUNIT_PLUGIN_IMPLEMENT();
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

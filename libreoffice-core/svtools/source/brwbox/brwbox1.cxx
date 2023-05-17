@@ -19,6 +19,7 @@
 
 #include <svtools/brwbox.hxx>
 #include <svtools/brwhead.hxx>
+#include <svtools/scrolladaptor.hxx>
 #include <o3tl/numeric.hxx>
 #include <o3tl/safeint.hxx>
 #include "datwin.hxx"
@@ -26,7 +27,6 @@
 #include <tools/fract.hxx>
 #include <sal/log.hxx>
 #include <vcl/InterimItemWindow.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 
@@ -101,7 +101,7 @@ void BrowseBox::ConstructImpl( BrowserMode nMode )
     uRow.nSel = BROWSER_ENDOFSELECTION;
 
     aHScroll->SetLineSize(1);
-    aHScroll->SetScrollHdl( LINK( this, BrowseBox, ScrollHdl ) );
+    aHScroll->SetScrollHdl( LINK( this, BrowseBox, HorzScrollHdl ) );
     pDataWin->Show();
 
     SetMode( nMode );
@@ -148,22 +148,29 @@ public:
 
 tools::Long BrowseBox::GetBarHeight() const
 {
+    tools::Long nScrollBarSize = GetSettings().GetStyleSettings().GetScrollBarSize();
+    if (!m_bNavigationBar)
+        return nScrollBarSize;
+
     // tdf#115941 because some platforms have things like overlay scrollbars, take a max
     // of a statusbar height and a scrollbar height as the control area height
 
     // (we can't ask the scrollbars for their size cause if we're zoomed they still have to be
     // resized - which is done in UpdateScrollbars)
-
-    return std::max(aStatusBarHeight->GetSizePixel().Height(), static_cast<tools::Long>(GetSettings().GetStyleSettings().GetScrollBarSize()));
+    return std::max(aStatusBarHeight->GetSizePixel().Height(), nScrollBarSize);
 }
 
 BrowseBox::BrowseBox( vcl::Window* pParent, WinBits nBits, BrowserMode nMode )
     :Control( pParent, nBits | WB_3DLOOK )
     ,DragSourceHelper( this )
     ,DropTargetHelper( this )
-    ,aHScroll( VclPtr<ScrollBar>::Create(this, WB_HSCROLL) )
+    ,aHScroll( VclPtr<ScrollAdaptor>::Create(this, true) )
     // see NavigationBar ctor, here we just want to know its height
     ,aStatusBarHeight(VclPtr<MeasureStatusBar>::Create(this))
+    ,m_nCornerHeight(0)
+    ,m_nCornerWidth(0)
+    ,m_nActualCornerWidth(0)
+    ,m_bNavigationBar(false)
 {
     ConstructImpl( nMode );
 }
@@ -192,7 +199,6 @@ void BrowseBox::dispose()
 
     Hide();
     pDataWin->pHeaderBar.disposeAndClear();
-    pDataWin->pCornerWin.disposeAndClear();
     pDataWin.disposeAndClear();
     pVScroll.disposeAndClear();
     aHScroll.disposeAndClear();
@@ -494,10 +500,10 @@ void BrowseBox::SetColumnPos( sal_uInt16 nColumnId, sal_uInt16 nPos )
 
     commitTableEvent(
         TABLE_MODEL_CHANGED,
-        makeAny( AccessibleTableModelChange(
-                    DELETE,
-                    0,
-                    GetRowCount(),
+        Any( AccessibleTableModelChange(
+                    COLUMNS_REMOVED,
+                    -1,
+                    -1,
                     nOldPos,
                     nOldPos
                 )
@@ -507,10 +513,10 @@ void BrowseBox::SetColumnPos( sal_uInt16 nColumnId, sal_uInt16 nPos )
 
     commitTableEvent(
         TABLE_MODEL_CHANGED,
-        makeAny( AccessibleTableModelChange(
-                    INSERT,
-                    0,
-                    GetRowCount(),
+        Any( AccessibleTableModelChange(
+                    COLUMNS_INSERTED,
+                    -1,
+                    -1,
                     nPos,
                     nPos
                 )
@@ -557,8 +563,8 @@ void BrowseBox::SetColumnTitle( sal_uInt16 nItemId, const OUString& rTitle )
     if ( isAccessibleAlive() )
     {
         commitTableEvent(   TABLE_COLUMN_DESCRIPTION_CHANGED,
-            makeAny( rTitle ),
-            makeAny( sOld )
+            Any( rTitle ),
+            Any( sOld )
         );
     }
 }
@@ -740,9 +746,9 @@ void BrowseBox::RemoveColumn( sal_uInt16 nItemId )
 
     commitTableEvent(
         TABLE_MODEL_CHANGED,
-        makeAny( AccessibleTableModelChange(    DELETE,
-                                                0,
-                                                GetRowCount(),
+        Any( AccessibleTableModelChange(COLUMNS_REMOVED,
+                                                -1,
+                                                -1,
                                                 nPos,
                                                 nPos
                                            )
@@ -753,7 +759,7 @@ void BrowseBox::RemoveColumn( sal_uInt16 nItemId )
     commitHeaderBarEvent(
         CHILD,
         Any(),
-        makeAny( CreateAccessibleColumnHeader( nPos ) ),
+        Any( CreateAccessibleColumnHeader( nPos ) ),
         true
     );
 }
@@ -801,22 +807,22 @@ void BrowseBox::RemoveColumns()
     commitBrowseBoxEvent(
         CHILD,
         Any(),
-        makeAny(m_pImpl->getAccessibleHeaderBar(AccessibleBrowseBoxObjType::ColumnHeaderBar))
+        Any(m_pImpl->getAccessibleHeaderBar(AccessibleBrowseBoxObjType::ColumnHeaderBar))
     );
 
     // and now append it again
     commitBrowseBoxEvent(
         CHILD,
-        makeAny(m_pImpl->getAccessibleHeaderBar(AccessibleBrowseBoxObjType::ColumnHeaderBar)),
+        Any(m_pImpl->getAccessibleHeaderBar(AccessibleBrowseBoxObjType::ColumnHeaderBar)),
         Any()
     );
 
     // notify a table model change
     commitTableEvent(
         TABLE_MODEL_CHANGED,
-        makeAny ( AccessibleTableModelChange( DELETE,
-                        0,
-                        GetRowCount(),
+        Any ( AccessibleTableModelChange( COLUMNS_REMOVED,
+                        -1,
+                        -1,
                         0,
                         nOldCount
                     )
@@ -872,7 +878,7 @@ sal_Int32 BrowseBox::ScrollColumns( sal_Int32 nCols )
 {
 
     if ( nFirstCol + nCols < 0 ||
-         nFirstCol + nCols >= static_cast<tools::Long>(mvCols.size()) )
+         o3tl::make_unsigned(nFirstCol + nCols) >= mvCols.size() )
         return 0;
 
     // implicitly hides cursor while scrolling
@@ -1121,24 +1127,24 @@ void BrowseBox::Clear()
     commitBrowseBoxEvent(
         CHILD,
         Any(),
-        makeAny( m_pImpl->getAccessibleHeaderBar( AccessibleBrowseBoxObjType::RowHeaderBar ) )
+        Any( m_pImpl->getAccessibleHeaderBar( AccessibleBrowseBoxObjType::RowHeaderBar ) )
     );
 
     // and now append it again
     commitBrowseBoxEvent(
         CHILD,
-        makeAny( m_pImpl->getAccessibleHeaderBar( AccessibleBrowseBoxObjType::RowHeaderBar ) ),
+        Any( m_pImpl->getAccessibleHeaderBar( AccessibleBrowseBoxObjType::RowHeaderBar ) ),
         Any()
     );
 
     // notify a table model change
     commitTableEvent(
         TABLE_MODEL_CHANGED,
-        makeAny( AccessibleTableModelChange( DELETE,
+        Any( AccessibleTableModelChange(ROWS_REMOVED,
             0,
             nOldRowCount,
-            0,
-            GetColumnCount())
+            -1,
+            -1)
         ),
         Any()
     );
@@ -1220,12 +1226,12 @@ void BrowseBox::RowInserted( sal_Int32 nRow, sal_Int32 nNumRows, bool bDoPaint, 
     {
         commitTableEvent(
             TABLE_MODEL_CHANGED,
-            makeAny( AccessibleTableModelChange(
-                        INSERT,
+            Any( AccessibleTableModelChange(
+                        ROWS_INSERTED,
                         nRow,
                         nRow + nNumRows,
-                        0,
-                        GetColumnCount()
+                        -1,
+                        -1
                     )
             ),
             Any()
@@ -1235,7 +1241,7 @@ void BrowseBox::RowInserted( sal_Int32 nRow, sal_Int32 nNumRows, bool bDoPaint, 
         {
             commitHeaderBarEvent(
                 CHILD,
-                makeAny( CreateAccessibleRowHeader( i ) ),
+                Any( CreateAccessibleRowHeader( i ) ),
                 Any(),
                 false
             );
@@ -1364,25 +1370,25 @@ void BrowseBox::RowRemoved( sal_Int32 nRow, sal_Int32 nNumRows, bool bDoPaint )
             commitBrowseBoxEvent(
                 CHILD,
                 Any(),
-                makeAny( m_pImpl->getAccessibleHeaderBar( AccessibleBrowseBoxObjType::RowHeaderBar ) )
+                Any( m_pImpl->getAccessibleHeaderBar( AccessibleBrowseBoxObjType::RowHeaderBar ) )
             );
 
             // and now append it again
             commitBrowseBoxEvent(
                 CHILD,
-                makeAny(m_pImpl->getAccessibleHeaderBar(AccessibleBrowseBoxObjType::RowHeaderBar)),
+                Any(m_pImpl->getAccessibleHeaderBar(AccessibleBrowseBoxObjType::RowHeaderBar)),
                 Any()
             );
             commitBrowseBoxEvent(
                 CHILD,
                 Any(),
-                makeAny( m_pImpl->getAccessibleTable() )
+                Any( m_pImpl->getAccessibleTable() )
             );
 
             // and now append it again
             commitBrowseBoxEvent(
                 CHILD,
-                makeAny( m_pImpl->getAccessibleTable() ),
+                Any( m_pImpl->getAccessibleTable() ),
                 Any()
             );
         }
@@ -1390,12 +1396,12 @@ void BrowseBox::RowRemoved( sal_Int32 nRow, sal_Int32 nNumRows, bool bDoPaint )
         {
             commitTableEvent(
                 TABLE_MODEL_CHANGED,
-                makeAny( AccessibleTableModelChange(
-                            DELETE,
+                Any( AccessibleTableModelChange(
+                            ROWS_REMOVED,
                             nRow,
                             nRow + nNumRows,
-                            0,
-                            GetColumnCount()
+                            -1,
+                            -1
                             )
                 ),
                 Any()
@@ -1406,7 +1412,7 @@ void BrowseBox::RowRemoved( sal_Int32 nRow, sal_Int32 nNumRows, bool bDoPaint )
                 commitHeaderBarEvent(
                     CHILD,
                     Any(),
-                    makeAny( CreateAccessibleRowHeader( i ) ),
+                    Any( CreateAccessibleRowHeader( i ) ),
                     false
                 );
             }
@@ -2181,13 +2187,10 @@ void BrowseBox::SetMode( BrowserMode nMode )
     bHLines = ( nMode & BrowserMode::HLINES ) == BrowserMode::HLINES;
     bVLines = ( nMode & BrowserMode::VLINES ) == BrowserMode::VLINES;
 
-    constexpr WinBits nVScrollWinBits = WB_VSCROLL;
-    pVScroll = ( nMode & BrowserMode::TRACKING_TIPS ) == BrowserMode::TRACKING_TIPS
-                ? VclPtr<BrowserScrollBar>::Create( this, nVScrollWinBits, pDataWin.get() )
-                : VclPtr<ScrollBar>::Create( this, nVScrollWinBits );
+    pVScroll = VclPtr<ScrollAdaptor>::Create(this, false);
     pVScroll->SetLineSize( 1 );
     pVScroll->SetPageSize(1);
-    pVScroll->SetScrollHdl( LINK( this, BrowseBox, ScrollHdl ) );
+    pVScroll->SetScrollHdl( LINK( this, BrowseBox, VertScrollHdl ) );
 
     pDataWin->bAutoSizeLastCol =
             BrowserMode::AUTOSIZE_LASTCOL == ( nMode & BrowserMode::AUTOSIZE_LASTCOL );
@@ -2338,7 +2341,7 @@ void BrowseBox::CursorMoved()
     if ( isAccessibleAlive() && HasFocus() )
         commitTableEvent(
             ACTIVE_DESCENDANT_CHANGED,
-            makeAny( CreateAccessibleCell( GetCurRow(),GetColumnPos( GetCurColumnId() ) ) ),
+            Any( CreateAccessibleCell( GetCurRow(),GetColumnPos( GetCurColumnId() ) ) ),
             Any()
         );
 }

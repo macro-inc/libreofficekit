@@ -23,7 +23,7 @@
 
 #include <com/sun/star/inspection/XObjectInspectorUI.hpp>
 #include <com/sun/star/lang/NullPointerException.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #define TEXTTYPE_SINGLELINE     0
 #define TEXTTYPE_MULTILINE      1
@@ -141,8 +141,8 @@ namespace pcr
                 bool bHasVScroll = 0 != ( nScrollbars & 2 );
                 bool bHasHScroll = 0 != ( nScrollbars & 1 );
 
-                m_xComponent->setPropertyValue( PROPERTY_VSCROLL, makeAny( bHasVScroll ) );
-                m_xComponent->setPropertyValue( PROPERTY_HSCROLL, makeAny( bHasHScroll ) );
+                m_xComponent->setPropertyValue( PROPERTY_VSCROLL, Any( bHasVScroll ) );
+                m_xComponent->setPropertyValue( PROPERTY_HSCROLL, Any( bHasHScroll ) );
             }
             break;
 
@@ -161,8 +161,8 @@ namespace pcr
                     OSL_FAIL( "EditPropertyHandler::setPropertyValue: invalid text type!" );
                 }
 
-                m_xComponent->setPropertyValue( PROPERTY_MULTILINE, makeAny( bMultiLine ) );
-                m_xComponent->setPropertyValue( PROPERTY_RICHTEXT, makeAny( bRichText ) );
+                m_xComponent->setPropertyValue( PROPERTY_MULTILINE, Any( bMultiLine ) );
+                m_xComponent->setPropertyValue( PROPERTY_RICHTEXT, Any( bRichText ) );
             }
             break;
 

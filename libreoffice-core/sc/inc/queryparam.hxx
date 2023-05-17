@@ -21,9 +21,9 @@
 
 #include <unotools/textsearch.hxx>
 #include "address.hxx"
+#include "queryentry.hxx"
 #include "types.hxx"
 
-#include <memory>
 #include <vector>
 #include <ostream>
 
@@ -65,7 +65,7 @@ struct SAL_DLLPUBLIC_RTTI ScQueryParamBase
                             SvNumberFormatter* pFormatter );
 
 protected:
-    typedef std::vector<std::unique_ptr<ScQueryEntry>> EntriesType;
+    typedef std::vector<ScQueryEntry> EntriesType;
 
 public:
     typedef EntriesType::const_iterator const_iterator;

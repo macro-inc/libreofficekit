@@ -19,6 +19,8 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     CLI/CSharp/Spreadsheet/ViewSample.cs \
     CLI/VB.NET/WriterDemo/Makefile \
     CLI/VB.NET/WriterDemo/WriterDemo.vb \
+    DevelopersGuide/FirstSteps/cxx/FirstUnoContact.cxx \
+    DevelopersGuide/FirstSteps/cxx/Makefile \
     DevelopersGuide/BasicAndDialogs/CreatingDialogs/CreatingDialogs.odt \
     DevelopersGuide/BasicAndDialogs/CreatingDialogs/Makefile \
     DevelopersGuide/BasicAndDialogs/CreatingDialogs/SampleDialog.java \
@@ -67,19 +69,21 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     DevelopersGuide/Components/CppComponent/Makefile \
     DevelopersGuide/Components/CppComponent/SimpleComponent.odt \
     DevelopersGuide/Components/CppComponent/TestCppComponent.cxx \
+    DevelopersGuide/Components/CppComponent/description.xml \
     DevelopersGuide/Components/CppComponent/service1_impl.cxx \
     DevelopersGuide/Components/CppComponent/service2_impl.cxx \
     DevelopersGuide/Components/CppComponent/some.idl \
     DevelopersGuide/Components/JavaComponent/JavaComponent.components \
     DevelopersGuide/Components/JavaComponent/Makefile \
-    DevelopersGuide/Components/JavaComponent/SomethingA.idl \
-    DevelopersGuide/Components/JavaComponent/SomethingB.idl \
     DevelopersGuide/Components/JavaComponent/TestComponentA.java \
     DevelopersGuide/Components/JavaComponent/TestComponentB.java \
     DevelopersGuide/Components/JavaComponent/TestJavaComponent.java \
     DevelopersGuide/Components/JavaComponent/TestServiceProvider.java \
-    DevelopersGuide/Components/JavaComponent/XSomethingA.idl \
-    DevelopersGuide/Components/JavaComponent/XSomethingB.idl \
+    DevelopersGuide/Components/JavaComponent/com/sun/star/test/SomethingA.idl \
+    DevelopersGuide/Components/JavaComponent/com/sun/star/test/SomethingB.idl \
+    DevelopersGuide/Components/JavaComponent/com/sun/star/test/XSomethingA.idl \
+    DevelopersGuide/Components/JavaComponent/com/sun/star/test/XSomethingB.idl \
+    DevelopersGuide/Components/JavaComponent/description.xml \
     DevelopersGuide/Components/SimpleLicense/LicenseTest.components \
     DevelopersGuide/Components/SimpleLicense/LicenseTest.idl \
     DevelopersGuide/Components/SimpleLicense/LicenseTest.java \
@@ -92,6 +96,7 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     DevelopersGuide/Components/Thumbs/org/openoffice/comp/test/ImageShrink.java \
     DevelopersGuide/Components/Thumbs/org/openoffice/comp/test/Makefile \
     DevelopersGuide/Components/Thumbs/org/openoffice/comp/test/Thumbs.java \
+    DevelopersGuide/Components/Thumbs/org/openoffice/comp/test/description.xml \
     DevelopersGuide/Components/Thumbs/org/openoffice/test/ImageShrink.idl \
     DevelopersGuide/Components/Thumbs/org/openoffice/test/Makefile \
     DevelopersGuide/Components/Thumbs/org/openoffice/test/XImageShrink.idl \
@@ -101,8 +106,9 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     DevelopersGuide/Components/dialogcomponent/DialogComponent.java \
     DevelopersGuide/Components/dialogcomponent/DialogComponent.odt \
     DevelopersGuide/Components/dialogcomponent/Makefile \
-    DevelopersGuide/Components/dialogcomponent/TestDialogHandler.idl \
-    DevelopersGuide/Components/dialogcomponent/XTestDialogHandler.idl \
+    DevelopersGuide/Components/dialogcomponent/com/sun/star/test/TestDialogHandler.idl \
+    DevelopersGuide/Components/dialogcomponent/com/sun/star/test/XTestDialogHandler.idl \
+    DevelopersGuide/Components/dialogcomponent/description.xml \
     DevelopersGuide/Config/ConfigExamples.java \
     DevelopersGuide/Config/Makefile \
     DevelopersGuide/Database/CodeSamples.java \
@@ -167,7 +173,6 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     DevelopersGuide/Extensions/DialogWithHelp/help/en/com.foocorp.foo-ext/page1.xhp \
     DevelopersGuide/Extensions/DialogWithHelp/help/en/com.foocorp.foo-ext/page2.xhp \
     DevelopersGuide/Extensions/DialogWithHelp/help/en/com.foocorp.foo-ext/subfolder/anotherpage.xhp \
-    DevelopersGuide/FirstSteps/FirstConnection.java \
     DevelopersGuide/FirstSteps/FirstLoadComponent.java \
     DevelopersGuide/FirstSteps/FirstUnoContact.java \
     DevelopersGuide/FirstSteps/HelloTextTableShape.java \
@@ -341,6 +346,7 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     DevelopersGuide/Spreadsheet/SpreadsheetSample.java \
     DevelopersGuide/Spreadsheet/ViewSample.java \
     DevelopersGuide/Spreadsheet/XExampleAddIn.idl \
+    DevelopersGuide/Spreadsheet/description.xml \
     DevelopersGuide/Text/Makefile \
     DevelopersGuide/Text/PrintDemo.odt \
     DevelopersGuide/Text/TextDocuments.java \
@@ -446,7 +452,6 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     java/Inspector/Inspector.java \
     java/Inspector/InspectorAddon.java \
     java/Inspector/InspectorPane.java \
-    java/Inspector/InstanceInspector.idl \
     java/Inspector/InstanceInspectorTest.odt \
     java/Inspector/Introspector.java \
     java/Inspector/Makefile \
@@ -470,7 +475,6 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     java/Inspector/UnoPropertyNode.java \
     java/Inspector/UnoTreeRenderer.java \
     java/Inspector/XDialogProvider.java \
-    java/Inspector/XInstanceInspector.idl \
     java/Inspector/XLanguageSourceCodeGenerator.java \
     java/Inspector/XTreeControlProvider.java \
     java/Inspector/XTreePathProvider.java \
@@ -478,6 +482,7 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     java/Inspector/XUnoMethodNode.java \
     java/Inspector/XUnoNode.java \
     java/Inspector/XUnoPropertyNode.java \
+    java/Inspector/description.xml \
     java/Inspector/images/containers_16.png \
     java/Inspector/images/content_16.png \
     java/Inspector/images/interfaces_16.png \
@@ -485,11 +490,14 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     java/Inspector/images/properties_16.png \
     java/Inspector/images/services_16.png \
     java/Inspector/manifest.mf \
+    java/Inspector/org/openoffice/InstanceInspector.idl \
+    java/Inspector/org/openoffice/XInstanceInspector.idl \
     java/MinimalComponent/Makefile \
     java/MinimalComponent/MinimalComponent.components \
     java/MinimalComponent/MinimalComponent.idl \
     java/MinimalComponent/MinimalComponent.java \
     java/MinimalComponent/TestMinimalComponent.java \
+    java/MinimalComponent/description.xml \
     java/PropertySet/Makefile \
     java/PropertySet/PropTest.components \
     java/PropertySet/PropTest.java \
@@ -502,6 +510,7 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     java/Spreadsheet/Makefile \
     java/Spreadsheet/SCalc.java \
     java/Spreadsheet/XCalcAddins.idl \
+    java/Spreadsheet/description.xml \
     java/Text/BookmarkInsertion.java \
     java/Text/GraphicsInserter.java \
     java/Text/HardFormatting.java \
@@ -515,10 +524,11 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     java/Text/oo_smiley.gif \
     java/ToDo/Makefile \
     java/ToDo/ToDo.components \
-    java/ToDo/ToDo.idl \
     java/ToDo/ToDo.java \
     java/ToDo/ToDo.ods \
-    java/ToDo/XToDo.idl \
+    java/ToDo/description.xml \
+    java/ToDo/org/openoffice/ToDo.idl \
+    java/ToDo/org/openoffice/XToDo.idl \
     python/toolpanel/CalcWindowState.xcu \
     python/toolpanel/Factory.xcu \
     python/toolpanel/META-INF/manifest.xml \
@@ -531,6 +541,12 @@ $(eval $(call gb_Package_add_files_with_dir,odk_examples,$(SDKDIRNAME)/examples,
     python/toolpanel/toolpanel.component \
     python/toolpanel/toolpanel.py \
     python/toolpanel/toolpanels/poc.xdl \
+    python/DocumentHandling/DocumentConverter.py \
+    python/DocumentHandling/DocumentLoader.py \
+    python/DocumentHandling/DocumentPrinter.py \
+    python/DocumentHandling/DocumentSaver.py \
+    python/DocumentHandling/README.md \
+    python/DocumentHandling/tests/hello.odt \
 ))
 
 # vim: set noet sw=4 ts=4:

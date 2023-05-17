@@ -208,7 +208,7 @@ SwUndoRedlineDelete::SwUndoRedlineDelete(
     SetRedlineText(rRange.GetText());
     if( SwUndoId::DELETE == mnUserId &&
         m_nSttNode == m_nEndNode && m_nSttContent + 1 == m_nEndContent &&
-        nullptr != (pTNd = rRange.GetNode().GetTextNode()) )
+        nullptr != (pTNd = rRange.GetPointNode().GetTextNode()) )
     {
         sal_Unicode const cCh = pTNd->GetText()[m_nSttContent];
         if( CH_TXTATR_BREAKWORD != cCh && CH_TXTATR_INWORD != cCh )
@@ -216,7 +216,7 @@ SwUndoRedlineDelete::SwUndoRedlineDelete(
             m_bCanGroup = true;
             m_bIsDelim = !GetAppCharClass().isLetterNumeric( pTNd->GetText(),
                                                             m_nSttContent );
-            m_bIsBackspace = m_nSttContent == rRange.GetPoint()->nContent.GetIndex();
+            m_bIsBackspace = m_nSttContent == rRange.GetPoint()->GetContentIndex();
         }
     }
 
@@ -234,7 +234,7 @@ void SwUndoRedlineDelete::InitHistory(SwPaM const& rRedline)
     // backspacing/deleting consecutive characters
     SaveFlyArr flys;
     SaveFlyInRange(rRedline, *rRedline.GetMark(), flys, false, m_pHistory.get());
-    RestFlyInRange(flys, *rRedline.GetPoint(), &rRedline.GetPoint()->nNode, true);
+    RestFlyInRange(flys, *rRedline.GetPoint(), &rRedline.GetPoint()->GetNode(), true);
     if (m_pHistory->Count())
     {
         m_bCanGroup = false; // how to group history?
@@ -333,11 +333,10 @@ void SwUndoRedlineSort::UndoRedlineImpl(SwDoc & rDoc, SwPaM & rPam)
     // rPam contains the sorted range
     // aSaveRange contains copied (i.e. original) range
 
-    SwPosition *const pStart = rPam.Start();
-    SwPosition *const pEnd   = rPam.End();
+    auto [pStart, pEnd] = rPam.StartEnd(); // SwPosition*
 
-    SwNodeIndex aPrevIdx( pStart->nNode, -1 );
-    SwNodeOffset nOffsetTemp = pEnd->nNode.GetIndex() - pStart->nNode.GetIndex();
+    SwNodeIndex aPrevIdx( pStart->GetNode(), -1 );
+    SwNodeOffset nOffsetTemp = pEnd->GetNodeIndex() - pStart->GetNodeIndex();
 
     if( !( RedlineFlags::ShowDelete & rDoc.getIDocumentRedlineAccess().GetRedlineFlags()) )
     {
@@ -354,11 +353,9 @@ void SwUndoRedlineSort::UndoRedlineImpl(SwDoc & rDoc, SwPaM & rPam)
     }
 
     {
-        SwPaM aTmp( *rPam.GetMark() );
-        aTmp.GetMark()->nContent = 0;
+        SwPaM aTmp( rPam.GetMark()->GetNode() );
         aTmp.SetMark();
-        aTmp.GetPoint()->nNode = m_nSaveEndNode;
-        aTmp.GetPoint()->nContent.Assign( aTmp.GetContentNode(), m_nSaveEndContent );
+        aTmp.GetPoint()->Assign( m_nSaveEndNode, m_nSaveEndContent );
         rDoc.getIDocumentRedlineAccess().DeleteRedline( aTmp, true, RedlineType::Any );
     }
 
@@ -366,14 +363,12 @@ void SwUndoRedlineSort::UndoRedlineImpl(SwDoc & rDoc, SwPaM & rPam)
 
     SwPaM *const pPam = & rPam;
     pPam->DeleteMark();
-    pPam->GetPoint()->nNode.Assign( aPrevIdx.GetNode(), +1 );
-    SwContentNode* pCNd = pPam->GetContentNode();
-    pPam->GetPoint()->nContent.Assign(pCNd, 0 );
+    pPam->GetPoint()->Assign( aPrevIdx.GetNode(), SwNodeOffset(+1) );
     pPam->SetMark();
 
-    pPam->GetPoint()->nNode += nOffsetTemp;
-    pCNd = pPam->GetContentNode();
-    pPam->GetPoint()->nContent.Assign( pCNd, pCNd->Len() );
+    pPam->GetPoint()->Adjust(nOffsetTemp);
+    SwContentNode* pCNd = pPam->GetPointContentNode();
+    pPam->GetPoint()->SetContent( pCNd->Len() );
 
     SetValues( *pPam );
 
@@ -383,33 +378,31 @@ void SwUndoRedlineSort::UndoRedlineImpl(SwDoc & rDoc, SwPaM & rPam)
 void SwUndoRedlineSort::RedoRedlineImpl(SwDoc & rDoc, SwPaM & rPam)
 {
     SwPaM* pPam = &rPam;
-    SwPosition* pStart = pPam->Start();
-    SwPosition* pEnd   = pPam->End();
+    auto [pStart, pEnd] = pPam->StartEnd(); // SwPosition*
 
-    SwNodeIndex aPrevIdx( pStart->nNode, -1 );
-    SwNodeOffset nOffsetTemp = pEnd->nNode.GetIndex() - pStart->nNode.GetIndex();
-    const sal_Int32 nCntStt  = pStart->nContent.GetIndex();
+    SwNodeIndex aPrevIdx( pStart->GetNode(), -1 );
+    SwNodeOffset nOffsetTemp = pEnd->GetNodeIndex() - pStart->GetNodeIndex();
+    const sal_Int32 nCntStt  = pStart->GetContentIndex();
 
     rDoc.SortText(rPam, *m_pOpt);
 
     pPam->DeleteMark();
-    pPam->GetPoint()->nNode.Assign( aPrevIdx.GetNode(), +1 );
-    SwContentNode* pCNd = pPam->GetContentNode();
+    pPam->GetPoint()->Assign( aPrevIdx.GetNode(), SwNodeOffset(+1) );
+    SwContentNode* pCNd = pPam->GetPointContentNode();
     sal_Int32 nLen = pCNd->Len();
     if( nLen > nCntStt )
         nLen = nCntStt;
-    pPam->GetPoint()->nContent.Assign(pCNd, nLen );
+    pPam->GetPoint()->SetContent( nLen );
     pPam->SetMark();
 
-    pPam->GetPoint()->nNode += nOffsetTemp;
-    pCNd = pPam->GetContentNode();
-    pPam->GetPoint()->nContent.Assign( pCNd, pCNd->Len() );
+    pPam->GetPoint()->Adjust(nOffsetTemp);
+    pCNd = pPam->GetPointContentNode();
+    pPam->GetPoint()->SetContent( pCNd->Len() );
 
     SetValues( rPam );
 
     SetPaM( rPam );
-    rPam.GetPoint()->nNode = m_nSaveEndNode;
-    rPam.GetPoint()->nContent.Assign( rPam.GetContentNode(), m_nSaveEndContent );
+    rPam.GetPoint()->Assign( m_nSaveEndNode, m_nSaveEndContent );
 }
 
 void SwUndoRedlineSort::RepeatImpl(::sw::RepeatContext & rContext)
@@ -420,8 +413,8 @@ void SwUndoRedlineSort::RepeatImpl(::sw::RepeatContext & rContext)
 void SwUndoRedlineSort::SetSaveRange( const SwPaM& rRange )
 {
     const SwPosition& rPos = *rRange.End();
-    m_nSaveEndNode = rPos.nNode.GetIndex();
-    m_nSaveEndContent = rPos.nContent.GetIndex();
+    m_nSaveEndNode = rPos.GetNodeIndex();
+    m_nSaveEndContent = rPos.GetContentIndex();
 }
 
 SwUndoAcceptRedline::SwUndoAcceptRedline( const SwPaM& rRange )
@@ -510,8 +503,8 @@ void SwUndoCompDoc::UndoImpl(::sw::UndoRedoContext & rContext)
         rDoc.getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld );
 
         // per definition Point is end (in SwUndRng!)
-        SwContentNode* pCSttNd = rPam.GetContentNode(false);
-        SwContentNode* pCEndNd = rPam.GetContentNode();
+        SwContentNode* pCSttNd = rPam.GetMarkContentNode();
+        SwContentNode* pCEndNd = rPam.GetPointContentNode();
 
         // if start- and end-content is zero, then the doc-compare moves
         // complete nodes into the current doc. And then the selection
@@ -531,15 +524,13 @@ void SwUndoCompDoc::UndoImpl(::sw::UndoRedoContext & rContext)
         if( pCSttNd && !pCEndNd)
         {
             // #112139# Do not step behind the end of content.
-            SwNode & rTmp = rPam.GetNode();
+            SwNode & rTmp = rPam.GetPointNode();
             SwNode * pEnd = rDoc.GetNodes().DocumentSectionEndNode(&rTmp);
 
             if (&rTmp != pEnd)
             {
                 rPam.SetMark();
-                ++rPam.GetPoint()->nNode;
-                rPam.GetBound().nContent.Assign( nullptr, 0 );
-                rPam.GetBound( false ).nContent.Assign( nullptr, 0 );
+                rPam.GetPoint()->Adjust(SwNodeOffset(1));
                 m_pUndoDelete2.reset(new SwUndoDelete(rPam, SwDeleteFlags::Default, true));
             }
         }

@@ -18,12 +18,14 @@
  */
 
 #include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
 #include <dlg_DataSource.hxx>
 #include <ChartTypeTemplateProvider.hxx>
+#include <ChartTypeTemplate.hxx>
+#include <Diagram.hxx>
 #include <DiagramHelper.hxx>
 #include "DialogModel.hxx"
+#include <ChartModel.hxx>
 
 #include "tp_RangeChooser.hxx"
 #include "tp_DataSource.hxx"
@@ -43,36 +45,35 @@ class DocumentChartTypeTemplateProvider : public ChartTypeTemplateProvider
 {
 public:
     explicit DocumentChartTypeTemplateProvider(
-        const Reference< chart2::XChartDocument > & xDoc );
+        const rtl::Reference<::chart::ChartModel> & xDoc );
 
     // ____ ChartTypeTemplateProvider ____
-    virtual Reference< chart2::XChartTypeTemplate > getCurrentTemplate() const override;
+    virtual rtl::Reference< ::chart::ChartTypeTemplate > getCurrentTemplate() const override;
 
 private:
-    Reference< chart2::XChartTypeTemplate > m_xTemplate;
+    rtl::Reference< ::chart::ChartTypeTemplate > m_xTemplate;
 };
 
 }
 
 DocumentChartTypeTemplateProvider::DocumentChartTypeTemplateProvider(
-    const Reference< chart2::XChartDocument > & xDoc )
+    const rtl::Reference<::chart::ChartModel> & xDoc )
 {
     if( !xDoc.is())
         return;
 
-    Reference< chart2::XDiagram > xDia( xDoc->getFirstDiagram());
+    rtl::Reference< Diagram > xDia( xDoc->getFirstChartDiagram());
     if( xDia.is())
     {
         DiagramHelper::tTemplateWithServiceName aResult(
             DiagramHelper::getTemplateForDiagram(
                 xDia,
-                Reference< lang::XMultiServiceFactory >(
-                    xDoc->getChartTypeManager(), uno::UNO_QUERY ) ));
-        m_xTemplate.set( aResult.first );
+                xDoc->getTypeManager() ));
+        m_xTemplate = aResult.xChartTypeTemplate;
     }
 }
 
-Reference< chart2::XChartTypeTemplate > DocumentChartTypeTemplateProvider::getCurrentTemplate() const
+rtl::Reference< ::chart::ChartTypeTemplate > DocumentChartTypeTemplateProvider::getCurrentTemplate() const
 {
     return m_xTemplate;
 }
@@ -80,12 +81,11 @@ Reference< chart2::XChartTypeTemplate > DocumentChartTypeTemplateProvider::getCu
 sal_uInt16 DataSourceDialog::m_nLastPageId = 0;
 
 DataSourceDialog::DataSourceDialog(weld::Window * pParent,
-    const Reference< XChartDocument > & xChartDocument,
-    const Reference< uno::XComponentContext > & xContext)
+    const rtl::Reference<::chart::ChartModel> & xChartDocument)
     : GenericDialogController(pParent, "modules/schart/ui/datarangedialog.ui",
                               "DataRangeDialog")
     , m_apDocTemplateProvider(new DocumentChartTypeTemplateProvider(xChartDocument))
-    , m_apDialogModel(new DialogModel(xChartDocument, xContext))
+    , m_apDialogModel(new DialogModel(xChartDocument))
     , m_bRangeChooserTabIsValid(true)
     , m_bDataSourceTabIsValid(true)
     , m_bTogglingEnabled(true)

@@ -23,7 +23,7 @@
 #include <vcl/dllapi.h>
 #include <vcl/outdev.hxx>
 #include <tools/link.hxx>
-#include <tools/wintypes.hxx>
+#include <vcl/wintypes.hxx>
 #include <vcl/vclenum.hxx>
 #include <vcl/keycodes.hxx>
 #include <vcl/region.hxx>
@@ -43,6 +43,7 @@ struct SystemParentData;
 class ImplBorderWindow;
 class Timer;
 class DockingManager;
+class Scrollable;
 class ScrollBar;
 class FixedText;
 class MouseEvent;
@@ -687,7 +688,7 @@ private:
     SAL_DLLPRIVATE void                 ImplCallActivateListeners(vcl::Window*);
     SAL_DLLPRIVATE void                 ImplCallDeactivateListeners(vcl::Window*);
 
-    SAL_DLLPRIVATE static void          ImplHandleScroll(ScrollBar* pHScrl, double nX, ScrollBar* pVScrl, double nY);
+    SAL_DLLPRIVATE static void          ImplHandleScroll(Scrollable* pHScrl, double nX, Scrollable* pVScrl, double nY);
 
     SAL_DLLPRIVATE tools::Rectangle     ImplOutputToUnmirroredAbsoluteScreenPixel( const tools::Rectangle& rRect ) const;
     SAL_DLLPRIVATE tools::Rectangle     ImplUnmirroredAbsoluteScreenToOutputPixel( const tools::Rectangle& rRect ) const;
@@ -1017,7 +1018,7 @@ public:
     void                                ReleaseMouse();
     bool                                IsMouseCaptured() const;
 
-    void                                SetPointer( PointerStyle );
+    virtual void                        SetPointer( PointerStyle );
     PointerStyle                        GetPointer() const;
     void                                EnableChildPointerOverwrite( bool bOverwrite );
     void                                SetPointerPosPixel( const Point& rPos );
@@ -1086,8 +1087,8 @@ public:
     void                                EndAutoScroll();
 
     bool                                HandleScrollCommand( const CommandEvent& rCmd,
-                                                             ScrollBar* pHScrl,
-                                                             ScrollBar* pVScrl );
+                                                             Scrollable* pHScrl,
+                                                             Scrollable* pVScrl );
 
     virtual const SystemEnvData*        GetSystemData() const;
 
@@ -1151,7 +1152,6 @@ public:
     void                                SetAccessibleRelationLabelFor( vcl::Window* pLabelFor );
     vcl::Window*                        GetAccessibleRelationLabelFor() const;
 
-    void                                SetAccessibleRelationMemberOf( vcl::Window* pMemberOf );
     vcl::Window*                        GetAccessibleRelationMemberOf() const;
 
     // to avoid sending accessibility events in cases like closing dialogs
@@ -1391,7 +1391,7 @@ public:
      *
      * @return false if attribute is unknown
      */
-    bool set_font_attribute(const OString &rKey, const OUString &rValue);
+    bool set_font_attribute(const OString &rKey, std::u16string_view rValue);
 
     /*
      * Adds this widget to the xGroup VclSizeGroup
@@ -1554,8 +1554,6 @@ public:
     /** Query the platform layer for control support
      */
     bool                        IsNativeControlSupported( ControlType nType, ControlPart nPart ) const;
-
-    static OUString             GetNonMnemonicString(const OUString& rStr) { return OutputDevice::GetNonMnemonicString(rStr); }
 
     /** Query the native control's actual drawing region (including adornment)
      */

@@ -77,7 +77,7 @@ namespace drawinglayer::primitive2d
             }
 
             const Primitive2DReference xRef(getChildren()[nIndex], uno::UNO_SET_THROW);
-            rVisitor.append(xRef);
+            rVisitor.visit(xRef);
         }
 
         // provide unique ID
@@ -132,9 +132,9 @@ namespace drawinglayer::primitive2d
             const sal_uInt32 nCount(rmMatrixStack.size());
             maMatrixStack.reserve(nCount);
 
-            for(sal_uInt32 a(0); a < nCount; a++)
+            for(const auto& a : rmMatrixStack)
             {
-                maMatrixStack.emplace_back(rmMatrixStack[a]);
+                maMatrixStack.emplace_back(a);
             }
         }
 
@@ -185,7 +185,7 @@ namespace drawinglayer::primitive2d
 
                 // create new transform primitive reference, return new sequence
                 Primitive2DReference xRef(new TransformPrimitive2D(aTargetTransform, Primitive2DContainer(getChildren())));
-                rVisitor.append(xRef);
+                rVisitor.visit(xRef);
             }
             else
             {

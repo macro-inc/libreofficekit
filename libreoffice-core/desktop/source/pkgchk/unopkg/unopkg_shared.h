@@ -17,13 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <com/sun/star/uno/Exception.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/ucb/XCommandEnvironment.hpp>
 #include <com/sun/star/deployment/XPackage.hpp>
 #include <osl/diagnose.h>
 #include <rtl/ustring.hxx>
 
+#include <utility>
 #include <vector>
 
 #define APP_NAME "unopkg"
@@ -40,8 +40,8 @@ struct OptionInfo
 
 struct LockFileException
 {
-    explicit LockFileException(OUString const & sMessage) :
-        Message(sMessage) {}
+    explicit LockFileException(OUString sMessage) :
+        Message(std::move(sMessage)) {}
 
     OUString Message;
 };

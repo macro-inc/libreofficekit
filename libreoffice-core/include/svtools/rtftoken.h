@@ -26,7 +26,7 @@ namespace rtl {
 };
 
 // search the TokenID for the token
-int GetRTFToken( const OUString& rSearch );
+int GetRTFToken( std::u16string_view rSearch );
 
 enum RTF_TOKEN_RANGES {
     RTF_NOGROUP                     = 0x0100,
@@ -655,13 +655,6 @@ enum RTF_TOKEN_IDS {
     RTF_BRDRINSET,
     RTF_BRDROUTSET,
     RTF_BRDRFRAME,
-
-    // Swg border tokens
-    RTF_BRDBOX          = (RTF_BRDRDEF|RTF_SWGDEFS),
-    RTF_BRDLINE_COL,
-    RTF_BRDLINE_IN,
-    RTF_BRDLINE_OUT,
-    RTF_BRDLINE_DIST,
 
 /*  */
 

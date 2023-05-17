@@ -25,6 +25,7 @@
 #include <global.hxx>
 #include <compiler.hxx>
 #include <document.hxx>
+#include <utility>
 
 namespace {
 
@@ -90,7 +91,7 @@ sal_Int32 FindEndPosR1C1(const sal_Unicode* p, sal_Int32 nStartPos, sal_Int32 nE
         if (*p == '\'')
         {
             // Skip until the closing quote.
-            for (; nNewEnd <= nEndPos; ++p, ++nNewEnd)
+            for (++p, ++nNewEnd; nNewEnd <= nEndPos; ++p, ++nNewEnd)
                 if (*p == '\'')
                     break;
             if (nNewEnd > nEndPos)
@@ -99,7 +100,7 @@ sal_Int32 FindEndPosR1C1(const sal_Unicode* p, sal_Int32 nStartPos, sal_Int32 nE
         else if (*p == '[')
         {
             // Skip until the closing bracket.
-            for (; nNewEnd <= nEndPos; ++p, ++nNewEnd)
+            for (++p, ++nNewEnd; nNewEnd <= nEndPos; ++p, ++nNewEnd)
                 if (*p == ']')
                     break;
             if (nNewEnd > nEndPos)
@@ -203,9 +204,9 @@ void ExpandToText(const sal_Unicode* p, sal_Int32 nLen, sal_Int32& rStartPos, sa
 }
 
 ScRefFinder::ScRefFinder(
-    const OUString& rFormula, const ScAddress& rPos,
+    OUString aFormula, const ScAddress& rPos,
     ScDocument& rDoc, formula::FormulaGrammar::AddressConvention eConvP) :
-    maFormula(rFormula),
+    maFormula(std::move(aFormula)),
     meConv(eConvP),
     mrDoc(rDoc),
     maPos(rPos),
@@ -291,7 +292,7 @@ void ScRefFinder::ToggleRel( sal_Int32 nStartPos, sal_Int32 nEndPos )
                 if (nSep >= 0)
                 {
                     OUString aRef = aExpr.copy(nSep+1);
-                    OUString aExtDocNameTabName = aExpr.copy(0, nSep+1);
+                    std::u16string_view aExtDocNameTabName = aExpr.subView(0, nSep+1);
                     nResult = aAddr.Parse(aRef, mrDoc, aDetails);
                     aAddr.SetTab(0); // force to first tab to avoid error on checking
                     nFlags = lcl_NextFlags( nResult );
@@ -324,7 +325,7 @@ void ScRefFinder::ToggleRel( sal_Int32 nStartPos, sal_Int32 nEndPos )
         nLoopStart = nEEnd;
     }
 
-    OUString aTotal = maFormula.subView(0, nStartPos) + aResult.makeStringAndClear();
+    OUString aTotal = maFormula.subView(0, nStartPos) + aResult;
     if (nEndPos < maFormula.getLength()-1)
         aTotal += maFormula.subView(nEndPos+1);
 

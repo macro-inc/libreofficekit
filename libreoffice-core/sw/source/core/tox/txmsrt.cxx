@@ -47,6 +47,7 @@
 #include <strings.hrc>
 #include <reffld.hxx>
 #include <docsh.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -55,9 +56,9 @@ using namespace ::com::sun::star::uno;
 SwTOIOptions SwTOXSortTabBase::nOpt = SwTOIOptions::NONE;
 
 SwTOXInternational::SwTOXInternational( LanguageType nLang, SwTOIOptions nOpt,
-                                        const OUString& rSortAlgorithm ) :
+                                        OUString aSortAlgorithm ) :
     m_eLang( nLang ),
-    m_sSortAlgorithm(rSortAlgorithm),
+    m_sSortAlgorithm(std::move(aSortAlgorithm)),
     m_nOptions( nOpt )
 {
     Init();
@@ -174,8 +175,8 @@ SwTOXSortTabBase::SwTOXSortTabBase( TOXSortType nTyp, const SwContentNode* pNd,
                 const SwDoc& rDoc = pNd->GetDoc();
                 bool const bResult = GetBodyTextNode( rDoc, aPos, *pFrame );
                 OSL_ENSURE(bResult, "where is the text node");
-                nPos = aPos.nNode.GetIndex();
-                nCntPos = aPos.nContent.GetIndex();
+                nPos = aPos.GetNodeIndex();
+                nCntPos = aPos.GetContentIndex();
             }
         }
         else
@@ -217,7 +218,7 @@ bool SwTOXSortTabBase::IsFullPara() const
     return false;
 }
 
-void SwTOXSortTabBase::FillText( SwTextNode& rNd, const SwIndex& rInsPos,
+void SwTOXSortTabBase::FillText( SwTextNode& rNd, const SwContentIndex& rInsPos,
                                     sal_uInt16, SwRootFrame const*const) const
 {
     rNd.InsertText( GetText().sText, rInsPos );
@@ -394,7 +395,7 @@ TextAndReading SwTOXIndex::GetText_Impl(SwRootFrame const*const pLayout) const
     return aRet;
 }
 
-void SwTOXIndex::FillText( SwTextNode& rNd, const SwIndex& rInsPos, sal_uInt16,
+void SwTOXIndex::FillText( SwTextNode& rNd, const SwContentIndex& rInsPos, sal_uInt16,
         SwRootFrame const*const pLayout) const
 {
     assert(!"sw_redlinehide: this is dead code, Bibliography only has SwTOXAuthority");
@@ -441,12 +442,12 @@ sal_uInt16 SwTOXIndex::GetLevel() const
 }
 
 // Key and separator
-SwTOXCustom::SwTOXCustom(const TextAndReading& rKey,
+SwTOXCustom::SwTOXCustom(TextAndReading aKey,
                          sal_uInt16 nLevel,
                          const SwTOXInternational& rIntl,
                          const lang::Locale& rLocale )
     : SwTOXSortTabBase( TOX_SORT_CUSTOM, nullptr, nullptr, &rIntl, &rLocale ),
-    m_aKey(rKey), nLev(nLevel)
+    m_aKey(std::move(aKey)), nLev(nLevel)
 {
 }
 
@@ -504,7 +505,7 @@ TextAndReading SwTOXContent::GetText_Impl(SwRootFrame const*const pLayout) const
     return TextAndReading(pTextMark->GetTOXMark().GetAlternativeText(), OUString());
 }
 
-void SwTOXContent::FillText(SwTextNode& rNd, const SwIndex& rInsPos, sal_uInt16,
+void SwTOXContent::FillText(SwTextNode& rNd, const SwContentIndex& rInsPos, sal_uInt16,
         SwRootFrame const*const pLayout) const
 {
     assert(!"sw_redlinehide: this is dead code, Bibliography only has SwTOXAuthority");
@@ -530,13 +531,13 @@ sal_uInt16 SwTOXContent::GetLevel() const
 // TOX assembled from paragraphs
 // Watch out for OLE/graphics when sorting!
 // The position must not come from the document, but from the "anchor"!
-SwTOXPara::SwTOXPara(SwContentNode& rNd, SwTOXElement eT, sal_uInt16 nLevel, const OUString& sSeqName)
+SwTOXPara::SwTOXPara(SwContentNode& rNd, SwTOXElement eT, sal_uInt16 nLevel, OUString sSeqName)
     : SwTOXSortTabBase( TOX_SORT_PARA, &rNd, nullptr, nullptr ),
     eType( eT ),
     m_nLevel(nLevel),
     nStartIndex(0),
     nEndIndex(-1),
-    m_sSequenceName( sSeqName )
+    m_sSequenceName(std::move( sSeqName ))
 {
     // tdf#123313 create any missing bookmarks *before* generating ToX nodes!
     switch (eType)
@@ -607,7 +608,7 @@ TextAndReading SwTOXPara::GetText_Impl(SwRootFrame const*const pLayout) const
     return TextAndReading();
 }
 
-void SwTOXPara::FillText( SwTextNode& rNd, const SwIndex& rInsPos, sal_uInt16,
+void SwTOXPara::FillText( SwTextNode& rNd, const SwContentIndex& rInsPos, sal_uInt16,
         SwRootFrame const*const pLayout) const
 {
     assert(!"sw_redlinehide: this is dead code, Bibliography only has SwTOXAuthority");
@@ -753,7 +754,7 @@ TextAndReading SwTOXTable::GetText_Impl(SwRootFrame const*const) const
     if( pNd )
     {
         const SwTableNode* pTableNd =
-            reinterpret_cast<const SwTableNode*>(pNd->FindTableNode());
+            pNd->FindTableNode();
         if (pTableNd)
         {
             return TextAndReading(pTableNd->GetTable().GetFrameFormat()->GetName(), OUString());
@@ -872,7 +873,7 @@ OUString SwTOXAuthority::GetSourceURL(const OUString& rText)
     return aText;
 }
 
-void SwTOXAuthority::FillText(SwTextNode& rNd, const SwIndex& rInsPos, sal_uInt16 nAuthField,
+void SwTOXAuthority::FillText(SwTextNode& rNd, const SwContentIndex& rInsPos, sal_uInt16 nAuthField,
                               SwRootFrame const* const pLayout) const
 {
     OUString aText = GetText(nAuthField, pLayout);
@@ -883,12 +884,12 @@ void SwTOXAuthority::FillText(SwTextNode& rNd, const SwIndex& rInsPos, sal_uInt1
         // Convert URL to a relative one if requested.
         SwDoc* pDoc = static_cast<SwAuthorityFieldType*>(m_rField.GetField()->GetTyp())->GetDoc();
         SwDocShell* pDocShell = pDoc->GetDocShell();
-        OUString aBaseURL = pDocShell->getDocumentBaseURL();
-        OUString aBaseURIScheme;
+        const OUString aBaseURL = pDocShell->getDocumentBaseURL();
+        std::u16string_view aBaseURIScheme;
         sal_Int32 nSep = aBaseURL.indexOf(':');
         if (nSep != -1)
         {
-            aBaseURIScheme = aBaseURL.copy(0, nSep);
+            aBaseURIScheme = aBaseURL.subView(0, nSep);
         }
 
         uno::Reference<uri::XUriReferenceFactory> xUriReferenceFactory

@@ -34,14 +34,16 @@
 #include <unotools/bootstrap.hxx>
 #include <rtl/uri.hxx>
 #include <i18nlangtag/lang.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
+#include <officecfg/Office/UI.hxx>
 #include <osl/file.hxx>
 #include <osl/security.hxx>
 #include <unotools/configmgr.hxx>
 
 #include <com/sun/star/configuration/Update.hpp>
 #include <com/sun/star/configuration/theDefaultProvider.hpp>
+#include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/task/XJob.hpp>
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -197,7 +199,7 @@ bool MigrationImpl::doMigration()
 
 
             OUString aOldCfgDataPath = m_aInfo.userdata + "/user/config/soffice.cfg/modules/" + i.sModuleShortName;
-            uno::Sequence< uno::Any > lArgs {uno::makeAny(aOldCfgDataPath), uno::makeAny(embed::ElementModes::READ)};
+            uno::Sequence< uno::Any > lArgs {uno::Any(aOldCfgDataPath), uno::Any(embed::ElementModes::READ)};
 
             uno::Reference< uno::XComponentContext > xContext(comphelper::getProcessComponentContext());
             uno::Reference< lang::XSingleServiceFactory > xStorageFactory(embed::FileSystemStorageFactory::create(xContext));
@@ -261,7 +263,7 @@ void MigrationImpl::setMigrationCompleted()
 {
     try {
         uno::Reference< XPropertySet > aPropertySet(getConfigAccess("org.openoffice.Setup/Office", true), uno::UNO_QUERY_THROW);
-        aPropertySet->setPropertyValue("MigrationCompleted", uno::makeAny(true));
+        aPropertySet->setPropertyValue("MigrationCompleted", uno::Any(true));
         uno::Reference< XChangesBatch >(aPropertySet, uno::UNO_QUERY_THROW)->commitChanges();
     } catch (...) {
         // fail silently
@@ -429,7 +431,7 @@ OUString MigrationImpl::preXDGConfigDir(const OUString& rConfigDir)
 
 void MigrationImpl::setInstallInfoIfExist(
     install_info& aInfo,
-    const OUString& rConfigDir,
+    std::u16string_view rConfigDir,
     const OUString& rVersion)
 {
     OUString url(INetURLObject(rConfigDir).GetMainURL(INetURLObject::DecodeMechanism::NONE));
@@ -470,11 +472,11 @@ install_info MigrationImpl::findInstallation(const strings_v& rVersions)
              ( aInfo.userdata.isEmpty() ||
                aProfileName.equalsIgnoreAsciiCase(
                    utl::ConfigManager::getProductName() ) ) ) {
-            setInstallInfoIfExist(aInfo, aTopConfigDir + aProfileName, aVersion);
+            setInstallInfoIfExist(aInfo, Concat2View(aTopConfigDir + aProfileName), aVersion);
 #if defined UNX && ! defined MACOSX
             //try preXDG path if the new one does not exist
             if ( aInfo.userdata.isEmpty())
-                setInstallInfoIfExist(aInfo, aPreXDGTopConfigDir + aProfileName, aVersion);
+                setInstallInfoIfExist(aInfo, Concat2View(aPreXDGTopConfigDir + aProfileName), aVersion);
 #endif
         }
     }
@@ -616,6 +618,55 @@ bool getComponent(OUString const & path, OUString * component)
     return true;
 }
 
+void renameMigratedSetElementTo(
+    css::uno::Reference<css::container::XNameContainer> const & set, OUString const & currentName,
+    OUString const & migratedName)
+{
+    // To avoid unexpected data loss, the code is careful to only rename from currentName to
+    // migratedName in the expected case where the currentName element exists and the migratedName
+    // element doesn't exist:
+    bool const hasCurrent = set->hasByName(currentName);
+    bool const hasMigrated = set->hasByName(migratedName);
+    if (hasCurrent && !hasMigrated) {
+        auto const elem = set->getByName(currentName);
+        set->removeByName(currentName);
+        set->insertByName(migratedName, elem);
+    } else {
+        SAL_INFO_IF(!hasCurrent, "desktop.migration", "unexpectedly missing " << currentName);
+        SAL_INFO_IF(hasMigrated, "desktop.migration", "unexpectedly present " << migratedName);
+    }
+}
+
+void renameMigratedSetElementBack(
+    css::uno::Reference<css::container::XNameContainer> const & set, OUString const & currentName,
+    OUString const & migratedName)
+{
+    // To avoid unexpected data loss, the code is careful to ensure that in the end a currentName
+    // element exists, creating it from a template if the migratedName element had unexpectedly gone
+    // missing:
+    bool const hasMigrated = set->hasByName(migratedName);
+    css::uno::Any elem;
+    if (hasMigrated) {
+        elem = set->getByName(migratedName);
+        set->removeByName(migratedName);
+    } else {
+        SAL_INFO("desktop.migration", "unexpected loss of " << migratedName);
+        elem <<= css::uno::Reference<css::lang::XSingleServiceFactory>(
+            set, css::uno::UNO_QUERY_THROW)->createInstance();
+    }
+    if (set->hasByName(currentName)) {
+        SAL_INFO("desktop.migration", "unexpected reappearance of " << currentName);
+        if (hasMigrated) {
+            SAL_INFO(
+                "desktop.migration",
+                "reappeared " << currentName << " overwritten with " << migratedName);
+            set->replaceByName(currentName, elem);
+        }
+    } else {
+        set->insertByName(currentName, elem);
+    }
+}
+
 }
 
 void MigrationImpl::copyConfig()
@@ -646,6 +697,30 @@ void MigrationImpl::copyConfig()
         regFile.close();
     }
 
+    // If the to-be-migrated data contains modifications of
+    // /org.openoffice.Office.UI/ColorScheme/ColorSchemes set elements named after the migrated
+    // product name, those modifications must instead be made to the corresponding set elements
+    // named after the current product name.  However, if the current configuration data does not
+    // contain those old-named set elements at all, their modification data would silently be
+    // ignored by css.configuration.XUpdate::insertModificationXcuFile.  So temporarily rename any
+    // new-named set elements to their old-named counterparts here, and rename them back again down
+    // below after importing the migrated data:
+    OUString sProductName = utl::ConfigManager::getProductName();
+    OUString sProductNameDark = sProductName + " Dark";
+    OUString sMigratedProductName = m_aInfo.productname;
+    // remove version number from the end of product name if there’s one
+    if (isdigit(sMigratedProductName[sMigratedProductName.getLength() - 1]))
+        sMigratedProductName = (sMigratedProductName.copy(0, m_aInfo.productname.getLength() - 1)).trim();
+    OUString sMigratedProductNameDark = sMigratedProductName + " Dark";
+    auto const tempRename = sMigratedProductName != sProductName;
+    if (tempRename) {
+        auto const batch = comphelper::ConfigurationChanges::create();
+        auto const schemes = officecfg::Office::UI::ColorScheme::ColorSchemes::get(batch);
+        renameMigratedSetElementTo(schemes, sProductName, sMigratedProductName);
+        renameMigratedSetElementTo(schemes, sProductNameDark, sMigratedProductNameDark);
+        batch->commit();
+    }
+
     for (auto const& comp : comps)
     {
         if (!comp.second.includedPaths.empty()) {
@@ -670,7 +745,7 @@ void MigrationImpl::copyConfig()
                     buf.append(enc);
                 } while (n >= 0);
                 buf.append(".xcu");
-                regFilePath = buf.toString();
+                regFilePath = buf.makeStringAndClear();
             }
             configuration::Update::get(
                 comphelper::getProcessComponentContext())->
@@ -678,11 +753,43 @@ void MigrationImpl::copyConfig()
                 regFilePath,
                 comphelper::containerToSequence(comp.second.includedPaths),
                 comphelper::containerToSequence(comp.second.excludedPaths));
+
         } else {
             SAL_INFO( "desktop.migration", "configuration migration component " << comp.first << " ignored (only excludes, no includes)" );
         }
 next:
         ;
+    }
+    if (tempRename) {
+        auto const batch = comphelper::ConfigurationChanges::create();
+        auto const schemes = officecfg::Office::UI::ColorScheme::ColorSchemes::get(batch);
+        renameMigratedSetElementBack(schemes, sProductName, sMigratedProductName);
+        renameMigratedSetElementBack(schemes, sProductNameDark, sMigratedProductNameDark);
+        batch->commit();
+    }
+    // checking the migrated (product name related) color scheme name, and replace it to the current version scheme name
+    try
+    {
+        OUString sMigratedColorScheme;
+        uno::Reference<XPropertySet> aPropertySet(
+            getConfigAccess("org.openoffice.Office.UI/ColorScheme", true), uno::UNO_QUERY_THROW);
+        if (aPropertySet->getPropertyValue("CurrentColorScheme") >>= sMigratedColorScheme)
+        {
+            if (sMigratedColorScheme.equals(sMigratedProductName))
+            {
+                aPropertySet->setPropertyValue("CurrentColorScheme",
+                                               uno::Any(sProductName));
+                uno::Reference<XChangesBatch>(aPropertySet, uno::UNO_QUERY_THROW)->commitChanges();
+            }
+            else if (sMigratedColorScheme.equals(sMigratedProductNameDark))
+            {
+                aPropertySet->setPropertyValue("CurrentColorScheme",
+                                               uno::Any(sProductNameDark));
+                uno::Reference<XChangesBatch>(aPropertySet, uno::UNO_QUERY_THROW)->commitChanges();
+            }
+        }
+    } catch (const Exception&) {
+        // fail silently...
     }
 }
 
@@ -703,7 +810,7 @@ uno::Reference< XNameAccess > MigrationImpl::getConfigAccess(const char* pPath, 
                 comphelper::getProcessComponentContext()));
 
         // access the provider
-        uno::Sequence< uno::Any > theArgs {uno::makeAny(sConfigURL)};
+        uno::Sequence< uno::Any > theArgs {uno::Any(sConfigURL)};
         xNameAccess.set(
             theConfigProvider->createInstanceWithArguments(
                 sAccessSrvc, theArgs ), uno::UNO_QUERY_THROW );
@@ -753,9 +860,9 @@ void MigrationImpl::runServices()
     uno::Sequence< uno::Any > seqArguments(3);
     auto pseqArguments = seqArguments.getArray();
     pseqArguments[0] <<= NamedValue("Productname",
-                                   uno::makeAny(m_aInfo.productname));
+                                   uno::Any(m_aInfo.productname));
     pseqArguments[1] <<= NamedValue("UserData",
-                                   uno::makeAny(m_aInfo.userdata));
+                                   uno::Any(m_aInfo.userdata));
 
 
     // create an instance of every migration service
@@ -775,7 +882,7 @@ void MigrationImpl::runServices()
                     seqExtDenyList = comphelper::arrayToSequence< OUString >(
                                           rMigration.excludeExtensions.data(), nSize );
                 pseqArguments[2] <<= NamedValue("ExtensionDenyList",
-                                               uno::makeAny( seqExtDenyList ));
+                                               uno::Any( seqExtDenyList ));
 
                 xMigrationJob.set(
                     xContext->getServiceManager()->createInstanceWithArgumentsAndContext(rMigration.service, seqArguments, xContext),
@@ -802,8 +909,8 @@ std::vector< MigrationModuleInfo > MigrationImpl::detectUIChangesForAllModules()
     static const OUStringLiteral MENUBAR(u"menubar");
     static const OUStringLiteral TOOLBAR(u"toolbar");
 
-    uno::Sequence< uno::Any > lArgs {uno::makeAny(m_aInfo.userdata + "/user/config/soffice.cfg/modules"),
-                                     uno::makeAny(embed::ElementModes::READ)};
+    uno::Sequence< uno::Any > lArgs {uno::Any(m_aInfo.userdata + "/user/config/soffice.cfg/modules"),
+                                     uno::Any(embed::ElementModes::READ)};
 
     uno::Reference< lang::XSingleServiceFactory > xStorageFactory(
         embed::FileSystemStorageFactory::create(comphelper::getProcessComponentContext()));
@@ -839,9 +946,9 @@ std::vector< MigrationModuleInfo > MigrationImpl::detectUIChangesForAllModules()
                     aModuleInfo.sModuleShortName = sModuleShortName;
                     sal_Int32 nIndex = sToolbarName.lastIndexOf('.');
                     if (nIndex > 0) {
-                        OUString sExtension(sToolbarName.copy(nIndex));
+                        std::u16string_view sExtension(sToolbarName.subView(nIndex));
                         OUString sToolbarResourceName(sToolbarName.copy(0, nIndex));
-                        if (!sToolbarResourceName.isEmpty() && sExtension == ".xml")
+                        if (!sToolbarResourceName.isEmpty() && sExtension == u".xml")
                             aModuleInfo.m_vToolbars.push_back(sToolbarResourceName);
                     }
                 }
@@ -941,8 +1048,8 @@ void MigrationImpl::mergeOldToNewVersion(const uno::Reference< ui::XUIConfigurat
         OUString sParentNodeName = elem.m_sParentNodeName;
         sal_Int32 nIndex = 0;
         do {
-            OUString sToken = sParentNodeName.getToken(0, '|', nIndex).trim();
-            if (sToken.isEmpty())
+            std::u16string_view sToken( o3tl::trim(o3tl::getToken(sParentNodeName, 0, '|', nIndex)) );
+            if (sToken.empty())
                 break;
 
             sal_Int32 nCount = xTemp->getCount();
@@ -974,13 +1081,13 @@ void MigrationImpl::mergeOldToNewVersion(const uno::Reference< ui::XUIConfigurat
         if (nIndex == -1) {
             auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(elem.m_sCommandURL, sModuleIdentifier);
             uno::Sequence< beans::PropertyValue > aPropSeq {
-                beans::PropertyValue(ITEM_DESCRIPTOR_COMMANDURL, 0, uno::makeAny(elem.m_sCommandURL), beans::PropertyState_DIRECT_VALUE),
-                beans::PropertyValue(ITEM_DESCRIPTOR_LABEL, 0, uno::makeAny(vcl::CommandInfoProvider::GetLabelForCommand(aProperties)), beans::PropertyState_DIRECT_VALUE),
-                beans::PropertyValue(ITEM_DESCRIPTOR_CONTAINER, 0, uno::makeAny(elem.m_xPopupMenu), beans::PropertyState_DIRECT_VALUE)
+                beans::PropertyValue(ITEM_DESCRIPTOR_COMMANDURL, 0, uno::Any(elem.m_sCommandURL), beans::PropertyState_DIRECT_VALUE),
+                beans::PropertyValue(ITEM_DESCRIPTOR_LABEL, 0, uno::Any(vcl::CommandInfoProvider::GetLabelForCommand(aProperties)), beans::PropertyState_DIRECT_VALUE),
+                beans::PropertyValue(ITEM_DESCRIPTOR_CONTAINER, 0, uno::Any(elem.m_xPopupMenu), beans::PropertyState_DIRECT_VALUE)
             };
 
             if (elem.m_sPrevSibling.isEmpty())
-                xTemp->insertByIndex(0, uno::makeAny(aPropSeq));
+                xTemp->insertByIndex(0, uno::Any(aPropSeq));
             else {
                 sal_Int32 nCount = xTemp->getCount();
                 sal_Int32 i = 0;
@@ -999,7 +1106,7 @@ void MigrationImpl::mergeOldToNewVersion(const uno::Reference< ui::XUIConfigurat
                         break;
                 }
 
-                xTemp->insertByIndex(i+1, uno::makeAny(aPropSeq));
+                xTemp->insertByIndex(i+1, uno::Any(aPropSeq));
             }
         }
     }

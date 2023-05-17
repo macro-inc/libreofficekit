@@ -26,7 +26,7 @@
 #include <com/sun/star/container/XChild.hpp>
 
 #include <comphelper/types.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <utility>
 #include <dbaccess/dbsubcomponentcontroller.hxx>
 #include <svx/unoshape.hxx>
@@ -89,12 +89,12 @@ void OCommentUndoAction::Redo()
 
 OUndoContainerAction::OUndoContainerAction(SdrModel& _rMod
                                              ,Action _eAction
-                                             ,const uno::Reference< container::XIndexContainer >& rContainer
+                                             ,uno::Reference< container::XIndexContainer > xContainer
                                              ,const Reference< XInterface > & xElem
                                              ,TranslateId pCommentId)
                       :OCommentUndoAction(_rMod, pCommentId)
                       ,m_xElement(xElem)
-                      ,m_xContainer(rContainer)
+                      ,m_xContainer(std::move(xContainer))
                          ,m_eAction( _eAction )
 {
     // normalize
@@ -118,12 +118,6 @@ OUndoContainerAction::~OUndoContainerAction()
     OXUndoEnvironment& rEnv = static_cast< OReportModel& >( rMod ).GetUndoEnv();
     rEnv.RemoveElement( m_xOwnElement );
 
-#if OSL_DEBUG_LEVEL > 0
-    SvxShape* pShape = comphelper::getFromUnoTunnel<SvxShape>( xChild );
-    SdrObject* pObject = pShape ? pShape->GetSdrObject() : nullptr;
-    OSL_ENSURE( pObject == nullptr || (pShape->HasSdrObjectOwnership() && !pObject->IsInserted()),
-        "OUndoContainerAction::~OUndoContainerAction: inconsistency in the shape/object ownership!" );
-#endif
     // -> dispose it
     try
     {
@@ -140,7 +134,7 @@ void OUndoContainerAction::implReInsert( )
     if ( m_xContainer.is() )
     {
         // insert the element
-        m_xContainer->insertByIndex( m_xContainer->getCount(),uno::makeAny(m_xElement) );
+        m_xContainer->insertByIndex( m_xContainer->getCount(),uno::Any(m_xElement) );
     }
     // we don't own the object anymore
     m_xOwnElement = nullptr;

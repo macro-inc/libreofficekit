@@ -31,7 +31,7 @@
 #include <sdr/contact/viewcontactofe3dlathe.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
-#include <rtl/ustrbuf.hxx>
+#include <utility>
 
 
 // DrawContact section
@@ -49,9 +49,9 @@ std::unique_ptr<sdr::properties::BaseProperties> E3dLatheObj::CreateObjectSpecif
 E3dLatheObj::E3dLatheObj(
     SdrModel& rSdrModel,
     const E3dDefaultAttributes& rDefault,
-    const basegfx::B2DPolyPolygon& rPoly2D)
+    basegfx::B2DPolyPolygon aPoly2D)
 :   E3dCompoundObject(rSdrModel),
-    maPolyPoly2D(rPoly2D)
+    maPolyPoly2D(std::move(aPoly2D))
 {
     // since the old class PolyPolygon3D did mirror the given PolyPolygons in Y, do the same here
     basegfx::B2DHomMatrix aMirrorY;
@@ -114,17 +114,17 @@ void E3dLatheObj::SetDefaultAttributes(const E3dDefaultAttributes& rDefault)
 
 SdrObjKind E3dLatheObj::GetObjIdentifier() const
 {
-    return E3D_LATHEOBJ_ID;
+    return SdrObjKind::E3D_Lathe;
 }
 
-E3dLatheObj* E3dLatheObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> E3dLatheObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new E3dLatheObj(rTargetModel, *this);
 }
 
 // Convert the object to group object consisting of n polygons
 
-SdrObjectUniquePtr E3dLatheObj::DoConvertToPolyObj(bool /*bBezier*/, bool /*bAddText*/) const
+rtl::Reference<SdrObject> E3dLatheObj::DoConvertToPolyObj(bool /*bBezier*/, bool /*bAddText*/) const
 {
     return nullptr;
 }
@@ -181,12 +181,12 @@ bool E3dLatheObj::IsBreakObjPossible()
     return true;
 }
 
-std::unique_ptr<SdrAttrObj,SdrObjectFreeOp> E3dLatheObj::GetBreakObj()
+rtl::Reference<SdrAttrObj> E3dLatheObj::GetBreakObj()
 {
     // create PathObj
     basegfx::B3DPolyPolygon aLathePoly3D(basegfx::utils::createB3DPolyPolygonFromB2DPolyPolygon(maPolyPoly2D));
     basegfx::B2DPolyPolygon aTransPoly(TransformToScreenCoor(aLathePoly3D));
-    std::unique_ptr<SdrPathObj,SdrObjectFreeOp> pPathObj(new SdrPathObj(getSdrModelFromSdrObject(), OBJ_PLIN, aTransPoly));
+    rtl::Reference<SdrPathObj> pPathObj(new SdrPathObj(getSdrModelFromSdrObject(), SdrObjKind::PolyLine, std::move(aTransPoly)));
 
     // Set Attribute
     SfxItemSet aSet(GetObjectItemSet());
@@ -196,7 +196,7 @@ std::unique_ptr<SdrAttrObj,SdrObjectFreeOp> E3dLatheObj::GetBreakObj()
 
     pPathObj->SetMergedItemSet(aSet);
 
-    return std::unique_ptr<SdrAttrObj,SdrObjectFreeOp>(pPathObj.release());
+    return pPathObj;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

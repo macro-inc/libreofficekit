@@ -45,10 +45,10 @@ using namespace ::oox::core;
 namespace
 {
 /// Looks up the value of the rInternalName -> nProperty key in rProperties.
-oox::OptValue<sal_Int32> findProperty(const oox::drawingml::LayoutPropertyMap& rProperties,
+std::optional<sal_Int32> findProperty(const oox::drawingml::LayoutPropertyMap& rProperties,
                                       const OUString& rInternalName, sal_Int32 nProperty)
 {
-    oox::OptValue<sal_Int32> oRet;
+    std::optional<sal_Int32> oRet;
 
     auto it = rProperties.find(rInternalName);
     if (it != rProperties.end())
@@ -701,7 +701,7 @@ void CompositeAlg::layoutShapeChildren(AlgAtom& rAlg, const ShapePtr& rShape,
         nVertMax = std::max(aPos.Y + aSize.Height, nVertMax);
 
         NamedShapePairs& rDiagramFontHeights
-            = rAlg.getLayoutNode().getDiagram().getShape()->getDiagramFontHeights();
+            = rAlg.getLayoutNode().getDiagram().getDiagramFontHeights();
         auto it = rDiagramFontHeights.find(aCurrShape->getInternalName());
         if (it != rDiagramFontHeights.end())
         {
@@ -834,12 +834,12 @@ namespace
  * Takes the connection list from rLayoutNode, navigates from rFrom on an edge
  * of type nType, using a direction determined by bSourceToDestination.
  */
-OUString navigate(LayoutNode& rLayoutNode, sal_Int32 nType, std::u16string_view rFrom,
+OUString navigate(LayoutNode& rLayoutNode, svx::diagram::TypeConstant nType, std::u16string_view rFrom,
                   bool bSourceToDestination)
 {
     for (const auto& rConnection : rLayoutNode.getDiagram().getData()->getConnections())
     {
-        if (rConnection.mnType != nType)
+        if (rConnection.mnXMLType != nType)
             continue;
 
         if (bSourceToDestination)
@@ -857,37 +857,37 @@ OUString navigate(LayoutNode& rLayoutNode, sal_Int32 nType, std::u16string_view 
     return OUString();
 }
 
-sal_Int32 calcMaxDepth(std::u16string_view rNodeName, const dgm::Connections& rConnections)
+sal_Int32 calcMaxDepth(std::u16string_view rNodeName, const svx::diagram::Connections& rConnections)
 {
     sal_Int32 nMaxLength = 0;
     for (auto const& aCxn : rConnections)
-        if (aCxn.mnType == XML_parOf && aCxn.msSourceId == rNodeName)
+        if (aCxn.mnXMLType == svx::diagram::TypeConstant::XML_parOf && aCxn.msSourceId == rNodeName)
             nMaxLength = std::max(nMaxLength, calcMaxDepth(aCxn.msDestId, rConnections) + 1);
 
     return nMaxLength;
 }
 }
 
-sal_Int32 ConditionAtom::getNodeCount(const dgm::Point* pPresPoint) const
+sal_Int32 ConditionAtom::getNodeCount(const svx::diagram::Point* pPresPoint) const
 {
     sal_Int32 nCount = 0;
     OUString sNodeId = pPresPoint->msPresentationAssociationId;
 
     // HACK: special case - count children of first child
     if (maIter.maAxis.size() == 2 && maIter.maAxis[0] == XML_ch && maIter.maAxis[1] == XML_ch)
-        sNodeId = navigate(mrLayoutNode, XML_parOf, sNodeId, /*bSourceToDestination*/ true);
+        sNodeId = navigate(mrLayoutNode, svx::diagram::TypeConstant::XML_parOf, sNodeId, /*bSourceToDestination*/ true);
 
     if (!sNodeId.isEmpty())
     {
         for (const auto& aCxn : mrLayoutNode.getDiagram().getData()->getConnections())
-            if (aCxn.mnType == XML_parOf && aCxn.msSourceId == sNodeId)
+            if (aCxn.mnXMLType == svx::diagram::TypeConstant::XML_parOf && aCxn.msSourceId == sNodeId)
                 nCount++;
     }
 
     return nCount;
 }
 
-bool ConditionAtom::getDecision(const dgm::Point* pPresPoint) const
+bool ConditionAtom::getDecision(const svx::diagram::Point* pPresPoint) const
 {
     if (mIsElse)
         return true;
@@ -902,21 +902,21 @@ bool ConditionAtom::getDecision(const dgm::Point* pPresPoint) const
             return compareResult(maCond.mnOp, pPresPoint->mnDirection, maCond.mnVal);
         else if (maCond.mnArg == XML_hierBranch)
         {
-            sal_Int32 nHierarchyBranch = pPresPoint->moHierarchyBranch.get(XML_std);
-            if (!pPresPoint->moHierarchyBranch.has())
+            sal_Int32 nHierarchyBranch = pPresPoint->moHierarchyBranch.value_or(XML_std);
+            if (!pPresPoint->moHierarchyBranch.has_value())
             {
                 // If <dgm:hierBranch> is missing in the current presentation
                 // point, ask the parent.
-                OUString aParent = navigate(mrLayoutNode, XML_presParOf, pPresPoint->msModelId,
+                OUString aParent = navigate(mrLayoutNode, svx::diagram::TypeConstant::XML_presParOf, pPresPoint->msModelId,
                                             /*bSourceToDestination*/ false);
                 DiagramData::PointNameMap& rPointNameMap
                     = mrLayoutNode.getDiagram().getData()->getPointNameMap();
                 auto it = rPointNameMap.find(aParent);
                 if (it != rPointNameMap.end())
                 {
-                    const dgm::Point* pParent = it->second;
-                    if (pParent->moHierarchyBranch.has())
-                        nHierarchyBranch = pParent->moHierarchyBranch.get();
+                    const svx::diagram::Point* pParent = it->second;
+                    if (pParent->moHierarchyBranch.has_value())
+                        nHierarchyBranch = pParent->moHierarchyBranch.value();
                 }
             }
             return compareResult(maCond.mnOp, nHierarchyBranch, maCond.mnVal);
@@ -1080,7 +1080,7 @@ bool HasCustomText(const ShapePtr& rShape, LayoutNode& rLayoutNode)
     const DiagramData::PointNameMap& rPointNameMap
         = rLayoutNode.getDiagram().getData()->getPointNameMap();
     // Get the first presentation node of the shape.
-    const dgm::Point* pPresNode = nullptr;
+    const svx::diagram::Point* pPresNode = nullptr;
     for (const auto& rPair : rPresPointShapeMap)
     {
         if (rPair.second == rShape)
@@ -1090,7 +1090,7 @@ bool HasCustomText(const ShapePtr& rShape, LayoutNode& rLayoutNode)
         }
     }
     // Get the first data node of the presentation node.
-    dgm::Point* pDataNode = nullptr;
+    svx::diagram::Point* pDataNode = nullptr;
     if (pPresNode)
     {
         auto itPresToData = rPresOfNameMap.find(pPresNode->msModelId);
@@ -1421,7 +1421,7 @@ void AlgAtom::layoutShape(const ShapePtr& rShape, const std::vector<Constraint>&
                     && rConstraint.mnOperator == XML_equ)
                 {
                     NamedShapePairs& rDiagramFontHeights
-                        = getLayoutNode().getDiagram().getShape()->getDiagramFontHeights();
+                        = getLayoutNode().getDiagram().getDiagramFontHeights();
                     auto it = rDiagramFontHeights.find(rConstraint.msForName);
                     if (it == rDiagramFontHeights.end())
                     {
@@ -1515,13 +1515,13 @@ void AlgAtom::layoutShape(const ShapePtr& rShape, const std::vector<Constraint>&
                                 bool bScaleDownEmptySpacing = false;
                                 if (nDir == XML_fromL || nDir == XML_fromR)
                                 {
-                                    oox::OptValue<sal_Int32> oWidth = findProperty(aProperties, aCurrShape->getInternalName(), XML_w);
-                                    bScaleDownEmptySpacing = oWidth.has() && oWidth.get() > 0;
+                                    std::optional<sal_Int32> oWidth = findProperty(aProperties, aCurrShape->getInternalName(), XML_w);
+                                    bScaleDownEmptySpacing = oWidth.has_value() && oWidth.value() > 0;
                                 }
                                 if (!bScaleDownEmptySpacing && (nDir == XML_fromT || nDir == XML_fromB))
                                 {
-                                    oox::OptValue<sal_Int32> oHeight = findProperty(aProperties, aCurrShape->getInternalName(), XML_h);
-                                    bScaleDownEmptySpacing = oHeight.has() && oHeight.get() > 0;
+                                    std::optional<sal_Int32> oHeight = findProperty(aProperties, aCurrShape->getInternalName(), XML_h);
+                                    bScaleDownEmptySpacing = oHeight.has_value() && oHeight.value() > 0;
                                 }
                                 if (bScaleDownEmptySpacing && aCurrShape->getChildren().empty())
                                 {
@@ -1568,13 +1568,13 @@ void AlgAtom::layoutShape(const ShapePtr& rShape, const std::vector<Constraint>&
             awt::Size aTotalSize;
             for (const auto & aCurrShape : rShape->getChildren())
             {
-                oox::OptValue<sal_Int32> oWidth = findProperty(aProperties, aCurrShape->getInternalName(), XML_w);
-                oox::OptValue<sal_Int32> oHeight = findProperty(aProperties, aCurrShape->getInternalName(), XML_h);
+                std::optional<sal_Int32> oWidth = findProperty(aProperties, aCurrShape->getInternalName(), XML_w);
+                std::optional<sal_Int32> oHeight = findProperty(aProperties, aCurrShape->getInternalName(), XML_h);
                 awt::Size aSize = aChildSize;
-                if (oWidth.has())
-                    aSize.Width = oWidth.get();
-                if (oHeight.has())
-                    aSize.Height = oHeight.get();
+                if (oWidth.has_value())
+                    aSize.Width = oWidth.value();
+                if (oHeight.has_value())
+                    aSize.Height = oHeight.value();
                 aTotalSize.Width += aSize.Width;
                 aTotalSize.Height += aSize.Height;
             }
@@ -1594,14 +1594,14 @@ void AlgAtom::layoutShape(const ShapePtr& rShape, const std::vector<Constraint>&
             for (auto& aCurrShape : rShape->getChildren())
             {
                 // Extract properties relevant for this shape from constraints.
-                oox::OptValue<sal_Int32> oWidth = findProperty(aProperties, aCurrShape->getInternalName(), XML_w);
-                oox::OptValue<sal_Int32> oHeight = findProperty(aProperties, aCurrShape->getInternalName(), XML_h);
+                std::optional<sal_Int32> oWidth = findProperty(aProperties, aCurrShape->getInternalName(), XML_w);
+                std::optional<sal_Int32> oHeight = findProperty(aProperties, aCurrShape->getInternalName(), XML_h);
 
                 awt::Size aSize = aChildSize;
-                if (oWidth.has())
-                    aSize.Width = oWidth.get();
-                if (oHeight.has())
-                    aSize.Height = oHeight.get();
+                if (oWidth.has_value())
+                    aSize.Width = oWidth.value();
+                if (oHeight.has_value())
+                    aSize.Height = oHeight.value();
                 if (aChildrenToShrink.empty()
                     || aChildrenToShrink.find(aCurrShape->getInternalName())
                            != aChildrenToShrink.end())
@@ -1725,7 +1725,7 @@ void AlgAtom::layoutShape(const ShapePtr& rShape, const std::vector<Constraint>&
             {
                 for (auto& aParagraph : pTextBody->getParagraphs())
                     for (auto& aRun : aParagraph->getRuns())
-                        if (!aRun->getTextCharacterProperties().moHeight.has())
+                        if (!aRun->getTextCharacterProperties().moHeight.has_value())
                             aRun->getTextCharacterProperties().moHeight = fFontSize * 100;
             }
 
@@ -1757,13 +1757,13 @@ void AlgAtom::layoutShape(const ShapePtr& rShape, const std::vector<Constraint>&
                         n90x = -2;
                     else if (nShapeRot > 45 * PER_DEGREE)
                         n90x = -1;
-                    pTextBody->getTextProperties().moRotation = n90x * 90 * PER_DEGREE;
+                    pTextBody->getTextProperties().moTextPreRotation = n90x * 90 * PER_DEGREE;
                 }
                 break;
                 case XML_grav:
                 {
                     if (nShapeRot > (90 * PER_DEGREE) && nShapeRot < (270 * PER_DEGREE))
-                        pTextBody->getTextProperties().moRotation = -180 * PER_DEGREE;
+                        pTextBody->getTextProperties().moTextPreRotation = -180 * PER_DEGREE;
                 }
                 break;
                 case XML_none:
@@ -1866,7 +1866,7 @@ void LayoutNode::accept( LayoutAtomVisitor& rVisitor )
     rVisitor.visit(*this);
 }
 
-bool LayoutNode::setupShape( const ShapePtr& rShape, const dgm::Point* pPresNode, sal_Int32 nCurrIdx ) const
+bool LayoutNode::setupShape( const ShapePtr& rShape, const svx::diagram::Point* pPresNode, sal_Int32 nCurrIdx ) const
 {
     SAL_INFO(
         "oox.drawingml",
@@ -1898,22 +1898,23 @@ bool LayoutNode::setupShape( const ShapePtr& rShape, const dgm::Point* pPresNode
                 continue;
             }
 
-            if (!aDataNode2->second->mpShape)
+            Shape* pDataNode2Shape(mrDgm.getData()->getOrCreateAssociatedShape(*aDataNode2->second));
+            if (nullptr == pDataNode2Shape)
             {
                 //busted, skip it
                 continue;
             }
 
-            rShape->setDataNodeType(aDataNode2->second->mnType);
+            rShape->setDataNodeType(aDataNode2->second->mnXMLType);
 
             if (rItem.mnDepth == 0)
             {
                 // grab shape attr from topmost element(s)
-                rShape->getShapeProperties() = aDataNode2->second->mpShape->getShapeProperties();
-                rShape->getLineProperties() = aDataNode2->second->mpShape->getLineProperties();
-                rShape->getFillProperties() = aDataNode2->second->mpShape->getFillProperties();
-                rShape->getCustomShapeProperties() = aDataNode2->second->mpShape->getCustomShapeProperties();
-                rShape->setMasterTextListStyle( aDataNode2->second->mpShape->getMasterTextListStyle() );
+                rShape->getShapeProperties() = pDataNode2Shape->getShapeProperties();
+                rShape->getLineProperties() = pDataNode2Shape->getLineProperties();
+                rShape->getFillProperties() = pDataNode2Shape->getFillProperties();
+                rShape->getCustomShapeProperties() = pDataNode2Shape->getCustomShapeProperties();
+                rShape->setMasterTextListStyle( pDataNode2Shape->getMasterTextListStyle() );
 
                 SAL_INFO(
                     "oox.drawingml",
@@ -1927,14 +1928,14 @@ bool LayoutNode::setupShape( const ShapePtr& rShape, const dgm::Point* pPresNode
             {
                 // If no real topmost element, then take properties from the one that's the closest
                 // to topmost.
-                rShape->getLineProperties() = aDataNode2->second->mpShape->getLineProperties();
-                rShape->getFillProperties() = aDataNode2->second->mpShape->getFillProperties();
+                rShape->getLineProperties() = pDataNode2Shape->getLineProperties();
+                rShape->getFillProperties() = pDataNode2Shape->getFillProperties();
             }
 
             // append text with right outline level
-            if( aDataNode2->second->mpShape->getTextBody() &&
-                !aDataNode2->second->mpShape->getTextBody()->getParagraphs().empty() &&
-                !aDataNode2->second->mpShape->getTextBody()->getParagraphs().front()->getRuns().empty() )
+            if( pDataNode2Shape->getTextBody() &&
+                !pDataNode2Shape->getTextBody()->getParagraphs().empty() &&
+                !pDataNode2Shape->getTextBody()->getParagraphs().front()->getRuns().empty() )
             {
                 TextBodyPtr pTextBody=rShape->getTextBody();
                 if( !pTextBody )
@@ -1943,15 +1944,15 @@ bool LayoutNode::setupShape( const ShapePtr& rShape, const dgm::Point* pPresNode
 
                     // also copy text attrs
                     pTextBody->getTextListStyle() =
-                        aDataNode2->second->mpShape->getTextBody()->getTextListStyle();
+                        pDataNode2Shape->getTextBody()->getTextListStyle();
                     pTextBody->getTextProperties() =
-                        aDataNode2->second->mpShape->getTextBody()->getTextProperties();
+                        pDataNode2Shape->getTextBody()->getTextProperties();
 
                     rShape->setTextBody(pTextBody);
                 }
 
                 const TextParagraphVector& rSourceParagraphs
-                    = aDataNode2->second->mpShape->getTextBody()->getParagraphs();
+                    = pDataNode2Shape->getTextBody()->getParagraphs();
                 for (const auto& pSourceParagraph : rSourceParagraphs)
                 {
                     TextParagraph& rPara = pTextBody->addParagraph();
@@ -1960,7 +1961,7 @@ bool LayoutNode::setupShape( const ShapePtr& rShape, const dgm::Point* pPresNode
 
                     for (const auto& pRun : pSourceParagraph->getRuns())
                         rPara.addRun(pRun);
-                    const TextBodyPtr& rBody = aDataNode2->second->mpShape->getTextBody();
+                    const TextBodyPtr& rBody = pDataNode2Shape->getTextBody();
                     rPara.getProperties().apply(rBody->getParagraphs().front()->getProperties());
                 }
             }
@@ -1974,8 +1975,9 @@ bool LayoutNode::setupShape( const ShapePtr& rShape, const dgm::Point* pPresNode
                 " processing shape type "
                 << rShape->getCustomShapeProperties()->getShapePresetType()
                 << " for layout node named \"" << msName << "\"");
-        if (pPresNode->mpShape)
-            rShape->getFillProperties().assignUsed(pPresNode->mpShape->getFillProperties());
+        Shape* pPresNodeShape(mrDgm.getData()->getOrCreateAssociatedShape(*pPresNode));
+        if (nullptr != pPresNodeShape)
+            rShape->getFillProperties().assignUsed(pPresNodeShape->getFillProperties());
     }
 
     // TODO(Q1): apply styling & coloring - take presentation

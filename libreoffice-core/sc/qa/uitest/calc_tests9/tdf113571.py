@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_url_for_data_file
@@ -32,3 +35,4 @@ class Tdf113571(UITestCase):
             self.assertEqual('<?xml version="1.0" encoding="UTF-8"?>\n<test>\n  <hello>world</hello>\n</test>',
                     writer_document.Text.String)
 
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

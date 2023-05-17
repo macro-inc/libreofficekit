@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xindexaccess.hxx>
 #include <test/container/xnameaccess.hxx>
@@ -30,7 +30,7 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScStyleFamiliesObj : public CalcUnoApiTest,
+class ScStyleFamiliesObj : public UnoApiTest,
                            public apitest::XElementAccess,
                            public apitest::XIndexAccess,
                            public apitest::XNameAccess,
@@ -76,12 +76,11 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    uno::Reference<lang::XComponent> m_xComponent;
     uno::Reference<lang::XComponent> m_xSrcComponent;
 };
 
 ScStyleFamiliesObj::ScStyleFamiliesObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<container::XNameContainer>::get())
     , XIndexAccess(2)
     , XNameAccess("CellStyles")
@@ -91,7 +90,7 @@ ScStyleFamiliesObj::ScStyleFamiliesObj()
 
 uno::Reference<uno::XInterface> ScStyleFamiliesObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     uno::Reference<style::XStyleFamiliesSupplier> xSFS(xDoc, uno::UNO_QUERY_THROW);
@@ -102,7 +101,7 @@ uno::Reference<uno::XInterface> ScStyleFamiliesObj::init()
 
 uno::Reference<sheet::XSpreadsheetDocument> ScStyleFamiliesObj::getTargetDoc()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     return xDoc;
@@ -113,27 +112,23 @@ uno::Reference<lang::XComponent> ScStyleFamiliesObj::getSourceComponent()
     return m_xSrcComponent;
 }
 
-OUString ScStyleFamiliesObj::getTestURL()
-{
-    OUString aFileURL;
-    createFileURL(u"ScStyleFamiliesObj.ods", aFileURL);
-    return aFileURL;
-}
+OUString ScStyleFamiliesObj::getTestURL() { return createFileURL(u"ScStyleFamiliesObj.ods"); }
 
 void ScStyleFamiliesObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
+    mxComponent = loadFromDesktop("private:factory/scalc");
 
     m_xSrcComponent = loadFromDesktop(getTestURL());
 }
 
 void ScStyleFamiliesObj::tearDown()
 {
-    closeDocument(m_xComponent);
-    closeDocument(m_xSrcComponent);
-    CalcUnoApiTest::tearDown();
+    m_xSrcComponent->dispose();
+    m_xSrcComponent.clear();
+
+    UnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScStyleFamiliesObj);

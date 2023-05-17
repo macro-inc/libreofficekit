@@ -17,7 +17,8 @@
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/primitive2d/fillgradientprimitive2d.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 
 using namespace drawinglayer;
 
@@ -53,13 +54,15 @@ public:
 
         drawinglayer::geometry::ViewInformation2D view;
         std::unique_ptr<processor2d::BaseProcessor2D> processor(
-            processor2d::createBaseProcessor2DFromOutputDevice(*device, view));
+            processor2d::createProcessor2DFromOutputDevice(*device, view));
         CPPUNIT_ASSERT(processor);
 
         basegfx::B2DRange definitionRange(0, 0, 100, 200);
         basegfx::B2DRange outputRange(0, 100, 100, 200); // Paint only lower half of the gradient.
-        attribute::FillGradientAttribute attributes(attribute::GradientStyle::Linear, 0, 0, 0, 0,
-                                                    COL_WHITE.getBColor(), COL_BLACK.getBColor());
+        attribute::FillGradientAttribute attributes(
+            css::awt::GradientStyle_LINEAR, 0, 0, 0, 0,
+            basegfx::utils::createColorStopsFromStartEndColor(COL_WHITE.getBColor(),
+                                                              COL_BLACK.getBColor()));
         rtl::Reference<primitive2d::FillGradientPrimitive2D> gradientPrimitive(
             new primitive2d::FillGradientPrimitive2D(outputRange, definitionRange, attributes));
         primitive2d::Primitive2DContainer primitives;

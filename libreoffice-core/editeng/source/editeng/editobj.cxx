@@ -22,12 +22,10 @@
 #include <o3tl/safeint.hxx>
 #include <sal/log.hxx>
 
-#include <editeng/fieldupdater.hxx>
 #include <editeng/macros.hxx>
 #include <editeng/section.hxx>
 #include "editobj2.hxx"
 #include <editeng/editdata.hxx>
-#include <editattr.hxx>
 #include <editeng/editeng.hxx>
 #include <editeng/flditem.hxx>
 
@@ -72,11 +70,14 @@ void XEditAttribute::SetItem(const SfxPoolItem& rNew)
     pItem = &rNew;
 }
 
-XParaPortionList::XParaPortionList(
-    OutputDevice* pRefDev, sal_uInt32 nPW, sal_uInt16 _nStretchX, sal_uInt16 _nStretchY)
+XParaPortionList::XParaPortionList(OutputDevice* pRefDev, sal_uInt32 nPW,
+            double fFontScaleX, double fFontScaleY,
+            double fSpacingScaleX, double fSpacingScaleY)
     : pRefDevPtr(pRefDev)
-    , nStretchX(_nStretchX)
-    , nStretchY(_nStretchY)
+    , mfFontScaleX(fFontScaleX)
+    , mfFontScaleY(fFontScaleY)
+    , mfSpacingScaleX(fSpacingScaleX)
+    , mfSpacingScaleY(fSpacingScaleY)
     , nPaperWidth(nPW)
 {
 }
@@ -149,15 +150,15 @@ void ContentInfo::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("text"));
     OUString aText = GetText();
     // TODO share code with sax_fastparser::FastSaxSerializer::write().
-    (void)xmlTextWriterWriteString(pWriter, BAD_CAST(aText.replaceAll("", "&#9;").toUtf8().getStr()));
+    (void)xmlTextWriterWriteString(pWriter, BAD_CAST(aText.replaceAll("\x01", "&#1;").toUtf8().getStr()));
     (void)xmlTextWriterEndElement(pWriter);
     aParaAttribs.dumpAsXml(pWriter);
-    for (size_t i=0; i<maCharAttribs.size(); ++i)
+    for (auto const& rCharAttribs : maCharAttribs)
     {
         (void)xmlTextWriterStartElement(pWriter, BAD_CAST("attribs"));
-        (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("start"), "%" SAL_PRIdINT32, maCharAttribs[i].GetStart());
-        (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("end"), "%" SAL_PRIdINT32, maCharAttribs[i].GetEnd());
-        maCharAttribs[i].GetItem()->dumpAsXml(pWriter);
+        (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("start"), "%" SAL_PRIdINT32, rCharAttribs.GetStart());
+        (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("end"), "%" SAL_PRIdINT32, rCharAttribs.GetEnd());
+        rCharAttribs.GetItem()->dumpAsXml(pWriter);
         (void)xmlTextWriterEndElement(pWriter);
     }
     (void)xmlTextWriterEndElement(pWriter);

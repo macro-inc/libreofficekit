@@ -25,7 +25,8 @@
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <directsql.hxx>
 #include <datasourceconnector.hxx>
-#include <tools/diagnose_ex.h>
+#include <strings.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 
 extern "C" SAL_DLLPUBLIC_EXPORT css::uno::XInterface*

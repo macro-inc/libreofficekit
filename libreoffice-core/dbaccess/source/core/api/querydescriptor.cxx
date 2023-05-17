@@ -18,8 +18,8 @@
  */
 
 #include "querydescriptor.hxx"
-#include <apitools.hxx>
 #include <stringconstants.hxx>
+#include <strings.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
@@ -149,7 +149,7 @@ sal_Int64 SAL_CALL OQueryDescriptor_Base::getSomething( const Sequence< sal_Int8
     return comphelper::getSomethingImpl(_rIdentifier, this);
 }
 
-css::uno::Sequence<sal_Int8> OQueryDescriptor_Base::getUnoTunnelId()
+const css::uno::Sequence<sal_Int8> & OQueryDescriptor_Base::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit aId;
     return aId.getSeq();

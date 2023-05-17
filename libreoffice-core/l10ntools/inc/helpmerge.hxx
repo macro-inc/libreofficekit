@@ -24,10 +24,10 @@
 
 #include <string_view>
 
+#include "export.hxx"
 #include "xmlparse.hxx"
-#include <rtl/ustring.hxx>
-#include <rtl/ustrbuf.hxx>
-#include <rtl/strbuf.hxx>
+
+#include <rtl/string.hxx>
 
 /// This Class is responsible for extracting/merging OpenOffice XML Helpfiles
 class HelpParser
@@ -44,7 +44,7 @@ private:
 #endif
 
 public:
-    HelpParser( const OString &rHelpFile );
+    HelpParser( OString sHelpFile );
 
 /// Method append a PO file with the content of a parsed XML file
 /// @PRECOND rHelpFile is valid

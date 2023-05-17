@@ -18,6 +18,8 @@
  */
 
 #include <officecfg/Office/Common.hxx>
+#include <config_wasm_strip.h>
+
 #include <com/sun/star/accessibility/XAccessible.hpp>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/progress.hxx>
@@ -37,7 +39,6 @@
 #include <IDocumentState.hxx>
 #include <rootfrm.hxx>
 #include <pagefrm.hxx>
-#include <cntfrm.hxx>
 #include <viewimp.hxx>
 #include <frmtool.hxx>
 #include <viewopt.hxx>
@@ -51,7 +52,6 @@
 #include <fntcache.hxx>
 #include <ptqueue.hxx>
 #include <docsh.hxx>
-#include <pagedesc.hxx>
 #include <bookmark.hxx>
 #include <ndole.hxx>
 #include <ndindex.hxx>
@@ -83,6 +83,9 @@
 #if !HAVE_FEATURE_DESKTOP
 #include <vcl/sysdata.hxx>
 #endif
+
+#include <frameformats.hxx>
+#include <fmtcntnt.hxx>
 
 bool SwViewShell::sbLstAct = false;
 ShellResource *SwViewShell::spShellRes = nullptr;
@@ -248,10 +251,12 @@ void SwViewShell::ImplEndAction( const bool bIdleEnd )
         UISizeNotify();
         // tdf#101464 print preview may generate events if another view shell
         // performs layout...
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         if (IsPreview() && Imp()->IsAccessible())
         {
             Imp()->FireAccessibleEvents();
         }
+#endif
         return;
     }
 
@@ -314,29 +319,29 @@ void SwViewShell::ImplEndAction( const bool bIdleEnd )
             }
             mbPaintWorks = true;
 
-            std::unique_ptr<SwRegionRects> pRegion = Imp()->TakePaintRegion();
+            std::optional<SwRegionRects> oRegion = Imp()->TakePaintRegion();
 
             //JP 27.11.97: what hid the selection, must also Show it,
             //             else we get Paint errors!
             // e.g. additional mode, page half visible vertically, in the
             // middle a selection and with another cursor jump to left
             // right border. Without ShowCursor the selection disappears.
-            bool bShowCursor = pRegion && dynamic_cast<const SwCursorShell*>(this) !=  nullptr;
+            bool bShowCursor = oRegion && dynamic_cast<const SwCursorShell*>(this) !=  nullptr;
             if( bShowCursor )
                 static_cast<SwCursorShell*>(this)->HideCursors();
 
-            if ( pRegion )
+            if ( oRegion )
             {
                 SwRootFrame* pCurrentLayout = GetLayout();
 
-                pRegion->LimitToOrigin();
-                pRegion->Compress( SwRegionRects::CompressFuzzy );
+                oRegion->LimitToOrigin();
+                oRegion->Compress( SwRegionRects::CompressFuzzy );
 
                 ScopedVclPtr<VirtualDevice> pVout;
-                while ( !pRegion->empty() )
+                while ( !oRegion->empty() )
                 {
-                    SwRect aRect( pRegion->back() );
-                    pRegion->pop_back();
+                    SwRect aRect( oRegion->back() );
+                    oRegion->pop_back();
 
                     bool bPaint = true;
                     if ( IsEndActionByVirDev() )
@@ -456,8 +461,10 @@ void SwViewShell::ImplEndAction( const bool bIdleEnd )
     UISizeNotify();
     ++mnStartAction;
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( Imp()->IsAccessible() )
         Imp()->FireAccessibleEvents();
+#endif
 }
 
 void SwViewShell::ImplStartAction()
@@ -718,6 +725,44 @@ void SwViewShell::UpdateFields(bool bCloseDB)
         EndAction();
 }
 
+void SwViewShell::UpdateOleObjectPreviews()
+{
+    SwDoc* pDoc = GetDoc();
+    const SwFrameFormats* const pFormats = pDoc->GetSpzFrameFormats();
+    if (pFormats->empty())
+    {
+        return;
+    }
+
+    for (size_t i = 0; i < pFormats->size(); ++i)
+    {
+        SwFrameFormat* pFormat = (*pFormats)[i];
+        if (pFormat->Which() != RES_FLYFRMFMT)
+        {
+            continue;
+        }
+
+        const SwNodeIndex* pNodeIndex = pFormat->GetContent().GetContentIdx();
+        if (!pNodeIndex || !pNodeIndex->GetNodes().IsDocNodes())
+        {
+            continue;
+        }
+
+        SwNode* pNode = pDoc->GetNodes()[pNodeIndex->GetIndex() + 1];
+        SwOLENode* pOleNode = pNode->GetOLENode();
+        if (!pOleNode)
+        {
+            continue;
+        }
+
+        SwOLEObj& rOleObj = pOleNode->GetOLEObj();
+        svt::EmbeddedObjectRef& rObject = rOleObj.GetObject();
+        rObject.UpdateReplacement( true );
+        // Trigger the repaint.
+        pOleNode->SetChanged();
+    }
+}
+
 /** update all charts for which any table exists */
 void SwViewShell::UpdateAllCharts()
 {
@@ -863,18 +908,6 @@ void SwViewShell::SetAddExtLeading( bool bNew )
             pTmpDrawModel->SetAddExtLeading( bNew );
         const SwInvalidateFlags nInv = SwInvalidateFlags::PrtArea | SwInvalidateFlags::Size | SwInvalidateFlags::Table | SwInvalidateFlags::Section;
         lcl_InvalidateAllContent( *this, nInv );
-    }
-}
-
-void SwViewShell::SetUseVirDev( bool bNewVirtual )
-{
-    IDocumentSettingAccess& rIDSA = getIDocumentSettingAccess();
-    if ( rIDSA.get(DocumentSettingId::USE_VIRTUAL_DEVICE) != bNewVirtual )
-    {
-        SwWait aWait( *GetDoc()->GetDocShell(), true );
-        // this sets the flag at the document and calls PrtDataChanged
-        IDocumentDeviceAccess& rIDDA = getIDocumentDeviceAccess();
-        rIDDA.setReferenceDeviceType( bNewVirtual, true );
     }
 }
 
@@ -1293,8 +1326,10 @@ void SwViewShell::VisPortChgd( const SwRect &rRect)
     if ( !bScrolled && pPostItMgr && pPostItMgr->HasNotes() && pPostItMgr->ShowNotes() )
         pPostItMgr->CorrectPositions();
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( Imp()->IsAccessible() )
         Imp()->UpdateAccessible();
+#endif
 }
 
 bool SwViewShell::SmoothScroll( tools::Long lXDiff, tools::Long lYDiff, const tools::Rectangle *pRect )
@@ -1371,14 +1406,14 @@ bool SwViewShell::SmoothScroll( tools::Long lXDiff, tools::Long lYDiff, const to
                 // #i75172# To get a clean repaint, a new ObjectContact is needed here. Without, the
                 // repaint would not be correct since it would use the wrong DrawPage visible region.
                 // This repaint IS about painting something currently outside the visible part (!).
-                // For that purpose, AddWindowToPaintView is used which creates a new SdrPageViewWindow
+                // For that purpose, AddDeviceToPaintView is used which creates a new SdrPageViewWindow
                 // and all the necessary stuff. It's not cheap, but necessary here. Alone because repaint
                 // target really is NOT the current window.
                 // Also will automatically NOT use PreRendering and overlay (since target is VirtualDevice)
                 if(!HasDrawView())
                     MakeDrawView();
                 SdrView* pDrawView = GetDrawView();
-                pDrawView->AddWindowToPaintView(pVout, nullptr);
+                pDrawView->AddDeviceToPaintView(*pVout, nullptr);
 
                 // clear mpWin during DLPrePaint2 to get paint preparation for mpOut, but set it again
                 // immediately afterwards. There are many decisions in SW which imply that Printing
@@ -1396,7 +1431,7 @@ bool SwViewShell::SmoothScroll( tools::Long lXDiff, tools::Long lYDiff, const to
 
                 // end paint and destroy ObjectContact again
                 DLPostPaint2(true);
-                pDrawView->DeleteWindowFromPaintView(pVout);
+                pDrawView->DeleteDeviceFromPaintView(*pVout);
             }
 
             mpOut = pOld;
@@ -1656,7 +1691,7 @@ void SwViewShell::PaintDesktop_(const SwRegionRects &rRegion)
 
         // #i75172# needed to move line/Fill color setters into loop since DLPrePaint2
         // may exchange GetOut(), that's it's purpose. This happens e.g. at print preview.
-        GetOut()->SetFillColor( SwViewOption::GetAppBackgroundColor());
+        GetOut()->SetFillColor( GetViewOptions()->GetAppBackgroundColor());
         GetOut()->SetLineColor();
         GetOut()->DrawRect(aRectangle);
 
@@ -1702,32 +1737,32 @@ bool SwViewShell::CheckInvalidForPaint( const SwRect &rRect )
         aAction.Action(GetWin()->GetOutDev());
         --mnStartAction;
 
-        std::unique_ptr<SwRegionRects> pRegion = Imp()->TakePaintRegion();
-        if ( pRegion && aAction.IsBrowseActionStop() )
+        std::optional<SwRegionRects> oRegion = Imp()->TakePaintRegion();
+        if ( oRegion && aAction.IsBrowseActionStop() )
         {
             //only of interest when something has changed in the visible range
             bool bStop = true;
-            for ( size_t i = 0; i < pRegion->size(); ++i )
+            for ( size_t i = 0; i < oRegion->size(); ++i )
             {
-                const SwRect &rTmp = (*pRegion)[i];
+                const SwRect &rTmp = (*oRegion)[i];
                 bStop = rTmp.Overlaps( VisArea() );
                 if ( !bStop )
                     break;
             }
             if ( bStop )
-                pRegion.reset();
+                oRegion.reset();
         }
 
-        if ( pRegion )
+        if ( oRegion )
         {
-            pRegion->LimitToOrigin();
-            pRegion->Compress( SwRegionRects::CompressFuzzy );
+            oRegion->LimitToOrigin();
+            oRegion->Compress( SwRegionRects::CompressFuzzy );
             bRet = false;
-            if ( !pRegion->empty() )
+            if ( !oRegion->empty() )
             {
                 SwRegionRects aRegion( rRect );
-                for ( size_t i = 0; i < pRegion->size(); ++i )
-                {   const SwRect &rTmp = (*pRegion)[i];
+                for ( size_t i = 0; i < oRegion->size(); ++i )
+                {   const SwRect &rTmp = (*oRegion)[i];
                     if ( !rRect.Contains( rTmp ) )
                     {
                         InvalidateWindows( rTmp );
@@ -2287,11 +2322,15 @@ void SwViewShell::ImplApplyViewOptions( const SwViewOption &rOpt )
     // - Of course, the screen is something completely different than the printer ...
     bool const isToggleFieldNames(mpOpt->IsFieldName() != rOpt.IsFieldName());
 
-    if (mpOpt->IsFieldName() != rOpt.IsFieldName())
+    if (mpOpt->IsFieldName() != rOpt.IsFieldName()
+        || mpOpt->IsParagraph() != rOpt.IsParagraph())
     {
         GetLayout()->SetFieldmarkMode( rOpt.IsFieldName()
                     ? sw::FieldmarkMode::ShowCommand
-                    : sw::FieldmarkMode::ShowResult );
+                    : sw::FieldmarkMode::ShowResult,
+                rOpt.IsParagraph()
+                    ? sw::ParagraphBreakMode::Shown
+                    : sw::ParagraphBreakMode::Hidden);
         bReformat = true;
     }
 
@@ -2371,6 +2410,9 @@ void SwViewShell::ImplApplyViewOptions( const SwViewOption &rOpt )
         InvalidateLayout( true );
     }
 
+    SwXTextDocument* pModel = comphelper::getFromUnoTunnel<SwXTextDocument>(GetSfxViewShell()->GetCurrentDocument());
+    SfxLokHelper::notifyViewRenderState(GetSfxViewShell(), pModel);
+
     pMyWin->Invalidate();
     if ( bReformat )
     {
@@ -2391,7 +2433,7 @@ void SwViewShell::ImplApplyViewOptions( const SwViewOption &rOpt )
                     || IsCursorInFieldmarkHidden(*pSh->GetCursor(),
                             pSh->GetLayout()->GetFieldmarkMode()))
                 {   // move cursor out of field
-                    pSh->Left(1, CRSR_SKIP_CHARS);
+                    pSh->Left(1, SwCursorSkipMode::Chars);
                 }
             }
         }
@@ -2450,8 +2492,10 @@ void SwViewShell::SetReadonlyOption(bool bSet)
     }
     else if ( GetWin() )
         GetWin()->Invalidate();
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( Imp()->IsAccessible() )
         Imp()->InvalidateAccessibleEditableState( false );
+#endif
 }
 
 void  SwViewShell::SetPDFExportOption(bool bSet)
@@ -2504,6 +2548,7 @@ bool SwViewShell::IsNewLayout() const
     return GetLayout()->IsNewLayout();
 }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
 uno::Reference< css::accessibility::XAccessible > SwViewShell::CreateAccessible()
 {
     uno::Reference< css::accessibility::XAccessible > xAcc;
@@ -2607,6 +2652,7 @@ void SwViewShell::ApplyAccessibilityOptions(SvtAccessibilityOptions const & rAcc
         mpOpt->SetSelectionInReadonly(rAccessibilityOptions.IsSelectionInReadonly());
     }
 }
+#endif // ENABLE_WASM_STRIP_ACCESSIBILITY
 
 ShellResource* SwViewShell::GetShellRes()
 {
@@ -2718,6 +2764,44 @@ SwPostItMgr* SwViewShell::GetPostItMgr()
         return pView->GetPostItMgr();
 
     return nullptr;
+}
+
+void SwViewShell::GetFirstLastVisPageNumbers(SwVisiblePageNumbers& rVisiblePageNumbers)
+{
+    SwView* pView = GetDoc()->GetDocShell() ? GetDoc()->GetDocShell()->GetView() : nullptr;
+    if (!pView)
+        return;
+    SwRect rViewVisArea(pView->GetVisArea());
+    vcl::RenderContext* pRenderContext = GetOut();
+    const SwPageFrame* pPageFrame = Imp()->GetFirstVisPage(pRenderContext);
+    SwRect rPageRect = pPageFrame->getFrameArea();
+    rPageRect.AddBottom(-pPageFrame->GetBottomMargin());
+    while (!rPageRect.Overlaps(rViewVisArea) && pPageFrame->GetNext())
+    {
+        pPageFrame = static_cast<const SwPageFrame*>(pPageFrame->GetNext());
+        rPageRect = pPageFrame->getFrameArea();
+        if (rPageRect.Top() > 0)
+            rPageRect.AddBottom(-pPageFrame->GetBottomMargin());
+    }
+    rVisiblePageNumbers.nFirstPhy = pPageFrame->GetPhyPageNum();
+    rVisiblePageNumbers.nFirstVirt = pPageFrame->GetVirtPageNum();
+    const SvxNumberType& rFirstVisNum = pPageFrame->GetPageDesc()->GetNumType();
+    rVisiblePageNumbers.sFirstCustomPhy = rFirstVisNum.GetNumStr(rVisiblePageNumbers.nFirstPhy);
+    rVisiblePageNumbers.sFirstCustomVirt = rFirstVisNum.GetNumStr(rVisiblePageNumbers.nFirstVirt);
+    pPageFrame = Imp()->GetLastVisPage(pRenderContext);
+    rPageRect = pPageFrame->getFrameArea();
+    rPageRect.AddTop(pPageFrame->GetTopMargin());
+    while (!rPageRect.Overlaps(rViewVisArea) && pPageFrame->GetPrev())
+    {
+        pPageFrame = static_cast<const SwPageFrame*>(pPageFrame->GetPrev());
+        rPageRect = pPageFrame->getFrameArea();
+        rPageRect.AddTop(pPageFrame->GetTopMargin());
+    }
+    rVisiblePageNumbers.nLastPhy = pPageFrame->GetPhyPageNum();
+    rVisiblePageNumbers.nLastVirt = pPageFrame->GetVirtPageNum();
+    const SvxNumberType& rLastVisNum = pPageFrame->GetPageDesc()->GetNumType();
+    rVisiblePageNumbers.sLastCustomPhy = rLastVisNum.GetNumStr(rVisiblePageNumbers.nLastPhy);
+    rVisiblePageNumbers.sLastCustomVirt = rLastVisNum.GetNumStr(rVisiblePageNumbers.nLastVirt);
 }
 
 /*

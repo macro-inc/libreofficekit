@@ -19,21 +19,20 @@
 
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/beans/XPropertyChangeListener.hpp>
+#include <com/sun/star/form/XBoundComponent.hpp>
 #include <com/sun/star/sdbc/XRowSet.hpp>
 #include <com/sun/star/sdb/XColumn.hpp>
 #include <com/sun/star/sdb/CommandType.hpp>
-#include <com/sun/star/sdbcx/XColumnsSupplier.hpp>
-#include <com/sun/star/awt/XWindow.hpp>
-#include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/uri/UriReferenceFactory.hpp>
 
 #include <o3tl/safeint.hxx>
-#include <toolkit/helper/vclunohelper.hxx>
+#include <o3tl/string_view.hxx>
+#include <sal/log.hxx>
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/mnemonic.hxx>
-#include <vcl/settings.hxx>
 #include "general.hxx"
 #include "bibresid.hxx"
 #include "datman.hxx"
@@ -41,11 +40,7 @@
 #include <strings.hrc>
 #include "bibmod.hxx"
 #include <helpids.h>
-#include <tools/debug.hxx>
-#include <vcl/svapp.hxx>
-#include <vcl/i18nhelp.hxx>
 #include <algorithm>
-#include <tools/urlobj.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <sfx2/objsh.hxx>
 
@@ -79,7 +74,7 @@ bool SplitUrlAndPage(const OUString& rText, OUString& rUrl, int& nPageNumber)
         return false;
     }
 
-    nPageNumber = xUriRef->getFragment().copy(aPagePrefix.getLength()).toInt32();
+    nPageNumber = o3tl::toInt32(xUriRef->getFragment().subView(aPagePrefix.getLength()));
     xUriRef->clearFragment();
     rUrl = xUriRef->getUriReference();
     return true;
@@ -367,9 +362,8 @@ IMPL_LINK_NOARG(BibGeneralPage, BrowseHdl, weld::Button&, void)
     }
     else
     {
-        SfxObjectShell* pShell = SfxObjectShell::Current();
         OUString aBaseURL;
-        if (pShell)
+        if (SfxObjectShell* pShell = SfxObjectShell::Current())
         {
             aBaseURL = pShell->getDocumentBaseURL();
         }
@@ -453,27 +447,25 @@ IMPL_LINK(BibGeneralPage, LastElementKeyInputHdl, const KeyEvent&, rKeyEvent, bo
     bool bShift = rKeyEvent.GetKeyCode().IsShift();
     bool bCtrl = rKeyEvent.GetKeyCode().IsMod1();
     bool bAlt = rKeyEvent.GetKeyCode().IsMod2();
-    if (KEY_TAB == nCode && !bShift && !bCtrl && !bAlt)
+    if (KEY_TAB != nCode || bShift || bCtrl || bAlt)
+        return false;
+    SaveChanges();
+    uno::Reference<sdbc::XRowSet> xRowSet(pDatMan->getForm(), UNO_QUERY);
+    if (xRowSet.is())
     {
-        SaveChanges();
-        uno::Reference<sdbc::XRowSet> xRowSet(pDatMan->getForm(), UNO_QUERY);
-        if (xRowSet.is())
+        if (xRowSet->isLast())
         {
-            if (xRowSet->isLast())
-            {
-                uno::Reference<sdbc::XResultSetUpdate> xUpdateCursor(xRowSet, UNO_QUERY);
-                if (xUpdateCursor.is())
-                    xUpdateCursor->moveToInsertRow();
-            }
-            else
-                (void)xRowSet->next();
+            uno::Reference<sdbc::XResultSetUpdate> xUpdateCursor(xRowSet, UNO_QUERY);
+            if (xUpdateCursor.is())
+                xUpdateCursor->moveToInsertRow();
         }
-        xIdentifierED->grab_focus();
-        xIdentifierED->select_region(0, -1);
-        GainFocusHdl(*xIdentifierED);
-        return true;
+        else
+            (void)xRowSet->next();
     }
-    return false;
+    xIdentifierED->grab_focus();
+    xIdentifierED->select_region(0, -1);
+    GainFocusHdl(*xIdentifierED);
+    return true;
 }
 
 BibGeneralPage::~BibGeneralPage()
@@ -484,8 +476,8 @@ BibGeneralPage::~BibGeneralPage()
 class ChangeListener : public cppu::WeakImplHelper<css::beans::XPropertyChangeListener>
 {
 public:
-    explicit ChangeListener(const css::uno::Reference<css::beans::XPropertySet>& rPropSet)
-        : m_xPropSet(rPropSet)
+    explicit ChangeListener(css::uno::Reference<css::beans::XPropertySet> xPropSet)
+        : m_xPropSet(std::move(xPropSet))
         , m_bSelfChanging(false)
     {
     }
@@ -601,7 +593,7 @@ namespace
             {
                 aText = m_rEntry.get_text();
             }
-            m_xPropSet->setPropertyValue("Text", makeAny(aText));
+            m_xPropSet->setPropertyValue("Text", Any(aText));
 
             css::uno::Reference<css::form::XBoundComponent> xBound(m_xPropSet, css::uno::UNO_QUERY);
             if (xBound.is())
@@ -675,7 +667,7 @@ namespace
             m_bSelfChanging = true;
 
             Sequence<sal_Int16> aSelection{ o3tl::narrowing<sal_Int16>(m_rComboBox.get_active()) };
-            m_xPropSet->setPropertyValue("SelectedItems", makeAny(aSelection));
+            m_xPropSet->setPropertyValue("SelectedItems", Any(aSelection));
 
             css::uno::Reference<css::form::XBoundComponent> xBound(m_xPropSet, css::uno::UNO_QUERY);
             if (xBound.is())
@@ -790,7 +782,6 @@ bool BibGeneralPage::AddXControl(const OUString& rName, weld::Entry& rEntry)
 
             if( xPropSet.is())
             {
-                uno::Reference< beans::XPropertySetInfo >  xPropInfo = xPropSet->getPropertySetInfo();
                 maChangeListeners.emplace_back(new EntryChangeListener(rEntry, xPropSet, *this));
                 maChangeListeners.back()->start();
                 if (&rEntry == m_xLocalURLED.get())
@@ -857,8 +848,6 @@ bool BibGeneralPage::AddXControl(const OUString& rName, weld::ComboBox& rList)
 
             if( xPropSet.is())
             {
-                uno::Reference< beans::XPropertySetInfo >  xPropInfo = xPropSet->getPropertySetInfo();
-
                 css::uno::Sequence<OUString> aEntries;
                 xPropSet->getPropertyValue("StringItemList") >>= aEntries;
                 for (const OUString& rString : std::as_const(aEntries))

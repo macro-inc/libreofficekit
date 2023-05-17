@@ -21,10 +21,11 @@
 #include <res_Titles.hxx>
 #include <res_LegendPosition.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
+#include <Diagram.hxx>
 #include <AxisHelper.hxx>
 #include <ControllerLockGuard.hxx>
-#include <com/sun/star/frame/XModel.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
+#include <utility>
 
 namespace chart
 {
@@ -32,12 +33,12 @@ using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
 TitlesAndObjectsTabPage::TitlesAndObjectsTabPage(weld::Container* pPage, weld::DialogController* pController,
-                                                 const uno::Reference< XChartDocument >& xChartModel,
+                                                 rtl::Reference<::chart::ChartModel> xChartModel,
                                                  const uno::Reference< uno::XComponentContext >& xContext )
     : OWizardPage(pPage, pController, "modules/schart/ui/wizelementspage.ui", "WizElementsPage")
     , m_xTitleResources(new TitleResources(*m_xBuilder, false))
     , m_xLegendPositionResources(new LegendPositionResources(*m_xBuilder, xContext))
-    , m_xChartModel(xChartModel)
+    , m_xChartModel(std::move(xChartModel))
     , m_xCC(xContext)
     , m_bCommitToModel(true)
     , m_aTimerTriggeredControllerLock( m_xChartModel )
@@ -75,7 +76,7 @@ void TitlesAndObjectsTabPage::initializePage()
 
     //init grid checkboxes
     {
-        uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram( m_xChartModel );
+        rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( m_xChartModel );
         uno::Sequence< sal_Bool > aPossibilityList;
         uno::Sequence< sal_Bool > aExistenceList;
         AxisHelper::getAxisOrGridPossibilities( aPossibilityList, xDiagram, false );
@@ -101,7 +102,7 @@ bool TitlesAndObjectsTabPage::commitPage( ::vcl::WizardTypes::CommitPageReason /
 void TitlesAndObjectsTabPage::commitToModel()
 {
     m_aTimerTriggeredControllerLock.startTimer();
-    uno::Reference< frame::XModel >  xModel = m_xChartModel;
+    rtl::Reference<::chart::ChartModel>  xModel = m_xChartModel;
 
     ControllerLockGuardUNO aLockedControllers( xModel );
 
@@ -120,7 +121,7 @@ void TitlesAndObjectsTabPage::commitToModel()
 
     //commit grid changes to model
     {
-        uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram( xModel );
+        rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xModel );
         uno::Sequence< sal_Bool > aOldExistenceList;
         AxisHelper::getAxisOrGridExistence( aOldExistenceList, xDiagram, false );
         uno::Sequence< sal_Bool > aNewExistenceList(aOldExistenceList);

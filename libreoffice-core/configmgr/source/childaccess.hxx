@@ -56,7 +56,7 @@ public:
 
     ChildAccess(
         Components & components, rtl::Reference< RootAccess > const & root,
-        rtl::Reference< Access > const & parent, OUString const & name,
+        rtl::Reference< Access > const & parent, OUString name,
         rtl::Reference< Node > const & node);
 
     ChildAccess(
@@ -71,7 +71,7 @@ public:
 
     virtual bool isFinalized() override;
 
-    virtual OUString getNameInternal() override;
+    virtual const OUString & getNameInternal() override;
 
     virtual rtl::Reference< RootAccess > getRootAccess() override;
     virtual rtl::Reference< Access > getParentAccess() override;

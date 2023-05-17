@@ -39,6 +39,7 @@
 #include <headless/svpvd.hxx>
 
 #include <QtCore/QAbstractEventDispatcher>
+#include <QtCore/QLibraryInfo>
 #include <QtCore/QThread>
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
@@ -47,6 +48,8 @@
 #include <vclpluginapi.h>
 #include <tools/debug.hxx>
 #include <comphelper/flagguard.hxx>
+#include <dndhelper.hxx>
+#include <vcl/sysdata.hxx>
 #include <sal/log.hxx>
 #include <osl/process.h>
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && ENABLE_GSTREAMER_1_0 && QT5_HAVE_GOBJECT
@@ -97,7 +100,7 @@ public:
 
 bool QtYieldMutex::IsCurrentThread() const
 {
-    auto const* pSalInst(static_cast<QtInstance const*>(GetSalData()->m_pInstance));
+    auto const* pSalInst(GetQtInstance());
     assert(pSalInst);
     if (pSalInst->IsMainThread() && m_bNoYieldLock)
     {
@@ -108,7 +111,7 @@ bool QtYieldMutex::IsCurrentThread() const
 
 void QtYieldMutex::doAcquire(sal_uInt32 nLockCount)
 {
-    auto const* pSalInst(static_cast<QtInstance const*>(GetSalData()->m_pInstance));
+    auto const* pSalInst(GetQtInstance());
     assert(pSalInst);
     if (!pSalInst->IsMainThread())
     {
@@ -154,7 +157,7 @@ void QtYieldMutex::doAcquire(sal_uInt32 nLockCount)
 
 sal_uInt32 QtYieldMutex::doRelease(bool const bUnlockAll)
 {
-    auto const* pSalInst(static_cast<QtInstance const*>(GetSalData()->m_pInstance));
+    auto const* pSalInst(GetQtInstance());
     assert(pSalInst);
     if (pSalInst->IsMainThread() && m_bNoYieldLock)
     {
@@ -258,6 +261,8 @@ QtInstance::QtInstance(std::unique_ptr<QApplication>& pQApp, bool bUseCairo)
 
 #ifndef EMSCRIPTEN
     m_bSupportsOpenGL = true;
+#else
+    ImplGetSVData()->maAppData.m_bUseSystemLoop = true;
 #endif
 }
 
@@ -539,16 +544,16 @@ QtInstance::CreateClipboard(const css::uno::Sequence<css::uno::Any>& arguments)
     return xClipboard;
 }
 
-css::uno::Reference<css::uno::XInterface> QtInstance::CreateDragSource()
+css::uno::Reference<css::uno::XInterface>
+QtInstance::ImplCreateDragSource(const SystemEnvData* pSysEnv)
 {
-    return css::uno::Reference<css::uno::XInterface>(
-        static_cast<cppu::OWeakObject*>(new QtDragSource()));
+    return vcl::X11DnDHelper(new QtDragSource(), pSysEnv->aShellWindow);
 }
 
-css::uno::Reference<css::uno::XInterface> QtInstance::CreateDropTarget()
+css::uno::Reference<css::uno::XInterface>
+QtInstance::ImplCreateDropTarget(const SystemEnvData* pSysEnv)
 {
-    return css::uno::Reference<css::uno::XInterface>(
-        static_cast<cppu::OWeakObject*>(new QtDropTarget()));
+    return vcl::X11DnDHelper(new QtDropTarget(), pSysEnv->aShellWindow);
 }
 
 IMPL_LINK_NOARG(QtInstance, updateStyleHdl, Timer*, void)
@@ -723,6 +728,20 @@ std::unique_ptr<QApplication> QtInstance::CreateQApplication(int& nArgc, char** 
     return pQApp;
 }
 
+bool QtInstance::DoExecute(int& nExitCode)
+{
+    const bool bIsOnSystemEventLoop = Application::IsOnSystemEventLoop();
+    if (bIsOnSystemEventLoop)
+        nExitCode = QApplication::exec();
+    return bIsOnSystemEventLoop;
+}
+
+void QtInstance::DoQuit()
+{
+    if (Application::IsOnSystemEventLoop())
+        QApplication::quit();
+}
+
 void QtInstance::setActivePopup(QtFrame* pFrame)
 {
     assert(!pFrame || pFrame->isPopup());
@@ -745,7 +764,7 @@ VCLPLUG_QT_PUBLIC SalInstance* create_SalInstance()
     QtInstance* pInstance = new QtInstance(pQApp, bUseCairo);
     pInstance->MoveFakeCmdlineArgs(pFakeArgv, pFakeArgc, aFakeArgvFreeable);
 
-    new QtData(pInstance);
+    new QtData();
 
     return pInstance;
 }

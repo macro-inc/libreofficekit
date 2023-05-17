@@ -62,7 +62,7 @@ struct ReferenceToolbarPathInfo
 class ToolBarMerger
 {
     public:
-        static bool       IsCorrectContext( const OUString& aContext, std::u16string_view aModuleIdentifier );
+        static bool       IsCorrectContext( std::u16string_view aContext, std::u16string_view aModuleIdentifier );
 
         static void       ConvertSeqSeqToVector( const css::uno::Sequence< css::uno::Sequence< css::beans::PropertyValue > >& rSequence,
                                                  AddonToolbarItemContainer& rContainer );
@@ -75,7 +75,7 @@ class ToolBarMerger
                                                    OUString& rControlType,
                                                    sal_uInt16& rWidth );
 
-        static ReferenceToolbarPathInfo FindReferencePoint( const ToolBox* pToolbar,
+        static ReferenceToolbarPathInfo FindReferencePoint( const ToolBox* pToolbar, sal_uInt16 nFirstItem,
                                                             std::u16string_view rReferencePoint );
 
         static bool       ProcessMergeOperation( ToolBox*                  pToolbar,
@@ -84,7 +84,7 @@ class ToolBarMerger
                                                  CommandToInfoMap&         rCommandMap,
                                                  std::u16string_view       rModuleIdentifier,
                                                  std::u16string_view       rMergeCommand,
-                                                 const OUString&           rMergeCommandParameter,
+                                                 std::u16string_view       rMergeCommandParameter,
                                                  const AddonToolbarItemContainer& rItems );
 
         static bool       ProcessMergeFallback( ToolBox*                         pToolbar,
@@ -112,7 +112,7 @@ class ToolBarMerger
 
         static void       RemoveItems( ToolBox*           pToolbar,
                                        ToolBox::ImplToolItems::size_type nPos,
-                                       const OUString&    rMergeCommandParameter );
+                                       std::u16string_view rMergeCommandParameter );
 
         static rtl::Reference<::cppu::OWeakObject> CreateController(
             const css::uno::Reference< css::uno::XComponentContext > & rxContext,

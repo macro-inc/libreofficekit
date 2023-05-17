@@ -52,6 +52,7 @@
 #include <vcl/uitest/logger.hxx>
 #include <vcl/uitest/eventdescription.hxx>
 #include <vcl/window.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <comphelper/lok.hxx>
@@ -66,8 +67,6 @@
 #include <com/sun/star/view/XSelectionSupplier.hpp>
 
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/optional/optional.hpp>
-#include <tools/UnitConversion.hxx>
 
 using namespace com::sun::star;
 
@@ -423,7 +422,7 @@ bool SdrMarkView::EndMarkObj()
         if(maDragStat.IsMinMoved())
         {
             tools::Rectangle aRect(maDragStat.GetStart(), maDragStat.GetNow());
-            aRect.Justify();
+            aRect.Normalize();
             MarkObj(aRect, mpMarkObjOverlay->IsUnmarking());
             bRetval = true;
         }
@@ -486,7 +485,7 @@ bool SdrMarkView::EndMarkPoints()
         if(maDragStat.IsMinMoved())
         {
             tools::Rectangle aRect(maDragStat.GetStart(), maDragStat.GetNow());
-            aRect.Justify();
+            aRect.Normalize();
             MarkPoints(&aRect, mpMarkPointsOverlay->IsUnmarking());
 
             bRetval = true;
@@ -548,7 +547,7 @@ void SdrMarkView::EndMarkGluePoints()
         if(maDragStat.IsMinMoved())
         {
             tools::Rectangle aRect(maDragStat.GetStart(),maDragStat.GetNow());
-            aRect.Justify();
+            aRect.Normalize();
             MarkGluePoints(&aRect, mpMarkGluePointsOverlay->IsUnmarking());
         }
 
@@ -611,8 +610,8 @@ bool SdrMarkView::ImpIsFrameHandles() const
         const SdrObject* pObj=GetMarkedObjectByIndex(0);
         if (pObj && pObj->GetObjInventor()==SdrInventor::Default)
         {
-            sal_uInt16 nIdent=pObj->GetObjIdentifier();
-            if (nIdent==OBJ_LINE || nIdent==OBJ_EDGE || nIdent==OBJ_CAPTION || nIdent==OBJ_MEASURE || nIdent==OBJ_CUSTOMSHAPE || nIdent==OBJ_TABLE )
+            SdrObjKind nIdent=pObj->GetObjIdentifier();
+            if (nIdent==SdrObjKind::Line || nIdent==SdrObjKind::Edge || nIdent==SdrObjKind::Caption || nIdent==SdrObjKind::Measure || nIdent==SdrObjKind::CustomShape || nIdent==SdrObjKind::Table )
             {
                 bFrmHdl=false;
             }
@@ -650,50 +649,50 @@ bool SdrMarkView::ImpIsFrameHandles() const
 
 namespace
 {
-OUString lcl_getDragMethodServiceName( const OUString& rCID )
+std::u16string_view lcl_getDragMethodServiceName( std::u16string_view rCID )
 {
-    OUString aRet;
+    std::u16string_view aRet;
 
-    sal_Int32 nIndexStart = rCID.indexOf( "DragMethod=" );
-    if( nIndexStart != -1 )
+    size_t nIndexStart = rCID.find( u"DragMethod=" );
+    if( nIndexStart != std::u16string_view::npos )
     {
-        nIndexStart = rCID.indexOf( '=', nIndexStart );
-        if( nIndexStart != -1 )
+        nIndexStart = rCID.find( '=', nIndexStart );
+        if( nIndexStart != std::u16string_view::npos )
         {
             nIndexStart++;
-            sal_Int32 nNextSlash = rCID.indexOf( '/', nIndexStart );
-            if( nNextSlash != -1 )
+            size_t nNextSlash = rCID.find( '/', nIndexStart );
+            if( nNextSlash != std::u16string_view::npos )
             {
                 sal_Int32 nIndexEnd = nNextSlash;
-                sal_Int32 nNextColon = rCID.indexOf( ':', nIndexStart );
-                if( nNextColon < nNextSlash )
+                size_t nNextColon = rCID.find( ':', nIndexStart );
+                if( nNextColon == std::u16string_view::npos || nNextColon < nNextSlash )
                     nIndexEnd = nNextColon;
-                aRet = rCID.copy(nIndexStart,nIndexEnd-nIndexStart);
+                aRet = rCID.substr(nIndexStart,nIndexEnd-nIndexStart);
             }
         }
     }
     return aRet;
 }
 
-OUString lcl_getDragParameterString( const OUString& rCID )
+std::u16string_view lcl_getDragParameterString( std::u16string_view rCID )
 {
-    OUString aRet;
+    std::u16string_view aRet;
 
-    sal_Int32 nIndexStart = rCID.indexOf( "DragParameter=" );
-    if( nIndexStart != -1 )
+    size_t nIndexStart = rCID.find( u"DragParameter=" );
+    if( nIndexStart != std::u16string_view::npos )
     {
-        nIndexStart = rCID.indexOf( '=', nIndexStart );
-        if( nIndexStart != -1 )
+        nIndexStart = rCID.find( '=', nIndexStart );
+        if( nIndexStart != std::u16string_view::npos )
         {
             nIndexStart++;
-            sal_Int32 nNextSlash = rCID.indexOf( '/', nIndexStart );
-            if( nNextSlash != -1 )
+            size_t nNextSlash = rCID.find( '/', nIndexStart );
+            if( nNextSlash != std::u16string_view::npos )
             {
                 sal_Int32 nIndexEnd = nNextSlash;
-                sal_Int32 nNextColon = rCID.indexOf( ':', nIndexStart );
-                if( nNextColon < nNextSlash )
+                size_t nNextColon = rCID.find( ':', nIndexStart );
+                if( nNextColon == std::u16string_view::npos || nNextColon < nNextSlash )
                     nIndexEnd = nNextColon;
-                aRet = rCID.copy(nIndexStart,nIndexEnd-nIndexStart);
+                aRet = rCID.substr(nIndexStart,nIndexEnd-nIndexStart);
             }
         }
     }
@@ -832,12 +831,12 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
         bool bTableSelection = false;
         bool bConnectorSelection = false;
 
-        if (mpMarkedObj && mpMarkedObj->GetObjIdentifier() == OBJ_TABLE)
+        if (mpMarkedObj && mpMarkedObj->GetObjIdentifier() == SdrObjKind::Table)
         {
             auto& rTableObject = dynamic_cast<sdr::table::SdrTableObj&>(*mpMarkedObj);
             bTableSelection = rTableObject.createTableEdgesJson(aTableJsonTree);
         }
-        if (mpMarkedObj && mpMarkedObj->GetObjIdentifier() == OBJ_EDGE)
+        if (mpMarkedObj && mpMarkedObj->GetObjIdentifier() == SdrObjKind::Edge)
         {
             bConnectorSelection = dumpGluePointsToJSON(aGluePointsTree);
         }
@@ -908,29 +907,28 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
                             aExtraInfo.append(OString::boolean(aObjectCID[nPos] == '1'));
                         }
 
-                        OUString sDragMethod = lcl_getDragMethodServiceName(aValue);
-                        if (sDragMethod == "PieSegmentDragging")
+                        std::u16string_view sDragMethod = lcl_getDragMethodServiceName(aValue);
+                        if (sDragMethod == u"PieSegmentDragging")
                         {
                             // old initial offset inside the CID returned by xSelectionSupplier->getSelection()
                             // after a pie segment dragging; using SdrObject::GetName for getting a CID with the updated offset
                             aValue = pO->GetName();
-                            OUString sDragParameters = lcl_getDragParameterString(aValue);
-                            if (!sDragParameters.isEmpty())
+                            std::u16string_view sDragParameters = lcl_getDragParameterString(aValue);
+                            if (!sDragParameters.empty())
                             {
                                 aExtraInfo.append(", \"dragInfo\": { ");
                                 aExtraInfo.append("\"dragMethod\": \"");
-                                aExtraInfo.append(sDragMethod.toUtf8());
+                                aExtraInfo.append(OUString(sDragMethod).toUtf8());
                                 aExtraInfo.append("\"");
 
-                                OUString sParam;
                                 sal_Int32 nStartIndex = 0;
                                 std::array<int, 5> aDragParameters;
                                 for (auto& rParam : aDragParameters)
                                 {
-                                    sParam = sDragParameters.getToken(0, ',', nStartIndex);
-                                    if (sParam.isEmpty())
+                                    std::u16string_view sParam = o3tl::getToken(sDragParameters, 0, ',', nStartIndex);
+                                    if (sParam.empty())
                                         break;
-                                    rParam = sParam.toInt32();
+                                    rParam = o3tl::toInt32(sParam);
                                 }
 
                                 // initial offset in %
@@ -953,7 +951,7 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
                                 aExtraInfo.append("]");
 
                                 // polygon approximating the pie segment or donut segment
-                                if (pO->GetObjIdentifier() == OBJ_PATHFILL)
+                                if (pO->GetObjIdentifier() == SdrObjKind::PathFill)
                                 {
                                     const basegfx::B2DPolyPolygon aPolyPolygon(pO->TakeXorPoly());
                                     if (aPolyPolygon.count() == 1)
@@ -1097,7 +1095,7 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
                 tools::Rectangle aNegatedRect(aSelection);
                 aNegatedRect.SetLeft(-aNegatedRect.Left());
                 aNegatedRect.SetRight(-aNegatedRect.Right());
-                aNegatedRect.Justify();
+                aNegatedRect.Normalize();
                 sSelectionText = aNegatedRect.toString() +
                     ", " + OString::number(nRotAngle.get());
             }
@@ -1108,10 +1106,11 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
             }
             if (!aExtraInfo.isEmpty())
             {
-                sSelectionTextView = sSelectionText + ", " + aExtraInfo.toString() + "}";
+                sSelectionTextView = sSelectionText + ", " + aExtraInfo + "}";
                 aExtraInfo.append(handleArrayStr);
                 aExtraInfo.append("}");
-                sSelectionText += ", " + aExtraInfo.makeStringAndClear();
+                sSelectionText += ", " + aExtraInfo;
+                aExtraInfo.setLength(0);
             }
         }
 
@@ -1157,7 +1156,7 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
         }
 
         if (comphelper::LibreOfficeKit::isActive() && mpMarkedObj
-            && mpMarkedObj->GetObjIdentifier() == OBJ_MEDIA)
+            && mpMarkedObj->GetObjIdentifier() == SdrObjKind::Media)
         {
             SdrMediaObj* mediaObj = dynamic_cast<SdrMediaObj*>(mpMarkedObj);
             if (mediaObj)
@@ -1215,7 +1214,7 @@ void SdrMarkView::SetMarkHandles(SfxViewShell* pOtherShell)
         if(nullptr != mpMarkedObj)
         {
             bSingleTextObjMark =
-                dynamic_cast<const SdrTextObj*>( mpMarkedObj) !=  nullptr &&
+                DynCastSdrTextObj( mpMarkedObj) !=  nullptr &&
                 static_cast<SdrTextObj*>(mpMarkedObj)->IsTextFrame();
 
             // RotGrfFlyFrame: we may have limited rotation
@@ -1255,7 +1254,7 @@ void SdrMarkView::SetMarkHandles(SfxViewShell* pOtherShell)
         // Also formerly #122142#: Pretty much the same for SdrCaptionObj's in calc.
         if(static_cast<SdrView*>(this)->IsTextEdit())
         {
-            const SdrTextObj* pSdrTextObj = dynamic_cast< const SdrTextObj* >(mpMarkedObj);
+            const SdrTextObj* pSdrTextObj = DynCastSdrTextObj(mpMarkedObj);
 
             if (pSdrTextObj && pSdrTextObj->IsInEditMode())
             {
@@ -1343,6 +1342,13 @@ void SdrMarkView::SetMarkHandles(SfxViewShell* pOtherShell)
                         maHdlList.AddHdl(std::make_unique<SdrHdl>(aRect.BottomRight(), SdrHdlKind::LowerRight));
                     }
                 }
+            }
+
+            // Diagram selection visualization support
+            // Caution: CppunitTest_sd_tiledrendering shows that mpMarkedObj *can* actually be nullptr (!)
+            if(nullptr != mpMarkedObj && mpMarkedObj->isDiagram())
+            {
+                mpMarkedObj->AddToHdlList(maHdlList);
             }
 
             const size_t nSiz1(maHdlList.GetHdlCount());
@@ -2046,7 +2052,7 @@ bool SdrMarkView::MarkNextObj(const Point& rPnt, short nTol, bool bPrev)
         nullptr != dynamic_cast< const E3dCompoundObject* >(pObjHit);
     if (bRemap)
     {
-        pScene = dynamic_cast< E3dScene* >(pObjHit->getParentSdrObjectFromSdrObject());
+        pScene = DynCastE3dScene(pObjHit->getParentSdrObjectFromSdrObject());
         bRemap = nullptr != pScene;
     }
 
@@ -2301,7 +2307,7 @@ SdrObject* SdrMarkView::CheckSingleSdrObjectHit(const Point& rPnt, sal_uInt16 nT
     const bool bCheckIfMarkable(nOptions & SdrSearchOptions::TESTMARKABLE);
     const bool bDeep(nOptions & SdrSearchOptions::DEEP);
     const bool bOLE(dynamic_cast< const SdrOle2Obj* >(pObj) !=  nullptr);
-    auto pTextObj = dynamic_cast<const SdrTextObj*>( pObj);
+    auto pTextObj = DynCastSdrTextObj( pObj);
     const bool bTXT(pTextObj && pTextObj->IsTextFrame());
     SdrObject* pRet=nullptr;
     tools::Rectangle aRect(pObj->GetCurrentBoundRect());
@@ -2375,41 +2381,37 @@ SdrObject* SdrMarkView::CheckSingleSdrObjectHit(const Point& rPnt, sal_uInt16 nT
 {
     SdrObject* pRet=nullptr;
     rpRootObj=nullptr;
-    if (pOL!=nullptr)
+    if (!pOL)
+        return nullptr;
+    const E3dScene* pRemapScene = DynCastE3dScene(pOL->getSdrObjectFromSdrObjList());
+    const size_t nObjCount(pOL->GetObjCount());
+    size_t nObjNum(nObjCount);
+
+    while (pRet==nullptr && nObjNum>0)
     {
-        const bool bRemap(
-            nullptr != pOL->getSdrObjectFromSdrObjList()
-            && nullptr != dynamic_cast< const E3dScene* >(pOL->getSdrObjectFromSdrObjList()));
-        const E3dScene* pRemapScene(bRemap ? static_cast< E3dScene* >(pOL->getSdrObjectFromSdrObjList()) : nullptr);
-        const size_t nObjCount(pOL->GetObjCount());
-        size_t nObjNum(nObjCount);
+        nObjNum--;
+        SdrObject* pObj;
 
-        while (pRet==nullptr && nObjNum>0)
+        if(pRemapScene)
         {
-            nObjNum--;
-            SdrObject* pObj;
-
-            if(bRemap)
+            pObj = pOL->GetObj(pRemapScene->RemapOrdNum(nObjNum));
+        }
+        else
+        {
+            pObj = pOL->GetObj(nObjNum);
+        }
+        if (nOptions & SdrSearchOptions::BEFOREMARK)
+        {
+            if (pMarkList!=nullptr)
             {
-                pObj = pOL->GetObj(pRemapScene->RemapOrdNum(nObjNum));
-            }
-            else
-            {
-                pObj = pOL->GetObj(nObjNum);
-            }
-            if (nOptions & SdrSearchOptions::BEFOREMARK)
-            {
-                if (pMarkList!=nullptr)
+                if ((*pMarkList).FindObject(pObj)!=SAL_MAX_SIZE)
                 {
-                    if ((*pMarkList).FindObject(pObj)!=SAL_MAX_SIZE)
-                    {
-                        return nullptr;
-                    }
+                    return nullptr;
                 }
             }
-            pRet=CheckSingleSdrObjectHit(rPnt,nTol,pObj,pPV,nOptions,pMVisLay);
-            if (pRet!=nullptr) rpRootObj=pObj;
         }
+        pRet=CheckSingleSdrObjectHit(rPnt,nTol,pObj,pPV,nOptions,pMVisLay);
+        if (pRet!=nullptr) rpRootObj=pObj;
     }
     return pRet;
 }
@@ -2712,8 +2714,7 @@ void SdrMarkView::MarkListHasChanged()
     if (GetMarkedObjectCount()==1) {
         const SdrObject* pObj=GetMarkedObjectByIndex(0);
         if (pObj->GetObjInventor()==SdrInventor::Default) {
-            sal_uInt16 nIdent=pObj->GetObjIdentifier();
-            bOneEdgeMarked=nIdent==OBJ_EDGE;
+            bOneEdgeMarked = pObj->GetObjIdentifier() == SdrObjKind::Edge;
         }
     }
     ImpSetGlueVisible4(bOneEdgeMarked);

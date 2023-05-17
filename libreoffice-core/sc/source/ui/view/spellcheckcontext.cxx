@@ -74,10 +74,10 @@ public:
 
     bool query(SCCOL nCol, SCROW nRow, const ScRefCellValue& rCell, MisspellType*& rpRanges) const
     {
-        CellType eType = rCell.meType;
+        CellType eType = rCell.getType();
         if (eType == CELLTYPE_STRING)
         {
-            SharedStringMapType::const_iterator it = maStringMisspells.find(rCell.mpString->getData());
+            SharedStringMapType::const_iterator it = maStringMisspells.find(rCell.getSharedString()->getData());
             if (it == maStringMisspells.end())
                 return false; // Not available
 
@@ -101,9 +101,9 @@ public:
 
     void set(SCCOL nCol, SCROW nRow, const ScRefCellValue& rCell, std::unique_ptr<MisspellType> pRanges)
     {
-        CellType eType = rCell.meType;
+        CellType eType = rCell.getType();
         if (eType == CELLTYPE_STRING)
-            maStringMisspells.insert_or_assign(rCell.mpString->getData(), std::move(pRanges));
+            maStringMisspells.insert_or_assign(rCell.getSharedString()->getData(), std::move(pRanges));
         else if (eType == CELLTYPE_EDIT)
             maEditTextMisspells.insert_or_assign(CellPos(nCol, nRow), std::move(pRanges));
     }
@@ -234,7 +234,7 @@ void SpellCheckContext::setMisspellRanges(
         reset();
 
     ScRefCellValue aCell(*pDoc, ScAddress(nCol, nRow, mnTab));
-    CellType eType = aCell.meType;
+    CellType eType = aCell.getType();
 
     if (eType != CELLTYPE_STRING && eType != CELLTYPE_EDIT)
         return;
@@ -272,7 +272,7 @@ void SpellCheckContext::ensureResults(SCCOL nCol, SCROW nRow)
         if (ScDPCollection* pDPs = pDoc->GetDPCollection())
         {
             ScRangeList aPivotRanges = pDPs->GetAllTableRanges(mnTab);
-            if (aPivotRanges.In(ScAddress(nCol, nRow, mnTab))) // Don't spell check within pivot tables
+            if (aPivotRanges.Contains(ScAddress(nCol, nRow, mnTab))) // Don't spell check within pivot tables
             {
                 mpResult->set(nCol, nRow, nullptr);
                 return;
@@ -281,7 +281,7 @@ void SpellCheckContext::ensureResults(SCCOL nCol, SCROW nRow)
     }
 
     ScRefCellValue aCell(*pDoc, ScAddress(nCol, nRow, mnTab));
-    CellType eType = aCell.meType;
+    CellType eType = aCell.getType();
 
     if (eType != CELLTYPE_STRING && eType != CELLTYPE_EDIT)
     {
@@ -328,9 +328,9 @@ void SpellCheckContext::ensureResults(SCCOL nCol, SCROW nRow)
 
     // Cache miss, the cell needs spell-check..
     if (eType == CELLTYPE_STRING)
-        mpEngine->SetText(aCell.mpString->getString());
+        mpEngine->SetText(aCell.getSharedString()->getString());
     else
-        mpEngine->SetText(*aCell.mpEditText);
+        mpEngine->SetText(*aCell.getEditText());
 
     // it has to happen after we set text
     mpEngine->SetDefaultItem(SvxLanguageItem(eCellLang, EE_CHAR_LANGUAGE));

@@ -20,10 +20,7 @@
 #include <sal/config.h>
 
 #include <drawinglayer/primitive2d/BufferedDecompositionPrimitive2D.hxx>
-#include <drawinglayer/primitive2d/Tools.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
-#include <basegfx/utils/canvastools.hxx>
-#include <comphelper/sequence.hxx>
 
 namespace drawinglayer::primitive2d
 {
@@ -33,8 +30,6 @@ void BufferedDecompositionPrimitive2D::get2DDecomposition(
     Primitive2DDecompositionVisitor& rVisitor,
     const geometry::ViewInformation2D& rViewInformation) const
 {
-    std::unique_lock aGuard(m_aMutex);
-
     if (getBuffered2DDecomposition().empty())
     {
         Primitive2DContainer aNewSequence;
@@ -43,7 +38,7 @@ void BufferedDecompositionPrimitive2D::get2DDecomposition(
             std::move(aNewSequence));
     }
 
-    rVisitor.append(getBuffered2DDecomposition());
+    rVisitor.visit(getBuffered2DDecomposition());
 }
 
 } // end of namespace drawinglayer::primitive2d

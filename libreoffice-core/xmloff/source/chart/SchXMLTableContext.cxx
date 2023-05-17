@@ -27,11 +27,13 @@
 #include "transporttypes.hxx"
 #include <XMLStringBufferImportContext.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <sal/log.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/namespacemap.hxx>
 #include <comphelper/sequence.hxx>
+#include <comphelper/string.hxx>
 #include <com/sun/star/chart2/XAnyDescriptionAccess.hpp>
 #include <com/sun/star/chart2/XDataSeriesContainer.hpp>
 #include <com/sun/star/chart2/XChartDocument.hpp>
@@ -181,13 +183,13 @@ bool lcl_mapContainsRange(
 }
 
 bool lcl_tableOfRangeMatches(
-    const OUString & rRange,
+    std::u16string_view rRange,
     std::u16string_view rTableName )
 {
     // both strings are non-empty and the table name is part of the range
-    return ( !rRange.isEmpty() &&
+    return ( !rRange.empty() &&
              !rTableName.empty() &&
-             (rRange.indexOf( rTableName ) != -1 ));
+             (rRange.find( rTableName ) != std::u16string_view::npos ));
 }
 
 } // anonymous namespace
@@ -275,9 +277,9 @@ void SchXMLTableContext::endFastElement(sal_Int32 )
     if( mbHasColumnPermutation )
     {
         SAL_WARN_IF( mbHasRowPermutation, "xmloff.chart", "mbHasColumnPermutation is true" );
-        auto aPermutation( comphelper::sequenceToContainer<std::vector< sal_Int32 >>( maColumnPermutation ));
-        SAL_WARN_IF( aPermutation.empty(), "xmloff.chart", "aPermutation is NULL");
-        if( aPermutation.empty())
+        const auto & aPermutation( maColumnPermutation );
+        SAL_WARN_IF( !aPermutation.hasElements(), "xmloff.chart", "aPermutation is NULL");
+        if( !aPermutation.hasElements())
             return;
 
         // permute the values of all rows according to aPermutation
@@ -314,9 +316,9 @@ void SchXMLTableContext::endFastElement(sal_Int32 )
     }
     else if( mbHasRowPermutation )
     {
-        auto aPermutation( comphelper::sequenceToContainer<std::vector< sal_Int32 >>( maRowPermutation ));
-        SAL_WARN_IF( aPermutation.empty(), "xmloff.chart", "aPermutation is NULL");
-        if( aPermutation.empty())
+        const auto & aPermutation( maRowPermutation );
+        SAL_WARN_IF( !aPermutation.hasElements(), "xmloff.chart", "aPermutation is NULL");
+        if( !aPermutation.hasElements())
             return;
 
         bool bModified = false;
@@ -764,8 +766,8 @@ void SchXMLTableHelper::applyTableToInternalDataProvider(
         try
         {
             Reference< beans::XPropertySet > xProps( xChartDoc, uno::UNO_QUERY_THROW );
-            xProps->setPropertyValue( "DisableDataTableDialog", uno::makeAny( true ) );
-            xProps->setPropertyValue( "DisableComplexChartTypes", uno::makeAny( true ) );
+            xProps->setPropertyValue( "DisableDataTableDialog", uno::Any( true ) );
+            xProps->setPropertyValue( "DisableComplexChartTypes", uno::Any( true ) );
         }
         catch ( uno::Exception& )
         {
@@ -946,7 +948,7 @@ void SchXMLTableHelper::switchRangesFromOuterToInternalIfNecessary(
                                 if( xLabel.is() )
                                 {
                                     aRange = xLabel->getSourceRangeRepresentation();
-                                    const sal_Int32 nId {aRange.getToken(1, ' ').toInt32()};
+                                    const sal_Int32 nId = o3tl::toInt32(o3tl::getToken(aRange, 1, ' '));
                                     if( ::std::find( rTable.aHiddenColumns.begin(), rTable.aHiddenColumns.end(), nId ) == rTable.aHiddenColumns.end() )
                                         bHasUnhiddenColumns = true;
                                 }
@@ -957,7 +959,7 @@ void SchXMLTableHelper::switchRangesFromOuterToInternalIfNecessary(
                     }
                 }
 
-                if( static_cast<sal_Int32>(aRemainingSeries.size()) != aSeriesSeq.getLength() )
+                if( aRemainingSeries.size() != o3tl::make_unsigned(aSeriesSeq.getLength()) )
                 {
                     //remove the series that have only hidden data
                     xSeriesContainer->setDataSeries( comphelper::containerToSequence(aRemainingSeries) );
@@ -986,9 +988,9 @@ void SchXMLTableHelper::switchRangesFromOuterToInternalIfNecessary(
                             if( xLabel.is() )
                             {
                                 aRange = xLabel->getSourceRangeRepresentation();
-                                OUString aSecondToken = aRange.getToken(1, ' ');
-                                if( !aSecondToken.isEmpty() )
-                                    aUsageMap[aSecondToken.toInt32()] = true;
+                                std::u16string_view aSecondToken = o3tl::getToken(aRange, 1, ' ');
+                                if( !aSecondToken.empty() )
+                                    aUsageMap[o3tl::toInt32(aSecondToken)] = true;
                             }
                         }
 
@@ -1028,7 +1030,8 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > SchXMLRangeSomewhereCo
     sal_Int32 nElement,
     const css::uno::Reference< css::xml::sax::XFastAttributeList >&  )
 {
-    if( nElement == XML_ELEMENT(SVG, XML_DESC) )
+    if( nElement == XML_ELEMENT(SVG, XML_DESC)
+        || nElement == XML_ELEMENT(SVG_COMPAT, XML_DESC) )
     {
         return new XMLStringBufferImportContext( GetImport(), maRangeStringBuffer );
     }

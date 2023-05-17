@@ -34,7 +34,7 @@ namespace rptui
 using namespace ::com::sun::star;
 
 
-static void lcl_setScrollBar(sal_Int32 _nNewValue,const Point& _aPos,const Size& _aSize,ScrollBar& _rScrollBar)
+static void lcl_setScrollBar(sal_Int32 _nNewValue,const Point& _aPos,const Size& _aSize,ScrollAdaptor& _rScrollBar)
 {
     _rScrollBar.SetPosSizePixel(_aPos,_aSize);
     _rScrollBar.SetPageSize( _nNewValue );
@@ -45,9 +45,8 @@ static void lcl_setScrollBar(sal_Int32 _nNewValue,const Point& _aPos,const Size&
 OScrollWindowHelper::OScrollWindowHelper( ODesignView* _pDesignView)
     : OScrollWindowHelper_BASE( _pDesignView,WB_DIALOGCONTROL)
     ,OPropertyChangeListener(m_aMutex)
-    ,m_aHScroll( VclPtr<ScrollBar>::Create(this, WB_HSCROLL|WB_REPEAT|WB_DRAG) )
-    ,m_aVScroll( VclPtr<ScrollBar>::Create(this, WB_VSCROLL|WB_REPEAT|WB_DRAG) )
-    ,m_aCornerWin( VclPtr<ScrollBarBox>::Create(this) )
+    ,m_aHScroll( VclPtr<ScrollAdaptor>::Create(this, true) )
+    ,m_aVScroll( VclPtr<ScrollAdaptor>::Create(this, false) )
     ,m_pParent(_pDesignView)
     ,m_aReportWindow(VclPtr<rptui::OReportWindow>::Create(this,m_pParent))
 {
@@ -77,25 +76,16 @@ void OScrollWindowHelper::dispose()
 
     m_aHScroll.disposeAndClear();
     m_aVScroll.disposeAndClear();
-    m_aCornerWin.disposeAndClear();
     m_aReportWindow.disposeAndClear();
     m_pParent.clear();
     OScrollWindowHelper_BASE::dispose();
 }
 
-
-void OScrollWindowHelper::impl_initScrollBar( ScrollBar& _rScrollBar ) const
+void OScrollWindowHelper::impl_initScrollBar( ScrollAdaptor& _rScrollBar ) const
 {
-    AllSettings aSettings( _rScrollBar.GetSettings() );
-    StyleSettings aStyle( aSettings.GetStyleSettings() );
-    aStyle.SetDragFullOptions( aStyle.GetDragFullOptions() | DragFullOptions::Scroll ); // live scrolling
-    aSettings.SetStyleSettings( aStyle );
-    _rScrollBar.SetSettings( aSettings );
-
     _rScrollBar.SetScrollHdl( LINK( const_cast<OScrollWindowHelper*>(this), OScrollWindowHelper, ScrollHdl ) );
     _rScrollBar.SetLineSize( SCR_LINE_SIZE );
 }
-
 
 void OScrollWindowHelper::initialize()
 {
@@ -159,15 +149,6 @@ Size OScrollWindowHelper::ResizeScrollBars()
     m_aVScroll->Show( bVVisible );
     m_aHScroll->Show( bHVisible );
 
-    // disable painting in the corner between the scrollbars
-    if ( bVVisible && bHVisible )
-    {
-        m_aCornerWin->SetPosSizePixel(Point(aOutPixSz.Width(), aOutPixSz.Height()), Size(nScrSize, nScrSize) );
-        m_aCornerWin->Show();
-    }
-    else
-        m_aCornerWin->Hide();
-
     const Point aOffset = LogicToPixel(Point(SECTION_OFFSET, SECTION_OFFSET), MapMode(MapUnit::MapAppFont));
     // resize scrollbars and set their ranges
     {
@@ -191,7 +172,7 @@ void OScrollWindowHelper::Resize()
     m_aReportWindow->SetPosSizePixel(Point( 0, 0 ),aTotalOutputSize);
 }
 
-IMPL_LINK( OScrollWindowHelper, ScrollHdl, ScrollBar*, /*pScroll*/, void )
+IMPL_LINK_NOARG(OScrollWindowHelper, ScrollHdl, weld::Scrollbar&, void)
 {
     m_aReportWindow->ScrollChildren( getThumbPos() );
 }
@@ -258,7 +239,7 @@ bool OScrollWindowHelper::IsPasteAllowed() const
     return m_aReportWindow->IsPasteAllowed();
 }
 
-void OScrollWindowHelper::SelectAll(const sal_uInt16 _nObjectType)
+void OScrollWindowHelper::SelectAll(const SdrObjKind _nObjectType)
 {
     m_aReportWindow->SelectAll(_nObjectType);
 }
@@ -331,8 +312,8 @@ bool OScrollWindowHelper::EventNotify( NotifyEvent& rNEvt )
          (pCommandEvent->GetCommand() == CommandEventId::StartAutoScroll) ||
          (pCommandEvent->GetCommand() == CommandEventId::AutoScroll)) )
     {
-        ScrollBar* pHScrBar = nullptr;
-        ScrollBar* pVScrBar = nullptr;
+        ScrollAdaptor* pHScrBar = nullptr;
+        ScrollAdaptor* pVScrBar = nullptr;
         if ( m_aHScroll->IsVisible() )
             pHScrBar = m_aHScroll.get();
 

@@ -602,7 +602,7 @@ SwTextFormatColl* DocumentStylePoolManager::GetTextCollFromPool( sal_uInt16 nId,
                 OUString aName;
                 SwStyleNameMapper::GetUIName(nId, aName);
                 if (!aName.isEmpty())
-                    pNewColl->SetName(aName);
+                    pNewColl->SetFormatName(aName);
             }
 
             return pNewColl;
@@ -657,13 +657,11 @@ SwTextFormatColl* DocumentStylePoolManager::GetTextCollFromPool( sal_uInt16 nId,
 
     {
 
-//FEATURE::CONDCOLL
         if(::IsConditionalByPoolId( nId ))
             pNewColl = new SwConditionTextFormatColl( m_rDoc.GetAttrPool(), aNm, !nParent
                                                 ? m_rDoc.GetDfltTextFormatColl()
                                                 : GetTextCollFromPool( nParent ));
         else
-//FEATURE::CONDCOLL
             pNewColl = new SwTextFormatColl( m_rDoc.GetAttrPool(), aNm, !nParent
                                             ? m_rDoc.GetDfltTextFormatColl()
                                             : GetTextCollFromPool( nParent ));
@@ -823,14 +821,6 @@ SwTextFormatColl* DocumentStylePoolManager::GetTextCollFromPool( sal_uInt16 nId,
                     aSet.Put( SvxWidowsItem( 0, RES_PARATR_WIDOWS ) );
                     aSet.Put( SvxOrphansItem( 0, RES_PARATR_ORPHANS ) );
                 }
-                // tdf#143066 : set language to 'none' to prevent spell checking for indices
-                if (nId == RES_POOLCOLL_REGISTER_BASE)
-                {
-                    aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_LANGUAGE ) );
-                    aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_CJK_LANGUAGE ) );
-                    aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_CTL_LANGUAGE ) );
-                }
-                break;
             }
             break;
 
@@ -1559,19 +1549,12 @@ SwFormat* DocumentStylePoolManager::GetFormatFromPool( sal_uInt16 nId )
         {
             aSet.Put( SvxColorItem( COL_BLUE, RES_CHRATR_COLOR ) );
             aSet.Put( SvxUnderlineItem( LINESTYLE_SINGLE, RES_CHRATR_UNDERLINE ) );
-            // i40133: patch submitted by rail: set language to 'none' to prevent spell checking:
-            aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_LANGUAGE ) );
-            aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_CJK_LANGUAGE ) );
-            aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_CTL_LANGUAGE ) );
         }
         break;
     case RES_POOLCHR_INET_VISIT:
         {
             aSet.Put( SvxColorItem( COL_RED, RES_CHRATR_COLOR ) );
             aSet.Put( SvxUnderlineItem( LINESTYLE_SINGLE, RES_CHRATR_UNDERLINE ) );
-            aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_LANGUAGE ) );
-            aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_CJK_LANGUAGE ) );
-            aSet.Put( SvxLanguageItem( LANGUAGE_NONE, RES_CHRATR_CTL_LANGUAGE ) );
         }
         break;
     case RES_POOLCHR_JUMPEDIT:
@@ -1662,7 +1645,7 @@ SwFormat* DocumentStylePoolManager::GetFormatFromPool( sal_uInt16 nId )
         {
             aSet.Put( SwFormatAnchor( RndStdIds::FLY_AS_CHAR ) );
             aSet.Put( SwFormatVertOrient( 0, text::VertOrientation::CHAR_CENTER, text::RelOrientation::FRAME ) );
-            aSet.Put( SvxLRSpaceItem( 114, 114, 0, 0, RES_LR_SPACE ) );
+            aSet.Put( SvxLRSpaceItem( 0, 0, 0, 0, RES_LR_SPACE ) );
         }
         break;
     case RES_POOLFRM_MARGINAL:
@@ -2086,7 +2069,7 @@ SwNumRule* DocumentStylePoolManager::GetNumRuleFromPool( sal_uInt16 nId )
             static const sal_uInt16 aAbsSpace[ MAXLEVEL ] =
                 {
 //              cm: 1.33 cm intervals
-                    754, 1508, 1191, 2262, 3016, 3771, 4525, 5279, 6033, 6787
+                    754, 1508, 2262, 3016, 3771, 4525, 5279, 6033, 6787, 7541
                 };
             const sal_uInt16* pArr = aAbsSpace;
 
@@ -2122,9 +2105,9 @@ SwNumRule* DocumentStylePoolManager::GetNumRuleFromPool( sal_uInt16 nId )
             // [ First, LSpace ]
             static const sal_uInt16 aAbsSpace0to2[] =
                 {
-                    174,  754,      // 0.33, 1.33,
-                    567,  1151,      // 1.03, 2.03,
-                    397,  1548       // 2.03, 2.73
+                    174,  754,  // 0.33, 1.33cm
+                    174,  1508, // 0.33, 2.66cm
+                    397,  2262  // 0.70, 4.00cm
                 };
 
             const sal_uInt16* pArr0to2 = aAbsSpace0to2;
@@ -2144,8 +2127,8 @@ SwNumRule* DocumentStylePoolManager::GetNumRuleFromPool( sal_uInt16 nId )
 
             if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_WIDTH_AND_POSITION )
             {
-                aFormat.SetFirstLineOffset( -pArr0to2[0] );    // == 0.33 cm
-                aFormat.SetAbsLSpace( pArr0to2[1] );           // == 1.33 cm
+                aFormat.SetFirstLineOffset(- pArr0to2[0]); // num ends at 1.00 cm
+                aFormat.SetAbsLSpace(pArr0to2[1]);         // text starts at 1.33 cm
             }
             else if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_ALIGNMENT )
             {
@@ -2157,14 +2140,14 @@ SwNumRule* DocumentStylePoolManager::GetNumRuleFromPool( sal_uInt16 nId )
             aFormat.SetCharFormat( pNumCFormat );
             pNewRule->Set( 0, aFormat );
 
+            aFormat.SetNumberingType(SVX_NUM_ROMAN_UPPER);
             aFormat.SetIncludeUpperLevels( 1 );
-            aFormat.SetStart( 1 );
             aFormat.SetListFormat("", ".", 1);
 
             if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_WIDTH_AND_POSITION )
             {
-                aFormat.SetFirstLineOffset( -pArr0to2[2] );    // == 1.03 cm
-                aFormat.SetAbsLSpace( pArr0to2[3] );           // == 2.03 cm
+                aFormat.SetFirstLineOffset(- pArr0to2[2]); // num ends at 2.33 cm
+                aFormat.SetAbsLSpace(pArr0to2[3]);         // text starts at 2.66 cm
             }
             else if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_ALIGNMENT )
             {
@@ -2177,13 +2160,13 @@ SwNumRule* DocumentStylePoolManager::GetNumRuleFromPool( sal_uInt16 nId )
 
             aFormat.SetNumberingType(SVX_NUM_CHARS_LOWER_LETTER);
             aFormat.SetIncludeUpperLevels( 1 );
-            aFormat.SetStart( 3 );
             aFormat.SetListFormat("", u")", 2);
+            aFormat.SetNumAdjust( SvxAdjust::Left );
 
             if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_WIDTH_AND_POSITION )
             {
-                aFormat.SetFirstLineOffset( - pArr0to2[4] );   // == 2.03 cm
-                aFormat.SetAbsLSpace( pArr0to2[5] );           // == 2.73 cm
+                aFormat.SetFirstLineOffset(- pArr0to2[4]); // num starts at 3.30 cm
+                aFormat.SetAbsLSpace(pArr0to2[5]);         // text starts at 4.00 cm
             }
             else if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_ALIGNMENT )
             {
@@ -2198,8 +2181,8 @@ SwNumRule* DocumentStylePoolManager::GetNumRuleFromPool( sal_uInt16 nId )
             aFormat.SetCharFormat( pBullCFormat );
             aFormat.SetBulletFont(  &numfunc::GetDefBulletFont() );
             aFormat.SetBulletChar( cBulletChar );
-            sal_Int16 nOffs = o3tl::convert(4, o3tl::Length::mm, o3tl::Length::twip),
-                      nOffs2 = o3tl::convert(2, o3tl::Length::cm, o3tl::Length::twip);
+            sal_Int16 nOffs = o3tl::convert(660, o3tl::Length::mm100, o3tl::Length::twip),
+                      nOffs2 = o3tl::convert(4000, o3tl::Length::mm100, o3tl::Length::twip);
 
             if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_WIDTH_AND_POSITION )
             {
@@ -2217,11 +2200,11 @@ SwNumRule* DocumentStylePoolManager::GetNumRuleFromPool( sal_uInt16 nId )
 
                 if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_WIDTH_AND_POSITION )
                 {
-                    aFormat.SetAbsLSpace( nOffs2 + ((n-3) * nOffs) );
+                    aFormat.SetAbsLSpace(nOffs2 + ((n - 2) * static_cast<tools::Long>(nOffs)));
                 }
                 else if ( eNumberFormatPositionAndSpaceMode == SvxNumberFormat::LABEL_ALIGNMENT )
                 {
-                    tools::Long nPos = nOffs2 + ((n-3) * static_cast<tools::Long>(nOffs));
+                    tools::Long nPos = nOffs2 + ((n - 2) * static_cast<tools::Long>(nOffs));
                     aFormat.SetListtabPos(nPos);
                     aFormat.SetIndentAt(nPos);
                 }

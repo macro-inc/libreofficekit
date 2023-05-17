@@ -56,8 +56,11 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 	$(gb_RUN_CONFIGURE) ./configure \
 		$(if $(debug),STRIP=" ") \
 		$(if $(filter ANDROID iOS,$(OS)),CFLAGS="$(if $(debug),-g) $(ZLIB_CFLAGS) $(gb_VISIBILITY_FLAGS)") \
-		$(if $(filter EMSCRIPTEN,$(OS)),CFLAGS=" $(ZLIB_CFLAGS)" --enable-pthread=yes PTHREAD_LIBS="") \
-		$(if $(filter-out EMSCRIPTEN ANDROID iOS,$(OS)),CFLAGS="$(CFLAGS) $(if $(debug),-g) $(ZLIB_CFLAGS)" ) \
+		$(if $(filter EMSCRIPTEN,$(OS)),CFLAGS="-O3 -DCAIRO_NO_MUTEX $(ZLIB_CFLAGS) -Wno-enum-conversion $(gb_EMSCRIPTEN_CPPFLAGS)" ) \
+		$(if $(filter-out EMSCRIPTEN ANDROID iOS,$(OS)), \
+			CFLAGS="$(CFLAGS) $(call gb_ExternalProject_get_build_flags,cairo) $(ZLIB_CFLAGS)" \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,cairo)" \
+			) \
 		$(if $(filter ANDROID iOS,$(OS)),PKG_CONFIG=./dummy_pkg_config) \
 		LIBS="$(ZLIB_LIBS)" \
 		$(if $(filter -fsanitize=%,$(LDFLAGS)),LDFLAGS="$(LDFLAGS) -fuse-ld=bfd") \
@@ -79,8 +82,8 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 		--disable-valgrind \
 		--enable-ft --enable-fc \
 		--disable-svg --enable-gtk-doc=no --enable-test-surfaces=no \
-		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
-		$(if $(filter INTEL ARM X86_64,$(CPUNAME)),ac_cv_c_bigendian=no ax_cv_c_float_words_bigendian=no) \
+		$(gb_CONFIGURE_PLATFORMS) \
+		$(if $(CROSS_COMPILING),$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no ax_cv_c_float_words_bigendian=no)) \
 		$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
 		$(if $(filter MACOSX,$(OS)),FONTCONFIG_LIBS="-L$(call gb_UnpackedTarball_get_dir,fontconfig)/src/.libs -lfontconfig -L$(gb_StaticLibrary_WORKDIR) -lexpat") \
 	&& cd src && $(MAKE) \

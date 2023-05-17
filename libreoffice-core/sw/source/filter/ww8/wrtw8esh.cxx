@@ -33,6 +33,7 @@
 #include <svx/svdobj.hxx>
 #include <svx/svdotext.hxx>
 #include <svx/svdpage.hxx>
+#include <editeng/colritem.hxx>
 #include <editeng/outlobj.hxx>
 #include <editeng/editobj.hxx>
 #include <editeng/brushitem.hxx>
@@ -46,9 +47,7 @@
 #include <editeng/eeitem.hxx>
 #include <editeng/formatbreakitem.hxx>
 #include <svx/svdouno.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/svdview.hxx>
-#include <svx/unopage.hxx>
 #include <fmtcnct.hxx>
 #include <fmtanchr.hxx>
 #include <fmtsrnd.hxx>
@@ -87,7 +86,6 @@
 #include <fmturl.hxx>
 #include <frameformats.hxx>
 #include <sfx2/sfxsids.hrc>
-#include <unotools/saveopt.hxx>
 #include <o3tl/enumrange.hxx>
 #include <o3tl/enumarray.hxx>
 #include <sfx2/docfile.hxx>
@@ -105,7 +103,7 @@ using ::com::sun::star::drawing::XShape;
 bool SwBasicEscherEx::IsRelUrl() const
 {
     bool bRelUrl = false;
-    SfxMedium * pMedium = rWrt.GetWriter().GetMedia();
+    SfxMedium * pMedium = mrWrt.GetWriter().GetMedia();
     if ( pMedium )
         bRelUrl = pMedium->IsRemote()
             ? officecfg::Office::Common::Save::URL::Internet::get()
@@ -116,13 +114,13 @@ bool SwBasicEscherEx::IsRelUrl() const
 OUString SwBasicEscherEx::GetBasePath() const
 {
     OUString sDocUrl;
-    SfxMedium * pMedium = rWrt.GetWriter().GetMedia();
+    SfxMedium * pMedium = mrWrt.GetWriter().GetMedia();
     if (pMedium)
     {
         const SfxItemSet* pPItemSet = pMedium->GetItemSet();
         if( pPItemSet )
         {
-            const SfxStringItem* pPItem = dynamic_cast< const SfxStringItem* >( pPItemSet->GetItem( SID_FILE_NAME ) );
+            const SfxStringItem* pPItem = pPItemSet->GetItem( SID_FILE_NAME );
             if ( pPItem )
                 sDocUrl = pPItem->GetValue();
         }
@@ -276,12 +274,8 @@ void SwBasicEscherEx::WriteHyperlinkWithinFly( SvMemoryStream& rStrm, const SwFo
 }
 void SwBasicEscherEx::PreWriteHyperlinkWithinFly(const SwFrameFormat& rFormat,EscherPropertyContainer& rPropOpt)
 {
-    const SfxPoolItem* pItem;
     const SwAttrSet& rAttrSet = rFormat.GetAttrSet();
-    if (SfxItemState::SET != rAttrSet.GetItemState(RES_URL, true, &pItem))
-        return;
-
-    const SwFormatURL *pINetFormat = dynamic_cast<const SwFormatURL*>(pItem);
+    const SwFormatURL* pINetFormat = rAttrSet.GetItemIfSet(RES_URL);
     if (!pINetFormat || pINetFormat->GetURL().isEmpty())
         return;
 
@@ -319,14 +313,14 @@ namespace
     class CompareDrawObjs
     {
     private:
-        const WW8Export& wrt;
+        const WW8Export& m_rWrt;
 
     public:
-        explicit CompareDrawObjs(const WW8Export& rWrt) : wrt(rWrt) {};
+        explicit CompareDrawObjs(const WW8Export& rWrt) : m_rWrt(rWrt) {};
         bool operator()(DrawObj const *a, DrawObj const *b) const
         {
-            sal_uLong aSort = lcl_getSdrOrderNumber(wrt, a);
-            sal_uLong bSort = lcl_getSdrOrderNumber(wrt, b);
+            sal_uLong aSort = lcl_getSdrOrderNumber(m_rWrt, a);
+            sal_uLong bSort = lcl_getSdrOrderNumber(m_rWrt, b);
             return aSort < bSort;
         }
     };
@@ -433,7 +427,7 @@ void WW8Export::DoComboBox(const OUString &rName,
     OutputField(nullptr, ww::eFORMDROPDOWN, FieldString(ww::eFORMDROPDOWN),
              FieldFlags::Start | FieldFlags::CmdStart);
     // write the reference to the "picture" structure
-    sal_uLong nDataStt = pDataStrm->Tell();
+    sal_uInt64 nDataStt = m_pDataStrm->Tell();
     m_pChpPlc->AppendFkpEntry( Strm().Tell() );
 
     WriteChar( 0x01 );
@@ -469,7 +463,7 @@ void WW8Export::DoComboBox(const OUString &rName,
         aFFData.addListboxEntry(rListItems[i]);
     }
 
-    aFFData.Write(pDataStrm);
+    aFFData.Write(m_pDataStrm);
 }
 
 void WW8Export::DoFormText(const SwInputField * pField)
@@ -477,7 +471,7 @@ void WW8Export::DoFormText(const SwInputField * pField)
     OutputField(nullptr, ww::eFORMTEXT, FieldString(ww::eFORMTEXT),
         FieldFlags::Start | FieldFlags::CmdStart);
     // write the reference to the "picture" structure
-    sal_uLong nDataStt = pDataStrm->Tell();
+    sal_uInt64 nDataStt = m_pDataStrm->Tell();
     m_pChpPlc->AppendFkpEntry( Strm().Tell() );
 
     WriteChar( 0x01 );
@@ -500,7 +494,7 @@ void WW8Export::DoFormText(const SwInputField * pField)
     aFFData.setName(pField->GetPar2());
     aFFData.setHelp(pField->GetHelp());
     aFFData.setStatus(pField->GetToolTip());
-    aFFData.Write(pDataStrm);
+    aFFData.Write(m_pDataStrm);
 
     OutputField(nullptr, ww::eFORMTEXT, OUString(), FieldFlags::CmdEnd);
 
@@ -617,22 +611,22 @@ void WW8Export::MiserableRTLFrameFormatHack(SwTwips &rLeft, SwTwips &rRight,
 
 void PlcDrawObj::WritePlc( WW8Export& rWrt ) const
 {
-    if (8 > rWrt.pFib->m_nVersion)    // Cannot export drawobject in vers 7-
+    if (8 > rWrt.m_pFib->m_nVersion)    // Cannot export drawobject in vers 7-
         return;
 
-    sal_uInt32 nFcStart = rWrt.pTableStrm->Tell();
+    sal_uInt32 nFcStart = rWrt.m_pTableStrm->Tell();
 
     if (maDrawObjs.empty())
         return;
 
     // write CPs
-    WW8Fib& rFib = *rWrt.pFib;
+    WW8Fib& rFib = *rWrt.m_pFib;
     WW8_CP nCpOffs = GetCpOffset(rFib);
 
     for (const auto& rDrawObj : maDrawObjs)
-        SwWW8Writer::WriteLong(*rWrt.pTableStrm, rDrawObj.mnCp - nCpOffs);
+        SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, rDrawObj.mnCp - nCpOffs);
 
-    SwWW8Writer::WriteLong(*rWrt.pTableStrm, rFib.m_ccpText + rFib.m_ccpFootnote +
+    SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, rFib.m_ccpText + rFib.m_ccpFootnote +
         rFib.m_ccpHdr + rFib.m_ccpEdn + rFib.m_ccpTxbx + rFib.m_ccpHdrTxbx + 1);
 
     for (const auto& rDrawObj : maDrawObjs)
@@ -680,11 +674,11 @@ void PlcDrawObj::WritePlc( WW8Export& rWrt ) const
 
                 // rotating to vertical means swapping height and width as seen in SvxMSDffManager::ImportShape
                 const Degree100 nAngle = NormAngle36000( pObj->GetRotateAngle() );
-                const bool bAllowSwap = pObj->GetObjIdentifier() != OBJ_LINE && pObj->GetObjIdentifier() != OBJ_GRUP;
+                const bool bAllowSwap = pObj->GetObjIdentifier() != SdrObjKind::Line && pObj->GetObjIdentifier() != SdrObjKind::Group;
                 if ( bAllowSwap && (( nAngle > 4500_deg100 && nAngle <= 13500_deg100 ) || ( nAngle > 22500_deg100 && nAngle <= 31500_deg100 )) )
                 {
-                    const tools::Long nWidth  = aRect.getWidth();
-                    const tools::Long nHeight = aRect.getHeight();
+                    const tools::Long nWidth  = aRect.getOpenWidth();
+                    const tools::Long nHeight = aRect.getOpenHeight();
                     aRect.setWidth( nHeight );
                     aRect.setHeight( nWidth );
                     bHasHeightWidthSwapped = true;
@@ -728,7 +722,7 @@ void PlcDrawObj::WritePlc( WW8Export& rWrt ) const
         }
 
         // spid
-        SwWW8Writer::WriteLong(*rWrt.pTableStrm, rDrawObj.mnShapeId);
+        SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, rDrawObj.mnShapeId);
 
         SwTwips nLeft = aRect.Left() + nThick;
         SwTwips nRight = aRect.Right() - nThick;
@@ -756,10 +750,10 @@ void PlcDrawObj::WritePlc( WW8Export& rWrt ) const
         {
             SwTwips nXOff;
             SwTwips nYOff;
-            SwTwips nSnapWidth = pObj->GetSnapRect().getWidth();
-            SwTwips nSnapHeight = pObj->GetSnapRect().getHeight();
-            SwTwips nLogicWidth = pObj->GetLogicRect().getWidth();
-            SwTwips nLogicHeight = pObj->GetLogicRect().getHeight();
+            SwTwips nSnapWidth = pObj->GetSnapRect().getOpenWidth();
+            SwTwips nSnapHeight = pObj->GetSnapRect().getOpenHeight();
+            SwTwips nLogicWidth = pObj->GetLogicRect().getOpenWidth();
+            SwTwips nLogicHeight = pObj->GetLogicRect().getOpenHeight();
             // +1 for to compensate integer arithmetic rounding errors
             if(bHasHeightWidthSwapped)
             {
@@ -780,10 +774,10 @@ void PlcDrawObj::WritePlc( WW8Export& rWrt ) const
         //xaLeft/yaTop/xaRight/yaBottom - rel. to anchor
         //(most of) the border is outside the graphic is word, so
         //change dimensions to fit
-        SwWW8Writer::WriteLong(*rWrt.pTableStrm, nLeft);
-        SwWW8Writer::WriteLong(*rWrt.pTableStrm, nTop);
-        SwWW8Writer::WriteLong(*rWrt.pTableStrm, nRight);
-        SwWW8Writer::WriteLong(*rWrt.pTableStrm, nBottom);
+        SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, nLeft);
+        SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, nTop);
+        SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, nRight);
+        SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, nBottom);
 
         //fHdr/bx/by/wr/wrk/fRcaSimple/fBelowText/fAnchorLock
         sal_uInt16 nFlags=0;
@@ -843,13 +837,13 @@ void PlcDrawObj::WritePlc( WW8Export& rWrt ) const
         if (rFrameFormat.IsInline())
             nFlags |= 0x8000;
 
-        SwWW8Writer::WriteShort(*rWrt.pTableStrm, nFlags);
+        SwWW8Writer::WriteShort(*rWrt.m_pTableStrm, nFlags);
 
         // cTxbx
-        SwWW8Writer::WriteLong(*rWrt.pTableStrm, 0);
+        SwWW8Writer::WriteLong(*rWrt.m_pTableStrm, 0);
     }
 
-    RegisterWithFib(rFib, nFcStart, rWrt.pTableStrm->Tell() - nFcStart);
+    RegisterWithFib(rFib, nFcStart, rWrt.m_pTableStrm->Tell() - nFcStart);
 }
 
 void MainTextPlcDrawObj::RegisterWithFib(WW8Fib &rFib, sal_uInt32 nStart,
@@ -911,15 +905,15 @@ void DrawObj::SetShapeDetails(sal_uInt32 nId, sal_Int32 nThick)
 bool WW8_WrPlcTextBoxes::WriteText( WW8Export& rWrt )
 {
     rWrt.m_bInWriteEscher = true;
-    WW8_CP& rccp=TXT_TXTBOX == nTyp ? rWrt.pFib->m_ccpTxbx : rWrt.pFib->m_ccpHdrTxbx;
+    WW8_CP& rccp=TXT_TXTBOX == m_nTyp ? rWrt.m_pFib->m_ccpTxbx : rWrt.m_pFib->m_ccpHdrTxbx;
 
-    bool bRet = WriteGenericText( rWrt, nTyp, rccp );
+    bool bRet = WriteGenericText( rWrt, m_nTyp, rccp );
 
     WW8_CP nCP = rWrt.Fc2Cp( rWrt.Strm().Tell() );
-    WW8Fib& rFib = *rWrt.pFib;
+    WW8Fib& rFib = *rWrt.m_pFib;
     WW8_CP nMyOffset = rFib.m_ccpText + rFib.m_ccpFootnote + rFib.m_ccpHdr + rFib.m_ccpAtn
                             + rFib.m_ccpEdn;
-    if( TXT_TXTBOX == nTyp )
+    if( TXT_TXTBOX == m_nTyp )
         rWrt.m_pFieldTextBxs->Finish( nCP, nMyOffset );
     else
         rWrt.m_pFieldHFTextBxs->Finish( nCP, nMyOffset + rFib.m_ccpTxbx );
@@ -929,23 +923,23 @@ bool WW8_WrPlcTextBoxes::WriteText( WW8Export& rWrt )
 
 void WW8_WrPlcTextBoxes::Append( const SdrObject& rObj, sal_uInt32 nShapeId )
 {
-    aContent.push_back( &rObj );
-    aShapeIds.push_back( nShapeId );
+    m_aContent.push_back( &rObj );
+    m_aShapeIds.push_back( nShapeId );
     //save NULL, if we have an actual SdrObject
-    aSpareFormats.push_back(nullptr);
+    m_aSpareFormats.push_back(nullptr);
 }
 
 void WW8_WrPlcTextBoxes::Append( const SwFrameFormat* pFormat, sal_uInt32 nShapeId )
 {
     //no sdr object, we insert a NULL in the aContent and save the real fmt in aSpareFormats.
-    aContent.push_back( nullptr );
-    aShapeIds.push_back( nShapeId );
-    aSpareFormats.push_back(pFormat);
+    m_aContent.push_back( nullptr );
+    m_aShapeIds.push_back( nShapeId );
+    m_aSpareFormats.push_back(pFormat);
 }
 
 const std::vector<sal_uInt32>* WW8_WrPlcTextBoxes::GetShapeIdArr() const
 {
-    return &aShapeIds;
+    return &m_aShapeIds;
 }
 
 sal_uInt32 WW8Export::GetSdrOrdNum( const SwFrameFormat& rFormat ) const
@@ -1016,43 +1010,43 @@ void WW8Export::AppendFlyInFlys(const ww8::Frame& rFrameFormat,
 
 MSWord_SdrAttrIter::MSWord_SdrAttrIter( MSWordExportBase& rWr,
     const EditTextObject& rEditObj, sal_uInt8 nTyp )
-    : MSWordAttrIter( rWr ), pEditObj(&rEditObj), pEditPool(nullptr), mnTyp(nTyp)
+    : MSWordAttrIter( rWr ), m_pEditObj(&rEditObj), m_pEditPool(nullptr), mnTyp(nTyp)
 {
     NextPara( 0 );
 }
 
 void MSWord_SdrAttrIter::NextPara( sal_Int32 nPar )
 {
-    nPara = nPar;
+    m_nPara = nPar;
     // Ignore change of attribute at position 0, because we expect that
     // the attributes are outputted at start of a paragraph anyway.
-    aChrTextAtrArr.clear();
-    aChrSetArr.clear();
-    nCurrentSwPos = nTmpSwPos = 0;
+    m_aChrTextAtrArr.clear();
+    m_aChrSetArr.clear();
+    m_nCurrentSwPos = m_nTmpSwPos = 0;
 
-    SfxItemSet aSet( pEditObj->GetParaAttribs( nPara ));
-    pEditPool = aSet.GetPool();
-    eNdChrSet = ItemGet<SvxFontItem>(aSet,EE_CHAR_FONTINFO).GetCharSet();
+    SfxItemSet aSet( m_pEditObj->GetParaAttribs( m_nPara ));
+    m_pEditPool = aSet.GetPool();
+    m_eNdChrSet = aSet.Get(EE_CHAR_FONTINFO).GetCharSet();
 
     assert(g_pBreakIt && g_pBreakIt->GetBreakIter().is());
-    nScript = g_pBreakIt->GetBreakIter()->getScriptType( pEditObj->GetText(nPara), 0);
+    m_nScript = g_pBreakIt->GetBreakIter()->getScriptType( m_pEditObj->GetText(m_nPara), 0);
 
-    pEditObj->GetCharAttribs( nPara, aTextAtrArr );
-    nCurrentSwPos = SearchNext( 1 );
+    m_pEditObj->GetCharAttribs( m_nPara, m_aTextAtrArr );
+    m_nCurrentSwPos = SearchNext( 1 );
 }
 
 rtl_TextEncoding MSWord_SdrAttrIter::GetNextCharSet() const
 {
-    if( !aChrSetArr.empty() )
-        return aChrSetArr.back();
-    return eNdChrSet;
+    if( !m_aChrSetArr.empty() )
+        return m_aChrSetArr.back();
+    return m_eNdChrSet;
 }
 
 // the first parameter in SearchNext() returns if it's a TextAtr
 sal_Int32 MSWord_SdrAttrIter::SearchNext( sal_Int32 nStartPos )
 {
     sal_Int32 nMinPos = SAL_MAX_INT32;
-    for(const auto& rTextAtr : aTextAtrArr)
+    for(const auto& rTextAtr : m_aTextAtrArr)
     {
         sal_Int32 nPos = rTextAtr.nStart; // first character attribute
         if( nPos >= nStartPos && nPos <= nMinPos )
@@ -1082,17 +1076,17 @@ void MSWord_SdrAttrIter::SetCharSet(const EECharAttrib& rAttr, bool bStart)
     if( bStart )
     {
         rtl_TextEncoding eChrSet = static_cast<const SvxFontItem&>(rItem).GetCharSet();
-        aChrSetArr.push_back( eChrSet );
-        aChrTextAtrArr.push_back( &rAttr );
+        m_aChrSetArr.push_back( eChrSet );
+        m_aChrTextAtrArr.push_back( &rAttr );
     }
     else
     {
         std::vector<const EECharAttrib*>::iterator it =
-           std::find( aChrTextAtrArr.begin(), aChrTextAtrArr.end(), &rAttr );
-        if ( it != aChrTextAtrArr.end() )
+           std::find( m_aChrTextAtrArr.begin(), m_aChrTextAtrArr.end(), &rAttr );
+        if ( it != m_aChrTextAtrArr.end() )
         {
-            aChrSetArr.erase( aChrSetArr.begin() + (it - aChrTextAtrArr.begin()) );
-            aChrTextAtrArr.erase( it );
+            m_aChrSetArr.erase( m_aChrSetArr.begin() + (it - m_aChrTextAtrArr.begin()) );
+            m_aChrTextAtrArr.erase( it );
         }
     }
 }
@@ -1123,7 +1117,7 @@ void MSWord_SdrAttrIter::OutAttr( sal_Int32 nSwPos )
     //duplicate attributes in docx export. Doesn't matter in doc
     //export as later props just override earlier ones.
     std::set<sal_uInt16> aUsedRunWhichs;
-    for(const auto& rTextAtr : aTextAtrArr)
+    for(const auto& rTextAtr : m_aTextAtrArr)
     {
         if (nSwPos >= rTextAtr.nStart && nSwPos < rTextAtr.nEnd)
         {
@@ -1137,19 +1131,19 @@ void MSWord_SdrAttrIter::OutAttr( sal_Int32 nSwPos )
 
     OutParaAttr(true, &aUsedRunWhichs);
 
-    if (aTextAtrArr.empty())
+    if (m_aTextAtrArr.empty())
         return;
 
     const sw::BroadcastingModify* pOldMod = m_rExport.m_pOutFormatNode;
     m_rExport.m_pOutFormatNode = nullptr;
 
-    const SfxItemPool* pSrcPool = pEditPool;
+    const SfxItemPool* pSrcPool = m_pEditPool;
     const SfxItemPool& rDstPool = m_rExport.m_rDoc.GetAttrPool();
 
-    nTmpSwPos = nSwPos;
+    m_nTmpSwPos = nSwPos;
     // Did we already produce a <w:sz> element?
     m_rExport.m_bFontSizeWritten = false;
-    for(const auto& rTextAtr : aTextAtrArr)
+    for(const auto& rTextAtr : m_aTextAtrArr)
     {
         if (nSwPos >= rTextAtr.nStart && nSwPos < rTextAtr.nEnd)
         {
@@ -1164,6 +1158,12 @@ void MSWord_SdrAttrIter::OutAttr( sal_Int32 nSwPos )
                 m_rExport.WriteChar(0x9);
                 continue;
             }
+            if (nWhich == EE_CHAR_BKGCOLOR)
+            {
+                Color aColor(static_cast<const SvxColorItem*>(rTextAtr.pAttr)->GetValue());
+                m_rExport.AttrOutput().OutputItem(SvxBrushItem(aColor, RES_CHRATR_BACKGROUND));
+                continue;
+            }
 
             const sal_uInt16 nSlotId = pSrcPool->GetSlotId(nWhich);
             if (nSlotId && nWhich != nSlotId)
@@ -1171,7 +1171,7 @@ void MSWord_SdrAttrIter::OutAttr( sal_Int32 nSwPos )
                 nWhich = rDstPool.GetWhich(nSlotId);
                 if (nWhich && nWhich != nSlotId &&
                     nWhich < RES_UNKNOWNATR_BEGIN &&
-                    m_rExport.CollapseScriptsforWordOk(nScript,nWhich))
+                    m_rExport.CollapseScriptsforWordOk(m_nScript,nWhich))
                 {
                     // use always the SW-Which Id !
                     std::unique_ptr<SfxPoolItem> pI(rTextAtr.pAttr->Clone());
@@ -1191,13 +1191,13 @@ void MSWord_SdrAttrIter::OutAttr( sal_Int32 nSwPos )
     }
     m_rExport.m_bFontSizeWritten = false;
 
-    nTmpSwPos = 0;      // HasTextItem only allowed in the above area
+    m_nTmpSwPos = 0;      // HasTextItem only allowed in the above area
     m_rExport.m_pOutFormatNode = pOldMod;
 }
 
 bool MSWord_SdrAttrIter::IsTextAttr(sal_Int32 nSwPos)
 {
-    return std::any_of(aTextAtrArr.begin(), aTextAtrArr.end(),
+    return std::any_of(m_aTextAtrArr.begin(), m_aTextAtrArr.end(),
         [nSwPos](const EECharAttrib& rTextAtr) {
             return (nSwPos >= rTextAtr.nStart && nSwPos < rTextAtr.nEnd) &&
                 (rTextAtr.pAttr->Which() == EE_FEATURE_FIELD ||
@@ -1213,15 +1213,15 @@ bool MSWord_SdrAttrIter::IsTextAttr(sal_Int32 nSwPos)
 // The search is done with bDeep.
 const SfxPoolItem* MSWord_SdrAttrIter::HasTextItem(sal_uInt16 nWhich) const
 {
-    nWhich = sw::hack::TransformWhichBetweenPools(*pEditPool,
+    nWhich = sw::hack::TransformWhichBetweenPools(*m_pEditPool,
         m_rExport.m_rDoc.GetAttrPool(), nWhich);
     if (nWhich)
     {
-        for (const auto& rTextAtr : aTextAtrArr)
+        for (const auto& rTextAtr : m_aTextAtrArr)
         {
-            if (nWhich == rTextAtr.pAttr->Which() && nTmpSwPos >= rTextAtr.nStart && nTmpSwPos < rTextAtr.nEnd)
+            if (nWhich == rTextAtr.pAttr->Which() && m_nTmpSwPos >= rTextAtr.nStart && m_nTmpSwPos < rTextAtr.nEnd)
                 return rTextAtr.pAttr;    // Found
-            if (nTmpSwPos < rTextAtr.nStart)
+            if (m_nTmpSwPos < rTextAtr.nStart)
                 return nullptr;
         }
     }
@@ -1234,7 +1234,7 @@ const SfxPoolItem& MSWord_SdrAttrIter::GetItem( sal_uInt16 nWhich ) const
     const SfxPoolItem* pRet = HasTextItem(nWhich);
     if (!pRet)
     {
-        SfxItemSet aSet(pEditObj->GetParaAttribs(nPara));
+        SfxItemSet aSet(m_pEditObj->GetParaAttribs(m_nPara));
         nWhich = GetSetWhichFromSwDocWhich(aSet, m_rExport.m_rDoc, nWhich);
         OSL_ENSURE(nWhich, "Impossible, catastrophic failure imminent");
         pRet = &aSet.Get(nWhich);
@@ -1253,10 +1253,10 @@ void MSWord_SdrAttrIter::SetItemsThatDifferFromStandard(bool bCharAttr, SfxItemS
     SfxWhichIter aWhichIter(rSet);
     for (sal_uInt16 nEEWhich = aWhichIter.FirstWhich(); nEEWhich; nEEWhich = aWhichIter.NextWhich())
     {
-        if (SfxItemState::SET != rSet.GetItemState(nEEWhich, false))
+        if (SfxItemState::SET != aWhichIter.GetItemState(false))
         {
             sal_uInt16 nSwWhich = sw::hack::TransformWhichBetweenPools(m_rExport.m_rDoc.GetAttrPool(),
-                *pEditPool, nEEWhich);
+                *m_pEditPool, nEEWhich);
             if (!nSwWhich)
                 continue;
             bool bWanted = ( bCharAttr ? ( nSwWhich >= RES_CHRATR_BEGIN && nSwWhich < RES_TXTATR_END )
@@ -1274,7 +1274,7 @@ void MSWord_SdrAttrIter::SetItemsThatDifferFromStandard(bool bCharAttr, SfxItemS
 
 void MSWord_SdrAttrIter::OutParaAttr(bool bCharAttr, const std::set<sal_uInt16>* pWhichsToIgnore)
 {
-    SfxItemSet aSet( pEditObj->GetParaAttribs( nPara ));
+    SfxItemSet aSet( m_pEditObj->GetParaAttribs( m_nPara ));
 
     SetItemsThatDifferFromStandard(bCharAttr, aSet);
 
@@ -1287,7 +1287,7 @@ void MSWord_SdrAttrIter::OutParaAttr(bool bCharAttr, const std::set<sal_uInt16>*
     SfxItemIter aIter( aSet );
     const SfxPoolItem* pItem = aIter.GetCurItem();
 
-    const SfxItemPool* pSrcPool = pEditPool,
+    const SfxItemPool* pSrcPool = m_pEditPool,
                      * pDstPool = &m_rExport.m_rDoc.GetAttrPool();
 
     do
@@ -1307,7 +1307,7 @@ void MSWord_SdrAttrIter::OutParaAttr(bool bCharAttr, const std::set<sal_uInt16>*
             // use always the SW-Which Id !
             std::unique_ptr<SfxPoolItem> pI(pItem->Clone());
             pI->SetWhich( nWhich );
-            if (m_rExport.CollapseScriptsforWordOk(nScript,nWhich))
+            if (m_rExport.CollapseScriptsforWordOk(m_nScript,nWhich))
                 m_rExport.AttrOutput().OutputItem(*pI);
         }
     } while ((pItem = aIter.NextItem()));
@@ -1351,7 +1351,7 @@ void WW8Export::WriteOutliner(const OutlinerParaObject& rParaObj, sal_uInt8 nTyp
         if( n )
             aAttrIter.NextPara( n );
 
-        OSL_ENSURE( pO->empty(), " pO is not empty at start of line" );
+        OSL_ENSURE( m_pO->empty(), " pO is not empty at start of line" );
 
         OUString aStr( rEditObj.GetText( n ));
         sal_Int32 nCurrentPos = 0;
@@ -1359,10 +1359,9 @@ void WW8Export::WriteOutliner(const OutlinerParaObject& rParaObj, sal_uInt8 nTyp
 
         const SfxItemSet& aSet(rEditObj.GetParaAttribs(n));
         bool bIsRTLPara = false;
-        const SfxPoolItem *pItem;
-        if(SfxItemState::SET == aSet.GetItemState(EE_PARA_WRITINGDIR, true, &pItem))
+        if(const SvxFrameDirectionItem* pItem = aSet.GetItemIfSet(EE_PARA_WRITINGDIR))
         {
-            SvxFrameDirection nDir = static_cast<const SvxFrameDirectionItem*>(pItem)->GetValue();
+            SvxFrameDirection nDir = pItem->GetValue();
             bIsRTLPara = SvxFrameDirection::Horizontal_RL_TB == nDir;
         }
 
@@ -1392,8 +1391,8 @@ void WW8Export::WriteOutliner(const OutlinerParaObject& rParaObj, sal_uInt8 nTyp
             }
 
             m_pChpPlc->AppendFkpEntry( Strm().Tell(),
-                                            pO->size(), pO->data() );
-            pO->clear();
+                                            m_pO->size(), m_pO->data() );
+            m_pO->clear();
 
             // exception: foot note at line end
             if( nNextAttr == nEnd && bTextAtr )
@@ -1403,17 +1402,17 @@ void WW8Export::WriteOutliner(const OutlinerParaObject& rParaObj, sal_uInt8 nTyp
         }
         while( nCurrentPos < nEnd );
 
-        OSL_ENSURE( pO->empty(), " pO is not empty at start of line" );
+        OSL_ENSURE( m_pO->empty(), " pO is not empty at start of line" );
 
-        pO->push_back( bNul );        // Style # as short
-        pO->push_back( bNul );
+        m_pO->push_back( bNul );        // Style # as short
+        m_pO->push_back( bNul );
 
         aAttrIter.OutParaAttr(false);
 
-        sal_uLong nPos = Strm().Tell();
+        sal_uInt64 nPos = Strm().Tell();
         m_pPapPlc->AppendFkpEntry( Strm().Tell(),
-                                        pO->size(), pO->data() );
-        pO->clear();
+                                        m_pO->size(), m_pO->data() );
+        m_pO->clear();
         m_pChpPlc->AppendFkpEntry( nPos );
     }
 
@@ -1431,9 +1430,11 @@ void WinwordAnchoring::WriteData( EscherEx& rEx ) const
 
     SvStream& rSt = rEx.GetStream();
     //The last argument denotes the number of sub properties in this atom
+    int nSubProps = mnGroupShapeBooleanProperties ? 1 : 0;
     if (mbInline)
     {
-        rEx.AddAtom(18, DFF_msofbtUDefProp, 3, 3); //Prop id is 0xF122
+        nSubProps += 3;
+        rEx.AddAtom(6 * nSubProps, DFF_msofbtUDefProp, 3, nSubProps); // Prop id is 0xF122
         rSt.WriteUInt16( 0x0390 ).WriteUInt32( 3 );
         rSt.WriteUInt16( 0x0392 ).WriteUInt32( 3 );
         //This sub property is required to be in the dummy inline frame as
@@ -1442,12 +1443,15 @@ void WinwordAnchoring::WriteData( EscherEx& rEx ) const
     }
     else
     {
-        rEx.AddAtom(24, DFF_msofbtUDefProp, 3, 4 ); //Prop id is 0xF122
+        nSubProps += 4;
+        rEx.AddAtom(6 * nSubProps, DFF_msofbtUDefProp, 3, nSubProps); // Prop id is 0xF122
         rSt.WriteUInt16( 0x038F ).WriteUInt32( mnXAlign );
         rSt.WriteUInt16( 0x0390 ).WriteUInt32( mnXRelTo );
         rSt.WriteUInt16( 0x0391 ).WriteUInt32( mnYAlign );
         rSt.WriteUInt16( 0x0392 ).WriteUInt32( mnYRelTo );
     }
+    if (mnGroupShapeBooleanProperties)
+        rSt.WriteUInt16(0x03BF).WriteUInt32(mnGroupShapeBooleanProperties);
 }
 
 void WW8Export::CreateEscher()
@@ -1467,13 +1471,13 @@ void WW8Export::WriteEscher()
 {
     if (m_pEscher)
     {
-        sal_uLong nStart = pTableStrm->Tell();
+        sal_uInt64 nStart = m_pTableStrm->Tell();
 
         m_pEscher->WritePictures();
         m_pEscher->FinishEscher();
 
-        pFib->m_fcDggInfo = nStart;
-        pFib->m_lcbDggInfo = pTableStrm->Tell() - nStart;
+        m_pFib->m_fcDggInfo = nStart;
+        m_pFib->m_lcbDggInfo = m_pTableStrm->Tell() - nStart;
         delete m_pEscher;
         m_pEscher = nullptr;
     }
@@ -1484,11 +1488,11 @@ void SwEscherEx::WritePictures()
     if( SvStream* pPicStrm = static_cast< SwEscherExGlobal& >( *mxGlobal ).GetPictureStream() )
     {
         // set the blip - entries to the correct stream pos
-        sal_Int32 nEndPos = rWrt.Strm().Tell();
+        sal_Int32 nEndPos = mrWrt.Strm().Tell();
         mxGlobal->SetNewBlipStreamOffset( nEndPos );
 
         pPicStrm->Seek( 0 );
-        rWrt.Strm().WriteStream( *pPicStrm );
+        mrWrt.Strm().WriteStream( *pPicStrm );
     }
     Flush();
 }
@@ -1512,7 +1516,7 @@ SvStream* SwEscherExGlobal::ImplQueryPictureStream()
 }
 
 SwBasicEscherEx::SwBasicEscherEx(SvStream* pStrm, WW8Export& rWW8Wrt)
-    : EscherEx( std::make_shared<SwEscherExGlobal>(), pStrm), rWrt(rWW8Wrt), pEscherStrm(pStrm)
+    : EscherEx( std::make_shared<SwEscherExGlobal>(), pStrm), mrWrt(rWW8Wrt), mpEscherStrm(pStrm)
 {
     Init();
 }
@@ -1586,7 +1590,7 @@ void SwBasicEscherEx::WriteGrfBullet(const Graphic& rGrf)
     aPropOpt.AddOpt( ESCHER_Prop_dxTextRight, 0 );
     const Color aTmpColor( COL_WHITE );
     std::shared_ptr<SvxBrushItem> aBrush(std::make_shared<SvxBrushItem>(aTmpColor, RES_BACKGROUND));
-    const SvxBrushItem* pRet = rWrt.GetCurrentPageBgBrush();
+    const SvxBrushItem* pRet = mrWrt.GetCurrentPageBgBrush();
     if (pRet && (pRet->GetGraphic() ||( pRet->GetColor() != COL_TRANSPARENT)))
         aBrush.reset(pRet->Clone());
     WriteBrushAttr(*aBrush, aPropOpt);
@@ -1661,27 +1665,23 @@ sal_Int32 SwBasicEscherEx::WriteGrfFlyFrame(const SwFrameFormat& rFormat, sal_uI
 void SwBasicEscherEx::WriteGrfAttr(const SwNoTextNode& rNd, const SwFrameFormat& rFormat,
     EscherPropertyContainer& rPropOpt)
 {
-    const SfxPoolItem* pItem;
     GraphicDrawMode nMode = GraphicDrawMode::Standard;
     sal_Int32 nContrast = 0;
     sal_Int16 nBrightness = 0;
 
-    if (SfxItemState::SET == rNd.GetSwAttrSet().GetItemState(RES_GRFATR_CONTRAST,
-        true, &pItem))
+    if (const SfxInt16Item* pItem = rNd.GetSwAttrSet().GetItemIfSet(RES_GRFATR_CONTRAST))
     {
-        nContrast = static_cast<const SfxInt16Item*>(pItem)->GetValue();
+        nContrast = pItem->GetValue();
     }
 
-    if (SfxItemState::SET == rNd.GetSwAttrSet().GetItemState(RES_GRFATR_LUMINANCE,
-        true, &pItem))
+    if (const SfxInt16Item* pItem = rNd.GetSwAttrSet().GetItemIfSet(RES_GRFATR_LUMINANCE))
     {
-        nBrightness = static_cast<const SfxInt16Item*>(pItem)->GetValue();
+        nBrightness = pItem->GetValue();
     }
 
-    if (SfxItemState::SET == rNd.GetSwAttrSet().GetItemState(RES_GRFATR_DRAWMODE,
-        true, &pItem))
+    if (const SfxEnumItemInterface* pItem = rNd.GetSwAttrSet().GetItemIfSet(RES_GRFATR_DRAWMODE))
     {
-        nMode = static_cast<GraphicDrawMode>(static_cast<const SfxEnumItemInterface*>(pItem)->GetEnumValue());
+        nMode = static_cast<GraphicDrawMode>(pItem->GetEnumValue());
         if (nMode == GraphicDrawMode::Watermark)
         {
             /*
@@ -1734,24 +1734,21 @@ void SwBasicEscherEx::WriteGrfAttr(const SwNoTextNode& rNd, const SwFrameFormat&
     sal_Int32 nCropR = 0;
     sal_Int32 nCropT = 0;
     sal_Int32 nCropB = 0;
-    if (SfxItemState::SET == rNd.GetSwAttrSet().GetItemState(RES_GRFATR_CROPGRF,
-        true, &pItem))
+    if (const SwCropGrf* pCropItem = rNd.GetSwAttrSet().GetItemIfSet(RES_GRFATR_CROPGRF))
     {
-        const SwCropGrf& rCrop = *static_cast<const SwCropGrf*>(pItem);
-        nCropL += rCrop.GetLeft();
-        nCropR += rCrop.GetRight();
-        nCropT += rCrop.GetTop();
-        nCropB += rCrop.GetBottom();
+        nCropL += pCropItem->GetLeft();
+        nCropR += pCropItem->GetRight();
+        nCropT += pCropItem->GetTop();
+        nCropB += pCropItem->GetBottom();
     }
 
     // simulate border padding as a negative crop.
-    if (SfxItemState::SET == rFormat.GetItemState(RES_BOX, false, &pItem))
+    if (const SvxBoxItem* pBoxItem = rFormat.GetItemIfSet(RES_BOX, false))
     {
-        const SvxBoxItem& rBox = *static_cast<const SvxBoxItem*>(pItem);
-        nCropL -= rBox.GetDistance( SvxBoxItemLine::LEFT );
-        nCropR -= rBox.GetDistance( SvxBoxItemLine::RIGHT );
-        nCropT -= rBox.GetDistance( SvxBoxItemLine::TOP );
-        nCropB -= rBox.GetDistance( SvxBoxItemLine::BOTTOM );
+        nCropL -= pBoxItem->GetDistance( SvxBoxItemLine::LEFT );
+        nCropR -= pBoxItem->GetDistance( SvxBoxItemLine::RIGHT );
+        nCropT -= pBoxItem->GetDistance( SvxBoxItemLine::TOP );
+        nCropB -= pBoxItem->GetDistance( SvxBoxItemLine::BOTTOM );
     }
 
     const Size aSz( rNd.GetTwipSize() );
@@ -1773,8 +1770,8 @@ void SwBasicEscherEx::SetPicId(const SdrObject &, sal_uInt32,
 void SwEscherEx::SetPicId(const SdrObject &rSdrObj, sal_uInt32 nShapeId,
     EscherPropertyContainer &rPropOpt)
 {
-    pTextBxs->Append(rSdrObj, nShapeId);
-    sal_uInt32 nPicId = pTextBxs->Count();
+    m_pTextBxs->Append(rSdrObj, nShapeId);
+    sal_uInt32 nPicId = m_pTextBxs->Count();
     nPicId *= 0x10000;
     rPropOpt.AddOpt( ESCHER_Prop_pictureId, nPicId );
 }
@@ -1885,20 +1882,19 @@ sal_Int32 SwBasicEscherEx::WriteFlyFrameAttr(const SwFrameFormat& rFormat,
     MSO_SPT eShapeType, EscherPropertyContainer& rPropOpt)
 {
     sal_Int32 nLineWidth=0;
-    const SfxPoolItem* pItem;
     bool bFirstLine = true;
-    if (SfxItemState::SET == rFormat.GetItemState(RES_BOX, true, &pItem))
+    if (const SvxBoxItem* pItem = rFormat.GetItemIfSet(RES_BOX))
     {
         static const o3tl::enumarray<SvxBoxItemLine, sal_uInt16> aExhperProp =
         {
-            ESCHER_Prop_dyTextTop,  ESCHER_Prop_dyTextBottom,
-            ESCHER_Prop_dxTextLeft, ESCHER_Prop_dxTextRight
+            sal_uInt16(ESCHER_Prop_dyTextTop),  sal_uInt16(ESCHER_Prop_dyTextBottom),
+            sal_uInt16(ESCHER_Prop_dxTextLeft), sal_uInt16(ESCHER_Prop_dxTextRight)
         };
         const SvxBorderLine* pLine;
 
         for( SvxBoxItemLine n : o3tl::enumrange<SvxBoxItemLine>() )
         {
-            pLine = static_cast<const SvxBoxItem*>(pItem)->GetLine( n );
+            pLine = pItem->GetLine( n );
             if( nullptr != pLine )
             {
                 if( bFirstLine )
@@ -1954,10 +1950,10 @@ sal_Int32 SwBasicEscherEx::WriteFlyFrameAttr(const SwFrameFormat& rFormat,
                     bFirstLine = false;
                 }
                 rPropOpt.AddOpt( aExhperProp[ n ], DrawModelToEmu(
-                    static_cast<const SvxBoxItem*>(pItem)->GetDistance( n ) ));
+                    pItem->GetDistance( n ) ));
             }
             else
-                rPropOpt.AddOpt( aExhperProp[ n ], DrawModelToEmu(static_cast<const SvxBoxItem*>(pItem)->GetDistance( n )) );
+                rPropOpt.AddOpt( aExhperProp[ n ], DrawModelToEmu(pItem->GetDistance( n )) );
         }
     }
     else
@@ -1973,57 +1969,49 @@ sal_Int32 SwBasicEscherEx::WriteFlyFrameAttr(const SwFrameFormat& rFormat,
         rPropOpt.AddOpt( ESCHER_Prop_fNoLineDrawDash, 0x80000 );
     }
     const SwAttrSet& rAttrSet = rFormat.GetAttrSet();
-    if (SfxItemState::SET == rAttrSet.GetItemState(RES_BOX, false, &pItem))
+    if (rAttrSet.GetItemIfSet(RES_BOX, false))
     {
-        const SvxBoxItem* pBox = static_cast<const SvxBoxItem*>(pItem);
-        if( pBox )
+        if (const SvxShadowItem* pSI =rAttrSet.GetItemIfSet(RES_SHADOW))
         {
-            const SfxPoolItem* pShadItem;
-            if (SfxItemState::SET
-                == rAttrSet.GetItemState(RES_SHADOW, true, &pShadItem))
+            constexpr sal_uInt32 nShadowType = 131074;   // shadow type of ms word. need to set the default value.
+
+            Color  nColor = pSI->GetColor();
+            sal_Int32 nOffX
+                = o3tl::convert(pSI->GetWidth(), o3tl::Length::twip, o3tl::Length::emu);
+            sal_Int32 nOffY
+                = o3tl::convert(pSI->GetWidth(), o3tl::Length::twip, o3tl::Length::emu);
+
+            SvxShadowLocation eLocation = pSI->GetLocation();
+            if( (eLocation!=SvxShadowLocation::NONE) && (pSI->GetWidth()!=0) )
             {
-                const SvxShadowItem* pSI = static_cast<const SvxShadowItem*>(pShadItem);
-
-                constexpr sal_uInt32 nShadowType = 131074;   // shadow type of ms word. need to set the default value.
-
-                Color  nColor = pSI->GetColor();
-                sal_Int32 nOffX
-                    = o3tl::convert(pSI->GetWidth(), o3tl::Length::twip, o3tl::Length::emu);
-                sal_Int32 nOffY
-                    = o3tl::convert(pSI->GetWidth(), o3tl::Length::twip, o3tl::Length::emu);
-
-                SvxShadowLocation eLocation = pSI->GetLocation();
-                if( (eLocation!=SvxShadowLocation::NONE) && (pSI->GetWidth()!=0) )
+                switch( eLocation )
                 {
-                    switch( eLocation )
+                case SvxShadowLocation::TopLeft:
                     {
-                    case SvxShadowLocation::TopLeft:
-                        {
-                            nOffX = -nOffX;
-                            nOffY = -nOffY;
-                        }
-                        break;
-                    case SvxShadowLocation::TopRight:
-                        {
-                            nOffY = -nOffY;
-                        }
-                        break;
-                    case SvxShadowLocation::BottomLeft:
-                        {
-                            nOffX = -nOffX;
-                        }
-                        break;
-                    case SvxShadowLocation::BottomRight:
-                        break;
-                    default:
-                        break;
+                        nOffX = -nOffX;
+                        nOffY = -nOffY;
                     }
-
-                    rPropOpt.AddOpt( DFF_Prop_shadowColor,      wwUtility::RGBToBGR(nColor));
-                    rPropOpt.AddOpt( DFF_Prop_shadowOffsetX,    nOffX );
-                    rPropOpt.AddOpt( DFF_Prop_shadowOffsetY,    nOffY );
-                    rPropOpt.AddOpt( DFF_Prop_fshadowObscured,  nShadowType );
+                    break;
+                case SvxShadowLocation::TopRight:
+                    {
+                        nOffY = -nOffY;
+                    }
+                    break;
+                case SvxShadowLocation::BottomLeft:
+                    {
+                        nOffX = -nOffX;
+                    }
+                    break;
+                case SvxShadowLocation::BottomRight:
+                    break;
+                default:
+                    break;
                 }
+
+                rPropOpt.AddOpt( DFF_Prop_shadowColor,      wwUtility::RGBToBGR(nColor));
+                rPropOpt.AddOpt( DFF_Prop_shadowOffsetX,    nOffX );
+                rPropOpt.AddOpt( DFF_Prop_shadowOffsetY,    nOffY );
+                rPropOpt.AddOpt( DFF_Prop_fshadowObscured,  nShadowType );
             }
         }
     }
@@ -2038,16 +2026,12 @@ sal_Int32 SwBasicEscherEx::WriteFlyFrameAttr(const SwFrameFormat& rFormat,
     if (bIsInHeader || bIsThrough)
     {
         std::unique_ptr<SvxBrushItem> aBrush(rFormat.makeBackgroundBrushItem());
-
-        if(aBrush)
-        {
-            WriteBrushAttr(*aBrush, rPropOpt);
-        }
+        WriteBrushAttr(*aBrush, rPropOpt);
     }
     else
     {
         // for unknown reasons, force exporting a non-transparent background on fly frames.
-        std::shared_ptr<SvxBrushItem> aBrush(rWrt.TrueFrameBgBrush(rFormat));
+        std::shared_ptr<SvxBrushItem> aBrush(mrWrt.TrueFrameBgBrush(rFormat));
 
         if(aBrush)
         {
@@ -2080,13 +2064,12 @@ sal_Int32 SwEscherEx::WriteFlyFrameAttr(const SwFrameFormat& rFormat, MSO_SPT eS
      way, perhaps we should actually draw in this space into the graphic we
      are exporting!
      */
-    const SfxPoolItem* pItem;
-    if (SfxItemState::SET == rFormat.GetItemState(RES_LR_SPACE, true, &pItem))
+    if (const SvxLRSpaceItem* pItem = rFormat.GetItemIfSet(RES_LR_SPACE))
     {
         rPropOpt.AddOpt( ESCHER_Prop_dxWrapDistLeft,
-                DrawModelToEmu( static_cast<const SvxLRSpaceItem*>(pItem)->GetLeft() ) );
+                DrawModelToEmu( pItem->GetLeft() ) );
         rPropOpt.AddOpt( ESCHER_Prop_dxWrapDistRight,
-                DrawModelToEmu( static_cast<const SvxLRSpaceItem*>(pItem)->GetRight() ) );
+                DrawModelToEmu( pItem->GetRight() ) );
     }
     else
     {
@@ -2094,12 +2077,12 @@ sal_Int32 SwEscherEx::WriteFlyFrameAttr(const SwFrameFormat& rFormat, MSO_SPT eS
         rPropOpt.AddOpt( ESCHER_Prop_dxWrapDistRight, 0 );
     }
 
-    if (SfxItemState::SET == rFormat.GetItemState(RES_UL_SPACE, true, &pItem))
+    if (const SvxULSpaceItem* pItem = rFormat.GetItemIfSet(RES_UL_SPACE))
     {
         rPropOpt.AddOpt( ESCHER_Prop_dyWrapDistTop,
-                DrawModelToEmu( static_cast<const SvxULSpaceItem*>(pItem)->GetUpper() ) );
+                DrawModelToEmu( pItem->GetUpper() ) );
         rPropOpt.AddOpt( ESCHER_Prop_dyWrapDistBottom,
-                DrawModelToEmu( static_cast<const SvxULSpaceItem*>(pItem)->GetLower() ) );
+                DrawModelToEmu( pItem->GetLower() ) );
     }
 
     if (rFormat.GetSurround().IsContour())
@@ -2136,7 +2119,7 @@ sal_Int32 SwEscherEx::WriteFlyFrameAttr(const SwFrameFormat& rFormat, MSO_SPT eS
 void SwBasicEscherEx::Init()
 {
     MapUnit eMap = MapUnit::MapTwip;
-    if (SwDrawModel *pModel = rWrt.m_rDoc.getIDocumentDrawModelAccess().GetDrawModel())
+    if (SwDrawModel *pModel = mrWrt.m_rDoc.getIDocumentDrawModelAccess().GetDrawModel())
     {
         // PPT works only with units of 576DPI
         // WW however is using twips, i.e 1440DPI.
@@ -2149,7 +2132,7 @@ void SwBasicEscherEx::Init()
     mnEmuMul = aFact.GetNumerator();
     mnEmuDiv = aFact.GetDenominator();
 
-    SetHellLayerId(rWrt.m_rDoc.getIDocumentDrawModelAccess().GetHellId());
+    SetHellLayerId(mrWrt.m_rDoc.getIDocumentDrawModelAccess().GetHellId());
 }
 
 sal_Int32 SwBasicEscherEx::ToFract16(sal_Int32 nVal, sal_uInt32 nMax)
@@ -2175,7 +2158,7 @@ sal_Int32 SwBasicEscherEx::ToFract16(sal_Int32 nVal, sal_uInt32 nMax)
 
 SdrLayerID SwBasicEscherEx::GetInvisibleHellId() const
 {
-    return rWrt.m_rDoc.getIDocumentDrawModelAccess().GetInvisibleHellId();
+    return mrWrt.m_rDoc.getIDocumentDrawModelAccess().GetInvisibleHellId();
 }
 
 void SwBasicEscherEx::WritePictures()
@@ -2184,18 +2167,18 @@ void SwBasicEscherEx::WritePictures()
     {
         // set the blip - entries to the correct stream pos
         sal_Int32 nEndPos = pPicStrm->Tell();
-        mxGlobal->WriteBlibStoreEntry(*pEscherStrm, 1, nEndPos);
+        mxGlobal->WriteBlibStoreEntry(*mpEscherStrm, 1, nEndPos);
 
         pPicStrm->Seek(0);
-        pEscherStrm->WriteStream( *pPicStrm );
+        mpEscherStrm->WriteStream( *pPicStrm );
     }
 }
 
 SwEscherEx::SwEscherEx(SvStream* pStrm, WW8Export& rWW8Wrt)
     : SwBasicEscherEx(pStrm, rWW8Wrt),
-    pTextBxs(nullptr)
+    m_pTextBxs(nullptr)
 {
-    aHostData.SetClientData(&aWinwordAnchoring);
+    m_aHostData.SetClientData(&m_aWinwordAnchoring);
     OpenContainer( ESCHER_DggContainer );
 
     sal_uInt16 nColorCount = 4;
@@ -2210,18 +2193,18 @@ SwEscherEx::SwEscherEx(SvStream* pStrm, WW8Export& rWW8Wrt)
     CloseContainer();   // ESCHER_DggContainer
 
     sal_uInt8 i = 2;     // for header/footer and the other
-    PlcDrawObj *pSdrObjs = rWrt.m_pHFSdrObjs.get();
-    pTextBxs = rWrt.m_pHFTextBxs.get();
+    PlcDrawObj *pSdrObjs = mrWrt.m_pHFSdrObjs.get();
+    m_pTextBxs = mrWrt.m_pHFTextBxs.get();
 
     // if no header/footer -> skip over
     if (!pSdrObjs->size())
     {
         --i;
-        pSdrObjs = rWrt.m_pSdrObjs.get();
-        pTextBxs = rWrt.m_pTextBxs.get();
+        pSdrObjs = mrWrt.m_pSdrObjs.get();
+        m_pTextBxs = mrWrt.m_pTextBxs.get();
     }
 
-    for( ; i--; pSdrObjs = rWrt.m_pSdrObjs.get(), pTextBxs = rWrt.m_pTextBxs.get() )
+    for( ; i--; pSdrObjs = mrWrt.m_pSdrObjs.get(), m_pTextBxs = mrWrt.m_pTextBxs.get() )
     {
         // "dummy char" (or any Count ?) - why? Only Microsoft knows it.
         GetStream().WriteChar( i );
@@ -2230,7 +2213,7 @@ SwEscherEx::SwEscherEx(SvStream* pStrm, WW8Export& rWW8Wrt)
 
         EnterGroup();
 
-        sal_uLong nSecondShapeId = pSdrObjs == rWrt.m_pSdrObjs.get() ? GenerateShapeId() : 0;
+        sal_uLong nSecondShapeId = pSdrObjs == mrWrt.m_pSdrObjs.get() ? GenerateShapeId() : 0;
 
         // write now all Writer-/DrawObjects
         DrawObjPointerVector aSorted;
@@ -2259,7 +2242,7 @@ SwEscherEx::SwEscherEx(SvStream* pStrm, WW8Export& rWW8Wrt)
                     break;
                 case ww8::Frame::eDrawing:
                 {
-                    aWinwordAnchoring.SetAnchoring(rFormat);
+                    m_aWinwordAnchoring.SetAnchoring(rFormat);
                     const SdrObject* pSdrObj = rFormat.FindRealSdrObject();
                     if (pSdrObj)
                     {
@@ -2294,13 +2277,9 @@ SwEscherEx::SwEscherEx(SvStream* pStrm, WW8Export& rWW8Wrt)
                       nSecondShapeId );
 
             EscherPropertyContainer aPropOpt;
-            const SwFrameFormat &rFormat = rWrt.m_rDoc.GetPageDesc(0).GetMaster();
-            const SfxPoolItem* pItem = nullptr;
-            SfxItemState eState = rFormat.GetItemState(RES_BACKGROUND, true,
-                &pItem);
-            if (SfxItemState::SET == eState && pItem)
+            const SwFrameFormat &rFormat = mrWrt.m_rDoc.GetPageDesc(0).GetMaster();
+            if (const SvxBrushItem* pBrush = rFormat.GetItemIfSet(RES_BACKGROUND))
             {
-                const SvxBrushItem* pBrush = static_cast<const SvxBrushItem*>(pItem);
                 WriteBrushAttr(*pBrush, aPropOpt);
 
                 SvxGraphicPosition ePos = pBrush->GetGraphicPos();
@@ -2334,10 +2313,10 @@ SwEscherEx::~SwEscherEx()
 
 void SwEscherEx::FinishEscher()
 {
-    pEscherStrm->Seek(0);
-    rWrt.pTableStrm->WriteStream( *pEscherStrm );
-    delete pEscherStrm;
-    pEscherStrm = nullptr;
+    mpEscherStrm->Seek(0);
+    mrWrt.m_pTableStrm->WriteStream( *mpEscherStrm );
+    delete mpEscherStrm;
+    mpEscherStrm = nullptr;
 }
 
 
@@ -2415,12 +2394,12 @@ bool WinwordAnchoring::ConvertPosition( SwFormatHoriOrient& _iorHoriOri,
     // break before" attribute
     bool bConvDueToAnchoredAtColBreakPara( false );
     if ( ( (eAnchor == RndStdIds::FLY_AT_PARA) || (eAnchor == RndStdIds::FLY_AT_CHAR) ) &&
-         _rFrameFormat.GetAnchor().GetContentAnchor() &&
-         _rFrameFormat.GetAnchor().GetContentAnchor()->nNode.GetNode().IsTextNode() )
+         _rFrameFormat.GetAnchor().GetAnchorNode() &&
+         _rFrameFormat.GetAnchor().GetAnchorNode()->IsTextNode() )
     {
         SwTextNode& rAnchorTextNode =
-            dynamic_cast<SwTextNode&>(_rFrameFormat.GetAnchor().GetContentAnchor()->nNode.GetNode());
-        const SvxFormatBreakItem& rBreak = ItemGet<SvxFormatBreakItem>(rAnchorTextNode, RES_BREAK);
+            dynamic_cast<SwTextNode&>(*_rFrameFormat.GetAnchor().GetAnchorNode());
+        const SvxFormatBreakItem& rBreak = rAnchorTextNode.GetAttr(RES_BREAK);
         if (rBreak.GetBreak() == SvxBreak::ColumnBefore)
         {
             bConvDueToAnchoredAtColBreakPara = true;
@@ -2595,6 +2574,13 @@ void WinwordAnchoring::SetAnchoring(const SwFrameFormat& rFormat)
     const RndStdIds eAnchor = rFormat.GetAnchor().GetAnchorId();
     mbInline = (eAnchor == RndStdIds::FLY_AS_CHAR);
 
+    mnGroupShapeBooleanProperties = 0;
+    if (!rFormat.GetFollowTextFlow().GetValue())
+    {
+        // bit32: fUseLayoutInCell, bit16: fLayoutInCell
+        mnGroupShapeBooleanProperties |= 0x80000000;
+    }
+
     SwFormatHoriOrient rHoriOri = rFormat.GetHoriOrient();
     SwFormatVertOrient rVertOri = rFormat.GetVertOrient();
 
@@ -2727,8 +2713,8 @@ void WinwordAnchoring::SetAnchoring(const SwFrameFormat& rFormat)
 
 void SwEscherEx::WriteFrameExtraData( const SwFrameFormat& rFormat )
 {
-    aWinwordAnchoring.SetAnchoring(rFormat);
-    aWinwordAnchoring.WriteData(*this);
+    m_aWinwordAnchoring.SetAnchoring(rFormat);
+    m_aWinwordAnchoring.WriteData(*this);
 
     AddAtom(4, ESCHER_ClientAnchor);
     GetStream().WriteInt32( 0 );
@@ -2774,11 +2760,11 @@ sal_Int32 SwEscherEx::WriteFlyFrame(const DrawObj &rObj, sal_uInt32 &rShapeId,
                 rShapeId = GetFlyShapeId(rFormat, rObj.mnHdFtIndex, rPVec);
                 if( !nOff )
                 {
-                    nTextId = pTextBxs->GetPos( pObj );
+                    nTextId = m_pTextBxs->GetPos( pObj );
                     if( USHRT_MAX == nTextId )
                     {
-                        pTextBxs->Append( *pObj, rShapeId );
-                        nTextId = pTextBxs->Count();
+                        m_pTextBxs->Append( *pObj, rShapeId );
+                        nTextId = m_pTextBxs->Count();
                     }
                     else
                         ++nTextId;
@@ -2786,13 +2772,13 @@ sal_Int32 SwEscherEx::WriteFlyFrame(const DrawObj &rObj, sal_uInt32 &rShapeId,
                 else
                 {
                     const SdrObject* pPrevObj = pFormat->FindRealSdrObject();
-                    nTextId = pTextBxs->GetPos( pPrevObj );
+                    nTextId = m_pTextBxs->GetPos( pPrevObj );
                     if( USHRT_MAX == nTextId )
                     {
                         sal_uInt32 nPrevShapeId =
                             GetFlyShapeId(*pFormat, rObj.mnHdFtIndex, rPVec);
-                        pTextBxs->Append( *pPrevObj, nPrevShapeId );
-                        nTextId = pTextBxs->Count();
+                        m_pTextBxs->Append( *pPrevObj, nPrevShapeId );
+                        nTextId = m_pTextBxs->Count();
                     }
                     else
                         ++nTextId;
@@ -2812,8 +2798,8 @@ sal_Int32 SwEscherEx::WriteFlyFrame(const DrawObj &rObj, sal_uInt32 &rShapeId,
                 if( !rFormat.GetChain().GetPrev() )//obj in header/footer?
                 {
                     rShapeId = GetFlyShapeId(rFormat, rObj.mnHdFtIndex, rPVec);
-                    pTextBxs->Append( &rFormat, rShapeId );
-                    sal_uInt32 nTextId = pTextBxs->Count();
+                    m_pTextBxs->Append( &rFormat, rShapeId );
+                    sal_uInt32 nTextId = m_pTextBxs->Count();
 
                     nTextId *= 0x10000;
                     nBorderThick = WriteTextFlyFrame(rObj, rShapeId, nTextId, rPVec);
@@ -2855,8 +2841,8 @@ sal_Int32 SwEscherEx::WriteTextFlyFrame(const DrawObj &rObj, sal_uInt32 nShapeId
     if (const SwFrameFormat *pNext = rFormat.GetChain().GetNext())
     {
         sal_uInt16 nPos = FindPos(*pNext, rObj.mnHdFtIndex, rPVec);
-        if (USHRT_MAX != nPos && aFollowShpIds[nPos])
-            aPropOpt.AddOpt(ESCHER_Prop_hspNext, aFollowShpIds[nPos]);
+        if (USHRT_MAX != nPos && m_aFollowShpIds[nPos])
+            aPropOpt.AddOpt(ESCHER_Prop_hspNext, m_aFollowShpIds[nPos]);
     }
     nBorderThick = WriteFlyFrameAttr( rFormat, mso_sptTextBox, aPropOpt );
 
@@ -2923,7 +2909,7 @@ void SwEscherEx::WriteOCXControl( const SwFrameFormat& rFormat, sal_uInt32 nShap
 
     OpenContainer( ESCHER_SpContainer );
 
-    SwDrawModel *pModel = rWrt.m_rDoc.getIDocumentDrawModelAccess().GetDrawModel();
+    SwDrawModel *pModel = mrWrt.m_rDoc.getIDocumentDrawModelAccess().GetDrawModel();
     OutputDevice *pDevice = Application::GetDefaultDevice();
     OSL_ENSURE(pModel && pDevice, "no model or device");
 
@@ -2949,10 +2935,10 @@ void SwEscherEx::WriteOCXControl( const SwFrameFormat& rFormat, sal_uInt32 nShap
 void SwEscherEx::MakeZOrderArrAndFollowIds(
     std::vector<DrawObj>& rSrcArr, DrawObjPointerVector&rDstArr)
 {
-    ::lcl_makeZOrderArray(rWrt, rSrcArr, rDstArr);
+    ::lcl_makeZOrderArray(mrWrt, rSrcArr, rDstArr);
 
     //Now set up the follow IDs
-    aFollowShpIds.clear();
+    m_aFollowShpIds.clear();
 
     for (DrawObj* p : rDstArr)
     {
@@ -2968,7 +2954,7 @@ void SwEscherEx::MakeZOrderArrAndFollowIds(
 
         sal_uLong nShapeId = bNeedsShapeId ? GenerateShapeId() : 0;
 
-        aFollowShpIds.push_back(nShapeId);
+        m_aFollowShpIds.push_back(nShapeId);
     }
 }
 
@@ -2979,11 +2965,11 @@ sal_uInt32 SwEscherEx::GetFlyShapeId(const SwFrameFormat& rFormat,
     sal_uInt32 nShapeId;
     if (USHRT_MAX != nPos)
     {
-        nShapeId = aFollowShpIds[nPos];
+        nShapeId = m_aFollowShpIds[nPos];
         if (0 == nShapeId)
         {
             nShapeId = GenerateShapeId();
-            aFollowShpIds[ nPos ] = nShapeId;
+            m_aFollowShpIds[ nPos ] = nShapeId;
         }
     }
     else
@@ -2997,15 +2983,15 @@ sal_uInt32 SwEscherEx::QueryTextID(
     sal_uInt32 nId = 0;
     if (SdrObject* pObj = SdrObject::getSdrObjectFromXShape(xXShapeRef))
     {
-        pTextBxs->Append( *pObj, nShapeId );
-        nId = pTextBxs->Count();
+        m_pTextBxs->Append( *pObj, nShapeId );
+        nId = m_pTextBxs->Count();
         nId *= 0x10000;
     }
     return nId;
 }
 
 SwMSConvertControls::SwMSConvertControls( SfxObjectShell const *pDSh, SwPaM *pP ) : oox
-::ole::MSConvertOCXControls(  pDSh ? pDSh->GetModel() : nullptr ), pPaM( pP ), mnObjectId(0)
+::ole::MSConvertOCXControls(  pDSh ? pDSh->GetModel() : nullptr ), m_pPaM( pP ), mnObjectId(0)
 {
 }
 

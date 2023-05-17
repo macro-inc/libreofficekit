@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <svx/svdpage.hxx>
 #include <editeng/brushitem.hxx>
 #include <editeng/shaditem.hxx>
@@ -126,7 +128,12 @@ SwFrameNotify::SwFrameNotify( SwFrame *pF ) :
     mbHadFollow = pF->IsContentFrame() && static_cast<SwContentFrame*>(pF)->GetFollow();
 }
 
-SwFrameNotify::~SwFrameNotify() COVERITY_NOEXCEPT_FALSE
+SwFrameNotify::~SwFrameNotify()
+{
+    suppress_fun_call_w_exception(ImplDestroy());
+}
+
+void SwFrameNotify::ImplDestroy()
 {
     SwRectFnSet aRectFnSet(mpFrame);
     const bool bAbsP = aRectFnSet.PosDiff(maFrame, mpFrame->getFrameArea());
@@ -259,6 +266,7 @@ SwFrameNotify::~SwFrameNotify() COVERITY_NOEXCEPT_FALSE
     if ( bAbsP || bPrtP || bChgWidth || bChgHeight ||
          bPrtWidth || bPrtHeight || bChgFlyBasePos )
     {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         if( mpFrame->IsAccessibleFrame() )
         {
             SwRootFrame *pRootFrame = mpFrame->getRootFrame();
@@ -268,6 +276,7 @@ SwFrameNotify::~SwFrameNotify() COVERITY_NOEXCEPT_FALSE
                 pRootFrame->GetCurrShell()->Imp()->MoveAccessibleFrame( mpFrame, maFrame );
             }
         }
+#endif
 
         // Notification of anchored objects
         if ( mpFrame->GetDrawObjs() )
@@ -387,6 +396,7 @@ SwFrameNotify::~SwFrameNotify() COVERITY_NOEXCEPT_FALSE
             }
         }
     }
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     else if( mpFrame->IsTextFrame() && mbValidSize != mpFrame->isFrameAreaSizeValid() )
     {
         SwRootFrame *pRootFrame = mpFrame->getRootFrame();
@@ -396,6 +406,7 @@ SwFrameNotify::~SwFrameNotify() COVERITY_NOEXCEPT_FALSE
             pRootFrame->GetCurrShell()->Imp()->InvalidateAccessibleFrameContent( mpFrame );
         }
     }
+#endif
 
     // #i9046# Automatic frame width
     SwFlyFrame* pFly = nullptr;
@@ -467,7 +478,7 @@ static void lcl_InvalidatePosOfLowers( SwLayoutFrame& _rLayoutFrame )
     }
 }
 
-SwLayNotify::~SwLayNotify()
+void SwLayNotify::ImplDestroy()
 {
     SwLayoutFrame *pLay = static_cast<SwLayoutFrame*>(mpFrame);
     SwRectFnSet aRectFnSet(pLay);
@@ -644,16 +655,21 @@ SwLayNotify::~SwLayNotify()
         static_cast<SwFlyFrame*>(pLay)->AnchorFrame()->InvalidateSize();
 }
 
+SwLayNotify::~SwLayNotify()
+{
+    suppress_fun_call_w_exception(ImplDestroy());
+}
+
 SwFlyNotify::SwFlyNotify( SwFlyFrame *pFlyFrame ) :
     SwLayNotify( pFlyFrame ),
     // #115759# - keep correct page frame - the page frame
     // the Writer fly frame is currently registered at.
-    pOldPage( pFlyFrame->GetPageFrame() ),
-    aFrameAndSpace( pFlyFrame->GetObjRectWithSpaces() )
+    m_pOldPage( pFlyFrame->GetPageFrame() ),
+    m_aFrameAndSpace( pFlyFrame->GetObjRectWithSpaces() )
 {
 }
 
-SwFlyNotify::~SwFlyNotify()
+void SwFlyNotify::ImplDestroy()
 {
     SwFlyFrame *pFly = static_cast<SwFlyFrame*>(mpFrame);
     if ( pFly->IsNotifyBack() )
@@ -664,11 +680,11 @@ SwFlyNotify::~SwFlyNotify()
         {
             //If in the LayAction the IsAgain is set it can be
             //that the old page is destroyed in the meantime!
-            ::Notify( pFly, pOldPage, aFrameAndSpace, &maPrt );
+            ::Notify( pFly, m_pOldPage, m_aFrameAndSpace, &maPrt );
             // #i35640# - additional notify anchor text frame,
             // if Writer fly frame has changed its page
             if ( pFly->GetAnchorFrame()->IsTextFrame() &&
-                 pFly->GetPageFrame() != pOldPage )
+                 pFly->GetPageFrame() != m_pOldPage )
             {
                 pFly->AnchorFrame()->Prepare( PrepareHint::FlyFrameLeave );
             }
@@ -757,6 +773,11 @@ SwFlyNotify::~SwFlyNotify()
     // a re-format of the anchor frame, which also causes a
     // re-format of the invalid previous frames of the anchor frame.
     pFly->AnchorFrame()->InvalidatePos();
+}
+
+SwFlyNotify::~SwFlyNotify()
+{
+    suppress_fun_call_w_exception(ImplDestroy());
 }
 
 SwContentNotify::SwContentNotify( SwContentFrame *pContentFrame ) :
@@ -939,12 +960,12 @@ void SwContentNotify::ImplDestroy()
                 SwFrameFormat *pFormat = (*pTable)[i];
                 const SwFormatAnchor &rAnch = pFormat->GetAnchor();
                 if ( RndStdIds::FLY_AT_PAGE != rAnch.GetAnchorId() ||
-                     rAnch.GetContentAnchor() == nullptr )
+                     rAnch.GetAnchorNode() == nullptr )
                 {
                     continue;
                 }
 
-                if (FrameContainsNode(*pCnt, rAnch.GetContentAnchor()->nNode.GetIndex()))
+                if (FrameContainsNode(*pCnt, rAnch.GetAnchorNode()->GetIndex()))
                 {
                     OSL_FAIL( "<SwContentNotify::~SwContentNotify()> - to page anchored object with content position." );
                     if ( !pPage )
@@ -1081,8 +1102,8 @@ static bool IsShown(SwNodeOffset const nIndex,
     SwTextNode const*const pFirstNode, SwTextNode const*const pLastNode)
 {
     assert(!pIter || *pIter == *pEnd || (*pIter)->pNode->GetIndex() == nIndex);
-    SwPosition const& rAnchor(*rAnch.GetContentAnchor());
-    if (rAnchor.nNode.GetIndex() != nIndex)
+    SwNode* pAnchorNode = rAnch.GetAnchorNode();
+    if (pAnchorNode->GetIndex() != nIndex)
     {
         return false;
     }
@@ -1090,9 +1111,9 @@ static bool IsShown(SwNodeOffset const nIndex,
     {
         return pIter == nullptr // not merged
             || pIter != pEnd    // at least one char visible in node
-            || !IsSelectFrameAnchoredAtPara(rAnchor,
-                    SwPosition(const_cast<SwTextNode&>(*pFirstNode), 0),
-                    SwPosition(const_cast<SwTextNode&>(*pLastNode), pLastNode->Len()));
+            || !IsSelectFrameAnchoredAtPara(*rAnch.GetContentAnchor(),
+                    SwPosition(*pFirstNode, 0),
+                    SwPosition(*pLastNode, pLastNode->Len()));
     }
     if (pIter)
     {
@@ -1101,11 +1122,17 @@ static bool IsShown(SwNodeOffset const nIndex,
         assert(pFirstNode);
         assert(pLastNode);
         assert(rAnch.GetAnchorId() != RndStdIds::FLY_AT_FLY);
+        if (*pIter == *pEnd && rAnch.GetAnchorId() == RndStdIds::FLY_AT_CHAR)
+        {   // tdf#149595 special case - it *could* be shown if first == last
+            return !IsDestroyFrameAnchoredAtChar(*rAnch.GetContentAnchor(),
+                        SwPosition(*pFirstNode, 0),
+                        SwPosition(*pLastNode, pLastNode->Len()));
+        }
         for (auto iter = *pIter; iter != *pEnd; ++iter)
         {
             assert(iter->nStart != iter->nEnd); // TODO possible?
             assert(iter->pNode->GetIndex() == nIndex);
-            if (rAnchor.nContent.GetIndex() < iter->nStart)
+            if (rAnch.GetAnchorContentOffset() < iter->nStart)
             {
                 return false;
             }
@@ -1123,7 +1150,7 @@ static bool IsShown(SwNodeOffset const nIndex,
                 // the interesting corner cases are on the edge of the extent!
                 // no need to check for > the last extent because those
                 // are never visible.
-                if (rAnchor.nContent.GetIndex() <= iter->nEnd)
+                if (rAnch.GetAnchorContentOffset() <= iter->nEnd)
                 {
                     if (iter->nStart == 0)
                     {
@@ -1132,17 +1159,16 @@ static bool IsShown(SwNodeOffset const nIndex,
                     else
                     {
                         SwPosition const start(
-                            const_cast<SwTextNode&>(
-                                iter == *pIter
-                                    ? *pFirstNode // simplification
-                                    : *iter->pNode),
+                            iter == *pIter
+                                ? *pFirstNode // simplification
+                                : *iter->pNode,
                             iter == *pIter // first extent?
                                 ? iter->pNode == pFirstNode
                                     ? 0 // at start of 1st node
                                     : pFirstNode->Len() // previous node; simplification but should get right result
                                 : (iter-1)->nEnd); // previous extent
                         SwPosition const end(*iter->pNode, iter->nStart);
-                        return !IsDestroyFrameAnchoredAtChar(rAnchor, start, end);
+                        return !IsDestroyFrameAnchoredAtChar(*rAnch.GetContentAnchor(), start, end);
                     }
                 }
                 else if (iter == *pEnd - 1) // special case: after last extent
@@ -1155,19 +1181,19 @@ static bool IsShown(SwNodeOffset const nIndex,
                     {
                         SwPosition const start(*iter->pNode, iter->nEnd);
                         SwPosition const end(
-                            const_cast<SwTextNode&>(*pLastNode), // simplification
+                            *pLastNode, // simplification
                             iter->pNode == pLastNode
                                 ? iter->pNode->Len()
                                 : 0);
-                        return !IsDestroyFrameAnchoredAtChar(rAnchor, start, end);
-                    }
+                        return !IsDestroyFrameAnchoredAtChar(*rAnch.GetContentAnchor(), start, end);
+                   }
                 }
             }
             else
             {
                 assert(rAnch.GetAnchorId() == RndStdIds::FLY_AS_CHAR);
                 // for AS_CHAR obviously must be <
-                if (rAnchor.nContent.GetIndex() < iter->nEnd)
+                if (rAnch.GetAnchorContentOffset() < iter->nEnd)
                 {
                     return true;
                 }
@@ -1193,7 +1219,7 @@ void RemoveHiddenObjsOfNode(SwTextNode const& rNode,
         if (rAnchor.GetAnchorId() == RndStdIds::FLY_AT_CHAR
             || rAnchor.GetAnchorId() == RndStdIds::FLY_AS_CHAR)
         {
-            assert(rAnchor.GetContentAnchor()->nNode.GetIndex() == rNode.GetIndex());
+            assert(rAnchor.GetAnchorNode()->GetIndex() == rNode.GetIndex());
             if (!IsShown(rNode.GetIndex(), rAnchor, pIter, pEnd, pFirstNode, pLastNode))
             {
                 pFrameFormat->DelFrames();
@@ -1214,7 +1240,7 @@ void AppendObjsOfNode(SwFrameFormats const*const pTable, SwNodeOffset const nInd
     {
         SwFrameFormat *pFormat = (*pTable)[i];
         const SwFormatAnchor &rAnch = pFormat->GetAnchor();
-        if ( rAnch.GetContentAnchor() &&
+        if ( rAnch.GetAnchorNode() &&
             IsShown(nIndex, rAnch, pIter, pEnd, pFirstNode, pLastNode))
         {
             checkFormats.push_back( pFormat );
@@ -1230,7 +1256,7 @@ void AppendObjsOfNode(SwFrameFormats const*const pTable, SwNodeOffset const nInd
     {
         SwFrameFormat *const pFormat = rFlys[it];
         const SwFormatAnchor &rAnch = pFormat->GetAnchor();
-        if ( rAnch.GetContentAnchor() &&
+        if ( rAnch.GetAnchorNode() &&
             IsShown(nIndex, rAnch, pIter, pEnd, pFirstNode, pLastNode))
         {
 #if OSL_DEBUG_LEVEL > 0
@@ -1309,18 +1335,18 @@ bool IsAnchoredObjShown(SwTextFrame const& rFrame, SwFormatAnchor const& rAnchor
     if (auto const pMergedPara = rFrame.GetMergedPara())
     {
         ret = false;
-        auto const pAnchor(rAnchor.GetContentAnchor());
+        SwNode* pAnchorNode(rAnchor.GetAnchorNode());
         auto iterFirst(pMergedPara->extents.cbegin());
         if (iterFirst == pMergedPara->extents.end()
             && (rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PARA
                 || rAnchor.GetAnchorId() == RndStdIds::FLY_AT_CHAR))
         {
-            ret = (&pAnchor->nNode.GetNode() == pMergedPara->pFirstNode
+            ret = (pAnchorNode == pMergedPara->pFirstNode
                     && (rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PARA
-                        || pAnchor->nContent == 0))
-                || (&pAnchor->nNode.GetNode() == pMergedPara->pLastNode
+                        || rAnchor.GetAnchorContentOffset() == 0))
+                || (pAnchorNode == pMergedPara->pLastNode
                     && (rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PARA
-                        || pAnchor->nContent == pMergedPara->pLastNode->Len()));
+                        || rAnchor.GetAnchorContentOffset() == pMergedPara->pLastNode->Len()));
         }
         auto iter(iterFirst);
         SwTextNode const* pNode(pMergedPara->pFirstNode);
@@ -1330,7 +1356,7 @@ bool IsAnchoredObjShown(SwTextFrame const& rFrame, SwFormatAnchor const& rAnchor
                 || iter->pNode != pNode)
             {
                 assert(pNode->GetRedlineMergeFlag() != SwNode::Merge::Hidden);
-                if (pNode == &pAnchor->nNode.GetNode())
+                if (pNode == pAnchorNode)
                 {
                     ret = IsShown(pNode->GetIndex(), rAnchor, &iterFirst, &iter,
                             pMergedPara->pFirstNode, pMergedPara->pLastNode);
@@ -1341,7 +1367,7 @@ bool IsAnchoredObjShown(SwTextFrame const& rFrame, SwFormatAnchor const& rAnchor
                     break;
                 }
                 pNode = iter->pNode;
-                if (pAnchor->nNode.GetIndex() < pNode->GetIndex())
+                if (pAnchorNode->GetIndex() < pNode->GetIndex())
                 {
                     break;
                 }
@@ -1365,9 +1391,9 @@ void AppendAllObjs(const SwFrameFormats* pTable, const SwFrame* pSib)
         // frames nor objects which are anchored to character bounds.
         if ((rAnch.GetAnchorId() != RndStdIds::FLY_AT_PAGE) && (rAnch.GetAnchorId() != RndStdIds::FLY_AS_CHAR))
         {
-            auto pContentAnchor = rAnch.GetContentAnchor();
+            const SwNode* pAnchorNode = rAnch.GetAnchorNode();
             // formats in header/footer have no dependencies
-            if(pContentAnchor && pFormat->GetDoc()->IsInHeaderFooter(pContentAnchor->nNode))
+            if(pAnchorNode && pFormat->GetDoc()->IsInHeaderFooter(*pAnchorNode))
                 pFormat->MakeFrames();
             else
                 vFormatsToConnect.push_back(pFormat);
@@ -1585,6 +1611,7 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
             // CONTENT_FLOWS_FROM/_TO relation.
             // Relation CONTENT_FLOWS_FROM for next paragraph will change
             // and relation CONTENT_FLOWS_TO for previous paragraph will change.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
             if ( pFrame->IsTextFrame() )
             {
                 SwViewShell* pViewShell( pFrame->getRootFrame()->GetCurrShell() );
@@ -1608,6 +1635,7 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
                     pFrame->InvalidateInfFlags();
                 }
             }
+#endif
             // OD 12.08.2003 #i17969# - consider horizontal/vertical layout
             // for setting position at newly inserted frame
             lcl_SetPos( *pFrame, *pLay );
@@ -1629,7 +1657,7 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
                 // be created in UI but by import filters...
                 if (pRedline
                     && pRedline->GetType() == RedlineType::Delete
-                    && &pRedline->Start()->nNode.GetNode() == pNd)
+                    && &pRedline->Start()->GetNode() == pNd)
                 {
                     SAL_WARN("sw.pageframe", "skipping table frame creation on bizarre redline");
                     while (true)
@@ -1681,6 +1709,7 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
             // CONTENT_FLOWS_FROM/_TO relation.
             // Relation CONTENT_FLOWS_FROM for next paragraph will change
             // and relation CONTENT_FLOWS_TO for previous paragraph will change.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
             {
                 SwViewShell* pViewShell( pFrame->getRootFrame()->GetCurrShell() );
                 // no notification, if <SwViewShell> is in construction
@@ -1696,6 +1725,7 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
                             pPrev ? pPrev->DynCastTextFrame() : nullptr );
                 }
             }
+#endif
             if ( bObjsDirect && !pTable->empty() )
                 static_cast<SwTabFrame*>(pFrame)->RegistFlys();
             // OD 12.08.2003 #i17969# - consider horizontal/vertical layout
@@ -1727,6 +1757,9 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
                 nIndex = pNode->EndOfSectionIndex();
             else
             {
+                if (pActualSection)
+                    pActualSection->SetLastPos(pPrv);
+
                 pFrame = pNode->MakeFrame( pLay );
                 pActualSection.reset( new SwActualSection( pActualSection.release(),
                                                 static_cast<SwSectionFrame*>(pFrame), pNode ) );
@@ -1798,6 +1831,7 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
                 // CONTENT_FLOWS_FROM/_TO relation.
                 // Relation CONTENT_FLOWS_FROM for next paragraph will change
                 // and relation CONTENT_FLOWS_TO for previous paragraph will change.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
                 {
                     SwViewShell* pViewShell( pFrame->getRootFrame()->GetCurrShell() );
                     // no notification, if <SwViewShell> is in construction
@@ -1813,6 +1847,7 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
                             pPrev ? pPrev->DynCastTextFrame() : nullptr );
                     }
                 }
+#endif
                 pFrame->CheckDirChange();
 
                 // OD 12.08.2003 #i17969# - consider horizontal/vertical layout
@@ -1881,33 +1916,30 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
                 }
 
                 // new section frame
-                pFrame = pActualSection->GetSectionNode()->MakeFrame( pLay );
-                pFrame->InsertBehind( pLay, pPrv );
-                static_cast<SwSectionFrame*>(pFrame)->Init();
-
-                // OD 12.08.2003 #i17969# - consider horizontal/vertical layout
-                // for setting position at newly inserted frame
-                lcl_SetPos( *pFrame, *pLay );
-
-                SwSectionFrame* pOuterSectionFrame = pActualSection->GetSectionFrame();
-
-                // a follow has to be appended to the new section frame
-                SwSectionFrame* pFollow = pOuterSectionFrame ? pOuterSectionFrame->GetFollow() : nullptr;
-                if ( pFollow )
+                if (SwSectionFrame* pOuterSectionFrame = pActualSection->GetSectionFrame())
                 {
-                    pOuterSectionFrame->SetFollow( nullptr );
-                    pOuterSectionFrame->InvalidateSize();
-                    static_cast<SwSectionFrame*>(pFrame)->SetFollow( pFollow );
+                    // Splitting moves the trailing content to the next frame
+                    pFrame = pOuterSectionFrame->SplitSect(pActualSection->GetLastPos(), pPrv);
+
+                    // We don't want to leave empty parts back.
+                    if (! pOuterSectionFrame->IsColLocked() &&
+                        ! pOuterSectionFrame->ContainsContent() )
+                    {
+                        pOuterSectionFrame->DelEmpty( true );
+                        SwFrame::DestroyFrame(pOuterSectionFrame);
+                    }
+                }
+                else
+                {
+                    pFrame = pActualSection->GetSectionNode()->MakeFrame( pLay );
+                    pFrame->InsertBehind( pLay, pPrv );
+                    static_cast<SwSectionFrame*>(pFrame)->Init();
+
+                    // OD 12.08.2003 #i17969# - consider horizontal/vertical layout
+                    // for setting position at newly inserted frame
+                    lcl_SetPos( *pFrame, *pLay );
                 }
 
-                // We don't want to leave empty parts back.
-                if (pOuterSectionFrame &&
-                    ! pOuterSectionFrame->IsColLocked() &&
-                    ! pOuterSectionFrame->ContainsContent() )
-                {
-                    pOuterSectionFrame->DelEmpty( true );
-                    SwFrame::DestroyFrame(pOuterSectionFrame);
-                }
                 pActualSection->SetSectionFrame( static_cast<SwSectionFrame*>(pFrame) );
 
                 pLay = static_cast<SwLayoutFrame*>(pFrame);
@@ -1984,24 +2016,27 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc,
         pLayout->SetCallbackActionEnabled( bOldCallbackActionEnabled );
 }
 
-void MakeFrames( SwDoc *pDoc, const SwNodeIndex &rSttIdx,
-               const SwNodeIndex &rEndIdx )
+void MakeFrames( SwDoc *pDoc, SwNode &rSttIdx, SwNode &rEndIdx )
 {
     bObjsDirect = false;
 
-    SwNodeIndex aTmp( rSttIdx );
     SwNodeOffset nEndIdx = rEndIdx.GetIndex();
     // TODO for multiple layouts there should be a loop here
-    SwNode* pNd = pDoc->GetNodes().FindPrvNxtFrameNode( aTmp,
+    SwNode* pNd = pDoc->GetNodes().FindPrvNxtFrameNode( rSttIdx,
                     pDoc->GetNodes()[ nEndIdx-1 ],
                     pDoc->getIDocumentLayoutAccess().GetCurrentLayout());
     if ( pNd )
     {
-        bool bApres = aTmp < rSttIdx;
+        bool bAfter = *pNd < rSttIdx;
         SwNode2Layout aNode2Layout( *pNd, rSttIdx.GetIndex() );
-        SwFrame* pFrame;
         sw::FrameMode eMode = sw::FrameMode::Existing;
-        while( nullptr != (pFrame = aNode2Layout.NextFrame()) )
+        ::std::vector<SwFrame*> frames;
+        while (SwFrame* pFrame = aNode2Layout.NextFrame())
+        {   // tdf#150500 new frames may be created that end up merged on pNd
+            // so copy the currently existing ones; they shouldn't get deleted
+            frames.push_back(pFrame);
+        }
+        for (SwFrame *const pFrame : frames)
         {
             SwLayoutFrame *pUpper = pFrame->GetUpper();
             SwFootnoteFrame* pFootnoteFrame = pUpper->FindFootnoteFrame();
@@ -2040,7 +2075,7 @@ void MakeFrames( SwDoc *pDoc, const SwNodeIndex &rSttIdx,
                 SwFlowFrame *pTmp = SwFlowFrame::CastFlowFrame( pMove );
                 assert(pTmp);
 
-                if ( bApres )
+                if ( bAfter )
                 {
                     // The rest of this page should be empty. Thus, the following one has to move to
                     // the next page (it might also be located in the following column).
@@ -2132,20 +2167,7 @@ void MakeFrames( SwDoc *pDoc, const SwNodeIndex &rSttIdx,
             }
             else
             {
-                bool bSplit;
-                SwFrame* pPrv = bApres ? pFrame : pFrame->GetPrev();
-                // If the section frame is inserted into another one, it must be split.
-                if( pSct && rSttIdx.GetNode().IsSectionNode() )
-                {
-                    bSplit = pSct->SplitSect( pFrame, bApres );
-                    if( !bSplit && !bApres )
-                    {
-                        pUpper = pSct->GetUpper();
-                        pPrv = pSct->GetPrev();
-                    }
-                }
-                else
-                    bSplit = false;
+                SwFrame* pPrv = bAfter ? pFrame : pFrame->GetPrev();
 
                 ::InsertCnt_( pUpper, pDoc, rSttIdx.GetIndex(), false,
                               nEndIdx, pPrv, eMode );
@@ -2158,10 +2180,6 @@ void MakeFrames( SwDoc *pDoc, const SwNodeIndex &rSttIdx,
                         AppendAllObjs( pTable, pUpper );
                 }
 
-                // If nothing was added (e.g. a hidden section), the split must be reversed.
-                if( bSplit && pSct && pSct->GetNext()
-                    && pSct->GetNext()->IsSctFrame() )
-                    pSct->MergeNext( static_cast<SwSectionFrame*>(pSct->GetNext()) );
                 if( pFrame->IsInFly() )
                     pFrame->FindFlyFrame()->Invalidate_();
                 if( pFrame->IsInTab() )
@@ -2201,7 +2219,7 @@ SwBorderAttrs::SwBorderAttrs(const sw::BorderCacheOwner* pOwner, const SwFrame* 
     , m_rUL(m_rAttrSet.GetULSpace())
     // #i96772#
     // LRSpaceItem is copied due to the possibility that it is adjusted - see below
-    , m_rLR(m_rAttrSet.GetLRSpace().Clone())
+    , m_xLR(m_rAttrSet.GetLRSpace().Clone())
     , m_rBox(m_rAttrSet.GetBox())
     , m_rShadow(m_rAttrSet.GetShadow())
     , m_aFrameSize(m_rAttrSet.GetFrameSize().GetSize())
@@ -2222,12 +2240,14 @@ SwBorderAttrs::SwBorderAttrs(const sw::BorderCacheOwner* pOwner, const SwFrame* 
     const SwTextFrame* pTextFrame = pConstructor->DynCastTextFrame();
     if ( pTextFrame )
     {
-        pTextFrame->GetTextNodeForParaProps()->ClearLRSpaceItemDueToListLevelIndents( m_rLR );
+        pTextFrame->GetTextNodeForParaProps()->ClearLRSpaceItemDueToListLevelIndents( m_xLR );
     }
     else if ( pConstructor->IsNoTextFrame() )
     {
-        m_rLR = std::make_shared<SvxLRSpaceItem>(RES_LR_SPACE);
+        m_xLR = std::make_shared<SvxLRSpaceItem>(RES_LR_SPACE);
     }
+
+    assert(m_xLR && "always exists");
 
     // Caution: The USHORTs for the cached values are not initialized by intention!
 
@@ -2259,15 +2279,12 @@ void SwBorderAttrs::CalcTop_()
 {
     m_nTop = CalcTopLine() + m_rUL.GetUpper();
 
-    if (m_rLR)
+    bool bGutterAtTop = m_rAttrSet.GetDoc()->getIDocumentSettingAccess().get(
+        DocumentSettingId::GUTTER_AT_TOP);
+    if (bGutterAtTop)
     {
-        bool bGutterAtTop = m_rAttrSet.GetDoc()->getIDocumentSettingAccess().get(
-            DocumentSettingId::GUTTER_AT_TOP);
-        if (bGutterAtTop)
-        {
-            // Decrease the print area: the top space is the sum of top and gutter margins.
-            m_nTop += m_rLR->GetGutterMargin();
-        }
+        // Decrease the print area: the top space is the sum of top and gutter margins.
+        m_nTop += m_xLR->GetGutterMargin();
     }
 
     m_bTop = false;
@@ -2294,9 +2311,9 @@ tools::Long SwBorderAttrs::CalcRight( const SwFrame* pCaller ) const
     }
     // for paragraphs, "left" is "before text" and "right" is "after text"
     if ( pCaller->IsTextFrame() && pCaller->IsRightToLeft() )
-        nRight += m_rLR->GetLeft();
+        nRight += m_xLR->GetLeft();
     else
-        nRight += m_rLR->GetRight();
+        nRight += m_xLR->GetRight();
 
     // correction: retrieve left margin for numbering in R2L-layout
     if ( pCaller->IsTextFrame() && pCaller->IsRightToLeft() )
@@ -2304,7 +2321,7 @@ tools::Long SwBorderAttrs::CalcRight( const SwFrame* pCaller ) const
         nRight += static_cast<const SwTextFrame*>(pCaller)->GetTextNodeForParaProps()->GetLeftMarginWithNum();
     }
 
-    if (pCaller->IsPageFrame() && m_rLR)
+    if (pCaller->IsPageFrame())
     {
         const auto pPageFrame = static_cast<const SwPageFrame*>(pCaller);
         bool bGutterAtTop = pPageFrame->GetFormat()->getIDocumentSettingAccess().get(
@@ -2312,7 +2329,7 @@ tools::Long SwBorderAttrs::CalcRight( const SwFrame* pCaller ) const
         if (!bGutterAtTop)
         {
             bool bRtlGutter = pPageFrame->GetAttrSet()->GetItem<SfxBoolItem>(RES_RTL_GUTTER)->GetValue();
-            tools::Long nGutterMargin = bRtlGutter ? m_rLR->GetGutterMargin() : m_rLR->GetRightGutterMargin();
+            tools::Long nGutterMargin = bRtlGutter ? m_xLR->GetGutterMargin() : m_xLR->GetRightGutterMargin();
             // Decrease the print area: the right space is the sum of right and right gutter
             // margins.
             nRight += nGutterMargin;
@@ -2357,7 +2374,7 @@ tools::Long SwBorderAttrs::CalcLeft( const SwFrame *pCaller ) const
 
     // for paragraphs, "left" is "before text" and "right" is "after text"
     if ( pCaller->IsTextFrame() && pCaller->IsRightToLeft() )
-        nLeft += m_rLR->GetRight();
+        nLeft += m_xLR->GetRight();
     else
     {
         bool bIgnoreMargin = false;
@@ -2375,7 +2392,7 @@ tools::Long SwBorderAttrs::CalcLeft( const SwFrame *pCaller ) const
             }
         }
         if (!bIgnoreMargin)
-            nLeft += m_rLR->GetLeft();
+            nLeft += m_xLR->GetLeft();
     }
 
     // correction: do not retrieve left margin for numbering in R2L-layout
@@ -2384,7 +2401,7 @@ tools::Long SwBorderAttrs::CalcLeft( const SwFrame *pCaller ) const
         nLeft += static_cast<const SwTextFrame*>(pCaller)->GetTextNodeForParaProps()->GetLeftMarginWithNum();
     }
 
-    if (pCaller->IsPageFrame() && m_rLR)
+    if (pCaller->IsPageFrame())
     {
         const auto pPageFrame = static_cast<const SwPageFrame*>(pCaller);
         bool bGutterAtTop = pPageFrame->GetFormat()->getIDocumentSettingAccess().get(
@@ -2392,7 +2409,7 @@ tools::Long SwBorderAttrs::CalcLeft( const SwFrame *pCaller ) const
         if (!bGutterAtTop)
         {
             bool bRtlGutter = pPageFrame->GetAttrSet()->GetItem<SfxBoolItem>(RES_RTL_GUTTER)->GetValue();
-            tools::Long nGutterMargin = bRtlGutter ? m_rLR->GetRightGutterMargin() : m_rLR->GetGutterMargin();
+            tools::Long nGutterMargin = bRtlGutter ? m_xLR->GetRightGutterMargin() : m_xLR->GetGutterMargin();
             // Decrease the print area: the left space is the sum of left and gutter margins.
             nLeft += nGutterMargin;
         }
@@ -3863,12 +3880,17 @@ SwFrame* GetFrameOfModify(SwRootFrame const*const pLayout, sw::BroadcastingModif
 bool IsExtraData( const SwDoc *pDoc )
 {
     const SwLineNumberInfo &rInf = pDoc->GetLineNumberInfo();
-    return rInf.IsPaintLineNumbers() ||
+    if (rInf.IsPaintLineNumbers() ||
            rInf.IsCountInFlys() ||
            (static_cast<sal_Int16>(SW_MOD()->GetRedlineMarkPos()) != text::HoriOrientation::NONE &&
-            !pDoc->getIDocumentRedlineAccess().GetRedlineTable().empty()) ||
-            (pDoc->GetEditShell() && pDoc->GetEditShell()->GetViewOptions() &&
-             pDoc->GetEditShell()->GetViewOptions()->IsShowOutlineContentVisibilityButton());
+            !pDoc->getIDocumentRedlineAccess().GetRedlineTable().empty()))
+    {
+        return true;
+    }
+
+    const SwEditShell* pSh = pDoc->GetEditShell();
+    const SwViewOption* pViewOptions = pSh ? pSh->GetViewOptions() : nullptr;
+    return pViewOptions && pViewOptions->IsShowOutlineContentVisibilityButton();
 }
 
 // OD 22.09.2003 #110978#

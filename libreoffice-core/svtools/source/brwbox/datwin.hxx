@@ -21,7 +21,7 @@
 
 #include <svtools/brwbox.hxx>
 #include <tools/long.hxx>
-#include <vcl/scrbar.hxx>
+#include <utility>
 
 #include <limits>
 
@@ -36,12 +36,12 @@ class ButtonFrame
 
 public:
                ButtonFrame( const Point& rPt, const Size& rSz,
-                            const OUString &rText,
+                            OUString _aText,
                             bool _bDrawDisabled)
                 :aRect( rPt, rSz )
                 ,aInnerRect( Point( aRect.Left()+1, aRect.Top()+1 ),
                             Size( aRect.GetWidth()-2, aRect.GetHeight()-2 ) )
-                ,aText(rText)
+                ,aText(std::move(_aText))
                 ,m_bDrawDisabled(_bDrawDisabled)
             {
             }
@@ -60,7 +60,7 @@ class BrowserColumn final
 
 public:
                         BrowserColumn( sal_uInt16 nItemId,
-                                        const OUString& rTitle, sal_uLong nWidthPixel, const Fraction& rCurrentZoom );
+                                        OUString aTitle, sal_uLong nWidthPixel, const Fraction& rCurrentZoom );
                         ~BrowserColumn();
 
     sal_uInt16          GetId() const { return _nId; }
@@ -78,30 +78,6 @@ public:
     void                ZoomChanged(const Fraction& rNewZoom);
 };
 
-
-class BrowserScrollBar: public ScrollBar
-{
-    tools::Long _nLastPos;
-    VclPtr<BrowserDataWin> _pDataWin;
-
-public:
-                    BrowserScrollBar( vcl::Window* pParent, WinBits nStyle,
-                                      BrowserDataWin *pDataWin )
-                    :   ScrollBar( pParent, nStyle ),
-                        _nLastPos( std::numeric_limits<tools::Long>::max() ),
-                        _pDataWin( pDataWin )
-                    {}
-   virtual          ~BrowserScrollBar() override;
-   virtual void     dispose() override;
-                    //ScrollBar( vcl::Window* pParent, const ResId& rResId );
-
-    virtual void    Tracking( const TrackingEvent& rTEvt ) override;
-    virtual void    EndScroll() override;
-};
-
-
 void InitSettings_Impl( vcl::Window *pWin );
-
-
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

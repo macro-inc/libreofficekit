@@ -17,6 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cstddef>
+
 #include <dlg_ObjectProperties.hxx>
 #include <strings.hrc>
 #include "tp_AxisLabel.hxx"
@@ -35,20 +39,24 @@
 #include <ResId.hxx>
 #include <ViewElementListProvider.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
 #include <ObjectNameProvider.hxx>
+#include <DataSeries.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <NumberFormatterWrapper.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <ExplicitCategoriesProvider.hxx>
 #include <ChartModel.hxx>
 #include <CommonConverters.hxx>
 #include <RegressionCalculationHelper.hxx>
+#include <BaseCoordinateSystem.hxx>
 
 #include <com/sun/star/chart2/AxisType.hpp>
 #include <com/sun/star/chart2/XAxis.hpp>
 #include <svl/intitem.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/ctloptions.hxx>
 
 #include <svx/svxids.hrc>
@@ -64,7 +72,8 @@
 #include <svx/numinf.hxx>
 
 #include <svl/cjkoptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace com::sun::star::chart2 { class XChartType; }
 namespace com::sun::star::chart2 { class XDataSeries; }
@@ -79,8 +88,8 @@ using ::com::sun::star::uno::Sequence;
 using ::com::sun::star::uno::Exception;
 using ::com::sun::star::beans::XPropertySet;
 
-ObjectPropertiesDialogParameter::ObjectPropertiesDialogParameter( const OUString& rObjectCID )
-        : m_aObjectCID( rObjectCID )
+ObjectPropertiesDialogParameter::ObjectPropertiesDialogParameter( OUString aObjectCID )
+        : m_aObjectCID(std::move( aObjectCID ))
         , m_eObjectType( ObjectIdentifier::getObjectType( m_aObjectCID ) )
         , m_bAffectsMultipleObjects(false)
         , m_bHasGeometryProperties(false)
@@ -103,19 +112,19 @@ ObjectPropertiesDialogParameter::ObjectPropertiesDialogParameter( const OUString
         , m_bComplexCategoriesAxis( false )
         , m_nNbPoints( 0 )
 {
-    OUString aParticleID = ObjectIdentifier::getParticleID( m_aObjectCID );
-    m_bAffectsMultipleObjects = (aParticleID == "ALLELEMENTS");
+    std::u16string_view aParticleID = ObjectIdentifier::getParticleID( m_aObjectCID );
+    m_bAffectsMultipleObjects = (aParticleID == u"ALLELEMENTS");
 }
 ObjectPropertiesDialogParameter::~ObjectPropertiesDialogParameter()
 {
 }
 
-void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel >& xChartModel )
+void ObjectPropertiesDialogParameter::init( const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    m_xChartDocument.set( xChartModel, uno::UNO_QUERY );
-    uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram( xChartModel ) );
-    uno::Reference< XDataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( m_aObjectCID, xChartModel );
-    uno::Reference< XChartType > xChartType = ChartModelHelper::getChartTypeOfSeries( xChartModel, xSeries );
+    m_xChartDocument = xChartModel;
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
+    rtl::Reference< DataSeries > xSeries = ObjectIdentifier::getDataSeriesForCID( m_aObjectCID, xChartModel );
+    rtl::Reference< ChartType > xChartType = ChartModelHelper::getChartTypeOfSeries( xChartModel, xSeries );
     sal_Int32 nDimensionCount = DiagramHelper::getDimension( xDiagram );
 
     bool bHasSeriesProperties = (m_eObjectType==OBJECTTYPE_DATA_SERIES);
@@ -153,7 +162,7 @@ void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel 
 
         if( m_bHasScaleProperties )
         {
-            uno::Reference< XAxis > xAxis( ObjectIdentifier::getAxisForCID( m_aObjectCID, xChartModel ) );
+            rtl::Reference< Axis > xAxis = ObjectIdentifier::getAxisForCID( m_aObjectCID, xChartModel );
             if( xAxis.is() )
             {
                 //no scale page for series axis
@@ -164,7 +173,7 @@ void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel 
                     m_bHasNumberProperties = true;
 
                 //is the crossing main axis a category axes?:
-                uno::Reference< XCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis( xAxis, xDiagram ) );
+                rtl::Reference< BaseCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis( xAxis, xDiagram ) );
                 uno::Reference< XAxis > xCrossingMainAxis( AxisHelper::getCrossingMainAxis( xAxis, xCooSys ) );
                 if( xCrossingMainAxis.is() )
                 {
@@ -172,9 +181,8 @@ void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel 
                     m_bIsCrossingAxisIsCategoryAxis = ( aScale.AxisType == chart2::AxisType::CATEGORY  );
                     if( m_bIsCrossingAxisIsCategoryAxis )
                     {
-                        ChartModel* pModel = dynamic_cast<ChartModel*>(xChartModel.get());
-                        if (pModel)
-                            m_aCategories = DiagramHelper::getExplicitSimpleCategories( *pModel );
+                        if (xChartModel)
+                            m_aCategories = DiagramHelper::getExplicitSimpleCategories( *xChartModel );
                     }
                 }
 
@@ -193,10 +201,9 @@ void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel 
 
                     if ( nDimensionIndex == 0 && ( aData.AxisType == chart2::AxisType::CATEGORY || aData.AxisType == chart2::AxisType::DATE ) )
                     {
-                        ChartModel* pModel = dynamic_cast<ChartModel*>(xChartModel.get());
-                        if (pModel)
+                        if (xChartModel)
                         {
-                            ExplicitCategoriesProvider aExplicitCategoriesProvider( xCooSys, *pModel );
+                            ExplicitCategoriesProvider aExplicitCategoriesProvider( xCooSys, *xChartModel );
                             m_bComplexCategoriesAxis = aExplicitCategoriesProvider.hasComplexCategories();
                         }
 
@@ -213,14 +220,12 @@ void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel 
 
     if( m_eObjectType == OBJECTTYPE_DATA_CURVE )
     {
-        uno::Reference< data::XDataSource > xSource( xSeries, uno::UNO_QUERY );
-        Sequence< Reference< data::XLabeledDataSequence > > aDataSeqs( xSource->getDataSequences());
+        const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > & aDataSeqs( xSeries->getDataSequences2());
         Sequence< double > aXValues, aYValues;
         bool bXValuesFound = false, bYValuesFound = false;
         m_nNbPoints = 0;
-        sal_Int32 i = 0;
-        for( i=0;
-             ! (bXValuesFound && bYValuesFound) && i<aDataSeqs.getLength();
+        for( std::size_t i=0;
+             ! (bXValuesFound && bYValuesFound) && i<aDataSeqs.size();
              ++i )
         {
             try
@@ -253,7 +258,7 @@ void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel 
             //first category (index 0) matches with real number 1.0
             aXValues.realloc( aYValues.getLength() );
             auto pXValues = aXValues.getArray();
-            for( i=0; i<aXValues.getLength(); ++i )
+            for( sal_Int32 i=0; i<aXValues.getLength(); ++i )
                 pXValues[i] = i+1;
             bXValuesFound = true;
         }
@@ -311,10 +316,10 @@ void ObjectPropertiesDialogParameter::init( const uno::Reference< frame::XModel 
 const sal_uInt16 nNoArrowNoShadowDlg    = 1101;
 
 void SchAttribTabDlg::setSymbolInformation( SfxItemSet&& rSymbolShapeProperties,
-                std::unique_ptr<Graphic> pAutoSymbolGraphic )
+                std::optional<Graphic> oAutoSymbolGraphic )
 {
     m_oSymbolShapeProperties.emplace(std::move(rSymbolShapeProperties));
-    m_pAutoSymbolGraphic = std::move(pAutoSymbolGraphic);
+    m_oAutoSymbolGraphic = std::move(oAutoSymbolGraphic);
 }
 
 void SchAttribTabDlg::SetAxisMinorStepWidthForErrorBarDecimals( double fMinorStepWidth )
@@ -506,8 +511,8 @@ void SchAttribTabDlg::PageCreated(const OString& rId, SfxTabPage &rPage)
             aSet.Put(OfaPtrItem(SID_OBJECT_LIST,m_pViewElementListProvider->GetSymbolList()));
             if( m_oSymbolShapeProperties )
                 aSet.Put(SfxTabDialogItem(SID_ATTR_SET, *m_oSymbolShapeProperties));
-            if( m_pAutoSymbolGraphic )
-                aSet.Put(SvxGraphicItem(*m_pAutoSymbolGraphic));
+            if( m_oAutoSymbolGraphic )
+                aSet.Put(SvxGraphicItem(*m_oAutoSymbolGraphic));
         }
         rPage.PageCreated(aSet);
     }
@@ -577,7 +582,7 @@ void SchAttribTabDlg::PageCreated(const OString& rId, SfxTabPage &rPage)
     }
     else if (rId == "numberformat")
     {
-        aSet.Put (SvxNumberInfoItem( m_pNumberFormatter, static_cast<sal_uInt16>(SID_ATTR_NUMBERFORMAT_INFO)));
+        aSet.Put (SvxNumberInfoItem( m_pNumberFormatter, SID_ATTR_NUMBERFORMAT_INFO));
         rPage.PageCreated(aSet);
     }
     else if (rId == "xerrorbar")

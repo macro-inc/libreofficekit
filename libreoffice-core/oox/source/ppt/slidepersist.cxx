@@ -41,6 +41,12 @@
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 #include <com/sun/star/container/XNamed.hpp>
 #include <com/sun/star/animations/XAnimationNodeSupplier.hpp>
+#include <com/sun/star/drawing/XGluePointsSupplier.hpp>
+#include <com/sun/star/container/XIdentifierContainer.hpp>
+#include <com/sun/star/drawing/EnhancedCustomShapeGluePointType.hpp>
+#include <com/sun/star/drawing/ConnectorType.hpp>
+#include <utility>
+#include <svx/svdobj.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::oox::core;
@@ -54,14 +60,14 @@ namespace oox::ppt {
 
 SlidePersist::SlidePersist( XmlFilterBase& rFilter, bool bMaster, bool bNotes,
     const css::uno::Reference< css::drawing::XDrawPage >& rxPage,
-        oox::drawingml::ShapePtr const & pShapesPtr, const drawingml::TextListStylePtr & pDefaultTextStyle )
+        oox::drawingml::ShapePtr pShapesPtr, drawingml::TextListStylePtr pDefaultTextStyle )
 : mpDrawingPtr( std::make_shared<oox::vml::Drawing>( rFilter, rxPage, oox::vml::VMLDRAWING_POWERPOINT ) )
 , mxPage( rxPage )
-, maShapesPtr( pShapesPtr )
+, maShapesPtr(std::move( pShapesPtr ))
 , mnLayoutValueToken( 0 )
 , mbMaster( bMaster )
 , mbNotes ( bNotes )
-, maDefaultTextStylePtr( pDefaultTextStyle )
+, maDefaultTextStylePtr(std::move( pDefaultTextStyle ))
 , maTitleTextStylePtr( std::make_shared<oox::drawingml::TextListStyle>() )
 , maBodyTextStylePtr( std::make_shared<oox::drawingml::TextListStyle>() )
 , maNotesTextStylePtr( std::make_shared<oox::drawingml::TextListStyle>() )
@@ -143,11 +149,26 @@ void SlidePersist::createXShapes( XmlFilterBase& rFilterBase )
             PPTShape* pPPTShape = dynamic_cast< PPTShape* >( child.get() );
             basegfx::B2DHomMatrix aTransformation;
             if ( pPPTShape )
+            {
                 pPPTShape->addShape( rFilterBase, *this, getTheme().get(), xShapes, aTransformation, &getShapeMap() );
+                if (pPPTShape->isConnectorShape())
+                    maConnectorShapeId.push_back(pPPTShape->getId());
+                if (!pPPTShape->getChildren().empty())
+                {
+                    for (size_t i = 0; i < pPPTShape->getChildren().size(); i++)
+                    {
+                        if (pPPTShape->getChildren()[i]->isConnectorShape())
+                            maConnectorShapeId.push_back(pPPTShape->getChildren()[i]->getId());
+                    }
+                }
+            }
             else
                 child->addShape( rFilterBase, getTheme().get(), xShapes, aTransformation, maShapesPtr->getFillProperties(), &getShapeMap() );
         }
     }
+
+    if (!maConnectorShapeId.empty())
+        createConnectorShapeConnection();
 
     Reference< XAnimationNodeSupplier > xNodeSupplier( getPage(), UNO_QUERY);
     if( !xNodeSupplier.is() )
@@ -320,6 +341,36 @@ void SlidePersist::hideShapesAsMasterShapes()
     }
 }
 
+// This angle determines in the direction of the line
+static sal_Int32 lcl_GetAngle(uno::Reference<drawing::XShape>& rXShape, awt::Point& rPt)
+{
+    SdrObject* pObj = SdrObject::getSdrObjectFromXShape(rXShape);
+    tools::Rectangle aR(pObj->GetSnapRect());
+    sal_Int32 nLeftX = rPt.X - aR.Left();
+    sal_Int32 nTopY = rPt.Y - aR.Top();
+    sal_Int32 nRightX = aR.Right() - rPt.X;
+    sal_Int32 nBottomY = aR.Bottom() - rPt.Y;
+    sal_Int32 nX = std::min(nLeftX, nRightX);
+    sal_Int32 nY = std::min(nTopY, nBottomY);
+
+    sal_Int32 nAngle;
+    if (nX < nY)
+    {
+        if (nLeftX < nRightX)
+            nAngle = 180; // Left
+        else
+            nAngle = 0; // Right
+    }
+    else
+    {
+        if (nTopY < nBottomY)
+            nAngle = 270; // Top
+        else
+            nAngle = 90; // Bottom
+    }
+    return nAngle;
+}
+
 Reference<XAnimationNode> SlidePersist::getAnimationNode(const OUString& sId) const
 {
     const auto& pIter = maAnimNodesMap.find(sId);
@@ -328,6 +379,317 @@ Reference<XAnimationNode> SlidePersist::getAnimationNode(const OUString& sId) co
 
     Reference<XAnimationNode> aResult;
     return aResult;
+}
+
+static void lcl_SetEdgeLineValue(uno::Reference<drawing::XShape>& rXConnector,
+                                 oox::drawingml::ShapePtr& rShapePtr)
+{
+    sal_Int32 nEdge = 0;
+    awt::Point aStartPt, aEndPt;
+    tools::Rectangle aS, aE; // Start, End rectangle
+    uno::Reference<drawing::XShape> xStartSp, xEndSp;
+    uno::Reference<beans::XPropertySet> xPropSet(rXConnector, uno::UNO_QUERY);
+    xPropSet->getPropertyValue("EdgeStartPoint") >>= aStartPt;
+    xPropSet->getPropertyValue("EdgeEndPoint") >>= aEndPt;
+    xPropSet->getPropertyValue("StartShape") >>= xStartSp;
+    xPropSet->getPropertyValue("EndShape") >>= xEndSp;
+    xPropSet->setPropertyValue("EdgeNode1HorzDist", Any(sal_Int32(0)));
+    xPropSet->setPropertyValue("EdgeNode1VertDist", Any(sal_Int32(0)));
+    xPropSet->setPropertyValue("EdgeNode2HorzDist", Any(sal_Int32(0)));
+    xPropSet->setPropertyValue("EdgeNode2VertDist", Any(sal_Int32(0)));
+
+    SdrObject* pStartObj = xStartSp.is() ? SdrObject::getSdrObjectFromXShape(xStartSp) : nullptr;
+    SdrObject* pEndObj = xEndSp.is() ? SdrObject::getSdrObjectFromXShape(xEndSp) : nullptr;
+
+    sal_Int32 nStartA = -1;
+    sal_Int32 nEndA = -1;
+    if (pStartObj)
+    {
+        aS = pStartObj->GetSnapRect();
+        nStartA = lcl_GetAngle(xStartSp, aStartPt);
+    }
+    if (pEndObj)
+    {
+        aE = pEndObj->GetSnapRect();
+        nEndA = lcl_GetAngle(xEndSp, aEndPt);
+    }
+
+    // bentConnector3, bentConnector4, bentConnector5
+    if (!rShapePtr->getConnectorAdjustments().empty())
+    {
+        sal_Int32 nAdjustValue = 0;
+        for (size_t i = 0; i < rShapePtr->getConnectorAdjustments().size(); i++)
+        {
+            bool bVertical = false;
+            if (xStartSp.is() || xEndSp.is())
+                bVertical = xStartSp.is() ? ((nStartA == 90 || nStartA == 270) ? true : false)
+                                          : ((nEndA == 90 || nEndA == 270) ? true : false);
+            else
+            {
+                sal_Int32 nAng = rShapePtr->getRotation() / 60000;
+                bVertical = (nAng == 90 || nAng == 270) ? true : false;
+            }
+
+            if (i % 2 == 1)
+                bVertical = !bVertical;
+
+            nAdjustValue = rShapePtr->getConnectorAdjustments()[i].toInt32();
+            if (bVertical)
+            {
+                sal_Int32 nY = aStartPt.Y + ((nAdjustValue * (aEndPt.Y - aStartPt.Y)) / 100000);
+                if (xStartSp.is() && xEndSp.is())
+                {
+                    if (aS.Top() <= aE.Top())
+                    {
+                        if (nStartA == 270 && i != 2)
+                            nEdge = nY - aS.Top();
+                        else
+                        {
+                            if (aS.Bottom() < aE.Top() && nEndA != 90)
+                            {
+                                nEdge = nY - (aS.Bottom() + ((aE.Top() - aS.Bottom()) / 2));
+                            }
+                            else
+                                nEdge = nY - aE.Bottom();
+                        }
+                    }
+                    else
+                    {
+                        if (nStartA == 90 && i != 2)
+                            nEdge = nY - aS.Bottom();
+                        else
+                        {
+                            if (aE.Bottom() < aS.Top() && nEndA != 270)
+                                nEdge = nY - (aS.Top() + ((aE.Bottom() - aS.Top()) / 2));
+                            else
+                                nEdge = nY - aE.Top();
+                        }
+                    }
+                }
+                else if ((xStartSp.is() && !xEndSp.is()) || (!xStartSp.is() && xEndSp.is()))
+                {
+                    if (aStartPt.Y < aEndPt.Y)
+                    {
+                        if (xStartSp.is())
+                            nEdge = (nStartA == 90)
+                                        ? nY - (aEndPt.Y - ((aEndPt.Y - aS.Bottom()) / 2))
+                                        : nY - aS.Top();
+                        else
+                            nEdge = (nEndA == 90)
+                                        ? nY - aE.Bottom()
+                                        : nY - (aStartPt.Y + ((aE.Top() - aStartPt.Y) / 2));
+                    }
+                    else
+                    {
+                        if (xStartSp.is())
+                            nEdge = (nStartA == 90) ? nY - aS.Bottom()
+                                                    : nY - (aEndPt.Y + ((aS.Top() - aEndPt.Y) / 2));
+                        else
+                            nEdge = (nEndA == 90)
+                                        ? nY - (aStartPt.Y - ((aStartPt.Y - aE.Bottom()) / 2))
+                                        : nY - aE.Top();
+                    }
+                }
+                else
+                {
+                    nEdge = (aStartPt.Y < aEndPt.Y)
+                                ? nY - (aStartPt.Y + (rXConnector->getSize().Height / 2))
+                                : nY - (aStartPt.Y - (rXConnector->getSize().Height / 2));
+                }
+            }
+            else // Horizontal
+            {
+                sal_Int32 nX = aStartPt.X + ((nAdjustValue * (aEndPt.X - aStartPt.X)) / 100000);
+                if (xStartSp.is() && xEndSp.is())
+                {
+                    if (aS.Left() <= aE.Left())
+                    {
+                        if (nStartA == 180 && i != 2)
+                            nEdge = nX - aS.Left();
+                        else
+                        {
+                            if (aS.Right() < aE.Left() && nEndA != 0)
+                                nEdge = nX - (aS.Right() + ((aE.Left() - aS.Right()) / 2));
+                            else
+                                nEdge = nX - aE.Right();
+                        }
+                    }
+                    else
+                    {
+                        if (nStartA == 0 && i != 2)
+                            nEdge = nX - aS.Right();
+                        else
+                        {
+                            if (aE.Right() < aS.Left() && nEndA != 180)
+                                nEdge = nX - (aS.Left() + ((aE.Right() - aS.Left()) / 2));
+                            else
+                                nEdge = nX - aE.Left();
+                        }
+                    }
+                }
+                else if ((xStartSp.is() && !xEndSp.is()) || (!xStartSp.is() && xEndSp.is()))
+                {
+                    if (aStartPt.X < aEndPt.X)
+                    {
+                        if (xStartSp.is())
+                            nEdge = (nStartA == 0)
+                                        ? nX - (aS.Right() + ((aEndPt.X - aS.Right()) / 2))
+                                        : nX - aS.Left();
+                        else
+                            nEdge = (nEndA == 0)
+                                        ? nX - aE.Right()
+                                        : nX - (aStartPt.X + ((aE.Left() - aStartPt.X) / 2));
+                    }
+                    else
+                    {
+                        if (xStartSp.is())
+                            nEdge = (nStartA == 0) ? nX - aS.Right()
+                                                   : nX - (aEndPt.X + ((aS.Left() - aEndPt.X) / 2));
+                        else
+                            nEdge = (nEndA == 0)
+                                        ? nX - (aE.Right() + ((aStartPt.X - aE.Right()) / 2))
+                                        : nX - aE.Left();
+                    }
+                }
+                else
+                {
+                    nEdge = (aStartPt.X < aEndPt.X)
+                                ? nX - (aStartPt.X + (rXConnector->getSize().Width / 2))
+                                : nX - (aStartPt.X - (rXConnector->getSize().Width / 2));
+                }
+            }
+            xPropSet->setPropertyValue("EdgeLine" + OUString::number(i + 1) + "Delta", Any(nEdge));
+        }
+    }
+    else
+    {
+        const OUString sConnectorName = rShapePtr->getConnectorName();
+        if (sConnectorName == "bentConnector2")
+        {
+            awt::Size aConnSize = rXConnector->getSize();
+            if (xStartSp.is() || xEndSp.is())
+            {
+                if (nStartA >= 0)
+                {
+                    switch (nStartA)
+                    {
+                    case 0:     nEdge = aEndPt.X - aS.Right();  break;
+                    case 180:   nEdge = aEndPt.X - aS.Left();   break;
+                    case 90:    nEdge = aEndPt.Y - aS.Bottom(); break;
+                    case 270:   nEdge = aEndPt.Y - aS.Top();    break;
+                    }
+                } else {
+                    switch (nEndA)
+                    {
+                    case 0:     nEdge = aStartPt.X - aE.Right();  break;
+                    case 180:   nEdge = aStartPt.X - aE.Left();   break;
+                    case 90:    nEdge = aStartPt.Y - aE.Bottom(); break;
+                    case 270:   nEdge = aStartPt.Y - aE.Top();    break;
+                    }
+                }
+            }
+            else
+            {
+                bool bFlipH = rShapePtr->getFlipH();
+                bool bFlipV = rShapePtr->getFlipV();
+                sal_Int32 nConnectorAngle = rShapePtr->getRotation() / 60000;
+                if (aConnSize.Height < aConnSize.Width)
+                {
+                    if ((nConnectorAngle == 90 && bFlipH && bFlipV) || (nConnectorAngle == 180)
+                        || (nConnectorAngle == 270 && bFlipH))
+                        nEdge -= aConnSize.Width;
+                    else
+                        nEdge += aConnSize.Width;
+                }
+                else
+                {
+                    if ((nConnectorAngle == 180 && bFlipV) || (nConnectorAngle == 270 && bFlipV)
+                        || (nConnectorAngle == 90 && bFlipH && bFlipV)
+                        || (nConnectorAngle == 0 && !bFlipV))
+                        nEdge -= aConnSize.Height;
+                    else
+                        nEdge += aConnSize.Height;
+                }
+            }
+            xPropSet->setPropertyValue("EdgeLine1Delta", Any(nEdge / 2));
+        }
+    }
+}
+
+// create connection between two shape with a connector shape.
+void SlidePersist::createConnectorShapeConnection()
+{
+    sal_Int32 nConnectorShapeCount = maConnectorShapeId.size();
+    for (sal_Int32 i = 0; i < nConnectorShapeCount; i++)
+    {
+        const auto& pIt = maShapeMap.find(maConnectorShapeId[i]);
+        if (pIt == maShapeMap.end())
+            continue;
+        oox::drawingml::ConnectorShapePropertiesList aConnectorShapeProperties
+            = pIt->second->getConnectorShapeProperties();
+        uno::Reference<drawing::XShape> xConnector(pIt->second->getXShape(), uno::UNO_QUERY);
+        uno::Reference<beans::XPropertySet> xPropertySet(xConnector, uno::UNO_QUERY);
+
+        if (xConnector.is())
+        {
+            sal_Int32 nCount = aConnectorShapeProperties.size();
+            for (sal_Int32 j = 0; j < nCount; j++)
+            {
+                OUString aDestShapeId = aConnectorShapeProperties[j].maDestShapeId;
+                const auto& pShape = maShapeMap.find(aDestShapeId);
+                if (pShape == maShapeMap.end())
+                    continue;
+                uno::Reference<drawing::XShape> xShape(pShape->second->getXShape(), uno::UNO_QUERY);
+                if (xShape.is())
+                {
+                    uno::Reference<drawing::XGluePointsSupplier> xSupplier(xShape, uno::UNO_QUERY);
+                    css::uno::Reference<css::container::XIdentifierContainer> xGluePoints(
+                        xSupplier->getGluePoints(), uno::UNO_QUERY);
+
+                    sal_Int32 nCountGluePoints = xGluePoints->getIdentifiers().getLength();
+                    sal_Int32 nGlueId = aConnectorShapeProperties[j].mnDestGlueId;
+
+                    // The first 4 glue points belong to the bounding box.
+                    if (nCountGluePoints > 4)
+                        nGlueId += 4;
+                    else
+                    {
+                        bool bFlipH = pShape->second->getFlipH();
+                        bool bFlipV = pShape->second->getFlipV();
+                        if ((!bFlipH && !bFlipV) || (bFlipH && bFlipV))
+                        {
+                            // change id of the left and right glue points of the bounding box (1 <-> 3)
+                            if (nGlueId == 1)
+                                nGlueId = 3; // Right
+                            else if (nGlueId == 3)
+                                nGlueId = 1; // Left
+                        }
+                    }
+
+                    bool bStart = aConnectorShapeProperties[j].mbStartShape;
+                    if (bStart)
+                    {
+                        xPropertySet->setPropertyValue("StartShape", uno::Any(xShape));
+                        xPropertySet->setPropertyValue("StartGluePointIndex", uno::Any(nGlueId));
+                    }
+                    else
+                    {
+                        xPropertySet->setPropertyValue("EndShape", uno::Any(xShape));
+                        xPropertySet->setPropertyValue("EndGluePointIndex", uno::Any(nGlueId));
+                    }
+                }
+            }
+            uno::Reference<beans::XPropertySetInfo> xPropInfo = xPropertySet->getPropertySetInfo();
+            if (xPropInfo->hasPropertyByName("EdgeKind"))
+            {
+                ConnectorType aConnectorType;
+                xPropertySet->getPropertyValue("EdgeKind") >>= aConnectorType;
+                if (aConnectorType == ConnectorType_STANDARD)
+                    lcl_SetEdgeLineValue(xConnector, pIt->second);
+            }
+        }
+    }
+    maConnectorShapeId.clear();
 }
 
 }

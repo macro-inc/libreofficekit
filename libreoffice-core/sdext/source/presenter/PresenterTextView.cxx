@@ -36,7 +36,8 @@
 #include <com/sun/star/rendering/TextDirection.hpp>
 #include <com/sun/star/text/WritingMode2.hpp>
 #include <o3tl/safeint.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::accessibility;
@@ -419,7 +420,7 @@ SharedPresenterTextParagraph PresenterTextView::GetParagraph (
 {
     if (nParagraphIndex < 0)
         return SharedPresenterTextParagraph();
-    else if (nParagraphIndex>=sal_Int32(maParagraphs.size()))
+    else if (o3tl::make_unsigned(nParagraphIndex)>=maParagraphs.size())
         return SharedPresenterTextParagraph();
     else
         return maParagraphs[nParagraphIndex];
@@ -432,9 +433,9 @@ PresenterTextParagraph::PresenterTextParagraph (
     const Reference<i18n::XBreakIterator>& rxBreakIterator,
     const Reference<i18n::XScriptTypeDetector>& rxScriptTypeDetector,
     const Reference<text::XTextRange>& rxTextRange,
-    const SharedPresenterTextCaret& rpCaret)
+    SharedPresenterTextCaret xCaret)
     : mnParagraphIndex(nParagraphIndex),
-      mpCaret(rpCaret),
+      mpCaret(std::move(xCaret)),
       mxBreakIterator(rxBreakIterator),
       mxScriptTypeDetector(rxScriptTypeDetector),
       mnVerticalOffset(0),
@@ -1029,15 +1030,15 @@ void PresenterTextParagraph::SetupCellArray (
 
 PresenterTextCaret::PresenterTextCaret (
         uno::Reference<uno::XComponentContext> const& xContext,
-    const ::std::function<css::awt::Rectangle (const sal_Int32,const sal_Int32)>& rCharacterBoundsAccess,
-    const ::std::function<void (const css::awt::Rectangle&)>& rInvalidator)
+    ::std::function<css::awt::Rectangle (const sal_Int32,const sal_Int32)> aCharacterBoundsAccess,
+    ::std::function<void (const css::awt::Rectangle&)> aInvalidator)
     : m_xContext(xContext)
     , mnParagraphIndex(-1),
       mnCharacterIndex(-1),
       mnCaretBlinkTaskId(0),
       mbIsCaretVisible(false),
-      maCharacterBoundsAccess(rCharacterBoundsAccess),
-      maInvalidator(rInvalidator)
+      maCharacterBoundsAccess(std::move(aCharacterBoundsAccess)),
+      maInvalidator(std::move(aInvalidator))
 {
 }
 

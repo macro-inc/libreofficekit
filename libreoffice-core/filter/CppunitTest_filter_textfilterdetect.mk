@@ -21,6 +21,8 @@ $(eval $(call gb_CppunitTest_use_libraries,filter_textfilterdetect, \
 	cppu \
 	cppuhelper \
 	sal \
+	sfx \
+	subsequenttest \
 	test \
 	textfd \
 	tl \

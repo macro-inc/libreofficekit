@@ -45,7 +45,7 @@
 
 #include <tools/gen.hxx>
 #include <tools/stream.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <vcl/gdimtf.hxx>
 #include <vcl/graph.hxx>
@@ -55,6 +55,7 @@
 #include <vcl/metaact.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/vcllayout.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::lang;
@@ -118,10 +119,10 @@ void setPageMargins(const uno::Reference<beans::XPropertySet>& xPageProperySet,
         || aPageMargins.nRight < 0)
         return;
 
-    xPageProperySet->setPropertyValue("BorderTop", css::uno::makeAny(aPageMargins.nTop));
-    xPageProperySet->setPropertyValue("BorderBottom", css::uno::makeAny(aPageMargins.nBottom));
-    xPageProperySet->setPropertyValue("BorderLeft", css::uno::makeAny(aPageMargins.nLeft));
-    xPageProperySet->setPropertyValue("BorderRight", css::uno::makeAny(aPageMargins.nRight));
+    xPageProperySet->setPropertyValue("BorderTop", css::uno::Any(aPageMargins.nTop));
+    xPageProperySet->setPropertyValue("BorderBottom", css::uno::Any(aPageMargins.nBottom));
+    xPageProperySet->setPropertyValue("BorderLeft", css::uno::Any(aPageMargins.nLeft));
+    xPageProperySet->setPropertyValue("BorderRight", css::uno::Any(aPageMargins.nRight));
 }
 
 // #i10613# Extracted from ImplCheckRect::ImplCreate
@@ -234,8 +235,8 @@ void SfxRedactionHelper::addPagesToDraw(
 
         // Set page size & margins
         uno::Reference<beans::XPropertySet> xPageProperySet(xPage, uno::UNO_QUERY);
-        xPageProperySet->setPropertyValue("Height", css::uno::makeAny(nPageHeight));
-        xPageProperySet->setPropertyValue("Width", css::uno::makeAny(nPageWidth));
+        xPageProperySet->setPropertyValue("Height", css::uno::Any(nPageHeight));
+        xPageProperySet->setPropertyValue("Width", css::uno::Any(nPageWidth));
 
         setPageMargins(xPageProperySet, aPageMargins);
 
@@ -492,10 +493,10 @@ void SfxRedactionHelper::addRedactionRectToPage(
         xRectShapeProperySet->setPropertyValue("Name",
                                                uno::Any(OUString("RectangleRedactionShape")));
         xRectShapeProperySet->setPropertyValue("FillTransparence",
-                                               css::uno::makeAny(static_cast<sal_Int16>(50)));
-        xRectShapeProperySet->setPropertyValue("FillColor", css::uno::makeAny(COL_GRAY7));
+                                               css::uno::Any(static_cast<sal_Int16>(50)));
+        xRectShapeProperySet->setPropertyValue("FillColor", css::uno::Any(COL_GRAY7));
         xRectShapeProperySet->setPropertyValue(
-            "LineStyle", css::uno::makeAny(css::drawing::LineStyle::LineStyle_NONE));
+            "LineStyle", css::uno::Any(css::drawing::LineStyle::LineStyle_NONE));
 
         xRectShape->setSize(awt::Size(aNewRectangle.GetWidth(), aNewRectangle.GetHeight()));
         xRectShape->setPosition(awt::Point(aNewRectangle.Left(), aNewRectangle.Top()));
@@ -543,7 +544,7 @@ void SfxRedactionHelper::fillSearchOptions(i18nutil::SearchOptions2& rSearchOpt,
     rSearchOpt.Locale = GetAppLanguageTag().getLocale();
     if (rTarget.sType == RedactionTargetType::REDACTION_TARGET_PREDEFINED)
     {
-        auto nPredefIndex = rTarget.sContent.getToken(0, ';').toUInt32();
+        auto nPredefIndex = o3tl::toUInt32(o3tl::getToken(rTarget.sContent, 0, ';'));
         rSearchOpt.searchString = m_aPredefinedTargets[nPredefIndex];
     }
     else

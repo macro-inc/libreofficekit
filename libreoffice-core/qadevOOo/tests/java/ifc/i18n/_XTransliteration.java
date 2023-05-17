@@ -321,12 +321,7 @@ public class _XTransliteration extends MultiMethodTest {
 
         boolean ret = true ;
 
-        int res = -666 ;
-        try {
-            res = oObj.compareSubstring(str1, p1, len1, str2, p2, len2);
-        } catch (NullPointerException e) {
-            log.println("Exception while method calling occurs :" + e);
-        }
+        int res = oObj.compareSubstring(str1, p1, len1, str2, p2, len2);
 
         if (res != expRes) {
             log.print("Comparing FAILED; return: " + res + ", expected: " +
@@ -338,12 +333,7 @@ public class _XTransliteration extends MultiMethodTest {
         log.println("('" + str1 + "', " + p1 + ", " + len1 + ", '" +
             str2 + "', " + p2 + ", " + len2 + ")");
 
-        res = -666 ;
-        try {
-            res = oObj.compareSubstring(str2, p2, len2, str1, p1, len1);
-        } catch (NullPointerException e) {
-            log.println("Exception while method calling occurs :" + e);
-        }
+        res = oObj.compareSubstring(str2, p2, len2, str1, p1, len1);
 
         if (res != -expRes) {
             log.print("Comparing FAILED; return: " + res + ", expected: " +
@@ -407,12 +397,7 @@ public class _XTransliteration extends MultiMethodTest {
 
         boolean ret = true ;
 
-        int res = -666 ;
-        try {
-            res = oObj.compareString(str1, str2);
-        } catch (NullPointerException e) {
-            log.println("Exception while method calling occurs :" + e);
-        }
+        int res = oObj.compareString(str1, str2);
 
         if (res == expRes) {
             log.println("Comparing of '" + str1 + "' and '" + str2 + "' OK" );
@@ -424,12 +409,7 @@ public class _XTransliteration extends MultiMethodTest {
 
         if (!testReverse) return ret ;
 
-        res = -666 ;
-        try {
-            res = oObj.compareString(str2, str1);
-        } catch (NullPointerException e) {
-            log.println("Exception while method calling occurs :" + e);
-        }
+        res = oObj.compareString(str2, str1);
 
         if (res == -expRes) {
             log.println("Comparing of '" + str2 + "' and '" + str1 + "' OK" );

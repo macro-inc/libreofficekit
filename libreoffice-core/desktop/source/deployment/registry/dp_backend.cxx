@@ -22,6 +22,7 @@
 #include <cassert>
 
 #include <dp_backend.h>
+#include <dp_misc.h>
 #include <dp_ucb.h>
 #include <rtl/ustring.hxx>
 #include <rtl/bootstrap.hxx>
@@ -41,9 +42,10 @@
 #include <com/sun/star/beans/StringPair.hpp>
 #include <com/sun/star/sdbc/XResultSet.hpp>
 #include <com/sun/star/sdbc/XRow.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/tempfile.hxx>
 #include <optional>
+#include <utility>
 
 using namespace ::dp_misc;
 using namespace ::com::sun::star;
@@ -63,7 +65,7 @@ void PackageRegistryBackend::disposing( lang::EventObject const & event )
     Reference<deployment::XPackage> xPackage(
         event.Source, UNO_QUERY_THROW );
     OUString url( xPackage->getURL() );
-    ::osl::MutexGuard guard( getMutex() );
+    ::osl::MutexGuard guard( m_aMutex );
     if ( m_bound.erase( url ) != 1 )
     {
         SAL_WARN("desktop.deployment", "erase(" << url << ") != 1");
@@ -74,7 +76,7 @@ void PackageRegistryBackend::disposing( lang::EventObject const & event )
 PackageRegistryBackend::PackageRegistryBackend(
     Sequence<Any> const & args,
     Reference<XComponentContext> const & xContext )
-    : t_BackendBase( getMutex() ),
+    : t_BackendBase( m_aMutex ),
       m_xComponentContext( xContext ),
       m_eContext( Context::Unknown )
 {
@@ -102,7 +104,7 @@ PackageRegistryBackend::PackageRegistryBackend(
 
 void PackageRegistryBackend::check()
 {
-    ::osl::MutexGuard guard( getMutex() );
+    ::osl::MutexGuard guard( m_aMutex );
     if (rBHelper.bInDispose || rBHelper.bDisposed) {
         throw lang::DisposedException(
             "PackageRegistryBackend instance has already been disposed!",
@@ -137,7 +139,7 @@ Reference<deployment::XPackage> PackageRegistryBackend::bindPackage(
     OUString const & url, OUString const & mediaType, sal_Bool  bRemoved,
     OUString const & identifier, Reference<XCommandEnvironment> const & xCmdEnv )
 {
-    ::osl::ResettableMutexGuard guard( getMutex() );
+    ::osl::ResettableMutexGuard guard( m_aMutex );
     check();
 
     t_string2ref::const_iterator const iFind( m_bound.find( url ) );
@@ -213,9 +215,7 @@ OUString PackageRegistryBackend::createFolder(
     ucbhelper::Content dataContent;
     ::dp_misc::create_folder(&dataContent, sDataFolder, xCmdEnv);
 
-    const OUString baseDir(sDataFolder);
-    ::utl::TempFile aTemp(&baseDir, true);
-    const OUString& url = aTemp.GetURL();
+    const OUString url = ::utl::CreateTempURL(&sDataFolder, true);
     return sDataFolder + url.subView(url.lastIndexOf('/'));
 }
 
@@ -296,21 +296,21 @@ Package::~Package()
 }
 
 
-Package::Package( ::rtl::Reference<PackageRegistryBackend> const & myBackend,
-                  OUString const & url,
-                  OUString const & rName,
-                  OUString const & displayName,
+Package::Package( ::rtl::Reference<PackageRegistryBackend>  myBackend,
+                  OUString url,
+                  OUString aName,
+                  OUString displayName,
                   Reference<deployment::XPackageTypeInfo> const & xPackageType,
                   bool bRemoved,
-                  OUString const & identifier)
-    : t_PackageBase( getMutex() ),
-      m_myBackend( myBackend ),
-      m_url( url ),
-      m_name( rName ),
-      m_displayName( displayName ),
+                  OUString identifier)
+    : t_PackageBase( m_aMutex ),
+      m_myBackend(std::move( myBackend )),
+      m_url(std::move( url )),
+      m_name(std::move( aName )),
+      m_displayName(std::move( displayName )),
       m_xPackageType( xPackageType ),
       m_bRemoved(bRemoved),
-      m_identifier(identifier)
+      m_identifier(std::move(identifier))
 {
     if (m_bRemoved)
     {
@@ -335,7 +335,7 @@ void Package::disposing()
 
 void Package::check() const
 {
-    ::osl::MutexGuard guard( getMutex() );
+    ::osl::MutexGuard guard( m_aMutex );
     if (rBHelper.bInDispose || rBHelper.bDisposed) {
         throw lang::DisposedException(
             "Package instance has already been disposed!",
@@ -574,7 +574,7 @@ beans::Optional< beans::Ambiguous<sal_Bool> > Package::isRegistered(
     Reference<XCommandEnvironment> const & xCmdEnv )
 {
     try {
-        ::osl::ResettableMutexGuard guard( getMutex() );
+        ::osl::ResettableMutexGuard guard( m_aMutex );
         return isRegistered_( guard,
                               AbortChannel::get(xAbortChannel),
                               xCmdEnv );
@@ -611,7 +611,7 @@ void Package::processPackage_impl(
 
     try {
         try {
-            ::osl::ResettableMutexGuard guard( getMutex() );
+            ::osl::ResettableMutexGuard guard( m_aMutex );
             beans::Optional< beans::Ambiguous<sal_Bool> > option(
                 isRegistered_( guard, AbortChannel::get(xAbortChannel),
                                xCmdEnv ) );

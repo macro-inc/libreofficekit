@@ -21,9 +21,9 @@
 #define INCLUDED_SW_SOURCE_UIBASE_INC_UNOMAILMERGE_HXX
 
 #include <cppuhelper/implbase.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
 #include <comphelper/interfacecontainer2.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 
 #include <com/sun/star/task/XJob.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -57,12 +57,16 @@ namespace com::sun::star {
 
 }
 
-typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<sal_Int32>
+typedef comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, sal_Int32>
     OPropertyListenerContainerHelper;
 
 class SwDBManager;
 class MailMergeExecuteFinalizer;
 
+/**
+ * Gives UNO access to the global mail merge functionality, via the com.sun.star.text.MailMerge
+ * service.
+ */
 class SwXMailMerge final :
     public cppu::WeakImplHelper
     <
@@ -76,8 +80,8 @@ class SwXMailMerge final :
 {
     friend class MailMergeExecuteFinalizer;
 
-    comphelper::OInterfaceContainerHelper2     m_aEvtListeners;
-    comphelper::OInterfaceContainerHelper2     m_aMergeListeners;
+    comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>  m_aEvtListeners;
+    comphelper::OInterfaceContainerHelper2 m_aMergeListeners;
     OPropertyListenerContainerHelper     m_aPropListeners;
 
     const SfxItemPropertySet*   m_pPropSet;

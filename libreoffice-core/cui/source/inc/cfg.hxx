@@ -53,6 +53,7 @@ inline constexpr OUStringLiteral ITEM_DESCRIPTOR_UINAME = u"UIName";
 
 inline constexpr OUStringLiteral ITEM_MENUBAR_URL = u"private:resource/menubar/menubar";
 inline constexpr OUStringLiteral ITEM_TOOLBAR_URL = u"private:resource/toolbar/";
+inline constexpr OUStringLiteral ITEM_EVENT_URL = u"private:resource/event/";
 
 inline constexpr OUStringLiteral CUSTOM_TOOLBAR_STR = u"custom_toolbar_";
 
@@ -67,6 +68,8 @@ class SvxConfigDialog : public SfxTabDialogController
 {
 private:
     css::uno::Reference< css::frame::XFrame > m_xFrame;
+
+    virtual void ActivatePage(const OString& rPage) override;
 
 public:
     SvxConfigDialog(weld::Window*, const SfxItemSet*);
@@ -113,8 +116,8 @@ protected:
 public:
 
     SaveInData(
-        const css::uno::Reference < css::ui::XUIConfigurationManager >& xCfgMgr,
-        const css::uno::Reference < css::ui::XUIConfigurationManager >& xParentCfgMgr,
+        css::uno::Reference < css::ui::XUIConfigurationManager > xCfgMgr,
+        css::uno::Reference < css::ui::XUIConfigurationManager > xParentCfgMgr,
         const OUString& aModuleId,
         bool docConfig );
 
@@ -253,8 +256,8 @@ private:
 
 public:
 
-    SvxConfigEntry( const OUString& rDisplayName,
-                    const OUString& rCommandURL,
+    SvxConfigEntry( OUString aDisplayName,
+                    OUString aCommandURL,
                     bool bPopup,
                     bool bParentData );
 
@@ -348,6 +351,7 @@ public:
     }
 
     DECL_LINK(KeyInputHdl, const KeyEvent&, bool);
+    DECL_LINK(QueryTooltip, const weld::TreeIter& rIter, OUString);
 
     void CreateDropDown();
 };
@@ -496,7 +500,7 @@ public:
 
     SvxConfigEntry* GetTopLevelSelection()
     {
-        return reinterpret_cast<SvxConfigEntry*>(m_xTopLevelListBox->get_active_id().toInt64());
+        return weld::fromId<SvxConfigEntry*>(m_xTopLevelListBox->get_active_id());
     }
 
     /** identifies the module in the given frame. If the frame is <NULL/>, a default
@@ -599,7 +603,6 @@ class SvxNewToolbarDialog : public weld::GenericDialogController
 {
 private:
     std::unique_ptr<weld::Entry> m_xEdtName;
-    std::unique_ptr<weld::Button> m_xBtnOK;
 public:
     std::unique_ptr<weld::ComboBox> m_xSaveInListBox;
 
@@ -647,8 +650,8 @@ public:
 
     SvxIconSelectorDialog(
         weld::Window *pWindow,
-        const css::uno::Reference< css::ui::XImageManager >& rXImageManager,
-        const css::uno::Reference< css::ui::XImageManager >& rXParentImageManager);
+        css::uno::Reference< css::ui::XImageManager > xImageManager,
+        css::uno::Reference< css::ui::XImageManager > xParentImageManager);
 
     virtual ~SvxIconSelectorDialog() override;
 

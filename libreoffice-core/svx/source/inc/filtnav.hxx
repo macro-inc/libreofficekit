@@ -25,6 +25,7 @@
 #include <svl/lstner.hxx>
 #include <svl/SfxBroadcaster.hxx>
 
+#include <utility>
 #include <vcl/window.hxx>
 #include <sfx2/childwin.hxx>
 #include <svl/poolitem.hxx>
@@ -52,9 +53,9 @@ class FmFilterData
     OUString         m_aText;
 
 public:
-    FmFilterData(FmParentData* pParent, const OUString& rText)
+    FmFilterData(FmParentData* pParent, OUString aText)
         :m_pParent( pParent )
-        ,m_aText( rText )
+        ,m_aText(std::move( aText ))
     {}
     virtual ~FmFilterData(){}
 
@@ -122,7 +123,7 @@ class FmFilterItem final : public FmFilterData
 public:
     FmFilterItem(
         FmFilterItems* pParent,
-        const OUString& aFieldName,
+        OUString aFieldName,
         const OUString& aCondition,
         const sal_Int32 _nComponentIndex
     );
@@ -273,7 +274,7 @@ private:
 
     void DeleteSelection();
     std::unique_ptr<weld::TreeIter> FindEntry(const FmFilterData* pItem) const;
-    void Insert(FmFilterData* pItem, int nPos);
+    void Insert(const FmFilterData* pItem, int nPos);
     void Remove(FmFilterData const * pItem);
 
     DECL_LINK(OnRemove, void*, void);

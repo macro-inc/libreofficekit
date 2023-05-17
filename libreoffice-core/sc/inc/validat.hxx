@@ -156,6 +156,10 @@ public:
 
     bool IsDataValid( ScRefCellValue& rCell, const ScAddress& rPos ) const;
 
+    /** Test, if formula is valid. */
+    bool isFormulaResultsValidatable(const OUString& rTest, const ScAddress& rPos, SvNumberFormatter* pFormatter,
+        OUString& rStrResult, double& nVal, sal_uInt32& nFormat, bool& bIsVal) const;
+
                     // TRUE -> break
     bool DoError(weld::Window* pParent, const OUString& rInput, const ScAddress& rPos) const;
     void DoCalcError( ScFormulaCell* pCell ) const;
@@ -194,7 +198,7 @@ private:
                 properly initialized ScValidationDataIsNumeric struct, see
                 implementation.
      */
-    bool IsDataValidTextLen( const OUString& rTest, const ScAddress& rPos,
+    bool IsDataValidTextLen( std::u16string_view rTest, const ScAddress& rPos,
             ScValidationDataIsNumeric* pDataNumeric ) const;
 };
 

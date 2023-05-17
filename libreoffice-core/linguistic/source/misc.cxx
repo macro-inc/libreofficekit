@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <optional>
 #include <sal/log.hxx>
 #include <svl/lngmisc.hxx>
 #include <ucbhelper/content.hxx>
@@ -38,13 +39,11 @@
 #include <unotools/charclass.hxx>
 #include <unotools/linguprops.hxx>
 #include <unotools/localedatawrapper.hxx>
-#include <unotools/syslocale.hxx>
 #include <svtools/strings.hrc>
 #include <unotools/resmgr.hxx>
 
 #include <linguistic/misc.hxx>
 #include <linguistic/hyphdta.hxx>
-#include <mutex>
 
 using namespace osl;
 using namespace com::sun::star;
@@ -66,10 +65,10 @@ osl::Mutex & GetLinguMutex()
 
 const LocaleDataWrapper & GetLocaleDataWrapper( LanguageType nLang )
 {
-    static std::unique_ptr<LocaleDataWrapper> xLclDtaWrp;
-    if (!xLclDtaWrp || xLclDtaWrp->getLoadedLanguageTag().getLanguageType() != nLang)
-        xLclDtaWrp.reset(new LocaleDataWrapper(LanguageTag( nLang )));
-    return *xLclDtaWrp;
+    static std::optional<LocaleDataWrapper> oLclDtaWrp;
+    if (!oLclDtaWrp || oLclDtaWrp->getLoadedLanguageTag().getLanguageType() != nLang)
+        oLclDtaWrp.emplace(LanguageTag( nLang ));
+    return *oLclDtaWrp;
 }
 
 LanguageType LinguLocaleToLanguage( const css::lang::Locale& rLocale )
@@ -98,11 +97,11 @@ bool LinguIsUnspecified( LanguageType nLanguage )
 // For mappings between language code string and LanguageType see
 // i18nlangtag/source/isolang/isolang.cxx
 
-bool LinguIsUnspecified( const OUString & rBcp47 )
+bool LinguIsUnspecified( std::u16string_view rBcp47 )
 {
-    if (rBcp47.getLength() != 3)
+    if (rBcp47.size() != 3)
         return false;
-    return rBcp47 == "zxx" || rBcp47 == "und" || rBcp47 == "mul";
+    return rBcp47 == u"zxx" || rBcp47 == u"und" || rBcp47 == u"mul";
 }
 
 static sal_Int32 Minimum( sal_Int32 n1, sal_Int32 n2, sal_Int32 n3 )
@@ -141,10 +140,10 @@ sal_Int32 & IntArray2D::Value( int i, int k  )
     return pData[ i * n2 + k ];
 }
 
-sal_Int32 LevDistance( const OUString &rTxt1, const OUString &rTxt2 )
+sal_Int32 LevDistance( std::u16string_view rTxt1, std::u16string_view rTxt2 )
 {
-    sal_Int32 nLen1 = rTxt1.getLength();
-    sal_Int32 nLen2 = rTxt2.getLength();
+    sal_Int32 nLen1 = rTxt1.size();
+    sal_Int32 nLen2 = rTxt2.size();
 
     if (nLen1 == 0)
         return nLen2;
@@ -465,9 +464,9 @@ static bool GetAltSpelling( sal_Int16 &rnChgPos, sal_Int16 &rnChgLen, OUString &
     return bRes;
 }
 
-static sal_Int16 GetOrigWordPos( const OUString &rOrigWord, sal_Int16 nPos )
+static sal_Int16 GetOrigWordPos( std::u16string_view rOrigWord, sal_Int16 nPos )
 {
-    sal_Int32 nLen = rOrigWord.getLength();
+    sal_Int32 nLen = rOrigWord.size();
     sal_Int32 i = -1;
     while (nPos >= 0  &&  i++ < nLen)
     {
@@ -479,10 +478,10 @@ static sal_Int16 GetOrigWordPos( const OUString &rOrigWord, sal_Int16 nPos )
     return sal::static_int_cast< sal_Int16 >((0 <= i  &&  i < nLen) ? i : -1);
 }
 
-sal_Int32 GetPosInWordToCheck( const OUString &rTxt, sal_Int32 nPos )
+sal_Int32 GetPosInWordToCheck( std::u16string_view rTxt, sal_Int32 nPos )
 {
     sal_Int32 nRes = -1;
-    sal_Int32 nLen = rTxt.getLength();
+    sal_Int32 nLen = rTxt.size();
     if (0 <= nPos  &&  nPos < nLen)
     {
         nRes = 0;
@@ -523,7 +522,6 @@ uno::Reference< XHyphenatedWord > RebuildHyphensAndControlChars(
             //! should at least work with the German words
             //! B-"u-c-k-er and Sc-hif-fah-rt
 
-            OUString aLeft, aRight;
             sal_Int16 nPos = GetOrigWordPos( rOrigWord, nChgPos );
 
             // get words like Sc-hif-fah-rt to work correct
@@ -531,12 +529,12 @@ uno::Reference< XHyphenatedWord > RebuildHyphensAndControlChars(
             if (nChgPos > nHyphenationPos)
                 --nPos;
 
-            aLeft = rOrigWord.copy( 0, nPos );
-            aRight = rOrigWord.copy( nPos ); // FIXME: changes at the right side
+            std::u16string_view aLeft = rOrigWord.subView( 0, nPos );
+            std::u16string_view aRight = rOrigWord.subView( nPos ); // FIXME: changes at the right side
 
             aOrigHyphenatedWord =  aLeft + aRplc + aRight;
 
-            nOrigHyphenPos      = sal::static_int_cast< sal_Int16 >(aLeft.getLength() +
+            nOrigHyphenPos      = sal::static_int_cast< sal_Int16 >(aLeft.size() +
                                   rxHyphWord->getHyphenPos() - nChgPos);
             nOrigHyphenationPos = GetOrigWordPos( rOrigWord, nHyphenationPos );
         }
@@ -560,34 +558,31 @@ uno::Reference< XHyphenatedWord > RebuildHyphensAndControlChars(
 bool IsUpper( const OUString &rText, sal_Int32 nPos, sal_Int32 nLen, LanguageType nLanguage )
 {
     CharClass aCC(( LanguageTag( nLanguage ) ));
-    sal_Int32 nFlags = aCC.getStringType( rText, nPos, nLen );
-    return      (nFlags & KCharacterType::UPPER)
-            && !(nFlags & KCharacterType::LOWER);
+    return aCC.isUpper( rText, nPos, nLen );
 }
 
 CapType capitalType(const OUString& aTerm, CharClass const * pCC)
 {
         sal_Int32 tlen = aTerm.getLength();
-        if (pCC && tlen)
+        if (!pCC || !tlen)
+            return CapType::UNKNOWN;
+
+        sal_Int32 nc = 0;
+        for (sal_Int32 tindex = 0; tindex < tlen; ++tindex)
         {
-            sal_Int32 nc = 0;
-            for (sal_Int32 tindex = 0; tindex < tlen; ++tindex)
-            {
-                if (pCC->getCharacterType(aTerm,tindex) &
-                   css::i18n::KCharacterType::UPPER) nc++;
-            }
-
-            if (nc == 0)
-                return CapType::NOCAP;
-            if (nc == tlen)
-                return CapType::ALLCAP;
-            if ((nc == 1) && (pCC->getCharacterType(aTerm,0) &
-                  css::i18n::KCharacterType::UPPER))
-                return CapType::INITCAP;
-
-            return CapType::MIXED;
+            if (pCC->getCharacterType(aTerm,tindex) &
+               css::i18n::KCharacterType::UPPER) nc++;
         }
-        return CapType::UNKNOWN;
+
+        if (nc == 0)
+            return CapType::NOCAP;
+        if (nc == tlen)
+            return CapType::ALLCAP;
+        if ((nc == 1) && (pCC->getCharacterType(aTerm,0) &
+              css::i18n::KCharacterType::UPPER))
+            return CapType::INITCAP;
+
+        return CapType::MIXED;
 }
 
 // sorted(!) array of unicode ranges for code points that are exclusively(!) used as numbers
@@ -648,12 +643,12 @@ bool HasDigits( const OUString &rText )
     return false;
 }
 
-bool IsNumeric( const OUString &rText )
+bool IsNumeric( std::u16string_view rText )
 {
     bool bRes = false;
-    if (!rText.isEmpty())
+    if (!rText.empty())
     {
-        sal_Int32 nLen = rText.getLength();
+        sal_Int32 nLen = rText.size();
         bRes = true;
         for(sal_Int32 i = 0; i < nLen; ++i)
         {

@@ -42,6 +42,7 @@
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
 #include <com/sun/star/script/XScriptEventsSupplier.hpp>
 #include <com/sun/star/table/CellAddress.hpp>
+#include <com/sun/star/table/CellRangeAddress.hpp>
 #include <cppuhelper/exc_hlp.hxx>
 #include <o3tl/functional.hxx>
 #include <svx/svdpagv.hxx>
@@ -70,7 +71,6 @@ DlgEditor& DlgEdObj::GetDialogEditor ()
 DlgEdObj::DlgEdObj(SdrModel& rSdrModel)
 :   SdrUnoObj(rSdrModel, OUString())
     ,bIsListening(false)
-    ,pDlgEdForm( nullptr )
 {
 }
 
@@ -118,7 +118,6 @@ DlgEdObj::DlgEdObj(
     const css::uno::Reference< css::lang::XMultiServiceFactory >& rxSFac)
 :   SdrUnoObj(rSdrModel, rModelName, rxSFac)
     ,bIsListening(false)
-    ,pDlgEdForm( nullptr )
 {
 }
 
@@ -810,112 +809,112 @@ SdrObjKind DlgEdObj::GetObjIdentifier() const
 {
     if ( supportsService( "com.sun.star.awt.UnoControlDialogModel" ))
     {
-        return OBJ_DLG_DIALOG;
+        return SdrObjKind::BasicDialogDialog;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlButtonModel" ))
     {
-        return OBJ_DLG_PUSHBUTTON;
+        return SdrObjKind::BasicDialogPushButton;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlRadioButtonModel" ))
     {
-        return OBJ_DLG_RADIOBUTTON;
+        return SdrObjKind::BasicDialogRadioButton;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlCheckBoxModel" ))
     {
-        return OBJ_DLG_CHECKBOX;
+        return SdrObjKind::BasicDialogCheckbox;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlListBoxModel" ))
     {
-        return OBJ_DLG_LISTBOX;
+        return SdrObjKind::BasicDialogListbox;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlComboBoxModel" ))
     {
-        return OBJ_DLG_COMBOBOX;
+        return SdrObjKind::BasicDialogCombobox;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlGroupBoxModel" ))
     {
-        return OBJ_DLG_GROUPBOX;
+        return SdrObjKind::BasicDialogGroupBox;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlEditModel" ))
     {
-        return OBJ_DLG_EDIT;
+        return SdrObjKind::BasicDialogEdit;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlFixedTextModel" ))
     {
-        return OBJ_DLG_FIXEDTEXT;
+        return SdrObjKind::BasicDialogFixedText;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlImageControlModel" ))
     {
-        return OBJ_DLG_IMAGECONTROL;
+        return SdrObjKind::BasicDialogImageControl;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlProgressBarModel" ))
     {
-        return OBJ_DLG_PROGRESSBAR;
+        return SdrObjKind::BasicDialogProgressbar;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlScrollBarModel" ))
     {
-        return OBJ_DLG_HSCROLLBAR;
+        return SdrObjKind::BasicDialogHorizontalScrollbar;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlFixedLineModel" ))
     {
-        return OBJ_DLG_HFIXEDLINE;
+        return SdrObjKind::BasicDialogHorizontalFixedLine;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlDateFieldModel" ))
     {
-        return OBJ_DLG_DATEFIELD;
+        return SdrObjKind::BasicDialogDateField;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlTimeFieldModel" ))
     {
-        return OBJ_DLG_TIMEFIELD;
+        return SdrObjKind::BasicDialogTimeField;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlNumericFieldModel" ))
     {
-        return OBJ_DLG_NUMERICFIELD;
+        return SdrObjKind::BasicDialogNumericField;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlCurrencyFieldModel" ))
     {
-        return OBJ_DLG_CURRENCYFIELD;
+        return SdrObjKind::BasicDialogCurencyField;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlFormattedFieldModel" ))
     {
-        return OBJ_DLG_FORMATTEDFIELD;
+        return SdrObjKind::BasicDialogFormattedField;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlPatternFieldModel" ))
     {
-        return OBJ_DLG_PATTERNFIELD;
+        return SdrObjKind::BasicDialogPatternField;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlFileControlModel" ))
     {
-        return OBJ_DLG_FILECONTROL;
+        return SdrObjKind::BasicDialogFileControl;
     }
     else if ( supportsService( "com.sun.star.awt.tree.TreeControlModel" ))
     {
-        return OBJ_DLG_TREECONTROL;
+        return SdrObjKind::BasicDialogTreeControl;
     }
     else if ( supportsService( "com.sun.star.awt.grid.UnoControlGridModel" ))
     {
-        return OBJ_DLG_GRIDCONTROL;
+        return SdrObjKind::BasicDialogGridControl;
     }
     else if ( supportsService( "com.sun.star.awt.UnoControlFixedHyperlinkModel" ))
     {
-        return OBJ_DLG_HYPERLINKCONTROL;
+        return SdrObjKind::BasicDialogHyperlinkControl;
     }
     else
     {
-        return OBJ_DLG_CONTROL;
+        return SdrObjKind::BasicDialogControl;
     }
 }
 
-DlgEdObj* DlgEdObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> DlgEdObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new DlgEdObj(rTargetModel, *this);
 }
 
-SdrObjectUniquePtr DlgEdObj::getFullDragClone() const
+rtl::Reference<SdrObject> DlgEdObj::getFullDragClone() const
 {
     // no need to really add the clone for dragging, it's a temporary
     // object
-    return SdrObjectUniquePtr(new SdrUnoObj(getSdrModelFromSdrObject(), *this));
+    return rtl::Reference<SdrObject>(new SdrUnoObj(getSdrModelFromSdrObject(), *this));
 }
 
 void DlgEdObj::NbcMove( const Size& rSize )
@@ -961,7 +960,7 @@ bool DlgEdObj::EndCreate(SdrDragStat& rStat, SdrCreateCmd eCmd)
     // implementation. For historical reasons, the SdrPage (which is the DlgEdPage) was
     // already set. For now, get it from the SdrDragStat and use it to access and set
     // the local pDlgEdForm
-    if(nullptr == pDlgEdForm && nullptr != rStat.GetPageView())
+    if(!pDlgEdForm && nullptr != rStat.GetPageView())
     {
         const DlgEdPage* pDlgEdPage(dynamic_cast<const DlgEdPage*>(rStat.GetPageView()->GetPage()));
 
@@ -1675,17 +1674,21 @@ void DlgEdObj::MakeDataAware( const Reference< frame::XModel >& xModel )
     if ( !xFac.is() )
         return;
 
-    css::table::CellAddress aApiAddress;
-
-    //tdf#90361 CellValueBinding and CellRangeListSource are unusable
+    //tdf#90361 and tdf#104011 CellValueBinding and CellRangeListSource are unusable
     //without being initialized, so use createInstanceWithArguments with a
-    //dummy BoundCell instead of createInstance. This at least results in
+    //dummy BoundCell and CellRange instead of createInstance. This at least results in
     //the dialog editor not falling.
-    css::beans::NamedValue aValue;
-    aValue.Name = "BoundCell";
-    aValue.Value <<= aApiAddress;
+    css::beans::NamedValue aCellValue;
+    aCellValue.Name = "BoundCell";
+    css::table::CellAddress aCellAddress;
+    aCellValue.Value <<= aCellAddress;
 
-    Sequence< Any > aArgs{ Any(aValue) };
+    css::beans::NamedValue aCellRange;
+    aCellRange.Name = "CellRange";
+    css::table::CellRangeAddress aRangeAddress;
+    aCellRange.Value <<= aRangeAddress;
+
+    Sequence< Any > aArgs{ Any(aCellValue), Any(aCellRange) };
 
     if ( xBindable.is() )
     {

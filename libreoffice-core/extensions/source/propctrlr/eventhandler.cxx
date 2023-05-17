@@ -59,12 +59,13 @@
 #include <rtl/ref.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <svx/svxdlg.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <map>
 #include <algorithm>
 #include <iterator>
 #include <string_view>
+#include <utility>
 
 namespace pcr
 {
@@ -98,7 +99,6 @@ namespace pcr
     using ::com::sun::star::form::runtime::FormController;
     using ::com::sun::star::form::runtime::XFormController;
     using ::com::sun::star::beans::UnknownPropertyException;
-    using ::com::sun::star::uno::makeAny;
     using ::com::sun::star::container::NoSuchElementException;
     using ::com::sun::star::beans::XPropertySetInfo;
     using ::com::sun::star::container::XNameReplace;
@@ -124,11 +124,11 @@ namespace pcr
     namespace FormComponentType = css::form::FormComponentType;
 
     EventDescription::EventDescription( EventId _nId, const char* _pListenerNamespaceAscii, const char* _pListenerClassAsciiName,
-            const char* _pListenerMethodAsciiName, TranslateId pDisplayNameResId, const OUString& _sHelpId, const OString& _sUniqueBrowseId )
+            const char* _pListenerMethodAsciiName, TranslateId pDisplayNameResId, OUString _sHelpId, OString _sUniqueBrowseId )
         :sDisplayName(PcrRes( pDisplayNameResId ))
         ,sListenerMethodName( OUString::createFromAscii( _pListenerMethodAsciiName ) )
-        ,sHelpId( _sHelpId )
-        ,sUniqueBrowseId( _sUniqueBrowseId )
+        ,sHelpId(std::move( _sHelpId ))
+        ,sUniqueBrowseId(std::move( _sUniqueBrowseId ))
         ,nId( _nId )
     {
         OUStringBuffer aQualifiedListenerClass;
@@ -237,11 +237,11 @@ namespace pcr
 
                 sal_Int32 nPrefixLen = aScriptEvent.ScriptCode.indexOf( ':' );
                 OSL_ENSURE( nPrefixLen > 0, "lcl_getAssignedScriptEvent: illegal location!" );
-                OUString sLocation = aScriptEvent.ScriptCode.copy( 0, nPrefixLen );
-                OUString sMacroPath = aScriptEvent.ScriptCode.copy( nPrefixLen + 1 );
+                std::u16string_view sLocation = aScriptEvent.ScriptCode.subView( 0, nPrefixLen );
+                std::u16string_view sMacroPath = aScriptEvent.ScriptCode.subView( nPrefixLen + 1 );
 
                 aScriptEvent.ScriptCode =
-                    "vnd.sun.star.script:" +
+                    OUString::Concat("vnd.sun.star.script:") +
                     sMacroPath +
                     "?language=Basic&location=" +
                     sLocation;
@@ -275,7 +275,7 @@ namespace pcr
             OSL_PRECOND( _rxIntrospection.is(), "lcl_addListenerTypesFor_throw: this will crash!" );
 
             Reference< XIntrospectionAccess > xIntrospectionAccess(
-                _rxIntrospection->inspect( makeAny( _rxComponent ) ), UNO_SET_THROW );
+                _rxIntrospection->inspect( Any( _rxComponent ) ), UNO_SET_THROW );
 
             const Sequence< Type > aListeners( xIntrospectionAccess->getSupportedListeners() );
 
@@ -381,7 +381,7 @@ namespace pcr
             comphelper::makePropertyValue("Script", aDescriptor.ScriptCode)
         };
 
-        return makeAny( aScriptDescriptor );
+        return Any( aScriptDescriptor );
     }
 
     Sequence< OUString > SAL_CALL EventHolder::getElementNames(  )
@@ -511,7 +511,7 @@ namespace pcr
             }
         }
 
-        return makeAny( aPropertyValue );
+        return Any( aPropertyValue );
     }
 
     void SAL_CALL EventHandler::setPropertyValue( const OUString& _rPropertyName, const Any& _rValue )
@@ -541,7 +541,7 @@ namespace pcr
         aEvent.PropertyName = _rPropertyName;
         aEvent.OldValue <<= aOldScriptEvent;
         aEvent.NewValue <<= aNewScriptEvent;
-        m_aPropertyListeners.notify( aEvent, &XPropertyChangeListener::propertyChange );
+        m_aPropertyListeners.notifyEach( &XPropertyChangeListener::propertyChange, aEvent );
     }
 
     Any SAL_CALL EventHandler::convertToPropertyValue( const OUString& _rPropertyName, const Any& _rControlValue )
@@ -568,7 +568,7 @@ namespace pcr
         // there is no need for this code...
 
         aAssignedScript.ScriptCode = sNewScriptCode;
-        return makeAny( aAssignedScript );
+        return Any( aAssignedScript );
     }
 
     Any SAL_CALL EventHandler::convertToControlValue( const OUString& /*_rPropertyName*/, const Any& _rPropertyValue, const Type& _rControlValueType )
@@ -629,7 +629,7 @@ namespace pcr
             }
         }
 
-        return makeAny( sScript );
+        return Any( sScript );
     }
 
     PropertyState SAL_CALL EventHandler::getPropertyState( const OUString& /*_rPropertyName*/ )
@@ -642,13 +642,13 @@ namespace pcr
         ::osl::MutexGuard aGuard( m_aMutex );
         if ( !_rxListener.is() )
             throw NullPointerException();
-        m_aPropertyListeners.addListener( _rxListener );
+        m_aPropertyListeners.addInterface( _rxListener );
     }
 
     void SAL_CALL EventHandler::removePropertyChangeListener( const Reference< XPropertyChangeListener >& _rxListener )
     {
         ::osl::MutexGuard aGuard( m_aMutex );
-        m_aPropertyListeners.removeListener( _rxListener );
+        m_aPropertyListeners.removeInterface( _rxListener );
     }
 
     Sequence< Property > SAL_CALL EventHandler::getSupportedProperties()
@@ -802,7 +802,7 @@ namespace pcr
                 // set the new "property value"
                 setPropertyValue(
                     lcl_getEventPropertyName( event.second.sListenerClassName, event.second.sListenerMethodName ),
-                    makeAny( aScriptDescriptor )
+                    Any( aScriptDescriptor )
                 );
             }
         }
@@ -973,14 +973,14 @@ namespace pcr
 
     namespace
     {
-        bool lcl_endsWith( const OUString& _rText, const OUString& _rCheck )
+        bool lcl_endsWith( std::u16string_view _rText, std::u16string_view _rCheck )
         {
-            sal_Int32 nTextLen = _rText.getLength();
-            sal_Int32 nCheckLen = _rCheck.getLength();
+            size_t nTextLen = _rText.size();
+            size_t nCheckLen = _rCheck.size();
             if ( nCheckLen > nTextLen )
                 return false;
 
-            return _rText.indexOf( _rCheck ) == ( nTextLen - nCheckLen );
+            return _rText.find( _rCheck ) == ( nTextLen - nCheckLen );
         }
     }
 

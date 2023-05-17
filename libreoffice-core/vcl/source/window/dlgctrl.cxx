@@ -29,6 +29,7 @@
 #include <vcl/tabpage.hxx>
 #include <vcl/tabctrl.hxx>
 #include <vcl/toolkit/button.hxx>
+#include <vcl/toolbox.hxx>
 #include <vcl/settings.hxx>
 #include <sal/log.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -519,9 +520,11 @@ void Window::ImplControlFocus( GetFocusFlags nFlags )
         if (mpWindowImpl->maMnemonicActivateHdl.Call(*this))
             return;
 
+        const bool bUniqueMnemonic(nFlags & GetFocusFlags::UniqueMnemonic);
+
         if ( GetType() == WindowType::RADIOBUTTON )
         {
-            if ( !static_cast<RadioButton*>(this)->IsChecked() )
+            if (bUniqueMnemonic && !static_cast<RadioButton*>(this)->IsChecked())
                 static_cast<RadioButton*>(this)->ImplCallClick( true, nFlags );
             else
                 ImplGrabFocus( nFlags );
@@ -529,7 +532,7 @@ void Window::ImplControlFocus( GetFocusFlags nFlags )
         else
         {
             ImplGrabFocus( nFlags );
-            if ( nFlags & GetFocusFlags::UniqueMnemonic )
+            if (bUniqueMnemonic)
             {
                 if ( GetType() == WindowType::CHECKBOX )
                     static_cast<CheckBox*>(this)->ImplCheck();
@@ -720,11 +723,11 @@ bool Window::ImplDlgCtrl( const KeyEvent& rKEvt, bool bKeyInput )
             // in case AROUND is being processed
             if ( pTempWindow && (pTempWindow == pSWindow) )
             {
-                NotifyEvent aNEvt1( MouseNotifyEvent::LOSEFOCUS, pSWindow );
+                NotifyEvent aNEvt1( NotifyEventType::LOSEFOCUS, pSWindow );
                 if ( !ImplCallPreNotify( aNEvt1 ) )
                     pSWindow->CompatLoseFocus();
                 pSWindow->mpWindowImpl->mnGetFocusFlags = nGetFocusFlags | GetFocusFlags::Around;
-                NotifyEvent aNEvt2( MouseNotifyEvent::GETFOCUS, pSWindow );
+                NotifyEvent aNEvt2( NotifyEventType::GETFOCUS, pSWindow );
                 if ( !ImplCallPreNotify( aNEvt2 ) )
                     pSWindow->CompatGetFocus();
                 pSWindow->mpWindowImpl->mnGetFocusFlags = GetFocusFlags::NONE;
@@ -851,11 +854,11 @@ bool Window::ImplDlgCtrl( const KeyEvent& rKEvt, bool bKeyInput )
                         // in case AROUND is being processed
                         if ( pWindow == pSWindow )
                         {
-                            NotifyEvent aNEvt1( MouseNotifyEvent::LOSEFOCUS, pSWindow );
+                            NotifyEvent aNEvt1( NotifyEventType::LOSEFOCUS, pSWindow );
                             if ( !ImplCallPreNotify( aNEvt1 ) )
                                 pSWindow->CompatLoseFocus();
                             pSWindow->mpWindowImpl->mnGetFocusFlags = nGetFocusFlags | GetFocusFlags::Around;
-                            NotifyEvent aNEvt2( MouseNotifyEvent::GETFOCUS, pSWindow );
+                            NotifyEvent aNEvt2( NotifyEventType::GETFOCUS, pSWindow );
                             if ( !ImplCallPreNotify( aNEvt2 ) )
                                 pSWindow->CompatGetFocus();
                             pSWindow->mpWindowImpl->mnGetFocusFlags = GetFocusFlags::NONE;
@@ -938,7 +941,7 @@ bool Window::ImplDlgCtrl( const KeyEvent& rKEvt, bool bKeyInput )
                 }
             }
         }
-        else
+        else if (aKeyCode.IsMod2()) // tdf#151385
         {
             sal_Unicode c = rKEvt.GetCharCode();
             if ( c )
@@ -1138,14 +1141,14 @@ KeyEvent Window::GetActivationKey() const
 
 } /* namespace vcl */
 
-sal_Unicode getAccel( const OUString& rStr )
+sal_Unicode getAccel( std::u16string_view rStr )
 {
     sal_Unicode nChar = 0;
-    sal_Int32 nPos = 0;
+    size_t nPos = 0;
     do
     {
-        nPos = rStr.indexOf( '~', nPos );
-        if( nPos != -1 && nPos < rStr.getLength() )
+        nPos = rStr.find( '~', nPos );
+        if( nPos != std::u16string_view::npos && nPos < rStr.size() )
             nChar = rStr[ ++nPos ];
         else
             nChar = 0;

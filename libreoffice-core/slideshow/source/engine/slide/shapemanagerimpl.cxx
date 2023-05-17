@@ -18,20 +18,18 @@
  */
 
 #include <comphelper/processfactory.hxx>
-#include <comphelper/servicehelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/awt/MouseButton.hpp>
 #include <com/sun/star/awt/SystemPointer.hpp>
-#include <com/sun/star/presentation/XShapeEventListener.hpp>
 #include <com/sun/star/system/SystemShellExecute.hpp>
 #include <com/sun/star/system/SystemShellExecuteFlags.hpp>
 #include <com/sun/star/system/XSystemShellExecute.hpp>
-#include <svx/unoshape.hxx>
 #include <svx/ImageMapInfo.hxx>
 
 #include "shapemanagerimpl.hxx"
 
 #include <functional>
+#include <utility>
 
 using namespace css;
 using namespace css::uno;
@@ -41,13 +39,13 @@ using namespace css::system;
 namespace slideshow::internal {
 
 ShapeManagerImpl::ShapeManagerImpl( EventMultiplexer&            rMultiplexer,
-                                    LayerManagerSharedPtr const& rLayerManager,
+                                    LayerManagerSharedPtr        xLayerManager,
                                     CursorManager&               rCursorManager,
                                     const ShapeEventListenerMap& rGlobalListenersMap,
                                     const ShapeCursorMap&        rGlobalCursorMap,
                                     const Reference<XDrawPage>& xDrawPage ):
     mrMultiplexer(rMultiplexer),
-    mpLayerManager(rLayerManager),
+    mpLayerManager(std::move(xLayerManager)),
     mrCursorManager(rCursorManager),
     mrGlobalListenersMap(rGlobalListenersMap),
     mrGlobalCursorMap(rGlobalCursorMap),
@@ -161,13 +159,13 @@ bool ShapeManagerImpl::handleMouseReleased( awt::MouseEvent const& e )
         // shape hit, and shape is visible. Raise
         // event.
 
-        std::shared_ptr<comphelper::OInterfaceContainerHelper2> const pCont(
-            aCurrBroadcaster->second );
+        std::shared_ptr<comphelper::OInterfaceContainerHelper3<css::presentation::XShapeEventListener>> const & pCont =
+            aCurrBroadcaster->second;
         uno::Reference<drawing::XShape> const xShape(
             aCurrBroadcaster->first->getXShape() );
 
         // DON'T do anything with /this/ after this point!
-        pCont->forEach<presentation::XShapeEventListener>(
+        pCont->forEach(
             [&xShape, &e]( const uno::Reference< presentation::XShapeEventListener >& rListener )
             { return rListener->click( xShape, e ); } );
 
@@ -297,9 +295,8 @@ void ShapeManagerImpl::revokeSubset( const AttributableShapeSharedPtr& rOrigShap
 bool ShapeManagerImpl::listenerAdded(
     const uno::Reference<drawing::XShape>& xShape )
 {
-    ShapeEventListenerMap::const_iterator aIter;
-    if( (aIter = mrGlobalListenersMap.find( xShape )) ==
-        mrGlobalListenersMap.end() )
+    ShapeEventListenerMap::const_iterator aIter = mrGlobalListenersMap.find( xShape );
+    if( aIter == mrGlobalListenersMap.end() )
     {
         ENSURE_OR_RETURN_FALSE(false,
                           "ShapeManagerImpl::listenerAdded(): global "

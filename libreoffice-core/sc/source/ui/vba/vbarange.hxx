@@ -69,6 +69,8 @@ public:
 
 typedef ScVbaFormat< ov::excel::XRange > ScVbaRange_BASE;
 
+enum class RangeValueType { value, value2 };
+
 class ScVbaRange : public ScVbaRange_BASE
 {
     css::uno::Reference< ov::XCollection > m_Areas;
@@ -95,6 +97,7 @@ class ScVbaRange : public ScVbaRange_BASE
 
     /// @throws css::uno::RuntimeException
     css::uno::Any getValue( ValueGetter& rValueGetter );
+    css::uno::Any DoGetValue( RangeValueType eValueType );
     /// @throws css::uno::RuntimeException
     void setValue( const css::uno::Any& aValue, ValueSetter& setter );
 
@@ -174,7 +177,9 @@ public:
 
     // Attributes
     virtual css::uno::Any SAL_CALL getValue() override;
+    virtual css::uno::Any SAL_CALL getValue2() override;
     virtual void   SAL_CALL setValue( const css::uno::Any& aValue ) override;
+    virtual void   SAL_CALL setValue2( const css::uno::Any& aValue2 ) override;
     virtual css::uno::Any SAL_CALL getFormula() override;
     virtual void   SAL_CALL setFormula( const css::uno::Any& rFormula ) override;
     virtual css::uno::Any SAL_CALL getFormulaArray() override;
@@ -309,7 +314,7 @@ public:
 //     * we shouldn't need hacks like this below
     /// @throws css::uno::RuntimeException
     static css::uno::Reference< ov::excel::XRange > ApplicationRange( const css::uno::Reference< css::uno::XComponentContext >& xContext, const css::uno::Any &Cell1, const css::uno::Any &Cell2 );
-    static bool getCellRangesForAddress(ScRefFlags &rResFlags, const OUString& sAddress, ScDocShell* pDocSh, ScRangeList& rCellRanges, formula::FormulaGrammar::AddressConvention eConv, char cDelimiter );
+    static bool getCellRangesForAddress(ScRefFlags &rResFlags, std::u16string_view sAddress, ScDocShell* pDocSh, ScRangeList& rCellRanges, formula::FormulaGrammar::AddressConvention eConv, char cDelimiter );
     virtual sal_Bool SAL_CALL GoalSeek( const css::uno::Any& Goal, const css::uno::Reference< ov::excel::XRange >& ChangingCell ) override;
     virtual css::uno::Reference< ov::excel::XRange > SAL_CALL SpecialCells( const css::uno::Any& _oType, const css::uno::Any& _oValue) override;
     // XErrorQuery

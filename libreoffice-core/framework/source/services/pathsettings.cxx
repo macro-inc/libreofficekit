@@ -50,6 +50,7 @@
 #include <comphelper/sequence.hxx>
 #include <comphelper/configurationhelper.hxx>
 #include <unotools/configpaths.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace framework;
 
@@ -165,7 +166,7 @@ public:
         Attention: It's necessary for right function of this class, that the order of base
         classes is the right one. Because we transfer information from one base to another
         during this ctor runs! */
-    explicit PathSettings(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+    explicit PathSettings(css::uno::Reference< css::uno::XComponentContext >  xContext);
 
     /** free all used resources ... if it was not already done. */
     virtual ~PathSettings() override;
@@ -369,7 +370,7 @@ private:
 
     /** converts our new string list schema to the old ";" separated schema ... */
     OUString impl_convertPath2OldStyle(const PathSettings::PathInfo& rPath        ) const;
-    std::vector<OUString> impl_convertOldStyle2Path(const OUString&        sOldStylePath) const;
+    std::vector<OUString> impl_convertOldStyle2Path(std::u16string_view sOldStylePath) const;
 
     /** remove still known paths from the given lList argument.
         So real user defined paths can be extracted from the list of
@@ -394,7 +395,7 @@ private:
     const PathSettings::PathInfo* impl_getPathAccessConst(sal_Int32 nHandle) const;
 
     /** it checks, if the given path value seems to be a valid URL or system path. */
-    bool impl_isValidPath(const OUString& sPath) const;
+    bool impl_isValidPath(std::u16string_view sPath) const;
     bool impl_isValidPath(const std::vector<OUString>& lPath) const;
 
     void impl_storePath(const PathSettings::PathInfo& aPath);
@@ -427,10 +428,10 @@ private:
     css::uno::Reference< css::container::XNameAccess >    fa_getCfgNew();
 };
 
-PathSettings::PathSettings( const css::uno::Reference< css::uno::XComponentContext >& xContext )
+PathSettings::PathSettings( css::uno::Reference< css::uno::XComponentContext >  xContext )
     : PathSettings_BASE(m_aMutex)
     , ::cppu::OPropertySetHelper(cppu::WeakComponentImplHelperBase::rBHelper)
-    ,   m_xContext (xContext)
+    ,   m_xContext (std::move(xContext))
 {
 }
 
@@ -637,13 +638,13 @@ void PathSettings::impl_storePath(const PathSettings::PathInfo& aPath)
         ::comphelper::ConfigurationHelper::writeRelativeKey(xCfgNew,
                                                             aResubstPath.sPathName,
                                                             CFGPROP_USERPATHS,
-                            css::uno::makeAny(comphelper::containerToSequence(aResubstPath.lUserPaths)));
+                            css::uno::Any(comphelper::containerToSequence(aResubstPath.lUserPaths)));
     }
 
     ::comphelper::ConfigurationHelper::writeRelativeKey(xCfgNew,
                                                         aResubstPath.sPathName,
                                                         CFGPROP_WRITEPATH,
-                                                        css::uno::makeAny(aResubstPath.sWritePath));
+                                                        css::uno::Any(aResubstPath.sWritePath));
 
     ::comphelper::ConfigurationHelper::flush(xCfgNew);
 
@@ -941,42 +942,37 @@ void PathSettings::impl_subst(PathSettings::PathInfo& aPath   ,
 
 OUString PathSettings::impl_convertPath2OldStyle(const PathSettings::PathInfo& rPath) const
 {
-    std::vector<OUString> lTemp;
-    lTemp.reserve(rPath.lInternalPaths.size() + rPath.lUserPaths.size() + 1);
+    OUStringBuffer sPathVal(256);
 
     for (auto const& internalPath : rPath.lInternalPaths)
     {
-        lTemp.push_back(internalPath);
+        if (sPathVal.getLength())
+            sPathVal.append(";");
+        sPathVal.append(internalPath);
     }
     for (auto const& userPath : rPath.lUserPaths)
     {
-        lTemp.push_back(userPath);
-    }
-
-    if (!rPath.sWritePath.isEmpty())
-        lTemp.push_back(rPath.sWritePath);
-
-    OUStringBuffer sPathVal(256);
-    for (  auto pIt  = lTemp.begin();
-           pIt != lTemp.end();
-                               )
-    {
-        sPathVal.append(*pIt);
-        ++pIt;
-        if (pIt != lTemp.end())
+        if (sPathVal.getLength())
             sPathVal.append(";");
+        sPathVal.append(userPath);
+    }
+    if (!rPath.sWritePath.isEmpty())
+    {
+        if (sPathVal.getLength())
+            sPathVal.append(";");
+        sPathVal.append(rPath.sWritePath);
     }
 
     return sPathVal.makeStringAndClear();
 }
 
-std::vector<OUString> PathSettings::impl_convertOldStyle2Path(const OUString& sOldStylePath) const
+std::vector<OUString> PathSettings::impl_convertOldStyle2Path(std::u16string_view sOldStylePath) const
 {
     std::vector<OUString> lList;
     sal_Int32    nToken = 0;
     do
     {
-        OUString sToken = sOldStylePath.getToken(0, ';', nToken);
+        OUString sToken( o3tl::getToken(sOldStylePath, 0, ';', nToken) );
         if (!sToken.isEmpty())
             lList.push_back(sToken);
     }
@@ -1227,7 +1223,7 @@ bool PathSettings::impl_isValidPath(const std::vector<OUString>& lPath) const
     return true;
 }
 
-bool PathSettings::impl_isValidPath(const OUString& sPath) const
+bool PathSettings::impl_isValidPath(std::u16string_view sPath) const
 {
     // allow empty path to reset a path.
 // idea by LLA to support empty paths

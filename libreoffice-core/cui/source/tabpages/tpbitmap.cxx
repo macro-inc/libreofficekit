@@ -316,15 +316,9 @@ void SvxBitmapTabPage::Reset( const SfxItemSet* rAttrs )
     if(rAttrs->GetItemState(XATTR_FILLBMP_SIZELOG) != SfxItemState::DONTCARE)
     {
         if (rAttrs->Get( XATTR_FILLBMP_SIZELOG ).GetValue())
-        {
             m_xTsbScale->set_state(TRISTATE_FALSE);
-            m_bLogicalSize = true;
-        }
         else
-        {
             m_xTsbScale->set_state(TRISTATE_TRUE);
-            m_bLogicalSize = false;
-        }
     }
     else
         m_xTsbScale->set_state(TRISTATE_INDET);
@@ -337,6 +331,7 @@ void SvxBitmapTabPage::Reset( const SfxItemSet* rAttrs )
             nWidth = rBitmapSize.Width();
         else if(nWidth < 0)
         {
+            m_bLogicalSize = true;
             eRelative = TRISTATE_TRUE;
             nWidth = std::abs(nWidth);
         }
@@ -349,6 +344,7 @@ void SvxBitmapTabPage::Reset( const SfxItemSet* rAttrs )
             nHeight = rBitmapSize.Height();
         else if(nHeight < 0)
         {
+            m_bLogicalSize = true;
             eRelative = TRISTATE_TRUE;
             nHeight = std::abs(nHeight);
         }
@@ -464,15 +460,14 @@ IMPL_LINK_NOARG(SvxBitmapTabPage, ModifyBitmapHdl, ValueSet*, void)
     }
     else
     {
-        const SfxPoolItem* pPoolItem = nullptr;
-
-        if(SfxItemState::SET == m_rOutAttrs.GetItemState(GetWhich(XATTR_FILLSTYLE), true, &pPoolItem))
+        if(const XFillStyleItem* pFillStyleItem = m_rOutAttrs.GetItemIfSet(GetWhich(XATTR_FILLSTYLE)))
         {
-            const drawing::FillStyle eXFS(static_cast<const XFillStyleItem*>(pPoolItem)->GetValue());
+            const drawing::FillStyle eXFS(pFillStyleItem->GetValue());
 
-            if((drawing::FillStyle_BITMAP == eXFS) && (SfxItemState::SET == m_rOutAttrs.GetItemState(GetWhich(XATTR_FILLBITMAP), true, &pPoolItem)))
+            const XFillBitmapItem* pBitmapItem;
+            if((drawing::FillStyle_BITMAP == eXFS) && (pBitmapItem = m_rOutAttrs.GetItemIfSet(GetWhich(XATTR_FILLBITMAP))))
             {
-                pGraphicObject.reset(new GraphicObject(static_cast<const XFillBitmapItem*>(pPoolItem)->GetGraphicObject()));
+                pGraphicObject.reset(new GraphicObject(pBitmapItem->GetGraphicObject()));
             }
         }
 
@@ -523,7 +518,7 @@ IMPL_LINK_NOARG(SvxBitmapTabPage, ClickRenameHdl, SvxPresetListBox*, void)
     if( nPos == VALUESET_ITEM_NOTFOUND )
         return;
 
-    OUString aDesc( CuiResId( RID_SVXSTR_DESC_NEW_BITMAP ) );
+    OUString aDesc( CuiResId( RID_CUISTR_DESC_NEW_BITMAP ) );
     OUString aName( m_pBitmapList->GetBitmap( nPos )->GetName() );
 
     SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();
@@ -718,7 +713,7 @@ IMPL_LINK_NOARG(SvxBitmapTabPage, ClickImportHdl, weld::Button&, void)
 {
     weld::Window* pDialogFrameWeld = GetFrameWeld();
 
-    SvxOpenGraphicDialog aDlg(CuiResId(RID_SVXSTR_ADD_IMAGE), pDialogFrameWeld);
+    SvxOpenGraphicDialog aDlg(CuiResId(RID_CUISTR_ADD_IMAGE), pDialogFrameWeld);
     aDlg.EnableLink(false);
     tools::Long nCount = m_pBitmapList->Count();
 
@@ -733,7 +728,7 @@ IMPL_LINK_NOARG(SvxBitmapTabPage, ClickImportHdl, weld::Button&, void)
 
     if( !nError )
     {
-        OUString aDesc(CuiResId(RID_SVXSTR_DESC_EXT_BITMAP));
+        OUString aDesc(CuiResId(RID_CUISTR_DESC_EXT_BITMAP));
 
         // convert file URL to UI name
         OUString        aName;

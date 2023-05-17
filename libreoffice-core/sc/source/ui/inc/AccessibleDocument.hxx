@@ -98,16 +98,15 @@ public:
     ///=====  XAccessibleContext  ==============================================
 
     /// Return the number of currently visible children.
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleChildCount() override;
 
     /// Return the specified child or NULL if index is invalid.
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild(sal_Int32 nIndex) override;
+        getAccessibleChild(sal_Int64 nIndex) override;
 
     /// Return the set of current states.
-    virtual css::uno::Reference<
-            css::accessibility::XAccessibleStateSet> SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleStateSet() override;
 
     virtual OUString SAL_CALL
@@ -117,10 +116,10 @@ public:
     ///=====  XAccessibleSelection  ===========================================
 
     virtual void SAL_CALL
-        selectAccessibleChild( sal_Int32 nChildIndex ) override;
+        selectAccessibleChild( sal_Int64 nChildIndex ) override;
 
     virtual sal_Bool SAL_CALL
-        isAccessibleChildSelected( sal_Int32 nChildIndex ) override;
+        isAccessibleChildSelected( sal_Int64 nChildIndex ) override;
 
     virtual void SAL_CALL
         clearAccessibleSelection(  ) override;
@@ -128,15 +127,15 @@ public:
     virtual void SAL_CALL
         selectAllAccessibleChildren(  ) override;
 
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getSelectedAccessibleChildCount(  ) override;
 
     virtual css::uno::Reference<
         css::accessibility::XAccessible > SAL_CALL
-        getSelectedAccessibleChild( sal_Int32 nSelectedChildIndex ) override;
+        getSelectedAccessibleChild( sal_Int64 nSelectedChildIndex ) override;
 
     virtual void SAL_CALL
-        deselectAccessibleChild( sal_Int32 nChildIndex ) override;
+        deselectAccessibleChild( sal_Int64 nChildIndex ) override;
 
     ///=====  XSelectionListener  =============================================
 
@@ -241,8 +240,7 @@ private:
 
     bool IsTableSelected() const;
 
-    bool IsDefunc(
-        const css::uno::Reference<css::accessibility::XAccessibleStateSet>& rxParentStates);
+    bool IsDefunc(sal_Int64 nParentStates);
 
     void AddChild(const css::uno::Reference<css::accessibility::XAccessible>& xAcc, bool bFireEvent);
     void RemoveChild(const css::uno::Reference<css::accessibility::XAccessible>& xAcc, bool bFireEvent);

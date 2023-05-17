@@ -41,7 +41,7 @@ solarisrequires =  "%BASISPACKAGEPREFIX-core (Name="Core module for %PRODUCTNAME
 packagename = "%BASISPACKAGEPREFIX-extension-mediawiki-publisher"
 requires = "%BASISPACKAGEPREFIX-core %PACKAGEVERSION %PACKAGEVERSION-%PACKAGEREVISION"
 linuxpatchrequires = ""
-copyright = "2021 Collabora Productivity Ltd."
+copyright = "2023 Collabora Productivity Ltd."
 solariscopyright = "solariscopyrightfile"
 vendor = "Collabora Productivity Ltd."
 description = "MediaWiki publisher extension for %PRODUCTNAME %PRODUCTVERSION"
@@ -65,28 +65,13 @@ packageversion = "%PACKAGEVERSION"
 End
 
 Start
-module = "gid_Module_Optional_Extensions_CT2N"
-solarispackagename = "%BASISPACKAGEPREFIX-extension-ct2n"
-solarisrequires =  "%BASISPACKAGEPREFIX-core (Name="Core module for %PRODUCTNAME %PRODUCTVERSION")"
-packagename = "%BASISPACKAGEPREFIX-extension-ct2n"
-requires = "%BASISPACKAGEPREFIX-core %PACKAGEVERSION %PACKAGEVERSION-%PACKAGEREVISION"
-linuxpatchrequires = ""
-copyright = "Copyright (c) 2008 Cor Nouws"
-solariscopyright = "solariscopyrightfile"
-vendor = "Collabora Productivity Ltd."
-description = "ConvertTextToNumber extension for %PRODUCTNAME %PRODUCTVERSION"
-destpath = "/opt"
-packageversion = "%PACKAGEVERSION"
-End
-
-Start
 module = "gid_Module_Optional_Extensions_NLPSolver"
 solarispackagename = "%BASISPACKAGEPREFIX-extension-nlpsolver"
 solarisrequires =  "%BASISPACKAGEPREFIX-core (Name="Core module for %PRODUCTNAME %PRODUCTVERSION")"
 packagename = "%BASISPACKAGEPREFIX-extension-nlpsolver"
 requires = "%BASISPACKAGEPREFIX-core %PACKAGEVERSION %PACKAGEVERSION-%PACKAGEREVISION"
 linuxpatchrequires = ""
-copyright = "2021 Collabora Productivity Ltd."
+copyright = "2023 Collabora Productivity Ltd."
 solariscopyright = "solariscopyrightfile"
 vendor = "Collabora Productivity Ltd."
 description = "NLPSolver extension for %PRODUCTNAME %PRODUCTVERSION"
@@ -94,20 +79,6 @@ destpath = "/opt"
 packageversion = "%PACKAGEVERSION"
 End
 
-Start
-module = "gid_Module_Optional_Extensions_LanguageTool"
-solarispackagename = "%BASISPACKAGEPREFIX-extension-languagetool"
-solarisrequires =  "%BASISPACKAGEPREFIX-core (Name="Core module for %PRODUCTNAME %PRODUCTVERSION")"
-packagename = "%BASISPACKAGEPREFIX-extension-languagetool"
-requires = "%BASISPACKAGEPREFIX-core %PACKAGEVERSION %PACKAGEVERSION-%PACKAGEREVISION"
-linuxpatchrequires = ""
-copyright = "2005-2009 by Daniel Naber"
-solariscopyright = "solariscopyrightfile"
-vendor = "Collabora Productivity Ltd."
-description = "LanguageTool extension for %PRODUCTNAME %PRODUCTVERSION"
-destpath = "/opt"
-packageversion = "%PACKAGEVERSION"
-End
 
 Start
 module = "gid_Module_Optional_Extensions_Script_Provider_For_BS"
@@ -116,7 +87,7 @@ solarisrequires =  "%BASISPACKAGEPREFIX-core (Name="Core module for %PRODUCTNAME
 packagename = "%BASISPACKAGEPREFIX-extension-beanshell-script-provider"
 requires = "%BASISPACKAGEPREFIX-core %PACKAGEVERSION %PACKAGEVERSION-%PACKAGEREVISION"
 linuxpatchrequires = ""
-copyright = "2021 Collabora Productivity Ltd."
+copyright = "2023 Collabora Productivity Ltd."
 solariscopyright = "solariscopyrightfile"
 vendor = "Collabora Productivity Ltd."
 description = "Script provider for BeanShell extension for %PRODUCTNAME %PRODUCTVERSION"
@@ -131,7 +102,7 @@ solarisrequires =  "%BASISPACKAGEPREFIX-core (Name="Core module for %PRODUCTNAME
 packagename = "%BASISPACKAGEPREFIX-extension-javascript-script-provider"
 requires = "%BASISPACKAGEPREFIX-core %PACKAGEVERSION %PACKAGEVERSION-%PACKAGEREVISION"
 linuxpatchrequires = ""
-copyright = "2021 Collabora Productivity Ltd."
+copyright = "2023 Collabora Productivity Ltd."
 solariscopyright = "solariscopyrightfile"
 vendor = "Collabora Productivity Ltd."
 description = "Script provider for JavaScript extension for %PRODUCTNAME %PRODUCTVERSION"

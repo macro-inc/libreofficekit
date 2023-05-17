@@ -11,6 +11,7 @@
 #include <set>
 #include <string>
 #include <iostream>
+#include "config_clang.h"
 #include "plugin.hxx"
 #include <fstream>
 
@@ -55,6 +56,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         TraverseDecl(compiler.getASTContext().getTranslationUnitDecl());
 
         // dump all our output in one write call - this is to try and limit IO "crosstalk" between multiple processes
@@ -144,7 +147,7 @@ bool MergeClasses::VisitCXXRecordDecl(const CXXRecordDecl* decl)
     }
     if (decl->isThisDeclarationADefinition())
     {
-        SourceLocation spellingLocation = compiler.getSourceManager().getSpellingLoc(compat::getBeginLoc(decl));
+        SourceLocation spellingLocation = compiler.getSourceManager().getSpellingLoc(decl->getBeginLoc());
         auto filename = getFilenameOfLocation(spellingLocation);
         filename = filename.substr(strlen(SRCDIR));
         std::string s = decl->getQualifiedNameAsString();

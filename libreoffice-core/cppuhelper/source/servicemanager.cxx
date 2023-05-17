@@ -14,6 +14,7 @@
 #include <iostream>
 #include <mutex>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/beans/NamedValue.hpp>
@@ -46,6 +47,7 @@
 #include <sal/log.hxx>
 #include <uno/environment.hxx>
 #include <uno/mapping.hxx>
+#include <o3tl/string_view.hxx>
 
 #include "loadsharedlibcomponentfactory.hxx"
 
@@ -105,7 +107,7 @@ class Parser {
 public:
     Parser(
         OUString const & uri,
-        css::uno::Reference< css::uno::XComponentContext > const & alienContext,
+        css::uno::Reference< css::uno::XComponentContext > alienContext,
         cppuhelper::ServiceManager::Data * data);
 
     Parser(const Parser&) = delete;
@@ -135,9 +137,9 @@ private:
 
 Parser::Parser(
     OUString const & uri,
-    css::uno::Reference< css::uno::XComponentContext > const & alienContext,
+    css::uno::Reference< css::uno::XComponentContext > alienContext,
     cppuhelper::ServiceManager::Data * data):
-    reader_(uri), alienContext_(alienContext), data_(data)
+    reader_(uri), alienContext_(std::move(alienContext)), data_(data)
 {
     assert(data != nullptr);
     int ucNsId = reader_.registerNamespaceIri(
@@ -664,7 +666,7 @@ cppuhelper::ServiceManager::Data::Implementation::createInstance(
 {
     css::uno::Reference<css::uno::XInterface> inst;
     if (isSingleInstance) {
-        osl::MutexGuard g(mutex);
+        std::unique_lock g(mutex);
         if (!singleInstance.is()) {
             singleInstance = doCreateInstance(context);
         }
@@ -683,7 +685,7 @@ cppuhelper::ServiceManager::Data::Implementation::createInstanceWithArguments(
 {
     css::uno::Reference<css::uno::XInterface> inst;
     if (isSingleInstance) {
-        osl::MutexGuard g(mutex);
+        std::unique_lock g(mutex);
         if (!singleInstance.is()) {
             singleInstance = doCreateInstanceWithArguments(context, arguments);
         }
@@ -750,14 +752,14 @@ void cppuhelper::ServiceManager::Data::Implementation::updateDisposeInstance(
     // at most one of the instances obtained via the service manager, in case
     // the implementation hands out different instances):
     if (singletonRequest) {
-        osl::MutexGuard g(mutex);
+        std::unique_lock g(mutex);
         disposeInstance.clear();
         dispose = false;
     } else if (shallDispose()) {
         css::uno::Reference<css::lang::XComponent> comp(
             instance, css::uno::UNO_QUERY);
         if (comp.is()) {
-            osl::MutexGuard g(mutex);
+            std::unique_lock g(mutex);
             if (dispose) {
                 disposeInstance = comp;
             }
@@ -780,9 +782,9 @@ void cppuhelper::ServiceManager::addSingletonContextEntries(
         entries->push_back(
             cppu::ContextEntry_Init(
                 "/singletons/" + rName,
-                css::uno::makeAny<
-                    css::uno::Reference<css::lang::XSingleComponentFactory> >(
-                        new SingletonFactory(this, rImpls[0])),
+                css::uno::Any(
+                    css::uno::Reference<css::lang::XSingleComponentFactory>(
+                        new SingletonFactory(this, rImpls[0]))),
                 true));
     }
 }
@@ -890,7 +892,7 @@ void cppuhelper::ServiceManager::disposing() {
         {
             assert(rEntry.second);
             if (rEntry.second->shallDispose()) {
-                osl::MutexGuard g2(rEntry.second->mutex);
+                std::unique_lock g2(rEntry.second->mutex);
                 if (rEntry.second->disposeInstance.is()) {
                     sngls.push_back(rEntry.second->disposeInstance);
                 }
@@ -900,7 +902,7 @@ void cppuhelper::ServiceManager::disposing() {
         {
             assert(rEntry.second);
             if (rEntry.second->shallDispose()) {
-                osl::MutexGuard g2(rEntry.second->mutex);
+                std::unique_lock g2(rEntry.second->mutex);
                 if (rEntry.second->disposeInstance.is()) {
                     sngls.push_back(rEntry.second->disposeInstance);
                 }
@@ -1082,24 +1084,6 @@ void cppuhelper::ServiceManager::insert(css::uno::Any const & aElement)
     css::uno::Reference< css::lang::XServiceInfo > info;
     if ((aElement >>= info) && info.is()) {
         insertLegacyFactory(info);
-        return;
-    }
-// At least revisions up to 1.7 of LanguageTool.oxt (incl. the bundled 1.4.0 in
-// module languagetool) contain an (actively registered) factory that does not
-// implement XServiceInfo (see <http://sourceforge.net/tracker/?
-// func=detail&aid=3526635&group_id=110216&atid=655717> "SingletonFactory should
-// implement XServiceInfo"); the old OServiceManager::insert
-// (stoc/source/servicemanager/servicemanager.cxx) silently did not add such
-// broken factories to its m_ImplementationNameMap, so ignore them here for
-// backwards compatibility of live-insertion of extensions, too.
-
-// (The plan was that this warning would go away (and we would do the
-// throw instead) for the incompatible LO 4, but we changed our mind):
-    css::uno::Reference< css::lang::XSingleComponentFactory > legacy;
-    if ((aElement >>= legacy) && legacy.is()) {
-        SAL_WARN(
-            "cppuhelper",
-            "Ignored XSingleComponentFactory not implementing XServiceInfo");
         return;
     }
 
@@ -1322,10 +1306,10 @@ void cppuhelper::ServiceManager::removeEventListenerFromComponent(
     }
 }
 
-void cppuhelper::ServiceManager::init(OUString const & rdbUris) {
+void cppuhelper::ServiceManager::init(std::u16string_view rdbUris) {
     for (sal_Int32 i = 0; i != -1;) {
-        OUString uri(rdbUris.getToken(0, ' ', i));
-        if (uri.isEmpty()) {
+        std::u16string_view uri(o3tl::getToken(rdbUris, 0, ' ', i));
+        if (uri.empty()) {
             continue;
         }
         bool optional;
@@ -1334,27 +1318,27 @@ void cppuhelper::ServiceManager::init(OUString const & rdbUris) {
         if (directory) {
             readRdbDirectory(uri, optional);
         } else {
-            readRdbFile(uri, optional);
+            readRdbFile(OUString(uri), optional);
         }
     }
 }
 
 void cppuhelper::ServiceManager::readRdbDirectory(
-    OUString const & uri, bool optional)
+    std::u16string_view uri, bool optional)
 {
-    osl::Directory dir(uri);
+    osl::Directory dir = OUString(uri);
     switch (dir.open()) {
     case osl::FileBase::E_None:
         break;
     case osl::FileBase::E_NOENT:
         if (optional) {
-            SAL_INFO("cppuhelper", "Ignored optional " << uri);
+            SAL_INFO("cppuhelper", "Ignored optional " << OUString(uri));
             return;
         }
         [[fallthrough]];
     default:
         throw css::uno::DeploymentException(
-            "Cannot open directory " + uri,
+            OUString::Concat("Cannot open directory ") + uri,
             static_cast< cppu::OWeakObject * >(this));
     }
     for (;;) {
@@ -1622,37 +1606,38 @@ bool cppuhelper::ServiceManager::insertExtraData(Data const & extra) {
     }
     //TODO: Updating the component context singleton data should be part of the
     // atomic service manager update:
-    if (!extra.singletons.empty()) {
-        assert(context_.is());
-        css::uno::Reference< css::container::XNameContainer > cont(
-            context_, css::uno::UNO_QUERY_THROW);
-        for (const auto& [rName, rImpls] : extra.singletons)
-        {
-            OUString name("/singletons/" + rName);
-            //TODO: Update should be atomic:
-            try {
-                cont->removeByName(name + "/arguments");
-            } catch (const css::container::NoSuchElementException &) {}
-            assert(!rImpls.empty());
-            assert(rImpls[0]);
-            SAL_INFO_IF(
-                rImpls.size() > 1, "cppuhelper",
-                "Arbitrarily choosing " << rImpls[0]->name
-                    << " among multiple implementations for singleton "
-                    << rName);
-            try {
-                cont->insertByName(
-                    name + "/service", css::uno::Any(rImpls[0]->name));
-            } catch (css::container::ElementExistException &) {
-                cont->replaceByName(
-                    name + "/service", css::uno::Any(rImpls[0]->name));
-            }
-            try {
-                cont->insertByName(name, css::uno::Any());
-            } catch (css::container::ElementExistException &) {
-                SAL_INFO("cppuhelper", "Overwriting singleton " << rName);
-                cont->replaceByName(name, css::uno::Any());
-            }
+    if (extra.singletons.empty())
+        return true;
+
+    assert(context_.is());
+    css::uno::Reference< css::container::XNameContainer > cont(
+        context_, css::uno::UNO_QUERY_THROW);
+    for (const auto& [rName, rImpls] : extra.singletons)
+    {
+        OUString name("/singletons/" + rName);
+        //TODO: Update should be atomic:
+        try {
+            cont->removeByName(name + "/arguments");
+        } catch (const css::container::NoSuchElementException &) {}
+        assert(!rImpls.empty());
+        assert(rImpls[0]);
+        SAL_INFO_IF(
+            rImpls.size() > 1, "cppuhelper",
+            "Arbitrarily choosing " << rImpls[0]->name
+                << " among multiple implementations for singleton "
+                << rName);
+        try {
+            cont->insertByName(
+                name + "/service", css::uno::Any(rImpls[0]->name));
+        } catch (css::container::ElementExistException &) {
+            cont->replaceByName(
+                name + "/service", css::uno::Any(rImpls[0]->name));
+        }
+        try {
+            cont->insertByName(name, css::uno::Any());
+        } catch (css::container::ElementExistException &) {
+            SAL_INFO("cppuhelper", "Overwriting singleton " << rName);
+            cont->replaceByName(name, css::uno::Any());
         }
     }
     return true;
@@ -1845,7 +1830,7 @@ void cppuhelper::ServiceManager::preloadImplementations() {
         OUString aDisable(pDisable, strlen(pDisable), RTL_TEXTENCODING_UTF8);
         for (sal_Int32 i = 0; i >= 0; )
         {
-            OUString tok = aDisable.getToken(0, ' ', i);
+            OUString tok( aDisable.getToken(0, ' ', i) );
             tok = tok.trim();
             if (!tok.isEmpty())
                 aDisabled.push_back(tok);

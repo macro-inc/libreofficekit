@@ -26,11 +26,12 @@
 #include "xlformula.hxx"
 #include <svx/sdtaitm.hxx>
 #include <rtl/ustring.hxx>
+#include <unotools/tempfile.hxx>
 #include <memory>
+#include <optional>
 
 class ScPostIt;
 
-namespace utl { class TempFile; }
 namespace com::sun::star::chart { class XChartDocument; }
 namespace com::sun::star::script { struct ScriptEventDescriptor; }
 
@@ -148,7 +149,7 @@ public:
 class XclExpImgData : public XclExpRecordBase
 {
 public:
-    explicit            XclExpImgData( const Graphic& rGraphic, sal_uInt16 nRecId );
+    explicit            XclExpImgData( Graphic aGraphic, sal_uInt16 nRecId );
 
     /** Writes the BITMAP record. */
     virtual void        Save( XclExpStream& rStrm ) override;
@@ -231,7 +232,7 @@ public:
                             XclExpObjectManager& rObjMgr,
                             css::uno::Reference< css::drawing::XShape > const & xShape,
                             const tools::Rectangle* pChildAnchor,
-                            const OUString& rClassName,
+                            OUString aClassName,
                             sal_uInt32 nStrmStart, sal_uInt32 nStrmSize );
 
 private:
@@ -437,8 +438,9 @@ private:
     void                InitStream( bool bTempFile );
 
 private:
-    std::shared_ptr< ::utl::TempFile > mxTempFile;
-    std::unique_ptr< SvStream >  mxDffStrm;
+    std::optional< ::utl::TempFileFast > moTempFile;
+    SvStream* mpDffStrm = nullptr;
+    std::unique_ptr<SvMemoryStream> mpBackupStrm;
     std::shared_ptr< XclEscherEx > mxEscherEx;
     rtl::Reference< XclExpObjList > mxObjList;
 };

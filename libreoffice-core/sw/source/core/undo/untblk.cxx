@@ -46,9 +46,9 @@ GetFlysAnchoredAt(SwDoc & rDoc, SwNodeOffset const nSttNode)
     {
         SwFrameFormat *const pFormat = (*rDoc.GetSpzFrameFormats())[n];
         SwFormatAnchor const*const pAnchor = &pFormat->GetAnchor();
-        SwPosition const*const pAPos = pAnchor->GetContentAnchor();
-        if (pAPos
-             && nSttNode == pAPos->nNode.GetIndex()
+        SwNode const*const pAnchorNode = pAnchor->GetAnchorNode();
+        if (pAnchorNode
+             && nSttNode == pAnchorNode->GetIndex()
              && ((pAnchor->GetAnchorId() == RndStdIds::FLY_AT_PARA)
                  || (pAnchor->GetAnchorId() == RndStdIds::FLY_AT_CHAR)))
         {
@@ -75,7 +75,7 @@ SwUndoInserts::SwUndoInserts( SwUndoId nUndoId, const SwPaM& rPam )
     m_pHistory.reset( new SwHistory );
     SwDoc& rDoc = rPam.GetDoc();
 
-    SwTextNode* pTextNd = rPam.GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNd = rPam.GetPoint()->GetNode().GetTextNode();
     if( pTextNd )
     {
         m_pTextFormatColl = pTextNd->GetTextColl();
@@ -115,8 +115,8 @@ void SwUndoInserts::SetInsertRange( const SwPaM& rPam, bool bScanFlys,
                                     SwNodeOffset const nDeleteTextNodes)
 {
     const SwPosition* pTmpPos = rPam.End();
-    m_nEndNode = pTmpPos->nNode.GetIndex();
-    m_nEndContent = pTmpPos->nContent.GetIndex();
+    m_nEndNode = pTmpPos->GetNodeIndex();
+    m_nEndContent = pTmpPos->GetContentIndex();
     if( rPam.HasMark() )
     {
         if( pTmpPos == rPam.GetPoint() )
@@ -124,8 +124,8 @@ void SwUndoInserts::SetInsertRange( const SwPaM& rPam, bool bScanFlys,
         else
             pTmpPos = rPam.GetPoint();
 
-        m_nSttNode = pTmpPos->nNode.GetIndex();
-        m_nSttContent = pTmpPos->nContent.GetIndex();
+        m_nSttNode = pTmpPos->GetNodeIndex();
+        m_nSttContent = pTmpPos->GetContentIndex();
 
         m_nDeleteTextNodes = nDeleteTextNodes;
         if (m_nDeleteTextNodes == SwNodeOffset(0)) // if a table selection is added...
@@ -178,12 +178,12 @@ bool SwUndoInserts::IsCreateUndoForNewFly(SwFormatAnchor const& rAnchor,
 
     // check all at-char flys at the start/end nodes:
     // ExcludeFlyAtStartEnd will exclude them!
-    SwPosition const*const pAnchorPos = rAnchor.GetContentAnchor();
-    return pAnchorPos != nullptr
+    SwNode const*const pAnchorNode = rAnchor.GetAnchorNode();
+    return pAnchorNode != nullptr
         && (   rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PARA
             || rAnchor.GetAnchorId() == RndStdIds::FLY_AT_CHAR)
-        && (   nStartNode == pAnchorPos->nNode.GetIndex()
-            || nEndNode == pAnchorPos->nNode.GetIndex());
+        && (   nStartNode == pAnchorNode->GetIndex()
+            || nEndNode == pAnchorNode->GetIndex());
 }
 
 void SwUndoInserts::dumpAsXml(xmlTextWriterPtr pWriter) const
@@ -221,13 +221,13 @@ void SwUndoInserts::dumpAsXml(xmlTextWriterPtr pWriter) const
 
 SwUndoInserts::~SwUndoInserts()
 {
-    if (m_pUndoNodeIndex) // delete also the section from UndoNodes array
+    if (m_oUndoNodeIndex) // delete also the section from UndoNodes array
     {
         // Insert saves content in IconSection
-        SwNodes& rUNds = m_pUndoNodeIndex->GetNodes();
-        rUNds.Delete(*m_pUndoNodeIndex,
-            rUNds.GetEndOfExtras().GetIndex() - m_pUndoNodeIndex->GetIndex());
-        m_pUndoNodeIndex.reset();
+        SwNodes& rUNds = m_oUndoNodeIndex->GetNodes();
+        rUNds.Delete(*m_oUndoNodeIndex,
+            rUNds.GetEndOfExtras().GetIndex() - m_oUndoNodeIndex->GetIndex());
+        m_oUndoNodeIndex.reset();
     }
     m_pFrameFormats.reset();
     m_pRedlineData.reset();
@@ -265,8 +265,8 @@ void SwUndoInserts::UndoImpl(::sw::UndoRedoContext & rContext)
 
     // if Point and Mark are different text nodes so a JoinNext has to be done
     bool bJoinNext = m_nSttNode != m_nEndNode &&
-                rPam.GetMark()->nNode.GetNode().GetTextNode() &&
-                rPam.GetPoint()->nNode.GetNode().GetTextNode();
+                rPam.GetMark()->GetNode().GetTextNode() &&
+                rPam.GetPoint()->GetNode().GetTextNode();
 
     // Is there any content? (loading from template does not have content)
     if( m_nSttNode != m_nEndNode || m_nSttContent != m_nEndContent )
@@ -293,27 +293,26 @@ void SwUndoInserts::UndoImpl(::sw::UndoRedoContext & rContext)
     // indexes
     if (!m_FlyUndos.empty())
     {
-        SwNodeOffset nTmp = rPam.GetPoint()->nNode.GetIndex();
+        SwNodeOffset nTmp = rPam.GetPoint()->GetNodeIndex();
         for (size_t n = m_FlyUndos.size(); 0 < n; --n)
         {
             m_FlyUndos[ n-1 ]->UndoImpl(rContext);
         }
-        m_nNodeDiff += nTmp - rPam.GetPoint()->nNode.GetIndex();
+        m_nNodeDiff += nTmp - rPam.GetPoint()->GetNodeIndex();
     }
 
     if (m_nSttNode != m_nEndNode || m_nSttContent != m_nEndContent)
     {
         // are there Footnotes or ContentFlyFrames in text?
         m_nSetPos = m_pHistory->Count();
-        SwNodeOffset nTmp = rPam.GetMark()->nNode.GetIndex();
+        SwNodeOffset nTmp = rPam.GetMark()->GetNodeIndex();
         DelContentIndex(*rPam.GetMark(), *rPam.GetPoint(),
             DelContentType::AllMask|DelContentType::ExcludeFlyAtStartEnd);
-        m_nNodeDiff += nTmp - rPam.GetMark()->nNode.GetIndex();
+        m_nNodeDiff += nTmp - rPam.GetMark()->GetNodeIndex();
         if( *rPam.GetPoint() != *rPam.GetMark() )
         {
-            m_pUndoNodeIndex.reset(
-                    new SwNodeIndex(rDoc.GetNodes().GetEndOfContent()));
-            MoveToUndoNds(rPam, m_pUndoNodeIndex.get());
+            m_oUndoNodeIndex.emplace(rDoc.GetNodes().GetEndOfContent());
+            MoveToUndoNds(rPam, &*m_oUndoNodeIndex);
 
             if (m_nDeleteTextNodes == SwNodeOffset(0))
             {
@@ -322,14 +321,13 @@ void SwUndoInserts::UndoImpl(::sw::UndoRedoContext & rContext)
         }
     }
 
-    SwNodeIndex& rIdx = rPam.GetPoint()->nNode;
-    SwTextNode* pTextNode = rIdx.GetNode().GetTextNode();
+    SwTextNode* pTextNode = rPam.GetPoint()->GetNode().GetTextNode();
     if( !pTextNode )
         return;
 
     if( !m_pTextFormatColl ) // if 0 than it's no TextNode -> delete
     {
-        SwNodeIndex aDelIdx( rIdx );
+        SwNodeIndex aDelIdx( *pTextNode );
         assert(SwNodeOffset(0) < m_nDeleteTextNodes && m_nDeleteTextNodes < SwNodeOffset(3));
         for (SwNodeOffset i(0); i < m_nDeleteTextNodes; ++i)
         {
@@ -349,13 +347,13 @@ void SwUndoInserts::UndoImpl(::sw::UndoRedoContext & rContext)
         if( bJoinNext && pTextNode->CanJoinNext())
         {
             {
-                RemoveIdxRel( rIdx.GetIndex()+1, SwPosition( rIdx,
-                    SwIndex( pTextNode, pTextNode->GetText().getLength() )));
+                RemoveIdxRel( pTextNode->GetIndex()+1,
+                    SwPosition( *pTextNode, pTextNode, pTextNode->GetText().getLength() ) );
             }
             pTextNode->JoinNext();
         }
         // reset all text attributes in the paragraph!
-        pTextNode->RstTextAttr( SwIndex(pTextNode, 0), pTextNode->Len(), 0, nullptr, true );
+        pTextNode->RstTextAttr( 0, pTextNode->Len(), 0, nullptr, true );
 
         pTextNode->ResetAllAttr();
 
@@ -376,9 +374,8 @@ void SwUndoInserts::RedoImpl(::sw::UndoRedoContext & rContext)
     SwCursor& rPam(rContext.GetCursorSupplier().CreateNewShellCursor());
     SwDoc& rDoc = rPam.GetDoc();
     rPam.DeleteMark();
-    rPam.GetPoint()->nNode = m_nSttNode - m_nNodeDiff;
-    SwContentNode* pCNd = rPam.GetContentNode();
-    rPam.GetPoint()->nContent.Assign( pCNd, m_nSttContent );
+    rPam.GetPoint()->Assign( m_nSttNode - m_nNodeDiff, m_nSttContent );
+    SwContentNode* pCNd = rPam.GetPointContentNode();
 
     SwTextFormatColl* pSavTextFormatColl = m_pTextFormatColl;
     if( m_pTextFormatColl && pCNd && pCNd->IsTextNode() )
@@ -387,16 +384,16 @@ void SwUndoInserts::RedoImpl(::sw::UndoRedoContext & rContext)
     m_pHistory->SetTmpEnd( m_nSetPos );
 
     // retrieve start position for rollback
-    if( ( m_nSttNode != m_nEndNode || m_nSttContent != m_nEndContent ) && m_pUndoNodeIndex)
+    if( ( m_nSttNode != m_nEndNode || m_nSttContent != m_nEndContent ) && m_oUndoNodeIndex)
     {
         auto const pFlysAtInsPos(sw::GetFlysAnchoredAt(rDoc,
-            rPam.GetPoint()->nNode.GetIndex()));
+            rPam.GetPoint()->GetNodeIndex()));
 
         const bool bMvBkwrd = MovePtBackward(rPam);
 
-        // re-insert content again (first detach m_pUndoNodeIndex!)
-        SwNodeOffset const nMvNd = m_pUndoNodeIndex->GetIndex();
-        m_pUndoNodeIndex.reset();
+        // re-insert content again (first detach m_oUndoNodeIndex!)
+        SwNodeOffset const nMvNd = m_oUndoNodeIndex->GetIndex();
+        m_oUndoNodeIndex.reset();
         MoveFromUndoNds(rDoc, nMvNd, *rPam.GetMark());
         if (m_nDeleteTextNodes != SwNodeOffset(0))
         {
@@ -423,16 +420,16 @@ void SwUndoInserts::RedoImpl(::sw::UndoRedoContext & rContext)
 
     if (m_pTextFormatColl && rDoc.GetTextFormatColls()->IsAlive(m_pTextFormatColl))
     {
-        SwTextNode* pTextNd = rPam.GetMark()->nNode.GetNode().GetTextNode();
+        SwTextNode* pTextNd = rPam.GetMark()->GetNode().GetTextNode();
         if( pTextNd )
             pTextNd->ChgFormatColl( m_pTextFormatColl );
     }
     m_pTextFormatColl = pSavTextFormatColl;
 
     if (m_pLastNodeColl && rDoc.GetTextFormatColls()->IsAlive(m_pLastNodeColl)
-        && rPam.GetPoint()->nNode != rPam.GetMark()->nNode)
+        && rPam.GetPoint()->GetNode() != rPam.GetMark()->GetNode())
     {
-        SwTextNode* pTextNd = rPam.GetPoint()->nNode.GetNode().GetTextNode();
+        SwTextNode* pTextNd = rPam.GetPoint()->GetNode().GetTextNode();
         if( pTextNd )
             pTextNd->ChgFormatColl( m_pLastNodeColl );
     }

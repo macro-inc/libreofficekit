@@ -146,7 +146,7 @@ public:
         // is there a text- or frameselection?
     bool    HasSelection() const { return SwCursorShell::HasSelection() ||
                                         IsMultiSelection() || IsSelFrameMode() || IsObjSelected(); }
-    bool    Pop(SwCursorShell::PopMode, ::std::unique_ptr<SwCallLink> const pLink);
+    bool    Pop(SwCursorShell::PopMode, ::std::optional<SwCallLink>& roLink);
     bool    Pop(SwCursorShell::PopMode = SwCursorShell::PopMode::DeleteStack);
 
     void    EnterStdMode();
@@ -208,9 +208,9 @@ public:
 typedef bool (SwWrtShell::*FNSimpleMove)();
     bool SimpleMove( FNSimpleMove, bool bSelect );
 
-    bool Left       ( sal_uInt16 nMode, bool bSelect,
+    bool Left       ( SwCursorSkipMode nMode, bool bSelect,
                             sal_uInt16 nCount, bool bBasicCall, bool bVisual = false );
-    bool Right      ( sal_uInt16 nMode, bool bSelect,
+    bool Right      ( SwCursorSkipMode nMode, bool bSelect,
                             sal_uInt16 nCount, bool bBasicCall, bool bVisual = false );
     bool Up         ( bool bSelect, sal_uInt16 nCount = 1, bool bBasicCall = false );
     bool Down       ( bool bSelect, sal_uInt16 nCount = 1, bool bBasicCall = false );
@@ -385,18 +385,18 @@ typedef bool (SwWrtShell::*FNSimpleMove)();
     void    GetDoStrings( DoType eDoType, SfxStringListItem& rStrLstItem ) const;
 
     // search and replace
-    sal_uLong SearchPattern(const i18nutil::SearchOptions2& rSearchOpt,
+    sal_Int32 SearchPattern(const i18nutil::SearchOptions2& rSearchOpt,
                          bool bSearchInNotes,
                          SwDocPositions eStart, SwDocPositions eEnd,
                          FindRanges eFlags = FindRanges::InBody,
                          bool bReplace = false );
 
-    sal_uLong SearchTempl  (const OUString &rTempl,
+    sal_Int32 SearchTempl  (const OUString &rTempl,
                          SwDocPositions eStart, SwDocPositions eEnd,
                          FindRanges eFlags = FindRanges::InBody,
                          const OUString* pReplTempl = nullptr );
 
-    sal_uLong SearchAttr   (const SfxItemSet& rFindSet,
+    sal_Int32 SearchAttr   (const SfxItemSet& rFindSet,
                          bool bNoColls,
                          SwDocPositions eStart, SwDocPositions eEnd,
                          FindRanges eFlags = FindRanges::InBody,
@@ -506,10 +506,15 @@ typedef bool (SwWrtShell::*FNSimpleMove)();
     void InsertPostIt(SwFieldMgr& rFieldMgr, const SfxRequest& rReq);
 
     bool IsOutlineContentVisible(const size_t nPos);
-    void MakeOutlineContentVisible(const size_t nPos, bool bMakeVisible = true);
+    void MakeOutlineContentVisible(const size_t nPos, bool bMakeVisible = true, bool bSetAttrOutlineVisibility = true);
     void MakeAllFoldedOutlineContentVisible(bool bMakeVisible = true);
     void InvalidateOutlineContentVisibility();
     bool GetAttrOutlineContentVisible(const size_t nPos);
+
+    void MakeOutlineLevelsVisible(const int nLevel);
+
+    bool HasFoldedOutlineContentSelected();
+    void InfoReadOnlyDialog(bool bAsync = false);
 
     std::optional<OString> getLOKPayload(int nType, int nViewId) const;
 
@@ -676,9 +681,10 @@ class MakeAllOutlineContentTemporarilyVisible
 private:
     SwWrtShell* m_pWrtSh = nullptr;
     bool m_bDone = false;
+    bool m_bScrollToCursor = false;
 public:
     static sal_uInt32 nLock;
-    MakeAllOutlineContentTemporarilyVisible(SwDoc* pDoc)
+    MakeAllOutlineContentTemporarilyVisible(SwDoc* pDoc, bool bScrollToCursor = false)
     {
         ++nLock;
         if (nLock > 1)
@@ -687,8 +693,10 @@ public:
             if ((m_pWrtSh = pDocSh->GetWrtShell()) && m_pWrtSh->GetViewOptions() &&
                     m_pWrtSh->GetViewOptions()->IsShowOutlineContentVisibilityButton())
             {
-                m_pWrtSh->StartAllAction();
+                m_pWrtSh->LockView(true);
+                m_pWrtSh->LockPaint();
                 m_pWrtSh->MakeAllFoldedOutlineContentVisible();
+                m_bScrollToCursor = bScrollToCursor;
                 m_bDone = true;
             }
     }
@@ -701,7 +709,10 @@ public:
         if (m_bDone && m_pWrtSh)
         {
             m_pWrtSh->MakeAllFoldedOutlineContentVisible(false);
-            m_pWrtSh->EndAllAction();
+            m_pWrtSh->UnlockPaint();
+            m_pWrtSh->LockView(false);
+            if (m_bScrollToCursor)
+                m_pWrtSh->UpdateCursor(SwCursorShell::SCROLLWIN);
         }
     }
 };

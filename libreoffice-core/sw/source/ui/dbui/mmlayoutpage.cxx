@@ -24,6 +24,8 @@
 #include <mailmergehelper.hxx>
 #include <unotools.hxx>
 #include <comphelper/string.hxx>
+#include <comphelper/propertyvalue.hxx>
+#include <comphelper/servicehelper.hxx>
 #include <i18nutil/unicode.hxx>
 #include <unotools/tempfile.hxx>
 #include <uitool.hxx>
@@ -93,18 +95,17 @@ SwMailMergeLayoutPage::SwMailMergeLayoutPage(weld::Container* pPage, SwMailMerge
         //creating with extension is not supported by a static method :-(
         OUString const sExt(
             comphelper::string::stripStart(pSfxFlt->GetDefaultExtension(),'*'));
-        utl::TempFile aTempFile( OUString(), true, &sExt );
-        m_sExampleURL = aTempFile.GetURL();
+        utl::TempFileNamed aTempFile( u"", true, sExt );
         aTempFile.EnableKillingFile();
+        m_sExampleURL = aTempFile.GetURL();
     }
     SwView* pView = m_pWizard->GetSwView();
-    uno::Sequence< beans::PropertyValue > aValues(2);
-    beans::PropertyValue* pValues = aValues.getArray();
-    pValues[0].Name = "FilterName";
-    pValues[0].Value <<= pSfxFlt->GetFilterName();
     // Don't save embedded data set! It would steal it from current document.
-    pValues[1].Name = "NoEmbDataSet";
-    pValues[1].Value <<= true;
+    uno::Sequence< beans::PropertyValue > aValues =
+    {
+        comphelper::makePropertyValue("FilterName", pSfxFlt->GetFilterName()),
+        comphelper::makePropertyValue("NoEmbDataSet", true)
+    };
 
     uno::Reference< frame::XStorable > xStore( pView->GetDocShell()->GetModel(), uno::UNO_QUERY);
     xStore->storeToURL( m_sExampleURL, aValues   );

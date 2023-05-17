@@ -66,6 +66,13 @@ char const * printExprValueKind(ExprValueKind k) {
     llvm_unreachable("unknown ExprValueKind");
 }
 
+QualType desugarElaboratedType(QualType type) {
+    if (auto const t = dyn_cast<ElaboratedType>(type)) {
+        return t->desugar();
+    }
+    return type;
+}
+
 enum class AlgebraicType { None, Integer, FloatingPoint };
 
 AlgebraicType algebraicType(clang::Type const & type) {
@@ -158,7 +165,7 @@ private:
     bool isOverloadedFunction(FunctionDecl const * decl);
 
     bool isInIgnoredMacroBody(Expr const * expr) {
-        auto const loc = compat::getBeginLoc(expr);
+        auto const loc = expr->getBeginLoc();
         return compiler.getSourceManager().isMacroBodyExpansion(loc)
             && ignoreLocation(compiler.getSourceManager().getSpellingLoc(loc));
     }
@@ -232,7 +239,7 @@ bool RedundantCast::VisitImplicitCastExpr(const ImplicitCastExpr * expr) {
                            dyn_cast<CXXStaticCastExpr>(e)->getSubExpr()
                            ->IgnoreParenImpCasts()->getType())
                        && !compiler.getSourceManager().isMacroBodyExpansion(
-                           compat::getBeginLoc(e)))
+                           e->getBeginLoc()))
             {
                 report(
                     DiagnosticsEngine::Warning,
@@ -312,7 +319,7 @@ bool RedundantCast::VisitCStyleCastExpr(CStyleCastExpr const * expr) {
     if (ignoreLocation(expr)) {
         return true;
     }
-    if (isInUnoIncludeFile(compiler.getSourceManager().getSpellingLoc(compat::getBeginLoc(expr)))) {
+    if (isInUnoIncludeFile(compiler.getSourceManager().getSpellingLoc(expr->getBeginLoc()))) {
         return true;
     }
     auto t1 = compat::getSubExprAsWritten(expr)->getType();
@@ -320,7 +327,7 @@ bool RedundantCast::VisitCStyleCastExpr(CStyleCastExpr const * expr) {
     if (auto templateType = dyn_cast<SubstTemplateTypeParmType>(t1)) {
         t1 = templateType->desugar();
     }
-    if (t1 != t2) {
+    if (desugarElaboratedType(t1) != desugarElaboratedType(t2)) {
         return true;
     }
     if (!t1->isBuiltinType() && !loplugin::TypeCheck(t1).Enum() && !loplugin::TypeCheck(t1).Typedef()) {
@@ -333,7 +340,7 @@ bool RedundantCast::VisitCStyleCastExpr(CStyleCastExpr const * expr) {
     // Ignore FD_ISSET expanding to "...(SOCKET)(fd)..." in some Microsoft
     // winsock2.h (TODO: improve heuristic of determining that the whole
     // expr is part of a single macro body expansion):
-    auto l1 = compat::getBeginLoc(expr);
+    auto l1 = expr->getBeginLoc();
     while (compiler.getSourceManager().isMacroArgExpansion(l1)) {
         l1 = compiler.getSourceManager().getImmediateMacroCallerLoc(l1);
     }
@@ -341,7 +348,7 @@ bool RedundantCast::VisitCStyleCastExpr(CStyleCastExpr const * expr) {
     while (compiler.getSourceManager().isMacroArgExpansion(l2)) {
         l2 = compiler.getSourceManager().getImmediateMacroCallerLoc(l2);
     }
-    auto l3 = compat::getEndLoc(expr);
+    auto l3 = expr->getEndLoc();
     while (compiler.getSourceManager().isMacroArgExpansion(l3)) {
          l3 = compiler.getSourceManager().getImmediateMacroCallerLoc(l3);
     }
@@ -551,7 +558,7 @@ bool RedundantCast::VisitCXXStaticCastExpr(CXXStaticCastExpr const * expr) {
     // h=b5889d25e9bf944a89fdd7bcabf3b6c6f6bb6f7c> "assert: Support types
     // without operator== (int) [BZ #21972]":
     if (t1->isBooleanType() && t2->isBooleanType()) {
-        auto loc = compat::getBeginLoc(expr);
+        auto loc = expr->getBeginLoc();
         if (compiler.getSourceManager().isMacroBodyExpansion(loc)
             && (Lexer::getImmediateMacroName(
                     loc, compiler.getSourceManager(), compiler.getLangOpts())
@@ -575,6 +582,16 @@ bool RedundantCast::VisitCXXReinterpretCastExpr(
     CXXReinterpretCastExpr const * expr)
 {
     if (ignoreLocation(expr)) {
+        return true;
+    }
+    if (expr->getTypeAsWritten() == expr->getSubExprAsWritten()->getType())
+        //TODO: instead of exact QualType match, allow some variation?
+    {
+        report(
+            DiagnosticsEngine::Warning, "redundant reinterpret_cast from %0 to %1",
+                expr->getExprLoc())
+                << expr->getSubExprAsWritten()->getType() << expr->getTypeAsWritten()
+                << expr->getSourceRange();
         return true;
     }
     if (auto const sub = dyn_cast<ImplicitCastExpr>(expr->getSubExpr())) {
@@ -607,13 +624,13 @@ bool RedundantCast::VisitCXXReinterpretCastExpr(
             return true;
         }
         if (rewriter != nullptr) {
-            auto loc = compat::getBeginLoc(expr);
+            auto loc = expr->getBeginLoc();
             while (compiler.getSourceManager().isMacroArgExpansion(loc)) {
                 loc = compiler.getSourceManager().getImmediateMacroCallerLoc(
                     loc);
             }
             if (compiler.getSourceManager().isMacroBodyExpansion(loc)) {
-                auto loc2 = compat::getEndLoc(expr);
+                auto loc2 = expr->getEndLoc();
                 while (compiler.getSourceManager().isMacroArgExpansion(loc2)) {
                     loc2 = compiler.getSourceManager()
                         .getImmediateMacroCallerLoc(loc2);
@@ -663,6 +680,24 @@ bool RedundantCast::VisitCXXReinterpretCastExpr(
                 << sub->getTypeAsWritten() << expr->getTypeAsWritten()
                 << expr->getSourceRange();
             return true;
+        }
+    }
+    if (auto const t1 = expr->getSubExpr()->getType()->getAs<clang::PointerType>()) {
+        if (auto const t2 = expr->getType()->getAs<clang::PointerType>()) {
+            if (auto const d1 = t1->getPointeeCXXRecordDecl()) {
+                if (auto const d2 = t2->getPointeeCXXRecordDecl()) {
+                    if (d1->hasDefinition() && d1->isDerivedFrom(d2)) {
+                        report(
+                            DiagnosticsEngine::Warning,
+                            "suspicious reinterpret_cast from derived %0 to base %1, maybe this was"
+                                " meant to be a static_cast",
+                            expr->getExprLoc())
+                            << expr->getSubExprAsWritten()->getType() << expr->getTypeAsWritten()
+                            << expr->getSourceRange();
+                        return true;
+                    }
+                }
+            }
         }
     }
     return true;
@@ -795,8 +830,8 @@ bool RedundantCast::VisitCXXFunctionalCastExpr(CXXFunctionalCastExpr const * exp
     //
     // in sal/osl/unx/socket.cxx:
     //TODO: Better check that sub is exactly an expansion of FD_ISSET:
-    if (compat::getEndLoc(sub).isMacroID()) {
-        for (auto loc = compat::getBeginLoc(sub);
+    if (sub->getEndLoc().isMacroID()) {
+        for (auto loc = sub->getBeginLoc();
              loc.isMacroID()
                  && (compiler.getSourceManager()
                      .isAtStartOfImmediateMacroExpansion(loc));
@@ -845,6 +880,28 @@ bool RedundantCast::VisitCXXDynamicCastExpr(CXXDynamicCastExpr const * expr) {
         // casting from 'T*' to 'const T*' is redundant, so compare without the qualifiers
         qt1 = qt1->getPointeeType().getUnqualifiedType();
         qt2 = qt2->getPointeeType().getUnqualifiedType();
+        if (qt1 == qt2)
+        {
+            report(
+                DiagnosticsEngine::Warning,
+                "redundant dynamic cast from %0 to %1", expr->getExprLoc())
+                << t2 << t1 << expr->getSourceRange();
+            return true;
+        }
+        if (qt1->getAsCXXRecordDecl() && qt2->getAsCXXRecordDecl()->isDerivedFrom(qt1->getAsCXXRecordDecl()))
+        {
+            report(
+                DiagnosticsEngine::Warning,
+                "redundant dynamic upcast from %0 to %1", expr->getExprLoc())
+                << t2 << t1 << expr->getSourceRange();
+            return true;
+        }
+    }
+    else if (qt1->isReferenceType() && qt2->isRecordType())
+    {
+        // casting from 'T&' to 'const T&' is redundant, so compare without the qualifiers
+        qt1 = qt1->getPointeeType().getUnqualifiedType();
+        qt2 = qt2.getUnqualifiedType();
         if (qt1 == qt2)
         {
             report(

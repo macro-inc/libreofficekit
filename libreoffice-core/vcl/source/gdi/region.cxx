@@ -33,6 +33,7 @@
 #include <basegfx/range/b2drange.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <tools/poly.hxx>
+#include <unotools/configmgr.hxx>
 
 namespace
 {
@@ -315,7 +316,8 @@ Region::Region(bool bIsNull)
 Region::Region(const tools::Rectangle& rRect)
 :   mbIsNull(false)
 {
-    mpRegionBand.reset(rRect.IsEmpty() ? nullptr : new RegionBand(rRect));
+    if (!rRect.IsEmpty())
+        mpRegionBand = std::make_shared<RegionBand>(rRect);
 }
 
 Region::Region(const tools::Polygon& rPolygon)
@@ -436,12 +438,12 @@ void vcl::Region::Move( tools::Long nHorzMove, tools::Long nVertMove )
     }
     else if(getRegionBand())
     {
-        RegionBand* pNew = new RegionBand(*getRegionBand());
+        std::shared_ptr<RegionBand> pNew = std::make_shared<RegionBand>(*getRegionBand());
 
         pNew->Move(nHorzMove, nVertMove);
         mpB2DPolyPolygon.reset();
         mpPolyPolygon.reset();
-        mpRegionBand.reset(pNew);
+        mpRegionBand = std::move(pNew);
     }
     else
     {
@@ -489,12 +491,12 @@ void vcl::Region::Scale( double fScaleX, double fScaleY )
     }
     else if(getRegionBand())
     {
-        RegionBand* pNew = new RegionBand(*getRegionBand());
+        std::shared_ptr<RegionBand> pNew = std::make_shared<RegionBand>(*getRegionBand());
 
         pNew->Scale(fScaleX, fScaleY);
         mpB2DPolyPolygon.reset();
         mpPolyPolygon.reset();
-        mpRegionBand.reset(pNew);
+        mpRegionBand = std::move(pNew);
     }
     else
     {
@@ -723,15 +725,16 @@ void vcl::Region::Exclude( const tools::Rectangle& rRect )
     }
 
     // only region band mode possibility left here or null/empty
-    const RegionBand* pCurrent = getRegionBand();
-
-    if(!pCurrent)
+    if(!mpRegionBand)
     {
         // empty? -> done!
         return;
     }
 
-    std::shared_ptr<RegionBand> pNew( std::make_shared<RegionBand>(*pCurrent));
+    std::shared_ptr<RegionBand>& pNew = mpRegionBand;
+    // only make a copy if someone else is also using it
+    if (pNew.use_count() > 1)
+        pNew = std::make_shared<RegionBand>(*pNew);
 
     // get justified rectangle
     const tools::Long nLeft(std::min(rRect.Left(), rRect.Right()));
@@ -747,11 +750,7 @@ void vcl::Region::Exclude( const tools::Rectangle& rRect )
 
     // cleanup
     if(!pNew->OptimizeBandList())
-    {
         pNew.reset();
-    }
-
-    mpRegionBand = std::move(pNew);
 }
 
 void vcl::Region::XOr( const tools::Rectangle& rRect )
@@ -988,12 +987,15 @@ void vcl::Region::Intersect( const vcl::Region& rRegion )
             return;
         }
 
+        static size_t gPointLimit = !utl::ConfigManager::IsFuzzing() ? SAL_MAX_SIZE : 8192;
+        size_t nPointLimit(gPointLimit);
         const basegfx::B2DPolyPolygon aClip(
             basegfx::utils::clipPolyPolygonOnPolyPolygon(
                 aOtherPolyPoly,
                 aThisPolyPoly,
                 true,
-                false));
+                false,
+                &nPointLimit));
         *this = vcl::Region( aClip );
         return;
     }
@@ -1443,7 +1445,10 @@ Region& vcl::Region::operator=( const tools::Rectangle& rRect )
 {
     mpB2DPolyPolygon.reset();
     mpPolyPolygon.reset();
-    mpRegionBand.reset(rRect.IsEmpty() ? nullptr : new RegionBand(rRect));
+    if (!rRect.IsEmpty())
+        mpRegionBand = std::make_shared<RegionBand>(rRect);
+    else
+        mpRegionBand.reset();
     mbIsNull = false;
 
     return *this;
@@ -1570,6 +1575,13 @@ SvStream& ReadRegion(SvStream& rIStrm, vcl::Region& rRegion)
                 {
                     tools::PolyPolygon aNewPoly;
                     ReadPolyPolygon(rIStrm, aNewPoly);
+                    const auto nPolygons = aNewPoly.Count();
+                    if (nPolygons > 128)
+                    {
+                        SAL_WARN("vcl.gdi", "suspiciously high no of polygons in clip:" << nPolygons);
+                        if (utl::ConfigManager::IsFuzzing())
+                            aNewPoly.Clear();
+                    }
                     rRegion.mpPolyPolygon = aNewPoly;
                 }
             }

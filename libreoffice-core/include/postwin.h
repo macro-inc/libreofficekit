@@ -51,10 +51,8 @@
 #undef WB_LEFT
 #undef WB_RIGHT
 #undef Yield
+#undef max
 #undef mciSetCommand
-
-#if !defined INCLUDED_POSTWIN_H && defined __cplusplus
-#define INCLUDED_POSTWIN_H
-#endif
+#undef min
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

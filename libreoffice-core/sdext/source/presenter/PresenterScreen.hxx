@@ -95,7 +95,7 @@ class PresenterScreen
 public:
     PresenterScreen (
         const css::uno::Reference<css::uno::XComponentContext>& rxContext,
-        const css::uno::Reference<css::frame::XModel2>& rxModel);
+        css::uno::Reference<css::frame::XModel2> xModel);
     virtual ~PresenterScreen() override;
     PresenterScreen(const PresenterScreen&) = delete;
     PresenterScreen& operator=(const PresenterScreen&) = delete;
@@ -104,6 +104,9 @@ public:
 
     static bool isPresenterScreenEnabled(
         const css::uno::Reference<css::uno::XComponentContext>& rxContext);
+    static bool isPresenterScreenFullScreen(
+        const css::uno::Reference<css::uno::XComponentContext>& rxContext);
+
     /** Make the presenter screen visible.
     */
     void InitializePresenterScreen();
@@ -217,7 +220,8 @@ private:
         is displayed on another screen than the full screen presentation.
     */
     css::uno::Reference<css::drawing::framework::XResourceId> GetMainPaneId (
-        const css::uno::Reference<css::presentation::XPresentation2>& rxPresentation) const;
+        const css::uno::Reference<css::presentation::XPresentation2>& rxPresentation,
+        const css::uno::Reference<com::sun::star::uno::XComponentContext>& xContext) const;
 };
 
 }

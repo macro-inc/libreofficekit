@@ -52,8 +52,11 @@
 // needed for theming
 // FIXME: move theming code to salnativewidgets.cxx
 #include <Carbon/Carbon.h>
+#include <quartz/CGHelpers.hxx>
 #include <postmac.h>
 
+
+const int nMinBlinkCursorDelay = 500;
 
 AquaSalFrame* AquaSalFrame::s_pCaptureFrame = nullptr;
 
@@ -84,7 +87,7 @@ AquaSalFrame::AquaSalFrame( SalFrame* pParent, SalFrameStyleFlags salFrameStyle 
     mnTrackingRectTag( 0 ),
     mrClippingPath( nullptr ),
     mnICOptions( InputContextFlags::NONE ),
-    mnBlinkCursorDelay ( 500 )
+    mnBlinkCursorDelay ( nMinBlinkCursorDelay )
 {
     mpParent = dynamic_cast<AquaSalFrame*>(pParent);
 
@@ -93,24 +96,31 @@ AquaSalFrame::AquaSalFrame( SalFrame* pParent, SalFrameStyleFlags salFrameStyle 
     SalData* pSalData = GetSalData();
     pSalData->mpInstance->insertFrame( this );
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+
+    // tdf#150177 Limit minimum blink cursor rate
+    // This bug occurs when the values for NSTextInsertionPointBlinkPeriodOn or
+    // NSTextInsertionPointBlinkPeriodOff are set to zero or close to zero.
+    // LibreOffice becomes very sluggish opening documents when either is set
+    // at 100 milliseconds or less so set the blink rate to the maximum of
+    // nMinBlinkCursorDelay, NSTextInsertionPointBlinkPeriodOn, and
+    // NSTextInsertionPointBlinkPeriodOff.
+    mnBlinkCursorDelay = nMinBlinkCursorDelay;
     if (userDefaults != nil)
     {
         id setting = [userDefaults objectForKey: @"NSTextInsertionPointBlinkPeriodOn"];
-        if (setting)
-            mnBlinkCursorDelay = [setting intValue];
-        else
-        {
-            setting = [userDefaults objectForKey: @"NSTextInsertionPointBlinkPeriodOff"];
-            if (setting)
-                mnBlinkCursorDelay = [setting intValue];
-        }
+        if (setting && [setting isKindOfClass:[NSNumber class]])
+            mnBlinkCursorDelay = std::max(mnBlinkCursorDelay, [setting intValue]);
+
+        setting = [userDefaults objectForKey: @"NSTextInsertionPointBlinkPeriodOff"];
+        if (setting && [setting isKindOfClass:[NSNumber class]])
+            mnBlinkCursorDelay = std::max(mnBlinkCursorDelay, [setting intValue]);
     }
 }
 
 AquaSalFrame::~AquaSalFrame()
 {
     if (mbFullScreen)
-        doShowFullScreen(false, maGeometry.nDisplayScreenNumber);
+        doShowFullScreen(false, maGeometry.screen());
 
     assert( GetSalData()->mpInstance->IsMainThread() );
 
@@ -168,10 +178,10 @@ void AquaSalFrame::initWindowAndView()
     NSRect aVisibleRect = [pNSScreen visibleFrame];
     CocoaToVCL( aVisibleRect );
 
-    maGeometry.nX = static_cast<int>(aVisibleRect.origin.x + aVisibleRect.size.width / 10);
-    maGeometry.nY = static_cast<int>(aVisibleRect.origin.y + aVisibleRect.size.height / 10);
-    maGeometry.nWidth = static_cast<unsigned int>(aVisibleRect.size.width * 0.8);
-    maGeometry.nHeight = static_cast<unsigned int>(aVisibleRect.size.height * 0.8);
+    maGeometry.setX(static_cast<sal_Int32>(aVisibleRect.origin.x + aVisibleRect.size.width / 10));
+    maGeometry.setY(static_cast<sal_Int32>(aVisibleRect.origin.y + aVisibleRect.size.height / 10));
+    maGeometry.setWidth(static_cast<sal_uInt32>(aVisibleRect.size.width * 0.8));
+    maGeometry.setHeight(static_cast<sal_uInt32>(aVisibleRect.size.height * 0.8));
 
     // calculate style mask
     if( (mnStyle & SalFrameStyleFlags::FLOAT) ||
@@ -184,10 +194,10 @@ void AquaSalFrame::initWindowAndView()
                       NSWindowStyleMaskResizable      |
                       NSWindowStyleMaskClosable;
         // make default window "maximized"
-        maGeometry.nX = static_cast<int>(aVisibleRect.origin.x);
-        maGeometry.nY = static_cast<int>(aVisibleRect.origin.y);
-        maGeometry.nWidth = static_cast<int>(aVisibleRect.size.width);
-        maGeometry.nHeight = static_cast<int>(aVisibleRect.size.height);
+        maGeometry.setX(static_cast<sal_Int32>(aVisibleRect.origin.x));
+        maGeometry.setY(static_cast<sal_Int32>(aVisibleRect.origin.y));
+        maGeometry.setWidth(static_cast<sal_uInt32>(aVisibleRect.size.width));
+        maGeometry.setHeight(static_cast<sal_uInt32>(aVisibleRect.size.height));
         mbPositioned = mbSized = true;
     }
     else
@@ -231,7 +241,7 @@ void AquaSalFrame::initWindowAndView()
     [mpNSWindow setDelegate: static_cast<id<NSWindowDelegate> >(mpNSWindow)];
 
     [mpNSWindow setRestorable:NO];
-    const NSRect aRect = { NSZeroPoint, NSMakeSize( maGeometry.nWidth, maGeometry.nHeight )};
+    const NSRect aRect = { NSZeroPoint, NSMakeSize(maGeometry.width(), maGeometry.height()) };
     mnTrackingRectTag = [mpNSView addTrackingRect: aRect owner: mpNSView userData: nil assumeInside: NO];
 
     maSysData.mpNSView = mpNSView;
@@ -246,7 +256,7 @@ void AquaSalFrame::CocoaToVCL( NSRect& io_rRect, bool bRelativeToScreen )
     if( bRelativeToScreen )
         io_rRect.origin.y = maScreenRect.size.height - (io_rRect.origin.y+io_rRect.size.height);
     else
-        io_rRect.origin.y = maGeometry.nHeight - (io_rRect.origin.y+io_rRect.size.height);
+        io_rRect.origin.y = maGeometry.height() - (io_rRect.origin.y+io_rRect.size.height);
 }
 
 void AquaSalFrame::VCLToCocoa( NSRect& io_rRect, bool bRelativeToScreen )
@@ -254,7 +264,7 @@ void AquaSalFrame::VCLToCocoa( NSRect& io_rRect, bool bRelativeToScreen )
     if( bRelativeToScreen )
         io_rRect.origin.y = maScreenRect.size.height - (io_rRect.origin.y+io_rRect.size.height);
     else
-        io_rRect.origin.y = maGeometry.nHeight - (io_rRect.origin.y+io_rRect.size.height);
+        io_rRect.origin.y = maGeometry.height() - (io_rRect.origin.y+io_rRect.size.height);
 }
 
 void AquaSalFrame::CocoaToVCL( NSPoint& io_rPoint, bool bRelativeToScreen )
@@ -262,7 +272,7 @@ void AquaSalFrame::CocoaToVCL( NSPoint& io_rPoint, bool bRelativeToScreen )
     if( bRelativeToScreen )
         io_rPoint.y = maScreenRect.size.height - io_rPoint.y;
     else
-        io_rPoint.y = maGeometry.nHeight - io_rPoint.y;
+        io_rPoint.y = maGeometry.height() - io_rPoint.y;
 }
 
 void AquaSalFrame::VCLToCocoa( NSPoint& io_rPoint, bool bRelativeToScreen )
@@ -270,12 +280,14 @@ void AquaSalFrame::VCLToCocoa( NSPoint& io_rPoint, bool bRelativeToScreen )
     if( bRelativeToScreen )
         io_rPoint.y = maScreenRect.size.height - io_rPoint.y;
     else
-        io_rPoint.y = maGeometry.nHeight - io_rPoint.y;
+        io_rPoint.y = maGeometry.height() - io_rPoint.y;
 }
 
 void AquaSalFrame::screenParametersChanged()
 {
     OSX_SALDATA_RUNINMAIN( screenParametersChanged() )
+
+    sal::aqua::resetWindowScaling();
 
     UpdateFrameGeometry();
 
@@ -393,25 +405,25 @@ void AquaSalFrame::initShow()
         if( mpParent ) // center relative to parent
         {
             // center on parent
-            tools::Long nNewX = mpParent->maGeometry.nX + (static_cast<tools::Long>(mpParent->maGeometry.nWidth) - static_cast<tools::Long>(maGeometry.nWidth))/2;
+            tools::Long nNewX = mpParent->maGeometry.x() + (static_cast<tools::Long>(mpParent->maGeometry.width()) - static_cast<tools::Long>(maGeometry.width())) / 2;
             if( nNewX < aScreenRect.Left() )
                 nNewX = aScreenRect.Left();
-            if( tools::Long(nNewX + maGeometry.nWidth) > aScreenRect.Right() )
-                nNewX = aScreenRect.Right() - maGeometry.nWidth-1;
-            tools::Long nNewY = mpParent->maGeometry.nY + (static_cast<tools::Long>(mpParent->maGeometry.nHeight) - static_cast<tools::Long>(maGeometry.nHeight))/2;
+            if (static_cast<tools::Long>(nNewX + maGeometry.width()) > aScreenRect.Right())
+                nNewX = aScreenRect.Right() - maGeometry.width() - 1;
+            tools::Long nNewY = mpParent->maGeometry.y() + (static_cast<tools::Long>(mpParent->maGeometry.height()) - static_cast<tools::Long>(maGeometry.height())) / 2;
             if( nNewY < aScreenRect.Top() )
                 nNewY = aScreenRect.Top();
             if( nNewY > aScreenRect.Bottom() )
-                nNewY = aScreenRect.Bottom() - maGeometry.nHeight-1;
-            SetPosSize( nNewX - mpParent->maGeometry.nX,
-                        nNewY - mpParent->maGeometry.nY,
+                nNewY = aScreenRect.Bottom() - maGeometry.height() - 1;
+            SetPosSize( nNewX - mpParent->maGeometry.x(),
+                        nNewY - mpParent->maGeometry.y(),
                         0, 0,  SAL_FRAME_POSSIZE_X | SAL_FRAME_POSSIZE_Y );
         }
         else if( ! (mnStyle & SalFrameStyleFlags::SIZEABLE) )
         {
             // center on screen
-            tools::Long nNewX = (aScreenRect.GetWidth() - maGeometry.nWidth)/2;
-            tools::Long nNewY = (aScreenRect.GetHeight() - maGeometry.nHeight)/2;
+            tools::Long nNewX = (aScreenRect.GetWidth() - maGeometry.width()) / 2;
+            tools::Long nNewY = (aScreenRect.GetHeight() - maGeometry.height()) / 2;
             SetPosSize( nNewX, nNewY, 0, 0,  SAL_FRAME_POSSIZE_X | SAL_FRAME_POSSIZE_Y );
         }
     }
@@ -424,7 +436,7 @@ void AquaSalFrame::SendPaintEvent( const tools::Rectangle* pRect )
 {
     OSX_SALDATA_RUNINMAIN( SendPaintEvent( pRect ) )
 
-    SalPaintEvent aPaintEvt( 0, 0, maGeometry.nWidth, maGeometry.nHeight, true );
+    SalPaintEvent aPaintEvt(0, 0, maGeometry.width(), maGeometry.height(), true);
     if( pRect )
     {
         aPaintEvt.mnBoundX      = pRect->Left();
@@ -442,6 +454,19 @@ void AquaSalFrame::Show(bool bVisible, bool bNoActivate)
         return;
 
     OSX_SALDATA_RUNINMAIN( Show(bVisible, bNoActivate) )
+
+    // tdf#152173 Don't display tooltip windows when application is inactive
+    // Starting with macOS 13 Ventura, inactive applications receive mouse
+    // move events so when LibreOffice is inactive, a mouse move event causes
+    // a tooltip to be displayed. Since the tooltip window is attached to its
+    // parent window (to ensure that the tooltip is above the parent window),
+    // displaying a tooltip pulls the parent window in front of the windows
+    // of all other inactive applications.
+    // Also, don't display tooltips when mousing over non-key windows even if
+    // the application is active as the tooltip window will pull the non-key
+    // window in front of the key window.
+    if (bVisible && (mnStyle & SalFrameStyleFlags::TOOLTIP) && (![NSApp isActive] || (mpParent && ![ mpParent->mpNSWindow isKeyWindow])))
+        return;
 
     mbShown = bVisible;
     if(bVisible)
@@ -507,8 +532,8 @@ void AquaSalFrame::SetMinClientSize( tools::Long nWidth, tools::Long nHeight )
     {
         // Always add the decoration as the dimension concerns only
         // the content rectangle
-        nWidth += maGeometry.nLeftDecoration + maGeometry.nRightDecoration;
-        nHeight += maGeometry.nTopDecoration + maGeometry.nBottomDecoration;
+        nWidth += maGeometry.leftDecoration() + maGeometry.rightDecoration();
+        nHeight += maGeometry.topDecoration() + maGeometry.bottomDecoration();
 
         NSSize aSize = { static_cast<CGFloat>(nWidth), static_cast<CGFloat>(nHeight) };
 
@@ -529,8 +554,8 @@ void AquaSalFrame::SetMaxClientSize( tools::Long nWidth, tools::Long nHeight )
     {
         // Always add the decoration as the dimension concerns only
         // the content rectangle
-        nWidth += maGeometry.nLeftDecoration + maGeometry.nRightDecoration;
-        nHeight += maGeometry.nTopDecoration + maGeometry.nBottomDecoration;
+        nWidth += maGeometry.leftDecoration() + maGeometry.rightDecoration();
+        nHeight += maGeometry.topDecoration() + maGeometry.bottomDecoration();
 
         // Carbon windows can't have a size greater than 32767x32767
         if (nWidth>32767) nWidth=32767;
@@ -548,8 +573,8 @@ void AquaSalFrame::GetClientSize( tools::Long& rWidth, tools::Long& rHeight )
 {
     if (mbShown || mbInitShow || Application::IsBitmapRendering())
     {
-        rWidth  = maGeometry.nWidth;
-        rHeight = maGeometry.nHeight;
+        rWidth = maGeometry.width();
+        rHeight = maGeometry.height();
     }
     else
     {
@@ -578,24 +603,24 @@ SalEvent AquaSalFrame::PreparePosSize(tools::Long nX, tools::Long nY, tools::Lon
     if (Application::IsBitmapRendering())
     {
         if (nFlags & SAL_FRAME_POSSIZE_X)
-            maGeometry.nX = nX;
+            maGeometry.setX(nX);
         if (nFlags & SAL_FRAME_POSSIZE_Y)
-            maGeometry.nY = nY;
+            maGeometry.setY(nY);
         if (nFlags & SAL_FRAME_POSSIZE_WIDTH)
         {
-            maGeometry.nWidth = nWidth;
-            if (mnMaxWidth > 0 && maGeometry.nWidth > o3tl::make_unsigned(mnMaxWidth))
-                maGeometry.nWidth = mnMaxWidth;
-            if (mnMinWidth > 0 && maGeometry.nWidth < o3tl::make_unsigned(mnMinWidth))
-                maGeometry.nWidth = mnMinWidth;
+            maGeometry.setWidth(nWidth);
+            if (mnMaxWidth > 0 && maGeometry.width() > mnMaxWidth)
+                maGeometry.setWidth(mnMaxWidth);
+            if (mnMinWidth > 0 && maGeometry.width() < mnMinWidth)
+                maGeometry.setWidth(mnMinWidth);
         }
         if (nFlags & SAL_FRAME_POSSIZE_HEIGHT)
         {
-            maGeometry.nHeight = nHeight;
-            if (mnMaxHeight > 0 && maGeometry.nHeight > o3tl::make_unsigned(mnMaxHeight))
-                maGeometry.nHeight = mnMaxHeight;
-            if (mnMinHeight > 0 && maGeometry.nHeight < o3tl::make_unsigned(mnMinHeight))
-                maGeometry.nHeight = mnMinHeight;
+            maGeometry.setHeight(nHeight);
+            if (mnMaxHeight > 0 && maGeometry.height() > mnMaxHeight)
+                maGeometry.setHeight(mnMaxHeight);
+            if (mnMinHeight > 0 && maGeometry.height() < mnMinHeight)
+                maGeometry.setHeight(mnMinHeight);
         }
         if (nEvent != SalEvent::NONE)
             CallCallback(nEvent, nullptr);
@@ -604,7 +629,7 @@ SalEvent AquaSalFrame::PreparePosSize(tools::Long nX, tools::Long nY, tools::Lon
     return nEvent;
 }
 
-void AquaSalFrame::SetWindowState( const SalFrameState* pState )
+void AquaSalFrame::SetWindowState(const vcl::WindowData* pState)
 {
     if (!mpNSWindow && !Application::IsBitmapRendering())
         return;
@@ -612,12 +637,12 @@ void AquaSalFrame::SetWindowState( const SalFrameState* pState )
     OSX_SALDATA_RUNINMAIN( SetWindowState( pState ) )
 
     sal_uInt16 nFlags = 0;
-    nFlags |= ((pState->mnMask & WindowStateMask::X) ? SAL_FRAME_POSSIZE_X : 0);
-    nFlags |= ((pState->mnMask & WindowStateMask::Y) ? SAL_FRAME_POSSIZE_Y : 0);
-    nFlags |= ((pState->mnMask & WindowStateMask::Width) ? SAL_FRAME_POSSIZE_WIDTH : 0);
-    nFlags |= ((pState->mnMask & WindowStateMask::Height) ? SAL_FRAME_POSSIZE_HEIGHT : 0);
+    nFlags |= ((pState->mask() & vcl::WindowDataMask::X) ? SAL_FRAME_POSSIZE_X : 0);
+    nFlags |= ((pState->mask() & vcl::WindowDataMask::Y) ? SAL_FRAME_POSSIZE_Y : 0);
+    nFlags |= ((pState->mask() & vcl::WindowDataMask::Width) ? SAL_FRAME_POSSIZE_WIDTH : 0);
+    nFlags |= ((pState->mask() & vcl::WindowDataMask::Height) ? SAL_FRAME_POSSIZE_HEIGHT : 0);
 
-    SalEvent nEvent = PreparePosSize(pState->mnX, pState->mnY, pState->mnWidth, pState->mnHeight, nFlags);
+    SalEvent nEvent = PreparePosSize(pState->x(), pState->y(), pState->width(), pState->height(), nFlags);
     if (Application::IsBitmapRendering())
         return;
 
@@ -625,19 +650,19 @@ void AquaSalFrame::SetWindowState( const SalFrameState* pState )
     NSRect aStateRect = [mpNSWindow frame];
     aStateRect = [NSWindow contentRectForFrameRect: aStateRect styleMask: mnStyleMask];
     CocoaToVCL(aStateRect);
-    if (pState->mnMask & WindowStateMask::X)
-        aStateRect.origin.x = float(pState->mnX);
-    if (pState->mnMask & WindowStateMask::Y)
-        aStateRect.origin.y = float(pState->mnY);
-    if (pState->mnMask & WindowStateMask::Width)
-        aStateRect.size.width = float(pState->mnWidth);
-    if (pState->mnMask & WindowStateMask::Height)
-        aStateRect.size.height = float(pState->mnHeight);
+    if (pState->mask() & vcl::WindowDataMask::X)
+        aStateRect.origin.x = float(pState->x());
+    if (pState->mask() & vcl::WindowDataMask::Y)
+        aStateRect.origin.y = float(pState->y());
+    if (pState->mask() & vcl::WindowDataMask::Width)
+        aStateRect.size.width = float(pState->width());
+    if (pState->mask() & vcl::WindowDataMask::Height)
+        aStateRect.size.height = float(pState->height());
     VCLToCocoa(aStateRect);
     aStateRect = [NSWindow frameRectForContentRect: aStateRect styleMask: mnStyleMask];
     [mpNSWindow setFrame: aStateRect display: NO];
 
-    if (pState->mnState == WindowStateState::Minimized)
+    if (pState->state() == vcl::WindowState::Minimized)
         [mpNSWindow miniaturize: NSApp];
     else if ([mpNSWindow isMiniaturized])
         [mpNSWindow deminiaturize: NSApp];
@@ -646,7 +671,7 @@ void AquaSalFrame::SetWindowState( const SalFrameState* pState )
        the program specified one), but comes closest since the default behavior is
        "maximized" if the user did not intervene
      */
-    if (pState->mnState == WindowStateState::Maximized)
+    if (pState->state() == vcl::WindowState::Maximized)
     {
         if (![mpNSWindow isZoomed])
             [mpNSWindow zoom: NSApp];
@@ -674,20 +699,15 @@ void AquaSalFrame::SetWindowState( const SalFrameState* pState )
     }
 }
 
-bool AquaSalFrame::GetWindowState( SalFrameState* pState )
+bool AquaSalFrame::GetWindowState(vcl::WindowData* pState)
 {
     if (!mpNSWindow)
     {
         if (Application::IsBitmapRendering())
         {
-            pState->mnMask = WindowStateMask::X | WindowStateMask::Y
-                             | WindowStateMask::Width | WindowStateMask::Height
-                             | WindowStateMask::State;
-            pState->mnX = maGeometry.nX;
-            pState->mnY = maGeometry.nY;
-            pState->mnWidth = maGeometry.nWidth;
-            pState->mnHeight = maGeometry.nHeight;
-            pState->mnState = WindowStateState::Normal;
+            pState->setMask(vcl::WindowDataMask::PosSizeState);
+            pState->setPosSize(maGeometry.posSize());
+            pState->setState(vcl::WindowState::Normal);
             return true;
         }
         return false;
@@ -695,26 +715,22 @@ bool AquaSalFrame::GetWindowState( SalFrameState* pState )
 
     OSX_SALDATA_RUNINMAIN_UNION( GetWindowState( pState ), boolean )
 
-    pState->mnMask = WindowStateMask::X                 |
-                     WindowStateMask::Y                 |
-                     WindowStateMask::Width             |
-                     WindowStateMask::Height            |
-                     WindowStateMask::State;
+    pState->setMask(vcl::WindowDataMask::PosSizeState);
 
     NSRect aStateRect = [mpNSWindow frame];
     aStateRect = [NSWindow contentRectForFrameRect: aStateRect styleMask: mnStyleMask];
     CocoaToVCL( aStateRect );
-    pState->mnX         = tools::Long(aStateRect.origin.x);
-    pState->mnY         = tools::Long(aStateRect.origin.y);
-    pState->mnWidth     = tools::Long(aStateRect.size.width);
-    pState->mnHeight    = tools::Long(aStateRect.size.height);
+    pState->setX(static_cast<sal_Int32>(aStateRect.origin.x));
+    pState->setY(static_cast<sal_Int32>(aStateRect.origin.y));
+    pState->setWidth(static_cast<sal_uInt32>(aStateRect.size.width));
+    pState->setHeight(static_cast<sal_uInt32>(aStateRect.size.height));
 
     if( [mpNSWindow isMiniaturized] )
-        pState->mnState = WindowStateState::Minimized;
+        pState->setState(vcl::WindowState::Minimized);
     else if( ! [mpNSWindow isZoomed] )
-        pState->mnState = WindowStateState::Normal;
+        pState->setState(vcl::WindowState::Normal);
     else
-        pState->mnState = WindowStateState::Maximized;
+        pState->setState(vcl::WindowState::Maximized);
 
     return true;
 }
@@ -961,7 +977,7 @@ void AquaSalFrame::SetPointerPos( tools::Long nX, tools::Long nY )
 
     // FIXME: use Cocoa functions
     // FIXME: multiscreen support
-    CGPoint aPoint = { static_cast<CGFloat>(nX + maGeometry.nX), static_cast<CGFloat>(nY + maGeometry.nY) };
+    CGPoint aPoint = { static_cast<CGFloat>(nX + maGeometry.x()), static_cast<CGFloat>(nY + maGeometry.y()) };
     CGDirectDisplayID mainDisplayID = CGMainDisplayID();
     CGDisplayMoveCursorToPoint( mainDisplayID, aPoint );
 }
@@ -1020,8 +1036,16 @@ void AquaSalFrame::SetInputContext( SalInputContext* pContext )
         return;
 }
 
-void AquaSalFrame::EndExtTextInput( EndExtTextInputFlags )
+void AquaSalFrame::EndExtTextInput( EndExtTextInputFlags nFlags )
 {
+    // tdf#82115 Commit uncommitted text when a popup menu is opened
+    // The Windows implementation of this method commits or discards the native
+    // input method session. It appears that very few, if any, macOS
+    // applications discard the uncommitted text when cancelling a session so
+    // always commit the uncommitted text.
+    SalFrameWindow *pWindow = static_cast<SalFrameWindow*>(mpNSWindow);
+    if (pWindow && [pWindow isKindOfClass:[SalFrameWindow class]])
+        [pWindow endExtTextInput:nFlags];
 }
 
 OUString AquaSalFrame::GetKeyName( sal_uInt16 nKeyCode )
@@ -1069,6 +1093,7 @@ OUString AquaSalFrame::GetKeyName( sal_uInt16 nKeyCode )
         aKeyMap[ KEY_SEMICOLON ] = ";";
         aKeyMap[ KEY_QUOTERIGHT ] = "'";
         aKeyMap[ KEY_RIGHTCURLYBRACKET ] = "}";
+        aKeyMap[ KEY_COLON ] = ":";
 
         /* yet unmapped KEYCODES:
         aKeyMap[ KEY_INSERT ]   = OUString( sal_Unicode( ) );
@@ -1158,6 +1183,48 @@ static void getAppleScrollBarVariant(StyleSettings &rSettings)
     }
 }
 
+static Color getNSBoxBackgroundColor(NSColor* pSysColor)
+{
+    // Figuring out what a NSBox will draw for windowBackground, etc. seems very difficult.
+    // So just draw to a 1x1 surface and read what actually gets drawn
+    // This is similar to getPixel
+#if defined OSL_BIGENDIAN
+    struct
+    {
+        unsigned char b, g, r, a;
+    } aPixel;
+#else
+    struct
+    {
+        unsigned char a, r, g, b;
+    } aPixel;
+#endif
+
+    // create a one-pixel bitmap context
+    CGContextRef xOnePixelContext = CGBitmapContextCreate(
+        &aPixel, 1, 1, 8, 32, GetSalData()->mxRGBSpace,
+        uint32_t(kCGImageAlphaNoneSkipFirst) | uint32_t(kCGBitmapByteOrder32Big));
+
+    NSGraphicsContext* graphicsContext = [NSGraphicsContext graphicsContextWithCGContext:xOnePixelContext flipped:NO];
+
+    NSRect rect = { NSZeroPoint, NSMakeSize(1, 1) };
+    NSBox* pBox = [[NSBox alloc] initWithFrame: rect];
+
+    [pBox setBoxType: NSBoxCustom];
+    [pBox setFillColor: pSysColor];
+    SAL_WNODEPRECATED_DECLARATIONS_PUSH // setBorderType first deprecated in macOS 10.15
+    [pBox setBorderType: NSNoBorder];
+    SAL_WNODEPRECATED_DECLARATIONS_POP
+
+    [pBox displayRectIgnoringOpacity: rect inContext: graphicsContext];
+
+    [pBox release];
+
+    CGContextRelease(xOnePixelContext);
+
+    return Color(aPixel.r, aPixel.g, aPixel.b);
+}
+
 static Color getColor( NSColor* pSysColor, const Color& rDefault, NSWindow* pWin )
 {
     Color aRet( rDefault );
@@ -1174,12 +1241,6 @@ SAL_WNODEPRECATED_DECLARATIONS_POP
             CGFloat r = 0, g = 0, b = 0, a = 0;
             [pRBGColor getRed: &r green: &g blue: &b alpha: &a];
             aRet = Color( int(r*255.999), int(g*255.999), int(b*255.999) );
-            /*
-            do not release here; leads to duplicate free in yield
-            it seems the converted color comes out autoreleased, although this
-            is not documented
-            [pRBGColor release];
-            */
         }
     }
     return aRet;
@@ -1191,7 +1252,7 @@ static vcl::Font getFont( NSFont* pFont, sal_Int32 nDPIY, const vcl::Font& rDefa
     if( pFont )
     {
         aResult.SetFamilyName( GetOUString( [pFont familyName] ) );
-        aResult.SetFontHeight( static_cast<int>(([pFont pointSize] * 72.0 / static_cast<float>(nDPIY))+0.5) );
+        aResult.SetFontHeight( static_cast<int>(ceil([pFont pointSize] * 72.0 / static_cast<float>(nDPIY))) );
         aResult.SetItalic( ([pFont italicAngle] != 0.0) ? ITALIC_NORMAL : ITALIC_NONE );
         // FIMXE: bold ?
     }
@@ -1209,6 +1270,26 @@ void AquaSalFrame::getResolution( sal_Int32& o_rDPIX, sal_Int32& o_rDPIY )
         ReleaseGraphics( mpGraphics );
     }
     mpGraphics->GetResolution( o_rDPIX, o_rDPIY );
+}
+
+void AquaSalFrame::UpdateDarkMode()
+{
+    if (@available(macOS 10.14, iOS 13, *))
+    {
+        switch (MiscSettings::GetDarkMode())
+        {
+            case 0: // auto
+            default:
+                [NSApp setAppearance: nil];
+                break;
+            case 1: // light
+                [NSApp setAppearance: [NSAppearance appearanceNamed: NSAppearanceNameAqua]];
+                break;
+            case 2: // dark
+                [NSApp setAppearance: [NSAppearance appearanceNamed: NSAppearanceNameDarkAqua]];
+                break;
+        }
+    }
 }
 
 // on OSX-Aqua the style settings are independent of the frame, so it does
@@ -1232,20 +1313,47 @@ SAL_WNODEPRECATED_DECLARATIONS_PUSH
         return;
 SAL_WNODEPRECATED_DECLARATIONS_POP
 
+SAL_WNODEPRECATED_DECLARATIONS_PUSH
+        // "'setCurrentAppearance:' is deprecated: first deprecated in macOS 12.0 - Use
+        // -performAsCurrentDrawingAppearance: to temporarily set the drawing appearance, or
+        // +currentDrawingAppearance to access the currently drawing appearance."
+    [NSAppearance setCurrentAppearance: mpNSView.effectiveAppearance];
+SAL_WNODEPRECATED_DECLARATIONS_POP
+
     StyleSettings aStyleSettings = rSettings.GetStyleSettings();
 
-    // Background Color
-    Color aBackgroundColor( 0xEC, 0xEC, 0xEC );
-    aStyleSettings.BatchSetBackgrounds( aBackgroundColor, false );
-    aStyleSettings.SetLightBorderColor( aBackgroundColor );
+    bool bUseDarkMode(false);
+    if (@available(macOS 10.14, iOS 13, *))
+    {
+        NSAppearanceName match = [mpNSView.effectiveAppearance bestMatchFromAppearancesWithNames: @[
+                                  NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        bUseDarkMode = [match isEqualToString: NSAppearanceNameDarkAqua];
+    }
+    OUString sThemeName(!bUseDarkMode ? u"sukapura" : u"sukapura_dark");
+    aStyleSettings.SetPreferredIconTheme(sThemeName, bUseDarkMode);
 
-    Color aInactiveTabColor( aBackgroundColor );
+    Color aControlBackgroundColor(getNSBoxBackgroundColor([NSColor controlBackgroundColor]));
+    Color aWindowBackgroundColor(getNSBoxBackgroundColor([NSColor windowBackgroundColor]));
+    Color aUnderPageBackgroundColor(getNSBoxBackgroundColor([NSColor underPageBackgroundColor]));
+
+    // Background Color
+    aStyleSettings.BatchSetBackgrounds( aWindowBackgroundColor, false );
+    aStyleSettings.SetLightBorderColor( aWindowBackgroundColor );
+
+    aStyleSettings.SetActiveTabColor(aWindowBackgroundColor);
+    Color aInactiveTabColor( aWindowBackgroundColor );
     aInactiveTabColor.DecreaseLuminance( 32 );
     aStyleSettings.SetInactiveTabColor( aInactiveTabColor );
 
-    Color aShadowColor( aStyleSettings.GetShadowColor() );
-    aShadowColor.IncreaseLuminance( 32 );
+    Color aShadowColor = getColor( [NSColor systemGrayColor ],
+                                      aStyleSettings.GetShadowColor(), mpNSWindow );
     aStyleSettings.SetShadowColor( aShadowColor );
+
+    // tdf#152284 for DarkMode brighten it, while darken for BrightMode
+    NSColor* pDarkColor = bUseDarkMode ? [[NSColor systemGrayColor] highlightWithLevel: 0.5]
+                                       : [[NSColor systemGrayColor] shadowWithLevel: 0.5];
+    Color aDarkShadowColor = getColor( pDarkColor, aStyleSettings.GetDarkShadowColor(), mpNSWindow );
+    aStyleSettings.SetDarkShadowColor(aDarkShadowColor);
 
     // get the system font settings
     vcl::Font aAppFont = aStyleSettings.GetAppFont();
@@ -1275,6 +1383,11 @@ SAL_WNODEPRECATED_DECLARATIONS_POP
                                          aStyleSettings.GetHighlightTextColor(), mpNSWindow ) );
     aStyleSettings.SetHighlightTextColor( aHighlightTextColor );
 
+    aStyleSettings.SetLinkColor(getColor( [NSColor linkColor],
+                                           aStyleSettings.GetLinkColor(), mpNSWindow ) );
+    aStyleSettings.SetVisitedLinkColor(getColor( [NSColor purpleColor],
+                                                  aStyleSettings.GetVisitedLinkColor(), mpNSWindow ) );
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     Color aMenuHighlightColor( getColor( [NSColor selectedMenuItemColor],
@@ -1285,7 +1398,7 @@ SAL_WNODEPRECATED_DECLARATIONS_POP
                                              aStyleSettings.GetMenuHighlightTextColor(), mpNSWindow ) );
     aStyleSettings.SetMenuHighlightTextColor( aMenuHighlightTextColor );
 
-    aStyleSettings.SetMenuColor( aBackgroundColor );
+    aStyleSettings.SetMenuColor( aWindowBackgroundColor );
     Color aMenuTextColor( getColor( [NSColor textColor],
                                     aStyleSettings.GetMenuTextColor(), mpNSWindow ) );
     aStyleSettings.SetMenuTextColor( aMenuTextColor );
@@ -1293,16 +1406,37 @@ SAL_WNODEPRECATED_DECLARATIONS_POP
     aStyleSettings.SetMenuBarRolloverTextColor( aMenuTextColor );
     aStyleSettings.SetMenuBarHighlightTextColor(aStyleSettings.GetMenuHighlightTextColor());
 
+    aStyleSettings.SetListBoxWindowBackgroundColor( aWindowBackgroundColor );
+    aStyleSettings.SetListBoxWindowTextColor( aMenuTextColor );
+    aStyleSettings.SetListBoxWindowHighlightColor( aMenuHighlightColor );
+    aStyleSettings.SetListBoxWindowHighlightTextColor( aMenuHighlightTextColor );
+
+    // FIXME: Starting with macOS Big Sur, coloring has changed. Currently there is no documentation which system color should be
+    // used for some button states and for selected tab text. As a workaround the current OS version has to be considered. This code
+    // has to be reviewed once issue is covered by documentation.
+
     // Set text colors for buttons and their different status according to OS settings, typically white for selected buttons,
     // black otherwise
 
-    Color aControlTextColor(getColor([NSColor controlTextColor], COL_BLACK, mpNSWindow));
-    Color aSelectedControlTextColor(getColor([NSColor selectedControlTextColor], COL_BLACK, mpNSWindow));
-    Color aAlternateSelectedControlTextColor(getColor([NSColor alternateSelectedControlTextColor], COL_WHITE, mpNSWindow));
-    aStyleSettings.SetDefaultButtonTextColor(aAlternateSelectedControlTextColor);
+    NSOperatingSystemVersion aOSVersion = { .majorVersion = 10, .minorVersion = 16, .patchVersion = 0 };
+    Color aControlTextColor(getColor([NSColor controlTextColor], COL_BLACK, mpNSWindow ));
+    Color aSelectedControlTextColor(getColor([NSColor selectedControlTextColor], COL_BLACK, mpNSWindow ));
+    Color aAlternateSelectedControlTextColor(getColor([NSColor alternateSelectedControlTextColor], COL_WHITE, mpNSWindow ));
+    aStyleSettings.SetWindowColor(aWindowBackgroundColor);
+    aStyleSettings.SetListBoxWindowBackgroundColor(aWindowBackgroundColor);
+
+    aStyleSettings.SetDialogTextColor(aControlTextColor);
     aStyleSettings.SetButtonTextColor(aControlTextColor);
-    aStyleSettings.SetDefaultActionButtonTextColor(aAlternateSelectedControlTextColor);
     aStyleSettings.SetActionButtonTextColor(aControlTextColor);
+    aStyleSettings.SetRadioCheckTextColor(aControlTextColor);
+    aStyleSettings.SetGroupTextColor(aControlTextColor);
+    aStyleSettings.SetLabelTextColor(aControlTextColor);
+    aStyleSettings.SetWindowTextColor(aControlTextColor);
+    aStyleSettings.SetFieldTextColor(aControlTextColor);
+
+    aStyleSettings.SetFieldRolloverTextColor(aControlTextColor);
+    aStyleSettings.SetFieldColor(aControlBackgroundColor);
+    aStyleSettings.SetDefaultActionButtonTextColor(aAlternateSelectedControlTextColor);
     aStyleSettings.SetFlatButtonTextColor(aControlTextColor);
     aStyleSettings.SetDefaultButtonRolloverTextColor(aAlternateSelectedControlTextColor);
     aStyleSettings.SetButtonRolloverTextColor(aControlTextColor);
@@ -1310,26 +1444,38 @@ SAL_WNODEPRECATED_DECLARATIONS_POP
     aStyleSettings.SetActionButtonRolloverTextColor(aControlTextColor);
     aStyleSettings.SetFlatButtonRolloverTextColor(aControlTextColor);
     aStyleSettings.SetDefaultButtonPressedRolloverTextColor(aAlternateSelectedControlTextColor);
-    aStyleSettings.SetButtonPressedRolloverTextColor(aAlternateSelectedControlTextColor);
     aStyleSettings.SetDefaultActionButtonPressedRolloverTextColor(aAlternateSelectedControlTextColor);
-    aStyleSettings.SetActionButtonPressedRolloverTextColor(aAlternateSelectedControlTextColor);
     aStyleSettings.SetFlatButtonPressedRolloverTextColor(aControlTextColor);
+    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion: aOSVersion])
+    {
+        aStyleSettings.SetDefaultButtonTextColor(aAlternateSelectedControlTextColor);
+        aStyleSettings.SetButtonPressedRolloverTextColor(aSelectedControlTextColor);
+        aStyleSettings.SetActionButtonPressedRolloverTextColor(aSelectedControlTextColor);
+    }
+    else
+    {
+        aStyleSettings.SetButtonPressedRolloverTextColor(aAlternateSelectedControlTextColor);
+        aStyleSettings.SetActionButtonPressedRolloverTextColor(aAlternateSelectedControlTextColor);
+        aStyleSettings.SetDefaultButtonTextColor(aSelectedControlTextColor);
+    }
+
+    aStyleSettings.SetWorkspaceColor(aUnderPageBackgroundColor);
+
+    aStyleSettings.SetHelpColor(aControlBackgroundColor);
+    aStyleSettings.SetHelpTextColor(aControlTextColor);
+    aStyleSettings.SetToolTextColor(aControlTextColor);
 
     // Set text colors for tabs according to OS settings
 
     aStyleSettings.SetTabTextColor(aControlTextColor);
-
-    // FIXME: Starting with macOS Big Sur, coloring has changed. Currently there is no documentation which system color should be
-    // used for selected tab text. As a workaround the current OS version has to be considered. This code has to be reviewed once
-    // issue is covered by documentation.
-
-    NSOperatingSystemVersion aOSVersion = { .majorVersion = 10, .minorVersion = 16, .patchVersion = 0 };
+    aStyleSettings.SetTabRolloverTextColor(aControlTextColor);
     if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion: aOSVersion])
         aStyleSettings.SetTabHighlightTextColor(aSelectedControlTextColor);
     else
         aStyleSettings.SetTabHighlightTextColor(aAlternateSelectedControlTextColor);
 
     aStyleSettings.SetCursorBlinkTime( mnBlinkCursorDelay );
+    aStyleSettings.SetCursorSize(1);
 
     // no mnemonics on macOS
     aStyleSettings.SetOptions( aStyleSettings.GetOptions() | StyleSettingsOptions::NoMnemonics );
@@ -1393,9 +1539,9 @@ void AquaSalFrame::SetPosSize(
         if( AllSettings::GetLayoutRTL() )
         {
             if( (nFlags & SAL_FRAME_POSSIZE_WIDTH) != 0 )
-                nX = mpParent->maGeometry.nWidth - nWidth-1 - nX;
+                nX = static_cast<tools::Long>(mpParent->maGeometry.width()) - nWidth - 1 - nX;
             else
-                nX = mpParent->maGeometry.nWidth - static_cast<tools::Long>( aContentRect.size.width-1) - nX;
+                nX = static_cast<tools::Long>(mpParent->maGeometry.width()) - aContentRect.size.width - 1 - nX;
         }
         NSRect aParentFrameRect = [mpParent->mpNSWindow frame];
         aParentContentRect = [NSWindow contentRectForFrameRect: aParentFrameRect styleMask: mpParent->mnStyleMask];
@@ -1596,10 +1742,6 @@ LanguageType AquaSalFrame::GetInputLanguage()
     return LANGUAGE_DONTKNOW;
 }
 
-void AquaSalFrame::DrawMenuBar()
-{
-}
-
 void AquaSalFrame::SetMenu( SalMenu* pSalMenu )
 {
     OSX_SALDATA_RUNINMAIN( SetMenu( pSalMenu ) )
@@ -1670,10 +1812,10 @@ void AquaSalFrame::UpdateFrameGeometry()
         if( pScreens )
         {
             unsigned int nNewDisplayScreenNumber = [pScreens indexOfObject: pScreen];
-            if (bFirstTime || maGeometry.nDisplayScreenNumber != nNewDisplayScreenNumber)
+            if (bFirstTime || maGeometry.screen() != nNewDisplayScreenNumber)
             {
                 mbGeometryDidChange = true;
-                maGeometry.nDisplayScreenNumber = nNewDisplayScreenNumber;
+                maGeometry.setScreen(nNewDisplayScreenNumber);
             }
         }
     }
@@ -1705,19 +1847,17 @@ void AquaSalFrame::UpdateFrameGeometry()
         maContentRect = aContentRect;
         maFrameRect = aFrameRect;
 
-        maGeometry.nX = static_cast<int>(aContentRect.origin.x);
-        maGeometry.nY = static_cast<int>(aContentRect.origin.y);
+        maGeometry.setX(static_cast<sal_Int32>(aContentRect.origin.x));
+        maGeometry.setY(static_cast<sal_Int32>(aContentRect.origin.y));
+        maGeometry.setWidth(static_cast<sal_uInt32>(aContentRect.size.width));
+        maGeometry.setHeight(static_cast<sal_uInt32>(aContentRect.size.height));
 
-        maGeometry.nLeftDecoration = static_cast<unsigned int>(aContentRect.origin.x - aFrameRect.origin.x);
-        maGeometry.nRightDecoration = static_cast<unsigned int>((aFrameRect.origin.x + aFrameRect.size.width) -
-                                      (aContentRect.origin.x + aContentRect.size.width));
-
-        maGeometry.nTopDecoration = static_cast<unsigned int>(aContentRect.origin.y - aFrameRect.origin.y);
-        maGeometry.nBottomDecoration = static_cast<unsigned int>((aFrameRect.origin.y + aFrameRect.size.height) -
-                                       (aContentRect.origin.y + aContentRect.size.height));
-
-        maGeometry.nWidth = static_cast<unsigned int>(aContentRect.size.width);
-        maGeometry.nHeight = static_cast<unsigned int>(aContentRect.size.height);
+        maGeometry.setLeftDecoration(static_cast<sal_uInt32>(aContentRect.origin.x - aFrameRect.origin.x));
+        maGeometry.setRightDecoration(static_cast<sal_uInt32>((aFrameRect.origin.x + aFrameRect.size.width) -
+                                      (aContentRect.origin.x + aContentRect.size.width)));
+        maGeometry.setTopDecoration(static_cast<sal_uInt32>(aContentRect.origin.y - aFrameRect.origin.y));
+        maGeometry.setBottomDecoration(static_cast<sal_uInt32>((aFrameRect.origin.y + aFrameRect.size.height) -
+                                       (aContentRect.origin.y + aContentRect.size.height)));
     }
 }
 

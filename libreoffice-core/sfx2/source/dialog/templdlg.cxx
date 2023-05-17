@@ -19,15 +19,7 @@
 
 #include <memory>
 
-#include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/container/XNameAccess.hpp>
-#include <vcl/commandevent.hxx>
 #include <vcl/commandinfoprovider.hxx>
-#include <vcl/event.hxx>
-#include <vcl/settings.hxx>
-#include <vcl/svapp.hxx>
-#include <vcl/weldutils.hxx>
 #include <svl/intitem.hxx>
 #include <svl/stritem.hxx>
 #include <svl/style.hxx>
@@ -41,31 +33,21 @@
 
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sfx2/app.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/bindings.hxx>
 #include <sfx2/templdlg.hxx>
 #include <templdgi.hxx>
-#include <tplcitem.hxx>
 #include <sfx2/styfitem.hxx>
 #include <sfx2/objsh.hxx>
-#include <sfx2/viewsh.hxx>
-#include <sfx2/newstyle.hxx>
 #include <sfx2/tplpitem.hxx>
 #include <sfx2/sfxresid.hxx>
 
 #include <sfx2/sfxsids.hrc>
 #include <sfx2/strings.hrc>
-#include <sfx2/docfac.hxx>
-#include <sfx2/module.hxx>
 #include <helpids.h>
 #include <sfx2/viewfrm.hxx>
-
-#include <comphelper/string.hxx>
-
-#include <sfx2/StyleManager.hxx>
-#include <sfx2/StylePreviewRenderer.hxx>
 
 using namespace css;
 using namespace css::beans;
@@ -190,7 +172,6 @@ void SfxCommonTemplateDialog_Impl::connect_stylelist_set_water_can_state(
 
 SfxCommonTemplateDialog_Impl::SfxCommonTemplateDialog_Impl(SfxBindings* pB, weld::Container* pC, weld::Builder* pBuilder)
     : pBindings(pB)
-    , mpContainer(pC)
     , xModuleManager(frame::ModuleManager::create(::comphelper::getProcessComponentContext()))
     , m_pDeletionWatcher(nullptr)
     , m_aStyleList(pBuilder, pB, this, pC, "treeview", "flatview")
@@ -276,7 +257,6 @@ void SfxCommonTemplateDialog_Impl::Initialize()
     m_aStyleList.connect_ClearResource(LINK(this, SfxCommonTemplateDialog_Impl, ClearResource_Hdl));
     m_aStyleList.connect_LoadFactoryStyleFilter(LINK(this, SfxCommonTemplateDialog_Impl, LoadFactoryStyleFilter_Hdl));
     m_aStyleList.connect_SaveSelection(LINK(this, SfxCommonTemplateDialog_Impl, SaveSelection_Hdl));
-    m_aStyleList.connect_UpdateStyleDependents(LINK(this, SfxCommonTemplateDialog_Impl, UpdateStyleDependents_Hdl));
     m_aStyleList.connect_UpdateFamily(LINK(this, SfxCommonTemplateDialog_Impl, UpdateFamily_Hdl));
     m_aStyleList.connect_UpdateStyles(LINK(this, SfxCommonTemplateDialog_Impl, UpdateStyles_Hdl));
 
@@ -513,17 +493,14 @@ void SfxCommonTemplateDialog_Impl::FilterSelect(
     m_aStyleList.FilterSelect(nActFilter, true);
 }
 
-void SfxCommonTemplateDialog_Impl::IsUpdate(bool bDoUpdate, StyleList&)
+void SfxCommonTemplateDialog_Impl::IsUpdate(StyleList&)
 {
     SfxViewFrame* pViewFrame = pBindings->GetDispatcher_Impl()->GetFrame();
     SfxObjectShell* pDocShell = pViewFrame->GetObjectShell();
-    if (bDoUpdate)
+    nActFilter = static_cast<sal_uInt16>(LoadFactoryStyleFilter_Hdl(pDocShell));
+    if (0xffff == nActFilter)
     {
-        nActFilter = static_cast<sal_uInt16>(LoadFactoryStyleFilter_Hdl(pDocShell));
-        if (0xffff == nActFilter)
-        {
-            nActFilter = pDocShell->GetAutoStyleFilterIndex();
-        }
+        nActFilter = pDocShell->GetAutoStyleFilterIndex();
     }
 }
 
@@ -633,7 +610,7 @@ void SfxCommonTemplateDialog_Impl::SaveFactoryStyleFilter( SfxObjectShell const 
     OSL_ENSURE( i_pObjSh, "SfxCommonTemplateDialog_Impl::LoadFactoryStyleFilter(): no ObjectShell" );
     Sequence< PropertyValue > lProps{ comphelper::makePropertyValue(
         "ooSetupFactoryStyleFilter", i_nFilter | (m_bWantHierarchical ? 0x1000 : 0)) };
-    xModuleManager->replaceByName( getModuleIdentifier( xModuleManager, i_pObjSh ), makeAny( lProps ) );
+    xModuleManager->replaceByName( getModuleIdentifier( xModuleManager, i_pObjSh ), Any( lProps ) );
 }
 
 IMPL_LINK_NOARG(SfxCommonTemplateDialog_Impl, SaveSelection_Hdl, StyleList&, SfxObjectShell*)
@@ -684,24 +661,6 @@ void SfxCommonTemplateDialog_Impl::EnableExample_Impl(sal_uInt16 nId, bool bEnab
     }
 }
 
-SfxTemplateDialog_Impl::SfxTemplateDialog_Impl(SfxBindings* pB, SfxTemplatePanelControl* pDlgWindow)
-    : SfxCommonTemplateDialog_Impl(pB, pDlgWindow->get_container(), pDlgWindow->get_builder())
-    , m_xActionTbL(pDlgWindow->get_builder()->weld_toolbar("left"))
-    , m_xActionTbR(pDlgWindow->get_builder()->weld_toolbar("right"))
-    , m_xToolMenu(pDlgWindow->get_builder()->weld_menu("toolmenu"))
-    , m_nActionTbLVisible(0)
-{
-    m_xActionTbR->set_item_help_id("watercan", HID_TEMPLDLG_WATERCAN);
-    // shown/hidden in SfxTemplateDialog_Impl::ReplaceUpdateButtonByMenu()
-    m_xActionTbR->set_item_help_id("new", HID_TEMPLDLG_NEWBYEXAMPLE);
-    m_xActionTbR->set_item_help_id("newmenu", HID_TEMPLDLG_NEWBYEXAMPLE);
-    m_xActionTbR->set_item_menu("newmenu", m_xToolMenu.get());
-    m_xToolMenu->connect_activate(LINK(this, SfxTemplateDialog_Impl, ToolMenuSelectHdl));
-    m_xActionTbR->set_item_help_id("update", HID_TEMPLDLG_UPDATEBYEXAMPLE);
-
-    Initialize();
-}
-
 class ToolbarDropTarget final : public DropTargetHelper
 {
 private:
@@ -724,6 +683,24 @@ public:
         return m_rParent.ExecuteDrop(rEvt);
     }
 };
+
+SfxTemplateDialog_Impl::SfxTemplateDialog_Impl(SfxBindings* pB, SfxTemplatePanelControl* pDlgWindow)
+    : SfxCommonTemplateDialog_Impl(pB, pDlgWindow->get_container(), pDlgWindow->get_builder())
+    , m_xActionTbL(pDlgWindow->get_builder()->weld_toolbar("left"))
+    , m_xActionTbR(pDlgWindow->get_builder()->weld_toolbar("right"))
+    , m_xToolMenu(pDlgWindow->get_builder()->weld_menu("toolmenu"))
+    , m_nActionTbLVisible(0)
+{
+    m_xActionTbR->set_item_help_id("watercan", HID_TEMPLDLG_WATERCAN);
+    // shown/hidden in SfxTemplateDialog_Impl::ReplaceUpdateButtonByMenu()
+    m_xActionTbR->set_item_help_id("new", HID_TEMPLDLG_NEWBYEXAMPLE);
+    m_xActionTbR->set_item_help_id("newmenu", HID_TEMPLDLG_NEWBYEXAMPLE);
+    m_xActionTbR->set_item_menu("newmenu", m_xToolMenu.get());
+    m_xToolMenu->connect_activate(LINK(this, SfxTemplateDialog_Impl, ToolMenuSelectHdl));
+    m_xActionTbR->set_item_help_id("update", HID_TEMPLDLG_UPDATEBYEXAMPLE);
+
+    Initialize();
+}
 
 void SfxTemplateDialog_Impl::Initialize()
 {

@@ -37,6 +37,10 @@ public:
         : maBitmapColor(aBitmapColor)
     {
     }
+    ImplBitmapPalette(const BitmapColor* first, const BitmapColor* last)
+        : maBitmapColor(first, last)
+    {
+    }
     ImplBitmapPalette() {}
     ImplBitmapPalette(sal_uInt16 nCount)
         : maBitmapColor(nCount)
@@ -82,6 +86,11 @@ BitmapPalette::BitmapPalette(std::initializer_list<BitmapColor> aBitmapColor)
 {
 }
 
+BitmapPalette::BitmapPalette(const BitmapColor* first, const BitmapColor* last)
+    : mpImpl({ first, last })
+{
+}
+
 BitmapPalette::BitmapPalette(sal_uInt16 nCount)
     : mpImpl(nCount)
 {
@@ -101,15 +110,12 @@ BitmapPalette& BitmapPalette::operator=(BitmapPalette&& rOther) noexcept
     return *this;
 }
 
-SAL_DLLPRIVATE const BitmapColor* BitmapPalette::ImplGetColorBuffer() const
+const BitmapColor* BitmapPalette::ImplGetColorBuffer() const
 {
     return mpImpl->GetBitmapData().data();
 }
 
-SAL_DLLPRIVATE BitmapColor* BitmapPalette::ImplGetColorBuffer()
-{
-    return mpImpl->GetBitmapData().data();
-}
+BitmapColor* BitmapPalette::ImplGetColorBuffer() { return mpImpl->GetBitmapData().data(); }
 
 BitmapChecksum BitmapPalette::GetChecksum() const
 {

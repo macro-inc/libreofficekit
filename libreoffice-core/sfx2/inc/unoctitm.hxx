@@ -21,14 +21,13 @@
 #include <memory>
 #include <com/sun/star/frame/XNotifyingDispatch.hpp>
 #include <com/sun/star/lang/XUnoTunnel.hpp>
-#include <comphelper/multiinterfacecontainer2.hxx>
+#include <comphelper/multiinterfacecontainer4.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
 #include <cppuhelper/weakref.hxx>
 
 #include <svl/lstner.hxx>
 #include <sfx2/ctrlitem.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 
 namespace com::sun::star::frame { class XFrame; }
 namespace com::sun::star::frame { class XNotifyingDispatch; }
@@ -39,13 +38,14 @@ class SfxBindings;
 class SfxDispatcher;
 class SfxSlot;
 
-typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString>
+typedef comphelper::OMultiTypeInterfaceContainerHelperVar4<OUString, css::frame::XStatusListener>
     SfxStatusDispatcher_Impl_ListenerContainer;
 
 class SfxStatusDispatcher   :   public cppu::WeakImplHelper<css::frame::XNotifyingDispatch>
 {
-    ::osl::Mutex        aMutex;
-    SfxStatusDispatcher_Impl_ListenerContainer  aListeners;
+protected:
+    std::mutex        maMutex;
+    SfxStatusDispatcher_Impl_ListenerContainer  maListeners;
 
 public:
 
@@ -61,8 +61,8 @@ public:
 
     // Something else
     void                ReleaseAll();
-    SfxStatusDispatcher_Impl_ListenerContainer& GetListeners()
-                        { return aListeners; }
+    void                sendStatusChanged(const OUString& rURL, const css::frame::FeatureStateEvent& rEvent);
+    std::vector<OUString> getContainedTypes() { std::unique_lock g(maMutex); return maListeners.getContainedTypes(g); };
 };
 
 class SfxSlotServer;
@@ -129,7 +129,7 @@ public:
                                                     SfxBindings*                       pBind,
                                                     SfxDispatcher*                     pDispat,
                                                     const SfxSlot*                     pSlot,
-                                                    const css::util::URL& rURL );
+                                                    css::util::URL aURL );
                         virtual ~SfxDispatchController_Impl() override;
 
     virtual void Notify(SfxBroadcaster& rBC, const SfxHint& rHint) override;

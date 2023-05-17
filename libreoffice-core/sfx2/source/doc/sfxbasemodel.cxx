@@ -42,7 +42,6 @@
 #include <com/sun/star/frame/DoubleInitializationException.hpp>
 #include <com/sun/star/embed/XStorage.hpp>
 #include <com/sun/star/document/XStorageChangeListener.hpp>
-#include <com/sun/star/document/IndexedPropertyValues.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/container/XIndexContainer.hpp>
@@ -60,8 +59,11 @@
 #include <com/sun/star/util/InvalidStateException.hpp>
 #include <com/sun/star/util/CloseVetoException.hpp>
 #include <comphelper/enumhelper.hxx>
+#include <comphelper/indexedpropertyvalues.hxx>
+#include <comphelper/string.hxx>
 
 #include <cppuhelper/implbase.hxx>
+#include <comphelper/lok.hxx>
 #include <comphelper/multicontainer2.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <comphelper/processfactory.hxx>
@@ -69,17 +71,18 @@
 #include <comphelper/sequenceashashmap.hxx>
 #include <comphelper/namedvaluecollection.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <svl/itemset.hxx>
 #include <svl/stritem.hxx>
 #include <svl/eitem.hxx>
 #include <svl/grabbagitem.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/svborder.hxx>
 #include <unotools/tempfile.hxx>
 #include <osl/mutex.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/filter/SvmWriter.hxx>
 #include <vcl/salctype.hxx>
 #include <vcl/gdimtf.hxx>
@@ -129,6 +132,8 @@
 #include <comphelper/profilezone.hxx>
 #include <vcl/threadex.hxx>
 #include <unotools/mediadescriptor.hxx>
+
+#include <LibreOfficeKit/LibreOfficeKitEnums.h>
 
 //  namespaces
 
@@ -212,6 +217,7 @@ struct IMPL_SfxBaseModel_DataContainer : public ::sfx2::IModifiableDocument
     bool                                                       m_bSuicide               ;
     bool                                                       m_bExternalTitle         ;
     bool                                                       m_bModifiedSinceLastSave ;
+    bool                                                       m_bDisposing             ;
     Reference< view::XPrintable>                               m_xPrintable             ;
     Reference< ui::XUIConfigurationManager2 >                  m_xUIConfigurationManager;
     ::rtl::Reference< ::sfx2::DocumentStorageModifyListener >  m_pStorageModifyListen   ;
@@ -233,6 +239,7 @@ struct IMPL_SfxBaseModel_DataContainer : public ::sfx2::IModifiableDocument
             ,   m_bSuicide              ( false     )
             ,   m_bExternalTitle        ( false     )
             ,   m_bModifiedSinceLastSave( false     )
+            ,   m_bDisposing            ( false     )
     {
         // increase global instance counter.
         ++g_nInstanceCounter;
@@ -724,6 +731,10 @@ void SAL_CALL SfxBaseModel::dispose()
         return;
     }
 
+    if  ( m_pData->m_bDisposing )
+        return;
+    m_pData->m_bDisposing = true;
+
     if ( m_pData->m_pStorageModifyListen.is() )
     {
         m_pData->m_pStorageModifyListen->dispose();
@@ -855,41 +866,47 @@ sal_Bool SAL_CALL SfxBaseModel::attachResource( const   OUString&               
 
         SfxObjectShell* pObjectShell = m_pData->m_pObjectShell.get();
 
-        ::comphelper::NamedValueCollection aArgs( rArgs );
-
         Sequence< sal_Int32 > aWinExtent;
-        if ( ( aArgs.get( "WinExtent" ) >>= aWinExtent )&& ( aWinExtent.getLength() == 4 ) )
+        for (const beans::PropertyValue & rProp : rArgs)
         {
-            tools::Rectangle aVisArea( aWinExtent[0], aWinExtent[1], aWinExtent[2], aWinExtent[3] );
-            aVisArea = OutputDevice::LogicToLogic(aVisArea, MapMode(MapUnit::Map100thMM), MapMode(pObjectShell->GetMapUnit()));
-            pObjectShell->SetVisArea( aVisArea );
+            if (rProp.Name == "WinExtent" && (rProp.Value >>= aWinExtent) && ( aWinExtent.getLength() == 4 ) )
+            {
+                tools::Rectangle aVisArea( aWinExtent[0], aWinExtent[1], aWinExtent[2], aWinExtent[3] );
+                aVisArea = OutputDevice::LogicToLogic(aVisArea, MapMode(MapUnit::Map100thMM), MapMode(pObjectShell->GetMapUnit()));
+                pObjectShell->SetVisArea( aVisArea );
+            }
+            bool bBreakMacroSign = false;
+            if ( rProp.Name == "BreakMacroSignature" && (rProp.Value >>= bBreakMacroSign) )
+            {
+                pObjectShell->BreakMacroSign_Impl( bBreakMacroSign );
+            }
+            bool bMacroEventRead = false;
+            if ( rProp.Name == "MacroEventRead" && (rProp.Value >>= bMacroEventRead) && bMacroEventRead)
+            {
+                pObjectShell->SetMacroCallsSeenWhileLoading();
+            }
         }
-
-        bool bBreakMacroSign = false;
-        if ( aArgs.get( "BreakMacroSignature" ) >>= bBreakMacroSign )
+        Sequence<beans::PropertyValue> aStrippedArgs(rArgs.getLength());
+        beans::PropertyValue* pStripped = aStrippedArgs.getArray();
+        for (const beans::PropertyValue & rProp : rArgs)
         {
-            pObjectShell->BreakMacroSign_Impl( bBreakMacroSign );
+            if (rProp.Name == "WinExtent"
+                || rProp.Name == "BreakMacroSignature"
+                || rProp.Name == "MacroEventRead"
+                || rProp.Name == "Stream"
+                || rProp.Name == "InputStream"
+                || rProp.Name == "URL"
+                || rProp.Name == "Frame"
+                || rProp.Name == "Password"
+                || rProp.Name == "EncryptionData")
+                continue;
+            *pStripped++ = rProp;
         }
-
-        bool bMacroEventRead = false;
-        if ((aArgs.get("MacroEventRead") >>= bMacroEventRead) && bMacroEventRead)
-        {
-            pObjectShell->SetMacroCallsSeenWhileLoading();
-        }
-
-        aArgs.remove( "WinExtent" );
-        aArgs.remove( "BreakMacroSignature" );
-        aArgs.remove( "MacroEventRead" );
-        aArgs.remove( "Stream" );
-        aArgs.remove( "InputStream" );
-        aArgs.remove( "URL" );
-        aArgs.remove( "Frame" );
-        aArgs.remove( "Password" );
-        aArgs.remove( "EncryptionData" );
+        aStrippedArgs.realloc(pStripped - aStrippedArgs.getArray());
 
         // TODO/LATER: all the parameters that are accepted by ItemSet of the DocShell must be removed here
 
-        m_pData->m_seqArguments = aArgs.getPropertyValues();
+        m_pData->m_seqArguments = aStrippedArgs;
 
         SfxMedium* pMedium = pObjectShell->GetMedium();
         if ( pMedium )
@@ -1681,7 +1698,7 @@ void SAL_CALL SfxBaseModel::storeSelf( const    Sequence< beans::PropertyValue >
         SfxGetpApp()->NotifyEvent( SfxEventHint( SfxEventHintId::SaveDocFailed, GlobalEventConfig::GetEventName(GlobalEventId::SAVEDOCFAILED), m_pData->m_pObjectShell.get() ) );
 
         throw task::ErrorCodeIOException(
-            "SfxBaseModel::storeSelf: " + nErrCode.toHexString(),
+            "SfxBaseModel::storeSelf: " + nErrCode.toString(),
             Reference< XInterface >(), sal_uInt32(nErrCode));
     }
 }
@@ -1846,7 +1863,7 @@ void SAL_CALL SfxBaseModel::initNew()
 
     if ( !bRes )
         throw task::ErrorCodeIOException(
-            "SfxBaseModel::initNew: " + nErrCode.toHexString(),
+            "SfxBaseModel::initNew: " + nErrCode.toString(),
             Reference< XInterface >(), sal_uInt32(nErrCode));
 }
 
@@ -2043,7 +2060,7 @@ Any SAL_CALL SfxBaseModel::getTransferData( const datatransfer::DataFlavor& aFla
 
             try
             {
-                utl::TempFile aTmp;
+                utl::TempFileNamed aTmp;
                 aTmp.EnableKillingFile();
                 storeToURL( aTmp.GetURL(), Sequence < beans::PropertyValue >() );
                 std::unique_ptr<SvStream> pStream(aTmp.GetStream( StreamMode::READ ));
@@ -2532,7 +2549,7 @@ void SAL_CALL SfxBaseModel::updateCmisProperties( const Sequence< document::Cmis
             Reference<ucb::XCommandEnvironment>(),
             comphelper::getProcessComponentContext() );
 
-        aContent.executeCommand( "updateProperties", uno::makeAny( aProperties ) );
+        aContent.executeCommand( "updateProperties", uno::Any( aProperties ) );
         loadCmisProperties( );
     }
     catch (const Exception & e)
@@ -2785,9 +2802,11 @@ SfxMedium* SfxBaseModel::handleLoadError( ErrCode nError, SfxMedium* pMedium )
     {
         nError = nError ? nError : ERRCODE_IO_CANTREAD;
         throw task::ErrorCodeIOException(
-            "SfxBaseModel::handleLoadError: 0x" + nError.toHexString(),
+            "SfxBaseModel::handleLoadError: 0x" + nError.toString(),
             Reference< XInterface >(), sal_uInt32(nError));
     }
+    else
+        pMedium->SetWarningError(nError);
 
     return pMedium;
 }
@@ -2895,14 +2914,11 @@ void SfxBaseModel::Notify(          SfxBroadcaster& rBC     ,
         default: break;
         }
 
+        Any aSupplement;
+        if (const SfxPrintingHint* pPrintingHint = dynamic_cast<const SfxPrintingHint*>(&rHint))
+            aSupplement <<= pPrintingHint->GetWhich();
         const SfxViewEventHint* pViewHint = dynamic_cast<const SfxViewEventHint*>(&rHint);
-        if (pViewHint)
-        {
-            const SfxPrintingHint* pPrintingHint = dynamic_cast<const SfxPrintingHint*>(&rHint);
-            postEvent_Impl( pNamedHint->GetEventName(), pViewHint->GetController(), pPrintingHint? Any(pPrintingHint->GetWhich()) : Any() );
-        }
-        else
-            postEvent_Impl( pNamedHint->GetEventName(), Reference< frame::XController2 >() );
+        postEvent_Impl( pNamedHint->GetEventName(), pViewHint ? pViewHint->GetController() : Reference< frame::XController2 >(), aSupplement );
     }
 
     if ( rHint.GetId() == SfxHintId::TitleChanged )
@@ -3167,7 +3183,7 @@ void SfxBaseModel::impl_store(  const   OUString&                   sURL        
 
                 task::ErrorCodeRequest aErrorCode;
                 aErrorCode.ErrCode = sal_uInt32(nErrCode);
-                SfxMedium::CallApproveHandler( xHandler, makeAny( aErrorCode ), false );
+                SfxMedium::CallApproveHandler( xHandler, Any( aErrorCode ), false );
             }
         }
 
@@ -3194,6 +3210,9 @@ void SfxBaseModel::impl_store(  const   OUString&                   sURL        
 
         SfxGetpApp()->NotifyEvent( SfxEventHint( bSaveTo ? SfxEventHintId::SaveToDocFailed : SfxEventHintId::SaveAsDocFailed, GlobalEventConfig::GetEventName( bSaveTo ? GlobalEventId::SAVETODOCFAILED : GlobalEventId::SAVEASDOCFAILED),
                                                 m_pData->m_pObjectShell.get() ) );
+
+        if ( comphelper::LibreOfficeKit::isActive() && SfxViewShell::Current() )
+            SfxViewShell::Current()->libreOfficeKitViewCallback( LOK_CALLBACK_EXPORT_FILE, "ERROR" );
 
         std::stringstream aErrCode;
         aErrCode << nErrCode;
@@ -3288,7 +3307,7 @@ Reference < container::XIndexAccess > SAL_CALL SfxBaseModel::getViewData()
             // currently no frame for this document at all or View is under construction
             return Reference < container::XIndexAccess >();
 
-        m_pData->m_contViewData = document::IndexedPropertyValues::create( ::comphelper::getProcessComponentContext() );
+        m_pData->m_contViewData = new comphelper::IndexedPropertyValuesContainer();
 
         if ( !m_pData->m_contViewData.is() )
         {
@@ -3490,7 +3509,7 @@ Reference< script::provider::XScriptProvider > SAL_CALL SfxBaseModel::getScriptP
     Reference< XScriptInvocationContext > xScriptContext( this );
 
     Reference< script::provider::XScriptProvider > xScriptProvider(
-        xScriptProviderFactory->createScriptProvider( makeAny( xScriptContext ) ),
+        xScriptProviderFactory->createScriptProvider( Any( xScriptContext ) ),
         UNO_SET_THROW );
 
     return xScriptProvider;
@@ -3561,7 +3580,7 @@ static void ConvertSlotsToCommands( SfxObjectShell const * pDoc, Reference< cont
             GetCommandFromSequence( aCommand, nIndex, aSeqPropValue );
             if ( nIndex >= 0 && aCommand.startsWith( "slot:" ) )
             {
-                const sal_uInt16 nSlot = aCommand.copy( 5 ).toInt32();
+                const sal_uInt16 nSlot = o3tl::toInt32(aCommand.subView( 5 ));
 
                 // We have to replace the old "slot-Command" with our new ".uno:-Command"
                 const SfxSlot* pSlot = pModule->GetSlotPool()->GetSlot( nSlot );
@@ -3774,7 +3793,7 @@ void SAL_CALL SfxBaseModel::loadFromStorage( const Reference< embed::XStorage >&
         ErrCode nError = m_pData->m_pObjectShell->GetErrorCode();
         nError = nError ? nError : ERRCODE_IO_CANTREAD;
         throw task::ErrorCodeIOException(
-            "SfxBaseModel::loadFromStorage: " + nError.toHexString(),
+            "SfxBaseModel::loadFromStorage: " + nError.toString(),
             Reference< XInterface >(), sal_uInt32(nError));
     }
     loadCmisProperties( );
@@ -3832,7 +3851,7 @@ void SAL_CALL SfxBaseModel::storeToStorage( const Reference< embed::XStorage >& 
     {
         nError = nError ? nError : ERRCODE_IO_GENERAL;
         throw task::ErrorCodeIOException(
-            "SfxBaseModel::storeToStorage: " + nError.toHexString(),
+            "SfxBaseModel::storeToStorage: " + nError.toString(),
             Reference< XInterface >(), sal_uInt32(nError));
     }
 }
@@ -3852,7 +3871,7 @@ void SAL_CALL SfxBaseModel::switchToStorage( const Reference< embed::XStorage >&
             ErrCode nError = m_pData->m_pObjectShell->GetErrorCode();
             nError = nError ? nError : ERRCODE_IO_GENERAL;
             throw task::ErrorCodeIOException(
-                "SfxBaseModel::switchToStorage: " + nError.toHexString(),
+                "SfxBaseModel::switchToStorage: " + nError.toString(),
                 Reference< XInterface >(), sal_uInt32(nError));
         }
         else
@@ -4084,7 +4103,7 @@ Reference< container::XEnumeration > SAL_CALL SfxBaseModel::getControllers()
     sal_Int32 c = m_pData->m_seqControllers.size();
     Sequence< Any > lEnum(c);
     std::transform(m_pData->m_seqControllers.begin(), m_pData->m_seqControllers.end(),
-                   lEnum.getArray(), [](const auto& x) { return css::uno::makeAny(x); });
+                   lEnum.getArray(), [](const auto& x) { return css::uno::Any(x); });
 
     return new ::comphelper::OAnyEnumeration(lEnum);
 }

@@ -50,6 +50,7 @@ public:
     virtual css::uno::Reference<ov::word::XWindow> SAL_CALL getActiveWindow() override;
     virtual css::uno::Reference<ooo::vba::word::XOptions> SAL_CALL getOptions() override;
     virtual css::uno::Reference<ooo::vba::word::XSelection> SAL_CALL getSelection() override;
+    virtual css::uno::Reference<ooo::vba::word::XGlobals> SAL_CALL getWord() override;
     virtual css::uno::Reference<ooo::vba::word::XWordBasic> SAL_CALL getWordBasic() override;
     virtual css::uno::Any SAL_CALL CommandBars(const css::uno::Any& aIndex) override;
     virtual css::uno::Any SAL_CALL Documents(const css::uno::Any& aIndex) override;
@@ -57,6 +58,16 @@ public:
     virtual css::uno::Any SAL_CALL Dialogs(const css::uno::Any& aIndex) override;
     virtual css::uno::Any SAL_CALL ListGalleries(const css::uno::Any& aIndex) override;
     virtual float SAL_CALL CentimetersToPoints(float Centimeters) override;
+    virtual float SAL_CALL PointsToCentimeters(float Points) override;
+    virtual float SAL_CALL PixelsToPoints(float Pixels, ::sal_Bool fVertical) override;
+    virtual float SAL_CALL PointsToPixels(float Pixels, ::sal_Bool fVertical) override;
+    virtual float SAL_CALL InchesToPoints(float Inches) override;
+    virtual float SAL_CALL PointsToInches(float Points) override;
+    virtual float SAL_CALL MillimetersToPoints(float Millimeters) override;
+    virtual float SAL_CALL PointsToMillimeters(float Points) override;
+    virtual float SAL_CALL PicasToPoints(float Picas) override;
+    virtual float SAL_CALL PointsToPicas(float Points) override;
+
     // XMultiServiceFactory
     virtual css::uno::Sequence<OUString> SAL_CALL getAvailableServiceNames() override;
 

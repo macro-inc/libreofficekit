@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <sal/types.h>
-#include <basegfx/basegfxdllapi.h>
 #include <basegfx/utils/common.hxx>
 #include <basegfx/numeric/ftools.hxx>
 
@@ -107,52 +105,86 @@ public:
 
     // operator overrides
 
-    Tuple2D& operator+=(const Tuple2D& rTup)
+    Tuple2D<TYPE>& operator+=(const Tuple2D<TYPE>& rTup)
     {
         mfX += rTup.mfX;
         mfY += rTup.mfY;
         return *this;
     }
 
-    Tuple2D& operator-=(const Tuple2D& rTup)
+    Tuple2D<TYPE>& operator-=(const Tuple2D<TYPE>& rTup)
     {
         mfX -= rTup.mfX;
         mfY -= rTup.mfY;
         return *this;
     }
 
-    Tuple2D& operator/=(const Tuple2D& rTup)
+    Tuple2D<TYPE>& operator/=(const Tuple2D<TYPE>& rTup)
     {
         mfX /= rTup.mfX;
         mfY /= rTup.mfY;
         return *this;
     }
 
-    Tuple2D& operator*=(const Tuple2D& rTup)
+    Tuple2D<TYPE>& operator*=(const Tuple2D<TYPE>& rTup)
     {
         mfX *= rTup.mfX;
         mfY *= rTup.mfY;
         return *this;
     }
 
-    Tuple2D& operator*=(TYPE t)
+    Tuple2D<TYPE>& operator*=(TYPE t)
     {
         mfX *= t;
         mfY *= t;
         return *this;
     }
 
-    Tuple2D& operator/=(TYPE t)
+    Tuple2D<TYPE>& operator/=(TYPE t)
     {
         mfX /= t;
         mfY /= t;
         return *this;
     }
 
-    bool operator==(const Tuple2D& rTup) const { return mfX == rTup.mfX && mfY == rTup.mfY; }
+    Tuple2D<TYPE> operator-(void) const { return Tuple2D<TYPE>(-mfX, -mfY); }
 
-    bool operator!=(const Tuple2D& rTup) const { return !(*this == rTup); }
+    bool operator==(const Tuple2D<TYPE>& rTup) const { return mfX == rTup.mfX && mfY == rTup.mfY; }
+
+    bool operator!=(const Tuple2D<TYPE>& rTup) const { return !(*this == rTup); }
 };
+
+template <typename TYPE>
+inline Tuple2D<TYPE> operator-(const Tuple2D<TYPE>& rTupA, const Tuple2D<TYPE>& rTupB)
+{
+    Tuple2D<TYPE> aNew(rTupA);
+    aNew -= rTupB;
+    return aNew;
+}
+
+template <typename TYPE>
+inline Tuple2D<TYPE> operator+(const Tuple2D<TYPE>& rTupA, const Tuple2D<TYPE>& rTupB)
+{
+    Tuple2D<TYPE> aNew(rTupA);
+    aNew += rTupB;
+    return aNew;
+}
+
+template <typename TYPE>
+inline Tuple2D<TYPE> operator*(const Tuple2D<TYPE>& rTupA, const Tuple2D<TYPE>& rTupB)
+{
+    Tuple2D<TYPE> aNew(rTupA);
+    aNew *= rTupB;
+    return aNew;
+}
+
+template <typename TYPE>
+inline Tuple2D<TYPE> operator/(const Tuple2D<TYPE>& rTupA, const Tuple2D<TYPE>& rTupB)
+{
+    Tuple2D<TYPE> aNew(rTupA);
+    aNew /= rTupB;
+    return aNew;
+}
 
 } // end of namespace basegfx
 

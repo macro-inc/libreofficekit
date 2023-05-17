@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <config_options.h>
 #include "address.hxx"
 #include "rangelst.hxx"
 
@@ -87,7 +88,6 @@
 #include <com/sun/star/document/XEventsSupplier.hpp>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <cppuhelper/weakref.hxx>
 
 #include <memory>
 #include <optional>
@@ -231,7 +231,7 @@ protected:
 
 public:
                             ScCellRangesBase(ScDocShell* pDocSh, const ScRange& rR);
-                            ScCellRangesBase(ScDocShell* pDocSh, const ScRangeList& rR);
+                            ScCellRangesBase(ScDocShell* pDocSh, ScRangeList aR);
     virtual                 ~ScCellRangesBase() override;
 
     virtual void            Notify( SfxBroadcaster& rBC, const SfxHint& rHint ) override;
@@ -377,7 +377,7 @@ public:
     UNO3_GETIMPLEMENTATION_DECL(ScCellRangesBase)
 };
 
-class SC_DLLPUBLIC ScCellRangesObj final : public ScCellRangesBase,
+class UNLESS_MERGELIBS(SC_DLLPUBLIC) ScCellRangesObj final : public ScCellRangesBase,
                         public css::sheet::XSheetCellRangeContainer,
                         public css::container::XNameContainer,
                         public css::container::XEnumerationAccess
@@ -396,10 +396,12 @@ private:
     rtl::Reference<ScCellRangeObj> GetObjectByIndex_Impl(sal_Int32 nIndex) const;
 
 public:
+    IF_MERGELIBS(SC_DLLPUBLIC)
                             ScCellRangesObj(ScDocShell* pDocSh, const ScRangeList& rR);
     virtual                 ~ScCellRangesObj() override;
 
     virtual css::uno::Any SAL_CALL queryInterface( const css::uno::Type & rType ) override;
+    IF_MERGELIBS(SC_DLLPUBLIC)
     virtual void SAL_CALL   acquire() noexcept override;
     virtual void SAL_CALL   release() noexcept override;
 
@@ -1039,7 +1041,7 @@ private:
     ScRangeList             aRanges;
 
 public:
-                            ScCellsObj(ScDocShell* pDocSh, const ScRangeList& rR);
+                            ScCellsObj(ScDocShell* pDocSh, ScRangeList aR);
     virtual                 ~ScCellsObj() override;
 
     virtual void            Notify( SfxBroadcaster& rBC, const SfxHint& rHint ) override;
@@ -1075,7 +1077,7 @@ private:
     void                    CheckPos_Impl();
 
 public:
-                            ScCellsEnumeration(ScDocShell* pDocSh, const ScRangeList& rR);
+                            ScCellsEnumeration(ScDocShell* pDocSh, ScRangeList aR);
     virtual                 ~ScCellsEnumeration() override;
 
     virtual void            Notify( SfxBroadcaster& rBC, const SfxHint& rHint ) override;

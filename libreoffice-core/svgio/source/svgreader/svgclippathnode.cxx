@@ -25,6 +25,7 @@
 #include <drawinglayer/processor2d/contourextractor2d.hxx>
 #include <basegfx/polygon/b2dpolypolygoncutter.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace svgio::svgreader
 {
@@ -52,7 +53,7 @@ namespace svgio::svgreader
             SvgNode::parseAttribute(rTokenName, aSVGToken, aContent);
 
             // read style attributes
-            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent, false);
+            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent);
 
             // parse own
             switch(aSVGToken)
@@ -76,11 +77,11 @@ namespace svgio::svgreader
                 {
                     if(!aContent.isEmpty())
                     {
-                        if(aContent.match(commonStrings::aStrUserSpaceOnUse))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrUserSpaceOnUse))
                         {
                             setClipPathUnits(SvgUnits::userSpaceOnUse);
                         }
-                        else if(aContent.match(commonStrings::aStrObjectBoundingBox))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrObjectBoundingBox))
                         {
                             setClipPathUnits(SvgUnits::objectBoundingBox);
                         }
@@ -233,7 +234,7 @@ namespace svgio::svgreader
                     // and strokeWidth and forced to black
                     drawinglayer::primitive2d::Primitive2DReference xEmbedTransparence(
                         new drawinglayer::primitive2d::MaskPrimitive2D(
-                            aClipPolyPolygon,
+                            std::move(aClipPolyPolygon),
                             std::move(rContent)));
 
                     rContent = drawinglayer::primitive2d::Primitive2DContainer { xEmbedTransparence };

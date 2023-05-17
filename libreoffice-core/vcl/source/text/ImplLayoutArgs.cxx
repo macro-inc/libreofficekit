@@ -24,20 +24,21 @@
 
 #include <algorithm>
 #include <memory>
+#include <utility>
 
 namespace vcl::text
 {
 ImplLayoutArgs::ImplLayoutArgs(const OUString& rStr, int nMinCharPos, int nEndCharPos,
-                               SalLayoutFlags nFlags, const LanguageTag& rLanguageTag,
+                               SalLayoutFlags nFlags, LanguageTag aLanguageTag,
                                vcl::text::TextLayoutCache const* const pLayoutCache)
-    : maLanguageTag(rLanguageTag)
+    : maLanguageTag(std::move(aLanguageTag))
     , mnFlags(nFlags)
     , mrStr(rStr)
     , mnMinCharPos(nMinCharPos)
     , mnEndCharPos(nEndCharPos)
     , m_pTextLayoutCache(pLayoutCache)
-    , mpDXArray(nullptr)
-    , mpAltNaturalDXArray(nullptr)
+    , mpNaturalDXArray(nullptr)
+    , mpKashidaArray(nullptr)
     , mnLayoutWidth(0)
     , mnOrientation(0)
 {
@@ -59,28 +60,19 @@ ImplLayoutArgs::ImplLayoutArgs(const OUString& rStr, int nMinCharPos, int nEndCh
         // prepare substring for BiDi analysis
         // TODO: reuse allocated pParaBidi
         UErrorCode rcI18n = U_ZERO_ERROR;
-        const int nLength = mrStr.getLength();
+        const int nLength = mnEndCharPos - mnMinCharPos;
         UBiDi* pParaBidi = ubidi_openSized(nLength, 0, &rcI18n);
         if (!pParaBidi)
             return;
-        ubidi_setPara(pParaBidi, reinterpret_cast<const UChar*>(mrStr.getStr()), nLength, nLevel,
-                      nullptr, &rcI18n);
-
-        UBiDi* pLineBidi = pParaBidi;
-        int nSubLength = mnEndCharPos - mnMinCharPos;
-        if (nSubLength != nLength)
-        {
-            pLineBidi = ubidi_openSized(nSubLength, 0, &rcI18n);
-            ubidi_setLine(pParaBidi, mnMinCharPos, mnEndCharPos, pLineBidi, &rcI18n);
-        }
+        ubidi_setPara(pParaBidi, reinterpret_cast<const UChar*>(mrStr.getStr()) + mnMinCharPos,
+                      nLength, nLevel, nullptr, &rcI18n);
 
         // run BiDi algorithm
-        const int nRunCount = ubidi_countRuns(pLineBidi, &rcI18n);
-        //maRuns.resize( 2 * nRunCount );
+        const int nRunCount = ubidi_countRuns(pParaBidi, &rcI18n);
         for (int i = 0; i < nRunCount; ++i)
         {
             int32_t nMinPos, nRunLength;
-            const UBiDiDirection nDir = ubidi_getVisualRun(pLineBidi, i, &nMinPos, &nRunLength);
+            const UBiDiDirection nDir = ubidi_getVisualRun(pParaBidi, i, &nMinPos, &nRunLength);
             const int nPos0 = nMinPos + mnMinCharPos;
             const int nPos1 = nPos0 + nRunLength;
 
@@ -89,8 +81,6 @@ ImplLayoutArgs::ImplLayoutArgs(const OUString& rStr, int nMinCharPos, int nEndCh
         }
 
         // cleanup BiDi engine
-        if (pLineBidi != pParaBidi)
-            ubidi_close(pLineBidi);
         ubidi_close(pParaBidi);
     }
 
@@ -100,11 +90,11 @@ ImplLayoutArgs::ImplLayoutArgs(const OUString& rStr, int nMinCharPos, int nEndCh
 
 void ImplLayoutArgs::SetLayoutWidth(DeviceCoordinate nWidth) { mnLayoutWidth = nWidth; }
 
-void ImplLayoutArgs::SetDXArray(DeviceCoordinate const* pDXArray) { mpDXArray = pDXArray; }
+void ImplLayoutArgs::SetNaturalDXArray(double const* pDXArray) { mpNaturalDXArray = pDXArray; }
 
-void ImplLayoutArgs::SetAltNaturalDXArray(double const* pDXArray)
+void ImplLayoutArgs::SetKashidaArray(sal_Bool const* pKashidaArray)
 {
-    mpAltNaturalDXArray = pDXArray;
+    mpKashidaArray = pKashidaArray;
 }
 
 void ImplLayoutArgs::SetOrientation(Degree10 nOrientation) { mnOrientation = nOrientation; }
@@ -140,6 +130,9 @@ static bool IsControlChar(sal_UCS4 cChar)
         return true;
     // byte order markers and invalid unicode
     if ((cChar == 0xFEFF) || (cChar == 0xFFFE) || (cChar == 0xFFFF))
+        return true;
+    // drop null character too, broken documents may contain it (ofz34898-1.doc)
+    if (cChar == 0)
         return true;
     return false;
 }
@@ -276,7 +269,7 @@ std::ostream& operator<<(std::ostream& s, vcl::text::ImplLayoutArgs const& rArgs
         TEST(DisableKerning);
         TEST(KerningAsian);
         TEST(Vertical);
-        TEST(KashidaJustification);
+        TEST(DisableLigatures);
         TEST(ForFallback);
 #undef TEST
         s << "}";
@@ -310,7 +303,7 @@ std::ostream& operator<<(std::ostream& s, vcl::text::ImplLayoutArgs const& rArgs
     s << "\"";
 
     s << ",DXArray=";
-    if (rArgs.mpDXArray || rArgs.mpAltNaturalDXArray)
+    if (rArgs.mpNaturalDXArray)
     {
         s << "[";
         int count = rArgs.mnEndCharPos - rArgs.mnMinCharPos;
@@ -319,10 +312,7 @@ std::ostream& operator<<(std::ostream& s, vcl::text::ImplLayoutArgs const& rArgs
             lim = 7;
         for (int i = 0; i < lim; i++)
         {
-            if (rArgs.mpDXArray)
-                s << rArgs.mpDXArray[i];
-            else
-                s << rArgs.mpAltNaturalDXArray[i];
+            s << rArgs.mpNaturalDXArray[i];
             if (i < lim - 1)
                 s << ",";
         }
@@ -330,10 +320,32 @@ std::ostream& operator<<(std::ostream& s, vcl::text::ImplLayoutArgs const& rArgs
         {
             if (count > lim + 1)
                 s << "...";
-            if (rArgs.mpDXArray)
-                s << rArgs.mpDXArray[count - 1];
-            else
-                s << rArgs.mpAltNaturalDXArray[count - 1];
+            s << rArgs.mpNaturalDXArray[count - 1];
+        }
+        s << "]";
+    }
+    else
+        s << "NULL";
+
+    s << ",KashidaArray=";
+    if (rArgs.mpKashidaArray)
+    {
+        s << "[";
+        int count = rArgs.mnEndCharPos - rArgs.mnMinCharPos;
+        lim = count;
+        if (lim > 10)
+            lim = 7;
+        for (int i = 0; i < lim; i++)
+        {
+            s << rArgs.mpKashidaArray[i];
+            if (i < lim - 1)
+                s << ",";
+        }
+        if (count > lim)
+        {
+            if (count > lim + 1)
+                s << "...";
+            s << rArgs.mpKashidaArray[count - 1];
         }
         s << "]";
     }

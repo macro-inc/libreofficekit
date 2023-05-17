@@ -19,17 +19,19 @@
 #pragma once
 
 #include "ItemConverter.hxx"
+#include <rtl/ref.hxx>
 
 namespace com::sun::star::frame { class XModel; }
+namespace chart { class ChartModel; }
 
 namespace chart::wrapper
 {
 
-class StatisticsItemConverter : public ItemConverter
+class StatisticsItemConverter final : public ItemConverter
 {
 public:
     StatisticsItemConverter(
-        const css::uno::Reference< css::frame::XModel > & xChartModel,
+        rtl::Reference<::chart::ChartModel> xChartModel,
         const css::uno::Reference< css::beans::XPropertySet > & rPropertySet,
         SfxItemPool& rItemPool );
     virtual ~StatisticsItemConverter() override;
@@ -42,7 +44,7 @@ protected:
     virtual bool ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet & rItemSet ) override;
 
 private:
-    css::uno::Reference< css::frame::XModel >  m_xModel;
+    rtl::Reference<::chart::ChartModel>  m_xModel;
 };
 
 } //  namespace chart::wrapper

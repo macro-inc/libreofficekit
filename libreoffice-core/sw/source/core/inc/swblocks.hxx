@@ -22,7 +22,7 @@
 #include <tools/date.hxx>
 #include <tools/time.hxx>
 #include <o3tl/sorted_vector.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <rtl/ref.hxx>
 
 class SwPaM;
@@ -43,7 +43,7 @@ public:
     bool m_bIsOnlyText : 1;           /// Unformatted text
 
     SwBlockName( const OUString& rShort, const OUString& rLong );
-    SwBlockName( const OUString& rShort, const OUString& rLong, const OUString& rPackageName );
+    SwBlockName( const OUString& rShort, const OUString& rLong, OUString aPackageName );
 
     /// For sorting in the array
     bool operator< ( const SwBlockName& r ) const { return m_aShort <  r.m_aShort; }
@@ -87,10 +87,10 @@ protected:
 public:
     virtual ~SwImpBlocks();
 
-    static sal_uInt16 Hash( const OUString& );        /// Hashcode for Block names
+    static sal_uInt16 Hash( std::u16string_view );        /// Hashcode for Block names
     sal_uInt16 GetCount() const;                      /// Get count of Text Blocks
     sal_uInt16 GetIndex( const OUString& ) const;     /// Index for shortnames
-    sal_uInt16 GetLongIndex( const OUString& ) const; /// Index for longnames
+    sal_uInt16 GetLongIndex( std::u16string_view ) const; /// Index for longnames
     OUString GetShortName( sal_uInt16 ) const;        /// Return shortname for index
     OUString GetLongName( sal_uInt16 ) const;         /// Return longname for index
     OUString GetPackageName( sal_uInt16 ) const;      /// Return packagename for index
@@ -106,6 +106,7 @@ public:
 
     virtual ErrCode Delete( sal_uInt16 ) = 0;
     virtual ErrCode Rename( sal_uInt16, const OUString& ) = 0;
+    virtual ErrCode CopyBlock( SwImpBlocks& rImp, OUString& rShort, const OUString& rLong) = 0;
     virtual ErrCode GetDoc( sal_uInt16 ) = 0;
     virtual ErrCode BeginPutDoc( const OUString&, const OUString& ) = 0;
     virtual ErrCode PutDoc() = 0;

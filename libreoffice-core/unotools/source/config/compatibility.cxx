@@ -31,7 +31,6 @@
 #include "itemholder1.hxx"
 
 #include <algorithm>
-#include <vector>
 
 using namespace ::std;
 using namespace ::utl;
@@ -51,7 +50,6 @@ SvtCompatibilityEntry::SvtCompatibilityEntry()
     setValue<OUString>( Index::Module, OUString() );
 
     /* Editable list of default values. Sync it with the SvtCompatibilityEntry::Index enum class. */
-    setValue<bool>( Index::UsePrtMetrics, false );
     setValue<bool>( Index::AddSpacing, false );
     setValue<bool>( Index::AddSpacingAtPages, false );
     setValue<bool>( Index::UseOurTabStops, false );
@@ -67,8 +65,6 @@ SvtCompatibilityEntry::SvtCompatibilityEntry()
     setValue<bool>( Index::SubtractFlysAnchoredAtFlys, false );
     setValue<bool>( Index::EmptyDbFieldHidesPara, true );
     setValue<bool>( Index::AddTableLineSpacing, false );
-
-    setDefaultEntry( false );
 }
 
 OUString SvtCompatibilityEntry::getName( const Index rIdx )
@@ -80,7 +76,6 @@ OUString SvtCompatibilityEntry::getName( const Index rIdx )
         "Module",
 
         /* Editable list of compatibility option names. Sync it with the SvtCompatibilityEntry::Index enum class. */
-        "UsePrinterMetrics",
         "AddSpacing",
         "AddSpacingAtPages",
         "UseOurTabStopFormat",
@@ -99,7 +94,7 @@ OUString SvtCompatibilityEntry::getName( const Index rIdx )
     };
 
     /* Size of sPropertyName array not equal size of the SvtCompatibilityEntry::Index enum class */
-    assert( SAL_N_ELEMENTS(sPropertyName) == static_cast<int>( SvtCompatibilityEntry::getElementCount() ) );
+    assert( std::size(sPropertyName) == SvtCompatibilityEntry::getElementCount() );
 
     return OUString::createFromAscii( sPropertyName[ static_cast<int>(rIdx) ] );
 }

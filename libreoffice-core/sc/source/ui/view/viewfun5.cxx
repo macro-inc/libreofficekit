@@ -43,6 +43,7 @@
 #include <vcl/TypeSerializer.hxx>
 #include <osl/thread.h>
 #include <o3tl/unit_conversion.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <comphelper/automationinvokedzone.hxx>
 #include <comphelper/lok.hxx>
@@ -496,7 +497,7 @@ bool ScViewFunc::PasteDataFormat( SotClipboardFormatId nFormatId,
         {
             MakeDrawLayer();
             ScDrawView* pScDrawView = GetScDrawView();
-            SdrObjectUniquePtr pObj = pScDrawView->CreateFieldControl( svx::OColumnTransferable::extractColumnDescriptor( aDataHelper ) );
+            rtl::Reference<SdrObject> pObj = pScDrawView->CreateFieldControl( svx::OColumnTransferable::extractColumnDescriptor( aDataHelper ) );
             if (pObj)
             {
                 Point aInsPos = aPos;
@@ -526,7 +527,7 @@ bool ScViewFunc::PasteDataFormat( SotClipboardFormatId nFormatId,
                     }
                 }
 
-                pScDrawView->InsertObjectSafe(pObj.release(), *pScDrawView->GetSdrPageView());
+                pScDrawView->InsertObjectSafe(pObj.get(), *pScDrawView->GetSdrPageView());
 
                 GetViewData().GetViewShell()->SetDrawShell( true );
                 bRet = true;
@@ -615,7 +616,7 @@ bool ScViewFunc::PasteDataFormat( SotClipboardFormatId nFormatId,
             aInsDoc.ResetClip( &rDoc, nSrcTab );
 
             SfxMedium aMed;
-            aMed.GetItemSet()->Put( SfxUnoAnyItem( SID_INPUTSTREAM, uno::makeAny( xStm ) ) );
+            aMed.GetItemSet()->Put( SfxUnoAnyItem( SID_INPUTSTREAM, uno::Any( xStm ) ) );
             ErrCode eErr = ScFormatFilter::Get().ScImportExcel( aMed, &aInsDoc, EIF_AUTO );
             if ( eErr == ERRCODE_NONE )
             {
@@ -732,8 +733,8 @@ bool ScViewFunc::PasteLink( const uno::Reference<datatransfer::XTransferable>& r
             if (!aDataStr.isEmpty())
             {
                 nRows = comphelper::string::getTokenCount(aDataStr, '\n');
-                OUString aLine = aDataStr.getToken( 0, '\n' );
-                if (!aLine.isEmpty())
+                std::u16string_view aLine = o3tl::getToken(aDataStr, 0, '\n' );
+                if (!aLine.empty())
                     nCols = comphelper::string::getTokenCount(aLine, '\t');
             }
         }

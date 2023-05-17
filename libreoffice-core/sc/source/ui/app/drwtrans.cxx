@@ -50,6 +50,7 @@
 #include <docsh.hxx>
 #include <drwlayer.hxx>
 #include <drawview.hxx>
+#include <utility>
 #include <viewdata.hxx>
 #include <scmod.hxx>
 #include <dragdata.hxx>
@@ -66,9 +67,9 @@ constexpr sal_uInt32 SCDRAWTRANS_TYPE_DRAWMODEL = 2;
 constexpr sal_uInt32 SCDRAWTRANS_TYPE_DOCUMENT  = 3;
 
 ScDrawTransferObj::ScDrawTransferObj( std::unique_ptr<SdrModel> pClipModel, ScDocShell* pContainerShell,
-                                        const TransferableObjectDescriptor& rDesc ) :
+                                        TransferableObjectDescriptor aDesc ) :
     m_pModel( std::move(pClipModel) ),
-    m_aObjDesc( rDesc ),
+    m_aObjDesc(std::move( aDesc )),
     m_bGraphic( false ),
     m_bGrIsBit( false ),
     m_bOleObj( false ),
@@ -89,8 +90,8 @@ ScDrawTransferObj::ScDrawTransferObj( std::unique_ptr<SdrModel> pClipModel, ScDo
 
             //  OLE object
 
-            sal_uInt16 nSdrObjKind = pObject->GetObjIdentifier();
-            if (nSdrObjKind == OBJ_OLE2)
+            SdrObjKind nSdrObjKind = pObject->GetObjIdentifier();
+            if (nSdrObjKind == SdrObjKind::OLE2)
             {
                 // if object has no persistence it must be copied as a part of document
                 try
@@ -106,7 +107,7 @@ ScDrawTransferObj::ScDrawTransferObj( std::unique_ptr<SdrModel> pClipModel, ScDo
 
             //  Graphic object
 
-            if (nSdrObjKind == OBJ_GRAF)
+            if (nSdrObjKind == SdrObjKind::Graphic)
             {
                 m_bGraphic = true;
                 if ( static_cast<SdrGrafObj*>(pObject)->GetGraphic().GetType() == GraphicType::Bitmap )
@@ -383,7 +384,7 @@ bool ScDrawTransferObj::GetData( const css::datatransfer::DataFlavor& rFlavor, c
             {
                 SdrObjListIter aIter( pPage, SdrIterMode::Flat );
                 SdrObject* pObject = aIter.Next();
-                if (pObject && pObject->GetObjIdentifier() == OBJ_GRAF)
+                if (pObject && pObject->GetObjIdentifier() == SdrObjKind::Graphic)
                 {
                     SdrGrafObj* pGraphObj = static_cast<SdrGrafObj*>(pObject);
                     bOK = SetGraphic( pGraphObj->GetGraphic() );
@@ -469,10 +470,10 @@ bool ScDrawTransferObj::WriteObject( tools::SvRef<SotTempStream>& rxOStm, void* 
                 // impl. for "single OLE"
                 embed::XEmbeddedObject* pEmbObj = static_cast<embed::XEmbeddedObject*>(pUserObject);
 
-                ::utl::TempFile     aTempFile;
-                aTempFile.EnableKillingFile();
+                ::utl::TempFileFast aTempFile;
+                SvStream* pTempStream = aTempFile.GetStream(StreamMode::READWRITE);
                 uno::Reference< embed::XStorage > xWorkStore =
-                    ::comphelper::OStorageHelper::GetStorageFromURL( aTempFile.GetURL(), embed::ElementModes::READWRITE );
+                    ::comphelper::OStorageHelper::GetStorageFromStream( new utl::OStreamWrapper(*pTempStream) );
 
                 uno::Reference < embed::XEmbedPersist > xPers( static_cast<embed::XVisualObject*>(pEmbObj), uno::UNO_QUERY );
                 if ( xPers.is() )
@@ -513,10 +514,10 @@ bool ScDrawTransferObj::WriteObject( tools::SvRef<SotTempStream>& rxOStm, void* 
 
                 try
                 {
-                    ::utl::TempFile     aTempFile;
-                    aTempFile.EnableKillingFile();
+                    ::utl::TempFileFast aTempFile;
+                    SvStream* pTempStream = aTempFile.GetStream(StreamMode::READWRITE);
                     uno::Reference< embed::XStorage > xWorkStore =
-                        ::comphelper::OStorageHelper::GetStorageFromURL( aTempFile.GetURL(), embed::ElementModes::READWRITE );
+                        ::comphelper::OStorageHelper::GetStorageFromStream( new utl::OStreamWrapper(*pTempStream) );
 
                     // write document storage
                     pEmbObj->SetupStorage( xWorkStore, SOFFICE_FILEFORMAT_CURRENT, false );
@@ -530,13 +531,8 @@ bool ScDrawTransferObj::WriteObject( tools::SvRef<SotTempStream>& rxOStm, void* 
                     if ( xTransact.is() )
                         xTransact->commit();
 
-                    std::unique_ptr<SvStream> pSrcStm = ::utl::UcbStreamHelper::CreateStream( aTempFile.GetURL(), StreamMode::READ );
-                    if( pSrcStm )
-                    {
-                        rxOStm->SetBufferSize( 0xff00 );
-                        rxOStm->WriteStream( *pSrcStm );
-                        pSrcStm.reset();
-                    }
+                    rxOStm->SetBufferSize( 0xff00 );
+                    rxOStm->WriteStream( *pTempStream );
 
                     xWorkStore->dispose();
                     xWorkStore.clear();
@@ -637,7 +633,7 @@ SdrOle2Obj* ScDrawTransferObj::GetSingleObject()
     {
         SdrObjListIter aIter( pPage, SdrIterMode::Flat );
         SdrObject* pObject = aIter.Next();
-        if (pObject && pObject->GetObjIdentifier() == OBJ_OLE2)
+        if (pObject && pObject->GetObjIdentifier() == SdrObjKind::OLE2)
         {
             return static_cast<SdrOle2Obj*>(pObject);
         }

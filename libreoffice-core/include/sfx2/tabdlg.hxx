@@ -20,6 +20,7 @@
 #define INCLUDED_SFX2_TABDLG_HXX
 
 #include <memory>
+#include <unordered_map>
 #include <string_view>
 
 #include <sal/config.h>
@@ -92,6 +93,9 @@ protected:
     virtual void                RefreshInputSet();
     virtual SfxItemSet*         CreateInputItemSet(const OString& rName);
     virtual void                PageCreated(const OString &rName, SfxTabPage &rPage);
+
+    virtual void ActivatePage(const OString& rPage);
+    bool DeactivatePage(std::string_view aPage);
 
     std::unique_ptr<SfxItemSet> m_xExampleSet;
     SfxItemSet*     GetInputSetImpl();
@@ -187,6 +191,8 @@ private:
     const SfxItemSet*   pSet;
     OUString            aUserString;
     bool                bHasExchangeSupport;
+    std::unordered_map<OString, css::uno::Any> maAdditionalProperties;
+
     std::unique_ptr< TabPageImpl >        pImpl;
 
 protected:
@@ -194,6 +200,12 @@ protected:
 
     sal_uInt16          GetWhich( sal_uInt16 nSlot, bool bDeep = true ) const
                             { return pSet->GetPool()->GetWhich( nSlot, bDeep ); }
+    template<class T>
+    TypedWhichId<T> GetWhich( TypedWhichId<T> nSlot, bool bDeep = true ) const
+    {
+        return TypedWhichId<T>(GetWhich(sal_uInt16(nSlot), bDeep));
+    }
+
     const SfxPoolItem*  GetOldItem( const SfxItemSet& rSet, sal_uInt16 nSlot, bool bDeep = true );
     template<class T> const T* GetOldItem( const SfxItemSet& rSet, TypedWhichId<T> nSlot, bool bDeep = true )
     {
@@ -248,6 +260,11 @@ public:
     bool            IsVisible() const { return m_xContainer->get_visible(); }
 
     weld::Window*   GetFrameWeld() const;
+
+    std::unordered_map<OString, css::uno::Any>& getAdditionalProperties()
+    {
+        return maAdditionalProperties;
+    }
 };
 
 #endif

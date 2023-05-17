@@ -38,6 +38,8 @@
 
 #include <i18nlangtag/languagetag.hxx>
 #include <tools/UnitConversion.hxx>
+#include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <stdio.h>
 #include <string.h>
@@ -450,7 +452,7 @@ Strikeout2String(const uno::Any& rAny)
 {
     sal_Int16 n = rAny.get<sal_Int16>();
 
-    if( n >= 0 && n < sal_Int16(SAL_N_ELEMENTS(font_strikethrough)) )
+    if( n >= 0 && o3tl::make_unsigned(n) < SAL_N_ELEMENTS(font_strikethrough) )
         return g_strdup( font_strikethrough[n] );
 
     return nullptr;
@@ -1230,9 +1232,9 @@ attribute_set_new_from_extended_attributes(
         OUString sProperty = sExtendedAttrs.getToken( 0, ';', nIndex );
 
         sal_Int32 nColonPos = 0;
-        OString sPropertyName = OUStringToOString( sProperty.getToken( 0, ':', nColonPos ),
+        OString sPropertyName = OUStringToOString( o3tl::getToken(sProperty, 0, ':', nColonPos ),
                                                    RTL_TEXTENCODING_UTF8 );
-        OString sPropertyValue = OUStringToOString( sProperty.getToken( 0, ':', nColonPos ),
+        OString sPropertyValue = OUStringToOString( o3tl::getToken(sProperty, 0, ':', nColonPos ),
                                                     RTL_TEXTENCODING_UTF8 );
 
         pSet = attribute_set_prepend( pSet,

@@ -25,12 +25,14 @@
 #include <com/sun/star/awt/KeyEvent.hpp>
 #include <osl/diagnose.h>
 #include <rtl/character.hxx>
+#include <o3tl/string_view.hxx>
 #include <filter/msfilter/msvbahelper.hxx>
 #include <oox/helper/binaryinputstream.hxx>
 #include <oox/helper/storagebase.hxx>
 #include <oox/helper/textinputstream.hxx>
 #include <oox/ole/vbahelper.hxx>
 #include <oox/ole/vbainputstream.hxx>
+#include <utility>
 
 namespace oox::ole {
 
@@ -43,10 +45,10 @@ using ::com::sun::star::awt::KeyEvent;
 
 VbaModule::VbaModule( const Reference< XComponentContext >& rxContext,
                       const Reference< frame::XModel >& rxDocModel,
-                      const OUString& rName, rtl_TextEncoding eTextEnc, bool bExecutable ) :
+                      OUString aName, rtl_TextEncoding eTextEnc, bool bExecutable ) :
     mxContext( rxContext ),
     mxDocModel( rxDocModel ),
-    maName( rName ),
+    maName(std::move( aName )),
     meTextEnc( eTextEnc ),
     mnType( script::ModuleType::UNKNOWN ),
     mnOffset( SAL_MAX_UINT32 ),
@@ -136,7 +138,7 @@ void VbaModule::createAndImportModule( StorageBase& rVbaStrg,
 
 void VbaModule::registerShortcutKeys()
 {
-    for (VbaKeyBinding const& rKeyBinding : maKeyBindings)
+    for (VbaMacroKeyAndMethodBinding const& rKeyBinding : maKeyBindings)
     {
         try
         {
@@ -198,13 +200,13 @@ OUString VbaModule::readSourceCode( StorageBase& rVbaStrg )
                         int nSpaceIndex = aCodeLine.indexOf(' ');
                         OUString sProc = aCodeLine.copy( nSpaceIndex + 1, index - nSpaceIndex - 1);
                         // for Excel short cut key seems limited to cntrl+'a-z, A-Z'
-                        OUString sKey = aCodeLine.copy( aCodeLine.lastIndexOf("= ") + 3, 1 );
+                        std::u16string_view sKey = aCodeLine.subView( aCodeLine.lastIndexOf("= ") + 3, 1 );
                         // only alpha key valid for key shortcut, however the api will accept other keys
                         if ( rtl::isAsciiAlpha( sKey[ 0 ] ) )
                         {
                             // cntrl modifier is explicit ( but could be cntrl+shift ), parseKeyEvent
                             // will handle and uppercase letter appropriately
-                            OUString sApiKey = "^" + sKey;
+                            OUString sApiKey = OUString::Concat("^") + sKey;
                             maKeyBindings.push_back({sApiKey, sProc});
                         }
                     }
@@ -237,7 +239,7 @@ OUString VbaModule::readSourceCode( StorageBase& rVbaStrg )
                             procInfo.nPos = aSourceCode.getLength();
                         }
                     }
-                    else if ( mbExecutable && aCodeLine.trim().match("End Sub") )
+                    else if ( mbExecutable && o3tl::starts_with(o3tl::trim(aCodeLine), u"End Sub") )
                     {
                         // un-matched End Sub
                         if ( !procInfo.bInProcedure )

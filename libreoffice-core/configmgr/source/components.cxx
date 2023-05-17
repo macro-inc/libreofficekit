@@ -21,6 +21,7 @@
 
 #include <cassert>
 #include <chrono>
+#include <utility>
 #include <vector>
 #include <set>
 
@@ -49,8 +50,9 @@
 #include <sal/log.hxx>
 #include <sal/types.h>
 #include <salhelper/thread.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/backupfilehelper.hxx>
+#include <o3tl/string_view.hxx>
 
 #include "additions.hxx"
 #include "components.hxx"
@@ -84,9 +86,9 @@ struct UnresolvedVectorItem {
     rtl::Reference< ParseManager > manager;
 
     UnresolvedVectorItem(
-        OUString const & theName,
-        rtl::Reference< ParseManager > const & theManager):
-        name(theName), manager(theManager) {}
+        OUString  theName,
+        rtl::Reference< ParseManager > theManager):
+        name(std::move(theName)), manager(std::move(theManager)) {}
 };
 
 typedef std::vector< UnresolvedVectorItem > UnresolvedVector;
@@ -150,7 +152,7 @@ class Components::WriteThread: public salhelper::Thread {
 public:
     WriteThread(
         rtl::Reference< WriteThread > * reference, Components & components,
-        OUString const & url, Data const & data);
+        OUString url, Data const & data);
 
     void flush() { delay_.set(); }
 
@@ -169,9 +171,9 @@ private:
 
 Components::WriteThread::WriteThread(
     rtl::Reference< WriteThread > * reference, Components & components,
-    OUString const & url, Data const & data):
+    OUString url, Data const & data):
     Thread("configmgrWriter"), reference_(reference), components_(components),
-    url_(url), data_(data),
+    url_(std::move(url)), data_(data),
     lock_( lock() )
 {
     assert(reference != nullptr);
@@ -404,15 +406,15 @@ void Components::insertModificationXcuFile(
 }
 
 css::beans::Optional< css::uno::Any > Components::getExternalValue(
-    OUString const & descriptor)
+    std::u16string_view descriptor)
 {
-    sal_Int32 i = descriptor.indexOf(' ');
-    if (i <= 0) {
+    size_t i = descriptor.find(' ');
+    if (i == 0 || i == std::u16string_view::npos) {
         throw css::uno::RuntimeException(
-            "bad external value descriptor " + descriptor);
+            OUString::Concat("bad external value descriptor ") + descriptor);
     }
     //TODO: Do not make calls with mutex locked:
-    OUString name(descriptor.copy(0, i));
+    OUString name(descriptor.substr(0, i));
     ExternalServices::iterator j(externalServices_.find(name));
     if (j == externalServices_.end()) {
         css::uno::Reference< css::uno::XInterface > service;
@@ -438,11 +440,11 @@ css::beans::Optional< css::uno::Any > Components::getExternalValue(
     css::beans::Optional< css::uno::Any > value;
     if (j->second.is()) {
         try {
-            if (!(j->second->getPropertyValue(descriptor.copy(i + 1)) >>=
+            if (!(j->second->getPropertyValue(OUString(descriptor.substr(i + 1))) >>=
                   value))
             {
                 throw css::uno::RuntimeException(
-                    "cannot obtain external value through " + descriptor);
+                    OUString::Concat("cannot obtain external value through ") + descriptor);
             }
         } catch (css::beans::UnknownPropertyException & e) {
             throw css::uno::RuntimeException(
@@ -715,11 +717,11 @@ void Components::parseFiles(
 }
 
 void Components::parseFileList(
-    int layer, FileParser * parseFile, OUString const & urls,
+    int layer, FileParser * parseFile, std::u16string_view urls,
     bool recordAdditions)
 {
     for (sal_Int32 i = 0;;) {
-        OUString url(urls.getToken(0, ' ', i));
+        OUString url(o3tl::getToken(urls, 0, ' ', i));
         if (!url.isEmpty()) {
             Additions * adds = nullptr;
             if (recordAdditions) {
@@ -843,12 +845,12 @@ void Components::parseXcsXcuIniLayer(
         }
     }
     prefix.append(':');
-    OUString urls(prefix.toString() + "SCHEMA}");
+    OUString urls(prefix + "SCHEMA}");
     rtl::Bootstrap::expandMacros(urls);
     if (!urls.isEmpty()) {
         parseFileList(layer, &parseXcsFile, urls, false);
     }
-    urls = prefix.makeStringAndClear() + "DATA}";
+    urls = prefix + "DATA}";
     rtl::Bootstrap::expandMacros(urls);
     if (!urls.isEmpty()) {
         parseFileList(layer + 1, &parseXcuFile, urls, recordAdditions);

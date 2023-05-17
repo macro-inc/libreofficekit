@@ -22,7 +22,7 @@
 
 #include <array>
 #include <memory>
-#include <vcl/scrbar.hxx>
+#include <svtools/scrolladaptor.hxx>
 #include <vcl/help.hxx>
 
 #include "hiranges.hxx"
@@ -147,13 +147,12 @@ private:
     VclPtr<ScTabSplitter>       pHSplitter;
     VclPtr<ScTabSplitter>       pVSplitter;
     VclPtr<ScTabControl>        pTabControl;
-    VclPtr<ScrollBar>           aVScrollTop;
-    VclPtr<ScrollBar>           aVScrollBottom;         // initially visible
-    VclPtr<ScrollBar>           aHScrollLeft;           // initially visible
-    VclPtr<ScrollBar>           aHScrollRight;
+    VclPtr<ScrollAdaptor>       aVScrollTop;
+    VclPtr<ScrollAdaptor>       aVScrollBottom;         // initially visible
+    VclPtr<ScrollAdaptor>       aHScrollLeft;           // initially visible
+    VclPtr<ScrollAdaptor>       aHScrollRight;
     VclPtr<ScCornerButton>      aCornerButton;
     VclPtr<ScCornerButton>      aTopButton;
-    VclPtr<ScrollBarBox>        aScrollBarBox;
 
     std::shared_ptr<sc::SpellCheckContext> mpSpellCheckCxt;
 
@@ -215,13 +214,20 @@ private:
     bool                bBlockRows:1;             // are whole rows selected?
     bool                mbInlineWithScrollbar:1;  // should inline with scrollbar?
 
+    double              mfLastZoomScale = 0;
+    double              mfAccumulatedZoom = 0;
+
     void            Init();
 
     void            DoAddWin( ScGridWindow* pWin );
 
-    void            InitScrollBar( ScrollBar& rScrollBar, tools::Long nMaxVal );
-    DECL_LINK(ScrollHdl, ScrollBar*, void );
-    DECL_LINK(EndScrollHdl, ScrollBar*, void );
+    void            InitScrollBar(ScrollAdaptor& rScrollBar, tools::Long nMaxVal, const Link<weld::Scrollbar&, void>& rLink);
+    DECL_LINK(HScrollLeftHdl, weld::Scrollbar&, void );
+    DECL_LINK(HScrollRightHdl, weld::Scrollbar&, void );
+    DECL_LINK(VScrollTopHdl, weld::Scrollbar&, void );
+    DECL_LINK(VScrollBottomHdl, weld::Scrollbar&, void );
+    DECL_LINK(EndScrollHdl, const MouseEvent&, bool);
+    void ScrollHdl(ScrollAdaptor* rScrollBar);
 
     DECL_LINK(SplitHdl, Splitter*, void);
     void            DoHSplit(tools::Long nSplitPos);
@@ -231,8 +237,8 @@ private:
 
     void            UpdateVarZoom();
 
-    static void     SetScrollBar( ScrollBar& rScroll, tools::Long nRangeMax, tools::Long nVisible, tools::Long nPos, bool bLayoutRTL );
-    static tools::Long     GetScrollBarPos( const ScrollBar& rScroll );
+    static void     SetScrollBar( ScrollAdaptor& rScroll, tools::Long nRangeMax, tools::Long nVisible, tools::Long nPos, bool bLayoutRTL );
+    static tools::Long     GetScrollBarPos( const ScrollAdaptor& rScroll );
 
     void            GetAreaMoveEndPosition(SCCOL nMovX, SCROW nMovY, ScFollowMode eMode,
                                            SCCOL& rAreaX, SCROW& rAreaY, ScFollowMode& rMode);
@@ -251,6 +257,10 @@ private:
      **/
 
     void            PaintRangeFinderEntry (const ScRangeFindData* pData, SCTAB nTab);
+
+    void            SetZoomPercentFromCommand(sal_uInt16 nZoomPercent);
+
+    DECL_STATIC_LINK(ScTabView, InstallLOKNotifierHdl, void*, vcl::ILibreOfficeKitNotifier*);
 
 protected:
     void            UpdateHeaderWidth( const ScVSplitPos* pWhich = nullptr,
@@ -454,6 +464,7 @@ public:
     SC_DLLPUBLIC void           ScrollLines( tools::Long nDeltaX, tools::Long nDeltaY );              // active
 
     bool            ScrollCommand( const CommandEvent& rCEvt, ScSplitPos ePos );
+    bool            GestureZoomCommand(const CommandEvent& rCEvt);
 
     void            ScrollToObject( const SdrObject* pDrawObj );
     void            MakeVisible( const tools::Rectangle& rHMMRect );
@@ -521,7 +532,7 @@ public:
     void            InitBlockMode( SCCOL nCurX, SCROW nCurY, SCTAB nCurZ,
                                    bool bTestNeg = false,
                                    bool bCols = false, bool bRows = false, bool bForceNeg = false );
-    void            InitOwnBlockMode();
+    void            InitOwnBlockMode( const ScRange& rMarkRange );
     void            DoneBlockMode( bool bContinue = false );
 
     bool            IsBlockMode() const;

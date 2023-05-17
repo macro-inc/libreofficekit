@@ -57,7 +57,7 @@ struct MapTableFrameFormat
 
 typedef std::vector<MapTableFrameFormat> MapTableFrameFormats;
 
-SwContentNode* SwTextNode::MakeCopy(SwDoc& rDoc, const SwNodeIndex& rIdx, bool const bNewFrames) const
+SwContentNode* SwTextNode::MakeCopy(SwDoc& rDoc, SwNode& rIdx, bool const bNewFrames) const
 {
     // the Copy-Textnode is the Node with the Text, the Copy-Attrnode is the
     // node with the collection and hard attributes. Normally is the same
@@ -106,7 +106,7 @@ SwContentNode* SwTextNode::MakeCopy(SwDoc& rDoc, const SwNodeIndex& rIdx, bool c
 
     // Is that enough? What about PostIts/Fields/FieldTypes?
     // #i96213# - force copy of all attributes
-    pCpyTextNd->CopyText( pTextNd, SwIndex( pCpyTextNd ),
+    pCpyTextNd->CopyText( pTextNd, SwContentIndex( pCpyTextNd ),
         pCpyTextNd->GetText().getLength(), true );
 
     if( RES_CONDTXTFMTCOLL == pColl->Which() )
@@ -155,11 +155,10 @@ static void lcl_CopyTableBox( SwTableBox* pBox, CopyTable* pCT )
 
     if (pBoxFormat == pBox->GetFrameFormat()) // Create a new one?
     {
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == pBoxFormat->GetItemState( RES_BOXATR_FORMULA, false,
-            &pItem ) && static_cast<const SwTableBoxFormula*>(pItem)->IsIntrnlName() )
+        const SwTableBoxFormula* pFormulaItem = pBoxFormat->GetItemIfSet( RES_BOXATR_FORMULA, false );
+        if( pFormulaItem && pFormulaItem->IsIntrnlName() )
         {
-            const_cast<SwTableBoxFormula*>(static_cast<const SwTableBoxFormula*>(pItem))->PtrToBoxNm(pCT->m_pOldTable);
+            const_cast<SwTableBoxFormula*>(pFormulaItem)->PtrToBoxNm(pCT->m_pOldTable);
         }
 
         pBoxFormat = pCT->m_rDoc.MakeTableBoxFormat();
@@ -168,10 +167,11 @@ static void lcl_CopyTableBox( SwTableBox* pBox, CopyTable* pCT )
         if( pBox->GetSttIdx() )
         {
             SvNumberFormatter* pN = pCT->m_rDoc.GetNumberFormatter(false);
-            if( pN && pN->HasMergeFormatTable() && SfxItemState::SET == pBoxFormat->
-                GetItemState( RES_BOXATR_FORMAT, false, &pItem ) )
+            const SwTableBoxNumFormat* pFormatItem;
+            if( pN && pN->HasMergeFormatTable() &&
+                (pFormatItem = pBoxFormat->GetItemIfSet( RES_BOXATR_FORMAT, false )) )
             {
-                sal_uLong nOldIdx = static_cast<const SwTableBoxNumFormat*>(pItem)->GetValue();
+                sal_uLong nOldIdx = pFormatItem->GetValue();
                 sal_uLong nNewIdx = pN->GetMergeFormatIndex( nOldIdx );
                 if( nNewIdx != nOldIdx )
                     pBoxFormat->SetFormatAttr( SwTableBoxNumFormat( nNewIdx ));
@@ -258,17 +258,20 @@ SwTableNode* SwTableNode::MakeCopy( SwDoc& rDoc, const SwNodeIndex& rIdx ) const
     {
         const SwFrameFormats& rTableFormats = *rDoc.GetTableFrameFormats();
         for( size_t n = rTableFormats.size(); n; )
-            if( rTableFormats[ --n ]->GetName() == sTableName )
+        {
+            const SwFrameFormat* pFormat = rTableFormats[--n];
+            if (pFormat->GetName() == sTableName && rDoc.IsUsed(*pFormat))
             {
                 sTableName = rDoc.GetUniqueTableName();
                 break;
             }
+        }
     }
 
     SwFrameFormat* pTableFormat = rDoc.MakeTableFrameFormat( sTableName, rDoc.GetDfltFrameFormat() );
     pTableFormat->CopyAttrs( *GetTable().GetFrameFormat() );
-    SwTableNode* pTableNd = new SwTableNode( rIdx );
-    SwEndNode* pEndNd = new SwEndNode( rIdx, *pTableNd );
+    SwTableNode* pTableNd = new SwTableNode( rIdx.GetNode() );
+    SwEndNode* pEndNd = new SwEndNode( rIdx.GetNode(), *pTableNd );
     SwNodeIndex aInsPos( *pEndNd );
 
     SwTable& rTable = pTableNd->GetTable();
@@ -305,7 +308,7 @@ SwTableNode* SwTableNode::MakeCopy( SwDoc& rDoc, const SwNodeIndex& rIdx ) const
     // We have to make sure that the table node of the SwTable is accessible, even
     // without any content in m_TabSortContentBoxes. #i26629#
     pTableNd->GetTable().SetTableNode( pTableNd );
-    rNds.Copy_( aRg, aInsPos, false );
+    rNds.Copy_( aRg, aInsPos.GetNode(), false );
     pTableNd->GetTable().SetTableNode( nullptr );
 
     // Special case for a single box

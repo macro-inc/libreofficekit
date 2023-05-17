@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from libreoffice.uno.propertyvalue import mkPropertyValues
@@ -22,7 +25,7 @@ class WriterSort(UITestCase):
             xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RETURN"}))
             type_text(xWriterEdit, "v")
 
-            selection = self.xUITest.executeCommand(".uno:SelectAll")  #select whole text
+            self.xUITest.executeCommand(".uno:SelectAll")  #select whole text
             #Tools - Sort
             with self.ui_test.execute_dialog_through_command(".uno:SortDialog") as xDialog:
                 xDown = xDialog.getChild("down1")
@@ -40,11 +43,10 @@ class WriterSort(UITestCase):
             xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RETURN"}))
             type_text(xWriterEdit, "2;8;3")
 
-            selection = self.xUITest.executeCommand(".uno:SelectAll")  #select whole text
+            self.xUITest.executeCommand(".uno:SelectAll")  #select whole text
             #Tools - Sort
             with self.ui_test.execute_dialog_through_command(".uno:SortDialog") as xDialog:
                 xDown = xDialog.getChild("down1")
-                xcolsb1 = xDialog.getChild("colsb1")
                 xtypelb1 = xDialog.getChild("typelb1")
                 xcharacter = xDialog.getChild("character")
                 xseparator = xDialog.getChild("separator")

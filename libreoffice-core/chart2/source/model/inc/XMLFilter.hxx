@@ -24,9 +24,8 @@
 #include <com/sun/star/document/XExporter.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/io/XActiveDataSource.hpp>
 #include <osl/mutex.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 namespace com::sun::star::beans { class XPropertySet; }
 namespace com::sun::star::uno { class XComponentContext; }
@@ -129,7 +128,7 @@ private:
     ::osl::Mutex                                   m_aMutex;
 };
 
-class XMLReportFilterHelper : public XMLFilter
+class XMLReportFilterHelper final : public XMLFilter
 {
     virtual void isOasisFormat(const css::uno::Sequence< css::beans::PropertyValue >& _rMediaDescriptor,
                                bool & _rOutOASIS ) override;

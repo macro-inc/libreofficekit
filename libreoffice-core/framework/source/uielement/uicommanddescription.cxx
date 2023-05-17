@@ -203,11 +203,11 @@ Any ConfigurationAccess_UICommand::getByNameImpl( const OUString& rCommandURL )
         addGenericInfoToCache();
 
         if ( rCommandURL.equalsIgnoreAsciiCase( UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDIMAGELIST ))
-            return makeAny( m_aCommandImageList );
+            return Any( m_aCommandImageList );
         else if ( rCommandURL.equalsIgnoreAsciiCase( UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDROTATEIMAGELIST ))
-            return makeAny( m_aCommandRotateImageList );
+            return Any( m_aCommandRotateImageList );
         else if ( rCommandURL.equalsIgnoreAsciiCase( UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDMIRRORIMAGELIST ))
-            return makeAny( m_aCommandMirrorImageList );
+            return Any( m_aCommandMirrorImageList );
         else
             return Any();
     }
@@ -266,19 +266,26 @@ Any ConfigurationAccess_UICommand::getSequenceFromCache( const OUString& aComman
         if ( !pIter->second.bCommandNameCreated )
             fillInfoFromResult( pIter->second, pIter->second.aLabel );
 
+        static constexpr OUStringLiteral sLabel = u"Label";
+        static constexpr OUStringLiteral sName = u"Name";
+        static constexpr OUStringLiteral sPopup = u"Popup";
+        static constexpr OUStringLiteral sPopupLabel = u"PopupLabel";
+        static constexpr OUStringLiteral sTooltipLabel = u"TooltipLabel";
+        static constexpr OUStringLiteral sTargetURL = u"TargetURL";
+        static constexpr OUStringLiteral sIsExperimental = u"IsExperimental";
         Sequence< PropertyValue > aPropSeq{
-            comphelper::makePropertyValue("Label", !pIter->second.aContextLabel.isEmpty()
-                                                       ? makeAny(pIter->second.aContextLabel)
-                                                       : makeAny(pIter->second.aLabel)),
-            comphelper::makePropertyValue("Name", pIter->second.aCommandName),
-            comphelper::makePropertyValue("Popup", pIter->second.bPopup),
+            comphelper::makePropertyValue(sLabel, !pIter->second.aContextLabel.isEmpty()
+                                                       ? Any(pIter->second.aContextLabel)
+                                                       : Any(pIter->second.aLabel)),
+            comphelper::makePropertyValue(sName, pIter->second.aCommandName),
+            comphelper::makePropertyValue(sPopup, pIter->second.bPopup),
             comphelper::makePropertyValue(m_aPropProperties, pIter->second.nProperties),
-            comphelper::makePropertyValue("PopupLabel", pIter->second.aPopupLabel),
-            comphelper::makePropertyValue("TooltipLabel", pIter->second.aTooltipLabel),
-            comphelper::makePropertyValue("TargetURL", pIter->second.aTargetURL),
-            comphelper::makePropertyValue("IsExperimental", pIter->second.bIsExperimental)
+            comphelper::makePropertyValue(sPopupLabel, pIter->second.aPopupLabel),
+            comphelper::makePropertyValue(sTooltipLabel, pIter->second.aTooltipLabel),
+            comphelper::makePropertyValue(sTargetURL, pIter->second.aTargetURL),
+            comphelper::makePropertyValue(sIsExperimental, pIter->second.bIsExperimental)
         };
-        return makeAny( aPropSeq );
+        return Any( aPropSeq );
     }
 
     return Any();
@@ -565,8 +572,7 @@ void UICommandDescription::ensureGenericUICommandsForLanguage(const LanguageTag&
 }
 
 UICommandDescription::UICommandDescription(const Reference< XComponentContext >& rxContext)
-    : UICommandDescription_BASE(m_aMutex)
-    , m_aPrivateResourceURL(PRIVATE_RESOURCE_URL)
+    : m_aPrivateResourceURL(PRIVATE_RESOURCE_URL)
     , m_xContext(rxContext)
 {
     SvtSysLocale aSysLocale;
@@ -584,14 +590,13 @@ UICommandDescription::UICommandDescription(const Reference< XComponentContext >&
 }
 
 UICommandDescription::UICommandDescription(const Reference< XComponentContext >& rxContext, bool)
-    : UICommandDescription_BASE(m_aMutex)
-    , m_xContext(rxContext)
+    : m_xContext(rxContext)
 {
 }
 
 UICommandDescription::~UICommandDescription()
 {
-    osl::MutexGuard g(rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
     m_aModuleToCommandFileMap.clear();
     m_aUICommandsHashMap.clear();
     m_xGenericUICommands.clear();
@@ -637,7 +642,7 @@ Any SAL_CALL UICommandDescription::getByName( const OUString& aName )
     const LanguageTag& rCurrentLanguage = aSysLocale.GetUILanguageTag();
     Any a;
 
-    osl::MutexGuard g(rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
 
     ModuleToCommandFileMap::const_iterator pM2CIter = m_aModuleToCommandFileMap.find( aName );
     if ( pM2CIter != m_aModuleToCommandFileMap.end() )
@@ -682,14 +687,14 @@ Any SAL_CALL UICommandDescription::getByName( const OUString& aName )
 
 Sequence< OUString > SAL_CALL UICommandDescription::getElementNames()
 {
-    osl::MutexGuard g(rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
 
     return comphelper::mapKeysToSequence( m_aModuleToCommandFileMap );
 }
 
 sal_Bool SAL_CALL UICommandDescription::hasByName( const OUString& aName )
 {
-    osl::MutexGuard g(rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
 
     ModuleToCommandFileMap::const_iterator pIter = m_aModuleToCommandFileMap.find( aName );
     return ( pIter != m_aModuleToCommandFileMap.end() );

@@ -82,10 +82,10 @@ ParaLineSpacingControl::ParaLineSpacingControl(SvxLineSpacingToolBoxControl* pCo
     mxLineDistAtMetricBox->connect_value_changed( aLink2 );
 
     FieldUnit eUnit = FieldUnit::INCH;
-    const SfxPoolItem* pItem = nullptr;
+    const SfxUInt16Item* pItem = nullptr;
     SfxViewFrame* pCurrent = SfxViewFrame::Current();
     if (pCurrent && pCurrent->GetBindings().GetDispatcher()->QueryState(SID_ATTR_METRIC, pItem) >= SfxItemState::DEFAULT)
-        eUnit = static_cast<FieldUnit>(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
+        eUnit = static_cast<FieldUnit>(pItem->GetValue());
     else
         eUnit = SfxModule::GetCurrentFieldUnit();
 
@@ -122,7 +122,7 @@ ParaLineSpacingControl::~ParaLineSpacingControl()
 
 void ParaLineSpacingControl::Initialize()
 {
-    const SfxPoolItem* pItem(nullptr);
+    const SvxLineSpacingItem* pItem(nullptr);
     SfxViewFrame* pCurrent = SfxViewFrame::Current();
     const bool bItemStateSet(nullptr != pCurrent);
     const SfxItemState eState(bItemStateSet
@@ -133,7 +133,7 @@ void ParaLineSpacingControl::Initialize()
 
     if( bItemStateSet && (eState == SfxItemState::DEFAULT || eState == SfxItemState::SET) )
     {
-        const SvxLineSpacingItem* currSPItem = static_cast<const SvxLineSpacingItem*>(pItem);
+        const SvxLineSpacingItem* currSPItem = pItem;
         MapUnit eUnit = pCurrent->GetPool().GetMetric(currSPItem->Which());
         meLNSpaceUnit = eUnit;
 
@@ -346,8 +346,11 @@ void ParaLineSpacingControl::ExecuteLineSpace()
             break;
     }
 
-    SfxViewFrame::Current()->GetBindings().GetDispatcher()->ExecuteList(
+    if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+    {
+        pViewFrm->GetBindings().GetDispatcher()->ExecuteList(
             SID_ATTR_PARA_LINESPACE, SfxCallMode::RECORD, { &aSpacing });
+    }
 }
 
 void ParaLineSpacingControl::SetLineSpace(SvxLineSpacingItem& rLineSpace, sal_Int32 eSpace, tools::Long lValue)
@@ -423,8 +426,11 @@ void ParaLineSpacingControl::ExecuteLineSpacing(sal_Int32 nEntry)
 
     SetLineSpace(aSpacing, nEntry);
 
-    SfxViewFrame::Current()->GetBindings().GetDispatcher()->ExecuteList(
+    if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+    {
+        pViewFrm->GetBindings().GetDispatcher()->ExecuteList(
             SID_ATTR_PARA_LINESPACE, SfxCallMode::RECORD, { &aSpacing });
+    }
 
     // close when the user used the buttons
     mxControl->EndPopupMode();

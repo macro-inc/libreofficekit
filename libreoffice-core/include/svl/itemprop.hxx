@@ -25,10 +25,10 @@
 #include <cppuhelper/implbase.hxx>
 #include <svl/itemset.hxx>
 #include <svl/svldllapi.h>
-#include <vector>
-#include <unordered_map>
 #include <o3tl/sorted_vector.hxx>
+#include <o3tl/span.hxx>
 #include <string_view>
+#include <utility>
 
 // values from com/sun/star/beans/PropertyAttribute
 #define PROPERTY_NONE 0
@@ -46,9 +46,9 @@ struct SfxItemPropertyMapEntry
     sal_uInt8                           nMemberId;
     PropertyMoreFlags                   nMoreFlags;
 
-    SfxItemPropertyMapEntry(const OUString & _aName, sal_uInt16 _nWID, css::uno::Type const & _rType,
+    SfxItemPropertyMapEntry(OUString _aName, sal_uInt16 _nWID, css::uno::Type const & _rType,
                                sal_Int16 _nFlags, sal_uInt8 const _nMemberId, PropertyMoreFlags _nMoreFlags = PropertyMoreFlags::NONE)
-        : aName(      _aName )
+        : aName(std::move( _aName ))
         , aType(     _rType )
         , nWID(      _nWID )
         , nFlags(    _nFlags )
@@ -81,7 +81,7 @@ class SVL_DLLPUBLIC SfxItemPropertyMap
     o3tl::sorted_vector< const SfxItemPropertyMapEntry*, SfxItemPropertyMapCompare > m_aMap;
     mutable css::uno::Sequence< css::beans::Property > m_aPropSeq;
 public:
-    SfxItemPropertyMap( const SfxItemPropertyMapEntry* pEntries );
+    SfxItemPropertyMap( o3tl::span<const SfxItemPropertyMapEntry> pEntries );
     SfxItemPropertyMap( const SfxItemPropertyMap& rSource );
     ~SfxItemPropertyMap();
 
@@ -100,7 +100,7 @@ class SVL_DLLPUBLIC SfxItemPropertySet final
     mutable css::uno::Reference<css::beans::XPropertySetInfo> m_xInfo;
 
 public:
-                            SfxItemPropertySet( const SfxItemPropertyMapEntry *pMap ) :
+                            SfxItemPropertySet( o3tl::span<const SfxItemPropertyMapEntry> pMap ) :
                                 m_aMap(pMap) {}
                             ~SfxItemPropertySet();
 
@@ -151,7 +151,7 @@ class SVL_DLLPUBLIC SfxItemPropertySetInfo final : public SfxItemPropertySetInfo
 
 public:
     SfxItemPropertySetInfo(const SfxItemPropertyMap &rMap );
-    SfxItemPropertySetInfo(const SfxItemPropertyMapEntry *pEntries );
+    SfxItemPropertySetInfo(o3tl::span<const SfxItemPropertyMapEntry> pEntries );
     virtual ~SfxItemPropertySetInfo() override;
 
     virtual css::uno::Sequence< css::beans::Property > SAL_CALL
@@ -180,7 +180,7 @@ class SVL_DLLPUBLIC SfxExtItemPropertySetInfo final : public SfxExtItemPropertyS
 {
 public:
                             SfxExtItemPropertySetInfo(
-                                const SfxItemPropertyMapEntry *pMap,
+                                o3tl::span<const SfxItemPropertyMapEntry> pMap,
                                 const css::uno::Sequence<css::beans::Property>& rPropSeq );
                             virtual ~SfxExtItemPropertySetInfo() override;
 

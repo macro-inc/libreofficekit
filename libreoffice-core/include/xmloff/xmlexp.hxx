@@ -49,7 +49,7 @@
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <tools/fldunit.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 #include <vector>
 #include <memory>
@@ -267,22 +267,22 @@ public:
 
     SvXMLExport(
         const css::uno::Reference< css::uno::XComponentContext >& xContext,
-        OUString const & implementationName,
+        OUString implementationName,
         sal_Int16 const eDefaultMeasureUnit /*css::util::MeasureUnit*/,
         const enum ::xmloff::token::XMLTokenEnum eClass,
         SvXMLExportFlags nExportFlag );
 
     SvXMLExport(
         const css::uno::Reference< css::uno::XComponentContext >& xContext,
-        OUString const & implementationName,
-        const OUString& rFileName,
+        OUString implementationName,
+        OUString fileName,
         sal_Int16 const eDefaultMeasureUnit /*css::util::MeasureUnit*/,
         const css::uno::Reference< css::xml::sax::XDocumentHandler > & rHandler);
 
     SvXMLExport(
         const css::uno::Reference< css::uno::XComponentContext >& xContext,
-        OUString const & implementationName,
-        const OUString& rFileName,
+        OUString implementationName,
+        OUString fileName,
         const css::uno::Reference< css::xml::sax::XDocumentHandler > & rHandler,
         const css::uno::Reference< css::frame::XModel > &,
         FieldUnit const eDefaultFieldUnit,

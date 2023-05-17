@@ -20,6 +20,7 @@
 #pragma once
 
 #include "address.hxx"
+#include "typedstrdata.hxx"
 #include <i18nlangtag/lang.h>
 #include <svx/svdtypes.hxx>
 #include <tools/ref.hxx>
@@ -44,7 +45,7 @@ namespace com::sun::star::uno { template <typename > class Reference; }
 class SfxItemSet;
 class SfxViewShell;
 struct ScCalcConfig;
-enum class SvtScriptType;
+enum class SvtScriptType : sal_uInt8;
 enum class FormulaError : sal_uInt16;
 enum class SvNumFormatType : sal_Int16;
 
@@ -54,12 +55,12 @@ enum class SvNumFormatType : sal_Int16;
 //  Clipboard names are in so3/soapp.hxx now
 //  STRING_SCAPP was "scalc3", "scalc4", now just "scalc"
 
-#define STRING_SCAPP    "scalc"
+inline constexpr OUStringLiteral STRING_SCAPP = u"scalc";
 
-#define STRING_STANDARD "Standard"
+inline constexpr OUStringLiteral STRING_STANDARD = u"Standard";
 
 // Have the dreaded programmatic filter name defined in one place.
-#define SC_TEXT_CSV_FILTER_NAME "Text - txt - csv (StarCalc)"
+inline constexpr OUStringLiteral SC_TEXT_CSV_FILTER_NAME = u"Text - txt - csv (StarCalc)";
 
 // characters
 
@@ -75,8 +76,8 @@ const sal_Unicode CHAR_NNBSP    = 0x202F; //NARROW NO-BREAK SPACE
 #define MINDOUBLE   1.7e-307
 #define MAXDOUBLE   1.7e307
 
-#define MINZOOM     20
-#define MAXZOOM     400
+const sal_uInt16 MINZOOM = 20;
+const sal_uInt16 MAXZOOM = 400;
 
 const SCSIZE MAXSUBTOTAL        = 3;
 
@@ -455,6 +456,17 @@ struct ScImportParam
     bool            operator==  ( const ScImportParam& r ) const;
 };
 
+// Formula data replacement character for a pair of parentheses at end of
+// function name, to force sorting parentheses before all other characters.
+// Collation may treat parentheses differently.
+constexpr sal_Unicode cParenthesesReplacement = 0x0001;
+struct InputHandlerFunctionNames
+{
+    ScTypedCaseStrSet       maFunctionData;
+    ScTypedCaseStrSet       maFunctionDataPara;
+    std::set<sal_Unicode>   maFunctionChar;
+};
+
 class ScDocShell;
 class SvxSearchItem;
 class ScAutoFormat;
@@ -489,6 +501,10 @@ namespace utl {
     class TransliterationWrapper;
 }
 
+namespace sc {
+    class SharedStringPoolPurge;
+}
+
 class ScGlobal
 {
     static std::unique_ptr<SvxSearchItem> xSearchItem;
@@ -516,6 +532,10 @@ class ScGlobal
     static std::atomic<css::lang::Locale*>   pLocale;
 
     static std::unique_ptr<ScFieldEditEngine> xFieldEditEngine;
+
+    static std::atomic<sc::SharedStringPoolPurge*> pSharedStringPoolPurge;
+
+    static InputHandlerFunctionNames maInputHandlerFunctionNames;
 
     static void                 InitPPT();
 
@@ -589,6 +609,7 @@ public:
     static ScFunctionList*  GetStarCalcFunctionList();
     static ScFunctionMgr*   GetStarCalcFunctionMgr();
     static void             ResetFunctionList();
+    static const InputHandlerFunctionNames& GetInputHandlerFunctionNames();
 
     static OUString         GetErrorString(FormulaError nErrNumber);
     static OUString         GetLongErrorString(FormulaError nErrNumber);
@@ -621,7 +642,7 @@ public:
                                 bool bForceSep = false );
 
     /** Returns true, if the first and last character of the string is cQuote. */
-    SC_DLLPUBLIC static bool             IsQuoted( const OUString& rString, sal_Unicode cQuote );
+    SC_DLLPUBLIC static bool             IsQuoted( std::u16string_view rString, sal_Unicode cQuote );
 
     /** Inserts the character cQuote at beginning and end of rString.
         @param bEscapeEmbedded      If <TRUE/>, embedded quote characters are
@@ -652,7 +673,7 @@ public:
      */
     SC_DLLPUBLIC static const sal_Unicode* FindUnquoted( const sal_Unicode* pString, sal_Unicode cChar );
 
-    static  rtl_TextEncoding GetCharsetValue( const OUString& rCharSet );
+    static  rtl_TextEncoding GetCharsetValue( std::u16string_view rCharSet );
     static  OUString        GetCharsetString( rtl_TextEncoding eVal );
 
     /// a "ReadOnly" formatter for UNO/XML export
@@ -676,6 +697,8 @@ public:
     /** A static instance of ScFieldEditEngine not capable of resolving
         document specific fields, to be used only by ScEditUtil::GetString(). */
     static ScFieldEditEngine&   GetStaticFieldEditEngine();
+
+    static sc::SharedStringPoolPurge& GetSharedStringPoolPurge();
 
     /** Replaces the first occurrence of rPlaceholder in rString with
         rReplacement, or if rPlaceholder is not found appends one space if

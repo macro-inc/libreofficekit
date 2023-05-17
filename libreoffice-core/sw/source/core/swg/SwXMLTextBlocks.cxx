@@ -29,8 +29,9 @@
 #include <sot/stg.hxx>
 #include <sfx2/docfile.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/ucbstreamhelper.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <comphelper/storagehelper.hxx>
 #include <doc.hxx>
@@ -231,6 +232,59 @@ ErrCode SwXMLTextBlocks::Rename( sal_uInt16 nIdx, const OUString& rNewShort )
     return ERRCODE_NONE;
 }
 
+ErrCode SwXMLTextBlocks::CopyBlock( SwImpBlocks& rDestImp, OUString& rShort,
+                                                    const OUString& rLong)
+{
+    ErrCode nError = ERRCODE_NONE;
+    OpenFile();
+    rDestImp.OpenFile(false);
+    const OUString aGroup( rShort );
+    bool bTextOnly = IsOnlyTextBlock ( rShort ) ;//pImp->pBlkRoot->IsStream( aGroup );
+    sal_uInt16 nIndex = GetIndex ( rShort );
+    OUString sPackageName( GetPackageName (nIndex) );
+    OUString sDestShortName( sPackageName );
+    sal_uInt16 nIdx = 0;
+
+    OSL_ENSURE( m_xBlkRoot.is(), "No storage set" );
+    if(!m_xBlkRoot.is())
+        return ERR_SWG_WRITE_ERROR;
+
+    uno::Reference < container::XNameAccess > xAccess(static_cast<SwXMLTextBlocks&>(rDestImp).m_xBlkRoot);
+    while ( xAccess->hasByName( sDestShortName ) )
+    {
+        ++nIdx;
+        // If someone is that crazy ...
+        if(USHRT_MAX == nIdx)
+        {
+            CloseFile();
+            rDestImp.CloseFile();
+            return ERR_SWG_WRITE_ERROR;
+        }
+        sDestShortName = sPackageName + OUString::number( nIdx );
+    }
+
+    try
+    {
+        uno::Reference < embed::XStorage > rSourceRoot = m_xBlkRoot->openStorageElement( aGroup, embed::ElementModes::READ );
+        uno::Reference < embed::XStorage > rDestRoot = static_cast<SwXMLTextBlocks&>(rDestImp).m_xBlkRoot->openStorageElement( sDestShortName, embed::ElementModes::READWRITE );
+        rSourceRoot->copyToStorage( rDestRoot );
+    }
+    catch (const uno::Exception&)
+    {
+        nError = ERR_SWG_WRITE_ERROR;
+    }
+
+    if(!nError)
+    {
+        rShort = sDestShortName;
+        static_cast<SwXMLTextBlocks&>(rDestImp).AddName( rShort, rLong, bTextOnly );
+        static_cast<SwXMLTextBlocks&>(rDestImp).MakeBlockList();
+    }
+    CloseFile();
+    rDestImp.CloseFile();
+    return nError;
+}
+
 ErrCode SwXMLTextBlocks::StartPutBlock( const OUString& rShort, const OUString& rPackageName )
 {
     OSL_ENSURE( m_xBlkRoot.is(), "No storage set" );
@@ -243,7 +297,7 @@ ErrCode SwXMLTextBlocks::StartPutBlock( const OUString& rShort, const OUString& 
 
         uno::Reference< beans::XPropertySet > xRootProps( m_xRoot, uno::UNO_QUERY_THROW );
         OUString aMime( SotExchange::GetFormatMimeType( SotClipboardFormatId::STARWRITER_8 ) );
-        xRootProps->setPropertyValue( "MediaType", uno::makeAny( aMime ) );
+        xRootProps->setPropertyValue( "MediaType", uno::Any( aMime ) );
     }
     catch (const uno::Exception&)
     {
@@ -267,7 +321,7 @@ ErrCode SwXMLTextBlocks::PutBlock()
     SwXmlFlags nCommitFlags = m_nFlags;
 
     WriterRef xWrt;
-    ::GetXMLWriter ( OUString(), GetBaseURL(), xWrt);
+    ::GetXMLWriter ( std::u16string_view(), GetBaseURL(), xWrt);
     SwWriter aWriter (m_xRoot, *m_xDoc );
 
     xWrt->m_bBlock = true;
@@ -496,7 +550,7 @@ ErrCode SwXMLTextBlocks::PutText( const OUString& rShort, const OUString& rName,
     return nRes;
 }
 
-void SwXMLTextBlocks::MakeBlockText( const OUString& rText )
+void SwXMLTextBlocks::MakeBlockText( std::u16string_view rText )
 {
     SwTextNode* pTextNode = m_xDoc->GetNodes()[ m_xDoc->GetNodes().GetEndOfContent().
                                         GetIndex() - 1 ]->GetTextNode();
@@ -510,8 +564,8 @@ void SwXMLTextBlocks::MakeBlockText( const OUString& rText )
         {
             pTextNode = static_cast<SwTextNode*>(pTextNode->AppendNode( SwPosition( *pTextNode ) ));
         }
-        SwIndex aIdx( pTextNode );
-        pTextNode->InsertText( rText.getToken( 0, '\015', nPos ), aIdx );
+        SwContentIndex aIdx( pTextNode );
+        pTextNode->InsertText( OUString(o3tl::getToken(rText, 0, '\015', nPos )), aIdx );
     } while ( -1 != nPos );
 }
 

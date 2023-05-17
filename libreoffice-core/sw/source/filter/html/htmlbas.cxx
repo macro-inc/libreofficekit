@@ -189,7 +189,7 @@ void SwHTMLParser::AddScriptSource()
             if( nPos != -1 )
             {
                 m_aBasicLib =
-                    aToken.copy( nPos + sizeof(OOO_STRING_SVTOOLS_HTML_SB_library) - 1 );
+                    aToken.subView( nPos + sizeof(OOO_STRING_SVTOOLS_HTML_SB_library) - 1 );
                 m_aBasicLib = comphelper::string::strip(m_aBasicLib, ' ');
             }
         }
@@ -200,7 +200,7 @@ void SwHTMLParser::AddScriptSource()
             if( nPos != -1 )
             {
                 m_aBasicModule =
-                    aToken.copy( nPos + sizeof(OOO_STRING_SVTOOLS_HTML_SB_module) - 1 );
+                    aToken.subView( nPos + sizeof(OOO_STRING_SVTOOLS_HTML_SB_module) - 1 );
                 m_aBasicModule = comphelper::string::strip(m_aBasicModule, ' ');
             }
         }
@@ -284,7 +284,7 @@ void SwHTMLWriter::OutBasic(const SwHTMLWriter & rHTMLWrt)
                     "=\"text/x-";
                 Strm().WriteOString( sOut );
                 // Entities aren't welcome here
-                Strm().WriteOString( OUStringToOString(sLang, m_eDestEnc) )
+                Strm().WriteOString( OUStringToOString(sLang, RTL_TEXTENCODING_UTF8) )
                    .WriteCharPtr( "\">" );
             }
 
@@ -292,8 +292,7 @@ void SwHTMLWriter::OutBasic(const SwHTMLWriter & rHTMLWrt)
             Strm().WriteCharPtr( SAL_NEWLINE_STRING );   // don't indent!
             HTMLOutFuncs::OutScript( Strm(), GetBaseURL(), pModule->GetSource32(),
                                      sLang, STARBASIC, OUString(),
-                                     &rLibName, &rModName,
-                                     m_eDestEnc, &m_aNonConvertableCharacters );
+                                     &rLibName, &rModName );
         }
     }
 #endif
@@ -325,7 +324,7 @@ void SwHTMLWriter::OutBasicBodyEvents()
 
     if( !aDocTable.empty() )
         HTMLOutFuncs::Out_Events( Strm(), aDocTable, aBodyEventTable,
-                                  m_bCfgStarBasic, m_eDestEnc, &m_aNonConvertableCharacters );
+                                  m_bCfgStarBasic );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

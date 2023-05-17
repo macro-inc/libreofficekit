@@ -33,9 +33,6 @@
 #include <uno/lbnames.h>
 
 
-using namespace ::std;
-using namespace ::osl;
-
 namespace jni_uno
 {
 
@@ -172,12 +169,9 @@ JNI_interface_type_info::JNI_interface_type_info(
                     sig_buf.append( "()" );
                     sig_buf.append( type_sig );
                     OString method_signature( sig_buf.makeStringAndClear() );
-                    OUStringBuffer name_buf( 3 + member_name.getLength() );
-                    name_buf.append( "get" );
-                    name_buf.append( member_name );
                     OString method_name(
                         OUStringToOString(
-                            name_buf.makeStringAndClear(),
+                            rtl::Concat2View("get" + member_name),
                             RTL_TEXTENCODING_JAVA_UTF8 ) );
                     m_methods[ nMethodIndex ] = jni->GetMethodID(
                         static_cast<jclass>(jo_class.get()), method_name.getStr(),
@@ -193,11 +187,8 @@ JNI_interface_type_info::JNI_interface_type_info(
                         sig_buf.append( type_sig );
                         sig_buf.append( ")V" );
                         method_signature = sig_buf.makeStringAndClear();
-                        name_buf.ensureCapacity( 3 + member_name.getLength() );
-                        name_buf.append( "set" );
-                        name_buf.append( member_name );
                         method_name = OUStringToOString(
-                            name_buf.makeStringAndClear(),
+                            rtl::Concat2View("set" + member_name),
                             RTL_TEXTENCODING_JAVA_UTF8 );
                         m_methods[ nMethodIndex ] = jni->GetMethodID(
                             static_cast<jclass>(jo_class.get()), method_name.getStr(),
@@ -243,12 +234,12 @@ JNI_compound_type_info::JNI_compound_type_info(
         OUString::unacquired( &td->aBase.pTypeName );
 
     // Erase type arguments of instantiated polymorphic struct types:
-    OUString nucleus;
+    std::u16string_view nucleus;
     sal_Int32 i = uno_name.indexOf( '<' );
     if ( i < 0 ) {
         nucleus = uno_name;
     } else {
-        nucleus = uno_name.copy( 0, i );
+        nucleus = uno_name.subView( 0, i );
     }
     JLocalAutoRef jo_class(
         jni,
@@ -369,18 +360,18 @@ JNI_type_info const * JNI_info::create_type_info(
 
     // look up
     JNI_type_info * info;
-    ClearableMutexGuard guard( m_mutex );
+    std::unique_lock guard( m_mutex );
     JNI_type_info_holder & holder = m_type_map[ uno_name ];
     if (holder.m_info == nullptr) // new insertion
     {
         holder.m_info = new_info;
-        guard.clear();
+        guard.unlock();
         info = new_info;
     }
     else // inserted in the meantime
     {
         info = holder.m_info;
-        guard.clear();
+        guard.unlock();
         new_info->destroy( jni.get_jni_env() );
     }
     return info;
@@ -397,12 +388,12 @@ JNI_type_info const * JNI_info::get_type_info(
 
     OUString const & uno_name = OUString::unacquired( &td->pTypeName );
     JNI_type_info const * info;
-    ClearableMutexGuard guard( m_mutex );
+    std::unique_lock guard( m_mutex );
 
     t_str2type::const_iterator iFind( m_type_map.find( uno_name ) );
     if (iFind == m_type_map.end())
     {
-        guard.clear();
+        guard.unlock();
         info = create_type_info( jni, td );
     }
     else
@@ -424,11 +415,11 @@ JNI_type_info const * JNI_info::get_type_info(
 
     OUString const & uno_name = OUString::unacquired( &type->pTypeName );
     JNI_type_info const * info;
-    ClearableMutexGuard guard( m_mutex );
+    std::unique_lock guard( m_mutex );
     t_str2type::const_iterator iFind( m_type_map.find( uno_name ) );
     if (iFind == m_type_map.end())
     {
-        guard.clear();
+        guard.unlock();
         TypeDescr td( type );
         info = create_type_info( jni, td.get() );
     }
@@ -450,11 +441,11 @@ JNI_type_info const * JNI_info::get_type_info(
     }
 
     JNI_type_info const * info;
-    ClearableMutexGuard guard( m_mutex );
+    std::unique_lock guard( m_mutex );
     t_str2type::const_iterator iFind( m_type_map.find( uno_name ) );
     if (iFind == m_type_map.end())
     {
-        guard.clear();
+        guard.unlock();
         css::uno::TypeDescription td( uno_name );
         if (! td.is())
         {
@@ -948,7 +939,7 @@ JNI_info const * JNI_info::get_jni_info(
             jni_env, static_cast< jobject >(uno_vm->getClassLoader()), jo_class,
             jo_forName );
 
-        ClearableMutexGuard g( Mutex::getGlobalMutex() );
+        osl::ClearableMutexGuard g( osl::Mutex::getGlobalMutex() );
         jni_info =
             reinterpret_cast< JNI_info const * >(
                 jni->GetStaticLongField(

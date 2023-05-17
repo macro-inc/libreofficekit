@@ -51,9 +51,10 @@ LockedCanvasContext::onCreateContext(sal_Int32 nElementToken, const ::oox::Attri
         }
         case XML_cxnSp: // CT_GvmlConnector
         {
-            return new oox::drawingml::ConnectorShapeContext(
-                *this, mpShapePtr,
-                std::make_shared<oox::drawingml::Shape>("com.sun.star.drawing.ConnectorShape"));
+            oox::drawingml::ShapePtr pShape
+                = std::make_shared<oox::drawingml::Shape>("com.sun.star.drawing.ConnectorShape");
+            return new oox::drawingml::ConnectorShapeContext(*this, mpShapePtr, pShape,
+                                                             pShape->getConnectorShapeProperties());
         }
         case XML_pic: // CT_GvmlPicture
         {
@@ -78,8 +79,8 @@ LockedCanvasContext::onCreateContext(sal_Int32 nElementToken, const ::oox::Attri
         case XML_cNvPr: // CT_NonVisualDrawingProps
         {
             mpShapePtr->setHidden(rAttribs.getBool(XML_hidden, false));
-            mpShapePtr->setId(rAttribs.getString(XML_id).get());
-            mpShapePtr->setName(rAttribs.getString(XML_name).get());
+            mpShapePtr->setId(rAttribs.getStringDefaulted(XML_id));
+            mpShapePtr->setName(rAttribs.getStringDefaulted(XML_name));
             break;
         }
         case XML_cNvGrpSpPr: // CT_NonVisualGroupDrawingShapeProps

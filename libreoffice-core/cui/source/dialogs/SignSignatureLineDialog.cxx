@@ -33,7 +33,6 @@
 #include <com/sun/star/graphic/XGraphicProvider.hpp>
 #include <com/sun/star/security/CertificateKind.hpp>
 #include <com/sun/star/security/XCertificate.hpp>
-#include <com/sun/star/ui/dialogs/FilePicker.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
 
@@ -157,7 +156,7 @@ IMPL_LINK_NOARG(SignSignatureLineDialog, chooseCertificate, weld::Button&, void)
 {
     // Document needs to be saved before selecting a certificate
     SfxObjectShell* pShell = SfxObjectShell::Current();
-    if (!pShell->PrepareForSigning(m_xDialog.get()))
+    if (!pShell || !pShell->PrepareForSigning(m_xDialog.get()))
         return;
 
     Reference<XCertificate> xSignCertificate
@@ -194,6 +193,12 @@ void SignSignatureLineDialog::Apply()
     }
 
     SfxObjectShell* pShell = SfxObjectShell::Current();
+    if (!pShell)
+    {
+        SAL_WARN("cui.dialogs", "No SfxObjectShell!");
+        return;
+    }
+
     Reference<XGraphic> xValidGraphic = getSignedGraphic(true);
     Reference<XGraphic> xInvalidGraphic = getSignedGraphic(false);
     pShell->SignSignatureLine(m_xDialog.get(), m_aSignatureLineId, m_xSelectedCertifate,
@@ -208,7 +213,7 @@ css::uno::Reference<css::graphic::XGraphic> SignSignatureLineDialog::getSignedGr
     aSvgImage = aSvgImage.replaceAll("[SIGNER_TITLE]", getCDataString(m_aSuggestedSignerTitle));
 
     OUString aIssuerLine
-        = CuiResId(RID_SVXSTR_SIGNATURELINE_SIGNED_BY)
+        = CuiResId(RID_CUISTR_SIGNATURELINE_SIGNED_BY)
               .replaceFirst("%1", svx::SignatureLineHelper::getSignerName(m_xSelectedCertifate));
     aSvgImage = aSvgImage.replaceAll("[SIGNED_BY]", getCDataString(aIssuerLine));
     if (bValid)

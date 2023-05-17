@@ -18,14 +18,15 @@
 #include <sfx2/sidebar/Deck.hxx>
 #include <sidebar/DeckDescriptor.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 
 using namespace css;
 using namespace ::sfx2::sidebar;
 
-SfxUnoDeck::SfxUnoDeck(const uno::Reference<frame::XFrame>& rFrame, const OUString& deckId):
-xFrame(rFrame),
-mDeckId(deckId)
+SfxUnoDeck::SfxUnoDeck(uno::Reference<frame::XFrame> _xFrame, OUString deckId):
+xFrame(std::move(_xFrame)),
+mDeckId(std::move(deckId))
 {
 
 }
@@ -247,14 +248,14 @@ void SAL_CALL SfxUnoDeck::moveDown()
     }
 }
 
-sal_Int32 SfxUnoDeck::GetMinOrderIndex(ResourceManager::DeckContextDescriptorContainer aDecks)
+sal_Int32 SfxUnoDeck::GetMinOrderIndex(const ResourceManager::DeckContextDescriptorContainer& rDecks)
 {
     SidebarController* pSidebarController = getSidebarController();
 
-    ResourceManager::DeckContextDescriptorContainer::const_iterator iDeck = aDecks.begin();
+    ResourceManager::DeckContextDescriptorContainer::const_iterator iDeck = rDecks.begin();
     sal_Int32 minIndex = pSidebarController->GetResourceManager()->GetDeckDescriptor(iDeck->msId)->mnOrderIndex;
 
-    for (auto const& deck : aDecks)
+    for (auto const& deck : rDecks)
     {
         sal_Int32 index = pSidebarController->GetResourceManager()->GetDeckDescriptor(deck.msId)->mnOrderIndex;
         if(minIndex > index)
@@ -263,13 +264,13 @@ sal_Int32 SfxUnoDeck::GetMinOrderIndex(ResourceManager::DeckContextDescriptorCon
     return minIndex;
 }
 
-sal_Int32 SfxUnoDeck::GetMaxOrderIndex(ResourceManager::DeckContextDescriptorContainer aDecks)
+sal_Int32 SfxUnoDeck::GetMaxOrderIndex(const ResourceManager::DeckContextDescriptorContainer& rDecks)
 {
     SidebarController* pSidebarController = getSidebarController();
 
-    sal_Int32 maxIndex = pSidebarController->GetResourceManager()->GetDeckDescriptor(aDecks.begin()->msId)->mnOrderIndex;
+    sal_Int32 maxIndex = pSidebarController->GetResourceManager()->GetDeckDescriptor(rDecks.begin()->msId)->mnOrderIndex;
 
-    for (auto const& deck : aDecks)
+    for (auto const& deck : rDecks)
     {
         sal_Int32 index = pSidebarController->GetResourceManager()->GetDeckDescriptor(deck.msId)->mnOrderIndex;
         if(maxIndex < index)

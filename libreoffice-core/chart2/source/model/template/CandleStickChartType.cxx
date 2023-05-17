@@ -24,7 +24,7 @@
 #include <servicenames_charttypes.hxx>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace com::sun::star::uno { class XComponentContext; }
 
@@ -206,6 +206,11 @@ uno::Reference< util::XCloneable > SAL_CALL CandleStickChartType::createClone()
     return uno::Reference< util::XCloneable >( new CandleStickChartType( *this ));
 }
 
+rtl::Reference< ChartType > CandleStickChartType::cloneChartType() const
+{
+    return new CandleStickChartType( *this );
+}
+
 // ____ XChartType ____
 OUString SAL_CALL CandleStickChartType::getChartType()
 {
@@ -263,13 +268,14 @@ OUString SAL_CALL CandleStickChartType::getRoleOfSequenceForSeriesLabel()
 }
 
 // ____ OPropertySet ____
-uno::Any CandleStickChartType::GetDefaultValue( sal_Int32 nHandle ) const
+void CandleStickChartType::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticCandleStickChartTypeDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 // ____ OPropertySet ____

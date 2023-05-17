@@ -22,6 +22,7 @@
 #include <iomanip>
 
 #include <comphelper/servicehelper.hxx>
+#include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <svl/itempool.hxx>
 #include <svl/itemiter.hxx>
@@ -897,9 +898,9 @@ const SfxPoolItem* SfxBindings::Execute_Impl( sal_uInt16 nId, const SfxPoolItem*
         // slot is uncached, use SlotCache to handle external dispatch providers
         xCache.reset(new SfxStateCache(nId));
         pCache = xCache.get();
-        pCache->GetSlotServer( rDispatcher, pImpl->xProv );
     }
 
+    pCache->GetSlotServer( rDispatcher, pImpl->xProv ); // make pCache->GetDispatch() up to date
     if ( pCache->GetDispatch().is() )
     {
         DBG_ASSERT( !ppInternalArgs, "Internal args get lost when dispatched!" );

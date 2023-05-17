@@ -27,7 +27,6 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/sequence.hxx>
 #include <rtl/ustring.hxx>
-#include <tools/diagnose_ex.h>
 
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
@@ -614,11 +613,11 @@ void deleteAllImplementations(   const Reference < XSimpleRegistry >& xReg,
 
                         for (const Reference < XRegistryKey > & rSubKey2 : subKeys2)
                         {
-                            if (rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_SERVICES ) &&
-                                rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_REGISTRY_LINKS ) &&
-                                rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_ACTIVATOR ) &&
-                                rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_SINGLETONS ) &&
-                                rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_LOCATION) )
+                            if (rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_SERVICES ) &&
+                                rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_REGISTRY_LINKS ) &&
+                                rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_ACTIVATOR ) &&
+                                rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_SINGLETONS ) &&
+                                rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_LOCATION) )
                             {
                                 prepareUserKeys(xReg, xKey, rSubKey2, implName, false);
                             }
@@ -950,9 +949,9 @@ void prepareRegistry(
 
                 for (const Reference < XRegistryKey >& rSubKey2 : subKeys2)
                 {
-                    if (rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_SERVICES) &&
-                        rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_REGISTRY_LINKS ) &&
-                        rSubKey2->getKeyName() != OUStringConcatenation(xImplKey->getKeyName() + slash_UNO_slash_SINGLETONS ))
+                    if (rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_SERVICES) &&
+                        rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_REGISTRY_LINKS ) &&
+                        rSubKey2->getKeyName() != Concat2View(xImplKey->getKeyName() + slash_UNO_slash_SINGLETONS ))
                     {
                         prepareUserKeys(xDest, xKey, rSubKey2, implName, true);
                     }
@@ -1367,7 +1366,7 @@ sal_Bool ImplementationRegistration::revokeImplementation(const OUString& locati
         {
             // no way to transport the error, as no exception is specified and a runtime
             // exception is not appropriate.
-            TOOLS_WARN_EXCEPTION( "stoc", "InvalidRegistryException during revokeImplementation" );
+            OSL_FAIL( "InvalidRegistryException during revokeImplementation" );
         }
     }
 

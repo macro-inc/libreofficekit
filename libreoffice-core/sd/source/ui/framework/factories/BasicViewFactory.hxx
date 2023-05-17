@@ -19,12 +19,10 @@
 
 #pragma once
 
-#include <MutexOwner.hxx>
-
 #include <com/sun/star/drawing/framework/XResourceFactory.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 
 #include <vcl/vclptr.hxx>
 #include <memory>
@@ -42,7 +40,7 @@ namespace vcl { class Window; }
 
 namespace sd::framework {
 
-typedef ::cppu::WeakComponentImplHelper <
+typedef comphelper::WeakComponentImplHelper <
     css::drawing::framework::XResourceFactory,
     css::lang::XInitialization
     > BasicViewFactoryInterfaceBase;
@@ -60,14 +58,13 @@ typedef ::cppu::WeakComponentImplHelper <
     For some views in some panes this class also acts as a cache.
 */
 class BasicViewFactory
-    : private sd::MutexOwner,
-      public BasicViewFactoryInterfaceBase
+    : public BasicViewFactoryInterfaceBase
 {
 public:
     BasicViewFactory ();
     virtual ~BasicViewFactory() override;
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // XViewFactory
 

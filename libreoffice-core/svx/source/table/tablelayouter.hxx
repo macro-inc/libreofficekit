@@ -23,6 +23,7 @@
 #include <sal/types.h>
 #include <basegfx/range/b2irectangle.hxx>
 #include <basegfx/tuple/b2ituple.hxx>
+#include <o3tl/safeint.hxx>
 #include <vector>
 
 #include <svx/svdotable.hxx>
@@ -66,7 +67,7 @@ struct EdgeInfo final
 class TableLayouter final
 {
 public:
-    explicit TableLayouter( const TableModelRef& xTableModel );
+    explicit TableLayouter( TableModelRef xTableModel );
     ~TableLayouter();
 
     /** try to fit the table into the given rectangle.
@@ -129,8 +130,8 @@ private:
     CellRef getCell( const CellPos& rPos ) const;
     basegfx::B2ITuple getCellSize( const CellRef& xCell, const CellPos& rPos ) const;
 
-    bool isValidColumn( sal_Int32 nColumn ) const { return (nColumn >= 0) && (nColumn < static_cast<sal_Int32>( maColumns.size())); }
-    bool isValidRow( sal_Int32 nRow ) const { return (nRow >= 0) && (nRow < static_cast<sal_Int32>( maRows.size())); }
+    bool isValidColumn( sal_Int32 nColumn ) const { return (nColumn >= 0) && (o3tl::make_unsigned(nColumn) < maColumns.size()); }
+    bool isValidRow( sal_Int32 nRow ) const { return (nRow >= 0) && (o3tl::make_unsigned(nRow) < maRows.size()); }
     bool isValid( const CellPos& rPos ) const { return isValidColumn( rPos.mnCol ) && isValidRow( rPos.mnRow ); }
 
     void ClearBorderLayout();

@@ -18,9 +18,9 @@
  */
 
 #include <comphelper/asyncnotification.hxx>
+#include <comphelper/scopeguard.hxx>
 #include <mutex>
 #include <condition_variable>
-#include <osl/mutex.hxx>
 
 #include <cassert>
 #include <stdexcept>
@@ -231,26 +231,20 @@ namespace comphelper
     {
         // see salhelper::Thread::launch
         xThis->m_xImpl->pKeepThisAlive = xThis;
-        try {
-            if (!xThis->create()) {
-                throw std::runtime_error("osl::Thread::create failed");
-            }
-        } catch (...) {
-            xThis->m_xImpl->pKeepThisAlive.reset();
-            throw;
+        comphelper::ScopeGuard g([&xThis] { xThis->m_xImpl->pKeepThisAlive.reset(); });
+        if (!xThis->create()) {
+            throw std::runtime_error("osl::Thread::create failed");
         }
+        g.dismiss();
     }
 
     void AsyncEventNotifierAutoJoin::run()
     {
         // see salhelper::Thread::run
-        try {
-            setName(m_xImpl->name);
-            execute();
-        } catch (...) {
-            onTerminated();
-            throw;
-        }
+        comphelper::ScopeGuard g([this] { onTerminated(); });
+        setName(m_xImpl->name);
+        execute();
+        g.dismiss();
     }
 
     void AsyncEventNotifierAutoJoin::onTerminated()

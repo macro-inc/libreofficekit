@@ -30,11 +30,6 @@ class DBTestBase
 public:
     DBTestBase() : UnoApiTest("dbaccess/qa/unit/data") {};
 
-    utl::TempFile createTempCopy(std::u16string_view pathname);
-
-    uno::Reference< XOfficeDatabaseDocument >
-        getDocumentForFileName(std::u16string_view sFileName);
-
     uno::Reference<XOfficeDatabaseDocument> getDocumentForUrl(OUString const & url);
 
     uno::Reference< XConnection >
@@ -42,34 +37,9 @@ public:
             uno::Reference< XOfficeDatabaseDocument > const & xDocument);
 };
 
-utl::TempFile DBTestBase::createTempCopy(std::u16string_view pathname) {
-    OUString url;
-    createFileURL(pathname, url);
-    utl::TempFile tmp;
-    tmp.EnableKillingFile();
-    auto const e = osl::File::copy(url, tmp.GetURL());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(
-        (OString(
-            "<" + OUStringToOString(url, RTL_TEXTENCODING_UTF8) + "> -> <"
-            + OUStringToOString(tmp.GetURL(), RTL_TEXTENCODING_UTF8) + ">")
-         .getStr()),
-        osl::FileBase::E_None, e);
-    return tmp;
-}
-
-uno::Reference< XOfficeDatabaseDocument >
-    DBTestBase::getDocumentForFileName(std::u16string_view sFileName)
-{
-    OUString sFilePath;
-    createFileURL(sFileName, sFilePath);
-    return getDocumentForUrl(sFilePath);
-}
-
 uno::Reference<XOfficeDatabaseDocument> DBTestBase::getDocumentForUrl(OUString const & url) {
-    uno::Reference< lang::XComponent > xComponent (loadFromDesktop(url));
-    uno::Reference< XOfficeDatabaseDocument > xDocument(xComponent, UNO_QUERY);
-    CPPUNIT_ASSERT(xDocument.is());
-
+    mxComponent = loadFromDesktop(url);
+    uno::Reference< XOfficeDatabaseDocument > xDocument(mxComponent, UNO_QUERY_THROW);
     return xDocument;
 }
 

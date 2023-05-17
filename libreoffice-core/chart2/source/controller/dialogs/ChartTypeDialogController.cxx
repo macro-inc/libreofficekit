@@ -18,24 +18,28 @@
  */
 
 #include <ChartTypeDialogController.hxx>
+#include <ChartTypeManager.hxx>
+#include <ChartTypeTemplate.hxx>
 #include <ResId.hxx>
 #include <strings.hrc>
 #include <bitmaps.hlst>
 #include <ChartModelHelper.hxx>
+#include <DataSeries.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <ControllerLockGuard.hxx>
 #include <AxisHelper.hxx>
 #include <unonames.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <ChartModel.hxx>
 
 #include <com/sun/star/chart2/DataPointGeometry3D.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 
 #include <svtools/valueset.hxx>
 #include <vcl/image.hxx>
 #include <vcl/settings.hxx>
 
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -250,19 +254,19 @@ OUString ChartTypeDialogController::getServiceNameForParameter( const ChartTypeP
     }
     return OUString();
 }
-uno::Reference< XChartTypeTemplate > ChartTypeDialogController::getCurrentTemplate(
+rtl::Reference< ChartTypeTemplate > ChartTypeDialogController::getCurrentTemplate(
     const ChartTypeParameter& rParameter
-    , const uno::Reference< lang::XMultiServiceFactory >& xTemplateManager ) const
+    , const rtl::Reference< ChartTypeManager >& xTemplateManager ) const
 {
-    uno::Reference< XChartTypeTemplate > xTemplate;
+    rtl::Reference< ChartTypeTemplate > xTemplate;
 
     OUString aServiceName( getServiceNameForParameter( rParameter ) );
     if(!aServiceName.isEmpty())
     {
-        xTemplate.set( xTemplateManager->createInstance( aServiceName ), uno::UNO_QUERY );
+        xTemplate = xTemplateManager->createTemplate( aServiceName );
         if(xTemplate.is())
         {
-            uno::Reference< beans::XPropertySet > xTemplateProps( xTemplate, uno::UNO_QUERY );
+            uno::Reference< beans::XPropertySet > xTemplateProps( static_cast<cppu::OWeakObject*>(xTemplate.get()), uno::UNO_QUERY );
             if(xTemplateProps.is())
             {
                 try
@@ -301,30 +305,29 @@ uno::Reference< XChartTypeTemplate > ChartTypeDialogController::getCurrentTempla
 }
 
 void ChartTypeDialogController::commitToModel( const ChartTypeParameter& rParameter
-                , const uno::Reference< XChartDocument >& xChartModel )
+                , const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    uno::Reference< lang::XMultiServiceFactory > xTemplateManager( xChartModel->getChartTypeManager(), uno::UNO_QUERY );
-    uno::Reference< XChartTypeTemplate > xTemplate( getCurrentTemplate( rParameter, xTemplateManager ) );
+    rtl::Reference< ::chart::ChartTypeManager > xTemplateManager = xChartModel->getTypeManager();
+    rtl::Reference< ::chart::ChartTypeTemplate > xTemplate( getCurrentTemplate( rParameter, xTemplateManager ) );
     if(!xTemplate.is())
         return;
 
     // locked controllers
     ControllerLockGuardUNO aCtrlLockGuard( xChartModel );
-    uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
     DiagramHelper::tTemplateWithServiceName aTemplateWithService(
         DiagramHelper::getTemplateForDiagram( xDiagram, xTemplateManager ));
-    if( aTemplateWithService.first.is())
-        aTemplateWithService.first->resetStyles( xDiagram );
+    if( aTemplateWithService.xChartTypeTemplate.is())
+        aTemplateWithService.xChartTypeTemplate->resetStyles2( xDiagram );
     xTemplate->changeDiagram( xDiagram );
     if( AllSettings::GetMathLayoutRTL() )
         AxisHelper::setRTLAxisLayout( AxisHelper::getCoordinateSystemByIndex( xDiagram, 0 ) );
     if( rParameter.b3DLook )
         ThreeDHelper::setScheme( xDiagram, rParameter.eThreeDLookScheme );
 
-    uno::Reference<beans::XPropertySet> xDiaProp(xDiagram, uno::UNO_QUERY);
-    if (xDiaProp.is())
+    if (xDiagram.is())
     {
-        xDiaProp->setPropertyValue(CHART_UNONAME_SORT_BY_XVALUES, uno::Any(rParameter.bSortByXValues));
+        xDiagram->setPropertyValue(CHART_UNONAME_SORT_BY_XVALUES, uno::Any(rParameter.bSortByXValues));
     }
 }
 void ChartTypeDialogController::fillSubTypeList( ValueSet& rSubTypeList, const ChartTypeParameter& /*rParameter*/ )
@@ -358,7 +361,7 @@ void ChartTypeDialogController::showExtraControls(weld::Builder* /*pBuilder*/)
 void ChartTypeDialogController::hideExtraControls() const
 {
 }
-void ChartTypeDialogController::fillExtraControls(  const uno::Reference< XChartDocument >& /*xChartModel*/
+void ChartTypeDialogController::fillExtraControls(  const rtl::Reference<::chart::ChartModel>& /*xChartModel*/
                                                   , const uno::Reference< beans::XPropertySet >& /*xTemplateProps*/ ) const
 {
 }
@@ -1146,15 +1149,13 @@ void CombiColumnLineChartDialogController::hideExtraControls() const
 }
 
 void CombiColumnLineChartDialogController::fillExtraControls(
-                  const uno::Reference< XChartDocument >& xChartModel
+                  const rtl::Reference<::chart::ChartModel>& xChartModel
                 , const uno::Reference< beans::XPropertySet >& xTemplateProps ) const
 {
     if (!m_xMF_NumberOfLines)
         return;
 
-    uno::Reference< frame::XModel > xModel = xChartModel;
-
-    uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram( xModel );
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram( xChartModel );
     if(!xDiagram.is())
         return;
 
@@ -1175,7 +1176,7 @@ void CombiColumnLineChartDialogController::fillExtraControls(
         nNumLines = 0;
     m_xMF_NumberOfLines->set_value(nNumLines);
 
-    sal_Int32 nMaxLines = ChartModelHelper::getDataSeries( xModel ).size() - 1;
+    sal_Int32 nMaxLines = ChartModelHelper::getDataSeries( xChartModel ).size() - 1;
     if( nMaxLines < 0 )
         nMaxLines = 0;
     m_xMF_NumberOfLines->set_max(nMaxLines);

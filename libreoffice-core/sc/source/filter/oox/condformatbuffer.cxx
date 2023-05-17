@@ -26,6 +26,7 @@
 #include <com/sun/star/sheet/ConditionOperator2.hpp>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 #include <svl/sharedstringpool.hxx>
 #include <oox/core/filterbase.hxx>
 #include <oox/helper/binaryinputstream.hxx>
@@ -42,6 +43,7 @@
 #include <tokenarray.hxx>
 #include <tokenuno.hxx>
 #include <extlstcontext.hxx>
+#include <utility>
 
 namespace oox::xls {
 
@@ -101,12 +103,12 @@ const sal_uInt16 BIFF12_CFRULE_ABOVEAVERAGE         = 0x0004;
 const sal_uInt16 BIFF12_CFRULE_BOTTOM               = 0x0008;
 const sal_uInt16 BIFF12_CFRULE_PERCENT              = 0x0010;
 
-bool isValue(const OUString& rStr, double& rVal)
+bool isValue(std::u16string_view rStr, double& rVal)
 {
     sal_Int32 nEnd = -1;
-    rVal = rtl::math::stringToDouble(rStr.trim(), '.', ',', nullptr, &nEnd);
+    rVal = rtl::math::stringToDouble(o3tl::trim(rStr), '.', ',', nullptr, &nEnd);
 
-    return nEnd >= rStr.getLength();
+    return nEnd >= static_cast<sal_Int32>(rStr.size());
 }
 
 void SetCfvoData( ColorScaleRuleModelEntry* pEntry, const AttributeList& rAttribs )
@@ -168,6 +170,76 @@ void ColorScaleRule::importCfvo( const AttributeList& rAttribs )
 
 namespace {
 
+// https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.spreadsheet.indexedcolors?view=openxml-2.8.1
+static ::Color IndexedColors[] = {
+    0x00000000,
+    0x00FFFFFF,
+    0x00FF0000,
+    0x0000FF00,
+    0x000000FF,
+    0x00FFFF00,
+    0x00FF00FF,
+    0x0000FFFF,
+    0x00000000,
+    0x00FFFFFF,
+    0x00FF0000,
+    0x0000FF00,
+    0x000000FF,
+    0x00FFFF00,
+    0x00FF00FF,
+    0x0000FFFF,
+    0x00800000,
+    0x00008000,
+    0x00000080,
+    0x00808000,
+    0x00800080,
+    0x00008080,
+    0x00C0C0C0,
+    0x00808080,
+    0x009999FF,
+    0x00993366,
+    0x00FFFFCC,
+    0x00CCFFFF,
+    0x00660066,
+    0x00FF8080,
+    0x000066CC,
+    0x00CCCCFF,
+    0x00000080,
+    0x00FF00FF,
+    0x00FFFF00,
+    0x0000FFFF,
+    0x00800080,
+    0x00800000,
+    0x00008080,
+    0x000000FF,
+    0x0000CCFF,
+    0x00CCFFFF,
+    0x00CCFFCC,
+    0x00FFFF99,
+    0x0099CCFF,
+    0x00FF99CC,
+    0x00CC99FF,
+    0x00FFCC99,
+    0x003366FF,
+    0x0033CCCC,
+    0x0099CC00,
+    0x00FFCC00,
+    0x00FF9900,
+    0x00FF6600,
+    0x00666699,
+    0x00969696,
+    0x00003366,
+    0x00339966,
+    0x00003300,
+    0x00333300,
+    0x00993300,
+    0x00993366,
+    0x00333399,
+    0x00333333,
+    0x00000000, // System Foreground ?
+    0x00000000, // System Background ?
+};
+
 ::Color importOOXColor(const AttributeList& rAttribs, const ThemeBuffer& rThemeBuffer, const GraphicHelper& rGraphicHelper)
 {
     ::Color nColor;
@@ -188,6 +260,12 @@ namespace {
             nThemeIndex = 2;
 
         nColor = rThemeBuffer.getColorByIndex( nThemeIndex );
+    }
+    else if (rAttribs.hasAttribute(XML_indexed))
+    {
+        sal_uInt32 nIndexed = rAttribs.getUnsigned(XML_indexed, 0);
+        if (nIndexed < sizeof(IndexedColors))
+            nColor = IndexedColors[nIndexed];
     }
 
     ::Color aColor;
@@ -1161,6 +1239,27 @@ void CondFormatBuffer::finalizeImport()
         ++nExtCFIndex;
     }
 
+    // tdf#138601 sort conditional formatting rules by their priority
+    if (maCondFormats.size() > 1)
+    {
+        size_t minIndex;
+        for (size_t i = 0; i < maCondFormats.size() - 1; ++i)
+        {
+            minIndex = i;
+            for (size_t j = i + 1; j < maCondFormats.size(); ++j)
+            {
+                const CondFormat::CondFormatRuleMap& rNextRules = maCondFormats[j]->maRules;
+                const CondFormat::CondFormatRuleMap& rMinRules = maCondFormats[minIndex]->maRules;
+                if (rNextRules.empty() || rMinRules.empty())
+                    continue;
+                if (rNextRules.begin()->first < rMinRules.begin()->first)
+                    minIndex = j;
+            }
+            if (i != minIndex)
+                std::swap(maCondFormats[i], maCondFormats[minIndex]);
+        }
+    }
+
     for( const auto& rxCondFormat : maCondFormats )
     {
         if ( rxCondFormat)
@@ -1299,6 +1398,12 @@ void ExtCfDataBarRule::finalizeImport()
             pDataBar->maAxisColor = maModel.mnAxisColor;
             break;
         }
+        case POSITIVEFILLCOLOR:
+        {
+            ScDataBarFormatData* pDataBar = mpTarget;
+            pDataBar->maPositiveColor = maModel.mnPositiveColor;
+            break;
+        }
         case NEGATIVEFILLCOLOR:
         {
             ScDataBarFormatData* pDataBar = mpTarget;
@@ -1344,6 +1449,15 @@ void ExtCfDataBarRule::importDataBar( const AttributeList& rAttribs )
     maModel.maAxisPosition = rAttribs.getString( XML_axisPosition, "automatic" );
 }
 
+void ExtCfDataBarRule::importPositiveFillColor( const AttributeList& rAttribs )
+{
+    mnRuleType = POSITIVEFILLCOLOR;
+    ThemeBuffer& rThemeBuffer = getTheme();
+    GraphicHelper& rGraphicHelper = getBaseFilter().getGraphicHelper();
+    ::Color aColor = importOOXColor(rAttribs, rThemeBuffer, rGraphicHelper);
+    maModel.mnPositiveColor = aColor;
+}
+
 void ExtCfDataBarRule::importNegativeFillColor( const AttributeList& rAttribs )
 {
     mnRuleType = NEGATIVEFILLCOLOR;
@@ -1368,9 +1482,9 @@ void ExtCfDataBarRule::importCfvo( const AttributeList& rAttribs )
     maModel.maColorScaleType = rAttribs.getString( XML_type, OUString() );
 }
 
-ExtCfCondFormat::ExtCfCondFormat(const ScRangeList& rRange, std::vector< std::unique_ptr<ScFormatEntry> >& rEntries,
+ExtCfCondFormat::ExtCfCondFormat(ScRangeList aRange, std::vector< std::unique_ptr<ScFormatEntry> >& rEntries,
                                  const std::vector<sal_Int32>* pPriorities):
-    maRange(rRange)
+    maRange(std::move(aRange))
 {
     maEntries.swap(rEntries);
     if (pPriorities)

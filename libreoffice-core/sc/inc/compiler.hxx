@@ -258,6 +258,7 @@ public:
 
 private:
 
+    static osl::Mutex           maMutex;
     static const CharClass      *pCharClassEnglish;     // character classification for en_US locale
     static const CharClass      *pCharClassLocalized;   // character classification for UI locale
     static const Convention     *pConventions[ formula::FormulaGrammar::CONV_LAST ];
@@ -350,7 +351,7 @@ private:
 
     bool ParseValue( const OUString& );
     bool ParseOpCode( const OUString&, bool bInArray );
-    bool ParseOpCode2( const OUString& );
+    bool ParseOpCode2( std::u16string_view );
     bool ParseString();
     bool ParseReference( const OUString& rSymbol, const OUString* pErrRef = nullptr );
     bool ParseSingleReference( const OUString& rSymbol, const OUString* pErrRef = nullptr );
@@ -378,8 +379,9 @@ private:
 
     bool HasPossibleNamedRangeConflict(SCTAB nTab) const;
 
-    static const CharClass* GetCharClassEnglish();
+public:
     static const CharClass* GetCharClassLocalized();
+    static const CharClass* GetCharClassEnglish();
 
 public:
     ScCompiler( sc::CompileFormulaContext& rCxt, const ScAddress& rPos,
@@ -415,8 +417,6 @@ public:
                  -1 if none. */
     static sal_Int32 GetDocTabPos( const OUString& rString );
 
-    static bool EnQuote( OUString& rStr );
-
     // Check if it is a valid english function name
     static bool IsEnglishSymbol( const OUString& rName );
 
@@ -437,6 +437,11 @@ public:
     void            SetRefConvention( const formula::FormulaGrammar::AddressConvention eConv );
 
     static const Convention* GetRefConvention( formula::FormulaGrammar::AddressConvention eConv );
+
+    /** Overwrite FormulaCompiler::GetOpCodeMap() forwarding to
+        GetFinalOpCodeMap().
+     */
+    OpCodeMapPtr    GetOpCodeMap( const sal_Int32 nLanguage ) const { return GetFinalOpCodeMap(nLanguage); }
 
     /// Set symbol map if not empty.
     void            SetFormulaLanguage( const OpCodeMapPtr & xMap );

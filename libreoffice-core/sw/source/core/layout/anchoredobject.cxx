@@ -31,6 +31,7 @@
 #include <pagefrm.hxx>
 #include <layouter.hxx>
 #include <osl/diagnose.h>
+#include <flyfrms.hxx>
 
 using namespace ::com::sun::star;
 
@@ -68,7 +69,6 @@ SwObjPositioningInProgress::~SwObjPositioningInProgress()
 
 
 SwAnchoredObject::SwAnchoredObject() :
-    mpDrawObj( nullptr ),
     mpAnchorFrame( nullptr ),
     // --> #i28701#
     mpPageFrame( nullptr ),
@@ -217,7 +217,7 @@ void SwAnchoredObject::CheckCharRectAndTopOfLine(
 
     const SwFormatAnchor& rAnch = GetFrameFormat().GetAnchor();
     if ( !((rAnch.GetAnchorId() == RndStdIds::FLY_AT_CHAR) &&
-         rAnch.GetContentAnchor()) )
+         rAnch.GetAnchorNode()) )
         return;
 
     // --> if requested, assure that anchor frame,
@@ -716,6 +716,34 @@ SwTextFrame* SwAnchoredObject::FindAnchorCharFrame()
             SwTextFrame *const pFrame(static_cast<SwTextFrame*>(AnchorFrame()));
             TextFrameIndex const nOffset(pFrame->MapModelToViewPos(*rAnch.GetContentAnchor()));
             pAnchorCharFrame = &pFrame->GetFrameAtOfst(nOffset);
+        }
+        else if (SwFlyFrame* pFlyFrame = DynCastFlyFrame())
+        {
+            // See if this fly is split. If so, then the anchor is also split. All anchors are
+            // empty, except the last follow.
+            if (pFlyFrame->IsFlySplitAllowed())
+            {
+                auto pFlyAtContentFrame = static_cast<SwFlyAtContentFrame*>(pFlyFrame);
+                SwFlyAtContentFrame* pFly = pFlyAtContentFrame;
+                SwTextFrame* pAnchor = static_cast<SwTextFrame*>(AnchorFrame());
+                // If we have to jump back N frames to find the master fly, then we have to step N
+                // frames from the master anchor to reach the correct follow anchor.
+                while (pFly->GetPrecede())
+                {
+                    pFly = pFly->GetPrecede();
+                    if (!pAnchor)
+                    {
+                        SAL_WARN("sw.layout", "SwAnchoredObject::FindAnchorCharFrame: fly chain "
+                                              "length is longer then anchor chain length");
+                        break;
+                    }
+                    pAnchor = pAnchor->GetFollow();
+                }
+                if (pAnchor)
+                {
+                    pAnchorCharFrame = pAnchor;
+                }
+            }
         }
     }
 

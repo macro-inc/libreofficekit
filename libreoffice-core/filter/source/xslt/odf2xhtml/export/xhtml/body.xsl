@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?> <!-- -*- fill-column: 130; nxml-child-indent: 4; tab-width: 4; indent-tabs-mode: nil -*- -->
 <!--
  * This file is part of the LibreOffice project.
  *
@@ -50,9 +50,11 @@
     <xsl:key name="writingModeStyles" match="/*/office:styles/style:style/style:paragraph-properties/@style:writing-mode | /*/office:automatic-styles/style:style/style:paragraph-properties/@style:writing-mode" use="'test'"/>
     <xsl:template name="create-body">
         <xsl:param name="globalData"/>
+        <xsl:text>&#xa;</xsl:text>
         <xsl:call-template name="create-body.collect-page-properties">
             <xsl:with-param name="globalData" select="$globalData"/>
         </xsl:call-template>
+        <xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
     <xsl:template name="create-body.collect-page-properties">
@@ -139,15 +141,21 @@
             </xsl:choose>
             <!-- adapt page size -->
             <xsl:variable name="pageWidth" select="$pageProperties/style:page-layout-properties/@fo:page-width"/>
+            <xsl:variable name="pageHeight" select="$pageProperties/style:page-layout-properties/@fo:height"/>
 
             <!-- multiple backgroundimages for different page styles (never used in html) -->
             <xsl:variable name="backgroundImage" select="$pageProperties/style:page-layout-properties/style:background-image"/>
             <!-- page margins & background image  -->
-            <xsl:if test="$pageWidth or $pageProperties/style:page-layout-properties/@fo:* or $backgroundImage/@xlink:href">
+            <xsl:if test="$pageWidth or $pageHeight or $pageProperties/style:page-layout-properties/@fo:* or $backgroundImage/@xlink:href">
                 <xsl:attribute name="style">
                     <xsl:if test="$pageWidth">
                         <xsl:text>max-width:</xsl:text>
-                        <xsl:value-of select="$pageWidth"/>
+                        <xsl:value-of select="$pageWidth" />
+                        <xsl:text>;</xsl:text>
+                    </xsl:if>
+                    <xsl:if test="$pageHeight">
+                        <xsl:text>max-height:</xsl:text>
+                        <xsl:value-of select="$pageHeight" />
                         <xsl:text>;</xsl:text>
                     </xsl:if>
                     <xsl:if test="$pageProperties/style:page-layout-properties/@fo:* or $backgroundImage/@xlink:href">
@@ -178,6 +186,7 @@
                     </xsl:if>
                 </xsl:attribute>
             </xsl:if>
+            <xsl:text>&#xa;</xsl:text>
             <!-- processing the content of the OpenDocument content file -->
             <xsl:apply-templates select="/*/office:body/*">
                 <xsl:with-param name="globalData" select="$globalData"/>
@@ -233,6 +242,7 @@
                 <xsl:with-param name="globalData" select="$globalData"/>
             </xsl:apply-templates>
         </xsl:element>
+        <xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
 
@@ -244,23 +254,25 @@
     <xsl:template match="draw:text-box">
         <xsl:param name="globalData"/>
 
+        <xsl:text>&#xa;</xsl:text>
         <xsl:comment>Next 'div' was a 'draw:text-box'.</xsl:comment>
+        <xsl:text>&#xa;</xsl:text>
         <xsl:element name="div">
             <xsl:variable name="dimension">
-                <xsl:apply-templates select="@fo:min-width"/>
-                <xsl:apply-templates select="@fo:max-width"/>
-                <xsl:apply-templates select="@fo:min-height"/>
-                <xsl:apply-templates select="@fo:max-height"/>
+                <xsl:apply-templates select="@fo:min-width" />
+                <xsl:apply-templates select="@fo:max-width" />
+                <xsl:apply-templates select="@fo:min-height" />
+                <xsl:apply-templates select="@fo:max-height" />
             </xsl:variable>
-            <xsl:if test="$dimension">
+            <xsl:if test="normalize-space($dimension)!=''">
                 <xsl:attribute name="style">
-                    <xsl:value-of select="$dimension"/>
+                    <xsl:value-of select="$dimension" />
                 </xsl:attribute>
             </xsl:if>
-            <xsl:apply-templates select="@draw:name">
-                <xsl:with-param name="globalData" select="$globalData"/>
-            </xsl:apply-templates>
 
+            <xsl:apply-templates select="@xml:id">
+                <xsl:with-param name="globalData" select="$globalData" />
+            </xsl:apply-templates>
             <xsl:apply-templates select="node()">
                 <xsl:with-param name="globalData" select="$globalData"/>
             </xsl:apply-templates>
@@ -341,7 +353,7 @@
                 A surrounding 'div' element taking over the image style solves that problem, but the div is invalid as child of a paragraph
                 Therefore the paragraph has to be exchanged with a HTML div element
         -->
-        <!-- 2DO page alignment fix - PART1 -->
+        <!-- TODO page alignment fix - PART1 -->
         <xsl:variable name="childText"><xsl:apply-templates mode="getAllTextChildren"/></xsl:variable>
         <xsl:choose>
             <xsl:when test="name() = 'text:p' and not(*) and (normalize-space($childText) = '')">
@@ -355,11 +367,12 @@
                     <xsl:call-template name="create-paragraph">
                         <xsl:with-param name="globalData" select="$globalData" />
                         <xsl:with-param name="footnotePrefix" select="$footnotePrefix" />
+                        <xsl:with-param name="frameFloating" select="true()"/>
                     </xsl:call-template>
                 </xsl:if>
 
             </xsl:when>
-            <xsl:when test="draw:frame and ((normalize-space($childText) != '')  or (((count(*) - count(text:soft-page-break)) &gt; 1)))">
+            <xsl:when test="name() = 'draw:frame' and ((normalize-space($childText) != '')  or (((count(*) - count(text:soft-page-break)) &gt; 1)))">
                 <!-- If there is a 'draw:frame' child with text (not being whitespace alone) and more than the draw:frame alone and
                     not the draw:frame and a soft-page-break alone (which is quite often) -->
 
@@ -368,10 +381,14 @@
                 <!-- The paragraph is written as DIV as there might be nested paragraphs (see above choose block) -->
                 <xsl:choose>
                     <xsl:when test="name() = 'text:p'">
+                        <xsl:text>&#xa;</xsl:text>
                         <xsl:comment>Next 'div' was a 'text:p'.</xsl:comment>
+                        <xsl:text>&#xa;</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
+                        <xsl:text>&#xa;</xsl:text>
                         <xsl:comment>Next 'div' was a 'draw:page'.</xsl:comment>
+                        <xsl:text>&#xa;</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:element name="div">
@@ -388,7 +405,7 @@
                             <xsl:with-param name="previousFrameHeights" select="0"/>
                             <xsl:with-param name="leftPosition" select="0" />
                             <xsl:with-param name="stopAtFirstFrame" select="true()" />
-                            <!-- 2DO for me (Svante) - Not used, uncertain 4now...
+                            <!-- TODO for me (Svante) - Not used, uncertain for now...
                             <xsl:with-param name="pageMarginLeft">
                                 <xsl:call-template name="getPageMarginLeft"/>
                             </xsl:with-param>-->
@@ -401,7 +418,7 @@
                         <xsl:with-param name="previousFrameHeights" select="0"/>
                         <xsl:with-param name="leftPosition" select="0"/>
 
-                        <!-- 2DO for me (Svante) - Not used, uncertain 4now...
+                        <!-- TODO for me (Svante) - Not used, uncertain for now...
                         <xsl:with-param name="pageMarginLeft">
                             <xsl:call-template name="getPageMarginLeft"/>
                          </xsl:with-param>-->
@@ -411,7 +428,7 @@
                     &#160; is an unbreakable whitespace to give content to the element and force a browser not to ignore the element -->
                 <div style="clear:both; line-height:0; width:0; height:0; margin:0; padding:0;">&#160;</div>
             </xsl:when>
-            <xsl:when test="text:tab and not(ancestor::text:index-body)">
+            <xsl:when test="text:tab and not(ancestor::text:index-body)">                
                 <!-- If there is a tabulator (ie. text:tab) within a paragraph, a heuristic for ODF tabulators creates a
                     span for every text:tab embracing the following text nodes aligning them according to the tabulator.
                     A line break or another text:tab starts a new text:span, line break even the tab counter for the line.
@@ -430,7 +447,7 @@
                             <xsl:variable name="paragraphName" select="@text:style-name" />
                             <xsl:variable name="imageParagraphStyle" select="$globalData/all-styles/style[@style:name = $paragraphName]/final-properties"/>
                             <!-- Only the left margin of the first paragraph of a list item will be added to the margin of the complete list (all levels)-->
-<!-- 2DO: left-margin in order with bidirectional -->
+                            <!-- TODO: left-margin in order with bidirectional -->
                             <xsl:choose>
                                 <xsl:when test="contains($imageParagraphStyle, 'margin-left:')">
                                     <xsl:call-template name="convert2cm">
@@ -472,10 +489,12 @@
                         </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
+                        <xsl:text>&#xa;</xsl:text>
                         <xsl:call-template name="create-paragraph">
                             <xsl:with-param name="globalData" select="$globalData" />
                             <xsl:with-param name="footnotePrefix" select="$footnotePrefix" />
                         </xsl:call-template>
+                        <xsl:text>&#xa;</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:otherwise>
@@ -497,7 +516,7 @@
         <xsl:param name="parentMarginLeft" />
         <xsl:param name="pageMarginLeft" />
 
-<!-- 2DO: EXCHANGE FOLLOWING SIBLING BY VARIABLE -->
+<!-- TODO: EXCHANGE FOLLOWING SIBLING BY VARIABLE -->
         <xsl:variable name="followingSiblingNode" select="following-sibling::node()[1]"/>
 
 
@@ -522,7 +541,7 @@
 
         <xsl:choose>
             <xsl:when test="name() = 'text:tab'">
-                <!-- every frame sibling have to be incapuslated within a div with left indent  -->
+                <!-- every frame sibling have to be encapsulated within a div with left indent  -->
                 <xsl:element name="span">
                     <xsl:choose>
                         <xsl:when test="count($tabStops/style:tab-stop) &gt; 0 and count($tabStops/style:tab-stop) &lt; 3">
@@ -547,6 +566,7 @@
                         <xsl:with-param name="globalData" select="$globalData"/>
                     </xsl:apply-templates>
                 </xsl:element>
+                <xsl:text>&#xa;</xsl:text>
                 <xsl:apply-templates select="following-sibling::node()[1]" mode="tabHandling">
                     <xsl:with-param name="globalData" select="$globalData"/>
                     <xsl:with-param name="tabStops" select="$tabStops"/>
@@ -558,6 +578,7 @@
             <xsl:when test="name() = 'text:line-break'">
                 <!-- A line-break resets the tabCount to '0' -->
                 <br/>
+                <xsl:text>&#xa;</xsl:text>
                 <xsl:apply-templates select="following-sibling::node()[1]" mode="tabHandling">
                     <xsl:with-param name="globalData" select="$globalData"/>
                     <xsl:with-param name="tabStops" select="$tabStops"/>
@@ -565,6 +586,7 @@
                     <xsl:with-param name="parentMarginLeft" select="$parentMarginLeft"/>
                     <xsl:with-param name="pageMarginLeft" select="$pageMarginLeft"/>
                 </xsl:apply-templates>
+                <xsl:text>&#xa;</xsl:text>
             </xsl:when>
             <xsl:otherwise>
                 <!-- only before the first tab all content is written out -->
@@ -580,6 +602,7 @@
                     <xsl:with-param name="parentMarginLeft" select="$parentMarginLeft"/>
                     <xsl:with-param name="pageMarginLeft" select="$pageMarginLeft"/>
                 </xsl:apply-templates>
+                <xsl:text>&#xa;</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -679,6 +702,7 @@
         <xsl:param name="globalData"/>
         <!-- the footnote symbol is the prefix for a footnote in the footer -->
         <xsl:param name="footnotePrefix"/>
+        <xsl:param name="frameFloating"/>
 
         <!-- xhtml:p may only contain inline elements.
              If there is one frame beyond, div must be used! -->
@@ -688,7 +712,10 @@
                 <xsl:otherwise>p</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-
+        <xsl:if test="name() = 'text:p' and $elementName = 'div'">
+            <xsl:comment>Next 'div' was a 'text:p'.</xsl:comment>
+            <xsl:text>&#xa;</xsl:text>
+        </xsl:if>
         <xsl:element name="{$elementName}">
             <xsl:choose>
                 <!-- in ODF borders of paragraphs will be merged by default. Merging means the adjacent paragraphs are building a unit,
@@ -788,7 +815,7 @@
         <xsl:text>;</xsl:text>
     </xsl:template>
 
-    <!-- As soon a frame is within a paragraph (text:p) or page:frame, every child element is  floating (CSS) and worked out in sequence.
+    <!-- As soon a frame is within a paragraph (text:p) or page:frame, every child element is floating (CSS) and worked out in sequence.
     Accumulating prior frame width and adding parent's left margin -->
     <!-- Matching all elements and text beyond a paragraph/text:page which are sibling of a draw:frame -->
     <xsl:template match="* | text()" mode="frameFloating">
@@ -798,16 +825,17 @@
         <xsl:param name="leftPosition" select="0" />
         <xsl:param name="parentMarginLeft" />
         <xsl:param name="stopAtFirstFrame" select="false()" />
+        <xsl:param name="frameFloating" select="false()" />
 
         <xsl:choose>
             <xsl:when test="name() = 'draw:frame' and not($stopAtFirstFrame)">
-
                 <!-- if the first node is a draw:frame create a div -->
                 <xsl:call-template name="createDrawFrame">
                     <xsl:with-param name="globalData" select="$globalData"/>
                     <xsl:with-param name="previousFrameWidths" select="$previousFrameWidths"/>
                     <xsl:with-param name="previousFrameHeights" select="$previousFrameHeights"/>
                     <xsl:with-param name="parentMarginLeft" select="$parentMarginLeft"/>
+                    <xsl:with-param name="frameFloating" select="true()"/>
                 </xsl:call-template>
                 <!-- next elements will be called after the creation with the new indent (plus width of frame) -->
             </xsl:when>
@@ -816,19 +844,26 @@
                 <xsl:choose>
                     <xsl:when test="normalize-space(.) != ''">
                         <!-- every following frame sibling till the next draw:frame
-                            have to be incapuslated within a div with left indent.
+                            have to be encapsulated within a div with left indent.
                             To be moved altogether according the indent (usually right) -->
+                        <xsl:text>&#xa;</xsl:text>
                         <xsl:comment>Next 'div' added for floating.</xsl:comment>
+                        <xsl:text>&#xa;</xsl:text>
                         <xsl:element name="div">
                             <xsl:attribute name="style">
                                 <xsl:text>display:inline; position:relative; left:</xsl:text>
                                 <xsl:value-of select="$leftPosition"/>
                                 <xsl:text>cm;</xsl:text>
                             </xsl:attribute>
-                            <xsl:apply-templates select=".">
-                                <xsl:with-param name="globalData" select="$globalData"/>
-                            </xsl:apply-templates>
-                            <!-- if it is a frame sibling it will be NOT incapuslated within the div (as already within one) -->
+                            <!-- This xsl:if is the meat of the extremely ugly "fix" to tdf#146264. It probably has unintended
+                                 bad side-effects.
+                            -->
+                            <xsl:if test="not($frameFloating)">
+                                <xsl:apply-templates select=".">
+                                    <xsl:with-param name="globalData" select="$globalData"/>
+                                </xsl:apply-templates>
+                            </xsl:if>
+                            <!-- if it is a frame sibling it will be NOT encapsulated within the div (as already within one) -->
                             <xsl:if test="not($nextSiblingIsFrame)">
                                 <xsl:apply-templates select="following-sibling::node()[1]" mode="frameFloating">
                                     <xsl:with-param name="globalData" select="$globalData"/>
@@ -898,11 +933,13 @@
         <xsl:param name="globalData"/>
         <xsl:param name="previousFrameWidths" select="0"/>
         <xsl:param name="previousFrameHeights" select="0" />
+        <xsl:param name="frameFloating" select="false()" />
 
         <xsl:call-template name="createDrawFrame">
             <xsl:with-param name="globalData" select="$globalData" />
             <xsl:with-param name="previousFrameWidths" select="$previousFrameWidths"/>
             <xsl:with-param name="previousFrameHeights" select="$previousFrameHeights"/>
+            <xsl:with-param name="frameFloating" select="$frameFloating"/>
         </xsl:call-template>
         <!-- after the last draw:frame sibling the CSS float is disabled -->
         <xsl:if test="@text:anchor-type!='as-char'">
@@ -946,6 +983,7 @@
         <xsl:param name="previousFrameHeights" select="0" />
         <xsl:param name="parentMarginLeft"/>
         <xsl:param name="stopAtFirstFrame" select="false()" />
+        <xsl:param name="frameFloating" select="false()" />
 
         <xsl:variable name="parentMarginLeftNew">
             <xsl:choose>
@@ -1001,7 +1039,9 @@
         </xsl:variable>
         <!-- if the frame is anchored on a paragraph -->
         <xsl:if test="@text:anchor-type='paragraph'">
+            <xsl:text>&#xa;</xsl:text>
             <xsl:comment>Next 'div' is emulating the top height of a draw:frame.</xsl:comment>
+            <xsl:text>&#xa;</xsl:text>
             <!-- When the svg:y is set relative to the paragraph content, the best way to emulate a positive height,
              is to add an invisible division inbetween with a height.
              Often text will flow into this 'gap', which is handled separately!
@@ -1023,14 +1063,8 @@
             <xsl:with-param name="parentMarginLeftNew" select="$parentMarginLeftNew"/>
             <xsl:with-param name="leftPosition" select="$leftPosition"/>
             <xsl:with-param name="svgY" select="$svgY"/>
+            <xsl:with-param name="frameFloating" select="$frameFloating"/>
         </xsl:call-template>
-        <xsl:apply-templates select="following-sibling::node()[1]" mode="frameFloating">
-            <xsl:with-param name="globalData" select="$globalData"/>
-            <xsl:with-param name="previousFrameWidths" select="$previousFrameWidths + $svgWidth"/>
-            <xsl:with-param name="parentMarginLeft" select="$parentMarginLeftNew"/>
-            <xsl:with-param name="leftPosition" select="$leftPosition"/>
-            <xsl:with-param name="stopAtFirstFrame" select="$stopAtFirstFrame" />
-        </xsl:apply-templates>
     </xsl:template>
 
     <xsl:template name="createDrawFrame2">
@@ -1046,9 +1080,9 @@
                 <xsl:otherwise>div</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:comment>Next '
-            <xsl:value-of select="$elem-name"/>' is a draw:frame.
-        </xsl:comment>
+        <xsl:text>&#xa;</xsl:text>
+        <xsl:comment>Next '<xsl:value-of select="$elem-name"/>' is a draw:frame. </xsl:comment>
+        <xsl:text>&#xa;</xsl:text>
         <xsl:element name="{$elem-name}">
             <xsl:choose>
                 <xsl:when test="draw:object/math:math">
@@ -1064,18 +1098,33 @@
                     <xsl:attribute name="style">
                     <xsl:call-template name="widthAndHeight"/>
                     <xsl:text> padding:0; </xsl:text>
-                    <xsl:if test="@text:anchor-type!='as-char'">
-                        <!-- all images float (CSS float relative) with a left position calculated by svg:x - parentMarginLeft - previousFrameWidths -->
-                        <xsl:text> float:left; position:relative; left:</xsl:text>
-                        <xsl:value-of select="$leftPosition"/>
-                        <xsl:text>cm; </xsl:text>
-                        <!-- if the frame is anchored on a char -->
-                        <xsl:if test="@text:anchor-type='char'">
-                            <xsl:text>top:</xsl:text>
-                            <xsl:value-of select="$svgY"/>
+                    <xsl:choose>
+                        <xsl:when test="@text:anchor-type='as-char'">
+                            <!-- images being used as character are not floating and ar not positioned (CSS position:static being the default)-->
+                            <!--<xsl:text> position:static;</xsl:text>-->
+                        </xsl:when>
+                        <xsl:when test="@text:anchor-type!='as-char'">
+                            <!-- all images float (CSS float relative) with a left position calculated by svg:x - parentMarginLeft - previousFrameWidths -->
+                            <xsl:text> float:left; position:relative; left:</xsl:text>
+                                    <xsl:value-of select="$leftPosition" />
                             <xsl:text>cm; </xsl:text>
-                        </xsl:if>
-                    </xsl:if>
+                            <!-- if the frame is anchored on a char -->
+                            <xsl:if test="@text:anchor-type='char'">
+                                <xsl:text>top:</xsl:text>
+                                        <xsl:value-of select="$svgY" />
+                                <xsl:text>cm; </xsl:text>
+                            </xsl:if>
+                        </xsl:when>
+                        <!-- @text:anchor-type='' -->
+                        <xsl:otherwise>
+                                <xsl:text> position:absolute; left:</xsl:text>
+                                    <xsl:value-of select="$leftPosition" />
+                            <xsl:text>cm; </xsl:text>
+                            <xsl:text>top:</xsl:text>
+                                    <xsl:value-of select="$svgY" />
+                            <xsl:text>cm; </xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:attribute>
                 <xsl:apply-templates select="@*">
                     <xsl:with-param name="globalData" select="$globalData"/>
@@ -1183,6 +1232,7 @@
             </xsl:apply-templates>
         </xsl:element>
 
+        <xsl:text>&#xa;</xsl:text>
     </xsl:template>
 
     <xsl:template name="create-heading-anchor">
@@ -1687,7 +1737,7 @@
 
         <!-- $globalData/styles-file/*/office:styles/ -->
         <xsl:variable name="listLevelStyle" select="$listStyle/*/*[@text:level = number($listLevel)]"/>
-        <!-- 2DO: Access new list styles
+        <!-- TODO: Access new list styles
         <xsl:variable name="listLevelLabelAlignment1" select="$listLevelStyle/style:list-level-properties/style:list-level-label-alignment"/>-->
         <xsl:variable name="listIndent">
             <xsl:call-template name="getListIndent">
@@ -1998,7 +2048,7 @@
                                                         <xsl:with-param name="value" select="string($listLevelLabelAlignment/@fo:text-indent)"/>
                                                     </xsl:call-template>
                                                 </xsl:variable>
-                                                <!-- 2DO: Access new ODF 1.2 list styles
+                                                <!-- TODO: Access new ODF 1.2 list styles
                                                 <xsl:variable name="listLevelTextIndent">
                                                     <xsl:call-template name="convert2cm">
                                                         <xsl:with-param name="value" select="string($listLevelLabelAlignment/@text:list-tab-stop-position)"/>
@@ -2020,7 +2070,7 @@
                                         </xsl:if>
                                         <xsl:attribute name="style">
                                             <xsl:text>display:block;float:</xsl:text>
-                                            <!-- 2DO: Svante - copy this functionality for other used margin:left (in western country 'left') -->
+                                            <!-- TODO: Svante - copy this functionality for other used margin:left (in western country 'left') -->
                                             <xsl:call-template name="getOppositeWritingDirection">
                                                 <xsl:with-param name="globalData" select="$globalData"/>
                                                 <xsl:with-param name="paraStyleName" select="descendant-or-self::*/@text:style-name"/>
@@ -2269,7 +2319,7 @@
                                     <xsl:choose>
                                         <!-- if it has content the counting is ended -->
                                         <xsl:when test="*[name() = 'text:h' or name() = 'text:p'] or $isListHeader">
-                                            <!-- 2DO: Perhaps the children still have to be processed -->
+                                            <!-- TODO: Perhaps the children still have to be processed -->
                                             <xsl:value-of select="$itemNumber + $pseudoLevel"/>
                                         </xsl:when>
                                         <xsl:otherwise>
@@ -2524,7 +2574,7 @@
         <xsl:param name="minLabelDist"/>
         <xsl:param name="minLabelWidth"/>
 
-        <!-- 2DO page alignment fix - PART1 -->
+        <!-- TODO page alignment fix - PART1 -->
 
         <!-- xhtml:p may only contain inline elements.
              If there is one frame beyond, div must be used! -->
@@ -2551,6 +2601,7 @@
             <xsl:apply-templates>
                 <xsl:with-param name="globalData" select="$globalData"/>
                 <xsl:with-param name="listIndent" select="$minLabelWidth"/>
+                <xsl:with-param name="frameFloating" select="true()"/>
             </xsl:apply-templates>
             <!-- this span disables the float necessary to bring two block elements on one line. It contains a space as IE6 bug workaround -->
             <span class="odfLiEnd"></span>
@@ -2771,12 +2822,15 @@
         <xsl:param name="globalData"/>
 
         <xsl:if test="not(contains(@text:display, 'none'))">
+            <xsl:text>&#xa;</xsl:text>
             <xsl:comment>Next 'div' was a 'text:section'.</xsl:comment>
+            <xsl:text>&#xa;</xsl:text>
             <xsl:element name="div">
                 <xsl:call-template name="apply-styles-and-content">
                     <xsl:with-param name="globalData" select="$globalData"/>
                 </xsl:call-template>
             </xsl:element>
+            <xsl:text>&#xa;</xsl:text>
         </xsl:if>
     </xsl:template>
 
@@ -2809,7 +2863,22 @@
         <xsl:param name="globalData"/>
 
         <xsl:attribute name="class">
-            <xsl:value-of select="translate(., '.,;: %()[]/\+', '_____________')"/>
+        	<xsl:choose>
+        		<xsl:when test="name() = 'draw:text-style-name' or name() = 'draw:style-name'">
+                    <xsl:choose>
+                        <xsl:when test="parent::*/@draw:text-style-name and parent::*/@draw:style-name">
+                            <xsl:value-of select="translate(parent::*/@draw:style-name, '.,;: %()[]/\+', '_____________')" /><xsl:text> </xsl:text>
+                            <xsl:value-of select="translate(parent::*/@draw:text-style-name, '.,;: %()[]/\+', '_____________')" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="translate(., '.,;: %()[]/\+', '_____________')" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="translate(., '.,;: %()[]/\+', '_____________')"/>
+                </xsl:otherwise>	            
+	        </xsl:choose>    
         </xsl:attribute>
     </xsl:template>
 

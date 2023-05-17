@@ -20,7 +20,6 @@
 #include <iodetect.hxx>
 #include <memory>
 #include <osl/endian.h>
-#include <osl/thread.h>
 #include <sot/storage.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/moduleoptions.hxx>
@@ -242,8 +241,8 @@ std::shared_ptr<const SfxFilter> SwIoSystem::GetFileFilter(const OUString& rFile
 rtl_TextEncoding SwIoSystem::GetTextEncoding(SvStream& rStrm)
 {
     sal_Size nLen, nOrig;
-    char aBuf[DETECT_ENCODING_BUFFER_SIZE];
-    nOrig = nLen = rStrm.ReadBytes(aBuf, DETECT_ENCODING_BUFFER_SIZE);
+    char aBuf[4096];
+    nOrig = nLen = rStrm.ReadBytes(aBuf, sizeof(aBuf));
 
     rtl_TextEncoding eCharSet;
     const bool bRet = SwIoSystem::IsDetectableText(aBuf, nLen, &eCharSet, nullptr, nullptr, nullptr);
@@ -311,6 +310,10 @@ bool SwIoSystem::IsDetectableText(const char* pBuf, sal_uLong &rLen,
             else if (U_SUCCESS(uerr) && !strcmp("UTF-16LE", pEncodingName))
             {
                 eCharSet = RTL_TEXTENCODING_UCS2; // UTF-16LE
+            }
+            else if (U_SUCCESS(uerr) && !strcmp("GB18030", pEncodingName))
+            {
+                eCharSet = RTL_TEXTENCODING_GB_18030;
             }
         }
 

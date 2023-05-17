@@ -19,8 +19,6 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/bindings.hxx>
 #include <sfx2/dispatch.hxx>
@@ -64,28 +62,28 @@ class ImageButtonHdl;
 const sal_uInt16 gButtonSlots[] = { SID_INSERT_TABLE, SID_INSERT_DIAGRAM, SID_INSERT_GRAPHIC, SID_INSERT_AVMEDIA };
 const TranslateId gButtonToolTips[] = { STR_INSERT_TABLE, STR_INSERT_CHART, STR_INSERT_PICTURE, STR_INSERT_MOVIE };
 
-const std::u16string_view aSmallPlaceHolders[] =
+constexpr rtl::OUStringConstExpr aSmallPlaceHolders[] =
 {
-    u"" BMP_PLACEHOLDER_TABLE_SMALL,
-    u"" BMP_PLACEHOLDER_CHART_SMALL,
-    u"" BMP_PLACEHOLDER_IMAGE_SMALL,
-    u"" BMP_PLACEHOLDER_MOVIE_SMALL,
-    u"" BMP_PLACEHOLDER_TABLE_SMALL_HOVER,
-    u"" BMP_PLACEHOLDER_CHART_SMALL_HOVER,
-    u"" BMP_PLACEHOLDER_IMAGE_SMALL_HOVER,
-    u"" BMP_PLACEHOLDER_MOVIE_SMALL_HOVER
+    BMP_PLACEHOLDER_TABLE_SMALL,
+    BMP_PLACEHOLDER_CHART_SMALL,
+    BMP_PLACEHOLDER_IMAGE_SMALL,
+    BMP_PLACEHOLDER_MOVIE_SMALL,
+    BMP_PLACEHOLDER_TABLE_SMALL_HOVER,
+    BMP_PLACEHOLDER_CHART_SMALL_HOVER,
+    BMP_PLACEHOLDER_IMAGE_SMALL_HOVER,
+    BMP_PLACEHOLDER_MOVIE_SMALL_HOVER
 };
 
-const std::u16string_view aBigPlaceHolders[] =
+constexpr rtl::OUStringConstExpr aBigPlaceHolders[] =
 {
-    u"" BMP_PLACEHOLDER_TABLE_LARGE,
-    u"" BMP_PLACEHOLDER_CHART_LARGE,
-    u"" BMP_PLACEHOLDER_IMAGE_LARGE,
-    u"" BMP_PLACEHOLDER_MOVIE_LARGE,
-    u"" BMP_PLACEHOLDER_TABLE_LARGE_HOVER,
-    u"" BMP_PLACEHOLDER_CHART_LARGE_HOVER,
-    u"" BMP_PLACEHOLDER_IMAGE_LARGE_HOVER,
-    u"" BMP_PLACEHOLDER_MOVIE_LARGE_HOVER
+    BMP_PLACEHOLDER_TABLE_LARGE,
+    BMP_PLACEHOLDER_CHART_LARGE,
+    BMP_PLACEHOLDER_IMAGE_LARGE,
+    BMP_PLACEHOLDER_MOVIE_LARGE,
+    BMP_PLACEHOLDER_TABLE_LARGE_HOVER,
+    BMP_PLACEHOLDER_CHART_LARGE_HOVER,
+    BMP_PLACEHOLDER_IMAGE_LARGE_HOVER,
+    BMP_PLACEHOLDER_MOVIE_LARGE_HOVER
 };
 
 static BitmapEx* getButtonImage( int index, bool large )
@@ -136,7 +134,7 @@ protected:
     virtual void addCustomHandles( SdrHdlList& rHandlerList ) override;
 
 private:
-    ::tools::WeakReference<SdrObject>    mxPlaceholderObj;
+    ::unotools::WeakReference<SdrObject>    mxPlaceholderObj;
 };
 
 class ImageButtonHdl : public SmartHdl
@@ -318,14 +316,14 @@ bool ChangePlaceholderTag::MouseButtonDown( const MouseEvent& /*rMEvt*/, SmartHd
     {
         sal_uInt16 nSID = gButtonSlots[nHighlightId];
 
-        if( mxPlaceholderObj )
+        if( auto pPlaceholder = mxPlaceholderObj.get() )
         {
             // mark placeholder if it is not currently marked (or if also others are marked)
-            if( !mrView.IsObjMarked( mxPlaceholderObj.get() ) || (mrView.GetMarkedObjectList().GetMarkCount() != 1) )
+            if( !mrView.IsObjMarked( pPlaceholder.get() ) || (mrView.GetMarkedObjectList().GetMarkCount() != 1) )
             {
                 SdrPageView* pPV = mrView.GetSdrPageView();
                 mrView.UnmarkAllObj(pPV );
-                mrView.MarkObj(mxPlaceholderObj.get(), pPV);
+                mrView.MarkObj(pPlaceholder.get(), pPV);
             }
         }
 
@@ -356,9 +354,8 @@ bool ChangePlaceholderTag::KeyInput( const KeyEvent& rKEvt )
 BitmapEx ChangePlaceholderTag::createOverlayImage( int nHighlight )
 {
     BitmapEx aRet;
-    if( mxPlaceholderObj.is() )
+    if( auto pPlaceholder = mxPlaceholderObj.get() )
     {
-        SdrObject* pPlaceholder = mxPlaceholderObj.get();
         SmartTagReference xThis( this );
         const ::tools::Rectangle& rSnapRect = pPlaceholder->GetSnapRect();
 
@@ -390,10 +387,10 @@ BitmapEx ChangePlaceholderTag::createOverlayImage( int nHighlight )
 
 void ChangePlaceholderTag::addCustomHandles( SdrHdlList& rHandlerList )
 {
-    if( !mxPlaceholderObj.is() )
+    rtl::Reference<SdrObject> pPlaceholder = mxPlaceholderObj.get();
+    if( !pPlaceholder )
         return;
 
-    SdrObject* pPlaceholder = mxPlaceholderObj.get();
     SmartTagReference xThis( this );
     const ::tools::Rectangle& rSnapRect = pPlaceholder->GetSnapRect();
     const Point aPoint;
@@ -500,7 +497,7 @@ bool ViewOverlayManager::CreateTags()
 
         for( SdrObject* pShape : rShapes )
         {
-            if( pShape->IsEmptyPresObj() && (pShape->GetObjIdentifier() == OBJ_OUTLINETEXT) && (mrBase.GetDrawView()->GetTextEditObject() != pShape) )
+            if( pShape->IsEmptyPresObj() && (pShape->GetObjIdentifier() == SdrObjKind::OutlineText) && (mrBase.GetDrawView()->GetTextEditObject() != pShape) )
             {
                 rtl::Reference< SmartTag > xTag( new ChangePlaceholderTag( *mrBase.GetMainViewShell()->GetView(), *pShape ) );
                 maTagVector.push_back(xTag);

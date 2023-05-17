@@ -29,9 +29,10 @@
 
 #include <comphelper/lok.hxx>
 
+#include <basegfx/matrix/b2dhommatrix.hxx>
 #include <drawinglayer/attribute/lineattribute.hxx>
 #include <drawinglayer/attribute/strokeattribute.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <memory>
@@ -59,8 +60,7 @@ XDashEntry* XDashList::GetDash(tools::Long nIndex) const
 
 uno::Reference< container::XNameContainer > XDashList::createInstance()
 {
-    return uno::Reference< container::XNameContainer >(
-        SvxUnoXDashTable_createInstance( this ), uno::UNO_QUERY );
+    return SvxUnoXDashTable_createInstance( *this );
 }
 
 bool XDashList::Create()
@@ -74,7 +74,12 @@ bool XDashList::Create()
     return true;
 }
 
-BitmapEx XDashList::ImpCreateBitmapForXDash(const XDash* pDash)
+double XDashList::ImpGetDefaultLineThickness()
+{
+    return StyleSettings::GetListBoxPreviewDefaultLineWidth() * 1.1;
+}
+
+BitmapEx XDashList::CreateBitmapForXDash(const XDash* pDash, double fLineThickness)
 {
     const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
     const Size& rSize = rStyleSettings.GetListBoxPreviewDefaultPixelSize();
@@ -89,7 +94,7 @@ BitmapEx XDashList::ImpCreateBitmapForXDash(const XDash* pDash)
 
     // prepare LineAttribute
     const basegfx::BColor aLineColor(rStyleSettings.GetFieldTextColor().getBColor());
-    const double fLineWidth(StyleSettings::GetListBoxPreviewDefaultLineWidth() * (nFactor * 1.1));
+    const double fLineWidth(fLineThickness * nFactor);
     const drawinglayer::attribute::LineAttribute aLineAttribute(
         aLineColor,
         fLineWidth);
@@ -121,16 +126,16 @@ BitmapEx XDashList::ImpCreateBitmapForXDash(const XDash* pDash)
         }
     }
 
-    const drawinglayer::attribute::StrokeAttribute aStrokeAttribute(
+    drawinglayer::attribute::StrokeAttribute aStrokeAttribute(
         std::move(aDotDashArray),
         fFullDotDashLen);
 
     // create LinePrimitive
     const drawinglayer::primitive2d::Primitive2DReference aLinePrimitive(
         new drawinglayer::primitive2d::PolygonStrokePrimitive2D(
-            aLine,
+            std::move(aLine),
             aLineAttribute,
-            aStrokeAttribute));
+            std::move(aStrokeAttribute)));
 
     // prepare VirtualDevice
     ScopedVclPtrInstance< VirtualDevice > pVirtualDevice;
@@ -181,14 +186,14 @@ BitmapEx XDashList::CreateBitmapForUI( tools::Long nIndex )
 {
     const XDash& rDash = GetDash(nIndex)->GetDash();
 
-    return ImpCreateBitmapForXDash(&rDash);
+    return CreateBitmapForXDash(&rDash, ImpGetDefaultLineThickness());
 }
 
 BitmapEx const & XDashList::GetBitmapForUISolidLine() const
 {
     if(maBitmapSolidLine.IsEmpty())
     {
-        const_cast< XDashList* >(this)->maBitmapSolidLine = XDashList::ImpCreateBitmapForXDash(nullptr);
+        const_cast< XDashList* >(this)->maBitmapSolidLine = XDashList::CreateBitmapForXDash(nullptr, ImpGetDefaultLineThickness());
     }
 
     return maBitmapSolidLine;

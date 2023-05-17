@@ -35,6 +35,7 @@
 #include <comphelper/propertysequence.hxx>
 #include <sfx2/app.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 
 using namespace com::sun::star;
@@ -68,17 +69,6 @@ bool ScMyValidation::IsEqual(const ScMyValidation& aVal) const
         aVal.sFormula2 == sFormula2;
 }
 
-constexpr OUStringLiteral gsERRALSTY(u"" SC_UNONAME_ERRALSTY);
-constexpr OUStringLiteral gsIGNOREBL(u"" SC_UNONAME_IGNOREBL);
-constexpr OUStringLiteral gsSHOWLIST(u"" SC_UNONAME_SHOWLIST);
-constexpr OUStringLiteral gsTYPE(u"" SC_UNONAME_TYPE);
-constexpr OUStringLiteral gsSHOWINP(u"" SC_UNONAME_SHOWINP);
-constexpr OUStringLiteral gsSHOWERR(u"" SC_UNONAME_SHOWERR);
-constexpr OUStringLiteral gsINPTITLE(u"" SC_UNONAME_INPTITLE);
-constexpr OUStringLiteral gsINPMESS(u"" SC_UNONAME_INPMESS);
-constexpr OUStringLiteral gsERRTITLE(u"" SC_UNONAME_ERRTITLE);
-constexpr OUStringLiteral gsERRMESS(u"" SC_UNONAME_ERRMESS);
-
 ScMyValidationsContainer::ScMyValidationsContainer()
 {
 }
@@ -95,17 +85,17 @@ void ScMyValidationsContainer::AddValidation(const uno::Any& aTempAny,
         return;
 
     OUString sErrorMessage;
-    xPropertySet->getPropertyValue(gsERRMESS) >>= sErrorMessage;
+    xPropertySet->getPropertyValue(SC_UNONAME_ERRMESS) >>= sErrorMessage;
     OUString sErrorTitle;
-    xPropertySet->getPropertyValue(gsERRTITLE) >>= sErrorTitle;
+    xPropertySet->getPropertyValue(SC_UNONAME_ERRTITLE) >>= sErrorTitle;
     OUString sInputMessage;
-    xPropertySet->getPropertyValue(gsINPMESS) >>= sInputMessage;
+    xPropertySet->getPropertyValue(SC_UNONAME_INPMESS) >>= sInputMessage;
     OUString sInputTitle;
-    xPropertySet->getPropertyValue(gsINPTITLE) >>= sInputTitle;
-    bool bShowErrorMessage = ::cppu::any2bool(xPropertySet->getPropertyValue(gsSHOWERR));
-    bool bShowInputMessage = ::cppu::any2bool(xPropertySet->getPropertyValue(gsSHOWINP));
+    xPropertySet->getPropertyValue(SC_UNONAME_INPTITLE) >>= sInputTitle;
+    bool bShowErrorMessage = ::cppu::any2bool(xPropertySet->getPropertyValue(SC_UNONAME_SHOWERR));
+    bool bShowInputMessage = ::cppu::any2bool(xPropertySet->getPropertyValue(SC_UNONAME_SHOWINP));
     sheet::ValidationType aValidationType;
-    xPropertySet->getPropertyValue(gsTYPE) >>= aValidationType;
+    xPropertySet->getPropertyValue(SC_UNONAME_TYPE) >>= aValidationType;
     if (!bShowErrorMessage && !bShowInputMessage && aValidationType == sheet::ValidationType_ANY &&
         sErrorMessage.isEmpty() && sErrorTitle.isEmpty() && sInputMessage.isEmpty() && sInputTitle.isEmpty())
         return;
@@ -118,9 +108,9 @@ void ScMyValidationsContainer::AddValidation(const uno::Any& aTempAny,
     aValidation.bShowErrorMessage = bShowErrorMessage;
     aValidation.bShowInputMessage = bShowInputMessage;
     aValidation.aValidationType = aValidationType;
-    aValidation.bIgnoreBlanks = ::cppu::any2bool(xPropertySet->getPropertyValue(gsIGNOREBL));
-    xPropertySet->getPropertyValue(gsSHOWLIST) >>= aValidation.nShowList;
-    xPropertySet->getPropertyValue(gsERRALSTY) >>= aValidation.aAlertStyle;
+    aValidation.bIgnoreBlanks = ::cppu::any2bool(xPropertySet->getPropertyValue(SC_UNONAME_IGNOREBL));
+    xPropertySet->getPropertyValue(SC_UNONAME_SHOWLIST) >>= aValidation.nShowList;
+    xPropertySet->getPropertyValue(SC_UNONAME_ERRALSTY) >>= aValidation.aAlertStyle;
     uno::Reference<sheet::XSheetCondition> xCondition(xPropertySet, uno::UNO_QUERY);
     if (xCondition.is())
     {
@@ -712,11 +702,11 @@ bool ScFormatRangeStyles::AddStyleName(OUString const & rString, sal_Int32& rInd
     }
 }
 
-sal_Int32 ScFormatRangeStyles::GetIndexOfStyleName(const OUString& rString, const OUString& rPrefix, bool& bIsAutoStyle)
+sal_Int32 ScFormatRangeStyles::GetIndexOfStyleName(std::u16string_view rString, std::u16string_view rPrefix, bool& bIsAutoStyle)
 {
-    sal_Int32 nPrefixLength(rPrefix.getLength());
-    OUString sTemp(rString.copy(nPrefixLength));
-    sal_Int32 nIndex(sTemp.toInt32());
+    sal_Int32 nPrefixLength(rPrefix.size());
+    std::u16string_view sTemp(rString.substr(nPrefixLength));
+    sal_Int32 nIndex(o3tl::toInt32(sTemp));
     if (nIndex > 0 && o3tl::make_unsigned(nIndex-1) < aAutoStyleNames.size() && aAutoStyleNames.at(nIndex - 1) == rString)
     {
         bIsAutoStyle = true;
@@ -924,11 +914,11 @@ sal_Int32 ScColumnRowStylesBase::AddStyleName(const OUString & rString)
     return aStyleNames.size() - 1;
 }
 
-sal_Int32 ScColumnRowStylesBase::GetIndexOfStyleName(const OUString& rString, const OUString& rPrefix)
+sal_Int32 ScColumnRowStylesBase::GetIndexOfStyleName(std::u16string_view rString, std::u16string_view rPrefix)
 {
-    sal_Int32 nPrefixLength(rPrefix.getLength());
-    OUString sTemp(rString.copy(nPrefixLength));
-    sal_Int32 nIndex(sTemp.toInt32());
+    sal_Int32 nPrefixLength(rPrefix.size());
+    std::u16string_view sTemp(rString.substr(nPrefixLength));
+    sal_Int32 nIndex(o3tl::toInt32(sTemp));
     if (nIndex > 0 && o3tl::make_unsigned(nIndex-1) < aStyleNames.size() && aStyleNames.at(nIndex - 1) == rString)
         return nIndex - 1;
     else

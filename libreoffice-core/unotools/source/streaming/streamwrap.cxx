@@ -78,6 +78,21 @@ sal_Int32 SAL_CALL OInputStreamWrapper::readBytes(css::uno::Sequence< sal_Int8 >
     return nRead;
 }
 
+sal_Int32 OInputStreamWrapper::readSomeBytes(sal_Int8* pData, sal_Int32 nBytesToRead)
+{
+    checkConnected();
+
+    if (nBytesToRead < 0)
+        throw css::io::BufferSizeExceededException(OUString(),static_cast<css::uno::XWeak*>(this));
+
+    std::scoped_lock aGuard( m_aMutex );
+
+    sal_uInt32 nRead = m_pSvStream->ReadBytes(static_cast<void*>(pData), nBytesToRead);
+    checkError();
+
+    return nRead;
+}
+
 sal_Int32 SAL_CALL OInputStreamWrapper::readSomeBytes(css::uno::Sequence< sal_Int8 >& aData, sal_Int32 nMaxBytesToRead)
 {
     checkError();
@@ -117,12 +132,13 @@ sal_Int32 SAL_CALL OInputStreamWrapper::available()
 void SAL_CALL OInputStreamWrapper::closeInput()
 {
     std::scoped_lock aGuard( m_aMutex );
-    checkConnected();
+    if (m_pSvStream)
+    {
+        if (m_bSvStreamOwner)
+            delete m_pSvStream;
 
-    if (m_bSvStreamOwner)
-        delete m_pSvStream;
-
-    m_pSvStream = nullptr;
+        m_pSvStream = nullptr;
+    }
 }
 
 void OInputStreamWrapper::checkConnected() const
@@ -138,8 +154,16 @@ void OInputStreamWrapper::checkError() const
     auto const e = m_pSvStream->SvStream::GetError();
     if (e != ERRCODE_NONE)
         // TODO: really evaluate the error
-        throw css::io::NotConnectedException("utl::OInputStreamWrapper error " + e.toHexString(), const_cast<css::uno::XWeak*>(static_cast<const css::uno::XWeak*>(this)));
+        throw css::io::NotConnectedException("utl::OInputStreamWrapper error " + e.toString(), const_cast<css::uno::XWeak*>(static_cast<const css::uno::XWeak*>(this)));
 }
+
+sal_Int64 SAL_CALL OInputStreamWrapper::getSomething( const css::uno::Sequence< sal_Int8 >& rIdentifier )
+{
+    if (rIdentifier == comphelper::ByteReader::getUnoTunnelId())
+        return reinterpret_cast<sal_Int64>(static_cast<comphelper::ByteReader*>(this));
+    return 0;
+}
+
 
 //= OSeekableInputStreamWrapper
 
@@ -160,7 +184,7 @@ void SAL_CALL OSeekableInputStreamWrapper::seek( sal_Int64 _nLocation )
     std::scoped_lock aGuard( m_aMutex );
     checkConnected();
 
-    m_pSvStream->Seek(static_cast<sal_uInt32>(_nLocation));
+    m_pSvStream->Seek(static_cast<sal_uInt64>(_nLocation));
     checkError();
 }
 
@@ -208,7 +232,7 @@ void SAL_CALL OOutputStreamWrapper::writeBytes(const css::uno::Sequence< sal_Int
 
 void SAL_CALL OOutputStreamWrapper::flush()
 {
-    rStream.Flush();
+    rStream.FlushBuffer();
     checkError();
 }
 
@@ -274,6 +298,11 @@ OStreamWrapper::OStreamWrapper(std::unique_ptr<SvStream> pStream)
     SetStream( pStream.release(), true );
 }
 
+OStreamWrapper::OStreamWrapper(SvStream* pStream, bool bOwner)
+{
+    SetStream( pStream, bOwner );
+}
+
 css::uno::Reference< css::io::XInputStream > SAL_CALL OStreamWrapper::getInputStream(  )
 {
     return this;
@@ -298,7 +327,7 @@ void SAL_CALL OStreamWrapper::writeBytes(const css::uno::Sequence< sal_Int8 >& a
 
 void SAL_CALL OStreamWrapper::flush()
 {
-    m_pSvStream->Flush();
+    m_pSvStream->FlushBuffer();
     if (m_pSvStream->GetError() != ERRCODE_NONE)
         throw css::io::NotConnectedException(OUString(),static_cast<css::uno::XWeak*>(this));
 }

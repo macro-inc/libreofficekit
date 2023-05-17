@@ -169,6 +169,7 @@ Sane::~Sane()
 
 void Sane::Init()
 {
+#ifndef DISABLE_DYNLOADING
     OUString sSaneLibName( "libsane" SAL_DLLEXTENSION  );
     pSaneLib = osl_loadModule( sSaneLibName.pData, SAL_LOADMODULE_LAZY );
     if( ! pSaneLib )
@@ -183,7 +184,7 @@ void Sane::Init()
         osl_getFileURLFromSystemPath( sSaneLibSystemPath.pData, &sSaneLibName.pData );
         pSaneLib = osl_loadModule( sSaneLibName.pData, SAL_LOADMODULE_LAZY );
     }
-
+#endif
     if( pSaneLib )
     {
         bSaneSymbolLoadFailed = false;
@@ -243,7 +244,9 @@ void Sane::DeInit()
     if( pSaneLib )
     {
         p_exit();
+#ifndef DISABLE_DYNLOADING
         osl_unloadModule( pSaneLib );
+#endif
         pSaneLib = nullptr;
     }
 }
@@ -695,7 +698,7 @@ bool Sane::Start( BitmapTransporter& rBitmap )
                 if( nStatus != SANE_STATUS_GOOD )
                     bSynchronousRead = true;
             }
-            utl::TempFile aFrame;
+            utl::TempFileNamed aFrame;
             aFrame.EnableKillingFile();
             FILE* pFrame = fopen(OUStringToOString(aFrame.GetFileName(), osl_getThreadTextEncoding()).getStr(), "w+b");
             if( ! pFrame )

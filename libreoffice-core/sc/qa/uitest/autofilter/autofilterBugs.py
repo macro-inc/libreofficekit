@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from libreoffice.uno.propertyvalue import mkPropertyValues
@@ -21,6 +24,54 @@ class autofilter(UITestCase):
 
             #autofilter still exist
             self.assertEqual(calc_doc.getPropertyValue("UnnamedDatabaseRanges").getByTable(0).AutoFilter, True)
+
+   def test_tdf123095(self):
+        with self.ui_test.create_doc_in_start_center("calc"):
+            calcDoc = self.xUITest.getTopFocusWindow()
+            xGridWindow = calcDoc.getChild("grid_window")
+            enter_text_to_cell(xGridWindow, "A1", "乙二醇(进口料件)")
+            enter_text_to_cell(xGridWindow, "A2", "乙二醇（进口料件）")
+            xGridWindow.executeAction("SELECT", mkPropertyValues({"RANGE": "A1:A2"}))
+
+            with self.ui_test.execute_dialog_through_command(".uno:DataFilterAutoFilter", close_button="no"):
+                pass
+
+            xGridWindow.executeAction("LAUNCH", mkPropertyValues({"AUTOFILTER": "", "COL": "0", "ROW": "0"}))
+            xFloatWindow = self.xUITest.getFloatWindow()
+            xTreeList = xFloatWindow.getChild("check_list_box")
+
+            # Without the fix in place, the second entry would not exist
+            self.assertEqual(2, len(xTreeList.getChildren()))
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("0"))["Text"], "乙二醇(进口料件)")
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("1"))["Text"], "乙二醇（进口料件）")
+
+   def test_tdf125363(self):
+        with self.ui_test.create_doc_in_start_center("calc"):
+            calcDoc = self.xUITest.getTopFocusWindow()
+            xGridWindow = calcDoc.getChild("grid_window")
+            enter_text_to_cell(xGridWindow, "A1", "guet")
+            enter_text_to_cell(xGridWindow, "A2", "guͤt")
+            enter_text_to_cell(xGridWindow, "A3", "tuon")
+            enter_text_to_cell(xGridWindow, "A4", "tuͦn")
+            enter_text_to_cell(xGridWindow, "A5", "vröude")
+            enter_text_to_cell(xGridWindow, "A6", "vröudᵉ")
+            xGridWindow.executeAction("SELECT", mkPropertyValues({"RANGE": "A1:A6"}))
+
+            with self.ui_test.execute_dialog_through_command(".uno:DataFilterAutoFilter", close_button="no"):
+                pass
+
+            xGridWindow.executeAction("LAUNCH", mkPropertyValues({"AUTOFILTER": "", "COL": "0", "ROW": "0"}))
+            xFloatWindow = self.xUITest.getFloatWindow()
+            xTreeList = xFloatWindow.getChild("check_list_box")
+
+            # Without the fix in place, the entries with superscript/modifier letters would not exist
+            self.assertEqual(6, len(xTreeList.getChildren()))
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("0"))["Text"], "guet")
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("1"))["Text"], "guͤt")
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("2"))["Text"], "tuon")
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("3"))["Text"], "tuͦn")
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("4"))["Text"], "vröude")
+            self.assertEqual(get_state_as_dict(xTreeList.getChild("5"))["Text"], "vröudᵉ")
 
    def test_tdf94055(self):
         with self.ui_test.create_doc_in_start_center("calc") as document:
@@ -65,7 +116,7 @@ class autofilter(UITestCase):
 
         #112656
    def test_tdf112656(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf112656.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf112656.ods")):
             calcDoc = self.xUITest.getTopFocusWindow()
             xGridWindow = calcDoc.getChild("grid_window")
 
@@ -79,7 +130,7 @@ class autofilter(UITestCase):
 
         #tdf81124
    def test_tdf81124(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf81124.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf81124.ods")):
             calcDoc = self.xUITest.getTopFocusWindow()
             xGridWindow = calcDoc.getChild("grid_window")
 
@@ -101,7 +152,7 @@ class autofilter(UITestCase):
 
 #tdf73565
    def test_tdf73565(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf73565.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf73565.ods")):
             calcDoc = self.xUITest.getTopFocusWindow()
             xGridWindow = calcDoc.getChild("grid_window")
 
@@ -116,7 +167,7 @@ class autofilter(UITestCase):
 
         #tdf65505
    def test_tdf65505(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf81124.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf81124.ods")):
             calcDoc = self.xUITest.getTopFocusWindow()
             xGridWindow = calcDoc.getChild("grid_window")
 
@@ -131,7 +182,7 @@ class autofilter(UITestCase):
 
 #tdf74857
    def test_tdf74857(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf74857.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf74857.ods")):
             calcDoc = self.xUITest.getTopFocusWindow()
             xGridWindow = calcDoc.getChild("grid_window")
 
@@ -142,7 +193,7 @@ class autofilter(UITestCase):
 
         #tdf35294
    def test_tdf35294(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf35294.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf35294.ods")):
             calcDoc = self.xUITest.getTopFocusWindow()
             xGridWindow = calcDoc.getChild("grid_window")
 
@@ -170,7 +221,7 @@ class autofilter(UITestCase):
 
         #tdf55712
    def test_tdf55712(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf55712.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf55712.ods")):
             calcDoc = self.xUITest.getTopFocusWindow()
             xGridWindow = calcDoc.getChild("grid_window")
 
@@ -200,5 +251,23 @@ class autofilter(UITestCase):
 
             xCancel = xFloatWindow.getChild("cancel")
             xCancel.executeAction("CLICK", tuple())
+
+        #tdf152082
+   def test_tdf152082(self):
+        with self.ui_test.load_file(get_url_for_data_file("tdf152082.ods")):
+            xCalcDoc = self.xUITest.getTopFocusWindow()
+            gridwin = xCalcDoc.getChild("grid_window")
+
+            gridwin.executeAction("LAUNCH", mkPropertyValues({"AUTOFILTER": "", "COL": "0", "ROW": "0"}))
+            xFloatWindow = self.xUITest.getFloatWindow()
+            xCheckListMenu = xFloatWindow.getChild("FilterDropDown")
+            xTreeList = xCheckListMenu.getChild("check_list_box")
+            self.assertEqual(4, len(xTreeList.getChildren()))
+            self.assertEqual('true', get_state_as_dict(xTreeList.getChild('0'))['IsChecked'])
+            self.assertEqual('true', get_state_as_dict(xTreeList.getChild('1'))['IsChecked'])
+            self.assertEqual('true', get_state_as_dict(xTreeList.getChild('2'))['IsChecked'])
+            self.assertEqual('false', get_state_as_dict(xTreeList.getChild('3'))['IsChecked'])
+            xCancelBtn = xFloatWindow.getChild("cancel")
+            xCancelBtn.executeAction("CLICK", tuple())
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

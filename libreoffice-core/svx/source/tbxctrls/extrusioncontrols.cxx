@@ -19,8 +19,6 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include <comphelper/propertyvalue.hxx>
 #include <svtools/toolbarmenu.hxx>
 #include <vcl/toolbox.hxx>
@@ -47,57 +45,58 @@ namespace svx
 const sal_Int32 gSkewList[] = { 135, 90, 45, 180, 0, -360, -135, -90, -45 };
 constexpr OUStringLiteral g_sExtrusionDirection = u".uno:ExtrusionDirection";
 constexpr OUStringLiteral g_sExtrusionProjection = u".uno:ExtrusionProjection";
+constexpr OUStringLiteral EMPTY = u"";
 
-const std::u16string_view aLightOffBmps[] =
+constexpr rtl::OUStringConstExpr aLightOffBmps[] =
 {
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_TOP_LEFT,
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_TOP,
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_TOP_RIGHT,
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_LEFT,
-    u"",
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_RIGHT,
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_BOTTOM_LEFT,
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_BOTTOM,
-    u"" RID_SVXBMP_LIGHT_OFF_FROM_BOTTOM_RIGHT
+    RID_SVXBMP_LIGHT_OFF_FROM_TOP_LEFT,
+    RID_SVXBMP_LIGHT_OFF_FROM_TOP,
+    RID_SVXBMP_LIGHT_OFF_FROM_TOP_RIGHT,
+    RID_SVXBMP_LIGHT_OFF_FROM_LEFT,
+    EMPTY,
+    RID_SVXBMP_LIGHT_OFF_FROM_RIGHT,
+    RID_SVXBMP_LIGHT_OFF_FROM_BOTTOM_LEFT,
+    RID_SVXBMP_LIGHT_OFF_FROM_BOTTOM,
+    RID_SVXBMP_LIGHT_OFF_FROM_BOTTOM_RIGHT
 };
 
-const std::u16string_view aLightOnBmps[] =
+constexpr rtl::OUStringConstExpr aLightOnBmps[] =
 {
-    u"" RID_SVXBMP_LIGHT_ON_FROM_TOP_LEFT,
-    u"" RID_SVXBMP_LIGHT_ON_FROM_TOP,
-    u"" RID_SVXBMP_LIGHT_ON_FROM_TOP_RIGHT,
-    u"" RID_SVXBMP_LIGHT_ON_FROM_LEFT,
-    u"",
-    u"" RID_SVXBMP_LIGHT_ON_FROM_RIGHT,
-    u"" RID_SVXBMP_LIGHT_ON_FROM_BOTTOM_LEFT,
-    u"" RID_SVXBMP_LIGHT_ON_FROM_BOTTOM,
-    u"" RID_SVXBMP_LIGHT_ON_FROM_BOTTOM_RIGHT
+    RID_SVXBMP_LIGHT_ON_FROM_TOP_LEFT,
+    RID_SVXBMP_LIGHT_ON_FROM_TOP,
+    RID_SVXBMP_LIGHT_ON_FROM_TOP_RIGHT,
+    RID_SVXBMP_LIGHT_ON_FROM_LEFT,
+    EMPTY,
+    RID_SVXBMP_LIGHT_ON_FROM_RIGHT,
+    RID_SVXBMP_LIGHT_ON_FROM_BOTTOM_LEFT,
+    RID_SVXBMP_LIGHT_ON_FROM_BOTTOM,
+    RID_SVXBMP_LIGHT_ON_FROM_BOTTOM_RIGHT
 };
 
-const std::u16string_view aLightPreviewBmps[] =
+constexpr rtl::OUStringConstExpr aLightPreviewBmps[] =
 {
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_TOP_LEFT,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_TOP,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_TOP_RIGHT,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_LEFT,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_RIGHT,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_FRONT,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_BOTTOM_LEFT,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_BOTTOM,
-    u"" RID_SVXBMP_LIGHT_PREVIEW_FROM_BOTTOM_RIGHT
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_TOP_LEFT,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_TOP,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_TOP_RIGHT,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_LEFT,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_FRONT,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_RIGHT,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_BOTTOM_LEFT,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_BOTTOM,
+    RID_SVXBMP_LIGHT_PREVIEW_FROM_BOTTOM_RIGHT
 };
 
-const std::u16string_view aDirectionBmps[] =
+constexpr rtl::OUStringConstExpr aDirectionBmps[] =
 {
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_NW,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_N,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_NE,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_W,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_NONE,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_E,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_SW,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_S,
-    u"" RID_SVXBMP_DIRECTION_DIRECTION_SE
+    RID_SVXBMP_DIRECTION_DIRECTION_NW,
+    RID_SVXBMP_DIRECTION_DIRECTION_N,
+    RID_SVXBMP_DIRECTION_DIRECTION_NE,
+    RID_SVXBMP_DIRECTION_DIRECTION_W,
+    RID_SVXBMP_DIRECTION_DIRECTION_NONE,
+    RID_SVXBMP_DIRECTION_DIRECTION_E,
+    RID_SVXBMP_DIRECTION_DIRECTION_SW,
+    RID_SVXBMP_DIRECTION_DIRECTION_S,
+    RID_SVXBMP_DIRECTION_DIRECTION_SE
 };
 
 static TranslateId aDirectionStrs[] =
@@ -828,11 +827,13 @@ ExtrusionSurfaceWindow::ExtrusionSurfaceWindow(svt::PopupWindowController* pCont
     , mxMatt(m_xBuilder->weld_radio_button("matt"))
     , mxPlastic(m_xBuilder->weld_radio_button("plastic"))
     , mxMetal(m_xBuilder->weld_radio_button("metal"))
+    , mxMetalMSO(m_xBuilder->weld_radio_button("metalMSO"))
 {
     mxWireFrame->connect_toggled(LINK(this, ExtrusionSurfaceWindow, SelectHdl));
     mxMatt->connect_toggled(LINK(this, ExtrusionSurfaceWindow, SelectHdl));
     mxPlastic->connect_toggled(LINK(this, ExtrusionSurfaceWindow, SelectHdl));
     mxMetal->connect_toggled(LINK(this, ExtrusionSurfaceWindow, SelectHdl));
+    mxMetalMSO->connect_toggled(LINK(this, ExtrusionSurfaceWindow, SelectHdl));
 
     AddStatusListener( g_sExtrusionSurface );
 }
@@ -852,6 +853,8 @@ void ExtrusionSurfaceWindow::implSetSurface( int nSurface, bool bEnabled )
     mxPlastic->set_sensitive(bEnabled);
     mxMetal->set_active(nSurface == 3 && bEnabled);
     mxMetal->set_sensitive(bEnabled);
+    mxMetalMSO->set_active(nSurface == 4 && bEnabled);
+    mxMetalMSO->set_sensitive(bEnabled);
 }
 
 void ExtrusionSurfaceWindow::statusChanged(
@@ -885,8 +888,10 @@ IMPL_LINK(ExtrusionSurfaceWindow, SelectHdl, weld::Toggleable&, rButton, void)
         nSurface = 1;
     else if (mxPlastic->get_active())
         nSurface = 2;
-    else
+    else if (mxMetal->get_active())
         nSurface = 3;
+    else
+        nSurface = 4;
 
     Sequence< PropertyValue > aArgs{ comphelper::makePropertyValue(
         OUString(g_sExtrusionSurface).copy(5), nSurface) };

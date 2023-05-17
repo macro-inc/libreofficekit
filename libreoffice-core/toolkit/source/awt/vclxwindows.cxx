@@ -24,15 +24,10 @@
 #include <com/sun/star/graphic/GraphicProvider.hpp>
 #include <com/sun/star/graphic/XGraphicProvider.hpp>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <toolkit/helper/macros.hxx>
 #include <toolkit/helper/property.hxx>
 #include <toolkit/helper/convert.hxx>
-#include <cppuhelper/typeprovider.hxx>
-#include <cppuhelper/queryinterface.hxx>
 #include <com/sun/star/awt/VisualEffect.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
-#include <com/sun/star/system/SystemShellExecute.hpp>
-#include <com/sun/star/system/SystemShellExecuteFlags.hpp>
 #include <com/sun/star/resource/XStringResourceResolver.hpp>
 #include <com/sun/star/awt/ImageScaleMode.hpp>
 #include <com/sun/star/awt/XItemList.hpp>
@@ -44,7 +39,6 @@
 #include <awt/vclxwindows.hxx>
 #include <controls/filectrl.hxx>
 #include <controls/svmedit.hxx>
-#include <svl/zforlist.hxx>
 #include <vcl/toolkit/button.hxx>
 #include <vcl/toolkit/fmtfield.hxx>
 #include <vcl/graph.hxx>
@@ -55,12 +49,12 @@
 #include <vcl/toolkit/imgctrl.hxx>
 #include <vcl/toolkit/dialog.hxx>
 #include <vcl/toolkit/prgsbar.hxx>
-#include <vcl/scrbar.hxx>
+#include <vcl/toolkit/scrbar.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/tabpage.hxx>
 #include <vcl/tabctrl.hxx>
 #include <vcl/settings.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 
 #include <helper/imagealign.hxx>
@@ -71,7 +65,6 @@
 
 using ::com::sun::star::uno::Any;
 using ::com::sun::star::uno::Reference;
-using ::com::sun::star::uno::makeAny;
 using ::com::sun::star::uno::RuntimeException;
 using ::com::sun::star::lang::EventObject;
 using ::com::sun::star::awt::ItemListEvent;
@@ -160,7 +153,7 @@ namespace toolkit
     Any getButtonLikeFaceColor( const vcl::Window* _pWindow )
     {
         Color nBackgroundColor = _pWindow->GetSettings().GetStyleSettings().GetFaceColor();
-        return makeAny( sal_Int32(nBackgroundColor) );
+        return Any( sal_Int32(nBackgroundColor) );
     }
 
     static void adjustBooleanWindowStyle( const Any& _rValue, vcl::Window* _pWindow, WinBits _nBits, bool _bInverseSemantics )
@@ -786,29 +779,6 @@ VCLXCheckBox::VCLXCheckBox() :  maActionListeners( *this ), maItemListeners( *th
 {
 }
 
-// css::uno::XInterface
-css::uno::Any VCLXCheckBox::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XButton* >(this),
-                                        static_cast< css::awt::XCheckBox* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXGraphicControl::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXCheckBox )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXCheckBox::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XButton>::get(),
-        cppu::UnoType<css::awt::XCheckBox>::get(),
-        VCLXGraphicControl::getTypes()
-    );
-    return aTypeList.getTypes();
-}
-
 css::uno::Reference< css::accessibility::XAccessibleContext > VCLXCheckBox::CreateAccessibleContext()
 {
     return getAccessibleFactory().createAccessibleContext( this );
@@ -1093,29 +1063,6 @@ VCLXRadioButton::VCLXRadioButton() : maItemListeners( *this ), maActionListeners
 {
 }
 
-// css::uno::XInterface
-css::uno::Any VCLXRadioButton::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XRadioButton* >(this),
-                                        static_cast< css::awt::XButton* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXGraphicControl::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXRadioButton )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXRadioButton::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XRadioButton>::get(),
-        cppu::UnoType<css::awt::XButton>::get(),
-        VCLXGraphicControl::getTypes()
-    );
-    return aTypeList.getTypes();
-}
-
 css::uno::Reference< css::accessibility::XAccessibleContext > VCLXRadioButton::CreateAccessibleContext()
 {
     return getAccessibleFactory().createAccessibleContext( this );
@@ -1360,27 +1307,6 @@ VCLXSpinField::VCLXSpinField() : maSpinListeners( *this )
 {
 }
 
-// css::uno::XInterface
-css::uno::Any VCLXSpinField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XSpinField* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXEdit::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXSpinField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXSpinField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XSpinField>::get(),
-        VCLXEdit::getTypes()
-    );
-    return aTypeList.getTypes();
-}
-
 void VCLXSpinField::addSpinListener( const css::uno::Reference< css::awt::XSpinListener > & l )
 {
     SolarMutexGuard aGuard;
@@ -1516,6 +1442,8 @@ void VCLXListBox::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_REFERENCE_DEVICE,
                      BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXWindow::ImplGetPropertyIds( rIds );
 }
@@ -1930,6 +1858,38 @@ void VCLXListBox::setProperty( const OUString& PropertyName, const css::uno::Any
             }
         }
         break;
+        case BASEPROPERTY_HIGHLIGHT_COLOR:
+        {
+            Color nColor = 0;
+            bool bVoid = Value.getValueType().getTypeClass() == css::uno::TypeClass_VOID;
+            if (bVoid)
+            {
+                nColor = Application::GetSettings().GetStyleSettings().GetHighlightColor();
+            }
+            else
+            {
+                if (!(Value >>= nColor))
+                    break;
+            }
+            pListBox->SetHighlightColor(nColor);
+        }
+        break;
+        case BASEPROPERTY_HIGHLIGHT_TEXT_COLOR:
+        {
+            Color nColor = 0;
+            bool bVoid = Value.getValueType().getTypeClass() == css::uno::TypeClass_VOID;
+            if (bVoid)
+            {
+                nColor = Application::GetSettings().GetStyleSettings().GetHighlightTextColor();
+            }
+            else
+            {
+                if (!(Value >>= nColor))
+                    break;
+            }
+            pListBox->SetHighlightTextColor(nColor);
+        }
+        break;
         default:
         {
             VCLXWindow::setProperty( PropertyName, Value );
@@ -2196,27 +2156,6 @@ VCLXMessageBox::~VCLXMessageBox()
 {
 }
 
-// css::uno::XInterface
-css::uno::Any VCLXMessageBox::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XMessageBox* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXTopWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXMessageBox )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXMessageBox::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XMessageBox>::get(),
-        VCLXTopWindow::getTypes()
-    );
-    return aTypeList.getTypes();
-}
-
 void VCLXMessageBox::setCaptionText( const OUString& rText )
 {
     SolarMutexGuard aGuard;
@@ -2264,7 +2203,6 @@ sal_Int16 VCLXMessageBox::execute()
 
 css::awt::Size SAL_CALL VCLXMessageBox::getMinimumSize()
 {
-    SolarMutexGuard aGuard;
     return css::awt::Size( 250, 100 );
 }
 
@@ -2283,29 +2221,6 @@ VCLXDialog::VCLXDialog()
 VCLXDialog::~VCLXDialog()
 {
     SAL_INFO("toolkit", __FUNCTION__);
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXDialog::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XDialog2* >(this),
-                                        static_cast< css::awt::XDialog* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXTopWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXDialog )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXDialog::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XDialog2>::get(),
-        cppu::UnoType<css::awt::XDialog>::get(),
-        VCLXTopWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 void SAL_CALL VCLXDialog::endDialog( ::sal_Int32 i_result )
@@ -2492,13 +2407,6 @@ void SAL_CALL VCLXMultiPage::dispose()
     maTabListeners.disposeAndClear( aObj );
     VCLXContainer::dispose();
 }
-css::uno::Any SAL_CALL VCLXMultiPage::queryInterface(const css::uno::Type & rType )
-{
-    uno::Any aRet = ::cppu::queryInterface( rType, static_cast< awt::XSimpleTabController*>( this ) );
-
-    return ( aRet.hasValue() ? aRet : VCLXContainer::queryInterface( rType ) );
-}
-IMPL_IMPLEMENTATION_ID( VCLXMultiPage )
 // css::awt::XView
 void SAL_CALL VCLXMultiPage::draw( sal_Int32 nX, sal_Int32 nY )
 {
@@ -2682,8 +2590,8 @@ uno::Sequence< beans::NamedValue > SAL_CALL VCLXMultiPage::getTabProps( sal_Int3
 
     uno::Sequence< beans::NamedValue > props
     {
-        { "Title",    css::uno::makeAny(pTabControl->GetPageText( sal::static_int_cast< sal_uInt16 >( ID ) )) },
-        { "Position", css::uno::makeAny(pTabControl->GetPagePos( sal::static_int_cast< sal_uInt16 >( ID ) )) }
+        { "Title",    css::uno::Any(pTabControl->GetPageText( sal::static_int_cast< sal_uInt16 >( ID ) )) },
+        { "Position", css::uno::Any(pTabControl->GetPagePos( sal::static_int_cast< sal_uInt16 >( ID ) )) }
     };
     return props;
 }
@@ -2741,8 +2649,6 @@ void VCLXTabPage::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
 VCLXTabPage::~VCLXTabPage()
 {
 }
-
-IMPL_IMPLEMENTATION_ID( VCLXTabPage )
 
 // css::awt::XView
 void SAL_CALL VCLXTabPage::draw( sal_Int32 nX, sal_Int32 nY )
@@ -2836,14 +2742,6 @@ VCLXFixedHyperlink::~VCLXFixedHyperlink()
 {
 }
 
-// css::uno::XInterface
-css::uno::Any VCLXFixedHyperlink::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XFixedHyperlink* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXWindow::queryInterface( rType ));
-}
-
 void VCLXFixedHyperlink::dispose()
 {
         SolarMutexGuard aGuard;
@@ -2852,19 +2750,6 @@ void VCLXFixedHyperlink::dispose()
         aObj.Source = static_cast<cppu::OWeakObject*>(this);
         maActionListeners.disposeAndClear( aObj );
         VCLXWindow::dispose();
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXFixedHyperlink )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXFixedHyperlink::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XFixedHyperlink>::get(),
-        VCLXWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 void VCLXFixedHyperlink::ProcessWindowEvent( const VclWindowEvent& rVclWindowEvent )
@@ -3124,6 +3009,8 @@ void VCLXFixedText::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_WRITING_MODE,
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_REFERENCE_DEVICE,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXWindow::ImplGetPropertyIds( rIds );
 }
@@ -3134,27 +3021,6 @@ VCLXFixedText::VCLXFixedText()
 
 VCLXFixedText::~VCLXFixedText()
 {
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXFixedText::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XFixedText* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXFixedText )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXFixedText::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XFixedText>::get(),
-        VCLXWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 css::uno::Reference< css::accessibility::XAccessibleContext > VCLXFixedText::CreateAccessibleContext()
@@ -3282,27 +3148,6 @@ void VCLXScrollBar::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
 
 VCLXScrollBar::VCLXScrollBar() : maAdjustmentListeners( *this )
 {
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXScrollBar::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XScrollBar* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXScrollBar )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXScrollBar::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XScrollBar>::get(),
-        VCLXWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 css::uno::Reference< css::accessibility::XAccessibleContext > VCLXScrollBar::CreateAccessibleContext()
@@ -3765,37 +3610,14 @@ void VCLXEdit::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_VERTICALALIGN,
                      BASEPROPERTY_WRITING_MODE,
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXWindow::ImplGetPropertyIds( rIds );
 }
 
 VCLXEdit::VCLXEdit() : maTextListeners( *this )
 {
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXEdit::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XTextComponent* >(this),
-                                        static_cast< css::awt::XTextEditField* >(this),
-                                        static_cast< css::awt::XTextLayoutConstrains* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXEdit )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXEdit::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XTextComponent>::get(),
-        cppu::UnoType<css::awt::XTextEditField>::get(),
-        cppu::UnoType<css::awt::XTextLayoutConstrains>::get(),
-        VCLXWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 css::uno::Reference< css::accessibility::XAccessibleContext > VCLXEdit::CreateAccessibleContext()
@@ -4145,6 +3967,8 @@ void VCLXComboBox::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_REFERENCE_DEVICE,
                      BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     // no, don't call VCLXEdit here - it has properties which we do *not* want to have at combo box
     // #i92690# / 2008-08-12 / frank.schoenheit@sun.com
@@ -4313,6 +4137,7 @@ void VCLXComboBox::setProperty( const OUString& PropertyName, const css::uno::An
     if ( !pComboBox )
         return;
 
+    bool bVoid = Value.getValueType().getTypeClass() == css::uno::TypeClass_VOID;
     sal_uInt16 nPropType = GetPropertyId( PropertyName );
     switch ( nPropType )
     {
@@ -4344,6 +4169,36 @@ void VCLXComboBox::setProperty( const OUString& PropertyName, const css::uno::An
                 pComboBox->Clear();
                 addItems( aItems, 0 );
             }
+        }
+        break;
+        case BASEPROPERTY_HIGHLIGHT_COLOR:
+        {
+            Color nColor = 0;
+            if (bVoid)
+            {
+                nColor = Application::GetSettings().GetStyleSettings().GetHighlightColor();
+            }
+            else
+            {
+                if (!(Value >>= nColor))
+                    break;
+            }
+            pComboBox->SetHighlightColor(nColor);
+        }
+        break;
+        case BASEPROPERTY_HIGHLIGHT_TEXT_COLOR:
+        {
+            Color nColor = 0;
+            if (bVoid)
+            {
+                nColor = Application::GetSettings().GetStyleSettings().GetHighlightTextColor();
+            }
+            else
+            {
+                if (!(Value >>= nColor))
+                    break;
+            }
+            pComboBox->SetHighlightTextColor(nColor);
         }
         break;
         default:
@@ -4748,6 +4603,8 @@ void VCLXDateField::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_WRITING_MODE,
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXFormattedSpinField::ImplGetPropertyIds( rIds );
 }
@@ -4769,27 +4626,6 @@ css::uno::Reference< css::accessibility::XAccessibleContext > VCLXDateField::Cre
         pWindow->SetType( WindowType::DATEFIELD );
     }
     return getAccessibleFactory().createAccessibleContext( this );
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXDateField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XDateField* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXFormattedSpinField::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXDateField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXDateField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XDateField>::get(),
-        VCLXFormattedSpinField::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 void VCLXDateField::setProperty( const OUString& PropertyName, const css::uno::Any& Value)
@@ -4814,7 +4650,7 @@ void VCLXDateField::setProperty( const OUString& PropertyName, const css::uno::A
             else
             {
                 util::Date d;
-                if ( Value >>= d )
+                if ((Value >>= d) && d.Year != 0)
                      setDate( d );
             }
         }
@@ -4822,14 +4658,14 @@ void VCLXDateField::setProperty( const OUString& PropertyName, const css::uno::A
         case BASEPROPERTY_DATEMIN:
         {
             util::Date d;
-            if ( Value >>= d )
+            if ((Value >>= d) && d.Year != 0)
                  setMin( d );
         }
         break;
         case BASEPROPERTY_DATEMAX:
         {
             util::Date d;
-            if ( Value >>= d )
+            if ((Value >>= d) && d.Year != 0)
                  setMax( d );
         }
         break;
@@ -5101,6 +4937,8 @@ void VCLXTimeField::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_WRITING_MODE,
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXFormattedSpinField::ImplGetPropertyIds( rIds );
 }
@@ -5122,27 +4960,6 @@ css::uno::Reference< css::accessibility::XAccessibleContext > VCLXTimeField::Cre
         pWindow->SetType( WindowType::TIMEFIELD );
     }
     return getAccessibleFactory().createAccessibleContext( this );
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXTimeField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XTimeField* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXFormattedSpinField::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXTimeField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXTimeField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XTimeField>::get(),
-        VCLXFormattedSpinField::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 void VCLXTimeField::setTime( const util::Time& aTime )
@@ -5417,6 +5234,8 @@ void VCLXNumericField::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_WRITING_MODE,
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXFormattedSpinField::ImplGetPropertyIds( rIds );
 }
@@ -5427,27 +5246,6 @@ VCLXNumericField::VCLXNumericField()
 
 VCLXNumericField::~VCLXNumericField()
 {
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXNumericField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XNumericField* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXFormattedSpinField::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXNumericField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXNumericField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XNumericField>::get(),
-        VCLXFormattedSpinField::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 void VCLXNumericField::setValue( double Value )
@@ -5800,26 +5598,6 @@ MetricField *VCLXMetricField::GetMetricField()
     return pField;
 }
 
-// css::uno::XInterface
-css::uno::Any VCLXMetricField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType, static_cast< css::awt::XMetricField* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXFormattedSpinField::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXMetricField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXMetricField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XMetricField>::get(),
-        VCLXFormattedSpinField::getTypes()
-    );
-    return aTypeList.getTypes();
-}
-
 // FIXME: later ...
 #define MetricUnitUnoToVcl(a) (static_cast<FieldUnit>(a))
 
@@ -6028,6 +5806,8 @@ void VCLXPatternField::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_WRITING_MODE,
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXFormattedSpinField::ImplGetPropertyIds( rIds );
 }
@@ -6038,27 +5818,6 @@ VCLXPatternField::VCLXPatternField()
 
 VCLXPatternField::~VCLXPatternField()
 {
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXPatternField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XPatternField* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXFormattedSpinField::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXPatternField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXPatternField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XPatternField>::get(),
-        VCLXFormattedSpinField::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 void VCLXPatternField::setMasks( const OUString& EditMask, const OUString& LiteralMask )
@@ -6230,8 +5989,6 @@ VCLXFrame::~VCLXFrame()
 {
 }
 
-IMPL_IMPLEMENTATION_ID( VCLXFrame )
-
 // css::awt::XView
 void SAL_CALL VCLXFrame::draw( sal_Int32 nX, sal_Int32 nY )
 {
@@ -6324,28 +6081,6 @@ void VCLXProgressBar::ImplUpdateValue()
 
     // set progressbar value
     pProgressBar->SetValue( static_cast<sal_uInt16>(nPercent) );
-}
-
-// css::uno::XInterface
-css::uno::Any VCLXProgressBar::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XProgressBar* >(this),
-                                        static_cast< css::lang::XTypeProvider* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXProgressBar )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXProgressBar::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XProgressBar>::get(),
-        VCLXWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 // css::awt::XProgressBar
@@ -6519,29 +6254,6 @@ VCLXFileControl::~VCLXFileControl()
     VclPtr< FileControl > pControl = GetAs< FileControl >();
     if ( pControl )
         pControl->GetEdit().SetModifyHdl( Link<Edit&,void>() );
-}
-
-css::uno::Any VCLXFileControl::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XTextComponent* >(this),
-                                        static_cast< css::awt::XTextLayoutConstrains* >(this),
-                                        static_cast< css::lang::XTypeProvider* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXFileControl )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXFileControl::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XTextComponent>::get(),
-        cppu::UnoType<css::awt::XTextLayoutConstrains>::get(),
-        VCLXWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 namespace
@@ -6891,7 +6603,7 @@ void SVTXFormattedField::setProperty( const OUString& PropertyName, const css::u
                             sal_Int32 nValue = 0;
                             if (!(Value >>= nValue))
                                 throw css::lang::IllegalArgumentException();
-                            SetValue(css::uno::makeAny(static_cast<double>(nValue)));
+                            SetValue(css::uno::Any(static_cast<double>(nValue)));
                             break;
                         }
 
@@ -7380,27 +7092,6 @@ SVTXCurrencyField::~SVTXCurrencyField()
 {
 }
 
-css::uno::Any SVTXCurrencyField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XCurrencyField* >(this),
-                                        static_cast< css::lang::XTypeProvider* >(this) );
-    return (aRet.hasValue() ? aRet : SVTXFormattedField::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( SVTXCurrencyField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > SVTXCurrencyField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XCurrencyField>::get(),
-        SVTXFormattedField::getTypes()
-    );
-    return aTypeList.getTypes();
-}
-
 void SVTXCurrencyField::setValue( double Value )
 {
     SolarMutexGuard aGuard;
@@ -7633,6 +7324,8 @@ void SVTXCurrencyField::ImplGetPropertyIds( std::vector< sal_uInt16 > &rIds )
                      BASEPROPERTY_WRITING_MODE,
                      BASEPROPERTY_CONTEXT_WRITING_MODE,
                      BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR,
+                     BASEPROPERTY_HIGHLIGHT_COLOR,
+                     BASEPROPERTY_HIGHLIGHT_TEXT_COLOR,
                      0);
     VCLXWindow::ImplGetPropertyIds( rIds );
 }
@@ -7643,27 +7336,6 @@ SVTXNumericField::SVTXNumericField()
 
 SVTXNumericField::~SVTXNumericField()
 {
-}
-
-css::uno::Any SVTXNumericField::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XNumericField* >(this),
-                                        static_cast< css::lang::XTypeProvider* >(this) );
-    return (aRet.hasValue() ? aRet : SVTXFormattedField::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( SVTXNumericField )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > SVTXNumericField::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XNumericField>::get(),
-        SVTXFormattedField::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 
@@ -7863,31 +7535,6 @@ VCLXMultiLineEdit::VCLXMultiLineEdit()
 
 VCLXMultiLineEdit::~VCLXMultiLineEdit()
 {
-}
-
-css::uno::Any VCLXMultiLineEdit::queryInterface( const css::uno::Type & rType )
-{
-    css::uno::Any aRet = ::cppu::queryInterface( rType,
-                                        static_cast< css::awt::XTextComponent* >(this),
-                                        static_cast< css::awt::XTextArea* >(this),
-                                        static_cast< css::awt::XTextLayoutConstrains* >(this),
-                                        static_cast< css::lang::XTypeProvider* >(this) );
-    return (aRet.hasValue() ? aRet : VCLXWindow::queryInterface( rType ));
-}
-
-IMPL_IMPLEMENTATION_ID( VCLXMultiLineEdit )
-
-// css::lang::XTypeProvider
-css::uno::Sequence< css::uno::Type > VCLXMultiLineEdit::getTypes()
-{
-    static const ::cppu::OTypeCollection aTypeList(
-        cppu::UnoType<css::lang::XTypeProvider>::get(),
-        cppu::UnoType<css::awt::XTextComponent>::get(),
-        cppu::UnoType<css::awt::XTextArea>::get(),
-        cppu::UnoType<css::awt::XTextLayoutConstrains>::get(),
-        VCLXWindow::getTypes()
-    );
-    return aTypeList.getTypes();
 }
 
 void VCLXMultiLineEdit::addTextListener( const css::uno::Reference< css::awt::XTextListener > & l )

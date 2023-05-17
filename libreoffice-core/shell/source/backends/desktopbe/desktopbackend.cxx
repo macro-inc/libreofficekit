@@ -44,7 +44,7 @@
 #include <rtl/ustrbuf.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <uno/current_context.hxx>
 
 namespace {
@@ -201,7 +201,7 @@ OUString xdg_user_dir_lookup (const char *type, bool bAllowHomeDir)
     {
         aDocumentsDirURL = aUserDirBuf.makeStringAndClear();
         if ( bAllowHomeDir ||
-             (aDocumentsDirURL != aHomeDirURL && aDocumentsDirURL != OUStringConcatenation(aHomeDirURL + "/")) )
+             (aDocumentsDirURL != aHomeDirURL && aDocumentsDirURL != Concat2View(aHomeDirURL + "/")) )
         {
             osl::Directory aDocumentsDir( aDocumentsDirURL );
             if( osl::FileBase::E_None == aDocumentsDir.open() )
@@ -248,7 +248,7 @@ css::uno::Any Default::getPropertyValue(OUString const & PropertyName)
          PropertyName == "givenname" ||
          PropertyName == "sn" )
     {
-        return css::uno::makeAny(css::beans::Optional< css::uno::Any >());
+        return css::uno::Any(css::beans::Optional< css::uno::Any >());
     }
 
     throw css::beans::UnknownPropertyException(

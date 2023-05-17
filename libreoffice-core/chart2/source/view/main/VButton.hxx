@@ -13,6 +13,8 @@
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/uno/Reference.hxx>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 
 namespace com::sun::star::beans { class XPropertySet; }
 namespace com::sun::star::drawing { class XShape; }
@@ -25,9 +27,8 @@ namespace chart
 class VButton final
 {
 private:
-    css::uno::Reference<css::lang::XMultiServiceFactory> m_xShapeFactory;
-    css::uno::Reference<css::drawing::XShapes> m_xTarget;
-    css::uno::Reference<css::drawing::XShape> m_xShape;
+    rtl::Reference<SvxShapeGroupAnyD> m_xTarget;
+    rtl::Reference<SvxShapeGroup> m_xShape;
     OUString m_sLabel;
     OUString m_sCID;
     css::awt::Point m_aPosition;
@@ -36,14 +37,13 @@ private:
     Color m_nArrowColor;
     Color m_nBGColor;
 
-    css::uno::Reference<css::drawing::XShape>
+    rtl::Reference<SvxShapePolyPolygon>
         createTriangle(css::awt::Size aSize);
 
 public:
     VButton();
 
-    void init(const css::uno::Reference<css::drawing::XShapes>& xTargetPage,
-              const css::uno::Reference<css::lang::XMultiServiceFactory>& xFactory);
+    void init(const rtl::Reference<SvxShapeGroupAnyD>& xTargetPage);
 
     void createShapes(const css::uno::Reference<css::beans::XPropertySet>& xTextProp);
 

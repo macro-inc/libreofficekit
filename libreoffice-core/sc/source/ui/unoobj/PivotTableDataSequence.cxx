@@ -14,6 +14,7 @@
 #include <sal/log.hxx>
 #include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <miscuno.hxx>
@@ -27,22 +28,21 @@ namespace sc
 
 SC_SIMPLE_SERVICE_INFO( PivotTableDataSequence, "PivotTableDataSequence", "com.sun.star.chart2.data.DataSequence")
 
-static const SfxItemPropertyMapEntry* lcl_GetDataSequencePropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDataSequencePropertyMap()
 {
     static const SfxItemPropertyMapEntry aDataSequencePropertyMap_Impl[] =
     {
-        { u"" SC_UNONAME_HIDDENVALUES, 0, cppu::UnoType<uno::Sequence<sal_Int32>>::get(), 0, 0 },
-        { u"" SC_UNONAME_ROLE, 0, cppu::UnoType<css::chart2::data::DataSequenceRole>::get(), 0, 0 },
-        { u"" SC_UNONAME_INCLUDEHIDDENCELLS, 0, cppu::UnoType<bool>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_HIDDENVALUES, 0, cppu::UnoType<uno::Sequence<sal_Int32>>::get(), 0, 0 },
+        { SC_UNONAME_ROLE, 0, cppu::UnoType<css::chart2::data::DataSequenceRole>::get(), 0, 0 },
+        { SC_UNONAME_INCLUDEHIDDENCELLS, 0, cppu::UnoType<bool>::get(), 0, 0 },
     };
     return aDataSequencePropertyMap_Impl;
 }
 
-PivotTableDataSequence::PivotTableDataSequence(ScDocument* pDocument, OUString const & sID,
+PivotTableDataSequence::PivotTableDataSequence(ScDocument* pDocument, OUString sID,
                                                std::vector<ValueAndFormat>&& rData)
     : m_pDocument(pDocument)
-    , m_aID(sID)
+    , m_aID(std::move(sID))
     , m_aData(std::move(rData))
     , m_aPropSet(lcl_GetDataSequencePropertyMap())
 {

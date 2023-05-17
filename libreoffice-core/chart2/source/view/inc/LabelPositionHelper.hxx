@@ -22,6 +22,8 @@
 #include "LabelAlignment.hxx"
 #include "PropertyMapper.hxx"
 #include <com/sun/star/awt/Point.hpp>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 
 namespace com::sun::star::drawing { struct Position3D; }
 namespace com::sun::star::drawing { class XShapes; }
@@ -31,16 +33,13 @@ namespace com::sun::star::drawing { class XShape; }
 namespace chart
 {
 
-class ShapeFactory;
-
 class LabelPositionHelper
 {
 public:
     LabelPositionHelper() = delete;
     LabelPositionHelper(
           sal_Int32 nDimensionCount
-        , const css::uno::Reference< css::drawing::XShapes >& xLogicTarget
-        , ShapeFactory* pShapeFactory );
+        , rtl::Reference<SvxShapeGroupAnyD> xLogicTarget );
     virtual ~LabelPositionHelper();
 
     css::awt::Point transformSceneToScreenPosition(
@@ -51,7 +50,7 @@ public:
                     , const css::uno::Reference< css::beans::XPropertySet >& xAxisModelProps
                     , const css::awt::Size& rNewReferenceSize );
 
-    static void correctPositionForRotation( const css::uno::Reference< css::drawing::XShape >& xShape2DText
+    static void correctPositionForRotation( const rtl::Reference<SvxShapeText>& xShape2DText
                     , LabelAlignment eLabelAlignment, const double fRotationAngle, bool bRotateAroundCenter );
 
 protected:
@@ -59,8 +58,7 @@ protected:
 
 private:
     //these members are only necessary for transformation from 3D to 2D
-    css::uno::Reference< css::drawing::XShapes >    m_xLogicTarget;
-    ShapeFactory* m_pShapeFactory;
+    rtl::Reference<SvxShapeGroupAnyD>    m_xLogicTarget;
 };
 
 } //namespace chart

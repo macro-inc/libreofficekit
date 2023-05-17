@@ -59,12 +59,13 @@
 #include <connectivity/dbtools.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
+#include <o3tl/safeint.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 #include <svtools/genericunodialog.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/sharedunocomponent.hxx>
 #include <vcl/svapp.hxx>
 
@@ -79,7 +80,6 @@ namespace dbaui
     using ::com::sun::star::uno::Exception;
     using ::com::sun::star::uno::RuntimeException;
     using ::com::sun::star::uno::Any;
-    using ::com::sun::star::uno::makeAny;
     using ::com::sun::star::uno::Sequence;
     using ::com::sun::star::uno::XComponentContext;
     using ::com::sun::star::beans::XPropertySetInfo;
@@ -338,7 +338,7 @@ private:
 
         // other
         Reference< XInteractionHandler > m_xInteractionHandler;
-        ::comphelper::OInterfaceContainerHelper2
+        ::comphelper::OInterfaceContainerHelper3<XCopyTableListener>
                                         m_aCopyTableListeners;
         sal_Int16                       m_nOverrideExecutionResult;
     };
@@ -572,8 +572,7 @@ namespace
         // see whether the document model can provide a handler
         if ( xDocumentModel.is() )
         {
-            ::comphelper::NamedValueCollection aModelArgs( xDocumentModel->getArgs() );
-            xHandler = aModelArgs.getOrDefault( "InteractionHandler", xHandler );
+            xHandler = ::comphelper::NamedValueCollection::getOrDefault( xDocumentModel->getArgs(), u"InteractionHandler", xHandler );
         }
 
         return xHandler;
@@ -942,40 +941,39 @@ namespace
     class ValueTransfer
     {
     public:
-        ValueTransfer( const sal_Int32& _rSourcePos, const sal_Int32& _rDestPos, std::vector< sal_Int32 >&& _rColTypes,
+        ValueTransfer( std::vector< sal_Int32 > _rColTypes,
             const Reference< XRow >& _rxSource, const Reference< XParameters >& _rxDest )
-            :m_rSourcePos( _rSourcePos )
-            ,m_rDestPos( _rDestPos )
-            ,m_rColTypes( std::move(_rColTypes) )
+            :m_ColTypes( std::move(_rColTypes) )
             ,m_xSource( _rxSource )
             ,m_xDest( _rxDest )
         {
         }
 
     template< typename VALUE_TYPE >
-    void transferValue( VALUE_TYPE ( SAL_CALL XRow::*_pGetter )( sal_Int32 ),
+    void transferValue( sal_Int32 _nSourcePos, sal_Int32 _nDestPos,
+        VALUE_TYPE ( SAL_CALL XRow::*_pGetter )( sal_Int32 ),
         void (SAL_CALL XParameters::*_pSetter)( sal_Int32, VALUE_TYPE ) )
     {
-        VALUE_TYPE value( (m_xSource.get()->*_pGetter)( m_rSourcePos ) );
+        VALUE_TYPE value( (m_xSource.get()->*_pGetter)( _nSourcePos ) );
         if ( m_xSource->wasNull() )
-            m_xDest->setNull( m_rDestPos, m_rColTypes[ m_rSourcePos ] );
+            m_xDest->setNull( _nDestPos, m_ColTypes[ _nSourcePos ] );
         else
-            (m_xDest.get()->*_pSetter)( m_rDestPos, value );
+            (m_xDest.get()->*_pSetter)( _nDestPos, value );
     }
- template< typename VALUE_TYPE >
-    void transferComplexValue( VALUE_TYPE ( SAL_CALL XRow::*_pGetter )( sal_Int32 ),
+
+    template< typename VALUE_TYPE >
+    void transferComplexValue( sal_Int32 _nSourcePos, sal_Int32 _nDestPos,
+        VALUE_TYPE ( SAL_CALL XRow::*_pGetter )( sal_Int32 ),
         void (SAL_CALL XParameters::*_pSetter)( sal_Int32, const VALUE_TYPE& ) )
     {
-        const VALUE_TYPE value( (m_xSource.get()->*_pGetter)( m_rSourcePos ) );
+        const VALUE_TYPE value( (m_xSource.get()->*_pGetter)( _nSourcePos ) );
         if ( m_xSource->wasNull() )
-            m_xDest->setNull( m_rDestPos, m_rColTypes[ m_rSourcePos ] );
+            m_xDest->setNull( _nDestPos, m_ColTypes[ _nSourcePos ] );
         else
-            (m_xDest.get()->*_pSetter)( m_rDestPos, value );
+            (m_xDest.get()->*_pSetter)( _nDestPos, value );
     }
     private:
-        const sal_Int32&                    m_rSourcePos;
-        const sal_Int32&                    m_rDestPos;
-        const std::vector< sal_Int32 >    m_rColTypes;
+        const std::vector< sal_Int32 >      m_ColTypes;
         const Reference< XRow >             m_xSource;
         const Reference< XParameters >      m_xDest;
     };
@@ -983,13 +981,12 @@ namespace
 
 bool CopyTableWizard::impl_processCopyError_nothrow( const CopyTableRowEvent& _rEvent )
 {
-    Reference< XCopyTableListener > xListener;
     try
     {
-        ::comphelper::OInterfaceIteratorHelper2 aIter( m_aCopyTableListeners );
+        ::comphelper::OInterfaceIteratorHelper3 aIter( m_aCopyTableListeners );
         while ( aIter.hasMoreElements() )
         {
-            xListener.set( aIter.next(), UNO_QUERY_THROW );
+            Reference< XCopyTableListener > xListener( aIter.next() );
             sal_Int16 nListenerChoice = xListener->copyRowError( _rEvent );
             switch ( nListenerChoice )
             {
@@ -1033,7 +1030,7 @@ bool CopyTableWizard::impl_processCopyError_nothrow( const CopyTableRowEvent& _r
             aError.NextException <<= aContext;
         }
 
-        ::rtl::Reference< ::comphelper::OInteractionRequest > xRequest( new ::comphelper::OInteractionRequest( makeAny( aError ) ) );
+        ::rtl::Reference< ::comphelper::OInteractionRequest > xRequest( new ::comphelper::OInteractionRequest( Any( aError ) ) );
 
         ::rtl::Reference< ::comphelper::OInteractionApprove > xYes = new ::comphelper::OInteractionApprove;
         xRequest->addContinuation( xYes );
@@ -1068,6 +1065,7 @@ void CopyTableWizard::impl_copyRows_throw( const Reference< XResultSet >& _rxSou
 
     const OCopyTableWizard& rWizard             = impl_getDialog_throw();
     ODatabaseExport::TPositions aColumnPositions = rWizard.GetColumnPositions();
+    const bool bShouldCreatePrimaryKey = rWizard.shouldCreatePrimaryKey();
 
     Reference< XRow > xRow              ( _rxSourceResultSet, UNO_QUERY_THROW );
     Reference< XRowLocate > xRowLocate  ( _rxSourceResultSet, UNO_QUERY_THROW );
@@ -1092,7 +1090,7 @@ void CopyTableWizard::impl_copyRows_throw( const Reference< XResultSet >& _rxSou
     }
 
     // now create, fill and execute the prepared statement
-    Reference< XPreparedStatement > xStatement( ODatabaseExport::createPreparedStatment( xDestMetaData, _rxDestTable, aColumnPositions ), UNO_SET_THROW );
+    Reference< XPreparedStatement > xStatement( ODatabaseExport::createPreparedStatement( xDestMetaData, _rxDestTable, aColumnPositions ), UNO_SET_THROW );
     Reference< XParameters > xStatementParams( xStatement, UNO_QUERY_THROW );
 
     const bool bSelectedRecordsOnly = m_aSourceSelection.hasElements();
@@ -1139,16 +1137,16 @@ void CopyTableWizard::impl_copyRows_throw( const Reference< XResultSet >& _rxSou
         aCopyEvent.Error.clear();
         try
         {
+            bool bInsertedPrimaryKey = false;
             // notify listeners
             m_aCopyTableListeners.notifyEach( &XCopyTableListener::copyingRow, aCopyEvent );
 
-            sal_Int32 nDestColumn( 0 );
             sal_Int32 nSourceColumn( 1 );
-            ValueTransfer aTransfer( nSourceColumn, nDestColumn, std::vector(aSourceColTypes), xRow, xStatementParams );
+            ValueTransfer aTransfer( aSourceColTypes, xRow, xStatementParams );
 
             for ( auto const& rColumnPos : aColumnPositions )
             {
-                nDestColumn = rColumnPos.first;
+                sal_Int32 nDestColumn = rColumnPos.first;
                 if ( nDestColumn == COLUMN_POSITION_NOT_FOUND )
                 {
                     ++nSourceColumn;
@@ -1156,7 +1154,15 @@ void CopyTableWizard::impl_copyRows_throw( const Reference< XResultSet >& _rxSou
                     continue;
                 }
 
-                if ( ( nSourceColumn < 1 ) || ( nSourceColumn >= static_cast<sal_Int32>(aSourceColTypes.size()) ) )
+                if ( bShouldCreatePrimaryKey && !bInsertedPrimaryKey )
+                {
+                    xStatementParams->setInt( 1, nRowCount );
+                    ++nSourceColumn;
+                    bInsertedPrimaryKey = true;
+                    continue;
+                }
+
+                if ( ( nSourceColumn < 1 ) || ( o3tl::make_unsigned(nSourceColumn) >= aSourceColTypes.size() ) )
                 {   // ( we have to check here against 1 because the parameters are 1 based)
                     ::dbtools::throwSQLException("Internal error: invalid column type index.",
                                                  ::dbtools::StandardSQLState::INVALID_DESCRIPTOR_INDEX, *this);
@@ -1166,7 +1172,7 @@ void CopyTableWizard::impl_copyRows_throw( const Reference< XResultSet >& _rxSou
                 {
                     case DataType::DOUBLE:
                     case DataType::REAL:
-                        aTransfer.transferValue( &XRow::getDouble, &XParameters::setDouble );
+                        aTransfer.transferValue( nSourceColumn, nDestColumn, &XRow::getDouble, &XParameters::setDouble );
                         break;
 
                     case DataType::CHAR:
@@ -1174,64 +1180,64 @@ void CopyTableWizard::impl_copyRows_throw( const Reference< XResultSet >& _rxSou
                     case DataType::LONGVARCHAR:
                     case DataType::DECIMAL:
                     case DataType::NUMERIC:
-                        aTransfer.transferComplexValue( &XRow::getString, &XParameters::setString );
+                        aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getString, &XParameters::setString );
                         break;
 
                     case DataType::BIGINT:
-                        aTransfer.transferValue( &XRow::getLong, &XParameters::setLong );
+                        aTransfer.transferValue( nSourceColumn, nDestColumn, &XRow::getLong, &XParameters::setLong );
                         break;
 
                     case DataType::FLOAT:
-                        aTransfer.transferValue( &XRow::getFloat, &XParameters::setFloat );
+                        aTransfer.transferValue( nSourceColumn, nDestColumn, &XRow::getFloat, &XParameters::setFloat );
                         break;
 
                     case DataType::LONGVARBINARY:
                     case DataType::BINARY:
                     case DataType::VARBINARY:
-                        aTransfer.transferComplexValue( &XRow::getBytes, &XParameters::setBytes );
+                        aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getBytes, &XParameters::setBytes );
                         break;
 
                     case DataType::DATE:
-                        aTransfer.transferComplexValue( &XRow::getDate, &XParameters::setDate );
+                        aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getDate, &XParameters::setDate );
                         break;
 
                     case DataType::TIME:
-                        aTransfer.transferComplexValue( &XRow::getTime, &XParameters::setTime );
+                        aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getTime, &XParameters::setTime );
                         break;
 
                     case DataType::TIMESTAMP:
-                        aTransfer.transferComplexValue( &XRow::getTimestamp, &XParameters::setTimestamp );
+                        aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getTimestamp, &XParameters::setTimestamp );
                         break;
 
                     case DataType::BIT:
                         if ( aSourcePrec[nSourceColumn] > 1 )
                         {
-                            aTransfer.transferComplexValue( &XRow::getBytes, &XParameters::setBytes );
+                            aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getBytes, &XParameters::setBytes );
                             break;
                         }
                         [[fallthrough]];
                     case DataType::BOOLEAN:
-                        aTransfer.transferValue( &XRow::getBoolean, &XParameters::setBoolean );
+                        aTransfer.transferValue( nSourceColumn, nDestColumn, &XRow::getBoolean, &XParameters::setBoolean );
                         break;
 
                     case DataType::TINYINT:
-                        aTransfer.transferValue( &XRow::getByte, &XParameters::setByte );
+                        aTransfer.transferValue( nSourceColumn, nDestColumn, &XRow::getByte, &XParameters::setByte );
                         break;
 
                     case DataType::SMALLINT:
-                        aTransfer.transferValue( &XRow::getShort, &XParameters::setShort );
+                        aTransfer.transferValue( nSourceColumn, nDestColumn, &XRow::getShort, &XParameters::setShort );
                         break;
 
                     case DataType::INTEGER:
-                        aTransfer.transferValue( &XRow::getInt, &XParameters::setInt );
+                        aTransfer.transferValue( nSourceColumn, nDestColumn, &XRow::getInt, &XParameters::setInt );
                         break;
 
                     case DataType::BLOB:
-                        aTransfer.transferComplexValue( &XRow::getBlob, &XParameters::setBlob );
+                        aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getBlob, &XParameters::setBlob );
                         break;
 
                     case DataType::CLOB:
-                        aTransfer.transferComplexValue( &XRow::getClob, &XParameters::setClob );
+                        aTransfer.transferComplexValue( nSourceColumn, nDestColumn, &XRow::getClob, &XParameters::setClob );
                         break;
 
                     default:
@@ -1257,6 +1263,7 @@ void CopyTableWizard::impl_copyRows_throw( const Reference< XResultSet >& _rxSou
         }
         catch( const Exception& )
         {
+            TOOLS_WARN_EXCEPTION("dbaccess", "");
             aCopyEvent.Error = ::cppu::getCaughtException();
         }
 
@@ -1351,42 +1358,48 @@ void CopyTableWizard::impl_doCopy_nothrow()
 
                 // tdf#119962
                 const Reference< XDatabaseMetaData > xDestMetaData( m_xDestConnection->getMetaData(), UNO_SET_THROW );
-                const OUString sComposedTableName = ::dbtools::composeTableName( xDestMetaData, xTable, ::dbtools::EComposeRule::InDataManipulation, true );
-
-                OUString aSchema,aTable;
-                xTable->getPropertyValue("SchemaName") >>= aSchema;
-                xTable->getPropertyValue("Name")       >>= aTable;
-                Any aCatalog = xTable->getPropertyValue("CatalogName");
-
-                const Reference< XResultSet > xResultPKCL(xDestMetaData->getPrimaryKeys(aCatalog,aSchema,aTable));
-                Reference< XRow > xRowPKCL(xResultPKCL, UNO_QUERY_THROW);
-                OUString sPKCL;
-                if ( xRowPKCL.is() )
+                OUString sDatabaseDest = xDestMetaData->getDatabaseProductName().toAsciiLowerCase();
+                // If we created a new primary key, then it won't necessarily be an IDENTITY column
+                const bool bShouldCreatePrimaryKey = rWizard.shouldCreatePrimaryKey();
+                if ( !bShouldCreatePrimaryKey && (sDatabaseDest.indexOf("firebird") != -1) )
                 {
-                    if (xResultPKCL->next())
+                    const OUString sComposedTableName = ::dbtools::composeTableName( xDestMetaData, xTable, ::dbtools::EComposeRule::InDataManipulation, true );
+
+                    OUString aSchema,aTable;
+                    xTable->getPropertyValue("SchemaName") >>= aSchema;
+                    xTable->getPropertyValue("Name")       >>= aTable;
+                    Any aCatalog = xTable->getPropertyValue("CatalogName");
+
+                    const Reference< XResultSet > xResultPKCL(xDestMetaData->getPrimaryKeys(aCatalog,aSchema,aTable));
+                    Reference< XRow > xRowPKCL(xResultPKCL, UNO_QUERY_THROW);
+                    OUString sPKCL;
+                    if ( xRowPKCL.is() )
                     {
-                        sPKCL = xRowPKCL->getString(4);
-                    }
-                }
-
-                if (!sPKCL.isEmpty())
-                {
-                    OUString strSql = "SELECT MAX(\"" + sPKCL + "\") FROM " + sComposedTableName;
-
-                    Reference< XResultSet > xResultMAXNUM(m_xDestConnection->createStatement()->executeQuery(strSql));
-                    Reference< XRow > xRow(xResultMAXNUM, UNO_QUERY_THROW);
-
-                    sal_Int64 maxVal = -1L;
-                    if (xResultMAXNUM->next())
-                    {
-                        maxVal = xRow->getLong(1);
+                        if (xResultPKCL->next())
+                        {
+                            sPKCL = xRowPKCL->getString(4);
+                        }
                     }
 
-                    if (maxVal > 0L)
+                    if (!sPKCL.isEmpty())
                     {
-                        strSql = "ALTER TABLE " + sComposedTableName + " ALTER \"" + sPKCL + "\" RESTART WITH " + OUString::number(maxVal + 1);
+                        OUString strSql = "SELECT MAX(\"" + sPKCL + "\") FROM " + sComposedTableName;
 
-                        m_xDestConnection->createStatement()->execute(strSql);
+                        Reference< XResultSet > xResultMAXNUM(m_xDestConnection->createStatement()->executeQuery(strSql));
+                        Reference< XRow > xRow(xResultMAXNUM, UNO_QUERY_THROW);
+
+                        sal_Int64 maxVal = -1L;
+                        if (xResultMAXNUM->next())
+                        {
+                            maxVal = xRow->getLong(1);
+                        }
+
+                        if (maxVal > 0L)
+                        {
+                            strSql = "ALTER TABLE " + sComposedTableName + " ALTER \"" + sPKCL + "\" RESTART WITH " + OUString::number(maxVal + 1);
+
+                            m_xDestConnection->createStatement()->execute(strSql);
+                        }
                     }
                 }
             }
@@ -1404,6 +1417,7 @@ void CopyTableWizard::impl_doCopy_nothrow()
     catch( const Exception& )
     {
         aError = ::cppu::getCaughtException();
+        SAL_WARN("dbaccess", exceptionToString(aError));
 
         // silence the error of the user cancelling the parameter's dialog
         SQLException aSQLError;
@@ -1446,7 +1460,7 @@ OUString CopyTableWizard::impl_getServerSideCopyStatement_throw(const Reference<
         }
     }
     const OUString sComposedTableName = ::dbtools::composeTableName( xDestMetaData, _xTable, ::dbtools::EComposeRule::InDataManipulation, true );
-    OUString sSql("INSERT INTO " + sComposedTableName + " ( " + sColumns.makeStringAndClear() + " ) " + m_pSourceObject->getSelectStatement());
+    OUString sSql("INSERT INTO " + sComposedTableName + " ( " + sColumns + " ) " + m_pSourceObject->getSelectStatement());
 
     return sSql;
 }

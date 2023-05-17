@@ -21,6 +21,7 @@
 #include <scitems.hxx>
 #include <editeng/eeitem.hxx>
 #include <i18nutil/unicode.hxx>
+#include <i18nutil/transliteration.hxx>
 
 #include <svx/clipfmtitem.hxx>
 #include <svx/svxdlg.hxx>
@@ -196,7 +197,7 @@ void ScEditShell::Execute( SfxRequest& rReq )
         case SID_THES:
             {
                 OUString aReplaceText;
-                const SfxStringItem* pItem2 = rReq.GetArg<SfxStringItem>(SID_THES);
+                const SfxStringItem* pItem2 = rReq.GetArg(FN_PARAM_THES_WORD_REPLACE);
                 if (pItem2)
                     aReplaceText = pItem2->GetValue();
                 if (!aReplaceText.isEmpty())
@@ -382,8 +383,9 @@ void ScEditShell::Execute( SfxRequest& rReq )
                 sal_uInt16 nFontWhich = ( nScript == SvtScriptType::ASIAN ) ? EE_CHAR_FONTINFO_CJK :
                                 ( ( nScript == SvtScriptType::COMPLEX ) ? EE_CHAR_FONTINFO_CTL :
                                                                         EE_CHAR_FONTINFO );
+                auto const attribs = pTableView->GetAttribs();
                 const SvxFontItem& rItem = static_cast<const SvxFontItem&>(
-                            pTableView->GetAttribs().Get(nFontWhich));
+                            attribs.Get(nFontWhich));
 
                 OUString aString;
                 std::shared_ptr<SvxFontItem> aNewItem(std::make_shared<SvxFontItem>(EE_CHAR_FONTINFO));
@@ -391,14 +393,12 @@ void ScEditShell::Execute( SfxRequest& rReq )
                 const SfxItemSet *pArgs = rReq.GetArgs();
                 const SfxPoolItem* pItem = nullptr;
                 if( pArgs )
-                    pArgs->GetItemState(GetPool().GetWhich(SID_CHARMAP), false, &pItem);
+                    pArgs->GetItemState(SID_CHARMAP, false, &pItem);
 
                 if ( pItem )
                 {
                     aString = static_cast<const SfxStringItem*>(pItem)->GetValue();
-                    const SfxPoolItem* pFtItem = nullptr;
-                    pArgs->GetItemState( GetPool().GetWhich(SID_ATTR_SPECIALCHAR), false, &pFtItem);
-                    const SfxStringItem* pFontItem = dynamic_cast<const SfxStringItem*>( pFtItem  );
+                    const SfxStringItem* pFontItem = pArgs->GetItemIfSet( SID_ATTR_SPECIALCHAR, false);
                     if ( pFontItem )
                     {
                         const OUString& aFontName(pFontItem->GetValue());
@@ -482,9 +482,10 @@ void ScEditShell::Execute( SfxRequest& rReq )
                         {
                             aBuffer.append(rName).append(' ');
                         }
-                        pTableView->InsertText(aBuffer.toString());
+                        const OUString s = aBuffer.makeStringAndClear();
+                        pTableView->InsertText(s);
                         if (pTopView)
-                            pTopView->InsertText(aBuffer.makeStringAndClear());
+                            pTopView->InsertText(s);
                     }
                 }
                 pDlg.disposeAndClear();
@@ -967,12 +968,10 @@ void ScEditShell::ExecuteAttr(SfxRequest& rReq)
             {
                 if (pArgs)
                 {
-                    const SfxPoolItem* pColorStringItem = nullptr;
-
-                    if ( pArgs && SfxItemState::SET == pArgs->GetItemState( SID_ATTR_COLOR_STR, false, &pColorStringItem ) )
+                    if ( const SfxStringItem* pColorStringItem = pArgs->GetItemIfSet( SID_ATTR_COLOR_STR, false ) )
                     {
                         Color aColor;
-                        OUString sColor = static_cast<const SfxStringItem*>( pColorStringItem )->GetValue();
+                        OUString sColor = pColorStringItem->GetValue();
                         if ( sColor == "transparent" )
                             aColor = COL_TRANSPARENT;
                         else
@@ -1141,8 +1140,9 @@ void ScEditShell::ExecuteAttr(SfxRequest& rReq)
         case SID_GROW_FONT_SIZE:
         case SID_SHRINK_FONT_SIZE:
             {
-                const SvxFontListItem* pFontListItem = static_cast< const SvxFontListItem* >
-                        ( SfxObjectShell::Current()->GetItem( SID_ATTR_CHAR_FONTLIST ) );
+                SfxObjectShell* pObjSh = SfxObjectShell::Current();
+                const SvxFontListItem* pFontListItem = static_cast<const SvxFontListItem*>
+                        (pObjSh ? pObjSh->GetItem(SID_ATTR_CHAR_FONTLIST) : nullptr);
                 const FontList* pFontList = pFontListItem ? pFontListItem->GetFontList() : nullptr;
                 pEditView->ChangeFontSize( nSlot == SID_GROW_FONT_SIZE, pFontList );
                 rBindings.Invalidate( SID_ATTR_CHAR_FONTHEIGHT );

@@ -10,10 +10,8 @@
 #pragma once
 
 #include "OPropertySet.hxx"
-#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/uno3.hxx>
-#include <rtl/ref.hxx>
 
 #include "charttoolsdllapi.hxx"
 #include <com/sun/star/chart2/XDataTable.hpp>
@@ -29,8 +27,7 @@ typedef cppu::WeakImplHelper<css::chart2::XDataTable, css::lang::XServiceInfo,
     DataTable_Base;
 
 /** Data table implementation */
-class OOO_DLLPUBLIC_CHARTTOOLS DataTable final : public cppu::BaseMutex,
-                                                 public DataTable_Base,
+class OOO_DLLPUBLIC_CHARTTOOLS DataTable final : public DataTable_Base,
                                                  public ::property::OPropertySet
 {
 public:
@@ -52,7 +49,7 @@ public:
 
 private:
     // ____ OPropertySet ____
-    virtual css::uno::Any GetDefaultValue(sal_Int32 nHandle) const override;
+    virtual void GetDefaultValue(sal_Int32 nHandle, css::uno::Any& rAny) const override;
 
     // ____ OPropertySet ____
     virtual ::cppu::IPropertyArrayHelper& SAL_CALL getInfoHelper() override;
@@ -82,7 +79,7 @@ private:
     virtual void firePropertyChangeEvent() override;
     using OPropertySet::disposing;
 
-    css::uno::Reference<css::util::XModifyListener> m_xModifyEventForwarder;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
 };
 
 } //  namespace chart

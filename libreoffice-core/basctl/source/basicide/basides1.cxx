@@ -56,6 +56,8 @@
 #include <vcl/textview.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
+#include <svx/zoomsliderctrl.hxx>
+#include <svx/zoomslideritem.hxx>
 
 constexpr sal_Int32 TAB_HEIGHT_MARGIN = 10;
 
@@ -338,10 +340,10 @@ void Shell::ExecuteGlobal( SfxRequest& rReq )
             if ( rReq.GetArgs() )
             {
                 const SfxUInt16Item &rTabId = rReq.GetArgs()->Get(SID_BASICIDE_ARG_TABID );
-                Organize(rReq.GetFrameWeld(), rTabId.GetValue());
+                Organize(rReq.GetFrameWeld(), nullptr, rTabId.GetValue());
             }
             else
-                Organize(rReq.GetFrameWeld(), 0);
+                Organize(rReq.GetFrameWeld(), nullptr, 0);
         }
         break;
         case SID_BASICIDE_CHOOSEMACRO:
@@ -763,6 +765,16 @@ void Shell::ExecuteGlobal( SfxRequest& rReq )
         }
         break;
 
+        case SID_ATTR_ZOOMSLIDER:
+        {
+            const SfxItemSet *pArgs = rReq.GetArgs();
+            const SfxPoolItem* pItem;
+
+            if (pArgs && pArgs->GetItemState(SID_ATTR_ZOOMSLIDER, true, &pItem ) == SfxItemState::SET)
+                SetGlobalEditorZoomLevel(static_cast<const SvxZoomSliderItem*>(pItem)->GetValue());
+        }
+        break;
+
         default:
             if (pLayout)
                 pLayout->ExecuteGlobal(rReq);
@@ -1012,6 +1024,19 @@ void Shell::GetState(SfxItemSet &rSet)
                 }
             }
             break;
+            case SID_BASICIDE_CURRENT_ZOOM:
+            {
+                // The current zoom value is only visible in a module window
+                ModulWindow* pModuleWindow = dynamic_cast<ModulWindow*>(pCurWin.get());
+                if (pModuleWindow)
+                {
+                    OUString sZoom;
+                    sZoom = OUString::number(m_nCurrentZoomSliderValue) + "%";
+                    SfxStringItem aItem( SID_BASICIDE_CURRENT_ZOOM, sZoom );
+                    rSet.Put( aItem );
+                }
+            }
+            break;
             // are interpreted by the controller:
             case SID_ATTR_SIZE:
             case SID_ATTR_INSERT:
@@ -1110,6 +1135,20 @@ void Shell::GetState(SfxItemSet &rSet)
                     rSet.DisableItem(nWh);
             }
             break;
+
+            case SID_ATTR_ZOOMSLIDER:
+            {
+                // The zoom slider is only visible in a module window
+                ModulWindow* pModuleWindow = dynamic_cast<ModulWindow*>(pCurWin.get());
+                if (pModuleWindow)
+                {
+                    SvxZoomSliderItem aZoomSliderItem(GetCurrentZoomSliderValue(), GetMinZoom(), GetMaxZoom());
+                    aZoomSliderItem.AddSnappingPoint(100);
+                    rSet.Put( aZoomSliderItem );
+                }
+            }
+            break;
+
             default:
                 if (pLayout)
                     pLayout->GetState(rSet, nWh);
@@ -1196,7 +1235,6 @@ void Shell::SetCurWindow( BaseWindow* pNewWin, bool bUpdateTabBar, bool bRemembe
     SetUndoManager( pCurWin ? pCurWin->GetUndoManager() : nullptr );
     InvalidateBasicIDESlots();
     InvalidateControlSlots();
-    EnableScrollbars(pCurWin != nullptr);
 
     if ( m_pCurLocalizationMgr )
         m_pCurLocalizationMgr->handleTranslationbar();
@@ -1353,19 +1391,30 @@ void Shell::AdjustPosSizePixel( const Point &rPos, const Size &rSize )
     aTabBarSize.setWidth( rSize.Width() );
 
     Size aSz( rSize );
-    Size aScrollBarBoxSz( aScrollBarBox->GetSizePixel() );
-    aSz.AdjustHeight( -(aScrollBarBoxSz.Height()) );
-    aSz.AdjustHeight( -(aTabBarSize.Height()) );
+    auto nScrollBarSz(Application::GetSettings().GetStyleSettings().GetScrollBarSize());
+    aSz.AdjustHeight(-aTabBarSize.Height());
 
     Size aOutSz( aSz );
-    aSz.AdjustWidth( -(aScrollBarBoxSz.Width()) );
-    aScrollBarBox->SetPosPixel( Point( rSize.Width() - aScrollBarBoxSz.Width(), rSize.Height() - aScrollBarBoxSz.Height() ) );
-    aVScrollBar->SetPosSizePixel( Point( rPos.X()+aSz.Width(), rPos.Y() ), Size( aScrollBarBoxSz.Width(), aSz.Height() ) );
-    aHScrollBar->SetPosSizePixel( Point( rPos.X(), rPos.Y()+aSz.Height() ), Size( aSz.Width(), aScrollBarBoxSz.Height() ) );
-    pTabBar->SetPosSizePixel( Point( rPos.X(), rPos.Y()+aScrollBarBoxSz.Height()+aSz.Height()), aTabBarSize );
+    aSz.AdjustWidth(-nScrollBarSz);
+    aSz.AdjustHeight(-nScrollBarSz);
+    aVScrollBar->SetPosSizePixel( Point( rPos.X()+aSz.Width(), rPos.Y() ), Size( nScrollBarSz, aSz.Height() ) );
+    aHScrollBar->SetPosSizePixel( Point( rPos.X(), rPos.Y()+aSz.Height() ), Size( aOutSz.Width(), nScrollBarSz ) );
+    pTabBar->SetPosSizePixel( Point( rPos.X(), rPos.Y() + nScrollBarSz + aSz.Height()), aTabBarSize );
 
+    // The size to be applied depends on whether it is a DialogWindow or a ModulWindow
     if (pLayout)
-        pLayout->SetPosSizePixel(rPos, dynamic_cast<DialogWindow*>(pCurWin.get()) ? aSz : aOutSz);
+    {
+        if (dynamic_cast<DialogWindow*>(pCurWin.get()))
+        {
+            pCurWin->ShowShellScrollBars();
+            pLayout->SetPosSizePixel(rPos, aSz);
+        }
+        else
+        {
+            pCurWin->ShowShellScrollBars(false);
+            pLayout->SetPosSizePixel(rPos, aOutSz);
+        }
+    }
 }
 
 Reference< XModel > Shell::GetCurrentDocument() const

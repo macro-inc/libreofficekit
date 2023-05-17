@@ -18,11 +18,12 @@
  */
 
 #include <definitioncontainer.hxx>
-#include <apitools.hxx>
 #include <core_resource.hxx>
 #include <strings.hrc>
+#include <strings.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/enumhelper.hxx>
 #include <cppuhelper/exc_hlp.hxx>
@@ -32,7 +33,6 @@
 #include <com/sun/star/sdb/ErrorCondition.hpp>
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/types.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
 #include <rtl/ref.hxx>
 
 using namespace ::com::sun::star::uno;
@@ -287,7 +287,7 @@ void ODefinitionContainer::notifyByName( ResettableMutexGuard& _rGuard, const OU
     if ( !rContainer.getLength() )
         return;
 
-    ContainerEvent aEvent( *this, makeAny( _rName ), makeAny( _xNewElement ), makeAny( _xOldElement ) );
+    ContainerEvent aEvent( *this, Any( _rName ), Any( _xNewElement ), Any( _xOldElement ) );
 
     _rGuard.clear();
     switch ( _eOperation )
@@ -373,7 +373,7 @@ Any SAL_CALL ODefinitionContainer::getByIndex( sal_Int32 _nIndex )
 {
     MutexGuard aGuard(m_aMutex);
 
-    if ((_nIndex < 0) || (_nIndex >= static_cast<sal_Int32>(m_aDocuments.size())))
+    if ((_nIndex < 0) || (o3tl::make_unsigned(_nIndex) >= m_aDocuments.size()))
         throw IndexOutOfBoundsException();
 
     Documents::iterator aPos = m_aDocuments[_nIndex];
@@ -386,14 +386,14 @@ Any SAL_CALL ODefinitionContainer::getByIndex( sal_Int32 _nIndex )
         // and update the name-access map
     }
 
-    return makeAny(xProp);
+    return Any(xProp);
 }
 
 Any SAL_CALL ODefinitionContainer::getByName( const OUString& _rName )
 {
     MutexGuard aGuard(m_aMutex);
 
-    return makeAny( implGetByName( _rName, true ) );
+    return Any( implGetByName( _rName, true ) );
 }
 
 Reference< XContent > ODefinitionContainer::implGetByName(const OUString& _rName, bool _bReadIfNecessary)

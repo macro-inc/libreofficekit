@@ -32,8 +32,6 @@ ScPrintSaverTab::ScPrintSaverTab() :
 
 ScPrintSaverTab::~ScPrintSaverTab()
 {
-    mpRepeatCol.reset();
-    mpRepeatRow.reset();
 }
 
 void ScPrintSaverTab::SetAreas( ScRangeVec&& rRanges, bool bEntireSheet )
@@ -42,22 +40,17 @@ void ScPrintSaverTab::SetAreas( ScRangeVec&& rRanges, bool bEntireSheet )
     mbEntireSheet = bEntireSheet;
 }
 
-void ScPrintSaverTab::SetRepeat( const ScRange* pCol, const ScRange* pRow )
+void ScPrintSaverTab::SetRepeat( std::optional<ScRange> oCol, std::optional<ScRange> oRow )
 {
-    mpRepeatCol.reset(pCol ? new ScRange(*pCol) : nullptr);
-    mpRepeatRow.reset(pRow ? new ScRange(*pRow) : nullptr);
-}
-
-static bool PtrEqual( const ScRange* p1, const ScRange* p2 )
-{
-    return ( !p1 && !p2 ) || ( p1 && p2 && *p1 == *p2 );
+    moRepeatCol = std::move(oCol);
+    moRepeatRow = std::move(oRow);
 }
 
 bool ScPrintSaverTab::operator==( const ScPrintSaverTab& rCmp ) const
 {
     return
-        PtrEqual( mpRepeatCol.get(), rCmp.mpRepeatCol.get() ) &&
-        PtrEqual( mpRepeatRow.get(), rCmp.mpRepeatRow.get() ) &&
+        (moRepeatCol == rCmp.moRepeatCol) &&
+        (moRepeatRow == rCmp.moRepeatRow) &&
         (mbEntireSheet == rCmp.mbEntireSheet) &&
         (maPrintRanges == rCmp.maPrintRanges);
 }
@@ -111,7 +104,7 @@ void ScPrintRangeSaver::GetPrintRangesInfo(tools::JsonWriter& rPrintRanges) cons
                 OString::number(rRange.aStart.Row()) + ", " +
                 OString::number(rRange.aEnd.Col()) + ", " +
                 OString::number(rRange.aEnd.Row()) +
-                OString(nLast == nIdx ? "]" : "], "));
+                (nLast == nIdx ? std::string_view("]") : std::string_view("], ")));
         }
 
         rPrintRanges.putRaw(aRanges.getStr());

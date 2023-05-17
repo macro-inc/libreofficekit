@@ -191,8 +191,8 @@ public:
             return false;
         }
         SwRangeRedline const*const pRedline(m_rIDRA.GetRedlineTable()[m_nextRedline]);
-        return pRedline->Start()->nNode.GetIndex() < m_rNode.GetIndex()
-            && m_rNode.GetIndex() < pRedline->End()->nNode.GetIndex();
+        return pRedline->Start()->GetNodeIndex() < m_rNode.GetIndex()
+            && m_rNode.GetIndex() < pRedline->End()->GetNodeIndex();
     }
 
     std::pair<sal_Int32, sal_Int32> GetNextRedlineSkip()
@@ -206,29 +206,28 @@ public:
             {
                 continue;
             }
-            SwPosition const*const pStart(pRedline->Start());
-            SwPosition const*const pEnd(pRedline->End());
-            if (m_rNode.GetIndex() < pStart->nNode.GetIndex())
+            auto [pStart, pEnd] = pRedline->StartEnd(); // SwPosition*
+            if (m_rNode.GetIndex() < pStart->GetNodeIndex())
             {
                 m_nextRedline = SwRedlineTable::npos;
                 break; // done
             }
             if (nRedlineStart == COMPLETE_STRING)
             {
-                nRedlineStart = pStart->nNode.GetIndex() == m_rNode.GetIndex()
-                        ? pStart->nContent.GetIndex()
+                nRedlineStart = pStart->GetNodeIndex() == m_rNode.GetIndex()
+                        ? pStart->GetContentIndex()
                         : 0;
             }
             else
             {
-                if (pStart->nContent.GetIndex() != nRedlineEnd)
+                if (pStart->GetContentIndex() != nRedlineEnd)
                 {
-                    assert(nRedlineEnd < pStart->nContent.GetIndex());
+                    assert(nRedlineEnd < pStart->GetContentIndex());
                     break; // no increment, revisit it next call
                 }
             }
-            nRedlineEnd = pEnd->nNode.GetIndex() == m_rNode.GetIndex()
-                    ? pEnd->nContent.GetIndex()
+            nRedlineEnd = pEnd->GetNodeIndex() == m_rNode.GetIndex()
+                    ? pEnd->GetContentIndex()
                     : COMPLETE_STRING;
         }
         return std::make_pair(nRedlineStart, nRedlineEnd);
@@ -243,14 +242,14 @@ static Writer& OutASC_SwTextNode( Writer& rWrt, SwContentNode& rNode )
 {
     const SwTextNode& rNd = static_cast<SwTextNode&>(rNode);
 
-    sal_Int32 nStrPos = rWrt.m_pCurrentPam->GetPoint()->nContent.GetIndex();
+    sal_Int32 nStrPos = rWrt.m_pCurrentPam->GetPoint()->GetContentIndex();
     const sal_Int32 nNodeEnd = rNd.Len();
     sal_Int32 nEnd = nNodeEnd;
-    bool bLastNd =  rWrt.m_pCurrentPam->GetPoint()->nNode == rWrt.m_pCurrentPam->GetMark()->nNode;
+    bool bLastNd =  rWrt.m_pCurrentPam->GetPoint()->GetNode() == rWrt.m_pCurrentPam->GetMark()->GetNode();
     if( bLastNd )
-        nEnd = rWrt.m_pCurrentPam->GetMark()->nContent.GetIndex();
+        nEnd = rWrt.m_pCurrentPam->GetMark()->GetContentIndex();
 
-    bool bIsOneParagraph = rWrt.m_pOrigPam->Start()->nNode == rWrt.m_pOrigPam->End()->nNode;
+    bool bIsOneParagraph = rWrt.m_pOrigPam->Start()->GetNode() == rWrt.m_pOrigPam->End()->GetNode() && !getenv("SW_ASCII_COPY_NUMBERING");
 
     SwASC_AttrIter aAttrIter( static_cast<SwASCWriter&>(rWrt), rNd, nStrPos );
     SwASC_RedlineIter redlineIter(static_cast<SwASCWriter&>(rWrt), rNd);
@@ -286,7 +285,7 @@ static Writer& OutASC_SwTextNode( Writer& rWrt, SwContentNode& rNode )
         }
 
         if (!level.isEmpty() || !numString.isEmpty())
-            rWrt.Strm().WriteUnicodeOrByteText(OUStringConcatenation(level + numString + " "));
+            rWrt.Strm().WriteUnicodeOrByteText(Concat2View(level + numString + " "));
     }
 
     OUString aStr( rNd.GetText() );

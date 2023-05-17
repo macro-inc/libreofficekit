@@ -39,8 +39,7 @@ namespace toolkit
 
 
     GridColumn::GridColumn()
-        :GridColumn_Base( m_aMutex )
-        ,m_nIndex(-1)
+        :m_nIndex(-1)
         ,m_nDataColumnIndex(-1)
         ,m_nColumnWidth(4)
         ,m_nMaxWidth(0)
@@ -53,9 +52,7 @@ namespace toolkit
 
 
     GridColumn::GridColumn( GridColumn const & i_copySource )
-        :cppu::BaseMutex()
-        ,GridColumn_Base( m_aMutex )
-        ,m_aIdentifier( i_copySource.m_aIdentifier )
+        :m_aIdentifier( i_copySource.m_aIdentifier )
         ,m_nIndex( -1 )
         ,m_nDataColumnIndex( i_copySource.m_nDataColumnIndex )
         ,m_nColumnWidth( i_copySource.m_nColumnWidth )
@@ -76,7 +73,7 @@ namespace toolkit
 
 
     void GridColumn::broadcast_changed( char const * const i_asciiAttributeName, const Any& i_oldValue, const Any& i_newValue,
-        ::comphelper::ComponentGuard& i_Guard )
+        std::unique_lock<std::mutex>& i_Guard )
     {
         Reference< XInterface > const xSource( static_cast< ::cppu::OWeakObject* >( this ) );
         GridColumnEvent const aEvent(
@@ -84,31 +81,27 @@ namespace toolkit
             i_oldValue, i_newValue, m_nIndex
         );
 
-        ::cppu::OInterfaceContainerHelper* pIter = rBHelper.getContainer( cppu::UnoType<XGridColumnListener>::get() );
-
-        i_Guard.clear();
-        if( pIter )
-            pIter->notifyEach( &XGridColumnListener::columnChanged, aEvent );
+        maGridColumnListeners.notifyEach( i_Guard, &XGridColumnListener::columnChanged, aEvent );
     }
 
 
     css::uno::Any SAL_CALL GridColumn::getIdentifier()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_aIdentifier;
     }
 
 
     void SAL_CALL GridColumn::setIdentifier(const css::uno::Any & value)
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         m_aIdentifier = value;
     }
 
 
     ::sal_Int32 SAL_CALL GridColumn::getColumnWidth()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_nColumnWidth;
     }
 
@@ -121,7 +114,7 @@ namespace toolkit
 
     ::sal_Int32 SAL_CALL GridColumn::getMaxWidth()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_nMaxWidth;
     }
 
@@ -134,7 +127,7 @@ namespace toolkit
 
     ::sal_Int32 SAL_CALL GridColumn::getMinWidth()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_nMinWidth;
     }
 
@@ -147,7 +140,7 @@ namespace toolkit
 
     OUString SAL_CALL GridColumn::getTitle()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_sTitle;
     }
 
@@ -160,7 +153,7 @@ namespace toolkit
 
     OUString SAL_CALL GridColumn::getHelpText()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_sHelpText;
     }
 
@@ -173,7 +166,7 @@ namespace toolkit
 
     sal_Bool SAL_CALL GridColumn::getResizeable()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_bResizeable;
     }
 
@@ -186,7 +179,7 @@ namespace toolkit
 
     ::sal_Int32 SAL_CALL GridColumn::getFlexibility()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_nFlexibility;
     }
 
@@ -201,7 +194,7 @@ namespace toolkit
 
     HorizontalAlignment SAL_CALL GridColumn::getHorizontalAlign()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_eHorizontalAlign;
     }
 
@@ -214,19 +207,20 @@ namespace toolkit
 
     void SAL_CALL GridColumn::addGridColumnListener( const Reference< XGridColumnListener >& xListener )
     {
-        rBHelper.addListener( cppu::UnoType<XGridColumnListener>::get(), xListener );
+        std::unique_lock aGuard( m_aMutex );
+        maGridColumnListeners.addInterface( aGuard, xListener );
     }
 
 
     void SAL_CALL GridColumn::removeGridColumnListener( const Reference< XGridColumnListener >& xListener )
     {
-        rBHelper.removeListener( cppu::UnoType<XGridColumnListener>::get(), xListener );
+        std::unique_lock aGuard( m_aMutex );
+        maGridColumnListeners.removeInterface( aGuard, xListener );
     }
 
 
-    void SAL_CALL GridColumn::disposing()
+    void GridColumn::disposing(std::unique_lock<std::mutex>&)
     {
-        ::osl::MutexGuard aGuard( m_aMutex );
         m_aIdentifier.clear();
         m_sTitle.clear();
         m_sHelpText.clear();
@@ -235,21 +229,21 @@ namespace toolkit
 
     ::sal_Int32 SAL_CALL GridColumn::getIndex()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_nIndex;
     }
 
 
     void GridColumn::setIndex( sal_Int32 const i_index )
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         m_nIndex = i_index;
     }
 
 
     ::sal_Int32 SAL_CALL GridColumn::getDataColumnIndex()
     {
-        ::comphelper::ComponentGuard aGuard( *this, rBHelper );
+        std::unique_lock aGuard( m_aMutex );
         return m_nDataColumnIndex;
     }
 
@@ -288,7 +282,7 @@ namespace toolkit
     }
 
 
-    Sequence< sal_Int8 > GridColumn::getUnoTunnelId() noexcept
+    const Sequence< sal_Int8 > & GridColumn::getUnoTunnelId() noexcept
     {
         static const comphelper::UnoIdInit aId;
         return aId.getSeq();

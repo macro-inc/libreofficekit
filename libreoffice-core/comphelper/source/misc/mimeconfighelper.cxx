@@ -33,14 +33,15 @@
 #include <comphelper/documentconstants.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <rtl/ustrbuf.hxx>
+#include <utility>
 
 
 using namespace ::com::sun::star;
 using namespace comphelper;
 
 
-MimeConfigurationHelper::MimeConfigurationHelper( const uno::Reference< uno::XComponentContext >& rxContext )
-: m_xContext( rxContext )
+MimeConfigurationHelper::MimeConfigurationHelper( uno::Reference< uno::XComponentContext > xContext )
+: m_xContext(std::move( xContext ))
 {
     if ( !m_xContext.is() )
         throw uno::RuntimeException();
@@ -81,18 +82,18 @@ static sal_uInt8 GetDigit_Impl( char aChar )
 }
 
 
-uno::Sequence< sal_Int8 > MimeConfigurationHelper::GetSequenceClassIDRepresentation( const OUString& aClassID )
+uno::Sequence< sal_Int8 > MimeConfigurationHelper::GetSequenceClassIDRepresentation( std::u16string_view aClassID )
 {
-    sal_Int32 nLength = aClassID.getLength();
+    size_t nLength = aClassID.size();
     if ( nLength == 36 )
     {
         OString aCharClassID = OUStringToOString( aClassID, RTL_TEXTENCODING_ASCII_US );
         uno::Sequence< sal_Int8 > aResult( 16 );
         auto pResult = aResult.getArray();
 
-        sal_Int32 nStrPointer = 0;
+        size_t nStrPointer = 0;
         sal_Int32 nSeqInd = 0;
-        while( nSeqInd < 16 && nStrPointer + 1 < nLength )
+        while( nSeqInd < 16 && nStrPointer + 1U < nLength )
         {
             sal_uInt8 nDigit1 = GetDigit_Impl( aCharClassID[nStrPointer++] );
             sal_uInt8 nDigit2 = GetDigit_Impl( aCharClassID[nStrPointer++] );
@@ -113,12 +114,6 @@ uno::Sequence< sal_Int8 > MimeConfigurationHelper::GetSequenceClassIDRepresentat
     return uno::Sequence< sal_Int8 >();
 }
 
-
-uno::Reference< container::XNameAccess > MimeConfigurationHelper::GetConfigurationByPath( const OUString& aPath )
-{
-    std::unique_lock aGuard( m_aMutex );
-    return GetConfigurationByPathImpl(aPath);
-}
 
 uno::Reference< container::XNameAccess > MimeConfigurationHelper::GetConfigurationByPathImpl( const OUString& aPath )
 {
@@ -273,10 +268,14 @@ bool MimeConfigurationHelper::GetVerbByShortcut( const OUString& aVerbShortcut,
         if ( xVerbsConfig.is() && ( xVerbsConfig->getByName( aVerbShortcut ) >>= xVerbsProps ) && xVerbsProps.is() )
         {
             embed::VerbDescriptor aTempDescr;
-            if ( ( xVerbsProps->getByName("VerbID") >>= aTempDescr.VerbID )
-              && ( xVerbsProps->getByName("VerbUIName") >>= aTempDescr.VerbName )
-              && ( xVerbsProps->getByName("VerbFlags") >>= aTempDescr.VerbFlags )
-              && ( xVerbsProps->getByName("VerbAttributes") >>= aTempDescr.VerbAttributes ) )
+            static constexpr OUStringLiteral sVerbID = u"VerbID";
+            static constexpr OUStringLiteral sVerbUIName = u"VerbUIName";
+            static constexpr OUStringLiteral sVerbFlags = u"VerbFlags";
+            static constexpr OUStringLiteral sVerbAttributes = u"VerbAttributes";
+            if ( ( xVerbsProps->getByName(sVerbID) >>= aTempDescr.VerbID )
+              && ( xVerbsProps->getByName(sVerbUIName) >>= aTempDescr.VerbName )
+              && ( xVerbsProps->getByName(sVerbFlags) >>= aTempDescr.VerbFlags )
+              && ( xVerbsProps->getByName(sVerbAttributes) >>= aTempDescr.VerbAttributes ) )
             {
                 aDescriptor = aTempDescr;
                 bResult = true;
@@ -730,8 +729,19 @@ OUString MimeConfigurationHelper::GetDefaultFilterFromServiceName( const OUStrin
                     uno::Sequence< beans::PropertyValue > aProps;
                     if ( xFilterEnum->nextElement() >>= aProps )
                     {
-                        SequenceAsHashMap aPropsHM( aProps );
-                        SfxFilterFlags nFlags = static_cast<SfxFilterFlags>(aPropsHM.getUnpackedValueOrDefault( "Flags", sal_Int32(0) ));
+                        SfxFilterFlags nFlags = SfxFilterFlags::NONE;
+                        OUString sName;
+                        for (const auto & rPropVal : aProps)
+                        {
+                            if (rPropVal.Name == "Flags")
+                            {
+                                sal_Int32 nTmp(0);
+                                if (rPropVal.Value >>= nTmp)
+                                    nFlags = static_cast<SfxFilterFlags>(nTmp);
+                            }
+                            else if (rPropVal.Name == "Name")
+                                rPropVal.Value >>= sName;
+                        }
 
                         // that should be import, export, own filter and not a template filter ( TemplatePath flag )
                         SfxFilterFlags const nRequired = SfxFilterFlags::OWN
@@ -745,7 +755,7 @@ OUString MimeConfigurationHelper::GetDefaultFilterFromServiceName( const OUStrin
                             // if there are more than one filter the preferred one should be used
                             // if there is no preferred filter the first one will be used
                             if ( aResult.isEmpty() || ( nFlags & SfxFilterFlags::PREFERED ) )
-                                aResult = aPropsHM.getUnpackedValueOrDefault( "Name", OUString() );
+                                aResult = sName;
                             if ( nFlags & SfxFilterFlags::PREFERED )
                                 break; // the preferred filter was found
                         }

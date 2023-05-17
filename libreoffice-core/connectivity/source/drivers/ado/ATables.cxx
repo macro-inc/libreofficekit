@@ -71,7 +71,7 @@ sdbcx::ObjectType OTables::appendObject( const OUString&, const Reference< XProp
 
     OSL_ENSURE(m_aCollection.IsValid(),"Collection isn't valid");
     if(!m_aCollection.Append(pTable->getImpl()))
-        ADOS::ThrowException(*m_pCatalog->getConnection()->getConnection(),static_cast<XTypeProvider*>(this));
+        ADOS::ThrowException(m_pCatalog->getConnection()->getConnection(),static_cast<XTypeProvider*>(this));
     m_aCollection.Refresh();
 
     return new OAdoTable(this,isCaseSensitive(),m_pCatalog,pTable->getImpl());
@@ -82,7 +82,7 @@ void OTables::dropObject(sal_Int32 /*_nPos*/,const OUString& _sElementName)
 {
     OSL_ENSURE(m_aCollection.IsValid(),"Collection isn't valid");
     if ( !m_aCollection.Delete(_sElementName) )
-        ADOS::ThrowException(*m_pCatalog->getConnection()->getConnection(),static_cast<XTypeProvider*>(this));
+        ADOS::ThrowException(m_pCatalog->getConnection()->getConnection(),static_cast<XTypeProvider*>(this));
 }
 
 void OTables::appendNew(const OUString& _rsNewTable)
@@ -93,10 +93,10 @@ void OTables::appendNew(const OUString& _rsNewTable)
     insertElement(_rsNewTable,nullptr);
 
     // notify our container listeners
-    ContainerEvent aEvent(static_cast<XContainer*>(this), makeAny(_rsNewTable), Any(), Any());
-    OInterfaceIteratorHelper2 aListenerLoop(m_aContainerListeners);
+    ContainerEvent aEvent(static_cast<XContainer*>(this), Any(_rsNewTable), Any(), Any());
+    OInterfaceIteratorHelper3 aListenerLoop(m_aContainerListeners);
     while (aListenerLoop.hasMoreElements())
-        static_cast<XContainerListener*>(aListenerLoop.next())->elementInserted(aEvent);
+        aListenerLoop.next()->elementInserted(aEvent);
 }
 
 

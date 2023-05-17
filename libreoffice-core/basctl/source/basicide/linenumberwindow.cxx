@@ -21,7 +21,9 @@ LineNumberWindow::LineNumberWindow(vcl::Window* pParent, ModulWindow* pModulWind
     , m_pModulWindow(pModulWindow)
     , m_nCurYOffset(0)
 {
-    SetBackground(Wallpaper(GetSettings().GetStyleSettings().GetWindowColor()));
+    const Wallpaper aBackground(GetSettings().GetStyleSettings().GetWindowColor());
+    SetBackground(aBackground);
+    GetWindow(GetWindowType::Border)->SetBackground(aBackground);
     m_FontColor = GetSettings().GetStyleSettings().GetWindowTextColor();
     m_nBaseWidth = GetTextWidth("8");
     m_nWidth = m_nBaseWidth * 3 + m_nBaseWidth / 2;
@@ -47,8 +49,6 @@ void LineNumberWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Re
     TextView* txtView = m_pModulWindow->GetEditView();
     if (!txtView)
         return;
-
-    GetParent()->Resize();
 
     int windowHeight = rRenderContext.GetOutputSize().Height();
     int nLineHeight = rRenderContext.GetTextHeight();
@@ -82,6 +82,9 @@ void LineNumberWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Re
     rRenderContext.SetTextColor(m_FontColor);
     for (sal_uInt32 n = nStartLine; n <= nEndLine; ++n, y += nLineHeight)
         rRenderContext.DrawText(Point(0, y - m_nCurYOffset), OUString::number(n));
+
+    // Resize the parent after calculating the new width and height values
+    GetParent()->Resize();
 }
 
 void LineNumberWindow::DataChanged(DataChangedEvent const& rDCEvt)

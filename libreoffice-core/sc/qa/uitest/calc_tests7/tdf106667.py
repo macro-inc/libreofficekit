@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -24,7 +26,7 @@ class tdf106667(UITestCase):
 
             self.xUITest.executeCommand(".uno:SelectAll")
 
-            with self.ui_test.execute_dialog_through_command(".uno:About", close_button="btnClose") as xAboutDlg:
+            with self.ui_test.execute_dialog_through_command(".uno:About", close_button="btnClose"):
                 pass
 
             self.assertEqual(get_cell_by_position(document, 0, 0, 0).getString(), "A")

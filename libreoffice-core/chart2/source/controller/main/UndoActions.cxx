@@ -19,12 +19,14 @@
 
 #include "UndoActions.hxx"
 #include "ChartModelClone.hxx"
+#include <ChartModel.hxx>
 
 #include <com/sun/star/lang/DisposedException.hpp>
 
 #include <svx/svdundo.hxx>
 
 #include <memory>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -34,12 +36,10 @@ namespace chart::impl
     using ::com::sun::star::frame::XModel;
     using ::com::sun::star::lang::DisposedException;
 
-UndoElement::UndoElement( const OUString& i_actionString, const Reference< XModel >& i_documentModel, const std::shared_ptr< ChartModelClone >& i_modelClone )
-    :UndoElement_MBase()
-    ,UndoElement_TBase( m_aMutex )
-    ,m_sActionString( i_actionString )
-    ,m_xDocumentModel( i_documentModel )
-    ,m_pModelClone( i_modelClone )
+UndoElement::UndoElement( OUString i_actionString, rtl::Reference<::chart::ChartModel> i_documentModel, std::shared_ptr< ChartModelClone > i_modelClone )
+    :m_sActionString(std::move( i_actionString ))
+    ,m_xDocumentModel(std::move( i_documentModel ))
+    ,m_pModelClone(std::move( i_modelClone ))
 {
 }
 
@@ -47,7 +47,7 @@ UndoElement::~UndoElement()
 {
 }
 
-void SAL_CALL UndoElement::disposing()
+void UndoElement::disposing(std::unique_lock<std::mutex>&)
 {
     if ( m_pModelClone )
         m_pModelClone->dispose();
@@ -83,9 +83,7 @@ void SAL_CALL UndoElement::redo(  )
 // = ShapeUndoElement
 
 ShapeUndoElement::ShapeUndoElement( std::unique_ptr<SdrUndoAction> xSdrUndoAction )
-    :ShapeUndoElement_MBase()
-    ,ShapeUndoElement_TBase( m_aMutex )
-    ,m_xAction( std::move(xSdrUndoAction) )
+    :m_xAction( std::move(xSdrUndoAction) )
 {
 }
 
@@ -112,10 +110,6 @@ void SAL_CALL ShapeUndoElement::redo(  )
     if ( !m_xAction )
         throw DisposedException( OUString(), *this );
     m_xAction->Redo();
-}
-
-void SAL_CALL ShapeUndoElement::disposing()
-{
 }
 
 } //  namespace chart::impl

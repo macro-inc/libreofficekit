@@ -26,6 +26,7 @@
 #include "charttoolsdllapi.hxx"
 
 #include <rtl/ustring.hxx>
+#include <rtl/ref.hxx>
 
 namespace chart { class ChartModel; }
 namespace com::sun::star::awt { struct Point; }
@@ -41,6 +42,11 @@ namespace com::sun::star::uno { class XInterface; }
 
 namespace chart
 {
+class Axis;
+class BaseCoordinateSystem;
+class DataSeries;
+class Diagram;
+class Legend;
 
 enum ObjectType
 {
@@ -94,7 +100,7 @@ class OOO_DLLPUBLIC_CHARTTOOLS ObjectIdentifier
 
 public:
     ObjectIdentifier();
-    ObjectIdentifier( const OUString& rObjectCID );
+    ObjectIdentifier( OUString aObjectCID );
     ObjectIdentifier( const css::uno::Reference< css::drawing::XShape >& rxShape );
     ObjectIdentifier( const css::uno::Any& rAny );
 
@@ -104,35 +110,33 @@ public:
 
     static OUString createClassifiedIdentifierForObject(
           const css::uno::Reference< css::uno::XInterface >& xObject
-        , ChartModel& rModel);
-
+        , const rtl::Reference<::chart::ChartModel>& xChartModel );
     static OUString createClassifiedIdentifierForObject(
-          const css::uno::Reference< css::uno::XInterface >& xObject
-        , const css::uno::Reference< css::frame::XModel >& xChartModel );
+          const rtl::Reference< ::chart::Legend >& xObject
+        , const rtl::Reference<::chart::ChartModel>& xChartModel );
+    static OUString createClassifiedIdentifierForObject(
+          const rtl::Reference< ::chart::Axis >& xObject
+        , const rtl::Reference<::chart::ChartModel>& xChartModel );
 
     static OUString createClassifiedIdentifierForParticle(
-        const OUString& rParticle );
+        std::u16string_view rParticle );
 
     static OUString createClassifiedIdentifierForParticles(
-            const OUString& rParentParticle
-          , const OUString& rChildParticle
+            std::u16string_view rParentParticle
+          , std::u16string_view rChildParticle
           , std::u16string_view rDragMethodServiceName = std::u16string_view()
           , std::u16string_view rDragParameterString = std::u16string_view() );
 
     static OUString createClassifiedIdentifierForGrid(
           const css::uno::Reference< css::chart2::XAxis >& xAxis
-        , const css::uno::Reference< css::frame::XModel >& xChartModel
+        , const rtl::Reference<::chart::ChartModel>& xChartModel
         , sal_Int32 nSubIndex = -1 );//-1: main grid, 0: first subgrid etc
 
     SAL_DLLPRIVATE static OUString createParticleForDiagram();
 
     static OUString createParticleForCoordinateSystem(
-          const css::uno::Reference< css::chart2::XCoordinateSystem >& xCooSys
-        , ChartModel& rModel );
-
-    static OUString createParticleForCoordinateSystem(
-          const css::uno::Reference< css::chart2::XCoordinateSystem >& xCooSys
-        , const css::uno::Reference< css::frame::XModel >& xChartModel );
+          const rtl::Reference< ::chart::BaseCoordinateSystem >& xCooSys
+        , const rtl::Reference<::chart::ChartModel>& xChartModel );
 
     static OUString createParticleForAxis(
                       sal_Int32 nDimensionIndex, sal_Int32 nAxisIndex );
@@ -143,17 +147,16 @@ public:
     static OUString createParticleForSeries( sal_Int32 nDiagramIndex, sal_Int32 nCooSysIndex
             , sal_Int32 nChartTypeIndex, sal_Int32 nSeriesIndex );
 
-    static OUString createParticleForLegend( ChartModel& rModel );
-
     static OUString createParticleForLegend(
-        const css::uno::Reference< css::frame::XModel >& xChartModel );
+        const rtl::Reference<::chart::ChartModel>& xChartModel );
 
+    /** Creates an identifier for the data table */
     static OUString createParticleForDataTable(
-        const css::uno::Reference< css::frame::XModel >& xChartModel );
+        const rtl::Reference<::chart::ChartModel>& xChartModel );
 
     static OUString addChildParticle( std::u16string_view rParticle, std::u16string_view rChildParticle );
     static OUString createChildParticleWithIndex( ObjectType eObjectType, sal_Int32 nIndex );
-    static sal_Int32 getIndexFromParticleOrCID( const OUString& rParticleOrCID );
+    static sal_Int32 getIndexFromParticleOrCID( std::u16string_view rParticleOrCID );
 
     static OUString createClassifiedIdentifier(
         enum ObjectType eObjectType //e.g. OBJECTTYPE_DATA_SERIES
@@ -167,22 +170,22 @@ public:
         , std::u16string_view rDragParameterString = std::u16string_view()
         );
 
-    static bool isCID( const OUString& rName );
-    static OUString getDragMethodServiceName( const OUString& rClassifiedIdentifier );
-    static OUString getDragParameterString( const OUString& rCID );
-    static bool isDragableObject( const OUString& rClassifiedIdentifier );
+    static bool isCID( std::u16string_view rName );
+    static std::u16string_view getDragMethodServiceName( std::u16string_view rClassifiedIdentifier );
+    static std::u16string_view getDragParameterString( std::u16string_view rCID );
+    static bool isDragableObject( std::u16string_view rClassifiedIdentifier );
     bool isDragableObject() const;
-    static bool isRotateableObject( const OUString& rClassifiedIdentifier );
-    static bool isMultiClickObject( const OUString& rClassifiedIdentifier );
-    static bool areSiblings( const OUString& rCID1, const OUString& rCID2 );//identical object is no sibling
-    static bool areIdenticalObjects( const OUString& rCID1, const OUString& rCID2 );
+    static bool isRotateableObject( std::u16string_view rClassifiedIdentifier );
+    static bool isMultiClickObject( std::u16string_view rClassifiedIdentifier );
+    static bool areSiblings( std::u16string_view rCID1, std::u16string_view rCID2 );//identical object is no sibling
+    static bool areIdenticalObjects( std::u16string_view rCID1, std::u16string_view rCID2 );
 
     static OUString getStringForType( ObjectType eObjectType );
-    static ObjectType    getObjectType( const OUString& rCID );
+    static ObjectType getObjectType( std::u16string_view rCID );
     ObjectType getObjectType() const;
 
     static OUString createSeriesSubObjectStub( ObjectType eSubObjectType
-                    , const OUString& rSeriesParticle
+                    , std::u16string_view rSeriesParticle
                     , std::u16string_view rDragMethodServiceName = std::u16string_view()
                     , std::u16string_view rDragParameterString = std::u16string_view() );
     static OUString createPointCID( std::u16string_view rPointCID_Stub, sal_Int32 nIndex  );
@@ -190,53 +193,49 @@ public:
     static OUString createDataCurveCID( std::u16string_view rSeriesParticle, sal_Int32 nCurveIndex, bool bAverageLine );
     static OUString createDataCurveEquationCID( std::u16string_view rSeriesParticle, sal_Int32 nCurveIndex );
 
-    SAL_DLLPRIVATE static OUString getObjectID( const OUString& rCID );
-    static OUString getParticleID( const OUString& rCID );
-    static OUString getFullParentParticle( const OUString& rCID );
+    SAL_DLLPRIVATE static OUString getObjectID( std::u16string_view rCID );
+    static std::u16string_view getParticleID( std::u16string_view rCID );
+    static std::u16string_view getFullParentParticle( std::u16string_view rCID );
 
     //returns the series particle of a CID when the CID is a child of the series
-    static OUString getSeriesParticleFromCID( const OUString& rCID );
+    static OUString getSeriesParticleFromCID( std::u16string_view rCID );
 
     //return the model object that is indicated by rObjectCID
     static css::uno::Reference< css::beans::XPropertySet >
             getObjectPropertySet(
-                  const OUString& rObjectCID
-                , const css::uno::Reference< css::frame::XModel >& xChartModel );
-    static css::uno::Reference< css::beans::XPropertySet >
-            getObjectPropertySet(
-                  const OUString& rObjectCID
-                , const css::uno::Reference< css::chart2::XChartDocument >& xChartDocument );
+                  std::u16string_view rObjectCID
+                , const rtl::Reference< ::chart::ChartModel >& xChartDocument );
 
     //return the axis object that belongs to rObjectCID if any
-    static css::uno::Reference< css::chart2::XAxis >
+    static rtl::Reference< ::chart::Axis >
             getAxisForCID(
-                  const OUString& rObjectCID
-                , const css::uno::Reference< css::frame::XModel >& xChartModel );
+                  std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel );
 
     //return the series object that belongs to rObjectCID if any
-    static css::uno::Reference< css::chart2::XDataSeries >
+    static rtl::Reference< ::chart::DataSeries >
             getDataSeriesForCID(
-                  const OUString& rObjectCID
-                , const css::uno::Reference< css::frame::XModel >& xChartModel );
+                  std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel );
 
-    static css::uno::Reference< css::chart2::XDiagram >
+    static rtl::Reference< ::chart::Diagram >
             getDiagramForCID(
-                  const OUString& rObjectCID
-                , const css::uno::Reference< css::frame::XModel >& xChartModel );
+                  std::u16string_view rObjectCID
+                , const rtl::Reference<::chart::ChartModel>& xChartModel );
 
     static const OUString& getPieSegmentDragMethodServiceName();
     static OUString createPieSegmentDragParameterString(
           sal_Int32 nOffsetPercent
         , const css::awt::Point& rMinimumPosition
         , const css::awt::Point& rMaximumPosition );
-    static bool parsePieSegmentDragParameterString( const OUString& rDragParameterString
+    static bool parsePieSegmentDragParameterString( std::u16string_view rDragParameterString
         , sal_Int32& rOffsetPercent
         , css::awt::Point& rMinimumPosition
         , css::awt::Point& rMaximumPosition );
 
-    static TitleHelper::eTitleType getTitleTypeForCID( const OUString& rCID );
+    static TitleHelper::eTitleType getTitleTypeForCID( std::u16string_view rCID );
 
-    static OUString getMovedSeriesCID( const OUString& rObjectCID, bool bForward );
+    static OUString getMovedSeriesCID( std::u16string_view rObjectCID, bool bForward );
 
     bool isValid() const;
     bool isAutoGeneratedObject() const;

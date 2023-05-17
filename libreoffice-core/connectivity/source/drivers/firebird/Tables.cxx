@@ -11,7 +11,6 @@
 #include "Tables.hxx"
 #include "Views.hxx"
 #include "Catalog.hxx"
-#include "Util.hxx"
 
 #include <TConnection.hxx>
 
@@ -219,11 +218,11 @@ void connectivity::firebird::Tables::appendNew(const OUString& _rsNewTable)
 
     // notify our container listeners
     css::container::ContainerEvent aEvent(static_cast<XContainer*>(this),
-                                          css::uno::makeAny(_rsNewTable), css::uno::Any(),
+                                          css::uno::Any(_rsNewTable), css::uno::Any(),
                                           css::uno::Any());
-    ::comphelper::OInterfaceIteratorHelper2 aListenerLoop(m_aContainerListeners);
+    comphelper::OInterfaceIteratorHelper3 aListenerLoop(m_aContainerListeners);
     while (aListenerLoop.hasMoreElements())
-        static_cast<XContainerListener*>(aListenerLoop.next())->elementInserted(aEvent);
+        aListenerLoop.next()->elementInserted(aEvent);
 }
 
 

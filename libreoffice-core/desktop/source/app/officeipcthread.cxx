@@ -31,6 +31,7 @@
 #include <salhelper/thread.hxx>
 #include <sal/log.hxx>
 #include <unotools/bootstrap.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <unotools/configmgr.hxx>
 #include <osl/pipe.hxx>
@@ -42,6 +43,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/file.hxx>
 #include <rtl/process.h>
+#include <o3tl/string_view.hxx>
 
 #include <cassert>
 #include <cstdlib>
@@ -70,7 +72,7 @@ char const PROCESSING_DONE[] = "InternalIPC::ProcessingDone";
 OString readStringFromPipe(osl::StreamPipe const & pipe) {
     for (OStringBuffer str;;) {
         char buf[1024];
-        sal_Int32 n = pipe.recv(buf, SAL_N_ELEMENTS(buf));
+        sal_Int32 n = pipe.recv(buf, std::size(buf));
         if (n <= 0) {
             SAL_INFO("desktop.app", "read empty string");
             return "";
@@ -99,7 +101,7 @@ namespace {
 
 class Parser: public CommandLineArgs::Supplier {
 public:
-    explicit Parser(OString const & input): m_input(input) {
+    explicit Parser(OString input): m_input(std::move(input)) {
         if (!m_input.match(ARGUMENT_PREFIX) ||
             m_input.getLength() == RTL_CONSTASCII_LENGTH(ARGUMENT_PREFIX))
         {
@@ -301,7 +303,7 @@ static void ImplPostProcessDocumentsEvent( std::unique_ptr<ProcessDocumentsReque
 oslSignalAction SalMainPipeExchangeSignal_impl(SAL_UNUSED_PARAMETER void* /*pData*/, oslSignalInfo* pInfo)
 {
     if( pInfo->Signal == osl_Signal_Terminate )
-        RequestHandler::SetDowning();
+        RequestHandler::Disable();
     return osl_Signal_ActCallNextHdl;
 }
 
@@ -377,8 +379,8 @@ public:
     static RequestHandler::Status enable(rtl::Reference<IpcThread> * thread);
 
 private:
-    explicit PipeIpcThread(osl::Pipe const & pipe):
-        IpcThread("PipeIPC"), pipe_(pipe)
+    explicit PipeIpcThread(osl::Pipe pipe):
+        IpcThread("PipeIPC"), pipe_(std::move(pipe))
     {}
 
     virtual ~PipeIpcThread() override {}
@@ -661,9 +663,7 @@ void RequestHandler::EnableRequests()
         if (pGlobal->mState != State::Downing) {
             pGlobal->mState = State::RequestsEnabled;
         }
-        // hit the compiler over the head - this avoids GCC -Werror=maybe-uninitialized
-        std::optional<OUString> tmp;
-        ProcessDocumentsRequest aEmptyReq(tmp);
+        ProcessDocumentsRequest aEmptyReq(std::nullopt);
         // trigger already queued requests
         RequestHandler::ExecuteCmdLineRequests(aEmptyReq, true);
     }
@@ -697,7 +697,7 @@ RequestHandler::Status RequestHandler::Enable(bool ipc)
     if( pGlobal.is() )
         return IPC_STATUS_OK;
 
-#if !HAVE_FEATURE_DESKTOP || HAVE_FEATURE_MACOSX_SANDBOX
+#if !HAVE_FEATURE_DESKTOP || HAVE_FEATURE_MACOSX_SANDBOX || defined(EMSCRIPTEN)
     ipc = false;
 #endif
 
@@ -1154,10 +1154,10 @@ void PipeIpcThread::execute()
 
             // notify client we're ready to process its args:
             SAL_INFO("desktop.app", "writing <" << SEND_ARGUMENTS << ">");
-            sal_Int32 n = aStreamPipe.write(
-                SEND_ARGUMENTS, SAL_N_ELEMENTS(SEND_ARGUMENTS));
+            std::size_t n = aStreamPipe.write(
+                SEND_ARGUMENTS, std::size(SEND_ARGUMENTS));
                 // incl. terminating NUL
-            if (n != SAL_N_ELEMENTS(SEND_ARGUMENTS)) {
+            if (n != std::size(SEND_ARGUMENTS)) {
                 SAL_WARN("desktop.app", "short write: " << n);
                 continue;
             }
@@ -1186,9 +1186,9 @@ void PipeIpcThread::execute()
             {
                 // processing finished, inform the requesting end:
                 SAL_INFO("desktop.app", "writing <" << PROCESSING_DONE << ">");
-                n = aStreamPipe.write(PROCESSING_DONE, SAL_N_ELEMENTS(PROCESSING_DONE));
+                n = aStreamPipe.write(PROCESSING_DONE, std::size(PROCESSING_DONE));
                 // incl. terminating NUL
-                if (n != SAL_N_ELEMENTS(PROCESSING_DONE))
+                if (n != std::size(PROCESSING_DONE))
                 {
                     SAL_WARN("desktop.app", "short write: " << n);
                     continue;
@@ -1236,7 +1236,7 @@ static void AddConversionsToDispatchList(
     const OUString& rPrinterName,
     const OUString& rFactory,
     const OUString& rParamOut,
-    const OUString& rImgOut,
+    std::u16string_view rImgOut,
     const bool isTextCat,
     const bool isScriptCat )
 {
@@ -1249,7 +1249,6 @@ static void AddConversionsToDispatchList(
             nType = DispatchWatcher::REQUEST_CAT;
         else
             nType = DispatchWatcher::REQUEST_CONVERSION;
-        aParam = rParam;
     }
     else
     {
@@ -1262,8 +1261,6 @@ static void AddConversionsToDispatchList(
         }
     }
 
-    OUString aOutDir( rParamOut.trim() );
-    OUString aImgOut( rImgOut.trim() );
     OUString aPWD;
     if (cwdUrl)
     {
@@ -1274,11 +1271,10 @@ static void AddConversionsToDispatchList(
         utl::Bootstrap::getProcessWorkingDir( aPWD );
     }
 
-    if( !::osl::FileBase::getAbsoluteFileURL( aPWD, rParamOut, aOutDir ) )
-        ::osl::FileBase::getSystemPathFromFileURL( aOutDir, aOutDir );
-
-    if( !rParamOut.trim().isEmpty() )
+    if (OUString aOutDir(rParamOut.trim()); !aOutDir.isEmpty())
     {
+        if (osl::FileBase::getAbsoluteFileURL(aPWD, rParamOut, aOutDir) == osl::FileBase::E_None)
+            osl::FileBase::getSystemPathFromFileURL(aOutDir, aOutDir);
         aParam += ";" + aOutDir;
     }
     else
@@ -1287,8 +1283,8 @@ static void AddConversionsToDispatchList(
         aParam += ";" + aPWD;
     }
 
-    if( !rImgOut.trim().isEmpty() )
-        aParam += "|" + aImgOut;
+    if( !rImgOut.empty() )
+        aParam += OUString::Concat("|") + o3tl::trim(rImgOut);
 
     for (auto const& request : rRequestList)
     {

@@ -33,6 +33,8 @@
 
 #if defined LIBO_INTERNAL_ONLY
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #endif
 
 #include "rtl/ustrbuf.h"
@@ -100,31 +102,32 @@ public:
 
         @param      length   the initial capacity.
      */
-    explicit OUStringBuffer(int length)
+    explicit OUStringBuffer(sal_Int32 length)
         : pData(NULL)
         , nCapacity( length )
     {
         rtl_uString_new_WithLength( &pData, length );
     }
-#if __cplusplus >= 201103L
-    explicit OUStringBuffer(unsigned int length)
-        : OUStringBuffer(static_cast<int>(length))
+#if defined LIBO_INTERNAL_ONLY
+    template<typename T>
+    explicit OUStringBuffer(T length, std::enable_if_t<std::is_integral_v<T>, int> = 0)
+        : OUStringBuffer(static_cast<sal_Int32>(length))
     {
+        assert(
+            length >= 0
+            && static_cast<std::make_unsigned_t<T>>(length)
+                <= static_cast<std::make_unsigned_t<sal_Int32>>(
+                    std::numeric_limits<sal_Int32>::max()));
     }
-#if SAL_TYPES_SIZEOFLONG == 4
-    // additional overloads for sal_Int32 sal_uInt32
-    explicit OUStringBuffer(long length)
-        : OUStringBuffer(static_cast<int>(length))
-    {
-    }
-    explicit OUStringBuffer(unsigned long length)
-        : OUStringBuffer(static_cast<int>(length))
-    {
-    }
-#endif
-    // avoid obvious bugs
+    // avoid (obvious) bugs
+    explicit OUStringBuffer(bool) = delete;
     explicit OUStringBuffer(char) = delete;
-    explicit OUStringBuffer(sal_Unicode) = delete;
+    explicit OUStringBuffer(wchar_t) = delete;
+#if defined __cpp_char8_t
+    explicit OUStringBuffer(char8_t) = delete;
+#endif
+    explicit OUStringBuffer(char16_t) = delete;
+    explicit OUStringBuffer(char32_t) = delete;
 #endif
 
     /**
@@ -239,8 +242,8 @@ public:
      @overload
      @internal
     */
-    template< typename T >
-    OUStringBuffer( OUStringNumber< T >&& n )
+    template< typename T, std::size_t N >
+    OUStringBuffer( StringNumberBase< sal_Unicode, T, N >&& n )
         : pData(NULL)
         , nCapacity( n.length + 16 )
     {
@@ -294,7 +297,8 @@ public:
         }
         std::memcpy(
             pData->buffer, string.data(),
-            (n + 1) * sizeof (sal_Unicode));
+            n * sizeof (sal_Unicode));
+        pData->buffer[n] = '\0';
         pData->length = n;
         return *this;
     }
@@ -349,10 +353,14 @@ public:
         if (n >= nCapacity) {
             ensureCapacity(n + 16); //TODO: check for overflow
         }
+        // For OUStringChar, which is covered by this template's ConstCharArrayDetector TypeUtf16
+        // check, toPointer does not return a NUL-terminated string, so we can't just memcpy n+1
+        // elements but rather need to add the terminating NUL manually:
         std::memcpy(
             pData->buffer,
             libreoffice_internal::ConstCharArrayDetector<T>::toPointer(literal),
-            (n + 1) * sizeof (sal_Unicode)); //TODO: check for overflow
+            n * sizeof (sal_Unicode));
+        pData->buffer[n] = '\0';
         pData->length = n;
         return *this;
     }
@@ -372,8 +380,8 @@ public:
     }
 
     /** @overload @internal */
-    template<typename T>
-    OUStringBuffer & operator =(OUStringNumber<T> && n)
+    template<typename T, std::size_t N>
+    OUStringBuffer & operator =(StringNumberBase<sal_Unicode, T, N> && n)
     {
         *this = OUStringBuffer( std::move( n ) );
         return *this;
@@ -714,8 +722,8 @@ public:
      @overload
      @internal
     */
-    template< typename T >
-    OUStringBuffer& append( OUStringNumber< T >&& c )
+    template< typename T, std::size_t N >
+    OUStringBuffer& append( StringNumberBase< sal_Unicode, T, N >&& c )
     {
         return append( c.buf, c.length );
     }
@@ -748,8 +756,7 @@ public:
         Since this method is optimized for performance. the ASCII
         character values are not converted in any way. The caller
         has to make sure that all ASCII characters are in the
-        allowed range between 0 and 127. The ASCII string must be
-        NULL-terminated.
+        allowed range between 0 and 127.
         <p>
         Characters of the character array <code>str</code> are appended,
         in order, to the contents of this string buffer. The length of this
@@ -966,6 +973,20 @@ public:
         rtl_uStringbuffer_insert(&pData, &nCapacity, n, NULL, length);
         return pData->buffer + n;
     }
+
+#if defined LIBO_INTERNAL_ONLY
+    /**
+       "Stream" operator to append a value to this OUStringBuffer.
+
+       @internal
+       @since LibreOffice 7.5
+     */
+    template<typename T>
+    OUStringBuffer& operator<<(T&& rValue)
+    {
+        return append(std::forward<T>(rValue));
+    }
+#endif
 
     /**
         Inserts the string into this string buffer.
@@ -1746,11 +1767,8 @@ private:
 template<> struct ToStringHelper<OUStringBuffer> {
     static std::size_t length(OUStringBuffer const & s) { return s.getLength(); }
 
-    static sal_Unicode * addData(sal_Unicode * buffer, OUStringBuffer const & s) SAL_RETURNS_NONNULL
+    sal_Unicode * operator()(sal_Unicode * buffer, OUStringBuffer const & s) const SAL_RETURNS_NONNULL
     { return addDataHelper(buffer, s.getStr(), s.getLength()); }
-
-    static constexpr bool allowOStringConcat = false;
-    static constexpr bool allowOUStringConcat = true;
 };
 #endif
 
@@ -1764,6 +1782,11 @@ template<> struct ToStringHelper<OUStringBuffer> {
             return operator=(str.toString());
         else
             return internalAppend(str.pData);
+    }
+
+    inline OUString const& OUString::unacquired(const OUStringBuffer& str)
+    {
+        return unacquired(&str.pData);
     }
 #endif
 }

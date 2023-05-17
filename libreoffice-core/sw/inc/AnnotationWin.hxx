@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_SW_INC_ANNOTATIONWIN_HXX
-#define INCLUDED_SW_INC_ANNOTATIONWIN_HXX
+#pragma once
 
 #include <basegfx/range/b2drange.hxx>
 #include <editeng/outlobj.hxx>
@@ -192,6 +191,11 @@ class SAL_DLLPUBLIC_RTTI SwAnnotationWin final : public InterimItemWindow
         bool IsResolved() const;
         bool IsThreadResolved();
 
+        // Get annotation paraId or generate one if it doesn't exist
+        sal_uInt32 GetParaId();
+        // Used to generate a unique paraId
+        static sal_uInt32 CreateUniqueParaId();
+
         // Set this SwAnnotationWin as the currently active one
         // return false if it was already active
         bool SetActiveSidebarWin();
@@ -229,7 +233,7 @@ class SAL_DLLPUBLIC_RTTI SwAnnotationWin final : public InterimItemWindow
         SwPostItMgr&    mrMgr;
         SwView&         mrView;
 
-        ImplSVEvent *   mnEventId;
+        ImplSVEvent*    mnDeleteEventId;
 
         std::unique_ptr<OutlinerView>   mpOutlinerView;
         std::unique_ptr<Outliner>       mpOutliner;
@@ -279,7 +283,5 @@ class SAL_DLLPUBLIC_RTTI SwAnnotationWin final : public InterimItemWindow
 };
 
 } // end of namespace sw::annotation
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

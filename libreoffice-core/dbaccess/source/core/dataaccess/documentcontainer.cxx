@@ -34,6 +34,7 @@
 #include <connectivity/sqlerror.hxx>
 #include <core_resource.hxx>
 #include <strings.hrc>
+#include <strings.hxx>
 #include <comphelper/namedvaluecollection.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/servicehelper.hxx>
@@ -41,6 +42,7 @@
 
 #include <vcl/svapp.hxx>
 #include <osl/mutex.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::lang;
@@ -391,7 +393,7 @@ Reference< XInterface > SAL_CALL ODocumentContainer::createInstanceWithArguments
                     Reference<XContent > xNew(xORB->createInstanceWithArguments(sServiceName,aArguments),UNO_QUERY);
                     Reference<XNameContainer> xNameContainer(xContent,UNO_QUERY);
                     if ( xNameContainer.is() )
-                        xNameContainer->insertByName(*elements,makeAny(xNew));
+                        xNameContainer->insertByName(*elements,Any(xNew));
                 }
             }
         }
@@ -421,7 +423,7 @@ Any SAL_CALL ODocumentContainer::execute( const Command& aCommand, sal_Int32 Com
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -448,7 +450,7 @@ Any SAL_CALL ODocumentContainer::execute( const Command& aCommand, sal_Int32 Com
         {
             // Unsupported.
             ucbhelper::cancelCommandExecution(
-                makeAny( UnsupportedOpenModeException(
+                Any( UnsupportedOpenModeException(
                                 OUString(),
                                 static_cast< cppu::OWeakObject * >( this ),
                                 sal_Int16( aOpenCommand.Mode ) ) ),
@@ -465,7 +467,7 @@ Any SAL_CALL ODocumentContainer::execute( const Command& aCommand, sal_Int32 Com
         {
             OSL_FAIL( "Wrong argument type!" );
             ucbhelper::cancelCommandExecution(
-                makeAny( IllegalArgumentException(
+                Any( IllegalArgumentException(
                                     OUString(),
                                     static_cast< cppu::OWeakObject * >( this ),
                                     -1 ) ),
@@ -491,10 +493,10 @@ Any SAL_CALL ODocumentContainer::execute( const Command& aCommand, sal_Int32 Com
 
 namespace
 {
-    bool lcl_queryContent(const OUString& _sName,Reference< XNameContainer >& _xNameContainer,Any& _rRet,OUString& _sSimpleName)
+    bool lcl_queryContent(std::u16string_view _sName,Reference< XNameContainer >& _xNameContainer,Any& _rRet,OUString& _sSimpleName)
     {
         sal_Int32 nIndex = 0;
-        OUString sName = _sName.getToken(0,'/',nIndex);
+        OUString sName( o3tl::getToken(_sName,0,'/',nIndex) );
         bool bRet = _xNameContainer->hasByName(sName);
         if ( bRet )
         {
@@ -502,7 +504,7 @@ namespace
             _rRet = _xNameContainer->getByName(_sSimpleName);
             while ( nIndex != -1 && bRet )
             {
-                sName = _sName.getToken(0,'/',nIndex);
+                sName = o3tl::getToken(_sName,0,'/',nIndex);
                 _xNameContainer.set(_rRet,UNO_QUERY);
                 bRet = _xNameContainer.is();
                 if ( bRet )
@@ -610,7 +612,7 @@ void SAL_CALL ODocumentContainer::insertByHierarchicalName( const OUString& _sNa
         sal_Int32 index = sName.getLength();
         OUString sMessage(
             DBA_RES(RID_STR_NO_SUB_FOLDER).replaceFirst("$folder$",
-                _sName.getToken(0,'/',index)));
+                o3tl::getToken(_sName, 0,'/',index)));
         throw IllegalArgumentException( sMessage, *this, 1 );
     }
 
@@ -710,7 +712,7 @@ void SAL_CALL ODocumentContainer::revert(  )
 Reference< XStorage> ODocumentContainer::getContainerStorage() const
 {
     return  m_pImpl->m_pDataSource
-        ?   m_pImpl->m_pDataSource->getStorage( m_bFormsContainer ? ODatabaseModelImpl::E_FORM : ODatabaseModelImpl::E_REPORT )
+        ?   m_pImpl->m_pDataSource->getStorage( m_bFormsContainer ? ODatabaseModelImpl::ObjectType::Form : ODatabaseModelImpl::ObjectType::Report )
         :   Reference< XStorage>();
 }
 
@@ -749,8 +751,8 @@ void SAL_CALL ODocumentContainer::rename( const OUString& newName )
             return;
 
         sal_Int32 nHandle = PROPERTY_ID_NAME;
-        Any aOld = makeAny(m_pImpl->m_aProps.aTitle);
-        Any aNew = makeAny(newName);
+        Any aOld(m_pImpl->m_aProps.aTitle);
+        Any aNew(newName);
 
         aGuard.clear();
         fire(&nHandle, &aNew, &aOld, 1, true );

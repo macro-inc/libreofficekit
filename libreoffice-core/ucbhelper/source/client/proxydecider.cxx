@@ -36,6 +36,7 @@
 #include <com/sun/star/util/XChangesNotifier.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <ucbhelper/proxydecider.hxx>
+#include <o3tl/string_view.hxx>
 
 #ifdef _WIN32
 #include <o3tl/char16_t2wchar_t.hxx>
@@ -136,7 +137,7 @@ class InternetProxyDecider_Impl :
     mutable HostnameCache                    m_aHostnames;
 
 private:
-    bool shouldUseProxy( const OUString & rHost,
+    bool shouldUseProxy( std::u16string_view rHost,
                          sal_Int32 nPort,
                          bool bUseFullyQualified ) const;
 public:
@@ -399,13 +400,13 @@ void InternetProxyDecider_Impl::dispose()
 }
 
 
-bool InternetProxyDecider_Impl::shouldUseProxy( const OUString & rHost,
+bool InternetProxyDecider_Impl::shouldUseProxy( std::u16string_view rHost,
                                                 sal_Int32 nPort,
                                                 bool bUseFullyQualified ) const
 {
     OUStringBuffer aBuffer;
 
-    if ( ( rHost.indexOf( ':' ) != -1 ) &&
+    if ( ( rHost.find( ':' ) != std::u16string_view::npos ) &&
          ( rHost[ 0 ] != '[' ) )
     {
         // host is given as numeric IPv6 address
@@ -518,7 +519,7 @@ DWORD WINAPI GetPACProxyThread(_In_ LPVOID lpParameter)
             sal_Int32 nPortSepPos = sProxyResult.indexOf(':');
             if (nPortSepPos != -1)
             {
-                pData->m_ProxyServer.nPort = sProxyResult.copy(nPortSepPos + 1).toInt32();
+                pData->m_ProxyServer.nPort = o3tl::toInt32(sProxyResult.subView(nPortSepPos + 1));
                 sProxyResult = sProxyResult.copy(0, nPortSepPos);
             }
             else
@@ -590,7 +591,7 @@ InternetProxyServer GetUnixSystemProxy(const OUString & rProtocol)
     sal_Int32 x = tmp.indexOf(':');
     if (x == -1)
         return aProxy;
-    int nPort = tmp.copy(x + 1).toInt32();
+    int nPort = o3tl::toInt32(tmp.subView(x + 1));
     if (nPort == 0)
         return aProxy;
     aProxy.aName = tmp.copy(0, x);
@@ -903,7 +904,7 @@ void InternetProxyDecider_Impl::setNoProxyList(
             }
 
             m_aNoProxyList.emplace_back( WildCard( aToken ),
-                                  WildCard( aFullyQualifiedHost.makeStringAndClear() ) );
+                                  WildCard( aFullyQualifiedHost ) );
         }
 
         if ( nEnd != nLen )

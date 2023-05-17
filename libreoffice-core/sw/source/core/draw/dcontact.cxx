@@ -28,6 +28,7 @@
 #include <svx/svdview.hxx>
 #include <svx/sdr/contact/displayinfo.hxx>
 #include <svx/sdr/contact/objectcontact.hxx>
+#include <svx/shapepropertynotifier.hxx>
 #include <drawdoc.hxx>
 #include <fmtornt.hxx>
 #include <viewimp.hxx>
@@ -92,7 +93,7 @@ namespace
         :   m_pAnchorFrame(FindFrame(pAnchorFrame))
         {}
 
-        bool operator()(const SwDrawVirtObjPtr& rpDrawVirtObj)
+        bool operator()(const rtl::Reference<SwDrawVirtObj>& rpDrawVirtObj)
         {
             return FindFrame(rpDrawVirtObj->GetAnchorFrame()) == m_pAnchorFrame;
         }
@@ -182,7 +183,7 @@ SwContact* GetUserCall( const SdrObject* pObj )
 bool IsMarqueeTextObj( const SdrObject& rObj )
 {
     if (SdrInventor::Default != rObj.GetObjInventor() ||
-        OBJ_TEXT != rObj.GetObjIdentifier())
+        SdrObjKind::Text != rObj.GetObjIdentifier())
         return false;
     SdrTextAniKind eTKind = static_cast<const SdrTextObj&>(rObj).GetTextAniKind();
     return ( SdrTextAniKind::Scroll == eTKind
@@ -420,13 +421,15 @@ namespace
 void SwContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
 {
     // this does not call SwClient::SwClientNotify and thus doesn't handle RES_OBJECTDYING as usual. Is this intentional?
-    if (auto pFindSdrObjectHint = dynamic_cast<const sw::FindSdrObjectHint*>(&rHint))
+    if (rHint.GetId() == SfxHintId::SwFindSdrObject)
     {
+        auto pFindSdrObjectHint = static_cast<const sw::FindSdrObjectHint*>(&rHint);
         if(!pFindSdrObjectHint->m_rpObject)
             pFindSdrObjectHint->m_rpObject = GetMaster();
     }
-    else if (auto pWW8AnchorConvHint = dynamic_cast<const sw::WW8AnchorConvHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwWW8AnchorConv)
     {
+        auto pWW8AnchorConvHint = static_cast<const sw::WW8AnchorConvHint*>(&rHint);
         // determine anchored object
         SwAnchoredObject* pAnchoredObj(nullptr);
         {
@@ -529,7 +532,7 @@ SwVirtFlyDrawObj* SwFlyDrawContact::CreateNewRef(SwFlyFrame* pFly,
 
     IDocumentDrawModelAccess& rIDDMA = pFormat->getIDocumentDrawModelAccess();
     SwFlyDrawContact* pContact = pFormat->GetOrCreateContact();
-    SwVirtFlyDrawObj* pDrawObj(
+    rtl::Reference<SwVirtFlyDrawObj> pDrawObj(
         new SwVirtFlyDrawObj(
             pContact->GetMaster()->getSdrModelFromSdrObject(),
             *pContact->GetMaster(),
@@ -544,16 +547,16 @@ SwVirtFlyDrawObj* SwFlyDrawContact::CreateNewRef(SwFlyFrame* pFly,
     if(nullptr != pPg)
     {
         const size_t nOrdNum = pContact->GetMaster()->GetOrdNum();
-        pPg->ReplaceObject(pDrawObj, nOrdNum);
+        pPg->ReplaceObject(pDrawObj.get(), nOrdNum);
     }
     // #i27030# - insert new <SwVirtFlyDrawObj> instance
     // into drawing page with correct order number
     else
-        rIDDMA.GetDrawModel()->GetPage(0)->InsertObject(pDrawObj, pContact->GetOrdNumForNewRef(pFly, rAnchorFrame));
+        rIDDMA.GetDrawModel()->GetPage(0)->InsertObject(pDrawObj.get(), pContact->GetOrdNumForNewRef(pFly, rAnchorFrame));
     // #i38889# - assure, that new <SwVirtFlyDrawObj> instance
     // is in a visible layer.
-    pContact->MoveObjToVisibleLayer(pDrawObj);
-    return pDrawObj;
+    pContact->MoveObjToVisibleLayer(pDrawObj.get());
+    return pDrawObj.get();
 }
 
 // #i26791#
@@ -663,8 +666,9 @@ void SwFlyDrawContact::GetAnchoredObjs( std::vector<SwAnchoredObject*>& _roAncho
 void SwFlyDrawContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
 {
     SwContact::SwClientNotify(rMod, rHint);
-    if(auto pGetZOrdnerHint = dynamic_cast<const sw::GetZOrderHint*>(&rHint))
+    if(rHint.GetId() == SfxHintId::SwGetZOrder)
     {
+        auto pGetZOrdnerHint = static_cast<const sw::GetZOrderHint*>(&rHint);
         // #i11176#
         // This also needs to work when no layout exists. Thus, for
         // FlyFrames an alternative method is used now in that case.
@@ -742,10 +746,7 @@ SwDrawContact::~SwDrawContact()
     RemoveAllVirtObjs();
 
     if ( !mbMasterObjCleared )
-    {
-        SdrObject* pObject = const_cast< SdrObject* >( maAnchoredDrawObj.GetDrawObj() );
-        SdrObject::Free( pObject );
-    }
+        maAnchoredDrawObj.ClearDrawObj();
 }
 
 void SwDrawContact::GetTextObjectsFromFormat(std::list<SdrTextObj*>& o_rTextObjects, SwDoc& rDoc)
@@ -829,11 +830,10 @@ SwFrame* SwDrawContact::GetAnchorFrame(SdrObject const *const pDrawObj)
 SwDrawVirtObj* SwDrawContact::AddVirtObj(SwFrame const& rAnchorFrame)
 {
     maDrawVirtObjs.push_back(
-        SwDrawVirtObjPtr(
             new SwDrawVirtObj(
                 GetMaster()->getSdrModelFromSdrObject(),
                 *GetMaster(),
-                *this)));
+                *this));
     maDrawVirtObjs.back()->AddToDrawingPage(rAnchorFrame);
     return maDrawVirtObjs.back().get();
 }
@@ -846,6 +846,8 @@ void SwDrawContact::RemoveAllVirtObjs()
         // remove and destroy 'virtual object'
         rpDrawVirtObj->RemoveFromWriterLayout();
         rpDrawVirtObj->RemoveFromDrawingPage();
+        // to break the reference cycle
+        rpDrawVirtObj->AnchoredObj().ClearDrawObj();
     }
     maDrawVirtObjs.clear();
 }
@@ -1250,10 +1252,8 @@ void SwDrawContact::Changed_( const SdrObject& rObj,
                     // use geometry of drawing object
                     aObjRect = pGroupObj->GetSnapRect();
 
-                    for (size_t i = 0; i < pGroupObj->getChildrenOfSdrObject()->GetObjCount(); ++i )
-                    {
-                        SwTextBoxHelper::doTextBoxPositioning(GetFormat(), pGroupObj->getChildrenOfSdrObject()->GetObj(i));
-                    }
+                    SwTextBoxHelper::synchronizeGroupTextBoxProperty(&SwTextBoxHelper::changeAnchor, GetFormat(), &const_cast<SdrObject&>(rObj));
+                    SwTextBoxHelper::synchronizeGroupTextBoxProperty(&SwTextBoxHelper::syncTextBoxSize, GetFormat(), &const_cast<SdrObject&>(rObj));
 
                 }
                 SwTwips nXPosDiff(0);
@@ -1343,7 +1343,7 @@ void SwDrawContact::Changed_( const SdrObject& rObj,
             // tdf#135198: keep text box together with its shape
             const SwPageFrame* rPageFrame = pAnchoredDrawObj->GetPageFrame();
             if (rPageFrame && rPageFrame->isFrameAreaPositionValid() && GetFormat()
-                && GetFormat()->GetOtherTextBoxFormat())
+                && GetFormat()->GetOtherTextBoxFormats())
             {
                 SwDoc* const pDoc = GetFormat()->GetDoc();
 
@@ -1371,7 +1371,13 @@ void SwDrawContact::Changed_( const SdrObject& rObj,
                     aSet.Put(aSyncSet);
                     aSet.Put(pSdrObj->GetMergedItem(RES_FRM_SIZE));
                     SwTextBoxHelper::syncFlyFrameAttr(*GetFormat(), aSet, pSdrObj);
-                    SwTextBoxHelper::changeAnchor(GetFormat(), pSdrObj);
+
+                    SwTextBoxHelper::synchronizeGroupTextBoxProperty(
+                        &SwTextBoxHelper::changeAnchor, GetFormat(),
+                        GetFormat()->FindRealSdrObject());
+                    SwTextBoxHelper::synchronizeGroupTextBoxProperty(
+                        &SwTextBoxHelper::syncTextBoxSize, GetFormat(),
+                        GetFormat()->FindRealSdrObject());
                 }
                 else
                     SwTextBoxHelper::syncFlyFrameAttr(*GetFormat(), aSyncSet, GetFormat()->FindRealSdrObject());
@@ -1399,8 +1405,8 @@ namespace
         const SwFormatAnchor* pAnchorFormat = nullptr;
         if ( RES_ATTRSET_CHG == nWhich )
         {
-            static_cast<const SwAttrSetChg&>(_rItem).GetChgSet()->
-                GetItemState( RES_ANCHOR, false, reinterpret_cast<const SfxPoolItem**>(&pAnchorFormat) );
+            pAnchorFormat = static_cast<const SwAttrSetChg&>(_rItem).GetChgSet()->
+                GetItemIfSet( RES_ANCHOR, false );
         }
         else if ( RES_ANCHOR == nWhich )
         {
@@ -1453,7 +1459,7 @@ void SwDrawContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
                         {
                             // --> #i102752#
                             // assure that a ShapePropertyChangeNotifier exists
-                            maAnchoredDrawObj.DrawObj()->notifyShapePropertyChange(svx::ShapeProperty::TextDocAnchor);
+                            maAnchoredDrawObj.DrawObj()->notifyShapePropertyChange(svx::ShapePropertyProviderId::TextDocAnchor);
                         }
                         else
                             SAL_WARN("sw.core", "SwDrawContact::Modify: no draw object here?");
@@ -1507,8 +1513,9 @@ void SwDrawContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
         // #i51474#
         GetAnchoredObj(nullptr)->ResetLayoutProcessBools();
     }
-    else if (auto pDrawFrameFormatHint = dynamic_cast<const sw::DrawFrameFormatHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwDrawFrameFormat)
     {
+        auto pDrawFrameFormatHint = static_cast<const sw::DrawFrameFormatHint*>(&rHint);
         switch(pDrawFrameFormatHint->m_eId)
         {
             case sw::DrawFrameFormatHintId::DYING:
@@ -1543,33 +1550,38 @@ void SwDrawContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
                 ;
         }
     }
-    else if (auto pCheckDrawFrameFormatLayerHint = dynamic_cast<const sw::CheckDrawFrameFormatLayerHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwCheckDrawFrameFormatLayer)
     {
+        auto pCheckDrawFrameFormatLayerHint = static_cast<const sw::CheckDrawFrameFormatLayerHint*>(&rHint);
         *(pCheckDrawFrameFormatLayerHint->m_bCheckControlLayer) |= (GetMaster() && CheckControlLayer(GetMaster()));
     }
-    else if (auto pContactChangedHint = dynamic_cast<const sw::ContactChangedHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwContactChanged)
     {
+        auto pContactChangedHint = static_cast<const sw::ContactChangedHint*>(&rHint);
         if(!*pContactChangedHint->m_ppObject)
             *pContactChangedHint->m_ppObject = GetMaster();
         auto pObject = *pContactChangedHint->m_ppObject;
         Changed(*pObject, SdrUserCallType::Delete, pObject->GetLastBoundRect());
     }
-    else if (auto pDrawFormatLayoutCopyHint = dynamic_cast<const sw::DrawFormatLayoutCopyHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwDrawFormatLayoutCopy)
     {
+        auto pDrawFormatLayoutCopyHint = static_cast<const sw::DrawFormatLayoutCopyHint*>(&rHint);
         const SwDrawFrameFormat& rFormat = static_cast<const SwDrawFrameFormat&>(rMod);
-        new SwDrawContact(
-                &pDrawFormatLayoutCopyHint->m_rDestFormat,
+        rtl::Reference<SdrObject> xNewObj =
                 pDrawFormatLayoutCopyHint->m_rDestDoc.CloneSdrObj(
                         *GetMaster(),
-                        pDrawFormatLayoutCopyHint->m_rDestDoc.IsCopyIsMove() && &pDrawFormatLayoutCopyHint->m_rDestDoc == rFormat.GetDoc()));
+                        pDrawFormatLayoutCopyHint->m_rDestDoc.IsCopyIsMove() && &pDrawFormatLayoutCopyHint->m_rDestDoc == rFormat.GetDoc());
+        new SwDrawContact(
+                &pDrawFormatLayoutCopyHint->m_rDestFormat, xNewObj.get() );
         // #i49730# - notify draw frame format that position attributes are
         // already set, if the position attributes are already set at the
         // source draw frame format.
         if(rFormat.IsPosAttrSet())
             pDrawFormatLayoutCopyHint->m_rDestFormat.PosAttrSet();
     }
-    else if (auto pRestoreFlyAnchorHint = dynamic_cast<const sw::RestoreFlyAnchorHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwRestoreFlyAnchor)
     {
+        auto pRestoreFlyAnchorHint = static_cast<const sw::RestoreFlyAnchorHint*>(&rHint);
         SdrObject* pObj = GetMaster();
         if(GetAnchorFrame() && !pObj->IsInserted())
         {
@@ -1579,8 +1591,9 @@ void SwDrawContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
         }
         pObj->SetRelativePos(pRestoreFlyAnchorHint->m_aPos);
     }
-    else if (auto pCreatePortionHint = dynamic_cast<const sw::CreatePortionHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwCreatePortion)
     {
+        auto pCreatePortionHint = static_cast<const sw::CreatePortionHint*>(&rHint);
         if(*pCreatePortionHint->m_ppContact)
             return;
         *pCreatePortionHint->m_ppContact = this; // This is kind of ridiculous: the FrameFormat doesn't even hold a pointer to the contact itself,  but here we are leaking it out randomly
@@ -1592,8 +1605,9 @@ void SwDrawContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
             MoveObjToVisibleLayer(GetMaster());
         }
     }
-    else if (auto pCollectTextObjectsHint = dynamic_cast<const sw::CollectTextObjectsHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwCollectTextObjects)
     {
+        auto pCollectTextObjectsHint = static_cast<const sw::CollectTextObjectsHint*>(&rHint);
         auto pSdrO = GetMaster();
         if(!pSdrO)
             return;
@@ -1603,26 +1617,27 @@ void SwDrawContact::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
             //iterate inside of a grouped object
             while(aListIter.IsMore())
             {
-                SdrObject* pSdrOElement = aListIter.Next();
-                auto pTextObj = const_cast<SdrTextObj*>(dynamic_cast<const SdrTextObj*>(pSdrOElement));
+                SdrTextObj* pTextObj = DynCastSdrTextObj(aListIter.Next());
                 if(pTextObj && pTextObj->HasText())
                     pCollectTextObjectsHint->m_rTextObjects.push_back(pTextObj);
             }
         }
-        else if(auto pTextObj = const_cast<SdrTextObj*>(dynamic_cast<const SdrTextObj*>(pSdrO)))
+        else if(SdrTextObj* pTextObj = DynCastSdrTextObj(pSdrO))
         {
             if(pTextObj->HasText())
                 pCollectTextObjectsHint->m_rTextObjects.push_back(pTextObj);
         }
     }
-    else if (auto pGetZOrdnerHint = dynamic_cast<const sw::GetZOrderHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwGetZOrder)
     {
+        auto pGetZOrdnerHint = static_cast<const sw::GetZOrderHint*>(&rHint);
         auto pFormat(dynamic_cast<const SwFrameFormat*>(&rMod));
-        if(pFormat->Which() == RES_DRAWFRMFMT)
+        if (pFormat && pFormat->Which() == RES_DRAWFRMFMT)
             pGetZOrdnerHint->m_rnZOrder = GetMaster()->GetOrdNum();
     }
-    else if (auto pConnectedHint = dynamic_cast<const sw::GetObjectConnectedHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwGetObjectConnected)
     {
+        auto pConnectedHint = static_cast<const sw::GetObjectConnectedHint*>(&rHint);
         pConnectedHint->m_risConnected |= (GetAnchorFrame() != nullptr);
     }
 }
@@ -1738,7 +1753,7 @@ void SwDrawContact::DisconnectObjFromLayout( SdrObject* _pDrawObj )
     else
     {
         const auto ppVirtDrawObj(std::find_if(maDrawVirtObjs.begin(), maDrawVirtObjs.end(),
-                [] (const SwDrawVirtObjPtr& pObj) { return pObj->IsConnected(); }));
+                [] (const rtl::Reference<SwDrawVirtObj>& pObj) { return pObj->IsConnected(); }));
 
         if(ppVirtDrawObj != maDrawVirtObjs.end())
         {
@@ -1852,22 +1867,22 @@ void SwDrawContact::ConnectToLayout( const SwFormatAnchor* pAnch )
                 // at the following frames 'virtual' drawing objects.
                 // Note: method is similar to <SwFlyFrameFormat::MakeFrames(..)>
                 sw::BroadcastingModify *pModify = nullptr;
-                if( pAnch->GetContentAnchor() )
+                if( pAnch->GetAnchorNode() )
                 {
                     if ( pAnch->GetAnchorId() == RndStdIds::FLY_AT_FLY )
                     {
-                        SwNodeIndex aIdx( pAnch->GetContentAnchor()->nNode );
+                        SwNodeIndex aIdx( *pAnch->GetAnchorNode() );
                         SwContentNode* pCNd = pDrawFrameFormat->GetDoc()->GetNodes().GoNext( &aIdx );
                         if (SwIterator<SwFrame, SwContentNode, sw::IteratorMode::UnwrapMulti>(*pCNd).First())
                             pModify = pCNd;
                         else
                         {
-                            const SwNodeIndex& rIdx = pAnch->GetContentAnchor()->nNode;
+                            const SwNode& rIdx = *pAnch->GetAnchorNode();
                             SwFrameFormats& rFormats = *(pDrawFrameFormat->GetDoc()->GetSpzFrameFormats());
                             for( auto pFlyFormat : rFormats )
                             {
                                 if( pFlyFormat->GetContent().GetContentIdx() &&
-                                    rIdx == *(pFlyFormat->GetContent().GetContentIdx()) )
+                                    rIdx == pFlyFormat->GetContent().GetContentIdx()->GetNode() )
                                 {
                                     pModify = pFlyFormat;
                                     break;
@@ -1877,7 +1892,7 @@ void SwDrawContact::ConnectToLayout( const SwFormatAnchor* pAnch )
                     }
                     else
                     {
-                        pModify = pAnch->GetContentAnchor()->nNode.GetNode().GetContentNode();
+                        pModify = pAnch->GetAnchorNode()->GetContentNode();
                     }
                 }
 
@@ -1961,7 +1976,14 @@ void SwDrawContact::ConnectToLayout( const SwFormatAnchor* pAnch )
                                             if (pDrawPage)
                                             {
                                                 sal_uInt32 nOrdNum = pAnchoredObj->GetDrawObj()->GetOrdNum();
-                                                pDrawPage->SetObjectOrdNum(maAnchoredDrawObj.GetDrawObj()->GetOrdNumDirect(), nOrdNum);
+                                                if (maAnchoredDrawObj.GetDrawObj()->GetOrdNum() >= nOrdNum)
+                                                {
+                                                    pDrawPage->SetObjectOrdNum(maAnchoredDrawObj.GetDrawObj()->GetOrdNumDirect(), nOrdNum);
+                                                }
+                                                else
+                                                {
+                                                    pDrawPage->SetObjectOrdNum(nOrdNum, maAnchoredDrawObj.GetDrawObj()->GetOrdNumDirect() + 1);
+                                                }
                                                 break;
                                             }
                                         }
@@ -2109,7 +2131,7 @@ namespace sdr::contact
              *
              * This method will not handle included hierarchies and not check geometric visibility.
              */
-            virtual drawinglayer::primitive2d::Primitive2DContainer createPrimitive2DSequence(const DisplayInfo& rDisplayInfo) const override;
+            virtual void createPrimitive2DSequence(const DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const override;
 
         public:
             VOCOfDrawVirtObj(ObjectContact& rObjectContact, ViewContact& rViewContact)
@@ -2195,7 +2217,7 @@ namespace sdr::contact
             }
         }
 
-        drawinglayer::primitive2d::Primitive2DContainer VOCOfDrawVirtObj::createPrimitive2DSequence(const DisplayInfo& rDisplayInfo) const
+        void VOCOfDrawVirtObj::createPrimitive2DSequence(const DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
         {
             // tdf#91260 have already checked top-level one is on the right page
             assert(isPrimitiveVisible(rDisplayInfo));
@@ -2233,7 +2255,7 @@ namespace sdr::contact
             else
             {
                 // single object, use method from referenced object to get the Primitive2DSequence
-                xRetval = rReferencedObject.GetViewContact().getViewIndependentPrimitive2DContainer();
+                rReferencedObject.GetViewContact().getViewIndependentPrimitive2DContainer(xRetval);
             }
 
             if(!xRetval.empty())
@@ -2243,7 +2265,7 @@ namespace sdr::contact
                 xRetval = drawinglayer::primitive2d::Primitive2DContainer { xReference };
             }
 
-            return xRetval;
+            rVisitor.visit(xRetval);
         }
 
         ViewObjectContact& VCOfDrawVirtObj::CreateObjectSpecificViewObjectContact(ObjectContact& rObjectContact)
@@ -2293,7 +2315,7 @@ SwDrawVirtObj::~SwDrawVirtObj()
 {
 }
 
-SwDrawVirtObj* SwDrawVirtObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SwDrawVirtObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SwDrawVirtObj(rTargetModel, *this);
 }
@@ -2414,7 +2436,7 @@ void SwDrawVirtObj::NbcSetAnchorPos(const Point& rPnt)
 
 const tools::Rectangle& SwDrawVirtObj::GetCurrentBoundRect() const
 {
-    if(m_aOutRect.IsEmpty())
+    if (m_aOutRect.IsEmpty())
     {
         const_cast<SwDrawVirtObj*>(this)->RecalcBoundRect();
     }
@@ -2431,13 +2453,13 @@ Point SwDrawVirtObj::GetOffset() const
 {
     // do NOT use IsEmpty() here, there is already a useful offset
     // in the position
-    if(m_aOutRect == tools::Rectangle())
+    if (m_aOutRect == tools::Rectangle())
     {
         return Point();
     }
     else
     {
-        return m_aOutRect.TopLeft() - GetReferencedObj().GetCurrentBoundRect().TopLeft();
+        return getOutRectangle().TopLeft() - GetReferencedObj().GetCurrentBoundRect().TopLeft();
     }
 }
 
@@ -2453,12 +2475,12 @@ void SwDrawVirtObj::RecalcBoundRect()
     // its value by the 'BoundRect' of the referenced object.
 
     const Point aOffset(GetOffset());
-    m_aOutRect = ReferencedObj().GetCurrentBoundRect() + aOffset;
+    setOutRectangle(ReferencedObj().GetCurrentBoundRect() + aOffset);
 }
 
 basegfx::B2DPolyPolygon SwDrawVirtObj::TakeXorPoly() const
 {
-    basegfx::B2DPolyPolygon aRetval(rRefObj.TakeXorPoly());
+    basegfx::B2DPolyPolygon aRetval(mxRefObj->TakeXorPoly());
     aRetval.transform(basegfx::utils::createTranslateB2DHomMatrix(GetOffset().X(), GetOffset().Y()));
 
     return aRetval;
@@ -2466,7 +2488,7 @@ basegfx::B2DPolyPolygon SwDrawVirtObj::TakeXorPoly() const
 
 basegfx::B2DPolyPolygon SwDrawVirtObj::TakeContour() const
 {
-    basegfx::B2DPolyPolygon aRetval(rRefObj.TakeContour());
+    basegfx::B2DPolyPolygon aRetval(mxRefObj->TakeContour());
     aRetval.transform(basegfx::utils::createTranslateB2DHomMatrix(GetOffset().X(), GetOffset().Y()));
 
     return aRetval;
@@ -2475,7 +2497,7 @@ basegfx::B2DPolyPolygon SwDrawVirtObj::TakeContour() const
 void SwDrawVirtObj::AddToHdlList(SdrHdlList& rHdlList) const
 {
     SdrHdlList tmpList(nullptr);
-    rRefObj.AddToHdlList(tmpList);
+    mxRefObj->AddToHdlList(tmpList);
 
     size_t cnt = tmpList.GetHdlCount();
     for(size_t i=0; i < cnt; ++i)
@@ -2494,25 +2516,25 @@ void SwDrawVirtObj::NbcMove(const Size& rSiz)
 
 void SwDrawVirtObj::NbcResize(const Point& rRef, const Fraction& xFact, const Fraction& yFact)
 {
-    rRefObj.NbcResize(rRef - GetOffset(), xFact, yFact);
+    mxRefObj->NbcResize(rRef - GetOffset(), xFact, yFact);
     SetBoundAndSnapRectsDirty();
 }
 
 void SwDrawVirtObj::NbcRotate(const Point& rRef, Degree100 nAngle, double sn, double cs)
 {
-    rRefObj.NbcRotate(rRef - GetOffset(), nAngle, sn, cs);
+    mxRefObj->NbcRotate(rRef - GetOffset(), nAngle, sn, cs);
     SetBoundAndSnapRectsDirty();
 }
 
 void SwDrawVirtObj::NbcMirror(const Point& rRef1, const Point& rRef2)
 {
-    rRefObj.NbcMirror(rRef1 - GetOffset(), rRef2 - GetOffset());
+    mxRefObj->NbcMirror(rRef1 - GetOffset(), rRef2 - GetOffset());
     SetBoundAndSnapRectsDirty();
 }
 
 void SwDrawVirtObj::NbcShear(const Point& rRef, Degree100 nAngle, double tn, bool bVShear)
 {
-    rRefObj.NbcShear(rRef - GetOffset(), nAngle, tn, bVShear);
+    mxRefObj->NbcShear(rRef - GetOffset(), nAngle, tn, bVShear);
     SetBoundAndSnapRectsDirty();
 }
 
@@ -2526,7 +2548,7 @@ void SwDrawVirtObj::Resize(const Point& rRef, const Fraction& xFact, const Fract
     if(xFact.GetNumerator() != xFact.GetDenominator() || yFact.GetNumerator() != yFact.GetDenominator())
     {
         tools::Rectangle aBoundRect0; if(m_pUserCall) aBoundRect0 = GetLastBoundRect();
-        rRefObj.Resize(rRef - GetOffset(), xFact, yFact, bUnsetRelative);
+        mxRefObj->Resize(rRef - GetOffset(), xFact, yFact, bUnsetRelative);
         SetBoundAndSnapRectsDirty();
         SendUserCall(SdrUserCallType::Resize, aBoundRect0);
     }
@@ -2537,7 +2559,7 @@ void SwDrawVirtObj::Rotate(const Point& rRef, Degree100 nAngle, double sn, doubl
     if(nAngle)
     {
         tools::Rectangle aBoundRect0; if(m_pUserCall) aBoundRect0 = GetLastBoundRect();
-        rRefObj.Rotate(rRef - GetOffset(), nAngle, sn, cs);
+        mxRefObj->Rotate(rRef - GetOffset(), nAngle, sn, cs);
         SetBoundAndSnapRectsDirty();
         SendUserCall(SdrUserCallType::Resize, aBoundRect0);
     }
@@ -2546,7 +2568,7 @@ void SwDrawVirtObj::Rotate(const Point& rRef, Degree100 nAngle, double sn, doubl
 void SwDrawVirtObj::Mirror(const Point& rRef1, const Point& rRef2)
 {
     tools::Rectangle aBoundRect0; if(m_pUserCall) aBoundRect0 = GetLastBoundRect();
-    rRefObj.Mirror(rRef1 - GetOffset(), rRef2 - GetOffset());
+    mxRefObj->Mirror(rRef1 - GetOffset(), rRef2 - GetOffset());
     SetBoundAndSnapRectsDirty();
     SendUserCall(SdrUserCallType::Resize, aBoundRect0);
 }
@@ -2556,7 +2578,7 @@ void SwDrawVirtObj::Shear(const Point& rRef, Degree100 nAngle, double tn, bool b
     if(nAngle)
     {
         tools::Rectangle aBoundRect0; if(m_pUserCall) aBoundRect0 = GetLastBoundRect();
-        rRefObj.Shear(rRef - GetOffset(), nAngle, tn, bVShear);
+        mxRefObj->Shear(rRef - GetOffset(), nAngle, tn, bVShear);
         SetBoundAndSnapRectsDirty();
         SendUserCall(SdrUserCallType::Resize, aBoundRect0);
     }
@@ -2564,13 +2586,13 @@ void SwDrawVirtObj::Shear(const Point& rRef, Degree100 nAngle, double tn, bool b
 
 void SwDrawVirtObj::RecalcSnapRect()
 {
-    aSnapRect = rRefObj.GetSnapRect();
+    aSnapRect = mxRefObj->GetSnapRect();
     aSnapRect += GetOffset();
 }
 
 const tools::Rectangle& SwDrawVirtObj::GetSnapRect() const
 {
-    const_cast<SwDrawVirtObj*>(this)->aSnapRect = rRefObj.GetSnapRect();
+    const_cast<SwDrawVirtObj*>(this)->aSnapRect = mxRefObj->GetSnapRect();
     const_cast<SwDrawVirtObj*>(this)->aSnapRect += GetOffset();
 
     return aSnapRect;
@@ -2581,7 +2603,7 @@ void SwDrawVirtObj::SetSnapRect(const tools::Rectangle& rRect)
     tools::Rectangle aBoundRect0; if(m_pUserCall) aBoundRect0 = GetLastBoundRect();
     tools::Rectangle aR(rRect);
     aR -= GetOffset();
-    rRefObj.SetSnapRect(aR);
+    mxRefObj->SetSnapRect(aR);
     SetBoundAndSnapRectsDirty();
     SendUserCall(SdrUserCallType::Resize, aBoundRect0);
 }
@@ -2591,12 +2613,12 @@ void SwDrawVirtObj::NbcSetSnapRect(const tools::Rectangle& rRect)
     tools::Rectangle aR(rRect);
     aR -= GetOffset();
     SetBoundAndSnapRectsDirty();
-    rRefObj.NbcSetSnapRect(aR);
+    mxRefObj->NbcSetSnapRect(aR);
 }
 
 const tools::Rectangle& SwDrawVirtObj::GetLogicRect() const
 {
-    const_cast<SwDrawVirtObj*>(this)->aSnapRect = rRefObj.GetLogicRect();
+    const_cast<SwDrawVirtObj*>(this)->aSnapRect = mxRefObj->GetLogicRect();
     const_cast<SwDrawVirtObj*>(this)->aSnapRect += GetOffset();
 
     return aSnapRect;
@@ -2607,7 +2629,7 @@ void SwDrawVirtObj::SetLogicRect(const tools::Rectangle& rRect)
     tools::Rectangle aBoundRect0; if(m_pUserCall) aBoundRect0 = GetLastBoundRect();
     tools::Rectangle aR(rRect);
     aR -= GetOffset();
-    rRefObj.SetLogicRect(aR);
+    mxRefObj->SetLogicRect(aR);
     SetBoundAndSnapRectsDirty();
     SendUserCall(SdrUserCallType::Resize, aBoundRect0);
 }
@@ -2616,13 +2638,13 @@ void SwDrawVirtObj::NbcSetLogicRect(const tools::Rectangle& rRect)
 {
     tools::Rectangle aR(rRect);
     aR -= GetOffset();
-    rRefObj.NbcSetLogicRect(aR);
+    mxRefObj->NbcSetLogicRect(aR);
     SetBoundAndSnapRectsDirty();
 }
 
 Point SwDrawVirtObj::GetSnapPoint(sal_uInt32 i) const
 {
-    Point aP(rRefObj.GetSnapPoint(i));
+    Point aP(mxRefObj->GetSnapPoint(i));
     aP += GetOffset();
 
     return aP;
@@ -2630,20 +2652,20 @@ Point SwDrawVirtObj::GetSnapPoint(sal_uInt32 i) const
 
 Point SwDrawVirtObj::GetPoint(sal_uInt32 i) const
 {
-    return rRefObj.GetPoint(i) + GetOffset();
+    return mxRefObj->GetPoint(i) + GetOffset();
 }
 
 void SwDrawVirtObj::NbcSetPoint(const Point& rPnt, sal_uInt32 i)
 {
     Point aP(rPnt);
     aP -= GetOffset();
-    rRefObj.SetPoint(aP, i);
+    mxRefObj->SetPoint(aP, i);
     SetBoundAndSnapRectsDirty();
 }
 
 bool SwDrawVirtObj::HasTextEdit() const
 {
-    return rRefObj.HasTextEdit();
+    return mxRefObj->HasTextEdit();
 }
 
 // override 'layer' methods for 'virtual' drawing object to assure

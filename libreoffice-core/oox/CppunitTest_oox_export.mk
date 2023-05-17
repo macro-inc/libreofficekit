@@ -23,11 +23,14 @@ $(eval $(call gb_CppunitTest_add_exception_objects,oox_export, \
 $(eval $(call gb_CppunitTest_use_libraries,oox_export, \
     comphelper \
     cppu \
+    cppuhelper \
     oox \
     sal \
+    subsequenttest \
     test \
     unotest \
     utl \
+    tl \
 ))
 
 $(eval $(call gb_CppunitTest_use_sdk_api,oox_export))
@@ -42,5 +45,9 @@ $(eval $(call gb_CppunitTest_use_custom_headers,oox_export,\
 ))
 
 $(eval $(call gb_CppunitTest_use_configuration,oox_export))
+
+$(eval $(call gb_CppunitTest_add_arguments,oox_export, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

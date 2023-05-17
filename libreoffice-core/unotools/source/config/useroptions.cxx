@@ -22,7 +22,6 @@
 #include <unotools/useroptions.hxx>
 #include <unotools/syslocale.hxx>
 #include <com/sun/star/uno/Any.hxx>
-#include <osl/mutex.hxx>
 #include "itemholder1.hxx"
 
 #include <cppuhelper/implbase.hxx>
@@ -38,7 +37,8 @@
 #include <i18nlangtag/mslangid.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <o3tl/enumarray.hxx>
-#include <tools/diagnose_ex.h>
+#include <o3tl/string_view.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace utl;
 using namespace com::sun::star;
@@ -180,7 +180,7 @@ void SvtUserOptions::Impl::SetValue_Impl (UserOptToken nToken, ValueType const& 
     try
     {
         if (m_xData.is())
-             m_xData->setPropertyValue(OUString::createFromAscii(vOptionNames[nToken]), uno::makeAny(sToken));
+             m_xData->setPropertyValue(OUString::createFromAscii(vOptionNames[nToken]), uno::Any(sToken));
         comphelper::ConfigurationHelper::flush(m_xCfg);
     }
     catch (uno::Exception const&)
@@ -218,10 +218,10 @@ OUString SvtUserOptions::Impl::GetFullName () const
         sFullName = GetToken(UserOptToken::FirstName).trim();
         if (!sFullName.isEmpty())
             sFullName += " ";
-        sFullName += GetToken(UserOptToken::FathersName).trim();
+        sFullName += o3tl::trim(GetToken(UserOptToken::FathersName));
         if (!sFullName.isEmpty())
             sFullName += " ";
-        sFullName += GetToken(UserOptToken::LastName);
+        sFullName += o3tl::trim(GetToken(UserOptToken::LastName));
     }
     else
     {
@@ -230,14 +230,14 @@ OUString SvtUserOptions::Impl::GetFullName () const
             sFullName = GetToken(UserOptToken::LastName).trim();
             if (!sFullName.isEmpty())
                 sFullName += " ";
-            sFullName += GetToken(UserOptToken::FirstName);
+            sFullName += o3tl::trim(GetToken(UserOptToken::FirstName));
         }
         else
         {
             sFullName = GetToken(UserOptToken::FirstName).trim();
             if (!sFullName.isEmpty())
                 sFullName += " ";
-            sFullName += GetToken(UserOptToken::LastName);
+            sFullName += o3tl::trim(GetToken(UserOptToken::LastName));
         }
     }
     sFullName = sFullName.trim();
@@ -259,32 +259,34 @@ bool SvtUserOptions::Impl::IsTokenReadonly (UserOptToken nToken) const
             beans::PropertyAttribute::READONLY);
 }
 
+static std::recursive_mutex& GetInitMutex()
+{
+    static std::recursive_mutex gMutex;
+    return gMutex;
+}
+
+
 SvtUserOptions::SvtUserOptions ()
 {
     // Global access, must be guarded (multithreading)
-    osl::MutexGuard aGuard(GetInitMutex());
+    std::unique_lock aGuard(GetInitMutex());
 
-    if (xSharedImpl.expired())
+    xImpl = xSharedImpl.lock();
+    if (!xImpl)
     {
         xImpl = std::make_shared<Impl>();
         xSharedImpl = xImpl;
+        aGuard.unlock(); // because holdConfigItem will call this constructor
         ItemHolder1::holdConfigItem(EItem::UserOptions);
     }
-    xImpl = xSharedImpl.lock();
     xImpl->AddListener(this);
 }
 
 SvtUserOptions::~SvtUserOptions()
 {
     // Global access, must be guarded (multithreading)
-    osl::MutexGuard aGuard( GetInitMutex() );
+    std::unique_lock aGuard( GetInitMutex() );
     xImpl->RemoveListener(this);
-}
-
-osl::Mutex& SvtUserOptions::GetInitMutex()
-{
-    static osl::Mutex gMutex;
-    return gMutex;
 }
 
 OUString SvtUserOptions::GetCompany        () const { return GetToken(UserOptToken::Company); }
@@ -307,37 +309,37 @@ OUString SvtUserOptions::GetEncryptionKey  () const { return GetToken(UserOptTok
 
 bool SvtUserOptions::IsTokenReadonly (UserOptToken nToken) const
 {
-    osl::MutexGuard aGuard(GetInitMutex());
+    std::unique_lock aGuard(GetInitMutex());
     return xImpl->IsTokenReadonly(nToken);
 }
 
 OUString SvtUserOptions::GetToken (UserOptToken nToken) const
 {
-    osl::MutexGuard aGuard(GetInitMutex());
+    std::unique_lock aGuard(GetInitMutex());
     return xImpl->GetToken(nToken);
 }
 
 void SvtUserOptions::SetToken (UserOptToken nToken, OUString const& rNewToken)
 {
-    osl::MutexGuard aGuard(GetInitMutex());
+    std::unique_lock aGuard(GetInitMutex());
     xImpl->SetToken(nToken, rNewToken);
 }
 
 void SvtUserOptions::SetBoolValue (UserOptToken nToken, bool bNewValue)
 {
-    osl::MutexGuard aGuard(GetInitMutex());
+    std::unique_lock aGuard(GetInitMutex());
     xImpl->SetBoolValue(nToken, bNewValue);
 }
 
 bool SvtUserOptions::GetEncryptToSelf() const
 {
-    osl::MutexGuard aGuard(GetInitMutex());
+    std::unique_lock aGuard(GetInitMutex());
     return xImpl->GetBoolValue(UserOptToken::EncryptToSelf);
 }
 
 OUString SvtUserOptions::GetFullName () const
 {
-    osl::MutexGuard aGuard(GetInitMutex());
+    std::unique_lock aGuard(GetInitMutex());
     return xImpl->GetFullName();
 }
 

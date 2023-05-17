@@ -30,10 +30,16 @@
 #include <com/sun/star/awt/XSimpleTabController.hpp>
 #include <com/sun/star/awt/XTextArea.hpp>
 #include <com/sun/star/awt/XTimeField.hpp>
+#include <com/sun/star/awt/grid/XGridControl.hpp>
+#include <com/sun/star/awt/grid/XGridRowSelection.hpp>
+#include <com/sun/star/awt/grid/XGridDataListener.hpp>
+#include <com/sun/star/awt/grid/GridDataEvent.hpp>
+#include <com/sun/star/awt/grid/XGridSelectionListener.hpp>
+#include <com/sun/star/container/XContainerListener.hpp>
 #include <com/sun/star/util/Time.hpp>
 #include <com/sun/star/util/Date.hpp>
 
-#include <svl/numuno.hxx>
+#include <cppuhelper/implbase.hxx>
 #include <tools/lineend.hxx>
 
 #include <awt/vclxtopwindow.hxx>
@@ -68,21 +74,12 @@ private:
 };
 
 //  class VCLXMessageBox
-class VCLXMessageBox final : public css::awt::XMessageBox,
-                        public VCLXTopWindow
+class VCLXMessageBox final :
+                        public cppu::ImplInheritanceHelper<VCLXTopWindow, css::awt::XMessageBox>
 {
 public:
                         VCLXMessageBox();
                         virtual ~VCLXMessageBox() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
 
     // css::awt::XMessageBox
@@ -107,13 +104,6 @@ public:
     VCLXFrame();
     virtual ~VCLXFrame() override;
 
-    // css::uno::XInterface
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
-
     // css::awt::XView
     void SAL_CALL draw( sal_Int32 nX, sal_Int32 nY ) override;
 
@@ -125,21 +115,11 @@ public:
 };
 
 //  class VCLXDialog
-class VCLXDialog final : public css::awt::XDialog2,
-                    public VCLXTopWindow
+class VCLXDialog final : public cppu::ImplInheritanceHelper<VCLXTopWindow, css::awt::XDialog2>
 {
 public:
                         VCLXDialog();
                         virtual ~VCLXDialog() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XDialog2
     virtual void SAL_CALL endDialog( ::sal_Int32 Result ) override;
@@ -171,13 +151,6 @@ public:
                         VCLXTabPage();
                         virtual ~VCLXTabPage() override;
 
-    // css::uno::XInterface
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
-
     // css::awt::XView
     void SAL_CALL draw( sal_Int32 nX, sal_Int32 nY ) override;
 
@@ -190,7 +163,8 @@ public:
     virtual void    GetPropertyIds( std::vector< sal_uInt16 > &aIds ) override { return ImplGetPropertyIds( aIds ); }
 };
 
-class VCLXMultiPage final : public css::awt::XSimpleTabController, public VCLXContainer
+class VCLXMultiPage final :
+    public cppu::ImplInheritanceHelper<VCLXContainer, css::awt::XSimpleTabController>
 {
     TabListenerMultiplexer maTabListeners;
     sal_Int32 mTabId;
@@ -199,14 +173,6 @@ class VCLXMultiPage final : public css::awt::XSimpleTabController, public VCLXCo
 public:
     VCLXMultiPage();
     virtual ~VCLXMultiPage() override;
-
-    // css::uno::XInterface
-    css::uno::Any SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void SAL_CALL acquire() noexcept override { OWeakObject::acquire(); }
-    void SAL_CALL release() noexcept override { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< sal_Int8 > SAL_CALL getImplementationId() override;
 
     // css::lang::XComponent
     void SAL_CALL dispose(  ) override;
@@ -237,10 +203,11 @@ public:
     virtual void    GetPropertyIds( std::vector< sal_uInt16 > &aIds ) override { return ImplGetPropertyIds( aIds ); }
 };
 
-class VCLXMultiLineEdit final : public css::awt::XTextComponent,
-                            public css::awt::XTextArea,
-                            public css::awt::XTextLayoutConstrains,
-                            public VCLXWindow
+class VCLXMultiLineEdit final : public cppu::ImplInheritanceHelper<
+                            VCLXWindow,
+                            css::awt::XTextComponent,
+                            css::awt::XTextArea,
+                            css::awt::XTextLayoutConstrains>
 {
 private:
     TextListenerMultiplexer maTextListeners;
@@ -251,15 +218,6 @@ private:
 public:
                     VCLXMultiLineEdit();
                     virtual ~VCLXMultiLineEdit() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                           SAL_CALL acquire() noexcept override  { VCLXWindow::acquire(); }
-    void                           SAL_CALL release() noexcept override  { VCLXWindow::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XTextComponent
     void SAL_CALL addTextListener( const css::uno::Reference< css::awt::XTextListener >& l ) override;
@@ -299,8 +257,7 @@ public:
 };
 
 //  class VCLXProgressBar
-class VCLXProgressBar final : public css::awt::XProgressBar
-                            , public VCLXWindow
+class VCLXProgressBar final : public cppu::ImplInheritanceHelper<VCLXWindow, css::awt::XProgressBar>
 {
 private:
     sal_Int32   m_nValue;
@@ -312,15 +269,6 @@ private:
 public:
                     VCLXProgressBar();
                     virtual ~VCLXProgressBar() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                           SAL_CALL acquire() noexcept override  { VCLXWindow::acquire(); }
-    void                           SAL_CALL release() noexcept override  { VCLXWindow::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XProgressBar
     void SAL_CALL setForegroundColor( sal_Int32 nColor ) override;
@@ -367,23 +315,14 @@ public:
 
 //  class VCLXDateField
 
-class VCLXDateField : public css::awt::XDateField,
-                        public VCLXFormattedSpinField
+class VCLXDateField :
+    public cppu::ImplInheritanceHelper<VCLXFormattedSpinField, css::awt::XDateField>
 {
 protected:
     virtual css::uno::Reference< css::accessibility::XAccessibleContext > CreateAccessibleContext() override;
 public:
                     VCLXDateField();
                     virtual ~VCLXDateField() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
 
     // css::awt::XDateField
@@ -415,22 +354,13 @@ public:
 
 //  class VCLXTimeField
 
-class VCLXTimeField final : public css::awt::XTimeField,
-                        public VCLXFormattedSpinField
+class VCLXTimeField final :
+    public cppu::ImplInheritanceHelper<VCLXFormattedSpinField, css::awt::XTimeField>
 {
     virtual css::uno::Reference< css::accessibility::XAccessibleContext > CreateAccessibleContext() override;
 public:
                     VCLXTimeField();
                     virtual ~VCLXTimeField() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XTimeField
     void SAL_CALL setTime( const css::util::Time& Time ) override;
@@ -459,21 +389,12 @@ public:
 
 //  class VCLXNumericField
 
-class VCLXNumericField final : public css::awt::XNumericField,
-                            public VCLXFormattedSpinField
+class VCLXNumericField final :
+    public cppu::ImplInheritanceHelper<VCLXFormattedSpinField, css::awt::XNumericField>
 {
 public:
                     VCLXNumericField();
                     virtual ~VCLXNumericField() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XNumericField
     void SAL_CALL setValue( double Value ) override;
@@ -506,8 +427,8 @@ public:
 
 class MetricFormatter;
 class MetricField;
-class VCLXMetricField final : public css::awt::XMetricField,
-                        public VCLXFormattedSpinField
+class VCLXMetricField final :
+    public cppu::ImplInheritanceHelper<VCLXFormattedSpinField, css::awt::XMetricField>
 {
     /// @throws css::uno::RuntimeException
     MetricFormatter *GetMetricFormatter();
@@ -517,15 +438,6 @@ class VCLXMetricField final : public css::awt::XMetricField,
 public:
     VCLXMetricField();
     virtual ~VCLXMetricField() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XMetricField
     virtual void SAL_CALL setValue( ::sal_Int64 Value, ::sal_Int16 Unit ) override;
@@ -556,21 +468,12 @@ public:
 };
 
 //  class VCLXPatternField
-class VCLXPatternField final :  public css::awt::XPatternField,
-                            public VCLXFormattedSpinField
+class VCLXPatternField final :
+    public cppu::ImplInheritanceHelper<VCLXFormattedSpinField, css::awt::XPatternField>
 {
 public:
                     VCLXPatternField();
                     virtual ~VCLXPatternField() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                                        SAL_CALL acquire() noexcept override  { OWeakObject::acquire(); }
-    void                                        SAL_CALL release() noexcept override  { OWeakObject::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
 
     // css::awt::XPatternField
@@ -590,7 +493,7 @@ public:
 };
 
 
-class VCLXFileControl final : public css::awt::XTextComponent, public css::awt::XTextLayoutConstrains, public VCLXWindow
+class VCLXFileControl final : public cppu::ImplInheritanceHelper<VCLXWindow, css::awt::XTextComponent, css::awt::XTextLayoutConstrains>
 {
     DECL_LINK(ModifyHdl, Edit&, void);
     void ModifyHdl();
@@ -601,15 +504,6 @@ public:
                     virtual ~VCLXFileControl() override;
 
     virtual void SetWindow( const VclPtr< vcl::Window > &pWindow ) override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                           SAL_CALL acquire() noexcept override  { VCLXWindow::acquire(); }
-    void                           SAL_CALL release() noexcept override  { VCLXWindow::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XTextComponent
     void SAL_CALL addTextListener( const css::uno::Reference< css::awt::XTextListener >& l ) override;
@@ -640,20 +534,12 @@ public:
     virtual void    GetPropertyIds( std::vector< sal_uInt16 > &aIds ) override { return ImplGetPropertyIds( aIds ); }
 };
 
-class SVTXCurrencyField final : public css::awt::XCurrencyField, public SVTXFormattedField
+class SVTXCurrencyField final :
+    public cppu::ImplInheritanceHelper<SVTXFormattedField, css::awt::XCurrencyField>
 {
 public:
                     SVTXCurrencyField();
                     virtual ~SVTXCurrencyField() override;
-
-    // css::uno::XInterface
-    css::uno::Any                  SAL_CALL queryInterface( const css::uno::Type & rType ) override;
-    void                           SAL_CALL acquire() noexcept override  { SVTXFormattedField::acquire(); }
-    void                           SAL_CALL release() noexcept override  { SVTXFormattedField::release(); }
-
-    // css::lang::XTypeProvider
-    css::uno::Sequence< css::uno::Type >  SAL_CALL getTypes() override;
-    css::uno::Sequence< sal_Int8 >                     SAL_CALL getImplementationId() override;
 
     // css::awt::XVclWindowPeer
     void SAL_CALL setProperty( const OUString& PropertyName, const css::uno::Any& Value ) override;
@@ -693,6 +579,82 @@ public:
 
     static void     ImplGetPropertyIds( std::vector< sal_uInt16 > &aIds );
     virtual void    GetPropertyIds( std::vector< sal_uInt16 > &aIds ) override { return ImplGetPropertyIds( aIds ); }
+};
+
+namespace svt::table {
+    class TableControl;
+    class UnoControlTableModel;
+}
+
+typedef ::cppu::ImplInheritanceHelper  <   VCLXWindow
+                                        ,   css::awt::grid::XGridControl
+                                        ,   css::awt::grid::XGridRowSelection
+                                        ,   css::awt::grid::XGridDataListener
+                                        ,   css::container::XContainerListener
+                                        >   SVTXGridControl_Base;
+class SVTXGridControl final : public SVTXGridControl_Base
+{
+public:
+    SVTXGridControl();
+    virtual ~SVTXGridControl() override;
+
+    // XGridDataListener
+    virtual void SAL_CALL rowsInserted( const css::awt::grid::GridDataEvent& Event ) override;
+    virtual void SAL_CALL rowsRemoved( const css::awt::grid::GridDataEvent& Event ) override;
+    virtual void SAL_CALL dataChanged( const css::awt::grid::GridDataEvent& Event ) override;
+    virtual void SAL_CALL rowHeadingChanged( const css::awt::grid::GridDataEvent& Event ) override;
+
+    // XContainerListener
+    virtual void SAL_CALL elementInserted( const css::container::ContainerEvent& Event ) override;
+    virtual void SAL_CALL elementRemoved( const css::container::ContainerEvent& Event ) override;
+    virtual void SAL_CALL elementReplaced( const css::container::ContainerEvent& Event ) override;
+
+    // XEventListener
+    virtual void SAL_CALL disposing( const css::lang::EventObject& Source ) override;
+
+    // XGridControl
+    virtual ::sal_Int32 SAL_CALL getRowAtPoint(::sal_Int32 x, ::sal_Int32 y) override;
+    virtual ::sal_Int32 SAL_CALL getColumnAtPoint(::sal_Int32 x, ::sal_Int32 y) override;
+    virtual ::sal_Int32 SAL_CALL getCurrentColumn(  ) override;
+    virtual ::sal_Int32 SAL_CALL getCurrentRow(  ) override;
+    virtual void SAL_CALL goToCell( ::sal_Int32 i_columnIndex, ::sal_Int32 i_rowIndex ) override;
+
+    // XGridRowSelection
+    virtual void SAL_CALL selectRow( ::sal_Int32 i_rowIndex ) override;
+    virtual void SAL_CALL selectAllRows() override;
+    virtual void SAL_CALL deselectRow( ::sal_Int32 i_rowIndex ) override;
+    virtual void SAL_CALL deselectAllRows() override;
+    virtual css::uno::Sequence< ::sal_Int32 > SAL_CALL getSelectedRows() override;
+    virtual sal_Bool SAL_CALL hasSelectedRows() override;
+    virtual sal_Bool SAL_CALL isRowSelected(::sal_Int32 index) override;
+    virtual void SAL_CALL addSelectionListener(const css::uno::Reference< css::awt::grid::XGridSelectionListener > & listener) override;
+    virtual void SAL_CALL removeSelectionListener(const css::uno::Reference< css::awt::grid::XGridSelectionListener > & listener) override;
+
+    void SAL_CALL setProperty( const OUString& PropertyName, const css::uno::Any& Value ) override;
+    css::uno::Any SAL_CALL getProperty( const OUString& PropertyName ) override;
+
+    // css::lang::XComponent
+    void SAL_CALL dispose(  ) override;
+
+    // XWindow
+    void SAL_CALL setEnable( sal_Bool bEnable ) override;
+
+private:
+    // VCLXWindow
+    virtual void    SetWindow( const VclPtr< vcl::Window > &pWindow ) override;
+
+    void    impl_updateColumnsFromModel_nothrow();
+    void    impl_checkTableModelInit();
+
+    void    impl_checkColumnIndex_throw( ::svt::table::TableControl const & i_table, sal_Int32 const i_columnIndex ) const;
+    void    impl_checkRowIndex_throw( ::svt::table::TableControl const & i_table, sal_Int32 const i_rowIndex ) const;
+
+    virtual void    ProcessWindowEvent( const VclWindowEvent& rVclWindowEvent ) override;
+    void            ImplCallItemListeners();
+
+    std::shared_ptr< ::svt::table::UnoControlTableModel >   m_xTableModel;
+    bool                                                    m_bTableModelInitCompleted;
+    SelectionListenerMultiplexer                            m_aSelectionListeners;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

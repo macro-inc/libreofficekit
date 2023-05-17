@@ -7,34 +7,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <memory>
 #include <swmodeltestbase.hxx>
 
 #include <com/sun/star/graphic/GraphicType.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
-#include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/style/CaseMap.hpp>
 #include <com/sun/star/style/LineSpacing.hpp>
 #include <com/sun/star/style/LineSpacingMode.hpp>
 #include <com/sun/star/style/ParagraphAdjust.hpp>
-#include <com/sun/star/table/BorderLine2.hpp>
-#include <com/sun/star/table/BorderLineStyle.hpp>
 #include <com/sun/star/text/TableColumnSeparator.hpp>
-#include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/text/XFootnotesSupplier.hpp>
 #include <com/sun/star/text/XTextGraphicObjectsSupplier.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/text/XTextFramesSupplier.hpp>
 #include <com/sun/star/text/XTextRangeCompare.hpp>
 #include <com/sun/star/text/XTextTablesSupplier.hpp>
-#include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/text/WrapTextMode.hpp>
 #include <com/sun/star/text/HoriOrientation.hpp>
 #include <com/sun/star/util/XNumberFormatsSupplier.hpp>
 
-#include <rtl/ustring.hxx>
 #include <tools/UnitConversion.hxx>
-#include <vcl/outdev.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -376,7 +368,7 @@ DECLARE_RTFEXPORT_TEST(testFdo48037, "fdo48037.rtf")
 DECLARE_RTFEXPORT_TEST(testFdo47764, "fdo47764.rtf")
 {
     // \cbpat with zero argument should mean the auto (-1) color, not a default color (black)
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(-1), getProperty<sal_Int32>(getParagraph(1), "ParaBackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_AUTO, getProperty<Color>(getParagraph(1), "ParaBackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo38786, "fdo38786.rtf")
@@ -417,8 +409,7 @@ DECLARE_RTFEXPORT_TEST(testFdo49271, "fdo49271.rtf")
 DECLARE_RTFEXPORT_TEST(testFdo50539, "fdo50539.rtf")
 {
     // \chcbpat with zero argument should mean the auto (-1) color, not a default color (black)
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(-1),
-                         getProperty<sal_Int32>(getRun(getParagraph(1), 1), "CharBackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_AUTO, getProperty<Color>(getRun(getParagraph(1), 1), "CharBackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo50665, "fdo50665.rtf")
@@ -460,18 +451,10 @@ DECLARE_RTFEXPORT_TEST(testFdo46966, "fdo46966.rtf")
 DECLARE_RTFEXPORT_TEST(testFdo76633, "fdo76633.rtf")
 {
     // check that there is only a graphic object, not an additional rectangle
+    CPPUNIT_ASSERT_EQUAL(1, getShapes());
     uno::Reference<lang::XServiceInfo> xShape(getShape(1), uno::UNO_QUERY);
     CPPUNIT_ASSERT(xShape.is());
     CPPUNIT_ASSERT(xShape->supportsService("com.sun.star.text.TextGraphicObject"));
-    try
-    {
-        getShape(2);
-        CPPUNIT_FAIL("exception expected");
-    }
-    catch (lang::IndexOutOfBoundsException const&)
-    {
-        /* expected */
-    }
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo48033, "fdo48033.rtf")
@@ -580,8 +563,7 @@ DECLARE_RTFEXPORT_TEST(testFdo62805, "fdo62805.rtf")
 DECLARE_RTFEXPORT_TEST(testFdo52475, "fdo52475.rtf")
 {
     // The problem was that \chcbpat0 resulted in no color, instead of COL_AUTO.
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(-1),
-                         getProperty<sal_Int32>(getRun(getParagraph(1), 3), "CharBackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_AUTO, getProperty<Color>(getRun(getParagraph(1), 3), "CharBackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo55493, "fdo55493.rtf")
@@ -593,7 +575,7 @@ DECLARE_RTFEXPORT_TEST(testFdo55493, "fdo55493.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testCopyPastePageStyle)
 {
-    load(mpTestDocumentPath, "copypaste-pagestyle.rtf");
+    createSwDoc("copypaste-pagestyle.rtf");
     // The problem was that RTF import during copy&paste did not ignore page styles.
     // Once we have more copy&paste tests, makes sense to refactor this to some helper method.
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
@@ -609,7 +591,7 @@ CPPUNIT_TEST_FIXTURE(Test, testCopyPastePageStyle)
 
 CPPUNIT_TEST_FIXTURE(Test, testCopyPasteFootnote)
 {
-    load(mpTestDocumentPath, "copypaste-footnote.rtf");
+    createSwDoc("copypaste-footnote.rtf");
     // The RTF import did not handle the case when the position wasn't the main document XText, but something different, e.g. a footnote.
     uno::Reference<text::XFootnotesSupplier> xFootnotesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xFootnotes = xFootnotesSupplier->getFootnotes();
@@ -621,7 +603,7 @@ CPPUNIT_TEST_FIXTURE(Test, testCopyPasteFootnote)
 
 CPPUNIT_TEST_FIXTURE(Test, testFdo63428)
 {
-    load(mpTestDocumentPath, "hello.rtf");
+    createSwDoc("hello.rtf");
     // Pasting content that contained an annotation caused a crash.
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextRange> xText = xTextDocument->getText();
@@ -647,7 +629,7 @@ DECLARE_RTFEXPORT_TEST(testFdo69384, "fdo69384-paste.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testFdo69384Inserted)
 {
-    load(mpTestDocumentPath, "hello.rtf");
+    createSwDoc("hello.rtf");
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextRange> xText = xTextDocument->getText();
     uno::Reference<text::XTextRange> xEnd = xText->getEnd();
@@ -662,7 +644,7 @@ CPPUNIT_TEST_FIXTURE(Test, testFdo69384Inserted)
 
 CPPUNIT_TEST_FIXTURE(Test, testFdo61193)
 {
-    load(mpTestDocumentPath, "hello.rtf");
+    createSwDoc("hello.rtf");
     // Pasting content that contained a footnote caused a crash.
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextRange> xText = xTextDocument->getText();
@@ -672,7 +654,7 @@ CPPUNIT_TEST_FIXTURE(Test, testFdo61193)
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf108123)
 {
-    load(mpTestDocumentPath, "hello.rtf");
+    createSwDoc("hello.rtf");
     // This crashed, the shape push/pop and table manager stack went out of
     // sync -> we tried to de-reference an empty stack.
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
@@ -694,7 +676,7 @@ DECLARE_RTFEXPORT_TEST(testDoDhgt, "do-dhgt.rtf")
     CPPUNIT_ASSERT_EQUAL(3, nShapes);
     for (int i = 0; i < nShapes; ++i)
     {
-        sal_Int32 nFillColor = getProperty<sal_Int32>(getShape(i + 1), "FillColor");
+        Color nFillColor = getProperty<Color>(getShape(i + 1), "FillColor");
         if (nFillColor == 0xc0504d) // red
             CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(getShape(i + 1), "ZOrder"));
         else if (nFillColor == 0x9bbb59) // green
@@ -909,7 +891,7 @@ DECLARE_RTFEXPORT_TEST(testFdo60722, "fdo60722.rtf")
     // Color of the line was blue, and it had zero width.
     xShape.set(getShape(3), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_uInt32(26), getProperty<sal_uInt32>(xShape, "LineWidth"));
-    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), getProperty<sal_uInt32>(xShape, "LineColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(xShape, "LineColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testDoDhgtOld, "do-dhgt-old.rtf")
@@ -922,8 +904,7 @@ DECLARE_RTFEXPORT_TEST(testDoDhgtOld, "do-dhgt-old.rtf")
 
     xShape.set(getShape(2), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_Int32(1), getProperty<sal_Int32>(xShape, "ZOrder"));
-    CPPUNIT_ASSERT_EQUAL(COL_BLACK,
-                         Color(ColorTransparency, getProperty<sal_uInt32>(xShape, "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(xShape, "FillColor"));
 
     xShape.set(getShape(3), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_Int32(2), getProperty<sal_Int32>(xShape, "ZOrder"));
@@ -936,8 +917,7 @@ DECLARE_RTFEXPORT_TEST(testFdo61909, "fdo61909.rtf")
     // Was the Writer default font.
     CPPUNIT_ASSERT_EQUAL(OUString("Courier New"),
                          getProperty<OUString>(xTextRange, "CharFontName"));
-    CPPUNIT_ASSERT_EQUAL(
-        COL_AUTO, Color(ColorTransparency, getProperty<sal_uInt32>(xTextRange, "CharBackColor")));
+    CPPUNIT_ASSERT_EQUAL(COL_AUTO, getProperty<Color>(xTextRange, "CharBackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo62288, "fdo62288.rtf")

@@ -16,10 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __com_sun_star_lang_Locale_idl__
-#define __com_sun_star_lang_Locale_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
 
 
 
@@ -79,8 +75,10 @@ published struct Locale
         field is empty. </p>
 
         <p>You can find BCP 47 language tag resources at <br/>
-        <a href="http://www.langtag.net/">
-        <code>http://www.langtag.net/</code></a>. </p>
+        <a href="https://en.wikipedia.org/wiki/IETF_language_tag">
+        <code>https://en.wikipedia.org/wiki/IETF_language_tag</code></a> and
+        <a href="https://www.w3.org/International/articles/language-tags/">
+        <code>https://www.w3.org/International/articles/language-tags/</code></a>. </p>
 
         <p>Earlier versions of the documentation mentioned "vendor and
         browser-specific" codes but that was never supported. Use of any
@@ -95,7 +93,5 @@ published struct Locale
 
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

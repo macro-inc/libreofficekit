@@ -42,7 +42,7 @@
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <rtl/math.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/bitmapex.hxx>
 #include <vcl/BitmapTools.hxx>
 #include <vcl/canvastools.hxx>
@@ -1175,8 +1175,13 @@ constexpr OUStringLiteral PARAMETRICPOLYPOLYGON_IMPLEMENTATION_NAME = u"Canvas::
             cairo_rectangle( mpCairo.get(), 0, 0, aBitmapSize.Width, aBitmapSize.Height );
             cairo_clip( mpCairo.get() );
 
-            int nPixelWidth = std::round(rSize.Width * aMatrix.xx);
-            int nPixelHeight = std::round(rSize.Height * aMatrix.yy);
+            // Use cairo_matrix_transform_distance() to determine the scaling, as that works even if
+            // the matrix also has rotation.
+            double fPixelWidth = rSize.Width;
+            double fPixelHeight = rSize.Height;
+            cairo_matrix_transform_distance(&aMatrix, &fPixelWidth, &fPixelHeight);
+            int nPixelWidth = std::round(fPixelWidth);
+            int nPixelHeight = std::round(fPixelHeight);
             if (std::abs(nPixelWidth) > 0 && std::abs(nPixelHeight) > 0)
             {
                 // Only render the image if it's at least 1x1 px sized.
@@ -2015,25 +2020,25 @@ constexpr OUStringLiteral PARAMETRICPOLYPOLYGON_IMPLEMENTATION_NAME = u"Canvas::
     {
         SAL_INFO( "canvas.cairo", "CanvasHelper::repaint");
 
-        if( mpCairo )
-        {
-            cairo_save( mpCairo.get() );
+        if( !mpCairo )
+            return true;
 
-            cairo_rectangle( mpCairo.get(), 0, 0, maSize.getX(), maSize.getY() );
-            cairo_clip( mpCairo.get() );
+        cairo_save( mpCairo.get() );
 
-            useStates( viewState, renderState, true );
+        cairo_rectangle( mpCairo.get(), 0, 0, maSize.getX(), maSize.getY() );
+        cairo_clip( mpCairo.get() );
 
-            cairo_matrix_t aMatrix;
+        useStates( viewState, renderState, true );
 
-            cairo_get_matrix( mpCairo.get(), &aMatrix );
-            aMatrix.xx = aMatrix.yy = 1;
-            cairo_set_matrix( mpCairo.get(), &aMatrix );
+        cairo_matrix_t aMatrix;
 
-            cairo_set_source_surface( mpCairo.get(), pSurface->getCairoSurface().get(), 0, 0 );
-            cairo_paint( mpCairo.get() );
-            cairo_restore( mpCairo.get() );
-        }
+        cairo_get_matrix( mpCairo.get(), &aMatrix );
+        aMatrix.xx = aMatrix.yy = 1;
+        cairo_set_matrix( mpCairo.get(), &aMatrix );
+
+        cairo_set_source_surface( mpCairo.get(), pSurface->getCairoSurface().get(), 0, 0 );
+        cairo_paint( mpCairo.get() );
+        cairo_restore( mpCairo.get() );
 
         return true;
     }

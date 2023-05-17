@@ -21,7 +21,8 @@
 #include <chartview/ExplicitScaleValues.hxx>
 #include <basegfx/vector/b2dvector.hxx>
 #include <com/sun/star/drawing/PointSequenceSequence.hpp>
-
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 #include <vector>
 
 namespace chart { struct AxisProperties; }
@@ -35,7 +36,7 @@ struct TickInfo
 {
     double      fScaledTickValue;
     css::uno::Reference<css::chart2::XScaling> xInverseScaling;
-    css::uno::Reference<css::drawing::XShape> xTextShape;
+    rtl::Reference<SvxShapeText> xTextShape;
     OUString aText;//used only for complex categories so far
     ::basegfx::B2DVector  aTickScreenPosition;
     sal_Int32 nFactorForLimitedTextWidth;//categories in higher levels of complex categories can have more place than a single simple category
@@ -43,7 +44,7 @@ struct TickInfo
 
 //methods:
     TickInfo() = delete;
-    explicit TickInfo( const css::uno::Reference<css::chart2::XScaling>& xInverse );
+    explicit TickInfo( css::uno::Reference<css::chart2::XScaling> xInverse );
 
     /**
      * Return a value associated with the tick mark. It's normally an original
@@ -82,8 +83,8 @@ class TickFactory
 {
 public:
     TickFactory(
-         const ExplicitScaleData& rScale
-        , const ExplicitIncrementData& rIncrement );
+         ExplicitScaleData aScale
+        , ExplicitIncrementData aIncrement );
     virtual ~TickFactory();
 
     void getAllTicks( TickInfoArraysType& rAllTickInfos ) const;

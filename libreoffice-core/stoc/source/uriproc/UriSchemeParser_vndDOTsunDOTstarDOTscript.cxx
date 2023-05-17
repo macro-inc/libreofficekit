@@ -28,12 +28,12 @@
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
-#include <osl/mutex.hxx>
 #include <rtl/character.hxx>
 #include <rtl/uri.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
+#include <o3tl/safeint.hxx>
 
 #include <string_view>
 
@@ -50,8 +50,8 @@ int getHexWeight(sal_Unicode c) {
         : -1;
 }
 
-int parseEscaped(OUString const & part, sal_Int32 * index) {
-    if (part.getLength() - *index < 3 || part[*index] != '%') {
+int parseEscaped(std::u16string_view part, sal_Int32 * index) {
+    if (part.size() - *index < 3 || part[*index] != '%') {
         return -1;
     }
     int n1 = getHexWeight(part[*index + 1]);
@@ -64,10 +64,10 @@ int parseEscaped(OUString const & part, sal_Int32 * index) {
 }
 
 OUString parsePart(
-    OUString const & part, bool namePart, sal_Int32 * index)
+    std::u16string_view part, bool namePart, sal_Int32 * index)
 {
     OUStringBuffer buf(64);
-    while (*index < part.getLength()) {
+    while (o3tl::make_unsigned(*index) < part.size()) {
         sal_Unicode c = part[*index];
         if (namePart ? c == '?' : c == '&' || c == '=') {
             break;
@@ -115,14 +115,7 @@ OUString parsePart(
                 {
                     break;
                 }
-                if (encoded <= 0xFFFF) {
-                    buf.append(static_cast< sal_Unicode >(encoded));
-                } else {
-                    buf.append(static_cast< sal_Unicode >(
-                        (encoded >> 10) | 0xD800));
-                    buf.append(static_cast< sal_Unicode >(
-                        (encoded & 0x3FF) | 0xDC00));
-                }
+                buf.appendUtf32(encoded);
             } else {
                 break;
             }
@@ -136,47 +129,32 @@ OUString parsePart(
 }
 
 OUString encodeNameOrParamFragment(OUString const & fragment) {
-    static sal_Bool const nameOrParamFragment[] = {
-        false, false, false, false, false, false, false, false,
-        false, false, false, false, false, false, false, false,
-        false, false, false, false, false, false, false, false,
-        false, false, false, false, false, false, false, false,
-        false,  true, false, false,  true, false, false,  true,  //  !"#$%&'
-         true,  true,  true,  true,  true,  true,  true, false,  // ()*+,-./
-         true,  true,  true,  true,  true,  true,  true,  true,  // 01234567
-         true,  true,  true,  true, false, false, false, false,  // 89:;<=>?
-         true,  true,  true,  true,  true,  true,  true,  true,  // @ABCDEFG
-         true,  true,  true,  true,  true,  true,  true,  true,  // HIJKLMNO
-         true,  true,  true,  true,  true,  true,  true,  true,  // PQRSTUVW
-         true,  true,  true,  true, false,  true, false,  true,  // XYZ[\]^_
-        false,  true,  true,  true,  true,  true,  true,  true,  // `abcdefg
-         true,  true,  true,  true,  true,  true,  true,  true,  // hijklmno
-         true,  true,  true,  true,  true,  true,  true,  true,  // pqrstuvw
-         true,  true,  true, false, false, false,  true, false}; // xyz{|}~
+    static constexpr auto nameOrParamFragment = rtl::createUriCharClass(
+        u8"!$'()*+,-.0123456789:;@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]_abcdefghijklmnopqrstuvwxyz~");
     return rtl::Uri::encode(
-        fragment, nameOrParamFragment, rtl_UriEncodeIgnoreEscapes,
+        fragment, nameOrParamFragment.data(), rtl_UriEncodeIgnoreEscapes,
         RTL_TEXTENCODING_UTF8);
 }
 
-bool parseSchemeSpecificPart(OUString const & part) {
-    sal_Int32 len = part.getLength();
+bool parseSchemeSpecificPart(std::u16string_view part) {
+    size_t len = part.size();
     sal_Int32 i = 0;
     if (parsePart(part, true, &i).isEmpty() || part[0] == '/') {
         return false;
     }
-    if (i == len) {
+    if (o3tl::make_unsigned(i) == len) {
         return true;
     }
     for (;;) {
         ++i; // skip '?' or '&'
-        if (parsePart(part, false, &i).isEmpty() || i == len
+        if (parsePart(part, false, &i).isEmpty() || o3tl::make_unsigned(i) == len
             || part[i] != '=')
         {
             return false;
         }
         ++i;
         parsePart(part, false, &i);
-        if (i == len) {
+        if (o3tl::make_unsigned(i) == len) {
             return true;
         }
         if (part[i] != '&') {

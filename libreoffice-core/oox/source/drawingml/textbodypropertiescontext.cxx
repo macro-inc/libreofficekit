@@ -20,9 +20,11 @@
 #include <drawingml/textbodypropertiescontext.hxx>
 
 #include <com/sun/star/text/WritingMode.hpp>
+#include <com/sun/star/text/WritingMode2.hpp>
 #include <com/sun/star/drawing/TextFitToSizeType.hpp>
 #include <com/sun/star/drawing/TextHorizontalAdjust.hpp>
 #include <com/sun/star/text/XTextColumns.hpp>
+
 #include <drawingml/textbodyproperties.hxx>
 #include <drawingml/textbody.hxx>
 #include <drawingml/customshapegeometry.hxx>
@@ -66,16 +68,12 @@ TextBodyPropertiesContext::TextBodyPropertiesContext( ContextHandler2Helper cons
     // ST_Coordinate
     OUString sValue;
     sal_Int32 aIns[] = { XML_lIns, XML_tIns, XML_rIns, XML_bIns };
-    for( sal_Int32 i = 0; i < sal_Int32(SAL_N_ELEMENTS( aIns )); i++)
+    for( sal_Int32 i = 0; i < sal_Int32(std::size( aIns )); i++)
     {
-        sValue = rAttribs.getString( aIns[i] ).get();
+        sValue = rAttribs.getStringDefaulted( aIns[i] );
         if( !sValue.isEmpty() )
             mrTextBodyProp.moInsets[i] = GetCoordinate( sValue );
     }
-
-    mrTextBodyProp.mbAnchorCtr = rAttribs.getBool( XML_anchorCtr, false );
-    if( mrTextBodyProp.mbAnchorCtr )
-        mrTextBodyProp.maPropertyMap.setProperty( PROP_TextHorizontalAdjust, TextHorizontalAdjust_CENTER );
 
 //   bool bCompatLineSpacing = rAttribs.getBool( XML_compatLnSpc, false );
 //   bool bForceAA = rAttribs.getBool( XML_forceAA, false );
@@ -83,9 +81,21 @@ TextBodyPropertiesContext::TextBodyPropertiesContext( ContextHandler2Helper cons
     mrTextBodyProp.maPropertyMap.setProperty(PROP_FromWordArt, bFromWordArt);
 
   // ST_TextHorzOverflowType
-    mrTextBodyProp.msHorzOverflow = rAttribs.getString(XML_horzOverflow, "");
+    mrTextBodyProp.msHorzOverflow = rAttribs.getStringDefaulted(XML_horzOverflow);
     // ST_TextVertOverflowType
-    mrTextBodyProp.msVertOverflow = rAttribs.getString(XML_vertOverflow, "");
+    if( rAttribs.hasAttribute(XML_vertOverflow) )
+    {
+        mrTextBodyProp.moVertOverflow = rAttribs.getToken(XML_vertOverflow);
+        switch( mrTextBodyProp.moVertOverflow.value_or(XML_overflow) )
+        {
+            case XML_ellipsis:
+            case XML_clip:
+                mrTextBodyProp.maPropertyMap.setProperty(PROP_TextClipVerticalOverflow, true);
+                break;
+            default:
+                break;
+        }
+    }
 
     // ST_TextColumnCount
     if (const sal_Int32 nColumns = rAttribs.getInteger(XML_numCol, 0); nColumns > 0)
@@ -102,7 +112,8 @@ TextBodyPropertiesContext::TextBodyPropertiesContext( ContextHandler2Helper cons
     }
 
     // ST_Angle
-    mrTextBodyProp.moRotation = rAttribs.getInteger( XML_rot );
+    if (rAttribs.getInteger(XML_rot).has_value())
+        mrTextBodyProp.moTextAreaRotation = rAttribs.getInteger(XML_rot).value();
 
 //   bool bRtlCol = rAttribs.getBool( XML_rtlCol, false );
     // ST_PositiveCoordinate
@@ -116,23 +127,75 @@ TextBodyPropertiesContext::TextBodyPropertiesContext( ContextHandler2Helper cons
     // ST_TextVerticalType
     if( rAttribs.hasAttribute( XML_vert ) ) {
         mrTextBodyProp.moVert = rAttribs.getToken( XML_vert );
-        sal_Int32 tVert = mrTextBodyProp.moVert.get( XML_horz );
-        if (tVert == XML_vert || tVert == XML_eaVert || tVert == XML_mongolianVert)
-            mrTextBodyProp.moRotation = 5400000;
+        sal_Int32 tVert = mrTextBodyProp.moVert.value_or( XML_horz );
+        if (tVert == XML_eaVert)
+        {
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_TextWritingMode, WritingMode_TB_RL);
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_WritingMode, text::WritingMode2::TB_RL);
+        }
+        else if (tVert == XML_vert)
+        {
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_WritingMode, text::WritingMode2::TB_RL90);
+        }
+        else if (tVert == XML_mongolianVert)
+        {
+            // rendering not yet implemented for shape text, only for frames
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_WritingMode, text::WritingMode2::TB_LR);
+        }
         else if (tVert == XML_vert270)
-            mrTextBodyProp.moRotation = 5400000 * 3;
+        {
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_WritingMode, text::WritingMode2::BT_LR);
+        }
         else {
             bool bRtl = rAttribs.getBool( XML_rtl, false );
             mrTextBodyProp.maPropertyMap.setProperty( PROP_TextWritingMode,
                 ( bRtl ? WritingMode_RL_TB : WritingMode_LR_TB ));
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_WritingMode,
+                ( bRtl ? text::WritingMode2::RL_TB : text::WritingMode2::LR_TB));
         }
     }
 
     // ST_TextAnchoringType
-    if( rAttribs.hasAttribute( XML_anchor ) )
+    mrTextBodyProp.mbAnchorCtr = rAttribs.getBool(XML_anchorCtr, false );
+    if (rAttribs.hasAttribute(XML_anchor))
+        mrTextBodyProp.meVA = GetTextVerticalAdjust( rAttribs.getToken(XML_anchor, XML_t));
+    // else meVA is initialized to TextVerticalAdjust_TOP
+
+    sal_Int32 tVert = mrTextBodyProp.moVert.value_or(XML_horz);
+    if (tVert == XML_eaVert || tVert == XML_mongolianVert)
     {
-        mrTextBodyProp.meVA = GetTextVerticalAdjust( rAttribs.getToken( XML_anchor, XML_t ) );
-        mrTextBodyProp.maPropertyMap.setProperty( PROP_TextVerticalAdjust, mrTextBodyProp.meVA);
+        if (mrTextBodyProp.mbAnchorCtr)
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_TextVerticalAdjust,
+                                                     TextVerticalAdjust_CENTER);
+        else
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_TextVerticalAdjust,
+                                                     TextVerticalAdjust_TOP);
+
+        if (mrTextBodyProp.meVA == TextVerticalAdjust_CENTER)
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_TextHorizontalAdjust,
+                                                     TextHorizontalAdjust_CENTER);
+        else if (mrTextBodyProp.meVA == TextVerticalAdjust_TOP)
+        {
+            mrTextBodyProp.maPropertyMap.setProperty(
+                PROP_TextHorizontalAdjust,
+                tVert == XML_eaVert ? TextHorizontalAdjust_RIGHT : TextHorizontalAdjust_LEFT);
+        }
+        else // meVA == TextVerticalAdjust_BOTTOM
+        {
+            mrTextBodyProp.maPropertyMap.setProperty(
+                PROP_TextHorizontalAdjust,
+                tVert == XML_eaVert ? TextHorizontalAdjust_LEFT : TextHorizontalAdjust_RIGHT);
+        }
+    }
+    else
+    {
+        if (mrTextBodyProp.mbAnchorCtr)
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_TextHorizontalAdjust,
+                                                     TextHorizontalAdjust_CENTER);
+        else // BLOCK is nearer to rendering in MS Office than LEFT, see tdf#137023
+            mrTextBodyProp.maPropertyMap.setProperty(PROP_TextHorizontalAdjust,
+                                                     TextHorizontalAdjust_BLOCK);
+        mrTextBodyProp.maPropertyMap.setProperty(PROP_TextVerticalAdjust, mrTextBodyProp.meVA);
     }
 
     // Push defaults
@@ -148,10 +211,10 @@ ContextHandlerRef TextBodyPropertiesContext::onCreateContext( sal_Int32 aElement
             case A_TOKEN( prstTxWarp ):     // CT_PresetTextShape
                 if( mpShapePtr )
                 {
-                    const OptValue<OUString> sPrst = rAttribs.getString( XML_prst );
-                    if( sPrst.has() )
+                    const std::optional<OUString> sPrst = rAttribs.getString( XML_prst );
+                    if( sPrst.has_value() )
                     {
-                        mrTextBodyProp.msPrst = sPrst.get();
+                        mrTextBodyProp.msPrst = sPrst.value();
                         if( mrTextBodyProp.msPrst != "textNoShape" )
                             return new PresetTextShapeContext( *this, rAttribs,
                                                            *( mpShapePtr->getCustomShapeProperties() ) );
@@ -175,7 +238,7 @@ ContextHandlerRef TextBodyPropertiesContext::onCreateContext( sal_Int32 aElement
             }
             case A_TOKEN( spAutoFit ):
                 {
-                    const sal_Int32 tVert = mrTextBodyProp.moVert.get( XML_horz );
+                    const sal_Int32 tVert = mrTextBodyProp.moVert.value_or( XML_horz );
                     if( tVert != XML_vert && tVert != XML_eaVert && tVert != XML_vert270 && tVert != XML_mongolianVert )
                         mrTextBodyProp.maPropertyMap.setProperty( PROP_TextAutoGrowHeight, true);
                 }

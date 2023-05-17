@@ -82,7 +82,7 @@ void DrawViewShell::GetFormTextState(SfxItemSet& rSet)
     if ( rMarkList.GetMarkCount() == 1 )
         pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
 
-    const SdrTextObj* pTextObj = dynamic_cast< const SdrTextObj* >(pObj);
+    const SdrTextObj* pTextObj = DynCastSdrTextObj(pObj);
     const bool bDeactivate(
         !pObj ||
         !pTextObj ||
@@ -175,11 +175,11 @@ void DrawViewShell::GetAnimationWinState( SfxItemSet& rSet )
     {
         const SdrObject* pObj = rMarkList.GetMark( 0 )->GetMarkedSdrObj();
         SdrInventor nInv = pObj->GetObjInventor();
-        sal_uInt16  nId  = pObj->GetObjIdentifier();
+        SdrObjKind  nId  = pObj->GetObjIdentifier();
         // 1 selected group object
-        if( nInv == SdrInventor::Default && nId == OBJ_GRUP )
+        if( nInv == SdrInventor::Default && nId == SdrObjKind::Group )
             nValue = 3;
-        else if( nInv == SdrInventor::Default && nId == OBJ_GRAF ) // Animated GIF ?
+        else if( nInv == SdrInventor::Default && nId == SdrObjKind::Graphic ) // Animated GIF ?
         {
             sal_uInt16 nCount = 0;
 
@@ -268,8 +268,7 @@ void DrawViewShell::ExecBmpMask( SfxRequest const & rReq )
 
             if ( pObj && !mpDrawView->IsTextEdit() )
             {
-                typedef std::unique_ptr< SdrGrafObj, SdrObjectFreeOp > SdrGrafObjPtr;
-                SdrGrafObjPtr xNewObj(pObj->CloneSdrObject(pObj->getSdrModelFromSdrObject()));
+                rtl::Reference<SdrGrafObj> xNewObj(SdrObject::Clone(*pObj, pObj->getSdrModelFromSdrObject()));
                 bool bCont = true;
 
                 if (xNewObj->IsLinkedGraphic())
@@ -303,7 +302,7 @@ void DrawViewShell::ExecBmpMask( SfxRequest const & rReq )
                             " " + SdResId(STR_EYEDROPPER);
 
                         mpDrawView->BegUndo( aStr );
-                        mpDrawView->ReplaceObjectAtView(pObj, *pPV, xNewObj.release());
+                        mpDrawView->ReplaceObjectAtView(pObj, *pPV, xNewObj.get());
                         mpDrawView->EndUndo();
                     }
                 }

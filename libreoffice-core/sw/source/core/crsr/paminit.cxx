@@ -24,23 +24,25 @@
 const SwMoveFnCollection aFwrd = {
     /* fnNd         */  &GoNext,
     /* fnNds        */  &GoNextNds,
+    /* fnPos        */  &GoNextPos,
     /* fnDoc        */  &GoEndDoc,
     /* fnSections   */  &GoEndSection,
     /* fnCmpOp      */  &SwPosition::operator<,
     /* fnGetHint    */  &GetFrwrdTextHint,
     /* fnSearch     */  &utl::TextSearch::SearchForward,
-    /* fnSection    */  &SwNodes::GoStartOfSection
+    /* fnSection    */  &GoStartOfSection
 };
 
 const SwMoveFnCollection aBwrd = {
     /* fnNd         */  &GoPrevious,
     /* fnNds        */  &GoPreviousNds,
+    /* fnPos        */  &GoPreviousPos,
     /* fnDoc        */  &GoStartDoc,
     /* fnSections   */  &GoStartSection,
     /* fnCmpOp      */  &SwPosition::operator>,
     /* fnGetHint    */  &GetBkwrdTextHint,
     /* fnSearch     */  &utl::TextSearch::SearchBackward,
-    /* fnSection    */  &SwNodes::GoEndOfSection
+    /* fnSection    */  &GoEndOfSection
 };
 
 SwMoveFnCollection const & fnParaStart   = aFwrd;

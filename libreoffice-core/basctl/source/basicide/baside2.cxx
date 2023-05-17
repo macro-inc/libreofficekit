@@ -38,7 +38,7 @@
 #include <com/sun/star/script/ModuleType.hpp>
 #include <com/sun/star/ui/dialogs/ExtendedFilePickerElementIds.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
-#include <com/sun/star/ui/dialogs/FilePicker.hpp>
+#include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
 #include <com/sun/star/ui/dialogs/XFilePickerControlAccess.hpp>
 #include <comphelper/SetFlagContextHelper.hxx>
 #include <comphelper/string.hxx>
@@ -56,6 +56,7 @@
 #include <svl/whiter.hxx>
 #include <svx/svxids.hrc>
 #include <tools/debug.hxx>
+#include <utility>
 #include <vcl/locktoplevels.hxx>
 #include <vcl/errinf.hxx>
 #include <vcl/event.hxx>
@@ -182,7 +183,7 @@ void lcl_ConvertTabsToSpaces( OUString& rLine )
             OUStringBuffer aBlanker;
             string::padToLength(aBlanker, ( 4 - ( nPos % 4 ) ), ' ');
             aResult.remove( nPos, 1 );
-            aResult.insert( nPos, aBlanker.makeStringAndClear() );
+            aResult.insert( nPos, aBlanker );
             nMax = aResult.getLength();
         }
         ++nPos;
@@ -193,12 +194,12 @@ void lcl_ConvertTabsToSpaces( OUString& rLine )
 } // namespace
 
 ModulWindow::ModulWindow (ModulWindowLayout* pParent, ScriptDocument const& rDocument,
-                          const OUString& aLibName, const OUString& aName, OUString const & aModule)
+                          const OUString& aLibName, const OUString& aName, OUString aModule)
     : BaseWindow(pParent, rDocument, aLibName, aName)
     , m_rLayout(*pParent)
     , m_nValid(ValidWindow)
     , m_aXEditorWindow(VclPtr<ComplexEditorWindow>::Create(this))
-    , m_aModule(aModule)
+    , m_aModule(std::move(aModule))
 {
     m_aXEditorWindow->Show();
     SetBackground();
@@ -254,9 +255,6 @@ void ModulWindow::GetFocus()
 
 void ModulWindow::DoInit()
 {
-    if (GetVScrollBar())
-        GetVScrollBar()->Hide();
-    GetHScrollBar()->Show();
     GetEditorWindow().InitScrollBars();
 }
 
@@ -459,7 +457,6 @@ void ModulWindow::LoadBasic()
 
 void ModulWindow::SaveBasicSource()
 {
-    Reference< uno::XComponentContext > xContext( ::comphelper::getProcessComponentContext() );
     sfx2::FileDialogHelper aDlg(ui::dialogs::TemplateDescription::FILESAVE_AUTOEXTENSION_PASSWORD,
                                 FileDialogFlags::NONE, this->GetFrameWeld());
     aDlg.SetContext(sfx2::FileDialogHelper::BasicExportSource);
@@ -1164,7 +1161,7 @@ void ModulWindow::GetState( SfxItemSet &rSet )
     }
 }
 
-void ModulWindow::DoScroll( ScrollBar* pCurScrollBar )
+void ModulWindow::DoScroll( Scrollable* pCurScrollBar )
 {
     if ( ( pCurScrollBar == GetHScrollBar() ) && GetEditView() )
     {
@@ -1584,7 +1581,7 @@ void ModulWindowLayout::SyntaxColors::NewConfig (bool bFirst)
     }
 
     bool bChanged = false;
-    for (unsigned i = 0; i != SAL_N_ELEMENTS(vIds); ++i)
+    for (unsigned i = 0; i != std::size(vIds); ++i)
     {
         Color const aColor = aConfig.GetColorValue(vIds[i].eEntry).nColor;
         Color& rMyColor = aColors[vIds[i].eTokenType];

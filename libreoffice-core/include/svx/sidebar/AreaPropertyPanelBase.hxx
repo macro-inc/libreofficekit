@@ -24,6 +24,7 @@
 #include <sfx2/sidebar/ControllerItem.hxx>
 #include <svx/colorbox.hxx>
 #include <svx/xgrad.hxx>
+#include <svx/xfilluseslidebackgrounditem.hxx>
 #include <svx/xfillit0.hxx>
 #include <svx/xflclit.hxx>
 #include <svx/xflgrit.hxx>
@@ -35,6 +36,7 @@
 
 class ToolbarUnoDispatcher;
 class XFillFloatTransparenceItem;
+class XFillUseSlideBackgroundItem;
 class XFillTransparenceItem;
 class XFillStyleItem;
 class XFillGradientItem;
@@ -84,6 +86,7 @@ public:
     virtual void setFillStyleAndGradient(const XFillStyleItem* pStyleItem, const XFillGradientItem& aGradientItem) = 0;
     virtual void setFillStyleAndHatch(const XFillStyleItem* pStyleItem, const XFillHatchItem& aHatchItem) = 0;
     virtual void setFillStyleAndBitmap(const XFillStyleItem* pStyleItem, const XFillBitmapItem& aHatchItem) = 0;
+    virtual void setFillUseBackground(const XFillStyleItem* pStyleItem, const XFillUseSlideBackgroundItem& rItem) = 0;
 
     void updateFillTransparence(bool bDisabled, bool bDefaultOrSet, const SfxPoolItem* pState);
     void updateFillFloatTransparence(bool bDisabled, bool bDefaultOrSet, const SfxPoolItem* pState);
@@ -92,6 +95,7 @@ public:
     void updateFillHatch(bool bDisabled, bool bDefaultOrSet, const SfxPoolItem* pState);
     void updateFillColor(bool bDefaultOrSet, const SfxPoolItem* pState);
     void updateFillBitmap(bool BDisabled, bool bDefaultOrSet, const SfxPoolItem* pState);
+    void updateFillUseBackground(bool BDisabled, bool bDefaultOrSet, const SfxPoolItem* pState);
 
 private:
     void Initialize();
@@ -147,6 +151,9 @@ protected:
     std::unique_ptr< XFillFloatTransparenceItem >   mpFloatTransparenceItem;
     std::unique_ptr< SfxUInt16Item >                mpTransparenceItem;
 
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops maColorStops;
+
     DECL_DLLPRIVATE_LINK(SelectFillTypeHdl, weld::ComboBox&, void );
     DECL_DLLPRIVATE_LINK(SelectFillAttrHdl, weld::ComboBox&, void );
     DECL_DLLPRIVATE_LINK(SelectFillColorHdl, ColorListBox&, void);
@@ -157,10 +164,13 @@ protected:
     DECL_DLLPRIVATE_LINK(ClickImportBitmapHdl, weld::Button&, void);
     DECL_DLLPRIVATE_LINK(ToolbarHdl_Impl, const OString&, void);
 
-    void Update();
     void ImpUpdateTransparencies();
     void SetTransparency(sal_uInt16 nVal);
     void SelectFillAttrHdl_Impl();
+    void FillStyleChanged(bool bUpdateModel);
+
+    // MCGR: Preserve in-between ColorStops until we have an UI to edit these
+    basegfx::ColorStops createColorStops();
 };
 
 } // end of namespace svx::sidebar

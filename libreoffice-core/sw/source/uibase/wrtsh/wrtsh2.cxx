@@ -28,6 +28,7 @@
 #include <sfx2/viewfrm.hxx>
 #include <sot/exchange.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 #include <fmtinfmt.hxx>
 #include <wrtsh.hxx>
 #include <docsh.hxx>
@@ -88,7 +89,7 @@ bool SwWrtShell::InsertField2(SwField const& rField, SwPaM* pAnnotationRange)
             if ( IsTableMode() )
             {
                 GetTableCrs()->Normalize( false );
-                const SwPosition rStartPos( *(GetTableCrs()->GetMark()->nNode.GetNode().GetContentNode()), 0 );
+                const SwPosition rStartPos( *(GetTableCrs()->GetMark()->GetNode().GetContentNode()), 0 );
                 KillPams();
                 if ( !IsEndOfPara() )
                 {
@@ -124,9 +125,8 @@ bool SwWrtShell::InsertField2(SwField const& rField, SwPaM* pAnnotationRange)
                 // Annotation range was passed in externally, and inserting the postit field shifted
                 // its start/end positions right by one. Restore the original position for the range
                 // start. This allows commenting on the placeholder character of the field.
-                SwIndex& rRangeStart = pAnnotationTextRange->Start()->nContent;
-                if (rRangeStart.GetIndex() > 0)
-                    --rRangeStart;
+                if (pAnnotationTextRange->Start()->GetContentIndex() > 0)
+                    pAnnotationTextRange->Start()->AdjustContent(-1);
             }
             IDocumentMarkAccess* pMarksAccess = GetDoc()->getIDocumentMarkAccess();
             pMarksAccess->makeAnnotationMark( *pAnnotationTextRange, OUString() );
@@ -346,7 +346,7 @@ void SwWrtShell::ClickToField(const SwField& rField, bool bExecHyperlinks)
     if (SwFieldIds::GetRef != rField.GetTyp()->Which())
     {
         StartAllAction();
-        Right( CRSR_SKIP_CHARS, true, 1, false ); // Select the field.
+        Right( SwCursorSkipMode::Chars, true, 1, false ); // Select the field.
         NormalizePam();
         EndAllAction();
     }
@@ -596,10 +596,10 @@ void SwWrtShell::NavigatorPaste( const NaviContentBookmark& rBkmk,
     else
     {
         SwSectionData aSection( SectionType::FileLink, GetUniqueSectionName() );
-        OUString aLinkFile = rBkmk.GetURL().getToken(0, '#')
+        OUString aLinkFile = o3tl::getToken(rBkmk.GetURL(), 0, '#')
             + OUStringChar(sfx2::cTokenSeparator)
             + OUStringChar(sfx2::cTokenSeparator)
-            + rBkmk.GetURL().getToken(1, '#');
+            + o3tl::getToken(rBkmk.GetURL(), 1, '#');
         aSection.SetLinkFileName( aLinkFile );
         aSection.SetProtectFlag( true );
         const SwSection* pIns = InsertSection( aSection );

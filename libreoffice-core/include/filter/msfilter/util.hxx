@@ -84,7 +84,7 @@ public:
  *
  * Example: SEQ "Figure" \someoption -> "Figure"
  */
-MSFILTER_DLLPUBLIC OUString findQuotedText( const OUString& rCommand, const char* cStartQuote, const sal_Unicode uEndQuote );
+MSFILTER_DLLPUBLIC std::u16string_view findQuotedText( std::u16string_view rCommand, const char* cStartQuote, const sal_Unicode uEndQuote );
 
 class MSFILTER_DLLPUBLIC WW8ReadFieldParams
 {
@@ -94,7 +94,7 @@ private:
     sal_Int32 nNext;
     sal_Int32 nSavPtr;
 public:
-    WW8ReadFieldParams( const OUString& rData );
+    WW8ReadFieldParams( OUString aData );
 
     bool GoToTokenParam();
     sal_Int32 SkipToNextToken();
@@ -115,10 +115,10 @@ struct MSFILTER_DLLPUBLIC EquationResult
 MSFILTER_DLLPUBLIC EquationResult ParseCombinedChars(const OUString& rStr);
 
 /// Similar to EnhancedCustomShapeTypeNames::Get(), but it also supports OOXML types and returns a drawingML string.
-MSFILTER_DLLPUBLIC const char* GetOOXMLPresetGeometry( const char* sShapeType );
+MSFILTER_DLLPUBLIC OString GetOOXMLPresetGeometry( std::u16string_view rShapeType );
 
 /// Similar to EnhancedCustomShapeTypeNames::Get(), but returns an MSO_SPT (binary / VML type).
-MSFILTER_DLLPUBLIC MSO_SPT GETVMLShapeType(const OString& aType);
+MSFILTER_DLLPUBLIC MSO_SPT GETVMLShapeType(std::u16string_view aType);
 
 /**
  * The following function checks if a MSO shapetype is allowed to have textboxcontent.

@@ -42,7 +42,7 @@ XmlTestTools::XmlTestTools()
 XmlTestTools::~XmlTestTools()
 {}
 
-xmlDocUniquePtr XmlTestTools::parseXml(utl::TempFile const & aTempFile)
+xmlDocUniquePtr XmlTestTools::parseXml(utl::TempFileNamed const & aTempFile)
 {
     SvFileStream aFileStream(aTempFile.GetURL(), StreamMode::READ);
     return parseXmlStream(&aFileStream);
@@ -88,11 +88,7 @@ OUString XmlTestTools::getXPath(const xmlDocUniquePtr& pXmlDoc, const OString& r
     xmlNodeSetPtr pXmlNodes = pXmlObj->nodesetval;
     CPPUNIT_ASSERT_EQUAL_MESSAGE(OString(OString::Concat("In <") + pXmlDoc->name + ">, XPath '" + rXPath + "' number of nodes is incorrect").getStr(),
                                  1, xmlXPathNodeSetGetLength(pXmlNodes));
-    if (rAttribute.isEmpty())
-    {
-        xmlXPathFreeObject(pXmlObj);
-        return OUString();
-    }
+    CPPUNIT_ASSERT(!rAttribute.isEmpty());
     xmlNodePtr pXmlNode = pXmlNodes->nodeTab[0];
     xmlChar * prop = xmlGetProp(pXmlNode, BAD_CAST(rAttribute.getStr()));
     OString sAttAbsent = OString::Concat("In <") + pXmlDoc->name + ">, XPath '" + rXPath
@@ -160,11 +156,6 @@ OUString XmlTestTools::getXPathContent(const xmlDocUniquePtr& pXmlDoc, const OSt
     }
 
     CPPUNIT_FAIL("Invalid XPath type");
-}
-
-void XmlTestTools::assertXPath(const xmlDocUniquePtr& pXmlDoc, const OString& rXPath)
-{
-    getXPath(pXmlDoc, rXPath, ""); // it asserts that rXPath exists, and returns exactly one node
 }
 
 void XmlTestTools::assertXPath(const xmlDocUniquePtr& pXmlDoc, const OString& rXPath, const OString& rAttribute, const OUString& rExpectedValue)

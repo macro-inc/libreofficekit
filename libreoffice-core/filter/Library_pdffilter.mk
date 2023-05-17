@@ -19,7 +19,7 @@
 
 $(eval $(call gb_Library_Library,pdffilter))
 
-$(eval $(call gb_Library_set_componentfile,pdffilter,filter/source/pdf/pdffilter))
+$(eval $(call gb_Library_set_componentfile,pdffilter,filter/source/pdf/pdffilter,services))
 
 $(eval $(call gb_Library_use_external,pdffilter,boost_headers))
 
@@ -49,7 +49,9 @@ $(eval $(call gb_Library_use_libraries,pdffilter,\
 	cppuhelper \
 	cppu \
 	sal \
+	salhelper \
 	drawinglayer \
+	drawinglayercore \
 ))
 
 $(eval $(call gb_Library_add_exception_objects,pdffilter,\

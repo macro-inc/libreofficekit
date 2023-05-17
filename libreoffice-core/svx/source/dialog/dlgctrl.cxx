@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/virdev.hxx>
@@ -89,7 +91,9 @@ void SvxRectCtl::SetControlSettings(RectPoint eRpt, sal_uInt16 nBorder)
 SvxRectCtl::~SvxRectCtl()
 {
     pBitmap.reset();
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     pAccContext.clear();
+#endif
 }
 
 void SvxRectCtl::Resize()
@@ -415,11 +419,13 @@ void SvxRectCtl::GetFocus()
 {
     Invalidate();
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     // Send accessibility event.
     if (pAccContext.is())
     {
         pAccContext->FireChildFocus(GetActualRP());
     }
+#endif
 }
 
 void SvxRectCtl::LoseFocus()
@@ -499,9 +505,11 @@ void SvxRectCtl::SetActualRP( RectPoint eNewRP )
 
     Invalidate();
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     // notify accessibility object about change
     if (pAccContext.is())
         pAccContext->selectChild( eNewRP /* MT, bFireFocus */ );
+#endif
 }
 
 void SvxRectCtl::SetState( CTL_STATE nState )
@@ -552,7 +560,9 @@ tools::Rectangle SvxRectCtl::CalculateFocusRectangle( RectPoint eRectPoint ) con
 
 Reference< XAccessible > SvxRectCtl::CreateAccessible()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     pAccContext = new SvxRectCtlAccessibleContext(this);
+#endif
     return pAccContext;
 }
 
@@ -572,8 +582,10 @@ void SvxRectCtl::DoCompletelyDisable(bool bNew)
 
 css::uno::Reference< css::accessibility::XAccessible > SvxPixelCtl::CreateAccessible()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (!m_xAccess.is())
         m_xAccess = new SvxPixelCtlAccessible(this);
+#endif
     return m_xAccess;
 }
 
@@ -673,10 +685,14 @@ bool SvxPixelCtl::MouseButtonDown( const MouseEvent& rMEvt )
 
     tools::Long nIndex = ShowPosition(rMEvt.GetPosPixel());
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if(m_xAccess.is())
     {
         m_xAccess->NotifyChild(nIndex,true, true);
     }
+#else
+    (void)nIndex;
+#endif
 
     return true;
 }
@@ -816,6 +832,7 @@ bool SvxPixelCtl::KeyInput( const KeyEvent& rKEvt )
             default:
                 return CustomWidgetController::KeyInput( rKEvt );
         }
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         if(m_xAccess.is())
         {
             tools::Long nIndex = GetFocusPosIndex();
@@ -837,6 +854,9 @@ bool SvxPixelCtl::KeyInput( const KeyEvent& rKEvt )
                 break;
             }
         }
+#else
+        (void)bFocusPosChanged;
+#endif
         return true;
     }
     else
@@ -850,10 +870,12 @@ void SvxPixelCtl::GetFocus()
 {
     Invalidate(implCalFocusRect(aFocusPosition));
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (m_xAccess.is())
     {
         m_xAccess->NotifyChild(GetFocusPosIndex(),true,false);
     }
+#endif
 }
 
 void SvxPixelCtl::LoseFocus()
@@ -1097,10 +1119,7 @@ void SvxXLinePreview::Resize()
 }
 
 SvxXLinePreview::SvxXLinePreview()
-    : mpLineObjA(nullptr)
-    , mpLineObjB(nullptr)
-    , mpLineObjC(nullptr)
-    , mpGraphic(nullptr)
+    : mpGraphic(nullptr)
     , mbWithSymbol(false)
 {
 }
@@ -1109,9 +1128,9 @@ void SvxXLinePreview::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 {
     SvxPreviewBase::SetDrawingArea(pDrawingArea);
 
-    mpLineObjA = new SdrPathObj(getModel(), OBJ_LINE);
-    mpLineObjB = new SdrPathObj(getModel(), OBJ_PLIN);
-    mpLineObjC = new SdrPathObj(getModel(), OBJ_PLIN);
+    mpLineObjA = new SdrPathObj(getModel(), SdrObjKind::Line);
+    mpLineObjB = new SdrPathObj(getModel(), SdrObjKind::PolyLine);
+    mpLineObjC = new SdrPathObj(getModel(), SdrObjKind::PolyLine);
 
     Resize();
     Invalidate();
@@ -1119,12 +1138,6 @@ void SvxXLinePreview::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 
 SvxXLinePreview::~SvxXLinePreview()
 {
-    SdrObject *pFoo = mpLineObjA;
-    SdrObject::Free( pFoo );
-    pFoo = mpLineObjB;
-    SdrObject::Free( pFoo );
-    pFoo = mpLineObjC;
-    SdrObject::Free( pFoo );
 }
 
 void SvxXLinePreview::SetSymbol(Graphic* p,const Size& s)
@@ -1162,9 +1175,9 @@ void SvxXLinePreview::Paint(vcl::RenderContext& rRenderContext, const tools::Rec
 
     // paint objects to buffer device
     sdr::contact::SdrObjectVector aObjectVector;
-    aObjectVector.push_back(mpLineObjA);
-    aObjectVector.push_back(mpLineObjB);
-    aObjectVector.push_back(mpLineObjC);
+    aObjectVector.push_back(mpLineObjA.get());
+    aObjectVector.push_back(mpLineObjB.get());
+    aObjectVector.push_back(mpLineObjC.get());
 
     sdr::contact::ObjectContactOfObjListPainter aPainter(getBufferDevice(), std::move(aObjectVector), nullptr);
     sdr::contact::DisplayInfo aDisplayInfo;
@@ -1185,8 +1198,6 @@ void SvxXLinePreview::Paint(vcl::RenderContext& rRenderContext, const tools::Rec
 }
 
 SvxXShadowPreview::SvxXShadowPreview()
-    : mpRectangleObject(nullptr)
-    , mpRectangleShadow(nullptr)
 {
 }
 
@@ -1215,8 +1226,6 @@ void SvxXShadowPreview::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 
 SvxXShadowPreview::~SvxXShadowPreview()
 {
-    SdrObject::Free(mpRectangleObject);
-    SdrObject::Free(mpRectangleShadow);
 }
 
 void SvxXShadowPreview::SetRectangleAttributes(const SfxItemSet& rItemSet)
@@ -1255,8 +1264,8 @@ void SvxXShadowPreview::Paint(vcl::RenderContext& rRenderContext, const tools::R
 
     sdr::contact::SdrObjectVector aObjectVector;
 
-    aObjectVector.push_back(mpRectangleShadow);
-    aObjectVector.push_back(mpRectangleObject);
+    aObjectVector.push_back(mpRectangleShadow.get());
+    aObjectVector.push_back(mpRectangleObject.get());
 
     sdr::contact::ObjectContactOfObjListPainter aPainter(getBufferDevice(), std::move(aObjectVector), nullptr);
     sdr::contact::DisplayInfo aDisplayInfo;
@@ -1359,7 +1368,6 @@ void SvxPreviewBase::StyleUpdated()
 }
 
 SvxXRectPreview::SvxXRectPreview()
-    : mpRectangleObject(nullptr)
 {
 }
 
@@ -1380,19 +1388,18 @@ void SvxXRectPreview::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 
 void SvxXRectPreview::Resize()
 {
-    SdrObject *pOrigObject = mpRectangleObject;
+    rtl::Reference<SdrObject> pOrigObject = mpRectangleObject;
     if (pOrigObject)
     {
         mpRectangleObject = new SdrRectObj(getModel(), GetPreviewSize());
         SetAttributes(pOrigObject->GetMergedItemSet());
-        SdrObject::Free(pOrigObject);
+        pOrigObject.clear();
     }
     SvxPreviewBase::Resize();
 }
 
 SvxXRectPreview::~SvxXRectPreview()
 {
-    SdrObject::Free(mpRectangleObject);
 }
 
 void SvxXRectPreview::SetAttributes(const SfxItemSet& rItemSet)
@@ -1409,7 +1416,7 @@ void SvxXRectPreview::Paint(vcl::RenderContext& rRenderContext, const tools::Rec
 
     sdr::contact::SdrObjectVector aObjectVector;
 
-    aObjectVector.push_back(mpRectangleObject);
+    aObjectVector.push_back(mpRectangleObject.get());
 
     sdr::contact::ObjectContactOfObjListPainter aPainter(getBufferDevice(), std::move(aObjectVector), nullptr);
     sdr::contact::DisplayInfo aDisplayInfo;

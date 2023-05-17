@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 #include <basegfx/matrix/b2dhommatrix.hxx>
@@ -35,6 +35,7 @@
 #include "combtransition.hxx"
 #include <tools.hxx>
 #include <memory>
+#include <utility>
 
 
 /***************************************************
@@ -73,8 +74,8 @@ void fillPage( const ::cppcanvas::CanvasSharedPtr& rDestinationCanvas,
               ::basegfx::B2DRectangle(
                   aOutputPosPixel.getX(),
                   aOutputPosPixel.getY(),
-                  aOutputPosPixel.getX() + rPageSizePixel.getX(),
-                  aOutputPosPixel.getY() + rPageSizePixel.getY() ),
+                  aOutputPosPixel.getX() + rPageSizePixel.getWidth(),
+                  aOutputPosPixel.getY() + rPageSizePixel.getHeight() ),
               rFillColor.getIntegerColor() );
 }
 
@@ -84,8 +85,8 @@ class PluginSlideChange: public SlideChangeBase
     uno::Reference<presentation::XTransition> mxTransition;
     UnoViewSharedPtr mpView;
 
-    TransitionViewPair( uno::Reference<presentation::XTransition> const & xTransition, const UnoViewSharedPtr& rView )
-         : mxTransition(xTransition), mpView(rView)
+    TransitionViewPair( uno::Reference<presentation::XTransition> xTransition, UnoViewSharedPtr xView )
+         : mxTransition(std::move(xTransition)), mpView(std::move(xView))
     {
     }
 
@@ -113,8 +114,8 @@ public:
                        const SlideSharedPtr&                    pEnteringSlide,
                        const UnoViewContainer&                  rViewContainer,
                        ScreenUpdater&                           rScreenUpdater,
-                       const uno::Reference<
-                             presentation::XTransitionFactory>& xFactory,
+                       uno::Reference<
+                             presentation::XTransitionFactory>  xFactory,
                        const SoundPlayerSharedPtr&              pSoundPlayer,
                        EventMultiplexer&                        rEventMultiplexer) :
         SlideChangeBase( leavingSlide_,
@@ -128,7 +129,7 @@ public:
         mnTransitionType( nTransitionType ),
         mnTransitionSubType( nTransitionSubType ),
         mnTransitionFadeColor( rTransitionFadeColor ),
-        mxFactory( xFactory )
+        mxFactory(std::move( xFactory ))
     {
         // create one transition per view
         for( const auto& rView : rViewContainer )
@@ -618,7 +619,7 @@ void MovingSlideChange::performIn(
     rSprite->movePixel(
         aPageOrigin +
         ((t - 1.0) *
-         ::basegfx::B2DSize( getEnteringSlideSizePixel(rViewEntry.mpView) ) *
+         basegfx::B2DVector( getEnteringSlideSizePixel(rViewEntry.mpView) ) *
          maEnteringDirection) );
 }
 
@@ -649,7 +650,7 @@ void MovingSlideChange::performOut(
     // move sprite
     rSprite->movePixel(
         aPageOrigin + (t *
-                       ::basegfx::B2DSize( getEnteringSlideSizePixel(rViewEntry.mpView) ) *
+                       basegfx::B2DVector( getEnteringSlideSizePixel(rViewEntry.mpView) ) *
                        maLeavingDirection) );
 }
 

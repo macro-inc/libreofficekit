@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -34,12 +36,15 @@ class tdf46184(UITestCase):
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
-            self.assertEqual("Standard Filter...", get_state_as_dict(xMenu)['SelectEntryText'])
             xMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"RETURN"}))
+            xSubFloatWindow = self.xUITest.getFloatWindow()
+            xSubMenu = xSubFloatWindow.getChild("menu")
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"DOWN"}))
+            self.assertEqual("Standard Filter...", get_state_as_dict(xSubMenu)['SelectEntryText'])
+            xSubMenu.executeAction("TYPE", mkPropertyValues({"KEYCODE":"RETURN"}))
 
             xDialog = self.xUITest.getTopFocusWindow()
             xfield1 = xDialog.getChild("field1")

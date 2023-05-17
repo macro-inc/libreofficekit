@@ -55,7 +55,7 @@ void testDataBar_Impl(const ScDocument& rDoc)
     ScConditionalFormatList* pList = rDoc.GetCondFormList(0);
     CPPUNIT_ASSERT(pList);
 
-    for(size_t i = 0; i < SAL_N_ELEMENTS(aData); ++i)
+    for(size_t i = 0; i < std::size(aData); ++i)
     {
         ScConditionalFormatList::const_iterator itr = std::find_if(pList->begin(),
                 pList->end(), FindCondFormatByEnclosingRange(aData[i].aRange));
@@ -92,7 +92,7 @@ void testColorScale2Entry_Impl(const ScDocument& rDoc)
     const ScConditionalFormatList* pList = rDoc.GetCondFormList(0);
     CPPUNIT_ASSERT(pList);
 
-    for(size_t i = 0; i < SAL_N_ELEMENTS(aData2Entry); ++i)
+    for(size_t i = 0; i < std::size(aData2Entry); ++i)
     {
         ScConditionalFormatList::const_iterator itr = std::find_if(pList->begin(),
                             pList->end(), FindCondFormatByEnclosingRange(aData2Entry[i].aRange));
@@ -131,7 +131,7 @@ void testColorScale3Entry_Impl(const ScDocument& rDoc)
     ScConditionalFormatList* pList = rDoc.GetCondFormList(1);
     CPPUNIT_ASSERT(pList);
 
-    for(size_t i = 0; i < SAL_N_ELEMENTS(aData3Entry); ++i)
+    for(size_t i = 0; i < std::size(aData3Entry); ++i)
     {
         ScConditionalFormatList::const_iterator itr = std::find_if(pList->begin(),
                             pList->end(), FindCondFormatByEnclosingRange(aData3Entry[i].aRange));
@@ -152,6 +152,15 @@ void testColorScale3Entry_Impl(const ScDocument& rDoc)
         CPPUNIT_ASSERT(format_itr != pColFormat->end());
         CPPUNIT_ASSERT_EQUAL(aData3Entry[i].eUpperType, (*format_itr)->GetType());
     }
+}
+
+bool isFormulaWithoutError(ScDocument& rDoc, const ScAddress& rPos)
+{
+    ScFormulaCell* pFC = rDoc.GetFormulaCell(rPos);
+    if (!pFC)
+        return false;
+
+    return pFC->GetErrCode() == FormulaError::NONE;
 }
 
 void testFunctionsExcel2010_Impl( ScDocument& rDoc )
@@ -244,7 +253,7 @@ void testFunctionsExcel2010_Impl( ScDocument& rDoc )
         { 80, true  }
     };
 
-    for (size_t i=0; i < SAL_N_ELEMENTS(aTests); ++i)
+    for (size_t i=0; i < std::size(aTests); ++i)
     {
         if (aTests[i].bEvaluate)
         {
@@ -280,7 +289,7 @@ void testCeilingFloor_Impl( ScDocument& rDoc )
     static constexpr OUStringLiteral pORef = u"Sheet1.K1";
     ScAddress aPos;
     aPos.Parse(pORef, rDoc);
-    ASSERT_FORMULA_EQUAL(rDoc, aPos, "AND(K3:K81)", "Wrong formula.");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong formula.", OUString("=AND(K3:K81)"), rDoc.GetFormula(aPos.Col(), aPos.Row(), aPos.Tab()));
     CPPUNIT_ASSERT_MESSAGE( OUString( pORef + " result is error.").toUtf8().getStr(),
             isFormulaWithoutError( rDoc, aPos));
     CPPUNIT_ASSERT_EQUAL(1.0, rDoc.GetValue(aPos));

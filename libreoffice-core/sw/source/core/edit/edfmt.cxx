@@ -21,7 +21,6 @@
 #include <IDocumentStylePoolAccess.hxx>
 #include <editsh.hxx>
 #include <pam.hxx>
-#include <docary.hxx>
 #include <fchrfmt.hxx>
 #include <frmfmt.hxx>
 #include <charfmt.hxx>
@@ -41,10 +40,10 @@ SwCharFormat* SwEditShell::GetCurCharFormat() const
 {
     SwCharFormat *pFormat = nullptr;
     SfxItemSetFixed<RES_TXTATR_CHARFMT, RES_TXTATR_CHARFMT> aSet( GetDoc()->GetAttrPool() );
-    const SfxPoolItem* pItem;
-    if( GetCurAttr( aSet ) && SfxItemState::SET ==
-        aSet.GetItemState( RES_TXTATR_CHARFMT, false, &pItem ) )
-        pFormat = static_cast<const SwFormatCharFormat*>(pItem)->GetCharFormat();
+    const SwFormatCharFormat* pItem;
+    if( GetCurAttr( aSet ) &&
+        (pItem = aSet.GetItemIfSet( RES_TXTATR_CHARFMT, false ) ) )
+        pFormat = pItem->GetCharFormat();
 
     return pFormat;
 }
@@ -52,7 +51,7 @@ SwCharFormat* SwEditShell::GetCurCharFormat() const
 void SwEditShell::FillByEx(SwCharFormat* pCharFormat)
 {
     SwPaM* pPam = GetCursor();
-    const SwContentNode* pCNd = pPam->GetContentNode();
+    const SwContentNode* pCNd = pPam->GetPointContentNode();
     if( pCNd->IsTextNode() )
     {
         SwTextNode const*const pTextNode(pCNd->GetTextNode());
@@ -62,21 +61,21 @@ void SwEditShell::FillByEx(SwCharFormat* pCharFormat)
         {
             const SwPosition* pPtPos = pPam->GetPoint();
             const SwPosition* pMkPos = pPam->GetMark();
-            if( pPtPos->nNode == pMkPos->nNode )        // in the same node?
+            if( pPtPos->GetNode() == pMkPos->GetNode() )        // in the same node?
             {
-                nStt = pPtPos->nContent.GetIndex();
-                if( nStt < pMkPos->nContent.GetIndex() )
-                    nEnd = pMkPos->nContent.GetIndex();
+                nStt = pPtPos->GetContentIndex();
+                if( nStt < pMkPos->GetContentIndex() )
+                    nEnd = pMkPos->GetContentIndex();
                 else
                 {
                     nEnd = nStt;
-                    nStt = pMkPos->nContent.GetIndex();
+                    nStt = pMkPos->GetContentIndex();
                 }
             }
             else
             {
-                nStt = pMkPos->nContent.GetIndex();
-                if( pPtPos->nNode < pMkPos->nNode )
+                nStt = pMkPos->GetContentIndex();
+                if( pPtPos->GetNode() < pMkPos->GetNode() )
                 {
                     nEnd = nStt;
                     nStt = 0;
@@ -86,7 +85,7 @@ void SwEditShell::FillByEx(SwCharFormat* pCharFormat)
             }
         }
         else
-            nStt = nEnd = pPam->GetPoint()->nContent.GetIndex();
+            nStt = nEnd = pPam->GetPoint()->GetContentIndex();
 
         SfxItemSet aSet( mxDoc->GetAttrPool(),
                             pCharFormat->GetAttrSet().GetRanges() );

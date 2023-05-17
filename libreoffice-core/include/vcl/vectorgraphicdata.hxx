@@ -31,9 +31,6 @@
 #include <optional>
 
 namespace com::sun::star::graphic { class XPrimitive2D; }
-struct WmfExternal;
-
-typedef css::uno::Sequence<sal_Int8> VectorGraphicDataArray;
 
 
 // helper to convert any Primitive2DSequence to a good quality BitmapEx,
@@ -69,9 +66,6 @@ private:
     size_t                      mNestedBitmapSize;
     VectorGraphicDataType meType;
 
-    // extra:
-    std::unique_ptr<WmfExternal> mpExternalHeader;
-
     /// If the vector format has more pages this denotes which page to render
     sal_Int32 mnPageIndex;
 
@@ -91,16 +85,13 @@ private:
 public:
     VectorGraphicData(const OUString& rPath, VectorGraphicDataType eVectorDataType);
     VectorGraphicData(
-        const BinaryDataContainer& rDataContainer,
+        BinaryDataContainer aDataContainer,
         VectorGraphicDataType eVectorDataType,
         sal_Int32 nPageIndex = -1);
     ~VectorGraphicData();
 
     /// compare op
     bool operator==(const VectorGraphicData& rCandidate) const;
-
-    /// special: needed for emf/wmf, maybe replaced by scaling the result later (?)
-    void setWmfExternalHeader(const WmfExternal& aExtHeader);
 
     /// data read
     const BinaryDataContainer& getBinaryDataContainer() const

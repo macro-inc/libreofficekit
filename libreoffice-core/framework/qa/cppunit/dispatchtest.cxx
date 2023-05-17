@@ -8,16 +8,13 @@
  */
 
 #include <cppuhelper/implbase.hxx>
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 
 #include <com/sun/star/frame/Desktop.hpp>
-#include <com/sun/star/frame/DispatchHelper.hpp>
 #include <com/sun/star/frame/XDispatchProviderInterceptor.hpp>
 #include <com/sun/star/frame/XInterceptorInfo.hpp>
 #include <com/sun/star/util/URLTransformer.hpp>
 
-#include <comphelper/processfactory.hxx>
 #include <rtl/ref.hxx>
 
 using namespace ::com::sun::star;
@@ -135,50 +132,14 @@ uno::Reference<frame::XDispatch> MyInterceptor::queryDispatch(const util::URL& r
 }
 
 /// Tests how InterceptionHelper invokes a registered interceptor.
-class DispatchTest : public test::BootstrapFixture, public unotest::MacrosTest
+class DispatchTest : public UnoApiTest
 {
-protected:
-    uno::Reference<lang::XComponent> mxComponent;
-    void dispatchCommand(const uno::Reference<lang::XComponent>& xComponent,
-                         const OUString& rCommand,
-                         const uno::Sequence<beans::PropertyValue>& rPropertyValues);
-
 public:
-    virtual void setUp() override;
-    virtual void tearDown() override;
+    DispatchTest()
+        : UnoApiTest("/framework/qa/cppunit/data/")
+    {
+    }
 };
-
-void DispatchTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void DispatchTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-void DispatchTest::dispatchCommand(const uno::Reference<lang::XComponent>& xComponent,
-                                   const OUString& rCommand,
-                                   const uno::Sequence<beans::PropertyValue>& rPropertyValues)
-{
-    uno::Reference<frame::XController> xController
-        = uno::Reference<frame::XModel>(xComponent, uno::UNO_QUERY_THROW)->getCurrentController();
-    CPPUNIT_ASSERT(xController.is());
-    uno::Reference<frame::XDispatchProvider> xFrame(xController->getFrame(), uno::UNO_QUERY);
-    CPPUNIT_ASSERT(xFrame.is());
-
-    uno::Reference<uno::XComponentContext> xContext = ::comphelper::getProcessComponentContext();
-    uno::Reference<frame::XDispatchHelper> xDispatchHelper(frame::DispatchHelper::create(xContext));
-    CPPUNIT_ASSERT(xDispatchHelper.is());
-
-    xDispatchHelper->executeDispatch(xFrame, rCommand, OUString(), 0, rPropertyValues);
-}
 
 CPPUNIT_TEST_FIXTURE(DispatchTest, testInterception)
 {
@@ -202,13 +163,10 @@ CPPUNIT_TEST_FIXTURE(DispatchTest, testInterception)
     CPPUNIT_ASSERT_EQUAL(0, pInterceptor->getUnexpected());
 }
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/framework/qa/cppunit/data/";
-
 CPPUNIT_TEST_FIXTURE(DispatchTest, testSfxOfficeDispatchDispose)
 {
     // this test doesn't work with a new document because of aURL.Main check in SfxBaseController::dispatch()
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY) + "empty.fodp",
-                                  "com.sun.star.presentation.PresentationDocument");
+    loadFromURL(u"empty.fodp");
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
     CPPUNIT_ASSERT(xModel.is());
     uno::Reference<frame::XController> xController(xModel->getCurrentController());

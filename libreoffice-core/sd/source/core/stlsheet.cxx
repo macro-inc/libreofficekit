@@ -40,6 +40,7 @@
 
 #include <svx/xflbmtit.hxx>
 #include <svx/xflbstit.hxx>
+#include <svx/xlnclit.hxx>
 #include <editeng/bulletitem.hxx>
 #include <editeng/lrspitem.hxx>
 #include <svx/unoshprp.hxx>
@@ -52,7 +53,7 @@
 #include <svx/sdtaiitm.hxx>
 #include <svx/xit.hxx>
 #include <svx/xflclit.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <stlsheet.hxx>
 #include <sdresid.hxx>
 #include <sdpage.hxx>
@@ -106,7 +107,6 @@ static SvxItemPropertySet& GetStylePropertySet()
         { u"BottomBorder",                 SDRATTR_TABLE_BORDER,           ::cppu::UnoType<BorderLine>::get(), 0, BOTTOM_BORDER },
         { u"LeftBorder",                   SDRATTR_TABLE_BORDER,           ::cppu::UnoType<BorderLine>::get(), 0, LEFT_BORDER },
         { u"RightBorder",                  SDRATTR_TABLE_BORDER,           ::cppu::UnoType<BorderLine>::get(), 0, RIGHT_BORDER },
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
 
     static SvxItemPropertySet aPropSet( aFullPropertyMap_Impl, SdrObject::GetGlobalDrawObjectItemPool() );
@@ -310,11 +310,49 @@ bool SdStyleSheet::IsUsed() const
             bResult = std::any_of(aModifyListeners.begin(), aModifyListeners.end(),
                 [](const Reference<XInterface>& rListener) {
                     Reference< XStyle > xStyle( rListener, UNO_QUERY );
+                    try
+                    {
+                        Reference<XPropertySet> xPropertySet(xStyle, UNO_QUERY_THROW);
+                        if (xPropertySet->getPropertyValue("IsPhysical").get<bool>())
+                            return true;
+                    }
+                    catch (const Exception&)
+                    {
+                    }
                     return xStyle.is() && xStyle->isInUse();
                 });
         }
     }
     return bResult;
+}
+
+/**
+ * Checks if a cell style is used in two places at once.
+ * Typically we modify the formatting of a single place,
+ * so such style shouldn't be edited directly.
+ */
+bool SdStyleSheet::IsEditable()
+{
+    if (GetFamily() != SfxStyleFamily::Frame)
+        return true;
+
+    if (!IsUserDefined())
+        return false;
+
+    const size_t nListenerCount = GetSizeOfVector();
+    for (size_t n = 0; n < nListenerCount; ++n)
+    {
+        SfxListener* pListener = GetListener(n);
+        if (pListener == this)
+            continue;
+        if (dynamic_cast<SdStyleSheet*>(pListener))
+            return false;
+    }
+
+    MutexGuard aGuard(mrBHelper.rMutex);
+
+    auto pContainer = mrBHelper.getContainer(cppu::UnoType<XModifyListener>::get());
+    return !pContainer || pContainer->getLength() <= 1;
 }
 
 /**
@@ -402,7 +440,7 @@ SdStyleSheet* SdStyleSheet::GetRealStyleSheet() const
         sal_Int32 nPos = aStyleName.indexOf(aOutlineStr);
         if (nPos >= 0)
         {
-            OUString aNumStr(aStyleName.copy(aOutlineStr.getLength()));
+            std::u16string_view aNumStr(aStyleName.subView(aOutlineStr.getLength()));
             aInternalName = STR_LAYOUT_OUTLINE + aNumStr;
         }
     }
@@ -464,7 +502,7 @@ SdStyleSheet* SdStyleSheet::GetPseudoStyleSheet() const
         sal_Int32 nPos = aStyleName.indexOf(aOutlineStr);
         if (nPos != -1)
         {
-            OUString aNumStr(aStyleName.copy(aOutlineStr.getLength()));
+            std::u16string_view aNumStr(aStyleName.subView(aOutlineStr.getLength()));
             aStyleName = SdResId(STR_PSEUDOSHEET_OUTLINE) + aNumStr;
         }
     }
@@ -590,7 +628,7 @@ struct ApiNameMap
         { std::u16string_view(u"Title A4"), HID_POOLSHEET_A4_TITLE },
         { std::u16string_view(u"Heading A4"), HID_POOLSHEET_A4_HEADLINE },
         { std::u16string_view(u"Text A4"), HID_POOLSHEET_A4_TEXT },
-        { std::u16string_view(u"A4"), HID_POOLSHEET_A0 },
+        { std::u16string_view(u"A0"), HID_POOLSHEET_A0 },
         { std::u16string_view(u"Title A0"), HID_POOLSHEET_A0_TITLE },
         { std::u16string_view(u"Heading A0"), HID_POOLSHEET_A0_HEADLINE },
         { std::u16string_view(u"Text A0"), HID_POOLSHEET_A0_TEXT },
@@ -1321,7 +1359,7 @@ PropertyState SAL_CALL SdStyleSheet::getPropertyState( const OUString& PropertyN
                 if (pEntry->nMemberId == MID_COLOR_THEME_INDEX)
                 {
                     const XFillColorItem* pColor = rStyleSet.GetItem<XFillColorItem>(pEntry->nWID);
-                    if (pColor->GetThemeColor().GetThemeIndex() == -1)
+                    if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
                     {
                         eState = PropertyState_DEFAULT_VALUE;
                     }
@@ -1329,7 +1367,13 @@ PropertyState SAL_CALL SdStyleSheet::getPropertyState( const OUString& PropertyN
                 else if (pEntry->nMemberId == MID_COLOR_LUM_MOD)
                 {
                     const XFillColorItem* pColor = rStyleSet.GetItem<XFillColorItem>(pEntry->nWID);
-                    if (pColor->GetThemeColor().GetLumMod() == 10000)
+                    sal_Int16 nLumMod = 10000;
+                    for (auto const& rTransform : pColor->GetThemeColor().getTransformations())
+                    {
+                        if (rTransform.meType == model::TransformationType::LumMod)
+                            nLumMod = rTransform.mnValue;
+                    }
+                    if (nLumMod == 10000)
                     {
                         eState = PropertyState_DEFAULT_VALUE;
                     }
@@ -1337,7 +1381,31 @@ PropertyState SAL_CALL SdStyleSheet::getPropertyState( const OUString& PropertyN
                 else if (pEntry->nMemberId == MID_COLOR_LUM_OFF)
                 {
                     const XFillColorItem* pColor = rStyleSet.GetItem<XFillColorItem>(pEntry->nWID);
-                    if (pColor->GetThemeColor().GetLumOff() == 0)
+                    sal_Int16 nLumOff = 0;
+                    for (auto const& rTransform : pColor->GetThemeColor().getTransformations())
+                    {
+                        if (rTransform.meType == model::TransformationType::LumOff)
+                            nLumOff = rTransform.mnValue;
+                    }
+                    if (nLumOff == 0)
+                    {
+                        eState = PropertyState_DEFAULT_VALUE;
+                    }
+                }
+                else if (pEntry->nMemberId == MID_COLOR_THEME_REFERENCE)
+                {
+                    const XFillColorItem* pColor = rStyleSet.GetItem<XFillColorItem>(pEntry->nWID);
+                    if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
+                    {
+                        eState = PropertyState_DEFAULT_VALUE;
+                    }
+                }
+                break;
+            case XATTR_LINECOLOR:
+                if (pEntry->nMemberId == MID_COLOR_THEME_REFERENCE)
+                {
+                    auto const* pColor = rStyleSet.GetItem<XLineColorItem>(pEntry->nWID);
+                    if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
                     {
                         eState = PropertyState_DEFAULT_VALUE;
                     }

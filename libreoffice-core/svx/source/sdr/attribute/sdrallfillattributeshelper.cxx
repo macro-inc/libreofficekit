@@ -21,6 +21,7 @@
 #include <sdr/primitive2d/sdrdecompositiontools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 #include <drawinglayer/attribute/fillhatchattribute.hxx>
 #include <drawinglayer/attribute/sdrfillgraphicattribute.hxx>
 #include <vcl/graph.hxx>
@@ -151,8 +152,8 @@ namespace drawinglayer::attribute
 
                 if(!rFillTransparenceGradientAttribute.isDefault())
                 {
-                    const double fTransA = rFillTransparenceGradientAttribute.getStartColor().luminance();
-                    const double fTransB = rFillTransparenceGradientAttribute.getEndColor().luminance();
+                    const double fTransA(rFillTransparenceGradientAttribute.getColorStops().front().getStopColor().luminance());
+                    const double fTransB(rFillTransparenceGradientAttribute.getColorStops().back().getStopColor().luminance());
 
                     fTransparence = (fTransA + fTransB) * 0.5;
                 }
@@ -160,10 +161,10 @@ namespace drawinglayer::attribute
                 if(!rFillGradientAttribute.isDefault())
                 {
                     // gradient fill
-                    const basegfx::BColor& rStart = rFillGradientAttribute.getStartColor();
-                    const basegfx::BColor& rEnd = rFillGradientAttribute.getEndColor();
+                    const basegfx::BColor aStart(rFillGradientAttribute.getColorStops().front().getStopColor());
+                    const basegfx::BColor aEnd(rFillGradientAttribute.getColorStops().back().getStopColor());
 
-                    aRetval = basegfx::interpolate(rStart, rEnd, 0.5);
+                    aRetval = basegfx::interpolate(aStart, aEnd, 0.5);
                 }
                 else if(!rFillHatchAttribute.isDefault())
                 {

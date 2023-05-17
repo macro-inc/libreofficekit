@@ -21,15 +21,16 @@
 #include <DiagramHelper.hxx>
 #include <DataSourceHelper.hxx>
 #include <ChartModelHelper.hxx>
+#include <InternalDataProvider.hxx>
 #include <ControllerLockGuard.hxx>
 #include "Chart2ModelContact.hxx"
 #include <cppuhelper/supportsservice.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart/XChartDocument.hpp>
 
 #include <float.h>
 #include <cmath>
 #include <limits>
+#include <utility>
 #include <osl/diagnose.h>
 
 using namespace ::com::sun::star;
@@ -176,9 +177,9 @@ struct lcl_DataOperator : public lcl_Operator
 struct lcl_RowDescriptionsOperator : public lcl_Operator
 {
     lcl_RowDescriptionsOperator( const Sequence< OUString >& rRowDescriptions
-        , const Reference< chart2::XChartDocument >& xChartDoc )
+        , rtl::Reference<::chart::ChartModel> xChartDoc )
         : m_rRowDescriptions( rRowDescriptions )
-        , m_xChartDoc(xChartDoc)
+        , m_xChartDoc(std::move(xChartDoc))
         , m_bDataInColumns(true)
     {
     }
@@ -200,16 +201,16 @@ struct lcl_RowDescriptionsOperator : public lcl_Operator
     }
 
     const Sequence< OUString >& m_rRowDescriptions;
-    Reference< chart2::XChartDocument > m_xChartDoc;
+    rtl::Reference<::chart::ChartModel> m_xChartDoc;
     bool m_bDataInColumns;
 };
 
 struct lcl_ComplexRowDescriptionsOperator : public lcl_Operator
 {
     lcl_ComplexRowDescriptionsOperator( const Sequence< Sequence< OUString > >& rComplexRowDescriptions
-        , const Reference< chart2::XChartDocument >& xChartDoc )
+        , rtl::Reference<::chart::ChartModel> xChartDoc )
         : m_rComplexRowDescriptions( rComplexRowDescriptions )
-        , m_xChartDoc(xChartDoc)
+        , m_xChartDoc(std::move(xChartDoc))
         , m_bDataInColumns(true)
     {
     }
@@ -231,7 +232,7 @@ struct lcl_ComplexRowDescriptionsOperator : public lcl_Operator
     }
 
     const Sequence< Sequence< OUString > >& m_rComplexRowDescriptions;
-    Reference< chart2::XChartDocument > m_xChartDoc;
+    rtl::Reference<::chart::ChartModel> m_xChartDoc;
     bool m_bDataInColumns;
 };
 
@@ -259,9 +260,9 @@ struct lcl_AnyRowDescriptionsOperator : public lcl_Operator
 struct lcl_ColumnDescriptionsOperator : public lcl_Operator
 {
     lcl_ColumnDescriptionsOperator( const Sequence< OUString >& rColumnDescriptions
-        , const Reference< chart2::XChartDocument >& xChartDoc )
+        , rtl::Reference<::chart::ChartModel> xChartDoc )
         : m_rColumnDescriptions( rColumnDescriptions )
-        , m_xChartDoc(xChartDoc)
+        , m_xChartDoc(std::move(xChartDoc))
         , m_bDataInColumns(true)
     {
     }
@@ -283,16 +284,16 @@ struct lcl_ColumnDescriptionsOperator : public lcl_Operator
     }
 
     const Sequence< OUString >& m_rColumnDescriptions;
-    Reference< chart2::XChartDocument > m_xChartDoc;
+    rtl::Reference<::chart::ChartModel> m_xChartDoc;
     bool m_bDataInColumns;
 };
 
 struct lcl_ComplexColumnDescriptionsOperator : public lcl_Operator
 {
     lcl_ComplexColumnDescriptionsOperator( const Sequence< Sequence< OUString > >& rComplexColumnDescriptions
-        , const Reference< chart2::XChartDocument >& xChartDoc )
+        , rtl::Reference<::chart::ChartModel> xChartDoc )
         : m_rComplexColumnDescriptions( rComplexColumnDescriptions )
-        , m_xChartDoc(xChartDoc)
+        , m_xChartDoc(std::move(xChartDoc))
         , m_bDataInColumns(true)
     {
     }
@@ -314,7 +315,7 @@ struct lcl_ComplexColumnDescriptionsOperator : public lcl_Operator
     }
 
     const Sequence< Sequence< OUString > >& m_rComplexColumnDescriptions;
-    Reference< chart2::XChartDocument > m_xChartDoc;
+    rtl::Reference<::chart::ChartModel> m_xChartDoc;
     bool m_bDataInColumns;
 };
 
@@ -363,8 +364,8 @@ struct lcl_DateCategoriesOperator : public lcl_Operator
 
 }
 
-ChartDataWrapper::ChartDataWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
-    : m_spChart2ModelContact(spChart2ModelContact)
+ChartDataWrapper::ChartDataWrapper(std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
+    : m_spChart2ModelContact(std::move(spChart2ModelContact))
     , m_aEventListenerContainer(m_aMutex)
 {
     osl_atomic_increment( &m_refCount );
@@ -372,9 +373,9 @@ ChartDataWrapper::ChartDataWrapper(const std::shared_ptr<Chart2ModelContact>& sp
     osl_atomic_decrement( &m_refCount );
 }
 
-ChartDataWrapper::ChartDataWrapper( const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact,
+ChartDataWrapper::ChartDataWrapper( std::shared_ptr<Chart2ModelContact> spChart2ModelContact,
                                     const Reference< XChartData >& xNewData ) :
-        m_spChart2ModelContact( spChart2ModelContact ),
+        m_spChart2ModelContact(std::move( spChart2ModelContact )),
         m_aEventListenerContainer( m_aMutex )
 {
     osl_atomic_increment( &m_refCount );
@@ -465,24 +466,24 @@ void SAL_CALL ChartDataWrapper::setData( const Sequence< Sequence< double > >& r
 }
 void SAL_CALL ChartDataWrapper::setRowDescriptions( const Sequence< OUString >& rRowDescriptions )
 {
-    lcl_RowDescriptionsOperator aOperator( rRowDescriptions, m_spChart2ModelContact->getChart2Document() );
+    lcl_RowDescriptionsOperator aOperator( rRowDescriptions, m_spChart2ModelContact->getDocumentModel() );
     applyData( aOperator );
 }
 void SAL_CALL ChartDataWrapper::setColumnDescriptions( const Sequence< OUString >& rColumnDescriptions )
 {
-    lcl_ColumnDescriptionsOperator aOperator( rColumnDescriptions, m_spChart2ModelContact->getChart2Document() );
+    lcl_ColumnDescriptionsOperator aOperator( rColumnDescriptions, m_spChart2ModelContact->getDocumentModel() );
     applyData( aOperator );
 }
 
 // ____ XComplexDescriptionAccess (write) ____
 void SAL_CALL ChartDataWrapper::setComplexRowDescriptions( const Sequence< Sequence< OUString > >& rRowDescriptions )
 {
-    lcl_ComplexRowDescriptionsOperator aOperator( rRowDescriptions, m_spChart2ModelContact->getChart2Document() );
+    lcl_ComplexRowDescriptionsOperator aOperator( rRowDescriptions, m_spChart2ModelContact->getDocumentModel() );
     applyData( aOperator );
 }
 void SAL_CALL ChartDataWrapper::setComplexColumnDescriptions( const Sequence< Sequence< OUString > >& rColumnDescriptions )
 {
-    lcl_ComplexColumnDescriptionsOperator aOperator( rColumnDescriptions, m_spChart2ModelContact->getChart2Document() );
+    lcl_ComplexColumnDescriptionsOperator aOperator( rColumnDescriptions, m_spChart2ModelContact->getDocumentModel() );
     applyData( aOperator );
 }
 
@@ -501,7 +502,7 @@ void SAL_CALL ChartDataWrapper::setAnyColumnDescriptions( const Sequence< Sequen
 // ____ XDateCategories (write) ____
 void SAL_CALL ChartDataWrapper::setDateCategories( const Sequence< double >& rDates )
 {
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
     ControllerLockGuardUNO aCtrlLockGuard( xChartDoc );
     lcl_DateCategoriesOperator aOperator( rDates );
     applyData( aOperator );
@@ -573,7 +574,7 @@ void ChartDataWrapper::fireChartDataChangeEvent( css::chart::ChartDataChangeEven
 void ChartDataWrapper::switchToInternalDataProvider()
 {
     //create an internal data provider that is connected to the model
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
     if( xChartDoc.is() )
         xChartDoc->createInternalDataProvider( true /*bCloneExistingData*/ );
     initDataAccess();
@@ -581,7 +582,7 @@ void ChartDataWrapper::switchToInternalDataProvider()
 
 void ChartDataWrapper::initDataAccess()
 {
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
     if( !xChartDoc.is() )
         return;
     if( xChartDoc->hasInternalDataProvider() )
@@ -589,15 +590,16 @@ void ChartDataWrapper::initDataAccess()
     else
     {
         //create a separate "internal data provider" that is not connected to the model
-        m_xDataAccess.set( ChartModelHelper::createInternalDataProvider(
-            xChartDoc, false /*bConnectToModel*/ ), uno::UNO_QUERY_THROW );
+        auto xInternal = ChartModelHelper::createInternalDataProvider(
+            xChartDoc, false /*bConnectToModel*/ );
+        m_xDataAccess.set( static_cast<cppu::OWeakObject*>(xInternal.get()), uno::UNO_QUERY_THROW );
     }
 }
 
 void ChartDataWrapper::applyData( lcl_Operator& rDataOperator )
 {
     //bool bSetValues, bool bSetRowDescriptions, bool bSetColumnDescriptions
-    Reference< chart2::XChartDocument > xChartDoc( m_spChart2ModelContact->getChart2Document() );
+    rtl::Reference< ChartModel > xChartDoc( m_spChart2ModelContact->getDocumentModel() );
     if( !xChartDoc.is() )
         return;
 
@@ -605,7 +607,7 @@ void ChartDataWrapper::applyData( lcl_Operator& rDataOperator )
     bool bStacked = false;
     bool bPercent = false;
     bool bDeep = false;
-    uno::Reference< css::chart::XChartDocument > xOldDoc( xChartDoc, uno::UNO_QUERY );
+    uno::Reference< css::chart::XChartDocument > xOldDoc( static_cast<cppu::OWeakObject*>(xChartDoc.get()), uno::UNO_QUERY );
     OSL_ASSERT( xOldDoc.is());
     uno::Reference< beans::XPropertySet > xDiaProp( xOldDoc->getDiagram(), uno::UNO_QUERY );
     if( xDiaProp.is())
@@ -645,7 +647,7 @@ void ChartDataWrapper::applyData( lcl_Operator& rDataOperator )
         return;
     uno::Reference< chart2::data::XDataSource > xSource( xDataProvider->createDataSource( aArguments ) );
 
-    uno::Reference< chart2::XDiagram > xDia( xChartDoc->getFirstDiagram() );
+    rtl::Reference< Diagram > xDia( xChartDoc->getFirstChartDiagram() );
     if( xDia.is() )
         xDia->setDiagramData( xSource, aArguments );
 

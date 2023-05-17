@@ -641,10 +641,6 @@ SvxXMLNumRuleExport::SvxXMLNumRuleExport( SvXMLExport& rExp ) :
     }
 }
 
-SvxXMLNumRuleExport::~SvxXMLNumRuleExport()
-{
-}
-
 void SvxXMLNumRuleExport::exportNumberingRule(
         const OUString& rName, bool bIsHidden,
         const Reference< XIndexReplace >& rNumRule )
@@ -786,9 +782,7 @@ void SvxXMLNumRuleExport::exportOutline()
     }
 }
 
-void SvxXMLNumRuleExport::exportStyles( bool bUsed,
-                                        XMLTextListAutoStylePool *pPool,
-                                        bool bExportChapterNumbering )
+void SvxXMLNumRuleExport::exportStyles( bool bUsed, bool bExportChapterNumbering )
 {
     if( bExportChapterNumbering )
         exportOutline();
@@ -825,11 +819,8 @@ void SvxXMLNumRuleExport::exportStyles( bool bUsed,
         xStyles->getByIndex( i ) >>= xStyle;
 
         if( !bUsed || xStyle->isInUse() )
-        {
             exportStyle( xStyle );
-            if( pPool )
-                pPool->RegisterName( xStyle->getName() );
-        }
+
     }
 }
 

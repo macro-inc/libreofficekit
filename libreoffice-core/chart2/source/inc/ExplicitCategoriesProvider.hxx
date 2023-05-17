@@ -19,10 +19,11 @@
 #pragma once
 
 #include "charttoolsdllapi.hxx"
-#include <cppuhelper/weakref.hxx>
+#include <unotools/weakref.hxx>
 #include <com/sun/star/uno/Reference.h>
 #include <com/sun/star/uno/Sequence.h>
 
+#include <utility>
 #include <vector>
 
 namespace chart { class ChartModel; }
@@ -33,13 +34,15 @@ namespace com::sun::star::uno { class Any; }
 
 namespace chart
 {
+class BaseCoordinateSystem;
+class LabeledDataSequence;
 
 struct OOO_DLLPUBLIC_CHARTTOOLS ComplexCategory
 {
     OUString Text;
     sal_Int32 Count;
 
-    ComplexCategory( const OUString& rText, sal_Int32 nCount ) : Text( rText ), Count (nCount)
+    ComplexCategory( OUString aText, sal_Int32 nCount ) : Text(std::move( aText )), Count (nCount)
     {}
 };
 
@@ -55,7 +58,7 @@ public:
 class OOO_DLLPUBLIC_CHARTTOOLS ExplicitCategoriesProvider final
 {
 public:
-    ExplicitCategoriesProvider( const css::uno::Reference< css::chart2::XCoordinateSystem >& xCooSysModel
+    ExplicitCategoriesProvider( const rtl::Reference< ::chart::BaseCoordinateSystem >& xCooSysModel
                        , ChartModel& rChartModel
                        );
     ~ExplicitCategoriesProvider();
@@ -68,7 +71,7 @@ public:
     const std::vector<ComplexCategory>* getCategoriesByLevel( sal_Int32 nLevel );
 
     static OUString getCategoryByIndex(
-          const css::uno::Reference< css::chart2::XCoordinateSystem >& xCooSysModel
+          const rtl::Reference< ::chart::BaseCoordinateSystem >& xCooSysModel
         , ChartModel& rModel
         , sal_Int32 nIndex );
 
@@ -82,8 +85,8 @@ public:
     bool hasComplexCategories() const;
     sal_Int32 getCategoryLevelCount() const;
 
-    const css::uno::Sequence< css::uno::Reference<
-        css::chart2::data::XLabeledDataSequence> >& getSplitCategoriesList() const { return m_aSplitCategoriesList;}
+    const std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence> >&
+            getSplitCategoriesList() const { return m_aSplitCategoriesList;}
 
     bool isDateAxis();
     const std::vector< double >&  getDateCategories();
@@ -93,15 +96,14 @@ private:
     ExplicitCategoriesProvider& operator =(ExplicitCategoriesProvider const &) = delete;
 
     bool volatile m_bDirty;
-    css::uno::WeakReference< css::chart2::XCoordinateSystem >   m_xCooSysModel;
+    unotools::WeakReference< ::chart::BaseCoordinateSystem >   m_xCooSysModel;
     ChartModel& mrModel;
     css::uno::Reference< css::chart2::data::XLabeledDataSequence> m_xOriginalCategories;
 
     bool m_bIsExplicitCategoriesInited;
     css::uno::Sequence< OUString >  m_aExplicitCategories;
     std::vector< std::vector< ComplexCategory > >   m_aComplexCats;
-    css::uno::Sequence< css::uno::Reference<
-        css::chart2::data::XLabeledDataSequence> > m_aSplitCategoriesList;
+    std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence> > m_aSplitCategoriesList;
 
     bool m_bIsDateAxis;
     bool m_bIsAutoDate;

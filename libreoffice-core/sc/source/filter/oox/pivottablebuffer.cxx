@@ -40,8 +40,9 @@
 #include <com/sun/star/xml/sax/XFastAttributeList.hpp>
 
 #include <comphelper/sequence.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <oox/helper/binaryinputstream.hxx>
 #include <oox/helper/attributelist.hxx>
@@ -200,6 +201,7 @@ PTFieldModel::PTFieldModel() :
     mbShowAll( true ),
     mbOutline( true ),
     mbSubtotalTop( true ),
+    mbCompact( false ),
     mbInsertBlankRow( false ),
     mbInsertPageBreak( false ),
     mbAutoShow( false ),
@@ -285,6 +287,7 @@ void PivotTableField::importPivotField( const AttributeList& rAttribs )
     maModel.mbShowAll         = rAttribs.getBool( XML_showAll, true );
     maModel.mbOutline         = rAttribs.getBool( XML_outline, true );
     maModel.mbSubtotalTop     = rAttribs.getBool( XML_subtotalTop, true );
+    maModel.mbCompact         = maModel.mbSubtotalTop && maModel.mbOutline && rAttribs.getBool( XML_compact, true );
     maModel.mbInsertBlankRow  = rAttribs.getBool( XML_insertBlankRow, false );
     maModel.mbInsertPageBreak = rAttribs.getBool( XML_insertPageBreak, false );
     maModel.mbAutoShow        = rAttribs.getBool( XML_autoShow, false );
@@ -551,7 +554,7 @@ void PivotTableField::convertPageField( const PTPageFieldModel& rPageField )
     else
     {
         // single item may be selected
-        if( (0 <= rPageField.mnItem) && (rPageField.mnItem < static_cast< sal_Int32 >( maItems.size() )) )
+        if( (0 <= rPageField.mnItem) && (o3tl::make_unsigned(rPageField.mnItem) < maItems.size()) )
             nCacheItem = maItems[ rPageField.mnItem ].mnCacheItem;
     }
 
@@ -707,9 +710,22 @@ Reference< XDataPilotField > PivotTableField::convertRowColPageField( sal_Int32 
 
             // layout settings
             DataPilotFieldLayoutInfo aLayoutInfo;
-            aLayoutInfo.LayoutMode = maModel.mbOutline ?
-                (maModel.mbSubtotalTop ? DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_TOP : DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_BOTTOM) :
-                DataPilotFieldLayoutMode::TABULAR_LAYOUT;
+            if (maModel.mbCompact)
+            {
+                aLayoutInfo.LayoutMode = DataPilotFieldLayoutMode::COMPACT_LAYOUT;
+            }
+            else if (maModel.mbOutline)
+            {
+                if (maModel.mbSubtotalTop)
+                    aLayoutInfo.LayoutMode = DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_TOP;
+                else
+                    aLayoutInfo.LayoutMode = DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_BOTTOM;
+            }
+            else
+            {
+                aLayoutInfo.LayoutMode = DataPilotFieldLayoutMode::TABULAR_LAYOUT;
+            }
+
             aLayoutInfo.AddEmptyLines = maModel.mbInsertBlankRow;
             aPropSet.setProperty( PROP_LayoutInfo, aLayoutInfo );
             aPropSet.setProperty( PROP_ShowEmpty, maModel.mbShowAll );
@@ -754,8 +770,9 @@ Reference< XDataPilotField > PivotTableField::convertRowColPageField( sal_Int32 
             {
                 ScDPSaveData* pSaveData = pDPObj->GetSaveData();
                 ScDPSaveDimension* pDim = pSaveData->GetDimensionByName(pCacheField->getName());
+                SAL_WARN_IF(!pDim, "sc.filter", "PivotTableField::convertRowColPageField - no Dimension found for: " << pCacheField->getName());
 
-                try
+                if (pDim) try
                 {
                     for( const auto& rItem : maItems )
                     {
@@ -1254,6 +1271,9 @@ void PivotTable::finalizeImport()
         aDescProp.setProperty( PROP_ShowFilterButton, false );
         aDescProp.setProperty( PROP_DrillDownOnDoubleClick, maDefModel.mbEnableDrill );
 
+        if (auto* pSaveData = mpDPObject->GetSaveData())
+            pSaveData->SetExpandCollapse(maDefModel.mbShowDrill);
+
         // finalize all fields, this finds field names and creates grouping fields
         finalizeFieldsImport();
 
@@ -1458,6 +1478,18 @@ PivotTable& PivotTableBuffer::createPivotTable()
 
 void PivotTableBuffer::finalizeImport()
 {
+    if(maTables.empty())
+        return;
+
+    // Create formula groups. This needs to be done before pivot tables, because
+    // import may lead to calling ScDPObject::GetSource(), which calls ScDPObject::CreateObjects(),
+    // which will ensure all the cells are not dirty, causing recalculation even though
+    // ScDPObject::GetSource() doesn't need it. And the recalculation is slower without formula
+    // groups set up. Fixing that properly seems quite complex, given that do-everything approach
+    // of ScDPObject, so at least ensure the calculation is efficient.
+    ScDocument& rDoc = getDocImport().getDoc();
+    rDoc.RegroupFormulaCells( ScRange( 0, 0, 0, rDoc.MaxCol(), rDoc.MaxRow(), rDoc.GetMaxTableNumber()));
+
     maTables.forEachMem( &PivotTable::finalizeImport );
 }
 

@@ -31,7 +31,8 @@
 #include <connectivity/dbtools.hxx>
 #include <osl/diagnose.h>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/window.hxx>
 
 namespace dbaui
@@ -51,11 +52,11 @@ namespace dbaui
     DatabaseObjectView::DatabaseObjectView( const Reference< XComponentContext >& _rxORB,
             const Reference< XDatabaseDocumentUI >& _rxApplication,
             const Reference< XFrame >& _rxParentFrame,
-            const OUString& _rComponentURL )
+            OUString _sComponentURL )
         :m_xORB             ( _rxORB            )
         ,m_xParentFrame     ( _rxParentFrame    )
         ,m_xApplication     ( _rxApplication    )
-        ,m_sComponentURL    ( _rComponentURL    )
+        ,m_sComponentURL    (std::move( _sComponentURL    ))
     {
         OSL_ENSURE( m_xORB.is(), "DatabaseObjectView::DatabaseObjectView: invalid service factory!" );
         OSL_ENSURE( m_xApplication.is(), "DatabaseObjectView::DatabaseObjectView: invalid connection!" );
@@ -71,7 +72,7 @@ namespace dbaui
 
     Reference< XComponent > DatabaseObjectView::createNew( const Reference< XDataSource >& _xDataSource, const ::comphelper::NamedValueCollection& i_rDispatchArgs )
     {
-        return doCreateView( makeAny( _xDataSource ), OUString(), i_rDispatchArgs );
+        return doCreateView( Any( _xDataSource ), OUString(), i_rDispatchArgs );
     }
 
     Reference< XComponent > DatabaseObjectView::openExisting( const Any& _rDataSource, const OUString& _rName,

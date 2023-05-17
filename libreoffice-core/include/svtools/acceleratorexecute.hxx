@@ -22,6 +22,7 @@
 #include <svtools/svtdllapi.h>
 
 #include <memory>
+#include <mutex>
 
 #include <com/sun/star/awt/KeyEvent.hpp>
 #include <vcl/keycod.hxx>
@@ -65,7 +66,7 @@ class SVT_DLLPUBLIC AcceleratorExecute final
 {
     // member
     private:
-        ::osl::Mutex m_aLock;
+        std::mutex m_aLock;
 
         /** TODO document me */
         css::uno::Reference< css::uno::XComponentContext > m_xContext;
@@ -111,7 +112,7 @@ class SVT_DLLPUBLIC AcceleratorExecute final
 
 
         /** @short  fight against inlining ... */
-        virtual ~AcceleratorExecute();
+        ~AcceleratorExecute();
 
 
         /** @short  init this instance.
@@ -175,6 +176,8 @@ class SVT_DLLPUBLIC AcceleratorExecute final
         static css::uno::Reference< css::ui::XAcceleratorConfiguration > st_openModuleConfig(const css::uno::Reference< css::uno::XComponentContext >& rxContext ,
                                                                                               const css::uno::Reference< css::frame::XFrame >&              xFrame);
 
+        static css::uno::Reference<css::ui::XAcceleratorConfiguration> lok_createNewAcceleratorConfiguration(const css::uno::Reference< css::uno::XComponentContext >& rxContext, OUString sModule);
+        void lok_setModuleConfig(css::uno::Reference<css::ui::XAcceleratorConfiguration> acceleratorConfig);
 
         /** TODO document me */
         static css::uno::Reference< css::ui::XAcceleratorConfiguration > st_openDocConfig(const css::uno::Reference< css::frame::XModel >& xModel);

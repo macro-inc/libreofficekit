@@ -7,10 +7,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <com/sun/star/embed/XStorage.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
 
 #include <comphelper/storagehelper.hxx>
@@ -25,36 +23,43 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Tests for svx/source/core/ code.
-class Test : public test::BootstrapFixture, public unotest::MacrosTest
+class Test : public UnoApiTest
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
+    Test()
+        : UnoApiTest("svx/qa/unit/data/")
+    {
+    }
 };
 
-void Test::setUp()
+CPPUNIT_TEST_FIXTURE(Test, testChartExportToPdf)
 {
-    test::BootstrapFixture::setUp();
+    // Given a Calc document with a chart in it:
+    loadFromURL(u"chart.ods");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
+                                                 uno::UNO_QUERY);
+    uno::Reference<drawing::XShape> xShape(xDrawPage->getByIndex(0), uno::UNO_QUERY);
 
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
+    // When exporting that chart to PDF:
+    GraphicHelper::SaveShapeAsGraphicToPath(mxComponent, xShape, "application/pdf",
+                                            maTempFile.GetURL());
+
+    // Then make sure we get a valid, non-empty PDF:
+    // Without the accompanying fix in place, this test would have failed, because the output was
+    // empty (0 bytes).
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = parsePDFExport();
+    if (!pPdfDocument)
+    {
+        return;
+    }
+    int nPageCount = pPdfDocument->getPageCount();
+    CPPUNIT_ASSERT_GREATER(0, nPageCount);
 }
-
-void Test::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/svx/qa/unit/data/";
 
 CPPUNIT_TEST_FIXTURE(Test, testGraphicObjectResolver)
 {
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "GraphicObjectResolverTest.zip";
+    OUString aURL = createFileURL(u"GraphicObjectResolverTest.zip");
     uno::Reference<embed::XStorage> xStorage
         = comphelper::OStorageHelper::GetStorageOfFormatFromURL(ZIP_STORAGE_FORMAT_STRING, aURL,
                                                                 embed::ElementModes::READWRITE);

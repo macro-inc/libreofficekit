@@ -94,12 +94,14 @@ class XParaPortionList
     ListType maList;
 
     VclPtr<OutputDevice> pRefDevPtr;
-    sal_uInt16  nStretchX;
-    sal_uInt16  nStretchY;
+    double  mfFontScaleX;
+    double  mfFontScaleY;
+    double  mfSpacingScaleX;
+    double  mfSpacingScaleY;
     sal_uInt32  nPaperWidth;
 
 public:
-    XParaPortionList(OutputDevice* pRefDev, sal_uInt32 nPW, sal_uInt16 _nStretchX, sal_uInt16 _nStretchY);
+    XParaPortionList(OutputDevice* pRefDev, sal_uInt32 nPW, double fFontScaleX, double fFontScaleY, double fSpacingScaleX, double fSpacingScaleY);
 
     void push_back(XParaPortion* p);
     const XParaPortion& operator[](size_t i) const;
@@ -108,8 +110,10 @@ public:
     sal_uInt32          GetPaperWidth() const       { return nPaperWidth; }
     bool                RefDevIsVirtual() const {return pRefDevPtr->IsVirtual();}
     const MapMode&  GetRefMapMode() const       { return pRefDevPtr->GetMapMode(); }
-    sal_uInt16  GetStretchX() const         { return nStretchX; }
-    sal_uInt16  GetStretchY() const         { return nStretchY; }
+    double  getFontScaleX() const { return mfFontScaleX; }
+    double  getFontScaleY() const { return mfFontScaleY; }
+    double  getSpacingScaleX() const { return mfSpacingScaleX; }
+    double  getSpacingScaleY() const { return mfSpacingScaleY; }
 };
 
 class ContentInfo

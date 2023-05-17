@@ -21,7 +21,7 @@
 #include "wizardshell.hxx"
 #include "wizardpagecontroller.hxx"
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/ui/dialogs/WizardTravelType.hpp>
 
@@ -81,6 +81,16 @@ namespace svt::uno
     {
         ActivatePage();
         return WizardShell_Base::run();
+    }
+
+    OString WizardShell::getPageIdentForState(WizardState nState) const
+    {
+        return OString::number(impl_stateToPageId(nState));
+    }
+
+    WizardState WizardShell::getStateFromPageIdent(const OString& rIdent) const
+    {
+        return impl_pageIdToState(rIdent.toInt32());
     }
 
     sal_Int16 WizardShell::convertCommitReasonToTravelType( const CommitPageReason i_eReason )

@@ -18,7 +18,6 @@
  */
 #pragma once
 
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include "VAxisOrGridBase.hxx"
 #include "VAxisProperties.hxx"
 #include "Tickmarks.hxx"
@@ -68,7 +67,7 @@ public:
 
     virtual void createDataTableView(std::vector<std::unique_ptr<VSeriesPlotter>>& rSeriesPlotterList,
                                      css::uno::Reference<css::util::XNumberFormatsSupplier> const& xNumberFormatsSupplier,
-                                     css::uno::Reference<css::chart2::XChartDocument> const& xChartDoc,
+                                     rtl::Reference<::chart::ChartModel> const& xChartDoc,
                                      css::uno::Reference<css::uno::XComponentContext> const& rComponentContext);
 
     std::shared_ptr<DataTableView> getDataTableView() { return m_pDataTableView; }
@@ -79,8 +78,7 @@ protected: //methods
     void updateUnscaledValuesAtTicks( TickIter& rIter );
 
     virtual bool prepareShapeCreation();
-    void recordMaximumTextSize( const css::uno::Reference< css::drawing::XShape >& xShape
-                    , double fRotationAngleDegree );
+    void recordMaximumTextSize( SvxShape& xShape, double fRotationAngleDegree );
 
     bool isDateAxis() const;
     bool isComplexCategoryAxis() const;
@@ -92,9 +90,9 @@ protected: //member
     css::uno::Sequence< OUString >                            m_aTextLabels;
     bool                                                      m_bUseTextLabels;
 
-    css::uno::Reference< css::drawing::XShapes > m_xGroupShape_Shapes;
-    css::uno::Reference< css::drawing::XShapes > m_xTextTarget;
-    css::uno::Reference< css::drawing::XShapes > m_xDataTableTarget;
+    rtl::Reference< SvxShapeGroupAnyD > m_xGroupShape_Shapes;
+    rtl::Reference< SvxShapeGroupAnyD > m_xTextTarget;
+    rtl::Reference< SvxShapeGroupAnyD > m_xDataTableTarget;
 
     std::shared_ptr<DataTableView> m_pDataTableView;
 

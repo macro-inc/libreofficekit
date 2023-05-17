@@ -23,7 +23,8 @@
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/color/bcolor.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
+#include <osl/diagnose.h>
 #include <tools/debug.hxx>
 
 namespace sdr::contact
@@ -206,8 +207,8 @@ SdrObject* ViewContact::TryToGetSdrObject() const { return nullptr; }
 
 // primitive stuff
 
-drawinglayer::primitive2d::Primitive2DContainer
-ViewContact::createViewIndependentPrimitive2DSequence() const
+void ViewContact::createViewIndependentPrimitive2DSequence(
+    drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
 {
     // This is the default implementation and should never be called (see header). If this is called,
     // someone implemented a ViewContact (VC) visualisation object without defining the visualisation by
@@ -216,23 +217,23 @@ ViewContact::createViewIndependentPrimitive2DSequence() const
     // hairline polygon with a default size of (1000, 1000, 5000, 3000)
     OSL_FAIL("ViewContact::createViewIndependentPrimitive2DSequence(): Never call the fallback "
              "base implementation, this is always an error (!)");
-    const basegfx::B2DPolygon aOutline(
+    basegfx::B2DPolygon aOutline(
         basegfx::utils::createPolygonFromRect(basegfx::B2DRange(1000.0, 1000.0, 5000.0, 3000.0)));
     const basegfx::BColor aYellow(1.0, 1.0, 0.0);
     const drawinglayer::primitive2d::Primitive2DReference xReference(
-        new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(aOutline, aYellow));
+        new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(std::move(aOutline), aYellow));
 
-    return drawinglayer::primitive2d::Primitive2DContainer{ xReference };
+    rVisitor.visit(xReference);
 }
 
-drawinglayer::primitive2d::Primitive2DContainer
-ViewContact::getViewIndependentPrimitive2DContainer() const
+void ViewContact::getViewIndependentPrimitive2DContainer(
+    drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
 {
     /* Local up-to-date checks. Create new list and compare.
         We cannot just always use the new data because the old data has cached bitmaps in it e.g. see the document in tdf#146108.
     */
-    drawinglayer::primitive2d::Primitive2DContainer xNew(
-        createViewIndependentPrimitive2DSequence());
+    drawinglayer::primitive2d::Primitive2DContainer xNew;
+    createViewIndependentPrimitive2DSequence(xNew);
 
     if (!xNew.empty())
     {
@@ -247,7 +248,7 @@ ViewContact::getViewIndependentPrimitive2DContainer() const
     }
 
     // return current Primitive2DContainer
-    return mxViewIndependentPrimitive2DSequence;
+    rVisitor.visit(mxViewIndependentPrimitive2DSequence);
 }
 
 // add Gluepoints (if available)

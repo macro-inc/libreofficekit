@@ -111,7 +111,7 @@ class SW_DLLPUBLIC SwSpellPopup
 
 public:
     SwSpellPopup( SwWrtShell *pWrtSh,
-            const css::uno::Reference< css::linguistic2::XSpellAlternatives >  &xAlt,
+            css::uno::Reference< css::linguistic2::XSpellAlternatives > xAlt,
             const OUString & rParaText );
 
     SwSpellPopup( SwWrtShell *pWrtSh,
@@ -128,6 +128,8 @@ public:
     {
         return *m_xPopupMenu;
     }
+
+    css::uno::Reference<css::awt::XPopupMenu> CreateMenuInterface() { return m_xPopupMenu->CreateMenuInterface(); }
 
     void Execute( const tools::Rectangle& rPopupPos, vcl::Window* pWin );
     void Execute( sal_uInt16 nId );

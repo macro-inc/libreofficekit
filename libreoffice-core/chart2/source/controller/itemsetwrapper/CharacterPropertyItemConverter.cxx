@@ -33,7 +33,8 @@
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/chart2/XFormattedString.hpp>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -74,10 +75,10 @@ CharacterPropertyItemConverter::CharacterPropertyItemConverter(
     const uno::Reference< beans::XPropertySet > & rPropertySet,
     SfxItemPool& rItemPool,
     const awt::Size* pRefSize,
-    const OUString & rRefSizePropertyName,
+    OUString aRefSizePropertyName,
     const uno::Reference< beans::XPropertySet > & rRefSizePropSet ) :
         ItemConverter( rPropertySet, rItemPool ),
-        m_aRefSizePropertyName( rRefSizePropertyName ),
+        m_aRefSizePropertyName(std::move( aRefSizePropertyName )),
         m_xRefSizePropSet( rRefSizePropSet.is() ? rRefSizePropSet : rPropertySet )
 {
     if (pRefSize)

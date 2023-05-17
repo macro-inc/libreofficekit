@@ -73,7 +73,7 @@
 #include <vcl/cairo.hxx>
 #include <vcl/devicecoordinate.hxx>
 #include <vcl/dllapi.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/font.hxx>
 #include <vcl/mapmod.hxx>
 #include <vcl/metaactiontypes.hxx>
@@ -147,7 +147,6 @@
 #include <com/sun/star/chart2/XDataSeriesContainer.hpp>
 #include <com/sun/star/chart2/XRegressionCurveCalculator.hpp>
 #include <com/sun/star/chart2/XRegressionCurveContainer.hpp>
-#include <com/sun/star/chart2/XTransformation.hpp>
 #include <com/sun/star/chart2/data/XDataSequence.hpp>
 #include <com/sun/star/chart2/data/XDataSink.hpp>
 #include <com/sun/star/chart2/data/XDataSource.hpp>
@@ -241,8 +240,6 @@
 #include <svl/svldllapi.h>
 #include <svl/typedwhich.hxx>
 #include <svl/zforlist.hxx>
-#include <svx/DiagramDataInterface.hxx>
-#include <svx/shapeproperty.hxx>
 #include <svx/svdobj.hxx>
 #include <svx/svdobjkind.hxx>
 #include <svx/svdtypes.hxx>
@@ -252,7 +249,7 @@
 #include <tools/color.hxx>
 #include <tools/date.hxx>
 #include <tools/degree.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/gen.hxx>
 #include <tools/helpers.hxx>
 #include <tools/lineend.hxx>
@@ -300,7 +297,6 @@
 #include <MediaDescriptorHelper.hxx>
 #include <MinimumAndMaximumSupplier.hxx>
 #include <ModifyListenerHelper.hxx>
-#include <MutexContainer.hxx>
 #include <NumberFormatterWrapper.hxx>
 #include <OPropertySet.hxx>
 #include <ObjectIdentifier.hxx>

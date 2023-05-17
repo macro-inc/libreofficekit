@@ -25,7 +25,9 @@
 #include <editeng/langitem.hxx>
 #include <editeng/editobj.hxx>
 #include <editeng/editview.hxx>
+#include <editeng/eeitem.hxx>
 #include <sfx2/viewfrm.hxx>
+#include <utility>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -40,6 +42,7 @@
 #include <globstr.hrc>
 #include <scresid.hxx>
 #include <markdata.hxx>
+#include <docpool.hxx>
 
 #include <memory>
 
@@ -91,7 +94,18 @@ bool ScConversionEngineBase::FindNextConversionCell()
 
         OUString aNewStr = GetText();
 
+        // Check if the user has changed the language. If the new language is
+        // applied to the entire string length, we will set the language as cell
+        // attribute. Otherwise we will commit this as an edit-engine string.
+        editeng::LanguageSpan aLang = GetLanguage(0, 0);
+
+        bool bSimpleString = GetParagraphCount() == 1 &&
+            aLang.nLang != LANGUAGE_DONTKNOW &&
+            aLang.nStart == 0 &&
+            aLang.nEnd == aNewStr.getLength();
+
         bool bMultiTab = (rMark.GetSelectCount() > 1);
+
         OUString aVisibleStr;
         if( bMultiTab )
             aVisibleStr = mrDoc.GetString(mnCurrCol, mnCurrRow, mnStartTab);
@@ -111,13 +125,27 @@ bool ScConversionEngineBase::FindNextConversionCell()
                 if (mpUndoDoc && !bEmptyCell)
                     mrDoc.CopyCellToDocument(aPos, aPos, *mpUndoDoc);
 
-                if (eCellType == CELLTYPE_EDIT)
+                if (!bSimpleString || eCellType == CELLTYPE_EDIT)
                 {
                     std::unique_ptr<EditTextObject> pEditObj(CreateTextObject());
                     mrDoc.SetEditText(aPos, *pEditObj, GetEditTextObjectPool());
                 }
                 else
+                {
+                    // Set the new string and update the language with the cell.
                     mrDoc.SetString(aPos, aNewStr);
+
+                    const ScPatternAttr* pAttr = mrDoc.GetPattern(aPos);
+                    std::unique_ptr<ScPatternAttr> pNewAttr;
+
+                    if (pAttr)
+                        pNewAttr = std::make_unique<ScPatternAttr>(*pAttr);
+                    else
+                        pNewAttr = std::make_unique<ScPatternAttr>(mrDoc.GetPool());
+
+                    pNewAttr->GetItemSet().Put(SvxLanguageItem(aLang.nLang, EE_CHAR_LANGUAGE), ATTR_FONT_LANGUAGE);
+                    mrDoc.SetPattern(aPos, std::move(pNewAttr));
+                }
 
                 if (mpRedoDoc && !bEmptyCell)
                     mrDoc.CopyCellToDocument(aPos, aPos, *mpRedoDoc);
@@ -250,7 +278,7 @@ void ScConversionEngineBase::FillFromCell( SCCOL nCol, SCROW nRow, SCTAB nTab )
     ScAddress aPos(nCol, nRow, nTab);
 
     ScRefCellValue aCell(mrDoc, aPos);
-    switch (aCell.meType)
+    switch (aCell.getType())
     {
         case CELLTYPE_STRING:
         {
@@ -264,7 +292,7 @@ void ScConversionEngineBase::FillFromCell( SCCOL nCol, SCROW nRow, SCTAB nTab )
         break;
         case CELLTYPE_EDIT:
         {
-            const EditTextObject* pNewEditObj = aCell.mpEditText;
+            const EditTextObject* pNewEditObj = aCell.getEditText();
             SetTextCurrentDefaults(*pNewEditObj);
         }
         break;
@@ -372,12 +400,12 @@ ScConversionParam::ScConversionParam( ScConversionType eConvType,
 }
 
 ScConversionParam::ScConversionParam( ScConversionType eConvType,
-        LanguageType eSourceLang, LanguageType eTargetLang, const vcl::Font& rTargetFont,
+        LanguageType eSourceLang, LanguageType eTargetLang, vcl::Font aTargetFont,
         sal_Int32 nOptions, bool bIsInteractive ) :
     meConvType( eConvType ),
     meSourceLang( eSourceLang ),
     meTargetLang( eTargetLang ),
-    maTargetFont( rTargetFont ),
+    maTargetFont(std::move( aTargetFont )),
     mnOptions( nOptions ),
     mbUseTargetFont( true ),
     mbIsInteractive( bIsInteractive )
@@ -388,10 +416,10 @@ ScConversionParam::ScConversionParam( ScConversionType eConvType,
 
 ScTextConversionEngine::ScTextConversionEngine(
         SfxItemPool* pEnginePoolP, ScViewData& rViewData,
-        const ScConversionParam& rConvParam,
+        ScConversionParam aConvParam,
         ScDocument* pUndoDoc, ScDocument* pRedoDoc ) :
     ScConversionEngineBase( pEnginePoolP, rViewData, pUndoDoc, pRedoDoc ),
-    maConvParam( rConvParam )
+    maConvParam(std::move( aConvParam ))
 {
 }
 

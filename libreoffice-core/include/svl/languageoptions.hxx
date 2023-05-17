@@ -22,15 +22,13 @@
 #include <svl/svldllapi.h>
 #include <sal/types.h>
 #include <o3tl/typed_flags_set.hxx>
-#include <unotools/options.hxx>
 #include <i18nlangtag/lang.h>
-#include <memory>
 
 // class SvtLanguageOptions ----------------------------------------------------
 
 // these defines can be ORed
 // note these values DO NOT match the values in css::i18n::ScriptType
-enum class SvtScriptType
+enum class SvtScriptType : sal_uInt8
 {
     NONE         = 0x00,
     LATIN        = 0x01,

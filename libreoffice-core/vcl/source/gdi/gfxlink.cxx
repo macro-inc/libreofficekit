@@ -20,6 +20,7 @@
 #include <sal/log.hxx>
 #include <tools/stream.hxx>
 #include <tools/vcompat.hxx>
+#include <utility>
 #include <vcl/graph.hxx>
 #include <vcl/gfxlink.hxx>
 #include <vcl/graphicfilter.hxx>
@@ -35,20 +36,10 @@ GfxLink::GfxLink()
 {
 }
 
-GfxLink::GfxLink(std::unique_ptr<sal_uInt8[]> pBuf, sal_uInt32 nSize, GfxLinkType nType)
+GfxLink::GfxLink(BinaryDataContainer aDataConainer, GfxLinkType nType)
     : meType(nType)
     , mnUserId(0)
-    , maDataContainer(pBuf.get(), nSize)
-    , maHash(0)
-    , mbPrefMapModeValid(false)
-    , mbPrefSizeValid(false)
-{
-}
-
-GfxLink::GfxLink(BinaryDataContainer const & rDataConainer, GfxLinkType nType)
-    : meType(nType)
-    , mnUserId(0)
-    , maDataContainer(rDataConainer)
+    , maDataContainer(std::move(aDataConainer))
     , maHash(0)
     , mbPrefMapModeValid(false)
     , mbPrefSizeValid(false)
@@ -141,7 +132,7 @@ bool GfxLink::LoadNative( Graphic& rGraphic ) const
             {
                 GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
                 sal_uInt16 nFormat = rFilter.GetImportFormatNumberForShortName(aShortName);
-                ErrCode nResult = rFilter.ImportGraphic(rGraphic, OUString(), aMemoryStream, nFormat);
+                ErrCode nResult = rFilter.ImportGraphic(rGraphic, u"", aMemoryStream, nFormat);
                 if (nResult == ERRCODE_NONE)
                     bRet = true;
             }

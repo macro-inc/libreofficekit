@@ -21,23 +21,19 @@
 
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/awt/Size.hpp>
-#include <com/sun/star/awt/XDevice.hpp>
-#include <com/sun/star/awt/XUnitConversion.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/graphic/GraphicProvider.hpp>
-#include <com/sun/star/util/MeasureUnit.hpp>
 #include <com/sun/star/graphic/GraphicMapper.hpp>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/seqstream.hxx>
+#include <utility>
 #include <vcl/wmfexternal.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/outdev.hxx>
 #include <tools/gen.hxx>
-#include <tools/diagnose_ex.h>
-#include <comphelper/sequence.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <oox/helper/containerhelper.hxx>
 #include <oox/helper/propertyset.hxx>
 #include <oox/token/properties.hxx>
@@ -62,9 +58,9 @@ sal_Int32 lclConvertScreenPixelToHmm( double fPixel, double fPixelPerHmm )
 
 } // namespace
 
-GraphicHelper::GraphicHelper( const Reference< XComponentContext >& rxContext, const Reference< XFrame >& /*rxTargetFrame*/, const StorageRef& rxStorage ) :
+GraphicHelper::GraphicHelper( const Reference< XComponentContext >& rxContext, const Reference< XFrame >& /*rxTargetFrame*/, StorageRef xStorage ) :
     mxContext( rxContext ),
-    mxStorage( rxStorage )
+    mxStorage(std::move( xStorage ))
 {
     OSL_ENSURE( mxContext.is(), "GraphicHelper::GraphicHelper - missing component context" );
     if( mxContext.is() )

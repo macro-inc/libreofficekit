@@ -25,7 +25,7 @@
 #include <formadapter.hxx>
 #include <strings.hxx>
 #include <o3tl/any.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 using namespace ::com::sun::star::uno;
@@ -104,9 +104,7 @@ void SbaExternalSourceBrowser::modified(const css::lang::EventObject& aEvent)
 
     // multiplex this event to all my listeners
     css::lang::EventObject aEvt(*this);
-    ::comphelper::OInterfaceIteratorHelper2 aIt(m_aModifyListeners);
-    while (aIt.hasMoreElements())
-        static_cast< css::util::XModifyListener*>(aIt.next())->modified(aEvt);
+    m_aModifyListeners.notifyEach( &css::util::XModifyListener::modified, aEvt );
 }
 
 void SAL_CALL SbaExternalSourceBrowser::dispatch(const css::util::URL& aURL, const Sequence< css::beans::PropertyValue>& aArgs)
@@ -183,7 +181,7 @@ void SAL_CALL SbaExternalSourceBrowser::dispatch(const css::util::URL& aURL, con
             nControlPos = 0;
 
         // append the column
-        xColContainer->insertByIndex(nControlPos, makeAny(xNewCol));
+        xColContainer->insertByIndex(nControlPos, Any(xNewCol));
     }
     else if ( aURL.Complete == ".uno:FormSlots/ClearView" )
     {

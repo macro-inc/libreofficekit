@@ -30,10 +30,12 @@
 #include <connectivity/dbexception.hxx>
 #include <com/sun/star/sdbc/XDataSource.hpp>
 #include <UITools.hxx>
+#include <utility>
+#include <vcl/mnemonic.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/stdtext.hxx>
 #include <vcl/weld.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <strings.hrc>
 #include <strings.hxx>
@@ -59,10 +61,10 @@ namespace dbaui
     }
 
     ODatasourceConnector::ODatasourceConnector( const Reference< XComponentContext >& _rxContext, weld::Window* _pMessageParent,
-        const OUString& _rContextInformation )
+        OUString _sContextInformation )
         :m_pErrorMessageParent(_pMessageParent)
         ,m_xContext(_rxContext)
-        ,m_sContextInformation( _rContextInformation )
+        ,m_sContextInformation(std::move( _sContextInformation ))
     {
     }
 
@@ -155,7 +157,7 @@ namespace dbaui
                     {
                         OUString sMessage( DBA_RES( STR_WARNINGS_DURING_CONNECT ) );
                         sMessage = sMessage.replaceFirst( "$buttontext$", GetStandardText( StandardButtonType::More ) );
-                        sMessage = OutputDevice::GetNonMnemonicString( sMessage );
+                        sMessage = removeMnemonicFromString( sMessage );
 
                         SQLWarning aContext;
                         aContext.Message = sMessage;

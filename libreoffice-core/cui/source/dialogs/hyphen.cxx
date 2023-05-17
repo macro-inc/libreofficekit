@@ -27,6 +27,7 @@
 #include <sal/log.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <tools/debug.hxx>
+#include <utility>
 
 #define HYPH_POS_CHAR       '='
 
@@ -158,11 +159,11 @@ OUString SvxHyphenWordDialog::EraseUnusableHyphens_Impl()
         }
 
         // 2) remove all hyphenation positions from the start that are not considered by the core
-        const OUString aSearchRange( aTxt.copy( 0, nPos1 ) );
-        sal_Int32 nPos2 = aSearchRange.lastIndexOf( '-' );  // the '-' position the core will use by default
-        if (nPos2 != -1 )
+        const std::u16string_view aSearchRange( aTxt.subView( 0, nPos1 ) );
+        size_t nPos2 = aSearchRange.rfind( '-' );  // the '-' position the core will use by default
+        if (nPos2 != std::u16string_view::npos && nPos2 != 0)
         {
-            OUString aLeft( aSearchRange.copy( 0, nPos2 ) );
+            OUString aLeft( aSearchRange.substr( 0, nPos2 ) );
             nPos = 0;
             while (nPos != -1)
             {
@@ -402,13 +403,13 @@ IMPL_LINK_NOARG(SvxHyphenWordDialog, GetFocusHdl_Impl, weld::Widget&, void)
 // class SvxHyphenWordDialog ---------------------------------------------
 
 SvxHyphenWordDialog::SvxHyphenWordDialog(
-    const OUString &rWord, LanguageType nLang,
+    OUString aWord, LanguageType nLang,
     weld::Widget* pParent,
     uno::Reference< linguistic2::XHyphenator > const &xHyphen,
     SvxSpellWrapper* pWrapper)
     : SfxDialogController(pParent, "cui/ui/hyphenate.ui", "HyphenateDialog")
     , m_pHyphWrapper(pWrapper)
-    , m_aActWord(rWord)
+    , m_aActWord(std::move(aWord))
     , m_nActLanguage(nLang)
     , m_nMaxHyphenationPos(0)
     , m_nOldPos(0)

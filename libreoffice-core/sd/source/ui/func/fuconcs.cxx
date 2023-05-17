@@ -124,6 +124,24 @@ bool FuConstructCustomShape::MouseButtonUp(const MouseEvent& rMEvt)
         {
             bReturn = true;
         }
+        else
+        {
+            //Drag was too small to create object, so insert default object at click pos
+            Point aClickPos(mpWindow->PixelToLogic(rMEvt.GetPosPixel()));
+            sal_uInt32 nDefaultObjectSize(1000);
+            sal_Int32 nCenterOffset(-sal_Int32(nDefaultObjectSize / 2));
+            aClickPos.AdjustX(nCenterOffset);
+            aClickPos.AdjustY(nCenterOffset);
+
+            SdrPageView *pPV = mpView->GetSdrPageView();
+            if(mpView->IsSnapEnabled())
+                aClickPos = mpView->GetSnapPos(aClickPos, pPV);
+
+            ::tools::Rectangle aNewObjectRectangle(aClickPos, Size(nDefaultObjectSize, nDefaultObjectSize));
+            rtl::Reference<SdrObject> pObjDefault = CreateDefaultObject(nSlotId, aNewObjectRectangle);
+
+            bReturn = mpView->InsertObjectAtView(pObjDefault.get(), *pPV);
+        }
     }
     bReturn = FuConstruct::MouseButtonUp (rMEvt) || bReturn;
 
@@ -135,7 +153,7 @@ bool FuConstructCustomShape::MouseButtonUp(const MouseEvent& rMEvt)
 
 void FuConstructCustomShape::Activate()
 {
-    mpView->SetCurrentObj( OBJ_CUSTOMSHAPE );
+    mpView->SetCurrentObj( SdrObjKind::CustomShape );
     FuConstruct::Activate();
 }
 
@@ -211,9 +229,9 @@ const OUString& FuConstructCustomShape::GetShapeType() const
     return aCustomShape;
 }
 
-SdrObjectUniquePtr FuConstructCustomShape::CreateDefaultObject(const sal_uInt16, const ::tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstructCustomShape::CreateDefaultObject(const sal_uInt16, const ::tools::Rectangle& rRectangle)
 {
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         mpView->getSdrModelFromSdrView(),
         mpView->GetCurrentObjInventor(),
         mpView->GetCurrentObjIdentifier()));

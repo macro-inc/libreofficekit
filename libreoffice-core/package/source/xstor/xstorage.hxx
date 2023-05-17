@@ -27,13 +27,10 @@
 #include <com/sun/star/embed/XStorageRawAccess.hpp>
 #include <com/sun/star/embed/XTransactedObject.hpp>
 #include <com/sun/star/embed/XTransactionBroadcaster.hpp>
-#include <com/sun/star/embed/XClassifiedObject.hpp>
 #include <com/sun/star/embed/XEncryptionProtectedStorage.hpp>
 #include <com/sun/star/embed/XRelationshipAccess.hpp>
 #include <com/sun/star/util/XModifiable.hpp>
-#include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
-#include <com/sun/star/util/XCloseable.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/beans/StringPair.hpp>
@@ -41,15 +38,18 @@
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/lang/XTypeProvider.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
-#include <com/sun/star/packages/NoEncryptionException.hpp>
 
+#include <cppuhelper/typeprovider.hxx>
 #include <cppuhelper/weak.hxx>
 #include <cppuhelper/weakref.hxx>
-#include <cppuhelper/interfacecontainer.h>
+#include <comphelper/multicontainer2.hxx>
 #include <comphelper/refcountedmutex.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <o3tl/deleter.hxx>
 #include <rtl/ref.hxx>
+
+#include "ohierarchyholder.hxx"
+#include "disposelistener.hxx"
 
 #include <vector>
 #include <memory>
@@ -74,7 +74,6 @@ namespace com::sun::star::uno {
 
 // a common implementation for an entry
 
-struct StorInternalData_Impl;
 struct OStorage_Impl;
 struct OWriteStream_Impl;
 
@@ -89,7 +88,7 @@ struct SotElement_Impl
     std::unique_ptr<OWriteStream_Impl, o3tl::default_delete<OWriteStream_Impl>> m_xStream;
 
 public:
-    SotElement_Impl(const OUString& rName, bool bStor, bool bNew);
+    SotElement_Impl(OUString aName, bool bStor, bool bNew);
 };
 
 // Main storage implementation
@@ -183,7 +182,7 @@ struct OStorage_Impl
     OStorage_Impl(  OStorage_Impl* pParent,
                     sal_Int32 nMode,
                     css::uno::Reference< css::container::XNameContainer > const & xPackageFolder,
-                    css::uno::Reference< css::lang::XSingleServiceFactory > const & xPackage,
+                    css::uno::Reference< css::lang::XSingleServiceFactory > xPackage,
                     css::uno::Reference< css::uno::XComponentContext > const & xContext,
                     sal_Int32 nStorageType );
 
@@ -279,7 +278,13 @@ class OStorage final : public css::lang::XTypeProvider
                 , public ::cppu::OWeakObject
 {
     OStorage_Impl*  m_pImpl;
-    std::unique_ptr<StorInternalData_Impl> m_pData;
+    rtl::Reference<comphelper::RefCountedMutex> m_xSharedMutex;
+    comphelper::OMultiTypeInterfaceContainerHelper2 m_aListenersContainer; // list of listeners
+    ::std::unique_ptr< ::cppu::OTypeCollection> m_pTypeCollection;
+    bool m_bReadOnlyWrap;
+    ::rtl::Reference<OChildDispListener_Impl> m_pSubElDispListener;
+    ::std::vector< css::uno::WeakReference< css::lang::XComponent > > m_aOpenSubComponentsVector;
+    ::rtl::Reference< OHierarchyHolder_Impl > m_rHierarchyHolder;
 
     SotElement_Impl* OpenStreamElement_Impl( const OUString& aStreamName, sal_Int32 nOpenMode, bool bEncr );
 

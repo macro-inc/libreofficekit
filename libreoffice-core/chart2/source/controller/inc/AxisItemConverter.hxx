@@ -19,6 +19,7 @@
 #pragma once
 
 #include "ItemConverter.hxx"
+#include <rtl/ref.hxx>
 
 #include <vector>
 
@@ -28,18 +29,19 @@ namespace com::sun::star::chart2 { class XAxis; }
 namespace com::sun::star::chart2 { class XChartDocument; }
 namespace chart { struct ExplicitIncrementData; }
 namespace chart { struct ExplicitScaleData; }
+namespace chart { class ChartModel; }
 
 class SdrModel;
 
 namespace chart::wrapper {
 
-class AxisItemConverter : public ItemConverter
+class AxisItemConverter final : public ItemConverter
 {
 public:
     AxisItemConverter(
         const css::uno::Reference<css::beans::XPropertySet>& rPropertySet,
         SfxItemPool& rItemPool, SdrModel& rDrawModel,
-        const css::uno::Reference<css::chart2::XChartDocument> & xChartDoc,
+        const rtl::Reference<::chart::ChartModel> & xChartDoc,
         ExplicitScaleData const * pScale,
         ExplicitIncrementData const * pIncrement,
         const css::awt::Size* pRefSize );
@@ -61,8 +63,7 @@ private:
     css::uno::Reference<
         css::chart2::XAxis >  m_xAxis;
 
-    css::uno::Reference<
-        css::chart2::XChartDocument >      m_xChartDoc;
+    rtl::Reference<::chart::ChartModel>m_xChartDoc;
 
     std::unique_ptr<ExplicitScaleData>  m_pExplicitScale;
     std::unique_ptr<ExplicitIncrementData>  m_pExplicitIncrement;

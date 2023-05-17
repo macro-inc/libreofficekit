@@ -7,8 +7,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <memory>
-#include <string_view>
 #include <swmodeltestbase.hxx>
 
 #include <com/sun/star/awt/FontWeight.hpp>
@@ -17,11 +15,8 @@
 #include <com/sun/star/style/LineSpacingMode.hpp>
 #include <com/sun/star/style/ParagraphAdjust.hpp>
 #include <com/sun/star/style/TabStop.hpp>
-#include <com/sun/star/table/BorderLine2.hpp>
-#include <com/sun/star/table/BorderLineStyle.hpp>
 #include <com/sun/star/text/RelOrientation.hpp>
 #include <com/sun/star/text/TableColumnSeparator.hpp>
-#include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/text/XFootnotesSupplier.hpp>
 #include <com/sun/star/text/XPageCursor.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
@@ -30,16 +25,14 @@
 #include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/text/XTextViewCursorSupplier.hpp>
 #include <com/sun/star/text/WritingMode2.hpp>
-#include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/text/XTextContentAppend.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
+#include <com/sun/star/text/XDependentTextField.hpp>
 #include <com/sun/star/beans/XPropertyState.hpp>
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
-#include <com/sun/star/awt/FontWeight.hpp>
 #include <com/sun/star/awt/FontSlant.hpp>
 #include <com/sun/star/awt/FontUnderline.hpp>
 
-#include <rtl/ustring.hxx>
 #include <tools/UnitConversion.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -72,14 +65,6 @@ public:
     }
 
 protected:
-    /// Denylist handling.
-    bool mustTestImportOf(const char* filename) const override
-    {
-        // If the testcase is stored in some other format, it's pointless to
-        // test.
-        return OString(filename).endsWith(".rtf");
-    }
-
     AllSettings m_aSavedSettings;
 };
 
@@ -89,8 +74,8 @@ DECLARE_RTFEXPORT_TEST(testFdo63023, "fdo63023.rtf")
         getStyles("PageStyles")->getByName("Standard"), "HeaderText");
     // Back color was black (0) in the header, due to missing color table in the substream.
     CPPUNIT_ASSERT_EQUAL(
-        sal_Int32(0xFFFF99),
-        getProperty<sal_Int32>(getRun(getParagraphOfText(1, xHeaderText), 1), "CharBackColor"));
+        Color(0xFFFF99),
+        getProperty<Color>(getRun(getParagraphOfText(1, xHeaderText), 1), "CharBackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo42109, "fdo42109.rtf")
@@ -118,6 +103,76 @@ DECLARE_RTFEXPORT_TEST(testN818997, "n818997.rtf")
     CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
+DECLARE_RTFEXPORT_TEST(testN818997B, "n818997B.rtf")
+{
+    // \page was ignored between two \shp tokens - this time not IsFirstParagraphInSection.
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf153613_anchoredAfterPgBreak, "tdf153613_anchoredAfterPgBreak.rtf")
+{
+    // An anchored TO character image (followed by nothing) anchors before the page break, no split.
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    CPPUNIT_ASSERT_EQUAL(3, getParagraphs());
+
+    const auto& pLayout = parseLayoutDump();
+    assertXPath(pLayout, "//page[1]//anchored", 1);
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf153613_anchoredAfterPgBreak2, "tdf153613_anchoredAfterPgBreak2.rtf")
+{
+    // An anchored TO character image, followed by more characters moves to the following page
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    CPPUNIT_ASSERT_EQUAL(3, getParagraphs());
+
+    const auto& pLayout = parseLayoutDump();
+    assertXPath(pLayout, "//page[2]//anchored", 1);
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf153613_anchoredAfterPgBreak4, "tdf153613_anchoredAfterPgBreak4.rtf")
+{
+    // An anchored TO character image (followed by nothing) anchors before the page break, no split.
+    // This differs from #1 only in that it has a preceding character run before the page break.
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    CPPUNIT_ASSERT_MESSAGE("YOU FIXED ME!", 3 != getParagraphs());
+
+    const auto& pLayout = parseLayoutDump();
+    assertXPath(pLayout, "//page[2]//anchored", 1); // DID YOU FIX ME? This should be page[1]
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf153613_anchoredAfterPgBreak5, "tdf153613_anchoredAfterPgBreak5.rtf")
+{
+    // Two anchored TO character images (followed by nothing) splits & anchors after the page break
+    // This differs from #1 only in that it has two anchored images.
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    CPPUNIT_ASSERT_EQUAL(3, getParagraphs());
+
+    const auto& pLayout = parseLayoutDump();
+    assertXPath(pLayout, "//page[1]//anchored", 1);
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf153613_inlineAfterPgBreak, "tdf153613_inlineAfterPgBreak.rtf")
+{
+    // An inline AS character image moves to the following page when after the page break.
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    CPPUNIT_ASSERT_EQUAL(3, getParagraphs());
+
+    const auto& pLayout = parseLayoutDump();
+    assertXPath(pLayout, "//page[2]//anchored", 1);
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf153613_inlineAfterPgBreak2, "tdf153613_inlineAfterPgBreak2.rtf")
+{
+    // An inline AS character image moves to the following page when after the page break.
+    // The difference from the previous test is that it is not the first character run
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    CPPUNIT_ASSERT_EQUAL(4, getParagraphs());
+
+    const auto& pLayout = parseLayoutDump();
+    CPPUNIT_ASSERT_EQUAL(OUString("x"), getXPathContent(pLayout, "//page[1]/body/txt[2]"));
+    assertXPath(pLayout, "//page[2]//anchored", 1);
+}
+
 DECLARE_RTFEXPORT_TEST(testFdo64671, "fdo64671.rtf")
 {
     // Additional '}' was inserted before the special character.
@@ -126,7 +181,7 @@ DECLARE_RTFEXPORT_TEST(testFdo64671, "fdo64671.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testFdo62044)
 {
-    load(mpTestDocumentPath, "fdo62044.rtf");
+    createSwDoc("fdo62044.rtf");
     // The problem was that RTF import during copy&paste did not ignore existing paragraph styles.
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextRange> xText = xTextDocument->getText();
@@ -155,8 +210,7 @@ DECLARE_RTFEXPORT_TEST(testN825305, "n825305.rtf")
 {
     // The problem was that the textbox wasn't transparent, due to unimplemented fFilled == 0.
     uno::Reference<beans::XPropertyState> xPropertyState(getShape(2), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(100),
-                         getProperty<sal_Int32>(getShape(2), "BackColorTransparency"));
+    CPPUNIT_ASSERT_EQUAL(Color(0x000064), getProperty<Color>(getShape(2), "BackColorTransparency"));
     beans::PropertyState ePropertyState = xPropertyState->getPropertyState("BackColorTransparency");
     // Was beans::PropertyState_DEFAULT_VALUE.
     CPPUNIT_ASSERT_EQUAL(beans::PropertyState_DIRECT_VALUE, ePropertyState);
@@ -196,7 +250,7 @@ DECLARE_RTFEXPORT_TEST(testParaBottomMargin, "para-bottom-margin.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testParaStyleBottomMargin2)
 {
-    load(mpTestDocumentPath, "para-style-bottom-margin-2.rtf");
+    createSwDoc("para-style-bottom-margin-2.rtf");
     uno::Reference<beans::XPropertySet> xPropertySet(
         getStyles("ParagraphStyles")->getByName("Standard"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_Int32(353), getProperty<sal_Int32>(xPropertySet, "ParaBottomMargin"));
@@ -389,8 +443,7 @@ DECLARE_RTFEXPORT_TEST(testNestedTable, "rhbz1065629.rtf")
     CPPUNIT_ASSERT_BORDER_EQUAL(fullPtSolid, getProperty<table::BorderLine2>(xCell, "TopBorder"));
     CPPUNIT_ASSERT_BORDER_EQUAL(fullPtSolid,
                                 getProperty<table::BorderLine2>(xCell, "BottomBorder"));
-    CPPUNIT_ASSERT_EQUAL(Color(0xCC0000),
-                         Color(ColorTransparency, getProperty<sal_Int32>(xCell, "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0xCC0000), getProperty<Color>(xCell, "BackColor"));
     xCell.set(xTable->getCellByName("A2"), uno::UNO_QUERY);
     CPPUNIT_ASSERT(xCell.is());
     table::BorderLine2 halfPtSolid(sal_Int32(COL_BLACK), 0, 18, 0, table::BorderLineStyle::SOLID,
@@ -421,19 +474,44 @@ DECLARE_RTFEXPORT_TEST(testFooterPara, "footer-para.rtf")
         getProperty</*style::ParagraphAdjust*/ sal_Int16>(xParagraph, "ParaAdjust"));
 }
 
+DECLARE_RTFEXPORT_TEST(testTdf107413, "tdf107413.rtf")
+{
+    CPPUNIT_ASSERT_EQUAL(1, getPages());
+
+    xmlDocUniquePtr pDump = parseLayoutDump();
+    const double nLeftFooter
+        = getXPath(pDump, "/root/page[1]/footer/infos/bounds", "left").toDouble();
+    const double nRightFooter
+        = getXPath(pDump, "/root/page[1]/footer/infos/bounds", "right").toDouble();
+    const double nTopFooter
+        = getXPath(pDump, "/root/page[1]/footer/infos/bounds", "top").toDouble();
+    const double nBottomFooter
+        = getXPath(pDump, "/root/page[1]/footer/infos/bounds", "bottom").toDouble();
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 1
+    // - Actual  : 0
+    // - In <>, XPath '/root/page[1]/footer/txt/anchored/fly/infos/bounds' number of nodes is incorrect
+    const double nLeftFly
+        = getXPath(pDump, "/root/page[1]/footer/txt/anchored/fly/infos/bounds", "left").toDouble();
+    const double nRightFly
+        = getXPath(pDump, "/root/page[1]/footer/txt/anchored/fly/infos/bounds", "right").toDouble();
+    const double nTopFly
+        = getXPath(pDump, "/root/page[1]/footer/txt/anchored/fly/infos/bounds", "top").toDouble();
+    const double nBottomFly
+        = getXPath(pDump, "/root/page[1]/footer/txt/anchored/fly/infos/bounds", "bottom")
+              .toDouble();
+
+    CPPUNIT_ASSERT_EQUAL(nLeftFooter, nLeftFly);
+    CPPUNIT_ASSERT_EQUAL(nRightFooter, nRightFly);
+    CPPUNIT_ASSERT_EQUAL(nBottomFooter, nBottomFly);
+    CPPUNIT_ASSERT_EQUAL(nTopFooter + 1056.0, nTopFly);
+}
+
 DECLARE_RTFEXPORT_TEST(testCp1000016, "hello.rtf")
 {
     // The single-line document had a second fake empty para on Windows.
-    bool bFound = true;
-    try
-    {
-        getParagraph(2);
-    }
-    catch (const container::NoSuchElementException&)
-    {
-        bFound = false;
-    }
-    CPPUNIT_ASSERT_EQUAL(false, bFound);
+    CPPUNIT_ASSERT_EQUAL(1, getParagraphs());
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo65090, "fdo65090.rtf")
@@ -499,11 +577,9 @@ DECLARE_RTFEXPORT_TEST(testShpzDhgt, "shpz-dhgt.rtf")
 {
     // Test that shpz has priority over dhgt and not the other way around.
     // Drawpage is sorted by ZOrder, so first should be red (back).
-    CPPUNIT_ASSERT_EQUAL(Color(0xff0000), Color(ColorTransparency,
-                                                getProperty<sal_Int32>(getShape(1), "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0xff0000), getProperty<Color>(getShape(1), "FillColor"));
     // Second (front) should be green.
-    CPPUNIT_ASSERT_EQUAL(Color(0x00ff00), Color(ColorTransparency,
-                                                getProperty<sal_Int32>(getShape(2), "FillColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x00ff00), getProperty<Color>(getShape(2), "FillColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testLevelfollow, "levelfollow.rtf")
@@ -536,9 +612,7 @@ DECLARE_RTFEXPORT_TEST(testLevelfollow, "levelfollow.rtf")
 DECLARE_RTFEXPORT_TEST(testCharColor, "char-color.rtf")
 {
     // This was -1: character color wasn't set.
-    CPPUNIT_ASSERT_EQUAL(
-        Color(0x365F91),
-        Color(ColorTransparency, getProperty<sal_Int32>(getParagraph(1), "CharColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x365F91), getProperty<Color>(getParagraph(1), "CharColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo69289, "fdo69289.rtf")
@@ -707,8 +781,7 @@ DECLARE_RTFEXPORT_TEST(testFdo86761, "fdo86761.rtf")
 DECLARE_RTFEXPORT_TEST(testFdo82859, "fdo82859.rtf")
 {
     // This was 0: "0xffffff" was converted to 0, i.e. the background was black instead of the default.
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(-1),
-                         getProperty<sal_Int32>(getShape(1), "BackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_AUTO, getProperty<Color>(getShape(1), "BackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testFdo82076, "fdo82076.rtf")
@@ -809,13 +882,14 @@ DECLARE_RTFEXPORT_TEST(testTdf91074, "tdf91074.rtf")
 {
     // The file failed to load, as the border color was imported using the LineColor UNO property.
     uno::Reference<drawing::XShape> xShape = getShape(1);
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(COL_LIGHTRED),
-                         getProperty<table::BorderLine2>(xShape, "TopBorder").Color);
+    CPPUNIT_ASSERT_EQUAL(
+        COL_LIGHTRED,
+        Color(ColorTransparency, getProperty<table::BorderLine2>(xShape, "TopBorder").Color));
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf90260Nopar)
 {
-    load(mpTestDocumentPath, "hello.rtf");
+    createSwDoc("hello.rtf");
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextRange> xText = xTextDocument->getText();
     uno::Reference<text::XTextRange> xEnd = xText->getEnd();
@@ -828,6 +902,38 @@ DECLARE_RTFEXPORT_TEST(testTdf86814, "tdf86814.rtf")
     // This was awt::FontWeight::NORMAL, i.e. the first run wasn't bold, when it should be bold (applied paragraph style with direct formatting).
     CPPUNIT_ASSERT_EQUAL(awt::FontWeight::BOLD,
                          getProperty<float>(getRun(getParagraph(1), 1), "CharWeight"));
+}
+
+/** Make sure that the document variable "Unused", which is not referenced in the document,
+    is imported and exported. */
+DECLARE_RTFEXPORT_TEST(testTdf150267, "tdf150267.rtf")
+{
+    uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextFieldsSupplier> xSupplier(xModel, uno::UNO_QUERY);
+    uno::Reference<container::XNameAccess> xTextFieldMasters = xSupplier->getTextFieldMasters();
+    CPPUNIT_ASSERT_EQUAL(sal_True,
+                         xTextFieldMasters->hasByName("com.sun.star.text.fieldmaster.User.Unused"));
+
+    auto xFieldMaster = xTextFieldMasters->getByName("com.sun.star.text.fieldmaster.User.Unused");
+    CPPUNIT_ASSERT_EQUAL(OUString("Hello World"), getProperty<OUString>(xFieldMaster, "Content"));
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf151370, "tdf151370.rtf")
+{
+    uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextFieldsSupplier> xSupplier(xModel, uno::UNO_QUERY);
+    uno::Reference<container::XNameAccess> xTextFieldMasters = xSupplier->getTextFieldMasters();
+    // Here we try to read/write docvar having non-ascii name and value. So it is encoded in Unicode
+    OUString sFieldName(u"com.sun.star.text.fieldmaster.User."
+                        "LocalChars\u00c1\u0072\u0076\u00ed\u007a\u0074\u0075\u0072\u006f\u0054"
+                        "\u00fc\u006b\u00f6\u0072\u0066\u00fa\u0072\u00f3\u0067\u00e9\u0070");
+    CPPUNIT_ASSERT_EQUAL(sal_True, xTextFieldMasters->hasByName(sFieldName));
+
+    auto xFieldMaster = xTextFieldMasters->getByName(sFieldName);
+    CPPUNIT_ASSERT_EQUAL(
+        OUString(u"\u00e1\u0072\u0076\u00ed\u007a\u0074\u0075\u0072\u006f\u0074\u00fc"
+                 "\u006b\u00f6\u0072\u0066\u00fa\u0072\u00f3\u0067\u00e9\u0070"),
+        getProperty<OUString>(xFieldMaster, "Content"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf108416, "tdf108416.rtf")
@@ -957,7 +1063,7 @@ DECLARE_RTFEXPORT_TEST(testTdf87034, "tdf87034.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testClassificatonPasteLevels)
 {
-    load(mpTestDocumentPath, "classification-confidential.rtf");
+    createSwDoc("classification-confidential.rtf");
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextRange> xText = xTextDocument->getText();
     uno::Reference<text::XTextRange> xEnd = xText->getEnd();
@@ -993,7 +1099,7 @@ DECLARE_RTFEXPORT_TEST(testTdf82073, "tdf82073.rtf")
     uno::Reference<text::XTextTable> xTable(getParagraphOrTable(2), uno::UNO_QUERY);
     uno::Reference<text::XTextRange> xCell(xTable->getCellByName("A1"), uno::UNO_QUERY);
     // This was -1: the background color was automatic, not black.
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), getProperty<sal_Int32>(xCell, "BackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(xCell, "BackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf74795, "tdf74795.rtf")
@@ -1086,12 +1192,12 @@ DECLARE_RTFEXPORT_TEST(testTdf104744, "tdf104744.rtf")
 CPPUNIT_TEST_FIXTURE(SwModelTestBase, testChicagoNumberingFootnote)
 {
     // Create a document, set footnote numbering type to SYMBOL_CHICAGO.
-    loadURL("private:factory/swriter", nullptr);
+    createSwDoc();
     uno::Reference<text::XFootnotesSupplier> xFootnotesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xFootnoteSettings
         = xFootnotesSupplier->getFootnoteSettings();
     sal_uInt16 nNumberingType = style::NumberingType::SYMBOL_CHICAGO;
-    xFootnoteSettings->setPropertyValue("NumberingType", uno::makeAny(nNumberingType));
+    xFootnoteSettings->setPropertyValue("NumberingType", uno::Any(nNumberingType));
 
     // Insert a footnote.
     uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
@@ -1175,8 +1281,9 @@ DECLARE_RTFEXPORT_TEST(testTdf106950, "tdf106950.rtf")
         static_cast<style::ParagraphAdjust>(getProperty<sal_Int16>(xPara, "ParaAdjust")));
 }
 
-DECLARE_RTFEXPORT_TEST(testTdf116371, "tdf116371.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf116371)
 {
+    loadAndReload("tdf116371.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     auto xShape(getShape(1));
@@ -1208,7 +1315,7 @@ DECLARE_RTFEXPORT_TEST(testTdf133437, "tdf133437.rtf")
         xmlNodeSetPtr pXmlNodes = pXmlObj->nodesetval;
         sal_Int32 shapesOnPage = xmlXPathNodeSetGetLength(pXmlNodes);
         xmlXPathFreeObject(pXmlObj);
-        CPPUNIT_ASSERT_EQUAL(sal_Int32(120), shapesOnPage);
+        CPPUNIT_ASSERT_EQUAL(sal_Int32(118), shapesOnPage);
     }
     // Third page
     {
@@ -1217,12 +1324,13 @@ DECLARE_RTFEXPORT_TEST(testTdf133437, "tdf133437.rtf")
         xmlNodeSetPtr pXmlNodes = pXmlObj->nodesetval;
         sal_Int32 shapesOnPage = xmlXPathNodeSetGetLength(pXmlNodes);
         xmlXPathFreeObject(pXmlObj);
-        CPPUNIT_ASSERT_EQUAL(sal_Int32(86), shapesOnPage);
+        CPPUNIT_ASSERT_EQUAL(sal_Int32(84), shapesOnPage);
     }
 }
 
-DECLARE_RTFEXPORT_TEST(testTdf128320, "tdf128320.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf128320)
 {
+    loadAndReload("tdf128320.odt");
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Shape does exist in RTF output
@@ -1267,8 +1375,9 @@ DECLARE_RTFEXPORT_TEST(testTdf138210, "tdf138210.rtf")
     CPPUNIT_ASSERT_EQUAL(sal_Int32(1), xIndexAccess->getCount());
 }
 
-DECLARE_RTFEXPORT_TEST(testTdf137894, "tdf137894.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf137894)
 {
+    loadAndReload("tdf137894.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     lang::Locale locale1(getProperty<lang::Locale>(getRun(getParagraph(1), 1), "CharLocaleAsian"));
     CPPUNIT_ASSERT_EQUAL(OUString("ja"), locale1.Language);
@@ -1284,14 +1393,16 @@ DECLARE_RTFEXPORT_TEST(testTdf137894, "tdf137894.odt")
     CPPUNIT_ASSERT_EQUAL(32.f, getProperty<float>(getRun(getParagraph(2), 1), "CharHeightComplex"));
 }
 
-DECLARE_RTFEXPORT_TEST(testTdf138779, "tdf138779.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf138779)
 {
+    loadAndReload("tdf138779.docx");
     // The text "2. Kozuka Mincho Pro, 8 pt Ruby ..." has font size 11pt ( was 20pt ).
     CPPUNIT_ASSERT_EQUAL(11.f, getProperty<float>(getRun(getParagraph(2), 14), "CharHeight"));
 }
 
-DECLARE_RTFEXPORT_TEST(testTdf144437, "tdf144437.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf144437)
 {
+    loadAndReload("tdf144437.odt");
     SvStream* pStream = maTempFile.GetStream(StreamMode::READ);
     CPPUNIT_ASSERT(pStream);
     OString aRtfContent(read_uInt8s_ToOString(*pStream, pStream->TellEnd()));
@@ -1317,7 +1428,7 @@ DECLARE_RTFEXPORT_TEST(testTdf131234, "tdf131234.rtf")
     // Ensure that text has default font attrs in spite of style referenced
     // E.g. 12pt, Times New Roman, black, no bold, no italic, no underline
     CPPUNIT_ASSERT_EQUAL(12.f, getProperty<float>(xRun, "CharHeight"));
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(xRun, "CharColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(xRun, "CharColor"));
     CPPUNIT_ASSERT_EQUAL(OUString("Times New Roman"), getProperty<OUString>(xRun, "CharFontName"));
     CPPUNIT_ASSERT_EQUAL(awt::FontWeight::NORMAL, getProperty<float>(xRun, "CharWeight"));
     CPPUNIT_ASSERT_EQUAL(awt::FontUnderline::NONE, getProperty<sal_Int16>(xRun, "CharUnderline"));
@@ -1352,6 +1463,22 @@ DECLARE_RTFEXPORT_TEST(testTdf104390, "tdf104390.rtf")
 
     // Ensure there is only one run
     CPPUNIT_ASSERT_MESSAGE("Extra elements in paragraph", !xRunEnum->hasMoreElements());
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf153681, "tdf153681.odt")
+{
+    uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(),
+                                                    uno::UNO_QUERY_THROW);
+
+    // This is outside table
+    uno::Reference<text::XTextTable> xTable(xTables->getByIndex(1), uno::UNO_QUERY_THROW);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 2
+    // - Actual  : 3
+    // Generates extra cell
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2), xTable->getRows()->getCount());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2), xTable->getColumns()->getCount());
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

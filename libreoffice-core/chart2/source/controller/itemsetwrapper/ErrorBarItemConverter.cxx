@@ -30,7 +30,8 @@
 #include <com/sun/star/chart2/XInternalDataProvider.hpp>
 #include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart/ErrorBarStyle.hpp>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -78,7 +79,7 @@ namespace chart::wrapper
 {
 
 ErrorBarItemConverter::ErrorBarItemConverter(
-    const uno::Reference< frame::XModel > & xModel,
+    uno::Reference< frame::XModel > xModel,
     const uno::Reference< beans::XPropertySet > & rPropertySet,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
@@ -88,7 +89,7 @@ ErrorBarItemConverter::ErrorBarItemConverter(
                                   rPropertySet, rItemPool, rDrawModel,
                                   xNamedPropertyContainerFactory,
                                   GraphicObjectType::LineProperties )),
-        m_xModel( xModel )
+        m_xModel(std::move( xModel ))
 {}
 
 ErrorBarItemConverter::~ErrorBarItemConverter()
@@ -356,7 +357,7 @@ void ErrorBarItemConverter::FillSpecialItem(
         {
             double fPos(0.0), fNeg(0.0);
             lcl_getErrorValues( GetPropertySet(), fPos, fNeg );
-            rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, nWhichId ));
+            rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, SCHATTR_STAT_PERCENT ));
         }
         break;
 
@@ -364,7 +365,7 @@ void ErrorBarItemConverter::FillSpecialItem(
         {
             double fPos(0.0), fNeg(0.0);
             lcl_getErrorValues( GetPropertySet(), fPos, fNeg );
-            rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, nWhichId ));
+            rOutItemSet.Put( SvxDoubleItem( ( fPos + fNeg ) / 2.0, SCHATTR_STAT_BIGERROR ));
         }
         break;
 
@@ -372,7 +373,7 @@ void ErrorBarItemConverter::FillSpecialItem(
         {
             double fPos(0.0), fNeg(0.0);
             lcl_getErrorValues( GetPropertySet(), fPos, fNeg );
-            rOutItemSet.Put( SvxDoubleItem( fPos, nWhichId ));
+            rOutItemSet.Put( SvxDoubleItem( fPos, SCHATTR_STAT_CONSTPLUS ));
         }
         break;
 
@@ -380,7 +381,7 @@ void ErrorBarItemConverter::FillSpecialItem(
         {
             double fPos(0.0), fNeg(0.0);
             lcl_getErrorValues( GetPropertySet(), fPos, fNeg );
-            rOutItemSet.Put( SvxDoubleItem( fNeg, nWhichId ));
+            rOutItemSet.Put( SvxDoubleItem( fNeg, SCHATTR_STAT_CONSTMINUS ));
         }
         break;
 

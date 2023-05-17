@@ -81,13 +81,14 @@
 #include <svx/svxids.hrc>
 #include <svx/sdtfsitm.hxx>
 #include <svx/sdmetitm.hxx>
+#include <svx/zoomslideritem.hxx>
 #include <svx/xflclit.hxx>
 #include <svx/xlnwtit.hxx>
 #include <svx/chrtitem.hxx>
 #include <svx/xlnclit.hxx>
 #include <svx/xflgrit.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
 
 #include <unotools/useroptions.hxx>
@@ -243,9 +244,9 @@ protected:
     uno::Reference<beans::XPropertyContainer> m_xPropertyContainer;
     sfx::ClassificationKeyCreator m_aKeyCreator;
 public:
-    ClassificationCommon(sd::DrawViewShell & rDrawViewShell)
+    ClassificationCommon(sd::DrawViewShell& rDrawViewShell, const css::uno::Reference<css::document::XDocumentProperties>& rDocProps)
         : m_rDrawViewShell(rDrawViewShell)
-        , m_xDocumentProperties(SfxObjectShell::Current()->getDocProperties())
+        , m_xDocumentProperties(rDocProps)
         , m_xPropertyContainer(m_xDocumentProperties->getUserDefinedProperties())
         , m_aKeyCreator(SfxClassificationHelper::getPolicyType())
     {}
@@ -305,8 +306,8 @@ private:
     }
 
 public:
-    ClassificationCollector(sd::DrawViewShell & rDrawViewShell)
-        : ClassificationCommon(rDrawViewShell)
+    ClassificationCollector(sd::DrawViewShell & rDrawViewShell, const css::uno::Reference<css::document::XDocumentProperties>& rDocProps)
+        : ClassificationCommon(rDrawViewShell, rDocProps)
     {}
 
     std::vector<svx::ClassificationResult> const & getResults() const
@@ -335,7 +336,7 @@ public:
             {
                 SdrObject* pObject = pMasterPage->GetObj(nObject);
                 SdrRectObj* pRectObject = dynamic_cast<SdrRectObj*>(pObject);
-                if (pRectObject && pRectObject->GetTextKind() == OBJ_TEXT)
+                if (pRectObject && pRectObject->GetTextKind() == SdrObjKind::Text)
                 {
                     OutlinerParaObject* pOutlinerParagraphObject = pRectObject->GetOutlinerParaObject();
                     if (pOutlinerParagraphObject)
@@ -374,7 +375,7 @@ private:
             {
                 SdrObject* pObject = pMasterPage->GetObj(nObject);
                 SdrRectObj* pRectObject = dynamic_cast<SdrRectObj*>(pObject);
-                if (pRectObject && pRectObject->GetTextKind() == OBJ_TEXT)
+                if (pRectObject && pRectObject->GetTextKind() == SdrObjKind::Text)
                 {
                     OutlinerParaObject* pOutlinerParagraphObject = pRectObject->GetOutlinerParaObject();
                     if (pOutlinerParagraphObject)
@@ -460,8 +461,8 @@ private:
     }
 
 public:
-    ClassificationInserter(sd::DrawViewShell & rDrawViewShell)
-        : ClassificationCommon(rDrawViewShell)
+    ClassificationInserter(sd::DrawViewShell & rDrawViewShell, const css::uno::Reference<css::document::XDocumentProperties>& rDocProps)
+        : ClassificationCommon(rDrawViewShell, rDocProps)
     {
     }
 
@@ -523,12 +524,12 @@ public:
             if (!pMasterPage)
                 continue;
 
-            SdrRectObj* pObject = new SdrRectObj(
+            rtl::Reference<SdrRectObj> pObject = new SdrRectObj(
                 *m_rDrawViewShell.GetDoc(), // TTTT should be reference
-                OBJ_TEXT);
+                SdrObjKind::Text);
             pObject->SetMergedItem(makeSdrTextAutoGrowWidthItem(true));
             pObject->SetOutlinerParaObject(pOutliner->CreateParaObject());
-            pMasterPage->InsertObject(pObject);
+            pMasterPage->InsertObject(pObject.get());
 
             // Calculate position
             ::tools::Rectangle aRectangle(Point(), pMasterPage->GetSize());
@@ -601,20 +602,21 @@ public:
             if (pColorItem)
             {
                 XFillColorItem aColorItem(*pColorItem);
+                aColorItem.GetThemeColor().clearTransformations();
                 if (pArgs->GetItemState(SID_ATTR_COLOR_THEME_INDEX, false, &pItem) == SfxItemState::SET)
                 {
                     auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                    aColorItem.GetThemeColor().SetThemeIndex(pIntItem->GetValue());
+                    aColorItem.GetThemeColor().setType(model::convertToThemeColorType(pIntItem->GetValue()));
                 }
                 if (pArgs->GetItemState(SID_ATTR_COLOR_LUM_MOD, false, &pItem) == SfxItemState::SET)
                 {
                     auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                    aColorItem.GetThemeColor().SetLumMod(pIntItem->GetValue());
+                    aColorItem.GetThemeColor().addTransformation({model::TransformationType::LumMod, pIntItem->GetValue()});
                 }
                 if (pArgs->GetItemState(SID_ATTR_COLOR_LUM_OFF, false, &pItem) == SfxItemState::SET)
                 {
                     auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                    aColorItem.GetThemeColor().SetLumOff(pIntItem->GetValue());
+                    aColorItem.GetThemeColor().addTransformation({model::TransformationType::LumOff, pIntItem->GetValue()});
                 }
                 pArgs->Put(aColorItem);
             }
@@ -690,6 +692,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
         case SID_ATTR_SHADOW_BLUR:
         case SID_ATTR_SHADOW_XDISTANCE:
         case SID_ATTR_SHADOW_YDISTANCE:
+        case SID_ATTR_FILL_USE_SLIDE_BACKGROUND:
         case SID_ATTR_FILL_TRANSPARENCE:
         case SID_ATTR_FILL_FLOATTRANSPARENCE:
 
@@ -728,6 +731,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                     case SID_ATTR_FILL_GRADIENT:
                     case SID_ATTR_FILL_HATCH:
                     case SID_ATTR_FILL_BITMAP:
+                    case SID_ATTR_FILL_USE_SLIDE_BACKGROUND:
                     case SID_ATTR_FILL_TRANSPARENCE:
                     case SID_ATTR_FILL_FLOATTRANSPARENCE:
                         GetViewFrame()->GetDispatcher()->Execute( SID_ATTRIBUTES_AREA, SfxCallMode::ASYNCHRON );
@@ -991,7 +995,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
             const SfxItemSet* pArgs = rReq.GetArgs();
 
             const SfxUInt16Item* pScale = (pArgs && pArgs->Count () == 1) ?
-                rReq.GetArg<SfxUInt16Item>(SID_ATTR_ZOOMSLIDER) : nullptr;
+                rReq.GetArg(SID_ATTR_ZOOMSLIDER) : nullptr;
             if (pScale && CHECK_RANGE (5, pScale->GetValue (), 3000))
             {
                 SetZoom (pScale->GetValue ());
@@ -1199,7 +1203,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                 }
 
                 // create new object
-                SdrGrafObj* pGraphicObj = new SdrGrafObj(
+                rtl::Reference<SdrGrafObj> pGraphicObj = new SdrGrafObj(
                     *GetDoc(),
                     aGraphic);
 
@@ -1234,7 +1238,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                 pGraphicObj->SetLayer(pReplacementCandidate->GetLayer());
 
                 // now replace lowest object with new one
-                mpDrawView->ReplaceObjectAtView(pReplacementCandidate, *pPageView, pGraphicObj);
+                mpDrawView->ReplaceObjectAtView(pReplacementCandidate, *pPageView, pGraphicObj.get());
 
                 // switch off undo
                 mpDrawView->EndUndo();
@@ -1306,13 +1310,13 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                     SfxStyleSheet* pSheet = nullptr;
                     SdrObject* pObj = rMarkList.GetMark(i)->GetMarkedSdrObj();
 
-                    if (pObj->GetObjIdentifier() == OBJ_TITLETEXT)
+                    if (pObj->GetObjIdentifier() == SdrObjKind::TitleText)
                     {
                         pSheet = mpActualPage->GetStyleSheetForPresObj(PresObjKind::Title);
                         if (pSheet)
                             pObj->SetStyleSheet(pSheet, false);
                     }
-                    else if(pObj->GetObjIdentifier() == OBJ_OUTLINETEXT)
+                    else if(pObj->GetObjIdentifier() == SdrObjKind::OutlineText)
                     {
                         for (sal_uInt16 nLevel = 1; nLevel < 10; nLevel++)
                         {
@@ -1453,7 +1457,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                         GraphicObject aGraphicObject( pGraphicObj->GetGraphicObject() );
                         m_ExternalEdits.push_back(
                             std::make_unique<SdrExternalToolEdit>(
-                                mpDrawView.get(), pObj));
+                                mpDrawView.get(), pGraphicObj));
                         m_ExternalEdits.back()->Edit( &aGraphicObject );
                     }
             }
@@ -1475,11 +1479,11 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                         CompressGraphicsDialog dialog(GetFrameWeld(), pGraphicObj, GetViewFrame()->GetBindings() );
                         if (dialog.run() == RET_OK)
                         {
-                            SdrGrafObj* pNewObject = dialog.GetCompressedSdrGrafObj();
+                            rtl::Reference<SdrGrafObj> pNewObject = dialog.GetCompressedSdrGrafObj();
                             SdrPageView* pPageView = mpDrawView->GetSdrPageView();
                             OUString aUndoString = mpDrawView->GetDescriptionOfMarkedObjects() + " Compress";
                             mpDrawView->BegUndo( aUndoString );
-                            mpDrawView->ReplaceObjectAtView( pObj, *pPageView, pNewObject );
+                            mpDrawView->ReplaceObjectAtView( pObj, *pPageView, pNewObject.get() );
                             mpDrawView->EndUndo();
                         }
                     }
@@ -1686,18 +1690,22 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
 
         case SID_CLASSIFICATION_DIALOG:
         {
-            auto xDialog = std::make_shared<svx::ClassificationDialog>(GetFrameWeld(), false, [](){} );
-            ClassificationCollector aCollector(*this);
-            aCollector.collect();
-
-            xDialog->setupValues(std::vector(aCollector.getResults()));
-
-            if (RET_OK == xDialog->run())
+            if (SfxObjectShell* pObjShell = SfxObjectShell::Current())
             {
-                ClassificationInserter aInserter(*this);
-                aInserter.insert(xDialog->getResult());
+                css::uno::Reference<css::document::XDocumentProperties> xDocProps(pObjShell->getDocProperties());
+                auto xDialog = std::make_shared<svx::ClassificationDialog>(GetFrameWeld(), xDocProps, false, [](){} );
+                ClassificationCollector aCollector(*this, xDocProps);
+                aCollector.collect();
+
+                xDialog->setupValues(std::vector(aCollector.getResults()));
+
+                if (RET_OK == xDialog->run())
+                {
+                    ClassificationInserter aInserter(*this, xDocProps);
+                    aInserter.insert(xDialog->getResult());
+                }
+                xDialog.reset();
             }
-            xDialog.reset();
 
             Cancel();
             rReq.Ignore();
@@ -2530,9 +2538,9 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                 pOutl->QuickInsertField( *pFieldItem, ESelection() );
                 std::optional<OutlinerParaObject> pOutlParaObject = pOutl->CreateParaObject();
 
-                SdrRectObj* pRectObj = new SdrRectObj(
+                rtl::Reference<SdrRectObj> pRectObj = new SdrRectObj(
                     *GetDoc(),
-                    OBJ_TEXT);
+                    SdrObjKind::Text);
                 pRectObj->SetMergedItem(makeSdrTextAutoGrowWidthItem(true));
 
                 pOutl->UpdateFields();
@@ -2551,7 +2559,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                 ::tools::Rectangle aLogicRect(aPos, aSize);
                 pRectObj->SetLogicRect(aLogicRect);
                 pRectObj->SetOutlinerParaObject( std::move(pOutlParaObject) );
-                mpDrawView->InsertObjectAtView(pRectObj, *mpDrawView->GetSdrPageView());
+                mpDrawView->InsertObjectAtView(pRectObj.get(), *mpDrawView->GetSdrPageView());
                 pOutl->Init( nOutlMode );
             }
 
@@ -3159,6 +3167,8 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
             else
                 mpDrawView->SelectAll();
 
+            FreshNavigatrTree();
+
             Cancel();
             rReq.Done ();
         }
@@ -3340,16 +3350,27 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
 
         case SID_NAVIGATOR:
         {
-            if ( rReq.GetArgs() )
-                GetViewFrame()->SetChildWindow(SID_NAVIGATOR,
-                                        static_cast<const SfxBoolItem&>(rReq.GetArgs()->
-                                        Get(SID_NAVIGATOR)).GetValue());
-            else
-                GetViewFrame()->ToggleChildWindow( SID_NAVIGATOR );
+            if (comphelper::LibreOfficeKit::isActive())
+            {
+                GetViewFrame()->ShowChildWindow(SID_SIDEBAR);
+                OUString panelId = "SdNavigatorPanel";
+                ::sfx2::sidebar::Sidebar::TogglePanel(
+                    panelId, GetViewFrame()->GetFrame().GetFrameInterface());
 
-            GetViewFrame()->GetBindings().Invalidate(SID_NAVIGATOR);
-            Cancel();
-            rReq.Ignore ();
+                Cancel();
+                rReq.Done();
+            } else {
+                if ( rReq.GetArgs() )
+                    GetViewFrame()->SetChildWindow(SID_NAVIGATOR,
+                                            static_cast<const SfxBoolItem&>(rReq.GetArgs()->
+                                            Get(SID_NAVIGATOR)).GetValue());
+                else
+                    GetViewFrame()->ToggleChildWindow( SID_NAVIGATOR );
+
+                GetViewFrame()->GetBindings().Invalidate(SID_NAVIGATOR);
+                Cancel();
+                rReq.Ignore ();
+            }
         }
         break;
 
@@ -3559,7 +3580,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
         {
             OUString sAdditionsTag = "";
 
-            const SfxStringItem* pStringArg = rReq.GetArg<SfxStringItem>(SID_ADDITIONS_TAG);
+            const SfxStringItem* pStringArg = rReq.GetArg<SfxStringItem>(FN_PARAM_ADDITIONS_TAG);
             if (pStringArg)
                 sAdditionsTag = pStringArg->GetValue();
 

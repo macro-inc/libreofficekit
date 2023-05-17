@@ -48,15 +48,15 @@
 #include <com/sun/star/chart2/XChartDocument.hpp>
 
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
-#include <com/sun/star/io/XTruncate.hpp>
 
 #include <comphelper/fileformat.h>
 #include <comphelper/storagehelper.hxx>
 #include <comphelper/mimeconfighelper.hxx>
 #include <comphelper/namedvaluecollection.hxx>
 #include <comphelper/propertyvalue.hxx>
+#include <unotools/mediadescriptor.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <unotools/configmgr.hxx>
 #include "persistence.hxx"
@@ -190,10 +190,13 @@ static void TransferMediaType( const uno::Reference< embed::XStorage >& i_rSourc
 static uno::Reference< util::XCloseable > CreateDocument( const uno::Reference< uno::XComponentContext >& _rxContext,
     const OUString& _rDocumentServiceName, bool _bEmbeddedScriptSupport, const bool i_bDocumentRecoverySupport )
 {
+    static constexpr OUStringLiteral sEmbeddedObject = u"EmbeddedObject";
+    static constexpr OUStringLiteral sEmbeddedScriptSupport = u"EmbeddedScriptSupport";
+    static constexpr OUStringLiteral sDocumentRecoverySupport = u"DocumentRecoverySupport";
     ::comphelper::NamedValueCollection aArguments;
-    aArguments.put( "EmbeddedObject", true );
-    aArguments.put( "EmbeddedScriptSupport", _bEmbeddedScriptSupport );
-    aArguments.put( "DocumentRecoverySupport", i_bDocumentRecoverySupport );
+    aArguments.put( sEmbeddedObject, true );
+    aArguments.put( sEmbeddedScriptSupport, _bEmbeddedScriptSupport );
+    aArguments.put( sDocumentRecoverySupport, i_bDocumentRecoverySupport );
 
     uno::Reference< uno::XInterface > xDocument;
     try
@@ -393,6 +396,8 @@ uno::Reference< util::XCloseable > OCommonEmbeddedObject::LoadLink_Impl()
 
     try
     {
+        handleLinkedOLE(CopyBackToOLELink::CopyLinkToTemp);
+
         // the document is not really an embedded one, it is a link
         EmbedAndReparentDoc_Impl( xDocument );
 
@@ -773,14 +778,19 @@ void OCommonEmbeddedObject::StoreDocToStorage_Impl(
         if ( aFilterName.isEmpty() )
             throw io::IOException(); // TODO:
 
+        static constexpr OUStringLiteral sFilterName = u"FilterName";
+        static constexpr OUStringLiteral sHierarchicalDocumentName = u"HierarchicalDocumentName";
+        static constexpr OUStringLiteral sDocumentBaseURL = u"DocumentBaseURL";
+        static constexpr OUStringLiteral sSourceShellID = u"SourceShellID";
+        static constexpr OUStringLiteral sDestinationShellID = u"DestinationShellID";
         uno::Sequence<beans::PropertyValue> aArgs{
-            comphelper::makePropertyValue("FilterName", aFilterName),
-            comphelper::makePropertyValue("HierarchicalDocumentName", aHierarchName),
-            comphelper::makePropertyValue("DocumentBaseURL", aBaseURL),
-            comphelper::makePropertyValue("SourceShellID",
-                                          getStringPropertyValue(rObjArgs, u"SourceShellID")),
+            comphelper::makePropertyValue(sFilterName, aFilterName),
+            comphelper::makePropertyValue(sHierarchicalDocumentName, aHierarchName),
+            comphelper::makePropertyValue(sDocumentBaseURL, aBaseURL),
+            comphelper::makePropertyValue(sSourceShellID,
+                                          getStringPropertyValue(rObjArgs, sSourceShellID)),
             comphelper::makePropertyValue(
-                "DestinationShellID", getStringPropertyValue(rObjArgs, u"DestinationShellID"))
+                sDestinationShellID, getStringPropertyValue(rObjArgs, sDestinationShellID))
         };
 
         xDoc->storeToStorage( xStorage, aArgs );
@@ -1255,11 +1265,13 @@ void SAL_CALL OCommonEmbeddedObject::storeAsEntry( const uno::Reference< embed::
                             const uno::Sequence< beans::PropertyValue >& lArguments,
                             const uno::Sequence< beans::PropertyValue >& lObjArgs )
 {
-    // TODO: use lObjArgs
-
     ::osl::ResettableMutexGuard aGuard( m_aMutex );
     if ( m_bDisposed )
         throw lang::DisposedException(); // TODO
+
+    bool AutoSaveEvent = false;
+    utl::MediaDescriptor lArgs(lObjArgs);
+    lArgs[utl::MediaDescriptor::PROP_AUTOSAVEEVENT] >>= AutoSaveEvent;
 
     if ( m_nObjectState == -1 )
     {
@@ -1280,27 +1292,8 @@ void SAL_CALL OCommonEmbeddedObject::storeAsEntry( const uno::Reference< embed::
     {
         m_aNewEntryName = sEntName;
 
-        if(m_aLinkTempFile.is() && m_bLinkTempFileChanged)
-        {
-            // tdf#141529 if we have a changed copy of the original OLE data we now
-            // need to write it back 'over' the original OLE data
-            uno::Reference < ucb::XSimpleFileAccess2 > xFileAccess(ucb::SimpleFileAccess::create( m_xContext ));
-            uno::Reference < io::XInputStream > xTempIn = m_aLinkTempFile->getInputStream();
-
-            // This is *needed* since OTempFileService calls OTempFileService::readBytes which
-            // ensures the SvStream mpStream gets/is opened, *but* also sets the mnCachedPos from
-            // OTempFileService which still points to the end-of-file (from write-cc'ing).
-            uno::Reference < io::XSeekable > xSeek( xTempIn, uno::UNO_QUERY_THROW );
-            xSeek->seek(0);
-
-            xFileAccess->writeFile(m_aLinkURL, xTempIn);
-
-            // Do *not* close input, that would remove the temporary file too early
-            // xTempIn->closeInput();
-
-            // reset flag m_bLinkTempFileChanged
-            m_bLinkTempFileChanged = false;
-        }
+        if ( !AutoSaveEvent )
+            handleLinkedOLE(CopyBackToOLELink::CopyTempToLink);
 
         return;
     }

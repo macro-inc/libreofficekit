@@ -57,6 +57,7 @@
 
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/storagehelper.hxx>
+#include <utility>
 
 #include "databases.hxx"
 #include "urlparameter.hxx"
@@ -566,36 +567,37 @@ namespace chelp {
 
 KeywordInfo::KeywordElement::KeywordElement( Databases const *pDatabases,
                                              helpdatafileproxy::Hdf* pHdf,
-                                             OUString const & ky,
-                                             OUString const & data )
-    : key( ky )
+                                             OUString ky,
+                                             std::u16string_view data )
+    : key(std::move( ky ))
 {
     pDatabases->replaceName( key );
     init( pDatabases,pHdf,data );
 }
 
-void KeywordInfo::KeywordElement::init( Databases const *pDatabases,helpdatafileproxy::Hdf* pHdf,const OUString& ids )
+void KeywordInfo::KeywordElement::init( Databases const *pDatabases,helpdatafileproxy::Hdf* pHdf, std::u16string_view ids )
 {
     std::vector< OUString > id,anchor;
-    int idx = -1,k;
+    size_t idx = std::u16string_view::npos;
+    size_t k = 0;
     for (;;)
     {
-        k = ++idx;
-        idx = ids.indexOf( ';', k );
-        if( idx == -1 )
+        idx = ids.find( ';', k );
+        if( idx == std::u16string_view::npos )
             break;
-        int h = ids.indexOf( '#', k );
-        if( h < idx )
+        size_t h = ids.find( '#', k );
+        if( h == std::u16string_view::npos || h < idx )
         {
             // found an anchor
-            id.push_back( ids.copy( k, h-k ) );
-            anchor.push_back( ids.copy( h+1, idx-h-1 ) );
+            id.push_back( OUString(ids.substr( k, h-k )) );
+            anchor.push_back( OUString(ids.substr( h+1, idx-h-1 )) );
         }
         else
         {
-            id.push_back( ids.copy( k, idx-k ) );
+            id.push_back( OUString(ids.substr( k, idx-k )) );
             anchor.emplace_back( );
         }
+        k = ++idx;
     }
 
     listId.realloc( id.size() );
@@ -775,10 +777,10 @@ KeywordInfo* Databases::getKeyword( const OUString& Database,
     return it->second.get();
 }
 
-Reference< XHierarchicalNameAccess > Databases::jarFile( const OUString& jar,
+Reference< XHierarchicalNameAccess > Databases::jarFile( std::u16string_view jar,
                                                          const OUString& Language )
 {
-    if( jar.isEmpty() || Language.isEmpty() )
+    if( jar.empty() || Language.isEmpty() )
     {
         return Reference< XHierarchicalNameAccess >( nullptr );
     }
@@ -795,14 +797,14 @@ Reference< XHierarchicalNameAccess > Databases::jarFile( const OUString& jar,
         {
             OUString zipFile;
             // Extension jar file? Search for ?
-            sal_Int32 nQuestionMark1 = jar.indexOf( '?' );
-            sal_Int32 nQuestionMark2 = jar.lastIndexOf( '?' );
-            if( nQuestionMark1 != -1 && nQuestionMark2 != -1 && nQuestionMark1 != nQuestionMark2 )
+            size_t nQuestionMark1 = jar.find( '?' );
+            size_t nQuestionMark2 = jar.rfind( '?' );
+            if( nQuestionMark1 != std::u16string_view::npos && nQuestionMark2 != std::u16string_view::npos && nQuestionMark1 != nQuestionMark2 )
             {
-                OUString aExtensionPath = jar.copy( nQuestionMark1 + 1, nQuestionMark2 - nQuestionMark1 - 1 );
-                OUString aPureJar = jar.copy( nQuestionMark2 + 1 );
+                std::u16string_view aExtensionPath = jar.substr( nQuestionMark1 + 1, nQuestionMark2 - nQuestionMark1 - 1 );
+                std::u16string_view aPureJar = jar.substr( nQuestionMark2 + 1 );
 
-                zipFile = expandURL( aExtensionPath + "/" + aPureJar );
+                zipFile = expandURL( OUString::Concat(aExtensionPath) + "/" + aPureJar );
             }
             else
             {
@@ -1099,24 +1101,24 @@ void Databases::setInstallPath( const OUString& aInstDir )
 ExtensionHelpExistenceMap ExtensionIteratorBase::aHelpExistenceMap;
 
 ExtensionIteratorBase::ExtensionIteratorBase( Reference< XComponentContext > const & xContext,
-    Databases& rDatabases, const OUString& aInitialModule, const OUString& aLanguage )
+    Databases& rDatabases, OUString aInitialModule, OUString aLanguage )
         : m_xContext( xContext )
         , m_rDatabases( rDatabases )
         , m_eState( IteratorState::InitialModule )
-        , m_aInitialModule( aInitialModule )
-        , m_aLanguage( aLanguage )
+        , m_aInitialModule(std::move( aInitialModule ))
+        , m_aLanguage(std::move( aLanguage ))
 {
     assert( m_xContext.is() );
     init();
 }
 
 ExtensionIteratorBase::ExtensionIteratorBase( Databases& rDatabases,
-    const OUString& aInitialModule, const OUString& aLanguage )
+    OUString aInitialModule, OUString aLanguage )
         : m_xContext( comphelper::getProcessComponentContext() )
         , m_rDatabases( rDatabases )
         , m_eState( IteratorState::InitialModule )
-        , m_aInitialModule( aInitialModule )
-        , m_aLanguage( aLanguage )
+        , m_aInitialModule(std::move( aInitialModule ))
+        , m_aLanguage(std::move( aLanguage ))
 {
     init();
 }
@@ -1795,12 +1797,12 @@ OUString IndexFolderIterator::implGetIndexFolderFromPackage( bool& o_rbTemporary
     return aIndexFolder;
 }
 
-void IndexFolderIterator::deleteTempIndexFolder( const OUString& aIndexFolder )
+void IndexFolderIterator::deleteTempIndexFolder( std::u16string_view aIndexFolder )
 {
-    sal_Int32 nLastSlash = aIndexFolder.lastIndexOf( '/' );
-    if( nLastSlash != -1 )
+    size_t nLastSlash = aIndexFolder.rfind( '/' );
+    if( nLastSlash != std::u16string_view::npos )
     {
-        OUString aTmpFolder = aIndexFolder.copy( 0, nLastSlash );
+        OUString aTmpFolder( aIndexFolder.substr( 0, nLastSlash ) );
         try
         {
             m_xSFA->kill( aTmpFolder );

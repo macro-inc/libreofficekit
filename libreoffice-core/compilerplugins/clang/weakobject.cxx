@@ -1,3 +1,4 @@
+
 /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 /*
  * This file is part of the LibreOffice project.
@@ -70,7 +71,7 @@ bool WeakObject::VisitCXXRecordDecl(const CXXRecordDecl* decl)
         return true;
 
     report(DiagnosticsEngine::Warning, "more than one copy of cppu::OWeakObject inherited",
-            compat::getBeginLoc(decl))
+            decl->getBeginLoc())
         << decl->getSourceRange();
     return true;
 }

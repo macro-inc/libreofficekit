@@ -20,6 +20,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -43,6 +44,51 @@ namespace sal::systools
 
     private:
         HRESULT hr_;
+    };
+
+    /* Convert failed HRESULT to thrown ComError */
+    inline void ThrowIfFailed(HRESULT hr, std::string_view msg)
+    {
+        if (FAILED(hr))
+            throw ComError(std::string(msg), hr);
+    }
+
+    /* A guard class to call CoInitializeEx/CoUninitialize in proper pairs
+     * See also: o3tl::safeCoInitializeEx doing dangerous re-initialization
+     */
+    class CoInitializeGuard
+    {
+    public:
+        enum class WhenFailed
+        {
+            NoThrow, // do not throw
+            Throw, // throw on failure
+            Abort, // std::abort on failure
+        };
+        explicit CoInitializeGuard(DWORD dwCoInit, bool failChangeMode = false,
+                                   WhenFailed whenFailed = WhenFailed::Throw)
+        {
+            HRESULT hr = ::CoInitializeEx(nullptr, dwCoInit);
+            if (whenFailed != WhenFailed::NoThrow && FAILED(hr)
+                && (failChangeMode || hr != RPC_E_CHANGED_MODE))
+            {
+                if (whenFailed == WhenFailed::Throw)
+                    throw ComError("CoInitializeEx failed", hr);
+                else // if (whenFailed == Abort)
+                    std::abort();
+            }
+            mbUninit = SUCCEEDED(hr);
+        }
+        CoInitializeGuard(const CoInitializeGuard&) = delete; // non-construction-copyable
+        void operator=(const CoInitializeGuard&) = delete; // non-copyable
+        ~CoInitializeGuard()
+        {
+            if (mbUninit)
+                ::CoUninitialize();
+        }
+
+    private:
+        bool mbUninit;
     };
 
     struct COM_QUERY_TAG {} constexpr COM_QUERY;
@@ -69,6 +115,11 @@ namespace sal::systools
         {
         }
 
+        COMReference(COMReference<T>&& other) :
+            COMReference(std::exchange(other.com_ptr_, nullptr), false)
+        {
+        }
+
         // Query from IUnknown*, using COM_QUERY or COM_QUERY_THROW tags
         template <typename T2, typename TAG>
         COMReference(const COMReference<T2>& p, TAG t)
@@ -76,9 +127,26 @@ namespace sal::systools
         {
         }
 
+        // Using CoCreateInstance
+        COMReference(REFCLSID clsid, IUnknown* pOuter = nullptr, DWORD nCtx = CLSCTX_ALL)
+            : com_ptr_(nullptr)
+        {
+            ThrowIfFailed(CoCreateInstance(clsid, pOuter, nCtx), "CoCreateInstance failed");
+        }
+
         COMReference<T>& operator=(const COMReference<T>& other)
         {
             return operator=(other.com_ptr_);
+        }
+
+        COMReference<T>& operator=(COMReference<T>&& other)
+        {
+            if (com_ptr_ != other.com_ptr_)
+            {
+                clear();
+                std::swap(com_ptr_, other.com_ptr_);
+            }
+            return *this;
         }
 
         COMReference<T>& operator=(T* comptr)
@@ -92,16 +160,15 @@ namespace sal::systools
         template <typename T2, typename TAG, std::enable_if_t<is_COM_query_tag<TAG>, int> = 0>
         COMReference<T2> QueryInterface(TAG) const
         {
-            void* ip = nullptr;
-            HRESULT hr = E_FAIL;
+            T2* ip = nullptr;
+            HRESULT hr = E_POINTER;
             if (com_ptr_)
-                hr = com_ptr_->QueryInterface(__uuidof(T2), &ip);
+                hr = com_ptr_->QueryInterface(&ip);
 
             if constexpr (std::is_same_v<TAG, COM_QUERY_THROW_TAG>)
-                if (FAILED(hr))
-                    throw ComError("QueryInterface failed: Interface not supported!", hr);
+                ThrowIfFailed(hr, "QueryInterface failed");
 
-            return { static_cast<T2*>(ip), false };
+            return { ip, false };
         }
 
         template <typename T2, typename TAG>
@@ -110,16 +177,23 @@ namespace sal::systools
             return operator=(p.template QueryInterface<T>(t));
         }
 
-        COMReference<T>& CoCreateInstance(REFCLSID clsid, IUnknown* pOuter = nullptr,
-                                          DWORD nCtx = CLSCTX_ALL)
+        HRESULT CoCreateInstance(REFCLSID clsid, IUnknown* pOuter = nullptr,
+                                 DWORD nCtx = CLSCTX_ALL)
         {
-            clear();
-            HRESULT hr = ::CoCreateInstance(clsid, pOuter, nCtx, __uuidof(T),
-                                            reinterpret_cast<void**>(&com_ptr_));
-            if (FAILED(hr))
-                throw ComError("CoCreateInstance failed!", hr);
+            T* ip;
+            HRESULT hr = ::CoCreateInstance(clsid, pOuter, nCtx, IID_PPV_ARGS(&ip));
+            if (SUCCEEDED(hr))
+                release(std::exchange(com_ptr_, ip));
+            return hr;
+        }
 
-            return *this;
+        HRESULT CoGetClassObject(REFCLSID clsid, DWORD nCtx = CLSCTX_ALL)
+        {
+            T* ip;
+            HRESULT hr = ::CoGetClassObject(clsid, nCtx, nullptr, IID_PPV_ARGS(&ip));
+            if (SUCCEEDED(hr))
+                release(std::exchange(com_ptr_, ip));
+            return hr;
         }
 
         T* operator->() const { return com_ptr_; }

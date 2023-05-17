@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/xlabelrange.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -26,14 +26,13 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScLabelRangeObj : public CalcUnoApiTest, public apitest::XLabelRange
+class ScLabelRangeObj : public UnoApiTest, public apitest::XLabelRange
 {
 public:
     ScLabelRangeObj();
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScLabelRangeObj);
 
@@ -42,13 +41,10 @@ public:
     CPPUNIT_TEST(testGetSetLabelArea);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScLabelRangeObj::ScLabelRangeObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -71,15 +67,9 @@ uno::Reference<uno::XInterface> ScLabelRangeObj::init()
 
 void ScLabelRangeObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScLabelRangeObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScLabelRangeObj);

@@ -18,10 +18,12 @@
 #include <tools/gen.hxx>
 #include <tools/link.hxx>
 #include <vcl/dllapi.h>
+#include <utility>
 #include <vcl/vclenum.hxx>
 #include <vcl/font.hxx>
 #include <vcl/vclptr.hxx>
 #include <vcl/uitest/factory.hxx>
+#include <vcl/windowstate.hxx>
 
 #include <com/sun/star/accessibility/XAccessibleRelationSet.hpp>
 #include <com/sun/star/accessibility/XAccessible.hpp>
@@ -138,9 +140,6 @@ public:
     // TODO: review if this has any practical difference from has_focus()
     virtual bool is_active() const = 0;
 
-    virtual void set_has_default(bool has_default) = 0;
-    virtual bool get_has_default() const = 0;
-
     /* size */
     virtual void set_size_request(int nWidth, int nHeight) = 0;
     virtual Size get_size_request() const = 0;
@@ -214,8 +213,9 @@ public:
 
     virtual OUString get_accessible_description() const = 0;
 
+    // After this call this widget is only accessibility labelled by pLabel and
+    // pLabel only accessibility labels this widget
     virtual void set_accessible_relation_labeled_by(weld::Widget* pLabel) = 0;
-    virtual void set_accessible_relation_label_for(weld::Widget* pLabeled) = 0;
 
     virtual void set_tooltip_text(const OUString& rTip) = 0;
     virtual OUString get_tooltip_text() const = 0;
@@ -326,6 +326,9 @@ public:
 
     virtual VclPtr<VirtualDevice> create_virtual_device() const = 0;
 
+    //do something transient to attract the attention of the user to the widget
+    virtual void call_attention_to() = 0;
+
     //make this widget look like a page in a notebook
     virtual void set_stack_background() = 0;
     //make this widget look like it has a highlighted background
@@ -352,16 +355,15 @@ public:
 
 class VCL_DLLPUBLIC Container : virtual public Widget
 {
-protected:
     Link<Container&, void> m_aContainerFocusChangedHdl;
 
+protected:
     void signal_container_focus_changed() { m_aContainerFocusChangedHdl.Call(*this); }
 
 public:
-    // remove and add in one go
+    // remove from old container and add to new container in one go
+    // new container can be null to just remove from old container
     virtual void move(weld::Widget* pWidget, weld::Container* pNewParent) = 0;
-    // recursively unset has-default on any buttons in the widget hierarchy
-    virtual void recursively_unset_default_buttons() = 0;
     // create an XWindow as a child of this container. The XWindow is
     // suitable to contain css::awt::XControl items
     virtual css::uno::Reference<css::awt::XWindow> CreateChildFrame() = 0;
@@ -395,10 +397,12 @@ public:
 
 class VCL_DLLPUBLIC ScrolledWindow : virtual public Container
 {
-protected:
+    friend class ::LOKTrigger;
+
     Link<ScrolledWindow&, void> m_aVChangeHdl;
     Link<ScrolledWindow&, void> m_aHChangeHdl;
 
+protected:
     void signal_vadjustment_changed() { m_aVChangeHdl.Call(*this); }
     void signal_hadjustment_changed() { m_aHChangeHdl.Call(*this); }
 
@@ -482,19 +486,19 @@ public:
     }
     virtual void set_tab_label_text(const OString& rIdent, const OUString& rLabel) = 0;
     virtual OUString get_tab_label_text(const OString& rIdent) const = 0;
+    virtual void set_show_tabs(bool bShow) = 0;
     virtual int get_n_pages() const = 0;
     virtual weld::Container* get_page(const OString& rIdent) const = 0;
 
     void connect_leave_page(const Link<const OString&, bool>& rLink) { m_aLeavePageHdl = rLink; }
-
     void connect_enter_page(const Link<const OString&, void>& rLink) { m_aEnterPageHdl = rLink; }
 };
 
 class VCL_DLLPUBLIC ScreenShotEntry
 {
 public:
-    ScreenShotEntry(const OString& rHelpId, const basegfx::B2IRange& rB2IRange)
-        : msHelpId(rHelpId)
+    ScreenShotEntry(OString aHelpId, const basegfx::B2IRange& rB2IRange)
+        : msHelpId(std::move(aHelpId))
         , maB2IRange(rB2IRange)
     {
     }
@@ -541,8 +545,14 @@ public:
     // desirable)
     virtual bool has_toplevel_focus() const = 0;
     virtual void present() = 0;
+
+    // with pOld of null, automatically find the old default widget and unset
+    // it, otherwise use as hint to the old default
+    virtual void change_default_widget(weld::Widget* pOld, weld::Widget* pNew) = 0;
+    virtual bool is_default_widget(const weld::Widget* pCandidate) const = 0;
+
     virtual void set_window_state(const OString& rStr) = 0;
-    virtual OString get_window_state(WindowStateMask nMask) const = 0;
+    virtual OString get_window_state(vcl::WindowDataMask nMask) const = 0;
 
     virtual css::uno::Reference<css::awt::XWindow> GetXWindow() = 0;
 
@@ -557,6 +567,8 @@ public:
 
     // render the widget to an output device
     virtual VclPtr<VirtualDevice> screenshot() = 0;
+
+    virtual const vcl::ILibreOfficeKitNotifier* GetLOKNotifier() = 0;
 };
 
 class VCL_DLLPUBLIC WaitObject
@@ -623,9 +635,9 @@ public:
 
 class VCL_DLLPUBLIC Assistant : virtual public Dialog
 {
-protected:
     Link<const OString&, bool> m_aJumpPageHdl;
 
+protected:
     bool signal_jump_page(const OString& rIdent) { return m_aJumpPageHdl.Call(rIdent); }
 
 public:
@@ -644,27 +656,39 @@ public:
 
     virtual void set_page_side_help_id(const OString& rHelpId) = 0;
 
+    virtual void set_page_side_image(const OUString& rImage) = 0;
+
     void connect_jump_page(const Link<const OString&, bool>& rLink) { m_aJumpPageHdl = rLink; }
 };
+
+inline OUString toId(const void* pValue)
+{
+    return OUString::number(reinterpret_cast<sal_uIntPtr>(pValue));
+}
+
+template <typename T> T fromId(const OUString& rValue)
+{
+    return reinterpret_cast<T>(rValue.toUInt64());
+}
 
 struct VCL_DLLPUBLIC ComboBoxEntry
 {
     OUString sString;
     OUString sId;
     OUString sImage;
-    ComboBoxEntry(const OUString& rString)
-        : sString(rString)
+    ComboBoxEntry(OUString _aString)
+        : sString(std::move(_aString))
     {
     }
-    ComboBoxEntry(const OUString& rString, const OUString& rId)
-        : sString(rString)
-        , sId(rId)
+    ComboBoxEntry(OUString _aString, OUString _aId)
+        : sString(std::move(_aString))
+        , sId(std::move(_aId))
     {
     }
-    ComboBoxEntry(const OUString& rString, const OUString& rId, const OUString& rImage)
-        : sString(rString)
-        , sId(rId)
-        , sImage(rImage)
+    ComboBoxEntry(OUString _aString, OUString _aId, OUString _aImage)
+        : sString(std::move(_aString))
+        , sId(std::move(_aId))
+        , sImage(std::move(_aImage))
     {
     }
 };
@@ -683,6 +707,7 @@ class VCL_DLLPUBLIC ComboBox : virtual public Widget
 {
 private:
     OUString m_sSavedValue;
+    std::vector<OUString> m_aSavedValues;
 
 public:
     // OUString is the id of the row, it may be null to measure the height of a generic line
@@ -733,6 +758,10 @@ public:
     void append(const OUString& rId, const OUString& rStr, VirtualDevice& rImage)
     {
         insert(-1, rStr, &rId, nullptr, &rImage);
+    }
+    void append(int pos, const OUString& rId, const OUString& rStr)
+    {
+        insert(pos, rStr, &rId, nullptr, nullptr);
     }
     virtual void insert_separator(int pos, const OUString& rId) = 0;
     void append_separator(const OUString& rId) { insert_separator(-1, rId); }
@@ -810,8 +839,23 @@ public:
     void connect_entry_activate(const Link<ComboBox&, bool>& rLink) { m_aEntryActivateHdl = rLink; }
 
     void save_value() { m_sSavedValue = get_active_text(); }
+
+    void save_values_by_id(const OUString& rId)
+    {
+        m_aSavedValues.push_back(get_text(find_id(rId)));
+    }
+
     OUString const& get_saved_value() const { return m_sSavedValue; }
+    OUString const& get_saved_values(int pos) const { return m_aSavedValues[pos]; }
     bool get_value_changed_from_saved() const { return m_sSavedValue != get_active_text(); }
+    bool get_values_changed_from_saved() const
+    {
+        return !m_aSavedValues.empty()
+               && std::find(m_aSavedValues.begin(), m_aSavedValues.end(), get_active_text())
+                      == m_aSavedValues.end();
+    }
+
+    void removeSavedValues() { m_aSavedValues.clear(); }
 
     // for custom rendering a row
     void connect_custom_get_size(const Link<vcl::RenderContext&, Size>& rLink)
@@ -1018,8 +1062,9 @@ public:
     virtual OUString get_text(int row, int col = -1) const = 0;
     // col index -1 sets the first text column
     virtual void set_text(int row, const OUString& rText, int col = -1) = 0;
-    // col index -1 sets the first text column
+    // col index -1 sets all columns
     virtual void set_sensitive(int row, bool bSensitive, int col = -1) = 0;
+    virtual bool get_sensitive(int row, int col) const = 0;
     virtual void set_id(int row, const OUString& rId) = 0;
     // col index -1 sets the expander toggle, enable_toggle_buttons must have been called to create that column
     virtual void set_toggle(int row, TriState eState, int col = -1) = 0;
@@ -1117,8 +1162,9 @@ public:
     virtual void set_extra_row_indent(const TreeIter& rIter, int nIndentLevel) = 0;
     // col index -1 sets the first text column
     virtual void set_text(const TreeIter& rIter, const OUString& rStr, int col = -1) = 0;
-    // col index -1 sets the first text column
+    // col index -1 sets all columns
     virtual void set_sensitive(const TreeIter& rIter, bool bSensitive, int col = -1) = 0;
+    virtual bool get_sensitive(const TreeIter& rIter, int col) const = 0;
     virtual void set_text_emphasis(const TreeIter& rIter, bool bOn, int col) = 0;
     virtual bool get_text_emphasis(const TreeIter& rIter, int col) const = 0;
     virtual void set_text_align(const TreeIter& rIter, double fAlign, int col) = 0;
@@ -1233,7 +1279,7 @@ public:
         m_aPopupMenuHdl = rLink;
     }
 
-    virtual void enable_drag_source(rtl::Reference<TransferDataContainer>& rTransferrable,
+    virtual void enable_drag_source(rtl::Reference<TransferDataContainer>& rTransferable,
                                     sal_uInt8 eDNDConstants)
         = 0;
 
@@ -1283,6 +1329,10 @@ public:
     // remove the selected nodes
     virtual void remove_selection() = 0;
 
+    // only meaningful is call this from a "changed" callback, true if the change
+    // was due to mouse hovering over the entry
+    virtual bool changed_by_hover() const = 0;
+
     virtual void vadjustment_set_value(int value) = 0;
     virtual int vadjustment_get_value() const = 0;
 
@@ -1308,13 +1358,16 @@ public:
      *    after the row
      * b) dnd highlight the dest row
      */
-    virtual bool get_dest_row_at_pos(const Point& rPos, weld::TreeIter* pResult, bool bDnDMode) = 0;
+    virtual bool get_dest_row_at_pos(const Point& rPos, weld::TreeIter* pResult, bool bDnDMode,
+                                     bool bAutoScroll = true)
+        = 0;
     virtual void unset_drag_dest_row() = 0;
     virtual tools::Rectangle get_row_area(const weld::TreeIter& rIter) const = 0;
     // for dragging and dropping between TreeViews, return the active source
     virtual TreeView* get_drag_source() const = 0;
 
     using Widget::set_sensitive;
+    using Widget::get_sensitive;
 };
 
 class VCL_DLLPUBLIC IconView : virtual public Widget
@@ -1523,9 +1576,11 @@ struct VCL_DLLPUBLIC TriStateEnabled
 
 class VCL_DLLPUBLIC MenuButton : virtual public ToggleButton
 {
-protected:
+    friend class ::LOKTrigger;
+
     Link<const OString&, void> m_aSelectHdl;
 
+protected:
     void signal_selected(const OString& rIdent) { m_aSelectHdl.Call(rIdent); }
 
 public:
@@ -1588,9 +1643,9 @@ class VCL_DLLPUBLIC RadioButton : virtual public CheckButton
 
 class VCL_DLLPUBLIC LinkButton : virtual public Widget
 {
-protected:
     Link<LinkButton&, bool> m_aActivateLinkHdl;
 
+protected:
     bool signal_activate_link() { return m_aActivateLinkHdl.Call(*this); }
 
 public:
@@ -1604,9 +1659,9 @@ public:
 
 class VCL_DLLPUBLIC Scale : virtual public Widget
 {
-protected:
     Link<Scale&, void> m_aValueChangedHdl;
 
+protected:
     void signal_value_changed() { m_aValueChangedHdl.Call(*this); }
 
 public:
@@ -1712,11 +1767,11 @@ class VCL_DLLPUBLIC SpinButton : virtual public Entry
 {
     friend class ::LOKTrigger;
 
-protected:
     Link<SpinButton&, void> m_aValueChangedHdl;
     Link<SpinButton&, void> m_aOutputHdl;
     Link<int*, bool> m_aInputHdl;
 
+protected:
     void signal_value_changed() { m_aValueChangedHdl.Call(*this); }
 
     bool signal_output()
@@ -1735,31 +1790,31 @@ protected:
     }
 
 public:
-    virtual void set_value(int value) = 0;
-    virtual int get_value() const = 0;
-    virtual void set_range(int min, int max) = 0;
-    virtual void get_range(int& min, int& max) const = 0;
-    void set_min(int min)
+    virtual void set_value(sal_Int64 value) = 0;
+    virtual sal_Int64 get_value() const = 0;
+    virtual void set_range(sal_Int64 min, sal_Int64 max) = 0;
+    virtual void get_range(sal_Int64& min, sal_Int64& max) const = 0;
+    void set_min(sal_Int64 min)
     {
-        int dummy, max;
+        sal_Int64 dummy, max;
         get_range(dummy, max);
         set_range(min, max);
     }
-    void set_max(int max)
+    void set_max(sal_Int64 max)
     {
-        int min, dummy;
+        sal_Int64 min, dummy;
         get_range(min, dummy);
         set_range(min, max);
     }
-    int get_min() const
+    sal_Int64 get_min() const
     {
-        int min, dummy;
+        sal_Int64 min, dummy;
         get_range(min, dummy);
         return min;
     }
-    int get_max() const
+    sal_Int64 get_max() const
     {
-        int dummy, max;
+        sal_Int64 dummy, max;
         get_range(dummy, max);
         return max;
     }
@@ -1773,9 +1828,9 @@ public:
     void connect_output(const Link<SpinButton&, void>& rLink) { m_aOutputHdl = rLink; }
     void connect_input(const Link<int*, bool>& rLink) { m_aInputHdl = rLink; }
 
-    int normalize(int nValue) const { return (nValue * Power10(get_digits())); }
+    sal_Int64 normalize(sal_Int64 nValue) const { return (nValue * Power10(get_digits())); }
 
-    int denormalize(int nValue) const;
+    sal_Int64 denormalize(sal_Int64 nValue) const;
 
     static unsigned int Power10(unsigned int n);
 };
@@ -1786,9 +1841,9 @@ class EntryFormatter;
 // are managed by a more complex Formatter which can support doubles.
 class VCL_DLLPUBLIC FormattedSpinButton : virtual public Entry
 {
-protected:
     Link<FormattedSpinButton&, void> m_aValueChangedHdl;
 
+protected:
     void signal_value_changed() { m_aValueChangedHdl.Call(*this); }
 
 public:
@@ -1819,10 +1874,10 @@ public:
 
 class VCL_DLLPUBLIC Calendar : virtual public Widget
 {
-protected:
     Link<Calendar&, void> m_aSelectedHdl;
     Link<Calendar&, void> m_aActivatedHdl;
 
+protected:
     void signal_selected() { m_aSelectedHdl.Call(*this); }
     void signal_activated() { m_aActivatedHdl.Call(*this); }
 
@@ -1944,8 +1999,8 @@ class VCL_DLLPUBLIC MetricSpinButton final
 
     void signal_value_changed() { m_aValueChangedHdl.Call(*this); }
 
-    int ConvertValue(int nValue, FieldUnit eInUnit, FieldUnit eOutUnit) const;
-    OUString format_number(int nValue) const;
+    sal_Int64 ConvertValue(sal_Int64 nValue, FieldUnit eInUnit, FieldUnit eOutUnit) const;
+    OUString format_number(sal_Int64 nValue) const;
     void update_width_chars();
 
 public:
@@ -1967,22 +2022,22 @@ public:
 
     void set_unit(FieldUnit eUnit);
 
-    int convert_value_to(int nValue, FieldUnit eValueUnit) const
+    sal_Int64 convert_value_to(sal_Int64 nValue, FieldUnit eValueUnit) const
     {
         return ConvertValue(nValue, m_eSrcUnit, eValueUnit);
     }
 
-    int convert_value_from(int nValue, FieldUnit eValueUnit) const
+    sal_Int64 convert_value_from(sal_Int64 nValue, FieldUnit eValueUnit) const
     {
         return ConvertValue(nValue, eValueUnit, m_eSrcUnit);
     }
 
-    void set_value(int nValue, FieldUnit eValueUnit)
+    void set_value(sal_Int64 nValue, FieldUnit eValueUnit)
     {
         m_xSpinButton->set_value(convert_value_from(nValue, eValueUnit));
     }
 
-    int get_value(FieldUnit eDestUnit) const
+    sal_Int64 get_value(FieldUnit eDestUnit) const
     {
         return convert_value_to(m_xSpinButton->get_value(), eDestUnit);
     }
@@ -1992,7 +2047,7 @@ public:
     // formatted value and now you want to show it as formatted again
     void reformat() { spin_button_output(*m_xSpinButton); }
 
-    void set_range(int min, int max, FieldUnit eValueUnit)
+    void set_range(sal_Int64 min, sal_Int64 max, FieldUnit eValueUnit)
     {
         min = convert_value_from(min, eValueUnit);
         max = convert_value_from(max, eValueUnit);
@@ -2000,37 +2055,37 @@ public:
         update_width_chars();
     }
 
-    void get_range(int& min, int& max, FieldUnit eDestUnit) const
+    void get_range(sal_Int64& min, sal_Int64& max, FieldUnit eDestUnit) const
     {
         m_xSpinButton->get_range(min, max);
         min = convert_value_to(min, eDestUnit);
         max = convert_value_to(max, eDestUnit);
     }
 
-    void set_min(int min, FieldUnit eValueUnit)
+    void set_min(sal_Int64 min, FieldUnit eValueUnit)
     {
-        int dummy, max;
+        sal_Int64 dummy, max;
         get_range(dummy, max, eValueUnit);
         set_range(min, max, eValueUnit);
     }
 
-    void set_max(int max, FieldUnit eValueUnit)
+    void set_max(sal_Int64 max, FieldUnit eValueUnit)
     {
-        int min, dummy;
+        sal_Int64 min, dummy;
         get_range(min, dummy, eValueUnit);
         set_range(min, max, eValueUnit);
     }
 
-    int get_min(FieldUnit eValueUnit) const
+    sal_Int64 get_min(FieldUnit eValueUnit) const
     {
-        int min, dummy;
+        sal_Int64 min, dummy;
         get_range(min, dummy, eValueUnit);
         return min;
     }
 
-    int get_max(FieldUnit eValueUnit) const
+    sal_Int64 get_max(FieldUnit eValueUnit) const
     {
-        int dummy, max;
+        sal_Int64 dummy, max;
         get_range(dummy, max, eValueUnit);
         return max;
     }
@@ -2054,8 +2109,8 @@ public:
         m_aValueChangedHdl = rLink;
     }
 
-    int normalize(int nValue) const { return m_xSpinButton->normalize(nValue); }
-    int denormalize(int nValue) const { return m_xSpinButton->denormalize(nValue); }
+    sal_Int64 normalize(sal_Int64 nValue) const { return m_xSpinButton->normalize(nValue); }
+    sal_Int64 denormalize(sal_Int64 nValue) const { return m_xSpinButton->denormalize(nValue); }
     void set_sensitive(bool sensitive) { m_xSpinButton->set_sensitive(sensitive); }
     bool get_sensitive() const { return m_xSpinButton->get_sensitive(); }
     bool get_visible() const { return m_xSpinButton->get_visible(); }
@@ -2202,9 +2257,9 @@ public:
 
 class VCL_DLLPUBLIC Expander : virtual public Widget
 {
-protected:
     Link<Expander&, void> m_aExpandedHdl;
 
+protected:
     void signal_expanded() { m_aExpandedHdl.Call(*this); }
 
 public:
@@ -2275,7 +2330,7 @@ public:
     virtual void queue_draw() = 0;
     virtual void queue_draw_area(int x, int y, int width, int height) = 0;
 
-    virtual void enable_drag_source(rtl::Reference<TransferDataContainer>& rTransferrable,
+    virtual void enable_drag_source(rtl::Reference<TransferDataContainer>& rTransferable,
                                     sal_uInt8 eDNDConstants)
         = 0;
 
@@ -2298,7 +2353,15 @@ public:
 private:
     friend class ::LOKTrigger;
 
-    virtual void click(const Point& rPos) = 0;
+    virtual void click(const Point&) = 0;
+
+    virtual void dblclick(const Point&){};
+
+    virtual void mouse_up(const Point&){};
+
+    virtual void mouse_down(const Point&){};
+
+    virtual void mouse_move(const Point&){};
 };
 
 enum class Placement
@@ -2309,9 +2372,9 @@ enum class Placement
 
 class VCL_DLLPUBLIC Menu
 {
-protected:
     Link<const OString&, void> m_aActivateHdl;
 
+protected:
     void signal_activate(const OString& rIdent) { m_aActivateHdl.Call(rIdent); }
 
 public:
@@ -2387,15 +2450,17 @@ public:
         = 0;
     virtual void popdown() = 0;
 
+    virtual void resize_to_request() = 0;
+
     void connect_closed(const Link<weld::Popover&, void>& rLink) { m_aCloseHdl = rLink; }
 };
 
 class VCL_DLLPUBLIC Toolbar : virtual public Widget
 {
-protected:
     Link<const OString&, void> m_aClickHdl;
     Link<const OString&, void> m_aToggleMenuHdl;
 
+protected:
     friend class ::LOKTrigger;
 
     void signal_clicked(const OString& rIdent) { m_aClickHdl.Call(rIdent); }
@@ -2418,6 +2483,7 @@ public:
     virtual void set_item_tooltip_text(const OString& rIdent, const OUString& rTip) = 0;
     virtual OUString get_item_tooltip_text(const OString& rIdent) const = 0;
     virtual void set_item_icon_name(const OString& rIdent, const OUString& rIconName) = 0;
+    virtual void set_item_image_mirrored(const OString& rIdent, bool bMirrored) = 0;
     virtual void set_item_image(const OString& rIdent,
                                 const css::uno::Reference<css::graphic::XGraphic>& rIcon)
         = 0;
@@ -2448,6 +2514,38 @@ public:
 
     void connect_clicked(const Link<const OString&, void>& rLink) { m_aClickHdl = rLink; }
     void connect_menu_toggled(const Link<const OString&, void>& rLink) { m_aToggleMenuHdl = rLink; }
+};
+
+class VCL_DLLPUBLIC Scrollbar : virtual public Widget
+{
+    Link<Scrollbar&, void> m_aChangeHdl;
+
+protected:
+    void signal_adjustment_changed() { m_aChangeHdl.Call(*this); }
+
+public:
+    virtual void adjustment_configure(int value, int lower, int upper, int step_increment,
+                                      int page_increment, int page_size)
+        = 0;
+    virtual int adjustment_get_value() const = 0;
+    virtual void adjustment_set_value(int value) = 0;
+    virtual int adjustment_get_upper() const = 0;
+    virtual void adjustment_set_upper(int upper) = 0;
+    virtual int adjustment_get_page_size() const = 0;
+    virtual void adjustment_set_page_size(int size) = 0;
+    virtual int adjustment_get_page_increment() const = 0;
+    virtual void adjustment_set_page_increment(int size) = 0;
+    virtual int adjustment_get_step_increment() const = 0;
+    virtual void adjustment_set_step_increment(int size) = 0;
+    virtual int adjustment_get_lower() const = 0;
+    virtual void adjustment_set_lower(int upper) = 0;
+
+    virtual int get_scroll_thickness() const = 0;
+    virtual void set_scroll_thickness(int nThickness) = 0;
+
+    virtual ScrollType get_scroll_type() const = 0;
+
+    void connect_adjustment_changed(const Link<Scrollbar&, void>& rLink) { m_aChangeHdl = rLink; }
 };
 
 class VCL_DLLPUBLIC SizeGroup
@@ -2512,6 +2610,7 @@ public:
     virtual std::unique_ptr<Menu> weld_menu(const OString& id) = 0;
     virtual std::unique_ptr<Popover> weld_popover(const OString& id) = 0;
     virtual std::unique_ptr<Toolbar> weld_toolbar(const OString& id) = 0;
+    virtual std::unique_ptr<Scrollbar> weld_scrollbar(const OString& id) = 0;
     virtual std::unique_ptr<SizeGroup> create_size_group() = 0;
     /* return a Dialog suitable to take a screenshot of containing the contents of the .ui file.
 
@@ -2581,6 +2680,8 @@ public:
     virtual ~MessageDialogController() override;
     void set_primary_text(const OUString& rText) { m_xDialog->set_primary_text(rText); }
     OUString get_primary_text() const { return m_xDialog->get_primary_text(); }
+    void set_secondary_text(const OUString& rText) { m_xDialog->set_secondary_text(rText); }
+    OUString get_secondary_text() const { return m_xDialog->get_secondary_text(); }
     void set_default_response(int nResponse) { m_xDialog->set_default_response(nResponse); }
 };
 

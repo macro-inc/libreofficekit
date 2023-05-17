@@ -22,6 +22,7 @@
 #include "global.hxx"
 #include "address.hxx"
 #include "cellvalue.hxx"
+#include "columnspanset.hxx"
 #include "rangelst.hxx"
 #include "types.hxx"
 #include "mtvelements.hxx"
@@ -48,8 +49,6 @@ class CopyFromClipContext;
 class CopyToClipContext;
 class CopyToDocContext;
 class MixDocContext;
-class ColumnSpanSet;
-class SingleColumnSpanSet;
 struct RefUpdateContext;
 struct RefUpdateInsertTabContext;
 struct RefUpdateDeleteTabContext;
@@ -203,15 +202,17 @@ class ScColumn : protected ScColumnData
     SCCOL           nCol;
     SCTAB           nTab;
 
-    bool mbFiltering; // it is true if there is a filtering in the column
+    bool mbEmptyBroadcastersPending : 1; // a broadcaster not removed during EnableDelayDeletingBroadcasters()
 
 friend class ScDocument;                    // for FillInfo
 friend class ScTable;
 friend class ScValueIterator;
 friend class ScHorizontalValueIterator;
 friend class ScDBQueryDataIterator;
-friend class ScQueryCellIterator;
-friend class ScCountIfCellIterator;
+template< ScQueryCellIteratorAccess accessType, ScQueryCellIteratorType queryType >
+friend class ScQueryCellIteratorBase;
+template< ScQueryCellIteratorAccess accessType >
+friend class ScQueryCellIteratorAccessSpecific;
 friend class ScFormulaGroupIterator;
 friend class ScCellIterator;
 friend class ScHorizontalCellIterator;
@@ -251,7 +252,6 @@ public:
     using ScColumnData::GetDoc;
     SCTAB GetTab() const { return nTab; }
     SCCOL GetCol() const { return nCol; }
-    bool HasFiltering() const { return mbFiltering; }
     sc::CellStoreType& GetCellStore() { return maCells; }
     const sc::CellStoreType& GetCellStore() const { return maCells; }
     sc::CellTextAttrStoreType& GetCellAttrStore() { return maCellTextAttrs; }
@@ -285,7 +285,7 @@ public:
     bool        IsEmptyAttr() const;
 
                 // data only:
-    bool        IsEmptyBlock(SCROW nStartRow, SCROW nEndRow) const;
+    bool        IsEmptyData(SCROW nStartRow, SCROW nEndRow) const;
     SCSIZE      GetEmptyLinesInBlock( SCROW nStartRow, SCROW nEndRow, ScDirection eDir ) const;
     bool        HasDataAt( SCROW nRow, ScDataAreaExtras* pDataAreaExtras = nullptr ) const;
     bool        HasDataAt( sc::ColumnBlockConstPosition& rBlockPos, SCROW nRow,
@@ -443,11 +443,11 @@ public:
         { return GetString( GetCellValue( rBlockPos, nRow ), nRow, pContext ); }
     double* GetValueCell( SCROW nRow );
     // Note that if pShared is set and a value is returned that way, the returned OUString is empty.
-    OUString    GetInputString( SCROW nRow, const svl::SharedString** pShared = nullptr ) const
-        { return GetInputString( GetCellValue( nRow ), nRow, pShared ); }
+    OUString    GetInputString( SCROW nRow, bool bForceSystemLocale = false ) const
+        { return GetInputString( GetCellValue( nRow ), nRow, bForceSystemLocale ); }
     OUString    GetInputString( sc::ColumnBlockConstPosition& rBlockPos, SCROW nRow,
-                    const svl::SharedString** pShared = nullptr ) const
-        { return GetInputString( GetCellValue( rBlockPos, nRow ), nRow, pShared ); }
+                    bool bForceSystemLocale = false ) const
+        { return GetInputString( GetCellValue( rBlockPos, nRow ), nRow, bForceSystemLocale ); }
     double      GetValue( SCROW nRow ) const;
     const EditTextObject* GetEditText( SCROW nRow ) const;
     void RemoveEditTextCharAttribs( SCROW nRow, const ScPatternAttr& rAttr );
@@ -595,7 +595,7 @@ public:
 
     void GetFilterEntries(
         sc::ColumnBlockConstPosition& rBlockPos, SCROW nStartRow, SCROW nEndRow,
-        ScFilterEntries& rFilterEntries, bool bFiltering );
+        ScFilterEntries& rFilterEntries, bool bFiltering, bool bFilteredRow );
 
     bool GetDataEntries( SCROW nRow, std::set<ScTypedStrData>& rStrings) const;
 
@@ -663,6 +663,7 @@ public:
 
     void DeleteBroadcasters( sc::ColumnBlockPosition& rBlockPos, SCROW nRow1, SCROW nRow2 );
     void PrepareBroadcastersForDestruction();
+    void DeleteEmptyBroadcasters();
 
     void Broadcast( SCROW nRow );
     void BroadcastCells( const std::vector<SCROW>& rRows, SfxHintId nHint );
@@ -717,7 +718,7 @@ public:
     bool IsDrawObjectsEmptyBlock(SCROW nStartRow, SCROW nEndRow) const;
 
     void InterpretDirtyCells( SCROW nRow1, SCROW nRow2 );
-    void InterpretCellsIfNeeded( SCROW nRow1, SCROW nRow2 );
+    bool InterpretCellsIfNeeded( SCROW nRow1, SCROW nRow2 );
 
     static void JoinNewFormulaCell( const sc::CellStoreType::position_type& aPos, ScFormulaCell& rCell );
 
@@ -739,8 +740,7 @@ public:
                              std::vector<SCROW>* pNewSharedRows );
 
     void AttachFormulaCells( sc::StartListeningContext& rCxt, SCROW nRow1, SCROW nRow2 );
-    void DetachFormulaCells( sc::EndListeningContext& rCxt, SCROW nRow1, SCROW nRow2,
-                             std::vector<SCROW>* pNewSharedRows );
+    void DetachFormulaCells( sc::EndListeningContext& rCxt, SCROW nRow1, SCROW nRow2 );
 
     /**
      * Regroup formula cells for the entire column.
@@ -823,7 +823,7 @@ private:
     SCROW FindNextVisibleRow(SCROW nRow, bool bForward) const;
 
     OUString GetString( const ScRefCellValue& cell, SCROW nRow, const ScInterpreterContext* pContext = nullptr ) const;
-    OUString GetInputString( const ScRefCellValue& cell, SCROW nRow, const svl::SharedString** pShared = nullptr ) const;
+    OUString GetInputString( const ScRefCellValue& cell, SCROW nRow, bool bForceSystemLocale = false ) const;
 
     /**
      * Called whenever the state of cell array gets modified i.e. new cell
@@ -836,9 +836,19 @@ private:
 
     void CopyCellTextAttrsToDocument(SCROW nRow1, SCROW nRow2, ScColumn& rDestCol) const;
 
-    void DeleteCells(
-        sc::ColumnBlockPosition& rBlockPos, SCROW nRow1, SCROW nRow2, InsertDeleteFlags nDelFlag,
-        sc::SingleColumnSpanSet& rDeleted );
+    struct DeleteCellsResult
+    {
+        /** cell ranges that have been deleted. */
+        sc::SingleColumnSpanSet aDeletedRows;
+        /** formula cell range that has stopped listening. */
+        std::vector<std::pair<SCROW, SCROW>> aFormulaRanges;
+
+        DeleteCellsResult( const ScDocument& rDoc );
+        DeleteCellsResult( const DeleteCellsResult& ) = delete;
+    };
+
+    std::unique_ptr<DeleteCellsResult> DeleteCells(
+        sc::ColumnBlockPosition& rBlockPos, SCROW nRow1, SCROW nRow2, InsertDeleteFlags nDelFlag );
 
     /**
      * Get all non-grouped formula cells and formula cell groups in the whole

@@ -30,14 +30,15 @@
 #include <svtools/imagemgr.hxx>
 #include <svl/svlresid.hxx>
 #include <svl/svl.hrc>
+#include <utility>
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::lang;
 using namespace ::utl;
 
-SvtFileDialogFilter_Impl::SvtFileDialogFilter_Impl( const OUString& rName, const OUString& rType )
-    : m_aName( rName )
-    , m_aType( rType )
+SvtFileDialogFilter_Impl::SvtFileDialogFilter_Impl( OUString aName, OUString aType )
+    : m_aName(std::move( aName ))
+    , m_aType(std::move( aType ))
 {
     m_aType = m_aType.toAsciiLowerCase();
 }
@@ -161,7 +162,7 @@ void SvtExpFileDlg_Impl::SetCurFilter( SvtFileDialogFilter_Impl const * pFilter,
 void SvtExpFileDlg_Impl::InsertFilterListEntry(const SvtFileDialogFilter_Impl* pFilterDesc)
 {
     // insert and set user data
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pFilterDesc)));
+    OUString sId(weld::toId(pFilterDesc));
     OUString sName = pFilterDesc->GetName();
     if (pFilterDesc->isGroupSeparator())
         m_xLbFilter->append_separator(sId);

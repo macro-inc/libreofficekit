@@ -37,7 +37,6 @@
 #include <formulaiter.hxx>
 #include <validat.hxx>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleRelationType.hpp>
@@ -54,7 +53,7 @@ rtl::Reference<ScAccessibleCell> ScAccessibleCell::create(
         const uno::Reference<XAccessible>& rxParent,
         ScTabViewShell* pViewShell,
         const ScAddress& rCellAddress,
-        sal_Int32 nIndex,
+        sal_Int64 nIndex,
         ScSplitPos eSplitPos,
         ScAccessibleDocument* pAccDoc)
 {
@@ -68,7 +67,7 @@ ScAccessibleCell::ScAccessibleCell(
         const uno::Reference<XAccessible>& rxParent,
         ScTabViewShell* pViewShell,
         const ScAddress& rCellAddress,
-        sal_Int32 nIndex,
+        sal_Int64 nIndex,
         ScSplitPos eSplitPos,
         ScAccessibleDocument* pAccDoc)
     :
@@ -122,7 +121,15 @@ IMPLEMENT_FORWARD_XINTERFACE3( ScAccessibleCell, ScAccessibleCellBase, Accessibl
 
     //=====  XTypeProvider  ===================================================
 
-IMPLEMENT_FORWARD_XTYPEPROVIDER3( ScAccessibleCell, ScAccessibleCellBase, AccessibleStaticTextBase, ScAccessibleCellAttributeImpl )
+css::uno::Sequence< css::uno::Type > SAL_CALL ScAccessibleCell::getTypes()
+{
+    return ::comphelper::concatSequences(
+        ScAccessibleCellBase::getTypes(),
+        AccessibleStaticTextBase::getTypes(),
+        ScAccessibleCellAttributeImpl::getTypes()
+    );
+}
+IMPLEMENT_GET_IMPLEMENTATION_ID( ScAccessibleCell )
 
     //=====  XAccessibleComponent  ============================================
 
@@ -204,71 +211,74 @@ tools::Rectangle ScAccessibleCell::GetBoundingBox() const
 
     //=====  XAccessibleContext  ==============================================
 
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
     ScAccessibleCell::getAccessibleChildCount()
 {
     return AccessibleStaticTextBase::getAccessibleChildCount();
 }
 
 uno::Reference< XAccessible > SAL_CALL
-    ScAccessibleCell::getAccessibleChild(sal_Int32 nIndex)
+    ScAccessibleCell::getAccessibleChild(sal_Int64 nIndex)
 {
     return AccessibleStaticTextBase::getAccessibleChild(nIndex);
 }
 
-uno::Reference<XAccessibleStateSet> SAL_CALL
+sal_Int64 SAL_CALL
     ScAccessibleCell::getAccessibleStateSet()
 {
     SolarMutexGuard aGuard;
-    uno::Reference<XAccessibleStateSet> xParentStates;
+    sal_Int64 nParentStates = 0;
     if (getAccessibleParent().is())
     {
         uno::Reference<XAccessibleContext> xParentContext = getAccessibleParent()->getAccessibleContext();
-        xParentStates = xParentContext->getAccessibleStateSet();
+        nParentStates = xParentContext->getAccessibleStateSet();
     }
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSet = new utl::AccessibleStateSetHelper();
-    if (IsDefunc(xParentStates))
-        pStateSet->AddState(AccessibleStateType::DEFUNC);
+    sal_Int64 nStateSet = 0;
+    if (IsDefunc(nParentStates))
+        nStateSet |= AccessibleStateType::DEFUNC;
     else
     {
+        if (IsFocused())
+            nStateSet |= AccessibleStateType::FOCUSED;
+
         if (IsFormulaMode())
         {
-            pStateSet->AddState(AccessibleStateType::ENABLED);
-            pStateSet->AddState(AccessibleStateType::MULTI_LINE);
-            pStateSet->AddState(AccessibleStateType::MULTI_SELECTABLE);
+            nStateSet |= AccessibleStateType::ENABLED;
+            nStateSet |= AccessibleStateType::MULTI_LINE;
+            nStateSet |= AccessibleStateType::MULTI_SELECTABLE;
             if (IsOpaque())
-                pStateSet->AddState(AccessibleStateType::OPAQUE);
-            pStateSet->AddState(AccessibleStateType::SELECTABLE);
+                nStateSet |= AccessibleStateType::OPAQUE;
+            nStateSet |= AccessibleStateType::SELECTABLE;
             if (IsSelected())
-                pStateSet->AddState(AccessibleStateType::SELECTED);
+                nStateSet |= AccessibleStateType::SELECTED;
             if (isShowing())
-                pStateSet->AddState(AccessibleStateType::SHOWING);
-            pStateSet->AddState(AccessibleStateType::TRANSIENT);
+                nStateSet |= AccessibleStateType::SHOWING;
+            nStateSet |= AccessibleStateType::TRANSIENT;
             if (isVisible())
-                pStateSet->AddState(AccessibleStateType::VISIBLE);
-            return pStateSet;
+                nStateSet |= AccessibleStateType::VISIBLE;
+            return nStateSet;
         }
-        if (IsEditable(xParentStates))
+        if (IsEditable(nParentStates))
         {
-            pStateSet->AddState(AccessibleStateType::EDITABLE);
-            pStateSet->AddState(AccessibleStateType::RESIZABLE);
+            nStateSet |= AccessibleStateType::EDITABLE;
+            nStateSet |= AccessibleStateType::RESIZABLE;
         }
-        pStateSet->AddState(AccessibleStateType::ENABLED);
-        pStateSet->AddState(AccessibleStateType::MULTI_LINE);
-        pStateSet->AddState(AccessibleStateType::MULTI_SELECTABLE);
-        pStateSet->AddState(AccessibleStateType::FOCUSABLE);
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::MULTI_LINE;
+        nStateSet |= AccessibleStateType::MULTI_SELECTABLE;
+        nStateSet |= AccessibleStateType::FOCUSABLE;
         if (IsOpaque())
-            pStateSet->AddState(AccessibleStateType::OPAQUE);
-        pStateSet->AddState(AccessibleStateType::SELECTABLE);
+            nStateSet |= AccessibleStateType::OPAQUE;
+        nStateSet |= AccessibleStateType::SELECTABLE;
         if (IsSelected())
-            pStateSet->AddState(AccessibleStateType::SELECTED);
+            nStateSet |= AccessibleStateType::SELECTED;
         if (isShowing())
-            pStateSet->AddState(AccessibleStateType::SHOWING);
-        pStateSet->AddState(AccessibleStateType::TRANSIENT);
+            nStateSet |= AccessibleStateType::SHOWING;
+        nStateSet |= AccessibleStateType::TRANSIENT;
         if (isVisible())
-            pStateSet->AddState(AccessibleStateType::VISIBLE);
+            nStateSet |= AccessibleStateType::VISIBLE;
     }
-    return pStateSet;
+    return nStateSet;
 }
 
 uno::Reference<XAccessibleRelationSet> SAL_CALL
@@ -302,18 +312,16 @@ uno::Sequence< OUString> SAL_CALL
 
     //====  internal  =========================================================
 
-bool ScAccessibleCell::IsDefunc(
-    const uno::Reference<XAccessibleStateSet>& rxParentStates)
+bool ScAccessibleCell::IsDefunc(sal_Int64 nParentStates)
 {
     return ScAccessibleContextBase::IsDefunc() || (mpDoc == nullptr) || (mpViewShell == nullptr) || !getAccessibleParent().is() ||
-         (rxParentStates.is() && rxParentStates->contains(AccessibleStateType::DEFUNC));
+         (nParentStates & AccessibleStateType::DEFUNC);
 }
 
-bool ScAccessibleCell::IsEditable(
-    const uno::Reference<XAccessibleStateSet>& rxParentStates)
+bool ScAccessibleCell::IsEditable(sal_Int64 nParentStates)
 {
     bool bEditable(true);
-    if (rxParentStates.is() && !rxParentStates->contains(AccessibleStateType::EDITABLE) &&
+    if ( !(nParentStates & AccessibleStateType::EDITABLE) &&
         mpDoc)
     {
         // here I have to test whether the protection of the table should influence this cell.
@@ -335,6 +343,14 @@ bool ScAccessibleCell::IsOpaque() const
             bOpaque = pItem->GetColor() != COL_TRANSPARENT;
     }
     return bOpaque;
+}
+
+bool ScAccessibleCell::IsFocused() const
+{
+    if (mpViewShell && mpViewShell->GetViewData().GetCurPos() == maCellAddress)
+        return mpViewShell->GetActiveWin()->HasFocus();
+
+    return false;
 }
 
 bool ScAccessibleCell::IsSelected()
@@ -394,7 +410,7 @@ void ScAccessibleCell::FillDependents(utl::AccessibleRelationSetHelper* pRelatio
             ScRange aRef;
             while ( !bFound && aIter.GetNextRef( aRef ) )
             {
-                if (aRef.In(maCellAddress))
+                if (aRef.Contains(maCellAddress))
                     bFound = true;
             }
             if (bFound)
@@ -409,9 +425,9 @@ void ScAccessibleCell::FillPrecedents(utl::AccessibleRelationSetHelper* pRelatio
         return;
 
     ScRefCellValue aCell(*mpDoc, maCellAddress);
-    if (aCell.meType == CELLTYPE_FORMULA)
+    if (aCell.getType() == CELLTYPE_FORMULA)
     {
-        ScFormulaCell* pCell = aCell.mpFormula;
+        ScFormulaCell* pCell = aCell.getFormula();
         ScDetectiveRefIter aIter(*mpDoc, pCell);
         ScRange aRef;
         while ( aIter.GetNextRef( aRef ) )
@@ -457,26 +473,13 @@ void ScAccessibleCell::AddRelation(const ScRange& rRange,
     pRelationSet->AddRelation(aRelation);
 }
 
-static OUString ReplaceOneChar(const OUString& oldOUString, std::u16string_view replacedChar, std::u16string_view replaceStr)
-{
-    int iReplace = oldOUString.lastIndexOf(replacedChar);
-    OUString aRet = oldOUString;
-    while(iReplace > -1)
-    {
-        aRet = aRet.replaceAt(iReplace, 1, replaceStr);
-        iReplace = aRet.lastIndexOf(replacedChar, iReplace);
-    }
-    return aRet;
-}
-
 static OUString ReplaceFourChar(const OUString& oldOUString)
 {
-    OUString aRet = ReplaceOneChar(oldOUString, u"\\", u"\\\\");
-    aRet = ReplaceOneChar(aRet, u";", u"\\;");
-    aRet = ReplaceOneChar(aRet, u"=", u"\\=");
-    aRet = ReplaceOneChar(aRet, u",", u"\\,");
-    aRet = ReplaceOneChar(aRet, u":", u"\\:");
-    return aRet;
+    return oldOUString.replaceAll(u"\\", u"\\\\")
+        .replaceAll(u";", u"\\;")
+        .replaceAll(u"=", u"\\=")
+        .replaceAll(u",", u"\\,")
+        .replaceAll(u":", u"\\:");
 }
 
 uno::Any SAL_CALL ScAccessibleCell::getExtendedAttributes()

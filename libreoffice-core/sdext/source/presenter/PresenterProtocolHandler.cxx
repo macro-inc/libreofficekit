@@ -27,6 +27,7 @@
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <algorithm>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -48,7 +49,7 @@ namespace {
     {
     public:
         explicit GotoPreviousSlideCommand (
-            const rtl::Reference<PresenterController>& rpPresenterController);
+            rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
         virtual bool IsEnabled() const override;
     private:
@@ -59,7 +60,7 @@ namespace {
     {
     public:
         explicit GotoNextSlideCommand (
-            const rtl::Reference<PresenterController>& rpPresenterController);
+            rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
         // The next slide command is always enabled, even when the current slide
         // is the last slide:  from the last slide it goes to the pause slide,
@@ -73,7 +74,7 @@ namespace {
     {
     public:
         explicit GotoNextEffectCommand (
-            const rtl::Reference<PresenterController>& rpPresenterController);
+            rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
         virtual bool IsEnabled() const override;
     private:
@@ -84,7 +85,7 @@ namespace {
     {
     public:
         explicit SwitchMonitorCommand (
-            const rtl::Reference<PresenterController>& rpPresenterController);
+            rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
     private:
         rtl::Reference<PresenterController> mpPresenterController;
@@ -93,7 +94,7 @@ namespace {
     class PauseResumeCommand : public Command
     {
     public:
-        explicit PauseResumeCommand(const rtl::Reference<PresenterController>& rpPresenterController);
+        explicit PauseResumeCommand(rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
         virtual Any GetState() const override;
     private:
@@ -104,7 +105,7 @@ namespace {
     class RestartTimerCommand : public Command
     {
     public:
-        explicit RestartTimerCommand(const rtl::Reference<PresenterController>& rpPresenterController);
+        explicit RestartTimerCommand(rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
     private:
         rtl::Reference<PresenterController> mpPresenterController;
@@ -115,7 +116,7 @@ namespace {
     public:
         SetNotesViewCommand (
             const bool bOn,
-            const rtl::Reference<PresenterController>& rpPresenterController);
+            rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
         virtual Any GetState() const override;
     private:
@@ -128,7 +129,7 @@ namespace {
     public:
         SetSlideSorterCommand (
             const bool bOn,
-            const rtl::Reference<PresenterController>& rpPresenterController);
+            rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
         virtual Any GetState() const override;
     private:
@@ -141,7 +142,7 @@ namespace {
     public:
         SetHelpViewCommand (
             const bool bOn,
-            const rtl::Reference<PresenterController>& rpPresenterController);
+            rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
         virtual Any GetState() const override;
     private:
@@ -153,7 +154,7 @@ namespace {
     {
     public:
         NotesFontSizeCommand(
-            const rtl::Reference<PresenterController>& rpPresenterController,
+            rtl::Reference<PresenterController> xPresenterController,
             const sal_Int32 nSizeChange);
         virtual void Execute() override;
         virtual Any GetState() const override;
@@ -167,7 +168,7 @@ namespace {
     class ExitPresenterCommand : public Command
     {
     public:
-        explicit ExitPresenterCommand(const rtl::Reference<PresenterController>& rpPresenterController);
+        explicit ExitPresenterCommand(rtl::Reference<PresenterController> xPresenterController);
         virtual void Execute() override;
     private:
         rtl::Reference<PresenterController> mpPresenterController;
@@ -196,7 +197,7 @@ public:
 
     void SAL_CALL disposing() override;
     static Command* CreateCommand (
-        const OUString& rsURLPath,
+        std::u16string_view rsURLPath,
         const ::rtl::Reference<PresenterController>& rpPresenterController);
 
     // XDispatch
@@ -306,7 +307,10 @@ Reference<frame::XDispatch> SAL_CALL PresenterProtocolHandler::queryDispatch (
 
     Reference<frame::XDispatch> xDispatch;
 
-    if (rURL.Protocol == "vnd.org.libreoffice.presenterscreen:")
+    // tdf#154546 skip dispatch when presenter controller is not set
+    // mpPresenterController is sometimes unset and this will cause a
+    // crash when pressing the presenter console's Exchange button.
+    if (rURL.Protocol == "vnd.org.libreoffice.presenterscreen:" && mpPresenterController.is())
     {
         xDispatch.set(Dispatch::Create(rURL.Path, mpPresenterController));
     }
@@ -362,41 +366,41 @@ PresenterProtocolHandler::Dispatch::Dispatch (
 }
 
 Command* PresenterProtocolHandler::Dispatch::CreateCommand (
-    const OUString& rsURLPath,
+    std::u16string_view rsURLPath,
     const ::rtl::Reference<PresenterController>& rpPresenterController)
 {
-    if (rsURLPath.getLength() <= 5)
+    if (rsURLPath.size() <= 5)
         return nullptr;
 
-    if (rsURLPath == "CloseNotes")
+    if (rsURLPath == u"CloseNotes")
         return new SetNotesViewCommand(false, rpPresenterController);
-    if (rsURLPath == "CloseSlideSorter")
+    if (rsURLPath == u"CloseSlideSorter")
         return new SetSlideSorterCommand(false, rpPresenterController);
-    if (rsURLPath == "CloseHelp")
+    if (rsURLPath == u"CloseHelp")
         return new SetHelpViewCommand(false, rpPresenterController);
-    if (rsURLPath == "GrowNotesFont")
+    if (rsURLPath == u"GrowNotesFont")
         return new NotesFontSizeCommand(rpPresenterController, +1);
-    if (rsURLPath == "NextEffect")
+    if (rsURLPath == u"NextEffect")
         return new GotoNextEffectCommand(rpPresenterController);
-    if (rsURLPath == "NextSlide")
+    if (rsURLPath == u"NextSlide")
         return new GotoNextSlideCommand(rpPresenterController);
-    if (rsURLPath == "PrevSlide")
+    if (rsURLPath == u"PrevSlide")
         return new GotoPreviousSlideCommand(rpPresenterController);
-    if (rsURLPath == "SwitchMonitor")
+    if (rsURLPath == u"SwitchMonitor")
         return new SwitchMonitorCommand(rpPresenterController);
-    if (rsURLPath == "PauseResumeTimer")
+    if (rsURLPath == u"PauseResumeTimer")
         return new PauseResumeCommand(rpPresenterController);
-    if (rsURLPath == "RestartTimer")
+    if (rsURLPath == u"RestartTimer")
         return new RestartTimerCommand(rpPresenterController);
-    if (rsURLPath == "ShowNotes")
+    if (rsURLPath == u"ShowNotes")
         return new SetNotesViewCommand(true, rpPresenterController);
-    if (rsURLPath == "ShowSlideSorter")
+    if (rsURLPath == u"ShowSlideSorter")
         return new SetSlideSorterCommand(true, rpPresenterController);
-    if (rsURLPath == "ShowHelp")
+    if (rsURLPath == u"ShowHelp")
         return new SetHelpViewCommand(true, rpPresenterController);
-    if (rsURLPath == "ShrinkNotesFont")
+    if (rsURLPath == u"ShrinkNotesFont")
         return new NotesFontSizeCommand(rpPresenterController, -1);
-    if (rsURLPath == "ExitPresenter")
+    if (rsURLPath == u"ExitPresenter")
         return new ExitPresenterCommand(rpPresenterController);
 
     return nullptr;
@@ -494,8 +498,8 @@ void SAL_CALL PresenterProtocolHandler::Dispatch::disposing (const css::lang::Ev
 //===== GotoPreviousSlideCommand ==============================================
 
 GotoPreviousSlideCommand::GotoPreviousSlideCommand (
-    const rtl::Reference<PresenterController>& rpPresenterController)
-    : mpPresenterController(rpPresenterController)
+    rtl::Reference<PresenterController> xPresenterController)
+    : mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -524,8 +528,8 @@ bool GotoPreviousSlideCommand::IsEnabled() const
 //===== GotoNextEffect ========================================================
 
 GotoNextEffectCommand::GotoNextEffectCommand (
-    const rtl::Reference<PresenterController>& rpPresenterController)
-    : mpPresenterController(rpPresenterController)
+    rtl::Reference<PresenterController> xPresenterController)
+    : mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -555,8 +559,8 @@ bool GotoNextEffectCommand::IsEnabled() const
 //===== GotoNextSlide =========================================================
 
 GotoNextSlideCommand::GotoNextSlideCommand (
-    const rtl::Reference<PresenterController>& rpPresenterController)
-    : mpPresenterController(rpPresenterController)
+    rtl::Reference<PresenterController> xPresenterController)
+    : mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -574,8 +578,8 @@ void GotoNextSlideCommand::Execute()
 //===== SwitchMonitorCommand ==============================================
 
 SwitchMonitorCommand::SwitchMonitorCommand (
-    const rtl::Reference<PresenterController>& rpPresenterController)
-    : mpPresenterController(rpPresenterController)
+    rtl::Reference<PresenterController> xPresenterController)
+    : mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -586,8 +590,8 @@ void SwitchMonitorCommand::Execute()
 
 //===== PauseResumeCommand ==============================================
 
-PauseResumeCommand::PauseResumeCommand (const rtl::Reference<PresenterController>& rpPresenterController)
-: mpPresenterController(rpPresenterController)
+PauseResumeCommand::PauseResumeCommand (rtl::Reference<PresenterController> xPresenterController)
+: mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -635,8 +639,8 @@ Any PauseResumeCommand::GetState() const
         return Any(false);
 }
 
-RestartTimerCommand::RestartTimerCommand (const rtl::Reference<PresenterController>& rpPresenterController)
-: mpPresenterController(rpPresenterController)
+RestartTimerCommand::RestartTimerCommand (rtl::Reference<PresenterController> xPresenterController)
+: mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -663,9 +667,9 @@ void RestartTimerCommand::Execute()
 
 SetNotesViewCommand::SetNotesViewCommand (
     const bool bOn,
-    const rtl::Reference<PresenterController>& rpPresenterController)
+    rtl::Reference<PresenterController> xPresenterController)
     : mbOn(bOn),
-      mpPresenterController(rpPresenterController)
+      mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -702,9 +706,9 @@ Any SetNotesViewCommand::GetState() const
 
 SetSlideSorterCommand::SetSlideSorterCommand (
     const bool bOn,
-    const rtl::Reference<PresenterController>& rpPresenterController)
+    rtl::Reference<PresenterController> xPresenterController)
     : mbOn(bOn),
-      mpPresenterController(rpPresenterController)
+      mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -738,9 +742,9 @@ Any SetSlideSorterCommand::GetState() const
 
 SetHelpViewCommand::SetHelpViewCommand (
     const bool bOn,
-    const rtl::Reference<PresenterController>& rpPresenterController)
+    rtl::Reference<PresenterController> xPresenterController)
     : mbOn(bOn),
-      mpPresenterController(rpPresenterController)
+      mpPresenterController(std::move(xPresenterController))
 {
 }
 
@@ -773,9 +777,9 @@ Any SetHelpViewCommand::GetState() const
 //===== NotesFontSizeCommand ==================================================
 
 NotesFontSizeCommand::NotesFontSizeCommand(
-    const rtl::Reference<PresenterController>& rpPresenterController,
+    rtl::Reference<PresenterController> xPresenterController,
     const sal_Int32 nSizeChange)
-    : mpPresenterController(rpPresenterController),
+    : mpPresenterController(std::move(xPresenterController)),
       mnSizeChange(nSizeChange)
 {
 }
@@ -808,8 +812,8 @@ Any NotesFontSizeCommand::GetState() const
 
 //===== ExitPresenterCommand ==================================================
 
-ExitPresenterCommand::ExitPresenterCommand (const rtl::Reference<PresenterController>& rpPresenterController)
-: mpPresenterController(rpPresenterController)
+ExitPresenterCommand::ExitPresenterCommand (rtl::Reference<PresenterController> xPresenterController)
+: mpPresenterController(std::move(xPresenterController))
 {
 }
 

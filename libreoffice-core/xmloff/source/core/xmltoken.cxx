@@ -299,6 +299,7 @@ namespace xmloff::token {
         TOKEN( "author-name",                     XML_AUTHOR_NAME ),
         TOKEN( "auto",                            XML_AUTO ),
         TOKEN( "auto-complete",                   XML_AUTO_COMPLETE ),
+        TOKEN( "auto-create-new-frame",           XML_AUTO_CREATE_NEW_FRAME ),
         TOKEN( "auto-grow-height",                XML_AUTO_GROW_HEIGHT ),
         TOKEN( "auto-grow-width",                 XML_AUTO_GROW_WIDTH ),
         TOKEN( "auto-reload",                     XML_AUTO_RELOAD ),
@@ -1065,6 +1066,9 @@ namespace xmloff::token {
         TOKEN( "hyphenation-push-char-count",     XML_HYPHENATION_PUSH_CHAR_COUNT ),
         TOKEN( "hyphenation-remain-char-count",       XML_HYPHENATION_REMAIN_CHAR_COUNT ),
         TOKEN( "hyphenation-no-caps",             XML_HYPHENATION_NO_CAPS ),
+        TOKEN( "hyphenation-no-last-word",        XML_HYPHENATION_NO_LAST_WORD ),
+        TOKEN( "hyphenation-word-char-count",     XML_HYPHENATION_WORD_CHAR_COUNT ),
+        TOKEN( "hyphenation-zone",                XML_HYPHENATION_ZONE ),
         TOKEN( "i",                               XML_I ),
         TOKEN( "icon",                            XML_ICON ),
         TOKEN( "icon-set",                        XML_ICON_SET ),
@@ -1218,6 +1222,7 @@ namespace xmloff::token {
         TOKEN( "linked-cell",                     XML_LINKED_CELL ),
         TOKEN( "link-to-source-data",             XML_LINK_TO_SOURCE_DATA ),
         TOKEN( "list",                            XML_LIST ),
+        TOKEN( "marker-style-name",               XML_MARKER_STYLE_NAME ),
         TOKEN( "list-block",                      XML_LIST_BLOCK ),
         TOKEN( "list-header",                     XML_LIST_HEADER ),
         TOKEN( "list-info",                       XML_LIST_INFO ),
@@ -1231,6 +1236,7 @@ namespace xmloff::token {
         TOKEN( "list-style",                      XML_LIST_STYLE ),
         TOKEN( "list-style-name",                 XML_LIST_STYLE_NAME ),
         TOKEN( "ln",                              XML_LN ),
+        TOKEN( "lock",                            XML_LOCK ),
         TOKEN( "locked",                          XML_LOCKED ),
         TOKEN( "log",                             XML_LOG ),
         TOKEN( "logarithmic",                     XML_LOGARITHMIC ),
@@ -1464,6 +1470,7 @@ namespace xmloff::token {
         TOKEN( "outline-style",                   XML_OUTLINE_STYLE ),
         TOKEN( "outset",                          XML_OUTSET ),
         TOKEN( "outside",                         XML_OUTSIDE ),
+        TOKEN( "overflow-behavior",               XML_OVERFLOW_BEHAVIOR ),
         TOKEN( "overlap",                         XML_OVERLAP ),
         TOKEN( "overlay",                         XML_OVERLAY ),
         TOKEN( "p",                               XML_P ),
@@ -2296,6 +2303,7 @@ namespace xmloff::token {
         TOKEN( "lr",                              XML_LR ),
         TOKEN( "rl",                              XML_RL ),
         TOKEN( "tb",                              XML_TB ),
+        TOKEN( "tb-rl90",                         XML_TB_RL90 ),
 
         TOKEN( "layout-grid-color",               XML_LAYOUT_GRID_COLOR ),
         TOKEN( "layout-grid-lines",               XML_LAYOUT_GRID_LINES ),
@@ -2505,11 +2513,13 @@ namespace xmloff::token {
         TOKEN( "extrusion-first-light-direction" ,      XML_EXTRUSION_FIRST_LIGHT_DIRECTION ),
         TOKEN( "extrusion-second-light-direction" , XML_EXTRUSION_SECOND_LIGHT_DIRECTION ),
         TOKEN( "extrusion-metal" ,                      XML_EXTRUSION_METAL ),
+        TOKEN( "extrusion-metal-type" ,                 XML_EXTRUSION_METAL_TYPE ),
         TOKEN( "extrusion-rotation-angle" ,         XML_EXTRUSION_ROTATION_ANGLE ),
         TOKEN( "extrusion-rotation-center" ,            XML_EXTRUSION_ROTATION_CENTER ),
         TOKEN( "extrusion-shininess" ,                  XML_EXTRUSION_SHININESS ),
         TOKEN( "extrusion-skew" ,                       XML_EXTRUSION_SKEW ),
         TOKEN( "extrusion-specularity" ,                XML_EXTRUSION_SPECULARITY ),
+        TOKEN( "extrusion-specularity-loext",           XML_EXTRUSION_SPECULARITY_LOEXT ),
         TOKEN( "extrusion-projection-mode" ,            XML_EXTRUSION_PROJECTION_MODE ),
         TOKEN( "extrusion-viewpoint" ,                  XML_EXTRUSION_VIEWPOINT ),
         TOKEN( "extrusion-origin" ,                 XML_EXTRUSION_ORIGIN ),
@@ -2579,6 +2589,7 @@ namespace xmloff::token {
         TOKEN( "tabular-layout",                    XML_TABULAR_LAYOUT ),
         TOKEN( "outline-subtotals-top",             XML_OUTLINE_SUBTOTALS_TOP ),
         TOKEN( "outline-subtotals-bottom",          XML_OUTLINE_SUBTOTALS_BOTTOM ),
+        TOKEN( "compact-layout",                    XML_COMPACT_LAYOUT ),
         TOKEN( "layout-mode",                       XML_LAYOUT_MODE ),
         TOKEN( "data-pilot-layout-info",            XML_DATA_PILOT_LAYOUT_INFO ),
         TOKEN( "symbol-color",                      XML_SYMBOL_COLOR ),
@@ -2761,6 +2772,7 @@ namespace xmloff::token {
 
         TOKEN( "show-filter-button",                   XML_SHOW_FILTER_BUTTON ),
         TOKEN( "drill-down-on-double-click",           XML_DRILL_DOWN_ON_DOUBLE_CLICK ),
+        TOKEN( "show-drill-down-buttons",              XML_SHOW_DRILL_DOWN_BUTTONS ),
         TOKEN( "header-grid-layout",                   XML_HEADER_GRID_LAYOUT ),
         TOKEN( "grouped-by",                           XML_GROUPED_BY ),
         TOKEN( "days",                                 XML_DAYS ),
@@ -3318,6 +3330,7 @@ namespace xmloff::token {
         // enhanced fields
         TOKEN( "fieldmark",             XML_FIELDMARK ),
         TOKEN( "fieldmark-start",       XML_FIELDMARK_START ),
+        TOKEN( "fieldmark-separator",   XML_FIELDMARK_SEPARATOR ),
         TOKEN( "fieldmark-end",         XML_FIELDMARK_END ),
 
         TOKEN( "image-scale",           XML_IMAGE_SCALE  ),
@@ -3476,8 +3489,8 @@ namespace xmloff::token {
         TOKEN("linked-style-name",   XML_LINKED_STYLE_NAME ),
 
         TOKEN("theme",               XML_THEME ),
-        TOKEN("theme-color",         XML_THEME_COLOR ),
-        TOKEN("fill-theme-color",    XML_FILL_THEME_COLOR ),
+        TOKEN("char-color-theme-reference", XML_CHAR_COLOR_THEME_REFERENCE),
+        TOKEN("fill-color-theme-reference", XML_FILL_COLOR_THEME_REFERENCE),
         TOKEN("dk1",                 XML_DK1 ),
         TOKEN("lt1",                 XML_LT1 ),
         TOKEN("dk2",                 XML_DK2 ),
@@ -3490,10 +3503,6 @@ namespace xmloff::token {
         TOKEN("accent6",             XML_ACCENT6 ),
         TOKEN("hlink",               XML_HLINK ),
         TOKEN("folHlink",            XML_FOLHLINK ),
-        TOKEN("color-lum-mod",       XML_COLOR_LUM_MOD ),
-        TOKEN("color-lum-off",       XML_COLOR_LUM_OFF ),
-        TOKEN("fill-color-lum-mod",  XML_FILL_COLOR_LUM_MOD ),
-        TOKEN("fill-color-lum-off",  XML_FILL_COLOR_LUM_OFF ),
 
         TOKEN("content-control",     XML_CONTENT_CONTROL ),
         TOKEN("showing-place-holder", XML_SHOWING_PLACE_HOLDER ),
@@ -3507,6 +3516,14 @@ namespace xmloff::token {
         TOKEN("alias", XML_ALIAS),
         TOKEN("tag", XML_TAG),
 
+        TOKEN("fill-use-slide-background", XML_FILL_USE_SLIDE_BACKGROUND),
+
+        TOKEN("may-break-between-pages", XML_MAY_BREAK_BETWEEN_PAGES),
+
+        TOKEN("gradient-stop", XML_GRADIENT_STOP),
+        TOKEN("opacity-stop", XML_OPACITY_STOP),
+        TOKEN("color-value", XML_COLOR_VALUE),
+        TOKEN("color-type", XML_COLOR_TYPE),
 
 #if OSL_DEBUG_LEVEL > 0
         { 0, nullptr, std::nullopt,               XML_TOKEN_END }

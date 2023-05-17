@@ -25,12 +25,12 @@
 #include <nodeoffset.hxx>
 
 #include <set>
+#include <utility>
 
 namespace com::sun::star::linguistic2 { class XHyphenatedWord; }
 
 namespace sw::mark { class IMark; }
 class SwCharRange;
-class SwInsText;
 class SwTextNode;
 class SwTextAttrEnd;
 class SwTextFormatter;
@@ -49,6 +49,8 @@ class SwScriptInfo;
 enum class ExpandMode;
 class SwTextAttr;
 class SwWrtShell;
+class SwNode;
+class SwFlyAtContentFrame;
 
 #define NON_PRINTING_CHARACTER_COLOR Color(0x26, 0x8b, 0xd2)
 
@@ -97,6 +99,7 @@ struct Extent
 };
 
 struct MergedPara;
+class InsertText;
 
 std::pair<SwTextNode*, sal_Int32> MapViewToModel(MergedPara const&, TextFrameIndex nIndex);
 TextFrameIndex MapModelToView(MergedPara const&, SwTextNode const* pNode, sal_Int32 nIndex);
@@ -108,10 +111,10 @@ SwTextFrame * MakeTextFrame(SwTextNode & rNode, SwFrame *, sw::FrameMode eMode);
 
 bool FrameContainsNode(SwContentFrame const& rFrame, SwNodeOffset nNodeIndex);
 bool IsParaPropsNode(SwRootFrame const& rLayout, SwTextNode const& rNode);
-SwTextNode * GetParaPropsNode(SwRootFrame const& rLayout, SwNodeIndex const& rNode);
+SwTextNode * GetParaPropsNode(SwRootFrame const& rLayout, SwNode const& rNode);
 SwPosition GetParaPropsPos(SwRootFrame const& rLayout, SwPosition const& rPos);
 std::pair<SwTextNode *, SwTextNode *>
-GetFirstAndLastNode(SwRootFrame const& rLayout, SwNodeIndex const& rPos);
+GetFirstAndLastNode(SwRootFrame const& rLayout, SwNode const& rPos);
 
 SwTextNode const& GetAttrMerged(SfxItemSet & rFormatSet,
         SwTextNode const& rNode, SwRootFrame const* pLayout);
@@ -147,7 +150,7 @@ bool IsMarkHintHidden(SwRootFrame const& rLayout,
 
 void RecreateStartTextFrames(SwTextNode & rNode);
 
-auto MakeSwInsText(SwTextNode & rNode, sal_Int32 nPos, sal_Int32 nLen) -> SwInsText;
+sw::InsertText MakeInsertText(SwTextNode& rNode, const sal_Int32 nPos, const sal_Int32 nLen);
 
 /**
  * Decides if rTextNode has a numbering which has layout-level values (e.g. Arabic, but not
@@ -274,7 +277,7 @@ class SW_DLLPUBLIC SwTextFrame final : public SwContentFrame
     virtual void MakePos() override;
 
     // Corrects the position from which we need to format
-    static TextFrameIndex FindBrk(const OUString &rText, TextFrameIndex nStart,
+    static TextFrameIndex FindBrk(std::u16string_view aText, TextFrameIndex nStart,
                                   TextFrameIndex nEnd);
 
     // inline branch
@@ -329,6 +332,9 @@ class SW_DLLPUBLIC SwTextFrame final : public SwContentFrame
 
     virtual void SwClientNotify(SwModify const& rModify, SfxHint const& rHint) override;
 
+    /// Like GetDrawObjs(), but limit to fly frames which are allowed to split.
+    std::vector<SwFlyAtContentFrame*> GetSplitFlyDrawObjs() const;
+
 public:
 
     virtual const SvxFormatBreakItem& GetBreakItem() const override;
@@ -342,7 +348,7 @@ public:
      */
     void Init();
 
-    /// Is called by DoIdleJob_() and ExecSpellPopup()
+    /// Is called by DoIdleJob_(), ExecSpellPopup() and UpDown()
     SwRect AutoSpell_(SwTextNode &, sal_Int32);
 
     /// Is called by DoIdleJob_()
@@ -352,7 +358,7 @@ public:
     void CollectAutoCmplWrds(SwTextNode &, sal_Int32);
 
     /**
-     * Returns the screen position of rPos. The values are relative to the upper
+     * Returns the view rectangle for the rPos model position. The values are relative to the upper
      * left position of the page frame.
      * Additional information can be obtained by passing an SwCursorMoveState object.
      * Returns false if rPos > number of character is string
@@ -483,7 +489,7 @@ public:
      * bSplit indicates, that the paragraph has to be split
      * bTst indicates, that we are currently doing a test formatting
      */
-    virtual bool WouldFit( SwTwips &nMaxHeight, bool &bSplit, bool bTst ) override;
+    virtual bool WouldFit(SwTwips &nMaxHeight, bool &bSplit, bool bTst, bool bMoveBwd) override;
 
     /**
      * The WouldFit equivalent for temporarily rewired TextFrames
@@ -781,6 +787,10 @@ public:
     OUString GetCurWord(SwPosition const&) const;
     sal_uInt16 GetScalingOfSelectedText(TextFrameIndex nStt, TextFrameIndex nEnd);
 
+    /// This text frame may have a split fly frames anchored to it. Is any of them a frame that has
+    /// a follow, i.e. not the last in a master -> follow 1 -> ... -> last follow chain?
+    bool HasNonLastSplitFlyDrawObj() const;
+
     virtual void dumpAsXmlAttributes(xmlTextWriterPtr writer) const override;
 };
 
@@ -971,10 +981,10 @@ struct MergedPara
     /// mainly for sanity checks
     SwTextNode const* pLastNode;
     MergedPara(SwTextFrame & rFrame, std::vector<Extent>&& rExtents,
-            OUString const& rText,
+            OUString aText,
             SwTextNode *const pProps, SwTextNode *const pFirst,
             SwTextNode const*const pLast)
-        : listener(rFrame), extents(std::move(rExtents)), mergedText(rText)
+        : listener(rFrame), extents(std::move(rExtents)), mergedText(std::move(aText))
         , pParaPropsNode(pProps), pFirstNode(pFirst), pLastNode(pLast)
     {
         assert(pParaPropsNode);

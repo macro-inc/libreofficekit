@@ -18,15 +18,18 @@
  */
 
 #include "NetChartTypeTemplate.hxx"
+#include "FilledNetChartType.hxx"
+#include "NetChartType.hxx"
+#include <Diagram.hxx>
 #include <DiagramHelper.hxx>
-#include <servicenames_charttypes.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
+#include <ChartType.hxx>
 #include <com/sun/star/chart2/SymbolStyle.hpp>
 #include <com/sun/star/chart2/Symbol.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -58,21 +61,19 @@ StackMode NetChartTypeTemplate::getStackMode( sal_Int32 /* nChartTypeIndex */ ) 
     return m_eStackMode;
 }
 
-void SAL_CALL NetChartTypeTemplate::applyStyle(
-    const Reference< chart2::XDataSeries >& xSeries,
+void NetChartTypeTemplate::applyStyle2(
+    const rtl::Reference< DataSeries >& xSeries,
     ::sal_Int32 nChartTypeIndex,
     ::sal_Int32 nSeriesIndex,
     ::sal_Int32 nSeriesCount )
 {
-    ChartTypeTemplate::applyStyle( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
+    ChartTypeTemplate::applyStyle2( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
 
     try
     {
-        Reference< beans::XPropertySet > xProp( xSeries, uno::UNO_QUERY_THROW );
-
-        DataSeriesHelper::switchSymbolsOnOrOff( xProp, m_bHasSymbols, nSeriesIndex );
-        DataSeriesHelper::switchLinesOnOrOff( xProp, m_bHasLines );
-        DataSeriesHelper::makeLinesThickOrThin( xProp, true );
+        DataSeriesHelper::switchSymbolsOnOrOff( xSeries, m_bHasSymbols, nSeriesIndex );
+        DataSeriesHelper::switchLinesOnOrOff( xSeries, m_bHasLines );
+        DataSeriesHelper::makeLinesThickOrThin( xSeries, true );
     }
     catch( const uno::Exception & )
     {
@@ -80,15 +81,12 @@ void SAL_CALL NetChartTypeTemplate::applyStyle(
     }
 }
 
-// ____ XChartTypeTemplate ____
-sal_Bool SAL_CALL NetChartTypeTemplate::matchesTemplate(
-    const Reference< chart2::XDiagram >& xDiagram,
-    sal_Bool bAdaptProperties )
+// ____ ChartTypeTemplate ____
+bool NetChartTypeTemplate::matchesTemplate2(
+    const rtl::Reference< ::chart::Diagram >& xDiagram,
+    bool bAdaptProperties )
 {
-    bool bResult = ChartTypeTemplate::matchesTemplate( xDiagram, bAdaptProperties );
-
-    uno::Reference< beans::XPropertySet > xChartTypeProp(
-        DiagramHelper::getChartTypeByIndex( xDiagram, 0 ), uno::UNO_QUERY_THROW );
+    bool bResult = ChartTypeTemplate::matchesTemplate2( xDiagram, bAdaptProperties );
 
     if( bResult )
     {
@@ -102,8 +100,8 @@ sal_Bool SAL_CALL NetChartTypeTemplate::matchesTemplate(
         bool bSymbolFound = false;
         bool bLineFound = false;
 
-        std::vector< Reference< chart2::XDataSeries > > aSeriesVec(
-            DiagramHelper::getDataSeriesFromDiagram( xDiagram ));
+        std::vector< rtl::Reference< DataSeries > > aSeriesVec =
+            DiagramHelper::getDataSeriesFromDiagram( xDiagram );
 
         for (auto const& series : aSeriesVec)
         {
@@ -111,9 +109,8 @@ sal_Bool SAL_CALL NetChartTypeTemplate::matchesTemplate(
             {
                 chart2::Symbol aSymbProp;
                 drawing::LineStyle eLineStyle;
-                Reference< beans::XPropertySet > xProp(series, uno::UNO_QUERY_THROW);
 
-                bool bCurrentHasSymbol = (xProp->getPropertyValue( "Symbol") >>= aSymbProp) &&
+                bool bCurrentHasSymbol = (series->getPropertyValue( "Symbol") >>= aSymbProp) &&
                     (aSymbProp.Style != chart2::SymbolStyle_NONE);
 
                 if( bCurrentHasSymbol )
@@ -125,7 +122,7 @@ sal_Bool SAL_CALL NetChartTypeTemplate::matchesTemplate(
                     break;
                 }
 
-                bool bCurrentHasLine = (xProp->getPropertyValue( "LineStyle") >>= eLineStyle) &&
+                bool bCurrentHasLine = (series->getPropertyValue( "LineStyle") >>= eLineStyle) &&
                     ( eLineStyle != drawing::LineStyle_NONE );
 
                 if( bCurrentHasLine )
@@ -157,34 +154,18 @@ sal_Bool SAL_CALL NetChartTypeTemplate::matchesTemplate(
     return bResult;
 }
 
-Reference< chart2::XChartType > NetChartTypeTemplate::getChartTypeForIndex( sal_Int32 /*nChartTypeIndex*/ )
+rtl::Reference< ChartType > NetChartTypeTemplate::getChartTypeForIndex( sal_Int32 /*nChartTypeIndex*/ )
 {
-    Reference< chart2::XChartType > xResult;
-
-    try
-    {
-        Reference< lang::XMultiServiceFactory > xFact(
-            GetComponentContext()->getServiceManager(), uno::UNO_QUERY_THROW );
-
-        if( m_bHasFilledArea )
-            xResult.set( xFact->createInstance(
-                             CHART2_SERVICE_NAME_CHARTTYPE_FILLED_NET ), uno::UNO_QUERY_THROW );
-        else
-            xResult.set( xFact->createInstance(
-                             CHART2_SERVICE_NAME_CHARTTYPE_NET ), uno::UNO_QUERY_THROW );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
-
-    return xResult;
+    if( m_bHasFilledArea )
+        return new FilledNetChartType();
+    else
+        return new NetChartType();
 }
 
-Reference< chart2::XChartType > SAL_CALL NetChartTypeTemplate::getChartTypeForNewSeries(
-        const uno::Sequence< Reference< chart2::XChartType > >& aFormerlyUsedChartTypes )
+rtl::Reference< ChartType > NetChartTypeTemplate::getChartTypeForNewSeries2(
+        const std::vector< rtl::Reference< ChartType > >& aFormerlyUsedChartTypes )
 {
-    Reference< chart2::XChartType > xResult( getChartTypeForIndex( 0 ) );
+    rtl::Reference< ChartType > xResult( getChartTypeForIndex( 0 ) );
     ChartTypeTemplate::copyPropertiesFromOldToNewCoordinateSystem( aFormerlyUsedChartTypes, xResult );
     return xResult;
 }

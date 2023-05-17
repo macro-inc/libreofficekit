@@ -75,11 +75,11 @@ css::uno::Reference< css::xml::crypto::sax::XReferenceResolvedListener > XSecCon
 
     css::uno::Sequence<css::uno::Any> args
     {
-        makeAny(OUString::number(nSecurityId)),
-        makeAny(uno::Reference<xml::crypto::sax::XSecuritySAXEventKeeper>(m_xSAXEventKeeper)),
-        makeAny(OUString::number(nIdOfSignatureElementCollector)),
-        makeAny(m_xSecurityContext),
-        makeAny(m_xXMLSignature)
+        Any(OUString::number(nSecurityId)),
+        Any(uno::Reference<xml::crypto::sax::XSecuritySAXEventKeeper>(m_xSAXEventKeeper)),
+        Any(OUString::number(nIdOfSignatureElementCollector)),
+        Any(m_xSecurityContext),
+        Any(m_xXMLSignature)
     };
     xInitialization->initialize(args);
 
@@ -473,7 +473,7 @@ void XSecController::setX509CertDigest(
 }
 
 namespace {
-Reference<css::graphic::XGraphic> lcl_getGraphicFromString(const OUString& rImage)
+Reference<css::graphic::XGraphic> lcl_getGraphicFromString(std::u16string_view rImage)
 {
     Sequence<sal_Int8> seq;
     comphelper::Base64::decode(seq, rImage);
@@ -493,18 +493,18 @@ Reference<css::graphic::XGraphic> lcl_getGraphicFromString(const OUString& rImag
 }
 }
 
-void XSecController::setValidSignatureImage(const OUString& rValidSigImg)
+void XSecController::setValidSignatureImage(std::u16string_view rValidSigImg)
 {
-    if (m_vInternalSignatureInformations.empty() || rValidSigImg.isEmpty())
+    if (m_vInternalSignatureInformations.empty() || rValidSigImg.empty())
         return;
 
     InternalSignatureInformation& rInformation = m_vInternalSignatureInformations.back();
     rInformation.signatureInfor.aValidSignatureImage = lcl_getGraphicFromString(rValidSigImg);
 }
 
-void XSecController::setInvalidSignatureImage(const OUString& rInvalidSigImg)
+void XSecController::setInvalidSignatureImage(std::u16string_view rInvalidSigImg)
 {
-    if (m_vInternalSignatureInformations.empty() || rInvalidSigImg.isEmpty())
+    if (m_vInternalSignatureInformations.empty() || rInvalidSigImg.empty())
         return;
 
     InternalSignatureInformation& rInformation = m_vInternalSignatureInformations.back();

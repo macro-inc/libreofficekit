@@ -27,7 +27,8 @@
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <o3tl/safeint.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 
 #include <helper/unopropertyarrayhelper.hxx>
@@ -68,9 +69,9 @@ uno::Any UnoControlTabPageContainerModel::ImplGetDefaultValue( sal_uInt16 nPropI
     switch(nPropId)
     {
         case BASEPROPERTY_DEFAULTCONTROL:
-            return uno::makeAny( OUString("com.sun.star.awt.tab.UnoControlTabPageContainer") );
+            return uno::Any( OUString("com.sun.star.awt.tab.UnoControlTabPageContainer") );
         case BASEPROPERTY_BORDER:
-            return uno::makeAny(sal_Int16(0));              // No Border
+            return uno::Any(sal_Int16(0));              // No Border
         default:
             return UnoControlModel::ImplGetDefaultValue( nPropId );
     }
@@ -176,9 +177,9 @@ void SAL_CALL UnoControlTabPageContainerModel::replaceByIndex( ::sal_Int32 /*Ind
 uno::Any SAL_CALL UnoControlTabPageContainerModel::getByIndex( ::sal_Int32 nIndex )
 {
     ::osl::Guard< ::osl::Mutex > aGuard( GetMutex() );
-    if ( nIndex < 0 || nIndex > sal_Int32(m_aTabPageVector.size()) )
+    if ( nIndex < 0 || o3tl::make_unsigned(nIndex) > m_aTabPageVector.size() )
         throw lang::IndexOutOfBoundsException();
-    return uno::makeAny(m_aTabPageVector[nIndex]);
+    return uno::Any(m_aTabPageVector[nIndex]);
 }
 
 // XElementAccess
@@ -211,7 +212,7 @@ UnoControlTabPageContainer::UnoControlTabPageContainer( const uno::Reference< un
 {
 }
 
-OUString UnoControlTabPageContainer::GetComponentServiceName()
+OUString UnoControlTabPageContainer::GetComponentServiceName() const
 {
     return "TabPageContainer";
 }

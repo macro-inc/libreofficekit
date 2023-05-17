@@ -205,7 +205,7 @@ FrmMap const aHFlyHtmlMap[] =
 
 // #i18732# - own vertical alignment map for to frame anchored objects
 // #i22305#
-#define VERT_FRAME_REL   (LB::VertFrame|LB::FlyVertPrintArea)
+#define VERT_FRAME_REL   (LB::FlyVertFrame|LB::FlyVertPrintArea)
 
 FrmMap const aVFrameMap[] =
 {
@@ -379,55 +379,54 @@ FrmMap const aVAsCharHtmlMap[] =
 
 static std::size_t lcl_GetFrmMapCount(const FrmMap* pMap)
 {
-    if( pMap )
-    {
-        if( pMap == aVParaHtmlMap )
-            return SAL_N_ELEMENTS(aVParaHtmlMap);
-        if( pMap == aVAsCharHtmlMap )
-            return SAL_N_ELEMENTS( aVAsCharHtmlMap );
-        if( pMap == aHParaHtmlMap )
-            return SAL_N_ELEMENTS( aHParaHtmlMap );
-        if( pMap == aHParaHtmlAbsMap )
-            return SAL_N_ELEMENTS( aHParaHtmlAbsMap );
-        if( pMap == aVPageMap )
-            return SAL_N_ELEMENTS( aVPageMap );
-        if( pMap == aVPageHtmlMap )
-            return SAL_N_ELEMENTS( aVPageHtmlMap );
-        if( pMap == aVAsCharMap )
-            return SAL_N_ELEMENTS( aVAsCharMap );
-        if( pMap == aVParaMap )
-            return SAL_N_ELEMENTS( aVParaMap );
-        if( pMap == aHParaMap )
-            return SAL_N_ELEMENTS( aHParaMap );
-        if( pMap == aHFrameMap )
-            return SAL_N_ELEMENTS( aHFrameMap );
-        if( pMap == aVFrameMap )
-            return SAL_N_ELEMENTS( aVFrameMap );
-        if( pMap == aHCharMap )
-            return SAL_N_ELEMENTS( aHCharMap );
-        if( pMap == aHCharHtmlMap )
-            return SAL_N_ELEMENTS( aHCharHtmlMap );
-        if( pMap == aHCharHtmlAbsMap )
-            return SAL_N_ELEMENTS( aHCharHtmlAbsMap );
-        if( pMap == aVCharMap )
-            return SAL_N_ELEMENTS( aVCharMap );
-        if( pMap == aVCharHtmlMap )
-            return SAL_N_ELEMENTS( aVCharHtmlMap );
-        if( pMap == aVCharHtmlAbsMap )
-            return SAL_N_ELEMENTS( aVCharHtmlAbsMap );
-        if( pMap == aHPageHtmlMap )
-            return SAL_N_ELEMENTS( aHPageHtmlMap );
-        if( pMap == aHFlyHtmlMap )
-            return SAL_N_ELEMENTS( aHFlyHtmlMap );
-        if( pMap == aVFlyHtmlMap )
-            return SAL_N_ELEMENTS( aVFlyHtmlMap );
-        if( pMap == aVMultiSelectionMap )
-            return SAL_N_ELEMENTS( aVMultiSelectionMap );
-        if( pMap == aHMultiSelectionMap )
-            return SAL_N_ELEMENTS( aHMultiSelectionMap );
-        return SAL_N_ELEMENTS(aHPageMap);
-    }
-    return 0;
+    if( !pMap )
+        return 0;
+
+    if( pMap == aVParaHtmlMap )
+        return std::size(aVParaHtmlMap);
+    if( pMap == aVAsCharHtmlMap )
+        return std::size( aVAsCharHtmlMap );
+    if( pMap == aHParaHtmlMap )
+        return std::size( aHParaHtmlMap );
+    if( pMap == aHParaHtmlAbsMap )
+        return std::size( aHParaHtmlAbsMap );
+    if( pMap == aVPageMap )
+        return std::size( aVPageMap );
+    if( pMap == aVPageHtmlMap )
+        return std::size( aVPageHtmlMap );
+    if( pMap == aVAsCharMap )
+        return std::size( aVAsCharMap );
+    if( pMap == aVParaMap )
+        return std::size( aVParaMap );
+    if( pMap == aHParaMap )
+        return std::size( aHParaMap );
+    if( pMap == aHFrameMap )
+        return std::size( aHFrameMap );
+    if( pMap == aVFrameMap )
+        return std::size( aVFrameMap );
+    if( pMap == aHCharMap )
+        return std::size( aHCharMap );
+    if( pMap == aHCharHtmlMap )
+        return std::size( aHCharHtmlMap );
+    if( pMap == aHCharHtmlAbsMap )
+        return std::size( aHCharHtmlAbsMap );
+    if( pMap == aVCharMap )
+        return std::size( aVCharMap );
+    if( pMap == aVCharHtmlMap )
+        return std::size( aVCharHtmlMap );
+    if( pMap == aVCharHtmlAbsMap )
+        return std::size( aVCharHtmlAbsMap );
+    if( pMap == aHPageHtmlMap )
+        return std::size( aHPageHtmlMap );
+    if( pMap == aHFlyHtmlMap )
+        return std::size( aHFlyHtmlMap );
+    if( pMap == aVFlyHtmlMap )
+        return std::size( aVFlyHtmlMap );
+    if( pMap == aVMultiSelectionMap )
+        return std::size( aVMultiSelectionMap );
+    if( pMap == aHMultiSelectionMap )
+        return std::size( aHMultiSelectionMap );
+    return std::size(aHPageMap);
 }
 
 static SvxSwFramePosString::StringId lcl_ChangeResIdToVerticalOrRTL(
@@ -466,19 +465,19 @@ static SvxSwFramePosString::StringId lcl_ChangeResIdToVerticalOrRTL(
             {SvxSwFramePosString::REL_FRM_TOP,    SvxSwFramePosString::REL_FRM_LEFT },
             {SvxSwFramePosString::REL_FRM_BOTTOM, SvxSwFramePosString::REL_FRM_RIGHT }
         };
-        for(size_t nIndex = 0; nIndex < SAL_N_ELEMENTS(aHoriIds); ++nIndex)
+        for(const auto &a : aHoriIds)
         {
-            if(aHoriIds[nIndex].eHori == eStringId)
+            if(a.eHori == eStringId)
             {
-                eStringId = aHoriIds[nIndex].eVert;
+                eStringId = a.eVert;
                 return eStringId;
             }
         }
-        for(size_t nIndex = 0; nIndex < SAL_N_ELEMENTS(aVertIds); ++nIndex)
+        for(const auto &a : aVertIds)
         {
-            if(aVertIds[nIndex].eHori == eStringId)
+            if(a.eHori == eStringId)
             {
-                eStringId = aVertIds[nIndex].eVert;
+                eStringId = a.eVert;
                 break;
             }
         }
@@ -627,27 +626,27 @@ namespace
 void SvxSwPosSizeTabPage::setOptimalFrmWidth()
 {
     static const FrmMaps aMaps[] = {
-        { aHPageMap, SAL_N_ELEMENTS(aHPageMap) },
-        { aHPageHtmlMap, SAL_N_ELEMENTS(aHPageHtmlMap) },
-        { aVPageMap, SAL_N_ELEMENTS(aVPageMap) },
-        { aVPageHtmlMap, SAL_N_ELEMENTS(aVPageHtmlMap) },
-        { aHFrameMap, SAL_N_ELEMENTS(aHFrameMap) },
-        { aHFlyHtmlMap, SAL_N_ELEMENTS(aHFlyHtmlMap) },
-        { aVFrameMap, SAL_N_ELEMENTS(aVFrameMap) },
-        { aVFlyHtmlMap, SAL_N_ELEMENTS(aVFlyHtmlMap) },
-        { aHParaMap, SAL_N_ELEMENTS(aHParaMap) },
-        { aHParaHtmlMap, SAL_N_ELEMENTS(aHParaHtmlMap) },
-        { aHParaHtmlAbsMap, SAL_N_ELEMENTS(aHParaHtmlAbsMap) },
-        { aVParaMap, SAL_N_ELEMENTS(aVParaMap) },
-        { aVParaHtmlMap, SAL_N_ELEMENTS(aVParaHtmlMap) },
-        { aHCharMap, SAL_N_ELEMENTS(aHCharMap) },
-        { aHCharHtmlMap, SAL_N_ELEMENTS(aHCharHtmlMap) },
-        { aHCharHtmlAbsMap, SAL_N_ELEMENTS(aHCharHtmlAbsMap) },
-        { aVCharMap, SAL_N_ELEMENTS(aVCharMap) },
-        { aVCharHtmlMap, SAL_N_ELEMENTS(aVCharHtmlMap) },
-        { aVCharHtmlAbsMap, SAL_N_ELEMENTS(aVCharHtmlAbsMap) },
-        { aVAsCharMap, SAL_N_ELEMENTS(aVAsCharMap) },
-        { aVAsCharHtmlMap, SAL_N_ELEMENTS(aVAsCharHtmlMap) }
+        { aHPageMap, std::size(aHPageMap) },
+        { aHPageHtmlMap, std::size(aHPageHtmlMap) },
+        { aVPageMap, std::size(aVPageMap) },
+        { aVPageHtmlMap, std::size(aVPageHtmlMap) },
+        { aHFrameMap, std::size(aHFrameMap) },
+        { aHFlyHtmlMap, std::size(aHFlyHtmlMap) },
+        { aVFrameMap, std::size(aVFrameMap) },
+        { aVFlyHtmlMap, std::size(aVFlyHtmlMap) },
+        { aHParaMap, std::size(aHParaMap) },
+        { aHParaHtmlMap, std::size(aHParaHtmlMap) },
+        { aHParaHtmlAbsMap, std::size(aHParaHtmlAbsMap) },
+        { aVParaMap, std::size(aVParaMap) },
+        { aVParaHtmlMap, std::size(aVParaHtmlMap) },
+        { aHCharMap, std::size(aHCharMap) },
+        { aHCharHtmlMap, std::size(aHCharHtmlMap) },
+        { aHCharHtmlAbsMap, std::size(aHCharHtmlAbsMap) },
+        { aVCharMap, std::size(aVCharMap) },
+        { aVCharHtmlMap, std::size(aVCharHtmlMap) },
+        { aVCharHtmlAbsMap, std::size(aVCharHtmlAbsMap) },
+        { aVAsCharMap, std::size(aVAsCharMap) },
+        { aVAsCharHtmlMap, std::size(aVAsCharHtmlMap) }
     };
 
     std::vector<SvxSwFramePosString::StringId> aFrames;
@@ -686,8 +685,8 @@ namespace
 void SvxSwPosSizeTabPage::setOptimalRelWidth()
 {
     static const RelationMaps aMaps[] = {
-        { aRelationMap, SAL_N_ELEMENTS(aRelationMap) },
-        { aAsCharRelationMap, SAL_N_ELEMENTS(aAsCharRelationMap) }
+        { aRelationMap, std::size(aRelationMap) },
+        { aAsCharRelationMap, std::size(aAsCharRelationMap) }
     };
 
     std::vector<SvxSwFramePosString::StringId> aRels;
@@ -749,7 +748,7 @@ bool SvxSwPosSizeTabPage::FillItemSet( SfxItemSet* rSet)
             rSet->InvalidateItem( SID_ATTR_TRANSFORM_PROTECT_POS );
         else
             rSet->Put(
-                SfxBoolItem( GetWhich( SID_ATTR_TRANSFORM_PROTECT_POS ),
+                SfxBoolItem( SID_ATTR_TRANSFORM_PROTECT_POS,
                 m_xPositionCB->get_state() == TRISTATE_TRUE ) );
         bModified = true;
     }
@@ -760,7 +759,7 @@ bool SvxSwPosSizeTabPage::FillItemSet( SfxItemSet* rSet)
             rSet->InvalidateItem( SID_ATTR_TRANSFORM_PROTECT_SIZE );
         else
             rSet->Put(
-                SfxBoolItem( GetWhich( SID_ATTR_TRANSFORM_PROTECT_SIZE ),
+                SfxBoolItem( SID_ATTR_TRANSFORM_PROTECT_SIZE,
                 m_xSizeCB->get_state() == TRISTATE_TRUE ) );
         bModified = true;
     }
@@ -784,8 +783,8 @@ bool SvxSwPosSizeTabPage::FillItemSet( SfxItemSet* rSet)
                 nHoriByPos += m_aAnchorPos.X();
                 nVertByPos += m_aAnchorPos.Y();
 
-                rSet->Put( SfxInt32Item( GetWhich( SID_ATTR_TRANSFORM_POS_X ), nHoriByPos ) );
-                rSet->Put( SfxInt32Item( GetWhich( SID_ATTR_TRANSFORM_POS_Y ), nVertByPos ) );
+                rSet->Put( SfxInt32Item( SID_ATTR_TRANSFORM_POS_X, nHoriByPos ) );
+                rSet->Put( SfxInt32Item( SID_ATTR_TRANSFORM_POS_Y, nVertByPos ) );
 
                 bModified = true;
             }
@@ -795,11 +794,11 @@ bool SvxSwPosSizeTabPage::FillItemSet( SfxItemSet* rSet)
             if ( m_pHMap )
             {
                 const SfxInt16Item& rHoriOrient =
-                        static_cast<const SfxInt16Item&>(rOldSet.Get( SID_ATTR_TRANSFORM_HORI_ORIENT));
+                        rOldSet.Get( SID_ATTR_TRANSFORM_HORI_ORIENT );
                 const SfxInt16Item& rHoriRelation =
-                        static_cast<const SfxInt16Item&>(rOldSet.Get( SID_ATTR_TRANSFORM_HORI_RELATION));
+                        rOldSet.Get( SID_ATTR_TRANSFORM_HORI_RELATION);
                 const SfxInt32Item& rHoriPosition =
-                        static_cast<const SfxInt32Item&>(rOldSet.Get( SID_ATTR_TRANSFORM_HORI_POSITION)) ;
+                        rOldSet.Get( SID_ATTR_TRANSFORM_HORI_POSITION);
 
                 sal_uInt16 nMapPos = GetMapPos(m_pHMap, *m_xHoriLB);
                 short nAlign = GetAlignment(m_pHMap, nMapPos, *m_xHoriToLB);
@@ -824,11 +823,11 @@ bool SvxSwPosSizeTabPage::FillItemSet( SfxItemSet* rSet)
             if ( m_pVMap )
             {
                 const SfxInt16Item& rVertOrient =
-                        static_cast<const SfxInt16Item&>(rOldSet.Get( SID_ATTR_TRANSFORM_VERT_ORIENT));
+                        rOldSet.Get( SID_ATTR_TRANSFORM_VERT_ORIENT);
                 const SfxInt16Item& rVertRelation =
-                        static_cast<const SfxInt16Item&>(rOldSet.Get( SID_ATTR_TRANSFORM_VERT_RELATION));
+                        rOldSet.Get( SID_ATTR_TRANSFORM_VERT_RELATION);
                 const SfxInt32Item& rVertPosition =
-                        static_cast<const SfxInt32Item&>(rOldSet.Get( SID_ATTR_TRANSFORM_VERT_POSITION));
+                        rOldSet.Get( SID_ATTR_TRANSFORM_VERT_POSITION);
 
                 sal_uInt16 nMapPos = GetMapPos(m_pVMap, *m_xVertLB);
                 short nAlign = GetAlignment(m_pVMap, nMapPos, *m_xVertToLB);
@@ -862,7 +861,7 @@ bool SvxSwPosSizeTabPage::FillItemSet( SfxItemSet* rSet)
                 {
                     std::unique_ptr<SfxBoolItem> pFollow(static_cast<SfxBoolItem*>(pItem->Clone()));
                     pFollow->SetValue(m_xFollowCB->get_active());
-                    bModified |= nullptr != rSet->Put(*pFollow);
+                    bModified |= nullptr != rSet->Put(std::move(pFollow));
                 }
             }
         }
@@ -871,10 +870,10 @@ bool SvxSwPosSizeTabPage::FillItemSet( SfxItemSet* rSet)
     {
         sal_uInt32 nWidth = static_cast<sal_uInt32>(m_xWidthMF->denormalize(m_xWidthMF->get_value(FieldUnit::TWIP)));
         sal_uInt32 nHeight = static_cast<sal_uInt32>(m_xHeightMF->denormalize(m_xHeightMF->get_value(FieldUnit::TWIP)));
-        rSet->Put( SfxUInt32Item( GetWhich( SID_ATTR_TRANSFORM_WIDTH ), nWidth ) );
-        rSet->Put( SfxUInt32Item( GetWhich( SID_ATTR_TRANSFORM_HEIGHT ), nHeight ) );
+        rSet->Put( SfxUInt32Item( SID_ATTR_TRANSFORM_WIDTH, nWidth ) );
+        rSet->Put( SfxUInt32Item( SID_ATTR_TRANSFORM_HEIGHT, nHeight ) );
         //this item is required by SdrEditView::SetGeoAttrToMarked()
-        rSet->Put( SfxUInt16Item( GetWhich( SID_ATTR_TRANSFORM_SIZE_POINT ), sal_uInt16(RectPoint::LT) ) );
+        rSet->Put( SfxUInt16Item( SID_ATTR_TRANSFORM_SIZE_POINT, sal_uInt16(RectPoint::LT) ) );
 
         bModified = true;
     }
@@ -1050,9 +1049,9 @@ DeactivateRC SvxSwPosSizeTabPage::DeactivatePage( SfxItemSet* _pSet )
 {
     if( _pSet )
     {
-        _pSet->Put(SfxBoolItem(GetWhich( SID_ATTR_TRANSFORM_PROTECT_POS ),
+        _pSet->Put(SfxBoolItem( SID_ATTR_TRANSFORM_PROTECT_POS,
                 m_xPositionCB->get_active()));
-        _pSet->Put(SfxBoolItem(GetWhich( SID_ATTR_TRANSFORM_PROTECT_SIZE ),
+        _pSet->Put(SfxBoolItem( SID_ATTR_TRANSFORM_PROTECT_SIZE,
                 m_xSizeCB->get_active()));
         FillItemSet( _pSet );
     }
@@ -1269,7 +1268,7 @@ IMPL_LINK(SvxSwPosSizeTabPage, PosHdl, weld::ComboBox&, rLB, void)
     if (rLB.get_active() != -1)
     {
         if (pRelLB->get_active() != -1)
-            nRel = reinterpret_cast<RelationMap*>(pRelLB->get_active_id().toUInt64())->nRelation;
+            nRel = weld::fromId<RelationMap*>(pRelLB->get_active_id())->nRelation;
 
         FillRelLB(pMap, nMapPos, nAlign, nRel, *pRelLB, *pRelFT);
     }
@@ -1372,7 +1371,7 @@ short SvxSwPosSizeTabPage::GetRelation(const weld::ComboBox& rRelationLB)
     int nPos = rRelationLB.get_active();
     if (nPos != -1)
     {
-        RelationMap *pEntry = reinterpret_cast<RelationMap*>(rRelationLB.get_id(nPos).toUInt64());
+        RelationMap *pEntry = weld::fromId<RelationMap*>(rRelationLB.get_id(nPos));
         nRel = pEntry->nRelation;
     }
 
@@ -1390,7 +1389,7 @@ short SvxSwPosSizeTabPage::GetAlignment(FrmMap const *pMap, sal_uInt16 nMapPos, 
     {
         if (rRelationLB.get_active() != -1)
         {
-            LB  nRel = reinterpret_cast<RelationMap*>(rRelationLB.get_active_id().toUInt64())->nLBRelation;
+            LB  nRel = weld::fromId<RelationMap*>(rRelationLB.get_active_id())->nLBRelation;
             std::size_t nMapCount = ::lcl_GetFrmMapCount(pMap);
             SvxSwFramePosString::StringId eStrId = pMap[nMapPos].eStrId;
 
@@ -1460,7 +1459,7 @@ void SvxSwPosSizeTabPage::InitPos(RndStdIds nAnchor,
         m_nOldV    = m_pVMap[nPos].nAlign;
         nPos = m_xVertToLB->get_active();
         if (nPos != -1)
-            m_nOldVRel = reinterpret_cast<RelationMap*>(m_xVertToLB->get_id(nPos).toUInt64())->nRelation;
+            m_nOldVRel = weld::fromId<RelationMap*>(m_xVertToLB->get_id(nPos))->nRelation;
     }
 
     nPos = m_xHoriLB->get_active();
@@ -1470,7 +1469,7 @@ void SvxSwPosSizeTabPage::InitPos(RndStdIds nAnchor,
 
         nPos = m_xHoriToLB->get_active();
         if (nPos != -1)
-            m_nOldHRel = reinterpret_cast<RelationMap*>(m_xHoriToLB->get_id(nPos).toUInt64())->nRelation;
+            m_nOldHRel = weld::fromId<RelationMap*>(m_xHoriToLB->get_id(nPos))->nRelation;
     }
 
     bool bEnable = true;
@@ -1645,7 +1644,7 @@ void SvxSwPosSizeTabPage::FillRelLB(FrmMap const *pMap, sal_uInt16 nMapPos, sal_
                 if (pMap[_nMapPos].eStrId == eStrId)
                 {
                     nLBRelations = pMap[_nMapPos].nLBRelations;
-                    for (size_t nRelPos = 0; nRelPos < SAL_N_ELEMENTS(aAsCharRelationMap); nRelPos++)
+                    for (size_t nRelPos = 0; nRelPos < std::size(aAsCharRelationMap); nRelPos++)
                     {
                         if (nLBRelations & aAsCharRelationMap[nRelPos].nLBRelation)
                         {
@@ -1653,7 +1652,7 @@ void SvxSwPosSizeTabPage::FillRelLB(FrmMap const *pMap, sal_uInt16 nMapPos, sal_
 
                             sStrId1 = lcl_ChangeResIdToVerticalOrRTL(sStrId1, m_bIsVerticalFrame, m_bIsInRightToLeft);
                             OUString sEntry = SvxSwFramePosString::GetString(sStrId1);
-                            rLB.append(OUString::number(reinterpret_cast<sal_uInt64>(&aAsCharRelationMap[nRelPos])), sEntry);
+                            rLB.append(weld::toId(&aAsCharRelationMap[nRelPos]), sEntry);
                             if (pMap[_nMapPos].nAlign == nAlign)
                                 sSelEntry = sEntry;
                             break;
@@ -1670,7 +1669,7 @@ void SvxSwPosSizeTabPage::FillRelLB(FrmMap const *pMap, sal_uInt16 nMapPos, sal_
                 {
                     for (int i = 0; i < rLB.get_count(); i++)
                     {
-                        RelationMap *pEntry = reinterpret_cast<RelationMap*>(rLB.get_id(i).toUInt64());
+                        RelationMap *pEntry = weld::fromId<RelationMap*>(rLB.get_id(i));
                         if (pEntry->nLBRelation == LB::RelChar) // Default
                         {
                             rLB.set_active(i);
@@ -1701,14 +1700,14 @@ void SvxSwPosSizeTabPage::FillRelLB(FrmMap const *pMap, sal_uInt16 nMapPos, sal_
             {
                 if (nLBRelations & static_cast<LB>(nBit))
                 {
-                    for (size_t nRelPos = 0; nRelPos < SAL_N_ELEMENTS(aRelationMap); nRelPos++)
+                    for (size_t nRelPos = 0; nRelPos < std::size(aRelationMap); nRelPos++)
                     {
                         if (aRelationMap[nRelPos].nLBRelation == static_cast<LB>(nBit))
                         {
                             SvxSwFramePosString::StringId sStrId1 = m_xHoriMirrorCB->get_active() ? aRelationMap[nRelPos].eMirrorStrId : aRelationMap[nRelPos].eStrId;
                             sStrId1 = lcl_ChangeResIdToVerticalOrRTL(sStrId1, m_bIsVerticalFrame, m_bIsInRightToLeft);
                             OUString sEntry = SvxSwFramePosString::GetString(sStrId1);
-                            rLB.append(OUString::number(reinterpret_cast<sal_uInt64>(&aRelationMap[nRelPos])), sEntry);
+                            rLB.append(weld::toId(&aRelationMap[nRelPos]), sEntry);
                             if (sSelEntry.isEmpty() && aRelationMap[nRelPos].nRelation == nRel)
                                 sSelEntry = sEntry;
                         }
@@ -1734,7 +1733,7 @@ void SvxSwPosSizeTabPage::FillRelLB(FrmMap const *pMap, sal_uInt16 nMapPos, sal_
                     default:
                         if (rLB.get_count())
                         {
-                            RelationMap *pEntry = reinterpret_cast<RelationMap*>(rLB.get_id(rLB.get_count() - 1).toUInt64());
+                            RelationMap *pEntry = weld::fromId<RelationMap*>(rLB.get_id(rLB.get_count() - 1));
                             nRel = pEntry->nRelation;
                         }
                         break;
@@ -1742,7 +1741,7 @@ void SvxSwPosSizeTabPage::FillRelLB(FrmMap const *pMap, sal_uInt16 nMapPos, sal_
 
                 for (int i = 0; i < rLB.get_count(); ++i)
                 {
-                    RelationMap *pEntry = reinterpret_cast<RelationMap*>(rLB.get_id(i).toUInt64());
+                    RelationMap *pEntry = weld::fromId<RelationMap*>(rLB.get_id(i));
                     if (pEntry->nRelation == nRel)
                     {
                         rLB.set_active(i);
@@ -1867,7 +1866,7 @@ void SvxSwPosSizeTabPage::SetView( const SdrView* pSdrView )
         const SdrObject* pObj = rMarkList.GetMark( 0 )->GetMarkedSdrObj();
         SdrObjKind eKind = (SdrObjKind) pObj->GetObjIdentifier();
         if( ( pObj->GetObjInventor() == SdrInventor::Default ) &&
-            ( eKind==OBJ_TEXT || eKind==OBJ_TITLETEXT || eKind==OBJ_OUTLINETEXT) &&
+            ( eKind==SdrObjKind::Text || eKind==SdrObjKind::TitleText || eKind==SdrObjKind::OutlineText) &&
             pObj->HasText() )
         {
             OSL_FAIL("AutoWidth/AutoHeight should be enabled");

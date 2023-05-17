@@ -24,6 +24,12 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
 #include <comphelper/propertyvalue.hxx>
+#include <sal/log.hxx>
+#include <svx/unopage.hxx>
+#include <svx/svdpage.hxx>
+#include <docmodel/theme/ColorSet.hxx>
+#include <docmodel/theme/Theme.hxx>
+#include <svx/unoapi.hxx>
 
 using namespace com::sun::star;
 
@@ -34,7 +40,7 @@ namespace {
 template< typename Type >
 const Type* lclGetStyleElement( const RefVector< Type >& rVector, sal_Int32 nIndex )
 {
-    return (rVector.empty() || (nIndex < 1)) ? 0 :
+    return (rVector.empty() || (nIndex < 1)) ? nullptr :
         rVector.get( ::std::min( static_cast< sal_Int32 >( nIndex - 1 ), static_cast< sal_Int32 >( rVector.size() - 1 ) ) ).get();
 }
 
@@ -62,14 +68,14 @@ const TextCharacterProperties* Theme::getFontStyle( sal_Int32 nSchemeType ) cons
     return maFontScheme.get( nSchemeType ).get();
 }
 
-const TextFont* Theme::resolveFont( const OUString& rName ) const
+const TextFont* Theme::resolveFont( std::u16string_view rName ) const
 {
     const TextCharacterProperties* pCharProps = nullptr;
     /*  Resolves the following names:
         +mj-lt, +mj-ea, +mj-cs  --  major Latin, Asian, Complex font
         +mn-lt, +mn-ea, +mn-cs  --  minor Latin, Asian, Complex font
      */
-    if( (rName.getLength() == 6) && (rName[ 0 ] == '+') && (rName[ 3 ] == '-') )
+    if( (rName.size() == 6) && (rName[ 0 ] == '+') && (rName[ 3 ] == '-') )
     {
         if( (rName[ 1 ] == 'm') && (rName[ 2 ] == 'j') )
             pCharProps = maFontScheme.get( XML_major ).get();
@@ -87,17 +93,17 @@ const TextFont* Theme::resolveFont( const OUString& rName ) const
     }
 
     // See writerfilter::dmapper::ThemeTable::getFontNameForTheme().
-    if (rName == "majorHAnsi" || rName == "majorAscii" || rName == "majorBidi" || rName == "majorEastAsia")
+    if (rName == u"majorHAnsi" || rName == u"majorAscii" || rName == u"majorBidi" || rName == u"majorEastAsia")
         pCharProps = maFontScheme.get(XML_major).get();
-    else if (rName == "minorHAnsi" || rName == "minorAscii" || rName == "minorBidi" || rName == "minorEastAsia")
+    else if (rName == u"minorHAnsi" || rName == u"minorAscii" || rName == u"minorBidi" || rName == u"minorEastAsia")
         pCharProps = maFontScheme.get(XML_minor).get();
     if (pCharProps)
     {
-        if (rName == "majorAscii" || rName == "majorHAnsi" || rName == "minorAscii" || rName == "minorHAnsi")
+        if (rName == u"majorAscii" || rName == u"majorHAnsi" || rName == u"minorAscii" || rName == u"minorHAnsi")
             return &pCharProps->maLatinFont;
-        else if (rName == "minorBidi" || rName == "majorBidi")
+        else if (rName == u"minorBidi" || rName == u"majorBidi")
             return &pCharProps->maComplexFont;
-        else if (rName == "minorEastAsia" || rName == "majorEastAsia")
+        else if (rName == u"minorEastAsia" || rName == u"majorEastAsia")
             return &pCharProps->maAsianFont;
     }
     return nullptr;
@@ -105,16 +111,16 @@ const TextFont* Theme::resolveFont( const OUString& rName ) const
 
 void Theme::addTheme(const css::uno::Reference<css::drawing::XDrawPage>& xDrawPage) const
 {
-    beans::PropertyValue aColorScheme;
-    aColorScheme.Name = "ColorScheme";
-    maClrScheme.ToAny(aColorScheme.Value);
-    beans::PropertyValues aValues = {
-        comphelper::makePropertyValue("Name", maThemeName),
-        comphelper::makePropertyValue("ColorSchemeName", maClrScheme.GetName()),
-        aColorScheme,
-    };
-    uno::Reference<beans::XPropertySet> xPropertySet(xDrawPage, uno::UNO_QUERY);
-    xPropertySet->setPropertyValue("Theme", uno::makeAny(aValues));
+    SAL_WARN_IF(!xDrawPage.is(), "oox", "DrawPage is not set");
+
+    SdrPage* pPage = GetSdrPageFromXDrawPage(xDrawPage);
+
+    SAL_WARN_IF(!pPage, "oox", "Can't get SdrPage from XDrawPage");
+
+    if (!pPage)
+        return;
+
+    pPage->getSdrPageProperties().SetTheme(getTheme());
 }
 
 } // namespace oox::drawingml

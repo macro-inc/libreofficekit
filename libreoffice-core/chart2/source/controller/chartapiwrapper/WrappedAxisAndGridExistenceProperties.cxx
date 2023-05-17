@@ -23,12 +23,12 @@
 
 #include "WrappedAxisAndGridExistenceProperties.hxx"
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/chart2/XAxis.hpp>
-#include <com/sun/star/chart2/XDiagram.hpp>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <WrappedProperty.hxx>
 #include "Chart2ModelContact.hxx"
 #include <TitleHelper.hxx>
+#include <utility>
 #include <osl/diagnose.h>
 
 using namespace ::com::sun::star;
@@ -44,7 +44,7 @@ class WrappedAxisAndGridExistenceProperty : public WrappedProperty
 {
 public:
     WrappedAxisAndGridExistenceProperty( bool bAxis, bool bMain, sal_Int32 nDimensionIndex
-        , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact );
+        , std::shared_ptr<Chart2ModelContact> spChart2ModelContact );
 
     virtual void setPropertyValue( const css::uno::Any& rOuterValue, const css::uno::Reference< css::beans::XPropertySet >& xInnerPropertySet ) const override;
 
@@ -80,9 +80,9 @@ void WrappedAxisAndGridExistenceProperties::addWrappedProperties( std::vector< s
 }
 
 WrappedAxisAndGridExistenceProperty::WrappedAxisAndGridExistenceProperty( bool bAxis, bool bMain, sal_Int32 nDimensionIndex
-                , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact )
+                , std::shared_ptr<Chart2ModelContact> spChart2ModelContact )
             : WrappedProperty(OUString(),OUString())
-            , m_spChart2ModelContact( spChart2ModelContact )
+            , m_spChart2ModelContact(std::move( spChart2ModelContact ))
             , m_bAxis( bAxis )
             , m_bMain( bMain )
             , m_nDimensionIndex( nDimensionIndex )
@@ -157,7 +157,7 @@ void WrappedAxisAndGridExistenceProperty::setPropertyValue( const Any& rOuterVal
     if( bOldValue == bNewValue )
         return;
 
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if( bNewValue )
     {
         if( m_bAxis )
@@ -177,7 +177,7 @@ void WrappedAxisAndGridExistenceProperty::setPropertyValue( const Any& rOuterVal
 Any WrappedAxisAndGridExistenceProperty::getPropertyValue( const Reference< beans::XPropertySet >& /* xInnerPropertySet */ ) const
 {
     Any aRet;
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if(m_bAxis)
     {
         bool bShown = AxisHelper::isAxisShown( m_nDimensionIndex, m_bMain, xDiagram );
@@ -204,7 +204,7 @@ class WrappedAxisTitleExistenceProperty : public WrappedProperty
 {
 public:
     WrappedAxisTitleExistenceProperty( sal_Int32 nTitleIndex
-        , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact );
+        , std::shared_ptr<Chart2ModelContact> spChart2ModelContact );
 
     virtual void setPropertyValue( const css::uno::Any& rOuterValue, const css::uno::Reference< css::beans::XPropertySet >& xInnerPropertySet ) const override;
 
@@ -230,9 +230,9 @@ void WrappedAxisTitleExistenceProperties::addWrappedProperties( std::vector< std
 }
 
 WrappedAxisTitleExistenceProperty::WrappedAxisTitleExistenceProperty(sal_Int32 nTitleIndex
-                , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
+                , std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
             : WrappedProperty(OUString(),OUString())
-            , m_spChart2ModelContact( spChart2ModelContact )
+            , m_spChart2ModelContact(std::move( spChart2ModelContact ))
             , m_eTitleType( TitleHelper::Y_AXIS_TITLE )
 {
     switch( nTitleIndex )
@@ -275,11 +275,11 @@ void WrappedAxisTitleExistenceProperty::setPropertyValue( const Any& rOuterValue
     if( bNewValue )
     {
         TitleHelper::createTitle(  m_eTitleType, OUString()
-            , m_spChart2ModelContact->getChartModel(), m_spChart2ModelContact->m_xContext );
+            , m_spChart2ModelContact->getDocumentModel(), m_spChart2ModelContact->m_xContext );
     }
     else
     {
-        TitleHelper::removeTitle( m_eTitleType, m_spChart2ModelContact->getChartModel() );
+        TitleHelper::removeTitle( m_eTitleType, m_spChart2ModelContact->getDocumentModel() );
     }
 }
 
@@ -287,7 +287,7 @@ Any WrappedAxisTitleExistenceProperty::getPropertyValue( const Reference< beans:
 {
     bool bHasTitle = false;
 
-    Reference< chart2::XTitle > xTitle( TitleHelper::getTitle( m_eTitleType, m_spChart2ModelContact->getChartModel() ) );
+    Reference< chart2::XTitle > xTitle( TitleHelper::getTitle( m_eTitleType, m_spChart2ModelContact->getDocumentModel() ) );
     if( xTitle.is() && !TitleHelper::getCompleteString( xTitle ).isEmpty() )
         bHasTitle = true;
 
@@ -310,7 +310,7 @@ class WrappedAxisLabelExistenceProperty : public WrappedProperty
 {
 public:
     WrappedAxisLabelExistenceProperty( bool bMain, sal_Int32 nDimensionIndex
-        , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact );
+        , std::shared_ptr<Chart2ModelContact> spChart2ModelContact );
 
     virtual void setPropertyValue( const css::uno::Any& rOuterValue, const css::uno::Reference< css::beans::XPropertySet >& xInnerPropertySet ) const override;
 
@@ -337,9 +337,9 @@ void WrappedAxisLabelExistenceProperties::addWrappedProperties( std::vector< std
 }
 
 WrappedAxisLabelExistenceProperty::WrappedAxisLabelExistenceProperty(bool bMain, sal_Int32 nDimensionIndex
-                , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
+                , std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
             : WrappedProperty(OUString(),OUString())
-            , m_spChart2ModelContact( spChart2ModelContact )
+            , m_spChart2ModelContact(std::move( spChart2ModelContact ))
             , m_bMain( bMain )
             , m_nDimensionIndex( nDimensionIndex )
 {
@@ -370,12 +370,12 @@ void WrappedAxisLabelExistenceProperty::setPropertyValue( const Any& rOuterValue
     if( bOldValue == bNewValue )
         return;
 
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
-    Reference< beans::XPropertySet > xProp( AxisHelper::getAxis( m_nDimensionIndex, m_bMain, xDiagram ), uno::UNO_QUERY );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
+    rtl::Reference< Axis > xProp = AxisHelper::getAxis( m_nDimensionIndex, m_bMain, xDiagram );
     if( !xProp.is() && bNewValue )
     {
         //create axis if needed
-        xProp.set( AxisHelper::createAxis( m_nDimensionIndex, m_bMain, xDiagram, m_spChart2ModelContact->m_xContext ), uno::UNO_QUERY );
+        xProp = AxisHelper::createAxis( m_nDimensionIndex, m_bMain, xDiagram, m_spChart2ModelContact->m_xContext );
         if( xProp.is() )
             xProp->setPropertyValue( "Show", uno::Any( false ) );
     }
@@ -386,8 +386,8 @@ void WrappedAxisLabelExistenceProperty::setPropertyValue( const Any& rOuterValue
 Any WrappedAxisLabelExistenceProperty::getPropertyValue( const Reference< beans::XPropertySet >& /*xInnerPropertySet*/ ) const
 {
     Any aRet;
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
-    Reference< beans::XPropertySet > xProp( AxisHelper::getAxis( m_nDimensionIndex, m_bMain, xDiagram ), uno::UNO_QUERY );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
+    rtl::Reference< Axis > xProp = AxisHelper::getAxis( m_nDimensionIndex, m_bMain, xDiagram );
     if( xProp.is() )
         aRet = xProp->getPropertyValue( "DisplayLabels" );
     else

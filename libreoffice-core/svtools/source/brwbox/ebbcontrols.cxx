@@ -30,6 +30,7 @@ namespace svt
         m_xWidget->set_entry_width_chars(1); // so a smaller than default width can be used
         m_xWidget->connect_changed(LINK(this, ComboBoxControl, SelectHdl));
         m_xWidget->connect_key_press(LINK(this, ControlBase, KeyInputHdl));
+        m_xWidget->connect_key_release(LINK(this, ControlBase, KeyReleaseHdl));
         m_xWidget->connect_focus_in(LINK(this, ControlBase, FocusInHdl));
         m_xWidget->connect_focus_out(LINK(this, ControlBase, FocusOutHdl));
         m_xWidget->connect_mouse_press(LINK(this, ControlBase, MousePressHdl));
@@ -125,6 +126,7 @@ namespace svt
         m_xWidget->set_size_request(42, -1); // so a later narrow size request can stick
         m_xWidget->connect_changed(LINK(this, ListBoxControl, SelectHdl));
         m_xWidget->connect_key_press(LINK(this, ControlBase, KeyInputHdl));
+        m_xWidget->connect_key_release(LINK(this, ControlBase, KeyReleaseHdl));
         m_xWidget->connect_focus_in(LINK(this, ControlBase, FocusInHdl));
         m_xWidget->connect_focus_out(LINK(this, ControlBase, FocusOutHdl));
         m_xWidget->connect_mouse_press(LINK(this, ControlBase, MousePressHdl));
@@ -203,6 +205,7 @@ namespace svt
         m_aModeState.bTriStateEnabled = true;
         InitControlBase(m_xBox.get());
         m_xBox->connect_key_press(LINK(this, ControlBase, KeyInputHdl));
+        m_xBox->connect_key_release(LINK(this, ControlBase, KeyReleaseHdl));
         m_xBox->connect_focus_in(LINK(this, ControlBase, FocusInHdl));
         m_xBox->connect_focus_out(LINK(this, ControlBase, FocusOutHdl));
         m_xBox->connect_mouse_press(LINK(this, ControlBase, MousePressHdl));
@@ -362,9 +365,10 @@ namespace svt
         m_pEntry = pEntry;
         m_pEntry->show();
         m_pEntry->set_width_chars(1); // so a smaller than default width can be used
-        m_pEntry->connect_key_press(LINK(this, ControlBase, KeyInputHdl));
-        m_pEntry->connect_focus_in(LINK(this, ControlBase, FocusInHdl));
-        connect_focus_out(LINK(this, ControlBase, FocusOutHdl));
+        connect_focus_in(LINK(this, ControlBase, FocusInHdl));   // need to chain with pattern handler
+        connect_focus_out(LINK(this, ControlBase, FocusOutHdl)); // need to chain with pattern handler
+        connect_key_press(LINK(this, ControlBase, KeyInputHdl)); // need to chain with pattern handler
+        m_pEntry->connect_key_release(LINK(this, ControlBase, KeyReleaseHdl));
         m_pEntry->connect_mouse_press(LINK(this, ControlBase, MousePressHdl));
         m_pEntry->connect_mouse_release(LINK(this, ControlBase, MouseReleaseHdl));
         m_pEntry->connect_mouse_move(LINK(this, ControlBase, MouseMoveHdl));
@@ -377,7 +381,14 @@ namespace svt
 
     IMPL_LINK(ControlBase, KeyInputHdl, const KeyEvent&, rKEvt, bool)
     {
+        m_aKeyInputHdl.Call(rKEvt);
         return ProcessKey(rKEvt);
+    }
+
+    IMPL_LINK(ControlBase, KeyReleaseHdl, const KeyEvent&, rKEvt, bool)
+    {
+        m_aKeyReleaseHdl.Call(rKEvt);
+        return false;
     }
 
     IMPL_LINK_NOARG(ControlBase, FocusInHdl, weld::Widget&, void)
@@ -447,9 +458,19 @@ namespace svt
         get_formatter().connect_changed(rLink);
     }
 
+    void FormattedControlBase::connect_focus_in(const Link<weld::Widget&, void>& rLink)
+    {
+        get_widget().connect_focus_in(rLink);
+    }
+
     void FormattedControlBase::connect_focus_out(const Link<weld::Widget&, void>& rLink)
     {
         get_formatter().connect_focus_out(rLink);
+    }
+
+    void FormattedControlBase::connect_key_press(const Link<const KeyEvent&, bool>& rLink)
+    {
+        get_widget().connect_key_press(rLink);
     }
 
     weld::EntryFormatter& FormattedControlBase::get_formatter()
@@ -578,11 +599,11 @@ namespace svt
     }
 
     PatternControl::PatternControl(BrowserDataWin* pParent)
-        : EditControl(pParent)
+        : EditControlBase(pParent)
+        , m_xWidget(m_xBuilder->weld_entry("entry"))
     {
-        m_xWidget->connect_key_press(Link<const KeyEvent&, bool>()); // 1) acknowledge we first remove the old one
         m_xEntryFormatter.reset(new weld::PatternFormatter(*m_xWidget));
-        m_xEntryFormatter->connect_key_press(LINK(this, ControlBase, KeyInputHdl)); // 2) and here we reattach via the formatter
+        InitEditControlBase(m_xWidget.get());
     }
 
     void PatternControl::connect_changed(const Link<weld::Entry&, void>& rLink)
@@ -590,15 +611,26 @@ namespace svt
         m_xEntryFormatter->connect_changed(rLink);
     }
 
+    void PatternControl::connect_focus_in(const Link<weld::Widget&, void>& rLink)
+    {
+        m_xEntryFormatter->connect_focus_in(rLink);
+    }
+
     void PatternControl::connect_focus_out(const Link<weld::Widget&, void>& rLink)
     {
         m_xEntryFormatter->connect_focus_out(rLink);
     }
 
+    void PatternControl::connect_key_press(const Link<const KeyEvent&, bool>& rLink)
+    {
+        m_xEntryFormatter->connect_key_press(rLink);
+    }
+
     void PatternControl::dispose()
     {
         m_xEntryFormatter.reset();
-        EditControl::dispose();
+        m_xWidget.reset();
+        EditControlBase::dispose();
     }
 
     EditCellController::EditCellController(EditControlBase* pEdit)
@@ -682,6 +714,7 @@ namespace svt
     {
         InitControlBase(m_xWidget.get());
         m_xWidget->connect_key_press(LINK(this, ControlBase, KeyInputHdl));
+        m_xWidget->connect_key_release(LINK(this, ControlBase, KeyReleaseHdl));
         m_xWidget->connect_focus_in(LINK(this, ControlBase, FocusInHdl));
         m_xWidget->connect_focus_out(LINK(this, ControlBase, FocusOutHdl));
         m_xWidget->connect_mouse_press(LINK(this, ControlBase, MousePressHdl));

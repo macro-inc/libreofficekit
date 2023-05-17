@@ -27,6 +27,7 @@
 #include <unotools/fontdefs.hxx>
 #include <unotools/intlwrapper.hxx>
 #include <unotools/syslocale.hxx>
+#include <utility>
 #include <vcl/outdev.hxx>
 #include <vcl/unohelp.hxx>
 #include <svtools/unitconv.hxx>
@@ -76,6 +77,8 @@
 #include <editeng/charreliefitem.hxx>
 #include <editeng/itemtype.hxx>
 #include <editeng/eerdll.hxx>
+#include <docmodel/uno/UnoThemeColor.hxx>
+#include <docmodel/theme/ThemeColorJSON.hxx>
 #include <libxml/xmlwriter.h>
 
 using namespace ::com::sun::star;
@@ -181,14 +184,14 @@ SvxFontItem::SvxFontItem( const sal_uInt16 nId ) :
 }
 
 
-SvxFontItem::SvxFontItem( const FontFamily eFam, const OUString& aName,
-                  const OUString& aStName, const FontPitch eFontPitch,
+SvxFontItem::SvxFontItem( const FontFamily eFam, OUString aName,
+                  OUString aStName, const FontPitch eFontPitch,
                   const rtl_TextEncoding eFontTextEncoding, const sal_uInt16 nId ) :
 
     SfxPoolItem( nId ),
 
-    aFamilyName(aName),
-    aStyleName(aStName)
+    aFamilyName(std::move(aName)),
+    aStyleName(std::move(aStName))
 {
     eFamily = eFam;
     ePitch = eFontPitch;
@@ -1352,46 +1355,23 @@ bool SvxContourItem::GetPresentation
     return true;
 }
 
-SvxThemeColor::SvxThemeColor()
-    : maThemeIndex(-1),
-    mnLumMod(10000),
-    mnLumOff(0)
-{
-}
-
-bool SvxThemeColor::operator==(const SvxThemeColor& rThemeColor) const
-{
-    return maThemeIndex == rThemeColor.maThemeIndex &&
-        mnLumMod == rThemeColor.mnLumMod &&
-        mnLumOff == rThemeColor.mnLumOff;
-}
-
-void SvxThemeColor::dumpAsXml(xmlTextWriterPtr pWriter) const
-{
-    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SvxThemeColor"));
-
-    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("theme-index"),
-                                      BAD_CAST(OString::number(maThemeIndex).getStr()));
-    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("lum-mod"),
-                                      BAD_CAST(OString::number(mnLumMod).getStr()));
-    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("lum-off"),
-                                      BAD_CAST(OString::number(mnLumOff).getStr()));
-
-    (void)xmlTextWriterEndElement(pWriter);
-}
-
 // class SvxColorItem ----------------------------------------------------
 SvxColorItem::SvxColorItem( const sal_uInt16 nId ) :
     SfxPoolItem(nId),
-    mColor( COL_BLACK ),
-    maTintShade(0)
+    mColor( COL_BLACK )
 {
 }
 
 SvxColorItem::SvxColorItem( const Color& rCol, const sal_uInt16 nId ) :
     SfxPoolItem( nId ),
-    mColor( rCol ),
-    maTintShade(0)
+    mColor( rCol )
+{
+}
+
+SvxColorItem::SvxColorItem(Color const& rColor, model::ThemeColor const& rThemeColor, const sal_uInt16 nId)
+    : SfxPoolItem(nId)
+    , mColor(rColor)
+    , maThemeColor(rThemeColor)
 {
 }
 
@@ -1405,8 +1385,7 @@ bool SvxColorItem::operator==( const SfxPoolItem& rAttr ) const
     const SvxColorItem& rColorItem = static_cast<const SvxColorItem&>(rAttr);
 
     return mColor == rColorItem.mColor &&
-           maThemeColor == rColorItem.maThemeColor &&
-           maTintShade == rColorItem.maTintShade;
+           maThemeColor == rColorItem.maThemeColor;
 }
 
 bool SvxColorItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
@@ -1427,24 +1406,56 @@ bool SvxColorItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
         }
         case MID_COLOR_THEME_INDEX:
         {
-            rVal <<= maThemeColor.GetThemeIndex();
+            rVal <<= sal_Int16(maThemeColor.getType());
             break;
         }
         case MID_COLOR_TINT_OR_SHADE:
         {
-            rVal <<= maTintShade;
+            sal_Int16 nValue = 0;
+            for (auto const& rTransform : maThemeColor.getTransformations())
+            {
+                if (rTransform.meType == model::TransformationType::Tint)
+                    nValue = rTransform.mnValue;
+                else if (rTransform.meType == model::TransformationType::Shade)
+                    nValue = -rTransform.mnValue;
+            }
+            rVal <<= nValue;
             break;
         }
         case MID_COLOR_LUM_MOD:
         {
-            rVal <<= maThemeColor.GetLumMod();
+            sal_Int16 nValue = 10000;
+            for (auto const& rTransform : maThemeColor.getTransformations())
+            {
+                if (rTransform.meType == model::TransformationType::LumMod)
+                    nValue = rTransform.mnValue;
+            }
+            rVal <<= nValue;
             break;
         }
         case MID_COLOR_LUM_OFF:
         {
-            rVal <<= maThemeColor.GetLumOff();
+            sal_Int16 nValue = 0;
+            for (auto const& rTransform : maThemeColor.getTransformations())
+            {
+                if (rTransform.meType == model::TransformationType::LumOff)
+                    nValue = rTransform.mnValue;
+            }
+            rVal <<= nValue;
             break;
         }
+        case MID_COLOR_THEME_REFERENCE:
+        {
+            auto xThemeColor = model::theme::createXThemeColor(maThemeColor);
+            rVal <<= xThemeColor;
+            break;
+        }
+        case MID_COLOR_THEME_REFERENCE_JSON:
+        {
+            rVal <<= OStringToOUString(model::theme::convertToJSON(maThemeColor), RTL_TEXTENCODING_UTF8);
+            break;
+        }
+        case MID_COLOR_RGB:
         default:
         {
             rVal <<= mColor;
@@ -1480,33 +1491,74 @@ bool SvxColorItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
             sal_Int16 nIndex = -1;
             if (!(rVal >>= nIndex))
                 return false;
-            maThemeColor.SetThemeIndex(nIndex);
+            maThemeColor.setType(model::convertToThemeColorType(nIndex));
         }
         break;
         case MID_COLOR_TINT_OR_SHADE:
         {
-            sal_Int16 nTintShade = -1;
+            sal_Int16 nTintShade = 0;
             if (!(rVal >>= nTintShade))
                 return false;
-            maTintShade = nTintShade;
+
+            maThemeColor.removeTransformations(model::TransformationType::Tint);
+            maThemeColor.removeTransformations(model::TransformationType::Shade);
+
+            if (nTintShade > 0)
+                maThemeColor.addTransformation({model::TransformationType::Tint, nTintShade});
+            else if (nTintShade < 0)
+            {
+                sal_Int16 nShade = o3tl::narrowing<sal_Int16>(-nTintShade);
+                maThemeColor.addTransformation({model::TransformationType::Shade, nShade});
+            }
         }
         break;
         case MID_COLOR_LUM_MOD:
         {
-            sal_Int16 nLumMod = -1;
+            sal_Int16 nLumMod = 10000;
             if (!(rVal >>= nLumMod))
                 return false;
-            maThemeColor.SetLumMod(nLumMod);
+            maThemeColor.removeTransformations(model::TransformationType::LumMod);
+            maThemeColor.addTransformation({model::TransformationType::LumMod, nLumMod});
         }
         break;
         case MID_COLOR_LUM_OFF:
         {
-            sal_Int16 nLumOff = -1;
+            sal_Int16 nLumOff = 0;
             if (!(rVal >>= nLumOff))
                 return false;
-            maThemeColor.SetLumOff(nLumOff);
+            maThemeColor.removeTransformations(model::TransformationType::LumOff);
+            maThemeColor.addTransformation({model::TransformationType::LumOff, nLumOff});
         }
         break;
+        case MID_COLOR_THEME_REFERENCE:
+        {
+            css::uno::Reference<css::util::XThemeColor> xThemeColor;
+            if (!(rVal >>= xThemeColor))
+                return false;
+
+            if (xThemeColor.is())
+            {
+                model::theme::setFromXThemeColor(maThemeColor, xThemeColor);
+            }
+        }
+        break;
+
+        case MID_COLOR_THEME_REFERENCE_JSON:
+        {
+            OUString sThemeJson;
+            if (!(rVal >>= sThemeJson))
+                return false;
+
+            if (sThemeJson.isEmpty())
+            {
+                return false;
+            }
+            OString aJSON = OUStringToOString(sThemeJson, RTL_TEXTENCODING_ASCII_US);
+            model::theme::convertFromJSON(aJSON, maThemeColor);
+        }
+        break;
+
+        case MID_COLOR_RGB:
         default:
         {
             return rVal >>= mColor;
@@ -1547,12 +1599,25 @@ void SvxColorItem::dumpAsXml(xmlTextWriterPtr pWriter) const
     GetPresentation( SfxItemPresentation::Complete, MapUnit::Map100thMM, MapUnit::Map100thMM, aStr, aIntlWrapper);
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("presentation"), BAD_CAST(OUStringToOString(aStr, RTL_TEXTENCODING_UTF8).getStr()));
 
-    maThemeColor.dumpAsXml(pWriter);
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("theme-color"));
+
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("theme-index"),
+                                      BAD_CAST(OString::number(sal_Int16(maThemeColor.getType())).getStr()));
+
+    for (auto const& rTransform : maThemeColor.getTransformations())
+    {
+        (void)xmlTextWriterStartElement(pWriter, BAD_CAST("transformation"));
+        (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("type"),
+                                      BAD_CAST(OString::number(sal_Int16(rTransform.meType)).getStr()));
+        (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("value"),
+                                      BAD_CAST(OString::number(rTransform.mnValue).getStr()));
+        (void)xmlTextWriterEndElement(pWriter);
+    }
+
+    (void)xmlTextWriterEndElement(pWriter);
 
     (void)xmlTextWriterEndElement(pWriter);
 }
-
-
 
 void SvxColorItem::SetValue( const Color& rNewCol )
 {
@@ -2620,21 +2685,17 @@ void SvxScriptSetItem::PutItemForScriptType( SvtScriptType nScriptType,
     sal_uInt16 nLatin, nAsian, nComplex;
     GetWhichIds( nLatin, nAsian, nComplex );
 
-    std::unique_ptr<SfxPoolItem> pCpy(rItem.Clone());
     if( SvtScriptType::LATIN & nScriptType )
     {
-        pCpy->SetWhich( nLatin );
-        GetItemSet().Put( *pCpy );
+        GetItemSet().Put( rItem.CloneSetWhich(nLatin) );
     }
     if( SvtScriptType::ASIAN & nScriptType )
     {
-        pCpy->SetWhich( nAsian );
-        GetItemSet().Put( *pCpy );
+        GetItemSet().Put( rItem.CloneSetWhich(nAsian) );
     }
     if( SvtScriptType::COMPLEX & nScriptType )
     {
-        pCpy->SetWhich( nComplex );
-        GetItemSet().Put( *pCpy );
+        GetItemSet().Put( rItem.CloneSetWhich(nComplex) );
     }
 }
 

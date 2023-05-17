@@ -16,7 +16,6 @@
 #include <comphelper/documentinfo.hxx>
 #include <config_version.h>
 #include <rtl/string.hxx>
-#include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
 
 #include "Communicator.hxx"
@@ -128,10 +127,12 @@ void Communicator::execute()
 
 void Communicator::informListenerDestroyed()
 {
+    // called only from the Listener::disposing() method
+    // during disposal of this communicator
+
     if ( pTransmitter )
         pTransmitter->addMessage( "slideshow_finished\n\n",
                                   Transmitter::PRIORITY_HIGH );
-    mListener.clear();
 }
 
 void Communicator::presentationStarted( const css::uno::Reference<
@@ -148,7 +149,7 @@ void Communicator::disposeListener()
 {
     if ( mListener.is() )
     {
-        mListener->disposing();
+        mListener->dispose();
         mListener = nullptr;
     }
 }

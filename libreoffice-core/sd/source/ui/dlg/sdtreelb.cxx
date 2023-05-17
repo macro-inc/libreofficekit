@@ -17,8 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/log.hxx>
 #include <sal/types.h>
 #include <sot/formats.hxx>
+#include <utility>
 #include <vcl/weld.hxx>
 #include <svx/svditer.hxx>
 #include <sfx2/docfile.hxx>
@@ -51,6 +53,7 @@
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/processfactory.hxx>
 
+#include <vcl/commandevent.hxx>
 
 using namespace com::sun::star;
 
@@ -64,11 +67,11 @@ bool SdPageObjsTLV::IsInDrag()
 SotClipboardFormatId SdPageObjsTLV::SdPageObjsTransferable::mnListBoxDropFormatId = static_cast<SotClipboardFormatId>(SAL_MAX_UINT32);
 
 SdPageObjsTLV::SdPageObjsTransferable::SdPageObjsTransferable(
-        const INetBookmark& rBookmark,
+        INetBookmark aBookmark,
     ::sd::DrawDocShell& rDocShell,
     NavigatorDragType eDragType)
     : SdTransferable(rDocShell.GetDoc(), nullptr, true),
-      maBookmark( rBookmark ),
+      maBookmark(std::move( aBookmark )),
       mrDocShell( rDocShell ),
       meDragType( eDragType )
 {
@@ -284,16 +287,44 @@ bool SdPageObjsTLV::IsEqualToDoc( const SdDrawDocument* pInDoc )
     return !xEntry;
 }
 
+IMPL_LINK(SdPageObjsTLV, CommandHdl, const CommandEvent&, rCEvt, bool)
+{
+    if (IsEditingActive())
+        return false;
+
+    if (rCEvt.GetCommand() == CommandEventId::ContextMenu)
+    {
+        m_xTreeView->grab_focus();
+
+        // select clicked entry
+        if (std::unique_ptr<weld::TreeIter> xEntry(m_xTreeView->make_iterator());
+                rCEvt.IsMouseEvent() &&  m_xTreeView->get_dest_row_at_pos(
+                    rCEvt.GetMousePosPixel(), xEntry.get(), false))
+        {
+            m_bSelectionHandlerNavigates = true;
+            m_bNavigationGrabsFocus = false;
+            m_xTreeView->set_cursor(*xEntry);
+            Select();
+        }
+
+        return m_aPopupMenuHdl.Call(rCEvt);
+    }
+
+    return false;
+}
+
 IMPL_LINK(SdPageObjsTLV, KeyInputHdl, const KeyEvent&, rKEvt, bool)
 {
     const vcl::KeyCode& rKeyCode = rKEvt.GetKeyCode();
     if (m_xAccel->execute(rKeyCode))
     {
+        m_bEditing = false;
         // the accelerator consumed the event
         return true;
     }
     if (rKeyCode.GetCode() == KEY_RETURN)
     {
+        m_bEditing = false;
         std::unique_ptr<weld::TreeIter> xCursor(m_xTreeView->make_iterator());
         if (m_xTreeView->get_cursor(xCursor.get()) && m_xTreeView->iter_has_child(*xCursor))
         {
@@ -302,14 +333,21 @@ IMPL_LINK(SdPageObjsTLV, KeyInputHdl, const KeyEvent&, rKEvt, bool)
             else
                 m_xTreeView->expand_row(*xCursor);
         }
+        m_bNavigationGrabsFocus = true;
         m_aRowActivatedHdl.Call(*m_xTreeView);
+        m_bNavigationGrabsFocus = false;
         return true;
     }
-    return m_aKeyPressHdl.Call(rKEvt);
+    bool bRet = m_aKeyPressHdl.Call(rKEvt);
+    // m_bEditing needs to be set after key press handler call back or x11 won't end editing on
+    // Esc key press. See SdNavigatorWin::KeyInputHdl.
+    m_bEditing = false;
+    return bRet;
 }
 
 IMPL_LINK(SdPageObjsTLV, MousePressHdl, const MouseEvent&, rMEvt, bool)
 {
+    m_bEditing = false;
     m_bSelectionHandlerNavigates = rMEvt.GetClicks() == 1;
     m_bNavigationGrabsFocus = rMEvt.GetClicks() != 1;
     return false;
@@ -317,6 +355,9 @@ IMPL_LINK(SdPageObjsTLV, MousePressHdl, const MouseEvent&, rMEvt, bool)
 
 IMPL_LINK_NOARG(SdPageObjsTLV, MouseReleaseHdl, const MouseEvent&, bool)
 {
+    if (m_aMouseReleaseHdl.IsSet() && m_aMouseReleaseHdl.Call(MouseEvent()))
+        return false;
+
     m_bSelectionHandlerNavigates = false;
     m_bNavigationGrabsFocus = true;
     return false;
@@ -338,11 +379,11 @@ namespace
 
         std::unique_ptr<weld::TreeIter> xSourceParent(rTreeView.make_iterator(xSource.get()));
         bool bSourceHasParent = rTreeView.iter_parent(*xSourceParent);
-        // level 1 objects only
-        if (!bSourceHasParent || rTreeView.get_iter_depth(*xSourceParent))
+        // disallow root drag
+        if (!bSourceHasParent)
             return false;
 
-        SdrObject* pSourceObject = reinterpret_cast<SdrObject*>(rTreeView.get_id(*xSource).toInt64());
+        SdrObject* pSourceObject = weld::fromId<SdrObject*>(rTreeView.get_id(*xSource));
         if (pSourceObject == reinterpret_cast<SdrObject*>(1))
             pSourceObject = nullptr;
 
@@ -454,20 +495,36 @@ sal_Int8 SdPageObjsTLVDropTarget::AcceptDrop(const AcceptDropEvent& rEvt)
     if (!m_rTreeView.get_dest_row_at_pos(rEvt.maPosPixel, xTarget.get(), true))
         return DND_ACTION_NONE;
 
+    // disallow when root is drop target
+    if (m_rTreeView.get_iter_depth(*xTarget) == 0)
+        return DND_ACTION_NONE;
+
+    // disallow if there is no source entry selected
     std::unique_ptr<weld::TreeIter> xSource(m_rTreeView.make_iterator());
     if (!m_rTreeView.get_selected(xSource.get()))
         return DND_ACTION_NONE;
 
+    // disallow when root is source
+    if (m_rTreeView.get_iter_depth(*xSource) == 0)
+        return DND_ACTION_NONE;
+
+    // disallow when the source is the parent or ancestral parent of the target
     std::unique_ptr<weld::TreeIter> xTargetParent(m_rTreeView.make_iterator(xTarget.get()));
-    while (m_rTreeView.get_iter_depth(*xTargetParent))
-        m_rTreeView.iter_parent(*xTargetParent);
+    while (m_rTreeView.get_iter_depth(*xTargetParent) > 1)
+    {
+        if (!m_rTreeView.iter_parent(*xTargetParent) ||
+                m_rTreeView.iter_compare(*xSource, *xTargetParent) == 0)
+            return DND_ACTION_NONE;
+    }
 
-    std::unique_ptr<weld::TreeIter> xSourceParent(m_rTreeView.make_iterator(xSource.get()));
-    while (m_rTreeView.get_iter_depth(*xSourceParent))
-        m_rTreeView.iter_parent(*xSourceParent);
-
-    // can only drop within the same page
-    if (m_rTreeView.iter_compare(*xTargetParent, *xSourceParent) != 0)
+    // disallow drop when source and target are not within the same page
+    std::unique_ptr<weld::TreeIter> xSourcePage(m_rTreeView.make_iterator(xSource.get()));
+    std::unique_ptr<weld::TreeIter> xTargetPage(m_rTreeView.make_iterator(xTarget.get()));
+    while (m_rTreeView.get_iter_depth(*xTargetPage))
+        m_rTreeView.iter_parent(*xTargetPage);
+    while (m_rTreeView.get_iter_depth(*xSourcePage))
+        m_rTreeView.iter_parent(*xSourcePage);
+    if (m_rTreeView.iter_compare(*xTargetPage, *xSourcePage) != 0)
         return DND_ACTION_NONE;
 
     return DND_ACTION_MOVE;
@@ -488,35 +545,73 @@ sal_Int8 SdPageObjsTLVDropTarget::ExecuteDrop( const ExecuteDropEvent& rEvt )
         return DND_ACTION_NONE;
 
     std::unique_ptr<weld::TreeIter> xTarget(m_rTreeView.make_iterator());
-    if (!m_rTreeView.get_dest_row_at_pos(rEvt.maPosPixel, xTarget.get(), true))
+    if (!m_rTreeView.get_dest_row_at_pos(rEvt.maPosPixel, xTarget.get(), false))
         return DND_ACTION_NONE;
-    int nTargetPos = m_rTreeView.get_iter_index_in_parent(*xTarget) + 1;
 
-    SdrObject* pTargetObject = reinterpret_cast<SdrObject*>(m_rTreeView.get_id(*xTarget).toInt64());
-    SdrObject* pSourceObject = reinterpret_cast<SdrObject*>(m_rTreeView.get_id(*xSource).toInt64());
+    auto nIterCompare = m_rTreeView.iter_compare(*xSource, *xTarget);
+    if (nIterCompare == 0)
+    {
+        // drop position is the same as source position
+        return DND_ACTION_NONE;
+    }
+
+    SdrObject* pTargetObject = weld::fromId<SdrObject*>(m_rTreeView.get_id(*xTarget));
+    SdrObject* pSourceObject = weld::fromId<SdrObject*>(m_rTreeView.get_id(*xSource));
     if (pSourceObject == reinterpret_cast<SdrObject*>(1))
         pSourceObject = nullptr;
+    if (pTargetObject == reinterpret_cast<SdrObject*>(1))
+        pTargetObject = nullptr;
 
     if (pTargetObject != nullptr && pSourceObject != nullptr)
     {
         SdrPage* pObjectList = pSourceObject->getSdrPageFromSdrObject();
-        if (pObjectList != nullptr)
-        {
-            sal_uInt32 nNewPosition;
-            if (pTargetObject == reinterpret_cast<SdrObject*>(1))
-            {
-                nNewPosition = 0;
-                nTargetPos = 0;
-            }
-            else
-                nNewPosition = pTargetObject->GetNavigationPosition() + 1;
-            pObjectList->SetObjectNavigationPosition(*pSourceObject, nNewPosition);
-        }
 
         std::unique_ptr<weld::TreeIter> xSourceParent(m_rTreeView.make_iterator(xSource.get()));
         m_rTreeView.iter_parent(*xSourceParent);
+        std::unique_ptr<weld::TreeIter> xTargetParent(m_rTreeView.make_iterator(xTarget.get()));
+        m_rTreeView.iter_parent(*xTargetParent);
 
-        m_rTreeView.move_subtree(*xSource, xSourceParent.get(), nTargetPos);
+        int nTargetPos = m_rTreeView.get_iter_index_in_parent(*xTarget);
+
+        // Make the tree view what the model will be when it is changed below.
+        m_rTreeView.move_subtree(*xSource, xTargetParent.get(), nTargetPos);
+        m_rTreeView.iter_previous_sibling(*xTarget);
+        m_rTreeView.set_cursor(*xTarget);
+
+        if (m_rTreeView.iter_compare(*xSourceParent, *xTargetParent) == 0 && nIterCompare < 0)
+            nTargetPos = m_rTreeView.get_iter_index_in_parent(*xTarget);
+
+        // Remove the source object from source parent list and insert it in the target parent list.
+        SdrObject* pSourceParentObject = weld::fromId<SdrObject*>(m_rTreeView.get_id(*xSourceParent));
+        SdrObject* pTargetParentObject = weld::fromId<SdrObject*>(m_rTreeView.get_id(*xTargetParent));
+
+        // Presumably there is need for a hard reference to hold on to the removed object so it is
+        // guaranteed to be valid for insert back into an object list.
+        rtl::Reference<SdrObject> rSourceObject;
+
+        // remove object
+        if (pSourceParentObject == reinterpret_cast<SdrObject*>(1))
+        {
+            rSourceObject = pObjectList->NbcRemoveObject(pSourceObject->GetOrdNum());
+        }
+        else
+        {
+            SdrObjList* pList = pSourceParentObject->GetSubList();
+            rSourceObject = pList->NbcRemoveObject(pSourceObject->GetOrdNum());
+        }
+
+        // insert object
+        if (pTargetParentObject == reinterpret_cast<SdrObject*>(1))
+        {
+            pObjectList->NbcInsertObject(rSourceObject.get());
+            pObjectList->SetObjectNavigationPosition(*rSourceObject, nTargetPos);
+        }
+        else
+        {
+            SdrObjList* pList = pTargetParentObject->GetSubList();
+            pList->NbcInsertObject(rSourceObject.get(), nTargetPos);
+            pList->SetObjectNavigationPosition(*rSourceObject, nTargetPos);
+        }
     }
 
     return DND_ACTION_NONE;
@@ -645,9 +740,83 @@ SdPageObjsTLV::SdPageObjsTLV(std::unique_ptr<weld::TreeView> xTreeView)
     m_xTreeView->connect_key_press(LINK(this, SdPageObjsTLV, KeyInputHdl));
     m_xTreeView->connect_mouse_press(LINK(this, SdPageObjsTLV, MousePressHdl));
     m_xTreeView->connect_mouse_release(LINK(this, SdPageObjsTLV, MouseReleaseHdl));
+    m_xTreeView->connect_editing(LINK(this, SdPageObjsTLV, EditingEntryHdl),
+                                 LINK(this, SdPageObjsTLV, EditedEntryHdl));
+    m_xTreeView->connect_popup_menu(LINK(this, SdPageObjsTLV, CommandHdl));
 
     m_xTreeView->set_size_request(m_xTreeView->get_approximate_digit_width() * 28,
                                   m_xTreeView->get_text_height() * 8);
+}
+
+IMPL_LINK(SdPageObjsTLV, EditEntryAgain, void*, p, void)
+{
+    m_xTreeView->grab_focus();
+    std::unique_ptr<weld::TreeIter> xEntry(static_cast<weld::TreeIter*>(p));
+    m_xTreeView->start_editing(*xEntry);
+    m_bEditing = true;
+}
+
+IMPL_LINK_NOARG(SdPageObjsTLV, EditingEntryHdl, const weld::TreeIter&, bool)
+{
+    m_bEditing = true;
+    return true;
+}
+
+IMPL_LINK(SdPageObjsTLV, EditedEntryHdl, const IterString&, rIterString, bool)
+{
+    m_bEditing = false;
+
+    // Did the name change?
+    if (m_xTreeView->get_text(rIterString.first) == rIterString.second)
+        return true;
+
+    // If the new name is empty or not unique, start editing again.
+    bool bUniqueName = true;
+    std::unique_ptr<weld::TreeIter> xEntry(m_xTreeView->make_iterator());
+    if (!rIterString.second.isEmpty())
+    {
+        if (m_xTreeView->get_iter_first(*xEntry))
+        {
+            do
+            {
+                // skip self!
+                if (m_xTreeView->iter_compare(*xEntry, rIterString.first) != 0 &&
+                        m_xTreeView->get_text(*xEntry) == rIterString.second)
+                {
+                    bUniqueName = false;
+                    break;
+                }
+            } while(m_xTreeView->iter_next(*xEntry));
+        }
+    }
+    if (rIterString.second.isEmpty() || !bUniqueName)
+    {
+        m_xTreeView->copy_iterator(rIterString.first, *xEntry);
+        Application::PostUserEvent(LINK(this, SdPageObjsTLV, EditEntryAgain), xEntry.release());
+        return false;
+    }
+
+    // set the new name
+    const auto& rEntryId = m_xTreeView->get_id(rIterString.first);
+    if (rEntryId.toInt64() == 1)
+    {
+        // page name
+        if (::sd::DrawDocShell* pDocShell = m_pDoc->GetDocSh())
+        {
+            if (::sd::ViewShell* pViewShell = GetViewShellForDocShell(*pDocShell))
+            {
+                SdPage* pPage = pViewShell->GetActualPage();
+                pPage->SetName(rIterString.second);
+            }
+        }
+    }
+    else if (SdrObject* pCursorEntryObject = weld::fromId<SdrObject*>(rEntryId))
+    {
+        // object name
+        pCursorEntryObject->SetName(rIterString.second);
+    }
+
+    return true;
 }
 
 IMPL_LINK_NOARG(SdPageObjsTLV, SelectHdl, weld::TreeView&, void)
@@ -664,7 +833,7 @@ IMPL_LINK_NOARG(SdPageObjsTLV, RowActivatedHdl, weld::TreeView&, bool)
         Application::RemoveUserEvent(m_nRowActivateEventId);
     // post the event to process row activate after mouse press event
     m_nRowActivateEventId = Application::PostUserEvent(LINK(this, SdPageObjsTLV, AsyncRowActivatedHdl));
-    return true;
+    return false;
 }
 
 IMPL_LINK_NOARG(SdPageObjsTLV, AsyncSelectHdl, void*, void)
@@ -675,6 +844,9 @@ IMPL_LINK_NOARG(SdPageObjsTLV, AsyncSelectHdl, void*, void)
 void SdPageObjsTLV::Select()
 {
     m_nSelectEventId = nullptr;
+
+    if (IsEditingActive())
+        return;
 
     m_bLinkableSelected = true;
 
@@ -687,30 +859,7 @@ void SdPageObjsTLV::Select()
     m_aChangeHdl.Call(*m_xTreeView);
 
     if (m_bSelectionHandlerNavigates)
-    {
-        // Page items in the tree are given user data value 1.
-        // Drawing object items are given user data value of the object pointer they represent.
-        sal_Int64 nUserData = m_xTreeView->get_selected_id().toInt64();
-        if (nUserData != 1)
-        {
-            SdrObject* pObject = reinterpret_cast<SdrObject*>(nUserData);
-            if (pObject && pObject->GetName().isEmpty())
-            {
-                const bool bUndo = pObject->getSdrModelFromSdrObject().IsUndoEnabled();
-                pObject->getSdrModelFromSdrObject().EnableUndo(false);
-                pObject->SetName(m_xTreeView->get_selected_text(), false);
-                pObject->getSdrModelFromSdrObject().EnableUndo(bUndo);
-                m_aRowActivatedHdl.Call(*m_xTreeView);
-                pObject->getSdrModelFromSdrObject().EnableUndo(false);
-                pObject->SetName(OUString(), false);
-                pObject->getSdrModelFromSdrObject().EnableUndo(bUndo);
-            }
-            else
-                m_aRowActivatedHdl.Call(*m_xTreeView);
-        }
-        else
-            m_aRowActivatedHdl.Call(*m_xTreeView);
-    }
+        m_aRowActivatedHdl.Call(*m_xTreeView);
 
     if (!m_pNavigator)
     {
@@ -722,7 +871,7 @@ void SdPageObjsTLV::Select()
     OUString aURL = INetURLObject(pDocShell->GetMedium()->GetPhysicalName(), INetProtocol::File).GetMainURL(INetURLObject::DecodeMechanism::NONE);
     NavigatorDragType eDragType = m_pNavigator->GetNavigatorDragType();
 
-    OUString sSelectedEntry = m_xTreeView->get_selected_text();
+    OUString sSelectedEntry = get_cursor_text(); // what about multiple selections?
     aURL += "#" + sSelectedEntry;
 
     INetBookmark aBookmark(aURL, sSelectedEntry);
@@ -737,7 +886,7 @@ void SdPageObjsTLV::Select()
     }
 
     // object is destroyed by internal reference mechanism
-    m_xHelper.set(new SdPageObjsTLV::SdPageObjsTransferable(aBookmark, *pDocShell, eDragType));
+    m_xHelper.set(new SdPageObjsTLV::SdPageObjsTransferable(std::move(aBookmark), *pDocShell, eDragType));
     rtl::Reference<TransferDataContainer> xHelper(m_xHelper);
     m_xTreeView->enable_drag_source(xHelper, nDNDActions);
 }
@@ -787,6 +936,18 @@ std::vector<OUString> SdPageObjsTLV::GetSelectEntryList(const int nDepth) const
     });
 
     return aEntries;
+}
+
+std::vector<OUString> SdPageObjsTLV::GetSelectedEntryIds() const
+{
+    std::vector<OUString> vEntryIds;
+
+    m_xTreeView->selected_foreach([this, &vEntryIds](weld::TreeIter& rEntry){
+        vEntryIds.push_back(m_xTreeView->get_id(rEntry));
+        return false;
+    });
+
+    return vEntryIds;
 }
 
 /**
@@ -896,13 +1057,13 @@ IMPL_LINK(SdPageObjsTLV, RequestingChildrenHdl, const weld::TreeIter&, rFileEntr
                         OUString aStr( GetObjectName( pObj ) );
                         if( !aStr.isEmpty() )
                         {
-                            if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == OBJ_OLE2 )
+                            if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == SdrObjKind::OLE2 )
                             {
                                 m_xTreeView->insert(xPageEntry.get(), -1, &aStr, nullptr,
                                                     nullptr, nullptr, false, m_xScratchIter.get());
                                 m_xTreeView->set_image(*m_xScratchIter, sImgOle);
                             }
-                            else if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == OBJ_GRAF )
+                            else if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == SdrObjKind::Graphic )
                             {
                                 m_xTreeView->insert(xPageEntry.get(), -1, &aStr, nullptr,
                                                     nullptr, nullptr, false, m_xScratchIter.get());
@@ -1008,7 +1169,7 @@ bool SdPageObjsTLV::PageBelongsToCurrentShow(const SdPage* pPage) const
 
 void SdPageObjsTLV::AddShapeList (
     const SdrObjList& rList,
-    SdrObject* pShape,
+    const SdrObject* pShape,
     const OUString& rsName,
     const bool bIsExcluded,
     const weld::TreeIter* pParentEntry)
@@ -1021,7 +1182,7 @@ void SdPageObjsTLV::AddShapeList (
 
     OUString aUserData("1");
     if (pShape != nullptr)
-        aUserData = OUString::number(reinterpret_cast<sal_Int64>(pShape));
+        aUserData = weld::toId(pShape);
 
     std::unique_ptr<weld::TreeIter> xEntry = m_xTreeView->make_iterator();
     InsertEntry(pParentEntry, aUserData, rsName, aIcon, xEntry.get());
@@ -1038,15 +1199,15 @@ void SdPageObjsTLV::AddShapeList (
 
         // Get the shape name.
         OUString aStr (GetObjectName( pObj ) );
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pObj)));
+        OUString sId(weld::toId(pObj));
 
         if( !aStr.isEmpty() )
         {
-            if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == OBJ_OLE2 )
+            if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == SdrObjKind::OLE2 )
             {
                 InsertEntry(xEntry.get(), sId, aStr, BMP_OLE);
             }
-            else if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == OBJ_GRAF )
+            else if( pObj->GetObjInventor() == SdrInventor::Default && pObj->GetObjIdentifier() == SdrObjKind::Graphic )
             {
                 InsertEntry(xEntry.get(), sId, aStr, BMP_GRAPHIC);
             }
@@ -1183,6 +1344,25 @@ bool SdPageObjsTLV::SelectEntry( std::u16string_view rName )
     }
 
     return bFound;
+}
+
+void SdPageObjsTLV::SelectEntry(const SdrObject *pObj)
+{
+    if (pObj)
+    {
+        m_xTreeView->all_foreach([this, &pObj](weld::TreeIter& rEntry){
+            if (weld::fromId<SdrObject*>(m_xTreeView->get_id(rEntry)) == pObj)
+            {
+                // Only scroll to the row of the first selected. And only when the treeview
+                // doesn't have the focus.
+                if (!m_xTreeView->has_focus() && m_xTreeView->get_selected_rows().empty())
+                    m_xTreeView->set_cursor(rEntry);
+                m_xTreeView->select(rEntry);
+                return true;
+            }
+            return false;
+        });
+    }
 }
 
 SdPageObjsTLV::~SdPageObjsTLV()

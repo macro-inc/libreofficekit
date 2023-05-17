@@ -22,7 +22,7 @@
 
 #include <com/sun/star/uno/Reference.h>
 #include <i18nlangtag/languagetag.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <rtl/ustring.hxx>
 #include <tools/long.hxx>
 #include <vcl/dllapi.h>
@@ -41,7 +41,7 @@ namespace vcl
 
 class VCL_DLLPUBLIC I18nHelper
 {
-    ::osl::Mutex                    maMutex;
+    mutable std::mutex              maMutex;
     LanguageTag                     maLanguageTag;
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
 
@@ -57,13 +57,13 @@ class VCL_DLLPUBLIC I18nHelper
 
 public:
 
-                I18nHelper( const css::uno::Reference< css::uno::XComponentContext >& rxContext, const LanguageTag& rLanguageTag );
+                I18nHelper( const css::uno::Reference< css::uno::XComponentContext >& rxContext, LanguageTag aLanguageTag );
                 ~I18nHelper();
 
     sal_Int32   CompareString( const OUString& rStr1, const OUString& rStr2 ) const;
 
     bool    MatchString( const OUString& rStr1, const OUString& rStr2 ) const;
-    bool    MatchMnemonic( const OUString& rString, sal_Unicode cMnemonicChar ) const;
+    bool    MatchMnemonic( std::u16string_view rString, sal_Unicode cMnemonicChar ) const;
 
     OUString    GetNum( tools::Long nNumber, sal_uInt16 nDecimals, bool bUseThousandSep = true, bool bTrailingZeros = true ) const;
 

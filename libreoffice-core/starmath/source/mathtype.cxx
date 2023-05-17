@@ -24,24 +24,28 @@
 #include <osl/diagnose.h>
 #include <sfx2/docfile.hxx>
 #include <sot/storage.hxx>
+#include <array>
+
+//These are the default MathType sizes
+constexpr std::array<sal_Int16, 7> aSizeTable {
+    12,
+    8,
+    6,
+    24,
+    10,
+    12,
+    12,
+};
 
 void MathType::Init()
 {
-    //These are the default MathType sizes
-    aSizeTable.push_back(12);
-    aSizeTable.push_back(8);
-    aSizeTable.push_back(6);
-    aSizeTable.push_back(24);
-    aSizeTable.push_back(10);
-    aSizeTable.push_back(12);
-    aSizeTable.push_back(12);
-
     /*
     These are the default MathType italic/bold settings If mathtype is changed
     from its defaults, there is nothing we can do, as this information is not
     stored in the document
     */
     MathTypeFont aFont;
+    aUserStyles.reserve(11);
     for(sal_uInt8 i=1;i<=11;i++)
     {
         aFont.nTface = i+128;
@@ -537,7 +541,7 @@ void MathTypeFont::AppendStyleToText(OUString &rRet)
 void MathType::TypeFaceToString(OUString &rTxt,sal_uInt8 nFace)
 {
     MathTypeFont aFont(nFace);
-    MathTypeFontSet::iterator aItr = aUserStyles.find(aFont);
+    auto aItr = aUserStyles.find(aFont);
     if (aItr != aUserStyles.end())
         aFont.nStyle = aItr->nStyle;
     aFont.AppendStyleToText(rTxt);
@@ -3187,8 +3191,9 @@ void MathType::HandleAttributes(SmNode *pNode,int nLevel)
             break;
         case TOVERLINE: //If the next node is not text
                         //or text with more than one char
-            if ((pIsText->GetToken().eType != TTEXT) ||
-                (pIsText->GetText().getLength() > 1))
+            if (!pIsText ||
+                pIsText->GetToken().eType != TTEXT ||
+                pIsText->GetText().getLength() > 1)
                 nOldPending = StartTemplate(0x11);
             break;
         default:
@@ -3200,19 +3205,23 @@ void MathType::HandleAttributes(SmNode *pNode,int nLevel)
     if (pIsText)
         HandleNodes(pIsText,nLevel+1);
 
-    switch (pTemp->GetToken().eType)
+    if (pTemp)
     {
-        case TWIDEVEC:
-        case TUNDERLINE:
-            EndTemplate(nOldPending);
-            break;
-        case TOVERLINE:
-            if ((pIsText->GetToken().eType != TTEXT) ||
-                (pIsText->GetText().getLength() > 1))
+        switch (pTemp->GetToken().eType)
+        {
+            case TWIDEVEC:
+            case TUNDERLINE:
                 EndTemplate(nOldPending);
-            break;
-        default:
-            break;
+                break;
+            case TOVERLINE:
+                if (!pIsText ||
+                    pIsText->GetToken().eType != TTEXT ||
+                    pIsText->GetText().getLength() > 1)
+                    EndTemplate(nOldPending);
+                break;
+            default:
+                break;
+        }
     }
 
     //if there was no suitable place to put the attribute,
@@ -3254,8 +3263,9 @@ void MathType::HandleAttributes(SmNode *pNode,int nLevel)
                 pS->WriteUChar( 16 );
                 break;
             case TOVERLINE:
-                if ((pIsText->GetToken().eType == TTEXT) &&
-                    (pIsText->GetText().getLength() == 1))
+                if (pIsText &&
+                    (pIsText->GetToken().eType == TTEXT &&
+                     pIsText->GetText().getLength() == 1))
                     pS->WriteUChar( 17 );
                 break;
             case TBREVE:

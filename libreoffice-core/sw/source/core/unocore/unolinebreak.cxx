@@ -20,7 +20,7 @@
 #include <unolinebreak.hxx>
 
 #include <cppuhelper/supportsservice.hxx>
-#include <cppuhelper/weakref.hxx>
+#include <comphelper/servicehelper.hxx>
 #include <sal/log.hxx>
 #include <svl/listener.hxx>
 #include <svl/itemprop.hxx>
@@ -40,15 +40,12 @@ using namespace com::sun::star;
 class SwXLineBreak::Impl : public SvtListener
 {
 public:
-    SwXLineBreak& m_rThis;
-    uno::WeakReference<uno::XInterface> m_wThis;
     bool m_bIsDescriptor;
     SwFormatLineBreak* m_pFormatLineBreak;
     SwLineBreakClear m_eClear;
 
-    Impl(SwXLineBreak& rThis, SwFormatLineBreak* const pLineBreak)
-        : m_rThis(rThis)
-        , m_bIsDescriptor(pLineBreak == nullptr)
+    Impl(SwFormatLineBreak* const pLineBreak)
+        : m_bIsDescriptor(pLineBreak == nullptr)
         , m_pFormatLineBreak(pLineBreak)
         , m_eClear(SwLineBreakClear::NONE)
     {
@@ -99,35 +96,31 @@ void SwXLineBreak::Impl::Notify(const SfxHint& rHint)
 }
 
 SwXLineBreak::SwXLineBreak(SwFormatLineBreak& rFormat)
-    : m_pImpl(new SwXLineBreak::Impl(*this, &rFormat))
+    : m_pImpl(new SwXLineBreak::Impl(&rFormat))
 {
 }
 
 SwXLineBreak::SwXLineBreak()
-    : m_pImpl(new SwXLineBreak::Impl(*this, nullptr))
+    : m_pImpl(new SwXLineBreak::Impl(nullptr))
 {
 }
 
 SwXLineBreak::~SwXLineBreak() {}
 
-uno::Reference<text::XTextContent>
-SwXLineBreak::CreateXLineBreak(SwFormatLineBreak* pLineBreakFormat)
+rtl::Reference<SwXLineBreak> SwXLineBreak::CreateXLineBreak(SwFormatLineBreak* pLineBreakFormat)
 {
-    uno::Reference<text::XTextContent> xLineBreak;
+    rtl::Reference<SwXLineBreak> xLineBreak;
     if (pLineBreakFormat)
     {
         xLineBreak = pLineBreakFormat->GetXTextContent();
     }
     if (!xLineBreak.is())
     {
-        SwXLineBreak* const pLineBreak(pLineBreakFormat ? new SwXLineBreak(*pLineBreakFormat)
-                                                        : new SwXLineBreak);
-        xLineBreak.set(pLineBreak);
+        xLineBreak = pLineBreakFormat ? new SwXLineBreak(*pLineBreakFormat) : new SwXLineBreak;
         if (pLineBreakFormat)
         {
             pLineBreakFormat->SetXLineBreak(xLineBreak);
         }
-        pLineBreak->m_pImpl->m_wThis = xLineBreak;
     }
     return xLineBreak;
 }
@@ -166,8 +159,8 @@ void SAL_CALL SwXLineBreak::attach(const uno::Reference<text::XTextRange>& xText
     SetAttrMode nInsertFlags = SetAttrMode::DEFAULT;
     rNewDoc.getIDocumentContentOperations().InsertPoolItem(aPam, aLineBreak, nInsertFlags);
     auto pTextAttr
-        = static_cast<SwTextLineBreak*>(aPam.GetNode().GetTextNode()->GetTextAttrForCharAt(
-            aPam.GetPoint()->nContent.GetIndex() - 1, RES_TXTATR_LINEBREAK));
+        = static_cast<SwTextLineBreak*>(aPam.GetPointNode().GetTextNode()->GetTextAttrForCharAt(
+            aPam.GetPoint()->GetContentIndex() - 1, RES_TXTATR_LINEBREAK));
     if (pTextAttr)
     {
         m_pImpl->EndListeningAll();
@@ -187,8 +180,6 @@ uno::Reference<text::XTextRange> SAL_CALL SwXLineBreak::getAnchor()
 
 void SAL_CALL SwXLineBreak::dispose()
 {
-    SolarMutexGuard aGuard;
-
     SAL_WARN("sw.uno", "SwXLineBreak::dispose: not implemented");
 }
 

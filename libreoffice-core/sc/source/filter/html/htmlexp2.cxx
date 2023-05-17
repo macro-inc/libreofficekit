@@ -89,7 +89,7 @@ void ScHTMLExport::FillGraphList( const SdrPage* pPage, SCTAB nTab,
             SCCOL nCol2 = aR.aEnd.Col();
             SCROW nRow2 = aR.aEnd.Row();
             // All cells empty under object?
-            bool bInCell = pDoc->IsEmptyBlock( nCol1, nRow1, nCol2, nRow2, nTab );
+            bool bInCell = pDoc->IsEmptyData( nCol1, nRow1, nCol2, nRow2, nTab );
             if ( bInCell )
             {   // Spacing in spanning cell
                 tools::Rectangle aCellRect = pDoc->GetMMRect(
@@ -127,7 +127,7 @@ void ScHTMLExport::WriteGraphEntry( ScHTMLGraphEntry* pE )
     OString aOpt = aBuf.makeStringAndClear();
     switch ( pObject->GetObjIdentifier() )
     {
-        case OBJ_GRAF:
+        case SdrObjKind::Graphic:
         {
             const SdrGrafObj* pSGO = static_cast<SdrGrafObj*>(pObject);
             std::unique_ptr<SdrGrafObjGeoData> pGeo(static_cast<SdrGrafObjGeoData*>(pSGO->GetGeoData().release()));
@@ -147,7 +147,7 @@ void ScHTMLExport::WriteGraphEntry( ScHTMLGraphEntry* pE )
             pE->bWritten = true;
         }
         break;
-        case OBJ_OLE2:
+        case SdrObjKind::OLE2:
         {
             const Graphic* pGraphic = static_cast<SdrOle2Obj*>(pObject)->GetGraphic();
             if ( pGraphic )
@@ -213,7 +213,7 @@ void ScHTMLExport::WriteImage( OUString& rLinkName, const Graphic& rGrf,
         rStrm.WriteChar( '<' ).WriteCharPtr( OOO_STRING_SVTOOLS_HTML_image ).WriteChar( ' ' ).WriteCharPtr( OOO_STRING_SVTOOLS_HTML_O_src ).WriteCharPtr( "=\"" );
         HTMLOutFuncs::Out_String( rStrm, URIHelper::simpleNormalizedMakeRelative(
                     aBaseURL,
-                    rLinkName ), eDestEnc ).WriteChar( '\"' );
+                    rLinkName ) ).WriteChar( '\"' );
         if ( !rImgOptions.empty() )
             rStrm.WriteOString( rImgOptions );
         rStrm.WriteChar( '>' ).WriteCharPtr( SAL_NEWLINE_STRING ).WriteCharPtr( GetIndentStr() );

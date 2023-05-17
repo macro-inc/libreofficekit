@@ -23,7 +23,6 @@
 #include <sfx2/objsh.hxx>
 #include <svx/svxids.hrc>
 #include <svtools/unitconv.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <chardlg.hxx>
@@ -63,6 +62,7 @@
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
 #include <o3tl/unit_conversion.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::com::sun::star;
 
@@ -190,84 +190,73 @@ struct SvxCharNamePage_Impl
 SvxCharNamePage::SvxCharNamePage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInSet)
     : SvxCharBasePage(pPage, pController, "cui/ui/charnamepage.ui", "CharNamePage", rInSet)
     , m_pImpl(new SvxCharNamePage_Impl)
-    , m_xEastFrame(m_xBuilder->weld_widget("asian"))
-    , m_xEastFontNameFT(m_xBuilder->weld_label("eastfontnameft"))
-    , m_xEastFontNameLB(m_xBuilder->weld_combo_box("eastfontnamelb"))
-    , m_xEastFontStyleFT(m_xBuilder->weld_label("eaststyleft"))
-    , m_xEastFontStyleLB(new FontStyleBox(m_xBuilder->weld_combo_box("eaststylelb")))
-    , m_xEastFontSizeFT(m_xBuilder->weld_label("eastsizeft"))
-    , m_xEastFontSizeLB(new FontSizeBox(m_xBuilder->weld_combo_box("eastsizelb")))
-    , m_xEastFontLanguageFT(m_xBuilder->weld_label("eastlangft"))
-    , m_xEastFontLanguageLB(new SvxLanguageBox(m_xBuilder->weld_combo_box("eastlanglb")))
-    , m_xEastFontTypeFT(m_xBuilder->weld_label("eastfontinfo"))
-    , m_xEastFontFeaturesButton(m_xBuilder->weld_button("east_features_button"))
-    , m_xCTLFrame(m_xBuilder->weld_widget("ctl"))
-    , m_xCTLFontNameFT(m_xBuilder->weld_label("ctlfontnameft"))
-    , m_xCTLFontNameLB(m_xBuilder->weld_combo_box("ctlfontnamelb"))
-    , m_xCTLFontStyleFT(m_xBuilder->weld_label("ctlstyleft"))
-    , m_xCTLFontStyleLB(new FontStyleBox(m_xBuilder->weld_combo_box("ctlstylelb")))
-    , m_xCTLFontSizeFT(m_xBuilder->weld_label("ctlsizeft"))
-    , m_xCTLFontSizeLB(new FontSizeBox(m_xBuilder->weld_combo_box("ctlsizelb")))
-    , m_xCTLFontLanguageFT(m_xBuilder->weld_label("ctllangft"))
-    , m_xCTLFontLanguageLB(new SvxLanguageBox(m_xBuilder->weld_combo_box("ctllanglb")))
-    , m_xCTLFontTypeFT(m_xBuilder->weld_label("ctlfontinfo"))
-    , m_xCTLFontFeaturesButton(m_xBuilder->weld_button("ctl_features_button"))
+    // Western
+    , m_xWestern(m_xBuilder->weld_notebook("nbWestern"))
+    , m_xWestFontNameFT(m_xBuilder->weld_label("lbWestFontname"))
+    , m_xWestFontStyleFT(m_xBuilder->weld_label("lbWestStyle"))
+    , m_xWestFontStyleLB(new FontStyleBox(m_xBuilder->weld_combo_box("cbWestStyle")))
+    , m_xWestFontSizeFT(m_xBuilder->weld_label("lbWestSize"))
+    , m_xWestFontSizeLB(new FontSizeBox(m_xBuilder->weld_combo_box("cbWestSize")))
+    , m_xWestFontLanguageFT(m_xBuilder->weld_label("lbWestLanguage"))
+    , m_xWestFontLanguageLB(new SvxLanguageBox(m_xBuilder->weld_combo_box("cbWestLanguage")))
+    , m_xWestFontFeaturesButton(m_xBuilder->weld_button("btnWestFeatures"))
+    , m_xWestFontTypeFT(m_xBuilder->weld_label("lbWestFontinfo"))
+    , m_xCJK_CTL(m_xBuilder->weld_notebook("nbCJKCTL"))
+    // CJK
+    , m_xEastFontNameFT(m_xBuilder->weld_label("lbCJKFontname"))
+    , m_xEastFontStyleFT(m_xBuilder->weld_label("lbCJKStyle"))
+    , m_xEastFontStyleLB(new FontStyleBox(m_xBuilder->weld_combo_box("cbCJKStyle")))
+    , m_xEastFontSizeFT(m_xBuilder->weld_label("lbCJKSize"))
+    , m_xEastFontSizeLB(new FontSizeBox(m_xBuilder->weld_combo_box("cbCJKSize")))
+    , m_xEastFontLanguageFT(m_xBuilder->weld_label("lbCJKLanguage"))
+    , m_xEastFontLanguageLB(new SvxLanguageBox(m_xBuilder->weld_combo_box("cbCJKLanguage")))
+    , m_xEastFontFeaturesButton(m_xBuilder->weld_button("btnCJKFeatures"))
+    , m_xEastFontTypeFT(m_xBuilder->weld_label("lbCJKFontinfo"))
+    // CTL
+    , m_xCTLFontNameFT(m_xBuilder->weld_label("lbCTLFontname"))
+    // tree
+    , m_xCTLFontStyleFT(m_xBuilder->weld_label("lbCTLStyle"))
+    , m_xCTLFontStyleLB(new FontStyleBox(m_xBuilder->weld_combo_box("cbCTLStyle")))
+    , m_xCTLFontSizeFT(m_xBuilder->weld_label("lbCTLSize"))
+    , m_xCTLFontSizeLB(new FontSizeBox(m_xBuilder->weld_combo_box("cbCTLSize")))
+    , m_xCTLFontLanguageFT(m_xBuilder->weld_label("lbCTLLanguage"))
+    , m_xCTLFontLanguageLB(new SvxLanguageBox(m_xBuilder->weld_combo_box("cbCTLLanguage")))
+    , m_xCTLFontFeaturesButton(m_xBuilder->weld_button("btnCTLFeatures"))
+    , m_xCTLFontTypeFT(m_xBuilder->weld_label("lbCTLFontinfo"))
+
     , m_xVDev(*Application::GetDefaultDevice(), DeviceFormat::DEFAULT, DeviceFormat::DEFAULT)
 {
     m_xPreviewWin.reset(new weld::CustomWeld(*m_xBuilder, "preview", m_aPreviewWin));
 #ifdef IOS
     m_xPreviewWin->hide();
 #endif
-    m_pImpl->m_aNoStyleText = CuiResId( RID_SVXSTR_CHARNAME_NOSTYLE );
+    m_pImpl->m_aNoStyleText = CuiResId( RID_CUISTR_CHARNAME_NOSTYLE );
+
+    std::unique_ptr<weld::EntryTreeView> xWestFontName = m_xBuilder->weld_entry_tree_view("gdWestern", "edWestFontName", "trWestFontName");
+    std::unique_ptr<weld::EntryTreeView> xCJKFontName = m_xBuilder->weld_entry_tree_view("gdCJK", "edCJKFontName", "trCJKFontName");
+    std::unique_ptr<weld::EntryTreeView> xCTLFontName = m_xBuilder->weld_entry_tree_view("gdCTL", "edCTLFontName", "trCTLFontName");
+
+    // 7 lines in the treeview
+    xWestFontName->set_height_request_by_rows(7);
+    xCJKFontName->set_height_request_by_rows(7);
+    xCTLFontName->set_height_request_by_rows(7);
+
+    m_xWestFontNameLB = std::move(xWestFontName);
+    m_xEastFontNameLB = std::move(xCJKFontName);
+    m_xCTLFontNameLB = std::move(xCTLFontName);
 
     SvtCTLOptions aCTLLanguageOptions;
     bool bShowCJK = SvtCJKOptions::IsCJKFontEnabled();
     bool bShowCTL = aCTLLanguageOptions.IsCTLFontEnabled();
     bool bShowNonWestern = bShowCJK || bShowCTL;
-
-    if (bShowNonWestern)
+    if (!bShowNonWestern)
     {
-        m_xWestFrame = m_xBuilder->weld_widget("western");
-        m_xWestFontNameFT = m_xBuilder->weld_label("westfontnameft-cjk");
-        m_xWestFontNameLB = m_xBuilder->weld_combo_box("westfontnamelb-cjk");
-        m_xWestFontStyleFT = m_xBuilder->weld_label("weststyleft-cjk");
-        m_xWestFontSizeFT = m_xBuilder->weld_label("westsizeft-cjk");
-
-        m_xWestFontStyleLB.reset(new FontStyleBox(m_xBuilder->weld_combo_box("weststylelb-cjk")));
-        m_xWestFontSizeLB.reset(new FontSizeBox(m_xBuilder->weld_combo_box("westsizelb-cjk")));
-
-        m_xWestFontLanguageFT = m_xBuilder->weld_label("westlangft-cjk");
-        m_xWestFontLanguageLB.reset(new SvxLanguageBox(m_xBuilder->weld_combo_box("westlanglb-cjk")));
-        m_xWestFontTypeFT = m_xBuilder->weld_label("westfontinfo-cjk");
-
-        m_xWestFontFeaturesButton = m_xBuilder->weld_button("west_features_button-cjk");
+        m_xCJK_CTL->hide();
+        m_xWestern->set_show_tabs(false); //hide single tab in case of Western only
     }
-    else
-    {
-        m_xWestFrame = m_xBuilder->weld_widget("simple");
-        m_xWestFontNameFT = m_xBuilder->weld_label("westfontnameft-nocjk");
-        m_xWestFontStyleFT = m_xBuilder->weld_label("weststyleft-nocjk");
-        m_xWestFontSizeFT = m_xBuilder->weld_label("westsizeft-nocjk");
+    else if (!bShowCJK) m_xCJK_CTL->remove_page("nbCJK");
+    else if (!bShowCTL) m_xCJK_CTL->remove_page("nbCTL");
 
-        m_xWestFontLanguageFT = m_xBuilder->weld_label("westlangft-nocjk");
-        m_xWestFontLanguageLB.reset(new SvxLanguageBox(m_xBuilder->weld_combo_box("westlanglb-nocjk")));
-        m_xWestFontTypeFT = m_xBuilder->weld_label("westfontinfo-nocjk");
-
-        m_xWestFontFeaturesButton = m_xBuilder->weld_button("west_features_button-nocjk");
-
-        std::unique_ptr<weld::EntryTreeView> xWestFontNameLB = m_xBuilder->weld_entry_tree_view("namegrid", "westfontname-nocjk", "westfontnamelb-nocjk");
-        std::unique_ptr<weld::EntryTreeView> xWestFontStyleLB = m_xBuilder->weld_entry_tree_view("stylegrid", "weststyle-nocjk", "weststylelb-nocjk");
-        std::unique_ptr<weld::EntryTreeView> xWestFontSizeLB = m_xBuilder->weld_entry_tree_view("sizegrid", "westsize-nocjk", "westsizelb-nocjk");
-
-        // 7 lines in the treeview
-        xWestFontNameLB->set_height_request_by_rows(7);
-        xWestFontStyleLB->set_height_request_by_rows(7);
-        xWestFontSizeLB->set_height_request_by_rows(7);
-
-        m_xWestFontNameLB = std::move(xWestFontNameLB);
-        m_xWestFontStyleLB.reset(new FontStyleBox(std::move(xWestFontStyleLB)));
-        m_xWestFontSizeLB.reset(new FontSizeBox(std::move(xWestFontSizeLB)));
-    }
 
     //In MacOSX the standard dialogs name font-name, font-style as
     //Family, Typeface
@@ -276,33 +265,34 @@ SvxCharNamePage::SvxCharNamePage(weld::Container* pPage, weld::DialogController*
     //In Windows the standard dialogs name font-name, font-style as
     //Font, Style
 #ifdef _WIN32
-    OUString sFontFamilyString(CuiResId(RID_SVXSTR_CHARNAME_FONT));
+    OUString sFontFamilyString(CuiResId(RID_CUISTR_CHARNAME_FONT));
 #else
-    OUString sFontFamilyString(CuiResId(RID_SVXSTR_CHARNAME_FAMILY));
+    OUString sFontFamilyString(CuiResId(RID_CUISTR_CHARNAME_FAMILY));
 #endif
     m_xWestFontNameFT->set_label(sFontFamilyString);
-    m_xEastFontNameFT->set_label(sFontFamilyString);
     m_xCTLFontNameFT->set_label(sFontFamilyString);
+    m_xEastFontNameFT->set_label(sFontFamilyString);
 
 #ifdef MACOSX
-    OUString sFontStyleString(CuiResId(RID_SVXSTR_CHARNAME_TYPEFACE));
+    OUString sFontStyleString(CuiResId(RID_CUISTR_CHARNAME_TYPEFACE));
 #else
-    OUString sFontStyleString(CuiResId(RID_SVXSTR_CHARNAME_STYLE));
+    OUString sFontStyleString(CuiResId(RID_CUISTR_CHARNAME_STYLE));
 #endif
     m_xWestFontStyleFT->set_label(sFontStyleString);
     m_xEastFontStyleFT->set_label(sFontStyleString);
     m_xCTLFontStyleFT->set_label(sFontStyleString);
 
-    m_xWestFrame->show();
-    m_xEastFrame->set_visible(bShowCJK);
-    m_xCTLFrame->set_visible(bShowCTL);
-
     m_xWestFontLanguageLB->SetLanguageList(SvxLanguageListFlags::WESTERN, true, false, true, true,
-                                           LANGUAGE_SYSTEM, css::i18n::ScriptType::LATIN);
+                                             LANGUAGE_SYSTEM, css::i18n::ScriptType::LATIN);
     m_xEastFontLanguageLB->SetLanguageList(SvxLanguageListFlags::CJK, true, false, true, true,
-                                           LANGUAGE_SYSTEM, css::i18n::ScriptType::ASIAN);
+                                            LANGUAGE_SYSTEM, css::i18n::ScriptType::ASIAN);
     m_xCTLFontLanguageLB->SetLanguageList(SvxLanguageListFlags::CTL, true, false, true, true,
-                                          LANGUAGE_SYSTEM, css::i18n::ScriptType::COMPLEX);
+                                            LANGUAGE_SYSTEM, css::i18n::ScriptType::COMPLEX);
+    int nVisibleChars = 15;
+    // read-only combobox / HasEntry asserts on set_width_char()
+    m_xWestFontLanguageLB->set_width_chars(nVisibleChars);
+    m_xEastFontLanguageLB->set_width_chars(nVisibleChars);
+    m_xCTLFontLanguageLB->set_width_chars(nVisibleChars);
 
     Initialize();
 }
@@ -354,10 +344,8 @@ const FontList* SvxCharNamePage::GetFontList() const
 {
     if ( !m_pImpl->m_pFontList )
     {
-        SfxObjectShell* pDocSh = SfxObjectShell::Current();
-
         /* #110771# SvxFontListItem::GetFontList can return NULL */
-        if ( pDocSh )
+        if (SfxObjectShell* pDocSh = SfxObjectShell::Current())
         {
             const SfxPoolItem* pItem = pDocSh->GetItem( SID_ATTR_CHAR_FONTLIST );
             if ( pItem != nullptr )
@@ -1072,30 +1060,39 @@ bool SvxCharNamePage::FillItemSet_Impl( SfxItemSet& rSet, LanguageGroup eLangGrp
         case Asian : nSlot = SID_ATTR_CHAR_CJK_LANGUAGE; break;
         case Ctl : nSlot = SID_ATTR_CHAR_CTL_LANGUAGE; break;
     }
-    nWhich = GetWhich( nSlot );
-    pOld = GetOldItem( rSet, nSlot );
 
     // For language list boxes acting as ComboBox, check for, add and select an
     // edited entry.
-    if (pLangBox == m_xWestFontLanguageLB.get())
+    switch (pLangBox->GetEditedAndValid())
     {
-        switch (pLangBox->GetEditedAndValid())
-        {
-            case SvxLanguageBox::EditedAndValid::No:
-                ;   // nothing to do
-                break;
-            case SvxLanguageBox::EditedAndValid::Valid:
+        case SvxLanguageBox::EditedAndValid::No:
+            ;   // nothing to do
+        break;
+        case SvxLanguageBox::EditedAndValid::Valid:
+            {
+                SvxLanguageBox* ppBoxes[3]
+                    = {m_xWestFontLanguageLB.get(), m_xEastFontLanguageLB.get(), m_xCTLFontLanguageLB.get()};
+                SvxLanguageBox* pBox = pLangBox->SaveEditedAsEntry(ppBoxes);
+                if (pBox != pLangBox)
                 {
-                    const int nPos = pLangBox->SaveEditedAsEntry();
-                    if (nPos != -1)
-                        pLangBox->set_active(nPos);
+                    // Get item from corresponding slot.
+                    if (pBox == m_xWestFontLanguageLB.get())
+                        nSlot = SID_ATTR_CHAR_LANGUAGE;
+                    else if (pBox == m_xEastFontLanguageLB.get())
+                        nSlot = SID_ATTR_CHAR_CJK_LANGUAGE;
+                    else if (pBox == m_xCTLFontLanguageLB.get())
+                        nSlot = SID_ATTR_CHAR_CTL_LANGUAGE;
+                    pLangBox = pBox;
                 }
-                break;
-            case SvxLanguageBox::EditedAndValid::Invalid:
-                pLangBox->set_active_id(pLangBox->get_saved_active_id());
-                break;
-        }
+            }
+        break;
+        case SvxLanguageBox::EditedAndValid::Invalid:
+            pLangBox->set_active_id(pLangBox->get_saved_active_id());
+        break;
     }
+
+    nWhich = GetWhich( nSlot );
+    pOld = GetOldItem( rSet, nSlot );
 
     int nLangPos = pLangBox->get_active();
     LanguageType eLangType = pLangBox->get_active_id();
@@ -1364,13 +1361,15 @@ void SvxCharEffectsPage::Initialize()
     SetExchangeSupport();
 
     // HTML-Mode
-    const SfxPoolItem* pItem;
-    SfxObjectShell* pShell;
-    if ( SfxItemState::SET == GetItemSet().GetItemState( SID_HTML_MODE, false, &pItem ) ||
-         ( nullptr != ( pShell = SfxObjectShell::Current() ) &&
-           nullptr != ( pItem = pShell->GetItem( SID_HTML_MODE ) ) ) )
+    const SfxUInt16Item* pHtmlModeItem = GetItemSet().GetItemIfSet( SID_HTML_MODE, false );
+    if ( !pHtmlModeItem)
     {
-        m_nHtmlMode = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+        if (SfxObjectShell* pShell = SfxObjectShell::Current())
+           pHtmlModeItem = pShell->GetItem( SID_HTML_MODE );
+    }
+    if (pHtmlModeItem)
+    {
+        m_nHtmlMode = pHtmlModeItem->GetValue();
         if ( ( m_nHtmlMode & HTMLMODE_ON ) == HTMLMODE_ON )
         {
             //!!! hide some controls please
@@ -1597,12 +1596,14 @@ bool SvxCharEffectsPage::FillItemSetColor_Impl( SfxItemSet& rSet )
     {
         SvxColorItem aItem( aSelectedColor.m_aColor, nWhich );
 
-        if (aSelectedColor.m_nThemeIndex != -1)
+        // The color was picked from the theme palette, remember its index.
+        model::ThemeColorType eType = model::convertToThemeColorType(aSelectedColor.m_nThemeIndex);
+        if (eType != model::ThemeColorType::Unknown)
         {
-            // The color was picked from the theme palette, remember its index.
-            aItem.GetThemeColor().SetThemeIndex(aSelectedColor.m_nThemeIndex);
-            aItem.GetThemeColor().SetLumMod(aSelectedColor.m_nLumMod);
-            aItem.GetThemeColor().SetLumOff(aSelectedColor.m_nLumOff);
+            aItem.GetThemeColor().setType(eType);
+            aItem.GetThemeColor().clearTransformations();
+            aItem.GetThemeColor().addTransformation({model::TransformationType::LumMod, aSelectedColor.m_nLumMod});
+            aItem.GetThemeColor().addTransformation({model::TransformationType::LumOff, aSelectedColor.m_nLumOff});
         }
 
         rSet.Put(aItem);
@@ -2648,10 +2649,10 @@ void SvxCharPositionPage::Reset( const SfxItemSet* rSet )
     if ( !sUser.isEmpty() )
     {
         sal_Int32 nIdx {0};
-        m_nSuperEsc = static_cast<short>(sUser.getToken( 0, ';', nIdx ).toInt32());
-        m_nSubEsc = static_cast<short>(sUser.getToken( 0, ';', nIdx ).toInt32());
-        m_nSuperProp = static_cast<sal_uInt8>(sUser.getToken( 0, ';', nIdx ).toInt32());
-        m_nSubProp = static_cast<sal_uInt8>(sUser.getToken( 0, ';', nIdx ).toInt32());
+        m_nSuperEsc = static_cast<short>(o3tl::toInt32(o3tl::getToken(sUser, 0, ';', nIdx )));
+        m_nSubEsc = static_cast<short>(o3tl::toInt32(o3tl::getToken(sUser, 0, ';', nIdx )));
+        m_nSuperProp = static_cast<sal_uInt8>(o3tl::toInt32(o3tl::getToken(sUser, 0, ';', nIdx )));
+        m_nSubProp = static_cast<sal_uInt8>(o3tl::toInt32(o3tl::getToken(sUser, 0, ';', nIdx )));
 
         m_xHighLowMF->set_max(MAX_ESC_POS, FieldUnit::PERCENT);
 
@@ -2773,10 +2774,13 @@ void SvxCharPositionPage::Reset( const SfxItemSet* rSet )
         rCJKFont.SetFixKerning( static_cast<short>(nKern) );
         rCTLFont.SetFixKerning( static_cast<short>(nKern) );
 
-        //the attribute value must be displayed also if it's above the maximum allowed value
+        //the attribute value must be displayed also if it's above/below the maximum allowed value
         tools::Long nVal = static_cast<tools::Long>(m_xKerningMF->get_max(FieldUnit::POINT));
         if(nVal < nKerning)
             m_xKerningMF->set_max(nKerning, FieldUnit::POINT);
+        nVal = static_cast<tools::Long>(m_xKerningMF->get_min(FieldUnit::POINT));
+        if (nVal > nKerning)
+            m_xKerningMF->set_min(nKerning, FieldUnit::POINT);
         m_xKerningMF->set_value(nKerning, FieldUnit::POINT);
     }
     else
@@ -2804,9 +2808,8 @@ void SvxCharPositionPage::Reset( const SfxItemSet* rSet )
     else
         m_xScaleWidthMF->set_value(100, FieldUnit::PERCENT);
 
-    nWhich = GetWhich( SID_ATTR_CHAR_WIDTH_FIT_TO_LINE );
-    if ( rSet->GetItemState( nWhich ) >= SfxItemState::DEFAULT )
-        m_nScaleWidthItemSetVal = static_cast<const SfxUInt16Item&>( rSet->Get( nWhich )).GetValue();
+    if ( rSet->GetItemState( SID_ATTR_CHAR_WIDTH_FIT_TO_LINE ) >= SfxItemState::DEFAULT )
+        m_nScaleWidthItemSetVal = static_cast<const SfxUInt16Item&>( rSet->Get( SID_ATTR_CHAR_WIDTH_FIT_TO_LINE )).GetValue();
 
     // Rotation
     nWhich = GetWhich( SID_ATTR_CHAR_ROTATED );
@@ -2854,8 +2857,8 @@ void SvxCharPositionPage::Reset( const SfxItemSet* rSet )
         m_xFitToLineCB->set_sensitive(!m_x0degRB->get_active());
 
         // is this value set?
-        if( SfxItemState::UNKNOWN == rSet->GetItemState( GetWhich(
-                                        SID_ATTR_CHAR_WIDTH_FIT_TO_LINE ) ))
+        if( SfxItemState::UNKNOWN == rSet->GetItemState(
+                                        SID_ATTR_CHAR_WIDTH_FIT_TO_LINE ))
             m_xFitToLineCB->hide();
     }
     ChangesApplied();
@@ -3029,9 +3032,9 @@ SvxCharTwoLinesPage::SvxCharTwoLinesPage(weld::Container* pPage, weld::DialogCon
     , m_xStartBracketLB(m_xBuilder->weld_tree_view("startbracket"))
     , m_xEndBracketLB(m_xBuilder->weld_tree_view("endbracket"))
 {
-    for (size_t i = 0; i < SAL_N_ELEMENTS(TWOLINE_OPEN); ++i)
+    for (size_t i = 0; i < std::size(TWOLINE_OPEN); ++i)
         m_xStartBracketLB->append(OUString::number(TWOLINE_OPEN[i].second), CuiResId(TWOLINE_OPEN[i].first));
-    for (size_t i = 0; i < SAL_N_ELEMENTS(TWOLINE_CLOSE); ++i)
+    for (size_t i = 0; i < std::size(TWOLINE_CLOSE); ++i)
         m_xEndBracketLB->append(OUString::number(TWOLINE_CLOSE[i].second), CuiResId(TWOLINE_CLOSE[i].first));
 
     m_xPreviewWin.reset(new weld::CustomWeld(*m_xBuilder, "preview", m_aPreviewWin));

@@ -168,9 +168,7 @@ SvxZoomDialog::SvxZoomDialog(weld::Window* pParent, const SfxItemSet& rCoreSet)
 
     // maybe get the old value first
     const SfxUInt16Item* pOldUserItem = nullptr;
-    SfxObjectShell* pShell = SfxObjectShell::Current();
-
-    if (pShell)
+    if (SfxObjectShell* pShell = SfxObjectShell::Current())
         pOldUserItem = pShell->GetItem(SID_ATTR_ZOOM_USER);
 
     if (pOldUserItem)
@@ -185,7 +183,7 @@ SvxZoomDialog::SvxZoomDialog(weld::Window* pParent, const SfxItemSet& rCoreSet)
     SetLimits(nMin, nMax);
     m_xUserEdit->set_value(nValue, FieldUnit::PERCENT);
 
-    const SfxPoolItem& rItem = m_rSet.Get(m_rSet.GetPool()->GetWhich(SID_ATTR_ZOOM));
+    const SfxPoolItem& rItem = m_rSet.Get(SID_ATTR_ZOOM);
 
     if (auto pZoomItem = dynamic_cast<const SvxZoomItem*>(&rItem))
     {
@@ -228,11 +226,8 @@ SvxZoomDialog::SvxZoomDialog(weld::Window* pParent, const SfxItemSet& rCoreSet)
         SetFactor(nZoom);
     }
 
-    const SfxPoolItem* pPoolViewLayoutItem = nullptr;
-    if (SfxItemState::SET == m_rSet.GetItemState(SID_ATTR_VIEWLAYOUT, false, &pPoolViewLayoutItem))
+    if (const SvxViewLayoutItem* pViewLayoutItem = m_rSet.GetItemIfSet(SID_ATTR_VIEWLAYOUT, false))
     {
-        const SvxViewLayoutItem* pViewLayoutItem
-            = static_cast<const SvxViewLayoutItem*>(pPoolViewLayoutItem);
         const sal_uInt16 nColumns = pViewLayoutItem->GetValue();
         const bool bBookMode = pViewLayoutItem->IsBookMode();
 
@@ -344,9 +339,8 @@ IMPL_LINK_NOARG(SvxZoomDialog, OKHdl, weld::Button&, void)
 {
     if (m_bModified)
     {
-        SvxZoomItem aZoomItem(SvxZoomType::PERCENT, 0, m_rSet.GetPool()->GetWhich(SID_ATTR_ZOOM));
-        SvxViewLayoutItem aViewLayoutItem(0, false,
-                                          m_rSet.GetPool()->GetWhich(SID_ATTR_VIEWLAYOUT));
+        SvxZoomItem aZoomItem(SvxZoomType::PERCENT, 0, SID_ATTR_ZOOM);
+        SvxViewLayoutItem aViewLayoutItem(0, false, SID_ATTR_VIEWLAYOUT);
 
         sal_uInt16 nFactor = GetFactor();
 
@@ -388,9 +382,7 @@ IMPL_LINK_NOARG(SvxZoomDialog, OKHdl, weld::Button&, void)
             m_pOutSet->Put(aViewLayoutItem);
 
         // memorize value from the UserEdit beyond the dialog
-        SfxObjectShell* pShell = SfxObjectShell::Current();
-
-        if (pShell)
+        if (SfxObjectShell* pShell = SfxObjectShell::Current())
         {
             sal_uInt16 nZoomValue
                 = static_cast<sal_uInt16>(m_xUserEdit->get_value(FieldUnit::PERCENT));

@@ -33,12 +33,17 @@ class SwView;
 
 namespace sw {
 
+/**
+ * Stores the undo/redo information, implementing the IDocumentUndoRedo interface.
+ * It contains a stack of SwUndo actions, each of which represents one user-visible
+ * undo / redo step.
+ */
 class SW_DLLPUBLIC UndoManager final
     : public IDocumentUndoRedo
     , public SdrUndoManager
 {
 public:
-    UndoManager(std::shared_ptr<SwNodes> const & pUndoNodes,
+    UndoManager(std::shared_ptr<SwNodes> pUndoNodes,
         IDocumentDrawModelAccess & rDrawModelAccess,
         IDocumentRedlineAccess & rRedlineAccess,
         IDocumentState & rState);
@@ -109,7 +114,7 @@ private:
     IDocumentRedlineAccess & m_rRedlineAccess;
     IDocumentState & m_rState;
 
-    /// Undo nodes array: content not currently in document
+    /// Undo nodes array: content not currently in document, but required for undo/redo.
     std::shared_ptr<SwNodes> m_xUndoNodes;
 
     bool m_bGroupUndo       : 1;    // TRUE: Undo grouping enabled

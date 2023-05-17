@@ -20,6 +20,7 @@
 #pragma once
 
 #include <vcl/weld.hxx>
+#include <rtl/ref.hxx>
 
 namespace com::sun::star::uno { class XComponentContext; }
 namespace comphelper { template <class Tp, class Arg> class mem_fun1_t; }
@@ -32,14 +33,14 @@ namespace com::sun::star {
 
 namespace chart
 {
-
+class ChartModel;
 class DataBrowser;
 
-class DataEditor : public weld::GenericDialogController
+class DataEditor final : public weld::GenericDialogController
 {
 public:
     DataEditor(weld::Window* pParent,
-               const css::uno::Reference<css::chart2::XChartDocument> & xChartDoc,
+               rtl::Reference<::chart::ChartModel> xChartDoc,
                const css::uno::Reference<css::uno::XComponentContext> & xContext);
     virtual ~DataEditor() override;
 
@@ -50,7 +51,7 @@ public:
 private:
     bool                           m_bReadOnly;
 
-    css::uno::Reference<css::chart2::XChartDocument> m_xChartDoc;
+    rtl::Reference<::chart::ChartModel> m_xChartDoc;
     css::uno::Reference<css::uno::XComponentContext> m_xContext;
 
     std::unique_ptr<weld::Toolbar> m_xTbxData;

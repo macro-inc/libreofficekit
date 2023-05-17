@@ -17,12 +17,11 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#undef SC_DLLIMPLEMENTATION
+    #undef SC_DLLIMPLEMENTATION
 
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 
 #include <globstr.hrc>
 #include <scresid.hxx>
@@ -36,10 +35,8 @@
 ScTpCalcOptions::ScTpCalcOptions(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreAttrs)
     : SfxTabPage(pPage, pController, "modules/scalc/ui/optcalculatepage.ui", "OptCalculatePage", &rCoreAttrs)
     , pOldOptions(new ScDocOptions(
-        static_cast<const ScTpCalcItem&>(rCoreAttrs.Get(
-            GetWhich(SID_SCDOCOPTIONS))).GetDocOptions()))
+        rCoreAttrs.Get(SID_SCDOCOPTIONS).GetDocOptions()))
     , pLocalOptions(new ScDocOptions)
-    , nWhichCalc(GetWhich(SID_SCDOCOPTIONS))
     , m_xBtnIterate(m_xBuilder->weld_check_button("iterate"))
     , m_xFtSteps(m_xBuilder->weld_label("stepsft"))
     , m_xEdSteps(m_xBuilder->weld_spin_button("steps"))
@@ -89,8 +86,7 @@ void ScTpCalcOptions::Reset(const SfxItemSet* rCoreAttrs)
     sal_Int16   y;
 
     pOldOptions.reset(new ScDocOptions(
-        static_cast<const ScTpCalcItem&>(rCoreAttrs->Get(
-            GetWhich(SID_SCDOCOPTIONS))).GetDocOptions()));
+        rCoreAttrs->Get(SID_SCDOCOPTIONS).GetDocOptions()));
 
     *pLocalOptions = *pOldOptions;
 
@@ -147,6 +143,7 @@ void ScTpCalcOptions::Reset(const SfxItemSet* rCoreAttrs)
         m_xFtPrec->set_sensitive(false);
         m_xEdPrec->set_sensitive(false);
         m_xBtnGeneralPrec->set_active(false);
+        m_xEdPrec->set_value(0);
     }
     else
     {
@@ -193,7 +190,7 @@ bool ScTpCalcOptions::FillItemSet( SfxItemSet* rCoreAttrs )
     }
     if ( *pLocalOptions != *pOldOptions )
     {
-        rCoreAttrs->Put( ScTpCalcItem( nWhichCalc, *pLocalOptions ) );
+        rCoreAttrs->Put( ScTpCalcItem( SID_SCDOCOPTIONS, *pLocalOptions ) );
         return true;
     }
     else

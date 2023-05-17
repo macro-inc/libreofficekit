@@ -78,7 +78,7 @@ Reader* SwReaderWriterEntry::GetReader()
     return nullptr;
 }
 
-void SwReaderWriterEntry::GetWriter( const OUString& rNm, const OUString& rBaseURL, WriterRef& xWrt ) const
+void SwReaderWriterEntry::GetWriter( std::u16string_view rNm, const OUString& rBaseURL, WriterRef& xWrt ) const
 {
     if ( fnGetWriter )
         (*fnGetWriter)( rNm, rBaseURL, xWrt );
@@ -156,7 +156,7 @@ Reader* GetDOCXReader()
     return aReaderWriter[READER_WRITER_DOCX].GetReader();
 }
 
-void GetWriter( const OUString& rFltName, const OUString& rBaseURL, WriterRef& xRet )
+void GetWriter( std::u16string_view rFltName, const OUString& rBaseURL, WriterRef& xRet )
 {
     for( int n = 0; n < MAXFILTER; ++n )
         if ( aFilterDetect[n].IsFilter( rFltName ) )
@@ -268,21 +268,20 @@ void StgReader::SetFltName( const OUString& rFltNm )
         m_aFltName = rFltNm;
 }
 
-void CalculateFlySize(SfxItemSet& rFlySet, const SwNodeIndex& rAnchor,
+void CalculateFlySize(SfxItemSet& rFlySet, const SwNode& rAnchor,
         SwTwips nPageWidth)
 {
-    const SfxPoolItem* pItem = nullptr;
-    if( SfxItemState::SET != rFlySet.GetItemState( RES_FRM_SIZE, true, &pItem ) ||
-            MINFLY > static_cast<const SwFormatFrameSize*>(pItem)->GetWidth() )
+    const SwFormatFrameSize* pFrameSizeItem = rFlySet.GetItemIfSet( RES_FRM_SIZE );
+    if( !pFrameSizeItem || MINFLY > pFrameSizeItem->GetWidth() )
     {
         std::unique_ptr<SwFormatFrameSize> aSz(rFlySet.Get(RES_FRM_SIZE).Clone());
-        if (pItem)
-            aSz.reset(static_cast<SwFormatFrameSize*>(pItem->Clone()));
+        if (pFrameSizeItem)
+            aSz.reset(pFrameSizeItem->Clone());
 
         SwTwips nWidth;
         // determine the width; if there is a table use the width of the table;
         // otherwise use the width of the page
-        const SwTableNode* pTableNd = rAnchor.GetNode().FindTableNode();
+        const SwTableNode* pTableNd = rAnchor.FindTableNode();
         if( pTableNd )
             nWidth = pTableNd->GetTable().GetFrameFormat()->GetFrameSize().GetWidth();
         else
@@ -323,7 +322,7 @@ void CalculateFlySize(SfxItemSet& rFlySet, const SwNodeIndex& rAnchor,
                 {
                     // if the first node don't contained any content, then
                     // insert one char in it calc again and delete once again
-                    SwIndex aNdIdx( pFirstTextNd );
+                    SwContentIndex aNdIdx( pFirstTextNd );
                     pFirstTextNd->InsertText("MM", aNdIdx);
                     sal_uLong nAbsMinCnts;
                     pFirstTextNd->GetMinMaxSize( pFirstTextNd->GetIndex(),
@@ -367,11 +366,11 @@ void CalculateFlySize(SfxItemSet& rFlySet, const SwNodeIndex& rAnchor,
         aSz->SetWidth( nWidth );
         if( MINFLY > aSz->GetHeight() )
             aSz->SetHeight( MINFLY );
-        rFlySet.Put( *aSz );
+        rFlySet.Put( std::move(aSz) );
     }
-    else if( MINFLY > static_cast<const SwFormatFrameSize*>(pItem)->GetHeight() )
+    else if( MINFLY > pFrameSizeItem->GetHeight() )
     {
-        std::unique_ptr<SwFormatFrameSize> aSz(static_cast<SwFormatFrameSize*>(pItem->Clone()));
+        std::unique_ptr<SwFormatFrameSize> aSz(pFrameSizeItem->Clone());
         aSz->SetHeight( MINFLY );
         rFlySet.Put( std::move(aSz) );
     }
@@ -545,30 +544,30 @@ OUString NameFromCharSet(rtl_TextEncoding nChrSet)
 //      6. Whether to include hidden paragraphs and text - as true/false
 // the delimiter character is ","
 
-void SwAsciiOptions::ReadUserData( const OUString& rStr )
+void SwAsciiOptions::ReadUserData( std::u16string_view rStr )
 {
     sal_Int32 nToken = 0;
-    OUString sToken = rStr.getToken(0, ',', nToken); // 1. Charset name
-    if (!sToken.isEmpty())
-        m_eCharSet = CharSetFromName(sToken);
-    if (nToken >= 0 && !(sToken = rStr.getToken(0, ',', nToken)).isEmpty()) // 2. Line ending type
+    std::u16string_view sToken = o3tl::getToken(rStr, 0, ',', nToken); // 1. Charset name
+    if (!sToken.empty())
+        m_eCharSet = CharSetFromName(OUString(sToken));
+    if (nToken >= 0 && !(sToken = o3tl::getToken(rStr, 0, ',', nToken)).empty()) // 2. Line ending type
     {
-        if (sToken.equalsIgnoreAsciiCase("CRLF"))
+        if (o3tl::equalsIgnoreAsciiCase(sToken, u"CRLF"))
             m_eCRLF_Flag = LINEEND_CRLF;
-        else if (sToken.equalsIgnoreAsciiCase("LF"))
+        else if (o3tl::equalsIgnoreAsciiCase(sToken, u"LF"))
             m_eCRLF_Flag = LINEEND_LF;
         else
             m_eCRLF_Flag = LINEEND_CR;
     }
-    if (nToken >= 0 && !(sToken = rStr.getToken(0, ',', nToken)).isEmpty()) // 3. Font name
+    if (nToken >= 0 && !(sToken = o3tl::getToken(rStr, 0, ',', nToken)).empty()) // 3. Font name
         m_sFont = sToken;
-    if (nToken >= 0 && !(sToken = rStr.getToken(0, ',', nToken)).isEmpty()) // 4. Language tag
-        m_nLanguage = LanguageTag::convertToLanguageTypeWithFallback(sToken);
-    if (nToken >= 0 && !(sToken = rStr.getToken(0, ',', nToken)).isEmpty()) // 5. Include BOM?
-        m_bIncludeBOM = !(sToken.equalsIgnoreAsciiCase("FALSE"));
+    if (nToken >= 0 && !(sToken = o3tl::getToken(rStr, 0, ',', nToken)).empty()) // 4. Language tag
+        m_nLanguage = LanguageTag::convertToLanguageTypeWithFallback(OUString(sToken));
+    if (nToken >= 0 && !(sToken = o3tl::getToken(rStr, 0, ',', nToken)).empty()) // 5. Include BOM?
+        m_bIncludeBOM = !(o3tl::equalsIgnoreAsciiCase(sToken, u"FALSE"));
     // 6. Include hidden text
-    if (nToken >= 0 && !(sToken = rStr.getToken(0, ',', nToken)).isEmpty())
-        m_bIncludeHidden = !(sToken.equalsIgnoreAsciiCase("FALSE"));
+    if (nToken >= 0 && !(sToken = o3tl::getToken(rStr, 0, ',', nToken)).empty())
+        m_bIncludeHidden = !(o3tl::equalsIgnoreAsciiCase(sToken, u"FALSE"));
 }
 
 void SwAsciiOptions::WriteUserData(OUString& rStr) const
@@ -628,9 +627,9 @@ void SwAsciiOptions::WriteUserData(OUString& rStr) const
 
 extern "C" {
     Reader *ImportRTF();
-    void ExportRTF( const OUString&, const OUString& rBaseURL, WriterRef& );
+    void ExportRTF( std::u16string_view, const OUString& rBaseURL, WriterRef& );
     Reader *ImportDOC();
-    void ExportDOC( const OUString&, const OUString& rBaseURL, WriterRef& );
+    void ExportDOC( std::u16string_view, const OUString& rBaseURL, WriterRef& );
     Reader *ImportDOCX();
     sal_uInt32 SaveOrDelMSVBAStorage_ww8( SfxObjectShell&, SotStorage&, sal_Bool, const OUString& );
     sal_uInt32 GetSaveWarningOfMSVBAStorage_ww8( SfxObjectShell& );
@@ -654,7 +653,7 @@ Reader* GetRTFReader()
 
 }
 
-void GetRTFWriter( const OUString& rFltName, const OUString& rBaseURL, WriterRef& xRet )
+void GetRTFWriter( std::u16string_view rFltName, const OUString& rBaseURL, WriterRef& xRet )
 {
 #ifndef DISABLE_DYNLOADING
     FnGetWriter pFunction = reinterpret_cast<FnGetWriter>( SwGlobals::getFilters().GetMswordLibSymbol( "ExportRTF" ) );
@@ -682,7 +681,7 @@ Reader* GetWW8Reader()
 #endif
 }
 
-void GetWW8Writer( const OUString& rFltName, const OUString& rBaseURL, WriterRef& xRet )
+void GetWW8Writer( std::u16string_view rFltName, const OUString& rBaseURL, WriterRef& xRet )
 {
 #ifndef DISABLE_DYNLOADING
     FnGetWriter pFunction = reinterpret_cast<FnGetWriter>( SwGlobals::getFilters().GetMswordLibSymbol( "ExportDOC" ) );

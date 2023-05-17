@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
@@ -32,7 +32,7 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScNamedRangesObj : public CalcUnoApiTest,
+class ScNamedRangesObj : public UnoApiTest,
                          public apitest::XActionLockable,
                          public apitest::XElementAccess,
                          public apitest::XEnumerationAccess,
@@ -46,7 +46,6 @@ public:
     ScNamedRangesObj();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual uno::Reference<uno::XInterface> getXNamedRanges(sal_Int32 nSheet = 0) override;
@@ -92,13 +91,10 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScNamedRangesObj::ScNamedRangesObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<sheet::XNamedRange>::get())
     , XIndexAccess(4)
     , XNameAccess("initial1")
@@ -136,17 +132,9 @@ uno::Reference<uno::XInterface> ScNamedRangesObj::getXNamedRanges(sal_Int32 nShe
 
 void ScNamedRangesObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    OUString aFileURL;
-    createFileURL(u"ScNamedRangeObj.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL, "com.sun.star.sheet.SpreadsheetDocument");
-}
-
-void ScNamedRangesObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"ScNamedRangeObj.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScNamedRangesObj);

@@ -570,7 +570,7 @@ sal_Int64 OSection::getSomething( const uno::Sequence< sal_Int8 > & rId )
     return (m_xDrawPage_Tunnel.is()) ? m_xDrawPage_Tunnel->getSomething(rId) : 0;
 }
 
-uno::Sequence< sal_Int8 > OSection::getUnoTunnelId()
+const uno::Sequence< sal_Int8 > & OSection::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();
@@ -580,7 +580,7 @@ void OSection::notifyElementAdded(const uno::Reference< drawing::XShape >& xShap
 {
     if ( !m_bInInsertNotify )
     {
-        container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::Any(), uno::makeAny(xShape), uno::Any());
+        container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::Any(), uno::Any(xShape), uno::Any());
         m_aContainerListeners.notifyEach(&container::XContainerListener::elementInserted,aEvent);
     }
 }
@@ -590,7 +590,7 @@ void OSection::notifyElementRemoved(const uno::Reference< drawing::XShape >& xSh
     if ( !m_bInRemoveNotify )
     {
         // notify our container listeners
-        container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::Any(), uno::makeAny(xShape), uno::Any());
+        container::ContainerEvent aEvent(static_cast<container::XContainer*>(this), uno::Any(), uno::Any(xShape), uno::Any());
         m_aContainerListeners.notifyEach(&container::XContainerListener::elementRemoved,aEvent);
     }
 }

@@ -16,8 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef INCLUDED_SW_SOURCE_UI_ENVELP_LABFMT_HXX
-#define INCLUDED_SW_SOURCE_UI_ENVELP_LABFMT_HXX
+#pragma once
 
 #include <labimg.hxx>
 #include <label.hxx>
@@ -65,9 +64,9 @@ public:
 
 class SwLabFormatPage : public SfxTabPage
 {
-    Idle aPreviewIdle;
-    SwLabItem aItem;
-    bool bModified;
+    Idle m_aPreviewIdle;
+    SwLabItem m_aItem;
+    bool m_bModified;
 
     SwLabPreview m_aPreview;
 
@@ -112,9 +111,9 @@ public:
 
 class SwSaveLabelDlg : public weld::GenericDialogController
 {
-    bool bSuccess;
+    bool m_bSuccess;
     SwLabDlg* m_pLabDialog;
-    SwLabRec& rLabRec;
+    SwLabRec& m_rLabRec;
 
     std::unique_ptr<weld::ComboBox> m_xMakeCB;
     std::unique_ptr<weld::Entry> m_xTypeED;
@@ -137,6 +136,5 @@ public:
     }
     bool GetLabel(SwLabItem& rItem);
 };
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

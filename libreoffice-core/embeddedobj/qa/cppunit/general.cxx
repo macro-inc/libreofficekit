@@ -7,10 +7,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/embed/XStorage.hpp>
 
 #include <comphelper/embeddedobjectcontainer.hxx>
@@ -21,34 +19,20 @@
 
 using namespace ::com::sun::star;
 
-/// embeddedobj general tests.
-class EmbeddedobjGeneralTest : public test::BootstrapFixture, public unotest::MacrosTest
+namespace
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
+/// Covers embeddedobj/source/general/ fixes.
+class Test : public UnoApiTest
+{
 public:
-    void setUp() override;
-    void tearDown() override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
+    Test()
+        : UnoApiTest("/embeddedobj/qa/cppunit/data/")
+    {
+    }
 };
-
-void EmbeddedobjGeneralTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
 }
 
-void EmbeddedobjGeneralTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfig)
+CPPUNIT_TEST_FIXTURE(Test, testInsertFileConfig)
 {
     // Explicitly disable Word->Writer mapping for this test.
     std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
@@ -62,14 +46,12 @@ CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfig)
                                                                                    pBatchReset);
         pBatchReset->commit();
     });
-    getComponent().set(
-        loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument"));
+    mxComponent.set(loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument"));
 
     // Insert a file as an embedded object.
     uno::Reference<embed::XStorage> xStorage = comphelper::OStorageHelper::GetTemporaryStorage();
     comphelper::EmbeddedObjectContainer aContainer(xStorage);
-    OUString aFileName
-        = m_directories.getURLFromSrc(u"embeddedobj/qa/cppunit/data/insert-file-config.doc");
+    OUString aFileName = createFileURL(u"insert-file-config.doc");
     uno::Sequence<beans::PropertyValue> aMedium{ comphelper::makePropertyValue("URL", aFileName) };
     OUString aName("Object 1");
     uno::Reference<embed::XEmbeddedObject> xObject
@@ -82,7 +64,7 @@ CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfig)
     CPPUNIT_ASSERT(!xObject.is());
 }
 
-CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfigVsdx)
+CPPUNIT_TEST_FIXTURE(Test, testInsertFileConfigVsdx)
 {
     // Explicitly disable Word->Writer mapping for this test.
     std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
@@ -95,14 +77,12 @@ CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfigVsdx)
         officecfg::Office::Common::Filter::Microsoft::Import::VisioToDraw::set(true, pBatchReset);
         pBatchReset->commit();
     });
-    getComponent().set(
-        loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument"));
+    mxComponent.set(loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument"));
 
     // Insert a file as an embedded object.
     uno::Reference<embed::XStorage> xStorage = comphelper::OStorageHelper::GetTemporaryStorage();
     comphelper::EmbeddedObjectContainer aContainer(xStorage);
-    OUString aFileName
-        = m_directories.getURLFromSrc(u"embeddedobj/qa/cppunit/data/insert-file-config.vsdx");
+    OUString aFileName = createFileURL(u"insert-file-config.vsdx");
     uno::Sequence<beans::PropertyValue> aMedium{ comphelper::makePropertyValue("URL", aFileName) };
     OUString aName("Object 1");
     uno::Reference<embed::XEmbeddedObject> xObject
@@ -115,7 +95,7 @@ CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfigVsdx)
     CPPUNIT_ASSERT(!xObject.is());
 }
 
-CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfigPdf)
+CPPUNIT_TEST_FIXTURE(Test, testInsertFileConfigPdf)
 {
     // Explicitly disable Word->Writer mapping for this test.
     std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
@@ -128,14 +108,12 @@ CPPUNIT_TEST_FIXTURE(EmbeddedobjGeneralTest, testInsertFileConfigPdf)
         officecfg::Office::Common::Filter::Adobe::Import::PDFToDraw::set(true, pBatchReset);
         pBatchReset->commit();
     });
-    getComponent().set(
-        loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument"));
+    mxComponent.set(loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument"));
 
     // Insert a PDF file as an embedded object.
     uno::Reference<embed::XStorage> xStorage = comphelper::OStorageHelper::GetTemporaryStorage();
     comphelper::EmbeddedObjectContainer aContainer(xStorage);
-    OUString aFileName
-        = m_directories.getURLFromSrc(u"embeddedobj/qa/cppunit/data/insert-file-config.pdf");
+    OUString aFileName = createFileURL(u"insert-file-config.pdf");
     uno::Sequence<beans::PropertyValue> aMedium{ comphelper::makePropertyValue("URL", aFileName) };
     OUString aName("Object 1");
     uno::Reference<embed::XEmbeddedObject> xObject

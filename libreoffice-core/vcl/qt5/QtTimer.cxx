@@ -20,11 +20,15 @@
 #include <QtTimer.hxx>
 #include <QtTimer.moc>
 
+#include <QtInstance.hxx>
+
 #include <QtWidgets/QApplication>
 #include <QtCore/QThread>
 
 #include <vcl/svapp.hxx>
 #include <sal/log.hxx>
+
+#include <svdata.hxx>
 
 QtTimer::QtTimer()
 {
@@ -38,6 +42,12 @@ QtTimer::QtTimer()
 void QtTimer::timeoutActivated()
 {
     SolarMutexGuard aGuard;
+    if (Application::IsOnSystemEventLoop())
+    {
+        const ImplSVData* pSVData = ImplGetSVData();
+        assert(pSVData && pSVData->mpDefInst);
+        static_cast<QtInstance*>(pSVData->mpDefInst)->DispatchUserEvents(true);
+    }
     CallCallback();
 }
 

@@ -21,6 +21,7 @@
 #include <comphelper/string.hxx>
 #include <comphelper/processfactory.hxx>
 #include <connectivity/dbexception.hxx>
+#include <sal/log.hxx>
 
 #include "utils.hxx"
 
@@ -87,7 +88,7 @@ OUString utils::convertToUTF8(std::string_view original)
     return res;
 }
 
-OUString utils::getTableNameFromStmt(const OUString& sSql)
+OUString utils::getTableNameFromStmt(std::u16string_view sSql)
 {
     auto stmtComponents = comphelper::string::split(sSql, sal_Unicode(u' '));
     assert(stmtComponents.size() > 2);
@@ -103,17 +104,22 @@ OUString utils::getTableNameFromStmt(const OUString& sSql)
     // it may contain spaces if it's put into apostrophes.
     if (wordIter->indexOf("\"") >= 0)
     {
-        sal_Int32 nAposBegin = sSql.indexOf("\"");
-        sal_Int32 nAposEnd = nAposBegin;
+        size_t nAposBegin = sSql.find('"');
+        size_t nAposEnd = nAposBegin;
         bool bProperEndAposFound = false;
         while (!bProperEndAposFound)
         {
-            nAposEnd = sSql.indexOf("\"", nAposEnd + 1);
+            nAposEnd = sSql.find('"', nAposEnd + 1);
+            if (nAposEnd == std::u16string_view::npos)
+            {
+                SAL_WARN("dbaccess", "no matching \"");
+                return OUString();
+            }
             if (sSql[nAposEnd - 1] != u'\\')
                 bProperEndAposFound = true;
         }
-        OUString result = sSql.copy(nAposBegin, nAposEnd - nAposBegin + 1);
-        return result;
+        std::u16string_view result = sSql.substr(nAposBegin, nAposEnd - nAposBegin + 1);
+        return OUString(result);
     }
 
     // next word is the table's name
@@ -125,9 +131,9 @@ OUString utils::getTableNameFromStmt(const OUString& sSql)
         return *wordIter;
 }
 
-void utils::ensureFirebirdTableLength(const OUString& sName)
+void utils::ensureFirebirdTableLength(std::u16string_view sName)
 {
-    if (sName.getLength() > 30) // Firebird limitation
+    if (sName.size() > 30) // Firebird limitation
     {
         static constexpr OUStringLiteral NAME_TOO_LONG
             = u"Firebird 3 doesn't support object (table, field) names "

@@ -23,53 +23,20 @@
 using ::xmloff::token::IsXMLToken;
 using ::xmloff::token::XML_TOKEN_INVALID;
 
-// TODO: optimize this!
-class SvXMLItemMapEntries_impl
-{
-public:
-    SvXMLItemMapEntry const * mpEntries;
-    sal_uInt16 mnCount;
-};
-
-SvXMLItemMapEntries::SvXMLItemMapEntries( SvXMLItemMapEntry const * pEntries )
-   : mpImpl( new SvXMLItemMapEntries_impl )
-{
-    mpImpl->mpEntries = pEntries;
-
-    mpImpl->mnCount = 0;
-    while( pEntries->eLocalName != XML_TOKEN_INVALID )
-    {
-        pEntries++;
-        mpImpl->mnCount++;
-    }
-}
-
 SvXMLItemMapEntries::~SvXMLItemMapEntries()
 {
 }
 
 SvXMLItemMapEntry const * SvXMLItemMapEntries::getByName(  sal_Int32 nElement  ) const
 {
-    SvXMLItemMapEntry const * pMap = mpImpl->mpEntries;
-    while( pMap && (pMap->eLocalName != XML_TOKEN_INVALID) )
+    for (const SvXMLItemMapEntry& rEntry : mpEntries)
     {
-        if( IsTokenInNamespace(nElement, pMap->nNameSpace) &&
-            (nElement & TOKEN_MASK) == pMap->eLocalName )
-            break;
-        pMap++;
+        if( IsTokenInNamespace(nElement, rEntry.nNameSpace) &&
+            (nElement & TOKEN_MASK) == rEntry.eLocalName )
+            return &rEntry;
     }
 
-    return (pMap && (pMap->eLocalName != XML_TOKEN_INVALID)) ? pMap : nullptr;
-}
-
-SvXMLItemMapEntry const & SvXMLItemMapEntries::getByIndex( sal_uInt16 nIndex ) const
-{
-    return mpImpl->mpEntries[nIndex];
-}
-
-sal_uInt16 SvXMLItemMapEntries::getCount() const
-{
-    return mpImpl->mnCount;
+    return nullptr;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -21,7 +21,10 @@
 
 #include <sal/config.h>
 
+#include <swdllapi.h>
+
 #include "flyfrm.hxx"
+#include "flowfrm.hxx"
 
 class SwNoTextFrame;
 
@@ -29,7 +32,7 @@ double getLocalFrameRotation_from_SwNoTextFrame(const SwNoTextFrame& rNoTextFram
 
 // Base class for those Flys that can "move freely" or better that are not
 // bound in Content.
-class SwFlyFreeFrame : public SwFlyFrame
+class SW_DLLPUBLIC SwFlyFreeFrame : public SwFlyFrame
 {
 private:
     // #i34753# - flag for at-page anchored Writer fly frames
@@ -70,7 +73,7 @@ protected:
     friend class SwFlyNotify;
     virtual void NotifyBackground( SwPageFrame *pPage,
                                    const SwRect& rRect, PrepareHint eHint) override;
-    SwFlyFreeFrame( SwFlyFrameFormat*, SwFrame*, SwFrame *pAnchor );
+    SwFlyFreeFrame( SwFlyFrameFormat*, SwFrame*, SwFrame *pAnchor, bool bFollow = false );
 
     virtual void DestroyImpl() override;
     virtual ~SwFlyFreeFrame() override;
@@ -150,11 +153,13 @@ public:
     // #i28701#
 
     SwFlyLayFrame( SwFlyFrameFormat*, SwFrame*, SwFrame *pAnchor );
+
+    virtual void RegisterAtPage(SwPageFrame &) override;
     virtual void SwClientNotify(const SwModify&, const SfxHint&) override;
 };
 
 // Flys that are bound to Content but not in Content
-class SwFlyAtContentFrame final: public SwFlyFreeFrame
+class SW_DLLPUBLIC SwFlyAtContentFrame final: public SwFlyFreeFrame, public SwFlowFrame
 {
     virtual void MakeAll(vcl::RenderContext* pRenderContext) override;
 
@@ -169,11 +174,14 @@ class SwFlyAtContentFrame final: public SwFlyFreeFrame
     virtual void RegisterAtCorrectPage() override;
     virtual void RegisterAtPage(SwPageFrame &) override;
     virtual void SwClientNotify(const SwModify&, const SfxHint&) override;
+    bool ShouldBwdMoved(SwLayoutFrame* pNewUpper, bool& rReformat) override;
 
 public:
     // #i28701#
 
-    SwFlyAtContentFrame( SwFlyFrameFormat*, SwFrame*, SwFrame *pAnchor );
+    SwFlyAtContentFrame( SwFlyFrameFormat*, SwFrame*, SwFrame *pAnchor, bool bFollow = false );
+    SwFlyAtContentFrame(SwFlyAtContentFrame& rPrecede);
+    ~SwFlyAtContentFrame();
 
     void SetAbsPos( const Point &rNew );
 
@@ -188,6 +196,13 @@ public:
         format isn't possible, if method <MakeAll()> is already in progress.
     */
     virtual bool IsFormatPossible() const override;
+    const SwFlyAtContentFrame* GetFollow() const;
+    SwFlyAtContentFrame* GetFollow();
+    const SwFlyAtContentFrame* GetPrecede() const;
+    SwFlyAtContentFrame* GetPrecede();
+    /// Like Cut(), except that follow chaining is maintained.
+    void DelEmpty();
+    void dumpAsXmlAttributes(xmlTextWriterPtr pWriter) const override;
 };
 
 // Flys that are bound to a character in Content

@@ -9,13 +9,15 @@
 
 #pragma once
 
+#include <rtl/ustring.hxx>
+
 /* do not translate */
-#define STR_LAYOUT_TITLE                "Titel"
-#define STR_LAYOUT_OUTLINE              "Gliederung"
-#define STR_LAYOUT_BACKGROUND           "Hintergrund"
-#define STR_LAYOUT_BACKGROUNDOBJECTS    "Hintergrundobjekte"
-#define STR_LAYOUT_NOTES                "Notizen"
-#define STR_LAYOUT_SUBTITLE             "Untertitel"
+inline constexpr OUStringLiteral STR_LAYOUT_TITLE = u"Titel";
+inline constexpr OUStringLiteral STR_LAYOUT_OUTLINE = u"Gliederung";
+inline constexpr OUStringLiteral STR_LAYOUT_BACKGROUND = u"Hintergrund";
+inline constexpr OUStringLiteral STR_LAYOUT_BACKGROUNDOBJECTS = u"Hintergrundobjekte";
+inline constexpr OUStringLiteral STR_LAYOUT_NOTES = u"Notizen";
+inline constexpr OUStringLiteral STR_LAYOUT_SUBTITLE = u"Untertitel";
 #define STR_HTMLEXP_DEFAULT_EXTENSION   ".html"
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab cinoptions=b1,g0,N-s cinkeys+=0=break: */

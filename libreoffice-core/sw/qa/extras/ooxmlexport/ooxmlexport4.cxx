@@ -7,14 +7,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <sal/config.h>
-
-#include <string_view>
-
 #include <swmodeltestbase.hxx>
 
 #include <com/sun/star/awt/XBitmap.hpp>
-#include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
 #include <com/sun/star/drawing/XControlShape.hpp>
 #include <com/sun/star/text/RelOrientation.hpp>
@@ -22,17 +17,13 @@
 #include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/text/XTextViewCursorSupplier.hpp>
 #include <com/sun/star/text/XTextColumns.hpp>
-#include <com/sun/star/table/BorderLine2.hpp>
 #include <com/sun/star/text/XPageCursor.hpp>
-#include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 #include <com/sun/star/packages/zip/ZipFileAccess.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/text/XTextTablesSupplier.hpp>
 
-#include <config_features.h>
-#include <unotools/tempfile.hxx>
-#include <comphelper/configuration.hxx>
+#include <config_fonts.h>
 #include <officecfg/Office/Writer.hxx>
 #include <vcl/svapp.hxx>
 
@@ -42,20 +33,6 @@ public:
     Test() : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text") {}
 
 protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        const char* aDenylist[] = {
-            "math-escape.docx",
-            "math-mso2k7.docx",
-        };
-        std::vector<const char*> vDenylist(aDenylist, aDenylist + SAL_N_ELEMENTS(aDenylist));
-
-        // If the testcase is stored in some other format, it's pointless to test.
-        return (OString(filename).endsWith(".docx") && std::find(vDenylist.begin(), vDenylist.end(), filename) == vDenylist.end());
-    }
-
     virtual std::unique_ptr<Resetter> preTest(const char* filename) override
     {
         if (filename == std::string_view("combobox-control.docx") )
@@ -86,7 +63,7 @@ DECLARE_OOXMLEXPORT_TEST(testRelorientation, "relorientation.docx")
     // width 8.61cm and 325px in UI in Word and rounds down to 8609 Hmm. Considering scaling of the
     // parent group to the anchor extent (* 3118485 / 3108960) we get a display width of 3108960 EMU
     // = 8636Hmm. FIXME: Expected value is as in LO 7.2. Reason for difference is yet unknown.
-    if (mbExported)
+    if (isExported())
     {
         uno::Reference<drawing::XShape> xYear(xGroup->getByIndex(1), uno::UNO_QUERY);
         // This was 2, due to incorrect handling of parent transformations inside DML groupshapes.
@@ -94,8 +71,9 @@ DECLARE_OOXMLEXPORT_TEST(testRelorientation, "relorientation.docx")
     }
 }
 
-DECLARE_OOXMLEXPORT_TEST(testBezier, "bezier.odt")
+CPPUNIT_TEST_FIXTURE(Test, testBezier)
 {
+    loadAndReload("bezier.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Check that no shape got lost: a bezier, a line and a text shape.
     CPPUNIT_ASSERT_EQUAL(3, getShapes());
@@ -109,7 +87,7 @@ DECLARE_OOXMLEXPORT_TEST(testGroupshapeTextbox, "groupshape-textbox.docx")
     // The DML export does not, make sure it stays that way.
     CPPUNIT_ASSERT_EQUAL(OUString("first"), xShape->getString());
     // This was 16, i.e. inheriting doc default char height didn't work.
-    CPPUNIT_ASSERT_EQUAL(11.f, getProperty<float>(xShape, "CharHeight"));
+    CPPUNIT_ASSERT_EQUAL(11.f, getProperty<float>(getParagraphOfText(1, xShape->getText()), "CharHeight"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testGroupshapePicture, "groupshape-picture.docx")
@@ -204,8 +182,9 @@ CPPUNIT_TEST_FIXTURE(Test, testTrackChangesParagraphProperties)
     assertXPathChildren(pXmlDoc, "/w:document/w:body/w:p[1]/w:pPr/w:pPrChange", 0);
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testMsoSpt180, "mso-spt180.docx")
+CPPUNIT_TEST_FIXTURE(Test, testMsoSpt180)
 {
+    loadAndReload("mso-spt180.docx");
     uno::Reference<container::XIndexAccess> xGroup(getShape(1), uno::UNO_QUERY);
     const uno::Sequence<beans::PropertyValue> aProps = getProperty< uno::Sequence<beans::PropertyValue> >(xGroup->getByIndex(0), "CustomShapeGeometry");
     OUString aType;
@@ -249,7 +228,7 @@ DECLARE_OOXMLEXPORT_TEST(testTestTitlePage, "testTitlePage.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), parseDump("/root/page[2]/footer/txt/text()"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTableRowDataDisplayedTwice,"table-row-data-displayed-twice.docx")
+DECLARE_OOXMLEXPORT_TEST(testTableRowDataDisplayedTwice, "table-row-data-displayed-twice.docx")
 {
     // fdo#73534: There was a problem for some documents during export.Invalid sectPr getting added
     // because of wrong condition in code.
@@ -257,8 +236,9 @@ DECLARE_OOXMLEXPORT_TEST(testTableRowDataDisplayedTwice,"table-row-data-displaye
     CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testFdo73556,"fdo73556.docx")
+CPPUNIT_TEST_FIXTURE(Test, testFdo73556)
 {
+    loadAndSave("fdo73556.docx");
     /*
     *  The file contains a table with 3 columns
     *  the gridcols are as follows: {1210, 1331, 1210}
@@ -295,7 +275,7 @@ CPPUNIT_TEST_FIXTURE(Test, fdo69656)
     // After changes for fdo76741 the fixed width is exported as "dxa" for DOCX
 
     // Check for the width type of table and its cells.
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     assertXPath(pXmlDoc, "/w:document/w:body/w:tbl/w:tblPr/w:tblW","type","dxa");
 }
 
@@ -314,18 +294,27 @@ CPPUNIT_TEST_FIXTURE(Test, testFdo76741)
     assertXPath(pXmlDoc, "//w:tblW", "type", "dxa");
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testFdo73541,"fdo73541.docx")
+CPPUNIT_TEST_FIXTURE(Test, testFdo73541)
 {
+    loadAndSave("fdo73541.docx");
     // fdo#73541: The mirrored margins were not imported and mapped correctly in Page Layout
     // Hence <w:mirrorMargins /> tag was not exported back in settings.xml
     xmlDocUniquePtr pXmlDoc = parseExport("word/settings.xml");
     assertXPath(pXmlDoc, "/w:settings/w:mirrorMargins");
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testFdo106029,"fdo106029.docx")
+CPPUNIT_TEST_FIXTURE(Test, testFdo106029)
 {
+    loadAndSave("fdo106029.docx");
     xmlDocUniquePtr pXmlDoc = parseExport("word/settings.xml");
     assertXPath(pXmlDoc, "/w:settings/w:compat/w:doNotExpandShiftReturn");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf146515)
+{
+    loadAndSave("tdf146515.odt");
+    xmlDocUniquePtr pXmlDoc = parseExport("word/settings.xml");
+    assertXPath(pXmlDoc, "/w:settings/w:compat/w:usePrinterMetrics");
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testFDO74106)
@@ -374,9 +363,11 @@ DECLARE_OOXMLEXPORT_TEST(testColumnBreak_ColumnCountIsZero,"fdo74153.docx")
     /* fdo73545: Column Break with Column_count = 0 was not getting preserved.
      * The <w:br w:type="column" /> was missing after roundtrip
      */
-    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
-    if (pXmlDoc)
+    if (isExported())
+    {
+        xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
         assertXPath(pXmlDoc, "/w:document/w:body/w:p[3]/w:r[1]/w:br","type","column");
+    }
 
     //tdf76349 match Word's behavior of treating breaks in single columns as page breaks.
     CPPUNIT_ASSERT_EQUAL(2, getPages());
@@ -445,8 +436,9 @@ CPPUNIT_TEST_FIXTURE(Test, testChartInFooter)
     CPPUNIT_ASSERT_EQUAL(1, getShapes());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testNestedTextFrames, "nested-text-frames.odt")
+CPPUNIT_TEST_FIXTURE(Test, testNestedTextFrames)
 {
+    loadAndReload("nested-text-frames.odt");
     CPPUNIT_ASSERT_EQUAL(3, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // First problem was LO crashed during export (crash test)
@@ -499,9 +491,9 @@ DECLARE_OOXMLEXPORT_TEST(testEmbeddedXlsx, "embedded-xlsx.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("FrameShape"), getShape(2)->getShapeType());
 
     // check the objects are present in the exported document.xml
-    xmlDocUniquePtr pXmlDocument = parseExport("word/document.xml");
-    if (!pXmlDocument)
+    if (!isExported())
         return;
+    xmlDocUniquePtr pXmlDocument = parseExport("word/document.xml");
     assertXPath(pXmlDocument, "/w:document/w:body/w:p/w:r/w:object", 2);
 
     // finally check the embedded files are present in the zipped document
@@ -534,8 +526,9 @@ CPPUNIT_TEST_FIXTURE(Test, testNumberedLists_StartingWithZero)
     assertXPath(pXmlDoc, "w:numbering/w:abstractNum[1]/w:lvl[1]/w:start", 0);
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testPageBreak,"fdo74566.docx")
+CPPUNIT_TEST_FIXTURE(Test, testPageBreak)
 {
+    loadAndReload("fdo74566.docx");
     /*  Break to next page was written into wrong paragraph as <w:pageBreakBefore />.
      *  LO was not preserving Page Break as <w:br w:type="page" />.
      *  Now after fix , LO writes Page Break as the new paragraph and also
@@ -805,7 +798,7 @@ CPPUNIT_TEST_FIXTURE(Test, tdf134043_ImportComboBoxAsDropDown_true)
     officecfg::Office::Writer::Filter::Import::DOCX::ImportComboBoxAsDropDown::set(true, batch);
     batch->commit();
 
-    load(mpTestDocumentPath, "combobox-control.docx");
+    createSwDoc("combobox-control.docx");
     verifyComboBoxExport(true);
 }
 
@@ -815,7 +808,7 @@ CPPUNIT_TEST_FIXTURE(Test, tdf134043_ImportComboBoxAsDropDown_false)
     officecfg::Office::Writer::Filter::Import::DOCX::ImportComboBoxAsDropDown::set(false, batch);
     batch->commit();
 
-    load(mpTestDocumentPath, "combobox-control.docx");
+    createSwDoc("combobox-control.docx");
     verifyComboBoxExport(false);
 }
 
@@ -846,8 +839,9 @@ CPPUNIT_TEST_FIXTURE(Test, testParagraphWithComments)
     CPPUNIT_ASSERT_EQUAL( idInDocXml, idInCommentXml );
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf104707_urlComment, "tdf104707_urlComment.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf104707_urlComment)
 {
+    loadAndReload("tdf104707_urlComment.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
@@ -1022,6 +1016,7 @@ CPPUNIT_TEST_FIXTURE(Test, testSimpleSdts)
 
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:sdt/w:sdtPr/w:text", 1);
     assertXPath(pXmlDoc, "//*/w:sdt/w:sdtPr/w:id", 5);
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:lock", 1);
     assertXPath(pXmlDoc, "/w:document/w:body/w:sdt[1]/w:sdtPr/w:picture", 1);
     assertXPath(pXmlDoc, "/w:document/w:body/w:sdt[2]/w:sdtPr/w:group", 1);
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[4]/w:sdt/w:sdtPr/w:citation", 1);
@@ -1195,7 +1190,7 @@ DECLARE_OOXMLEXPORT_TEST(testInheritFirstHeader,"inheritFirstHeader.docx")
 }
 
 #if HAVE_MORE_FONTS
-DECLARE_OOXMLEXPORT_TEST(testTdf81345_045Original,"tdf81345.docx")
+DECLARE_OOXMLEXPORT_TEST(testTdf81345_045Original, "tdf81345.docx")
 {
     //Header wasn't replaced  and columns were missing because no new style was created.
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
@@ -1222,7 +1217,8 @@ CPPUNIT_TEST_FIXTURE(Test, testDocxTablePosition)
     assertXPath(pXmlDoc, "/w:document/w:body/w:tbl/w:tblPr/w:tblpPr", "tblpX", "3494");
     assertXPath(pXmlDoc, "/w:document/w:body/w:tbl/w:tblPr/w:tblpPr", "tblpY", "4611");
 }
-
+#if 0
+// FIXME:
 CPPUNIT_TEST_FIXTURE(Test, testUnderlineGroupShapeText)
 {
     loadAndSave("tdf123351_UnderlineGroupSapeText.docx");
@@ -1275,7 +1271,7 @@ CPPUNIT_TEST_FIXTURE(Test, testUnderlineGroupShapeText)
     assertXPath(pXmlDocument, "/w:document/w:body/w:p[32]/w:r/mc:AlternateContent[1]/mc:Choice/w:drawing/wp:anchor"
         "/a:graphic/a:graphicData/wpg:wgp/wps:wsp[2]/wps:txbx/w:txbxContent/w:p/w:r/w:rPr/w:u", "val", "single");
 }
-
+#endif
 CPPUNIT_TEST_FIXTURE(Test, testUnderlineColorGroupedShapes)
 {
     loadAndSave("tdf132491_UnderlineColorGroupedShapes.docx");

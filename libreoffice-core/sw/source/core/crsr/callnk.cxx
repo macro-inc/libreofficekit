@@ -38,9 +38,9 @@ SwCallLink::SwCallLink( SwCursorShell & rSh )
 {
     // remember SPoint-values of current cursor
     SwPaM* pCursor = m_rShell.IsTableMode() ? m_rShell.GetTableCrs() : m_rShell.GetCursor();
-    SwNode& rNd = pCursor->GetPoint()->nNode.GetNode();
+    SwNode& rNd = pCursor->GetPoint()->GetNode();
     m_nNode = rNd.GetIndex();
-    m_nContent = pCursor->GetPoint()->nContent.GetIndex();
+    m_nContent = pCursor->GetPoint()->GetContentIndex();
     m_nNodeType = rNd.GetNodeType();
     m_bHasSelection = ( *pCursor->GetPoint() != *pCursor->GetMark() );
 
@@ -90,7 +90,7 @@ void NotifyTableCollapsedParagraph(const SwContentNode *const pNode, SwCursorShe
 
     const SwTableLine* pLine = pRow->GetTabLine( );
 
-    if (pShell && (pShell->IsTableMode() || (pShell->StartsWithTable() && pShell->ExtendedSelectedAll())))
+    if (pShell && (pShell->IsTableMode() || (pShell->StartsWith_() != SwCursorShell::StartsWith::None && pShell->ExtendedSelectedAll())))
     {
         // If we have a table selection, then avoid the notification: it's not necessary (the text
         // cursor needs no updating) and the notification may kill the selection overlay, leading to
@@ -106,7 +106,7 @@ void NotifyTableCollapsedParagraph(const SwContentNode *const pNode, SwCursorShe
 
 } // namespace sw
 
-SwCallLink::~SwCallLink() COVERITY_NOEXCEPT_FALSE
+void SwCallLink::ImplDestroy()
 {
     if( m_nNodeType == SwNodeType::NONE || !m_rShell.m_bCallChgLnk ) // see ctor
         return ;
@@ -114,7 +114,7 @@ SwCallLink::~SwCallLink() COVERITY_NOEXCEPT_FALSE
     // If travelling over Nodes check formats and register them anew at the
     // new Node.
     SwPaM* pCurrentCursor = m_rShell.IsTableMode() ? m_rShell.GetTableCrs() : m_rShell.GetCursor();
-    SwContentNode * pCNd = pCurrentCursor->GetContentNode();
+    SwContentNode * pCNd = pCurrentCursor->GetPointContentNode();
     if( !pCNd )
         return;
 
@@ -130,9 +130,9 @@ SwCallLink::~SwCallLink() COVERITY_NOEXCEPT_FALSE
         }
     }
 
-    sal_Int32 nCmp, nCurrentContent = pCurrentCursor->GetPoint()->nContent.GetIndex();
+    sal_Int32 nCmp, nCurrentContent = pCurrentCursor->GetPoint()->GetContentIndex();
     SwNodeType nNdWhich = pCNd->GetNodeType();
-    SwNodeOffset nCurrentNode = pCurrentCursor->GetPoint()->nNode.GetIndex();
+    SwNodeOffset nCurrentNode = pCurrentCursor->GetPoint()->GetNodeIndex();
 
     // Register the Shell as dependent at the current Node. By doing this all
     // attribute changes can be signaled over the link.
@@ -237,6 +237,11 @@ SwCallLink::~SwCallLink() COVERITY_NOEXCEPT_FALSE
     if( rStNd.EndOfSectionNode()->StartOfSectionIndex() > m_nNode ||
         m_nNode > rStNd.EndOfSectionIndex() )
         m_rShell.GetFlyMacroLnk().Call( pFlyFrame->GetFormat() );
+}
+
+SwCallLink::~SwCallLink()
+{
+    suppress_fun_call_w_exception(ImplDestroy());
 }
 
 tools::Long SwCallLink::getLayoutFrame(const SwRootFrame* pRoot,

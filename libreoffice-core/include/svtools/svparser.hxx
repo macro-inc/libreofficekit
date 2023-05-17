@@ -24,9 +24,10 @@
 #include <tools/ref.hxx>
 #include <tools/long.hxx>
 #include <rtl/textenc.h>
+#include <rtl/ustrbuf.hxx>
 #include <rtl/ustring.hxx>
-#include <vector>
 #include <memory>
+#include <utility>
 
 template<typename T> struct SvParser_Impl;
 class SvStream;
@@ -47,7 +48,7 @@ class SVT_DLLPUBLIC SvParser : public SvRefBase
 
 protected:
     SvStream&           rInput;
-    OUString            aToken;             // scanned token
+    OUStringBuffer      aToken;             // scanned token
     sal_uInt32          nlLineNr;           // current line number
     sal_uInt32          nlLinePos;          // current column number
 
@@ -160,8 +161,8 @@ public:
     SvKeyValue()
     {}
 
-    SvKeyValue (const OUString &rKey, const OUString &rValue)
-        : m_aKey (rKey), m_aValue (rValue)
+    SvKeyValue (OUString aKey, OUString aValue)
+        : m_aKey (std::move(aKey)), m_aValue (std::move(aValue))
     {}
 
     SvKeyValue (const SvKeyValue &rOther)

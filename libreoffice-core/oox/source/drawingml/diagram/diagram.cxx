@@ -34,6 +34,8 @@
 #include <oox/token/namespaces.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <svx/svdpage.hxx>
+#include <oox/ppt/pptimport.hxx>
+#include <comphelper/xmltools.hxx>
 
 #include "diagramlayoutatoms.hxx"
 #include "layoutatomvisitors.hxx"
@@ -102,6 +104,7 @@ static void removeUnneededGroupShapes(const ShapePtr& pShape)
     }
 }
 
+
 void Diagram::addTo( const ShapePtr & pParentShape )
 {
     if (pParentShape->getSize().Width == 0 || pParentShape->getSize().Height == 0)
@@ -110,7 +113,7 @@ void Diagram::addTo( const ShapePtr & pParentShape )
 
     pParentShape->setChildSize(pParentShape->getSize());
 
-    const dgm::Point* pRootPoint = mpData->getRootPoint();
+    const svx::diagram::Point* pRootPoint = mpData->getRootPoint();
     if (mpLayout->getNode() && pRootPoint)
     {
         // create Shape hierarchy
@@ -130,14 +133,19 @@ void Diagram::addTo( const ShapePtr & pParentShape )
     pBackground->setSubType(XML_rect);
     pBackground->getCustomShapeProperties()->setShapePresetType(XML_rect);
     pBackground->setSize(pParentShape->getSize());
-    pBackground->getFillProperties() = *mpData->getFillProperties();
+    pBackground->getFillProperties() = *mpData->getBackgroundShapeFillProperties();
     pBackground->setLocked(true);
+
+    // create and set ModelID for BackgroundShape to allow later association
+    getData()->setBackgroundShapeModelID(OStringToOUString(comphelper::xml::generateGUIDString(), RTL_TEXTENCODING_UTF8));
+    pBackground->setDiagramDataModelID(getData()->getBackgroundShapeModelID());
+
     auto& aChildren = pParentShape->getChildren();
     aChildren.insert(aChildren.begin(), pBackground);
 }
 
-Diagram::Diagram(const ShapePtr& pShape)
-    : mpShape(pShape)
+Diagram::Diagram()
+: maDiagramFontHeights()
 {
 }
 
@@ -165,6 +173,50 @@ uno::Sequence<beans::PropertyValue> Diagram::getDomsAsPropertyValues() const
     }
 
     return aValue;
+}
+
+using ShapePairs
+    = std::map<std::shared_ptr<drawingml::Shape>, css::uno::Reference<css::drawing::XShape>>;
+
+void Diagram::syncDiagramFontHeights()
+{
+    // Each name represents a group of shapes, for which the font height should have the same
+    // scaling.
+    for (const auto& rNameAndPairs : maDiagramFontHeights)
+    {
+        // Find out the minimum scale within this group.
+        const ShapePairs& rShapePairs = rNameAndPairs.second;
+        double nMinScale = 100.0;
+        for (const auto& rShapePair : rShapePairs)
+        {
+            uno::Reference<beans::XPropertySet> xPropertySet(rShapePair.second, uno::UNO_QUERY);
+            if (xPropertySet.is())
+            {
+                double nTextFitToSizeScale = 0.0;
+                xPropertySet->getPropertyValue("TextFitToSizeScale") >>= nTextFitToSizeScale;
+                if (nTextFitToSizeScale > 0 && nTextFitToSizeScale < nMinScale)
+                {
+                    nMinScale = nTextFitToSizeScale;
+                }
+            }
+        }
+
+        // Set that minimum scale for all members of the group.
+        if (nMinScale < 100.0)
+        {
+            for (const auto& rShapePair : rShapePairs)
+            {
+                uno::Reference<beans::XPropertySet> xPropertySet(rShapePair.second, uno::UNO_QUERY);
+                if (xPropertySet.is())
+                {
+                    xPropertySet->setPropertyValue("TextFitToSizeScale", uno::Any(nMinScale));
+                }
+            }
+        }
+    }
+
+    // no longer needed after processing
+    maDiagramFontHeights.clear();
 }
 
 static uno::Reference<xml::dom::XDocument> loadFragment(
@@ -251,13 +303,16 @@ void loadDiagram( ShapePtr const & pShape,
                   const OUString& rColorStylePath,
                   const oox::core::Relations& rRelations )
 {
-    DiagramPtr pDiagram = std::make_shared<Diagram>(pShape);
+    DiagramPtr pDiagram = std::make_shared<Diagram>();
 
-    DiagramDataPtr pData = std::make_shared<DiagramData>();
+    OoxDiagramDataPtr pData = std::make_shared<DiagramData>();
     pDiagram->setData( pData );
 
     DiagramLayoutPtr pLayout = std::make_shared<DiagramLayout>(*pDiagram);
     pDiagram->setLayout( pLayout );
+
+    // set DiagramFontHeights at filter
+    rFilter.setDiagramFontHeights(&pDiagram->getDiagramFontHeights());
 
     // data
     if( !rDataModelPath.isEmpty() )
@@ -356,103 +411,21 @@ void loadDiagram( ShapePtr const & pShape,
     }
 
     // collect data, init maps
-    pData->build();
+    // for Diagram import, do - for now - NOT clear all oox::drawingml::Shape
+    pData->buildDiagramDataModel(false);
 
     // diagram loaded. now lump together & attach to shape
     pDiagram->addTo(pShape);
-    pShape->setDiagramData(pData);
     pShape->setDiagramDoms(pDiagram->getDomsAsPropertyValues());
-}
 
-void loadDiagram(ShapePtr const& pShape,
-                 DiagramDataPtr pDiagramData,
-                 const uno::Reference<xml::dom::XDocument>& layoutDom,
-                 const uno::Reference<xml::dom::XDocument>& styleDom,
-                 const uno::Reference<xml::dom::XDocument>& colorDom,
-                 core::XmlFilterBase& rFilter)
-{
-    DiagramPtr pDiagram = std::make_shared<Diagram>(pShape);
+    // Get the oox::Theme definition and - if available - move/secure the
+    // original ImportData directly to the Diagram ModelData
+    std::shared_ptr<::oox::drawingml::Theme> aTheme(rFilter.getCurrentThemePtr());
+    if(aTheme)
+        pData->setThemeDocument(aTheme->getFragment()); //getTempFile());
 
-    pDiagram->setData(pDiagramData);
-
-    DiagramLayoutPtr pLayout = std::make_shared<DiagramLayout>(*pDiagram);
-    pDiagram->setLayout(pLayout);
-
-    // layout
-    if (layoutDom.is())
-    {
-        rtl::Reference<core::FragmentHandler> xRefLayout(
-            new DiagramLayoutFragmentHandler(rFilter, OUString(), pLayout));
-
-        importFragment(rFilter, layoutDom, "OOXLayout", pDiagram, xRefLayout);
-    }
-
-    // style
-    if (styleDom.is())
-    {
-        rtl::Reference<core::FragmentHandler> xRefQStyle(
-            new DiagramQStylesFragmentHandler(rFilter, OUString(), pDiagram->getStyles()));
-
-        importFragment(rFilter, styleDom, "OOXStyle", pDiagram, xRefQStyle);
-    }
-
-    // colors
-    if (colorDom.is())
-    {
-        rtl::Reference<core::FragmentHandler> xRefColorStyle(
-            new ColorFragmentHandler(rFilter, OUString(), pDiagram->getColors()));
-
-        importFragment(rFilter, colorDom, "OOXColor", pDiagram, xRefColorStyle);
-    }
-
-    // diagram loaded. now lump together & attach to shape
-    pDiagram->addTo(pShape);
-}
-
-void reloadDiagram(SdrObject* pObj, core::XmlFilterBase& rFilter)
-{
-    DiagramDataPtr pDiagramData = std::dynamic_pointer_cast<DiagramData>(pObj->GetDiagramData());
-    if (!pDiagramData)
-        return;
-
-    pObj->getChildrenOfSdrObject()->ClearSdrObjList();
-
-    uno::Reference<css::drawing::XShape> xShape(pObj->getUnoShape());
-    uno::Reference<beans::XPropertySet> xPropSet(xShape, uno::UNO_QUERY_THROW);
-
-    uno::Reference<xml::dom::XDocument> layoutDom;
-    uno::Reference<xml::dom::XDocument> styleDom;
-    uno::Reference<xml::dom::XDocument> colorDom;
-
-    // retrieve the doms from the GrabBag
-    uno::Sequence<beans::PropertyValue> propList;
-    xPropSet->getPropertyValue(UNO_NAME_MISC_OBJ_INTEROPGRABBAG) >>= propList;
-    for (const auto& rProp : std::as_const(propList))
-    {
-        OUString propName = rProp.Name;
-        if (propName == "OOXLayout")
-            rProp.Value >>= layoutDom;
-        else if (propName == "OOXStyle")
-            rProp.Value >>= styleDom;
-        else if (propName == "OOXColor")
-            rProp.Value >>= colorDom;
-    }
-
-    ShapePtr pShape = std::make_shared<Shape>();
-    pShape->setDiagramType();
-    pShape->setSize(
-        awt::Size(o3tl::convert(xShape->getSize().Width, o3tl::Length::mm100, o3tl::Length::emu),
-                  o3tl::convert(xShape->getSize().Height, o3tl::Length::mm100, o3tl::Length::emu)));
-
-    loadDiagram(pShape, pDiagramData, layoutDom, styleDom, colorDom, rFilter);
-
-    uno::Reference<drawing::XShapes> xShapes(xShape, uno::UNO_QUERY_THROW);
-    basegfx::B2DHomMatrix aTransformation;
-    aTransformation.translate(
-        o3tl::convert(xShape->getPosition().X, o3tl::Length::mm100, o3tl::Length::emu),
-        o3tl::convert(xShape->getPosition().Y, o3tl::Length::mm100, o3tl::Length::emu));
-    for (auto const& child : pShape->getChildren())
-        child->addShape(rFilter, rFilter.getCurrentTheme(), xShapes, aTransformation, pShape->getFillProperties());
+    // Prepare support for the advanced DiagramHelper using Diagram & Theme data
+    pShape->prepareDiagramHelper(pDiagram, rFilter.getCurrentThemePtr());
 }
 
 const oox::drawingml::Color&

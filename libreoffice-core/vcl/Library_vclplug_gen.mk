@@ -19,6 +19,8 @@
 
 $(eval $(call gb_Library_Library,vclplug_gen))
 
+$(eval $(call gb_Library_set_plugin_for,vclplug_gen,vcl))
+
 $(eval $(call gb_Library_set_include,vclplug_gen,\
     $$(INCLUDE) \
     -I$(SRCDIR)/vcl/inc \
@@ -33,7 +35,6 @@ $(eval $(call gb_Library_use_sdk_api,vclplug_gen))
 $(eval $(call gb_Library_use_common_precompiled_header,vclplug_gen))
 
 $(eval $(call gb_Library_use_libraries,vclplug_gen,\
-    vcl \
     tl \
     utl \
     sot \
@@ -98,6 +99,7 @@ $(eval $(call gb_Library_add_exception_objects,vclplug_gen,\
     vcl/unx/generic/dtrans/X11_transferable \
     vcl/unx/generic/gdi/cairo_xlib_cairo \
     vcl/unx/generic/gdi/x11cairotextrender \
+    vcl/unx/generic/gdi/X11CairoSalGraphicsImpl \
     vcl/unx/generic/gdi/gdiimpl \
     vcl/unx/generic/gdi/salbmp \
     vcl/unx/generic/gdi/salgdi2 \

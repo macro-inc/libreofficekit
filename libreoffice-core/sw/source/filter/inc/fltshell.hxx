@@ -64,15 +64,15 @@ public:
     //operators with SwPosition, where the node is hacked to the previous one,
     //and the offset to content is de-dynamic-ified
     SwFltPosition(const SwPosition &rPos)
-        : m_nNode(rPos.nNode, -1)
-        , m_nContent(rPos.nContent.GetIndex())
+        : m_nNode(rPos.GetNode(), -1)
+        , m_nContent(rPos.GetContentIndex())
     {
     }
 
     void FromSwPosition(const SwPosition &rPos)
     {
-        m_nNode = rPos.nNode.GetIndex()-1;
-        m_nContent = rPos.nContent.GetIndex();
+        m_nNode = rPos.GetNodeIndex()-1;
+        m_nContent = rPos.GetContentIndex();
     }
 };
 
@@ -147,7 +147,7 @@ public:
 
     virtual SwFltStackEntry* SetAttr(const SwPosition& rPos, sal_uInt16 nAttrId, bool bTstEnd=true, tools::Long nHand = LONG_MAX, bool consumedByField=false);
 
-    void StealAttr(const SwNodeIndex& rNode);
+    void StealAttr(const SwNode& rNode);
     void MarkAllAttrsOld();
     void KillUnlockedAttrs(const SwPosition& pPos);
     SfxPoolItem* GetFormatStackAttr(sal_uInt16 nWhich, sal_uInt16 * pPos);
@@ -181,6 +181,7 @@ public:
           SwFrameFormat* GetFrameFormat() { return m_pFrameFormat; }
 };
 
+/// Used by SwFltAnchor, to listen to an SwFrameFormat (to be aware when it is replaced or deleted).
 class SwFltAnchorListener final : public SvtListener
 {
     SwFltAnchor* m_pFltAnchor;
@@ -221,7 +222,7 @@ private:
 
 public:
     SwFltBookmark( const OUString& rNa,
-                   const OUString& rVa,
+                   OUString aVa,
                    tools::Long nHand,
                    const bool bIsTOCBookmark = false );
 

@@ -28,7 +28,7 @@
 #include <osl/time.h>
 #include <osl/conditn.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <rtl/ref.hxx>
 
@@ -63,10 +63,10 @@
 #include <com/sun/star/util/XStringSubstitution.hpp>
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/task/XInteractionHandler.hpp>
-#include <com/sun/star/task/XInteractionRequest.hpp>
 #include <com/sun/star/ucb/InteractiveAugmentedIOException.hpp>
 #include <com/sun/star/xml/xslt/XSLT2Transformer.hpp>
 #include <com/sun/star/xml/xslt/XSLTTransformer.hpp>
+#include <utility>
 
 #define TRANSFORMATION_TIMEOUT_SEC 60
 
@@ -148,7 +148,7 @@ namespace XSLT
     public:
 
         // ctor...
-        explicit XSLTFilter(const css::uno::Reference<XComponentContext> &r);
+        explicit XSLTFilter(css::uno::Reference<XComponentContext> x);
 
         //  XServiceInfo
         virtual sal_Bool SAL_CALL supportsService(const OUString& sServiceName) override;
@@ -181,8 +181,8 @@ namespace XSLT
 
     }
 
-    XSLTFilter::XSLTFilter(const css::uno::Reference<XComponentContext> &r):
-        m_xContext(r), m_bTerminated(false), m_bError(false)
+    XSLTFilter::XSLTFilter(css::uno::Reference<XComponentContext> x):
+        m_xContext(std::move(x)), m_bTerminated(false), m_bError(false)
     {}
 
     void
@@ -311,14 +311,13 @@ namespace XSLT
         // the input stream that represents the imported file
         // is most important here since we need to supply it to
         // the sax parser that drives the supplied document handler
-        sal_Int32 nLength = aSourceData.getLength();
         OUString aName, aURL;
         css::uno::Reference<XInputStream> xInputStream;
         css::uno::Reference<XInteractionHandler> xInterActionHandler;
-        for (sal_Int32 i = 0; i < nLength; i++)
+        for (const auto& sourceDataItem : aSourceData)
         {
-            aName = aSourceData[i].Name;
-            Any value = aSourceData[i].Value;
+            aName = sourceDataItem.Name;
+            Any value = sourceDataItem.Value;
             if ( aName == "InputStream" )
                 value >>= xInputStream;
             else if ( aName == "URL" )
@@ -367,8 +366,8 @@ namespace XSLT
                         aInput.sPublicId = aURL;
                         aInput.aInputStream = pipein;
 
-                        css::uno::Reference< css::xml::sax::XFastParser > xFastParser = dynamic_cast<
-                            css::xml::sax::XFastParser* >( xHandler.get() );
+                        css::uno::Reference< css::xml::sax::XFastParser > xFastParser(
+                            xHandler, css::uno::UNO_QUERY );
 
                         // transform
                         m_tcontrol->start();

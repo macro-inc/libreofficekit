@@ -31,7 +31,7 @@
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/file.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/mediadescriptor.hxx>
 #include <unotools/streamwrap.hxx>
 #include <unotools/ucbstreamhelper.hxx>
@@ -101,13 +101,13 @@ sal_Bool RtfFilter::filter(const uno::Sequence<beans::PropertyValue>& rDescripto
     if (m_xDstDoc.is()) // not in cppunittest?
     {
         xDocProps.set(m_xDstDoc, uno::UNO_QUERY);
-        xDocProps->setPropertyValue("UndocumentedWriterfilterHack", uno::makeAny(true));
+        xDocProps->setPropertyValue("UndocumentedWriterfilterHack", uno::Any(true));
     }
     comphelper::ScopeGuard g([xDocProps] {
         if (xDocProps.is()) // not in cppunittest?
         {
             // note: pStream.clear calls RemoveLastParagraph()
-            xDocProps->setPropertyValue("UndocumentedWriterfilterHack", uno::makeAny(false));
+            xDocProps->setPropertyValue("UndocumentedWriterfilterHack", uno::Any(false));
         }
     });
 

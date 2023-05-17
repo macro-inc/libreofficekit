@@ -28,7 +28,6 @@
 #include <vcl/mnemonic.hxx>
 #include <svl/stritem.hxx>
 #include <sfx2/htmlmode.hxx>
-#include <editeng/sizeitem.hxx>
 #include <editeng/opaqitem.hxx>
 #include <editeng/protitem.hxx>
 #include <editeng/prntitem.hxx>
@@ -62,6 +61,8 @@
 #include <osl/diagnose.h>
 
 #include <strings.hrc>
+#include <formatflysplit.hxx>
+#include <fmtcntnt.hxx>
 #include <svx/strings.hrc>
 #include <svx/dialmgr.hxx>
 #include <svx/graphichelper.hxx>
@@ -90,8 +91,8 @@ struct StringIdPair_Impl
 
 }
 
-#define MAX_PERCENT_WIDTH   254
-#define MAX_PERCENT_HEIGHT  254
+#define MAX_PERCENT_WIDTH   SAL_CONST_INT64(254)
+#define MAX_PERCENT_HEIGHT  SAL_CONST_INT64(254)
 
 namespace {
 
@@ -387,13 +388,13 @@ FrameMap const aVAsCharHtmlMap[] =
     {SwFPos::CENTER_VERT,   SwFPos::CENTER_VERT,    text::VertOrientation::LINE_CENTER,   LB::RelRow}
 };
 
-const WhichRangesContainer SwFramePage::aPageRg(svl::Items<
+const WhichRangesContainer SwFramePage::s_aPageRg(svl::Items<
     RES_FRM_SIZE, RES_FRM_SIZE,
     RES_VERT_ORIENT, RES_ANCHOR,
     RES_COL, RES_COL,
     RES_FOLLOW_TEXT_FLOW, RES_FOLLOW_TEXT_FLOW
 >);
-const WhichRangesContainer SwFrameAddPage::aAddPgRg(svl::Items<
+const WhichRangesContainer SwFrameAddPage::s_aAddPgRg(svl::Items<
     RES_PRINT,              RES_PRINT,
     RES_PROTECT,            RES_PROTECT,
     FN_SET_FRM_NAME,        FN_SET_FRM_NAME,
@@ -674,6 +675,7 @@ SwFramePage::SwFramePage(weld::Container* pPage, weld::DialogController* pContro
     , m_xVertRelationFT(m_xBuilder->weld_label("verttoft"))
     , m_xVertRelationLB(m_xBuilder->weld_combo_box("vertanchor"))
     , m_xFollowTextFlowCB(m_xBuilder->weld_check_button("followtextflow"))
+    , m_xFlySplitCB(m_xBuilder->weld_check_button("flysplit"))
     , m_xExampleWN(new weld::CustomWeld(*m_xBuilder, "preview", m_aExampleWN))
     , m_xWidthED(new SwPercentField(m_xBuilder->weld_metric_spin_button("width", FieldUnit::CM)))
     , m_xHeightED(new SwPercentField(m_xBuilder->weld_metric_spin_button("height", FieldUnit::CM)))
@@ -794,6 +796,40 @@ namespace
         RelationMap const * pMap;
         size_t nCount;
     };
+
+/// Checks if the current fly frame contains exactly one table.
+bool ContainsSingleTable(SwWrtShell* pWrtShell)
+{
+    const SwFrameFormat* pFlyFormat = pWrtShell->GetFlyFrameFormat();
+    if (!pFlyFormat)
+    {
+        return false;
+    }
+
+    const SwNodeIndex* pStartNode = pFlyFormat->GetContent().GetContentIdx();
+    if (!pStartNode)
+    {
+        return false;
+    }
+
+    // Check if the frame content starts with a table.
+    SwNodeIndex aNodeIndex(*pStartNode);
+    ++aNodeIndex;
+    if (!aNodeIndex.GetNode().IsTableNode())
+    {
+        return false;
+    }
+
+    // Check if the frame content ends with the same table.
+    SwNodeIndex aEndIndex(*aNodeIndex.GetNode().EndOfSectionNode());
+    ++aEndIndex;
+    if (&aEndIndex.GetNode() != pStartNode->GetNode().EndOfSectionNode())
+    {
+        return false;
+    }
+
+    return true;
+}
 }
 
 void SwFramePage::setOptimalRelWidth()
@@ -860,6 +896,9 @@ void SwFramePage::Reset( const SfxItemSet *rSet )
 {
     SwWrtShell* pSh = m_bFormat ? ::GetActiveWrtShell() :
             getFrameDlgParentShell();
+    OSL_ENSURE(pSh , "shell not found");
+    if (!pSh)
+        return;
 
     m_nHtmlMode = ::GetHtmlMode(pSh->GetView().GetDocShell());
     m_bHtmlMode = (m_nHtmlMode & HTMLMODE_ON) != 0;
@@ -870,13 +909,12 @@ void SwFramePage::Reset( const SfxItemSet *rSet )
     ::SetFieldUnit(*m_xAtHorzPosED, aMetric);
     ::SetFieldUnit(*m_xAtVertPosED, aMetric);
 
-    const SfxPoolItem* pItem = nullptr;
     const SwFormatAnchor& rAnchor = rSet->Get(RES_ANCHOR);
 
-    if (SfxItemState::SET == rSet->GetItemState(FN_OLE_IS_MATH, false, &pItem))
-        m_bIsMathOLE = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-    if (SfxItemState::SET == rSet->GetItemState(FN_MATH_BASELINE_ALIGNMENT, false, &pItem))
-        m_bIsMathBaselineAlignment = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+    if (const SfxBoolItem* pMathItem = rSet->GetItemIfSet(FN_OLE_IS_MATH, false))
+        m_bIsMathOLE = pMathItem->GetValue();
+    if (const SfxBoolItem* pAlignItem = rSet->GetItemIfSet(FN_MATH_BASELINE_ALIGNMENT, false))
+        m_bIsMathBaselineAlignment = pAlignItem->GetValue();
     EnableVerticalPositioning( !(m_bIsMathOLE && m_bIsMathBaselineAlignment
             && RndStdIds::FLY_AS_CHAR == rAnchor.GetAnchorId()) );
 
@@ -904,12 +942,7 @@ void SwFramePage::Reset( const SfxItemSet *rSet )
 
     if ( m_sDlgType == "PictureDialog" || m_sDlgType == "ObjectDialog" )
     {
-        OSL_ENSURE(pSh , "shell not found");
-        //OS: only for the variant Insert/Graphic/Properties
-        if(SfxItemState::SET == rSet->GetItemState(FN_PARAM_GRF_REALSIZE, false, &pItem))
-            m_aGrfSize = static_cast<const SvxSizeItem*>(pItem)->GetSize();
-        else
-            pSh->GetGrfSize( m_aGrfSize );
+        pSh->GetGrfSize( m_aGrfSize );
 
         if ( !m_bNew )
         {
@@ -977,13 +1010,17 @@ void SwFramePage::Reset( const SfxItemSet *rSet )
 
     // i#22341 - determine content position of character
     // Note: content position can be NULL
-    mpToCharContentPos = rAnchor.GetContentAnchor();
+    mpToCharContentPos = rAnchor.GetAnchorNode() ? &rAnchor : nullptr;
 
     // i#18732 - init checkbox value
     {
         const bool bFollowTextFlow =
             rSet->Get(RES_FOLLOW_TEXT_FLOW).GetValue();
         m_xFollowTextFlowCB->set_active(bFollowTextFlow);
+    }
+    {
+        const bool bFlySplit = rSet->Get(RES_FLY_SPLIT).GetValue();
+        m_xFlySplitCB->set_active(bFlySplit);
     }
 
     if(m_bHtmlMode)
@@ -1007,12 +1044,21 @@ void SwFramePage::Reset( const SfxItemSet *rSet )
         m_xFollowTextFlowCB->set_sensitive(m_xAnchorAtParaRB->get_active() ||
                                            m_xAnchorAtCharRB->get_active() ||
                                            m_xAnchorAtFrameRB->get_active());
+        m_xFlySplitCB->set_sensitive(m_xAnchorAtParaRB->get_active());
+    }
+
+    if (!ContainsSingleTable(pSh))
+    {
+        // Only allow fly split if the frame contains a single table, otherwise it would be hard the
+        // resulting model to Word formats.
+        m_xFlySplitCB->hide();
     }
 
     Init(*rSet);
     m_xAtVertPosED->save_value();
     m_xAtHorzPosED->save_value();
     m_xFollowTextFlowCB->save_state();
+    m_xFlySplitCB->save_state();
 
     m_xWidthED->save_value();
     m_xHeightED->save_value();
@@ -1037,9 +1083,7 @@ void SwFramePage::Reset( const SfxItemSet *rSet )
 bool SwFramePage::FillItemSet(SfxItemSet *rSet)
 {
     bool bRet = false;
-    SwWrtShell* pSh = m_bFormat ? ::GetActiveWrtShell()
-                        : getFrameDlgParentShell();
-    OSL_ENSURE( pSh , "shell not found");
+
     const SfxItemSet& rOldSet = GetItemSet();
     const SfxPoolItem* pOldItem = nullptr;
 
@@ -1050,8 +1094,14 @@ bool SwFramePage::FillItemSet(SfxItemSet *rSet)
         pOldItem = GetOldItem(*rSet, RES_ANCHOR);
         if (m_bNew || !pOldItem || eAnchorId != static_cast<const SwFormatAnchor*>(pOldItem)->GetAnchorId())
         {
-            SwFormatAnchor aAnc( eAnchorId, pSh->GetPhyPageNum() );
-            bRet = nullptr != rSet->Put( aAnc );
+            SwWrtShell* pSh = m_bFormat ? ::GetActiveWrtShell()
+                                : getFrameDlgParentShell();
+            OSL_ENSURE( pSh , "shell not found");
+            if (pSh)
+            {
+                SwFormatAnchor aAnc( eAnchorId, pSh->GetPhyPageNum() );
+                bRet = nullptr != rSet->Put( aAnc );
+            }
         }
     }
 
@@ -1227,6 +1277,10 @@ bool SwFramePage::FillItemSet(SfxItemSet *rSet)
     {
         bRet |= nullptr != rSet->Put(SwFormatFollowTextFlow(m_xFollowTextFlowCB->get_active()));
     }
+    if (m_xFlySplitCB->get_state_changed_from_saved())
+    {
+        bRet |= rSet->Put(SwFormatFlySplit(m_xFlySplitCB->get_active())) != nullptr;
+    }
     return bRet;
 }
 
@@ -1246,7 +1300,7 @@ void SwFramePage::InitPos(RndStdIds eId,
 
         nPos = m_xVertRelationLB->get_active();
         if (nPos != -1)
-            m_nOldVRel = reinterpret_cast<RelationMap*>(m_xVertRelationLB->get_id(nPos).toInt64())->nRelation;
+            m_nOldVRel = weld::fromId<RelationMap*>(m_xVertRelationLB->get_id(nPos))->nRelation;
     }
 
     nPos = m_xHorizontalDLB->get_active();
@@ -1256,7 +1310,7 @@ void SwFramePage::InitPos(RndStdIds eId,
 
         nPos = m_xHoriRelationLB->get_active();
         if (nPos != -1)
-            m_nOldHRel = reinterpret_cast<RelationMap*>(m_xHoriRelationLB->get_id(nPos).toInt64())->nRelation;
+            m_nOldHRel = weld::fromId<RelationMap*>(m_xHoriRelationLB->get_id(nPos))->nRelation;
     }
 
     bool bEnable = true;
@@ -1403,7 +1457,7 @@ sal_Int32 SwFramePage::FillPosLB(const FrameMap* _pMap,
     if (_rLB.get_active() == -1)
         _rLB.set_active_text(sOldEntry);
 
-    if (_rLB.get_active() == -1)
+    if (_rLB.get_active() == -1 && _rLB.get_count())
         _rLB.set_active(0);
 
     PosHdl(_rLB);
@@ -1447,7 +1501,7 @@ void SwFramePage::FillRelLB(const FrameMap* _pMap,
                                                                 m_bIsVerticalL2R,
                                                                 m_bIsInRightToLeft);
                             const OUString sEntry = SvxSwFramePosString::GetString(sStrId1);
-                            _rLB.append(OUString::number(reinterpret_cast<sal_Int64>(&rCharMap)), sEntry);
+                            _rLB.append(weld::toId(&rCharMap), sEntry);
                             if (_pMap[nMapPos].nAlign == _nAlign)
                                 sSelEntry = sEntry;
                             break;
@@ -1465,7 +1519,7 @@ void SwFramePage::FillRelLB(const FrameMap* _pMap,
                 {
                     for (int i = 0; i < _rLB.get_count(); i++)
                     {
-                        RelationMap *pEntry = reinterpret_cast<RelationMap*>(_rLB.get_id(i).toInt64());
+                        RelationMap *pEntry = weld::fromId<RelationMap*>(_rLB.get_id(i));
                         if (pEntry->nLBRelation == LB::RelChar) // default
                         {
                             _rLB.set_active(i);
@@ -1509,7 +1563,7 @@ void SwFramePage::FillRelLB(const FrameMap* _pMap,
                                                                 m_bIsVerticalL2R,
                                                                 m_bIsInRightToLeft);
                             const OUString sEntry = SvxSwFramePosString::GetString(eStrId1);
-                            _rLB.append(OUString::number(reinterpret_cast<sal_Int64>(&rMap)), sEntry);
+                            _rLB.append(weld::toId(&rMap), sEntry);
                             if (sSelEntry.isEmpty() && rMap.nRelation == _nRel)
                                 sSelEntry = sEntry;
                         }
@@ -1552,7 +1606,7 @@ void SwFramePage::FillRelLB(const FrameMap* _pMap,
                     default:
                         if (_rLB.get_active() != -1)
                         {
-                            RelationMap *pEntry = reinterpret_cast<RelationMap*>(_rLB.get_id(_rLB.get_count() - 1).toInt64());
+                            RelationMap *pEntry = weld::fromId<RelationMap*>(_rLB.get_id(_rLB.get_count() - 1));
                             nSimRel = pEntry->nRelation;
                         }
                         break;
@@ -1560,7 +1614,7 @@ void SwFramePage::FillRelLB(const FrameMap* _pMap,
 
                 for (int i = 0; i < _rLB.get_count(); i++)
                 {
-                    RelationMap *pEntry = reinterpret_cast<RelationMap*>(_rLB.get_id(i).toInt64());
+                    RelationMap *pEntry = weld::fromId<RelationMap*>(_rLB.get_id(i));
                     if (pEntry->nRelation == nSimRel)
                     {
                         _rLB.set_active(i);
@@ -1587,7 +1641,7 @@ sal_Int16 SwFramePage::GetRelation(const weld::ComboBox& rRelationLB)
     const auto nPos = rRelationLB.get_active();
     if (nPos != -1)
     {
-        RelationMap *pEntry = reinterpret_cast<RelationMap *>(rRelationLB.get_id(nPos).toInt64());
+        RelationMap *pEntry = weld::fromId<RelationMap *>(rRelationLB.get_id(nPos));
         return pEntry->nRelation;
     }
 
@@ -1613,8 +1667,8 @@ sal_Int16 SwFramePage::GetAlignment(FrameMap const *pMap, sal_Int32 nMapPos,
     if (rRelationLB.get_active() == -1)
         return 0;
 
-    const RelationMap *const pRelationMap = reinterpret_cast<const RelationMap *>(
-        rRelationLB.get_active_id().toInt64());
+    const RelationMap *const pRelationMap = weld::fromId<const RelationMap*>(
+        rRelationLB.get_active_id());
     const LB nRel = pRelationMap->nLBRelation;
     const SvxSwFramePosString::StringId eStrId = pMap[nMapPos].eStrId;
 
@@ -1695,6 +1749,7 @@ void SwFramePage::ActivatePage(const SfxItemSet& rSet)
     m_xHeightED->LockAutoCalculation(false);
     m_xWidthED->LockAutoCalculation(false);
     m_xFollowTextFlowCB->save_state();
+    m_xFlySplitCB->save_state();
 }
 
 DeactivateRC SwFramePage::DeactivatePage(SfxItemSet * _pSet)
@@ -1709,9 +1764,12 @@ DeactivateRC SwFramePage::DeactivatePage(SfxItemSet * _pSet)
             //the original. But for the other pages we need the current anchor.
             SwWrtShell* pSh = m_bFormat ? ::GetActiveWrtShell()
                                 : getFrameDlgParentShell();
-            RndStdIds eAnchorId = GetAnchor();
-            SwFormatAnchor aAnc( eAnchorId, pSh->GetPhyPageNum() );
-            _pSet->Put( aAnc );
+            if (pSh)
+            {
+                RndStdIds eAnchorId = GetAnchor();
+                SwFormatAnchor aAnc( eAnchorId, pSh->GetPhyPageNum() );
+                _pSet->Put( aAnc );
+            }
         }
     }
 
@@ -1764,6 +1822,9 @@ void SwFramePage::RangeModifyHdl()
     SwWrtShell* pSh = m_bFormat ? ::GetActiveWrtShell()
                         : getFrameDlgParentShell();
     OSL_ENSURE(pSh , "shell not found");
+    if (!pSh)
+        return;
+
     SwFlyFrameAttrMgr aMgr( m_bNew, pSh, GetItemSet() );
     SvxSwFrameValidation        aVal;
 
@@ -1887,6 +1948,7 @@ IMPL_LINK_NOARG(SwFramePage, AnchorTypeHdl, weld::Toggleable&, void)
     m_xFollowTextFlowCB->set_sensitive(m_xAnchorAtParaRB->get_active() ||
                                        m_xAnchorAtCharRB->get_active() ||
                                        m_xAnchorAtFrameRB->get_active());
+    m_xFlySplitCB->set_sensitive(m_xAnchorAtParaRB->get_active());
 
     RndStdIds eId = GetAnchor();
 
@@ -1932,7 +1994,7 @@ IMPL_LINK( SwFramePage, PosHdl, weld::ComboBox&, rLB, void )
     if (rLB.get_active() != -1)
     {
         if (pRelLB->get_active() != -1)
-            nRel = reinterpret_cast<RelationMap*>(pRelLB->get_active_id().toInt64())->nRelation;
+            nRel = weld::fromId<RelationMap*>(pRelLB->get_active_id())->nRelation;
         FillRelLB(pMap, nMapPos, nAlign, nRel, *pRelLB, *pRelFT);
     }
     else
@@ -2193,7 +2255,7 @@ void SwFramePage::Init(const SfxItemSet& rSet)
     m_nLowerBorder = rUL.GetLower();
 
     if (SfxItemState::SET == rSet.GetItemState(FN_KEEP_ASPECT_RATIO))
-        m_xFixedRatioCB->set_active(static_cast<const SfxBoolItem&>(rSet.Get(FN_KEEP_ASPECT_RATIO)).GetValue());
+        m_xFixedRatioCB->set_active(rSet.Get(FN_KEEP_ASPECT_RATIO).GetValue());
 
     // columns
     SwFormatCol aCol( rSet.Get(RES_COL) );
@@ -2345,21 +2407,20 @@ std::unique_ptr<SfxTabPage> SwGrfExtPage::Create(weld::Container* pPage, weld::D
 
 void SwGrfExtPage::Reset(const SfxItemSet *rSet)
 {
-    const SfxPoolItem* pItem;
     const sal_uInt16 nHtmlMode = ::GetHtmlMode(static_cast<const SwDocShell*>(SfxObjectShell::Current()));
     m_bHtmlMode = (nHtmlMode & HTMLMODE_ON) != 0;
 
-    if( SfxItemState::SET == rSet->GetItemState( FN_PARAM_GRF_CONNECT, true, &pItem)
-        && static_cast<const SfxBoolItem *>(pItem)->GetValue() )
+    const SfxBoolItem* pConnectItem = rSet->GetItemIfSet( FN_PARAM_GRF_CONNECT );
+    if( pConnectItem && pConnectItem->GetValue() )
     {
         m_xBrowseBT->set_sensitive(true);
         m_xConnectED->set_editable(true);
     }
 
     // RotGrfFlyFrame: Get RotationAngle and set at control
-    if(SfxItemState::SET == rSet->GetItemState( SID_ATTR_TRANSFORM_ANGLE, false, &pItem))
+    if(const SdrAngleItem* pAngleItem = rSet->GetItemIfSet( SID_ATTR_TRANSFORM_ANGLE, false))
     {
-        m_xCtlAngle->SetRotation(static_cast<const SdrAngleItem*>(pItem)->GetValue());
+        m_xCtlAngle->SetRotation(pAngleItem->GetValue());
     }
     else
     {
@@ -2423,13 +2484,12 @@ void SwGrfExtPage::ActivatePage(const SfxItemSet& rSet)
         }
     }
 
-    if( SfxItemState::SET == rSet.GetItemState( SID_ATTR_GRAF_GRAPHIC, false, &pItem ) )
+    if( const SvxBrushItem* pGraphicBrushItem = rSet.GetItemIfSet( SID_ATTR_GRAF_GRAPHIC, false ) )
     {
-        const SvxBrushItem& rBrush = *static_cast<const SvxBrushItem*>(pItem);
-        if( !rBrush.GetGraphicLink().isEmpty() )
+        if( !pGraphicBrushItem->GetGraphicLink().isEmpty() )
         {
-            aGrfName = aNewGrfName = rBrush.GetGraphicLink();
-            m_xConnectED->set_text(aNewGrfName);
+            m_aGrfName = m_aNewGrfName = pGraphicBrushItem->GetGraphicLink();
+            m_xConnectED->set_text(m_aNewGrfName);
         }
         OUString referer;
         SfxStringItem const * it = static_cast<SfxStringItem const *>(
@@ -2437,7 +2497,7 @@ void SwGrfExtPage::ActivatePage(const SfxItemSet& rSet)
         if (it != nullptr) {
             referer = it->GetValue();
         }
-        const Graphic* pGrf = rBrush.GetGraphic(referer);
+        const Graphic* pGrf = pGraphicBrushItem->GetGraphic(referer);
         if( pGrf )
         {
             m_aBmpWin.SetGraphic( *pGrf );
@@ -2492,18 +2552,18 @@ bool SwGrfExtPage::FillItemSet( SfxItemSet *rSet )
         rSet->Put( aMirror );
     }
 
-    if (aGrfName != aNewGrfName || m_xConnectED->get_value_changed_from_saved())
+    if (m_aGrfName != m_aNewGrfName || m_xConnectED->get_value_changed_from_saved())
     {
         bModified = true;
-        aGrfName = m_xConnectED->get_text();
-        rSet->Put( SvxBrushItem( aGrfName, aFilterName, GPOS_LT,
+        m_aGrfName = m_xConnectED->get_text();
+        rSet->Put( SvxBrushItem( m_aGrfName, m_aFilterName, GPOS_LT,
                                 SID_ATTR_GRAF_GRAPHIC ));
     }
 
     // RotGrfFlyFrame: Safe rotation if modified
     if(m_xCtlAngle->IsValueModified())
     {
-        rSet->Put(SdrAngleItem(GetWhich(SID_ATTR_TRANSFORM_ANGLE), m_xCtlAngle->GetRotation()));
+        rSet->Put(SdrAngleItem(SID_ATTR_TRANSFORM_ANGLE, m_xCtlAngle->GetRotation()));
         bModified = true;
     }
 
@@ -2529,16 +2589,16 @@ IMPL_LINK_NOARG(SwGrfExtPage, BrowseHdl, weld::Button&, void)
     m_xGrfDlg->SetDisplayDirectory(m_xConnectED->get_text());
     uno::Reference < ui::dialogs::XFilePicker3 > xFP = m_xGrfDlg->GetFilePicker();
     uno::Reference < ui::dialogs::XFilePickerControlAccess > xCtrlAcc(xFP, uno::UNO_QUERY);
-    xCtrlAcc->setValue( ui::dialogs::ExtendedFilePickerElementIds::CHECKBOX_LINK, 0, uno::makeAny(true) );
+    xCtrlAcc->setValue( ui::dialogs::ExtendedFilePickerElementIds::CHECKBOX_LINK, 0, uno::Any(true) );
 
     if ( m_xGrfDlg->Execute() != ERRCODE_NONE )
         return;
 
 // remember selected filter
-    aFilterName = m_xGrfDlg->GetCurrentFilter();
-    aNewGrfName = INetURLObject::decode( m_xGrfDlg->GetPath(),
+    m_aFilterName = m_xGrfDlg->GetCurrentFilter();
+    m_aNewGrfName = INetURLObject::decode( m_xGrfDlg->GetPath(),
                                        INetURLObject::DecodeMechanism::Unambiguous );
-    m_xConnectED->set_text(aNewGrfName);
+    m_xConnectED->set_text(m_aNewGrfName);
     //reset mirrors because maybe a Bitmap was swapped with
     //another type of graphic that cannot be mirrored.
     m_xMirrorVertBox->set_active(false);
@@ -2581,9 +2641,9 @@ IMPL_LINK_NOARG(SwGrfExtPage, MirrorHdl, weld::Toggleable&, void)
 
 // example window
 BmpWindow::BmpWindow()
-    : bHorz(false)
-    , bVert(false)
-    , bGraphic(false)
+    : m_bHorz(false)
+    , m_bVert(false)
+    , m_bGraphic(false)
 {
 }
 
@@ -2598,7 +2658,8 @@ void BmpWindow::SetDrawingArea(weld::DrawingArea* pDrawingArea)
 void BmpWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle&)
 {
     // Setup
-    rRenderContext.SetBackground();
+    rRenderContext.SetBackground(Wallpaper(Application::GetSettings().GetStyleSettings().GetDialogColor()));
+    rRenderContext.Erase();
     // #i119307# the graphic might have transparency, set up white as the color
     // to use when drawing a rectangle under the image
     rRenderContext.SetLineColor(COL_WHITE);
@@ -2608,11 +2669,11 @@ void BmpWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle
     Point aPntPos;
     Size aPntSz(GetOutputSizePixel());
     Size aGrfSize;
-    if (bGraphic)
-        aGrfSize = ::GetGraphicSizeTwip(aGraphic, &rRenderContext);
+    if (m_bGraphic)
+        aGrfSize = ::GetGraphicSizeTwip(m_aGraphic, &rRenderContext);
     //it should show the default bitmap also if no graphic can be found
     if (!aGrfSize.Width() && !aGrfSize.Height())
-        aGrfSize = rRenderContext.PixelToLogic(aBmp.GetSizePixel());
+        aGrfSize = rRenderContext.PixelToLogic(m_aBmp.GetSizePixel());
 
     tools::Long nRelGrf = aGrfSize.Width() * 100 / aGrfSize.Height();
     tools::Long nRelWin = aPntSz.Width() * 100 / aPntSz.Height();
@@ -2620,7 +2681,7 @@ void BmpWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle
     {
         const tools::Long nWidth = aPntSz.Width();
         // if we use a replacement preview, try to draw at original size
-        if (!bGraphic && (aGrfSize.Width() <= aPntSz.Width())
+        if (!m_bGraphic && (aGrfSize.Width() <= aPntSz.Width())
                       && (aGrfSize.Height() <= aPntSz.Height()))
         {
             const tools::Long nHeight = aPntSz.Height();
@@ -2637,24 +2698,24 @@ void BmpWindow::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle
     // #i119307# clear window background, the graphic might have transparency
     rRenderContext.DrawRect(tools::Rectangle(aPntPos, aPntSz));
 
-    if (bHorz || bVert)
+    if (m_bHorz || m_bVert)
     {
-        BitmapEx aTmpBmp(bGraphic ? aGraphic.GetBitmapEx() : aBmp);
+        BitmapEx aTmpBmp(m_bGraphic ? m_aGraphic.GetBitmapEx() : m_aBmp);
         BmpMirrorFlags nMirrorFlags(BmpMirrorFlags::NONE);
-        if (bHorz)
+        if (m_bHorz)
             nMirrorFlags |= BmpMirrorFlags::Vertical;
-        if (bVert)
+        if (m_bVert)
             nMirrorFlags |= BmpMirrorFlags::Horizontal;
         aTmpBmp.Mirror(nMirrorFlags);
         rRenderContext.DrawBitmapEx(aPntPos, aPntSz, aTmpBmp);
     }
-    else if (bGraphic)  //draw unmirrored preview graphic
+    else if (m_bGraphic)  //draw unmirrored preview graphic
     {
-        aGraphic.Draw(rRenderContext, aPntPos, aPntSz);
+        m_aGraphic.Draw(rRenderContext, aPntPos, aPntSz);
     }
     else    //draw unmirrored stock sample image
     {
-        rRenderContext.DrawBitmapEx(aPntPos, aPntSz, aBmp);
+        rRenderContext.DrawBitmapEx(aPntPos, aPntSz, m_aBmp);
     }
 }
 
@@ -2664,15 +2725,15 @@ BmpWindow::~BmpWindow()
 
 void BmpWindow::SetGraphic(const Graphic& rGraphic)
 {
-    aGraphic = rGraphic;
-    Size aSize = aGraphic.GetPrefSize();
-    bGraphic = aSize.Width() && aSize.Height();
+    m_aGraphic = rGraphic;
+    Size aSize = m_aGraphic.GetPrefSize();
+    m_bGraphic = aSize.Width() && aSize.Height();
     Invalidate();
 }
 
 void BmpWindow::SetBitmapEx(const BitmapEx& rBmp)
 {
-    aBmp = rBmp;
+    m_aBmp = rBmp;
     Invalidate();
 }
 
@@ -2695,8 +2756,7 @@ SwFrameURLPage::~SwFrameURLPage()
 
 void SwFrameURLPage::Reset( const SfxItemSet *rSet )
 {
-    const SfxPoolItem* pItem;
-    if ( SfxItemState::SET == rSet->GetItemState( SID_DOCFRAME, true, &pItem))
+    if ( SfxItemState::SET == rSet->GetItemState( SID_DOCFRAME ))
     {
         TargetList aList;
         SfxFrame::GetDefaultTargetList(aList);
@@ -2707,9 +2767,8 @@ void SwFrameURLPage::Reset( const SfxItemSet *rSet )
         }
     }
 
-    if ( SfxItemState::SET == rSet->GetItemState( RES_URL, true, &pItem ) )
+    if ( const SwFormatURL* pFormatURL = rSet->GetItemIfSet( RES_URL ) )
     {
-        const SwFormatURL* pFormatURL = static_cast<const SwFormatURL*>(pItem);
         m_xURLED->set_text(INetURLObject::decode(pFormatURL->GetURL(),
                                            INetURLObject::DecodeMechanism::Unambiguous));
         m_xNameED->set_text(pFormatURL->GetName());
@@ -2762,7 +2821,7 @@ bool SwFrameURLPage::FillItemSet(SfxItemSet *rSet)
         pFormatURL->SetTargetFrameName(m_xFrameCB->get_active_text());
         bModified = true;
     }
-    rSet->Put(*pFormatURL);
+    rSet->Put(std::move(pFormatURL));
     return bModified;
 }
 
@@ -2801,11 +2860,10 @@ SwFrameAddPage::SwFrameAddPage(weld::Container* pPage, weld::DialogController* p
     , m_xNameED(m_xBuilder->weld_entry("name"))
     , m_xAltNameFT(m_xBuilder->weld_label("altname_label"))
     , m_xAltNameED(m_xBuilder->weld_entry("altname"))
-    , m_xDescriptionFT(m_xBuilder->weld_label("description_label"))
     , m_xDescriptionED(m_xBuilder->weld_text_view("description"))
-    , m_xPrevFT(m_xBuilder->weld_label("prev_label"))
+    , m_xDecorativeCB(m_xBuilder->weld_check_button("decorative"))
+    , m_xSequenceFrame(m_xBuilder->weld_widget("frmSequence"))
     , m_xPrevLB(m_xBuilder->weld_combo_box("prev"))
-    , m_xNextFT(m_xBuilder->weld_label("next_label"))
     , m_xNextLB(m_xBuilder->weld_combo_box("next"))
     , m_xProtectFrame(m_xBuilder->weld_widget("protect"))
     , m_xProtectContentCB(m_xBuilder->weld_check_button("protectcontent"))
@@ -2840,7 +2898,6 @@ std::unique_ptr<SfxTabPage> SwFrameAddPage::Create(weld::Container* pPage, weld:
 
 void SwFrameAddPage::Reset(const SfxItemSet *rSet )
 {
-    const SfxPoolItem* pItem;
     sal_uInt16 nHtmlMode = ::GetHtmlMode(static_cast<const SwDocShell*>(SfxObjectShell::Current()));
     m_bHtmlMode = (nHtmlMode & HTMLMODE_ON) != 0;
     if (m_bHtmlMode)
@@ -2851,6 +2908,7 @@ void SwFrameAddPage::Reset(const SfxItemSet *rSet )
     }
     if (m_sDlgType == "PictureDialog" || m_sDlgType == "ObjectDialog")
     {
+        m_xSequenceFrame->hide();
         m_xEditInReadonlyCB->hide();
         if (m_bHtmlMode)
         {
@@ -2859,15 +2917,15 @@ void SwFrameAddPage::Reset(const SfxItemSet *rSet )
         m_xContentAlignFrame->hide();
     }
 
-    if(SfxItemState::SET == rSet->GetItemState(FN_SET_FRM_ALT_NAME, false, &pItem))
+    if(const SfxStringItem* pNameItem = rSet->GetItemIfSet(FN_SET_FRM_ALT_NAME, false))
     {
-        m_xAltNameED->set_text(static_cast<const SfxStringItem*>(pItem)->GetValue());
+        m_xAltNameED->set_text(pNameItem->GetValue());
         m_xAltNameED->save_value();
     }
 
-    if(SfxItemState::SET == rSet->GetItemState(FN_UNO_DESCRIPTION, false, &pItem))
+    if(const SfxStringItem* pDescriptionItem = rSet->GetItemIfSet(FN_UNO_DESCRIPTION, false))
     {
-        m_xDescriptionED->set_text(static_cast<const SfxStringItem*>(pItem)->GetValue());
+        m_xDescriptionED->set_text(pDescriptionItem->GetValue());
         m_xDescriptionED->save_value();
     }
 
@@ -2876,9 +2934,9 @@ void SwFrameAddPage::Reset(const SfxItemSet *rSet )
         // insert graphic - properties
         // bNew is not set, so recognise by selection
         OUString aTmpName1;
-        if(SfxItemState::SET == rSet->GetItemState(FN_SET_FRM_NAME, false, &pItem))
+        if(const SfxStringItem* pNameItem = rSet->GetItemIfSet(FN_SET_FRM_NAME, false))
         {
-            aTmpName1 = static_cast<const SfxStringItem*>(pItem)->GetValue();
+            aTmpName1 = pNameItem->GetValue();
         }
 
         OSL_ENSURE(m_pWrtSh, "no Shell?");
@@ -2990,6 +3048,10 @@ void SwFrameAddPage::Reset(const SfxItemSet *rSet )
     m_xPrintFrameCB->set_active(rPrt.GetValue());
     m_xPrintFrameCB->save_state();
 
+    SfxBoolItem const& rDecorative = rSet->Get(RES_DECORATIVE);
+    m_xDecorativeCB->set_active(rDecorative.GetValue());
+    m_xDecorativeCB->save_state();
+
     // textflow
     if( (!m_bHtmlMode || (0 != (nHtmlMode&HTMLMODE_SOME_STYLES)))
         && m_sDlgType != "PictureDialog" && m_sDlgType != "ObjectDialog"
@@ -3054,6 +3116,11 @@ bool SwFrameAddPage::FillItemSet(SfxItemSet *rSet)
 
     if ( m_xPrintFrameCB->get_state_changed_from_saved() )
         bRet |= nullptr != rSet->Put( SvxPrintItem( RES_PRINT, m_xPrintFrameCB->get_active()));
+
+    if (m_xDecorativeCB->get_state_changed_from_saved())
+    {
+        bRet |= nullptr != rSet->Put(SfxBoolItem(RES_DECORATIVE, m_xDecorativeCB->get_active()));
+    }
 
     // textflow
     if (m_xTextFlowLB->get_visible() && m_xTextFlowLB->get_value_changed_from_saved())

@@ -18,9 +18,11 @@
  */
 
 #include <RegressionCurveHelper.hxx>
+#include <RegressionCurveModel.hxx>
 #include <RegressionCurveItemConverter.hxx>
 #include "SchWhichPairs.hxx"
 #include <GraphicPropertyItemConverter.hxx>
+#include <DataSeries.hxx>
 
 #include <com/sun/star/chart2/XRegressionCurve.hpp>
 #include <osl/diagnose.h>
@@ -28,6 +30,7 @@
 #include <svl/eitem.hxx>
 #include <svl/intitem.hxx>
 #include <svl/stritem.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -65,12 +68,12 @@ void lclConvertToItemSet(SfxItemSet& rItemSet, sal_uInt16 nWhichId, const uno::R
     }
 }
 
-void lclConvertToItemSetDouble(SfxItemSet& rItemSet, sal_uInt16 nWhichId, const uno::Reference<beans::XPropertySet>& xProperties, const OUString& aPropertyID)
+void lclConvertToItemSetDouble(SfxItemSet& rItemSet, TypedWhichId<SvxDoubleItem> nWhichId, const uno::Reference<beans::XPropertySet>& xProperties, const OUString& aPropertyID)
 {
     OSL_ASSERT(xProperties.is());
     if( xProperties.is() )
     {
-        double aValue = static_cast<const SvxDoubleItem&>(rItemSet.Get( nWhichId )).GetValue();
+        double aValue = rItemSet.Get( nWhichId ).GetValue();
         if(xProperties->getPropertyValue( aPropertyID ) >>= aValue)
         {
             rItemSet.Put(SvxDoubleItem( aValue, nWhichId ));
@@ -85,7 +88,7 @@ namespace chart::wrapper
 
 RegressionCurveItemConverter::RegressionCurveItemConverter(
     const uno::Reference< beans::XPropertySet >& rPropertySet,
-    const uno::Reference< chart2::XRegressionCurveContainer >& xContainer,
+    rtl::Reference< DataSeries > xContainer,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
     const uno::Reference< lang::XMultiServiceFactory > & xNamedPropertyContainerFactory ) :
@@ -94,7 +97,7 @@ RegressionCurveItemConverter::RegressionCurveItemConverter(
                                   rPropertySet, rItemPool, rDrawModel,
                                   xNamedPropertyContainerFactory,
                                   GraphicObjectType::LineProperties )),
-        m_xCurveContainer( xContainer )
+        m_xCurveContainer(std::move( xContainer ))
 {}
 
 RegressionCurveItemConverter::~RegressionCurveItemConverter()
@@ -283,13 +286,13 @@ void RegressionCurveItemConverter::FillSpecialItem(sal_uInt16 nWhichId, SfxItemS
 
         case SCHATTR_REGRESSION_EXTRAPOLATE_FORWARD:
         {
-            lclConvertToItemSetDouble(rOutItemSet, nWhichId, xProperties, "ExtrapolateForward");
+            lclConvertToItemSetDouble(rOutItemSet, SCHATTR_REGRESSION_EXTRAPOLATE_FORWARD, xProperties, "ExtrapolateForward");
         }
         break;
 
         case SCHATTR_REGRESSION_EXTRAPOLATE_BACKWARD:
         {
-            lclConvertToItemSetDouble(rOutItemSet, nWhichId, xProperties, "ExtrapolateBackward");
+            lclConvertToItemSetDouble(rOutItemSet, SCHATTR_REGRESSION_EXTRAPOLATE_BACKWARD, xProperties, "ExtrapolateBackward");
         }
         break;
 
@@ -301,7 +304,7 @@ void RegressionCurveItemConverter::FillSpecialItem(sal_uInt16 nWhichId, SfxItemS
 
         case SCHATTR_REGRESSION_INTERCEPT_VALUE:
         {
-            lclConvertToItemSetDouble(rOutItemSet, nWhichId, xProperties, "InterceptValue");
+            lclConvertToItemSetDouble(rOutItemSet, SCHATTR_REGRESSION_INTERCEPT_VALUE, xProperties, "InterceptValue");
         }
         break;
 

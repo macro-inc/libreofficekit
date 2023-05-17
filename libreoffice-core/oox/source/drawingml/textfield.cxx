@@ -36,7 +36,7 @@
 #include <oox/core/xmlfilterbase.hxx>
 #include <drawingml/textparagraphproperties.hxx>
 #include <drawingml/textcharacterproperties.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <editeng/flditem.hxx>
 
 using namespace ::com::sun::star;
@@ -67,11 +67,10 @@ void lclCreateTextFields( std::vector< Reference< XTextField > > & aFields,
     Reference< XMultiServiceFactory > xFactory( xModel, UNO_QUERY_THROW );
     if( o3tl::starts_with(sType, u"datetime"))
     {
-        OString s = OUStringToOString( sType, RTL_TEXTENCODING_UTF8);
-        OString p( s.pData->buffer + 8 );
+        auto p = sType.substr(8);
         try
         {
-            if(p.startsWith("'"))
+            if (o3tl::starts_with(p, u"'"))
             {
                 xIface = xFactory->createInstance( "com.sun.star.text.TextField.Custom" );
                 aFields.emplace_back( xIface, UNO_QUERY );
@@ -122,9 +121,7 @@ void lclCreateTextFields( std::vector< Reference< XTextField > > & aFields,
     }
     else if ( o3tl::starts_with(sType, u"file") )
     {
-        OString s = OUStringToOString( sType, RTL_TEXTENCODING_UTF8);
-        OString p( s.pData->buffer + 4 );
-        int idx = p.toInt32();
+        int idx = o3tl::toInt32(sType.substr(4));
         xIface = xFactory->createInstance( "com.sun.star.text.TextField.FileName" );
         aFields.emplace_back( xIface, UNO_QUERY );
         Reference< XPropertySet > xProps( xIface, UNO_QUERY_THROW );
@@ -132,16 +129,16 @@ void lclCreateTextFields( std::vector< Reference< XTextField > > & aFields,
         switch( idx )
         {
             case 1: // Path
-                xProps->setPropertyValue("FileFormat", makeAny<sal_Int16>(1));
+                xProps->setPropertyValue("FileFormat", Any(sal_Int16(1)));
                 break;
             case 2: // File name without extension
-                xProps->setPropertyValue("FileFormat", makeAny<sal_Int16>(2));
+                xProps->setPropertyValue("FileFormat", Any(sal_Int16(2)));
                 break;
             case 3: // File name with extension
-                xProps->setPropertyValue("FileFormat", makeAny<sal_Int16>(3));
+                xProps->setPropertyValue("FileFormat", Any(sal_Int16(3)));
                 break;
             default: // Path/File name
-                xProps->setPropertyValue("FileFormat", makeAny<sal_Int16>(0));
+                xProps->setPropertyValue("FileFormat", Any(sal_Int16(0)));
         }
     }
     else if( sType == u"author" )
@@ -172,8 +169,8 @@ sal_Int32 TextField::insertAt(
         TextCharacterProperties aTextCharacterProps( rTextCharacterStyle );
         aTextCharacterProps.assignUsed( maTextParagraphProperties.getTextCharacterProperties() );
         aTextCharacterProps.assignUsed( getTextCharacterProperties() );
-        if ( aTextCharacterProps.moHeight.has() )
-            nCharHeight = aTextCharacterProps.moHeight.get();
+        if ( aTextCharacterProps.moHeight.has_value() )
+            nCharHeight = aTextCharacterProps.moHeight.value();
         aTextCharacterProps.pushToPropSet( aPropSet, rFilterBase );
 
         std::vector< Reference< XTextField > > fields;
@@ -213,12 +210,12 @@ sal_Int32 TextField::insertAt(
 
 SvxDateFormat TextField::getLODateFormat(std::u16string_view rDateTimeType)
 {
-    OString aDateTimeNum = OUStringToOString(rDateTimeType.substr(8), RTL_TEXTENCODING_UTF8);
+    auto aDateTimeNum = rDateTimeType.substr(8);
 
-    if( aDateTimeNum.isEmpty() ) // "datetime"
+    if( aDateTimeNum.empty() ) // "datetime"
         return SvxDateFormat::StdSmall;
 
-    int nDateTimeNum = aDateTimeNum.toInt32();
+    int nDateTimeNum = o3tl::toInt32(aDateTimeNum);
 
     switch( nDateTimeNum )
     {
@@ -246,8 +243,8 @@ SvxDateFormat TextField::getLODateFormat(std::u16string_view rDateTimeType)
 
 SvxTimeFormat TextField::getLOTimeFormat(std::u16string_view rDateTimeType)
 {
-    OString aDateTimeNum = OUStringToOString(rDateTimeType.substr(8), RTL_TEXTENCODING_UTF8);
-    int nDateTimeNum = aDateTimeNum.toInt32();
+    auto aDateTimeNum = rDateTimeType.substr(8);
+    int nDateTimeNum = o3tl::toInt32(aDateTimeNum);
 
     switch( nDateTimeNum )
     {

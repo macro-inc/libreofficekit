@@ -24,18 +24,20 @@
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <drawinglayer/attribute/lineattribute.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
+#include <osl/diagnose.h>
 #include <rtl/ustrbuf.hxx>
+#include <utility>
 
 
 namespace drawinglayer::primitive2d
 {
         BaseTextStrikeoutPrimitive2D::BaseTextStrikeoutPrimitive2D(
-            const basegfx::B2DHomMatrix& rObjectTransformation,
+            basegfx::B2DHomMatrix aObjectTransformation,
             double fWidth,
             const basegfx::BColor& rFontColor)
-        :   maObjectTransformation(rObjectTransformation),
+        :   maObjectTransformation(std::move(aObjectTransformation)),
             mfWidth(fWidth),
             maFontColor(rFontColor)
         {
@@ -95,6 +97,7 @@ namespace drawinglayer::primitive2d
                     0,
                     len,
                     std::move(aDXArray),
+                    {},
                     getFontAttribute(),
                     getLocale(),
                     getFontColor()));
@@ -105,12 +108,12 @@ namespace drawinglayer::primitive2d
             double fWidth,
             const basegfx::BColor& rFontColor,
             sal_Unicode aStrikeoutChar,
-            const attribute::FontAttribute& rFontAttribute,
-            const css::lang::Locale& rLocale)
+            attribute::FontAttribute aFontAttribute,
+            css::lang::Locale aLocale)
         :   BaseTextStrikeoutPrimitive2D(rObjectTransformation, fWidth, rFontColor),
             maStrikeoutChar(aStrikeoutChar),
-            maFontAttribute(rFontAttribute),
-            maLocale(rLocale)
+            maFontAttribute(std::move(aFontAttribute)),
+            maLocale(std::move(aLocale))
         {
         }
 
@@ -189,7 +192,7 @@ namespace drawinglayer::primitive2d
             // add primitive
             const attribute::LineAttribute aLineAttribute(getFontColor(), fStrikeoutHeight, basegfx::B2DLineJoin::NONE);
             Primitive2DContainer xRetval(1);
-            xRetval[0] = new PolygonStrokePrimitive2D(aStrikeoutLine, aLineAttribute);
+            xRetval[0] = new PolygonStrokePrimitive2D(std::move(aStrikeoutLine), aLineAttribute);
 
             if(bDoubleLine)
             {
@@ -216,7 +219,7 @@ namespace drawinglayer::primitive2d
                             Primitive2DContainer(xRetval)));
             }
 
-            rContainer.insert(rContainer.end(), xRetval.begin(), xRetval.end());
+            rContainer.append(std::move(xRetval));
         }
 
         TextGeometryStrikeoutPrimitive2D::TextGeometryStrikeoutPrimitive2D(

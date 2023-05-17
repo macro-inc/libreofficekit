@@ -31,6 +31,7 @@
 #include <com/sun/star/drawing/TextVerticalAdjust.hpp>
 #include <swtypes.hxx>
 #include <fldbas.hxx>
+#include <utility>
 
 class Point;
 class SvxCaseMapItem;
@@ -274,7 +275,7 @@ public:
 
     /// Start of a style in the styles table.
     virtual void StartStyle( const OUString& rName, StyleType eType,
-            sal_uInt16 nBase, sal_uInt16 nNext, sal_uInt16 nLink, sal_uInt16 nWwId, sal_uInt16 nId,
+            sal_uInt16 nBase, sal_uInt16 nNext, sal_uInt16 nLink, sal_uInt16 nWwId, sal_uInt16 nSlot,
             bool bAutoUpdate ) = 0;
 
     /// End of a style in the styles table.
@@ -646,8 +647,8 @@ protected:
     virtual void SectionRtlGutter(const SfxBoolItem& rRtlGutter) = 0;
 
 public:
-    AttributeOutputBase(const OUString& sBaseURL)
-        : m_sBaseURL(sBaseURL)
+    AttributeOutputBase(OUString sBaseURL)
+        : m_sBaseURL(std::move(sBaseURL))
     {
     }
     virtual ~AttributeOutputBase() {}

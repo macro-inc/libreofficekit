@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "Resource.h"       // main symbols
 #include <map>
+#include <string_view>
 #include <com/sun/star/accessibility/XAccessible.hpp>
 #include <com/sun/star/accessibility/XAccessibleSelection.hpp>
 #include <com/sun/star/accessibility/XAccessibleAction.hpp>
@@ -140,7 +141,6 @@ public:
     STDMETHOD(IncreaseState)(DWORD pXSate) override;
     STDMETHOD(SetState)(DWORD pXSate) override;
     STDMETHOD(Put_XAccValue)(const OLECHAR __RPC_FAR *pszAccValue) override;
-    STDMETHOD(Put_XAccLocation)(const Location sLocation) override;
     STDMETHOD(Put_XAccFocus)(long dChildID) override;
     STDMETHOD(Put_XAccParent)(IMAccessible __RPC_FAR *pIParent) override;
     STDMETHOD(Put_XAccWindowHandle)(HWND hwnd) override;
@@ -159,7 +159,6 @@ private:
     unsigned short m_iRole;
     DWORD   m_dState;
     IMAccessible* m_pIParent;
-    Location m_sLocation;
 
     // identify a COM object/Acc object uniquely
     long m_dChildID;
@@ -193,23 +192,13 @@ private:
     HRESULT GetNextSibling(VARIANT varStart,VARIANT* pvarEndUpAt);//for accNavigate implementation
     HRESULT GetPreSibling(VARIANT varStart,VARIANT* pvarEndUpAt);//for accNavigate implementation
 
-    // the following private methods are used to implement accSelect method
-    HRESULT SelectChild(css::accessibility::XAccessible* pItem);
-    HRESULT DeSelectChild(css::accessibility::XAccessible* pItem);
-    HRESULT SelectMultipleChidren(css::accessibility::XAccessible** pItem,
-                int size);
-    HRESULT DeSelectMultipleChildren(css::accessibility::XAccessible** pItem,
-                int size);
     static css::accessibility::XAccessibleContext* GetContextByXAcc(
             css::accessibility::XAccessible* pXAcc);
-    css::uno::Reference<css::accessibility::XAccessibleSelection> GetSelection();
-    // end accSelect implementation methods
     static bool GetXInterfaceFromXAccessible(css::accessibility::XAccessible*,
             css::uno::XInterface**, XInterfaceType);
     HRESULT WINAPI SmartQI(void* pv, REFIID iid, void** ppvObject);
 
 public:
-    STDMETHOD(Get_XAccChildID)(/*[out,retval]*/ long* childID) override;
     // AccObjectManagerAgent is a management object in UNO, here keep its pointer for
     // the implementation of accNavigate when descendant manage happens for List,Tree, or Table
     // AccObjectManagerAgent and the following UNO objects XAccessible,XAccessibleSelection,
@@ -230,7 +219,7 @@ public:
     static OUString get_StringFromAny(css::uno::Any const & pAny);
 
     static OUString get_String4Numbering(const css::uno::Any& pAny,
-            sal_Int16 numberingLevel, const OUString& numberingPrefix);
+            sal_Int16 numberingLevel, std::u16string_view numberingPrefix);
 
     // Helper function for data conversion.
     static void ConvertAnyToVariant(const css::uno::Any &rAnyVal,

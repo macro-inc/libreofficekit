@@ -63,6 +63,7 @@
 
 #include <rtl/ref.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <algorithm>
 
@@ -482,7 +483,7 @@ void LayoutManager::implts_toggleFloatingUIElementsVisibility( bool bActive )
         pToolbarManager->setFloatingToolbarsVisibility( bActive );
 }
 
-uno::Reference< ui::XUIElement > LayoutManager::implts_findElement( const OUString& aName )
+uno::Reference< ui::XUIElement > LayoutManager::implts_findElement( std::u16string_view aName )
 {
     OUString aElementType;
     OUString aElementName;
@@ -513,130 +514,130 @@ bool LayoutManager::readWindowStateData( const OUString& aName, UIElement& rElem
         std::unique_ptr<GlobalSettings> &rGlobalSettings, bool &bInGlobalSettings,
         const Reference< XComponentContext > &rComponentContext )
 {
-    if ( rPersistentWindowState.is() )
+    if ( !rPersistentWindowState.is() )
+        return false;
+
+    bool bGetSettingsState( false );
+
+    SolarMutexClearableGuard aWriteLock;
+    bool bGlobalSettings( bInGlobalSettings );
+    if ( rGlobalSettings == nullptr )
     {
-        bool bGetSettingsState( false );
+        rGlobalSettings.reset( new GlobalSettings( rComponentContext ) );
+        bGetSettingsState = true;
+    }
+    GlobalSettings* pGlobalSettings = rGlobalSettings.get();
+    aWriteLock.clear();
 
-        SolarMutexClearableGuard aWriteLock;
-        bool bGlobalSettings( bInGlobalSettings );
-        if ( rGlobalSettings == nullptr )
+    try
+    {
+        Sequence< PropertyValue > aWindowState;
+        if ( rPersistentWindowState->hasByName( aName ) && (rPersistentWindowState->getByName( aName ) >>= aWindowState) )
         {
-            rGlobalSettings.reset( new GlobalSettings( rComponentContext ) );
-            bGetSettingsState = true;
-        }
-        GlobalSettings* pGlobalSettings = rGlobalSettings.get();
-        aWriteLock.clear();
-
-        try
-        {
-            Sequence< PropertyValue > aWindowState;
-            if ( rPersistentWindowState->hasByName( aName ) && (rPersistentWindowState->getByName( aName ) >>= aWindowState) )
+            bool bValue( false );
+            for ( PropertyValue const & rProp : std::as_const(aWindowState) )
             {
-                bool bValue( false );
-                for ( PropertyValue const & rProp : std::as_const(aWindowState) )
+                if ( rProp.Name == WINDOWSTATE_PROPERTY_DOCKED )
                 {
-                    if ( rProp.Name == WINDOWSTATE_PROPERTY_DOCKED )
+                    if ( rProp.Value >>= bValue )
+                        rElementData.m_bFloating = !bValue;
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_VISIBLE )
+                {
+                    if ( rProp.Value >>= bValue )
+                        rElementData.m_bVisible = bValue;
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_DOCKINGAREA )
+                {
+                    ui::DockingArea eDockingArea;
+                    if ( rProp.Value >>= eDockingArea )
+                        rElementData.m_aDockedData.m_nDockedArea = eDockingArea;
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_DOCKPOS )
+                {
+                    awt::Point aPoint;
+                    if (rProp.Value >>= aPoint)
                     {
-                        if ( rProp.Value >>= bValue )
-                            rElementData.m_bFloating = !bValue;
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_VISIBLE )
-                    {
-                        if ( rProp.Value >>= bValue )
-                            rElementData.m_bVisible = bValue;
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_DOCKINGAREA )
-                    {
-                        ui::DockingArea eDockingArea;
-                        if ( rProp.Value >>= eDockingArea )
-                            rElementData.m_aDockedData.m_nDockedArea = eDockingArea;
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_DOCKPOS )
-                    {
-                        awt::Point aPoint;
-                        if (rProp.Value >>= aPoint)
-                        {
-                            //tdf#90256 repair these broken Docking positions
-                            if (aPoint.X < 0)
-                                aPoint.X = SAL_MAX_INT32;
-                            if (aPoint.Y < 0)
-                                aPoint.Y = SAL_MAX_INT32;
-                            rElementData.m_aDockedData.m_aPos = aPoint;
-                        }
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_POS )
-                    {
-                        awt::Point aPoint;
-                        if ( rProp.Value >>= aPoint )
-                            rElementData.m_aFloatingData.m_aPos = aPoint;
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_SIZE )
-                    {
-                        awt::Size aSize;
-                        if ( rProp.Value >>= aSize )
-                            rElementData.m_aFloatingData.m_aSize = aSize;
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_UINAME )
-                        rProp.Value >>= rElementData.m_aUIName;
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_STYLE )
-                    {
-                        sal_Int32 nStyle = 0;
-                        if ( rProp.Value >>= nStyle )
-                            rElementData.m_nStyle = static_cast<ButtonType>( nStyle );
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_LOCKED )
-                    {
-                        if ( rProp.Value >>= bValue )
-                            rElementData.m_aDockedData.m_bLocked = bValue;
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_CONTEXT )
-                    {
-                        if ( rProp.Value >>= bValue )
-                            rElementData.m_bContextSensitive = bValue;
-                    }
-                    else if ( rProp.Name == WINDOWSTATE_PROPERTY_NOCLOSE )
-                    {
-                        if ( rProp.Value >>= bValue )
-                            rElementData.m_bNoClose = bValue;
+                        //tdf#90256 repair these broken Docking positions
+                        if (aPoint.X < 0)
+                            aPoint.X = SAL_MAX_INT32;
+                        if (aPoint.Y < 0)
+                            aPoint.Y = SAL_MAX_INT32;
+                        rElementData.m_aDockedData.m_aPos = aPoint;
                     }
                 }
-            }
-
-            // oversteer values with global settings
-            if (bGetSettingsState || bGlobalSettings)
-            {
-                if ( pGlobalSettings->HasToolbarStatesInfo())
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_POS )
                 {
-                    {
-                        SolarMutexGuard aWriteLock2;
-                        bInGlobalSettings = true;
-                    }
-
-                    uno::Any aValue;
-                    if ( pGlobalSettings->GetToolbarStateInfo(
-                                                        GlobalSettings::STATEINFO_LOCKED,
-                                                        aValue ))
-                        aValue >>= rElementData.m_aDockedData.m_bLocked;
-                    if ( pGlobalSettings->GetToolbarStateInfo(
-                                                        GlobalSettings::STATEINFO_DOCKED,
-                                                        aValue ))
-                    {
-                        bool bValue;
-                        if ( aValue >>= bValue )
-                            rElementData.m_bFloating = !bValue;
-                    }
+                    awt::Point aPoint;
+                    if ( rProp.Value >>= aPoint )
+                        rElementData.m_aFloatingData.m_aPos = aPoint;
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_SIZE )
+                {
+                    awt::Size aSize;
+                    if ( rProp.Value >>= aSize )
+                        rElementData.m_aFloatingData.m_aSize = aSize;
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_UINAME )
+                    rProp.Value >>= rElementData.m_aUIName;
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_STYLE )
+                {
+                    sal_Int32 nStyle = 0;
+                    if ( rProp.Value >>= nStyle )
+                        rElementData.m_nStyle = static_cast<ButtonType>( nStyle );
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_LOCKED )
+                {
+                    if ( rProp.Value >>= bValue )
+                        rElementData.m_aDockedData.m_bLocked = bValue;
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_CONTEXT )
+                {
+                    if ( rProp.Value >>= bValue )
+                        rElementData.m_bContextSensitive = bValue;
+                }
+                else if ( rProp.Name == WINDOWSTATE_PROPERTY_NOCLOSE )
+                {
+                    if ( rProp.Value >>= bValue )
+                        rElementData.m_bNoClose = bValue;
                 }
             }
-
-            const bool bDockingSupportCrippled = !StyleSettings::GetDockingFloatsSupported();
-            if (bDockingSupportCrippled)
-                rElementData.m_bFloating = false;
-
-            return true;
         }
-        catch (const NoSuchElementException&)
+
+        // oversteer values with global settings
+        if (bGetSettingsState || bGlobalSettings)
         {
+            if ( pGlobalSettings->HasToolbarStatesInfo())
+            {
+                {
+                    SolarMutexGuard aWriteLock2;
+                    bInGlobalSettings = true;
+                }
+
+                uno::Any aValue;
+                if ( pGlobalSettings->GetToolbarStateInfo(
+                                                    GlobalSettings::STATEINFO_LOCKED,
+                                                    aValue ))
+                    aValue >>= rElementData.m_aDockedData.m_bLocked;
+                if ( pGlobalSettings->GetToolbarStateInfo(
+                                                    GlobalSettings::STATEINFO_DOCKED,
+                                                    aValue ))
+                {
+                    bool bValue;
+                    if ( aValue >>= bValue )
+                        rElementData.m_bFloating = !bValue;
+                }
+            }
         }
+
+        const bool bDockingSupportCrippled = !StyleSettings::GetDockingFloatsSupported();
+        if (bDockingSupportCrippled)
+            rElementData.m_bFloating = false;
+
+        return true;
+    }
+    catch (const NoSuchElementException&)
+    {
     }
 
     return false;
@@ -692,12 +693,12 @@ void LayoutManager::implts_writeWindowStateData( const OUString& aName, const UI
         if ( xPersistentWindowState->hasByName( aName ))
         {
             Reference< XNameReplace > xReplace( xPersistentWindowState, uno::UNO_QUERY );
-            xReplace->replaceByName( aName, makeAny( aWindowState ));
+            xReplace->replaceByName( aName, Any( aWindowState ));
         }
         else
         {
             Reference< XNameContainer > xInsert( xPersistentWindowState, uno::UNO_QUERY );
-            xInsert->insertByName( aName, makeAny( aWindowState ));
+            xInsert->insertByName( aName, Any( aWindowState ));
         }
     }
     catch (const Exception&)
@@ -1480,7 +1481,7 @@ void SAL_CALL LayoutManager::createElement( const OUString& aName )
     if ( bNotify )
     {
         // UI element is invisible - provide information to listeners
-        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_VISIBLE, uno::makeAny( aName ) );
+        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_VISIBLE, uno::Any( aName ) );
     }
 }
 
@@ -1550,7 +1551,7 @@ void SAL_CALL LayoutManager::destroyElement( const OUString& aName )
         doLayout();
 
     if ( bNotify )
-        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_INVISIBLE, uno::makeAny( aName ) );
+        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_INVISIBLE, uno::Any( aName ) );
 }
 
 sal_Bool SAL_CALL LayoutManager::requestElement( const OUString& rResourceURL )
@@ -1624,7 +1625,7 @@ sal_Bool SAL_CALL LayoutManager::requestElement( const OUString& rResourceURL )
     }
 
     if ( bNotify )
-        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_VISIBLE, uno::makeAny( rResourceURL ) );
+        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_VISIBLE, uno::Any( rResourceURL ) );
 
     return bResult;
 }
@@ -1752,7 +1753,7 @@ sal_Bool SAL_CALL LayoutManager::showElement( const OUString& aName )
         doLayout();
 
     if ( bNotify )
-        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_VISIBLE, uno::makeAny( aName ) );
+        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_VISIBLE, uno::Any( aName ) );
 
     return bResult;
 }
@@ -1834,7 +1835,7 @@ sal_Bool SAL_CALL LayoutManager::hideElement( const OUString& aName )
         doLayout();
 
     if ( bNotify )
-        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_INVISIBLE, uno::makeAny( aName ) );
+        implts_notifyListeners( frame::LayoutManagerEvents::UIELEMENT_INVISIBLE, uno::Any( aName ) );
 
     return false;
 }
@@ -1880,7 +1881,7 @@ sal_Bool SAL_CALL LayoutManager::dockAllWindows( ::sal_Int16 /*nElementType*/ )
 sal_Bool SAL_CALL LayoutManager::floatWindow( const OUString& aName )
 {
     bool bResult( false );
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager*             pToolbarManager = m_xToolbarManager.get();
@@ -1899,7 +1900,7 @@ sal_Bool SAL_CALL LayoutManager::floatWindow( const OUString& aName )
 sal_Bool SAL_CALL LayoutManager::lockWindow( const OUString& aName )
 {
     bool bResult( false );
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager*             pToolbarManager = m_xToolbarManager.get();
@@ -1918,7 +1919,7 @@ sal_Bool SAL_CALL LayoutManager::lockWindow( const OUString& aName )
 sal_Bool SAL_CALL LayoutManager::unlockWindow( const OUString& aName )
 {
     bool bResult( false );
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager*             pToolbarManager = m_xToolbarManager.get();
@@ -1936,7 +1937,7 @@ sal_Bool SAL_CALL LayoutManager::unlockWindow( const OUString& aName )
 
 void SAL_CALL LayoutManager::setElementSize( const OUString& aName, const awt::Size& aSize )
 {
-    if ( !getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( !o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
         return;
 
     SolarMutexClearableGuard aReadLock;
@@ -1953,7 +1954,7 @@ void SAL_CALL LayoutManager::setElementSize( const OUString& aName, const awt::S
 
 void SAL_CALL LayoutManager::setElementPos( const OUString& aName, const awt::Point& aPos )
 {
-    if ( !getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( !o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
         return;
 
     SolarMutexClearableGuard aReadLock;
@@ -1970,7 +1971,7 @@ void SAL_CALL LayoutManager::setElementPos( const OUString& aName, const awt::Po
 
 void SAL_CALL LayoutManager::setElementPosSize( const OUString& aName, const awt::Point& aPos, const awt::Size& aSize )
 {
-    if ( !getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( !o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
         return;
 
     SolarMutexClearableGuard aReadLock;
@@ -2061,7 +2062,7 @@ sal_Bool SAL_CALL LayoutManager::isElementVisible( const OUString& aName )
 
 sal_Bool SAL_CALL LayoutManager::isElementFloating( const OUString& aName )
 {
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager* pToolbarManager = m_xToolbarManager.get();
@@ -2076,7 +2077,7 @@ sal_Bool SAL_CALL LayoutManager::isElementFloating( const OUString& aName )
 
 sal_Bool SAL_CALL LayoutManager::isElementDocked( const OUString& aName )
 {
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager* pToolbarManager = m_xToolbarManager.get();
@@ -2091,7 +2092,7 @@ sal_Bool SAL_CALL LayoutManager::isElementDocked( const OUString& aName )
 
 sal_Bool SAL_CALL LayoutManager::isElementLocked( const OUString& aName )
 {
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager* pToolbarManager = m_xToolbarManager.get();
@@ -2106,7 +2107,7 @@ sal_Bool SAL_CALL LayoutManager::isElementLocked( const OUString& aName )
 
 awt::Size SAL_CALL LayoutManager::getElementSize( const OUString& aName )
 {
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager* pToolbarManager = m_xToolbarManager.get();
@@ -2121,7 +2122,7 @@ awt::Size SAL_CALL LayoutManager::getElementSize( const OUString& aName )
 
 awt::Point SAL_CALL LayoutManager::getElementPos( const OUString& aName )
 {
-    if ( getElementTypeFromResourceURL( aName ).equalsIgnoreAsciiCase( UIRESOURCETYPE_TOOLBAR ))
+    if ( o3tl::equalsIgnoreAsciiCase(getElementTypeFromResourceURL( aName ), UIRESOURCETYPE_TOOLBAR ))
     {
         SolarMutexClearableGuard aReadLock;
         ToolbarLayoutManager* pToolbarManager = m_xToolbarManager.get();
@@ -2522,7 +2523,7 @@ void LayoutManager::implts_createMSCompatibleMenuBar( const OUString& aName )
     assert(xFormsMenuIndex->getCount() >= 1);
     uno::Sequence< beans::PropertyValue > aNewFormsMenu;
     xFormsMenuIndex->getByIndex( 0 ) >>= aNewFormsMenu;
-    xMenuIndex->replaceByIndex(nFormsMenu, uno::makeAny(aNewFormsMenu));
+    xMenuIndex->replaceByIndex(nFormsMenu, uno::Any(aNewFormsMenu));
 
     setMergedMenuBar( xMenuIndex );
 
@@ -2852,7 +2853,7 @@ void SAL_CALL LayoutManager::elementInserted( const ui::ConfigurationEvent& Even
             if ( xPropSet.is() )
             {
                 if ( Event.Source == uno::Reference< uno::XInterface >( m_xDocCfgMgr, uno::UNO_QUERY ))
-                    xPropSet->setPropertyValue( "ConfigurationSource", makeAny( m_xDocCfgMgr ));
+                    xPropSet->setPropertyValue( "ConfigurationSource", Any( m_xDocCfgMgr ));
             }
             xElementSettings->updateSettings();
         }
@@ -2915,7 +2916,7 @@ void SAL_CALL LayoutManager::elementRemoved( const ui::ConfigurationEvent& Event
                     // document settings removed
                     if ( xModuleCfgMgr->hasSettings( Event.ResourceURL ))
                     {
-                        xPropSet->setPropertyValue( aConfigSourcePropName, makeAny( m_xModuleCfgMgr ));
+                        xPropSet->setPropertyValue( aConfigSourcePropName, Any( m_xModuleCfgMgr ));
                         xElementSettings->updateSettings();
                         return;
                     }

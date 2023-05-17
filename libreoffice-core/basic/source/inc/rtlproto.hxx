@@ -201,7 +201,6 @@ extern void SbRtl_Tan(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 extern void SbRtl_UCase(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 extern void SbRtl_Val(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 extern void SbRtl_Len(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
-extern void SbRtl_Spc(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 extern void SbRtl_DateSerial(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 extern void SbRtl_TimeSerial(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 extern void SbRtl_DateValue(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
@@ -354,7 +353,7 @@ extern void SbRtl_CDateFromIso(StarBASIC * pBasic, SbxArray & rPar, bool bWrite)
 extern void SbRtl_CompatibilityMode(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 extern void SbRtl_CDec(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 
-extern void SbRtl_Partition(StarBASIC * pBasic, SbxArray & rPar, bool bWrite); // Fong
+extern void SbRtl_Partition(StarBASIC * pBasic, SbxArray & rPar, bool bWrite);
 
 extern bool LibreOffice6FloatingPointMode();
 extern double Now_Impl();

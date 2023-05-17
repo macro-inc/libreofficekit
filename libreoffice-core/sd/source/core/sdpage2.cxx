@@ -81,7 +81,7 @@ void SdPage::SetPresentationLayout(std::u16string_view rLayoutName,
     |* Name of the layout of the page
     \********************************************************************/
     OUString aOldLayoutName(maLayoutName);    // memorize
-    maLayoutName = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE;
+    maLayoutName = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE;
 
     /*********************************************************************
     |* search and replace master page if necessary
@@ -146,7 +146,7 @@ void SdPage::SetPresentationLayout(std::u16string_view rLayoutName,
         auto pObj = GetObj(nObj);
 
         if (pObj->GetObjInventor() == SdrInventor::Default &&
-            pObj->GetObjIdentifier() == OBJ_OUTLINETEXT)
+            pObj->GetObjIdentifier() == SdrObjKind::OutlineText)
         {
             if (!bListsFilled || !bReplaceStyleSheets)
             {
@@ -221,7 +221,7 @@ void SdPage::SetPresentationLayout(std::u16string_view rLayoutName,
             }
         }
         else if (pObj->GetObjInventor() == SdrInventor::Default &&
-                 pObj->GetObjIdentifier() == OBJ_TITLETEXT)
+                 pObj->GetObjIdentifier() == SdrObjKind::TitleText)
         {
             // We do not get PresObjKind via GetPresObjKind() since there are
             // only PresObjListe considered. But we want to consider all "Title
@@ -469,16 +469,16 @@ bool SdPage::setAlienAttributes( const css::uno::Any& rAttributes )
 
 void SdPage::getAlienAttributes( css::uno::Any& rAttributes )
 {
-    const SfxPoolItem* pItem;
+    const SvXMLAttrContainerItem* pItem;
 
-    if( (mpItems == nullptr) || ( SfxItemState::SET != mpItems->GetItemState( SDRATTR_XMLATTRIBUTES, false, &pItem ) ) )
+    if( (mpItems == nullptr) || !( pItem = mpItems->GetItemIfSet( SDRATTR_XMLATTRIBUTES, false ) ) )
     {
         SvXMLAttrContainerItem aAlienAttributes;
         aAlienAttributes.QueryValue( rAttributes );
     }
     else
     {
-        static_cast<const SvXMLAttrContainerItem*>(pItem)->QueryValue( rAttributes );
+        pItem->QueryValue( rAttributes );
     }
 }
 
@@ -491,7 +491,6 @@ void SdPage::RemoveEmptyPresentationObjects()
         if (pShape->IsEmptyPresObj())
         {
             RemoveObject( pShape->GetOrdNum() );
-            SdrObject::Free( pShape );
         }
     }
 }

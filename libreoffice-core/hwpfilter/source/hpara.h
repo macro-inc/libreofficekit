@@ -57,20 +57,7 @@ class HWPPara;
 
 struct LineInfo
 {
-/* the position of the starting character: the control has a different length */
-/**
- * Starting character position
- */
-    unsigned short    pos;
-    hunit         space_width;
-    hunit         height;
     hunit         pgy;                            /* internal */
-    hunit         sx;                             /* internal */
-    hunit         psx;                            /* internal */
-    hunit         pex;                            /* internal */
-// for formatting
-    hunit         height_sp;
-    unsigned short    softbreak;                  // column, page, section
 
     void  Read(HWPFile &hwpf, HWPPara const *para);
 };
@@ -114,7 +101,7 @@ class DLLEXPORT HWPPara
 /**
  * Box object list
  */
-        std::map<unsigned short, std::unique_ptr<HBox>> hhstr;
+        std::vector<std::unique_ptr<HBox>> hhstr;
 
         HWPPara(void);
         ~HWPPara(void);

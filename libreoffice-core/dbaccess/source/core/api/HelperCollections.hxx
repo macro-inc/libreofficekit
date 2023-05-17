@@ -50,7 +50,7 @@ namespace dbaccess
             return nullptr;
         }
     public:
-        OPrivateColumns(const ::rtl::Reference< ::connectivity::OSQLColumns>& _rColumns,
+        OPrivateColumns(::rtl::Reference< ::connectivity::OSQLColumns> _xColumns,
                         bool _bCase,
                         ::cppu::OWeakObject& _rParent,
                         ::osl::Mutex& _rMutex,
@@ -83,7 +83,7 @@ namespace dbaccess
             return nullptr;
         }
     public:
-        OPrivateTables( const OSQLTables& _rTables,
+        OPrivateTables( OSQLTables _rTables,
                         bool _bCase,
                         ::cppu::OWeakObject& _rParent,
                         ::osl::Mutex& _rMutex,

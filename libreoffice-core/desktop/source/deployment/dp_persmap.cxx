@@ -17,8 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cstddef>
+
 #include <dp_misc.h>
 #include <dp_persmap.h>
+#include <o3tl/safeint.hxx>
 #include <rtl/byteseq.hxx>
 #include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
@@ -175,7 +180,7 @@ void PersistentMap::readAll()
     if( nBytesRead != sizeof(aHeaderBytes))
         return;
     // check header magic
-    for( int i = 0; i < int(sizeof(PmapMagic)); ++i)
+    for( std::size_t i = 0; i < sizeof(PmapMagic); ++i)
         if( aHeaderBytes[i] != PmapMagic[i])
             return;
 
@@ -239,13 +244,13 @@ void PersistentMap::flush()
         const OString aKeyString = encodeString( entry.first);
         const sal_Int32 nKeyLen = aKeyString.getLength();
         m_MapFile.write( aKeyString.getStr(), nKeyLen, nBytesWritten);
-        OSL_ASSERT( nKeyLen == static_cast<sal_Int32>(nBytesWritten));
+        OSL_ASSERT( o3tl::make_unsigned(nKeyLen) == nBytesWritten);
         m_MapFile.write( "\n", 1, nBytesWritten);
         // write line for value
         const OString& rValString = encodeString( entry.second);
         const sal_Int32 nValLen = rValString.getLength();
         m_MapFile.write( rValString.getStr(), nValLen, nBytesWritten);
-        OSL_ASSERT( nValLen == static_cast<sal_Int32>(nBytesWritten));
+        OSL_ASSERT( o3tl::make_unsigned(nValLen) == nBytesWritten);
         m_MapFile.write( "\n", 1, nBytesWritten);
     }
 

@@ -25,6 +25,7 @@
 #include <DrawController.hxx>
 
 #include <Client.hxx>
+#include <utility>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 
@@ -36,7 +37,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -59,13 +60,15 @@ bool IsEqual (const TabBarButton& rButton1, const TabBarButton& rButton2)
 ViewTabBar::ViewTabBar (
     const Reference<XResourceId>& rxViewTabBarId,
     const Reference<frame::XController>& rxController)
-    : ViewTabBarInterfaceBase(maMutex),
-      mpTabControl(VclPtr<TabBarControl>::Create(GetAnchorWindow(rxViewTabBarId,rxController), this)),
+    : mpTabControl(VclPtr<TabBarControl>::Create(GetAnchorWindow(rxViewTabBarId,rxController), this)),
       mxController(rxController),
       mxViewTabBarId(rxViewTabBarId),
       mpViewShellBase(nullptr),
       mnNoteBookWidthPadding(0)
 {
+    // Do this manually instead of via uno::Reference, so we don't delete ourselves.
+    osl_atomic_increment(&m_refCount);
+
     // Tunnel through the controller and use the ViewShellBase to obtain the
     // view frame.
     try
@@ -100,13 +103,15 @@ ViewTabBar::ViewTabBar (
     {
         mpViewShellBase->SetViewTabBar(this);
     }
+
+    osl_atomic_decrement(&m_refCount);
 }
 
 ViewTabBar::~ViewTabBar()
 {
 }
 
-void ViewTabBar::disposing()
+void ViewTabBar::disposing(std::unique_lock<std::mutex>&)
 {
     if (mpViewShellBase != nullptr
         && mxViewTabBarId->isBoundToURL(
@@ -511,10 +516,10 @@ void ViewTabBar::UpdateTabBarButtons()
 
 TabBarControl::TabBarControl (
     vcl::Window* pParentWindow,
-    const ::rtl::Reference<ViewTabBar>& rpViewTabBar)
+    ::rtl::Reference<ViewTabBar> pViewTabBar)
     : InterimItemWindow(pParentWindow, "modules/simpress/ui/tabviewbar.ui", "TabViewBar")
     , mxTabControl(m_xBuilder->weld_notebook("tabcontrol"))
-    , mpViewTabBar(rpViewTabBar)
+    , mpViewTabBar(std::move(pViewTabBar))
     , mnAllocatedWidth(0)
 {
     // Because the actual window background is transparent--to avoid

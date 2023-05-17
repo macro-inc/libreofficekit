@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vcl/errinf.hxx>
 #include <vcl/weld.hxx>
 #include <svl/macitem.hxx>
@@ -24,6 +25,7 @@
 #include <sfx2/docfile.hxx>
 #include <sfx2/docfilt.hxx>
 #include <unotools/transliterationwrapper.hxx>
+#include <o3tl/string_view.hxx>
 #include <docsh.hxx>
 #include <wrtsh.hxx>
 #include <view.hxx>
@@ -57,8 +59,8 @@ struct TextBlockInfo_Impl
     OUString sTitle;
     OUString sLongName;
     OUString sGroupName;
-    TextBlockInfo_Impl(OUString const& rTitle, OUString const& rLongName, OUString const& rGroupName)
-        : sTitle(rTitle), sLongName(rLongName), sGroupName(rGroupName) {}
+    TextBlockInfo_Impl(OUString aTitle, OUString aLongName, OUString aGroupName)
+        : sTitle(std::move(aTitle)), sLongName(std::move(aLongName)), sGroupName(std::move(aGroupName)) {}
 };
 
 }
@@ -116,10 +118,10 @@ void SwGlossaryHdl::SetCurGroup(const OUString &rGrp, bool bApi, bool bAlwaysCre
                     break;
                 }
             }
-            const OUString sPath = sGroup.getToken(1, GLOS_DELIM);
-            sal_uInt16 nComparePath = o3tl::narrowing<sal_uInt16>(sPath.toInt32());
+            const std::u16string_view sPath = o3tl::getToken(sGroup, 1, GLOS_DELIM);
+            sal_uInt16 nComparePath = o3tl::narrowing<sal_uInt16>(o3tl::toInt32(sPath));
             if(nCurrentPath == nComparePath &&
-                sGroup.getToken(0, GLOS_DELIM) == sCurBase)
+                o3tl::getToken(sGroup, 0, GLOS_DELIM) == sCurBase)
                 bPathEqual = true;
         }
 
@@ -194,6 +196,28 @@ void SwGlossaryHdl::RenameGroup(const OUString& rOld, OUString& rNew, const OUSt
     }
 }
 
+bool SwGlossaryHdl::CopyOrMove(const OUString& rSourceGroupName, OUString& rSourceShortName,
+                               const OUString& rDestGroupName, const OUString& rLongName, bool bMove)
+{
+    std::unique_ptr<SwTextBlocks> pSourceGroup = m_rStatGlossaries.GetGroupDoc(rSourceGroupName);
+    std::unique_ptr<SwTextBlocks> pDestGroup = m_rStatGlossaries.GetGroupDoc(rDestGroupName);
+    if (pDestGroup->IsReadOnly() || (bMove && pSourceGroup->IsReadOnly()) )
+    {
+        return false;
+    }
+
+    //The index must be determined here because rSourceShortName maybe changed in CopyBlock
+    sal_uInt16 nDeleteIdx = pSourceGroup->GetIndex( rSourceShortName );
+    OSL_ENSURE(USHRT_MAX != nDeleteIdx, "entry not found");
+    ErrCode nRet = pSourceGroup->CopyBlock( *pDestGroup, rSourceShortName, rLongName );
+    if(!nRet && bMove)
+    {
+        // the index must be existing
+        nRet = pSourceGroup->Delete( nDeleteIdx ) ? ERRCODE_NONE : ErrCode(1);
+    }
+    return !nRet;
+}
+
 // delete an autotext-file-group
 bool SwGlossaryHdl::DelGroup(const OUString &rGrpName)
 {
@@ -231,14 +255,14 @@ OUString SwGlossaryHdl::GetGlossaryShortName(sal_uInt16 nId)
 }
 
 // ask for short name
-OUString SwGlossaryHdl::GetGlossaryShortName(const OUString &rName)
+OUString SwGlossaryHdl::GetGlossaryShortName(std::u16string_view aName)
 {
     OUString sReturn;
     SwTextBlocks *pTmp =
         m_pCurGrp ? m_pCurGrp.get() : m_rStatGlossaries.GetGroupDoc( m_aCurGrp ).release();
     if(pTmp)
     {
-        sal_uInt16 nIdx = pTmp->GetLongIndex( rName );
+        sal_uInt16 nIdx = pTmp->GetLongIndex( aName );
         if( nIdx != sal_uInt16(-1) )
             sReturn = pTmp->GetShortName( nIdx );
         if( !m_pCurGrp )
@@ -673,8 +697,9 @@ bool SwGlossaryHdl::ImportGlossaries( const OUString& rName )
         SfxMedium aMed( rName, StreamMode::READ, nullptr, nullptr );
         SfxFilterMatcher aMatcher( "swriter" );
         aMed.UseInteractionHandler( true );
-        if (!aMatcher.GuessFilter(aMed, pFilter, SfxFilterFlags::NONE))
+        if (aMatcher.GuessFilter(aMed, pFilter, SfxFilterFlags::NONE) == ERRCODE_NONE)
         {
+            assert(pFilter && "success means pFilter was set");
             SwTextBlocks *pGlossary = nullptr;
             aMed.SetFilter( pFilter );
             Reader* pR = SwReaderWriter::GetReader( pFilter->GetUserData() );

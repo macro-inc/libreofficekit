@@ -19,7 +19,6 @@
 
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/container/XEnumerationAccess.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 
 #include <tools/urlobj.hxx>
 #include <rtl/ref.hxx>
@@ -28,6 +27,7 @@
 #include "vbadocuments.hxx"
 
 #include <osl/file.hxx>
+#include <utility>
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
@@ -49,7 +49,7 @@ class DocumentEnumImpl : public EnumerationHelperImpl
     uno::Any m_aApplication;
 public:
     /// @throws uno::RuntimeException
-    DocumentEnumImpl( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XEnumeration >& xEnumeration, const uno::Any& aApplication ) : EnumerationHelperImpl( xParent, xContext, xEnumeration ), m_aApplication( aApplication ) {}
+    DocumentEnumImpl( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< container::XEnumeration >& xEnumeration, uno::Any  aApplication ) : EnumerationHelperImpl( xParent, xContext, xEnumeration ), m_aApplication(std::move( aApplication )) {}
 
     virtual uno::Any SAL_CALL nextElement(  ) override
     {
@@ -122,9 +122,7 @@ SwVbaDocuments::Open( const OUString& Filename, const uno::Any& /*ConfirmConvers
     else
         osl::FileBase::getFileURLFromSystemPath( Filename, aURL );
 
-    uno::Sequence< beans::PropertyValue > sProps(0);
-
-    uno::Reference <text::XTextDocument> xSpreadDoc( openDocument( Filename, ReadOnly, sProps ), uno::UNO_QUERY_THROW );
+    uno::Reference <text::XTextDocument> xSpreadDoc( openDocument( Filename, ReadOnly, {}), uno::UNO_QUERY_THROW );
     uno::Any aRet = getDocument( mxContext, xSpreadDoc, Application() );
     uno::Reference< word::XDocument > xDocument( aRet, uno::UNO_QUERY );
     if ( xDocument.is() )

@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <hintids.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
 #include <svx/svdpage.hxx>
@@ -56,7 +58,6 @@
 #include <vector>
 
 #include <sortedobjs.hxx>
-#include <UndoManager.hxx>
 
 using namespace com::sun::star;
 
@@ -379,6 +380,7 @@ void SwDrawView::MoveRepeatedObjs( const SwAnchoredObject& _rMovedAnchoredObj,
                                         nNewPos );
             pDrawPage->RecalcObjOrdNums();
             // adjustments for accessibility API
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
             if ( auto pTmpFlyFrame = pAnchoredObj->DynCastFlyFrame() )
             {
                 m_rImp.DisposeAccessibleFrame( pTmpFlyFrame );
@@ -389,6 +391,7 @@ void SwDrawView::MoveRepeatedObjs( const SwAnchoredObject& _rMovedAnchoredObj,
                 m_rImp.DisposeAccessibleObj(pAnchoredObj->GetDrawObj(), true);
                 m_rImp.AddAccessibleObj( pAnchoredObj->GetDrawObj() );
             }
+#endif
         }
         aAnchoredObjs.pop_back();
     }
@@ -412,6 +415,7 @@ void SwDrawView::MoveRepeatedObjs( const SwAnchoredObject& _rMovedAnchoredObj,
                                             nTmpNewPos );
                 pDrawPage->RecalcObjOrdNums();
                 // adjustments for accessibility API
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
                 if ( auto pTmpFlyFrame = pAnchoredObj->DynCastFlyFrame() )
                 {
                     m_rImp.DisposeAccessibleFrame( pTmpFlyFrame );
@@ -422,6 +426,7 @@ void SwDrawView::MoveRepeatedObjs( const SwAnchoredObject& _rMovedAnchoredObj,
                     m_rImp.DisposeAccessibleObj(pAnchoredObj->GetDrawObj(), true);
                     m_rImp.AddAccessibleObj( pAnchoredObj->GetDrawObj() );
                 }
+#endif
             }
             aAnchoredObjs.pop_back();
         }
@@ -589,8 +594,10 @@ void SwDrawView::ObjOrderChanged( SdrObject* pObj, size_t nOldPos,
     if ( auto pFlyFrame = pMovedAnchoredObj->DynCastFlyFrame() )
     {
         // adjustments for accessibility API
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         m_rImp.DisposeAccessibleFrame( pFlyFrame );
         m_rImp.AddAccessibleFrame( pFlyFrame );
+#endif
 
         const sal_uInt32 nChildNewPos = bMovedForward ? nNewPos : nNewPos+1;
         size_t i = bMovedForward ? nOldPos : nObjCount-1;
@@ -617,6 +624,7 @@ void SwDrawView::ObjOrderChanged( SdrObject* pObj, size_t nOldPos,
                 // collect 'child' object
                 aMovedChildObjs.push_back( pTmpObj );
                 // adjustments for accessibility API
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
                 if ( auto pFlyDrawObj = dynamic_cast<SwVirtFlyDrawObj *>( pTmpObj ) )
                 {
                     const SwFlyFrame *pTmpFlyFrame = pFlyDrawObj->GetFlyFrame();
@@ -628,6 +636,7 @@ void SwDrawView::ObjOrderChanged( SdrObject* pObj, size_t nOldPos,
                     m_rImp.DisposeAccessibleObj(pTmpObj, true);
                     m_rImp.AddAccessibleObj( pTmpObj );
                 }
+#endif
             }
             else
             {
@@ -641,12 +650,14 @@ void SwDrawView::ObjOrderChanged( SdrObject* pObj, size_t nOldPos,
         } while ( ( bMovedForward && i < ( nObjCount - aMovedChildObjs.size() ) ) ||
                   ( !bMovedForward && i > ( nNewPos + aMovedChildObjs.size() ) ) );
     }
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     else
     {
         // adjustments for accessibility API
         m_rImp.DisposeAccessibleObj(pObj, true);
         m_rImp.AddAccessibleObj( pObj );
     }
+#endif
 
     MoveRepeatedObjs( *pMovedAnchoredObj, aMovedChildObjs );
 }
@@ -967,12 +978,11 @@ void SwDrawView::DeleteMarked()
         SdrObject *pObject = rMarkList.GetMark(i)->GetMarkedSdrObj();
         SwContact* pContact = GetUserCall(pObject);
         SwFrameFormat* pFormat = pContact->GetFormat();
-        if (auto pChildren = pObject->getChildrenOfSdrObject())
+        if (pObject->getChildrenOfSdrObject())
         {
-            for (size_t it = 0; it < pChildren->GetObjCount(); ++it)
-                if (SwFrameFormat* pTextBox = SwTextBoxHelper::getOtherTextBoxFormat(
-                        pFormat, RES_DRAWFRMFMT, pChildren->GetObj(it)))
-                    aTextBoxesToDelete.push_back(pTextBox);
+            auto pChildTextBoxes = SwTextBoxHelper::CollectTextBoxes(pObject, pFormat);
+            for (auto& rChildTextBox : pChildTextBoxes)
+                aTextBoxesToDelete.push_back(rChildTextBox);
         }
         else
             if (SwFrameFormat* pTextBox = SwTextBoxHelper::getOtherTextBoxFormat(pFormat, RES_DRAWFRMFMT))

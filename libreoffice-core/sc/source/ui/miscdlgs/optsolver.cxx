@@ -20,7 +20,7 @@
 #include <rangelst.hxx>
 #include <sfx2/bindings.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
+#include <utility>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/svapp.hxx>
@@ -132,19 +132,19 @@ IMPL_LINK(ScCursorRefEdit, KeyInputHdl, const KeyEvent&, rKEvt, bool)
     return formula::RefEdit::KeyInput(rKEvt);
 }
 
-ScOptSolverSave::ScOptSolverSave( const OUString& rObjective, bool bMax, bool bMin, bool bValue,
-                             const OUString& rTarget, const OUString& rVariable,
+ScOptSolverSave::ScOptSolverSave( OUString aObjective, bool bMax, bool bMin, bool bValue,
+                             OUString aTarget, OUString aVariable,
                              std::vector<ScOptConditionRow>&& rConditions,
-                             const OUString& rEngine,
+                             OUString aEngine,
                              const uno::Sequence<beans::PropertyValue>& rProperties ) :
-    maObjective( rObjective ),
+    maObjective( std::move(aObjective) ),
     mbMax( bMax ),
     mbMin( bMin ),
     mbValue( bValue ),
-    maTarget( rTarget ),
-    maVariable( rVariable ),
+    maTarget( std::move(aTarget) ),
+    maVariable( std::move(aVariable) ),
     maConditions( std::move(rConditions) ),
-    maEngine( rEngine ),
+    maEngine( std::move(aEngine) ),
     maProperties( rProperties )
 {
 }
@@ -175,7 +175,6 @@ ScOptSolverDlg::ScOptSolverDlg(SfxBindings* pB, SfxChildWindow* pCW, weld::Windo
     , m_xFtCellRef(m_xBuilder->weld_label("cellreflabel"))
     , m_xEdLeft1(new ScCursorRefEdit(m_xBuilder->weld_entry("ref1edit")))
     , m_xRBLeft1(new formula::RefButton(m_xBuilder->weld_button("ref1button")))
-    , m_xFtOperator(m_xBuilder->weld_label("oplabel"))
     , m_xLbOp1(m_xBuilder->weld_combo_box("op1list"))
     , m_xFtConstraint(m_xBuilder->weld_label("constraintlabel"))
     , m_xEdRight1(new ScCursorRefEdit(m_xBuilder->weld_entry("val1edit")))
@@ -482,7 +481,7 @@ void ScOptSolverDlg::SetReference( const ScRange& rRef, ScDocument& rDocP )
     {
         OUString aVal = mpEdActive->GetText();
         Selection aSel = mpEdActive->GetSelection();
-        aSel.Justify();
+        aSel.Normalize();
         aVal = aVal.replaceAt( aSel.Min(), aSel.Len(), aStr );
         Selection aNewSel( aSel.Min(), aSel.Min()+aStr.getLength() );
         mpEdActive->SetRefString( aVal );

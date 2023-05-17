@@ -42,6 +42,7 @@
 #include <com/sun/star/embed/Aspects.hpp>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 namespace com::sun::star::datatransfer::dnd { class XDragGestureRecognizer; }
 namespace com::sun::star::io { class XInputStream; }
@@ -103,9 +104,9 @@ struct AcceptDropEvent
 
     AcceptDropEvent( sal_Int8 nAction,
                      const Point& rPosPixel,
-                     const css::datatransfer::dnd::DropTargetDragEvent& rDragEvent ) :
+                     css::datatransfer::dnd::DropTargetDragEvent aDragEvent ) :
         maPosPixel( rPosPixel ),
-        maDragEvent( rDragEvent ),
+        maDragEvent(std::move( aDragEvent )),
         mnAction( nAction ),
         mbLeaving( false ),
         mbDefault( false ) {}
@@ -120,9 +121,9 @@ struct ExecuteDropEvent
 
     ExecuteDropEvent( sal_Int8 nAction,
                       const Point& rPosPixel,
-                      const css::datatransfer::dnd::DropTargetDropEvent& rDropEvent ) :
+                      css::datatransfer::dnd::DropTargetDropEvent aDropEvent ) :
         maPosPixel( rPosPixel ),
-        maDropEvent( rDropEvent ),
+        maDropEvent(std::move( aDropEvent )),
         mnAction( nAction ),
         mbDefault( false ) {}
 };
@@ -372,7 +373,7 @@ public:
                                              const css::datatransfer::DataFlavor& rRequestFlavor );
 };
 
-class VCL_DLLPUBLIC DragSourceHelper
+class VCL_DLLPUBLIC SAL_LOPLUGIN_ANNOTATE("crosscast") DragSourceHelper
 {
 private:
 
@@ -418,7 +419,7 @@ public:
     virtual             ~DragSourceHelper();
 };
 
-class VCL_DLLPUBLIC DropTargetHelper
+class VCL_DLLPUBLIC SAL_LOPLUGIN_ANNOTATE("crosscast") DropTargetHelper
 {
 private:
 
@@ -509,7 +510,7 @@ public:
 
     using TransferableHelper::StartDrag;
     void                StartDrag( vcl::Window* pWindow, sal_Int8 nDragSourceActions,
-                                   const Link<sal_Int8,void>& rCallbck );
+                                   const Link<sal_Int8,void>& rCallback );
     virtual void        DragFinished( sal_Int8 nDropAction ) override;
 };
 

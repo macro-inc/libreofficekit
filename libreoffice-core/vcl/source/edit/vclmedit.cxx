@@ -26,7 +26,6 @@
 #include <vcl/menu.hxx>
 #include <vcl/specialchars.hxx>
 #include <vcl/timer.hxx>
-#include <vcl/toolkit/vclmedit.hxx>
 #include <vcl/vclevent.hxx>
 #include <vcl/xtextedt.hxx>
 #include <vcl/textview.hxx>
@@ -36,8 +35,9 @@
 #include <svl/lstner.hxx>
 #include <vcl/uitest/uiobject.hxx>
 
-#include <vcl/scrbar.hxx>
 #include <vcl/settings.hxx>
+#include <vcl/toolkit/scrbar.hxx>
+#include <vcl/toolkit/vclmedit.hxx>
 #include <vcl/weld.hxx>
 #include <osl/diagnose.h>
 #include <tools/json_writer.hxx>
@@ -626,7 +626,7 @@ bool ImpVclMEdit::HandleCommand( const CommandEvent& rCEvt )
     if (nCommand == CommandEventId::Wheel ||
         nCommand == CommandEventId::StartAutoScroll ||
         nCommand == CommandEventId::AutoScroll ||
-        nCommand == CommandEventId::Gesture)
+        nCommand == CommandEventId::GesturePan)
     {
         ScrollBar* pHScrollBar = mpHScrollBar->IsVisible() ? mpHScrollBar.get() : nullptr;
         ScrollBar* pVScrollBar = mpVScrollBar->IsVisible() ? mpVScrollBar.get() : nullptr;
@@ -724,8 +724,19 @@ void TextWindow::KeyInput( const KeyEvent& rKEvent )
     }
     else if ( nCode == KEY_TAB )
     {
-        if ( !mbIgnoreTab || rKEvent.GetKeyCode().IsMod1() )
-            bDone = mpExtTextView->KeyInput( rKEvent  );
+        if (!mbIgnoreTab)
+        {
+            if (!rKEvent.GetKeyCode().IsMod1())
+                bDone = mpExtTextView->KeyInput(rKEvent);
+            else
+            {
+                // tdf#107625 make ctrl+tab act like tab when MultiLine Edit normally accepts tab as an input char
+                vcl::KeyCode aKeyCode(rKEvent.GetKeyCode().GetCode(), rKEvent.GetKeyCode().GetModifier() & ~KEY_MOD1);
+                KeyEvent aKEventWithoutMod1(rKEvent.GetCharCode(), aKeyCode, rKEvent.GetRepeat());
+                Window::KeyInput(aKEventWithoutMod1);
+                bDone = true;
+            }
+        }
     }
     else
     {
@@ -1326,7 +1337,7 @@ void VclMultiLineEdit::Draw( OutputDevice* pDev, const Point& rPos, SystemTextCo
 bool VclMultiLineEdit::EventNotify( NotifyEvent& rNEvt )
 {
     bool bDone = false;
-    if( rNEvt.GetType() == MouseNotifyEvent::COMMAND )
+    if( rNEvt.GetType() == NotifyEventType::COMMAND )
     {
         bDone = pImpVclMEdit->HandleCommand( *rNEvt.GetCommandEvent() );
     }
@@ -1337,7 +1348,7 @@ bool VclMultiLineEdit::PreNotify( NotifyEvent& rNEvt )
 {
     bool bDone = false;
 
-    if( ( rNEvt.GetType() == MouseNotifyEvent::KEYINPUT ) && ( !GetTextView()->IsCursorEnabled() ) )
+    if( ( rNEvt.GetType() == NotifyEventType::KEYINPUT ) && ( !GetTextView()->IsCursorEnabled() ) )
     {
         const KeyEvent& rKEvent = *rNEvt.GetKeyEvent();
         if ( !rKEvent.GetKeyCode().IsShift() && ( rKEvent.GetKeyCode().GetGroup() == KEYGROUP_CURSOR ) )

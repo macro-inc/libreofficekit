@@ -17,13 +17,14 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include "SidebarTxtControl.hxx"
 
 #include <docsh.hxx>
 #include <doc.hxx>
 
 #include <PostItMgr.hxx>
-#include <edtwin.hxx>
 
 #include <cmdid.h>
 #include <strings.hrc>
@@ -37,8 +38,9 @@
 #include <sfx2/sfxhelp.hxx>
 
 #include <vcl/commandevent.hxx>
+#include <vcl/event.hxx>
+#include <vcl/ptrstyle.hxx>
 #include <vcl/svapp.hxx>
-#include <vcl/help.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/gradient.hxx>
 #include <vcl/settings.hxx>
@@ -47,13 +49,12 @@
 #include <editeng/editeng.hxx>
 #include <editeng/editview.hxx>
 #include <editeng/flditem.hxx>
-#include <comphelper/lok.hxx>
-#include <sfx2/lokhelper.hxx>
 
 #include <uitool.hxx>
 #include <view.hxx>
 #include <wrtsh.hxx>
 #include <AnnotationWin.hxx>
+#include <IDocumentDeviceAccess.hxx>
 #include <redline.hxx>
 #include <memory>
 
@@ -105,8 +106,6 @@ void SidebarTextControl::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     rDevice.SetBackground(aBgColor);
 
     Size aOutputSize(rDevice.PixelToLogic(aSize));
-    aSize = aOutputSize;
-    aSize.setHeight(aSize.Height());
 
     EditView* pEditView = GetEditView();
     pEditView->setEditViewCallbacks(this);
@@ -118,14 +117,16 @@ void SidebarTextControl::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     // for layout in the sidebar.
     Size aPaperSize(mrPostItMgr.GetSidebarWidth(), pEditEngine->GetPaperSize().Height());
     pEditEngine->SetPaperSize(aPaperSize);
-    pEditEngine->SetRefDevice(&rDevice);
+    pEditEngine->SetRefDevice(mrDocView.GetWrtShell().getIDocumentDeviceAccess().getReferenceDevice(false));
 
     pEditView->SetOutputArea(tools::Rectangle(Point(0, 0), aOutputSize));
     pEditView->SetBackgroundColor(aBgColor);
 
     pDrawingArea->set_cursor(PointerStyle::Text);
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     InitAccessible();
+#endif
 }
 
 void SidebarTextControl::SetCursorLogicPosition(const Point& rPosition, bool bPoint, bool bClearMark)
@@ -245,12 +246,12 @@ void SidebarTextControl::Paint(vcl::RenderContext& rRenderContext, const tools::
         if (mrSidebarWin.IsMouseOverSidebarWin() || HasFocus())
         {
             rRenderContext.DrawGradient(tools::Rectangle(aPos, rRenderContext.PixelToLogic(aSize)),
-                                        Gradient(GradientStyle::Linear, mrSidebarWin.ColorDark(), mrSidebarWin.ColorDark()));
+                                        Gradient(css::awt::GradientStyle_LINEAR, mrSidebarWin.ColorDark(), mrSidebarWin.ColorDark()));
         }
         else
         {
             rRenderContext.DrawGradient(tools::Rectangle(aPos, rRenderContext.PixelToLogic(aSize)),
-                           Gradient(GradientStyle::Linear, mrSidebarWin.ColorLight(), mrSidebarWin.ColorDark()));
+                           Gradient(css::awt::GradientStyle_LINEAR, mrSidebarWin.ColorLight(), mrSidebarWin.ColorDark()));
         }
     }
 
@@ -331,11 +332,7 @@ bool SidebarTextControl::KeyInput( const KeyEvent& rKeyEvt )
                 bDone = pEditView && pEditView->PostKeyEvent(rKeyEvt);
             }
             else
-            {
-                std::unique_ptr<weld::Builder> xBuilder(Application::CreateBuilder(GetDrawingArea(), "modules/swriter/ui/inforeadonlydialog.ui"));
-                std::unique_ptr<weld::MessageDialog> xQuery(xBuilder->weld_message_dialog("InfoReadonlyDialog"));
-                xQuery->run();
-            }
+                mrDocView.GetWrtShell().InfoReadOnlyDialog();
         }
         if (bDone)
             mrSidebarWin.ResizeIfNecessary( aOldHeight, mrSidebarWin.GetPostItTextHeight() );
@@ -401,6 +398,13 @@ bool SidebarTextControl::MouseButtonUp(const MouseEvent& rMEvt)
     }
 
     return bRet;
+}
+
+bool SidebarTextControl::MouseMove(const MouseEvent& rMEvt)
+{
+    if (rMEvt.IsEnterWindow())
+        GetDrawingArea()->set_cursor(PointerStyle::Text);
+    return WeldEditView::MouseMove(rMEvt);
 }
 
 IMPL_LINK( SidebarTextControl, OnlineSpellCallback, SpellCallbackInfo&, rInfo, void )

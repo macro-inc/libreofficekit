@@ -38,6 +38,7 @@
 #include <sfx2/sfxhtml.hxx>
 
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <vector>
 
@@ -98,7 +99,7 @@ bool SfxHTMLParser::ParseMapOptions(
     return !aName.isEmpty();
 }
 
-bool SfxHTMLParser::ParseAreaOptions(ImageMap * pImageMap, const OUString& rBaseURL,
+bool SfxHTMLParser::ParseAreaOptions(ImageMap * pImageMap, std::u16string_view rBaseURL,
                                      const HTMLOptions& rOptions,
                                      SvMacroItemId nEventMouseOver,
                                      SvMacroItemId nEventMouseOut )
@@ -313,18 +314,18 @@ const OUString& SfxHTMLParser::GetScriptTypeString(
 }
 
 double SfxHTMLParser::GetTableDataOptionsValNum( sal_uInt32& nNumForm,
-        LanguageType& eNumLang, const OUString& aValStr, const OUString& aNumStr,
+        LanguageType& eNumLang, const OUString& aValStr, std::u16string_view aNumStr,
         SvNumberFormatter& rFormatter )
 {
-    LanguageType eParseLang(aNumStr.toInt32());
+    LanguageType eParseLang(o3tl::toInt32(aNumStr));
     sal_uInt32 nParseForm = rFormatter.GetFormatForLanguageIfBuiltIn( 0, eParseLang );
     double fVal;
     (void)rFormatter.IsNumberFormat(aValStr, nParseForm, fVal);
     if ( comphelper::string::getTokenCount(aNumStr, ';') > 2 )
     {
         sal_Int32 nIdx {0};
-        eNumLang = LanguageType(aNumStr.getToken( 1, ';', nIdx ).toInt32());
-        OUString aFormat( aNumStr.copy( nIdx ) );
+        eNumLang = LanguageType(o3tl::toInt32(o3tl::getToken(aNumStr, 1, ';', nIdx )));
+        OUString aFormat( aNumStr.substr( nIdx ) );
         sal_Int32 nCheckPos;
         SvNumFormatType nType;
         if ( eNumLang != LANGUAGE_SYSTEM )

@@ -261,10 +261,12 @@
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="colSeries">
+                        <property name="label" translatable="no"></property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
+                        <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
                         <child>
                           <placeholder/>
@@ -284,7 +286,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                         <accessibility>
@@ -298,10 +299,12 @@
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="colNegative">
+                        <property name="label" translatable="no"></property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
+                        <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
                         <child>
                           <placeholder/>
@@ -321,7 +324,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                         <accessibility>
@@ -335,10 +337,12 @@
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="colHigh">
+                        <property name="label" translatable="no"></property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
+                        <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
                         <child>
                           <placeholder/>
@@ -358,7 +362,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                         <accessibility>
@@ -372,10 +375,12 @@
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="colLow">
+                        <property name="label" translatable="no"></property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
+                        <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
                         <child>
                           <placeholder/>
@@ -395,7 +400,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                         <accessibility>
@@ -409,10 +413,12 @@
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="colMarker">
+                        <property name="label" translatable="no"></property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
+                        <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
                         <child>
                           <placeholder/>
@@ -432,7 +438,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                         <accessibility>
@@ -446,10 +451,12 @@
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="colFirst">
+                        <property name="label" translatable="no"></property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
+                        <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
                         <child>
                           <placeholder/>
@@ -469,7 +476,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                         <accessibility>
@@ -483,10 +489,12 @@
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="colLast">
+                        <property name="label" translatable="no"></property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
+                        <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
                         <child>
                           <placeholder/>
@@ -556,12 +564,12 @@
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>
                         <property name="text" translatable="yes" context="SparklineDialog|spinButton_LineWidth">1,00</property>
-                        <property name="input-purpose">number</property>
                         <property name="adjustment">adjustment-line-width</property>
                         <property name="climb-rate">0.25</property>
                         <property name="digits">2</property>
                         <property name="snap-to-ticks">True</property>
                         <property name="numeric">True</property>
+                        <property name="truncate-multiline">True</property>
                         <property name="value">1</property>
                       </object>
                       <packing>
@@ -604,7 +612,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                       </object>
@@ -620,7 +627,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                       </object>
@@ -773,7 +779,6 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="halign">start</property>
-                        <property name="xpad">0</property>
                         <property name="label" translatable="yes" context="SparklineDialog|label_AxisMinimum">Vertical minimum:</property>
                         <property name="use-underline">True</property>
                         <property name="mnemonic-widget">cbMinAxisType</property>
@@ -791,7 +796,6 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="halign">start</property>
-                        <property name="image-position">right</property>
                         <property name="always-show-image">True</property>
                         <property name="draw-indicator">True</property>
                       </object>

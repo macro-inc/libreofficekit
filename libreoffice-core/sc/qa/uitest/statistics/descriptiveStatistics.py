@@ -1,18 +1,17 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict
-from uitest.uihelper.common import select_pos
 from uitest.uihelper.calc import enter_text_to_cell
-from libreoffice.calc.document import get_sheet_from_doc
-from libreoffice.calc.conditional_format import get_conditional_format_from_sheet
-from uitest.debug import sleep
+
 from libreoffice.calc.document import get_cell_by_position
 from libreoffice.uno.propertyvalue import mkPropertyValues
+
 
 class descriptiveStatistics(UITestCase):
     def test_descriptive_statistics(self):
@@ -105,7 +104,7 @@ class descriptiveStatistics(UITestCase):
             self.assertEqual(round(get_cell_by_position(document, 0, 6, 7).getValue(),11) , 139.49090909091)
             self.assertEqual(round(get_cell_by_position(document, 0, 6, 8).getValue(),12) , 11.810626955878)
             self.assertEqual(round(get_cell_by_position(document, 0, 6, 9).getValue(),13) , -1.4621677980825)
-            self.assertEqual(round(get_cell_by_position(document, 0, 6, 10).getValue(),14) , 0.01524095329036)
+            self.assertEqual(round(get_cell_by_position(document, 0, 6, 10).getValue(),13) , 0.0152409532904)
             self.assertEqual(get_cell_by_position(document, 0, 6, 11).getValue() , 31)
             self.assertEqual(get_cell_by_position(document, 0, 6, 12).getValue() , 26)
             self.assertEqual(get_cell_by_position(document, 0, 6, 13).getValue() , 57)

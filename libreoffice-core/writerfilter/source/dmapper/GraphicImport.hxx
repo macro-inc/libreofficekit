@@ -81,10 +81,10 @@ class GraphicImport : public LoggedProperties, public LoggedTable
     void putPropertyToFrameGrabBag( const OUString& sPropertyName, const css::uno::Any& aPropertyValue );
 
 public:
-    explicit GraphicImport( css::uno::Reference<css::uno::XComponentContext> const& xComponentContext,
-                            css::uno::Reference<css::lang::XMultiServiceFactory> const& xTextFactory,
+    explicit GraphicImport( css::uno::Reference<css::uno::XComponentContext>  xComponentContext,
+                            css::uno::Reference<css::lang::XMultiServiceFactory> xTextFactory,
                             DomainMapper& rDomainMapper,
-                            GraphicImportType eGraphicImportType,
+                            GraphicImportType & rGraphicImportType,
                             std::pair<OUString, OUString>& rPositionOffsets,
                             std::pair<OUString, OUString>& rAligns,
                             std::queue<OUString>& rPositivePercentages);
@@ -124,6 +124,8 @@ public:
                            writerfilter::Reference<Table>::Pointer_t ref) override;
     virtual void lcl_substream(Id name, writerfilter::Reference<Stream>::Pointer_t ref) override;
     virtual void lcl_startShape(css::uno::Reference<css::drawing::XShape> const& xShape) override;
+    virtual void lcl_startTextBoxContent() override {};
+    virtual void lcl_endTextBoxContent() override {};
     virtual void lcl_endShape() override;
 
     void handleWrapTextValue(sal_uInt32 nVal);

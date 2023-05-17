@@ -108,9 +108,9 @@ void FixedHyperlink::GetFocus()
     Size aSize = GetSizePixel();
     tools::Rectangle aFocusRect(Point(1, 1), Size(m_nTextLen + 4, aSize.Height() - 2));
     if (GetStyle() & WB_RIGHT)
-        aFocusRect.Move(aSize.Width() - aFocusRect.getWidth(), 0);
+        aFocusRect.Move(aSize.Width() - aFocusRect.getOpenWidth(), 0);
     else if (GetStyle() & WB_CENTER)
-        aFocusRect.Move((aSize.Width() - aFocusRect.getWidth()) / 2, 0);
+        aFocusRect.Move((aSize.Width() - aFocusRect.getOpenWidth()) / 2, 0);
 
     Invalidate(aFocusRect);
     ShowFocus(aFocusRect);
@@ -176,9 +176,10 @@ IMPL_LINK(FixedHyperlink, HandleClick, FixedHyperlink&, rHyperlink, void)
         uno::Any exc(cppu::getCaughtException());
         OUString msg(comphelper::anyToString(exc));
         SolarMutexGuard g;
-        std::unique_ptr<weld::MessageDialog> xErrorBox(Application::CreateMessageDialog(GetFrameWeld(), VclMessageType::Error, VclButtonsType::Ok, msg));
+        std::shared_ptr<weld::MessageDialog> xErrorBox(
+            Application::CreateMessageDialog(GetFrameWeld(), VclMessageType::Error, VclButtonsType::Ok, msg));
         xErrorBox->set_title(rHyperlink.GetText());
-        xErrorBox->run();
+        xErrorBox->runAsync(xErrorBox, [](sal_Int32){});
     }
 }
 

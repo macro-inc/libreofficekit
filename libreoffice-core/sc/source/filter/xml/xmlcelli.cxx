@@ -47,11 +47,11 @@
 #include "editattributemap.hxx"
 #include <tokenarray.hxx>
 #include <scmatrix.hxx>
+#include <stringutil.hxx>
 #include <documentimport.hxx>
 #include <externalrefmgr.hxx>
 
 #include <xmloff/maptype.hxx>
-#include <xmloff/xmltkmap.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlprmap.hxx>
 #include <xmloff/xmluconv.hxx>
@@ -82,7 +82,6 @@
 #include <editeng/escapementitem.hxx>
 #include <editeng/emphasismarkitem.hxx>
 #include <editeng/langitem.hxx>
-#include <svx/unoapi.hxx>
 #include <svl/sharedstringpool.hxx>
 #include <sax/tools/converter.hxx>
 #include <sax/fastattribs.hxx>
@@ -215,7 +214,7 @@ ScXMLTableRowCellContext::ScXMLTableRowCellContext( ScXMLImport& rImport,
                 {
                     if (!it.isEmpty() && rXMLImport.SetNullDateOnUnitConverter())
                     {
-                        rXMLImport.GetMM100UnitConverter().convertDateTime(fValue, it.toString());
+                        rXMLImport.GetMM100UnitConverter().convertDateTime(fValue, it.toView());
                         bIsEmpty = false;
                     }
                 }
@@ -224,7 +223,7 @@ ScXMLTableRowCellContext::ScXMLTableRowCellContext( ScXMLImport& rImport,
                 {
                     if (!it.isEmpty())
                     {
-                        ::sax::Converter::convertDuration(fValue, it.toString());
+                        ::sax::Converter::convertDuration(fValue, it.toView());
                         bIsEmpty = false;
                     }
                 }
@@ -311,10 +310,10 @@ bool cellExists( const ScDocument& rDoc, const ScAddress& rCellPos )
 
 }
 
-void ScXMLTableRowCellContext::PushParagraphSpan(const OUString& rSpan, const OUString& rStyleName)
+void ScXMLTableRowCellContext::PushParagraphSpan(std::u16string_view rSpan, const OUString& rStyleName)
 {
     sal_Int32 nBegin = maParagraph.getLength();
-    sal_Int32 nEnd = nBegin + rSpan.getLength();
+    sal_Int32 nEnd = nBegin + rSpan.size();
     maParagraph.append(rSpan);
 
     PushFormat(nBegin, nEnd, rStyleName);
@@ -395,8 +394,7 @@ void ScXMLTableRowCellContext::PushFormat(sal_Int32 nBegin, sal_Int32 nEnd, cons
         if (nLastItemID != pEntry->mnItemID && pPoolItem)
         {
             // Flush the last item when the item ID changes.
-            rFmt.maItemSet.Put(*pPoolItem);
-            pPoolItem.reset();
+            rFmt.maItemSet.Put(std::move(pPoolItem));
         }
 
         switch (pEntry->mnItemID)
@@ -564,7 +562,7 @@ void ScXMLTableRowCellContext::PushFormat(sal_Int32 nBegin, sal_Int32 nEnd, cons
     }
 
     if (pPoolItem)
-        rFmt.maItemSet.Put(*pPoolItem);
+        rFmt.maItemSet.Put(std::move(pPoolItem));
 }
 
 OUString ScXMLTableRowCellContext::GetFirstParagraph() const
@@ -615,7 +613,7 @@ void ScXMLTableRowCellContext::PushParagraphEnd()
         }
         mpEditEngine->InsertParagraph(mpEditEngine->GetParagraphCount(), maParagraph.makeStringAndClear());
     }
-    else if (mbHasFormatRuns)
+    else if (mbHasFormatRuns || ScStringUtil::isMultiline(maParagraph))
     {
         mpEditEngine->Clear();
         mpEditEngine->SetTextCurrentDefaults(maParagraph.makeStringAndClear());
@@ -721,8 +719,8 @@ void ScXMLTableRowCellContext::DoMerge( const ScAddress& rScAddress, const SCCOL
                        mergeToCol <= pDoc->MaxCol() && mergeToRow <= pDoc->MaxRow();
     if( bInBounds )
     {
-        pDoc->DoMerge( rScAddress.Tab(),
-            rScAddress.Col(), rScAddress.Row(), mergeToCol, mergeToRow );
+        pDoc->DoMerge( rScAddress.Col(), rScAddress.Row(),
+                       mergeToCol, mergeToRow, rScAddress.Tab() );
     }
 }
 
@@ -794,7 +792,7 @@ void ScXMLTableRowCellContext::SetContentValidation( const ScRange& rScRange )
     if( !aValidation.sBaseCellAddress.isEmpty() )
         aScValidationData.SetSrcString( aValidation.sBaseCellAddress );
 
-    sal_uLong nIndex = pDoc->AddValidationEntry( aScValidationData );
+    sal_uInt32 nIndex = pDoc->AddValidationEntry( aScValidationData );
 
     ScPatternAttr aPattern( pDoc->GetPool() );
     aPattern.GetItemSet().Put( SfxUInt32Item( ATTR_VALIDDATA, nIndex ) );
@@ -1029,10 +1027,10 @@ void ScXMLTableRowCellContext::PutTextCell( const ScAddress& rCurrentPos,
     if( pDoc && rXMLImport.GetTables().IsPartOfMatrix(rCurrentPos) )
     {
         ScRefCellValue aCell(*pDoc, rCurrentPos);
-        bDoIncrement = aCell.meType == CELLTYPE_FORMULA;
+        bDoIncrement = aCell.getType() == CELLTYPE_FORMULA;
         if ( bDoIncrement )
         {
-            ScFormulaCell* pFCell = aCell.mpFormula;
+            ScFormulaCell* pFCell = aCell.getFormula();
             OUString aCellString;
             if (maStringValue)
                 aCellString = *maStringValue;
@@ -1123,9 +1121,9 @@ void ScXMLTableRowCellContext::PutValueCell( const ScAddress& rCurrentPos )
     if( rXMLImport.GetTables().IsPartOfMatrix(rCurrentPos) )
     {
         ScRefCellValue aCell(*rXMLImport.GetDocument(), rCurrentPos);
-        if (aCell.meType == CELLTYPE_FORMULA)
+        if (aCell.getType() == CELLTYPE_FORMULA)
         {
-            ScFormulaCell* pFCell = aCell.mpFormula;
+            ScFormulaCell* pFCell = aCell.getFormula();
             SetFormulaCell(pFCell);
             if (pFCell)
                 pFCell->SetNeedNumberFormat( true );
@@ -1270,7 +1268,7 @@ OUString getOutputString( ScDocument* pDoc, const ScAddress& aCellPos )
         return OUString();
 
     ScRefCellValue aCell(*pDoc, aCellPos);
-    switch (aCell.meType)
+    switch (aCell.getType())
     {
         case CELLTYPE_NONE:
             return OUString();
@@ -1278,7 +1276,7 @@ OUString getOutputString( ScDocument* pDoc, const ScAddress& aCellPos )
         {
             //  GetString on EditCell replaces linebreaks with spaces;
             //  however here we need line breaks
-            const EditTextObject* pData = aCell.mpEditText;
+            const EditTextObject* pData = aCell.getEditText();
             EditEngine& rEngine = pDoc->GetEditEngine();
             rEngine.SetText(*pData);
             return rEngine.GetText();
@@ -1339,7 +1337,7 @@ void ScXMLTableRowCellContext::PutFormulaCell( const ScAddress& rCellPos )
     ScDocument* pDoc = rXMLImport.GetDocument();
     ScDocumentImport& rDocImport = rXMLImport.GetDoc();
 
-    OUString aText = maFormula->first;
+    const OUString & aText = maFormula->first;
 
     ScExternalRefManager::ApiGuard aExtRefGuard(*pDoc);
 
@@ -1485,7 +1483,7 @@ bool ScXMLTableRowCellContext::IsPossibleErrorString() const
         return false;
     else if(mbNewValueType && mbErrorValue)
         return true;
-    return mbPossibleErrorCell || (mbCheckWithCompilerForError &&
+    return mbPossibleErrorCell || (mbCheckWithCompilerForError && maStringValue &&
             GetScImport().GetFormulaErrorConstant(*maStringValue) != FormulaError::NONE);
 }
 

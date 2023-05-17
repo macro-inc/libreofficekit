@@ -22,11 +22,10 @@
 #endif
 
 #include <svtools/inettbc.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/beans/Property.hpp>
-#include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/sdbc/XResultSet.hpp>
 #include <com/sun/star/sdbc/XRow.hpp>
 #include <com/sun/star/task/XInteractionHandler.hpp>
@@ -41,6 +40,7 @@
 #include <comphelper/string.hxx>
 #include <salhelper/thread.hxx>
 #include <tools/debug.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/file.hxx>
 #include <osl/mutex.hxx>
 #include <unotools/historyoptions.hxx>
@@ -52,6 +52,7 @@
 #include <svtools/urlfilter.hxx>
 
 #include <mutex>
+#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -76,7 +77,7 @@ public:
 
     SvtURLBox_Impl( )
     {
-        FilterMatch::createWildCardFilterList(OUString(),m_aFilters);
+        FilterMatch::createWildCardFilterList(u"",m_aFilters);
     }
 };
 
@@ -106,7 +107,7 @@ class SvtMatchContext_Impl: public salhelper::Thread
     static void                     FillPicklist(std::vector<OUString>& rPickList);
 
 public:
-                                    SvtMatchContext_Impl( SvtURLBox* pBoxP, const OUString& rText );
+                                    SvtMatchContext_Impl( SvtURLBox* pBoxP, OUString aText );
     void                            Stop();
 };
 
@@ -120,10 +121,10 @@ namespace
     }
 }
 
-SvtMatchContext_Impl::SvtMatchContext_Impl(SvtURLBox* pBoxP, const OUString& rText)
+SvtMatchContext_Impl::SvtMatchContext_Impl(SvtURLBox* pBoxP, OUString _aText)
     : Thread( "MatchContext_Impl" )
     , aLink( LINK( this, SvtMatchContext_Impl, Select_Impl ) )
-    , aText( rText )
+    , aText(std::move( _aText ))
     , pBox( pBoxP )
     , bOnlyDirectories( pBoxP->bOnlyDirectories )
     , bNoSelection( pBoxP->bNoSelection )
@@ -489,7 +490,7 @@ void SvtMatchContext_Impl::doExecute()
                                 res = proc->execute(
                                     css::ucb::Command(
                                         "getPropertyValues", -1,
-                                        css::uno::makeAny(prop)),
+                                        css::uno::Any(prop)),
                                     id,
                                     css::uno::Reference<
                                         css::ucb::XCommandEnvironment >());
@@ -592,7 +593,7 @@ void SvtMatchContext_Impl::doExecute()
                             {
                                 aCurObj.SetMark( u"" );
                                 aCurObj.SetParam( u"" );
-                                aCurObj.SetURLPath( "" );
+                                aCurObj.SetURLPath( u"" );
                                 aMatch = aCurObj.GetMainURL( INetURLObject::DecodeMechanism::NONE );
                             }
 
@@ -611,7 +612,7 @@ void SvtMatchContext_Impl::doExecute()
                         {
                             aCurObj.SetMark( u"" );
                             aCurObj.SetParam( u"" );
-                            aCurObj.SetURLPath( "" );
+                            aCurObj.SetURLPath( u"" );
                             aMatch = aCurObj.GetMainURL( INetURLObject::DecodeMechanism::NONE );
                         }
 
@@ -1079,22 +1080,22 @@ void SvtURLBox::DisableHistory()
     UpdatePicklistForSmartProtocol_Impl();
 }
 
-void SvtURLBox::SetFilter(const OUString& _sFilter)
+void SvtURLBox::SetFilter(std::u16string_view _sFilter)
 {
     pImpl->m_aFilters.clear();
     FilterMatch::createWildCardFilterList(_sFilter,pImpl->m_aFilters);
 }
 
-void FilterMatch::createWildCardFilterList(const OUString& _rFilterList,::std::vector< WildCard >& _rFilters)
+void FilterMatch::createWildCardFilterList(std::u16string_view _rFilterList,::std::vector< WildCard >& _rFilters)
 {
-    if( _rFilterList.getLength() )
+    if( !_rFilterList.empty() )
     {
         // filter is given
         sal_Int32 nIndex = 0;
         OUString sToken;
         do
         {
-            sToken = _rFilterList.getToken( 0, ';', nIndex );
+            sToken = o3tl::getToken(_rFilterList, 0, ';', nIndex );
             if ( !sToken.isEmpty() )
             {
                 _rFilters.emplace_back( sToken.toAsciiUpperCase() );

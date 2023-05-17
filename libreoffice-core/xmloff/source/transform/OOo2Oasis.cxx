@@ -17,12 +17,15 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <osl/diagnose.h>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <comphelper/base64.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <utility>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmltoken.hxx>
@@ -42,7 +45,7 @@
 #include "OOo2Oasis.hxx"
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/typeprovider.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::xmloff::token;
 using namespace ::com::sun::star::uno;
@@ -1438,7 +1441,7 @@ void XMLTrackedChangesOOoTContext_Impl::StartElement(
                     Sequence < sal_Int8 > aKey;
                     ::comphelper::Base64::decode( aKey,
                                         rAttrList->getValueByIndex( i ) );
-                    rPropSet->setPropertyValue( aPropName, makeAny( aKey ) );
+                    rPropSet->setPropertyValue( aPropName, Any( aKey ) );
                 }
                 else
                 {
@@ -1552,14 +1555,16 @@ XMLTransformerContext *OOo2OasisTransformer::CreateUserDefinedContext(
         return new XMLControlOOoTransformerContext( *this, rQName );
     case XML_ETACTION_FORM_PROPERTY:
         return new XMLFormPropOOoTransformerContext( *this, rQName );
+#if !ENABLE_WASM_STRIP_CHART
     case XML_ETACTION_CHART:
         return new XMLChartOOoTransformerContext( *this, rQName );
+    case XML_ETACTION_CHART_PLOT_AREA:
+        return new XMLChartPlotAreaOOoTContext( *this, rQName );
+#endif
     case XML_ETACTION_TRACKED_CHANGES:
         return new XMLTrackedChangesOOoTContext_Impl( *this, rQName,
                                rAction.GetQNamePrefixFromParam1(),
                             rAction.GetQNameTokenFromParam1() );
-    case XML_ETACTION_CHART_PLOT_AREA:
-        return new XMLChartPlotAreaOOoTContext( *this, rQName );
     case XML_ETACTION_TABLE:
         return new XMLTableOOoTransformerContext_Impl( *this, rQName );
     default:
@@ -1766,12 +1771,12 @@ OUString OOo2OasisTransformer::GetEventName( const OUString& rName, bool )
     return aNewName;
 }
 
-OOo2OasisTransformer::OOo2OasisTransformer( OUString const & rImplName,
-                                            OUString const & rSubServiceName )
+OOo2OasisTransformer::OOo2OasisTransformer( OUString aImplName,
+                                            OUString aSubServiceName )
         noexcept :
     XMLTransformerBase( aActionTable, aTokenMap ),
-    m_aImplName(rImplName),
-    m_aSubServiceName(rSubServiceName),
+    m_aImplName(std::move(aImplName)),
+    m_aSubServiceName(std::move(aSubServiceName)),
     m_pEventMap( nullptr )
 {
     GetNamespaceMap().Add( GetXMLToken(XML_NP_OFFICE), GetXMLToken(XML_N_OFFICE_OOO), XML_NAMESPACE_OFFICE );

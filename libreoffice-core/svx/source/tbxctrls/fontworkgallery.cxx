@@ -34,7 +34,6 @@
 #include <svtools/popupwindowcontroller.hxx>
 
 #include <svx/fmmodel.hxx>
-#include <svx/strings.hrc>
 #include <svx/svdpage.hxx>
 #include <svx/svdobj.hxx>
 #include <svx/svdview.hxx>
@@ -59,7 +58,6 @@ FontWorkGalleryDialog::FontWorkGalleryDialog(weld::Window* pParent, SdrView& rSd
     , mnThemeId(0xffff)
     , mrSdrView(rSdrView)
     , mbInsertIntoPage(true)
-    , mppSdrObject(nullptr)
     , mpDestModel(nullptr)
     , maCtlFavorites(m_xBuilder->weld_icon_view("ctlFavoriteswin"))
     , mxOKButton(m_xBuilder->weld_button("ok"))
@@ -180,7 +178,7 @@ void FontWorkGalleryDialog::insertSelectedFontwork()
         return;
 
     // Clone directly to target SdrModel (may be different due to user/caller (!))
-    SdrObject* pNewObject(
+    rtl::Reference<SdrObject> pNewObject(
         pPage->GetObj(0)->CloneSdrObject(
             bUseSpecialCalcMode ? *mpDestModel : mrSdrView.getSdrModelFromSdrView()));
 
@@ -211,7 +209,7 @@ void FontWorkGalleryDialog::insertSelectedFontwork()
         aPagePos.setX(convertTwipToMm100(aPagePos.X()));
         aPagePos.setY(convertTwipToMm100(aPagePos.Y()));
 
-        sal_Int32 nLOKViewWidth = 0.8 * convertTwipToMm100(pViewShell->getLOKVisibleArea().getWidth());
+        sal_Int32 nLOKViewWidth = 0.8 * convertTwipToMm100(pViewShell->getLOKVisibleArea().getOpenWidth());
         if (aFontworkSize.getWidth() > nLOKViewWidth)
         {
             double fScale = static_cast<double>(aFontworkSize.getWidth()) / nLOKViewWidth;
@@ -238,7 +236,7 @@ void FontWorkGalleryDialog::insertSelectedFontwork()
 
     if (bUseSpecialCalcMode)
     {
-        mppSdrObject = pNewObject;
+        mxSdrObject = pNewObject;
     }
     else
     {
@@ -246,12 +244,7 @@ void FontWorkGalleryDialog::insertSelectedFontwork()
 
         if (nullptr != pPV)
         {
-            mrSdrView.InsertObjectAtView( pNewObject, *pPV );
-        }
-        else
-        {
-            // tdf#116993 no target -> delete clone
-            SdrObject::Free(pNewObject);
+            mrSdrView.InsertObjectAtView( pNewObject.get(), *pPV );
         }
     }
 }
@@ -286,7 +279,6 @@ private:
     std::unique_ptr<weld::RadioButton> mxLeft;
     std::unique_ptr<weld::RadioButton> mxCenter;
     std::unique_ptr<weld::RadioButton> mxRight;
-    std::unique_ptr<weld::RadioButton> mxWord;
     std::unique_ptr<weld::RadioButton> mxStretch;
     bool mbSettingValue;
 
@@ -305,14 +297,12 @@ FontworkAlignmentWindow::FontworkAlignmentWindow(svt::PopupWindowController* pCo
     , mxLeft(m_xBuilder->weld_radio_button("left"))
     , mxCenter(m_xBuilder->weld_radio_button("center"))
     , mxRight(m_xBuilder->weld_radio_button("right"))
-    , mxWord(m_xBuilder->weld_radio_button("word"))
     , mxStretch(m_xBuilder->weld_radio_button("stretch"))
     , mbSettingValue(false)
 {
     mxLeft->connect_toggled(LINK(this, FontworkAlignmentWindow, SelectHdl));
     mxCenter->connect_toggled(LINK(this, FontworkAlignmentWindow, SelectHdl));
     mxRight->connect_toggled(LINK(this, FontworkAlignmentWindow, SelectHdl));
-    mxWord->connect_toggled(LINK(this, FontworkAlignmentWindow, SelectHdl));
     mxStretch->connect_toggled(LINK(this, FontworkAlignmentWindow, SelectHdl));
 
     AddStatusListener( gsFontworkAlignment );
@@ -328,8 +318,9 @@ void FontworkAlignmentWindow::implSetAlignment( int nSurface, bool bEnabled )
     mxCenter->set_sensitive(bEnabled);
     mxRight->set_active(nSurface == 2 && bEnabled);
     mxRight->set_sensitive(bEnabled);
-    mxWord->set_active(nSurface == 3 && bEnabled);
-    mxWord->set_sensitive(bEnabled);
+    //Refer https://bugs.documentfoundation.org/show_bug.cgi?id=145092 for why following lines are commented
+    //mxWord->set_active(nSurface == 3 && bEnabled);
+    //mxWord->set_sensitive(bEnabled);
     mxStretch->set_active(nSurface == 4 && bEnabled);
     mxStretch->set_sensitive(bEnabled);
     mbSettingValue = bSettingValue;
@@ -364,8 +355,9 @@ IMPL_LINK(FontworkAlignmentWindow, SelectHdl, weld::Toggleable&, rButton, void)
         nAlignment = 1;
     else if (mxRight->get_active())
         nAlignment = 2;
-    else if (mxWord->get_active())
-        nAlignment = 3;
+    //Refer https://bugs.documentfoundation.org/show_bug.cgi?id=145092 for why following lines are commented
+    //else if (mxWord->get_active())
+    //    nAlignment = 3;
     else
         nAlignment = 4;
 

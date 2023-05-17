@@ -33,7 +33,6 @@ class SVL_DLLPUBLIC SfxItemIter
 
 public:
     SfxItemIter(const SfxItemSet& rSet);
-    ~SfxItemIter();
 
     /// get item, or null if no items
     const SfxPoolItem* GetCurItem() const
@@ -47,6 +46,10 @@ public:
     sal_uInt16 GetCurPos() const { return m_nCurrent; }
     sal_uInt16 GetFirstPos() const { return m_nStart; }
     sal_uInt16 GetLastPos() const { return m_nEnd; }
+
+    SfxItemState GetItemState(bool bSrchInParent = true,
+                              const SfxPoolItem** ppItem = nullptr) const;
+    void ClearItem();
 
 private:
     const SfxPoolItem* ImplNextItem();

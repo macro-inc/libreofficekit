@@ -188,7 +188,7 @@ public:
     SbiDdeControl* GetDdeControl() { return pDdeCtrl.get(); }
     StarBASIC* GetBasic() { return pBasic; }
     SbiDllMgr* GetDllMgr();
-    SbiRTLData& GetRTLData() const { return const_cast<SbiRTLData&>(aRTLData); }
+    SbiRTLData& GetRTLData() { return aRTLData; }
 
     std::shared_ptr<SvNumberFormatter> const & GetNumberFormatter();
     sal_uInt32 GetStdDateIdx() const { return nStdDateIdx; }
@@ -250,7 +250,6 @@ class SbiRuntime
     BasicDebugFlags    nFlags;           // Debugging-Flags
     ErrCode            nError;
     sal_uInt16         nOps;             // opcode counter
-    sal_uInt32         m_nLastTime;
 
     std::vector<SbxVariableRef>  aRefSaved; // #74254 save temporary references
     std::vector<SbiGosub>   pGosubStk;      // GOSUB stack

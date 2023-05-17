@@ -23,17 +23,18 @@
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <ucbhelper/resultsetmetadata.hxx>
 #include <cppuhelper/queryinterface.hxx>
+#include <utility>
 
 #include "resultsetbase.hxx"
 
 using namespace chelp;
 using namespace com::sun::star;
 
-ResultSetBase::ResultSetBase( const uno::Reference< uno::XComponentContext >&  rxContext,
-                              const uno::Reference< ucb::XContentProvider >&  xProvider,
+ResultSetBase::ResultSetBase( uno::Reference< uno::XComponentContext >  xContext,
+                              uno::Reference< ucb::XContentProvider >  xProvider,
                               const uno::Sequence< beans::Property >& seq )
-    : m_xContext( rxContext ),
-      m_xProvider( xProvider ),
+    : m_xContext(std::move( xContext )),
+      m_xProvider(std::move( xProvider )),
       m_nRow( -1 ),
       m_nWasNull( true ),
       m_sProperty( seq )
@@ -88,7 +89,7 @@ ResultSetBase::addEventListener(
 
     if ( ! m_pDisposeEventListeners )
         m_pDisposeEventListeners.reset(
-            new comphelper::OInterfaceContainerHelper2( m_aMutex ));
+            new comphelper::OInterfaceContainerHelper3<lang::XEventListener>( m_aMutex ));
 
     m_pDisposeEventListeners->addInterface( Listener );
 }
@@ -440,7 +441,7 @@ void SAL_CALL ResultSetBase::addPropertyChangeListener(
         osl::MutexGuard aGuard( m_aMutex );
         if ( ! m_pIsFinalListeners )
             m_pIsFinalListeners.reset(
-                new comphelper::OInterfaceContainerHelper2( m_aMutex ));
+                new comphelper::OInterfaceContainerHelper3<beans::XPropertyChangeListener>( m_aMutex ));
 
         m_pIsFinalListeners->addInterface( xListener );
     }
@@ -449,7 +450,7 @@ void SAL_CALL ResultSetBase::addPropertyChangeListener(
         osl::MutexGuard aGuard( m_aMutex );
         if ( ! m_pRowCountListeners )
             m_pRowCountListeners.reset(
-                new comphelper::OInterfaceContainerHelper2( m_aMutex ));
+                new comphelper::OInterfaceContainerHelper3<beans::XPropertyChangeListener>( m_aMutex ));
         m_pRowCountListeners->addInterface( xListener );
     }
     else

@@ -29,13 +29,13 @@ OUString featureCodeAsString(uint32_t nFeature)
 
 // Feature
 Feature::Feature()
-    : m_aID({ 0, 0, 0 })
+    : m_nCode(0)
     , m_eType(FeatureType::OpenType)
 {
 }
 
-Feature::Feature(FeatureID const& rID, FeatureType eType)
-    : m_aID(rID)
+Feature::Feature(uint32_t nCode, FeatureType eType)
+    : m_nCode(nCode)
     , m_eType(eType)
 {
 }
@@ -89,16 +89,16 @@ uint32_t FeatureParameter::getCode() const { return m_nCode; }
 
 FeatureDefinition::FeatureDefinition()
     : m_nCode(0)
-    , m_nDefault(0)
+    , m_nDefault(-1)
     , m_eType(FeatureParameterType::BOOL)
 {
 }
 
-FeatureDefinition::FeatureDefinition(uint32_t nCode, OUString const& rDescription,
+FeatureDefinition::FeatureDefinition(uint32_t nCode, OUString aDescription,
                                      FeatureParameterType eType,
                                      std::vector<FeatureParameter>&& rEnumParameters,
-                                     uint32_t nDefault)
-    : m_sDescription(rDescription)
+                                     int32_t nDefault)
+    : m_sDescription(std::move(aDescription))
     , m_nCode(nCode)
     , m_nDefault(nDefault)
     , m_eType(eType)
@@ -107,11 +107,11 @@ FeatureDefinition::FeatureDefinition(uint32_t nCode, OUString const& rDescriptio
 }
 
 FeatureDefinition::FeatureDefinition(uint32_t nCode, TranslateId pDescriptionID,
-                                     OUString const& rNumericPart)
+                                     OUString aNumericPart)
     : m_pDescriptionID(pDescriptionID)
-    , m_sNumericPart(rNumericPart)
+    , m_sNumericPart(std::move(aNumericPart))
     , m_nCode(nCode)
-    , m_nDefault(0)
+    , m_nDefault(-1)
     , m_eType(FeatureParameterType::BOOL)
 {
 }
@@ -120,7 +120,7 @@ FeatureDefinition::FeatureDefinition(uint32_t nCode, TranslateId pDescriptionID,
                                      std::vector<FeatureParameter> aEnumParameters)
     : m_pDescriptionID(pDescriptionID)
     , m_nCode(nCode)
-    , m_nDefault(0)
+    , m_nDefault(-1)
     , m_eType(FeatureParameterType::ENUM)
     , m_aEnumParameters(std::move(aEnumParameters))
 {
@@ -156,7 +156,7 @@ FeatureParameterType FeatureDefinition::getType() const { return m_eType; }
 
 FeatureDefinition::operator bool() const { return m_nCode != 0; }
 
-uint32_t FeatureDefinition::getDefault() const { return m_nDefault; }
+int32_t FeatureDefinition::getDefault() const { return m_nDefault; }
 } // end vcl::font namespace
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

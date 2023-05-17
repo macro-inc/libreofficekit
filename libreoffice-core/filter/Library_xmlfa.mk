@@ -19,11 +19,16 @@
 
 $(eval $(call gb_Library_Library,xmlfa))
 
-$(eval $(call gb_Library_set_componentfile,xmlfa,filter/source/xmlfilteradaptor/xmlfa))
+$(eval $(call gb_Library_set_componentfile,xmlfa,filter/source/xmlfilteradaptor/xmlfa,services))
 
 $(eval $(call gb_Library_use_external,xmlfa,boost_headers))
 
 $(eval $(call gb_Library_use_sdk_api,xmlfa))
+
+$(eval $(call gb_Library_set_include,xmlfa,\
+	$$(INCLUDE) \
+	-I$(SRCDIR)/filter/inc \
+))
 
 $(eval $(call gb_Library_use_libraries,xmlfa,\
 	comphelper \

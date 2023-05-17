@@ -81,6 +81,7 @@
 #include <xfilter/xfparastyle.hxx>
 #include <o3tl/sorted_vector.hxx>
 #include <sal/log.hxx>
+#include <unotools/configmgr.hxx>
 
 #include <algorithm>
 #include <memory>
@@ -111,22 +112,24 @@ LwpTableLayout* LwpSuperTableLayout::GetTableLayout()
 {
     LwpObjectID *pID = &GetChildTail();
 
-    while(pID && !pID->IsNull())
+    o3tl::sorted_vector<LwpObjectID*> aSeen;
+    while (pID && !pID->IsNull())
     {
+        bool bAlreadySeen = !aSeen.insert(pID).second;
+        if (bAlreadySeen)
+            throw std::runtime_error("loop in conversion");
+
         LwpLayout* pLayout = dynamic_cast<LwpLayout*>(pID->obj().get());
         if (!pLayout)
-        {
             break;
-        }
         if (pLayout->GetLayoutType() == LWP_TABLE_LAYOUT)
-        {
             return dynamic_cast<LwpTableLayout *>(pLayout);
-        }
         pID = &pLayout->GetPrevious();
     }
 
     return nullptr;
 }
+
 /**
  * @short   Get effective heading table layout, the one just before table layout is the only one which is effective
  * @return LwpTableHeadingLayout* - pointer to table heading layout
@@ -135,23 +138,24 @@ LwpTableHeadingLayout* LwpSuperTableLayout::GetTableHeadingLayout()
 {
     LwpObjectID *pID = &GetChildTail();
 
-    while(pID && !pID->IsNull())
+    o3tl::sorted_vector<LwpObjectID*> aSeen;
+    while (pID && !pID->IsNull())
     {
+        bool bAlreadySeen = !aSeen.insert(pID).second;
+        if (bAlreadySeen)
+            throw std::runtime_error("loop in conversion");
+
         LwpLayout * pLayout = dynamic_cast<LwpLayout *>(pID->obj().get());
         if (!pLayout)
-        {
             break;
-        }
-
         if (pLayout->GetLayoutType() == LWP_TABLE_HEADING_LAYOUT)
-        {
             return dynamic_cast<LwpTableHeadingLayout *>(pLayout);
-        }
         pID = &pLayout->GetPrevious();
     }
 
     return nullptr;
 }
+
 /**
  * @short   Register super table layout style
  */
@@ -787,6 +791,8 @@ void LwpTableLayout::ParseTable()
     sal_uInt16 nRow = m_nRows;
     sal_uInt8 nCol = static_cast<sal_uInt8>(m_nCols);
 
+    sal_uInt16 nContentRow = 0;
+
     //process header rows
     LwpTableHeadingLayout* pTableHeading;
     pTableHeading = pSuper->GetTableHeadingLayout();
@@ -795,16 +801,18 @@ void LwpTableLayout::ParseTable()
         sal_uInt16 nStartHeadRow;
         sal_uInt16 nEndHeadRow;
         pTableHeading->GetStartEndRow(nStartHeadRow,nEndHeadRow);
-        if (nStartHeadRow != 0)
-            ConvertTable(m_pXFTable,0,nRow,0,nCol);
-        else
+        if (nStartHeadRow == 0)
         {
-            sal_uInt16 nContentRow = ConvertHeadingRow(m_pXFTable,nStartHeadRow,nEndHeadRow+1);
-            ConvertTable(m_pXFTable,nContentRow,nRow,0,nCol);
+            if (utl::ConfigManager::IsFuzzing() && nEndHeadRow - nStartHeadRow > 128)
+            {
+                SAL_WARN("lwp", "truncating HeadingRow for fuzzing performance");
+                nEndHeadRow = nStartHeadRow + 128;
+            }
+            nContentRow = ConvertHeadingRow(m_pXFTable,nStartHeadRow,nEndHeadRow+1);
         }
     }
-    else
-        ConvertTable(m_pXFTable,0,nRow,0,nCol);
+
+    ConvertTable(m_pXFTable, nContentRow, nRow, 0, nCol);
 }
 
 /**

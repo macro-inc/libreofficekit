@@ -23,11 +23,12 @@
 #include <tools/debug.hxx>
 #include <osl/diagnose.h>
 
+#include <cassert>
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 
-typedef std::map<SvTreeListEntry*, std::unique_ptr<SvViewDataEntry>> SvDataTable;
+typedef std::unordered_map<SvTreeListEntry*, std::unique_ptr<SvViewDataEntry>> SvDataTable;
 
 struct SvListView::Impl
 {
@@ -101,8 +102,6 @@ bool SvTreeList::IsEntryVisible( const SvListView* pView, SvTreeListEntry* pEntr
 
 sal_uInt16 SvTreeList::GetDepth( const SvTreeListEntry* pEntry ) const
 {
-    if (!pEntry)
-        return 0;
     DBG_ASSERT(pEntry && pEntry!=pRootItem.get(),"GetDepth:Bad Entry");
     sal_uInt16 nDepth = 0;
     while( pEntry && pEntry->pParent != pRootItem.get() )
@@ -675,8 +674,6 @@ SvTreeListEntry* SvTreeList::PrevVisible(const SvListView* pView, SvTreeListEntr
 {
     DBG_ASSERT(pView&&pActEntry,"PrevVis:View/Entry?");
 
-    sal_uInt16 nDepth = 0;
-
     SvTreeListEntries* pActualList = &pActEntry->pParent->m_Children;
     sal_uInt32 nActualPos = pActEntry->GetChildListPos();
 
@@ -686,7 +683,6 @@ SvTreeListEntry* SvTreeList::PrevVisible(const SvListView* pView, SvTreeListEntr
         while( pView->IsExpanded(pActEntry) )
         {
             pActualList = &pActEntry->m_Children;
-            nDepth++;
             pActEntry = pActualList->back().get();
         }
         return pActEntry;
@@ -698,7 +694,6 @@ SvTreeListEntry* SvTreeList::PrevVisible(const SvListView* pView, SvTreeListEntr
     pActEntry = pActEntry->pParent;
     if ( pActEntry )
     {
-        nDepth--;
         return pActEntry;
     }
     return nullptr;
@@ -1356,7 +1351,7 @@ const SvViewDataEntry* SvListView::GetViewData( const SvTreeListEntry* pEntry ) 
 SvViewDataEntry* SvListView::GetViewData( SvTreeListEntry* pEntry )
 {
     SvDataTable::iterator itr = m_pImpl->m_DataTable.find( pEntry );
-    DBG_ASSERT(itr != m_pImpl->m_DataTable.end(),"Entry not in model or wrong view");
+    assert(itr != m_pImpl->m_DataTable.end() && "Entry not in model or wrong view");
     return itr->second.get();
 }
 
@@ -1507,8 +1502,6 @@ SvTreeListEntries& SvTreeList::GetChildList( SvTreeListEntry* pParent )
 
 const SvTreeListEntry* SvTreeList::GetParent( const SvTreeListEntry* pEntry ) const
 {
-    if (!pEntry)
-        return nullptr;
     const SvTreeListEntry* pParent = pEntry->pParent;
     if (pParent == pRootItem.get())
         pParent = nullptr;
@@ -1517,8 +1510,6 @@ const SvTreeListEntry* SvTreeList::GetParent( const SvTreeListEntry* pEntry ) co
 
 SvTreeListEntry* SvTreeList::GetParent( SvTreeListEntry* pEntry )
 {
-    if (!pEntry)
-        return nullptr;
     SvTreeListEntry* pParent = pEntry->pParent;
     if (pParent == pRootItem.get())
         pParent = nullptr;

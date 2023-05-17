@@ -20,7 +20,7 @@
 
 #include <WrappedPropertySet.hxx>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <com/sun/star/chart/XDiagramPositioning.hpp>
 #include <com/sun/star/chart2/XDiagramProvider.hpp>
 #include <com/sun/star/chart/XDiagram.hpp>
@@ -63,7 +63,7 @@ class DiagramWrapper : public cppu::ImplInheritanceHelper<
                     >
 {
 public:
-    explicit DiagramWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact);
+    explicit DiagramWrapper(std::shared_ptr<Chart2ModelContact> spChart2ModelContact);
     virtual ~DiagramWrapper() override;
 
     /// XServiceInfo declarations
@@ -186,7 +186,7 @@ protected:
 
 private:
     std::shared_ptr< Chart2ModelContact >   m_spChart2ModelContact;
-    ::comphelper::OInterfaceContainerHelper2           m_aEventListenerContainer;
+    ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener> m_aEventListenerContainer;
 
     css::uno::Reference<
         css::chart::XAxis >        m_xXAxis;

@@ -93,9 +93,9 @@ public:
     bool            Create(CGLayerHolder const & rLayerHolder, int nBitCount, int nX, int nY, int nWidth, int nHeight, bool bFlipped);
 
 public:
-    CGImageRef      CreateWithMask( const QuartzSalBitmap& rMask, int nX, int nY, int nWidth, int nHeight ) const;
-    CGImageRef      CreateColorMask( int nX, int nY, int nWidth, int nHeight, Color nMaskColor ) const;
-    CGImageRef      CreateCroppedImage( int nX, int nY, int nWidth, int nHeight ) const;
+    virtual CGImageRef CreateWithMask( const SalBitmap& rMask, int nX, int nY, int nWidth, int nHeight ) const override;
+    virtual CGImageRef CreateColorMask( int nX, int nY, int nWidth, int nHeight, Color nMaskColor ) const override;
+    virtual CGImageRef CreateCroppedImage( int nX, int nY, int nWidth, int nHeight ) const override;
 
     void doDestroy();
 };

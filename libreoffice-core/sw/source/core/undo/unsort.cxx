@@ -140,7 +140,7 @@ void SwUndoSort::UndoImpl(::sw::UndoRedoContext & rContext)
         {
             SwNodeIndex aIdx( rDoc.GetNodes(), m_nSttNode + SwNodeOffset(i) );
             SwNodeRange aRg( aIdxList[i], SwNodeOffset(0), aIdxList[i], SwNodeOffset(1) );
-            rDoc.getIDocumentContentOperations().MoveNodeRange(aRg, aIdx,
+            rDoc.getIDocumentContentOperations().MoveNodeRange(aRg, aIdx.GetNode(),
                 SwMoveFlags::DEFAULT);
         }
         // delete indices
@@ -213,16 +213,16 @@ void SwUndoSort::RedoImpl(::sw::UndoRedoContext & rContext)
         {
             SwNodeIndex aIdx( rDoc.GetNodes(), m_nSttNode + SwNodeOffset(i));
             SwNodeRange aRg( aIdxList[i], SwNodeOffset(0), aIdxList[i], SwNodeOffset(1) );
-            rDoc.getIDocumentContentOperations().MoveNodeRange(aRg, aIdx,
+            rDoc.getIDocumentContentOperations().MoveNodeRange(aRg, aIdx.GetNode(),
                 SwMoveFlags::DEFAULT);
         }
         // delete indices
         aIdxList.clear();
         SetPaM(rPam, true);
-        SwTextNode const*const pTNd = rPam.GetNode().GetTextNode();
+        SwTextNode const*const pTNd = rPam.GetPointNode().GetTextNode();
         if( pTNd )
         {
-            rPam.GetPoint()->nContent = pTNd->GetText().getLength();
+            rPam.GetPoint()->SetContent( pTNd->GetText().getLength() );
         }
     }
 }
@@ -235,7 +235,7 @@ void SwUndoSort::RepeatImpl(::sw::RepeatContext & rContext)
         SwPaM *const pPam = & rContext.GetRepeatPaM();
         SwDoc& rDoc = pPam->GetDoc();
 
-        if( !rDoc.IsIdxInTable( pPam->Start()->nNode ) )
+        if( !SwDoc::IsInTable( pPam->Start()->GetNode() ) )
             rDoc.SortText(*pPam, *m_pSortOptions);
     }
 }

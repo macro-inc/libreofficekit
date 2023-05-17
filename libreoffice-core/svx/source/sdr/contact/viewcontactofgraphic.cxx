@@ -39,7 +39,7 @@
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
 #include <sdr/primitive2d/sdrtextprimitive2d.hxx>
 #include <editeng/eeitem.hxx>
@@ -162,7 +162,7 @@ namespace sdr::contact
                 xRetval.push_back(
                     drawinglayer::primitive2d::Primitive2DReference(
                         new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(
-                            aOutline,
+                            std::move(aOutline),
                             aBColor)));
             }
 
@@ -212,7 +212,7 @@ namespace sdr::contact
                     xRetval.push_back(
                         drawinglayer::primitive2d::Primitive2DReference(
                             new drawinglayer::primitive2d::BitmapPrimitive2D(
-                                VCLUnoHelper::CreateVCLXBitmap(aDraftBitmap),
+                                aDraftBitmap,
                                 aBitmapMatrix)));
 
                     // consume bitmap size in X
@@ -241,7 +241,7 @@ namespace sdr::contact
                 // needed and can be deleted.
 
                 // create temp RectObj as TextObj and set needed attributes
-                SdrRectObj* pRectObj(new SdrRectObj(GetGrafObject().getSdrModelFromSdrObject(), OBJ_TEXT));
+                rtl::Reference<SdrRectObj> pRectObj(new SdrRectObj(GetGrafObject().getSdrModelFromSdrObject(), SdrObjKind::Text));
                 pRectObj->NbcSetText(aDraftText);
                 pRectObj->SetMergedItem(SvxColorItem(COL_LIGHTRED, EE_CHAR_COLOR));
 
@@ -272,18 +272,13 @@ namespace sdr::contact
                     const drawinglayer::geometry::ViewInformation2D aViewInformation2D;
                     xBlockTextPrimitive->get2DDecomposition(xRetval, aViewInformation2D);
                 }
-
-                // always use SdrObject::Free(...) for SdrObjects (!)
-                SdrObject* pTemp(pRectObj);
-                SdrObject::Free(pTemp);
             }
 
             return xRetval;
         }
 
-        drawinglayer::primitive2d::Primitive2DContainer ViewContactOfGraphic::createViewIndependentPrimitive2DSequence() const
+        void ViewContactOfGraphic::createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
         {
-            drawinglayer::primitive2d::Primitive2DContainer xRetval;
             const SfxItemSet& rItemSet = GetGrafObject().GetMergedItemSet();
 
             // create and fill GraphicAttr
@@ -316,28 +311,10 @@ namespace sdr::contact
             // look for mirroring
             const GeoStat& rGeoStat(GetGrafObject().GetGeoStat());
             const Degree100 nRotationAngle(rGeoStat.nRotationAngle);
-            const bool bRota180(18000_deg100 == nRotationAngle);
             const bool bMirrored(GetGrafObject().IsMirrored());
-            const sal_uInt16 nMirrorCase(bRota180 ? (bMirrored ? 3 : 4) : (bMirrored ? 2 : 1));
-            bool bHMirr((2 == nMirrorCase ) || (4 == nMirrorCase));
-            bool bVMirr((3 == nMirrorCase ) || (4 == nMirrorCase));
 
-            // set mirror flags at LocalGrafInfo. Take into account that the geometry in
-            // aObjectRange is already changed and rotated when bRota180 is used. To rebuild
-            // that old behaviour (as long as part of the model data), correct the H/V flags
-            // accordingly. The created bitmapPrimitive WILL use the rotation, too.
-            if(bRota180)
-            {
-                // if bRota180 which is used for vertical mirroring, the graphic will already be rotated
-                // by 180 degrees. To correct, switch off VMirror and invert HMirroring.
-                bHMirr = !bHMirr;
-                bVMirr = false;
-            }
-
-            if(bHMirr || bVMirr)
-            {
-                aLocalGrafInfo.SetMirrorFlags((bHMirr ? BmpMirrorFlags::Horizontal : BmpMirrorFlags::NONE)|(bVMirr ? BmpMirrorFlags::Vertical : BmpMirrorFlags::NONE));
-            }
+            if (bMirrored)
+                aLocalGrafInfo.SetMirrorFlags(BmpMirrorFlags::Horizontal);
 
             // fill object matrix
             const double fShearX(-rGeoStat.mfTanShearAngle);
@@ -354,7 +331,7 @@ namespace sdr::contact
             {
                 // it's an EmptyPresObj, create the SdrGrafPrimitive2D without content and another scaled one
                 // with the content which is the placeholder graphic
-                xRetval = createVIP2DSForPresObj(aObjectMatrix, aAttribute);
+                rVisitor.visit(createVIP2DSForPresObj(aObjectMatrix, aAttribute));
             }
 #ifndef IOS // Enforce swap-in for tiled rendering for now, while we have no delayed updating mechanism
             else if(visualisationUsesDraft())
@@ -364,7 +341,7 @@ namespace sdr::contact
                 // visual update mechanism for swapped-out graphics when they were loaded (see AsynchGraphicLoadingEvent
                 // and ViewObjectContactOfGraphic implementation). Not forcing the swap-in here allows faster
                 // (non-blocking) processing here and thus in the effect e.g. fast scrolling through pages
-                xRetval = createVIP2DSForDraft(aObjectMatrix, aAttribute);
+                rVisitor.visit(createVIP2DSForDraft(aObjectMatrix, aAttribute));
             }
 #endif
             else
@@ -378,16 +355,14 @@ namespace sdr::contact
                         rGraphicObject,
                         aLocalGrafInfo));
 
-                xRetval = drawinglayer::primitive2d::Primitive2DContainer { xReference };
+                rVisitor.visit(xReference);
             }
 
             // always append an invisible outline for the cases where no visible content exists
-            xRetval.push_back(
+            rVisitor.visit(
                 drawinglayer::primitive2d::createHiddenGeometryPrimitives2D(
                     aObjectMatrix));
-
-            return xRetval;
-        }
+       }
 
         bool ViewContactOfGraphic::visualisationUsesPresObj() const
         {

@@ -27,14 +27,15 @@
 #include <Clipping.hxx>
 #include <PolarLabelPositionHelper.hxx>
 #include <DateHelper.hxx>
+#include <ChartType.hxx>
 
 #include <com/sun/star/chart2/Symbol.hpp>
 #include <com/sun/star/chart/DataLabelPlacement.hpp>
 #include <com/sun/star/chart/MissingValueTreatment.hpp>
 
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 
-#include <com/sun/star/drawing/XShapes.hpp>
 #include <officecfg/Office/Compatibility.hxx>
 
 #include <limits>
@@ -44,7 +45,7 @@ namespace chart
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
-NetChart::NetChart( const uno::Reference<XChartType>& xChartTypeModel
+NetChart::NetChart( const rtl::Reference<ChartType>& xChartTypeModel
                      , sal_Int32 nDimensionCount
                      , bool bNoArea
                      , std::unique_ptr<PlottingPositionHelper> pPlottingPositionHelper
@@ -111,13 +112,13 @@ drawing::Direction3D NetChart::getPreferredDiagramAspectRatio() const
 }
 
 bool NetChart::impl_createLine( VDataSeries* pSeries
-                , drawing::PolyPolygonShape3D* pSeriesPoly
+                , const std::vector<std::vector<css::drawing::Position3D>>* pSeriesPoly
                 , PlottingPositionHelper const * pPosHelper )
 {
     //return true if a line was created successfully
-    uno::Reference< drawing::XShapes > xSeriesGroupShape_Shapes = getSeriesGroupShapeBackChild(pSeries, m_xSeriesTarget);
+    rtl::Reference<SvxShapeGroupAnyD> xSeriesGroupShape_Shapes = getSeriesGroupShapeBackChild(pSeries, m_xSeriesTarget);
 
-    drawing::PolyPolygonShape3D aPoly;
+    std::vector<std::vector<css::drawing::Position3D>> aPoly;
     {
         bool bIsClipped = false;
         if( !ShapeFactory::isPolygonEmptyOrSinglePoint(*pSeriesPoly) )
@@ -130,10 +131,10 @@ bool NetChart::impl_createLine( VDataSeries* pSeries
             {
                 // connect last point in last polygon with first point in first polygon
                 ::basegfx::B2DRectangle aScaledLogicClipDoubleRect( pPosHelper->getScaledLogicClipDoubleRect() );
-                drawing::PolyPolygonShape3D aTmpPoly(*pSeriesPoly);
-                drawing::Position3D aLast(aScaledLogicClipDoubleRect.getMaxX(),aTmpPoly.SequenceY[0][0],aTmpPoly.SequenceZ[0][0]);
+                std::vector<std::vector<css::drawing::Position3D>> aTmpPoly(*pSeriesPoly);
+                drawing::Position3D aLast(aScaledLogicClipDoubleRect.getMaxX(),aTmpPoly[0][0].PositionY,aTmpPoly[0][0].PositionZ);
                 // add connector line to last polygon
-                AddPointToPoly( aTmpPoly, aLast, pSeriesPoly->SequenceX.getLength() - 1 );
+                AddPointToPoly( aTmpPoly, aLast, pSeriesPoly->size() - 1 );
                 Clipping::clipPolygonAtRectangle( aTmpPoly, aScaledLogicClipDoubleRect, aPoly );
                 bIsClipped = true;
             }
@@ -150,11 +151,10 @@ bool NetChart::impl_createLine( VDataSeries* pSeries
     pPosHelper->transformScaledLogicToScene( aPoly );
 
     //create line:
-    uno::Reference< drawing::XShape > xShape;
+    rtl::Reference<SvxShapePolyPolygon> xShape;
     {
-        xShape = m_pShapeFactory->createLine2D( xSeriesGroupShape_Shapes
-                , PolyToPointSequence( aPoly ) );
-        setMappedProperties( xShape
+        xShape = ShapeFactory::createLine2D( xSeriesGroupShape_Shapes, aPoly );
+        PropertyMapper::setMappedProperties( *xShape
                 , pSeries->getPropertiesOfSeries()
                 , PropertyMapper::getPropertyNameMapForLineSeriesProperties() );
         //because of this name this line will be used for marking
@@ -164,16 +164,16 @@ bool NetChart::impl_createLine( VDataSeries* pSeries
 }
 
 bool NetChart::impl_createArea( VDataSeries* pSeries
-                , drawing::PolyPolygonShape3D* pSeriesPoly
-                , drawing::PolyPolygonShape3D const * pPreviousSeriesPoly
+                , const std::vector<std::vector<css::drawing::Position3D>>* pSeriesPoly
+                , std::vector<std::vector<css::drawing::Position3D>> const * pPreviousSeriesPoly
                 , PlottingPositionHelper const * pPosHelper )
 {
     //return true if an area was created successfully
 
-    uno::Reference< drawing::XShapes > xSeriesGroupShape_Shapes = getSeriesGroupShapeBackChild(pSeries, m_xSeriesTarget);
+    rtl::Reference<SvxShapeGroupAnyD> xSeriesGroupShape_Shapes = getSeriesGroupShapeBackChild(pSeries, m_xSeriesTarget);
     double zValue = pSeries->m_fLogicZPos;
 
-    drawing::PolyPolygonShape3D aPoly( *pSeriesPoly );
+    std::vector<std::vector<css::drawing::Position3D>> aPoly( *pSeriesPoly );
     //add second part to the polygon (grounding points or previous series points)
     if( !ShapeFactory::isPolygonEmptyOrSinglePoint(*pSeriesPoly) )
     {
@@ -209,7 +209,7 @@ bool NetChart::impl_createArea( VDataSeries* pSeries
 
     //apply clipping
     {
-        drawing::PolyPolygonShape3D aClippedPoly;
+        std::vector<std::vector<css::drawing::Position3D>> aClippedPoly;
         Clipping::clipPolygonAtRectangle( aPoly, pPosHelper->getScaledLogicClipDoubleRect(), aClippedPoly, false );
         ShapeFactory::closePolygon(aClippedPoly); //again necessary after clipping
         aPoly = aClippedPoly;
@@ -222,10 +222,10 @@ bool NetChart::impl_createArea( VDataSeries* pSeries
     pPosHelper->transformScaledLogicToScene( aPoly );
 
     //create area:
-    uno::Reference< drawing::XShape >
-        xShape = m_pShapeFactory->createArea2D( xSeriesGroupShape_Shapes
+    rtl::Reference<SvxShapePolyPolygon>
+        xShape = ShapeFactory::createArea2D( xSeriesGroupShape_Shapes
                 , aPoly );
-    setMappedProperties( xShape
+    PropertyMapper::setMappedProperties( *xShape
                 , pSeries->getPropertiesOfSeries()
                 , PropertyMapper::getPropertyNameMapForFilledSeriesProperties() );
     //because of this name this line will be used for marking
@@ -242,8 +242,8 @@ void NetChart::impl_createSeriesShapes()
     {
         for( auto const& rXSlot : rZSlot )
         {
-            std::map< sal_Int32, drawing::PolyPolygonShape3D* > aPreviousSeriesPolyMap;//a PreviousSeriesPoly for each different nAttachedAxisIndex
-            drawing::PolyPolygonShape3D* pSeriesPoly = nullptr;
+            std::map< sal_Int32, std::vector<std::vector<css::drawing::Position3D>>* > aPreviousSeriesPolyMap;//a PreviousSeriesPoly for each different nAttachedAxisIndex
+            std::vector<std::vector<css::drawing::Position3D>>* pSeriesPoly = nullptr;
 
             //iterate through all series
             for( std::unique_ptr<VDataSeries> const & pSeries : rXSlot.m_aSeriesVector )
@@ -324,8 +324,8 @@ void NetChart::createShapes()
     if (officecfg::Office::Compatibility::View::ReverseSeriesOrderAreaAndNetChart::get() && m_bArea)
         lcl_reorderSeries( m_aZSlots );
 
-    OSL_ENSURE(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is(),"NetChart is not proper initialized");
-    if(!(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is()))
+    OSL_ENSURE(m_xLogicTarget.is()&&m_xFinalTarget.is(),"NetChart is not proper initialized");
+    if(!(m_xLogicTarget.is()&&m_xFinalTarget.is()))
         return;
 
     //the text labels should be always on top of the other series shapes
@@ -334,7 +334,7 @@ void NetChart::createShapes()
     //therefore create an own group for the texts and the error bars to move them to front
     //(because the text group is created after the series group the texts are displayed on top)
     m_xSeriesTarget   = createGroupShape( m_xLogicTarget );
-    m_xTextTarget     = m_pShapeFactory->createGroup2D( m_xFinalTarget );
+    m_xTextTarget     = ShapeFactory::createGroup2D( m_xFinalTarget );
 
     //check necessary here that different Y axis can not be stacked in the same group? ... hm?
 
@@ -400,7 +400,7 @@ void NetChart::createShapes()
                     if( m_bArea && (rXSlot.m_aSeriesVector.size() == 1) && (nIndex >= pSeries->getTotalPointCount()) )
                         continue;
 
-                    uno::Reference< drawing::XShapes > xSeriesGroupShape_Shapes = getSeriesGroupShapeFrontChild(pSeries.get(), m_xSeriesTarget);
+                    rtl::Reference<SvxShapeGroupAnyD> xSeriesGroupShape_Shapes = getSeriesGroupShapeFrontChild(pSeries.get(), m_xSeriesTarget);
 
                     sal_Int32 nAttachedAxisIndex = pSeries->getAttachedAxisIndex();
                     m_pPosHelper = &getPlottingPositionHelper(nAttachedAxisIndex);
@@ -439,11 +439,11 @@ void NetChart::createShapes()
                     {
                         if( pSeries->getMissingValueTreatment() == css::chart::MissingValueTreatment::LEAVE_GAP )
                         {
-                            drawing::PolyPolygonShape3D& rPolygon = pSeries->m_aPolyPolygonShape3D;
+                            std::vector<std::vector<css::drawing::Position3D>>& rPolygon = pSeries->m_aPolyPolygonShape3D;
                             sal_Int32& rIndex = pSeries->m_nPolygonIndex;
-                            if( 0<= rIndex && rIndex < rPolygon.SequenceX.getLength() )
+                            if( 0<= rIndex && o3tl::make_unsigned(rIndex) < rPolygon.size() )
                             {
-                                if( rPolygon.SequenceX[ rIndex ].hasElements() )
+                                if( !rPolygon[ rIndex ].empty() )
                                     rIndex++; //start a new polygon for the next point if the current poly is not empty
                             }
                         }
@@ -527,9 +527,8 @@ void NetChart::createShapes()
                     //create a group shape for this point and add to the series shape:
                     OUString aPointCID = ObjectIdentifier::createPointCID(
                         pSeries->getPointCID_Stub(), nIndex );
-                    uno::Reference< drawing::XShapes > xPointGroupShape_Shapes(
+                    rtl::Reference<SvxShapeGroupAnyD> xPointGroupShape_Shapes(
                         createGroupShape(xSeriesGroupShape_Shapes,aPointCID) );
-                    uno::Reference<drawing::XShape> xPointGroupShape_Shape( xPointGroupShape_Shapes, uno::UNO_QUERY );
 
                     {
                         //create data point
@@ -545,13 +544,13 @@ void NetChart::createShapes()
                             if (pSymbolProperties->Style == SymbolStyle_STANDARD)
                             {
                                 sal_Int32 nSymbol = pSymbolProperties->StandardSymbol;
-                                m_pShapeFactory->createSymbol2D(
+                                ShapeFactory::createSymbol2D(
                                     xPointGroupShape_Shapes, aScenePosition, aSymbolSize, nSymbol,
                                     pSymbolProperties->BorderColor, pSymbolProperties->FillColor);
                             }
                             else if (pSymbolProperties->Style == SymbolStyle_GRAPHIC)
                             {
-                                m_pShapeFactory->createGraphic2D(xPointGroupShape_Shapes,
+                                ShapeFactory::createGraphic2D(xPointGroupShape_Shapes,
                                                                  aScenePosition, aSymbolSize,
                                                                  pSymbolProperties->Graphic);
                             }
@@ -606,7 +605,7 @@ void NetChart::createShapes()
                                     = dynamic_cast<PolarPlottingPositionHelper*>(m_pPosHelper);
                                 if( pPolarPosHelper )
                                 {
-                                    PolarLabelPositionHelper aPolarLabelPositionHelper(pPolarPosHelper,m_nDimension,m_xLogicTarget,m_pShapeFactory);
+                                    PolarLabelPositionHelper aPolarLabelPositionHelper(pPolarPosHelper,m_nDimension,m_xLogicTarget);
                                     aScreenPosition2D = aPolarLabelPositionHelper.getLabelScreenPositionAndAlignmentForLogicValues(
                                         eAlignment, fLogicX, fLogicY, fLogicZ, nOffset );
                                 }
@@ -615,7 +614,7 @@ void NetChart::createShapes()
                             {
                                 if(eAlignment==LABEL_ALIGN_CENTER )
                                     nOffset = 0;
-                                aScreenPosition2D = LabelPositionHelper(m_nDimension,m_xLogicTarget,m_pShapeFactory)
+                                aScreenPosition2D = LabelPositionHelper(m_nDimension,m_xLogicTarget)
                                     .transformSceneToScreenPosition( aScenePosition3D );
                             }
 
@@ -627,7 +626,7 @@ void NetChart::createShapes()
 
                     //remove PointGroupShape if empty
                     if(!xPointGroupShape_Shapes->getCount())
-                        xSeriesGroupShape_Shapes->remove(xPointGroupShape_Shape);
+                        xSeriesGroupShape_Shapes->remove(xPointGroupShape_Shapes);
 
                 }//next series in x slot (next y slot)
             }//next x slot

@@ -27,9 +27,9 @@
 #include <sal/types.h>
 #include <osl/endian.h>
 #include <osl/diagnose.h>
-#include "reflread.hxx"
 #include <sal/log.hxx>
 
+#include <registry/refltype.hxx>
 #include <registry/typereg_reader.hxx>
 #include <registry/version.h>
 
@@ -44,16 +44,11 @@ const sal_uInt32    magic = 0x12345678;
 const sal_uInt16 minorVersion = 0x0000;
 const sal_uInt16 majorVersion = 0x0001;
 
-/**************************************************************************
-
-    class BlopObject
-
-    holds any data in a flat memory buffer
-
-**************************************************************************/
-
 namespace {
 
+/**
+   Holds any data in a flat memory buffer
+ */
 class BlopObject
 {
 public:
@@ -158,12 +153,6 @@ BlopObject::BlopObject(const sal_uInt8* buffer, sal_uInt32 len)
     m_pBuffer = buffer;
 }
 
-/**************************************************************************
-
-    class StringCache
-
-**************************************************************************/
-
 namespace {
 
 class StringCache
@@ -209,12 +198,6 @@ sal_uInt16 StringCache::createString(const sal_uInt8* buffer)
     else
         return 0;
 }
-
-/**************************************************************************
-
-    class ConstantPool
-
-**************************************************************************/
 
 namespace {
 
@@ -530,12 +513,6 @@ const sal_Unicode* ConstantPool::readStringConstant(sal_uInt16 index) const
     return aString;
 }
 
-/**************************************************************************
-
-    class FieldList
-
-**************************************************************************/
-
 namespace {
 
 class FieldList : public BlopObject
@@ -717,12 +694,6 @@ const char* FieldList::getFieldFileName(sal_uInt16 index) const
     return aFileName;
 }
 
-/**************************************************************************
-
-    class ReferenceList
-
-**************************************************************************/
-
 namespace {
 
 class ReferenceList : public BlopObject
@@ -819,12 +790,6 @@ RTFieldAccess ReferenceList::getReferenceAccess(sal_uInt16 index) const
 
     return aAccess;
 }
-
-/**************************************************************************
-
-    class MethodList
-
-**************************************************************************/
 
 namespace {
 
@@ -1085,12 +1050,6 @@ const char* MethodList::getMethodDoku(sal_uInt16 index) const
     return aDoku;
 }
 
-/**************************************************************************
-
-    class TypeRegistryEntry
-
-**************************************************************************/
-
 namespace {
 
 class TypeRegistryEntry: public BlopObject {
@@ -1173,12 +1132,6 @@ typereg_Version TypeRegistryEntry::getVersion() const {
     return static_cast< typereg_Version >(readUINT32(OFFSET_MAGIC) - magic);
 }
 
-/**************************************************************************
-
-    C-API
-
-**************************************************************************/
-
 bool TYPEREG_CALLTYPE typereg_reader_create(
     void const * buffer, sal_uInt32 length,
     void ** result)
@@ -1211,13 +1164,6 @@ bool TYPEREG_CALLTYPE typereg_reader_create(
         SAL_WARN("registry", "bad data");
         return false;
     }
-}
-
-static TypeReaderImpl TYPEREG_CALLTYPE createEntry(const sal_uInt8* buffer, sal_uInt32 len)
-{
-    void * handle;
-    typereg_reader_create(buffer, len, &handle);
-    return handle;
 }
 
 void TYPEREG_CALLTYPE typereg_reader_acquire(void * hEntry)
@@ -1294,23 +1240,6 @@ void TYPEREG_CALLTYPE typereg_reader_getTypeName(void * hEntry, rtl_uString** pT
 }
 
 
-static void TYPEREG_CALLTYPE getSuperTypeName(TypeReaderImpl hEntry, rtl_uString** pSuperTypeName)
-{
-    TypeRegistryEntry* pEntry = static_cast<TypeRegistryEntry*>(hEntry);
-    if (pEntry != nullptr && pEntry->m_nSuperTypes != 0) {
-        try {
-            const char* pTmp = pEntry->m_pCP->readUTF8NameConstant(pEntry->readUINT16(pEntry->m_offset_SUPERTYPES )); //+ (index * sizeof(sal_uInt16))));
-            rtl_string2UString(
-                pSuperTypeName, pTmp, pTmp == nullptr ? 0 : rtl_str_getLength(pTmp),
-                RTL_TEXTENCODING_UTF8, OSTRING_TO_OUSTRING_CVTFLAGS);
-            return;
-        } catch (BlopObject::BoundsError &) {
-            SAL_WARN("registry", "bad data");
-        }
-    }
-    rtl_uString_new(pSuperTypeName);
-}
-
 void TYPEREG_CALLTYPE typereg_reader_getDocumentation(void * hEntry, rtl_uString** pDoku)
 {
     TypeRegistryEntry* pEntry = static_cast<TypeRegistryEntry*>(hEntry);
@@ -1353,11 +1282,6 @@ sal_uInt16 TYPEREG_CALLTYPE typereg_reader_getFieldCount(void * hEntry)
     if (pEntry == nullptr) return 0;
 
     return pEntry->m_pFields->m_numOfEntries;
-}
-
-static sal_uInt32 TYPEREG_CALLTYPE getFieldCount(TypeReaderImpl hEntry)
-{
-    return typereg_reader_getFieldCount(hEntry);
 }
 
 void TYPEREG_CALLTYPE typereg_reader_getFieldName(void * hEntry, rtl_uString** pFieldName, sal_uInt16 index)
@@ -1417,13 +1341,6 @@ bool TYPEREG_CALLTYPE typereg_reader_getFieldValue(
         return false;
     }
     return true;
-}
-
-static RTValueType TYPEREG_CALLTYPE getFieldConstValue(TypeReaderImpl hEntry, sal_uInt16 index, RTConstValueUnion* value)
-{
-    RTValueType t = RT_TYPE_NONE;
-    typereg_reader_getFieldValue(hEntry, index, &t, value);
-    return t;
 }
 
 void TYPEREG_CALLTYPE typereg_reader_getFieldDocumentation(void * hEntry, rtl_uString** pDoku, sal_uInt16 index)
@@ -1687,74 +1604,6 @@ void TYPEREG_CALLTYPE typereg_reader_getSuperTypeName(
         }
     }
     rtl_uString_new(pSuperTypeName);
-}
-
-RegistryTypeReader::RegistryTypeReader(const sal_uInt8* buffer,
-                                              sal_uInt32 bufferLen)
-    : m_hImpl(nullptr)
-{
-    m_hImpl = createEntry(buffer, bufferLen);
-}
-
-RegistryTypeReader::~RegistryTypeReader()
-{ typereg_reader_release(m_hImpl); }
-
-RTTypeClass RegistryTypeReader::getTypeClass() const
-{  return typereg_reader_getTypeClass(m_hImpl); }
-
-OUString RegistryTypeReader::getTypeName() const
-{
-    OUString sRet;
-    typereg_reader_getTypeName(m_hImpl, &sRet.pData);
-    return sRet;
-}
-
-OUString RegistryTypeReader::getSuperTypeName() const
-{
-    OUString sRet;
-    ::getSuperTypeName(m_hImpl, &sRet.pData);
-    return sRet;
-}
-
-sal_uInt32 RegistryTypeReader::getFieldCount() const
-{   return ::getFieldCount(m_hImpl); }
-
-OUString RegistryTypeReader::getFieldName( sal_uInt16 index ) const
-{
-    OUString sRet;
-    typereg_reader_getFieldName(m_hImpl, &sRet.pData, index);
-    return sRet;
-}
-
-OUString RegistryTypeReader::getFieldType( sal_uInt16 index ) const
-{
-    OUString sRet;
-    typereg_reader_getFieldTypeName(m_hImpl, &sRet.pData, index);
-    return sRet;
-}
-
-RTFieldAccess RegistryTypeReader::getFieldAccess( sal_uInt16 index ) const
-{  return typereg_reader_getFieldFlags(m_hImpl, index); }
-
-RTConstValue RegistryTypeReader::getFieldConstValue( sal_uInt16 index ) const
-{
-    RTConstValue ret;
-    ret.m_type = ::getFieldConstValue(m_hImpl, index, &ret.m_value);
-    return ret;
-}
-
-OUString RegistryTypeReader::getFieldDoku( sal_uInt16 index ) const
-{
-    OUString sRet;
-    typereg_reader_getFieldDocumentation(m_hImpl, &sRet.pData, index);
-    return sRet;
-}
-
-OUString RegistryTypeReader::getFieldFileName( sal_uInt16 index ) const
-{
-    OUString sRet;
-    typereg_reader_getFieldFileName(m_hImpl, &sRet.pData, index);
-    return sRet;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

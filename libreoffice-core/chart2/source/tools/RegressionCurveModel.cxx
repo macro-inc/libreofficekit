@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include "RegressionCurveModel.hxx"
+#include <RegressionCurveModel.hxx>
 #include <LinePropertiesHelper.hxx>
 #include <RegressionCurveHelper.hxx>
 #include "RegressionEquation.hxx"
@@ -26,7 +26,6 @@
 #include <ModifyListenerHelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
-#include <tools/diagnose_ex.h>
 
 namespace com::sun::star::uno { class XComponentContext; }
 
@@ -139,9 +138,8 @@ namespace chart
 {
 
 RegressionCurveModel::RegressionCurveModel( tCurveType eCurveType ) :
-    ::property::OPropertySet( m_aMutex ),
     m_eRegressionCurveType( eCurveType ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+    m_xModifyEventForwarder( new ModifyEventForwarder() ),
     m_xEquationProperties( new RegressionEquation )
 {
     // set 0 line width (default) hard, so that it is always written to XML,
@@ -153,9 +151,9 @@ RegressionCurveModel::RegressionCurveModel( tCurveType eCurveType ) :
 
 RegressionCurveModel::RegressionCurveModel( const RegressionCurveModel & rOther ) :
     impl::RegressionCurveModel_Base(rOther),
-    ::property::OPropertySet( rOther, m_aMutex ),
+    ::property::OPropertySet( rOther ),
     m_eRegressionCurveType( rOther.m_eRegressionCurveType ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     m_xEquationProperties.set( CloneHelper::CreateRefClone< beans::XPropertySet >()( rOther.m_xEquationProperties ));
     ModifyListenerHelper::addListener( m_xEquationProperties, m_xModifyEventForwarder );
@@ -216,28 +214,12 @@ OUString SAL_CALL RegressionCurveModel::getServiceName()
 // ____ XModifyBroadcaster ____
 void SAL_CALL RegressionCurveModel::addModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL RegressionCurveModel::removeModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____
@@ -264,13 +246,14 @@ void RegressionCurveModel::fireModifyEvent()
 }
 
 // ____ OPropertySet ____
-uno::Any RegressionCurveModel::GetDefaultValue( sal_Int32 nHandle ) const
+void RegressionCurveModel::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = GetStaticXXXDefaults();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL RegressionCurveModel::getInfoHelper()

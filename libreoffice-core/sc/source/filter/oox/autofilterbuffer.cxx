@@ -30,12 +30,10 @@
 #include <com/sun/star/table/CellAddress.hpp>
 
 #include <comphelper/sequence.hxx>
-#include <editeng/colritem.hxx>
 #include <editeng/brushitem.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <osl/diagnose.h>
 #include <oox/helper/attributelist.hxx>
-#include <oox/helper/containerhelper.hxx>
 #include <oox/helper/propertyset.hxx>
 #include <oox/helper/binaryinputstream.hxx>
 #include <oox/token/namespaces.hxx>
@@ -658,6 +656,11 @@ ApiFilterSettings FilterColumn::finalizeImport()
     return aSettings;
 }
 
+bool FilterColumn::isButtonHidden()
+{
+    return (mbShowButton == false) || (mbHiddenButton == true);
+}
+
 // SortCondition
 
 SortCondition::SortCondition( const WorkbookHelper& rHelper ) :
@@ -734,7 +737,7 @@ void AutoFilter::finalizeImport( const Reference< XDatabaseRange >& rxDatabaseRa
     ::std::vector<TableFilterField3> aFilterFields;
 
     // track if columns require to enable or disable regular expressions
-    OptValue< bool > obNeedsRegExp;
+    std::optional< bool > obNeedsRegExp;
 
     /*  Track whether the filter fields of the first filter column are
         connected with 'or'. In this case, other filter fields cannot be
@@ -745,6 +748,11 @@ void AutoFilter::finalizeImport( const Reference< XDatabaseRange >& rxDatabaseRa
         '(A1 and B1) or (B2 and C1)'. */
     bool bHasOrConnection = false;
 
+    ScDocument& rDoc = getScDocument();
+    SCCOL nCol = maRange.aStart.Col();
+    SCROW nRow = maRange.aStart.Row();
+    SCTAB nTab = maRange.aStart.Tab();
+
     // process all filter column objects, exit when 'or' connection exists
     for( const auto& rxFilterColumn : maFilterColumns )
     {
@@ -752,11 +760,18 @@ void AutoFilter::finalizeImport( const Reference< XDatabaseRange >& rxDatabaseRa
         ApiFilterSettings aSettings = rxFilterColumn->finalizeImport();
         ApiFilterSettings::FilterFieldVector& rColumnFields = aSettings.maFilterFields;
 
+        if (rxFilterColumn->isButtonHidden())
+        {
+            auto nFlag = rDoc.GetAttr(nCol, nRow, nTab, ATTR_MERGE_FLAG)->GetValue();
+            rDoc.ApplyAttr(nCol, nRow, nTab, ScMergeFlagAttr(nFlag & ~ScMF::Auto));
+        }
+        nCol++;
+
         /*  Check whether mode for regular expressions is compatible with
             the global mode in obNeedsRegExp. If either one is still in
             don't-care state, all is fine. If both are set, they must be
             equal. */
-        bool bRegExpCompatible = !obNeedsRegExp || !aSettings.mobNeedsRegExp || (obNeedsRegExp.get() == aSettings.mobNeedsRegExp.get());
+        bool bRegExpCompatible = !obNeedsRegExp || !aSettings.mobNeedsRegExp || (obNeedsRegExp.value() == aSettings.mobNeedsRegExp.value());
 
         // check whether fields are connected by 'or' (see comments above).
         if( rColumnFields.size() >= 2 )
@@ -776,7 +791,7 @@ void AutoFilter::finalizeImport( const Reference< XDatabaseRange >& rxDatabaseRa
             aFilterFields.insert( aFilterFields.end(), rColumnFields.begin(), rColumnFields.end() );
 
             // update the regular expressions mode
-            obNeedsRegExp.assignIfUsed( aSettings.mobNeedsRegExp );
+            assignIfUsed( obNeedsRegExp, aSettings.mobNeedsRegExp );
         }
 
         if( bHasOrConnection )
@@ -788,7 +803,7 @@ void AutoFilter::finalizeImport( const Reference< XDatabaseRange >& rxDatabaseRa
         xFilterDesc->setFilterFields3( comphelper::containerToSequence( aFilterFields ) );
 
     // regular expressions
-    bool bUseRegExp = obNeedsRegExp.get( false );
+    bool bUseRegExp = obNeedsRegExp.value_or( false );
     aDescProps.setProperty( PROP_UseRegularExpressions, bUseRegExp );
 
     // sort
@@ -840,7 +855,6 @@ void AutoFilter::finalizeImport( const Reference< XDatabaseRange >& rxDatabaseRa
         aParam.maKeyState[0].nField += nStartPos;
     }
 
-    ScDocument& rDoc = getScDocument();
     ScDBData* pDBData = rDoc.GetDBAtArea(
         nSheet,
         maRange.aStart.Col(), maRange.aStart.Row(),

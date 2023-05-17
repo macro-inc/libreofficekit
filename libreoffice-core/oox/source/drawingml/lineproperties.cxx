@@ -31,9 +31,11 @@
 #include <com/sun/star/drawing/PolyPolygonBezierCoords.hpp>
 #include <oox/drawingml/drawingmltypes.hxx>
 #include <oox/drawingml/shapepropertymap.hxx>
-#include <oox/helper/containerhelper.hxx>
 #include <oox/helper/graphichelper.hxx>
 #include <oox/token/tokens.hxx>
+#include <oox/token/properties.hxx>
+#include <docmodel/uno/UnoThemeColor.hxx>
+
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::beans;
@@ -245,7 +247,7 @@ void lclPushMarkerProperties( ShapePropertyMap& rPropMap,
     OUStringBuffer aBuffer;
     sal_Int32 nMarkerWidth = 0;
     bool bMarkerCenter = false;
-    sal_Int32 nArrowType = rArrowProps.moArrowType.get( XML_none );
+    sal_Int32 nArrowType = rArrowProps.moArrowType.value_or( XML_none );
     OSL_ASSERT((nArrowType & sal_Int32(0xFFFF0000))==0);
     switch( nArrowType )
     {
@@ -271,8 +273,8 @@ void lclPushMarkerProperties( ShapePropertyMap& rPropMap,
     if( !aBuffer.isEmpty() )
     {
         bool bIsArrow = nArrowType == XML_arrow;
-        sal_Int32 nLength = lclGetArrowSize( rArrowProps.moArrowLength.get( XML_med ) );
-        sal_Int32 nWidth  = lclGetArrowSize( rArrowProps.moArrowWidth.get( XML_med ) );
+        sal_Int32 nLength = lclGetArrowSize( rArrowProps.moArrowLength.value_or( XML_med ) );
+        sal_Int32 nWidth  = lclGetArrowSize( rArrowProps.moArrowWidth.value_or( XML_med ) );
 
         sal_Int32 nNameIndex = nWidth * 3 + nLength + 1;
         aBuffer.append( ' ' ).append( nNameIndex );
@@ -315,8 +317,8 @@ void lclPushMarkerProperties( ShapePropertyMap& rPropMap,
             const double fArrowLineHalfWidth = ::std::max< double >( 100.0 * 0.5 * nLineWidth / nMarkerWidth, 1 );
 
             ::std::vector< awt::Point > aPoints;
-            OSL_ASSERT((rArrowProps.moArrowType.get() & sal_Int32(0xFFFF0000))==0);
-            switch( rArrowProps.moArrowType.get() )
+            OSL_ASSERT((rArrowProps.moArrowType.value() & sal_Int32(0xFFFF0000))==0);
+            switch( rArrowProps.moArrowType.value() )
             {
                 case XML_triangle:
                     aPoints.push_back( OOX_ARROW_POINT(  50,   0 ) );
@@ -411,9 +413,9 @@ void lclPushMarkerProperties( ShapePropertyMap& rPropMap,
 
 void LineArrowProperties::assignUsed( const LineArrowProperties& rSourceProps )
 {
-    moArrowType.assignIfUsed( rSourceProps.moArrowType );
-    moArrowWidth.assignIfUsed( rSourceProps.moArrowWidth );
-    moArrowLength.assignIfUsed( rSourceProps.moArrowLength );
+    assignIfUsed( moArrowType, rSourceProps.moArrowType );
+    assignIfUsed( moArrowWidth, rSourceProps.moArrowWidth );
+    assignIfUsed( moArrowLength, rSourceProps.moArrowLength );
 }
 
 void LineProperties::assignUsed( const LineProperties& rSourceProps )
@@ -423,40 +425,41 @@ void LineProperties::assignUsed( const LineProperties& rSourceProps )
     maLineFill.assignUsed( rSourceProps.maLineFill );
     if( !rSourceProps.maCustomDash.empty() )
         maCustomDash = rSourceProps.maCustomDash;
-    moLineWidth.assignIfUsed( rSourceProps.moLineWidth );
-    moPresetDash.assignIfUsed( rSourceProps.moPresetDash );
-    moLineCompound.assignIfUsed( rSourceProps.moLineCompound );
-    moLineCap.assignIfUsed( rSourceProps.moLineCap );
-    moLineJoint.assignIfUsed( rSourceProps.moLineJoint );
+    assignIfUsed( moLineWidth, rSourceProps.moLineWidth );
+    assignIfUsed( moPresetDash, rSourceProps.moPresetDash );
+    assignIfUsed( moLineCompound, rSourceProps.moLineCompound );
+    assignIfUsed( moLineCap, rSourceProps.moLineCap );
+    assignIfUsed( moLineJoint, rSourceProps.moLineJoint );
 }
 
 void LineProperties::pushToPropMap( ShapePropertyMap& rPropMap,
-        const GraphicHelper& rGraphicHelper, ::Color nPhClr ) const
+        const GraphicHelper& rGraphicHelper, ::Color nPhClr, sal_Int16 nPhClrTheme) const
 {
     // line fill type must exist, otherwise ignore other properties
-    if( !maLineFill.moFillType.has() )
+    if( !maLineFill.moFillType.has_value() )
         return;
 
     // line style (our core only supports none and solid)
-    drawing::LineStyle eLineStyle = (maLineFill.moFillType.get() == XML_noFill) ? drawing::LineStyle_NONE : drawing::LineStyle_SOLID;
+    drawing::LineStyle eLineStyle = (maLineFill.moFillType.value() == XML_noFill) ? drawing::LineStyle_NONE : drawing::LineStyle_SOLID;
 
     // line width in 1/100mm
     sal_Int32 nLineWidth = getLineWidth(); // includes conversion from EMUs to 1/100mm
     rPropMap.setProperty( ShapeProperty::LineWidth, nLineWidth );
 
     // line cap type
-    LineCap eLineCap = moLineCap.has() ? lclGetLineCap( moLineCap.get() ) : LineCap_BUTT;
-    if( moLineCap.has() )
+    LineCap eLineCap = moLineCap.has_value() ? lclGetLineCap( moLineCap.value() ) : LineCap_BUTT;
+    if( moLineCap.has_value() )
         rPropMap.setProperty( ShapeProperty::LineCap, eLineCap );
 
     // create line dash from preset dash token or dash stop vector (not for invisible line)
-    if( (eLineStyle != drawing::LineStyle_NONE) && (moPresetDash.differsFrom( XML_solid ) || !maCustomDash.empty()) )
+    if( (eLineStyle != drawing::LineStyle_NONE) &&
+        ((moPresetDash.has_value() && moPresetDash.value() != XML_solid) || !maCustomDash.empty()) )
     {
         LineDash aLineDash;
-        aLineDash.Style = lclGetDashStyle( moLineCap.get( XML_flat ) );
+        aLineDash.Style = lclGetDashStyle( moLineCap.value_or( XML_flat ) );
 
-        if(moPresetDash.differsFrom(XML_solid))
-            lclConvertPresetDash(aLineDash, moPresetDash.get(XML_dash));
+        if(moPresetDash.has_value() && moPresetDash.value() != XML_solid)
+            lclConvertPresetDash(aLineDash, moPresetDash.value_or(XML_dash));
         else // !maCustomDash.empty()
         {
             lclConvertCustomDash(aLineDash, maCustomDash);
@@ -486,16 +489,41 @@ void LineProperties::pushToPropMap( ShapePropertyMap& rPropMap,
     rPropMap.setProperty( ShapeProperty::LineStyle, eLineStyle );
 
     // line joint type
-    if( moLineJoint.has() )
-        rPropMap.setProperty( ShapeProperty::LineJoint, lclGetLineJoint( moLineJoint.get() ) );
+    if( moLineJoint.has_value() )
+        rPropMap.setProperty( ShapeProperty::LineJoint, lclGetLineJoint( moLineJoint.value() ) );
 
     // line color and transparence
     Color aLineColor = maLineFill.getBestSolidColor();
-    if( aLineColor.isUsed() )
+    if (aLineColor.isUsed())
     {
-        rPropMap.setProperty( ShapeProperty::LineColor, aLineColor.getColor( rGraphicHelper, nPhClr ) );
+        ::Color aColor = aLineColor.getColor(rGraphicHelper, nPhClr);
+        rPropMap.setProperty(ShapeProperty::LineColor, aColor);
         if( aLineColor.hasTransparency() )
             rPropMap.setProperty( ShapeProperty::LineTransparency, aLineColor.getTransparency() );
+
+        model::ThemeColor aThemeColor;
+
+        if (aColor == nPhClr)
+        {
+            aThemeColor.setType(model::convertToThemeColorType(nPhClrTheme));
+            rPropMap.setProperty(PROP_LineColorThemeReference, model::theme::createXThemeColor(aThemeColor));
+        }
+        else
+        {
+            aThemeColor.setType(model::convertToThemeColorType(aLineColor.getSchemeColorIndex()));
+            if (aLineColor.getLumMod() != 10000)
+                aThemeColor.addTransformation({model::TransformationType::LumMod, aLineColor.getLumMod()});
+            if (aLineColor.getLumOff() != 0)
+                aThemeColor.addTransformation({model::TransformationType::LumOff, aLineColor.getLumOff()});
+            if (aLineColor.getTintOrShade() > 0)
+                aThemeColor.addTransformation({model::TransformationType::Tint, aLineColor.getTintOrShade()});
+            if (aLineColor.getTintOrShade() < 0)
+            {
+                sal_Int16 nShade = o3tl::narrowing<sal_Int16>(-aLineColor.getTintOrShade());
+                aThemeColor.addTransformation({model::TransformationType::Shade, nShade});
+            }
+            rPropMap.setProperty(PROP_LineColorThemeReference, model::theme::createXThemeColor(aThemeColor));
+        }
     }
 
     // line markers
@@ -506,32 +534,33 @@ void LineProperties::pushToPropMap( ShapePropertyMap& rPropMap,
 drawing::LineStyle LineProperties::getLineStyle() const
 {
     // rules to calculate the line style inferred from the code in LineProperties::pushToPropMap
-    return (maLineFill.moFillType.get() == XML_noFill) ?
-            drawing::LineStyle_NONE :
-            (moPresetDash.differsFrom( XML_solid ) || (!moPresetDash && !maCustomDash.empty())) ?
-                    drawing::LineStyle_DASH :
-                    drawing::LineStyle_SOLID;
+    if (maLineFill.moFillType.value() == XML_noFill)
+        return drawing::LineStyle_NONE;
+    if ((moPresetDash.has_value() && moPresetDash.value() != XML_solid) ||
+        (!moPresetDash && !maCustomDash.empty()))
+       return drawing::LineStyle_DASH;
+    return drawing::LineStyle_SOLID;
 }
 
 drawing::LineCap LineProperties::getLineCap() const
 {
-    if( moLineCap.has() )
-        return lclGetLineCap( moLineCap.get() );
+    if( moLineCap.has_value() )
+        return lclGetLineCap( moLineCap.value() );
 
     return drawing::LineCap_BUTT;
 }
 
 drawing::LineJoint LineProperties::getLineJoint() const
 {
-    if( moLineJoint.has() )
-        return lclGetLineJoint( moLineJoint.get() );
+    if( moLineJoint.has_value() )
+        return lclGetLineJoint( moLineJoint.value() );
 
     return drawing::LineJoint_NONE;
 }
 
 sal_Int32 LineProperties::getLineWidth() const
 {
-    return convertEmuToHmm( moLineWidth.get( 0 ) );
+    return convertEmuToHmm( moLineWidth.value_or( 0 ) );
 }
 
 } // namespace oox

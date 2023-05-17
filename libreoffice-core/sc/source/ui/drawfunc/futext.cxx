@@ -416,7 +416,7 @@ bool FuText::MouseButtonUp(const MouseEvent& rMEvt)
                 if(rMarkList.GetMark(0))
                 {
                     SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
-                    if(auto pText = dynamic_cast<SdrTextObj*>( pObj))
+                    if(auto pText = DynCastSdrTextObj( pObj))
                     {
                         SfxItemSet aSet(pDrDoc->GetItemPool());
 
@@ -509,7 +509,7 @@ void FuText::Activate()
     {
         // no text object in EditMode, therefore set CreateMode
 
-        pView->SetCurrentObj(OBJ_TEXT);
+        pView->SetCurrentObj(SdrObjKind::Text);
 
         pView->SetCreateMode();
     }
@@ -552,12 +552,12 @@ void FuText::SetInEditMode(SdrObject* pObj, const Point* pMousePixel,
     if ( !pObj )
         return;
 
-    sal_uInt16 nSdrObjKind = pObj->GetObjIdentifier();
+    SdrObjKind nSdrObjKind = pObj->GetObjIdentifier();
 
-    if (!(nSdrObjKind == OBJ_TEXT ||
-        nSdrObjKind == OBJ_TITLETEXT ||
-        nSdrObjKind == OBJ_OUTLINETEXT ||
-        dynamic_cast<const SdrTextObj*>( pObj) !=  nullptr))
+    if (!(nSdrObjKind == SdrObjKind::Text ||
+        nSdrObjKind == SdrObjKind::TitleText ||
+        nSdrObjKind == SdrObjKind::OutlineText ||
+        DynCastSdrTextObj( pObj) !=  nullptr))
         return;
 
     SdrPageView* pPV = pView->GetSdrPageView();
@@ -620,21 +620,21 @@ void FuText::SetInEditMode(SdrObject* pObj, const Point* pMousePixel,
 }
 
 // Create default drawing objects via keyboard
-SdrObjectUniquePtr FuText::CreateDefaultObject(const sal_uInt16 nID, const tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuText::CreateDefaultObject(const sal_uInt16 nID, const tools::Rectangle& rRectangle)
 {
     // case SID_DRAW_TEXT:
     // case SID_DRAW_TEXT_VERTICAL:
     // case SID_DRAW_TEXT_MARQUEE:
     // case SID_DRAW_NOTEEDIT:
 
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         *pDrDoc,
         pView->GetCurrentObjInventor(),
         pView->GetCurrentObjIdentifier()));
 
     if(pObj)
     {
-        if(auto pText = dynamic_cast<SdrTextObj*>( pObj.get() ))
+        if(auto pText = DynCastSdrTextObj( pObj.get() ))
         {
             pText->SetLogicRect(rRectangle);
 

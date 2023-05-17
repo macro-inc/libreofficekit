@@ -22,7 +22,7 @@
 #include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
 #include <osl/diagnose.h>
-
+#include <sal/log.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/objface.hxx>
 #include <sfx2/objsh.hxx>
@@ -992,18 +992,24 @@ void SfxWorkWindow::ShowChildren_Impl()
 
             if ( SfxChildVisibility::VISIBLE == (pCli->nVisible & SfxChildVisibility::VISIBLE) && bVisible )
             {
-                ShowFlags nFlags = pCli->bSetFocus ? ShowFlags::NONE : ShowFlags::NoFocusChange | ShowFlags::NoActivate;
                 if (pCli->xController)
                 {
                     if (!pCli->xController->getDialog()->get_visible())
                     {
                         auto xController = pCli->xController;
                         weld::DialogController::runAsync(xController,
-                            [=](sal_Int32 /*nResult*/){ xController->Close(); });
+                            [=](sal_Int32 nResult){
+                                if (nResult == nCloseResponseToJustHide)
+                                    return;
+                                xController->Close();
+                            });
                     }
                 }
                 else
+                {
+                    ShowFlags nFlags = pCli->bSetFocus ? ShowFlags::NONE : ShowFlags::NoFocusChange | ShowFlags::NoActivate;
                     pCli->pWin->Show(true, nFlags);
+                }
                 pCli->bSetFocus = false;
             }
             else
@@ -1189,7 +1195,7 @@ void SfxWorkWindow::UpdateObjectBars_Impl2()
 
     // Iterate over all Toolboxes
     xLayoutManager->lock();
-    const bool isNotebookBarActive = sfx2::SfxNotebookBar::IsActive();
+    const bool isNotebookBarActive = sfx2::SfxNotebookBar::IsActive(true);
     for ( auto const & n: aObjBarList )
     {
         ToolbarId eId = n.eId;

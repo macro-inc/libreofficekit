@@ -16,10 +16,15 @@ $(eval $(call gb_ExternalProject_register_targets,libwebp,\
 ifeq ($(COM),MSC)
 $(eval $(call gb_ExternalProject_use_nmake,libwebp,build))
 
+# Explicitly passing in ARCH (for the known architectures, at least) avoids
+# workdir/UnpackedTarball/libwebp/Makefile.vc not being able to detect it when CC is clang-cl:
 $(call gb_ExternalProject_get_state_target,libwebp,build):
 	$(call gb_Trace_StartRange,libwebp,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
-		nmake -nologo -f Makefile.vc CFG=release-static OBJDIR=output \
+		nmake -nologo -f Makefile.vc CFG=$(if $(MSVC_USE_DEBUG_RUNTIME),debug,release)-static OBJDIR=output \
+		    $(if $(filter INTEL,$(CPUNAME)),ARCH=x86, \
+		    $(if $(filter X86_64,$(CPUNAME)),ARCH=x64, \
+		    $(if $(filter AARCH64,$(CPUNAME)),ARCH=ARM))) \
 	)
 	$(call gb_Trace_EndRange,libwebp,EXTERNAL)
 else
@@ -41,9 +46,10 @@ $(call gb_ExternalProject_get_state_target,libwebp,build) :
 			--disable-gif \
 			--disable-wic \
 			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
-			CXXFLAGS="$(gb_CXXFLAGS) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS))" \
+			CFLAGS="$(CFLAGS) $(call gb_ExternalProject_get_build_flags,libwebp)" \
 			CPPFLAGS="$(CPPFLAGS) $(BOOST_CPPFLAGS)" \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,libwebp)" \
+			$(gb_CONFIGURE_PLATFORMS) \
 		&& $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,libwebp,EXTERNAL)

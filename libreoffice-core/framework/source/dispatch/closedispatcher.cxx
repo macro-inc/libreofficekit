@@ -36,10 +36,12 @@
 #include <toolkit/helper/vclunohelper.hxx>
 
 #include <osl/diagnose.h>
+#include <utility>
 #include <vcl/window.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/syswin.hxx>
 #include <unotools/moduleoptions.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace com::sun::star;
 
@@ -54,10 +56,10 @@ constexpr OUStringLiteral URL_CLOSEDOC = u".uno:CloseDoc";
 constexpr OUStringLiteral URL_CLOSEWIN = u".uno:CloseWin";
 const char URL_CLOSEFRAME[] = ".uno:CloseFrame";
 
-CloseDispatcher::CloseDispatcher(const css::uno::Reference< css::uno::XComponentContext >& rxContext ,
+CloseDispatcher::CloseDispatcher(css::uno::Reference< css::uno::XComponentContext >        xContext ,
                                  const css::uno::Reference< css::frame::XFrame >&          xFrame ,
-                                 const OUString&                                           sTarget)
-    : m_xContext         (rxContext                                       )
+                                 std::u16string_view                                       sTarget)
+    : m_xContext(std::move(xContext))
     , m_aAsyncCallback(
         new vcl::EventPoster(LINK(this, CloseDispatcher, impl_asyncCallback)))
     , m_eOperation(E_CLOSE_DOC)
@@ -563,12 +565,12 @@ void CloseDispatcher::implts_notifyResultListener(const css::uno::Reference< css
 }
 
 css::uno::Reference< css::frame::XFrame > CloseDispatcher::static_impl_searchRightTargetFrame(const css::uno::Reference< css::frame::XFrame >& xFrame ,
-                                                                                              const OUString&                           sTarget)
+                                                                                              std::u16string_view                           sTarget)
 {
-    if (sTarget.equalsIgnoreAsciiCase("_self"))
+    if (o3tl::equalsIgnoreAsciiCase(sTarget, u"_self"))
         return xFrame;
 
-    OSL_ENSURE(sTarget.isEmpty(), "CloseDispatch used for unexpected target. Magic things will happen now .-)");
+    OSL_ENSURE(sTarget.empty(), "CloseDispatch used for unexpected target. Magic things will happen now .-)");
 
     css::uno::Reference< css::frame::XFrame > xTarget = xFrame;
     while(true)

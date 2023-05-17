@@ -446,28 +446,6 @@ class SAL_DLLPUBLIC_RTTI SpinbuttonValue final : public ImplControlValue
         SpinbuttonValue & operator =(SpinbuttonValue &&) = delete; // due to ImplControlValue
 };
 
-/*  Toolbarvalue:
- *
- *  Value container for toolbars detailing the grip position
- */
-class ToolbarValue final : public ImplControlValue
-{
-public:
-    ToolbarValue() : ImplControlValue( ControlType::Toolbar, 0 )
-    { mbIsTopDockingArea = false; }
-    virtual ~ToolbarValue() override;
-    virtual ToolbarValue* clone() const override;
-
-    ToolbarValue(ToolbarValue const &) = default;
-    ToolbarValue(ToolbarValue &&) = default;
-    ToolbarValue & operator =(ToolbarValue const &) = delete; // due to ImplControlValue
-    ToolbarValue & operator =(ToolbarValue &&) = delete; // due to ImplControlValue
-
-    tools::Rectangle           maGripRect;
-    bool                mbIsTopDockingArea; // indicates that this is the top aligned dockingarea
-                                            // adjacent to the menubar, only used on Windows
-};
-
 /*  MenubarValue:
  *
  *  Value container for menubars specifying height of adjacent docking area
@@ -516,7 +494,6 @@ class VCL_DLLPUBLIC PushButtonValue final : public ImplControlValue
 public:
     PushButtonValue()
         : ImplControlValue( ControlType::Pushbutton, 0 )
-        , mbBevelButton(false)
         , mbSingleLine(true)
         , mbIsAction(false)
         , m_bFlatButton(false)
@@ -530,7 +507,6 @@ public:
     PushButtonValue & operator =(PushButtonValue const &) = delete; // due to ImplControlValue
     PushButtonValue & operator =(PushButtonValue &&) = delete; // due to ImplControlValue
 
-    bool mbBevelButton:1; // only used on OSX
     bool mbSingleLine:1;  // only used on OSX
     bool mbIsAction:1;
     bool m_bFlatButton:1;

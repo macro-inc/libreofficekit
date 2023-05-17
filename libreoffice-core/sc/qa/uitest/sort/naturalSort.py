@@ -1,20 +1,20 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict
-from uitest.uihelper.common import select_pos
 from uitest.uihelper.calc import enter_text_to_cell
-from libreoffice.calc.document import get_sheet_from_doc
-from libreoffice.calc.conditional_format import get_conditional_format_from_sheet
-from uitest.debug import sleep
+from uitest.uihelper.common import get_state_as_dict, select_pos
+
 from libreoffice.calc.document import get_cell_by_position
 from libreoffice.uno.propertyvalue import mkPropertyValues
-#Testcases Sorting TCS_Sorting
 
+
+# Testcases Sorting TCS_Sorting
 class CalcNaturalSorting(UITestCase):
 
     def test_natural_sorting_rows(self):
@@ -84,12 +84,13 @@ class CalcNaturalSorting(UITestCase):
             #Open sort dialog by DATA - SORT
             with self.ui_test.execute_dialog_through_command(".uno:DataSort") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
-                xleftright = xDialog.getChild("leftright")
                 select_pos(xTabs, "1")
                 xNatural = xDialog.getChild("naturalsort")
-                xleftright.executeAction("CLICK", tuple())
                 if (get_state_as_dict(xNatural)["Selected"]) == "false":
                     xNatural.executeAction("CLICK", tuple())
+                select_pos(xTabs, "0")
+                xleftright = xDialog.getChild("rbLeftRight")
+                xleftright.executeAction("CLICK", tuple())
 
             #Verify
             self.assertEqual(get_cell_by_position(document, 0, 0, 0).getString(), "MW-1")

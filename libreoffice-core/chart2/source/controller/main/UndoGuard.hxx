@@ -37,7 +37,7 @@ class UndoGuard
 {
 public:
     explicit UndoGuard(
-        const OUString& i_undoMessage,
+        OUString i_undoMessage,
         const css::uno::Reference< css::document::XUndoManager > & i_undoManager,
         const ModelFacet i_facet = E_MODEL
     );
@@ -53,7 +53,7 @@ private:
     void    discardSnapshot();
 
 private:
-    const css::uno::Reference< css::frame::XModel >           m_xChartModel;
+    rtl::Reference<::chart::ChartModel>                       m_xChartModel;
     const css::uno::Reference< css::document::XUndoManager >  m_xUndoManager;
 
     std::shared_ptr< ChartModelClone >  m_pDocumentSnapshot;

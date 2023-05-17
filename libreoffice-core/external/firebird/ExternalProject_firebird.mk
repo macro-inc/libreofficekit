@@ -44,6 +44,13 @@ $(call gb_ExternalProject_get_state_target,firebird,build):
 			) \
 			$(if $(filter GCC-INTEL,$(COM)-$(CPUNAME)),-Di386=1) \
 			" \
+		&& export CFLAGS=" \
+			$(if $(filter MSC,$(COM)),$(if $(MSVC_USE_DEBUG_RUNTIME),-DMSVC_USE_DEBUG_RUNTIME)) \
+			$(if $(filter MSC-TRUE-X86_64,$(COM)-$(COM_IS_CLANG)-$(CPUNAME)),-march=x86-64-v2) \
+			$(if $(HAVE_GCC_FNO_SIZED_DEALLOCATION),-fno-sized-deallocation -fno-delete-null-pointer-checks) \
+			$(call gb_ExternalProject_get_build_flags,firebird) \
+			$(if $(ENABLE_DEBUG),$(if $(filter MSC,$(COM)),-Od -Z7)) \
+		" \
 		&& export CXXFLAGS=" \
 			$(BOOST_CXXFLAGS) \
 			$(if $(filter MSC,$(COM)),$(if $(MSVC_USE_DEBUG_RUNTIME),-DMSVC_USE_DEBUG_RUNTIME)) \
@@ -51,10 +58,11 @@ $(call gb_ExternalProject_get_state_target,firebird,build):
 			$(if $(HAVE_GCC_FNO_SIZED_DEALLOCATION),-fno-sized-deallocation -fno-delete-null-pointer-checks) \
 			$(CXXFLAGS_CXX11) \
 			$(if $(filter TRUE,$(COM_IS_CLANG)), -Wno-c++11-narrowing) \
-			$(if $(call gb_Module__symbols_enabled,firebird),$(gb_DEBUGINFO_FLAGS)) \
+			$(call gb_ExternalProject_get_build_flags,firebird) \
 			$(if $(ENABLE_DEBUG),$(if $(filter MSC,$(COM)),-Od -Z7)) \
 		" \
 		&& export LDFLAGS=" \
+			$(call gb_ExternalProject_get_link_flags,firebird) \
 			$(if $(SYSTEM_LIBATOMIC_OPS),$(LIBATOMIC_OPS_LIBS), \
 				-L$(call gb_UnpackedTarball_get_dir,libatomic_ops)/src \
 			) \
@@ -70,18 +78,13 @@ $(call gb_ExternalProject_get_state_target,firebird,build):
 		&& MAKE=$(MAKE) $(gb_RUN_CONFIGURE) ./configure \
 			--without-editline \
 			--with-wire-compress=no \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			$(gb_CONFIGURE_PLATFORMS) \
 			$(if $(DISABLE_DYNLOADING), \
 				--enable-static --disable-shared \
 			, \
 				--enable-shared --disable-static \
 			) \
-			$(if $(filter MACOSX,$(OS)), \
-				--build=$(subst macos,darwin,$(BUILD_PLATFORM)) --host=$(subst macos,darwin,$(HOST_PLATFORM)) \
-				$(if $(filter 1, \
-						$(shell expr '$(MAC_OS_X_VERSION_MIN_REQUIRED)' \
-							'<' 101200)), \
-					ac_cv_func_clock_gettime=no)) \
+			$(if $(HAVE_LIBCPP),CXX='$(CXX) -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR') \
 		&& LC_ALL=C $(MAKE) \
 			$(if $(ENABLE_DEBUG),Debug) SHELL='$(SHELL)' $(if $(filter LINUX,$(OS)),CXXFLAGS="$$CXXFLAGS -std=gnu++11") \
 			MATHLIB="$(if $(SYSTEM_LIBTOMMATH),$(LIBTOMMATH_LIBS),-L$(call gb_UnpackedTarball_get_dir,libtommath) -ltommath)" \

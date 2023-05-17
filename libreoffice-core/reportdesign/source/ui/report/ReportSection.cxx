@@ -31,8 +31,8 @@
 
 #include <svx/svdpagv.hxx>
 #include <editeng/adjustitem.hxx>
+#include <editeng/eeitem.hxx>
 #include <svx/sdrpaintwindow.hxx>
-#include <svx/unoshape.hxx>
 #include <svx/gallery.hxx>
 #include <svx/svxids.hrc>
 #include <svx/svditer.hxx>
@@ -43,13 +43,14 @@
 #include <com/sun/star/frame/XPopupMenuController.hpp>
 #include <comphelper/propertyvalue.hxx>
 #include <toolkit/helper/convert.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <RptDef.hxx>
 #include <SectionWindow.hxx>
 #include <helpids.h>
 #include <dlgedclip.hxx>
 #include <rptui_slotid.hrc>
 
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <o3tl/safeint.hxx>
 
@@ -69,14 +70,14 @@ static Color lcl_getOverlappedControlColor(/*const uno::Reference <lang::XMultiS
     return aConfig.GetColorValue(CFG_REPORTDESIGNER, DBOVERLAPPEDCONTROL).getColor();
 }
 
-OReportSection::OReportSection(OSectionWindow* _pParent,const uno::Reference< report::XSection >& _xSection)
+OReportSection::OReportSection(OSectionWindow* _pParent,uno::Reference< report::XSection > _xSection)
     : Window(_pParent,WB_DIALOGCONTROL)
     , ::comphelper::OPropertyChangeListener(m_aMutex)
     , DropTargetHelper(this)
     , m_pPage(nullptr)
     , m_pView(nullptr)
     , m_pParent(_pParent)
-    , m_xSection(_xSection)
+    , m_xSection(std::move(_xSection))
     , m_nPaintEntranceCount(0)
     , m_eMode(DlgEdMode::Select)
 {
@@ -251,25 +252,25 @@ void OReportSection::Paste(const uno::Sequence< beans::NamedValue >& _aAllreadyC
                     if ( pObject )
                     {
                         // Clone to target SdrModel
-                        SdrObject* pNewObj(pObject->CloneSdrObject(*m_pModel));
-                        m_pPage->InsertObject(pNewObj, SAL_MAX_SIZE);
+                        rtl::Reference<SdrObject> pNewObj(pObject->CloneSdrObject(*m_pModel));
+                        m_pPage->InsertObject(pNewObj.get(), SAL_MAX_SIZE);
                         tools::Rectangle aRet(VCLPoint(rCopy->getPosition()),VCLSize(rCopy->getSize()));
-                        aRet.setHeight(aRet.getHeight() + 1);
-                        aRet.setWidth(aRet.getWidth() + 1);
+                        aRet.setHeight(aRet.getOpenHeight() + 1);
+                        aRet.setWidth(aRet.getOpenWidth() + 1);
                         bool bOverlapping = true;
                         while ( bOverlapping )
                         {
-                            bOverlapping = isOver(aRet,*m_pPage,*m_pView,true,pNewObj) != nullptr;
+                            bOverlapping = isOver(aRet,*m_pPage,*m_pView,true,pNewObj.get()) != nullptr;
                             if ( bOverlapping )
                             {
-                                aRet.Move(0,aRet.getHeight()+1);
+                                aRet.Move(0,aRet.getOpenHeight()+1);
                                 pNewObj->SetLogicRect(aRet);
                             }
                         }
                         m_pView->AddUndo( m_pView->GetModel()->GetSdrUndoFactory().CreateUndoNewObject( *pNewObj ) );
-                        m_pView->MarkObj( pNewObj, m_pView->GetSdrPageView() );
-                        if ( m_xSection.is() && (o3tl::make_unsigned(aRet.getHeight() + aRet.Top()) > m_xSection->getHeight()) )
-                            m_xSection->setHeight(aRet.getHeight() + aRet.Top());
+                        m_pView->MarkObj( pNewObj.get(), m_pView->GetSdrPageView() );
+                        if ( m_xSection.is() && (o3tl::make_unsigned(aRet.getOpenHeight() + aRet.Top()) > m_xSection->getHeight()) )
+                            m_xSection->setHeight(aRet.getOpenHeight() + aRet.Top());
                     }
                 }
             }
@@ -339,7 +340,7 @@ void OReportSection::Copy(uno::Sequence< beans::NamedValue >& _rAllreadyCopiedOb
         {
             try
             {
-                SdrObject* pNewObj(pSdrObject->CloneSdrObject(pSdrObject->getSdrModelFromSdrObject()));
+                rtl::Reference<SdrObject> pNewObj(pSdrObject->CloneSdrObject(pSdrObject->getSdrModelFromSdrObject()));
                 aCopies.emplace_back(pNewObj->getUnoShape(),uno::UNO_QUERY);
                 if ( _bEraseAnddNoClone )
                 {
@@ -391,12 +392,12 @@ void OReportSection::SetGridVisible(bool _bVisible)
     m_pView->SetGridVisible( _bVisible );
 }
 
-void OReportSection::SelectAll(const sal_uInt16 _nObjectType)
+void OReportSection::SelectAll(const SdrObjKind _nObjectType)
 {
     if ( !m_pView )
         return;
 
-    if ( _nObjectType == OBJ_NONE )
+    if ( _nObjectType == SdrObjKind::NONE )
         m_pView->MarkAllObj();
     else
     {
@@ -420,9 +421,9 @@ void OReportSection::Command( const CommandEvent& _rCEvt )
     OReportController& rController = m_pParent->getViewsWindow()->getView()->getReportView()->getController();
     uno::Reference<frame::XFrame> xFrame = rController.getFrame();
     css::uno::Sequence<css::uno::Any> aArgs {
-        css::uno::makeAny(comphelper::makePropertyValue("Value", OUString("report"))),
-        css::uno::makeAny(comphelper::makePropertyValue("Frame", xFrame)),
-        css::uno::makeAny(comphelper::makePropertyValue("IsContextMenu", true))
+        css::uno::Any(comphelper::makePropertyValue("Value", OUString("report"))),
+        css::uno::Any(comphelper::makePropertyValue("Frame", xFrame)),
+        css::uno::Any(comphelper::makePropertyValue("IsContextMenu", true))
     };
 
     css::uno::Reference<css::uno::XComponentContext> xContext(rController.getORB());
@@ -537,10 +538,10 @@ void OReportSection::impl_adjustObjectSizePosition(sal_Int32 i_nPaperWidth,sal_I
                     xReportComponent->setPosition(aPos);
                     correctOverlapping(pObject,*this,false);
                     tools::Rectangle aRet(VCLPoint(xReportComponent->getPosition()),VCLSize(xReportComponent->getSize()));
-                    aRet.setHeight(aRet.getHeight() + 1);
-                    aRet.setWidth(aRet.getWidth() + 1);
-                    if ( m_xSection.is() && (o3tl::make_unsigned(aRet.getHeight() + aRet.Top()) > m_xSection->getHeight()) )
-                        m_xSection->setHeight(aRet.getHeight() + aRet.Top());
+                    aRet.setHeight(aRet.getOpenHeight() + 1);
+                    aRet.setWidth(aRet.getOpenWidth() + 1);
+                    if ( m_xSection.is() && (o3tl::make_unsigned(aRet.getOpenHeight() + aRet.Top()) > m_xSection->getHeight()) )
+                        m_xSection->setHeight(aRet.getOpenHeight() + aRet.Top());
 
                     pObject->RecalcBoundRect();
                 }

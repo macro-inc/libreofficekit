@@ -105,6 +105,18 @@ void DelayStartListeningFormulaCells::set()
     mColumn.GetDoc().EnableDelayStartListeningFormulaCells(&mColumn, true);
 }
 
+DelayDeletingBroadcasters::DelayDeletingBroadcasters(ScDocument& doc)
+    : mDoc( doc )
+    , mOldValue( mDoc.IsDelayedDeletingBroadcasters())
+{
+    mDoc.EnableDelayDeletingBroadcasters( true );
+}
+
+DelayDeletingBroadcasters::~DelayDeletingBroadcasters()
+{
+    suppress_fun_call_w_exception(mDoc.EnableDelayDeletingBroadcasters(mOldValue));
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

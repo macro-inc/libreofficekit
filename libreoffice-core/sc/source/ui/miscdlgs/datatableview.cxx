@@ -27,7 +27,6 @@
 #include <table.hxx>
 
 #include <toolkit/helper/vclunohelper.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/seleng.hxx>
 #include <sal/log.hxx>
 
@@ -36,7 +35,6 @@ constexpr double nPPTY = 0.06666;
 
 constexpr sal_uInt16 nRowHeaderWidth = 100;
 constexpr sal_uInt16 nColHeaderHeight = 20;
-constexpr sal_uInt16 nScrollBarSize = 10;
 
 ScDataTableColView::ScDataTableColView(vcl::Window* pParent, ScDocument* pDoc, SelectionEngine* pSelectionEngine):
         ScHeaderControl(pParent, pSelectionEngine, pDoc->MaxCol()+1, false, nullptr),
@@ -133,27 +131,25 @@ ScDataTableView::ScDataTableView(const css::uno::Reference<css::awt::XWindow> &r
     Control(VCLUnoHelper::GetWindow(rParent)),
     mpDoc(std::move(pDoc)),
     mpSelectionEngine(new SelectionEngine(this)),
-    mpTopLeft(VclPtr<ScrollBarBox>::Create(this, WB_SIZEABLE)),
     mpColView(VclPtr<ScDataTableColView>::Create(this, mpDoc.get(), mpSelectionEngine.get())),
     mpRowView(VclPtr<ScDataTableRowView>::Create(this, mpDoc.get(), mpSelectionEngine.get())),
-    mpVScroll(VclPtr<ScrollBar>::Create(this, WinBits(WB_VSCROLL | WB_DRAG))),
-    mpHScroll(VclPtr<ScrollBar>::Create(this, WinBits(WB_HSCROLL | WB_DRAG))),
+    mpVScroll(VclPtr<ScrollAdaptor>::Create(this, false)),
+    mpHScroll(VclPtr<ScrollAdaptor>::Create(this, true)),
+    mnScrollBarSize(mpVScroll->GetSizePixel().Width()),
     mnFirstVisibleRow(0),
     mnFirstVisibleCol(0)
 {
-    mpTopLeft->setPosSizePixel(0, 0, nRowHeaderWidth, nColHeaderHeight);
     mpColView->setPosSizePixel(nRowHeaderWidth, 0, nRowHeaderWidth, nColHeaderHeight);
     mpRowView->setPosSizePixel(0, nColHeaderHeight, nRowHeaderWidth, nColHeaderHeight);
 
     mpVScroll->SetRangeMin(0);
     mpVScroll->SetRangeMax(100);
-    mpVScroll->SetEndScrollHdl(LINK(this, ScDataTableView, ScrollHdl));
+    mpVScroll->SetScrollHdl(LINK(this, ScDataTableView, VertScrollHdl));
 
     mpHScroll->SetRangeMin(0);
     mpHScroll->SetRangeMax(50);
-    mpHScroll->SetEndScrollHdl(LINK(this, ScDataTableView, ScrollHdl));
+    mpHScroll->SetScrollHdl(LINK(this, ScDataTableView, HorzScrollHdl));
 
-    mpTopLeft->Show();
     mpColView->Show();
     mpRowView->Show();
     mpVScroll->Show();
@@ -167,7 +163,6 @@ ScDataTableView::~ScDataTableView()
 
 void ScDataTableView::dispose()
 {
-    mpTopLeft.disposeAndClear();
     mpColView.disposeAndClear();
     mpRowView.disposeAndClear();
     mpVScroll.disposeAndClear();
@@ -249,18 +244,17 @@ void ScDataTableView::MouseButtonUp(const MouseEvent& rMEvt)
 void ScDataTableView::Resize()
 {
     Size aSize = GetSizePixel();
-    mpTopLeft->setPosSizePixel(0, 0, nRowHeaderWidth, nColHeaderHeight);
-    mpColView->setPosSizePixel(nRowHeaderWidth, 0, aSize.Width() - nScrollBarSize, nColHeaderHeight);
+    mpColView->setPosSizePixel(nRowHeaderWidth, 0, aSize.Width() - mnScrollBarSize, nColHeaderHeight);
     mpRowView->setPosSizePixel(0, nColHeaderHeight, nRowHeaderWidth, aSize.Height());
 
-    mpVScroll->setPosSizePixel(aSize.Width() - nScrollBarSize, nColHeaderHeight, nScrollBarSize, aSize.Height() - nColHeaderHeight - nScrollBarSize);
-    mpHScroll->setPosSizePixel(nRowHeaderWidth, aSize.Height() - nScrollBarSize, aSize.Width() - nRowHeaderWidth - nScrollBarSize, nScrollBarSize);
+    mpVScroll->setPosSizePixel(aSize.Width() - mnScrollBarSize, nColHeaderHeight, mnScrollBarSize, aSize.Height() - nColHeaderHeight - mnScrollBarSize);
+    mpHScroll->setPosSizePixel(nRowHeaderWidth, aSize.Height() - mnScrollBarSize, aSize.Width() - nRowHeaderWidth - mnScrollBarSize, mnScrollBarSize);
 }
 
 void ScDataTableView::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRectangle)
 {
     Size aSize = GetSizePixel();
-    SCCOL nMaxVisibleCol = findColFromPos(aSize.Width() - nScrollBarSize, mpDoc.get(), mnFirstVisibleCol);
+    SCCOL nMaxVisibleCol = findColFromPos(aSize.Width() - mnScrollBarSize, mpDoc.get(), mnFirstVisibleCol);
     SCROW nMaxVisibleRow = findRowFromPos(aSize.Height(), mpDoc.get(), mnFirstVisibleRow);
 
     ScTableInfo aTableInfo;
@@ -274,6 +268,13 @@ void ScDataTableView::Paint(vcl::RenderContext& rRenderContext, const tools::Rec
     aOutput.DrawDocumentBackground();
     aOutput.DrawGrid(rRenderContext, true, false);
     aOutput.DrawStrings();
+
+    Color aFaceColor(rRenderContext.GetSettings().GetStyleSettings().GetFaceColor());
+    rRenderContext.SetLineColor(aFaceColor);
+    rRenderContext.SetFillColor(aFaceColor);
+    rRenderContext.DrawRect(tools::Rectangle(Point(0, 0), Size(nRowHeaderWidth, nColHeaderHeight)));
+    rRenderContext.DrawRect(tools::Rectangle(Point(aSize.Width() - mnScrollBarSize, aSize.Height() - mnScrollBarSize), Size(mnScrollBarSize, mnScrollBarSize)));
+
     Control::Paint(rRenderContext, rRectangle);
 }
 
@@ -300,20 +301,19 @@ void ScDataTableView::getRowRange(SCROW& rStartCol, SCROW& rEndCol) const
     rEndCol = static_cast<SCROW>(aEnd);
 }
 
-IMPL_LINK(ScDataTableView, ScrollHdl, ScrollBar*, pScrollBar, void)
+IMPL_LINK_NOARG(ScDataTableView, VertScrollHdl, weld::Scrollbar&, void)
 {
-    if (pScrollBar == mpVScroll.get())
-    {
-        mnFirstVisibleRow = pScrollBar->GetThumbPos();
-        pScrollBar->SetRangeMax(std::min(mpDoc->MaxRow(), static_cast<SCROW>(mnFirstVisibleRow + 100)));
-        mpRowView->SetPos(mnFirstVisibleRow);
-    }
-    else
-    {
-        mnFirstVisibleCol = pScrollBar->GetThumbPos();
-        pScrollBar->SetRangeMax(std::min(mpDoc->MaxCol(), static_cast<SCCOL>(mnFirstVisibleCol + 50)));
-        mpColView->SetPos(mnFirstVisibleCol);
-    }
+    mnFirstVisibleRow = mpVScroll->GetThumbPos();
+    mpVScroll->SetRangeMax(std::min(mpDoc->MaxRow(), static_cast<SCROW>(mnFirstVisibleRow + 100)));
+    mpRowView->SetPos(mnFirstVisibleRow);
+    Invalidate();
+}
+
+IMPL_LINK_NOARG(ScDataTableView, HorzScrollHdl, weld::Scrollbar&, void)
+{
+    mnFirstVisibleCol = mpHScroll->GetThumbPos();
+    mpHScroll->SetRangeMax(std::min(mpDoc->MaxCol(), static_cast<SCCOL>(mnFirstVisibleCol + 50)));
+    mpColView->SetPos(mnFirstVisibleCol);
     Invalidate();
 }
 

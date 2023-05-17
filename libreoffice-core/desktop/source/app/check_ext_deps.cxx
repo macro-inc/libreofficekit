@@ -25,7 +25,7 @@
 #include <sal/log.hxx>
 #include <cppuhelper/implbase.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 
 #include <comphelper/lok.hxx>
@@ -51,6 +51,7 @@
 #include <com/sun/star/util/XChangesBatch.hpp>
 
 #include <app.hxx>
+#include <utility>
 
 #include <dp_misc.h>
 
@@ -75,7 +76,7 @@ class SilentCommandEnv
 
 public:
     SilentCommandEnv(
-        uno::Reference<uno::XComponentContext> const & xContext,
+        uno::Reference<uno::XComponentContext> xContext,
         Desktop* pDesktop );
     virtual ~SilentCommandEnv() override;
 
@@ -97,9 +98,9 @@ public:
 
 
 SilentCommandEnv::SilentCommandEnv(
-    uno::Reference<uno::XComponentContext> const & xContext,
+    uno::Reference<uno::XComponentContext> xContext,
     Desktop* pDesktop ):
-    mxContext( xContext ),
+    mxContext(std::move( xContext )),
     mpDesktop( pDesktop ),
     mnLevel( 0 ),
     mnProgress( 25 )
@@ -316,12 +317,12 @@ static void impl_setNeedsCompatCheck()
                 comphelper::getProcessComponentContext() ) );
 
         beans::NamedValue v( "nodepath",
-                      makeAny( OUString("org.openoffice.Setup/Office") ) );
+                      Any( OUString("org.openoffice.Setup/Office") ) );
         Sequence< Any > theArgs{ Any(v) };
         Reference< beans::XPropertySet > pset(
             theConfigProvider->createInstanceWithArguments( aAccessSrvc, theArgs ), UNO_QUERY_THROW );
 
-        Any value = makeAny( OUString("never") );
+        Any value( OUString("never") );
 
         pset->setPropertyValue("LastCompatibilityCheckID", value );
         Reference< util::XChangesBatch >( pset, UNO_QUERY_THROW )->commitChanges();
@@ -346,7 +347,7 @@ static bool impl_needsCompatCheck()
                 comphelper::getProcessComponentContext() ) );
 
         beans::NamedValue v( "nodepath",
-                      makeAny( OUString("org.openoffice.Setup/Office") ) );
+                      Any( OUString("org.openoffice.Setup/Office") ) );
         Sequence< Any > theArgs{ Any(v) };
         Reference< beans::XPropertySet > pset(
             theConfigProvider->createInstanceWithArguments( aAccessSrvc, theArgs ), UNO_QUERY_THROW );

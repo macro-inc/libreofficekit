@@ -21,7 +21,7 @@ $(eval $(call gb_Library_use_custom_headers,utl,\
 ))
 
 # in case UNO services are exported: declare location of component file
-$(eval $(call gb_Library_set_componentfile,utl,unotools/util/utl))
+$(eval $(call gb_Library_set_componentfile,utl,unotools/util/utl,services))
 
 $(eval $(call gb_Library_set_include,utl, \
     $$(INCLUDE) \
@@ -51,11 +51,13 @@ $(eval $(call gb_Library_use_libraries,utl,\
     ucbhelper \
 ))
 
+$(eval $(call gb_Library_add_exception_objects,utl,\
+    unotools/source/accessibility/accessiblerelationsethelper \
+))
+
 # add all source files that shall be compiled with exceptions enabled
 # the name is relative to $(SRCROOT) and must not contain an extension
 $(eval $(call gb_Library_add_exception_objects,utl,\
-    unotools/source/accessibility/accessiblerelationsethelper \
-    unotools/source/accessibility/accessiblestatesethelper \
     unotools/source/config/bootstrap \
     unotools/source/config/cmdoptions \
     unotools/source/config/compatibility \

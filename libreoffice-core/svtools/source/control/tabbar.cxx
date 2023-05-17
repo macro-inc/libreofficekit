@@ -21,6 +21,7 @@
 #include <svtools/tabbar.hxx>
 #include <tools/time.hxx>
 #include <tools/poly.hxx>
+#include <utility>
 #include <vcl/InterimItemWindow.hxx>
 #include <vcl/bitmapex.hxx>
 #include <vcl/svapp.hxx>
@@ -37,7 +38,6 @@
 #include <svtools/strings.hrc>
 #include <limits>
 #include <memory>
-#include <utility>
 #include <vector>
 #include <vcl/idle.hxx>
 #include <bitmaps.hlst>
@@ -105,8 +105,8 @@ public:
         tools::Long nTextWidth = mrRenderContext.GetTextWidth(aText);
         tools::Long nTextHeight = mrRenderContext.GetTextHeight();
         Point aPos = aRect.TopLeft();
-        aPos.AdjustX((aRect.getWidth()  - nTextWidth) / 2 );
-        aPos.AdjustY((aRect.getHeight() - nTextHeight) / 2 );
+        aPos.AdjustX((aRect.getOpenWidth()  - nTextWidth) / 2 );
+        aPos.AdjustY((aRect.getOpenHeight() - nTextHeight) / 2 );
 
         if (mbEnabled)
             mrRenderContext.DrawText(aPos, aText);
@@ -137,16 +137,27 @@ public:
         mrRenderContext.DrawRect(maLineRect);
     }
 
+    void drawSeparator()
+    {
+        const tools::Long cMargin = 5;
+        const tools::Long aRight( maRect.Right() - 1 );
+        mrRenderContext.SetLineColor(mrStyleSettings.GetShadowColor());
+        mrRenderContext.DrawLine(Point(aRight, maRect.Top() + cMargin),
+                                 Point(aRight, maRect.Bottom() - cMargin));
+    }
+
     void drawTab()
     {
         drawOuterFrame();
         drawColorLine();
+        if (!mbSelected && !mbCustomColored)
+            drawSeparator();
         if (mbProtect)
         {
             BitmapEx aBitmap(BMP_TAB_LOCK);
             Point aPosition = maRect.TopLeft();
             aPosition.AdjustX(2);
-            aPosition.AdjustY((maRect.getHeight() - aBitmap.GetSizePixel().Height()) / 2);
+            aPosition.AdjustY((maRect.getOpenHeight() - aBitmap.GetSizePixel().Height()) / 2);
             mrRenderContext.DrawBitmapEx(aPosition, aBitmap);
         }
     }
@@ -202,10 +213,10 @@ struct ImplTabBarItem
     Color maTabBgColor;
     Color maTabTextColor;
 
-    ImplTabBarItem(sal_uInt16 nItemId, const OUString& rText, TabBarPageBits nPageBits)
+    ImplTabBarItem(sal_uInt16 nItemId, OUString aText, TabBarPageBits nPageBits)
         : mnId(nItemId)
         , mnBits(nPageBits)
-        , maText(rText)
+        , maText(std::move(aText))
         , mnWidth(0)
         , mbShort(false)
         , mbSelect(false)
@@ -428,7 +439,7 @@ public:
     std::shared_ptr<weld::ButtonPressRepeater> m_xPrevRepeater;
     std::shared_ptr<weld::ButtonPressRepeater> m_xNextRepeater;
 
-    TabButtons(TabBar* pParent)
+    TabButtons(TabBar* pParent, bool bSheets)
         : InterimItemWindow(pParent,
                             pParent->IsMirrored() ? OUString("svt/ui/tabbuttonsmirrored.ui")
                                                   : OUString("svt/ui/tabbuttons.ui"),
@@ -448,6 +459,15 @@ public:
         m_xNextButton->set_accessible_name(SvtResId(STR_TABBAR_PUSHBUTTON_MOVERIGHT));
         m_xLastButton->set_accessible_name(SvtResId(STR_TABBAR_PUSHBUTTON_MOVETOEND));
         m_xAddButton->set_accessible_name(SvtResId(STR_TABBAR_PUSHBUTTON_ADDTAB));
+
+        if (bSheets)
+        {
+            m_xFirstButton->set_tooltip_text(SvtResId(STR_TABBAR_HINT_MOVETOHOME_SHEETS));
+            m_xPrevButton->set_tooltip_text(SvtResId(STR_TABBAR_HINT_MOVELEFT_SHEETS));
+            m_xNextButton->set_tooltip_text(SvtResId(STR_TABBAR_HINT_MOVERIGHT_SHEETS));
+            m_xLastButton->set_tooltip_text(SvtResId(STR_TABBAR_HINT_MOVETOEND_SHEETS));
+            m_xAddButton->set_tooltip_text(SvtResId(STR_TABBAR_HINT_ADDTAB_SHEETS));
+        }
     }
 
     void AdaptToHeight(int nHeight)
@@ -493,10 +513,10 @@ struct TabBar_Impl
     }
 };
 
-TabBar::TabBar( vcl::Window* pParent, WinBits nWinStyle ) :
+TabBar::TabBar( vcl::Window* pParent, WinBits nWinStyle, bool bSheets ) :
     Window( pParent, (nWinStyle & WB_3DLOOK) | WB_CLIPCHILDREN )
 {
-    ImplInit( nWinStyle );
+    ImplInit( nWinStyle, bSheets );
     maCurrentItemList = 0;
 }
 
@@ -515,7 +535,7 @@ void TabBar::dispose()
 const sal_uInt16 TabBar::APPEND         = ::std::numeric_limits<sal_uInt16>::max();
 const sal_uInt16 TabBar::PAGE_NOT_FOUND = ::std::numeric_limits<sal_uInt16>::max();
 
-void TabBar::ImplInit( WinBits nWinStyle )
+void TabBar::ImplInit( WinBits nWinStyle, bool bSheets )
 {
     mpImpl.reset(new TabBar_Impl);
 
@@ -541,6 +561,7 @@ void TabBar::ImplInit( WinBits nWinStyle )
     mbInSelect      = false;
     mbMirrored      = false;
     mbScrollAlwaysEnabled = false;
+    mbSheets = bSheets;
 
     ImplInitControls();
 
@@ -771,7 +792,7 @@ void TabBar::ImplInitControls()
         mpImpl->mpSizer.disposeAndClear();
     }
 
-    mpImpl->mxButtonBox.disposeAndReset(VclPtr<TabButtons>::Create(this));
+    mpImpl->mxButtonBox.disposeAndReset(VclPtr<TabButtons>::Create(this, mbSheets));
 
     Link<const CommandEvent&, void> aContextLink = LINK( this, TabBar, ContextMenuHdl );
 
@@ -860,6 +881,18 @@ void TabBar::ImplShowPage( sal_uInt16 nPos )
 
 IMPL_LINK( TabBar, ImplClickHdl, weld::Button&, rBtn, void )
 {
+    if (&rBtn != mpImpl->mxButtonBox->m_xFirstButton.get() && &rBtn != mpImpl->mxButtonBox->m_xLastButton.get())
+    {
+        if ((GetPointerState().mnState & (MOUSE_LEFT | MOUSE_MIDDLE | MOUSE_RIGHT)) == 0)
+        {
+            // like tdf#149482 if we didn't see a mouse up, but find that the mouse is no
+            // longer pressed at this point, then bail
+            mpImpl->mxButtonBox->m_xPrevRepeater->Stop();
+            mpImpl->mxButtonBox->m_xNextRepeater->Stop();
+            return;
+        }
+    }
+
     EndEditMode();
 
     sal_uInt16 nNewPos = mnFirstPos;
@@ -898,6 +931,14 @@ IMPL_LINK( TabBar, ImplClickHdl, weld::Button&, rBtn, void )
 
 IMPL_LINK_NOARG(TabBar, ImplAddClickHandler, weld::Button&, void)
 {
+    if ((GetPointerState().mnState & (MOUSE_LEFT | MOUSE_MIDDLE | MOUSE_RIGHT)) == 0)
+    {
+        // tdf#149482 if we didn't see a mouse up, but find that the mouse is no
+        // longer pressed at this point, then bail
+        mpImpl->mxButtonBox->m_xAddRepeater->Stop();
+        return;
+    }
+
     EndEditMode();
     AddTabClick();
 }
@@ -1292,7 +1333,7 @@ void TabBar::Resize()
 
 bool TabBar::PreNotify(NotifyEvent& rNEvt)
 {
-    if (rNEvt.GetType() == MouseNotifyEvent::COMMAND)
+    if (rNEvt.GetType() == NotifyEventType::COMMAND)
     {
         if (rNEvt.GetCommandEvent()->GetCommand() == CommandEventId::Wheel)
         {
@@ -2320,7 +2361,8 @@ sal_uInt16 TabBar::ShowDropPos(const Point& rPos)
     }
 
     // draw drop position arrows
-    Color aBlackColor(COL_BLACK);
+    const StyleSettings& rStyles = Application::GetSettings().GetStyleSettings();
+    const Color aTextColor = rStyles.GetLabelTextColor();
     tools::Long nX;
     tools::Long nY = (maWinSize.Height() / 2) - 1;
     sal_uInt16 nCurPos = GetPagePos(mnCurPageId);
@@ -2329,8 +2371,8 @@ sal_uInt16 TabBar::ShowDropPos(const Point& rPos)
 
     if (mnDropPos < nItemCount)
     {
-        GetOutDev()->SetLineColor(aBlackColor);
-        GetOutDev()->SetFillColor(aBlackColor);
+        GetOutDev()->SetLineColor(aTextColor);
+        GetOutDev()->SetFillColor(aTextColor);
 
         auto& rItem = mpImpl->maItemList[mnDropPos];
         nX = rItem.maRect.Left();
@@ -2353,8 +2395,8 @@ sal_uInt16 TabBar::ShowDropPos(const Point& rPos)
     }
     if (mnDropPos > 0 && mnDropPos < nItemCount + 1)
     {
-        GetOutDev()->SetLineColor(aBlackColor);
-        GetOutDev()->SetFillColor(aBlackColor);
+        GetOutDev()->SetLineColor(aTextColor);
+        GetOutDev()->SetFillColor(aTextColor);
 
         auto& rItem = mpImpl->maItemList[mnDropPos - 1];
         nX = rItem.maRect.Right();
@@ -2481,6 +2523,11 @@ tools::Rectangle TabBar::GetPageArea() const
 {
     return tools::Rectangle(Point(mnOffX, mnOffY),
                      Size(mnLastOffX - mnOffX + 1, GetSizePixel().Height() - mnOffY));
+}
+
+void TabBar::SetAddButtonEnabled(bool bAddButtonEnabled)
+{
+    mpImpl->mxButtonBox->m_xAddButton->set_sensitive(bAddButtonEnabled);
 }
 
 css::uno::Reference<css::accessibility::XAccessible> TabBar::CreateAccessible()

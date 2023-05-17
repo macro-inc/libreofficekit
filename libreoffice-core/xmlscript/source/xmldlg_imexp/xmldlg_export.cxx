@@ -23,7 +23,7 @@
 
 #include <o3tl/any.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/awt/CharSet.hpp>
 #include <com/sun/star/awt/FontFamily.hpp>
@@ -937,7 +937,7 @@ void ElementDescriptor::readDataAwareAttr( OUString const & rAttrName )
             {
                 table::CellAddress aAddress;
                 xBindable->getPropertyValue( "BoundCell" ) >>= aAddress;
-                xConvertor->setPropertyValue( "Address", makeAny( aAddress ) );
+                xConvertor->setPropertyValue( "Address", Any( aAddress ) );
                 OUString sAddress;
                 xConvertor->getPropertyValue( "PersistentRepresentation" ) >>= sAddress;
                 if ( !sAddress.isEmpty() )
@@ -967,7 +967,7 @@ void ElementDescriptor::readDataAwareAttr( OUString const & rAttrName )
         xListSource->getPropertyValue( "CellRange" ) >>= aAddress;
 
         OUString sAddress;
-        xConvertor->setPropertyValue( "Address", makeAny( aAddress ) );
+        xConvertor->setPropertyValue( "Address", Any( aAddress ) );
         xConvertor->getPropertyValue( "PersistentRepresentation" ) >>= sAddress;
         SAL_INFO("xmlscript.xmldlg","**** cell range source list " << sAddress );
         if ( !sAddress.isEmpty() )

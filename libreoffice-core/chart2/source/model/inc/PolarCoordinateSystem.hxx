@@ -18,7 +18,7 @@
  */
 #pragma once
 
-#include "BaseCoordinateSystem.hxx"
+#include <BaseCoordinateSystem.hxx>
 
 namespace chart
 {
@@ -42,7 +42,7 @@ public:
     virtual css::uno::Sequence<OUString> SAL_CALL getSupportedServiceNames() override;
 };
 
-class PolarCoordinateSystem2d : public PolarCoordinateSystem
+class PolarCoordinateSystem2d final : public PolarCoordinateSystem
 {
 public:
     explicit PolarCoordinateSystem2d();
@@ -54,7 +54,7 @@ public:
     virtual css::uno::Sequence<OUString> SAL_CALL getSupportedServiceNames() override;
 };
 
-class PolarCoordinateSystem3d : public PolarCoordinateSystem
+class PolarCoordinateSystem3d final : public PolarCoordinateSystem
 {
 public:
     explicit PolarCoordinateSystem3d();

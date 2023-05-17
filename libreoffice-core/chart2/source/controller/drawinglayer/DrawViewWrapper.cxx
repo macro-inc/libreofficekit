@@ -22,6 +22,7 @@
 #include <ConfigurationAccess.hxx>
 
 #include <unotools/lingucfg.hxx>
+#include <editeng/eeitem.hxx>
 #include <editeng/langitem.hxx>
 #include <svl/intitem.hxx>
 #include <svl/itempool.hxx>
@@ -31,10 +32,11 @@
 #include <svx/svdetc.hxx>
 #include <svx/svdoutl.hxx>
 #include <svx/svxids.hrc>
-#include <svx/unoshape.hxx>
 #include <editeng/fhgtitem.hxx>
+#include <osl/diagnose.h>
 
 #include <com/sun/star/frame/XModel.hpp>
+#include <com/sun/star/drawing/XShape.hpp>
 
 #include <sfx2/objsh.hxx>
 #include <svx/helperhittest3d.hxx>
@@ -166,7 +168,7 @@ SdrObject* DrawViewWrapper::getHitObject( const Point& rPnt ) const
 
         //3d objects need a special treatment
         //because the simple PickObj method is not accurate in this case for performance reasons
-        E3dObject* pE3d = dynamic_cast< E3dObject* >(pRet);
+        E3dObject* pE3d = DynCastE3dObject(pRet);
         if( pE3d )
         {
             E3dScene* pScene(pE3d->getRootE3dSceneFromE3dObject());

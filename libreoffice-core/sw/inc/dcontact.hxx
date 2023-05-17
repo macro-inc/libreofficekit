@@ -56,7 +56,7 @@ void setContextWritingMode( SdrObject* pObj, SwFrame const * pAnchor );
 /// @return BoundRect plus distance.
 SwRect GetBoundRectOfAnchoredObj( const SdrObject* pObj );
 
-/// @return UserCall of goup object (if applicable).
+/// @return UserCall of group object (if applicable).
 SwContact* GetUserCall( const SdrObject* );
 
 /// @return TRUE if the SrdObject is a Marquee object.
@@ -149,10 +149,11 @@ public:
     bool      ObjAnchoredAtChar() const { return GetAnchorId() == RndStdIds::FLY_AT_CHAR; }
     bool      ObjAnchoredAsChar() const { return GetAnchorId() == RndStdIds::FLY_AS_CHAR; }
 
-    const SwPosition&  GetContentAnchor() const
+    const SwNode& GetAnchorNode() const
     {
-        assert( GetAnchorFormat().GetContentAnchor() );
-        return *(GetAnchorFormat().GetContentAnchor());
+        const SwNode* pNode = GetAnchorFormat().GetAnchorNode();
+        assert( pNode );
+        return *pNode;
     }
 
     /** get data collection of anchored objects, handled by with contact */
@@ -175,9 +176,7 @@ public:
 class SW_DLLPUBLIC SwFlyDrawContact final : public SwContact
 {
 private:
-    typedef std::unique_ptr< SwFlyDrawObj, SdrObjectFreeOp > SwFlyDrawObjPtr;
-
-    SwFlyDrawObjPtr mpMasterObj;
+    rtl::Reference<SwFlyDrawObj> mpMasterObj;
     void SwClientNotify(const SwModify&, const SfxHint& rHint) override;
     sal_uInt32 GetOrdNumForNewRef(const SwFlyFrame* pFly, SwFrame const& rAnchorFrame);
 
@@ -241,7 +240,7 @@ class SwDrawVirtObj final : public SdrVirtObj
         /// access to offset
         virtual Point GetOffset() const override;
 
-        virtual SwDrawVirtObj* CloneSdrObject(SdrModel& rTargetModel) const override;
+        virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const override;
 
         /// connection to writer layout
         const SwAnchoredObject& GetAnchoredObj() const { return maAnchoredDrawObj; }
@@ -302,8 +301,6 @@ bool CheckControlLayer( const SdrObject *pObj );
 /** ContactObject for connection of formats as representatives of draw objects
  in SwClient and the objects themselves in Drawing (SDrObjUserCall). */
 
-typedef std::unique_ptr< SwDrawVirtObj, SdrObjectFreeOp > SwDrawVirtObjPtr;
-
 class SAL_DLLPUBLIC_RTTI SwDrawContact final : public SwContact
 {
     private:
@@ -312,7 +309,7 @@ class SAL_DLLPUBLIC_RTTI SwDrawContact final : public SwContact
         SwAnchoredDrawObject maAnchoredDrawObj;
 
         /** container for 'virtual' drawing object supporting drawing objects in headers/footers. */
-        std::vector< SwDrawVirtObjPtr > maDrawVirtObjs;
+        std::vector< rtl::Reference<SwDrawVirtObj> > maDrawVirtObjs;
 
         /** boolean indicating set 'master' drawing
          object has been cleared. */
@@ -331,8 +328,6 @@ class SAL_DLLPUBLIC_RTTI SwDrawContact final : public SwContact
 
         friend class NestedUserCallHdl;
 
-
-        void RemoveAllVirtObjs();
 
         void InvalidateObjs_( const bool _bUpdateSortedObjsList = false );
 
@@ -387,12 +382,15 @@ class SAL_DLLPUBLIC_RTTI SwDrawContact final : public SwContact
          drawing object from drawing page. */
         void RemoveMasterFromDrawPage();
 
+        void RemoveAllVirtObjs();
+
         /** get drawing object ('master' or 'virtual')
          by frame. */
         SdrObject* GetDrawObjectByAnchorFrame( const SwFrame& _rAnchorFrame );
 
         /// Virtual methods of SdrObjUserCall.
         virtual void Changed(const SdrObject& rObj, SdrUserCallType eType, const tools::Rectangle& rOldBoundRect) override;
+        virtual sal_Int32 GetPDFAnchorStructureElementId(SdrObject const& rObj, OutputDevice const&) override;
 
         /** Used by Changed() and by UndoDraw.
          Notifies paragraphs that have to get out of the way. */

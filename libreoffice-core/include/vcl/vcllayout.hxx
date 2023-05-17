@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include <sal/log.hxx>
-
 #include <basegfx/polygon/b2dpolypolygon.hxx>
+#include <i18nlangtag/languagetag.hxx>
 #include <tools/gen.hxx>
 #include <tools/degree.hxx>
 
@@ -81,7 +80,6 @@ public:
     virtual void    InitFont() const {}
     virtual void    DrawText( SalGraphics& ) const = 0;
 
-    int             GetUnitsPerPixel() const                { return mnUnitsPerPixel; }
     Degree10        GetOrientation() const                  { return mnOrientation; }
 
     void            SetTextRenderModeForResolutionIndependentLayout(bool bTextRenderModeForResolutionIndependentLayout)
@@ -89,17 +87,21 @@ public:
         mbTextRenderModeForResolutionIndependentLayout = bTextRenderModeForResolutionIndependentLayout;
     }
 
+    bool            GetTextRenderModeForResolutionIndependentLayout() const
+    {
+        return mbTextRenderModeForResolutionIndependentLayout;
+    }
+
     // methods using string indexing
     virtual sal_Int32 GetTextBreak(DeviceCoordinate nMaxWidth, DeviceCoordinate nCharExtra, int nFactor) const = 0;
-    virtual DeviceCoordinate FillDXArray( std::vector<DeviceCoordinate>* pDXArray ) const = 0;
-    virtual DeviceCoordinate GetTextWidth() const { return FillDXArray( nullptr ); }
+    virtual DeviceCoordinate FillDXArray( std::vector<DeviceCoordinate>* pDXArray, const OUString& rStr ) const = 0;
+    virtual DeviceCoordinate GetTextWidth() const { return FillDXArray( nullptr, {} ); }
     virtual void    GetCaretPositions( int nArraySize, sal_Int32* pCaretXArray ) const = 0;
-    virtual bool    IsKashidaPosValid ( int /*nCharPos*/ ) const { return true; } // i60594
+    virtual bool    IsKashidaPosValid ( int /*nCharPos*/, int /*nNextCharPos*/ ) const = 0; // i60594
 
     // methods using glyph indexing
     virtual bool    GetNextGlyph(const GlyphItem** pGlyph, DevicePoint& rPos, int& nStart,
-                                 const LogicalFontInstance** ppGlyphFont = nullptr,
-                                 const vcl::font::PhysicalFontFace** pFallbackFont = nullptr) const = 0;
+                                 const LogicalFontInstance** ppGlyphFont = nullptr) const = 0;
     virtual bool GetOutline(basegfx::B2DPolyPolygonVector&) const;
     bool GetBoundRect(tools::Rectangle&) const;
 
@@ -116,8 +118,8 @@ private:
 protected:
     int             mnMinCharPos;
     int             mnEndCharPos;
+    LanguageTag     maLanguageTag;
 
-    int             mnUnitsPerPixel;
     Degree10        mnOrientation;
 
     mutable Point   maDrawOffset;

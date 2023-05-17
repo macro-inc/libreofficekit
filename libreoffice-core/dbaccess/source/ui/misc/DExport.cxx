@@ -40,12 +40,11 @@
 #include <TypeInfo.hxx>
 #include <FieldDescriptions.hxx>
 #include <UITools.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/awt/FontDescriptor.hpp>
 #include <WCopyTable.hxx>
 #include <unotools/syslocale.hxx>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <connectivity/dbexception.hxx>
 #include <connectivity/FValue.hxx>
 #include <com/sun/star/sdb/application/CopyTableOperation.hpp>
@@ -656,7 +655,7 @@ void ODatabaseExport::CreateDefaultColumn(const OUString& _rColumnName)
 
 void ODatabaseExport::createRowSet()
 {
-    m_pUpdateHelper = std::make_shared<OParameterUpdateHelper>(createPreparedStatment(m_xConnection->getMetaData(),m_xTable,m_vColumnPositions));
+    m_pUpdateHelper = std::make_shared<OParameterUpdateHelper>(createPreparedStatement(m_xConnection->getMetaData(),m_xTable,m_vColumnPositions));
 }
 
 bool ODatabaseExport::executeWizard(const OUString& _rTableName, const Any& _aTextColor, const FontDescriptor& _rFont)
@@ -690,7 +689,7 @@ bool ODatabaseExport::executeWizard(const OUString& _rTableName, const Any& _aTe
                         bError = !m_xTable.is();
                         if(m_xTable.is())
                         {
-                            m_xTable->setPropertyValue(PROPERTY_FONT,makeAny(_rFont));
+                            m_xTable->setPropertyValue(PROPERTY_FONT,Any(_rFont));
                             if(_aTextColor.hasValue())
                                 m_xTable->setPropertyValue(PROPERTY_TEXTCOLOR,_aTextColor);
                         }
@@ -779,7 +778,7 @@ void ODatabaseExport::ensureFormatter()
     }
 }
 
-Reference< XPreparedStatement > ODatabaseExport::createPreparedStatment( const Reference<XDatabaseMetaData>& _xMetaData
+Reference< XPreparedStatement > ODatabaseExport::createPreparedStatement( const Reference<XDatabaseMetaData>& _xMetaData
                                                        ,const Reference<XPropertySet>& _xDestTable
                                                        ,const TPositions& _rvColumns)
 {

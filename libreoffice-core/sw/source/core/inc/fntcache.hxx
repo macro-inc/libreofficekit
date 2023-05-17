@@ -26,8 +26,8 @@
 #include <unordered_map>
 
 #include <vcl/font.hxx>
+#include <vcl/glyphitem.hxx>
 #include <vcl/vclptr.hxx>
-#include <vcl/vcllayout.hxx>
 #include <vcl/outdev.hxx>
 #include "swcache.hxx"
 #include "TextFrameIndex.hxx"
@@ -53,41 +53,9 @@ public:
     void Flush();
 };
 
-/// Clears the pre-calculated text glyphs in all SwFntObj instances.
-void SwClearFntCacheTextGlyphs();
-
 // Font cache, global variable, created/destroyed in txtinit.cxx
 extern SwFntCache *pFntCache;
 extern SwFntObj *pLastFont;
-
-/**
- * Defines a substring on a given output device, to be used as an std::unordered_map<>
- * key.
- */
-struct SwTextGlyphsKey
-{
-    VclPtr<const OutputDevice> m_pOutputDevice;
-    OUString m_aText;
-    sal_Int32 m_nIndex;
-    sal_Int32 m_nLength;
-    size_t mnHashCode;
-
-    SwTextGlyphsKey(const OutputDevice* pOutputDevice, const OUString & sText, sal_Int32 nIndex, sal_Int32 nLength);
-    bool operator==(SwTextGlyphsKey const & rhs) const;
-};
-struct SwTextGlyphsKeyHash
-{
-    size_t operator()(SwTextGlyphsKey const & rKey) const { return rKey.mnHashCode; }
-};
-/**
- * Glyphs and text width for the given SwTextGlyphsKey.
- */
-struct SwTextGlyphsData
-{
-    SalLayoutGlyphs m_aTextGlyphs;
-    tools::Long m_nTextWidth = -1; // -1 = not computed yet
-};
-typedef std::unordered_map<SwTextGlyphsKey, SwTextGlyphsData, SwTextGlyphsKeyHash> SwTextGlyphsMap;
 
 class SwFntObj final : public SwCacheObj
 {
@@ -106,16 +74,11 @@ class SwFntObj final : public SwCacheObj
     sal_uInt16 m_nScrHeight;
     sal_uInt16 m_nPrtHeight;
     sal_uInt16 m_nPropWidth;
+    sal_uInt16 m_nScrHangingBaseline;
+    sal_uInt16 m_nPrtHangingBaseline;
     sal_uInt16 m_nZoom;
     bool m_bSymbol : 1;
     bool m_bPaintBlank : 1;
-
-    /// Cache of already calculated layout glyphs and text widths.
-    SwTextGlyphsMap m_aTextGlyphs;
-
-    void GetTextArray(const OutputDevice& rOutputDevice, const OUString& rStr,
-                      std::vector<sal_Int32>& rDXAry, sal_Int32 nIndex, sal_Int32 nLen,
-                      bool bCaching);
 
     static tools::Long s_nPixWidth;
     static MapMode *s_pPixMap;
@@ -136,6 +99,7 @@ public:
     sal_uInt16 GetFontAscent( const SwViewShell *pSh, const OutputDevice& rOut );
     sal_uInt16 GetFontHeight( const SwViewShell *pSh, const OutputDevice& rOut );
     sal_uInt16 GetFontLeading( const SwViewShell *pSh, const OutputDevice& rOut );
+    sal_uInt16 GetFontHangingBaseline( const SwViewShell *pSh, const OutputDevice& rOut );
 
     void GuessLeading( const SwViewShell& rSh, const FontMetric& rMet );
 
@@ -144,10 +108,6 @@ public:
     sal_uInt16   GetZoom() const { return m_nZoom; }
     sal_uInt16   GetPropWidth() const { return m_nPropWidth; }
     bool     IsSymbol() const { return m_bSymbol; }
-
-    tools::Long GetCachedTextWidth(const SwTextGlyphsKey& key, const vcl::text::TextLayoutCache* vclCache);
-    SalLayoutGlyphs* GetCachedSalLayoutGlyphs(const SwTextGlyphsKey& key);
-    void ClearCachedTextGlyphs();
 
     void   DrawText( SwDrawTextInfo &rInf );
     /// determine the TextSize (of the printer)

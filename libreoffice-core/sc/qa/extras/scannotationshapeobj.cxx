@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/drawing/captionshape.hxx>
 #include <test/drawing/xgluepointssupplier.hxx>
 #include <test/drawing/xshape.hxx>
@@ -37,7 +37,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScAnnotationShapeObj : public CalcUnoApiTest,
+class ScAnnotationShapeObj : public UnoApiTest,
                              public apitest::CaptionShape,
                              public apitest::XGluePointsSupplier,
                              public apitest::XShape,
@@ -87,35 +87,32 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    uno::Reference<lang::XComponent> m_xComponent;
     static uno::Reference<text::XTextContent> m_xField;
 };
 
 uno::Reference<text::XTextContent> ScAnnotationShapeObj::m_xField;
 
 ScAnnotationShapeObj::ScAnnotationShapeObj()
-    : CalcUnoApiTest("sc/qa/extras/testdocuments")
+    : UnoApiTest("sc/qa/extras/testdocuments")
     , XShapeDescriptor("com.sun.star.drawing.CaptionShape")
 {
 }
 
 void ScAnnotationShapeObj::setUp()
 {
-    CalcUnoApiTest::setUp();
-    m_xComponent = loadFromDesktop("private:factory/scalc");
+    UnoApiTest::setUp();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 void ScAnnotationShapeObj::tearDown()
 {
     m_xField.clear();
-    closeDocument(m_xComponent);
-
-    CalcUnoApiTest::tearDown();
+    UnoApiTest::tearDown();
 }
 
 uno::Reference<uno::XInterface> ScAnnotationShapeObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
 
     uno::Reference<container::XIndexAccess> xIA(xDoc->getSheets(), uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheet> xSheet(xIA->getByIndex(0), uno::UNO_QUERY_THROW);
@@ -146,7 +143,7 @@ uno::Reference<text::XTextContent> ScAnnotationShapeObj::getTextContent()
 {
     if (!m_xField.is())
     {
-        uno::Reference<lang::XMultiServiceFactory> xSM(m_xComponent, uno::UNO_QUERY_THROW);
+        uno::Reference<lang::XMultiServiceFactory> xSM(mxComponent, uno::UNO_QUERY_THROW);
         m_xField.set(xSM->createInstance("com.sun.star.text.TextField.DateTime"),
                      uno::UNO_QUERY_THROW);
     }

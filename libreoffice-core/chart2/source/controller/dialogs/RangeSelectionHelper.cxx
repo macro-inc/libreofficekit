@@ -20,9 +20,10 @@
 #include <RangeSelectionHelper.hxx>
 #include <RangeSelectionListener.hxx>
 #include <com/sun/star/awt/XTopWindow.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart2/data/XDataProvider.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <ChartModel.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -33,8 +34,8 @@ namespace chart
 {
 
 RangeSelectionHelper::RangeSelectionHelper(
-    const Reference< chart2::XChartDocument > & xChartDocument ) :
-        m_xChartDocument( xChartDocument )
+    rtl::Reference<::chart::ChartModel> xChartDocument ) :
+        m_xChartDocument(std::move( xChartDocument ))
 {}
 
 RangeSelectionHelper::~RangeSelectionHelper()

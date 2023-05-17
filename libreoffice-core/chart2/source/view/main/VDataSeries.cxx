@@ -20,9 +20,11 @@
 #include <limits>
 #include <memory>
 #include <VDataSeries.hxx>
+#include <DataSeries.hxx>
 #include <ObjectIdentifier.hxx>
 #include <CommonConverters.hxx>
 #include <LabelPositionHelper.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
 #include <RegressionCurveHelper.hxx>
 #include <unonames.hxx>
@@ -30,16 +32,14 @@
 #include <com/sun/star/chart/MissingValueTreatment.hpp>
 #include <com/sun/star/chart2/DataPointLabel.hpp>
 #include <com/sun/star/chart2/Symbol.hpp>
-#include <com/sun/star/chart2/XDataSeries.hpp>
 #include <com/sun/star/chart2/XRegressionCurveCalculator.hpp>
 #include <com/sun/star/chart2/RelativePosition.hpp>
 
 #include <osl/diagnose.h>
 #include <tools/color.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/XPropertyState.hpp>
-#include <com/sun/star/chart2/data/XDataSource.hpp>
 
 namespace chart {
 
@@ -49,24 +49,24 @@ using ::com::sun::star::uno::Reference;
 
 void VDataSequence::init( const uno::Reference< data::XDataSequence >& xModel )
 {
-    Model = xModel;
-    Doubles = DataSequenceToDoubleSequence( xModel );
+    m_xModel = xModel;
+    m_aValues = DataSequenceToDoubleSequence( xModel );
 }
 
 bool VDataSequence::is() const
 {
-    return Model.is();
+    return m_xModel.is();
 }
 void VDataSequence::clear()
 {
-    Model = nullptr;
-    Doubles.realloc(0);
+    m_xModel = nullptr;
+    m_aValues.realloc(0);
 }
 
 double VDataSequence::getValue( sal_Int32 index ) const
 {
-    if( 0<=index && index<Doubles.getLength() )
-        return Doubles[index];
+    if( 0<=index && index<m_aValues.getLength() )
+        return m_aValues[index];
     return std::numeric_limits<double>::quiet_NaN();
 }
 
@@ -75,10 +75,9 @@ sal_Int32 VDataSequence::detectNumberFormatKey( sal_Int32 index ) const
     sal_Int32 nNumberFormatKey = -1;
 
     // -1 is allowed and means a key for the whole sequence
-    if( -1<=index && index<Doubles.getLength() &&
-        Model.is())
+    if( -1<=index && index<m_aValues.getLength() && m_xModel.is())
     {
-        nNumberFormatKey = Model->getNumberFormatKeyByIndex( index );
+        nNumberFormatKey = m_xModel->getNumberFormatKeyByIndex( index );
     }
 
     return nNumberFormatKey;
@@ -86,7 +85,7 @@ sal_Int32 VDataSequence::detectNumberFormatKey( sal_Int32 index ) const
 
 sal_Int32 VDataSequence::getLength() const
 {
-    return Doubles.getLength();
+    return m_aValues.getLength();
 }
 
 namespace
@@ -107,10 +106,10 @@ struct lcl_LessXOfPoint
 void lcl_clearIfNoValuesButTextIsContained( VDataSequence& rData, const uno::Reference<data::XDataSequence>& xDataSequence )
 {
     //#i71686#, #i101968#, #i102428#
-    sal_Int32 nCount = rData.Doubles.getLength();
+    sal_Int32 nCount = rData.m_aValues.getLength();
     for( sal_Int32 i = 0; i < nCount; ++i )
     {
-        if( !std::isnan( rData.Doubles[i] ) )
+        if( !std::isnan( rData.m_aValues[i] ) )
             return;
     }
     //no double value is contained
@@ -137,7 +136,7 @@ void lcl_maybeReplaceNanWithZero( double& rfValue, sal_Int32 nMissingValueTreatm
 
 }
 
-VDataSeries::VDataSeries( const uno::Reference< XDataSeries >& xDataSeries )
+VDataSeries::VDataSeries( const rtl::Reference< DataSeries >& xDataSeries )
     : m_nPolygonIndex(0)
     , m_fLogicMinX(0.0)
     , m_fLogicMaxX(0.0)
@@ -159,16 +158,13 @@ VDataSeries::VDataSeries( const uno::Reference< XDataSeries >& xDataSeries )
     , mpOldSeries(nullptr)
     , mnPercent(0.0)
 {
-    uno::Reference<data::XDataSource> xDataSource( xDataSeries, uno::UNO_QUERY );
+    m_xDataSeriesProps = m_xDataSeries;
 
-    uno::Sequence< uno::Reference<
-        chart2::data::XLabeledDataSequence > > aDataSequences =
-            xDataSource->getDataSequences();
+    const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > & aDataSequences =
+            m_xDataSeries->getDataSequences2();
 
-    for(sal_Int32 nN = aDataSequences.getLength();nN--;)
+    for(sal_Int32 nN = aDataSequences.size();nN--;)
     {
-        if(!aDataSequences[nN].is())
-            continue;
         uno::Reference<data::XDataSequence>  xDataSequence( aDataSequences[nN]->getValues());
         uno::Reference<beans::XPropertySet> xProp(xDataSequence, uno::UNO_QUERY );
         if( xProp.is())
@@ -225,18 +221,17 @@ VDataSeries::VDataSeries( const uno::Reference< XDataSeries >& xDataSeries )
             m_nPointCount = m_aValues_Y_Last.getLength();
     }
 
-    uno::Reference<beans::XPropertySet> xProp(xDataSeries, uno::UNO_QUERY );
-    if( !xProp.is())
+    if( !xDataSeries.is())
         return;
 
     try
     {
         //get AttributedDataPoints
-        xProp->getPropertyValue("AttributedDataPoints") >>= m_aAttributedDataPointIndexList;
+        xDataSeries->getPropertyValue("AttributedDataPoints") >>= m_aAttributedDataPointIndexList;
 
-        xProp->getPropertyValue("StackingDirection") >>= m_eStackingDirection;
+        xDataSeries->getPropertyValue("StackingDirection") >>= m_eStackingDirection;
 
-        xProp->getPropertyValue("AttachedAxisIndex") >>= m_nAxisIndex;
+        xDataSeries->getPropertyValue("AttachedAxisIndex") >>= m_nAxisIndex;
         if(m_nAxisIndex<0)
             m_nAxisIndex=0;
     }
@@ -252,7 +247,7 @@ VDataSeries::~VDataSeries()
 
 void VDataSeries::doSortByXValues()
 {
-    if( !(m_aValues_X.is() && m_aValues_X.Doubles.hasElements()) )
+    if( !(m_aValues_X.is() && m_aValues_X.m_aValues.hasElements()) )
         return;
 
     //prepare a vector for sorting
@@ -261,9 +256,9 @@ void VDataSeries::doSortByXValues()
     for( nPointIndex=0; nPointIndex < m_nPointCount; nPointIndex++ )
     {
         aTmp.push_back(
-                        { ((nPointIndex < m_aValues_X.Doubles.getLength()) ? m_aValues_X.Doubles[nPointIndex]
+                        { ((nPointIndex < m_aValues_X.m_aValues.getLength()) ? m_aValues_X.m_aValues[nPointIndex]
                                                                            : std::numeric_limits<double>::quiet_NaN()),
-                          ((nPointIndex < m_aValues_Y.Doubles.getLength()) ? m_aValues_Y.Doubles[nPointIndex]
+                          ((nPointIndex < m_aValues_Y.m_aValues.getLength()) ? m_aValues_Y.m_aValues[nPointIndex]
                                                                            : std::numeric_limits<double>::quiet_NaN())
                         }
                       );
@@ -273,10 +268,10 @@ void VDataSeries::doSortByXValues()
     std::stable_sort( aTmp.begin(), aTmp.end(), lcl_LessXOfPoint() );
 
     //fill the sorted points back to the members
-    m_aValues_X.Doubles.realloc( m_nPointCount );
-    auto pDoublesX = m_aValues_X.Doubles.getArray();
-    m_aValues_Y.Doubles.realloc( m_nPointCount );
-    auto pDoublesY = m_aValues_Y.Doubles.getArray();
+    m_aValues_X.m_aValues.realloc( m_nPointCount );
+    auto pDoublesX = m_aValues_X.m_aValues.getArray();
+    m_aValues_Y.m_aValues.realloc( m_nPointCount );
+    auto pDoublesY = m_aValues_Y.m_aValues.getArray();
 
     for( nPointIndex=0; nPointIndex < m_nPointCount; nPointIndex++ )
     {
@@ -294,13 +289,11 @@ void VDataSeries::releaseShapes()
     m_xFrontSubGroupShape.set(nullptr);
     m_xBackSubGroupShape.set(nullptr);
 
-    m_aPolyPolygonShape3D.SequenceX.realloc(0);
-    m_aPolyPolygonShape3D.SequenceY.realloc(0);
-    m_aPolyPolygonShape3D.SequenceZ.realloc(0);
+    m_aPolyPolygonShape3D.clear();
     m_nPolygonIndex = 0;
 }
 
-const uno::Reference<css::chart2::XDataSeries>& VDataSeries::getModel() const
+const rtl::Reference<::chart::DataSeries>& VDataSeries::getModel() const
 {
     return m_xDataSeries;
 }
@@ -427,10 +420,10 @@ double VDataSeries::getXValue( sal_Int32 index ) const
     {
         if( 0<=index && index<m_aValues_X.getLength() )
         {
-            fRet = m_aValues_X.Doubles[index];
+            fRet = m_aValues_X.m_aValues[index];
             if(mpOldSeries && index < mpOldSeries->m_aValues_X.getLength())
             {
-                double nOldVal = mpOldSeries->m_aValues_X.Doubles[index];
+                double nOldVal = mpOldSeries->m_aValues_X.m_aValues[index];
                 fRet = nOldVal + (fRet - nOldVal) * mnPercent;
             }
         }
@@ -452,10 +445,10 @@ double VDataSeries::getYValue( sal_Int32 index ) const
     {
         if( 0<=index && index<m_aValues_Y.getLength() )
         {
-            fRet = m_aValues_Y.Doubles[index];
+            fRet = m_aValues_Y.m_aValues[index];
             if(mpOldSeries && index < mpOldSeries->m_aValues_Y.getLength())
             {
-                double nOldVal = mpOldSeries->m_aValues_Y.Doubles[index];
+                double nOldVal = mpOldSeries->m_aValues_Y.m_aValues[index];
                 fRet = nOldVal + (fRet - nOldVal) * mnPercent;
             }
         }
@@ -575,7 +568,7 @@ sal_Int32 VDataSeries::detectNumberFormatKey( sal_Int32 index ) const
     return nRet;
 }
 
-sal_Int32 VDataSeries::getLabelPlacement( sal_Int32 nPointIndex, const uno::Reference< chart2::XChartType >& xChartType, bool bSwapXAndY ) const
+sal_Int32 VDataSeries::getLabelPlacement( sal_Int32 nPointIndex, const rtl::Reference< ChartType >& xChartType, bool bSwapXAndY ) const
 {
     sal_Int32 nLabelPlacement=0;
     try
@@ -725,12 +718,12 @@ uno::Sequence< double > const & VDataSeries::getAllX() const
     {
         //init x values from category indexes
         //first category (index 0) matches with real number 1.0
-        m_aValues_X.Doubles.realloc( m_nPointCount );
-        auto pDoubles = m_aValues_X.Doubles.getArray();
+        m_aValues_X.m_aValues.realloc( m_nPointCount );
+        auto pDoubles = m_aValues_X.m_aValues.getArray();
         for(sal_Int32 nN=m_aValues_X.getLength();nN--;)
             pDoubles[nN] = nN+1;
     }
-    return m_aValues_X.Doubles;
+    return m_aValues_X.m_aValues;
 }
 
 uno::Sequence< double > const & VDataSeries::getAllY() const
@@ -739,12 +732,12 @@ uno::Sequence< double > const & VDataSeries::getAllY() const
     {
         //init y values from indexes
         //first y-value (index 0) matches with real number 1.0
-        m_aValues_Y.Doubles.realloc( m_nPointCount );
-        auto pDoubles = m_aValues_Y.Doubles.getArray();
+        m_aValues_Y.m_aValues.realloc( m_nPointCount );
+        auto pDoubles = m_aValues_Y.m_aValues.getArray();
         for(sal_Int32 nN=m_aValues_Y.getLength();nN--;)
             pDoubles[nN] = nN+1;
     }
-    return m_aValues_Y.Doubles;
+    return m_aValues_Y.m_aValues;
 }
 
 double VDataSeries::getXMeanValue() const
@@ -913,9 +906,9 @@ uno::Reference< beans::XPropertySet > VDataSeries::getPropertiesOfPoint( sal_Int
     return getPropertiesOfSeries();
 }
 
-uno::Reference<beans::XPropertySet> VDataSeries::getPropertiesOfSeries() const
+const uno::Reference<beans::XPropertySet> & VDataSeries::getPropertiesOfSeries() const
 {
-    return uno::Reference<css::beans::XPropertySet>(m_xDataSeries, css::uno::UNO_QUERY);
+    return m_xDataSeriesProps;
 }
 
 static std::unique_ptr<DataPointLabel> getDataPointLabelFromPropertySet( const uno::Reference< beans::XPropertySet >& xProp )

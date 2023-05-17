@@ -79,7 +79,6 @@ class IDocumentMarkAccess
                 iterator& operator=(iterator const& rOther);
                 iterator(iterator && rOther) noexcept;
                 iterator& operator=(iterator && rOther) noexcept;
-                ~iterator();
 
                 // FIXME unfortunately there's a requirement on input iterator
                 // and forward iterator to return reference, which isn't
@@ -198,7 +197,7 @@ class IDocumentMarkAccess
             @param nOffset
             [in] the offset by which the mark gets positioned of rNewPos
         */
-        virtual void correctMarksAbsolute(const SwNodeIndex& rOldNode,
+        virtual void correctMarksAbsolute(const SwNode& rOldNode,
             const SwPosition& rNewPos,
             const sal_Int32 nOffset) =0;
 
@@ -216,7 +215,7 @@ class IDocumentMarkAccess
             [in] the offset by which the mark gets positioned of rNewPos in addition to
                  its old position in the paragraph
         */
-        virtual void correctMarksRelative(const SwNodeIndex& rOldNode,
+        virtual void correctMarksRelative(const SwNode& rOldNode,
             const SwPosition& rNewPos,
             const sal_Int32 nOffset) =0;
 
@@ -226,11 +225,11 @@ class IDocumentMarkAccess
 
         */
         virtual void deleteMarks(
-            const SwNodeIndex& rStt,
-            const SwNodeIndex& rEnd,
+            const SwNode& rStt,
+            const SwNode& rEnd,
             std::vector< ::sw::mark::SaveBookmark>* pSaveBkmk, // Ugly: SaveBookmark is core-internal
-            const SwIndex* pSttIdx,
-            const SwIndex* pEndIdx) =0;
+            std::optional<sal_Int32> oStartContentIdx,
+            std::optional<sal_Int32> oEndContentIdx) =0;
 
         /** Deletes a mark.
 
@@ -283,7 +282,7 @@ class IDocumentMarkAccess
         // interface IBookmarks (BOOKMARK, CROSSREF_NUMITEM_BOOKMARK, CROSSREF_HEADING_BOOKMARK )
 
         /** check if the selection would delete a BOOKMARK */
-        virtual bool isBookmarkDeleted(SwPaM const& rPaM) const =0;
+        virtual bool isBookmarkDeleted(SwPaM const& rPaM, bool isReplace) const =0;
 
         /** returns a STL-like random access iterator to the begin of the sequence the IBookmarks.
         */
@@ -314,6 +313,8 @@ class IDocumentMarkAccess
         */
         virtual const_iterator_t findFirstBookmarkStartsAfter(const SwPosition& rPos) const =0;
 
+        /// Get the innermost bookmark that contains rPos.
+        virtual sw::mark::IMark* getBookmarkFor(const SwPosition& rPos) const = 0;
 
         // Fieldmarks
         /** returns a STL-like random access iterator to the begin of the sequence of fieldmarks.
@@ -324,11 +325,14 @@ class IDocumentMarkAccess
         */
         virtual const_iterator_t getFieldmarksEnd() const =0;
 
+        /// returns the number of IFieldmarks.
+        virtual sal_Int32 getFieldmarksCount() const = 0;
+
         /// get Fieldmark for CH_TXT_ATR_FIELDSTART/CH_TXT_ATR_FIELDEND at rPos
         virtual ::sw::mark::IFieldmark* getFieldmarkAt(const SwPosition& rPos) const =0;
         virtual ::sw::mark::IFieldmark* getFieldmarkFor(const SwPosition& pos) const =0;
-        virtual ::sw::mark::IFieldmark* getFieldmarkBefore(const SwPosition& pos) const =0;
-        virtual ::sw::mark::IFieldmark* getFieldmarkAfter(const SwPosition& pos) const =0;
+        virtual sw::mark::IFieldmark* getFieldmarkBefore(const SwPosition& pos, bool bLoop) const =0;
+        virtual sw::mark::IFieldmark* getFieldmarkAfter(const SwPosition& pos, bool bLoop) const =0;
 
         virtual ::sw::mark::IFieldmark* getDropDownFor(const SwPosition& pos) const=0;
         virtual std::vector<::sw::mark::IFieldmark*> getNoTextFieldmarksIn(const SwPaM &rPaM) const=0;

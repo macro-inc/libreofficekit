@@ -32,7 +32,6 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <unotools/unotoolsdllapi.h>
 #include <memory>
-#include <map>
 #include <string_view>
 
 namespace com::sun::star::uno { class XComponentContext; }
@@ -102,13 +101,13 @@ class UNOTOOLS_DLLPUBLIC LocaleDataWrapper
 
     void                loadCurrencyFormats();
 
-    void                scanCurrFormatImpl( const OUString& rCode,
+    void                scanCurrFormatImpl( std::u16string_view rCode,
                             sal_Int32 nStart, sal_Int32& nSign,
                             sal_Int32& nPar, sal_Int32& nNum,
                             sal_Int32& nBlank, sal_Int32& nSym ) const;
 
     void                loadDateOrders();
-    LongDateOrder       scanDateOrderImpl( const OUString& rCode ) const;
+    LongDateOrder       scanDateOrderImpl( std::u16string_view rCode ) const;
 
     void                ImplAddFormatNum( rtl::OUStringBuffer& rBuf,
                             sal_Int64 nNumber, sal_uInt16 nDecimals,
@@ -119,14 +118,14 @@ class UNOTOOLS_DLLPUBLIC LocaleDataWrapper
 public:
     LocaleDataWrapper(
         const css::uno::Reference< css::uno::XComponentContext > & rxContext,
-        const LanguageTag& rLanguageTag
+        LanguageTag aLanguageTag
         );
     /**
         @param rOverrideDateAcceptancePatterns Override locale's date acceptance patterns.
             An empty sequence resets the patterns to the locale's pattern sequence.
      */
     LocaleDataWrapper(
-        const LanguageTag& rLanguageTag,
+        LanguageTag aLanguageTag,
         const std::vector<OUString> & rOverrideDateAcceptancePatterns = {}
         );
     ~LocaleDataWrapper();
@@ -174,7 +173,7 @@ public:
     static const std::vector< LanguageType > & getInstalledLanguageTypes();
 
     /// maps the LocaleData string to the International enum
-    MeasurementSystem   mapMeasurementStringToEnum( const OUString& rMS ) const;
+    MeasurementSystem   mapMeasurementStringToEnum( std::u16string_view rMS ) const;
 
     /// Convenience method to obtain the default calendar.
     const std::shared_ptr< css::i18n::Calendar2 >& getDefaultCalendar() const;
@@ -253,7 +252,7 @@ public:
         rtl::math::stringToDouble() does. The caller is responsible for proper
         error checking and end comparison.
 
-        @param  rString
+        @param  aString
                 The string to parse as floating point number.
         @param  bUseGroupSep
                 Whether group separator is used/accepted during parsing.
@@ -265,7 +264,7 @@ public:
                 rtl::math::stringToDouble().
         @return The floating point number as parsed.
      */
-    double              stringToDouble( const OUString& rString, bool bUseGroupSep,
+    double              stringToDouble( std::u16string_view aString, bool bUseGroupSep,
                                         rtl_math_ConversionStatus* pStatus, sal_Int32* pParseEnd ) const;
 
     /** A wrapper around rtl_math_uStringToDouble() using the locale dependent
@@ -330,7 +329,7 @@ public:
 
                         /// "Secure" currency formatted string.
     OUString       getCurr( sal_Int64 nNumber, sal_uInt16 nDecimals,
-                            const OUString& rCurrencySymbol,
+                            std::u16string_view rCurrencySymbol,
                             bool bUseThousandSep = true ) const;
 
     // dummy returns, to be implemented

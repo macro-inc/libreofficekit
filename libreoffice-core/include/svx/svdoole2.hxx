@@ -42,6 +42,7 @@ namespace io { class XInputStream; }
 namespace svt { class EmbeddedObjectRef; }
 
 class SdrOle2ObjImpl;
+class SvxOle2Shape;
 
 class SVXCORE_DLLPUBLIC SdrOle2Obj : public SdrRectObj
 {
@@ -49,14 +50,14 @@ private:
     std::unique_ptr<SdrOle2ObjImpl> mpImpl;
 
 private:
-    SVX_DLLPRIVATE void Connect_Impl();
+    SVX_DLLPRIVATE void Connect_Impl(SvxOle2Shape* pCreator = nullptr);
     SVX_DLLPRIVATE void Disconnect_Impl();
     SVX_DLLPRIVATE void AddListeners_Impl();
     SVX_DLLPRIVATE void RemoveListeners_Impl();
     SVX_DLLPRIVATE void GetObjRef_Impl();
 
     // #i118485# helper added
-    SVX_DLLPRIVATE SdrObjectUniquePtr createSdrGrafObjReplacement(bool bAddText) const;
+    SVX_DLLPRIVATE rtl::Reference<SdrObject> createSdrGrafObjReplacement(bool bAddText) const;
     SVX_DLLPRIVATE void ImpSetVisAreaSize();
 
     SVX_DLLPRIVATE void Init();
@@ -107,7 +108,7 @@ public:
     // OLE object has got a separate PersistName member now;
     // !!! use ::SetPersistName( ... ) only, if you know what you do !!!
     const OUString& GetPersistName() const;
-    void        SetPersistName( const OUString& rPersistName );
+    void        SetPersistName( const OUString& rPersistName, SvxOle2Shape* pCreator = nullptr );
 
     // One can add an application name to a SdrOle2Obj, which can be queried for
     // later on (SD needs this for presentation objects).
@@ -133,14 +134,14 @@ public:
     void SetClosedObj( bool bIsClosed );
 
     // FullDrag support
-    virtual SdrObjectUniquePtr getFullDragClone() const override;
+    virtual rtl::Reference<SdrObject> getFullDragClone() const override;
 
     virtual void TakeObjInfo(SdrObjTransformInfoRec& rInfo) const override;
     virtual SdrObjKind GetObjIdentifier() const override;
     virtual OUString TakeObjNameSingul() const override;
     virtual OUString TakeObjNamePlural() const override;
 
-    virtual SdrOle2Obj* CloneSdrObject(SdrModel& rTargetModel) const override;
+    virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const override;
 
     virtual void NbcMove(const Size& rSize) override;
     virtual void NbcResize(const Point& rRef, const Fraction& xFact, const Fraction& yFact) override;
@@ -152,7 +153,7 @@ public:
                                          sal_Int64 nAspect );
     static bool Unload( const css::uno::Reference< css::embed::XEmbeddedObject >& xObj, sal_Int64 nAspect );
     bool Unload();
-    void Connect();
+    void Connect(SvxOle2Shape* pCreator = nullptr);
     void Disconnect();
     void ObjectLoaded();
 
@@ -181,7 +182,7 @@ public:
     void SetWindow(const css::uno::Reference < css::awt::XWindow >& _xWindow);
 
     // #i118485# missing converter added
-    virtual SdrObjectUniquePtr DoConvertToPolyObj(bool bBezier, bool bAddText) const override;
+    virtual rtl::Reference<SdrObject> DoConvertToPolyObj(bool bBezier, bool bAddText) const override;
 };
 
 class SVXCORE_DLLPUBLIC SdrEmbedObjectLink final : public sfx2::SvBaseLink
@@ -197,6 +198,16 @@ public:
         const OUString& rMimeType, const css::uno::Any & rValue ) override;
 
     void                Connect() { GetRealObject(); }
+};
+
+class SVXCORE_DLLPUBLIC SdrIFrameLink final : public sfx2::SvBaseLink
+{
+    SdrOle2Obj* m_pObject;
+
+public:
+    explicit SdrIFrameLink(SdrOle2Obj* pObject);
+    virtual ::sfx2::SvBaseLink::UpdateResult DataChanged(
+        const OUString& rMimeType, const css::uno::Any & rValue ) override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

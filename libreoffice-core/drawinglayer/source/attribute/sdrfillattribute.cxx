@@ -22,6 +22,7 @@
 #include <drawinglayer/attribute/sdrfillgraphicattribute.hxx>
 #include <drawinglayer/attribute/fillhatchattribute.hxx>
 #include <drawinglayer/attribute/fillgradientattribute.hxx>
+#include <utility>
 
 
 namespace drawinglayer::attribute
@@ -40,14 +41,14 @@ namespace drawinglayer::attribute
             ImpSdrFillAttribute(
                 double fTransparence,
                 const basegfx::BColor& rColor,
-                const FillGradientAttribute& rGradient,
-                const FillHatchAttribute& rHatch,
-                const SdrFillGraphicAttribute& rFillGraphic)
+                FillGradientAttribute aGradient,
+                FillHatchAttribute aHatch,
+                SdrFillGraphicAttribute aFillGraphic)
             :   mfTransparence(fTransparence),
                 maColor(rColor),
-                maGradient(rGradient),
-                maHatch(rHatch),
-                maFillGraphic(rFillGraphic)
+                maGradient(std::move(aGradient)),
+                maHatch(std::move(aHatch)),
+                maFillGraphic(std::move(aFillGraphic))
             {
             }
 
@@ -81,6 +82,11 @@ namespace drawinglayer::attribute
                 static SdrFillAttribute::ImplType SINGLETON;
                 return SINGLETON;
             }
+            SdrFillAttribute::ImplType& slideBackgroundFillGlobalDefault()
+            {
+                static SdrFillAttribute::ImplType SINGLETON2;
+                return SINGLETON2;
+            }
         }
 
         SdrFillAttribute::SdrFillAttribute(
@@ -94,8 +100,10 @@ namespace drawinglayer::attribute
         {
         }
 
-        SdrFillAttribute::SdrFillAttribute()
-        :   mpSdrFillAttribute(theGlobalDefault())
+        SdrFillAttribute::SdrFillAttribute(bool bSlideBackgroundFill)
+        :   mpSdrFillAttribute(bSlideBackgroundFill
+                ? slideBackgroundFillGlobalDefault()
+                : theGlobalDefault())
         {
         }
 
@@ -108,6 +116,11 @@ namespace drawinglayer::attribute
         bool SdrFillAttribute::isDefault() const
         {
             return mpSdrFillAttribute.same_object(theGlobalDefault());
+        }
+
+        bool SdrFillAttribute::isSlideBackgroundFill() const
+        {
+            return mpSdrFillAttribute.same_object(slideBackgroundFillGlobalDefault());
         }
 
         SdrFillAttribute& SdrFillAttribute::operator=(const SdrFillAttribute&) = default;

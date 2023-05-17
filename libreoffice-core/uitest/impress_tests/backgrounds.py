@@ -1,3 +1,6 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -72,9 +75,9 @@ class ImpressBackgrounds(UITestCase):
             self.assertEqual(
               document.DrawPages.getByIndex(0).Background.FillBitmapLogicalSize, True)
             self.assertEqual(
-              document.DrawPages.getByIndex(0).Background.FillBitmapSizeX, 0)
+              document.DrawPages.getByIndex(0).Background.FillBitmapSizeX, 2540)
             self.assertEqual(
-              document.DrawPages.getByIndex(0).Background.FillBitmapSizeY, 0)
+              document.DrawPages.getByIndex(0).Background.FillBitmapSizeY, 2540)
             self.assertEqual(document.DrawPages.getByIndex(0).Background.FillBitmapName, 'Painted White')
         elif btn == 'btnpattern':
             self.assertEqual(

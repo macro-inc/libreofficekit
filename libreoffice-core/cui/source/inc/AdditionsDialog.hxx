@@ -68,7 +68,6 @@ public:
     css::uno::Reference<css::deployment::XExtensionManager> m_xExtensionManager;
     std::unique_ptr<weld::Entry> m_xEntrySearch;
     std::unique_ptr<weld::Button> m_xButtonClose;
-    std::unique_ptr<weld::MenuButton> m_xMenuButtonSettings;
     std::vector<std::shared_ptr<AdditionsItem>> m_aAdditionsItems; // UI components
     std::vector<AdditionInfo> m_aAllExtensionsVector; // Stores the all extensions' info
 
@@ -117,19 +116,15 @@ public:
     std::unique_ptr<weld::LinkButton> m_xLinkButtonWebsite;
     std::unique_ptr<weld::Label> m_xLabelName;
     std::unique_ptr<weld::Label> m_xLabelAuthor;
-    std::unique_ptr<weld::Label> m_xLabelDesc;
     std::unique_ptr<weld::Label> m_xLabelDescription;
     std::unique_ptr<weld::Label> m_xLabelLicense;
     std::unique_ptr<weld::Label> m_xLabelVersion;
-    std::unique_ptr<weld::Label> m_xLabelComments;
     std::unique_ptr<weld::LinkButton> m_xLinkButtonComments;
     std::unique_ptr<weld::Image> m_xImageVoting1;
     std::unique_ptr<weld::Image> m_xImageVoting2;
     std::unique_ptr<weld::Image> m_xImageVoting3;
     std::unique_ptr<weld::Image> m_xImageVoting4;
     std::unique_ptr<weld::Image> m_xImageVoting5;
-    std::unique_ptr<weld::Label> m_xLabelNoVoting;
-    std::unique_ptr<weld::Image> m_xImageDownloadNumber;
     std::unique_ptr<weld::Label> m_xLabelDownloadNumber;
     std::unique_ptr<weld::Button> m_xButtonShowMore;
     AdditionsDialog* m_pParentDialog;

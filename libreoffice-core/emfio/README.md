@@ -49,13 +49,17 @@ documentation.
 ## How does it work?
 `emfio` module takes a byte array and turns it into a `drawinglayer` primitive container. The rendering is done via `drawinglayer` primitives. For more information, you should refer to [VCL](../vcl) documentation.
 
+The drawinglayer primitives created to draw the emf/wmf files can be dumped as
+xml for debugging purposes. For more information, please refer to the
+[drawinglayer](../drawyinglayer) documentation.
+
 ## Limitations
 Not all the WMF/EMF/EMF+ records are supported by this module. Unsupported
 records are marked as "not implemented", and a warning message will printed
 if they are actually read within a file. You can file a bug report for
 implementing these records.
 
-Currently, these records are not implemented (specified in
+Currently, these records are not implemented for WMF (specified in
 `wmfreader.cxx`):
 
 ```
@@ -69,12 +73,12 @@ W_META_RESETDC W_META_STARTDOC W_META_STARTPAGE W_META_ENDPAGE
 W_META_ABORTDOC W_META_ENDDOC
 ```
 
-And these records are not implemented (specified in `emfreader.cxx`):
+And these records are not implemented for EMF/EMF+ (specified in `emfreader.cxx`):
 
 ```
 EMR_MASKBLT EMR_PLGBLT EMR_SETDIBITSTODEVICE EMR_FRAMERGN
 EMR_INVERTRGN EMR_FLATTENPATH EMR_WIDENPATH EMR_POLYDRAW
-EMR_SETARCDIRECTION EMR_SETPALETTEENTRIES EMR_RESIZEPALETTE
+EMR_SETPALETTEENTRIES EMR_RESIZEPALETTE
 EMR_EXTFLOODFILL EMR_ANGLEARC EMR_SETCOLORADJUSTMENT EMR_POLYDRAW16
 EMR_CREATECOLORSPACE EMR_SETCOLORSPACE EMR_DELETECOLORSPACE
 EMR_GLSRECORD EMR_GLSBOUNDEDRECORD EMR_PIXELFORMAT EMR_DRAWESCAPE
@@ -114,6 +118,8 @@ formats. Some of them are:
 modifies several binary formats from Microsoft including WMF/EMF/EMF+, and also
 other companies.
 * [EMF+ diagnostics reporting tool](https://github.com/chrissherlock/emfplus-decoder)
+* [limerest](https://gitlab.com/re-lab-project/limerest): A new gui tool based
+on OLEToy for working with various binary formats
 
 ## Related Software
 * [libemf](http://libemf.sourceforge.net/)

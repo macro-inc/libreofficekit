@@ -19,8 +19,6 @@
 
 $(eval $(call gb_Library_Library,sb))
 
-$(eval $(call gb_Library_set_componentfile,sb,basic/util/sb))
-
 $(eval $(call gb_Library_set_include,sb,\
 	$$(INCLUDE) \
 	-I$(SRCDIR)/basic/inc \
@@ -60,19 +58,19 @@ $(eval $(call gb_Library_use_libraries,sb,\
 
 ifneq ($(filter SCRIPTING,$(BUILD_TYPE)),)
 
+$(eval $(call gb_Library_set_componentfile,sb,basic/util/sb,services))
+
 $(eval $(call gb_Library_add_exception_objects,sb,\
 	basic/source/basmgr/basicmanagerrepository \
 	basic/source/basmgr/basmgr \
 	basic/source/basmgr/vbahelper \
 	basic/source/classes/codecompletecache \
 	basic/source/classes/eventatt \
-	basic/source/classes/global \
 	basic/source/classes/image \
 	basic/source/classes/propacc \
 	basic/source/classes/sb \
 	basic/source/classes/sbunoobj \
 	basic/source/classes/sbxmod \
-	basic/source/comp/basiccharclass \
 	basic/source/comp/buffer \
 	basic/source/comp/codegen \
 	basic/source/comp/dim \
@@ -104,9 +102,11 @@ endif
 
 $(eval $(call gb_Library_add_exception_objects,sb,\
 	basic/source/runtime/basrdll \
+	basic/source/classes/global \
 	basic/source/runtime/methods \
 	basic/source/runtime/methods1 \
 	basic/source/classes/sbintern \
+	basic/source/comp/basiccharclass \
 	basic/source/sbx/sbxarray \
 	basic/source/sbx/sbxbool \
 	basic/source/sbx/sbxbyte \

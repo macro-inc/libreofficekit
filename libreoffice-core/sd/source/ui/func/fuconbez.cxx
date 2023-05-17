@@ -108,9 +108,9 @@ void FuConstructBezierPolygon::DoExecute( SfxRequest& rReq )
     if( !pArgs )
         return;
 
-    const SfxPoolItem*  pPoolItem = nullptr;
-    if( SfxItemState::SET == pArgs->GetItemState( SID_ADD_MOTION_PATH, true, &pPoolItem ) )
-        maTargets = static_cast<const SfxUnoAnyItem*>( pPoolItem )->GetValue();
+    const SfxUnoAnyItem* pPoolItem = pArgs->GetItemIfSet( SID_ADD_MOTION_PATH );
+    if( pPoolItem )
+        maTargets = pPoolItem->GetValue();
 
     if (nSlotId != SID_DRAW_FREELINE_NOFILL)
         return;
@@ -292,44 +292,44 @@ void FuConstructBezierPolygon::Activate()
         case SID_DRAW_POLYGON_NOFILL:
         case SID_DRAW_XPOLYGON_NOFILL:
         {
-            eKind = OBJ_PLIN;
+            eKind = SdrObjKind::PolyLine;
         }
         break;
 
         case SID_DRAW_POLYGON:
         case SID_DRAW_XPOLYGON:
         {
-            eKind = OBJ_POLY;
+            eKind = SdrObjKind::Polygon;
         }
         break;
 
         case SID_DRAW_BEZIER_NOFILL:
         {
-            eKind = OBJ_PATHLINE;
+            eKind = SdrObjKind::PathLine;
         }
         break;
 
         case SID_DRAW_BEZIER_FILL:
         {
-            eKind = OBJ_PATHFILL;
+            eKind = SdrObjKind::PathFill;
         }
         break;
 
         case SID_DRAW_FREELINE_NOFILL:
         {
-            eKind = OBJ_FREELINE;
+            eKind = SdrObjKind::FreehandLine;
         }
         break;
 
         case SID_DRAW_FREELINE:
         {
-            eKind = OBJ_FREEFILL;
+            eKind = SdrObjKind::FreehandFill;
         }
         break;
 
         default:
         {
-            eKind = OBJ_PATHLINE;
+            eKind = SdrObjKind::PathLine;
         }
         break;
     }
@@ -401,7 +401,7 @@ void FuConstructBezierPolygon::SetEditMode(sal_uInt16 nMode)
     rBindings.Invalidate(SID_BEZIER_INSERT);
 }
 
-SdrObjectUniquePtr FuConstructBezierPolygon::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstructBezierPolygon::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
 {
     // case SID_DRAW_POLYGON:
     // case SID_DRAW_POLYGON_NOFILL:
@@ -412,7 +412,7 @@ SdrObjectUniquePtr FuConstructBezierPolygon::CreateDefaultObject(const sal_uInt1
     // case SID_DRAW_BEZIER_FILL:          // BASIC
     // case SID_DRAW_BEZIER_NOFILL:        // BASIC
 
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         mpView->getSdrModelFromSdrView(),
         mpView->GetCurrentObjInventor(),
         mpView->GetCurrentObjIdentifier()));

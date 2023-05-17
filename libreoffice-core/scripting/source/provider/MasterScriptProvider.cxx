@@ -23,7 +23,7 @@
 
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 
 #include <com/sun/star/frame/XModel.hpp>
@@ -51,11 +51,11 @@ using namespace ::sf_misc;
 namespace func_provider
 {
 
-static bool endsWith( const OUString& target, const OUString& item )
+static bool endsWith( std::u16string_view target, std::u16string_view item )
 {
-    sal_Int32 index = target.indexOf( item );
-    return index != -1  &&
-           index == ( target.getLength() - item.getLength() );
+    size_t index = target.find( item );
+    return index != std::u16string_view::npos  &&
+           index == ( target.size() - item.size() );
 }
 
 /* should be available in some central location. */
@@ -323,7 +323,7 @@ MasterScriptProvider::getScript( const OUString& scriptURI )
             provider::theMasterScriptProviderFactory::get( m_xContext );
 
         Reference< provider::XScriptProvider > xSP(
-            xFac_->createScriptProvider( makeAny( location ) ), UNO_SET_THROW );
+            xFac_->createScriptProvider( Any( location ) ), UNO_SET_THROW );
         xScript = xSP->getScript( scriptURI );
     }
 

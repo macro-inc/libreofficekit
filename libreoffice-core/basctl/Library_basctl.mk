@@ -19,7 +19,7 @@
 
 $(eval $(call gb_Library_Library,basctl))
 
-$(eval $(call gb_Library_set_componentfile,basctl,basctl/util/basctl))
+$(eval $(call gb_Library_set_componentfile,basctl,basctl/util/basctl,services))
 
 $(eval $(call gb_Library_set_include,basctl,\
 	-I$(SRCDIR)/basctl/inc \
@@ -40,6 +40,7 @@ $(eval $(call gb_Library_set_precompiled_header,basctl,basctl/inc/pch/precompile
 $(eval $(call gb_Library_use_sdk_api,basctl))
 
 $(eval $(call gb_Library_use_libraries,basctl,\
+	basegfx \
 	comphelper \
 	cppu \
 	cppuhelper \
@@ -62,9 +63,14 @@ $(eval $(call gb_Library_use_libraries,basctl,\
 	xmlscript \
 ))
 
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
 $(eval $(call gb_Library_add_exception_objects,basctl,\
 	basctl/source/accessibility/accessibledialogcontrolshape \
 	basctl/source/accessibility/accessibledialogwindow \
+))
+endif
+
+$(eval $(call gb_Library_add_exception_objects,basctl,\
 	basctl/source/basicide/basdoc \
 	basctl/source/basicide/IDEComboBox \
 	basctl/source/basicide/basicrenderable \

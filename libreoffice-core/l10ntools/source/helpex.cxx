@@ -20,7 +20,6 @@
 #include <sal/config.h>
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <cstring>
 
@@ -82,7 +81,7 @@ SAL_IMPLEMENT_MAIN_WITH_ARGS(argc, argv)
                 std::unique_ptr<MergeDataFile> pMergeDataFile;
                 if( aArgs.m_sLanguage != "qtz")
                 {
-                    pMergeDataFile.reset(new MergeDataFile(aArgs.m_sMergeSrc, OString(), false, false ));
+                    pMergeDataFile.reset(new MergeDataFile(aArgs.m_sMergeSrc, "", false, false ));
                 }
                 std::string sTemp;
                 aInput >> sTemp;

@@ -24,6 +24,7 @@
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
+#include <comphelper/windowserrorstring.hxx>
 #include <win/wincomp.hxx>
 #include <win/saldata.hxx>
 #include <win/salgdi.h>
@@ -591,8 +592,7 @@ CompatibleDC::CompatibleDC(SalGraphics &rGraphics, int x, int y, int width, int 
         return;
     }
 
-    mpImpl = dynamic_cast<WinSalGraphicsImplBase*>(rWinGraphics.GetImpl());
-    assert(mpImpl != nullptr);
+    mpImpl = rWinGraphics.getWinSalGraphicsImplBase();
     mhCompatibleDC = CreateCompatibleDC(rWinGraphics.getHDC());
 
     // move the origin so that we always paint at 0,0 - to keep the bitmap
@@ -641,10 +641,18 @@ WinSalGraphics::WinSalGraphics(WinSalGraphics::Type eType, bool bScreen, HWND hW
 {
 #if HAVE_FEATURE_SKIA
     if (SkiaHelper::isVCLSkiaEnabled() && !mbPrinter)
-        mpImpl.reset(new WinSkiaSalGraphicsImpl(*this, pProvider));
+    {
+        auto const impl = new WinSkiaSalGraphicsImpl(*this, pProvider);
+        mpImpl.reset(impl);
+        mWinSalGraphicsImplBase = impl;
+    }
     else
 #endif
-        mpImpl.reset(new WinSalGraphicsImpl(*this));
+    {
+        auto const impl = new WinSalGraphicsImpl(*this);
+        mpImpl.reset(impl);
+        mWinSalGraphicsImplBase = impl;
+    }
 }
 
 WinSalGraphics::~WinSalGraphics()
@@ -755,6 +763,37 @@ void WinSalGraphics::GetResolution( sal_Int32& rDPIX, sal_Int32& rDPIY )
         rDPIX = rDPIY = 600;
 }
 
+void WinSalGraphics::getDWriteFactory(IDWriteFactory** pFactory, IDWriteGdiInterop** pInterop)
+{
+    if (!bDWriteDone)
+    {
+        HRESULT hr = S_OK;
+        hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                                 reinterpret_cast<IUnknown**>(&mxDWriteFactory));
+        if (FAILED(hr))
+        {
+            SAL_WARN("vcl.fonts", "HRESULT 0x" << OUString::number(hr, 16) << ": "
+                                               << WindowsErrorStringFromHRESULT(hr));
+            abort();
+        }
+
+        hr = mxDWriteFactory->GetGdiInterop(&mxDWriteGdiInterop);
+        if (FAILED(hr))
+        {
+            SAL_WARN("vcl.fonts", "HRESULT 0x" << OUString::number(hr, 16) << ": "
+                                               << WindowsErrorStringFromHRESULT(hr));
+            abort();
+        }
+
+        bDWriteDone = true;
+    }
+
+    if (pFactory)
+        *pFactory = mxDWriteFactory.get();
+    if (pInterop)
+        *pInterop = mxDWriteGdiInterop.get();
+}
+
 sal_uInt16 WinSalGraphics::GetBitCount() const
 {
     return mpImpl->GetBitCount();
@@ -767,8 +806,7 @@ tools::Long WinSalGraphics::GetGraphicsWidth() const
 
 void WinSalGraphics::Flush()
 {
-    if(WinSalGraphicsImplBase* impl = dynamic_cast<WinSalGraphicsImplBase*>(GetImpl()))
-        impl->Flush();
+    mWinSalGraphicsImplBase->Flush();
 }
 
 void WinSalGraphics::ResetClipRegion()

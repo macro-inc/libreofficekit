@@ -104,16 +104,14 @@ sal_uInt16 SwEditShell::SaveGlossaryDoc( SwTextBlocks& rBlock,
         if( !pNd )
             pNd = pContentNd;
 
-        pCursor->GetPoint()->nNode = *pNd;
-        if( pNd == pContentNd )
-            pCursor->GetPoint()->nContent.Assign( pContentNd, 0 );
+        pCursor->GetPoint()->Assign(*pNd);
         pCursor->SetMark();
 
         // then until the end of the Node array
-        pCursor->GetPoint()->nNode = pMyDoc->GetNodes().GetEndOfContent().GetIndex()-1;
-        pContentNd = pCursor->GetContentNode();
+        pCursor->GetPoint()->Assign(pMyDoc->GetNodes().GetEndOfContent().GetIndex()-1);
+        pContentNd = pCursor->GetPointContentNode();
         if( pContentNd )
-            pCursor->GetPoint()->nContent.Assign( pContentNd, pContentNd->Len() );
+            pCursor->GetPoint()->SetContent( pContentNd->Len() );
 
         OUString sBuf;
         GetSelectedText( sBuf, ParaBreakType::ToOnlyCR );
@@ -133,14 +131,14 @@ sal_uInt16 SwEditShell::SaveGlossaryDoc( SwTextBlocks& rBlock,
             aCpyPam.SetMark();
 
             // then until the end of the nodes array
-            aCpyPam.GetPoint()->nNode = pMyDoc->GetNodes().GetEndOfContent().GetIndex()-1;
-            pContentNd = aCpyPam.GetContentNode();
-            aCpyPam.GetPoint()->nContent.Assign(
-                   pContentNd, pContentNd ? pContentNd->Len() : 0);
+            aCpyPam.GetPoint()->Assign(pMyDoc->GetNodes().GetEndOfContent().GetIndex()-1);
+            pContentNd = aCpyPam.GetPointContentNode();
+            if(pContentNd)
+                aCpyPam.GetPoint()->SetContent( pContentNd->Len() );
 
             aStt = pGDoc->GetNodes().GetEndOfExtras();
             pContentNd = pGDoc->GetNodes().GoNext( &aStt );
-            SwPosition aInsPos( aStt, SwIndex( pContentNd ));
+            SwPosition aInsPos( aStt );
             pMyDoc->getIDocumentContentOperations().CopyRange(aCpyPam, aInsPos, SwCopyFlags::CheckPosInFly);
 
             nRet = rBlock.PutDoc();
@@ -157,8 +155,7 @@ bool SwEditShell::CopySelToDoc( SwDoc& rInsDoc )
 
     SwNodeIndex aIdx( rNds.GetEndOfContent(), -1 );
     SwContentNode *const pContentNode = aIdx.GetNode().GetContentNode();
-    SwPosition aPos( aIdx,
-        SwIndex(pContentNode, pContentNode ? pContentNode->Len() : 0));
+    SwPosition aPos( aIdx, pContentNode, pContentNode ? pContentNode->Len() : 0);
 
     bool bRet = false;
     CurrShell aCurr( this );
@@ -200,13 +197,13 @@ bool SwEditShell::CopySelToDoc( SwDoc& rInsDoc )
         bool bColSel = GetCursor_()->IsColumnSelection();
         if( bColSel && rInsDoc.IsClipBoard() )
             rInsDoc.SetColumnSelection( true );
-        bool bSelectAll = StartsWithTable() && ExtendedSelectedAll();
+        bool bSelectAll = StartsWith_() != SwCursorShell::StartsWith::None && ExtendedSelectedAll();
         {
             for(SwPaM& rPaM : GetCursor()->GetRingContainer())
             {
                 if( !rPaM.HasMark() )
                 {
-                    SwContentNode *const pNd = rPaM.GetContentNode();
+                    SwContentNode *const pNd = rPaM.GetPointContentNode();
                     if (nullptr != pNd &&
                         ( bColSel || !pNd->GetTextNode() ) )
                     {
@@ -230,17 +227,18 @@ bool SwEditShell::CopySelToDoc( SwDoc& rInsDoc )
                         // but we want to copy the table and the start node before
                         // the first cell as well.
                         // tdf#133982 tables can be nested
+                        const SwNode* pNode = &aPaM.Start()->GetNode();
                         while (SwTableNode const* pTableNode =
-                            aPaM.Start()->nNode.GetNode().StartOfSectionNode()->FindTableNode())
+                            pNode->StartOfSectionNode()->FindTableNode())
                         {
-                            aPaM.Start()->nNode = *pTableNode;
+                            pNode = pTableNode;
                         }
                         while (SwSectionNode const* pSectionNode =
-                            aPaM.Start()->nNode.GetNode().StartOfSectionNode()->FindSectionNode())
+                            pNode->StartOfSectionNode()->FindSectionNode())
                         {
-                            aPaM.Start()->nNode = *pSectionNode;
+                            pNode = pSectionNode;
                         }
-                        aPaM.Start()->nContent.Assign(nullptr, 0);
+                        aPaM.Start()->Assign(*pNode);
                     }
                     bRet = GetDoc()->getIDocumentContentOperations().CopyRange( aPaM, aPos, SwCopyFlags::CheckPosInFly)
                         || bRet;

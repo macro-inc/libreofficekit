@@ -23,6 +23,7 @@
 #include <sal/config.h>
 
 #include <memory>
+#include <optional>
 
 #include <com/sun/star/document/XDocumentProperties.hpp>
 
@@ -31,13 +32,13 @@
 
 #include "xmlitmap.hxx"
 #include <o3tl/typed_flags_set.hxx>
+#include <ndindex.hxx>
 
 class SwDoc;
 class SvXMLUnitConverter;
 class SvXMLTokenMap;
 class SvXMLImportItemMapper;
 class SfxItemSet;
-class SwNodeIndex;
 class XMLTextImportHelper;
 class SvXMLGraphicHelper;
 class SvXMLEmbeddedObjectHelper;
@@ -47,10 +48,6 @@ enum class SfxStyleFamily;
 // for styles, autostyles and settings + meta
 #define PROGRESS_BAR_STEP 20
 
-namespace SwImport {
-    SwDoc* GetDocFromXMLImport( SvXMLImport const & );
-}
-
 // we only need this scoped enum to be flags here, in sw
 namespace o3tl
 {
@@ -59,7 +56,7 @@ namespace o3tl
 
 class SwXMLImport: public SvXMLImport
 {
-    std::unique_ptr<SwNodeIndex> m_pSttNdIdx;
+    std::optional<SwNodeIndex> m_oSttNdIdx;
 
     std::unique_ptr<SvXMLUnitConverter> m_pTwipUnitConv;
     std::unique_ptr<SvXMLImportItemMapper> m_pTableItemMapper;// paragraph item import
@@ -86,6 +83,10 @@ class SwXMLImport: public SvXMLImport
     bool                m_bInititedXForms : 1;
 
     SwDoc*      m_pDoc; // cached for getDoc()
+
+    // Optimization for new table name lookup
+    OUString m_sDefTableName; // See STR_TABLE_DEFNAME
+    std::map<OUString, sal_uInt32> m_aTableNameMap; // Last used indices for duplicating table names
 
     void                    InitItemImport();
     void                    FinitItemImport();
@@ -170,6 +171,9 @@ public:
 
     const SwDoc* getDoc() const;
     SwDoc* getDoc();
+
+    const OUString& GetDefTableName() { return m_sDefTableName; }
+    std::map<OUString, sal_uInt32>& GetTableNameMap() { return m_aTableNameMap; }
 };
 
 inline const SvXMLImportItemMapper& SwXMLImport::GetTableItemMapper() const

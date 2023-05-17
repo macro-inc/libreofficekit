@@ -29,12 +29,15 @@
 #include <oox/helper/propertyset.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
+#include <oox/token/tokenmap.hxx>
 #include <tools/color.hxx>
 #include <com/sun/star/table/BorderLineStyle.hpp>
 #include <com/sun/star/table/BorderLine2.hpp>
 #include <com/sun/star/drawing/TextVerticalAdjust.hpp>
 #include <com/sun/star/text/XText.hpp>
 #include <com/sun/star/text/WritingMode.hpp>
+#include <comphelper/propertysequence.hxx>
+#include <comphelper/propertyvalue.hxx>
 
 using namespace ::oox::core;
 using namespace ::com::sun::star;
@@ -61,32 +64,47 @@ TableCell::TableCell()
 {
 }
 
-static void applyLineAttributes( const ::oox::core::XmlFilterBase& rFilterBase,
-        Reference< XPropertySet > const & rxPropSet, oox::drawingml::LineProperties const & rLineProperties,
-        sal_Int32 nPropId )
+static void applyLineAttributes(const ::oox::core::XmlFilterBase& rFilterBase,
+                                Reference<XPropertySet> const& rxPropSet,
+                                oox::drawingml::table::TableStyle const& rTableStyle,
+                                oox::drawingml::LineProperties const& rLineProperties,
+                                sal_Int32 nPropId)
 {
     BorderLine2 aBorderLine;
-    if ( rLineProperties.maLineFill.moFillType.differsFrom( XML_noFill ))
+    TableStyle& rTable(const_cast<TableStyle&>(rTableStyle));
+    if (!rTable.getStyleId().isEmpty())
     {
         Color aColor = rLineProperties.maLineFill.getBestSolidColor();
-        aBorderLine.Color = sal_Int32(aColor.getColor( rFilterBase.getGraphicHelper() ));
-        aBorderLine.OuterLineWidth = static_cast< sal_Int16 >( GetCoordinate( rLineProperties.moLineWidth.get( 0 ) ) / 4 );
-        aBorderLine.InnerLineWidth = static_cast< sal_Int16 >( GetCoordinate( rLineProperties.moLineWidth.get( 0 ) ) / 4 );
-        aBorderLine.LineWidth = static_cast< sal_Int16 >( GetCoordinate( rLineProperties.moLineWidth.get( 0 ) ) / 2 );
+        aBorderLine.Color = sal_Int32(aColor.getColor(rFilterBase.getGraphicHelper()));
+        aBorderLine.OuterLineWidth = static_cast<sal_Int16>(GetCoordinate(rLineProperties.moLineWidth.value_or(0)) / 4);
+        aBorderLine.InnerLineWidth = static_cast<sal_Int16>(GetCoordinate(rLineProperties.moLineWidth.value_or(0)) / 4);
+        aBorderLine.LineWidth = static_cast<sal_Int16>(GetCoordinate(rLineProperties.moLineWidth.value_or(0)) / 2);
         aBorderLine.LineDistance = 0;
     }
     else
     {
-        aBorderLine.Color = sal_Int32( COL_AUTO );
-        aBorderLine.OuterLineWidth = static_cast< sal_Int16 >( GetCoordinate( rLineProperties.moLineWidth.get( 0 ) ) / 4 );
-        aBorderLine.InnerLineWidth = static_cast< sal_Int16 >( GetCoordinate( rLineProperties.moLineWidth.get( 0 ) ) / 4 );
-        aBorderLine.LineWidth = static_cast< sal_Int16 >( GetCoordinate( rLineProperties.moLineWidth.get( 0 ) ) / 2 );
+        if (rLineProperties.maLineFill.moFillType.has_value())
+        {
+            if (rLineProperties.maLineFill.moFillType.value() != XML_noFill)
+            {
+                Color aColor = rLineProperties.maLineFill.getBestSolidColor();
+                aBorderLine.Color = sal_Int32(aColor.getColor(rFilterBase.getGraphicHelper()));
+            }
+            else
+                aBorderLine.Color = sal_Int32(COL_AUTO);
+        }
+        else
+            aBorderLine.Color = sal_Int32(COL_BLACK);
+
+        aBorderLine.OuterLineWidth = static_cast<sal_Int16>(GetCoordinate(rLineProperties.moLineWidth.value_or(12700)) / 4);
+        aBorderLine.InnerLineWidth = static_cast<sal_Int16>(GetCoordinate(rLineProperties.moLineWidth.value_or(12700)) / 4);
+        aBorderLine.LineWidth = static_cast<sal_Int16>(GetCoordinate(rLineProperties.moLineWidth.value_or(12700)) / 2);
         aBorderLine.LineDistance = 0;
     }
 
-    if ( rLineProperties.moPresetDash.has() )
+    if ( rLineProperties.moPresetDash.has_value() )
     {
-        switch ( rLineProperties.moPresetDash.get() )
+        switch ( rLineProperties.moPresetDash.value() )
         {
         case XML_dot:
         case XML_sysDot:
@@ -215,7 +233,7 @@ static void applyTableStylePart( const ::oox::core::XmlFilterBase& rFilterBase,
     if ( rTableStylePart.getTextColor().isUsed() )
     {
         aTextCharProps.maFillProperties.maFillColor = rTableStylePart.getTextColor();
-        aTextCharProps.maFillProperties.moFillType.set(XML_solidFill);
+        aTextCharProps.maFillProperties.moFillType = XML_solidFill;
     }
     if( rTableStylePart.getTextBoldStyle() )
         aTextCharProps.moBold = *rTableStylePart.getTextBoldStyle();
@@ -475,36 +493,37 @@ void TableCell::pushToXCell( const ::oox::core::XmlFilterBase& rFilterBase, cons
     aLinePropertiesTopLeftToBottomRight.assignUsed( maLinePropertiesTopLeftToBottomRight );
     aLinePropertiesBottomLeftToTopRight.assignUsed( maLinePropertiesBottomLeftToTopRight );
 
-    applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesLeft, PROP_LeftBorder );
-    applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesRight, PROP_RightBorder );
-    applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesTop, PROP_TopBorder );
-    applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesBottom, PROP_BottomBorder );
-    applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesTopLeftToBottomRight, PROP_DiagonalTLBR );
-    applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesBottomLeftToTopRight, PROP_DiagonalBLTR );
+    applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesLeft, PROP_LeftBorder );
+    applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesRight, PROP_RightBorder );
+    applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesTop, PROP_TopBorder );
+    applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesBottom, PROP_BottomBorder );
+    applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesTopLeftToBottomRight, PROP_DiagonalTLBR );
+    applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesBottomLeftToTopRight, PROP_DiagonalBLTR );
 
     // Convert insideH to Top and Bottom, InsideV to Left and Right. Exclude the outer borders.
     if(nRow != 0)
     {
         aLinePropertiesInsideH.assignUsed( aLinePropertiesTop );
-        applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesInsideH, PROP_TopBorder );
+        applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesInsideH, PROP_TopBorder );
     }
     if(nRow != nMaxRow)
     {
         aLinePropertiesInsideH.assignUsed( aLinePropertiesBottom );
-        applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesInsideH, PROP_BottomBorder );
+        applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesInsideH, PROP_BottomBorder );
     }
     if(nColumn != 0)
     {
         aLinePropertiesInsideV.assignUsed( aLinePropertiesLeft );
-        applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesInsideV, PROP_LeftBorder );
+        applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesInsideV, PROP_LeftBorder );
     }
     if(nColumn != nMaxColumn)
     {
         aLinePropertiesInsideV.assignUsed( aLinePropertiesRight );
-        applyLineAttributes( rFilterBase, xPropSet, aLinePropertiesInsideV, PROP_RightBorder );
+        applyLineAttributes( rFilterBase, xPropSet, rTable, aLinePropertiesInsideV, PROP_RightBorder );
     }
 
-    if (rProperties.getBgColor().isUsed() && !maFillProperties.maFillColor.isUsed() && maFillProperties.moFillType.get() == XML_noFill)
+    if (rProperties.getBgColor().isUsed() && !maFillProperties.maFillColor.isUsed() &&
+        maFillProperties.moFillType.value_or(0) == XML_noFill)
     {
         maFillProperties.moFillType = XML_solidFill;
         maFillProperties.maFillColor = rProperties.getBgColor();
@@ -536,10 +555,10 @@ void TableCell::pushToXCell( const ::oox::core::XmlFilterBase& rFilterBase, cons
         ::Color aResult( basegfx::interpolate(nBgColor.getBColor(), nCellColor.getBColor(), 1.0 - fTransparency) );
         aFillProperties.maFillColor.clearTransformations();
         aFillProperties.maFillColor.setSrgbClr(sal_Int32(aResult.GetRGBColor()));
-        aFillProperties.moFillType.set(XML_solidFill);
+        aFillProperties.moFillType = XML_solidFill;
     }
-    if (!aFillProperties.moFillType.has())
-        aFillProperties.moFillType.set(XML_noFill);
+    if (!aFillProperties.moFillType.has_value())
+        aFillProperties.moFillType = XML_noFill;
 
     // TODO: phClr?
     aFillProperties.pushToPropMap( aPropMap, rFilterBase.getGraphicHelper() );
@@ -567,10 +586,36 @@ void TableCell::pushToXCell( const ::oox::core::XmlFilterBase& rFilterBase, cons
         }
     }
 
-    if (getVertToken() == XML_vert)
+    if ( getVertToken() == XML_vert )
+    {
         xPropSet->setPropertyValue("RotateAngle", Any(short(27000)));
-    else if (getVertToken() == XML_vert270)
+    }
+    else if ( getVertToken() == XML_vert270 )
+    {
         xPropSet->setPropertyValue("RotateAngle", Any(short(9000)));
+    }
+    else if ( getVertToken() != XML_horz && getVertToken() != XML_eaVert )
+    {
+        // put the vert value in the grab bag for roundtrip
+        const Sequence<sal_Int8>& aTokenNameSeq = StaticTokenMap().getUtf8TokenName(getVertToken());
+        const OUString aTokenName{ reinterpret_cast<const char*>(aTokenNameSeq.getConstArray()),
+                                   aTokenNameSeq.getLength(), RTL_TEXTENCODING_UTF8 };
+
+        Sequence<PropertyValue> aGrabBag;
+        xPropSet->getPropertyValue("CellInteropGrabBag") >>= aGrabBag;
+        PropertyValue aPropertyValue = comphelper::makePropertyValue("mso-tcPr-vert-value", aTokenName);
+        if (aGrabBag.hasElements())
+        {
+            sal_Int32 nLength = aGrabBag.getLength();
+            aGrabBag.realloc(nLength + 1);
+            aGrabBag.getArray()[nLength] = aPropertyValue;
+        }
+        else
+        {
+            aGrabBag = { aPropertyValue };
+        }
+        xPropSet->setPropertyValue("CellInteropGrabBag", Any(aGrabBag));
+    }
 }
 
 }

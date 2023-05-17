@@ -19,7 +19,7 @@
 
 
 #include <memory>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "filtercache.hxx"
 #include "constant.hxx"
 #include "cacheupdatelistener.hxx"
@@ -51,6 +51,7 @@
 #include <i18nlangtag/languagetag.hxx>
 
 #include <officecfg/Setup.hxx>
+#include <o3tl/string_view.hxx>
 
 
 namespace filter::config{
@@ -244,8 +245,8 @@ bool FilterCache::isFillState(FilterCache::EFillState eState) const
 
 
 std::vector<OUString> FilterCache::getMatchingItemsByProps(      EItemType  eType  ,
-                                                  const CacheItem& lIProps,
-                                                  const CacheItem& lEProps) const
+                                                  o3tl::span< const css::beans::NamedValue > lIProps,
+                                                  o3tl::span< const css::beans::NamedValue > lEProps) const
 {
     // SAFE ->
     osl::MutexGuard aLock(m_aMutex);
@@ -256,6 +257,7 @@ std::vector<OUString> FilterCache::getMatchingItemsByProps(      EItemType  eTyp
     const CacheItemList& rList = impl_getItemList(eType);
 
     std::vector<OUString> lKeys;
+    lKeys.reserve(rList.size());
 
     // search items, which provides all needed properties of set "lIProps"
     // but not of set "lEProps"!
@@ -348,6 +350,15 @@ CacheItem FilterCache::getItem(      EItemType        eType,
     // SAFE ->
     osl::MutexGuard aLock(m_aMutex);
 
+    CacheItem aItem = impl_getItem(eType, sItem);
+    // <- SAFE
+    return aItem;
+}
+
+
+CacheItem& FilterCache::impl_getItem(      EItemType        eType,
+                               const OUString& sItem)
+{
     // search for right list
     // An exception is thrown if "eType" is unknown.
     // => rList will be valid everytimes next line is reached.
@@ -388,7 +399,6 @@ CacheItem FilterCache::getItem(      EItemType        eType,
     }
 
     return pIt->second;
-    // <- SAFE
 }
 
 
@@ -449,12 +459,13 @@ void FilterCache::refreshItem(      EItemType        eType,
 }
 
 
-void FilterCache::addStatePropsToItem(      EItemType        eType,
-                                      const OUString& sItem,
-                                            CacheItem&       rItem)
+css::uno::Any FilterCache::getItemWithStateProps(      EItemType        eType,
+                                      const OUString& sItem)
 {
     // SAFE ->
     osl::MutexGuard aLock(m_aMutex);
+
+    const CacheItem& rItem = impl_getItem(eType, sItem);
 
     // Note: Opening of the configuration layer throws some exceptions
     // if it failed. So we mustn't check any reference here...
@@ -493,9 +504,8 @@ void FilterCache::addStatePropsToItem(      EItemType        eType,
                     (sItem == sDefaultFrameLoader   )
                    )
                 {
-                    rItem[PROPNAME_FINALIZED] <<= true;
-                    rItem[PROPNAME_MANDATORY] <<= true;
-                    return;
+                    css::uno::Sequence aProps = rItem.getAsPackedPropertyValueList(true, true);
+                    return css::uno::Any(aProps);
                 }
                 /* <-- HACK */
 
@@ -513,17 +523,16 @@ void FilterCache::addStatePropsToItem(      EItemType        eType,
         default: break;
     }
 
+    bool bFinalized, bMandatory;
     try
     {
         css::uno::Reference< css::beans::XProperty > xItem;
         xSet->getByName(sItem) >>= xItem;
         css::beans::Property aDescription = xItem->getAsProperty();
 
-        bool bFinalized = ((aDescription.Attributes & css::beans::PropertyAttribute::READONLY  ) == css::beans::PropertyAttribute::READONLY  );
-        bool bMandatory = ((aDescription.Attributes & css::beans::PropertyAttribute::REMOVABLE) != css::beans::PropertyAttribute::REMOVABLE);
+        bFinalized = ((aDescription.Attributes & css::beans::PropertyAttribute::READONLY  ) == css::beans::PropertyAttribute::READONLY  );
+        bMandatory = ((aDescription.Attributes & css::beans::PropertyAttribute::REMOVABLE) != css::beans::PropertyAttribute::REMOVABLE);
 
-        rItem[PROPNAME_FINALIZED] <<= bFinalized;
-        rItem[PROPNAME_MANDATORY] <<= bMandatory;
     }
     catch(const css::container::NoSuchElementException&)
     {
@@ -536,10 +545,13 @@ void FilterCache::addStatePropsToItem(      EItemType        eType,
 
             => mark item as FINALIZED / MANDATORY, we don't support writing to the old format
         */
-        rItem[PROPNAME_FINALIZED] <<= true;
-        rItem[PROPNAME_MANDATORY] <<= true;
+        bFinalized = true;
+        bMandatory = true;
     }
 
+    css::uno::Sequence<css::beans::PropertyValue> aProps = rItem.getAsPackedPropertyValueList(bFinalized, bMandatory);
+
+    return css::uno::Any(aProps);
     // <- SAFE
 }
 
@@ -622,7 +634,7 @@ void FilterCache::impl_flushByList(const css::uno::Reference< css::container::XN
 
                 CacheItemList::const_iterator pItem = rCache.find(item);
                 impl_saveItem(xItem, eType, pItem->second);
-                xAddRemoveSet->insertByName(item, css::uno::makeAny(xItem));
+                xAddRemoveSet->insertByName(item, css::uno::Any(xItem));
             }
             break;
 
@@ -828,7 +840,7 @@ css::uno::Reference< css::uno::XInterface > FilterCache::impl_openConfig(EConfig
     return *pConfig;
 }
 
-css::uno::Any FilterCache::impl_getDirectCFGValue(const OUString& sDirectKey)
+css::uno::Any FilterCache::impl_getDirectCFGValue(std::u16string_view sDirectKey)
 {
     OUString sRoot;
     OUString sKey ;
@@ -889,14 +901,14 @@ css::uno::Reference< css::uno::XInterface > FilterCache::impl_createConfigAccess
             // set root path
             aParam.Name = "nodepath";
             aParam.Value <<= sRoot;
-            lParams.push_back(css::uno::makeAny(aParam));
+            lParams.push_back(css::uno::Any(aParam));
 
             // enable "all locales mode" ... if required
             if (bLocalesMode)
             {
                 aParam.Name = "locale";
                 aParam.Value <<= OUString("*");
-                lParams.push_back(css::uno::makeAny(aParam));
+                lParams.push_back(css::uno::Any(aParam));
             }
 
             // open it
@@ -1013,7 +1025,7 @@ void FilterCache::impl_validateAndOptimize()
 
         // create an optimized registration for this type to
         // its set list of extensions/url pattern. If it's a "normal" type
-        // set it at the end of this optimized list. But if its
+        // set it at the end of this optimized list. But if it's
         // a "Preferred" one - set it to the front of this list.
         // Of course multiple "Preferred" registrations can occur
         // (they shouldn't - but they can!) ... Ignore it. The last
@@ -1176,7 +1188,7 @@ void FilterCache::impl_validateAndOptimize()
 
         CacheItem&     rLoader   = frameLoader.second;
         css::uno::Any& rTypesReg = rLoader[PROPNAME_TYPES];
-        std::vector<OUString>   lTypesReg (comphelper::sequenceToContainer< std::vector<OUString> >(rTypesReg.get<css::uno::Sequence<OUString> >()));
+        const css::uno::Sequence<OUString> lTypesReg = rTypesReg.get<css::uno::Sequence<OUString> >();
 
         for (auto const& typeReg : lTypesReg)
         {
@@ -1272,7 +1284,7 @@ void FilterCache::impl_load(EFillState eRequiredState)
        )
     {
         // Attention! If config couldn't be opened successfully
-        // and exception os thrown automatically and must be forwarded
+        // and exception is thrown automatically and must be forwarded
         // to our caller...
         css::uno::Reference< css::container::XNameAccess > xTypes(impl_openConfig(E_PROVIDER_TYPES), css::uno::UNO_QUERY_THROW);
         {
@@ -1289,7 +1301,7 @@ void FilterCache::impl_load(EFillState eRequiredState)
        )
     {
         // Attention! If config couldn't be opened successfully
-        // and exception os thrown automatically and must be forwarded
+        // and exception is thrown automatically and must be forwarded
         // to our call...
         css::uno::Reference< css::container::XNameAccess > xTypes(impl_openConfig(E_PROVIDER_TYPES), css::uno::UNO_QUERY_THROW);
         {
@@ -1306,7 +1318,7 @@ void FilterCache::impl_load(EFillState eRequiredState)
        )
     {
         // Attention! If config couldn't be opened successfully
-        // and exception os thrown automatically and must be forwarded
+        // and exception is thrown automatically and must be forwarded
         // to our call...
         css::uno::Reference< css::container::XNameAccess > xFilters(impl_openConfig(E_PROVIDER_FILTERS), css::uno::UNO_QUERY_THROW);
         {
@@ -1323,7 +1335,7 @@ void FilterCache::impl_load(EFillState eRequiredState)
        )
     {
         // Attention! If config couldn't be opened successfully
-        // and exception os thrown automatically and must be forwarded
+        // and exception is thrown automatically and must be forwarded
         // to our call...
         css::uno::Reference< css::container::XNameAccess > xLoaders(impl_openConfig(E_PROVIDER_OTHERS), css::uno::UNO_QUERY_THROW);
         {
@@ -1340,7 +1352,7 @@ void FilterCache::impl_load(EFillState eRequiredState)
        )
     {
         // Attention! If config couldn't be opened successfully
-        // and exception os thrown automatically and must be forwarded
+        // and exception is thrown automatically and must be forwarded
         // to our call...
         css::uno::Reference< css::container::XNameAccess > xHandlers(impl_openConfig(E_PROVIDER_OTHERS), css::uno::UNO_QUERY_THROW);
         {
@@ -2146,14 +2158,14 @@ CacheItem FilterCache::impl_readOldItem(const css::uno::Reference< css::containe
 }
 
 
-std::vector<OUString> FilterCache::impl_tokenizeString(const OUString& sData     ,
+std::vector<OUString> FilterCache::impl_tokenizeString(std::u16string_view sData     ,
                                                     sal_Unicode      cSeparator)
 {
     std::vector<OUString> lData  ;
     sal_Int32    nToken = 0;
     do
     {
-        OUString sToken = sData.getToken(0, cSeparator, nToken);
+        OUString sToken( o3tl::getToken(sData, 0, cSeparator, nToken) );
         lData.push_back(sToken);
     }
     while(nToken >= 0);
@@ -2169,8 +2181,8 @@ OUString FilterCache::impl_searchFrameLoaderForType(const OUString& sType) const
     {
         const OUString& sItem = frameLoader.first;
         ::comphelper::SequenceAsHashMap lProps(frameLoader.second);
-        std::vector<OUString>           lTypes(
-                comphelper::sequenceToContainer< std::vector<OUString> >(lProps[PROPNAME_TYPES].get<css::uno::Sequence<OUString> >()));
+        const css::uno::Sequence<OUString> lTypes =
+                lProps[PROPNAME_TYPES].get<css::uno::Sequence<OUString> >();
 
         if (::std::find(lTypes.begin(), lTypes.end(), sType) != lTypes.end())
             return sItem;
@@ -2186,8 +2198,8 @@ OUString FilterCache::impl_searchContentHandlerForType(const OUString& sType) co
     {
         const OUString& sItem = contentHandler.first;
         ::comphelper::SequenceAsHashMap lProps(contentHandler.second);
-        std::vector<OUString>           lTypes(
-                comphelper::sequenceToContainer< std::vector<OUString> >( lProps[PROPNAME_TYPES].get<css::uno::Sequence<OUString> >() ));
+        const css::uno::Sequence<OUString> lTypes =
+                lProps[PROPNAME_TYPES].get<css::uno::Sequence<OUString> >();
         if (::std::find(lTypes.begin(), lTypes.end(), sType) != lTypes.end())
             return sItem;
     }

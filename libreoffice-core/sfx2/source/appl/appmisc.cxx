@@ -28,6 +28,7 @@
 #include <com/sun/star/uno/Reference.h>
 #include <unotools/configmgr.hxx>
 #include <comphelper/processfactory.hxx>
+#include <osl/diagnose.h>
 #include <rtl/bootstrap.hxx>
 #include <svl/stritem.hxx>
 #include <tools/urlobj.hxx>
@@ -155,7 +156,7 @@ bool SfxApplication::loadBrandSvg(const char *pName, BitmapEx &rBitmap, int nWid
     const drawinglayer::primitive2d::Primitive2DReference xTransformRef(
         new drawinglayer::primitive2d::TransformPrimitive2D(
             aTransform,
-            aVectorGraphicData.getPrimitive2DSequence()));
+            drawinglayer::primitive2d::Primitive2DContainer(aVectorGraphicData.getPrimitive2DSequence())));
 
     // UNO dance to render from drawinglayer
 
@@ -177,7 +178,7 @@ bool SfxApplication::loadBrandSvg(const char *pName, BitmapEx &rBitmap, int nWid
 
         const uno::Reference< rendering::XBitmap > xBitmap(
             xPrimitive2DRenderer->rasterize(
-                drawinglayer::primitive2d::Primitive2DSequence(&xTransformRef, 1),
+                drawinglayer::primitive2d::Primitive2DContainer{xTransformRef}.toSequence(),
                 uno::Sequence< beans::PropertyValue >(),
                 fFakeDPI,
                 fFakeDPI,

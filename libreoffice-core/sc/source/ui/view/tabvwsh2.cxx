@@ -22,9 +22,7 @@
 #include <sfx2/viewfrm.hxx>
 #include <svl/whiter.hxx>
 #include <unotools/moduleoptions.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
-#include <svl/ctloptions.hxx>
 #include <sfx2/dispatch.hxx>
 #include <tools/UnitConversion.hxx>
 
@@ -97,7 +95,7 @@ void ScTabViewShell::ExecDraw(SfxRequest& rReq)
     if ( nNewId == SID_DRAW_SELECT )
         nNewId = SID_OBJECT_SELECT;
 
-    SdrObjKind eNewFormObjKind = OBJ_NONE;
+    SdrObjKind eNewFormObjKind = SdrObjKind::NONE;
     if (nNewId == SID_FM_CREATE_CONTROL)
     {
         const SfxUInt16Item* pIdentifierItem = rReq.GetArg<SfxUInt16Item>(SID_FM_CONTROL_IDENTIFIER);
@@ -132,7 +130,7 @@ void ScTabViewShell::ExecDraw(SfxRequest& rReq)
         bEx = true;
     }
     else if ( nNewId == nDrawSfxId && ( nNewId != SID_FM_CREATE_CONTROL ||
-                                    eNewFormObjKind == eFormObjKind || eNewFormObjKind == OBJ_NONE ) && !bSwitchCustom )
+                                    eNewFormObjKind == eFormObjKind || eNewFormObjKind == SdrObjKind::NONE ) && !bSwitchCustom )
     {
         // #i52871# if a different custom shape is selected, the slot id can be the same,
         // so the custom shape type string has to be compared, too.
@@ -363,13 +361,13 @@ void ScTabViewShell::ExecDraw(SfxRequest& rReq)
         return;
 
     // create the default object
-    SdrObjectUniquePtr pObj = pFuActual->CreateDefaultObject(nNewId, aNewObjectRectangle);
+    rtl::Reference<SdrObject> pObj = pFuActual->CreateDefaultObject(nNewId, aNewObjectRectangle);
 
     if(!pObj)
         return;
 
     // insert into page
-    pView->InsertObjectAtView(pObj.release(), *pPageView);
+    pView->InsertObjectAtView(pObj.get(), *pPageView);
 
     switch ( nNewId )
     {

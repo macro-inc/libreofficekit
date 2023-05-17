@@ -26,10 +26,15 @@
 #include <chartview/ExplicitValueProvider.hxx>
 #include "SchWhichPairs.hxx"
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <CommonConverters.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
+#include <Diagram.hxx>
 #include <unonames.hxx>
+#include <BaseCoordinateSystem.hxx>
 #include <memory>
 
 #include <com/sun/star/chart/ChartAxisLabelPosition.hpp>
@@ -37,10 +42,8 @@
 #include <com/sun/star/chart/ChartAxisPosition.hpp>
 #include <com/sun/star/chart/TimeInterval.hpp>
 #include <com/sun/star/chart2/XAxis.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart2/AxisOrientation.hpp>
 #include <com/sun/star/chart2/AxisType.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
 #include <osl/diagnose.h>
 #include <o3tl/any.hxx>
@@ -79,15 +82,13 @@ AxisItemConverter::AxisItemConverter(
     const Reference< beans::XPropertySet > & rPropertySet,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
-    const Reference< chart2::XChartDocument > & xChartDoc,
+    const rtl::Reference<::chart::ChartModel> & xChartDoc,
     ::chart::ExplicitScaleData const * pScale /* = NULL */,
     ::chart::ExplicitIncrementData const * pIncrement /* = NULL */,
     const awt::Size* pRefSize ) :
         ItemConverter( rPropertySet, rItemPool ),
         m_xChartDoc( xChartDoc )
 {
-    Reference< lang::XMultiServiceFactory > xNamedPropertyContainerFactory( xChartDoc, uno::UNO_QUERY );
-
     if( pScale )
         m_pExplicitScale.reset( new ::chart::ExplicitScaleData( *pScale ) );
     if( pIncrement )
@@ -95,7 +96,7 @@ AxisItemConverter::AxisItemConverter(
 
     m_aConverters.emplace_back( new GraphicPropertyItemConverter(
                                  rPropertySet, rItemPool, rDrawModel,
-                                 xNamedPropertyContainerFactory,
+                                 xChartDoc,
                                  GraphicObjectType::LineProperties ));
     m_aConverters.emplace_back(
         new CharacterPropertyItemConverter(rPropertySet, rItemPool, pRefSize, "ReferencePageSize"));
@@ -179,12 +180,12 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
             {
                 double fMax = 10.0;
                 if( rScale.Maximum >>= fMax )
-                    rOutItemSet.Put( SvxDoubleItem( fMax, nWhichId ) );
+                    rOutItemSet.Put( SvxDoubleItem( fMax, SCHATTR_AXIS_MAX ) );
                 else
                 {
                     if( m_pExplicitScale )
                         fMax = m_pExplicitScale->Maximum;
-                    rOutItemSet.Put( SvxDoubleItem( fMax, nWhichId ) );
+                    rOutItemSet.Put( SvxDoubleItem( fMax, SCHATTR_AXIS_MAX ) );
                 }
             }
             break;
@@ -197,9 +198,9 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
             {
                 double fMin = 0.0;
                 if( rScale.Minimum >>= fMin )
-                    rOutItemSet.Put( SvxDoubleItem( fMin, nWhichId ) );
+                    rOutItemSet.Put( SvxDoubleItem( fMin, SCHATTR_AXIS_MIN ) );
                 else if( m_pExplicitScale )
-                    rOutItemSet.Put( SvxDoubleItem( m_pExplicitScale->Minimum, nWhichId ));
+                    rOutItemSet.Put( SvxDoubleItem( m_pExplicitScale->Minimum, SCHATTR_AXIS_MIN ));
             }
             break;
 
@@ -237,17 +238,17 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
             {
                 TimeInterval aTimeInterval;
                 if( rTimeIncrement.MajorTimeInterval >>= aTimeInterval )
-                    rOutItemSet.Put( SvxDoubleItem(aTimeInterval.Number, nWhichId ));
+                    rOutItemSet.Put( SvxDoubleItem(aTimeInterval.Number, SCHATTR_AXIS_STEP_MAIN ));
                 else if( m_pExplicitIncrement )
-                    rOutItemSet.Put( SvxDoubleItem( m_pExplicitIncrement->MajorTimeInterval.Number, nWhichId ));
+                    rOutItemSet.Put( SvxDoubleItem( m_pExplicitIncrement->MajorTimeInterval.Number, SCHATTR_AXIS_STEP_MAIN ));
             }
             else
             {
                 double fDistance = 1.0;
                 if( rIncrement.Distance >>= fDistance )
-                    rOutItemSet.Put( SvxDoubleItem(fDistance, nWhichId ));
+                    rOutItemSet.Put( SvxDoubleItem(fDistance, SCHATTR_AXIS_STEP_MAIN ));
                 else if( m_pExplicitIncrement )
-                    rOutItemSet.Put( SvxDoubleItem( m_pExplicitIncrement->Distance, nWhichId ));
+                    rOutItemSet.Put( SvxDoubleItem( m_pExplicitIncrement->Distance, SCHATTR_AXIS_STEP_MAIN ));
             }
             break;
 
@@ -306,7 +307,7 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
             break;
         case SCHATTR_AXIS_TIME_RESOLUTION:
             {
-                tools::Long nTimeResolution=0;
+                sal_Int32 nTimeResolution=0;
                 if( rTimeIncrement.TimeResolution >>= nTimeResolution )
                     rOutItemSet.Put( SfxInt32Item( nWhichId, nTimeResolution ) );
                 else if( m_pExplicitScale )
@@ -328,7 +329,7 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
                 if( m_pExplicitScale )
                     fOrigin = m_pExplicitScale->Origin;
             }
-            rOutItemSet.Put( SvxDoubleItem( fOrigin, nWhichId ));
+            rOutItemSet.Put( SvxDoubleItem( fOrigin, SCHATTR_AXIS_ORIGIN ));
         }
         break;
 
@@ -344,7 +345,7 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
         {
             double fValue = 0.0;
             if( GetPropertySet()->getPropertyValue( "CrossoverValue" ) >>= fValue )
-                rOutItemSet.Put( SvxDoubleItem( fValue, nWhichId ) );
+                rOutItemSet.Put( SvxDoubleItem( fValue, SCHATTR_AXIS_POSITION_VALUE ) );
         }
         break;
 
@@ -353,10 +354,10 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
             //read only item
             //necessary tp display the crossing value with an appropriate format
 
-            Reference< chart2::XCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis(
+            rtl::Reference< BaseCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis(
                 m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ) );
 
-            Reference< chart2::XAxis > xCrossingMainAxis( AxisHelper::getCrossingMainAxis( m_xAxis, xCooSys ) );
+            rtl::Reference< Axis > xCrossingMainAxis = AxisHelper::getCrossingMainAxis( m_xAxis, xCooSys );
 
             sal_Int32 nFormatKey = ExplicitValueProvider::getExplicitNumberFormatKeyForAxis(
                 xCrossingMainAxis, xCooSys, m_xChartDoc);
@@ -392,7 +393,7 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
 
             if( GetPropertySet()->getPropertyValue( "TextRotation" ) >>= fVal )
             {
-                rOutItemSet.Put( SdrAngleItem( nWhichId, Degree100(static_cast< sal_Int32 >(
+                rOutItemSet.Put( SdrAngleItem( SCHATTR_TEXT_DEGREES, Degree100(static_cast< sal_Int32 >(
                                                    ::rtl::math::round( fVal * 100.0 )) ) ));
             }
         }
@@ -402,7 +403,7 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
         {
             if( m_pExplicitScale )
             {
-                Reference< chart2::XCoordinateSystem > xCooSys(
+                rtl::Reference< BaseCoordinateSystem > xCooSys(
                         AxisHelper::getCoordinateSystemOfAxis(
                               m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ) );
 
@@ -432,7 +433,7 @@ void AxisItemConverter::FillSpecialItem( sal_uInt16 nWhichId, SfxItemSet & rOutI
 
         case SCHATTR_AXIS_ALLOW_DATEAXIS:
         {
-            Reference< chart2::XCoordinateSystem > xCooSys(
+            rtl::Reference< BaseCoordinateSystem > xCooSys(
                 AxisHelper::getCoordinateSystemOfAxis( m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ) );
             sal_Int32 nDimensionIndex=0; sal_Int32 nAxisIndex=0;
             AxisHelper::getIndicesForAxis(m_xAxis, xCooSys, nDimensionIndex, nAxisIndex );
@@ -714,14 +715,14 @@ bool AxisItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet 
                     if( !AxisHelper::isAxisPositioningEnabled() )
                     {
                         //keep old and new settings for axis positioning in sync somehow
-                        Reference< chart2::XCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis(
+                        rtl::Reference< BaseCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis(
                             m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ) );
 
                         sal_Int32 nDimensionIndex=0;
                         sal_Int32 nAxisIndex=0;
                         if( AxisHelper::getIndicesForAxis( m_xAxis, xCooSys, nDimensionIndex, nAxisIndex ) && nAxisIndex==0 )
                         {
-                            Reference< beans::XPropertySet > xCrossingMainAxis( AxisHelper::getCrossingMainAxis( m_xAxis, xCooSys ), uno::UNO_QUERY );
+                            rtl::Reference< Axis > xCrossingMainAxis = AxisHelper::getCrossingMainAxis( m_xAxis, xCooSys );
                             if( xCrossingMainAxis.is() )
                             {
                                 double fValue = 0.0;
@@ -756,7 +757,7 @@ bool AxisItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet 
                 //move the parallel axes to the other side if necessary
                 if( eAxisPos==css::chart::ChartAxisPosition_START || eAxisPos==css::chart::ChartAxisPosition_END )
                 {
-                    Reference< beans::XPropertySet > xParallelAxis( AxisHelper::getParallelAxis( m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ), uno::UNO_QUERY );
+                    rtl::Reference< Axis > xParallelAxis = AxisHelper::getParallelAxis( m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) );
                     if( xParallelAxis.is() )
                     {
                         css::chart::ChartAxisPosition eOtherPos;
@@ -791,7 +792,7 @@ bool AxisItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet 
 
                 //keep old and new settings for axis positioning in sync somehow
                 {
-                    Reference< chart2::XCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis(
+                    rtl::Reference< BaseCoordinateSystem > xCooSys( AxisHelper::getCoordinateSystemOfAxis(
                         m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ) );
 
                     sal_Int32 nDimensionIndex=0;
@@ -839,7 +840,7 @@ bool AxisItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet 
                 //move the parallel axes to the other side if necessary
                 if( ePos==css::chart::ChartAxisLabelPosition_OUTSIDE_START || ePos==css::chart::ChartAxisLabelPosition_OUTSIDE_END )
                 {
-                    Reference< beans::XPropertySet > xParallelAxis( AxisHelper::getParallelAxis( m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ), uno::UNO_QUERY );
+                    rtl::Reference< Axis > xParallelAxis = AxisHelper::getParallelAxis( m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) );
                     if( xParallelAxis.is() )
                     {
                         css::chart::ChartAxisLabelPosition eOtherPos;
@@ -896,8 +897,7 @@ bool AxisItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet 
             if( m_pExplicitScale )
             {
                 bool bUseSourceFormat =
-                    static_cast< const SfxBoolItem & >(
-                        rItemSet.Get( SID_ATTR_NUMBERFORMAT_SOURCE )).GetValue();
+                        rItemSet.Get( SID_ATTR_NUMBERFORMAT_SOURCE ).GetValue();
 
                 if( ! bUseSourceFormat )
                 {
@@ -939,9 +939,9 @@ bool AxisItemConverter::ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet 
                     }
                     else
                     {
-                        Reference< chart2::XCoordinateSystem > xCooSys(
-                        AxisHelper::getCoordinateSystemOfAxis(
-                              m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) ) );
+                        rtl::Reference< BaseCoordinateSystem > xCooSys =
+                            AxisHelper::getCoordinateSystemOfAxis(
+                                m_xAxis, ChartModelHelper::findDiagram( m_xChartDoc ) );
 
                         sal_Int32 nFormatKey = ExplicitValueProvider::getExplicitNumberFormatKeyForAxis(
                             m_xAxis, xCooSys, m_xChartDoc);

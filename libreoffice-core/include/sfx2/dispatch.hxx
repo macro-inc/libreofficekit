@@ -32,7 +32,6 @@
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <initializer_list>
 
-class Menu;
 class SfxSlotServer;
 class SfxRequest;
 class SfxViewFrame;
@@ -41,6 +40,7 @@ class SfxModule;
 class Point;
 struct SfxDispatcher_Impl;
 
+namespace com::sun::star::awt { class XPopupMenu; }
 namespace vcl { class Window; }
 
 enum class SfxDispatcherPopFlags
@@ -151,6 +151,11 @@ public:
     ToolbarId           GetObjectBarId( sal_uInt16 nPos ) const;
 
     SfxItemState        QueryState( sal_uInt16 nSID, const SfxPoolItem* &rpState );
+    template<class T>
+    SfxItemState        QueryState( TypedWhichId<T> nSID, const T* &rpState )
+    {
+        return QueryState(sal_uInt16(nSID), reinterpret_cast<SfxPoolItem const*&>(rpState));
+    }
     SfxItemState        QueryState( sal_uInt16 nSID, css::uno::Any& rAny );
 
     void                SetDisableFlags( SfxDisableFlags nFlags );
@@ -171,7 +176,7 @@ public:
     SAL_DLLPRIVATE void DoDeactivate_Impl( bool bMDI, SfxViewFrame const * pNew );
     SAL_DLLPRIVATE void InvalidateBindings_Impl(bool);
 
-    static boost::property_tree::ptree fillPopupMenu(Menu* pMenu);
+    static boost::property_tree::ptree fillPopupMenu(const css::uno::Reference<css::awt::XPopupMenu>& rMenu);
 };
 
 #endif

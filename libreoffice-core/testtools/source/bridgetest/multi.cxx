@@ -22,17 +22,17 @@
 
 #include "multi.hxx"
 
-#include <rtl/string.hxx>
 #include <rtl/textenc.h>
 #include <rtl/ustring.hxx>
 
 #include <sstream>
 #include <string_view>
+#include <utility>
 
 namespace {
 
 struct CheckFailed {
-    explicit CheckFailed(OUString const & theMessage): message(theMessage)
+    explicit CheckFailed(OUString theMessage): message(std::move(theMessage))
     {}
 
     OUString message;

@@ -20,13 +20,13 @@
 #include "VPolarCoordinateSystem.hxx"
 #include "VPolarGrid.hxx"
 #include "VPolarAxis.hxx"
+#include <BaseCoordinateSystem.hxx>
 #include <AxisIndexDefines.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <Diagram.hxx>
 #include <DataTable.hxx>
 #include <ChartModel.hxx>
-#include <Diagram.hxx>
-#include <com/sun/star/chart2/XCoordinateSystem.hpp>
 
 namespace chart
 {
@@ -34,7 +34,7 @@ using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 using ::com::sun::star::uno::Reference;
 
-VPolarCoordinateSystem::VPolarCoordinateSystem( const Reference< XCoordinateSystem >& xCooSys )
+VPolarCoordinateSystem::VPolarCoordinateSystem( const rtl::Reference< BaseCoordinateSystem >& xCooSys )
     : VCoordinateSystem(xCooSys)
 {
 }
@@ -68,17 +68,17 @@ uno::Sequence< sal_Int32 > VPolarCoordinateSystem::getCoordinateSystemResolution
 }
 
 void VPolarCoordinateSystem::createVAxisList(
-              const uno::Reference<chart2::XChartDocument> & xChartDoc
-            , const awt::Size& rFontReferenceSize
-            , const awt::Rectangle& rMaximumSpaceForLabels
-            , bool //bLimitSpaceForLabels
-            , std::vector<std::unique_ptr<VSeriesPlotter>>& /*rSeriesPlotterList*/
-            , uno::Reference<uno::XComponentContext> const& /*rComponentContext*/)
+            const rtl::Reference<::chart::ChartModel> & xChartDoc,
+            const awt::Size& rFontReferenceSize,
+            const awt::Rectangle& rMaximumSpaceForLabels,
+            bool /*bLimitSpaceForLabels*/,
+            std::vector<std::unique_ptr<VSeriesPlotter>>& /*rSeriesPlotterList*/,
+            css::uno::Reference<css::uno::XComponentContext> const& /*rComponentContext*/)
 {
     // note: using xChartDoc itself as XNumberFormatsSupplier would cause
     // a leak from VPolarAxis due to cyclic reference
     uno::Reference<util::XNumberFormatsSupplier> const xNumberFormatsSupplier(
-        dynamic_cast<ChartModel&>(*xChartDoc).getNumberFormatsSupplier());
+        xChartDoc->getNumberFormatsSupplier());
 
     m_aAxisMap.clear();
     sal_Int32 nDimensionCount = m_xCooSysModel->getDimension();
@@ -90,14 +90,12 @@ void VPolarCoordinateSystem::createVAxisList(
         sal_Int32 nMaxAxisIndex = m_xCooSysModel->getMaximumAxisIndexByDimension(nDimensionIndex);
         for( sal_Int32 nAxisIndex = 0; nAxisIndex <= nMaxAxisIndex; nAxisIndex++ )
         {
-            Reference< XAxis > xAxis( getAxisByDimension(nDimensionIndex,nAxisIndex) );
+            rtl::Reference< Axis > xAxis = getAxisByDimension(nDimensionIndex,nAxisIndex);
             if(!xAxis.is() || !AxisHelper::shouldAxisBeDisplayed( xAxis, m_xCooSysModel ))
                 continue;
 
-            uno::Reference<chart2::XDiagram> xDiagram(xChartDoc->getFirstDiagram());
-            auto pDiagram = dynamic_cast<Diagram*>(xDiagram.get());
-            assert(pDiagram);
-            AxisProperties aAxisProperties(xAxis,getExplicitCategoriesProvider(), pDiagram->getDataTableRef());
+            rtl::Reference<Diagram> xDiagram(xChartDoc->getFirstChartDiagram());
+            AxisProperties aAxisProperties(xAxis,getExplicitCategoriesProvider(), xDiagram->getDataTableRef());
             aAxisProperties.init();
             if(aAxisProperties.m_bDisplayLabels)
                 aAxisProperties.m_nNumberFormatKey = getNumberFormatKeyForAxis(xAxis, xChartDoc);
@@ -127,7 +125,7 @@ void VPolarCoordinateSystem::initVAxisInList()
             sal_Int32 nDimensionIndex = elem.first.first;
             sal_Int32 nAxisIndex = elem.first.second;
             pVAxis->setExplicitScaleAndIncrement( getExplicitScale( nDimensionIndex, nAxisIndex ), getExplicitIncrement(nDimensionIndex, nAxisIndex) );
-            pVAxis->initPlotter(m_xLogicTargetForAxes,m_xFinalTarget,m_xShapeFactory
+            pVAxis->initPlotter(m_xLogicTargetForAxes,m_xFinalTarget
                 , createCIDForAxis( nDimensionIndex, nAxisIndex ) );
             VPolarAxis* pVPolarAxis = dynamic_cast< VPolarAxis* >( pVAxis );
             if( pVPolarAxis )
@@ -177,13 +175,13 @@ void VPolarCoordinateSystem::createGridShapes()
     {
         sal_Int32 nAxisIndex = MAIN_AXIS_INDEX;
 
-        Reference< XAxis > xAxis( AxisHelper::getAxis( nDimensionIndex, nAxisIndex, m_xCooSysModel ) );
+        rtl::Reference< Axis > xAxis = AxisHelper::getAxis( nDimensionIndex, nAxisIndex, m_xCooSysModel );
         if(!xAxis.is() || !AxisHelper::shouldAxisBeDisplayed( xAxis, m_xCooSysModel ))
             continue;
 
         VPolarGrid aGrid(nDimensionIndex,nDimensionCount,getGridListFromAxis( xAxis ));
         aGrid.setIncrements( getExplicitIncrements( nDimensionIndex, nAxisIndex ) );
-        aGrid.initPlotter(m_xLogicTargetForGrids,m_xFinalTarget,m_xShapeFactory
+        aGrid.initPlotter(m_xLogicTargetForGrids,m_xFinalTarget
             , createCIDForGrid( nDimensionIndex, nAxisIndex ) );
         if(nDimensionCount==2)
             aGrid.setTransformationSceneToScreen( m_aMatrixSceneToScreen );

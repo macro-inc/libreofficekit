@@ -20,6 +20,8 @@
 #include "optlanguagetool.hxx"
 #include <svtools/languagetoolcfg.hxx>
 #include <sal/log.hxx>
+#include <dialmgr.hxx>
+#include <strings.hrc>
 
 OptLanguageToolTabPage::OptLanguageToolTabPage(weld::Container* pPage,
                                                weld::DialogController* pController,
@@ -36,6 +38,11 @@ OptLanguageToolTabPage::OptLanguageToolTabPage(weld::Container* pPage,
     m_xActivateBox->connect_toggled(LINK(this, OptLanguageToolTabPage, CheckHdl));
     SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();
     EnableControls(rLanguageOpts.getEnabled());
+
+    // tdf#150494 Set default values as placeholder text
+    m_xBaseURLED->set_placeholder_text(CuiResId(RID_LANGUAGETOOL_LEAVE_EMPTY));
+    m_xUsernameED->set_placeholder_text(CuiResId(RID_LANGUAGETOOL_LEAVE_EMPTY));
+    m_xApiKeyED->set_placeholder_text(CuiResId(RID_LANGUAGETOOL_LEAVE_EMPTY));
 }
 
 OptLanguageToolTabPage::~OptLanguageToolTabPage() {}
@@ -57,7 +64,14 @@ IMPL_LINK_NOARG(OptLanguageToolTabPage, CheckHdl, weld::Toggleable&, void)
 void OptLanguageToolTabPage::Reset(const SfxItemSet*)
 {
     SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();
-    m_xBaseURLED->set_text(rLanguageOpts.getBaseURL());
+
+    // tdf#150494 If no URL has been set, use the default URL
+    OUString aBaseURL = rLanguageOpts.getBaseURL();
+    if (aBaseURL.isEmpty())
+        m_xBaseURLED->set_text(LANGUAGETOOL_DEFAULT_URL);
+    else
+        m_xBaseURLED->set_text(rLanguageOpts.getBaseURL());
+
     m_xUsernameED->set_text(rLanguageOpts.getUsername());
     m_xApiKeyED->set_text(rLanguageOpts.getApiKey());
     m_xRestProtocol->set_text(rLanguageOpts.getRestProtocol());
@@ -67,7 +81,14 @@ void OptLanguageToolTabPage::Reset(const SfxItemSet*)
 bool OptLanguageToolTabPage::FillItemSet(SfxItemSet*)
 {
     SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();
-    rLanguageOpts.setBaseURL(m_xBaseURLED->get_text());
+
+    // tdf#150494 If no URL has been set, then save the default URL
+    OUString aBaseURL = m_xBaseURLED->get_text();
+    if (aBaseURL.isEmpty())
+        rLanguageOpts.setBaseURL(LANGUAGETOOL_DEFAULT_URL);
+    else
+        rLanguageOpts.setBaseURL(aBaseURL);
+
     rLanguageOpts.setUsername(m_xUsernameED->get_text());
     rLanguageOpts.setApiKey(m_xApiKeyED->get_text());
     rLanguageOpts.setRestProtocol(m_xRestProtocol->get_text());

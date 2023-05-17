@@ -61,6 +61,7 @@
 /bin/officeotron.sh
 /hardened_runtime.xcent
 /lo.xcent
+/vs-code.code-workspace.template
 /Makefile
 
 # make id
@@ -94,6 +95,7 @@ eclipsesettingfile.xml
 .yavide_session
 .vscode
 *.code-workspace
+.mold-*
 
 # things below this point are targeted for elimination
 
@@ -143,11 +145,12 @@ DerivedData
 *.VC.db
 LibreOffice.VC.VC.opendb
 
-# QtCreator specific
+# Qt Creator specific
 *.pro
 *.pro.shared
 *.pro.user
 *.pro.user.*
+.qtc_clangd
 
 # doxygen output
 /docs
@@ -184,6 +187,9 @@ LibreOffice.VC.VC.opendb
 /a.wasm
 /a.out.js
 /a.out.wasm
+
+# lockfile config header
+/solenv/lockfile/autoconf.h
 
 # Android builds
 /android/jniLibs/

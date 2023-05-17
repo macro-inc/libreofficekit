@@ -20,6 +20,7 @@
 #include <com/sun/star/lang/DisposedException.hpp>
 #include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <com/sun/star/ucb/XCommandEnvironment.hpp>
+#include <com/sun/star/io/NotConnectedException.hpp>
 #include <com/sun/star/io/XActiveDataSink.hpp>
 #include <com/sun/star/io/XStream.hpp>
 #include <com/sun/star/io/XSeekable.hpp>
@@ -28,7 +29,6 @@
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <zipfileaccess.hxx>
-#include <ZipEnumeration.hxx>
 #include "ZipPackageSink.hxx"
 #include <EncryptionData.hxx>
 
@@ -117,7 +117,7 @@ uno::Sequence< OUString > OZipFileAccess::GetPatternsFromString_Impl( const OUSt
     return aPattern;
 }
 
-bool OZipFileAccess::StringGoodForPattern_Impl( const OUString& aString,
+bool OZipFileAccess::StringGoodForPattern_Impl( std::u16string_view aString,
                                                     const uno::Sequence< OUString >& aPattern )
 {
     sal_Int32 nInd = aPattern.getLength() - 1;
@@ -133,35 +133,33 @@ bool OZipFileAccess::StringGoodForPattern_Impl( const OUString& aString,
     }
 
     sal_Int32 nBeginInd = aPattern[0].getLength();
-    sal_Int32 nEndInd = aString.getLength() - aPattern[nInd].getLength();
-    if ( nEndInd >= nBeginInd
-      && ( nEndInd == aString.getLength() || aString.subView( nEndInd ) == aPattern[nInd] )
-      && ( nBeginInd == 0 || aString.subView( 0, nBeginInd ) == aPattern[0] ) )
+    sal_Int32 nEndInd = aString.size() - aPattern[nInd].getLength();
+    if ( nEndInd < nBeginInd
+      || ( nEndInd != sal_Int32(aString.size()) && aString.substr( nEndInd ) != aPattern[nInd] )
+      || ( nBeginInd != 0 && aString.substr( 0, nBeginInd ) != aPattern[0] ) )
+          return false;
+
+    for ( sal_Int32 nCurInd = aPattern.getLength() - 2; nCurInd > 0; nCurInd-- )
     {
-        for ( sal_Int32 nCurInd = aPattern.getLength() - 2; nCurInd > 0; nCurInd-- )
-        {
-            if ( aPattern[nCurInd].isEmpty() )
-                continue;
+        if ( aPattern[nCurInd].isEmpty() )
+            continue;
 
-            if ( nEndInd == nBeginInd )
-                return false;
+        if ( nEndInd == nBeginInd )
+            return false;
 
-            // check that search does not use nEndInd position
-            sal_Int32 nLastInd = aString.lastIndexOf( aPattern[nCurInd], nEndInd - 1 );
+        // check that search does not use nEndInd position
+        size_t nLastInd = aString.substr(0, nEndInd - 1).rfind( aPattern[nCurInd] );
 
-            if ( nLastInd == -1 )
-                return false;
+        if ( nLastInd == std::u16string_view::npos )
+            return false;
 
-            if ( nLastInd < nBeginInd )
-                return false;
+        if ( sal_Int32(nLastInd) < nBeginInd )
+            return false;
 
-            nEndInd = nLastInd;
-        }
-
-        return true;
+        nEndInd = nLastInd;
     }
 
-    return false;
+    return true;
 }
 
 // XInitialization
@@ -294,7 +292,7 @@ uno::Any SAL_CALL OZipFileAccess::getByName( const OUString& aName )
     if ( !xEntryStream.is() )
         throw uno::RuntimeException(THROW_WHERE );
 
-    return uno::makeAny ( xEntryStream );
+    return uno::Any ( xEntryStream );
 }
 
 uno::Sequence< OUString > SAL_CALL OZipFileAccess::getElementNames()
@@ -438,7 +436,7 @@ void SAL_CALL OZipFileAccess::addEventListener( const uno::Reference< lang::XEve
         throw lang::DisposedException(THROW_WHERE );
 
     if ( !m_pListenersContainer )
-        m_pListenersContainer.reset( new ::comphelper::OInterfaceContainerHelper2( m_aMutexHolder->GetMutex() ) );
+        m_pListenersContainer.reset( new ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>( m_aMutexHolder->GetMutex() ) );
     m_pListenersContainer->addInterface( xListener );
 }
 

@@ -9,6 +9,8 @@
 
 #include <swmodeltestbase.hxx>
 
+#include <com/sun/star/view/XSelectionSupplier.hpp>
+
 #include <comphelper/classids.hxx>
 #include <tools/globname.hxx>
 #include <svtools/embedhlp.hxx>
@@ -32,18 +34,23 @@
 #include <cmdid.h>
 #include <unotxdoc.hxx>
 #include <UndoManager.hxx>
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/doc/data/";
+#include <IDocumentRedlineAccess.hxx>
 
 /// Covers sw/source/core/doc/ fixes.
 class SwCoreDocTest : public SwModelTestBase
 {
+public:
+    SwCoreDocTest()
+        : SwModelTestBase("/sw/qa/core/doc/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testMathInsertAnchorType)
 {
     // Given an empty document.
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
 
     // When inserting an a math object.
     SwWrtShell* pShell = pDoc->GetDocShell()->GetWrtShell();
@@ -66,7 +73,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testMathInsertAnchorType)
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testTextboxTextRotateAngle)
 {
     // Check the writing direction of the only TextFrame in the document.
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "textbox-textrotateangle.odt");
+    createSwDoc("textbox-textrotateangle.odt");
+    SwDoc* pDoc = getSwDoc();
     SwFrameFormats& rFrameFormats = *pDoc->GetSpzFrameFormats();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), rFrameFormats.size());
     CPPUNIT_ASSERT_EQUAL(o3tl::narrowing<sal_uInt16>(RES_DRAWFRMFMT), rFrameFormats[0]->Which());
@@ -84,14 +92,15 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testTextboxTextRotateAngle)
 
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testNumDownIndent)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "num-down-indent.docx");
+    createSwDoc("num-down-indent.docx");
+    SwDoc* pDoc = getSwDoc();
     SwDocShell* pDocShell = pDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
     pWrtShell->Down(/*bSelect=*/false);
     SwEditWin& rEditWin = pDocShell->GetView()->GetEditWin();
     KeyEvent aKeyEvent(0, KEY_TAB);
     rEditWin.KeyInput(aKeyEvent);
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
 
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: \tB
@@ -103,7 +112,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testNumDownIndent)
 
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testLocaleIndependentTemplate)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "locale-independent-template.odt");
+    createSwDoc("locale-independent-template.odt");
+    SwDoc* pDoc = getSwDoc();
     SwDocShell* pDocShell = pDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
     SfxItemSet aSet(pWrtShell->GetAttrPool(), svl::Items<RES_CHRATR_LANGUAGE, RES_CHRATR_LANGUAGE>);
@@ -123,7 +133,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testLocaleIndependentTemplate)
 
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testTextBoxZOrder)
 {
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "textbox-zorder.docx");
+    createSwDoc("textbox-zorder.docx");
+    SwDoc* pDoc = getSwDoc();
     SwFrameFormats& rFormats = *pDoc->GetSpzFrameFormats();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), rFormats.size());
     const SwFrameFormat* pEllipse = rFormats[2];
@@ -140,12 +151,11 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testTextBoxZOrder)
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testTextBoxMakeFlyFrame)
 {
     // Given a document with an as-char textbox (as-char draw format + at-char fly format):
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "textbox-makeflyframe.docx");
+    createSwDoc("textbox-makeflyframe.docx");
+    SwDoc* pDoc = getSwDoc();
 
     // When cutting the textbox and pasting it to a new document:
-    SwView* pView = pDoc->GetDocShell()->GetView();
-    pView->GetViewFrame()->GetDispatcher()->Execute(FN_CNTNT_TO_NEXT_FRAME, SfxCallMode::SYNCHRON);
-    pView->StopShellTimer();
+    selectShape(1);
     SwDocShell* pDocShell = pDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
     rtl::Reference<SwTransferable> pTransfer = new SwTransferable(*pWrtShell);
@@ -174,7 +184,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testIMEGrouping)
 // non-headless.
 #if !defined MACOSX && !defined _WIN32
     // Given an empty document:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     // Make sure no idle is in action, so the ExtTextInput events go to SwEditWin.
     Scheduler::ProcessEventsToIdle();
 
@@ -188,7 +199,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testIMEGrouping)
 
     // Then make sure that gets grouped together to a single undo action:
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     CPPUNIT_ASSERT_EQUAL(OUString("ab"), pTextNode->GetText());
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: 1
@@ -201,7 +212,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testIMEGrouping)
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testImageHyperlinkStyle)
 {
     // Given a document with an image with a hyperlink:
-    loadURL("private:factory/swriter", nullptr);
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xDocument->getText();
@@ -211,10 +222,10 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testImageHyperlinkStyle)
     xText->insertTextContent(xCursor, xImage, /*bAbsorb=*/false);
     uno::Reference<beans::XPropertySet> xImageProps(xImage, uno::UNO_QUERY);
     OUString aExpected = "http://www.example.com";
-    xImageProps->setPropertyValue("HyperLinkURL", uno::makeAny(aExpected));
+    xImageProps->setPropertyValue("HyperLinkURL", uno::Any(aExpected));
 
     // When applying a frame style on it:
-    xImageProps->setPropertyValue("FrameStyleName", uno::makeAny(OUString("Frame")));
+    xImageProps->setPropertyValue("FrameStyleName", uno::Any(OUString("Frame")));
 
     // Then make sure that the hyperlink is not lost:
     auto aActual = getProperty<OUString>(xImageProps, "HyperLinkURL");
@@ -229,7 +240,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testImageHyperlinkStyle)
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testContentControlDelete)
 {
     // Given a document with a content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -248,12 +260,55 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testContentControlDelete)
 
     // Then make sure that we only enter the content control, to be consistent with the start dummy
     // character:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetMark()->nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetMark()->GetNode().GetTextNode();
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: ^Atest^A
     // - Actual  : ^Atest
     // i.e. the end dummy character got deleted, but not the first one, which is inconsistent.
     CPPUNIT_ASSERT_EQUAL(OUString("\x0001test\x0001"), pTextNode->GetText());
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testCopyBookmarks)
+{
+    // Given a document with a bookmark in a header that is linked later:
+    createSwDoc("copy-bookmarks.docx");
+    SwDoc* pDoc = getSwDoc();
+
+    // When checking the # of non-copy bookmarks in the resulting doc model:
+    sal_Int32 nActual = 0;
+    for (auto it = pDoc->getIDocumentMarkAccess()->getBookmarksBegin();
+         it != pDoc->getIDocumentMarkAccess()->getBookmarksEnd(); ++it)
+    {
+        if ((*it)->GetName().indexOf("Copy") == -1)
+        {
+            ++nActual;
+        }
+    }
+
+    // Then make sure we have a single non-copy bookmark, with no duplications:
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 2
+    // i.e. the 2nd header had a duplicated bookmark without "Copy" in its name.
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), nActual);
+
+    // Also, when checking the # of non-copy images in the resulting doc model:
+    nActual = 0;
+    SwFrameFormats& rFrameFormats = *pDoc->GetSpzFrameFormats();
+    for (size_t i = 0; i < rFrameFormats.size(); ++i)
+    {
+        if (rFrameFormats[i]->GetName().indexOf("Copy") == -1)
+        {
+            ++nActual;
+        }
+    }
+
+    // Then make sure we have a single non-copy image, with no duplications:
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 2
+    // i.e. the 2nd header had a duplicated image without "Copy" in its name.
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), nActual);
 }
 
 CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testLinkedStyleDelete)
@@ -283,6 +338,112 @@ CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testLinkedStyleDelete)
         comphelper::makePropertyValue("FilterName", OUString("writer8")),
     };
     xStorable->storeAsURL(maTempFile.GetURL(), aArgs);
+}
+
+namespace
+{
+/// This selection listener calls getAnchor() on selection change, which creates UNO cursors and is
+/// invoked in the middle of a bookmark deletion.
+struct SelectionChangeListener : public cppu::WeakImplHelper<view::XSelectionChangeListener>
+{
+    uno::Reference<container::XNameAccess> m_xBookmarks;
+    std::vector<uno::Reference<text::XTextRange>> m_aAnchors;
+
+public:
+    SelectionChangeListener(const uno::Reference<container::XNameAccess>& xBookmarks);
+    // view::XSelectionChangeListener
+    void SAL_CALL selectionChanged(const lang::EventObject& rEvent) override;
+
+    // lang::XEventListener
+    void SAL_CALL disposing(const lang::EventObject& rSource) override;
+};
+}
+
+SelectionChangeListener::SelectionChangeListener(
+    const uno::Reference<container::XNameAccess>& xBookmarks)
+    : m_xBookmarks(xBookmarks)
+{
+}
+
+void SelectionChangeListener::selectionChanged(const lang::EventObject& /*rEvent*/)
+{
+    uno::Sequence<OUString> aElementNames = m_xBookmarks->getElementNames();
+    for (const auto& rName : aElementNames)
+    {
+        uno::Reference<text::XTextContent> xTextContent(m_xBookmarks->getByName(rName),
+                                                        uno::UNO_QUERY);
+        m_aAnchors.push_back(xTextContent->getAnchor());
+    }
+}
+
+void SelectionChangeListener::disposing(const lang::EventObject& /*rSource*/) {}
+
+CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testBookmarkDeleteListeners)
+{
+    // Given a document with 2 bookmarks:
+    createSwDoc();
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XText> xText = xTextDocument->getText();
+    uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
+    {
+        xText->insertString(xCursor, "test", /*bAbsorb=*/false);
+        xCursor->gotoStart(/*bExpand=*/false);
+        xCursor->gotoEnd(/*bExpand=*/true);
+        uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
+        uno::Reference<text::XTextContent> xBookmark(
+            xFactory->createInstance("com.sun.star.text.Bookmark"), uno::UNO_QUERY);
+        uno::Reference<container::XNamed> xBookmarkNamed(xBookmark, uno::UNO_QUERY);
+        xBookmarkNamed->setName("mybookmark");
+        xText->insertTextContent(xCursor, xBookmark, /*bAbsorb=*/true);
+    }
+    {
+        xCursor->gotoEnd(/*bExpand=*/false);
+        xText->insertString(xCursor, "test2", /*bAbsorb=*/false);
+        xCursor->goLeft(4, /*bExpand=*/true);
+        uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
+        uno::Reference<text::XTextContent> xBookmark(
+            xFactory->createInstance("com.sun.star.text.Bookmark"), uno::UNO_QUERY);
+        uno::Reference<container::XNamed> xBookmarkNamed(xBookmark, uno::UNO_QUERY);
+        xBookmarkNamed->setName("mybookmark2");
+        xText->insertTextContent(xCursor, xBookmark, /*bAbsorb=*/true);
+    }
+    uno::Reference<text::XBookmarksSupplier> xBookmarksSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XNameAccess> xBookmarks = xBookmarksSupplier->getBookmarks();
+
+    // When registering a selection listener that creates uno marks:
+    uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY);
+    uno::Reference<view::XSelectionSupplier> xController(xModel->getCurrentController(),
+                                                         uno::UNO_QUERY);
+    xController->addSelectionChangeListener(new SelectionChangeListener(xBookmarks));
+
+    // Then make sure that deleting a bookmark doesn't crash:
+    uno::Reference<lang::XComponent> xBookmark(xBookmarks->getByName("mybookmark2"),
+                                               uno::UNO_QUERY);
+    // Without the accompanying fix in place, this test would have crashed, an invalidated iterator
+    // was used with erase().
+    xBookmark->dispose();
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testBookmarkDeleteRedline)
+{
+    // Given a document with redlines, a mark (annotation mark) inside a redline:
+    createSwDoc("bookmark-delete-redline.doc");
+    SwDoc* pDoc = getSwDoc();
+
+    // When hiding deletions / showing only inserts, make sure we don't crash:
+    // Without the accompanying fix in place, this test would have crashed, equal_range() was used
+    // on an unsorted container.
+    pDoc->getIDocumentRedlineAccess().SetRedlineFlags(RedlineFlags::ShowInsert);
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreDocTest, testHeaderFooterDelete)
+{
+    // Given a document with bookmarks in header/footers:
+    // When importing that document:
+    // Then make sure that we don't crash:
+    // Without the accompanying fix in place, this test would have crashed, an invalidated iterator
+    // was used in sw::mark::MarkManager::deleteMarks().
+    createSwDoc("header-footer-delete.docx");
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

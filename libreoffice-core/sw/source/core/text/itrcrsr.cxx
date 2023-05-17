@@ -250,49 +250,54 @@ void SwTextMargin::CtorInitTextMargin( SwTextFrame *pNewFrame, SwTextSizeInfo *p
             if (aLang != LANGUAGE_KOREAN && aLang != LANGUAGE_JAPANESE)
                 nFirstLineOfs<<=1;
 
-            const SvxLineSpacingItem *pSpace = m_aLineInf.GetLineSpacing();
-            if( pSpace )
+            // tdf#129448: Auto first-line indent should not be effected by line space.
+            // Below is for compatibility with old documents.
+            if (!pNode->getIDocumentSettingAccess()->get(DocumentSettingId::AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE))
             {
-                switch( pSpace->GetLineSpaceRule() )
+                const SvxLineSpacingItem *pSpace = m_aLineInf.GetLineSpacing();
+                if( pSpace )
                 {
-                    case SvxLineSpaceRule::Auto:
-                    break;
-                    case SvxLineSpaceRule::Min:
+                    switch( pSpace->GetLineSpaceRule() )
                     {
-                        if( nFirstLineOfs < pSpace->GetLineHeight() )
+                        case SvxLineSpaceRule::Auto:
+                        break;
+                        case SvxLineSpaceRule::Min:
+                        {
+                            if( nFirstLineOfs < pSpace->GetLineHeight() )
+                                nFirstLineOfs = pSpace->GetLineHeight();
+                            break;
+                        }
+                        case SvxLineSpaceRule::Fix:
                             nFirstLineOfs = pSpace->GetLineHeight();
                         break;
+                        default: OSL_FAIL( ": unknown LineSpaceRule" );
                     }
-                    case SvxLineSpaceRule::Fix:
-                        nFirstLineOfs = pSpace->GetLineHeight();
-                    break;
-                    default: OSL_FAIL( ": unknown LineSpaceRule" );
-                }
-                switch( pSpace->GetInterLineSpaceRule() )
-                {
-                    case SvxInterLineSpaceRule::Off:
-                    break;
-                    case SvxInterLineSpaceRule::Prop:
+                    switch( pSpace->GetInterLineSpaceRule() )
                     {
-                        tools::Long nTmp = pSpace->GetPropLineSpace();
-                        // 50% is the minimum, at 0% we switch to
-                        // the default value 100%...
-                        if( nTmp < 50 )
-                            nTmp = nTmp ? 50 : 100;
+                        case SvxInterLineSpaceRule::Off:
+                        break;
+                        case SvxInterLineSpaceRule::Prop:
+                        {
+                            tools::Long nTmp = pSpace->GetPropLineSpace();
+                            // 50% is the minimum, at 0% we switch to
+                            // the default value 100%...
+                            if( nTmp < 50 )
+                                nTmp = nTmp ? 50 : 100;
 
-                        nTmp *= nFirstLineOfs;
-                        nTmp /= 100;
-                        if( !nTmp )
-                            ++nTmp;
-                        nFirstLineOfs = nTmp;
-                        break;
+                            nTmp *= nFirstLineOfs;
+                            nTmp /= 100;
+                            if( !nTmp )
+                                ++nTmp;
+                            nFirstLineOfs = nTmp;
+                            break;
+                        }
+                        case SvxInterLineSpaceRule::Fix:
+                        {
+                            nFirstLineOfs += pSpace->GetInterLineSpace();
+                            break;
+                        }
+                        default: OSL_FAIL( ": unknown InterLineSpaceRule" );
                     }
-                    case SvxInterLineSpaceRule::Fix:
-                    {
-                        nFirstLineOfs += pSpace->GetInterLineSpace();
-                        break;
-                    }
-                    default: OSL_FAIL( ": unknown InterLineSpaceRule" );
                 }
             }
         }
@@ -394,6 +399,26 @@ void SwTextCursor::CtorInitTextCursor( SwTextFrame *pNewFrame, SwTextSizeInfo *p
     CtorInitTextMargin( pNewFrame, pNewInf );
     // 6096: Attention, the iterators are derived!
     // GetInfo().SetOut( GetInfo().GetWin() );
+}
+
+// tdf#120715 tdf#43100: Make width for some HolePortions, so cursor will be able to move into it.
+// It should not change the layout, so this should be called after the layout is calculated.
+void SwTextCursor::AddExtraBlankWidth()
+{
+    SwLinePortion* pPos = m_pCurr->GetNextPortion();
+    SwLinePortion* pNextPos;
+    while (pPos)
+    {
+        pNextPos = pPos->GetNextPortion();
+        // Do it only if it is the last portion that able to handle the cursor,
+        // else the next portion would miscalculate the cursor position
+        if (pPos->ExtraBlankWidth() && (!pNextPos || pNextPos->IsMarginPortion()))
+        {
+            pPos->Width(pPos->Width() + pPos->ExtraBlankWidth());
+            pPos->ExtraBlankWidth(0);
+        }
+        pPos = pNextPos;
+    }
 }
 
 // 1170: Ancient bug: Shift-End forgets the last character ...
@@ -882,9 +907,21 @@ void SwTextCursor::GetCharRect_( SwRect* pOrig, TextFrameIndex const nOfst,
                     }
                     if ( pPor->PrtWidth() )
                     {
+                        // tdf#30731: To get the correct nOfst width, we need
+                        // to send the whole portion string to GetTextSize()
+                        // and ask it to return the width of nOfst by calling
+                        // SetMeasureLen(). Cutting the string at nOfst can
+                        // give the wrong width if nOfst is in e.g. the middle
+                        // of a ligature. See SwFntObj::DrawText().
                         TextFrameIndex const nOldLen = pPor->GetLen();
-                        pPor->SetLen( nOfst - aInf.GetIdx() );
                         aInf.SetLen( pPor->GetLen() );
+                        pPor->SetLen( nOfst - aInf.GetIdx() );
+                        aInf.SetMeasureLen(pPor->GetLen());
+                        if (aInf.GetLen() < aInf.GetMeasureLen())
+                        {
+                            pPor->SetLen(aInf.GetMeasureLen());
+                            aInf.SetLen(pPor->GetLen());
+                        }
                         if( nX || !pPor->InNumberGrp() )
                         {
                             SeekAndChg( aInf );
@@ -900,7 +937,12 @@ void SwTextCursor::GetCharRect_( SwRect* pOrig, TextFrameIndex const nOfst,
                             if( bWidth )
                             {
                                 pPor->SetLen(pPor->GetLen() + TextFrameIndex(1));
-                                aInf.SetLen( pPor->GetLen() );
+                                aInf.SetMeasureLen(pPor->GetLen());
+                                if (aInf.GetLen() < aInf.GetMeasureLen())
+                                {
+                                    pPor->SetLen(aInf.GetMeasureLen());
+                                    aInf.SetLen(pPor->GetLen());
+                                }
                                 aInf.SetOnWin( false ); // no BULLETs!
                                 nTmp += pPor->GetTextSize( aInf ).Width();
                                 aInf.SetOnWin( bOldOnWin );
@@ -1077,8 +1119,14 @@ void SwTextCursor::GetCharRect_( SwRect* pOrig, TextFrameIndex const nOfst,
                     {
                         const bool bOldOnWin = aInf.OnWin();
                         TextFrameIndex const nOldLen = pPor->GetLen();
-                        pPor->SetLen( TextFrameIndex(1) );
                         aInf.SetLen( pPor->GetLen() );
+                        pPor->SetLen( TextFrameIndex(1) );
+                        aInf.SetMeasureLen(pPor->GetLen());
+                        if (aInf.GetLen() < aInf.GetMeasureLen())
+                        {
+                            pPor->SetLen(aInf.GetMeasureLen());
+                            aInf.SetLen(pPor->GetLen());
+                        }
                         SeekAndChg( aInf );
                         aInf.SetOnWin( false ); // no BULLETs!
                         aInf.SetKanaComp( pKanaComp );
@@ -1208,10 +1256,6 @@ void SwTextCursor::GetCharRect( SwRect* pOrig, TextFrameIndex const nOfst,
 
     GetCharRect_( pOrig, nFindOfst, pCMS );
 
-    // This actually would have to be "-1 LogicToPixel", but that seems too
-    // expensive, so it's a value (-12), that should hopefully be OK.
-    const SwTwips nTmpRight = Right() - 12;
-
     pOrig->Pos().AdjustX(aCharPos.X() );
     pOrig->Pos().AdjustY(aCharPos.Y() );
 
@@ -1222,13 +1266,6 @@ void SwTextCursor::GetCharRect( SwRect* pOrig, TextFrameIndex const nOfst,
         pCMS->m_p2Lines->aPortion.Pos().AdjustX(aCharPos.X() );
         pCMS->m_p2Lines->aPortion.Pos().AdjustY(aCharPos.Y() );
     }
-
-    const IDocumentSettingAccess& rIDSA = GetTextFrame()->GetDoc().getIDocumentSettingAccess();
-    const bool bTabOverMargin = rIDSA.get(DocumentSettingId::TAB_OVER_MARGIN)
-        || rIDSA.get(DocumentSettingId::TAB_OVER_SPACING);
-    // Make sure the cursor respects the right margin, unless in compat mode, where the tab size has priority over the margin size.
-    if( pOrig->Left() > nTmpRight && !bTabOverMargin)
-        pOrig->Pos().setX( nTmpRight );
 
     if( nMax )
     {
@@ -1249,16 +1286,6 @@ void SwTextCursor::GetCharRect( SwRect* pOrig, TextFrameIndex const nOfst,
             else if( nTmp + pCMS->m_aRealHeight.Y() > nMax )
                 pCMS->m_aRealHeight.setY( nMax - nTmp );
         }
-    }
-    tools::Long nOut = pOrig->Right() - GetTextFrame()->getFrameArea().Right();
-    if( nOut > 0 )
-    {
-        if( GetTextFrame()->getFrameArea().Width() < GetTextFrame()->getFramePrintArea().Left()
-                                   + GetTextFrame()->getFramePrintArea().Width() )
-            nOut += GetTextFrame()->getFrameArea().Width() - GetTextFrame()->getFramePrintArea().Left()
-                    - GetTextFrame()->getFramePrintArea().Width();
-        if( nOut > 0 )
-            pOrig->Pos().AdjustX( -(nOut + 10) );
     }
 }
 
@@ -1315,9 +1342,6 @@ TextFrameIndex SwTextCursor::GetModelPositionForViewPoint( SwPosition *pPos, con
     if( bLeftOver )
         x = nLeftMargin;
     const bool bRightOver = x > nRightMargin;
-    if( bRightOver )
-        x = nRightMargin;
-
     const bool bRightAllowed = pCMS && ( pCMS->m_eState == CursorMoveState::NONE );
 
     // Until here everything in document coordinates.
@@ -1642,7 +1666,7 @@ TextFrameIndex SwTextCursor::GetModelPositionForViewPoint( SwPosition *pPos, con
             return GetModelPositionForViewPoint( pPos, Point( GetLineStart() + nX, rPoint.Y() ),
                                 bChgNode, pCMS );
         }
-        if( pPor->InTextGrp() )
+        if( pPor->InTextGrp() || pPor->IsHolePortion() )
         {
             sal_uInt8 nOldProp;
             if( GetPropFont() )
@@ -1655,7 +1679,7 @@ TextFrameIndex SwTextCursor::GetModelPositionForViewPoint( SwPosition *pPos, con
             {
                 SwTextSizeInfo aSizeInf( GetInfo(), &rText, nCurrStart );
                 const_cast<SwTextCursor*>(this)->SeekAndChg( aSizeInf );
-                SwTextSlot aDiffText( &aSizeInf, static_cast<SwTextPortion*>(pPor), false, false );
+                SwTextSlot aDiffText( &aSizeInf, pPor, false, false );
                 SwFontSave aSave( aSizeInf, pPor->IsDropPortion() ?
                         static_cast<SwDropPortion*>(pPor)->GetFnt() : nullptr );
 
@@ -1839,7 +1863,7 @@ bool SwTextFrame::FillSelection( SwSelectionList& rSelList, const SwRect& rRect 
         }
         else if( aRect.HasArea() )
         {
-            SwPosition aOld(aPosL.nNode.GetNodes().GetEndOfContent());
+            SwPosition aOld(aPosL.GetNodes().GetEndOfContent());
             SwPosition aPosR( aPosL );
             Point aPoint;
             SwTextInfo aInf( const_cast<SwTextFrame*>(this) );

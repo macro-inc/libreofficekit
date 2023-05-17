@@ -22,7 +22,7 @@
 #include <com/sun/star/uno/Reference.hxx>
 #include "importfilterdata.hxx"
 
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 namespace com::sun::star {
     namespace beans { struct PropertyValue; }
@@ -83,7 +83,7 @@ class ScXMLImportWrapper
 public:
 
     ScXMLImportWrapper(
-        ScDocShell& rDocSh, SfxMedium* pM, const css::uno::Reference<css::embed::XStorage>& xStor );
+        ScDocShell& rDocSh, SfxMedium* pM, css::uno::Reference<css::embed::XStorage> xStor );
 
     bool Import( ImportFlags nMode, ErrCode& rError );
     bool Export(bool bStylesOnly);

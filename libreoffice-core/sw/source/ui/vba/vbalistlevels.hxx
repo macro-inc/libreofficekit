@@ -16,8 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef INCLUDED_SW_SOURCE_UI_VBA_VBALISTLEVELS_HXX
-#define INCLUDED_SW_SOURCE_UI_VBA_VBALISTLEVELS_HXX
+#pragma once
 
 #include <vbahelper/vbacollectionimpl.hxx>
 #include <ooo/vba/word/XListLevels.hpp>
@@ -32,7 +31,7 @@ private:
 
 public:
     /// @throws css::uno::RuntimeException
-    SwVbaListLevels( const css::uno::Reference< ooo::vba::XHelperInterface >& rParent, const css::uno::Reference< css::uno::XComponentContext >& rContext, SwVbaListHelperRef const & pHelper );
+    SwVbaListLevels( const css::uno::Reference< ooo::vba::XHelperInterface >& rParent, const css::uno::Reference< css::uno::XComponentContext >& rContext, SwVbaListHelperRef  pHelper );
 
     virtual ::sal_Int32 SAL_CALL getCount() override;
     virtual css::uno::Any SAL_CALL Item( const css::uno::Any& Index1, const css::uno::Any& /*not processed in this base class*/ ) override;
@@ -45,7 +44,5 @@ public:
     virtual OUString getServiceImplName() override;
     virtual css::uno::Sequence<OUString> getServiceNames() override;
 };
-
-#endif // INCLUDED_SW_SOURCE_UI_VBA_VBALISTLEVELS_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

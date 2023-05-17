@@ -23,7 +23,9 @@
 #include <com/sun/star/beans/PropertyValue.hpp>
 
 #include <cppuhelper/weakref.hxx>
+#include <sal/types.h>
 #include <svl/poolitem.hxx>
+#include <unotools/weakref.hxx>
 
 #include "calbck.hxx"
 #include "swdllapi.h"
@@ -78,7 +80,6 @@ public:
     void NotifyChangeTextNode(SwTextNode* pTextNode);
     SwTextNode* GetTextNode() const;
     static SwFormatContentControl* CreatePoolDefault(sal_uInt16 nWhich);
-    std::shared_ptr<SwContentControl> GetContentControl() { return m_pContentControl; }
     const std::shared_ptr<SwContentControl>& GetContentControl() const { return m_pContentControl; }
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
@@ -95,7 +96,7 @@ public:
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const;
 
-    OUString ToString() const;
+    const OUString& ToString() const;
 
     bool operator==(const SwContentControlListItem& rOther) const;
 
@@ -108,7 +109,7 @@ public:
 /// Stores the properties of a content control.
 class SW_DLLPUBLIC SwContentControl : public sw::BroadcastingModify
 {
-    css::uno::WeakReference<css::text::XTextContent> m_wXContentControl;
+    unotools::WeakReference<SwXContentControl> m_wXContentControl;
 
     SwFormatContentControl* m_pFormat;
 
@@ -169,6 +170,9 @@ class SW_DLLPUBLIC SwContentControl : public sw::BroadcastingModify
     /// The color: just remembered.
     OUString m_aColor;
 
+    /// The appearance: just remembered.
+    OUString m_aAppearance;
+
     /// The alias: just remembered.
     OUString m_aAlias;
 
@@ -177,6 +181,12 @@ class SW_DLLPUBLIC SwContentControl : public sw::BroadcastingModify
 
     /// The id: just remembered.
     sal_Int32 m_nId = 0;
+
+    /// The tabIndex: just remembered.
+    sal_uInt32 m_nTabIndex = 0;
+
+    /// The control and content locks: mostly just remembered.
+    OUString m_aLock;
 
     /// Stores a list item index, in case the doc model is not yet updated.
     // i.e. temporarily store the selected item until the text is inserted by GotoContentControl.
@@ -203,15 +213,12 @@ public:
 
     void NotifyChangeTextNode(SwTextNode* pTextNode);
 
-    css::uno::WeakReference<css::text::XTextContent> GetXContentControl() const
+    const unotools::WeakReference<SwXContentControl>& GetXContentControl() const
     {
         return m_wXContentControl;
     }
 
-    void SetXContentControl(const css::uno::Reference<css::text::XTextContent>& xContentCnotrol)
-    {
-        m_wXContentControl = xContentCnotrol;
-    }
+    void SetXContentControl(const rtl::Reference<SwXContentControl>& xContentCnotrol);
 
     virtual void SwClientNotify(const SwModify&, const SfxHint&) override;
 
@@ -236,13 +243,13 @@ public:
 
     void SetCheckedState(const OUString& rCheckedState) { m_aCheckedState = rCheckedState; }
 
-    OUString GetCheckedState() const { return m_aCheckedState; }
+    const OUString& GetCheckedState() const { return m_aCheckedState; }
 
     void SetUncheckedState(const OUString& rUncheckedState) { m_aUncheckedState = rUncheckedState; }
 
-    OUString GetUncheckedState() const { return m_aUncheckedState; }
+    const OUString& GetUncheckedState() const { return m_aUncheckedState; }
 
-    std::vector<SwContentControlListItem> GetListItems() const { return m_aListItems; }
+    const std::vector<SwContentControlListItem>& GetListItems() const { return m_aListItems; }
 
     void SetListItems(const std::vector<SwContentControlListItem>& rListItems)
     {
@@ -263,15 +270,15 @@ public:
 
     void SetDateFormat(const OUString& rDateFormat) { m_aDateFormat = rDateFormat; }
 
-    OUString GetDateFormat() const { return m_aDateFormat; }
+    const OUString& GetDateFormat() const { return m_aDateFormat; }
 
     void SetDateLanguage(const OUString& rDateLanguage) { m_aDateLanguage = rDateLanguage; }
 
-    OUString GetDateLanguage() const { return m_aDateLanguage; }
+    const OUString& GetDateLanguage() const { return m_aDateLanguage; }
 
     void SetCurrentDate(const OUString& rCurrentDate) { m_aCurrentDate = rCurrentDate; }
 
-    OUString GetCurrentDate() const { return m_aCurrentDate; }
+    const OUString& GetCurrentDate() const { return m_aCurrentDate; }
 
     /// Formats fCurrentDate and sets it.
     void SetCurrentDateValue(double fCurrentDate);
@@ -299,14 +306,14 @@ public:
         m_aPlaceholderDocPart = rPlaceholderDocPart;
     }
 
-    OUString GetPlaceholderDocPart() const { return m_aPlaceholderDocPart; }
+    const OUString& GetPlaceholderDocPart() const { return m_aPlaceholderDocPart; }
 
     void SetSelectedListItem(std::optional<size_t> oSelectedListItem)
     {
         m_oSelectedListItem = oSelectedListItem;
     }
 
-    std::optional<size_t> GetSelectedListItem() const { return m_oSelectedListItem; }
+    const std::optional<size_t>& GetSelectedListItem() const { return m_oSelectedListItem; }
 
     /// Get a copy of selected list item's index,
     /// potentially even if the selection is already written out to text (i.e. validated).
@@ -314,7 +321,7 @@ public:
 
     void SetSelectedDate(std::optional<double> oSelectedDate) { m_oSelectedDate = oSelectedDate; }
 
-    std::optional<double> GetSelectedDate() const { return m_oSelectedDate; }
+    const std::optional<double>& GetSelectedDate() const { return m_oSelectedDate; }
 
     /// Should this character (during key input) interact with the content control?
     bool IsInteractingCharacter(sal_Unicode cCh);
@@ -322,32 +329,36 @@ public:
     /// Given rKeyCode as a keyboard event, should a popup be opened for this content control?
     bool ShouldOpenPopup(const vcl::KeyCode& rKeyCode);
 
-    virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
+    void dumpAsXml(xmlTextWriterPtr pWriter) const;
 
     void SetDataBindingPrefixMappings(const OUString& rDataBindingPrefixMappings)
     {
         m_aDataBindingPrefixMappings = rDataBindingPrefixMappings;
     }
 
-    OUString GetDataBindingPrefixMappings() const { return m_aDataBindingPrefixMappings; }
+    const OUString& GetDataBindingPrefixMappings() const { return m_aDataBindingPrefixMappings; }
 
     void SetDataBindingXpath(const OUString& rDataBindingXpath)
     {
         m_aDataBindingXpath = rDataBindingXpath;
     }
 
-    OUString GetDataBindingXpath() const { return m_aDataBindingXpath; }
+    const OUString& GetDataBindingXpath() const { return m_aDataBindingXpath; }
 
     void SetDataBindingStoreItemID(const OUString& rDataBindingStoreItemID)
     {
         m_aDataBindingStoreItemID = rDataBindingStoreItemID;
     }
 
-    OUString GetDataBindingStoreItemID() const { return m_aDataBindingStoreItemID; }
+    const OUString& GetDataBindingStoreItemID() const { return m_aDataBindingStoreItemID; }
 
     void SetColor(const OUString& rColor) { m_aColor = rColor; }
 
-    OUString GetColor() const { return m_aColor; }
+    const OUString& GetColor() const { return m_aColor; }
+
+    void SetAppearance(const OUString& rAppearance) { m_aAppearance = rAppearance; }
+
+    const OUString& GetAppearance() const { return m_aAppearance; }
 
     void SetAlias(const OUString& rAlias) { m_aAlias = rAlias; }
 
@@ -361,8 +372,21 @@ public:
 
     sal_Int32 GetId() const { return m_nId; }
 
+    void SetTabIndex(sal_uInt32 nTabIndex) { m_nTabIndex = nTabIndex; }
+
+    sal_uInt32 GetTabIndex() const { return m_nTabIndex; }
+
+    // At the design level, define how the control should be locked. No effect at implementation lvl
+    void SetLock(bool bLockContent, bool bLockControl);
+    void SetLock(const OUString& rLock) { m_aLock = rLock; }
+
+    // At the design level, get how the control is locked. Does not reflect actual implementation.
+    std::optional<bool> GetLock(bool bControl) const;
+    const OUString& GetLock() const { return m_aLock; }
+
     void SetReadWrite(bool bReadWrite) { m_bReadWrite = bReadWrite; }
 
+    // At the implementation level, define whether the user can directly modify the contents.
     bool GetReadWrite() const { return m_bReadWrite; }
 
     SwContentControlType GetType() const;

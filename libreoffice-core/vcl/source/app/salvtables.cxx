@@ -19,6 +19,7 @@
 
 #include <sal/config.h>
 
+#include <limits>
 #include <string_view>
 
 #include <com/sun/star/accessibility/AccessibleRelationType.hpp>
@@ -26,6 +27,7 @@
 #include <com/sun/star/awt/XWindowPeer.hpp>
 #include <o3tl/safeint.hxx>
 #include <o3tl/sorted_vector.hxx>
+#include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <salframe.hxx>
 #include <salinst.hxx>
@@ -51,7 +53,6 @@
 #include <vcl/toolkit/combobox.hxx>
 #include <vcl/toolkit/dialog.hxx>
 #include <vcl/toolkit/fixed.hxx>
-#include <vcl/toolkit/fixedhyper.hxx>
 #include <vcl/toolkit/fmtfield.hxx>
 #include <vcl/headbar.hxx>
 #include <vcl/toolkit/ivctrl.hxx>
@@ -65,6 +66,7 @@
 #include <vcl/toolkit/svtabbx.hxx>
 #include <vcl/tabctrl.hxx>
 #include <vcl/tabpage.hxx>
+#include <vcl/toolbox.hxx>
 #include <vcl/toolkit/treelistentry.hxx>
 #include <vcl/toolkit/throbber.hxx>
 #include <vcl/toolkit/unowrap.hxx>
@@ -108,6 +110,30 @@ void SalFrame::SetRepresentedURL(const OUString&)
     // currently this is Mac only functionality
 }
 
+OUString SalFrame::DumpSetPosSize(tools::Long nX, tools::Long nY, tools::Long nWidth,
+                                  tools::Long nHeight, sal_uInt16 nFlags)
+{
+    // assuming the 4 integers normally don't have more than 4 digits, but might be negative
+    OUStringBuffer aBuffer(4 * 5 + 5);
+    if (nFlags & SAL_FRAME_POSSIZE_WIDTH)
+        aBuffer << nWidth << "x";
+    else
+        aBuffer << "?x";
+    if (nFlags & SAL_FRAME_POSSIZE_HEIGHT)
+        aBuffer << nHeight << "@(";
+    else
+        aBuffer << "?@(";
+    if (nFlags & SAL_FRAME_POSSIZE_X)
+        aBuffer << nX << ",";
+    else
+        aBuffer << "?,";
+    if (nFlags & SAL_FRAME_POSSIZE_Y)
+        aBuffer << nY << ")";
+    else
+        aBuffer << "?)";
+    return aBuffer.makeStringAndClear();
+}
+
 SalInstance::SalInstance(std::unique_ptr<comphelper::SolarMutex> pMutex)
     : m_pYieldMutex(std::move(pMutex))
 {
@@ -140,6 +166,20 @@ std::unique_ptr<SalMenuItem> SalInstance::CreateMenuItem(const SalItemParams&) {
 bool SalInstance::CallEventCallback(void const* pEvent, int nBytes)
 {
     return m_pEventInst.is() && m_pEventInst->dispatchEvent(pEvent, nBytes);
+}
+
+bool SalInstance::DoExecute(int&)
+{
+    // can't run on system event loop without implementing DoExecute and DoQuit
+    if (Application::IsOnSystemEventLoop())
+        std::abort();
+    return false;
+}
+
+void SalInstance::DoQuit()
+{
+    if (Application::IsOnSystemEventLoop())
+        std::abort();
 }
 
 SalTimer::~SalTimer() COVERITY_NOEXCEPT_FALSE {}
@@ -197,6 +237,73 @@ int SalMenu::GetMenuBarHeight() const { return 0; }
 void SalMenu::ApplyPersona() {}
 
 SalMenuItem::~SalMenuItem() {}
+
+class SalFlashAttention
+{
+private:
+    VclPtr<vcl::Window> m_xWidget;
+    Timer m_aFlashTimer;
+    Color m_aOrigControlBackground;
+    Wallpaper m_aOrigBackground;
+    bool m_bOrigControlBackground;
+    int m_nFlashCount;
+
+    void SetFlash()
+    {
+        Color aColor(Application::GetSettings().GetStyleSettings().GetHighlightColor());
+        m_xWidget->SetControlBackground(aColor);
+    }
+
+    void ClearFlash()
+    {
+        if (m_bOrigControlBackground)
+            m_xWidget->SetControlBackground(m_aOrigControlBackground);
+        else
+            m_xWidget->SetControlBackground();
+    }
+
+    void Flash()
+    {
+        constexpr int FlashesWanted = 1;
+
+        if (m_nFlashCount % 2 == 0)
+            ClearFlash();
+        else
+            SetFlash();
+
+        if (m_nFlashCount == FlashesWanted * 2)
+            return;
+
+        ++m_nFlashCount;
+
+        m_aFlashTimer.Start();
+    }
+
+    DECL_LINK(FlashTimeout, Timer*, void);
+
+public:
+    SalFlashAttention(VclPtr<vcl::Window> xWidget)
+        : m_xWidget(std::move(xWidget))
+        , m_aFlashTimer("SalFlashAttention")
+        , m_bOrigControlBackground(false)
+        , m_nFlashCount(1)
+    {
+        m_aFlashTimer.SetTimeout(150);
+        m_aFlashTimer.SetInvokeHandler(LINK(this, SalFlashAttention, FlashTimeout));
+    }
+
+    void Start()
+    {
+        m_bOrigControlBackground = m_xWidget->IsControlBackground();
+        if (m_bOrigControlBackground)
+            m_aOrigControlBackground = m_xWidget->GetControlBackground();
+        m_aFlashTimer.Start();
+    }
+
+    ~SalFlashAttention() { ClearFlash(); }
+};
+
+IMPL_LINK_NOARG(SalFlashAttention, FlashTimeout, Timer*, void) { Flash(); }
 
 void SalInstanceWidget::ensure_event_listener()
 {
@@ -290,13 +397,6 @@ bool SalInstanceWidget::is_active() const { return m_xWidget->IsActive(); }
 
 bool SalInstanceWidget::has_child_focus() const { return m_xWidget->HasChildPathFocus(true); }
 
-void SalInstanceWidget::set_has_default(bool has_default)
-{
-    m_xWidget->set_property("has-default", OUString::boolean(has_default));
-}
-
-bool SalInstanceWidget::get_has_default() const { return m_xWidget->GetStyle() & WB_DEFBUTTON; }
-
 void SalInstanceWidget::show() { m_xWidget->Show(); }
 
 void SalInstanceWidget::hide() { m_xWidget->Hide(); }
@@ -370,7 +470,7 @@ void SalInstanceWidget::set_margin_bottom(int nMargin) { m_xWidget->set_margin_b
 
 void SalInstanceWidget::set_margin_start(int nMargin) { m_xWidget->set_margin_start(nMargin); }
 
-void SalInstanceWidget::set_margin_end(int nMargin) { m_xWidget->set_margin_bottom(nMargin); }
+void SalInstanceWidget::set_margin_end(int nMargin) { m_xWidget->set_margin_end(nMargin); }
 
 int SalInstanceWidget::get_margin_top() const { return m_xWidget->get_margin_top(); }
 
@@ -378,7 +478,7 @@ int SalInstanceWidget::get_margin_bottom() const { return m_xWidget->get_margin_
 
 int SalInstanceWidget::get_margin_start() const { return m_xWidget->get_margin_start(); }
 
-int SalInstanceWidget::get_margin_end() const { return m_xWidget->get_margin_bottom(); }
+int SalInstanceWidget::get_margin_end() const { return m_xWidget->get_margin_end(); }
 
 void SalInstanceWidget::set_accessible_name(const OUString& rName)
 {
@@ -399,16 +499,13 @@ OUString SalInstanceWidget::get_accessible_description() const
 
 void SalInstanceWidget::set_accessible_relation_labeled_by(weld::Widget* pLabel)
 {
-    vcl::Window* pAtkLabel
+    if (vcl::Window* pOldLabel = m_xWidget->GetAccessibleRelationLabeledBy())
+        pOldLabel->SetAccessibleRelationLabelFor(nullptr);
+    vcl::Window* pA11yLabel
         = pLabel ? dynamic_cast<SalInstanceWidget&>(*pLabel).getWidget() : nullptr;
-    m_xWidget->SetAccessibleRelationLabeledBy(pAtkLabel);
-}
-
-void SalInstanceWidget::set_accessible_relation_label_for(weld::Widget* pLabeled)
-{
-    vcl::Window* pAtkLabeled
-        = pLabeled ? dynamic_cast<SalInstanceWidget&>(*pLabeled).getWidget() : nullptr;
-    m_xWidget->SetAccessibleRelationLabelFor(pAtkLabeled);
+    m_xWidget->SetAccessibleRelationLabeledBy(pA11yLabel);
+    if (pA11yLabel)
+        pA11yLabel->SetAccessibleRelationLabelFor(m_xWidget);
 }
 
 void SalInstanceWidget::set_tooltip_text(const OUString& rTip)
@@ -564,6 +661,12 @@ VclPtr<VirtualDevice> SalInstanceWidget::create_virtual_device() const
     // create with (annoying) separate alpha layer that LibreOffice itself uses
     return VclPtr<VirtualDevice>::Create(*Application::GetDefaultDevice(), DeviceFormat::DEFAULT,
                                          DeviceFormat::DEFAULT);
+}
+
+void SalInstanceWidget::call_attention_to()
+{
+    m_xFlashAttention.reset(new SalFlashAttention(m_xWidget));
+    m_xFlashAttention->Start();
 }
 
 css::uno::Reference<css::datatransfer::dnd::XDropTarget> SalInstanceWidget::get_drop_target()
@@ -1010,8 +1113,7 @@ void SalInstanceToolbar::set_item_menu(const OString& rIdent, weld::Menu* pMenu)
 void SalInstanceToolbar::insert_item(int pos, const OUString& rId)
 {
     ToolBoxItemId nId(pos);
-    m_xToolBox->InsertItem(nId, rId, ToolBoxItemBits::ICON_ONLY);
-    m_xToolBox->SetItemCommand(nId, rId);
+    m_xToolBox->InsertItem(nId, OUString(), rId, ToolBoxItemBits::ICON_ONLY);
 }
 
 void SalInstanceToolbar::insert_separator(int pos, const OUString& /*rId*/)
@@ -1051,6 +1153,12 @@ void SalInstanceToolbar::set_item_icon_name(const OString& rIdent, const OUStrin
 {
     m_xToolBox->SetItemImage(m_xToolBox->GetItemId(OUString::fromUtf8(rIdent)),
                              Image(StockImage::Yes, rIconName));
+}
+
+void SalInstanceToolbar::set_item_image_mirrored(const OString& rIdent, bool bMirrored)
+{
+    m_xToolBox->SetItemImageMirrorMode(m_xToolBox->GetItemId(OUString::fromUtf8(rIdent)),
+                                       bMirrored);
 }
 
 void SalInstanceToolbar::set_item_image(const OString& rIdent,
@@ -1179,30 +1287,6 @@ public:
 };
 }
 
-void SalInstanceContainer::implResetDefault(const vcl::Window* _pWindow)
-{
-    vcl::Window* pChildLoop = _pWindow->GetWindow(GetWindowType::FirstChild);
-    while (pChildLoop)
-    {
-        // does the window participate in the tabbing order?
-        if (pChildLoop->GetStyle() & WB_DIALOGCONTROL)
-            implResetDefault(pChildLoop);
-
-        // is it a button?
-        WindowType eType = pChildLoop->GetType();
-        if ((WindowType::PUSHBUTTON == eType) || (WindowType::OKBUTTON == eType)
-            || (WindowType::CANCELBUTTON == eType) || (WindowType::HELPBUTTON == eType)
-            || (WindowType::IMAGEBUTTON == eType) || (WindowType::MENUBUTTON == eType)
-            || (WindowType::MOREBUTTON == eType))
-        {
-            pChildLoop->SetStyle(pChildLoop->GetStyle() & ~WB_DEFBUTTON);
-        }
-
-        // the next one ...
-        pChildLoop = pChildLoop->GetWindow(GetWindowType::Next);
-    }
-}
-
 void SalInstanceContainer::connect_container_focus_changed(const Link<Container&, void>& rLink)
 {
     ensure_event_listener();
@@ -1235,7 +1319,13 @@ void SalInstanceContainer::move(weld::Widget* pWidget, weld::Container* pNewPare
     assert(!pNewParent || pNewVclParent);
     vcl::Window* pVclWindow = pVclWidget->getWidget();
     if (pNewVclParent)
-        pVclWindow->SetParent(pNewVclParent->getWidget());
+    {
+        vcl::Window* pNew = pNewVclParent->getWidget();
+        if (!pNew->isDisposed())
+            pVclWindow->SetParent(pNewVclParent->getWidget());
+        else
+            SAL_WARN("vcl", "ignoring move because new parent is already disposed");
+    }
     else
     {
         pVclWindow->Hide();
@@ -1248,11 +1338,6 @@ void SalInstanceContainer::child_grab_focus()
     m_xContainer->GrabFocus();
     if (vcl::Window* pFirstChild = m_xContainer->ImplGetDlgWindow(0, GetDlgWindowType::First))
         pFirstChild->ImplControlFocus();
-}
-
-void SalInstanceContainer::recursively_unset_default_buttons()
-{
-    implResetDefault(m_xContainer.get());
 }
 
 css::uno::Reference<css::awt::XWindow> SalInstanceContainer::CreateChildFrame()
@@ -1469,20 +1554,25 @@ css::uno::Reference<css::awt::XWindow> SalInstanceWindow::GetXWindow()
     return xWindow;
 }
 
-void SalInstanceWindow::resize_to_request()
+namespace
 {
-    if (SystemWindow* pSysWin = dynamic_cast<SystemWindow*>(m_xWindow.get()))
+void resize_to_request(vcl::Window* pWindow)
+{
+    if (SystemWindow* pSysWin = dynamic_cast<SystemWindow*>(pWindow))
     {
-        pSysWin->setOptimalLayoutSize();
+        pSysWin->setOptimalLayoutSize(true);
         return;
     }
-    if (DockingWindow* pDockWin = dynamic_cast<DockingWindow*>(m_xWindow.get()))
+    if (DockingWindow* pDockWin = dynamic_cast<DockingWindow*>(pWindow))
     {
         pDockWin->setOptimalLayoutSize();
         return;
     }
     assert(false && "must be system or docking window");
 }
+}
+
+void SalInstanceWindow::resize_to_request() { ::resize_to_request(m_xWindow.get()); }
 
 void SalInstanceWindow::set_modal(bool bModal) { m_xWindow->ImplGetFrame()->SetModal(bModal); }
 
@@ -1520,6 +1610,53 @@ void SalInstanceWindow::present()
     m_xWindow->ToTop(ToTopFlags::RestoreWhenMin | ToTopFlags::ForegroundTask);
 }
 
+void SalInstanceWindow::implResetDefault(const vcl::Window* _pWindow)
+{
+    vcl::Window* pChildLoop = _pWindow->GetWindow(GetWindowType::FirstChild);
+    while (pChildLoop)
+    {
+        // does the window participate in the tabbing order?
+        if (pChildLoop->GetStyle() & WB_DIALOGCONTROL)
+            implResetDefault(pChildLoop);
+
+        // is it a button?
+        WindowType eType = pChildLoop->GetType();
+        if ((WindowType::PUSHBUTTON == eType) || (WindowType::OKBUTTON == eType)
+            || (WindowType::CANCELBUTTON == eType) || (WindowType::HELPBUTTON == eType)
+            || (WindowType::IMAGEBUTTON == eType) || (WindowType::MENUBUTTON == eType)
+            || (WindowType::MOREBUTTON == eType))
+        {
+            pChildLoop->SetStyle(pChildLoop->GetStyle() & ~WB_DEFBUTTON);
+        }
+
+        // the next one ...
+        pChildLoop = pChildLoop->GetWindow(GetWindowType::Next);
+    }
+}
+
+void SalInstanceWindow::recursively_unset_default_buttons() { implResetDefault(m_xWindow.get()); }
+
+void SalInstanceWindow::change_default_widget(weld::Widget* pOld, weld::Widget* pNew)
+{
+    SalInstanceWidget* pVclNew = dynamic_cast<SalInstanceWidget*>(pNew);
+    vcl::Window* pWidgetNew = pVclNew ? pVclNew->getWidget() : nullptr;
+    SalInstanceWidget* pVclOld = dynamic_cast<SalInstanceWidget*>(pOld);
+    vcl::Window* pWidgetOld = pVclOld ? pVclOld->getWidget() : nullptr;
+    if (pWidgetOld)
+        pWidgetOld->set_property("has-default", OUString::boolean(false));
+    else
+        recursively_unset_default_buttons();
+    if (pWidgetNew)
+        pWidgetNew->set_property("has-default", OUString::boolean(true));
+}
+
+bool SalInstanceWindow::is_default_widget(const weld::Widget* pCandidate) const
+{
+    const SalInstanceWidget* pVclCandidate = dynamic_cast<const SalInstanceWidget*>(pCandidate);
+    vcl::Window* pWidget = pVclCandidate ? pVclCandidate->getWidget() : nullptr;
+    return pWidget && pWidget->GetStyle() & WB_DEFBUTTON;
+}
+
 void SalInstanceWindow::set_window_state(const OString& rStr)
 {
     SystemWindow* pSysWin = dynamic_cast<SystemWindow*>(m_xWindow.get());
@@ -1527,7 +1664,7 @@ void SalInstanceWindow::set_window_state(const OString& rStr)
     pSysWin->SetWindowState(rStr);
 }
 
-OString SalInstanceWindow::get_window_state(WindowStateMask nMask) const
+OString SalInstanceWindow::get_window_state(vcl::WindowDataMask nMask) const
 {
     SystemWindow* pSysWin = dynamic_cast<SystemWindow*>(m_xWindow.get());
     assert(pSysWin);
@@ -1554,6 +1691,11 @@ weld::ScreenShotCollection SalInstanceWindow::collect_screenshot_data()
     CollectChildren(*m_xWindow, aTopLeft, aRet);
 
     return aRet;
+}
+
+const vcl::ILibreOfficeKitNotifier* SalInstanceWindow::GetLOKNotifier()
+{
+    return m_xWindow ? m_xWindow->GetLOKNotifier() : nullptr;
 }
 
 SalInstanceWindow::~SalInstanceWindow()
@@ -1679,7 +1821,7 @@ void SalInstanceDialog::collapse(weld::Widget* pEdit, weld::Widget* pButton)
     m_xDialog->set_border_width(0);
     if (vcl::Window* pActionArea = m_xDialog->get_action_area())
         pActionArea->Hide();
-    m_xDialog->setOptimalLayoutSize();
+    m_xDialog->setOptimalLayoutSize(true);
     m_xRefEdit = pRefEdit;
 }
 
@@ -1697,7 +1839,7 @@ void SalInstanceDialog::undo_collapse()
     m_xDialog->set_border_width(m_nOldBorderWidth);
     if (vcl::Window* pActionArea = m_xDialog->get_action_area())
         pActionArea->Show();
-    m_xDialog->setOptimalLayoutSize();
+    m_xDialog->setOptimalLayoutSize(true);
 }
 
 void SalInstanceDialog::SetInstallLOKNotifierHdl(
@@ -1841,198 +1983,183 @@ weld::Container* SalInstanceMessageDialog::weld_message_area()
     return new SalInstanceContainer(m_xMessageDialog->get_message_area(), m_pBuilder, false);
 }
 
-namespace
+int SalInstanceAssistant::find_page(std::string_view rIdent) const
 {
-class SalInstanceAssistant : public SalInstanceDialog, public virtual weld::Assistant
+    for (size_t i = 0; i < m_aAddedPages.size(); ++i)
+    {
+        if (m_aAddedPages[i]->get_id().toUtf8() == rIdent)
+            return i;
+    }
+    return -1;
+}
+
+int SalInstanceAssistant::find_id(int nId) const
 {
-private:
-    VclPtr<vcl::RoadmapWizard> m_xWizard;
-    std::vector<std::unique_ptr<SalInstanceContainer>> m_aPages;
-    std::vector<VclPtr<TabPage>> m_aAddedPages;
-    std::vector<int> m_aIds;
-    std::vector<VclPtr<VclGrid>> m_aAddedGrids;
-    Idle m_aUpdateRoadmapIdle;
-
-    int find_page(std::string_view rIdent) const
+    for (size_t i = 0; i < m_aIds.size(); ++i)
     {
-        for (size_t i = 0; i < m_aAddedPages.size(); ++i)
+        if (nId == m_aIds[i])
+            return i;
+    }
+    return -1;
+}
+
+SalInstanceAssistant::SalInstanceAssistant(vcl::RoadmapWizard* pDialog,
+                                           SalInstanceBuilder* pBuilder, bool bTakeOwnership)
+    : SalInstanceDialog(pDialog, pBuilder, bTakeOwnership)
+    , m_xWizard(pDialog)
+    , m_aUpdateRoadmapIdle("SalInstanceAssistant m_aUpdateRoadmapIdle")
+{
+    m_xWizard->SetItemSelectHdl(LINK(this, SalInstanceAssistant, OnRoadmapItemSelected));
+
+    m_aUpdateRoadmapIdle.SetInvokeHandler(LINK(this, SalInstanceAssistant, UpdateRoadmap_Hdl));
+    m_aUpdateRoadmapIdle.SetPriority(TaskPriority::HIGHEST);
+}
+
+int SalInstanceAssistant::get_current_page() const { return find_id(m_xWizard->GetCurLevel()); }
+
+int SalInstanceAssistant::get_n_pages() const { return m_aAddedPages.size(); }
+
+OString SalInstanceAssistant::get_page_ident(int nPage) const
+{
+    return m_aAddedPages[nPage]->get_id().toUtf8();
+}
+
+OString SalInstanceAssistant::get_current_page_ident() const
+{
+    return get_page_ident(get_current_page());
+}
+
+void SalInstanceAssistant::set_current_page(int nPage)
+{
+    disable_notify_events();
+
+    // take the first shown page as the size for all pages
+    if (m_xWizard->GetPageSizePixel().Width() == 0)
+    {
+        Size aFinalSize;
+        for (int i = 0, nPages = get_n_pages(); i < nPages; ++i)
         {
-            if (m_aAddedPages[i]->get_id().toUtf8() == rIdent)
-                return i;
+            TabPage* pPage = m_xWizard->GetPage(m_aIds[i]);
+            assert(pPage);
+            Size aPageSize(pPage->get_preferred_size());
+            if (aPageSize.Width() > aFinalSize.Width())
+                aFinalSize.setWidth(aPageSize.Width());
+            if (aPageSize.Height() > aFinalSize.Height())
+                aFinalSize.setHeight(aPageSize.Height());
         }
-        return -1;
+        m_xWizard->SetPageSizePixel(aFinalSize);
     }
 
-    int find_id(int nId) const
-    {
-        for (size_t i = 0; i < m_aIds.size(); ++i)
-        {
-            if (nId == m_aIds[i])
-                return i;
-        }
-        return -1;
-    }
+    (void)m_xWizard->ShowPage(m_aIds[nPage]);
+    enable_notify_events();
+}
 
-    DECL_LINK(OnRoadmapItemSelected, LinkParamNone*, void);
-    DECL_LINK(UpdateRoadmap_Hdl, Timer*, void);
+void SalInstanceAssistant::set_current_page(const OString& rIdent)
+{
+    int nIndex = find_page(rIdent);
+    if (nIndex == -1)
+        return;
+    set_current_page(nIndex);
+}
 
-public:
-    SalInstanceAssistant(vcl::RoadmapWizard* pDialog, SalInstanceBuilder* pBuilder,
-                         bool bTakeOwnership)
-        : SalInstanceDialog(pDialog, pBuilder, bTakeOwnership)
-        , m_xWizard(pDialog)
-        , m_aUpdateRoadmapIdle("SalInstanceAssistant m_aUpdateRoadmapIdle")
-    {
-        m_xWizard->SetItemSelectHdl(LINK(this, SalInstanceAssistant, OnRoadmapItemSelected));
+void SalInstanceAssistant::set_page_index(const OString& rIdent, int nNewIndex)
+{
+    int nOldIndex = find_page(rIdent);
 
-        m_aUpdateRoadmapIdle.SetInvokeHandler(LINK(this, SalInstanceAssistant, UpdateRoadmap_Hdl));
-        m_aUpdateRoadmapIdle.SetPriority(TaskPriority::HIGHEST);
-    }
+    if (nOldIndex == -1)
+        return;
 
-    virtual int get_current_page() const override { return find_id(m_xWizard->GetCurLevel()); }
+    if (nOldIndex == nNewIndex)
+        return;
 
-    virtual int get_n_pages() const override { return m_aAddedPages.size(); }
+    disable_notify_events();
 
-    virtual OString get_page_ident(int nPage) const override
-    {
-        return m_aAddedPages[nPage]->get_id().toUtf8();
-    }
+    auto entry = std::move(m_aAddedPages[nOldIndex]);
+    m_aAddedPages.erase(m_aAddedPages.begin() + nOldIndex);
+    m_aAddedPages.insert(m_aAddedPages.begin() + nNewIndex, std::move(entry));
 
-    virtual OString get_current_page_ident() const override
-    {
-        return get_page_ident(get_current_page());
-    }
+    int nId = m_aIds[nOldIndex];
+    m_aIds.erase(m_aIds.begin() + nOldIndex);
+    m_aIds.insert(m_aIds.begin() + nNewIndex, nId);
 
-    virtual void set_current_page(int nPage) override
+    m_aUpdateRoadmapIdle.Start();
+
+    enable_notify_events();
+}
+
+weld::Container* SalInstanceAssistant::append_page(const OString& rIdent)
+{
+    VclPtrInstance<TabPage> xPage(m_xWizard);
+    VclPtrInstance<VclGrid> xGrid(xPage);
+    xPage->set_id(OUString::fromUtf8(rIdent));
+    xPage->Show();
+    xGrid->set_hexpand(true);
+    xGrid->set_vexpand(true);
+    xGrid->Show();
+    m_xWizard->AddPage(xPage);
+    m_aIds.push_back(m_aAddedPages.size());
+    m_xWizard->SetPage(m_aIds.back(), xPage);
+    m_aAddedPages.push_back(xPage);
+    m_aAddedGrids.push_back(xGrid);
+
+    m_aUpdateRoadmapIdle.Start();
+
+    m_aPages.emplace_back(new SalInstanceContainer(xGrid, m_pBuilder, false));
+    return m_aPages.back().get();
+}
+
+OUString SalInstanceAssistant::get_page_title(const OString& rIdent) const
+{
+    int nIndex = find_page(rIdent);
+    if (nIndex == -1)
+        return OUString();
+    return m_aAddedPages[nIndex]->GetText();
+}
+
+void SalInstanceAssistant::set_page_title(const OString& rIdent, const OUString& rTitle)
+{
+    int nIndex = find_page(rIdent);
+    if (nIndex == -1)
+        return;
+    if (m_aAddedPages[nIndex]->GetText() != rTitle)
     {
         disable_notify_events();
-
-        // take the first shown page as the size for all pages
-        if (m_xWizard->GetPageSizePixel().Width() == 0)
-        {
-            Size aFinalSize;
-            for (int i = 0, nPages = get_n_pages(); i < nPages; ++i)
-            {
-                TabPage* pPage = m_xWizard->GetPage(m_aIds[i]);
-                assert(pPage);
-                Size aPageSize(pPage->get_preferred_size());
-                if (aPageSize.Width() > aFinalSize.Width())
-                    aFinalSize.setWidth(aPageSize.Width());
-                if (aPageSize.Height() > aFinalSize.Height())
-                    aFinalSize.setHeight(aPageSize.Height());
-            }
-            m_xWizard->SetPageSizePixel(aFinalSize);
-        }
-
-        (void)m_xWizard->ShowPage(m_aIds[nPage]);
+        m_aAddedPages[nIndex]->SetText(rTitle);
+        m_aUpdateRoadmapIdle.Start();
         enable_notify_events();
     }
+}
 
-    virtual void set_current_page(const OString& rIdent) override
+void SalInstanceAssistant::set_page_sensitive(const OString& rIdent, bool bSensitive)
+{
+    int nIndex = find_page(rIdent);
+    if (nIndex == -1)
+        return;
+    if (m_aAddedPages[nIndex]->IsEnabled() != bSensitive)
     {
-        int nIndex = find_page(rIdent);
-        if (nIndex == -1)
-            return;
-        set_current_page(nIndex);
-    }
-
-    virtual void set_page_index(const OString& rIdent, int nNewIndex) override
-    {
-        int nOldIndex = find_page(rIdent);
-
-        if (nOldIndex == -1)
-            return;
-
-        if (nOldIndex == nNewIndex)
-            return;
-
         disable_notify_events();
-
-        auto entry = std::move(m_aAddedPages[nOldIndex]);
-        m_aAddedPages.erase(m_aAddedPages.begin() + nOldIndex);
-        m_aAddedPages.insert(m_aAddedPages.begin() + nNewIndex, std::move(entry));
-
-        int nId = m_aIds[nOldIndex];
-        m_aIds.erase(m_aIds.begin() + nOldIndex);
-        m_aIds.insert(m_aIds.begin() + nNewIndex, nId);
-
+        m_aAddedPages[nIndex]->Enable(bSensitive);
         m_aUpdateRoadmapIdle.Start();
-
         enable_notify_events();
     }
+}
 
-    virtual weld::Container* append_page(const OString& rIdent) override
-    {
-        VclPtrInstance<TabPage> xPage(m_xWizard);
-        VclPtrInstance<VclGrid> xGrid(xPage);
-        xPage->set_id(OUString::fromUtf8(rIdent));
-        xPage->Show();
-        xGrid->set_hexpand(true);
-        xGrid->set_vexpand(true);
-        xGrid->Show();
-        m_xWizard->AddPage(xPage);
-        m_aIds.push_back(m_aAddedPages.size());
-        m_xWizard->SetPage(m_aIds.back(), xPage);
-        m_aAddedPages.push_back(xPage);
-        m_aAddedGrids.push_back(xGrid);
+void SalInstanceAssistant::set_page_side_help_id(const OString& rHelpId)
+{
+    m_xWizard->SetRoadmapHelpId(rHelpId);
+}
 
-        m_aUpdateRoadmapIdle.Start();
+void SalInstanceAssistant::set_page_side_image(const OUString& rImage)
+{
+    m_xWizard->SetRoadmapBitmap(createImage(rImage).GetBitmapEx());
+}
 
-        m_aPages.emplace_back(new SalInstanceContainer(xGrid, m_pBuilder, false));
-        return m_aPages.back().get();
-    }
-
-    virtual OUString get_page_title(const OString& rIdent) const override
-    {
-        int nIndex = find_page(rIdent);
-        if (nIndex == -1)
-            return OUString();
-        return m_aAddedPages[nIndex]->GetText();
-    }
-
-    virtual void set_page_title(const OString& rIdent, const OUString& rTitle) override
-    {
-        int nIndex = find_page(rIdent);
-        if (nIndex == -1)
-            return;
-        if (m_aAddedPages[nIndex]->GetText() != rTitle)
-        {
-            disable_notify_events();
-            m_aAddedPages[nIndex]->SetText(rTitle);
-            m_aUpdateRoadmapIdle.Start();
-            enable_notify_events();
-        }
-    }
-
-    virtual void set_page_sensitive(const OString& rIdent, bool bSensitive) override
-    {
-        int nIndex = find_page(rIdent);
-        if (nIndex == -1)
-            return;
-        if (m_aAddedPages[nIndex]->IsEnabled() != bSensitive)
-        {
-            disable_notify_events();
-            m_aAddedPages[nIndex]->Enable(bSensitive);
-            m_aUpdateRoadmapIdle.Start();
-            enable_notify_events();
-        }
-    }
-
-    virtual void set_page_side_help_id(const OString& rHelpId) override
-    {
-        m_xWizard->SetRoadmapHelpId(rHelpId);
-    }
-
-    weld::Button* weld_widget_for_response(int nResponse) override;
-
-    virtual ~SalInstanceAssistant() override
-    {
-        for (auto& rGrid : m_aAddedGrids)
-            rGrid.disposeAndClear();
-        for (auto& rPage : m_aAddedPages)
-            rPage.disposeAndClear();
-    }
-};
+SalInstanceAssistant::~SalInstanceAssistant()
+{
+    for (auto& rGrid : m_aAddedGrids)
+        rGrid.disposeAndClear();
+    for (auto& rPage : m_aAddedPages)
+        rPage.disposeAndClear();
 }
 
 IMPL_LINK_NOARG(SalInstanceAssistant, OnRoadmapItemSelected, LinkParamNone*, void)
@@ -2097,257 +2224,251 @@ public:
 
     virtual int get_position() const override { return m_xPaned->get_position(); }
 };
+}
 
-class SalInstanceScrolledWindow : public SalInstanceContainer, public virtual weld::ScrolledWindow
+void SalInstanceScrolledWindow::customize_scrollbars(ScrollBar& rScrollBar,
+                                                     const Color& rButtonTextColor,
+                                                     const Color& rBackgroundColor,
+                                                     const Color& rShadowColor,
+                                                     const Color& rFaceColor)
 {
-private:
-    VclPtr<VclScrolledWindow> m_xScrolledWindow;
-    Link<ScrollBar*, void> m_aOrigVScrollHdl;
-    Link<ScrollBar*, void> m_aOrigHScrollHdl;
-    bool m_bUserManagedScrolling;
+    rScrollBar.EnableNativeWidget(false);
+    AllSettings aSettings = rScrollBar.GetSettings();
+    StyleSettings aStyleSettings = aSettings.GetStyleSettings();
+    aStyleSettings.SetButtonTextColor(rButtonTextColor);
+    aStyleSettings.SetCheckedColor(rBackgroundColor); // background
+    aStyleSettings.SetShadowColor(rShadowColor);
+    aStyleSettings.SetFaceColor(rFaceColor);
+    aSettings.SetStyleSettings(aStyleSettings);
+    rScrollBar.SetSettings(aSettings);
+}
 
-    DECL_LINK(VscrollHdl, ScrollBar*, void);
-    DECL_LINK(HscrollHdl, ScrollBar*, void);
+SalInstanceScrolledWindow::SalInstanceScrolledWindow(VclScrolledWindow* pScrolledWindow,
+                                                     SalInstanceBuilder* pBuilder,
+                                                     bool bTakeOwnership,
+                                                     bool bUserManagedScrolling)
+    : SalInstanceContainer(pScrolledWindow, pBuilder, bTakeOwnership)
+    , m_xScrolledWindow(pScrolledWindow)
+    , m_bUserManagedScrolling(bUserManagedScrolling)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    m_aOrigVScrollHdl = rVertScrollBar.GetScrollHdl();
+    rVertScrollBar.SetScrollHdl(LINK(this, SalInstanceScrolledWindow, VscrollHdl));
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    m_aOrigHScrollHdl = rHorzScrollBar.GetScrollHdl();
+    rHorzScrollBar.SetScrollHdl(LINK(this, SalInstanceScrolledWindow, HscrollHdl));
+    m_xScrolledWindow->setUserManagedScrolling(m_bUserManagedScrolling);
+}
 
-    static void customize_scrollbars(ScrollBar& rScrollBar, const Color& rButtonTextColor,
-                                     const Color& rBackgroundColor, const Color& rShadowColor,
-                                     const Color& rFaceColor)
-    {
-        rScrollBar.EnableNativeWidget(false);
-        AllSettings aSettings = rScrollBar.GetSettings();
-        StyleSettings aStyleSettings = aSettings.GetStyleSettings();
-        aStyleSettings.SetButtonTextColor(rButtonTextColor);
-        aStyleSettings.SetCheckedColor(rBackgroundColor); // background
-        aStyleSettings.SetShadowColor(rShadowColor);
-        aStyleSettings.SetFaceColor(rFaceColor);
-        aSettings.SetStyleSettings(aStyleSettings);
-        rScrollBar.SetSettings(aSettings);
-    }
+void SalInstanceScrolledWindow::hadjustment_configure(int value, int lower, int upper,
+                                                      int step_increment, int page_increment,
+                                                      int page_size)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    rHorzScrollBar.SetRangeMin(lower);
+    rHorzScrollBar.SetRangeMax(upper);
+    rHorzScrollBar.SetLineSize(step_increment);
+    rHorzScrollBar.SetPageSize(page_increment);
+    rHorzScrollBar.SetThumbPos(value);
+    rHorzScrollBar.SetVisibleSize(page_size);
+}
 
-public:
-    SalInstanceScrolledWindow(VclScrolledWindow* pScrolledWindow, SalInstanceBuilder* pBuilder,
-                              bool bTakeOwnership, bool bUserManagedScrolling)
-        : SalInstanceContainer(pScrolledWindow, pBuilder, bTakeOwnership)
-        , m_xScrolledWindow(pScrolledWindow)
-        , m_bUserManagedScrolling(bUserManagedScrolling)
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        m_aOrigVScrollHdl = rVertScrollBar.GetScrollHdl();
-        rVertScrollBar.SetScrollHdl(LINK(this, SalInstanceScrolledWindow, VscrollHdl));
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        m_aOrigHScrollHdl = rHorzScrollBar.GetScrollHdl();
-        rHorzScrollBar.SetScrollHdl(LINK(this, SalInstanceScrolledWindow, HscrollHdl));
-        m_xScrolledWindow->setUserManagedScrolling(m_bUserManagedScrolling);
-    }
+int SalInstanceScrolledWindow::hadjustment_get_value() const
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    return rHorzScrollBar.GetThumbPos();
+}
 
-    virtual void hadjustment_configure(int value, int lower, int upper, int step_increment,
-                                       int page_increment, int page_size) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        rHorzScrollBar.SetRangeMin(lower);
-        rHorzScrollBar.SetRangeMax(upper);
-        rHorzScrollBar.SetLineSize(step_increment);
-        rHorzScrollBar.SetPageSize(page_increment);
-        rHorzScrollBar.SetThumbPos(value);
-        rHorzScrollBar.SetVisibleSize(page_size);
-    }
+void SalInstanceScrolledWindow::hadjustment_set_value(int value)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    rHorzScrollBar.SetThumbPos(value);
+    if (!m_bUserManagedScrolling)
+        m_aOrigHScrollHdl.Call(&rHorzScrollBar);
+}
 
-    virtual int hadjustment_get_value() const override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        return rHorzScrollBar.GetThumbPos();
-    }
+int SalInstanceScrolledWindow::hadjustment_get_upper() const
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    return rHorzScrollBar.GetRangeMax();
+}
 
-    virtual void hadjustment_set_value(int value) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        rHorzScrollBar.SetThumbPos(value);
-        if (!m_bUserManagedScrolling)
-            m_aOrigHScrollHdl.Call(&rHorzScrollBar);
-    }
+void SalInstanceScrolledWindow::hadjustment_set_upper(int upper)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    rHorzScrollBar.SetRangeMax(upper);
+}
 
-    virtual int hadjustment_get_upper() const override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        return rHorzScrollBar.GetRangeMax();
-    }
+int SalInstanceScrolledWindow::hadjustment_get_page_size() const
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    return rHorzScrollBar.GetVisibleSize();
+}
 
-    virtual void hadjustment_set_upper(int upper) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        rHorzScrollBar.SetRangeMax(upper);
-    }
+void SalInstanceScrolledWindow::hadjustment_set_page_size(int size)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    return rHorzScrollBar.SetVisibleSize(size);
+}
 
-    virtual int hadjustment_get_page_size() const override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        return rHorzScrollBar.GetVisibleSize();
-    }
+void SalInstanceScrolledWindow::hadjustment_set_page_increment(int size)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    return rHorzScrollBar.SetPageSize(size);
+}
 
-    virtual void hadjustment_set_page_size(int size) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        return rHorzScrollBar.SetVisibleSize(size);
-    }
+void SalInstanceScrolledWindow::hadjustment_set_step_increment(int size)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    return rHorzScrollBar.SetLineSize(size);
+}
 
-    virtual void hadjustment_set_page_increment(int size) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        return rHorzScrollBar.SetPageSize(size);
-    }
+void SalInstanceScrolledWindow::set_hpolicy(VclPolicyType eHPolicy)
+{
+    WinBits nWinBits = m_xScrolledWindow->GetStyle() & ~(WB_AUTOHSCROLL | WB_HSCROLL);
+    if (eHPolicy == VclPolicyType::ALWAYS)
+        nWinBits |= WB_HSCROLL;
+    else if (eHPolicy == VclPolicyType::AUTOMATIC)
+        nWinBits |= WB_AUTOHSCROLL;
+    m_xScrolledWindow->SetStyle(nWinBits);
+    m_xScrolledWindow->queue_resize();
+}
 
-    virtual void hadjustment_set_step_increment(int size) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        return rHorzScrollBar.SetLineSize(size);
-    }
+VclPolicyType SalInstanceScrolledWindow::get_hpolicy() const
+{
+    WinBits nWinBits = m_xScrolledWindow->GetStyle();
+    if (nWinBits & WB_AUTOHSCROLL)
+        return VclPolicyType::AUTOMATIC;
+    else if (nWinBits & WB_HSCROLL)
+        return VclPolicyType::ALWAYS;
+    return VclPolicyType::NEVER;
+}
 
-    virtual void set_hpolicy(VclPolicyType eHPolicy) override
-    {
-        WinBits nWinBits = m_xScrolledWindow->GetStyle() & ~(WB_AUTOHSCROLL | WB_HSCROLL);
-        if (eHPolicy == VclPolicyType::ALWAYS)
-            nWinBits |= WB_HSCROLL;
-        else if (eHPolicy == VclPolicyType::AUTOMATIC)
-            nWinBits |= WB_AUTOHSCROLL;
-        m_xScrolledWindow->SetStyle(nWinBits);
-        m_xScrolledWindow->queue_resize();
-    }
+void SalInstanceScrolledWindow::vadjustment_configure(int value, int lower, int upper,
+                                                      int step_increment, int page_increment,
+                                                      int page_size)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    rVertScrollBar.SetRangeMin(lower);
+    rVertScrollBar.SetRangeMax(upper);
+    rVertScrollBar.SetLineSize(step_increment);
+    rVertScrollBar.SetPageSize(page_increment);
+    rVertScrollBar.SetThumbPos(value);
+    rVertScrollBar.SetVisibleSize(page_size);
+}
 
-    virtual VclPolicyType get_hpolicy() const override
-    {
-        WinBits nWinBits = m_xScrolledWindow->GetStyle();
-        if (nWinBits & WB_AUTOHSCROLL)
-            return VclPolicyType::AUTOMATIC;
-        else if (nWinBits & WB_HSCROLL)
-            return VclPolicyType::ALWAYS;
-        return VclPolicyType::NEVER;
-    }
+int SalInstanceScrolledWindow::vadjustment_get_value() const
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    return rVertScrollBar.GetThumbPos();
+}
 
-    virtual void vadjustment_configure(int value, int lower, int upper, int step_increment,
-                                       int page_increment, int page_size) override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        rVertScrollBar.SetRangeMin(lower);
-        rVertScrollBar.SetRangeMax(upper);
-        rVertScrollBar.SetLineSize(step_increment);
-        rVertScrollBar.SetPageSize(page_increment);
-        rVertScrollBar.SetThumbPos(value);
-        rVertScrollBar.SetVisibleSize(page_size);
-    }
+void SalInstanceScrolledWindow::vadjustment_set_value(int value)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    rVertScrollBar.SetThumbPos(value);
+    if (!m_bUserManagedScrolling)
+        m_aOrigVScrollHdl.Call(&rVertScrollBar);
+}
 
-    virtual int vadjustment_get_value() const override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        return rVertScrollBar.GetThumbPos();
-    }
+int SalInstanceScrolledWindow::vadjustment_get_upper() const
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    return rVertScrollBar.GetRangeMax();
+}
 
-    virtual void vadjustment_set_value(int value) override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        rVertScrollBar.SetThumbPos(value);
-        if (!m_bUserManagedScrolling)
-            m_aOrigVScrollHdl.Call(&rVertScrollBar);
-    }
+void SalInstanceScrolledWindow::vadjustment_set_upper(int upper)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    rVertScrollBar.SetRangeMax(upper);
+}
 
-    virtual int vadjustment_get_upper() const override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        return rVertScrollBar.GetRangeMax();
-    }
+int SalInstanceScrolledWindow::vadjustment_get_lower() const
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    return rVertScrollBar.GetRangeMin();
+}
 
-    virtual void vadjustment_set_upper(int upper) override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        rVertScrollBar.SetRangeMax(upper);
-    }
+void SalInstanceScrolledWindow::vadjustment_set_lower(int lower)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    rVertScrollBar.SetRangeMin(lower);
+}
 
-    virtual int vadjustment_get_lower() const override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        return rVertScrollBar.GetRangeMin();
-    }
+int SalInstanceScrolledWindow::vadjustment_get_page_size() const
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    return rVertScrollBar.GetVisibleSize();
+}
 
-    virtual void vadjustment_set_lower(int lower) override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        rVertScrollBar.SetRangeMin(lower);
-    }
+void SalInstanceScrolledWindow::vadjustment_set_page_size(int size)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    return rVertScrollBar.SetVisibleSize(size);
+}
 
-    virtual int vadjustment_get_page_size() const override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        return rVertScrollBar.GetVisibleSize();
-    }
+void SalInstanceScrolledWindow::vadjustment_set_page_increment(int size)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    return rVertScrollBar.SetPageSize(size);
+}
 
-    virtual void vadjustment_set_page_size(int size) override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        return rVertScrollBar.SetVisibleSize(size);
-    }
+void SalInstanceScrolledWindow::vadjustment_set_step_increment(int size)
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    return rVertScrollBar.SetLineSize(size);
+}
 
-    virtual void vadjustment_set_page_increment(int size) override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        return rVertScrollBar.SetPageSize(size);
-    }
+void SalInstanceScrolledWindow::set_vpolicy(VclPolicyType eVPolicy)
+{
+    WinBits nWinBits = m_xScrolledWindow->GetStyle() & ~(WB_AUTOVSCROLL | WB_VSCROLL);
+    if (eVPolicy == VclPolicyType::ALWAYS)
+        nWinBits |= WB_VSCROLL;
+    else if (eVPolicy == VclPolicyType::AUTOMATIC)
+        nWinBits |= WB_AUTOVSCROLL;
+    m_xScrolledWindow->SetStyle(nWinBits);
+    m_xScrolledWindow->queue_resize();
+}
 
-    virtual void vadjustment_set_step_increment(int size) override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        return rVertScrollBar.SetLineSize(size);
-    }
+VclPolicyType SalInstanceScrolledWindow::get_vpolicy() const
+{
+    WinBits nWinBits = m_xScrolledWindow->GetStyle();
+    if (nWinBits & WB_AUTOVSCROLL)
+        return VclPolicyType::AUTOMATIC;
+    else if (nWinBits & WB_VSCROLL)
+        return VclPolicyType::ALWAYS;
+    return VclPolicyType::NEVER;
+}
 
-    virtual void set_vpolicy(VclPolicyType eVPolicy) override
-    {
-        WinBits nWinBits = m_xScrolledWindow->GetStyle() & ~(WB_AUTOVSCROLL | WB_VSCROLL);
-        if (eVPolicy == VclPolicyType::ALWAYS)
-            nWinBits |= WB_VSCROLL;
-        else if (eVPolicy == VclPolicyType::AUTOMATIC)
-            nWinBits |= WB_AUTOVSCROLL;
-        m_xScrolledWindow->SetStyle(nWinBits);
-        m_xScrolledWindow->queue_resize();
-    }
+int SalInstanceScrolledWindow::get_scroll_thickness() const
+{
+    return m_xScrolledWindow->getVertScrollBar().get_preferred_size().Width();
+}
 
-    virtual VclPolicyType get_vpolicy() const override
-    {
-        WinBits nWinBits = m_xScrolledWindow->GetStyle();
-        if (nWinBits & WB_AUTOVSCROLL)
-            return VclPolicyType::AUTOMATIC;
-        else if (nWinBits & WB_VSCROLL)
-            return VclPolicyType::ALWAYS;
-        return VclPolicyType::NEVER;
-    }
+void SalInstanceScrolledWindow::set_scroll_thickness(int nThickness)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    rHorzScrollBar.set_height_request(nThickness);
+    rVertScrollBar.set_width_request(nThickness);
+}
 
-    virtual int get_scroll_thickness() const override
-    {
-        return m_xScrolledWindow->getVertScrollBar().get_preferred_size().Width();
-    }
+void SalInstanceScrolledWindow::customize_scrollbars(const Color& rBackgroundColor,
+                                                     const Color& rShadowColor,
+                                                     const Color& rFaceColor)
+{
+    ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    customize_scrollbars(rHorzScrollBar, Color(0, 0, 0), rBackgroundColor, rShadowColor,
+                         rFaceColor);
+    customize_scrollbars(rVertScrollBar, Color(0, 0, 0), rBackgroundColor, rShadowColor,
+                         rFaceColor);
+}
 
-    virtual void set_scroll_thickness(int nThickness) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        rHorzScrollBar.set_height_request(nThickness);
-        rVertScrollBar.set_width_request(nThickness);
-    }
-
-    virtual void customize_scrollbars(const Color& rBackgroundColor, const Color& rShadowColor,
-                                      const Color& rFaceColor) override
-    {
-        ScrollBar& rHorzScrollBar = m_xScrolledWindow->getHorzScrollBar();
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        customize_scrollbars(rHorzScrollBar, Color(0, 0, 0), rBackgroundColor, rShadowColor,
-                             rFaceColor);
-        customize_scrollbars(rVertScrollBar, Color(0, 0, 0), rBackgroundColor, rShadowColor,
-                             rFaceColor);
-    }
-
-    virtual ~SalInstanceScrolledWindow() override
-    {
-        ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
-        rVertScrollBar.SetScrollHdl(m_aOrigVScrollHdl);
-    }
-};
+SalInstanceScrolledWindow::~SalInstanceScrolledWindow()
+{
+    ScrollBar& rVertScrollBar = m_xScrolledWindow->getVertScrollBar();
+    rVertScrollBar.SetScrollHdl(m_aOrigVScrollHdl);
 }
 
 IMPL_LINK(SalInstanceScrolledWindow, VscrollHdl, ScrollBar*, pScrollBar, void)
@@ -2363,6 +2484,92 @@ IMPL_LINK_NOARG(SalInstanceScrolledWindow, HscrollHdl, ScrollBar*, void)
     if (!m_bUserManagedScrolling)
         m_aOrigHScrollHdl.Call(&m_xScrolledWindow->getHorzScrollBar());
 }
+
+namespace
+{
+class SalInstanceScrollbar : public SalInstanceWidget, public virtual weld::Scrollbar
+{
+private:
+    VclPtr<ScrollBar> m_xScrollBar;
+
+    DECL_LINK(ScrollHdl, ScrollBar*, void);
+
+public:
+    SalInstanceScrollbar(ScrollBar* pScrollbar, SalInstanceBuilder* pBuilder, bool bTakeOwnership)
+        : SalInstanceWidget(pScrollbar, pBuilder, bTakeOwnership)
+        , m_xScrollBar(pScrollbar)
+    {
+        m_xScrollBar->SetScrollHdl(LINK(this, SalInstanceScrollbar, ScrollHdl));
+        m_xScrollBar->EnableDrag();
+    }
+
+    virtual void adjustment_configure(int value, int lower, int upper, int step_increment,
+                                      int page_increment, int page_size) override
+    {
+        m_xScrollBar->SetRangeMin(lower);
+        m_xScrollBar->SetRangeMax(upper);
+        m_xScrollBar->SetLineSize(step_increment);
+        m_xScrollBar->SetPageSize(page_increment);
+        m_xScrollBar->SetThumbPos(value);
+        m_xScrollBar->SetVisibleSize(page_size);
+    }
+
+    virtual int adjustment_get_value() const override { return m_xScrollBar->GetThumbPos(); }
+
+    virtual void adjustment_set_value(int value) override { m_xScrollBar->SetThumbPos(value); }
+
+    virtual int adjustment_get_upper() const override { return m_xScrollBar->GetRangeMax(); }
+
+    virtual void adjustment_set_upper(int upper) override { m_xScrollBar->SetRangeMax(upper); }
+
+    virtual int adjustment_get_lower() const override { return m_xScrollBar->GetRangeMin(); }
+
+    virtual void adjustment_set_lower(int lower) override { m_xScrollBar->SetRangeMin(lower); }
+
+    virtual int adjustment_get_page_size() const override { return m_xScrollBar->GetVisibleSize(); }
+
+    virtual void adjustment_set_page_size(int size) override { m_xScrollBar->SetVisibleSize(size); }
+
+    virtual int adjustment_get_page_increment() const override
+    {
+        return m_xScrollBar->GetPageSize();
+    }
+
+    virtual void adjustment_set_page_increment(int size) override
+    {
+        m_xScrollBar->SetPageSize(size);
+    }
+
+    virtual int adjustment_get_step_increment() const override
+    {
+        return m_xScrollBar->GetLineSize();
+    }
+
+    virtual void adjustment_set_step_increment(int size) override
+    {
+        m_xScrollBar->SetLineSize(size);
+    }
+
+    virtual ScrollType get_scroll_type() const override { return m_xScrollBar->GetType(); }
+
+    virtual int get_scroll_thickness() const override
+    {
+        if (m_xScrollBar->GetStyle() & WB_HORZ)
+            return m_xScrollBar->get_preferred_size().Height();
+        return m_xScrollBar->get_preferred_size().Width();
+    }
+
+    virtual void set_scroll_thickness(int nThickness) override
+    {
+        if (m_xScrollBar->GetStyle() & WB_HORZ)
+            m_xScrollBar->set_height_request(nThickness);
+        else
+            m_xScrollBar->set_width_request(nThickness);
+    }
+};
+}
+
+IMPL_LINK_NOARG(SalInstanceScrollbar, ScrollHdl, ScrollBar*, void) { signal_adjustment_changed(); }
 
 SalInstanceNotebook::SalInstanceNotebook(TabControl* pNotebook, SalInstanceBuilder* pBuilder,
                                          bool bTakeOwnership)
@@ -2478,6 +2685,11 @@ OUString SalInstanceNotebook::get_tab_label_text(const OString& rIdent) const
 void SalInstanceNotebook::set_tab_label_text(const OString& rIdent, const OUString& rText)
 {
     return m_xNotebook->SetPageText(m_xNotebook->GetPageId(rIdent), rText);
+}
+
+void SalInstanceNotebook::set_show_tabs(bool bShow)
+{
+    m_xNotebook->set_property("show-tabs", OUString::boolean(bShow));
 }
 
 SalInstanceNotebook::~SalInstanceNotebook()
@@ -2601,6 +2813,12 @@ public:
     virtual OUString get_tab_label_text(const OString& rIdent) const override
     {
         return m_xNotebook->GetPageText(rIdent);
+    }
+
+    virtual void set_show_tabs(bool /*bShow*/) override
+    {
+        // if someone needs this they will have to implement it in VerticalTabControl
+        assert(false && "not implemented");
     }
 
     virtual ~SalInstanceVerticalNotebook() override
@@ -2864,38 +3082,6 @@ public:
 };
 }
 
-namespace
-{
-class SalInstanceLinkButton : public SalInstanceWidget, public virtual weld::LinkButton
-{
-private:
-    VclPtr<FixedHyperlink> m_xButton;
-    Link<FixedHyperlink&, void> m_aOrigClickHdl;
-
-    DECL_LINK(ClickHdl, FixedHyperlink&, void);
-
-public:
-    SalInstanceLinkButton(FixedHyperlink* pButton, SalInstanceBuilder* pBuilder,
-                          bool bTakeOwnership)
-        : SalInstanceWidget(pButton, pBuilder, bTakeOwnership)
-        , m_xButton(pButton)
-    {
-        m_aOrigClickHdl = m_xButton->GetClickHdl();
-        m_xButton->SetClickHdl(LINK(this, SalInstanceLinkButton, ClickHdl));
-    }
-
-    virtual void set_label(const OUString& rText) override { m_xButton->SetText(rText); }
-
-    virtual OUString get_label() const override { return m_xButton->GetText(); }
-
-    virtual void set_uri(const OUString& rUri) override { m_xButton->SetURL(rUri); }
-
-    virtual OUString get_uri() const override { return m_xButton->GetURL(); }
-
-    virtual ~SalInstanceLinkButton() override { m_xButton->SetClickHdl(m_aOrigClickHdl); }
-};
-}
-
 IMPL_LINK(SalInstanceLinkButton, ClickHdl, FixedHyperlink&, rButton, void)
 {
     bool bConsumed = signal_activate_link();
@@ -2957,59 +3143,6 @@ IMPL_LINK_NOARG(SalInstanceRadioButton, ToggleHdl, ::RadioButton&, void)
     if (notify_events_disabled())
         return;
     signal_toggled();
-}
-
-namespace
-{
-class SalInstanceToggleButton : public SalInstanceButton, public virtual weld::ToggleButton
-{
-private:
-    VclPtr<PushButton> m_xToggleButton;
-
-    DECL_LINK(ToggleListener, VclWindowEvent&, void);
-
-public:
-    SalInstanceToggleButton(PushButton* pButton, SalInstanceBuilder* pBuilder, bool bTakeOwnership)
-        : SalInstanceButton(pButton, pBuilder, bTakeOwnership)
-        , m_xToggleButton(pButton)
-    {
-    }
-
-    virtual void connect_toggled(const Link<Toggleable&, void>& rLink) override
-    {
-        assert(!m_aToggleHdl.IsSet());
-        m_xToggleButton->AddEventListener(LINK(this, SalInstanceToggleButton, ToggleListener));
-        weld::ToggleButton::connect_toggled(rLink);
-    }
-
-    virtual void set_active(bool active) override
-    {
-        disable_notify_events();
-        m_xToggleButton->Check(active);
-        enable_notify_events();
-    }
-
-    virtual bool get_active() const override { return m_xToggleButton->IsChecked(); }
-
-    virtual void set_inconsistent(bool inconsistent) override
-    {
-        disable_notify_events();
-        m_xToggleButton->SetState(inconsistent ? TRISTATE_INDET : TRISTATE_FALSE);
-        enable_notify_events();
-    }
-
-    virtual bool get_inconsistent() const override
-    {
-        return m_xToggleButton->GetState() == TRISTATE_INDET;
-    }
-
-    virtual ~SalInstanceToggleButton() override
-    {
-        if (m_aToggleHdl.IsSet())
-            m_xToggleButton->RemoveEventListener(
-                LINK(this, SalInstanceToggleButton, ToggleListener));
-    }
-};
 }
 
 IMPL_LINK(SalInstanceToggleButton, ToggleListener, VclWindowEvent&, rEvent, void)
@@ -3300,30 +3433,38 @@ void SalInstanceEntry::set_overwrite_mode(bool bOn) { m_xEntry->SetInsertMode(!b
 
 bool SalInstanceEntry::get_overwrite_mode() const { return !m_xEntry->IsInsertMode(); }
 
-void SalInstanceEntry::set_message_type(weld::EntryMessageType eType)
+namespace
+{
+void set_message_type(Edit* pEntry, weld::EntryMessageType eType)
 {
     switch (eType)
     {
         case weld::EntryMessageType::Normal:
-            m_xEntry->SetForceControlBackground(false);
-            m_xEntry->SetControlForeground();
-            m_xEntry->SetControlBackground();
+            pEntry->SetForceControlBackground(false);
+            pEntry->SetControlForeground();
+            pEntry->SetControlBackground();
             break;
         case weld::EntryMessageType::Warning:
             // tdf#114603: enable setting the background to a different color;
             // relevant for GTK; see also #i75179#
-            m_xEntry->SetForceControlBackground(true);
-            m_xEntry->SetControlForeground(COL_BLACK);
-            m_xEntry->SetControlBackground(COL_YELLOW);
+            pEntry->SetForceControlBackground(true);
+            pEntry->SetControlForeground(COL_BLACK);
+            pEntry->SetControlBackground(COL_YELLOW);
             break;
         case weld::EntryMessageType::Error:
             // tdf#114603: enable setting the background to a different color;
             // relevant for GTK; see also #i75179#
-            m_xEntry->SetForceControlBackground(true);
-            m_xEntry->SetControlForeground(COL_WHITE);
-            m_xEntry->SetControlBackground(0xff6563);
+            pEntry->SetForceControlBackground(true);
+            pEntry->SetControlForeground(COL_WHITE);
+            pEntry->SetControlBackground(0xff6563);
             break;
     }
+}
+}
+
+void SalInstanceEntry::set_message_type(weld::EntryMessageType eType)
+{
+    ::set_message_type(m_xEntry, eType);
 }
 
 void SalInstanceEntry::set_font(const vcl::Font& rFont)
@@ -3478,7 +3619,7 @@ int SalInstanceTreeView::to_external_model(int col) const
 
 bool SalInstanceTreeView::IsDummyEntry(SvTreeListEntry* pEntry) const
 {
-    return m_xTreeView->GetEntryText(pEntry).trim() == "<dummy>";
+    return o3tl::trim(m_xTreeView->GetEntryText(pEntry)) == u"<dummy>";
 }
 
 SvTreeListEntry* SalInstanceTreeView::GetPlaceHolderChild(SvTreeListEntry* pEntry) const
@@ -3589,7 +3730,7 @@ void SalInstanceTreeView::InvalidateModelEntry(SvTreeListEntry* pEntry)
 void SalInstanceTreeView::do_set_toggle(SvTreeListEntry* pEntry, TriState eState, int col)
 {
     assert(col >= 0 && o3tl::make_unsigned(col) < pEntry->ItemCount());
-    // if its the placeholder to allow a blank column, replace it now
+    // if it's the placeholder to allow a blank column, replace it now
     if (pEntry->GetItem(col).GetType() != SvLBoxItemType::Button)
     {
         SvLBoxButtonData* pData = m_bTogglesAsRadio ? &m_aRadioButtonData : &m_aCheckButtonData;
@@ -4158,11 +4299,12 @@ void SalInstanceTreeView::set_sensitive(SvTreeListEntry* pEntry, bool bSensitive
         for (sal_uInt16 nCur = 0; nCur < nCount; ++nCur)
         {
             SvLBoxItem& rItem = pEntry->GetItem(nCur);
-            if (rItem.GetType() == SvLBoxItemType::String)
+            if (rItem.GetType() == SvLBoxItemType::String
+                || rItem.GetType() == SvLBoxItemType::Button
+                || rItem.GetType() == SvLBoxItemType::ContextBmp)
             {
                 rItem.Enable(bSensitive);
                 InvalidateModelEntry(pEntry);
-                break;
             }
         }
         return;
@@ -4177,16 +4319,44 @@ void SalInstanceTreeView::set_sensitive(SvTreeListEntry* pEntry, bool bSensitive
     InvalidateModelEntry(pEntry);
 }
 
+bool SalInstanceTreeView::do_get_sensitive(SvTreeListEntry* pEntry, int col)
+{
+    if (static_cast<size_t>(col) == pEntry->ItemCount())
+        return false;
+
+    assert(col >= 0 && o3tl::make_unsigned(col) < pEntry->ItemCount());
+    SvLBoxItem& rItem = pEntry->GetItem(col);
+    return rItem.isEnable();
+}
+
+bool SalInstanceTreeView::get_sensitive(SvTreeListEntry* pEntry, int col) const
+{
+    col = to_internal_model(col);
+    return do_get_sensitive(pEntry, col);
+}
+
 void SalInstanceTreeView::set_sensitive(int pos, bool bSensitive, int col)
 {
     SvTreeListEntry* pEntry = m_xTreeView->GetEntry(nullptr, pos);
     set_sensitive(pEntry, bSensitive, col);
 }
 
+bool SalInstanceTreeView::get_sensitive(int pos, int col) const
+{
+    SvTreeListEntry* pEntry = m_xTreeView->GetEntry(nullptr, pos);
+    return get_sensitive(pEntry, col);
+}
+
 void SalInstanceTreeView::set_sensitive(const weld::TreeIter& rIter, bool bSensitive, int col)
 {
     const SalInstanceTreeIter& rVclIter = static_cast<const SalInstanceTreeIter&>(rIter);
     set_sensitive(rVclIter.iter, bSensitive, col);
+}
+
+bool SalInstanceTreeView::get_sensitive(const weld::TreeIter& rIter, int col) const
+{
+    const SalInstanceTreeIter& rVclIter = static_cast<const SalInstanceTreeIter&>(rIter);
+    return get_sensitive(rVclIter.iter, col);
 }
 
 TriState SalInstanceTreeView::get_toggle(int pos, int col) const
@@ -4631,7 +4801,7 @@ void SalInstanceTreeView::expand_row(const weld::TreeIter& rIter)
 {
     assert(m_xTreeView->IsUpdateMode() && "don't expand when frozen");
     const SalInstanceTreeIter& rVclIter = static_cast<const SalInstanceTreeIter&>(rIter);
-    if (!m_xTreeView->IsExpanded(rVclIter.iter) && signal_expanding(rIter))
+    if (!m_xTreeView->IsExpanded(rVclIter.iter) && ExpandRow(rVclIter))
         m_xTreeView->Expand(rVclIter.iter);
 }
 
@@ -4657,8 +4827,6 @@ void SalInstanceTreeView::set_text(const weld::TreeIter& rIter, const OUString& 
 OUString SalInstanceTreeView::get_id(const weld::TreeIter& rIter) const
 {
     const SalInstanceTreeIter& rVclIter = static_cast<const SalInstanceTreeIter&>(rIter);
-    if (!rVclIter.iter)
-        return OUString();
     const OUString* pStr = static_cast<const OUString*>(rVclIter.iter->GetUserData());
     if (pStr)
         return *pStr;
@@ -4883,12 +5051,12 @@ void SalInstanceTreeView::set_sort_column(int nColumn)
 SvTabListBox& SalInstanceTreeView::getTreeView() { return *m_xTreeView; }
 
 bool SalInstanceTreeView::get_dest_row_at_pos(const Point& rPos, weld::TreeIter* pResult,
-                                              bool bDnDMode)
+                                              bool bDnDMode, bool bAutoScroll)
 {
     LclTabListBox* pTreeView
         = !bDnDMode ? dynamic_cast<LclTabListBox*>(m_xTreeView.get()) : nullptr;
-    SvTreeListEntry* pTarget
-        = pTreeView ? pTreeView->GetTargetAtPoint(rPos, false) : m_xTreeView->GetDropTarget(rPos);
+    SvTreeListEntry* pTarget = pTreeView ? pTreeView->GetTargetAtPoint(rPos, false, bAutoScroll)
+                                         : m_xTreeView->GetDropTarget(rPos);
 
     if (pTarget && pResult)
     {
@@ -4933,6 +5101,8 @@ void SalInstanceTreeView::set_show_expanders(bool bShow)
 {
     m_xTreeView->set_property("show-expanders", OUString::boolean(bShow));
 }
+
+bool SalInstanceTreeView::changed_by_hover() const { return m_xTreeView->IsSelectDueToHover(); }
 
 SalInstanceTreeView::~SalInstanceTreeView()
 {
@@ -5145,7 +5315,12 @@ IMPL_LINK_NOARG(SalInstanceTreeView, ExpandingHdl, SvTreeListBox*, bool)
     }
 
     // expanding
+    return ExpandRow(aIter);
+}
 
+bool SalInstanceTreeView::ExpandRow(const SalInstanceTreeIter& rIter)
+{
+    SvTreeListEntry* pEntry = rIter.iter;
     // if there's a preexisting placeholder child, required to make this
     // potentially expandable in the first place, now we remove it
     SvTreeListEntry* pPlaceHolder = GetPlaceHolderChild(pEntry);
@@ -5155,7 +5330,7 @@ IMPL_LINK_NOARG(SalInstanceTreeView, ExpandingHdl, SvTreeListBox*, bool)
         m_xTreeView->RemoveEntry(pPlaceHolder);
     }
 
-    bool bRet = signal_expanding(aIter);
+    bool bRet = signal_expanding(rIter);
 
     if (pPlaceHolder)
     {
@@ -5516,14 +5691,17 @@ IMPL_LINK(SalInstanceIconView, CommandHdl, const CommandEvent&, rEvent, bool)
     return m_aCommandHdl.Call(rEvent);
 }
 
-double SalInstanceSpinButton::toField(int nValue) const
+double SalInstanceSpinButton::toField(sal_Int64 nValue) const
 {
     return static_cast<double>(nValue) / Power10(get_digits());
 }
 
-int SalInstanceSpinButton::fromField(double fValue) const
+sal_Int64 SalInstanceSpinButton::fromField(double fValue) const
 {
-    return FRound(fValue * Power10(get_digits()));
+    auto const x = fValue * Power10(get_digits());
+    return x == double(std::numeric_limits<sal_Int64>::max())
+               ? std::numeric_limits<sal_Int64>::max()
+               : sal_Int64(std::round(x));
 }
 
 SalInstanceSpinButton::SalInstanceSpinButton(FormattedField* pButton, SalInstanceBuilder* pBuilder,
@@ -5544,17 +5722,17 @@ SalInstanceSpinButton::SalInstanceSpinButton(FormattedField* pButton, SalInstanc
         m_xButton->SetActivateHdl(LINK(this, SalInstanceSpinButton, ActivateHdl));
 }
 
-int SalInstanceSpinButton::get_value() const { return fromField(m_rFormatter.GetValue()); }
+sal_Int64 SalInstanceSpinButton::get_value() const { return fromField(m_rFormatter.GetValue()); }
 
-void SalInstanceSpinButton::set_value(int value) { m_rFormatter.SetValue(toField(value)); }
+void SalInstanceSpinButton::set_value(sal_Int64 value) { m_rFormatter.SetValue(toField(value)); }
 
-void SalInstanceSpinButton::set_range(int min, int max)
+void SalInstanceSpinButton::set_range(sal_Int64 min, sal_Int64 max)
 {
     m_rFormatter.SetMinValue(toField(min));
     m_rFormatter.SetMaxValue(toField(max));
 }
 
-void SalInstanceSpinButton::get_range(int& min, int& max) const
+void SalInstanceSpinButton::get_range(sal_Int64& min, sal_Int64& max) const
 {
     min = fromField(m_rFormatter.GetMinValue());
     max = fromField(m_rFormatter.GetMaxValue());
@@ -5710,7 +5888,8 @@ IMPL_LINK_NOARG(SalInstanceFormattedSpinButton, UpDownHdl, SpinField&, void)
 
 IMPL_LINK_NOARG(SalInstanceFormattedSpinButton, LoseFocusHdl, Control&, void)
 {
-    signal_value_changed();
+    if (!m_pFormatter)
+        signal_value_changed();
     m_aLoseFocusHdl.Call(*this);
 }
 }
@@ -5744,7 +5923,8 @@ void SalInstanceLabel::set_label_type(weld::LabelType eType)
             break;
         case weld::LabelType::Warning:
             m_xLabel->SetControlForeground();
-            m_xLabel->SetControlBackground(COL_YELLOW);
+            m_xLabel->SetControlBackground(
+                m_xLabel->GetSettings().GetStyleSettings().GetWarningColor());
             break;
         case weld::LabelType::Error:
             m_xLabel->SetControlForeground();
@@ -6147,6 +6327,31 @@ void SalInstanceDrawingArea::click(const Point& rPos)
     m_xDrawingArea->MouseButtonUp(aEvent);
 }
 
+void SalInstanceDrawingArea::dblclick(const Point& rPos)
+{
+    MouseEvent aEvent(rPos, 2, MouseEventModifiers::NONE, MOUSE_LEFT, 0);
+    m_xDrawingArea->MouseButtonDown(aEvent);
+    m_xDrawingArea->MouseButtonUp(aEvent);
+}
+
+void SalInstanceDrawingArea::mouse_up(const Point& rPos)
+{
+    MouseEvent aEvent(rPos, 0, MouseEventModifiers::NONE, MOUSE_LEFT, 0);
+    m_xDrawingArea->MouseButtonUp(aEvent);
+}
+
+void SalInstanceDrawingArea::mouse_down(const Point& rPos)
+{
+    MouseEvent aEvent(rPos, 0, MouseEventModifiers::NONE, MOUSE_LEFT, 0);
+    m_xDrawingArea->MouseButtonDown(aEvent);
+}
+
+void SalInstanceDrawingArea::mouse_move(const Point& rPos)
+{
+    MouseEvent aEvent(rPos, 0, MouseEventModifiers::NONE, MOUSE_LEFT, 0);
+    m_xDrawingArea->MouseMove(aEvent);
+}
+
 IMPL_LINK(SalInstanceDrawingArea, PaintHdl, target_and_area, aPayload, void)
 {
     m_aDrawHdl.Call(aPayload);
@@ -6363,6 +6568,14 @@ SalInstanceComboBoxWithEdit::SalInstanceComboBoxWithEdit(::ComboBox* pComboBox,
 
 bool SalInstanceComboBoxWithEdit::has_entry() const { return true; }
 
+void SalInstanceComboBoxWithEdit::call_attention_to()
+{
+    Edit* pEdit = m_xComboBox->GetSubEdit();
+    assert(pEdit);
+    m_xFlashAttention.reset(new SalFlashAttention(pEdit));
+    m_xFlashAttention->Start();
+}
+
 bool SalInstanceComboBoxWithEdit::changed_by_direct_pick() const
 {
     return m_bInSelect && !m_xComboBox->IsModifyByKeyboard() && !m_xComboBox->IsTravelSelect();
@@ -6370,18 +6583,9 @@ bool SalInstanceComboBoxWithEdit::changed_by_direct_pick() const
 
 void SalInstanceComboBoxWithEdit::set_entry_message_type(weld::EntryMessageType eType)
 {
-    switch (eType)
-    {
-        case weld::EntryMessageType::Normal:
-            m_xComboBox->SetControlForeground();
-            break;
-        case weld::EntryMessageType::Warning:
-            m_xComboBox->SetControlForeground(COL_YELLOW);
-            break;
-        case weld::EntryMessageType::Error:
-            m_xComboBox->SetControlForeground(Color(0xf0, 0, 0));
-            break;
-    }
+    Edit* pEdit = m_xComboBox->GetSubEdit();
+    assert(pEdit);
+    ::set_message_type(pEdit, eType);
 }
 
 OUString SalInstanceComboBoxWithEdit::get_active_text() const { return m_xComboBox->GetText(); }
@@ -6806,6 +7010,20 @@ void SalInstancePopover::ImplPopDown()
 
 void SalInstancePopover::popdown() { ImplPopDown(); }
 
+void SalInstancePopover::resize_to_request()
+{
+    ::resize_to_request(m_xPopover.get());
+
+    DockingManager* pDockingManager = vcl::Window::GetDockingManager();
+    if (pDockingManager->IsInPopupMode(m_xPopover.get()))
+    {
+        Size aSize = m_xPopover->get_preferred_size();
+        tools::Rectangle aRect = pDockingManager->GetPosSizePixel(m_xPopover.get());
+        pDockingManager->SetPosSizePixel(m_xPopover.get(), aRect.Left(), aRect.Top(), aSize.Width(),
+                                         aSize.Height(), PosSizeFlags::Size);
+    }
+}
+
 IMPL_LINK_NOARG(SalInstancePopover, PopupModeEndHdl, FloatingWindow*, void) { signal_closed(); }
 
 SalInstanceBuilder::SalInstanceBuilder(vcl::Window* pParent, const OUString& rUIRoot,
@@ -7139,6 +7357,12 @@ std::unique_ptr<weld::Toolbar> SalInstanceBuilder::weld_toolbar(const OString& i
     return pToolBox ? std::make_unique<SalInstanceToolbar>(pToolBox, this, false) : nullptr;
 }
 
+std::unique_ptr<weld::Scrollbar> SalInstanceBuilder::weld_scrollbar(const OString& id)
+{
+    ScrollBar* pScrollbar = m_xBuilder->get<ScrollBar>(id);
+    return pScrollbar ? std::make_unique<SalInstanceScrollbar>(pScrollbar, this, false) : nullptr;
+}
+
 std::unique_ptr<weld::SizeGroup> SalInstanceBuilder::create_size_group()
 {
     return std::make_unique<SalInstanceSizeGroup>();
@@ -7294,6 +7518,56 @@ weld::Window* SalFrame::GetFrameWeld() const
         }
     }
     return m_xFrameWeld.get();
+}
+
+Selection SalFrame::CalcDeleteSurroundingSelection(const OUString& rSurroundingText,
+                                                   sal_Int32 nCursorIndex, int nOffset, int nChars)
+{
+    Selection aInvalid(SAL_MAX_UINT32, SAL_MAX_UINT32);
+
+    if (nCursorIndex == -1)
+        return aInvalid;
+
+    if (nOffset > 0)
+    {
+        while (nOffset && nCursorIndex < rSurroundingText.getLength())
+        {
+            rSurroundingText.iterateCodePoints(&nCursorIndex, 1);
+            --nOffset;
+        }
+    }
+    else if (nOffset < 0)
+    {
+        while (nOffset && nCursorIndex > 0)
+        {
+            rSurroundingText.iterateCodePoints(&nCursorIndex, -1);
+            ++nOffset;
+        }
+    }
+
+    if (nOffset)
+    {
+        SAL_WARN("vcl",
+                 "SalFrame::CalcDeleteSurroundingSelection, unable to move to offset: " << nOffset);
+        return aInvalid;
+    }
+
+    sal_Int32 nCursorEndIndex(nCursorIndex);
+    sal_Int32 nCount(0);
+    while (nCount < nChars && nCursorEndIndex < rSurroundingText.getLength())
+    {
+        rSurroundingText.iterateCodePoints(&nCursorEndIndex, 1);
+        ++nCount;
+    }
+
+    if (nCount != nChars)
+    {
+        SAL_WARN("vcl", "SalFrame::CalcDeleteSurroundingSelection, unable to select: "
+                            << nChars << " characters");
+        return aInvalid;
+    }
+
+    return Selection(nCursorIndex, nCursorEndIndex);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

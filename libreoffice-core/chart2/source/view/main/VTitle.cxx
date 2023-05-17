@@ -21,17 +21,17 @@
 #include <CommonConverters.hxx>
 #include <ShapeFactory.hxx>
 #include <com/sun/star/chart2/XTitle.hpp>
-#include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
-VTitle::VTitle( const uno::Reference< XTitle > & xTitle )
-                : m_xTitle(xTitle)
+VTitle::VTitle( uno::Reference< XTitle > xTitle )
+                : m_xTitle(std::move(xTitle))
                 , m_fRotationAngleDegree(0.0)
                 , m_nXPos(0)
                 , m_nYPos(0)
@@ -43,12 +43,10 @@ VTitle::~VTitle()
 }
 
 void VTitle::init(
-              const uno::Reference< drawing::XShapes >& xTargetPage
-            , const uno::Reference< lang::XMultiServiceFactory >& xFactory
+              const rtl::Reference<SvxShapeGroupAnyD>& xTargetPage
             , const OUString& rCID )
 {
     m_xTarget = xTargetPage;
-    m_xShapeFactory = xFactory;
     m_aCID = rCID;
 }
 
@@ -68,15 +66,12 @@ awt::Size VTitle::getUnrotatedSize() const //size before rotation
 awt::Size VTitle::getFinalSize() const //size after rotation
 {
     return ShapeFactory::getSizeAfterRotation(
-         m_xShape, m_fRotationAngleDegree );
+         *m_xShape, m_fRotationAngleDegree );
 }
 
 void VTitle::changePosition( const awt::Point& rPos )
 {
     if(!m_xShape.is())
-        return;
-    uno::Reference< beans::XPropertySet > xShapeProp( m_xShape, uno::UNO_QUERY );
-    if(!xShapeProp.is())
         return;
     try
     {
@@ -88,7 +83,7 @@ void VTitle::changePosition( const awt::Point& rPos )
         ::basegfx::B2DHomMatrix aM;
         aM.rotate( basegfx::deg2rad(-m_fRotationAngleDegree) );//#i78696#->#i80521#
         aM.translate( m_nXPos, m_nYPos);
-        xShapeProp->setPropertyValue( "Transformation", uno::Any( B2DHomMatrixToHomogenMatrix3(aM) ) );
+        m_xShape->SvxShape::setPropertyValue( "Transformation", uno::Any( B2DHomMatrixToHomogenMatrix3(aM) ) );
     }
     catch( const uno::Exception& )
     {
@@ -155,8 +150,7 @@ void VTitle::createShapes(
     else
         nTextMaxWidth = rTextMaxWidth.Height;
 
-    ShapeFactory* pShapeFactory = ShapeFactory::getOrCreateShapeFactory(m_xShapeFactory);
-    m_xShape =pShapeFactory->createText( m_xTarget, rReferenceSize, rPos, aStringList, xTitleProperties,
+    m_xShape = ShapeFactory::createText( m_xTarget, rReferenceSize, rPos, aStringList, xTitleProperties,
                                     m_fRotationAngleDegree, m_aCID, nTextMaxWidth );
 }
 

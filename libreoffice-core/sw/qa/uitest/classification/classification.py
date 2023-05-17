@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -39,14 +41,9 @@ from libreoffice.uno.propertyvalue import mkPropertyValues
 class classification(UITestCase):
     def test_document_classification_dialog(self):
         with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             with self.ui_test.execute_dialog_through_command(".uno:ClassificationDialog") as xDialog:
-                classificationEditWindow = xDialog.getChild("classificationEditWindow")
-                recentlyUsedCB = xDialog.getChild("recentlyUsedCB")
                 classificationCB = xDialog.getChild("classificationCB")
                 internationalClassificationCB = xDialog.getChild("internationalClassificationCB")
-                intellectualPropertyPartEntry = xDialog.getChild("intellectualPropertyPartEntry")
-                intellectualPropertyPartAddButton = xDialog.getChild("intellectualPropertyPartAddButton")
 
                 select_by_text(classificationCB, "Confidential")
                 #verify International is set too
@@ -77,12 +74,8 @@ class classification(UITestCase):
 
             #do the same for Paragraph classification
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphClassificationDialog") as xDialog:
-                classificationEditWindow = xDialog.getChild("classificationEditWindow")
-                recentlyUsedCB = xDialog.getChild("recentlyUsedCB")
                 classificationCB = xDialog.getChild("classificationCB")
                 internationalClassificationCB = xDialog.getChild("internationalClassificationCB")
-                intellectualPropertyPartEntry = xDialog.getChild("intellectualPropertyPartEntry")
-                intellectualPropertyPartAddButton = xDialog.getChild("intellectualPropertyPartAddButton")
 
                 select_by_text(classificationCB, "Confidential")
                 #verify International is set too
@@ -97,15 +90,10 @@ class classification(UITestCase):
 
     def test_paragraph_classification_dialog(self):
         with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             #+ new file and do it only for Paragraph classification (no watermark!)
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphClassificationDialog") as xDialog:
-                classificationEditWindow = xDialog.getChild("classificationEditWindow")
-                recentlyUsedCB = xDialog.getChild("recentlyUsedCB")
                 classificationCB = xDialog.getChild("classificationCB")
                 internationalClassificationCB = xDialog.getChild("internationalClassificationCB")
-                intellectualPropertyPartEntry = xDialog.getChild("intellectualPropertyPartEntry")
-                intellectualPropertyPartAddButton = xDialog.getChild("intellectualPropertyPartAddButton")
 
                 select_by_text(classificationCB, "Confidential")
                 #verify International is set too
@@ -121,11 +109,8 @@ class classification(UITestCase):
 
     def test_paragraph_classification_dialog_text(self):
         with self.ui_test.create_doc_in_start_center("writer") as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             #+ new file and do it only for Paragraph classification (no watermark!)
             with self.ui_test.execute_dialog_through_command(".uno:ParagraphClassificationDialog") as xDialog:
-                classificationEditWindow = xDialog.getChild("classificationEditWindow")
-                recentlyUsedCB = xDialog.getChild("recentlyUsedCB")
                 classificationCB = xDialog.getChild("classificationCB")
                 internationalClassificationCB = xDialog.getChild("internationalClassificationCB")
                 intellectualPropertyPartEntry = xDialog.getChild("intellectualPropertyPartEntry")

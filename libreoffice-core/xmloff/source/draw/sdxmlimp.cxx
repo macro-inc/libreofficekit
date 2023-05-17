@@ -333,6 +333,9 @@ void SAL_CALL SdXMLImport::setTargetDocument( const uno::Reference< lang::XCompo
     if(xFamSup.is())
         mxDocStyleFamilies = xFamSup->getStyleFamilies();
 
+    if (!mbLoadDoc)
+        return;
+
     // prepare access to master pages
     uno::Reference < drawing::XMasterPagesSupplier > xMasterPagesSupplier(GetModel(), uno::UNO_QUERY);
     if(xMasterPagesSupplier.is())
@@ -372,6 +375,16 @@ void SAL_CALL SdXMLImport::initialize( const uno::Sequence< uno::Any >& aArgumen
 {
     SvXMLImport::initialize( aArguments );
 
+    OUString const sOrganizerMode("OrganizerMode");
+    bool bStyleOnly(false);
+
+    css::beans::PropertyValue aPropValue;
+    if (aArguments.hasElements() && (aArguments[0] >>= aPropValue) && aPropValue.Name == sOrganizerMode)
+    {
+        aPropValue.Value >>= bStyleOnly;
+        mbLoadDoc = !bStyleOnly;
+    }
+
     uno::Reference< beans::XPropertySet > xInfoSet( getImportInfo() );
     if( !xInfoSet.is() )
         return;
@@ -384,11 +397,8 @@ void SAL_CALL SdXMLImport::initialize( const uno::Sequence< uno::Any >& aArgumen
     if( xInfoSetInfo->hasPropertyByName( gsPreview ) )
         xInfoSet->getPropertyValue( gsPreview ) >>= mbPreview;
 
-    OUString const sOrganizerMode(
-        "OrganizerMode");
     if (xInfoSetInfo->hasPropertyByName(sOrganizerMode))
     {
-        bool bStyleOnly(false);
         if (xInfoSet->getPropertyValue(sOrganizerMode) >>= bStyleOnly)
         {
             mbLoadDoc = !bStyleOnly;
@@ -418,6 +428,11 @@ SvXMLImportContext *SdXMLImport::CreateFastContext( sal_Int32 nElement,
             // flat OpenDocument file format
             pContext = new SdXMLFlatDocContext_Impl( *this, xDPS->getDocumentProperties());
         }
+        break;
+        case XML_ELEMENT( OFFICE, XML_STYLES ):
+            // internal xml file for built in styles
+            if (!mbLoadDoc)
+                pContext = CreateStylesContext();
         break;
     }
     return pContext;
@@ -510,7 +525,7 @@ void SdXMLImport::SetViewSettings(const css::uno::Sequence<css::beans::PropertyV
 
     try
     {
-        xPropSet->setPropertyValue("VisibleArea", uno::makeAny( aVisArea )  );
+        xPropSet->setPropertyValue("VisibleArea", uno::Any( aVisArea )  );
     }
     catch(const css::uno::Exception&)
     {
@@ -656,7 +671,7 @@ void SdXMLImport::NotifyContainsEmbeddedFont()
     {
         uno::Reference< beans::XPropertySet > xProps( xFac->createInstance("com.sun.star.document.Settings"), uno::UNO_QUERY );
         if( xProps.is() )
-            xProps->setPropertyValue("EmbedFonts", uno::makeAny( true ) );
+            xProps->setPropertyValue("EmbedFonts", uno::Any( true ) );
     }
 }
 

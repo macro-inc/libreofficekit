@@ -18,6 +18,10 @@
 
 package installer::scriptitems;
 
+use strict;
+no strict 'refs';
+use warnings;
+
 use installer::converter;
 use installer::exiter;
 use installer::globals;
@@ -660,8 +664,8 @@ sub replace_setup_variables
             chomp;
             if (/^s*(\S+)=(\S+)$/)
             {
-                $key = $1;
-                $val = $2;
+                my $key = $1;
+                my $val = $2;
                 if ($key eq "channel")
                 {
                     $updatechannel = $val;
@@ -700,7 +704,7 @@ sub replace_setup_variables
 
 sub replace_userdir_variable
 {
-    my ($itemsarrayref) = @_;
+    my ($itemsarrayref, $allvariableshashref) = @_;
 
     my $userdir = "";
     if ( $allvariableshashref->{'LOCALUSERDIR'} ) { $userdir = $allvariableshashref->{'LOCALUSERDIR'}; }
@@ -1571,6 +1575,97 @@ sub optimize_list
     return join(",", sort keys %tmpHash);
 }
 
+###############################################################################
+# Add a directory with CREATE flag; save styles for already added directories
+###############################################################################
+
+sub add_directory_with_create_flag_hash
+{
+    my ($alldirectoryhash, $directoryname, $specificlanguage, $gid, $styles, $modules) = @_;
+    if ( ! $directoryname ) { installer::exiter::exit_program("No directory name (HostName) set for specified language in gid $gid", "add_directory_with_create_flag_hash"); }
+    my $origdirectoryname = $directoryname;
+    my $newdirincluded = 0;
+    if ( $styles =~ /\bCREATE\b/ )
+    {
+        if ( ! $modules ) { installer::exiter::exit_program("No assigned modules found for directory $directoryname", "add_directory_with_create_flag_hash"); }
+        if (!(exists($alldirectoryhash->{$directoryname})))
+        {
+            my %directoryhash = ();
+            $directoryhash{'HostName'} = $directoryname;
+            $directoryhash{'specificlanguage'} = $specificlanguage;
+            $directoryhash{'Dir'} = $gid;
+            $directoryhash{'Styles'} = $styles;
+
+            # saving also the modules
+            $directoryhash{'modules'} = $modules;
+
+            $alldirectoryhash->{$directoryname} = \%directoryhash;
+            $newdirincluded = 1;
+
+            # Problem: The $destinationpath can be share/registry/schema/org/openoffice
+            # but not all directories contain files and will be added to this list.
+            # Therefore the path has to be analyzed.
+
+            while ( $directoryname =~ /(^.*\S)\Q$installer::globals::separator\E(\S.*?)\s*$/ )  # as long as the path contains slashes
+            {
+                $directoryname = $1;
+
+                if (!(exists($alldirectoryhash->{$directoryname})))
+                {
+                    my %directoryhash = ();
+
+                    $directoryhash{'HostName'} = $directoryname;
+                    $directoryhash{'specificlanguage'} = $specificlanguage;
+                    $directoryhash{'Dir'} = $gid;
+                    if ( ! $installer::globals::iswindowsbuild ) { $directoryhash{'Styles'} = "(CREATE)"; } # Exception for Windows?
+
+                    # saving also the modules
+                    $directoryhash{'modules'} = $modules;
+
+                    $alldirectoryhash->{$directoryname} = \%directoryhash;
+                }
+                else
+                {
+                    # Adding the modules to the module list!
+                    $alldirectoryhash->{$directoryname}->{'modules'} = $alldirectoryhash->{$directoryname}->{'modules'} . "," . $modules;
+                }
+            }
+        }
+        else
+        {
+            # Adding the modules to the module list!
+            $alldirectoryhash->{$directoryname}->{'modules'} = $alldirectoryhash->{$directoryname}->{'modules'} . "," . $modules;
+
+            while ( $directoryname =~ /(^.*\S)\Q$installer::globals::separator\E(\S.*?)\s*$/ )  # as long as the path contains slashes
+            {
+                $directoryname = $1;
+                # Adding the modules to the module list!
+                $alldirectoryhash->{$directoryname}->{'modules'} = $alldirectoryhash->{$directoryname}->{'modules'} . "," . $modules;
+            }
+        }
+    }
+
+    # Saving the styles for already added directories in function collect_directories_from_filesarray
+
+    if (( ! $newdirincluded ) && ( $styles ne "" ))
+    {
+        $styles =~ s/\bWORKSTATION\b//;
+        $styles =~ s/\bCREATE\b//;
+
+        if (( ! ( $styles =~ /^\s*\(\s*\)\s*$/ )) && ( ! ( $styles =~ /^\s*\(\s*\,\s*\)\s*$/ )) && ( ! ( $styles =~ /^\s*$/ ))) # checking, if there are styles left
+        {
+            $directoryname = $origdirectoryname;
+
+            if ( exists($alldirectoryhash->{$directoryname}) )
+            {
+                $alldirectoryhash->{$directoryname}->{'Styles'} = $styles;
+            }
+        }
+    }
+
+    return $alldirectoryhash;
+}
+
 #######################################################################
 # Collecting all directories needed for the epm list
 # 1. Looking for all destination paths in the files array
@@ -1584,22 +1679,29 @@ sub optimize_list
 sub collect_directories_from_filesarray
 {
     my ($filesarrayref, $unixlinksarrayref) = @_;
-    my @allfiles;
-    push @allfiles, @{$filesarrayref};
-    push @allfiles, @{$unixlinksarrayref};
 
-    my @alldirectories = ();
     my %alldirectoryhash = ();
-
-    my $predefinedprogdir_added = 0;
+    my @filteredfilesarray = (); # without empty directories
+    foreach my $onefile (@{$filesarrayref})
+    {
+        # The "file" can actually be an empty directory added e.g. by gb_Package_add_empty_directory.
+        # TODO/LATER: it would be better if gb_Package_add_empty_directory added empty directories to
+        # "directories with CREATE flag" instead of a filelist.
+        if (-d $onefile->{'sourcepath'})
+        {
+            # Do the same as collect_directories_with_create_flag_from_directoryarray does
+            %alldirectoryhash = %{add_directory_with_create_flag_hash(\%alldirectoryhash, $onefile->{'destination'}, $onefile->{'specificlanguage'}, $onefile->{'gid'}, "(CREATE)", $onefile->{'modules'})};
+        }
+        else { push(@filteredfilesarray, $onefile); }
+    }
 
     # Preparing this already as hash, although the only needed value at the moment is the HostName
     # But also adding: "specificlanguage" and "Dir" (for instance gid_Dir_Program)
 
-    for ( my $i = 0; $i <= $#allfiles; $i++ )
+    foreach my $onefile (@filteredfilesarray, @{$unixlinksarrayref})
     {
-        my $onefile = $allfiles[$i];
         my $destinationpath = $onefile->{'destination'};
+
         installer::pathanalyzer::get_path_from_fullqualifiedname(\$destinationpath);
         $destinationpath =~ s/\Q$installer::globals::separator\E\s*$//;     # removing ending slashes or backslashes
 
@@ -1613,8 +1715,6 @@ sub collect_directories_from_filesarray
                 $directoryhash{'Dir'} = $onefile->{'Dir'};
                 $directoryhash{'modules'} = $onefile->{'modules'}; # NEW, saving modules
                 $directoryhash{'gid'} = $onefile->{'gid'};
-
-                $predefinedprogdir_added ||= $onefile->{'Dir'} eq "PREDEFINED_PROGDIR";
 
                 $alldirectoryhash{$destinationpath} = \%directoryhash;
             }
@@ -1635,28 +1735,14 @@ sub collect_directories_from_filesarray
         } while ($destinationpath =~ s/(^.*\S)\Q$installer::globals::separator\E(\S.*?)\s*$/$1/);  # as long as the path contains slashes
     }
 
-    # if there is no file in the root directory PREDEFINED_PROGDIR, it has to be included into the directory array now
-    # HostName= specificlanguage=   Dir=PREDEFINED_PROGDIR
-
-    if (! $predefinedprogdir_added )
-    {
-        my %directoryhash = ();
-        $directoryhash{'HostName'} = "";
-        $directoryhash{'specificlanguage'} = "";
-        $directoryhash{'modules'} = ""; # ToDo?
-        $directoryhash{'Dir'} = "PREDEFINED_PROGDIR";
-
-        push(@alldirectories, \%directoryhash);
-    }
-
     # Creating directory array
-    foreach my $destdir ( sort keys %alldirectoryhash )
+    foreach my $destdir ( keys %alldirectoryhash )
     {
         $alldirectoryhash{$destdir}->{'modules'} = optimize_list($alldirectoryhash{$destdir}->{'modules'});
-        push(@alldirectories, $alldirectoryhash{$destdir});
     }
 
-    return (\@alldirectories, \%alldirectoryhash);
+    @_[0] = \@filteredfilesarray; # out argument
+    return \%alldirectoryhash;
 }
 
 ##################################
@@ -1667,108 +1753,11 @@ sub collect_directories_with_create_flag_from_directoryarray
 {
     my ($directoryarrayref, $alldirectoryhash) = @_;
 
-    my $alreadyincluded = 0;
     my @alldirectories = ();
 
-    for ( my $i = 0; $i <= $#{$directoryarrayref}; $i++ )
+    foreach my $onedir (@{$directoryarrayref})
     {
-        my $onedir = ${$directoryarrayref}[$i];
-        my $styles = "";
-        $newdirincluded = 0;
-
-        if ( $onedir->{'Styles'} ) { $styles = $onedir->{'Styles'}; }
-
-        if ( $styles =~ /\bCREATE\b/ )
-        {
-            my $directoryname = "";
-
-            if ( $onedir->{'HostName'} ) { $directoryname = $onedir->{'HostName'}; }
-            else { installer::exiter::exit_program("ERROR: No directory name (HostName) set for specified language in gid $onedir->{'gid'}", "collect_directories_with_create_flag_from_directoryarray"); }
-
-            $alreadyincluded = 0;
-            if ( exists($alldirectoryhash->{$directoryname}) ) { $alreadyincluded = 1; }
-
-            if (!($alreadyincluded))
-            {
-                my %directoryhash = ();
-                $directoryhash{'HostName'} = $directoryname;
-                $directoryhash{'specificlanguage'} = $onedir->{'specificlanguage'};
-                $directoryhash{'Dir'} = $onedir->{'gid'};
-                $directoryhash{'Styles'} = $onedir->{'Styles'};
-
-                # saving also the modules
-                if ( ! $onedir->{'modules'} ) { installer::exiter::exit_program("ERROR: No assigned modules found for directory $onedir->{'gid'}", "collect_directories_with_create_flag_from_directoryarray"); }
-                $directoryhash{'modules'} = $onedir->{'modules'};
-
-                $alldirectoryhash->{$directoryname} = \%directoryhash;
-                $newdirincluded = 1;
-
-                # Problem: The $destinationpath can be share/registry/schema/org/openoffice
-                # but not all directories contain files and will be added to this list.
-                # Therefore the path has to be analyzed.
-
-                while ( $directoryname =~ /(^.*\S)\Q$installer::globals::separator\E(\S.*?)\s*$/ )  # as long as the path contains slashes
-                {
-                    $directoryname = $1;
-
-                    $alreadyincluded = 0;
-                    if ( exists($alldirectoryhash->{$directoryname}) ) { $alreadyincluded = 1; }
-
-                    if (!($alreadyincluded))
-                    {
-                        my %directoryhash = ();
-
-                        $directoryhash{'HostName'} = $directoryname;
-                        $directoryhash{'specificlanguage'} = $onedir->{'specificlanguage'};
-                        $directoryhash{'Dir'} = $onedir->{'gid'};
-                        if ( ! $installer::globals::iswindowsbuild ) { $directoryhash{'Styles'} = "(CREATE)"; } # Exception for Windows?
-
-                        # saving also the modules
-                        $directoryhash{'modules'} = $onedir->{'modules'};
-
-                        $alldirectoryhash->{$directoryname} = \%directoryhash;
-                        $newdirincluded = 1;
-                    }
-                    else
-                    {
-                        # Adding the modules to the module list!
-                        $alldirectoryhash->{$directoryname}->{'modules'} = $alldirectoryhash->{$directoryname}->{'modules'} . "," . $onedir->{'modules'};
-                    }
-                }
-            }
-            else
-            {
-                # Adding the modules to the module list!
-                $alldirectoryhash->{$directoryname}->{'modules'} = $alldirectoryhash->{$directoryname}->{'modules'} . "," . $onedir->{'modules'};
-
-                while ( $directoryname =~ /(^.*\S)\Q$installer::globals::separator\E(\S.*?)\s*$/ )  # as long as the path contains slashes
-                {
-                    $directoryname = $1;
-                    # Adding the modules to the module list!
-                    $alldirectoryhash->{$directoryname}->{'modules'} = $alldirectoryhash->{$directoryname}->{'modules'} . "," . $onedir->{'modules'};
-                }
-            }
-        }
-
-        # Saving the styles for already added directories in function collect_directories_from_filesarray
-
-        if (( ! $newdirincluded ) && ( $styles ne "" ))
-        {
-            $styles =~ s/\bWORKSTATION\b//;
-            $styles =~ s/\bCREATE\b//;
-
-            if (( ! ( $styles =~ /^\s*\(\s*\)\s*$/ )) && ( ! ( $styles =~ /^\s*\(\s*\,\s*\)\s*$/ )) && ( ! ( $styles =~ /^\s*$/ ))) # checking, if there are styles left
-            {
-                my $directoryname = "";
-                if ( $onedir->{'HostName'} ) { $directoryname = $onedir->{'HostName'}; }
-                else { installer::exiter::exit_program("ERROR: No directory name (HostName) set for specified language in gid $onedir->{'gid'}", "collect_directories_with_create_flag_from_directoryarray"); }
-
-                if ( exists($alldirectoryhash->{$directoryname}) )
-                {
-                    $alldirectoryhash->{$directoryname}->{'Styles'} = $styles;
-                }
-            }
-        }
+        $alldirectoryhash = add_directory_with_create_flag_hash($alldirectoryhash, $onedir->{'HostName'}, $onedir->{'specificlanguage'}, $onedir->{'gid'}, $onedir->{'Styles'}, $onedir->{'modules'});
     }
 
     # Creating directory array
@@ -1778,7 +1767,7 @@ sub collect_directories_with_create_flag_from_directoryarray
         push(@alldirectories, $alldirectoryhash->{$destdir});
     }
 
-    return (\@alldirectories, \%alldirectoryhash);
+    return \@alldirectories;
 }
 
 #################################################
@@ -1849,7 +1838,7 @@ sub get_destination_link_path_for_links
             for ( my $j = 0; $j <= $#{$linksarrayref}; $j++ )
             {
                 my $destlink = ${$linksarrayref}[$j];
-                $shortcutgid = $destlink->{'gid'};
+                my $shortcutgid = $destlink->{'gid'};
 
                 if ( $shortcutgid eq $shortcutid )
                 {
@@ -2200,7 +2189,7 @@ sub collect_all_parent_feature
             if ( $found_root_module ) { installer::exiter::exit_program("ERROR: Only one module without ParentID or with empty ParentID allowed ($installer::globals::rootmodulegid, $onefeature->{'gid'}).", "collect_all_parent_feature"); }
             $installer::globals::rootmodulegid = $onefeature->{'gid'};
             $found_root_module = 1;
-            $infoline = "Setting Root Module: $installer::globals::rootmodulegid\n";
+            my $infoline = "Setting Root Module: $installer::globals::rootmodulegid\n";
             push( @installer::globals::globallogfileinfo, $infoline);
         }
 
@@ -2392,7 +2381,7 @@ sub _key_in_a_is_also_key_in_b
         if ( ! exists($hashref_b->{$key}) )
         {
             print "*****\n";
-            foreach $keyb ( keys %{$hashref_b} ) { print "$keyb : $hashref_b->{$keyb}\n"; }
+            foreach my $keyb ( keys %{$hashref_b} ) { print "$keyb : $hashref_b->{$keyb}\n"; }
             print "*****\n";
             $returnvalue = 0;
         }

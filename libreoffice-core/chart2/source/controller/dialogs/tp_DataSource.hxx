@@ -18,6 +18,9 @@
  */
 #pragma once
 
+#include <DataSeries.hxx>
+#include <ChartType.hxx>
+
 #include <vcl/wizardmachine.hxx>
 
 #include <RangeSelectionListener.hxx>
@@ -29,8 +32,9 @@ namespace chart { class TabPageNotifiable; }
 
 namespace chart
 {
-
+class ChartType;
 class ChartTypeTemplateProvider;
+class DataSeries;
 class DialogModel;
 
 class SeriesEntry
@@ -39,10 +43,10 @@ public:
     OUString m_sRole;
 
     /// the corresponding data series
-    css::uno::Reference< css::chart2::XDataSeries > m_xDataSeries;
+    rtl::Reference< ::chart::DataSeries > m_xDataSeries;
 
     /// the chart type that contains the series (via XDataSeriesContainer)
-    css::uno::Reference< css::chart2::XChartType > m_xChartType;
+    rtl::Reference< ::chart::ChartType > m_xChartType;
 };
 
 class DataSourceTabPage final :

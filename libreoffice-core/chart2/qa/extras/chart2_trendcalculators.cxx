@@ -14,22 +14,20 @@
 
 
 // Define the index of sheets in the test document
-#define SHEET_POTENTIAL1          0
-#define SHEET_POTENTIAL2          ( SHEET_POTENTIAL1 + 1)
-#define SHEET_POTENTIAL_LAST      ( SHEET_POTENTIAL2 )
-
-#define SHEET_LINEAR1             ( SHEET_POTENTIAL_LAST + 1 )
-#define SHEET_LINEAR_LAST         ( SHEET_LINEAR1 )
-
-#define SHEET_POLYNOMIAL1         ( SHEET_LINEAR_LAST + 1 )
-#define SHEET_POLYNOMIAL_LAST     ( SHEET_POLYNOMIAL1 )
-
-#define SHEET_EXPONENTIAL1        ( SHEET_POLYNOMIAL_LAST + 1 )
-#define SHEET_EXPONENTIAL2        ( SHEET_EXPONENTIAL1 + 1 )
+constexpr sal_Int32 SHEET_POTENTIAL1 = 0;
+constexpr sal_Int32 SHEET_POTENTIAL2 = 1;
+constexpr sal_Int32 SHEET_LINEAR1 = 2;
+constexpr sal_Int32 SHEET_POLYNOMIAL1 = 3;
+constexpr sal_Int32 SHEET_EXPONENTIAL1 = 4;
+constexpr sal_Int32 SHEET_EXPONENTIAL2 = 5;
 
 class Chart2TrendCalculators : public ChartTest
 {
 public:
+    Chart2TrendCalculators()
+        : ChartTest("/chart2/qa/extras/data/")
+    {}
+
     void setUp() override;
     void tearDown() override;
 
@@ -50,7 +48,6 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-
     Reference<chart2::XRegressionCurve> m_xCurve;
     Reference< chart2::XRegressionCurveCalculator > m_xRegressionCurveCalculator;
 
@@ -58,13 +55,12 @@ private:
     void checkCalculator(
         const Sequence< double >& xValues, const Sequence< double >& yValues,
         const OUString& sExpectedFormula );
-
 };
 
 void Chart2TrendCalculators::setUp()
 {
     ChartTest::setUp();
-    load(u"/chart2/qa/extras/data/ods/", "trend_calculators.ods");
+    loadFromURL(u"ods/trend_calculators.ods");
 }
 
 void Chart2TrendCalculators::tearDown()

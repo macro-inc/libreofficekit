@@ -31,9 +31,8 @@
 #include <com/sun/star/sdbc/XRowSetListener.hpp>
 #include <com/sun/star/frame/XStatusListener.hpp>
 #include <comphelper/uno3.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
-#include <cppuhelper/queryinterface.hxx>
+#include <comphelper/interfacecontainer3.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 #include <cppuhelper/weak.hxx>
 
 namespace dbaui
@@ -56,7 +55,7 @@ namespace dbaui
     class SbaXStatusMultiplexer
             :public OSbaWeakSubObject
             ,public css::frame::XStatusListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::frame::XStatusListener>
     {
     public:
         SbaXStatusMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -81,7 +80,7 @@ namespace dbaui
     class SbaXLoadMultiplexer
             :public OSbaWeakSubObject
             ,public css::form::XLoadListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::form::XLoadListener>
     {
     public:
         SbaXLoadMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -105,7 +104,7 @@ namespace dbaui
     class SbaXParameterMultiplexer
             :public OSbaWeakSubObject
             ,public css::form::XDatabaseParameterListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::form::XDatabaseParameterListener>
     {
     public:
         SbaXParameterMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -124,7 +123,7 @@ namespace dbaui
     class SbaXSubmitMultiplexer
             :public OSbaWeakSubObject
             ,public css::form::XSubmitListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::form::XSubmitListener>
     {
     public:
         SbaXSubmitMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -143,7 +142,7 @@ namespace dbaui
     class SbaXResetMultiplexer
             :public OSbaWeakSubObject
             ,public css::form::XResetListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::form::XResetListener>
     {
     public:
         SbaXResetMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -163,7 +162,7 @@ namespace dbaui
     class SbaXRowSetMultiplexer
             :public OSbaWeakSubObject
             ,public css::sdbc::XRowSetListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::sdbc::XRowSetListener>
     {
     public:
         SbaXRowSetMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -184,7 +183,7 @@ namespace dbaui
     class SbaXRowSetApproveMultiplexer
             :public OSbaWeakSubObject
             ,public css::sdb::XRowSetApproveListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::sdb::XRowSetApproveListener>
     {
     public:
         SbaXRowSetApproveMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -205,7 +204,7 @@ namespace dbaui
     class SbaXSQLErrorMultiplexer
             :public OSbaWeakSubObject
             ,public css::sdb::XSQLErrorListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::sdb::XSQLErrorListener>
     {
     public:
         SbaXSQLErrorMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);
@@ -225,7 +224,7 @@ namespace dbaui
             :public OSbaWeakSubObject
             ,public css::beans::XPropertyChangeListener
     {
-        typedef ::comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString >  ListenerContainerMap;
+        typedef ::comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, OUString>  ListenerContainerMap;
         ListenerContainerMap    m_aListeners;
 
     public:
@@ -238,18 +237,18 @@ namespace dbaui
 
         virtual void SAL_CALL propertyChange(const css::beans::PropertyChangeEvent& e) override;
 
-        void addInterface(const OUString& rName, const css::uno::Reference< css::uno::XInterface >& rListener);
-        void removeInterface(const OUString& rName, const css::uno::Reference< css::uno::XInterface >& rListener);
+        void addInterface(const OUString& rName, const css::uno::Reference< css::beans::XPropertyChangeListener >& rListener);
+        void removeInterface(const OUString& rName, const css::uno::Reference< css::beans::XPropertyChangeListener >& rListener);
 
         void disposeAndClear();
 
         sal_Int32 getOverallLen() const;
 
-        ::comphelper::OInterfaceContainerHelper2* getContainer(const OUString& rName)
+        ::comphelper::OInterfaceContainerHelper3<css::beans::XPropertyChangeListener>* getContainer(const OUString& rName)
             { return m_aListeners.getContainer(rName); }
 
     private:
-        void Notify(::comphelper::OInterfaceContainerHelper2& rListeners, const css::beans::PropertyChangeEvent& e);
+        void Notify(::comphelper::OInterfaceContainerHelper3<css::beans::XPropertyChangeListener>& rListeners, const css::beans::PropertyChangeEvent& e);
     };
 
     // css::beans::XVetoableChangeListener
@@ -257,7 +256,7 @@ namespace dbaui
             :public OSbaWeakSubObject
             ,public css::beans::XVetoableChangeListener
     {
-        typedef ::comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString >  ListenerContainerMap;
+        typedef ::comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XVetoableChangeListener, OUString >  ListenerContainerMap;
         ListenerContainerMap    m_aListeners;
 
     public:
@@ -270,25 +269,22 @@ namespace dbaui
 
         virtual void SAL_CALL vetoableChange(const css::beans::PropertyChangeEvent& e) override;
 
-        void addInterface(const OUString& rName, const css::uno::Reference< css::uno::XInterface >& rListener);
-        void removeInterface(const OUString& rName, const css::uno::Reference< css::uno::XInterface >& rListener);
+        void addInterface(const OUString& rName, const css::uno::Reference< css::beans::XVetoableChangeListener >& rListener);
+        void removeInterface(const OUString& rName, const css::uno::Reference< css::beans::XVetoableChangeListener >& rListener);
 
         void disposeAndClear();
 
         sal_Int32 getOverallLen() const;
 
-        ::comphelper::OInterfaceContainerHelper2* getContainer(const OUString& rName)
-            { return m_aListeners.getContainer(rName); }
-
     private:
-        void Notify(::comphelper::OInterfaceContainerHelper2& rListeners, const css::beans::PropertyChangeEvent& e);
+        void Notify(::comphelper::OInterfaceContainerHelper3<css::beans::XVetoableChangeListener>& rListeners, const css::beans::PropertyChangeEvent& e);
     };
 
     // css::beans::XPropertiesChangeListener
     class SbaXPropertiesChangeMultiplexer
             :public OSbaWeakSubObject
             ,public css::beans::XPropertiesChangeListener
-            ,public ::comphelper::OInterfaceContainerHelper2
+            ,public ::comphelper::OInterfaceContainerHelper3<css::beans::XPropertiesChangeListener>
     {
     public:
         SbaXPropertiesChangeMultiplexer(::cppu::OWeakObject& rSource, ::osl::Mutex& rMutex);

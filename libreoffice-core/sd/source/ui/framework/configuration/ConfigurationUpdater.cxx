@@ -27,8 +27,9 @@
 
 #include <com/sun/star/drawing/framework/XControllerManager.hpp>
 #include <comphelper/scopeguard.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
+#include <utility>
 
 
 using namespace ::com::sun::star;
@@ -62,17 +63,17 @@ private:
 //===== ConfigurationUpdater ==================================================
 
 ConfigurationUpdater::ConfigurationUpdater (
-    const std::shared_ptr<ConfigurationControllerBroadcaster>& rpBroadcaster,
-    const std::shared_ptr<ConfigurationControllerResourceManager>& rpResourceManager,
+    std::shared_ptr<ConfigurationControllerBroadcaster> pBroadcaster,
+    std::shared_ptr<ConfigurationControllerResourceManager> pResourceManager,
     const Reference<XControllerManager>& rxControllerManager)
-    : mpBroadcaster(rpBroadcaster),
+    : mpBroadcaster(std::move(pBroadcaster)),
       mxCurrentConfiguration(Reference<XConfiguration>(new Configuration(nullptr, false))),
       mbUpdatePending(false),
       mbUpdateBeingProcessed(false),
       mnLockCount(0),
       maUpdateTimer("sd::ConfigurationUpdater maUpdateTimer"),
       mnFailedUpdateCount(0),
-      mpResourceManager(rpResourceManager)
+      mpResourceManager(std::move(pResourceManager))
 {
     // Prepare the timer that is started when after an update the current
     // and the requested configuration differ.  With the timer we try

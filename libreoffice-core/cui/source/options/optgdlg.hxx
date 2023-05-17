@@ -38,7 +38,6 @@ private:
     std::unique_ptr<weld::Widget> m_xFileDlgFrame;
     std::unique_ptr<weld::Widget> m_xFileDlgROImage;
     std::unique_ptr<weld::CheckButton> m_xFileDlgCB;
-    std::unique_ptr<weld::CheckButton> m_xPrintDlgCB;
     std::unique_ptr<weld::CheckButton> m_xDocStatusCB;
     std::unique_ptr<weld::Widget> m_xYearFrame;
     std::unique_ptr<weld::SpinButton> m_xYearValueField;
@@ -88,6 +87,8 @@ private:
     std::unique_ptr<weld::ComboBox> m_xIconSizeLB;
     std::unique_ptr<weld::ComboBox> m_xSidebarIconSizeLB;
     std::unique_ptr<weld::ComboBox> m_xNotebookbarIconSizeLB;
+    std::unique_ptr<weld::Widget> m_xDarkModeFrame;
+    std::unique_ptr<weld::ComboBox> m_xAppearanceStyleLB;
     std::unique_ptr<weld::ComboBox> m_xIconStyleLB;
 
     std::unique_ptr<weld::CheckButton> m_xFontAntiAliasing;
@@ -114,6 +115,8 @@ private:
     std::unique_ptr<weld::Button> m_xMoreIcons;
     std::unique_ptr<weld::Button> m_xRunGPTests;
 
+    OUString m_sAutoStr;
+
     DECL_LINK(OnAntialiasingToggled, weld::Toggleable&, void);
     DECL_LINK(OnUseSkiaToggled, weld::Toggleable&, void);
     DECL_STATIC_LINK(OfaViewTabPage, OnMoreIconsClick, weld::Button&, void);
@@ -121,6 +124,7 @@ private:
     void UpdateSkiaStatus();
     void HideSkiaWidgets();
     void UpdateHardwareAccelStatus();
+    void UpdateIconThemes();
 
 public:
     OfaViewTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet);
@@ -167,6 +171,8 @@ class OfaLanguagesTabPage : public SfxTabPage
     DECL_LINK(SupportHdl, weld::Toggleable&, void);
     DECL_LINK(LocaleSettingHdl, weld::ComboBox&, void);
     DECL_LINK(DatePatternsHdl, weld::Entry&, void);
+
+    bool validateDatePatterns( bool& rbModified, OUString& rPatterns );
 
 public:
     OfaLanguagesTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet);

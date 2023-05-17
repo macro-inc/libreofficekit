@@ -134,6 +134,7 @@ namespace vcl
         const Size&         GetPageSizePixel() const { return maPageSize; }
 
         void            SetRoadmapHelpId( const OString& _rId );
+        void            SetRoadmapBitmap( const BitmapEx& maBitmap );
 
         void            InsertRoadmapItem(int nIndex, const OUString& rLabel, int nId, bool bEnabled);
         void            DeleteRoadmapItems();
@@ -255,6 +256,8 @@ namespace vcl
         DECL_LINK(OnFinish, Button*, void);
 
         void     implConstruct( const WizardButtonFlags _nButtonFlags );
+
+        virtual void     DumpAsPropertyTree(tools::JsonWriter& rJsonWriter) override;
     };
 
     /// helper class to temporarily suspend any traveling in the wizard

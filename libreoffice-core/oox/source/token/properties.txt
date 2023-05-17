@@ -53,6 +53,7 @@ Change
 CharBackColor
 CharCaseMap
 CharColor
+CharColorThemeReference
 CharContoured
 CharColorTheme
 CharColorTintOrShade
@@ -176,6 +177,7 @@ FillColor
 FillColorTheme
 FillColorLumMod
 FillColorLumOff
+FillColorThemeReference
 FillGradient
 FillGradientName
 FillHatch
@@ -184,6 +186,7 @@ FillStyle
 FillTransparence
 FillTransparenceGradient
 FillTransparenceGradientName
+FillUseSlideBackground
 Filter
 FilterCriteriaSource
 FilterOptions
@@ -313,6 +316,7 @@ LeftPageHeaderContent
 LegacyFragment
 LineCap
 LineColor
+LineColorThemeReference
 LineCount
 LineDash
 LineDashName
@@ -381,6 +385,7 @@ ParaLeftMargin
 ParaLineSpacing
 ParaRightMargin
 ParaTabStops
+ParaTabStopDefaultDistance
 ParaTopMargin
 Path
 PercentageNumberFormat
@@ -466,6 +471,7 @@ Segments
 SelectedItems
 SelectedPage
 Shadow
+ShadowAlignment
 ShadowColor
 ShadowFormat
 ShadowSizeX
@@ -542,6 +548,7 @@ TextAutoGrowHeight
 TextBox
 TextBreak
 TextCameraZRotateAngle
+TextClipVerticalOverflow
 TextColor
 TextColumns
 TextContourFrame

@@ -15,10 +15,10 @@
 #include <ModifyListenerHelper.hxx>
 #include <PropertyHelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
 
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
+#include <com/sun/star/drawing/FillStyle.hpp>
 
 #include <algorithm>
 
@@ -26,6 +26,7 @@ using namespace css;
 
 namespace
 {
+/** DataTable Properties */
 enum
 {
     DataTableProperty_HorizontalBorder,
@@ -74,6 +75,9 @@ private:
 
         ::chart::PropertyHelper::setPropertyValue(
             aMap, ::chart::LinePropertiesHelper::PROP_LINE_WIDTH, uno::Any(sal_Int32(1)));
+
+        ::chart::PropertyHelper::setPropertyValueDefault(
+            aMap, ::chart::FillProperties::PROP_FILL_STYLE, drawing::FillStyle_NONE);
 
         float fDefaultCharHeight = 10.0;
         ::chart::PropertyHelper::setPropertyValue(
@@ -138,15 +142,14 @@ struct StaticDataTableInfo : public rtl::StaticAggregate<uno::Reference<beans::X
 namespace chart
 {
 DataTable::DataTable()
-    : ::property::OPropertySet(m_aMutex)
-    , m_xModifyEventForwarder(ModifyListenerHelper::createModifyEventForwarder())
+    : m_xModifyEventForwarder(new ModifyEventForwarder())
 {
 }
 
 DataTable::DataTable(const DataTable& rOther)
     : DataTable_Base(rOther)
-    , ::property::OPropertySet(rOther, m_aMutex)
-    , m_xModifyEventForwarder(ModifyListenerHelper::createModifyEventForwarder())
+    , ::property::OPropertySet(rOther)
+    , m_xModifyEventForwarder(new ModifyEventForwarder())
 {
 }
 
@@ -161,31 +164,13 @@ uno::Reference<util::XCloneable> SAL_CALL DataTable::createClone()
 // ____ XModifyBroadcaster ____
 void SAL_CALL DataTable::addModifyListener(const uno::Reference<util::XModifyListener>& aListener)
 {
-    try
-    {
-        uno::Reference<util::XModifyBroadcaster> xBroadcaster(m_xModifyEventForwarder,
-                                                              uno::UNO_QUERY_THROW);
-        xBroadcaster->addModifyListener(aListener);
-    }
-    catch (const uno::Exception&)
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener(aListener);
 }
 
 void SAL_CALL
 DataTable::removeModifyListener(const uno::Reference<util::XModifyListener>& aListener)
 {
-    try
-    {
-        uno::Reference<util::XModifyBroadcaster> xBroadcaster(m_xModifyEventForwarder,
-                                                              uno::UNO_QUERY_THROW);
-        xBroadcaster->removeModifyListener(aListener);
-    }
-    catch (const uno::Exception&)
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener(aListener);
 }
 
 // ____ XModifyListener ____
@@ -207,13 +192,14 @@ void DataTable::firePropertyChangeEvent()
 }
 
 // ____ OPropertySet ____
-uno::Any DataTable::GetDefaultValue(sal_Int32 nHandle) const
+void DataTable::GetDefaultValue(sal_Int32 nHandle, uno::Any& rAny) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticDataTableDefaults::get();
     auto aFound = rStaticDefaults.find(nHandle);
     if (aFound == rStaticDefaults.end())
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper& SAL_CALL DataTable::getInfoHelper()

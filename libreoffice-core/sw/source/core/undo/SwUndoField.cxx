@@ -28,6 +28,7 @@
 #include <fmtfld.hxx>
 #include <docsh.hxx>
 #include <pam.hxx>
+#include <utility>
 #include <osl/diagnose.h>
 
 using namespace ::com::sun::star::uno;
@@ -35,8 +36,8 @@ using namespace ::com::sun::star::uno;
 SwUndoField::SwUndoField(const SwPosition & rPos )
     : SwUndo(SwUndoId::FIELD, &rPos.GetDoc())
 {
-    m_nNodeIndex = rPos.nNode.GetIndex();
-    m_nOffset = rPos.nContent.GetIndex();
+    m_nNodeIndex = rPos.GetNodeIndex();
+    m_nOffset = rPos.GetContentIndex();
     m_pDoc = &rPos.GetDoc();
 }
 
@@ -47,9 +48,8 @@ SwUndoField::~SwUndoField()
 SwPosition SwUndoField::GetPosition()
 {
     SwNode * pNode = m_pDoc->GetNodes()[m_nNodeIndex];
-    SwNodeIndex aNodeIndex(*pNode);
-    SwIndex aIndex(pNode->GetContentNode(), m_nOffset);
-    SwPosition aResult(aNodeIndex, aIndex);
+    SwContentIndex aIndex(pNode->GetContentNode(), m_nOffset);
+    SwPosition aResult(*pNode, aIndex);
 
     return aResult;
 }
@@ -111,9 +111,9 @@ void SwUndoFieldFromDoc::RepeatImpl(::sw::RepeatContext &)
 }
 
 SwUndoFieldFromAPI::SwUndoFieldFromAPI(const SwPosition & rPos,
-                                       const Any & rOldVal, const Any & rNewVal,
+                                       Any aOldVal, Any aNewVal,
                                        sal_uInt16 _nWhich)
-    : SwUndoField(rPos), m_aOldVal(rOldVal), m_aNewVal(rNewVal), m_nWhich(_nWhich)
+    : SwUndoField(rPos), m_aOldVal(std::move(aOldVal)), m_aNewVal(std::move(aNewVal)), m_nWhich(_nWhich)
 {
 }
 

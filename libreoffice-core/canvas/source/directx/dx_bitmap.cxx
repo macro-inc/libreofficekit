@@ -23,7 +23,7 @@
 
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/range/b2irange.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include "dx_bitmap.hxx"
 #include "dx_graphicsprovider.hxx"
@@ -154,7 +154,7 @@ namespace dxcanvas
                                                       // getMemoryLayout
                                                       &aBmpData ) )
         {
-            throw uno::RuntimeException();
+            throw uno::RuntimeException("Internal error while writing BitmapData into Bitmap");
         }
 
         // commit data to bitmap
@@ -177,7 +177,7 @@ namespace dxcanvas
         if( Gdiplus::Ok != mpBitmap->SetPixel( pos.X, pos.Y,
                                                       Gdiplus::Color( tools::sequenceToArgb( color ))))
         {
-            throw uno::RuntimeException();
+            throw uno::RuntimeException("SetPixel called with invalid x,y points or color");
         }
     }
 

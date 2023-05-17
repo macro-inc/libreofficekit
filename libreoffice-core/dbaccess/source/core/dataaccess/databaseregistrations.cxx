@@ -26,7 +26,7 @@
 #include <com/sun/star/sdb/XDatabaseRegistrations.hpp>
 
 #include <cppuhelper/basemutex.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <cppuhelper/implbase1.hxx>
 #include <osl/diagnose.h>
 #include <unotools/pathoptions.hxx>
@@ -39,7 +39,7 @@ namespace dbaccess
 {
     using ::com::sun::star::uno::Reference;
     using ::com::sun::star::uno::RuntimeException;
-    using ::com::sun::star::uno::makeAny;
+    using ::com::sun::star::uno::Any;
     using ::com::sun::star::uno::Sequence;
     using ::com::sun::star::uno::XComponentContext;
     using ::com::sun::star::container::NoSuchElementException;
@@ -100,7 +100,7 @@ namespace dbaccess
         ::utl::OConfigurationNode
                 impl_checkValidName_throw_must_not_exist(const OUString& _rName);
 
-        void    impl_checkValidLocation_throw( const OUString& _rLocation );
+        void    impl_checkValidLocation_throw( std::u16string_view _rLocation );
 
         /** retrieves the configuration node whose "Name" sub node has the given value
 
@@ -136,7 +136,7 @@ namespace dbaccess
     private:
         Reference<XComponentContext>        m_aContext;
         ::utl::OConfigurationTreeRoot       m_aConfigurationRoot;
-        ::comphelper::OInterfaceContainerHelper2  m_aRegistrationListeners;
+        ::comphelper::OInterfaceContainerHelper3<XDatabaseRegistrationsListener>  m_aRegistrationListeners;
     };
 
     }
@@ -196,7 +196,7 @@ namespace dbaccess
         }
 
         ::utl::OConfigurationNode aNewNode( m_aConfigurationRoot.createNode( sNewNodeName ) );
-        aNewNode.setNodeValue( getNameNodeName(), makeAny( _rName ) );
+        aNewNode.setNodeValue( getNameNodeName(), Any( _rName ) );
         return aNewNode;
     }
 
@@ -221,9 +221,9 @@ namespace dbaccess
         return impl_getNodeForName_throw_must_not_exist(_rName);
     }
 
-    void DatabaseRegistrations::impl_checkValidLocation_throw( const OUString& _rLocation )
+    void DatabaseRegistrations::impl_checkValidLocation_throw( std::u16string_view _rLocation )
     {
-        if ( _rLocation.isEmpty() )
+        if ( _rLocation.empty() )
             throw IllegalArgumentException( OUString(), *this, 2 );
 
         INetURLObject aURL( _rLocation );
@@ -280,7 +280,7 @@ namespace dbaccess
         ::utl::OConfigurationNode aDataSourceRegistration = impl_checkValidName_throw_must_not_exist(Name);
 
         // register
-        aDataSourceRegistration.setNodeValue( getLocationNodeName(), makeAny( Location ) );
+        aDataSourceRegistration.setNodeValue( getLocationNodeName(), Any( Location ) );
         m_aConfigurationRoot.commit();
 
         // notify
@@ -330,7 +330,7 @@ namespace dbaccess
         OSL_VERIFY( aDataSourceRegistration.getNodeValue( getLocationNodeName() ) >>= sOldLocation );
 
         // change
-        aDataSourceRegistration.setNodeValue( getLocationNodeName(), makeAny( NewLocation ) );
+        aDataSourceRegistration.setNodeValue( getLocationNodeName(), Any( NewLocation ) );
         m_aConfigurationRoot.commit();
 
         // notify

@@ -25,16 +25,15 @@ namespace framework{
 
 /** properties for "Frame" class */
 
-#define FRAME_PROPNAME_ASCII_DISPATCHRECORDERSUPPLIER   "DispatchRecorderSupplier"
-#define FRAME_PROPNAME_ASCII_ISHIDDEN                   "IsHidden"
-#define FRAME_PROPNAME_ASCII_LAYOUTMANAGER              "LayoutManager"
-#define FRAME_PROPNAME_ASCII_TITLE                      "Title"
-#define FRAME_PROPNAME_ASCII_INDICATORINTERCEPTION      "IndicatorInterception"
-#define FRAME_PROPNAME_ASCII_URL "URL"
+inline constexpr OUStringLiteral FRAME_PROPNAME_ASCII_DISPATCHRECORDERSUPPLIER = u"DispatchRecorderSupplier";
+inline constexpr OUStringLiteral FRAME_PROPNAME_ASCII_ISHIDDEN = u"IsHidden";
+inline constexpr OUStringLiteral FRAME_PROPNAME_ASCII_LAYOUTMANAGER = u"LayoutManager";
+inline constexpr OUStringLiteral FRAME_PROPNAME_ASCII_TITLE = u"Title";
+inline constexpr OUStringLiteral FRAME_PROPNAME_ASCII_INDICATORINTERCEPTION = u"IndicatorInterception";
+inline constexpr OUStringLiteral FRAME_PROPNAME_ASCII_URL = u"URL";
 
 // Please add new entries alphabetical sorted and correct all other handles!
 // Start counting with 0, so it can be used as direct index into an array too.
-// Don't forget updating of define FRAME_PROPCOUNT below!!!
 #define FRAME_PROPHANDLE_DISPATCHRECORDERSUPPLIER       0
 #define FRAME_PROPHANDLE_ISHIDDEN                       1
 #define FRAME_PROPHANDLE_LAYOUTMANAGER                  2
@@ -42,44 +41,14 @@ namespace framework{
 #define FRAME_PROPHANDLE_INDICATORINTERCEPTION          4
 #define FRAME_PROPHANDLE_URL 5
 
-#define FRAME_PROPCOUNT 6
-
-/** properties for "PathSettings" class */
-
-#define PATHSETTINGS_PROPNAME_ASCII_ADDIN               "Addin"
-#define PATHSETTINGS_PROPNAME_ASCII_AUTOCORRECT         "AutoCorrect"
-#define PATHSETTINGS_PROPNAME_ASCII_AUTOTEXT            "AutoText"
-#define PATHSETTINGS_PROPNAME_ASCII_BACKUP              "Backup"
-#define PATHSETTINGS_PROPNAME_ASCII_BASIC               "Basic"
-#define PATHSETTINGS_PROPNAME_ASCII_BITMAP              "Bitmap"
-#define PATHSETTINGS_PROPNAME_ASCII_CONFIG              "Config"
-#define PATHSETTINGS_PROPNAME_ASCII_DICTIONARY          "Dictionary"
-#define PATHSETTINGS_PROPNAME_ASCII_FAVORITE            "Favorite"
-#define PATHSETTINGS_PROPNAME_ASCII_FILTER              "Filter"
-#define PATHSETTINGS_PROPNAME_ASCII_GALLERY             "Gallery"
-#define PATHSETTINGS_PROPNAME_ASCII_GRAPHIC             "Graphic"
-#define PATHSETTINGS_PROPNAME_ASCII_HELP                "Help"
-#define PATHSETTINGS_PROPNAME_ASCII_LINGUISTIC          "Linguistic"
-#define PATHSETTINGS_PROPNAME_ASCII_MODULE              "Module"
-#define PATHSETTINGS_PROPNAME_ASCII_PALETTE             "Palette"
-#define PATHSETTINGS_PROPNAME_ASCII_PLUGIN              "Plugin"
-#define PATHSETTINGS_PROPNAME_ASCII_STORAGE             "Storage"
-#define PATHSETTINGS_PROPNAME_ASCII_TEMP                "Temp"
-#define PATHSETTINGS_PROPNAME_ASCII_TEMPLATE            "Template"
-#define PATHSETTINGS_PROPNAME_ASCII_UICONFIG            "UIConfig"
-#define PATHSETTINGS_PROPNAME_ASCII_USERCONFIG          "UserConfig"
-#define PATHSETTINGS_PROPNAME_ASCII_USERDICTIONARY      "UserDictionary"
-#define PATHSETTINGS_PROPNAME_ASCII_WORK                "Work"
-
-
 /** properties for "LayoutManager" class */
 
-#define LAYOUTMANAGER_PROPNAME_ASCII_MENUBARCLOSER          "MenuBarCloser"
-#define LAYOUTMANAGER_PROPNAME_ASCII_AUTOMATICTOOLBARS      "AutomaticToolbars"
-#define LAYOUTMANAGER_PROPNAME_ASCII_REFRESHVISIBILITY      "RefreshContextToolbarVisibility"
-#define LAYOUTMANAGER_PROPNAME_ASCII_HIDECURRENTUI          "HideCurrentUI"
-#define LAYOUTMANAGER_PROPNAME_ASCII_LOCKCOUNT              "LockCount"
-#define LAYOUTMANAGER_PROPNAME_ASCII_PRESERVE_CONTENT_SIZE  "PreserveContentSize"
+inline constexpr OUStringLiteral LAYOUTMANAGER_PROPNAME_ASCII_MENUBARCLOSER = u"MenuBarCloser";
+inline constexpr OUStringLiteral LAYOUTMANAGER_PROPNAME_ASCII_AUTOMATICTOOLBARS = u"AutomaticToolbars";
+inline constexpr OUStringLiteral LAYOUTMANAGER_PROPNAME_ASCII_REFRESHVISIBILITY = u"RefreshContextToolbarVisibility";
+inline constexpr OUStringLiteral LAYOUTMANAGER_PROPNAME_ASCII_HIDECURRENTUI = u"HideCurrentUI";
+inline constexpr OUStringLiteral LAYOUTMANAGER_PROPNAME_ASCII_LOCKCOUNT = u"LockCount";
+inline constexpr OUStringLiteral LAYOUTMANAGER_PROPNAME_ASCII_PRESERVE_CONTENT_SIZE = u"PreserveContentSize";
 
 #define LAYOUTMANAGER_PROPNAME_MENUBARCLOSER            LAYOUTMANAGER_PROPNAME_ASCII_MENUBARCLOSER
 
@@ -91,18 +60,18 @@ namespace framework{
 #define LAYOUTMANAGER_PROPHANDLE_PRESERVE_CONTENT_SIZE  5
 
 /** properties for "UICommandDescription" class */
-#define UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDIMAGELIST        "private:resource/image/commandimagelist"
-#define UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDROTATEIMAGELIST  "private:resource/image/commandrotateimagelist"
-#define UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDMIRRORIMAGELIST  "private:resource/image/commandmirrorimagelist"
+inline constexpr OUStringLiteral UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDIMAGELIST = u"private:resource/image/commandimagelist";
+inline constexpr OUStringLiteral UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDROTATEIMAGELIST = u"private:resource/image/commandrotateimagelist";
+inline constexpr OUStringLiteral UICOMMANDDESCRIPTION_NAMEACCESS_COMMANDMIRRORIMAGELIST = u"private:resource/image/commandmirrorimagelist";
 
 
 #define UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON            8
 
 /** properties for "AutoRecovery" class */
 
-#define AUTORECOVERY_PROPNAME_ASCII_EXISTS_RECOVERYDATA "ExistsRecoveryData"
-#define AUTORECOVERY_PROPNAME_ASCII_EXISTS_SESSIONDATA  "ExistsSessionData"
-#define AUTORECOVERY_PROPNAME_ASCII_CRASHED             "Crashed"
+inline constexpr OUStringLiteral AUTORECOVERY_PROPNAME_ASCII_EXISTS_RECOVERYDATA = u"ExistsRecoveryData";
+inline constexpr OUStringLiteral AUTORECOVERY_PROPNAME_ASCII_EXISTS_SESSIONDATA = u"ExistsSessionData";
+inline constexpr OUStringLiteral AUTORECOVERY_PROPNAME_ASCII_CRASHED = u"Crashed";
 
 #define AUTORECOVERY_PROPNAME_EXISTS_RECOVERYDATA       AUTORECOVERY_PROPNAME_ASCII_EXISTS_RECOVERYDATA
 #define AUTORECOVERY_PROPNAME_EXISTS_SESSIONDATA        AUTORECOVERY_PROPNAME_ASCII_EXISTS_SESSIONDATA
@@ -112,28 +81,14 @@ namespace framework{
 #define AUTORECOVERY_PROPHANDLE_EXISTS_SESSIONDATA      1
 #define AUTORECOVERY_PROPHANDLE_CRASHED                 2
 
-#define AUTORECOVERY_PROPCOUNT                          3
-
 /** properties for Filter config */
 
-#define FILTER_PROPNAME_ASCII_DOCUMENTSERVICE           "DocumentService"
+inline constexpr OUStringLiteral FILTER_PROPNAME_ASCII_DOCUMENTSERVICE = u"DocumentService";
 
 /** properties for office module config (Setup.xcu) */
 
-#define OFFICEFACTORY_PROPNAME_ASCII_UINAME             "ooSetupFactoryUIName"
-#define OFFICEFACTORY_PROPNAME_ASCII_ICON               "ooSetupFactoryIcon"
-
-/** properties for tab window (old) */
-#define TABWINDOW_PROPNAME_ASCII_PARENTWINDOW           "ParentWindow"
-#define TABWINDOW_PROPNAME_ASCII_TOPWINDOW              "TopWindow"
-#define TABWINDOW_PROPNAME_PARENTWINDOW                 TABWINDOW_PROPNAME_ASCII_PARENTWINDOW
-#define TABWINDOW_PROPNAME_TOPWINDOW                    TABWINDOW_PROPNAME_ASCII_TOPWINDOW
-
-#define TABWINDOW_PROPHANDLE_PARENTWINDOW               0
-#define TABWINDOW_PROPHANDLE_TOPWINDOW                  1
-#define TABWINDOW_PROPCOUNT                             2
-
-#define TABWINDOWSERVICE_PROPHANDLE_WINDOW              0
+inline constexpr OUStringLiteral OFFICEFACTORY_PROPNAME_ASCII_UINAME = u"ooSetupFactoryUIName";
+inline constexpr OUStringLiteral OFFICEFACTORY_PROPNAME_ASCII_ICON = u"ooSetupFactoryIcon";
 
 /** provides some helper methods to implement property sets. */
 

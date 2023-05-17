@@ -31,7 +31,7 @@
 
 #include <toolkit/helper/vclunohelper.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <vcl/svapp.hxx>
 
@@ -239,13 +239,10 @@ namespace frm
 
     Sequence< Reference< XDispatch > > SAL_CALL ORichTextControl::queryDispatches( const Sequence< DispatchDescriptor >& _rRequests )
     {
-        Sequence< Reference< XDispatch > > aReturn;
-        Reference< XDispatchProvider > xTypedPeer( getPeer(), UNO_QUERY );
-        if ( xTypedPeer.is() )
-        {
-            aReturn = xTypedPeer->queryDispatches( _rRequests );
-        }
-        return aReturn;
+        Reference<XDispatchProvider> xTypedPeer(getPeer(), UNO_QUERY);
+        if (xTypedPeer.is())
+            return xTypedPeer->queryDispatches(_rRequests);
+        return Sequence<Reference<XDispatch>>();
     }
 
     bool ORichTextControl::requiresNewPeer( const OUString& _rPropertyName ) const
@@ -589,10 +586,10 @@ namespace frm
         }
 
         // is it a UNO slot?
-        OUString sUnoProtocolPrefix( ".uno:" );
+        static constexpr std::u16string_view sUnoProtocolPrefix( u".uno:" );
         if ( _rURL.Complete.startsWith( sUnoProtocolPrefix ) )
         {
-            OUString sUnoSlotName = _rURL.Complete.copy( sUnoProtocolPrefix.getLength() );
+            OUString sUnoSlotName = _rURL.Complete.copy( sUnoProtocolPrefix.size() );
             SfxSlotId nSlotId = lcl_getSlotFromUnoName( SfxSlotPool::GetSlotPool(), sUnoSlotName );
             if ( nSlotId > 0 )
             {

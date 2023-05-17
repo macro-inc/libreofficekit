@@ -26,6 +26,7 @@
 #include <unotools/ucbstreamhelper.hxx>
 #include <unotools/tempfile.hxx>
 #include <vcl/FilterConfigItem.hxx>
+#include <vcl/glyphitemcache.hxx>
 #include <memory>
 
 #include <com/sun/star/io/XOutputStream.hpp>
@@ -89,9 +90,10 @@ bool PDFFilter::implExport( const Sequence< PropertyValue >& rDescriptor )
                 = comphelper::JsonToPropertyValues(aFilterOptions.toUtf8());
             aFilterData = comphelper::containerToSequence(aData);
         }
-        catch (const boost::property_tree::json_parser::json_parser_error&)
+        catch (const boost::property_tree::json_parser::json_parser_error& e)
         {
             // This wasn't a valid json; maybe came from import filter (tdf#150846)
+            SAL_WARN("filter.pdf", "error parsing FilterOptions: " << e.message());
         }
     }
 
@@ -108,6 +110,7 @@ bool PDFFilter::implExport( const Sequence< PropertyValue >& rDescriptor )
         aCfgItem.ReadInt32( "SelectPdfVersion", 0 );
         aCfgItem.ReadBool("PDFUACompliance", false);
         aCfgItem.ReadBool(  "ExportNotes", false );
+        aCfgItem.ReadBool(  "ExportNotesInMargin", false );
         aCfgItem.ReadBool( "ExportPlaceholders", false );
         aCfgItem.ReadBool(  "ExportNotesPages", false );
         aCfgItem.ReadBool(  "ExportOnlyNotesPages", false );
@@ -178,7 +181,7 @@ bool PDFFilter::implExport( const Sequence< PropertyValue >& rDescriptor )
     if( mxSrcDoc.is() && xOStm.is() )
     {
         PDFExport       aExport( mxSrcDoc, xStatusIndicator, xIH, mxContext );
-        ::utl::TempFile aTempFile;
+        ::utl::TempFileNamed aTempFile;
 
         aTempFile.EnableKillingFile();
         bRet = aExport.Export( aTempFile.GetURL(), aFilterData );
@@ -244,7 +247,11 @@ sal_Bool SAL_CALL PDFFilter::filter( const Sequence< PropertyValue >& rDescripto
 {
     FocusWindowWaitCursor aCur;
 
+    SalLayoutGlyphsCache::self()->SetCacheGlyphsWhenDoingFallbackFonts(true);
+
     const bool bRet = implExport( rDescriptor );
+
+    SalLayoutGlyphsCache::self()->SetCacheGlyphsWhenDoingFallbackFonts(false);
 
     return bRet;
 }

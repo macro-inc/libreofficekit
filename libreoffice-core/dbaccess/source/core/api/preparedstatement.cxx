@@ -28,9 +28,10 @@
 #include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <preparedstatement.hxx>
+#include <strings.hxx>
 #include "resultcolumn.hxx"
 #include "resultset.hxx"
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star::sdbc;
 using namespace ::com::sun::star::sdbcx;
@@ -116,7 +117,7 @@ sal_Bool OPreparedStatement::supportsService( const OUString& _rServiceName )
 
 Sequence< OUString > OPreparedStatement::getSupportedServiceNames(  )
 {
-    return { SERVICE_SDBC_PREPAREDSTATEMENT, SERVICE_SDB_PREPAREDSTATMENT };
+    return { SERVICE_SDBC_PREPAREDSTATEMENT, SERVICE_SDB_PREPAREDSTATEMENT };
 }
 
 // OComponentHelper

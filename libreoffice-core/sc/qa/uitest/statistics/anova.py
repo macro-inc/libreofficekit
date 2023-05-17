@@ -1,18 +1,17 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict
-from uitest.uihelper.common import select_pos
 from uitest.uihelper.calc import enter_text_to_cell
-from libreoffice.calc.document import get_sheet_from_doc
-from libreoffice.calc.conditional_format import get_conditional_format_from_sheet
-from uitest.debug import sleep
+
 from libreoffice.calc.document import get_cell_by_position
 from libreoffice.uno.propertyvalue import mkPropertyValues
+
 
 class anova(UITestCase):
     def test_statistic_anova(self):
@@ -60,10 +59,7 @@ class anova(UITestCase):
             with self.ui_test.execute_modeless_dialog_through_command(".uno:AnalysisOfVarianceDialog") as xDialog:
                 xinputrangeedit = xDialog.getChild("input-range-edit")
                 xoutputrangeedit = xDialog.getChild("output-range-edit")
-                xradiotwofactor = xDialog.getChild("radio-two-factor")
                 xradiosinglefactor = xDialog.getChild("radio-single-factor")
-                xgroupedbyrowsradio = xDialog.getChild("groupedby-rows-radio")
-                xgroupedbycolumnsradio = xDialog.getChild("groupedby-columns-radio")
                 xalphaspin = xDialog.getChild("alpha-spin")
 
                 xinputrangeedit.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))

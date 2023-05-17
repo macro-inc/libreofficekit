@@ -29,7 +29,7 @@
 #include <com/sun/star/inspection/PropertyControlType.hpp>
 #include <com/sun/star/inspection/XStringListControl.hpp>
 #include <com/sun/star/inspection/XNumericControl.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/weldutils.hxx>
@@ -299,7 +299,7 @@ namespace pcr
     {
         Reference<css::container::XNameContainer> xName(rContext, UNO_QUERY_THROW);
         Reference<XWindow> xWindow(new weld::TransportAsXWindow(pParent));
-        xName->insertByName("BuilderParent", makeAny(xWindow));
+        xName->insertByName("BuilderParent", Any(xWindow));
     }
 
     void PropertyHandlerHelper::clearBuilderParent(const css::uno::Reference<css::uno::XComponentContext>& rContext)

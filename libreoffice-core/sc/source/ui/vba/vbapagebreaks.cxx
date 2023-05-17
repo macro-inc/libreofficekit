@@ -25,6 +25,7 @@
 #include <com/sun/star/sheet/XSheetPageBreak.hpp>
 #include <com/sun/star/table/XColumnRowRange.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::ooo::vba;
@@ -40,10 +41,10 @@ private:
     bool m_bColumn;
 
 public:
-    RangePageBreaks( const uno::Reference< XHelperInterface >& xParent,
-                     const uno::Reference< uno::XComponentContext >& xContext,
-                     const uno::Reference< sheet::XSheetPageBreak >& xSheetPageBreak,
-                     bool bColumn ) : mxParent( xParent ), mxContext( xContext ), mxSheetPageBreak( xSheetPageBreak ), m_bColumn( bColumn )
+    RangePageBreaks( uno::Reference< XHelperInterface > xParent,
+                     uno::Reference< uno::XComponentContext > xContext,
+                     uno::Reference< sheet::XSheetPageBreak > xSheetPageBreak,
+                     bool bColumn ) : mxParent(std::move( xParent )), mxContext(std::move( xContext )), mxSheetPageBreak(std::move( xSheetPageBreak )), m_bColumn( bColumn )
     {
     }
 
@@ -136,8 +137,8 @@ uno::Any SAL_CALL RangePageBreaks::getByIndex( sal_Int32 Index )
         {
             uno::Reference< beans::XPropertySet > xRowColPropertySet( xIndexAccess->getByIndex(nPos), uno::UNO_QUERY_THROW );
             if( m_bColumn )
-                return uno::makeAny( uno::Reference< excel::XVPageBreak >( new ScVbaVPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
-            return uno::makeAny( uno::Reference< excel::XHPageBreak >( new ScVbaHPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
+                return uno::Any( uno::Reference< excel::XVPageBreak >( new ScVbaVPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
+            return uno::Any( uno::Reference< excel::XHPageBreak >( new ScVbaHPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
         }
     }
     throw lang::IndexOutOfBoundsException();
@@ -179,13 +180,13 @@ uno::Any RangePageBreaks::Add( const css::uno::Any& Before )
     sal_Int32 nAPIRowColIndex = getAPIStartofRange( xRange );
     uno::Reference< container::XIndexAccess > xIndexAccess = getRowColContainer();
     uno::Reference< beans::XPropertySet > xRowColPropertySet( xIndexAccess->getByIndex(nAPIRowColIndex), uno::UNO_QUERY_THROW );
-    xRowColPropertySet->setPropertyValue("IsStartOfNewPage", uno::makeAny(true));
+    xRowColPropertySet->setPropertyValue("IsStartOfNewPage", uno::Any(true));
     sheet::TablePageBreakData aTablePageBreakData;
     aTablePageBreakData.ManualBreak = true;
     aTablePageBreakData.Position = nAPIRowColIndex;
     if( m_bColumn )
-        return uno::makeAny( uno::Reference< excel::XVPageBreak >( new ScVbaVPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
-    return uno::makeAny( uno::Reference< excel::XHPageBreak >( new ScVbaHPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
+        return uno::Any( uno::Reference< excel::XVPageBreak >( new ScVbaVPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
+    return uno::Any( uno::Reference< excel::XHPageBreak >( new ScVbaHPageBreak( mxParent, mxContext, xRowColPropertySet, aTablePageBreakData) ));
 }
 
 namespace {
@@ -195,7 +196,7 @@ class RangePageBreaksEnumWrapper : public EnumerationHelper_BASE
     uno::Reference<container::XIndexAccess > m_xIndexAccess;
     sal_Int32 nIndex;
 public:
-    explicit RangePageBreaksEnumWrapper( const uno::Reference< container::XIndexAccess >& xIndexAccess ) : m_xIndexAccess( xIndexAccess ), nIndex( 0 ) {}
+    explicit RangePageBreaksEnumWrapper( uno::Reference< container::XIndexAccess > xIndexAccess ) : m_xIndexAccess(std::move( xIndexAccess )), nIndex( 0 ) {}
     virtual sal_Bool SAL_CALL hasMoreElements(  ) override
     {
         return ( nIndex < m_xIndexAccess->getCount() );

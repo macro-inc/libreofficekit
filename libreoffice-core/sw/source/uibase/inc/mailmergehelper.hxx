@@ -26,8 +26,10 @@
 #include <com/sun/star/mail/XMailMessage.hpp>
 #include <com/sun/star/datatransfer/XTransferable.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/compbase.hxx>
+#include <utility>
 #include <vcl/customweld.hxx>
 #include <vcl/weld.hxx>
 #include <rtl/ustring.hxx>
@@ -43,7 +45,7 @@ namespace com::sun::star::mail {
 namespace SwMailMergeHelper
 {
     SW_DLLPUBLIC OUString CallSaveAsDialog(weld::Window* pParent, OUString& rFilter);
-    SW_DLLPUBLIC bool CheckMailAddress(const OUString& rMailAddress);
+    SW_DLLPUBLIC bool CheckMailAddress(std::u16string_view aMailAddress);
     SW_DLLPUBLIC css::uno::Reference<css::mail::XSmtpService> ConnectToSmtpServer(
                             SwMailMergeConfigItem const & rConfigItem,
                             css::uno::Reference<css::mail::XMailService>& xInMailService,
@@ -62,7 +64,7 @@ class SW_DLLPUBLIC SwAddressPreview final : public weld::CustomWidgetController
     std::unique_ptr<weld::ScrolledWindow> m_xVScrollBar;
     Link<LinkParamNone*,void> m_aSelectHdl;
 
-    void DrawText_Impl(vcl::RenderContext& rRenderContext, const OUString& rAddress,
+    void DrawText_Impl(vcl::RenderContext& rRenderContext, std::u16string_view rAddress,
                        const Point& rTopLeft, const Size& rSize, bool bIsSelected);
 
     virtual void Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle&) override;
@@ -125,8 +127,8 @@ class SW_DLLPUBLIC SwAddressIterator
 {
     OUString m_sAddress;
 public:
-    SwAddressIterator(const OUString& rAddress) :
-        m_sAddress(rAddress)
+    SwAddressIterator(OUString aAddress) :
+        m_sAddress(std::move(aAddress))
     {}
 
     SwMergeAddressItem  Next();
@@ -143,9 +145,9 @@ public:
     SwAuthenticator()
         : m_pParentWindow(nullptr)
     {}
-    SwAuthenticator(const OUString& username, const OUString& password, weld::Window* pParent)
-        : m_aUserName(username)
-        , m_aPassword(password)
+    SwAuthenticator(OUString username, OUString password, weld::Window* pParent)
+        : m_aUserName(std::move(username))
+        , m_aPassword(std::move(password))
         , m_pParentWindow(pParent)
     {}
     virtual ~SwAuthenticator() override;
@@ -162,20 +164,14 @@ class SW_DLLPUBLIC SwConnectionContext final : public cppu::WeakImplHelper<css::
     OUString m_sConnectionType;
 
 public:
-    SwConnectionContext(const OUString& rMailServer, sal_Int16 nPort, const OUString& rConnectionType);
+    SwConnectionContext(OUString aMailServer, sal_Int16 nPort, OUString aConnectionType);
     virtual ~SwConnectionContext() override;
 
     virtual css::uno::Any SAL_CALL getValueByName(const OUString& Name) override;
 };
 
-class SwMutexBase
-{
-public:
-    osl::Mutex m_aMutex;
-};
-
 class SW_DLLPUBLIC SwConnectionListener final :
-        public SwMutexBase,
+        public cppu::BaseMutex,
         public cppu::WeakComponentImplHelper<css::mail::XConnectionListener>
 {
     using cppu::WeakComponentImplHelperBase::disposing;
@@ -194,7 +190,7 @@ public:
 };
 
 class SW_DLLPUBLIC SwMailTransferable final :
-        public SwMutexBase,
+        public cppu::BaseMutex,
         public cppu::WeakComponentImplHelper<css::datatransfer::XTransferable, css::beans::XPropertySet>
 {
     OUString  m_aMimeType;
@@ -204,8 +200,8 @@ class SW_DLLPUBLIC SwMailTransferable final :
     bool m_bIsBody;
 
     public:
-    SwMailTransferable(const OUString& rURL, const OUString& rName, const OUString& rMimeType);
-    SwMailTransferable(const OUString& rBody, const OUString& rMimeType);
+    SwMailTransferable(OUString aURL, OUString aName, OUString aMimeType);
+    SwMailTransferable(OUString aBody, OUString aMimeType);
     virtual ~SwMailTransferable() override;
     virtual css::uno::Any SAL_CALL getTransferData(const css::datatransfer::DataFlavor& aFlavor) override;
 
@@ -229,7 +225,7 @@ class SW_DLLPUBLIC SwMailTransferable final :
 };
 
 class SW_DLLPUBLIC SwMailMessage final :
-        public SwMutexBase,
+        public cppu::BaseMutex,
         public cppu::WeakComponentImplHelper<css::mail::XMailMessage>
 {
     OUString m_sSenderName;

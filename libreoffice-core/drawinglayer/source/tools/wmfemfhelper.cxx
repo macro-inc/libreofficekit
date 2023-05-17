@@ -21,10 +21,12 @@
 #include <drawinglayer/primitive2d/pointarrayprimitive2d.hxx>
 #include <vcl/lineinfo.hxx>
 #include <vcl/metaact.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 #include <drawinglayer/primitive2d/unifiedtransparenceprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonGradientPrimitive2D.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
@@ -332,15 +334,8 @@ namespace wmfemfhelper
 
     drawinglayer::primitive2d::Primitive2DContainer TargetHolder::getPrimitive2DSequence(const PropertyHolder& rPropertyHolder)
     {
-        const sal_uInt32 nCount(aTargets.size());
-        drawinglayer::primitive2d::Primitive2DContainer xRetval(nCount);
+        drawinglayer::primitive2d::Primitive2DContainer xRetval = std::move(aTargets);
 
-        for (sal_uInt32 a(0); a < nCount; a++)
-        {
-            xRetval[a] = aTargets[a].get();
-        }
-        // Since we have released them from the list
-        aTargets.clear();
 
         if (!xRetval.empty() && rPropertyHolder.getClipPolyPolygonActive())
         {
@@ -476,7 +471,7 @@ namespace wmfemfhelper
             aLinePolygon.transform(rProperties.getTransformation());
             rTarget.append(
                 new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(
-                    aLinePolygon,
+                    std::move(aLinePolygon),
                     rProperties.getLineColor()));
         }
     }
@@ -493,7 +488,7 @@ namespace wmfemfhelper
             aFillPolyPolygon.transform(rProperties.getTransformation());
             rTarget.append(
                 new drawinglayer::primitive2d::PolyPolygonColorPrimitive2D(
-                    aFillPolyPolygon,
+                    std::move(aFillPolyPolygon),
                     rProperties.getFillColor()));
         }
     }
@@ -515,7 +510,7 @@ namespace wmfemfhelper
         {
             basegfx::B2DPolygon aLinePolygon(rLinePolygon);
             aLinePolygon.transform(rProperties.getTransformation());
-            const drawinglayer::attribute::LineAttribute aLineAttribute(
+            drawinglayer::attribute::LineAttribute aLineAttribute(
                 rProperties.getLineColor(),
                 bWidthUsed ? rLineInfo.GetWidth() : 0.0,
                 rLineInfo.GetLineJoin(),
@@ -523,39 +518,23 @@ namespace wmfemfhelper
 
             if(bDashDotUsed)
             {
-                std::vector< double > fDotDashArray;
-                const double fDashLen(rLineInfo.GetDashLen());
-                const double fDotLen(rLineInfo.GetDotLen());
-                const double fDistance(rLineInfo.GetDistance());
-
-                for(sal_uInt16 a(0); a < rLineInfo.GetDashCount(); a++)
-                {
-                    fDotDashArray.push_back(fDashLen);
-                    fDotDashArray.push_back(fDistance);
-                }
-
-                for(sal_uInt16 b(0); b < rLineInfo.GetDotCount(); b++)
-                {
-                    fDotDashArray.push_back(fDotLen);
-                    fDotDashArray.push_back(fDistance);
-                }
-
+                std::vector< double > fDotDashArray = rLineInfo.GetDotDashArray();
                 const double fAccumulated(std::accumulate(fDotDashArray.begin(), fDotDashArray.end(), 0.0));
-                const drawinglayer::attribute::StrokeAttribute aStrokeAttribute(
+                drawinglayer::attribute::StrokeAttribute aStrokeAttribute(
                     std::move(fDotDashArray),
                     fAccumulated);
 
                 rTarget.append(
                     new drawinglayer::primitive2d::PolygonStrokePrimitive2D(
-                        aLinePolygon,
-                        aLineAttribute,
-                        aStrokeAttribute));
+                        std::move(aLinePolygon),
+                        std::move(aLineAttribute),
+                        std::move(aStrokeAttribute)));
             }
             else
             {
                 rTarget.append(
                     new drawinglayer::primitive2d::PolygonStrokePrimitive2D(
-                        aLinePolygon,
+                        std::move(aLinePolygon),
                         aLineAttribute));
             }
         }
@@ -648,7 +627,7 @@ namespace wmfemfhelper
 
         rTarget.append(
             new drawinglayer::primitive2d::BitmapPrimitive2D(
-                VCLUnoHelper::CreateVCLXBitmap(rBitmapEx),
+                rBitmapEx,
                 aObjectTransform));
     }
 
@@ -696,50 +675,13 @@ namespace wmfemfhelper
             aEnd = interpolate(aBlack, aEnd, static_cast<double>(nEndIntens) * 0.01);
         }
 
-        drawinglayer::attribute::GradientStyle aGradientStyle(drawinglayer::attribute::GradientStyle::Rect);
-
-        switch(rGradient.GetStyle())
-        {
-            case GradientStyle::Linear :
-            {
-                aGradientStyle = drawinglayer::attribute::GradientStyle::Linear;
-                break;
-            }
-            case GradientStyle::Axial :
-            {
-                aGradientStyle = drawinglayer::attribute::GradientStyle::Axial;
-                break;
-            }
-            case GradientStyle::Radial :
-            {
-                aGradientStyle = drawinglayer::attribute::GradientStyle::Radial;
-                break;
-            }
-            case GradientStyle::Elliptical :
-            {
-                aGradientStyle = drawinglayer::attribute::GradientStyle::Elliptical;
-                break;
-            }
-            case GradientStyle::Square :
-            {
-                aGradientStyle = drawinglayer::attribute::GradientStyle::Square;
-                break;
-            }
-            default : // GradientStyle::Rect
-            {
-                aGradientStyle = drawinglayer::attribute::GradientStyle::Rect;
-                break;
-            }
-        }
-
         return drawinglayer::attribute::FillGradientAttribute(
-            aGradientStyle,
+            rGradient.GetStyle(),
             static_cast<double>(rGradient.GetBorder()) * 0.01,
             static_cast<double>(rGradient.GetOfsX()) * 0.01,
             static_cast<double>(rGradient.GetOfsY()) * 0.01,
             toRadians(rGradient.GetAngle()),
-            aStart,
-            aEnd,
+            basegfx::utils::createColorStopsFromStartEndColor(aStart, aEnd),
             rGradient.GetSteps());
     }
 
@@ -939,12 +881,12 @@ namespace wmfemfhelper
         const Gradient& rGradient,
         PropertyHolder const & rPropertyHolder)
     {
-        const drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
+        drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
 
-        if(aAttribute.getStartColor() == aAttribute.getEndColor())
+        if(aAttribute.hasSingleColor())
         {
             // not really a gradient. Create filled rectangle
-            return CreateColorWallpaper(rRange, aAttribute.getStartColor(), rPropertyHolder);
+            return CreateColorWallpaper(rRange, aAttribute.getColorStops().front().getStopColor(), rPropertyHolder);
         }
         else
         {
@@ -952,7 +894,7 @@ namespace wmfemfhelper
             rtl::Reference<drawinglayer::primitive2d::BasePrimitive2D> pRetval(
                 new drawinglayer::primitive2d::FillGradientPrimitive2D(
                     rRange,
-                    aAttribute));
+                    std::move(aAttribute)));
 
             if(!rPropertyHolder.getTransformation().isIdentity())
             {
@@ -1099,6 +1041,7 @@ namespace wmfemfhelper
         sal_uInt16 nTextStart,
         sal_uInt16 nTextLength,
         std::vector< double >&& rDXArray,
+        std::vector< sal_Bool >&& rKashidaArray,
         TargetHolder& rTarget,
         PropertyHolder const & rProperty)
     {
@@ -1124,7 +1067,7 @@ namespace wmfemfhelper
             // prepare FontColor and Locale
             const basegfx::BColor aFontColor(rProperty.getTextColor());
             const Color aFillColor(rFont.GetFillColor());
-            const css::lang::Locale aLocale(LanguageTag(rProperty.getLanguageType()).getLocale());
+            css::lang::Locale aLocale(LanguageTag(rProperty.getLanguageType()).getLocale());
             const bool bWordLineMode(rFont.IsWordLineMode());
 
             const bool bDecoratedIsNeeded(
@@ -1183,6 +1126,7 @@ namespace wmfemfhelper
                     nTextStart,
                     nTextLength,
                     std::move(rDXArray),
+                    std::move(rKashidaArray),
                     aFontAttribute,
                     aLocale,
                     aFontColor,
@@ -1211,8 +1155,9 @@ namespace wmfemfhelper
                     nTextStart,
                     nTextLength,
                     std::vector(rDXArray),
-                    aFontAttribute,
-                    aLocale,
+                    std::vector(rKashidaArray),
+                    std::move(aFontAttribute),
+                    std::move(aLocale),
                     aFontColor);
             }
         }
@@ -1256,7 +1201,7 @@ namespace wmfemfhelper
 
                 // prepare Primitive2DSequence, put text in foreground
                 drawinglayer::primitive2d::Primitive2DContainer aSequence(2);
-                aSequence[1] = drawinglayer::primitive2d::Primitive2DReference(pResult);
+                aSequence[1] = pResult;
 
                 // prepare filled polygon
                 basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aTextRange));
@@ -1314,7 +1259,7 @@ namespace wmfemfhelper
         if(!(bUnderlineUsed || bStrikeoutUsed || bOverlineUsed))
             return;
 
-        std::vector< drawinglayer::primitive2d::BasePrimitive2D* > aTargetVector;
+        drawinglayer::primitive2d::Primitive2DContainer aTargets;
         basegfx::B2DVector aAlignmentOffset(0.0, 0.0);
         drawinglayer::attribute::FontAttribute aFontAttribute;
         basegfx::B2DHomMatrix aTextTransform;
@@ -1336,7 +1281,7 @@ namespace wmfemfhelper
         if(bOverlineUsed)
         {
             // create primitive geometry for overline
-            aTargetVector.push_back(
+            aTargets.push_back(
                 new drawinglayer::primitive2d::TextLinePrimitive2D(
                     aTextTransform,
                     fLineWidth,
@@ -1349,7 +1294,7 @@ namespace wmfemfhelper
         if(bUnderlineUsed)
         {
             // create primitive geometry for underline
-            aTargetVector.push_back(
+            aTargets.push_back(
                 new drawinglayer::primitive2d::TextLinePrimitive2D(
                     aTextTransform,
                     fLineWidth,
@@ -1368,22 +1313,22 @@ namespace wmfemfhelper
                 // strikeout with character
                 const sal_Unicode aStrikeoutChar(
                     drawinglayer::primitive2d::TEXT_STRIKEOUT_SLASH == aTextStrikeout ? '/' : 'X');
-                const css::lang::Locale aLocale(LanguageTag(
+                css::lang::Locale aLocale(LanguageTag(
                     rProperty.getLanguageType()).getLocale());
 
-                aTargetVector.push_back(
+                aTargets.push_back(
                     new drawinglayer::primitive2d::TextCharacterStrikeoutPrimitive2D(
                         aTextTransform,
                         fLineWidth,
                         rProperty.getTextColor(),
                         aStrikeoutChar,
-                        aFontAttribute,
-                        aLocale));
+                        std::move(aFontAttribute),
+                        std::move(aLocale)));
             }
             else
             {
                 // strikeout with geometry
-                aTargetVector.push_back(
+                aTargets.push_back(
                     new drawinglayer::primitive2d::TextGeometryStrikeoutPrimitive2D(
                         aTextTransform,
                         fLineWidth,
@@ -1394,31 +1339,21 @@ namespace wmfemfhelper
             }
         }
 
-        if(aTargetVector.empty())
+        if(aTargets.empty())
             return;
 
         // add created text primitive to target
         if(rProperty.getTransformation().isIdentity())
         {
-            for(drawinglayer::primitive2d::BasePrimitive2D* a : aTargetVector)
-            {
-                rTarget.append(a);
-            }
+            rTarget.append(std::move(aTargets));
         }
         else
         {
             // when a transformation is set, embed to it
-            drawinglayer::primitive2d::Primitive2DContainer xTargets(aTargetVector.size());
-
-            for(size_t a(0); a < aTargetVector.size(); a++)
-            {
-                xTargets[a] = drawinglayer::primitive2d::Primitive2DReference(aTargetVector[a]);
-            }
-
             rTarget.append(
                 new drawinglayer::primitive2d::TransformPrimitive2D(
                     rProperty.getTransformation(),
-                    std::move(xTargets)));
+                    std::move(aTargets)));
         }
     }
 
@@ -1563,7 +1498,6 @@ namespace wmfemfhelper
                                 }
                                 else
                                 {
-                                    aLineInfo.SetLineJoin(basegfx::B2DLineJoin::NONE); // It were lines; force to NONE
                                     createLinePrimitive(aLinePolygon, aLineInfo, rTargetHolders.Current(), rPropertyHolders.Current());
                                     aLinePolygon.clear();
                                     aLineInfo = pA->GetLineInfo();
@@ -1578,16 +1512,14 @@ namespace wmfemfhelper
                                 aLinePolygon.append(aEnd);
                             }
 
-                            nAction++; if(nAction < nCount) pAction = rMetaFile.GetAction(nAction);
+                            nAction++;
+                            if (nAction < nCount)
+                                pAction = rMetaFile.GetAction(nAction);
                         }
 
                         nAction--;
-
-                        if(aLinePolygon.count())
-                        {
-                            aLineInfo.SetLineJoin(basegfx::B2DLineJoin::NONE); // It were lines; force to NONE
+                        if (aLinePolygon.count())
                             createLinePrimitive(aLinePolygon, aLineInfo, rTargetHolders.Current(), rPropertyHolders.Current());
-                        }
                     }
 
                     break;
@@ -1805,6 +1737,7 @@ namespace wmfemfhelper
                             nTextIndex,
                             nTextLength,
                             std::move(aDXArray),
+                            {},
                             rTargetHolders.Current(),
                             rPropertyHolders.Current());
                     }
@@ -1828,7 +1761,8 @@ namespace wmfemfhelper
                     {
                         // prepare DXArray (if used)
                         std::vector< double > aDXArray;
-                        const std::vector<sal_Int32> & rDXArray = pA->GetDXArray();
+                        const KernArray& rDXArray = pA->GetDXArray();
+                        std::vector< sal_Bool > aKashidaArray = pA->GetKashidaArray();
 
                         if(!rDXArray.empty())
                         {
@@ -1846,6 +1780,7 @@ namespace wmfemfhelper
                             nTextIndex,
                             nTextLength,
                             std::move(aDXArray),
+                            std::move(aKashidaArray),
                             rTargetHolders.Current(),
                             rPropertyHolders.Current());
                     }
@@ -1909,6 +1844,7 @@ namespace wmfemfhelper
                             nTextIndex,
                             nTextLength,
                             std::move(aTextArray),
+                            {},
                             rTargetHolders.Current(),
                             rPropertyHolders.Current());
                     }
@@ -2114,10 +2050,10 @@ namespace wmfemfhelper
                         if(!aRange.isEmpty())
                         {
                             const Gradient& rGradient = pA->GetGradient();
-                            const drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
+                            drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
                             basegfx::B2DPolyPolygon aOutline(basegfx::utils::createPolygonFromRect(aRange));
 
-                            if(aAttribute.getStartColor() == aAttribute.getEndColor())
+                            if(aAttribute.hasSingleColor())
                             {
                                 // not really a gradient. Create filled rectangle
                                 createFillPrimitive(
@@ -2146,7 +2082,7 @@ namespace wmfemfhelper
                                     xGradient[0] = drawinglayer::primitive2d::Primitive2DReference(
                                         new drawinglayer::primitive2d::FillGradientPrimitive2D(
                                             aRange,
-                                            aAttribute));
+                                            std::move(aAttribute)));
                                 }
 
                                 // #i112300# clip against polygon representing the rectangle from
@@ -2155,7 +2091,7 @@ namespace wmfemfhelper
                                 aOutline.transform(rPropertyHolders.Current().getTransformation());
                                 rTargetHolders.Current().append(
                                     new drawinglayer::primitive2d::MaskPrimitive2D(
-                                        aOutline,
+                                        std::move(aOutline),
                                         std::move(xGradient)));
                             }
                         }
@@ -2172,7 +2108,7 @@ namespace wmfemfhelper
                     if(aOutline.count())
                     {
                         const Hatch& rHatch = pA->GetHatch();
-                        const drawinglayer::attribute::FillHatchAttribute aAttribute(createFillHatchAttribute(rHatch));
+                        drawinglayer::attribute::FillHatchAttribute aAttribute(createFillHatchAttribute(rHatch));
 
                         aOutline.transform(rPropertyHolders.Current().getTransformation());
 
@@ -2181,11 +2117,11 @@ namespace wmfemfhelper
                             new drawinglayer::primitive2d::FillHatchPrimitive2D(
                                 aObjectRange,
                                 basegfx::BColor(),
-                                aAttribute));
+                                std::move(aAttribute)));
 
                         rTargetHolders.Current().append(
                             new drawinglayer::primitive2d::MaskPrimitive2D(
-                                aOutline,
+                                std::move(aOutline),
                                 drawinglayer::primitive2d::Primitive2DContainer { aFillHatch }));
                     }
 
@@ -2825,15 +2761,15 @@ namespace wmfemfhelper
 
                                 // check if gradient is a real gradient
                                 const Gradient& rGradient = pA->GetGradient();
-                                const drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
+                                drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
 
-                                if(aAttribute.getStartColor() == aAttribute.getEndColor())
+                                if(aAttribute.hasSingleColor())
                                 {
                                     // not really a gradient; create UnifiedTransparencePrimitive2D
                                     rTargetHolders.Current().append(
                                         new drawinglayer::primitive2d::UnifiedTransparencePrimitive2D(
                                             std::move(xSubContent),
-                                            aAttribute.getStartColor().luminance()));
+                                            aAttribute.getColorStops().front().getStopColor().luminance()));
                                 }
                                 else
                                 {
@@ -2845,7 +2781,7 @@ namespace wmfemfhelper
                                     const drawinglayer::primitive2d::Primitive2DReference xTransparence(
                                         new drawinglayer::primitive2d::FillGradientPrimitive2D(
                                             aRange,
-                                            aAttribute));
+                                            std::move(aAttribute)));
 
                                     // create transparence primitive
                                     rTargetHolders.Current().append(
@@ -2945,15 +2881,15 @@ namespace wmfemfhelper
 
                                 // get and check if gradient is a real gradient
                                 const Gradient& rGradient = pMetaGradientExAction->GetGradient();
-                                const drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
+                                drawinglayer::attribute::FillGradientAttribute aAttribute(createFillGradientAttribute(rGradient));
 
-                                if(aAttribute.getStartColor() == aAttribute.getEndColor())
+                                if(aAttribute.hasSingleColor())
                                 {
                                     // not really a gradient
                                     rTargetHolders.Current().append(
                                         new drawinglayer::primitive2d::PolyPolygonColorPrimitive2D(
-                                            aPolyPolygon,
-                                            aAttribute.getStartColor()));
+                                            std::move(aPolyPolygon),
+                                            aAttribute.getColorStops().front().getStopColor()));
                                 }
                                 else
                                 {
@@ -2961,7 +2897,7 @@ namespace wmfemfhelper
                                     rTargetHolders.Current().append(
                                         new drawinglayer::primitive2d::PolyPolygonGradientPrimitive2D(
                                             aPolyPolygon,
-                                            aAttribute));
+                                            std::move(aAttribute)));
                                 }
                             }
                         }

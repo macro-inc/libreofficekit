@@ -29,6 +29,7 @@
 #include <swmodule.hxx>
 #include <swtypes.hxx>
 #include <swundo.hxx>
+#include <utility>
 #include <view.hxx>
 #include <wrtsh.hxx>
 
@@ -195,7 +196,7 @@ void SwSpellPopup::fillLangPopupMenu(
 
 SwSpellPopup::SwSpellPopup(
         SwWrtShell* pWrtSh,
-        const uno::Reference< linguistic2::XSpellAlternatives >  &xAlt,
+        uno::Reference< linguistic2::XSpellAlternatives > xAlt,
         const OUString &rParaText)
     : m_aBuilder(nullptr, AllSettings::GetUIRootDir(), "modules/swriter/ui/spellmenu.ui", "")
     , m_xPopupMenu(m_aBuilder.get_menu("menu"))
@@ -212,7 +213,7 @@ SwSpellPopup::SwSpellPopup(
     , m_nRedlineNextId(m_xPopupMenu->GetItemId("next"))
     , m_nRedlinePrevId(m_xPopupMenu->GetItemId("prev"))
     , m_pSh( pWrtSh )
-    , m_xSpellAlt(xAlt)
+    , m_xSpellAlt(std::move(xAlt))
     , m_bGrammarResults(false)
 {
     OSL_ENSURE(m_xSpellAlt.is(), "no spelling alternatives available");
@@ -398,7 +399,7 @@ SwSpellPopup::SwSpellPopup(
             vcl::CommandInfoProvider::GetImageForCommand(".uno:SpellingAndGrammarDialog", xFrame));
 
     checkRedline();
-    m_xPopupMenu->RemoveDisabledEntries( true, true );
+    m_xPopupMenu->RemoveDisabledEntries( true );
 
     InitItemCommands(aSuggestions);
 }
@@ -555,9 +556,9 @@ SwSpellPopup::SwSpellPopup(
             vcl::CommandInfoProvider::GetImageForCommand(".uno:SpellingAndGrammarDialog", xFrame));
 
     checkRedline();
-    m_xPopupMenu->RemoveDisabledEntries(true, true);
+    m_xPopupMenu->RemoveDisabledEntries(true);
 
-    SvtLinguConfig().SetProperty( UPN_IS_GRAMMAR_INTERACTIVE, uno::makeAny( true ));
+    SvtLinguConfig().SetProperty( UPN_IS_GRAMMAR_INTERACTIVE, uno::Any( true ));
 
     InitItemCommands(rSuggestions);
 }
@@ -747,7 +748,7 @@ void SwSpellPopup::Execute( sal_uInt16 nId )
     }
     else if (nId == m_nSpellDialogId)
     {
-        m_pSh->Left(CRSR_SKIP_CHARS, false, 1, false );
+        m_pSh->Left(SwCursorSkipMode::Chars, false, 1, false );
         {
             m_pSh->GetView().GetViewFrame()->GetDispatcher()->
                 Execute( FN_SPELL_GRAMMAR_DIALOG, SfxCallMode::ASYNCHRON );

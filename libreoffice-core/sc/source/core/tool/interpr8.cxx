@@ -1395,9 +1395,9 @@ void ScInterpreter::ScConcat_MS()
             case svString:
             case svDouble:
                 {
-                    const OUString& rStr = GetString().getString();
-                    if (CheckStringResultLen( aResBuf, rStr))
-                        aResBuf.append( rStr);
+                    OUString aStr = GetString().getString();
+                    if (CheckStringResultLen(aResBuf, aStr.getLength()))
+                        aResBuf.append(aStr);
                 }
                 break;
             case svSingleRef :
@@ -1412,7 +1412,7 @@ void ScInterpreter::ScConcat_MS()
                     svl::SharedString aSS;
                     GetCellString( aSS, aCell);
                     const OUString& rStr = aSS.getString();
-                    if (CheckStringResultLen( aResBuf, rStr))
+                    if (CheckStringResultLen(aResBuf, rStr.getLength()))
                         aResBuf.append( rStr);
                 }
             }
@@ -1434,10 +1434,8 @@ void ScInterpreter::ScConcat_MS()
                     SetError( FormulaError::IllegalParameter);
                     break;
                 }
-                if ( nRow1 > nRow2 )
-                    std::swap( nRow1, nRow2 );
-                if ( nCol1 > nCol2 )
-                    std::swap( nCol1, nCol2 );
+                PutInOrder( nRow1, nRow2 );
+                PutInOrder( nCol1, nCol2 );
                 ScAddress aAdr;
                 aAdr.SetTab( nTab1 );
                 for ( SCROW nRow = nRow1; nRow <= nRow2; nRow++ )
@@ -1452,7 +1450,7 @@ void ScInterpreter::ScConcat_MS()
                             svl::SharedString aSS;
                             GetCellString( aSS, aCell);
                             const OUString& rStr = aSS.getString();
-                            if (CheckStringResultLen( aResBuf, rStr))
+                            if (CheckStringResultLen(aResBuf, rStr.getLength()))
                                 aResBuf.append( rStr);
                         }
                     }
@@ -1478,17 +1476,17 @@ void ScInterpreter::ScConcat_MS()
                             {
                                 if ( pMat->IsStringOrEmpty( j, k ) )
                                 {
-                                    const OUString& rStr = pMat->GetString( j, k ).getString();
-                                    if (CheckStringResultLen( aResBuf, rStr))
-                                        aResBuf.append( rStr);
+                                    OUString aStr = pMat->GetString( j, k ).getString();
+                                    if (CheckStringResultLen(aResBuf, aStr.getLength()))
+                                        aResBuf.append(aStr);
                                 }
                                 else
                                 {
                                     if ( pMat->IsValue( j, k ) )
                                     {
-                                        const OUString& rStr = pMat->GetString( *pFormatter, j, k ).getString();
-                                        if (CheckStringResultLen( aResBuf, rStr))
-                                            aResBuf.append( rStr);
+                                        OUString aStr = pMat->GetString( *pFormatter, j, k ).getString();
+                                        if (CheckStringResultLen(aResBuf, aStr.getLength()))
+                                            aResBuf.append(aStr);
                                     }
                                 }
                             }
@@ -1559,10 +1557,8 @@ void ScInterpreter::ScTextJoin_MS()
                 SetError( FormulaError::IllegalParameter);
                 break;
             }
-            if ( nRow1 > nRow2 )
-                std::swap( nRow1, nRow2 );
-            if ( nCol1 > nCol2 )
-                std::swap( nCol1, nCol2 );
+            PutInOrder( nRow1, nRow2 );
+            PutInOrder( nCol1, nCol2 );
             ScAddress aAdr;
             aAdr.SetTab( nTab1 );
             for ( SCROW nRow = nRow1; nRow <= nRow2; nRow++ )
@@ -1658,7 +1654,7 @@ void ScInterpreter::ScTextJoin_MS()
                     }
                     else
                         bFirst = false;
-                    if (CheckStringResultLen( aResBuf, aStr))
+                    if (CheckStringResultLen(aResBuf, aStr.getLength()))
                         aResBuf.append( aStr );
                 }
             }
@@ -1690,7 +1686,7 @@ void ScInterpreter::ScTextJoin_MS()
                     }
                     else
                         bFirst = false;
-                    if (CheckStringResultLen( aResBuf, aStr))
+                    if (CheckStringResultLen(aResBuf, aStr.getLength()))
                         aResBuf.append( aStr );
                 }
             }
@@ -1712,10 +1708,8 @@ void ScInterpreter::ScTextJoin_MS()
                     SetError( FormulaError::IllegalParameter);
                     break;
                 }
-                if ( nRow1 > nRow2 )
-                    std::swap( nRow1, nRow2 );
-                if ( nCol1 > nCol2 )
-                    std::swap( nCol1, nCol2 );
+                PutInOrder( nRow1, nRow2 );
+                PutInOrder( nCol1, nCol2 );
                 ScAddress aAdr;
                 aAdr.SetTab( nTab1 );
                 OUString aStr;
@@ -1747,7 +1741,7 @@ void ScInterpreter::ScTextJoin_MS()
                             }
                             else
                                 bFirst = false;
-                            if (CheckStringResultLen( aResBuf, aStr))
+                            if (CheckStringResultLen(aResBuf, aStr.getLength()))
                                 aResBuf.append( aStr );
                         }
                     }
@@ -1796,7 +1790,7 @@ void ScInterpreter::ScTextJoin_MS()
                                     }
                                     else
                                         bFirst = false;
-                                    if (CheckStringResultLen( aResBuf, aStr))
+                                    if (CheckStringResultLen(aResBuf, aStr.getLength()))
                                         aResBuf.append( aStr );
                                 }
                             }

@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
 #include <test/container/xindexaccess.hxx>
@@ -33,7 +33,7 @@
 using namespace css;
 namespace sc_apitest
 {
-class ScDataPilotFieldsObj : public CalcUnoApiTest,
+class ScDataPilotFieldsObj : public UnoApiTest,
                              public apitest::XElementAccess,
                              public apitest::XEnumerationAccess,
                              public apitest::XIndexAccess,
@@ -44,7 +44,6 @@ public:
     ScDataPilotFieldsObj();
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScDataPilotFieldsObj);
 
@@ -70,13 +69,10 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScDataPilotFieldsObj::ScDataPilotFieldsObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<beans::XPropertySet>::get())
     , XIndexAccess(6)
     , XNameAccess("")
@@ -86,7 +82,7 @@ ScDataPilotFieldsObj::ScDataPilotFieldsObj()
 
 uno::Reference<uno::XInterface> ScDataPilotFieldsObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
     uno::Reference<container::XIndexAccess> xIA(xSheets, uno::UNO_QUERY_THROW);
 
@@ -119,15 +115,9 @@ uno::Reference<uno::XInterface> ScDataPilotFieldsObj::init()
 
 void ScDataPilotFieldsObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScDataPilotFieldsObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDataPilotFieldsObj);

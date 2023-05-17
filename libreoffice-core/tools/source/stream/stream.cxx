@@ -26,12 +26,12 @@
 #include <memory>
 
 #include <string.h>
-#include <stdio.h>
 
 #include <o3tl/safeint.hxx>
 #include <osl/endian.h>
 #include <osl/diagnose.h>
 #include <rtl/strbuf.hxx>
+#include <rtl/string.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 #include <tools/long.hxx>
@@ -361,14 +361,19 @@ void SvStream::SetError( ErrCode nErrorCode )
 
 void SvStream::SetEndian( SvStreamEndian nNewFormat )
 {
-    m_nEndian = nNewFormat;
-    m_isSwap = false;
 #ifdef OSL_BIGENDIAN
-    if (m_nEndian == SvStreamEndian::LITTLE)
-        m_isSwap = true;
+    m_isSwap = nNewFormat == SvStreamEndian::LITTLE;
 #else
-    if (m_nEndian == SvStreamEndian::BIG)
-        m_isSwap = true;
+    m_isSwap = nNewFormat == SvStreamEndian::BIG;
+#endif
+}
+
+SvStreamEndian SvStream::GetEndian() const
+{
+#ifdef OSL_BIGENDIAN
+    return m_isSwap ? SvStreamEndian::LITTLE : SvStreamEndian::BIG;
+#else
+    return m_isSwap ? SvStreamEndian::BIG : SvStreamEndian::LITTLE;
 #endif
 }
 
@@ -378,7 +383,7 @@ void SvStream::SetBufferSize( sal_uInt16 nBufferSize )
     bool bDontSeek = (m_pRWBuf == nullptr);
 
     if (m_isDirty && m_isWritable)  // due to Windows NT: Access denied
-        Flush();
+        FlushBuffer();
 
     if (m_nBufSize)
     {
@@ -426,13 +431,21 @@ bool SvStream::ReadByteStringLine( OUString& rStr, rtl_TextEncoding eSrcCharSet,
 
 bool SvStream::ReadLine( OString& rStr, sal_Int32 nMaxBytesToRead )
 {
+    OStringBuffer aBuf(4096);
+    bool rv = ReadLine(aBuf, nMaxBytesToRead);
+    rStr = aBuf.makeStringAndClear();
+    return rv;
+}
+
+bool SvStream::ReadLine( OStringBuffer& aBuf, sal_Int32 nMaxBytesToRead )
+{
     char    buf[256+1];
     bool        bEnd        = false;
     sal_uInt64  nOldFilePos = Tell();
     char    c           = 0;
     std::size_t nTotalLen   = 0;
 
-    OStringBuffer aBuf(4096);
+    aBuf.setLength(0);
     while( !bEnd && !GetError() )   // Don't test for EOF as we
                                     // are reading block-wise!
     {
@@ -443,7 +456,7 @@ bool SvStream::ReadLine( OString& rStr, sal_Int32 nMaxBytesToRead )
             {
                 // Exit on first block-read error
                 m_isEof = true;
-                rStr.clear();
+                aBuf.setLength(0);
                 return false;
             }
             else
@@ -494,7 +507,6 @@ bool SvStream::ReadLine( OString& rStr, sal_Int32 nMaxBytesToRead )
 
     if ( bEnd )
         m_isEof = false;
-    rStr = aBuf.makeStringAndClear();
     return bEnd;
 }
 
@@ -705,10 +717,11 @@ bool SvStream::WriteUniOrByteChar( sal_Unicode ch, rtl_TextEncoding eDestCharSet
 
 void SvStream::StartWritingUnicodeText()
 {
+    m_isSwap = false; // Switch to no endian swapping
     // BOM, Byte Order Mark, U+FEFF, see
     // http://www.unicode.org/faq/utf_bom.html#BOM
     // Upon read: 0xfeff(-257) => no swap; 0xfffe(-2) => swap
-    writeNumberWithoutSwap(sal_uInt16(0xfeff)); // write native format
+    WriteUInt16(0xfeff);
 }
 
 void SvStream::StartReadingUnicodeText( rtl_TextEncoding eReadBomCharSet )
@@ -718,52 +731,54 @@ void SvStream::StartReadingUnicodeText( rtl_TextEncoding eReadBomCharSet )
             eReadBomCharSet == RTL_TEXTENCODING_UTF8))
         return;    // nothing to read
 
-    bool bTryUtf8 = false;
-    sal_uInt16 nFlag(0);
-    sal_sSize nBack = sizeof(nFlag);
-    ReadUInt16( nFlag );
+    const sal_uInt64 nOldPos = Tell();
+    bool bGetBack = true;
+    unsigned char nFlag(0);
+    ReadUChar( nFlag );
     switch ( nFlag )
     {
-        case 0xfeff :
-            // native UTF-16
-            if (    eReadBomCharSet == RTL_TEXTENCODING_DONTKNOW ||
-                    eReadBomCharSet == RTL_TEXTENCODING_UNICODE)
-                nBack = 0;
-        break;
-        case 0xfffe :
-            // swapped UTF-16
+        case 0xfe: // UTF-16BE?
             if (    eReadBomCharSet == RTL_TEXTENCODING_DONTKNOW ||
                     eReadBomCharSet == RTL_TEXTENCODING_UNICODE)
             {
-                SetEndian( m_nEndian == SvStreamEndian::BIG ? SvStreamEndian::LITTLE : SvStreamEndian::BIG );
-                nBack = 0;
+                ReadUChar(nFlag);
+                if (nFlag == 0xff)
+                {
+                    SetEndian(SvStreamEndian::BIG);
+                    bGetBack = false;
+                }
             }
         break;
-        case 0xefbb :
-            if (m_nEndian == SvStreamEndian::BIG &&
-                    (eReadBomCharSet == RTL_TEXTENCODING_DONTKNOW ||
-                     eReadBomCharSet == RTL_TEXTENCODING_UTF8))
-                bTryUtf8 = true;
+        case 0xff: // UTF-16LE?
+            if (    eReadBomCharSet == RTL_TEXTENCODING_DONTKNOW ||
+                    eReadBomCharSet == RTL_TEXTENCODING_UNICODE)
+            {
+                ReadUChar(nFlag);
+                if (nFlag == 0xfe)
+                {
+                    SetEndian(SvStreamEndian::LITTLE);
+                    bGetBack = false;
+                }
+            }
         break;
-        case 0xbbef :
-            if (m_nEndian == SvStreamEndian::LITTLE &&
-                    (eReadBomCharSet == RTL_TEXTENCODING_DONTKNOW ||
-                     eReadBomCharSet == RTL_TEXTENCODING_UTF8))
-                bTryUtf8 = true;
+        case 0xef: // UTF-8?
+            if (    eReadBomCharSet == RTL_TEXTENCODING_DONTKNOW ||
+                    eReadBomCharSet == RTL_TEXTENCODING_UTF8)
+            {
+                ReadUChar(nFlag);
+                if (nFlag == 0xbb)
+                {
+                    ReadUChar(nFlag);
+                    if (nFlag == 0xbf)
+                        bGetBack = false; // it is UTF-8
+                }
+            }
         break;
         default:
             ;   // nothing
     }
-    if (bTryUtf8)
-    {
-        unsigned char nChar(0);
-        nBack += sizeof(nChar);
-        ReadUChar( nChar );
-        if (nChar == 0xbf)
-            nBack = 0;      // it is UTF-8
-    }
-    if (nBack)
-        SeekRel( -nBack );      // no BOM, pure data
+    if (bGetBack)
+        Seek(nOldPos);      // no BOM, pure data
 }
 
 sal_uInt64 SvStream::SeekRel(sal_Int64 const nPos)
@@ -1346,17 +1361,15 @@ void SvStream::RefreshBuffer()
 
 SvStream& SvStream::WriteInt32AsString(sal_Int32 nInt32)
 {
-    char buffer[12];
-    std::size_t nLen = sprintf(buffer, "%" SAL_PRIdINT32, nInt32);
-    WriteBytes(buffer, nLen);
+    auto const buffer = OString::number(nInt32);
+    WriteBytes(buffer.getStr(), buffer.length);
     return *this;
 }
 
 SvStream& SvStream::WriteUInt32AsString(sal_uInt32 nUInt32)
 {
-    char buffer[11];
-    std::size_t nLen = sprintf(buffer, "%" SAL_PRIuUINT32, nUInt32);
-    WriteBytes(buffer, nLen);
+    auto const buffer = OString::number(nUInt32);
+    WriteBytes(buffer.getStr(), buffer.length);
     return *this;
 }
 
@@ -1544,7 +1557,7 @@ SvMemoryStream::~SvMemoryStream()
         if( bOwnsData )
             FreeMemory();
         else
-            Flush();
+            FlushBuffer();
     }
 }
 
@@ -1752,7 +1765,7 @@ void SvMemoryStream::FreeMemory()
 
 void* SvMemoryStream::SwitchBuffer()
 {
-    Flush();
+    FlushBuffer();
     if( !bOwnsData )
         return nullptr;
     Seek( STREAM_SEEK_TO_BEGIN );
@@ -1785,7 +1798,16 @@ void SvMemoryStream::SetSize(sal_uInt64 const nNewSize)
     ReAllocateMemory( nDiff );
 }
 
-//Create an OString of nLen bytes from rStream
+void SvMemoryStream::MakeReadOnly()
+{
+    FlushBuffer();
+    m_isWritable = false;
+    nResize     = 0;
+    SetBufferSize( 0 );
+}
+
+// Create an OString of nLen bytes from rStream
+// coverity[ +taint_sanitize ]
 OString read_uInt8s_ToOString(SvStream& rStrm, std::size_t nLen)
 {
     rtl_String *pStr = nullptr;
@@ -1816,7 +1838,8 @@ OString read_uInt8s_ToOString(SvStream& rStrm, std::size_t nLen)
     return pStr ? OString(pStr, SAL_NO_ACQUIRE) : OString();
 }
 
-//Create an OUString of nLen sal_Unicode code units from rStream
+// Create an OUString of nLen sal_Unicode code units from rStream
+// coverity[ +taint_sanitize ]
 OUString read_uInt16s_ToOUString(SvStream& rStrm, std::size_t nLen)
 {
     rtl_uString *pStr = nullptr;
@@ -1848,7 +1871,8 @@ OUString read_uInt16s_ToOUString(SvStream& rStrm, std::size_t nLen)
         }
     }
 
-    //take ownership of buffer and return, otherwise return empty string
+    // take ownership of buffer and return, otherwise return empty string
+    // coverity[tainted_data] - unhelpful untrusted loop bound
     return pStr ? OUString(pStr, SAL_NO_ACQUIRE) : OUString();
 }
 

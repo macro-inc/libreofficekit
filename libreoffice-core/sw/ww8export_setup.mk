@@ -24,6 +24,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_ww8export$(1), \
     comphelper \
     cppu \
     cppuhelper \
+    docmodel \
     editeng \
     emboleobj \
     sal \
@@ -31,6 +32,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_ww8export$(1), \
     test \
     unotest \
     utl \
+    subsequenttest \
     svl \
     svxcore \
     sw \

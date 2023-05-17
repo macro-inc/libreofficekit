@@ -7,13 +7,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/PropertyValues.hpp>
+#include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 
 #include <tools/UnitConversion.hxx>
 
@@ -22,42 +21,22 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Tests for writerfilter/source/dmapper/DomainMapper.cxx.
-class Test : public test::BootstrapFixture, public unotest::MacrosTest
+class Test : public UnoApiTest
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
+    Test()
+        : UnoApiTest("/writerfilter/qa/cppunittests/dmapper/data/")
+    {
+    }
 };
-
-void Test::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void Test::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/writerfilter/qa/cppunittests/dmapper/data/";
 
 CPPUNIT_TEST_FIXTURE(Test, testLargeParaTopMargin)
 {
     // Given a document with a paragraph with a large "before" spacing.
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "large-para-top-margin.docx";
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"large-para-top-margin.docx");
 
     // When checking the first paragraph.
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParaEnumAccess(xTextDocument->getText(),
                                                                   uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParaEnum = xParaEnumAccess->createEnumeration();
@@ -79,13 +58,10 @@ CPPUNIT_TEST_FIXTURE(Test, testLargeParaTopMargin)
 CPPUNIT_TEST_FIXTURE(Test, testSdtRunInPara)
 {
     // Given a document with a block SDT, and inside that some content + a run SDT:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "sdt-run-in-para.docx";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"sdt-run-in-para.docx");
 
     // Then make sure the content inside the block SDT but outside the run SDT is not lost:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParaEnumAccess(xTextDocument->getText(),
                                                                   uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParaEnum = xParaEnumAccess->createEnumeration();
@@ -100,14 +76,10 @@ CPPUNIT_TEST_FIXTURE(Test, testSdtRunInPara)
 CPPUNIT_TEST_FIXTURE(Test, testSdtDropdownNoDisplayText)
 {
     // Given a document with <w:listItem w:value="..."/> (no display text):
-    OUString aURL
-        = m_directories.getURLFromSrc(DATA_DIRECTORY) + "sdt-dropdown-no-display-text.docx";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"sdt-dropdown-no-display-text.docx");
 
     // Then make sure we create a dropdown content control, not a rich text one:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -128,6 +100,24 @@ CPPUNIT_TEST_FIXTURE(Test, testSdtDropdownNoDisplayText)
     // - Actual  : 0
     // i.e. the list item was lost on import.
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), aListItems.getLength());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testFloattableThenTable)
+{
+    // Given a document with an in-section floating table, followed by a table:
+    // When laying out that document:
+    loadFromURL(u"floattable-then-table.docx");
+
+    // Then make sure that instead of crashing, the floating table is anchored inside the body text
+    // (and not a cell):
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XText> xBodyText = xTextDocument->getText();
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
+    uno::Reference<text::XTextContent> xShape(xDrawPage->getByIndex(0), uno::UNO_QUERY);
+    uno::Reference<text::XTextRange> xAnchor = xShape->getAnchor();
+    // Make sure the anchor text is the body text, not some cell.
+    CPPUNIT_ASSERT_EQUAL(xBodyText, xAnchor->getText());
 }
 }
 

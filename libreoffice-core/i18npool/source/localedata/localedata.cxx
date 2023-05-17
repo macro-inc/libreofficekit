@@ -18,20 +18,22 @@
  */
 
 #include <memory>
+#include <mutex>
 #include <string_view>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/container/XIndexAccess.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
-#include <com/sun/star/text/HoriOrientation.hpp>
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <editeng/svxenum.hxx>
 #include <localedata.hxx>
 #include <i18nlangtag/mslangid.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
 #include <sal/macros.h>
+#include <o3tl/string_view.hxx>
 
 namespace com::sun::star::uno { class XComponentContext; }
 
@@ -51,10 +53,6 @@ static const char *lcl_DATA_EN = "localedata_en";
 static const char *lcl_DATA_ES = "localedata_es";
 static const char *lcl_DATA_EURO = "localedata_euro";
 static const char *lcl_DATA_OTHERS = "localedata_others";
-
-#endif
-
-#ifndef DISABLE_DYNLOADING
 
 const struct {
     const char* pLocale;
@@ -82,6 +80,7 @@ const struct {
     { "en_NG",  lcl_DATA_EN },
     { "en_KE",  lcl_DATA_EN },
     { "en_DK",  lcl_DATA_EN },
+    { "en_MU",  lcl_DATA_EN },
 
     { "es_ES",  lcl_DATA_ES },
     { "es_AR",  lcl_DATA_ES },
@@ -103,6 +102,7 @@ const struct {
     { "es_UY",  lcl_DATA_ES },
     { "es_VE",  lcl_DATA_ES },
     { "gl_ES",  lcl_DATA_ES },
+    { "oc_ES_aranes",  lcl_DATA_ES },
 
     { "de_DE",  lcl_DATA_EURO },
     { "de_AT",  lcl_DATA_EURO },
@@ -142,8 +142,9 @@ const struct {
     { "nb_NO",  lcl_DATA_EURO },
     { "nds_DE", lcl_DATA_EURO },
     { "pl_PL",  lcl_DATA_EURO },
-    { "pt_BR",  lcl_DATA_EURO },
     { "pt_PT",  lcl_DATA_EURO },
+    { "pt_BR",  lcl_DATA_EURO },  // needs to be in EURO because inherits from pt_PT
+    { "pt_MZ",  lcl_DATA_EURO },  // needs to be in EURO because inherits from pt_PT
     { "ru_RU",  lcl_DATA_EURO },
     { "tr_TR",  lcl_DATA_EURO },
     { "tt_RU",  lcl_DATA_EURO },
@@ -179,7 +180,7 @@ const struct {
     { "fur_IT", lcl_DATA_EURO },
     { "gsc_FR", lcl_DATA_EURO },
     { "fy_NL",  lcl_DATA_EURO },
-    { "oc_FR",  lcl_DATA_EURO },
+    { "oc_FR_lengadoc",  lcl_DATA_EURO },
     { "mt_MT",  lcl_DATA_EURO },
     { "sc_IT",  lcl_DATA_EURO },
     { "ast_ES", lcl_DATA_EURO },
@@ -333,7 +334,9 @@ const struct {
     { "ha_Latn_NG",  lcl_DATA_OTHERS },
     { "min_ID", lcl_DATA_OTHERS },
     { "sun_ID", lcl_DATA_OTHERS },
-    { "en_IL",  lcl_DATA_OTHERS }   // needs to be in OTHERS instead of EN because inherits from he_IL
+    { "en_IL",  lcl_DATA_OTHERS },  // needs to be in OTHERS instead of EN because inherits from he_IL
+    { "pdc_US", lcl_DATA_OTHERS },
+    { "dv_MV",  lcl_DATA_OTHERS }
 };
 
 #else
@@ -346,22 +349,6 @@ const sal_Unicode cUnder = '_';
 const sal_Unicode cHyphen = '-';
 
 const sal_Int16 nbOfLocales = SAL_N_ELEMENTS(aLibTable);
-
-struct LocaleDataLookupTableItem
-{
-    const char* dllName;
-    osl::Module *module;
-    const char* localeName;
-    css::lang::Locale aLocale;
-
-    LocaleDataLookupTableItem(const char *name, osl::Module* m, const char* lname) : dllName(name), module(m), localeName(lname)
-    {
-    }
-    bool equals(const css::lang::Locale& rLocale) const
-    {
-        return (rLocale == aLocale);
-    }
-};
 
 namespace i18npool {
 
@@ -492,10 +479,10 @@ public:
 
     oslGenericFunction getFunctionSymbolByName(
             const OUString& localeName, const char* pFunction,
-            std::unique_ptr<LocaleDataLookupTableItem>* pOutCachedItem );
+            std::optional<LocaleDataLookupTableItem>& rOutCachedItem );
 
 private:
-    ::osl::Mutex maMutex;
+    std::mutex maMutex;
     ::std::vector< LocaleDataLookupTableItem >  maLookupTable;
 };
 
@@ -523,7 +510,7 @@ lcl_LookupTableHelper::~lcl_LookupTableHelper()
 
 oslGenericFunction lcl_LookupTableHelper::getFunctionSymbolByName(
         const OUString& localeName, const char* pFunction,
-        std::unique_ptr<LocaleDataLookupTableItem>* pOutCachedItem )
+        std::optional<LocaleDataLookupTableItem>& rOutCachedItem )
 {
     OUString aFallback;
     bool bFallback = (localeName.indexOf( cUnder) < 0);
@@ -545,23 +532,17 @@ oslGenericFunction lcl_LookupTableHelper::getFunctionSymbolByName(
         {
 #ifndef DISABLE_DYNLOADING
             {
-                ::osl::MutexGuard aGuard( maMutex );
+                std::unique_lock aGuard( maMutex );
                 for (LocaleDataLookupTableItem & rCurrent : maLookupTable)
                 {
                     if (rCurrent.dllName == i.pLib)
                     {
-                        OSL_ASSERT( pOutCachedItem );
-                        if( pOutCachedItem )
-                        {
-                            (*pOutCachedItem).reset(new LocaleDataLookupTableItem( rCurrent ));
-                            (*pOutCachedItem)->localeName = i.pLocale;
-                            OString sSymbolName = OString::Concat(pFunction) + "_" +
-                                    (*pOutCachedItem)->localeName;
-                            return (*pOutCachedItem)->module->getFunctionSymbol(
-                                    sSymbolName.getStr());
-                        }
-                        else
-                            return nullptr;
+                        rOutCachedItem.emplace( rCurrent );
+                        rOutCachedItem->localeName = i.pLocale;
+                        OString sSymbolName = OString::Concat(pFunction) + "_" +
+                                rOutCachedItem->localeName;
+                        return rOutCachedItem->module->getFunctionSymbol(
+                                sSymbolName.getStr());
                     }
                 }
             }
@@ -576,23 +557,17 @@ oslGenericFunction lcl_LookupTableHelper::getFunctionSymbolByName(
             std::unique_ptr<osl::Module> module(new osl::Module());
             if ( module->loadRelative(&thisModule, sModuleName.getStr()) )
             {
-                ::osl::MutexGuard aGuard( maMutex );
+                std::unique_lock aGuard( maMutex );
                 auto pTmpModule = module.get();
                 maLookupTable.emplace_back(i.pLib, module.release(), i.pLocale);
-                OSL_ASSERT( pOutCachedItem );
-                if( pOutCachedItem )
-                {
-                    pOutCachedItem->reset(new LocaleDataLookupTableItem( maLookupTable.back() ));
-                    OString sSymbolName = OString::Concat(pFunction) + "_" + (*pOutCachedItem)->localeName;
-                    return pTmpModule->getFunctionSymbol(sSymbolName.getStr());
-                }
-                else
-                    return nullptr;
+                rOutCachedItem.emplace( maLookupTable.back() );
+                OString sSymbolName = OString::Concat(pFunction) + "_" + rOutCachedItem->localeName;
+                return pTmpModule->getFunctionSymbol(sSymbolName.getStr());
             }
             else
                 module.reset();
 #else
-            (void) pOutCachedItem;
+            (void) rOutCachedItem;
 
             if( strcmp(pFunction, "getAllCalendars") == 0 )
                 return i.getAllCalendars;
@@ -1108,7 +1083,7 @@ LocaleDataImpl::getUnicodeScripts( const Locale& rLocale )
         Sequence< UnicodeScript > seq(scriptCount);
         auto seqRange = asNonConstRange(seq);
         for(sal_Int16 i = 0; i < scriptCount; i++) {
-            seqRange[i] = UnicodeScript( OUString(scriptArray[i]).toInt32() );
+            seqRange[i] = UnicodeScript( o3tl::toInt32(std::u16string_view(scriptArray[i], 1)) );
         }
         return seq;
     }
@@ -1344,6 +1319,7 @@ struct OutlineNumberingLevel_Impl
     sal_Int32       nLeftMargin;
     sal_Int32       nSymbolTextDistance;
     sal_Int32       nFirstLineOffset;
+    sal_Int16       nAdjust;
     OUString        sTransliteration;
     sal_Int32       nNatNum;
 };
@@ -1409,7 +1385,7 @@ LocaleDataImpl::getOutlineNumberingLevels( const lang::Locale& rLocale )
                         case 6: level[j].nLeftMargin         = tmp.toInt32();   break;
                         case 7: level[j].nSymbolTextDistance = tmp.toInt32();   break;
                         case 8: level[j].nFirstLineOffset    = tmp.toInt32();   break;
-                        case 9: break;
+                        case 9: level[j].nAdjust             = sal::static_int_cast<sal_Int16>(tmp.toInt32()); break;
                         case 10: level[j].sTransliteration = tmp; break;
                         case 11: level[j].nNatNum    = tmp.toInt32();   break;
                         default:
@@ -1420,6 +1396,7 @@ LocaleDataImpl::getOutlineNumberingLevels( const lang::Locale& rLocale )
             level[j].sPrefix.clear();
             level[j].nNumType            = 0;
             level[j].sSuffix.clear();
+            level[j].nAdjust = 0;
             level[j].cBulletChar         = 0;
             level[j].sBulletFontName.clear();
             level[j].nParentNumbering    = 0;
@@ -1443,26 +1420,26 @@ oslGenericFunction LocaleDataImpl::getFunctionSymbol( const Locale& rLocale, con
 {
     lcl_LookupTableHelper & rLookupTable = lcl_LookupTableStatic();
 
-    if (cachedItem && cachedItem->equals(rLocale))
+    if (moCachedItem && moCachedItem->equals(rLocale))
     {
         OString sSymbolName = OString::Concat(pFunction) + "_" +
-                cachedItem->localeName;
-        return cachedItem->module->getFunctionSymbol(sSymbolName.getStr());
+                moCachedItem->localeName;
+        return moCachedItem->module->getFunctionSymbol(sSymbolName.getStr());
     }
 
     oslGenericFunction pSymbol = nullptr;
-    std::unique_ptr<LocaleDataLookupTableItem> pCachedItem;
+    std::optional<LocaleDataLookupTableItem> oCachedItem;
 
     // Load function with name <func>_<lang>_<country> or <func>_<bcp47> and
     // fallbacks.
     pSymbol = rLookupTable.getFunctionSymbolByName( LocaleDataImpl::getFirstLocaleServiceName( rLocale),
-            pFunction, &pCachedItem);
+            pFunction, oCachedItem);
     if (!pSymbol)
     {
         ::std::vector< OUString > aFallbacks( LocaleDataImpl::getFallbackLocaleServiceNames( rLocale));
         for (const auto& rFallback : aFallbacks)
         {
-            pSymbol = rLookupTable.getFunctionSymbolByName(rFallback, pFunction, &pCachedItem);
+            pSymbol = rLookupTable.getFunctionSymbolByName(rFallback, pFunction, oCachedItem);
             if (pSymbol)
                 break;
         }
@@ -1470,17 +1447,17 @@ oslGenericFunction LocaleDataImpl::getFunctionSymbol( const Locale& rLocale, con
     if (!pSymbol)
     {
         // load default function with name <func>_en_US
-        pSymbol = rLookupTable.getFunctionSymbolByName("en_US", pFunction, &pCachedItem);
+        pSymbol = rLookupTable.getFunctionSymbolByName("en_US", pFunction, oCachedItem);
     }
 
     if (!pSymbol)
         // Appropriate symbol could not be found.  Give up.
         throw RuntimeException();
 
-    if (pCachedItem)
-        cachedItem = std::move(pCachedItem);
-    if (cachedItem)
-        cachedItem->aLocale = rLocale;
+    if (oCachedItem)
+        moCachedItem = std::move(oCachedItem);
+    if (moCachedItem)
+        moCachedItem->aLocale = rLocale;
 
     return pSymbol;
 }
@@ -1497,10 +1474,10 @@ LocaleDataImpl::getAllInstalledLocaleNames()
 
         // Check if the locale is really available and not just in the table,
         // don't allow fall backs.
-        std::unique_ptr<LocaleDataLookupTableItem> pCachedItem;
-        if (lcl_LookupTableStatic().getFunctionSymbolByName( name, "getLocaleItem", &pCachedItem )) {
-            if( pCachedItem )
-                cachedItem = std::move( pCachedItem );
+        std::optional<LocaleDataLookupTableItem> oCachedItem;
+        if (lcl_LookupTableStatic().getFunctionSymbolByName( name, "getLocaleItem", oCachedItem )) {
+            if( oCachedItem )
+                moCachedItem = std::move( oCachedItem );
             seqRange[nInstalled++] = LanguageTag::convertToLocale( name.replace( cUnder, cHyphen), false);
         }
     }
@@ -1512,7 +1489,6 @@ LocaleDataImpl::getAllInstalledLocaleNames()
 
 using namespace ::com::sun::star::container;
 using namespace ::com::sun::star::beans;
-using namespace ::com::sun::star::text;
 
 OutlineNumbering::OutlineNumbering(std::unique_ptr<const OutlineNumberingLevel_Impl[]> pOutlnLevels, int nLevels) :
     m_pOutlineLevels(std::move(pOutlnLevels)),
@@ -1554,7 +1530,7 @@ Any OutlineNumbering::getByIndex( sal_Int32 nIndex )
     pValues[8].Name = "FirstLineOffset";
     pValues[8].Value <<= pTemp->nFirstLineOffset;
     pValues[9].Name = "Adjust";
-    pValues[9].Value <<= sal_Int16(HoriOrientation::LEFT);
+    pValues[9].Value <<= pTemp->nAdjust;
     pValues[10].Name = "Transliteration";
     pValues[10].Value <<= pTemp->sTransliteration;
     pValues[11].Name = "NatNum";

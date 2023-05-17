@@ -80,13 +80,15 @@ class FontTable : public LoggedProperties, public LoggedTable
                                ::writerfilter::Reference<Stream>::Pointer_t ref) override;
     virtual void lcl_startShape(css::uno::Reference<css::drawing::XShape> const& xShape) override;
     virtual void lcl_endShape( ) override;
+    virtual void lcl_startTextBoxContent() override {};
+    virtual void lcl_endTextBoxContent() override {};
 };
 typedef tools::SvRef< FontTable >          FontTablePtr;
 
 class EmbeddedFontHandler : public LoggedProperties
 {
 public:
-    EmbeddedFontHandler(FontTable& rFontTable, const OUString& fontName, const char* style);
+    EmbeddedFontHandler(FontTable& rFontTable, OUString fontName, const char* style);
     virtual ~EmbeddedFontHandler() override;
 private:
     virtual void lcl_attribute( Id name, Value& val ) override;

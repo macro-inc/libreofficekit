@@ -17,10 +17,16 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cstddef>
+
 #include "WrappedGapwidthProperty.hxx"
 #include "Chart2ModelContact.hxx"
+#include <ChartType.hxx>
 #include <DiagramHelper.hxx>
 #include <tools/long.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 using ::com::sun::star::uno::Reference;
@@ -35,15 +41,15 @@ const sal_Int32 DEFAULT_OVERLAP = 0;
 
 WrappedBarPositionProperty_Base::WrappedBarPositionProperty_Base(
                   const OUString& rOuterName
-                , const OUString& rInnerSequencePropertyName
+                , OUString aInnerSequencePropertyName
                 , sal_Int32 nDefaultValue
-                , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact )
+                , std::shared_ptr<Chart2ModelContact> spChart2ModelContact )
             : WrappedDefaultProperty( rOuterName, OUString(), uno::Any( nDefaultValue ) )
             , m_nDimensionIndex(0)
             , m_nAxisIndex(0)
-            , m_spChart2ModelContact( spChart2ModelContact )
+            , m_spChart2ModelContact(std::move( spChart2ModelContact ))
             , m_nDefaultValue( nDefaultValue )
-            , m_InnerSequencePropertyName( rInnerSequencePropertyName )
+            , m_InnerSequencePropertyName(std::move( aInnerSequencePropertyName ))
 {
 }
 
@@ -65,36 +71,32 @@ void WrappedBarPositionProperty_Base::setPropertyValue( const Any& rOuterValue, 
 
     m_aOuterValue = rOuterValue;
 
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if( !xDiagram.is() )
         return;
 
     if( m_nDimensionIndex!=1 )
         return;
 
-    const Sequence< Reference< chart2::XChartType > > aChartTypeList( DiagramHelper::getChartTypesFromDiagram( xDiagram ) );
-    for( Reference< chart2::XChartType > const & chartType : aChartTypeList )
+    const std::vector< rtl::Reference< ChartType > > aChartTypeList( DiagramHelper::getChartTypesFromDiagram( xDiagram ) );
+    for( rtl::Reference< ChartType > const & chartType : aChartTypeList )
     {
         try
         {
-            Reference< beans::XPropertySet > xProp( chartType, uno::UNO_QUERY );
-            if( xProp.is() )
+            Sequence< sal_Int32 > aBarPositionSequence;
+            chartType->getPropertyValue( m_InnerSequencePropertyName ) >>= aBarPositionSequence;
+
+            tools::Long nOldLength = aBarPositionSequence.getLength();
+            if( nOldLength <= m_nAxisIndex  )
+                aBarPositionSequence.realloc( m_nAxisIndex+1 );
+            auto pBarPositionSequence = aBarPositionSequence.getArray();
+            for( sal_Int32 i=nOldLength; i<m_nAxisIndex; i++ )
             {
-                Sequence< sal_Int32 > aBarPositionSequence;
-                xProp->getPropertyValue( m_InnerSequencePropertyName ) >>= aBarPositionSequence;
-
-                tools::Long nOldLength = aBarPositionSequence.getLength();
-                if( nOldLength <= m_nAxisIndex  )
-                    aBarPositionSequence.realloc( m_nAxisIndex+1 );
-                auto pBarPositionSequence = aBarPositionSequence.getArray();
-                for( sal_Int32 i=nOldLength; i<m_nAxisIndex; i++ )
-                {
-                    pBarPositionSequence[i] = m_nDefaultValue;
-                }
-                pBarPositionSequence[m_nAxisIndex] = nNewValue;
-
-                xProp->setPropertyValue( m_InnerSequencePropertyName, uno::Any( aBarPositionSequence ) );
+                pBarPositionSequence[i] = m_nDefaultValue;
             }
+            pBarPositionSequence[m_nAxisIndex] = nNewValue;
+
+            chartType->setPropertyValue( m_InnerSequencePropertyName, uno::Any( aBarPositionSequence ) );
         }
         catch( uno::Exception& e )
         {
@@ -107,7 +109,7 @@ void WrappedBarPositionProperty_Base::setPropertyValue( const Any& rOuterValue, 
 
 Any WrappedBarPositionProperty_Base::getPropertyValue( const Reference< beans::XPropertySet >& /*xInnerPropertySet*/ ) const
 {
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if( xDiagram.is() )
     {
         bool bInnerValueDetected = false;
@@ -115,21 +117,17 @@ Any WrappedBarPositionProperty_Base::getPropertyValue( const Reference< beans::X
 
         if( m_nDimensionIndex==1 )
         {
-            Sequence< Reference< chart2::XChartType > > aChartTypeList( DiagramHelper::getChartTypesFromDiagram( xDiagram ) );
-            for( sal_Int32 nN = 0; nN < aChartTypeList.getLength() && !bInnerValueDetected; nN++ )
+            std::vector< rtl::Reference< ChartType > > aChartTypeList( DiagramHelper::getChartTypesFromDiagram( xDiagram ) );
+            for( std::size_t nN = 0; nN < aChartTypeList.size() && !bInnerValueDetected; nN++ )
             {
                 try
                 {
-                    Reference< beans::XPropertySet > xProp( aChartTypeList[nN], uno::UNO_QUERY );
-                    if( xProp.is() )
+                    Sequence< sal_Int32 > aBarPositionSequence;
+                    aChartTypeList[nN]->getPropertyValue( m_InnerSequencePropertyName ) >>= aBarPositionSequence;
+                    if( m_nAxisIndex < aBarPositionSequence.getLength() )
                     {
-                        Sequence< sal_Int32 > aBarPositionSequence;
-                        xProp->getPropertyValue( m_InnerSequencePropertyName ) >>= aBarPositionSequence;
-                        if( m_nAxisIndex < aBarPositionSequence.getLength() )
-                        {
-                            nInnerValue = aBarPositionSequence[m_nAxisIndex];
-                            bInnerValueDetected = true;
-                        }
+                        nInnerValue = aBarPositionSequence[m_nAxisIndex];
+                        bInnerValueDetected = true;
                     }
                 }
                 catch( uno::Exception& e )

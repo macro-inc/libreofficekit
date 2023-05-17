@@ -21,6 +21,7 @@
 #include <tools/datetime.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/weldutils.hxx>
@@ -75,7 +76,7 @@
 #include <dinfdlg.hrc>
 #include <sfx2/strings.hrc>
 #include <strings.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "securitypage.hxx"
 
 #include <algorithm>
@@ -88,8 +89,8 @@ struct CustomProperty
     OUString         m_sName;
     css::uno::Any    m_aValue;
 
-    CustomProperty( const OUString& sName, const css::uno::Any& rValue ) :
-        m_sName( sName ), m_aValue( rValue ) {}
+    CustomProperty( OUString sName, css::uno::Any aValue ) :
+        m_sName(std::move( sName )), m_aValue(std::move( aValue )) {}
 
     bool operator==(const CustomProperty& rProp) const
     {
@@ -159,8 +160,8 @@ OUString ConvertDateTime_Impl( std::u16string_view rName,
      OUString aStr = rWrapper.getDate( aD )
                    + aDelim
                    + rWrapper.getTime( aT );
-     OUString aAuthor = comphelper::string::stripStart(rName, ' ');
-     if (!aAuthor.isEmpty())
+     std::u16string_view aAuthor = comphelper::string::stripStart(rName, ' ');
+     if (!aAuthor.empty())
      {
         aStr += aDelim + aAuthor;
      }
@@ -608,14 +609,14 @@ bool SfxDocumentDescPage::FillItemSet(SfxItemSet *rSet)
     }
 
     // Generating the output data
-    const SfxPoolItem* pItem = nullptr;
+    const SfxDocumentInfoItem* pItem = nullptr;
     SfxDocumentInfoItem* pInfo = nullptr;
     const SfxItemSet* pExSet = GetDialogExampleSet();
 
-    if ( pExSet && SfxItemState::SET != pExSet->GetItemState( SID_DOCINFO, true, &pItem ) )
+    if ( pExSet && !(pItem = pExSet->GetItemIfSet( SID_DOCINFO )) )
         pInfo = m_pInfoItem;
     else if ( pItem )
-        pInfo = new SfxDocumentInfoItem( *static_cast<const SfxDocumentInfoItem *>(pItem) );
+        pInfo = new SfxDocumentInfoItem( *pItem );
 
     if ( !pInfo )
     {
@@ -697,6 +698,8 @@ SfxDocumentPage::SfxDocumentPage(weld::Container* pPage, weld::DialogController*
     , m_xImagePreferredDpiCheckButton(m_xBuilder->weld_check_button("image-preferred-dpi-checkbutton"))
     , m_xImagePreferredDpiComboBox(m_xBuilder->weld_combo_box("image-preferred-dpi-combobox"))
 {
+    m_xUseUserDataCB->set_accessible_description(SfxResId(STR_A11Y_DESC_USERDATA));
+
     m_aUnknownSize = m_xShowSizeFT->get_label();
     m_xShowSizeFT->set_label(OUString());
 
@@ -883,11 +886,10 @@ bool SfxDocumentPage::FillItemSet( SfxItemSet* rSet )
          m_xUseUserDataCB->get_state_changed_from_saved() )
     {
         const SfxItemSet* pExpSet = GetDialogExampleSet();
-        const SfxPoolItem* pItem;
+        const SfxDocumentInfoItem* pInfoItem;
 
-        if ( pExpSet && SfxItemState::SET == pExpSet->GetItemState( SID_DOCINFO, true, &pItem ) )
+        if ( pExpSet && (pInfoItem = pExpSet->GetItemIfSet( SID_DOCINFO ) ) )
         {
-            const SfxDocumentInfoItem* pInfoItem = static_cast<const SfxDocumentInfoItem*>(pItem);
             bool bUseData = ( TRISTATE_TRUE == m_xUseUserDataCB->get_state() );
             const_cast<SfxDocumentInfoItem*>(pInfoItem)->SetUseUserData( bUseData );
             rSet->Put( *pInfoItem );
@@ -898,10 +900,9 @@ bool SfxDocumentPage::FillItemSet( SfxItemSet* rSet )
     if ( bHandleDelete )
     {
         const SfxItemSet* pExpSet = GetDialogExampleSet();
-        const SfxPoolItem* pItem;
-        if ( pExpSet && SfxItemState::SET == pExpSet->GetItemState( SID_DOCINFO, true, &pItem ) )
+        const SfxDocumentInfoItem* pInfoItem;
+        if ( pExpSet && (pInfoItem = pExpSet->GetItemIfSet( SID_DOCINFO )) )
         {
-            const SfxDocumentInfoItem* pInfoItem = static_cast<const SfxDocumentInfoItem*>(pItem);
             bool bUseAuthor = bEnableUseUserData && m_xUseUserDataCB->get_active();
             SfxDocumentInfoItem newItem( *pInfoItem );
             newItem.resetUserData( bUseAuthor
@@ -919,11 +920,10 @@ bool SfxDocumentPage::FillItemSet( SfxItemSet* rSet )
     if ( m_xUseThumbnailSaveCB->get_state_changed_from_saved() )
     {
         const SfxItemSet* pExpSet = GetDialogExampleSet();
-        const SfxPoolItem* pItem;
+        const SfxDocumentInfoItem* pInfoItem;
 
-        if ( pExpSet && SfxItemState::SET == pExpSet->GetItemState( SID_DOCINFO, true, &pItem ) )
+        if ( pExpSet && (pInfoItem = pExpSet->GetItemIfSet( SID_DOCINFO )) )
         {
-            const SfxDocumentInfoItem* pInfoItem = static_cast<const SfxDocumentInfoItem*>(pItem);
             bool bUseThumbnail = ( TRISTATE_TRUE == m_xUseThumbnailSaveCB->get_state() );
             const_cast<SfxDocumentInfoItem*>(pInfoItem)->SetUseThumbnailSave( bUseThumbnail );
             rSet->Put( *pInfoItem );
@@ -946,7 +946,7 @@ bool SfxDocumentPage::FillItemSet( SfxItemSet* rSet )
                     OUString aImagePreferredDPIString = m_xImagePreferredDpiComboBox->get_active_text();
                     nImagePreferredDPI = aImagePreferredDPIString.toInt32();
                 }
-                xProps->setPropertyValue("ImagePreferredDPI", uno::makeAny(nImagePreferredDPI));
+                xProps->setPropertyValue("ImagePreferredDPI", uno::Any(nImagePreferredDPI));
             }
         }
     }
@@ -1164,10 +1164,9 @@ SfxDocumentInfoDialog::SfxDocumentInfoDialog(weld::Window* pParent, const SfxIte
 #endif
 
      // Determine the Titles
-    const SfxPoolItem* pItem = nullptr;
     OUString aTitle(m_xDialog->get_title());
-    if ( SfxItemState::SET !=
-         rItemSet.GetItemState( SID_EXPLORER_PROPS_START, false, &pItem ) )
+    const SfxStringItem* pItem = rItemSet.GetItemIfSet( SID_EXPLORER_PROPS_START, false );
+    if ( !pItem )
     {
         // File name
         const OUString& aFile( rInfoItem.GetValue() );
@@ -1188,9 +1187,7 @@ SfxDocumentInfoDialog::SfxDocumentInfoDialog(weld::Window* pParent, const SfxIte
     }
     else
     {
-        DBG_ASSERT( dynamic_cast<const SfxStringItem *>(pItem) != nullptr,
-                    "SfxDocumentInfoDialog:<SfxStringItem> expected" );
-        aTitle = aTitle.replaceFirst("%1", static_cast<const SfxStringItem*>(pItem)->GetValue());
+        aTitle = aTitle.replaceFirst("%1", pItem->GetValue());
     }
     m_xDialog->set_title(aTitle);
 
@@ -2009,18 +2006,19 @@ IMPL_LINK_NOARG(SfxCustomPropertiesPage, AddHdl, weld::Button&, void)
 
 bool SfxCustomPropertiesPage::FillItemSet( SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem = nullptr;
+    const SfxDocumentInfoItem* pItem = nullptr;
     SfxDocumentInfoItem* pInfo = nullptr;
     bool bMustDelete = false;
 
     if (const SfxItemSet* pItemSet = GetDialogExampleSet())
     {
-        if (SfxItemState::SET != pItemSet->GetItemState(SID_DOCINFO, true, &pItem))
+        pItem = pItemSet->GetItemIfSet(SID_DOCINFO);
+        if (!pItem)
             pInfo = const_cast<SfxDocumentInfoItem*>(&rSet->Get( SID_DOCINFO ));
         else
         {
             bMustDelete = true;
-            pInfo = new SfxDocumentInfoItem( *static_cast<const SfxDocumentInfoItem*>(pItem) );
+            pInfo = new SfxDocumentInfoItem( *pItem );
         }
     }
 
@@ -2393,18 +2391,19 @@ SfxCmisPropertiesPage::~SfxCmisPropertiesPage()
 
 bool SfxCmisPropertiesPage::FillItemSet( SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem = nullptr;
+    const SfxDocumentInfoItem* pItem = nullptr;
     SfxDocumentInfoItem* pInfo = nullptr;
     bool bMustDelete = false;
 
     if (const SfxItemSet* pItemSet = GetDialogExampleSet())
     {
-        if (SfxItemState::SET != pItemSet->GetItemState(SID_DOCINFO, true, &pItem))
+        pItem = pItemSet->GetItemIfSet(SID_DOCINFO);
+        if (!pItem)
             pInfo = const_cast<SfxDocumentInfoItem*>(&rSet->Get( SID_DOCINFO ));
         else
         {
             bMustDelete = true;
-            pInfo = new SfxDocumentInfoItem( *static_cast<const SfxDocumentInfoItem*>(pItem) );
+            pInfo = new SfxDocumentInfoItem( *pItem );
         }
     }
 

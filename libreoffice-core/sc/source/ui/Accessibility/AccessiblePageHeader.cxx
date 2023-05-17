@@ -39,7 +39,6 @@
 #include <svl/hint.hxx>
 #include <svl/itemset.hxx>
 #include <vcl/svapp.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <svl/style.hxx>
 #include <editeng/editobj.hxx>
 
@@ -150,7 +149,7 @@ uno::Reference< XAccessible > SAL_CALL ScAccessiblePageHeader::getAccessibleAtPo
         SolarMutexGuard aGuard;
         IsObjectValid();
 
-        sal_Int32 nCount(getAccessibleChildCount()); // fill the areas
+        sal_Int64 nCount(getAccessibleChildCount()); // fill the areas
 
         if (nCount)
         {
@@ -183,7 +182,7 @@ void SAL_CALL ScAccessiblePageHeader::grabFocus()
 
 //=====  XAccessibleContext  ==============================================
 
-sal_Int32 SAL_CALL ScAccessiblePageHeader::getAccessibleChildCount()
+sal_Int64 SAL_CALL ScAccessiblePageHeader::getAccessibleChildCount()
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
@@ -213,7 +212,7 @@ sal_Int32 SAL_CALL ScAccessiblePageHeader::getAccessibleChildCount()
     return mnChildCount;
 }
 
-uno::Reference< XAccessible > SAL_CALL ScAccessiblePageHeader::getAccessibleChild( sal_Int32 nIndex )
+uno::Reference< XAccessible > SAL_CALL ScAccessiblePageHeader::getAccessibleChild( sal_Int64 nIndex )
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
@@ -244,33 +243,33 @@ uno::Reference< XAccessible > SAL_CALL ScAccessiblePageHeader::getAccessibleChil
     return xRet;
 }
 
-sal_Int32 SAL_CALL ScAccessiblePageHeader::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL ScAccessiblePageHeader::getAccessibleIndexInParent()
 {
     return mnIndex;
 }
 
-uno::Reference< XAccessibleStateSet > SAL_CALL ScAccessiblePageHeader::getAccessibleStateSet()
+sal_Int64 SAL_CALL ScAccessiblePageHeader::getAccessibleStateSet()
 {
     SolarMutexGuard aGuard;
-    uno::Reference<XAccessibleStateSet> xParentStates;
+    sal_Int64 nParentStates = 0;
     if (getAccessibleParent().is())
     {
         uno::Reference<XAccessibleContext> xParentContext = getAccessibleParent()->getAccessibleContext();
-        xParentStates = xParentContext->getAccessibleStateSet();
+        nParentStates = xParentContext->getAccessibleStateSet();
     }
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSet = new utl::AccessibleStateSetHelper();
-    if (IsDefunc(xParentStates))
-        pStateSet->AddState(AccessibleStateType::DEFUNC);
+    sal_Int64 nStateSet = 0;
+    if (IsDefunc(nParentStates))
+        nStateSet |= AccessibleStateType::DEFUNC;
     else
     {
-        pStateSet->AddState(AccessibleStateType::ENABLED);
-        pStateSet->AddState(AccessibleStateType::OPAQUE);
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::OPAQUE;
         if (isShowing())
-            pStateSet->AddState(AccessibleStateType::SHOWING);
+            nStateSet |= AccessibleStateType::SHOWING;
         if (isVisible())
-            pStateSet->AddState(AccessibleStateType::VISIBLE);
+            nStateSet |= AccessibleStateType::VISIBLE;
     }
-    return pStateSet;
+    return nStateSet;
 }
 
 //=====  XServiceInfo  ====================================================
@@ -339,10 +338,10 @@ tools::Rectangle ScAccessiblePageHeader::GetBoundingBox() const
     return aRect;
 }
 
-bool ScAccessiblePageHeader::IsDefunc( const uno::Reference<XAccessibleStateSet>& rxParentStates )
+bool ScAccessiblePageHeader::IsDefunc( sal_Int64 nParentStates )
 {
     return ScAccessibleContextBase::IsDefunc() || (mpViewShell == nullptr) || !getAccessibleParent().is() ||
-        (rxParentStates.is() && rxParentStates->contains(AccessibleStateType::DEFUNC));
+        (nParentStates & AccessibleStateType::DEFUNC);
 }
 
 void ScAccessiblePageHeader::AddChild(const EditTextObject* pArea, sal_uInt32 nIndex, SvxAdjust eAdjust)

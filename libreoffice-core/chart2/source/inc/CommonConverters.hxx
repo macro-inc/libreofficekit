@@ -29,6 +29,7 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/point/b3dpoint.hxx>
 #include <basegfx/vector/b3dvector.hxx>
+#include <basegfx/polygon/b2dpolypolygon.hxx>
 #include "charttoolsdllapi.hxx"
 
 namespace com::sun::star::awt { struct Rectangle; }
@@ -84,21 +85,28 @@ OOO_DLLPUBLIC_CHARTTOOLS
 void AddPointToPoly( css::drawing::PolyPolygonShape3D& rPoly
                 , const css::drawing::Position3D& rPos
                 , sal_Int32 nSequenceIndex=0 );
+OOO_DLLPUBLIC_CHARTTOOLS
+void AddPointToPoly( std::vector<std::vector<css::drawing::Position3D>>& rPoly
+                , const css::drawing::Position3D& rPos
+                , sal_Int32 nSequenceIndex=0 );
 
 /** get a single Point from a Polygon
 */
+OOO_DLLPUBLIC_CHARTTOOLS css::drawing::Position3D getPointFromPoly(
+                  const std::vector<std::vector<css::drawing::Position3D>>& rPolygon
+                , sal_Int32 nPointIndex, sal_Int32 nPolyIndex );
 OOO_DLLPUBLIC_CHARTTOOLS css::drawing::Position3D getPointFromPoly(
                   const css::drawing::PolyPolygonShape3D& rPolygon
                 , sal_Int32 nPointIndex, sal_Int32 nPolyIndex );
 
 OOO_DLLPUBLIC_CHARTTOOLS
-void addPolygon( css::drawing::PolyPolygonShape3D& rRet
-                , const css::drawing::PolyPolygonShape3D& rAdd );
+void addPolygon( std::vector<std::vector<css::drawing::Position3D>>& rRet
+                , const std::vector<std::vector<css::drawing::Position3D>>& rAdd );
 /** PolyPolygonShape3D + PolyPolygonShape3D -> PolyPolygonShape3D
 */
 OOO_DLLPUBLIC_CHARTTOOLS
-void appendPoly( css::drawing::PolyPolygonShape3D& rRet
-                , const css::drawing::PolyPolygonShape3D& rAdd );
+void appendPoly( std::vector<std::vector<css::drawing::Position3D>>& rRet
+                , const std::vector<std::vector<css::drawing::Position3D>>& rAdd );
 
 /** PolyPolygonBezierCoords -> PolyPolygonShape3D
 */
@@ -111,12 +119,21 @@ css::drawing::PolyPolygonShape3D BezierToPoly(
 OOO_DLLPUBLIC_CHARTTOOLS
 css::drawing::PointSequenceSequence PolyToPointSequence(
                 const css::drawing::PolyPolygonShape3D& rPolyPolygon );
+OOO_DLLPUBLIC_CHARTTOOLS
+css::drawing::PointSequenceSequence PolyToPointSequence(
+                const std::vector<std::vector<css::drawing::Position3D>>& rPolyPolygon );
+
+/** PolyPolygonShape3D ->  basegfx::B2DPolyPolygon (2D)
+*/
+OOO_DLLPUBLIC_CHARTTOOLS
+basegfx::B2DPolyPolygon PolyToB2DPolyPolygon(
+                const std::vector<std::vector<css::drawing::Position3D>>& rPolyPolygon );
 
 /** drawing::PointSequenceSequence + drawing::PointSequenceSequence
 */
 OOO_DLLPUBLIC_CHARTTOOLS
 void appendPointSequence( css::drawing::PointSequenceSequence& rTarget
-                        , css::drawing::PointSequenceSequence& rAdd );
+                        , const css::drawing::PointSequenceSequence& rAdd );
 
 /** Position3D + Direction3D == Position3D
 */
@@ -146,20 +163,10 @@ OOO_DLLPUBLIC_CHARTTOOLS css::awt::Point Position3DToAWTPoint( const css::drawin
 */
 OOO_DLLPUBLIC_CHARTTOOLS css::awt::Size Direction3DToAWTSize( const css::drawing::Direction3D& rDirection );
 
-/** B3DPoint -> Sequence<double>
-*/
-OOO_DLLPUBLIC_CHARTTOOLS css::uno::Sequence< double > B3DPointToSequence( const ::basegfx::B3DPoint& rPoint );
-
 /** Sequence<double> -> drawing::Position3D
 */
 OOO_DLLPUBLIC_CHARTTOOLS css::drawing::Position3D
                 SequenceToPosition3D( const css::uno::Sequence< double >& rSeq );
-
-/** drawing::Position3D -> Sequence<double>
-*/
-
-OOO_DLLPUBLIC_CHARTTOOLS css::uno::Sequence< double >
-                Position3DToSequence( const css::drawing::Position3D& rPosition );
 
 /** chart2::XDataSequence -> uno::Sequence< double >
 */
@@ -172,25 +179,24 @@ OOO_DLLPUBLIC_CHARTTOOLS
 css::uno::Sequence< OUString > DataSequenceToStringSequence(
     const css::uno::Reference< css::chart2::data::XDataSequence > & xDataSequence );
 
-/** uno::Sequence< uno::Sequence< T > > -> uno::Sequence< T >
+/** std::vector< std::vector< T > > -> std::vector< T >
  */
 template< typename T >
-css::uno::Sequence< T >
-    FlattenSequence( const css::uno::Sequence< css::uno::Sequence< T > > & aSeqSeq )
+std::vector< T >
+    FlattenSequence( const std::vector< std::vector< T > > & aSeqSeq )
 {
     sal_Int32 nOuter, nInner, nCount = 0,
         nResultSize = 0;
-    const sal_Int32 nOuterSize = aSeqSeq.getLength();
+    const sal_Int32 nOuterSize = aSeqSeq.size();
     for( nOuter=0; nOuter<nOuterSize; ++nOuter )
-        nResultSize += aSeqSeq[nOuter].getLength();
-    css::uno::Sequence< T > aResult( nResultSize );
-    auto aResultRange = asNonConstRange(aResult);
+        nResultSize += aSeqSeq[nOuter].size();
+    std::vector< T > aResult( nResultSize );
 
     for( nOuter=0; nOuter<nOuterSize; ++nOuter )
     {
-        const sal_Int32 nInnerSize = aSeqSeq[nOuter].getLength();
+        const sal_Int32 nInnerSize = aSeqSeq[nOuter].size();
         for( nInner=0; nInner<nInnerSize; ++nInner, ++nCount )
-            aResultRange[nCount] = aSeqSeq[nOuter][nInner];
+            aResult[nCount] = aSeqSeq[nOuter][nInner];
     }
     return aResult;
 }
@@ -205,7 +211,7 @@ sal_Int16 getShortForLongAlso( const css::uno::Any& rAny );
 
 OOO_DLLPUBLIC_CHARTTOOLS
 bool replaceParamterInString( OUString & rInOutResourceString,
-                            const OUString & rParamToReplace,
+                            std::u16string_view rParamToReplace,
                             std::u16string_view rReplaceWith );
 
 } //namespace chart

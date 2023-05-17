@@ -67,6 +67,7 @@ gb_GenCxxObject_get_dwo_target = $(WORKDIR)/GenCxxObject/$(1).dwo
 gb_GenNasmObject_get_target = $(WORKDIR)/GenNasmObject/$(1).o
 gb_GenNasmObject_get_dwo_target = $(WORKDIR)/GenNasmObject/$(1).dwo
 gb_Executable_get_headers_target = $(WORKDIR)/Headers/Executable/$(1)
+gb_Executable_get_linktargetfile = $(call gb_LinkTarget_get_target,$(call gb_Executable_get_linktarget,$1))
 gb_Executable_get_runtime_target = $(WORKDIR_FOR_BUILD)/Executable/$(1).run
 gb_Extension_get_target = $(WORKDIR)/Extension/$(1).oxt
 gb_Extension_get_rootdir = $(WORKDIR)/Extension/$(1)/root
@@ -114,13 +115,23 @@ gb_JunitTest_get_classsetname = JunitTest/$(1)
 gb_JunitTest_get_target = $(WORKDIR)/JunitTest/$(1)/done
 gb_JunitTest_get_userdir = $(WORKDIR)/JunitTest/$(1)/user
 gb_PythonTest_get_target = $(WORKDIR)/PythonTest/$(1)/done
+# linktarget = class/object<>some_optional_target, like Library/libswlo.so<>/.../instdir/program/libswlo.so
+# while the target is optional, the workdir functions will always work correctly
 gb_LinkTarget__get_workdir_linktargetname = $(firstword $(subst <>,  ,$(1)))
+gb_LinkTarget__get_workdir_linktargetclass =  $(firstword $(subst /,  ,$(call gb_LinkTarget__get_workdir_linktargetname,$(1))))
+gb_LinkTarget__get_workdir_linktargetobject = $(lastword $(subst /,  ,$(call gb_LinkTarget__get_workdir_linktargetname,$(1))))
 gb_LinkTarget_get_headers_target = \
  $(WORKDIR)/Headers/$(call gb_LinkTarget__get_workdir_linktargetname,$(1))
 gb_LinkTarget_get_objects_list = \
  $(WORKDIR)/LinkTarget/$(call gb_LinkTarget__get_workdir_linktargetname,$(1)).objectlist
 gb_LinkTarget_get_dep_target = \
  $(WORKDIR)/Dep/LinkTarget/$(call gb_LinkTarget__get_workdir_linktargetname,$(1)).d
+gb_LinkTarget_get_dep_libraries_target = \
+ $(WORKDIR)/Dep/LinkTarget/$(call gb_LinkTarget__get_workdir_linktargetname,$(1)).d.libraries
+gb_LinkTarget_get_dep_externals_target = \
+ $(WORKDIR)/Dep/LinkTarget/$(call gb_LinkTarget__get_workdir_linktargetname,$(1)).d.externals
+gb_LinkTarget_get_dep_statics_target = \
+ $(WORKDIR)/Dep/LinkTarget/$(call gb_LinkTarget__get_workdir_linktargetname,$(1)).d.statics
 gb_LinkTarget_get_clean_target = \
  $(WORKDIR)/Clean/LinkTarget/$(call gb_LinkTarget__get_workdir_linktargetname,$(1))
 gb_LinkTarget_get_target = $(lastword $(subst <>,  ,$(1)))
@@ -131,8 +142,8 @@ gb_Module_get_l10n_target = $(WORKDIR)/Module/l10n/$(1)
 gb_Module_get_check_target = $(WORKDIR)/Module/check/$(1)
 gb_Module_get_slowcheck_target = $(WORKDIR)/Module/slowcheck/$(1)
 gb_Module_get_screenshot_target = $(WORKDIR)/Module/screenshot/$(1)
+gb_Module_get_coverage_target = $(WORKDIR)/Module/coverage/$(1)
 gb_Module_get_subsequentcheck_target = $(WORKDIR)/Module/subsequentcheck/$(1)
-gb_Module_get_stagingcheck_target = $(WORKDIR)/Module/stagingcheck/$(1)
 gb_Module_get_perfcheck_target = $(WORKDIR)/Module/perfcheck/$(1)
 gb_Module_get_uicheck_target = $(WORKDIR)/Module/uicheck/$(1)
 gb_Module_get_target = $(WORKDIR)/Module/$(1)
@@ -401,6 +412,9 @@ endif # CROSS_COMPILING
 define gb_Executable_get_linktarget
 $(call gb_Executable__get_workdir_linktargetname,$(1))<>$(call gb_Executable_get_target,$(1))
 endef
+gb_Executable_get_linktarget_target = $(call gb_LinkTarget_get_target,$(call gb_Executable_get_linktarget,$(1)))
+
+gb_ExternalProject__get_workdir_linktargetname = ExternalProject/$(1)
 
 define gb_Library__get_workdir_linktargetname
 Library/$(call gb_Library_get_filename,$(1))
@@ -419,6 +433,8 @@ endif # CROSS_COMPILING
 define gb_Library_get_linktarget
 $(call gb_Library__get_workdir_linktargetname,$(1))<>$(call gb_Library_get_target,$(1))
 endef
+gb_Library_get_linktarget_target = $(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,$(1)))
+gb_Library_get_dep_libraries_target = $(call gb_LinkTarget_get_dep_libraries_target,$(call gb_Library_get_linktarget,$(1)))
 
 define gb_StaticLibrary__get_workdir_linktargetname
 StaticLibrary/$(call gb_StaticLibrary_get_filename,$(1))
@@ -430,6 +446,7 @@ endef
 define gb_StaticLibrary_get_linktarget
 $(call gb_StaticLibrary__get_workdir_linktargetname,$(1))<>$(call gb_StaticLibrary_get_target,$(1))
 endef
+gb_StaticLibrary_get_linktarget_target = $(call gb_LinkTarget_get_target,$(call gb_StaticLibrary_get_linktarget,$(1)))
 
 define gb_CppunitTest__get_workdir_linktargetname
 CppunitTest/$(call gb_CppunitTest_get_filename,$(1))
@@ -441,6 +458,7 @@ endef
 define gb_CppunitTest_get_linktarget
 $(call gb_CppunitTest__get_workdir_linktargetname,$(1))<>$(call gb_CppunitTest__get_linktarget_target,$(1))
 endef
+gb_CppunitTest_get_linktarget_target = $(call gb_LinkTarget_get_target,$(call gb_CppunitTest_get_linktarget,$(1)))
 
 define gb_CompilerTest__get_workdir_linktargetname
 CompilerTest/$(1)

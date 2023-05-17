@@ -22,13 +22,18 @@
 #include <cassert>
 #include <utility>
 
+#include <com/sun/star/io/BufferSizeExceededException.hpp>
+#include <com/sun/star/io/NotConnectedException.hpp>
+#include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <unotools/tempfile.hxx>
 #include <rtl/ustring.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/mutex.hxx>
 #include <osl/detail/file.h>
 #include <osl/file.hxx>
 #include <tools/time.hxx>
 #include <tools/debug.hxx>
+#include <tools/Guid.hxx>
 #include <comphelper/DirectoryHelper.hxx>
 
 #ifdef UNX
@@ -47,14 +52,14 @@ namespace
 namespace utl
 {
 
-static OUString getParentName( const OUString& aFileName )
+static OUString getParentName( std::u16string_view aFileName )
 {
-    sal_Int32 lastIndex = aFileName.lastIndexOf( '/' );
+    size_t lastIndex = aFileName.rfind( '/' );
     OUString aParent;
 
-    if (lastIndex > -1)
+    if (lastIndex != std::u16string_view::npos)
     {
-        aParent = aFileName.copy(0, lastIndex);
+        aParent = aFileName.substr(0, lastIndex);
 
         if (aParent.endsWith(":") && aParent.getLength() == 6)
             aParent += "/";
@@ -142,19 +147,18 @@ static OUString ConstructTempDir_Impl( const OUString* pParent, bool bCreatePare
 
     if ( aName.isEmpty() )
     {
-        OUString &rTempNameBase_Impl = gTempNameBase_Impl;
-        if (rTempNameBase_Impl.isEmpty())
+        if (gTempNameBase_Impl.isEmpty())
         {
             OUString ustrTempDirURL;
             ::osl::FileBase::RC rc = ::osl::File::getTempDirURL(
                 ustrTempDirURL );
             if (rc == ::osl::FileBase::E_None)
-                rTempNameBase_Impl = ustrTempDirURL;
+                gTempNameBase_Impl = ustrTempDirURL;
+            ensuredir( aName );
         }
         // if no parent or invalid parent : use default directory
-        DBG_ASSERT( !rTempNameBase_Impl.isEmpty(), "No TempDir!" );
-        aName = rTempNameBase_Impl;
-        ensuredir( aName );
+        DBG_ASSERT( !gTempNameBase_Impl.isEmpty(), "No TempDir!" );
+        aName = gTempNameBase_Impl;
     }
 
     // Make sure that directory ends with a separator
@@ -247,17 +251,17 @@ namespace
 };
 
 static OUString lcl_createName(
-    const OUString& rLeadingChars, Tokens & tokens, const OUString* pExtension,
+    std::u16string_view rLeadingChars, Tokens & tokens, std::u16string_view pExtension,
     const OUString* pParent, bool bDirectory, bool bKeep, bool bLock,
     bool bCreateParentDirs )
 {
     OUString aName = ConstructTempDir_Impl( pParent, bCreateParentDirs );
     if ( bCreateParentDirs )
     {
-        sal_Int32 nOffset = rLeadingChars.lastIndexOf("/");
+        size_t nOffset = rLeadingChars.rfind(u"/");
         OUString aDirName;
-        if (-1 != nOffset)
-            aDirName = aName + rLeadingChars.subView( 0, nOffset );
+        if (std::u16string_view::npos != nOffset)
+            aDirName = aName + rLeadingChars.substr( 0, nOffset );
         else
             aDirName = aName;
         TempDirCreatedObserver observer;
@@ -271,8 +275,8 @@ static OUString lcl_createName(
     while (tokens.next(&token))
     {
         OUString aTmp( aName + token );
-        if ( pExtension )
-            aTmp += *pExtension;
+        if ( !pExtension.empty() )
+            aTmp += pExtension;
         else
             aTmp += ".tmp";
         if ( bDirectory )
@@ -343,11 +347,39 @@ static OUString CreateTempName_Impl( const OUString* pParent, bool bKeep, bool b
     aEyeCatcher += aPidString;
 #endif
     UniqueTokens t;
-    return lcl_createName( aEyeCatcher, t, nullptr, pParent, bDir, bKeep,
+    return lcl_createName( aEyeCatcher, t, u"", pParent, bDir, bKeep,
                            false, false);
 }
 
-OUString TempFile::CreateTempName()
+static OUString CreateTempNameFast()
+{
+    OUString aEyeCatcher = "lu";
+#ifdef UNX
+#ifdef DBG_UTIL
+    const char* eye = getenv("LO_TESTNAME");
+    if(eye)
+    {
+        aEyeCatcher = OUString(eye, strlen(eye), RTL_TEXTENCODING_ASCII_US);
+    }
+#else
+    static const pid_t pid = getpid();
+    static const OUString aPidString = OUString::number(pid);
+    aEyeCatcher += aPidString;
+#endif
+#elif defined(_WIN32)
+    static const int pid = _getpid();
+    static const OUString aPidString = OUString::number(pid);
+    aEyeCatcher += aPidString;
+#endif
+
+    OUString aName = ConstructTempDir_Impl( /*pParent*/nullptr, /*bCreateParentDirs*/false ) + aEyeCatcher;
+
+    tools::Guid aGuid(tools::Guid::Generate);
+
+    return aName + aGuid.getOUString() + ".tmp" ;
+}
+
+OUString CreateTempName()
 {
     OUString aName(CreateTempName_Impl( nullptr, false ));
 
@@ -358,15 +390,75 @@ OUString TempFile::CreateTempName()
     return aTmp;
 }
 
-TempFile::TempFile( const OUString* pParent, bool bDirectory )
+TempFileFast::TempFileFast( )
+{
+}
+
+TempFileFast::TempFileFast(TempFileFast && other) noexcept :
+    mxStream(std::move(other.mxStream))
+{
+}
+
+TempFileFast::~TempFileFast()
+{
+    CloseStream();
+}
+
+SvStream* TempFileFast::GetStream( StreamMode eMode )
+{
+    if (!mxStream)
+    {
+        OUString aName = CreateTempNameFast();
+#ifdef _WIN32
+        mxStream.reset(new SvFileStream(aName, eMode | StreamMode::TEMPORARY | StreamMode::DELETE_ON_CLOSE));
+#else
+        mxStream.reset(new SvFileStream(aName, eMode | StreamMode::TEMPORARY));
+#endif
+    }
+    return mxStream.get();
+}
+
+void TempFileFast::CloseStream()
+{
+    if (mxStream)
+    {
+#if !defined _WIN32
+        OUString aName = mxStream->GetFileName();
+#endif
+        mxStream.reset();
+#ifdef _WIN32
+        // On Windows, the file is opened with FILE_FLAG_DELETE_ON_CLOSE, so it will delete as soon as the handle closes.
+        // On other platforms, we need to explicitly delete it.
+#else
+        if (!aName.isEmpty() && (osl::FileBase::getFileURLFromSystemPath(aName, aName) == osl::FileBase::E_None))
+            File::remove(aName);
+#endif
+    }
+}
+
+OUString CreateTempURL( const OUString* pParent, bool bDirectory )
+{
+    return CreateTempName_Impl( pParent, true, bDirectory );
+}
+
+OUString CreateTempURL( std::u16string_view rLeadingChars, bool _bStartWithZero,
+                    std::u16string_view pExtension, const OUString* pParent,
+                    bool bCreateParentDirs )
+{
+    SequentialTokens t(_bStartWithZero);
+    return lcl_createName( rLeadingChars, t, pExtension, pParent, false,
+                            true, true, bCreateParentDirs );
+}
+
+TempFileNamed::TempFileNamed( const OUString* pParent, bool bDirectory )
     : bIsDirectory( bDirectory )
     , bKillingFileEnabled( false )
 {
     aName = CreateTempName_Impl( pParent, true, bDirectory );
 }
 
-TempFile::TempFile( const OUString& rLeadingChars, bool _bStartWithZero,
-                    const OUString* pExtension, const OUString* pParent,
+TempFileNamed::TempFileNamed( std::u16string_view rLeadingChars, bool _bStartWithZero,
+                    std::u16string_view pExtension, const OUString* pParent,
                     bool bCreateParentDirs )
     : bIsDirectory( false )
     , bKillingFileEnabled( false )
@@ -376,21 +468,18 @@ TempFile::TempFile( const OUString& rLeadingChars, bool _bStartWithZero,
                             true, true, bCreateParentDirs );
 }
 
-TempFile::TempFile(TempFile && other) noexcept :
+TempFileNamed::TempFileNamed(TempFileNamed && other) noexcept :
     aName(std::move(other.aName)), pStream(std::move(other.pStream)), bIsDirectory(other.bIsDirectory),
     bKillingFileEnabled(other.bKillingFileEnabled)
 {
     other.bKillingFileEnabled = false;
 }
 
-TempFile::~TempFile()
+TempFileNamed::~TempFileNamed()
 {
     if ( !bKillingFileEnabled )
         return;
 
-    // if we're going to delete this file, no point in flushing it when closing
-    if (pStream && !aName.isEmpty())
-        static_cast<SvFileStream*>(pStream.get())->SetDontFlushOnClose(true);
     pStream.reset();
     if ( bIsDirectory )
     {
@@ -402,42 +491,49 @@ TempFile::~TempFile()
     }
 }
 
-bool TempFile::IsValid() const
+bool TempFileNamed::IsValid() const
 {
     return !aName.isEmpty();
 }
 
-OUString TempFile::GetFileName() const
+OUString TempFileNamed::GetFileName() const
 {
     OUString aTmp;
     FileBase::getSystemPathFromFileURL(aName, aTmp);
     return aTmp;
 }
 
-OUString const & TempFile::GetURL() const
+OUString const & TempFileNamed::GetURL() const
 {
+    // if you request the URL, then you presumably want to access this via UCB,
+    // and UCB will want to open the file via a separate file handle, which means
+    // we have to make this file data actually hit disk. We do this here (and not
+    // elsewhere) to make the other (normal) paths fast. Flushing to disk
+    // really slows temp files down.
+    if (pStream)
+        pStream->Flush();
     return aName;
 }
 
-SvStream* TempFile::GetStream( StreamMode eMode )
+SvStream* TempFileNamed::GetStream( StreamMode eMode )
 {
     if (!pStream)
     {
         if (!aName.isEmpty())
             pStream.reset(new SvFileStream(aName, eMode | StreamMode::TEMPORARY));
         else
-            pStream.reset(new SvMemoryStream(nullptr, 0, eMode));
+            pStream.reset(new SvMemoryStream);
     }
 
     return pStream.get();
 }
 
-void TempFile::CloseStream()
+void TempFileNamed::CloseStream()
 {
     pStream.reset();
 }
 
-OUString TempFile::SetTempNameBaseDirectory( const OUString &rBaseName )
+OUString SetTempNameBaseDirectory( const OUString &rBaseName )
 {
     if( rBaseName.isEmpty() )
         return OUString();
@@ -465,7 +561,7 @@ OUString TempFile::SetTempNameBaseDirectory( const OUString &rBaseName )
         OUString &rTempNameBase_Impl = gTempNameBase_Impl;
         rTempNameBase_Impl = rBaseName + "/";
 
-        TempFile aBase( nullptr, true );
+        TempFileNamed aBase( {}, true );
         if ( aBase.IsValid() )
             // use it in case of success
             rTempNameBase_Impl = aBase.aName;
@@ -477,10 +573,235 @@ OUString TempFile::SetTempNameBaseDirectory( const OUString &rBaseName )
     return aTmp;
 }
 
-OUString TempFile::GetTempNameBaseDirectory()
+OUString GetTempNameBaseDirectory()
 {
     return ConstructTempDir_Impl(nullptr, false);
 }
+
+
+TempFileFastService::TempFileFastService()
+: mbInClosed( false )
+, mbOutClosed( false )
+{
+    mpTempFile.emplace();
+    mpStream = mpTempFile->GetStream(StreamMode::READWRITE);
+}
+
+TempFileFastService::~TempFileFastService ()
+{
+}
+
+// XInputStream
+
+sal_Int32 SAL_CALL TempFileFastService::readBytes( css::uno::Sequence< sal_Int8 >& aData, sal_Int32 nBytesToRead )
+{
+    std::unique_lock aGuard( maMutex );
+    if ( mbInClosed )
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+    checkConnected();
+    if (nBytesToRead < 0)
+        throw css::io::BufferSizeExceededException( OUString(), static_cast< css::uno::XWeak * >(this));
+
+    if (aData.getLength() < nBytesToRead)
+        aData.realloc(nBytesToRead);
+
+    sal_uInt32 nRead = mpStream->ReadBytes(static_cast<void*>(aData.getArray()), nBytesToRead);
+    checkError();
+
+    if (nRead < o3tl::make_unsigned(aData.getLength()))
+        aData.realloc( nRead );
+
+    return nRead;
+}
+
+sal_Int32 SAL_CALL TempFileFastService::readSomeBytes( css::uno::Sequence< sal_Int8 >& aData, sal_Int32 nMaxBytesToRead )
+{
+    {
+        std::unique_lock aGuard( maMutex );
+        if ( mbInClosed )
+            throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+        checkConnected();
+        checkError();
+
+        if (nMaxBytesToRead < 0)
+            throw css::io::BufferSizeExceededException( OUString(), static_cast < css::uno::XWeak * >( this ) );
+
+        if (mpStream->eof())
+        {
+            aData.realloc(0);
+            return 0;
+        }
+    }
+    return readBytes(aData, nMaxBytesToRead);
+}
+
+void SAL_CALL TempFileFastService::skipBytes( sal_Int32 nBytesToSkip )
+{
+    std::unique_lock aGuard( maMutex );
+    if ( mbInClosed )
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+    checkConnected();
+    checkError();
+    mpStream->SeekRel(nBytesToSkip);
+    checkError();
+}
+
+sal_Int32 SAL_CALL TempFileFastService::available()
+{
+    std::unique_lock aGuard( maMutex );
+    if ( mbInClosed )
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+    checkConnected();
+
+    sal_Int64 nAvailable = mpStream->remainingSize();
+    checkError();
+
+    return std::min<sal_Int64>(SAL_MAX_INT32, nAvailable);
+}
+
+void SAL_CALL TempFileFastService::closeInput()
+{
+    std::unique_lock aGuard( maMutex );
+    if ( mbInClosed )
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+    mbInClosed = true;
+
+    if ( mbOutClosed )
+    {
+        // stream will be deleted by TempFile implementation
+        mpStream = nullptr;
+        mpTempFile.reset();
+    }
+}
+
+// XOutputStream
+
+void SAL_CALL TempFileFastService::writeBytes( const css::uno::Sequence< sal_Int8 >& aData )
+{
+    std::unique_lock aGuard( maMutex );
+    if ( mbOutClosed )
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+    checkConnected();
+    sal_uInt32 nWritten = mpStream->WriteBytes(aData.getConstArray(), aData.getLength());
+    checkError();
+    if  ( nWritten != static_cast<sal_uInt32>(aData.getLength()))
+        throw css::io::BufferSizeExceededException( OUString(),static_cast < css::uno::XWeak * > ( this ) );
+}
+
+void SAL_CALL TempFileFastService::flush()
+{
+    std::unique_lock aGuard( maMutex );
+    if ( mbOutClosed )
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+    checkConnected();
+    mpStream->Flush();
+    checkError();
+}
+
+void SAL_CALL TempFileFastService::closeOutput()
+{
+    std::unique_lock aGuard( maMutex );
+    if ( mbOutClosed )
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+
+    mbOutClosed = true;
+    if (mpStream)
+    {
+        // so that if you then open the InputStream, you can read the content
+        mpStream->FlushBuffer();
+        mpStream->Seek(0);
+    }
+
+    if ( mbInClosed )
+    {
+        // stream will be deleted by TempFile implementation
+        mpStream = nullptr;
+        mpTempFile.reset();
+    }
+}
+
+void TempFileFastService::checkError() const
+{
+    if (!mpStream || mpStream->SvStream::GetError () != ERRCODE_NONE )
+        throw css::io::NotConnectedException ( OUString(), const_cast < css::uno::XWeak * > ( static_cast < const css::uno::XWeak * > (this ) ) );
+}
+
+void TempFileFastService::checkConnected()
+{
+    if (!mpStream)
+        throw css::io::NotConnectedException ( OUString(), static_cast < css::uno::XWeak * > (this ) );
+}
+
+// XSeekable
+
+void SAL_CALL TempFileFastService::seek( sal_Int64 nLocation )
+{
+    std::unique_lock aGuard( maMutex );
+    checkConnected();
+    checkError();
+    if ( nLocation < 0 )
+        throw css::lang::IllegalArgumentException();
+
+    sal_Int64 nNewLoc = mpStream->Seek(static_cast<sal_uInt32>(nLocation) );
+    if ( nNewLoc != nLocation )
+        throw css::lang::IllegalArgumentException();
+    checkError();
+}
+
+sal_Int64 SAL_CALL TempFileFastService::getPosition()
+{
+    std::unique_lock aGuard( maMutex );
+    checkConnected();
+
+    sal_uInt32 nPos = mpStream->Tell();
+    checkError();
+    return static_cast<sal_Int64>(nPos);
+}
+
+sal_Int64 SAL_CALL TempFileFastService::getLength()
+{
+    std::unique_lock aGuard( maMutex );
+    checkConnected();
+
+    checkError();
+
+    sal_Int64 nEndPos = mpStream->TellEnd();
+
+    return nEndPos;
+}
+
+// XStream
+
+css::uno::Reference< css::io::XInputStream > SAL_CALL TempFileFastService::getInputStream()
+{
+    return this;
+}
+
+css::uno::Reference< css::io::XOutputStream > SAL_CALL TempFileFastService::getOutputStream()
+{
+    return this;
+}
+
+// XTruncate
+
+void SAL_CALL TempFileFastService::truncate()
+{
+    std::unique_lock aGuard( maMutex );
+    checkConnected();
+    // SetStreamSize() call does not change the position
+    mpStream->Seek( 0 );
+    mpStream->SetStreamSize( 0 );
+    checkError();
+}
+
+
 
 }
 

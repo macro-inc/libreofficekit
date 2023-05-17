@@ -376,10 +376,10 @@ bool FindTextImpl(SwPaM & rSearchPam,
     if( rSearchOpt.searchString.isEmpty() )
         return false;
 
-    std::unique_ptr<SwPaM> pPam = sw::MakeRegion(fnMove, rRegion);
+    std::optional<SwPaM> oPam;
+    sw::MakeRegion(fnMove, rRegion, oPam);
     const bool bSrchForward = &fnMove == &fnMoveForward;
-    SwNodeIndex& rNdIdx = pPam->GetPoint()->nNode;
-    SwIndex& rContentIdx = pPam->GetPoint()->nContent;
+    SwPosition& rPtPos = *oPam->GetPoint();
 
     // If bFound is true then the string was found and is between nStart and nEnd
     bool bFound = false;
@@ -401,7 +401,7 @@ bool FindTextImpl(SwPaM & rSearchPam,
     }
 
     // LanguageType eLastLang = 0;
-    while (nullptr != (pNode = ::GetNode(*pPam, bFirst, fnMove, bInReadOnly, pLayout)))
+    while (nullptr != (pNode = ::GetNode(*oPam, bFirst, fnMove, bInReadOnly, pLayout)))
     {
         if( pNode->IsTextNode() )
         {
@@ -421,16 +421,16 @@ bool FindTextImpl(SwPaM & rSearchPam,
             }
             AmbiguousIndex nEnd;
             if (pLayout
-                    ? FrameContainsNode(*pFrame, pPam->GetMark()->nNode.GetIndex())
-                    : rNdIdx == pPam->GetMark()->nNode)
+                    ? FrameContainsNode(*pFrame, oPam->GetMark()->GetNodeIndex())
+                    : rPtPos.GetNode() == oPam->GetMark()->GetNode())
             {
                 if (pLayout)
                 {
-                    nEnd.SetFrameIndex(pFrame->MapModelToViewPos(*pPam->GetMark()));
+                    nEnd.SetFrameIndex(pFrame->MapModelToViewPos(*oPam->GetMark()));
                 }
                 else
                 {
-                    nEnd.SetModelIndex(pPam->GetMark()->nContent.GetIndex());
+                    nEnd.SetModelIndex(oPam->GetMark()->GetContentIndex());
                 }
             }
             else
@@ -454,11 +454,11 @@ bool FindTextImpl(SwPaM & rSearchPam,
             AmbiguousIndex nStart;
             if (pLayout)
             {
-                nStart.SetFrameIndex(pFrame->MapModelToViewPos(*pPam->GetPoint()));
+                nStart.SetFrameIndex(pFrame->MapModelToViewPos(*oPam->GetPoint()));
             }
             else
             {
-                nStart.SetModelIndex(rContentIdx.GetIndex());
+                nStart.SetModelIndex(rPtPos.GetContentIndex());
             }
 
             /* #i80135# */
@@ -516,10 +516,10 @@ bool FindTextImpl(SwPaM & rSearchPam,
                 {
                     if (SwFrameFormat* pFrameFormat = FindFrameFormat(pObject))
                     {
-                        const SwPosition* pPosition = pFrameFormat->GetAnchor().GetContentAnchor();
-                        if (!pPosition || (pLayout
-                                ? !FrameContainsNode(*pFrame, pPosition->nNode.GetIndex())
-                                : pPosition->nNode.GetIndex() != pNode->GetIndex()))
+                        const SwNode* pAnchorNode = pFrameFormat->GetAnchor().GetAnchorNode();
+                        if (!pAnchorNode || (pLayout
+                                ? !FrameContainsNode(*pFrame, pAnchorNode->GetIndex())
+                                : pAnchorNode->GetIndex() != pNode->GetIndex()))
                             pObject = nullptr;
                     }
                 }
@@ -560,36 +560,31 @@ bool FindTextImpl(SwPaM & rSearchPam,
                     }
                     else
                     {
-                        aPaM.GetPoint()->nNode = rTextNode;
-                        aPaM.GetPoint()->nContent.Assign(
-                            aPaM.GetPoint()->nNode.GetNode().GetTextNode(),
-                            nStart.GetModelIndex());
+                        aPaM.GetPoint()->Assign(rTextNode, nStart.GetModelIndex());
                     }
                     aPaM.SetMark();
                     if (pLayout)
                     {
-                        aPaM.GetMark()->nNode = (pFrame->GetMergedPara()
+                        aPaM.GetMark()->Assign( (pFrame->GetMergedPara()
                                 ? *pFrame->GetMergedPara()->pLastNode
                                 : rTextNode)
-                            .GetIndex() + 1;
+                            .GetIndex() + 1 );
                     }
                     else
                     {
-                        aPaM.GetMark()->nNode = rTextNode.GetIndex() + 1;
+                        aPaM.GetMark()->Assign( rTextNode.GetIndex() + 1 );
                     }
-                    aPaM.GetMark()->nContent.Assign(aPaM.GetMark()->nNode.GetNode().GetTextNode(), 0);
                     if (pNode->GetDoc().getIDocumentDrawModelAccess().Search(aPaM, *xSearchItem) && pSdrView)
                     {
                         if (SdrObject* pObject = pSdrView->GetTextEditObject())
                         {
                             if (SwFrameFormat* pFrameFormat = FindFrameFormat(pObject))
                             {
-                                const SwPosition* pPosition = pFrameFormat->GetAnchor().GetContentAnchor();
-                                if (pPosition)
+                                const SwNode* pAnchorNode = pFrameFormat->GetAnchor().GetAnchorNode();
+                                if (pAnchorNode)
                                 {
                                     // Set search position to the shape's anchor point.
-                                    *rSearchPam.GetPoint() = *pPosition;
-                                    rSearchPam.GetPoint()->nContent.Assign(pPosition->nNode.GetNode().GetContentNode(), 0);
+                                    rSearchPam.GetPoint()->Assign(*pAnchorNode);
                                     rSearchPam.SetMark();
                                     bFound = true;
                                     break;
@@ -682,7 +677,7 @@ bool FindTextImpl(SwPaM & rSearchPam,
                                        bRegSearch, bChkEmptyPara, bChkParaEnd,
                                        nStartInside, nEndInside, nTextLen,
                                        pNode->GetTextNode(), pFrame, pLayout,
-                                       pPam.get() );
+                                       oPam ? &*oPam : nullptr );
                     if ( bFound )
                         break;
                     else
@@ -715,7 +710,7 @@ bool FindTextImpl(SwPaM & rSearchPam,
                                    bRegSearch, bChkEmptyPara, bChkParaEnd,
                                    nStart, nEnd, nTextLen,
                                    pNode->GetTextNode(), pFrame, pLayout,
-                                   pPam.get() );
+                                   oPam ? &*oPam : nullptr );
             }
             if (bFound)
                 break;
@@ -735,7 +730,7 @@ bool DoSearch(SwPaM & rSearchPam,
         SwRootFrame const*const pLayout, SwPaM* pPam)
 {
     bool bFound = false;
-    SwNodeIndex& rNdIdx = pPam->GetPoint()->nNode;
+    SwPosition& rPtPos = *pPam->GetPoint();
     OUString sCleanStr;
     std::vector<AmbiguousIndex> aFltArr;
     LanguageType eLastLang = LANGUAGE_SYSTEM;
@@ -750,6 +745,7 @@ bool DoSearch(SwPaM & rSearchPam,
         if (   -1 != rSearchOpt.searchString.indexOf("\\xAD")
             || -1 != rSearchOpt.searchString.indexOf("\\x{00AD}")
             || -1 != rSearchOpt.searchString.indexOf("\\u00AD")
+            || -1 != rSearchOpt.searchString.indexOf("\\u00ad")
             || -1 != rSearchOpt.searchString.indexOf("\\U000000AD")
             || -1 != rSearchOpt.searchString.indexOf("\\N{SOFT HYPHEN}"))
         {
@@ -855,8 +851,8 @@ bool DoSearch(SwPaM & rSearchPam,
             }
             else
             {
-                rSearchPam.GetMark()->nContent = nStart.GetModelIndex();
-                rSearchPam.GetPoint()->nContent = nEnd.GetModelIndex();
+                rSearchPam.GetMark()->SetContent( nStart.GetModelIndex() );
+                rSearchPam.GetPoint()->SetContent( nEnd.GetModelIndex() );
             }
 
             // if backward search, switch point and mark
@@ -887,20 +883,20 @@ bool DoSearch(SwPaM & rSearchPam,
         }
         else
         {
-            rSearchPam.GetPoint()->nContent = bChkParaEnd ? nTextLen.GetModelIndex() : 0;
+            rSearchPam.GetPoint()->SetContent( bChkParaEnd ? nTextLen.GetModelIndex() : 0 );
         }
         rSearchPam.SetMark();
         const SwNode *const pSttNd = bSrchForward
-            ? &rSearchPam.GetPoint()->nNode.GetNode() // end of the frame
-            : &rNdIdx.GetNode(); // keep the bug as-is for now...
+            ? &rSearchPam.GetPoint()->GetNode() // end of the frame
+            : &rPtPos.GetNode(); // keep the bug as-is for now...
         /* FIXME: this condition does not work for !bSrchForward backward
          * search, it probably never did. (pSttNd != &rNdIdx.GetNode())
          * is never true in this case. */
-        if( (bSrchForward || pSttNd != &rNdIdx.GetNode()) &&
+        if( (bSrchForward || pSttNd != &rPtPos.GetNode()) &&
             rSearchPam.Move(fnMoveForward, GoInContent) &&
-            (!bSrchForward || pSttNd != &rSearchPam.GetPoint()->nNode.GetNode()) &&
-            SwNodeOffset(1) == abs(rSearchPam.GetPoint()->nNode.GetIndex() -
-                                   rSearchPam.GetMark()->nNode.GetIndex()))
+            (!bSrchForward || pSttNd != &rSearchPam.GetPoint()->GetNode()) &&
+            SwNodeOffset(1) == abs(rSearchPam.GetPoint()->GetNodeIndex() -
+                                   rSearchPam.GetMark()->GetNodeIndex()))
         {
             // if backward search, switch point and mark
             if( !bSrchForward )
@@ -957,8 +953,7 @@ int SwFindParaText::DoFind(SwPaM & rCursor, SwMoveFnCollection const & fnMove,
     {
         // use replace method in SwDoc
         const bool bRegExp(SearchAlgorithms2::REGEXP == m_rSearchOpt.AlgorithmType2);
-        SwIndex& rSttCntIdx = rCursor.Start()->nContent;
-        const sal_Int32 nSttCnt = rSttCntIdx.GetIndex();
+        const sal_Int32 nSttCnt = rCursor.Start()->GetContentIndex();
         // add to shell-cursor-ring so that the regions will be moved eventually
         SwPaM* pPrev(nullptr);
         if( bRegExp )
@@ -995,7 +990,7 @@ int SwFindParaText::DoFind(SwPaM & rCursor, SwMoveFnCollection const & fnMove,
             assert(bRet); // if join failed, next node must be SwTextNode
         }
         else
-            rCursor.Start()->nContent = nSttCnt;
+            rCursor.Start()->SetContent(nSttCnt);
         return FIND_NO_RING;
     }
     return bFnd ? FIND_FOUND : FIND_NOT_FOUND;
@@ -1006,7 +1001,7 @@ bool SwFindParaText::IsReplaceMode() const
     return m_bReplace;
 }
 
-sal_uLong SwCursor::Find_Text( const i18nutil::SearchOptions2& rSearchOpt, bool bSearchInNotes,
+sal_Int32 SwCursor::Find_Text( const i18nutil::SearchOptions2& rSearchOpt, bool bSearchInNotes,
                           SwDocPositions nStart, SwDocPositions nEnd,
                           bool& bCancel, FindRanges eFndRngs, bool bReplace,
                           SwRootFrame const*const pLayout)
@@ -1026,7 +1021,7 @@ sal_uLong SwCursor::Find_Text( const i18nutil::SearchOptions2& rSearchOpt, bool 
     if( bSearchSel )
         eFndRngs = static_cast<FindRanges>(eFndRngs | FindRanges::InSel);
     SwFindParaText aSwFindParaText(rSearchOpt, bSearchInNotes, bReplace, *this, pLayout);
-    sal_uLong nRet = FindAll( aSwFindParaText, nStart, nEnd, eFndRngs, bCancel );
+    sal_Int32 nRet = FindAll( aSwFindParaText, nStart, nEnd, eFndRngs, bCancel );
     rDoc.SetOle2Link( aLnk );
     if( nRet && bReplace )
         rDoc.getIDocumentState().SetModified();
@@ -1064,7 +1059,7 @@ bool ReplaceImpl(
     else
     {
         assert(!ranges.empty());
-        assert(ranges.front()->GetPoint()->nNode == ranges.front()->GetMark()->nNode);
+        assert(ranges.front()->GetPoint()->GetNode() == ranges.front()->GetMark()->GetNode());
         bReplaced = rIDCO.ReplaceRange(*ranges.front(), rReplacement, bRegExp);
         for (auto it = ranges.begin() + 1; it != ranges.end(); ++it)
         {
@@ -1117,8 +1112,8 @@ std::optional<OUString> ReplaceBackReferences(const i18nutil::SearchOptions2& rS
     if( pPam && pPam->HasMark() &&
         SearchAlgorithms2::REGEXP == rSearchOpt.AlgorithmType2 )
     {
-        SwContentNode const*const pTextNode = pPam->GetContentNode();
-        SwContentNode const*const pMarkTextNode = pPam->GetContentNode(false);
+        SwContentNode const*const pTextNode = pPam->GetPointContentNode();
+        SwContentNode const*const pMarkTextNode = pPam->GetMarkContentNode();
         if (!pTextNode || !pTextNode->IsTextNode()
             || !pMarkTextNode || !pMarkTextNode->IsTextNode())
         {
@@ -1129,7 +1124,7 @@ std::optional<OUString> ReplaceBackReferences(const i18nutil::SearchOptions2& rS
             : nullptr);
         const bool bParaEnd = rSearchOpt.searchString == "$" || rSearchOpt.searchString == "^$" || rSearchOpt.searchString == "$^";
         if (bParaEnd || (pLayout
-                ? sw::FrameContainsNode(*pFrame, pPam->GetMark()->nNode.GetIndex())
+                ? sw::FrameContainsNode(*pFrame, pPam->GetMark()->GetNodeIndex())
                 : pTextNode == pMarkTextNode))
         {
             utl::TextSearch aSText( utl::TextSearch::UpgradeToSearchOptions2( rSearchOpt) );
@@ -1155,8 +1150,8 @@ std::optional<OUString> ReplaceBackReferences(const i18nutil::SearchOptions2& rS
                 }
                 else
                 {
-                    nStart.SetModelIndex(pPam->Start()->nContent.GetIndex());
-                    nEnd.SetModelIndex(pPam->End()->nContent.GetIndex());
+                    nStart.SetModelIndex(pPam->Start()->GetContentIndex());
+                    nEnd.SetModelIndex(pPam->End()->GetContentIndex());
                 }
                 std::vector<AmbiguousIndex> aFltArr;
                 OUString const aStr = lcl_CleanStr(*pTextNode->GetTextNode(), pFrame, pLayout,

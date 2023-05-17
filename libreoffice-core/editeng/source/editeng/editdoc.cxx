@@ -50,6 +50,7 @@
 
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 
 #include <svl/grabbagitem.hxx>
@@ -59,10 +60,12 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <limits>
 #include <memory>
 #include <set>
 #include <string_view>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -162,6 +165,7 @@ const SfxItemInfo aItemInfos[EDITITEMCOUNT] = {
         { SID_ATTR_NUMBERING_RULE, true },         // EE_PARA_NUMBULL
         { 0, true },                               // EE_PARA_HYPHENATE
         { 0, true },                               // EE_PARA_HYPHENATE_NO_CAPS
+        { 0, true },                               // EE_PARA_HYPHENATE_NO_LAST_WORD
         { 0, true },                               // EE_PARA_BULLETSTATE
         { 0, true },                               // EE_PARA_OUTLLRSPACE
         { SID_ATTR_PARA_OUTLLEVEL, true },         // EE_PARA_OUTLLEVEL
@@ -689,17 +693,17 @@ sal_Int32 ParaPortionList::GetPos(const ParaPortion* p) const
 
 ParaPortion* ParaPortionList::operator [](sal_Int32 nPos)
 {
-    return 0 <= nPos && nPos < static_cast<sal_Int32>(maPortions.size()) ? maPortions[nPos].get() : nullptr;
+    return 0 <= nPos && o3tl::make_unsigned(nPos) < maPortions.size() ? maPortions[nPos].get() : nullptr;
 }
 
 const ParaPortion* ParaPortionList::operator [](sal_Int32 nPos) const
 {
-    return 0 <= nPos && nPos < static_cast<sal_Int32>(maPortions.size()) ? maPortions[nPos].get() : nullptr;
+    return 0 <= nPos && o3tl::make_unsigned(nPos) < maPortions.size() ? maPortions[nPos].get() : nullptr;
 }
 
 std::unique_ptr<ParaPortion> ParaPortionList::Release(sal_Int32 nPos)
 {
-    if (nPos < 0 || static_cast<sal_Int32>(maPortions.size()) <= nPos)
+    if (nPos < 0 || maPortions.size() <= o3tl::make_unsigned(nPos))
     {
         SAL_WARN( "editeng", "ParaPortionList::Release - out of bounds pos " << nPos);
         return nullptr;
@@ -711,7 +715,7 @@ std::unique_ptr<ParaPortion> ParaPortionList::Release(sal_Int32 nPos)
 
 void ParaPortionList::Remove(sal_Int32 nPos)
 {
-    if (nPos < 0 || static_cast<sal_Int32>(maPortions.size()) <= nPos)
+    if (nPos < 0 || maPortions.size() <= o3tl::make_unsigned(nPos))
     {
         SAL_WARN( "editeng", "ParaPortionList::Remove - out of bounds pos " << nPos);
         return;
@@ -721,7 +725,7 @@ void ParaPortionList::Remove(sal_Int32 nPos)
 
 void ParaPortionList::Insert(sal_Int32 nPos, std::unique_ptr<ParaPortion> p)
 {
-    if (nPos < 0 || static_cast<sal_Int32>(maPortions.size()) < nPos)
+    if (nPos < 0 || maPortions.size() < o3tl::make_unsigned(nPos))
     {
         SAL_WARN( "editeng", "ParaPortionList::Insert - out of bounds pos " << nPos);
         return;
@@ -778,12 +782,12 @@ sal_Int32 ParaPortionList::FindParagraph(tools::Long nYOffset) const
 
 const ParaPortion* ParaPortionList::SafeGetObject(sal_Int32 nPos) const
 {
-    return 0 <= nPos && nPos < static_cast<sal_Int32>(maPortions.size()) ? maPortions[nPos].get() : nullptr;
+    return 0 <= nPos && o3tl::make_unsigned(nPos) < maPortions.size() ? maPortions[nPos].get() : nullptr;
 }
 
 ParaPortion* ParaPortionList::SafeGetObject(sal_Int32 nPos)
 {
-    return 0 <= nPos && nPos < static_cast<sal_Int32>(maPortions.size()) ? maPortions[nPos].get() : nullptr;
+    return 0 <= nPos && o3tl::make_unsigned(nPos) < maPortions.size() ? maPortions[nPos].get() : nullptr;
 }
 
 #if OSL_DEBUG_LEVEL > 0 && !defined NDEBUG
@@ -800,8 +804,8 @@ ParaPortionList::DbgCheck(ParaPortionList const& rParas, EditDoc const& rDoc)
 }
 #endif
 
-ContentAttribsInfo::ContentAttribsInfo( const SfxItemSet& rParaAttribs ) :
-        aPrevParaAttribs( rParaAttribs)
+ContentAttribsInfo::ContentAttribsInfo( SfxItemSet aParaAttribs ) :
+        aPrevParaAttribs(std::move( aParaAttribs))
 {
 }
 
@@ -853,6 +857,13 @@ void ConvertItem( std::unique_ptr<SfxPoolItem>& rPoolItem, MapUnit eSourceUnit, 
             assert(dynamic_cast<const SvxTabStopItem *>(rPoolItem.get()) != nullptr);
             SvxTabStopItem& rItem = static_cast<SvxTabStopItem&>(*rPoolItem);
             SvxTabStopItem* pNewItem(new SvxTabStopItem(EE_PARA_TABS));
+
+            if (sal_Int32 nDefTabDistance = rItem.GetDefaultDistance())
+            {
+                pNewItem->SetDefaultDistance(
+                    OutputDevice::LogicToLogic(nDefTabDistance, eSourceUnit, eDestUnit));
+            }
+
             for ( sal_uInt16 i = 0; i < rItem.Count(); i++ )
             {
                 const SvxTabStop& rTab = rItem[i];
@@ -1215,7 +1226,7 @@ void ContentNode::ExpandAttribs( sal_Int32 nIndex, sal_Int32 nNew, SfxItemPool& 
     bool bResort = false;
     bool bExpandedEmptyAtIndexNull = false;
 
-    sal_Int32 nAttr = 0;
+    std::size_t nAttr = 0;
     CharAttribList::AttribsType& rAttribs = aCharAttribList.GetAttribs();
     EditCharAttrib* pAttrib = GetAttrib(rAttribs, nAttr);
     while ( pAttrib )
@@ -1280,7 +1291,7 @@ void ContentNode::ExpandAttribs( sal_Int32 nIndex, sal_Int32 nNew, SfxItemPool& 
                         {
                             // Check if this kind of attribute was empty and expanded here...
                             sal_uInt16 nW = pAttrib->GetItem()->Which();
-                            for ( sal_Int32 nA = 0; nA < nAttr; nA++ )
+                            for ( std::size_t nA = 0; nA < nAttr; nA++ )
                             {
                                 const EditCharAttrib& r = *aCharAttribList.GetAttribs()[nA];
                                 if ( ( r.GetStart() == 0 ) && ( r.GetItem()->Which() == nW ) )
@@ -1318,9 +1329,11 @@ void ContentNode::ExpandAttribs( sal_Int32 nIndex, sal_Int32 nNew, SfxItemPool& 
             bResort = true;
             rItemPool.Remove( *pAttrib->GetItem() );
             rAttribs.erase(rAttribs.begin()+nAttr);
-            --nAttr;
         }
-        ++nAttr;
+        else
+        {
+            ++nAttr;
+        }
         pAttrib = GetAttrib(rAttribs, nAttr);
     }
 
@@ -1352,7 +1365,7 @@ void ContentNode::CollapseAttribs( sal_Int32 nIndex, sal_Int32 nDeleted, SfxItem
     bool bResort = false;
     sal_Int32 nEndChanges = nIndex+nDeleted;
 
-    sal_Int32 nAttr = 0;
+    std::size_t nAttr = 0;
     CharAttribList::AttribsType& rAttribs = aCharAttribList.GetAttribs();
     EditCharAttrib* pAttrib = GetAttrib(rAttribs, nAttr);
     while ( pAttrib )
@@ -1412,12 +1425,14 @@ void ContentNode::CollapseAttribs( sal_Int32 nIndex, sal_Int32 nDeleted, SfxItem
             bResort = true;
             rItemPool.Remove( *pAttrib->GetItem() );
             rAttribs.erase(rAttribs.begin()+nAttr);
-            nAttr--;
         }
-        else if ( pAttrib->IsEmpty() )
-            aCharAttribList.SetHasEmptyAttribs(true);
+        else
+        {
+            if ( pAttrib->IsEmpty() )
+                aCharAttribList.SetHasEmptyAttribs(true);
+            nAttr++;
+        }
 
-        nAttr++;
         pAttrib = GetAttrib(rAttribs, nAttr);
     }
 
@@ -1443,7 +1458,7 @@ void ContentNode::CopyAndCutAttribs( ContentNode* pPrevNode, SfxItemPool& rPool,
 
     sal_Int32 nCut = pPrevNode->Len();
 
-    sal_Int32 nAttr = 0;
+    std::size_t nAttr = 0;
     CharAttribList::AttribsType& rPrevAttribs = pPrevNode->GetCharAttribs().GetAttribs();
     EditCharAttrib* pAttrib = GetAttrib(rPrevAttribs, nAttr);
     while ( pAttrib )
@@ -1451,7 +1466,7 @@ void ContentNode::CopyAndCutAttribs( ContentNode* pPrevNode, SfxItemPool& rPool,
         if ( pAttrib->GetEnd() < nCut )
         {
             // remain unchanged...
-            ;
+            nAttr++;
         }
         else if ( pAttrib->GetEnd() == nCut )
         {
@@ -1462,6 +1477,7 @@ void ContentNode::CopyAndCutAttribs( ContentNode* pPrevNode, SfxItemPool& rPool,
                 assert(pNewAttrib);
                 aCharAttribList.InsertAttrib( pNewAttrib );
             }
+            nAttr++;
         }
         else if ( pAttrib->IsInside( nCut ) || ( !nCut && !pAttrib->GetStart() && !pAttrib->IsFeature() ) )
         {
@@ -1471,6 +1487,7 @@ void ContentNode::CopyAndCutAttribs( ContentNode* pPrevNode, SfxItemPool& rPool,
             assert(pNewAttrib);
             aCharAttribList.InsertAttrib( pNewAttrib );
             pAttrib->GetEnd() = nCut;
+            nAttr++;
         }
         else
         {
@@ -1479,9 +1496,7 @@ void ContentNode::CopyAndCutAttribs( ContentNode* pPrevNode, SfxItemPool& rPool,
             aCharAttribList.InsertAttrib(it->release());
             rPrevAttribs.erase(it);
             pAttrib->MoveBackward( nCut );
-            nAttr--;
         }
-        nAttr++;
         pAttrib = GetAttrib(rPrevAttribs, nAttr);
     }
 
@@ -1502,7 +1517,7 @@ void ContentNode::AppendAttribs( ContentNode* pNextNode )
     CharAttribList::DbgCheckAttribs(pNextNode->aCharAttribList);
 #endif
 
-    sal_Int32 nAttr = 0;
+    std::size_t nAttr = 0;
     CharAttribList::AttribsType& rNextAttribs = pNextNode->GetCharAttribs().GetAttribs();
     EditCharAttrib* pAttrib = GetAttrib(rNextAttribs, nAttr);
     while ( pAttrib )
@@ -1512,10 +1527,11 @@ void ContentNode::AppendAttribs( ContentNode* pNextNode )
         if ( ( pAttrib->GetStart() == 0 ) && ( !pAttrib->IsFeature() ) )
         {
             // Attributes can possibly be summarized as:
-            sal_Int32 nTmpAttr = 0;
+            std::size_t nTmpAttr = 0;
             EditCharAttrib* pTmpAttrib = GetAttrib( aCharAttribList.GetAttribs(), nTmpAttr );
             while ( !bMelted && pTmpAttrib )
             {
+                ++nTmpAttr;
                 if ( pTmpAttrib->GetEnd() == nNewStart )
                 {
                     if (pTmpAttrib->Which() == pAttrib->Which())
@@ -1532,12 +1548,11 @@ void ContentNode::AppendAttribs( ContentNode* pNextNode )
                         }
                         else if (0 == pTmpAttrib->GetLen())
                         {
+                            --nTmpAttr; // to cancel earlier increment...
                             aCharAttribList.Remove(nTmpAttr);
-                            --nTmpAttr; // to cancel later increment...
                         }
                     }
                 }
-                ++nTmpAttr;
                 pTmpAttrib = GetAttrib( aCharAttribList.GetAttribs(), nTmpAttr );
             }
         }
@@ -1813,6 +1828,10 @@ SvxTabStop ContentAttribs::FindTabStop( sal_Int32 nCurPos, sal_uInt16 nDefTab )
             return rTab;
     }
 
+    // if there's a default tab size defined for this item use that instead
+    if (rTabs.GetDefaultDistance())
+        nDefTab = rTabs.GetDefaultDistance();
+
     // Determine DefTab ...
     SvxTabStop aTabStop;
     const sal_Int32 x = nCurPos / nDefTab + 1;
@@ -2031,14 +2050,14 @@ void CreateFont( SvxFont& rFont, const SfxItemSet& rSet, bool bSearchInParent, S
 void EditDoc::CreateDefFont( bool bUseStyles )
 {
     SfxItemSetFixed<EE_PARA_START, EE_CHAR_END> aTmpSet( GetItemPool() );
-    CreateFont( aDefFont, aTmpSet );
-    aDefFont.SetVertical( IsEffectivelyVertical() );
-    aDefFont.SetOrientation( Degree10(IsEffectivelyVertical() ? (IsTopToBottom() ? 2700 : 900) : 0) );
+    CreateFont(maDefFont, aTmpSet);
+    maDefFont.SetVertical( IsEffectivelyVertical() );
+    maDefFont.SetOrientation( Degree10(IsEffectivelyVertical() ? (IsTopToBottom() ? 2700 : 900) : 0) );
 
     for ( sal_Int32 nNode = 0; nNode < Count(); nNode++ )
     {
         ContentNode* pNode = GetObject( nNode );
-        pNode->GetCharAttribs().GetDefFont() = aDefFont;
+        pNode->GetCharAttribs().GetDefFont() = maDefFont;
         if ( bUseStyles )
             pNode->CreateDefFont();
     }
@@ -2068,12 +2087,12 @@ sal_Int32 EditDoc::GetPos(const ContentNode* p) const
 
 const ContentNode* EditDoc::GetObject(sal_Int32 nPos) const
 {
-    return 0 <= nPos && nPos < static_cast<sal_Int32>(maContents.size()) ? maContents[nPos].get() : nullptr;
+    return 0 <= nPos && o3tl::make_unsigned(nPos) < maContents.size() ? maContents[nPos].get() : nullptr;
 }
 
 ContentNode* EditDoc::GetObject(sal_Int32 nPos)
 {
-    return 0 <= nPos && nPos < static_cast<sal_Int32>(maContents.size()) ? maContents[nPos].get() : nullptr;
+    return 0 <= nPos && o3tl::make_unsigned(nPos) < maContents.size() ? maContents[nPos].get() : nullptr;
 }
 
 const ContentNode* EditDoc::operator[](sal_Int32 nPos) const
@@ -2098,7 +2117,7 @@ void EditDoc::Insert(sal_Int32 nPos, ContentNode* p)
 
 void EditDoc::Remove(sal_Int32 nPos)
 {
-    if (nPos < 0 || nPos >= static_cast<sal_Int32>(maContents.size()))
+    if (nPos < 0 || o3tl::make_unsigned(nPos) >= maContents.size())
     {
         SAL_WARN( "editeng", "EditDoc::Remove - out of bounds pos " << nPos);
         return;
@@ -2108,11 +2127,12 @@ void EditDoc::Remove(sal_Int32 nPos)
 
 void EditDoc::Release(sal_Int32 nPos)
 {
-    if (nPos < 0 || nPos >= static_cast<sal_Int32>(maContents.size()))
+    if (nPos < 0 || o3tl::make_unsigned(nPos) >= maContents.size())
     {
         SAL_WARN( "editeng", "EditDoc::Release - out of bounds pos " << nPos);
         return;
     }
+    // coverity[leaked_storage] - this is on purpose, ownership should be transferred to undo/redo
     (void)maContents[nPos].release();
     maContents.erase(maContents.begin() + nPos);
 }
@@ -2245,16 +2265,16 @@ EditPaM EditDoc::RemoveText()
     return EditPaM( pNode, 0 );
 }
 
-EditPaM EditDoc::InsertText( EditPaM aPaM, const OUString& rStr )
+EditPaM EditDoc::InsertText( EditPaM aPaM, std::u16string_view rStr )
 {
-    DBG_ASSERT( rStr.indexOf( 0x0A ) == -1, "EditDoc::InsertText: Newlines prohibited in paragraph!" );
-    DBG_ASSERT( rStr.indexOf( 0x0D ) == -1, "EditDoc::InsertText: Newlines prohibited in paragraph!" );
-    DBG_ASSERT( rStr.indexOf( '\t' ) == -1, "EditDoc::InsertText: Newlines prohibited in paragraph!" );
+    DBG_ASSERT( rStr.find( 0x0A ) == std::u16string_view::npos, "EditDoc::InsertText: Newlines prohibited in paragraph!" );
+    DBG_ASSERT( rStr.find( 0x0D ) == std::u16string_view::npos, "EditDoc::InsertText: Newlines prohibited in paragraph!" );
+    DBG_ASSERT( rStr.find( '\t' ) == std::u16string_view::npos, "EditDoc::InsertText: Newlines prohibited in paragraph!" );
     assert(aPaM.GetNode());
 
     aPaM.GetNode()->Insert( rStr, aPaM.GetIndex() );
-    aPaM.GetNode()->ExpandAttribs( aPaM.GetIndex(), rStr.getLength(), GetItemPool() );
-    aPaM.SetIndex( aPaM.GetIndex() + rStr.getLength() );
+    aPaM.GetNode()->ExpandAttribs( aPaM.GetIndex(), rStr.size(), GetItemPool() );
+    aPaM.SetIndex( aPaM.GetIndex() + rStr.size() );
 
     SetModified( true );
 
@@ -2276,7 +2296,7 @@ EditPaM EditDoc::InsertParaBreak( EditPaM aPaM, bool bKeepEndingAttribs )
     aContentAttribs.GetItems().Put( SfxBoolItem( EE_PARA_BULLETSTATE, true) );
 
     // ContentNode constructor copies also the paragraph attributes
-    ContentNode* pNode = new ContentNode( aStr, aContentAttribs );
+    ContentNode* pNode = new ContentNode( aStr, std::move(aContentAttribs) );
 
     // Copy the Default Font
     pNode->GetCharAttribs().GetDefFont() = aPaM.GetNode()->GetCharAttribs().GetDefFont();
@@ -2423,7 +2443,7 @@ bool EditDoc::RemoveAttribs( ContentNode* pNode, sal_Int32 nStart, sal_Int32 nEn
 #endif
 
     // iterate over the attributes ...
-    sal_Int32 nAttr = 0;
+    std::size_t nAttr = 0;
     CharAttribList::AttribsType& rAttribs = pNode->GetCharAttribs().GetAttribs();
     EditCharAttrib* pAttr = GetAttrib(rAttribs, nAttr);
     while ( pAttr )
@@ -2503,9 +2523,11 @@ bool EditDoc::RemoveAttribs( ContentNode* pNode, sal_Int32 nStart, sal_Int32 nEn
             DBG_ASSERT( !pAttr->IsFeature(), "RemoveAttribs: Remove a feature?!" );
             GetItemPool().Remove( *pAttr->GetItem() );
             rAttribs.erase(rAttribs.begin()+nAttr);
-            nAttr--;
         }
-        nAttr++;
+        else
+        {
+            nAttr++;
+        }
         pAttr = GetAttrib(rAttribs, nAttr);
     }
 
@@ -2583,7 +2605,7 @@ void EditDoc::FindAttribs( ContentNode* pNode, sal_Int32 nStartPos, sal_Int32 nE
     assert(pNode);
     DBG_ASSERT( nStartPos <= nEndPos, "Invalid region!" );
 
-    sal_uInt16 nAttr = 0;
+    std::size_t nAttr = 0;
     EditCharAttrib* pAttr = GetAttrib( pNode->GetCharAttribs().GetAttribs(), nAttr );
     // No Selection...
     if ( nStartPos == nEndPos )

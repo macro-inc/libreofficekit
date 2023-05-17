@@ -15,7 +15,10 @@
 #include <svtools/valueset.hxx>
 #include <svx/ColorSets.hxx>
 
-namespace sw::sidebar {
+namespace svx { class ThemeColorValueSet; }
+
+namespace sw::sidebar
+{
 
 class ThemePanel : public PanelLayout,
                        public sfx2::sidebar::ControllerItem::ItemUpdateReceiverInterface
@@ -36,11 +39,9 @@ public:
 
 private:
     std::unique_ptr<weld::TreeView> mxListBoxFonts;
-    std::unique_ptr<ValueSet> mxValueSetColors;
+    std::unique_ptr<svx::ThemeColorValueSet> mxValueSetColors;
     std::unique_ptr<weld::CustomWeld> mxValueSetColorsWin;
     std::unique_ptr<weld::Button> mxApplyButton;
-
-    svx::ColorSets maColorSets;
 
     DECL_LINK(ClickHdl, weld::Button&, void);
     DECL_LINK(DoubleClickHdl, weld::TreeView&, bool);

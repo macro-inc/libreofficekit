@@ -20,9 +20,10 @@
 #include <comphelper/anytostring.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequenceashashmap.hxx>
+#include <o3tl/string_view.hxx>
 #include <sal/log.hxx>
 #include <tools/multisel.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/container/XNamed.hpp>
 #include <com/sun/star/drawing/XMasterPagesSupplier.hpp>
@@ -59,6 +60,8 @@
 
 #include <com/sun/star/office/XAnnotation.hpp>
 #include <com/sun/star/office/XAnnotationAccess.hpp>
+#include <ooxresid.hxx>
+#include <strings.hrc>
 
 using namespace ::com::sun::star;
 using namespace ::oox::core;
@@ -105,60 +108,49 @@ PresentationFragmentHandler::~PresentationFragmentHandler() noexcept
 {
 }
 
-static void ResolveTextFields( XmlFilterBase const & rFilter )
+void PresentationFragmentHandler::importSlideNames(XmlFilterBase& rFilter, const std::vector<SlidePersistPtr>& rSlidePersist)
 {
-    const oox::core::TextFieldStack& rTextFields = rFilter.getTextFieldStack();
-    if ( rTextFields.empty() )
-        return;
-
-    const Reference< frame::XModel >& xModel( rFilter.getModel() );
-    for (auto const& textField : rTextFields)
+    sal_Int32 nMaxPages = rSlidePersist.size();
+    for (sal_Int32 nPage = 0; nPage < nMaxPages; nPage++)
     {
-        static const OUStringLiteral sURL = u"URL";
-        Reference< drawing::XDrawPagesSupplier > xDPS( xModel, uno::UNO_QUERY_THROW );
-        Reference< drawing::XDrawPages > xDrawPages( xDPS->getDrawPages(), uno::UNO_SET_THROW );
-
-        const oox::core::TextField& rTextField( textField );
-        Reference< XPropertySet > xPropSet( rTextField.xTextField, UNO_QUERY );
-        Reference< XPropertySetInfo > xPropSetInfo( xPropSet->getPropertySetInfo() );
-        if ( xPropSetInfo->hasPropertyByName( sURL ) )
+        auto aShapeMap = rSlidePersist[nPage]->getShapeMap();
+        auto aIter = std::find_if(aShapeMap.begin(), aShapeMap.end(),
+                                  [](const std::pair<OUString, ShapePtr>& element) {
+                                      auto pShapePtr = element.second;
+                                      return (pShapePtr
+                                              && (pShapePtr->getSubType() == XML_title
+                                                  || pShapePtr->getSubType() == XML_ctrTitle));
+                                  });
+        if (aIter != aShapeMap.end())
         {
-            OUString aURL;
-            if ( xPropSet->getPropertyValue( sURL ) >>= aURL )
+            OUString aTitleText;
+            Reference<text::XTextRange> xText(aIter->second->getXShape(), UNO_QUERY_THROW);
+            aTitleText = xText->getString();
+            // just a magic value but we don't want to drop out slide names which are too long
+            if (aTitleText.getLength() > 63)
+                aTitleText = aTitleText.copy(0, 63);
+            bool bUseTitleAsSlideName = !aTitleText.isEmpty();
+            // check duplicated title name
+            if (bUseTitleAsSlideName)
             {
-                static const OUStringLiteral sSlide = u"#Slide ";
-                static const OUStringLiteral sNotes = u"#Notes ";
-                bool bNotes = false;
-                sal_Int32 nPageNumber = 0;
-                if ( aURL.match( sSlide ) )
-                    nPageNumber = aURL.copy( sSlide.getLength() ).toInt32();
-                else if ( aURL.match( sNotes ) )
+                sal_Int32 nCount = 1;
+                Reference<XDrawPagesSupplier> xDPS(rFilter.getModel(), UNO_QUERY_THROW);
+                Reference<XDrawPages> xDrawPages(xDPS->getDrawPages(), UNO_SET_THROW);
+                for (sal_Int32 i = 0; i < nPage; ++i)
                 {
-                    nPageNumber = aURL.copy( sNotes.getLength() ).toInt32();
-                    bNotes = true;
+                    Reference<XDrawPage> xDrawPage(xDrawPages->getByIndex(i), UNO_QUERY);
+                    Reference<container::XNamed> xNamed(xDrawPage, UNO_QUERY_THROW);
+                    OUString sRest;
+                    if (xNamed->getName().startsWith(aTitleText, &sRest)
+                        && (sRest.isEmpty()
+                            || (sRest.startsWith(" (") && sRest.endsWith(")")
+                                && o3tl::toInt32(sRest.subView(2, sRest.getLength() - 3)) > 0)))
+                        nCount++;
                 }
-                if ( nPageNumber )
-                {
-                    try
-                    {
-                        Reference< XDrawPage > xDrawPage;
-                        xDrawPages->getByIndex( nPageNumber - 1 ) >>= xDrawPage;
-                        if ( bNotes )
-                        {
-                            Reference< css::presentation::XPresentationPage > xPresentationPage( xDrawPage, UNO_QUERY_THROW );
-                            xDrawPage = xPresentationPage->getNotesPage();
-                        }
-                        Reference< container::XNamed > xNamed( xDrawPage, UNO_QUERY_THROW );
-                        aURL = "#" + xNamed->getName();
-                        xPropSet->setPropertyValue( sURL, Any( aURL ) );
-                        Reference< text::XTextContent > xContent( rTextField.xTextField);
-                        Reference< text::XTextRange > xTextRange = rTextField.xTextCursor;
-                        rTextField.xText->insertTextContent( xTextRange, xContent, true );
-                    }
-                    catch( uno::Exception& )
-                    {
-                    }
-                }
+                Reference<container::XNamed> xName(rSlidePersist[nPage]->getPage(), UNO_QUERY_THROW);
+                xName->setName(
+                    aTitleText
+                    + (nCount == 1 ? OUString("") : " (" + OUString::number(nCount) + ")"));
             }
         }
     }
@@ -192,7 +184,7 @@ void PresentationFragmentHandler::importCustomSlideShow(std::vector<CustomShow>&
                 OUString sCustomSlide = rCustomShowList[i].maSldLst[j];
                 sal_Int32 nPageNumber = 0;
                 if (sCustomSlide.match(sSlide))
-                    nPageNumber = sCustomSlide.copy(sSlide.getLength()).toInt32();
+                    nPageNumber = o3tl::toInt32(sCustomSlide.subView(sSlide.getLength()));
 
                 Reference<XDrawPage> xPage;
                 xDrawPages->getByIndex(nPageNumber - 1) >>= xPage;
@@ -240,7 +232,7 @@ void PresentationFragmentHandler::saveThemeToGrabBag(const oox::drawingml::Theme
                     ::Color nColor;
 
                     rClrScheme.getColor(nToken, nColor);
-                    const uno::Any& rColor = uno::makeAny(nColor);
+                    const uno::Any& rColor = uno::Any(nColor);
 
                     pCurrentTheme[nId].Name = sName;
                     pCurrentTheme[nId].Value = rColor;
@@ -359,9 +351,11 @@ void PresentationFragmentHandler::importSlide(sal_uInt32 nSlide, bool bFirstPage
                                 Reference<xml::dom::XDocument> xDoc=
                                     rFilter.importFragment(aThemeFragmentPath);
 
+                                auto pTheme = std::make_shared<model::Theme>();
+                                pThemePtr->setTheme(pTheme);
+
                                 rFilter.importFragment(
-                                    new ThemeFragmentHandler(
-                                        rFilter, aThemeFragmentPath, *pThemePtr ),
+                                    new ThemeFragmentHandler(rFilter, aThemeFragmentPath, *pThemePtr, *pTheme),
                                     Reference<xml::sax::XFastSAXSerializable>(
                                         xDoc,
                                         UNO_QUERY_THROW));
@@ -549,7 +543,7 @@ void PresentationFragmentHandler::finalizeImport()
                 importSlide(elem, !nPagesImported, bImportNotesPages);
                 nPagesImported++;
             }
-            ResolveTextFields( rFilter );
+            importSlideNames( rFilter, rFilter.getDrawPages());
             if (!maCustomShowList.empty())
                 importCustomSlideShow(maCustomShowList);
         }
@@ -586,13 +580,13 @@ void PresentationFragmentHandler::finalizeImport()
     case PPT_TOKEN( sldIdLst ):
         return this;
     case PPT_TOKEN( sldMasterId ):
-        maSlideMasterVector.push_back( rAttribs.getString( R_TOKEN( id ), OUString() ) );
+        maSlideMasterVector.push_back( rAttribs.getStringDefaulted( R_TOKEN( id )) );
         return this;
     case PPT_TOKEN( sldId ):
-        maSlidesVector.push_back( rAttribs.getString( R_TOKEN( id ), OUString() ) );
+        maSlidesVector.push_back( rAttribs.getStringDefaulted( R_TOKEN( id )) );
         return this;
     case PPT_TOKEN( notesMasterId ):
-        maNotesMasterVector.push_back( rAttribs.getString( R_TOKEN( id ), OUString() ) );
+        maNotesMasterVector.push_back( rAttribs.getStringDefaulted( R_TOKEN( id )) );
         return this;
     case PPT_TOKEN( sldSz ):
         maSlideSize = GetSize2D( rAttribs.getFastAttributeList() );
@@ -605,12 +599,12 @@ void PresentationFragmentHandler::finalizeImport()
     case PPT_TOKEN( defaultTextStyle ):
         return new TextListStyleContext( *this, *mpTextListStyle );
     case PPT_TOKEN( modifyVerifier ):
-        OUString sAlgorithmClass = rAttribs.getString(XML_cryptAlgorithmClass, OUString());
-        OUString sAlgorithmType = rAttribs.getString(XML_cryptAlgorithmType, OUString());
+        OUString sAlgorithmClass = rAttribs.getStringDefaulted(XML_cryptAlgorithmClass);
+        OUString sAlgorithmType = rAttribs.getStringDefaulted(XML_cryptAlgorithmType);
         sal_Int32 nAlgorithmSid = rAttribs.getInteger(XML_cryptAlgorithmSid, 0);
         sal_Int32 nSpinCount = rAttribs.getInteger(XML_spinCount, 0);
-        OUString sSalt = rAttribs.getString(XML_saltData, OUString());
-        OUString sHash = rAttribs.getString(XML_hashData, OUString());
+        OUString sSalt = rAttribs.getStringDefaulted(XML_saltData);
+        OUString sHash = rAttribs.getStringDefaulted(XML_hashData);
         if (sAlgorithmClass == "hash" && sAlgorithmType == "typeAny" && nAlgorithmSid != 0
             && !sSalt.isEmpty() && !sHash.isEmpty())
         {
@@ -667,7 +661,7 @@ void PresentationFragmentHandler::finalizeImport()
                         getFilter().getModelFactory()->createInstance(
                             "com.sun.star.document.Settings"),
                         uno::UNO_QUERY);
-                    xDocSettings->setPropertyValue("ModifyPasswordInfo", uno::makeAny(aResult));
+                    xDocSettings->setPropertyValue("ModifyPasswordInfo", uno::Any(aResult));
                 }
                 catch (const uno::Exception&)
                 {

@@ -20,9 +20,8 @@
 #include <memory>
 #include <map>
 #include <optasian.hxx>
-#include <osl/diagnose.h>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <o3tl/any.hxx>
 #include <i18nlangtag/mslangid.hxx>
 #include <svl/asiancfg.hxx>
@@ -321,7 +320,7 @@ IMPL_LINK_NOARG(SvxAsianLayoutPage, LanguageHdl, weld::ComboBox&, void)
     }
     if(!bAvail)
     {
-        LocaleDataWrapper aWrap( aLanguageTag );
+        LocaleDataWrapper aWrap( std::move(aLanguageTag) );
         ForbiddenCharacters aForbidden = aWrap.getForbiddenCharacters();
         sStart = aForbidden.beginLine;
         sEnd = aForbidden.endLine;

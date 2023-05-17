@@ -22,6 +22,7 @@
 
 #include <o3tl/deleter.hxx>
 #include <tools/long.hxx>
+#include <tools/solar.h>
 #include <ndarr.hxx>
 #include <undobj.hxx>
 #include <set>
@@ -57,7 +58,7 @@ class SwUndoInsTable final : public SwUndo
     OUString m_sTableName;
     SwInsertTableOptions m_aInsTableOptions;
     std::unique_ptr<SwDDEFieldType> m_pDDEFieldType;
-    std::unique_ptr<std::vector<sal_uInt16>> m_pColumnWidth;
+    std::optional<std::vector<sal_uInt16>> m_oColumnWidth;
     std::unique_ptr<SwRedlineData>  m_pRedlineData;
     std::unique_ptr<SwTableAutoFormat> m_pAutoFormat;
     SwNodeOffset m_nStartNode;
@@ -233,7 +234,7 @@ public:
     virtual void UndoImpl( ::sw::UndoRedoContext & ) override;
     virtual void RedoImpl( ::sw::UndoRedoContext & ) override;
 
-    void MoveBoxContent( SwDoc& rDoc, SwNodeRange& rRg, SwNodeIndex& rPos );
+    void MoveBoxContent( SwDoc& rDoc, SwNodeRange& rRg, SwNode& rPos );
 
     void SetSelBoxes( const SwSelBoxes& rBoxes );
 
@@ -347,12 +348,11 @@ class SwUndoMergeTable final : public SwUndo
     SwNodeOffset m_nTableNode;
     std::unique_ptr<SaveTable> m_pSaveTable, m_pSaveHdl;
     std::unique_ptr<SwHistory> m_pHistory;
-    sal_uInt16 m_nMode;
     bool m_bWithPrev;
 
 public:
     SwUndoMergeTable( const SwTableNode& rTableNd, const SwTableNode& rDelTableNd,
-                    bool bWithPrev, sal_uInt16 nMode );
+                    bool bWithPrev );
 
     virtual ~SwUndoMergeTable() override;
 
@@ -384,7 +384,7 @@ class SwUndoTableStyleMake final : public SwUndo
     OUString m_sName;
     std::unique_ptr<SwTableAutoFormat> m_pAutoFormat;
 public:
-    SwUndoTableStyleMake(const OUString& rName, const SwDoc& rDoc);
+    SwUndoTableStyleMake(OUString aName, const SwDoc& rDoc);
 
     virtual ~SwUndoTableStyleMake() override;
 

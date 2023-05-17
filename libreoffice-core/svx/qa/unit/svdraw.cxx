@@ -7,14 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
-#include <test/xmltesttools.hxx>
+#include <test/unoapixml_test.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/text/XTextRange.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
@@ -27,7 +24,6 @@
 #include <svx/sdr/contact/displayinfo.hxx>
 #include <svx/sdr/contact/viewcontact.hxx>
 #include <svx/sdr/contact/viewobjectcontact.hxx>
-#include <svx/svdpage.hxx>
 #include <svx/svdorect.hxx>
 #include <svx/unopage.hxx>
 #include <svx/svdview.hxx>
@@ -37,6 +33,7 @@
 #include <sfx2/viewsh.hxx>
 #include <svl/itempool.hxx>
 #include <svx/svdomedia.hxx>
+#include <vcl/filter/PDFiumLibrary.hxx>
 
 #include <sdr/contact/objectcontactofobjlistpainter.hxx>
 
@@ -45,28 +42,16 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Tests for svx/source/svdraw/ code.
-class SvdrawTest : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class SvdrawTest : public UnoApiXmlTest
 {
-protected:
-    uno::Reference<lang::XComponent> mxComponent;
-    SdrPage* getFirstDrawPageWithAssert();
-
 public:
-    virtual void setUp() override
+    SvdrawTest()
+        : UnoApiXmlTest("svx/qa/unit/data/")
     {
-        test::BootstrapFixture::setUp();
-        mxDesktop.set(frame::Desktop::create(m_xContext));
     }
 
-    virtual void tearDown() override
-    {
-        if (mxComponent.is())
-        {
-            mxComponent->dispose();
-        }
-        test::BootstrapFixture::tearDown();
-    }
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
+protected:
+    SdrPage* getFirstDrawPageWithAssert();
 };
 
 SdrPage* SvdrawTest::getFirstDrawPageWithAssert()
@@ -103,14 +88,14 @@ xmlDocUniquePtr lcl_dumpAndParseFirstObjectWithAssert(SdrPage* pSdrPage)
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testSemiTransparentText)
 {
     // Create a new Draw document with a rectangle.
-    getComponent() = loadFromDesktop("private:factory/sdraw");
-    uno::Reference<lang::XMultiServiceFactory> xFactory(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/sdraw");
+    uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XShape> xShape(
         xFactory->createInstance("com.sun.star.drawing.RectangleShape"), uno::UNO_QUERY);
     xShape->setSize(awt::Size(10000, 10000));
     xShape->setPosition(awt::Point(1000, 1000));
 
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     xDrawPage->add(xShape);
@@ -120,9 +105,9 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testSemiTransparentText)
     xShapeText->getText()->setString("hello");
 
     uno::Reference<beans::XPropertySet> xShapeProperties(xShape, uno::UNO_QUERY);
-    xShapeProperties->setPropertyValue("CharColor", uno::makeAny(COL_RED));
+    xShapeProperties->setPropertyValue("CharColor", uno::Any(COL_RED));
     sal_Int16 nTransparence = 75;
-    xShapeProperties->setPropertyValue("CharTransparence", uno::makeAny(nTransparence));
+    xShapeProperties->setPropertyValue("CharTransparence", uno::Any(nTransparence));
 
     // Generates drawinglayer primitives for the page.
     auto pDrawPage = dynamic_cast<SvxDrawPage*>(xDrawPage.get());
@@ -144,8 +129,8 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testSemiTransparentText)
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testHandlePathObjScale)
 {
     // Given a path object:
-    getComponent() = loadFromDesktop("private:factory/sdraw");
-    uno::Reference<lang::XMultiServiceFactory> xFactory(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/sdraw");
+    uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XShape> xShape(
         xFactory->createInstance("com.sun.star.drawing.ClosedBezierShape"), uno::UNO_QUERY);
 
@@ -154,11 +139,11 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testHandlePathObjScale)
     xShape->setPosition(awt::Point(2512, 6062));
     xShape->setSize(awt::Size(112, 112));
     uno::Reference<beans::XPropertySet> xShapeProps(xShape, uno::UNO_QUERY);
-    xShapeProps->setPropertyValue("FillStyle", uno::makeAny(drawing::FillStyle_SOLID));
-    xShapeProps->setPropertyValue("LineStyle", uno::makeAny(drawing::LineStyle_SOLID));
-    xShapeProps->setPropertyValue("FillColor", uno::makeAny(static_cast<sal_Int32>(0)));
+    xShapeProps->setPropertyValue("FillStyle", uno::Any(drawing::FillStyle_SOLID));
+    xShapeProps->setPropertyValue("LineStyle", uno::Any(drawing::LineStyle_SOLID));
+    xShapeProps->setPropertyValue("FillColor", uno::Any(static_cast<sal_Int32>(0)));
     // Add it to the draw page.
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     xDrawPage->add(xShape);
@@ -198,7 +183,7 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testHandlePathObjScale)
             drawing::PolygonFlags_NORMAL,
         },
     };
-    xShapeProps->setPropertyValue("PolyPolygonBezier", uno::makeAny(aPolyPolygonBezierCoords));
+    xShapeProps->setPropertyValue("PolyPolygonBezier", uno::Any(aPolyPolygonBezierCoords));
     drawing::HomogenMatrix3 aMatrix;
     aMatrix.Line1.Column1 = 56;
     aMatrix.Line2.Column1 = -97;
@@ -209,7 +194,7 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testHandlePathObjScale)
     aMatrix.Line1.Column3 = 3317;
     aMatrix.Line2.Column3 = 5583;
     aMatrix.Line3.Column3 = 1;
-    xShapeProps->setPropertyValue("Transformation", uno::makeAny(aMatrix));
+    xShapeProps->setPropertyValue("Transformation", uno::Any(aMatrix));
 
     // Then make sure the scaling is only applied once:
     // Without the accompanying fix in place, this test would have failed with:
@@ -222,8 +207,8 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testHandlePathObjScale)
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testTextEditEmptyGrabBag)
 {
     // Given a document with a groupshape, which has 2 children.
-    getComponent() = loadFromDesktop("private:factory/sdraw");
-    uno::Reference<lang::XMultiServiceFactory> xFactory(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/sdraw");
+    uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XShape> xRect1(
         xFactory->createInstance("com.sun.star.drawing.RectangleShape"), uno::UNO_QUERY);
     xRect1->setPosition(awt::Point(1000, 1000));
@@ -234,7 +219,7 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testTextEditEmptyGrabBag)
     xRect2->setSize(awt::Size(10000, 10000));
     uno::Reference<drawing::XShapes> xGroup(
         xFactory->createInstance("com.sun.star.drawing.GroupShape"), uno::UNO_QUERY);
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     uno::Reference<drawing::XShape> xGroupShape(xGroup, uno::UNO_QUERY);
@@ -247,7 +232,7 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testTextEditEmptyGrabBag)
         comphelper::makePropertyValue("OOXLayout", true),
     };
     uno::Reference<beans::XPropertySet> xGroupProps(xGroup, uno::UNO_QUERY);
-    xGroupProps->setPropertyValue("InteropGrabBag", uno::makeAny(aGrabBag));
+    xGroupProps->setPropertyValue("InteropGrabBag", uno::Any(aGrabBag));
 
     // When editing the shape text of the 2nd rectangle (insert a char at the start).
     SfxViewShell* pViewShell = SfxViewShell::Current();
@@ -278,8 +263,8 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testRectangleObject)
     pModel->InsertPage(pPage.get(), 0);
 
     tools::Rectangle aSize(Point(), Size(100, 100));
-    auto* pRectangle = new SdrRectObj(*pModel, aSize);
-    pPage->NbcInsertObject(pRectangle);
+    rtl::Reference<SdrRectObj> pRectangle = new SdrRectObj(*pModel, aSize);
+    pPage->NbcInsertObject(pRectangle.get());
     pRectangle->SetMergedItem(XLineStyleItem(drawing::LineStyle_SOLID));
     pRectangle->SetMergedItem(XLineStartWidthItem(200));
 
@@ -343,9 +328,6 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testRectangleObject)
     assertXPath(pXmlDoc, aBasePath + "/stroke", 0);
 
     pPage->RemoveObject(0);
-
-    SdrObject* pObject(pRectangle);
-    SdrObject::Free(pObject);
 }
 
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testAutoHeightMultiColShape)
@@ -353,15 +335,11 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testAutoHeightMultiColShape)
     // Given a document containing a shape that has:
     // 1) automatic height (resize shape to fix text)
     // 2) multiple columns (2)
-    OUString aURL
-        = m_directories.getURLFromSrc(u"svx/qa/unit/data/auto-height-multi-col-shape.pptx");
-
-    // When loading that document:
-    getComponent().set(loadFromDesktop(aURL, "com.sun.star.presentation.PresentationDocument"));
+    loadFromURL(u"auto-height-multi-col-shape.pptx");
 
     // Make sure the in-file shape height is kept, even if nominally the shape height is
     // automatic:
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     uno::Reference<drawing::XShape> xShape(xDrawPage->getByIndex(0), uno::UNO_QUERY);
@@ -378,8 +356,7 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testAutoHeightMultiColShape)
 
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testFontWorks)
 {
-    OUString aURL = m_directories.getURLFromSrc(u"svx/qa/unit/data/FontWork.odg");
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.comp.drawing.DrawingDocument");
+    loadFromURL(u"FontWork.odg");
 
     uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent,
                                                                    uno::UNO_QUERY_THROW);
@@ -400,31 +377,72 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testFontWorks)
     assertXPath(pXmlDoc, "//scene", "projectionMode", "Perspective");
     assertXPath(pXmlDoc, "//scene/extrude3D[1]/fill", "color", "#ff0000");
     assertXPath(pXmlDoc, "//scene/extrude3D[1]/object3Dattributes/material", "color", "#ff0000");
+    // ODF default 50% is represented by Specular Intensity = 2^5. The relationship is not linear.
     assertXPath(pXmlDoc, "//scene/extrude3D[1]/object3Dattributes/material", "specularIntensity",
-                "20");
+                "32");
+}
+
+CPPUNIT_TEST_FIXTURE(SvdrawTest, testTdf148000_EOLinCurvedText)
+{
+    std::vector<OUString> aFilenames
+        = { u"tdf148000_EOLinCurvedText.pptx", u"tdf148000_EOLinCurvedText_New.odp",
+            u"tdf148000_EOLinCurvedText_Legacy.odp" };
+
+    for (int i = 0; i < 3; i++)
+    {
+        loadFromURL(aFilenames[i]);
+
+        SdrPage* pSdrPage = getFirstDrawPageWithAssert();
+
+        xmlDocUniquePtr pXmlDoc = lcl_dumpAndParseFirstObjectWithAssert(pSdrPage);
+
+        OString aBasePath
+            = "/primitive2D/objectinfo[4]/unhandled/unhandled/polypolygoncolor/polypolygon/";
+
+        // The text is: "O" + eop + "O" + eol + "O"
+        // It should be displayed as 3 line of text. (1 "O" letter in every line)
+        sal_Int32 nY1 = getXPath(pXmlDoc, aBasePath + "polygon[1]/point[1]", "y").toInt32();
+        sal_Int32 nY2 = getXPath(pXmlDoc, aBasePath + "polygon[3]/point[1]", "y").toInt32();
+        sal_Int32 nY3 = getXPath(pXmlDoc, aBasePath + "polygon[5]/point[1]", "y").toInt32();
+
+        sal_Int32 nDiff21 = nY2 - nY1;
+        sal_Int32 nDiff32 = nY3 - nY2;
+
+        // the 2. "O" must be positioned much lower as the 1. "O". (the eop break the line)
+        CPPUNIT_ASSERT_GREATER(sal_Int32(300), nDiff21);
+        if (i < 2)
+        {
+            // the 3. "O" must be positioned even lower with 1 line. (the eol must break the line as well)
+            CPPUNIT_ASSERT_LESS(sal_Int32(50), abs(nDiff32 - nDiff21));
+        }
+        else
+        {
+            // In legacy mode, the 3. "O" must be positioned about the same high as the 2. "O"
+            // the eol not break the line.
+            CPPUNIT_ASSERT_LESS(sal_Int32(50), nDiff32);
+        }
+    }
 }
 
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testSurfaceMetal)
 {
-    OUString aURL = m_directories.getURLFromSrc(u"svx/qa/unit/data/tdf140321_metal.odp");
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.presentation.PresentationDocument");
+    loadFromURL(u"tdf140321_metal.odp");
 
     SdrPage* pSdrPage = getFirstDrawPageWithAssert();
 
     xmlDocUniquePtr pXmlDoc = lcl_dumpAndParseFirstObjectWithAssert(pSdrPage);
 
-    // ODF specifies specular color as rgb(200,200,200) and adding 15 to specularity for metal=true
-    // without patch the specular color was #ffffff
-    assertXPath(pXmlDoc, "(//material)[1]", "specular", "#c8c8c8");
-    // specularIntensity = 100 - (80 + 15), with nominal value 80 in the file
-    // without patch specularIntensity was 15
-    assertXPath(pXmlDoc, "(//material)[1]", "specularIntensity", "5");
+    // ODF specifies for metal = true specular color as rgb(200,200,200) and adding 15 to specularity
+    // Together with extrusion-first-light-level 67% and extrusion-specularity 80% factor is
+    // 0.67*0.8 * 200/255 = 0.42 and color #6b6b6b
+    assertXPath(pXmlDoc, "(//material)[1]", "specular", "#6b6b6b");
+    // 3D specularIntensity = 2^(50/10) + 15 = 47, with default extrusion-shininess 50%
+    assertXPath(pXmlDoc, "(//material)[1]", "specularIntensity", "47");
 }
 
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testExtrusionPhong)
 {
-    OUString aURL = m_directories.getURLFromSrc(u"svx/qa/unit/data/tdf140321_phong.odp");
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.presentation.PresentationDocument");
+    loadFromURL(u"tdf140321_phong.odp");
 
     SdrPage* pSdrPage = getFirstDrawPageWithAssert();
 
@@ -437,48 +455,55 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testExtrusionPhong)
 
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testSurfaceMattePPT)
 {
-    OUString aURL = m_directories.getURLFromSrc(u"svx/qa/unit/data/tdf140321_Matte_import.ppt");
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.presentation.PresentationDocument");
+    loadFromURL(u"tdf140321_Matte_import.ppt");
 
     SdrPage* pSdrPage = getFirstDrawPageWithAssert();
 
     xmlDocUniquePtr pXmlDoc = lcl_dumpAndParseFirstObjectWithAssert(pSdrPage);
 
-    // The preset 'matte' in the PPT user interface sets the specularity of material to 0. To get the
-    // same effect in LO, specular of the lights need to be false in addition. Without patch the
-    // lights 1, 2, 3 are used, with patch lights 2, 3, 4. Thereby light 4 has the same color and
-    // direction as light 1, but without being specular. The dump has in both cases three lights, but
-    // without number. So we test as ersatz, that the third of them has the color of light 1. Being
-    // not light 1, it is never specular in LO, so no need to test.
-    // 'color' was "#464646" without patch.
-    assertXPath(pXmlDoc, "(//light)[3]", "color", "#aaaaaa");
-    // 'specularIntensity' was "15" without patch. specularIntensity = 100 - specularity of material.
-    assertXPath(pXmlDoc, "(//material)[1]", "specularIntensity", "100");
+    // The preset 'matte' sets the specularity of material to 0. But that alone does not make the
+    // rendering 'matte' in LO. To get a 'matte' effect in LO, specularity of the light need to be
+    // false in addition. To get this, first light is set off and values from first light are copied
+    // to forth light, as only first light is specular. Because first and third lights are off, the
+    // forth light is the second one in the dump. The gray color corresponding to
+    // FirstLightLevel = 38000/2^16 is #949494.
+    assertXPath(pXmlDoc, "(//material)[1]", "specular", "#000000");
+    assertXPath(pXmlDoc, "(//light)[2]", "color", "#949494");
+    // To make the second light soft, part of its intensity is moved to lights 5,6,7 and 8.
+    assertXPath(pXmlDoc, "(//light)[1]", "color", "#1e1e1e");
+    assertXPath(pXmlDoc, "(//light)[3]", "color", "#3b3b3b");
+    // The 3D property specularIntensity is not related to 'extrusion-specularity' but to
+    // 'extrusion-shininess'. specularIntensity = 2^(shininess/10), here default 32.
+    assertXPath(pXmlDoc, "(//material)[1]", "specularIntensity", "32");
 }
 
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testMaterialSpecular)
 {
-    OUString aURL
-        = m_directories.getURLFromSrc(u"svx/qa/unit/data/tdf140321_material_specular.odp");
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.presentation.PresentationDocument");
+    loadFromURL(u"tdf140321_material_specular.odp");
 
     SdrPage* pSdrPage = getFirstDrawPageWithAssert();
 
     xmlDocUniquePtr pXmlDoc = lcl_dumpAndParseFirstObjectWithAssert(pSdrPage);
     CPPUNIT_ASSERT(pXmlDoc);
 
-    // The material property 'draw:extrusion-specularity' was not applied to the object but to the
-    // scene. Without patch the object has always a default value 15 of specularIntensity. The file
-    // has specularity=77%. It should be specularIntensity = 100-77=23 with patch.
-    assertXPath(pXmlDoc, "(//material)[1]", "specularIntensity", "23");
+    // 3D specular color is derived from properties 'extrusion-specularity' and 'extrusion-first-light
+    // -level'. 3D specularIntensity is derived from property 'draw:extrusion-shininess'. Both are
+    // object properties, not scene properties. Those were wrong in various forms before the patch.
+    // Specularity = 77% * first-light-level 67% = 0.5159, which corresponds to gray color #848484.
+    assertXPath(pXmlDoc, "(//material)[1]", "specular", "#848484");
+    // extrusion-shininess 50% corresponds to 3D specularIntensity 32, use 2^(50/10).
+    assertXPath(pXmlDoc, "(//material)[1]", "specularIntensity", "32");
+    // extrusion-first-light-level 67% corresponds to gray color #ababab, use 255 * 0.67.
+    assertXPath(pXmlDoc, "(//light)[1]", "color", "#ababab");
+    // The first light is harsh, the second light soft. So the 3D scene should have 6 lights (1+1+4).
+    assertXPath(pXmlDoc, "//light", 6);
 }
 
 CPPUNIT_TEST_FIXTURE(SvdrawTest, testVideoSnapshot)
 {
     // Given a slide with a media shape, containing a 4 sec video, red-green-blue-black being the 4
     // seconds:
-    OUString aURL = m_directories.getURLFromSrc(u"svx/qa/unit/data/video-snapshot.pptx");
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.presentation.PresentationDocument");
+    loadFromURL(u"video-snapshot.pptx");
     SdrPage* pSdrPage = getFirstDrawPageWithAssert();
     auto pSdrMediaObj = dynamic_cast<SdrMediaObj*>(pSdrPage->GetObj(0));
 
@@ -499,6 +524,74 @@ CPPUNIT_TEST_FIXTURE(SvdrawTest, testVideoSnapshot)
     // - Actual  : 640
     // i.e. ~25% crop from left and right should result in half width, but it was not reduced.
     CPPUNIT_ASSERT_EQUAL(static_cast<tools::Long>(321), rBitmap.GetSizePixel().getWidth());
+}
+
+CPPUNIT_TEST_FIXTURE(SvdrawTest, testPageViewDrawLayerClip)
+{
+    // Given a document with 2 pages, first page footer has an off-page line shape:
+    loadFromURL(u"page-view-draw-layer-clip.docx");
+
+    // When saving that document to PDF:
+    save("writer_pdf_Export");
+
+    // Then make sure that line shape gets clipped:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pDoc = parsePDFExport();
+    if (!pDoc)
+    {
+        return;
+    }
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage1 = pDoc->openPage(0);
+    CPPUNIT_ASSERT_EQUAL(3, pPage1->getObjectCount());
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage2 = pDoc->openPage(1);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 2
+    // - Actual  : 3
+    // i.e. the 2nd page had a line shape from the first page's footer.
+    CPPUNIT_ASSERT_EQUAL(2, pPage2->getObjectCount());
+}
+
+CPPUNIT_TEST_FIXTURE(SvdrawTest, testClipVerticalTextOverflow)
+{
+    // File contains a slide with 4 rectangle shapes with text inside
+    // each have <a:bodyPr vertOverflow="clip">
+    // 1-) Text overflowing the rectangle
+    // 2-) Text not overflowing the rectangle
+    // 3-) (Vertical text) Text overflowing the rectangle
+    // 4-) (Vertical text) Text not overflowing the rectangle
+    loadFromURL(u"clip-vertical-overflow.pptx");
+
+    SdrPage* pSdrPage = getFirstDrawPageWithAssert();
+    xmlDocUniquePtr pDocument = lcl_dumpAndParseFirstObjectWithAssert(pSdrPage);
+
+    // Test vertically overflowing text
+    // Without the accompanying fix in place, this test would have failed with:
+    // equality assertion failed
+    // - Expected: 6
+    // - Actual  : 13
+    // - In <>, XPath contents of child does not match
+    // i.e. the vertically overflowing text wasn't clipped & overflowing text
+    // was drawn anyways.
+    assertXPathContent(pDocument, "count((//sdrblocktext)[4]//textsimpleportion)", "6");
+
+    // make sure text is aligned correctly after the overflowing text is clipped
+    assertXPath(pDocument, "((//sdrblocktext)[4]//textsimpleportion)[1]", "y", "3749");
+    assertXPath(pDocument, "((//sdrblocktext)[4]//textsimpleportion)[6]", "y", "7559");
+
+    // make sure the text that isn't overflowing is still aligned properly
+    assertXPathContent(pDocument, "count((//sdrblocktext)[5]//textsimpleportion)", "3");
+    assertXPath(pDocument, "((//sdrblocktext)[5]//textsimpleportion)[1]", "y", "5073");
+    assertXPath(pDocument, "((//sdrblocktext)[5]//textsimpleportion)[3]", "y", "6597");
+
+    // Test vertically overflowing text, with vertical text direction
+    assertXPathContent(pDocument, "count((//sdrblocktext)[6]//textsimpleportion)", "12");
+    // make sure text is aligned correctly after the overflowing text is clipped
+    assertXPath(pDocument, "((//sdrblocktext)[6]//textsimpleportion)[1]", "x", "13093");
+    assertXPath(pDocument, "((//sdrblocktext)[6]//textsimpleportion)[12]", "x", "4711");
+
+    // make sure the text that isn't overflowing is still aligned properly
+    assertXPathContent(pDocument, "count((//sdrblocktext)[7]//textsimpleportion)", "3");
+    assertXPath(pDocument, "((//sdrblocktext)[7]//textsimpleportion)[1]", "x", "25417");
+    assertXPath(pDocument, "((//sdrblocktext)[7]//textsimpleportion)[3]", "x", "23893");
 }
 }
 

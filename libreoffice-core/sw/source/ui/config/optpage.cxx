@@ -100,28 +100,17 @@ SwContentOptPage::SwContentOptPage(weld::Container* pPage, weld::DialogControlle
     , m_xMetricLabel(m_xBuilder->weld_label("measureunitlabel"))
     , m_xMetricLB(m_xBuilder->weld_combo_box("measureunit"))
     , m_xShowInlineTooltips(m_xBuilder->weld_check_button("changestooltip"))
-    , m_xOutlineLabel(m_xBuilder->weld_label("outlinelabel"))
     , m_xShowOutlineContentVisibilityButton(m_xBuilder->weld_check_button("outlinecontentvisibilitybutton"))
     , m_xTreatSubOutlineLevelsAsContent(m_xBuilder->weld_check_button("suboutlinelevelsascontent"))
     , m_xShowChangesInMargin(m_xBuilder->weld_check_button("changesinmargin"))
     , m_xFieldHiddenCB(m_xBuilder->weld_check_button("hiddentextfield"))
     , m_xFieldHiddenParaCB(m_xBuilder->weld_check_button("hiddenparafield"))
 {
-    if (!officecfg::Office::Common::Misc::ExperimentalMode::get())
-    {
-        m_xOutlineLabel->hide();
-        m_xShowOutlineContentVisibilityButton->hide();
-        m_xTreatSubOutlineLevelsAsContent->hide();
-    }
-    else
-    {
-        m_xShowOutlineContentVisibilityButton->connect_toggled(LINK(this, SwContentOptPage, ShowOutlineContentVisibilityButtonHdl));
-    }
+    m_xShowOutlineContentVisibilityButton->connect_toggled(LINK(this, SwContentOptPage, ShowOutlineContentVisibilityButtonHdl));
 
     /* This part is visible only with Writer/Web->View dialogue. */
-    const SfxPoolItem* pItem;
-    if (! (SfxItemState::SET == rCoreSet.GetItemState(SID_HTML_MODE, false, &pItem )
-           && static_cast<const SfxUInt16Item*>(pItem)->GetValue() & HTMLMODE_ON))
+    const SfxUInt16Item* pItem = rCoreSet.GetItemIfSet(SID_HTML_MODE, false );
+    if (!pItem || !(pItem->GetValue() & HTMLMODE_ON))
     {
         m_xSettingsFrame->hide();
         m_xSettingsLabel->hide();
@@ -178,7 +167,7 @@ std::unique_ptr<SfxTabPage> SwContentOptPage::Create( weld::Container* pPage, we
     return std::make_unique<SwContentOptPage>(pPage, pController, *rAttrSet);
 }
 
-static void lcl_SelectMetricLB(weld::ComboBox& rMetric, sal_uInt16 nSID, const SfxItemSet& rSet)
+static void lcl_SelectMetricLB(weld::ComboBox& rMetric, TypedWhichId<SfxUInt16Item> nSID, const SfxItemSet& rSet)
 {
     const SfxPoolItem* pItem;
     if( rSet.GetItemState( nSID, false, &pItem ) >= SfxItemState::DEFAULT )
@@ -198,10 +187,7 @@ static void lcl_SelectMetricLB(weld::ComboBox& rMetric, sal_uInt16 nSID, const S
 
 void SwContentOptPage::Reset(const SfxItemSet* rSet)
 {
-    const SwElemItem* pElemAttr = nullptr;
-
-    rSet->GetItemState( FN_PARAM_ELEM , false,
-                                    reinterpret_cast<const SfxPoolItem**>(&pElemAttr) );
+    const SwElemItem* pElemAttr = rSet->GetItemIfSet( FN_PARAM_ELEM , false );
     if(pElemAttr)
     {
         m_xTableCB->set_active(pElemAttr->m_bTable);
@@ -228,8 +214,7 @@ void SwContentOptPage::Reset(const SfxItemSet* rSet)
 
 bool SwContentOptPage::FillItemSet(SfxItemSet* rSet)
 {
-    const SwElemItem*   pOldAttr = static_cast<const SwElemItem*>(
-                        GetOldItem(GetItemSet(), FN_PARAM_ELEM));
+    const SwElemItem* pOldAttr = GetOldItem(GetItemSet(), FN_PARAM_ELEM);
 
     SwElemItem aElem;
     aElem.m_bTable                = m_xTableCB->get_active();
@@ -292,9 +277,9 @@ IMPL_LINK(SwContentOptPage, ShowOutlineContentVisibilityButtonHdl, weld::Togglea
 SwAddPrinterTabPage::SwAddPrinterTabPage(weld::Container* pPage, weld::DialogController* pController,
     const SfxItemSet& rCoreSet)
     : SfxTabPage(pPage, pController, "modules/swriter/ui/printoptionspage.ui", "PrintOptionsPage", &rCoreSet)
-    , sNone(SwResId(SW_STR_NONE))
-    , bAttrModified(false)
-    , bPreview(false)
+    , m_sNone(SwResId(SW_STR_NONE))
+    , m_bAttrModified(false)
+    , m_bPreview(false)
     , m_xGrfCB(m_xBuilder->weld_check_button("graphics"))
     , m_xCtrlFieldCB(m_xBuilder->weld_check_button("formcontrols"))
     , m_xBackgroundCB(m_xBuilder->weld_check_button("background"))
@@ -336,9 +321,8 @@ SwAddPrinterTabPage::SwAddPrinterTabPage(weld::Container* pPage, weld::DialogCon
     m_xNoRB->connect_toggled( aLk );
     m_xFaxLB->connect_changed( LINK( this, SwAddPrinterTabPage, SelectHdl ) );
 
-    const SfxPoolItem* pItem;
-    if(SfxItemState::SET == rCoreSet.GetItemState(SID_HTML_MODE, false, &pItem )
-        && static_cast<const SfxUInt16Item*>(pItem)->GetValue() & HTMLMODE_ON)
+    const SfxUInt16Item* pItem = rCoreSet.GetItemIfSet(SID_HTML_MODE, false );
+    if(pItem && pItem->GetValue() & HTMLMODE_ON)
     {
         m_xLeftPageCB->hide();
         m_xRightPageCB->hide();
@@ -357,9 +341,9 @@ SwAddPrinterTabPage::~SwAddPrinterTabPage()
 
 void SwAddPrinterTabPage::SetPreview(bool bPrev)
 {
-    bPreview = bPrev;
-    m_xCommentsFrame->set_sensitive(!bPreview);
-    m_xPagesFrame->set_sensitive(!bPreview);
+    m_bPreview = bPrev;
+    m_xCommentsFrame->set_sensitive(!m_bPreview);
+    m_xPagesFrame->set_sensitive(!m_bPreview);
 }
 
 std::unique_ptr<SfxTabPage> SwAddPrinterTabPage::Create( weld::Container* pPage, weld::DialogController* pController,
@@ -370,7 +354,7 @@ std::unique_ptr<SfxTabPage> SwAddPrinterTabPage::Create( weld::Container* pPage,
 
 bool    SwAddPrinterTabPage::FillItemSet( SfxItemSet* rCoreSet )
 {
-    if ( bAttrModified )
+    if ( m_bAttrModified )
     {
         SwAddPrinterItem aAddPrinterAttr;
         aAddPrinterAttr.m_bPrintGraphic   = m_xGrfCB->get_active();
@@ -403,19 +387,17 @@ bool    SwAddPrinterTabPage::FillItemSet( SfxItemSet* rCoreSet )
                                                         SwPostItMode::InMargins;
 
         const OUString sFax = m_xFaxLB->get_active_text();
-        aAddPrinterAttr.m_sFaxName = sNone == sFax ? OUString() : sFax;
+        aAddPrinterAttr.m_sFaxName = m_sNone == sFax ? OUString() : sFax;
         rCoreSet->Put(aAddPrinterAttr);
     }
-    return bAttrModified;
+    return m_bAttrModified;
 }
 
 void    SwAddPrinterTabPage::Reset( const SfxItemSet*  )
 {
     const   SfxItemSet&         rSet = GetItemSet();
-    const   SwAddPrinterItem*   pAddPrinterAttr = nullptr;
 
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_ADDPRINTER , false,
-                                    reinterpret_cast<const SfxPoolItem**>(&pAddPrinterAttr) ))
+    if( const SwAddPrinterItem* pAddPrinterAttr = rSet.GetItemIfSet( FN_PARAM_ADDPRINTER , false ) )
     {
         m_xGrfCB->set_active(pAddPrinterAttr->m_bPrintGraphic || pAddPrinterAttr->m_bPrintDraw);
         m_xCtrlFieldCB->set_active(       pAddPrinterAttr->m_bPrintControl);
@@ -438,7 +420,7 @@ void    SwAddPrinterTabPage::Reset( const SfxItemSet*  )
         auto nFound = m_xFaxLB->find_text(pAddPrinterAttr->m_sFaxName);
         if (nFound != -1)
             m_xFaxLB->set_active(nFound);
-        else
+        else if (m_xFaxLB->get_count())
             m_xFaxLB->set_active(0);
     }
     if (m_xProspectCB->get_active())
@@ -455,7 +437,7 @@ void    SwAddPrinterTabPage::Reset( const SfxItemSet*  )
 
 IMPL_LINK_NOARG(SwAddPrinterTabPage, AutoClickHdl, weld::Toggleable&, void)
 {
-    bAttrModified = true;
+    m_bAttrModified = true;
     bool bIsProspect = m_xProspectCB->get_active();
     if (!bIsProspect)
         m_xProspectCB_RTL->set_active( false );
@@ -469,7 +451,7 @@ IMPL_LINK_NOARG(SwAddPrinterTabPage, AutoClickHdl, weld::Toggleable&, void)
 
 void  SwAddPrinterTabPage::SetFax( const std::vector<OUString>& rFaxLst )
 {
-    m_xFaxLB->append_text(sNone);
+    m_xFaxLB->append_text(m_sNone);
     for(const auto & i : rFaxLst)
     {
         m_xFaxLB->append_text(i);
@@ -479,7 +461,7 @@ void  SwAddPrinterTabPage::SetFax( const std::vector<OUString>& rFaxLst )
 
 IMPL_LINK_NOARG(SwAddPrinterTabPage, SelectHdl, weld::ComboBox&, void)
 {
-    bAttrModified=true;
+    m_bAttrModified=true;
 }
 
 void SwAddPrinterTabPage::PageCreated( const SfxAllItemSet& aSet)
@@ -515,9 +497,6 @@ SwStdFontTabPage::SwStdFontTabPage(weld::Container* pPage, weld::DialogControlle
     , m_bIdxDefault(false)
     , m_bSetIdxDefault(true)
     , m_bDisposePrinter(false)
-    , m_bListHeightDefault(false)
-    , m_bLabelHeightDefault(false)
-    , m_bIndexHeightDefault(false)
     , m_nFontGroup(FONT_GROUP_DEFAULT)
     , m_sScriptWestern(SwResId(ST_SCRIPT_WESTERN))
     , m_sScriptAsian(SwResId(ST_SCRIPT_ASIAN))
@@ -726,12 +705,11 @@ bool SwStdFontTabPage::FillItemSet( SfxItemSet* )
 
 void SwStdFontTabPage::Reset( const SfxItemSet* rSet)
 {
-    const SfxPoolItem* pLang;
-    const sal_uInt16 nLangSlot = m_nFontGroup == FONT_GROUP_DEFAULT  ? SID_ATTR_LANGUAGE :
+    const TypedWhichId<SvxLanguageItem> nLangSlot = m_nFontGroup == FONT_GROUP_DEFAULT  ? SID_ATTR_LANGUAGE :
         FONT_GROUP_CJK == m_nFontGroup ? SID_ATTR_CHAR_CJK_LANGUAGE : SID_ATTR_CHAR_CTL_LANGUAGE;
 
-    if( SfxItemState::SET == rSet->GetItemState(nLangSlot, false, &pLang))
-        m_eLanguage = static_cast<const SvxLanguageItem*>(pLang)->GetValue();
+    if( const SvxLanguageItem* pLang = rSet->GetItemIfSet(nLangSlot, false) )
+        m_eLanguage = pLang->GetValue();
 
     OUString sToReplace = m_sScriptWestern;
     if(FONT_GROUP_CJK == m_nFontGroup )
@@ -740,17 +718,15 @@ void SwStdFontTabPage::Reset( const SfxItemSet* rSet)
         sToReplace = m_sScriptComplex;
     m_xLabelFT->set_label(m_xLabelFT->get_label().replaceFirst("%1", sToReplace));
 
-    const SfxPoolItem* pItem;
-
     if (m_bDisposePrinter)
     {
         m_pPrt.disposeAndClear();
         m_bDisposePrinter = false;
     }
 
-    if(SfxItemState::SET == rSet->GetItemState(FN_PARAM_PRINTER, false, &pItem))
+    if(const SwPtrItem* pItem = rSet->GetItemIfSet(FN_PARAM_PRINTER, false))
     {
-        m_pPrt = static_cast<SfxPrinter*>(static_cast<const SwPtrItem*>(pItem)->GetValue());
+        m_pPrt = static_cast<SfxPrinter*>(pItem->GetValue());
     }
     else
     {
@@ -783,14 +759,14 @@ void SwStdFontTabPage::Reset( const SfxItemSet* rSet)
             m_xIdxBox->append_text( rFontName );
         }
     }
-    if(SfxItemState::SET == rSet->GetItemState(FN_PARAM_STDFONTS, false, &pItem))
+    if(const SwPtrItem* pItem = rSet->GetItemIfSet(FN_PARAM_STDFONTS, false))
     {
-         m_pFontConfig = static_cast<SwStdFontConfig*>(static_cast<const SwPtrItem*>(pItem)->GetValue());
+         m_pFontConfig = static_cast<SwStdFontConfig*>(pItem->GetValue());
     }
 
-    if(SfxItemState::SET == rSet->GetItemState(FN_PARAM_WRTSHELL, false, &pItem))
+    if(const SwPtrItem* pItem = rSet->GetItemIfSet(FN_PARAM_WRTSHELL, false))
     {
-        m_pWrtShell = static_cast<SwWrtShell*>(static_cast<const SwPtrItem*>(pItem)->GetValue());
+        m_pWrtShell = static_cast<SwWrtShell*>(pItem->GetValue());
     }
     OUString sStdBackup;
     OUString sOutBackup;
@@ -858,7 +834,6 @@ void SwStdFontTabPage::Reset( const SfxItemSet* rSet)
 
         const SvxFontHeightItem& rFontHeightList = static_cast<const SvxFontHeightItem&>(pColl->GetFormatAttr(nFontHeightWhich));
         nListHeight = static_cast<sal_Int32>(rFontHeightList.GetHeight());
-        m_bListHeightDefault = SfxItemState::DEFAULT == pColl->GetAttrSet().GetItemState(nFontWhich, false);
 
         pColl = m_pWrtShell->GetTextCollFromPool(RES_POOLCOLL_LABEL);
         m_bLabelDefault = SfxItemState::DEFAULT == pColl->GetAttrSet().GetItemState(nFontWhich, false);
@@ -867,7 +842,6 @@ void SwStdFontTabPage::Reset( const SfxItemSet* rSet)
         m_sShellLabel = sCapBackup = rFontCP.GetFamilyName();
         const SvxFontHeightItem& rFontHeightLabel = static_cast<const SvxFontHeightItem&>(pColl->GetFormatAttr(nFontHeightWhich));
         nLabelHeight = static_cast<sal_Int32>(rFontHeightLabel.GetHeight());
-        m_bLabelHeightDefault = SfxItemState::DEFAULT == pColl->GetAttrSet().GetItemState(nFontWhich, false);
 
         pColl = m_pWrtShell->GetTextCollFromPool(RES_POOLCOLL_REGISTER_BASE);
         m_bIdxDefault = SfxItemState::DEFAULT == pColl->GetAttrSet().GetItemState(nFontWhich, false);
@@ -876,7 +850,6 @@ void SwStdFontTabPage::Reset( const SfxItemSet* rSet)
         m_sShellIndex = sIdxBackup = rFontIDX.GetFamilyName();
         const SvxFontHeightItem& rFontHeightIndex = static_cast<const SvxFontHeightItem&>(pColl->GetFormatAttr(nFontHeightWhich));
         nIndexHeight = static_cast<sal_Int32>(rFontHeightIndex.GetHeight());
-        m_bIndexHeightDefault = SfxItemState::DEFAULT == pColl->GetAttrSet().GetItemState(nFontWhich, false);
     }
     m_xStandardBox->set_entry_text(sStdBackup );
     m_xTitleBox->set_entry_text(sOutBackup );
@@ -1149,10 +1122,9 @@ void SwTableOptionsTabPage::Reset( const SfxItemSet* rSet)
         case TableChgMode::FixedWidthChangeProp:  m_xFixPropRB->set_active(true); break;
         case TableChgMode::VarWidthChangeAbs:     m_xVarRB->set_active(true); break;
     }
-    const SfxPoolItem* pItem;
-    if(SfxItemState::SET == rSet->GetItemState(SID_HTML_MODE, false, &pItem))
+    if(const SfxUInt16Item* pItem = rSet->GetItemIfSet(SID_HTML_MODE, false))
     {
-        m_bHTMLMode = 0 != (static_cast<const SfxUInt16Item*>(pItem)->GetValue() & HTMLMODE_ON);
+        m_bHTMLMode = 0 != (pItem->GetValue() & HTMLMODE_ON);
     }
 
     // hide certain controls for html
@@ -1225,21 +1197,19 @@ SwShdwCursorOptionsTabPage::SwShdwCursorOptionsTabPage(weld::Container* pPage, w
     , m_xDefaultAnchorType(m_xBuilder->weld_combo_box("cxDefaultAnchor"))
     , m_xMathBaselineAlignmentCB(m_xBuilder->weld_check_button("mathbaseline"))
 {
-    const SfxPoolItem* pItem = nullptr;
     SwFillMode eMode = SwFillMode::Tab;
     bool bIsOn = false;
 
-    if( SfxItemState::SET == rSet.GetItemState( FN_PARAM_SHADOWCURSOR, false, &pItem ))
+    if( const SwShadowCursorItem* pItem = rSet.GetItemIfSet( FN_PARAM_SHADOWCURSOR, false ))
     {
-        auto& aOpt = *static_cast<const SwShadowCursorItem*>(pItem);
-        eMode = aOpt.GetMode();
-        bIsOn = aOpt.IsOn();
+        eMode = pItem->GetMode();
+        bIsOn = pItem->IsOn();
     }
     m_xOnOffCB->set_active( bIsOn );
 
     m_xDirectCursorFillMode->set_active( static_cast<int>(eMode) );
-    if(SfxItemState::SET != rSet.GetItemState(SID_HTML_MODE, false, &pItem )
-        || !(static_cast<const SfxUInt16Item*>(pItem)->GetValue() & HTMLMODE_ON))
+    const SfxUInt16Item* pHtmlModeItem = rSet.GetItemIfSet(SID_HTML_MODE, false);
+    if(!pHtmlModeItem || !(pHtmlModeItem->GetValue() & HTMLMODE_ON))
         return;
 
     m_xTabCB->hide();
@@ -1281,9 +1251,8 @@ bool SwShdwCursorOptionsTabPage::FillItemSet( SfxItemSet* rSet )
     aOpt.SetMode( eMode );
 
     bool bRet = false;
-    const SfxPoolItem* pItem = nullptr;
-    if( SfxItemState::SET != rSet->GetItemState( FN_PARAM_SHADOWCURSOR, false, &pItem )
-        ||  static_cast<const SwShadowCursorItem&>(*pItem) != aOpt )
+    const SwShadowCursorItem* pShadowCursorItem = rSet->GetItemIfSet( FN_PARAM_SHADOWCURSOR, false );
+    if( !pShadowCursorItem || *pShadowCursorItem != aOpt )
     {
         rSet->Put( aOpt );
         bRet = true;
@@ -1301,8 +1270,7 @@ bool SwShdwCursorOptionsTabPage::FillItemSet( SfxItemSet* rSet )
         bRet = true;
     }
 
-    const SwDocDisplayItem* pOldAttr = static_cast<const SwDocDisplayItem*>(
-                        GetOldItem(GetItemSet(), FN_PARAM_DOCDISP));
+    const SwDocDisplayItem* pOldAttr = GetOldItem(GetItemSet(), FN_PARAM_DOCDISP);
 
     SwDocDisplayItem aDisp;
 
@@ -1325,15 +1293,13 @@ bool SwShdwCursorOptionsTabPage::FillItemSet( SfxItemSet* rSet )
 
 void SwShdwCursorOptionsTabPage::Reset( const SfxItemSet* rSet )
 {
-    const SfxPoolItem* pItem = nullptr;
     SwFillMode eMode = SwFillMode::Tab;
     bool bIsOn = false;
 
-    if( SfxItemState::SET == rSet->GetItemState( FN_PARAM_SHADOWCURSOR, false, &pItem ))
+    if( const SwShadowCursorItem* pItem = rSet->GetItemIfSet( FN_PARAM_SHADOWCURSOR, false ))
     {
-        auto& aOpt = *static_cast<const SwShadowCursorItem*>(pItem);
-        eMode = aOpt.GetMode();
-        bIsOn = aOpt.IsOn();
+        eMode = pItem->GetMode();
+        bIsOn = pItem->IsOn();
     }
     m_xOnOffCB->set_active( bIsOn );
 
@@ -1345,14 +1311,11 @@ void SwShdwCursorOptionsTabPage::Reset( const SfxItemSet* rSet )
         m_xMathBaselineAlignmentCB->hide();
     }
 
-    if( SfxItemState::SET == rSet->GetItemState( FN_PARAM_CRSR_IN_PROTECTED, false, &pItem ))
-        m_xCursorInProtCB->set_active(static_cast<const SfxBoolItem*>(pItem)->GetValue());
+    if( const SfxBoolItem* pItem = rSet->GetItemIfSet( FN_PARAM_CRSR_IN_PROTECTED, false ) )
+        m_xCursorInProtCB->set_active(pItem->GetValue());
     m_xCursorInProtCB->save_state();
 
-    const SwDocDisplayItem* pDocDisplayAttr = nullptr;
-
-    rSet->GetItemState( FN_PARAM_DOCDISP, false,
-                                    reinterpret_cast<const SfxPoolItem**>(&pDocDisplayAttr) );
+    const SwDocDisplayItem* pDocDisplayAttr = rSet->GetItemIfSet( FN_PARAM_DOCDISP, false );
     if(pDocDisplayAttr)
     {
         m_xParaCB->set_active( pDocDisplayAttr->m_bParagraphEnd );
@@ -1409,7 +1372,7 @@ static sal_uInt16 aChangedAttrMap[] = { 0, 1, 2, 3, 4, 6, 7, 8, 9, 10 };
 SwMarkPreview::SwMarkPreview()
     : m_aTransCol(COL_TRANSPARENT)
     , m_aMarkCol(COL_LIGHTRED)
-    , nMarkPos(0)
+    , m_nMarkPos(0)
 
 {
     InitColors();
@@ -1427,9 +1390,10 @@ void SwMarkPreview::InitColors()
     m_aBgCol = rSettings.GetWindowColor();
 
     bool bHC = rSettings.GetHighContrastMode();
-    m_aLineCol = bHC? SwViewOption::GetFontColor() : COL_BLACK;
+    const Color& rFontColor = SwViewOption::GetCurrentViewOptions().GetFontColor();
+    m_aLineCol = bHC? rFontColor : COL_BLACK;
     m_aShadowCol = bHC? m_aBgCol : rSettings.GetShadowColor();
-    m_aTextCol = bHC? SwViewOption::GetFontColor() : COL_GRAY;
+    m_aTextCol = bHC? rFontColor : COL_GRAY;
     m_aPrintAreaCol = m_aTextCol;
 }
 
@@ -1438,10 +1402,10 @@ void SwMarkPreview::Paint(vcl::RenderContext& rRenderContext, const tools::Recta
     const Size aSz(GetOutputSizePixel());
 
     // Page
-    aPage.SetSize(Size(aSz.Width() - 3, aSz.Height() - 3));
+    m_aPage.SetSize(Size(aSz.Width() - 3, aSz.Height() - 3));
 
-    const tools::Long nOutWPix = aPage.GetWidth();
-    const tools::Long nOutHPix = aPage.GetHeight();
+    const tools::Long nOutWPix = m_aPage.GetWidth();
+    const tools::Long nOutHPix = m_aPage.GetHeight();
 
     // PrintArea
     const tools::Long nLBorder = 8;
@@ -1449,50 +1413,50 @@ void SwMarkPreview::Paint(vcl::RenderContext& rRenderContext, const tools::Recta
     const tools::Long nTBorder = 4;
     const tools::Long nBBorder = 4;
 
-    aLeftPagePrtArea = tools::Rectangle(Point(nLBorder, nTBorder), Point((nOutWPix - 1) - nRBorder, (nOutHPix - 1) - nBBorder));
-    const tools::Long nWidth = aLeftPagePrtArea.GetWidth();
+    m_aLeftPagePrtArea = tools::Rectangle(Point(nLBorder, nTBorder), Point((nOutWPix - 1) - nRBorder, (nOutHPix - 1) - nBBorder));
+    const tools::Long nWidth = m_aLeftPagePrtArea.GetWidth();
     const tools::Long nCorr = (nWidth & 1) != 0 ? 0 : 1;
-    aLeftPagePrtArea.SetSize(Size(nWidth / 2 - (nLBorder + nRBorder) / 2 + nCorr, aLeftPagePrtArea.GetHeight()));
+    m_aLeftPagePrtArea.SetSize(Size(nWidth / 2 - (nLBorder + nRBorder) / 2 + nCorr, m_aLeftPagePrtArea.GetHeight()));
 
-    aRightPagePrtArea = aLeftPagePrtArea;
-    aRightPagePrtArea.Move(aLeftPagePrtArea.GetWidth() + nLBorder + nRBorder + 1, 0);
+    m_aRightPagePrtArea = m_aLeftPagePrtArea;
+    m_aRightPagePrtArea.Move(m_aLeftPagePrtArea.GetWidth() + nLBorder + nRBorder + 1, 0);
 
     // draw shadow
-    tools::Rectangle aShadow(aPage);
+    tools::Rectangle aShadow(m_aPage);
     aShadow += Point(3, 3);
     drawRect(rRenderContext, aShadow, m_aShadowCol, m_aTransCol);
 
     // draw page
-    drawRect(rRenderContext, aPage, m_aBgCol, m_aLineCol);
+    drawRect(rRenderContext, m_aPage, m_aBgCol, m_aLineCol);
 
     // draw separator
-    tools::Rectangle aPageSeparator(aPage);
+    tools::Rectangle aPageSeparator(m_aPage);
     aPageSeparator.SetSize(Size(2, aPageSeparator.GetHeight()));
-    aPageSeparator.Move(aPage.GetWidth() / 2 - 1, 0);
+    aPageSeparator.Move(m_aPage.GetWidth() / 2 - 1, 0);
     drawRect(rRenderContext, aPageSeparator, m_aLineCol, m_aTransCol);
 
-    PaintPage(rRenderContext, aLeftPagePrtArea);
-    PaintPage(rRenderContext, aRightPagePrtArea);
+    PaintPage(rRenderContext, m_aLeftPagePrtArea);
+    PaintPage(rRenderContext, m_aRightPagePrtArea);
 
-    tools::Rectangle aLeftMark(Point(aPage.Left() + 2, aLeftPagePrtArea.Top() + 4), Size(aLeftPagePrtArea.Left() - 4, 2));
-    tools::Rectangle aRightMark(Point(aRightPagePrtArea.Right() + 2, aRightPagePrtArea.Bottom() - 6), Size(aLeftPagePrtArea.Left() - 4, 2));
+    tools::Rectangle aLeftMark(Point(m_aPage.Left() + 2, m_aLeftPagePrtArea.Top() + 4), Size(m_aLeftPagePrtArea.Left() - 4, 2));
+    tools::Rectangle aRightMark(Point(m_aRightPagePrtArea.Right() + 2, m_aRightPagePrtArea.Bottom() - 6), Size(m_aLeftPagePrtArea.Left() - 4, 2));
 
-    switch (nMarkPos)
+    switch (m_nMarkPos)
     {
         case 1:     // left
-            aRightMark.SetPos(Point(aRightPagePrtArea.Left() - 2 - aRightMark.GetWidth(), aRightMark.Top()));
+            aRightMark.SetPos(Point(m_aRightPagePrtArea.Left() - 2 - aRightMark.GetWidth(), aRightMark.Top()));
             break;
 
         case 2:     // right
-            aLeftMark.SetPos(Point(aLeftPagePrtArea.Right() + 2, aLeftMark.Top()));
+            aLeftMark.SetPos(Point(m_aLeftPagePrtArea.Right() + 2, aLeftMark.Top()));
             break;
 
         case 3:     // outside
             break;
 
         case 4:     // inside
-            aLeftMark.SetPos(Point(aLeftPagePrtArea.Right() + 2, aLeftMark.Top()));
-            aRightMark.SetPos(Point(aRightPagePrtArea.Left() - 2 - aRightMark.GetWidth(), aRightMark.Top()));
+            aLeftMark.SetPos(Point(m_aLeftPagePrtArea.Right() + 2, aLeftMark.Top()));
+            aRightMark.SetPos(Point(m_aRightPagePrtArea.Left() - 2 - aRightMark.GetWidth(), aRightMark.Top()));
             break;
 
         case 0:     // none
@@ -1525,7 +1489,7 @@ void SwMarkPreview::PaintPage(vcl::RenderContext& rRenderContext, const tools::R
         if (i == (nLines - 1))
             aTextLine.SetSize(Size(aTextLine.GetWidth() / 2, aTextLine.GetHeight()));
 
-        if (aPage.Contains(aTextLine))
+        if (m_aPage.Contains(aTextLine))
             drawRect(rRenderContext, aTextLine, m_aTextCol, m_aTransCol);
 
         aTextLine.Move(0, nStep);
@@ -1550,7 +1514,7 @@ namespace
         for (size_t i = 0; i != nAttrMapSize; ++i)
         {
             CharAttr const & rAttr(aRedlineAttr[pAttrMap[i]]);
-            rLB.set_id(i, OUString::number(reinterpret_cast<sal_Int64>(&rAttr)));
+            rLB.set_id(i, weld::toId(&rAttr));
             if (rAttr.nItemId == rAttrToSelect.m_nItemId &&
                 rAttr.nAttr == rAttrToSelect.m_nAttr)
                 rLB.set_active(i);
@@ -1661,7 +1625,7 @@ bool SwRedlineOptionsTabPage::FillItemSet( SfxItemSet* )
     sal_Int32 nPos = m_xInsertLB->get_active();
     if (nPos != -1)
     {
-        pAttr = reinterpret_cast<CharAttr*>(m_xInsertLB->get_id(nPos).toInt64());
+        pAttr = weld::fromId<CharAttr*>(m_xInsertLB->get_id(nPos));
         aInsertedAttr.m_nItemId = pAttr->nItemId;
         aInsertedAttr.m_nAttr = pAttr->nAttr;
         aInsertedAttr.m_nColor = m_xInsertColorLB->GetSelectEntryColor();
@@ -1671,7 +1635,7 @@ bool SwRedlineOptionsTabPage::FillItemSet( SfxItemSet* )
     nPos = m_xDeletedLB->get_active();
     if (nPos != -1)
     {
-        pAttr = reinterpret_cast<CharAttr*>(m_xDeletedLB->get_id(nPos).toInt64());
+        pAttr = weld::fromId<CharAttr*>(m_xDeletedLB->get_id(nPos));
         aDeletedAttr.m_nItemId = pAttr->nItemId;
         aDeletedAttr.m_nAttr = pAttr->nAttr;
         aDeletedAttr.m_nColor = m_xDeletedColorLB->GetSelectEntryColor();
@@ -1681,7 +1645,7 @@ bool SwRedlineOptionsTabPage::FillItemSet( SfxItemSet* )
     nPos = m_xChangedLB->get_active();
     if (nPos != -1)
     {
-        pAttr = reinterpret_cast<CharAttr*>(m_xChangedLB->get_id(nPos).toInt64());
+        pAttr = weld::fromId<CharAttr*>(m_xChangedLB->get_id(nPos));
         aChangedAttr.m_nItemId = pAttr->nItemId;
         aChangedAttr.m_nAttr = pAttr->nAttr;
         aChangedAttr.m_nColor = m_xChangedColorLB->GetSelectEntryColor();
@@ -1830,7 +1794,7 @@ IMPL_LINK( SwRedlineOptionsTabPage, AttribHdl, weld::ComboBox&, rLB, void )
     if( nPos == -1)
         nPos = 0;
 
-    CharAttr* pAttr = reinterpret_cast<CharAttr*>(rLB.get_id(nPos).toInt64());
+    CharAttr* pAttr = weld::fromId<CharAttr*>(rLB.get_id(nPos));
     //switch off preview background color
     pPrev->ResetColor();
     switch (pAttr->nItemId)
@@ -1904,7 +1868,7 @@ IMPL_LINK(SwRedlineOptionsTabPage, ColorHdl, ColorListBox&, rListBox, void)
     if( nPos == -1)
         nPos = 0;
 
-    CharAttr* pAttr = reinterpret_cast<CharAttr*>(pLB->get_id(nPos).toInt64());
+    CharAttr* pAttr = weld::fromId<CharAttr*>(pLB->get_id(nPos));
 
     if( pAttr->nItemId == SID_ATTR_BRUSH )
     {
@@ -2139,7 +2103,7 @@ IMPL_LINK_NOARG(SwCompareOptionsTabPage, IgnoreHdl, weld::Toggleable&, void)
 
 SwTestTabPage::SwTestTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet)
     : SfxTabPage(pPage, pController, "modules/swriter/ui/opttestpage.ui", "OptTestPage", &rCoreSet)
-    , bAttrModified( false )
+    , m_bAttrModified( false )
     , m_xTest1CBox(m_xBuilder->weld_check_button("unused"))
     , m_xTest2CBox(m_xBuilder->weld_check_button("dynamic"))
     , m_xTest3CBox(m_xBuilder->weld_check_button("nocalm"))
@@ -2167,7 +2131,7 @@ std::unique_ptr<SfxTabPage> SwTestTabPage::Create( weld::Container* pPage, weld:
 bool    SwTestTabPage::FillItemSet( SfxItemSet* rCoreSet )
 {
 
-    if ( bAttrModified )
+    if ( m_bAttrModified )
     {
         SwTestItem aTestItem;
         aTestItem.m_bTest1=m_xTest1CBox->get_active();
@@ -2182,16 +2146,14 @@ bool    SwTestTabPage::FillItemSet( SfxItemSet* rCoreSet )
         aTestItem.m_bTest10=m_xTest10CBox->get_active();
         rCoreSet->Put(aTestItem);
     }
-    return bAttrModified;
+    return m_bAttrModified;
 }
 
 void SwTestTabPage::Reset( const SfxItemSet* )
 {
     const SfxItemSet& rSet = GetItemSet();
-    const SwTestItem* pTestAttr = nullptr;
-
-    if( SfxItemState::SET != rSet.GetItemState( FN_PARAM_SWTEST , false,
-                                    reinterpret_cast<const SfxPoolItem**>(&pTestAttr) ))
+    const SwTestItem* pTestAttr = rSet.GetItemIfSet( FN_PARAM_SWTEST, false );
+    if(!pTestAttr)
         return;
 
     m_xTest1CBox->set_active(pTestAttr->m_bTest1);
@@ -2224,7 +2186,7 @@ void SwTestTabPage::Init()
 
 IMPL_LINK_NOARG(SwTestTabPage, AutoClickHdl, weld::Toggleable&, void)
 {
-    bAttrModified = true;
+    m_bAttrModified = true;
 }
 
 #endif

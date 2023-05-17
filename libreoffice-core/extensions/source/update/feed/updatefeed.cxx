@@ -53,6 +53,7 @@
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
 #include <osl/conditn.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 namespace beans = com::sun::star::beans ;
@@ -159,10 +160,10 @@ public:
     virtual sal_Bool SAL_CALL supportsService(OUString const & serviceName) override;
     virtual uno::Sequence< OUString > SAL_CALL getSupportedServiceNames() override;
 
-    UpdateInformationProvider(const uno::Reference<uno::XComponentContext>& xContext,
-                              const uno::Reference< ucb::XUniversalContentBroker >& xUniversalContentBroker,
-                              const uno::Reference< xml::dom::XDocumentBuilder >& xDocumentBuilder,
-                              const uno::Reference< xml::xpath::XXPathAPI >& xXPathAPI);
+    UpdateInformationProvider(uno::Reference<uno::XComponentContext> xContext,
+                              uno::Reference< ucb::XUniversalContentBroker > xUniversalContentBroker,
+                              uno::Reference< xml::dom::XDocumentBuilder > xDocumentBuilder,
+                              uno::Reference< xml::xpath::XXPathAPI > xXPathAPI);
 
 protected:
 
@@ -199,8 +200,8 @@ class UpdateInformationEnumeration : public ::cppu::WeakImplHelper< container::X
 {
 public:
     UpdateInformationEnumeration(const uno::Reference< xml::dom::XNodeList >& xNodeList,
-                                 const rtl::Reference< UpdateInformationProvider >& xUpdateInformationProvider) :
-        m_xUpdateInformationProvider(xUpdateInformationProvider),
+                                 rtl::Reference< UpdateInformationProvider > xUpdateInformationProvider) :
+        m_xUpdateInformationProvider(std::move(xUpdateInformationProvider)),
         m_xNodeList(xNodeList),
         m_nNodes(xNodeList.is() ? xNodeList->getLength() : 0),
         m_nCount(0)
@@ -236,7 +237,7 @@ public:
             if( xContentNode.is() )
                 aEntry.UpdateDocument = m_xUpdateInformationProvider->getDocumentRoot(xContentNode);
 
-            return uno::makeAny(aEntry);
+            return uno::Any(aEntry);
         }
         catch( ucb::CommandAbortedException const &)
         {
@@ -279,7 +280,7 @@ public:
             throw container::NoSuchElementException(OUString::number(m_nCount), *this);
 
         ++m_nCount;
-        return uno::makeAny(m_aEntry);
+        return uno::Any(m_aEntry);
     };
 
 private:
@@ -288,14 +289,14 @@ private:
 };
 
 UpdateInformationProvider::UpdateInformationProvider(
-    const uno::Reference<uno::XComponentContext>& xContext,
-    const uno::Reference< ucb::XUniversalContentBroker >& xUniversalContentBroker,
-    const uno::Reference< xml::dom::XDocumentBuilder >& xDocumentBuilder,
-    const uno::Reference< xml::xpath::XXPathAPI >& xXPathAPI)
-    : m_xContext(xContext)
-    , m_xUniversalContentBroker(xUniversalContentBroker)
-    , m_xDocumentBuilder(xDocumentBuilder)
-    , m_xXPathAPI(xXPathAPI)
+    uno::Reference<uno::XComponentContext> xContext,
+    uno::Reference< ucb::XUniversalContentBroker > xUniversalContentBroker,
+    uno::Reference< xml::dom::XDocumentBuilder > xDocumentBuilder,
+    uno::Reference< xml::xpath::XXPathAPI > xXPathAPI)
+    : m_xContext(std::move(xContext))
+    , m_xUniversalContentBroker(std::move(xUniversalContentBroker))
+    , m_xDocumentBuilder(std::move(xDocumentBuilder))
+    , m_xXPathAPI(std::move(xXPathAPI))
     , m_aRequestHeaderList(2)
     , m_nCommandId(0)
 {
@@ -364,7 +365,9 @@ OUString UpdateInformationProvider::getUserAgent(bool bExtended)
     aUserAgent = aUserAgent.replaceAll("<PRODUCT>", product);
     aUserAgent = aUserAgent.replaceAll("<OPTIONAL_OS_HW_DATA>", aExtended);
     SAL_INFO("extensions.update", "UpdateUserAgent: " << aUserAgent);
-
+    // if you want to debug online updates from a dev version, then uncommenting this (adjust for platform)
+    // might be helpful
+    // return "LibreOffice 7.3.5.2 (184fe81b8c8c30d8b5082578aee2fed2ea847c01; Linux; X86_64; )";
     return aUserAgent;
 }
 
@@ -448,7 +451,7 @@ UpdateInformationProvider::load(const OUString& rURL)
 
     // Disable KeepAlive in webdav - don't want millions of office
     // instances phone home & clog up servers
-    uno::Sequence< beans::NamedValue > aProps { { "KeepAlive", uno::makeAny(false) } };
+    uno::Sequence< beans::NamedValue > aProps { { "KeepAlive", uno::Any(false) } };
 
     ucb::OpenCommandArgument3 aOpenArgument;
     aOpenArgument.Mode = ucb::OpenMode::DOCUMENT;

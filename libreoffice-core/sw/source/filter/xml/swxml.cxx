@@ -79,7 +79,7 @@
 #include <istyleaccess.hxx>
 
 #include <sfx2/DocumentMetadataAccess.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -90,18 +90,18 @@ using namespace ::com::sun::star::lang;
 
 static void lcl_EnsureValidPam( SwPaM& rPam )
 {
-    if( rPam.GetContentNode() != nullptr )
+    if( rPam.GetPointContentNode() != nullptr )
     {
         // set proper point content
-        if( rPam.GetContentNode() != rPam.GetPoint()->nContent.GetIdxReg() )
+        if( rPam.GetPointContentNode() != rPam.GetPoint()->GetContentNode() )
         {
-            rPam.GetPoint()->nContent.Assign( rPam.GetContentNode(), 0 );
+            rPam.GetPoint()->nContent.Assign( rPam.GetPointContentNode(), 0 );
         }
         // else: point was already valid
 
         // if mark is invalid, we delete it
-        if( ( rPam.GetContentNode( false ) == nullptr ) ||
-            ( rPam.GetContentNode( false ) != rPam.GetMark()->nContent.GetIdxReg() ) )
+        if( ( rPam.GetMarkContentNode() == nullptr ) ||
+            ( rPam.GetMarkContentNode() != rPam.GetMark()->GetContentNode() ) )
         {
             rPam.DeleteMark();
         }
@@ -110,9 +110,9 @@ static void lcl_EnsureValidPam( SwPaM& rPam )
     {
         // point is not valid, so move it into the first content
         rPam.DeleteMark();
-        rPam.GetPoint()->nNode =
-            *rPam.GetDoc().GetNodes().GetEndOfContent().StartOfSectionNode();
-        ++ rPam.GetPoint()->nNode;
+        rPam.GetPoint()->Assign(
+            *rPam.GetDoc().GetNodes().GetEndOfContent().StartOfSectionNode() );
+        rPam.GetPoint()->Adjust(SwNodeOffset(+1));
         rPam.Move( fnMoveForward, GoInContent ); // go into content
     }
 }
@@ -303,7 +303,7 @@ ErrCode ReadThroughComponent(
     OSL_ENSURE( xInfoSet.is(), "missing property set" );
     if( xInfoSet.is() )
     {
-        xInfoSet->setPropertyValue( "StreamName", makeAny( sStreamName ) );
+        xInfoSet->setPropertyValue( "StreamName", Any( sStreamName ) );
     }
 
     try
@@ -450,7 +450,7 @@ static void lcl_ConvertSdrOle2ObjsToSdrGrafObjs(SwDoc& _rDoc)
             pOle2Obj->Disconnect();
 
             // create new graphic shape with the ole graphic and shape size
-            SdrGrafObj* pGraphicObj = new SdrGrafObj(
+            rtl::Reference<SdrGrafObj> pGraphicObj = new SdrGrafObj(
                 pOle2Obj->getSdrModelFromSdrObject(),
                 aGraphic,
                 pOle2Obj->GetCurrentBoundRect());
@@ -459,8 +459,7 @@ static void lcl_ConvertSdrOle2ObjsToSdrGrafObjs(SwDoc& _rDoc)
             pGraphicObj->SetLayer( pOle2Obj->GetLayer() );
 
             // replace ole2 shape with the new graphic object and delete the ol2 shape
-            SdrObject* pReplaced = pObjList->ReplaceObject( pGraphicObj, pOle2Obj->GetOrdNum() );
-            SdrObject::Free( pReplaced );
+            pObjList->ReplaceObject( pGraphicObj.get(), pOle2Obj->GetOrdNum() );
         }
     }
 }
@@ -518,7 +517,7 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
     // the user.
 
     // create XPropertySet with three properties for status indicator
-    comphelper::PropertyMapEntry const aInfoMap[] =
+    static comphelper::PropertyMapEntry const aInfoMap[] =
     {
         { OUString("ProgressRange"), 0,
               ::cppu::UnoType<sal_Int32>::get(),
@@ -592,7 +591,6 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
               beans::PropertyAttribute::MAYBEVOID, 0 },
         { OUString("SourceStorage"), 0, cppu::UnoType<embed::XStorage>::get(),
           css::beans::PropertyAttribute::MAYBEVOID, 0 },
-        { OUString(), 0, css::uno::Type(), 0, 0 }
     };
     uno::Reference< beans::XPropertySet > xInfoSet(
                 comphelper::GenericPropertySet_CreateInstance(
@@ -622,8 +620,8 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
         SfxItemSet* pSet = pDocSh->GetMedium()->GetItemSet();
         if (pSet)
         {
-            const SfxUnoAnyItem* pItem = static_cast<const SfxUnoAnyItem*>(
-                pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL) );
+            const SfxUnoAnyItem* pItem =
+                pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL);
             if (pItem)
             {
                 pItem->GetValue() >>= xStatusIndicator;
@@ -642,7 +640,7 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
     xInfoSet->setPropertyValue("ProgressRange", aProgRange);
 
     Reference< container::XNameAccess > xLateInitSettings( document::NamedPropertyValues::create(xContext), UNO_QUERY_THROW );
-    beans::NamedValue aLateInitSettings( "LateInitSettings", makeAny( xLateInitSettings ) );
+    beans::NamedValue aLateInitSettings( "LateInitSettings", Any( xLateInitSettings ) );
 
     xInfoSet->setPropertyValue( "SourceStorage", Any( xStorage ) );
 
@@ -684,16 +682,16 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
             *pSeq++ = "NumberingStyles";
 
         xInfoSet->setPropertyValue( "StyleInsertModeFamilies",
-                                    makeAny(aFamiliesSeq) );
+                                    Any(aFamiliesSeq) );
 
-        xInfoSet->setPropertyValue( "StyleInsertModeOverwrite", makeAny(!m_aOption.IsMerge()) );
+        xInfoSet->setPropertyValue( "StyleInsertModeOverwrite", Any(!m_aOption.IsMerge()) );
     }
     else if( m_bInsertMode )
     {
-        const uno::Reference<text::XTextRange> xInsertTextRange =
+        const rtl::Reference<SwXTextRange> xInsertTextRange =
             SwXTextRange::CreateXTextRange(rDoc, *rPaM.GetPoint(), nullptr);
         xInfoSet->setPropertyValue( "TextInsertModeRange",
-                                    makeAny(xInsertTextRange) );
+                                    Any(uno::Reference<text::XTextRange>(xInsertTextRange)) );
     }
     else
     {
@@ -703,11 +701,11 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
 
     if( IsBlockMode() )
     {
-        xInfoSet->setPropertyValue( "AutoTextMode", makeAny(true) );
+        xInfoSet->setPropertyValue( "AutoTextMode", Any(true) );
     }
     if( IsOrganizerMode() )
     {
-        xInfoSet->setPropertyValue( "OrganizerMode", makeAny(true) );
+        xInfoSet->setPropertyValue( "OrganizerMode", Any(true) );
     }
 
     // Set base URI
@@ -716,7 +714,7 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
     SfxMedium* pMedDescrMedium = m_pMedium ? m_pMedium : pDocSh->GetMedium();
     OSL_ENSURE( pMedDescrMedium, "There is no medium to get MediaDescriptor from!" );
 
-    xInfoSet->setPropertyValue( "BaseURI", makeAny( rBaseURL ) );
+    xInfoSet->setPropertyValue( "BaseURI", Any( rBaseURL ) );
 
     // TODO/LATER: separate links from usual embedded objects
     OUString StreamPath;
@@ -724,8 +722,8 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
     {
         if ( pMedDescrMedium && pMedDescrMedium->GetItemSet() )
         {
-            const SfxStringItem* pDocHierarchItem = static_cast<const SfxStringItem*>(
-                pMedDescrMedium->GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME) );
+            const SfxStringItem* pDocHierarchItem =
+                pMedDescrMedium->GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME);
             if ( pDocHierarchItem )
                 StreamPath = pDocHierarchItem->GetValue();
         }
@@ -736,7 +734,7 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
 
         if( !StreamPath.isEmpty() )
         {
-            xInfoSet->setPropertyValue( "StreamRelPath", makeAny( StreamPath ) );
+            xInfoSet->setPropertyValue( "StreamRelPath", Any( StreamPath ) );
         }
     }
 
@@ -748,11 +746,11 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
     static const OUStringLiteral sRecordChanges(u"RecordChanges");
     static const OUStringLiteral sRedlineProtectionKey(u"RedlineProtectionKey");
     xInfoSet->setPropertyValue( sShowChanges,
-        makeAny(IDocumentRedlineAccess::IsShowChanges(rDoc.getIDocumentRedlineAccess().GetRedlineFlags())) );
+        Any(IDocumentRedlineAccess::IsShowChanges(rDoc.getIDocumentRedlineAccess().GetRedlineFlags())) );
     xInfoSet->setPropertyValue( sRecordChanges,
-        makeAny(IDocumentRedlineAccess::IsRedlineOn(rDoc.getIDocumentRedlineAccess().GetRedlineFlags())) );
+        Any(IDocumentRedlineAccess::IsRedlineOn(rDoc.getIDocumentRedlineAccess().GetRedlineFlags())) );
     xInfoSet->setPropertyValue( sRedlineProtectionKey,
-        makeAny(rDoc.getIDocumentRedlineAccess().GetRedlinePassword()) );
+        Any(rDoc.getIDocumentRedlineAccess().GetRedlinePassword()) );
 
     // force redline mode to "none"
     rDoc.getIDocumentRedlineAccess().SetRedlineFlags_intern( RedlineFlags::NONE );
@@ -763,13 +761,13 @@ ErrCode XMLReader::Read( SwDoc &rDoc, const OUString& rBaseURL, SwPaM &rPaM, con
         const bool bShapePositionInHoriL2R = !bOASIS;
         xInfoSet->setPropertyValue(
                 "ShapePositionInHoriL2R",
-                makeAny( bShapePositionInHoriL2R ) );
+                Any( bShapePositionInHoriL2R ) );
     }
     {
         const bool bTextDocInOOoFileFormat = !bOASIS;
         xInfoSet->setPropertyValue(
                 "TextDocInOOoFileFormat",
-                makeAny( bTextDocInOOoFileFormat ) );
+                Any( bTextDocInOOoFileFormat ) );
     }
 
     ErrCode nWarnRDF = ERRCODE_NONE;

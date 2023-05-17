@@ -235,8 +235,7 @@ desktop_LOKClipboard_get_implementation(css::uno::XComponentContext*,
 {
     SolarMutexGuard aGuard;
 
-    auto pClipboard
-        = static_cast<cppu::OWeakObject*>(LOKClipboardFactory::getClipboardForCurView().get());
+    cppu::OWeakObject* pClipboard = LOKClipboardFactory::getClipboardForCurView().get();
 
     pClipboard->acquire();
     return pClipboard;

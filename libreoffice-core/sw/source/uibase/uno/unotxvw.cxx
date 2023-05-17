@@ -20,7 +20,6 @@
 #include <memory>
 #include <viscrs.hxx>
 #include <o3tl/any.hxx>
-#include <sfx2/frame.hxx>
 #include <sfx2/printer.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <cmdid.h>
@@ -73,6 +72,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <tools/UnitConversion.hxx>
+#include <fmtanchr.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -265,7 +265,10 @@ sal_Bool SwXTextView::select(const uno::Any& aInterface)
             rSh.SetSelection(*pPaM);
             // the pPaM has been copied - delete it
             while (pPaM->GetNext() != pPaM)
+            {
+                // coverity[deref_arg] - the SwPaM delete moves a new entry into GetNext()
                 delete pPaM->GetNext();
+            }
             delete pPaM;
             return true;
         }
@@ -389,8 +392,8 @@ uno::Any SwXTextView::getSelection()
                 SwFrameFormat *const pFormat = rSh.GetFlyFrameFormat();
                 if (pFormat)
                 {
-                    aRef = SwXTextFrame::CreateXTextFrame(
-                            *pFormat->GetDoc(), pFormat);
+                    aRef = static_cast<cppu::OWeakObject*>(SwXTextFrame::CreateXTextFrame(
+                            *pFormat->GetDoc(), pFormat).get());
                 }
             }
             break;
@@ -399,8 +402,8 @@ uno::Any SwXTextView::getSelection()
                 SwFrameFormat *const pFormat = rSh.GetFlyFrameFormat();
                 if (pFormat)
                 {
-                    aRef = SwXTextGraphicObject::CreateXTextGraphicObject(
-                            *pFormat->GetDoc(), pFormat);
+                    aRef = static_cast<cppu::OWeakObject*>(SwXTextGraphicObject::CreateXTextGraphicObject(
+                            *pFormat->GetDoc(), pFormat).get());
                 }
             }
             break;
@@ -409,8 +412,8 @@ uno::Any SwXTextView::getSelection()
                 SwFrameFormat *const pFormat = rSh.GetFlyFrameFormat();
                 if (pFormat)
                 {
-                    aRef = SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
-                            *pFormat->GetDoc(), pFormat);
+                    aRef = static_cast<cppu::OWeakObject*>(SwXTextEmbeddedObject::CreateXTextEmbeddedObject(
+                            *pFormat->GetDoc(), pFormat).get());
                 }
             }
             break;
@@ -538,7 +541,29 @@ SwXTextView::createTextRangeByPixelPosition(const awt::Point& rPixelPosition)
     SwWrtShell& rSh = m_pView->GetWrtShell();
     SwPosition aPosition(*rSh.GetCurrentShellCursor().GetPoint());
     rSh.GetLayout()->GetModelPositionForViewPoint(&aPosition, aLogicPoint);
-    uno::Reference<text::XTextRange> xRet
+
+    if (aPosition.GetNode().IsGrfNode())
+    {
+        // The point is closest to a graphic node, look up its format.
+        const SwFrameFormat* pGraphicFormat = aPosition.GetNode().GetFlyFormat();
+        if (pGraphicFormat)
+        {
+            // Get the anchor of this format.
+            const SwFormatAnchor& rAnchor = pGraphicFormat->GetAnchor();
+            const SwPosition* pAnchor = rAnchor.GetContentAnchor();
+            if (pAnchor)
+            {
+                aPosition = *pAnchor;
+            }
+            else
+            {
+                // Page-anchored graphics have no anchor.
+                return {};
+            }
+        }
+    }
+
+    rtl::Reference<SwXTextRange> xRet
         = SwXTextRange::CreateXTextRange(*rSh.GetDoc(), aPosition, /*pMark=*/nullptr);
 
     return xRet;
@@ -690,23 +715,24 @@ SfxObjectShellLock SwXTextView::BuildTmpSelectionDoc()
     SfxViewFrame* pDocFrame = SfxViewFrame::LoadHiddenDocument( *xDocSh, SFX_INTERFACE_NONE );
     SwView* pDocView = static_cast<SwView*>( pDocFrame->GetViewShell() );
     pDocView->AttrChangedNotify(nullptr);//So that SelectShell is called.
-    SwWrtShell* pSh = pDocView->GetWrtShellPtr();
-
-    IDocumentDeviceAccess& rIDDA = pSh->getIDocumentDeviceAccess();
-    SfxPrinter* pTempPrinter = rIDDA.getPrinter( true );
-
-    const SwPageDesc& rCurPageDesc = rOldSh.GetPageDesc(rOldSh.GetCurPageDesc());
-
-    IDocumentDeviceAccess& rIDDA_old = rOldSh.getIDocumentDeviceAccess();
-
-    if( rIDDA_old.getPrinter( false ) )
+    if (SwWrtShell* pSh = pDocView->GetWrtShellPtr())
     {
-        rIDDA.setJobsetup( *rIDDA_old.getJobsetup() );
-        //#69563# if it isn't the same printer then the pointer has been invalidated!
-        pTempPrinter = rIDDA.getPrinter( true );
-    }
+        IDocumentDeviceAccess& rIDDA = pSh->getIDocumentDeviceAccess();
+        SfxPrinter* pTempPrinter = rIDDA.getPrinter( true );
 
-    pTempPrinter->SetPaperBin(rCurPageDesc.GetMaster().GetPaperBin().GetValue());
+        const SwPageDesc& rCurPageDesc = rOldSh.GetPageDesc(rOldSh.GetCurPageDesc());
+
+        IDocumentDeviceAccess& rIDDA_old = rOldSh.getIDocumentDeviceAccess();
+
+        if( rIDDA_old.getPrinter( false ) )
+        {
+            rIDDA.setJobsetup( *rIDDA_old.getJobsetup() );
+            //#69563# if it isn't the same printer then the pointer has been invalidated!
+            pTempPrinter = rIDDA.getPrinter( true );
+        }
+
+        pTempPrinter->SetPaperBin(rCurPageDesc.GetMaster().GetPaperBin().GetValue());
+    }
 
     return xDocSh;
 }
@@ -723,28 +749,18 @@ void SwXTextView::NotifySelChanged()
             &view::XSelectionChangeListener::selectionChanged, aEvent);
 }
 
-namespace {
-    struct DispatchListener
-    {
-        URL const & m_rURL;
-        Sequence<PropertyValue> const& m_rSeq;
-        explicit DispatchListener(URL const& rURL,
-                Sequence<PropertyValue> const& rSeq)
-            : m_rURL(rURL), m_rSeq(rSeq) { }
-        void operator()(uno::Reference<XDispatch> const & xListener) const
-        {
-            xListener->dispatch(m_rURL, m_rSeq);
-        }
-    };
-}
-
 void SwXTextView::NotifyDBChanged()
 {
     URL aURL;
     aURL.Complete = OUString::createFromAscii(SwXDispatch::GetDBChangeURL());
 
-    m_SelChangedListeners.forEach<XDispatch>(
-            DispatchListener(aURL, {}));
+    m_SelChangedListeners.forEach(
+        [&aURL] (const uno::Reference<XSelectionChangeListener>& xListener)
+        {
+            uno::Reference<XDispatch> xDispatch(xListener, UNO_QUERY);
+            if (xDispatch)
+                xDispatch->dispatch(aURL, {});
+        });
 }
 
 uno::Reference< beans::XPropertySetInfo > SAL_CALL SwXTextView::getPropertySetInfo(  )
@@ -825,7 +841,7 @@ uno::Any SAL_CALL SwXTextView::getPropertyValue(
             const SwViewOption *pOpt = m_pView->GetWrtShell().GetViewOptions();
             if (!pOpt)
                 throw RuntimeException();
-            aRet <<= bool(pOpt->GetCoreOptions() & ViewOptFlags1::OnlineSpell);
+            aRet <<= pOpt->IsOnlineSpell();
         }
         break;
         default :
@@ -1018,7 +1034,7 @@ sal_Bool SwXTextViewCursor::goLeft(sal_Int16 nCount, sal_Bool bExpand)
     if (!IsTextSelection())
         throw  uno::RuntimeException("no text selection", static_cast < cppu::OWeakObject * > ( this ) );
 
-    bRet = m_pView->GetWrtShell().Left( CRSR_SKIP_CHARS, bExpand, nCount, true );
+    bRet = m_pView->GetWrtShell().Left( SwCursorSkipMode::Chars, bExpand, nCount, true );
 
     return bRet;
 }
@@ -1033,7 +1049,7 @@ sal_Bool SwXTextViewCursor::goRight(sal_Int16 nCount, sal_Bool bExpand)
     if (!IsTextSelection())
         throw  uno::RuntimeException("no text selection", static_cast < cppu::OWeakObject * > ( this ) );
 
-    bRet = m_pView->GetWrtShell().Right( CRSR_SKIP_CHARS, bExpand, nCount, true );
+    bRet = m_pView->GetWrtShell().Right( SwCursorSkipMode::Chars, bExpand, nCount, true );
 
     return bRet;
 
@@ -1092,20 +1108,20 @@ void SwXTextViewCursor::gotoRange(
     else if(nFrameType & FrameTypeFlags::FOOTNOTE)
         eSearchNodeType = SwFootnoteStartNode;
 
-    const SwStartNode* pOwnStartNode = aOwnPaM.GetNode().
+    const SwStartNode* pOwnStartNode = aOwnPaM.GetPointNode().
                                             FindSttNodeByType(eSearchNodeType);
 
     const SwNode* pSrcNode = nullptr;
     if(pCursor && pCursor->GetPaM())
     {
-        pSrcNode = &pCursor->GetPaM()->GetNode();
+        pSrcNode = &pCursor->GetPaM()->GetPointNode();
     }
     else if (pRange)
     {
         SwPaM aPam(pRange->GetDoc().GetNodes());
         if (pRange->GetPositions(aPam))
         {
-            pSrcNode = &aPam.GetNode();
+            pSrcNode = &aPam.GetPointNode();
         }
     }
     else if (pPara && pPara->GetTextNode())
@@ -1140,8 +1156,7 @@ void SwXTextViewCursor::gotoRange(
         // by him and the transferred Range.
         SwPosition aOwnLeft(*aOwnPaM.Start());
         SwPosition aOwnRight(*aOwnPaM.End());
-        SwPosition* pParamLeft = rDestPam.Start();
-        SwPosition* pParamRight = rDestPam.End();
+        auto [pParamLeft, pParamRight] = rDestPam.StartEnd(); // SwPosition*
         // Now four SwPositions are there, two of them are needed, but which?
         if(aOwnRight > *pParamRight)
             *aOwnPaM.GetPoint() = aOwnRight;
@@ -1359,7 +1374,7 @@ uno::Reference< text::XText >  SwXTextViewCursor::getText()
     return xRet;
 }
 
-uno::Reference< text::XTextRange >  SwXTextViewCursor::getStart()
+uno::Reference< text::XTextRange > SwXTextViewCursor::getStart()
 {
     SolarMutexGuard aGuard;
     uno::Reference< text::XTextRange >  xRet;
@@ -1377,10 +1392,10 @@ uno::Reference< text::XTextRange >  SwXTextViewCursor::getStart()
     return xRet;
 }
 
-uno::Reference< text::XTextRange >  SwXTextViewCursor::getEnd()
+uno::Reference< text::XTextRange > SwXTextViewCursor::getEnd()
 {
     SolarMutexGuard aGuard;
-    uno::Reference< text::XTextRange >  xRet;
+    rtl::Reference<SwXTextRange> xRet;
     if(!m_pView)
         throw uno::RuntimeException();
 
@@ -1475,7 +1490,7 @@ void  SwXTextViewCursor::setPropertyValue( const OUString& rPropertyName, const 
 
     SwWrtShell& rSh = m_pView->GetWrtShell();
     SwPaM* pShellCursor = rSh.GetCursor();
-    SwNode& rNode = pShellCursor->GetNode();
+    SwNode& rNode = pShellCursor->GetPointNode();
     if (!rNode.IsTextNode())
         throw RuntimeException();
 

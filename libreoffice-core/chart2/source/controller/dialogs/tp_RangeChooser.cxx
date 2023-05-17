@@ -20,6 +20,7 @@
 #include "tp_RangeChooser.hxx"
 #include <DataSourceHelper.hxx>
 #include <ChartTypeTemplateProvider.hxx>
+#include <ChartTypeTemplate.hxx>
 #include "DialogModel.hxx"
 #include <RangeSelectionHelper.hxx>
 #include <TabPageNotifiable.hxx>
@@ -68,7 +69,6 @@ RangeChooserTabPage::RangeChooserTabPage(weld::Container* pPage, weld::DialogCon
     , m_rDialogModel( rDialogModel )
     , m_pTabPageNotifiable(dynamic_cast<TabPageNotifiable*>(pController))
     , m_xFT_Caption(m_xBuilder->weld_label("FT_CAPTION_FOR_WIZARD"))
-    , m_xFT_Range(m_xBuilder->weld_label("FT_RANGE"))
     , m_xED_Range(m_xBuilder->weld_entry("ED_RANGE"))
     , m_xIB_Range(m_xBuilder->weld_button("IB_RANGE"))
     , m_xRB_Rows(m_xBuilder->weld_radio_button("RB_DATAROWS"))
@@ -191,7 +191,7 @@ void RangeChooserTabPage::changeDialogModelAccordingToControls()
     if( !m_xCurrentChartTypeTemplate.is() )
     {
         if(m_pTemplateProvider)
-            m_xCurrentChartTypeTemplate.set( m_pTemplateProvider->getCurrentTemplate());
+            m_xCurrentChartTypeTemplate = m_pTemplateProvider->getCurrentTemplate();
         if( !m_xCurrentChartTypeTemplate.is())
         {
             OSL_FAIL( "Need a template to change data source" );

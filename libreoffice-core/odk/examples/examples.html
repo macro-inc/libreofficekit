@@ -85,7 +85,7 @@
             <tr valign="top">
               <td class="content3"><img src="../docs/images/arrow-1.gif"/></td>
               <td><a href="DevelopersGuide/examples.html" title="link to the Developer's Guide examples overview page">Developer's Guide examples</a></td>
-              <td class="content75">The <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/OpenOffice.org_Developers_Guide" title="link to the Developer's Guide in the Wiki">Developer's Guide</a> comes
+              <td class="content75">The <a href="https://wiki.documentfoundation.org/Documentation/DevGuide" title="link to the Developer's Guide in the Wiki">Developer's Guide</a> comes
 			  with a rich set of examples which demonstrate the use of the API in
 			  the different application areas.</td>
             </tr>
@@ -371,9 +371,9 @@
 		  <td  colspan="3">
 		  <p>Additional information:</p>
 		  <p>
-		  <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/WritingUNO/Simple_Component_in_Java" title="link to the &quot;Simple component in Java&quot; chapter in the Developer's Guide">How to write a UNO component in Java</a><br/>
-		  <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Java/Java_Language_Binding" title="link to the &quot;Java UNO Language Binding&quot; chapter in the Developer's Guide">Java UNO Language Binding</a><br/>
-		  <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/WritingUNO/Debugging" title="link to the &quot;Debugging Java components&quot; chapter in the Developer's Guide">Debugging Java components</a><br/>
+		  <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Writing_UNO_Components#Simple_Component_in_Java" title="link to the &quot;Simple component in Java&quot; section in the Developer's Guide">How to write a UNO component in Java</a><br/>
+		  <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Professional_UNO#Java_Language_Binding" title="link to the &quot;Java UNO Language Binding&quot; section in the Developer's Guide">Java UNO Language Binding</a><br/>
+		  <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Writing_UNO_Components#Debugging" title="link to the &quot;Debugging Java components&quot; section in the Developer's Guide">Debugging Java components</a><br/>
 		  </p>
 		  </td>
 		  </tr>
@@ -423,6 +423,90 @@
 		  </table>
 		  </td>
 		</tr>
+    <tr>
+      <td>
+        <table class="table4">
+          <tbody>
+            <tr class="thead">
+              <td class="cell20">Document Handling Examples</td>
+              <td class="cell80">Description</td>
+            </tr>
+            <tr>
+              <td class="cell20">
+                <a href="python/DocumentHandling/" title="link to the source directory of the Python DocumentHandling examples">DocumentConverter</a>
+              </td>
+              <td class="cell80">The program offers a service that converts arbitrary documents to a favored document type.</td>
+            </tr>
+            <tr>
+              <td class="cell20">
+                <a href="python/DocumentHandling/" title="link to the source directory of the Python DocumentHandling examples">DocumentLoader</a>
+              </td>
+              <td class="cell80">The DocumentLoader can open a new or an existing document.</td>
+            </tr>
+            <tr>
+              <td class="cell20">
+                <a href="python/DocumentHandling/" title="link to the source directory of the Python DocumentHandling examples">DocumentPrinter</a>
+              </td>
+              <td class="cell80">The DocumentPrinter allows you to print the favored pages of a specified document on your favored printer.</td>
+            </tr>
+            <tr>
+              <td class="cell20">
+                <a href="python/DocumentHandling/" title="link to the source directory of the Python DocumentHandling examples">DocumentSaver</a>
+              </td>
+              <td class="cell80">The DocumentSaver shows how to save a document and how you can change the type of your document.</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+        <tr>
+          <td>
+            <table class="table4">
+              <tbody>
+                <tr class="thead">
+                  <td class="cell20">Text Document Examples</td>
+                  <td class="cell80">Description</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">BookmarkInsertion</a></td>
+                  <td class="cell80">This application opens an empty text document and enters an example text. Afterwards, some bookmarks will be inserted.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">HardFormatting</a></td>
+                  <td class="cell80">This program opens an empty text document and enters an example text, some text attributes will be inspected, and the <a href="%DOXYGEN_PREFIX1%/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1beans.html#PropertyState" title="link into the IDL reference to the enum com.sun.star.beans.PropertyState">PropertyState</a> will be checked from the selection.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">SWriter</a></td>
+                  <td class="cell80">This program opens an empty text document and enters some text, and a text table, a colored text, and text frame will be inserted.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">StyleCreation</a></td>
+                  <td class="cell80">This program opens an empty text document. Then a new paragraph style will be created, and applied.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">StyleInitialization</a></td>
+                  <td class="cell80">This program opens an empty text document and enters an example text. The paragraph collection will be used, in order to apply a different paragraph style on the paragraphs.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">TextDocumentStructure</a></td>
+                  <td class="cell80">This program opens an empty text document and enters an example text. Document structure will be printed out. Looping through the paragraphs and their portions in a more Pythonic way instead of calling the methods of <a href="%DOXYGEN_PREFIX1%/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1container_1_1XEnumeration.html" title="link to the IDL reference to the interface com.sun.star.container.XEnumeration">XEnumeration</a> interface.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">TextReplace</a></td>
+                  <td class="cell80">The program opens an empty text document and enters an example text, and some English spelled words will be replaced with US spelled words.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">GraphicsInserter</a></td>
+                  <td class="cell80">The GraphicsInserter creates a graphics object on an empty text document by setting its position, width, height, and URL.</td>
+                </tr>
+                <tr>
+                  <td class="cell20"><a href="python/Text/" title="link to the source directory of the Python Text examples">WriterSelector</a></td>
+                  <td class="cell80">This program gives you information on the selected objects, e.g. text range, text frame or graphics.</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
         <tr>
           <td>
           <table class="table3">
@@ -518,8 +602,8 @@
 		  <td  colspan="3">
 		  <p>Additional information:</p>
 		  <p>
-		  <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/WritingUNO/C%2B%2B/C%2B%2B_Component" title="link to the &quot;How to write a UNO component in C++&quot; chapter in the Developer's Guide">How to write a UNO component in C++</a><br/>
-		  <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/ProUNO/C%2B%2B/C%2B%2B_Language_Binding" title="link to the &quot;C++ UNO Language Binding&quot; chapter in the Developer's Guide">C++ UNO Language Binding</a><br/>
+		  <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Writing_UNO_Components#C.2B.2B_Component" title="link to the &quot;How to write a UNO component in C++&quot; section in the Developer's Guide">How to write a UNO component in C++</a><br/>
+		  <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Professional_UNO#C.2B.2B_Language_Binding" title="link to the &quot;C++ UNO Language Binding&quot; section in the Developer's Guide">C++ UNO Language Binding</a><br/>
 		  <a href="%DOXYGEN_PREFIX1%/docs/cpp/ref/index.html" title="link to the C++ API reference">C++ reference</a>
 		  </p>
 		  </td>
@@ -676,7 +760,7 @@
           <table class="table3">
 		  <tr>
 		  <td  colspan="3">
-		  Additional information: <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Basic/OpenOffice.org_Basic" title="link to the &quot;OpenOffice.org %PRODUCT_RELEASE% Basic language binding&quot; chapter in the Developer's Guide">OpenOffice.org %PRODUCT_RELEASE% Basic language binding</a>
+		  Additional information: <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Professional_UNO#LibreOffice_Basic" title="link to the &quot;LibreOffice %PRODUCT_RELEASE% Basic language binding&quot; section in the Developer's Guide">LibreOffice %PRODUCT_RELEASE% Basic language binding</a>
 		  </td>
 		  </tr>
 		  </table>
@@ -741,7 +825,7 @@
           <table class="table3">
 		  <tr>
 		  <td  colspan="3">
-		  Additional information: <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Bridge/Automation_Bridge" title="link to the &quot;Automation Language Binding&quot; chapter in the Developer's Guide">Automation Language Binding</a>
+		  Additional information: <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Professional_UNO#Automation_Bridge" title="link to the &quot;Automation Language Binding&quot; section in the Developer's Guide">Automation Language Binding</a>
 		  </td>
 		  </tr>
 		  </table>
@@ -800,7 +884,7 @@
           <table class="table3">
 		  <tr>
 		  <td  colspan="3">
-		  Additional information: <a href="http://wiki.openoffice.org/wiki/Documentation/DevGuide/ProUNO/CLI/CLI_Language_Binding" title="link to the &quot;CLI-UNO Language Binding&quot; chapter in the Developer's Guide">CLI-UNO Language Binding</a>
+		  Additional information: <a href="https://wiki.documentfoundation.org/Documentation/DevGuide/Professional_UNO#CLI_Language_Binding" title="link to the &quot;CLI-UNO Language Binding&quot; section in the Developer's Guide">CLI-UNO Language Binding</a>
 		  </td>
 		  </tr>
 		  </table>
@@ -815,11 +899,10 @@
                 <div id="Footer">
                     <div id="FooterText">
                         <p>
-                            Copyright © 2000–2022 LibreOffice contributors. All rights reserved.
+                            Copyright © 2000–2023 LibreOffice contributors. All rights reserved.
                             <br/>
                             LibreOffice was created by The Document Foundation,
-                            based on Apache OpenOffice, which is Copyright 2011
-                            The Apache Software Foundation.
+                            based on OpenOffice.org.
                             <br/>
                             The Document Foundation acknowledges all community members, please find more info <a href="https://www.libreoffice.org/about-us/credits/" target="_blank">at our website</a>.
                         </p>

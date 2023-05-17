@@ -18,6 +18,7 @@
  */
 
 #include <config_feature_desktop.h>
+#include <config_wasm_strip.h>
 
 #include <ctime>
 #include <rootfrm.hxx>
@@ -66,7 +67,7 @@
 #include <fmtanchr.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <vector>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 void SwLayAction::CheckWaitCursor()
 {
@@ -499,8 +500,20 @@ void SwLayAction::InternalAction(OutputDevice* pRenderContext)
         return bAgain;
     };
 
+    int nOuterLoopControlRuns = 0;
+    const int nOutermoopControlMax = 10000;
     while ( (pPage && !IsInterrupt()) || m_nCheckPageNum != USHRT_MAX )
     {
+        // Fix infinite loop in sw_ooxmlexport17 unit test
+        // When running the sw_ooxmlexport17 unit test on slower macOS Intel
+        // machines, This loop will never end even after 1M+ loops so set a
+        // maximum number of loops like is done in the nested while loops.
+        if (++nOuterLoopControlRuns > nOutermoopControlMax)
+        {
+            SAL_WARN("sw", "SwLayAction::InternalAction has run too many loops");
+            m_bInterrupt = true;
+        }
+
         // note: this is the only place that consumes and resets m_nCheckPageNum
         if ((IsInterrupt() || !pPage) && m_nCheckPageNum != USHRT_MAX)
         {
@@ -536,6 +549,7 @@ void SwLayAction::InternalAction(OutputDevice* pRenderContext)
         const bool bTakeShortcut = !IsIdle() && !IsComplete() && IsShortCut(pPage);
 
         m_pRoot->DeleteEmptySct();
+        m_pRoot->DeleteEmptyFlys();
         if (lcl_isLayoutLooping()) return;
 
         if (!bTakeShortcut)
@@ -2013,8 +2027,8 @@ bool SwLayIdle::DoIdleJob_( const SwContentFrame *pCnt, IdleJobType eJob )
                     SwPaM *pCursor = pCursorShell->GetCursor();
                     if( !pCursor->HasMark() && !pCursor->IsMultiSelection() )
                     {
-                        m_pContentNode = pCursor->GetContentNode();
-                        m_nTextPos =  pCursor->GetPoint()->nContent.GetIndex();
+                        m_pContentNode = pCursor->GetPointContentNode();
+                        m_nTextPos =  pCursor->GetPoint()->GetContentIndex();
                     }
                 }
         }
@@ -2409,16 +2423,15 @@ SwLayIdle::SwLayIdle( SwRootFrame *pRt, SwViewShellImp *pI ) :
             m_pRoot->ResetIdleFormat();
             SfxObjectShell* pDocShell = m_pImp->GetShell()->GetDoc()->GetDocShell();
             pDocShell->Broadcast( SfxEventHint( SfxEventHintId::SwEventLayoutFinished, SwDocShell::GetEventName(STR_SW_EVENT_LAYOUT_FINISHED), pDocShell ) );
-            // Limit lifetime of the text glyphs cache to a single run of the
-            // layout.
-            SwClearFntCacheTextGlyphs();
         }
     }
 
     m_pImp->GetShell()->EnableSmooth( true );
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( m_pImp->IsAccessible() )
         m_pImp->FireAccessibleEvents();
+#endif
 
     SAL_INFO("sw.idle", "SwLayIdle() return");
 

@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/sprintf.hxx>
 #include <svx/sdtaitm.hxx>
 #include <svx/svdotext.hxx>
 #include <editeng/editobj.hxx>
@@ -34,6 +35,7 @@
 #include <drwlayer.hxx>
 
 #include <root.hxx>
+#include <utility>
 #include <xcl97rec.hxx>
 #include <xcl97esc.hxx>
 #include <xeescher.hxx>
@@ -223,13 +225,34 @@ bool IsValidObject( const XclObj& rObj )
 void SaveDrawingMLObjects( XclExpObjList& rList, XclExpXmlStream& rStrm )
 {
     std::vector<XclObj*> aList;
-    aList.reserve(rList.size());
+    // do not add objects to the list that are in the group,
+    // because the group already contains them. For this, count
+    // the next skipped objects, i.e. objects of a group,
+    // including objects of its subgroups
+    size_t nSkipObj = 0;
     for (const auto& rxObj : rList)
     {
+        // FIXME: Can DrawingML objects be grouped with VML or not valid objects?
         if (IsVmlObject(rxObj.get()) || !IsValidObject(*rxObj))
             continue;
 
-        aList.push_back(rxObj.get());
+        if (nSkipObj == 0)
+            aList.push_back(rxObj.get());
+        else
+            --nSkipObj;
+
+        XclObjAny* pObj = nullptr;
+        if (rxObj->GetObjType() == 0) // group (it can be a subgroup)
+            pObj = dynamic_cast<XclObjAny*>(rxObj.get());
+        if (pObj)
+        {
+            css::uno::Reference<css::drawing::XShapes> xShapes(pObj->GetShape(), UNO_QUERY);
+            if (xShapes)
+            {
+                // skip (also) the objects of this group
+                nSkipObj += xShapes->getCount();
+            }
+        }
     }
 
     if (aList.empty())
@@ -902,10 +925,9 @@ XclTxo::XclTxo( const XclExpRoot& rRoot, const EditTextObject& rEditObj, SdrObje
     if( !aParaText.isEmpty() )
     {
         const SfxItemSet& aSet( rEditObj.GetParaAttribs( 0));
-        const SfxPoolItem* pItem = nullptr;
-        if( aSet.GetItemState( EE_PARA_JUST, true, &pItem ) == SfxItemState::SET )
+        if( const SvxAdjustItem* pItem = aSet.GetItemIfSet( EE_PARA_JUST ) )
         {
-            SvxAdjust eEEAlign = static_cast< const SvxAdjustItem& >( *pItem ).GetAdjust();
+            SvxAdjust eEEAlign = pItem->GetAdjust();
             pCaption->SetMergedItem( SvxAdjustItem( eEEAlign, EE_PARA_JUST ) );
         }
     }
@@ -992,7 +1014,7 @@ void XclObjOle::WriteSubRecs( XclExpStream& rStrm )
     char        aBuf[ sizeof(sal_uInt32) * 2 + 1 ];
     // FIXME Eeek! Is this just a way to get a unique id?
     sal_uInt32          nPictureId = sal_uInt32(reinterpret_cast<sal_uIntPtr>(this) >> 2);
-    sprintf( aBuf, "%08X", static_cast< unsigned int >( nPictureId ) );
+    o3tl::sprintf( aBuf, "%08X", static_cast< unsigned int >( nPictureId ) );
     aStorageName += OUString::createFromAscii(aBuf);
     tools::SvRef<SotStorage>    xOleStg = pRootStorage->OpenSotStorage( aStorageName );
     if( !xOleStg.is() )
@@ -1106,9 +1128,9 @@ void XclObjAny::WriteFromTo( XclExpXmlStream& rStrm, const Reference< XShape >& 
     // Do not adjust objects, which have rotation incorporated into their points
     // but report a rotation angle nevertheless.
     SdrObject* pObj = SdrObject::getSdrObjectFromXShape(rShape);
-    if (pObj && pObj->GetObjIdentifier() != OBJ_LINE && pObj->GetObjIdentifier() != OBJ_PLIN
-        && pObj->GetObjIdentifier() != OBJ_PATHLINE && pObj->GetObjIdentifier() != OBJ_FREELINE
-        && pObj->GetObjIdentifier() != OBJ_PATHPLIN)
+    if (pObj && pObj->GetObjIdentifier() != SdrObjKind::Line && pObj->GetObjIdentifier() != SdrObjKind::PolyLine
+        && pObj->GetObjIdentifier() != SdrObjKind::PathLine && pObj->GetObjIdentifier() != SdrObjKind::FreehandLine
+        && pObj->GetObjIdentifier() != SdrObjKind::PathPolyLine)
     {
         Degree100 nRotation = NormAngle36000(pObj->GetRotateAngle());
         if (nRotation)
@@ -1283,11 +1305,6 @@ bool ScURLTransformer::isExternalURL(const OUString& rURL) const
 
 void XclObjAny::SaveXml( XclExpXmlStream& rStrm )
 {
-    // ignore group shapes at the moment, we don't process them correctly
-    // leading to ms2010 rejecting the content
-    if( !mxShape.is() || mxShape->getShapeType() == "com.sun.star.drawing.GroupShape" )
-        return;
-
     // Do not output any of the detective shapes and validation circles.
     SdrObject* pObject = SdrObject::getSdrObjectFromXShape(mxShape);
     if (pObject)
@@ -1366,8 +1383,8 @@ ExcBundlesheet8::ExcBundlesheet8( const RootData& rRootData, SCTAB _nTab ) :
 {
 }
 
-ExcBundlesheet8::ExcBundlesheet8( const OUString& rString ) :
-    sUnicodeName( rString )
+ExcBundlesheet8::ExcBundlesheet8( OUString aString ) :
+    sUnicodeName(std::move( aString ))
 {
 }
 
@@ -1724,10 +1741,10 @@ void XclExpSheetProtectOptions::WriteBody( XclExpStream& rStrm )
 }
 
 XclExpSheetEnhancedProtection::XclExpSheetEnhancedProtection( const XclExpRoot& rRoot,
-        const ScEnhancedProtection & rProt ) :
+        ScEnhancedProtection aProt ) :
     XclExpRecord( 0x0868 ),
     mrRoot( rRoot ),
-    maEnhancedProtection( rProt )
+    maEnhancedProtection(std::move( aProt ))
 {
 }
 

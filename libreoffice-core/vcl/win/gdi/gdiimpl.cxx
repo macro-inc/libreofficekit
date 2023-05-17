@@ -49,15 +49,6 @@
 #include <win/salids.hrc>
 #include <ControlCacheKey.hxx>
 
-#if defined _MSC_VER
-#ifndef min
-#define min(a,b)    (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b)    (((a) > (b)) ? (a) : (b))
-#endif
-#endif
-
 #include <prewin.h>
 
 #include <gdiplus.h>
@@ -964,8 +955,8 @@ tools::Long WinSalGraphicsImpl::GetGraphicsWidth() const
         WinSalFrame* pFrame = GetWindowPtr( mrParent.gethWnd() );
         if( pFrame )
         {
-            if( pFrame->maGeometry.nWidth )
-                return pFrame->maGeometry.nWidth;
+            if (pFrame->maGeometry.width())
+                return pFrame->maGeometry.width();
             else
             {
                 // TODO: perhaps not needed, maGeometry should always be up-to-date
@@ -1993,7 +1984,6 @@ private:
 
 public:
     SystemDependentData_GraphicsPath(
-        basegfx::SystemDependentDataManager& rSystemDependentDataManager,
         std::shared_ptr<Gdiplus::GraphicsPath>& rpGraphicsPath,
         bool bNoLineJoin,
         const std::vector< double >* pStroke); // MM01
@@ -2009,11 +1999,10 @@ public:
 }
 
 SystemDependentData_GraphicsPath::SystemDependentData_GraphicsPath(
-    basegfx::SystemDependentDataManager& rSystemDependentDataManager,
     std::shared_ptr<Gdiplus::GraphicsPath>& rpGraphicsPath,
     bool bNoLineJoin,
     const std::vector< double >* pStroke)
-:   basegfx::SystemDependentData(rSystemDependentDataManager),
+:   basegfx::SystemDependentData(Application::GetSystemDependentDataManager()),
     mpGraphicsPath(rpGraphicsPath),
     mbNoLineJoin(bNoLineJoin),
     maStroke()
@@ -2143,7 +2132,6 @@ bool WinSalGraphicsImpl::drawPolyPolygon(
 
         // add to buffering mechanism
         rPolyPolygon.addOrReplaceSystemDependentData<SystemDependentData_GraphicsPath>(
-            ImplGetSystemDependentDataManager(),
             pGraphicsPath,
             false,
             nullptr);
@@ -2462,7 +2450,6 @@ bool WinSalGraphicsImpl::drawPolyLine(
         if (!bPixelSnapHairline /*tdf#124700*/)
         {
             rPolygon.addOrReplaceSystemDependentData<SystemDependentData_GraphicsPath>(
-                ImplGetSystemDependentDataManager(),
                 pGraphicsPath,
                 bNoLineJoin,
                 pStroke);

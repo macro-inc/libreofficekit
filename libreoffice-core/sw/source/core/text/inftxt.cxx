@@ -29,7 +29,6 @@
 #include <editeng/hyphenzoneitem.hxx>
 #include <editeng/hngpnctitem.hxx>
 #include <editeng/scriptspaceitem.hxx>
-#include <editeng/brushitem.hxx>
 #include <editeng/splwrap.hxx>
 #include <editeng/pgrditem.hxx>
 #include <editeng/tstpitem.hxx>
@@ -38,7 +37,6 @@
 #include <SwSmartTagMgr.hxx>
 #include <breakit.hxx>
 #include <editeng/forbiddenruleitem.hxx>
-#include <paintfrm.hxx>
 #include <swmodule.hxx>
 #include <vcl/svapp.hxx>
 #include <viewsh.hxx>
@@ -193,6 +191,7 @@ SwTextSizeInfo::SwTextSizeInfo()
 , m_pText(nullptr)
 , m_nIdx(0)
 , m_nLen(0)
+, m_nMeasureLen(COMPLETE_STRING)
 , m_nKanaIdx(0)
 , m_bOnWin    (false)
 , m_bNotEOL   (false)
@@ -223,6 +222,7 @@ SwTextSizeInfo::SwTextSizeInfo( const SwTextSizeInfo &rNew )
       m_pText(&rNew.GetText()),
       m_nIdx(rNew.GetIdx()),
       m_nLen(rNew.GetLen()),
+      m_nMeasureLen(rNew.GetMeasureLen()),
       m_nKanaIdx( rNew.GetKanaIdx() ),
       m_bOnWin( rNew.OnWin() ),
       m_bNotEOL( rNew.NotEOL() ),
@@ -311,7 +311,7 @@ void SwTextSizeInfo::CtorInitTextSizeInfo( OutputDevice* pRenderContext, SwTextF
     m_pText = &m_pFrame->GetText();
 
     m_nIdx = nNewIdx;
-    m_nLen = TextFrameIndex(COMPLETE_STRING);
+    m_nLen = m_nMeasureLen = TextFrameIndex(COMPLETE_STRING);
     m_bNotEOL = false;
     m_bStopUnderflow = m_bFootnoteInside = m_bOtherThanFootnoteInside = false;
     m_bMulti = m_bFirstMulti = m_bRuby = m_bHanging = m_bScriptSpace =
@@ -334,6 +334,7 @@ SwTextSizeInfo::SwTextSizeInfo( const SwTextSizeInfo &rNew, const OUString* pTex
       m_pText(pText),
       m_nIdx(nIndex),
       m_nLen(COMPLETE_STRING),
+      m_nMeasureLen(COMPLETE_STRING),
       m_nKanaIdx( rNew.GetKanaIdx() ),
       m_bOnWin( rNew.OnWin() ),
       m_bNotEOL( rNew.NotEOL() ),
@@ -409,6 +410,7 @@ SwPosSize SwTextSizeInfo::GetTextSize() const
                                 0 ;
 
     SwDrawTextInfo aDrawInf( m_pVsh, *m_pOut, &rSI, *m_pText, m_nIdx, m_nLen );
+    aDrawInf.SetMeasureLen( m_nMeasureLen );
     aDrawInf.SetFrame( m_pFrame );
     aDrawInf.SetFont( m_pFnt );
     aDrawInf.SetSnapToGrid( SnapToGrid() );
@@ -573,7 +575,7 @@ SwTransparentTextGuard::~SwTransparentTextGuard()
     Gradient aVCLGradient;
     sal_uInt8 nTransPercentVcl = 255 - m_rPaintInf.GetFont()->GetColor().GetAlpha();
     const Color aTransColor(nTransPercentVcl, nTransPercentVcl, nTransPercentVcl);
-    aVCLGradient.SetStyle(GradientStyle::Linear);
+    aVCLGradient.SetStyle(css::awt::GradientStyle_LINEAR);
     aVCLGradient.SetStartColor(aTransColor);
     aVCLGradient.SetEndColor(aTransColor);
     aVCLGradient.SetAngle(0_deg10);
@@ -1082,7 +1084,7 @@ void SwTextPaintInfo::DrawPostIts( bool bScript ) const
     if ( GetTextFrame()->IsVertical() )
         GetTextFrame()->SwitchHorizontalToVertical( aTmpRect );
 
-    SwViewOption::PaintPostIts( const_cast<OutputDevice*>(GetOut()), aTmpRect, bScript );
+    GetOpt().PaintPostIts( const_cast<OutputDevice*>(GetOut()), aTmpRect, bScript );
 
 }
 
@@ -1093,12 +1095,12 @@ void SwTextPaintInfo::DrawCheckBox(const SwFieldFormCheckboxPortion &rPor, bool 
     if ( !aIntersect.HasArea() )
         return;
 
-    if (OnWin() && SwViewOption::IsFieldShadings() &&
+    if (OnWin() && GetOpt().IsFieldShadings() &&
             !GetOpt().IsPagePreview())
     {
         OutputDevice* pOut = const_cast<OutputDevice*>(GetOut());
         pOut->Push( vcl::PushFlags::LINECOLOR | vcl::PushFlags::FILLCOLOR );
-        pOut->SetFillColor( SwViewOption::GetFieldShadingsColor() );
+        pOut->SetFillColor( GetOpt().GetFieldShadingsColor() );
         pOut->SetLineColor();
         pOut->DrawRect( aIntersect.SVRect() );
         pOut->Pop();
@@ -1133,7 +1135,7 @@ void SwTextPaintInfo::DrawBackground( const SwLinePortion &rPor, const Color *pC
     if ( pColor )
         pOut->SetFillColor( *pColor );
     else
-        pOut->SetFillColor( SwViewOption::GetFieldShadingsColor() );
+        pOut->SetFillColor( GetOpt().GetFieldShadingsColor() );
 
     pOut->SetLineColor();
 
@@ -1159,12 +1161,12 @@ void SwTextPaintInfo::DrawBackBrush( const SwLinePortion &rPor ) const
             if(bIsStartMark)
                 SAL_INFO("sw.core", "Found StartMark");
             if (OnWin() && (pFieldmark!=nullptr || bIsStartMark) &&
-                    SwViewOption::IsFieldShadings() &&
+                    GetOpt().IsFieldShadings() &&
                     !GetOpt().IsPagePreview())
             {
                 OutputDevice* pOutDev = const_cast<OutputDevice*>(GetOut());
                 pOutDev->Push( vcl::PushFlags::LINECOLOR | vcl::PushFlags::FILLCOLOR );
-                pOutDev->SetFillColor( SwViewOption::GetFieldShadingsColor() );
+                pOutDev->SetFillColor( GetOpt().GetFieldShadingsColor() );
                 pOutDev->SetLineColor( );
                 pOutDev->DrawRect( aIntersect.SVRect() );
                 pOutDev->Pop();
@@ -1256,7 +1258,8 @@ void SwTextPaintInfo::DrawBackBrush( const SwLinePortion &rPor ) const
                         continue;
                     }
                     if ((i + TextFrameIndex(1) ).get() > GetText().getLength())
-                        ; // prevent crash by not passing bad data down to GetTextSize->SwDrawTextInfo
+                        // prevent crash by not passing bad data down to GetTextSize->SwDrawTextInfo
+                        SAL_WARN("sw", "something dodgy, clamping text index to prevent crash");
                     else if (i >= TextFrameIndex(GetText().getLength())
                         || GetText()[sal_Int32(i)] != CH_BLANK)
                     {
@@ -1323,7 +1326,7 @@ void SwTextPaintInfo::DrawViewOpt( const SwLinePortion &rPor,
     case PortionType::ControlChar:
         if ( !GetOpt().IsPagePreview()
              && !GetOpt().IsReadonly()
-             && SwViewOption::IsFieldShadings()
+             && GetOpt().IsFieldShadings()
              && ( PortionType::Number != nWhich
                   || m_pFrame->GetTextNodeForParaProps()->HasMarkedLabel())) // #i27615#
         {
@@ -1336,12 +1339,12 @@ void SwTextPaintInfo::DrawViewOpt( const SwLinePortion &rPor,
     case PortionType::InputField:
         // input field shading also in read-only mode
         if ( !GetOpt().IsPagePreview()
-             && SwViewOption::IsFieldShadings() )
+             && GetOpt().IsFieldShadings() )
         {
             bDraw = true;
         }
         break;
-    case PortionType::Table:
+    case PortionType::Tab:
         if ( GetOpt().IsTab() )     bDraw = true;
         break;
     case PortionType::SoftHyphen:
@@ -1361,13 +1364,15 @@ void SwTextPaintInfo::DrawViewOpt( const SwLinePortion &rPor,
 }
 
 static void lcl_InitHyphValues( PropertyValues &rVals,
-            sal_Int16 nMinLeading, sal_Int16 nMinTrailing, bool bNoCapsHyphenation )
+            sal_Int16 nMinLeading, sal_Int16 nMinTrailing,
+            bool bNoCapsHyphenation, bool bNoLastWordHyphenation,
+            sal_Int16 nMinWordLength, sal_Int16 nTextHyphZone )
 {
     sal_Int32 nLen = rVals.getLength();
 
     if (0 == nLen)  // yet to be initialized?
     {
-        rVals.realloc( 3 );
+        rVals.realloc( 6 );
         PropertyValue *pVal = rVals.getArray();
 
         pVal[0].Name    = UPN_HYPH_MIN_LEADING;
@@ -1381,13 +1386,28 @@ static void lcl_InitHyphValues( PropertyValues &rVals,
         pVal[2].Name    = UPN_HYPH_NO_CAPS;
         pVal[2].Handle  = UPH_HYPH_NO_CAPS;
         pVal[2].Value   <<= bNoCapsHyphenation;
+
+        pVal[3].Name    = UPN_HYPH_NO_LAST_WORD;
+        pVal[3].Handle  = UPH_HYPH_NO_LAST_WORD;
+        pVal[3].Value   <<= bNoLastWordHyphenation;
+
+        pVal[4].Name    = UPN_HYPH_MIN_WORD_LENGTH;
+        pVal[4].Handle  = UPH_HYPH_MIN_WORD_LENGTH;
+        pVal[4].Value   <<= nMinWordLength;
+
+        pVal[5].Name    = UPN_HYPH_ZONE;
+        pVal[5].Handle  = UPH_HYPH_ZONE;
+        pVal[5].Value   <<= nTextHyphZone;
     }
-    else if (3 == nLen) // already initialized once?
+    else if (6 == nLen) // already initialized once?
     {
         PropertyValue *pVal = rVals.getArray();
         pVal[0].Value <<= nMinLeading;
         pVal[1].Value <<= nMinTrailing;
         pVal[2].Value <<= bNoCapsHyphenation;
+        pVal[3].Value <<= bNoLastWordHyphenation;
+        pVal[4].Value <<= nMinWordLength;
+        pVal[5].Value <<= nTextHyphZone;
     }
     else {
         OSL_FAIL( "unexpected size of sequence" );
@@ -1396,7 +1416,7 @@ static void lcl_InitHyphValues( PropertyValues &rVals,
 
 const PropertyValues & SwTextFormatInfo::GetHyphValues() const
 {
-    OSL_ENSURE( 3 == m_aHyphVals.getLength(),
+    OSL_ENSURE( 6 == m_aHyphVals.getLength(),
             "hyphenation values not yet initialized" );
     return m_aHyphVals;
 }
@@ -1414,8 +1434,13 @@ bool SwTextFormatInfo::InitHyph( const bool bAutoHyphen )
     {
         const sal_Int16 nMinimalLeading  = std::max(rAttr.GetMinLead(), sal_uInt8(2));
         const sal_Int16 nMinimalTrailing = rAttr.GetMinTrail();
+        const sal_Int16 nMinimalWordLength = rAttr.GetMinWordLength();
         const bool bNoCapsHyphenation = rAttr.IsNoCapsHyphenation();
-        lcl_InitHyphValues( m_aHyphVals, nMinimalLeading, nMinimalTrailing, bNoCapsHyphenation);
+        const bool bNoLastWordHyphenation = rAttr.IsNoLastWordHyphenation();
+        const sal_Int16 nTextHyphZone = rAttr.GetTextHyphenZone();
+        lcl_InitHyphValues( m_aHyphVals, nMinimalLeading, nMinimalTrailing,
+                 bNoCapsHyphenation, bNoLastWordHyphenation,
+                 nMinimalWordLength, nTextHyphZone );
     }
     return bAuto;
 }
@@ -1804,6 +1829,7 @@ SwTextSlot::SwTextSlot(
     , m_pOldGrammarCheckList(nullptr)
     , nIdx(0)
     , nLen(0)
+    , nMeasureLen(0)
     , pInf(nullptr)
 {
     if( rCh.isEmpty() )
@@ -1823,11 +1849,15 @@ SwTextSlot::SwTextSlot(
     pInf = const_cast<SwTextSizeInfo*>(pNew);
     nIdx = pInf->GetIdx();
     nLen = pInf->GetLen();
+    nMeasureLen = pInf->GetMeasureLen();
     pOldText = &(pInf->GetText());
     m_pOldCachedVclData = pInf->GetCachedVclData();
     pInf->SetText( aText );
     pInf->SetIdx(TextFrameIndex(0));
     pInf->SetLen(bTextLen ? TextFrameIndex(pInf->GetText().getLength()) : pPor->GetLen());
+    if (nMeasureLen != TextFrameIndex(COMPLETE_STRING))
+        pInf->SetMeasureLen(TextFrameIndex(COMPLETE_STRING));
+
     pInf->SetCachedVclData(nullptr);
 
     // ST2
@@ -1901,6 +1931,7 @@ SwTextSlot::~SwTextSlot()
     pInf->SetText( *pOldText );
     pInf->SetIdx( nIdx );
     pInf->SetLen( nLen );
+    pInf->SetMeasureLen( nMeasureLen );
 
     // ST2
     // Restore old smart tag list

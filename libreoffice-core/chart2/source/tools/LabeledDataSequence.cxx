@@ -20,7 +20,7 @@
 #include <LabeledDataSequence.hxx>
 #include <ModifyListenerHelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
 
 namespace com::sun::star::uno { class XComponentContext; }
 
@@ -33,24 +33,46 @@ namespace chart
 {
 
 LabeledDataSequence::LabeledDataSequence() :
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+        m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 LabeledDataSequence::LabeledDataSequence(
-    const uno::Reference< chart2::data::XDataSequence > & rValues ) :
-        m_xData( rValues ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    uno::Reference< chart2::data::XDataSequence > xValues ) :
+        m_xData(std::move( xValues )),
+        m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     ModifyListenerHelper::addListener( m_xData, m_xModifyEventForwarder );
 }
 
 LabeledDataSequence::LabeledDataSequence(
-    const uno::Reference< chart2::data::XDataSequence > & rValues,
-    const uno::Reference< chart2::data::XDataSequence > & rLabel ) :
-        m_xData( rValues ),
-        m_xLabel( rLabel ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    uno::Reference< chart2::data::XDataSequence > xValues,
+    uno::Reference< chart2::data::XDataSequence > xLabel ) :
+        m_xData(std::move( xValues )),
+        m_xLabel(std::move( xLabel )),
+        m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
+    ModifyListenerHelper::addListener( m_xData, m_xModifyEventForwarder );
+    ModifyListenerHelper::addListener( m_xLabel, m_xModifyEventForwarder );
+}
+
+LabeledDataSequence::LabeledDataSequence( const LabeledDataSequence& rSource ) :
+    impl::LabeledDataSequence_Base(),
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
+{
+    uno::Reference< chart2::data::XDataSequence > xNewValues( rSource.m_xData );
+    uno::Reference< chart2::data::XDataSequence > xNewLabel( rSource.m_xLabel );
+
+    uno::Reference< util::XCloneable > xLabelCloneable( rSource.m_xLabel, uno::UNO_QUERY );
+    if( xLabelCloneable.is())
+        xNewLabel.set( xLabelCloneable->createClone(), uno::UNO_QUERY );
+
+    uno::Reference< util::XCloneable > xValuesCloneable( rSource.m_xData, uno::UNO_QUERY );
+    if( xValuesCloneable.is())
+        xNewValues.set( xValuesCloneable->createClone(), uno::UNO_QUERY );
+
+    m_xData = xNewValues;
+    m_xLabel = xNewLabel;
+
     ModifyListenerHelper::addListener( m_xData, m_xModifyEventForwarder );
     ModifyListenerHelper::addListener( m_xLabel, m_xModifyEventForwarder );
 }
@@ -120,28 +142,12 @@ uno::Reference< util::XCloneable > SAL_CALL LabeledDataSequence::createClone()
 // ____ XModifyBroadcaster ____
 void SAL_CALL LabeledDataSequence::addModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL LabeledDataSequence::removeModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 OUString SAL_CALL LabeledDataSequence::getImplementationName()

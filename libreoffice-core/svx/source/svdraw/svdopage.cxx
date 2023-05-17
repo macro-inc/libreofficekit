@@ -25,7 +25,6 @@
 #include <svx/svdpage.hxx>
 #include <sdr/properties/pageproperties.hxx>
 #include <sdr/contact/viewcontactofpageobj.hxx>
-#include <rtl/ustrbuf.hxx>
 
 
 // BaseProperties section
@@ -90,7 +89,7 @@ SdrPageObj::SdrPageObj(
         mpShownPage->AddPageUser(*this);
     }
 
-    m_aOutRect = rRect;
+    setOutRectangle(rRect);
 }
 
 SdrPageObj::~SdrPageObj()
@@ -132,7 +131,7 @@ void SdrPageObj::SetBoundRectDirty()
 
 SdrObjKind SdrPageObj::GetObjIdentifier() const
 {
-    return OBJ_PAGE;
+    return SdrObjKind::Page;
 }
 
 void SdrPageObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
@@ -152,7 +151,7 @@ void SdrPageObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
     rInfo.bCanConvToPolyLineToArea=false;
 }
 
-SdrPageObj* SdrPageObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrPageObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrPageObj(rTargetModel, *this);
 }

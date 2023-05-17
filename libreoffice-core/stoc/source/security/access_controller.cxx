@@ -18,6 +18,7 @@
  */
 
 
+#include <utility>
 #include <vector>
 
 #include <osl/diagnose.h>
@@ -30,6 +31,7 @@
 #include <uno/current_context.h>
 #include <uno/lbnames.h>
 
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -48,8 +50,8 @@
 
 #include <memory>
 
-#define SERVICE_NAME "com.sun.star.security.AccessController"
-#define USER_CREDS "access-control.user-credentials"
+constexpr OUStringLiteral SERVICE_NAME = u"com.sun.star.security.AccessController";
+constexpr OUStringLiteral USER_CREDS  = u"access-control.user-credentials.id";
 
 
 using namespace ::std;
@@ -173,8 +175,8 @@ class acc_Policy
 
 public:
     explicit acc_Policy(
-        PermissionCollection const & permissions )
-        : m_permissions( permissions )
+        PermissionCollection permissions )
+        : m_permissions(std::move( permissions ))
     {}
 
     // XAccessControlContext impl
@@ -270,16 +272,12 @@ public:
         { ::uno_setCurrentContext( m_cc, s_envType.pData, nullptr ); }
 };
 
-struct MutexHolder
-{
-    Mutex m_mutex;
-};
 typedef WeakComponentImplHelper<
     security::XAccessController, lang::XServiceInfo, lang::XInitialization > t_helper;
 
 
 class AccessController
-    : public MutexHolder
+    : public cppu::BaseMutex
     , public t_helper
 {
     Reference< XComponentContext > m_xComponentContext;
@@ -338,7 +336,7 @@ public:
 };
 
 AccessController::AccessController( Reference< XComponentContext > const & xComponentContext )
-    : t_helper( m_mutex )
+    : t_helper( m_aMutex )
     , m_xComponentContext( xComponentContext )
     , m_mode( Mode::On ) // default
     , m_defaultPerm_init( false )
@@ -350,7 +348,7 @@ AccessController::AccessController( Reference< XComponentContext > const & xComp
     // to something other than "off" depending on various UNO_AC* bootstrap
     // variables that are no longer supported, so this is mostly dead code now:
     OUString mode;
-    if (m_xComponentContext->getValueByName( "/services/" SERVICE_NAME "/mode" ) >>= mode)
+    if (m_xComponentContext->getValueByName( "/services/" + SERVICE_NAME + "/mode" ) >>= mode)
     {
         if ( mode == "off" )
         {
@@ -367,12 +365,12 @@ AccessController::AccessController( Reference< XComponentContext > const & xComp
         else if ( mode == "single-user" )
         {
             m_xComponentContext->getValueByName(
-                "/services/" SERVICE_NAME "/single-user-id" ) >>= m_singleUserId;
+                "/services/" + SERVICE_NAME + "/single-user-id" ) >>= m_singleUserId;
             if (m_singleUserId.isEmpty())
             {
                 throw RuntimeException(
                     "expected a user id in component context entry "
-                    "\"/services/" SERVICE_NAME "/single-user-id\"!",
+                    "\"/services/" + SERVICE_NAME + "/single-user-id\"!",
                     static_cast<OWeakObject *>(this) );
             }
             m_mode = Mode::SingleUser;
@@ -389,7 +387,7 @@ AccessController::AccessController( Reference< XComponentContext > const & xComp
 
     sal_Int32 cacheSize = 0; // multi-user cache size
     if (! (m_xComponentContext->getValueByName(
-        "/services/" SERVICE_NAME "/user-cache-size" ) >>= cacheSize))
+        "/services/" + SERVICE_NAME + "/user-cache-size" ) >>= cacheSize))
     {
         cacheSize = 128; // reasonable default?
     }
@@ -445,7 +443,7 @@ Reference< security::XPolicy > const & AccessController::getPolicy()
                 "cannot get policy singleton!", static_cast<OWeakObject *>(this) );
         }
 
-        MutexGuard guard( m_mutex );
+        MutexGuard guard( m_aMutex );
         if (! m_xPolicy.is())
         {
             m_xPolicy = xPolicy;
@@ -526,7 +524,7 @@ void AccessController::checkAndClearPostPoned()
             PermissionCollection const * pPermissions;
             // lookup policy for user
             {
-                MutexGuard guard( m_mutex );
+                MutexGuard guard( m_aMutex );
                 pPermissions = m_user2permissions.lookup( p.first );
             }
             OSL_ASSERT( pPermissions );
@@ -574,7 +572,7 @@ PermissionCollection AccessController::getEffectivePermissions(
     {
         if (xContext.is())
         {
-            xContext->getValueByName( USER_CREDS ".id" ) >>= userId;
+            xContext->getValueByName( USER_CREDS ) >>= userId;
         }
         if ( userId.isEmpty() )
         {
@@ -583,7 +581,7 @@ PermissionCollection AccessController::getEffectivePermissions(
         }
 
         // lookup policy for user
-        MutexGuard guard( m_mutex );
+        MutexGuard guard( m_aMutex );
         PermissionCollection const * pPermissions = m_user2permissions.lookup( userId );
         if (pPermissions)
             return *pPermissions;
@@ -623,7 +621,7 @@ PermissionCollection AccessController::getEffectivePermissions(
             PermissionCollection defaultPermissions(
                 getPolicy()->getDefaultPermissions() );
             // assign
-            MutexGuard guard( m_mutex );
+            MutexGuard guard( m_aMutex );
             if (! m_defaultPerm_init)
             {
                 m_defaultPermissions = defaultPermissions;
@@ -645,7 +643,7 @@ PermissionCollection AccessController::getEffectivePermissions(
                 getPolicy()->getPermissions( userId ), m_defaultPermissions );
             {
             // assign
-            MutexGuard guard( m_mutex );
+            MutexGuard guard( m_aMutex );
             if (m_singleUser_init)
             {
                 ret = m_singleUserPermissions;
@@ -672,7 +670,7 @@ PermissionCollection AccessController::getEffectivePermissions(
                 getPolicy()->getPermissions( userId ), m_defaultPermissions );
             {
             // cache
-            MutexGuard guard( m_mutex );
+            MutexGuard guard( m_aMutex );
             m_user2permissions.set( userId, ret );
             }
 #ifdef __DIAGNOSE

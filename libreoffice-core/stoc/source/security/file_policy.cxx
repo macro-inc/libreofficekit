@@ -24,6 +24,7 @@
 #include <rtl/ustrbuf.hxx>
 
 #include <cppuhelper/access_control.hxx>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -37,8 +38,9 @@
 
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
-#define IMPL_NAME "com.sun.star.security.comp.stoc.FilePolicy"
+constexpr OUStringLiteral IMPL_NAME = u"com.sun.star.security.comp.stoc.FilePolicy";
 
 using namespace ::osl;
 using namespace ::cppu;
@@ -47,15 +49,11 @@ using namespace css::uno;
 
 namespace {
 
-struct MutexHolder
-{
-    Mutex m_mutex;
-};
 typedef WeakComponentImplHelper< security::XPolicy, lang::XServiceInfo > t_helper;
 
 
 class FilePolicy
-    : public MutexHolder
+    : public cppu::BaseMutex
     , public t_helper
 {
     Reference< XComponentContext > m_xComponentContext;
@@ -85,7 +83,7 @@ public:
 };
 
 FilePolicy::FilePolicy( Reference< XComponentContext > const & xComponentContext )
-    : t_helper( m_mutex )
+    : t_helper( m_aMutex )
     , m_xComponentContext( xComponentContext )
     , m_ac( xComponentContext )
     , m_init( false )
@@ -108,7 +106,7 @@ Sequence< Any > FilePolicy::getPermissions(
         m_init = true;
     }
 
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     t_permissions::iterator iFind( m_userPermissions.find( userId ) );
     if (m_userPermissions.end() == iFind)
     {
@@ -128,7 +126,7 @@ Sequence< Any > FilePolicy::getDefaultPermissions()
         m_init = true;
     }
 
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     return m_defaultPermissions;
 }
 
@@ -155,7 +153,7 @@ class PolicyReader
         { return (';' == c || ',' == c || '{' == c || '}' == c); }
 
 public:
-    PolicyReader( OUString const & file, AccessControl & ac );
+    PolicyReader( OUString file, AccessControl & ac );
     ~PolicyReader();
 
     void error( std::u16string_view msg );
@@ -331,8 +329,8 @@ void PolicyReader::error( std::u16string_view msg )
         "] " + msg);
 }
 
-PolicyReader::PolicyReader( OUString const & fileName, AccessControl & ac )
-    : m_fileName( fileName )
+PolicyReader::PolicyReader( OUString fileName, AccessControl & ac )
+    : m_fileName(std::move( fileName ))
     , m_linepos( 0 )
     , m_pos( 1 ) // force readline
     , m_back( '\0' )
@@ -371,7 +369,7 @@ void FilePolicy::refresh()
     // supported, so this is effectively dead code):
     OUString fileName;
     m_xComponentContext->getValueByName(
-        "/implementations/" IMPL_NAME "/file-name" ) >>= fileName;
+        "/implementations/" + IMPL_NAME + "/file-name" ) >>= fileName;
     if ( fileName.isEmpty() )
     {
         throw RuntimeException(
@@ -462,7 +460,7 @@ void FilePolicy::refresh()
     }
 
     // assign new ones
-    MutexGuard guard( m_mutex );
+    MutexGuard guard( m_aMutex );
     m_defaultPermissions = defaultPermissions;
     m_userPermissions = userPermissions;
 }

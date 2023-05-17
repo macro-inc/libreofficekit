@@ -29,6 +29,7 @@
 #include <osl/diagnose.h>
 #include <tools/gen.hxx>
 #include <vcl/canvastools.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/timer.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/font.hxx>
@@ -215,8 +216,8 @@ double TextLayouterDevice::getTextWidth(const OUString& rText, sal_uInt32 nIndex
 
 void TextLayouterDevice::getTextOutlines(basegfx::B2DPolyPolygonVector& rB2DPolyPolyVector,
                                          const OUString& rText, sal_uInt32 nIndex,
-                                         sal_uInt32 nLength,
-                                         const std::vector<double>& rDXArray) const
+                                         sal_uInt32 nLength, const std::vector<double>& rDXArray,
+                                         const std::vector<sal_Bool>& rKashidaArray) const
 {
     const sal_uInt32 nDXArrayCount(rDXArray.size());
     sal_uInt32 nTextLength(nLength);
@@ -231,15 +232,14 @@ void TextLayouterDevice::getTextOutlines(basegfx::B2DPolyPolygonVector& rB2DPoly
     {
         OSL_ENSURE(nDXArrayCount == nTextLength,
                    "DXArray size does not correspond to text portion size (!)");
-        std::vector<sal_Int32> aIntegerDXArray(nDXArrayCount);
 
+        KernArray aIntegerDXArray;
+        aIntegerDXArray.reserve(nDXArrayCount);
         for (sal_uInt32 a(0); a < nDXArrayCount; a++)
-        {
-            aIntegerDXArray[a] = basegfx::fround(rDXArray[a]);
-        }
+            aIntegerDXArray.push_back(basegfx::fround(rDXArray[a]));
 
         mrDevice.GetTextOutlines(rB2DPolyPolyVector, rText, nIndex, nIndex, nLength, 0,
-                                 aIntegerDXArray);
+                                 aIntegerDXArray, rKashidaArray);
     }
     else
     {
@@ -307,10 +307,11 @@ std::vector<double> TextLayouterDevice::getTextArray(const OUString& rText, sal_
 
     if (nTextLength)
     {
-        aRetval.reserve(nTextLength);
-        std::vector<sal_Int32> aArray(nTextLength);
-        mrDevice.GetTextArray(rText, &aArray, nIndex, nLength);
-        aRetval.assign(aArray.begin(), aArray.end());
+        KernArray aArray;
+        mrDevice.GetTextArray(rText, &aArray, nIndex, nTextLength);
+        aRetval.reserve(aArray.size());
+        for (size_t i = 0, nEnd = aArray.size(); i < nEnd; ++i)
+            aRetval.push_back(aArray[i]);
     }
 
     return aRetval;
@@ -332,7 +333,7 @@ std::vector<double> TextLayouterDevice::getCaretPositions(const OUString& rText,
     {
         aRetval.reserve(2 * nTextLength);
         std::vector<sal_Int32> aArray(2 * nTextLength);
-        mrDevice.GetCaretPositions(rText, aArray.data(), nIndex, nLength);
+        mrDevice.GetCaretPositions(rText, aArray.data(), nIndex, nTextLength);
         aRetval.assign(aArray.begin(), aArray.end());
     }
 

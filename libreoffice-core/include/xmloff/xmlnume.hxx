@@ -57,16 +57,13 @@ class XMLOFF_DLLPUBLIC SvxXMLNumRuleExport final
 public:
 
     SvxXMLNumRuleExport( SvXMLExport& rExport );
-    ~SvxXMLNumRuleExport();
 
     // should be private but sw::StoredChapterNumberingExport needs it
     void exportLevelStyles(
             const css::uno::Reference< css::container::XIndexReplace > & xNumRule,
             bool bOutline=false );
 
-    void exportStyles( bool bUsed,
-                       XMLTextListAutoStylePool *pPool,
-                       bool bExportChapterNumbering );
+    void exportStyles(bool bUsed, bool bExportChapterNumbering);
     void exportNumberingRule(
             const OUString& rName, bool bIsHidden,
             const css::uno::Reference< css::container::XIndexReplace > & xNumRule );

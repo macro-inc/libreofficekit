@@ -32,7 +32,6 @@
 #include <com/sun/star/accessibility/XAccessibleContext2.hpp>
 #include <com/sun/star/accessibility/XAccessibleComponent.hpp>
 #include <com/sun/star/accessibility/XAccessibleEventBroadcaster.hpp>
-#include <com/sun/star/accessibility/XAccessibleStateSet.hpp>
 #include <com/sun/star/accessibility/XAccessibleRelationSet.hpp>
 #include <com/sun/star/accessibility/XAccessibleTable.hpp>
 #include <com/sun/star/accessibility/XAccessibleEditableText.hpp>
@@ -44,9 +43,10 @@
 
 #include <rtl/strbuf.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/syschild.hxx>
 #include <vcl/sysdata.hxx>
+#include <vcl/svapp.hxx>
 #include <vcl/toolkit/unowrap.hxx>
 
 #include "atkwrapper.hxx"
@@ -110,7 +110,7 @@ static AtkRelationType mapRelationType( sal_Int16 nRelation )
     return type;
 }
 
-AtkStateType mapAtkState( sal_Int16 nState )
+AtkStateType mapAtkState( sal_Int64 nState )
 {
     AtkStateType type = ATK_STATE_INVALID;
 
@@ -166,158 +166,190 @@ AtkStateType mapAtkState( sal_Int16 nState )
     return type;
 }
 
-static AtkRole getRoleForName( const gchar * name )
-{
-    AtkRole ret = atk_role_for_name( name );
-    if( ATK_ROLE_INVALID == ret )
-    {
-        // this should only happen in old ATK versions
-        SAL_WNODEPRECATED_DECLARATIONS_PUSH
-        ret = atk_role_register( name );
-        SAL_WNODEPRECATED_DECLARATIONS_POP
-    }
-
-    return ret;
-}
-
 static AtkRole mapToAtkRole( sal_Int16 nRole )
 {
-    AtkRole role = ATK_ROLE_UNKNOWN;
-
-    static AtkRole roleMap[] = {
-        ATK_ROLE_UNKNOWN,
-        ATK_ROLE_ALERT,
-        ATK_ROLE_COLUMN_HEADER,
-        ATK_ROLE_CANVAS,
-        ATK_ROLE_CHECK_BOX,
-        ATK_ROLE_CHECK_MENU_ITEM,
-        ATK_ROLE_COLOR_CHOOSER,
-        ATK_ROLE_COMBO_BOX,
-        ATK_ROLE_DATE_EDITOR,
-        ATK_ROLE_DESKTOP_ICON,
-        ATK_ROLE_DESKTOP_FRAME,   // ? pane
-        ATK_ROLE_DIRECTORY_PANE,
-        ATK_ROLE_DIALOG,
-        ATK_ROLE_UNKNOWN,         // DOCUMENT - registered below
-        ATK_ROLE_UNKNOWN,         // EMBEDDED_OBJECT - registered below
-        ATK_ROLE_UNKNOWN,         // END_NOTE - registered below
-        ATK_ROLE_FILE_CHOOSER,
-        ATK_ROLE_FILLER,
-        ATK_ROLE_FONT_CHOOSER,
-        ATK_ROLE_FOOTER,
-        ATK_ROLE_UNKNOWN,         // FOOTNOTE - registered below
-        ATK_ROLE_FRAME,
-        ATK_ROLE_GLASS_PANE,
-        ATK_ROLE_IMAGE,           // GRAPHIC
-        ATK_ROLE_UNKNOWN,         // GROUP_BOX - registered below
-        ATK_ROLE_HEADER,
-        ATK_ROLE_HEADING,
-        ATK_ROLE_TEXT,            // HYPER_LINK - registered below
-        ATK_ROLE_ICON,
-        ATK_ROLE_INTERNAL_FRAME,
-        ATK_ROLE_LABEL,
-        ATK_ROLE_LAYERED_PANE,
-        ATK_ROLE_LIST,
-        ATK_ROLE_LIST_ITEM,
-        ATK_ROLE_MENU,
-        ATK_ROLE_MENU_BAR,
-        ATK_ROLE_MENU_ITEM,
-        ATK_ROLE_OPTION_PANE,
-        ATK_ROLE_PAGE_TAB,
-        ATK_ROLE_PAGE_TAB_LIST,
-        ATK_ROLE_PANEL,
-        ATK_ROLE_PARAGRAPH,
-        ATK_ROLE_PASSWORD_TEXT,
-        ATK_ROLE_POPUP_MENU,
-        ATK_ROLE_PUSH_BUTTON,
-        ATK_ROLE_PROGRESS_BAR,
-        ATK_ROLE_RADIO_BUTTON,
-        ATK_ROLE_RADIO_MENU_ITEM,
-        ATK_ROLE_ROW_HEADER,
-        ATK_ROLE_ROOT_PANE,
-        ATK_ROLE_SCROLL_BAR,
-        ATK_ROLE_SCROLL_PANE,
-        ATK_ROLE_PANEL,         // SHAPE
-        ATK_ROLE_SEPARATOR,
-        ATK_ROLE_SLIDER,
-        ATK_ROLE_SPIN_BUTTON,   // SPIN_BOX ?
-        ATK_ROLE_SPLIT_PANE,
-        ATK_ROLE_STATUSBAR,
-        ATK_ROLE_TABLE,
-        ATK_ROLE_TABLE_CELL,
-        ATK_ROLE_TEXT,
-        ATK_ROLE_PANEL,         // TEXT_FRAME
-        ATK_ROLE_TOGGLE_BUTTON,
-        ATK_ROLE_TOOL_BAR,
-        ATK_ROLE_TOOL_TIP,
-        ATK_ROLE_TREE,
-        ATK_ROLE_VIEWPORT,
-        ATK_ROLE_WINDOW,
-        ATK_ROLE_PUSH_BUTTON,   // BUTTON_DROPDOWN
-        ATK_ROLE_PUSH_BUTTON,   // BUTTON_MENU
-        ATK_ROLE_UNKNOWN,       // CAPTION - registered below
-        ATK_ROLE_UNKNOWN,       // CHART - registered below
-        ATK_ROLE_UNKNOWN,       // EDIT_BAR - registered below
-        ATK_ROLE_UNKNOWN,       // FORM - registered below
-        ATK_ROLE_UNKNOWN,       // IMAGE_MAP - registered below
-        ATK_ROLE_UNKNOWN,       // NOTE - registered below
-        ATK_ROLE_UNKNOWN,       // PAGE - registered below
-        ATK_ROLE_RULER,
-        ATK_ROLE_UNKNOWN,       // SECTION - registered below
-        ATK_ROLE_UNKNOWN,       // TREE_ITEM - registered below
-        ATK_ROLE_TREE_TABLE,
-        ATK_ROLE_SCROLL_PANE,   // COMMENT - mapped to atk_role_scroll_pane
-        ATK_ROLE_UNKNOWN        // COMMENT_END - mapped to atk_role_unknown
-#if defined(ATK_CHECK_VERSION)
-        //older ver that doesn't define ATK_CHECK_VERSION doesn't have the following
-        , ATK_ROLE_DOCUMENT_PRESENTATION
-        , ATK_ROLE_DOCUMENT_SPREADSHEET
-        , ATK_ROLE_DOCUMENT_TEXT
-#if ATK_CHECK_VERSION(2,15,2)
-        , ATK_ROLE_STATIC
-#else
-        , ATK_ROLE_LABEL
-#endif
-#else
-        //older version should fallback to DOCUMENT_FRAME role
-        , ATK_ROLE_DOCUMENT_FRAME
-        , ATK_ROLE_DOCUMENT_FRAME
-        , ATK_ROLE_DOCUMENT_FRAME
-        , ATK_ROLE_LABEL
-#endif
-    };
-
-    static bool initialized = false;
-
-    if( ! initialized )
+    switch (nRole)
     {
-        // the accessible roles below were added to ATK in later versions,
-        // with role_for_name we will know if they exist in runtime.
-        roleMap[accessibility::AccessibleRole::EDIT_BAR] = getRoleForName("edit bar");
-        roleMap[accessibility::AccessibleRole::EMBEDDED_OBJECT] = getRoleForName("embedded");
-        roleMap[accessibility::AccessibleRole::CHART] = getRoleForName("chart");
-        roleMap[accessibility::AccessibleRole::CAPTION] = getRoleForName("caption");
-        roleMap[accessibility::AccessibleRole::DOCUMENT] = getRoleForName("document frame");
-        roleMap[accessibility::AccessibleRole::PAGE] = getRoleForName("page");
-        roleMap[accessibility::AccessibleRole::SECTION] = getRoleForName("section");
-        roleMap[accessibility::AccessibleRole::FORM] = getRoleForName("form");
-        roleMap[accessibility::AccessibleRole::GROUP_BOX] = getRoleForName("grouping");
-        roleMap[accessibility::AccessibleRole::COMMENT] = getRoleForName("comment");
-        roleMap[accessibility::AccessibleRole::IMAGE_MAP] = getRoleForName("image map");
-        roleMap[accessibility::AccessibleRole::TREE_ITEM] = getRoleForName("tree item");
-        roleMap[accessibility::AccessibleRole::HYPER_LINK] = getRoleForName("link");
-        roleMap[accessibility::AccessibleRole::END_NOTE] = getRoleForName("footnote");
-        roleMap[accessibility::AccessibleRole::FOOTNOTE] = getRoleForName("footnote");
-        roleMap[accessibility::AccessibleRole::NOTE] = getRoleForName("comment");
-
-        initialized = true;
+        case accessibility::AccessibleRole::UNKNOWN:
+            return ATK_ROLE_UNKNOWN;
+        case accessibility::AccessibleRole::ALERT:
+            return ATK_ROLE_ALERT;
+        case accessibility::AccessibleRole::COLUMN_HEADER:
+            return ATK_ROLE_COLUMN_HEADER;
+        case accessibility::AccessibleRole::CANVAS:
+            return ATK_ROLE_CANVAS;
+        case accessibility::AccessibleRole::CHECK_BOX:
+            return ATK_ROLE_CHECK_BOX;
+        case accessibility::AccessibleRole::CHECK_MENU_ITEM:
+            return ATK_ROLE_CHECK_MENU_ITEM;
+        case accessibility::AccessibleRole::COLOR_CHOOSER:
+            return ATK_ROLE_COLOR_CHOOSER;
+        case accessibility::AccessibleRole::COMBO_BOX:
+            return ATK_ROLE_COMBO_BOX;
+        case accessibility::AccessibleRole::DATE_EDITOR:
+            return ATK_ROLE_DATE_EDITOR;
+        case accessibility::AccessibleRole::DESKTOP_ICON:
+            return ATK_ROLE_DESKTOP_ICON;
+        case accessibility::AccessibleRole::DESKTOP_PANE:
+            return ATK_ROLE_DESKTOP_FRAME;
+        case accessibility::AccessibleRole::DIRECTORY_PANE:
+            return ATK_ROLE_DIRECTORY_PANE;
+        case accessibility::AccessibleRole::DIALOG:
+            return ATK_ROLE_DIALOG;
+        case accessibility::AccessibleRole::DOCUMENT:
+            return ATK_ROLE_DOCUMENT_FRAME;
+        case accessibility::AccessibleRole::EMBEDDED_OBJECT:
+            return ATK_ROLE_EMBEDDED;
+        case accessibility::AccessibleRole::END_NOTE:
+            return ATK_ROLE_FOOTNOTE;
+        case accessibility::AccessibleRole::FILE_CHOOSER:
+            return ATK_ROLE_FILE_CHOOSER;
+        case accessibility::AccessibleRole::FILLER:
+            return ATK_ROLE_FILLER;
+        case accessibility::AccessibleRole::FONT_CHOOSER:
+            return ATK_ROLE_FONT_CHOOSER;
+        case accessibility::AccessibleRole::FOOTER:
+            return ATK_ROLE_FOOTER;
+        case accessibility::AccessibleRole::FOOTNOTE:
+            return ATK_ROLE_FOOTNOTE;
+        case accessibility::AccessibleRole::FRAME:
+            return ATK_ROLE_FRAME;
+        case accessibility::AccessibleRole::GLASS_PANE:
+            return ATK_ROLE_GLASS_PANE;
+        case accessibility::AccessibleRole::GRAPHIC:
+            return ATK_ROLE_IMAGE;
+        case accessibility::AccessibleRole::GROUP_BOX:
+            return ATK_ROLE_GROUPING;
+        case accessibility::AccessibleRole::HEADER:
+            return ATK_ROLE_HEADER;
+        case accessibility::AccessibleRole::HEADING:
+            return ATK_ROLE_HEADING;
+        case accessibility::AccessibleRole::HYPER_LINK:
+            return ATK_ROLE_LINK;
+        case accessibility::AccessibleRole::ICON:
+            return ATK_ROLE_ICON;
+        case accessibility::AccessibleRole::INTERNAL_FRAME:
+            return ATK_ROLE_INTERNAL_FRAME;
+        case accessibility::AccessibleRole::LABEL:
+            return ATK_ROLE_LABEL;
+        case accessibility::AccessibleRole::LAYERED_PANE:
+            return ATK_ROLE_LAYERED_PANE;
+        case accessibility::AccessibleRole::LIST:
+            return ATK_ROLE_LIST;
+        case accessibility::AccessibleRole::LIST_ITEM:
+            return ATK_ROLE_LIST_ITEM;
+        case accessibility::AccessibleRole::MENU:
+            return ATK_ROLE_MENU;
+        case accessibility::AccessibleRole::MENU_BAR:
+            return ATK_ROLE_MENU_BAR;
+        case accessibility::AccessibleRole::MENU_ITEM:
+            return ATK_ROLE_MENU_ITEM;
+        case accessibility::AccessibleRole::OPTION_PANE:
+            return ATK_ROLE_OPTION_PANE;
+        case accessibility::AccessibleRole::PAGE_TAB:
+            return ATK_ROLE_PAGE_TAB;
+        case accessibility::AccessibleRole::PAGE_TAB_LIST:
+            return ATK_ROLE_PAGE_TAB_LIST;
+        case accessibility::AccessibleRole::PANEL:
+            return ATK_ROLE_PANEL;
+        case accessibility::AccessibleRole::PARAGRAPH:
+            return ATK_ROLE_PARAGRAPH;
+        case accessibility::AccessibleRole::PASSWORD_TEXT:
+            return ATK_ROLE_PASSWORD_TEXT;
+        case accessibility::AccessibleRole::POPUP_MENU:
+            return ATK_ROLE_POPUP_MENU;
+        case accessibility::AccessibleRole::PUSH_BUTTON:
+            return ATK_ROLE_PUSH_BUTTON;
+        case accessibility::AccessibleRole::PROGRESS_BAR:
+            return ATK_ROLE_PROGRESS_BAR;
+        case accessibility::AccessibleRole::RADIO_BUTTON:
+            return ATK_ROLE_RADIO_BUTTON;
+        case accessibility::AccessibleRole::RADIO_MENU_ITEM:
+            return ATK_ROLE_RADIO_MENU_ITEM;
+        case accessibility::AccessibleRole::ROW_HEADER:
+            return ATK_ROLE_ROW_HEADER;
+        case accessibility::AccessibleRole::ROOT_PANE:
+            return ATK_ROLE_ROOT_PANE;
+        case accessibility::AccessibleRole::SCROLL_BAR:
+            return ATK_ROLE_SCROLL_BAR;
+        case accessibility::AccessibleRole::SCROLL_PANE:
+            return ATK_ROLE_SCROLL_PANE;
+        case accessibility::AccessibleRole::SHAPE:
+            return ATK_ROLE_PANEL;
+        case accessibility::AccessibleRole::SEPARATOR:
+            return ATK_ROLE_SEPARATOR;
+        case accessibility::AccessibleRole::SLIDER:
+            return ATK_ROLE_SLIDER;
+        case accessibility::AccessibleRole::SPIN_BOX:
+            return ATK_ROLE_SPIN_BUTTON;
+        case accessibility::AccessibleRole::SPLIT_PANE:
+            return ATK_ROLE_SPLIT_PANE;
+        case accessibility::AccessibleRole::STATUS_BAR:
+            return ATK_ROLE_STATUSBAR;
+        case accessibility::AccessibleRole::TABLE:
+            return ATK_ROLE_TABLE;
+        case accessibility::AccessibleRole::TABLE_CELL:
+            return ATK_ROLE_TABLE_CELL;
+        case accessibility::AccessibleRole::TEXT:
+            return ATK_ROLE_TEXT;
+        case accessibility::AccessibleRole::TEXT_FRAME:
+            return ATK_ROLE_PANEL;
+        case accessibility::AccessibleRole::TOGGLE_BUTTON:
+            return ATK_ROLE_TOGGLE_BUTTON;
+        case accessibility::AccessibleRole::TOOL_BAR:
+            return ATK_ROLE_TOOL_BAR;
+        case accessibility::AccessibleRole::TOOL_TIP:
+            return ATK_ROLE_TOOL_TIP;
+        case accessibility::AccessibleRole::TREE:
+            return ATK_ROLE_TREE;
+        case accessibility::AccessibleRole::VIEW_PORT:
+            return ATK_ROLE_VIEWPORT;
+        case accessibility::AccessibleRole::WINDOW:
+            return ATK_ROLE_WINDOW;
+        case accessibility::AccessibleRole::BUTTON_DROPDOWN:
+            return ATK_ROLE_PUSH_BUTTON;
+        case accessibility::AccessibleRole::BUTTON_MENU:
+            return ATK_ROLE_PUSH_BUTTON;
+        case accessibility::AccessibleRole::CAPTION:
+            return ATK_ROLE_CAPTION;
+        case accessibility::AccessibleRole::CHART:
+            return ATK_ROLE_CHART;
+        case accessibility::AccessibleRole::EDIT_BAR:
+            return ATK_ROLE_EDITBAR;
+        case accessibility::AccessibleRole::FORM:
+            return ATK_ROLE_FORM;
+        case accessibility::AccessibleRole::IMAGE_MAP:
+            return ATK_ROLE_IMAGE_MAP;
+        case accessibility::AccessibleRole::NOTE:
+            return ATK_ROLE_COMMENT;
+        case accessibility::AccessibleRole::PAGE:
+            return ATK_ROLE_PAGE;
+        case accessibility::AccessibleRole::RULER:
+            return ATK_ROLE_RULER;
+        case accessibility::AccessibleRole::SECTION:
+            return ATK_ROLE_SECTION;
+        case accessibility::AccessibleRole::TREE_ITEM:
+            return ATK_ROLE_TREE_ITEM;
+        case accessibility::AccessibleRole::TREE_TABLE:
+            return ATK_ROLE_TREE_TABLE;
+        case accessibility::AccessibleRole::COMMENT:
+            return ATK_ROLE_COMMENT;
+        case accessibility::AccessibleRole::COMMENT_END:
+            return ATK_ROLE_UNKNOWN;
+        case accessibility::AccessibleRole::DOCUMENT_PRESENTATION:
+            return ATK_ROLE_DOCUMENT_PRESENTATION;
+        case accessibility::AccessibleRole::DOCUMENT_SPREADSHEET:
+            return ATK_ROLE_DOCUMENT_SPREADSHEET;
+        case accessibility::AccessibleRole::DOCUMENT_TEXT:
+            return ATK_ROLE_DOCUMENT_TEXT;
+        case accessibility::AccessibleRole::STATIC:
+            return ATK_ROLE_STATIC;
+        case accessibility::AccessibleRole::NOTIFICATION:
+            return ATK_ROLE_NOTIFICATION;
+        default:
+            SAL_WARN("vcl.gtk", "Unmapped accessible role: " << nRole);
+            return ATK_ROLE_UNKNOWN;
     }
-
-    static const sal_Int32 nMapSize = SAL_N_ELEMENTS(roleMap);
-    if( 0 <= nRole &&  nMapSize > nRole )
-        role = roleMap[nRole];
-
-    return role;
 }
 
 /*****************************************************************************/
@@ -420,7 +452,14 @@ wrapper_get_n_children( AtkObject *atk_obj )
     if( obj->mpContext.is() )
     {
         try {
-            n = obj->mpContext->getAccessibleChildCount();
+            sal_Int64 nChildCount = obj->mpContext->getAccessibleChildCount();
+            if (nChildCount > std::numeric_limits<gint>::max())
+            {
+                SAL_WARN("vcl.gtk", "wrapper_get_n_children: Child count exceeds maximum gint value, "
+                                    "returning max gint.");
+                nChildCount = std::numeric_limits<gint>::max();
+            }
+            n = nChildCount;
         }
         catch(const uno::Exception&) {
             TOOLS_WARN_EXCEPTION( "vcl", "Exception" );
@@ -436,6 +475,8 @@ static AtkObject *
 wrapper_ref_child( AtkObject *atk_obj,
                    gint       i )
 {
+    SolarMutexGuard aGuard;
+
     AtkObjectWrapper *obj = ATK_OBJECT_WRAPPER (atk_obj);
 
     if (obj->mpSysObjChild)
@@ -474,6 +515,8 @@ wrapper_ref_child( AtkObject *atk_obj,
 static gint
 wrapper_get_index_in_parent( AtkObject *atk_obj )
 {
+    SolarMutexGuard aGuard;
+
     AtkObjectWrapper *obj = ATK_OBJECT_WRAPPER (atk_obj);
 
     //if we're a native GtkDrawingArea with custom a11y, use the default toolkit a11y
@@ -485,7 +528,17 @@ wrapper_get_index_in_parent( AtkObject *atk_obj )
     if( obj->mpContext.is() )
     {
         try {
-            i = obj->mpContext->getAccessibleIndexInParent();
+            sal_Int64 nIndex = obj->mpContext->getAccessibleIndexInParent();
+            if (nIndex > std::numeric_limits<gint>::max())
+            {
+                // use -2 when the child index is too large to fit into 32 bit to neither use the
+                // valid index of another child nor -1, which would e.g. make Orca interpret the
+                // object as being a zombie
+                SAL_WARN("vcl.gtk", "wrapper_get_index_in_parent: Child index exceeds maximum gint value, "
+                                    "returning -2.");
+                nIndex = -2;
+            }
+            i = nIndex;
         }
         catch(const uno::Exception&) {
             g_warning( "Exception in getAccessibleIndexInParent()" );
@@ -562,18 +615,16 @@ wrapper_ref_state_set( AtkObject *atk_obj )
     if( obj->mpContext.is() )
     {
         try {
-            uno::Reference< accessibility::XAccessibleStateSet > xStateSet(
-                obj->mpContext->getAccessibleStateSet());
+            sal_Int64 nStateSet = obj->mpContext->getAccessibleStateSet();
 
-            if( xStateSet.is() )
+            if( nStateSet )
             {
-                uno::Sequence< sal_Int16 > aStates = xStateSet->getStates();
-
-                for( const auto nState : aStates )
+                for (int i=0; i<63; ++i)
                 {
                     // ATK_STATE_LAST_DEFINED is used to check if the state
                     // is unmapped, do not report it to Atk
-                    if ( mapAtkState( nState ) != ATK_STATE_LAST_DEFINED )
+                    sal_Int64 nState = sal_Int64(1) << i;
+                    if ( (nStateSet & nState) && mapAtkState( nState ) != ATK_STATE_LAST_DEFINED )
                         atk_state_set_add_state( pSet, mapAtkState( nState ) );
                 }
 
@@ -608,6 +659,7 @@ atk_object_wrapper_finalize (GObject *obj)
     if( pWrap->mpAccessible.is() )
     {
         ooo_wrapper_registry_remove( pWrap->mpAccessible );
+        SolarMutexGuard aGuard;
         pWrap->mpAccessible.clear();
     }
 
@@ -636,6 +688,13 @@ atk_object_wrapper_class_init (AtkObjectWrapperClass *klass)
   atk_class->get_index_in_parent = wrapper_get_index_in_parent;
   atk_class->ref_relation_set = wrapper_ref_relation_set;
   atk_class->ref_state_set = wrapper_ref_state_set;
+
+  AtkObjectClass* orig_atk_klass = static_cast<AtkObjectClass*>(g_type_class_ref(ATK_TYPE_OBJECT));
+  // tdf#150496 we want to inherit from GtkAccessible because gtk assumes it can cast to GtkAccessible
+  // but we want the original behaviour we got from atk_object_real_get_parent when we inherited
+  // from AtkObject
+  atk_class->get_parent = orig_atk_klass->get_parent;
+  g_type_class_unref(orig_atk_klass);
 }
 
 static void
@@ -649,6 +708,7 @@ atk_object_wrapper_init (AtkObjectWrapper      *wrapper,
    wrapper->mpImage = nullptr;
    wrapper->mpSelection = nullptr;
    wrapper->mpTable = nullptr;
+   wrapper->mpTableSelection = nullptr;
    wrapper->mpText = nullptr;
    wrapper->mpValue = nullptr;
 }
@@ -675,7 +735,7 @@ atk_object_wrapper_get_type()
         reinterpret_cast<GInstanceInitFunc>(atk_object_wrapper_init),
         nullptr
       } ;
-      type = g_type_register_static (ATK_TYPE_OBJECT,
+      type = g_type_register_static (GTK_TYPE_WIDGET_ACCESSIBLE,
                                      "OOoAtkObj",
                                      &typeInfo, GTypeFlags(0)) ;
   }
@@ -696,6 +756,44 @@ isOfType( uno::XInterface *pInterface, const uno::Type & rType )
     } catch( const uno::Exception &) { }
 
     return bIs;
+}
+
+// Whether AtkTableCell can be supported for the interface.
+// Returns true if the corresponding XAccessible has role TABLE_CELL
+// and an XAccessibleTable as parent.
+static bool isTableCell(uno::XInterface* pInterface)
+{
+    g_return_val_if_fail(pInterface != nullptr, false);
+
+    try {
+        auto aType = cppu::UnoType<accessibility::XAccessible>::get().getTypeLibType();
+        uno::Any aAcc = pInterface->queryInterface(aType);
+
+        css::uno::Reference<css::accessibility::XAccessible> xAcc;
+        aAcc >>= xAcc;
+        if (!xAcc.is())
+            return false;
+
+        css::uno::Reference<css::accessibility::XAccessibleContext> xContext = xAcc->getAccessibleContext();
+        if (!xContext.is() || !(xContext->getAccessibleRole() == accessibility::AccessibleRole::TABLE_CELL))
+            return false;
+
+        css::uno::Reference<css::accessibility::XAccessible> xParent = xContext->getAccessibleParent();
+        if (!xParent.is())
+            return false;
+        css::uno::Reference<css::accessibility::XAccessibleContext> xParentContext = xParent->getAccessibleContext();
+        if (!xParentContext.is())
+            return false;
+
+        css::uno::Reference<css::accessibility::XAccessibleTable> xTable(xParentContext, uno::UNO_QUERY);
+        return xTable.is();
+    }
+    catch(const uno::Exception &)
+    {
+        g_warning("Exception in isTableCell()");
+    }
+
+    return false;
 }
 
 extern "C" {
@@ -734,6 +832,12 @@ const struct {
         cppu::UnoType<accessibility::XAccessibleTable>::get
     },
     {
+        "Cell",  reinterpret_cast<GInterfaceInitFunc>(tablecellIfaceInit),
+        atk_table_cell_get_type,
+        // there is no UNO a11y interface for table cells, so this case is handled separately below
+        nullptr
+    },
+    {
         "Edt",  reinterpret_cast<GInterfaceInitFunc>(editableTextIfaceInit),
         atk_editable_text_get_type,
         cppu::UnoType<accessibility::XAccessibleEditableText>::get
@@ -768,7 +872,17 @@ ensureTypeFor( uno::XInterface *pAccessible )
 
     for( i = 0; i < aTypeTableSize; i++ )
     {
-        if( isOfType( pAccessible, aTypeTable[i].aGetUnoType() ) )
+        if(!g_strcmp0(aTypeTable[i].name, "Cell"))
+        {
+            // there is no UNO interface for table cells, but AtkTableCell can be supported
+            // for table cells via the methods of the parent that is a table
+            if (isTableCell(pAccessible))
+            {
+                aTypeNameBuf.append(aTypeTable[i].name);
+                bTypes[i] = true;
+            }
+        }
+        else if (isOfType( pAccessible, aTypeTable[i].aGetUnoType() ) )
         {
             aTypeNameBuf.append(aTypeTable[i].name);
             bTypes[i] = true;
@@ -866,8 +980,8 @@ atk_object_wrapper_new( const css::uno::Reference< css::accessibility::XAccessib
         }
 
         // Attach a listener to the UNO object if it's not TRANSIENT
-        uno::Reference< accessibility::XAccessibleStateSet > xStateSet( xContext->getAccessibleStateSet() );
-        if( xStateSet.is() && ! xStateSet->contains( accessibility::AccessibleStateType::TRANSIENT ) )
+        sal_Int64 nStateSet( xContext->getAccessibleStateSet() );
+        if( ! (nStateSet & accessibility::AccessibleStateType::TRANSIENT ) )
         {
             uno::Reference< accessibility::XAccessibleEventBroadcaster > xBroadcaster(xContext, uno::UNO_QUERY);
             if( xBroadcaster.is() )
@@ -962,6 +1076,7 @@ void atk_object_wrapper_dispose(AtkObjectWrapper* wrapper)
     wrapper->mpSelection.clear();
     wrapper->mpMultiLineText.clear();
     wrapper->mpTable.clear();
+    wrapper->mpTableSelection.clear();
     wrapper->mpText.clear();
     wrapper->mpTextMarkup.clear();
     wrapper->mpTextAttributes.clear();

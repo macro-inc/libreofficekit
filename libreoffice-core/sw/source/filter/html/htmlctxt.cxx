@@ -29,6 +29,7 @@
 #include <svtools/htmltokn.h>
 #include <editeng/boxitem.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <doc.hxx>
 #include <pam.hxx>
@@ -39,6 +40,7 @@
 #include "swhtml.hxx"
 
 #include <memory>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -115,9 +117,9 @@ HTMLAttrContext_SaveDoc *HTMLAttrContext::GetSaveDocContext( bool bCreate )
     return m_pSaveDocContext.get();
 }
 
-HTMLAttrContext::HTMLAttrContext( HtmlTokenId nTokn, sal_uInt16 nPoolId, const OUString& rClass,
+HTMLAttrContext::HTMLAttrContext( HtmlTokenId nTokn, sal_uInt16 nPoolId, OUString aClass,
                   bool bDfltColl ) :
-    m_aClass( rClass ),
+    m_aClass(std::move( aClass )),
     m_nToken( nTokn ),
     m_nTextFormatColl( nPoolId ),
     m_nLeftMargin( 0 ),
@@ -177,14 +179,14 @@ void SwHTMLParser::SplitAttrTab( const SwPosition& rNewPos )
         "Danger: there are non-final paragraph attributes");
     m_aParaAttrs.clear();
 
-    const SwNodeIndex* pOldEndPara = &m_pPam->GetPoint()->nNode;
+    const SwPosition* pOldEndPara = m_pPam->GetPoint();
 #ifndef NDEBUG
-    auto const nOld(pOldEndPara->GetIndex());
+    auto const nOld(pOldEndPara->GetNodeIndex());
 #endif
-    sal_Int32 nOldEndCnt = m_pPam->GetPoint()->nContent.GetIndex();
+    sal_Int32 nOldEndCnt = m_pPam->GetPoint()->GetContentIndex();
 
-    const SwNodeIndex& rNewSttPara = rNewPos.nNode;
-    sal_Int32 nNewSttCnt = rNewPos.nContent.GetIndex();
+    const SwPosition& rNewSttPara = rNewPos;
+    sal_Int32 nNewSttCnt = rNewPos.GetContentIndex();
 
     bool bMoveBack = false;
 
@@ -200,31 +202,31 @@ void SwHTMLParser::SplitAttrTab( const SwPosition& rNewPos )
 
             sal_uInt16 nWhich = pAttr->m_pItem->Which();
             if( !nOldEndCnt && RES_PARATR_BEGIN <= nWhich &&
-                pAttr->GetStartParagraphIdx() < pOldEndPara->GetIndex() )
+                pAttr->GetStartParagraphIdx() < pOldEndPara->GetNodeIndex() )
             {
                 // The attribute needs to be closed one content position beforehand
                 if( !bMoveBack )
                 {
                     bMoveBack = m_pPam->Move( fnMoveBackward );
-                    nOldEndCnt = m_pPam->GetPoint()->nContent.GetIndex();
+                    nOldEndCnt = m_pPam->GetPoint()->GetContentIndex();
                 }
             }
             else if( bMoveBack )
             {
                 m_pPam->Move( fnMoveForward );
-                nOldEndCnt = m_pPam->GetPoint()->nContent.GetIndex();
+                nOldEndCnt = m_pPam->GetPoint()->GetContentIndex();
                 bMoveBack = false;
             }
 
             if( (RES_PARATR_BEGIN <= nWhich && bMoveBack) ||
-                pAttr->GetStartParagraphIdx() < pOldEndPara->GetIndex() ||
-                (pAttr->GetStartParagraph() == *pOldEndPara &&
+                pAttr->GetStartParagraphIdx() < pOldEndPara->GetNodeIndex() ||
+                (pAttr->GetStartParagraph() == pOldEndPara->GetNode() &&
                  pAttr->GetStartContent() != nOldEndCnt) )
             {
                 // The attribute needs to be set. Because we still need the original, since
                 // pointers to the attribute still exists in the contexts, we need to clone it.
                 // The next-list gets lost but the previous-list is preserved
-                HTMLAttr *pSetAttr = pAttr->Clone( *pOldEndPara, nOldEndCnt );
+                HTMLAttr *pSetAttr = pAttr->Clone( pOldEndPara->GetNode(), nOldEndCnt );
 
                 if( pNext )
                     pNext->InsertPrev( pSetAttr );
@@ -252,8 +254,8 @@ void SwHTMLParser::SplitAttrTab( const SwPosition& rNewPos )
             }
 
             // Set the start of the attribute
-            pAttr->m_nStartPara = rNewSttPara;
-            pAttr->m_nEndPara = rNewSttPara;
+            pAttr->m_nStartPara = rNewSttPara.GetNode();
+            pAttr->m_nEndPara = rNewSttPara.GetNode();
             pAttr->m_nStartContent = nNewSttCnt;
             pAttr->m_nEndContent = nNewSttCnt;
             pAttr->m_pPrev = nullptr;
@@ -265,7 +267,7 @@ void SwHTMLParser::SplitAttrTab( const SwPosition& rNewPos )
     if( bMoveBack )
         m_pPam->Move( fnMoveForward );
 
-    assert(m_pPam->GetPoint()->nNode.GetIndex() == nOld);
+    assert(m_pPam->GetPoint()->GetNodeIndex() == nOld);
 }
 
 void SwHTMLParser::SaveDocContext( HTMLAttrContext *pCntxt,
@@ -399,7 +401,7 @@ void SwHTMLParser::EndContext( HTMLAttrContext *pContext )
 
     // Add a paragraph break if needed
     if( AM_NONE != pContext->GetAppendMode() &&
-        m_pPam->GetPoint()->nContent.GetIndex() )
+        m_pPam->GetPoint()->GetContentIndex() )
         AppendTextNode( pContext->GetAppendMode() );
 
     // Restart PRE, LISTING and XMP environments
@@ -500,13 +502,13 @@ bool SwHTMLParser::DoPositioning( SfxItemSet &rItemSet,
     return bRet;
 }
 
-bool SwHTMLParser::CreateContainer( const OUString& rClass,
+bool SwHTMLParser::CreateContainer( std::u16string_view rClass,
                                     SfxItemSet &rItemSet,
                                     SvxCSS1PropertyInfo &rPropInfo,
                                     HTMLAttrContext *pContext )
 {
     bool bRet = false;
-    if( rClass.equalsIgnoreAsciiCase( "sd-abs-pos" ) &&
+    if( o3tl::equalsIgnoreAsciiCase( rClass, u"sd-abs-pos" ) &&
         SwCSS1Parser::MayBePositioned( rPropInfo ) )
     {
         // Container class
@@ -534,7 +536,7 @@ void SwHTMLParser::InsertAttrs( SfxItemSet &rItemSet,
                                 bool bCharLvl )
 {
     // Put together a DropCap attribute, if a "float:left" is before the first character
-    if( bCharLvl && !m_pPam->GetPoint()->nContent.GetIndex() &&
+    if( bCharLvl && !m_pPam->GetPoint()->GetContentIndex() &&
         SvxAdjust::Left == rPropInfo.m_eFloat )
     {
         SwFormatDrop aDrop;

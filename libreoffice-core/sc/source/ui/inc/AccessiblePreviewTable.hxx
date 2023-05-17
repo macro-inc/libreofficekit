@@ -82,9 +82,9 @@ public:
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
                             getAccessibleSummary() override;
     virtual sal_Bool SAL_CALL isAccessibleSelected( sal_Int32 nRow, sal_Int32 nColumn ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleIndex( sal_Int32 nRow, sal_Int32 nColumn ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleRow( sal_Int32 nChildIndex ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleColumn( sal_Int32 nChildIndex ) override;
+    virtual sal_Int64 SAL_CALL getAccessibleIndex( sal_Int32 nRow, sal_Int32 nColumn ) override;
+    virtual sal_Int32 SAL_CALL getAccessibleRow( sal_Int64 nChildIndex ) override;
+    virtual sal_Int32 SAL_CALL getAccessibleColumn( sal_Int64 nChildIndex ) override;
 
     //=====  XAccessibleComponent  ============================================
 
@@ -94,12 +94,11 @@ public:
 
     //=====  XAccessibleContext  ==============================================
 
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-                            getAccessibleChild( sal_Int32 i ) override;
-    virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override;
-    virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
-                            getAccessibleStateSet() override;
+                            getAccessibleChild( sal_Int64 i ) override;
+    virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
 
     //=====  XServiceInfo  ====================================================
 
@@ -125,8 +124,7 @@ private:
     sal_Int32           mnIndex;
     mutable std::unique_ptr<ScPreviewTableInfo> mpTableInfo;
 
-    bool IsDefunc(
-        const css::uno::Reference<css::accessibility::XAccessibleStateSet>& rxParentStates);
+    bool IsDefunc(sal_Int64 nParentStates);
 
     void    FillTableInfo() const;
 };

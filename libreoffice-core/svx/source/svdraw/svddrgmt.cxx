@@ -21,6 +21,8 @@
 #include <math.h>
 
 #include <o3tl/numeric.hxx>
+#include <osl/diagnose.h>
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -52,9 +54,9 @@
 #include <svx/svditer.hxx>
 #include <svx/svdopath.hxx>
 #include <svx/polypolygoneditor.hxx>
+#include <drawinglayer/primitive2d/PolygonMarkerPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonSelectionPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonMarkerPrimitive2D.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
 #include <drawinglayer/primitive2d/markerarrayprimitive2d.hxx>
 #include <sdr/primitive2d/sdrattributecreator.hxx>
@@ -80,8 +82,8 @@ SdrDragEntry::~SdrDragEntry()
 }
 
 
-SdrDragEntryPolyPolygon::SdrDragEntryPolyPolygon(const basegfx::B2DPolyPolygon& rOriginalPolyPolygon)
-:   maOriginalPolyPolygon(rOriginalPolyPolygon)
+SdrDragEntryPolyPolygon::SdrDragEntryPolyPolygon(basegfx::B2DPolyPolygon aOriginalPolyPolygon)
+:   maOriginalPolyPolygon(std::move(aOriginalPolyPolygon))
 {
 }
 
@@ -119,7 +121,7 @@ drawinglayer::primitive2d::Primitive2DContainer SdrDragEntryPolyPolygon::createP
         const double fTransparence(SvtOptionsDrawinglayer::GetTransparentSelectionPercent() * 0.01);
 
         aRetval[1] = new drawinglayer::primitive2d::PolyPolygonSelectionPrimitive2D(
-            aCopy,
+            std::move(aCopy),
             aHilightColor,
             fTransparence,
             3.0,
@@ -150,7 +152,7 @@ void SdrDragEntrySdrObject::prepareCurrentState(SdrDragMethod& rDragMethod)
     // out when clone and original have the same class, so that i can use operator=
     // in those cases
 
-    mxClone.reset();
+    mxClone.clear();
 
     if(mbModify)
     {
@@ -173,7 +175,9 @@ drawinglayer::primitive2d::Primitive2DContainer SdrDragEntrySdrObject::createPri
 
     // use the view-independent primitive representation (without
     // evtl. GridOffset, that may be applied to the DragEntry individually)
-    return pSource->GetViewContact().getViewIndependentPrimitive2DContainer();
+    drawinglayer::primitive2d::Primitive2DContainer xRetval;
+    pSource->GetViewContact().getViewIndependentPrimitive2DContainer(xRetval);
+    return xRetval;
 }
 
 
@@ -459,7 +463,7 @@ void SdrDragMethod::createSdrDragEntries_PolygonDrag()
 
     if(aResult.count())
     {
-        addSdrDragEntry(std::unique_ptr<SdrDragEntry>(new SdrDragEntryPolyPolygon(aResult)));
+        addSdrDragEntry(std::unique_ptr<SdrDragEntry>(new SdrDragEntryPolyPolygon(std::move(aResult))));
     }
 }
 
@@ -651,7 +655,7 @@ void SdrDragMethod::Hide()
     getSdrDragView().HideDragObj();
 }
 
-basegfx::B2DHomMatrix SdrDragMethod::getCurrentTransformation()
+basegfx::B2DHomMatrix SdrDragMethod::getCurrentTransformation() const
 {
     return basegfx::B2DHomMatrix();
 }
@@ -876,7 +880,7 @@ drawinglayer::primitive2d::Primitive2DContainer SdrDragMethod::AddConnectorOverl
 
             if(pEdge)
             {
-                const basegfx::B2DPolygon aEdgePolygon(pEdge->ImplAddConnectorOverlay(*this, pEM->IsCon1(), pEM->IsCon2(), bDetail));
+                basegfx::B2DPolygon aEdgePolygon(pEdge->ImplAddConnectorOverlay(*this, pEM->IsCon1(), pEM->IsCon2(), bDetail));
 
                 if(aEdgePolygon.count())
                 {
@@ -927,7 +931,7 @@ drawinglayer::primitive2d::Primitive2DContainer SdrDragMethod::AddConnectorOverl
 
                         drawinglayer::primitive2d::Primitive2DReference aPolyPolygonMarkerPrimitive2D(
                             new drawinglayer::primitive2d::PolygonMarkerPrimitive2D(
-                                aEdgePolygon, aColA, aColB, fStripeLength));
+                                std::move(aEdgePolygon), aColA, aColB, fStripeLength));
                         aRetval.push_back(aPolyPolygonMarkerPrimitive2D);
                     }
                 }
@@ -1216,7 +1220,7 @@ void SdrDragObjOwn::createSdrDragEntries()
 
     if(aDragPolyPolygon.count())
     {
-        addSdrDragEntry(std::unique_ptr<SdrDragEntry>(new SdrDragEntryPolyPolygon(aDragPolyPolygon)));
+        addSdrDragEntry(std::unique_ptr<SdrDragEntry>(new SdrDragEntryPolyPolygon(std::move(aDragPolyPolygon))));
     }
 }
 
@@ -1308,7 +1312,7 @@ void SdrDragObjOwn::MoveSdrDrag(const Point& rNoSnapPnt)
     clearSdrDragEntries();
 
     // delete current clone (after the last reference to it is deleted above)
-    mxClone.reset();
+    mxClone.clear();
 
     // create a new clone and modify to current drag state
     mxClone = pObj->getFullDragClone();
@@ -1442,10 +1446,12 @@ void SdrDragMove::createSdrDragEntryForSdrObject(const SdrObject& rOriginal)
 {
     // use the view-independent primitive representation (without
     // evtl. GridOffset, that may be applied to the DragEntry individually)
+    drawinglayer::primitive2d::Primitive2DContainer xRetval;
+    rOriginal.GetViewContact().getViewIndependentPrimitive2DContainer(xRetval);
     addSdrDragEntry(
         std::unique_ptr<SdrDragEntry>(
             new SdrDragEntryPrimitive2DSequence(
-                rOriginal.GetViewContact().getViewIndependentPrimitive2DContainer())));
+                std::move(xRetval))));
 
 }
 
@@ -1491,7 +1497,7 @@ bool SdrDragMove::BeginSdrDrag()
     return true;
 }
 
-basegfx::B2DHomMatrix SdrDragMove::getCurrentTransformation()
+basegfx::B2DHomMatrix SdrDragMove::getCurrentTransformation() const
 {
     return basegfx::utils::createTranslateB2DHomMatrix(DragStat().GetDX(), DragStat().GetDY());
 }
@@ -1807,7 +1813,7 @@ bool SdrDragResize::BeginSdrDrag()
     return true;
 }
 
-basegfx::B2DHomMatrix SdrDragResize::getCurrentTransformation()
+basegfx::B2DHomMatrix SdrDragResize::getCurrentTransformation() const
 {
     basegfx::B2DHomMatrix aRetval(basegfx::utils::createTranslateB2DHomMatrix(
         -DragStat().GetRef1().X(), -DragStat().GetRef1().Y()));
@@ -2097,7 +2103,7 @@ bool SdrDragRotate::BeginSdrDrag()
     return false;
 }
 
-basegfx::B2DHomMatrix SdrDragRotate::getCurrentTransformation()
+basegfx::B2DHomMatrix SdrDragRotate::getCurrentTransformation() const
 {
     return basegfx::utils::createRotateAroundPoint(
         DragStat().GetRef1().X(), DragStat().GetRef1().Y(),
@@ -2243,7 +2249,7 @@ bool SdrDragShear::BeginSdrDrag()
     return true;
 }
 
-basegfx::B2DHomMatrix SdrDragShear::getCurrentTransformation()
+basegfx::B2DHomMatrix SdrDragShear::getCurrentTransformation() const
 {
     basegfx::B2DHomMatrix aRetval(basegfx::utils::createTranslateB2DHomMatrix(
         -DragStat().GetRef1().X(), -DragStat().GetRef1().Y()));
@@ -2530,7 +2536,7 @@ bool SdrDragMirror::BeginSdrDrag()
     }
 }
 
-basegfx::B2DHomMatrix SdrDragMirror::getCurrentTransformation()
+basegfx::B2DHomMatrix SdrDragMirror::getCurrentTransformation() const
 {
     basegfx::B2DHomMatrix aRetval;
 
@@ -3580,7 +3586,7 @@ bool SdrDragCrop::EndSdrDrag(bool /*bCopy*/)
     // there are currently no easy mechanisms to plug an alternative interaction
     // from there
     SdrObject* pSdrObject = rMarkList.GetMark(0)->GetMarkedSdrObj();
-    SdrObjectUniquePtr pFullDragClone;
+    rtl::Reference<SdrObject> pFullDragClone;
     bool bExternal(false);
     SdrObject* pExternalSdrObject(nullptr);
 

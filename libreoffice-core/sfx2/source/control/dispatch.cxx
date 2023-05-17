@@ -28,6 +28,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
+#include <com/sun/star/awt/PopupMenuDirection.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/frame/XDispatchRecorderSupplier.hpp>
 #include <com/sun/star/frame/XLayoutManager.hpp>
@@ -773,11 +774,13 @@ const SfxSlot* SfxDispatcher::GetSlot( const OUString& rCommand )
 
     for ( sal_uInt16 i = 0; i < nTotCount; ++i )
     {
-        SfxShell *pObjShell = GetShell(i);
-        SfxInterface *pIFace = pObjShell->GetInterface();
-        const SfxSlot *pSlot = pIFace->GetSlot( rCommand );
-        if ( pSlot )
-            return pSlot;
+        if (SfxShell *pObjShell = GetShell(i))
+        {
+            SfxInterface *pIFace = pObjShell->GetInterface();
+            const SfxSlot *pSlot = pIFace->GetSlot( rCommand );
+            if ( pSlot )
+                return pSlot;
+        }
     }
 
     return nullptr;
@@ -1151,6 +1154,9 @@ void SfxDispatcher::Update_Impl_( bool bUIActive, bool bIsMDIApp, bool bIsIPOwne
     for ( sal_uInt16 nShell = nTotCount; nShell > 0; --nShell )
     {
         SfxShell *pShell = GetShell( nShell-1 );
+        if (!pShell)
+            continue;
+
         SfxInterface *pIFace = pShell->GetInterface();
 
         // don't consider shells if "Hidden" or "Quiet"
@@ -1566,6 +1572,9 @@ bool SfxDispatcher::FindServer_(sal_uInt16 nSlot, SfxSlotServer& rServer)
     for ( sal_uInt16 i = nFirstShell; i < nTotCount; ++i )
     {
         SfxShell *pObjShell = GetShell(i);
+        if (!pObjShell)
+            continue;
+
         SfxInterface *pIFace = pObjShell->GetInterface();
         const SfxSlot *pSlot = pIFace->GetSlot(nSlot);
 
@@ -1645,7 +1654,8 @@ bool SfxDispatcher::FillState_(const SfxSlotServer& rSvr, SfxItemSet& rState,
 
         // Determine the object and call the Message of this object
         SfxShell *pSh = GetShell(rSvr.GetShellLevel());
-        DBG_ASSERT(pSh, "ObjectShell not found");
+        if (!pSh)
+            return false;
 
         SfxStateFunc pFunc;
 
@@ -1704,6 +1714,109 @@ void SfxDispatcher::ExecutePopup( vcl::Window *pWin, const Point *pPos )
     }
 }
 
+namespace {
+
+boost::property_tree::ptree fillPopupMenu(Menu* pMenu)
+{
+    // Activate this menu first
+    pMenu->HandleMenuActivateEvent(pMenu);
+    pMenu->HandleMenuDeActivateEvent(pMenu);
+
+    boost::property_tree::ptree aTree;
+    // If last item inserted is some valid text
+    bool bIsLastItemText = false;
+    sal_uInt16 nCount = pMenu->GetItemCount();
+    for (sal_uInt16 nPos = 0; nPos < nCount; nPos++)
+    {
+        boost::property_tree::ptree aItemTree;
+        const MenuItemType aItemType = pMenu->GetItemType(nPos);
+
+        if (aItemType == MenuItemType::DONTKNOW)
+            continue;
+
+        if (aItemType == MenuItemType::SEPARATOR)
+        {
+            if (bIsLastItemText)
+                aItemTree.put("type", "separator");
+            bIsLastItemText = false;
+        }
+        else
+        {
+            const sal_uInt16 nItemId = pMenu->GetItemId(nPos);
+            OUString aCommandURL = pMenu->GetItemCommand(nItemId);
+
+            if (aCommandURL.isEmpty())
+            {
+                const SfxSlot *pSlot = SFX_SLOTPOOL().GetSlot(nItemId);
+                if (pSlot)
+                    aCommandURL = pSlot->GetCommandString();
+            }
+
+            const OUString aItemText = pMenu->GetItemText(nItemId);
+            Menu* pPopupSubmenu = pMenu->GetPopupMenu(nItemId);
+
+            if (!aItemText.isEmpty())
+                aItemTree.put("text", aItemText.toUtf8().getStr());
+
+            if (pPopupSubmenu)
+            {
+                boost::property_tree::ptree aSubmenu = ::fillPopupMenu(pPopupSubmenu);
+                if (aSubmenu.empty())
+                    continue;
+
+                aItemTree.put("type", "menu");
+                if (!aCommandURL.isEmpty())
+                    aItemTree.put("command", aCommandURL.toUtf8().getStr());
+                aItemTree.push_back(std::make_pair("menu", aSubmenu));
+            }
+            else
+            {
+                // no point in exposing choices that don't have the .uno:
+                // command
+                if (aCommandURL.isEmpty())
+                    continue;
+
+                aItemTree.put("type", "command");
+                aItemTree.put("command", aCommandURL.toUtf8().getStr());
+            }
+
+            aItemTree.put("enabled", pMenu->IsItemEnabled(nItemId));
+
+            MenuItemBits aItemBits = pMenu->GetItemBits(nItemId);
+            bool bHasChecks = true;
+            if (aItemBits & MenuItemBits::CHECKABLE)
+                aItemTree.put("checktype", "checkmark");
+            else if (aItemBits & MenuItemBits::RADIOCHECK)
+                aItemTree.put("checktype", "radio");
+            else if (aItemBits & MenuItemBits::AUTOCHECK)
+                aItemTree.put("checktype", "auto");
+            else
+                bHasChecks = false;
+
+            if (bHasChecks)
+                aItemTree.put("checked", pMenu->IsItemChecked(nItemId));
+        }
+
+        if (!aItemTree.empty())
+        {
+            aTree.push_back(std::make_pair("", aItemTree));
+            if (aItemType != MenuItemType::SEPARATOR)
+                bIsLastItemText = true;
+        }
+    }
+
+    return aTree;
+}
+
+}
+
+boost::property_tree::ptree SfxDispatcher::fillPopupMenu(const css::uno::Reference<css::awt::XPopupMenu>& rPopupMenu)
+{
+    VCLXMenu* pAwtMenu = comphelper::getFromUnoTunnel<VCLXMenu>(rPopupMenu);
+    PopupMenu* pVCLMenu = static_cast<PopupMenu*>(pAwtMenu->GetMenu());
+    return ::fillPopupMenu(pVCLMenu);
+}
+
 void SfxDispatcher::ExecutePopup( const OUString& rResName, vcl::Window* pWin, const Point* pPos )
 {
     css::uno::Sequence< css::uno::Any > aArgs{
@@ -1732,11 +1845,9 @@ void SfxDispatcher::ExecutePopup( const OUString& rResName, vcl::Window* pWin, c
     aEvent.ExecutePosition.Y = aPos.Y();
 
     xPopupController->setPopupMenu( xPopupMenu );
-    VCLXMenu* pAwtMenu = comphelper::getFromUnoTunnel<VCLXMenu>( xPopupMenu );
-    PopupMenu* pVCLMenu = static_cast< PopupMenu* >( pAwtMenu->GetMenu() );
     if (comphelper::LibreOfficeKit::isActive())
     {
-        boost::property_tree::ptree aMenu = fillPopupMenu(pVCLMenu);
+        boost::property_tree::ptree aMenu = fillPopupMenu(xPopupMenu);
         boost::property_tree::ptree aRoot;
         aRoot.add_child("menu", aMenu);
 
@@ -1748,9 +1859,10 @@ void SfxDispatcher::ExecutePopup( const OUString& rResName, vcl::Window* pWin, c
     else
     {
         OUString aMenuURL = "private:resource/popupmenu/" + rResName;
-        if (pVCLMenu && GetFrame()->GetViewShell()->TryContextMenuInterception(*pVCLMenu, aMenuURL, aEvent))
+        if (GetFrame()->GetViewShell()->TryContextMenuInterception(xPopupMenu, aMenuURL, aEvent))
         {
-            pVCLMenu->Execute(pWindow, aPos);
+            css::uno::Reference<css::awt::XWindowPeer> xParent(aEvent.SourceWindow, css::uno::UNO_QUERY);
+            xPopupMenu->execute(xParent, css::awt::Rectangle(aPos.X(), aPos.Y(), 1, 1), css::awt::PopupMenuDirection::EXECUTE_DOWN);
         }
     }
 
@@ -1968,98 +2080,6 @@ SfxModule* SfxDispatcher::GetModule() const
         if ( auto pModule = dynamic_cast<SfxModule *>( pSh ) )
             return pModule;
     }
-}
-
-boost::property_tree::ptree SfxDispatcher::fillPopupMenu(Menu* pMenu)
-{
-    // Activate this menu first
-    pMenu->HandleMenuActivateEvent(pMenu);
-    pMenu->HandleMenuDeActivateEvent(pMenu);
-
-    boost::property_tree::ptree aTree;
-    // If last item inserted is some valid text
-    bool bIsLastItemText = false;
-    sal_uInt16 nCount = pMenu->GetItemCount();
-    for (sal_uInt16 nPos = 0; nPos < nCount; nPos++)
-    {
-        boost::property_tree::ptree aItemTree;
-        const MenuItemType aItemType = pMenu->GetItemType(nPos);
-
-        if (aItemType == MenuItemType::DONTKNOW)
-            continue;
-
-        if (aItemType == MenuItemType::SEPARATOR)
-        {
-            if (bIsLastItemText)
-                aItemTree.put("type", "separator");
-            bIsLastItemText = false;
-        }
-        else
-        {
-            const sal_uInt16 nItemId = pMenu->GetItemId(nPos);
-            OUString aCommandURL = pMenu->GetItemCommand(nItemId);
-
-            if (aCommandURL.isEmpty())
-            {
-                const SfxSlot *pSlot = SFX_SLOTPOOL().GetSlot(nItemId);
-                if (pSlot)
-                    aCommandURL = pSlot->GetCommandString();
-            }
-
-            const OUString aItemText = pMenu->GetItemText(nItemId);
-            Menu* pPopupSubmenu = pMenu->GetPopupMenu(nItemId);
-
-            if (!aItemText.isEmpty())
-                aItemTree.put("text", aItemText.toUtf8().getStr());
-
-            if (pPopupSubmenu)
-            {
-                boost::property_tree::ptree aSubmenu = fillPopupMenu(pPopupSubmenu);
-                if (aSubmenu.empty())
-                    continue;
-
-                aItemTree.put("type", "menu");
-                if (!aCommandURL.isEmpty())
-                    aItemTree.put("command", aCommandURL.toUtf8().getStr());
-                aItemTree.push_back(std::make_pair("menu", aSubmenu));
-            }
-            else
-            {
-                // no point in exposing choices that don't have the .uno:
-                // command
-                if (aCommandURL.isEmpty())
-                    continue;
-
-                aItemTree.put("type", "command");
-                aItemTree.put("command", aCommandURL.toUtf8().getStr());
-            }
-
-            aItemTree.put("enabled", pMenu->IsItemEnabled(nItemId));
-
-            MenuItemBits aItemBits = pMenu->GetItemBits(nItemId);
-            bool bHasChecks = true;
-            if (aItemBits & MenuItemBits::CHECKABLE)
-                aItemTree.put("checktype", "checkmark");
-            else if (aItemBits & MenuItemBits::RADIOCHECK)
-                aItemTree.put("checktype", "radio");
-            else if (aItemBits & MenuItemBits::AUTOCHECK)
-                aItemTree.put("checktype", "auto");
-            else
-                bHasChecks = false;
-
-            if (bHasChecks)
-                aItemTree.put("checked", pMenu->IsItemChecked(nItemId));
-        }
-
-        if (!aItemTree.empty())
-        {
-            aTree.push_back(std::make_pair("", aItemTree));
-            if (aItemType != MenuItemType::SEPARATOR)
-                bIsLastItemText = true;
-        }
-    }
-
-    return aTree;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

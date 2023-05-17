@@ -29,7 +29,6 @@ namespace dbp
     {
         std::unique_ptr<weld::TreeView> m_xTable;
         std::unique_ptr<weld::TreeView> m_xDatasource;
-        std::unique_ptr<weld::Label> m_xDatasourceLabel;
         std::unique_ptr<weld::Button> m_xSearchDatabase;
         std::unique_ptr<weld::Container> m_xSourceBox;
 
@@ -89,7 +88,6 @@ namespace dbp
 
     class ODBFieldPage : public OMaybeListSelectionPage
     {
-    protected:
         std::unique_ptr<weld::Label> m_xDescription;
         std::unique_ptr<weld::RadioButton> m_xStoreYes;
         std::unique_ptr<weld::RadioButton> m_xStoreNo;

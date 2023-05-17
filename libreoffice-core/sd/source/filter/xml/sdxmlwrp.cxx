@@ -26,6 +26,7 @@
 #include <com/sun/star/xml/sax/SAXParseException.hpp>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
+#include <o3tl/string_view.hxx>
 #include <editeng/outlobj.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/docfilt.hxx>
@@ -60,7 +61,6 @@
 #include <comphelper/genericpropertyset.hxx>
 #include <comphelper/propertysetinfo.hxx>
 #include <editeng/eeitem.hxx>
-#include <unotools/saveopt.hxx>
 
 // include necessary for XML progress bar at load time
 #include <svl/itemset.hxx>
@@ -75,7 +75,7 @@
 
 #include <sfx2/frame.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace com::sun::star;
 using namespace com::sun::star::uno;
@@ -342,7 +342,7 @@ ErrCode ReadThroughComponent(
     DBG_ASSERT( xInfoSet.is(), "missing property set" );
     if( xInfoSet.is() )
     {
-        xInfoSet->setPropertyValue( "StreamName", makeAny( sStreamName ) );
+        xInfoSet->setPropertyValue( "StreamName", Any( sStreamName ) );
     }
 
     try
@@ -458,7 +458,7 @@ bool SdXMLFilter::Import( ErrCode& nError )
     mxModel->lockControllers();
 
     /** property map for import info set */
-    PropertyMapEntry const aImportInfoMap[] =
+    static PropertyMapEntry const aImportInfoMap[] =
     {
         // necessary properties for XML progress bar at load time
         { OUString("ProgressRange"),   0, cppu::UnoType<sal_Int32>::get(),               css::beans::PropertyAttribute::MAYBEVOID, 0},
@@ -473,11 +473,10 @@ bool SdXMLFilter::Import( ErrCode& nError )
         { OUString("BuildId"),         0, cppu::UnoType<OUString>::get(),                css::beans::PropertyAttribute::MAYBEVOID, 0 },
         { OUString("OrganizerMode"),   0, cppu::UnoType<bool>::get(),                    css::beans::PropertyAttribute::MAYBEVOID, 0 },
         { OUString("SourceStorage"),   0, cppu::UnoType<embed::XStorage>::get(),         css::beans::PropertyAttribute::MAYBEVOID, 0 },
-        { OUString(), 0, css::uno::Type(), 0, 0 }
     };
 
     uno::Reference< beans::XPropertySet > xInfoSet( GenericPropertySet_CreateInstance( new PropertySetInfo( aImportInfoMap ) ) );
-    xInfoSet->setPropertyValue( "Preview" , uno::makeAny( mrDocShell.GetDoc()->IsStarDrawPreviewMode() ) );
+    xInfoSet->setPropertyValue( "Preview" , uno::Any( mrDocShell.GetDoc()->IsStarDrawPreviewMode() ) );
 
     // ---- get BuildId from parent container if available
 
@@ -508,8 +507,7 @@ bool SdXMLFilter::Import( ErrCode& nError )
         SfxItemSet* pSet = mrMedium.GetItemSet();
         if(pSet)
         {
-            const SfxUnoAnyItem* pItem = static_cast<const SfxUnoAnyItem*>(
-                pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL) );
+            const SfxUnoAnyItem* pItem = pSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL);
             if (pItem)
             {
                 pItem->GetValue() >>= mxStatusIndicator;
@@ -558,15 +556,15 @@ bool SdXMLFilter::Import( ErrCode& nError )
     OUString const baseURI(mrMedium.GetBaseURL());
     // needed for relative URLs, but in clipboard copy/paste there may be none
     SAL_INFO_IF(baseURI.isEmpty(), "sd.filter", "SdXMLFilter: no base URL");
-    xInfoSet->setPropertyValue("BaseURI", makeAny(baseURI));
+    xInfoSet->setPropertyValue("BaseURI", Any(baseURI));
 
     if( ERRCODE_NONE == nRet && SfxObjectCreateMode::EMBEDDED == mrDocShell.GetCreateMode() )
     {
         OUString aName;
         if ( mrMedium.GetItemSet() )
         {
-            const SfxStringItem* pDocHierarchItem = static_cast<const SfxStringItem*>(
-                mrMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME) );
+            const SfxStringItem* pDocHierarchItem =
+                mrMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME);
             if ( pDocHierarchItem )
                 aName = pDocHierarchItem->GetValue();
         }
@@ -578,7 +576,7 @@ bool SdXMLFilter::Import( ErrCode& nError )
     }
 
     if (SdXMLFilterMode::Organizer == meFilterMode)
-        xInfoSet->setPropertyValue("OrganizerMode", uno::makeAny(true));
+        xInfoSet->setPropertyValue("OrganizerMode", uno::Any(true));
 
     if( ERRCODE_NONE == nRet )
     {
@@ -697,11 +695,11 @@ bool SdXMLFilter::Import( ErrCode& nError )
                     sal_Int32 nIndex = sBuildId.indexOf('$');
                     if( nIndex != -1 )
                     {
-                        sal_Int32 nUPD = sBuildId.copy( 0, nIndex ).toInt32();
+                        sal_Int32 nUPD = o3tl::toInt32(sBuildId.subView( 0, nIndex ));
 
                         if( nUPD == 300 )
                         {
-                            sal_Int32 nBuildId = sBuildId.copy( nIndex+1 ).toInt32();
+                            sal_Int32 nBuildId = o3tl::toInt32(sBuildId.subView( nIndex+1 ));
                             if( (nBuildId > 0) && (nBuildId < 9316) )
                                 bTransform = true; // treat OOo 3.0 beta1 as OOo 2.x
                         }
@@ -768,7 +766,7 @@ bool SdXMLFilter::Export()
         uno::Reference< xml::sax::XWriter > xWriter = xml::sax::Writer::create( xContext );
 
         /** property map for export info set */
-        PropertyMapEntry const aExportInfoMap[] =
+        static PropertyMapEntry const aExportInfoMap[] =
         {
             { OUString("ProgressRange"),    0, cppu::UnoType<sal_Int32>::get(),   css::beans::PropertyAttribute::MAYBEVOID, 0},
             { OUString("ProgressMax"),      0, cppu::UnoType<sal_Int32>::get(),   css::beans::PropertyAttribute::MAYBEVOID, 0},
@@ -781,19 +779,18 @@ bool SdXMLFilter::Export()
             { OUString("StyleNames"),       0, cppu::UnoType<Sequence<OUString>>::get(),  css::beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("StyleFamilies"),    0, cppu::UnoType<Sequence<sal_Int32>>::get(), css::beans::PropertyAttribute::MAYBEVOID, 0 },
             { OUString("TargetStorage"),    0, cppu::UnoType<embed::XStorage>::get(),     css::beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 }
         };
 
         uno::Reference< beans::XPropertySet > xInfoSet( GenericPropertySet_CreateInstance( new PropertySetInfo( aExportInfoMap ) ) );
 
         bool bUsePrettyPrinting = officecfg::Office::Common::Save::Document::PrettyPrinting::get();
-        xInfoSet->setPropertyValue( "UsePrettyPrinting", makeAny( bUsePrettyPrinting ) );
+        xInfoSet->setPropertyValue( "UsePrettyPrinting", Any( bUsePrettyPrinting ) );
 
         const uno::Reference < embed::XStorage >& xStorage = mrMedium.GetOutputStorage();
 
         // Set base URI
         OUString sPropName( "BaseURI" );
-        xInfoSet->setPropertyValue( sPropName, makeAny( mrMedium.GetBaseURL( true ) ) );
+        xInfoSet->setPropertyValue( sPropName, Any( mrMedium.GetBaseURL( true ) ) );
 
         xInfoSet->setPropertyValue( "TargetStorage", Any( xStorage ) );
 
@@ -802,8 +799,8 @@ bool SdXMLFilter::Export()
             OUString aName;
             if ( mrMedium.GetItemSet() )
             {
-                const SfxStringItem* pDocHierarchItem = static_cast<const SfxStringItem*>(
-                    mrMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME) );
+                const SfxStringItem* pDocHierarchItem =
+                    mrMedium.GetItemSet()->GetItem(SID_DOC_HIERARCHICALNAME);
                 if ( pDocHierarchItem )
                     aName = pDocHierarchItem->GetValue();
             }
@@ -811,7 +808,7 @@ bool SdXMLFilter::Export()
             if( !aName.isEmpty() )
             {
                 sPropName = "StreamRelPath";
-                xInfoSet->setPropertyValue( sPropName, makeAny( aName ) );
+                xInfoSet->setPropertyValue( sPropName, Any( aName ) );
             }
         }
 
@@ -903,7 +900,7 @@ bool SdXMLFilter::Export()
 
                     // encrypt all streams
                     xProps->setPropertyValue( "UseCommonStoragePasswordEncryption",
-                                              uno::makeAny( true ) );
+                                              uno::Any( true ) );
 
                     xInfoSet->setPropertyValue( "StreamName", Any( sDocName ) );
                 }
@@ -1030,8 +1027,8 @@ extern "C" SAL_DLLPUBLIC_EXPORT bool TestImportPPTX(SvStream &rStream)
     uno::Reference<document::XImporter> xImporter(xFilter, uno::UNO_QUERY_THROW);
     uno::Sequence<beans::PropertyValue> aArgs(comphelper::InitPropertySequence(
     {
-        { "InputStream", uno::makeAny(xStream) },
-        { "InputMode", uno::makeAny(true) },
+        { "InputStream", uno::Any(xStream) },
+        { "InputMode", uno::Any(true) },
     }));
     xImporter->setTargetDocument(xModel);
 

@@ -43,9 +43,10 @@ namespace o3tl
 }
 
 // load language strings from resource
-SVXCORE_DLLPUBLIC OUString    GetDicInfoStr( const OUString& rName, const LanguageType nLang, bool bNeg );
+SVXCORE_DLLPUBLIC OUString    GetDicInfoStr( std::u16string_view rName, const LanguageType nLang, bool bNeg );
 
-class SVXCORE_DLLPUBLIC SvxLanguageBox
+class SVXCORE_DLLPUBLIC
+SvxLanguageBox
 {
 public:
     enum class EditedAndValid
@@ -83,7 +84,7 @@ public:
     void            InsertLanguage(const LanguageType nLangType);
 
     EditedAndValid      GetEditedAndValid() const { return m_eEditedAndValid;}
-    sal_Int32           SaveEditedAsEntry();
+    SvxLanguageBox*     SaveEditedAsEntry( SvxLanguageBox* ppBoxes[3] /* convention: Western, Asian, Complex */ );
 
     void connect_changed(const Link<weld::ComboBox&, void>& rLink) { m_aChangeHdl = rLink; }
     void connect_focus_in(const Link<weld::Widget&, void>& rLink) { m_xControl->connect_focus_in(rLink); }
@@ -93,6 +94,8 @@ public:
     bool get_active_id_changed_from_saved() const { return m_eSavedLanguage != get_active_id(); }
     void hide() { m_xControl->hide(); }
     void set_visible(bool bShow) { m_xControl->set_visible(bShow); }
+    void set_size_request(int nWidth, int nHeight) {  m_xControl->set_size_request(nWidth, nHeight); }
+    void set_width_chars(int nChars) { m_xControl->set_entry_width_chars(nChars); }
     void set_sensitive(bool bSensitive) { m_xControl->set_sensitive(bSensitive); }
     void set_active(int nPos) { m_xControl->set_active(nPos); }
     int get_active() const { return m_xControl->get_active(); }

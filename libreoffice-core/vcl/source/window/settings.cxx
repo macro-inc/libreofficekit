@@ -25,6 +25,8 @@
 #include <vcl/window.hxx>
 #include <vcl/settings.hxx>
 
+#include <officecfg/Office/Common.hxx>
+
 #include <unotools/configmgr.hxx>
 #include <unotools/confignode.hxx>
 
@@ -53,7 +55,7 @@ void WindowOutputDevice::SetSettings( const AllSettings& rSettings, bool bChild 
             static_cast<vcl::WindowOutputDevice*>(static_cast<ImplBorderWindow*>(pBorderWindow)->mpMenuBarWindow->GetOutDev())->SetSettings( rSettings, true );
     }
 
-    AllSettings aOldSettings(*mxSettings);
+    AllSettings aOldSettings(*moSettings);
     OutputDevice::SetSettings( rSettings );
     AllSettingsFlags nChangeFlags = aOldSettings.GetChangeFlags( rSettings );
 
@@ -83,13 +85,18 @@ void Window::UpdateSettings( const AllSettings& rSettings, bool bChild )
     if ( mpWindowImpl->mpBorderWindow )
     {
         mpWindowImpl->mpBorderWindow->UpdateSettings( rSettings );
-        if ( (mpWindowImpl->mpBorderWindow->GetType() == WindowType::BORDERWINDOW) &&
-             static_cast<ImplBorderWindow*>(mpWindowImpl->mpBorderWindow.get())->mpMenuBarWindow )
-            static_cast<ImplBorderWindow*>(mpWindowImpl->mpBorderWindow.get())->mpMenuBarWindow->UpdateSettings( rSettings, true );
+        if (mpWindowImpl->mpBorderWindow->GetType() == WindowType::BORDERWINDOW)
+        {
+            ImplBorderWindow* pImpl = static_cast<ImplBorderWindow*>(mpWindowImpl->mpBorderWindow.get());
+            if (pImpl->mpMenuBarWindow)
+                pImpl->mpMenuBarWindow->UpdateSettings(rSettings, true);
+            if (pImpl->mpNotebookBar)
+                pImpl->mpNotebookBar->UpdateSettings(rSettings, true);
+        }
     }
 
-    AllSettings aOldSettings(*mpWindowImpl->mxOutDev->mxSettings);
-    AllSettingsFlags nChangeFlags = mpWindowImpl->mxOutDev->mxSettings->Update( AllSettings::GetWindowUpdate(), rSettings );
+    AllSettings aOldSettings(*mpWindowImpl->mxOutDev->moSettings);
+    AllSettingsFlags nChangeFlags = mpWindowImpl->mxOutDev->moSettings->Update( AllSettings::GetWindowUpdate(), rSettings );
 
     // recalculate AppFont-resolution and DPI-resolution
     ImplInitResolutionSettings();
@@ -101,9 +108,9 @@ void Window::UpdateSettings( const AllSettings& rSettings, bool bChild )
     *  so we can spare all our users the hassle of reacting on
     *  this in their respective DataChanged.
     */
-    MouseSettings aSet( mpWindowImpl->mxOutDev->mxSettings->GetMouseSettings() );
+    MouseSettings aSet( mpWindowImpl->mxOutDev->moSettings->GetMouseSettings() );
     aSet.SetWheelBehavior( aOldSettings.GetMouseSettings().GetWheelBehavior() );
-    mpWindowImpl->mxOutDev->mxSettings->SetMouseSettings( aSet );
+    mpWindowImpl->mxOutDev->moSettings->SetMouseSettings( aSet );
 
     if( (nChangeFlags & AllSettingsFlags::STYLE) && IsBackground() )
     {
@@ -219,43 +226,21 @@ void Window::ImplUpdateGlobalSettings( AllSettings& rSettings, bool bCallHdl ) c
     aFont.SetFontHeight( defFontheight );
     aStyleSettings.SetGroupFont( aFont );
 
-    rSettings.SetStyleSettings( aStyleSettings );
-
-    bool bForceHCMode = false;
-
-    // auto detect HC mode; if the system already set it to "yes"
-    // (see above) then accept that
-    if (!rSettings.GetStyleSettings().GetHighContrastMode() && !utl::ConfigManager::IsFuzzing())
-    {
-        bool bAutoHCMode = true;
-        utl::OConfigurationNode aNode = utl::OConfigurationTreeRoot::tryCreateWithComponentContext(
-            comphelper::getProcessComponentContext(),
-            "org.openoffice.Office.Common/Accessibility" );    // note: case sensitive !
-        if ( aNode.isValid() )
-        {
-            css::uno::Any aValue = aNode.getNodeValue( "AutoDetectSystemHC" );
-            bool bTmp = false;
-            if( aValue >>= bTmp )
-                bAutoHCMode = bTmp;
-        }
-        if( bAutoHCMode )
-        {
-            if( rSettings.GetStyleSettings().GetFaceColor().IsDark() ||
-                rSettings.GetStyleSettings().GetWindowColor().IsDark() )
-                bForceHCMode = true;
-        }
-    }
-
     static const char* pEnvHC = getenv( "SAL_FORCE_HC" );
-    if( pEnvHC && *pEnvHC )
-        bForceHCMode = true;
-
-    if( bForceHCMode )
-    {
-        aStyleSettings = rSettings.GetStyleSettings();
+    const bool bForceHCMode = pEnvHC && *pEnvHC;
+    if (bForceHCMode)
         aStyleSettings.SetHighContrastMode( true );
-        rSettings.SetStyleSettings( aStyleSettings );
+    else
+    {
+        sal_Int32 nHighContrastMode = officecfg::Office::Common::Accessibility::HighContrast::get();
+        if (nHighContrastMode != 0) // 0 Automatic, 1 Disable, 2 Enable
+        {
+            const bool bEnable = nHighContrastMode == 2;
+            aStyleSettings.SetHighContrastMode(bEnable);
+        }
     }
+
+    rSettings.SetStyleSettings( aStyleSettings );
 
     if ( bCallHdl )
         GetpApp()->OverrideSystemSettings( rSettings );

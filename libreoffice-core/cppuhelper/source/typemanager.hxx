@@ -11,6 +11,8 @@
 
 #include <sal/config.h>
 
+#include <cstddef>
+
 #include <com/sun/star/container/XHierarchicalNameAccess.hpp>
 #include <com/sun/star/container/XSet.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
@@ -47,7 +49,7 @@ public:
     using TypeManager_Base::acquire;
     using TypeManager_Base::release;
 
-    void init(OUString const & rdbUris);
+    void init(std::u16string_view rdbUris);
 
     css::uno::Any find(OUString const & name);
 
@@ -90,9 +92,9 @@ private:
         css::uno::Sequence< css::uno::TypeClass > const & types,
         css::reflection::TypeDescriptionSearchDepth depth) override;
 
-    void readRdbDirectory(OUString const & uri, bool optional);
+    void readRdbDirectory(std::u16string_view uri, bool optional);
 
-    void readRdbFile(OUString const & uri, bool optional);
+    void readRdbFile(std::u16string_view uri, bool optional);
 
     css::uno::Any getSequenceType(OUString const & name);
 
@@ -100,7 +102,7 @@ private:
         OUString const & name, sal_Int32 separator);
 
     css::uno::Any getInterfaceMember(
-        OUString const & name, sal_Int32 separator);
+        std::u16string_view name, std::size_t separator);
 
     css::uno::Any getNamed(
         OUString const & name,
@@ -108,12 +110,12 @@ private:
 
     static css::uno::Any getEnumMember(
         rtl::Reference< unoidl::EnumTypeEntity > const & entity,
-        OUString const & member);
+        std::u16string_view member);
 
     static css::uno::Any getConstant(
-        OUString const & constantGroupName,
+        std::u16string_view constantGroupName,
         rtl::Reference< unoidl::ConstantGroupEntity > const & entity,
-        OUString const & member);
+        std::u16string_view member);
 
     rtl::Reference< unoidl::Entity > findEntity(OUString const & name);
 

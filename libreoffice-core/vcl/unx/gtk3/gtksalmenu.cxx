@@ -14,9 +14,10 @@
 #include <unx/gtk/gloactiongroup.h>
 #include <vcl/toolkit/floatwin.hxx>
 #include <vcl/menu.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/pdfwriter.hxx> // for escapeStringXML
 
+#include <o3tl/string_view.hxx>
 #include <sal/log.hxx>
 #include <tools/stream.hxx>
 #include <window.h>
@@ -30,7 +31,7 @@ static bool bUnityMode = false;
 static gchar* GetCommandForItem(GtkSalMenu* pParentMenu, sal_uInt16 nItemId)
 {
     OString aCommand = "window-" +
-        OString::number(reinterpret_cast<unsigned long>(pParentMenu)) +
+        OString::number(reinterpret_cast<sal_uIntPtr>(pParentMenu)) +
         "-" + OString::number(nItemId);
     return g_strdup(aCommand.getStr());
 }
@@ -73,19 +74,19 @@ namespace
 {
     MenuAndId decode_command(const gchar *action_name)
     {
-        OString sCommand(action_name);
+        std::string_view sCommand(action_name);
 
         sal_Int32 nIndex = 0;
-        OString sWindow = sCommand.getToken(0, '-', nIndex);
-        OString sGtkSalMenu = sCommand.getToken(0, '-', nIndex);
-        OString sItemId = sCommand.getToken(0, '-', nIndex);
+        std::string_view sWindow = o3tl::getToken(sCommand, 0, '-', nIndex);
+        std::string_view sGtkSalMenu = o3tl::getToken(sCommand, 0, '-', nIndex);
+        std::string_view sItemId = o3tl::getToken(sCommand, 0, '-', nIndex);
 
-        GtkSalMenu* pSalSubMenu = reinterpret_cast<GtkSalMenu*>(sGtkSalMenu.toInt64());
+        GtkSalMenu* pSalSubMenu = reinterpret_cast<GtkSalMenu*>(o3tl::toInt64(sGtkSalMenu));
 
         assert(sWindow == "window" && pSalSubMenu);
         (void) sWindow;
 
-        return MenuAndId(pSalSubMenu, sItemId.toInt32());
+        return MenuAndId(pSalSubMenu, o3tl::toInt32(sItemId));
     }
 }
 
@@ -467,7 +468,7 @@ bool GtkSalMenu::ShowNativePopupMenu(FloatingWindow* pWin, const tools::Rectangl
 
 #if GTK_CHECK_VERSION(4, 0, 0)
     tools::Rectangle aFloatRect = FloatingWindow::ImplConvertToAbsPos(xParent, rRect);
-    aFloatRect.Move(-mpFrame->maGeometry.nX, -mpFrame->maGeometry.nY);
+    aFloatRect.Move(-mpFrame->maGeometry.x(), -mpFrame->maGeometry.y());
     GdkRectangle rect {static_cast<int>(aFloatRect.Left()), static_cast<int>(aFloatRect.Top()),
                        static_cast<int>(aFloatRect.GetWidth()), static_cast<int>(aFloatRect.GetHeight())};
 
@@ -488,7 +489,7 @@ bool GtkSalMenu::ShowNativePopupMenu(FloatingWindow* pWin, const tools::Rectangl
     if (gtk_check_version(3, 22, 0) == nullptr)
     {
         tools::Rectangle aFloatRect = FloatingWindow::ImplConvertToAbsPos(xParent, rRect);
-        aFloatRect.Move(-mpFrame->maGeometry.nX, -mpFrame->maGeometry.nY);
+        aFloatRect.Move(-mpFrame->maGeometry.x(), -mpFrame->maGeometry.y());
         GdkRectangle rect {static_cast<int>(aFloatRect.Left()), static_cast<int>(aFloatRect.Top()),
                            static_cast<int>(aFloatRect.GetWidth()), static_cast<int>(aFloatRect.GetHeight())};
 
@@ -812,8 +813,9 @@ bool GtkSalMenu::AddMenuBarButton(const SalMenuButtonItem& rNewItem)
     if (!!rNewItem.maImage)
     {
         SvMemoryStream* pMemStm = new SvMemoryStream;
-        vcl::PNGWriter aWriter(rNewItem.maImage.GetBitmapEx());
-        aWriter.Write(*pMemStm);
+        auto aBitmapEx = rNewItem.maImage.GetBitmapEx();
+        vcl::PngImageWriter aWriter(*pMemStm);
+        aWriter.write(aBitmapEx);
 
         GBytes *pBytes = g_bytes_new_with_free_func(pMemStm->GetData(),
                                                     pMemStm->TellEnd(),
@@ -1070,11 +1072,11 @@ void GtkSalMenu::ApplyPersona()
     {
         if (maPersonaBitmap != rPersonaBitmap)
         {
-            vcl::PNGWriter aPNGWriter(rPersonaBitmap);
-            mxPersonaImage.reset(new utl::TempFile);
+            mxPersonaImage.reset(new utl::TempFileNamed);
             mxPersonaImage->EnableKillingFile(true);
             SvStream* pStream = mxPersonaImage->GetStream(StreamMode::WRITE);
-            aPNGWriter.Write(*pStream);
+            vcl::PngImageWriter aPNGWriter(*pStream);
+            aPNGWriter.write(rPersonaBitmap);
             mxPersonaImage->CloseStream();
         }
 
@@ -1259,8 +1261,9 @@ void GtkSalMenu::NativeSetItemIcon( unsigned nSection, unsigned nItemPos, const 
     if (!!rImage)
     {
         SvMemoryStream* pMemStm = new SvMemoryStream;
-        vcl::PNGWriter aWriter(rImage.GetBitmapEx());
-        aWriter.Write(*pMemStm);
+        auto aBitmapEx = rImage.GetBitmapEx();
+        vcl::PngImageWriter aWriter(*pMemStm);
+        aWriter.write(aBitmapEx);
 
         GBytes *pBytes = g_bytes_new_with_free_func(pMemStm->GetData(),
                                                     pMemStm->TellEnd(),

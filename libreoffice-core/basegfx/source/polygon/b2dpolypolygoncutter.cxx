@@ -28,6 +28,7 @@
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/curve/b2dcubicbezier.hxx>
 #include <sal/log.hxx>
+#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -513,8 +514,8 @@ namespace basegfx
                 impSolve();
             }
 
-            explicit solver(const B2DPolyPolygon& rOriginal)
-            :   maOriginal(rOriginal),
+            explicit solver(B2DPolyPolygon aOriginal, size_t* pPointLimit = nullptr)
+            :   maOriginal(std::move(aOriginal)),
                 mbIsCurve(false),
                 mbChanged(false)
             {
@@ -523,7 +524,7 @@ namespace basegfx
                 if(!nOriginalCount)
                     return;
 
-                B2DPolyPolygon aGeometry(utils::addPointsAtCutsAndTouches(maOriginal));
+                B2DPolyPolygon aGeometry(utils::addPointsAtCutsAndTouches(maOriginal, pPointLimit));
                 aGeometry.removeDoublePoints();
                 aGeometry = utils::simplifyCurveSegments(aGeometry);
                 mbIsCurve = aGeometry.areControlPointsUsed();
@@ -684,11 +685,11 @@ namespace basegfx
 namespace basegfx::utils
 {
 
-        B2DPolyPolygon solveCrossovers(const B2DPolyPolygon& rCandidate)
+        B2DPolyPolygon solveCrossovers(const B2DPolyPolygon& rCandidate, size_t* pPointLimit)
         {
             if(rCandidate.count() > 0)
             {
-                solver aSolver(rCandidate);
+                solver aSolver(rCandidate, pPointLimit);
                 return aSolver.getB2DPolyPolygon();
             }
             else

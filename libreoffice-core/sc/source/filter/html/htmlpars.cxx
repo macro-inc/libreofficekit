@@ -24,7 +24,6 @@
 
 #include <scitems.hxx>
 
-#include <svtools/htmlcfg.hxx>
 #include <editeng/colritem.hxx>
 #include <editeng/brushitem.hxx>
 #include <editeng/editeng.hxx>
@@ -36,9 +35,11 @@
 #include <editeng/borderline.hxx>
 #include <editeng/boxitem.hxx>
 #include <editeng/justifyitem.hxx>
+#include <sal/log.hxx>
 #include <sfx2/objsh.hxx>
 #include <svl/numformat.hxx>
 #include <svl/intitem.hxx>
+#include <utility>
 #include <vcl/graphicfilter.hxx>
 #include <svtools/parhtml.hxx>
 #include <svtools/htmlkywd.hxx>
@@ -48,6 +49,7 @@
 #include <vcl/svapp.hxx>
 #include <tools/urlobj.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <rtl/tencinfo.h>
 
@@ -63,7 +65,6 @@
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <numeric>
-#include <utility>
 #include <officecfg/Office/Common.hxx>
 
 using ::editeng::SvxBorderLine;
@@ -202,11 +203,11 @@ ScHTMLParser::~ScHTMLParser()
 }
 
 ScHTMLLayoutParser::ScHTMLLayoutParser(
-    EditEngine* pEditP, const OUString& rBaseURL, const Size& aPageSizeP,
+    EditEngine* pEditP, OUString _aBaseURL, const Size& aPageSizeP,
     ScDocument* pDocP ) :
         ScHTMLParser( pEditP, pDocP ),
         aPageSize( aPageSizeP ),
-        aBaseURL( rBaseURL ),
+        aBaseURL(std::move( _aBaseURL )),
         xLockedList( new ScRangeList ),
         pLocalColOffset( new ScHTMLColOffset ),
         nFirstTableCell(0),
@@ -1318,10 +1319,10 @@ void ScHTMLLayoutParser::Image( HtmlImportInfo* pInfo )
     }
 
     sal_uInt16 nFormat;
-    std::unique_ptr<Graphic> pGraphic(new Graphic);
+    std::optional<Graphic> oGraphic(std::in_place);
     GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
     if ( ERRCODE_NONE != GraphicFilter::LoadGraphic( pImage->aURL, pImage->aFilterName,
-            *pGraphic, &rFilter, &nFormat ) )
+            *oGraphic, &rFilter, &nFormat ) )
     {
         return ; // Bad luck
     }
@@ -1331,12 +1332,12 @@ void ScHTMLLayoutParser::Image( HtmlImportInfo* pInfo )
         mxActEntry->aAltText.clear();
     }
     pImage->aFilterName = rFilter.GetImportFormatName( nFormat );
-    pImage->pGraphic = std::move( pGraphic );
+    pImage->oGraphic = std::move( oGraphic );
     if ( !(pImage->aSize.Width() && pImage->aSize.Height()) )
     {
         OutputDevice* pDefaultDev = Application::GetDefaultDevice();
-        pImage->aSize = pDefaultDev->LogicToPixel( pImage->pGraphic->GetPrefSize(),
-            pImage->pGraphic->GetPrefMapMode() );
+        pImage->aSize = pDefaultDev->LogicToPixel( pImage->oGraphic->GetPrefSize(),
+            pImage->oGraphic->GetPrefMapMode() );
     }
     if (mxActEntry->maImageList.empty())
         return;
@@ -1427,7 +1428,7 @@ void ScHTMLLayoutParser::FontOn( HtmlImportInfo* pInfo )
                 {
                     // Font list, VCL uses the semicolon as separator
                     // HTML uses the comma
-                    OUString aFName = rFace.getToken( 0, ',', nPos );
+                    std::u16string_view aFName = o3tl::getToken(rFace, 0, ',', nPos );
                     aFName = comphelper::string::strip(aFName, ' ');
                     if( !aFontName.isEmpty() )
                         aFontName.append(";");
@@ -2933,7 +2934,7 @@ void ScHTMLQueryParser::FontOn( const HtmlImportInfo& rInfo )
                 while( nPos != -1 )
                 {
                     // font list separator: VCL = ';' HTML = ','
-                    OUString aFName = comphelper::string::strip(rFace.getToken(0, ',', nPos), ' ');
+                    std::u16string_view aFName = comphelper::string::strip(o3tl::getToken(rFace, 0, ',', nPos), ' ');
                     aFontName = ScGlobal::addToken(aFontName, aFName, ';');
                 }
                 if ( !aFontName.isEmpty() )

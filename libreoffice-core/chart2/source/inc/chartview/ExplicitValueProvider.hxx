@@ -18,14 +18,12 @@
  */
 #pragma once
 
-#include <com/sun/star/awt/Rectangle.hpp>
 #include <chartview/chartviewdllapi.hxx>
+#include <rtl/ref.hxx>
+#include <rtl/ustring.hxx>
 
 #include <memory>
 
-namespace chart { class ChartModel; }
-namespace chart { struct ExplicitIncrementData; }
-namespace chart { struct ExplicitScaleData; }
 namespace com::sun::star::beans { class XPropertySet; }
 namespace com::sun::star::chart2 { class XAxis; }
 namespace com::sun::star::chart2 { class XChartDocument; }
@@ -37,11 +35,18 @@ namespace com::sun::star::uno { class XInterface; }
 namespace com::sun::star::uno { template <typename > class Reference; }
 namespace com::sun::star::uno { template <typename > class Sequence; }
 namespace com::sun::star::util { class XNumberFormatsSupplier; }
+namespace com::sun::star::awt { struct Rectangle; }
+class SvxShape;
 
 namespace chart
 {
 
+class BaseCoordinateSystem;
 class DrawModelWrapper;
+class ChartModel;
+struct ExplicitIncrementData;
+struct ExplicitScaleData;
+
 class OOO_DLLPUBLIC_CHARTVIEW ExplicitValueProvider
 {
 public:
@@ -62,7 +67,7 @@ public:
 
     virtual css::awt::Rectangle getDiagramRectangleExcludingAxes()=0;
 
-    virtual css::uno::Reference< css::drawing::XShape >
+    virtual rtl::Reference< SvxShape >
         getShapeForCID( const OUString& rObjectCID )=0;
 
     virtual std::shared_ptr< DrawModelWrapper > getDrawModelWrapper() = 0;
@@ -72,13 +77,13 @@ public:
     static css::awt::Rectangle
         AddSubtractAxisTitleSizes(
                 ChartModel& rModel
-            , const css::uno::Reference< css::uno::XInterface >& xChartView
+            , ExplicitValueProvider* pChartView
             , const css::awt::Rectangle& rPositionAndSize, bool bSubtract );
 
     static sal_Int32 getExplicitNumberFormatKeyForAxis(
               const css::uno::Reference< css::chart2::XAxis >& xAxis
-            , const css::uno::Reference< css::chart2::XCoordinateSystem > & xCorrespondingCoordinateSystem
-            , const css::uno::Reference< css::chart2::XChartDocument>& xChartDoc);
+            , const rtl::Reference< ::chart::BaseCoordinateSystem > & xCorrespondingCoordinateSystem
+            , const rtl::Reference<::chart::ChartModel>& xChartDoc);
 
     static sal_Int32 getExplicitNumberFormatKeyForDataLabel(
             const css::uno::Reference< css::beans::XPropertySet >& xSeriesOrPointProp );
@@ -88,7 +93,7 @@ public:
             , const css::uno::Reference< css::util::XNumberFormatsSupplier >& xNumberFormatsSupplier );
 
 protected:
-    ~ExplicitValueProvider() {}
+    ~ExplicitValueProvider() = default;
 };
 
 } //namespace chart

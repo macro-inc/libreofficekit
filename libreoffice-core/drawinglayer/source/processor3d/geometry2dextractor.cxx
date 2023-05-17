@@ -23,11 +23,12 @@
 #include <drawinglayer/primitive3d/modifiedcolorprimitive3d.hxx>
 #include <drawinglayer/primitive3d/polygonprimitive3d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive3d/polypolygonprimitive3d.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <primitive3d/textureprimitive3d.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -89,7 +90,7 @@ namespace drawinglayer::processor3d
                     {
                         a2DHairline.transform(getObjectTransformation());
                         const basegfx::BColor aModifiedColor(maBColorModifierStack.getModifiedColor(rPrimitive.getBColor()));
-                        const primitive2d::Primitive2DReference xRef(new primitive2d::PolygonHairlinePrimitive2D(a2DHairline, aModifiedColor));
+                        const primitive2d::Primitive2DReference xRef(new primitive2d::PolygonHairlinePrimitive2D(std::move(a2DHairline), aModifiedColor));
                         maPrimitive2DSequence.push_back(xRef);
                     }
                     break;
@@ -104,7 +105,7 @@ namespace drawinglayer::processor3d
                     {
                         a2DFill.transform(getObjectTransformation());
                         const basegfx::BColor aModifiedColor(maBColorModifierStack.getModifiedColor(rPrimitive.getMaterial().getColor()));
-                        const primitive2d::Primitive2DReference xRef(new primitive2d::PolyPolygonColorPrimitive2D(a2DFill, aModifiedColor));
+                        const primitive2d::Primitive2DReference xRef(new primitive2d::PolyPolygonColorPrimitive2D(std::move(a2DFill), aModifiedColor));
                         maPrimitive2DSequence.push_back(xRef);
                     }
                     break;
@@ -141,9 +142,9 @@ namespace drawinglayer::processor3d
 
         Geometry2DExtractingProcessor::Geometry2DExtractingProcessor(
             const geometry::ViewInformation3D& rViewInformation,
-            const basegfx::B2DHomMatrix& rObjectTransformation)
+            basegfx::B2DHomMatrix aObjectTransformation)
         :   BaseProcessor3D(rViewInformation),
-            maObjectTransformation(rObjectTransformation),
+            maObjectTransformation(std::move(aObjectTransformation)),
             maBColorModifierStack()
         {
         }

@@ -126,7 +126,7 @@ class Calendar final : public Control
     tools::Rectangle       maPrevRect;
     tools::Rectangle       maNextRect;
     OUString        maDayOfWeekText;
-    sal_Int32       mnDayOfWeekAry[7];
+    sal_Int32       mnDayOfWeekAry[8];
     Date            maOldFormatFirstDate;
     Date            maOldFormatLastDate;
     Date            maFirstDate;
@@ -176,8 +176,7 @@ class Calendar final : public Control
     void         ImplUpdateSelection( IntDateSet* pOld );
     void         ImplMouseSelect( const Date& rDate, sal_uInt16 nHitTest );
     void         ImplUpdate( bool bCalcNew = false );
-    using Window::ImplScroll;
-    void         ImplScroll( bool bPrev );
+    void         ImplScrollCalendar( bool bPrev );
     void         ImplShowMenu( const Point& rPos, const Date& rDate );
     void         ImplTracking( const Point& rPos, bool bRepeat );
     void         ImplEndTracking( bool bCancel );

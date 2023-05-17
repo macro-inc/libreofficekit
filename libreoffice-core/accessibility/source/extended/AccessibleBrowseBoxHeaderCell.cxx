@@ -43,44 +43,40 @@ AccessibleBrowseBoxHeaderCell::AccessibleBrowseBoxHeaderCell(sal_Int32 _nColumnR
 , m_nColumnRowId(_nColumnRowId)
 {
 }
-/** Creates a new AccessibleStateSetHelper and fills it with states of the
-    current object.
-    @return
-        A filled AccessibleStateSetHelper.
+/** Return a bitset of states of the current object.
 */
-rtl::Reference<::utl::AccessibleStateSetHelper> AccessibleBrowseBoxHeaderCell::implCreateStateSetHelper()
+sal_Int64 AccessibleBrowseBoxHeaderCell::implCreateStateSet()
 {
     SolarMethodGuard aGuard( getMutex() );
 
-    rtl::Reference<::utl::AccessibleStateSetHelper>
-        pStateSetHelper = new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if( isAlive() )
     {
         // SHOWING done with mxParent
         if( implIsShowing() )
-            pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::SHOWING;
 
-        mpBrowseBox->FillAccessibleStateSet( *pStateSetHelper, getType() );
-        pStateSetHelper->AddState( AccessibleStateType::VISIBLE );
-        pStateSetHelper->AddState( AccessibleStateType::FOCUSABLE );
-        pStateSetHelper->AddState( AccessibleStateType::TRANSIENT );
-        pStateSetHelper->AddState( AccessibleStateType::SELECTABLE );
+        mpBrowseBox->FillAccessibleStateSet( nStateSet, getType() );
+        nStateSet |= AccessibleStateType::VISIBLE;
+        nStateSet |= AccessibleStateType::FOCUSABLE;
+        nStateSet |= AccessibleStateType::TRANSIENT;
+        nStateSet |= AccessibleStateType::SELECTABLE;
 
         bool bSelected = isRowBarCell() ? mpBrowseBox->IsRowSelected(m_nColumnRowId) : mpBrowseBox->IsColumnSelected(m_nColumnRowId);
         if ( bSelected )
-            pStateSetHelper->AddState( AccessibleStateType::SELECTED );
+            nStateSet |= AccessibleStateType::SELECTED;
     }
     else
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 /** @return
         The count of visible children.
 */
-sal_Int32 SAL_CALL AccessibleBrowseBoxHeaderCell::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleBrowseBoxHeaderCell::getAccessibleChildCount()
 {
     return 0;
 }
@@ -89,7 +85,7 @@ sal_Int32 SAL_CALL AccessibleBrowseBoxHeaderCell::getAccessibleChildCount()
 /** @return
         The XAccessible interface of the specified child.
 */
-Reference<XAccessible > SAL_CALL AccessibleBrowseBoxHeaderCell::getAccessibleChild( sal_Int32 )
+Reference<XAccessible > SAL_CALL AccessibleBrowseBoxHeaderCell::getAccessibleChild( sal_Int64 )
 {
     throw IndexOutOfBoundsException();
 }
@@ -143,11 +139,11 @@ tools::Rectangle AccessibleBrowseBoxHeaderCell::implGetBoundingBoxOnScreen()
     return getRectangle(mpBrowseBox,m_nColumnRowId,true,isRowBarCell());
 }
 
-sal_Int32 SAL_CALL AccessibleBrowseBoxHeaderCell::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleBrowseBoxHeaderCell::getAccessibleIndexInParent()
 {
     ::osl::MutexGuard aGuard( getMutex() );
     ensureIsAlive();
-    sal_Int32 nIndex = m_nColumnRowId;
+    sal_Int64 nIndex = m_nColumnRowId;
     if ( mpBrowseBox->HasRowHeader() )
         --nIndex;
     return nIndex;

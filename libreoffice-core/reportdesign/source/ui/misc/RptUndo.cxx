@@ -33,10 +33,9 @@
 #include <comphelper/types.hxx>
 #include <svx/unoshape.hxx>
 #include <utility>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <functional>
-#include <string_view>
 
 namespace rptui
 {
@@ -132,13 +131,6 @@ OSectionUndo::~OSectionUndo()
     for (uno::Reference<drawing::XShape>& xShape : m_aControls)
     {
         rEnv.RemoveElement(xShape);
-
-#if OSL_DEBUG_LEVEL > 0
-        SvxShape* pShape = comphelper::getFromUnoTunnel<SvxShape>( xShape );
-        SdrObject* pObject = pShape ? pShape->GetSdrObject() : nullptr;
-        OSL_ENSURE( pShape && pShape->HasSdrObjectOwnership() && pObject && !pObject->IsInserted(),
-            "OSectionUndo::~OSectionUndo: inconsistency in the shape/object ownership!" );
-#endif
         try
         {
             comphelper::disposeComponent(xShape);
@@ -284,7 +276,7 @@ OUString OGroupSectionUndo::GetComment() const
 
 void OGroupSectionUndo::implReInsert( )
 {
-    const OUString aHeaderFooterOnName(SID_GROUPHEADER_WITHOUT_UNDO == m_nSlot? std::u16string_view(u"" PROPERTY_HEADERON) : std::u16string_view(u"" PROPERTY_FOOTERON));
+    const OUString aHeaderFooterOnName(SID_GROUPHEADER_WITHOUT_UNDO == m_nSlot? OUString(PROPERTY_HEADERON) : OUString(PROPERTY_FOOTERON));
     uno::Sequence< beans::PropertyValue > aArgs{
         comphelper::makePropertyValue(aHeaderFooterOnName, true),
         comphelper::makePropertyValue(PROPERTY_GROUP, m_aGroupHelper.getGroup())
@@ -302,7 +294,7 @@ void OGroupSectionUndo::implReRemove( )
     if( m_eAction == Removed )
         collectControls(m_pMemberFunction(&m_aGroupHelper));
 
-    const OUString aHeaderFooterOnName(SID_GROUPHEADER_WITHOUT_UNDO == m_nSlot? std::u16string_view(u"" PROPERTY_HEADERON) : std::u16string_view(u"" PROPERTY_FOOTERON));
+    const OUString aHeaderFooterOnName(SID_GROUPHEADER_WITHOUT_UNDO == m_nSlot? OUString(PROPERTY_HEADERON) : OUString(PROPERTY_FOOTERON));
     uno::Sequence< beans::PropertyValue > aArgs{
         comphelper::makePropertyValue(aHeaderFooterOnName, false),
         comphelper::makePropertyValue(PROPERTY_GROUP, m_aGroupHelper.getGroup())
@@ -316,11 +308,11 @@ void OGroupSectionUndo::implReRemove( )
 OGroupUndo::OGroupUndo(OReportModel& _rMod
                        ,TranslateId pCommentID
                        ,Action  _eAction
-                       ,const uno::Reference< report::XGroup>& _xGroup
-                       ,const uno::Reference< report::XReportDefinition >& _xReportDefinition)
+                       ,uno::Reference< report::XGroup> _xGroup
+                       ,uno::Reference< report::XReportDefinition > _xReportDefinition)
 : OCommentUndoAction(_rMod,pCommentID)
-,m_xGroup(_xGroup)
-,m_xReportDefinition(_xReportDefinition)
+,m_xGroup(std::move(_xGroup))
+,m_xReportDefinition(std::move(_xReportDefinition))
 ,m_eAction(_eAction)
 {
     m_nLastPosition = getPositionInIndexAccess(m_xReportDefinition->getGroups(),m_xGroup);
@@ -330,7 +322,7 @@ void OGroupUndo::implReInsert( )
 {
     try
     {
-        m_xReportDefinition->getGroups()->insertByIndex(m_nLastPosition,uno::makeAny(m_xGroup));
+        m_xReportDefinition->getGroups()->insertByIndex(m_nLastPosition,uno::Any(m_xGroup));
     }
     catch(uno::Exception&)
     {

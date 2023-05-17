@@ -967,6 +967,9 @@ OUString SalDisplay::GetKeyName( sal_uInt16 nKeyCode ) const
         case KEY_RIGHTCURLYBRACKET:
             aCustomKeyName = "}";
             break;
+        case KEY_COLON:
+            aCustomKeyName = ":";
+            break;
         default:
             nKeySym = 0;
             break;
@@ -1316,6 +1319,10 @@ sal_uInt16 SalDisplay::GetKeyCode( KeySym keysym, char*pcPrintable ) const
         case XK_braceright:
             nKey = KEY_RIGHTCURLYBRACKET;
             *pcPrintable = '\'';
+            break;
+        case XK_colon:
+            nKey = KEY_COLON;
+            *pcPrintable = ':';
             break;
         // - - - - - - - - - - - - -  Apollo - - - - - - - - - - - - - 0x1000
         case 0x1000FF02: // apXK_Copy
@@ -1897,7 +1904,7 @@ void SalX11Display::Yield()
         return;
 
     XEvent aEvent;
-    DBG_ASSERT( GetSalData()->m_pInstance->GetYieldMutex()->IsCurrentThread(),
+    DBG_ASSERT(GetSalInstance()->GetYieldMutex()->IsCurrentThread(),
                 "will crash soon since solar mutex not locked in SalDisplay::Yield" );
 
     XNextEvent( pDisp_, &aEvent );
@@ -1941,7 +1948,7 @@ void SalX11Display::Dispatch( XEvent *pEvent )
             return;
     }
 
-    SalInstance* pInstance = GetSalData()->m_pInstance;
+    SalInstance* pInstance = GetSalInstance();
     pInstance->CallEventCallback( pEvent, sizeof( XEvent ) );
 
     switch( pEvent->type )

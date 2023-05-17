@@ -17,11 +17,15 @@
 #include <vector>
 #include <map>
 
+namespace model {
+enum class RectangleAlignment;
+}
+
 namespace oox::drawingml {
 
 struct EffectGlowProperties
 {
-    OptValue< sal_Int64 > moGlowRad; // size of glow effect
+    std::optional< sal_Int64 > moGlowRad; // size of glow effect
     Color moGlowColor;
     // TODO saturation and luminance missing
 
@@ -30,19 +34,20 @@ struct EffectGlowProperties
 
 struct EffectSoftEdgeProperties
 {
-    OptValue<sal_Int64> moRad; // size of effect
+    std::optional<sal_Int64> moRad; // size of effect
 
     void assignUsed(const EffectSoftEdgeProperties& rSourceProps);
 };
 
 struct EffectShadowProperties
 {
-    OptValue< sal_Int64 > moShadowDist;
-    OptValue< sal_Int64 > moShadowDir;
-    OptValue< sal_Int64 > moShadowSx;
-    OptValue< sal_Int64 > moShadowSy;
+    std::optional< sal_Int64 > moShadowDist;
+    std::optional< sal_Int64 > moShadowDir;
+    std::optional< sal_Int64 > moShadowSx;
+    std::optional< sal_Int64 > moShadowSy;
     Color moShadowColor;
-    OptValue< sal_Int64 > moShadowBlur; // size of blur effect
+    std::optional< sal_Int64 > moShadowBlur; // size of blur effect
+    std::optional< model::RectangleAlignment > moShadowAlignment;
 
     /** Overwrites all members that are explicitly set in rSourceProps. */
     void                assignUsed( const EffectShadowProperties& rSourceProps );

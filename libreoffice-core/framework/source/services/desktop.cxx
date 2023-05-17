@@ -51,11 +51,12 @@
 #include <comphelper/sequence.hxx>
 #include <comphelper/lok.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <desktop/crashreport.hxx>
 #include <vcl/scheduler.hxx>
 #include <sal/log.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/threadex.hxx>
 #include <unotools/configmgr.hxx>
 
@@ -139,14 +140,14 @@ void Desktop::constructorInit()
                 The value must be different from NULL!
     @onerror    We throw an ASSERT in debug version or do nothing in release version.
 *//*-*************************************************************************************************************/
-Desktop::Desktop( const css::uno::Reference< css::uno::XComponentContext >& xContext )
+Desktop::Desktop( css::uno::Reference< css::uno::XComponentContext >  xContext )
         :   Desktop_BASE            ( m_aMutex )
         ,   cppu::OPropertySetHelper( cppu::WeakComponentImplHelperBase::rBHelper   )
         // Init member
     , m_bIsTerminated(false)
     , m_bIsShutdown(false)   // see dispose() for further information!
         ,   m_bSession              ( false                                         )
-        ,   m_xContext              ( xContext                                      )
+        ,   m_xContext              (std::move( xContext                                      ))
         ,   m_aListenerContainer    ( m_aMutex )
         ,   m_eLoadState            ( E_NOTSET                                      )
         ,   m_bSuspendQuickstartVeto( false                                     )
@@ -341,9 +342,9 @@ namespace
         Desktop* const m_pDesktop;
         css::uno::Reference< css::frame::XTerminateListener > m_xQuickLauncher;
         public:
-            QuickstartSuppressor(Desktop* const pDesktop, css::uno::Reference< css::frame::XTerminateListener > const & xQuickLauncher)
+            QuickstartSuppressor(Desktop* const pDesktop, css::uno::Reference< css::frame::XTerminateListener >  xQuickLauncher)
                 : m_pDesktop(pDesktop)
-                , m_xQuickLauncher(xQuickLauncher)
+                , m_xQuickLauncher(std::move(xQuickLauncher))
             {
                 SAL_INFO("fwk.desktop", "temporary removing Quickstarter");
                 if(m_xQuickLauncher.is())
@@ -1335,21 +1336,21 @@ sal_Bool SAL_CALL Desktop::convertFastPropertyValue(       css::uno::Any&   aCon
     {
         case PropHandle::SuspendQuickstartVeto:
                 bReturn = PropHelper::willPropertyBeChanged(
-                    css::uno::makeAny(m_bSuspendQuickstartVeto),
+                    css::uno::Any(m_bSuspendQuickstartVeto),
                     aValue,
                     aOldValue,
                     aConvertedValue);
                 break;
         case PropHandle::DispatchRecorderSupplier :
                 bReturn = PropHelper::willPropertyBeChanged(
-                    css::uno::makeAny(m_xDispatchRecorderSupplier),
+                    css::uno::Any(m_xDispatchRecorderSupplier),
                     aValue,
                     aOldValue,
                     aConvertedValue);
                 break;
         case PropHandle::Title :
                 bReturn = PropHelper::willPropertyBeChanged(
-                    css::uno::makeAny(m_sTitle),
+                    css::uno::Any(m_sTitle),
                     aValue,
                     aOldValue,
                     aConvertedValue);

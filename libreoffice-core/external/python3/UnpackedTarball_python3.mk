@@ -15,9 +15,6 @@ $(eval $(call gb_UnpackedTarball_fix_end_of_line,python3,\
 	PCbuild/pcbuild.sln \
 ))
 
-# For the configure part of external/python3/darwin.patch.0, see
-# <https://bugs.python.org/issue44065> "'configure: error: internal configure error for the platform
-# triplet' on macOS with Clang supporting --print-multiarch:"
 $(eval $(call gb_UnpackedTarball_add_patches,python3,\
 	external/python3/i100492-freebsd.patch.1 \
 	external/python3/python-3.3.0-darwin.patch.1 \
@@ -28,6 +25,7 @@ $(eval $(call gb_UnpackedTarball_add_patches,python3,\
 	external/python3/python-3.5.tweak.strip.soabi.patch \
 	external/python3/darwin.patch.0 \
 	external/python3/macos-11.patch.0 \
+	external/python3/tsan.patch.0 \
 ))
 
 ifneq ($(filter DRAGONFLY FREEBSD LINUX NETBSD OPENBSD SOLARIS,$(OS)),)

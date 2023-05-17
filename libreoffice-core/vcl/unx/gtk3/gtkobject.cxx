@@ -34,8 +34,6 @@ GtkSalObjectBase::GtkSalObjectBase(GtkSalFrame* pParent)
     , m_pParent(pParent)
     , m_pRegion(nullptr)
 {
-    if (!m_pParent)
-        return;
 }
 
 GtkSalObject::GtkSalObject(GtkSalFrame* pParent, bool bShow)

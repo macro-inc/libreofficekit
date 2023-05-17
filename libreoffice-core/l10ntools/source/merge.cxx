@@ -21,8 +21,11 @@
 #include <sal/log.hxx>
 
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <export.hxx>
@@ -30,12 +33,17 @@
 
 namespace
 {
-    OString lcl_NormalizeFilename(const OString& rFilename)
+    OString lcl_NormalizeFilename(std::string_view rFilename)
     {
-        return rFilename.copy(
-            std::max(
-                rFilename.lastIndexOf( '\\' ),
-                rFilename.lastIndexOf( '/' ))+1);
+        size_t idx1 = rFilename.rfind( '\\' );
+        size_t idx2 = rFilename.rfind( '/' );
+        if (idx1 == std::string_view::npos && idx2 == std::string_view::npos)
+            return OString(rFilename);
+        if (idx1 == std::string_view::npos)
+            idx1 = 0;
+        if (idx2 == std::string_view::npos)
+            idx2 = 0;
+        return OString(rFilename.substr(std::max(idx1, idx2)+1));
     };
 
     bool lcl_ReadPoChecked(
@@ -58,17 +66,17 @@ namespace
 
 
 
-ResData::ResData( const OString &rGId )
+ResData::ResData( OString _sGId )
     :
-    sGId( rGId )
+    sGId(std::move( _sGId ))
 {
     sGId = sGId.replaceAll("\r", OString());
 }
 
-ResData::ResData( const OString &rGId, const OString &rFilename)
+ResData::ResData( OString _sGId, OString _sFilename)
     :
-    sGId( rGId ),
-    sFilename( rFilename )
+    sGId(std::move( _sGId )),
+    sFilename(std::move( _sFilename ))
 {
     sGId = sGId.replaceAll("\r", OString());
 }
@@ -109,7 +117,7 @@ OString MergeEntrys::GetQTZText(const ResData& rResData, std::string_view rOrigT
 
 
 MergeDataFile::MergeDataFile(
-    const OString &rFileName, const OString &rFile,
+    const OString &rFileName, std::string_view rFile,
     bool bCaseSensitive, bool bWithQtz )
 {
     auto const env = getenv("ENABLE_RELEASE_BUILD");
@@ -279,7 +287,7 @@ void MergeDataFile::InsertEntry(
     std::string_view rTYP, std::string_view rGID,
     std::string_view rLID, const OString &nLANG,
     const OString &rTEXT, const OString &rQHTEXT,
-    const OString &rTITLE, const OString &rInFilename,
+    const OString &rTITLE, std::string_view rInFilename,
     bool bFirstLang, bool bCaseSensitive )
 {
     MergeEntrys *pMergeEntrys = nullptr;
@@ -298,14 +306,18 @@ void MergeDataFile::InsertEntry(
     if( !pMergeEntrys )
     {
         pMergeEntrys = new MergeEntrys;
-        aMap.emplace( sKey, std::unique_ptr<MergeEntrys>(pMergeEntrys) );
+        if (!aMap.emplace( sKey, std::unique_ptr<MergeEntrys>(pMergeEntrys) ).second)
+        {
+            std::cerr << "Duplicate entry " << sKey << "\n";
+            std::exit(EXIT_FAILURE);
+        }
     }
 
 
     // insert the cur string
     if( nLANG =="qtz" )
     {
-        const OString sTemp = rInFilename + rGID + rLID + rTYP;
+        const OString sTemp = OString::Concat(rInFilename) + rGID + rLID + rTYP;
         pMergeEntrys->InsertEntry(
             nLANG,
             rTEXT.isEmpty()? rTEXT : PoEntry::genKeyId(sTemp + rTEXT) + GetDoubleBars() + rTEXT,
@@ -319,7 +331,7 @@ void MergeDataFile::InsertEntry(
 }
 
 OString MergeDataFile::CreateKey(std::string_view rTYP, std::string_view rGID,
-    std::string_view rLID, const OString& rFilename, bool bCaseSensitive)
+    std::string_view rLID, std::string_view rFilename, bool bCaseSensitive)
 {
     static const char sStroke[] = "-";
     OString sKey = OString::Concat(rTYP) + sStroke + rGID + sStroke + rLID + sStroke +

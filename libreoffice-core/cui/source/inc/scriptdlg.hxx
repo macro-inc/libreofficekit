@@ -76,7 +76,6 @@ public:
 
 class SvxScriptOrgDialog : public SfxDialogController
 {
-protected:
     weld::Window* m_pParent;
     OUString         m_sLanguage;
     static Selection_hash   m_lastSelection;
@@ -124,7 +123,7 @@ protected:
                               const weld::TreeIter* pParent,
                               bool bChildrenOnDemand,
                               std::unique_ptr< SFEntry > && aUserData,
-                              const OUString& factoryURL, bool bSelect);
+                              std::u16string_view factoryURL, bool bSelect);
     void        insertEntry(OUString const & rText, OUString const & rBitmap,
                               const weld::TreeIter* pParent,
                               bool bChildrenOnDemand,
@@ -143,7 +142,7 @@ protected:
 public:
     // prob need another arg in the ctor
     // to specify the language or provider
-    SvxScriptOrgDialog(weld::Window* pParent, const OUString& language);
+    SvxScriptOrgDialog(weld::Window* pParent, OUString language);
     virtual ~SvxScriptOrgDialog() override;
 
     virtual short run() override;

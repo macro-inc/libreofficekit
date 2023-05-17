@@ -19,6 +19,7 @@
 
 #include <sal/config.h>
 
+#include <optional>
 #include <utility>
 
 #include <hintids.hxx>
@@ -78,14 +79,13 @@ SwAsciiFilterDlg::SwAsciiFilterDlg( weld::Window* pParent, SwDocShell& rDocSh,
             aUserItem >>= m_sExtraData;
         }
 
-        const SfxPoolItem* pItem;
+        const SfxStringItem* pItem;
         OUString sAsciiOptions;
         if( rDocSh.GetMedium() != nullptr &&
             rDocSh.GetMedium()->GetItemSet() != nullptr &&
-            SfxItemState::SET == rDocSh.GetMedium()->GetItemSet()->GetItemState(
-                SID_FILE_FILTEROPTIONS, true, &pItem ))
+            (pItem = rDocSh.GetMedium()->GetItemSet()->GetItemIfSet( SID_FILE_FILTEROPTIONS )))
         {
-            sAsciiOptions = static_cast<const SfxStringItem*>(pItem)->GetValue();
+            sAsciiOptions = pItem->GetValue();
         }
 
         const OUString sFindNm = OUString::createFromAscii(
@@ -112,7 +112,7 @@ SwAsciiFilterDlg::SwAsciiFilterDlg( weld::Window* pParent, SwDocShell& rDocSh,
     if( pStream )
     {
         char aBuffer[ 4098 ];
-        const sal_uLong nOldPos = pStream->Tell();
+        const sal_uInt64 nOldPos = pStream->Tell();
         const size_t nBytesRead = pStream->ReadBytes(aBuffer, 4096);
         pStream->Seek( nOldPos );
 
@@ -123,7 +123,7 @@ SwAsciiFilterDlg::SwAsciiFilterDlg( weld::Window* pParent, SwDocShell& rDocSh,
         }
 
         bool bCR = false, bLF = false, bNullChar = false;
-        for( sal_uLong nCnt = 0; nCnt < nBytesRead; ++nCnt )
+        for( sal_uInt64 nCnt = 0; nCnt < nBytesRead; ++nCnt )
             switch( aBuffer[ nCnt ] )
             {
                 case 0x0:   bNullChar = true; break;
@@ -267,7 +267,7 @@ SwAsciiFilterDlg::SwAsciiFilterDlg( weld::Window* pParent, SwDocShell& rDocSh,
 SwAsciiFilterDlg::~SwAsciiFilterDlg()
 {
     SvtViewOptions aDlgOpt(EViewType::Dialog, OStringToOUString(m_xDialog->get_help_id(), RTL_TEXTENCODING_UTF8));
-    aDlgOpt.SetUserItem("UserItem", uno::makeAny(m_sExtraData));
+    aDlgOpt.SetUserItem("UserItem", uno::Any(m_sExtraData));
 }
 
 void SwAsciiFilterDlg::FillOptions( SwAsciiOptions& rOptions )
@@ -365,7 +365,8 @@ void SwAsciiFilterDlg::UpdateIncludeBOMSensitiveState()
 
 IMPL_LINK_NOARG(SwAsciiFilterDlg, CharSetSelHdl, weld::ComboBox&, void)
 {
-    LineEnd eOldEnd = GetCRLF(), eEnd = LineEnd(-1);
+    LineEnd eOldEnd = GetCRLF();
+    std::optional<LineEnd> eEnd;
     LanguageType nLng = m_xFontLB->get_visible()
                     ? m_xLanguageLB->get_active_id()
                     : LANGUAGE_SYSTEM,
@@ -419,10 +420,10 @@ IMPL_LINK_NOARG(SwAsciiFilterDlg, CharSetSelHdl, weld::ComboBox&, void)
     }
 
     m_bSaveLineStatus = false;
-    if( eEnd != LineEnd(-1) )       // changed?
+    if( eEnd )       // changed?
     {
-        if( eOldEnd != eEnd )
-            SetCRLF( eEnd );
+        if( eOldEnd != *eEnd )
+            SetCRLF( *eEnd );
     }
     else
     {

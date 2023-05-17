@@ -29,6 +29,7 @@
 #include <cppuhelper/typeprovider.hxx>
 #include <connectivity/dbtools.hxx>
 #include <cppuhelper/propshlp.hxx>
+#include <o3tl/safeint.hxx>
 #include <sal/log.hxx>
 #include <iterator>
 #include <com/sun/star/sdbc/ResultSetType.hpp>
@@ -41,7 +42,7 @@
 #include <comphelper/types.hxx>
 #include <resource/sharedresources.hxx>
 #include <strings.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::comphelper;
 using namespace connectivity;
@@ -921,7 +922,7 @@ bool OResultSet::Move(IResultSetHelper::Movement eCursorPosition, sal_Int32 nOff
             // The FileCursor is outside of the valid range, if:
             // a.) m_nRowPos < 1
             // b.) a KeySet exists and m_nRowPos > m_pFileSet->size()
-            if (m_nRowPos < 0 || (m_pFileSet->isFrozen() && eCursorPosition != IResultSetHelper::BOOKMARK && m_nRowPos >= static_cast<sal_Int32>(m_pFileSet->size()) )) // && m_pFileSet->IsFrozen()
+            if (m_nRowPos < 0 || (m_pFileSet->isFrozen() && eCursorPosition != IResultSetHelper::BOOKMARK && o3tl::make_unsigned(m_nRowPos) >= m_pFileSet->size() )) // && m_pFileSet->IsFrozen()
             {
                 goto Error;
             }
@@ -1380,7 +1381,7 @@ void OResultSet::OpenImpl()
     m_nFilePos  = 0;
 }
 
-Sequence< sal_Int8 > OResultSet::getUnoTunnelId()
+const Sequence< sal_Int8 > & OResultSet::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();

@@ -36,7 +36,6 @@
 #include <drawingml/textparagraph.hxx>
 #include <drawingml/chart/datasourceconverter.hxx>
 #include <drawingml/chart/titlemodel.hxx>
-#include <oox/helper/containerhelper.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
 #include <com/sun/star/chart2/RelativePosition.hpp>
@@ -256,7 +255,7 @@ void LegendConverter::convertFromModel( const Reference< XDiagram >& rxDiagram )
         aPropSet.setProperty( PROP_Expansion, eLegendExpand );
 
         if (bTopRight && !bManualLayout)
-            aPropSet.setProperty( PROP_RelativePosition , makeAny(eRelPos));
+            aPropSet.setProperty( PROP_RelativePosition , Any(eRelPos));
 
         aPropSet.setProperty(PROP_Overlay, mrModel.mbOverlay);
 

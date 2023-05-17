@@ -22,6 +22,7 @@
 #include <unoflatpara.hxx>
 
 #include <o3tl/safeint.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <com/sun/star/text/TextMarkupType.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
@@ -64,9 +65,9 @@ CreateFlatParagraphIterator(SwDoc & rDoc, sal_Int32 const nTextMarkupType,
 
 }
 
-SwXFlatParagraph::SwXFlatParagraph( SwTextNode& rTextNode, const OUString& aExpandText, const ModelToViewHelper& rMap )
+SwXFlatParagraph::SwXFlatParagraph( SwTextNode& rTextNode, OUString aExpandText, const ModelToViewHelper& rMap )
     : SwXFlatParagraph_Base(& rTextNode, rMap)
-    , maExpandText(aExpandText)
+    , maExpandText(std::move(aExpandText))
 {
 }
 
@@ -79,10 +80,9 @@ SwXFlatParagraph::~SwXFlatParagraph()
 uno::Reference< beans::XPropertySetInfo > SAL_CALL
 SwXFlatParagraph::getPropertySetInfo()
 {
-    static comphelper::PropertyMapEntry s_Entries[] = {
+    static const comphelper::PropertyMapEntry s_Entries[] = {
         { OUString("FieldPositions"), -1, ::cppu::UnoType<uno::Sequence<sal_Int32>>::get(), beans::PropertyAttribute::READONLY, 0 },
         { OUString("FootnotePositions"), -1, ::cppu::UnoType<uno::Sequence<sal_Int32>>::get(), beans::PropertyAttribute::READONLY, 0 },
-        { OUString(), -1, css::uno::Type(), 0, 0 }
     };
     return new comphelper::PropertySetInfo(s_Entries);
 }
@@ -101,11 +101,11 @@ SwXFlatParagraph::getPropertyValue(const OUString& rPropertyName)
 
     if (rPropertyName == "FieldPositions")
     {
-        return uno::makeAny( comphelper::containerToSequence( GetConversionMap().getFieldPositions() ) );
+        return uno::Any( comphelper::containerToSequence( GetConversionMap().getFieldPositions() ) );
     }
     else if (rPropertyName == "FootnotePositions")
     {
-        return uno::makeAny( comphelper::containerToSequence( GetConversionMap().getFootnotePositions() ) );
+        return uno::Any( comphelper::containerToSequence( GetConversionMap().getFootnotePositions() ) );
     }
     return uno::Any();
 }
@@ -260,14 +260,13 @@ void SAL_CALL SwXFlatParagraph::changeText(::sal_Int32 nPos, ::sal_Int32 nLen, c
 
     UnoActionContext aAction( &GetTextNode()->GetDoc() );
 
-    const uno::Reference< text::XTextRange > xRange =
+    const rtl::Reference<SwXTextRange> xRange =
         SwXTextRange::CreateXTextRange(
             GetTextNode()->GetDoc(), *aPaM.GetPoint(), aPaM.GetMark() );
-    uno::Reference< beans::XPropertySet > xPropSet( xRange, uno::UNO_QUERY );
-    if ( xPropSet.is() )
+    if ( xRange.is() )
     {
         for ( const auto& rAttribute : aAttributes )
-            xPropSet->setPropertyValue( rAttribute.Name, rAttribute.Value );
+            xRange->setPropertyValue( rAttribute.Name, rAttribute.Value );
     }
 
     IDocumentContentOperations& rIDCO = pOldTextNode->getIDocumentContentOperations();
@@ -293,14 +292,13 @@ void SAL_CALL SwXFlatParagraph::changeAttributes(::sal_Int32 nPos, ::sal_Int32 n
 
     UnoActionContext aAction( &GetTextNode()->GetDoc() );
 
-    const uno::Reference< text::XTextRange > xRange =
+    const rtl::Reference<SwXTextRange> xRange =
         SwXTextRange::CreateXTextRange(
             GetTextNode()->GetDoc(), *aPaM.GetPoint(), aPaM.GetMark() );
-    uno::Reference< beans::XPropertySet > xPropSet( xRange, uno::UNO_QUERY );
-    if ( xPropSet.is() )
+    if ( xRange.is() )
     {
         for ( const auto& rAttribute : aAttributes )
-            xPropSet->setPropertyValue( rAttribute.Name, rAttribute.Value );
+            xRange->setPropertyValue( rAttribute.Name, rAttribute.Value );
     }
 
     ClearTextNode(); // TODO: is this really needed?
@@ -464,7 +462,7 @@ uno::Reference< text::XFlatParagraph > SwXFlatParagraphIterator::getNextPara()
 
             ++mnCurrentNode;
 
-            pRet = dynamic_cast<SwTextNode*>(pNd);
+            pRet = pNd->GetTextNode();
             if ( pRet )
                 break;
 
@@ -521,7 +519,7 @@ uno::Reference< text::XFlatParagraph > SwXFlatParagraphIterator::getParaAfter(co
     for( SwNodeOffset nCurrentNode = pCurrentNode->GetIndex() + 1; nCurrentNode < rNodes.Count(); ++nCurrentNode )
     {
         SwNode* pNd = rNodes[ nCurrentNode ];
-        pNextTextNode = dynamic_cast<SwTextNode*>(pNd);
+        pNextTextNode = pNd->GetTextNode();
         if ( pNextTextNode )
             break;
     }
@@ -567,7 +565,7 @@ uno::Reference< text::XFlatParagraph > SwXFlatParagraphIterator::getParaBefore(c
     for( SwNodeOffset nCurrentNode = pCurrentNode->GetIndex() - 1; nCurrentNode > SwNodeOffset(0); --nCurrentNode )
     {
         SwNode* pNd = rNodes[ nCurrentNode ];
-        pPrevTextNode = dynamic_cast<SwTextNode*>(pNd);
+        pPrevTextNode = pNd->GetTextNode();
         if ( pPrevTextNode )
             break;
     }

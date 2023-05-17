@@ -11,15 +11,15 @@
 
 #include <basegfx/color/bcolortools.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <memory>
 
-SwDashedLine::SwDashedLine( vcl::Window* pParent, Color& ( *pColorFn )() )
+SwDashedLine::SwDashedLine( vcl::Window* pParent, const Color& ( SwViewOption::* pColorFn )() const )
     : Control( pParent, WB_DIALOGCONTROL | WB_HORZ )
     , m_pColorFn( pColorFn )
 {
@@ -33,7 +33,7 @@ void SwDashedLine::Paint(vcl::RenderContext& rRenderContext, const tools::Rectan
 {
     const drawinglayer::geometry::ViewInformation2D aNewViewInfos;
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(
-        drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(rRenderContext, aNewViewInfos));
+        drawinglayer::processor2d::createProcessor2DFromOutputDevice(rRenderContext, aNewViewInfos));
 
     // Compute the start and end points
     const tools::Rectangle aRect(tools::Rectangle(Point(0, 0), rRenderContext.PixelToLogic(GetSizePixel())));
@@ -51,7 +51,7 @@ void SwDashedLine::Paint(vcl::RenderContext& rRenderContext, const tools::Rectan
     const StyleSettings& rSettings = Application::GetSettings().GetStyleSettings();
 
     std::vector<double> aStrokePattern;
-    basegfx::BColor aColor = m_pColorFn().getBColor();
+    basegfx::BColor aColor = (SwViewOption::GetCurrentViewOptions().*m_pColorFn)().getBColor();
     if (rSettings.GetHighContrastMode())
     {
         // Only a solid line in high contrast mode
@@ -82,7 +82,7 @@ void SwDashedLine::Paint(vcl::RenderContext& rRenderContext, const tools::Rectan
     aSeq[aSeq.size() - 1] =
             new drawinglayer::primitive2d::PolyPolygonStrokePrimitive2D(
                 basegfx::B2DPolyPolygon(aPolygon),
-                drawinglayer::attribute::LineAttribute(m_pColorFn().getBColor()),
+                drawinglayer::attribute::LineAttribute((SwViewOption::GetCurrentViewOptions().*m_pColorFn)().getBColor()),
                 drawinglayer::attribute::StrokeAttribute(std::move(aStrokePattern)));
 
     pProcessor->process(aSeq);

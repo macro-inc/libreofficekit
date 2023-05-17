@@ -14,6 +14,10 @@ $(eval $(call gb_Executable_set_include,soffice_bin,\
     -I$(SRCDIR)/desktop/source/inc \
 ))
 
+$(eval $(call gb_Executable_add_defs,soffice_bin,\
+    $(if $(DISABLE_DYNLOADING),$(if $(SYSTEM_LIBXML),,-DNOTEST_xmlCleanupParser)) \
+))
+
 $(eval $(call gb_Executable_use_libraries,soffice_bin,\
     sal \
     sofficeapp \
@@ -22,6 +26,8 @@ $(eval $(call gb_Executable_use_libraries,soffice_bin,\
 $(eval $(call gb_Executable_add_cobjects,soffice_bin,\
     desktop/source/app/main \
 ))
+
+$(eval $(call gb_Executable_add_prejs,soffice_bin,$(SRCDIR)/static/emscripten/soffice_args.js))
 
 ifeq ($(OS),WNT)
 
@@ -38,6 +44,14 @@ $(eval $(call gb_Executable_add_ldflags,soffice_bin,\
 ))
 
 endif
+
+endif
+
+ifeq ($(OS),EMSCRIPTEN)
+
+$(eval $(call gb_Executable_add_ldflags,soffice_bin,\
+	-s EXPORTED_FUNCTIONS=["_main"$(COMMA)"_libreofficekit_hook"$(COMMA)"_libreofficekit_hook_2"$(COMMA)"_lok_preinit"$(COMMA)"_lok_preinit_2"] \
+))
 
 endif
 

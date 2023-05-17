@@ -21,7 +21,7 @@
 
 #include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/resmgr.hxx>
 #include <sal/log.hxx>
 
@@ -54,7 +54,7 @@
 #include <config_features.h>
 #include <config_vclplug.h>
 #include <basegfx/utils/systemdependentdata.hxx>
-#include <cppuhelper/basemutex.hxx>
+#include <mutex>
 
 using namespace com::sun::star::uno;
 using namespace com::sun::star::lang;
@@ -104,9 +104,10 @@ namespace
 {
     typedef ::std::map< basegfx::SystemDependentData_SharedPtr, sal_uInt32 > EntryMap;
 
-    class SystemDependentDataBuffer final : public basegfx::SystemDependentDataManager, protected cppu::BaseMutex
+    class SystemDependentDataBuffer final : public basegfx::SystemDependentDataManager
     {
     private:
+        std::mutex m_aMutex;
         std::unique_ptr<AutoTimer> maTimer;
         EntryMap maEntries;
 
@@ -127,7 +128,7 @@ namespace
 
         void startUsage(basegfx::SystemDependentData_SharedPtr& rData) override
         {
-            ::osl::MutexGuard aGuard(m_aMutex);
+            std::unique_lock aGuard(m_aMutex);
             EntryMap::iterator aFound(maEntries.find(rData));
 
             if(aFound == maEntries.end())
@@ -143,7 +144,7 @@ namespace
 
         void endUsage(basegfx::SystemDependentData_SharedPtr& rData) override
         {
-            ::osl::MutexGuard aGuard(m_aMutex);
+            std::unique_lock aGuard(m_aMutex);
             EntryMap::iterator aFound(maEntries.find(rData));
 
             if(aFound != maEntries.end())
@@ -154,7 +155,7 @@ namespace
 
         void touchUsage(basegfx::SystemDependentData_SharedPtr& rData) override
         {
-            ::osl::MutexGuard aGuard(m_aMutex);
+            std::unique_lock aGuard(m_aMutex);
             EntryMap::iterator aFound(maEntries.find(rData));
 
             if(aFound != maEntries.end())
@@ -165,7 +166,7 @@ namespace
 
         void flushAll() override
         {
-            ::osl::MutexGuard aGuard(m_aMutex);
+            std::unique_lock aGuard(m_aMutex);
 
             if(maTimer)
             {
@@ -179,7 +180,7 @@ namespace
 
     IMPL_LINK_NOARG(SystemDependentDataBuffer, implTimeoutHdl, Timer *, void)
     {
-        ::osl::MutexGuard aGuard(m_aMutex);
+        std::unique_lock aGuard(m_aMutex);
         EntryMap::iterator aIter(maEntries.begin());
 
         while(aIter != maEntries.end())
@@ -280,12 +281,12 @@ const FieldUnitStringList& ImplGetFieldUnits()
 
 namespace vcl
 {
-    FieldUnit EnglishStringToMetric(const OUString& rEnglishMetricString)
+    FieldUnit EnglishStringToMetric(std::string_view rEnglishMetricString)
     {
         sal_uInt32 nUnits = SAL_N_ELEMENTS(SV_FUNIT_STRINGS);
         for (sal_uInt32 i = 0; i < nUnits; ++i)
         {
-            if (rEnglishMetricString.equalsAscii(SV_FUNIT_STRINGS[i].first.mpId))
+            if (rEnglishMetricString == SV_FUNIT_STRINGS[i].first.mpId)
                 return SV_FUNIT_STRINGS[i].second;
         }
         return FieldUnit::NONE;
@@ -421,6 +422,29 @@ ImplSVData::ImplSVData()
     mpWinData = &private_aImplSVWinData::get();
 }
 
+void ImplSVData::dropCaches()
+{
+    maGDIData.maScaleCache.clear();
+    maGDIData.maThemeImageCache.clear();
+    maGDIData.maThemeDrawCommandsCache.clear();
+}
+
+void ImplSVData::dumpState(rtl::OStringBuffer &rState)
+{
+    rState.append("\nScaleCache:\t");
+    rState.append(static_cast<sal_Int32>(maGDIData.maScaleCache.size()));
+    rState.append("\t items:");
+
+    for (auto it = maGDIData.maScaleCache.begin();
+         it != maGDIData.maScaleCache.begin(); ++it)
+    {
+        rState.append("\n\t");
+        rState.append(static_cast<sal_Int32>(it->first.maDestSize.Width()));
+        rState.append("x");
+        rState.append(static_cast<sal_Int32>(it->first.maDestSize.Height()));
+    }
+}
+
 ImplSVHelpData* CreateSVHelpData()
 {
     if (!comphelper::LibreOfficeKit::isActive())
@@ -494,6 +518,13 @@ ImplSVHelpData& ImplGetSVHelpData()
 }
 
 ImplSVData::~ImplSVData() {}
+
+ImplSVAppData::ImplSVAppData()
+{
+    m_bUseSystemLoop = getenv("SAL_USE_SYSTEM_LOOP") != nullptr;
+    SAL_WARN_IF(m_bUseSystemLoop, "vcl.schedule", "Overriding to run LO on system event loop!");
+}
+
 ImplSVAppData::~ImplSVAppData() {}
 ImplSVGDIData::~ImplSVGDIData() {}
 ImplSVFrameData::~ImplSVFrameData() {}

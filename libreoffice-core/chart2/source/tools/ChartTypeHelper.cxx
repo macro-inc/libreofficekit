@@ -18,15 +18,18 @@
  */
 
 #include <ChartTypeHelper.hxx>
+#include <ChartType.hxx>
+#include <BaseCoordinateSystem.hxx>
 #include <DiagramHelper.hxx>
 #include <servicenames_charttypes.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/chart/DataLabelPlacement.hpp>
+#include <com/sun/star/chart/MissingValueTreatment.hpp>
 #include <com/sun/star/chart2/AxisType.hpp>
 #include <com/sun/star/chart2/StackingDirection.hpp>
-#include <com/sun/star/chart/MissingValueTreatment.hpp>
-#include <tools/diagnose_ex.h>
+#include <com/sun/star/chart2/XDataSeries.hpp>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -35,7 +38,7 @@ namespace chart
 {
 
 bool ChartTypeHelper::isSupportingAxisSideBySide(
-    const uno::Reference< chart2::XChartType >& xChartType, sal_Int32 nDimensionCount )
+    const rtl::Reference< ::chart::ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     bool bResult = false;
 
@@ -56,7 +59,7 @@ bool ChartTypeHelper::isSupportingAxisSideBySide(
     return bResult;
 }
 
-bool ChartTypeHelper::isSupportingGeometryProperties( const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount )
+bool ChartTypeHelper::isSupportingGeometryProperties( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     //form tab only for 3D-bar and 3D-column charts.
 
@@ -75,7 +78,7 @@ bool ChartTypeHelper::isSupportingGeometryProperties( const uno::Reference< XCha
     return false;
 }
 
-bool ChartTypeHelper::isSupportingStatisticProperties( const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount )
+bool ChartTypeHelper::isSupportingStatisticProperties( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     //3D charts, pie, net and stock do not support statistic properties
 
@@ -100,13 +103,13 @@ bool ChartTypeHelper::isSupportingStatisticProperties( const uno::Reference< XCh
     return true;
 }
 
-bool ChartTypeHelper::isSupportingRegressionProperties( const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount )
+bool ChartTypeHelper::isSupportingRegressionProperties( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     // note: old chart: only scatter chart
     return isSupportingStatisticProperties( xChartType, nDimensionCount );
 }
 
-bool ChartTypeHelper::isSupportingAreaProperties( const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount )
+bool ChartTypeHelper::isSupportingAreaProperties( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     //2D line charts, net and stock do not support area properties
 
@@ -129,7 +132,7 @@ bool ChartTypeHelper::isSupportingAreaProperties( const uno::Reference< XChartTy
     return true;
 }
 
-bool ChartTypeHelper::isSupportingSymbolProperties( const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount )
+bool ChartTypeHelper::isSupportingSymbolProperties( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     //2D line charts, 2D scatter charts and 2D net charts do support symbols
 
@@ -150,7 +153,7 @@ bool ChartTypeHelper::isSupportingSymbolProperties( const uno::Reference< XChart
     return false;
 }
 
-bool ChartTypeHelper::isSupportingMainAxis( const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount, sal_Int32 nDimensionIndex )
+bool ChartTypeHelper::isSupportingMainAxis( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount, sal_Int32 nDimensionIndex )
 {
     //pie charts do not support axis at all
     //no 3rd axis for 2D charts
@@ -168,7 +171,7 @@ bool ChartTypeHelper::isSupportingMainAxis( const uno::Reference< XChartType >& 
     return true;
 }
 
-bool ChartTypeHelper::isSupportingSecondaryAxis( const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount )
+bool ChartTypeHelper::isSupportingSecondaryAxis( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     //3D, pie and net charts do not support a secondary axis at all
 
@@ -190,7 +193,7 @@ bool ChartTypeHelper::isSupportingSecondaryAxis( const uno::Reference< XChartTyp
 }
 
 bool ChartTypeHelper::isSupportingOverlapAndGapWidthProperties(
-        const uno::Reference< XChartType >& xChartType, sal_Int32 nDimensionCount )
+        const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     //2D bar charts do support a this special properties
 
@@ -210,7 +213,7 @@ bool ChartTypeHelper::isSupportingOverlapAndGapWidthProperties(
 }
 
 bool ChartTypeHelper::isSupportingBarConnectors(
-    const uno::Reference< chart2::XChartType >& xChartType, sal_Int32 nDimensionCount )
+    const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     //2D bar charts with stacked series support this
 
@@ -235,7 +238,7 @@ bool ChartTypeHelper::isSupportingBarConnectors(
     return false;
 }
 
-uno::Sequence < sal_Int32 > ChartTypeHelper::getSupportedLabelPlacements( const uno::Reference< chart2::XChartType >& xChartType
+uno::Sequence < sal_Int32 > ChartTypeHelper::getSupportedLabelPlacements( const rtl::Reference< ChartType >& xChartType
                                                                          , bool bSwapXAndY
                                                                          , const uno::Reference< chart2::XDataSeries >& xSeries )
 {
@@ -247,8 +250,7 @@ uno::Sequence < sal_Int32 > ChartTypeHelper::getSupportedLabelPlacements( const 
     if( aChartTypeName.match(CHART2_SERVICE_NAME_CHARTTYPE_PIE) )
     {
         bool bDonut = false;
-        uno::Reference< beans::XPropertySet > xChartTypeProp( xChartType, uno::UNO_QUERY_THROW );
-        xChartTypeProp->getPropertyValue( "UseRings") >>= bDonut;
+        xChartType->getPropertyValue( "UseRings") >>= bDonut;
 
         if(!bDonut)
         {
@@ -367,7 +369,7 @@ uno::Sequence < sal_Int32 > ChartTypeHelper::getSupportedLabelPlacements( const 
     return aRet;
 }
 
-bool ChartTypeHelper::isSupportingRightAngledAxes( const uno::Reference< chart2::XChartType >& xChartType )
+bool ChartTypeHelper::isSupportingRightAngledAxes( const rtl::Reference< ChartType >& xChartType )
 {
     if(xChartType.is())
     {
@@ -378,7 +380,7 @@ bool ChartTypeHelper::isSupportingRightAngledAxes( const uno::Reference< chart2:
     return true;
 }
 
-bool ChartTypeHelper::isSupportingStartingAngle( const uno::Reference< chart2::XChartType >& xChartType )
+bool ChartTypeHelper::isSupportingStartingAngle( const rtl::Reference< ChartType >& xChartType )
 {
     if(xChartType.is())
     {
@@ -388,7 +390,7 @@ bool ChartTypeHelper::isSupportingStartingAngle( const uno::Reference< chart2::X
     }
     return false;
 }
-bool ChartTypeHelper::isSupportingBaseValue( const uno::Reference< chart2::XChartType >& xChartType )
+bool ChartTypeHelper::isSupportingBaseValue( const rtl::Reference< ChartType >& xChartType )
 {
     if(xChartType.is())
     {
@@ -402,7 +404,7 @@ bool ChartTypeHelper::isSupportingBaseValue( const uno::Reference< chart2::XChar
     return false;
 }
 
-bool ChartTypeHelper::isSupportingAxisPositioning( const uno::Reference< chart2::XChartType >& xChartType, sal_Int32 nDimensionCount, sal_Int32 nDimensionIndex )
+bool ChartTypeHelper::isSupportingAxisPositioning( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount, sal_Int32 nDimensionIndex )
 {
     if(xChartType.is())
     {
@@ -417,7 +419,7 @@ bool ChartTypeHelper::isSupportingAxisPositioning( const uno::Reference< chart2:
     return true;
 }
 
-bool ChartTypeHelper::isSupportingDateAxis( const uno::Reference< chart2::XChartType >& xChartType, sal_Int32 nDimensionIndex )
+bool ChartTypeHelper::isSupportingDateAxis( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionIndex )
 {
     if( nDimensionIndex!=0 )
         return false;
@@ -437,7 +439,7 @@ bool ChartTypeHelper::isSupportingDateAxis( const uno::Reference< chart2::XChart
     return true;
 }
 
-bool ChartTypeHelper::isSupportingComplexCategory( const uno::Reference< chart2::XChartType >& xChartType )
+bool ChartTypeHelper::isSupportingComplexCategory( const rtl::Reference< ChartType >& xChartType )
 {
     if( xChartType.is() )
     {
@@ -448,7 +450,7 @@ bool ChartTypeHelper::isSupportingComplexCategory( const uno::Reference< chart2:
     return true;
 }
 
-bool ChartTypeHelper::isSupportingCategoryPositioning( const uno::Reference< chart2::XChartType >& xChartType, sal_Int32 nDimensionCount )
+bool ChartTypeHelper::isSupportingCategoryPositioning( const rtl::Reference< ChartType >& xChartType, sal_Int32 nDimensionCount )
 {
     if( xChartType.is() )
     {
@@ -464,7 +466,7 @@ bool ChartTypeHelper::isSupportingCategoryPositioning( const uno::Reference< cha
     return false;
 }
 
-bool ChartTypeHelper::shiftCategoryPosAtXAxisPerDefault( const uno::Reference< chart2::XChartType >& xChartType )
+bool ChartTypeHelper::shiftCategoryPosAtXAxisPerDefault( const rtl::Reference< ChartType >& xChartType )
 {
     if(xChartType.is())
     {
@@ -477,7 +479,7 @@ bool ChartTypeHelper::shiftCategoryPosAtXAxisPerDefault( const uno::Reference< c
     return false;
 }
 
-bool ChartTypeHelper::noBordersForSimpleScheme( const uno::Reference< chart2::XChartType >& xChartType )
+bool ChartTypeHelper::noBordersForSimpleScheme( const rtl::Reference< ChartType >& xChartType )
 {
     if(xChartType.is())
     {
@@ -488,7 +490,7 @@ bool ChartTypeHelper::noBordersForSimpleScheme( const uno::Reference< chart2::XC
     return false;
 }
 
-sal_Int32 ChartTypeHelper::getDefaultDirectLightColor( bool bSimple, const uno::Reference< chart2::XChartType >& xChartType )
+sal_Int32 ChartTypeHelper::getDefaultDirectLightColor( bool bSimple, const rtl::Reference< ChartType >& xChartType )
 {
     sal_Int32 nRet = static_cast< sal_Int32 >( 0x808080 ); // grey
     if( xChartType .is() )
@@ -508,7 +510,7 @@ sal_Int32 ChartTypeHelper::getDefaultDirectLightColor( bool bSimple, const uno::
     return nRet;
 }
 
-sal_Int32 ChartTypeHelper::getDefaultAmbientLightColor( bool bSimple, const uno::Reference< chart2::XChartType >& xChartType )
+sal_Int32 ChartTypeHelper::getDefaultAmbientLightColor( bool bSimple, const rtl::Reference< ChartType >& xChartType )
 {
     sal_Int32 nRet = static_cast< sal_Int32 >( 0x999999 ); // grey40
     if( xChartType .is() )
@@ -525,7 +527,7 @@ sal_Int32 ChartTypeHelper::getDefaultAmbientLightColor( bool bSimple, const uno:
     return nRet;
 }
 
-drawing::Direction3D ChartTypeHelper::getDefaultSimpleLightDirection( const uno::Reference< chart2::XChartType >& xChartType )
+drawing::Direction3D ChartTypeHelper::getDefaultSimpleLightDirection( const rtl::Reference< ChartType >& xChartType )
 {
     drawing::Direction3D aRet(0.0, 0.0, 1.0);
     if( xChartType .is() )
@@ -540,7 +542,7 @@ drawing::Direction3D ChartTypeHelper::getDefaultSimpleLightDirection( const uno:
     return aRet;
 }
 
-drawing::Direction3D ChartTypeHelper::getDefaultRealisticLightDirection( const uno::Reference< chart2::XChartType >& xChartType )
+drawing::Direction3D ChartTypeHelper::getDefaultRealisticLightDirection( const rtl::Reference< ChartType >& xChartType )
 {
     drawing::Direction3D aRet(0.0, 0.0, 1.0);
     if( xChartType .is() )
@@ -555,8 +557,8 @@ drawing::Direction3D ChartTypeHelper::getDefaultRealisticLightDirection( const u
     return aRet;
 }
 
-sal_Int32 ChartTypeHelper::getAxisType( const uno::Reference<
-            XChartType >& xChartType, sal_Int32 nDimensionIndex )
+sal_Int32 ChartTypeHelper::getAxisType( const rtl::Reference<
+            ChartType >& xChartType, sal_Int32 nDimensionIndex )
 {
     //returned is a constant from constant group css::chart2::AxisType
 
@@ -580,7 +582,7 @@ sal_Int32 ChartTypeHelper::getAxisType( const uno::Reference<
 }
 
 sal_Int32 ChartTypeHelper::getNumberOfDisplayedSeries(
-    const uno::Reference< XChartType >& xChartType,
+    const rtl::Reference< ChartType >& xChartType,
     sal_Int32 nNumberOfSeries )
 {
     if( xChartType.is() )
@@ -590,9 +592,8 @@ sal_Int32 ChartTypeHelper::getNumberOfDisplayedSeries(
             OUString aChartTypeName = xChartType->getChartType();
             if( aChartTypeName == CHART2_SERVICE_NAME_CHARTTYPE_PIE )
             {
-                uno::Reference< beans::XPropertySet > xChartTypeProp( xChartType, uno::UNO_QUERY_THROW );
                 bool bDonut = false;
-                if( (xChartTypeProp->getPropertyValue( "UseRings") >>= bDonut)
+                if( (xChartType->getPropertyValue( "UseRings") >>= bDonut)
                     && !bDonut )
                 {
                     return nNumberOfSeries>0 ? 1 : 0;
@@ -607,7 +608,7 @@ sal_Int32 ChartTypeHelper::getNumberOfDisplayedSeries(
     return nNumberOfSeries;
 }
 
-uno::Sequence < sal_Int32 > ChartTypeHelper::getSupportedMissingValueTreatments( const uno::Reference< XChartType >& xChartType )
+uno::Sequence < sal_Int32 > ChartTypeHelper::getSupportedMissingValueTreatments( const rtl::Reference< ChartType >& xChartType )
 {
     uno::Sequence < sal_Int32 > aRet;
     if( !xChartType.is() )
@@ -668,7 +669,7 @@ uno::Sequence < sal_Int32 > ChartTypeHelper::getSupportedMissingValueTreatments(
     return aRet;
 }
 
-bool ChartTypeHelper::isSeriesInFrontOfAxisLine( const uno::Reference< XChartType >& xChartType )
+bool ChartTypeHelper::isSeriesInFrontOfAxisLine( const rtl::Reference< ChartType >& xChartType )
 {
     if( xChartType.is() )
     {
@@ -679,7 +680,7 @@ bool ChartTypeHelper::isSeriesInFrontOfAxisLine( const uno::Reference< XChartTyp
     return true;
 }
 
-OUString ChartTypeHelper::getRoleOfSequenceForYAxisNumberFormatDetection( const uno::Reference< XChartType >& xChartType )
+OUString ChartTypeHelper::getRoleOfSequenceForYAxisNumberFormatDetection( const rtl::Reference< ChartType >& xChartType )
 {
     OUString aRet( "values-y" );
     if( !xChartType.is() )
@@ -690,7 +691,7 @@ OUString ChartTypeHelper::getRoleOfSequenceForYAxisNumberFormatDetection( const 
     return aRet;
 }
 
-OUString ChartTypeHelper::getRoleOfSequenceForDataLabelNumberFormatDetection( const uno::Reference< XChartType >& xChartType )
+OUString ChartTypeHelper::getRoleOfSequenceForDataLabelNumberFormatDetection( const rtl::Reference< ChartType >& xChartType )
 {
     OUString aRet( "values-y" );
     if( !xChartType.is() )
@@ -702,7 +703,7 @@ OUString ChartTypeHelper::getRoleOfSequenceForDataLabelNumberFormatDetection( co
     return aRet;
 }
 
-bool ChartTypeHelper::isSupportingOnlyDeepStackingFor3D( const uno::Reference< XChartType >& xChartType )
+bool ChartTypeHelper::isSupportingOnlyDeepStackingFor3D( const rtl::Reference< ChartType >& xChartType )
 {
     bool bRet = false;
     if( !xChartType.is() )

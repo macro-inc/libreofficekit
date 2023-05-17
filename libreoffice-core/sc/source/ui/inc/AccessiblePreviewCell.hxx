@@ -58,12 +58,11 @@ public:
     //=====  XAccessibleContext  ==============================================
 
     // override to calculate this on demand
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-                            getAccessibleChild( sal_Int32 i ) override;
+                            getAccessibleChild( sal_Int64 i ) override;
 
-    virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
-                            getAccessibleStateSet() override;
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override;
 
     //=====  XServiceInfo  ====================================================
 
@@ -86,10 +85,8 @@ private:
 
     std::unique_ptr<accessibility::AccessibleTextHelper> mpTextHelper;
 
-    bool IsDefunc(
-        const css::uno::Reference<css::accessibility::XAccessibleStateSet>& rxParentStates);
-    virtual bool IsEditable(
-        const css::uno::Reference<css::accessibility::XAccessibleStateSet>& rxParentStates) override;
+    bool IsDefunc(sal_Int64 nParentStates);
+    virtual bool IsEditable(sal_Int64 nParentStates) override;
     bool IsOpaque() const;
 
     void CreateTextHelper();

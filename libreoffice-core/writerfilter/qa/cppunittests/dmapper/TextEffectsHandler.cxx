@@ -7,11 +7,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
 
 using namespace ::com::sun::star;
@@ -19,40 +17,20 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Tests for writerfilter/source/dmapper/TextEffectsHandler.cxx.
-class Test : public test::BootstrapFixture, public unotest::MacrosTest
+class Test : public UnoApiTest
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
+    Test()
+        : UnoApiTest("/writerfilter/qa/cppunittests/dmapper/data/")
+    {
+    }
 };
-
-void Test::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void Test::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/writerfilter/qa/cppunittests/dmapper/data/";
 
 CPPUNIT_TEST_FIXTURE(Test, testSemiTransparentText)
 {
     // Load a document with a single paragraph: second text portion has semi-transparent text.
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "semi-transparent-text.docx";
-    getComponent() = loadFromDesktop(aURL);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"semi-transparent-text.docx");
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParaEnumAccess(xTextDocument->getText(),
                                                                   uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParaEnum = xParaEnumAccess->createEnumeration();
@@ -67,6 +45,24 @@ CPPUNIT_TEST_FIXTURE(Test, testSemiTransparentText)
     // - Expected: 74
     // - Actual  : 0
     // i.e. text was imported as regular text with solid color only.
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int16>(74), nCharTransparence);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testThemeColorTransparency)
+{
+    // Load a document with a single paragraph. It has semi-transparent text and the color is
+    // determined by a w14:schemeClr element.
+    loadFromURL(u"tdf152884_Char_Transparency.docx");
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XEnumerationAccess> xParaEnumAccess(xTextDocument->getText(),
+                                                                  uno::UNO_QUERY);
+    uno::Reference<container::XEnumeration> xParaEnum = xParaEnumAccess->createEnumeration();
+    uno::Reference<container::XEnumerationAccess> xPara(xParaEnum->nextElement(), uno::UNO_QUERY);
+    uno::Reference<container::XEnumeration> xPortionEnum = xPara->createEnumeration();
+    sal_Int16 nCharTransparence = 0;
+    uno::Reference<beans::XPropertySet> xPortion(xPortionEnum->nextElement(), uno::UNO_QUERY);
+    xPortion->getPropertyValue("CharTransparence") >>= nCharTransparence;
+    // Without the fix this test would have failed with: Expected 74, Actual 0
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int16>(74), nCharTransparence);
 }
 }

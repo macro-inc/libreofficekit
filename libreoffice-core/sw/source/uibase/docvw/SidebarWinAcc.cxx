@@ -68,11 +68,11 @@ class SidebarWinAccessibleContext : public VCLXAccessibleComponent
             return xAccParent;
         }
 
-        virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override
+        virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override
         {
             std::scoped_lock aGuard(maMutex);
 
-            sal_Int32 nIndex( -1 );
+            sal_Int64 nIndex( -1 );
 
             if ( mpAnchorFrame && GetWindow() &&
                  mrViewShell.GetAccessibleMap() )
@@ -100,7 +100,7 @@ SidebarWinAccessible::SidebarWinAccessible( sw::annotation::SwAnnotationWin& rSi
     : mrSidebarWin( rSidebarWin )
     , mrViewShell( rViewShell )
     , mpAnchorFrame( rSidebarItem.maLayoutInfo.mpAnchorFrame )
-    , bAccContextCreated( false )
+    , m_bAccContextCreated( false )
 {
     SetWindow( &mrSidebarWin );
 }
@@ -111,7 +111,7 @@ SidebarWinAccessible::~SidebarWinAccessible()
 
 void SidebarWinAccessible::ChangeSidebarItem( const SwSidebarItem& rSidebarItem )
 {
-    if ( !bAccContextCreated )
+    if ( !m_bAccContextCreated )
         return;
 
     css::uno::Reference< css::accessibility::XAccessibleContext > xAcc
@@ -133,7 +133,7 @@ css::uno::Reference< css::accessibility::XAccessibleContext > SidebarWinAccessib
                                 new SidebarWinAccessibleContext( mrSidebarWin,
                                                                  mrViewShell,
                                                                  mpAnchorFrame );
-    bAccContextCreated = true;
+    m_bAccContextCreated = true;
     return pAccContext;
 }
 

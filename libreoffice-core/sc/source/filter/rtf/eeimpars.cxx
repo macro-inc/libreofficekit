@@ -27,7 +27,6 @@
 #include <o3tl/unit_conversion.hxx>
 #include <svx/svdograf.hxx>
 #include <svx/svdpage.hxx>
-#include <svtools/htmlcfg.hxx>
 #include <sfx2/sfxhtml.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
@@ -358,10 +357,9 @@ void ScEEImport::WriteToDocument( bool bSizeColsRows, double nOutputFactor, SvNu
 
                     bool bTextFormat = false;
 
-                    const SfxPoolItem* pNumFmt = nullptr;
-                    if (rAttrItemSet2.GetItemState(ATTR_VALUE_FORMAT, false, &pNumFmt) == SfxItemState::SET)
+                    if (const SfxUInt32Item* pNumFmt = rAttrItemSet2.GetItemIfSet(ATTR_VALUE_FORMAT, false))
                     {
-                        sal_uInt32 nNumFmt = static_cast<const SfxUInt32Item*>(pNumFmt)->GetValue();
+                        sal_uInt32 nNumFmt = pNumFmt->GetValue();
                         SvNumFormatType nType = pFormatter->GetType(nNumFmt);
                         if (nType == SvNumFormatType::TEXT)
                             // Format is set to Text.
@@ -494,7 +492,7 @@ bool ScEEImport::GraphicSize( SCCOL nCol, SCROW nRow, ScEEParseEntry* pE )
     for (const std::unique_ptr<ScHTMLImage> & pImage : pE->maImageList)
     {
         ScHTMLImage* pI = pImage.get();
-        if ( pI->pGraphic )
+        if ( pI->oGraphic )
             bHasGraphics = true;
         Size aSizePix = pI->aSize;
         aSizePix.AdjustWidth(2 * pI->aSpace.X() );
@@ -530,7 +528,13 @@ bool ScEEImport::GraphicSize( SCCOL nCol, SCROW nRow, ScEEParseEntry* pE )
     }
     // Distribute line height difference between all affected lines
     SCROW nRowSpan = pE->nRowOverlap;
+
+    assert(nRowSpan != 0);
+    if ( nRowSpan == 0 )
+        return bHasGraphics;
+
     nHeight /= nRowSpan;
+
     if ( nHeight == 0 )
         nHeight = 1; // For definite comparison
     for ( SCROW nR = nRow; nR < nRow + nRowSpan; nR++ )
@@ -592,18 +596,18 @@ void ScEEImport::InsertGraphic( SCCOL nCol, SCROW nRow, SCTAB nTab,
         // Limit size
         ::ScLimitSizeOnDrawPage( aLogicSize, aInsertPos, pPage->GetSize() );
 
-        if ( pI->pGraphic )
+        if ( pI->oGraphic )
         {
             tools::Rectangle aRect ( aInsertPos, aLogicSize );
-            SdrGrafObj* pObj = new SdrGrafObj(
+            rtl::Reference<SdrGrafObj> pObj = new SdrGrafObj(
                 *pModel,
-                *pI->pGraphic,
+                *pI->oGraphic,
                 aRect);
 
             // calling SetGraphicLink here doesn't work
             pObj->SetName( pI->aURL );
 
-            pPage->InsertObject( pObj );
+            pPage->InsertObject( pObj.get() );
 
             // SetGraphicLink has to be used after inserting the object,
             // otherwise an empty graphic is swapped in and the contact stuff crashes.

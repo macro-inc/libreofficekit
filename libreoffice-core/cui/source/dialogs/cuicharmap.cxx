@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <svl/eitem.hxx>
 #include <svl/intitem.hxx>
@@ -52,12 +53,11 @@
 using namespace css;
 
 SvxCharacterMap::SvxCharacterMap(weld::Widget* pParent, const SfxItemSet* pSet,
-                                 const css::uno::Reference<css::frame::XFrame>& rFrame)
+                                 css::uno::Reference<css::frame::XFrame> xFrame)
     : SfxDialogController(pParent, "cui/ui/specialcharacters.ui", "SpecialCharactersDialog")
     , m_xVirDev(VclPtr<VirtualDevice>::Create())
     , isSearchMode(true)
-    , m_xFrame(rFrame)
-    , mxContext(comphelper::getProcessComponentContext())
+    , m_xFrame(std::move(xFrame))
     , m_aRecentCharView{SvxCharView(m_xVirDev),
                         SvxCharView(m_xVirDev),
                         SvxCharView(m_xVirDev),
@@ -276,8 +276,8 @@ findInPair(std::u16string_view str1, const std::deque<OUString>& rContainer1,
 {
     assert(rContainer1.size() == rContainer2.size());
 
-    if (auto it1 = std::find(rContainer1.begin(), rContainer1.end(), str1);
-        it1 != rContainer1.end())
+    for (auto it1 = std::find(rContainer1.begin(), rContainer1.end(), str1);
+         it1 != rContainer1.end(); it1 = std::find(std::next(it1), rContainer1.end(), str1))
     {
         auto it2 = rContainer2.begin() + (it1 - rContainer1.begin());
         if (*it2 == str2)
@@ -352,7 +352,7 @@ void SvxCharacterMap::updateRecentCharacterList(const OUString& sTitle, const OU
         aRecentCharFontListRange[i] = maRecentCharFontList[i];
     }
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::RecentCharacters::RecentCharacterList::set(aRecentCharList, batch);
     officecfg::Office::Common::RecentCharacters::RecentCharacterFontList::set(aRecentCharFontList, batch);
     batch->commit();
@@ -391,7 +391,7 @@ void SvxCharacterMap::updateFavCharacterList(const OUString& sTitle, const OUStr
         aFavCharFontListRange[i] = maFavCharFontList[i];
     }
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterList::set(aFavCharList, batch);
     officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterFontList::set(aFavCharFontList, batch);
     batch->commit();
@@ -421,6 +421,8 @@ void SvxCharacterMap::updateFavCharControl()
     }
     m_xShowSet->getFavCharacterList();
     m_xSearchSet->getFavCharacterList();
+    // tdf#109214 - redraw highlight of the favorite characters
+    m_xShowSet->Invalidate();
 }
 
 void SvxCharacterMap::deleteFavCharacterFromList(std::u16string_view sTitle, std::u16string_view rFont)
@@ -444,7 +446,7 @@ void SvxCharacterMap::deleteFavCharacterFromList(std::u16string_view sTitle, std
         aFavCharFontListRange[i] = maFavCharFontList[i];
     }
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterList::set(aFavCharList, batch);
     officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterFontList::set(aFavCharFontList, batch);
     batch->commit();
@@ -476,7 +478,7 @@ void SvxCharacterMap::init()
     // the font may not be in the list =>
     // try to find a font name token in list and select found font,
     // else select topmost entry
-    bool bFound = (m_xFontLB->find_text(aDefStr) == -1);
+    bool bFound = (m_xFontLB->find_text(aDefStr) != -1);
     if (!bFound)
     {
         sal_Int32 nIndex = 0;
@@ -524,9 +526,9 @@ void SvxCharacterMap::init()
 
     // tdf#117038 set the buttons width to its max possible width so it doesn't
     // make layout change when the label changes
-    m_xFavouritesBtn->set_label(CuiResId(RID_SVXSTR_REMOVE_FAVORITES));
+    m_xFavouritesBtn->set_label(CuiResId(RID_CUISTR_REMOVE_FAVORITES));
     auto nMaxWidth = m_xFavouritesBtn->get_preferred_size().Width();
-    m_xFavouritesBtn->set_label(CuiResId(RID_SVXSTR_ADD_FAVORITES));
+    m_xFavouritesBtn->set_label(CuiResId(RID_CUISTR_ADD_FAVORITES));
     nMaxWidth = std::max(nMaxWidth, m_xFavouritesBtn->get_preferred_size().Width());
     m_xFavouritesBtn->set_size_request(nMaxWidth, -1);
 
@@ -590,7 +592,7 @@ void SvxCharacterMap::setFavButtonState(std::u16string_view sTitle, std::u16stri
 
     if (isFavChar(sTitle, rFont))
     {
-        m_xFavouritesBtn->set_label(CuiResId(RID_SVXSTR_REMOVE_FAVORITES));
+        m_xFavouritesBtn->set_label(CuiResId(RID_CUISTR_REMOVE_FAVORITES));
     }
     else
     {
@@ -599,7 +601,7 @@ void SvxCharacterMap::setFavButtonState(std::u16string_view sTitle, std::u16stri
             m_xFavouritesBtn->set_sensitive(false);
         }
 
-        m_xFavouritesBtn->set_label(CuiResId(RID_SVXSTR_ADD_FAVORITES));
+        m_xFavouritesBtn->set_label(CuiResId(RID_CUISTR_ADD_FAVORITES));
     }
 }
 
@@ -610,17 +612,21 @@ void SvxCharacterMap::SetCharFont( const vcl::Font& rFont )
     // like "Times New Roman;Times" resolved
     vcl::Font aTmp(m_xVirDev->GetFontMetric(rFont));
 
-    if (aTmp.GetFamilyName() == "StarSymbol" && m_xFontLB->find_text(aTmp.GetFamilyName()) == -1)
+    // tdf#56363 - search font family without the font feature after the colon
+    OUString sFontFamilyName = aTmp.GetFamilyName();
+    if (const sal_Int32 nIndex = sFontFamilyName.indexOf(":"); nIndex != -1)
+        sFontFamilyName = sFontFamilyName.copy(0, nIndex);
+    if (sFontFamilyName == "StarSymbol" && m_xFontLB->find_text(sFontFamilyName) == -1)
     {
         //if for some reason, like font in an old document, StarSymbol is requested and it's not available, then
         //try OpenSymbol instead
         aTmp.SetFamilyName("OpenSymbol");
     }
 
-    if (m_xFontLB->find_text(aTmp.GetFamilyName()) == -1)
+    if (m_xFontLB->find_text(sFontFamilyName) == -1)
         return;
 
-    m_xFontLB->set_active_text(aTmp.GetFamilyName());
+    m_xFontLB->set_active_text(sFontFamilyName);
     aFont = aTmp;
     FontSelectHdl(*m_xFontLB);
     if (m_xSubsetLB->get_count())
@@ -653,11 +659,11 @@ void SvxCharacterMap::insertCharToDoc(const OUString& sGlyph)
     } else {
         sal_UCS4 cChar = sGlyph.iterateCodePoints(&o3tl::temporary(sal_Int32(0)));
         const SfxItemPool* pPool = m_xOutputSet->GetPool();
-        m_xOutputSet->Put( SfxStringItem( pPool->GetWhich(SID_CHARMAP), sGlyph ) );
+        m_xOutputSet->Put( SfxStringItem( SID_CHARMAP, sGlyph ) );
         m_xOutputSet->Put( SvxFontItem( aFont.GetFamilyType(), aFont.GetFamilyName(),
             aFont.GetStyleName(), aFont.GetPitch(), aFont.GetCharSet(), pPool->GetWhich(SID_ATTR_CHAR_FONT) ) );
-        m_xOutputSet->Put( SfxStringItem( pPool->GetWhich(SID_FONT_NAME), aFont.GetFamilyName() ) );
-        m_xOutputSet->Put( SfxInt32Item( pPool->GetWhich(SID_ATTR_CHAR), cChar ) );
+        m_xOutputSet->Put( SfxStringItem( SID_FONT_NAME, aFont.GetFamilyName() ) );
+        m_xOutputSet->Put( SfxInt32Item( SID_ATTR_CHAR, cChar ) );
     }
 }
 
@@ -691,7 +697,7 @@ IMPL_LINK_NOARG(SvxCharacterMap, FontSelectHdl, weld::ComboBox&, void)
         // update subset listbox for new font's unicode subsets
         for (auto const& subset : pSubsetMap->GetSubsetMap())
         {
-            m_xSubsetLB->append(OUString::number(reinterpret_cast<sal_uInt64>(&subset)), subset.GetName());
+            m_xSubsetLB->append(weld::toId(&subset), subset.GetName());
             // NOTE: subset must live at least as long as the selected font
         }
 
@@ -710,7 +716,7 @@ IMPL_LINK_NOARG(SvxCharacterMap, FontSelectHdl, weld::ComboBox&, void)
         SearchCharHighlightHdl(m_xSearchSet.get());
     }
 
-    // tdf#118304 reselect current glyph to see if its still there in new font
+    // tdf#118304 reselect current glyph to see if it's still there in new font
     selectCharByCode(Radix::hexadecimal);
 }
 
@@ -748,7 +754,7 @@ void SvxCharacterMap::setCharName(sal_UCS4 nDecimalValue)
 IMPL_LINK_NOARG(SvxCharacterMap, SubsetSelectHdl, weld::ComboBox&, void)
 {
     const sal_Int32 nPos = m_xSubsetLB->get_active();
-    const Subset* pSubset = reinterpret_cast<const Subset*>(m_xSubsetLB->get_active_id().toUInt64());
+    const Subset* pSubset = weld::fromId<const Subset*>(m_xSubsetLB->get_active_id());
 
     if( pSubset && !isSearchMode)
     {
@@ -799,7 +805,7 @@ IMPL_LINK(SvxCharacterMap, RecentClearClickHdl, SvxCharView*, rView, void)
         aRecentCharFontListRange[i] = maRecentCharFontList[i];
     }
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::RecentCharacters::RecentCharacterList::set(aRecentCharList, batch);
     officecfg::Office::Common::RecentCharacters::RecentCharacterFontList::set(aRecentCharFontList, batch);
     batch->commit();
@@ -809,15 +815,12 @@ IMPL_LINK(SvxCharacterMap, RecentClearClickHdl, SvxCharView*, rView, void)
 
 IMPL_LINK_NOARG(SvxCharacterMap, RecentClearAllClickHdl, SvxCharView*, void)
 {
-    css::uno::Sequence< OUString > aRecentCharList(0);
-    css::uno::Sequence< OUString > aRecentCharFontList(0);
-
     maRecentCharList.clear();
     maRecentCharFontList.clear();
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
-    officecfg::Office::Common::RecentCharacters::RecentCharacterList::set(aRecentCharList, batch);
-    officecfg::Office::Common::RecentCharacters::RecentCharacterFontList::set(aRecentCharFontList, batch);
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+    officecfg::Office::Common::RecentCharacters::RecentCharacterList::set({ }, batch);
+    officecfg::Office::Common::RecentCharacters::RecentCharacterFontList::set({ }, batch);
     batch->commit();
 
     updateRecentCharControl();
@@ -831,15 +834,12 @@ IMPL_LINK(SvxCharacterMap, FavClearClickHdl, SvxCharView*, rView, void)
 
 IMPL_LINK_NOARG(SvxCharacterMap, FavClearAllClickHdl, SvxCharView*, void)
 {
-    css::uno::Sequence< OUString > aFavCharList(0);
-    css::uno::Sequence< OUString > aFavCharFontList(0);
-
     maFavCharList.clear();
     maFavCharFontList.clear();
 
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create(mxContext));
-    officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterList::set(aFavCharList, batch);
-    officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterFontList::set(aFavCharFontList, batch);
+    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+    officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterList::set({ }, batch);
+    officecfg::Office::Common::FavoriteCharacters::FavoriteCharacterFontList::set({ }, batch);
     batch->commit();
 
     updateFavCharControl();
@@ -885,6 +885,8 @@ IMPL_LINK_NOARG(SvxCharacterMap, SearchUpdateHdl, weld::Entry&, void)
             if(!sName.isEmpty() && sName.toAsciiLowerCase().indexOf(aKeyword.toAsciiLowerCase()) >= 0)
                 m_xSearchSet->AppendCharToList(sChar);
         }
+
+        m_xSearchSet->UpdateScrollRange();
     }
     else
     {
@@ -959,7 +961,7 @@ IMPL_LINK_NOARG(SvxCharacterMap, InsertClickHdl, weld::Button&, void)
 
 IMPL_LINK_NOARG(SvxCharacterMap, FavSelectHdl, weld::Button&, void)
 {
-    if (m_xFavouritesBtn->get_label().match(CuiResId(RID_SVXSTR_ADD_FAVORITES)))
+    if (m_xFavouritesBtn->get_label().match(CuiResId(RID_CUISTR_ADD_FAVORITES)))
     {
         updateFavCharacterList(m_aShowChar.GetText(), m_aShowChar.GetFont().GetFamilyName());
         setFavButtonState(m_aShowChar.GetText(), m_aShowChar.GetFont().GetFamilyName());
@@ -967,7 +969,7 @@ IMPL_LINK_NOARG(SvxCharacterMap, FavSelectHdl, weld::Button&, void)
     else
     {
         deleteFavCharacterFromList(m_aShowChar.GetText(), m_aShowChar.GetFont().GetFamilyName());
-        m_xFavouritesBtn->set_label(CuiResId(RID_SVXSTR_ADD_FAVORITES));
+        m_xFavouritesBtn->set_label(CuiResId(RID_CUISTR_ADD_FAVORITES));
         m_xFavouritesBtn->set_sensitive(false);
     }
 
@@ -1080,7 +1082,7 @@ void SvxCharacterMap::selectCharByCode(Radix radix)
         // Select the corresponding character
         SetChar(cChar);
     else {
-        m_xCharName->set_label(CuiResId(RID_SVXSTR_MISSING_CHAR));
+        m_xCharName->set_label(CuiResId(RID_CUISTR_MISSING_CHAR));
         m_aShowChar.SetText(" ");
         switch(radix)
         {
@@ -1163,10 +1165,12 @@ void SvxShowText::Paint(vcl::RenderContext& rRenderContext, const tools::Rectang
 
     Color aTextCol = rRenderContext.GetTextColor();
     Color aFillCol = rRenderContext.GetFillColor();
+    Color aLineCol = rRenderContext.GetLineColor();
 
     const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
     const Color aWindowTextColor(rStyleSettings.GetDialogTextColor());
     const Color aWindowColor(rStyleSettings.GetWindowColor());
+    const Color aShadowColor(rStyleSettings.GetShadowColor());
     rRenderContext.SetTextColor(aWindowTextColor);
     rRenderContext.SetFillColor(aWindowColor);
 
@@ -1237,10 +1241,12 @@ void SvxShowText::Paint(vcl::RenderContext& rRenderContext, const tools::Rectang
         }
     }
 
+    rRenderContext.SetLineColor(aShadowColor);
     rRenderContext.DrawRect(tools::Rectangle(Point(0, 0), aSize));
     rRenderContext.DrawText(aPoint, aText);
     rRenderContext.SetTextColor(aTextCol);
     rRenderContext.SetFillColor(aFillCol);
+    rRenderContext.SetLineColor(aLineCol);
     if (bShrankFont)
         rRenderContext.SetFont(aOrigFont);
 }

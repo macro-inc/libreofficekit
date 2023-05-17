@@ -50,13 +50,12 @@
 #include <vcl/event.hxx>
 #include <vcl/toolkit/floatwin.hxx>
 #include <window.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/accessibility/XAccessibleContext.hpp>
 #include <com/sun/star/accessibility/XAccessibleEditableText.hpp>
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11)                                      \
-    || (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0) && QT6_USING_X11)
+#if CHECK_ANY_QT_USING_X11
 #define XK_MISCELLANY
 #include <X11/keysymdef.h>
 #endif
@@ -94,43 +93,39 @@ void QtWidget::resizeEvent(QResizeEvent* pEvent)
     const int nWidth = ceil(pEvent->size().width() * fRatio);
     const int nHeight = ceil(pEvent->size().height() * fRatio);
 
-    m_rFrame.maGeometry.nWidth = nWidth;
-    m_rFrame.maGeometry.nHeight = nHeight;
+    m_rFrame.maGeometry.setSize({ nWidth, nHeight });
 
     if (m_rFrame.m_bUseCairo)
     {
-        if (m_rFrame.m_pSvpGraphics)
+        if (m_rFrame.m_pSurface)
         {
-            cairo_surface_t* pSurface
-                = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, nWidth, nHeight);
-            cairo_surface_set_user_data(pSurface, SvpSalGraphics::getDamageKey(),
-                                        &m_rFrame.m_aDamageHandler, nullptr);
-            m_rFrame.m_pSvpGraphics->setSurface(pSurface, basegfx::B2IVector(nWidth, nHeight));
-            UniqueCairoSurface old_surface(m_rFrame.m_pSurface.release());
-            m_rFrame.m_pSurface.reset(pSurface);
+            const int nOldWidth = cairo_image_surface_get_width(m_rFrame.m_pSurface.get());
+            const int nOldHeight = cairo_image_surface_get_height(m_rFrame.m_pSurface.get());
+            if (nOldWidth != nWidth || nOldHeight != nHeight)
+            {
+                cairo_surface_t* pSurface
+                    = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, nWidth, nHeight);
+                cairo_surface_set_user_data(pSurface, SvpSalGraphics::getDamageKey(),
+                                            &m_rFrame.m_aDamageHandler, nullptr);
+                m_rFrame.m_pSvpGraphics->setSurface(pSurface, basegfx::B2IVector(nWidth, nHeight));
+                UniqueCairoSurface old_surface(m_rFrame.m_pSurface.release());
+                m_rFrame.m_pSurface.reset(pSurface);
 
-            int min_width = qMin(cairo_image_surface_get_width(old_surface.get()), nWidth);
-            int min_height = qMin(cairo_image_surface_get_height(old_surface.get()), nHeight);
-
-            SalTwoRect rect(0, 0, min_width, min_height, 0, 0, min_width, min_height);
-
-            m_rFrame.m_pSvpGraphics->copySource(rect, old_surface.get());
+                const int nMinWidth = qMin(nOldWidth, nWidth);
+                const int nMinHeight = qMin(nOldHeight, nHeight);
+                SalTwoRect rect(0, 0, nMinWidth, nMinHeight, 0, 0, nMinWidth, nMinHeight);
+                m_rFrame.m_pSvpGraphics->copySource(rect, old_surface.get());
+            }
         }
     }
     else
     {
-        QImage* pImage = nullptr;
-
-        if (m_rFrame.m_pQImage)
-            pImage = new QImage(m_rFrame.m_pQImage->copy(0, 0, nWidth, nHeight));
-        else
+        if (m_rFrame.m_pQImage && m_rFrame.m_pQImage->size() != QSize(nWidth, nHeight))
         {
-            pImage = new QImage(nWidth, nHeight, Qt_DefaultFormat32);
-            pImage->fill(Qt::transparent);
+            QImage* pImage = new QImage(m_rFrame.m_pQImage->copy(0, 0, nWidth, nHeight));
+            m_rFrame.m_pQtGraphics->ChangeQImage(pImage);
+            m_rFrame.m_pQImage.reset(pImage);
         }
-
-        m_rFrame.m_pQtGraphics->ChangeQImage(pImage);
-        m_rFrame.m_pQImage.reset(pImage);
     }
 
     m_rFrame.CallCallback(SalEvent::Resize, nullptr);
@@ -158,8 +153,7 @@ void QtWidget::fillSalAbstractMouseEvent(const QtFrame& rFrame, const QInputEven
 #define FILL_SAME(rFrame, nWidth)                                                                  \
     fillSalAbstractMouseEvent(rFrame, pEvent, pEvent->pos(), pEvent->buttons(), nWidth, aEvent)
 
-void QtWidget::handleMouseButtonEvent(const QtFrame& rFrame, const QMouseEvent* pEvent,
-                                      const ButtonKeyState eState)
+void QtWidget::handleMouseButtonEvent(const QtFrame& rFrame, const QMouseEvent* pEvent)
 {
     SalMouseEvent aEvent;
     FILL_SAME(rFrame, rFrame.GetQWidget()->width());
@@ -180,7 +174,7 @@ void QtWidget::handleMouseButtonEvent(const QtFrame& rFrame, const QMouseEvent* 
     }
 
     SalEvent nEventType;
-    if (eState == ButtonKeyState::Pressed)
+    if (pEvent->type() == QEvent::MouseButtonPress || pEvent->type() == QEvent::MouseButtonDblClick)
         nEventType = SalEvent::MouseButtonDown;
     else
         nEventType = SalEvent::MouseButtonUp;
@@ -189,13 +183,13 @@ void QtWidget::handleMouseButtonEvent(const QtFrame& rFrame, const QMouseEvent* 
 
 void QtWidget::mousePressEvent(QMouseEvent* pEvent)
 {
-    handleMousePressEvent(m_rFrame, pEvent);
+    handleMouseButtonEvent(m_rFrame, pEvent);
     if (m_rFrame.isPopup()
         && !geometry().translated(geometry().topLeft() * -1).contains(pEvent->pos()))
         closePopup();
 }
 
-void QtWidget::mouseReleaseEvent(QMouseEvent* pEvent) { handleMouseReleaseEvent(m_rFrame, pEvent); }
+void QtWidget::mouseReleaseEvent(QMouseEvent* pEvent) { handleMouseButtonEvent(m_rFrame, pEvent); }
 
 void QtWidget::mouseMoveEvent(QMouseEvent* pEvent)
 {
@@ -304,9 +298,7 @@ void QtWidget::moveEvent(QMoveEvent* pEvent)
     if (m_rFrame.m_pTopLevel)
         return;
 
-    const Point aPos = toPoint(pEvent->pos() * m_rFrame.devicePixelRatioF());
-    m_rFrame.maGeometry.nX = aPos.X();
-    m_rFrame.maGeometry.nY = aPos.Y();
+    m_rFrame.maGeometry.setPos(toPoint(pEvent->pos() * m_rFrame.devicePixelRatioF()));
     m_rFrame.CallCallback(SalEvent::Move, nullptr);
 }
 
@@ -318,18 +310,14 @@ void QtWidget::showEvent(QShowEvent*)
     // resulting in a hidden / unmapped window
     SalPaintEvent aPaintEvt(0, 0, aSize.width(), aSize.height());
     if (m_rFrame.isPopup())
-    {
-        auto* pQtInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
-        pQtInst->setActivePopup(&m_rFrame);
-    }
+        GetQtInstance()->setActivePopup(&m_rFrame);
     m_rFrame.CallCallback(SalEvent::Paint, &aPaintEvt);
 }
 
 void QtWidget::hideEvent(QHideEvent*)
 {
-    auto* pQtInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
-    if (m_rFrame.isPopup() && pQtInst->activePopup() == &m_rFrame)
-        pQtInst->setActivePopup(nullptr);
+    if (m_rFrame.isPopup() && GetQtInstance()->activePopup() == &m_rFrame)
+        GetQtInstance()->setActivePopup(nullptr);
 }
 
 void QtWidget::closeEvent(QCloseEvent* /*pEvent*/)
@@ -462,6 +450,9 @@ static sal_uInt16 GetKeyCode(int keyval, Qt::KeyboardModifiers modifiers)
             case Qt::Key_BracketRight:
                 nCode = KEY_BRACKETRIGHT;
                 break;
+            case Qt::Key_Colon:
+                nCode = KEY_COLON;
+                break;
             case Qt::Key_Semicolon:
                 nCode = KEY_SEMICOLON;
                 break;
@@ -498,11 +489,39 @@ void QtWidget::commitText(QtFrame& rFrame, const QString& aText)
         rFrame.CallCallback(SalEvent::EndExtTextInput, nullptr);
 }
 
-bool QtWidget::handleKeyEvent(QtFrame& rFrame, const QWidget& rWidget, QKeyEvent* pEvent,
-                              const ButtonKeyState eState)
+void QtWidget::deleteReplacementText(QtFrame& rFrame, int nReplacementStart, int nReplacementLength)
 {
+    // get the surrounding text
+    SolarMutexGuard aGuard;
+    SalSurroundingTextRequestEvent aSurroundingTextEvt;
+    aSurroundingTextEvt.maText.clear();
+    aSurroundingTextEvt.mnStart = aSurroundingTextEvt.mnEnd = 0;
+    rFrame.CallCallback(SalEvent::SurroundingTextRequest, &aSurroundingTextEvt);
+
+    // Turn nReplacementStart, nReplacementLength into a UTF-16 selection
+    const Selection aSelection = SalFrame::CalcDeleteSurroundingSelection(
+        aSurroundingTextEvt.maText, aSurroundingTextEvt.mnStart, nReplacementStart,
+        nReplacementLength);
+
+    const Selection aInvalid(SAL_MAX_UINT32, SAL_MAX_UINT32);
+    if (aSelection == aInvalid)
+    {
+        SAL_WARN("vcl.qt", "Invalid selection when deleting IM replacement text");
+        return;
+    }
+
+    SalSurroundingTextSelectionChangeEvent aEvt;
+    aEvt.mnStart = aSelection.Min();
+    aEvt.mnEnd = aSelection.Max();
+    rFrame.CallCallback(SalEvent::DeleteSurroundingTextRequest, &aEvt);
+}
+
+bool QtWidget::handleKeyEvent(QtFrame& rFrame, const QWidget& rWidget, QKeyEvent* pEvent)
+{
+    const bool bIsKeyPressed
+        = pEvent->type() == QEvent::KeyPress || pEvent->type() == QEvent::ShortcutOverride;
     sal_uInt16 nCode = GetKeyCode(pEvent->key(), pEvent->modifiers());
-    if (eState == ButtonKeyState::Pressed && nCode == 0 && pEvent->text().length() > 1
+    if (bIsKeyPressed && nCode == 0 && pEvent->text().length() > 1
         && rWidget.testAttribute(Qt::WA_InputMethodEnabled))
     {
         commitText(rFrame, pEvent->text());
@@ -514,11 +533,10 @@ bool QtWidget::handleKeyEvent(QtFrame& rFrame, const QWidget& rWidget, QKeyEvent
     {
         sal_uInt16 nModCode = GetKeyModCode(pEvent->modifiers());
         SalKeyModEvent aModEvt;
-        aModEvt.mbDown = eState == ButtonKeyState::Pressed;
+        aModEvt.mbDown = bIsKeyPressed;
         aModEvt.mnModKeyCode = ModKeyFlags::NONE;
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11)                                      \
-    || (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0) && QT6_USING_X11)
+#if CHECK_ANY_QT_USING_X11
         if (QGuiApplication::platformName() == "xcb")
         {
             // pressing just the ctrl key leads to a keysym of XK_Control but
@@ -567,7 +585,7 @@ bool QtWidget::handleKeyEvent(QtFrame& rFrame, const QWidget& rWidget, QKeyEvent
                     break;
             }
 
-            if (eState == ButtonKeyState::Released)
+            if (!bIsKeyPressed)
             {
                 // sending the old mnModKeyCode mask on release is needed to
                 // implement the writing direction switch with Ctrl + L/R-Shift
@@ -589,8 +607,10 @@ bool QtWidget::handleKeyEvent(QtFrame& rFrame, const QWidget& rWidget, QKeyEvent
         return false;
     }
 
+#if CHECK_ANY_QT_USING_X11
     // prevent interference of writing direction switch (Ctrl + L/R-Shift) with "normal" shortcuts
     rFrame.m_nKeyModifiers = ModKeyFlags::NONE;
+#endif
 
     SalKeyEvent aEvent;
     aEvent.mnCharCode = (pEvent->text().isEmpty() ? 0 : pEvent->text().at(0).unicode());
@@ -601,7 +621,7 @@ bool QtWidget::handleKeyEvent(QtFrame& rFrame, const QWidget& rWidget, QKeyEvent
     QGuiApplication::inputMethod()->update(Qt::ImCursorRectangle);
 
     bool bStopProcessingKey;
-    if (eState == ButtonKeyState::Pressed)
+    if (bIsKeyPressed)
         bStopProcessingKey = rFrame.CallCallback(SalEvent::KeyInput, &aEvent);
     else
         bStopProcessingKey = rFrame.CallCallback(SalEvent::KeyUp, &aEvent);
@@ -633,16 +653,14 @@ bool QtWidget::handleEvent(QtFrame& rFrame, QWidget& rWidget, QEvent* pEvent)
         // and if it's handled - disable the shortcut, it should have been activated.
         // Don't process keyPressEvent generated after disabling shortcut since it was handled here.
         // If event is not handled, don't accept it and let Qt activate related shortcut.
-        if (handleKeyEvent(rFrame, rWidget, static_cast<QKeyEvent*>(pEvent),
-                           ButtonKeyState::Pressed))
+        if (handleKeyEvent(rFrame, rWidget, static_cast<QKeyEvent*>(pEvent)))
             return true;
     }
     else if (pEvent->type() == QEvent::ToolTip)
     {
         // Qt's POV on the active popup is wrong due to our fake popup, so check LO's state.
         // Otherwise Qt will continue handling ToolTip events from the "parent" window.
-        const QtFrame* pPopupFrame
-            = static_cast<QtInstance*>(GetSalData()->m_pInstance)->activePopup();
+        const QtFrame* pPopupFrame = GetQtInstance()->activePopup();
         if (!rFrame.m_aTooltipText.isEmpty() && (!pPopupFrame || pPopupFrame == &rFrame))
             QToolTip::showText(QCursor::pos(), toQString(rFrame.m_aTooltipText), &rWidget,
                                rFrame.m_aTooltipArea);
@@ -681,7 +699,9 @@ void QtWidget::closePopup()
 
 void QtWidget::focusOutEvent(QFocusEvent*)
 {
+#if CHECK_ANY_QT_USING_X11
     m_rFrame.m_nKeyModifiers = ModKeyFlags::NONE;
+#endif
     endExtTextInput();
     m_rFrame.CallCallback(SalEvent::LoseFocus, nullptr);
     closePopup();
@@ -697,11 +717,17 @@ QtWidget::QtWidget(QtFrame& rFrame, Qt::WindowFlags f)
     , m_nDeltaX(0)
     , m_nDeltaY(0)
 {
+    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setAttribute(Qt::WA_NoSystemBackground);
     setMouseTracking(true);
-    setFocusPolicy(Qt::StrongFocus);
+    if (!rFrame.isPopup())
+        setFocusPolicy(Qt::StrongFocus);
+    else
+        setFocusPolicy(Qt::ClickFocus);
 }
 
-static ExtTextInputAttr lcl_MapUndrelineStyle(QTextCharFormat::UnderlineStyle us)
+static ExtTextInputAttr lcl_MapUnderlineStyle(QTextCharFormat::UnderlineStyle us)
 {
     switch (us)
     {
@@ -721,8 +747,16 @@ static ExtTextInputAttr lcl_MapUndrelineStyle(QTextCharFormat::UnderlineStyle us
 
 void QtWidget::inputMethodEvent(QInputMethodEvent* pEvent)
 {
-    if (!pEvent->commitString().isEmpty())
-        commitText(m_rFrame, pEvent->commitString());
+    const bool bHasCommitText = !pEvent->commitString().isEmpty();
+    const int nReplacementLength = pEvent->replacementLength();
+
+    if (nReplacementLength > 0 || bHasCommitText)
+    {
+        if (nReplacementLength > 0)
+            deleteReplacementText(m_rFrame, pEvent->replacementStart(), nReplacementLength);
+        if (bHasCommitText)
+            commitText(m_rFrame, pEvent->commitString());
+    }
     else
     {
         SalExtTextInputEvent aInputEvent;
@@ -737,9 +771,8 @@ void QtWidget::inputMethodEvent(QInputMethodEvent* pEvent)
                                                  ExtTextInputAttr::NONE);
         aInputEvent.mpTextAttr = aTextAttrs.data();
 
-        for (int i = 0; i < rAttrList.size(); ++i)
+        for (const QInputMethodEvent::Attribute& rAttr : rAttrList)
         {
-            const QInputMethodEvent::Attribute& rAttr = rAttrList.at(i);
             switch (rAttr.type)
             {
                 case QInputMethodEvent::TextFormat:
@@ -749,7 +782,7 @@ void QtWidget::inputMethodEvent(QInputMethodEvent* pEvent)
                     if (aCharFormat.isValid())
                     {
                         ExtTextInputAttr aETIP
-                            = lcl_MapUndrelineStyle(aCharFormat.underlineStyle());
+                            = lcl_MapUnderlineStyle(aCharFormat.underlineStyle());
                         if (aCharFormat.hasProperty(QTextFormat::BackgroundBrush))
                             aETIP |= ExtTextInputAttr::Highlight;
                         if (aCharFormat.fontStrikeOut())
@@ -919,7 +952,7 @@ void QtWidget::changeEvent(QEvent* pEvent)
             [[fallthrough]];
         case QEvent::StyleChange:
         {
-            auto* pSalInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
+            auto* pSalInst(GetQtInstance());
             assert(pSalInst);
             pSalInst->UpdateStyle(QEvent::FontChange == pEvent->type());
             break;

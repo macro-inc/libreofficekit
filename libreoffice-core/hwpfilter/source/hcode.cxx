@@ -23,11 +23,20 @@
  * Hanja johap code => ks code => unicode
  * Special johap code => ks code => unicode
  */
+
+#include <sal/config.h>
+
 #include "precompile.h"
+#include <comphelper/base64.hxx>
+#include <comphelper/sequence.hxx>
 #include <basegfx/numeric/ftools.hxx>
+#include <o3tl/safeint.hxx>
+#include <o3tl/sprintf.hxx>
+#include <rtl/strbuf.hxx>
+#include <rtl/ustrbuf.hxx>
 #include <sal/types.h>
 #include <sal/macros.h>
-#include <stdio.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
@@ -1139,7 +1148,7 @@ hchar ksc5601_sym_to_ucs2 (hchar input)
     unsigned char ch = sal::static_int_cast<unsigned char>(input >> 8);
     unsigned char ch2 = sal::static_int_cast<unsigned char>(input & 0xff);
     int idx = (ch - 0xA1) * 94 + (ch2 - 0xA1);
-    if (idx >= 0 && idx < static_cast<int>(SAL_N_ELEMENTS(ksc5601_2uni_page21))) {
+    if (idx >= 0 && o3tl::make_unsigned(idx) < SAL_N_ELEMENTS(ksc5601_2uni_page21)) {
         hchar value = ksc5601_2uni_page21[idx];
         return value ? value :  0x25a1;
     }
@@ -1151,7 +1160,7 @@ hchar ksc5601_han_to_ucs2 (hchar input)
     unsigned char ch = sal::static_int_cast<unsigned char>(input >> 8);
     unsigned char ch2 = sal::static_int_cast<unsigned char>(input & 0xff);
     int idx = (ch - 0xA1) * 94 + (ch2 - 0xA1);
-    if (idx >= 3854 && idx < static_cast<int>(3854 + SAL_N_ELEMENTS(ksc5601_2uni_page21))) {
+    if (idx >= 3854 && o3tl::make_unsigned(idx) < 3854 + SAL_N_ELEMENTS(ksc5601_2uni_page21)) {
         // Hanja : row 42 - row 93 : 3854 = 94 * (42-1)
         hchar value = ksc5601_2uni_page21[idx - 3854];
         return value ? value : '?';
@@ -1159,17 +1168,16 @@ hchar ksc5601_han_to_ucs2 (hchar input)
     return '?';
 }
 
-hchar_string hstr2ucsstr(hchar const* hstr)
+OUString hstr2OUString(hchar const* hstr)
 {
-    hchar_string ret;
+    OUStringBuffer ret;
+    static_assert(sizeof(hchar) == sizeof(sal_Unicode));
     hchar dest[3];
     for( ; *hstr ; ){
         int const res = hcharconv(*hstr++, dest, UNICODE);
-        for (int j = 0 ; j < res ; j++) {
-            ret.push_back(dest[j]);
-        }
+        ret.append(reinterpret_cast<sal_Unicode*>(dest), res);
     }
-    return ret;
+    return ret.makeStringAndClear();
 }
 
 /**
@@ -1229,18 +1237,8 @@ hchar_string kstr2hstr(uchar const* src)
 }
 
 
-/**
- * Transfer integer to string following format
- */
-char* Int2Str(int value, const char *format, char *buf)
-{
-    sprintf(buf,format,value);
-    return buf;
-}
-
-
 /* Convert a combination of a color index value and a shade value to the color value of LibreOffice */
-char *hcolor2str(uchar color, uchar shade, char *buf, bool bIsChar)
+OUString hcolor2str(uchar color, uchar shade, bool bIsChar)
 {
     unsigned short red,green,blue;
 
@@ -1291,10 +1289,19 @@ char *hcolor2str(uchar color, uchar shade, char *buf, bool bIsChar)
             blue = 0xff;
             break;
     }
-
-    sprintf(buf,"#%02x%02x%02x", red, green, blue);
-    return buf;
+    return rgb2str(red, green, blue);
 }
+
+
+OUString rgb2str(unsigned char red, unsigned char green, unsigned char blue)
+{
+    char buf[8];
+    int n = std::max(o3tl::sprintf(buf, "#%02x%02x%02x", red, green, blue), 0);
+    return OUString::createFromAscii(std::string_view(buf, n));
+}
+
+
+OUString rgb2str(int32_t rgb) { return rgb2str(rgb & 0xff, (rgb >> 8) & 0xff, (rgb >> 16) & 0xff); }
 
 
 ::std::string urltounix(const char *src)
@@ -1385,57 +1392,14 @@ char *hcolor2str(uchar color, uchar shade, char *buf, bool bIsChar)
 }
 #endif
 
-char* base64_encode_string( const uchar *buf, unsigned int len )
+OUString base64_encode_string( const uchar *buf, unsigned int len )
 {
-    char basis_64[] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    char * out;
-    int inPos  = 0;
-    int outPos = 0;
-    int c1, c2;
-    unsigned int i;
-
-    out=static_cast<char *>(malloc( (len*4/3)+8 ));
-
-/* Get three characters at a time and encode them. */
-    for (i=0; i < len/3; ++i)
-    {
-        c1 = buf[inPos++] & 0xFF;
-        c2 = buf[inPos++] & 0xFF;
-        int c3 = buf[inPos++] & 0xFF;
-        out[outPos++] = basis_64[(c1 & 0xFC) >> 2];
-        out[outPos++] = basis_64[((c1 & 0x03) << 4) | ((c2 & 0xF0) >> 4)];
-        out[outPos++] = basis_64[((c2 & 0x0F) << 2) | ((c3 & 0xC0) >> 6)];
-        out[outPos++] = basis_64[c3 & 0x3F];
-    }
-
-/* Encode the remaining one or two characters. */
-
-    switch (len % 3)
-    {
-        case 0:
-            break;
-        case 1:
-            c1 = buf[inPos] & 0xFF;
-            out[outPos++] = basis_64[(c1 & 0xFC) >> 2];
-            out[outPos++] = basis_64[((c1 & 0x03) << 4)];
-            out[outPos++] = '=';
-            out[outPos++] = '=';
-            break;
-        case 2:
-            c1 = buf[inPos++] & 0xFF;
-            c2 = buf[inPos] & 0xFF;
-            out[outPos++] = basis_64[(c1 & 0xFC) >> 2];
-            out[outPos++] = basis_64[((c1 & 0x03) << 4) | ((c2 & 0xF0) >> 4)];
-            out[outPos++] = basis_64[((c2 & 0x0F) << 2)];
-            out[outPos++] = '=';
-            break;
-    }
-    out[outPos] = 0;
-    return out;
+    OStringBuffer aBuf;
+    comphelper::Base64::encode(aBuf, comphelper::arrayToSequence<sal_Int8>(buf, len));
+    return OUString::createFromAscii(aBuf);
 }
 
-double calcAngle(int x1, int y1, int x2, int y2)
+double calcAngle(double x1, double y1, double x2, double y2)
 {
      y1 = -y1;
      y2 = -y2;
@@ -1445,10 +1409,8 @@ double calcAngle(int x1, int y1, int x2, int y2)
           else
                 return 270.;
      }
-     double angle;
      // atan2 handles all 4 quadrants
-     angle = basegfx::rad2deg(atan2(y2 - y1 , x2 - x1));
-     return angle;
+     return basegfx::rad2deg(atan2(y2 - y1 , x2 - x1));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

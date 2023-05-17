@@ -18,15 +18,19 @@
  */
 
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/bitmapex.hxx>
+#include <vcl/gdimtf.hxx>
 #include <vcl/settings.hxx>
+#include <vcl/virdev.hxx>
 #include <vcl/BitmapFilter.hxx>
 #include <vcl/ImageTree.hxx>
 #include <bitmap/BitmapDisabledImageFilter.hxx>
 #include <comphelper/lok.hxx>
 
 #include <image.h>
+#include <salgdi.hxx>
 
 ImplImage::ImplImage(const BitmapEx &rBitmapEx)
     : maBitmapChecksum(0)
@@ -35,20 +39,28 @@ ImplImage::ImplImage(const BitmapEx &rBitmapEx)
 {
 }
 
-ImplImage::ImplImage(const OUString &aStockName)
+ImplImage::ImplImage(OUString aStockName)
     : maBitmapChecksum(0)
-    , maStockName(aStockName)
+    , maStockName(std::move(aStockName))
 {
 }
 
-bool ImplImage::loadStockAtScale(double fScale, BitmapEx &rBitmapEx)
+ImplImage::ImplImage(const GDIMetaFile& rMetaFile)
+    : maBitmapChecksum(0)
+    , maSizePixel(rMetaFile.GetPrefSize())
+    , mxMetaFile(new GDIMetaFile(rMetaFile))
+{
+}
+
+bool ImplImage::loadStockAtScale(SalGraphics* pGraphics, BitmapEx &rBitmapEx)
 {
     BitmapEx aBitmapEx;
 
     ImageLoadFlags eScalingFlags = ImageLoadFlags::NONE;
     sal_Int32 nScalePercentage = -1;
 
-    if (comphelper::LibreOfficeKit::isActive()) // scale at the surface
+    double fScale(1.0);
+    if (pGraphics && pGraphics->ShouldDownscaleIconsAtSurface(&fScale)) // scale at the surface
     {
         nScalePercentage = fScale * 100.0;
         eScalingFlags = ImageLoadFlags::IgnoreScalingFactor;
@@ -93,7 +105,7 @@ Size ImplImage::getSizePixel()
         aRet = maSizePixel;
     else if (isStock())
     {
-        if (loadStockAtScale(1.0, maBitmapEx))
+        if (loadStockAtScale(nullptr, maBitmapEx))
         {
             assert(maDisabledBitmapEx.IsEmpty());
             assert(maBitmapChecksum == 0);
@@ -137,16 +149,27 @@ bool ImplImage::isEqual(const ImplImage &ref) const
         return maBitmapEx == ref.maBitmapEx;
 }
 
-BitmapEx const & ImplImage::getBitmapExForHiDPI(bool bDisabled)
+BitmapEx const & ImplImage::getBitmapExForHiDPI(bool bDisabled, SalGraphics* pGraphics)
 {
-    if (isStock())
+    if ((isStock() || mxMetaFile) && pGraphics)
     {   // check we have the right bitmap cached.
-        // FIXME: DPI scaling should be tied to the outdev really ...
-        double fScale = comphelper::LibreOfficeKit::getDPIScale();
+        double fScale = 1.0;
+        pGraphics->ShouldDownscaleIconsAtSurface(&fScale);
         Size aTarget(maSizePixel.Width()*fScale,
                      maSizePixel.Height()*fScale);
         if (maBitmapEx.GetSizePixel() != aTarget)
-            loadStockAtScale(fScale, maBitmapEx);
+        {
+            if (isStock())
+                loadStockAtScale(pGraphics, maBitmapEx);
+            else // if (mxMetaFile)
+            {
+                ScopedVclPtrInstance<VirtualDevice> aVDev(DeviceFormat::DEFAULT, DeviceFormat::DEFAULT);
+                aVDev->SetOutputSizePixel(aTarget);
+                mxMetaFile->WindStart();
+                mxMetaFile->Play(*aVDev, Point(), aTarget);
+                maBitmapEx = aVDev->GetBitmapEx(Point(), aTarget);
+            }
+        }
     }
     return getBitmapEx(bDisabled);
 }

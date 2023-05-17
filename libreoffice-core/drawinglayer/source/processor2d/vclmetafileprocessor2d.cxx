@@ -24,13 +24,15 @@
 #include <rtl/ustring.hxx>
 #include <tools/gen.hxx>
 #include <tools/stream.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <comphelper/flagguard.hxx>
 #include <comphelper/processfactory.hxx>
 #include <config_global.h>
 #include <basegfx/polygon/b2dpolygonclipper.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dlinegeometry.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/gdimtf.hxx>
 #include <vcl/gradient.hxx>
@@ -40,11 +42,12 @@
 #include <toolkit/helper/formpdfexport.hxx> // for PDFExtOutDevData Graphic support
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokeArrowPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonGradientPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonHatchPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonGraphicPrimitive2D.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
 #include <drawinglayer/primitive2d/maskprimitive2d.hxx>
 #include <drawinglayer/primitive2d/modifiedcolorprimitive2d.hxx>
@@ -256,19 +259,20 @@ void VclMetafileProcessor2D::impConvertFillGradientAttributeToVCLGradient(
     Gradient& o_rVCLGradient, const attribute::FillGradientAttribute& rFiGrAtt,
     bool bIsTransparenceGradient) const
 {
+    const basegfx::BColor aStartColor(rFiGrAtt.getColorStops().front().getStopColor());
+    const basegfx::BColor aEndColor(rFiGrAtt.getColorStops().back().getStopColor());
+
     if (bIsTransparenceGradient)
     {
         // it's about transparence channel intensities (black/white), do not use color modifier
-        o_rVCLGradient.SetStartColor(Color(rFiGrAtt.getStartColor()));
-        o_rVCLGradient.SetEndColor(Color(rFiGrAtt.getEndColor()));
+        o_rVCLGradient.SetStartColor(Color(aStartColor));
+        o_rVCLGradient.SetEndColor(Color(aEndColor));
     }
     else
     {
         // use color modifier to influence start/end color of gradient
-        o_rVCLGradient.SetStartColor(
-            Color(maBColorModifierStack.getModifiedColor(rFiGrAtt.getStartColor())));
-        o_rVCLGradient.SetEndColor(
-            Color(maBColorModifierStack.getModifiedColor(rFiGrAtt.getEndColor())));
+        o_rVCLGradient.SetStartColor(Color(maBColorModifierStack.getModifiedColor(aStartColor)));
+        o_rVCLGradient.SetEndColor(Color(maBColorModifierStack.getModifiedColor(aEndColor)));
     }
 
     o_rVCLGradient.SetAngle(
@@ -281,40 +285,7 @@ void VclMetafileProcessor2D::impConvertFillGradientAttributeToVCLGradient(
     // defaults for intensity; those were computed into the start/end colors already
     o_rVCLGradient.SetStartIntensity(100);
     o_rVCLGradient.SetEndIntensity(100);
-
-    switch (rFiGrAtt.getStyle())
-    {
-        default: // attribute::GradientStyle::Linear :
-        {
-            o_rVCLGradient.SetStyle(GradientStyle::Linear);
-            break;
-        }
-        case attribute::GradientStyle::Axial:
-        {
-            o_rVCLGradient.SetStyle(GradientStyle::Axial);
-            break;
-        }
-        case attribute::GradientStyle::Radial:
-        {
-            o_rVCLGradient.SetStyle(GradientStyle::Radial);
-            break;
-        }
-        case attribute::GradientStyle::Elliptical:
-        {
-            o_rVCLGradient.SetStyle(GradientStyle::Elliptical);
-            break;
-        }
-        case attribute::GradientStyle::Square:
-        {
-            o_rVCLGradient.SetStyle(GradientStyle::Square);
-            break;
-        }
-        case attribute::GradientStyle::Rect:
-        {
-            o_rVCLGradient.SetStyle(GradientStyle::Rect);
-            break;
-        }
-    }
+    o_rVCLGradient.SetStyle(rFiGrAtt.getStyle());
 }
 
 void VclMetafileProcessor2D::impStartSvtGraphicFill(SvtGraphicFill const* pSvtGraphicFill)
@@ -836,8 +807,17 @@ void VclMetafileProcessor2D::processBasePrimitive2D(const primitive2d::BasePrimi
         }
         case PRIMITIVE2D_ID_POLYPOLYGONGRAPHICPRIMITIVE2D:
         {
-            processPolyPolygonGraphicPrimitive2D(
-                static_cast<const primitive2d::PolyPolygonGraphicPrimitive2D&>(rCandidate));
+            if (maBColorModifierStack.count())
+            {
+                // tdf#151104 unfortunately processPolyPolygonGraphicPrimitive2D below
+                // does not support an active BColorModifierStack, so use the default
+                process(rCandidate);
+            }
+            else
+            {
+                processPolyPolygonGraphicPrimitive2D(
+                    static_cast<const primitive2d::PolyPolygonGraphicPrimitive2D&>(rCandidate));
+            }
             break;
         }
         case PRIMITIVE2D_ID_POLYPOLYGONHATCHPRIMITIVE2D:
@@ -916,6 +896,20 @@ void VclMetafileProcessor2D::processBasePrimitive2D(const primitive2d::BasePrimi
                 static_cast<const primitive2d::StructureTagPrimitive2D&>(rCandidate));
             break;
         }
+        case PRIMITIVE2D_ID_TEXTHIERARCHYEDITPRIMITIVE2D:
+        {
+            // This primitive is created if a text edit is active and contains it's
+            // current content, not from model data itself.
+            // Pixel renderers need to suppress that content, it gets displayed by the active
+            // TextEdit in the EditView. Suppression is done by decomposing to nothing.
+            // MetaFile renderers have to show it, so that the edited text is part of the
+            // MetaFile, e.g. needed for presentation previews and exports.
+            // So take action here and process it's content:
+            // Note: Former error was #i97628#
+            process(static_cast<const primitive2d::TextHierarchyEditPrimitive2D&>(rCandidate)
+                        .getContent());
+            break;
+        }
         case PRIMITIVE2D_ID_EPSPRIMITIVE2D:
         {
             RenderEpsPrimitive2D(static_cast<const primitive2d::EpsPrimitive2D&>(rCandidate));
@@ -923,15 +917,8 @@ void VclMetafileProcessor2D::processBasePrimitive2D(const primitive2d::BasePrimi
         }
         case PRIMITIVE2D_ID_OBJECTINFOPRIMITIVE2D:
         {
-            RenderObjectInfoPrimitive2D(
+            processObjectInfoPrimitive2D(
                 static_cast<const primitive2d::ObjectInfoPrimitive2D&>(rCandidate));
-            break;
-        }
-        case PRIMITIVE2D_ID_SHADOWPRIMITIVE2D:
-        case PRIMITIVE2D_ID_GLOWPRIMITIVE2D:
-        case PRIMITIVE2D_ID_SOFTEDGEPRIMITIVE2D:
-        {
-            processPrimitive2DOnPixelProcessor(rCandidate);
             break;
         }
         default:
@@ -941,6 +928,51 @@ void VclMetafileProcessor2D::processBasePrimitive2D(const primitive2d::BasePrimi
             break;
         }
     }
+}
+
+void VclMetafileProcessor2D::processObjectInfoPrimitive2D(
+    primitive2d::ObjectInfoPrimitive2D const& rObjectInfoPrimitive2D)
+{
+    // currently StructureTagPrimitive2D is only used for SdrObjects - have to
+    // avoid adding Alt text if the SdrObject is not actually tagged, as it
+    // would then end up on an unrelated structure element.
+    if (mpCurrentStructureTag && mpCurrentStructureTag->isTaggedSdrObject())
+    {
+        // Create image alternative description from ObjectInfoPrimitive2D info
+        // for PDF export, for the currently active SdrObject's structure element
+        if (mpPDFExtOutDevData->GetIsExportTaggedPDF())
+        {
+            OUString aAlternateDescription;
+
+            if (!rObjectInfoPrimitive2D.getTitle().isEmpty())
+            {
+                aAlternateDescription += rObjectInfoPrimitive2D.getTitle();
+            }
+
+            if (!rObjectInfoPrimitive2D.getDesc().isEmpty())
+            {
+                if (!aAlternateDescription.isEmpty())
+                {
+                    aAlternateDescription += " - ";
+                }
+
+                aAlternateDescription += rObjectInfoPrimitive2D.getDesc();
+            }
+
+            // Use SetAlternateText to set it. This will work as long as some
+            // structure is used (see PDFWriterImpl::setAlternateText and
+            // m_nCurrentStructElement - tagged PDF export works with this in
+            // Draw/Impress/Writer, but not in Calc due to too less structure...)
+            //Z maybe add structure to Calc PDF export, may need some BeginGroup/EndGroup stuff ..?
+            if (!aAlternateDescription.isEmpty())
+            {
+                mpPDFExtOutDevData->SetAlternateText(aAlternateDescription);
+            }
+        }
+    }
+
+    // process content
+    process(rObjectInfoPrimitive2D.getChildren());
 }
 
 void VclMetafileProcessor2D::processGraphicPrimitive2D(
@@ -1034,38 +1066,6 @@ void VclMetafileProcessor2D::processGraphicPrimitive2D(
             sal_Int32(ceil(aCropRange.getMaxX())), sal_Int32(ceil(aCropRange.getMaxY())));
     }
 
-    // Create image alternative description from ObjectInfoPrimitive2D info
-    // for PDF export
-    if (mpPDFExtOutDevData->GetIsExportTaggedPDF() && nullptr != getObjectInfoPrimitive2D())
-    {
-        OUString aAlternateDescription;
-
-        if (!getObjectInfoPrimitive2D()->getTitle().isEmpty())
-        {
-            aAlternateDescription += getObjectInfoPrimitive2D()->getTitle();
-        }
-
-        if (!getObjectInfoPrimitive2D()->getDesc().isEmpty())
-        {
-            if (!aAlternateDescription.isEmpty())
-            {
-                aAlternateDescription += " - ";
-            }
-
-            aAlternateDescription += getObjectInfoPrimitive2D()->getDesc();
-        }
-
-        // Use SetAlternateText to set it. This will work as long as some
-        // structure is used (see PDFWriterImpl::setAlternateText and
-        // m_nCurrentStructElement - tagged PDF export works with this in
-        // Draw/Impress/Writer, but not in Calc due to too less structure...)
-        //Z maybe add structure to Calc PDF export, may need some BeginGroup/EndGroup stuff ..?
-        if (!aAlternateDescription.isEmpty())
-        {
-            mpPDFExtOutDevData->SetAlternateText(aAlternateDescription);
-        }
-    }
-
     // #i123295# 3rd param is uncropped rect, 4th is cropped. The primitive has the cropped
     // object transformation, thus aCurrentRect *is* the clip region while aCropRect is the expanded,
     // uncropped region. Thus, correct order is aCropRect, aCurrentRect
@@ -1114,8 +1114,6 @@ void VclMetafileProcessor2D::processControlPrimitive2D(
     if (bPDFExport)
     {
         // PDF export. Emulate data handling from UnoControlPDFExportContact
-        // I have now moved describePDFControl to toolkit, thus i can implement the PDF
-        // form control support now as follows
         std::unique_ptr<vcl::PDFWriter::AnyWidget> pPDFControl(
             ::toolkitform::describePDFControl(rXControl, *mpPDFExtOutDevData));
 
@@ -1136,6 +1134,30 @@ void VclMetafileProcessor2D::processControlPrimitive2D(
             pPDFControl->TextFont.SetFontSize(aFontSize);
 
             mpPDFExtOutDevData->BeginStructureElement(vcl::PDFWriter::Form);
+            vcl::PDFWriter::StructAttributeValue role;
+            switch (pPDFControl->Type)
+            {
+                case vcl::PDFWriter::PushButton:
+                    role = vcl::PDFWriter::Pb;
+                    break;
+                case vcl::PDFWriter::RadioButton:
+                    role = vcl::PDFWriter::Rb;
+                    break;
+                case vcl::PDFWriter::CheckBox:
+                    role = vcl::PDFWriter::Cb;
+                    break;
+                default: // there is a paucity of roles, tv is the catch-all one
+                    role = vcl::PDFWriter::Tv;
+                    break;
+            }
+            // ISO 14289-1:2014, Clause: 7.18.4
+            mpPDFExtOutDevData->SetStructureAttribute(vcl::PDFWriter::Role, role);
+            // ISO 14289-1:2014, Clause: 7.18.1
+            OUString const& rAltText(rControlPrimitive.GetAltText());
+            if (!rAltText.isEmpty())
+            {
+                mpPDFExtOutDevData->SetAlternateText(rAltText);
+            }
             mpPDFExtOutDevData->CreateControl(*pPDFControl);
             mpPDFExtOutDevData->EndStructureElement();
 
@@ -1148,6 +1170,22 @@ void VclMetafileProcessor2D::processControlPrimitive2D(
             // PDF export did not work, try simple output.
             // Fallback to printer output by not setting bDoProcessRecursively
             // to false.
+        }
+    }
+
+    if (!bDoProcessRecursively)
+    {
+        return;
+    }
+
+    if (mpPDFExtOutDevData)
+    { // no corresponding PDF Form, use Figure instead
+        mpPDFExtOutDevData->BeginStructureElement(vcl::PDFWriter::Figure);
+        mpPDFExtOutDevData->SetStructureAttribute(vcl::PDFWriter::Placement, vcl::PDFWriter::Block);
+        OUString const& rAltText(rControlPrimitive.GetAltText());
+        if (!rAltText.isEmpty())
+        {
+            mpPDFExtOutDevData->SetAlternateText(rAltText);
         }
     }
 
@@ -1194,6 +1232,11 @@ void VclMetafileProcessor2D::processControlPrimitive2D(
     if (bDoProcessRecursively)
     {
         process(rControlPrimitive);
+    }
+
+    if (mpPDFExtOutDevData)
+    {
+        mpPDFExtOutDevData->EndStructureElement();
     }
 }
 
@@ -1251,7 +1294,8 @@ void VclMetafileProcessor2D::processTextHierarchyFieldPrimitive2D(
                                       static_cast<sal_Int32>(ceil(aViewRange.getMaxX())),
                                       static_cast<sal_Int32>(ceil(aViewRange.getMaxY())));
     vcl::PDFExtOutDevBookmarkEntry aBookmark;
-    aBookmark.nLinkId = mpPDFExtOutDevData->CreateLink(aRectLogic);
+    OUString const content(rFieldPrimitive.getValue("Representation"));
+    aBookmark.nLinkId = mpPDFExtOutDevData->CreateLink(aRectLogic, content);
     aBookmark.aBookmark = aURL;
     std::vector<vcl::PDFExtOutDevBookmarkEntry>& rBookmarks = mpPDFExtOutDevData->GetBookmarks();
     rBookmarks.push_back(aBookmark);
@@ -1500,9 +1544,11 @@ void VclMetafileProcessor2D::processPolygonHairlinePrimitive2D(
         basegfx::B2DPolygon aLeft, aRight;
         splitLinePolygon(rBasePolygon, aLeft, aRight);
         rtl::Reference<primitive2d::PolygonHairlinePrimitive2D> xPLeft(
-            new primitive2d::PolygonHairlinePrimitive2D(aLeft, rHairlinePrimitive.getBColor()));
+            new primitive2d::PolygonHairlinePrimitive2D(std::move(aLeft),
+                                                        rHairlinePrimitive.getBColor()));
         rtl::Reference<primitive2d::PolygonHairlinePrimitive2D> xPRight(
-            new primitive2d::PolygonHairlinePrimitive2D(aRight, rHairlinePrimitive.getBColor()));
+            new primitive2d::PolygonHairlinePrimitive2D(std::move(aRight),
+                                                        rHairlinePrimitive.getBColor()));
 
         processBasePrimitive2D(*xPLeft);
         processBasePrimitive2D(*xPRight);
@@ -1550,10 +1596,12 @@ void VclMetafileProcessor2D::processPolygonStrokePrimitive2D(
         basegfx::B2DPolygon aLeft, aRight;
         splitLinePolygon(rBasePolygon, aLeft, aRight);
         rtl::Reference<primitive2d::PolygonStrokePrimitive2D> xPLeft(
-            new primitive2d::PolygonStrokePrimitive2D(aLeft, rStrokePrimitive.getLineAttribute(),
+            new primitive2d::PolygonStrokePrimitive2D(std::move(aLeft),
+                                                      rStrokePrimitive.getLineAttribute(),
                                                       rStrokePrimitive.getStrokeAttribute()));
         rtl::Reference<primitive2d::PolygonStrokePrimitive2D> xPRight(
-            new primitive2d::PolygonStrokePrimitive2D(aRight, rStrokePrimitive.getLineAttribute(),
+            new primitive2d::PolygonStrokePrimitive2D(std::move(aRight),
+                                                      rStrokePrimitive.getLineAttribute(),
                                                       rStrokePrimitive.getStrokeAttribute()));
 
         processBasePrimitive2D(*xPLeft);
@@ -1753,6 +1801,16 @@ void VclMetafileProcessor2D::processPolyPolygonGraphicPrimitive2D(
     // need to handle PolyPolygonGraphicPrimitive2D here to support XPATHFILL_SEQ_BEGIN/XPATHFILL_SEQ_END
     basegfx::B2DPolyPolygon aLocalPolyPolygon(rBitmapCandidate.getB2DPolyPolygon());
 
+    if (!rBitmapCandidate.getDefinitionRange().isEmpty()
+        && aLocalPolyPolygon.getB2DRange() != rBitmapCandidate.getDefinitionRange())
+    {
+        // The range which defines the bitmap fill is defined and different from the
+        // range of the defining geometry (e.g. used for FillStyle UseSlideBackground).
+        // This cannot be done calling vcl, thus use decomposition here directly
+        process(rBitmapCandidate);
+        return;
+    }
+
     fillPolyPolygonNeededToBeSplit(aLocalPolyPolygon);
 
     std::unique_ptr<SvtGraphicFill> pSvtGraphicFill;
@@ -1940,6 +1998,13 @@ void VclMetafileProcessor2D::processPolyPolygonGradientPrimitive2D(
         return;
     }
 
+    // tdf#150551 for PDF export, use the decomposition for better gradient visualization
+    if (nullptr != mpPDFExtOutDevData)
+    {
+        process(rGradientCandidate);
+        return;
+    }
+
     basegfx::B2DPolyPolygon aLocalPolyPolygon(rGradientCandidate.getB2DPolyPolygon());
 
     if (aLocalPolyPolygon.getB2DRange() != rGradientCandidate.getDefinitionRange())
@@ -1947,6 +2012,15 @@ void VclMetafileProcessor2D::processPolyPolygonGradientPrimitive2D(
         // the range which defines the gradient is different from the range of the
         // geometry (used for writer frames). This cannot be done calling vcl, thus use
         // decomposition here
+        process(rGradientCandidate);
+        return;
+    }
+
+    if (!rGradientCandidate.getFillGradient().getColorStops().empty())
+    {
+        // MCGR: if we have ColorStops, do not try to fallback to old VCL-Gradient,
+        // that will *not* be capable of representing this properly. Use the
+        // correct decomposition instead
         process(rGradientCandidate);
         return;
     }
@@ -1981,16 +2055,16 @@ void VclMetafileProcessor2D::processPolyPolygonGradientPrimitive2D(
 
         switch (aVCLGradient.GetStyle())
         {
-            default: // GradientStyle::Linear:
-            case GradientStyle::Axial:
+            default: // css::awt::GradientStyle_LINEAR:
+            case css::awt::GradientStyle_AXIAL:
                 eGrad = SvtGraphicFill::GradientType::Linear;
                 break;
-            case GradientStyle::Radial:
-            case GradientStyle::Elliptical:
+            case css::awt::GradientStyle_RADIAL:
+            case css::awt::GradientStyle_ELLIPTICAL:
                 eGrad = SvtGraphicFill::GradientType::Radial;
                 break;
-            case GradientStyle::Square:
-            case GradientStyle::Rect:
+            case css::awt::GradientStyle_SQUARE:
+            case css::awt::GradientStyle_RECT:
                 eGrad = SvtGraphicFill::GradientType::Rectangular;
                 break;
         }
@@ -2172,7 +2246,7 @@ void VclMetafileProcessor2D::processUnifiedTransparencePrimitive2D(
                     basegfx::fround(rUniTransparenceCandidate.getTransparence() * 255.0)));
                 const Color aTransColor(nTransPercentVcl, nTransPercentVcl, nTransPercentVcl);
 
-                aVCLGradient.SetStyle(GradientStyle::Linear);
+                aVCLGradient.SetStyle(css::awt::GradientStyle_LINEAR);
                 aVCLGradient.SetStartColor(aTransColor);
                 aVCLGradient.SetEndColor(aTransColor);
                 aVCLGradient.SetAngle(0_deg10);
@@ -2306,9 +2380,9 @@ void VclMetafileProcessor2D::processTransparencePrimitive2D(
 
             // create view information and pixel renderer. Reuse known ViewInformation
             // except new transformation and range
-            const geometry::ViewInformation2D aViewInfo(
-                getViewInformation2D().getObjectTransformation(), aViewTransform, aViewRange,
-                getViewInformation2D().getVisualizedPage(), getViewInformation2D().getViewTime());
+            geometry::ViewInformation2D aViewInfo(getViewInformation2D());
+            aViewInfo.setViewTransformation(aViewTransform);
+            aViewInfo.setViewport(aViewRange);
 
             VclPixelProcessor2D aBufferProcessor(aViewInfo, *aBufferDevice);
 
@@ -2332,16 +2406,91 @@ void VclMetafileProcessor2D::processTransparencePrimitive2D(
 void VclMetafileProcessor2D::processStructureTagPrimitive2D(
     const primitive2d::StructureTagPrimitive2D& rStructureTagCandidate)
 {
+    ::comphelper::ValueRestorationGuard const g(mpCurrentStructureTag, &rStructureTagCandidate);
+
     // structured tag primitive
     const vcl::PDFWriter::StructElement& rTagElement(rStructureTagCandidate.getStructureElement());
     bool bTagUsed((vcl::PDFWriter::NonStructElement != rTagElement));
+    sal_Int32 nPreviousElement(-1);
+
+    if (!rStructureTagCandidate.isTaggedSdrObject())
+    {
+        bTagUsed = false;
+    }
 
     if (mpPDFExtOutDevData && bTagUsed)
     {
         // foreground object: tag as regular structure element
         if (!rStructureTagCandidate.isBackground())
         {
+            if (rStructureTagCandidate.GetAnchorStructureElementId() != -1)
+            {
+                auto const nTemp = mpPDFExtOutDevData->GetCurrentStructureElement();
+                bool const bSuccess = mpPDFExtOutDevData->SetCurrentStructureElement(
+                    rStructureTagCandidate.GetAnchorStructureElementId());
+                if (bSuccess)
+                {
+                    nPreviousElement = nTemp;
+                }
+                else
+                {
+                    SAL_WARN("drawinglayer", "anchor structure element not found?");
+                }
+            }
             mpPDFExtOutDevData->BeginStructureElement(rTagElement);
+            switch (rTagElement)
+            {
+                case vcl::PDFWriter::H1:
+                case vcl::PDFWriter::H2:
+                case vcl::PDFWriter::H3:
+                case vcl::PDFWriter::H4:
+                case vcl::PDFWriter::H5:
+                case vcl::PDFWriter::H6:
+                case vcl::PDFWriter::Paragraph:
+                case vcl::PDFWriter::Heading:
+                case vcl::PDFWriter::Caption:
+                case vcl::PDFWriter::BlockQuote:
+                case vcl::PDFWriter::Table:
+                case vcl::PDFWriter::TableRow:
+                case vcl::PDFWriter::Formula:
+                case vcl::PDFWriter::Figure:
+                    mpPDFExtOutDevData->SetStructureAttribute(vcl::PDFWriter::Placement,
+                                                              vcl::PDFWriter::Block);
+                    break;
+                case vcl::PDFWriter::TableData:
+                case vcl::PDFWriter::TableHeader:
+                    mpPDFExtOutDevData->SetStructureAttribute(vcl::PDFWriter::Placement,
+                                                              vcl::PDFWriter::Inline);
+                    break;
+                default:
+                    break;
+            }
+            switch (rTagElement)
+            {
+                case vcl::PDFWriter::Table:
+                case vcl::PDFWriter::Formula:
+                case vcl::PDFWriter::Figure:
+                case vcl::PDFWriter::Annot:
+                {
+                    auto const range(rStructureTagCandidate.getB2DRange(getViewInformation2D()));
+                    tools::Rectangle const aLogicRect(
+                        basegfx::fround(range.getMinX()), basegfx::fround(range.getMinY()),
+                        basegfx::fround(range.getMaxX()), basegfx::fround(range.getMaxY()));
+                    mpPDFExtOutDevData->SetStructureBoundingBox(aLogicRect);
+                    break;
+                }
+                default:
+                    break;
+            }
+            if (rTagElement == vcl::PDFWriter::Annot)
+            {
+                mpPDFExtOutDevData->SetStructureAnnotIds(rStructureTagCandidate.GetAnnotIds());
+            }
+            if (rTagElement == vcl::PDFWriter::TableHeader)
+            {
+                mpPDFExtOutDevData->SetStructureAttribute(vcl::PDFWriter::Scope,
+                                                          vcl::PDFWriter::Column);
+            }
         }
         // background object
         else
@@ -2351,7 +2500,7 @@ void VclMetafileProcessor2D::processStructureTagPrimitive2D(
                 mpPDFExtOutDevData->BeginStructureElement(vcl::PDFWriter::NonStructElement);
             // any other background object: do not tag
             else
-                bTagUsed = false;
+                assert(false);
         }
     }
 
@@ -2362,104 +2511,15 @@ void VclMetafileProcessor2D::processStructureTagPrimitive2D(
     {
         // write end tag
         mpPDFExtOutDevData->EndStructureElement();
-    }
-}
-
-VclPtr<VirtualDevice>
-VclMetafileProcessor2D::CreateBufferDevice(const basegfx::B2DRange& rCandidateRange,
-                                           geometry::ViewInformation2D& rViewInfo,
-                                           tools::Rectangle& rRectLogic, Size& rSizePixel) const
-{
-    constexpr double fMaxSquarePixels = 500000;
-    basegfx::B2DRange aViewRange(rCandidateRange);
-    aViewRange.transform(maCurrentTransformation);
-    rRectLogic = tools::Rectangle(static_cast<tools::Long>(std::floor(aViewRange.getMinX())),
-                                  static_cast<tools::Long>(std::floor(aViewRange.getMinY())),
-                                  static_cast<tools::Long>(std::ceil(aViewRange.getMaxX())),
-                                  static_cast<tools::Long>(std::ceil(aViewRange.getMaxY())));
-    const tools::Rectangle aRectPixel(mpOutputDevice->LogicToPixel(rRectLogic));
-    rSizePixel = aRectPixel.GetSize();
-    const double fViewVisibleArea(rSizePixel.getWidth() * rSizePixel.getHeight());
-    double fReduceFactor(1.0);
-
-    if (fViewVisibleArea > fMaxSquarePixels)
-    {
-        // reduce render size
-        fReduceFactor = sqrt(fMaxSquarePixels / fViewVisibleArea);
-        rSizePixel = Size(basegfx::fround(rSizePixel.getWidth() * fReduceFactor),
-                          basegfx::fround(rSizePixel.getHeight() * fReduceFactor));
-    }
-
-    VclPtrInstance<VirtualDevice> pBufferDevice(DeviceFormat::DEFAULT, DeviceFormat::DEFAULT);
-    if (pBufferDevice->SetOutputSizePixel(rSizePixel))
-    {
-        // create and set MapModes for target devices
-        MapMode aNewMapMode(mpOutputDevice->GetMapMode());
-        aNewMapMode.SetOrigin(Point(-rRectLogic.Left(), -rRectLogic.Top()));
-        pBufferDevice->SetMapMode(aNewMapMode);
-
-        // prepare view transformation for target renderers
-        // ATTENTION! Need to apply another scaling because of the potential DPI differences
-        // between Printer and VDev (mpOutputDevice and pBufferDevice here).
-        // To get the DPI, LogicToPixel from (1,1) from MapUnit::MapInch needs to be used.
-        basegfx::B2DHomMatrix aViewTransform(pBufferDevice->GetViewTransformation());
-        const Size aDPIOld(mpOutputDevice->LogicToPixel(Size(1, 1), MapMode(MapUnit::MapInch)));
-        const Size aDPINew(pBufferDevice->LogicToPixel(Size(1, 1), MapMode(MapUnit::MapInch)));
-        const double fDPIXChange(static_cast<double>(aDPIOld.getWidth())
-                                 / static_cast<double>(aDPINew.getWidth()));
-        const double fDPIYChange(static_cast<double>(aDPIOld.getHeight())
-                                 / static_cast<double>(aDPINew.getHeight()));
-
-        if (!basegfx::fTools::equal(fDPIXChange, 1.0) || !basegfx::fTools::equal(fDPIYChange, 1.0))
+        if (nPreviousElement != -1)
         {
-            aViewTransform.scale(fDPIXChange, fDPIYChange);
-        }
-
-        // also take scaling from Size reduction into account
-        if (!basegfx::fTools::equal(fReduceFactor, 1.0))
-        {
-            aViewTransform.scale(fReduceFactor, fReduceFactor);
-        }
-
-        // create view information and pixel renderer. Reuse known ViewInformation
-        // except new transformation and range
-        rViewInfo = geometry::ViewInformation2D(
-            getViewInformation2D().getObjectTransformation(), aViewTransform, aViewRange,
-            getViewInformation2D().getVisualizedPage(), getViewInformation2D().getViewTime());
-    }
-    else
-        pBufferDevice.disposeAndClear();
-
-#if HAVE_P1155R3
-    return pBufferDevice;
-#else
-    return std::move(pBufferDevice);
+#ifndef NDEBUG
+            bool const bSuccess =
 #endif
-}
-
-void VclMetafileProcessor2D::processPrimitive2DOnPixelProcessor(
-    const primitive2d::BasePrimitive2D& rCandidate)
-{
-    basegfx::B2DRange aViewRange(rCandidate.getB2DRange(getViewInformation2D()));
-    geometry::ViewInformation2D aViewInfo;
-    tools::Rectangle aRectLogic;
-    Size aSizePixel;
-    auto pBufferDevice(CreateBufferDevice(aViewRange, aViewInfo, aRectLogic, aSizePixel));
-    if (pBufferDevice)
-    {
-        VclPixelProcessor2D aBufferProcessor(aViewInfo, *pBufferDevice, maBColorModifierStack);
-
-        // draw content using pixel renderer
-        primitive2d::Primitive2DReference aRef(
-            &const_cast<primitive2d::BasePrimitive2D&>(rCandidate));
-        aBufferProcessor.process({ aRef });
-        const BitmapEx aBmContent(pBufferDevice->GetBitmapEx(Point(), aSizePixel));
-        mpOutputDevice->DrawBitmapEx(aRectLogic.TopLeft(), aRectLogic.GetSize(), aBmContent);
-
-        // aBufferProcessor dtor pops state off pBufferDevice pushed on by its ctor, let
-        // pBufferDevice live past aBufferProcessor scope to avoid warnings
+                mpPDFExtOutDevData->SetCurrentStructureElement(nPreviousElement);
+            assert(bSuccess);
+        }
     }
-    pBufferDevice.disposeAndClear();
 }
 
 } // end of namespace

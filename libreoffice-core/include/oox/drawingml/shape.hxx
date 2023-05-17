@@ -34,6 +34,7 @@
 #include <oox/core/xmlfilterbase.hxx>
 #include <oox/dllapi.h>
 #include <oox/drawingml/color.hxx>
+#include <oox/drawingml/connectorshapecontext.hxx>
 #include <oox/drawingml/drawingmltypes.hxx>
 #include <oox/helper/helper.hxx>
 #include <oox/helper/propertymap.hxx>
@@ -57,6 +58,10 @@ namespace oox::vml {
     struct OleObjectInfo;
 }
 
+namespace svx::diagram {
+    class IDiagramHelper;
+}
+
 namespace oox::drawingml {
 
 class Theme;
@@ -71,6 +76,8 @@ typedef std::shared_ptr< CustomShapeProperties > CustomShapePropertiesPtr;
 
 typedef ::std::map< OUString, ShapePtr > ShapeIdMap;
 
+typedef std::vector<ConnectorShapeProperties> ConnectorShapePropertiesList;
+
 struct ShapeStyleRef
 {
     Color               maPhClr;
@@ -79,9 +86,6 @@ struct ShapeStyleRef
 };
 
 typedef ::std::map< sal_Int32, ShapeStyleRef > ShapeStyleRefMap;
-
-class DiagramData;
-typedef std::shared_ptr<DiagramData> DiagramDataPtr;
 
 /** Additional information for a chart embedded in a drawing shape. */
 struct ChartShapeInfo
@@ -100,6 +104,8 @@ struct LinkedTxbxAttr
     LinkedTxbxAttr(): id(0),seq(0){};
 };
 
+class Diagram;
+
 class OOX_DLLPUBLIC Shape
     : public std::enable_shared_from_this< Shape >
 {
@@ -114,6 +120,9 @@ public:
     OUString&                  getServiceName(){ return msServiceName; }
     void                            setServiceName( const char* pServiceName );
 
+    const OUString& getDiagramDataModelID() const { return msDiagramDataModelID; }
+    void setDiagramDataModelID( const OUString& rDiagramDataModelID ) { msDiagramDataModelID = rDiagramDataModelID; }
+
     PropertyMap&                    getShapeProperties(){ return maShapeProperties; }
 
     LineProperties&          getLineProperties() { return *mpLinePropertiesPtr; }
@@ -126,6 +135,12 @@ public:
     const GraphicProperties& getGraphicProperties() const { return *mpGraphicPropertiesPtr; }
 
     CustomShapePropertiesPtr&       getCustomShapeProperties(){ return mpCustomShapePropertiesPtr; }
+
+    OUString&                       getConnectorName() { return msConnectorName; }
+    std::vector<OUString>&          getConnectorAdjustments() { return maConnectorAdjustmentList; };
+    ConnectorShapePropertiesList&   getConnectorShapeProperties() { return maConnectorShapePropertiesList; }
+    void                            setConnectorShape(bool bConnector) { mbConnector = bConnector; }
+    bool                            isConnectorShape() const { return mbConnector; }
 
     Shape3DProperties&              get3DProperties() { return *mp3DPropertiesPtr; }
     const Shape3DProperties&        get3DProperties() const { return *mp3DPropertiesPtr; }
@@ -147,6 +162,8 @@ public:
     sal_Int32                       getRotation() const { return mnRotation; }
     void                            setDiagramRotation( sal_Int32 nRotation ) { mnDiagramRotation = nRotation; }
     void                            setFlip( bool bFlipH, bool bFlipV ) { mbFlipH = bFlipH; mbFlipV = bFlipV; }
+    bool                            getFlipH() const { return mbFlipH; }
+    bool                            getFlipV() const { return mbFlipV; }
     void                            addChild( const ShapePtr& rChildPtr ) { maChildren.push_back( rChildPtr ); }
     std::vector< ShapePtr >&        getChildren() { return maChildren; }
 
@@ -163,7 +180,7 @@ public:
     void                            setSubType( sal_Int32 nSubType ) { mnSubType = nSubType; }
     sal_Int32                       getSubType() const { return mnSubType; }
     void                            setSubTypeIndex( sal_Int32 nSubTypeIndex ) { moSubTypeIndex = nSubTypeIndex; }
-    const OptValue< sal_Int32 >&    getSubTypeIndex() const { return moSubTypeIndex; }
+    const std::optional< sal_Int32 >& getSubTypeIndex() const { return moSubTypeIndex; }
 
     // setDefaults has to be called if styles are imported (OfficeXML is not storing properties having the default value)
     void                            setDefaults(bool bHeight);
@@ -205,13 +222,14 @@ public:
     const Color&        getFontRefColorForNodes() const { return maFontRefColorForNodes; }
     void                setLockedCanvas(bool bLockedCanvas);
     bool                getLockedCanvas() const { return mbLockedCanvas;}
+    void                setWPGChild(bool bWPG);
+    bool                isWPGChild() const { return mbWPGChild;}
     void                setWps(bool bWps);
     bool                getWps() const { return mbWps;}
     void                setTextBox(bool bTextBox);
     const css::uno::Sequence<css::beans::PropertyValue> &
                         getDiagramDoms() const { return maDiagramDoms; }
     void                setDiagramDoms(const css::uno::Sequence<css::beans::PropertyValue>& rDiagramDoms) { maDiagramDoms = rDiagramDoms; }
-    void                setDiagramData(const DiagramDataPtr& pDiagramData) { mpDiagramData = pDiagramData; }
     css::uno::Sequence< css::uno::Sequence< css::uno::Any > >resolveRelationshipsOfTypeFromOfficeDoc(
                                                                           core::XmlFilterBase& rFilter, const OUString& sFragment, std::u16string_view sType );
     void                setLinkedTxbxAttributes(const LinkedTxbxAttr& rhs){ maLinkedTxbxAttr = rhs; };
@@ -238,14 +256,18 @@ public:
     void setVerticalShapesCount(sal_Int32 nVerticalShapesCount) { mnVerticalShapesCount = nVerticalShapesCount; }
     sal_Int32 getVerticalShapesCount() const { return mnVerticalShapesCount; }
 
-    void setUseBgFill(bool bUseBgFill) { mbUseBgFill = bUseBgFill; }
-
     /// Changes reference semantics to value semantics for fill properties.
     void cloneFillProperties();
 
     void keepDiagramDrawing(::oox::core::XmlFilterBase& rFilterBase, const OUString& rFragmentPath);
 
-    oox::core::NamedShapePairs& getDiagramFontHeights() { return maDiagramFontHeights; }
+    // Allows preparation of a local Diagram helper && propagate an eventually
+    // existing one to the data holder object later
+    void prepareDiagramHelper(const std::shared_ptr< Diagram >& rDiagramPtr, const std::shared_ptr<::oox::drawingml::Theme>& rTheme);
+    void propagateDiagramHelper();
+
+    // for Writer it is necessary to migrate an existing helper to a new Shape
+    void migrateDiagramHelperToNewShape(const ShapePtr& pTarget);
 
 protected:
 
@@ -280,7 +302,6 @@ protected:
                             const basegfx::B2DHomMatrix& aTransformation );
 
     void                keepDiagramCompatibilityInfo();
-    void syncDiagramFontHeights();
     void                convertSmartArtToMetafile( ::oox::core::XmlFilterBase const& rFilterBase );
 
     css::uno::Reference< css::drawing::XShape >
@@ -310,6 +331,8 @@ protected:
     css::awt::Size   maChSize;                 // only used for group shapes
     css::awt::Point  maChPosition;             // only used for group shapes
 
+    std::vector<OUString>       maConnectorAdjustmentList; // only used for connector shapes
+
     TextBodyPtr                 mpTextBody;
     LinePropertiesPtr           mpLinePropertiesPtr;
     LinePropertiesPtr           mpShapeRefLinePropPtr;
@@ -325,14 +348,16 @@ protected:
     PropertyMap                 maDefaultShapeProperties;
     TextListStylePtr            mpMasterTextListStyle;
     css::uno::Reference< css::drawing::XShape > mxShape;
+    ConnectorShapePropertiesList maConnectorShapePropertiesList;
 
+    OUString                    msConnectorName;
     OUString                    msServiceName;
     OUString                    msName;
     OUString                    msInternalName; // used by diagram; not displayed in UI
     OUString                    msId;
     OUString                    msDescription;
     sal_Int32                   mnSubType;      // if this type is not zero, then the shape is a placeholder
-    OptValue< sal_Int32 >       moSubTypeIndex;
+    std::optional< sal_Int32 >  moSubTypeIndex;
 
     ShapeStyleRefMap            maShapeStyleRefs;
 
@@ -360,6 +385,7 @@ private:
                                                          // we need separate flag because we don't want
                                                          // to propagate it when applying reference shape
     bool                            mbLocked;
+    bool mbWPGChild; // Is this shape a child of a WPG shape?
     bool mbLockedCanvas; ///< Is this shape part of a locked canvas?
     bool mbWps; ///< Is this a wps shape?
     bool mbTextBox; ///< This shape has a textbox.
@@ -367,7 +393,6 @@ private:
     bool                            mbHasLinkedTxbx; // this text box has linked text box ?
 
     css::uno::Sequence<css::beans::PropertyValue> maDiagramDoms;
-    DiagramDataPtr mpDiagramData;
 
     /// Z-Order.
     sal_Int32 mnZOrder = 0;
@@ -384,11 +409,15 @@ private:
     /// Number of child shapes to be layouted vertically inside org chart in-diagram shape.
     sal_Int32 mnVerticalShapesCount = 0;
 
-    /// The shape fill should be set to that of the slide background surface.
-    bool mbUseBgFill = false;
+    // Is this a connector shape?
+    bool mbConnector = false;
 
-    /// For SmartArt, this contains groups of shapes: automatic font size is the same in each group.
-    oox::core::NamedShapePairs maDiagramFontHeights;
+    // temporary space for DiagramHelper in preparation for collecting data
+    // Note: I tried to use a unique_ptr here, but existing constructor func does not allow that
+    svx::diagram::IDiagramHelper* mpDiagramHelper;
+
+    // association-ID to identify the Diagram ModelData
+    OUString msDiagramDataModelID;
 };
 
 }

@@ -103,13 +103,13 @@ public class AccessibilityTools {
             SearchedAccessible = xacc;
             return ac;
         } else {
-            int k = ac.getAccessibleChildCount();
+            long k = ac.getAccessibleChildCount();
 
             if (ac.getAccessibleChildCount() > 100) {
                 k = 50;
             }
 
-            for (int i = 0; i < k; i++) {
+            for (long i = 0; i < k; i++) {
                 try {
                     XAccessibleContext ac2 = getAccessibleObjectForRoleIgnoreShowing_(
                         ac.getAccessibleChild(i), role);
@@ -128,20 +128,20 @@ public class AccessibilityTools {
     private static XAccessibleContext getAccessibleObjectForRole_(XAccessible xacc,
         short role) {
         XAccessibleContext ac = xacc.getAccessibleContext();
-        boolean isShowing = ac.getAccessibleStateSet()
-        .contains(com.sun.star.accessibility.AccessibleStateType.SHOWING);
+        boolean isShowing = (ac.getAccessibleStateSet()
+            & com.sun.star.accessibility.AccessibleStateType.SHOWING) != 0;
 
         if ((ac.getAccessibleRole() == role) && isShowing) {
             SearchedAccessible = xacc;
             return ac;
         } else {
-            int k = ac.getAccessibleChildCount();
+            long k = ac.getAccessibleChildCount();
 
             if (ac.getAccessibleChildCount() > 100) {
                 k = 50;
             }
 
-            for (int i = 0; i < k; i++) {
+            for (long i = 0; i < k; i++) {
                 try {
                     XAccessibleContext ac2 = getAccessibleObjectForRole_(ac.getAccessibleChild(i), role);
 
@@ -186,13 +186,13 @@ public class AccessibilityTools {
 
             return ac;
         } else {
-            int k = ac.getAccessibleChildCount();
+            long k = ac.getAccessibleChildCount();
 
             if (ac.getAccessibleChildCount() > 100) {
                 k = 50;
             }
 
-            for (int i = 0; i < k; i++) {
+            for (long i = 0; i < k; i++) {
                 try {
                     XAccessibleContext ac1 = getAccessibleObjectForRoleIgnoreShowing(
                         ac.getAccessibleChild(i),
@@ -215,8 +215,8 @@ public class AccessibilityTools {
         String name,
         String implName) {
         XAccessibleContext ac = xacc.getAccessibleContext();
-        boolean isShowing = ac.getAccessibleStateSet()
-        .contains(com.sun.star.accessibility.AccessibleStateType.SHOWING);
+        boolean isShowing = (ac.getAccessibleStateSet() &
+            com.sun.star.accessibility.AccessibleStateType.SHOWING) != 0;
 
         // hotfix for i91828:
         // if role to search is 0 then ignore the role.
@@ -227,13 +227,13 @@ public class AccessibilityTools {
             SearchedAccessible = xacc;
             return ac;
         } else {
-            int k = ac.getAccessibleChildCount();
+            long k = ac.getAccessibleChildCount();
 
             if (ac.getAccessibleChildCount() > 100) {
                 k = 50;
             }
 
-            for (int i = 0; i < k; i++) {
+            for (long i = 0; i < k; i++) {
                 try {
                     XAccessibleContext ac1 = getAccessibleObjectForRole(
                         ac.getAccessibleChild(i),
@@ -282,18 +282,18 @@ public class AccessibilityTools {
             logging(log,indent + indent + bounds);
         }
 
-        boolean isShowing = ac.getAccessibleStateSet()
-        .contains(com.sun.star.accessibility.AccessibleStateType.SHOWING);
+        boolean isShowing = (ac.getAccessibleStateSet()
+            & com.sun.star.accessibility.AccessibleStateType.SHOWING) != 0;
         logging(log,indent + indent + "StateType contains SHOWING: " +
             isShowing);
 
-        int k = ac.getAccessibleChildCount();
+        long k = ac.getAccessibleChildCount();
 
         if (ac.getAccessibleChildCount() > 100) {
             k = 50;
         }
 
-        for (int i = 0; i < k; i++) {
+        for (long i = 0; i < k; i++) {
             try {
                 printAccessibleTree(log, ac.getAccessibleChild(i),
                     indent + "  ");
@@ -305,10 +305,10 @@ public class AccessibilityTools {
         if (ac.getAccessibleChildCount() > 100) {
             k = ac.getAccessibleChildCount();
 
-            int st = ac.getAccessibleChildCount() - 50;
+            long st = ac.getAccessibleChildCount() - 50;
             logging(log,indent + "  " + " ...... [skipped] ......");
 
-            for (int i = st; i < k; i++) {
+            for (long i = st; i < k; i++) {
                 try {
                     printAccessibleTree(log, ac.getAccessibleChild(i),
                         indent + "  ");

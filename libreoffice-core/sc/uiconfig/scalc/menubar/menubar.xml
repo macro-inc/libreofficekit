@@ -165,6 +165,7 @@
       </menu:menu>
       <menu:menuseparator/>
       <menu:menuitem menu:id=".uno:ViewValueHighlighting"/>
+      <menu:menuitem menu:id=".uno:ViewHiddenColRow"/>
       <menu:menuitem menu:id=".uno:ToggleFormula"/>
       <menu:menuitem menu:id=".uno:ShowAnnotations"/>
       <menu:menuseparator/>
@@ -448,7 +449,7 @@
           <menu:menuitem menu:id=".uno:UngroupSparklines"/>
         </menu:menupopup>
       </menu:menu>
-      <menu:menu menu:id=".uno:ObjectMenu">
+      <menu:menu menu:id=".uno:FormatObjectMenu">
         <menu:menupopup>
           <menu:menuitem menu:id=".uno:TransformDialog"/>
           <menu:menuitem menu:id=".uno:FormatLine"/>
@@ -587,8 +588,10 @@
       <menu:menuitem menu:id=".uno:Show" menu:style="text"/>
       <menu:menuseparator/>
       <menu:menuitem menu:id=".uno:Move"/>
+      <menu:menuitem menu:id=".uno:DuplicateSheet"/>
       <menu:menu menu:id=".uno:NavigateMenu">
         <menu:menupopup>
+          <menu:menuitem menu:id=".uno:JumpToTable"/>
           <menu:menuitem menu:id=".uno:JumpToPrevTable"/>
           <menu:menuitem menu:id=".uno:JumpToNextTable"/>
         </menu:menupopup>
@@ -753,12 +756,11 @@
           <menu:menuseparator/>
           <menu:menuitem menu:id=".uno:MacroSignature"/>
           <menu:menuitem menu:id=".uno:MacroOrganizer?TabId:short=1"/>
-          <menu:menuseparator/>
-          <menu:menuitem menu:id=".uno:OpenXMLFilterSettings"/>
         </menu:menupopup>
       </menu:menu>
       <menu:menuitem menu:id=".uno:DevelopmentToolsDockingWindow"/>
       <menu:menuseparator/>
+      <menu:menuitem menu:id=".uno:OpenXMLFilterSettings"/>
       <menu:menuitem menu:id="service:com.sun.star.deployment.ui.PackageManagerDialog" menu:style="text"/>
       <menu:menuitem menu:id=".uno:ConfigureDialog" menu:style="text"/>
       <menu:menuitem menu:id=".uno:OptionsTreeDialog"/>

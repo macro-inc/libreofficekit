@@ -15,11 +15,12 @@
 #include <com/sun/star/text/XDocumentIndex.hpp>
 #include <com/sun/star/style/ParagraphAdjust.hpp>
 #include <com/sun/star/style/TabStop.hpp>
+#include <com/sun/star/text/VertOrientation.hpp>
 #include <com/sun/star/text/XTextTable.hpp>
 #include <o3tl/cppunittraitshelper.hxx>
-#include <svx/swframetypes.hxx>
 
-#include <doc.hxx>
+#include <xmloff/odffields.hxx>
+
 #include <docsh.hxx>
 #include <unotxdoc.hxx>
 #include <pam.hxx>
@@ -97,6 +98,144 @@ DECLARE_RTFEXPORT_TEST(testCjklist31, "cjklist31.rtf")
     CPPUNIT_ASSERT_EQUAL(style::NumberingType::DI_ZI_ZH, numFormat);
 }
 
+DECLARE_RTFEXPORT_TEST(test148518, "FORMDROPDOWN.rtf")
+{
+    SwXTextDocument* const pTextDoc(dynamic_cast<SwXTextDocument*>(mxComponent.get()));
+    CPPUNIT_ASSERT(pTextDoc);
+    SwDoc* const pDoc(pTextDoc->GetDocShell()->GetDoc());
+
+    CPPUNIT_ASSERT(pDoc->getIDocumentMarkAccess()->getFieldmarksBegin()
+                   != pDoc->getIDocumentMarkAccess()->getFieldmarksEnd());
+    ::sw::mark::IFieldmark* pFieldmark = dynamic_cast<::sw::mark::IFieldmark*>(
+        *pDoc->getIDocumentMarkAccess()->getFieldmarksBegin());
+    uno::Sequence<OUString> entries;
+    (*pFieldmark->GetParameters())[ODF_FORMDROPDOWN_LISTENTRY] >>= entries;
+    uno::Sequence<OUString> const expected{ OUString("x"), OUString("v"), OUString("d") };
+    CPPUNIT_ASSERT_EQUAL(expected, entries);
+    sal_Int32 result(-1);
+    (*pFieldmark->GetParameters())[ODF_FORMDROPDOWN_RESULT] >>= result;
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(1), result);
+}
+
+DECLARE_RTFEXPORT_TEST(test150269, "hidden-linebreaks.rtf")
+{
+    uno::Reference<text::XTextRange> xRun = getRun(getParagraph(1), 1, u"\n\n\n");
+    CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xRun, "CharHidden"));
+}
+
+DECLARE_RTFEXPORT_TEST(test129758, "tdf129631_lostBorders3.rtf")
+{
+    uno::Reference<container::XNameAccess> xStyles(getStyles("ParagraphStyles"));
+    uno::Reference<beans::XPropertySet> xStyle(xStyles->getByName("Border"), uno::UNO_QUERY);
+    // style has borders
+    table::BorderLine2 border;
+    border = getProperty<table::BorderLine2>(xStyle, "RightBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xStyle, "LeftBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xStyle, "TopBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xStyle, "BottomBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+    // style applied
+    uno::Reference<beans::XPropertySet> xPara2(getParagraph(2), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("Border"), getProperty<OUString>(xPara2, "ParaStyleName"));
+    // but no borders
+    border = getProperty<table::BorderLine2>(xPara2, "RightBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara2, "LeftBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara2, "TopBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara2, "BottomBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+    // last paragraph: style applied, no override
+    uno::Reference<beans::XPropertySet> xPara4(getParagraph(4), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("Border"), getProperty<OUString>(xPara4, "ParaStyleName"));
+    border = getProperty<table::BorderLine2>(xPara4, "RightBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara4, "LeftBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara4, "TopBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara4, "BottomBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(88), border.LineWidth);
+}
+
+DECLARE_RTFEXPORT_TEST(test150382, "para-border.rtf")
+{
+    uno::Reference<container::XNameAccess> xStyles(getStyles("ParagraphStyles"));
+    uno::Reference<beans::XPropertySet> xStyle(xStyles->getByName("Normal,Bordered"),
+                                               uno::UNO_QUERY);
+    // style has borders
+    table::BorderLine2 border;
+    border = getProperty<table::BorderLine2>(xStyle, "RightBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    border = getProperty<table::BorderLine2>(xStyle, "LeftBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    border = getProperty<table::BorderLine2>(xStyle, "TopBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    border = getProperty<table::BorderLine2>(xStyle, "BottomBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    // first paragraph: style applied, no override
+    uno::Reference<beans::XPropertySet> xPara1(getParagraph(1), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("Normal,Bordered"),
+                         getProperty<OUString>(xPara1, "ParaStyleName"));
+    border = getProperty<table::BorderLine2>(xPara1, "RightBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    border = getProperty<table::BorderLine2>(xPara1, "LeftBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    border = getProperty<table::BorderLine2>(xPara1, "TopBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    border = getProperty<table::BorderLine2>(xPara1, "BottomBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::SOLID, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(35), border.LineWidth);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(7384391), border.Color);
+    // second paragraph: style applied
+    uno::Reference<beans::XPropertySet> xPara2(getParagraph(2), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("Normal,Bordered"),
+                         getProperty<OUString>(xPara2, "ParaStyleName"));
+    // but no borders
+    border = getProperty<table::BorderLine2>(xPara2, "RightBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara2, "LeftBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara2, "TopBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+    border = getProperty<table::BorderLine2>(xPara2, "BottomBorder");
+    CPPUNIT_ASSERT_EQUAL(table::BorderLineStyle::NONE, border.LineStyle);
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(0), border.LineWidth);
+}
+
 DECLARE_RTFEXPORT_TEST(testAnchoredAtSamePosition, "anchor.fodt")
 {
     SwXTextDocument* const pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
@@ -105,7 +244,7 @@ DECLARE_RTFEXPORT_TEST(testAnchoredAtSamePosition, "anchor.fodt")
     CPPUNIT_ASSERT_EQUAL(OUString("foobar"), getParagraph(1)->getString());
 
     SwFrameFormats& rFlys(*pDoc->GetSpzFrameFormats());
-    if (mbExported)
+    if (isExported())
     { // 2, not 3: the form control becomes a field on export...
         CPPUNIT_ASSERT_EQUAL(size_t(2), rFlys.size());
     }
@@ -114,15 +253,13 @@ DECLARE_RTFEXPORT_TEST(testAnchoredAtSamePosition, "anchor.fodt")
         CPPUNIT_ASSERT_EQUAL(size_t(3), rFlys.size());
     }
 
-    sal_Int32 const nIndex(mbExported ? 4 : 3);
+    sal_Int32 const nIndex(isExported() ? 4 : 3);
     CPPUNIT_ASSERT_EQUAL(RndStdIds::FLY_AT_CHAR, rFlys[0]->GetAnchor().GetAnchorId());
-    CPPUNIT_ASSERT_EQUAL(SwNodeOffset(12),
-                         rFlys[0]->GetAnchor().GetContentAnchor()->nNode.GetIndex());
-    CPPUNIT_ASSERT_EQUAL(nIndex, rFlys[0]->GetAnchor().GetContentAnchor()->nContent.GetIndex());
+    CPPUNIT_ASSERT_EQUAL(SwNodeOffset(12), rFlys[0]->GetAnchor().GetAnchorNode()->GetIndex());
+    CPPUNIT_ASSERT_EQUAL(nIndex, rFlys[0]->GetAnchor().GetAnchorContentOffset());
     CPPUNIT_ASSERT_EQUAL(RndStdIds::FLY_AT_CHAR, rFlys[1]->GetAnchor().GetAnchorId());
-    CPPUNIT_ASSERT_EQUAL(SwNodeOffset(12),
-                         rFlys[1]->GetAnchor().GetContentAnchor()->nNode.GetIndex());
-    CPPUNIT_ASSERT_EQUAL(nIndex, rFlys[1]->GetAnchor().GetContentAnchor()->nContent.GetIndex());
+    CPPUNIT_ASSERT_EQUAL(SwNodeOffset(12), rFlys[1]->GetAnchor().GetAnchorNode()->GetIndex());
+    CPPUNIT_ASSERT_EQUAL(nIndex, rFlys[1]->GetAnchor().GetAnchorContentOffset());
 }
 
 DECLARE_RTFEXPORT_TEST(testRedlineInsdel, "redline-insdel.rtf")
@@ -199,7 +336,7 @@ DECLARE_RTFEXPORT_TEST(testCjklist34, "cjklist34.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testTabStopFillChars)
 {
-    load(mpTestDocumentPath, "tab-stop-fill-chars.rtf");
+    createSwDoc("tab-stop-fill-chars.rtf");
     // tlmdot
     auto aTabstops = getProperty<uno::Sequence<style::TabStop>>(getParagraph(1), "ParaTabStops");
     CPPUNIT_ASSERT(aTabstops.hasElements());
@@ -249,6 +386,18 @@ DECLARE_RTFEXPORT_TEST(testBtlrCell, "btlr-cell.rtf")
 
     uno::Reference<beans::XPropertySet> xC1(xTable->getCellByName("C1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(text::WritingMode2::TB_RL, getProperty<sal_Int16>(xC1, "WritingMode"));
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf114303, "tdf114303.rtf")
+{
+    CPPUNIT_ASSERT_EQUAL(text::HoriOrientation::NONE,
+                         getProperty<sal_Int16>(getShape(1), "HoriOrient"));
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 0
+    // - Actual  : 1
+    CPPUNIT_ASSERT_EQUAL(text::VertOrientation::NONE,
+                         getProperty<sal_Int16>(getShape(1), "VertOrient"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTbrlFrame, "tbrl-frame.odt")
@@ -336,7 +485,7 @@ DECLARE_RTFEXPORT_TEST(testTdf129522_removeShadowStyle, "tdf129522_removeShadowS
     table::BorderLine2 aBorderLine = getProperty<table::BorderLine2>(xRun, "CharRightBorder");
     // MS formats can't have a shadow without a border.
     // Char borders are all or none, so have to decide to add borders, or throw away shadow...
-    if (mbExported)
+    if (isExported())
         CPPUNIT_ASSERT(sal_uInt32(0) != aBorderLine.LineWidth);
 
     xRun.set(getRun(getParagraph(4), 2, "shadow"));
@@ -366,7 +515,7 @@ DECLARE_RTFEXPORT_TEST(testTdf136587_noStyleName, "tdf136587_noStyleName.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testPageBorder)
 {
-    load(mpTestDocumentPath, "page-border.rtf");
+    createSwDoc("page-border.rtf");
     uno::Reference<beans::XPropertySet> xPageStyle(getStyles("PageStyles")->getByName("Standard"),
                                                    uno::UNO_QUERY);
     auto aTopBorder = getProperty<table::BorderLine2>(xPageStyle, "TopBorder");
@@ -396,7 +545,7 @@ DECLARE_RTFEXPORT_TEST(testTbrlPage, "tbrl-page.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf126309)
 {
-    load(mpTestDocumentPath, "tdf126309.rtf");
+    createSwDoc("tdf126309.rtf");
     // Without the accompanying fix in place, this test would have failed, as
     // the paragraph was aligned to left, not right.
     CPPUNIT_ASSERT_EQUAL(
@@ -435,7 +584,7 @@ DECLARE_RTFEXPORT_TEST(testTdf116358, "tdf116358.rtf")
 
 CPPUNIT_TEST_FIXTURE(Test, testGutterLeft)
 {
-    load(mpTestDocumentPath, "gutter-left.rtf");
+    createSwDoc("gutter-left.rtf");
     reload(mpFilter, "gutter-left.rtf");
     uno::Reference<beans::XPropertySet> xPageStyle;
     getStyles("PageStyles")->getByName("Standard") >>= xPageStyle;
@@ -450,7 +599,7 @@ CPPUNIT_TEST_FIXTURE(Test, testGutterLeft)
 
 CPPUNIT_TEST_FIXTURE(Test, testGutterTop)
 {
-    load(mpTestDocumentPath, "gutter-top.rtf");
+    createSwDoc("gutter-top.rtf");
     reload(mpFilter, "gutter-left.rtf");
     uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xSettings(
@@ -460,6 +609,38 @@ CPPUNIT_TEST_FIXTURE(Test, testGutterTop)
     // Without the accompanying fix in place, this test would have failed, because the gutter was
     // at the left.
     CPPUNIT_ASSERT(bGutterAtTop);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testClearingBreak)
+{
+    auto verify = [this]() {
+        uno::Reference<container::XEnumerationAccess> xParagraph(getParagraph(1), uno::UNO_QUERY);
+        uno::Reference<container::XEnumeration> xPortions = xParagraph->createEnumeration();
+        xPortions->nextElement();
+        xPortions->nextElement();
+        // Without the accompanying fix in place, this test would have failed with:
+        // An uncaught exception of type com.sun.star.container.NoSuchElementException
+        // i.e. the first para was just a fly + text portion, the clearing break was lost.
+        uno::Reference<beans::XPropertySet> xPortion(xPortions->nextElement(), uno::UNO_QUERY);
+        OUString aPortionType;
+        xPortion->getPropertyValue("TextPortionType") >>= aPortionType;
+        CPPUNIT_ASSERT_EQUAL(OUString("LineBreak"), aPortionType);
+        uno::Reference<text::XTextContent> xLineBreak;
+        xPortion->getPropertyValue("LineBreak") >>= xLineBreak;
+        sal_Int16 eClear{};
+        uno::Reference<beans::XPropertySet> xLineBreakProps(xLineBreak, uno::UNO_QUERY);
+        xLineBreakProps->getPropertyValue("Clear") >>= eClear;
+        CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int16>(SwLineBreakClear::ALL), eClear);
+    };
+
+    // Given a document with a clearing break:
+    // When loading that file:
+    createSwDoc("clearing-break.rtf");
+    // Then make sure that the clear property of the break is not ignored:
+    verify();
+    reload(mpFilter, "clearing-break.rtf");
+    // Make sure that the clear property of the break is not ignored during export:
+    verify();
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf95706, "tdf95706.rtf")
@@ -542,65 +723,33 @@ DECLARE_RTFEXPORT_TEST(testTdf111851, "tdf111851.rtf")
     // No shading
     uno::Reference<text::XTextRange> xCell1(xTable->getCellByName("A1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(OUString("a"), xCell1->getString());
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(-1), getProperty<sal_Int32>(xCell1, "BackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_TRANSPARENT, getProperty<Color>(xCell1, "BackColor"));
 
     uno::Reference<text::XTextRange> xCell2(xTable->getCellByName("B1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(OUString("b"), xCell2->getString());
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(-1), getProperty<sal_Int32>(xCell2, "BackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_TRANSPARENT, getProperty<Color>(xCell2, "BackColor"));
 
     // Check some random not standard shading values and ensure some non-white background color
     uno::Reference<text::XTextRange> xCell3(xTable->getCellByName("C1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(OUString("c"), xCell3->getString());
-    sal_Int32 nShadingColor3 = getProperty<sal_Int32>(xCell3, "BackColor");
-    CPPUNIT_ASSERT(0x00FFFFFF > nShadingColor3);
-    CPPUNIT_ASSERT(0 < nShadingColor3);
+    Color nShadingColor3 = getProperty<Color>(xCell3, "BackColor");
+    CPPUNIT_ASSERT(COL_WHITE > nShadingColor3);
+    CPPUNIT_ASSERT(COL_BLACK < nShadingColor3);
 
     uno::Reference<text::XTextRange> xCell4(xTable->getCellByName("D1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(OUString("d"), xCell4->getString());
-    sal_Int32 nShadingColor4 = getProperty<sal_Int32>(xCell4, "BackColor");
-    CPPUNIT_ASSERT(0x00FFFFFF > nShadingColor4);
-    CPPUNIT_ASSERT(0 < nShadingColor4);
+    Color nShadingColor4 = getProperty<Color>(xCell4, "BackColor");
+    CPPUNIT_ASSERT(COL_WHITE > nShadingColor4);
+    CPPUNIT_ASSERT(COL_BLACK < nShadingColor4);
 
     // Values 10000 and more - black
     uno::Reference<text::XTextRange> xCell5(xTable->getCellByName("E1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(OUString("e"), xCell5->getString());
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(xCell5, "BackColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(xCell5, "BackColor"));
 
     uno::Reference<text::XTextRange> xCell6(xTable->getCellByName("F1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(OUString("f"), xCell6->getString());
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(xCell6, "BackColor"));
-}
-
-CPPUNIT_TEST_FIXTURE(Test, testClearingBreak)
-{
-    auto verify = [this]() {
-        uno::Reference<container::XEnumerationAccess> xParagraph(getParagraph(1), uno::UNO_QUERY);
-        uno::Reference<container::XEnumeration> xPortions = xParagraph->createEnumeration();
-        xPortions->nextElement();
-        xPortions->nextElement();
-        // Without the accompanying fix in place, this test would have failed with:
-        // An uncaught exception of type com.sun.star.container.NoSuchElementException
-        // i.e. the first para was just a fly + text portion, the clearing break was lost.
-        uno::Reference<beans::XPropertySet> xPortion(xPortions->nextElement(), uno::UNO_QUERY);
-        OUString aPortionType;
-        xPortion->getPropertyValue("TextPortionType") >>= aPortionType;
-        CPPUNIT_ASSERT_EQUAL(OUString("LineBreak"), aPortionType);
-        uno::Reference<text::XTextContent> xLineBreak;
-        xPortion->getPropertyValue("LineBreak") >>= xLineBreak;
-        sal_Int16 eClear{};
-        uno::Reference<beans::XPropertySet> xLineBreakProps(xLineBreak, uno::UNO_QUERY);
-        xLineBreakProps->getPropertyValue("Clear") >>= eClear;
-        CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int16>(SwLineBreakClear::ALL), eClear);
-    };
-
-    // Given a document with a clearing break:
-    // When loading that file:
-    load(mpTestDocumentPath, "clearing-break.rtf");
-    // Then make sure that the clear property of the break is not ignored:
-    verify();
-    reload(mpFilter, "clearing-break.rtf");
-    // Make sure that that the clear property of the break is not ignored during export:
-    verify();
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(xCell6, "BackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf139948, "tdf139948.rtf")
@@ -633,6 +782,43 @@ DECLARE_RTFEXPORT_TEST(testTdf139948, "tdf139948.rtf")
         sal_uInt32(0), getProperty<table::BorderLine2>(getParagraph(4), "BottomBorder").LineWidth);
     CPPUNIT_ASSERT_EQUAL(
         sal_uInt32(0), getProperty<table::BorderLine2>(getParagraph(5), "BottomBorder").LineWidth);
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf103956, "tdf103956.rtf")
+{
+    // Ensure that RTF tables without column width (\cellx or \cellx0) are displayed with some
+    // suitable width. Currently there is no good support for autofit for RTF docs, so ensure
+    // that table cells are somehow visible. Width for it is not clear, so here we will check
+    // table & cell widths are more than default minimal value of 41.
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #1 is too narrow!",
+        82 < parseDump("/root/page/body/tab[1]/row/infos/bounds", "width").toInt32());
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #1 cell#1 is too narrow!",
+        41 < parseDump("/root/page/body/tab[1]/row/cell[1]/infos/bounds", "width").toInt32());
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #1 cell#2 is too narrow!",
+        41 < parseDump("/root/page/body/tab[1]/row/cell[2]/infos/bounds", "width").toInt32());
+
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #2 is too narrow!",
+        82 < parseDump("/root/page/body/tab[2]/row/infos/bounds", "width").toInt32());
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #2 cell#1 is too narrow!",
+        41 < parseDump("/root/page/body/tab[2]/row/cell[1]/infos/bounds", "width").toInt32());
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #2 cell#2 is too narrow!",
+        41 < parseDump("/root/page/body/tab[2]/row/cell[2]/infos/bounds", "width").toInt32());
+
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #3 is too narrow!",
+        82 < parseDump("/root/page/body/tab[3]/row/infos/bounds", "width").toInt32());
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #3 cell#1 is too narrow!",
+        41 < parseDump("/root/page/body/tab[3]/row/cell[1]/infos/bounds", "width").toInt32());
+    CPPUNIT_ASSERT_MESSAGE(
+        "Table #3 cell#2 is too narrow!",
+        41 < parseDump("/root/page/body/tab[3]/row/cell[2]/infos/bounds", "width").toInt32());
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf148515, "tdf148515.rtf")

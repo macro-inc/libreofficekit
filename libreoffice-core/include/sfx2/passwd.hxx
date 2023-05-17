@@ -60,8 +60,11 @@ private:
     std::unique_ptr<weld::Entry> m_xConfirm2ED;
 
     std::unique_ptr<weld::Label> m_xMinLengthFT;
+    std::unique_ptr<weld::Label> m_xOnlyAsciiFT;
 
     std::unique_ptr<weld::Button> m_xOKBtn;
+
+    std::shared_ptr<weld::MessageDialog> m_xConfirmFailedDialog;
 
     OUString        maMinLenPwdStr;
     OUString        maMinLenPwdStr1;
@@ -117,14 +120,15 @@ public:
     {
         mnExtras = nExtras;
     }
-    void AllowAsciiOnly()
-    {
-        mbAsciiOnly = true;
-    }
 
+    void AllowAsciiOnly();
     void ShowMinLengthText(bool bShow);
 
+    void PreRun();
+
     virtual short run() override;
+
+    ~SfxPasswordDialog();
 };
 
 #endif // INCLUDED_SFX2_PASSWD_HXX

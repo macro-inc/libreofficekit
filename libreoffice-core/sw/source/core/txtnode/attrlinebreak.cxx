@@ -24,11 +24,11 @@
 #include <vcl/svapp.hxx>
 
 #include <hintids.hxx>
-#include <hints.hxx>
 #include <pam.hxx>
 #include <textlinebreak.hxx>
 #include <ndtxt.hxx>
 #include <unotextrange.hxx>
+#include <unolinebreak.hxx>
 
 using namespace com::sun::star;
 
@@ -40,6 +40,11 @@ SwFormatLineBreak::SwFormatLineBreak(SwLineBreakClear eClear)
 }
 
 SwFormatLineBreak::~SwFormatLineBreak() {}
+
+void SwFormatLineBreak::SetXLineBreak(rtl::Reference<SwXLineBreak> const& xLineBreak)
+{
+    m_wXLineBreak = xLineBreak.get();
+}
 
 bool SwFormatLineBreak::operator==(const SfxPoolItem& rAttr) const
 {
@@ -60,20 +65,13 @@ void SwFormatLineBreak::SwClientNotify(const SwModify&, const SfxHint& rHint)
     CallSwClientNotify(rHint);
     if (RES_REMOVE_UNO_OBJECT == pLegacy->GetWhich())
     {
-        SetXLineBreak(css::uno::Reference<css::text::XTextContent>(nullptr));
+        SetXLineBreak(nullptr);
     }
 }
 
 sal_uInt16 SwFormatLineBreak::GetValueCount() const
 {
     return static_cast<sal_uInt16>(SwLineBreakClear::LAST) + 1;
-}
-
-void SwFormatLineBreak::InvalidateLineBreak()
-{
-    SwPtrMsgPoolItem const aItem(RES_REMOVE_UNO_OBJECT,
-                                 &static_cast<sw::BroadcastingModify&>(*this));
-    CallSwClientNotify(sw::LegacyModifyHint(&aItem, &aItem));
 }
 
 uno::Reference<text::XTextRange> SwFormatLineBreak::GetAnchor() const
@@ -87,7 +85,7 @@ uno::Reference<text::XTextRange> SwFormatLineBreak::GetAnchor() const
 
     SwPaM aPam(m_pTextAttr->GetTextNode(), m_pTextAttr->GetStart());
     aPam.SetMark();
-    ++aPam.GetMark()->nContent;
+    aPam.GetMark()->AdjustContent(+1);
     uno::Reference<text::XTextRange> xRet
         = SwXTextRange::CreateXTextRange(aPam.GetDoc(), *aPam.Start(), aPam.End());
     return xRet;

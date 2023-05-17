@@ -18,6 +18,7 @@
  */
 
 #include <config_feature_desktop.h>
+#include <config_wasm_strip.h>
 
 #include <vcl/svtaccessiblefactory.hxx>
 #include <vcl/accessiblefactory.hxx>
@@ -41,7 +42,9 @@ namespace vcl
         oslModule                                s_hAccessibleImplementationModule = nullptr;
 #endif
 #if HAVE_FEATURE_DESKTOP
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         GetSvtAccessibilityComponentFactory      s_pAccessibleFactoryFunc = nullptr;
+#endif
 #endif
         ::rtl::Reference< IAccessibleFactory >   s_pFactory;
 
@@ -215,6 +218,7 @@ namespace vcl
     {
     }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
 #if HAVE_FEATURE_DESKTOP
 #ifndef DISABLE_DYNLOADING
     extern "C" { static void thisModule() {} }
@@ -222,6 +226,7 @@ namespace vcl
     extern "C" void* getSvtAccessibilityComponentFactory();
 #endif
 #endif // HAVE_FEATURE_DESKTOP
+#endif // ENABLE_WASM_STRIP_ACCESSIBILITY
 
     void AccessibleFactoryAccess::ensureInitialized()
     {
@@ -230,6 +235,7 @@ namespace vcl
 
         ::osl::MutexGuard aGuard( ::osl::Mutex::getGlobalMutex() );
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
 #if HAVE_FEATURE_DESKTOP
         // load the library implementing the factory
         if (!s_pFactory)
@@ -261,6 +267,7 @@ namespace vcl
             }
         }
 #endif // HAVE_FEATURE_DESKTOP
+#endif // ENABLE_WASM_STRIP_ACCESSIBILITY
 
         if (!s_pFactory)
             // the attempt to load the lib, or to create the factory, failed

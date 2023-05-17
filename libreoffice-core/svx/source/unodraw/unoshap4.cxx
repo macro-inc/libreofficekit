@@ -44,6 +44,7 @@
 
 #include <svx/unoshprp.hxx>
 
+#include <utility>
 #include <vcl/gdimtf.hxx>
 #include <vcl/wmf.hxx>
 #include <svtools/embedhlp.hxx>
@@ -69,7 +70,7 @@ SvxOle2Shape::SvxOle2Shape(SdrObject* pObject)
 {
 }
 
-SvxOle2Shape::SvxOle2Shape(SdrObject* pObject, const SfxItemPropertyMapEntry* pPropertyMap, const SvxItemPropertySet* pPropertySet)
+SvxOle2Shape::SvxOle2Shape(SdrObject* pObject, o3tl::span<const SfxItemPropertyMapEntry> pPropertyMap, const SvxItemPropertySet* pPropertySet)
 : SvxShapeText( pObject, pPropertyMap, pPropertySet  )
 {
 }
@@ -177,7 +178,7 @@ bool SvxOle2Shape::setPropertyValueImpl( const OUString& rName, const SfxItemPro
 #else
             pOle = static_cast<SdrOle2Obj*>(GetSdrObject());
 #endif
-            pOle->SetPersistName( aPersistName );
+            pOle->SetPersistName( aPersistName, this );
             return true;
         }
         break;
@@ -489,7 +490,7 @@ void SvxOle2Shape::createLink( const OUString& aLinkURL )
     }
 
     // connect the object after the visual area is set
-    SvxShape::setPropertyValue( UNO_NAME_OLE2_PERSISTNAME, uno::makeAny( aPersistName ) );
+    SvxShape::setPropertyValue( UNO_NAME_OLE2_PERSISTNAME, uno::Any( aPersistName ) );
 
     // the object is inserted during setting of PersistName property usually
     if ( pOle2Obj->IsEmpty() )
@@ -498,10 +499,11 @@ void SvxOle2Shape::createLink( const OUString& aLinkURL )
 
 void SvxOle2Shape::resetModifiedState()
 {
-    ::comphelper::IEmbeddedHelper* pPersist = GetSdrObject()->getSdrModelFromSdrObject().GetPersist();
+    SdrObject* pObject = GetSdrObject();
+    ::comphelper::IEmbeddedHelper* pPersist = pObject ? pObject->getSdrModelFromSdrObject().GetPersist() : nullptr;
     if( pPersist && !pPersist->isEnableSetModified() )
     {
-        SdrOle2Obj* pOle = dynamic_cast< SdrOle2Obj* >( GetSdrObject() );
+        SdrOle2Obj* pOle = dynamic_cast< SdrOle2Obj* >(pObject);
         if( pOle && !pOle->IsEmpty() )
         {
             uno::Reference < util::XModifiable > xMod( pOle->GetObjRef(), uno::UNO_QUERY );
@@ -549,6 +551,11 @@ SvGlobalName SvxOle2Shape::GetClassName_Impl(OUString& rHexCLSID)
     }
 
     return aClassName;
+}
+
+OUString SvxOle2Shape::GetAndClearInitialFrameURL()
+{
+    return OUString();
 }
 
 SvxAppletShape::SvxAppletShape(SdrObject* pObject)
@@ -704,8 +711,19 @@ SvxFrameShape::~SvxFrameShape() noexcept
 {
 }
 
+OUString SvxFrameShape::GetAndClearInitialFrameURL()
+{
+    OUString sRet(m_sInitialFrameURL);
+    m_sInitialFrameURL.clear();
+    return sRet;
+}
+
 void SvxFrameShape::Create( SdrObject* pNewObj, SvxDrawPage* pNewPage )
 {
+    uno::Reference<beans::XPropertySet> xSet(static_cast<OWeakObject *>(this), uno::UNO_QUERY);
+    if (xSet)
+        xSet->getPropertyValue("FrameURL") >>= m_sInitialFrameURL;
+
     SvxShape::Create( pNewObj, pNewPage );
     const SvGlobalName aIFrameClassId( SO3_IFRAME_CLASSID );
     createObject(aIFrameClassId);
@@ -765,9 +783,9 @@ bool SvxFrameShape::getPropertyValueImpl(const OUString& rName, const SfxItemPro
         return SvxOle2Shape::getPropertyValueImpl( rName, pProperty, rValue );
     }
 }
-SvxMediaShape::SvxMediaShape(SdrObject* pObj, OUString const & referer)
+SvxMediaShape::SvxMediaShape(SdrObject* pObj, OUString referer)
 :   SvxShape( pObj, getSvxMapProvider().GetMap(SVXMAP_MEDIA), getSvxMapProvider().GetPropertySet(SVXMAP_MEDIA, SdrObject::GetGlobalDrawObjectItemPool()) ),
-    referer_(referer)
+    referer_(std::move(referer))
 {
     SetShapeType( "com.sun.star.drawing.MediaShape" );
 }
@@ -786,9 +804,11 @@ bool SvxMediaShape::setPropertyValueImpl( const OUString& rName, const SfxItemPr
         || (pProperty->nWID == OWN_ATTR_VALUE_GRAPHIC)
         || (pProperty->nWID == SDRATTR_GRAFCROP))
     {
+#if HAVE_FEATURE_AVMEDIA
         SdrMediaObj* pMedia = static_cast< SdrMediaObj* >( GetSdrObject() );
         ::avmedia::MediaItem aItem;
         bool bOk = false;
+#endif
 
         switch( pProperty->nWID )
         {
@@ -933,11 +953,13 @@ bool SvxMediaShape::setPropertyValueImpl( const OUString& rName, const SfxItemPr
             OSL_FAIL("SvxMediaShape::setPropertyValueImpl(), unknown argument!");
         }
 
+#if HAVE_FEATURE_AVMEDIA
         if( bOk )
         {
             pMedia->setMediaProperties( aItem );
             return true;
         }
+#endif
     }
     else
     {
@@ -960,7 +982,9 @@ bool SvxMediaShape::getPropertyValueImpl( const OUString& rName, const SfxItemPr
         || (pProperty->nWID == SDRATTR_GRAFCROP))
     {
         SdrMediaObj* pMedia = static_cast< SdrMediaObj* >( GetSdrObject() );
+#if HAVE_FEATURE_AVMEDIA
         const ::avmedia::MediaItem aItem( pMedia->getMediaProperties() );
+#endif
 
         switch( pProperty->nWID )
         {

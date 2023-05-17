@@ -19,33 +19,31 @@
 
 #include <config_java.h>
 
-#include <rtl/strbuf.hxx>
 #include <tools/debug.hxx>
 #include <svl/eitem.hxx>
 #include <svl/intitem.hxx>
+#include <svl/itempool.hxx>
 #include <svl/itemset.hxx>
+#include <svl/stritem.hxx>
 #include <svl/visitem.hxx>
 #include <svtools/javacontext.hxx>
 #include <svtools/javainteractionhandler.hxx>
-#include <svl/itempool.hxx>
 #include <tools/urlobj.hxx>
 #include <com/sun/star/awt/FontDescriptor.hpp>
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/util/URLTransformer.hpp>
 #include <com/sun/star/util/XURLTransformer.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XFrame.hpp>
 #include <com/sun/star/frame/status/FontHeight.hpp>
 #include <com/sun/star/frame/status/ItemStatus.hpp>
 #include <com/sun/star/frame/status/ItemState.hpp>
 #include <com/sun/star/frame/status/Template.hpp>
 #include <com/sun/star/frame/DispatchResultState.hpp>
-#include <com/sun/star/frame/ModuleManager.hpp>
 #include <com/sun/star/frame/status/Visibility.hpp>
 #include <comphelper/processfactory.hxx>
-#include <officecfg/Office/Common.hxx>
 #include <uno/current_context.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/uitest/logger.hxx>
 #include <boost/property_tree/json_parser.hpp>
@@ -64,14 +62,9 @@
 #include <sfx2/msg.hxx>
 #include <sfx2/viewsh.hxx>
 #include <slotserv.hxx>
-#include <osl/file.hxx>
 #include <rtl/ustring.hxx>
-#include <unotools/pathoptions.hxx>
-#include <osl/time.h>
 #include <sfx2/lokhelper.hxx>
-#include <basic/sberrors.hxx>
 
-#include <map>
 #include <memory>
 #include <string_view>
 
@@ -83,7 +76,6 @@
 #include <desktop/crashreport.hxx>
 #include <vcl/threadex.hxx>
 #include <unotools/mediadescriptor.hxx>
-#include <tools/json_writer.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -124,7 +116,22 @@ void SfxStatusDispatcher::ReleaseAll()
 {
     css::lang::EventObject aObject;
     aObject.Source = static_cast<cppu::OWeakObject*>(this);
-    aListeners.disposeAndClear( aObject );
+    std::unique_lock aGuard(maMutex);
+    maListeners.disposeAndClear( aGuard, aObject );
+}
+
+void SfxStatusDispatcher::sendStatusChanged(const OUString& rURL, const css::frame::FeatureStateEvent& rEvent)
+{
+    std::unique_lock aGuard(maMutex);
+    ::comphelper::OInterfaceContainerHelper4<css::frame::XStatusListener>* pContnr = maListeners.getContainer(rURL);
+    if (!pContnr)
+        return;
+    pContnr->forEach(aGuard,
+        [&rEvent](const css::uno::Reference<css::frame::XStatusListener>& xListener)
+        {
+            xListener->statusChanged(rEvent);
+        }
+    );
 }
 
 void SAL_CALL SfxStatusDispatcher::dispatch( const css::util::URL&, const css::uno::Sequence< css::beans::PropertyValue >& )
@@ -139,13 +146,15 @@ void SAL_CALL SfxStatusDispatcher::dispatchWithNotification(
 }
 
 SfxStatusDispatcher::SfxStatusDispatcher()
-    : aListeners( aMutex )
 {
 }
 
 void SAL_CALL SfxStatusDispatcher::addStatusListener(const css::uno::Reference< css::frame::XStatusListener > & aListener, const css::util::URL& aURL)
 {
-    aListeners.addInterface( aURL.Complete, aListener );
+    {
+        std::unique_lock aGuard(maMutex);
+        maListeners.addInterface( aGuard, aURL.Complete, aListener );
+    }
     if ( aURL.Complete == ".uno:LifeTime" )
     {
         css::frame::FeatureStateEvent aEvent;
@@ -159,7 +168,8 @@ void SAL_CALL SfxStatusDispatcher::addStatusListener(const css::uno::Reference< 
 
 void SAL_CALL SfxStatusDispatcher::removeStatusListener( const css::uno::Reference< css::frame::XStatusListener > & aListener, const css::util::URL& aURL )
 {
-    aListeners.removeInterface( aURL.Complete, aListener );
+    std::unique_lock aGuard(maMutex);
+    maListeners.removeInterface( aGuard, aURL.Complete, aListener );
 }
 
 
@@ -273,7 +283,10 @@ void SAL_CALL SfxOfficeDispatch::dispatchWithNotification( const css::util::URL&
 
 void SAL_CALL SfxOfficeDispatch::addStatusListener(const css::uno::Reference< css::frame::XStatusListener > & aListener, const css::util::URL& aURL)
 {
-    GetListeners().addInterface( aURL.Complete, aListener );
+    {
+        std::unique_lock aGuard(maMutex);
+        maListeners.addInterface( aGuard, aURL.Complete, aListener );
+    }
     if ( pImpl )
     {
         // ControllerItem is the Impl class
@@ -327,8 +340,8 @@ SfxDispatchController_Impl::SfxDispatchController_Impl(
     SfxBindings*                       pBind,
     SfxDispatcher*                     pDispat,
     const SfxSlot*                     pSlot,
-    const css::util::URL&              rURL )
-    : aDispatchURL( rURL )
+    css::util::URL               aURL )
+    : aDispatchURL(std::move( aURL ))
     , pDispatcher( pDispat )
     , pBindings( pBind )
     , pLastState( nullptr )
@@ -387,9 +400,7 @@ SfxDispatchController_Impl::~SfxDispatchController_Impl()
         pDispatch->pImpl = nullptr;
 
         // force all listeners to release the dispatch object
-        css::lang::EventObject aObject;
-        aObject.Source = static_cast<cppu::OWeakObject*>(pDispatch);
-        pDispatch->GetListeners().disposeAndClear( aObject );
+        pDispatch->ReleaseAll();
     }
 }
 
@@ -518,7 +529,7 @@ void collectUIInformation(const util::URL& rURL, const css::uno::Sequence< css::
         return;
 
     UITestLogger::getInstance().logCommand(
-        OUStringConcatenation("Send UNO Command (\"" + rURL.Complete + "\") "), rArgs);
+        Concat2View("Send UNO Command (\"" + rURL.Complete + "\") "), rArgs);
 }
 
 }
@@ -799,21 +810,7 @@ void SfxDispatchController_Impl::addStatusListener(const css::uno::Reference< cs
 
 void SfxDispatchController_Impl::sendStatusChanged(const OUString& rURL, const css::frame::FeatureStateEvent& rEvent)
 {
-    ::comphelper::OInterfaceContainerHelper2* pContnr = pDispatch->GetListeners().getContainer(rURL);
-    if (!pContnr)
-        return;
-    ::comphelper::OInterfaceIteratorHelper2 aIt(*pContnr);
-    while (aIt.hasMoreElements())
-    {
-        try
-        {
-            static_cast<css::frame::XStatusListener*>(aIt.next())->statusChanged(rEvent);
-        }
-        catch (const css::uno::RuntimeException&)
-        {
-            aIt.remove();
-        }
-    }
+    pDispatch->sendStatusChanged(rURL, rEvent);
 }
 
 void SfxDispatchController_Impl::StateChanged( sal_uInt16 nSID, SfxItemState eState, const SfxPoolItem* pState, SfxSlotServer const * pSlotServ )
@@ -863,9 +860,7 @@ void SfxDispatchController_Impl::StateChanged( sal_uInt16 nSID, SfxItemState eSt
         // TODO/LATER: what about the FormShell? Does it use any metric data?! Perhaps it should use the Pool of the document!
         if ( pSlotServ && pDispatcher )
         {
-            SfxShell* pShell = pDispatcher->GetShell( pSlotServ->GetShellLevel() );
-            DBG_ASSERT( pShell, "Can't get core metric without shell!" );
-            if ( pShell )
+            if (SfxShell* pShell = pDispatcher->GetShell( pSlotServ->GetShellLevel() ))
                 eMapUnit = GetCoreMetric( pShell->GetPool(), nSID );
         }
 
@@ -894,7 +889,7 @@ void SfxDispatchController_Impl::StateChanged( sal_uInt16 nSID, SfxItemState eSt
         InterceptLOKStateChangeEvent(nSID, pDispatcher->GetFrame(), aEvent, pState);
     }
 
-    const std::vector<OUString> aContainedTypes = pDispatch->GetListeners().getContainedTypes();
+    const std::vector<OUString> aContainedTypes = pDispatch->getContainedTypes();
     for (const OUString& rName: aContainedTypes)
     {
         if (rName == aDispatchURL.Main || rName == aDispatchURL.Complete)
@@ -1091,6 +1086,7 @@ static void InterceptLOKStateChangeEvent(sal_uInt16 nSID, SfxViewFrame* pViewFra
              aEvent.FeatureURL.Path == "InsertAuthoritiesEntry" ||
              aEvent.FeatureURL.Path == "InsertMultiIndex" ||
              aEvent.FeatureURL.Path == "InsertField" ||
+             aEvent.FeatureURL.Path == "PageNumberWizard" ||
              aEvent.FeatureURL.Path == "InsertPageNumberField" ||
              aEvent.FeatureURL.Path == "InsertPageCountField" ||
              aEvent.FeatureURL.Path == "InsertDateField" ||
@@ -1126,6 +1122,7 @@ static void InterceptLOKStateChangeEvent(sal_uInt16 nSID, SfxViewFrame* pViewFra
              aEvent.FeatureURL.Path == "InsertContentControl" ||
              aEvent.FeatureURL.Path == "InsertDateContentControl" ||
              aEvent.FeatureURL.Path == "InsertDropdownContentControl" ||
+             aEvent.FeatureURL.Path == "InsertPlainTextContentControl" ||
              aEvent.FeatureURL.Path == "InsertPictureContentControl")
     {
         aBuffer.append(aEvent.IsEnabled ? std::u16string_view(u"enabled") : std::u16string_view(u"disabled"));
@@ -1170,7 +1167,6 @@ static void InterceptLOKStateChangeEvent(sal_uInt16 nSID, SfxViewFrame* pViewFra
     else if (aEvent.FeatureURL.Path == "StatusDocPos" ||
              aEvent.FeatureURL.Path == "RowColSelCount" ||
              aEvent.FeatureURL.Path == "StatusPageStyle" ||
-             aEvent.FeatureURL.Path == "StateTableCell" ||
              aEvent.FeatureURL.Path == "StateWordCount" ||
              aEvent.FeatureURL.Path == "PageStyleName" ||
              aEvent.FeatureURL.Path == "PageStatus" ||
@@ -1183,6 +1179,14 @@ static void InterceptLOKStateChangeEvent(sal_uInt16 nSID, SfxViewFrame* pViewFra
         if (aEvent.IsEnabled && (aEvent.State >>= aString))
         {
             aBuffer.append(aString);
+        }
+    }
+    else if (aEvent.FeatureURL.Path == "StateTableCell")
+    {
+        if (aEvent.IsEnabled)
+        {
+            if (const SfxStringItem* pSvxStatusItem = dynamic_cast<const SfxStringItem*>(pState))
+                aBuffer.append(pSvxStatusItem->GetValue());
         }
     }
     else if (aEvent.FeatureURL.Path == "InsertMode" ||

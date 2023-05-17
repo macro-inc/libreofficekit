@@ -52,7 +52,11 @@ void TabWin_Impl::Paint(vcl::RenderContext& rRenderContext, const ::tools::Recta
     Size aSize(GetOutputSizePixel());
     aPoint.setX( aSize.Width() / 2 );
     aPoint.setY( aSize.Height() / 2 );
-    Ruler::DrawTab(rRenderContext, rRenderContext.GetSettings().GetStyleSettings().GetFontColor(), aPoint, nTabStyle);
+    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
+    rRenderContext.SetLineColor(rStyleSettings.GetShadowColor());
+    rRenderContext.SetFillColor(rStyleSettings.GetDialogColor());
+    rRenderContext.DrawRect(tools::Rectangle(Point(0,0), rRenderContext.GetOutputSize()));
+    Ruler::DrawTab(rRenderContext, rStyleSettings.GetDialogTextColor(), aPoint, nTabStyle);
 }
 
 SvxTabulatorTabPage::SvxTabulatorTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rAttr)
@@ -190,7 +194,7 @@ bool SvxTabulatorTabPage::FillItemSet(SfxItemSet* rSet)
 
         if (!pOld || *static_cast<const SvxTabStopItem*>(pOld) != *aTmp)
         {
-            rSet->Put(*aTmp);
+            rSet->Put(std::move(aTmp));
             bModified = true;
         }
     }
@@ -312,10 +316,9 @@ void SvxTabulatorTabPage::InitTabPos_Impl( sal_uInt16 nTabPos )
     m_xTabBox->clear();
 
     tools::Long nOffset = 0;
-    const SfxPoolItem* pItem = nullptr;
-    if (GetItemSet().GetItemState(SID_ATTR_TABSTOP_OFFSET, true, &pItem) == SfxItemState::SET)
+    if (const SfxInt32Item* pOffSetItem = GetItemSet().GetItemIfSet(SID_ATTR_TABSTOP_OFFSET))
     {
-        nOffset = static_cast<const SfxInt32Item*>(pItem)->GetValue();
+        nOffset = pOffSetItem->GetValue();
         MapUnit eUnit = GetItemSet().GetPool()->GetMetric(GetWhich(SID_ATTR_TABSTOP));
         nOffset = OutputDevice::LogicToLogic(nOffset, eUnit, MapUnit::Map100thMM);
     }
@@ -426,12 +429,10 @@ void SvxTabulatorTabPage::NewHdl_Impl(const weld::Button* pBtn)
         return;
 
     tools::Long nOffset = 0;
-    const SfxPoolItem* pItem = nullptr;
 
-    if ( GetItemSet().GetItemState( SID_ATTR_TABSTOP_OFFSET, true, &pItem ) ==
-         SfxItemState::SET )
+    if ( const SfxInt32Item* pOffsetItem = GetItemSet().GetItemIfSet( SID_ATTR_TABSTOP_OFFSET ) )
     {
-        nOffset = static_cast<const SfxInt32Item*>(pItem)->GetValue();
+        nOffset = pOffsetItem->GetValue();
         MapUnit eUnit = GetItemSet().GetPool()->GetMetric( GetWhich( SID_ATTR_TABSTOP ) );
         nOffset = OutputDevice::LogicToLogic( nOffset, eUnit, MapUnit::Map100thMM  );
     }

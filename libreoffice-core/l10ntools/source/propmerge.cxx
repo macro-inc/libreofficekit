@@ -7,27 +7,30 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include <rtl/ustring.hxx>
+#include <o3tl/string_view.hxx>
+
 #include <memory>
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
-#include <fstream>
 #include <iomanip>
 #include <string_view>
 
 #include <export.hxx>
 #include <common.hxx>
 #include <propmerge.hxx>
+#include <utility>
 
 namespace
 {
     //Find ascii escaped unicode
     sal_Int32 lcl_IndexOfUnicode(
-        const OString& rSource, const sal_Int32 nFrom = 0 )
+        std::string_view rSource, const sal_Int32 nFrom = 0 )
     {
         const OString sHexDigits = "0123456789abcdefABCDEF";
-        sal_Int32 nIndex = rSource.indexOf( "\\u", nFrom );
-        if( nIndex == -1 )
+        size_t nIndex = rSource.find( "\\u", nFrom );
+        if( nIndex == std::string_view::npos )
         {
             return -1;
         }
@@ -86,10 +89,10 @@ namespace
 
 //Open source file and store its lines
 PropParser::PropParser(
-    const OString& rInputFile, const OString& rLang,
+    OString _sInputFile, OString _sLang,
     const bool bMergeMode )
-    : m_sSource( rInputFile )
-    , m_sLang( rLang )
+    : m_sSource(std::move( _sInputFile ))
+    , m_sLang(std::move( _sLang ))
     , m_bIsInitialized( false )
 {
     std::ifstream aIfstream( m_sSource.getStr() );
@@ -141,12 +144,12 @@ void PropParser::Extract( const OString& rPOFile )
         const sal_Int32 nEqualSign = sLine.indexOf('=');
         if( nEqualSign != -1 )
         {
-            OString sID = sLine.copy( 0, nEqualSign ).trim();
-            OString sText = lcl_ConvertToUTF8( sLine.copy( nEqualSign + 1 ).trim() );
+            std::string_view sID = o3tl::trim(sLine.subView( 0, nEqualSign ));
+            OString sText = lcl_ConvertToUTF8( OString(o3tl::trim(sLine.subView( nEqualSign + 1 ))) );
 
             common::writePoEntry(
                 "Propex", aPOStream, m_sSource, "property",
-                sID, OString(), OString(), sText);
+                OString(sID), OString(), OString(), sText);
         }
     }
 
@@ -190,13 +193,13 @@ void PropParser::Merge( const OString &rMergeSrc, const OString &rDestinationFil
         if( !sLine.startsWith(" *") && !sLine.startsWith("/*") &&
             nEqualSign != -1 )
         {
-            const OString sID( sLine.copy( 0, sLine.indexOf('=') ).trim() );
+            const OString sID( o3tl::trim(sLine.subView( 0, sLine.indexOf('=') )) );
             ResData  aResData( sID, m_sSource );
             aResData.sResTyp = "property";
             OString sNewText;
             if( m_sLang == "qtz" )
             {
-                const OString sOriginText = lcl_ConvertToUTF8(sLine.copy( nEqualSign + 1 ).trim());
+                const OString sOriginText = lcl_ConvertToUTF8(OString(o3tl::trim(sLine.subView( nEqualSign + 1 ))));
                 sNewText = MergeEntrys::GetQTZText(aResData, sOriginText);
             }
             else if( pMergeDataFile )

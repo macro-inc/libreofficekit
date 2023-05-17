@@ -89,7 +89,7 @@ SwColumnDlg::SwColumnDlg(weld::Window* pParent, SwWrtShell& rSh)
     , m_bSectionChanged(false)
     , m_bSelSectionChanged(false)
     , m_bFrameChanged(false)
-    , m_xContentArea(m_xDialog->weld_content_area())
+    , m_xContentArea(m_xBuilder->weld_container("content"))
     , m_xOkButton(m_xBuilder->weld_button("ok"))
 {
     SwRect aRect;
@@ -349,7 +349,7 @@ sal_uInt16 GetMaxWidth( SwColMgr const * pColMgr, sal_uInt16 nCols )
     return nMax;
 }
 
-const WhichRangesContainer SwColumnPage::aPageRg(svl::Items<RES_COL, RES_COL>);
+const WhichRangesContainer SwColumnPage::s_aPageRg(svl::Items<RES_COL, RES_COL>);
 
 void SwColumnPage::ResetColWidth()
 {
@@ -562,9 +562,8 @@ void SwColumnPage::Reset(const SfxItemSet *rSet)
     }
     if (m_xBalanceColsCB->get_visible())
     {
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == rSet->GetItemState( RES_COLUMNBALANCE, false, &pItem ))
-            m_xBalanceColsCB->set_active(!static_cast<const SwFormatNoBalancedColumns*>(pItem)->GetValue());
+        if( const SwFormatNoBalancedColumns* pItem = rSet->GetItemIfSet( RES_COLUMNBALANCE, false ) )
+            m_xBalanceColsCB->set_active(!pItem->GetValue());
         else
             m_xBalanceColsCB->set_active(true);
     }

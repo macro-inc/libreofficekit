@@ -19,13 +19,13 @@
 
 #include "EnhancedCustomShapeHandle.hxx"
 #include <svx/EnhancedCustomShape2d.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/svdoashp.hxx>
+#include <utility>
 
 
-EnhancedCustomShapeHandle::EnhancedCustomShapeHandle( css::uno::Reference< css::drawing::XShape > const & xCustomShape, sal_uInt32 nIndex ) :
+EnhancedCustomShapeHandle::EnhancedCustomShapeHandle( css::uno::Reference< css::drawing::XShape > xCustomShape, sal_uInt32 nIndex ) :
     mnIndex     ( nIndex ),
-    mxCustomShape ( xCustomShape )
+    mxCustomShape (std::move( xCustomShape ))
 {
 }
 

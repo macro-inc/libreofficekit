@@ -11,8 +11,6 @@
 
 #include <sal/types.h>
 
-#include <vector>
-
 namespace rtl
 {
 class OStringBuffer;

@@ -19,24 +19,28 @@
 
 #include <dlg_CreationWizard_UNO.hxx>
 #include <dlg_CreationWizard.hxx>
+#include <ChartModel.hxx>
 #include <servicenames.hxx>
 #include <TimerTriggeredControllerLock.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
+#include <vcl/weldutils.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <com/sun/star/awt/Point.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sfx2/viewsh.hxx>
+
 
 namespace chart
 {
 using namespace ::com::sun::star;
 
-CreationWizardUnoDlg::CreationWizardUnoDlg(const uno::Reference<uno::XComponentContext>& xContext)
+CreationWizardUnoDlg::CreationWizardUnoDlg(uno::Reference<uno::XComponentContext> xContext)
     : OComponentHelper(m_aMutex)
-    , m_xCC(xContext)
+    , m_xCC(std::move(xContext))
     , m_bUnlockControllersOnExecute(false)
 {
     uno::Reference< frame::XDesktop2 > xDesktop = frame::Desktop::create(m_xCC);
@@ -165,10 +169,18 @@ void CreationWizardUnoDlg::createDialogOnDemand()
                 m_xParentWindow = xFrame->getContainerWindow();
         }
     }
+
+    weld::Window* pParent(Application::GetFrameWeld(m_xParentWindow));
+    if (!pParent)
+    {
+        if (weld::TransportAsXWindow* pTunnel = dynamic_cast<weld::TransportAsXWindow*>(m_xParentWindow.get()))
+            pParent = dynamic_cast<weld::Window*>(pTunnel->getWidget());
+    }
+
     uno::Reference< XComponent > xKeepAlive( this );
     if( m_xChartModel.is() )
     {
-        m_xDialog = std::make_shared<CreationWizard>(Application::GetFrameWeld(m_xParentWindow), m_xChartModel, m_xCC);
+        m_xDialog = std::make_shared<CreationWizard>(pParent, m_xChartModel, m_xCC);
     }
 }
 
@@ -218,7 +230,10 @@ void SAL_CALL CreationWizardUnoDlg::initialize( const uno::Sequence< uno::Any >&
             }
             else if( aProperty.Name == "ChartModel" )
             {
-                aProperty.Value >>= m_xChartModel;
+                uno::Reference<XInterface> xInt;
+                aProperty.Value >>= xInt;
+                m_xChartModel = dynamic_cast<::chart::ChartModel*>(xInt.get());
+                assert(m_xChartModel);
             }
         }
     }

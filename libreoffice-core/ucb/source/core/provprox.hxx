@@ -19,26 +19,22 @@
 
 #pragma once
 
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/XTypeProvider.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/ucb/XContentProviderFactory.hpp>
 #include <com/sun/star/ucb/XContentProvider.hpp>
 #include <com/sun/star/ucb/XParameterizedContentProvider.hpp>
 #include <com/sun/star/ucb/XContentProviderSupplier.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <cppuhelper/weak.hxx>
-#include <cppuhelper/basemutex.hxx>
-#include <mutex>
 
 
 
-using UcbContentProviderProxyFactory_Base = cppu::WeakComponentImplHelper <
+using UcbContentProviderProxyFactory_Base = comphelper::WeakComponentImplHelper <
                                                 css::lang::XServiceInfo,
                                                 css::ucb::XContentProviderFactory >;
-class UcbContentProviderProxyFactory : public cppu::BaseMutex, public UcbContentProviderProxyFactory_Base
+class UcbContentProviderProxyFactory : public UcbContentProviderProxyFactory_Base
 {
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
 
@@ -85,7 +81,7 @@ class UcbContentProviderProxy :
 public:
     UcbContentProviderProxy(
             const css::uno::Reference< css::uno::XComponentContext >& rxContext,
-            const OUString& Service );
+            OUString Service );
     virtual ~UcbContentProviderProxy() override;
 
     // XInterface

@@ -29,9 +29,9 @@ namespace accessibility
     namespace
     {
         /// @throws css::lang::IndexOutOfBoundsException
-        void checkIndex_Impl( sal_Int32 _nIndex, const OUString& _sText )
+        void checkIndex_Impl( sal_Int32 _nIndex, std::u16string_view _sText )
         {
-            if ( _nIndex >= _sText.getLength() )
+            if ( _nIndex >= static_cast<sal_Int32>(_sText.size()) )
                 throw css::lang::IndexOutOfBoundsException();
         }
 
@@ -41,7 +41,6 @@ namespace accessibility
         }
     }
     using namespace ::com::sun::star::lang;
-    using namespace utl;
     using namespace comphelper;
     using namespace ::com::sun::star::uno;
     using ::com::sun::star::accessibility::XAccessible;
@@ -143,41 +142,38 @@ namespace accessibility
     }
 
     /** @return  The count of visible children. */
-    sal_Int32 SAL_CALL AccessibleBrowseBoxTableCell::getAccessibleChildCount()
+    sal_Int64 SAL_CALL AccessibleBrowseBoxTableCell::getAccessibleChildCount()
     {
         return 0;
     }
 
     /** @return  The XAccessible interface of the specified child. */
     css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-        AccessibleBrowseBoxTableCell::getAccessibleChild( sal_Int32 )
+        AccessibleBrowseBoxTableCell::getAccessibleChild( sal_Int64 )
     {
         throw css::lang::IndexOutOfBoundsException();
     }
 
-    /** Creates a new AccessibleStateSetHelper and fills it with states of the
-        current object.
-        @return
-            A filled AccessibleStateSetHelper.
+    /** Return a bitset of states of the current object.
     */
-    rtl::Reference<::utl::AccessibleStateSetHelper> AccessibleBrowseBoxTableCell::implCreateStateSetHelper()
+    sal_Int64 AccessibleBrowseBoxTableCell::implCreateStateSet()
     {
         SolarMethodGuard aGuard(getMutex());
 
-        rtl::Reference<::utl::AccessibleStateSetHelper> pStateSetHelper = new ::utl::AccessibleStateSetHelper;
+        sal_Int64 nStateSet = 0;
 
         if( isAlive() )
         {
             // SHOWING done with mxParent
             if( implIsShowing() )
-                pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+                nStateSet |= AccessibleStateType::SHOWING;
 
-            mpBrowseBox->FillAccessibleStateSetForCell( *pStateSetHelper, getRowPos(), static_cast< sal_uInt16 >( getColumnPos() ) );
+            mpBrowseBox->FillAccessibleStateSetForCell( nStateSet, getRowPos(), static_cast< sal_uInt16 >( getColumnPos() ) );
         }
         else
-            pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+            nStateSet |= AccessibleStateType::DEFUNC;
 
-        return pStateSetHelper;
+        return nStateSet;
     }
 
 
@@ -193,12 +189,12 @@ namespace accessibility
 
     // XAccessibleContext -----------------------------------------------------
 
-    sal_Int32 SAL_CALL AccessibleBrowseBoxTableCell::getAccessibleIndexInParent()
+    sal_Int64 SAL_CALL AccessibleBrowseBoxTableCell::getAccessibleIndexInParent()
     {
         SolarMethodGuard aGuard(getMutex());
         ensureIsAlive();
 
-        return /*vcl::BBINDEX_FIRSTCONTROL*/ m_nOffset + ( getRowPos() * mpBrowseBox->GetColumnCount() ) + getColumnPos();
+        return /*vcl::BBINDEX_FIRSTCONTROL*/ m_nOffset + (static_cast<sal_Int64>(getRowPos()) * static_cast<sal_Int64>(mpBrowseBox->GetColumnCount())) + getColumnPos();
     }
 
     sal_Int32 SAL_CALL AccessibleBrowseBoxTableCell::getCaretPosition(  )

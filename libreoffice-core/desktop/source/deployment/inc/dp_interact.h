@@ -24,6 +24,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <com/sun/star/ucb/XCommandEnvironment.hpp>
 #include <com/sun/star/task/XAbortChannel.hpp>
+#include <utility>
 #include "dp_misc_api.hxx"
 
 namespace dp_misc
@@ -37,7 +38,7 @@ inline void progressUpdate(
         css::uno::Reference<css::ucb::XProgressHandler> xProgressHandler(
             xCmdEnv->getProgressHandler() );
         if (xProgressHandler.is()) {
-            xProgressHandler->update( css::uno::makeAny(status) );
+            xProgressHandler->update( css::uno::Any(status) );
         }
     }
 }
@@ -65,7 +66,7 @@ inline ProgressLevel::ProgressLevel(
     if (xCmdEnv.is())
         m_xProgressHandler = xCmdEnv->getProgressHandler();
     if (m_xProgressHandler.is())
-        m_xProgressHandler->push( css::uno::makeAny(status) );
+        m_xProgressHandler->push( css::uno::Any(status) );
 }
 
 
@@ -79,7 +80,7 @@ inline ProgressLevel::~ProgressLevel()
 inline void ProgressLevel::update( OUString const & status ) const
 {
     if (m_xProgressHandler.is())
-        m_xProgressHandler->update( css::uno::makeAny(status) );
+        m_xProgressHandler->update( css::uno::Any(status) );
 }
 
 
@@ -124,9 +125,9 @@ public:
         const ::rtl::Reference<AbortChannel> m_abortChannel;
     public:
         Chain(
-            ::rtl::Reference<AbortChannel> const & abortChannel,
+            ::rtl::Reference<AbortChannel> abortChannel,
             css::uno::Reference<css::task::XAbortChannel> const & xNext )
-            : m_abortChannel( abortChannel )
+            : m_abortChannel(std::move( abortChannel ))
             { if (m_abortChannel.is()) m_abortChannel->m_xNext = xNext; }
         ~Chain()
             { if (m_abortChannel.is()) m_abortChannel->m_xNext.clear(); }

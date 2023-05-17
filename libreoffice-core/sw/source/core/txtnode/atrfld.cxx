@@ -27,6 +27,7 @@
 #include <docfld.hxx>
 #include <docufld.hxx>
 #include <doc.hxx>
+#include <unofield.hxx>
 
 #include <pam.hxx>
 #include <reffld.hxx>
@@ -222,8 +223,9 @@ void SwFormatField::InvalidateField()
 void SwFormatField::SwClientNotify( const SwModify& rModify, const SfxHint& rHint )
 {
     SwClient::SwClientNotify(rModify, rHint);
-    if (const auto pFieldHint = dynamic_cast<const SwFieldHint*>( &rHint ))
+    if (rHint.GetId() == SfxHintId::SwField)
     {
+        const auto pFieldHint = static_cast<const SwFieldHint*>( &rHint );
         // replace field content by text
         SwPaM* pPaM = pFieldHint->m_pPaM;
         pPaM->DeleteMark(); // TODO: this is really hackish
@@ -233,50 +235,64 @@ void SwFormatField::SwClientNotify( const SwModify& rModify, const SfxHint& rHin
 
         SwDoc& rDoc = pPaM->GetDoc();
         const SwTextNode& rTextNode = mpTextField->GetTextNode();
-        pPaM->GetPoint()->nNode = rTextNode;
-        pPaM->GetPoint()->nContent.Assign( const_cast<SwTextNode*>(&rTextNode), mpTextField->GetStart() );
+        pPaM->GetPoint()->Assign(rTextNode, mpTextField->GetStart());
 
         OUString const aEntry(mpField->ExpandField(rDoc.IsClipBoard(), pFieldHint->m_pLayout));
         pPaM->SetMark();
         pPaM->Move( fnMoveForward );
         rDoc.getIDocumentContentOperations().DeleteRange( *pPaM );
         rDoc.getIDocumentContentOperations().InsertString( *pPaM, aEntry );
-    } else if (rHint.GetId() == SfxHintId::SwLegacyModify)
+    }
+    else if (rHint.GetId() == SfxHintId::SwLegacyModify)
     {
         auto pLegacyHint = static_cast<const sw::LegacyModifyHint*>(&rHint);
         if( !mpTextField )
             return;
         UpdateTextNode(pLegacyHint->m_pOld, pLegacyHint->m_pNew);
-    } else if (const auto pFindForFieldHint = dynamic_cast<const sw::FindFormatForFieldHint*>( &rHint ))
+    }
+    else if (rHint.GetId() == SfxHintId::SwFindFormatForField)
     {
+        const auto pFindForFieldHint = static_cast<const sw::FindFormatForFieldHint*>( &rHint );
         if(pFindForFieldHint->m_rpFormat == nullptr && pFindForFieldHint->m_pField == GetField())
             pFindForFieldHint->m_rpFormat = this;
-    } else if (const auto pFindForPostItIdHint = dynamic_cast<const sw::FindFormatForPostItIdHint*>( &rHint ))
+    }
+    else if (rHint.GetId() == SfxHintId::SwFindFormatForPostItId)
     {
+        const auto pFindForPostItIdHint = static_cast<const sw::FindFormatForPostItIdHint*>( &rHint );
         auto pPostItField = dynamic_cast<SwPostItField*>(mpField.get());
         if(pPostItField && pFindForPostItIdHint->m_rpFormat == nullptr && pFindForPostItIdHint->m_nPostItId == pPostItField->GetPostItId())
             pFindForPostItIdHint->m_rpFormat = this;
-    } else if (const auto pCollectPostItsHint = dynamic_cast<const sw::CollectPostItsHint*>( &rHint ))
+    }
+    else if (rHint.GetId() == SfxHintId::SwCollectPostIts)
     {
+        const auto pCollectPostItsHint = static_cast<const sw::CollectPostItsHint*>( &rHint );
         if(GetTextField() && IsFieldInDoc() && (!pCollectPostItsHint->m_bHideRedlines || !sw::IsFieldDeletedInModel(pCollectPostItsHint->m_rIDRA, *GetTextField())))
             pCollectPostItsHint->m_rvFormatFields.push_back(this);
-    } else if (const auto pHasHiddenInfoHint = dynamic_cast<const sw::HasHiddenInformationNotesHint*>( &rHint ))
+    }
+    else if (rHint.GetId() == SfxHintId::SwHasHiddenInformationNotes)
     {
+        const auto pHasHiddenInfoHint = static_cast<const sw::HasHiddenInformationNotesHint*>( &rHint );
         if(!pHasHiddenInfoHint->m_rbHasHiddenInformationNotes && GetTextField() && IsFieldInDoc())
             pHasHiddenInfoHint->m_rbHasHiddenInformationNotes = true;
-    } else if (const auto pGatherNodeIndexHint = dynamic_cast<const sw::GatherNodeIndexHint*>( &rHint ))
+    }
+    else if (rHint.GetId() == SfxHintId::SwGatherNodeIndex)
     {
+        const auto pGatherNodeIndexHint = static_cast<const sw::GatherNodeIndexHint*>( &rHint );
         if(auto pTextField = GetTextField())
             pGatherNodeIndexHint->m_rvNodeIndex.push_back(pTextField->GetTextNode().GetIndex());
-    } else if (const auto pGatherRefFieldsHint = dynamic_cast<const sw::GatherRefFieldsHint*>( &rHint ))
+    }
+    else if (rHint.GetId() == SfxHintId::SwGatherRefFields)
     {
+        const auto pGatherRefFieldsHint = static_cast<const sw::GatherRefFieldsHint*>( &rHint );
         if(!GetTextField() || pGatherRefFieldsHint->m_nType != GetField()->GetSubType())
             return;
         SwTextNode* pNd = GetTextField()->GetpTextNode();
         if(pNd && pNd->GetNodes().IsDocNodes())
             pGatherRefFieldsHint->m_rvRFields.push_back(static_cast<SwGetRefField*>(GetField()));
-    } else if (const auto pGatherFieldsHint = dynamic_cast<const sw::GatherFieldsHint*>( &rHint ))
+    }
+    else if (rHint.GetId() == SfxHintId::SwGatherFields)
     {
+        const auto pGatherFieldsHint = static_cast<const sw::GatherFieldsHint*>( &rHint );
         if(pGatherFieldsHint->m_bCollectOnlyInDocNodes)
         {
             if(!GetTextField())
@@ -293,7 +309,7 @@ void SwFormatField::UpdateTextNode(const SfxPoolItem* pOld, const SfxPoolItem* p
 {
     if (pOld && (RES_REMOVE_UNO_OBJECT == pOld->Which()))
     {   // invalidate cached UNO object
-        m_wXTextField = nullptr;
+        m_wXTextField.clear();
         // ??? why does this Modify method not already do this?
         CallSwClientNotify(sw::LegacyModifyHint(pOld, pNew));
         return;
@@ -719,7 +735,7 @@ void SwTextInputField::UpdateTextNodeContent( const OUString& rNewContent )
     const sal_Int32 nIdx = GetStart() + 1;
     // skip CH_TXT_ATR_INPUTFIELDEND character
     const sal_Int32 nDelLen = std::max<sal_Int32>( 0, ( (*End()) - 1 - nIdx ) );
-    SwIndex aIdx( &GetTextNode(), nIdx );
+    SwContentIndex aIdx( &GetTextNode(), nIdx );
     GetTextNode().ReplaceText( aIdx, nDelLen, rNewContent );
 }
 
@@ -752,5 +768,8 @@ SwTextAnnotationField::~SwTextAnnotationField()
            ? *pMark
            : nullptr;
 }
+
+void SwFormatField::SetXTextField(rtl::Reference<SwXTextField> const& xTextField)
+{ m_wXTextField = xTextField.get(); }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

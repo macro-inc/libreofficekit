@@ -82,7 +82,7 @@ void SwView::ExecDraw(const SfxRequest& rReq)
     if(pArgs && SfxItemState::SET == pArgs->GetItemState(GetPool().GetWhich(nSlotId), false, &pItem))
         pStringItem = dynamic_cast< const SfxStringItem*>(pItem);
 
-    SdrObjKind eNewFormObjKind = OBJ_NONE;
+    SdrObjKind eNewFormObjKind = SdrObjKind::NONE;
     if (nSlotId == SID_FM_CREATE_CONTROL)
     {
         const SfxUInt16Item* pIdentifierItem = rReq.GetArg<SfxUInt16Item>(SID_FM_CONTROL_IDENTIFIER);
@@ -96,7 +96,7 @@ void SwView::ExecDraw(const SfxRequest& rReq)
     }
     else if (nSlotId == SID_FM_CREATE_CONTROL)
     {
-        if (eNewFormObjKind == m_eFormObjKind || eNewFormObjKind == OBJ_NONE)
+        if (eNewFormObjKind == m_eFormObjKind || eNewFormObjKind == SdrObjKind::NONE)
         {
             bDeselect = true;
             GetViewFrame()->GetDispatcher()->Execute(SID_FM_LEAVE_CREATE);  // Button should popping out
@@ -112,7 +112,7 @@ void SwView::ExecDraw(const SfxRequest& rReq)
             if( pDescriptorItem )
             {
                 svx::ODataAccessDescriptor aDescriptor( pDescriptorItem->GetValue() );
-                SdrObjectUniquePtr pObj = pFormView->CreateFieldControl( aDescriptor );
+                rtl::Reference<SdrObject> pObj = pFormView->CreateFieldControl( aDescriptor );
 
                 if ( pObj )
                 {
@@ -134,7 +134,7 @@ void SwView::ExecDraw(const SfxRequest& rReq)
 
                     // TODO: unmark all other
                     m_pWrtShell->EnterStdMode();
-                    m_pWrtShell->SwFEShell::InsertDrawObj( *(pObj.release()), aStartPos );
+                    m_pWrtShell->SwFEShell::InsertDrawObj( *pObj, aStartPos );
                 }
             }
         }
@@ -480,9 +480,9 @@ bool SwView::EnterDrawTextMode(const Point& aDocPos)
     {
         // To allow SwDrawVirtObj text objects to be activated, allow their type, too.
         auto pVirtObj =  dynamic_cast<SwDrawVirtObj*>( pObj );
-        if ( (pVirtObj && dynamic_cast< const SdrTextObj *>(&pVirtObj->GetReferencedObj() ) != nullptr &&
+        if ( (pVirtObj && DynCastSdrTextObj(&pVirtObj->GetReferencedObj() ) != nullptr &&
                m_pWrtShell->IsSelObjProtected(FlyProtectFlags::Content) == FlyProtectFlags::NONE) ||
-             dynamic_cast< const SdrTextObj *>( pObj ) != nullptr )
+             DynCastSdrTextObj( pObj ) != nullptr )
         {
             // Refuse to edit editeng text of the shape if it has textbox attached.
             if (!lcl_isTextBox(pObj))
@@ -524,7 +524,7 @@ bool SwView::BeginTextEdit(SdrObject* pObj, SdrPageView* pPV, vcl::Window* pWin,
 
         const SwViewOption *pOpt = pSh->GetViewOptions();
 
-        if (SwViewOption::IsFieldShadings())
+        if (pOpt->IsFieldShadings())
             nCntrl |= EEControlBits::MARKFIELDS;
         else
             nCntrl &= ~EEControlBits::MARKFIELDS;

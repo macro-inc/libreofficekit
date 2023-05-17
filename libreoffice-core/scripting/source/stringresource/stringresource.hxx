@@ -28,21 +28,15 @@
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/io/XOutputStream.hpp>
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
-#include <osl/mutex.hxx>
-
+#include <comphelper/interfacecontainer4.hxx>
+#include <mutex>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 
 namespace stringresource
 {
-
-
-// mutex
-
-
-::osl::Mutex& getMutex();
 
 
 // class stringresourceImpl
@@ -74,7 +68,7 @@ struct LocaleItem
     bool                   m_bModified;
 
     LocaleItem( css::lang::Locale locale, bool bLoaded=true )
-        : m_locale( locale )
+        : m_locale(std::move( locale ))
         , m_nNextIndex( 0 )
         , m_bLoaded( bLoaded )
         , m_bModified( false )
@@ -88,13 +82,14 @@ typedef ::cppu::WeakImplHelper<
 class StringResourceImpl : public StringResourceImpl_BASE
 {
 protected:
+    std::mutex                                                m_aMutex;
     css::uno::Reference< css::uno::XComponentContext >        m_xContext;
 
     LocaleItem*                                               m_pCurrentLocaleItem;
     LocaleItem*                                               m_pDefaultLocaleItem;
     bool                                                      m_bDefaultModified;
 
-    ::comphelper::OInterfaceContainerHelper2                        m_aListenerContainer;
+    ::comphelper::OInterfaceContainerHelper4<css::util::XModifyListener> m_aListenerContainer;
 
     std::vector< std::unique_ptr<LocaleItem> >                m_aLocaleItemVector;
     std::vector< std::unique_ptr<LocaleItem> >                m_aDeletedLocaleItemVector;
@@ -123,21 +118,21 @@ protected:
     LocaleItem* getClosestMatchItemForLocale( const css::lang::Locale& locale );
     /// @throws css::lang::IllegalArgumentException
     /// @throws css::uno::RuntimeException
-    void implSetCurrentLocale( const css::lang::Locale& locale,
+    void implSetCurrentLocale( std::unique_lock<std::mutex>& rGuard, const css::lang::Locale& locale,
         bool FindClosestMatch, bool bUseDefaultIfNoMatch );
 
-    void implModified();
-    void implNotifyListeners();
+    void implModified(std::unique_lock<std::mutex>&);
+    void implNotifyListeners(std::unique_lock<std::mutex>&);
 
     //=== Impl methods for ...ForLocale methods ===
     /// @throws css::resource::MissingResourceException
     OUString implResolveString( const OUString& ResourceID, LocaleItem* pLocaleItem );
     bool implHasEntryForId( const OUString& ResourceID, LocaleItem* pLocaleItem );
     css::uno::Sequence< OUString > implGetResourceIDs( LocaleItem* pLocaleItem );
-    void implSetString( const OUString& ResourceID,
+    void implSetString( std::unique_lock<std::mutex>& rGuard, const OUString& ResourceID,
         const OUString& Str, LocaleItem* pLocaleItem );
     /// @throws css::resource::MissingResourceException
-    void implRemoveId( const OUString& ResourceID, LocaleItem* pLocaleItem );
+    void implRemoveId( std::unique_lock<std::mutex>& rGuard, const OUString& ResourceID, LocaleItem* pLocaleItem );
 
     // Method to load a locale if necessary, returns true if loading was
     // successful. Default implementation in base class just returns true.
@@ -202,7 +197,7 @@ protected:
 
     /// @throws css::uno::Exception
     /// @throws css::uno::RuntimeException
-    void implInitializeCommonParameters( const css::uno::Sequence< css::uno::Any >& aArguments );
+    void implInitializeCommonParameters( std::unique_lock<std::mutex>& rGuard, const css::uno::Sequence< css::uno::Any >& aArguments );
 
     // Scan locale properties files
     virtual void implScanLocales();
@@ -218,7 +213,7 @@ protected:
     void implScanLocaleNames( const css::uno::Sequence< OUString >& aContentSeq );
     static OUString implGetFileNameForLocaleItem( LocaleItem const * pLocaleItem, const OUString& aNameBase );
     static OUString implGetPathForLocaleItem( LocaleItem const * pLocaleItem, const OUString& aNameBase,
-        const OUString& aLocation, bool bDefaultFile=false );
+        std::u16string_view aLocation, bool bDefaultFile=false );
 
     bool implReadPropertiesFile( LocaleItem* pLocaleItem,
         const css::uno::Reference< css::io::XInputStream >& xInput );
@@ -244,7 +239,7 @@ protected:
     /// @throws css::uno::RuntimeException
     void implKillRemovedLocaleFiles
     (
-        const OUString& Location,
+        std::u16string_view Location,
         const OUString& aNameBase,
         const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xFileAccess
     );
@@ -253,7 +248,7 @@ protected:
     /// @throws css::uno::RuntimeException
     void implKillChangedDefaultFiles
     (
-        const OUString& Location,
+        std::u16string_view Location,
         const OUString& aNameBase,
         const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xFileAccess
     );
@@ -262,7 +257,7 @@ protected:
     /// @throws css::uno::RuntimeException
     void implStoreAtLocation
     (
-        const OUString& Location,
+        std::u16string_view Location,
         const OUString& aNameBase,
         const OUString& aComment,
         const css::uno::Reference< css::ucb::XSimpleFileAccess3 >& xFileAccess,
@@ -418,7 +413,7 @@ class StringResourceWithLocationImpl : public StringResourceWithLocationImpl_BAS
     css::uno::Reference< css::ucb::XSimpleFileAccess3 >   m_xSFI;
     css::uno::Reference< css::task::XInteractionHandler > m_xInteractionHandler;
 
-    const css::uno::Reference< css::ucb::XSimpleFileAccess3 > & getFileAccess();
+    const css::uno::Reference< css::ucb::XSimpleFileAccess3 > & getFileAccessImpl();
 
     virtual void implScanLocales() override;
     virtual bool implLoadLocale( LocaleItem* pLocaleItem ) override;

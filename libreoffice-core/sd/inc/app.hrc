@@ -67,13 +67,6 @@
 #define HID_PSEUDOSHEET_NOTES               (HID_SD_START + 98)
 #define HID_PSEUDOSHEET_SUBTITLE            (HID_SD_START + 101)
 
-#define HID_SD_CELL_STYLE_DEFAULT                           (HID_SD_START + 194)
-#define HID_SD_CELL_STYLE_BANDED                            (HID_SD_START + 195)
-#define HID_SD_CELL_STYLE_HEADER                            (HID_SD_START + 196)
-#define HID_SD_CELL_STYLE_TOTAL                             (HID_SD_START + 197)
-#define HID_SD_CELL_STYLE_FIRST_COLUMN                      (HID_SD_START + 198)
-#define HID_SD_CELL_STYLE_LAST_COLUMN                       (HID_SD_START + 199)
-
 #define SID_PAGESETUP                       (SID_SD_START+2)
     // FREE
 #define SID_COPYOBJECTS                     (SID_SD_START+4)
@@ -137,7 +130,7 @@
 // In svxids.hrc: SID_BEZIER_CONVERT        (SID_SD_START+65)
 // In svxids.hrc: SID_BEZIER_EDGE           (SID_SD_START+66)
 // In svxids.hrc: SID_BEZIER_SYMMTR         (SID_SD_START+67)
-#define SID_NOTES_MODE                      (SID_SD_START+69)
+#define SID_NOTES_MODE                      TypedWhichId<SfxBoolItem>(SID_SD_START+69)
 #define SID_HANDOUT_MASTER_MODE             (SID_SD_START+70)
 #define SID_LINEEND_POLYGON                 (SID_SD_START+71)
 #define SID_EXECUTE_ANIMATION_EFFECT        (SID_SD_START+72)
@@ -375,7 +368,7 @@
 #define SID_SUMMARY_PAGE                    (SID_SD_START+344)
 #define SID_LEAVE_ALL_GROUPS                (SID_SD_START+345)
     // FREE
-#define SID_SLIDE_MASTER_MODE               (SID_SD_START+348)
+#define SID_SLIDE_MASTER_MODE               TypedWhichId<SfxBoolItem>(SID_SD_START+348)
     // FREE
 #define SID_NOTES_MASTER_MODE               (SID_SD_START+350)
     // FREE
@@ -430,7 +423,7 @@
         // FREE
 #define SID_NOTES_WINDOW                    (SID_SD_START+417)
         // FREE
-#define SID_NORMAL_MULTI_PANE_GUI           (SID_SD_START+420)
+#define SID_NORMAL_MULTI_PANE_GUI           TypedWhichId<SfxBoolItem>(SID_SD_START+420)
 #define SID_SLIDE_SORTER_MULTI_PANE_GUI     (SID_SD_START+421)
 
 #define SID_SELECT_BACKGROUND               (SID_SD_START+422)
@@ -451,14 +444,12 @@
 
 // Add companion for the SID_HIDE_SLIDE (that is defined in svx)
 #define SID_SHOW_SLIDE                      (SID_SD_START+441)
-#define SID_ADD_MOTION_PATH                 (SID_SD_START+442)
+#define SID_ADD_MOTION_PATH                 TypedWhichId<SfxUnoAnyItem>(SID_SD_START+442)
 
     // FREE
 #define SID_ZOOM_MODE                       (SID_SD_START+447)
 #define SID_HIDE_LAST_LEVEL                 (SID_SD_START+448)
 #define SID_SHOW_NEXT_LEVEL                 (SID_SD_START+449)
 #define SID_PRESENTATION_MINIMIZER          (SID_SD_START+450)
-#define SID_REGENERATE_DIAGRAM              (SID_SD_START+451)
-#define SID_EDIT_DIAGRAM                    (SID_SD_START+452)
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

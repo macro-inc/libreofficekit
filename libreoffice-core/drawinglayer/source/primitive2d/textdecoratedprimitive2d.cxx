@@ -30,12 +30,13 @@
 namespace drawinglayer::primitive2d
 {
         void TextDecoratedPortionPrimitive2D::impCreateGeometryContent(
-            std::vector< Primitive2DReference >& rTarget,
+            Primitive2DContainer& rTarget,
             basegfx::utils::B2DHomMatrixBufferedOnDemandDecompose const & rDecTrans,
             const OUString& rText,
             sal_Int32 nTextPosition,
             sal_Int32 nTextLength,
             const std::vector< double >& rDXArray,
+            const std::vector< sal_Bool >& rKashidaArray,
             const attribute::FontAttribute& rFontAttribute) const
         {
             // create the SimpleTextPrimitive needed in any case
@@ -46,6 +47,7 @@ namespace drawinglayer::primitive2d
                     nTextPosition,
                     nTextLength,
                     std::vector(rDXArray),
+                    std::vector(rKashidaArray),
                     rFontAttribute,
                     getLocale(),
                     getFontColor())));
@@ -155,13 +157,13 @@ namespace drawinglayer::primitive2d
             {
                 // support for single word mode; split to single word primitives
                 // using TextBreakupHelper
-                const TextBreakupHelper aTextBreakupHelper(*this);
-                const Primitive2DContainer& aBroken(aTextBreakupHelper.getResult(BreakupUnit::Word));
+                TextBreakupHelper aTextBreakupHelper(*this);
+                Primitive2DContainer aBroken(aTextBreakupHelper.extractResult(BreakupUnit::Word));
 
                 if(!aBroken.empty())
                 {
                     // was indeed split to several words, use as result
-                    rContainer.insert(rContainer.end(), aBroken.begin(), aBroken.end());
+                    rContainer.append(std::move(aBroken));
                     return;
                 }
                 else
@@ -170,7 +172,6 @@ namespace drawinglayer::primitive2d
                     // decompose local entity
                 }
             }
-            std::vector< Primitive2DReference > aNewPrimitives;
             basegfx::utils::B2DHomMatrixBufferedOnDemandDecompose aDecTrans(getTextTransform());
             Primitive2DContainer aRetval;
 
@@ -190,20 +191,7 @@ namespace drawinglayer::primitive2d
                 getFontAttribute().getBiDiStrong());
 
             // handle as one word
-            impCreateGeometryContent(aNewPrimitives, aDecTrans, getText(), getTextPosition(), getTextLength(), getDXArray(), aNewFontAttribute);
-
-            // convert to Primitive2DSequence
-            const sal_uInt32 nMemberCount(aNewPrimitives.size());
-
-            if(nMemberCount)
-            {
-                aRetval.resize(nMemberCount);
-
-                for(sal_uInt32 a(0); a < nMemberCount; a++)
-                {
-                    aRetval[a] = aNewPrimitives[a];
-                }
-            }
+            impCreateGeometryContent(aRetval, aDecTrans, getText(), getTextPosition(), getTextLength(), getDXArray(), getKashidaArray(), aNewFontAttribute);
 
             // Handle Shadow, Outline and TextRelief
             if(!aRetval.empty())
@@ -298,7 +286,7 @@ namespace drawinglayer::primitive2d
                 }
             }
 
-            rContainer.insert(rContainer.end(), aRetval.begin(), aRetval.end());
+            rContainer.append(std::move(aRetval));
         }
 
         TextDecoratedPortionPrimitive2D::TextDecoratedPortionPrimitive2D(
@@ -308,6 +296,7 @@ namespace drawinglayer::primitive2d
             sal_Int32 nTextPosition,
             sal_Int32 nTextLength,
             std::vector< double >&& rDXArray,
+            std::vector< sal_Bool >&& rKashidaArray,
             const attribute::FontAttribute& rFontAttribute,
             const css::lang::Locale& rLocale,
             const basegfx::BColor& rFontColor,
@@ -326,7 +315,7 @@ namespace drawinglayer::primitive2d
             bool bEmphasisMarkBelow,
             TextRelief eTextRelief,
             bool bShadow)
-        :   TextSimplePortionPrimitive2D(rNewTransform, rText, nTextPosition, nTextLength, std::move(rDXArray), rFontAttribute, rLocale, rFontColor, false, 0, rFillColor),
+        :   TextSimplePortionPrimitive2D(rNewTransform, rText, nTextPosition, nTextLength, std::move(rDXArray), std::move(rKashidaArray), rFontAttribute, rLocale, rFontColor, false, 0, rFillColor),
             maOverlineColor(rOverlineColor),
             maTextlineColor(rTextlineColor),
             meFontOverline(eFontOverline),

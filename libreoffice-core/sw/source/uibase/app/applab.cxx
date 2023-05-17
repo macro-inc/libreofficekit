@@ -23,7 +23,6 @@
 #include <hintids.hxx>
 
 #include <comphelper/string.hxx>
-#include <o3tl/deleter.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/printer.hxx>
 #include <sfx2/request.hxx>
@@ -182,6 +181,8 @@ void SwModule::InsertLab(SfxRequest& rReq, bool bLabel)
     }
 
     SfxViewFrame* pViewFrame = SfxViewFrame::DisplayNewDocument( *xDocSh, rReq );
+    if (!pViewFrame)
+        return;
 
     SwView      *pNewView = static_cast<SwView*>( pViewFrame->GetViewShell());
     pNewView->AttrChangedNotify(nullptr);// So that SelectShell is being called.
@@ -206,6 +207,7 @@ void SwModule::InsertLab(SfxRequest& rReq, bool bLabel)
     SwWrtShell *pSh = pNewView->GetWrtShellPtr();
     OSL_ENSURE( pSh, "missing WrtShell" );
 
+    if (pSh)
     {   // block for locks the dispatcher!!
 
         SwWait aWait( static_cast<SwDocShell&>(*xDocSh), true );

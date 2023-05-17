@@ -31,7 +31,7 @@ class NetChart : public VSeriesPlotter
 public:
     NetChart() = delete;
 
-    NetChart( const css::uno::Reference< css::chart2::XChartType >& xChartTypeModel
+    NetChart( const rtl::Reference< ::chart::ChartType >& xChartTypeModel
              , sal_Int32 nDimensionCount
              , bool bNoArea
              , std::unique_ptr<PlottingPositionHelper> pPlottingPositionHelper //takes ownership
@@ -53,11 +53,11 @@ public:
 private: //methods
     void impl_createSeriesShapes();
     bool impl_createArea( VDataSeries* pSeries
-                , css::drawing::PolyPolygonShape3D* pSeriesPoly
-                , css::drawing::PolyPolygonShape3D const * pPreviousSeriesPoly
+                , const std::vector<std::vector<css::drawing::Position3D>>* pSeriesPoly
+                , std::vector<std::vector<css::drawing::Position3D>> const * pPreviousSeriesPoly
                 , PlottingPositionHelper const * pPosHelper );
     bool impl_createLine( VDataSeries* pSeries
-                , css::drawing::PolyPolygonShape3D* pSeriesPoly
+                , const std::vector<std::vector<css::drawing::Position3D>>* pSeriesPoly
                 , PlottingPositionHelper const * pPosHelper );
 
 private: //member
@@ -66,8 +66,8 @@ private: //member
     bool                                m_bArea;//false -> line or symbol only
     bool                                m_bLine;
 
-    css::uno::Reference< css::drawing::XShapes > m_xSeriesTarget;
-    css::uno::Reference< css::drawing::XShapes > m_xTextTarget;
+    rtl::Reference<SvxShapeGroupAnyD> m_xSeriesTarget;
+    rtl::Reference<SvxShapeGroupAnyD> m_xTextTarget;
 };
 } //namespace chart
 

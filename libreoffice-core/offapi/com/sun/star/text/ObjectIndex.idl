@@ -18,11 +18,6 @@
  */
 
 
-#ifndef __com_sun_star_text_ObjectIndex_idl__
-#define __com_sun_star_text_ObjectIndex_idl__
-
-#include <com/sun/star/text/BaseIndex.idl>
-
 
  module com {  module sun {  module star {  module text {
 
@@ -50,12 +45,16 @@ published service ObjectIndex
     /** Determines if external embedded objects are included in the office.
      */
     [optional, property] boolean CreateFromOtherEmbeddedObjects;//objects
+
+    /** determines if paragraphs with one particular style applied are
+        included in the index.
+        @since LibreOffice 7.6
+     */
+    [optional, property, maybevoid] string CreateFromParagraphStyle;
 };
 
 
 }; }; }; };
-
-#endif
 
 
 

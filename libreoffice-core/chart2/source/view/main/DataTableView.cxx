@@ -42,17 +42,16 @@ namespace
 {
 void setTopCell(uno::Reference<beans::XPropertySet>& xPropertySet)
 {
-    xPropertySet->setPropertyValue("FillColor", uno::makeAny(Color(0xFFFFFF)));
-    xPropertySet->setPropertyValue("TextVerticalAdjust",
-                                   uno::makeAny(drawing::TextVerticalAdjust_TOP));
-    xPropertySet->setPropertyValue("ParaAdjust", uno::makeAny(style::ParagraphAdjust_CENTER));
+    xPropertySet->setPropertyValue("FillColor", uno::Any(Color(0xFFFFFF)));
+    xPropertySet->setPropertyValue("TextVerticalAdjust", uno::Any(drawing::TextVerticalAdjust_TOP));
+    xPropertySet->setPropertyValue("ParaAdjust", uno::Any(style::ParagraphAdjust_CENTER));
 
     table::BorderLine2 aBorderLine;
     aBorderLine.LineWidth = 0;
     aBorderLine.Color = 0x000000;
 
-    xPropertySet->setPropertyValue("TopBorder", uno::makeAny(aBorderLine));
-    xPropertySet->setPropertyValue("LeftBorder", uno::makeAny(aBorderLine));
+    xPropertySet->setPropertyValue("TopBorder", uno::Any(aBorderLine));
+    xPropertySet->setPropertyValue("LeftBorder", uno::Any(aBorderLine));
 }
 
 void copyProperty(uno::Reference<beans::XPropertySet>& xOut,
@@ -85,11 +84,12 @@ getFirstParagraphProperties(uno::Reference<text::XText> const& xText)
 
 } // end anonymous namespace
 
-DataTableView::DataTableView(uno::Reference<chart2::XChartDocument> const& xChartDoc,
-                             rtl::Reference<DataTable> const& rDataTableModel,
-                             uno::Reference<uno::XComponentContext> const& rComponentContext,
-                             bool bAlignAxisValuesWithColumns)
-    : m_xChartModel(xChartDoc)
+DataTableView::DataTableView(
+    rtl::Reference<::chart::ChartModel> const& xChartModel,
+    rtl::Reference<DataTable> const& rDataTableModel,
+    css::uno::Reference<css::uno::XComponentContext> const& rComponentContext,
+    bool bAlignAxisValuesWithColumns)
+    : m_xChartModel(xChartModel)
     , m_xDataTableModel(rDataTableModel)
     , m_xComponentContext(rComponentContext)
     , m_bAlignAxisValuesWithColumns(bAlignAxisValuesWithColumns)
@@ -153,13 +153,13 @@ void DataTableView::setCellCharAndParagraphProperties(
             xPropertySet->setPropertyValue("CharBackColor", uno::Any(aColor));
     }
 
-    xPropertySet->setPropertyValue("ParaAdjust", uno::makeAny(style::ParagraphAdjust_CENTER));
+    xPropertySet->setPropertyValue("ParaAdjust", uno::Any(style::ParagraphAdjust_CENTER));
 }
 
 void DataTableView::setCellProperties(css::uno::Reference<beans::XPropertySet>& xPropertySet,
                                       bool bLeft, bool bTop, bool bRight, bool bBottom)
 {
-    xPropertySet->setPropertyValue("FillColor", uno::makeAny(Color(0xFFFFFF)));
+    xPropertySet->setPropertyValue("FillColor", uno::Any(Color(0xFFFFFF)));
 
     uno::Reference<beans::XPropertySet> xDataTableProperties(m_xDataTableModel);
     float fFontHeight = 0.0;
@@ -168,13 +168,12 @@ void DataTableView::setCellProperties(css::uno::Reference<beans::XPropertySet>& 
     sal_Int32 nXDistance = std::round(fFontHeight * 0.18f);
     sal_Int32 nYDistance = std::round(fFontHeight * 0.30f);
 
-    xPropertySet->setPropertyValue("TextLeftDistance", uno::makeAny(nXDistance));
-    xPropertySet->setPropertyValue("TextRightDistance", uno::makeAny(nXDistance));
-    xPropertySet->setPropertyValue("TextUpperDistance", uno::makeAny(nYDistance));
-    xPropertySet->setPropertyValue("TextLowerDistance", uno::makeAny(nYDistance));
+    xPropertySet->setPropertyValue("TextLeftDistance", uno::Any(nXDistance));
+    xPropertySet->setPropertyValue("TextRightDistance", uno::Any(nXDistance));
+    xPropertySet->setPropertyValue("TextUpperDistance", uno::Any(nYDistance));
+    xPropertySet->setPropertyValue("TextLowerDistance", uno::Any(nYDistance));
 
-    xPropertySet->setPropertyValue("TextVerticalAdjust",
-                                   uno::makeAny(drawing::TextVerticalAdjust_TOP));
+    xPropertySet->setPropertyValue("TextVerticalAdjust", uno::Any(drawing::TextVerticalAdjust_TOP));
 
     drawing::LineStyle eStyle = drawing::LineStyle_NONE;
     m_aLineProperties.LineStyle >>= eStyle;
@@ -197,11 +196,11 @@ void DataTableView::setCellProperties(css::uno::Reference<beans::XPropertySet>& 
         {
             OUString aDashName;
             m_aLineProperties.DashName >>= aDashName;
-            uno::Reference<lang::XMultiServiceFactory> xFactory(m_xChartModel, uno::UNO_QUERY);
-            if (!aDashName.isEmpty() && xFactory.is())
+            if (!aDashName.isEmpty() && m_xChartModel.is())
             {
                 uno::Reference<container::XNameContainer> xDashTable(
-                    xFactory->createInstance("com.sun.star.drawing.DashTable"), uno::UNO_QUERY);
+                    m_xChartModel->createInstance("com.sun.star.drawing.DashTable"),
+                    uno::UNO_QUERY);
                 if (xDashTable.is() && xDashTable->hasByName(aDashName))
                 {
                     drawing::LineDash aLineDash;
@@ -224,13 +223,13 @@ void DataTableView::setCellProperties(css::uno::Reference<beans::XPropertySet>& 
         }
 
         if (bLeft)
-            xPropertySet->setPropertyValue("LeftBorder", uno::makeAny(aBorderLine));
+            xPropertySet->setPropertyValue("LeftBorder", uno::Any(aBorderLine));
         if (bTop)
-            xPropertySet->setPropertyValue("TopBorder", uno::makeAny(aBorderLine));
+            xPropertySet->setPropertyValue("TopBorder", uno::Any(aBorderLine));
         if (bRight)
-            xPropertySet->setPropertyValue("RightBorder", uno::makeAny(aBorderLine));
+            xPropertySet->setPropertyValue("RightBorder", uno::Any(aBorderLine));
         if (bBottom)
-            xPropertySet->setPropertyValue("BottomBorder", uno::makeAny(aBorderLine));
+            xPropertySet->setPropertyValue("BottomBorder", uno::Any(aBorderLine));
     }
 }
 
@@ -240,11 +239,13 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
     if (!m_xTarget.is())
         return;
 
+    // Remove shapes first before we add the new ones
     ShapeFactory::removeSubShapes(m_xTarget);
     auto sParticle = ObjectIdentifier::createParticleForDataTable(m_xChartModel);
     auto sCID = ObjectIdentifier::createClassifiedIdentifierForParticle(sParticle);
     m_xTableShape = ShapeFactory::createTable(m_xTarget, sCID);
 
+    // calculate the table size
     auto rDelta = rEnd - rStart;
     sal_Int32 nTableSize = basegfx::fround(rDelta.getX());
     m_xTableShape->setSize({ nTableSize, 0 });
@@ -270,6 +271,7 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
 
     auto* pTableObject = static_cast<sdr::table::SdrTableObj*>(m_xTableShape->GetSdrObject());
 
+    // get the data table properties from the model
     bool bHBorder = false;
     bool bVBorder = false;
     bool bOutline = false;
@@ -282,6 +284,7 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
     m_xDataTableModel->getPropertyValue("Outline") >>= bOutline;
     m_xDataTableModel->getPropertyValue("Keys") >>= bKeys;
 
+    // set the data table row and column size
     sal_Int32 nColumnCount = m_aXValues.size();
     uno::Reference<table::XTableColumns> xTableColumns = m_xTable->getColumns();
     xTableColumns->insertByIndex(0, nColumnCount);
@@ -292,7 +295,8 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
 
     sal_Int32 nColumnWidth = 0.0;
 
-    // If we don't align, we have to calculate the column width ourselves
+    // If we don't align, we have to calculate the column width ourselves,
+    // otherwise the column width is taken from the x-axis width
     if (m_bAlignAxisValuesWithColumns)
         nColumnWidth = nAxisStepWidth;
     else
@@ -343,8 +347,6 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
     constexpr const sal_Int32 constSymbolMargin = 100; // 1mm
     if (bKeys)
     {
-        uno::Reference<lang::XMultiServiceFactory> xFactory(m_xChartModel, uno::UNO_QUERY);
-
         uno::Reference<beans::XPropertySet> xDataTableProperties(m_xDataTableModel);
         float fFontHeight = 0.0;
         xDataTableProperties->getPropertyValue("CharHeight") >>= fFontHeight;
@@ -371,10 +373,11 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
             if (pSeriesPlotter)
             {
                 awt::Size aSize(nSymbolWidth, nSymbolHeight);
-                std::vector<ViewLegendSymbol> aNewEntries = pSeriesPlotter->createSymbols(
-                    aSize, m_xTarget, xFactory, m_xComponentContext);
+                std::vector<ViewLegendSymbol> aNewEntries
+                    = pSeriesPlotter->createSymbols(aSize, m_xTarget, m_xComponentContext);
 
-                aSymbols.insert(aSymbols.end(), aNewEntries.begin(), aNewEntries.end());
+                for (auto const& rSymbol : aNewEntries)
+                    aSymbols.push_back(rSymbol);
             }
         }
     }
@@ -399,13 +402,11 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
             setCellCharAndParagraphProperties(xTextPropertySet);
             setCellProperties(xCellPropertySet, bOutline, bTop, bOutline, bBottom);
 
-            xCellPropertySet->setPropertyValue("ParaAdjust",
-                                               uno::makeAny(style::ParagraphAdjust_LEFT));
+            xCellPropertySet->setPropertyValue("ParaAdjust", uno::Any(style::ParagraphAdjust_LEFT));
             if (bKeys)
             {
                 xCellPropertySet->setPropertyValue(
-                    "ParaLeftMargin",
-                    uno::makeAny(nMaxSymbolWidth + sal_Int32(2 * constSymbolMargin)));
+                    "ParaLeftMargin", uno::Any(nMaxSymbolWidth + sal_Int32(2 * constSymbolMargin)));
             }
         }
         nRow++;
@@ -456,11 +457,13 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
 
     xBroadcaster->unlockBroadcasts();
 
+    // force recalculation of all cells in the table shape
     pTableObject->DistributeColumns(0, nColumnCount, true, true);
     pTableObject->DistributeRows(0, nRowCount, true, true);
 
     xBroadcaster->lockBroadcasts();
 
+    // reposition the data table
     changePosition(basegfx::fround(rStart.getX()), basegfx::fround(rStart.getY()));
 
     sal_Int32 nTableX = m_xTableShape->getPosition().X;
@@ -471,7 +474,7 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
     for (sal_Int32 i = 1; i < xTableColumns->getCount(); ++i)
     {
         xPropertySet.set(xTableColumns->getByIndex(i), uno::UNO_QUERY);
-        xPropertySet->setPropertyValue("Width", uno::makeAny(nColumnWidth));
+        xPropertySet->setPropertyValue("Width", uno::Any(nColumnWidth));
     }
 
     if (bKeys)
@@ -487,7 +490,7 @@ void DataTableView::createShapes(basegfx::B2DVector const& rStart, basegfx::B2DV
                 xPropertySet->getPropertyValue("Height") >>= nHeight;
                 if (i > 0)
                 {
-                    auto& rSymbol = aSymbols[nSymbolIndex].aSymbol;
+                    auto& rSymbol = aSymbols[nSymbolIndex].xSymbol;
                     sal_Int32 nSymbolHeight = rSymbol->getSize().Height;
                     sal_Int32 nSymbolY
                         = basegfx::fround(double(nHeight) / 2.0 - double(nSymbolHeight) / 2.0);
@@ -511,12 +514,11 @@ void DataTableView::changePosition(sal_Int32 x, sal_Int32 y)
 
     sal_Int32 nWidth = 0;
     xPropertySet->getPropertyValue("Width") >>= nWidth;
-    uno::Reference<drawing::XShape> xTargetShape(m_xTarget, uno::UNO_QUERY);
-    if (xTargetShape.is())
-        xTargetShape->setPosition({ x - nWidth, y });
+
+    m_xTarget->setPosition({ x - nWidth, y });
 }
 
-void DataTableView::initializeShapes(const css::uno::Reference<css::drawing::XShapes>& xTarget)
+void DataTableView::initializeShapes(const rtl::Reference<SvxShapeGroupAnyD>& xTarget)
 {
     m_xTarget = xTarget;
 }

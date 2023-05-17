@@ -65,6 +65,7 @@ SfxStyleDialogController::SfxStyleDialogController
 */
 SfxStyleDialogController::~SfxStyleDialogController()
 {
+    // coverity[leaked_storage] - deliberate, ownership is really with m_rStyle
     m_xExampleSet.release();
 }
 
@@ -93,7 +94,7 @@ IMPL_LINK_NOARG(SfxStyleDialogController, CancelHdl, weld::Button&, void)
 
     while (nWhich)
     {
-        SfxItemState eState = pInSet->GetItemState(nWhich, false);
+        SfxItemState eState = aIter.GetItemState(false);
 
         if (SfxItemState::DEFAULT == eState)
             m_xExampleSet->ClearItem(nWhich);

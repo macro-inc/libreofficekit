@@ -169,18 +169,18 @@ public:
             const css::uno::Sequence< css::beans::PropertyValue >& rValues );
 
     css::uno::Any
-            GetProperty( const OUString &rPropertyName ) const;
+            GetProperty( std::u16string_view rPropertyName ) const;
     css::uno::Any
             GetProperty( sal_Int32 nPropertyHandle ) const;
 
-    bool    SetProperty( const OUString &rPropertyName,
+    bool    SetProperty( std::u16string_view rPropertyName,
                          const css::uno::Any &rValue );
     bool    SetProperty( sal_Int32 nPropertyHandle,
                          const css::uno::Any &rValue );
 
     void    GetOptions( SvtLinguOptions &rOptions ) const;
 
-    bool    IsReadOnly( const OUString &rPropertyName ) const;
+    bool    IsReadOnly( std::u16string_view rPropertyName ) const;
 
     //!
     //! the following functions work on the 'ServiceManager' sub node of the
@@ -191,8 +191,6 @@ public:
     bool GetSupportedDictionaryFormatsFor( const OUString &rSetName, const OUString &rSetEntry, css::uno::Sequence< OUString > &rFormatList ) const;
 
     bool GetDictionaryEntry( const OUString &rNodeName, SvtLinguConfigDictionaryEntry &rDicEntry ) const;
-
-    bool GetLocaleListFor( const OUString &rSetName, const OUString &rSetEntry, css::uno::Sequence< OUString > &rFormatList ) const;
 
     css::uno::Sequence< OUString > GetDisabledDictionaries() const;
 

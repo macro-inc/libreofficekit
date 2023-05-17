@@ -13,9 +13,9 @@
 #include <filter.hxx>
 #include <document.hxx>
 #include <datamapper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <orcusfilters.hxx>
-#include <utility>
 
 using namespace com::sun::star;
 
@@ -118,12 +118,7 @@ void XMLDataProvider::Import()
     }
 }
 
-void XMLDataProvider::ImportFinished()
-{
-    mrDataSource.getDBManager()->WriteToDoc(*mpDoc);
-    mxXMLFetchThread.clear();
-    mpDoc.reset();
-}
+void XMLDataProvider::ImportFinished() { mrDataSource.getDBManager()->WriteToDoc(*mpDoc); }
 
 const OUString& XMLDataProvider::GetURL() const { return mrDataSource.getURL(); }
 }

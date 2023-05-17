@@ -94,7 +94,7 @@ void AccFrameEventListener::HandleChildChangedEvent(Any oldValue, Any newValue)
             pAgent->InsertAccObj(pAcc, m_xAccessible.get(), systemdata->hWnd);
             //add all oldValue's existing children
             pAgent->InsertChildrenAccObj(pAcc);
-            pAgent->NotifyAccEvent(UM_EVENT_CHILD_ADDED, pAcc);
+            pAgent->NotifyAccEvent(UnoMSAAEvent::CHILD_ADDED, pAcc);
         }
     }
     else if (oldValue >>= xChild)
@@ -103,7 +103,7 @@ void AccFrameEventListener::HandleChildChangedEvent(Any oldValue, Any newValue)
         if(xChild.is())
         {
             XAccessible* pAcc = xChild.get();
-            pAgent->NotifyAccEvent(UM_EVENT_CHILD_REMOVED, pAcc);
+            pAgent->NotifyAccEvent(UnoMSAAEvent::CHILD_REMOVED, pAcc);
             //delete all oldValue's existing children
             pAgent->DeleteChildrenAccObj( pAcc );
             //delete this child
@@ -118,7 +118,7 @@ void AccFrameEventListener::HandleChildChangedEvent(Any oldValue, Any newValue)
  *  @param state    new state id
  *  @param enable   true if state is set, false if state is unset
  */
-void AccFrameEventListener::SetComponentState(short state, bool enable )
+void AccFrameEventListener::SetComponentState(sal_Int64 state, bool enable )
 {
     // only the following state can be fired state event.
     switch (state)

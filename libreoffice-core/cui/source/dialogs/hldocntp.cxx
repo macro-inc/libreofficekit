@@ -25,9 +25,8 @@
 #include <svl/stritem.hxx>
 #include <com/sun/star/awt/XTopWindow.hpp>
 #include <com/sun/star/uno/Reference.h>
-#include <com/sun/star/uno/Sequence.h>
-#include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/uno/Exception.hpp>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <tools/urlobj.hxx>
@@ -37,7 +36,7 @@
 #include <unotools/ucbhelper.hxx>
 
 #include <comphelper/processfactory.hxx>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
 #include <com/sun/star/ui/dialogs/ExecutableDialogResults.hpp>
 
 #include <cuihyperdlg.hxx>
@@ -62,13 +61,13 @@ struct DocumentTypeData
 {
     OUString aStrURL;
     OUString aStrExt;
-    DocumentTypeData (const OUString& aURL, const OUString& aExt) : aStrURL(aURL), aStrExt(aExt)
+    DocumentTypeData (OUString aURL, OUString aExt) : aStrURL(std::move(aURL)), aStrExt(std::move(aExt))
     {}
 };
 
 }
 
-bool SvxHyperlinkNewDocTp::ImplGetURLObject( const OUString& rPath, const OUString& rBase, INetURLObject& aURLObject ) const
+bool SvxHyperlinkNewDocTp::ImplGetURLObject( const OUString& rPath, std::u16string_view rBase, INetURLObject& aURLObject ) const
 {
     bool bIsValidURL = !rPath.isEmpty();
     if ( bIsValidURL )
@@ -94,7 +93,7 @@ bool SvxHyperlinkNewDocTp::ImplGetURLObject( const OUString& rPath, const OUStri
         {
             sal_Int32 nPos = m_xLbDocTypes->get_selected_index();
             if (nPos != -1)
-                aURLObject.SetExtension(reinterpret_cast<DocumentTypeData*>(m_xLbDocTypes->get_id(nPos).toInt64())->aStrExt);
+                aURLObject.SetExtension(weld::fromId<DocumentTypeData*>(m_xLbDocTypes->get_id(nPos))->aStrExt);
         }
 
     }
@@ -138,7 +137,7 @@ SvxHyperlinkNewDocTp::~SvxHyperlinkNewDocTp ()
     if (m_xLbDocTypes)
     {
         for (sal_Int32 n = 0, nEntryCount = m_xLbDocTypes->n_children(); n < nEntryCount; ++n)
-            delete reinterpret_cast<DocumentTypeData*>(m_xLbDocTypes->get_id(n).toInt64());
+            delete weld::fromId<DocumentTypeData*>(m_xLbDocTypes->get_id(n));
         m_xLbDocTypes = nullptr;
     }
 }
@@ -186,7 +185,7 @@ void SvxHyperlinkNewDocTp::FillDocumentList()
 
                 OUString aStrDefExt(pFilter->GetDefaultExtension());
                 DocumentTypeData *pTypeData = new DocumentTypeData(aDocumentUrl, aStrDefExt.copy(2));
-                OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pTypeData)));
+                OUString sId(weld::toId(pTypeData));
                 m_xLbDocTypes->append(sId, aTitleName);
             }
         }
@@ -234,25 +233,6 @@ std::unique_ptr<IconChoicePage> SvxHyperlinkNewDocTp::Create(weld::Container* pW
 void SvxHyperlinkNewDocTp::SetInitFocus()
 {
     m_xCbbPath->grab_focus();
-}
-
-/*************************************************************************
-|*
-|* Ask page whether an insert is possible
-|*
-\************************************************************************/
-bool SvxHyperlinkNewDocTp::AskApply()
-{
-    INetURLObject aINetURLObject;
-    bool bRet = ImplGetURLObject(m_xCbbPath->get_active_text(), m_xCbbPath->GetBaseURL(), aINetURLObject);
-    if ( !bRet )
-    {
-        std::unique_ptr<weld::MessageDialog> xWarn(Application::CreateMessageDialog(mpDialog->getDialog(),
-                                                   VclMessageType::Warning, VclButtonsType::Ok,
-                                                   CuiResId(RID_SVXSTR_HYPDLG_NOVALIDFILENAME)));
-        xWarn->run();
-    }
-    return bRet;
 }
 
 namespace
@@ -368,7 +348,7 @@ void SvxHyperlinkNewDocTp::DoApply()
         {
             std::unique_ptr<weld::MessageDialog> xWarn(Application::CreateMessageDialog(mpDialog->getDialog(),
                                                        VclMessageType::Warning, VclButtonsType::YesNo,
-                                                       CuiResId(RID_SVXSTR_HYPERDLG_QUERYOVERWRITE)));
+                                                       CuiResId(RID_CUISTR_HYPERDLG_QUERYOVERWRITE)));
             bCreate = xWarn->run() == RET_YES;
         }
     }
@@ -388,7 +368,7 @@ void SvxHyperlinkNewDocTp::DoApply()
     if (nPos == -1)
         nPos = 0;
     pExecuteInfo->aURL = aURL;
-    pExecuteInfo->aStrDocName = reinterpret_cast<DocumentTypeData*>(m_xLbDocTypes->get_id(nPos).toInt64())->aStrURL;
+    pExecuteInfo->aStrDocName = weld::fromId<DocumentTypeData*>(m_xLbDocTypes->get_id(nPos))->aStrURL;
 
     // current document
     pExecuteInfo->xFrame = GetDispatcher()->GetFrame()->GetFrame().GetFrameInterface();
@@ -452,7 +432,7 @@ IMPL_LINK_NOARG(SvxHyperlinkNewDocTp, ClickNewHdl_Impl, weld::Button&, void)
     {
         // get private-url
         const sal_Int32 nPos = m_xLbDocTypes->get_selected_index();
-        aNewURL.setExtension(reinterpret_cast<DocumentTypeData*>(m_xLbDocTypes->get_id(nPos).toInt64())->aStrExt);
+        aNewURL.setExtension(weld::fromId<DocumentTypeData*>(m_xLbDocTypes->get_id(nPos))->aStrExt);
     }
 
     if( aNewURL.GetProtocol() == INetProtocol::File )

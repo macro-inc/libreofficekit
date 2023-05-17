@@ -21,11 +21,12 @@
 
 #include <algorithm>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string_view>
 
+#include <command.hxx>
 #include <database.hxx>
 #include <globals.hxx>
+#include <slot.hxx>
 #include <rtl/strbuf.hxx>
 #include <osl/file.hxx>
 
@@ -174,8 +175,19 @@ bool SvIdlDataBase::ReadIdFile( std::string_view rOFileName )
                         if( !rTok.IsChar() || rTok.GetChar() != '<')
                             throw SvParseException( "expected '<'", rTok );
                         rTok = aTokStm.GetToken_Next();
-                        if( !rTok.IsIdentifier() )
-                            throw SvParseException( "expected identifier", rTok );
+                        if (rTok.IsChar() && rTok.GetChar() == ':')
+                        {
+                            // add support for "::avmedia::MediaItem" namespaced identifier
+                            rTok = aTokStm.GetToken_Next();
+                            if( !rTok.IsChar() || rTok.GetChar() != ':')
+                                throw SvParseException( "expected ':'", rTok );
+                            // the lexer reads "avmedia::MediaItem" as an identifier
+                            rTok = aTokStm.GetToken_Next();
+                            if( !rTok.IsIdentifier() )
+                                throw SvParseException( "expected identifier", rTok );
+                        }
+                        else if( !rTok.IsIdentifier() )
+                                throw SvParseException( "expected identifier", rTok );
                         rTok = aTokStm.GetToken_Next();
                         if( !rTok.IsChar() || rTok.GetChar() != '>')
                             throw SvParseException( "expected '<'", rTok );

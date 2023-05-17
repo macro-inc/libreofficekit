@@ -23,9 +23,9 @@
 #include <vcl/dllapi.h>
 #include <vcl/vclenum.hxx>
 #include <tools/ref.hxx>
+#include <vector>
 
 class ImplFontCharMap;
-class CmapResult;
 class FontCharMap;
 class OutputDevice;
 
@@ -40,9 +40,9 @@ public:
      **/
     FontCharMap();
 
-    /** A new FontCharMap is created based on the CmapResult
+    /** A new FontCharMap is created based on passed arguments.
      */
-    FontCharMap( const CmapResult& rCR );
+    FontCharMap(bool bMicrosoftSymbolMap, std::vector<sal_UCS4> aRangeCodes);
 
     virtual ~FontCharMap() override;
 
@@ -50,7 +50,7 @@ public:
 
         @returns the default font character map.
      */
-    static FontCharMapRef GetDefaultMap( bool bSymbols );
+    static FontCharMapRef GetDefaultMap(bool bMicrosoftSymbolMap);
 
     /** Determines if the font character map is the "default". The default map
         includes all codepoints in the Unicode BMP range, including surrogates.
@@ -136,9 +136,7 @@ public:
      */
     sal_UCS4            GetCharFromIndex( int nCharIndex ) const;
 
-    int                 GetGlyphIndex( sal_UCS4 ) const;
-
-    bool isSymbolic() const;
+    bool isMicrosoftSymbolMap() const;
 
 private:
     ImplFontCharMapRef mpImplFontCharMap;
@@ -147,26 +145,11 @@ private:
 
     int                 findRangeIndex( sal_UCS4 ) const;
 
-                        FontCharMap( ImplFontCharMapRef const & pIFCMap );
+                        FontCharMap( ImplFontCharMapRef pIFCMap );
 
     // prevent assignment and copy construction
                         FontCharMap( const FontCharMap& ) = delete;
     void                operator=( const FontCharMap& ) = delete;
-};
-
-// CmapResult is a normalized version of the many CMAP formats
-class VCL_PLUGIN_PUBLIC CmapResult
-{
-public:
-    explicit            CmapResult( bool bSymbolic = false,
-                            const sal_UCS4* pRangeCodes = nullptr, int nRangeCount = 0 );
-
-    const sal_UCS4*     mpRangeCodes;
-    const int*          mpStartGlyphs;
-    const sal_uInt16*   mpGlyphIds;
-    int                 mnRangeCount;
-    bool                mbSymbolic;
-    bool                mbRecoded;
 };
 
 #endif // INCLUDED_FONTCHARMAP_HXX

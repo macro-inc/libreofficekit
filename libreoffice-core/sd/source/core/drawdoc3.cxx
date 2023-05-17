@@ -26,7 +26,7 @@
 #include <sfx2/app.hxx>
 #include <svl/itemset.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <sfx2/fcontnr.hxx>
 #include <svl/style.hxx>
@@ -345,6 +345,21 @@ lcl_removeUnusedStyles(SfxStyleSheetBasePool* const pStyleSheetPool, StyleSheetC
     rStyles = aUsedStyles;
 }
 
+void
+lcl_removeUnusedTableStyles(SdStyleSheetPool* const pStyleSheetPool, XStyleVector const & rStyles)
+{
+    css::uno::Reference<css::container::XNameContainer> xTableFamily(
+        pStyleSheetPool->getByName("table"), css::uno::UNO_QUERY);
+    if (!xTableFamily)
+        return;
+
+    for (const auto& a : rStyles)
+    {
+        if (!a->isInUse())
+            xTableFamily->removeByName(a->getName());
+    }
+}
+
 SfxStyleSheet *lcl_findStyle(StyleSheetCopyResultVector& rStyles, std::u16string_view aStyleName)
 {
     for (const auto& a : rStyles)
@@ -524,7 +539,8 @@ bool SdDrawDocument::InsertBookmarkAsPage(
     rStyleSheetPool.CopyCellSheets(rBookmarkStyleSheetPool, aNewCellStyles);
 
     // TODO handle undo of table styles too
-    rStyleSheetPool.CopyTableStyles(rBookmarkStyleSheetPool);
+    XStyleVector aNewTableStyles;
+    rStyleSheetPool.CopyTableStyles(rBookmarkStyleSheetPool, aNewTableStyles);
 
     // Insert document
 
@@ -915,7 +931,7 @@ bool SdDrawDocument::InsertBookmarkAsPage(
                     if(pPg->GetObj(i)->GetStyleSheet())
                     {
                         OUString aStyleName = pPg->GetObj(i)->GetStyleSheet()->GetName();
-                        SfxStyleSheet *pSheet = lcl_findStyle(aNewGraphicStyles, OUStringConcatenation(aStyleName + aRenameStr));
+                        SfxStyleSheet *pSheet = lcl_findStyle(aNewGraphicStyles, Concat2View(aStyleName + aRenameStr));
                         if(pSheet != nullptr)
                             pPg->GetObj(i)->SetStyleSheet(pSheet, true);
                     }
@@ -934,9 +950,8 @@ bool SdDrawDocument::InsertBookmarkAsPage(
     lcl_removeUnusedStyles(GetStyleSheetPool(), aNewGraphicStyles);
     if (!aNewGraphicStyles.empty() && pUndoMgr)
         pUndoMgr->AddUndoAction(std::make_unique<SdMoveStyleSheetsUndoAction>(this, aNewGraphicStyles, true));
+    lcl_removeUnusedTableStyles(static_cast<SdStyleSheetPool*>(GetStyleSheetPool()), aNewTableStyles);
     lcl_removeUnusedStyles(GetStyleSheetPool(), aNewCellStyles);
-    if (!aNewCellStyles.empty() && pUndoMgr)
-        pUndoMgr->AddUndoAction(std::make_unique<SdMoveStyleSheetsUndoAction>(this, aNewCellStyles, true));
 
     if( bUndo )
         EndUndo();
@@ -994,7 +1009,7 @@ bool SdDrawDocument::InsertBookmarkAsObject(
             {
                 // Found an object
                 if (pObj->GetObjInventor() == SdrInventor::Default &&
-                    pObj->GetObjIdentifier() == OBJ_OLE2)
+                    pObj->GetObjIdentifier() == SdrObjKind::OLE2)
                 {
                     bOLEObjFound = true;
                 }
@@ -1403,7 +1418,7 @@ void SdDrawDocument::SetMasterPage(sal_uInt16 nSdPageNum,
         else
         {
             OUString aSearchFor
-                = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE;
+                = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE;
 
             for (sal_uInt16 nMP = 0; nMP < pSourceDoc->GetMasterPageCount(); ++nMP)
             {
@@ -1473,7 +1488,7 @@ void SdDrawDocument::SetMasterPage(sal_uInt16 nSdPageNum,
             {
                 aTargetNewLayoutName = createNewMasterPageLayoutName(*this);
 
-                OUString aTemp = aTargetNewLayoutName + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE;
+                OUString aTemp = aTargetNewLayoutName + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE;
 
                 pMaster->SetName(aTargetNewLayoutName);
                 pMaster->SetLayoutName(aTemp);
@@ -1736,7 +1751,7 @@ void SdDrawDocument::SetMasterPage(sal_uInt16 nSdPageNum,
     {
         // Find a new name for the layout
         OUString aName(createNewMasterPageLayoutName(*this));
-        OUString aPageLayoutName(aName + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE);
+        OUString aPageLayoutName(aName + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE);
 
         // Generate new stylesheets
         static_cast<SdStyleSheetPool*>( mxStyleSheetPool.get())->CreateLayoutStyleSheets(aName);

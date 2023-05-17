@@ -23,6 +23,7 @@
     xmlns:uc="http://openoffice.org/2010/uno-components">
   <xsl:param name="uri"/>
   <xsl:param name="cppu_env"/>
+  <xsl:param name="filtered"/>
   <xsl:strip-space elements="*"/>
   <xsl:template match="uc:component">
     <components>
@@ -35,6 +36,16 @@
       </xsl:copy>
     </components>
   </xsl:template>
+  <xsl:template match="uc:implementation">
+    <xsl:if test="not(contains($filtered,@name))">
+      <xsl:copy>
+        <xsl:apply-templates select="@*"/>
+        <xsl:apply-templates select="uc:optional"/>
+        <xsl:apply-templates/>
+      </xsl:copy>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template match="uc:optional"/>
   <xsl:template match="*">
     <xsl:copy>
       <xsl:apply-templates select="@*"/>

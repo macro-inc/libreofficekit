@@ -37,6 +37,8 @@
 #include <com/sun/star/container/ElementExistException.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/implbase.hxx>
+#include <o3tl/safeint.hxx>
+#include <utility>
 
 #include "pq_xcontainer.hxx"
 #include "pq_statics.hxx"
@@ -47,7 +49,6 @@ using osl::MutexGuard;
 using com::sun::star::beans::XPropertySet;
 
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 using com::sun::star::uno::Type;
 using com::sun::star::uno::XInterface;
 using com::sun::star::uno::Reference;
@@ -76,7 +77,7 @@ public:
         const OUString & name,
         const Any & newElement,
         const OUString & oldElement ) :
-        m_event( source, makeAny( name ), newElement, makeAny(oldElement) )
+        m_event( source, Any( name ), newElement, Any(oldElement) )
     {}
 
     virtual void fire( XEventListener * listener ) const override
@@ -97,7 +98,7 @@ public:
         const Reference< XInterface > & source,
         const OUString & name,
         const Any & newElement ) :
-        m_event( source, makeAny( name ), newElement, Any() )
+        m_event( source, Any( name ), newElement, Any() )
     {}
 
     virtual void fire( XEventListener * listener ) const override
@@ -118,7 +119,7 @@ public:
     RemovedBroadcaster(
         const Reference< XInterface > & source,
         const OUString & name) :
-        m_event( source, makeAny( name ), Any(), Any() )
+        m_event( source, Any( name ), Any(), Any() )
     {}
 
     virtual void fire( XEventListener * listener ) const override
@@ -136,14 +137,14 @@ public:
 
 Container::Container(
     const ::rtl::Reference< comphelper::RefCountedMutex > & refMutex,
-    const css::uno::Reference< css::sdbc::XConnection >  & origin,
+    css::uno::Reference< css::sdbc::XConnection > origin,
     ConnectionSettings *pSettings,
-    const OUString &type)
+    OUString type)
     : ContainerBase( refMutex->GetMutex() ),
       m_xMutex( refMutex ),
       m_pSettings( pSettings ),
-      m_origin( origin ),
-      m_type( type )
+      m_origin(std::move( origin )),
+      m_type(std::move( type ))
 {
 }
 
@@ -156,7 +157,7 @@ Any Container::getByName( const OUString& aName )
             "Element " + aName + " unknown in " + m_type + "-Container",
             *this );
     }
-    OSL_ASSERT( ii->second >= 0 && ii->second < static_cast<int>(m_values.size()) );
+    OSL_ASSERT( ii->second >= 0 && o3tl::make_unsigned(ii->second) < m_values.size() );
     return m_values[ ii->second ];
 }
 
@@ -189,7 +190,7 @@ sal_Bool Container::hasElements(  )
 
 Any Container::getByIndex( sal_Int32 Index )
 {
-    if( Index < 0 || Index >= static_cast<sal_Int32>(m_values.size()) )
+    if( Index < 0 || o3tl::make_unsigned(Index) >= m_values.size() )
     {
         throw IndexOutOfBoundsException(
             "Index " + OUString::number( Index )
@@ -299,7 +300,7 @@ void Container::dropByName( const OUString& elementName )
 void Container::dropByIndex( sal_Int32 index )
 {
     osl::MutexGuard guard( m_xMutex->GetMutex() );
-    if( index < 0 ||  index >=static_cast<sal_Int32>(m_values.size()) )
+    if( index < 0 ||  o3tl::make_unsigned(index) >=m_values.size() )
     {
         throw css::lang::IndexOutOfBoundsException(
             "Index out of range (allowed 0 to "
@@ -350,10 +351,10 @@ void Container::append(
     }
 
     int index = m_values.size();
-    m_values.push_back( makeAny( descriptor ) );
+    m_values.push_back( Any( descriptor ) );
     m_name2index[name] = index;
 
-    fire( InsertedBroadcaster( *this, name, makeAny( descriptor ) ) );
+    fire( InsertedBroadcaster( *this, name, Any( descriptor ) ) );
 }
 
 void Container::appendByDescriptor(

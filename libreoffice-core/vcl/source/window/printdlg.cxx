@@ -17,12 +17,14 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/safeint.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
 #include <rtl/ustrbuf.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <officecfg/Office/Common.hxx>
 
+#include <utility>
 #include <vcl/QueueInfo.hxx>
 #include <vcl/commandevent.hxx>
 #include <vcl/decoview.hxx>
@@ -223,18 +225,18 @@ void PrintDialog::PrintPreviewWindow::setPreview( const GDIMetaFile& i_rNewPrevi
 
     // use correct measurements
     const LocaleDataWrapper& rLocWrap(Application::GetSettings().GetLocaleDataWrapper());
-    MapUnit eUnit = MapUnit::MapMM;
+    o3tl::Length eUnit = o3tl::Length::mm;
     int nDigits = 0;
     if( rLocWrap.getMeasurementSystemEnum() == MeasurementSystem::US )
     {
-        eUnit = MapUnit::Map100thInch;
+        eUnit = o3tl::Length::in100;
         nDigits = 2;
     }
-    Size aLogicPaperSize(OutputDevice::LogicToLogic(i_rOrigSize, MapMode(MapUnit::Map100thMM), MapMode(eUnit)));
+    Size aLogicPaperSize(o3tl::convert(i_rOrigSize, o3tl::Length::mm100, eUnit));
     OUString aNumText( rLocWrap.getNum( aLogicPaperSize.Width(), nDigits ) );
     OUStringBuffer aBuf;
     aBuf.append( aNumText + " " );
-    aBuf.appendAscii( eUnit == MapUnit::MapMM ? "mm" : "in" );
+    aBuf.appendAscii( eUnit == o3tl::Length::mm ? "mm" : "in" );
     if( !i_rPaperName.empty() )
     {
         aBuf.append( " (" );
@@ -245,7 +247,7 @@ void PrintDialog::PrintPreviewWindow::setPreview( const GDIMetaFile& i_rNewPrevi
 
     aNumText = rLocWrap.getNum( aLogicPaperSize.Height(), nDigits );
     aBuf.append( aNumText + " " );
-    aBuf.appendAscii( eUnit == MapUnit::MapMM ? "mm" : "in" );
+    aBuf.appendAscii( eUnit == o3tl::Length::mm ? "mm" : "in" );
     maVertText = aBuf.makeStringAndClear();
 
     // We have a new Metafile and evtl. a new page, so we need to reset
@@ -525,9 +527,9 @@ Size const & PrintDialog::getJobPageSize()
     return maFirstPageSize;
 }
 
-PrintDialog::PrintDialog(weld::Window* i_pWindow, const std::shared_ptr<PrinterController>& i_rController)
+PrintDialog::PrintDialog(weld::Window* i_pWindow, std::shared_ptr<PrinterController> i_xController)
     : GenericDialogController(i_pWindow, "vcl/ui/printdialog.ui", "PrintDialog")
-    , maPController( i_rController )
+    , maPController(std::move( i_xController ))
     , mxTabCtrl(m_xBuilder->weld_notebook("tabcontrol"))
     , mxScrolledWindow(m_xBuilder->weld_scrolled_window("scrolledwindow"))
     , mxPageLayoutFrame(m_xBuilder->weld_frame("layoutframe"))
@@ -545,7 +547,6 @@ PrintDialog::PrintDialog(weld::Window* i_pWindow, const std::shared_ptr<PrinterC
     , mxOKButton(m_xBuilder->weld_button("ok"))
     , mxCancelButton(m_xBuilder->weld_button("cancel"))
     , mxHelpButton(m_xBuilder->weld_button("help"))
-    , mxMoreOptionsBtn(m_xBuilder->weld_button("moreoptionsbtn"))
     , mxBackwardBtn(m_xBuilder->weld_button("backward"))
     , mxForwardBtn(m_xBuilder->weld_button("forward"))
     , mxFirstBtn(m_xBuilder->weld_button("btnFirst"))
@@ -768,7 +769,7 @@ void PrintDialog::storeToSettings()
 
     pItem->setValue( "PrintDialog",
                      "WindowState",
-                     OStringToOUString(m_xDialog->get_window_state(WindowStateMask::All), RTL_TEXTENCODING_UTF8) );
+                     OStringToOUString(m_xDialog->get_window_state(vcl::WindowDataMask::All), RTL_TEXTENCODING_UTF8) );
 
     pItem->setValue( "PrintDialog",
                      "CopyCount",
@@ -987,6 +988,8 @@ void PrintDialog::preparePreview( bool i_bMayUseCache )
             Point aOff( aPrt->PixelToLogic( aPrt->GetPageOffsetPixel(), aMapMode ) );
             aMtf.Move( aOff.X(), aOff.Y() );
         }
+        // tdf#150561: page size may have changed so sync mePaper with it
+        mePaper = aPrt->GetPaper();
     }
 
     mxPreview->setPreview( aMtf, aCurPageSize,
@@ -1687,9 +1690,7 @@ void PrintDialog::setupOptionalUI()
         mxPagesBoxTitleTxt->show();
         mxPagesBtn->hide();
 
-        mxPagesBoxTitleTxt->set_accessible_relation_label_for(mxNupPagesBox.get());
         mxNupPagesBox->set_accessible_relation_labeled_by(mxPagesBoxTitleTxt.get());
-        mxPagesBtn->set_accessible_relation_label_for(nullptr);
     }
 
     // update enable states
@@ -1758,7 +1759,7 @@ void PrintDialog::updateWindowFromProperty( const OUString& i_rProperty )
         {
             pList->set_active( static_cast< sal_uInt16 >(nVal) );
         }
-        else if( nVal >= 0 && nVal < sal_Int32(rWindows.size() ) )
+        else if( nVal >= 0 && o3tl::make_unsigned(nVal) < rWindows.size() )
         {
             weld::RadioButton* pBtn = dynamic_cast<weld::RadioButton*>(rWindows[nVal]);
             SAL_WARN_IF( !pBtn, "vcl", "unexpected control for property" );
@@ -1817,13 +1818,13 @@ IMPL_LINK(PrintDialog, ToggleHdl, weld::Toggleable&, rButton, void)
     else if (&rButton == mxSingleJobsBox.get())
     {
         maPController->setValue( "SinglePrintJobs",
-                                 makeAny( isSingleJobs() ) );
+                                 Any( isSingleJobs() ) );
         checkControlDependencies();
     }
     else if( &rButton == mxCollateBox.get() )
     {
         maPController->setValue( "Collate",
-                                 makeAny( isCollate() ) );
+                                 Any( isCollate() ) );
         checkControlDependencies();
     }
     else if( &rButton == mxReverseOrderBox.get() )
@@ -1831,7 +1832,7 @@ IMPL_LINK(PrintDialog, ToggleHdl, weld::Toggleable&, rButton, void)
         bool bChecked = mxReverseOrderBox->get_active();
         maPController->setReversePrint( bChecked );
         maPController->setValue( "PrintReverse",
-                                 makeAny( bChecked ) );
+                                 Any( bChecked ) );
         maUpdatePreviewIdle.Start();
     }
     else if (&rButton == mxBrochureBtn.get())
@@ -2052,9 +2053,9 @@ IMPL_LINK( PrintDialog, SpinModifyHdl, weld::SpinButton&, rEdit, void )
     else if( &rEdit == mxCopyCountField.get() )
     {
         maPController->setValue( "CopyCount",
-                               makeAny( sal_Int32(mxCopyCountField->get_value()) ) );
+                               Any( sal_Int32(mxCopyCountField->get_value()) ) );
         maPController->setValue( "Collate",
-                               makeAny( isCollate() ) );
+                               Any( isCollate() ) );
     }
 }
 

@@ -21,8 +21,10 @@
 #include <svx/algitem.hxx>
 #include <editeng/brushitem.hxx>
 #include <editeng/editobj.hxx>
+#include <svl/itempool.hxx>
 #include <svl/srchitem.hxx>
 #include <editeng/langitem.hxx>
+#include <o3tl/string_view.hxx>
 #include <o3tl/unit_conversion.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/dispatch.hxx>
@@ -71,6 +73,8 @@
 #include <scmod.hxx>
 #include <editutil.hxx>
 #include <docsh.hxx>
+#include <sharedstringpoolpurge.hxx>
+#include <formulaopt.hxx>
 
 tools::SvRef<ScDocShell>  ScGlobal::xDrawClipDocShellRef;
 std::unique_ptr<SvxSearchItem> ScGlobal::xSearchItem;
@@ -98,6 +102,7 @@ std::unique_ptr<ScFunctionMgr> ScGlobal::xStarCalcFunctionMgr;
 std::atomic<ScUnitConverter*> ScGlobal::pUnitConverter(nullptr);
 std::unique_ptr<SvNumberFormatter> ScGlobal::xEnglishFormatter;
 std::unique_ptr<ScFieldEditEngine> ScGlobal::xFieldEditEngine;
+std::atomic<sc::SharedStringPoolPurge*> ScGlobal::pSharedStringPoolPurge;
 
 double          ScGlobal::nScreenPPTX           = 96.0;
 double          ScGlobal::nScreenPPTY           = 96.0;
@@ -113,6 +118,9 @@ sal_uInt16 nScClickMouseModifier = 0;    //FIXME: This too
 sal_uInt16 nScFillModeMouseModifier = 0; //FIXME: And this
 
 bool ScGlobal::bThreadedGroupCalcInProgress = false;
+
+InputHandlerFunctionNames ScGlobal::maInputHandlerFunctionNames;
+
 
 // Static functions
 
@@ -179,6 +187,12 @@ bool ScGlobal::CheckWidthInvalidate( bool& bNumFormatChanged,
                                      const SfxItemSet& rNewAttrs,
                                      const SfxItemSet& rOldAttrs )
 {
+    std::optional<bool> equal = ScPatternAttr::FastEqualPatternSets( rNewAttrs, rOldAttrs );
+    if( equal.has_value() && equal )
+    {
+        bNumFormatChanged = false;
+        return false;
+    }
     // Check whether attribute changes in rNewAttrs compared to rOldAttrs render
     // the text width at a cell invalid
     bNumFormatChanged =
@@ -546,35 +560,36 @@ void ScGlobal::Clear()
 
     delete pUnitConverter.exchange(nullptr);
     xFieldEditEngine.reset();
+    delete pSharedStringPoolPurge.exchange(nullptr);
 
     xDrawClipDocShellRef.clear();
 }
 
-rtl_TextEncoding ScGlobal::GetCharsetValue( const OUString& rCharSet )
+rtl_TextEncoding ScGlobal::GetCharsetValue( std::u16string_view rCharSet )
 {
     // new TextEncoding values
     if ( CharClass::isAsciiNumeric( rCharSet ) )
     {
-        sal_Int32 nVal = rCharSet.toInt32();
+        sal_Int32 nVal = o3tl::toInt32(rCharSet);
         if ( nVal == RTL_TEXTENCODING_DONTKNOW )
             return osl_getThreadTextEncoding();
         return static_cast<rtl_TextEncoding>(nVal);
     }
     // old CharSet values for compatibility
-    else if (rCharSet.equalsIgnoreAsciiCase("ANSI")     ) return RTL_TEXTENCODING_MS_1252;
-    else if (rCharSet.equalsIgnoreAsciiCase("MAC")      ) return RTL_TEXTENCODING_APPLE_ROMAN;
-    else if (rCharSet.equalsIgnoreAsciiCase("IBMPC")    ) return RTL_TEXTENCODING_IBM_850;
-    else if (rCharSet.equalsIgnoreAsciiCase("IBMPC_437")) return RTL_TEXTENCODING_IBM_437;
-    else if (rCharSet.equalsIgnoreAsciiCase("IBMPC_850")) return RTL_TEXTENCODING_IBM_850;
-    else if (rCharSet.equalsIgnoreAsciiCase("IBMPC_860")) return RTL_TEXTENCODING_IBM_860;
-    else if (rCharSet.equalsIgnoreAsciiCase("IBMPC_861")) return RTL_TEXTENCODING_IBM_861;
-    else if (rCharSet.equalsIgnoreAsciiCase("IBMPC_863")) return RTL_TEXTENCODING_IBM_863;
-    else if (rCharSet.equalsIgnoreAsciiCase("IBMPC_865")) return RTL_TEXTENCODING_IBM_865;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"ANSI")     ) return RTL_TEXTENCODING_MS_1252;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"MAC")      ) return RTL_TEXTENCODING_APPLE_ROMAN;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"IBMPC")    ) return RTL_TEXTENCODING_IBM_850;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"IBMPC_437")) return RTL_TEXTENCODING_IBM_437;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"IBMPC_850")) return RTL_TEXTENCODING_IBM_850;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"IBMPC_860")) return RTL_TEXTENCODING_IBM_860;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"IBMPC_861")) return RTL_TEXTENCODING_IBM_861;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"IBMPC_863")) return RTL_TEXTENCODING_IBM_863;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"IBMPC_865")) return RTL_TEXTENCODING_IBM_865;
     // Some wrong "help" on the net mentions UTF8 and even unoconv uses it,
     // which worked accidentally if the system encoding is UTF-8 anyway, so
     // support it ;) but only when reading.
-    else if (rCharSet.equalsIgnoreAsciiCase("UTF8"))      return RTL_TEXTENCODING_UTF8;
-    else if (rCharSet.equalsIgnoreAsciiCase("UTF-8"))     return RTL_TEXTENCODING_UTF8;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"UTF8"))      return RTL_TEXTENCODING_UTF8;
+    else if (o3tl::equalsIgnoreAsciiCase(rCharSet, u"UTF-8"))     return RTL_TEXTENCODING_UTF8;
     else return osl_getThreadTextEncoding();
 }
 
@@ -610,7 +625,7 @@ ScFunctionList* ScGlobal::GetStarCalcFunctionList()
 {
     assert(!bThreadedGroupCalcInProgress);
     if ( !xStarCalcFunctionList )
-        xStarCalcFunctionList.reset(new ScFunctionList);
+        xStarCalcFunctionList.reset( new ScFunctionList( SC_MOD()->GetFormulaOptions().GetUseEnglishFuncName()));
 
     return xStarCalcFunctionList.get();
 }
@@ -629,6 +644,40 @@ void ScGlobal::ResetFunctionList()
     // FunctionMgr has pointers into FunctionList, must also be updated
     xStarCalcFunctionMgr.reset();
     xStarCalcFunctionList.reset();
+    // Building new names also needs InputHandler data to be refreshed.
+    maInputHandlerFunctionNames = InputHandlerFunctionNames();
+}
+
+const InputHandlerFunctionNames& ScGlobal::GetInputHandlerFunctionNames()
+{
+    if (maInputHandlerFunctionNames.maFunctionData.empty())
+    {
+        const OUString aParenthesesReplacement( cParenthesesReplacement);
+        const ScFunctionList* pFuncList = GetStarCalcFunctionList();
+        const sal_uInt32 nListCount = pFuncList->GetCount();
+        const CharClass* pCharClass = (pFuncList->IsEnglishFunctionNames()
+                ? ScCompiler::GetCharClassEnglish()
+                : ScCompiler::GetCharClassLocalized());
+        for (sal_uInt32 i=0; i < nListCount; ++i)
+        {
+            const ScFuncDesc* pDesc = pFuncList->GetFunction( i );
+            if ( pDesc->mxFuncName )
+            {
+                OUString aFuncName(pCharClass->uppercase(*(pDesc->mxFuncName)));
+                // fdo#75264 fill maFormulaChar with all characters used in formula names
+                for (sal_Int32 j = 0; j < aFuncName.getLength(); j++)
+                    maInputHandlerFunctionNames.maFunctionChar.insert(aFuncName[j]);
+                maInputHandlerFunctionNames.maFunctionData.insert(
+                        ScTypedStrData(*(pDesc->mxFuncName) + aParenthesesReplacement, 0.0, 0.0,
+                            ScTypedStrData::Standard));
+                pDesc->initArgumentInfo();
+                OUString aEntry = pDesc->getSignature();
+                maInputHandlerFunctionNames.maFunctionDataPara.insert(
+                        ScTypedStrData(aEntry, 0.0, 0.0, ScTypedStrData::Standard));
+            }
+        }
+    }
+    return maInputHandlerFunctionNames;
 }
 
 ScUnitConverter* ScGlobal::GetUnitConverter()
@@ -661,9 +710,9 @@ OUString ScGlobal::addToken(std::u16string_view rTokenList, std::u16string_view 
     return aBuf.makeStringAndClear();
 }
 
-bool ScGlobal::IsQuoted( const OUString& rString, sal_Unicode cQuote )
+bool ScGlobal::IsQuoted( std::u16string_view rString, sal_Unicode cQuote )
 {
-    return (rString.getLength() >= 2) && (rString[0] == cQuote) && (rString[ rString.getLength() - 1 ] == cQuote);
+    return (rString.size() >= 2) && (rString[0] == cQuote) && (rString[ rString.size() - 1 ] == cQuote);
 }
 
 void ScGlobal::AddQuotes( OUString& rString, sal_Unicode cQuote, bool bEscapeEmbedded )
@@ -954,12 +1003,12 @@ void ScGlobal::AddLanguage( SfxItemSet& rSet, const SvNumberFormatter& rFormatte
     OSL_ENSURE( rSet.GetItemState( ATTR_LANGUAGE_FORMAT, false ) == SfxItemState::DEFAULT,
         "ScGlobal::AddLanguage - language already added");
 
-    const SfxPoolItem* pHardItem;
-    if ( rSet.GetItemState( ATTR_VALUE_FORMAT, false, &pHardItem ) != SfxItemState::SET )
+    const SfxUInt32Item* pHardItem = rSet.GetItemIfSet( ATTR_VALUE_FORMAT, false );
+    if ( !pHardItem )
         return;
 
     const SvNumberformat* pHardFormat = rFormatter.GetEntry(
-        static_cast<const SfxUInt32Item*>(pHardItem)->GetValue() );
+        pHardItem->GetValue() );
 
     sal_uInt32 nParentFmt = 0; // Pool default
     const SfxItemSet* pParent = rSet.GetParent();
@@ -1085,6 +1134,12 @@ ScFieldEditEngine& ScGlobal::GetStaticFieldEditEngine()
         xFieldEditEngine.reset(new ScFieldEditEngine( nullptr, nullptr));
     }
     return *xFieldEditEngine;
+}
+
+sc::SharedStringPoolPurge& ScGlobal::GetSharedStringPoolPurge()
+{
+    return *comphelper::doubleCheckedInit( pSharedStringPoolPurge,
+        []() { return new sc::SharedStringPoolPurge; });
 }
 
 OUString ScGlobal::ReplaceOrAppend( const OUString& rString,

@@ -30,12 +30,10 @@
 
 #include <memory>
 
-#include <editeng/formatbreakitem.hxx>
 #include <editeng/keepitem.hxx>
 #include <editeng/frmdiritem.hxx>
 #include <editeng/shaditem.hxx>
 #include <svx/autoformathelper.hxx>
-#include "fmtpdsc.hxx"
 #include "fmtornt.hxx"
 #include "swdllapi.h"
 
@@ -183,7 +181,7 @@ class SW_DLLPUBLIC SwTableAutoFormat
     bool m_bHidden;
     bool m_bUserDefined;
 public:
-    SwTableAutoFormat( const OUString& rName );
+    SwTableAutoFormat( OUString aName );
     SwTableAutoFormat( const SwTableAutoFormat& rNew );
     ~SwTableAutoFormat();
 
@@ -240,6 +238,7 @@ public:
     bool FirstRowStartColumnIsRow();
     bool LastRowEndColumnIsRow();
     bool LastRowStartColumnIsRow();
+    bool HasHeaderRow() const;
 
     bool Load( SvStream& rStream, const SwAfVersions& );
     bool Save( SvStream& rStream, sal_uInt16 fileVersion ) const;

@@ -19,13 +19,13 @@
 
 #include "tp_3D_SceneAppearance.hxx"
 #include <ChartModelHelper.hxx>
+#include <ChartModel.hxx>
 #include <ThreeDHelper.hxx>
 #include <ControllerLockGuard.hxx>
-#include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/chart2/XDiagram.hpp>
+#include <Diagram.hxx>
 #include <com/sun/star/drawing/ShadeMode.hpp>
-#include <com/sun/star/frame/XModel.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 using namespace ::com::sun::star;
@@ -48,14 +48,13 @@ struct lcl_ModelProperties
     {}
 };
 
-lcl_ModelProperties lcl_getPropertiesFromModel( uno::Reference< frame::XModel > const & xModel )
+lcl_ModelProperties lcl_getPropertiesFromModel( rtl::Reference<::chart::ChartModel> const & xModel )
 {
     lcl_ModelProperties aProps;
     try
     {
-        uno::Reference< chart2::XDiagram > xDiagram( ::chart::ChartModelHelper::findDiagram( xModel ) );
-        uno::Reference< beans::XPropertySet > xDiaProp( xDiagram, uno::UNO_QUERY_THROW );
-        xDiaProp->getPropertyValue( "D3DSceneShadeMode" ) >>= aProps.m_aShadeMode;
+        rtl::Reference< ::chart::Diagram > xDiagram( ::chart::ChartModelHelper::findDiagram( xModel ) );
+        xDiagram->getPropertyValue( "D3DSceneShadeMode" ) >>= aProps.m_aShadeMode;
         ::chart::ThreeDHelper::getRoundedEdgesAndObjectLines( xDiagram, aProps.m_nRoundedEdges, aProps.m_nObjectLines );
         aProps.m_eScheme = ::chart::ThreeDHelper::detectScheme( xDiagram );
     }
@@ -66,12 +65,11 @@ lcl_ModelProperties lcl_getPropertiesFromModel( uno::Reference< frame::XModel > 
     return aProps;
 }
 
-void lcl_setShadeModeAtModel( uno::Reference< frame::XModel > const & xModel, drawing::ShadeMode aShadeMode )
+void lcl_setShadeModeAtModel( rtl::Reference<::chart::ChartModel> const & xModel, drawing::ShadeMode aShadeMode )
 {
     try
     {
-        uno::Reference< beans::XPropertySet > xDiaProp(
-            ::chart::ChartModelHelper::findDiagram( xModel ), uno::UNO_QUERY_THROW );
+        rtl::Reference< ::chart::Diagram > xDiaProp = ::chart::ChartModelHelper::findDiagram( xModel );
         xDiaProp->setPropertyValue( "D3DSceneShadeMode" , uno::Any( aShadeMode ));
     }
     catch( const uno::Exception & )
@@ -90,9 +88,9 @@ namespace chart
 #define POS_3DSCHEME_CUSTOM 2
 
 ThreeD_SceneAppearance_TabPage::ThreeD_SceneAppearance_TabPage(weld::Container* pParent,
-        const uno::Reference<frame::XModel>& xChartModel,
+        rtl::Reference<::chart::ChartModel> xChartModel,
         ControllerLockHelper& rControllerLockHelper)
-    : m_xChartModel(xChartModel)
+    : m_xChartModel(std::move(xChartModel))
     , m_bUpdateOtherControls(true)
     , m_bCommitToModel(true)
     , m_rControllerLockHelper(rControllerLockHelper)
@@ -272,7 +270,7 @@ IMPL_LINK_NOARG(ThreeD_SceneAppearance_TabPage, SelectSchemeHdl, weld::ComboBox&
         // locked controllers
         ControllerLockHelperGuard aGuard( m_rControllerLockHelper );
 
-        uno::Reference< chart2::XDiagram > xDiagram( ::chart::ChartModelHelper::findDiagram( m_xChartModel ) );
+        rtl::Reference< Diagram > xDiagram = ::chart::ChartModelHelper::findDiagram( m_xChartModel );
 
         if( m_xLB_Scheme->get_active() == POS_3DSCHEME_REALISTIC )
             ThreeDHelper::setScheme( xDiagram, ThreeDLookScheme::ThreeDLookScheme_Realistic );

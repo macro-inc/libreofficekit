@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -23,7 +25,7 @@ class tdf124675(UITestCase):
                 xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RETURN"}))
 
             self.assertEqual(writer_doc.CurrentController.PageCount, 4)
-            self.assertEqual(get_state_as_dict(xWriterEdit)["CurrentPage"], "2")
+            self.assertEqual(get_state_as_dict(xWriterEdit)["CurrentPage"], "3")
 
             for i in range(52):
                 self.xUITest.executeCommand(".uno:Undo")

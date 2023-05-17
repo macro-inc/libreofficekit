@@ -10,12 +10,20 @@
 #include <swmodeltestbase.hxx>
 
 #include <com/sun/star/awt/CharSet.hpp>
+#include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
+#include <com/sun/star/text/WrapTextMode.hpp>
 
 #include <docsh.hxx>
 #include <formatcontentcontrol.hxx>
 #include <wrtsh.hxx>
-#include <unotxdoc.hxx>
+#include <itabenum.hxx>
+#include <frmmgr.hxx>
+#include <frameformats.hxx>
+#include <formatflysplit.hxx>
+#include <IDocumentLayoutAccess.hxx>
+#include <rootfrm.hxx>
+#include <pagefrm.hxx>
 
 namespace
 {
@@ -30,12 +38,40 @@ namespace
  */
 class Test : public SwModelTestBase
 {
+public:
+    Test()
+        : SwModelTestBase("/sw/qa/filter/ww8/data/")
+    {
+    }
 };
+
+CPPUNIT_TEST_FIXTURE(Test, testNegativePageBorderDocImport)
+{
+    // Given a document with a border distance that is larger than the margin, when loading that
+    // document:
+    createSwDoc("negative-page-border.doc");
+
+    // Then make sure we map that to a negative border distance (move border from the edge of body
+    // frame towards the center of the page, not towards the edge of the page):
+    uno::Reference<container::XNameAccess> xStyleFamily = getStyles("PageStyles");
+    uno::Reference<beans::XPropertySet> xStyle(xStyleFamily->getByName("Standard"), uno::UNO_QUERY);
+    auto nTopMargin = xStyle->getPropertyValue("TopMargin").get<sal_Int32>();
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 501
+    // - Actual  : 342
+    // i.e. the border properties influenced the margin, which was 284 twips in the sprmSDyaTop
+    // SPRM.
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(501), nTopMargin);
+    auto aTopBorder = xStyle->getPropertyValue("TopBorder").get<table::BorderLine2>();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt32>(159), aTopBorder.LineWidth);
+    auto nTopBorderDistance = xStyle->getPropertyValue("TopBorderDistance").get<sal_Int32>();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(-646), nTopBorderDistance);
+}
 
 CPPUNIT_TEST_FIXTURE(Test, testPlainTextContentControlExport)
 {
     // Given a document with a plain text content control around a text portion:
-    mxComponent = loadFromDesktop("private:factory/swriter");
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -50,8 +86,7 @@ CPPUNIT_TEST_FIXTURE(Test, testPlainTextContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -66,14 +101,13 @@ CPPUNIT_TEST_FIXTURE(Test, testPlainTextContentControlExport)
 CPPUNIT_TEST_FIXTURE(Test, testDocxComboBoxContentControlExport)
 {
     // Given a document with a combo box content control around a text portion:
-    mxComponent = loadFromDesktop("private:factory/swriter");
-    SwDocShell* pDocShell = dynamic_cast<SwXTextDocument*>(mxComponent.get())->GetDocShell();
-    SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::COMBO_BOX);
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -89,7 +123,7 @@ CPPUNIT_TEST_FIXTURE(Test, testDocxHyperlinkShape)
 {
     // Given a document with a hyperlink at char positions 0 -> 6 and a shape with text anchored at
     // char position 6:
-    mxComponent = loadFromDesktop("private:factory/swriter");
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -113,7 +147,27 @@ CPPUNIT_TEST_FIXTURE(Test, testDocxHyperlinkShape)
 
     // When saving this document to DOCX, then make sure we don't crash on export (due to an
     // assertion failure for not-well-formed XML output):
-    save("Office Open XML Text", maTempFile);
+    save("Office Open XML Text");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testDocxContentControlDropdownEmptyDisplayText)
+{
+    // Given a document with a dropdown content control, the only list item has no display text
+    // (only a value):
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::DROP_DOWN_LIST);
+
+    // When saving to DOCX:
+    save("Office Open XML Text");
+
+    // Then make sure that no display text attribute is written:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - XPath '//w:sdt/w:sdtPr/w:dropDownList/w:listItem' unexpected 'displayText' attribute
+    // i.e. we wrote an empty attribute instead of omitting it.
+    assertXPathNoAttribute(pXmlDoc, "//w:sdt/w:sdtPr/w:dropDownList/w:listItem", "displayText");
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testDocxSymbolFontExport)
@@ -135,8 +189,7 @@ CPPUNIT_TEST_FIXTURE(Test, testDocxSymbolFontExport)
     xTextProps->setPropertyValue("CharFontCharSet", uno::Any(awt::CharSet::SYMBOL));
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -144,6 +197,88 @@ CPPUNIT_TEST_FIXTURE(Test, testDocxSymbolFontExport)
     assertXPath(pXmlDoc, "//w:p/w:r/w:sym", 1);
     assertXPath(pXmlDoc, "//w:p/w:r/w:sym[1]", "font", "Wingdings");
     assertXPath(pXmlDoc, "//w:p/w:r/w:sym[1]", "char", "f0e0");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testDocxFloatingTableExport)
+{
+    // Given a document with a floating table:
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    // Insert a table:
+    SwInsertTableOptions aTableOptions(SwInsertTableFlags::DefaultBorder, 0);
+    pWrtShell->InsertTable(aTableOptions, 1, 1);
+    pWrtShell->MoveTable(GotoPrevTable, fnTableStart);
+    // Select it:
+    pWrtShell->SelAll();
+    // Wrap in a fly:
+    SwFlyFrameAttrMgr aMgr(true, pWrtShell, Frmmgr_Type::TEXT, nullptr);
+    pWrtShell->StartAllAction();
+    aMgr.InsertFlyFrame(RndStdIds::FLY_AT_PARA, aMgr.GetPos(), aMgr.GetSize());
+    // Mark it as a floating table:
+    SwFrameFormats& rFlys = *pDoc->GetSpzFrameFormats();
+    SwFrameFormat* pFly = rFlys[0];
+    SwAttrSet aSet(pFly->GetAttrSet());
+    aSet.Put(SwFormatFlySplit(true));
+    pDoc->SetAttr(aSet, *pFly);
+    pWrtShell->EndAllAction();
+
+    // When saving to docx:
+    save("Office Open XML Text");
+
+    // Then make sure we write a floating table, not a textframe containing a table:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - XPath '//w:tbl/w:tblPr/w:tblpPr' number of nodes is incorrect
+    // i.e. no floating table was exported.
+    assertXPath(pXmlDoc, "//w:tbl/w:tblPr/w:tblpPr", 1);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testDocFloatingTableImport)
+{
+    // Given a document with 2 pages:
+    createSwDoc("floattable-compat14.doc");
+
+    // When laying out that document:
+    calcLayout();
+
+    // Make sure that the table is split between page 1 and page 2:
+    SwDoc* pDoc = getSwDoc();
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = dynamic_cast<SwPageFrame*>(pLayout->Lower());
+    CPPUNIT_ASSERT(pPage1);
+    // Without the accompanying fix in place, this test would have failed, the fly frame was not
+    // split between page 1 and page 2.
+    CPPUNIT_ASSERT(pPage1->GetNext());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testWrapThroughLayoutInCell)
+{
+    // Given a document with a shape, "keep inside text boundaries" is off, wrap type is set to
+    // "through":
+    createSwDoc();
+    uno::Reference<css::lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XShape> xShape(
+        xFactory->createInstance("com.sun.star.drawing.RectangleShape"), uno::UNO_QUERY);
+    xShape->setSize(awt::Size(10000, 10000));
+    uno::Reference<beans::XPropertySet> xShapeProps(xShape, uno::UNO_QUERY);
+    xShapeProps->setPropertyValue("AnchorType", uno::Any(text::TextContentAnchorType_AT_CHARACTER));
+    xShapeProps->setPropertyValue("Surround", uno::Any(text::WrapTextMode_THROUGH));
+    xShapeProps->setPropertyValue("HoriOrientRelation", uno::Any(text::RelOrientation::FRAME));
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
+    xDrawPageSupplier->getDrawPage()->add(xShape);
+
+    // When saving to docx:
+    save("Office Open XML Text");
+
+    // Then make sure that layoutInCell is undoing the effect of the import-time tweak:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // - attribute 'layoutInCell' of '//wp:anchor' incorrect value.
+    // i.e. layoutInCell was disabled, leading to bad layout in Word.
+    assertXPath(pXmlDoc, "//wp:anchor", "layoutInCell", "1");
 }
 }
 

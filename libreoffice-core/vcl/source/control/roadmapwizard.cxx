@@ -20,6 +20,7 @@
 
 #include <vcl/toolkit/roadmap.hxx>
 #include <tools/debug.hxx>
+#include <tools/json_writer.hxx>
 #include <osl/diagnose.h>
 
 #include <strings.hrc>
@@ -226,6 +227,11 @@ namespace vcl
     void RoadmapWizard::SetRoadmapHelpId( const OString& _rId )
     {
         m_xRoadmapImpl->pRoadmap->SetHelpId( _rId );
+    }
+
+    void RoadmapWizard::SetRoadmapBitmap(const BitmapEx& rBmp)
+    {
+        m_xRoadmapImpl->pRoadmap->SetRoadmapBitmap(rBmp);
     }
 
     void RoadmapWizardMachine::SetRoadmapHelpId(const OString& rId)
@@ -465,7 +471,7 @@ namespace vcl
                 GetOrCreatePage(nState);
             }
 
-            OString sIdent(OString::number(nState));
+            OString sIdent(getPageIdentForState(nState));
             m_xAssistant->set_page_index(sIdent, nItemIndex);
             m_xAssistant->set_page_title(sIdent, getStateDisplayName(nState));
 
@@ -634,9 +640,9 @@ namespace vcl
 
     IMPL_LINK(RoadmapWizardMachine, OnRoadmapItemSelected, const OString&, rCurItemId, bool)
     {
-        int nCurItemId = rCurItemId.toInt32();
+        WizardTypes::WizardState nSelectedState = getStateFromPageIdent(rCurItemId);
 
-        if ( nCurItemId == getCurrentState() )
+        if (nSelectedState == getCurrentState())
             // nothing to do
             return false;
 
@@ -646,7 +652,7 @@ namespace vcl
         WizardTravelSuspension aTravelGuard( *this );
 
         sal_Int32 nCurrentIndex = m_pImpl->getStateIndexInPath( getCurrentState(), m_pImpl->nActivePath );
-        sal_Int32 nNewIndex     = m_pImpl->getStateIndexInPath( nCurItemId, m_pImpl->nActivePath );
+        sal_Int32 nNewIndex     = m_pImpl->getStateIndexInPath( nSelectedState, m_pImpl->nActivePath );
 
         DBG_ASSERT( ( nCurrentIndex != -1 ) && ( nNewIndex != -1 ),
             "RoadmapWizard::OnRoadmapItemSelected: something's wrong here!" );
@@ -658,8 +664,8 @@ namespace vcl
         bool bResult = true;
         if ( nNewIndex > nCurrentIndex )
         {
-            bResult = skipUntil( static_cast<WizardTypes::WizardState>(nCurItemId) );
-            WizardTypes::WizardState nTemp = static_cast<WizardTypes::WizardState>(nCurItemId);
+            bResult = skipUntil(nSelectedState);
+            WizardTypes::WizardState nTemp = nSelectedState;
             while( nTemp )
             {
                 if( m_pImpl->aDisabledStates.find( --nTemp ) != m_pImpl->aDisabledStates.end() )
@@ -667,7 +673,7 @@ namespace vcl
             }
         }
         else
-            bResult = skipBackwardUntil( static_cast<WizardTypes::WizardState>(nCurItemId) );
+            bResult = skipBackwardUntil(nSelectedState);
 
         return bResult;
     }
@@ -741,7 +747,7 @@ namespace vcl
         }
 
         // if the state is currently in the roadmap, reflect it's new status
-        m_xAssistant->set_page_sensitive(OString::number(_nState), _bEnable);
+        m_xAssistant->set_page_sensitive(getPageIdentForState(_nState), _bEnable);
     }
 
     bool RoadmapWizardMachine::knowsState( WizardTypes::WizardState i_nState ) const
@@ -791,6 +797,77 @@ namespace vcl
     FactoryFunction RoadmapWizard::GetUITestFactory() const
     {
         return RoadmapWizardUIObject::create;
+    }
+
+    namespace
+    {
+        bool isButton(WindowType eType)
+        {
+            return eType == WindowType::PUSHBUTTON || eType == WindowType::OKBUTTON
+                || eType == WindowType::CANCELBUTTON || eType == WindowType::HELPBUTTON;
+        }
+    }
+
+    void RoadmapWizard::DumpAsPropertyTree(tools::JsonWriter& rJsonWriter)
+    {
+        rJsonWriter.put("id", get_id());
+        rJsonWriter.put("type", "dialog");
+        rJsonWriter.put("title", GetText());
+
+        OUString sDialogId = OStringToOUString(GetHelpId(), RTL_TEXTENCODING_ASCII_US);
+        sal_Int32 nStartPos = sDialogId.lastIndexOf('/');
+        nStartPos = nStartPos >= 0 ? nStartPos + 1 : 0;
+        rJsonWriter.put("dialogid", sDialogId.copy(nStartPos));
+
+        vcl::Window* pFocusControl = GetFirstControlForFocus();
+        if (pFocusControl)
+            rJsonWriter.put("init_focus_id", pFocusControl->get_id());
+
+        {
+            auto childrenNode = rJsonWriter.startArray("children");
+
+            auto containerNode = rJsonWriter.startStruct();
+            rJsonWriter.put("id", "container");
+            rJsonWriter.put("type", "container");
+            rJsonWriter.put("vertical", true);
+
+            {
+                auto containerChildrenNode = rJsonWriter.startArray("children");
+
+                // tabpages
+                for (int i = 0; i < GetChildCount(); i++)
+                {
+                    vcl::Window* pChild = GetChild(i);
+
+                    if (!isButton(pChild->GetType()) && pChild != mpViewWindow)
+                    {
+                        auto childNode = rJsonWriter.startStruct();
+                        pChild->DumpAsPropertyTree(rJsonWriter);
+                    }
+                }
+
+                // buttons
+                {
+                    auto buttonsNode = rJsonWriter.startStruct();
+                    rJsonWriter.put("id", "buttons");
+                    rJsonWriter.put("type", "buttonbox");
+                    rJsonWriter.put("layoutstyle", "end");
+                    {
+                        auto buttonsChildrenNode = rJsonWriter.startArray("children");
+                        for (int i = 0; i < GetChildCount(); i++)
+                        {
+                            vcl::Window* pChild = GetChild(i);
+
+                            if (isButton(pChild->GetType()))
+                            {
+                                auto childNode = rJsonWriter.startStruct();
+                                pChild->DumpAsPropertyTree(rJsonWriter);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }   // namespace vcl

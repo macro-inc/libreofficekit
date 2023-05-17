@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <config_options.h>
 #include <svtools/svtdllapi.h>
 
 #include <osl/time.h>
@@ -17,8 +16,6 @@
 #include <vcl/timer.hxx>
 
 #include <functional>
-
-class Timer;
 
 /** Periodically checks if a file has been modified
 
@@ -38,7 +35,11 @@ private:
 
 public:
     void resetTimer();
-    bool hasFileChanged();
-    FileChangedChecker(const OUString& rFilename,
-            const ::std::function<void ()>& rCallback);
+    // bUpdate = true  when file has changed, get the return and the object get the new time
+    //         = false when file has changed, only get the return, not change the object
+    bool hasFileChanged(bool bUpdate = true);
+    FileChangedChecker(OUString aFilename,
+            ::std::function<void ()> aCallback);
+    // without Timer function
+    FileChangedChecker(OUString aFilename);
 };

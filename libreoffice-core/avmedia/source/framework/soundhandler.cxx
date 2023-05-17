@@ -144,7 +144,7 @@ SoundHandler::~SoundHandler()
 
     @short      try to load audio file
     @descr      This method try to load given audio file by URL and play it. We use vcl/Sound class to do that.
-                Playing of sound is asynchron every time.
+                Playing of sound is asynchronous every time.
 
     @attention  We must hold us alive by ourself ... because we use async. vcl sound player ... but playing is started
                 in async interface call "dispatch()" too. And caller forget us immediately. But then our uno ref count
@@ -164,7 +164,7 @@ void SAL_CALL SoundHandler::dispatchWithNotification(const css::util::URL&      
                                                      const css::uno::Reference< css::frame::XDispatchResultListener >& xListener )
 {
     // SAFE {
-    const ::osl::MutexGuard aLock( GetMutex() );
+    const ::osl::MutexGuard aLock( m_aMutex );
 
     utl::MediaDescriptor aDescriptor(lDescriptor);
 
@@ -276,7 +276,7 @@ OUString SAL_CALL SoundHandler::detect( css::uno::Sequence< css::beans::Property
 IMPL_LINK_NOARG(SoundHandler, implts_PlayerNotify, Timer *, void)
 {
     // SAFE {
-    ::osl::ClearableMutexGuard aLock( GetMutex() );
+    ::osl::ClearableMutexGuard aLock( m_aMutex );
 
     if (m_xPlayer.is() && m_xPlayer->isPlaying() && m_xPlayer->getMediaTime() < m_xPlayer->getDuration())
     {

@@ -20,9 +20,9 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <rtl/ref.hxx>
-#include <com/sun/star/ucb/XCommandEnvironment.hpp>
 #include "DAVAuthListener.hxx"
 
 namespace http_dav_ucp
@@ -32,21 +32,13 @@ namespace http_dav_ucp
 
 struct DAVRequestEnvironment
 {
-    OUString m_aRequestURI;
     rtl::Reference< DAVAuthListener >     m_xAuthListener;
     DAVRequestHeaders                     m_aRequestHeaders;
-    css::uno::Reference< css::ucb::XCommandEnvironment > m_xEnv;
 
-DAVRequestEnvironment( const OUString & rRequestURI,
-                       const rtl::Reference< DAVAuthListener > & xListener,
-                       const DAVRequestHeaders & rRequestHeaders,
-                       const css::uno::Reference< css::ucb::XCommandEnvironment > & xEnv)
-    : m_aRequestURI( rRequestURI ),
-      m_xAuthListener( xListener ),
-      m_aRequestHeaders( rRequestHeaders ),
-      m_xEnv( xEnv ){}
-
-    DAVRequestEnvironment() {}
+    DAVRequestEnvironment( rtl::Reference< DAVAuthListener > xListener,
+                       DAVRequestHeaders aRequestHeaders)
+    : m_xAuthListener(std::move( xListener )),
+      m_aRequestHeaders(std::move( aRequestHeaders )) {}
 };
 
 } // namespace http_dav_ucp

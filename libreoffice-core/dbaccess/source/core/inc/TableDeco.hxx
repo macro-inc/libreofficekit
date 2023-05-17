@@ -61,7 +61,6 @@ namespace dbaccess
                             ,public ODBTableDecorator_PROP
     {
         void fillPrivileges() const;
-    protected:
         css::uno::Reference< css::container::XContainerListener > m_xColumnMediator;
         css::uno::Reference< css::sdbcx::XColumnsSupplier >       m_xTable;
         css::uno::Reference< css::container::XNameAccess >        m_xColumnDefinitions;
@@ -75,6 +74,7 @@ namespace dbaccess
         // note: this thing uses the ref-count of "this", see OCollection::acquire()!
         std::unique_ptr<::connectivity::sdbcx::OCollection>       m_pColumns;
 
+    protected:
         // IColumnFactory
         virtual rtl::Reference<OColumn> createColumn(const OUString& _rName) const override;
         virtual css::uno::Reference< css::beans::XPropertySet > createColumnDescriptor() override;
@@ -145,7 +145,7 @@ namespace dbaccess
         virtual void SAL_CALL setName( const OUString& aName ) override;
         // css::lang::XUnoTunnel
         virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
-        static css::uno::Sequence< sal_Int8 > getUnoTunnelId();
+        static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
 
         // XColumnsSupplier
         virtual css::uno::Reference< css::container::XNameAccess > SAL_CALL getColumns(  ) override;

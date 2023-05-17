@@ -54,7 +54,7 @@ private:
     basegfx::B2DPolyPolygon             maOriginalPolyPolygon;
 
 public:
-    SdrDragEntryPolyPolygon(const basegfx::B2DPolyPolygon& rOriginalPolyPolygon);
+    SdrDragEntryPolyPolygon(basegfx::B2DPolyPolygon aOriginalPolyPolygon);
     virtual ~SdrDragEntryPolyPolygon() override;
 
     virtual drawinglayer::primitive2d::Primitive2DContainer createPrimitive2DSequenceInCurrentState(SdrDragMethod& rDragMethod) override;
@@ -65,7 +65,7 @@ class SdrDragEntrySdrObject final : public SdrDragEntry
 {
 private:
     const SdrObject&                                maOriginal;
-    SdrObjectUniquePtr                              mxClone;
+    rtl::Reference<SdrObject>                       mxClone;
     bool                                            mbModify;
 
 public:
@@ -206,7 +206,7 @@ public:
         const sdr::contact::ObjectContact& rObjectContact);
     void destroyOverlayGeometry();
 
-    virtual basegfx::B2DHomMatrix getCurrentTransformation();
+    virtual basegfx::B2DHomMatrix getCurrentTransformation() const;
     virtual void applyCurrentTransformationToSdrObject(SdrObject& rTarget);
     virtual void applyCurrentTransformationToPolyPolygon(basegfx::B2DPolyPolygon& rTarget);
 
@@ -247,7 +247,7 @@ public:
     virtual bool EndSdrDrag(bool bCopy) override;
     virtual PointerStyle GetSdrDragPointer() const override;
 
-    virtual basegfx::B2DHomMatrix getCurrentTransformation() override;
+    virtual basegfx::B2DHomMatrix getCurrentTransformation() const override;
     virtual void applyCurrentTransformationToSdrObject(SdrObject& rTarget) override;
 };
 
@@ -269,7 +269,7 @@ public:
     virtual bool EndSdrDrag(bool bCopy) override;
     virtual PointerStyle GetSdrDragPointer() const override;
 
-    virtual basegfx::B2DHomMatrix getCurrentTransformation() override;
+    virtual basegfx::B2DHomMatrix getCurrentTransformation() const override;
     virtual void applyCurrentTransformationToSdrObject(SdrObject& rTarget) override;
 };
 
@@ -283,7 +283,7 @@ private:
     // mechanism to modify wireframe visualisations, but uses the
     // SdrObject::applySpecialDrag() method to change a clone of the
     // SdrObject
-    SdrObjectUniquePtr               mxClone;
+    rtl::Reference<SdrObject>               mxClone;
 
 protected:
     virtual void createSdrDragEntries() override;

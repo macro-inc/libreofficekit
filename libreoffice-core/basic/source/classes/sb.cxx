@@ -18,6 +18,7 @@
  */
 
 #include <sb.hxx>
+#include <o3tl/safeint.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <tools/stream.hxx>
 #include <tools/debug.hxx>
@@ -46,9 +47,6 @@
 #include <errobject.hxx>
 #include <memory>
 #include <unordered_map>
-
-#include <global.hxx>
-#include <unotools/transliterationwrapper.hxx>
 
 #include <com/sun/star/script/ModuleType.hpp>
 #include <com/sun/star/script/ModuleInfo.hpp>
@@ -746,7 +744,7 @@ SbClassModuleObject::SbClassModuleObject( SbModule* pClassModule )
         }
     }
     SetModuleType( ModuleType::CLASS );
-    mbVBACompat = pClassModule->mbVBACompat;
+    mbVBASupport = pClassModule->mbVBASupport;
 }
 
 SbClassModuleObject::~SbClassModuleObject()
@@ -758,8 +756,8 @@ SbClassModuleObject::~SbClassModuleObject()
                 if( !pDocBasicItem->isDocClosed() )
                     triggerTerminateEvent();
 
-    // prevent the base class destructor from deleting these because
-    // we do not actually own them
+    // prevent the base class destructor from deleting this because:
+    // coverity[leaked_storage] - we do not actually own it
     pImage.release();
     pBreaks = nullptr;
 }
@@ -1308,7 +1306,7 @@ SbxVariable* StarBASIC::Find( const OUString& rName, SbxClassType t )
             }
         }
     }
-    OUString aMainStr("Main");
+    static constexpr OUStringLiteral aMainStr(u"Main");
     if( !pRes && pNamed && ( t == SbxClassType::Method || t == SbxClassType::DontCare ) &&
         !pNamed->GetName().equalsIgnoreAsciiCase( aMainStr ) )
     {
@@ -1327,11 +1325,11 @@ bool StarBASIC::Call( const OUString& rName, SbxArray* pParam )
     if( !bRes )
     {
         ErrCode eErr = SbxBase::GetError();
-        SbxBase::ResetError();
         if( eErr != ERRCODE_NONE )
         {
-            RTError( eErr, OUString(), 0, 0, 0 );
+            RTError(eErr, SbxBase::GetErrorMsg(), 0, 0, 0);
         }
+        SbxBase::ResetError();
     }
     return bRes;
 }
@@ -1680,11 +1678,6 @@ bool StarBASIC::RTError( ErrCode code, const OUString& rMsg, sal_Int32 l, sal_In
     {
         return ErrorHdl();
     }
-}
-
-void StarBASIC::Error( ErrCode n )
-{
-    Error( n, OUString() );
 }
 
 void StarBASIC::Error( ErrCode n, const OUString& rMsg )
@@ -2070,26 +2063,26 @@ sal_Int32 BasicCollection::implGetIndex( SbxVariable const * pIndexVar )
     return nIndex;
 }
 
-sal_Int32 BasicCollection::implGetIndexForName(std::u16string_view rName)
+sal_Int32 BasicCollection::implGetIndexForName(const OUString& rName)
 {
-    sal_Int32 nIndex = -1;
     sal_Int32 nCount = xItemArray->Count();
     sal_Int32 nNameHash = MakeHashCode( rName );
 
     // tdf#144245 - case-insensitive operation for non-ASCII characters
-    utl::TransliterationWrapper& rTransliteration = SbGlobal::GetTransliteration();
+    OUString aNameCI; // Only initialize when matching hash found
 
     for( sal_Int32 i = 0 ; i < nCount ; i++ )
     {
         SbxVariable* pVar = xItemArray->Get(i);
-        if (pVar->GetHashCode() == nNameHash
-            && rTransliteration.isEqual(pVar->GetName(), OUString(rName)))
+        if (pVar->GetHashCode() == nNameHash)
         {
-            nIndex = i;
-            break;
+            if (aNameCI.isEmpty() && !rName.isEmpty())
+                aNameCI = SbxVariable::NameToCaseInsensitiveName(rName);
+            if (aNameCI == pVar->GetName(SbxNameType::CaseInsensitive))
+                return i;
         }
     }
-    return nIndex;
+    return -1;
 }
 
 void BasicCollection::CollAdd( SbxArray* pPar_ )
@@ -2180,7 +2173,7 @@ void BasicCollection::CollItem( SbxArray* pPar_ )
     SbxVariable* pRes = nullptr;
     SbxVariable* p = pPar_->Get(1);
     sal_Int32 nIndex = implGetIndex( p );
-    if (nIndex >= 0 && nIndex < static_cast<sal_Int32>(xItemArray->Count()))
+    if (nIndex >= 0 && o3tl::make_unsigned(nIndex) < xItemArray->Count())
     {
         pRes = xItemArray->Get(nIndex);
     }
@@ -2204,7 +2197,7 @@ void BasicCollection::CollRemove( SbxArray* pPar_ )
 
     SbxVariable* p = pPar_->Get(1);
     sal_Int32 nIndex = implGetIndex( p );
-    if (nIndex >= 0 && nIndex < static_cast<sal_Int32>(xItemArray->Count()))
+    if (nIndex >= 0 && o3tl::make_unsigned(nIndex) < xItemArray->Count())
     {
         xItemArray->Remove( nIndex );
 

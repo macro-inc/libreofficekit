@@ -31,6 +31,7 @@
 #include <com/sun/star/i18n/ScriptType.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
+#include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <docsh.hxx>
 #include <viewsh.hxx>
 #include <viewopt.hxx>
@@ -55,13 +56,11 @@
 #include <svtools/rtfkeywd.hxx>
 #include <filter/msfilter/rtfutil.hxx>
 #include <unotools/docinfohelper.hxx>
+#include <xmloff/odffields.hxx>
 #include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <rtl/tencinfo.h>
 #include <sal/log.hxx>
-#if OSL_DEBUG_LEVEL > 1
-#include <iostream>
-#endif
 #include <svx/xflclit.hxx>
 #include <fmtmeta.hxx>
 #include <IDocumentSettingAccess.hxx>
@@ -129,8 +128,8 @@ void RtfExport::AppendBookmarks(const SwTextNode& rNode, sal_Int32 nCurrentPos, 
     {
         for (const auto& pMark : aMarks)
         {
-            const sal_Int32 nStart = pMark->GetMarkStart().nContent.GetIndex();
-            const sal_Int32 nEnd = pMark->GetMarkEnd().nContent.GetIndex();
+            const sal_Int32 nStart = pMark->GetMarkStart().GetContentIndex();
+            const sal_Int32 nEnd = pMark->GetMarkEnd().GetContentIndex();
 
             if (nStart == nCurrentPos)
                 aStarts.push_back(pMark->GetName());
@@ -162,8 +161,8 @@ void RtfExport::AppendAnnotationMarks(const SwWW8AttrIter& rAttrs, sal_Int32 nCu
     {
         for (const auto& pMark : aMarks)
         {
-            const sal_Int32 nStart = pMark->GetMarkStart().nContent.GetIndex();
-            const sal_Int32 nEnd = pMark->GetMarkEnd().nContent.GetIndex();
+            const sal_Int32 nStart = pMark->GetMarkStart().GetContentIndex();
+            const sal_Int32 nEnd = pMark->GetMarkEnd().GetContentIndex();
 
             if (nStart == nCurrentPos)
                 aStarts.push_back(pMark->GetName());
@@ -321,9 +320,62 @@ void RtfExport::OutputField(const SwField* pField, ww::eField eFieldType, const 
     m_pAttrOutput->WriteField_Impl(pField, eFieldType, rFieldCmd, nMode);
 }
 
-void RtfExport::WriteFormData(const ::sw::mark::IFieldmark& /*rFieldmark*/)
+void RtfExport::WriteFormData(const ::sw::mark::IFieldmark& rFieldmark)
 {
-    SAL_INFO("sw.rtf", "TODO: " << __func__);
+    sal_Int32 nType;
+    if (rFieldmark.GetFieldname() == ODF_FORMDROPDOWN)
+    {
+        nType = 2;
+    }
+    /* TODO
+    else if (rFieldmark.GetFieldname() == ODF_FORMCHECKBOX)
+    {
+        nType = 1;
+    }
+    else if (rFieldmark.GetFieldname() == ODF_FORMTEXT)
+    {
+        nType = 0;
+    }
+*/
+    else
+    {
+        SAL_INFO("sw.rtf", "unknown field type");
+        return;
+    }
+    m_pAttrOutput->RunText().append(
+        "{" OOO_STRING_SVTOOLS_RTF_IGNORE OOO_STRING_SVTOOLS_RTF_FORMFIELD
+        "{" OOO_STRING_SVTOOLS_RTF_FFTYPE);
+    m_pAttrOutput->RunText().append(nType);
+    if (rFieldmark.GetFieldname() == ODF_FORMDROPDOWN)
+    {
+        m_pAttrOutput->RunText().append(OOO_STRING_SVTOOLS_RTF_FFHASLISTBOX "1");
+        uno::Sequence<OUString> entries;
+        if (auto const it = rFieldmark.GetParameters()->find(ODF_FORMDROPDOWN_LISTENTRY);
+            it != rFieldmark.GetParameters()->end())
+        {
+            it->second >>= entries;
+        }
+        if (auto const it = rFieldmark.GetParameters()->find(ODF_FORMDROPDOWN_RESULT);
+            it != rFieldmark.GetParameters()->end())
+        {
+            sal_Int32 result(-1);
+            it->second >>= result;
+            if (0 <= result && result < entries.getLength())
+            {
+                m_pAttrOutput->RunText().append(OOO_STRING_SVTOOLS_RTF_FFRES);
+                m_pAttrOutput->RunText().append(result);
+            }
+        }
+        for (OUString const& rEntry : entries)
+        {
+            m_pAttrOutput->RunText().append(
+                "{" OOO_STRING_SVTOOLS_RTF_IGNORE OOO_STRING_SVTOOLS_RTF_FFL " ");
+            m_pAttrOutput->RunText().append(
+                msfilter::rtfutil::OutString(rEntry, m_eDefaultEncoding));
+            m_pAttrOutput->RunText().append("}");
+        }
+    }
+    m_pAttrOutput->RunText().append("}}"); // close FORMFIELD destination
 }
 
 void RtfExport::WriteHyperlinkData(const ::sw::mark::IFieldmark& /*rFieldmark*/)
@@ -376,7 +428,7 @@ void RtfExport::DoFormText(const SwInputField* pField)
                                     + "}}");
 }
 
-sal_uLong RtfExport::ReplaceCr(sal_uInt8 /*nChar*/)
+sal_uInt64 RtfExport::ReplaceCr(sal_uInt8 /*nChar*/)
 {
     // Completely unused for Rtf export... only here for code sharing
     // purpose with binary export
@@ -445,16 +497,15 @@ void RtfExport::WriteMainText()
         Strm().WriteChar('}'); // background
     }
 
-    SwTableNode* pTableNode = m_pCurPam->GetNode().FindTableNode();
+    SwTableNode* pTableNode = m_pCurPam->GetPointNode().FindTableNode();
     if (m_pWriter && m_pWriter->m_bWriteOnlyFirstTable && pTableNode != nullptr)
     {
-        m_pCurPam->GetPoint()->nNode = *pTableNode;
-        m_pCurPam->GetMark()->nNode = *(pTableNode->EndOfSectionNode());
+        m_pCurPam->GetPoint()->Assign(*pTableNode);
+        m_pCurPam->GetMark()->Assign(*pTableNode->EndOfSectionNode());
     }
     else
     {
-        m_pCurPam->GetPoint()->nNode
-            = m_rDoc.GetNodes().GetEndOfContent().StartOfSectionNode()->GetIndex();
+        m_pCurPam->GetPoint()->Assign(*m_rDoc.GetNodes().GetEndOfContent().StartOfSectionNode());
     }
 
     WriteText();
@@ -629,6 +680,57 @@ void RtfExport::WriteUserProps()
     Strm().WriteChar('}');
 }
 
+void RtfExport::WriteDocVars()
+{
+    SwDocShell* pDocShell(m_rDoc.GetDocShell());
+    if (!pDocShell)
+        return;
+
+    uno::Reference<text::XTextFieldsSupplier> xModel(pDocShell->GetModel(), uno::UNO_QUERY);
+    uno::Reference<container::XNameAccess> xTextFieldMasters = xModel->getTextFieldMasters();
+    uno::Sequence<rtl::OUString> aMasterNames = xTextFieldMasters->getElementNames();
+    if (!aMasterNames.hasElements())
+    {
+        return;
+    }
+
+    // Only write docVars if there will be at least a single docVar.
+    constexpr OUStringLiteral aPrefix(u"com.sun.star.text.fieldmaster.User.");
+    for (const auto& rMasterName : std::as_const(aMasterNames))
+    {
+        if (!rMasterName.startsWith(aPrefix))
+        {
+            // Not a user field.
+            continue;
+        }
+
+        uno::Reference<beans::XPropertySet> xField;
+        xTextFieldMasters->getByName(rMasterName) >>= xField;
+        if (!xField.is())
+        {
+            continue;
+        }
+
+        OUString aKey = rMasterName.copy(aPrefix.getLength());
+        OUString aValue;
+        xField->getPropertyValue("Content") >>= aValue;
+
+        Strm().WriteChar('{').WriteCharPtr(
+            OOO_STRING_SVTOOLS_RTF_IGNORE OOO_STRING_SVTOOLS_RTF_DOCVAR);
+        Strm().WriteChar(' ');
+
+        Strm().WriteChar('{');
+        Strm().WriteOString(msfilter::rtfutil::OutString(aKey, m_eDefaultEncoding));
+        Strm().WriteChar('}');
+
+        Strm().WriteChar('{');
+        Strm().WriteOString(msfilter::rtfutil::OutString(aValue, m_eDefaultEncoding));
+        Strm().WriteChar('}');
+
+        Strm().WriteChar('}');
+    }
+}
+
 void RtfExport::WritePageDescTable()
 {
     // Write page descriptions (page styles)
@@ -703,10 +805,11 @@ ErrCode RtfExport::ExportDocument_Impl()
 
     WriteInfo();
     WriteUserProps();
+    WriteDocVars();
+
     // Default TabSize
-    Strm()
-        .WriteOString(m_pAttrOutput->GetTabStop().makeStringAndClear())
-        .WriteCharPtr(SAL_NEWLINE_STRING);
+    Strm().WriteOString(m_pAttrOutput->GetTabStop()).WriteCharPtr(SAL_NEWLINE_STRING);
+    m_pAttrOutput->GetTabStop().setLength(0);
 
     // Automatic hyphenation: it's a global setting in Word, it's a paragraph setting in Writer.
     // Set it's value to "auto" and disable on paragraph level, if no hyphenation is used there.
@@ -754,6 +857,10 @@ ErrCode RtfExport::ExportDocument_Impl()
 
     // enable form field shading
     Strm().WriteCharPtr(OOO_STRING_SVTOOLS_RTF_FORMSHADE);
+
+    // Enable breaking wrapped tables across pages: the "no" in the control word's name is
+    // confusing.
+    Strm().WriteOString(LO_STRING_SVTOOLS_RTF_NOBRKWRPTBL);
 
     // size and empty margins of the page
     if (m_rDoc.GetPageDescCnt())
@@ -1047,7 +1154,7 @@ RtfExport::RtfExport(RtfExportFilter* pFilter, SwDoc& rDocument,
     // that just causes problems for RTF
     m_bSubstituteBullets = false;
     // needed to have a complete font table
-    m_aFontHelper.bLoadAllFonts = true;
+    m_aFontHelper.m_bLoadAllFonts = true;
     // the related SdrExport
     m_pSdrExport = std::make_unique<RtfSdrExport>(*this);
 
@@ -1471,8 +1578,8 @@ ErrCode SwRTFWriter::WriteStream()
     return ERRCODE_NONE;
 }
 
-extern "C" SAL_DLLPUBLIC_EXPORT void ExportRTF(const OUString& rFltName, const OUString& rBaseURL,
-                                               WriterRef& xRet)
+extern "C" SAL_DLLPUBLIC_EXPORT void ExportRTF(std::u16string_view rFltName,
+                                               const OUString& rBaseURL, WriterRef& xRet)
 {
     xRet = new SwRTFWriter(rFltName, rBaseURL);
 }

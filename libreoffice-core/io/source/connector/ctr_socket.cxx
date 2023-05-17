@@ -20,7 +20,7 @@
 
 #include "connector.hxx"
 #include <com/sun/star/io/IOException.hpp>
-#include <rtl/ustrbuf.hxx>
+#include <utility>
 
 using namespace ::osl;
 using namespace ::com::sun::star::uno;
@@ -35,7 +35,7 @@ namespace stoc_connector {
         XStreamListener_hash_set listeners;
 
         {
-            ::osl::MutexGuard guard(pCon->_mutex);
+            std::unique_lock guard(pCon->_mutex);
             if(!*notified)
             {
                 *notified = true;
@@ -81,9 +81,9 @@ namespace stoc_connector {
     }
 
 
-    SocketConnection::SocketConnection( const OUString &sConnectionDescription ) :
+    SocketConnection::SocketConnection( OUString sConnectionDescription ) :
         m_nStatus( 0 ),
-        m_sDescription( sConnectionDescription ),
+        m_sDescription(std::move( sConnectionDescription )),
         _started(false),
         _closed(false),
         _error(false)
@@ -210,14 +210,14 @@ namespace stoc_connector {
     // XConnectionBroadcaster
     void SAL_CALL SocketConnection::addStreamListener(const Reference<XStreamListener> & aListener)
     {
-        MutexGuard guard(_mutex);
+        std::unique_lock guard(_mutex);
 
         _listeners.insert(aListener);
     }
 
     void SAL_CALL SocketConnection::removeStreamListener(const Reference<XStreamListener> & aListener)
     {
-        MutexGuard guard(_mutex);
+        std::unique_lock guard(_mutex);
 
         _listeners.erase(aListener);
     }

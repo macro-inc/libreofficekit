@@ -32,7 +32,7 @@
 
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/weak.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 
 #include <tools/link.hxx>
 #include <vcl/vclptr.hxx>
@@ -48,8 +48,7 @@ typedef ::std::vector<
     css::uno::Reference< css::awt::XPopupMenu >
 > PopupMenuRefList;
 
-
-
+typedef void (*MenuUserDataReleaseFunction)(void*);
 
 class TOOLKIT_DLLPUBLIC VCLXMenu :  public css::awt::XMenuBar,
                                     public css::awt::XPopupMenu,
@@ -59,14 +58,13 @@ class TOOLKIT_DLLPUBLIC VCLXMenu :  public css::awt::XMenuBar,
                                     public ::cppu::OWeakObject
 {
 private:
-    ::osl::Mutex            maMutex;
+    std::mutex              maMutex;
     VclPtr<Menu>            mpMenu;
     MenuListenerMultiplexer maMenuListeners;
     PopupMenuRefList        maPopupMenuRefs;
     sal_Int16               mnDefaultItem;
 
 protected:
-    ::osl::Mutex&           GetMutex() { return maMutex; }
 
     DECL_DLLPRIVATE_LINK( MenuEventListener, VclMenuEvent&, void );
 
@@ -81,6 +79,8 @@ public:
 
     Menu*    GetMenu() const { return mpMenu; }
     bool IsPopupMenu() const;
+    void setUserValue(sal_uInt16 nItemId, void* nUserValue, MenuUserDataReleaseFunction aFunc);
+    void* getUserValue(sal_uInt16 nItemId);
 
     // css::uno::XInterface
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override;

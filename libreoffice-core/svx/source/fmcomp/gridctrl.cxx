@@ -41,7 +41,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/PropertyChangeEvent.hpp>
 #include <com/sun/star/container/XIndexAccess.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/commandevent.hxx>
@@ -707,7 +707,6 @@ DbGridControl::DbGridControl(
             ,m_nLastRowId(-1)
             ,m_bDesignMode(false)
             ,m_bRecordCountFinal(false)
-            ,m_bNavigationBar(true)
             ,m_bSynchDisplay(true)
             ,m_bHandle(true)
             ,m_bFilterMode(false)
@@ -716,6 +715,7 @@ DbGridControl::DbGridControl(
             ,m_bHideScrollbars( false )
             ,m_bUpdating(false)
 {
+    m_bNavigationBar = true;
 
     OUString sName(SvxResId(RID_STR_NAVIGATIONBAR));
     m_aBar->SetAccessibleName(sName);
@@ -2951,7 +2951,7 @@ bool DbGridControl::PreNotify(NotifyEvent& rEvt)
 
     switch (rEvt.GetType())
     {
-        case MouseNotifyEvent::KEYINPUT:
+        case NotifyEventType::KEYINPUT:
         {
             const KeyEvent* pKeyEvent = rEvt.GetKeyEvent();
 

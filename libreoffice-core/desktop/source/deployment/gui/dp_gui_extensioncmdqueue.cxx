@@ -46,9 +46,7 @@
 #include <com/sun/star/uno/Sequence.hxx>
 #include <com/sun/star/uno/TypeClass.hpp>
 #include <o3tl/any.hxx>
-#include <osl/conditn.hxx>
 #include <osl/diagnose.h>
-#include <osl/mutex.hxx>
 #include <rtl/ref.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
@@ -57,6 +55,7 @@
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/anytostring.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 
@@ -73,8 +72,10 @@
 #include <dp_identifier.hxx>
 #include <dp_version.hxx>
 
+#include <condition_variable>
 #include <queue>
 #include <memory>
+#include <mutex>
 
 #ifdef _WIN32
 #include <o3tl/safeCoInitUninit.hxx>
@@ -127,12 +128,12 @@ public:
     will be handled and in the second case a VersionException will be handled.
     */
 
-    ProgressCmdEnv( const uno::Reference< uno::XComponentContext >& rContext,
+    ProgressCmdEnv( uno::Reference< uno::XComponentContext > xContext,
                     DialogHelper* pDialogHelper,
-                    const OUString& rTitle )
-        : m_xContext( rContext )
+                    OUString aTitle )
+        : m_xContext(std::move( xContext ))
         , m_pDialogHelper( pDialogHelper )
-        , m_sTitle( rTitle )
+        , m_sTitle(std::move( aTitle ))
         , m_bWarnUser( false )
         , m_nCurrentProgress(0)
         {}
@@ -171,18 +172,18 @@ struct ExtensionCmd
     std::vector< uno::Reference< deployment::XPackage > >        m_vExtensionList;
 
     ExtensionCmd( const E_CMD_TYPE eCommand,
-                  const OUString &rExtensionURL,
-                  const OUString &rRepository,
+                  OUString aExtensionURL,
+                  OUString aRepository,
                   const bool bWarnUser )
         : m_eCmdType( eCommand ),
           m_bWarnUser( bWarnUser ),
-          m_sExtensionURL( rExtensionURL ),
-          m_sRepository( rRepository ) {};
+          m_sExtensionURL(std::move( aExtensionURL )),
+          m_sRepository(std::move( aRepository )) {};
     ExtensionCmd( const E_CMD_TYPE eCommand,
-                  const uno::Reference< deployment::XPackage > &rPackage )
+                  uno::Reference< deployment::XPackage > xPackage )
         : m_eCmdType( eCommand ),
           m_bWarnUser( false ),
-          m_xPackage( rPackage ) {};
+          m_xPackage(std::move( xPackage )) {};
     ExtensionCmd( const E_CMD_TYPE eCommand,
                 std::vector<uno::Reference<deployment::XPackage > >&&vExtensionList )
         : m_eCmdType( eCommand ),
@@ -200,7 +201,7 @@ class ExtensionCmdQueue::Thread: public salhelper::Thread
 public:
     Thread( DialogHelper *pDialogHelper,
             TheExtensionManager *pManager,
-            const uno::Reference< uno::XComponentContext > & rContext );
+            uno::Reference< uno::XComponentContext > xContext );
 
     void addExtension( const OUString &rExtensionURL,
                        const OUString &rRepository,
@@ -248,8 +249,8 @@ private:
     const OUString   m_sRemovingPackages;
     const OUString   m_sDefaultCmd;
     const OUString   m_sAcceptLicense;
-    osl::Condition   m_wakeup;
-    osl::Mutex       m_mutex;
+    std::condition_variable m_wakeup;
+    std::mutex       m_mutex;
     Input            m_eInput;
     bool             m_bStopped;
     bool             m_bWorking;
@@ -580,9 +581,9 @@ void ProgressCmdEnv::pop()
 
 ExtensionCmdQueue::Thread::Thread( DialogHelper *pDialogHelper,
                                    TheExtensionManager *pManager,
-                                   const uno::Reference< uno::XComponentContext > & rContext ) :
+                                   uno::Reference< uno::XComponentContext > xContext ) :
     salhelper::Thread( "dp_gui_extensioncmdqueue" ),
-    m_xContext( rContext ),
+    m_xContext(std::move( xContext )),
     m_pDialogHelper( pDialogHelper ),
     m_pManager( pManager ),
     m_sEnablingPackages( DpResId( RID_STR_ENABLING_PACKAGES ) ),
@@ -655,16 +656,16 @@ void ExtensionCmdQueue::Thread::checkForUpdates(
 //Stopping this thread will not abort the installation of extensions.
 void ExtensionCmdQueue::Thread::stop()
 {
-    osl::MutexGuard aGuard( m_mutex );
+    std::scoped_lock aGuard( m_mutex );
     m_bStopped = true;
     m_eInput = STOP;
-    m_wakeup.set();
+    m_wakeup.notify_all();
 }
 
 
 bool ExtensionCmdQueue::Thread::isBusy()
 {
-    osl::MutexGuard aGuard( m_mutex );
+    std::scoped_lock aGuard( m_mutex );
     return m_bWorking;
 }
 
@@ -682,33 +683,29 @@ void ExtensionCmdQueue::Thread::execute()
 #endif
     for (;;)
     {
-        if ( m_wakeup.wait() != osl::Condition::result_ok )
-        {
-            dp_misc::TRACE( "dp_gui::ExtensionCmdQueue::Thread::run: ignored "
-                       "osl::Condition::wait failure\n" );
-        }
-        m_wakeup.reset();
-
         int nSize;
         Input eInput;
         {
-            osl::MutexGuard aGuard( m_mutex );
+            std::unique_lock aGuard( m_mutex );
+            while (m_eInput == NONE) {
+                m_wakeup.wait(aGuard);
+            }
             eInput = m_eInput;
             m_eInput = NONE;
             nSize = m_queue.size();
+            // coverity[missing_lock: FALSE] - maybe due to (by-design) unique_lock vs. scoped_lock?
             m_bWorking = false;
         }
 
-        // If this thread has been woken up by anything else except start, stop
-        // then input is NONE and we wait again.
+        if ( eInput == STOP )
+            break;
+
         // We only install the extension which are currently in the queue.
         // The progressbar will be set to show the progress of the current number
         // of extensions. If we allowed to add extensions now then the progressbar may
         // have reached the end while we still install newly added extensions.
-        if ( ( eInput == NONE ) || ( nSize == 0 ) )
+        if ( nSize == 0 )
             continue;
-        if ( eInput == STOP )
-            break;
 
         ::rtl::Reference< ProgressCmdEnv > currentCmdEnv( new ProgressCmdEnv( m_xContext, m_pDialogHelper, m_sDefaultCmd ) );
 
@@ -720,7 +717,7 @@ void ExtensionCmdQueue::Thread::execute()
         while ( --nSize >= 0 )
         {
             {
-                osl::MutexGuard aGuard( m_mutex );
+                std::scoped_lock aGuard( m_mutex );
                 m_bWorking = true;
             }
 
@@ -728,7 +725,7 @@ void ExtensionCmdQueue::Thread::execute()
             {
                 TExtensionCmd pEntry;
                 {
-                    ::osl::MutexGuard queueGuard( m_mutex );
+                    std::scoped_lock queueGuard( m_mutex );
                     pEntry = m_queue.front();
                     m_queue.pop();
                 }
@@ -766,7 +763,7 @@ void ExtensionCmdQueue::Thread::execute()
                 //Then we cancel the installation of all extensions and remove them from
                 //the queue.
                 {
-                    ::osl::MutexGuard queueGuard2(m_mutex);
+                    std::scoped_lock queueGuard2(m_mutex);
                     while ( --nSize >= 0 )
                         m_queue.pop();
                 }
@@ -813,14 +810,14 @@ void ExtensionCmdQueue::Thread::execute()
                 //Continue with installation of the remaining extensions
             }
             {
-                osl::MutexGuard aGuard( m_mutex );
+                std::scoped_lock aGuard( m_mutex );
                 m_bWorking = false;
             }
         }
 
         {
             // when leaving the while loop with break, we should set working to false, too
-            osl::MutexGuard aGuard( m_mutex );
+            std::scoped_lock aGuard( m_mutex );
             m_bWorking = false;
         }
 
@@ -1043,7 +1040,7 @@ void ExtensionCmdQueue::Thread::_acceptLicense( ::rtl::Reference< ProgressCmdEnv
 
 void ExtensionCmdQueue::Thread::_insert(const TExtensionCmd& rExtCmd)
 {
-    ::osl::MutexGuard aGuard( m_mutex );
+    std::scoped_lock aGuard( m_mutex );
 
     // If someone called stop then we do not process the command -> game over!
     if ( m_bStopped )
@@ -1051,7 +1048,7 @@ void ExtensionCmdQueue::Thread::_insert(const TExtensionCmd& rExtCmd)
 
     m_queue.push( rExtCmd );
     m_eInput = START;
-    m_wakeup.set();
+    m_wakeup.notify_all();
 }
 
 
@@ -1064,7 +1061,8 @@ ExtensionCmdQueue::ExtensionCmdQueue( DialogHelper * pDialogHelper,
 }
 
 ExtensionCmdQueue::~ExtensionCmdQueue() {
-    stop();
+    m_thread->stop();
+    m_thread->join();
 }
 
 void ExtensionCmdQueue::addExtension( const OUString & extensionURL,
@@ -1098,11 +1096,6 @@ void ExtensionCmdQueue::acceptLicense( const uno::Reference< deployment::XPackag
 void ExtensionCmdQueue::syncRepositories( const uno::Reference< uno::XComponentContext > &xContext )
 {
     dp_misc::syncRepositories( false, new ProgressCmdEnv( xContext, nullptr, "Extension Manager" ) );
-}
-
-void ExtensionCmdQueue::stop()
-{
-    m_thread->stop();
 }
 
 bool ExtensionCmdQueue::isBusy()

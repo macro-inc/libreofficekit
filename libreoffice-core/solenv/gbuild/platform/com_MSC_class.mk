@@ -36,6 +36,7 @@ endef
 
 # $(call gb_CObject__compiler,flags,source,compiler)
 define gb_CObject__compiler
+	VSLANG=1033 \
 	$(if $(filter YES,$(LIBRARY_X64)), $(CXX_X64_BINARY), \
 		$(if $(filter YES,$(PE_X86)), $(CXX_X86_BINARY), \
 			$(if $(filter %.c,$(2)), \
@@ -65,6 +66,7 @@ define gb_CObject__command_pattern
 $(call gb_Helper_abbreviate_dirs,\
 	mkdir -p $(dir $(1)) $(dir $(4)) && \
 	unset INCLUDE && \
+	$(if $(and $(gb_COMPILERDEPFLAGS),$(T_USE_CLANG)), export SHOWINCLUDES_PREFIX="${LO_CLANG_SHOWINCLUDES_PREFIX}" &&) \
 	$(gb_COMPILER_SETUP) \
 	$(call gb_CObject__compiler,$(2),$(3),$(6)) \
 		$(call gb_Helper_remove_overridden_flags, \
@@ -108,6 +110,7 @@ $(call gb_Output_announce,$(2),$(true),PCH,1)
 $(call gb_Helper_abbreviate_dirs,\
 	mkdir -p $(dir $(1)) $(dir $(call gb_PrecompiledHeader_get_dep_target,$(2),$(6))) && \
 	unset INCLUDE && \
+	$(if $(and $(gb_COMPILERDEPFLAGS),$(T_USE_CLANG)), export SHOWINCLUDES_PREFIX="${LO_CLANG_SHOWINCLUDES_PREFIX}" &&) \
 	CCACHE_DISABLE=1 $(gb_COMPILER_SETUP) \
 	$(call gb_CObject__compiler,$(4),$(3),$(7)) \
 		$(call gb_Helper_remove_overridden_flags, \
@@ -116,12 +119,21 @@ $(call gb_Helper_abbreviate_dirs,\
 		$(if $(EXTERNAL_CODE),$(if $(COM_IS_CLANG),-Wno-undef),$(gb_DEFS_INTERNAL)) \
 		$(if $(filter YES,$(LIBRARY_X64)), ,$(gb_LTOFLAGS)) \
 		$(gb_COMPILERDEPFLAGS) \
+		$(gb_NO_PCH_TIMESTAMP) \
 		$(5) \
 		-c $(3) \
-		-Yc$(notdir $(patsubst %.cxx,%.hxx,$(3))) -Fp$(1) -Fo$(1).obj) $(call gb_create_deps,$(call gb_PrecompiledHeader_get_dep_target_tmp,$(2),$(6)),$(1),$(3))
+		-Yc$(notdir $(patsubst %.cxx,%.hxx,$(3))) -I$(dir $(patsubst %.cxx,%.hxx,$(3))) -Fp$(1) -Fo$(1).obj) \
+		$(call gb_create_deps,$(call gb_PrecompiledHeader_get_dep_target_tmp,$(2),$(6)),$(1),$(3))
 	$(call gb_Trace_EndRange,$(2),PCH)
 endef
 
+ifeq ($(COM_IS_CLANG),TRUE)
+# Clang has -fno-pch-timestamp, just checksum the file for CCACHE_PCH_EXTSUM
+# $(call gb_PrecompiledHeader__sum_command,pchfile,pchtarget,source,cxxflags,includes,linktargetmakefilename,compiler)
+define gb_PrecompiledHeader__sum_command
+	$(SHA256SUM) $(1) >$(1).sum
+endef
+else
 # MSVC does not generate the same .pch for the same input, so checksum the (preprocessed) input
 # $(call gb_PrecompiledHeader__sum_command,pchfile,pchtarget,source,cxxflags,includes,linktargetmakefilename,compiler)
 define gb_PrecompiledHeader__sum_command
@@ -138,6 +150,7 @@ $(call gb_Helper_abbreviate_dirs,\
 		2>&1 | $(SHA256SUM) >$(1).sum \
 		)
 endef
+endif
 
 # When building a PCH, MSVC also creates a .pdb file with debug info. So for reuse
 # add the .pdb to the PCH's files and then use the .pdb also for linktargets that reuse the PCH.
@@ -229,7 +242,7 @@ cat $${RESPONSEFILE} | sed 's/ /\n/g' | grep -v '^$$' > $${RESPONSEFILE}.1 && \
 mv $${RESPONSEFILE}.1 $${RESPONSEFILE} &&
 endef
 
-MSC_SUBSYSTEM_VERSION=$(COMMA)$(if $(filter AARCH64,$(CPUNAME)),6.02,6.01)
+gb_MSC_SUBSYSTEM_VERSION=$(COMMA)$(if $(filter AARCH64,$(CPUNAME)),6.02,6.01)
 
 # the sort on the libraries is used to filter out duplicates to keep commandline
 # length in check - otherwise the dupes easily hit the limit when linking mergedlib
@@ -238,7 +251,7 @@ $(call gb_Output_announce,$(2),$(true),LNK,4)
 	$(call gb_Trace_StartRange,$(2),LNK)
 $(call gb_Helper_abbreviate_dirs,\
 	rm -f $(1) && \
-	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),100, \
+	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)), \
 		$(foreach object,$(CXXOBJECTS),$(call gb_CxxObject_get_target,$(object))) \
 		$(foreach object,$(GENCXXOBJECTS),$(call gb_GenCxxObject_get_target,$(object))) \
 		$(foreach object,$(COBJECTS),$(call gb_CObject_get_target,$(object))) \
@@ -256,7 +269,7 @@ $(call gb_Helper_abbreviate_dirs,\
 		$(if $(filter StaticLibrary,$(TARGETTYPE)),-LIB) \
 		$(if $(filter Executable,$(TARGETTYPE)),$(gb_Executable_TARGETTYPEFLAGS)) \
 		$(if $(T_SYMBOLS),$(if $(filter Executable Library CppunitTest,$(TARGETTYPE)),$(gb_Windows_PE_TARGETTYPEFLAGS_DEBUGINFO)),) \
-		$(if $(filter YES,$(TARGETGUI)), -SUBSYSTEM:WINDOWS$(MSC_SUBSYSTEM_VERSION), -SUBSYSTEM:CONSOLE$(MSC_SUBSYSTEM_VERSION)) \
+		$(if $(filter YES,$(TARGETGUI)), -SUBSYSTEM:WINDOWS$(gb_MSC_SUBSYSTEM_VERSION), -SUBSYSTEM:CONSOLE$(gb_MSC_SUBSYSTEM_VERSION)) \
 		$(if $(filter YES,$(LIBRARY_X64)), -MACHINE:X64) \
 		$(if $(filter YES,$(PE_X86)), -MACHINE:X86) \
 		$(if $(filter YES,$(LIBRARY_X64)), \
@@ -279,15 +292,15 @@ $(call gb_Helper_abbreviate_dirs,\
 			-manifestfile:$(WORKDIR)/LinkTarget/$(2).manifest \
 			-pdb:$(call gb_LinkTarget__get_pdb_filename,$(WORKDIR)/LinkTarget/$(2))) \
 		$(if $(ILIBTARGET),-out:$(1) -implib:$(ILIBTARGET),-out:$(1)) \
-		| LC_ALL=C $(GBUILDDIR)/platform/filter-creatingLibrary.awk; RC=$${PIPESTATUS[0]}; rm $${RESPONSEFILE} \
+		| $(GBUILDDIR)/platform/filter-creatingLibrary.awk; RC=$${PIPESTATUS[0]}; rm $${RESPONSEFILE} \
 	$(if $(filter Library,$(TARGETTYPE)),; if [ ! -f $(ILIBTARGET) ]; then rm -f $(1); exit 42; fi) \
 	$(if $(filter Library,$(TARGETTYPE)),&& if [ -f $(WORKDIR)/LinkTarget/$(2).manifest ]; then mt.exe $(MTFLAGS) -nologo -manifest $(WORKDIR)/LinkTarget/$(2).manifest $(SRCDIR)/solenv/gbuild/platform/win_compatibility.manifest -outputresource:$(1)\;2 && touch -r $(1) $(WORKDIR)/LinkTarget/$(2).manifest $(ILIBTARGET); fi) \
 	$(if $(filter Executable,$(TARGETTYPE)),&& if [ -f $(WORKDIR)/LinkTarget/$(2).manifest ]; then mt.exe $(MTFLAGS) -nologo -manifest $(WORKDIR)/LinkTarget/$(2).manifest $(SRCDIR)/solenv/gbuild/platform/win_compatibility.manifest -outputresource:$(1)\;1 && touch -r $(1) $(WORKDIR)/LinkTarget/$(2).manifest; fi) \
 	$(if $(filter Executable,$(TARGETTYPE)),&& mt.exe $(MTFLAGS) -nologo -manifest $(SRCDIR)/solenv/gbuild/platform/DeclareDPIAware.manifest -updateresource:$(1)\;1 ) \
 	$(if $(filter Library,$(TARGETTYPE)),&& \
 		echo $(notdir $(1)) > $(WORKDIR)/LinkTarget/$(2).exports.tmp && \
-		$(gb_LINK) \
-			-dump -exports $(ILIBTARGET) \
+		$(gb_DUMPBIN) \
+			-exports $(ILIBTARGET) \
 			>> $(WORKDIR)/LinkTarget/$(2).exports.tmp && \
 		$(call gb_Helper_replace_if_different_and_touch,$(WORKDIR)/LinkTarget/$(2).exports.tmp,$(WORKDIR)/LinkTarget/$(2).exports,$(1))) \
 	; \
@@ -380,7 +393,7 @@ gb_Library_FILENAMES :=\
 # An assembly is a special kind of library for CLI
 define gb_Library_Assembly
 $(call gb_Library_Library,$(1))
-$(call gb_LinkTarget_get_target,$(call gb_Library_get_linktarget,$(1))) : NATIVERES :=
+$(call gb_Library_get_linktarget_target,$(1)) : NATIVERES :=
 
 endef
 
@@ -687,7 +700,7 @@ endif
 # use responsefile because cui has too many files for command line
 define gb_UIConfig__command
 $(call gb_Helper_abbreviate_dirs,\
-	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),100,$(if $(UI_IMAGELISTS),$(strip $(UI_IMAGELISTS)),/dev/null)) \
+	RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),$(if $(UI_IMAGELISTS),$(strip $(UI_IMAGELISTS)),/dev/null)) \
 	&& tr " " "\000" < $$RESPONSEFILE | tr -d "\r\n" > $$RESPONSEFILE.0 \
 	&& $(SORT) -u --files0-from=$$RESPONSEFILE.0 > $@ \
 	&& rm $$RESPONSEFILE $$RESPONSEFILE.0 \
@@ -699,10 +712,11 @@ endef
 define gb_UIConfig__gla11y_command
 $(call gb_ExternalExecutale__check_registration,python)
 $(call gb_Helper_abbreviate_dirs,\
-	FILES=$(call gb_var2file,$(shell $(gb_MKTEMP)),100,$(UIFILES)) && \
+	FILES=$(call gb_var2file,$(shell $(gb_MKTEMP)),$(UIFILES)) && \
 	$(gb_UIConfig_LXML_PATH) $(if $(SYSTEM_LIBXML)$(SYSTEM_LIBXSLT),,$(gb_Helper_set_ld_path)) \
 	$(call gb_ExternalExecutable_get_command,python) \
-	$(gb_UIConfig_gla11y_SCRIPT) $(gb_UIConfig_gla11y_PARAMETERS) -o $@ -L $$FILES
+	$(gb_UIConfig_gla11y_SCRIPT) $(gb_UIConfig_gla11y_PARAMETERS) -o $@ -L $$FILES && \
+	rm $$FILES
 )
 
 endef

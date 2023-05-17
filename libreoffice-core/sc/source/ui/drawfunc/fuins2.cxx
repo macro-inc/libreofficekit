@@ -41,7 +41,8 @@
 #include <sfx2/msg.hxx>
 #include <scmod.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <vcl/weldutils.hxx>
 
 #include <comphelper/lok.hxx>
 #include <comphelper/storagehelper.hxx>
@@ -51,7 +52,6 @@
 #include <com/sun/star/chart2/data/XDataReceiver.hpp>
 #include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/ui/dialogs/XAsynchronousExecutableDialog.hpp>
-#include <com/sun/star/ui/dialogs/XDialogClosedListener.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/chart/ChartDataRowSource.hpp>
@@ -183,16 +183,16 @@ void lcl_ChartInit(const uno::Reference <embed::XEmbeddedObject>& xObj, ScViewDa
     uno::Sequence< beans::PropertyValue > aArgs{
         beans::PropertyValue(
             "CellRangeRepresentation", -1,
-            uno::makeAny( aRangeString ), beans::PropertyState_DIRECT_VALUE ),
+            uno::Any( aRangeString ), beans::PropertyState_DIRECT_VALUE ),
         beans::PropertyValue(
             "HasCategories", -1,
-            uno::makeAny( bHasCategories ), beans::PropertyState_DIRECT_VALUE ),
+            uno::Any( bHasCategories ), beans::PropertyState_DIRECT_VALUE ),
         beans::PropertyValue(
             "FirstCellAsLabel", -1,
-            uno::makeAny( bFirstCellAsLabel ), beans::PropertyState_DIRECT_VALUE ),
+            uno::Any( bFirstCellAsLabel ), beans::PropertyState_DIRECT_VALUE ),
         beans::PropertyValue(
             "DataRowSource", -1,
-            uno::makeAny( eDataRowSource ), beans::PropertyState_DIRECT_VALUE )
+            uno::Any( eDataRowSource ), beans::PropertyState_DIRECT_VALUE )
     };
 
     try
@@ -343,13 +343,13 @@ FuInsertOLE::FuInsertOLE(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawView*
             if ( rData.GetDocument().IsNegativePage( rData.GetTabNo() ) )
                 aPnt.AdjustX( -(aSize.Width()) );      // move position to left edge
             tools::Rectangle aRect (aPnt, aSize);
-            SdrOle2Obj* pObj = new SdrOle2Obj(
+            rtl::Reference<SdrOle2Obj> pObj = new SdrOle2Obj(
                 *pDoc, // TTTT should be reference
                 aObjRef,
                 aName,
                 aRect);
             SdrPageView* pPV = pView->GetSdrPageView();
-            bool bSuccess = pView->InsertObjectAtView(pObj, *pPV);
+            bool bSuccess = pView->InsertObjectAtView(pObj.get(), *pPV);
 
             if (bSuccess && nAspect != embed::Aspects::MSOLE_ICON)
             {
@@ -384,7 +384,7 @@ FuInsertOLE::FuInsertOLE(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawView*
                 }
                 else if (bSuccess)
                 {
-                    rViewShell.ActivateObject(pObj, embed::EmbedVerbs::MS_OLEVERB_SHOW);
+                    rViewShell.ActivateObject(pObj.get(), embed::EmbedVerbs::MS_OLEVERB_SHOW);
                 }
             }
 
@@ -584,7 +584,7 @@ FuInsertChart::FuInsertChart(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawV
     Point aStart = rViewSh.GetChartInsertPos( aSize, aPositionRange );
 
     tools::Rectangle aRect (aStart, aSize);
-    SdrOle2Obj* pObj = new SdrOle2Obj(
+    rtl::Reference<SdrOle2Obj> pObj = new SdrOle2Obj(
         *pDoc, // TTTT should be reference
         svt::EmbeddedObjectRef(xObj, nAspect),
         aName,
@@ -599,9 +599,9 @@ FuInsertChart::FuInsertChart(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawV
 
     // use the page instead of the view to insert, so no undo action is created yet
     SdrPage* pPage = pPV->GetPage();
-    pPage->InsertObject( pObj );
+    pPage->InsertObject( pObj.get() );
     pView->UnmarkAllObj();
-    pView->MarkObj( pObj, pPV );
+    pView->MarkObj( pObj.get(), pPV );
 
     if (rReq.IsAPI())
     {
@@ -614,7 +614,7 @@ FuInsertChart::FuInsertChart(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawV
 
         // only activate object if not called via API (e.g. macro)
         if (!comphelper::LibreOfficeKit::isActive())
-            rViewShell.ActivateObject(pObj, embed::EmbedVerbs::MS_OLEVERB_SHOW);
+            rViewShell.ActivateObject(pObj.get(), embed::EmbedVerbs::MS_OLEVERB_SHOW);
 
         //open wizard
         //@todo get context from calc if that has one
@@ -632,9 +632,11 @@ FuInsertChart::FuInsertChart(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawV
                 uno::Reference< lang::XInitialization > xInit( xDialog, uno::UNO_QUERY );
                 if( xChartModel.is() && xInit.is() )
                 {
+                    css::uno::Reference< css::awt::XWindow > xParent
+                        = new weld::TransportAsXWindow(pWin->GetFrameWeld());
                     uno::Sequence<uno::Any> aSeq(comphelper::InitAnyPropertySequence(
                     {
-                        {"ParentWindow", uno::Any(uno::Reference< awt::XWindow >())},
+                        {"ParentWindow", uno::Any(xParent)},
                         {"ChartModel", uno::Any(xChartModel)}
                     }));
                     xInit->initialize( aSeq );
@@ -656,12 +658,12 @@ FuInsertChart::FuInsertChart(ScTabViewShell& rViewSh, vcl::Window* pWin, ScDrawV
                                     //calculate and set new position
                                     Point aDialogPos = rViewShell.GetChartDialogPos( aDialogSize, aRect );
                                     xDialogProps->setPropertyValue("Position",
-                                        uno::makeAny( awt::Point(aDialogPos.getX(),aDialogPos.getY()) ) );
+                                        uno::Any( awt::Point(aDialogPos.getX(),aDialogPos.getY()) ) );
                                 }
                             }
                             //tell the dialog to unlock controller
                             xDialogProps->setPropertyValue("UnlockControllersOnExecute",
-                                        uno::makeAny( true ) );
+                                        uno::Any( true ) );
 
                         }
                         catch( uno::Exception& )

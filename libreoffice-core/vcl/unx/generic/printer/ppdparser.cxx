@@ -22,9 +22,11 @@
 #include <stdlib.h>
 
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <ppdparser.hxx>
 #include <strhelper.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 
@@ -92,42 +94,42 @@ namespace psp
         PPDTranslator() {}
 
         void insertValue(
-            const OUString& i_rKey,
-            const OUString& i_rOption,
-            const OUString& i_rValue,
+            std::u16string_view i_rKey,
+            std::u16string_view i_rOption,
+            std::u16string_view i_rValue,
             const OUString& i_rTranslation,
             const css::lang::Locale& i_rLocale
             );
 
-        void insertOption( const OUString& i_rKey,
-                           const OUString& i_rOption,
+        void insertOption( std::u16string_view i_rKey,
+                           std::u16string_view i_rOption,
                            const OUString& i_rTranslation,
                            const css::lang::Locale& i_rLocale )
         {
-            insertValue( i_rKey, i_rOption, OUString(), i_rTranslation, i_rLocale );
+            insertValue( i_rKey, i_rOption, u"", i_rTranslation, i_rLocale );
         }
 
-        void insertKey( const OUString& i_rKey,
+        void insertKey( std::u16string_view i_rKey,
                         const OUString& i_rTranslation,
                         const css::lang::Locale& i_rLocale = css::lang::Locale() )
         {
-            insertValue( i_rKey, OUString(), OUString(), i_rTranslation, i_rLocale );
+            insertValue( i_rKey, u"", u"", i_rTranslation, i_rLocale );
         }
 
         OUString translateValue(
-            const OUString& i_rKey,
-            const OUString& i_rOption
+            std::u16string_view i_rKey,
+            std::u16string_view i_rOption
             ) const;
 
-        OUString translateOption( const OUString& i_rKey,
-                                       const OUString& i_rOption ) const
+        OUString translateOption( std::u16string_view i_rKey,
+                                       std::u16string_view i_rOption ) const
         {
             return translateValue( i_rKey, i_rOption  );
         }
 
-        OUString translateKey( const OUString& i_rKey ) const
+        OUString translateKey( std::u16string_view i_rKey ) const
         {
-            return translateValue( i_rKey, OUString() );
+            return translateValue( i_rKey, u"" );
         }
     };
 
@@ -165,21 +167,21 @@ namespace psp
     }
 
     void PPDTranslator::insertValue(
-        const OUString& i_rKey,
-        const OUString& i_rOption,
-        const OUString& i_rValue,
+        std::u16string_view i_rKey,
+        std::u16string_view i_rOption,
+        std::u16string_view i_rValue,
         const OUString& i_rTranslation,
         const css::lang::Locale& i_rLocale
         )
     {
-        OUStringBuffer aKey( i_rKey.getLength() + i_rOption.getLength() + i_rValue.getLength() + 2 );
+        OUStringBuffer aKey( i_rKey.size() + i_rOption.size() + i_rValue.size() + 2 );
         aKey.append( i_rKey );
-        if( !i_rOption.isEmpty() || !i_rValue.isEmpty() )
+        if( !i_rOption.empty() || !i_rValue.empty() )
         {
             aKey.append( ':' );
             aKey.append( i_rOption );
         }
-        if( !i_rValue.isEmpty() )
+        if( !i_rValue.empty() )
         {
             aKey.append( ':' );
             aKey.append( i_rValue );
@@ -197,15 +199,15 @@ namespace psp
     }
 
     OUString PPDTranslator::translateValue(
-        const OUString& i_rKey,
-        const OUString& i_rOption
+        std::u16string_view i_rKey,
+        std::u16string_view i_rOption
         ) const
     {
         OUString aResult;
 
-        OUStringBuffer aKey( i_rKey.getLength() + i_rOption.getLength() + 2 );
+        OUStringBuffer aKey( i_rKey.size() + i_rOption.size() + 2 );
         aKey.append( i_rKey );
-        if( !i_rOption.isEmpty() )
+        if( !i_rOption.empty() )
         {
             aKey.append( ':' );
             aKey.append( i_rOption );
@@ -591,8 +593,8 @@ const PPDParser* PPDParser::getParser( const OUString& rFile )
     return pNewParser;
 }
 
-PPDParser::PPDParser(const OUString& rFile, const std::vector<PPDKey*>& keys)
-    : m_aFile(rFile)
+PPDParser::PPDParser(OUString aFile, const std::vector<PPDKey*>& keys)
+    : m_aFile(std::move(aFile))
     , m_bColorDevice(false)
     , m_bType42Capable(false)
     , m_nLanguageLevel(0)
@@ -697,8 +699,8 @@ PPDParser::PPDParser(const OUString& rFile, const std::vector<PPDKey*>& keys)
         m_bColorDevice = pKey->countValues() > 1;
 }
 
-PPDParser::PPDParser( const OUString& rFile ) :
-        m_aFile( rFile ),
+PPDParser::PPDParser( OUString aFile ) :
+        m_aFile(std::move( aFile )),
         m_bColorDevice( false ),
         m_bType42Capable( false ),
         m_nLanguageLevel( 0 ),
@@ -936,7 +938,7 @@ OUString PPDParser::handleTranslation(const OString& i_rString, bool bIsGlobaliz
         else
             aTrans.append( *pStr++ );
     }
-    return OStringToOUString( aTrans.makeStringAndClear(), bIsGlobalized ? RTL_TEXTENCODING_UTF8 : m_aFileEncoding );
+    return OStringToOUString( aTrans, bIsGlobalized ? RTL_TEXTENCODING_UTF8 : m_aFileEncoding );
 }
 
 namespace
@@ -1243,7 +1245,7 @@ void PPDParser::parse( ::std::vector< OString >& rLines )
             {
                 aKey = aKey.copy(0, nPos);
                 OUString aOption(OStringToOUString(
-                    WhitespaceToSpace(aLine.copy(nPos+9)),
+                    WhitespaceToSpace(aLine.subView(nPos+9)),
                     RTL_TEXTENCODING_MS_1252));
                 keyit = m_aKeys.find( aKey );
                 if( keyit != m_aKeys.end() )
@@ -1464,7 +1466,7 @@ bool PPDParser::getPaperDimension(
     return true;
 }
 
-OUString PPDParser::matchPaper( int nWidth, int nHeight ) const
+OUString PPDParser::matchPaperImpl(int nWidth, int nHeight, bool bSwaped, psp::orientation* pOrientation) const
 {
     if( ! m_pPaperDimensions )
         return OUString();
@@ -1495,17 +1497,34 @@ OUString PPDParser::matchPaper( int nWidth, int nHeight ) const
         }
     }
 
-    static bool bDontSwap = false;
-    if( nPDim == -1 && ! bDontSwap )
+    if (nPDim == -1 && !bSwaped)
     {
         // swap portrait/landscape and try again
-        bDontSwap = true;
-        OUString rRet = matchPaper( nHeight, nWidth );
-        bDontSwap = false;
-        return rRet;
+        return matchPaperImpl(nHeight, nWidth, true, pOrientation);
     }
 
-    return nPDim != -1 ? m_pPaperDimensions->getValue( nPDim )->m_aOption : OUString();
+    if (nPDim == -1)
+        return OUString();
+
+    if (bSwaped && pOrientation)
+    {
+        switch (*pOrientation)
+        {
+            case psp::orientation::Portrait:
+                *pOrientation = psp::orientation::Landscape;
+            break;
+            case psp::orientation::Landscape:
+                *pOrientation = psp::orientation::Portrait;
+            break;
+        }
+    }
+
+    return m_pPaperDimensions->getValue( nPDim )->m_aOption;
+}
+
+OUString PPDParser::matchPaper(int nWidth, int nHeight, psp::orientation* pOrientation) const
+{
+    return matchPaperImpl(nHeight, nWidth, true, pOrientation);
 }
 
 OUString PPDParser::getDefaultInputSlot() const
@@ -1515,23 +1534,22 @@ OUString PPDParser::getDefaultInputSlot() const
     return OUString();
 }
 
-void PPDParser::getResolutionFromString(
-                                        const OUString& rString,
+void PPDParser::getResolutionFromString(std::u16string_view rString,
                                         int& rXRes, int& rYRes )
 {
     rXRes = rYRes = 300;
 
-    const sal_Int32 nDPIPos {rString.indexOf( "dpi" )};
-    if( nDPIPos != -1 )
+    const size_t nDPIPos {rString.find( u"dpi" )};
+    if( nDPIPos != std::u16string_view::npos )
     {
-        const sal_Int32 nPos {rString.indexOf( 'x' )};
-        if( nPos >=0 )
+        const size_t nPos {rString.find( 'x' )};
+        if( nPos != std::u16string_view::npos )
         {
-            rXRes = rString.copy( 0, nPos ).toInt32();
-            rYRes = rString.copy(nPos+1, nDPIPos - nPos - 1).toInt32();
+            rXRes = o3tl::toInt32(rString.substr( 0, nPos ));
+            rYRes = o3tl::toInt32(rString.substr(nPos+1, nDPIPos - nPos - 1));
         }
         else
-            rXRes = rYRes = rString.copy( 0, nDPIPos ).toInt32();
+            rXRes = rYRes = o3tl::toInt32(rString.substr( 0, nDPIPos ));
     }
 }
 
@@ -1555,7 +1573,7 @@ OUString PPDParser::translateKey( const OUString& i_rKey ) const
     return aResult;
 }
 
-OUString PPDParser::translateOption( const OUString& i_rKey,
+OUString PPDParser::translateOption( std::u16string_view i_rKey,
                                           const OUString& i_rOption ) const
 {
     OUString aResult( m_pTranslator->translateOption( i_rKey, i_rOption ) );
@@ -1568,8 +1586,8 @@ OUString PPDParser::translateOption( const OUString& i_rKey,
  *  PPDKey
  */
 
-PPDKey::PPDKey( const OUString& rKey ) :
-        m_aKey( rKey ),
+PPDKey::PPDKey( OUString aKey ) :
+        m_aKey(std::move( aKey )),
         m_pDefaultValue( nullptr ),
         m_bQueryValue( false ),
         m_bUIOption( false ),
@@ -1627,6 +1645,7 @@ PPDValue* PPDKey::insertValue(const OUString& rOption, PPDValueType eType, bool 
     PPDValue aValue;
     aValue.m_aOption = rOption;
     aValue.m_bCustomOption = bCustomOption;
+    aValue.m_bCustomOptionSetViaApp = false;
     aValue.m_eType = eType;
     m_aValues[ rOption ] = aValue;
     PPDValue* pValue = &m_aValues[rOption];

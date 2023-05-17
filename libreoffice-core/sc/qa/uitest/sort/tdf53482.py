@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -27,7 +29,7 @@ class tdf53482(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 select_pos(xTabs, "1")
                 #3. On Options tab, tick 'Range contains column labels'
-                xHeader = xDialog.getChild("header")
+                xHeader = xDialog.getChild("cbHeader")
                 xHeader.executeAction("CLICK", tuple())
                 if (get_state_as_dict(xHeader)["Selected"]) == "false":
                     xHeader.executeAction("CLICK", tuple())
@@ -58,14 +60,13 @@ class tdf53482(UITestCase):
             #2. Click Data menu, Sort
             with self.ui_test.execute_dialog_through_command(".uno:DataSort") as xDialog:
                 xTabs = xDialog.getChild("tabcontrol")
-                select_pos(xTabs, "1")
+                select_pos(xTabs, "0")
                 #3. On Options tab, tick 'Range contains column labels'
-                xHeader = xDialog.getChild("header")
+                xHeader = xDialog.getChild("cbHeader")
                 xHeader.executeAction("CLICK", tuple())
                 if (get_state_as_dict(xHeader)["Selected"]) == "false":
                     xHeader.executeAction("CLICK", tuple())
                 #4. On Sort Criteria tab, set appropriate criteria
-                select_pos(xTabs, "0")
                 xDown = xDialog.getChild("down")
                 xDown.executeAction("CLICK", tuple())
                 #5. Click Ok

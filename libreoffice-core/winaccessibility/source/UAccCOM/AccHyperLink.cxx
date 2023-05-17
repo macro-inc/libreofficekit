@@ -18,16 +18,8 @@
  */
 
 #include "stdafx.h"
-#include "AccHyperLink.h"
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
+#include "AccHyperLink.h"
 
 #include <vcl/svapp.hxx>
 
@@ -115,7 +107,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_anchor(/* [in] */ long inde
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(anchor == nullptr)
@@ -134,7 +126,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_anchor(/* [in] */ long inde
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -147,7 +139,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_anchorTarget(/* [in] */ lon
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(anchorTarget == nullptr)
@@ -166,7 +158,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_anchorTarget(/* [in] */ lon
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 
@@ -179,7 +171,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_startIndex(/* [retval][out]
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(index == nullptr)
@@ -190,7 +182,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_startIndex(/* [retval][out]
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -202,7 +194,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_endIndex(/* [retval][out] *
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(index == nullptr)
@@ -218,7 +210,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_endIndex(/* [retval][out] *
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -230,7 +222,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_valid(/* [retval][out] */ b
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if(valid == nullptr)
@@ -246,7 +238,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::get_valid(/* [retval][out] */ b
 
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -258,7 +250,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::put_XInterface(hyper pXInterfac
 {
     // internal IUNOXWrapper - no mutex meeded
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     CAccActionBase::put_XInterface(pXInterface);
     //special query.
@@ -279,7 +271,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccHyperLink::put_XInterface(hyper pXInterfac
     }
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**

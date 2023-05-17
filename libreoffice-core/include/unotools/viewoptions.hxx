@@ -23,7 +23,6 @@
 #include <com/sun/star/uno/Sequence.hxx>
 #include <sal/types.h>
 #include <rtl/ustring.hxx>
-#include <unotools/options.hxx>
 
 namespace com::sun::star::beans { struct NamedValue; }
 namespace com::sun::star::container { class XNameAccess; }
@@ -114,8 +113,7 @@ class SAL_WARN_UNUSED UNOTOOLS_DLLPUBLIC SvtViewOptions final
             @onerror    An assertion is thrown in debug version. Otherwise we do nothing!
         *//*-*****************************************************************************************************/
 
-         SvtViewOptions(       EViewType        eType     ,
-                         const OUString& sViewName );
+         SvtViewOptions( EViewType eType, OUString sViewName );
 
         //  interface
 

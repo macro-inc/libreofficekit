@@ -29,14 +29,15 @@
 #include <tools/long.hxx>
 
 /* gzip flag byte */
-//      GZ_ASCII_FLAG   0x01 /* bit 0 set: file probably ascii text */
-#define GZ_HEAD_CRC     0x02 /* bit 1 set: header CRC present */
-#define GZ_EXTRA_FIELD  0x04 /* bit 2 set: extra field present */
-#define GZ_ORIG_NAME    0x08 /* bit 3 set: original file name present */
-#define GZ_COMMENT      0x10 /* bit 4 set: file comment present */
-#define GZ_RESERVED     0xE0 /* bits 5..7: reserved */
-
-const int gz_magic[2] = { 0x1f, 0x8b }; /* gzip magic header */
+//                   GZ_ASCII_FLAG     = 0x01;   /* bit 0 set: file probably ascii text */
+constexpr sal_uInt8  GZ_HEAD_CRC       = 0x02;   /* bit 1 set: header CRC present */
+constexpr sal_uInt8  GZ_EXTRA_FIELD    = 0x04;   /* bit 2 set: extra field present */
+constexpr sal_uInt8  GZ_ORIG_NAME      = 0x08;   /* bit 3 set: original file name present */
+constexpr sal_uInt8  GZ_COMMENT        = 0x10;   /* bit 4 set: file comment present */
+constexpr sal_uInt8  GZ_RESERVED       = 0xE0;   /* bits 5..7: reserved */
+constexpr sal_uInt16 GZ_MAGIC_BYTES_LE = 0x8B1F; /* gzip magic bytes, little endian */
+constexpr sal_uInt8  GZ_DEFLATE        = 0x08;
+constexpr sal_uInt8  GZ_FS_UNKNOWN     = 0xFF;
 
 ZCodec::ZCodec( size_t nInBufSize, size_t nOutBufSize )
     : meState(STATE_INIT)
@@ -46,6 +47,9 @@ ZCodec::ZCodec( size_t nInBufSize, size_t nOutBufSize )
     , mnInToRead(0)
     , mpOStm(nullptr)
     , mnOutBufSize(nOutBufSize)
+    , mnUncompressedSize(0)
+    , mnInBufCRC32(0)
+    , mnLastModifiedTime(0)
     , mnCompressLevel(0)
     , mbGzLib(false)
 {
@@ -56,6 +60,16 @@ ZCodec::~ZCodec()
 {
     auto pStream = static_cast<z_stream*>(mpsC_Stream);
     delete pStream;
+}
+
+bool ZCodec::IsZCompressed( SvStream& rIStm )
+{
+    sal_uInt64 nCurPos = rIStm.Tell();
+    rIStm.Seek( 0 );
+    sal_uInt16 nFirstTwoBytes = 0;
+    rIStm.ReadUInt16( nFirstTwoBytes );
+    rIStm.Seek( nCurPos );
+    return nFirstTwoBytes == GZ_MAGIC_BYTES_LE;
 }
 
 void ZCodec::BeginCompression( int nCompressLevel, bool gzLib )
@@ -99,6 +113,25 @@ tools::Long ZCodec::EndCompression()
 
             retvalue = pStream->total_in;
             deflateEnd( pStream );
+            if ( mbGzLib )
+            {
+                // metadata must be set to compress as gz format
+                assert(!msFilename.isEmpty());
+                // overwrite zlib checksum
+                mpOStm->Seek(STREAM_SEEK_TO_END);
+                mpOStm->SeekRel(-4);
+                mpOStm->WriteUInt32( mnInBufCRC32 );       // Uncompressed buffer CRC32
+                mpOStm->WriteUInt32( mnUncompressedSize ); // Uncompressed size mod 2^32
+                mpOStm->Seek( 0 );
+                mpOStm->WriteUInt16( GZ_MAGIC_BYTES_LE )   // Magic bytes
+                        .WriteUInt8( GZ_DEFLATE )          // Compression algorithm
+                        .WriteUInt8( GZ_ORIG_NAME )        // Filename
+                        .WriteUInt32( mnLastModifiedTime ) // Modification time
+                        .WriteUInt8( 0 )                   // Extra flags
+                        .WriteUInt8( GZ_FS_UNKNOWN )       // Operating system
+                        .WriteBytes( msFilename.pData->buffer, msFilename.pData->length );
+                mpOStm->WriteUInt8( 0 ); // null terminate the filename string
+            }
         }
         else
         {
@@ -112,10 +145,20 @@ tools::Long ZCodec::EndCompression()
     return mbStatus ? retvalue : -1;
 }
 
+void ZCodec::SetCompressionMetadata( const OString& sFilename, sal_uInt32 nLastModifiedTime, sal_uInt32 nInBufCRC32 )
+{
+    assert( mbGzLib );
+    msFilename = sFilename;
+    mnLastModifiedTime = nLastModifiedTime;
+    mnInBufCRC32 = nInBufCRC32;
+}
+
 void ZCodec::Compress( SvStream& rIStm, SvStream& rOStm )
 {
     assert(meState == STATE_INIT);
     mpOStm = &rOStm;
+    rIStm.Seek(0);
+    mnUncompressedSize = rIStm.TellEnd();
     InitCompress();
     mpInBuf.reset(new sal_uInt8[ mnInBufSize ]);
     auto pStream = static_cast<z_stream*>(mpsC_Stream);
@@ -255,6 +298,14 @@ void ZCodec::ImplWriteBack()
 void ZCodec::InitCompress()
 {
     assert(meState == STATE_INIT);
+    if (mbGzLib)
+    {
+        // Seek just enough so that the zlib header is overwritten after compression
+        // with the gz header
+        // 10 header bytes + filename length + null terminator - 2 bytes for
+        // zlib header that gets overwritten
+        mpOStm->Seek(10 + msFilename.getLength() + 1 - 2);
+    }
     meState = STATE_COMPRESS;
     auto pStream = static_cast<z_stream*>(mpsC_Stream);
     mbStatus = deflateInit2_(
@@ -272,12 +323,11 @@ void ZCodec::InitDecompress(SvStream & inStream)
     if ( mbStatus &&  mbGzLib )
     {
         sal_uInt8 j, nMethod, nFlags;
-        for (int i : gz_magic)   // gz - magic number
-        {
-            inStream.ReadUChar( j );
-            if ( j != i )
-                mbStatus = false;
-        }
+        sal_uInt16 nFirstTwoBytes;
+        inStream.Seek( 0 );
+        inStream.ReadUInt16( nFirstTwoBytes );
+        if ( nFirstTwoBytes != GZ_MAGIC_BYTES_LE )
+            mbStatus = false;
         inStream.ReadUChar( nMethod );
         inStream.ReadUChar( nFlags );
         if ( nMethod != Z_DEFLATED )

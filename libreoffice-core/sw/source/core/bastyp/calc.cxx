@@ -24,7 +24,6 @@
 #include <cfloat>
 #include <climits>
 #include <memory>
-#include <string_view>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/string.hxx>
 #include <cstdlib>
@@ -43,13 +42,13 @@
 #include <shellres.hxx>
 #include <svl/numformat.hxx>
 #include <svl/languageoptions.hxx>
-#include <svl/zforlist.hxx>
 #include <swmodule.hxx>
 #include <swtypes.hxx>
 #include <unotools/charclass.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <unotools/useroptions.hxx>
 #include <usrfld.hxx>
+#include <utility>
 #include <viewsh.hxx>
 #include <com/sun/star/i18n/KParseTokens.hpp>
 #include <com/sun/star/i18n/KParseType.hpp>
@@ -90,6 +89,7 @@ const char sCalc_Average[] = "average";
 const char sCalc_Count[]=   "count";
 const char sCalc_Sign[] =   "sign";
 const char sCalc_Abs[]  =   "abs";
+const char sCalc_Int[]  =   "int";
 
 // ATTENTION: sorted list of all operators
 struct CalcOp
@@ -116,6 +116,7 @@ CalcOp const aOpTable[] = {
 /* EQ */      {{sCalc_Eq},         CALC_EQ},    // Equality
 /* G */       {{sCalc_G},          CALC_GRE},   // Greater than
 /* GEQ */     {{sCalc_Geq},        CALC_GEQ},   // Greater or equal
+/* INT */     {{sCalc_Int},        CALC_INT},   // Int (since LibreOffice 7.4)
 /* L */       {{sCalc_L},          CALC_LES},   // Less than
 /* LEQ */     {{sCalc_Leq},        CALC_LEQ},   // Less or equal
 /* MAX */     {{sCalc_Max},        CALC_MAX},   // Maximum value
@@ -194,12 +195,13 @@ CalcOp* FindOperator( const OUString& rSrch )
                               OperatorCompare ));
 }
 
-static LanguageType GetDocAppScriptLang( SwDoc const & rDoc )
+// static
+LanguageType SwCalc::GetDocAppScriptLang( SwDoc const & rDoc )
 {
-    return static_cast<const SvxLanguageItem&>(rDoc.GetDefault(
+    TypedWhichId<SvxLanguageItem> nWhich =
                GetWhichOfScript( RES_CHRATR_LANGUAGE,
-                                 SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ))
-            )).GetLanguage();
+                                 SvtLanguageOptions::GetI18NScriptTypeOfLanguage( GetAppLanguage() ));
+    return rDoc.GetDefault(nWhich).GetLanguage();
 }
 
 static double lcl_ConvertToDateValue( SwDoc& rDoc, sal_Int32 nDate )
@@ -235,7 +237,7 @@ SwCalc::SwCalc( SwDoc& rD )
     {
         m_pCharClass = new CharClass( ::comphelper::getProcessComponentContext(), aLanguageTag );
     }
-    m_xLocaleDataWrapper.reset(new LocaleDataWrapper( aLanguageTag ));
+    m_xLocaleDataWrapper.reset(new LocaleDataWrapper( std::move(aLanguageTag) ));
 
     m_sCurrSym = comphelper::string::strip(m_xLocaleDataWrapper->getCurrSymbol(), ' ');
     m_sCurrSym  = m_pCharClass->lowercase( m_sCurrSym );
@@ -324,7 +326,7 @@ SwCalc::SwCalc( SwDoc& rD )
     m_aVarTable[ aHashValue[ 0 ] ]->nValue.PutBool( false );
     m_aVarTable[ aHashValue[ 1 ] ]->nValue.PutBool( true );
     m_aVarTable[ aHashValue[ 2 ] ]->nValue.PutDouble( M_PI );
-    m_aVarTable[ aHashValue[ 3 ] ]->nValue.PutDouble( 2.7182818284590452354 );
+    m_aVarTable[ aHashValue[ 3 ] ]->nValue.PutDouble( M_E );
 
     for( n = 0; n < 3; ++n )
         m_aVarTable[ aHashValue[ n + 4 ] ]->nValue.PutLong( rDocStat.*aDocStat1[ n ]  );
@@ -347,10 +349,15 @@ SwCalc::SwCalc( SwDoc& rD )
 
 } // SwCalc::SwCalc
 
-SwCalc::~SwCalc() COVERITY_NOEXCEPT_FALSE
+void SwCalc::ImplDestroy()
 {
     if( m_pCharClass != &GetAppCharClass() )
         delete m_pCharClass;
+}
+
+SwCalc::~SwCalc()
+{
+    suppress_fun_call_w_exception(ImplDestroy());
 }
 
 SwSbxValue SwCalc::Calculate( const OUString& rStr )
@@ -423,7 +430,7 @@ SwCalcExp* SwCalc::VarLook( const OUString& rStr, bool bIns )
 {
     m_aErrExpr.nValue.SetVoidValue(false);
 
-    sal_uInt16 ii = 0;
+    sal_uInt32 ii = 0;
     OUString aStr = m_pCharClass->lowercase( rStr );
 
     SwCalcExp* pFnd = m_aVarTable.Find(aStr, &ii);
@@ -591,7 +598,7 @@ void SwCalc::VarChange( const OUString& rStr, const SwSbxValue& rValue )
 {
     OUString aStr = m_pCharClass->lowercase( rStr );
 
-    sal_uInt16 nPos = 0;
+    sal_uInt32 nPos = 0;
     SwCalcExp* pFnd = m_aVarTable.Find( aStr, &nPos );
 
     if( !pFnd )
@@ -713,9 +720,9 @@ SwCalcOper SwCalc::GetToken()
         }
         else if( aRes.TokenType & KParseType::ONE_SINGLE_CHAR )
         {
-            OUString aName( m_sCommand.copy( nRealStt,
+            std::u16string_view aName( m_sCommand.subView( nRealStt,
                               aRes.EndPos - nRealStt ));
-            if( 1 == aName.getLength() )
+            if( 1 == aName.size() )
             {
                 bSetError = false;
                 sal_Unicode ch = aName[0];
@@ -819,9 +826,9 @@ SwCalcOper SwCalc::GetToken()
         }
         else if( aRes.TokenType & KParseType::BOOLEAN )
         {
-            OUString aName( m_sCommand.copy( nRealStt,
+            std::u16string_view aName( m_sCommand.subView( nRealStt,
                                          aRes.EndPos - nRealStt ));
-            if( !aName.isEmpty() )
+            if( !aName.empty() )
             {
                 sal_Unicode ch = aName[0];
 
@@ -833,9 +840,9 @@ SwCalcOper SwCalc::GetToken()
                     SwCalcOper eTmp2 = ('<' == ch) ? CALC_LEQ : CALC_GEQ;
                     m_eCurrOper = ('<' == ch) ? CALC_LES : CALC_GRE;
 
-                    if( 2 == aName.getLength() && '=' == aName[1] )
+                    if( 2 == aName.size() && '=' == aName[1] )
                         m_eCurrOper = eTmp2;
-                    else if( 1 != aName.getLength() )
+                    else if( 1 != aName.size() )
                         bSetError = true;
                 }
             }
@@ -1084,6 +1091,15 @@ SwSbxValue SwCalc::PrimFunc(bool &rChkPow)
             GetToken();
             double nVal = Prim().GetDouble();
             nErg.PutDouble( int(0 < nVal) - int(nVal < 0) );
+            return nErg;
+        }
+        case CALC_INT:
+        {
+            SAL_INFO("sw.calc", "int");
+            SwSbxValue nErg;
+            GetToken();
+            sal_Int32 nVal = static_cast<sal_Int32>( Prim().GetDouble() );
+            nErg.PutDouble( nVal );
             return nErg;
         }
         case CALC_NOT:
@@ -1338,15 +1354,15 @@ OUString SwCalc::GetColumnName(const OUString& rName)
     return rName;
 }
 
-OUString SwCalc::GetDBName(const OUString& rName)
+OUString SwCalc::GetDBName(std::u16string_view rName)
 {
-    sal_Int32 nPos = rName.indexOf(DB_DELIM);
-    if( -1 != nPos )
+    size_t nPos = rName.find(DB_DELIM);
+    if( std::u16string_view::npos != nPos )
     {
-        nPos = rName.indexOf(DB_DELIM, nPos + 1);
+        nPos = rName.find(DB_DELIM, nPos + 1);
 
-        if( -1 != nPos )
-            return rName.copy( 0, nPos );
+        if( std::u16string_view::npos != nPos )
+            return OUString(rName.substr( 0, nPos ));
     }
     SwDBData aData = m_rDoc.GetDBData();
     return aData.sDataSource + OUStringChar(DB_DELIM) + aData.sCommand;
@@ -1426,8 +1442,8 @@ bool SwCalc::IsValidVarName( const OUString& rStr, OUString* pValidName )
     return bRet;
 }
 
-SwHash::SwHash(const OUString& rStr)
-    : aStr(rStr)
+SwHash::SwHash(OUString _aStr)
+    : aStr(std::move(_aStr))
 {
 }
 
@@ -1435,10 +1451,10 @@ SwHash::~SwHash()
 {
 }
 
-SwCalcExp::SwCalcExp(const OUString& rStr, const SwSbxValue& rVal,
+SwCalcExp::SwCalcExp(const OUString& rStr, SwSbxValue aVal,
                       const SwFieldType* pType)
     : SwHash(rStr)
-    , nValue(rVal)
+    , nValue(std::move(aVal))
     , pFieldType(pType)
 {
 }

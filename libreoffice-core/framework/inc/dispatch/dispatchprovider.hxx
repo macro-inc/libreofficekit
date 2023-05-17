@@ -74,17 +74,21 @@ class DispatchProvider final : public ::cppu::WeakImplHelper< css::frame::XDispa
         css::uno::WeakReference< css::frame::XFrame > m_xFrame;
         /// cache of some other dispatch provider which are registered inside configuration to handle special URL protocols
         HandlerCache m_aProtocolHandlerCache;
+        std::unordered_map<OUString, css::uno::Reference<css::frame::XDispatchProvider>>
+            m_aProtocolHandlers;
 
     /* interface */
     public:
 
-        DispatchProvider( const css::uno::Reference< css::uno::XComponentContext >&     xContext ,
-                          const css::uno::Reference< css::frame::XFrame >&              xFrame   );
+        DispatchProvider( css::uno::Reference< css::uno::XComponentContext >      xContext ,
+                          const css::uno::Reference< css::frame::XFrame >&        xFrame   );
 
         virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL                       queryDispatch  ( const css::util::URL&                                       aURL             ,
                                                                                                              const OUString&                                      sTargetFrameName ,
                                                                                                                    sal_Int32                                             nSearchFlags     ) override;
         virtual css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL queryDispatches( const css::uno::Sequence< css::frame::DispatchDescriptor >& lDescriptions    ) override;
+
+        void ClearProtocolHandlers() { m_aProtocolHandlers.clear(); }
 
     /* helper */
     private:

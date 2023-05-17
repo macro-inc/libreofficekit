@@ -35,6 +35,7 @@
 #include <svl/filenotation.hxx>
 #include <com/sun/star/ucb/XProgressHandler.hpp>
 #include <connectivity/CommonTools.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace dbaui
 {
@@ -127,7 +128,7 @@ namespace dbaui
             case  ::dbaccess::DST_MYSQL_ODBC:
             case  ::dbaccess::DST_ODBC:
                 m_xFT_Connection->set_label(DBA_RES(STR_NAME_OF_ODBC_DATASOURCE));
-                m_xConnectionURL->set_help_id( eType ==  ::dbaccess::DST_MYSQL_ODBC ? HID_DSADMIN_MYSQL_ODBC_DATASOURCE : HID_DSADMIN_ODBC_DATASOURCE);
+                m_xConnectionURL->set_help_id( eType ==  ::dbaccess::DST_MYSQL_ODBC ? OString(HID_DSADMIN_MYSQL_ODBC_DATASOURCE) : OString(HID_DSADMIN_ODBC_DATASOURCE));
                 break;
             case  ::dbaccess::DST_LDAP:
                 m_xFT_Connection->set_label(DBA_RES(STR_HOSTNAME));
@@ -247,7 +248,7 @@ namespace dbaui
             {
                 ::rtl::Reference< jvmaccess::VirtualMachine > xJVM = ::connectivity::getJavaVM( m_pAdminDialog->getORB() );
                 m_xJavaDriver->set_text(m_xJavaDriver->get_text().trim()); // fdo#68341
-                bSuccess = ::connectivity::existsJavaClassByName(xJVM,m_xJavaDriver->get_text().trim());
+                bSuccess = ::connectivity::existsJavaClassByName(xJVM, o3tl::trim(m_xJavaDriver->get_text()));
             }
         }
         catch(Exception&)

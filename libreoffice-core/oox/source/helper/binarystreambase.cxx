@@ -21,8 +21,7 @@
 #include <oox/helper/helper.hxx>
 
 #include <com/sun/star/io/XSeekable.hpp>
-#include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace oox {
 

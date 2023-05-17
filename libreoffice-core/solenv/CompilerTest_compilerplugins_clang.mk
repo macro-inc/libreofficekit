@@ -19,19 +19,15 @@ $(eval $(call gb_CompilerTest_add_exception_objects,compilerplugins_clang, \
     compilerplugins/clang/test/collapseif \
     compilerplugins/clang/test/commaoperator \
     compilerplugins/clang/test/conditionalstring \
-    $(if $(filter-out WNT,$(OS)),compilerplugins/clang/test/constfields) \
     compilerplugins/clang/test/constmethod \
-    compilerplugins/clang/test/constparams \
+    compilerplugins/clang/test/constmove \
     compilerplugins/clang/test/consttobool \
-    compilerplugins/clang/test/constvars \
-    compilerplugins/clang/test/convertlong \
     compilerplugins/clang/test/cow_wrapper \
     compilerplugins/clang/test/cppunitassertequals \
+    compilerplugins/clang/test/crosscast \
     compilerplugins/clang/test/cstylecast \
     compilerplugins/clang/test/datamembershadow \
     compilerplugins/clang/test/dbgunhandledexception \
-    compilerplugins/clang/test/dodgyswitch \
-    compilerplugins/clang/test/doubleconvert \
     compilerplugins/clang/test/elidestringvar \
     compilerplugins/clang/test/emptyif \
     compilerplugins/clang/test/expressionalwayszero \
@@ -48,12 +44,11 @@ $(eval $(call gb_CompilerTest_add_exception_objects,compilerplugins_clang, \
     compilerplugins/clang/test/loopvartoosmall \
     compilerplugins/clang/test/mapindex \
     compilerplugins/clang/test/makeshared \
+    compilerplugins/clang/test/moveit \
     compilerplugins/clang/test/moveparam \
-    compilerplugins/clang/test/namespaceindentation \
     compilerplugins/clang/test/noexcept \
     compilerplugins/clang/test/noexceptmove \
     compilerplugins/clang/test/nullptr \
-    compilerplugins/clang/test/oncevar \
     compilerplugins/clang/test/oslendian-1 \
     compilerplugins/clang/test/oslendian-2 \
     compilerplugins/clang/test/oslendian-3 \
@@ -74,31 +69,32 @@ $(eval $(call gb_CompilerTest_add_exception_objects,compilerplugins_clang, \
     compilerplugins/clang/test/sallogareas \
     compilerplugins/clang/test/salunicodeliteral \
     compilerplugins/clang/test/selfinit \
-    compilerplugins/clang/test/sequentialassign \
-    compilerplugins/clang/test/shouldreturnbool \
     compilerplugins/clang/test/simplifyconstruct \
     compilerplugins/clang/test/simplifydynamiccast \
     compilerplugins/clang/test/simplifypointertobool \
     compilerplugins/clang/test/singlevalfields \
     compilerplugins/clang/test/staticconstfield \
     compilerplugins/clang/test/staticdynamic \
-    compilerplugins/clang/test/staticvar \
     compilerplugins/clang/test/stdfunction \
     compilerplugins/clang/test/stringadd \
     compilerplugins/clang/test/stringconcatauto \
     compilerplugins/clang/test/stringconcatliterals \
     compilerplugins/clang/test/stringconstant \
     compilerplugins/clang/test/stringliteralvar \
-    compilerplugins/clang/test/stringliteraldefine \
-    compilerplugins/clang/test/stringloop \
     compilerplugins/clang/test/stringstatic \
     compilerplugins/clang/test/stringview \
+    compilerplugins/clang/test/stringviewdangle \
     compilerplugins/clang/test/stringviewparam \
+    compilerplugins/clang/test/stringviewvar \
+    compilerplugins/clang/test/trivialconstructor \
+    compilerplugins/clang/test/trivialdestructor \
     compilerplugins/clang/test/typedefparam \
+    compilerplugins/clang/test/typeidcomparison \
     compilerplugins/clang/test/unnecessarycatchthrow \
     compilerplugins/clang/test/unnecessaryoverride \
     compilerplugins/clang/test/unnecessaryoverride-dtor \
     compilerplugins/clang/test/unnecessaryparen \
+    compilerplugins/clang/test/unnecessarylocking \
     compilerplugins/clang/test/unoany \
     compilerplugins/clang/test/unoquery \
     compilerplugins/clang/test/unreffun \
@@ -106,7 +102,6 @@ $(eval $(call gb_CompilerTest_add_exception_objects,compilerplugins_clang, \
     compilerplugins/clang/test/unusedcapturedefault \
     compilerplugins/clang/test/unusedenumconstants \
     compilerplugins/clang/test/unusedfields \
-    compilerplugins/clang/test/unusedindex \
     compilerplugins/clang/test/unusedmember \
     compilerplugins/clang/test/unusedvariablecheck \
     compilerplugins/clang/test/unusedvariablemore \

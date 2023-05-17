@@ -23,6 +23,8 @@
 
 #include <filter/msfilter/util.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/sprintf.hxx>
+#include <osl/diagnose.h>
 #include <rtl/ustring.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <rtl/random.h>
@@ -40,7 +42,8 @@
 #include <xlstring.hxx>
 #include <xltools.hxx>
 #include <xeroot.hxx>
-#include <xcl97rec.hxx>
+#include <xestring.hxx>
+#include <xlstyle.hxx>
 #include <rangelst.hxx>
 #include <compiler.hxx>
 #include <formulacell.hxx>
@@ -53,11 +56,13 @@
 #include <sfx2/app.hxx>
 
 #include <docsh.hxx>
+#include <tabvwsh.hxx>
 #include <viewdata.hxx>
 #include <excdoc.hxx>
 
 #include <oox/token/tokens.hxx>
 #include <oox/token/relationship.hxx>
+#include <oox/export/drawingml.hxx>
 #include <oox/export/utils.hxx>
 #include <formula/grammar.hxx>
 #include <oox/ole/vbaexport.hxx>
@@ -104,7 +109,7 @@ XclExpStream::XclExpStream( SvStream& rOutStrm, const XclExpRoot& rRoot, sal_uIn
 
 XclExpStream::~XclExpStream()
 {
-    mrStrm.Flush();
+    mrStrm.FlushBuffer();
 }
 
 void XclExpStream::StartRecord( sal_uInt16 nRecId, std::size_t nRecSize )
@@ -706,9 +711,9 @@ OUString XclXmlUtils::GetStreamName( const char* sStreamDir, const char* sStream
 OString XclXmlUtils::ToOString( const Color& rColor )
 {
     char buf[9];
-    sprintf( buf, "%.2X%.2X%.2X%.2X", rColor.GetAlpha(), rColor.GetRed(), rColor.GetGreen(), rColor.GetBlue() );
+    o3tl::sprintf( buf, "%.2X%.2X%.2X%.2X", rColor.GetAlpha(), rColor.GetRed(), rColor.GetGreen(), rColor.GetBlue() );
     buf[8] = '\0';
-    return OString(buf);
+    return buf;
 }
 
 OStringBuffer& XclXmlUtils::ToOString( OStringBuffer& s, const ScAddress& rAddress )
@@ -1021,6 +1026,10 @@ bool XclExpXmlStream::exportDocument()
     tools::SvRef<SotStorage> rStorage = static_cast<SotStorage*>(nullptr);
     drawingml::DrawingML::ResetMlCounters();
 
+    auto& rGraphicExportCache = drawingml::GraphicExportCache::get();
+
+    rGraphicExportCache.push();
+
     XclExpRootData aData(
         EXC_BIFF8, *pShell->GetMedium (), rStorage, rDoc,
         msfilter::util::getBestTextEncodingFromLocale(
@@ -1043,8 +1052,18 @@ bool XclExpXmlStream::exportDocument()
     aRoot.GetOldRoot().pER = &aRoot;
     aRoot.GetOldRoot().eDateiTyp = Biff8;
     // Get the viewsettings before processing
-    if( ScDocShell::GetViewData() )
-        ScDocShell::GetViewData()->WriteExtOptions( mpRoot->GetExtDocOptions() );
+    if (ScViewData* pViewData = ScDocShell::GetViewData())
+        pViewData->WriteExtOptions( mpRoot->GetExtDocOptions() );
+    else
+    {
+        // Try to get ScViewData through the current ScDocShell
+        ScTabViewShell* pTabViewShell = pShell->GetBestViewShell( false );
+        if ( pTabViewShell )
+        {
+            pViewData = &pTabViewShell->GetViewData();
+            pViewData->WriteExtOptions( mpRoot->GetExtDocOptions() );
+        }
+    }
 
     OUString const workbook = "xl/workbook.xml";
     const char* pWorkbookContentType = nullptr;
@@ -1109,6 +1128,12 @@ bool XclExpXmlStream::exportDocument()
 
     PopStream();
     // Free all FSHelperPtr, to flush data before committing storage
+    for (auto& entry : maOpenedStreamMap)
+    {
+        if (!entry.second.second)
+            continue;
+        entry.second.second->endDocument();
+    }
     maOpenedStreamMap.clear();
 
     commitStorage();
@@ -1121,6 +1146,9 @@ bool XclExpXmlStream::exportDocument()
     if (xStatusIndicator.is())
         xStatusIndicator->end();
     mpRoot = nullptr;
+
+    rGraphicExportCache.pop();
+
     return true;
 }
 

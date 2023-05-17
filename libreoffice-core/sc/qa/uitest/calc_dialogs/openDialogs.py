@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -65,9 +67,10 @@ dialogs = [
     {"command": ".uno:StyleNewByExample", "closeButton": "cancel"},
     {"command": ".uno:InsertCell", "closeButton": "cancel"},
     {"command": ".uno:DeleteCell", "closeButton": "cancel"},
-    {"command": ".uno:Insert", "closeButton": "cancel", "skipTestOK": True},
+    # {"command": ".uno:Insert", "closeButton": "cancel", "skipTestOK": True},
         # OK button tested in uitest/calc_tests/gridwin.py
-    {"command": ".uno:Add", "closeButton": "cancel"},
+    # {"command": ".uno:Add", "closeButton": "cancel"},
+        # tested in sc/qa/uitest/range_name/tdf148072.py
     # {"command": ".uno:InsertExternalDataSource", "closeButton": "cancel"},
         # dialog opens and closes, but is not recognized as closed by close_dialog_through_button
     # {"command": ".uno:Delete", "closeButton": "cancel"},
@@ -99,8 +102,8 @@ dialogs = [
         # tested in sc/qa/uitest/autofilter/autofilterBugs.py
     # {"command": ".uno:DataFilterStandardFilter", "closeButton": "cancel"},
         # tested in sc/qa/uitest/calc_tests2/standardFilter.py
-    {"command": ".uno:DataFilterSpecialFilter", "closeButton": "cancel", "skipTestOK": True},
-        # OK button triggers a new dialog
+    #{"command": ".uno:DataFilterSpecialFilter", "closeButton": "cancel", "skipTestOK": True},
+        # tested in sc/qa/uitest/calc_tests6/tdf147830.py
     # {"command": ".uno:DefineDBName", "closeButton": "cancel"},
         # tested in sc/qa/uitest/range_name/tdf119954.py
     {"command": ".uno:SelectDB", "closeButton": "cancel"},

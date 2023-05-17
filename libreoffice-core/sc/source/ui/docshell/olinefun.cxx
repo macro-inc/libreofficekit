@@ -640,6 +640,9 @@ void ScOutlineDocFunc::ShowOutline( SCTAB nTab, bool bColumns, sal_uInt16 nLevel
         bRecord = false;
 
     ScOutlineTable* pTable = rDoc.GetOutlineTable( nTab );
+    if (!pTable)
+        return;
+
     ScOutlineArray& rArray = bColumns ? pTable->GetColArray() : pTable->GetRowArray();
     ScOutlineEntry* pEntry = rArray.GetEntry( nLevel, nEntry );
     SCCOLROW nStart = pEntry->GetStart();
@@ -728,6 +731,8 @@ bool ScOutlineDocFunc::HideOutline( SCTAB nTab, bool bColumns, sal_uInt16 nLevel
         bRecord = false;
 
     ScOutlineTable* pTable = rDoc.GetOutlineTable( nTab );
+    if (!pTable)
+        return false;
     ScOutlineArray& rArray = bColumns ? pTable->GetColArray() : pTable->GetRowArray();
     ScOutlineEntry* pEntry = rArray.GetEntry( nLevel, nEntry );
     SCCOLROW nStart = pEntry->GetStart();

@@ -23,8 +23,6 @@
 #include <com/sun/star/ui/XUIElementFactory.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <comphelper/namedvaluecollection.hxx>
@@ -36,16 +34,13 @@
 
 namespace
 {
-typedef cppu::WeakComponentImplHelper<css::ui::XUIElementFactory, css::lang::XServiceInfo>
+typedef comphelper::WeakComponentImplHelper<css::ui::XUIElementFactory, css::lang::XServiceInfo>
     PanelFactoryInterfaceBase;
 
-class SmPanelFactory final : public cppu::BaseMutex, public PanelFactoryInterfaceBase
+class SmPanelFactory final : public PanelFactoryInterfaceBase
 {
 public:
-    SmPanelFactory()
-        : PanelFactoryInterfaceBase(m_aMutex)
-    {
-    }
+    SmPanelFactory() = default;
 
     SmPanelFactory(const SmPanelFactory&) = delete;
     const SmPanelFactory& operator=(const SmPanelFactory&) = delete;

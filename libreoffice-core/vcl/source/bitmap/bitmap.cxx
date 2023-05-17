@@ -23,6 +23,7 @@
 #include <osl/diagnose.h>
 #include <tools/helpers.hxx>
 
+#include <utility>
 #include <vcl/bitmap.hxx>
 #include <vcl/bitmapex.hxx>
 #include <vcl/outdev.hxx>
@@ -67,8 +68,8 @@ Bitmap::Bitmap(const Bitmap& rBitmap)
 {
 }
 
-Bitmap::Bitmap(std::shared_ptr<SalBitmap> const & pSalBitmap)
-    : mxSalBmp(pSalBitmap)
+Bitmap::Bitmap(std::shared_ptr<SalBitmap> pSalBitmap)
+    : mxSalBmp(std::move(pSalBitmap))
     , maPrefMapMode(MapMode(MapUnit::MapPixel))
     , maPrefSize(mxSalBmp->GetSize())
 {
@@ -79,22 +80,19 @@ Bitmap::Bitmap( const Size& rSizePixel, vcl::PixelFormat ePixelFormat, const Bit
     if (!(rSizePixel.Width() && rSizePixel.Height()))
         return;
 
-    BitmapPalette   aPal;
-    BitmapPalette*  pRealPal = nullptr;
-
-    if (vcl::isPalettePixelFormat(ePixelFormat))
+    switch (ePixelFormat)
     {
-        if( !pPal )
+        case vcl::PixelFormat::N1_BPP:
         {
-            if (ePixelFormat == vcl::PixelFormat::N1_BPP)
-            {
-                aPal.SetEntryCount( 2 );
-                aPal[ 0 ] = COL_BLACK;
-                aPal[ 1 ] = COL_WHITE;
-            }
-            else if (ePixelFormat == vcl::PixelFormat::N8_BPP)
-            {
-                aPal.SetEntryCount(1 << sal_uInt16(ePixelFormat));
+            static const BitmapPalette aPalN1_BPP = { COL_BLACK, COL_WHITE };
+            if (!pPal)
+                pPal = &aPalN1_BPP;
+            break;
+        }
+        case vcl::PixelFormat::N8_BPP:
+        {
+            static const BitmapPalette aPalN8_BPP = [] {
+                BitmapPalette aPal(1 << sal_uInt16(vcl::PixelFormat::N8_BPP));
                 aPal[ 0 ] = COL_BLACK;
                 aPal[ 1 ] = COL_BLUE;
                 aPal[ 2 ] = COL_GREEN;
@@ -113,26 +111,32 @@ Bitmap::Bitmap( const Size& rSizePixel, vcl::PixelFormat ePixelFormat, const Bit
                 aPal[ 15 ] = COL_WHITE;
 
                 // Create dither palette
-                if (ePixelFormat == vcl::PixelFormat::N8_BPP)
-                {
-                    sal_uInt16 nActCol = 16;
+                sal_uInt16 nActCol = 16;
 
-                    for( sal_uInt16 nB = 0; nB < 256; nB += 51 )
-                        for( sal_uInt16 nG = 0; nG < 256; nG += 51 )
-                            for( sal_uInt16 nR = 0; nR < 256; nR += 51 )
-                                aPal[ nActCol++ ] = BitmapColor( static_cast<sal_uInt8>(nR), static_cast<sal_uInt8>(nG), static_cast<sal_uInt8>(nB) );
+                for( sal_uInt16 nB = 0; nB < 256; nB += 51 )
+                    for( sal_uInt16 nG = 0; nG < 256; nG += 51 )
+                        for( sal_uInt16 nR = 0; nR < 256; nR += 51 )
+                            aPal[ nActCol++ ] = BitmapColor( static_cast<sal_uInt8>(nR), static_cast<sal_uInt8>(nG), static_cast<sal_uInt8>(nB) );
 
-                    // Set standard Office colors
-                    aPal[ nActCol++ ] = BitmapColor( 0, 184, 255 );
-                }
-            }
+                // Set standard Office colors
+                aPal[ nActCol++ ] = BitmapColor( 0, 184, 255 );
+                return aPal;
+            }();
+            if (!pPal)
+                pPal = &aPalN8_BPP;
+            break;
         }
-        else
-            pRealPal = const_cast<BitmapPalette*>(pPal);
+        default:
+        {
+            static const BitmapPalette aPalEmpty;
+            if (!pPal || !vcl::isPalettePixelFormat(ePixelFormat))
+                pPal = &aPalEmpty;
+            break;
+        }
     }
 
     mxSalBmp = ImplGetSVData()->mpDefInst->CreateSalBitmap();
-    mxSalBmp->Create(rSizePixel, ePixelFormat, pRealPal ? *pRealPal : aPal);
+    mxSalBmp->Create(rSizePixel, ePixelFormat, *pPal);
 }
 
 #ifdef DBG_UTIL
@@ -152,7 +156,7 @@ void savePNG(const OUString& sWhere, const Bitmap& rBmp)
 Bitmap::~Bitmap()
 {
 #ifdef DBG_UTIL
-    // VCL_DUMP_BMP_PATH should be like C:/bmpDump.png or ~/bmpDump.png
+    // VCL_DUMP_BMP_PATH should be like C:/path/ or ~/path/
     static const OUString sDumpPath(OUString::createFromAscii(std::getenv("VCL_DUMP_BMP_PATH")));
     // Stepping into the dtor of a bitmap you need, and setting the volatile variable to true in
     // debugger, would dump the bitmap in question
@@ -160,9 +164,22 @@ Bitmap::~Bitmap()
     if (!sDumpPath.isEmpty() && save)
     {
         save = false;
-        savePNG(sDumpPath, *this);
+        savePNG(sDumpPath + "BitmapDump.png", *this);
     }
 #endif
+}
+
+namespace
+{
+template <size_t N>
+constexpr std::enable_if_t<255 % (N - 1) == 0, std::array<BitmapColor, N>> getGreyscalePalette()
+{
+    const int step = 255 / (N - 1);
+    std::array<BitmapColor, N> a;
+    for (size_t i = 0; i < N; ++i)
+        a[i] = BitmapColor(i * step, i * step, i * step);
+    return a;
+}
 }
 
 const BitmapPalette& Bitmap::GetGreyPalette( int nEntries )
@@ -172,56 +189,22 @@ const BitmapPalette& Bitmap::GetGreyPalette( int nEntries )
     {
         case 2:
         {
-            static const BitmapPalette aGreyPalette2 = [] {
-                BitmapPalette aPalette(2);
-                aPalette[0] = BitmapColor(0, 0, 0);
-                aPalette[1] = BitmapColor(255, 255, 255);
-                return aPalette;
-            }();
-
+            static const BitmapPalette aGreyPalette2 = getGreyscalePalette<2>();
             return aGreyPalette2;
         }
         case 4:
         {
-            static const BitmapPalette aGreyPalette4 = [] {
-                BitmapPalette aPalette(4);
-                aPalette[0] = BitmapColor(0, 0, 0);
-                aPalette[1] = BitmapColor(85, 85, 85);
-                aPalette[2] = BitmapColor(170, 170, 170);
-                aPalette[3] = BitmapColor(255, 255, 255);
-                return aPalette;
-            }();
-
+            static const BitmapPalette aGreyPalette4 = getGreyscalePalette<4>();
             return aGreyPalette4;
         }
         case 16:
         {
-            static const BitmapPalette aGreyPalette16 = [] {
-                sal_uInt8 cGrey = 0;
-                sal_uInt8 const cGreyInc = 17;
-
-                BitmapPalette aPalette(16);
-
-                for (sal_uInt16 i = 0; i < 16; ++i, cGrey += cGreyInc)
-                    aPalette[i] = BitmapColor(cGrey, cGrey, cGrey);
-
-                return aPalette;
-            }();
-
+            static const BitmapPalette aGreyPalette16 = getGreyscalePalette<16>();
             return aGreyPalette16;
         }
         case 256:
         {
-            static const BitmapPalette aGreyPalette256 = [] {
-                BitmapPalette aPalette(256);
-
-                for (sal_uInt16 i = 0; i < 256; ++i)
-                    aPalette[i] = BitmapColor(static_cast<sal_uInt8>(i), static_cast<sal_uInt8>(i),
-                                              static_cast<sal_uInt8>(i));
-
-                return aPalette;
-            }();
-
+            static const BitmapPalette aGreyPalette256 = getGreyscalePalette<256>();
             return aGreyPalette256;
         }
     }
@@ -259,9 +242,8 @@ bool Bitmap::operator==( const Bitmap& rBmp ) const
     if (rBmp.mxSalBmp->GetSize() != mxSalBmp->GetSize() ||
         rBmp.mxSalBmp->GetBitCount() != mxSalBmp->GetBitCount())
         return false;
-    BitmapChecksum aChecksum1, aChecksum2;
-    rBmp.mxSalBmp->GetChecksum(aChecksum1);
-    mxSalBmp->GetChecksum(aChecksum2);
+    BitmapChecksum aChecksum1 = rBmp.mxSalBmp->GetChecksum();
+    BitmapChecksum aChecksum2 = mxSalBmp->GetChecksum();
     // If the bitmaps can't calculate a checksum, best to regard them as different.
     if (aChecksum1 == 0 || aChecksum2 == 0)
         return false;
@@ -331,7 +313,7 @@ BitmapChecksum Bitmap::GetChecksum() const
 
     if( mxSalBmp )
     {
-        mxSalBmp->GetChecksum(nRet);
+        nRet = mxSalBmp->GetChecksum();
 
         if (!nRet)
         {
@@ -344,7 +326,7 @@ BitmapChecksum Bitmap::GetChecksum() const
             {
                 Bitmap* pThis = const_cast<Bitmap*>(this);
                 pThis->mxSalBmp = xNewImpBmp;
-                mxSalBmp->GetChecksum(nRet);
+                nRet = mxSalBmp->GetChecksum();
             }
         }
     }
@@ -1513,7 +1495,6 @@ bool Bitmap::Dither()
         BitmapScopedWriteAccess pWriteAcc(aNewBmp);
         if( pReadAcc && pWriteAcc )
         {
-            BitmapColor aColor;
             tools::Long nWidth = pReadAcc->Width();
             tools::Long nWidth1 = nWidth - 1;
             tools::Long nHeight = pReadAcc->Height();
@@ -1734,6 +1715,82 @@ bool Bitmap::Adjust( short nLuminancePercent, short nContrastPercent,
     }
 
     return bRet;
+}
+
+namespace
+{
+inline sal_uInt8 backBlendAlpha(sal_uInt16 alpha, sal_uInt16 srcCol, sal_uInt16 startCol)
+{
+    const sal_uInt16 nAlpha((alpha * startCol) / 255);
+    if(srcCol > nAlpha)
+    {
+        return static_cast<sal_uInt8>(((srcCol - nAlpha) * 255) / (255 - nAlpha));
+    }
+
+    return 0;
+}
+}
+
+void Bitmap::RemoveBlendedStartColor(
+    const Color& rStartColor,
+    const AlphaMask& rAlphaMask)
+{
+    // no content, done
+    if(IsEmpty())
+        return;
+
+    BitmapScopedWriteAccess pAcc(*this);
+    const tools::Long nHeight(pAcc->Height());
+    const tools::Long nWidth(pAcc->Width());
+
+    // no content, done
+    if(0 == nHeight || 0 == nWidth)
+        return;
+
+    AlphaMask::ScopedReadAccess pAlphaAcc(const_cast<AlphaMask&>(rAlphaMask));
+
+    // inequal sizes of content and alpha, avoid change (maybe assert?)
+    if(pAlphaAcc->Height() != nHeight || pAlphaAcc->Width() != nWidth)
+        return;
+
+    // prepare local values as sal_uInt16 to avoid multiple conversions
+    const sal_uInt16 nStartColRed(rStartColor.GetRed());
+    const sal_uInt16 nStartColGreen(rStartColor.GetGreen());
+    const sal_uInt16 nStartColBlue(rStartColor.GetBlue());
+
+    for (tools::Long y = 0; y < nHeight; ++y)
+    {
+        for (tools::Long x = 0; x < nWidth; ++x)
+        {
+            // get alpha value
+            const sal_uInt8 nAlpha8(pAlphaAcc->GetColor(y, x).GetRed());
+
+            // not or completely transparent, no adaptation needed
+            if(0 == nAlpha8 || 255 == nAlpha8)
+                continue;
+
+            // prepare local value as sal_uInt16 to avoid multiple conversions
+            const sal_uInt16 nAlpha16(static_cast<sal_uInt16>(nAlpha8));
+
+            // get source color
+            BitmapColor aColor(pAcc->GetColor(y, x));
+
+            // modify/blend back source color
+            aColor.SetRed(backBlendAlpha(nAlpha16, static_cast<sal_uInt16>(aColor.GetRed()), nStartColRed));
+            aColor.SetGreen(backBlendAlpha(nAlpha16, static_cast<sal_uInt16>(aColor.GetGreen()), nStartColGreen));
+            aColor.SetBlue(backBlendAlpha(nAlpha16, static_cast<sal_uInt16>(aColor.GetBlue()), nStartColBlue));
+
+            // write result back
+            pAcc->SetPixel(y, x, aColor);
+        }
+    }
+}
+
+const basegfx::SystemDependentDataHolder* Bitmap::accessSystemDependentDataHolder() const
+{
+    if(!mxSalBmp)
+        return nullptr;
+    return mxSalBmp->accessSystemDependentDataHolder();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

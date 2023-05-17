@@ -69,13 +69,13 @@ public:
         actual list.  The text field is not provided for non drop down list
         boxes.
     */
-    sal_Int32 SAL_CALL getAccessibleChildCount() final override;
+    sal_Int64 SAL_CALL getAccessibleChildCount() final override;
     /** For drop down list boxes the text field is a not editable
         VCLXAccessibleTextField, for combo boxes it is an
         editable VCLXAccessibleEdit.
     */
     css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild (sal_Int32 i) override;
+        getAccessibleChild (sal_Int64 i) override;
     /** The role is always AccessibleRole::COMBO_BOX.
     */
     sal_Int16 SAL_CALL getAccessibleRole() override;
@@ -110,7 +110,22 @@ public:
     virtual css::uno::Any SAL_CALL getMinimumValue(  ) override;
 
     virtual css::uno::Any SAL_CALL getMinimumIncrement(  ) override;
+
 protected:
+    virtual ~VCLXAccessibleBox() override = default;
+
+    /** Returns true when the object is valid.
+    */
+    virtual bool IsValid() const = 0;
+
+    virtual void ProcessWindowChildEvent (const VclWindowEvent& rVclWindowEvent) override;
+    virtual void ProcessWindowEvent (const VclWindowEvent& rVclWindowEvent) override;
+
+    virtual void FillAccessibleStateSet( sal_Int64& rStateSet ) override;
+
+    sal_Int64 implGetAccessibleChildCount();
+
+private:
     /** Specifies whether the box is a combo box or a list box.  List boxes
         have multi selection.
     */
@@ -140,19 +155,6 @@ protected:
         same life time.
     */
     bool m_bHasListChild;
-
-    virtual ~VCLXAccessibleBox() override = default;
-
-    /** Returns true when the object is valid.
-    */
-    virtual bool IsValid() const = 0;
-
-    virtual void ProcessWindowChildEvent (const VclWindowEvent& rVclWindowEvent) override;
-    virtual void ProcessWindowEvent (const VclWindowEvent& rVclWindowEvent) override;
-
-    virtual void FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet ) override;
-
-    sal_Int32 implGetAccessibleChildCount();
 };
 
 

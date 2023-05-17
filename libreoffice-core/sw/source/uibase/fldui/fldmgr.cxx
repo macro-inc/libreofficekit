@@ -35,6 +35,7 @@
 #include <com/sun/star/uri/XVndSunStarScriptUrl.hpp>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <tools/resary.hxx>
 #include <osl/diagnose.h>
 #include <sfx2/dispatch.hxx>
@@ -71,6 +72,8 @@
 #include <viewopt.hxx>
 #include <txmsrt.hxx>
 #include <unotools/useroptions.hxx>
+#include <IDocumentContentOperations.hxx>
+#include <translatehelper.hxx>
 
 using namespace com::sun::star::uno;
 using namespace com::sun::star::container;
@@ -354,10 +357,8 @@ const SwFieldPack aSwFields[] =
 // access to the shell
 static SwWrtShell* lcl_GetShell()
 {
-    SwView* pView = ::GetActiveView();
-    if ( nullptr != pView )
+    if (SwView* pView = GetActiveView())
         return pView->GetWrtShellPtr();
-    OSL_FAIL("no current shell found!");
     return nullptr;
 }
 
@@ -892,7 +893,7 @@ SwFieldTypesEnum SwFieldMgr::GetCurTypeId() const
 
 // Over string  insert field or update
 bool SwFieldMgr::InsertField(
-    const SwInsertField_Data& rData)
+    SwInsertField_Data& rData)
 {
     std::unique_ptr<SwField> pField;
     bool bExp = false;
@@ -1070,7 +1071,40 @@ bool SwFieldMgr::InsertField(
         {
             if( !rData.m_sPar1.isEmpty() && CanInsertRefMark( rData.m_sPar1 ) )
             {
+                const OUString& rRefmarkText = rData.m_sPar2;
+                SwPaM* pCursorPos = pCurShell->GetCursor();
+                pCurShell->StartAction();
+                if (!rRefmarkText.isEmpty())
+                {
+                    // Split node to remember where the start position is.
+                    bool bSuccess = pCurShell->GetDoc()->getIDocumentContentOperations().SplitNode(
+                            *pCursorPos->GetPoint(), /*bChkTableStart=*/false);
+                    if (bSuccess)
+                    {
+                        SwPaM aRefmarkPam(*pCursorPos->GetPoint());
+                        aRefmarkPam.Move(fnMoveBackward, GoInContent);
+
+                        // Paste HTML content.
+                        SwTranslateHelper::PasteHTMLToPaM(
+                                *pCurShell, pCursorPos, rRefmarkText.toUtf8(), /*bSetSelection=*/true);
+
+                        // Undo the above SplitNode().
+                        aRefmarkPam.SetMark();
+                        aRefmarkPam.Move(fnMoveForward, GoInContent);
+                        pCurShell->GetDoc()->getIDocumentContentOperations().DeleteAndJoin(
+                                aRefmarkPam);
+                        *aRefmarkPam.GetMark() = *pCursorPos->GetPoint();
+                        *pCursorPos = aRefmarkPam;
+                    }
+                }
+
                 pCurShell->SetAttrItem( SwFormatRefMark( rData.m_sPar1 ) );
+
+                if (!rRefmarkText.isEmpty())
+                {
+                    pCursorPos->DeleteMark();
+                }
+                pCurShell->EndAction();
                 return true;
             }
             return false;
@@ -1174,7 +1208,7 @@ bool SwFieldMgr::InsertField(
                 sal_Int32 nIdx{ 0 };
                 aDBData.sDataSource = rData.m_sPar1.getToken(0, DB_DELIM, nIdx);
                 aDBData.sCommand = rData.m_sPar1.getToken(0, DB_DELIM, nIdx);
-                aDBData.nCommandType = rData.m_sPar1.getToken(0, DB_DELIM, nIdx).toInt32();
+                aDBData.nCommandType = o3tl::toInt32(o3tl::getToken(rData.m_sPar1, 0, DB_DELIM, nIdx));
                 sPar1 = rData.m_sPar1.getToken(0, DB_DELIM, nIdx);
             }
 
@@ -1233,7 +1267,7 @@ bool SwFieldMgr::InsertField(
                     nExpPos = rData.m_sPar1.indexOf(DB_DELIM, nCmdTypePos);
                     if (nExpPos>=0)
                     {
-                        aDBData.nCommandType = rData.m_sPar1.copy(nCmdTypePos, nExpPos++ - nCmdTypePos).toInt32();
+                        aDBData.nCommandType = o3tl::toInt32(rData.m_sPar1.subView(nCmdTypePos, nExpPos++ - nCmdTypePos));
                     }
                 }
             }
@@ -1486,7 +1520,7 @@ bool SwFieldMgr::InsertField(
     // insert
     pCurShell->StartAllAction();
 
-    bool const isSuccess = pCurShell->InsertField2(*pField, rData.m_pAnnotationRange.get());
+    bool const isSuccess = pCurShell->InsertField2(*pField, rData.m_oAnnotationRange ? &*rData.m_oAnnotationRange : nullptr);
 
     if (isSuccess)
     {
@@ -1495,7 +1529,7 @@ bool SwFieldMgr::InsertField(
             pCurShell->Push();
 
             // start dialog, not before the field is inserted tdf#99529
-            pCurShell->Left(CRSR_SKIP_CHARS, false,
+            pCurShell->Left(SwCursorSkipMode::Chars, false,
                 (INP_VAR == (nSubType & 0xff) || pCurShell->GetViewOptions()->IsFieldName()) ? 1 : 2,
                 false);
             pCurShell->StartInputFieldDlg(pField.get(), false, true, rData.m_pParent);
@@ -1510,9 +1544,9 @@ bool SwFieldMgr::InsertField(
 
         if (bTable)
         {
-            pCurShell->Left(CRSR_SKIP_CHARS, false, 1, false );
+            pCurShell->Left(SwCursorSkipMode::Chars, false, 1, false );
             pCurShell->UpdateOneField(*pField);
-            pCurShell->Right(CRSR_SKIP_CHARS, false, 1, false );
+            pCurShell->Right(SwCursorSkipMode::Chars, false, 1, false );
         }
         else if (bPageVar)
         {
@@ -1631,7 +1665,7 @@ void SwFieldMgr::UpdateCurField(sal_uInt32 nFormat,
                 static_cast<SwGetRefField*>(pTmpField.get())->SetSubType( o3tl::narrowing<sal_uInt16>(rPar2.toInt32()) );
                 const sal_Int32 nPos = rPar2.indexOf( '|' );
                 if( nPos>=0 )
-                    static_cast<SwGetRefField*>(pTmpField.get())->SetSeqNo( o3tl::narrowing<sal_uInt16>(rPar2.copy( nPos + 1 ).toInt32()));
+                    static_cast<SwGetRefField*>(pTmpField.get())->SetSeqNo( o3tl::narrowing<sal_uInt16>(o3tl::toInt32(rPar2.subView( nPos + 1 ))));
             }
             break;
         case SwFieldTypesEnum::Dropdown:

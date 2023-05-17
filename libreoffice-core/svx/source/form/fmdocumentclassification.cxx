@@ -25,7 +25,8 @@
 #include <com/sun/star/xforms/XFormsSupplier.hpp>
 #include <com/sun/star/frame/XModule.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <o3tl/string_view.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 
 namespace svxform
@@ -164,12 +165,12 @@ namespace svxform
     }
 
 
-    DocumentType DocumentClassification::getDocumentTypeForModuleIdentifier( const OUString& _rModuleIdentifier )
+    DocumentType DocumentClassification::getDocumentTypeForModuleIdentifier( std::u16string_view _rModuleIdentifier )
     {
         const ModuleInfo* pModuleInfo = lcl_getModuleInfo();
         while ( pModuleInfo->pAsciiModuleOrServiceName )
         {
-            if ( _rModuleIdentifier.equalsAscii( pModuleInfo->pAsciiModuleOrServiceName ) )
+            if ( o3tl::equalsAscii(_rModuleIdentifier, pModuleInfo->pAsciiModuleOrServiceName ) )
                 return pModuleInfo->eType;
             ++pModuleInfo;
         }

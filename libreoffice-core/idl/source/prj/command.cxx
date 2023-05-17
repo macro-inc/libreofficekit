@@ -21,7 +21,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <osl/diagnose.h>
 #include <rtl/character.hxx>
@@ -137,7 +136,7 @@ static bool ResponseFile( std::vector<OUString> * pList, int argc, char ** argv 
             if( aStm.GetError() != ERRCODE_NONE )
                 return false;
 
-            OString aStr;
+            OStringBuffer aStr;
             while( aStm.ReadLine( aStr ) )
             {
                 sal_uInt16 n = 0;
@@ -154,7 +153,7 @@ static bool ResponseFile( std::vector<OUString> * pList, int argc, char ** argv 
                                static_cast<unsigned char>(aStr[n]) ) )
                         n++;
                     if( n != nPos )
-                        pList->push_back( OStringToOUString(aStr.subView(nPos, n - nPos), RTL_TEXTENCODING_ASCII_US) );
+                        pList->push_back( OStringToOUString(std::string_view(aStr).substr(nPos, n - nPos), RTL_TEXTENCODING_ASCII_US) );
                 }
             }
         }
