@@ -1377,6 +1377,11 @@ void AttributeOutputBase::TOXMark( const SwTextNode& rNode, const SwTOXMark& rAt
 int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
 {
     int nRet = 0;
+    OUString termUrl = "term://";
+    OUString termRefUrl = "termref://";
+    OUString sectionUrl = "section://";
+    OUString sectionRefUrl = "sectionref://";
+
     if ( const SwpHints* pTextAttrs = rNd.GetpSwpHints() )
     {
         m_rExport.m_aCurrentCharPropStarts.push( nPos );
@@ -1416,26 +1421,35 @@ int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
             if (nPos < pHt->GetAnyEnd())
                 break; // sorted by end
         }
+
         for ( size_t i = 0; i < pTextAttrs->Count(); ++i )
         {
             const SwTextAttr* pHt = pTextAttrs->Get(i);
             const SfxPoolItem* pItem = &pHt->GetAttr();
+
             switch ( pItem->Which() )
             {
                 case RES_TXTATR_INETFMT:
-                    if ( nPos == pHt->GetStart() )
                     {
+                        // If the hyperlink is one of our custom ones we want to unset the style of the hyperlink and break early before adding the hyperlink attributes to the document
                         const SwFormatINetFormat *rINet = static_cast< const SwFormatINetFormat* >( pItem );
-                        if ( m_rExport.AttrOutput().StartURL( rINet->GetValue(), rINet->GetTargetFrame() ) )
-                            ++nRet;
+                        OUString aDestinationURL = rINet->GetValue();
+                        if(aDestinationURL.startsWith(termUrl) || aDestinationURL.startsWith(termRefUrl) || aDestinationURL.startsWith(sectionUrl) || aDestinationURL.startsWith(sectionRefUrl)){
+                            break;
+                        }
+                        if ( nPos == pHt->GetStart() )
+                        {
+                            if ( m_rExport.AttrOutput().StartURL( rINet->GetValue(), rINet->GetTargetFrame() ) )
+                                ++nRet;
+                        }
+                        pEnd = pHt->End();
+                        if (nPos == *pEnd && nPos == pHt->GetStart())
+                        {   // special case: empty must be handled here
+                            if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len()))
+                                --nRet;
+                        }
+                        break;
                     }
-                    pEnd = pHt->End();
-                    if (nPos == *pEnd && nPos == pHt->GetStart())
-                    {   // special case: empty must be handled here
-                        if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len()))
-                            --nRet;
-                    }
-                    break;
                 case RES_TXTATR_REFMARK:
                     if ( nPos == pHt->GetStart() )
                     {

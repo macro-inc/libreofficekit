@@ -8665,6 +8665,17 @@ void DocxAttributeOutput::CharHighlight( const SvxBrushItem& rHighlight )
 void DocxAttributeOutput::TextINetFormat( const SwFormatINetFormat& rLink )
 {
     OString aStyleId = MSWordStyles::CreateStyleId(rLink.GetINetFormat());
+
+    OUString aDestinationURL = rLink.GetValue();
+    OUString termUrl = "term://";
+    OUString termRefUrl = "termref://";
+    OUString sectionUrl = "section://";
+    OUString sectionRefUrl = "sectionref://";
+
+    // Ignore styling if the hyperlink is one of ours
+    if(aDestinationURL.startsWith(termUrl) || aDestinationURL.startsWith(termRefUrl) || aDestinationURL.startsWith(sectionUrl) || aDestinationURL.startsWith(sectionRefUrl)){
+        return;
+    }
     if (!aStyleId.isEmpty() && !aStyleId.equalsIgnoreAsciiCase("DefaultStyle"))
         m_pSerializer->singleElementNS(XML_w, XML_rStyle, FSNS(XML_w, XML_val), aStyleId);
 }
