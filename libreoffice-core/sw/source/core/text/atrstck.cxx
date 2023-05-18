@@ -212,16 +212,25 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
         OUString sectionUrl = "section://";
         OUString sectionRefUrl = "sectionref://";
         if(aDestinationURL.startsWith(termUrl)){
-            *pColor = COL_PIP_TERM;
+            if(pColor)
+            {
+                *pColor = COL_PIP_TERM;
+            }
             return true;
         } else if (aDestinationURL.startsWith(termRefUrl)) {
-            *pColor = COL_PIP_TERM_REF;
+            if(pColor)
+            {
+                *pColor = COL_PIP_TERM_REF;
+            }
             return true;
         } else if(aDestinationURL.startsWith(sectionUrl)){
             // Sections are by default not highlighted a particular color
             return false;
         } else if (aDestinationURL.startsWith(sectionRefUrl)) {
-            *pColor = COL_PIP_SECTION_REF;
+            if(pColor)
+            {
+                *pColor = COL_PIP_SECTION_REF;
+            }
             return true;
         }
     }
