@@ -86,8 +86,8 @@ $(eval $(call gb_CppunitTest_use_uiconfigs,desktop_lib, \
     modules/swriter \
 ))
 
-$(eval $(call gb_CppunitTest_use_packages,desktop_lib, \
-    postprocess_images \
-))
+# $(eval $(call gb_CppunitTest_use_packages,desktop_lib, \
+#     postprocess_images \
+# ))
 
 # vim: set noet sw=4 ts=4:

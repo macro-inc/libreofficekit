@@ -22,15 +22,15 @@ $(eval $(call gb_Library_Library,vcl))
 $(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.common,services))
 
 ifeq ($(DISABLE_GUI),TRUE)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.headless))
+$(eval $(call gb_Library_add_componentimpl,vcl,headless))
 else ifeq ($(OS),MACOSX)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.macosx))
+$(eval $(call gb_Library_add_componentimpl,vcl,macosx))
 else ifeq ($(OS),WNT)
 $(eval $(call gb_Library_add_componentimpl,vcl,windows))
 else ifeq ($(OS),ANDROID)
 $(eval $(call gb_Library_add_componentimpl,vcl,android))
 else ifeq ($(OS),iOS)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.ios))
+$(eval $(call gb_Library_set_componentfile,vcl,ios))
 else
 $(eval $(call gb_Library_add_componentimpl,vcl,unx))
 endif
@@ -601,21 +601,17 @@ $(eval $(call gb_Library_add_libs,vcl,\
 ))
 endif # USING_X11
 
-
 ifeq ($(DISABLE_GUI),TRUE)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
 $(if $(filter WNT,$(OS)), \
     vcl/source/opengl/DeviceInfo \
     vcl/win/dummies \
 ) \
-    vcl/null/printerinfomanager \
 $(if $(filter-out WNT,$(OS)), \
     vcl/unx/generic/printer/jobdata \
     vcl/unx/generic/printer/ppdparser \
 ) \
     vcl/headless/headlessinst \
-    $(vcl_headless_code) \
-    $(vcl_headless_freetype_code) \
 ))
 
 $(eval $(call gb_Library_use_externals,vcl,\
@@ -641,7 +637,6 @@ $(eval $(call gb_Library_use_externals,vcl,\
     $(if $(filter SKIA,$(BUILD_TYPE)),skia) \
 ))
 endif # !DISABLE_GUI
-
 
 #
 # * plugin loader: used on all platforms except iOS and Android

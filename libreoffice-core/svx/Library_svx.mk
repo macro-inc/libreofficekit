@@ -111,6 +111,8 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/accessibility/ShapeTypeHandler \
     svx/source/accessibility/SvxShapeTypes \
     svx/source/accessibility/lookupcolorname \
+    svx/source/table/accessiblecell \
+    svx/source/table/accessibletableshape \
 ))
 endif
 
@@ -257,8 +259,6 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/svdraw/ActionDescriptionProvider \
     svx/source/svdraw/MediaShellHelpers \
     svx/source/smarttags/SmartTagMgr \
-    svx/source/table/accessiblecell \
-    svx/source/table/accessibletableshape \
     svx/source/table/tabledesign \
     svx/source/table/tablertfexporter \
     svx/source/table/tablertfimporter \

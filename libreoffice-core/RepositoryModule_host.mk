@@ -187,7 +187,6 @@ $(eval $(call gb_Module_add_moduledirs,libreoffice,\
 	vcl \
 	wizards \
 	writerfilter \
-	writerperfect \
 	xmerge \
     $(call gb_Helper_optional,XMLHELP,xmlhelp) \
 	xmloff \
@@ -229,7 +228,8 @@ $(eval $(call repositorymodule_serialize,\
 	$(call gb_Helper_optional,SCRIPTING,vbaobj) \
 	sc msword \
 	$(call gb_Helper_optional,DESKTOP,swui) \
-	sw sd \
+	sw \
+    $(if $(ENABLE_WASM_STRIP_BASIC_DRAW_MATH_IMPRESS),,sd) \
 	$(call gb_Helper_optional,DBCONNECTIVITY,dbu) \
 	writerfilter cui chartcontroller chartcore oox \
 	$(if $(MERGELIBS), merged, \

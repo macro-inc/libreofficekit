@@ -27,8 +27,8 @@ $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 	$(call gb_ExternalProject_run,build,\
 		CFLAGS="$(CFLAGS) \
 			$(call gb_ExternalProject_get_build_flags,fontconfig) \
-			$(if $(filter WNT,$(OS)), -nologo -MD)
-			$(if $(debug),-g)
+			$(if $(filter WNT,$(OS)), -nologo -MD) \
+			$(if $(debug),-g) \
 			$(gb_VISIBILITY_FLAGS) \
 			$(if $(filter EMSCRIPTEN,$(OS)),-pthread)" \
 			$(if $(filter ANDROID,$(OS)),LIBS="-lm") \

@@ -930,13 +930,66 @@ solaris*)
     ;;
 
 linux-gnu*|k*bsd*-gnu*|linux-musl*)
+    with_ppds=no
+    enable_firebird_sdbc=no
+    disable_database_connectivity_dependencies
     using_freetype_fontconfig=yes
-    using_x11=yes
-    build_skia=yes
+    using_x11=no
+    build_skia=no
+    enable_cmis=no
+    enable_coinmp=no
+    enable_cups=no
+    enable_database_connectivity=no
+    # enable_dynamic_loading=no
+    enable_extensions=no
+    enable_extension_update=no
+    enable_dbus=no
+    enable_dconf=no
     DISABLE_PYTHON=TRUE
     test_openldap=no
+    enable_gpgmepp=no
+    enable_ldap=no
+    enable_lotuswordpro=no
+    enable_lpsolve=no
+    enable_online_update=no
+    enable_opencl=no
+    enable_randr=no
+    enable_scripting=no
+    enable_sdremote_bluetooth=no
+    enable_report_builder=no
+    enable_xmlhelp=no
+    enable_zxing=no
     test_gdb_index=yes
     test_split_debug=yes
+    test_libepubgen=no
+    test_libcdr=no
+    test_libcmis=no
+    test_libetonyek=no
+    test_libfreehand=no
+    test_libmspub=no
+    test_libpagemaker=no
+    test_libqxp=no
+    test_libvisio=no
+    test_libzmf=no
+    test_webdav=no
+    with_galleries=no
+    with_webdav=no
+    with_x=no
+    AC_DEFINE(ENABLE_WASM_STRIP_ACCESSIBILITY)
+    AC_DEFINE(ENABLE_WASM_STRIP_CALC)
+    AC_DEFINE(ENABLE_WASM_STRIP_GUESSLANG)
+    AC_DEFINE(ENABLE_WASM_STRIP_LANGUAGETOOL)
+    AC_DEFINE(ENABLE_WASM_STRIP_LOCALES)
+    AC_DEFINE(ENABLE_WASM_STRIP_PINGUSER)
+    AC_DEFINE(ENABLE_WASM_STRIP_DBACCESS)
+    AC_DEFINE(ENABLE_WASM_STRIP_EPUB)
+    AC_DEFINE(ENABLE_WASM_STRIP_SWEXPORTS)
+    AC_DEFINE(ENABLE_WASM_STRIP_SCEXPORTS)
+    AC_DEFINE(ENABLE_WASM_STRIP_RECENT)
+    AC_DEFINE(ENABLE_WASM_STRIP_RECOVERYUI)
+    AC_DEFINE(ENABLE_WASM_STRIP_SPLASH)
+    ENABLE_WASM_STRIP_LOK=TRUE
+    ENABLE_WASM_STRIP_CALC=TRUE
     if test "$enable_fuzzers" = yes; then
         test_system_freetype=no
     fi
@@ -3189,8 +3242,8 @@ else
     DISABLE_DYNLOADING='TRUE'
     if test $_os != iOS -a $_os != Android; then
         enable_database_connectivity=no
-        enable_nss=no
-        enable_odk=no
+        # enable_nss=no
+        # enable_odk=no
         enable_python=no
         enable_skia=no
         with_java=no
@@ -3970,6 +4023,7 @@ else
 fi
 AC_SUBST(CROSS_COMPILING)
 AC_SUBST(ENABLE_WASM_STRIP)
+AC_SUBST(ENABLE_WASM_STRIP_LOK)
 AC_SUBST(ENABLE_WASM_STRIP_WRITER)
 AC_SUBST(ENABLE_WASM_STRIP_CALC)
 

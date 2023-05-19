@@ -118,7 +118,7 @@ jobs:
         run: |
           cd /lok/libreoffice-core
           ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="/external-tar"
-          make build-nocheck
+          make build
       - name: Make artifact
         run: |
           cd /lok/libreoffice-core

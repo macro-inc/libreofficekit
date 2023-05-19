@@ -39,11 +39,10 @@ gb_MERGE_LIBRARY_LIST := \
 	for \
 	forui \
 	fps_office \
-	frm \
 	fsstorage \
 	fwk \
 	$(if $(DISABLE_GUI),,$(if $(filter WNT,$(OS)),gdipluscanvas)) \
-	guesslang \
+	$(if $(ENABLE_WASM_STRIP_GUESSLANG),,guesslang) \
 	$(call gb_Helper_optionals_or,HELPTOOLS XMLHELP,helplinker) \
 	hyphen \
 	i18nsearch \
@@ -90,11 +89,9 @@ gb_MERGE_LIBRARY_LIST := \
 	ucptdoc1 \
 	unordf \
 	unoxml \
-	updatefeed \
+	$(if $(ENABLE_WASM_STRIP_PINGUSER),,updatefeed) \
 	utl \
 	uui \
-	vbaevents \
-	vbahelper \
 	vcl \
 	vclcanvas \
 	xmlfa \

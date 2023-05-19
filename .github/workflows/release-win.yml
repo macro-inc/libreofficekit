@@ -165,7 +165,7 @@ jobs:
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make nss || make nss"
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make boost"
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && cd winaccessibility && make CustomTarget_winaccessibility/ia2/idl"
-          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make build-nocheck"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make build"
         shell: cmd
       - name: Make artifact
         run: |

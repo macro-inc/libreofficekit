@@ -88,6 +88,7 @@ $(eval $(call gb_Helper_register_executables,NONE, \
 	$(if $(and $(ENABLE_GTK3), $(filter LINUX %BSD SOLARIS,$(OS))), gtktiledviewer) \
 	$(if $(and $(ENABLE_GTKTILEDVIEWER), $(filter WNT,$(OS))), gtktiledviewer) \
     $(if $(filter EMSCRIPTEN,$(OS)),wasm-qt5-mandelbrot) \
+	cppumaker \
 ))
 
 ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
@@ -479,7 +480,6 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 		vbahelper \
 	) \
 	vcl \
-	writerperfect \
 	xmlscript \
 	xmlfa \
 	xmlfd \
@@ -1248,7 +1248,6 @@ $(eval $(call gb_Helper_register_uiconfigs,\
 	svx \
 	uui \
 	vcl \
-	writerperfect \
 	$(if $(ENABLE_NSS)$(ENABLE_OPENSSL),xmlsec) \
 ))
 

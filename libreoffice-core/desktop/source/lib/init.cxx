@@ -6064,14 +6064,6 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
     static constexpr OStringLiteral aSheetGeometryData(".uno:SheetGeometryData");
     static constexpr OStringLiteral aCellCursor(".uno:CellCursor");
     static constexpr OStringLiteral aFontSubset(".uno:FontSubset&name=");
-<<<<<<< HEAD
-    static const std::initializer_list<std::u16string_view> vForward = {
-        u"TextFormFields",
-        u"SetDocumentProperties",
-        u"Bookmarks",
-        u"GetOutline"
-    };
-=======
 
     ITiledRenderable* pDoc = getTiledRenderable(pThis);
     if (!pDoc)
@@ -6079,7 +6071,6 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
         SetLastExceptionMsg("Document doesn't support tiled rendering");
         return nullptr;
     }
->>>>>>> 5899691bdd764c02e30d95553deb128893bac6e4
 
     if (!strcmp(pCommand, ".uno:LanguageStatus"))
     {
@@ -6963,7 +6954,6 @@ static void doc_sendContentControlEvent(LibreOfficeKitDocument* pThis, const cha
     pDoc->executeContentControlEvent(aMap);
 }
 
-<<<<<<< HEAD
 static void* doc_getXComponent(LibreOfficeKitDocument* pThis)
 {
     SolarMutexGuard aGuard;
@@ -6972,7 +6962,8 @@ static void* doc_getXComponent(LibreOfficeKitDocument* pThis)
     pDocument->mxComponent->acquire();
 
     return pDocument->mxComponent.get();
-=======
+}
+
 static void doc_setViewTimezone(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/, int nId,
                                 const char* pTimezone)
 {
@@ -6999,7 +6990,6 @@ static void doc_setAccessibilityState(SAL_UNUSED_PARAMETER LibreOfficeKitDocumen
         return;
 
     SfxLokHelper::setAccessibilityState(nId, nEnabled);
->>>>>>> 5899691bdd764c02e30d95553deb128893bac6e4
 }
 
 static char* lo_getError (LibreOfficeKit *pThis)

@@ -154,16 +154,6 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 ))
 $(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard,services))
 endif
-ifeq ($(DISABLE_GUI),TRUE)
-$(eval $(call gb_Library_add_exception_objects,sofficeapp,\
-    desktop/source/lib/init \
-	desktop/source/lib/lokdocumenteventnotifier \
-    desktop/source/lib/lokinteractionhandler \
-    desktop/source/lib/lokclipboard \
-    desktop/source/lib/unov8 \
-))
-$(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard,services))
-endif
 endif
 
 # vim: set ts=4 sw=4 et:

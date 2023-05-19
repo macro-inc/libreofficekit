@@ -33,7 +33,7 @@ jobs:
         run: |
           cd libreoffice-core
           ./autogen.sh --with-distro=LOKit-Mac --with-external-tar="$RUNNER_TOOL_CACHE/lokit-external"
-          make build-nocheck
+          make build
           tar -cJf ../libreofficekit-mac-${{ matrix.arch }}.tar.xz instdir
           cd ..
           shasum -a 256 libreofficekit-mac-${{ matrix.arch }}.tar.xz > libreofficekit-mac-${{ matrix.arch }}.tar.xz.sha256sum

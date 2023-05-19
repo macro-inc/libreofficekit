@@ -203,3 +203,6 @@ LibreOffice.VC.VC.opendb
 !/dictionaries/Module_dictionaries.mk
 
 .clangd
+
+CONF-FOR-BUILD/
+vs-code-template.code-workspace

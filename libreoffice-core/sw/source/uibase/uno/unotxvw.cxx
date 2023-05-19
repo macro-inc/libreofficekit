@@ -1842,7 +1842,7 @@ SwXTextView::getTextRangeRects(const ::css::uno::Reference<::css::text::XTextRan
 
         startPos = aPam.Start();
         endPos = aPam.End();
-        node = aPam.GetContentNode();
+        node = aPam.GetPointContentNode();
     }
     else if (auto pCursor = comphelper::getFromUnoTunnel<OTextCursorHelper>(xRangeTunnel))
     {
@@ -1850,7 +1850,7 @@ SwXTextView::getTextRangeRects(const ::css::uno::Reference<::css::text::XTextRan
 
         startPos = rPam.Start();
         endPos = rPam.End();
-        node = rPam.GetContentNode();
+        node = rPam.GetPointContentNode();
     }
 
     if (!startPos || !endPos || !node)
@@ -1858,8 +1858,7 @@ SwXTextView::getTextRangeRects(const ::css::uno::Reference<::css::text::XTextRan
 
     SwShellCursor aCursor(rSh, *startPos);
     aCursor.SetMark();
-    aCursor.GetMark()->nNode = *node;
-    aCursor.GetMark()->nContent.Assign(node, endPos->nContent.GetIndex());
+    aCursor.GetMark()->Assign(*node, endPos->GetContentIndex());
 
     aCursor.FillRects();
 
