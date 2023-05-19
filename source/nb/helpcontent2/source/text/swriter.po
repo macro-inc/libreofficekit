@@ -1,0 +1,3455 @@
+#. extracted from helpcontent2/source/text/swriter
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-01-08 10:42+0000\n"
+"Last-Translator: Karl Morten Ramberg <karl.m.ramberg@gmail.com>\n"
+"Language-Team: Norwegian Bokmål <https://translations.documentfoundation.org/projects/libo_help-master/textswriter/nb_NO/>\n"
+"Language: nb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1548252804.000000\n"
+
+#. x2qZ6
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Mail Merge Toolbar"
+msgstr "Verktøylinjen for brevfletting"
+
+#. 6B2FA
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"hd_id201703240024554113\n"
+"help.text"
+msgid "<link href=\"text/swriter/mailmergetoolbar.xhp\">Mail Merge Toolbar</link>"
+msgstr "<link href=\"text/swriter/mailmergetoolbar.xhp\">Verktøylinjen for brevfletting</link>"
+
+#. HJAAB
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_id201703240025596148\n"
+"help.text"
+msgid "The Mail Merge Toolbar contains commands for the final steps of the mail merge process."
+msgstr "Verktøylinjen for brevfletting inneholder kommandoer for de siste stegene i flettingsprosessen."
+
+#. 9Ecmk
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_id030820161754175468\n"
+"help.text"
+msgid "Go to menu <item type=\"menuitem\">View - Toolbars</item> and select <item type=\"menuitem\">Mail Merge</item>"
+msgstr "Gå til menyen <item type=\"menuitem\">Vis → Verktøylinjer</item> og velg<item type=\"menuitem\">Brevfletting</item>"
+
+#. BxVvc
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10559\n"
+"help.text"
+msgid "(Recipient number)"
+msgstr "(Mottaker nummer)"
+
+#. 7GUxk
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN1055A\n"
+"help.text"
+msgid "<ahelp hid=\".\">Enter the address record number of a recipient to preview the mail merge document for the recipient.</ahelp>"
+msgstr "<ahelp hid=\".\">Velg adressepostnummeret til en mottaker for å forhåndsvise det flettede dokumentet til denne mottakeren.</ahelp>"
+
+#. qhsJA
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10604\n"
+"help.text"
+msgid "<ahelp hid=\".\">Use the browse buttons to scroll through the address records.</ahelp>"
+msgstr "<ahelp hid=\".\">Du kan bruke pilknappene til å bla gjennom adressepostene.</ahelp>"
+
+#. AV749
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN1055D\n"
+"help.text"
+msgid "Exclude recipient"
+msgstr "Ikke ta med denne mottakeren"
+
+#. RBXJC
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10561\n"
+"help.text"
+msgid "<ahelp hid=\".\">Excludes the current recipient from this mail merge.</ahelp>"
+msgstr "<ahelp hid=\".\">Denne mottakeren blir utelatt fra brevflettingen.</ahelp>"
+
+#. TFyWt
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10564\n"
+"help.text"
+msgid "Edit Individual Documents"
+msgstr "Rediger enkeltdokument"
+
+#. Qm2ty
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10556\n"
+"help.text"
+msgid "<ahelp hid=\".\">Creates a single merged document with page breaks between each recipient.</ahelp> The names and the addresses of the recipients are contained in the document, which can be customized as needed."
+msgstr "<ahelp hid=\".\">Lager et flettet dokument med sideskift mellom hver mottager.</ahelp> Navnet og adressen på mottagerne ligger i dokumentet og kan tilpasses hvis nødvendig."
+
+#. 5JFds
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Welcome to the $[officename] Writer Help"
+msgstr "Velkommen til hjelp for $[officename] Writer"
+
+#. CsmWo
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3147233\n"
+"help.text"
+msgid "%PRODUCTNAME Writer Help"
+msgstr "%PRODUCTNAME Writer-hjelp"
+
+#. 6ZEFS
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3147258\n"
+"help.text"
+msgid "Working With %PRODUCTNAME Writer"
+msgstr "Arbeide med %PRODUCTNAME Writer"
+
+#. QmbGy
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3149131\n"
+"help.text"
+msgid "Menus, Toolbars, and Keys"
+msgstr "Menyer, verktøylinjer og taster"
+
+#. Z6Hed
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3149183\n"
+"help.text"
+msgid "Help about the Help"
+msgstr "Hjelp om hjelpen"
+
+#. aFUnY
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Menus"
+msgstr "Menyer"
+
+#. NZfEG
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"hd_id3147274\n"
+"help.text"
+msgid "<variable id=\"main0100\"><link href=\"text/swriter/main0100.xhp\">Menus</link></variable>"
+msgstr "<variable id=\"main0100\"><link href=\"text/swriter/main0100.xhp\">Menyer</link></variable>"
+
+#. b6Ayw
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"par_id3149569\n"
+"help.text"
+msgid "The following section lists the help topics available for menus and dialogs."
+msgstr "Denne delen lister hjelpeemnene som er tilgjengelige for menyer og dialogvinduer."
+
+#. PvGHJ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"tit\n"
+"help.text"
+msgid "File"
+msgstr "Fil"
+
+#. 7tAqJ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"hd_id3147331\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0101.xhp\">File</link>"
+msgstr "<link href=\"text/swriter/main0101.xhp\">Fil</link>"
+
+#. FEPdm
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"par_id3147352\n"
+"help.text"
+msgid "<ahelp hid=\".\">These commands apply to the current document, create a document, open an existing document, or close the application.</ahelp>"
+msgstr "<ahelp hid=\".\">Disse kommandoene gjelder for gjeldende dokument, opprett et dokument, åpne et eksisterende dokument eller lukk programmet.</ahelp>"
+
+#. 6hchv
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit"
+msgstr "Rediger"
+
+#. eZ87D
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id3149610\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0102.xhp\">Edit</link>"
+msgstr "<link href=\"text/swriter/main0102.xhp\">Rediger</link>"
+
+#. EXvjU
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id3149626\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands for editing the contents of the current document.</ahelp>"
+msgstr "<ahelp hid=\".\">Denne menyen inneholder kommandoer for å redigere innholdet i det gjeldende dokumentet..</ahelp>"
+
+#. TV7tD
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id3147619\n"
+"help.text"
+msgid "Select Text"
+msgstr "Velg Tekst"
+
+#. Hug2v
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id102920150120455108\n"
+"help.text"
+msgid "Go to Page"
+msgstr "Gå til side"
+
+#. GjSQM
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id102920150120456660\n"
+"help.text"
+msgid "Opens a dialog box to enter which page number should be shown. (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+G</keycode>)"
+msgstr "Åpner en dialogboks for å angi hvilket sidetal som skal vises. (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+G</keycode>)"
+
+#. xFstf
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id11603124968334\n"
+"help.text"
+msgid "Comment"
+msgstr "Kommentar"
+
+#. vcHKd
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id941603125587454\n"
+"help.text"
+msgid "Shows submenu that gives options to reply to comments from other users, resolve and delete comments."
+msgstr "Viser undermeny som gir alternativer for å svare på kommentarer fra andre brukere, løse og slette kommentarer."
+
+#. FDHX2
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id0914201501170124\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/02140000.xhp\">Fields</link>"
+msgstr "<link href=\"text/swriter/01/02140000.xhp\">Felt</link>"
+
+#. 5RCMR
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id0914201501170171\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02180000.xhp\">External Links</link>"
+msgstr "<link href=\"text/shared/01/02180000.xhp\">Eksterne Lenker</link>"
+
+#. YAajd
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id0914201502131542\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02200000.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/02200000.xhp\">OLE Objekt</link>"
+
+#. DhwSa
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id102920150120456626\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18130000.xhp\">Direct Cursor Mode</link>"
+msgstr "<link href=\"text/swriter/02/18130000.xhp\">Direkte skrivemerke på/av</link>"
+
+#. 96mxR
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id102920150120459176\n"
+"help.text"
+msgid "Allows a user to click at the beginning, middle, or end of any possible text line on a page and then begin typing."
+msgstr "Gjør at brukeren kan klikke ved starten, midten eller slutten av en tekstlinje på en side og begynne  å skrive inn tekst."
+
+#. zRW8E
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"tit\n"
+"help.text"
+msgid "View"
+msgstr "Vis"
+
+#. prCMC
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3147233\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0103.xhp\">View</link>"
+msgstr "<link href=\"text/swriter/main0103.xhp\">Vis</link>"
+
+#. VjZcs
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id3147249\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands to control the on-screen display of the document, change the user interface and access the sidebar panels.</ahelp>"
+msgstr "<ahelp hid=\".\">Denne menyen inneholder kommandoer for å kontrollere visningen av dokumentet på skjermen, endre brukergrensesnittet og få tilgang til sidepanelene.</ahelp>"
+
+#. VDkey
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150703473580\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/03130000.xhp\">Normal</link>"
+msgstr "<link href=\"text/swriter/01/03130000.xhp\">Normal</link>"
+
+#. QDRrz
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150703478401\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/03120000.xhp\">Web</link>"
+msgstr "<link href=\"text/swriter/01/03120000.xhp\">Web</link>"
+
+#. nRv2U
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150854015048\n"
+"help.text"
+msgid "Scrollbars"
+msgstr "Rullefelt"
+
+#. DW3uE
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150854017277\n"
+"help.text"
+msgid "Show or hide the horizontal and vertical scroll bars that are used to change the viewable area of a document that doesn't fit within the window."
+msgstr "Viser eller skjuler horisontale og vertikale rullefeltene som brukes for endre det synlige dokumentområdet som det ikke er plass til i vinduet"
+
+#. Qcoew
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_idN10613\n"
+"help.text"
+msgid "Table Boundaries"
+msgstr "Tabellgrenser"
+
+#. cWSmD
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_idN107CA\n"
+"help.text"
+msgid "Shows or hides the borders of table cells that have no set borders. The boundaries are only visible on screen and are not printed."
+msgstr "Viser eller skjuler kantlinjene rundt tabellceller. Kantlinjene er bare synlige på skjermen, og blir ikke skrevet ut."
+
+#. BGHSk
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150854011929\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "Bilde og Diagram"
+
+#. rFzz3
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150854013292\n"
+"help.text"
+msgid "Show or hide graphical objects like images and charts within a document."
+msgstr "Viser eller skjuler grafiske objekt som bilder og diagram i et dokument"
+
+#. ewZgE
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150854019880\n"
+"help.text"
+msgid "Comments"
+msgstr "Kommentarer"
+
+#. hjPDz
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150854014989\n"
+"help.text"
+msgid "Show or hide a document's comments and replies to them."
+msgstr "Viser eller skjuler et dokuments kommentarer og svarene til kommentarene"
+
+#. EWoyn
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id981573492083329\n"
+"help.text"
+msgid "Resolved comments"
+msgstr "Løste kommentarer"
+
+#. 8FzFE
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id331573492076499\n"
+"help.text"
+msgid "Show or hide <link href=\"text/shared/01/04050000.xhp#resolvecomments\">resolved comments</link>."
+msgstr "Vis eller skjul<link href=\"text/shared/01/04050000.xhp#resolvecomments\">løste kommentarer</link>."
+
+#. KqRGM
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3147265\n"
+"help.text"
+msgid "<link href=\"text/shared/01/03010000.xhp\">Zoom</link>"
+msgstr "<link href=\"text/shared/01/03010000.xhp\">Skalering</link>"
+
+#. Dp7mC
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Sett inn"
+
+#. aZsCM
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3155341\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0104.xhp\">Insert</link>"
+msgstr "<link href=\"text/swriter/main0104.xhp\">Sett inn</link>"
+
+#. TgA97
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id3155358\n"
+"help.text"
+msgid "<ahelp hid=\".\">The Insert menu contains commands for inserting new elements in your document. This includes images, media, charts, objects from other applications, hyperlink, comments, symbols, footnotes, and sections.</ahelp>"
+msgstr "<ahelp hid=\".\">Sett innm menyen inneholder kommandoer for å sette inn nye elementer i dokumentet. Dette inkluderer bilder, media, diagrammer, objekter fra andre applikasjoner, hyperlinker, kommentarer, symboler, fotnoter og seksjoner.</ahelp>"
+
+#. paR8F
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id030420160850525240\n"
+"help.text"
+msgid "Page Break"
+msgstr "Sideskift"
+
+#. 8z5Gv
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id030420160850533104\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertPagebreak\">Inserts a manual page break at the current cursor position and places the cursor at the beginning of the next page.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertPagebreak\">Setter inn et manuelt sideskifte ved markøren og plasserer markøren på starten av neste side.</ahelp>"
+
+#. mLs8G
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3158442\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">Image</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Bilde</link>"
+
+#. Bj8mG
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3147788\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\">Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\">Seksjon</link>"
+
+#. f3j54
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3149428\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\">Text from File</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\">Tekst fra Fil</link>"
+
+#. G4BAP
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id030720160706334584\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01140000.xhp#textbox_title\">Textbox</link>"
+msgstr "<link href=\"text/shared/02/01140000.xhp#textbox_title\">Tekstboks</link>"
+
+#. GFNXQ
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3147281\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\">Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\">Bokmerke</link>"
+
+#. Bed3E
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id030420161125315689\n"
+"help.text"
+msgid "Horizontal Line"
+msgstr "Horisontell linje"
+
+#. 7pGUa
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id030420161125315647\n"
+"help.text"
+msgid "Inserts a horizontal line at the current cursor position."
+msgstr "Setter inn en horisontell linje ved markørposisjonen"
+
+#. N6J2x
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3149865\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04070000.xhp\">Envelope</link>"
+msgstr "<link href=\"text/swriter/01/04070000.xhp\">Konvolutt</link>"
+
+#. JP4tR
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format"
+msgstr "Format"
+
+#. DTAbu
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3147820\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0105.xhp\">Format</link>"
+msgstr "<link href=\"text/swriter/main0105.xhp\">Format</link>"
+
+#. XVBUU
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id3147218\n"
+"help.text"
+msgid "<ahelp hid=\".uno:FormatMenu\">Contains commands for formatting the layout and the contents of your document.</ahelp>"
+msgstr "<ahelp hid=\".uno:FormatMenu\">Inneholder kommandoer for å endre utforminga av og innhold i dokumentet.</ahelp>"
+
+#. zjGX9
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id551602974854459\n"
+"help.text"
+msgid "Align Text"
+msgstr "Juster Tekst"
+
+#. 7FD3V
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id741602974888780\n"
+"help.text"
+msgid "Opens a submenu where you can align text and objects."
+msgstr "Åpner en undermeny hvor du kan justere tekst og objekter."
+
+#. Vsjn5
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3147261\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">Tegn</link>"
+
+#. SjBAg
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3147286\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">Avsnitt</link>"
+
+#. 7iyia
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id951602975070826\n"
+"help.text"
+msgid "Lists"
+msgstr "Lister"
+
+#. MKjWR
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id461602975083850\n"
+"help.text"
+msgid "Opens a submenu where you can modify the formatting of list paragraphs."
+msgstr "Åpner en undermeny hvor du kan endre formatering av listeavsnitt."
+
+#. aJdFV
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3145784\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06050000.xhp\">Bullets and Numbering</link>"
+msgstr "<link href=\"text/shared/01/06050000.xhp\">Punkter og nummerering</link>"
+
+#. E6Eut
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id871602976197055\n"
+"help.text"
+msgid "Title Page"
+msgstr "Tittelside"
+
+#. crAFH
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id471602976213270\n"
+"help.text"
+msgid "Opens a dialog where you can design a title page."
+msgstr "Åpner en dialogboks hvor du kan designe en tittelside."
+
+#. QKypm
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id201602976343046\n"
+"help.text"
+msgid "Comments"
+msgstr "Kommentarer"
+
+#. ercCs
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id61602976356685\n"
+"help.text"
+msgid "When comments are present, the character dialog is presented. Changes to font and font formatting are applied to all comments."
+msgstr "Når kommentarer er til stede, presenteres karakterdialogen. Endringer i skrifttype og skriftformatering brukes på alle kommentarer."
+
+#. ZZgeT
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3145743\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05040500.xhp\">Columns</link>"
+msgstr "<link href=\"text/swriter/01/05040500.xhp\">Kolonner</link>"
+
+#. xxsJP
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id11602979335965\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/watermark.xhp\">Watermark</link>"
+msgstr "<link href=\"text/swriter/01/watermark.xhp\">Vannmerke</link>"
+
+#. GWQbW
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3145717\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/02170000.xhp\">Sections</link>"
+msgstr "<link href=\"text/swriter/01/02170000.xhp\">Seksjoner</link>"
+
+#. G7ZKH
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3149935\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060000.xhp\">Image</link>"
+msgstr "<link href=\"text/swriter/01/05060000.xhp\">Bilde</link>"
+
+#. FUiBn
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id881602977719329\n"
+"help.text"
+msgid "Frame and Object"
+msgstr "Ramme og Objekt"
+
+#. hLVBp
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id951602977746649\n"
+"help.text"
+msgid "Opens a submenu to link and unlink frames, and edit properties of a selected frame."
+msgstr "Åpner en undermeny for å koble og koble fra rammer, og redigere egenskaper til en valgt ramme."
+
+#. JWALC
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id871602978482880\n"
+"help.text"
+msgid "Rotate or Flip"
+msgstr "Roter eller Flipp"
+
+#. BpkEj
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id561602978499640\n"
+"help.text"
+msgid "Opens a submenu where you can rotate or and flip a selected shape or image. Text boxes can only be rotated."
+msgstr "Åpner en undermeny hvor du kan rotere eller og vende en valgt form eller et bilde. Tekstbokser kan bare roteres."
+
+#. r9nLs
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools"
+msgstr "Verktøy"
+
+#. EQ4r3
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3147241\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0106.xhp\">Tools</link>"
+msgstr "<link href=\"text/swriter/main0106.xhp\">Verktøy</link>"
+
+#. UNAzE
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"par_id3147258\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains spelling tools, redact options, mail merge wizard, macros, development tools, extension manager, as well as tools for configuring and customizing menus, and setting program preferences.</ahelp>"
+msgstr "<ahelp hid=\".\">Inneholder staveverktøy, redigeringsalternativer, utskriftsflettingsveiviser, makroer, utviklingsverktøy, utvidelsesbehandling, samt verktøy for å konfigurere og tilpasse menyer og angi programinnstillinger.</ahelp>"
+
+#. ipUs6
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id691612907136111\n"
+"help.text"
+msgid "<link href=\"text/shared/02/18030000.xhp\">Automatic Spell Checking</link>"
+msgstr "<link href=\"text/shared/02/18030000.xhp\">Automatisk Stavekotroll</link>"
+
+#. RFxpX
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3156150\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02220000.xhp\">ImageMap</link>"
+msgstr "<link href=\"text/shared/01/02220000.xhp\">Bildekart</link>"
+
+#. c786T
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id621628789958422\n"
+"help.text"
+msgid "<link href=\"text/shared/guide/redaction.xhp\">Redact</link>"
+msgstr "<link href=\"text/shared/guide/redaction.xhp\">Rediger</link>"
+
+#. GvGzQ
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id231628790402002\n"
+"help.text"
+msgid "<link href=\"text/shared/guide/auto_redact.xhp\">Auto-Redact</link>"
+msgstr "<link href=\"text/shared/guide/auto_redact.xhp\">Auto-Rediger</link>"
+
+#. ww9WA
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3149965\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06060000.xhp\">Chapter Numbering</link>"
+msgstr "<link href=\"text/swriter/01/06060000.xhp\">Kapittelnummerering</link>"
+
+#. NcNiN
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3145688\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06180000.xhp\">Line Numbering</link>"
+msgstr "<link href=\"text/swriter/01/06180000.xhp\">Linjenummerering</link>"
+
+#. WctnW
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3145713\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06080000.xhp\">Footnotes and Endnotes</link>"
+msgstr "<link href=\"text/swriter/01/06080000.xhp\">Fotnoter og Sluttnoter</link>"
+
+#. PYr7Y
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id501612910204859\n"
+"help.text"
+msgid "<link href=\"text/shared/01/01110101.xhp\">Address Book Source</link>"
+msgstr "<link href=\"text/shared/01/01110101.xhp\">Kilde for Adressebok</link>"
+
+#. CXTEr
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3147346\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06100000.xhp\">Sort</link>"
+msgstr "<link href=\"text/swriter/01/06100000.xhp\">Sorter</link>"
+
+#. jVFic
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3147406\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06140000.xhp\">Customize</link>"
+msgstr "<link href=\"text/shared/01/06140000.xhp\">Tilpass</link>"
+
+#. KRfJh
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"tit\n"
+"help.text"
+msgid "Window"
+msgstr "Vindu"
+
+#. GwCED
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"hd_id3147248\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0107.xhp\">Window</link>"
+msgstr "<link href=\"text/swriter/main0107.xhp\">Vindu</link>"
+
+#. uGDRi
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"par_id3147269\n"
+"help.text"
+msgid "<ahelp hid=\".uno:WindowList\" visibility=\"visible\">Contains commands for manipulating and displaying document windows.</ahelp>"
+msgstr "<ahelp hid=\".uno:WindowList\" visibility=\"visible\">Inneholder kommandoer for å behandle og vise dokumentvinduer.</ahelp>"
+
+#. zC2qE
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table"
+msgstr "Tabell"
+
+#. v6SF2
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10553\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0110.xhp\">Table</link>"
+msgstr "<link href=\"text/swriter/main0110.xhp\">Tabell</link>"
+
+#. DunBb
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10563\n"
+"help.text"
+msgid "<ahelp hid=\".\">Shows commands to insert, edit, and delete a table and its elements inside a text document.</ahelp>"
+msgstr "<ahelp hid=\".\">Viser kommandoer som kan brukes til å sette inn og redigere en tabell i et tekstdokument.</ahelp>"
+
+#. jBnDR
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B5\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\">Insert Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\">Sett inn tabell</link>"
+
+#. YCMVU
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B8\n"
+"help.text"
+msgid "Inserts a new table."
+msgstr "Setter inn en ny tabell."
+
+#. cwdAZ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105AB\n"
+"help.text"
+msgid "Insert"
+msgstr "Sett inn"
+
+#. bYChy
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id881605975490097\n"
+"help.text"
+msgid "<variable id=\"submenu\">Opens a submenu with the following command options:</variable>"
+msgstr "<variable id=\"submenu\">Åpner en undermeny med følgende kommandoalternativer:</variable>"
+
+#. dAYGb
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id71605976065472\n"
+"help.text"
+msgid "Rows Above"
+msgstr "Rader Ovenfor"
+
+#. ETuzB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id811605976075887\n"
+"help.text"
+msgid "Insert a row above the row where the cursor is currently placed."
+msgstr "Sett inn en rad over raden hvor markøren er plassert."
+
+#. 3B4Ea
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id621605976125265\n"
+"help.text"
+msgid "Rows Below"
+msgstr "Rader Under"
+
+#. sZV4E
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id701605976138113\n"
+"help.text"
+msgid "Insert a row below the row where the cursor is currently placed."
+msgstr "Sett inn en rad under raden hvor markøren er plassert."
+
+#. KfmGG
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105E5\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120400.xhp\">Rows</link>"
+msgstr "<link href=\"text/swriter/01/05120400.xhp\">Rader</link>"
+
+#. AN99u
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105E8\n"
+"help.text"
+msgid "Opens dialog box for inserting rows."
+msgstr "Åpner dialogboksen for å sette inn rader."
+
+#. FedsM
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id841605976313559\n"
+"help.text"
+msgid "Columns Before"
+msgstr "Kolonner Før"
+
+#. 7CVcf
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id531605976347665\n"
+"help.text"
+msgid "Inserts a column before the column where the cursor is currently placed."
+msgstr "Setter inn en kolonne før kolonnen der markøren er plassert."
+
+#. UE3RA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id21605976318849\n"
+"help.text"
+msgid "Columns After"
+msgstr "Kolonner Etter"
+
+#. fooJR
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id731605976350615\n"
+"help.text"
+msgid "Inserts a column after the column where the cursor is currently placed."
+msgstr "Setter inn en kolonne etter kolonnen der markøren er plassert."
+
+#. GM6FW
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105CD\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120400.xhp\">Columns</link>"
+msgstr "<link href=\"text/swriter/01/05120400.xhp\">Kolonner</link>"
+
+#. i3nKB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105D0\n"
+"help.text"
+msgid "Opens dialog box for inserting columns."
+msgstr "Åpner dialogboksen for å sette inn kolonner."
+
+#. ttkBa
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105AF\n"
+"help.text"
+msgid "Delete"
+msgstr "Slett"
+
+#. mkgZ4
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1066A\n"
+"help.text"
+msgid "Rows"
+msgstr "Rader"
+
+#. ADvQJ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10616\n"
+"help.text"
+msgid "Deletes the selected rows."
+msgstr "Sletter de valgte radene."
+
+#. TdA3g
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1060D\n"
+"help.text"
+msgid "Columns"
+msgstr "Kolonner"
+
+#. egcgE
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10610\n"
+"help.text"
+msgid "Deletes the selected columns."
+msgstr "Sletter de valgte kolonnene."
+
+#. QTm9i
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1063E\n"
+"help.text"
+msgid "Table"
+msgstr "Tabell"
+
+#. 4ExJk
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1060A\n"
+"help.text"
+msgid "<ahelp hid=\".\">Deletes the current table.</ahelp>"
+msgstr "<ahelp hid=\".\">Sletter den gjeldende tabellen.</ahelp>"
+
+#. vCbDT
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B3\n"
+"help.text"
+msgid "Select"
+msgstr "Velg"
+
+#. EKDPA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10635\n"
+"help.text"
+msgid "Cell"
+msgstr "Celle"
+
+#. gBmZP
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10638\n"
+"help.text"
+msgid "<ahelp hid=\".\">Selects the current cell.</ahelp>"
+msgstr "<ahelp hid=\".\">Velger den gjeldende cellen.</ahelp>"
+
+#. HmSyb
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1062F\n"
+"help.text"
+msgid "Row"
+msgstr "Rad"
+
+#. WCPpF
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10632\n"
+"help.text"
+msgid "Selects the current row."
+msgstr "Velger den gjeldende raden."
+
+#. vk5ie
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10629\n"
+"help.text"
+msgid "Column"
+msgstr "Kolonne"
+
+#. zB3JC
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1062C\n"
+"help.text"
+msgid "Selects the current column."
+msgstr "Velger den gjeldende kolonnen."
+
+#. TA2Qc
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10623\n"
+"help.text"
+msgid "Table"
+msgstr "Tabell"
+
+#. MsH9h
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10626\n"
+"help.text"
+msgid "<ahelp hid=\".\">Selects the current table.</ahelp>"
+msgstr "<ahelp hid=\".\">Velger den gjeldende tabellen.</ahelp>"
+
+#. 5eQNa
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105FB\n"
+"help.text"
+msgid "Size"
+msgstr "Størrelse"
+
+#. C4FY8
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106E9\n"
+"help.text"
+msgid "Row Height"
+msgstr "Radhøyde"
+
+#. NE7NJ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106EC\n"
+"help.text"
+msgid "Opens the Row Height dialog where you can change the height of a row."
+msgstr "Åpner dialogvinduet for radhøyde, der du kan endre høyden på en rad."
+
+#. zBhmB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id451605990864684\n"
+"help.text"
+msgid "<link href=\"text/shared/01/minimal_row_height.xhp\">Minimal Row Height</link>"
+msgstr "<link href=\"text/shared/01/minimal_row_height.xhp\">Minimal radhøyde</link>"
+
+#. EF7XB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106EF\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05110200.xhp\">Optimal Row Height</link>"
+msgstr "<link href=\"text/swriter/01/05110200.xhp\">Beste radhøyde</link>"
+
+#. FqtLY
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10706\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05110600m.xhp\">Distribute Rows Evenly</link>"
+msgstr "<link href=\"text/shared/01/05110600m.xhp\">Fordel rader jevnt</link>"
+
+#. pTncP
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106B5\n"
+"help.text"
+msgid "Column Width"
+msgstr "Kolonnevidde"
+
+#. cuCmA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106B8\n"
+"help.text"
+msgid "Opens the Column Width dialog where you can change the width of a column."
+msgstr "Åpner dialogvinduet for kolonnebredde, der du kan endre bredden til en kolonne."
+
+#. qi4p9
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id671605991381461\n"
+"help.text"
+msgid "<link href=\"text/shared/01/minimal_column_width.xhp\">Minimal Column Width</link>"
+msgstr "<link href=\"text/shared/01/minimal_column_width.xhp\">Minimal kolonnebredde</link>"
+
+#. Y4m4U
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106BB\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120200.xhp\">Optimal Column Width</link>"
+msgstr "<link href=\"text/swriter/01/05120200.xhp\">Beste kolonnebredde</link>"
+
+#. yEGjw
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106D2\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05120600.xhp\">Distribute Columns Evenly</link>"
+msgstr "<link href=\"text/shared/01/05120600.xhp\">Fordel kolonner jevnt</link>"
+
+#. ChNkP
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B7\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100100.xhp\">Merge Cells</link>"
+msgstr "<link href=\"text/shared/01/05100100.xhp\">Slå sammen celler</link>"
+
+#. T8apK
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105BB\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100200.xhp\">Split Cells</link>"
+msgstr "<link href=\"text/shared/01/05100200.xhp\">Del celler</link>"
+
+#. LCqxC
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id371605978330177\n"
+"help.text"
+msgid "Protect Cells"
+msgstr "Beskytt Celler"
+
+#. GHXsD
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id531605978352545\n"
+"help.text"
+msgid "Unprotect Cells"
+msgstr "Opphev beskyttelse av Celler"
+
+#. 5CFq9
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105F7\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05150101.xhp\">AutoFormat Styles</link>"
+msgstr "<link href=\"text/swriter/01/05150101.xhp\">AutoFormater Stiler</link>"
+
+#. KRMHM
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1060F\n"
+"help.text"
+msgid "Number Format"
+msgstr "Tallformat"
+
+#. xfWAX
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN107AC\n"
+"help.text"
+msgid "Opens <link href=\"text/shared/optionen/01040500.xhp\">a dialog</link> where you can specify the format of numbers in the table."
+msgstr "Åpner <link href=\"text/shared/optionen/01040500.xhp\">et dialogvindu</link> der du kan angi formatet til tall i tabellen."
+
+#. z2HSC
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id931605978707761\n"
+"help.text"
+msgid "<link href=\"text/swriter/guide/number_date_conv.xhp\">Number Recognition</link>"
+msgstr "<link href=\"text/swriter/guide/number_date_conv.xhp\">Nummer Gjenkjennelse</link>"
+
+#. CW8ME
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id511605978897703\n"
+"help.text"
+msgid "Toggles the setting for automatically recognizing numbers or dates that you enter into a table cell, converting them from text to an appropriate number format."
+msgstr "Bytter innstillingen for automatisk å gjenkjenne tall eller datoer som du skriver inn i en tabellcelle, konverterer dem fra tekst til et passende nummerformat."
+
+#. kz8tL
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id711630938569930\n"
+"help.text"
+msgid "Header Rows Repeat Across Pages"
+msgstr "Sidehoderader gjentas på alle sider"
+
+#. pV6gM
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id451630938722616\n"
+"help.text"
+msgid "Repeat a table heading on each new page that the table spans."
+msgstr "Gjenta en tabelloverskrift på hver nye side som tabellen strekker seg over."
+
+#. kXsZH
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id191630938574129\n"
+"help.text"
+msgid "Rows to Break Across Pages"
+msgstr "Rader som å brytes på sidene"
+
+#. iUmYL
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id841630938899606\n"
+"help.text"
+msgid "Allows a page break or column break inside a row of the table. This option is not applied to the first row in a table if the <emph>Repeat Heading</emph> option is selected."
+msgstr "Tillater sideskift eller kolonneskifte inne i en rad i tabellen. Dette alternativet brukes ikke på den første raden i en tabell hvis alternativet <emph> Gjenta overskrift </emph> er valgt."
+
+#. kwKdS
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10603\n"
+"help.text"
+msgid "Convert"
+msgstr "Gjør om"
+
+#. SCAJt
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1074C\n"
+"help.text"
+msgid "Text to Table"
+msgstr "Tekst til tabell"
+
+#. tAGig
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1074F\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog where you can convert the selected text to a table.</ahelp> Opens <link href=\"text/swriter/01/06090000.xhp\">a dialog</link> where you can convert the selected text to a table."
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Åpner et dialogvindu der du kan gjøre om den valgte teksten til en tabell.</ahelp> Åpner <link href=\"text/swriter/01/06090000.xhp\">et dialogvindu</link> der du kan gjøre om den valgte teksten til en tabell."
+
+#. C9Sn9
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10763\n"
+"help.text"
+msgid "Table to Text"
+msgstr "Tabell til tekst"
+
+#. LAbdZ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10766\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog where you can convert the current table to text.</ahelp> Opens <link href=\"text/swriter/01/06090000.xhp\">a dialog</link> where you can convert the current table to text."
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Åpner et dialogvindu der du kan gjøre om den gjeldende tabellen til tekst.</ahelp> Åpner <link href=\"text/swriter/01/06090000.xhp\">et dialogvindu</link> der du kan gjøre om den gjeldende tabellen til tekst."
+
+#. Y4qBD
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1092F\n"
+"help.text"
+msgid "Text Formula"
+msgstr "Tekstformel"
+
+#. xLmxB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10933\n"
+"help.text"
+msgid "Opens the <link href=\"text/swriter/main0214.xhp\">Formula bar</link> to enter or edit a formula."
+msgstr "Åpner <link href=\"text/swriter/main0214.xhp\">Formellinjen</link> der du kan skrive inn eller endre en formel."
+
+#. HAZVY
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10607\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06100000.xhp\">Sort</link>"
+msgstr "<link href=\"text/swriter/01/06100000.xhp\">Sorter</link>"
+
+#. YtQGA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10617\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05090000.xhp\">Properties</link>"
+msgstr "<link href=\"text/swriter/01/05090000.xhp\">Egenskaper</link>"
+
+#. JcZa3
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"tit\n"
+"help.text"
+msgid "Styles (menu)"
+msgstr "Stiler (Meny)"
+
+#. uvGcE
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_idN10553\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0115.xhp\">Styles</link>"
+msgstr "<link href=\"text/swriter/main0115.xhp\">Stiler</link>"
+
+#. Ew4ac
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_idN10563\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains commands to apply, create, edit, update, load, and manage <link href=\"text/swriter/01/05130000.xhp\">styles</link> in a text document.</ahelp>"
+msgstr "<ahelp hid=\".\">Inneholderkommandoer for å skape, redigere, oppdatere, starte og administrere<link href=\"text/swriter/01/05130000.xhp\">Stiler</link>i et tekstdokument.</ahelp>"
+
+#. gsPnE
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id121529878513674\n"
+"help.text"
+msgid "Text styles entries"
+msgstr "Registrer Tekststiler"
+
+#. DEUQy
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id411529878520742\n"
+"help.text"
+msgid "The entries includes most common paragraph, character and list styles. Click on the style to apply."
+msgstr "Oppføringene inkluderer de vanligste avsnitts, tegn og listestiler. Klikk på stilen får å bruke den."
+
+#. RW2Mb
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id451529878529005\n"
+"help.text"
+msgid "You can customize the list of styles entries using menu <link href=\"text/shared/01/06140100.xhp\"><emph>Tools - Customize</emph></link>. Because custom styles belongs to the actual document, remember to store the customized menu in the document scope."
+msgstr "Du kan tilpasse stillisten ved å bruke menyen<link href=\"text/shared/01/06140100.xhp\"><emph>Verktøy - Tilpass</emph></link>. Fordi egendefinerte stiler tilhører det aktuelle dokumentet, husk å lagre den tilpassede menyen i dokumentet."
+
+#. 7kWCz
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id991529881414793\n"
+"help.text"
+msgid "Edit Style"
+msgstr "Rediger stil"
+
+#. yrGy9
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id111529881420452\n"
+"help.text"
+msgid "Opens the Paragraph Style dialog box of the current paragraph."
+msgstr "Åpner Avsnittsstil dialogboksen for det aktuelle avsnittet."
+
+#. uAA8T
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id111529881431158\n"
+"help.text"
+msgid "Update Selected Style"
+msgstr "Oppdater Valgt Stil"
+
+#. ZwMWW
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id971529881437377\n"
+"help.text"
+msgid "Update the paragraph style with the <link href=\"text/shared/00/00000005.xhp#Section7\">direct formatting</link> applied to the current paragraph."
+msgstr "Oppdater avsnittstilen med <link href=\"text/shared/00/00000005.xhp#Section7\">direkte formatering</link>som er brukt på det aktuelle avsnittet."
+
+#. DdHfV
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id191529881446409\n"
+"help.text"
+msgid "New Style from Selection"
+msgstr "Ny Stil fra Utvalg"
+
+#. gYvit
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id331529881457275\n"
+"help.text"
+msgid "Adds a paragraph style with the settings of the current selection. You will be prompted to enter the style name."
+msgstr "Legger til en avsnittsstil med egenskapene som er valgt. Du vil bli bedt om å angi et navn for den nye stilen."
+
+#. 8cXPR
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id351529881470044\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05170000.xhp\">Load Styles from Template</link>"
+msgstr "<link href=\"text/swriter/01/05170000.xhp\">Last inn Stiler fra Mal</link>"
+
+#. EycDZ
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id551529883682302\n"
+"help.text"
+msgid "<link href=\"text/swriter/guide/load_styles.xhp\">Import styles</link> from another document or template into the current document."
+msgstr "<link href=\"text/swriter/guide/load_styles.xhp\">Importer Stiler</link> fra et annet dokument eller mal inn i det aktuelle dokumentet."
+
+#. Fec4Z
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id361529881482828\n"
+"help.text"
+msgid "Manage Styles"
+msgstr "Administrere Stiler"
+
+#. Er7Gx
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id901529883673111\n"
+"help.text"
+msgid "Opens the <link href=\"text/swriter/01/05140000.xhp\">Styles deck</link> in the sidebar."
+msgstr "Åpner<link href=\"text/swriter/01/05140000.xhp\">Stilervelgeren</link> i sidestolpen."
+
+#. VmXct
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"tit\n"
+"help.text"
+msgid "Form Menu"
+msgstr "Skjema Meny"
+
+#. 3vYDT
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id111529755027117\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0120.xhp\">Form</link>"
+msgstr "<link href=\"text/swriter/main0120.xhp\">Skjema</link>"
+
+#. p36K7
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id991529755027118\n"
+"help.text"
+msgid "<variable id=\"form_intro\"><ahelp hid=\".\">Contains commands for activate form design mode, enable/disable control wizards and insert form controls in your document.</ahelp></variable>"
+msgstr "<variable id=\"form_intro\"><ahelp hid=\".\">Inneholder kommandoer for å aktivere skjemadesignmodus, aktivere/deaktivere kontrollveivisere og sette inn skjemakontroller i dokumentet ditt.</ahelp></variable>"
+
+#. AdXBE
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id551529758534136\n"
+"help.text"
+msgid "Design Mode"
+msgstr "Utformingsmodus"
+
+#. BFekR
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id791529758540932\n"
+"help.text"
+msgid "Enable or disable form design mode."
+msgstr "Aktiver eller deaktiver utformingsmodus."
+
+#. g2jWn
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id121529758546072\n"
+"help.text"
+msgid "Control Wizards"
+msgstr "Kontroll veivisere"
+
+#. 8G87B
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id271529758552229\n"
+"help.text"
+msgid "Enable or disable control wizards."
+msgstr "Aktiver eller deaktiver kontrollveivisere"
+
+#. CoDTS
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id571529784049416\n"
+"help.text"
+msgid "More fields"
+msgstr "Flere felt"
+
+#. cQUuS
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id951529784060420\n"
+"help.text"
+msgid "Date, time, numerical, currency and pattern form fields."
+msgstr "Dato, tid, nummer, valuta og formmønster felt"
+
+#. cFn9D
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id811529763403256\n"
+"help.text"
+msgid "Automatic Control Focus"
+msgstr "Automatisk fokus på kontrollelement"
+
+#. SKPin
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id281529763411414\n"
+"help.text"
+msgid "Enable or disable Automatic Control Focus"
+msgstr "Aktiver eller deaktiver Automatisk kontroll fokus"
+
+#. 5DRv5
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toolbars"
+msgstr "Verktøylinjer"
+
+#. GAURx
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"hd_id3145782\n"
+"help.text"
+msgid "<variable id=\"main0200\"><link href=\"text/swriter/main0200.xhp\">Toolbars</link></variable>"
+msgstr "<variable id=\"main0200\"><link href=\"text/swriter/main0200.xhp\">Verktøylinjer</link></variable>"
+
+#. FURde
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"par_id3145481\n"
+"help.text"
+msgid "This section provides an overview of the toolbars available in $[officename] Writer. <embedvar href=\"text/shared/00/00000007.xhp#symbolleistenneu\"/>"
+msgstr "Denne delen gir en oversikt over de tilgjengelige verktøylinjene i $[officename] Writer. <embedvar href=\"text/shared/00/00000007.xhp#symbolleistenneu\"/>"
+
+#. XUCUB
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formatting Bar"
+msgstr "Formateringslinjen"
+
+#. NemzY
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3154270\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0202.xhp\">Formatting Bar</link>"
+msgstr "<link href=\"text/swriter/main0202.xhp\">Formateringslinjen</link>"
+
+#. nFs3x
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3147762\n"
+"help.text"
+msgid "The Formatting bar contains several text formatting functions."
+msgstr "Formateringslinjen inneholder flere tekstformateringsfunksjoner."
+
+#. 5SXPT
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3149593\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#FontColor\">Font Color</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#FontColor\">Fontfarge</link>"
+
+#. 9sJ5w
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3149887\n"
+"help.text"
+msgid "Additional icons"
+msgstr "Flere ikoner"
+
+#. 9gZ3B
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0122200903085320\n"
+"help.text"
+msgid "Increase Font"
+msgstr "Større skrift"
+
+#. ozD6J
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0122200903085371\n"
+"help.text"
+msgid "<ahelp hid=\".\">Increases the font size of the selected text.</ahelp>"
+msgstr "<ahelp hid=\".\">Øker skriftstørrelsen på den valgte teksten.</ahelp>"
+
+#. 3oD2m
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id012220090308532\n"
+"help.text"
+msgid "Reduce Font"
+msgstr "Mindre skrift"
+
+#. 222dq
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0122200903085351\n"
+"help.text"
+msgid "<ahelp hid=\".\">Reduces the font size of the selected text.</ahelp>"
+msgstr "<ahelp hid=\".\">Minsker skriftstørrelsen på den valgte teksten.</ahelp>"
+
+#. 63ssr
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3149900\n"
+"help.text"
+msgid "If <link href=\"text/shared/00/00000005.xhp#ctl\">CTL</link> support is enabled, two additional icons are visible."
+msgstr "Hvis <link href=\"text/shared/00/00000005.xhp#ctl\">CTL</link>-støtte (kompleks tekst) er slått på, vil to ekstra ikoner være synlige."
+
+#. gHFFH
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3149946\n"
+"help.text"
+msgid "Left-To-Right"
+msgstr "Venstre mot høyre"
+
+#. 9tEuw
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN10784\n"
+"help.text"
+msgid "<image id=\"img_id8354747\" src=\"cmd/sc_paralefttoright.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8354747\">left to right icon</alt></image>"
+msgstr "<image id=\"img_id8354747\" src=\"cmd/sc_paralefttoright.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8354747\">venstre til høyre ikon</alt></image>"
+
+#. Xg9vt
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3149964\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ParaLeftToRight\">The text is entered from left to right.</ahelp>"
+msgstr "<ahelp hid=\".uno:ParaLeftToRight\">Teksten blir skrevet fra venstre mot høyre.</ahelp>"
+
+#. TRxZq
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3147300\n"
+"help.text"
+msgid "Right-To-Left"
+msgstr "Høyre mot venstre"
+
+#. iE56r
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN107DF\n"
+"help.text"
+msgid "<image id=\"img_id2405774\" src=\"cmd/sc_pararighttoleft.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2405774\">right to left icon</alt></image>"
+msgstr "<image id=\"img_id2405774\" src=\"cmd/sc_pararighttoleft.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2405774\">høyre til venstre ikon</alt></image>"
+
+#. TMwGp
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3147625\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ParaRightToLeft\">The text formatted in a complex text layout language is entered from right to left.</ahelp>"
+msgstr "<ahelp hid=\".uno:ParaRightToLeft\">Teksten blir skrevet fra høyre mot venstre. Dette brukes på tekst som er formatert med kompleks tekst-oppsett.</ahelp>"
+
+#. BdpWg
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"tit\n"
+"help.text"
+msgid "Image Bar"
+msgstr "Bildelinje"
+
+#. JdoFF
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3154263\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0203.xhp\">Image Bar</link>"
+msgstr "<link href=\"text/swriter/main0203.xhp\">Bildelinje</link>"
+
+#. Wsrvu
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"par_id3147756\n"
+"help.text"
+msgid "<ahelp hid=\"HID_GRAFIK_TOOLBOX\">The <emph>Image</emph> Bar contains functions for formatting and positioning selected bitmap graphics.</ahelp>"
+msgstr "<ahelp hid=\"HID_GRAFIK_TOOLBOX\"><emph>Bildelinjen</emph> inneholder funksjoner for formatering og plassering av valgte punktbilder.</ahelp>"
+
+#. DDVSp
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3145606\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060300.xhp\">Flip Vertically</link>"
+msgstr "<link href=\"text/swriter/01/05060300.xhp\">Speilvend loddrett</link>"
+
+#. FrHx9
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3145639\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060300.xhp\">Flip Horizontally</link>"
+msgstr "<link href=\"text/swriter/01/05060300.xhp\">Speilvend vannrett</link>"
+
+#. WPFE9
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3145673\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060000.xhp\">Graphics Properties</link>"
+msgstr "<link href=\"text/swriter/01/05060000.xhp\">Bildeegenskaper</link>"
+
+#. Xtuxp
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table Bar"
+msgstr "Verktøylinjen «Tabell»"
+
+#. bxaip
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3145587\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0204.xhp\">Table Bar</link>"
+msgstr "<link href=\"text/swriter/main0204.xhp\">Verktøylinjen «Tabell»</link>"
+
+#. RA9Tm
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3154252\n"
+"help.text"
+msgid "<ahelp hid=\"HID_TABLE_TOOLBOX\">The <emph>Table </emph>Bar contains functions you need when working with tables. It appears when you move the cursor into a table.</ahelp>"
+msgstr "<ahelp hid=\"HID_TABLE_TOOLBOX\">Verktøylinjen <emph>Tabell</emph> inneholder funksjoner for arbeid med tabeller. Verktøylinjen blir vist når du flytter skrivemerket til en tabell.</ahelp>"
+
+#. KVWGF
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05110500.xhp\">Delete Row</link>"
+msgstr "<link href=\"text/swriter/01/05110500.xhp\">Slett rad</link>"
+
+#. WddDC
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147231\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120500.xhp\">Delete Column</link>"
+msgstr "<link href=\"text/swriter/01/05120500.xhp\">Slett kolonne</link>"
+
+#. GsoVm
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147592\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100100.xhp\">Merge Cells</link>"
+msgstr "<link href=\"text/shared/01/05100100.xhp\">Slå sammen celler</link>"
+
+#. USPoA
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id943333820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05150101.xhp\">AutoFormat</link>"
+msgstr "<link href=\"text/swriter/01/05150101.xhp\">Autoformatering</link>"
+
+#. uGJzG
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id94007820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06100000.xhp\">Sort</link>"
+msgstr "<link href=\"text/swriter/01/06100000.xhp\">Sorter</link>"
+
+#. BHJGW
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"tit\n"
+"help.text"
+msgid "Drawing Object Properties Bar"
+msgstr "Verktøylinjen «Egenskaper for tegneobjekter»"
+
+#. takRR
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3154275\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0205.xhp\">Drawing Object Properties Bar</link>"
+msgstr "<link href=\"text/swriter/main0205.xhp\">Verktøylinjen «Egenskaper for tegneobjekter»</link>"
+
+#. k6L2d
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"par_id3147578\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DRAW_TOOLBOX\">You can see the <emph>Drawing Object Properties</emph> bar in Writer and Calc. Select the menu View - Toolbars - Drawing Object Properties. The controls are enabled when a drawing object is selected. You see some different icons by default, whether the current document is a text document or a spreadsheet.</ahelp>"
+msgstr "<ahelp hid=\"HID_DRAW_TOOLBOX\">Du kan se verktøylinjen <emph>Egenskaper for tegneobjekter</emph> i Writer og Calc. Velg menyen Vis → Verktøylinjer → Egenskaper for tegneobjekter. Kontrollelementene er tilgjengelige når et tegneobjekt er valgt. Som standard vil forskjellige knapper vises, avhengig av om det er et tekstdokument eller et regneark.</ahelp>"
+
+#. Xzm88
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147784\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Style</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Linjestil</link>"
+
+#. sbQFC
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147818\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Width</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Linjebredde</link>"
+
+#. MAqKS
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147229\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Color</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Linjefarge</link>"
+
+#. rV8so
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147280\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05210100.xhp\">Area Style/Filling</link>"
+msgstr "<link href=\"text/shared/01/05210100.xhp\">Områdestil/fyll</link>"
+
+#. KevCA
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"tit\n"
+"help.text"
+msgid "Bullets and Numbering Bar"
+msgstr "Verktøylinjen Punkter og nummerering"
+
+#. 6PVYG
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"hd_id3154256\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0206.xhp\">Bullets and Numbering Bar</link>"
+msgstr "<link href=\"text/swriter/main0206.xhp\">Verktøylinjen for punkter og nummerering</link>"
+
+#. qVzcD
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"par_id3154277\n"
+"help.text"
+msgid "<ahelp hid=\"HID_NUM_TOOLBOX\">The <emph>Bullets and Numbering</emph> bar contains functions to modify the structure of list paragraphs, including changing their order and list level.</ahelp>"
+msgstr "<ahelp hid=\"HID_NUM_TOOLBOX\">The <emph>Kulepunkter og Nummererings</emph> linjen inneholder funksjoner for å endre strukturen av listeavsnittene, inkludert endring av sorterings- og listenivå.</ahelp>"
+
+#. do6CG
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"tit\n"
+"help.text"
+msgid "Status Bar (Writer)"
+msgstr "Statuslinje (Writer)"
+
+#. XSLaB
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id3153397\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0208.xhp\">Status Bar</link>"
+msgstr "<link href=\"text/swriter/main0208.xhp\">Statuslinjen</link>"
+
+#. ir7r2
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id3153414\n"
+"help.text"
+msgid "The Status Bar contains information about the current document and offers various buttons with special functions."
+msgstr "Statuslinjen viser informasjon om dokumentet, og inneholder ulike knapper med egne funksjoner."
+
+#. 2GQ64
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id9648731\n"
+"help.text"
+msgid "Language"
+msgstr "Språk"
+
+#. 922NG
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id8193914\n"
+"help.text"
+msgid "<ahelp hid=\".\">Displays the language for the selected text. Click to open a menu where you can choose another language for the selected text or for the current paragraph.</ahelp>"
+msgstr "<ahelp hid=\".\">Viser språket for den valgte teksten. Klikk for å åpne en meny hvor du kan velge et annet språk for den valgte teksten, eller for gjeldende avsnitt.</ahelp>"
+
+#. ADEdD
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id221603808238822\n"
+"help.text"
+msgid "Choose <menuitem>None</menuitem>  to exclude the text from spellchecking and hyphenation."
+msgstr "Velg <menuitem>Ingen</menuitem> for å ekskludere teksten fra stavekontroll og ordeling."
+
+#. BrkYL
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id691603808343437\n"
+"help.text"
+msgid "Choose <menuitem>Reset to Default Language</menuitem>  to re-apply the default language for the selection or the paragraph."
+msgstr "Velg <menuitem>Tilbakestill til standard språk</menuitem>  til standard språk for valget eller avsnittet."
+
+#. YLVnp
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id291603808357876\n"
+"help.text"
+msgid "Choose <menuitem>More</menuitem> to open the character formatting dialog with more options."
+msgstr "Velg <menuitem>Mer</menuitem> for å åpne tegnformateringsdialogen med flere alternativer."
+
+#. zeCHC
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id0821200911015962\n"
+"help.text"
+msgid "Digital Signature"
+msgstr "Digital signatur"
+
+#. HYMp2
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id0821200911015941\n"
+"help.text"
+msgid "Click to start digital signature process.  You must have a digital certificate to complete the process. See also <link href=\"text/shared/guide/digital_signatures.xhp\">Digital Signatures</link>."
+msgstr "Klikk for å starte digital signaturprosess. Du må ha et digitalt sertifikat for å fullføre prosessen. Se også <link href=\"text/shared/guide/digital_signatures.xhp\">Digitale Signaturer</link>."
+
+#. DqFNG
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id8070314\n"
+"help.text"
+msgid "Zoom & View Layout"
+msgstr "Skaler og vis oppsett"
+
+#. p8GUN
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id7723929\n"
+"help.text"
+msgid "Three controls on the Writer Status Bar allow you to change the zoom and view layout of your text documents."
+msgstr "De tre kontrollene på statuslinjen i Writer lar deg endre hvordan tekstdokumentene skaleres og vises."
+
+#. yMrhF
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id3666188\n"
+"help.text"
+msgid "<ahelp hid=\".\">The View Layout icons show from left to right: Single column mode. View mode with pages side by side. Book mode with two pages as in an open book.</ahelp>"
+msgstr "<ahelp hid=\".\">Vis oppsett-ikoner fra venstre mot høyre: Enkeltsidemodus viser én og én side. Visningsmodus viser sidene side ved side. Bokmodus viser to sider om gangen, som i en åpen bok.</ahelp>"
+
+#. yF8fU
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id8796349\n"
+"help.text"
+msgid "<ahelp hid=\".\">Drag the Zoom slider to the left to show more pages, drag to the right to zoom into a page and show a smaller area of the page.</ahelp>"
+msgstr "<ahelp hid=\".\">Dra glidebryteren for skalering mot venstre for å vise flere sider, eller dra den mot høyre for å skalere til en side og vise et mindre område på denne siden.</ahelp>"
+
+#. JxuXA
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"tit\n"
+"help.text"
+msgid "Print Preview Bar (Writer)"
+msgstr "Forhåndsvisningslinje (Writer)"
+
+#. fuQ93
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3145783\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0210.xhp\">Print Preview</link>"
+msgstr "<link href=\"text/swriter/main0210.xhp\">Forhåndsvis utskrift</link>"
+
+#. nQ4Bj
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3154253\n"
+"help.text"
+msgid "The <emph>Print Preview</emph> Bar appears when you view the current document in the print preview mode."
+msgstr "Verktøylinjen for <emph>forhåndsvisning av siden</emph> åpnes når du forhåndsviser et dokument."
+
+#. AUxvw
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id801649977850317\n"
+"help.text"
+msgid "Jump to Specific Page"
+msgstr "Gå til spesifikk side"
+
+#. 4KMx6
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id891649977865555\n"
+"help.text"
+msgid "To go to a specific page in the Print Preview, type the page number in the entry box, then press <keycode>Enter</keycode>."
+msgstr "For å gå til en bestemt side i forhåndsvisningen, skriv inn sidenummeret i inntastingsboksen, og trykk deretter <keycode>Enter</keycode>."
+
+#. Qijav
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id121649334614450\n"
+"help.text"
+msgid "Print"
+msgstr "Skriv ut"
+
+#. E9beE
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id641649334677475\n"
+"help.text"
+msgid "Open the Print dialog."
+msgstr "Åpne dialogboksen Skriv ut."
+
+#. SiGWE
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id581649332297923\n"
+"help.text"
+msgid "Close Preview"
+msgstr "Steng forhåndsvisningen"
+
+#. JewxS
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id101649332370147\n"
+"help.text"
+msgid "Exit from Print Preview."
+msgstr "Avslutt forhåndsvisning."
+
+#. vrBnP
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id91649332206811\n"
+"help.text"
+msgid "<image src=\"cmd/lc_closepreview.png\" id=\"img_id451649332206811\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id221649332206811\">Close Preview Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_closepreview.png\" id=\"img_id451649332206811\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id221649332206811\">Lukk forhåndsvisningsikon</alt></image>"
+
+#. ZTPfH
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id661649332206811\n"
+"help.text"
+msgid "Close Preview"
+msgstr "Lukk forhåndsvisning"
+
+#. WmU6L
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"tit\n"
+"help.text"
+msgid "Rulers"
+msgstr "Linjaler"
+
+#. wayxW
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3154201\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0213.xhp\">Rulers</link>"
+msgstr "<link href=\"text/swriter/main0213.xhp\">Linjaler</link>"
+
+#. V4yDp
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154218\n"
+"help.text"
+msgid "Rulers display the dimensions of the page, and the position of tabs, indents, borders and columns. You can modify all of these on the rulers using the mouse."
+msgstr "Linjaler viser størrelsesforholdene til siden, samt posisjonen til tabulatorer, innrykk, kantlinjer og spalter. Du kan endre alle disse posisjonene på linjalene ved hjelp av musepekeren."
+
+#. BLa7m
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154239\n"
+"help.text"
+msgid "By double-clicking on the ruler, you can open the <emph>Paragraph</emph> dialog and assign <link href=\"text/shared/00/00000005.xhp#formatting\">direct paragraph formatting</link> for the current paragraph or all selected paragraphs."
+msgstr "Ved å dobbeltklikke på linjalen kan du åpne dialogboksen <emph> Avsnitt </emph> og tildele<link href=\"text/shared/00/00000005.xhp#formatting\"> direkte avsnittsformatering </link> for gjeldende avsnitt eller alle valgte avsnitt."
+
+#. LqCV4
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula Bar"
+msgstr "Formellinjen"
+
+#. Fqyww
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3145782\n"
+"help.text"
+msgid "<variable id=\"releistename\"><link href=\"text/swriter/main0214.xhp\">Formula Bar</link></variable>"
+msgstr "<variable id=\"releistename\"><link href=\"text/swriter/main0214.xhp\">Formellinjen</link></variable>"
+
+#. aQsd3
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3154254\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Formula</emph> Bar allows you to create and insert calculations into a text document.</ahelp> To activate the <emph>Formula</emph> Bar, press F2."
+msgstr "<ahelp hid=\".\">Med <emph>Formellinjen</emph> kan du lage regnestykker som du kan sette inn i et tekstdokument.</ahelp> Trykk «F2» for å vise <emph>Formellinjen</emph>."
+
+#. NmvGn
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"tit\n"
+"help.text"
+msgid "Frame Bar"
+msgstr "Rammelinjen"
+
+#. bXUUZ
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3154251\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0215.xhp\">Frame Bar</link>"
+msgstr "<link href=\"text/swriter/main0215.xhp\">Rammelinjen</link>"
+
+#. BfA2A
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3154272\n"
+"help.text"
+msgid "<ahelp hid=\"HID_FRAME_TOOLBOX\">When a frame is selected, the <emph>Frame </emph>Bar provides the most important functions for formatting and positioning the frame.</ahelp>"
+msgstr "<ahelp hid=\"HID_FRAME_TOOLBOX\">Når en ramme er valgt, viser verktøylinjen <emph>Ramme</emph> de viktigste funksjonene for formatering og plassering av rammen.</ahelp>"
+
+#. jAEEf
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3147403\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap Off</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Tekstbryting av</link>"
+
+#. PJcEB
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3147419\n"
+"help.text"
+msgid "You can also choose this setting on the <emph>Wrap</emph> tab page."
+msgstr "Du kan også velge denne innstillingen på <emph>Pakke inn</emph>-fanesiden."
+
+#. VZiGB
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3153388\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap On</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Tekstbryting på</link>"
+
+#. oCsKA
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3153405\n"
+"help.text"
+msgid "This icon represents the <emph>Page Wrap</emph> option on the <emph>Wrap</emph> tab page."
+msgstr "Dette ikonet representerer <emph>Sidepakking</emph>-alternativet på <emph>Fanesiden Pakking</emph>-."
+
+#. sHPGv
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3147782\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap Through</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Tekstflyt</link>"
+
+#. 3UyQZ
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3147799\n"
+"help.text"
+msgid "You can also define this setting on the <emph>Wrap</emph> tab page."
+msgstr "Du kan også definere denne innstillingen på <emph>Pakking</emph>-fanesiden."
+
+#. pDxUm
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3151285\n"
+"help.text"
+msgid "<link href=\"text/shared/02/02170000.xhp\">Background Color</link>"
+msgstr "<link href=\"text/shared/02/02170000.xhp\">Bakgrunnsfarge</link>"
+
+#. AQeQ3
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3151320\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\">Frame Properties</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\">Rammeegenskaper</link>"
+
+#. uXf8a
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"tit\n"
+"help.text"
+msgid "OLE Object Bar"
+msgstr "OLE-objektlinje"
+
+#. YCkLT
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3150726\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0216.xhp\">OLE Object Bar</link>"
+msgstr "<link href=\"text/swriter/main0216.xhp\">OLE Objektlinje</link>"
+
+#. phgBb
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3150746\n"
+"help.text"
+msgid "<ahelp hid=\"HID_OLE_TOOLBOX\">The <emph>OLE Object</emph> bar appears when objects are selected, and contains the most important functions for formatting and positioning objects.</ahelp>"
+msgstr "<ahelp hid=\"HID_OLE_TOOLBOX\"><emph>OLE-objekt</emph>-linjen vises når objekter er valgt, og inneholder de viktigste funksjonene for formatering og plassering av objekter.</ahelp>"
+
+#. 2gbs5
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3153377\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">No Wrap</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Ingen tekstbryting</link>"
+
+#. wKChQ
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3153394\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/01/05060200.xhp#keinumlauftext\"/> You can also choose this setting on the <emph>Wrap</emph> tab page."
+msgstr "<embedvar href=\"text/swriter/01/05060200.xhp#keinumlauftext\"/>Dette valget er også tilgjengelig under fanen <emph>Tekstbryting</emph>."
+
+#. f4XEc
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3147766\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Tekstbryting</link>"
+
+#. AAfik
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3147782\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/01/05060200.xhp#seitenumlauftext\"/> This icon corresponds to the <emph>Page Wrap</emph> option on the <emph>Wrap</emph> tab page."
+msgstr "<embedvar href=\"text/swriter/01/05060200.xhp#seitenumlauftext\"/> Dette ikonet står for valget <emph>Tekstbryting på siden</emph>, som du også finner under fanen <emph>Tekstbryting</emph>."
+
+#. xdFRN
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3147824\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap Through</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Tekstflyt</link>"
+
+#. BqZSu
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3147218\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/01/05060200.xhp#durchlauftext\"/> You can also achieve the same effect through the <emph>Wrap</emph> tab page."
+msgstr "<embedvar href=\"text/swriter/01/05060200.xhp#durchlauftext\"/>Du kan også oppnå samme effekt via valgene på fanen <emph>Tekstbryting</emph>."
+
+#. DjMnH
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3151208\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05080000.xhp\">Object Properties</link>"
+msgstr "<link href=\"text/swriter/01/05080000.xhp\">Objektegenskaper</link>"
+
+#. rDkoy
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text Object Bar"
+msgstr "Tekstobjektlinjen"
+
+#. HFpcv
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3155366\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0220.xhp\">Text Object Bar</link>"
+msgstr "<link href=\"text/swriter/main0220.xhp\">Tekstobjektlinjen</link>"
+
+#. AkAcR
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"par_id3155386\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DRAW_TEXT_TOOLBOX\">Contains formatting commands for text that is contained in a draw object.</ahelp> The <emph>Text Object</emph> bar appears when you double-click inside a draw object."
+msgstr "<ahelp hid=\"HID_DRAW_TEXT_TOOLBOX\">Inneholder formateringskommandoer for tekst inni tegneobjekter.</ahelp> Verktøylinjen <emph>Tekstobjekt</emph> blir vist når du dobbeltklikker inni et tegneobjekt."
+
+#. MHQMu
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3153416\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020500.xhp\">Superscript</link>"
+msgstr "<link href=\"text/shared/01/05020500.xhp\">Hevet skrift</link>"
+
+#. 5Mshp
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3147787\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020500.xhp\">Subscript</link>"
+msgstr "<link href=\"text/shared/01/05020500.xhp\">Senket skrift</link>"
+
+#. roADF
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3147265\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02090000.xhp\">Select All</link>"
+msgstr "<link href=\"text/shared/01/02090000.xhp\">Velg alle</link>"
+
+#. ELb3R
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3145596\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">Tegn</link>"
+
+#. 26W37
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3145631\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">Avsnitt</link>"
+
+#. tvQDK
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"par_id3145649\n"
+"help.text"
+msgid "Here you can define the indents, spacing, alignment and line spacing for the paragraph currently selected."
+msgstr "Her kan du angi innrykk, avstander, justering og linjeavstand for det valgte avsnittet."
+
+#. Exd7Q
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] Writer Features"
+msgstr "Funksjoner i $[officename] Writer"
+
+#. boS3k
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3154243\n"
+"help.text"
+msgid "<variable id=\"main0503\"><link href=\"text/swriter/main0503.xhp\">$[officename] Writer Features</link></variable>"
+msgstr "<variable id=\"main0503\"><link href=\"text/swriter/main0503.xhp\">Funksjoner i $[officename] Writer</link></variable>"
+
+#. DVNHm
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3154263\n"
+"help.text"
+msgid "$[officename] Writer lets you design and produce text documents that can include graphics, tables, or charts. You can then save the documents in a variety of formats, including the standardized OpenDocument format (ODF), Microsoft Word .doc format, or HTML. And you can easily export your document to the Portable Document Format (PDF)."
+msgstr "$[officename] Writer lar deg lage og utforme tekstdokumenter som du kan sette bilder, tabeller og diagrammer inn i. Du kan lagre dokumentene i mange ulike formater, som for eksempel det standardiserte OpenDocument format (ODF), Microsoft Word, doc-format, HTML og du kan lett eksportere dokumentene dine til «Portable Document Format» (PDF)."
+
+#. 4BzDB
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3147755\n"
+"help.text"
+msgid "Writing"
+msgstr "Skrive"
+
+#. puGo7
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147768\n"
+"help.text"
+msgid "$[officename] Writer lets you create both basic documents, such as memos, <link href=\"text/shared/guide/fax.xhp\">faxes</link>, letters , resumes and <link href=\"text/swriter/01/01150000.xhp\">merge documents</link>, as well as long and complex or multi-part documents, complete with bibliographies, reference tables and indexes."
+msgstr "$[officename] Writer lar deg lage både vanlige dokumenter, som notater, <link href=\"text/shared/guide/fax.xhp\">fakser</link>, brev, referater og <link href=\"text/swriter/01/01150000.xhp\">flettede dokumenter</link>, i tillegg til lange og komplekse eller oppdelte dokumenter med komplett litteraturliste, referansetabeller, innholdslister og stikkordregister."
+
+#. 7XkBL
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147797\n"
+"help.text"
+msgid "$[officename] Writer also includes such useful features as a <link href=\"text/shared/01/06010000.xhp\">spellchecker</link>, a <link href=\"text/swriter/guide/using_thesaurus.xhp\">thesaurus</link>, <link href=\"text/shared/01/06040000.xhp\">AutoCorrect</link>, and <link href=\"text/swriter/01/06030000.xhp\">hyphenation</link> as well as a variety of templates for almost every purpose. You can also create your own templates using the wizards."
+msgstr "$[officename] Writer inkluderer også nyttige funksjoner som <link href=\"text /shared/01/06010000.xhp\"> stavekontroll </link>, en <link href=\"text/swriter/guide/using_thesaurus.xhp\"> synonymordbok </link>, <link href=\"text/shared/01/06040000.xhp\">Autokorriger </link>, og <link href=\"text/swriter/01/06030000.xhp\"> bindestrek </link> i tillegg til en rekke maler for nesten alle formål. Du kan også lage dine egne maler ved hjelp av veivisere."
+
+#. TCYhh
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3147225\n"
+"help.text"
+msgid "Designing and Structuring"
+msgstr "Utforme og strukturere"
+
+#. ZnMXj
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147239\n"
+"help.text"
+msgid "$[officename] offers a wide variety of options to design documents. Use the <link href=\"text/swriter/01/05140000.xhp\">Styles window</link> to create, assign and modify styles for paragraphs, individual characters, frames and pages. In addition, the <link href=\"text/swriter/01/02110000.xhp\">Navigator</link> helps you to quickly move around inside your documents, lets you look at your document in an outline view, and keeps track of the objects that you have inserted into your document."
+msgstr "$[officename] gir mange alternativer for utforming av dokumenter. Bruk <link href=\"text/swriter/01/05140000.xhp\">Stilbehandleren</link> for å lage, tildele og endre stiler for avsnitt, enkelttegn, rammer og sider. I tillegg gir <link href=\"text/swriter/01/02110000.xhp\">Dokumentstrukturen</link> deg muligheten til å bevege deg raskt i dokumentet ditt, en disposisjonsvisning av dokumentet, samt en oversikt over objekter som er satt inn i dokumentet."
+
+#. Pxysg
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147272\n"
+"help.text"
+msgid "You can also create various <link href=\"text/swriter/01/04120000.xhp\">indexes and tables</link> in text documents. You can define the structure and appearance of the indexes and tables according to your individual needs. Live hyperlinks and bookmarks let you jump directly to the corresponding items in the text."
+msgstr "Du kan også lage ulike <link href=\"text/swriter/01/04120000.xhp\">registre og innholdslister</link> i tekstdokumenter. Du kan angi strukturen og utseendet til registrene og innholdslistene slik du måtte ønske. Hyperlenker og bokmerker lar deg hoppe direkte til tilhørende elementer i teksten."
+
+#. Ewjax
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3145596\n"
+"help.text"
+msgid "Desktop Publishing with $[officename] Writer"
+msgstr "Datatrykking i $[officename] Writer"
+
+#. bGD8q
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145610\n"
+"help.text"
+msgid "$[officename] Writer contains numerous desktop publishing and drawing tools to assist you in creating professionally styled documents, such as brochures, newsletters and invitations. You can format your documents with multi-column layouts, <link href=\"text/swriter/guide/text_frame.xhp\">frames</link>, <link href=\"text/swriter/guide/insert_graphic.xhp\">graphics</link>, <link href=\"text/swriter/guide/table_insert.xhp\">tables</link>, and other objects."
+msgstr "$[officename] Writer inneholder mange publiserings- og tegneverktøy som hjelper deg med å lage profesjonelt stilede dokumenter, for eksempel brosjyrer, nyhetsbrev og invitasjoner. Du kan formatere dokumentene med flersøyleoppsett, <link href=\"text/swriter/guide/text_frame.xhp\"> rammer </link>, <link href=\"text/swriter/guide/insert_graphic.xhp\"> grafikk </link>,<link href=\"text/swriter/guide/table_insert.xhp\">tabeller </link> og andre objekter."
+
+#. EpFCE
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3145649\n"
+"help.text"
+msgid "Calculations"
+msgstr "Beregninger"
+
+#. pGSXF
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145663\n"
+"help.text"
+msgid "Text documents in $[officename] have an integrated <link href=\"text/swriter/main0214.xhp\">calculation function</link> that helps you execute sophisticated calculations or logical links. You can easily create a table in a text document in order to perform calculations."
+msgstr "Tekstdokumenter i $[officename] har en innebygd <link href=\"text/swriter/main0214.xhp\">beregningsfunksjon</link> som hjelper deg med å utføre beregninger eller logiske lenker. Du kan enkelt lage en tabell i et tekstdokument for å gjøre beregninger."
+
+#. jKeQK
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3151192\n"
+"help.text"
+msgid "Creating Drawings"
+msgstr "Lage tegninger"
+
+#. iHHaA
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3151206\n"
+"help.text"
+msgid "The $[officename] Writer <link href=\"text/shared/02/01140000.xhp\">drawing tool</link> lets you create drawings, graphics, legends, and other types of drawings directly in text documents."
+msgstr "<link href=\"text/shared/02/01140000.xhp\">Tegneverktøyet</link> i $[officename] Writer lar deg lage tegninger, bilder, forklaringer og bildetekster, samt andre typer av tegninger direkte i tekstdokumentet."
+
+#. 3GNE9
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3151229\n"
+"help.text"
+msgid "Inserting Graphics"
+msgstr "Sette inn bilder"
+
+#. q9LTp
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3151243\n"
+"help.text"
+msgid "You can insert pictures with <link href=\"text/shared/00/00000020.xhp\">different formats</link> into a text document, including graphics with a JPG or GIF format. In addition, the <link href=\"text/shared/01/gallery.xhp\">Gallery</link> provides a collection of clipart graphics, and the <link href=\"text/shared/guide/fontwork.xhp\">Fontwork Gallery</link> creates stunning font effects."
+msgstr "Du kan sette bilder med mange <link href=\"text/shared/00/00000020.xhp\">ulike formater</link> inn i et tekstdokument. I tillegg gir <link href=\"text/shared/01/gallery.xhp\">Galleriet</link> en bildesamling sortert etter temaer, og du kan lage flotte skrifteffekter med <link href=\"text/shared/guide/fontwork.xhp\">Skriftformingsgalleriet</link>."
+
+#. pNEHk
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155084\n"
+"help.text"
+msgid "Flexible Application Interface"
+msgstr "Fleksibelt brukergrensesnitt"
+
+#. Fc9Cx
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3155098\n"
+"help.text"
+msgid "The program interface is designed so that you can configure it according to your preferences, including customizing icons and menus. You can position various program windows, such as the Styles window or the Navigator as floating windows anywhere on the screen. You can also <link href=\"text/shared/guide/autohide.xhp\">dock</link> some windows to the edge of the workspace."
+msgstr "Brukergrensesnittet til programmet er laget slik at du kan endre det til å passe din bruk. Dette gjelder også for menyer og knapper. Du kan plassere programvinduer, som for eksempel stilbehandleren og dokumentstrukturen, som flytende vinduer hvor som helst på skjermen. Du kan også <link href=\"text/shared/guide/autohide.xhp\">feste</link> noen vinduer til kanten på arbeidsområdet."
+
+#. AApwS
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155123\n"
+"help.text"
+msgid "Drag&Drop"
+msgstr "Dra og slipp"
+
+#. D3NCe
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3155137\n"
+"help.text"
+msgid "The <link href=\"text/shared/guide/dragdrop.xhp\">drag-and-drop</link> feature enables you to work quickly and efficiently with text documents in $[officename]. For example, you can drag-and-drop objects, such as graphics from the Gallery, from one location to another in the same document, or between open $[officename] documents."
+msgstr "Med <link href=\"text/shared/guide/dragdrop.xhp\">dra-og-slipp</link>-funksjonen kan du arbeide raskt og effektivt med tekstdokumenter i $[officename]. Du kan for eksempel dra og slippe objekter, slik som bilder fra galleriet, fra et sted til et annet i det samme dokumentet, eller du kan flytte objekter mellom åpne $[officename]-dokumenter."
+
+#. D3wvZ
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155162\n"
+"help.text"
+msgid "Help Functions"
+msgstr "Hjelpefunksjoner"
+
+#. BEBTR
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145675\n"
+"help.text"
+msgid "You can use the <link href=\"text/shared/05/00000110.xhp\">Help system</link> as a complete reference for $[officename] applications, including <link href=\"text/swriter/guide/main.xhp\">instructions</link> for simple and complex tasks."
+msgstr "Du kan bruke <link href=\"text/shared/05/00000110.xhp\">Hjelpesystemet</link> som et komplett oppslagsverk for $[officename]-programmene. Her finner du <link href=\"text/swriter/guide/main.xhp\">instruksjoner</link> for både enkle og avanserte oppgaver."
+
+#. 98N4J
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Navigate Toolbar"
+msgstr "Naviger på verktøylinjen"
+
+#. CfHqE
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"bm_id131655501267679\n"
+"help.text"
+msgid "<bookmark_value>navigate forward</bookmark_value>    <bookmark_value>navigate backward</bookmark_value>"
+msgstr "<bookmark_value>naviger fremover</bookmark_value> <bookmark_value>naviger bakover</bookmark_value>"
+
+#. GfGdk
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"hd_id111655496106993\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/swriter/navigate_toolbar.xhp\">Navigate Toolbar</link></variable>"
+msgstr "<variable id=\"h1\"><link href=\"text/swriter/navigate_toolbar.xhp\">Navigerverktøylinje</link></variable>"
+
+#. DRFce
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id451655496106996\n"
+"help.text"
+msgid "Open Navigate toolbar."
+msgstr "Åpne Naviger-verktøylinjen."
+
+#. FsFCu
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id921655501737088\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars - Navigation</menuitem>."
+msgstr "Velg <menuitem>Vis - Verktøylinjer - Navigasjon</menuitem>."
+
+#. CGzuK
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"hd_id271655497247655\n"
+"help.text"
+msgid "Navigate forward"
+msgstr "Naviger fremover"
+
+#. JCuNM
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id81655499487679\n"
+"help.text"
+msgid "Jump to the next object."
+msgstr "Gå til neste objekt."
+
+#. eQka2
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id791655500839247\n"
+"help.text"
+msgid "<image src=\"cmd/lc_nextrecord.svg\" id=\"img_id981655500839247\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id311655500839247\">Icon Forward</alt></image>"
+msgstr "<image src=\"cmd/lc_nextrecord.svg\" id=\"img_id981655500839247\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id311655500839247\">Ikon Framover</alt></image>"
+
+#. HLxC8
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id951655500839248\n"
+"help.text"
+msgid "Icon Forward"
+msgstr "Ikon Fremover"
+
+#. ihdNa
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"hd_id681655497252447\n"
+"help.text"
+msgid "Navigate backward"
+msgstr "Naviger bakover"
+
+#. 3RAwT
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id701655499492679\n"
+"help.text"
+msgid "Jump to the previous object."
+msgstr "Gå til det forrige objektet."
+
+#. oAeFc
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id381655500856490\n"
+"help.text"
+msgid "<image src=\"cmd/lc_prevrecord.svg\" id=\"img_id521655500856490\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id971655500856491\">Icon Back</alt></image>"
+msgstr "<image src=\"cmd/lc_prevrecord.svg\" id=\"img_id521655500856490\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id971655500856491\">Ikon Tilbake</alt></image>"
+
+#. 9ApJJ
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id41655500856491\n"
+"help.text"
+msgid "Icon Back"
+msgstr "Ikon Tilbake"
+
+#. DNbRR
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Track Changes Toolbar"
+msgstr "Verktøylinje for spor endringer"
+
+#. 6QbmX
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id671647012520594\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/swriter/track_changes_toolbar.xhp\">Track Changes Toolbar</link></variable>"
+msgstr "<variable id=\"h1\"><link href=\"text/swriter/track_changes_toolbar.xhp\">Spor endringer Verktøylinje</link></variable>"
+
+#. 4XWe5
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id471647012520596\n"
+"help.text"
+msgid "Contains the commands that are available for tracking changes in your file."
+msgstr "Inneholder kommandoene som er tilgjengelige for å spore endringer i filen din."
+
+#. iUjGN
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id261647012734234\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars - Track Changes</menuitem>."
+msgstr "Velg <menuitem>Vis - Verktøylinjer - Spor endringer</menuitem>."
+
+#. T8AaM
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id221647013245370\n"
+"help.text"
+msgid "<image src=\"cmd/lc_showtrackedchanges.svg\" id=\"img_id801647013245371\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821647013245372\">Icon Show track changes</alt></image>"
+msgstr "<image src=\"cmd/lc_showtrackedchanges.svg\" id=\"img_id801647013245371\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821647013245372\">Ikon Vis endringer</alt></image>"
+
+#. eBTMj
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id31647013245373\n"
+"help.text"
+msgid "Show track changes"
+msgstr "Vis endringer"
+
+#. FSoq4
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id791647013362400\n"
+"help.text"
+msgid "<image src=\"cmd/lc_trackchanges.svg\" id=\"img_id921647013362401\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id561647013362402\">Icon Record Changes</alt></image>"
+msgstr "<image src=\"cmd/lc_trackchanges.svg\" id=\"img_id921647013362401\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id561647013362402\">Ikon ta opp endringer</alt></image>"
+
+#. BxM8k
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id781647013362404\n"
+"help.text"
+msgid "Record Changes"
+msgstr "Ta opp endringer"
+
+#. R7EFt
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id731647013552967\n"
+"help.text"
+msgid "Previous Track Change"
+msgstr "Forrige opptak av endringer"
+
+#. nxbjC
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id901647013566069\n"
+"help.text"
+msgid "<image src=\"cmd/lc_previoustrackedchange.svg\" id=\"img_id151647013566070\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id981647013566071\">Icon Previous track change</alt></image>"
+msgstr "<image src=\"cmd/lc_previoustrackedchange.svg\" id=\"img_id151647013566070\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id981647013566071\">Ikon Forrige opptak av endringer</alt></image>"
+
+#. poJng
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id391647013566073\n"
+"help.text"
+msgid "Previous track change"
+msgstr "Forrige opptak av endringer"
+
+#. v76PF
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id551647013674361\n"
+"help.text"
+msgid "Next Track Change"
+msgstr "Neste opptak av endringer"
+
+#. NyWdo
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id231647013679440\n"
+"help.text"
+msgid "<image src=\"cmd/lc_nexttrackedchange.svg\" id=\"img_id1001647013679441\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id971647013679442\">Icon Next track change</alt></image>"
+msgstr "<image src=\"cmd/lc_nexttrackedchange.svg\" id=\"img_id1001647013679441\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id971647013679442\">Ikon Neste opptak av endringer</alt></image>"
+
+#. XE2LH
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id531647013679443\n"
+"help.text"
+msgid "Next track change"
+msgstr "Neste opptak av endringer"
+
+#. cniUB
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id421647013795427\n"
+"help.text"
+msgid "Accept Track Change"
+msgstr "Aksepter opptak av endringer"
+
+#. UgReW
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id1001647013785665\n"
+"help.text"
+msgid "<image src=\"cmd/lc_accepttrackedchange.svg\" id=\"img_id491647013785666\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id301647013785667\">Icon Accept Track Change</alt></image>"
+msgstr "<image src=\"cmd/lc_accepttrackedchange.svg\" id=\"img_id491647013785666\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id301647013785667\">Ikon Aksepter opptak av endringer</alt></image>"
+
+#. qe8kW
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id971647013785668\n"
+"help.text"
+msgid "Accept Track Change"
+msgstr "Aksepter opptak av endringer"
+
+#. 37qtQ
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id871647013918576\n"
+"help.text"
+msgid "Reject Track Change"
+msgstr "Avvis opptak av endringer"
+
+#. Dw5dd
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id981647013912301\n"
+"help.text"
+msgid "<image src=\"cmd/lc_rejecttrackedchange.svg\" id=\"img_id931647013912302\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id811647013912303\">Icon Reject Track Change</alt></image>"
+msgstr "<image src=\"cmd/lc_rejecttrackedchange.svg\" id=\"img_id931647013912302\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id811647013912303\">Ikon Avvis opptak av endringer</alt></image>"
+
+#. D68WB
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id21647013912304\n"
+"help.text"
+msgid "Reject Track Change"
+msgstr "Avvis opptak av endringer"
+
+#. DZWAf
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id991647014048136\n"
+"help.text"
+msgid "Accept All Tracked Changes"
+msgstr "Aksepter alle opptak av endringer"
+
+#. 6FjwL
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id161647014053976\n"
+"help.text"
+msgid "<image src=\"cmd/lc_acceptalltrackedchanges.svg\" id=\"img_id981647014053977\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761647014053978\">Icon Accept All Tracked Changes</alt></image>"
+msgstr "<image src=\"cmd/lc_acceptalltrackedchanges.svg\" id=\"img_id981647014053977\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761647014053978\">Ikon Aksepter alle opptak av endringer</alt></image>"
+
+#. B8Sna
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id701647014053979\n"
+"help.text"
+msgid "Accept All Tracked Changes"
+msgstr "Aksepter alle opptak av endringer"
+
+#. CxSzX
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id341647014115494\n"
+"help.text"
+msgid "Reject All Tracked Changes"
+msgstr "Avvis alle opptak av endringer"
+
+#. Nh45F
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id891647014121791\n"
+"help.text"
+msgid "<image src=\"cmd/lc_rejectalltrackedchanges.svg\" id=\"img_id141647014121792\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id861647014121793\">Icon Reject All Tracked Changes</alt></image>"
+msgstr "<image src=\"cmd/lc_rejectalltrackedchanges.svg\" id=\"img_id141647014121792\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id861647014121793\">Ikon Avvis alle opptak av endringer</alt></image>"
+
+#. YAGs7
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id451647014121795\n"
+"help.text"
+msgid "Reject All Tracked Changes"
+msgstr "Avvis alle opptak av endringer"
+
+#. aEELF
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id901647014258055\n"
+"help.text"
+msgid "Accept Track Change and select next one"
+msgstr "Aksepter opptak av endringer og velg den neste"
+
+#. vCCQp
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id511647014293796\n"
+"help.text"
+msgid "<image src=\"cmd/lc_accepttrackedchangetonext.svg\" id=\"img_id791647014293797\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id611647014293798\">Icon Accept Track Change and select next one</alt></image>"
+msgstr "<image src=\"cmd/lc_accepttrackedchangetonext.svg\" id=\"img_id791647014293797\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id611647014293798\">Ikon Aksepter opptak av endringer og velg den neste</alt></image>"
+
+#. 2E2qH
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id851647014293800\n"
+"help.text"
+msgid "Accept Track Change and select next one"
+msgstr "Aksepter opptak av endringer og velg den neste"
+
+#. o2wCB
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id451647014408416\n"
+"help.text"
+msgid "Reject Track Change and select next one"
+msgstr "Avvis opptak av endringer og velg den neste"
+
+#. LGqTK
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id971647014413668\n"
+"help.text"
+msgid "<image src=\"cmd/lc_rejecttrackedchangetonext.svg\" id=\"img_id631647014413669\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id661647014413670\">Icon Reject Track Change and select next one</alt></image>"
+msgstr "<image src=\"cmd/lc_rejecttrackedchangetonext.svg\" id=\"img_id631647014413669\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id661647014413670\">Ikon Avvis opptak av endringer og velg den neste</alt></image>"
+
+#. h9smy
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id361647014413671\n"
+"help.text"
+msgid "Reject Track Change and select next one"
+msgstr "Avvis opptak av endringer og velg den neste"
+
+#. s3jxf
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id721647014498850\n"
+"help.text"
+msgid "<image src=\"cmd/lc_accepttrackedchanges.svg\" id=\"img_id551647014498851\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381647014498852\">Icon Manage Track Changes</alt></image>"
+msgstr "<image src=\"cmd/lc_accepttrackedchanges.svg\" id=\"img_id551647014498851\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381647014498852\">Ikon Administrer opptak av endringer</alt></image>"
+
+#. nyhMH
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id641647014498854\n"
+"help.text"
+msgid "Manage Track Changes"
+msgstr "Administrer sporing av endringer"
+
+#. WAoEE
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id111647018300377\n"
+"help.text"
+msgid "<image src=\"cmd/lc_shownote.svg\" id=\"img_id271647018300378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id61647018300380\">Icon Insert Comment</alt></image>"
+msgstr "<image src=\"cmd/lc_shownote.svg\" id=\"img_id271647018300378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id61647018300380\">Ikon Sett inn kommentar</alt></image>"
+
+#. JRJZp
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id851647018300382\n"
+"help.text"
+msgid "Insert Comment"
+msgstr "Sett inn kommentar"
+
+#. KxwHJ
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id411647015103299\n"
+"help.text"
+msgid "<image src=\"cmd/lc_commentchangetracking.svg\" id=\"img_id181647015103300\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381647015103301\">Icon Insert Track Change Comment</alt></image>"
+msgstr "<image src=\"cmd/lc_commentchangetracking.svg\" id=\"img_id181647015103300\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381647015103301\">Ikon Sett inn kommentar for sporing av endringer</alt></image>"
+
+#. w43CP
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id611647015103302\n"
+"help.text"
+msgid "Insert Track Change Comment"
+msgstr "Sett inn kommentar for sporing av endringer"
+
+#. vHtJD
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id481647015406606\n"
+"help.text"
+msgid "<image src=\"cmd/lc_protecttracechangemode.svg\" id=\"img_id591647015406607\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id311647015406608\">Icon Protect Changes</alt></image>"
+msgstr "<image src=\"cmd/lc_protecttracechangemode.svg\" id=\"img_id591647015406607\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id311647015406608\">Ikon beskytt endringer</alt></image>"
+
+#. GrZBC
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id901647015406609\n"
+"help.text"
+msgid "Protect Changes"
+msgstr "Beskytt endringer"
+
+#. n4z84
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id611647015829636\n"
+"help.text"
+msgid "<image src=\"cmd/lc_comparedocuments.svg\" id=\"img_id31647015829637\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id691647015829638\">Icon Compare Document</alt></image>"
+msgstr "<image src=\"cmd/lc_comparedocuments.svg\" id=\"img_id31647015829637\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id691647015829638\">Ikon Sammenlign dokumenter</alt></image>"
+
+#. RxYUx
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id441647015829640\n"
+"help.text"
+msgid "Compare Document"
+msgstr "Sammenlign dokumenter"
+
+#. RMv9v
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id331647019044607\n"
+"help.text"
+msgid "<image src=\"cmd/lc_mergedocuments.svg\" id=\"img_id271647019044609\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id451647019044610\">Icon Merge Document</alt></image>"
+msgstr "<image src=\"cmd/lc_mergedocuments.svg\" id=\"img_id271647019044609\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id451647019044610\">Ikon flett dokumenter</alt></image>"
+
+#. GPhfh
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id201647019044612\n"
+"help.text"
+msgid "Merge Document"
+msgstr "Slå sammen dokumenter"

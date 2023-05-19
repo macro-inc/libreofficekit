@@ -1,0 +1,611 @@
+#. extracted from sysui/desktop/share
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-21 18:06+0100\n"
+"PO-Revision-Date: 2022-12-25 13:16+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
+"Language-Team: Catalan <https://translations.documentfoundation.org/projects/libo_ui-master/sysuidesktopshare/ca/>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1462963406.000000\n"
+
+#. a9uCy
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document"
+msgstr "Document de text de l'OpenOffice.org 1.0"
+
+#. 9mfCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document Template"
+msgstr "Plantilla de document de text de l'OpenOffice.org 1.0"
+
+#. hj5SQ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"master-document\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Master Document"
+msgstr "Document mestre de l'OpenOffice.org 1.0"
+
+#. 8tGE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"formula\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Formula"
+msgstr "Fórmula de l'OpenOffice.org 1.0"
+
+#. iJFTG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation"
+msgstr "Presentació de l'OpenOffice.org 1.0"
+
+#. CA7gZ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation Template"
+msgstr "Plantilla de presentació de l'OpenOffice.org 1.0"
+
+#. AuLrq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing"
+msgstr "Dibuix de l'OpenOffice.org 1.0"
+
+#. sHiv9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing Template"
+msgstr "Plantilla de dibuix de l'OpenOffice.org 1.0"
+
+#. rSDA2
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet"
+msgstr "Full de càlcul de l'OpenOffice.org 1.0"
+
+#. iUGdT
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet Template"
+msgstr "Plantilla de full de càlcul de l'OpenOffice.org 1.0"
+
+#. dup8a
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text\n"
+"LngText.text"
+msgid "OpenDocument Text"
+msgstr "Text OpenDocument"
+
+#. Tvbts
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Text (Flat XML)"
+msgstr "Text OpenDocument (XML pla)"
+
+#. 7rxHH
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-template\n"
+"LngText.text"
+msgid "OpenDocument Text Template"
+msgstr "Plantilla de text OpenDocument"
+
+#. qGKKU
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document\n"
+"LngText.text"
+msgid "OpenDocument Master Document"
+msgstr "Document mestre OpenDocument"
+
+#. LDcMd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document-template\n"
+"LngText.text"
+msgid "OpenDocument Master Document Template"
+msgstr "Plantilla de document mestre OpenDocument"
+
+#. xUvzk
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-formula\n"
+"LngText.text"
+msgid "OpenDocument Formula"
+msgstr "Fórmula OpenDocument"
+
+#. QaoV9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "Presentació OpenDocument"
+
+#. 7KXDa
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Presentation (Flat XML)"
+msgstr "Presentació OpenDocument (XML pla)"
+
+#. r5mkr
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-template\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "Plantilla de presentació OpenDocument"
+
+#. ABKBq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing\n"
+"LngText.text"
+msgid "OpenDocument Drawing"
+msgstr "Dibuix OpenDocument"
+
+#. uAguG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Drawing (Flat XML)"
+msgstr "Dibuix OpenDocument (XML pla)"
+
+#. nbGeB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-template\n"
+"LngText.text"
+msgid "OpenDocument Drawing Template"
+msgstr "Plantilla de dibuix OpenDocument"
+
+#. ww4GY
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet"
+msgstr "Full de càlcul OpenDocument"
+
+#. U6S6A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet (Flat XML)"
+msgstr "Full de càlcul OpenDocument (XML pla)"
+
+#. GRcE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-template\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet Template"
+msgstr "Plantilla de full de càlcul OpenDocument"
+
+#. FBzW7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-database\n"
+"LngText.text"
+msgid "OpenDocument Database"
+msgstr "Base de dades OpenDocument"
+
+#. PHjCX
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-web-template\n"
+"LngText.text"
+msgid "HTML Document Template"
+msgstr "Plantilla de document HTML"
+
+#. z5v7A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"extension\n"
+"LngText.text"
+msgid "%PRODUCTNAME Extension"
+msgstr "Extensió del %PRODUCTNAME"
+
+#. yfXFW
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Full del Microsoft Excel"
+
+#. GFWsF
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Presentació del Microsoft PowerPoint"
+
+#. sXwCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Document del Microsoft Word"
+
+#. N9WPd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document2\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Document del Microsoft Word"
+
+#. jtBEd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Full del Microsoft Excel"
+
+#. YMdW5
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-template-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Plantilla de full del Microsoft Excel"
+
+#. kg6D4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Presentació del Microsoft PowerPoint"
+
+#. 7TjD7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-template-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Plantilla de presentació del Microsoft PowerPoint"
+
+#. 9YtZo
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document-12\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Document del Microsoft Word"
+
+#. PXrJC
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-template-12\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Plantilla de document del Microsoft Word"
+
+#. EENV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Presentació del Microsoft PowerPoint"
+
+#. aBQW3
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-template\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Plantilla de presentació del Microsoft PowerPoint"
+
+#. CTtV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Full del Microsoft Excel"
+
+#. Dk7Bj
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-template\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Plantilla de full del Microsoft Excel"
+
+#. So2PB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Document del Microsoft Word"
+
+#. gHPAp
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-template\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Plantilla de document del Microsoft Word"
+
+#. rJW59
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-binary-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Full del Microsoft Excel"
+
+#. 7HYTf
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"writer_Comment\n"
+"LngText.text"
+msgid "Create and edit text and graphics in letters, reports, documents and Web pages."
+msgstr "Creeu i editeu textos i imatges en cartes, informes, documents i pàgines web."
+
+#. ZoKAh
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"impress_Comment\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meetings and Web pages."
+msgstr "Creeu i editeu presentacions per a ponències, pàgines web i conferències."
+
+#. 5y58d
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"draw_Comment\n"
+"LngText.text"
+msgid "Create and edit drawings, flow charts and logos."
+msgstr "Creeu i editeu dibuixos, diagrames de flux i logotips."
+
+#. Ropmz
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"calc_Comment\n"
+"LngText.text"
+msgid "Perform calculations, analyze information and manage lists in spreadsheets."
+msgstr "Feu càlculs, analitzeu informació i gestioneu llistes en fulls de càlcul."
+
+#. NRFDd
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"math_Comment\n"
+"LngText.text"
+msgid "Create and edit scientific formulas and equations."
+msgstr "Creeu i editeu fórmules científiques i equacions."
+
+#. xABrj
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"base_Comment\n"
+"LngText.text"
+msgid "Manage databases, create queries and reports to track and manage your information."
+msgstr "Gestioneu bases de dades i creeu consultes i informes per fer el seguiment i gestionar informació."
+
+#. dLjP3
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"startcenter_Comment\n"
+"LngText.text"
+msgid "Launch applications to create text documents, spreadsheets, presentations, drawings, formulas, and databases, or open recently used documents."
+msgstr "Inicieu aplicacions per a crear documents de text, fulls de càlcul, presentacions, dibuixos, fórmules i bases de dades, o obriu documents usats recentment."
+
+#. asG2q
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"writer_GenericName\n"
+"LngText.text"
+msgid "Word Processor"
+msgstr "Processador de textos"
+
+#. asccy
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"impress_GenericName\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "Presentació"
+
+#. PAscF
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"calc_GenericName\n"
+"LngText.text"
+msgid "Spreadsheet"
+msgstr "Full de càlcul"
+
+#. URsiw
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"base_GenericName\n"
+"LngText.text"
+msgid "Database Development"
+msgstr "Desenvolupament de bases de dades"
+
+#. WiFDB
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"math_GenericName\n"
+"LngText.text"
+msgid "Formula Editor"
+msgstr "Editor de fórmules"
+
+#. nVVgx
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"draw_GenericName\n"
+"LngText.text"
+msgid "Drawing Program"
+msgstr "Programa de dibuix"
+
+#. LJuAW
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"startcenter_GenericName\n"
+"LngText.text"
+msgid "Office"
+msgstr "Oficina"
+
+#. 5KBat
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"xsltfilter_GenericName\n"
+"LngText.text"
+msgid "XSLT based filters"
+msgstr "Filtres basats en XLST"
+
+#. qwzA2
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"writer_UnityQuickList\n"
+"LngText.text"
+msgid "New Document"
+msgstr "Document nou"
+
+#. UfbRG
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"impress_UnityQuickList\n"
+"LngText.text"
+msgid "New Presentation"
+msgstr "Presentació nova"
+
+#. 7EBht
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"calc_UnityQuickList\n"
+"LngText.text"
+msgid "New Spreadsheet"
+msgstr "Full de càlcul nou"
+
+#. zeweB
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"base_UnityQuickList\n"
+"LngText.text"
+msgid "New Database"
+msgstr "Base de dades nova"
+
+#. KmFBK
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"math_UnityQuickList\n"
+"LngText.text"
+msgid "New Formula"
+msgstr "Fórmula nova"
+
+#. f7T9D
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"draw_UnityQuickList\n"
+"LngText.text"
+msgid "New Drawing"
+msgstr "Dibuix nou"

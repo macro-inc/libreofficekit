@@ -1,0 +1,881 @@
+#. extracted from helpcontent2/source/text/schart
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-02 12:20+0000\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
+"Language-Team: Indonesian <https://translations.documentfoundation.org/projects/libo_help-master/textschart/id/>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1550992984.000000\n"
+
+#. wtFDe
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Charts in $[officename]"
+msgstr "Bagan dalam $[officename]"
+
+#. rTRMz
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"bm_id3148664\n"
+"help.text"
+msgid "<bookmark_value>charts; overview</bookmark_value>      <bookmark_value>HowTos for charts</bookmark_value>"
+msgstr "<bookmark_value>charts; overview</bookmark_value><bookmark_value>HowTo untuk diagram</bookmark_value>"
+
+#. XfYE9
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3148664\n"
+"help.text"
+msgid "<variable id=\"chart_main\"><link href=\"text/schart/main0000.xhp\">Using Charts in %PRODUCTNAME</link></variable>"
+msgstr "<variable id=\"chart_main\"><link href=\"text/schart/main0000.xhp\">Menggunakan Bagan dalam %PRODUCTNAME</link></variable>"
+
+#. MKzCA
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3154685\n"
+"help.text"
+msgid "<variable id=\"chart\">$[officename] lets you present data graphically in a chart, so that you can visually compare data series and view trends in the data. You can insert charts into spreadsheets, text documents, drawings, and presentations.</variable>"
+msgstr "<variable id=\"chart\">$[officename] memungkinkan Anda menampilkan data dalam sebuah bagan, sehingga Anda dapat membandingkan seri dan kecenderungan data secara visual. Anda dapat menyisipkan bagan ke dalam lembar sebar, dokumen teks, menggambar, dan presentasi.</variable>"
+
+#. wFC6F
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3153143\n"
+"help.text"
+msgid "Chart Data"
+msgstr "Data Bagan"
+
+#. SVCdj
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id5181432\n"
+"help.text"
+msgid "Charts can be based on the following data:"
+msgstr "Bagan dapat didasarkan pada data berikut:"
+
+#. upkcw
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id7787102\n"
+"help.text"
+msgid "Spreadsheet values from Calc cell ranges"
+msgstr "Nilai-nilai lembar sebar dari rentang sel Calc"
+
+#. xvPKt
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id7929929\n"
+"help.text"
+msgid "Cell values from a Writer table"
+msgstr "Nilai-nilai sel dari tabel Writer"
+
+#. pkLtG
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id4727011\n"
+"help.text"
+msgid "Values that you enter in the Chart Data Table dialog (you can create these charts in Writer, Draw, or Impress, and you can copy and paste them also to Calc)"
+msgstr "Nilai yang Anda masukkan dalam dialog Tabel Data Bagan (Anda dapat membuatnya dalam Writer, Draw, atau Impress, dan Anda juga dapat menyalin dan merekatkan mereka ke Calc)"
+
+#. yKUMz
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id76601\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Creates a chart in the current document. To use a continuous range of cells as the data source for your chart, click inside the cell range, and then choose this command. Alternatively, select some cells and choose this command to create a chart of the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Membuat bagan dalam dokumen yang bersangkutan. Untuk menggunakan rentang sel sebagai sumber data bagi bagan Anda, pilihlah sel-selnya, dan pilih perintah ini. Atau, pilih beberapa sel dan pilih perintah ini untuk membuat suatu bagan dari sel-sel yang dipilih.</ahelp>"
+
+#. MZr5A
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id5345011\n"
+"help.text"
+msgid "To insert a chart"
+msgstr "Untuk menyisipkan bagan"
+
+#. xMyYq
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id5631580\n"
+"help.text"
+msgid "To edit a chart"
+msgstr "Untuk menyunting bagan"
+
+#. 2awPo
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id7911008\n"
+"help.text"
+msgid "Click a chart to edit the object properties:"
+msgstr "Klik pada bagan untuk menyunting properti objek:"
+
+#. MMYWv
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id9844660\n"
+"help.text"
+msgid "Size and position on the current page."
+msgstr "Ukuran dan posisi pada halaman sekarang."
+
+#. 7zPqd
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id8039796\n"
+"help.text"
+msgid "Alignment, text wrap, outer borders, and more."
+msgstr "Perataan, pelipatan teks, bingkai luar, dan banyak lagi."
+
+#. X27Dw
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id7986693\n"
+"help.text"
+msgid "Double-click a chart to enter the chart edit mode:"
+msgstr "Klik ganda pada bagan untuk memasuki modus sunting bagan:"
+
+#. cUADi
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id2350840\n"
+"help.text"
+msgid "Chart data values (for charts with own data)."
+msgstr "Nilai data bagan (untuk bagan dengan datanya sendiri)."
+
+#. BGFEv
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3776055\n"
+"help.text"
+msgid "Chart type, axes, titles, walls, grid, and more."
+msgstr "Jenis bagan, sumbu, judul, dinding, kisi, dan banyak lagi."
+
+#. aDGNk
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id8442335\n"
+"help.text"
+msgid "Double-click a chart element in chart edit mode:"
+msgstr "Klik ganda pada elemen bagan pada modus sunting bagan:"
+
+#. Ft8G5
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id4194769\n"
+"help.text"
+msgid "Double-click an axis to edit the scale, type, color, and more."
+msgstr "Klik ganda pada sumbu untuk menyunting skala, tipe, warna, dan banyak lagi."
+
+#. BcUqt
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id8644672\n"
+"help.text"
+msgid "Double-click a data point to select and edit the data series to which the data point belongs."
+msgstr "Klik ganda titik data untuk memilih dan menyunting seri data tempat titik data berada."
+
+#. Drw6j
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id6574907\n"
+"help.text"
+msgid "With a data series selected, click, then double-click a single data point to edit the properties of this data point (for example, a single bar in a bar chart)."
+msgstr "Dengan seri data terpilih, klik ganda sebuah poin data untuk menyunting properti poin data ini (sebagai contoh, sebuah batang pada bagan batang)."
+
+#. ZrY6M
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id1019200902360575\n"
+"help.text"
+msgid "Double-click the legend to select and edit the legend. Click, then double-click a symbol in the selected legend to edit the associated data series."
+msgstr "Klik ganda pada legenda untuk memilih serta menyunting legenda tersebut. Klik, kemudian klik ganda salah satu simbol dalam legenda yang dipilih untuk menyunting rangkaian datanya."
+
+#. 2GvmD
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id7528916\n"
+"help.text"
+msgid "Double-click any other chart element, or click the element and open the Format menu, to edit the properties."
+msgstr "Klik ganda elemen bagan lainnya, atau klik elemen dan buka menu Format, untuk menyunting properti."
+
+#. eCML4
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id8420667\n"
+"help.text"
+msgid "Click outside the chart to leave the current edit mode."
+msgstr "Klik di luar bagan untuk meninggalkan modus sunting."
+
+#. Jcdvi
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id4923856\n"
+"help.text"
+msgid "To print a chart in high quality, you can export the chart to a PDF file and print that file."
+msgstr "Untuk mencetak bagan dalam kualitas tinggi, Anda dapat mengekspor diagram ke berkas PDF dan mencetak berkas tersebut."
+
+#. dk7i6
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200912061033\n"
+"help.text"
+msgid "In chart edit mode, you see the <link href=\"text/schart/main0202.xhp\">Formatting Bar</link> for charts near the upper border of the document. The Drawing Bar for charts appears near the lower border of the document. The Drawing Bar shows a subset of the icons from the <link href=\"text/simpress/main0210.xhp\">Drawing</link> toolbar of Draw and Impress."
+msgstr "Dalam modus sunting bagan, Anda bisa melihat <link href=\"text/schart/main0202.xhp\">Bilah Pemformatan</link> untuk bagan tersebut di sebelah atas dokumen. Bilah Menggambar milik bagan tersebut muncul di bagian bawah dokumen. Bilah Menggambar menampilkan sejumlah ikon dari bilah alat <link href=\"text/simpress/main0210.xhp\">Menggambar</link> milik Draw dan Impress."
+
+#. sNqMe
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200902080452\n"
+"help.text"
+msgid "You can right-click an element of a chart to open the context menu. The context menu offers many commands to format the selected element."
+msgstr "Anda bisa mengklik kanan pada salah satu elemen bagan untuk membuka menu konteks. Di dalam menu tersebut, tersedia sejumlah fungsi untuk memformat elemen yang dipilih."
+
+#. dQSHt
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id081020090354489\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the selected title.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat judul yang dipilih.</ahelp>"
+
+#. orDAZ
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903405629\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the chart area.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat wilayah bagan.</ahelp>"
+
+#. FAkFX
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903544867\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the chart wall.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat dinding bagan.</ahelp>"
+
+#. GBwcB
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903544952\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the chart floor.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat lantai bagan.</ahelp>"
+
+#. VsRbA
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903544927\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the chart legend.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat legenda bagan.</ahelp>"
+
+#. dahmw
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903544949\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the selected axis.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat sumbu yang dipilih.</ahelp>"
+
+#. dnReG
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903544984\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the selected data point.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat titik data yang dipilih.</ahelp>"
+
+#. Em2oQ
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545096\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the major grid.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat kisi mayor.</ahelp>"
+
+#. dSJTX
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545057\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the minor grid.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat kisi minor.</ahelp>"
+
+#. 8Dius
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545095\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the data series.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat seri data.</ahelp>"
+
+#. 9FeGU
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545094\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the stock loss indicators.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat indikator kerugian saham.</ahelp>"
+
+#. uhG9U
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545113\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the stock gain indicators.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat indikator keuntungan saham.</ahelp>"
+
+#. RshCo
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545149\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the data labels.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat label data.</ahelp>"
+
+#. 7Gexq
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545159\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the Y error bars.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat bilah kesalahan Y.</ahelp>"
+
+#. MhtWH
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id081020090354524\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the mean value line.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat garis nilai rerata.</ahelp>"
+
+#. H44aA
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200903545274\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the trendline.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat garis tren.</ahelp>"
+
+#. QYEkZ
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904063285\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the trendline equation.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat persamaan garis tren.</ahelp>"
+
+#. zgFB3
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904063252\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Formats the selected data label.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Memformat label data yang dipilih.</ahelp>"
+
+#. AdNa8
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904063239\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog to insert chart titles.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Membuka dialog untuk menambahkan judul bagan.</ahelp>"
+
+#. fZZ6J
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904233047\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog to insert or delete axes.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Membuka dialog untuk menambahkan atau menghapus sumbu.</ahelp>"
+
+#. CzaFt
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904233058\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog to insert an axis.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Membuka dialog untuk menambahkan sumbu.</ahelp>"
+
+#. x9jBK
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904233089\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog to insert an axis title.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Membuka dialog untuk menambahkan judul sumbu.</ahelp>"
+
+#. tS9HE
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904233160\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Inserts a major grid.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menambahkan kisi mayor.</ahelp>"
+
+#. NUu58
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904233175\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Inserts a minor grid.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menambahkan kisi minor.</ahelp>"
+
+#. B67hx
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904233111\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Inserts data labels.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menambahkan label data.</ahelp>"
+
+#. 2STaz
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904233174\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Inserts the trendline equation and the coefficient of determination R².</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menambahkan persamaan garis tren dan koefisien determinan R².</ahelp>"
+
+#. CKUEM
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904265639\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Inserts the coefficient of determination R² value.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menambahkan nilai koefisien determinan R².</ahelp>"
+
+#. BsSAb
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362614\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Inserts a single data label.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menambahkan label data tunggal.</ahelp>"
+
+#. 35PWr
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362666\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the chart legend.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus legenda bagan.</ahelp>"
+
+#. CFDbR
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362777\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the selected axis.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus sumbu yang dipilih.</ahelp>"
+
+#. jgG2M
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362785\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the major grid.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus kisi mayor.</ahelp>"
+
+#. bTycs
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362748\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the minor grid.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus kisi minor.</ahelp>"
+
+#. Qatm6
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362778\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes all data labels.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus semua label data.</ahelp>"
+
+#. NDa9X
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362893\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the trendline equation.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus persamaan garis tren.</ahelp>"
+
+#. CbYXF
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362896\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the R² value.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus nilai R².</ahelp>"
+
+#. 3thAk
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904362827\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the selected data label.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus label data yang dipilih.</ahelp>"
+
+#. LQRZw
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904431376\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the mean value line.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus garis nilai rerate.</ahelp>"
+
+#. WBA6w
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id081020090443142\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Deletes the Y error bars.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Menghapus bilah kesalahan Y.</ahelp>"
+
+#. d6WTf
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904393229\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Resets the selected data point to default format.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Mengembalikan format titik data yang dipilih ke setelan baku.</ahelp>"
+
+#. xZ45w
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id0810200904393351\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Resets all data points to default format.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Mengembalikan format semua titik data ke setelan baku.</ahelp>"
+
+#. XUCUB
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formatting Bar"
+msgstr "Bilah Pemformatan"
+
+#. 4erwk
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200911433792\n"
+"help.text"
+msgid "<link href=\"text/schart/main0202.xhp\">Formatting Bar</link>"
+msgstr "<link href=\"text/schart/main0202.xhp\">Bilah Pemformatan</link>"
+
+#. bGXHw
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200911433835\n"
+"help.text"
+msgid "The Formatting Bar is shown when a chart is set to edit mode. Double-click a chart to enter edit mode. Click outside the chart to leave edit mode."
+msgstr "Bilah Pemformatan akan muncul apabila Anda masuk ke modus sunting. Klik ganda pada bagan untuk masuk ke modus tersebut. Klik di luar bagan untuk keluar dari modus sunting."
+
+#. ffA95
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200911433878\n"
+"help.text"
+msgid "You can edit the formatting of a chart using the controls and icons on the Formatting Bar."
+msgstr "Anda bisa menyunting format bagan melalui sejumlah kontrol dan ikon pada Bilah Pemformatan."
+
+#. MnXYr
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200902300436\n"
+"help.text"
+msgid "Select Chart Element"
+msgstr "Pilih Elemen Bagan"
+
+#. eYgyC
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200902300479\n"
+"help.text"
+msgid "<ahelp hid=\".\">Select the element from the chart that you want to format. The element gets selected in the chart preview. Click Format Selection to open the properties dialog for the selected element.</ahelp>"
+msgstr "<ahelp hid=\".\">Pilih elemen bagan yang hendak diubah. Elemen yang dipilih akan langsung terlihat pada bagan. Klik Format Pemilihan untuk membuka dialog properti untuk unsur yang dipilih tersebut.</ahelp>"
+
+#. uGAFF
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200902300555\n"
+"help.text"
+msgid "Format Selection"
+msgstr "Pemilihan Format"
+
+#. BSwBH
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200902300539\n"
+"help.text"
+msgid "Opens the properties dialog for the selected element."
+msgstr "Membuka dialog properti bagi elemen yang dipilih."
+
+#. AUcrE
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200902300545\n"
+"help.text"
+msgid "Chart Type"
+msgstr "Jenis Bagan"
+
+#. Q4Sap
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200902300594\n"
+"help.text"
+msgid "Opens the Chart Type dialog."
+msgstr "Membuka dialog Tipe Bagan."
+
+#. wepEQ
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200902300537\n"
+"help.text"
+msgid "Chart Data Table"
+msgstr "Tabel Data Bagan"
+
+#. c6Act
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200902300699\n"
+"help.text"
+msgid "Opens the Data Table dialog where you can edit the chart data."
+msgstr "Membuka dialog Tabel Data tempat Anda bisa menyunting data bagan."
+
+#. aE624
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200902300672\n"
+"help.text"
+msgid "Horizontal Grids"
+msgstr "Kisi Horizontal"
+
+#. uTeV8
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200902300630\n"
+"help.text"
+msgid "The Horizontal Grids icon on the Formatting bar toggles the visibility of the grid display for the Y axis."
+msgstr "Ikon Kisi Horizontal pada bilah Pemformatan menjungkitkan kenampakan tampilan kisi untuk sumbu Y."
+
+#. dqfgM
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200902300738\n"
+"help.text"
+msgid "Legend On/Off"
+msgstr "Legenda Nyala/Mati"
+
+#. aAABk
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id081020090230076\n"
+"help.text"
+msgid "To show or hide a legend, click Legend On/Off on the Formatting bar."
+msgstr "Untuk menampilkan atau menyembunyikan legenda, klik Legenda Nyala/Mati pada bilah Pemformatan."
+
+#. ACmgc
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0810200902300785\n"
+"help.text"
+msgid "Scale Text"
+msgstr "Skala Teks"
+
+#. vUrp2
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200902300784\n"
+"help.text"
+msgid "Rescales the text in the chart when you change the size of the chart."
+msgstr "Mengubah skala teks pada bagan saat Anda mengubah ukuran bagan tersebut."
+
+#. hsSrG
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id081020090230087\n"
+"help.text"
+msgid "Automatic Layout"
+msgstr "Tata Letak Otomatis"
+
+#. gcAxi
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0810200902300834\n"
+"help.text"
+msgid "Moves all chart elements to their default positions inside the current chart. This function does not alter the chart type or any other attributes other than the position of elements."
+msgstr "Memindahkan semua elemen bagan ke posisi semula mereka di dalam bagan saat ini. Fungsi ini tidak mengubah jenis bagan atau atribut lainnya selain posisi elemen-elemen tersebut."
+
+#. NCrAu
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] Chart Features"
+msgstr "Fitur $[officename] Bagan"
+
+#. JxCQf
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3150543\n"
+"help.text"
+msgid "<link href=\"text/schart/main0503.xhp\">$[officename] Chart Features</link>"
+msgstr "<link href=\"text/schart/main0503.xhp\">Fitur $[officename] Bagan</link>"
+
+#. DR7Ma
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3150868\n"
+"help.text"
+msgid "Charts allow you to present data so that it is easy to visualize."
+msgstr "Bagan memperbolehkan Anda untuk menampilkan data sehingga mudah divisualisasikan."
+
+#. ozGGL
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3146974\n"
+"help.text"
+msgid "You can create a chart from source data in a Calc spreadsheet or a Writer table. When the chart is embedded in the same document as the data, it stays linked to the data, so that the chart automatically updates when you change the source data."
+msgstr "Anda dapat membuat sebuah bagan dari sumber data di lembar sebar Calc atau tabel di Writer. Saat bagan ditanamkan pada dokumen yang sama dengan data, ia akan terus terhubung dengan data, sehingga bagan akan otomatis diperbarui ketika Anda mengubah sumber data."
+
+#. 5BKEB
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3153143\n"
+"help.text"
+msgid "Chart Types"
+msgstr "Tipe Bagan"
+
+#. imCSX
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3151112\n"
+"help.text"
+msgid "Choose from a variety of 3D charts and 2D charts, such as bar charts, line charts, stock charts. You can change chart types with a few clicks of the mouse."
+msgstr "Pilih dari berbagai bagan 3D dan 2D, seperti diagram batang, diagram garis, diagram saham. Anda dapat mengubah tipe-tipe bagan dengan beberapa klik tetikus."
+
+#. xTCes
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3149665\n"
+"help.text"
+msgid "Individual Formatting"
+msgstr "Pemformatan Individu"
+
+#. AuSKr
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3156441\n"
+"help.text"
+msgid "You can customize individual chart elements, such as axes, data labels, and legends, by right-clicking them in the chart, or with toolbar icons and menu commands."
+msgstr "Anda dapat mengubah satu per satu elemen bagan, seperti sumbu, label data, legenda, dengan klik kanan pada elemen tersebut, atau dengan ikon bilah alat dan perintah di menu."

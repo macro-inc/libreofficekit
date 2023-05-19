@@ -1,0 +1,1856 @@
+#. extracted from helpcontent2/source/text/sbasic/shared/02
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-11-02 09:22+0000\n"
+"Last-Translator: Elisabetta Manuele <calembour@hotmail.it>\n"
+"Language-Team: Italian <https://translations.documentfoundation.org/projects/libo_help-master/textsbasicshared02/it/>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1563811923.000000\n"
+
+#. 6Kkin
+#: 11010000.xhp
+msgctxt ""
+"11010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Library"
+msgstr "Libreria"
+
+#. SUqwz
+#: 11010000.xhp
+msgctxt ""
+"11010000.xhp\n"
+"hd_id3151100\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11010000.xhp\">Library</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11010000.xhp\">Libreria</link>"
+
+#. MCJF5
+#: 11010000.xhp
+msgctxt ""
+"11010000.xhp\n"
+"par_id3154136\n"
+"help.text"
+msgid "<ahelp hid=\".uno:LibSelector\" visibility=\"visible\">Select the library that you want to edit.</ahelp> The first module of the library that you select is displayed in the Basic IDE."
+msgstr "<ahelp hid=\".uno:LibSelector\" visibility=\"visible\">Seleziona la libreria da modificare.</ahelp> Il primo modulo della libreria selezionata viene visualizzato nell'IDE Basic."
+
+#. hYM32
+#: 11010000.xhp
+msgctxt ""
+"11010000.xhp\n"
+"par_id3149095\n"
+"help.text"
+msgid "<image src=\"media/helpimg/feldalle.png\" id=\"img_id3147576\" localize=\"true\"><alt id=\"alt_id3147576\">List box Library</alt></image>"
+msgstr "<image src=\"media/helpimg/feldalle.png\" id=\"img_id3147576\" localize=\"true\"><alt id=\"alt_id3147576\">Casella di riepilogo Libreria</alt></image>"
+
+#. 2WAR4
+#: 11010000.xhp
+msgctxt ""
+"11010000.xhp\n"
+"par_id3147654\n"
+"help.text"
+msgid "Library List Box"
+msgstr "Casella di riepilogo Libreria"
+
+#. QZQhW
+#: 11020000.xhp
+msgctxt ""
+"11020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Compile"
+msgstr "Compila"
+
+#. zTzxA
+#: 11020000.xhp
+msgctxt ""
+"11020000.xhp\n"
+"hd_id3148983\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11020000.xhp\">Compile</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11020000.xhp\">Compila</link>"
+
+#. FkJqv
+#: 11020000.xhp
+msgctxt ""
+"11020000.xhp\n"
+"par_id3159201\n"
+"help.text"
+msgid "<ahelp hid=\".uno:CompileBasic\" visibility=\"visible\">Compiles the Basic macro.</ahelp> You need to compile a macro after you make changes to it, or if the macro uses single or procedure steps."
+msgstr "<ahelp hid=\".uno:CompileBasic\" visibility=\"visible\">Compila la macro di Basic.</ahelp> La macro deve essere compilata dopo una modifica, oppure se utilizza un passo singolo o un passo di procedura."
+
+#. LLoQJ
+#: 11020000.xhp
+msgctxt ""
+"11020000.xhp\n"
+"par_id3156426\n"
+"help.text"
+msgid "<image src=\"cmd/sc_compilebasic.png\" id=\"img_id3147576\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147576\">Icon Compile</alt></image>"
+msgstr "<image src=\"cmd/sc_compilebasic.png\" id=\"img_id3147576\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147576\">Icona Compila </alt></image>"
+
+#. 3Z8WW
+#: 11020000.xhp
+msgctxt ""
+"11020000.xhp\n"
+"par_id3149399\n"
+"help.text"
+msgid "Compile"
+msgstr "Compila"
+
+#. GjyfZ
+#: 11030000.xhp
+msgctxt ""
+"11030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Run"
+msgstr "Esegui"
+
+#. eTVMQ
+#: 11030000.xhp
+msgctxt ""
+"11030000.xhp\n"
+"hd_id3153255\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11030000.xhp\">Run</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11030000.xhp\">Esegui</link>"
+
+#. Vi9DY
+#: 11030000.xhp
+msgctxt ""
+"11030000.xhp\n"
+"par_id3159201\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RunBasic\">Runs the first macro of the current module.</ahelp>"
+msgstr "<ahelp hid=\".uno:RunBasic\">Esegue la prima macro del modulo attivo.</ahelp>"
+
+#. s2xuG
+#: 11030000.xhp
+msgctxt ""
+"11030000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "<image id=\"img_id3153311\" src=\"cmd/sc_runbasic.png\" width=\"0.423cm\" height=\"0.423cm\"><alt id=\"alt_id3153311\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153311\" src=\"cmd/sc_runbasic.png\" width=\"0.423cm\" height=\"0.423cm\"><alt id=\"alt_id3153311\">Icona</alt></image>"
+
+#. xkBpt
+#: 11030000.xhp
+msgctxt ""
+"11030000.xhp\n"
+"par_id3154750\n"
+"help.text"
+msgid "Run"
+msgstr "Esegui"
+
+#. vbsDe
+#: 11040000.xhp
+msgctxt ""
+"11040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Stop"
+msgstr "Stop"
+
+#. L7Mnk
+#: 11040000.xhp
+msgctxt ""
+"11040000.xhp\n"
+"bm_id3154863\n"
+"help.text"
+msgid "<bookmark_value>macros; stopping</bookmark_value><bookmark_value>program stops</bookmark_value><bookmark_value>stopping macros</bookmark_value>"
+msgstr "<bookmark_value>Macro;interrompere</bookmark_value><bookmark_value>Programma;interrompere le macro</bookmark_value><bookmark_value>Interruzione;macro</bookmark_value>"
+
+#. EUFsx
+#: 11040000.xhp
+msgctxt ""
+"11040000.xhp\n"
+"hd_id3154863\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11040000.xhp\">Stop</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11040000.xhp\">Stop</link>"
+
+#. XevvQ
+#: 11040000.xhp
+msgctxt ""
+"11040000.xhp\n"
+"par_id3147226\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BasicStop\">Stops running the current macro.</ahelp><switchinline select=\"sys\"><caseinline select=\"MAC\"></caseinline><defaultinline> You can also press Shift+Ctrl+Q.</defaultinline></switchinline>"
+msgstr "<ahelp hid=\".uno:BasicStop\">Interrompe l'esecuzione della macro in corso.</ahelp><switchinline select=\"sys\"><caseinline select=\"MAC\"></caseinline><defaultinline> È possibile anche attivare il comando con Maiusc+Ctrl+Q.</defaultinline></switchinline>"
+
+#. K8AjD
+#: 11040000.xhp
+msgctxt ""
+"11040000.xhp\n"
+"par_id3146797\n"
+"help.text"
+msgid "<image id=\"img_id3148538\" src=\"cmd/sc_basicstop.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148538\">Icon</alt></image>"
+msgstr "<image id=\"img_id3148538\" src=\"cmd/sc_basicstop.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148538\">Icona</alt></image>"
+
+#. g3Rn2
+#: 11040000.xhp
+msgctxt ""
+"11040000.xhp\n"
+"par_id3150986\n"
+"help.text"
+msgid "Stop"
+msgstr "Stop"
+
+#. AdkXx
+#: 11050000.xhp
+msgctxt ""
+"11050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Single Step"
+msgstr "Passo singolo"
+
+#. BfoCA
+#: 11050000.xhp
+msgctxt ""
+"11050000.xhp\n"
+"hd_id3155934\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11050000.xhp\">Single Step</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11050000.xhp\">Passo singolo</link>"
+
+#. 5NkKq
+#: 11050000.xhp
+msgctxt ""
+"11050000.xhp\n"
+"par_id3146117\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BasicStepInto\">Runs the macro and stops it after the next command.</ahelp>"
+msgstr "<ahelp hid=\".uno:BasicStepInto\">Esegue la macro e la interrompe dopo il comando successivo.</ahelp>"
+
+#. v6MCD
+#: 11050000.xhp
+msgctxt ""
+"11050000.xhp\n"
+"par_id3152801\n"
+"help.text"
+msgid "You can use this command in conjunction with the <link href=\"text/sbasic/shared/02/11080000.xhp\">Watch</link> command to troubleshoot errors."
+msgstr "Questo comando può essere usato assieme al comando <link href=\"text/sbasic/shared/02/11080000.xhp\">Controllo</link> per risolvere gli errori."
+
+#. SD8E7
+#: 11050000.xhp
+msgctxt ""
+"11050000.xhp\n"
+"par_id3157958\n"
+"help.text"
+msgid "<image id=\"img_id3153345\" src=\"cmd/sc_basicstepinto.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153345\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153345\" src=\"cmd/sc_basicstepinto.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153345\">Icona</alt></image>"
+
+#. ESgvs
+#: 11050000.xhp
+msgctxt ""
+"11050000.xhp\n"
+"par_id3147573\n"
+"help.text"
+msgid "Single Step"
+msgstr "Passo singolo"
+
+#. fmm7T
+#: 11050000.xhp
+msgctxt ""
+"11050000.xhp\n"
+"par_id3149235\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11060000.xhp\">Procedure Step function</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11060000.xhp\">Funzione Passo di procedura</link>"
+
+#. JceSB
+#: 11060000.xhp
+msgctxt ""
+"11060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Procedure Step"
+msgstr "Passo di procedura"
+
+#. BGWAS
+#: 11060000.xhp
+msgctxt ""
+"11060000.xhp\n"
+"hd_id3148520\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11060000.xhp\">Procedure Step</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11060000.xhp\">Passo di procedura</link>"
+
+#. narAD
+#: 11060000.xhp
+msgctxt ""
+"11060000.xhp\n"
+"par_id3152363\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BasicStepOver\">Runs the macro and stops it after the next procedure.</ahelp>"
+msgstr "<ahelp hid=\".uno:BasicStepOver\">Esegue la macro e la interrompe dopo la procedura successiva.</ahelp>"
+
+#. cnCf7
+#: 11060000.xhp
+msgctxt ""
+"11060000.xhp\n"
+"par_id3153394\n"
+"help.text"
+msgid "You can use this command in conjunction with the <link href=\"text/sbasic/shared/02/11080000.xhp\">Watch</link> command to troubleshoot errors."
+msgstr "Questo comando può essere usato assieme al comando <link href=\"text/sbasic/shared/02/11080000.xhp\">Controllo</link> per risolvere gli errori."
+
+#. 8z956
+#: 11060000.xhp
+msgctxt ""
+"11060000.xhp\n"
+"par_id3147576\n"
+"help.text"
+msgid "<image id=\"img_id3143267\" src=\"cmd/sc_basicstepover.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3143267\">Icon</alt></image>"
+msgstr "<image id=\"img_id3143267\" src=\"cmd/sc_basicstepover.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3143267\">Icona</alt></image>"
+
+#. 8cnSk
+#: 11060000.xhp
+msgctxt ""
+"11060000.xhp\n"
+"par_id3154307\n"
+"help.text"
+msgid "Procedure Step"
+msgstr "Passo di procedura"
+
+#. tLjsB
+#: 11060000.xhp
+msgctxt ""
+"11060000.xhp\n"
+"par_id3153562\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11050000.xhp\">Single Step function</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11050000.xhp\">Funzione Passo singolo</link>"
+
+#. mK2Ph
+#: 11070000.xhp
+msgctxt ""
+"11070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Breakpoint"
+msgstr "Punto di interruzione"
+
+#. hVDHU
+#: 11070000.xhp
+msgctxt ""
+"11070000.xhp\n"
+"hd_id3154863\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11070000.xhp\">Breakpoint</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11070000.xhp\">Punto di interruzione</link>"
+
+#. iTCUE
+#: 11070000.xhp
+msgctxt ""
+"11070000.xhp\n"
+"par_id3155364\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ToggleBreakPoint\">Inserts a breakpoint in the program line.</ahelp>"
+msgstr "<ahelp hid=\".uno:ToggleBreakPoint\">Inserisce un punto d'interruzione nella riga del programma.</ahelp>"
+
+#. KET2A
+#: 11070000.xhp
+msgctxt ""
+"11070000.xhp\n"
+"par_id3149346\n"
+"help.text"
+msgid "The breakpoint is inserted at the cursor position. Use a breakpoint to interrupt a program just before an error occurs. You can then troubleshoot the program by running it in <link href=\"text/sbasic/shared/02/11050000.xhp\">Single Step</link> mode until the error occurs. You can also use the <link href=\"text/sbasic/shared/02/11080000.xhp\">Watch</link> icon to check the content of the relevant variables."
+msgstr "Il punto di interruzione viene inserito nella posizione del cursore. Utilizzare un punto di interruzione per interrompere un programma un attimo prima che si verifichi un errore. In questo modo sarà possibile individuare i problemi del programma eseguendolo in modalità <link href=\"text/sbasic/shared/02/11050000.xhp\">Passo singolo</link> finché non si verifica l'errore. È inoltre possibile ricorrere all'icona <link href=\"text/sbasic/shared/02/11080000.xhp\">Controllo</link> per analizzare il contenuto delle variabili desiderate."
+
+#. srCR5
+#: 11070000.xhp
+msgctxt ""
+"11070000.xhp\n"
+"par_id3156346\n"
+"help.text"
+msgid "<image id=\"img_id3152780\" src=\"cmd/sc_togglebreakpoint.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3152780\">Icon</alt></image>"
+msgstr "<image id=\"img_id3152780\" src=\"cmd/sc_togglebreakpoint.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3152780\">Icona</alt></image>"
+
+#. GZkfR
+#: 11070000.xhp
+msgctxt ""
+"11070000.xhp\n"
+"par_id3149416\n"
+"help.text"
+msgid "Breakpoint"
+msgstr "Punto di interruzione"
+
+#. Xnu9h
+#: 11080000.xhp
+msgctxt ""
+"11080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Enable Watch"
+msgstr "Attiva controllo"
+
+#. MLDaG
+#: 11080000.xhp
+msgctxt ""
+"11080000.xhp\n"
+"hd_id3154863\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11080000.xhp\">Enable Watch</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11080000.xhp\">Attiva controllo</link>"
+
+#. TRivb
+#: 11080000.xhp
+msgctxt ""
+"11080000.xhp\n"
+"par_id3093440\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AddWatch\">Click this icon to view the variables in a macro. The contents of the variable are displayed in a separate window.</ahelp>"
+msgstr "<ahelp hid=\".uno:AddWatch\">Fare clic su questa icona per visualizzare le variabili contenute nella macro. I contenuti della variabile sono visualizzati in una finestra separata.</ahelp>"
+
+#. JteXo
+#: 11080000.xhp
+msgctxt ""
+"11080000.xhp\n"
+"par_id3147399\n"
+"help.text"
+msgid "Click the name of a variable to select it, then click the <emph>Enable Watch</emph> icon. The value that is assigned to the variable is displayed next to its name. This value is constantly updated."
+msgstr "Fare clic sul nome di una variabile per selezionarla, quindi sull'icona <emph>Attiva controllo</emph>. Il valore assegnato alla variabile è visualizzato accanto al nome. Il valore viene costantemente aggiornato."
+
+#. XDGmF
+#: 11080000.xhp
+msgctxt ""
+"11080000.xhp\n"
+"par_id3155892\n"
+"help.text"
+msgid "<image id=\"img_id3147209\" src=\"cmd/sc_addwatch.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3147209\">Icon</alt></image>"
+msgstr "<image id=\"img_id3147209\" src=\"cmd/sc_addwatch.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3147209\">Icona</alt></image>"
+
+#. LEifr
+#: 11080000.xhp
+msgctxt ""
+"11080000.xhp\n"
+"par_id3150276\n"
+"help.text"
+msgid "Enable Watch"
+msgstr "Attiva controllo"
+
+#. CLAjp
+#: 11080000.xhp
+msgctxt ""
+"11080000.xhp\n"
+"par_id3159158\n"
+"help.text"
+msgid "To remove the variable watch, select the variable in the Watch window, and then click on the <emph>Remove Watch</emph> icon."
+msgstr "Per rimuovere il controllo dalla variabile, selezionarla nella finestra Controllo e fare clic sull'icona <emph>Rimuovi controllo</emph>."
+
+#. kfzBw
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Object Catalog"
+msgstr "Catalogo oggetti"
+
+#. ThBAt
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"hd_id3153255\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11090000.xhp\">Object Catalog</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11090000.xhp\">Catalogo oggetti</link>"
+
+#. bHCXS
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"par_id3151384\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ObjectCatalog\">Opens the <emph>Objects</emph> pane, where you can view Basic objects.</ahelp>"
+msgstr "<ahelp hid=\".uno:ObjectCatalog\">Apre il pannello <emph>Oggetti</emph>, in cui è possibile visualizzare gli oggetti Basic.</ahelp>"
+
+#. AVf2T
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"par_id3147576\n"
+"help.text"
+msgid "Double click the name of a function or sub to load the module that contains that function or sub, and to position the cursor. Double click the name of a module or dialog to load and display that module or dialog."
+msgstr "Fare doppio clic sul nome di una funzione o sub per caricare il modulo che contiene quella funzione o sub e per posizionare il cursore. Fare doppio clic sul nome di un modulo o di una finestra di dialogo per caricare e visualizzare quel modulo o quella finestra."
+
+#. yNVBJ
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"par_id3148538\n"
+"help.text"
+msgid "<image id=\"img_id3163803\" src=\"cmd/sc_objectcatalog.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3163803\">Icon</alt></image>"
+msgstr "<image id=\"img_id3163803\" src=\"cmd/sc_objectcatalog.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3163803\">Icona</alt></image>"
+
+#. EtHDn
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"par_id3154515\n"
+"help.text"
+msgid "Object Catalog"
+msgstr "Catalogo oggetti"
+
+#. ATDaF
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"hd_id3146794\n"
+"help.text"
+msgid "Window Area"
+msgstr "Area della finestra"
+
+#. 452ze
+#: 11090000.xhp
+msgctxt ""
+"11090000.xhp\n"
+"par_id3149655\n"
+"help.text"
+msgid "<ahelp hid=\"HID_BASICIDE_OBJECTCAT\">Displays a hierarchical view of the current $[officename] macro libraries, modules, and dialogs. To display the contents of an item in the window, double click its name.</ahelp>"
+msgstr "<ahelp hid=\"HID_BASICIDE_OBJECTCAT\">Mostra una vista gerarchica delle librerie, i moduli e le finestre di dialogo delle macro correnti di $[officename]. Per visualizzare il contenuto di un elemento della finestra, fare doppio clic sul suo nome.</ahelp>"
+
+#. gMG3o
+#: 11100000.xhp
+msgctxt ""
+"11100000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Macros"
+msgstr "Macro"
+
+#. 7FmMu
+#: 11100000.xhp
+msgctxt ""
+"11100000.xhp\n"
+"hd_id3156183\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11100000.xhp\">Macros</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11100000.xhp\">Macro</link>"
+
+#. 5C9pN
+#: 11100000.xhp
+msgctxt ""
+"11100000.xhp\n"
+"par_id3147399\n"
+"help.text"
+msgid "<ahelp visibility=\"visible\" hid=\".uno:ChooseMacro\">Opens the <emph>Macro</emph> dialog.</ahelp>"
+msgstr "<ahelp visibility=\"visible\" hid=\".uno:ChooseMacro\">Apre la finestra di dialogo <emph>Macro</emph>.</ahelp>"
+
+#. ST6ud
+#: 11100000.xhp
+msgctxt ""
+"11100000.xhp\n"
+"par_id3148538\n"
+"help.text"
+msgid "<image src=\"cmd/sc_choosemacro.png\" id=\"img_id3153662\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153662\">Icon Macros</alt></image>"
+msgstr "<image src=\"cmd/sc_choosemacro.png\" id=\"img_id3153662\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153662\">Icona Macro</alt></image>"
+
+#. ZW2jE
+#: 11100000.xhp
+msgctxt ""
+"11100000.xhp\n"
+"par_id3153542\n"
+"help.text"
+msgid "Macros"
+msgstr "Macro"
+
+#. AzKnt
+#: 11110000.xhp
+msgctxt ""
+"11110000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Modules"
+msgstr "Moduli"
+
+#. 99Edc
+#: 11110000.xhp
+msgctxt ""
+"11110000.xhp\n"
+"hd_id3148520\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11110000.xhp\">Modules</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11110000.xhp\">Moduli</link>"
+
+#. knaPi
+#: 11110000.xhp
+msgctxt ""
+"11110000.xhp\n"
+"par_id3156414\n"
+"help.text"
+msgid "<ahelp visibility=\"visible\" hid=\".uno:ModuleDialog\">Click here to open the <link href=\"text/sbasic/shared/01/06130000.xhp\"><emph>Macro Organizer</emph></link> dialog.</ahelp>"
+msgstr "<ahelp visibility=\"visible\" hid=\".uno:ModuleDialog\">Fare clic qui per aprire la finestra di dialogo <link href=\"text/sbasic/shared/01/06130000.xhp\"><emph>Gestione macro</emph></link>.</ahelp>"
+
+#. 2pTWM
+#: 11110000.xhp
+msgctxt ""
+"11110000.xhp\n"
+"par_id3157958\n"
+"help.text"
+msgid "<image src=\"cmd/sc_moduledialog.png\" id=\"img_id3155535\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155535\">Icon Modules</alt></image>"
+msgstr "<image src=\"cmd/sc_moduledialog.png\" id=\"img_id3155535\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155535\">Icona Moduli</alt></image>"
+
+#. DikyS
+#: 11110000.xhp
+msgctxt ""
+"11110000.xhp\n"
+"par_id3145383\n"
+"help.text"
+msgid "Modules"
+msgstr "Moduli"
+
+#. D3G7x
+#: 11120000.xhp
+msgctxt ""
+"11120000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Find Parentheses"
+msgstr "Trova parentesi"
+
+#. fQkDR
+#: 11120000.xhp
+msgctxt ""
+"11120000.xhp\n"
+"hd_id3149497\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11120000.xhp\">Find Parentheses</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11120000.xhp\">Trova parentesi</link>"
+
+#. Kkd6M
+#: 11120000.xhp
+msgctxt ""
+"11120000.xhp\n"
+"par_id3155150\n"
+"help.text"
+msgid "<ahelp hid=\".uno:MatchGroup\" visibility=\"visible\">Highlights the text that is enclosed by two corresponding brackets. Place the text cursor in front of an opening or closing bracket, and then click this icon.</ahelp>"
+msgstr "<ahelp hid=\".uno:MatchGroup\" visibility=\"visible\">Evidenzia il testo racchiuso tra due parentesi corrispondenti. Posizionare il cursore di testo davanti a una parentesi aperta o chiusa e fare clic su questa icona.</ahelp>"
+
+#. jPbz5
+#: 11120000.xhp
+msgctxt ""
+"11120000.xhp\n"
+"par_id3149182\n"
+"help.text"
+msgid "<image src=\"cmd/sc_matchgroup.png\" id=\"img_id3155892\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155892\">Icon Find Parentheses</alt></image>"
+msgstr "<image src=\"cmd/sc_matchgroup.png\" id=\"img_id3155892\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155892\">Icona Trova parentesi</alt></image>"
+
+#. Y8mTx
+#: 11120000.xhp
+msgctxt ""
+"11120000.xhp\n"
+"par_id3147276\n"
+"help.text"
+msgid "Find Parentheses"
+msgstr "Trova parentesi"
+
+#. c5Phf
+#: 11140000.xhp
+msgctxt ""
+"11140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Source Text"
+msgstr "Inserisci testo sorgente"
+
+#. kKdim
+#: 11140000.xhp
+msgctxt ""
+"11140000.xhp\n"
+"hd_id3154044\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11140000.xhp\">Insert Source Text</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11140000.xhp\">Inserisci testo sorgente</link>"
+
+#. JscV7
+#: 11140000.xhp
+msgctxt ""
+"11140000.xhp\n"
+"par_id3150702\n"
+"help.text"
+msgid "<ahelp hid=\".uno:LoadBasic\">Opens the Basic source text in the Basic IDE window.</ahelp>"
+msgstr "<ahelp hid=\".uno:LoadBasic\">Apre il testo sorgente di Basic nella finestra dell'IDE Basic.</ahelp>"
+
+#. vDwRJ
+#: 11140000.xhp
+msgctxt ""
+"11140000.xhp\n"
+"par_id3150445\n"
+"help.text"
+msgid "Place the cursor in the code where you want to insert the source text, and then click the <emph>Insert source text</emph> icon. Locate the file that contains the Basic source text that you want to insert, and then click <emph>Open</emph>."
+msgstr "Posizionare il cursore nel punto del codice in cui inserire il testo sorgente e fare clic sull'icona <emph>Inserisci testo sorgente</emph>. Individuare il file contenente il testo sorgente Basic da inserire e fare clic su <emph>Apri</emph>."
+
+#. 9CHh2
+#: 11140000.xhp
+msgctxt ""
+"11140000.xhp\n"
+"par_id3145136\n"
+"help.text"
+msgid "<image id=\"img_id3147571\" src=\"cmd/sc_loadbasic.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3147571\">Icon</alt></image>"
+msgstr "<image id=\"img_id3147571\" src=\"cmd/sc_loadbasic.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3147571\">Icona</alt></image>"
+
+#. WqWiH
+#: 11140000.xhp
+msgctxt ""
+"11140000.xhp\n"
+"par_id3145346\n"
+"help.text"
+msgid "Insert source text"
+msgstr "Inserisci testo sorgente"
+
+#. FtAKL
+#: 11150000.xhp
+msgctxt ""
+"11150000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Save Source As"
+msgstr "Salva sorgente con nome"
+
+#. UCFMa
+#: 11150000.xhp
+msgctxt ""
+"11150000.xhp\n"
+"hd_id3149497\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11150000.xhp\">Save Source As</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11150000.xhp\">Salva sorgente con nome</link>"
+
+#. C4hju
+#: 11150000.xhp
+msgctxt ""
+"11150000.xhp\n"
+"par_id3147261\n"
+"help.text"
+msgid "<ahelp hid=\".uno:SaveBasicAs\">Saves the source code of the selected Basic macro.</ahelp>"
+msgstr "<ahelp hid=\".uno:SaveBasicAs\">Salva il codice sorgente della macro di Basic selezionata.</ahelp>"
+
+#. MVAHT
+#: 11150000.xhp
+msgctxt ""
+"11150000.xhp\n"
+"par_id3145071\n"
+"help.text"
+msgid "<image id=\"img_id3149182\" src=\"cmd/sc_savebasicas.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149182\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149182\" src=\"cmd/sc_savebasicas.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149182\">Icona</alt></image>"
+
+#. tHk8j
+#: 11150000.xhp
+msgctxt ""
+"11150000.xhp\n"
+"par_id3151110\n"
+"help.text"
+msgid "Save Source As"
+msgstr "Salva sorgente con nome"
+
+#. GG5kY
+#: 11160000.xhp
+msgctxt ""
+"11160000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Step Out"
+msgstr "Esci"
+
+#. EQK5E
+#: 11160000.xhp
+msgctxt ""
+"11160000.xhp\n"
+"hd_id3148983\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11160000.xhp\">Step Out</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11160000.xhp\">Esci</link>"
+
+#. 4rNBj
+#: 11160000.xhp
+msgctxt ""
+"11160000.xhp\n"
+"par_id3157898\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BasicStepOut\" visibility=\"visible\">Jumps back to the previous routine in the current macro.</ahelp>"
+msgstr "<ahelp hid=\".uno:BasicStepOut\" visibility=\"visible\">Torna alla routine precedente della macro.</ahelp>"
+
+#. V7PQF
+#: 11160000.xhp
+msgctxt ""
+"11160000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "<image src=\"cmd/sc_basicstepout.png\" id=\"img_id3159233\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159233\">Icon Step Out</alt></image>"
+msgstr "<image src=\"cmd/sc_basicstepout.png\" id=\"img_id3159233\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159233\">Icona Esci</alt></image>"
+
+#. aLy3R
+#: 11160000.xhp
+msgctxt ""
+"11160000.xhp\n"
+"par_id3158421\n"
+"help.text"
+msgid "Step Out"
+msgstr "Esci"
+
+#. p2AD7
+#: 11170000.xhp
+msgctxt ""
+"11170000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Manage Breakpoints"
+msgstr "Gestisci punti di interruzione"
+
+#. 58Sgj
+#: 11170000.xhp
+msgctxt ""
+"11170000.xhp\n"
+"hd_id3156183\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11170000.xhp\">Manage Breakpoints</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11170000.xhp\">Gestisci punti di interruzione</link>"
+
+#. XqJ6C
+#: 11170000.xhp
+msgctxt ""
+"11170000.xhp\n"
+"par_id3152363\n"
+"help.text"
+msgid "<ahelp hid=\".\">Calls a dialog to manage breakpoints.</ahelp>"
+msgstr "<ahelp hid=\".\">Richiama una finestra di dialogo per la gestione dei punti di interruzione.</ahelp>"
+
+#. EJzPX
+#: 11170000.xhp
+msgctxt ""
+"11170000.xhp\n"
+"par_id3143267\n"
+"help.text"
+msgid "<image id=\"img_id3155339\" src=\"cmd/sc_managebreakpoints.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3155339\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155339\" src=\"cmd/sc_managebreakpoints.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3155339\">Icona</alt></image>"
+
+#. drqjA
+#: 11170000.xhp
+msgctxt ""
+"11170000.xhp\n"
+"par_id3145383\n"
+"help.text"
+msgid "Manage Breakpoints"
+msgstr "Gestisci punti di interruzione"
+
+#. k7KJF
+#: 11170000.xhp
+msgctxt ""
+"11170000.xhp\n"
+"par_id3154897\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/01050300.xhp\"><emph>Manage Breakpoints</emph> dialog</link>"
+msgstr "<link href=\"text/sbasic/shared/01050300.xhp\">Finestra di dialogo <emph>Gestisci punti di interruzione</emph></link>"
+
+#. sBFuo
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Import Dialog"
+msgstr "Importa finestra di dialogo"
+
+#. uKC9G
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"hd_id3156183\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11180000.xhp\">Import Dialog</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11180000.xhp\">Importa finestra di dialogo</link>"
+
+#. XBChu
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id3152363\n"
+"help.text"
+msgid "<ahelp hid=\".\">Calls an \"Open\" dialog to import a BASIC dialog file.</ahelp>"
+msgstr "<ahelp hid=\".\">Richiama una finestra di dialogo \"Apri\" per importare un file di finestra di dialogo BASIC.</ahelp>"
+
+#. FbBoM
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id0929200903505211\n"
+"help.text"
+msgid "If the imported dialog has a name that already exists in the library, you see a message box where you can decide to rename the imported dialog. In this case the dialog will be renamed to the next free \"automatic\" name like when creating a new dialog. Or you can replace the existing dialog by the imported dialog. If you click Cancel the dialog is not imported."
+msgstr "Se la finestra di dialogo importata ha un nome già presente nella libreria comparirà una casella di testo in cui sarà possibile assegnarle un nuovo nome. In questo caso la finestra di dialogo verrà rinominata con il successivo nome \"automatico\" disponibile, analogamente a quanto avviene per la creazione di una nuova finestra. In alternativa è possibile sostituire la finestra di dialogo esistente con quella importata. Facendo clic sul pulsante Annulla la finestra di dialogo non sarà importata."
+
+#. n6QpJ
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id0929200903505360\n"
+"help.text"
+msgid "Dialogs can contain localization data. When importing a dialog, a mismatch of the dialogs' localization status can occur."
+msgstr "Le finestre di dialogo possono contenere dati di localizzazione. Quando si importa una finestra di dialogo, può accadere che emerga una discordanza nello stato di localizzazione delle finestre."
+
+#. DecXa
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id0929200903505320\n"
+"help.text"
+msgid "If the library contains additional languages compared to the imported dialog, or if the imported dialog is not localized at all, then the additional languages will silently be added to the imported dialog using the strings of the dialog's default locale."
+msgstr "Se la libreria contiene lingue aggiuntive rispetto alla finestra di dialogo importata o se quest'ultima non è localizzata affatto, le lingue supplementari saranno automaticamente aggiunte alla finestra importata utilizzando le stringhe relative alla localizzazione predefinita della finestra."
+
+#. mGc9E
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id0929200903505383\n"
+"help.text"
+msgid "If the imported dialog contains additional languages compared to the library, or if the library is not localized at all, then you see a message box with Add, Omit, and Cancel buttons."
+msgstr "Se la finestra di dialogo importata contiene lingue aggiuntive rispetto alla libreria, oppure se quest'ultima non è stata localizzata affatto, comparirà una finestra di scelta con i pulsanti Aggiungi, Ometti e Annulla."
+
+#. XrhtD
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id0929200903505340\n"
+"help.text"
+msgid "Add: The additional languages from the imported dialog will be added to the already existing dialog. The resources from the library's default language will be used for the new languages. This is the same as if you add these languages manually."
+msgstr "Aggiungi: le lingue supplementari presenti nella finestra di dialogo importata verranno aggiunte alla finestra esistente. Per le nuove lingue verranno utilizzate le risorse relative alla lingua predefinita della libreria. Questa opzione ha lo stesso effetto dell'aggiunta manuale delle lingue."
+
+#. GzYU9
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id0929200903505367\n"
+"help.text"
+msgid "Omit: The library's language settings will stay unchanged. The imported dialog's resources for the omitted languages are not copied into the library, but they remain in the imported dialog's source files."
+msgstr "Ometti: le impostazioni della lingua della libreria resteranno invariate. Le risorse della finestra di dialogo importata relative alle lingue omesse non verranno copiate nella libreria, ma rimarranno nei file sorgenti della finestra importata."
+
+#. CYDb7
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id3143267\n"
+"help.text"
+msgid "<image id=\"img_id3155339\" src=\"cmd/sc_importdialog.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3155339\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155339\" src=\"cmd/sc_importdialog.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3155339\">Icona</alt></image>"
+
+#. jhUym
+#: 11180000.xhp
+msgctxt ""
+"11180000.xhp\n"
+"par_id3145383\n"
+"help.text"
+msgid "Import Dialog"
+msgstr "Importa finestra di dialogo"
+
+#. csTtJ
+#: 11190000.xhp
+msgctxt ""
+"11190000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Export Dialog"
+msgstr "Esporta finestra di dialogo"
+
+#. 9y6Pg
+#: 11190000.xhp
+msgctxt ""
+"11190000.xhp\n"
+"hd_id3156183\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/11190000.xhp\">Export Dialog</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11190000.xhp\">Esporta finestra di dialogo</link>"
+
+#. aVo7E
+#: 11190000.xhp
+msgctxt ""
+"11190000.xhp\n"
+"par_id3152363\n"
+"help.text"
+msgid "<ahelp hid=\".\">In the dialog editor, this command calls a \"Save as\" dialog to export the current BASIC dialog.</ahelp>"
+msgstr "<ahelp hid=\".\">Nell'editor delle finestre, questo comando richiama una finestra di dialogo \"Salva con nome\" per esportare la finestra di dialogo BASIC attiva.</ahelp>"
+
+#. 7DnCe
+#: 11190000.xhp
+msgctxt ""
+"11190000.xhp\n"
+"par_id3143267\n"
+"help.text"
+msgid "<image id=\"img_id3155339\" src=\"cmd/sc_exportdialog.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3155339\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155339\" src=\"cmd/sc_exportdialog.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3155339\">Icona</alt></image>"
+
+#. hESPm
+#: 11190000.xhp
+msgctxt ""
+"11190000.xhp\n"
+"par_id3145383\n"
+"help.text"
+msgid "Export Dialog"
+msgstr "Esporta finestra di dialogo"
+
+#. d2nFH
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Controls"
+msgstr "Inserisci elementi di controllo"
+
+#. F2psp
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"bm_id3150402\n"
+"help.text"
+msgid "<bookmark_value>controls; in dialog editor</bookmark_value><bookmark_value>push button control in dialog editor</bookmark_value><bookmark_value>icon control</bookmark_value><bookmark_value>buttons; controls</bookmark_value><bookmark_value>image control</bookmark_value><bookmark_value>check box control</bookmark_value><bookmark_value>radio button control</bookmark_value><bookmark_value>option button control</bookmark_value><bookmark_value>fixed text control</bookmark_value><bookmark_value>label field control</bookmark_value><bookmark_value>editing; controls</bookmark_value><bookmark_value>text boxes; controls</bookmark_value><bookmark_value>list boxes; controls</bookmark_value><bookmark_value>combo box control</bookmark_value><bookmark_value>scroll bar control</bookmark_value><bookmark_value>horizontal scrollbar control</bookmark_value><bookmark_value>vertical scrollbar control</bookmark_value><bookmark_value>group box control</bookmark_value><bookmark_value>progress bar control</bookmark_value><bookmark_value>fixed line control</bookmark_value><bookmark_value>horizontal line control</bookmark_value><bookmark_value>line control</bookmark_value><bookmark_value>vertical line control</bookmark_value><bookmark_value>date field control</bookmark_value><bookmark_value>time field control</bookmark_value><bookmark_value>numerical field control</bookmark_value><bookmark_value>currency field control</bookmark_value><bookmark_value>formatted field control</bookmark_value><bookmark_value>pattern field control</bookmark_value><bookmark_value>masked field control</bookmark_value><bookmark_value>file selection control</bookmark_value><bookmark_value>selection options for controls</bookmark_value><bookmark_value>test mode control</bookmark_value>"
+msgstr ""
+"<bookmark_value>Campo di controllo;in editor delle finestre di dialogo</bookmark_value><bookmark_value>Premere il pulsante di controllo nell'editor delle finestre di dialogo</bookmark_value><bookmark_value>Icona;campi di controllo</bookmark_value><bookmark_value>Pulsante;campi di controllo</bookmark_value><bookmark_value>Immagine;campi di controllo</bookmark_value><bookmark_value>Casella;campi di controllo</bookmark_value><bookmark_value>Pulsante di scelta;campi di controllo</bookmark_value><bookmark_value>Testo fisso;campi di controllo</bookmark_value>\n"
+"<bookmark_value>Didascalia;campi di controllo</bookmark_value><bookmark_value>Modifica;campi di controllo</bookmark_value><bookmark_value>Testo, casella di;campi di controllo</bookmark_value><bookmark_value>Riepilogo, casella di;campi di controllo</bookmark_value><bookmark_value>Combinata, casella;campi di controllo</bookmark_value><bookmark_value>Scorrimento, barra di;campi di controllo</bookmark_value><bookmark_value>Scorrimento orizzontale, barra di;campi di controllo</bookmark_value><bookmark_value>Scorrimento verticale, barra di;campi di controllo</bookmark_value>\n"
+"<bookmark_value>Gruppo, casella di;campi di controllo</bookmark_value><bookmark_value>Avanzamento, barra di;campi di controllo</bookmark_value><bookmark_value>Fissa, linea;campi di controllo</bookmark_value><bookmark_value>Orizzontale, linea;campi di controllo</bookmark_value><bookmark_value>Linea;campi di controllo</bookmark_value><bookmark_value>Verticale, linea;campi di controllo</bookmark_value><bookmark_value>Data;campi di controllo</bookmark_value><bookmark_value>Orario;campi di controllo</bookmark_value><bookmark_value>Numerico;campi di controllo</bookmark_value><bookmark_value>Valuta;campi di controllo</bookmark_value><bookmark_value>Formattazione;campi di controllo</bookmark_value><bookmark_value>Maschera;campi di controllo</bookmark_value><bookmark_value>File, selezione;campi di controllo</bookmark_value><bookmark_value>Selezione;opzioni per campi di controllo</bookmark_value><bookmark_value>Test, modalità;campi di controllo</bookmark_value>"
+
+#. dVPiE
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3150402\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/02/20000000.xhp\">Insert Controls</link>"
+msgstr "<link href=\"text/sbasic/shared/02/20000000.xhp\">Inserisci elementi di controllo</link>"
+
+#. jnfj9
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3147000\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChooseControls\">Opens the <emph>Toolbox</emph> bar.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChooseControls\">Apre la barra dei <emph>Campi di controllo</emph>.</ahelp>"
+
+#. tFTAA
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3147226\n"
+"help.text"
+msgid "<image id=\"img_id3147571\" src=\"cmd/lc_choosecontrols.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147571\">Icon Choose Controls</alt></image>"
+msgstr "<image id=\"img_id3147571\" src=\"cmd/lc_choosecontrols.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147571\">Icona Seleziona controlli</alt></image>"
+
+#. DCFsK
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153749\n"
+"help.text"
+msgid "Insert Controls"
+msgstr "Inserisci elementi di controllo"
+
+#. 5qZGJ
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3157958\n"
+"help.text"
+msgid "In edit mode, double-click a control to open the <link href=\"text/sbasic/shared/01170100.xhp\">properties dialog</link>."
+msgstr "In modalità Modifica, fare doppio clic su un campo di controllo per aprire la <link href=\"text/sbasic/shared/01170100.xhp\">finestra di dialogo Proprietà</link>."
+
+#. eo4TR
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3148538\n"
+"help.text"
+msgid "In edit mode, you can also right-click a control and choose the cut, copy, and paste command."
+msgstr "In alternativa, è possibile fare clic col pulsante destro del mouse su un campo di controllo e scegliere i comandi Taglia, Copia e Incolla."
+
+#. s9tA6
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3148473\n"
+"help.text"
+msgid "Button"
+msgstr "Pulsante"
+
+#. extEu
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153824\n"
+"help.text"
+msgid "<image id=\"img_id3157909\" src=\"cmd/sc_insertpushbutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3157909\">Icon Button</alt></image>"
+msgstr "<image id=\"img_id3157909\" src=\"cmd/sc_insertpushbutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3157909\">Icona Pulsante</alt></image>"
+
+#. pGofA
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3147530\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertPushbutton\">Adds a command button.</ahelp> You can use a command button to execute a command for a defined event, such as a mouse click."
+msgstr "<ahelp hid=\".uno:InsertPushbutton\">Aggiunge un campo di controllo di tipo pulsante.</ahelp> È possibile utilizzare i pulsanti per eseguire un comando in risposta a un determinato evento, ad esempio un clic del mouse."
+
+#. GZHQC
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154923\n"
+"help.text"
+msgid "If you want, you can add text or a graphic to the button."
+msgstr "È possibile aggiungere al pulsante anche un testo o un'immagine."
+
+#. EFgyZ
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3148550\n"
+"help.text"
+msgid "Image Control"
+msgstr "Campo di controllo immagine"
+
+#. GUAtq
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154138\n"
+"help.text"
+msgid "<image id=\"img_id3144760\" src=\"cmd/sc_objectcatalog.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3144760\">Icon Image Control</alt></image>"
+msgstr "<image id=\"img_id3144760\" src=\"cmd/sc_objectcatalog.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3144760\">Icona Controllo immagine</alt></image>"
+
+#. VFc83
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3151042\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertImageControl\">Adds a control that displays a graphic.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertImageControl\">Aggiunge un campo di controllo che mostra un'immagine.</ahelp>"
+
+#. bYtDg
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3150447\n"
+"help.text"
+msgid "Check Box"
+msgstr "Casella di controllo"
+
+#. mDDYe
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3155131\n"
+"help.text"
+msgid "<image id=\"img_id3150439\" src=\"cmd/sc_checkbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150439\">Icon Check Box</alt></image>"
+msgstr "<image id=\"img_id3150439\" src=\"cmd/sc_checkbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150439\">Icona Casella di controllo</alt></image>"
+
+#. QWB7B
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3147317\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Checkbox\">Adds a check box that you can use to turn a function on or off.</ahelp>"
+msgstr "<ahelp hid=\".uno:Checkbox\">Aggiunge una casella di controllo utilizzabile per attivare o disattivare una funzione.</ahelp>"
+
+#. gG6kh
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3150486\n"
+"help.text"
+msgid "Option Button"
+msgstr "Pulsante di scelta"
+
+#. KRCpo
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3155856\n"
+"help.text"
+msgid "<image id=\"img_id3146921\" src=\"cmd/sc_radiobutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146921\">Icon Option Button</alt></image>"
+msgstr "<image id=\"img_id3146921\" src=\"cmd/sc_radiobutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146921\">Icona Pulsante di scelta</alt></image>"
+
+#. FNGHF
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153575\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Radiobutton\">Adds a button that allows a user to select from a number of options.</ahelp> Grouped option buttons must have consecutive tab order. They are commonly encircled by a group box. If you have two groups of option buttons, you must insert a tab order between the tab orders of the two groups. For example, to the frame of the second group, or to any other control in the dialog, with the exception of another option button."
+msgstr "<ahelp hid=\".uno:Radiobutton\">Aggiunge un pulsante che permette all'utente di scegliere tra una serie di opzioni.</ahelp> I pulsanti di scelta raggruppati devono essere ordinati consecutivamente nella sequenza di attivazione. Di solito sono racchiusi in una casella di gruppo. Se sono presenti due gruppi di pulsanti di scelta, è necessario inserire la sequenza di attivazione anche tra i due gruppi. Per esempio, verso la cornice del secondo gruppo, o verso qualunque campo di controllo della finestra di dialogo, con l'eccezione di un altro pulsante di scelta."
+
+#. DaRgN
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3154729\n"
+"help.text"
+msgid "Label Field"
+msgstr "Testo fisso"
+
+#. DQafE
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3149300\n"
+"help.text"
+msgid "<image id=\"img_id3153415\" src=\"cmd/sc_insertfixedtext.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153415\">Icon Label Field</alt></image>"
+msgstr "<image id=\"img_id3153415\" src=\"cmd/sc_insertfixedtext.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153415\">Icona Etichetta</alt></image>"
+
+#. XA4Aw
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3156181\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertFixedText\">Adds a field for displaying text labels.</ahelp> These labels are only for displaying predefined text, and not for entering text."
+msgstr "<ahelp hid=\".uno:InsertFixedText\">Aggiunge un campo per la visualizzazione di etichette di testo.</ahelp> Questi campi possono contenere solo testi predefiniti e non sono utilizzabili per l'inserimento di nuovi caratteri."
+
+#. BupCK
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3149123\n"
+"help.text"
+msgid "Text Box"
+msgstr "Casella di testo"
+
+#. DDKUC
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153766\n"
+"help.text"
+msgid "<image id=\"img_id3148996\" src=\"cmd/sc_edit.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148996\">Icon Text Box</alt></image>"
+msgstr "<image id=\"img_id3148996\" src=\"cmd/sc_edit.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148996\">Icona Casella di testo</alt></image>"
+
+#. ruGZ2
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153712\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertEdit\">Adds an input box where you can enter and edit text.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertEdit\">Aggiunge una casella di digitazione in cui è possibile inserire e modificare un testo.</ahelp>"
+
+#. zPAk2
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3154253\n"
+"help.text"
+msgid "List Box"
+msgstr "Casella di riepilogo"
+
+#. LdHYT
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3155959\n"
+"help.text"
+msgid "<image id=\"img_id3163808\" src=\"cmd/sc_listbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Icon List Box</alt></image>"
+msgstr "<image id=\"img_id3163808\" src=\"cmd/sc_listbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Icona Casella di riepilogo</alt></image>"
+
+#. CZ7M5
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3155176\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertListbox\">Adds a box where you can click an entry on a list.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertListbox\">Aggiunge una casella in cui è possibile selezionare la voce di un elenco.</ahelp>"
+
+#. Beb2k
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3150644\n"
+"help.text"
+msgid "Combo Box"
+msgstr "Casella combinata"
+
+#. YgGoR
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3148418\n"
+"help.text"
+msgid "<image id=\"img_id3153200\" src=\"cmd/sc_combobox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153200\">Icon Combo Box</alt></image>"
+msgstr "<image id=\"img_id3153200\" src=\"cmd/sc_combobox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153200\">Icona Casella combinata</alt></image>"
+
+#. Vdn74
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154199\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Combobox\">Adds a combo box. A combo box is a one line list box that a user can click, and then choose an entry from the list.</ahelp> If you want, you can make the entries in the combo box \"read only\"."
+msgstr "<ahelp hid=\".uno:Combobox\">Aggiunge una casella combinata. Una casella combinata è una casella di riepilogo di una sola riga che permette, con un clic, di scegliere una voce di un elenco.</ahelp> Se necessario, è possibile rendere le voci della casella combinata \"di sola lettura\"."
+
+#. Q7efB
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3154585\n"
+"help.text"
+msgid "Horizontal Scrollbar"
+msgstr "Barra di scorrimento orizzontale"
+
+#. AeTvn
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153781\n"
+"help.text"
+msgid "<image id=\"img_id3149530\" src=\"cmd/sc_hscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149530\">Icon Horizontal Scrollbar</alt></image>"
+msgstr "<image id=\"img_id3149530\" src=\"cmd/sc_hscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149530\">Icona Barra di scorrimento orizzontale</alt></image>"
+
+#. Vbp2o
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153232\n"
+"help.text"
+msgid "<ahelp hid=\".uno:HScrollbar\">Adds a horizontal scrollbar to the dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:HScrollbar\">Aggiunge una barra di scorrimento orizzontale alla finestra di dialogo.</ahelp>"
+
+#. ECtLc
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3154119\n"
+"help.text"
+msgid "Vertical Scrollbar"
+msgstr "Barra di scorrimento verticale"
+
+#. 2eBnb
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3150515\n"
+"help.text"
+msgid "<image id=\"img_id3150203\" src=\"cmd/sc_vscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150203\">Icon Vertical Scrollbar</alt></image>"
+msgstr "<image id=\"img_id3150203\" src=\"cmd/sc_vscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150203\">Icona Barra di scorrimento verticale</alt></image>"
+
+#. NmKDo
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3155376\n"
+"help.text"
+msgid "<ahelp hid=\".uno:VScrollbar\">Adds a vertical scrollbar to the dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:VScrollbar\">Aggiunge una barra di scorrimento verticale alla finestra di dialogo.</ahelp>"
+
+#. JmAgh
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3150313\n"
+"help.text"
+msgid "Group Box"
+msgstr "Casella di gruppo"
+
+#. UCcgq
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3151184\n"
+"help.text"
+msgid "<image id=\"img_id3151335\" src=\"cmd/sc_groupbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151335\">Icon Group Box</alt></image>"
+msgstr "<image id=\"img_id3151335\" src=\"cmd/sc_groupbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151335\">Icona Casella di gruppo</alt></image>"
+
+#. aMgsB
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3159622\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Groupbox\">Adds a frame that you can use to visually group similar controls, such as option buttons.</ahelp>"
+msgstr "<ahelp hid=\".uno:Groupbox\">Aggiunge una cornice con cui è possibile raggruppare visivamente campi di controllo simili, ad esempio pulsanti di scelta.</ahelp>"
+
+#. CQpDj
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3148820\n"
+"help.text"
+msgid "To define two different groups of option buttons, ensure that the tab index of the group frame is between the tab indices of the two groups."
+msgstr "Per definire due gruppi diversi di pulsanti di scelta, è necessario inserire l'indice della cornice tra gli indici dei due gruppi."
+
+#. qusDD
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3149330\n"
+"help.text"
+msgid "Progress Bar"
+msgstr "Barra di avanzamento"
+
+#. SDEqL
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3159093\n"
+"help.text"
+msgid "<image id=\"img_id3150318\" src=\"cmd/sc_progressbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150318\">Icon Progress Bar</alt></image>"
+msgstr "<image id=\"img_id3150318\" src=\"cmd/sc_progressbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150318\">Icona Barra di avanzamento</alt></image>"
+
+#. AUUic
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3157979\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ProgressBar\">Adds a progress bar to the dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:ProgressBar\">Aggiunge una barra di avanzamento alla finestra di dialogo.</ahelp>"
+
+#. 2xdUf
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3145654\n"
+"help.text"
+msgid "Horizontal Line"
+msgstr "Linea orizzontale"
+
+#. M4v9f
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3150888\n"
+"help.text"
+msgid "<image id=\"img_id3152872\" src=\"cmd/sc_hfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152872\">Icon Horizontal Line</alt></image>"
+msgstr "<image id=\"img_id3152872\" src=\"cmd/sc_hfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152872\">Icona Linea orizzontale</alt></image>"
+
+#. rVrjy
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3151000\n"
+"help.text"
+msgid "<ahelp hid=\".uno:HFixedLine\">Adds a horizontal line to the dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:HFixedLine\">Aggiunge una linea orizzontale alla finestra di dialogo.</ahelp>"
+
+#. UcBeW
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3155095\n"
+"help.text"
+msgid "Vertical Line"
+msgstr "Linea verticale"
+
+#. mXCzj
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154913\n"
+"help.text"
+msgid "<image id=\"img_id3153249\" src=\"cmd/sc_vfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153249\">Icon Vertical Line</alt></image>"
+msgstr "<image id=\"img_id3153249\" src=\"cmd/sc_vfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153249\">Icona Linea verticale</alt></image>"
+
+#. aQQuM
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3159203\n"
+"help.text"
+msgid "<ahelp hid=\".uno:VFixedLine\">Adds a vertical line to the dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:VFixedLine\">Aggiunge una linea verticale alla finestra di dialogo.</ahelp>"
+
+#. FxkjD
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3154540\n"
+"help.text"
+msgid "Date Field"
+msgstr "Campo data"
+
+#. ea37C
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3148901\n"
+"help.text"
+msgid "<image id=\"img_id3151010\" src=\"cmd/sc_adddatefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151010\">Icon Date Field</alt></image>"
+msgstr "<image id=\"img_id3151010\" src=\"cmd/sc_adddatefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151010\">Icona Campo data</alt></image>"
+
+#. VU2nc
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154214\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AddDateField\">Adds a date field.</ahelp>"
+msgstr "<ahelp hid=\".uno:AddDateField\">Aggiunge un campo per la data.</ahelp>"
+
+#. DBqW6
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3150046\n"
+"help.text"
+msgid "If you assign the \"dropdown\" property to the date field, a user can drop down a calendar to select a date."
+msgstr "Assegnando al campo data la proprietà \"apribile\", l'utente può visualizzare un calendario per la scelta della data."
+
+#. Mofqo
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3151126\n"
+"help.text"
+msgid "Time Field"
+msgstr "Campo orario"
+
+#. 7tb5m
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154338\n"
+"help.text"
+msgid "<image id=\"img_id3147077\" src=\"cmd/sc_timefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147077\">Icon Time Field</alt></image>"
+msgstr "<image id=\"img_id3147077\" src=\"cmd/sc_timefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147077\">Icona Campo orario</alt></image>"
+
+#. 6fSyF
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3151191\n"
+"help.text"
+msgid "<ahelp hid=\"SID_INSERT_TIMEFIELD\">Adds a time field.</ahelp>"
+msgstr "<ahelp hid=\"SID_INSERT_TIMEFIELD\">Aggiunge un campo per l'ora.</ahelp>"
+
+#. 6vzHV
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3154733\n"
+"help.text"
+msgid "Numeric Field"
+msgstr "Campo numerico"
+
+#. GeNcT
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3146107\n"
+"help.text"
+msgid "<image id=\"img_id3147499\" src=\"cmd/sc_insertnumericfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147499\">Icon Numeric Field</alt></image>"
+msgstr "<image id=\"img_id3147499\" src=\"cmd/sc_insertnumericfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147499\">Icona Campo numerico</alt></image>"
+
+#. hMT5t
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3147244\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertNumericField\">Adds a numeric field.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertNumericField\">Aggiunge un campo numerico.</ahelp>"
+
+#. jrbuR
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3149870\n"
+"help.text"
+msgid "Currency Field"
+msgstr "Campo valuta"
+
+#. FEqFW
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153958\n"
+"help.text"
+msgid "<image id=\"img_id3150435\" src=\"cmd/sc_currencyfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150435\">Icon Currency Field</alt></image>"
+msgstr "<image id=\"img_id3150435\" src=\"cmd/sc_currencyfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150435\">Icona Campo valuta</alt></image>"
+
+#. BeFRH
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154064\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCurrencyField\">Adds a currency field.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCurrencyField\">Aggiunge un campo valuta.</ahelp>"
+
+#. BJs4P
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3150117\n"
+"help.text"
+msgid "Formatted Field"
+msgstr "Campo formattato"
+
+#. B3cDo
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3153162\n"
+"help.text"
+msgid "<image id=\"img_id3152807\" src=\"cmd/sc_formattedfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152807\">Icon Formatted Field</alt></image>"
+msgstr "<image id=\"img_id3152807\" src=\"cmd/sc_formattedfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152807\">Icona Campo formattato</alt></image>"
+
+#. QAd5c
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3146320\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertFormattedField\">Adds a text box where you can define the formatting for text that is inputted or outputted as well as any limiting values.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertFormattedField\">Aggiunge una casella di testo in cui è possibile definire la formattazione per il testo digitato o visualizzato e gli eventuali valori limite.</ahelp>"
+
+#. 2iDg4
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3156160\n"
+"help.text"
+msgid "Pattern Field"
+msgstr "Campo a maschera"
+
+#. t7s46
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3150379\n"
+"help.text"
+msgid "<image id=\"img_id3150032\" src=\"cmd/sc_insertpatternfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150032\">Icon Pattern Field</alt></image>"
+msgstr "<image id=\"img_id3150032\" src=\"cmd/sc_insertpatternfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150032\">Icona Campo a maschera</alt></image>"
+
+#. AJhaK
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3147382\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertPatternField\">Adds a masked field.</ahelp> A masked field consists of an input mask and a literal mask. The input mask determines which user data can be entered. The literal mask determines the state of the masked field when the form is loaded."
+msgstr "<ahelp hid=\".uno:InsertPatternField\">Aggiunge un campo a maschera.</ahelp> I campi a maschera sono formati da una maschera di digitazione e da una maschera caratteri. La maschera di digitazione determina i dati da inserire. La maschera caratteri determina lo stato del campo a maschera durante il caricamento del formulario."
+
+#. 8rcKD
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3146815\n"
+"help.text"
+msgid "File Selection"
+msgstr "Selezione file"
+
+#. WaVBA
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3149194\n"
+"help.text"
+msgid "<image id=\"img_id3149101\" src=\"cmd/sc_filecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149101\">Icon File Selection</alt></image>"
+msgstr "<image id=\"img_id3149101\" src=\"cmd/sc_filecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149101\">Icona Selezione file</alt></image>"
+
+#. 9GHDa
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3145632\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertFileControl\">Adds a button that opens a file selection dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertFileControl\">Aggiunge un pulsante che apre una finestra di dialogo per la selezione dei file.</ahelp>"
+
+#. AnFmm
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3155912\n"
+"help.text"
+msgid "Select"
+msgstr "Seleziona"
+
+#. 3tedQ
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3154903\n"
+"help.text"
+msgid "<image id=\"img_id3150653\" src=\"cmd/sc_drawselect.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150653\">Icon Select</alt></image>"
+msgstr "<image id=\"img_id3150653\" src=\"cmd/sc_drawselect.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150653\">Icona Selezione</alt></image>"
+
+#. hAcNy
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3148465\n"
+"help.text"
+msgid "<ahelp hid=\".\">Activates or deactivates the Selection mode. In this mode, you can select the controls in a dialog so that you can edit them.</ahelp>"
+msgstr "<ahelp hid=\".\">Attiva o disattiva il modo Selezione. In tal modo è possibile selezionare i controlli della finestra di dialogo e modificarli.</ahelp>"
+
+#. SSQwJ
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3154055\n"
+"help.text"
+msgid "Properties"
+msgstr "Proprietà"
+
+#. uGYVs
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3148725\n"
+"help.text"
+msgid "<image id=\"img_id3146874\" src=\"cmd/sc_controlproperties.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146874\">Icon Properties</alt></image>"
+msgstr "<image id=\"img_id3146874\" src=\"cmd/sc_controlproperties.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146874\">Icona Proprietà</alt></image>"
+
+#. DToMk
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3151105\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowPropBrowser\">Opens a dialog where you can edit the <link href=\"text/sbasic/shared/01170100.xhp\">properties</link> of the selected control.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShowPropBrowser\">Apre una finestra di dialogo che permette di modificare le <link href=\"text/sbasic/shared/01170100.xhp\">proprietà</link> del campo di controllo selezionato.</ahelp>"
+
+#. GqGSX
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id3153746\n"
+"help.text"
+msgid "Activate Test Mode"
+msgstr "Modo prova sì/no"
+
+#. zHJyC
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3147417\n"
+"help.text"
+msgid "<image id=\"img_id3148883\" src=\"cmd/sc_testmode.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148883\">Icon Activate Test Mode</alt></image>"
+msgstr "<image id=\"img_id3148883\" src=\"cmd/sc_testmode.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148883\">Icona Modo prova sì/no</alt></image>"
+
+#. 9gCL9
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id3150699\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TestMode\">Starts test mode. Click the dialog closer icon to end test mode.</ahelp>"
+msgstr "<ahelp hid=\".uno:TestMode\">Attiva il modo prova. Fare clic sull'icona di chiusura della finestra di dialogo per terminare il modo prova.</ahelp>"
+
+#. 5HbMk
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id2954191\n"
+"help.text"
+msgid "Manage Language"
+msgstr "Gestisci lingua"
+
+#. BPnzG
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id2320017\n"
+"help.text"
+msgid "<image id=\"img_id2856837\" src=\"cmd/sc_managelanguage.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2856837\">Manage Language icon</alt></image>"
+msgstr "<image id=\"img_id2856837\" src=\"cmd/sc_managelanguage.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2856837\">Icona Gestisci lingua</alt></image>"
+
+#. adqA5
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id1261940\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ManageLanguage\">Opens a <link href=\"text/sbasic/guide/translation.xhp\">dialog</link> to enable or manage multiple sets of dialog resources for multiple languages.</ahelp>"
+msgstr "<ahelp hid=\".uno:ManageLanguage\">Apre una <link href=\"text/sbasic/guide/translation.xhp\">finestra di dialogo</link> per abilitare o gestire insiemi multipli di risorse per più lingue.</ahelp>"
+
+#. vbEQt
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id11902\n"
+"help.text"
+msgid "Tree Control"
+msgstr "Campo di controllo ad albero"
+
+#. tiKw8
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id7511520\n"
+"help.text"
+msgid "<image id=\"Graphic2\" src=\"cmd/sc_inserttreecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id285634\">Icon Tree Control</alt></image>"
+msgstr "<image id=\"Graphic2\" src=\"cmd/sc_inserttreecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id285634\">Icona Campo di controllo ad albero</alt></image>"
+
+#. xFjgC
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id9961851\n"
+"help.text"
+msgid "<ahelp hid=\".\">Adds a tree control that can show a hierarchical list. You can populate the list by your program, using API calls (XtreeControl).</ahelp>"
+msgstr "<ahelp hid=\".\">Aggiunge un campo di controllo ad albero in grado di mostrare un elenco in ordine gerarchico. È possibile popolare l'elenco dal proprio programma, tramite chiamate API (XTreeControl).</ahelp>"
+
+#. KjMwM
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id11904\n"
+"help.text"
+msgid "Table Control"
+msgstr "Campo di controllo tabella"
+
+#. 4bdNw
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id7511524\n"
+"help.text"
+msgid "<image id=\"Graphic3\" src=\"cmd/sc_insertgridcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2867837\">Table control icon</alt></image>"
+msgstr "<image id=\"Graphic3\" src=\"cmd/sc_insertgridcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2867837\">Icona Campo di controllo tabella</alt></image>"
+
+#. XzXwf
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id9961854\n"
+"help.text"
+msgid "<ahelp hid=\".\">Adds a table control that can show a table data. You can populate the data by your program, using API calls.</ahelp>"
+msgstr "<ahelp hid=\".\">Aggiunge un campo di controllo tabella in grado di mostrare dati di tabella. È possibile popolare i dati dal proprio programma, tramite chiamate API.</ahelp>"
+
+#. BQz8k
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"hd_id11905\n"
+"help.text"
+msgid "Hyperlink Control"
+msgstr "Controllo collegamento ipertestuale"
+
+#. CY98t
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id7511525\n"
+"help.text"
+msgid "<image id=\"Graphic3\" src=\"cmd/sc_inserthyperlinkcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2896837\">Insert hyperlink control icon</alt></image>"
+msgstr "<image id=\"Graphic3\" src=\"cmd/sc_inserthyperlinkcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2896837\">Icona Campo di controllo collegamento ipertestuale</alt></image>"
+
+#. C2Gjm
+#: 20000000.xhp
+msgctxt ""
+"20000000.xhp\n"
+"par_id9961856\n"
+"help.text"
+msgid "<ahelp hid=\".\">Adds a hyperlink control that can open an address in web browser.</ahelp>"
+msgstr "<ahelp hid=\".\">Aggiunge un controllo di collegamento ipertestuale in grado di aprire un indirizzo in un browser web.</ahelp>"

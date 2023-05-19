@@ -1,0 +1,4192 @@
+#. extracted from helpcontent2/source/text/swriter/02
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-12 00:36+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Lower Sorbian <https://translations.documentfoundation.org/projects/libo_help-master/textswriter02/dsb/>\n"
+"Language: dsb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 100 == 1) ? 0 : ((n % 100 == 2) ? 1 : ((n % 100 == 3 || n % 100 == 4) ? 2 : 3));\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.15.2\n"
+
+#. sqxGb
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toggle Ordered List"
+msgstr "Numerěrowanu lisćinu pśešaltowaś"
+
+#. QF2ZL
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"hd_id3150220\n"
+"help.text"
+msgid "<variable id=\"numberingh1\"><link href=\"text/swriter/02/02110000.xhp\">Toggle Ordered List</link></variable>"
+msgstr "<variable id=\"numberingh1\"><link href=\"text/swriter/02/02110000.xhp\">Numerěrowanu lisćinu pśešaltowaś</link></variable>"
+
+#. ABQAW
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150240\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DefaultNumbering\">Adds or removes numbering from the selected paragraphs.</ahelp>"
+msgstr "<ahelp hid=\".uno:DefaultNumbering\">Pśidawa wubranemu wótstawkoju numerěrowanje abo wótwónoźujo jo.</ahelp>"
+
+#. yGcX6
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id221649422095688\n"
+"help.text"
+msgid "To define the numbering format, choose <emph>Format - Bullets and Numbering</emph>. To display the <emph>Bullets and Numbering</emph> Bar, choose <emph>View - Toolbars - Bullets and Numbering</emph>."
+msgstr "Aby format numerěrowanja definěrował, wubjeŕśo <emph>Format – Naliceńske znamuška a numerěrowanje…</emph>. Aby symbolowu rědku <emph>Naliceńske znamuška a numerěrowanje</emph> pokazał, wubjeŕśo <emph>Naglěd – Symbolowe rědki – Naliceńske znamuška a numerěrowanje</emph>."
+
+#. mLmDR
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150952\n"
+"help.text"
+msgid "Some of the bullets and numbering options are not available when working in the <link href=\"text/swriter/01/03120000.xhp\">Web Layout</link>."
+msgstr "Někotare nastajenja za naliceńske znamuška a numerěrowanje njejsu k dispoziciji, gaž we wugótowanju <link href=\"text/swriter/01/03120000.xhp\">Web</link> źěłaśo."
+
+#. dwn77
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150502\n"
+"help.text"
+msgid "<image id=\"img_id3150508\" src=\"cmd/lc_defaultnumbering.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150508\">Toggle Ordered List Icon</alt></image>"
+msgstr "<image id=\"img_id3150508\" src=\"cmd/lc_defaultnumbering.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150508\">Symbol za numerěrowanu lisćinu</alt></image>"
+
+#. yYfzC
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3147525\n"
+"help.text"
+msgid "Toggle Ordered List"
+msgstr "Numerěrowanu lisćinu pśešaltowaś"
+
+#. AMB3E
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3147549\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06050000.xhp\">Bullets and Numbering</link>"
+msgstr "<link href=\"text/shared/01/06050000.xhp\">Naliceńske znamuška a numerěrowanje</link>"
+
+#. vCvMN
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Link Frames"
+msgstr "Wobłuki zwězaś"
+
+#. yDnvB
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"hd_id3148869\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/03210000.xhp\">Link Frames</link>"
+msgstr "<link href=\"text/swriter/02/03210000.xhp\">Wobłuki zwězaś</link>"
+
+#. HhxBu
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3149873\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChainFrames\" visibility=\"visible\">Links the selected frame to the next frame.</ahelp> The text automatically flows from one frame to another."
+msgstr "<ahelp hid=\".uno:ChainFrames\" visibility=\"visible\">Zwězujo wubrany wobłuk z pśiducym wobłukom.</ahelp> Tekst awtomatiski z jadnogo wobłuka do drugego běžy."
+
+#. tVMCL
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id721613395973296\n"
+"help.text"
+msgid "Choose <menuitem>Format - Frame and Object - Link Frames</menuitem>."
+msgstr "Wubjeŕśo <menuitem>Format – Wobłuk a objekt – Wobłuki zwězaś</menuitem>."
+
+#. VTeFM
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id531613396047070\n"
+"help.text"
+msgid "On the <emph>Format</emph> bar, click the <emph>Link Frames</emph> icon."
+msgstr "Klikniśo w symbolowej rědce <emph>Format</emph> na symbol <emph>Wobłuki zwězaś</emph>."
+
+#. BA5Cn
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<image src=\"cmd/sc_chainframes.png\" id=\"img_id3148771\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148771\">Icon Link Frames</alt></image>"
+msgstr "<image src=\"cmd/sc_chainframes.png\" id=\"img_id3148771\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148771\">Symbol za Wobłuki zwězaś</alt></image>"
+
+#. kcF9p
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3149288\n"
+"help.text"
+msgid "Link Frames"
+msgstr "Wobłuki zwězaś"
+
+#. 4BWgB
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Unlink Frames"
+msgstr "Wobłuki rozdźěliś"
+
+#. mBvuA
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"bm_id3151188\n"
+"help.text"
+msgid "<bookmark_value>frames;unlinking</bookmark_value><bookmark_value>unlinking frames</bookmark_value>"
+msgstr "<bookmark_value>Wobłuki;rozdźěliś</bookmark_value><bookmark_value>wobłuki rozdźěliś</bookmark_value>"
+
+#. mDTZs
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"hd_id3151188\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/03220000.xhp\">Unlink Frames</link>"
+msgstr "<link href=\"text/swriter/02/03220000.xhp\">Wobłuki rozdźěliś</link>"
+
+#. DMdUB
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3145412\n"
+"help.text"
+msgid "<ahelp hid=\".uno:UnhainFrames\">Breaks the link between two frames.</ahelp> You can only break the link that extends from the selected frame to the target frame."
+msgstr "<ahelp hid=\".uno:UnhainFrames\">Rozdźělujo dwa wobłuka.</ahelp> Móžośo jano zwisk źěliś, kótaryž se wót wubranego wobłuka do celoweho wobłuka wupśestrěwa."
+
+#. eDuj2
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3155903\n"
+"help.text"
+msgid "<image id=\"img_id3149687\" src=\"cmd/sc_unhainframes.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3149687\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149687\" src=\"cmd/sc_unhainframes.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3149687\">Symbol za Wobłuk rozdźěliś</alt></image>"
+
+#. 9CrhG
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3155628\n"
+"help.text"
+msgid "Unlink Frames"
+msgstr "Wobłuki rozdźěliś"
+
+#. ytwBC
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Rows"
+msgstr "Smužki zasajźiś"
+
+#. agDLU
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"bm_id3154838\n"
+"help.text"
+msgid "<bookmark_value>tables; inserting rows</bookmark_value><bookmark_value>rows; inserting in tables, using icon</bookmark_value>"
+msgstr "<bookmark_value>tabele; smužki zasajźiś</bookmark_value><bookmark_value>smužki; do tabele zasajźiś, z pomocu symbola</bookmark_value>"
+
+#. W9zgL
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"hd_id3154838\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04090000.xhp\">Insert Rows</link>"
+msgstr "<link href=\"text/swriter/02/04090000.xhp\">Smužki zasajźiś</link>"
+
+#. 46DLZ
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3147407\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertRows\">Inserts one or more rows in the table, below the selection. You can insert more than one row by opening the dialog (choose <emph>Table - Insert - Rows</emph>), or by selecting more than one row before clicking the icon.</ahelp> The second method inserts rows of the same height as the originally selected rows."
+msgstr "<ahelp hid=\".uno:InsertRows\">Zasajźujo jadnu smužku abo někotare smužki do tabele pód wuběrkom. Aby wěcej ako jadnu smužku zasajźił, wócyńśo dialog (wubjeŕśo <emph>Tabela – Zasajźiś – Smužki…</emph>) abo wubjeŕśo wěcej ako jadnu smužku, nježli až na symbol klikaśo.</ahelp> Druga metoda smužki samskeje wusokosći ako spócetnje wubrane smužki zasajźujo."
+
+#. xNXBv
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3151180\n"
+"help.text"
+msgid "<image id=\"img_id3151189\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151189\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151189\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151189\">Symbol za Smužku zasajźiś</alt></image>"
+
+#. cUehP
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3149670\n"
+"help.text"
+msgid "Insert Row"
+msgstr "Smužku zasajźiś"
+
+#. SDTyQ
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Column"
+msgstr "Słup zasajźiś"
+
+#. FQEcy
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"bm_id3152899\n"
+"help.text"
+msgid "<bookmark_value>tables; inserting columns in</bookmark_value><bookmark_value>columns; inserting in tables</bookmark_value>"
+msgstr "<bookmark_value>tabele; słupy zasajźiś</bookmark_value><bookmark_value>słupy; do tabelow zasajźiś</bookmark_value>"
+
+#. TJe6s
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"hd_id3152899\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04100000.xhp\">Insert Column</link>"
+msgstr "<link href=\"text/swriter/02/04100000.xhp\">Słup zasajźiś</link>"
+
+#. K7GFa
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3145078\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertColumns\">Inserts one or more columns into the table, after the selection. You can insert several columns at the same time by opening the dialog (choose <emph>Table - Insert - Columns</emph>), or by selecting several columns before clicking the icon.</ahelp> If the latter method is used, the columns inserted will have the same relative width as the selected columns."
+msgstr "<ahelp hid=\".uno:InsertColumns\">Zasajźujo jaden słup abo někotare słupy za wuběrkom do tabele. Móžośo teke někotare słupy naraz zasajźiś, gaž dialog wócynjaśo (wubjeŕśo <emph>Tabela – Zasajźiś – Słupy</emph>) abo někotare słupy wuběraśo, nježli až na symbol klikaśo.</ahelp> Jolic druga metoda se wužywa, změju zasajźone słupy samsku relatiwnu šyrokosć ako wubrane słupy."
+
+#. BVL59
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3149691\n"
+"help.text"
+msgid "<image id=\"img_id3155174\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155174\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155174\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155174\">Symbol za Słup zasajźiś</alt></image>"
+
+#. NGX9F
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3149669\n"
+"help.text"
+msgid "Insert Column"
+msgstr "Słup zasajźiś"
+
+#. V8cm8
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Fixed"
+msgstr "Tabela: kšuta"
+
+#. pdkkr
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"hd_id3151187\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04220000.xhp\">Table: Fixed</link>"
+msgstr "<link href=\"text/swriter/02/04220000.xhp\">Tabela: kšuta</link>"
+
+#. ACJtt
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3151174\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeFix\" visibility=\"visible\">If this mode is active, changes to a line and/or column affect only the neighboring lines or columns in question.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeFix\" visibility=\"visible\">Jolic toś ten modus jo aktiwny, změny smužki a/abo słupa jano dane susedne smužki abo słupy wobwliwuju.</ahelp>"
+
+#. ds3eW
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3155896\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodefix.png\" id=\"img_id3155903\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155903\">Icon Table: Fixed</alt></image>"
+msgstr "<image src=\"cmd/sc_tablemodefix.png\" id=\"img_id3155903\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155903\">Symbol za Tabela: kšuta</alt></image>"
+
+#. aRzgG
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3155066\n"
+"help.text"
+msgid "Table: Fixed"
+msgstr "Tabela: kšuta"
+
+#. feUuF
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Fixed, Proportional"
+msgstr "Tabela: kšuta, proporcionalna"
+
+#. ovm4D
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"hd_id3147169\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04230000.xhp\">Table: Fixed, Proportional</link>"
+msgstr "<link href=\"text/swriter/02/04230000.xhp\">Tabela: kšuta, proporcionalna</link>"
+
+#. TXCTY
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3145246\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeFixProp\" visibility=\"visible\">If this mode is active, changes to the line and/or column affect the entire table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeFixProp\" visibility=\"visible\">Jolic toś ten modus jo aktiwny, změny smužki a/abo słupa cełu tabelu wobwliwuju.</ahelp>"
+
+#. f7A4m
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3145087\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodefixprop.png\" id=\"img_id3156378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156378\">Icon Table: Fixed, Proportional</alt></image>"
+msgstr "<image src=\"cmd/sc_tablemodefixprop.png\" id=\"img_id3156378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156378\">Symbol za Tabela: kšuta, proporcionalna</alt></image>"
+
+#. nSBPn
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3149497\n"
+"help.text"
+msgid "Table: Fixed, Proportional"
+msgstr "Tabela: kšuta, proporcionalna"
+
+#. 9JRZE
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Variable"
+msgstr "Tabela: wariabelna"
+
+#. wdjWM
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"hd_id3154501\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04240000.xhp\">Table: Variable</link>"
+msgstr "<link href=\"text/swriter/02/04240000.xhp\">Tabela: wariabelna</link>"
+
+#. GKKgd
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3151182\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeVariable\" visibility=\"visible\">If this mode is active, changes to a line and/or column affect the size of the table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeVariable\" visibility=\"visible\">Jolic toś ten modus jo aktiwny, změny smužki a/abo słupa wjelikosć tabele wobwliwuju.</ahelp>"
+
+#. 5oPk9
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3145415\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodevariable.png\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Icon Table: Variable</alt></image>"
+msgstr "<image src=\"cmd/sc_tablemodevariable.png\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Symbol za Tabela: wariabelna</alt></image>"
+
+#. 6EZas
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Table: Variable"
+msgstr "Tabela: wariabelna"
+
+#. 27FsC
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sum"
+msgstr "Suma"
+
+#. WB2ER
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"hd_id3143232\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04250000.xhp\">Sum</link>"
+msgstr "<link href=\"text/swriter/02/04250000.xhp\">Suma</link>"
+
+#. BycTx
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3146899\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AutoSum\">Activates the sum function. Note that the cursor must be in the cell where you want the sum to appear.</ahelp>"
+msgstr "<ahelp hid=\".uno:AutoSum\">Aktiwěrujo sumowu funkciju. Źiwajśo na to, až kursor musy w celi byść, źož se ma suma zjawiś.</ahelp>"
+
+#. Rv2Fi
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3154504\n"
+"help.text"
+msgid "%PRODUCTNAME recognizes the cell range for the sum function as long as the cells are filled with numbers. Prior to entering the data, you must choose <menuitem>Table - Number Recognition</menuitem> to enable this feature."
+msgstr "%PRODUCTNAME celowy wobceŕk za sumowu funkciju spóznawa, jolic cele su z licbami wupołnjone. Nježli až daty zapódawaśo, musyśo <menuitem>Tabela – Licbowe spóznawanje</menuitem>, aby toś tu funkciju zmóžnił."
+
+#. CmiXF
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3148771\n"
+"help.text"
+msgid "Click <emph>Apply</emph> to accept the sum formula as it appears in the entry line."
+msgstr "Klikniśo na <emph>Nałožyś</emph>, aby sumowu formulu pśiwześ, ako se w zapódawańskej smužce zjawijo."
+
+#. HnsKB
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3145418\n"
+"help.text"
+msgid "<image id=\"img_id3147512\" src=\"cmd/sc_autosum.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147512\">Icon</alt></image>"
+msgstr "<image id=\"img_id3147512\" src=\"cmd/sc_autosum.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147512\">Symbol za Suma</alt></image>"
+
+#. ZiCky
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3150750\n"
+"help.text"
+msgid "Sum"
+msgstr "Suma"
+
+#. GqFYN
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "No List"
+msgstr "Žedna lisćina"
+
+#. QGkTU
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"hd_id3145822\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06040000.xhp\">No List</link>"
+msgstr "<link href=\"text/swriter/02/06040000.xhp\">Žedna lisćina</link>"
+
+#. MPBzT
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3154505\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RemoveBullets\" visibility=\"visible\">Removes numbering or bullets and list indenting for the current paragraph or selected paragraphs.</ahelp>"
+msgstr "<ahelp hid=\".uno:RemoveBullets\" visibility=\"visible\">Wótwónoźujo numerěrowanje abo naliceńske znamuška a zasunjenja lisćiny za aktualny wótstawk abo wubrane wótstawki.</ahelp>"
+
+#. LDHCy
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "<image src=\"cmd/lc_removebullets.png\" id=\"img_id3145083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145083\">Icon No List</alt></image>"
+msgstr "<image src=\"cmd/lc_removebullets.png\" id=\"img_id3145083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145083\">Symbol za Žedna lisćina</alt></image>"
+
+#. iNFhx
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "No List"
+msgstr "Žedna lisćina"
+
+#. 5FX23
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id811614270889392\n"
+"help.text"
+msgid "To preserve indenting, but remove bullet or number, place cursor at the beginning of the paragraph and press <keycode>Backspace</keycode>."
+msgstr "Aby zasunjenje wobchował, ale naliceńske znamuško abo numer wótwónoźeł, stajśo kursor na zachopjeńk wótstawka a tłocćo <keycode>slědkstajeńsku tastu</keycode>."
+
+#. ARLxg
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Demote Outline Level with Subpoints"
+msgstr "Rowninu rozrědowanja z póddypkami dołoj pśesunuś"
+
+#. JVsVH
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"hd_id3145826\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06070000.xhp\">Demote Outline Level with Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06070000.xhp\">Rowninu rozrědowanja z póddypkami dołoj pśesunuś</link>"
+
+#. eFSaF
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145241\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DecrementSubLevels\">Demotes the list of a list paragraph where the cursor is located and its subpoints to the next list level.</ahelp> Multiple list paragraphs can be selected. Demotes the outline level of a chapter heading where the cursor is located and all its subheadings to the next outline level. This command is active only when the cursor is positioned in a list paragraph or a chapter heading."
+msgstr "<ahelp hid=\".uno:DecrementSubLevels\">Pśesuwa lisćinu lisćinowego wótstawka, źož jo kursor, a jogo póddypki wó lisćinowu rowninu dołoj.</ahelp> Móžośo někotare lisćinowe wótstawki wubraś. Pśesuwa rowninu rozrědowanja kapitlowego nadpisma, źož jo kursor, a wšykne jogo pódnadpisma wó jadnu rowninu rozrědowanja dołoj. Toś ten pśikaz jo jano aktiwny, gaž kursor jo w lisćinowem wótstawku abo kapitlowem nadpismje."
+
+#. EH6kY
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145084\n"
+"help.text"
+msgid "<image id=\"img_id3156376\" src=\"cmd/sc_decrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156376\">Icon Demote Outline Level with Subpoints</alt></image>"
+msgstr "<image id=\"img_id3156376\" src=\"cmd/sc_decrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156376\">Symbol za Rowninu rozrědowanja z póddypkami dołoj pśesunuś</alt></image>"
+
+#. gUUUN
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145088\n"
+"help.text"
+msgid "Demote Outline Level With Subpoints"
+msgstr "Rozrědowańsku rowninu z póddypkami dołoj pśesunuś"
+
+#. kG3Fb
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Promote Outline Level With Subpoints"
+msgstr "Rozrědowańsku rowninu z póddypkami górjej pśesunuś"
+
+#. Gkdat
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"hd_id3154507\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06080000.xhp\">Promote Outline Level With Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06080000.xhp\">Rowninu rozrědowanja z póddypkami górjej pśesunuś</link>"
+
+#. KkHwc
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3151189\n"
+"help.text"
+msgid "<ahelp hid=\".uno:IncrementSubLevels\">Promotes the list level of a list paragraph where the cursor is located and its subpoints to the next list level.</ahelp> Multiple list paragraphs can be selected. Promotes the outline level of a chapter heading where the cursor is located and all its subheadings to the next outline level. This command is active only when the cursor is positioned in a list paragraph or chapter heading."
+msgstr "<ahelp hid=\".uno:DecrementSubLevels\">Pśesuwa lisćinu lisćinowego wótstawka, źož jo kursor, a jogo póddypki wó lisćinowu rowninu górjej.</ahelp> Móžośo někotare lisćinowe wótstawki wubraś. Pśesuwa rowninu rozrědowanja kapitlowego nadpisma, źož jo kursor, a wšykne jogo pódnadpisma wó jadnu rowninu rozrědowanja górjej. Toś ten pśikaz jo jano aktiwny, gaž kursor jo w lisćinowem wótstawku abo kapitlowem nadpismje."
+
+#. 98iKX
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3145410\n"
+"help.text"
+msgid "<image id=\"img_id3145421\" src=\"cmd/sc_incrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145421\">Icon Promote Outline Level With Subpoints</alt></image>"
+msgstr "<image id=\"img_id3145421\" src=\"cmd/sc_incrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145421\">Symbol za Rpzrědowańsku rowninu z póddypkami górjej pśesunuś</alt></image>"
+
+#. BEMRR
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3145417\n"
+"help.text"
+msgid "Promote Outline Level With Subpoints"
+msgstr "Rozrědowańsku rowninu z póddypkami górjej pśesunuś"
+
+#. jPBGz
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Unnumbered Entry"
+msgstr "Njenumerěrowany zapisk zasajźiś"
+
+#. SBEu5
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"hd_id3154505\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06090000.xhp\">Insert Unnumbered Entry</link>"
+msgstr "<link href=\"text/swriter/02/06090000.xhp\">Njenumerěrowany zapisk zasajźiś</link>"
+
+#. WX5QJ
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3148775\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertNeutralParagraph\">Inserts a paragraph without numbering. The existing numbering will not be affected.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertNeutralParagraph\">Zasajźujo wótstawk bźez numerěrowanja. Eksistěrujuce numerěrowanje so njewobwliwujo.</ahelp>"
+
+#. L9LqK
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3156377\n"
+"help.text"
+msgid "<image id=\"img_id3156384\" src=\"cmd/sc_insertneutralparagraph.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156384\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156384\" src=\"cmd/sc_insertneutralparagraph.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156384\">Symbol za Njenumerěrowany zapisk zasajźiś</alt></image>"
+
+#. Ut87w
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3156381\n"
+"help.text"
+msgid "Insert Unnumbered Entry"
+msgstr "Njenumerěrowany zapisk zasajźiś"
+
+#. D97qQ
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Move Item Up with Subpoints"
+msgstr "Zapisk z póddypkami górjej pśesunuś"
+
+#. AF9FJ
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"hd_id3147174\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06120000.xhp\">Move Item Up with Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06120000.xhp\">Zapisk z póddypkami górjej pśesunuś</link>"
+
+#. tHDTp
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "<ahelp hid=\".uno:MoveUpSubItems\" visibility=\"visible\">Moves a list paragraph where the cursor is located and its subpoints to before the previous list paragraph with the same list level. Moves a chapter heading where the cursor is located and all its subheadings and text to before the previous heading at the same outline level.</ahelp> You can also select and move more than one list paragraph or chapter heading. This command is only active when the cursor is positioned within a list paragraph or chapter heading."
+msgstr "<ahelp hid=\".uno:MoveUpSubItems\" visibility=\"visible\">Pśesuwa lisćinowy wótstawk, źož jo kursor, a jogo póddypki pśed pjerwjejšny lisćinowy wótstawk ze samskeju lisćinoweju rowninu. Pśesuwa kapitlowe nadpismo, źož jo kursor, a wšykne jogo pódnadpisma a tekst pśed pjerwjejšne nadpismo na samskeju rozrědowańskeju rowninje.</ahelp> Móžośo teke někotare lisćinowe wótstawki abo kapitlowe nadpisma wubraś a pśesunuś. Toś ten pśikaz jo jano aktiwny, gaž kursor jo w lisćinowem wótstawku abo kapitlowem nadpismje."
+
+#. KVXUP
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3145083\n"
+"help.text"
+msgid "<image src=\"cmd/sc_moveupsubitems.svg\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Icon Move Up with Subpoints</alt></image>"
+msgstr "<image src=\"cmd/sc_moveupsubitems.svg\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Symbol za Zapisk z póddypkami górjej pśesunuś</alt></image>"
+
+#. SRDNE
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Move Item Up with Subpoints"
+msgstr "Zapisk z póddypkami górjej pśesunuś"
+
+#. 9tvuo
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Move Item Down with Subpoints"
+msgstr "Zapisk z póddypkami dołoj pśesunuś"
+
+#. ByHPH
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"hd_id3154501\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06130000.xhp\">Move Item Down with Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06130000.xhp\">Zapisk z póddypkami dołoj pśesunuś</link>"
+
+#. nLCpV
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3148770\n"
+"help.text"
+msgid "<ahelp hid=\".uno:MoveDownSubItems\" visibility=\"visible\">Moves a list paragraph where the cursor is located and its subpoints to after the following list paragraph with the same list level. Moves a chapter heading where the cursor is located and all its subheadings and text to after the following heading at the same outline level.</ahelp> You can also select and move more than one list paragraph or chapter heading. This command is only active when the cursor is positioned in a list paragraph or chapter heading."
+msgstr "<ahelp hid=\".uno:MoveDownSubItems\" visibility=\"visible\">Pśesuwa lisćinowy wótstawk, źož jo kursor, a jogo póddypki za slědujucy lisćinowy wótstawk ze samskeju lisćinoweju rowninu. Pśesuwa kapitlowe nadpismo, źož jo kursor, a wšykne jogo pódnadpisma a tekst za slědujuce nadpismo na samskeju rozrědowańskeju rowninje.</ahelp> Móžośo teke někotare lisćinowe wótstawki abo kapitlowe nadpisma wubraś a pśesunuś. Toś ten pśikaz jo jano aktiwny, gaž kursor jo w lisćinowem wótstawku abo kapitlowem nadpismje."
+
+#. JX6PL
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3145086\n"
+"help.text"
+msgid "<image src=\"cmd/sc_movedownsubitems.svg\" id=\"img_id3156377\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156377\">Icon Move Down with Subpoints</alt></image>"
+msgstr "<image src=\"cmd/sc_movedownsubitems.svg\" id=\"img_id3156377\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156377\">Symbol za Zapisk z póddypkami dołoj pśesunuś</alt></image>"
+
+#. PE4NZ
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Move Item Down with Subpoints"
+msgstr "Zapisk z póddypkami dołoj pśesunuś"
+
+#. vLXu5
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Restart Numbering"
+msgstr "Numerěrowanje znowego zachopiś"
+
+#. HqgkP
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"hd_id3147171\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06140000.xhp\">Restart Numbering</link>"
+msgstr "<link href=\"text/swriter/02/06140000.xhp\">Numerěrowanje znowego zachopiś</link>"
+
+#. iwJHH
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145249\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberingStart\" visibility=\"visible\">Restarts list numbering from 1.</ahelp> This command is only active when the cursor is positioned within a list."
+msgstr "<ahelp hid=\".uno:NumberingStart\" visibility=\"visible\">Zachopina lisćinowe numerěrowanje znowego.</ahelp> Toś ten pśikaz jo jano aktiwny, gaž kursor jo w lisćinje."
+
+#. 89Xm9
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id631616370838434\n"
+"help.text"
+msgid "Choose <menuitem>Format - Lists - Restart Numbering</menuitem>."
+msgstr "Wubjeŕśo <menuitem>Format – Lisćiny – Numerěrowanje znowego zachopiś</menuitem>."
+
+#. fh5aw
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id31616370717930\n"
+"help.text"
+msgid "Place cursor in a list paragraph, right-click and choose <menuitem>List - Restart Numbering</menuitem>."
+msgstr "Stajśo kursor do lisćinowego wótstawka, klikniśo z pšaweju tastu a wubjeŕśo <menuitem>Lisćina – Numerěrowanje znowego zachopiś</menuitem>."
+
+#. bahpE
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id351616370727010\n"
+"help.text"
+msgid "On <link href=\"text/shared/01/06050000.xhp\"><emph>Bullets and Numbering</emph></link> bar, click"
+msgstr "Klikniśo na symbolowej rědce <link href=\"text/shared/01/06050000.xhp\"><emph>Naliceńske znamuška a numerěrowanje</emph></link> na"
+
+#. SLjuC
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145082\n"
+"help.text"
+msgid "<image src=\"cmd/sc_numberingstart.png\" id=\"img_id3145089\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145089\">Icon Restart Numbering</alt></image>"
+msgstr "<image src=\"cmd/sc_numberingstart.png\" id=\"img_id3145089\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145089\">Symbol za Numerěrowanje znowego zachopiś</alt></image>"
+
+#. dPfnv
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145086\n"
+"help.text"
+msgid "Restart Numbering"
+msgstr "Numerěrowanje znowego zachopiś"
+
+#. DmEY6
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id761616370463787\n"
+"help.text"
+msgid "To remove the numbering restart, apply the command again in the paragraph where the numbering was restarted."
+msgstr "Aby nowy zachopjénk numerěrowanja wótwónoźeł, wóspjetujśo pśikaz we wótstawku, źož numerěrowanje jo se znowego zachopiło."
+
+#. yoUyg
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id261616371203225\n"
+"help.text"
+msgid "To restart numbering with a number greater than 1, right-click in the paragraph where you want to restart numbering, choose <menuitem>Paragraph - Paragraph - </menuitem><link href=\"text/swriter/01/05030800.xhp\">Outline & List</link> tab, select <menuitem>Restart numbering at this paragraph</menuitem> and enter the start number in <menuitem>Start with</menuitem>."
+msgstr "Aby numerěrowanje z numerom wětšy ako 1 znowego zachopił, klikniśo z pšaweju tastu do wótstawka, w kótaremž cośo numerěrowanje znowego zachopiś, wubjerŕo <menuitem>Wótstawk – Wótstawk… – Rejtarik: </menuitem><link href=\"text/swriter/01/05030800.xhp\">Rozrědowanje a lisćina</link>, wubjeŕśo <menuitem>Numerěrowanje pla toś togo wótstawka znowego zachopiś</menuitem> a zapódajśo startowy numer do <menuitem>Zachopiś z</menuitem>."
+
+#. qCdhk
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Number"
+msgstr "Numer boka"
+
+#. WJ2wq
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"hd_id3145241\n"
+"help.text"
+msgid "Page Number"
+msgstr "Numer boka"
+
+#. JTxYv
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3151184\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatePageNumber\">The current page number is displayed in this field of the status bar. A click opens \"Go to Page\", with which you can navigate in the document. A right-click shows all bookmarks in the document. Click a bookmark to position the text cursor at the bookmark location.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatePageNumber\">Aktualny numer boka se w toś tom pólu statusoweje rědki pokazujo. Kliknjenje dialog „K bokoju pśejś“ wócynja, z kótarymž móžośo w dokumenśe nawigěrowaś. Kliknjenje z pšaweju tastu wšyke cytańske znamjenja w dokumenśe pokazujo. Klikniśo na cy tańske znamje, aby tekstowy kursor na městnje cytańskego znamjenja pozicioněrował.</ahelp>"
+
+#. BinAk
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3145078\n"
+"help.text"
+msgid "The displayed page (x) and the total number of pages (y) are shown in the form <emph>Page x/y</emph> When you scroll through a document with the mouse, the page number is displayed when you release the mouse button. When you scroll using the right scrollbar, the page numbers are displayed as a Help tip. The page numbering format of the status bar and scrollbar is identical."
+msgstr "Pokazany bok (x) a cełkowna licba bokow (y) se we formje <emph>Bok x/y</emph> pokazujotej. Gaž pó dokumenśe z myšku kulaśo, se numer boka pokazujo, gaž tastu myški pušćaśo. Gaž z pomocu pšaweje suwańskeje rědki kulaśo, se numery bokow ako pomocnu pokazku pokazuju. Format numerěrowanja bokow statusoweje rědki a suwańskeje rědki jo identiski."
+
+#. Ywsr3
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3145417\n"
+"help.text"
+msgid "You can turn the <link href=\"text/swriter/01/02110000.xhp\">Navigator</link> display on or off by double-clicking the<emph> Page Number </emph>field."
+msgstr "Móžośo <link href=\"text/swriter/01/02110000.xhp\">Nawigator</link> pokazaś abo schowaś, gaž na pólo <emph>Numer boka</emph> dwójcy klikaśo."
+
+#. 7CeFv
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3149806\n"
+"help.text"
+msgid "To go to a specific page, enter the page number in the <emph>Page</emph> spin button in the Navigator and then press Enter."
+msgstr "Aby k wěstemu bokoju pśejšeł, zapódajśo numer boka we wobwjertnem tłocašku <emph>Bok</emph> w Nawigatorje a tłocćo Enter."
+
+#. NptAB
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3149095\n"
+"help.text"
+msgid "By pressing the shortcut keys Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F5, you switch to entering a page number. When you press Enter, the cursor moves to the selected page."
+msgstr "Gaž tastowe skrotconki Umsch+<switchinline select=\"sys\"><caseinline select=\"MAC\">cmd ⌘</caseinline><defaultinline>Strg</defaultinline></switchinline>+F5 tłocyśo, móžośo numer boka zapódaś. Gaž Enter tłocyśo, se kursor k wubranemu bokoju giba."
+
+#. xw7kE
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Combined Display"
+msgstr "Skombiněrowane pokazanje"
+
+#. xwbpK
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"hd_id3151186\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/08080000.xhp\">Combined Display</link>"
+msgstr "<link href=\"text/swriter/02/08080000.xhp\">Skombiněrowane pokazanje</link>"
+
+#. RRcoi
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3151172\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatusBarFunc\" visibility=\"visible\">Displays current information about the active document.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatusBarFunc\" visibility=\"visible\">Pokazujo aktualne informacije wó aktiwnem dokumenśe.</ahelp>"
+
+#. YJiwS
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3156375\n"
+"help.text"
+msgid "When the cursor is in a named section, the section name appears. When the cursor is in a table, the name of the table cell appears. The size of the object is shown when you edit frames or drawing objects."
+msgstr "Gaž kursor jo w pomjenjonem wótrězku, se mě wótrězka zjawijo. Gaž kursor jo w tabeli, se mě tabeloweje cele zjawijo. Wjelikosć objekta se pokazujo, gaž wobłuki abo kresleńske objekty wobźěłujośo."
+
+#. Yw2PH
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3145416\n"
+"help.text"
+msgid "When the cursor is positioned within text, you can double-click this field to open the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. In this dialog, you can define a field to be inserted in your document at the current cursor position. When the cursor is positioned in a table, a double-click in this field will call the <emph>Table Format</emph> dialog. Depending on the object selected, you can call up a dialog to edit a section, a graphic object, a floating frame, an OLE object, direct numbering or the position and size of a drawing object."
+msgstr "Jolic kursor jo w teksće, móžośo na toś to pólo dwójcy kliknuś, aby dialog <link href=\"text/swriter/01/04090000.xhp\"><emph>Póla</emph></link> wócynał. W toś tom dialogu móžośo pólo definěrowaś, kótarež se ma do wašogo dokumenta na aktualnej poziciji kursora zasajźiś. Gaž kursor jo w tabeli, dwójne kliknjenje do toś togo póla dialog <emph>Tabelowy format</emph> wuwołujo. Wótwisujucy wót wubranego objekta, móžośo dialog wuwołaś, aby wótrězk, grafiski objekt, znosujucy se wobłuk, OLE-objekt, direktne numerěrowanje abo poziciju a wjelikosć kresleńskego objekta wobźěłał."
+
+#. kdhmw
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Pówětšyś"
+
+#. 3nMKp
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"hd_id3151173\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10010000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/swriter/02/10010000.xhp\">Pówětšyś</link>"
+
+#. B6oDo
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3163866\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomPlus\" visibility=\"visible\">Zooms in to get a close-up view of the document.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomPlus\" visibility=\"visible\">Pówětšujo, aby wy naglěd z bliskosći dokumenta dostał.</ahelp>"
+
+#. Lkcqa
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3154572\n"
+"help.text"
+msgid "<image src=\"cmd/sc_zoomin.svg\" id=\"img_id3155895\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155895\">Icon Zoom In</alt></image>"
+msgstr "<image src=\"cmd/sc_zoomin.svg\" id=\"img_id3155895\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155895\">Symbol za Pówětšyś</alt></image>"
+
+#. pBveG
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3155892\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Pówětšyś"
+
+#. LrnbF
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Pómjeńšyś"
+
+#. CYW6C
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"hd_id3149870\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10020000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/swriter/02/10020000.xhp\">Pómjeńšyś</link>"
+
+#. FPsvN
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3147401\n"
+"help.text"
+msgid "<ahelp hid=\".\">Zooms out to see more of the document at a reduced size.</ahelp>"
+msgstr "<ahelp hid=\".\">Pómjeńšujo dokumentowy naglěd, aby wy wěcej wiźeł.</ahelp>"
+
+#. MGnnw
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3148775\n"
+"help.text"
+msgid "<image id=\"img_id3150764\" src=\"cmd/sc_zoomout.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150764\">Zoom Out Icon</alt></image>"
+msgstr "<image id=\"img_id3150764\" src=\"cmd/sc_zoomout.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150764\">Symbol za Pómjeńšyś</alt></image>"
+
+#. k3fKF
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Pómjeńšyś"
+
+#. 4jEhf
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Preview Zoom"
+msgstr "Měritko pśeglěda"
+
+#. GJSJx
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"hd_id3147175\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10030000.xhp\">Preview Zoom</link>"
+msgstr "<link href=\"text/swriter/02/10030000.xhp\">Měritko pśeglěda</link>"
+
+#. zWNEA
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<ahelp hid=\"HID_PVIEW_ZOOM_LB\">Determines the zoom level of the print preview.</ahelp>"
+msgstr "<ahelp hid=\"HID_PVIEW_ZOOM_LB\">Póstaja měritko śišćaŕskego pśeglěda.</ahelp>"
+
+#. FCDCs
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Single Page Preview"
+msgstr "Pśeglěd jadnotliwego boka"
+
+#. XUTbH
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"hd_id691649976425993\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10040000.xhp\">Single Page Preview</link>"
+msgstr "<link href=\"text/swriter/02/10040000.xhp\">Pśeglěd jadnotliwego boka</link>"
+
+#. 8ttBs
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id801649977112401\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowSinglePage\" visibility=\"visible\">Displays one page at a time in the Print Preview window.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShowSinglePage\" visibility=\"visible\">Pokazujo jaden bok we woknje śišćaŕskego pśeglěda.</ahelp>"
+
+#. iwFVN
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id331649976674083\n"
+"help.text"
+msgid "<image src=\"cmd/sc_showsinglepage.svg\" id=\"img_id921649976674083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id861649976674083\">Single Page Preview Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_showsinglepage.svg\" id=\"img_id921649976674083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id861649976674083\">Symbol za Pśeglěd jadnotliwego boka</alt></image>"
+
+#. TgK95
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id161649976674083\n"
+"help.text"
+msgid "Single Page Preview"
+msgstr "Pśeglěd jadnotliwego boka"
+
+#. KSNCT
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Two Pages Preview"
+msgstr "Pśeglěd dweju bokowu"
+
+#. 5xzdG
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"hd_id3145822\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10050000.xhp\">Two Pages Preview</link>"
+msgstr "<link href=\"text/swriter/02/10050000.xhp\">Pśeglěd dweju bokowu</link>"
+
+#. JbPBQ
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3154504\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowTwoPages\" visibility=\"visible\">Displays two pages in the Print Preview window.</ahelp> Uneven numbers will always appear on the right side, even numbers on the left."
+msgstr "<ahelp hid=\".uno:ShowTwoPages\" visibility=\"visible\">Pokazujo dwa boka we woknje śišćaŕskego pśeglěda.</ahelp> Njerowne numery se pśecej na pšawem boku pokazuju, rowne numery na lěwem."
+
+#. 5xzpi
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3149292\n"
+"help.text"
+msgid "<image src=\"cmd/sc_showtwopages.png\" id=\"img_id3151170\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151170\">Icon Two Pages Preview</alt></image>"
+msgstr "<image src=\"cmd/sc_showtwopages.png\" id=\"img_id3151170\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151170\">Symbol za pśeglěd dweju bokowu</alt></image>"
+
+#. tb5KW
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3151168\n"
+"help.text"
+msgid "Two Pages Preview"
+msgstr "Pśeglěd dweju bokowu"
+
+#. exrVU
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Multiple Pages Preview"
+msgstr "Pśeglěd někotarych bokow"
+
+#. GSkNm
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3147171\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10070000.xhp\">Multiple Pages Preview</link>"
+msgstr "<link href=\"text/swriter/02/10070000.xhp\">Pśeglěd někotarych bokow</link>"
+
+#. NhuBC
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3148771\n"
+"help.text"
+msgid "<ahelp hid=\".uno:PreviewZoom\">Defines the number of pages displayed on screen. Click the arrow next to the icon to open a grid to select the number of pages to be displayed as rows and columns in the preview.</ahelp>"
+msgstr "<ahelp hid=\".uno:PreviewZoom\">Definěrujo licbu bokow, kótarež se maju na wobrazowce pokazaś. Klikniśo na šypku pódla symbola, aby kśidno wócynił, w kótaremž móžośo licbu bokow wubraś, kótarež se maju ako smužki a słupy w pśeglěźe pokazaś.</ahelp>"
+
+#. TDxzR
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3152738\n"
+"help.text"
+msgid "<image id=\"img_id3152744\" src=\"cmd/sc_showmultiplepages.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152744\">Icon Multiple Pages Preview</alt></image>"
+msgstr "<image id=\"img_id3152744\" src=\"cmd/sc_showmultiplepages.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152744\">Symbol za Pśeglěd někotarych bokow</alt></image>"
+
+#. zUeSr
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149805\n"
+"help.text"
+msgid "Multiple Pages Preview"
+msgstr "Pśeglěd někotarych bokow"
+
+#. 68LCW
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3154573\n"
+"help.text"
+msgid "After clicking the <menuitem>Multiple Pages Preview</menuitem> icon,  move the mouse over the desired number of rows and columns."
+msgstr "Gaž sćo kliknuł na symbol <menuitem>Pśeglěd někotarych bokow</menuitem>, gibniśo myšku nad póžedanu licbu smužkow a słupow."
+
+#. W4FH2
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id121649340192450\n"
+"help.text"
+msgid "More Options"
+msgstr "Dalšne nastajenja…"
+
+#. ACeQB
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149822\n"
+"help.text"
+msgid "You can also choose settings by clicking <menuitem>More Options</menuitem> to open a new dialog, then use the two spin buttons to set the number of pages to be displayed."
+msgstr "Móžośo teke nastajenja wubraś, gaž na <menuitem>Dalšne nastajenja…</menuitem> klikaśo, aby nowy dialog wócynił a wužywajśo pón dwa wobwjertnej tłocaška, aby licbu bokow nastajił, kótarež se maju pokazaś."
+
+#. F9TJ2
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3149695\n"
+"help.text"
+msgid "Rows"
+msgstr "Smužki"
+
+#. Bt9Yt
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149483\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/rows\">Defines the number of rows of pages.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/rows\">Definěrujo licbu bokow, kótarež se maju w smužkach pokazaś.</ahelp>"
+
+#. D3EDZ
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3143274\n"
+"help.text"
+msgid "Columns"
+msgstr "Słupy"
+
+#. 6HkQB
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149102\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/cols\">Defines the number of pages shown in columns.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/cols\">Definěrujo licbu bokow, kótarež se maju w słupach pokazaś.</ahelp>"
+
+#. fn4C8
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Book preview"
+msgstr "Knigłowy pśeglěd"
+
+#. q8XNf
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"bm_id9658192\n"
+"help.text"
+msgid "<bookmark_value>previews;book preview</bookmark_value><bookmark_value>book previews</bookmark_value>"
+msgstr "<bookmark_value>pśeglědy;knigłowy pśeglěd</bookmark_value><bookmark_value>knigłowy pśeglěd</bookmark_value>"
+
+#. 68CcD
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10548\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10080000.xhp\">Book preview</link>"
+msgstr "<link href=\"text/swriter/02/10080000.xhp\">Knigłowy pśeglěd</link>"
+
+#. eQo67
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN1054C\n"
+"help.text"
+msgid "<ahelp hid=\".\">Select to display the first page on the right side in the print preview.</ahelp> If not selected, the first page is displayed on the left side of the preview."
+msgstr "<ahelp hid=\".\">Wubjeŕśo to, aby prědny bok na pšawem boku w śišćaŕskem pśeglěźe pokazał.</ahelp> Jolic to njejo wubrane, se prědny bok na lěwem boku pśeglěda pokazujo."
+
+#. sJbRH
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10635\n"
+"help.text"
+msgid "<image id=\"img_id8750572\" src=\"cmd/sc_showbookview.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8750572\">book preview icon</alt></image>"
+msgstr "<image id=\"img_id8750572\" src=\"cmd/sc_showbookview.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8750572\">Symbol za Knigłowy pśeglěd</alt></image>"
+
+#. PDgVj
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10614\n"
+"help.text"
+msgid "Book Preview"
+msgstr "Knigłowy pśeglěd"
+
+#. EyfbL
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Print page view"
+msgstr "Pśeglěd boka śišćaś"
+
+#. CYSES
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"hd_id3152895\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10090000.xhp\">Print page view</link>"
+msgstr "<link href=\"text/swriter/02/10090000.xhp\">Pśeglěd boka śišćaś</link>"
+
+#. zBqRk
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"par_id3149811\n"
+"help.text"
+msgid "<image id=\"img_id3154575\" src=\"cmd/sc_printpagepreview.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154575\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154575\" src=\"cmd/sc_printpagepreview.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154575\">Symbol za Pśeglěd boka śišćaś</alt></image>"
+
+#. 9Wz63
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"par_id3154568\n"
+"help.text"
+msgid "Print page view"
+msgstr "Pśeglěd boka śišćaś"
+
+#. n6W25
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cell Reference"
+msgstr "Celowy póśěg"
+
+#. oisnp
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"hd_id3143228\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14010000.xhp\">Cell Reference</link>"
+msgstr "<link href=\"text/swriter/02/14010000.xhp\">Celowy póśeg</link>"
+
+#. 44pDz
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"par_id3149052\n"
+"help.text"
+msgid "Displays the position of the cell cursor in a table."
+msgstr "Pokazujo poziciju celowego kursora w tabeli."
+
+#. AGA9L
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula"
+msgstr "Formula"
+
+#. AjuPD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"bm_id3149687\n"
+"help.text"
+msgid "<bookmark_value>formulas; in text documents</bookmark_value><bookmark_value>table formulas; in text documents</bookmark_value><bookmark_value>operators; in table formulas</bookmark_value><bookmark_value>statistical functions in tables</bookmark_value><bookmark_value>mathematical functions in tables</bookmark_value><bookmark_value>trigonometric functions in tables</bookmark_value><bookmark_value>pages;number of pages in table formulas</bookmark_value><bookmark_value>variables;document properties in table formulas</bookmark_value><bookmark_value>arithmetical operators in formulas</bookmark_value>"
+msgstr "<bookmark_value>formule; w tekstowych dokumentach</bookmark_value><bookmark_value>tabelowe formule; w tekstowych dokumentach</bookmark_value><bookmark_value>operatory; w tabelowych formulach</bookmark_value><bookmark_value>statistiske funkcije w tabelach</bookmark_value><bookmark_value>matematiske funkcije w tabelach</bookmark_value><bookmark_value>trigonometriske funkcije w tabelach</bookmark_value><bookmark_value>boki;licba bokow w tabelowych formulach</bookmark_value><bookmark_value>wariable;dokumentowe kakosći w tabelowych formulach</bookmark_value><bookmark_value>aritmetiske operatory w formulach</bookmark_value>"
+
+#. m828y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3149687\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14020000.xhp\">Formula</link>"
+msgstr "<link href=\"text/swriter/02/14020000.xhp\">Formula</link>"
+
+#. fMazZ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3143270\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a submenu, from which you can insert a formula into the cell of a table.</ahelp> Place the cursor in a cell in the table or at the position in the document where you want the result to appear. Click the<emph> Formula </emph>icon and choose the desired formula from the submenu."
+msgstr "<ahelp hid=\".\">Wócynja pódmeni, z kótaregož móžośo formulu do tabeloweje cele zasajźiś.</ahelp> Stajśo kursor do cele w tabeli abo na poziciji w dokumenśe, źož se ma wuslědk zjawiś. Klikniśo na symbol <emph>Formula</emph> a wubjeŕśo póžedanu formulu z pódmenija."
+
+#. iCkcq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149096\n"
+"help.text"
+msgid "The formula appears in the input line. To specify a range of cells in a table, select the desired cells with the mouse. The corresponding cell references also appear in the input line. Enter additional parameters, as necessary, and click <emph>Apply</emph> to confirm your entry. You can also enter the formula directly if you know the appropriate syntax. This is necessary, for example, in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Insert Fields</emph></link> and <emph>Edit Fields</emph> dialogs."
+msgstr "Formula se w zapódawańskej smužce pokazujo. Aby wobceŕk celow w tabeli pódał, wubjeŕśo póžedane cele z myšku. Wótpowědne celowe póśěgi se teke w zapódawańskej smužce pokazuju. Zapódajśo pśidatne parametry, jo-lic trjeba, a klikniśo na <emph>Nałožyś</emph>, aby swój zapisk. Móžośo teke formulu direktnje zapódaś, jolic korektnu syntaksu znajośo. To jo na pśikład w dialogoma <link href=\"text/swriter/01/04090000.xhp\"><emph>Póla zasajźiś</emph></link> a <emph>Póla wobźěłaś</emph> trjebne."
+
+#. Nf9zE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id301663685328962\n"
+"help.text"
+msgid "Go to <menuitem>Table - Edit Formula</menuitem>."
+msgstr "K <menuitem>Tabela – Formulu wobźěłaś</menuitem>."
+
+#. CDacX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id101599562003431\n"
+"help.text"
+msgid "In the Table toolbar, press the <emph>Insert or Edit Formula</emph> icon."
+msgstr "Klikniśo w symbolowej rědce Tabela na symbol <emph>Formulu zasajźiś abo wobźěłaś</emph>."
+
+#. akufr
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id621599564033048\n"
+"help.text"
+msgid "In a text document, press <keycode>F2</keycode>."
+msgstr "Tłocćo <keycode>F2</keycode> w tekstowem dokumenśe."
+
+#. cgzyx
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155142\n"
+"help.text"
+msgid "<image id=\"img_id3155148\" src=\"sw/res/sc20556.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155148\">Formula icon in Table toolbar</alt></image>"
+msgstr "<image id=\"img_id3155148\" src=\"sw/res/sc20556.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155148\">Symbol za Formula w symbolowej rědce Tabela</alt></image>"
+
+#. DbZyc
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150113\n"
+"help.text"
+msgid "Formula"
+msgstr "Formula"
+
+#. D5MDw
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150691\n"
+"help.text"
+msgid "Summary of Formula Options"
+msgstr "Zespominanje formulowych nastajenjow"
+
+#. FcD7J
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3155858\n"
+"help.text"
+msgid "Basic Calculation Functions"
+msgstr "Zakładne liceńske funkcije"
+
+#. E8BRA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id221599495805480\n"
+"help.text"
+msgid "Operation"
+msgstr "Operacija"
+
+#. 7KcQ9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id641599495805481\n"
+"help.text"
+msgid "Name"
+msgstr "Mě"
+
+#. QywKU
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id121599495851064\n"
+"help.text"
+msgid "Example"
+msgstr "Pśikład"
+
+#. 6VYWD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149565\n"
+"help.text"
+msgid "Addition"
+msgstr "Adicija"
+
+#. 4pWsP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149831\n"
+"help.text"
+msgid "Calculates the total."
+msgstr "Wulicujo sumu."
+
+#. Kf7eZ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149845\n"
+"help.text"
+msgid "Example: <A1> + 8"
+msgstr "Pśikład: <A1> + 8"
+
+#. WGAhC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3156097\n"
+"help.text"
+msgid "Subtraction"
+msgstr "Subtrakcija"
+
+#. tFcef
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153122\n"
+"help.text"
+msgid "Calculates the difference."
+msgstr "Wulicujo diferencu."
+
+#. c9tdv
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153135\n"
+"help.text"
+msgid "Example: 10 - <B5>"
+msgstr "Pśikład: 10 - <B5>"
+
+#. 5fyhv
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149646\n"
+"help.text"
+msgid "Multiplication"
+msgstr "Multiplikacija"
+
+#. 2HTL5
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154038\n"
+"help.text"
+msgid "MUL or *"
+msgstr "MUL abo *"
+
+#. CC9kx
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149965\n"
+"help.text"
+msgid "Calculates the product."
+msgstr "Wulicujo produkt."
+
+#. ZRwjP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149603\n"
+"help.text"
+msgid "Example: 7 MUL 9 displays 63"
+msgstr "Pśikład: 7 MUL 9 63 pokazujo"
+
+#. DWCXA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145096\n"
+"help.text"
+msgid "Division"
+msgstr "Diwizija"
+
+#. 6M5Fq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149570\n"
+"help.text"
+msgid "DIV or /"
+msgstr "DIV abo /"
+
+#. 7Ddva
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149592\n"
+"help.text"
+msgid "Calculates the quotient."
+msgstr "Wulicujo kwocient."
+
+#. ByDRp
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3156243\n"
+"help.text"
+msgid "Example: 100 DIV 15 displays 6.67"
+msgstr "Pśikład: 100 DIV 15 6,67 pokazujo"
+
+#. DdgLa
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3156260\n"
+"help.text"
+msgid "Basic Functions in the Submenu"
+msgstr "Zakładne funkcije w pódmeniju"
+
+#. xt4uW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id121599495989098\n"
+"help.text"
+msgid "Function"
+msgstr "Funkcija"
+
+#. T7Ybo
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id901599495989100\n"
+"help.text"
+msgid "Name"
+msgstr "Mě"
+
+#. 2fE5r
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id501599496006870\n"
+"help.text"
+msgid "Example"
+msgstr "Pśikład"
+
+#. KwSwL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145185\n"
+"help.text"
+msgid "Sum"
+msgstr "Suma"
+
+#. QD5ax
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155335\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sum\">Calculates the sum of the selected cells.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sum\">Wulicujo sumu wubranych celow.</ahelp>"
+
+#. 6AdeA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154411\n"
+"help.text"
+msgid "Example: SUM <A2:C2> displays the sum of the values in cells A2 to C2"
+msgstr "Pśikład: SUM <A2:C2> pokazujo sumu gódnotow w celach A2 do C2"
+
+#. uru7Q
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153381\n"
+"help.text"
+msgid "Round"
+msgstr "Wótrownaś/Narownaś"
+
+#. 4a69n
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145621\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/round\">Rounds a number to the specified decimal places.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/round\">Wótrownujo/Narownujo licbu na pódane decimalne městna.</ahelp>"
+
+#. jhoL9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154862\n"
+"help.text"
+msgid "Example: 15.678 ROUND 2 displays 15.68"
+msgstr "Pśikład: 15,678 ROUND 2 15,68 pokazujo"
+
+#. FkYje
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148687\n"
+"help.text"
+msgid "Percent"
+msgstr "Procent"
+
+#. kXxBq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155953\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/phd\">Calculates a percentage.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/phd\">Wulicujo procentowu sajźbu.</ahelp>"
+
+#. gefrq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149991\n"
+"help.text"
+msgid "Example: 10 + 15 PHD displays 10.15"
+msgstr "Pśikład: 10 + 15 PHD 10,15 pokazujo"
+
+#. KeGBA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153016\n"
+"help.text"
+msgid "Square Root"
+msgstr "Kwadratny kórjeń"
+
+#. XCbNu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153062\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sqrt\">Calculates the square root.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sqrt\">Wulicujo kwadratny kórjeń.</ahelp>"
+
+#. AuptV
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153882\n"
+"help.text"
+msgid "Example: SQRT 25 displays 5"
+msgstr "Pśikład: SQRT 25 5 pokazujo"
+
+#. yjTqm
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153909\n"
+"help.text"
+msgid "Power"
+msgstr "Potenca"
+
+#. wFRf4
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149768\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/pow\">Calculates the power of a number.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/pow\">Wulicujo potencu licby.</ahelp>"
+
+#. B62mR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149789\n"
+"help.text"
+msgid "Example: 2 POW 8 displays 256"
+msgstr "Pśikład: 2 POW 8 256 pokazujo"
+
+#. eCu3h
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150216\n"
+"help.text"
+msgid "Operators"
+msgstr "Operatory"
+
+#. GzXyF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150244\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can insert various operators in your formula.</ahelp> Choose from the following functions:"
+msgstr "<ahelp hid=\".\">Móžośo wšake operatory do swójeje formule zasajźiś.</ahelp> Wubjeŕśo ze slědujucych funkcijow:"
+
+#. uCpNp
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id61599496064739\n"
+"help.text"
+msgid "Operator"
+msgstr "Operator"
+
+#. HCUeF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id611599496064740\n"
+"help.text"
+msgid "Name"
+msgstr "Mě"
+
+#. CNZiw
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id461599496082741\n"
+"help.text"
+msgid "Example"
+msgstr "Pśikład"
+
+#. kN6pM
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150316\n"
+"help.text"
+msgid "List Separator"
+msgstr "Źěleńske znamuško lisćiny"
+
+#. 4BmKs
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150339\n"
+"help.text"
+msgid "|"
+msgstr "|"
+
+#. qw66D
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153099\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/|\">Separates the elements in a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/|\">Wótźělujo elementy w lisćinje.</ahelp>"
+
+#. ufXPA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155817\n"
+"help.text"
+msgid "Example of using a list:"
+msgstr "Pśikład za wužywanje lisćiny:"
+
+#. 78gH2
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155830\n"
+"help.text"
+msgid "MIN 10|20|50|<C6>|<A2:B6>|20"
+msgstr "MIN 10|20|50|<C6>|<A2:B6>|20"
+
+#. Fob4h
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147012\n"
+"help.text"
+msgid "Equal"
+msgstr "Jadnak"
+
+#. mVqP4
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147034\n"
+"help.text"
+msgid "EQ or =="
+msgstr "EQ abo =="
+
+#. WcTEB
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150936\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/eq\">Checks if selected values are equal.</ahelp> If they are unequal, the result is zero, otherwise 1 (true) appears."
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/eq\">Pśeglědajśo, lěc wubrane gódnoty su jadnake.</ahelp> Jolic njejsu jadnake, jo wuslědk 0 (wopak), howac 1 (wěrno)."
+
+#. vuDKJ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150961\n"
+"help.text"
+msgid "Example: <A1> EQ 2 displays 1, if the content of A1 equals 2"
+msgstr "Pśikład: <A1> EQ 2 1 pokazujo, jolic wopśimjeśe A1 jo 2"
+
+#. b2AXc
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154370\n"
+"help.text"
+msgid "Not Equal"
+msgstr "Nic jadnak"
+
+#. jsDQ8
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150503\n"
+"help.text"
+msgid "NEQ or !="
+msgstr "NEQ abo !="
+
+#. rMcNe
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150526\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/neq\">Tests for inequality between selected values.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/neq\">Testujo za njejadnakosću mjazy wubranymi gódnotami.</ahelp>"
+
+#. STM3V
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147524\n"
+"help.text"
+msgid "Example: <A1> NEQ 2 displays 0 (wrong), if the content of A1 equals 2"
+msgstr "Pśikład: <A1> NEQ 2 0 (wopak) pokazujo, jolic wopśimjeśe A1 jo 2"
+
+#. FuXYL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147553\n"
+"help.text"
+msgid "Less than or Equal"
+msgstr "Mjenjej ako abo jadnak"
+
+#. m6G89
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153622\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/leq\">Tests for values less than or equal to a specified value.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/leq\">Testujo za gódnotami, kótarež su mjeńše ako abo jadnak pódatej gódnośe.</ahelp>"
+
+#. FeJXs
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151280\n"
+"help.text"
+msgid "Example: <A1> LEQ 2 displays 1 (true), if the content of A1 is less than or equal to 2"
+msgstr "Pśikład: <A1> LEQ 2 1 (wěrno) pokazujo, jolicwopśimjeśe A1 jo mjeńše ako abo jadnak 2"
+
+#. 24FA3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153729\n"
+"help.text"
+msgid "Greater than or Equal"
+msgstr "Wětšy ako abo jadnak"
+
+#. DKZmP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148876\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/geq\">Tests for values greater than or equal to a specified value.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/geq\">Testujo za gódnotami, kótarež su wětše ako abo jadnak pódanej gódnośe.</ahelp>"
+
+#. pdd5D
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148898\n"
+"help.text"
+msgid "Example: <A1> GEQ 2 displays 1 (true), if the content of A1 is greater than or equal to 2"
+msgstr "Pśikład: <A1> GEQ 2 1 (wěrno) pokazujo, jolic wopśimjeśe A1 jo wětše ako abo jadnak 2"
+
+#. zEADu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150836\n"
+"help.text"
+msgid "Less"
+msgstr "Mjeńšy"
+
+#. G4UeN
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/l\">Tests for values less than a specified value.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/l\">Testujo za gódnotami, kótarež su mjeńše ako pódana gódnota.</ahelp>"
+
+#. ZF7Jb
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155433\n"
+"help.text"
+msgid "Example: <A1> L 2 displays 1 (true), if the content of A1 is less than 2"
+msgstr "Pśikład: <A1> L 2 1 (wěrno) pokazujo, jolic wopśimjeśe A1 jo mjeńše ako 2"
+
+#. R7RyE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150720\n"
+"help.text"
+msgid "Greater"
+msgstr "Wětšy"
+
+#. ytwUF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147310\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/g\">Tests for values greater than a specified value.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/g\">Testujo za gódnotami, kótarež su wětše ako pódana gódnota.</ahelp>"
+
+#. UsxXH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147333\n"
+"help.text"
+msgid "Example: <A1> G 2 displays 1 (true), if the content of A1 is greater than 2"
+msgstr "Pśikład: <A1> G 2 1 (wěrno) pokazujo, jolic wopśimjeśe A1 jo wětšy ako 2"
+
+#. 9DyRz
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148408\n"
+"help.text"
+msgid "Boolean Or"
+msgstr "Logiske ABO"
+
+#. guFCu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150274\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/or\">Tests for values matching the Boolean OR.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/or\">Testujo za gódnotami, kótarež logiskemu ABO wótpowěduju.</ahelp>"
+
+#. wmnDC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150297\n"
+"help.text"
+msgid "Example: 0 OR 0 displays 0 (false), anything else results in 1 (true)"
+msgstr "Pśikład: 0 OR 0 0 (wopak) pokazujo, wšykno druge 1 (wěrno)"
+
+#. GNQAT
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149434\n"
+"help.text"
+msgid "Boolean X Or"
+msgstr "Logiske ekskluziwne ABO"
+
+#. EQwEt
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3146980\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/xor\">Tests for values matching the Boolean exclusive OR.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/xor\">Testujo za gódnotami, kótarež logiskemu ekskluziwnemu ABO wótpowěduju.</ahelp>"
+
+#. N9cHQ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147003\n"
+"help.text"
+msgid "Example: 1 XOR 0 displays 1 (true)"
+msgstr "Pśikład: 1 XOR 0 pokazujo (wěrno)"
+
+#. CNW42
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152925\n"
+"help.text"
+msgid "Boolean And"
+msgstr "Logiske A"
+
+#. x4HL7
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153792\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/and\">Tests for values matching the Boolean AND.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/and\">Testujo za gódnotami, kótarež logiskemu A wótpowěduju.</ahelp>"
+
+#. DFCfW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153814\n"
+"help.text"
+msgid "Example: 1 AND 2 displays 1 (true)"
+msgstr "Pśikład: 1 AND 2 1 pokazujo (wěrno)"
+
+#. a23Nq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153938\n"
+"help.text"
+msgid "Boolean Not"
+msgstr "LOGISKI NIC"
+
+#. oEENQ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148633\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/not\">Tests for values matching the Boolean NOT.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/not\">Testujo za gódnotami, kótarež logiskemu NIC wótpowěduju.</ahelp>"
+
+#. r4fRG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148655\n"
+"help.text"
+msgid "Example: NOT 1 (true) displays 0 (false)"
+msgstr "Pśikład: NOT 1 (wěrno) 0 pokazujo (wopak)"
+
+#. 5JNFn
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3154240\n"
+"help.text"
+msgid "Statistical Functions"
+msgstr "Statistiske funkcije"
+
+#. CEssi
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154263\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can choose from the following statistical functions:</ahelp>"
+msgstr "<ahelp hid=\".\">Móžośo ze slědujucych statistiskich funkcijow wubraś:</ahelp>"
+
+#. AeKzo
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id541599496194035\n"
+"help.text"
+msgid "Function"
+msgstr "Funkcija"
+
+#. fLyDG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id481599496194036\n"
+"help.text"
+msgid "Name"
+msgstr "Mě"
+
+#. z9BBL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id331599524563749\n"
+"help.text"
+msgid "Example"
+msgstr "Pśikład"
+
+#. SimgP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153176\n"
+"help.text"
+msgid "Mean"
+msgstr "Pśerězk"
+
+#. Gu59Y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154076\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/mean\">Calculates the arithmetic mean of the values in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/mean\">Wulicujo aritmetiski pśerězk gódnotow we wobceŕku abo lisćinje.</ahelp>"
+
+#. GjHGV
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145625\n"
+"help.text"
+msgid "Example: MEAN 10|30|20 displays 20"
+msgstr "Pśikład: MEAN 10|30|20 20 pokazujo"
+
+#. TNZeD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145652\n"
+"help.text"
+msgid "Minimum Value"
+msgstr "Minimalna gódnota"
+
+#. 9CKG8
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155281\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/min\">Calculates the minimum value in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/min\">Wulicujo minimalnu gódnotu we wobceŕku abo lisćinje.</ahelp>"
+
+#. F9J3k
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155304\n"
+"help.text"
+msgid "Example: MIN 10|30|20 displays 10"
+msgstr "Pśikład: MIN 10|30|20 10 pokazujo"
+
+#. G4CMT
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153993\n"
+"help.text"
+msgid "Maximum Value"
+msgstr "Maksimalna gódnota"
+
+#. mCGfj
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154726\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/max\">Calculates the maximum value in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/max\">Wulicujo maksimalnu gódnotu we wobceŕku abo lisćinje.</ahelp>"
+
+#. fN5WF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154748\n"
+"help.text"
+msgid "Example: MAX 10|30|20 displays 30"
+msgstr "Pśikład: MAX 10|30|20 30 pokazujo"
+
+#. 76riF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id21599557699262\n"
+"help.text"
+msgid "Product"
+msgstr "Produkt"
+
+#. 5caRN
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id671599563830630\n"
+"help.text"
+msgid "Calculates the product of the selected cells."
+msgstr "Wulicujo produkt wubranych celow."
+
+#. bwMRb
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id631599557734781\n"
+"help.text"
+msgid "Example: PRODUCT <A2:C2> displays the product of the values in cells A2 to C2"
+msgstr "Pśikład: PRODUCT <A2:C2> pokazujo produkt gódnotow w celach A2 do C2"
+
+#. DXVgk
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id31599557699262\n"
+"help.text"
+msgid "Count"
+msgstr "Licba"
+
+#. 53YC3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id331599557734781\n"
+"help.text"
+msgid "Counts the number of non empty cells."
+msgstr "Licy licbu njeproznych celow."
+
+#. hgQfG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id141599563739504\n"
+"help.text"
+msgid "Example: COUNT <A2:C2> displays the number of non empty cells in A2 to C2"
+msgstr "Pśikład: COUNT <A2:C2> licbu njeproznych celow w A2 do C2 pokazujo"
+
+#. SJ9rR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3153200\n"
+"help.text"
+msgid "Functions"
+msgstr "Funkcije"
+
+#. gRWF7
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153226\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can choose from the following  functions:</ahelp>"
+msgstr "<ahelp hid=\".\">Móžośo ze slědujucych funkcijow wubraś:</ahelp>"
+
+#. CYmFE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id341599524600306\n"
+"help.text"
+msgid "Function"
+msgstr "Funkcija"
+
+#. zUhbC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id521599524600307\n"
+"help.text"
+msgid "Name"
+msgstr "Mě"
+
+#. S6FE9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id831599524616362\n"
+"help.text"
+msgid "Example"
+msgstr "Pśikład"
+
+#. HmrvU
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145156\n"
+"help.text"
+msgid "Sine"
+msgstr "Sinus"
+
+#. CDWrS
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149530\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sin\">Calculates the sine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sin\">Wulicujo sinus we wobłukowej měrje.</ahelp>"
+
+#. U8Mew
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153312\n"
+"help.text"
+msgid "Example: SIN (PI/2) displays 1"
+msgstr "Pśikład: SIN (PI/2) 1 pokazujo"
+
+#. NvdMX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153340\n"
+"help.text"
+msgid "Cosine"
+msgstr "Kosinus"
+
+#. xBop9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154533\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/cos\">Calculates the cosine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/cos\">Wulicujo kosinus we wobłukowej měrje</ahelp>"
+
+#. Kxyji
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154554\n"
+"help.text"
+msgid "Example: COS 1 displays 0.54"
+msgstr "Pśikład: COS 1 0,54 pokazujo"
+
+#. tpfdH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150989\n"
+"help.text"
+msgid "Tangent"
+msgstr "Tangens"
+
+#. zaJcG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149369\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/tag\">Calculates the tangent in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/tag\">Wulicujo tangens we wobłukowej měrje</ahelp>"
+
+#. 4UG3b
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149391\n"
+"help.text"
+msgid "Example: TAN <A1>"
+msgstr "Pśikład: TAN <A1>"
+
+#. Es4fE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151032\n"
+"help.text"
+msgid "Arc Sine"
+msgstr "Arkussinus"
+
+#. CVzAA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150565\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/asin\">Calculates the arc sine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/asin\">Wulicujo arkussinus we wobłukowej měrje</ahelp>"
+
+#. qoLYg
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150588\n"
+"help.text"
+msgid "Example: ASIN 1"
+msgstr "Pśikład: ASIN 1"
+
+#. 3mn7r
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150615\n"
+"help.text"
+msgid "Arc Cosine"
+msgstr "Arkuskosinus"
+
+#. ZRyBG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149750\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/acos\">Calculates the arc cosine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/acos\">Wulicujo arkuskosinus we wobłukowej měrje</ahelp>"
+
+#. LnLqq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153833\n"
+"help.text"
+msgid "Example: ACOS 1"
+msgstr "Pśikład: ACOS 1"
+
+#. 8gRyA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153860\n"
+"help.text"
+msgid "Arc Tangent"
+msgstr "Arkustangens"
+
+#. aEs7N
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147080\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/atan\">Calculates the arc tangent in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/atan\">Wulicuje arkustangens we wobłukowej měrje.</ahelp>"
+
+#. bssFz
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147102\n"
+"help.text"
+msgid "Example: ATAN 1"
+msgstr "Pśikład: ATAN 1"
+
+#. bsPu3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id591599557967519\n"
+"help.text"
+msgid "Absolute value"
+msgstr "Absolutna gódnota"
+
+#. 2tt8G
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id211593557987787\n"
+"help.text"
+msgid "Returns the absolute value of the number."
+msgstr "Wrośa absolutnu gódnotu licby."
+
+#. jYyUX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id301599563956612\n"
+"help.text"
+msgid "Example: ABS -34 returns 34"
+msgstr "Pśikład: ABS -34 34 wrośa"
+
+#. zEe8j
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id591599557963519\n"
+"help.text"
+msgid "Sign"
+msgstr "Pśedznamuško"
+
+#. 8Y984
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id211599557987787\n"
+"help.text"
+msgid "Returns the algebraic sign of the number."
+msgstr "Wrośa pśedznamuško licby."
+
+#. wDJs9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id941599563922458\n"
+"help.text"
+msgid "Example: SIGN -23 returns -1"
+msgstr "Pśikład: SIGN -23 -1 wrośa"
+
+#. sHz7K
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150888\n"
+"help.text"
+msgid "Variables for document properties"
+msgstr "Wariable za dokumentowe kakosći"
+
+#. bEyNW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150161\n"
+"help.text"
+msgid "The following document properties are also found under <emph>File - Properties - Statistics</emph>."
+msgstr "Móžośo slědujuce dokumentowe kakosći pód <emph>Dataja – Kakosći – Statistika</emph> namakaś."
+
+#. jxf6E
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id901599524662588\n"
+"help.text"
+msgid "Name"
+msgstr "Mě"
+
+#. vmA7Y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id741599524662589\n"
+"help.text"
+msgid "Description"
+msgstr "Wopisanje"
+
+#. Mehmy
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152954\n"
+"help.text"
+msgid "Number of characters in the document"
+msgstr "Licba znamuškow w dokumenśe"
+
+#. knEJC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153005\n"
+"help.text"
+msgid "Number of words in the document"
+msgstr "Licba słowow w dokumenśe"
+
+#. X5hJF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152738\n"
+"help.text"
+msgid "Number of paragraphs in the document"
+msgstr "Licba wótstawkow w dokumenśe"
+
+#. t5nqK
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148476\n"
+"help.text"
+msgid "Number of graphics in the document"
+msgstr "Licba grafikow w dokumenśe"
+
+#. Bdc8a
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Number of tables in the document"
+msgstr "Licba tabelow w dokumenśe"
+
+#. zJGko
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151220\n"
+"help.text"
+msgid "Number of OLE objects in the document"
+msgstr "Licba OLE-objektow w dokumenśe"
+
+#. QeCMR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3146926\n"
+"help.text"
+msgid "Total number of pages in the document"
+msgstr "Cełkowna licba bokow w dokumenśe"
+
+#. akE2k
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3146944\n"
+"help.text"
+msgid "More Defined Values"
+msgstr "Dalšne definěrowane gódnoty"
+
+#. TUJRH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id981599524696609\n"
+"help.text"
+msgid "Description"
+msgstr "Wopisanje"
+
+#. gnbPF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id101599524696610\n"
+"help.text"
+msgid "Name"
+msgstr "Mě"
+
+#. FFwhP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id731599524730168\n"
+"help.text"
+msgid "Value"
+msgstr "Gódnota"
+
+#. 7QQ8G
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153562\n"
+"help.text"
+msgid "PI"
+msgstr "PI"
+
+#. SqL4F
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147393\n"
+"help.text"
+msgid "Euler's constant"
+msgstr "Eulerowa licba"
+
+#. GGtyF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145332\n"
+"help.text"
+msgid "True"
+msgstr "Wěrno"
+
+#. db4a5
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145378\n"
+"help.text"
+msgid "not equal to 0"
+msgstr "njejadnak 0"
+
+#. nVven
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150362\n"
+"help.text"
+msgid "False"
+msgstr "Wopak"
+
+#. qx5iP
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cancel"
+msgstr "Pśetergnuś"
+
+#. G2cUn
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"hd_id3149957\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14030000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/swriter/02/14030000.xhp\">Pśetergnuś</link>"
+
+#. 4Yz3J
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3149602\n"
+"help.text"
+msgid "<ahelp hid=\".\">Clears the contents of the input line and closes the formula bar.</ahelp>"
+msgstr "<ahelp hid=\".\">Lašujo wopśimjeśe zapódawańskeje smužki a zacynja formulowu rědku.</ahelp>"
+
+#. kp7Vc
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3149574\n"
+"help.text"
+msgid "<image id=\"img_id3149580\" src=\"sw/res/sc20557.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149580\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149580\" src=\"sw/res/sc20557.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149580\">Symbol za Pśetergnuś</alt></image>"
+
+#. 8UEDX
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3148855\n"
+"help.text"
+msgid "Cancel"
+msgstr "Pśetergnuś"
+
+#. USB9A
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Apply"
+msgstr "Nałožyś"
+
+#. FEwXA
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"hd_id3154834\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14040000.xhp\">Apply</link>"
+msgstr "<link href=\"text/swriter/02/14040000.xhp\">Nałožyś</link>"
+
+#. GcphZ
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3147173\n"
+"help.text"
+msgid "<ahelp hid=\".\">Transfers the contents of the input line into your document and closes the formula bar. The contents of the input line are inserted at the cursor position in the document.</ahelp>"
+msgstr "<ahelp hid=\".\">Pśenosujo wopśimjeśe zapódawańskeje smužki do wašogo dokumenta a zacynja formulowu rědku. Wopśimjeśe zapódawańskeje smužki se na poziciji kursora w dokumenśe zasajźujo.</ahelp>"
+
+#. YsphR
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3149286\n"
+"help.text"
+msgid "<image src=\"svx/res/nu01.png\" id=\"img_id3149291\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149291\">Icon Apply</alt></image>"
+msgstr "<image src=\"svx/res/nu01.png\" id=\"img_id3149291\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149291\">Symbol za Nałožyś</alt></image>"
+
+#. nwkU8
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Apply"
+msgstr "Nałožyś"
+
+#. fq9ZR
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula Area"
+msgstr "Formulowy wobceŕk"
+
+#. 3s4xT
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"hd_id3155624\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14050000.xhp\">Formula Area</link>"
+msgstr "<link href=\"text/swriter/02/14050000.xhp\">Formulowy wobceŕk</link>"
+
+#. VRahE
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3154501\n"
+"help.text"
+msgid "<ahelp hid=\".\">Allows you to create a formula by typing it directly into the input line or by clicking the <emph>Formula</emph> icon to display the formulas in submenu.</ahelp>"
+msgstr "<ahelp hid=\".\">Zmóžnja wam, formulu napóraś, gaž ju direktnje do zapódawańskeje smužki zapódawaśo abo na symbol <emph>Formula</emph> klikaśo, aby formule w pódmeniju pokazał.</ahelp>"
+
+#. evDCZ
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3151174\n"
+"help.text"
+msgid "<image src=\"media/helpimg/rechenlt.png\" id=\"img_id3156377\" localize=\"true\"><alt id=\"alt_id3156377\">Formula area with formula</alt></image>"
+msgstr "<image src=\"media/helpimg/rechenlt.png\" id=\"img_id3156377\" localize=\"true\"><alt id=\"alt_id3156377\">Formulowy wobceŕk z formulu</alt></image>"
+
+#. 6GPdp
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3151178\n"
+"help.text"
+msgid "Formula Area"
+msgstr "Formulowy wobceŕk"
+
+#. BwqAM
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Zasajźiś"
+
+#. 8PjuB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145824\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/swriter/02/18010000.xhp\">Zasajźiś</link>"
+
+#. Ha2Rw
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCtrl\">The toolbar contains various functions for inserting frames, graphics, tables, and other objects.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">Symbolowa rědka wšake funkcije wopśimujo, z kótarymiž móžośo wobłuki, grafiki, tabele a druge objekty zasajźiś.</ahelp>"
+
+#. kdTjb
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3149809\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "Móžośo slědujuce funkcije wubraś:"
+
+#. CFc4J
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3143272\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\">Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\">Tabelu zasajźiś</link>"
+
+#. Ru34K
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3150115\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\">Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\">Wótrězk zasajźiś</link>"
+
+#. wBBzU
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3154572\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\">Insert Frame Manually</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\">Wobłuk manuelnje zasajźiś</link>"
+
+#. FisVt
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3151341\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Znosujucy se wobłuk</link>"
+
+#. o6hwV
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3148974\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04030000.xhp\">Insert Footnote Directly</link>"
+msgstr "<link href=\"text/swriter/01/04030000.xhp\">Nožku direktnje zasajźiś</link>"
+
+#. Tz7Fe
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3152773\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04030000.xhp\">Insert Endnote Directly</link>"
+msgstr "<link href=\"text/swriter/01/04030000.xhp\">Kóńcnu nožku direktnje zasajźiś</link>"
+
+#. EosFy
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10777\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04050000.xhp\">Note</link>"
+msgstr "<link href=\"text/shared/01/04050000.xhp\">Pokazka</link>"
+
+#. tnpLA
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10863\n"
+"help.text"
+msgid "Inserts a note at the current cursor position."
+msgstr "Zasajźujo pokazku na aktualnej poziciji kursora."
+
+#. nEVAw
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145262\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\">Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\">Cytańske znamje</link>"
+
+#. Pkov7
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3149098\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\">File</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\">Dokument zasajźiś</link>"
+
+#. SmDBe
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10772\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/02120000.xhp\">AutoText</link>"
+msgstr "<link href=\"text/swriter/01/02120000.xhp\">Awtomatiski tekst</link>"
+
+#. AeZ5A
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145780\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Wósebne znamuško</link>"
+
+#. DKTSB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10759\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">Póla zasajźiś</link>"
+
+#. A5HwP
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN1077E\n"
+"help.text"
+msgid "Inserts a field at the current cursor position."
+msgstr "Zasajźujo pólo na aktualnej poziciji kursora."
+
+#. evVAV
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10768\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170000.xhp\">Controls</link>"
+msgstr "<link href=\"text/shared/02/01170000.xhp\">Wóźeńske elementy</link>"
+
+#. rDtXF
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN107ED\n"
+"help.text"
+msgid "The Controls icon opens a toolbar with the tools that you need to create an interactive form."
+msgstr "Symbol „Wóźeńske elementy“ symbolowu rědku z rědami wócynja, kótarež trjebaśo, aby interaktiwny formular napórał."
+
+#. EA2Mi
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3155174\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Z dataje</link>"
+
+#. BBUUT
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN106F4\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+
+#. sCB8B
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Diagram</link>"
+
+#. MnQuB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id1586962\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">OLE-Objekt</link>"
+
+#. uDrd9
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN1076D\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04120200.xhp\">Insert Index</link>"
+msgstr "<link href=\"text/swriter/01/04120200.xhp\">Gronidłowy zapis zasajźiś</link>"
+
+#. WRsG4
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10814\n"
+"help.text"
+msgid "Inserts an index or a table of contents at the current cursor position."
+msgstr "Zasajźujo gronidłowy zapis abo zapis wopśimjeśa na aktualnej poziciji kursora."
+
+#. SyhWA
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3155861\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04120100.xhp\">Entry</link>"
+msgstr "<link href=\"text/swriter/01/04120100.xhp\">Zapisk zasajźiś</link>"
+
+#. nzTGs
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "Póla zasajźiś"
+
+#. RGbK3
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"hd_id3153916\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030000.xhp\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/02/18030000.xhp\">Póla zasajźiś</link>"
+
+#. VSSUW
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"par_id3147403\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Click to open the Fields dialog. Click the arrow next to the icon to open a submenu.</ahelp> Click to open the <link href=\"text/swriter/01/04090000.xhp\">Fields</link> dialog. Click the arrow next to the icon to open a submenu."
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Klikniśo, aby dialog Póla wócynił. Klikniśo na šypku pódla symbola, aby pódmeni wócynił.</ahelp>Klikniśo, aby dialog <link href=\"text/swriter/01/04090000.xhp\">Póla</link> wócynił. Klikniśo na šypku pódla symbola, aby pódmeni wócynił."
+
+#. gthge
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"par_id3154503\n"
+"help.text"
+msgid "You can choose from the following functions:"
+msgstr "Móžośo ze slědujucych funkcijow wubraś:"
+
+#. zyChg
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"hd_id3148566\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\">Other</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">Druge</link>"
+
+#. UWFxy
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Date"
+msgstr "Datum"
+
+#. 8mad6
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"hd_id3151175\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030100.xhp\">Date</link>"
+msgstr "<link href=\"text/swriter/02/18030100.xhp\">Datum</link>"
+
+#. FfGqq
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"par_id3147511\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertDateField\">Inserts the current date as a field.</ahelp> The default date format is used, and the date is not automatically updated."
+msgstr "<ahelp hid=\".uno:InsertDateField\">Zasajźujo aktualny datum ako pólo.</ahelp> Standardny datumowy format se wužywa, a datum se awtomatiski njeaktualizěrujo."
+
+#. 6pFWk
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"par_id3151312\n"
+"help.text"
+msgid "If you would like to define a different date format, or have the date updated automatically, select <emph>Insert - Field - More Fields</emph> to insert a field command and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. The format of an existing date field can be modified at any time by choosing <link href=\"text/swriter/01/02140000.xhp\"><emph>Edit - Fields</emph></link>."
+msgstr "Jolic cośo drugi datumowy format definěrowaś, sćo awtomatiski zaktualizěrował datum, wubjeŕśo <emph>Zasajźiś – Pólo – Dalšne póla…</emph>, aby pólny pśikaz zasajźił a pśewjeźćo póžedane nastajenja w dialogu <link href=\"text/swriter/01/04090000.xhp\"><emph>Póla</emph></link>. Format eksistěrujucego datumowego póla dajo se kuždy cas změniś, gaž <link href=\"text/swriter/01/02140000.xhp\"><emph>Wobźěłaś – Póla</emph></link> wuběraśo."
+
+#. RfAPA
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Time"
+msgstr "Cas"
+
+#. yxN2Q
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"bm_id3147174\n"
+"help.text"
+msgid "<bookmark_value>time fields;inserting</bookmark_value><bookmark_value>fields;inserting time</bookmark_value>"
+msgstr "<bookmark_value>casowe póla;zasajźiś</bookmark_value><bookmark_value>póla;cas zasajźiś</bookmark_value>"
+
+#. MekNF
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"hd_id3147174\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030200.xhp\">Time</link>"
+msgstr "<link href=\"text/swriter/02/18030200.xhp\">Cas</link>"
+
+#. Uwk2Y
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTimeField\" visibility=\"visible\">Inserts the current time as a field.</ahelp> The time is taken directly from the system settings of your operating system. A fixed time format is applied, which cannot be updated by using the F9 function key."
+msgstr "<ahelp hid=\".uno:InsertTimeField\" visibility=\"visible\">Zasajźujo aktualny cas ako pólo.</ahelp> Cas se direktnje ze systemowych nastajenjow wašogo źěłowego systema pśewzejo. Kšuty casowy format se nałožujo, kótaryž njedajo se z pomocu tasty F9 aktualizěrowaś."
+
+#. GjkbK
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "To assign a different time format, or adapt the actual time data, select <emph>Insert - Field - More Fields</emph> and make the desired changes in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. Additionally, you can modify the format of an inserted time field at any time by choosing <link href=\"text/swriter/01/02140000.xhp\"><emph>Edit - Fields</emph></link>."
+msgstr "Aby drugi casowy format pśipokazał abo napšawdne casowe daty pśiměrił, wubjeŕśo <emph>Zasajźiś – Pólo – Dalšne póla…</emph> a pśewjeźćo póžedane změny w dialogu <link href=\"text/swriter/01/04090000.xhp\"><emph>Póla</emph></link>. Mimo togo móžośo kuždy cas format zasajźonego casowego póla změniś, gaž <link href=\"text/swriter/01/02140000.xhp\"><emph>Wobźěłaś – Póla…</emph></link> wuběraśo."
+
+#. F5PB7
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Number"
+msgstr "Numer boka"
+
+#. FRFVQ
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"hd_id3147173\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030300.xhp\">Page Number</link>"
+msgstr "<link href=\"text/swriter/02/18030300.xhp\">Numer boka</link>"
+
+#. Eyxsj
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"par_id3150760\n"
+"help.text"
+msgid "<ahelp hid=\".\">Inserts the current page number as a field at the cursor position.</ahelp> The default setting is for it to use the <emph>Page Number</emph> character style."
+msgstr "<ahelp hid=\".\">Zasajźujo aktualny numer boka ako pólo na poziciji kursora.</ahelp> Standardne nastajenje za to jo znamuškowa pśedłoga <emph>Numer boka</emph>."
+
+#. M86DV
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"par_id3151175\n"
+"help.text"
+msgid "If you would like to define a different format or modify the page number, insert a field with <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. It is also possible to edit a field inserted with the <emph>Page Number</emph> command with <link href=\"text/swriter/01/02140000.xhp\"><emph>Edit - Fields</emph></link>. To change page numbers, read the <link href=\"text/swriter/guide/pagenumbers.xhp\"><emph>Page Numbers</emph></link> guide."
+msgstr "Jolic cośo drugi format definěrowaś abo numer boka změniś, zasajźćo pólo ze <emph>Zasajźiś – Pólo – Dalšne póla…</emph> a stajśo póžedane nastajenja w dialogu <link href=\"text/swriter/01/04090000.xhp\"><emph>Póla</emph></link>. Jo teke móžno, pólo wobźěłaś, kótarež jo se zasajźiło z pśikazom <emph>Numer boka</emph> z <link href=\"text/swriter/01/02140000.xhp\"><emph>Wobźěłaś – Póla</emph></link>. Aby numer bokow změnił, glejśo pśewódnik <link href=\"text/swriter/guide/pagenumbers.xhp\"><emph>Numery bokow</emph></link>."
+
+#. 6HY9G
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Count"
+msgstr "Licba bokow"
+
+#. 5RK2v
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"hd_id3145828\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030400.xhp\">Page Count</link>"
+msgstr "<link href=\"text/swriter/02/18030400.xhp\">Licba bokow</link>"
+
+#. Zq6RD
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id3148772\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertPageCountField\">Inserts as a field the total number of pages in the document.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertPageCountField\">Zasajźujo cełkownu licbu bokow ako pólo do dokumenta.</ahelp>"
+
+#. cjLgc
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id3149294\n"
+"help.text"
+msgid "The format of the field inserted using the <emph>Page Count</emph> command can be modified using the <link href=\"text/swriter/01/02140000.xhp\"><menuitem>Edit - Fields</menuitem></link> command."
+msgstr "Format póla, kótarež jo se zasajźiło z pśikazom <emph>Licba bokow</emph>, dajo se z pomocu pśikaza <link href=\"text/swriter/01/02140000.xhp\"><menuitem>Wobźěłaś – Póla</menuitem></link> změniś."
+
+#. gHhp8
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id291613751393995\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090001.xhp\">Document Statistics Fields</link>"
+msgstr "<link href=\"text/swriter/01/04090001.xhp\">Statistiske póla dokumenta</link>"
+
+#. GRfFZ
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"tit\n"
+"help.text"
+msgid "Subject"
+msgstr "Tema"
+
+#. DadAn
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"bm_id3147169\n"
+"help.text"
+msgid "<bookmark_value>subject fields</bookmark_value><bookmark_value>fields; subject</bookmark_value>"
+msgstr "<bookmark_value>temowe póla</bookmark_value><bookmark_value>póla; tema</bookmark_value>"
+
+#. oFgCv
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"hd_id3147169\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030500.xhp\">Subject</link>"
+msgstr "<link href=\"text/swriter/02/18030500.xhp\">Tema</link>"
+
+#. Sq7ra
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"par_id3152892\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTopicField\">Inserts the subject specified in the document properties as a field .</ahelp> This field displays the data entered in the <emph>Subject</emph> field under <emph>File - Properties - Description</emph>."
+msgstr "<ahelp hid=\".uno:InsertTopicField\">Zasajźujo temu ako pólo, kótaraž jo pódana w kakosćach dokumenta.</ahelp> Toś to pólo daty pokazujo, kótarež su se zapódali w pólu <emph>Tema</emph> pód <emph>Dataja – Kakosći… – Rejtarik: Wopisanje</emph>."
+
+#. C5Dwh
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"par_id3156380\n"
+"help.text"
+msgid "If you would like to insert a different document property as a field, select <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. The <emph>DocInformation</emph> category contains all of the fields shown in the document properties."
+msgstr "Jolic cośo drugu dokumentowu kakosć ako pólo zasajźiś, wubjeŕśo <emph>Zasajźiś – Pólo – Dalšne póla…</emph> a stajśo póžedane nastajenja w dialogu <link href=\"text/swriter/01/04090000.xhp\"><emph>Póla</emph></link>. Kategorija <emph>Dokumentowe informacije</emph> wšykne póla wopśimujo, kótarež se w dokumentowych kakosćach pokazuju."
+
+#. aFDKk
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"tit\n"
+"help.text"
+msgid "Title"
+msgstr "Titel"
+
+#. 3Anmr
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"hd_id3154484\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030600.xhp\">Title</link>"
+msgstr "<link href=\"text/swriter/02/18030600.xhp\">Titel</link>"
+
+#. 4fVi2
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"par_id3151392\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTitleField\">Inserts the title specified in the document properties as a field.</ahelp> This field displays the data entered in the <emph>Title</emph> field under <emph>File - Properties - Description</emph>."
+msgstr "<ahelp hid=\".uno:InsertTitleField\">Zasajźujo titel ako pólo, kótaryž jo w kakosćach dokumenta pódany.</ahelp> Toś to pólo daty pokazujo, kótarež su se zapódali w pólu <emph>Titel</emph> pód <emph>Dataja – Kakosći… – Rejtarik: Wopisanje</emph>."
+
+#. ejboP
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "If you would like to insert a different document property as a field, select <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. The <emph>DocInformation</emph> category contains all of the fields shown in the document properties."
+msgstr "Jolic cośo drugu dokumentowu kakosć ako pólo zasajźiś, wubjeŕśo <emph>Zasajźiś – Pólo – Dalšne póla…</emph> a stajśo póžedane nastajenja w dialogu <link href=\"text/swriter/01/04090000.xhp\"><emph>Póla</emph></link>. Kategorija <emph>Dokumentowe informacije</emph> wšykne póla wopśimujo, kótarež se w dokumentowych kakosćach pokazuju."
+
+#. XDZuz
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"tit\n"
+"help.text"
+msgid "First Author (field)"
+msgstr "Prědny awtor (pólo)"
+
+#. 6QDbK
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"hd_id3154505\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030700.xhp\">First Author (field)</link>"
+msgstr "<link href=\"text/swriter/02/18030700.xhp\">Prědny awtor (pólo)</link>"
+
+#. ape4m
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertAuthorField\">Inserts the name of the person who created the document here as a field.</ahelp> The field applies the entry made under <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01010100.xhp\"><emph>$[officename] - User data</emph></link>."
+msgstr "<ahelp hid=\".uno:InsertAuthorField\">Zasajźujo mě wósoby ako pólo, kótaraž jo napórała dokument.</ahelp> Pólo zapisk wužywa, kótaryž jo pód <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME – Nastajenja</emph></caseinline><defaultinline><emph>Rědy – Nastajenja</emph></defaultinline></switchinline><emph> – </emph><link href=\"text/shared/optionen/01010100.xhp\"><emph>$[officename] – Wužywaŕske daty</emph></link> nastajony."
+
+#. xEPBR
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "Wobraze a diagramy"
+
+#. JQmg6
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"bm_id3147167\n"
+"help.text"
+msgid "<bookmark_value>graphics;do not show</bookmark_value>  <bookmark_value>images;do not show</bookmark_value>  <bookmark_value>pictures;do not show</bookmark_value>"
+msgstr "<bookmark_value>grafiki;njepokazaś</bookmark_value><bookmark_value>wobraze;njepokazaś</bookmark_value><bookmark_value>zwobraznjenki;njepokazać</bookmark_value>"
+
+#. kASwh
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"hd_id3148568\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18120000.xhp\">Images and Charts</link>"
+msgstr "<link href=\"text/swriter/02/18120000.xhp\">Wobraze a diagramy</link>"
+
+#. gHWtd
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3147167\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Graphic\">If the <emph>Images and Charts</emph> icon on the <emph>Tools</emph> bar is activated, no graphics are displayed - only empty frames as placeholders.</ahelp>"
+msgstr "<ahelp hid=\".uno:Graphic\">Jolic symbol <emph>Wobraze a diagramy</emph> jo zaktiwěrowany na rědce <emph>Rědy</emph> , se žedne grafiki njepokazuju – jano prozne wobłuki ako zastupujuce symbole.</ahelp>"
+
+#. cpSji
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "<image id=\"img_id3156379\" src=\"cmd/sc_graphic.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156379\">Icon Images and Charts</alt></image>"
+msgstr "<image id=\"img_id3156379\" src=\"cmd/sc_graphic.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156379\">Symbol za Wobraze a diagramy</alt></image>"
+
+#. P95p4
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3154107\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "Wobraze a diagramy"
+
+#. QCRVC
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Direct Cursor Mode"
+msgstr "Modus direktnego kursora"
+
+#. mt7Ns
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"bm_id3147167\n"
+"help.text"
+msgid "<bookmark_value>direct cursor; restriction</bookmark_value>"
+msgstr "<bookmark_value>direktny kursor; wobgranicowanje</bookmark_value>"
+
+#. d9iZy
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"hd_id3147167\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18130000.xhp\">Direct Cursor Mode</link>"
+msgstr "<link href=\"text/swriter/02/18130000.xhp\">Modus direktnego kursora</link>"
+
+#. Gxt3W
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShadowCursor\">Activates or deactivates the direct cursor.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShadowCursor\">Zmóžnja abo znjemóžnja direktny kursor.</ahelp>"
+
+#. qPByH
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id651655490756305\n"
+"help.text"
+msgid "You can specify the behavior of the direct cursor by choosing <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01040600.xhp\"><emph>%PRODUCTNAME Writer - Formatting Aids</emph></link>."
+msgstr "Wubjeŕśo <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME – Nastajenja</emph></caseinline><defaultinline><emph>Rědy – Nastajenja…</emph></defaultinline></switchinline><emph> – </emph><link href=\"text/shared/optionen/01040600.xhp\"><emph>%PRODUCTNAME Writer – Formatěrowańske pomocne srědki</emph></link>, aby zaźaržanje direktnego kursora pódał."
+
+#. 5c3tj
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151133\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar, click"
+msgstr "Klikniśo w symbolowej rědce <emph>Rědy</emph> na"
+
+#. CBw5G
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3147508\n"
+"help.text"
+msgid "<image id=\"img_id3154840\" src=\"cmd/lc_shadowcursor.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154840\">Icon Toggle Direct Cursor Mode</alt></image>"
+msgstr "<image id=\"img_id3154840\" src=\"cmd/lc_shadowcursor.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154840\">Symbol za Modus direktnego kursora pśešaltowaś</alt></image>"
+
+#. yboK5
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151310\n"
+"help.text"
+msgid "Toggle Direct Cursor Mode"
+msgstr "Modus direktnego kursora pśešaltowaś"
+
+#. kCFZu
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3154570\n"
+"help.text"
+msgid "The direct cursor allows you to click in any blank area of a page to place text, images, tables, frames, and other objects."
+msgstr "Direktny kursor wam zmóžnja, do někakego proznego wobceŕka boka kliknuś, aby tekst, wobraze, tabele, wobłuki a drufe objekty zasajźili."
+
+#. RwxaU
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3155902\n"
+"help.text"
+msgid "If you place the direct cursor approximately in the middle between the left and the right margin of a page or a table cell, the text you insert will be centered. Similarly, text is right-aligned when the direct cursor is placed on the right margin."
+msgstr "Jolic direktny kursor pśibližnje wesrjejź mjazy lěweju a pšaweju kšomu boka abo tabeloweje cele stajaśo, se tekst, kótaryž zapódawaśo, centrěrujo. Rowno tak se tekst napšawo wusměrjujo, gaž se direktny kursor na pšaweju kšomje pozicioněrujo."
+
+#. 5miBP
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151255\n"
+"help.text"
+msgid "The AutoCorrect tool automatically removes empty paragraphs, tabs, and spaces that are inserted by the direct cursor. If you want to use the direct cursor, then disable the AutoCorrect tool."
+msgstr "Awtomatiska korektura prozne wótstawki, tabulatory a prozne znamjenja awtomatiski wótwónoźujo, kótarež su se zasajźili pśez direktny kursor. Jolic cośo direktny kursor wužywaś, znjemóžniśo awtomatisku korekturu."
+
+#. ATnfu
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3148982\n"
+"help.text"
+msgid "The direct cursor sets tabs to position the cursor. If you change the tabs later. the position of the text on the page may change as well."
+msgstr "Direktny kursor tabulatory staja, aby kursor pozicioněrował. Jolic tabulatory pózdźej změnjaśo, móžo se pozicija teksta na boku teke změniś."
+
+#. 58ib2
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Header"
+msgstr "Głowowu smužku zasajźiś"
+
+#. pPEeo
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"hd_id3148769\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19010000.xhp\">Insert Header</link>"
+msgstr "<link href=\"text/swriter/02/19010000.xhp\">Głowowu smužku zasajźiś</link>"
+
+#. 6B3Vb
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"par_id3151180\n"
+"help.text"
+msgid "<ahelp hid=\"FN_INSERT_HEADER\">Displays the header of an HTML document if headers are enabled on the <link href=\"text/shared/01/05040300.xhp\"><emph>Format - Page Style - Header</emph></link> tab page.</ahelp>"
+msgstr "<ahelp hid=\"FN_INSERT_HEADER\">Pokazujo głowowu smužku HTML-dokumenta, jolic głowowe smužki na <link href=\"text/shared/01/05040300.xhp\"><emph>Format – Pśedłoga boka… – Rejtarik: Głowowa smužka</emph></link> su zmóžnjone.</ahelp>"
+
+#. LveMa
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Footer"
+msgstr "Nogowu smužku zasajźiś"
+
+#. 2Wrpr
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"hd_id3145829\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19020000.xhp\">Insert Footer</link>"
+msgstr "<link href=\"text/swriter/02/19020000.xhp\">Nogowu smužku zasajźiś</link>"
+
+#. icuLz
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "<ahelp hid=\"FN_INSERT_FOOTER\">Displays the footer of an HTML document if footers are enabled on the <link href=\"text/shared/01/05040400.xhp\"><emph>Format - Page Style - Footer</emph></link> tab page.</ahelp>"
+msgstr "<ahelp hid=\"FN_INSERT_FOOTER\">Pokazujo nogowu smužku HTML-dokumenta, jolic nogowe smužki na <link href=\"text/shared/01/05040400.xhp\"><emph>Format – Pśedłoga boka… – Rejtarik: Nogowa linka</emph></link> su zmóžnjone.</ahelp>"
+
+#. phEfn
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Zasajźiś"
+
+#. kskEB
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3147167\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19030000.xhp\">Insert</link>"
+msgstr "<link href=\"text/swriter/02/19030000.xhp\">Zasajźiś</link>"
+
+#. AAt9h
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3145241\n"
+"help.text"
+msgid "Click the arrow next to the icon to open a toolbar with various functions for inserting graphics, tables, documents, and special characters."
+msgstr "Klikniśo na na šypku pódla symbola, aby symbolowu rědku ze wšakimi funkcijami za zasajźowanje grafikow, tabelow, dokumentow a wósebnych znamuškow."
+
+#. TLGgk
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3151171\n"
+"help.text"
+msgid "<image id=\"img_id3151178\" src=\"cmd/sc_grid.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151178\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151178\" src=\"cmd/sc_grid.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151178\">Symbol za Zasajźiś</alt></image>"
+
+#. MDRwB
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3149801\n"
+"help.text"
+msgid "Insert"
+msgstr "Zasajźiś"
+
+#. fA9Po
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3155898\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "Móžośo slědujuce funkcije wubraś:"
+
+#. dTEks
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3149689\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\">Insert single-column frame manually</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\">Jadnosłupowy wobłuk manuelnje zasajźiś</link>"
+
+#. LBwvB
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3143278\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Z dataje</link>"
+
+#. B5fHZ
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3149104\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\">Insert Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\">Tabelu zasajźiś</link>"
+
+#. oAuiE
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3151259\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\">Insert Document</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\">Dokument zasajźiś</link>"
+
+#. MSCDc
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3153643\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Insert Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Wósebne znamuško zasajźiś</link>"
+
+#. uFcFn
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3152766\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\">Insert Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\">Wótrězk zasajźiś</link>"
+
+#. vBp8q
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3145774\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\">Insert Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\">Cytańske znamje zasajźiś</link>"
+
+#. J6RpX
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "Póla zasajźiś"
+
+#. 95S32
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"hd_id3149286\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19040000.xhp\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/02/19040000.xhp\">Póla zasajźiś</link>"
+
+#. 8sGAW
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"par_id3151173\n"
+"help.text"
+msgid "Click to open the <link href=\"text/swriter/01/04090000.xhp\">Fields</link> dialog. Click the arrow next to the icon and select the required field from the submenu."
+msgstr "Klikniśo, aby dialog <link href=\"text/swriter/01/04090000.xhp\">Póla</link> wócynił. Klikniśo na šypku pódla symbola a wubjeŕśo trjebne pólo z pódmenija."
+
+#. 48CyU
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"par_id3154104\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "Móžośo slědujuce funkcije wubraś:"
+
+#. RcJ5e
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"hd_id3145248\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\">Other</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">Druge</link>"
+
+#. FM5sf
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text Animation"
+msgstr "Tekstowa animacija"
+
+#. iKFuD
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"hd_id3155626\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19050000.xhp\">Text Animation</link>"
+msgstr "<link href=\"text/swriter/02/19050000.xhp\">Tekstowa animacija</link>"
+
+#. aDAnh
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"par_id3149286\n"
+"help.text"
+msgid "<image src=\"cmd/sc_text_marquee.png\" id=\"img_id3149292\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149292\">Icon Text Animation</alt></image>"
+msgstr "<image src=\"cmd/sc_text_marquee.png\" id=\"img_id3149292\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149292\">Symbol za Tekstowa animacija</alt></image>"
+
+#. Hp96F
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"par_id3149290\n"
+"help.text"
+msgid "Text Animation"
+msgstr "Tekstowa animacija"
+
+#. RajEo
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"tit\n"
+"help.text"
+msgid "Add to List"
+msgstr "Lisćinje pśidaś"
+
+#. mjGvU
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"bm_id1001616018043189\n"
+"help.text"
+msgid "<bookmark_value>Add to List</bookmark_value><bookmark_value>Lists;merging</bookmark_value>"
+msgstr "<bookmark_value>Lisćinje pśidaś</bookmark_value><bookmark_value>Lisciny;zjadnośiś</bookmark_value>"
+
+#. GmGBb
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id711614068729277\n"
+"help.text"
+msgid "<variable id=\"addtolisth1\"><link href=\"text/swriter/02/add_to_list.xhp\">Add to List</link></variable>"
+msgstr "<variable id=\"addtolisth1\"><link href=\"text/swriter/02/add_to_list.xhp\">Lisćinje pśidaś</link></variable>"
+
+#. kM6AJ
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id231614069215429\n"
+"help.text"
+msgid "Include selected paragraphs, whether a list item or not, as part of a list."
+msgstr "Pśidajśo wubrane wótstawki, lěc ako lisćinowy zapisk abo nic, ako źěl lisćiny."
+
+#. pxcFF
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id151614079148636\n"
+"help.text"
+msgid "<variable id=\"howtogetaddtolist\">Choose <menuitem>Format - Lists - Add to List</menuitem></variable>."
+msgstr "<variable id=\"howtogetaddtolist\">Wubjerće <menuitem>Format – Lisćiny – Lisćinje pśidaś</menuitem></variable>."
+
+#. PUsxs
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id631614079159620\n"
+"help.text"
+msgid "Right-click a paragraph, choose <menuitem>List - Add to List</menuitem>."
+msgstr "Klikniśo z pšaweju tastu na wótstawk a wubjeŕśo <menuitem>Lisćina – Lisćinje pśidaś</menuitem>."
+
+#. Zb43J
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id151615752168785\n"
+"help.text"
+msgid "<variable id=\"toolbar\">On <menuitem>Bullets and Numbering</menuitem> bar, click <emph>Add to List</emph> icon.</variable>"
+msgstr "<variable id=\"toolbar\">Klikniśo w symbolowej rědce <menuitem>Naliceńske znamuška a numerěrowanje</menuitem> na symbol <emph>Lisćinje pśidaś</emph>.</variable>"
+
+#. ViA36
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id651615752040364\n"
+"help.text"
+msgid "<image src=\"cmd/lc_continuenumbering.png\" id=\"img_id981615752040364\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761615752040364\">Add to List Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_continuenumbering.png\" id=\"img_id981615752040364\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761615752040364\">Symbol za Lisćinje pśidaś</alt></image>"
+
+#. hxMDa
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id51615752040365\n"
+"help.text"
+msgid "Add to List"
+msgstr "Lisćinje pśidaś"
+
+#. 6kruw
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id711616001147778\n"
+"help.text"
+msgid "The list labeling and indent formatting are applied to the selected paragraphs. The position of the paragraphs in the document does not change."
+msgstr "Lisćinowe pópisanje a formatěrowanje zasunjenjow se na wubrane wótstawki nałožuju. Pozicija wótstawkow se w dokumenśe njezměnja."
+
+#. L9RdM
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id441616017998739\n"
+"help.text"
+msgid "Add Consecutive List Entries to an Immediately Prior List"
+msgstr "Njepósrědnje pjerwjejšnej lisćinje jaden na drugi slědujuce lisćinowe zapiski pśidaś"
+
+#. GJuBD
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id631616018294373\n"
+"help.text"
+msgid "Select one or more consecutive list entries, starting from the first entry, that you want to add to the immediately prior list."
+msgstr "Wubjeŕśo jaden na drugi lisćinowy zapisk abo někotare z nich, zachopinajucy z prědnym zapiskom, kótaryž cośo direktnje pjerwjejšnej lisćinje pśidaś."
+
+#. g9LRR
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id621616018340980\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#rightclick\"/>"
+msgstr "<embedvar href=\"text/swriter/02/add_to_list.xhp#rightclick\"/>"
+
+#. p9hUv
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id811616018796902\n"
+"help.text"
+msgid "Use this procedure to combine two lists."
+msgstr "Wužywajśo toś tu metodu, aby dwě lisćinje kombiněrował."
+
+#. pADj5
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id851614072896370\n"
+"help.text"
+msgid "Add Selected Paragraphs to a List"
+msgstr "Lisćinje wubrane wótstawki pśidaś"
+
+#. FGi4A
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id491615988072533\n"
+"help.text"
+msgid "Select paragraphs, whether in a list or not, to be added to a list."
+msgstr "Wubjeŕśo wótstawki, lěc su w lisćinje abo nic, kótarež se maju lisćinje pśidaś."
+
+#. VEa3N
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id271615998908234\n"
+"help.text"
+msgid "For multiple selections, press and hold the <keycode> Ctrl</keycode> key after the first selection. Only one character needs to be selected in each paragraph to be added. The <keycode>Ctrl</keycode> key can be released without losing the selections, but must be pressed whenever clicking in the document to preserve the selection."
+msgstr "Tłocćo tastu <keycode>Strg</keycode> a źaržćo ju tłoconu pó prědnem wuběrku za někotare wuběrki. Jano jadno znamuško musy se w kuždem wótstawku wubraś, kótaryž se ma pśidaś. Tasta <keycode>Strg</keycode> dajo se pušćiś, bźez togo, aby wuběrki zgubił, ale musy se tłocyś, gažkuli do dokumenta klikaśo, aby wy wuběrk wobchował."
+
+#. Lshcb
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id551615985719902\n"
+"help.text"
+msgid "Press and hold the <keycode>Ctrl</keycode> key, select at least one character in the list, then release the <keycode> Ctrl</keycode> key."
+msgstr "Tłocćo tastu <keycode>Strg</keycode> a źaržćo ju tłoconu, wubjeŕśo nanejmjenjej jadno znamuško w lisćinje a pušććo pón tastu <keycode>Strg</keycode>."
+
+#. 3VT7j
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id901615999151001\n"
+"help.text"
+msgid "Do one of the following:"
+msgstr "Pśewjeźćo jaden ze slědujucych kšacow:"
+
+#. qPKKN
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id141615979735757\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#howtogetaddtolist\"/>"
+msgstr "<embedvar href=\"text/swriter/02/add_to_list.xhp#howtogetaddtolist\"/>"
+
+#. FADNr
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id961614073544958\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#toolbar\"/>"
+msgstr "<embedvar href=\"text/swriter/02/add_to_list.xhp#toolbar\"/>"
+
+#. L2ZPB
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id161615999749854\n"
+"help.text"
+msgid "<variable id=\"rightclick\">Right-click anywhere in highlighted selection, choose <menuitem>List - Add to List</menuitem>.</variable>"
+msgstr "<variable id=\"rightclick\">Klikniśo něźi z pšaweju tastu do wuzwignjonego wuběrka a wubjeŕśo <menuitem>Lisćina – Lisćinje pśidaś</menuitem>.</variable>"
+
+#. qFmgS
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id861614074931979\n"
+"help.text"
+msgid "This procedure works for ordered and unordered lists."
+msgstr "Toś ta metoda za numerěrowane lisćiny a nalicenja funkcioněrujo."
+
+#. JsrhA
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"title\n"
+"help.text"
+msgid "Word Count Status Bar Field"
+msgstr "Pólo licenja słowow w statusowej rědce"
+
+#. tBbnd
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"page_heading\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/word_count_stb.xhp\">Word Count Status Bar Field</link>"
+msgstr "<link href=\"text/swriter/02/word_count_stb.xhp\">Pólo licenja słowow w statusowej rědce</link>"
+
+#. mEywX
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"hd_id3149687\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StateWordCount\">The number of words in the document and selection is displayed in this field of the status bar. A double-click opens the <link href=\"text/swriter/01/06040000.xhp\">word count dialog</link>, which shows extra document statistics.</ahelp>"
+msgstr "<ahelp hid=\".uno:StateWordCount\">Licba słowow se w dokumenśe a we wuběrku w toś tom pólu w statusowej rědce pokazujo. Dwójne kliknjenje <link href=\"text/swriter/01/06040000.xhp\">dialog Licenje słowow</link> wócynja, kótaryž dalšne statistiske pódaśa wó dokumenśe pokazujo.</ahelp>"

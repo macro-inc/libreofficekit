@@ -1,0 +1,1115 @@
+#. extracted from helpcontent2/source/auxiliary
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2021-12-07 05:38+0000\n"
+"Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_help-master/auxiliary/tr/>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1558796004.000000\n"
+
+#. fEEXD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07\n"
+"help_section.text"
+msgid "Macros and Scripting"
+msgstr "Makrolar ve Betik"
+
+#. pDA36
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0701\n"
+"node.text"
+msgid "%PRODUCTNAME BASIC"
+msgstr "%PRODUCTNAME BASIC"
+
+#. Ua99d
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Genel Bilgi ve Kullanıcı Arayüzü Kullanımı"
+
+#. ooCCn
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070102\n"
+"node.text"
+msgid "Command Reference"
+msgstr "Komut Başvurusu"
+
+#. ZhxZF
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010202\n"
+"node.text"
+msgid "Functions, Statements and Operators"
+msgstr "İşlevler, İfadeler ve İşleçler"
+
+#. 3SEZD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010201\n"
+"node.text"
+msgid "Alphabetic List of Functions, Statements and Operators"
+msgstr "İşlevlerin, İfadelerin ve İşleçlerin Alfabetik Listesi"
+
+#. jhVCB
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010205\n"
+"node.text"
+msgid "Advanced Basic Libraries"
+msgstr "Gelişmiş Basic Kütüphaneleri"
+
+#. cFRyM
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010305\n"
+"node.text"
+msgid "ScriptForge Library"
+msgstr "ScriptForge Kütüphanesi"
+
+#. Vkt9E
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070103\n"
+"node.text"
+msgid "Guides"
+msgstr "Kılavuzlar"
+
+#. f7k4A
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0702\n"
+"node.text"
+msgid "Python Scripts Help"
+msgstr "Python Betikleri Yardım"
+
+#. pVb5g
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Genel Bilgi ve Kullanıcı Arayüzü Kullanımı"
+
+#. D6bPQ
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070202\n"
+"node.text"
+msgid "Programming with Python"
+msgstr "Python ile Programlama"
+
+#. Y4vuu
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070203\n"
+"node.text"
+msgid "Python Modules"
+msgstr ""
+
+#. JCHAg
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0703\n"
+"node.text"
+msgid "Script Development Tools"
+msgstr "Betik Geliştirme Araçları"
+
+#. KsAjT
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08\n"
+"help_section.text"
+msgid "Spreadsheets (Calc)"
+msgstr "Çalışma Sayfaları (Calc)"
+
+#. DnZNf
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0801\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Genel Bilgi ve Kullanıcı Arayüzü Kullanımı"
+
+#. DdtJy
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0802\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komut ve Menü Referansı"
+
+#. 8g9EE
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080201\n"
+"node.text"
+msgid "Menus"
+msgstr "Menüler"
+
+#. jwFgp
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Araç çubukları"
+
+#. sHFhh
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0803\n"
+"node.text"
+msgid "Functions Types and Operators"
+msgstr "İşlev Türleri ve İşleçler"
+
+#. DSUE2
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0804\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Yüklemek, Kaydetmek, İçe Aktarmak, Dışa Aktarmak ve Düzenlemek"
+
+#. yRwiN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0805\n"
+"node.text"
+msgid "Formatting"
+msgstr "Biçimlendirme"
+
+#. 5wLkU
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0806\n"
+"node.text"
+msgid "Filtering and Sorting"
+msgstr "Süzmek ve Sıralamak"
+
+#. yCyBs
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0807\n"
+"node.text"
+msgid "Printing"
+msgstr "Yazdırma"
+
+#. GTRoC
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0808\n"
+"node.text"
+msgid "Data Ranges"
+msgstr "Veri Aralıkları"
+
+#. cM3fi
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0809\n"
+"node.text"
+msgid "Pivot Table"
+msgstr "Özet Tablo"
+
+#. ZBuq9
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08091\n"
+"node.text"
+msgid "Pivot Chart"
+msgstr "Özet Grafik"
+
+#. RowUw
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0810\n"
+"node.text"
+msgid "Scenarios"
+msgstr "Senaryolar"
+
+#. NHiVG
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08101\n"
+"node.text"
+msgid "Subtotals"
+msgstr "Aratoplamlar"
+
+#. CzARM
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0811\n"
+"node.text"
+msgid "References"
+msgstr "Referanslar"
+
+#. ELC6F
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0812\n"
+"node.text"
+msgid "Viewing, Selecting, Copying"
+msgstr "Görüntülemek, Seçmek, Kopyalamak"
+
+#. VFHig
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0813\n"
+"node.text"
+msgid "Formulas and Calculations"
+msgstr "Formüller ve Hesaplamalar"
+
+#. bCMSS
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0814\n"
+"node.text"
+msgid "Protection"
+msgstr "Koruma"
+
+#. m2Dpj
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Writing Calc Macros"
+msgstr "Calc Makroları Yazma"
+
+#. vBXqp
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0816\n"
+"node.text"
+msgid "Miscellaneous"
+msgstr "Çeşitli"
+
+#. 6Saoi
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"05\n"
+"help_section.text"
+msgid "Charts and Diagrams"
+msgstr "Çizelge ve Diyagramlar"
+
+#. gu6pZ
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"0501\n"
+"node.text"
+msgid "General Information"
+msgstr "Genel Bilgi"
+
+#. Q5EUA
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"09\n"
+"help_section.text"
+msgid "Database Functionality (Base)"
+msgstr "Veritabanı İşlevselliği (Base)"
+
+#. tLWiE
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"0901\n"
+"node.text"
+msgid "General Information"
+msgstr "Genel Bilgiler"
+
+#. xU49Q
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11\n"
+"help_section.text"
+msgid "Drawings (Draw)"
+msgstr "Çizimler (Draw)"
+
+#. UcMAA
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Genel Bilgi ve Kullanıcı Arayüz Kullanımı"
+
+#. ZDeBD
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1102\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komut ve Menü Başvurusu"
+
+#. kq7Az
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020201\n"
+"node.text"
+msgid "Menus"
+msgstr "Menüler"
+
+#. SFgJ7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Araç çubukları"
+
+#. 9ojH7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1103\n"
+"node.text"
+msgid "Loading, Saving, Importing, and Exporting"
+msgstr "Yükleme, Kaydetme, İçe Aktarma ve Dışa Aktarma"
+
+#. fJYHX
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1104\n"
+"node.text"
+msgid "Formatting"
+msgstr "Biçimlendirme"
+
+#. HkVUY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1105\n"
+"node.text"
+msgid "Printing"
+msgstr "Yazdırma"
+
+#. G8GoF
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1106\n"
+"node.text"
+msgid "Effects"
+msgstr "Efektler"
+
+#. fd9tS
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1107\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "Nesneler, Grafikler ve Biteşlemler"
+
+#. crdMY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1108\n"
+"node.text"
+msgid "Groups and Layers"
+msgstr "Gruplar ve Katmanlar"
+
+#. G3s8n
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1109\n"
+"node.text"
+msgid "Text in Drawings"
+msgstr "Çizimlerdeki Metin"
+
+#. rxRmL
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1110\n"
+"node.text"
+msgid "Viewing"
+msgstr "Görünüm"
+
+#. 4zaCG
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"01\n"
+"help_section.text"
+msgid "%PRODUCTNAME Installation"
+msgstr "%PRODUCTNAME Kurulumu"
+
+#. 3EUAC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10\n"
+"help_section.text"
+msgid "Common Help Topics"
+msgstr "Genel Yardım Konuları"
+
+#. 3GoWS
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1001\n"
+"node.text"
+msgid "General Information"
+msgstr "Genel Bilgi"
+
+#. vFfKE
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1002\n"
+"node.text"
+msgid "%PRODUCTNAME and Microsoft Office"
+msgstr "%PRODUCTNAME ve Microsoft Office"
+
+#. GBR3F
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1004\n"
+"node.text"
+msgid "%PRODUCTNAME Options"
+msgstr "%PRODUCTNAME Seçenekleri"
+
+#. d4gAD
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1005\n"
+"node.text"
+msgid "Wizards"
+msgstr "Sihirbazlar"
+
+#. aXMeh
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100501\n"
+"node.text"
+msgid "Letter Wizard"
+msgstr "Mektup Sihirbazı"
+
+#. 6qzVL
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100502\n"
+"node.text"
+msgid "Fax Wizard"
+msgstr "Fax Sihirbazı"
+
+#. GMiKt
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100504\n"
+"node.text"
+msgid "Agenda Wizard"
+msgstr "Ajanda Sihirbazı"
+
+#. gvsML
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100506\n"
+"node.text"
+msgid "HTML Export Wizard"
+msgstr "HTML Dışarı Aktarma Sihirbazı"
+
+#. 8tHJK
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100510\n"
+"node.text"
+msgid "Document Converter Wizard"
+msgstr "Belge Dönüştürme Sihirbazı"
+
+#. zhnAF
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1006\n"
+"node.text"
+msgid "Configuring %PRODUCTNAME"
+msgstr "%PRODUCTNAME Yapılandırmak"
+
+#. 2rp8T
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1007\n"
+"node.text"
+msgid "Working with the User Interface"
+msgstr "Kullanıcı Arayüzü ile Çalışmak"
+
+#. mFuDH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10071\n"
+"node.text"
+msgid "Digital Signatures"
+msgstr "Sayısal İmzalar"
+
+#. drtXn
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1008\n"
+"node.text"
+msgid "Printing, Faxing, Sending"
+msgstr "Yazdırmak, Fax Göndermek, Göndermek"
+
+#. ZJbym
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1009\n"
+"node.text"
+msgid "Drag & Drop"
+msgstr "Sürükle & Bırak"
+
+#. DFzj6
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1010\n"
+"node.text"
+msgid "Copy and Paste"
+msgstr "Kopyala ve Yapıştır"
+
+#. hQXmX
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1012\n"
+"node.text"
+msgid "Charts and Diagrams"
+msgstr "Çizelge ve Diyagramlar"
+
+#. GVohQ
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1013\n"
+"node.text"
+msgid "Load, Save, Import, Export, PDF"
+msgstr "Yükle, Kaydet, İçe Aktar, Dışa Aktar, PDF"
+
+#. Ty8Du
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1014\n"
+"node.text"
+msgid "Links and References"
+msgstr "Bağlantılar ve Başvurular"
+
+#. nDFsH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1015\n"
+"node.text"
+msgid "Document Version Tracking"
+msgstr "Belge Sürüm Kaydı"
+
+#. AnvYc
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1016\n"
+"node.text"
+msgid "Labels and Business Cards"
+msgstr "Etiketler ve Kartvizitler"
+
+#. tEYBw
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1018\n"
+"node.text"
+msgid "Inserting External Data"
+msgstr "Harici Veri Eklemek"
+
+#. X2KH4
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1019\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Otomatik İşlevler"
+
+#. EGqAp
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1020\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Bulmak ve Değiştirmek"
+
+#. 4GGhC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1021\n"
+"node.text"
+msgid "Guides"
+msgstr "Rehberler"
+
+#. BjDNf
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04\n"
+"help_section.text"
+msgid "Presentations (Impress)"
+msgstr "Sunum (Impress)"
+
+#. hBFX8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0401\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Genel Bilgi ve Kullanıcı Arayüzü Kullanımı"
+
+#. XaGTA
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0402\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komut ve Menü Referansı"
+
+#. ADAgH
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020101\n"
+"node.text"
+msgid "Menus"
+msgstr "Menüler"
+
+#. fqLWR
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020102\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Araç çubukları"
+
+#. fiLDS
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0403\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Yükleme, Kaydetme, İçe Aktarma, Dışa Aktarma ve Düzenleme"
+
+#. jMBsp
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0404\n"
+"node.text"
+msgid "Formatting"
+msgstr "Biçimlendirme"
+
+#. HtUGZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0405\n"
+"node.text"
+msgid "Printing"
+msgstr "Yazdırma"
+
+#. FxREt
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0406\n"
+"node.text"
+msgid "Effects"
+msgstr "Etkiler"
+
+#. RX5V8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0407\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "Nesneler, Grafikler ve Biteşlemler"
+
+#. aDbFG
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0409\n"
+"node.text"
+msgid "Text in Presentations"
+msgstr "Sunumlardaki Metin"
+
+#. s8GCo
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0410\n"
+"node.text"
+msgid "Viewing"
+msgstr "Görünüm"
+
+#. Lo4YZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0411\n"
+"node.text"
+msgid "Slide Shows"
+msgstr "Slayt Gösterileri"
+
+#. m5CkC
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"03\n"
+"help_section.text"
+msgid "Formulas (Math)"
+msgstr "Formüller (Math)"
+
+#. kAkAL
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0301\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Genel Bilgi ve Kullanıcı Arayüzü Kullanımı"
+
+#. 3BZ8j
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"030101\n"
+"node.text"
+msgid "%PRODUCTNAME Formula Elements"
+msgstr "%PRODUCTNAME Formül Ögeleri"
+
+#. V99im
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0302\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komut ve Menü Referansı"
+
+#. CGoih
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0303\n"
+"node.text"
+msgid "Working with Formulas"
+msgstr "Formüller ile Çalışmak"
+
+#. FxCSV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"02\n"
+"help_section.text"
+msgid "Text Documents (Writer)"
+msgstr "Metin Belgeleri (Writer)"
+
+#. jWyEV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Genel Bilgi ve Kullanıcı Arayüzü Kullanımı"
+
+#. mT2iu
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0202\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komut ve Menü Referansı"
+
+#. 4RREa
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020201\n"
+"node.text"
+msgid "Menus"
+msgstr "Menüler"
+
+#. SQkvD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Araç çubukları"
+
+#. AExWW
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0210\n"
+"node.text"
+msgid "Navigating Text Documents"
+msgstr "Metin Belgelerinde Gezinmek"
+
+#. hjKKD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0212\n"
+"node.text"
+msgid "Formatting Text Documents"
+msgstr "Metin Belgelerini Biçimlendirmek"
+
+#. 6gFto
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"021201\n"
+"node.text"
+msgid "Templates and Styles"
+msgstr "Şablonlar ve Biçemler"
+
+#. 7BQES
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0204\n"
+"node.text"
+msgid "Graphics in Text Documents"
+msgstr "Metin Belgelerinde Grafikler"
+
+#. QsiTB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0205\n"
+"node.text"
+msgid "Tables in Text Documents"
+msgstr "Metin Belgelerinde Tablolar"
+
+#. Xx5Fp
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0206\n"
+"node.text"
+msgid "Objects in Text Documents"
+msgstr "Metin Belgelerinde Nesneler"
+
+#. 47SjN
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0207\n"
+"node.text"
+msgid "Sections and Frames in Text Documents"
+msgstr "Metin Belgelerinde Bölümler ve Çerçeveler"
+
+#. E2N9E
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0208\n"
+"node.text"
+msgid "Tables of Contents and Indexes"
+msgstr "İçindekiler ve Dizin Tabloları"
+
+#. yi6ro
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0209\n"
+"node.text"
+msgid "Fields in Text Documents"
+msgstr "Metin Belgelerinde Alanlar"
+
+#. ZgfjA
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0211\n"
+"node.text"
+msgid "Calculating in Text Documents"
+msgstr "Metin Belgelerinde Hesaplama Yapmak"
+
+#. wVGdF
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0213\n"
+"node.text"
+msgid "Special Text Elements"
+msgstr "Özel Metin Öğeleri"
+
+#. FxdVR
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0214\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Otomatik İşlevler"
+
+#. hi36Q
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0215\n"
+"node.text"
+msgid "Numbering and Lists"
+msgstr "Numaralama ve Listeler"
+
+#. 2FPcB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0216\n"
+"node.text"
+msgid "Spellchecking, Thesaurus, and Languages"
+msgstr "İmla Denetimi, Sözlükler ve Diller"
+
+#. vDffD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0218\n"
+"node.text"
+msgid "Troubleshooting Tips"
+msgstr "Sorun Çözme Önerileri"
+
+#. qLMLk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0219\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Yükleme, Kaydetme, İçe Aktarma, Dışa Aktarma ve Düzenleme"
+
+#. 8GC4J
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0220\n"
+"node.text"
+msgid "Master Documents"
+msgstr "Ana Belgeler"
+
+#. wbJh4
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0221\n"
+"node.text"
+msgid "Links and References"
+msgstr "Bağlantılar ve Başvurular"
+
+#. vHzyn
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0222\n"
+"node.text"
+msgid "Printing"
+msgstr "Yazdırma"
+
+#. F4LCk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0223\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Bulmak ve Değiştirmek"
+
+#. CYQr2
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"06\n"
+"help_section.text"
+msgid "HTML Documents (Writer Web)"
+msgstr "HTML Belgeleri (Writer Web)"

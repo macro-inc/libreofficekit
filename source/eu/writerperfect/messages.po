@@ -1,0 +1,268 @@
+#. extracted from writerperfect/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-03-23 11:46+0100\n"
+"PO-Revision-Date: 2021-01-23 09:42+0000\n"
+"Last-Translator: Asier Sarasua Garmendia <asiersar@yahoo.com>\n"
+"Language-Team: Basque <https://translations.documentfoundation.org/projects/libo_ui-master/writerperfectmessages/eu/>\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1526126916.000000\n"
+
+#. DXXuk
+#: writerperfect/inc/strings.hrc:14
+msgctxt "STR_ENCODING_DIALOG_TITLE"
+msgid "Import file"
+msgstr "Inportatu fitxategia"
+
+#. NCpDZ
+#: writerperfect/inc/strings.hrc:15
+msgctxt "STR_ENCODING_DIALOG_TITLE_MSMULTIPLAN"
+msgid "Import MS Multiplan for DOS file"
+msgstr "Inportatu MS Multiplan for DOS fitxategia"
+
+#. 9QaFD
+#: writerperfect/inc/strings.hrc:16
+msgctxt "STR_ENCODING_DIALOG_TITLE_MSWORKS"
+msgid "Import MS Works file"
+msgstr "Inportatu MS Works fitxategia"
+
+#. AGNp8
+#: writerperfect/inc/strings.hrc:17
+msgctxt "STR_ENCODING_DIALOG_TITLE_MSWRITE"
+msgid "Import MS Write file"
+msgstr "Inportatu MS Write fitxategia"
+
+#. YFuS7
+#: writerperfect/inc/strings.hrc:18
+msgctxt "STR_ENCODING_DIALOG_TITLE_DOSWORD"
+msgid "Import MS Word for DOS file"
+msgstr "Inportatu MS Word for DOS fitxategia"
+
+#. A3kjQ
+#: writerperfect/inc/strings.hrc:19
+msgctxt "STR_ENCODING_DIALOG_TITLE_LOTUS"
+msgid "Import Lotus file"
+msgstr "Inportatu Lotus fitxategita"
+
+#. 7ngKL
+#: writerperfect/inc/strings.hrc:20
+msgctxt "STR_ENCODING_DIALOG_TITLE_SYMPHONY"
+msgid "Import Symphony file"
+msgstr "Inportatu Symphony fitxategia"
+
+#. Dp6Zj
+#: writerperfect/inc/strings.hrc:21
+msgctxt "STR_ENCODING_DIALOG_TITLE_QUATTROPRO"
+msgid "Import Quattro Pro file"
+msgstr "Inportatu Quattro Pro fitxategia"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Gehitu"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Aplikatu"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Utzi"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "It_xi"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "E_zabatu"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Editatu"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Laguntza"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Berria"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Ez"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_Ados"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Kendu"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "Be_rrezarri"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Bai"
+
+#. MZYvQ
+#: writerperfect/uiconfig/ui/exportepub.ui:9
+msgctxt "exportepub|EpubDialog"
+msgid "EPUB Export"
+msgstr "EPUB esportazioa"
+
+#. 2ADpr
+#: writerperfect/uiconfig/ui/exportepub.ui:112
+msgctxt "exportepub|versionft"
+msgid "Version:"
+msgstr "Bertsioa:"
+
+#. 5uGCs
+#: writerperfect/uiconfig/ui/exportepub.ui:129
+msgctxt "exportepub|epub3"
+msgid "EPUB 3.0"
+msgstr "EPUB 3.0"
+
+#. EyGCH
+#: writerperfect/uiconfig/ui/exportepub.ui:130
+msgctxt "exportepub|epub2"
+msgid "EPUB 2.0"
+msgstr "EPUB 2.0"
+
+#. yVSHE
+#: writerperfect/uiconfig/ui/exportepub.ui:146
+msgctxt "exportepub|splitpage"
+msgid "Page break"
+msgstr "Orrialde-jauzia"
+
+#. u8EWu
+#: writerperfect/uiconfig/ui/exportepub.ui:147
+msgctxt "exportepub|splitheading"
+msgid "Heading"
+msgstr "Izenburua"
+
+#. 6nDti
+#: writerperfect/uiconfig/ui/exportepub.ui:160
+msgctxt "exportepub|splitft"
+msgid "Split method:"
+msgstr "Zatitze-metodoa:"
+
+#. DvEkf
+#: writerperfect/uiconfig/ui/exportepub.ui:174
+msgctxt "exportepub|layoutft"
+msgid "Layout method:"
+msgstr "Antolamendu modua:"
+
+#. Jxiwx
+#: writerperfect/uiconfig/ui/exportepub.ui:191
+msgctxt "exportepub|layoutreflowable"
+msgid "Reflowable"
+msgstr "Moldakorra"
+
+#. QANvp
+#: writerperfect/uiconfig/ui/exportepub.ui:192
+msgctxt "exportepub|layoutfixed"
+msgid "Fixed"
+msgstr "Finkoa"
+
+#. CeRQ4
+#: writerperfect/uiconfig/ui/exportepub.ui:207
+msgctxt "exportepub|generalft"
+msgid "General"
+msgstr "Orokorra"
+
+#. ET3pr
+#: writerperfect/uiconfig/ui/exportepub.ui:244
+msgctxt "exportepub|identifierft"
+msgid "Identifier:"
+msgstr "Identifikatzailea:"
+
+#. GFADK
+#: writerperfect/uiconfig/ui/exportepub.ui:258
+msgctxt "exportepub|titleft"
+msgid "Title:"
+msgstr "Titulua:"
+
+#. 4UDMh
+#: writerperfect/uiconfig/ui/exportepub.ui:272
+msgctxt "exportepub|authorft"
+msgid "Author:"
+msgstr "Egilea:"
+
+#. U4wuu
+#: writerperfect/uiconfig/ui/exportepub.ui:286
+msgctxt "exportepub|dateft"
+msgid "Date:"
+msgstr "Data:"
+
+#. B5NKD
+#: writerperfect/uiconfig/ui/exportepub.ui:300
+msgctxt "exportepub|languageft"
+msgid "Language:"
+msgstr "Hizkuntza:"
+
+#. MRBgx
+#: writerperfect/uiconfig/ui/exportepub.ui:381
+msgctxt "exportepub|metadataft"
+msgid "Metadata"
+msgstr "Metadatuak"
+
+#. swAre
+#: writerperfect/uiconfig/ui/exportepub.ui:417
+msgctxt "exportepub|coverimageft"
+msgid "Cover image:"
+msgstr "Azaleko irudia:"
+
+#. qSviq
+#: writerperfect/uiconfig/ui/exportepub.ui:442
+msgctxt "exportepub|coverbutton"
+msgid "Browse..."
+msgstr "Arakatu..."
+
+#. 3tfAE
+#: writerperfect/uiconfig/ui/exportepub.ui:456
+msgctxt "exportepub|mediadirft"
+msgid "Media directory:"
+msgstr "Multimedia-direktorioa:"
+
+#. jBQqe
+#: writerperfect/uiconfig/ui/exportepub.ui:481
+msgctxt "exportepub|mediabutton"
+msgid "Browse..."
+msgstr "Arakatu..."
+
+#. yFjyH
+#: writerperfect/uiconfig/ui/exportepub.ui:497
+msgctxt "exportepub|customizeft"
+msgid "Customize"
+msgstr "Pertsonalizatu"
+
+#. DCscf
+#: writerperfect/uiconfig/ui/wpftencodingdialog.ui:67
+msgctxt "wpftencodingdialog|label"
+msgid "_Character set:"
+msgstr "_Karaktere-jokoa:"

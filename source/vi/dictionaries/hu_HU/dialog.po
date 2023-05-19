@@ -1,0 +1,305 @@
+#. extracted from dictionaries/hu_HU/dialog
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2013-05-23 23:34+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1369352070.000000\n"
+
+#. jFVKx
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spelling\n"
+"property.text"
+msgid "Spelling"
+msgstr "Chính tả"
+
+#. DrGWV
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"cap\n"
+"property.text"
+msgid "Capitalization"
+msgstr "Viết hoa"
+
+#. z3yr8
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"par\n"
+"property.text"
+msgid "Parentheses"
+msgstr "Dấu ngoặc tròn"
+
+#. igaaQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"wordpart\n"
+"property.text"
+msgid "Word parts of compounds"
+msgstr "Phần chữ của từ ghép"
+
+#. L5Fo6
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"comma\n"
+"property.text"
+msgid "Comma usage"
+msgstr "Cách dùng dấu phảy"
+
+#. hgUiH
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"proofreading\n"
+"property.text"
+msgid "Proofreading"
+msgstr "Soát lỗi"
+
+#. VPQmL
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"style\n"
+"property.text"
+msgid "Style checking"
+msgstr "Kiểm tra kiểu"
+
+#. tALAw
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"compound\n"
+"property.text"
+msgid "Underline typo-like compound words"
+msgstr "Gạch dưới cụm có vẻ có lỗi"
+
+#. sxQau
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"allcompound\n"
+"property.text"
+msgid "Underline all generated compound words"
+msgstr "Gạch dưới mọi cụm từ được sinh ra"
+
+#. FdR3D
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"grammar\n"
+"property.text"
+msgid "Possible mistakes"
+msgstr "Các lỗi có thể"
+
+#. DPEKs
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"money\n"
+"property.text"
+msgid "Consistency of money amounts"
+msgstr "Tính nhất quán của lượng tiền"
+
+#. 3uXGW
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"duplication\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Từ lặp"
+
+#. Y2AD9
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup0\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Từ lặp"
+
+#. gsa8G
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup\n"
+"property.text"
+msgid "Duplication within clauses"
+msgstr "Lặp trong mệnh đề"
+
+#. NfAqF
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup2\n"
+"property.text"
+msgid "Duplication within sentences"
+msgstr "Lặp trong câu"
+
+#. MHboa
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup3\n"
+"property.text"
+msgid "Allow previous checkings with affixes"
+msgstr "Cho phép kiểm tra phần trước với phụ tố"
+
+#. CBEZj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"numpart\n"
+"property.text"
+msgid "Thousand separation of numbers"
+msgstr "phân cách hàng nghìn"
+
+#. BSBZA
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"typography\n"
+"property.text"
+msgid "Typography"
+msgstr "Ty-pô"
+
+#. MGpiu
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"quot\n"
+"property.text"
+msgid "Quotation marks"
+msgstr "Dấu trích dẫn"
+
+#. x3GM2
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"apost\n"
+"property.text"
+msgid "Apostrophe"
+msgstr "Dấu nháy đơn"
+
+#. kcfut
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dash\n"
+"property.text"
+msgid "En dash"
+msgstr "Gạch En"
+
+#. qbUaJ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"elli\n"
+"property.text"
+msgid "Ellipsis"
+msgstr "Dấu chấm lửng"
+
+#. CmffD
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"ligature\n"
+"property.text"
+msgid "Ligature suggestion"
+msgstr "Gợi ý ghép chữ"
+
+#. TwxSo
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"noligature\n"
+"property.text"
+msgid "Underline ligatures"
+msgstr "Gạch dưới chữ ghép"
+
+#. rE4tQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"frac\n"
+"property.text"
+msgid "Fractions"
+msgstr "Phân số"
+
+#. UJKCj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"thin\n"
+"property.text"
+msgid "Thin space"
+msgstr "Khoảng trống ngắn"
+
+#. SZQdU
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces\n"
+"property.text"
+msgid "Double spaces"
+msgstr "Khoảng trống kép"
+
+#. FqzDS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces2\n"
+"property.text"
+msgid "More spaces"
+msgstr "Nhiều dấu cách hơn nữa"
+
+#. FVCTr
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"idx\n"
+"property.text"
+msgid "Indices"
+msgstr "Chỉ số"
+
+#. E5PBN
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"minus\n"
+"property.text"
+msgid "Minus"
+msgstr "Trừ"
+
+#. nrJ49
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"SI\n"
+"property.text"
+msgid "Measurements"
+msgstr "Đo đạc"
+
+#. wAjsS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"hyphen\n"
+"property.text"
+msgid "Hyphenation of ambiguous words"
+msgstr "Gạch ngang từ không rõ ràng"

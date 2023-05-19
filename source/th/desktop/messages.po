@@ -1,0 +1,1232 @@
+#. extracted from desktop/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2022-05-03 12:41+0000\n"
+"Last-Translator: Theppitak Karoonboonyanan <theppitak@gmail.com>\n"
+"Language-Team: Thai <https://translations.documentfoundation.org/projects/libo_ui-master/desktopmessages/th/>\n"
+"Language: th\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1535976755.000000\n"
+
+#. v2iwK
+#: desktop/inc/strings.hrc:24
+msgctxt "RID_STR_COPYING_PACKAGE"
+msgid "Copying: "
+msgstr "กำลังคัดลอก: "
+
+#. 2dzDt
+#: desktop/inc/strings.hrc:25
+msgctxt "RID_STR_ERROR_WHILE_ADDING"
+msgid "Error while adding: "
+msgstr "เกิดข้อผิดพลาดขณะเพิ่ม: "
+
+#. CUrtD
+#: desktop/inc/strings.hrc:26
+msgctxt "RID_STR_ERROR_WHILE_REMOVING"
+msgid "Error while removing: "
+msgstr "เกิดข้อผิดพลาดขณะถอดถอน: "
+
+#. XyESz
+#: desktop/inc/strings.hrc:27
+msgctxt "RID_STR_PACKAGE_ALREADY_ADDED"
+msgid "Extension has already been added: "
+msgstr "มีส่วนขยายติดตั้งใช้งานไว้อยู่ก่อนแล้ว: "
+
+#. cuydq
+#: desktop/inc/strings.hrc:28
+msgctxt "RID_STR_NO_SUCH_PACKAGE"
+msgid "There is no such extension deployed: "
+msgstr "ไม่มีส่วนขยายนี้ติดตั้งใช้งานอยู่: "
+
+#. wzGYv
+#: desktop/inc/strings.hrc:29
+msgctxt "RID_STR_SYNCHRONIZING_REPOSITORY"
+msgid "Synchronizing repository for %NAME extensions"
+msgstr "กำลังปรับข้อมูลจากคลังสำหรับส่วนขยาย %NAME"
+
+#. dp8bf
+#: desktop/inc/strings.hrc:31
+msgctxt "RID_STR_REGISTERING_PACKAGE"
+msgid "Enabling: "
+msgstr "กำลังเปิดทำงาน: "
+
+#. xBysg
+#: desktop/inc/strings.hrc:32
+msgctxt "RID_STR_REVOKING_PACKAGE"
+msgid "Disabling: "
+msgstr "กำลังปิดใช้งาน: "
+
+#. HDgpp
+#: desktop/inc/strings.hrc:33
+msgctxt "RID_STR_CANNOT_DETECT_MEDIA_TYPE"
+msgid "Cannot detect media-type: "
+msgstr "ไม่สามารถตรวจหาประเภทของสื่อ: "
+
+#. QfGM7
+#: desktop/inc/strings.hrc:34
+msgctxt "RID_STR_UNSUPPORTED_MEDIA_TYPE"
+msgid "This media-type is not supported: "
+msgstr "ไม่รองรับสื่อประเภทนี้: "
+
+#. VHcMc
+#: desktop/inc/strings.hrc:35
+msgctxt "RID_STR_ERROR_WHILE_REGISTERING"
+msgid "An error occurred while enabling: "
+msgstr "เกิดข้อผิดพลาดขณะเปิดทำงาน: "
+
+#. BqmAM
+#: desktop/inc/strings.hrc:36
+msgctxt "RID_STR_ERROR_WHILE_REVOKING"
+msgid "An error occurred while disabling: "
+msgstr "เกิดข้อผิดพลาดขณะปิดใช้งาน: "
+
+#. Avii2
+#: desktop/inc/strings.hrc:38
+msgctxt "RID_STR_CONF_SCHEMA"
+msgid "Configuration Schema"
+msgstr "เค้าโครงค่าตั้ง"
+
+#. cL9MC
+#: desktop/inc/strings.hrc:39
+msgctxt "RID_STR_CONF_DATA"
+msgid "Configuration Data"
+msgstr "ข้อมูลค่าตั้ง"
+
+#. S8Pj8
+#: desktop/inc/strings.hrc:41
+msgctxt "RID_STR_BASIC_LIB"
+msgid "Basic Library"
+msgstr "ไลบรารีภาษาเบสิก"
+
+#. Tnphj
+#: desktop/inc/strings.hrc:42
+msgctxt "RID_STR_DIALOG_LIB"
+msgid "Dialog Library"
+msgstr "ไลบรารีกล่องโต้ตอบ"
+
+#. ThJQm
+#: desktop/inc/strings.hrc:43
+msgctxt "RID_STR_CANNOT_DETERMINE_LIBNAME"
+msgid "The library name could not be determined."
+msgstr "ไม่สามารถกำหนดชื่อไลบรารี"
+
+#. G6SqW
+#: desktop/inc/strings.hrc:45
+msgctxt "RID_STR_PACKAGE_BUNDLE"
+msgid "Extension"
+msgstr "ส่วนขยาย"
+
+#. o6NBi
+#: desktop/inc/strings.hrc:46
+msgctxt "RID_STR_PACKAGE_BUNDLE"
+msgid "All supported files"
+msgstr "ไฟล์ที่รองรับทั้งหมด"
+
+#. 5TAZB
+#: desktop/inc/strings.hrc:48
+msgctxt "RID_STR_DYN_COMPONENT"
+msgid "UNO Dynamic Library Component"
+msgstr "องค์ประกอบไลบรารีแบบไดนามิกของ UNO"
+
+#. SK5Ay
+#: desktop/inc/strings.hrc:49
+msgctxt "RID_STR_JAVA_COMPONENT"
+msgid "UNO Java Component"
+msgstr "องค์ประกอบจาวาของ UNO"
+
+#. a7o4C
+#: desktop/inc/strings.hrc:50
+msgctxt "RID_STR_PYTHON_COMPONENT"
+msgid "UNO Python Component"
+msgstr "องค์ประกอบไพธอนของ UNO"
+
+#. QyN3F
+#: desktop/inc/strings.hrc:51
+msgctxt "RID_STR_COMPONENTS"
+msgid "UNO Components"
+msgstr "องค์ประกอบ UNO"
+
+#. G6LCn
+#: desktop/inc/strings.hrc:52
+msgctxt "RID_STR_RDB_TYPELIB"
+msgid "UNO RDB Type Library"
+msgstr "UNO RDB Type Library"
+
+#. KcXfh
+#: desktop/inc/strings.hrc:53
+msgctxt "RID_STR_JAVA_TYPELIB"
+msgid "UNO Java Type Library"
+msgstr "UNO Java Type Library"
+
+#. wBhDU
+#: desktop/inc/strings.hrc:55
+msgctxt "RID_STR_SFWK_LIB"
+msgid "%MACROLANG Library"
+msgstr "ไลบรารี %MACROLANG"
+
+#. k2PBJ
+#: desktop/inc/strings.hrc:57
+msgctxt "RID_STR_HELP"
+msgid "Help"
+msgstr "วิธีใช้"
+
+#. wPwGt
+#: desktop/inc/strings.hrc:58
+msgctxt "RID_STR_HELPPROCESSING_GENERAL_ERROR"
+msgid "The extension cannot be installed because:\n"
+msgstr "ไม่สามารถติดตั้งส่วนขยายนี้เพราะ:\n"
+
+#. PBXkt
+#: desktop/inc/strings.hrc:59
+msgctxt "RID_STR_HELPPROCESSING_XMLPARSING_ERROR"
+msgid "The extension will not be installed because an error occurred in the Help files:\n"
+msgstr "จะไม่ติดตั้งส่วนขยายนี้เนื่องจากมีข้อผิดพลาดในแฟ้มวิธีใช้:\n"
+
+#. u3kcb
+#: desktop/inc/strings.hrc:61
+msgctxt "RID_STR_ADD_PACKAGES"
+msgid "Add Extension(s)"
+msgstr "เพิ่มส่วนขยาย"
+
+#. DDxFn
+#: desktop/inc/strings.hrc:62
+msgctxt "RID_CTX_ITEM_REMOVE"
+msgid "~Remove"
+msgstr "~ถอดถอน"
+
+#. s6iho
+#: desktop/inc/strings.hrc:63
+msgctxt "RID_CTX_ITEM_ENABLE"
+msgid "~Enable"
+msgstr "~เปิดทำงาน"
+
+#. CeKUw
+#: desktop/inc/strings.hrc:64
+msgctxt "RID_CTX_ITEM_DISABLE"
+msgid "~Disable"
+msgstr "ปิ~ดใช้งาน"
+
+#. Z7G4r
+#: desktop/inc/strings.hrc:65
+msgctxt "RID_CTX_ITEM_CHECK_UPDATE"
+msgid "~Update..."
+msgstr "~ปรับรุ่น..."
+
+#. iFBQd
+#: desktop/inc/strings.hrc:66
+msgctxt "RID_STR_ADDING_PACKAGES"
+msgid "Adding %EXTENSION_NAME"
+msgstr "กำลังเพิ่ม %EXTENSION_NAME"
+
+#. J5KAU
+#: desktop/inc/strings.hrc:67
+msgctxt "RID_STR_REMOVING_PACKAGES"
+msgid "Removing %EXTENSION_NAME"
+msgstr "กำลังถอดถอน %EXTENSION_NAME"
+
+#. A6AzC
+#: desktop/inc/strings.hrc:68
+msgctxt "RID_STR_ENABLING_PACKAGES"
+msgid "Enabling %EXTENSION_NAME"
+msgstr "กำลังเปิดทำงาน %EXTENSION_NAME"
+
+#. Mh7ag
+#: desktop/inc/strings.hrc:69
+msgctxt "RID_STR_DISABLING_PACKAGES"
+msgid "Disabling %EXTENSION_NAME"
+msgstr "กำลังปิดใช้งาน %EXTENSION_NAME"
+
+#. GjgyB
+#: desktop/inc/strings.hrc:70
+msgctxt "RID_STR_ACCEPT_LICENSE"
+msgid "Accept license for %EXTENSION_NAME"
+msgstr "ยอมรับเงื่อนไขในใบอนุญาตสำหรับ %EXTENSION_NAME"
+
+#. buqgv
+#: desktop/inc/strings.hrc:71
+msgctxt "RID_STR_ERROR_UNKNOWN_STATUS"
+msgid "Error: The status of this extension is unknown"
+msgstr "ผิดพลาด: ไม่ทราบสถานะของส่วนขยายนี้"
+
+#. H6NGb
+#: desktop/inc/strings.hrc:72
+msgctxt "RID_STR_CLOSE_BTN"
+msgid "Close"
+msgstr "ปิด"
+
+#. T9Gqg
+#: desktop/inc/strings.hrc:73
+msgctxt "RID_STR_EXIT_BTN"
+msgid "Quit"
+msgstr "ออก"
+
+#. AEv5h
+#: desktop/inc/strings.hrc:74
+msgctxt "RID_STR_NO_ADMIN_PRIVILEGE"
+msgid ""
+"%PRODUCTNAME has been updated to a new version. Some shared %PRODUCTNAME extensions are not compatible with this version and need to be updated before %PRODUCTNAME can be started.\n"
+"\n"
+"Updating of shared extension requires administrator privileges. Contact your system administrator to update the following shared extensions:"
+msgstr ""
+"%PRODUCTNAME มีการปรับรุ่นเป็นรุ่นใหม่ ส่วนขยายบางตัวของ %PRODUCTNAME ที่ใช้ร่วมกันอาจเข้ากันไม่ได้กับรุ่นนี้ และต้องปรับรุ่นก่อนที่ %PRODUCTNAME จะสามารถเริ่มทำงานได้\n"
+"\n"
+"การปรับรุ่นส่วนขยายที่ใช้ร่วมกันต้องใช้สิทธิ๋ของผู้ดูแลระบบ กรุณาติดต่อผู้ดูแลระบบเพื่อปรับรุ่นส่วนขยายที่ใช้ร่วมกันดังต่อไปนี้:"
+
+#. mQAQ9
+#: desktop/inc/strings.hrc:77
+msgctxt "RID_STR_ERROR_MISSING_DEPENDENCIES"
+msgid "The extension cannot be enabled as the following system dependencies are not fulfilled:"
+msgstr "ส่วนขยายนี้ไม่สามารถเปิดทำงานได้ เพราะยังขาดส่วนที่ต้องใช้ของระบบดังต่อไปนี้:"
+
+#. X4uSy
+#: desktop/inc/strings.hrc:78
+msgctxt "RID_STR_ERROR_MISSING_LICENSE"
+msgid "This extension is disabled because you haven't accepted the license yet.\n"
+msgstr "ส่วนขยายโปรแกรมนี้ยังปิดการใช้งาน เพราะคุณยังไม่ได้ยอมรับเงื่อนไขใบอนุญาต\n"
+
+#. ky6LA
+#: desktop/inc/strings.hrc:79
+msgctxt "RID_STR_SHOW_LICENSE_CMD"
+msgid "Show license"
+msgstr "แสดงเงื่อนไขใบอนุญาต"
+
+#. xyCf9
+#: desktop/inc/strings.hrc:80
+msgctxt "RID_STR_WARNING_INSTALL_EXTENSION"
+msgid ""
+"You are about to install the extension '%NAME'.\n"
+"Click 'OK' to proceed with the installation.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"คุณกำลังจะติดตั้งส่วนขยาย '%NAME'\n"
+"คลิก 'ตกลง' เพื่อดำเนินการติดตั้งต่อ\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการติดตั้ง"
+
+#. Y4EHy
+#: desktop/inc/strings.hrc:83
+msgctxt "RID_STR_WARNING_INSTALL_EXTENSION_DISABLED"
+msgid "Extension installation is currently disabled. Please consult your system administrator for more information."
+msgstr "การติดตั้งส่วนขยายถูกห้ามไว้ กรุณาสอบถามข้อมูลเพิ่มเติมจากผู้ดูแลระบบของคุณ"
+
+#. JiEFG
+#: desktop/inc/strings.hrc:85
+msgctxt "RID_STR_WARNING_REMOVE_EXTENSION_DISABLED"
+msgid "Extension removal is currently disabled. Please consult your system administrator for more information."
+msgstr "การถอดถอนส่วนขยายถูกห้ามไว้ กรุณาสอบถามข้อมูลเพิ่มเติมจากผู้ดูแลระบบของคุณ"
+
+#. LncbY
+#: desktop/inc/strings.hrc:87
+msgctxt "RID_STR_WARNING_REMOVE_EXTENSION"
+msgid ""
+"You are about to remove the extension '%NAME'.\n"
+"Click 'OK' to remove the extension.\n"
+"Click 'Cancel' to stop removing the extension."
+msgstr ""
+"คุณกำลังจะถอดถอนส่วนขยาย '%NAME'\n"
+"คลิก 'ตกลง' เพื่อดำเนินการถอดถอนต่อ\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการถอดถอนส่วนขยายดังกล่าว"
+
+#. fiYMH
+#: desktop/inc/strings.hrc:90
+msgctxt "RID_STR_WARNING_REMOVE_SHARED_EXTENSION"
+msgid ""
+"Make sure that no further users are working with the same %PRODUCTNAME, when changing shared extensions in a multi user environment.\n"
+"Click 'OK' to remove the extension.\n"
+"Click 'Cancel' to stop removing the extension."
+msgstr ""
+"โปรดตรวจสอบให้แน่ใจว่าไม่มีผู้ใช้ทำงานกับ %PRODUCTNAME อันเดียวกันแล้ว ก่อนที่จะเปลี่ยนแปลงส่วนขยายที่ใช้ร่วมกันในสภาพแวดล้อมหลายผู้ใช้\n"
+"คลิก 'ตกลง' เพื่อถอดถอนส่วนขยาย\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการถอดถอนส่วนขยาย"
+
+#. bQ675
+#: desktop/inc/strings.hrc:94
+msgctxt "RID_STR_WARNING_ENABLE_SHARED_EXTENSION"
+msgid ""
+"Make sure that no further users are working with the same %PRODUCTNAME, when changing shared extensions in a multi user environment.\n"
+"Click 'OK' to enable the extension.\n"
+"Click 'Cancel' to stop enabling the extension."
+msgstr ""
+"โปรดตรวจสอบให้แน่ใจว่าไม่มีผู้ใช้ทำงานกับ %PRODUCTNAME อันเดียวกันแล้ว ก่อนที่จะเปลี่ยนแปลงส่วนขยายที่ใช้ร่วมกันในสภาพแวดล้อมหลายผู้ใช้\n"
+"คลิก 'ตกลง' เพื่อเปิดทำงานส่วนขยาย\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการเปิดทำงานส่วนขยาย"
+
+#. zEGzE
+#: desktop/inc/strings.hrc:98
+msgctxt "RID_STR_WARNING_DISABLE_SHARED_EXTENSION"
+msgid ""
+"Make sure that no further users are working with the same %PRODUCTNAME, when changing shared extensions in a multi user environment.\n"
+"Click 'OK' to disable the extension.\n"
+"Click 'Cancel' to stop disabling the extension."
+msgstr ""
+"โปรดตรวจสอบให้แน่ใจว่าไม่มีผู้ใช้ทำงานกับ %PRODUCTNAME อันเดียวกันแล้ว ก่อนที่จะเปลี่ยนแปลงส่วนขยายที่ใช้ร่วมกันในสภาพแวดล้อมหลายผู้ใช้\n"
+"คลิก 'ตกลง' เพื่อปิดใช้งานส่วนขยาย\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการปิดใช้งานส่วนขยาย"
+
+#. bfdYH
+#: desktop/inc/strings.hrc:102
+msgctxt "RID_STR_UNSUPPORTED_PLATFORM"
+msgid "The extension '%Name' does not work on this computer."
+msgstr "ส่วนขยาย '%Name' ไม่สามารถทำงานได้บนคอมพิวเตอร์เครื่องนี้"
+
+#. cGEv7
+#: desktop/inc/strings.hrc:104
+msgctxt "RID_DLG_UPDATE_INSTALL_INSTALLING"
+msgid "Installing extensions..."
+msgstr "กำลังติดตั้งส่วนขยาย..."
+
+#. TP9Jx
+#: desktop/inc/strings.hrc:105
+msgctxt "RID_DLG_UPDATE_INSTALL_FINISHED"
+msgid "Installation finished"
+msgstr "การติดตั้งเสร็จสิ้น"
+
+#. vga5X
+#: desktop/inc/strings.hrc:106
+msgctxt "RID_DLG_UPDATE_INSTALL_NO_ERRORS"
+msgid "No errors."
+msgstr "ไม่มีข้อผิดพลาด"
+
+#. GtBF5
+#: desktop/inc/strings.hrc:107
+msgctxt "RID_DLG_UPDATE_INSTALL_ERROR_DOWNLOAD"
+msgid "Error while downloading extension %NAME. "
+msgstr "เกิดข้อผิดพลาดขณะดาวน์โหลดส่วนขยาย %NAME "
+
+#. 8wV4e
+#: desktop/inc/strings.hrc:108
+msgctxt "RID_DLG_UPDATE_INSTALL_THIS_ERROR_OCCURRED"
+msgid "The error message is: "
+msgstr "ข้อความข้อผิดพลาดคือ: "
+
+#. vAP5D
+#: desktop/inc/strings.hrc:109
+msgctxt "RID_DLG_UPDATE_INSTALL_ERROR_INSTALLATION"
+msgid "Error while installing extension %NAME. "
+msgstr "เกิดข้อผิดพลาดขณะติดตั้งส่วนขยาย %NAME "
+
+#. DNwGS
+#: desktop/inc/strings.hrc:110
+msgctxt "RID_DLG_UPDATE_INSTALL_ERROR_LIC_DECLINED"
+msgid "The license agreement for extension %NAME was refused. "
+msgstr "สัญญาอนุญาตสำหรับส่วนขยาย %NAME ถูกปฏิเสธ "
+
+#. q4fDv
+#: desktop/inc/strings.hrc:111
+msgctxt "RID_DLG_UPDATE_INSTALL_EXTENSION_NOINSTALL"
+msgid "The extension will not be installed."
+msgstr "จะไม่ติดตั้งส่วนขยายนี้"
+
+#. 2yEGV
+#: desktop/inc/strings.hrc:113
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_UNKNOWN"
+msgid "Unknown"
+msgstr "ไม่รู้จัก"
+
+#. kGwZa
+#: desktop/inc/strings.hrc:114
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_OOO_MIN"
+msgid "Extension requires at least OpenOffice.org reference version %VERSION"
+msgstr "ส่วนขยายต้องการ OpenOffice.org รุ่นอ้างอิงอย่างต่ำ %VERSION"
+
+#. rcfFe
+#: desktop/inc/strings.hrc:115
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_OOO_MAX"
+msgid "Extension does not support OpenOffice.org reference versions greater than %VERSION"
+msgstr "ส่วนขยายไม่รองรับ OpenOffice.org รุ่นอ้างอิงที่สูงกว่า %VERSION"
+
+#. 776kM
+#: desktop/inc/strings.hrc:116
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_LO_MIN"
+msgid "Extension requires at least %PRODUCTNAME version %VERSION"
+msgstr "ส่วนขยายต้องการ %PRODUCTNAME เวอร์ชัน %VERSION เป็นอย่างต่ำ"
+
+#. P4pgb
+#: desktop/inc/strings.hrc:117
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_LO_MAX"
+msgid "Extension does not support %PRODUCTNAME versions greater than %VERSION"
+msgstr "ส่วนขยายไม่รองรับ %PRODUCTNAME รุ่นที่สูงกว่า %VERSION"
+
+#. dNBtG
+#: desktop/inc/strings.hrc:119
+msgctxt "RID_STR_WARNING_VERSION_LESS"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The newer version $DEPLOYED is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"คุณกำลังจะติดตั้งรุ่น $NEW ของส่วนขยาย '$NAME'\n"
+"โดยมีส่วนขยายรุ่น $DEPLOYED ซึ่งใหม่กว่าติดตั้งไว้แล้ว\n"
+"คลิก 'ตกลง' เพื่อแทนที่ส่วนขยายเดิมที่ติดตั้งไว้\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการติดตั้ง"
+
+#. TmQCx
+#: desktop/inc/strings.hrc:123
+msgctxt "RID_STR_WARNINGBOX_VERSION_LESS_DIFFERENT_NAMES"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The newer version $DEPLOYED, named '$OLDNAME', is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"คุณกำลังจะติดตั้งรุ่น $NEW ของส่วนขยาย '$NAME'\n"
+"โดยมีส่วนขยายรุ่น $DEPLOYED ซึ่งใหม่กว่า ชื่อ '$OLDNAME' ติดตั้งไว้แล้ว\n"
+"คลิก 'ตกลง' เพื่อแทนที่ส่วนขยายเดิมที่ติดตั้งไว้\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการติดตั้ง"
+
+#. AMTBi
+#: desktop/inc/strings.hrc:127
+msgctxt "RID_STR_WARNING_VERSION_EQUAL"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"That version is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"คุณกำลังจะติดตั้งรุ่น $NEW ของส่วนขยาย '$NAME'\n"
+"โดยมีรุ่นดังกล่าวติดตั้งไว้แล้ว\n"
+"คลิก 'ตกลง' เพื่อแทนที่ส่วนขยายเดิมที่ติดตั้งไว้\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการติดตั้ง"
+
+#. 5TDnT
+#: desktop/inc/strings.hrc:131
+msgctxt "RID_STR_WARNINGBOX_VERSION_EQUAL_DIFFERENT_NAMES"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"That version, named '$OLDNAME', is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"คุณกำลังจะติดตั้งรุ่น $NEW ของส่วนขยาย '$NAME'\n"
+"โดยมีรุ่นดังกล่าว ชื่อ '$OLDNAME' ติดตั้งไว้แล้ว\n"
+"คลิก 'ตกลง' เพื่อแทนที่ส่วนขยายเดิมที่ติดตั้งไว้\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการติดตั้ง"
+
+#. 9wcAB
+#: desktop/inc/strings.hrc:135
+msgctxt "RID_STR_WARNING_VERSION_GREATER"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The older version $DEPLOYED is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"คุณกำลังจะติดตั้งรุ่น $NEW ของส่วนขยาย '$NAME'\n"
+"โดยมีส่วนขยายรุ่น $DEPLOYED ซึ่งเก่ากว่าติดตั้งไว้แล้ว\n"
+"คลิก 'ตกลง' เพื่อแทนที่ส่วนขยายเดิมที่ติดตั้งไว้\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการติดตั้ง"
+
+#. 2WQJk
+#: desktop/inc/strings.hrc:139
+msgctxt "RID_STR_WARNINGBOX_VERSION_GREATER_DIFFERENT_NAMES"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The older version $DEPLOYED, named '$OLDNAME', is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"คุณกำลังจะติดตั้งรุ่น $NEW ของส่วนขยาย '$NAME'\n"
+"โดยมีส่วนขยายรุ่น $DEPLOYED ซึ่งเก่ากว่า ชื่อ '$OLDNAME' ติดตั้งไว้แล้ว\n"
+"คลิก 'ตกลง' เพื่อแทนที่ส่วนขยายเดิมที่ติดตั้งไว้\n"
+"คลิก 'ยกเลิก' เพื่อหยุดการติดตั้ง"
+
+#. J2X2b
+#: desktop/inc/strings.hrc:144
+msgctxt "RID_DLG_UPDATE_NONE"
+msgid "No new updates are available."
+msgstr "ไม่มีรายการปรับรุ่น"
+
+#. y7gVg
+#: desktop/inc/strings.hrc:145
+msgctxt "RID_DLG_UPDATE_NOINSTALLABLE"
+msgid "No installable updates are available. To see ignored or disabled updates, mark the check box 'Show all updates'."
+msgstr "ไม่มีรายการปรับรุ่นที่สามารถติดตั้งได้ คุณสามารถดูรายการปรับรุ่นที่ถูกข้ามหรือปิดการทำงานได้ โดยกาช่อง 'แสดงรายการปรับรุ่นทั้งหมด'"
+
+#. rq2Co
+#: desktop/inc/strings.hrc:146
+msgctxt "RID_DLG_UPDATE_FAILURE"
+msgid "An error occurred:"
+msgstr "เกิดข้อผิดพลาด:"
+
+#. 77Hco
+#: desktop/inc/strings.hrc:147
+msgctxt "RID_DLG_UPDATE_UNKNOWNERROR"
+msgid "Unknown error."
+msgstr "ข้อผิดพลาดไม่ทราบสาเหตุ"
+
+#. 7xdom
+#: desktop/inc/strings.hrc:148
+msgctxt "RID_DLG_UPDATE_NODESCRIPTION"
+msgid "No more details are available for this update."
+msgstr "ไม่มีรายละเอียดเพิ่มเติมอีกแล้วสำหรับรายการปรับรุ่นนี้"
+
+#. NECjC
+#: desktop/inc/strings.hrc:149
+msgctxt "RID_DLG_UPDATE_NOINSTALL"
+msgid "The extension cannot be updated because:"
+msgstr "ส่วนขยายไม่สามารถปรับรุ่นได้เพราะ:"
+
+#. BstEF
+#: desktop/inc/strings.hrc:150
+msgctxt "RID_DLG_UPDATE_NODEPENDENCY"
+msgid "Required %PRODUCTNAME version doesn't match:"
+msgstr "ไม่พบ %PRODUCTNAME รุ่นที่ต้องการ:"
+
+#. fz5C3
+#: desktop/inc/strings.hrc:151
+msgctxt "RID_DLG_UPDATE_NODEPENDENCY_CUR_VER"
+msgid "You have %PRODUCTNAME %VERSION"
+msgstr "คุณมี %PRODUCTNAME %VERSION"
+
+#. ofeoD
+#: desktop/inc/strings.hrc:152
+msgctxt "RID_DLG_UPDATE_BROWSERBASED"
+msgid "browser based update"
+msgstr "ปรับรุ่นจากเบราว์เซอร์"
+
+#. 4NJkE
+#: desktop/inc/strings.hrc:153
+msgctxt "RID_DLG_UPDATE_VERSION"
+msgid "Version"
+msgstr "รุ่น"
+
+#. JRSnS
+#: desktop/inc/strings.hrc:154
+msgctxt "RID_DLG_UPDATE_IGNORED_UPDATE"
+msgid "This update will be ignored.\n"
+msgstr "จะข้ามรายการปรับรุ่นนี้\n"
+
+#. Ea8Mi
+#: desktop/inc/strings.hrc:156
+msgctxt "STR_BOOTSTRAP_ERR_CANNOT_START"
+msgid "The application cannot be started. "
+msgstr "โปรแกรมไม่สามารถเริ่มต้นทำงาน "
+
+#. STFHr
+#: desktop/inc/strings.hrc:157
+msgctxt "STR_BOOTSTRAP_ERR_DIR_MISSING"
+msgid "The configuration directory \"$1\" could not be found."
+msgstr "ไม่พบไดเรกทอรีค่าตั้ง \"$1\""
+
+#. bGWux
+#: desktop/inc/strings.hrc:158
+msgctxt "STR_BOOTSTRAP_ERR_PATH_INVALID"
+msgid "The installation path is invalid."
+msgstr "พาธติดตั้งไม่ถูกต้อง"
+
+#. kdZLA
+#: desktop/inc/strings.hrc:159
+msgctxt "STR_BOOTSTRAP_ERR_INTERNAL"
+msgid "An internal error occurred."
+msgstr "เกิดข้อผิดพลาดภายใน"
+
+#. yGBza
+#: desktop/inc/strings.hrc:160
+msgctxt "STR_BOOTSTRAP_ERR_FILE_CORRUPT"
+msgid "The configuration file \"$1\" is corrupt."
+msgstr "แฟ้มค่าตั้ง \"$1\" เสียหาย"
+
+#. CP9Qk
+#: desktop/inc/strings.hrc:161
+msgctxt "STR_BOOTSTRAP_ERR_FILE_MISSING"
+msgid "The configuration file \"$1\" was not found."
+msgstr "ไม่พบแฟ้มค่าตั้ง \"$1\""
+
+#. maapb
+#: desktop/inc/strings.hrc:162
+msgctxt "STR_BOOTSTRAP_ERR_NO_SUPPORT"
+msgid "The configuration file \"$1\" does not support the current version."
+msgstr "แฟ้มค่าตั้ง \"$1\" ไม่รองรับรุ่นปัจจุบัน"
+
+#. q2F59
+#: desktop/inc/strings.hrc:163
+msgctxt "STR_BOOTSTRAP_ERR_LANGUAGE_MISSING"
+msgid "The user interface language cannot be determined."
+msgstr "ไม่สามารถพิจารณาภาษาสำหรับส่วนติดต่อผู้ใช้"
+
+#. UTKHa
+#: desktop/inc/strings.hrc:164
+msgctxt "STR_BOOTSTRAP_ERR_USERINSTALL_FAILED"
+msgid "User installation could not be completed. "
+msgstr "ไม่สามารถติดตั้งโปรแกรมสำหรับผู้ใช้ให้เสร็จสมบูรณ์ "
+
+#. dgxZP
+#: desktop/inc/strings.hrc:165
+msgctxt "STR_BOOTSTRAP_ERR_NO_CFG_SERVICE"
+msgid "The configuration service is not available."
+msgstr "ไม่มีบริการค่าตั้งให้ใช้งาน"
+
+#. wbj4W
+#: desktop/inc/strings.hrc:166
+msgctxt "STR_ASK_START_SETUP_MANUALLY"
+msgid "Start the setup application to repair the installation from the CD or the folder containing the installation packages."
+msgstr "เรียกโปรแกรมติดตั้งเพื่อซ่อมแซมการติดตั้ง โดยใช้ซีดีหรือโฟลเดอร์ที่เก็บแพกเกจติดตั้งต่างๆ"
+
+#. d3or5
+#: desktop/inc/strings.hrc:167
+msgctxt "STR_CONFIG_ERR_ACCESS_GENERAL"
+msgid "A general error occurred while accessing your central configuration. "
+msgstr "เกิดข้อผิดพลาดทั่วไปขณะเข้าถึงค่าตั้งส่วนกลางของคุณ "
+
+#. zBSDM
+#: desktop/inc/strings.hrc:168
+msgctxt "STR_LO_MUST_BE_RESTARTED"
+msgid "%PRODUCTNAME must unfortunately be manually restarted once after installation or update."
+msgstr "จะต้องเริ่ม %PRODUCTNAME ใหม่หลังจากติดตั้งหรือปรับรุ่น"
+
+#. NBTfi
+#: desktop/inc/strings.hrc:169
+msgctxt "STR_QUERY_USERDATALOCKED"
+msgid ""
+"Either another instance of %PRODUCTNAME is accessing your personal settings or your personal settings are locked.\n"
+"Simultaneous access can lead to inconsistencies in your personal settings. Before continuing, you should make sure user '$u' closes %PRODUCTNAME on host '$h'.\n"
+"\n"
+"Do you really want to continue?"
+msgstr ""
+"อาจมีโปรแกรม %PRODUCTNAME ที่ทำงานอยู่กำลังเข้าใช้ข้อมูลค่าตั้งส่วนตัวของคุณ หรือมิฉะนั้น ข้อมูลค่าตั้งส่วนตัวของคุณก็อาจถูกล็อคไว้\n"
+"การเข้าใช้ข้อมูลพร้อมกันอาจทำให้ค่าตั้งส่วนตัวของคุณเกิดความไม่ลงรอยกันได้ ดังนั้น ก่อนที่จะทำต่อไป คุณจึงควรตรวจสอบให้แน่ใจว่าผู้ใช้ '$u' ได้ปิด %PRODUCTNAME บนเครื่อง '$h' แล้ว\n"
+"\n"
+"คุณต้องการที่จะทำต่อไปจริงๆ หรือ?"
+
+#. EB6Yf
+#: desktop/inc/strings.hrc:170
+msgctxt "STR_TITLE_USERDATALOCKED"
+msgid "%PRODUCTNAME %PRODUCTVERSION"
+msgstr "%PRODUCTNAME %PRODUCTVERSION"
+
+#. GiCJZ
+#: desktop/inc/strings.hrc:171
+msgctxt "STR_ERR_PRINTDISABLED"
+msgid "Printing is disabled. No documents can be printed."
+msgstr "การพิมพ์ถูกปิดอยู่ จึงไม่สามารถพิมพ์เอกสารใดได้"
+
+#. VxBTE
+#: desktop/inc/strings.hrc:172
+msgctxt "STR_BOOTSTRAP_ERR_NO_PATHSET_SERVICE"
+msgid "The path manager is not available.\n"
+msgstr "ไม่มีตัวจัดการพาธให้ใช้งาน\n"
+
+#. Cy4Wz
+#: desktop/inc/strings.hrc:173
+msgctxt "STR_BOOTSTRAP_ERR_NOTENOUGHDISKSPACE"
+msgid ""
+"%PRODUCTNAME user installation could not be completed due to insufficient free disk space. Please free more disc space at the following location and restart %PRODUCTNAME:\n"
+"\n"
+msgstr ""
+"การติดตั้ง %PRODUCTNAME ส่วนตัวสำหรับผู้ใช้ไม่สามารถดำเนินการจนเสร็จสิ้นได้ เนื่องจากเนื้อที่ว่างในดิสก์ไม่เพียงพอ กรุณาเคลียร์เนื้อที่ดิสก์ที่ตำแหน่งต่อไปนี้ แล้วเริ่มเปิด %PRODUCTNAME ใหม่:\n"
+"\n"
+
+#. 2o5XG
+#: desktop/inc/strings.hrc:174
+msgctxt "STR_BOOTSTRAP_ERR_NOACCESSRIGHTS"
+msgid ""
+"%PRODUCTNAME user installation could not be processed due to missing access rights. Please make sure that you have sufficient access rights for the following location and restart %PRODUCTNAME:\n"
+"\n"
+msgstr ""
+"การติดตั้ง %PRODUCTNAME ส่วนตัวสำหรับผู้ใช้ไม่สามารถทำได้ เนื่องจากไม่มีสิทธิ์เข้าใช้ กรุณาตรวจสอบให้แน่ใจว่าคุณมีสิทธิ์เข้าถึงตำแหน่งต่อไปนี้ แล้วเริ่มเปิด %PRODUCTNAME ใหม่:\n"
+"\n"
+
+#. uigQN
+#: desktop/inc/strings.hrc:176
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_1"
+msgid "Extension Software License Agreement of $NAME:"
+msgstr "ข้อตกลงใบอนุญาตซอฟต์แวร์ส่วนขยายของ $NAME:"
+
+#. DEkAo
+#: desktop/inc/strings.hrc:177
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_2"
+msgid "Read the complete License Agreement displayed above. Accept the License Agreement by typing \"yes\" on the console then press the Return key. Type \"no\" to decline and to abort the extension setup."
+msgstr "กรุณาอ่านข้อตกลงสัญญาอนุญาตฉบับสมบูรณ์ข้างต้น แล้วยอมรับข้อตกลงสัญญาอนุญาตโดยพิมพ์ \"yes\" ที่คอนโซลแล้วกดปุ่ม Return หรือพิมพ์ \"no\" เพื่อปฏิเสธและยกเลิกการติดตั้งส่วนขยาย"
+
+#. wANiC
+#: desktop/inc/strings.hrc:181
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_3"
+msgid "[Enter \"yes\" or \"no\"]:"
+msgstr "[ป้อน \"yes\" หรือ \"no\"]:"
+
+#. wEFn2
+#: desktop/inc/strings.hrc:182
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_4"
+msgid "Your input was not correct. Please enter \"yes\" or \"no\":"
+msgstr "สิ่งที่คุณป้อนไม่ถูกต้อง กรุณาป้อน \"yes\" หรือ \"no\":"
+
+#. A9CdG
+#: desktop/inc/strings.hrc:183
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_YES"
+msgid "YES"
+msgstr "YES"
+
+#. HLETc
+#: desktop/inc/strings.hrc:184
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_Y"
+msgid "Y"
+msgstr "Y"
+
+#. SQ6jd
+#: desktop/inc/strings.hrc:185
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_NO"
+msgid "NO"
+msgstr "NO"
+
+#. 6LgGA
+#: desktop/inc/strings.hrc:186
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_N"
+msgid "N"
+msgstr "N"
+
+#. aCY73
+#: desktop/inc/strings.hrc:187
+msgctxt "RID_STR_CONCURRENTINSTANCE"
+msgid "unopkg cannot be started. The lock file indicates it is already running. If this does not apply, delete the lock file at:"
+msgstr "unopkg ไม่สามารถเริ่มได้ ไฟล์ล็อคบ่งบอกว่าตัวโปรแกรมกำลังทำงานอยู่แล้ว ซึ่งถ้าไม่ใช่ ก็กรุณาลบไฟล์ล็อคที่:"
+
+#. MLhHo
+#: desktop/inc/strings.hrc:189
+msgctxt "RID_STR_UNOPKG_ERROR"
+msgid "ERROR: "
+msgstr "ข้อผิดพลาด: "
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "เ_พิ่ม"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "เ_ริ่มใช้"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_ยกเลิก"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "ปิ_ด"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_ลบ"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "แ_ก้ไข"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_วิธีใช้"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "ให_ม่"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "ไ_ม่"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_ตกลง"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "ตัด_ออก"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_ล้างค่า"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "ใ_ช่"
+
+#. Qcv5A
+#: desktop/uiconfig/ui/dependenciesdialog.ui:18
+msgctxt "dependenciesdialog|Dependencies"
+msgid "System dependencies check"
+msgstr "การตรวจสอบสิ่งที่จำเป็นต้องใช้ในระบบ"
+
+#. JNnsh
+#: desktop/uiconfig/ui/dependenciesdialog.ui:73
+msgctxt "dependenciesdialog|label1"
+msgid "The extension cannot be installed as the following system dependencies are not fulfilled:"
+msgstr "ส่วนขยายนี้ไม่สามารถติดตั้งได้ เพราะขาดสิ่งที่ต้องใช้ต่อไปนี้ในระบบ:"
+
+#. FfYDj
+#: desktop/uiconfig/ui/extensionmanager.ui:8
+msgctxt "extensionmanager|ExtensionManagerDialog"
+msgid "Extension Manager"
+msgstr "เครื่องมือจัดการส่วนขยาย"
+
+#. gjCkd
+#: desktop/uiconfig/ui/extensionmanager.ui:80
+msgctxt "extensionmanager|shared"
+msgid "Installed for all users"
+msgstr "ติดตั้งสำหรับผู้ใช้ทุกคน"
+
+#. pnXoG
+#: desktop/uiconfig/ui/extensionmanager.ui:89
+msgctxt "extensionmanager|extended_tip|shared"
+msgid "Filter extensions available for all users of this computer."
+msgstr "แสดงส่วนขยายที่ติดตั้งให้ผู้ใช้ทุกคนในเครื่องนี้ใช้งานได้"
+
+#. zhqZT
+#: desktop/uiconfig/ui/extensionmanager.ui:100
+msgctxt "extensionmanager|user"
+msgid "Installed for current user"
+msgstr "ติดตั้งสำหรับผู้ใช้ปัจจุบัน"
+
+#. QbHCi
+#: desktop/uiconfig/ui/extensionmanager.ui:109
+msgctxt "extensionmanager|extended_tip|user"
+msgid "Filter extensions only available for the currently logged in user."
+msgstr "แสดงส่วนขยายที่ติดตั้งให้เฉพาะผู้ใช้ที่กำลังเข้าระบบอยู่นี้ใช้งานได้"
+
+#. 6wBVk
+#: desktop/uiconfig/ui/extensionmanager.ui:120
+msgctxt "extensionmanager|bundled"
+msgid "Bundled with %PRODUCTNAME"
+msgstr "พ่วงมากับ %PRODUCTNAME"
+
+#. nF4rD
+#: desktop/uiconfig/ui/extensionmanager.ui:129
+msgctxt "extensionmanager|extended_tip|bundled"
+msgid "Bundled extensions are installed by the system administrator using the operating system specific installer packages. These can not be installed, updated or removed here."
+msgstr "ส่วนขยายที่พ่วงมานั้นติดตั้งโดยผู้ดูแลระบบโดยใช้แพกเกจติดตั้งเฉพาะของระบบปฏิบัติการ ซึ่งส่วนขยายเหล่านี้ไม่สามารถติดตั้ง ปรับรุ่น หรือถอดถอนได้ในที่นี้"
+
+#. T8BGR
+#: desktop/uiconfig/ui/extensionmanager.ui:144
+msgctxt "extensionmanager|label1"
+msgid "Display Extensions"
+msgstr "แสดงส่วนขยาย"
+
+#. WREKY
+#: desktop/uiconfig/ui/extensionmanager.ui:162
+msgctxt "extensionmanager|search"
+msgid "Search..."
+msgstr ""
+
+#. BAVdg
+#: desktop/uiconfig/ui/extensionmanager.ui:191
+msgctxt "extensionmanager|extended_tip|extensions"
+msgid "Select the extension that you want to remove, enable, or disable. For some extensions, you can also open an Options dialog."
+msgstr "เลือกส่วนขยายที่คุณต้องการถอดถอน เปิดทำงาน หรือปิดใช้งาน และสำหรับส่วนขยายบางตัว คุณยังสามารถเปิดกล่องโต้ตอบปรับตัวเลือกต่างๆ ได้ด้วย"
+
+#. DLME5
+#: desktop/uiconfig/ui/extensionmanager.ui:213
+msgctxt "extensionmanager|optionsbtn"
+msgid "_Options"
+msgstr "ตัวเ_ลือก"
+
+#. DbuQS
+#: desktop/uiconfig/ui/extensionmanager.ui:220
+msgctxt "extensionmanager|extended_tip|optionsbtn"
+msgid "Select an installed extension, then click to open the Options dialog for the extension."
+msgstr "เลือกส่วนขยายที่ติดตั้งไว้ แล้วคลิกปุ่มนี้เพื่อเปิดกล่องโต้ตอบ \"ตัวเลือก\" สำหรับส่วนขยายนั้น"
+
+#. ieiF4
+#: desktop/uiconfig/ui/extensionmanager.ui:232
+msgctxt "extensionmanager|updatebtn"
+msgid "Check for _Updates"
+msgstr "ตรวจสอบการ_ปรับรุ่น"
+
+#. rirpA
+#: desktop/uiconfig/ui/extensionmanager.ui:239
+msgctxt "extensionmanager|extended_tip|updatebtn"
+msgid "Click to check for online updates of all installed extensions. To check for updates of the selected extension only, choose the Update command from the context menu. The check for availability of updates starts immediately."
+msgstr "คลิกปุ่มนี้เพื่อตรวจสอบรายการปรับรุ่นออนไลน์ของส่วนขยายทั้งหมดที่ติดตั้งไว้ หากต้องการตรวจสอบการปรับรุ่นเฉพาะของส่วนขยายที่เลือก ก็เลือกคำสั่ง \"ปรับรุ่น\" ในเมนูคลิกขวา การตรวจสอบรายการปรับรุ่นจะทำทันทีที่คลิกปุ่ม"
+
+#. GehiB
+#: desktop/uiconfig/ui/extensionmanager.ui:252
+msgctxt "extensionmanager|addbtn"
+msgid "_Add"
+msgstr "เ_พิ่ม"
+
+#. MuigK
+#: desktop/uiconfig/ui/extensionmanager.ui:261
+msgctxt "extensionmanager|extended_tip|addbtn"
+msgid "Click Add to add an extension."
+msgstr "คลิก \"เพิ่ม\" เพื่อเพิ่มส่วนขยาย"
+
+#. wNCAw
+#: desktop/uiconfig/ui/extensionmanager.ui:274
+msgctxt "extensionmanager|removebtn"
+msgid "_Remove"
+msgstr "_ถอดถอน"
+
+#. AGoX7
+#: desktop/uiconfig/ui/extensionmanager.ui:281
+msgctxt "extensionmanager|extended_tip|removebtn"
+msgid "Select the extension that you want to remove, and then click Remove."
+msgstr "เลือกส่วนขยายที่คุณต้องการถอดถอน แล้วคลิกปุ่ม \"ถอดถอน\""
+
+#. qHMdq
+#: desktop/uiconfig/ui/extensionmanager.ui:294
+msgctxt "extensionmanager|enablebtn"
+msgid "_Enable"
+msgstr "_เปิดทำงาน"
+
+#. vz3Ti
+#: desktop/uiconfig/ui/extensionmanager.ui:324
+msgctxt "extensionmanager|progressft"
+msgid "Adding %EXTENSION_NAME"
+msgstr "กำลังเพิ่ม %EXTENSION_NAME"
+
+#. A33SB
+#: desktop/uiconfig/ui/extensionmanager.ui:359
+msgctxt "extensionmanager|getextensions"
+msgid "Get more extensions online..."
+msgstr "รับส่วนขยายเพิ่มเติมออนไลน์..."
+
+#. FBvRd
+#: desktop/uiconfig/ui/extensionmanager.ui:367
+msgctxt "extensionmanager|extended_tip|getextensions"
+msgid "You can find a collection of extensions on the Web."
+msgstr "คุณสามารถหาส่วนขยายเพิ่มเติมได้ทางเว็บ"
+
+#. LFF2R
+#: desktop/uiconfig/ui/extensionmanager.ui:399
+msgctxt "extensionmanager|extended_tip|ExtensionManagerDialog"
+msgid "The Extension Manager adds, removes, disables, enables, and updates extensions."
+msgstr "เครื่องมือจัดการส่วนขยาย ใช้เพิ่ม ถอดถอน ปิดใช้งาน เปิดทำงาน และปรับรุ่นส่วนขยายต่างๆ"
+
+#. EGwkP
+#: desktop/uiconfig/ui/installforalldialog.ui:12
+msgctxt "installforalldialog|InstallForAllDialog"
+msgid "For whom do you want to install the extension?"
+msgstr "คุณต้องการติดตั้งส่วนขยายสำหรับใคร?"
+
+#. bFbLc
+#: desktop/uiconfig/ui/installforalldialog.ui:13
+msgctxt "installforalldialog|InstallForAllDialog"
+msgid "Make sure that no further users are working with the same %PRODUCTNAME, when installing an extension for all users in a multi user environment."
+msgstr "โปรดตรวจสอบให้แน่ใจว่าไม่มีผู้ใช้ทำงานกับ %PRODUCTNAME อันเดียวกันแล้ว ก่อนที่จะติดตั้งส่วนขยายสำหรับผู้ใช้ทุกคนในสภาพแวดล้อมหลายผู้ใช้"
+
+#. urmUy
+#: desktop/uiconfig/ui/installforalldialog.ui:24
+msgctxt "installforalldialog|no"
+msgid "_For all users"
+msgstr "สำหรับผู้ใช้ทุก_คน"
+
+#. nPnM4
+#: desktop/uiconfig/ui/installforalldialog.ui:38
+msgctxt "installforalldialog|yes"
+msgid "_Only for me"
+msgstr "สำหรับฉันเ_ท่านั้น"
+
+#. feAcg
+#: desktop/uiconfig/ui/licensedialog.ui:8
+msgctxt "licensedialog|LicenseDialog"
+msgid "Extension Software License Agreement"
+msgstr "ข้อตกลงเงื่อนไขใบอนุญาตซอฟต์แวร์ของส่วนขยาย"
+
+#. Q6dKY
+#: desktop/uiconfig/ui/licensedialog.ui:24
+msgctxt "licensedialog|accept"
+msgid "Accept"
+msgstr "ยอมรับ"
+
+#. zXBFv
+#: desktop/uiconfig/ui/licensedialog.ui:39
+msgctxt "licensedialog|decline"
+msgid "Decline"
+msgstr "ปฏิเสธ"
+
+#. rvo9y
+#: desktop/uiconfig/ui/licensedialog.ui:70
+msgctxt "licensedialog|head"
+msgid "Please follow these steps to proceed with the installation of the extension:"
+msgstr "โปรดทำตามขั้นตอนต่อไปนี้เพื่อดำเนินการติดตั้งส่วนขยาย:"
+
+#. tEDSx
+#: desktop/uiconfig/ui/licensedialog.ui:92
+msgctxt "licensedialog|label2"
+msgid "1."
+msgstr "1."
+
+#. NyS5E
+#: desktop/uiconfig/ui/licensedialog.ui:105
+msgctxt "licensedialog|label3"
+msgid "2."
+msgstr "2."
+
+#. 5h4GZ
+#: desktop/uiconfig/ui/licensedialog.ui:143
+msgctxt "licensedialog|label4"
+msgid "Read the complete License Agreement. Use the scroll bar or the 'Scroll Down' button in this dialog to view the entire license text."
+msgstr "อ่านข้อตกลงสัญญาอนุญาตฉบับสมบูรณ์ กรุณาใช้แถบเลื่อนหรือปุ่ม \"เลื่อนลง\" ในกล่องข้อความนี้ เพื่อดูข้อความทั้งหมดของสัญญาอนุญาต"
+
+#. oyoCK
+#: desktop/uiconfig/ui/licensedialog.ui:160
+msgctxt "licensedialog|label5"
+msgid "Accept the License Agreement for the extension by pressing the 'Accept' button."
+msgstr "ยอมรับสัญญาอนุญาตสำหรับส่วนขยายโดยกดปุ่ม 'ยอมรับ'"
+
+#. ydBcE
+#: desktop/uiconfig/ui/licensedialog.ui:173
+msgctxt "licensedialog|down"
+msgid "_Scroll Down"
+msgstr "เ_ลื่อนลง"
+
+#. x4PCF
+#: desktop/uiconfig/ui/showlicensedialog.ui:8
+msgctxt "showlicensedialog|extended_tip|ShowLicenseDialog"
+msgid "Read the license. Click the Scroll Down button to scroll down if necessary. Click Accept to continue the installation of the extension."
+msgstr "อ่านสัญญาอนุญาต กรุณาใช้แถบเลื่อนหรือปุ่ม \"เลื่อนลง\" หากจำเป็น จากนั้น คลิกปุ่ม 'ยอมรับ' เพื่อดำเนินการติดตั้งส่วนขยายต่อไป"
+
+#. qquCs
+#: desktop/uiconfig/ui/showlicensedialog.ui:13
+msgctxt "showlicensedialog|ShowLicenseDialog"
+msgid "Extension Software License Agreement"
+msgstr "ข้อตกลงสัญญาอนุญาตซอฟต์แวร์ของส่วนขยาย"
+
+#. GX3k2
+#: desktop/uiconfig/ui/updatedialog.ui:24
+msgctxt "updatedialog|UpdateDialog"
+msgid "Extension Update"
+msgstr "ปรับรุ่นส่วนขยาย"
+
+#. DmHy5
+#: desktop/uiconfig/ui/updatedialog.ui:55
+msgctxt "updatedialog|INSTALL"
+msgid "_Install"
+msgstr "_ติดตั้ง"
+
+#. 3bJwo
+#: desktop/uiconfig/ui/updatedialog.ui:122
+msgctxt "updatedialog|UPDATE_LABEL"
+msgid "_Available extension updates"
+msgstr "_รายการปรับรุ่นส่วนขยายที่มี"
+
+#. 3mtLC
+#: desktop/uiconfig/ui/updatedialog.ui:135
+msgctxt "updatedialog|UPDATE_CHECKING"
+msgid "Checking..."
+msgstr "กำลังตรวจสอบ..."
+
+#. WkYgi
+#: desktop/uiconfig/ui/updatedialog.ui:219
+msgctxt "updatedialog|UPDATE_ALL"
+msgid "_Show all updates"
+msgstr "แ_สดงรายการปรับรุ่นทั้งหมด"
+
+#. ihAhY
+#: desktop/uiconfig/ui/updatedialog.ui:228
+msgctxt "updatedialog|extended_tip|UPDATE_ALL"
+msgid "By default, only the downloadable extensions are shown in the dialog. Mark Show all Updates to see also other extensions and error messages."
+msgstr "โดยปกติแล้ว ในกล่องโต้ตอบจะแสดงเฉพาะส่วนขยายที่ดาวน์โหลดได้เท่านั้น คุณสามารถกาช่อง 'แสดงการปรับรุ่นทั้งหมด' เพื่อดูส่วนขยายอื่นด้วยพร้อมทั้งดูข้อความข้อผิดพลาดได้"
+
+#. BriDD
+#: desktop/uiconfig/ui/updatedialog.ui:257
+msgctxt "updatedialog|DESCRIPTION_LABEL"
+msgid "Description"
+msgstr "คำบรรยาย"
+
+#. 7DTtA
+#: desktop/uiconfig/ui/updatedialog.ui:276
+msgctxt "updatedialog|PUBLISHER_LABEL"
+msgid "Publisher:"
+msgstr "ผู้เผยแพร่:"
+
+#. iaD89
+#: desktop/uiconfig/ui/updatedialog.ui:287
+msgctxt "updatedialog|PUBLISHER_LINK"
+msgid "button"
+msgstr "ปุ่ม"
+
+#. kgLHP
+#: desktop/uiconfig/ui/updatedialog.ui:303
+msgctxt "updatedialog|RELEASE_NOTES_LABEL"
+msgid "What is new:"
+msgstr "มีอะไรใหม่:"
+
+#. JqHGH
+#: desktop/uiconfig/ui/updatedialog.ui:314
+msgctxt "updatedialog|RELEASE_NOTES_LINK"
+msgid "Release notes"
+msgstr "บันทึกการออกรุ่น"
+
+#. UEHCd
+#: desktop/uiconfig/ui/updatedialog.ui:352
+msgctxt "updatedialog|extended_tip|DESCRIPTIONS"
+msgid "While checking for updates, you see a progress indicator. Wait for some messages to show up in the dialog, or click Cancel to abort the update check."
+msgstr "ขณะตรวจสอบรายการปรับรุ่น คุณจะเห็นแถบแสดงความคืบหน้า กรุณารอข้อความบางอย่างที่จะปรากฏขึ้นในกล่องโต้ตอบ หรือคลิก 'ยกเลิก' หากต้องการล้มเลิกการตรวจสอบรายการปรับรุ่น"
+
+#. c5FG9
+#: desktop/uiconfig/ui/updatedialog.ui:389
+msgctxt "updatedialog|extended_tip|UpdateDialog"
+msgid "Click the Check for Updates button in the Extension Manager to check for online updates for all installed extensions. To check for online updates for only the selected extension, right-click to open the context menu, then choose Update."
+msgstr "คลิกปุ่ม 'ตรวจสอบการปรับรุ่น' ในเครื่องมือจัดการส่วนขยายเพื่อตรวจสอบรายการปรับรุ่นออนไลน์สำหรับส่วนขยายทั้งหมดที่ติดตั้งไว้ หากต้องการตรวจสอบเฉพาะรายการปรับรุ่นของส่วนขยายที่เลือก ก็คลิกขวาเพื่อเปิดเมนูบริบทแล้วเลือกรายการ 'ปรับรุ่น'"
+
+#. YEhMN
+#: desktop/uiconfig/ui/updateinstalldialog.ui:8
+msgctxt "updateinstalldialog|UpdateInstallDialog"
+msgid "Download and Installation"
+msgstr "ดาวน์โหลดและติดตั้ง"
+
+#. t9MoN
+#: desktop/uiconfig/ui/updateinstalldialog.ui:87
+msgctxt "updateinstalldialog|DOWNLOADING"
+msgid "Downloading extensions..."
+msgstr "กำลังดาวน์โหลดส่วนขยาย..."
+
+#. 3AFnH
+#: desktop/uiconfig/ui/updateinstalldialog.ui:125
+msgctxt "updateinstalldialog|RESULTS"
+msgid "Result"
+msgstr "ผลลัพธ์"
+
+#. Q4xyF
+#: desktop/uiconfig/ui/updateinstalldialog.ui:178
+msgctxt "updateinstalldialog|extended_tip|UpdateInstallDialog"
+msgid "Click the Check for Updates button in the Extension Manager to check for online updates for all installed extensions. To check for online updates for only the selected extension, right-click to open the context menu, then choose Update."
+msgstr "คลิกปุ่ม 'ตรวจสอบการปรับรุ่น' ในเครื่องมือจัดการส่วนขยายเพื่อตรวจสอบรายการปรับรุ่นออนไลน์สำหรับส่วนขยายทั้งหมดที่ติดตั้งไว้ หากต้องการตรวจสอบเฉพาะรายการปรับรุ่นของส่วนขยายที่เลือก ก็คลิกขวาเพื่อเปิดเมนูบริบทแล้วเลือกรายการ 'ปรับรุ่น'"
+
+#. Kfhc4
+#: desktop/uiconfig/ui/updaterequireddialog.ui:8
+msgctxt "updaterequireddialog|UpdateRequiredDialog"
+msgid "Extension Update Required"
+msgstr "จำเป็นต้องปรับรุ่นส่วนขยาย"
+
+#. bp47k
+#: desktop/uiconfig/ui/updaterequireddialog.ui:27
+msgctxt "updaterequireddialog|check"
+msgid "Check for _Updates..."
+msgstr "ตรวจสอบการ_ปรับรุ่น..."
+
+#. 9S2f3
+#: desktop/uiconfig/ui/updaterequireddialog.ui:43
+msgctxt "updaterequireddialog|disable"
+msgid "Disable all"
+msgstr "ปิดใช้งานทั้งหมด"
+
+#. VYnoR
+#: desktop/uiconfig/ui/updaterequireddialog.ui:102
+msgctxt "updaterequireddialog|updatelabel"
+msgid "%PRODUCTNAME has been updated to a new version. Some installed %PRODUCTNAME extensions are not compatible with this version and need to be updated before they can be used."
+msgstr "%PRODUCTNAME มีการปรับรุ่นเป็นรุ่นใหม่ ส่วนขยายบางส่วนของ %PRODUCTNAME ที่ติดตั้งไว้อาจทำงานไม่ได้กับรุ่นใหม่นี้ และจำเป็นต้องปรับรุ่นก่อนจึงจะใช้งานได้"
+
+#. FXDEw
+#: desktop/uiconfig/ui/updaterequireddialog.ui:153
+msgctxt "updaterequireddialog|progresslabel"
+msgid "Adding %EXTENSION_NAME"
+msgstr "กำลังเพิ่ม %EXTENSION_NAME"

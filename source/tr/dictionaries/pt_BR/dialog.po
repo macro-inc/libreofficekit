@@ -1,0 +1,532 @@
+#. extracted from dictionaries/pt_BR/dialog
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-09-10 23:11+0200\n"
+"PO-Revision-Date: 2021-11-04 09:36+0000\n"
+"Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-master/dictionariespt_brdialog/tr/>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.8.1\n"
+"X-POOTLE-MTIME: 1547626418.000000\n"
+
+#. Bshz7
+#: OptionsDialog.xcu
+msgctxt ""
+"OptionsDialog.xcu\n"
+"..OptionsDialog.Nodes.LanguageSettings\n"
+"Label\n"
+"value.text"
+msgid "Language Settings"
+msgstr "Dil Ayarları"
+
+#. BnABt
+#: OptionsDialog.xcu
+msgctxt ""
+"OptionsDialog.xcu\n"
+"..OptionsDialog.Nodes.LanguageSettings.Leaves.org.openoffice.lightproof.pt_BR\n"
+"Label\n"
+"value.text"
+msgid "Grammar Checking (Portuguese)"
+msgstr "Dilbilgisi Denetimi (Portekizce)"
+
+#. UbDte
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spelling\n"
+"property.text"
+msgid "Grammar checking"
+msgstr "Dilbilgisi denetimi"
+
+#. Y3GdR
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_grammar\n"
+"property.text"
+msgid "Identify use of grave accent"
+msgstr "Ağır aksanın kullanımını tanımlayın"
+
+#. y47wU
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"grammar\n"
+"property.text"
+msgid "Grave accent"
+msgstr "Aksan işareti"
+
+#. KTKVL
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_cap\n"
+"property.text"
+msgid "Check missing capitalization of sentences."
+msgstr "Cümle başındaki eksik büyük harfleri denetle."
+
+#. czHGi
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"cap\n"
+"property.text"
+msgid "Capitalization"
+msgstr "Büyük harf kullanımı"
+
+#. 6q87h
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_dup\n"
+"property.text"
+msgid "Check repeated words."
+msgstr "Yinelenen kelimeleri kontrol et."
+
+#. vFbJC
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"dup\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Yinelenen kelime"
+
+#. CkE8A
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_pair\n"
+"property.text"
+msgid "Check missing or extra parentheses and quotation marks."
+msgstr "Eksik ya da gereksiz parantez ve tırnak işaretlerini kontrol et."
+
+#. DWaBt
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"pair\n"
+"property.text"
+msgid "Parentheses"
+msgstr "Parantezler"
+
+#. EJA3T
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"punctuation\n"
+"property.text"
+msgid "Punctuation"
+msgstr "Noktalama işaretleri"
+
+#. GfJce
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_spaces\n"
+"property.text"
+msgid "Check single spaces between words."
+msgstr "Kelimeler arasındaki tek boşlukları kontrol et."
+
+#. 2Cz8d
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spaces\n"
+"property.text"
+msgid "Word spacing"
+msgstr "Sözcük aralama"
+
+#. jh9qT
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_mdash\n"
+"property.text"
+msgid "Force unspaced em dash instead of spaced en dash."
+msgstr "Aralıksız çift tire yerine uzun çizgi kullanımını zorla."
+
+#. QUZwx
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"mdash\n"
+"property.text"
+msgid "Em-dash"
+msgstr "Uzun tire"
+
+#. ijU9H
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_ndash\n"
+"property.text"
+msgid "Force spaced en dash instead of unspaced em dash."
+msgstr "Boşluksuz uzun tire yerine aralıklı tireyi zorla."
+
+#. tyEkH
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"ndash\n"
+"property.text"
+msgid "En-dash"
+msgstr "kısa tire"
+
+#. ZQhno
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_quotation\n"
+"property.text"
+msgid "Check double quotation marks: \"x\" → “x”"
+msgstr "Tırnak işaretlerini kontrol et: \"x\" → “x”"
+
+#. bC8RD
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"quotation\n"
+"property.text"
+msgid "Quotation marks"
+msgstr "Tırnak işaretleri"
+
+#. CARTv
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_times\n"
+"property.text"
+msgid "Check true multiplication sign: 5x5 → 5×5"
+msgstr "Çarpım işleminin gösterimini denetle: 5x5 → 5×5"
+
+#. Y5eQr
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"times\n"
+"property.text"
+msgid "Multiplication sign"
+msgstr "Çarpma işareti"
+
+#. ykeAk
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_spaces2\n"
+"property.text"
+msgid "Check single spaces between sentences."
+msgstr "Cümleler arasındaki tek boşluğu kontrol et."
+
+#. uHT7U
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spaces2\n"
+"property.text"
+msgid "Sentence spacing"
+msgstr "Cümle aralama"
+
+#. WEAJJ
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_spaces3\n"
+"property.text"
+msgid "Check more than two extra space characters between words and sentences."
+msgstr "Cümleler ve sözcükler arasındaki ikiden fazla ek boşluğu denetle."
+
+#. XbDmT
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spaces3\n"
+"property.text"
+msgid "More spaces"
+msgstr "Daha fazla boşluk"
+
+#. Fthsx
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_minus\n"
+"property.text"
+msgid "Change hyphen characters to real minus signs."
+msgstr "Tire karakterini gerçek eksi karakteriyle değiştir."
+
+#. VNuhF
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"minus\n"
+"property.text"
+msgid "Minus sign"
+msgstr "Eksi işareti"
+
+#. nvi9G
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_apostrophe\n"
+"property.text"
+msgid "Change typewriter apostrophe, single quotation marks and correct double primes."
+msgstr "Daktilo apostrofunu, tek tırnak işaretiyle değiştir ve çift tırnakları düzelt."
+
+#. Daynz
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"apostrophe\n"
+"property.text"
+msgid "Apostrophes"
+msgstr "Kesme İşareti"
+
+#. MEi4w
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_ellipsis\n"
+"property.text"
+msgid "Change three dots with ellipsis."
+msgstr "Üç tane noktayı, üç nokta karakteri ile değiştir."
+
+#. ngM8A
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"ellipsis\n"
+"property.text"
+msgid "Ellipsis"
+msgstr "Üç nokta"
+
+#. 5dkwv
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"others\n"
+"property.text"
+msgid "Others"
+msgstr "Diğerleri"
+
+#. ifGmB
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_metric\n"
+"property.text"
+msgid "Identify redundant terms: \"criar novo\", \"subir para cima\", \"beco sem saída\", \"regra geral\"."
+msgstr "Gereksiz terimleri belirleyin: \"criar novo\", \"subir para cima\", \"beco sem saída\", \"regra geral\"."
+
+#. EgY9b
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"metric\n"
+"property.text"
+msgid "Pleonasms"
+msgstr "Pleonazmlar"
+
+#. wAFVA
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_gerund\n"
+"property.text"
+msgid "Inadequate use of gerund: \"estarei trabalhando\", \"vou estar fazendo\"."
+msgstr "İsim fiilin yetersiz kullanımı: \"estarei trabalhando\", \"vou estar fazendo\"."
+
+#. 3cDKm
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"gerund\n"
+"property.text"
+msgid "Gerundisms"
+msgstr "İsim-fiili"
+
+#. eJcDX
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_nonmetric\n"
+"property.text"
+msgid "Ugly or unpleasant sound: \"por cada\"."
+msgstr "Çirkin veya hoş olmayan ses: \"por cada\"."
+
+#. Bidr9
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"nonmetric\n"
+"property.text"
+msgid "Cacophonous sound"
+msgstr "Kakofonik ses"
+
+#. funWi
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_paronimo\n"
+"property.text"
+msgid "Words that are pronounced or written in a similar way but which have different lexical meanings."
+msgstr "Benzer şekilde telaffuz edilen veya yazılan ancak farklı sözlük anlamları olan kelimeler."
+
+#. ua58D
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"paronimo\n"
+"property.text"
+msgid "Paronyms"
+msgstr "Aynı kökenden gelen sözcükler"
+
+#. nJ4AT
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_composto\n"
+"property.text"
+msgid "Compound words written separatedly: \"auto escola\", \"sub contratado\"."
+msgstr "Ayrı ayrı yazılmış birleşik sözcükler: \"auto escola\", \"sub contratado\"."
+
+#. 5TS3y
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"composto\n"
+"property.text"
+msgid "Compound terms"
+msgstr "Bileşik terimler"
+
+#. RM535
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_malmau\n"
+"property.text"
+msgid "Use of \"mal\" or \"mau\"."
+msgstr "\"mal\" ya da \"mau\" kullanımı."
+
+#. SwvCV
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"malmau\n"
+"property.text"
+msgid "\"Mal\" or \"Mau\""
+msgstr "\"Mal\" ya da \"Mau\""
+
+#. pC8xk
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_aha\n"
+"property.text"
+msgid "Use of há or a."
+msgstr "há ya da a kullanımı."
+
+#. HGVSj
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"aha\n"
+"property.text"
+msgid "\"Há\" or \"a\""
+msgstr "\"Há\" ya da \"a\""
+
+#. cBTLG
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_meiameio\n"
+"property.text"
+msgid "Use of \"meia\" or \"meio\"."
+msgstr "\"meia\" ya da \"meio\" kullanımı"
+
+#. RxzDW
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"meiameio\n"
+"property.text"
+msgid "\"Meia\" or \"meio\""
+msgstr "\"Meia\" ya da \"meio\""
+
+#. bNA4x
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_verbo\n"
+"property.text"
+msgid "Check verbal agreement."
+msgstr "Sözlü anlaşmayı kontrol edin."
+
+#. Ekweu
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"verbo\n"
+"property.text"
+msgid "Verbal agreement"
+msgstr "Sözlü anlaşma"
+
+#. wRBb9
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_pronominal\n"
+"property.text"
+msgid "Position that personal pronouns occupy in relation to the verb."
+msgstr "Kişi zamirlerinin fiile göre yer aldığı konum."
+
+#. FHPjP
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"pronominal\n"
+"property.text"
+msgid "Pronominal placement"
+msgstr "Pronominal yerleşim"
+
+#. iiTDb
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_pronome\n"
+"property.text"
+msgid "Use of pronoun."
+msgstr "Zamir kullanımı."
+
+#. ETD6e
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"pronome\n"
+"property.text"
+msgid "Use of pronouns"
+msgstr "Zamirlerin kullanımı"
+
+#. szSVE
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_porque\n"
+"property.text"
+msgid "Check for \"porque\", \"por que\", \"porquê\" and \"por quê\"."
+msgstr "\"porque\", \"por que\", \"porquê\" ve \"por quê\" için denetle."
+
+#. 7QjsH
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"porque\n"
+"property.text"
+msgid "Use of \"porquê\""
+msgstr "\"porquê\" kullanımı"

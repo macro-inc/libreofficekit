@@ -1,0 +1,305 @@
+#. extracted from dictionaries/hu_HU/dialog
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2023-02-01 09:33+0000\n"
+"Last-Translator: Jun NOGATA <nogajun@gmail.com>\n"
+"Language-Team: Japanese <https://translations.documentfoundation.org/projects/libo_ui-master/dictionarieshu_hudialog/ja/>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1415683520.000000\n"
+
+#. jFVKx
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spelling\n"
+"property.text"
+msgid "Spelling"
+msgstr "つづり"
+
+#. DrGWV
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"cap\n"
+"property.text"
+msgid "Capitalization"
+msgstr "文頭の大文字化"
+
+#. z3yr8
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"par\n"
+"property.text"
+msgid "Parentheses"
+msgstr "丸括弧"
+
+#. igaaQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"wordpart\n"
+"property.text"
+msgid "Word parts of compounds"
+msgstr "合成語の部分となる語"
+
+#. L5Fo6
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"comma\n"
+"property.text"
+msgid "Comma usage"
+msgstr "コンマの用法"
+
+#. hgUiH
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"proofreading\n"
+"property.text"
+msgid "Proofreading"
+msgstr "査読"
+
+#. VPQmL
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"style\n"
+"property.text"
+msgid "Style checking"
+msgstr "スタイルのチェック"
+
+#. tALAw
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"compound\n"
+"property.text"
+msgid "Underline typo-like compound words"
+msgstr "誤植に見える合成語の単語に下線"
+
+#. sxQau
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"allcompound\n"
+"property.text"
+msgid "Underline all generated compound words"
+msgstr "生成された合成語の単語に下線"
+
+#. FdR3D
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"grammar\n"
+"property.text"
+msgid "Possible mistakes"
+msgstr "間違いと思われる箇所"
+
+#. DPEKs
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"money\n"
+"property.text"
+msgid "Consistency of money amounts"
+msgstr "金額の一貫性"
+
+#. 3uXGW
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"duplication\n"
+"property.text"
+msgid "Word duplication"
+msgstr "単語の重複"
+
+#. Y2AD9
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup0\n"
+"property.text"
+msgid "Word duplication"
+msgstr "単語の重複"
+
+#. gsa8G
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup\n"
+"property.text"
+msgid "Duplication within clauses"
+msgstr "文節内での重複"
+
+#. NfAqF
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup2\n"
+"property.text"
+msgid "Duplication within sentences"
+msgstr "文の中での重複"
+
+#. MHboa
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup3\n"
+"property.text"
+msgid "Allow previous checkings with affixes"
+msgstr "接頭語・接尾語を付けて直前のチェックを行う"
+
+#. CBEZj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"numpart\n"
+"property.text"
+msgid "Thousand separation of numbers"
+msgstr "数値を千の単位で分割"
+
+#. BSBZA
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"typography\n"
+"property.text"
+msgid "Typography"
+msgstr "タイポグラフィ"
+
+#. MGpiu
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"quot\n"
+"property.text"
+msgid "Quotation marks"
+msgstr "引用符"
+
+#. x3GM2
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"apost\n"
+"property.text"
+msgid "Apostrophe"
+msgstr "アポストロフィ"
+
+#. kcfut
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dash\n"
+"property.text"
+msgid "En dash"
+msgstr "enダッシュ"
+
+#. qbUaJ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"elli\n"
+"property.text"
+msgid "Ellipsis"
+msgstr "省略記号"
+
+#. CmffD
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"ligature\n"
+"property.text"
+msgid "Ligature suggestion"
+msgstr "合字の提案"
+
+#. TwxSo
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"noligature\n"
+"property.text"
+msgid "Underline ligatures"
+msgstr "合字に下線"
+
+#. rE4tQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"frac\n"
+"property.text"
+msgid "Fractions"
+msgstr "分数"
+
+#. UJKCj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"thin\n"
+"property.text"
+msgid "Thin space"
+msgstr "細い空白"
+
+#. SZQdU
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces\n"
+"property.text"
+msgid "Double spaces"
+msgstr "二重の空白"
+
+#. FqzDS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces2\n"
+"property.text"
+msgid "More spaces"
+msgstr "さらなる空白"
+
+#. FVCTr
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"idx\n"
+"property.text"
+msgid "Indices"
+msgstr "インデックス"
+
+#. E5PBN
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"minus\n"
+"property.text"
+msgid "Minus"
+msgstr "マイナス"
+
+#. nrJ49
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"SI\n"
+"property.text"
+msgid "Measurements"
+msgstr "測定単位"
+
+#. wAjsS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"hyphen\n"
+"property.text"
+msgid "Hyphenation of ambiguous words"
+msgstr "あいまいな単語のハイフン"

@@ -1,0 +1,944 @@
+#. extracted from helpcontent2/source/text/sdraw/04
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-10-24 10:35+0000\n"
+"Last-Translator: Mister Update <mr.update@yahoo.de>\n"
+"Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textsdraw04/de/>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1532496289.000000\n"
+
+#. XCKCk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys for Drawings"
+msgstr "Tastenkombinationen für Zeichnungen"
+
+#. 2VC98
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3156441\n"
+"help.text"
+msgid "<bookmark_value>shortcut keys;in drawings</bookmark_value>         <bookmark_value>drawings; shortcut keys</bookmark_value>"
+msgstr "<bookmark_value>Tastenkombinationen; in Zeichnungen</bookmark_value><bookmark_value>Zeichnungen; Tastenkombinationen</bookmark_value>"
+
+#. dRd3N
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156441\n"
+"help.text"
+msgid "<variable id=\"draw_keys\"><link href=\"text/sdraw/04/01020000.xhp\">Shortcut Keys for Drawings</link></variable>"
+msgstr "<variable id=\"draw_keys\"><link href=\"text/sdraw/04/01020000.xhp\">Tastenkombinationen für Zeichnungen</link></variable>"
+
+#. 92ApE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153877\n"
+"help.text"
+msgid "The following is a list of shortcut keys specific to Drawing documents."
+msgstr "Hier finden Sie eine Liste von Tastenkombinationen, die nur im Umgang mit Zeichnungsdokumenten interessant sind."
+
+#. SCBBa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154730\n"
+"help.text"
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys for $[officename]</link>."
+msgstr "Zusätzlich gelten die allgemeinen <link href=\"text/shared/04/01010000.xhp\">Tastenkombinationen von $[officename]</link>."
+
+#. pKEcC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149121\n"
+"help.text"
+msgid "Function Keys for Drawings"
+msgstr "Funktionstasten bei Zeichnungsdokumenten"
+
+#. EgDjQ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155768\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tastenkombinationen"
+
+#. A3Ecx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153713\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Wirkung</emph>"
+
+#. 35AGo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150044\n"
+"help.text"
+msgid "F2"
+msgstr "F2"
+
+#. zPdFf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152346\n"
+"help.text"
+msgid "Add or edit text."
+msgstr "Text hinzufügen oder bearbeiten."
+
+#. bX7Vf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154705\n"
+"help.text"
+msgid "F3"
+msgstr "F3"
+
+#. YTmqy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147004\n"
+"help.text"
+msgid "Opens group to edit individual objects."
+msgstr "Betritt die Gruppierung, um Einzelobjekte zu bearbeiten."
+
+#. AnEMG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155113\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+F3"
+
+#. GarrN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159238\n"
+"help.text"
+msgid "Close group editor."
+msgstr "Gruppierung verlassen."
+
+#. FoqKt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150199\n"
+"help.text"
+msgid "Shift+F3"
+msgstr "Umschalt+F3"
+
+#. yHpE6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152994\n"
+"help.text"
+msgid "Opens the <emph>Duplicate</emph> dialog."
+msgstr "Öffnet den Dialog <emph>Duplizieren</emph>."
+
+#. LbMoJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154488\n"
+"help.text"
+msgid "F4"
+msgstr "F4"
+
+#. wycWB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149406\n"
+"help.text"
+msgid "Opens the <emph>Position and Size</emph> dialog."
+msgstr "Öffnet den Dialog <emph>Position und Größe</emph>."
+
+#. Pbj7r
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148870\n"
+"help.text"
+msgid "F5"
+msgstr "F5"
+
+#. iYdpq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153917\n"
+"help.text"
+msgid "Opens the <emph>Navigator</emph>."
+msgstr "Öffnet den <emph>Navigator</emph>."
+
+#. tVgoy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3157982\n"
+"help.text"
+msgid "F7"
+msgstr "F7"
+
+#. Z87qg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154649\n"
+"help.text"
+msgid "Checks spelling."
+msgstr "Rechtschreibprüfung."
+
+#. nc3yd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152869\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+F7"
+
+#. 5ihC7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154765\n"
+"help.text"
+msgid "Opens the <emph>Thesaurus</emph>."
+msgstr "Öffnet das Fenster <emph>Thesaurus</emph>."
+
+#. 8FFCE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146962\n"
+"help.text"
+msgid "F8"
+msgstr "F8"
+
+#. 4bM8S
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154707\n"
+"help.text"
+msgid "Edit points on/off."
+msgstr "Punkte bearbeiten ein/aus."
+
+#. aUXTB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149317\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F8"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+F8"
+
+#. eBQXC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147250\n"
+"help.text"
+msgid "Fits to frame."
+msgstr "Text an Rahmen anpassen."
+
+#. 3wrBe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150434\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+T</caseinline><defaultinline>F11</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+T</caseinline><defaultinline>F11</defaultinline></switchinline>"
+
+#. 88RUh
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151389\n"
+"help.text"
+msgid "Opens Styles window."
+msgstr "Öffnet die Formatvorlagen."
+
+#. fajPA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3150393\n"
+"help.text"
+msgid "<bookmark_value>zooming;shortcut keys</bookmark_value>      <bookmark_value>drawings; zoom function in</bookmark_value>"
+msgstr "<bookmark_value>Maßstäbe; Tastenkombinationen</bookmark_value><bookmark_value>Zeichnungen; Maßstäbe</bookmark_value>"
+
+#. LiyWC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150393\n"
+"help.text"
+msgid "Shortcut Keys for Drawings"
+msgstr "Tastenkombinationen für Zeichnungen"
+
+#. VwQCG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156401\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tastenkombinationen"
+
+#. wEgcG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146323\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Wirkung</emph>"
+
+#. LsRSM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149946\n"
+"help.text"
+msgid "Plus(+) Key"
+msgstr "Plus (+)"
+
+#. o3zYS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159119\n"
+"help.text"
+msgid "Zooms in."
+msgstr "Vergrößert die Ansicht."
+
+#. Bxigw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150655\n"
+"help.text"
+msgid "Minus(-) Key"
+msgstr "Minus (-)"
+
+#. 3psr4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145827\n"
+"help.text"
+msgid "Zooms out."
+msgstr "Verkleinert die Ansicht."
+
+#. apXDE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149886\n"
+"help.text"
+msgid "Multiple(×) Key (number pad)"
+msgstr "Multiplikation (*) (Ziffernblock)"
+
+#. LuerC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150746\n"
+"help.text"
+msgid "Zooms to fit entire page in screen."
+msgstr "Stellt die ganze Seite dar."
+
+#. Lc4EE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154841\n"
+"help.text"
+msgid "Divide (÷) Key (number pad)"
+msgstr "Division (÷) (Ziffernblock)"
+
+#. r8C6V
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153039\n"
+"help.text"
+msgid "Zooms in on the current selection."
+msgstr "Stellt die aktuelle Auswahl dar."
+
+#. Kttme
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150867\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+G"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+G"
+
+#. xdhfv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149250\n"
+"help.text"
+msgid "Groups selected objects."
+msgstr "Gruppiert ausgewählte Objekte."
+
+#. sFFsB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149955\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+A"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Option</caseinline><defaultinline>Strg+Alt</defaultinline></switchinline>+Umschalt+A"
+
+#. Vpa4M
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148582\n"
+"help.text"
+msgid "Ungroups selected group."
+msgstr "Hebt die ausgewählte Gruppierung auf."
+
+#. WZJry
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146852\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+K"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline> Strg</defaultinline></switchinline>+Umschalt+K"
+
+#. CCwzy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153110\n"
+"help.text"
+msgid "Combines selected objects."
+msgstr "Kombination ausgewählter Objekte."
+
+#. 84EDw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153567\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+K"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Option</caseinline><defaultinline>Strg+Alt</defaultinline></switchinline>+Umschalt+K"
+
+#. gscGJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147366\n"
+"help.text"
+msgid "Uncombines selected objects."
+msgstr "Hebt die Kombination der ausgewählten Objekte auf."
+
+#. TQoYQ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153730\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+ +"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+Plus"
+
+#. rXBFC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155928\n"
+"help.text"
+msgid "Bring to front."
+msgstr "Ganz nach vorn."
+
+#. uTL6F
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145245\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ +"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Plus"
+
+#. XXV5X
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148393\n"
+"help.text"
+msgid "Bring forward."
+msgstr "Weiter nach vorn."
+
+#. 3RF6B
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150928\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ -"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Minus"
+
+#. xs2NW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156062\n"
+"help.text"
+msgid "Send backward."
+msgstr "Weiter nach hinten."
+
+#. KWYVf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145298\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+ -"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+Minus"
+
+#. ECARZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149028\n"
+"help.text"
+msgid "Send to back."
+msgstr "Ganz nach hinten."
+
+#. FAgrL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147533\n"
+"help.text"
+msgid "Shortcut Keys Specific to Drawings"
+msgstr "Spezielle Tastenkombinationen bei Zeichnungsdokumenten"
+
+#. Syicg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154865\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tastenkombinationen"
+
+#. xJEaM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155370\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Wirkung</emph>"
+
+#. XPybN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AD7\n"
+"help.text"
+msgid "Page Up"
+msgstr "Bild nach oben"
+
+#. qXfSM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10ADC\n"
+"help.text"
+msgid "Switch to previous page"
+msgstr "Zur vorherigen Seite wechseln."
+
+#. 3bsWt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AE2\n"
+"help.text"
+msgid "Page Down"
+msgstr "Bild nach unten"
+
+#. vZpFY
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AE7\n"
+"help.text"
+msgid "Switch to next page"
+msgstr "Zur nächsten Seite wechseln."
+
+#. VfFr5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AED\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Bild nach oben"
+
+#. qH8YG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AFD\n"
+"help.text"
+msgid "Switch to previous layer"
+msgstr "Zur vorherigen Ebene wechseln."
+
+#. 42DMR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AF8\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Bild nach unten"
+
+#. hTrtc
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AF2\n"
+"help.text"
+msgid "Switch to next layer"
+msgstr "Zur nächsten Ebene wechseln."
+
+#. FjvJT
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153927\n"
+"help.text"
+msgid "Arrow Key"
+msgstr "Pfeiltaste"
+
+#. DXEyq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155986\n"
+"help.text"
+msgid "Moves the selected object in the direction of the arrow key."
+msgstr "Bewegt das markierte Objekt in Pfeilrichtung."
+
+#. YFWGm
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156259\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Pfeiltasten"
+
+#. 8G82c
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147171\n"
+"help.text"
+msgid "Moves the page view in the direction of the arrow key."
+msgstr "Bewegt die Ansicht der Seite in die gewählte Richtung."
+
+#. 4QazT
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152484\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>-click while dragging an object. Note: this shortcut key works only when the <link href=\"text/shared/optionen/01070500.xhp\">Copy when moving</link> option in <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - %PRODUCTNAME Draw - General is enabled (it is enabled by default)."
+msgstr "Halten Sie <switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline> beim Ziehen am Objekt gedrückt. Hinweis: Sie müssen erst die Option <link href=\"text/shared/optionen/01070500.xhp\">Kopie beim Verschieben</link> unter <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME – Einstellungen</caseinline><defaultinline>Extras – Optionen…</defaultinline></switchinline> – %PRODUCTNAME Draw – Allgemein aktivieren, um diese Tastenkombination nutzen zu können."
+
+#. KVYGa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149450\n"
+"help.text"
+msgid "Creates a copy of the dragged object when mouse button is released."
+msgstr "Beim Bewegen des ausgewählten Objekts wird eine Kopie erzeugt."
+
+#. owujw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154643\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter with keyboard focus (F6) on a drawing object icon on Tools bar"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Eingabetaste bei Auswahl eines Zeichnungsobjekts aus der Symbolleiste Extras (mit F6 aktivieren)"
+
+#. LchHG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150756\n"
+"help.text"
+msgid "Inserts a drawing object of default size into the center of the current view."
+msgstr "Fügt in der Mitte der aktuellen Ansicht des Dokuments ein Zeichnungsobjekt mit vorgegebenen Maßen ein."
+
+#. xADuF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151189\n"
+"help.text"
+msgid "Shift+F10"
+msgstr "Umschalt+F10"
+
+#. wBQCG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151266\n"
+"help.text"
+msgid "Opens the context menu for the selected object."
+msgstr "Ruft das Kontextmenü eines ausgewählten Objekts auf."
+
+#. hREqR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156100\n"
+"help.text"
+msgid "F2"
+msgstr "F2"
+
+#. AANAF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156323\n"
+"help.text"
+msgid "Enters text mode."
+msgstr "Ist ein textfähiges Objekt ausgewählt, wird der Texteingabemodus aktiviert."
+
+#. jVnMA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147563\n"
+"help.text"
+msgid "Enter"
+msgstr "Eingabetaste"
+
+#. 6kqmA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150258\n"
+"help.text"
+msgid "Enters text mode if a text object is selected."
+msgstr "Ist ein textfähiges Objekt ausgewählt, wird der Texteingabemodus aktiviert."
+
+#. qtjRB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155851\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Eingabetaste"
+
+#. 2HVcw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154046\n"
+"help.text"
+msgid "Enters text mode if a text object is selected. If there are no text objects or if you have cycled through all of the text objects on the page, a new page is inserted."
+msgstr "Ist ein textfähiges Objekt ausgewählt, wird der Texteingabemodus aktiviert. Ist das letzte textfähige Objekt erreicht, wird eine Kopie der aktuellen Seite angelegt. Ist kein textfähiges Objekt ausgewählt, wird eine Kopie der aktuellen Seite angelegt."
+
+#. 5MSC7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149977\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>"
+
+#. 9QSpM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152812\n"
+"help.text"
+msgid "Press the <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> key and drag with the mouse to draw or resize an object from the center of the object outward."
+msgstr "Beim Erstellen oder bei einer Größenänderung von Objekten wird beim Drücken von <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> zentrisch konstruiert."
+
+#. 96WvT
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3143232\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+ click on an object"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+ Klick auf ein Objekt"
+
+#. 2xfiS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156007\n"
+"help.text"
+msgid "Selects the object behind the currently selected object."
+msgstr "Wählt das hinter dem aktuell gewählten Objekt liegende Objekt aus."
+
+#. C4F7t
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147252\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+click an object"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Umschalt und Mausklick auf ein Objekt"
+
+#. HKrSi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145666\n"
+"help.text"
+msgid "Selects the object in front of the currently selected object."
+msgstr "Wählt das vor dem aktuell ausgewählten Objekt liegende Objekt aus."
+
+#. siWfA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155325\n"
+"help.text"
+msgid "Shift key while selecting an object"
+msgstr "Umschalt beim Markieren eines Objekts"
+
+#. hEPFb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159343\n"
+"help.text"
+msgid "Adds or removes object to or from the selection."
+msgstr "Das Objekt wird der Auswahl hinzugefügt, wenn es noch nicht ausgewählt war, beziehungsweise aus der Auswahl entfernt, wenn es schon ausgewählt war."
+
+#. aJLvE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3083282\n"
+"help.text"
+msgid "Shift+ drag while moving an object"
+msgstr "Umschalt und ein Objekt mit der Maus verschieben"
+
+#. bAGEn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145620\n"
+"help.text"
+msgid "The movement of the selected object is constrained by multiples of 45 degrees."
+msgstr "Das ausgewählte Objekt wird in Schritten von 45° gedreht."
+
+#. DRuc6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154933\n"
+"help.text"
+msgid "Shift+drag while creating or resizing an object"
+msgstr "Umschalt beim Vergrößern/Erstellen"
+
+#. N8wCE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148831\n"
+"help.text"
+msgid "Constrains the size to keep the object's aspect ratio."
+msgstr "Ändert die Größe, erhält aber die Seitenverhältnisse."
+
+#. Asv5U
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154205\n"
+"help.text"
+msgid "Tab"
+msgstr "Tab"
+
+#. if8Ns
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148804\n"
+"help.text"
+msgid "Cycles through the objects on the page in the order in which they were created."
+msgstr "Es erfolgt eine Auswahl der einzelnen Objekte in der Reihenfolge der Erstellung vom ersten bis zum letzten Objekt."
+
+#. uD9Ei
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145410\n"
+"help.text"
+msgid "Shift+Tab"
+msgstr "Umschalt+Tab"
+
+#. W5FNA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149764\n"
+"help.text"
+msgid "Cycles through the objects on the page in the reverse-order in which they were created."
+msgstr "Auswahl der Objekte in der Reihenfolge der Erstellung vom letzten bis zum ersten Objekt."
+
+#. ypTEg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3158399\n"
+"help.text"
+msgid "Esc"
+msgstr "Esc"
+
+#. DncmW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3109840\n"
+"help.text"
+msgid "Exits current mode."
+msgstr "Schaltet auf den Auswahlmodus um, wenn ein Zeichenwerkzeug aktiv ist. Hebt die Auswahl eines Objekts auf. Beendet den Texteingabemodus eines Objekts. Das Objekt bleibt weiterhin markiert."

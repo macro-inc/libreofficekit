@@ -1,0 +1,305 @@
+#. extracted from dictionaries/hu_HU/dialog
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2016-09-01 23:34+0000\n"
+"Last-Translator: Olivier Hallot <olivier.hallot@documentfoundation.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1472772847.000000\n"
+
+#. jFVKx
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spelling\n"
+"property.text"
+msgid "Spelling"
+msgstr "Ortografia"
+
+#. DrGWV
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"cap\n"
+"property.text"
+msgid "Capitalization"
+msgstr "Maiúsculas"
+
+#. z3yr8
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"par\n"
+"property.text"
+msgid "Parentheses"
+msgstr "Parênteses"
+
+#. igaaQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"wordpart\n"
+"property.text"
+msgid "Word parts of compounds"
+msgstr "Partes de palavras compostas"
+
+#. L5Fo6
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"comma\n"
+"property.text"
+msgid "Comma usage"
+msgstr "Utilização da vírgula"
+
+#. hgUiH
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"proofreading\n"
+"property.text"
+msgid "Proofreading"
+msgstr "Revisão"
+
+#. VPQmL
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"style\n"
+"property.text"
+msgid "Style checking"
+msgstr "Verificação de estilo"
+
+#. tALAw
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"compound\n"
+"property.text"
+msgid "Underline typo-like compound words"
+msgstr "Sublinhar palavras compostas semelhantes a erros"
+
+#. sxQau
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"allcompound\n"
+"property.text"
+msgid "Underline all generated compound words"
+msgstr "Sublinhar todas as palavras compostas geradas"
+
+#. FdR3D
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"grammar\n"
+"property.text"
+msgid "Possible mistakes"
+msgstr "Erros possíveis"
+
+#. DPEKs
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"money\n"
+"property.text"
+msgid "Consistency of money amounts"
+msgstr "Consistência de valores monetários"
+
+#. 3uXGW
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"duplication\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Palavras duplicadas"
+
+#. Y2AD9
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup0\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Palavras duplicadas"
+
+#. gsa8G
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup\n"
+"property.text"
+msgid "Duplication within clauses"
+msgstr "Palavras duplicadas em proposições"
+
+#. NfAqF
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup2\n"
+"property.text"
+msgid "Duplication within sentences"
+msgstr "Palavras duplicadas em frases"
+
+#. MHboa
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup3\n"
+"property.text"
+msgid "Allow previous checkings with affixes"
+msgstr "Permitir verificações anteriores com afixos"
+
+#. CBEZj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"numpart\n"
+"property.text"
+msgid "Thousand separation of numbers"
+msgstr "Separador de milhares dos números"
+
+#. BSBZA
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"typography\n"
+"property.text"
+msgid "Typography"
+msgstr "Tipografia"
+
+#. MGpiu
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"quot\n"
+"property.text"
+msgid "Quotation marks"
+msgstr "Aspas"
+
+#. x3GM2
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"apost\n"
+"property.text"
+msgid "Apostrophe"
+msgstr "Apóstrofo"
+
+#. kcfut
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dash\n"
+"property.text"
+msgid "En dash"
+msgstr "Meia risca"
+
+#. qbUaJ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"elli\n"
+"property.text"
+msgid "Ellipsis"
+msgstr "Reticências"
+
+#. CmffD
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"ligature\n"
+"property.text"
+msgid "Ligature suggestion"
+msgstr "Sugestão de ligação"
+
+#. TwxSo
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"noligature\n"
+"property.text"
+msgid "Underline ligatures"
+msgstr "Ligações sublinhadas"
+
+#. rE4tQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"frac\n"
+"property.text"
+msgid "Fractions"
+msgstr "Frações"
+
+#. UJKCj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"thin\n"
+"property.text"
+msgid "Thin space"
+msgstr "\"Thin space\""
+
+#. SZQdU
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces\n"
+"property.text"
+msgid "Double spaces"
+msgstr "Espaços duplos"
+
+#. FqzDS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces2\n"
+"property.text"
+msgid "More spaces"
+msgstr "Espaços adicionais"
+
+#. FVCTr
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"idx\n"
+"property.text"
+msgid "Indices"
+msgstr "Índices"
+
+#. E5PBN
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"minus\n"
+"property.text"
+msgid "Minus"
+msgstr "Menos"
+
+#. nrJ49
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"SI\n"
+"property.text"
+msgid "Measurements"
+msgstr "Medidas"
+
+#. wAjsS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"hyphen\n"
+"property.text"
+msgid "Hyphenation of ambiguous words"
+msgstr "Hifenização de palavras ambíguas"

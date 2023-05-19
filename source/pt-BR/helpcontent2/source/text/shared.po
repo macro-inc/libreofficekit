@@ -1,0 +1,2897 @@
+#. extracted from helpcontent2/source/text/shared
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-12-27 11:24+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
+"Language-Team: Portuguese (Brazil) <https://translations.documentfoundation.org/projects/libo_help-master/textshared/pt_BR/>\n"
+"Language: pt-BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1546950112.000000\n"
+
+#. fcmzq
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Find Bar"
+msgstr "Barra Localizar"
+
+#. ZBBdy
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"bm_id871641583188415\n"
+"help.text"
+msgid "<bookmark_value>Find toolbar</bookmark_value>"
+msgstr "<bookmark_value>Barra de ferramentas Localizar</bookmark_value>"
+
+#. JS8DE
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id701641581066778\n"
+"help.text"
+msgid "<link href=\"/text/shared/find_toolbar.xhp\">Find Bar</link>"
+msgstr "<link href=\"/text/shared/find_toolbar.xhp\">Barra Localizar</link>"
+
+#. X55wK
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id3147762\n"
+"help.text"
+msgid "The <menuitem>Find</menuitem> toolbar can be used to quickly search the contents of %PRODUCTNAME documents."
+msgstr "A barra de ferramentas <menuitem>Localizar</menuitem> pode ser utilizada para pesquisar rapidamente o conteúdo dos documentos do %PRODUCTNAME."
+
+#. wMCEY
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id211641581251728\n"
+"help.text"
+msgid "Use the shortcut <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode> + F</keycode> to quickly open the <menuitem>Find</menuitem> toolbar."
+msgstr "Use o atalho <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Comando</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F </keycode> para abrir rapidamente a barra de ferramentas <menuitem>Localizar</menuitem>."
+
+#. DCYmX
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id991641581514302\n"
+"help.text"
+msgid "Find Text"
+msgstr "Localizar texto"
+
+#. 979Nt
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id921641581538352\n"
+"help.text"
+msgid "Enter the text to be searched in the document. Press <keycode>Enter</keycode> to perform the search."
+msgstr "Entre com o texto a ser pesquisado no documento. Pressione <keycode>Enter</keycode> para realizar a pesquisa."
+
+#. vYcEW
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id831641581895099\n"
+"help.text"
+msgid "Find Previous"
+msgstr "Localizar anterior"
+
+#. e8qFg
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id11641581906556\n"
+"help.text"
+msgid "Moves the cursor and selects the previous match of the search text."
+msgstr "Move o cursor e seleciona a correspondência anterior do texto de pesquisa."
+
+#. t33RZ
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id851642423451259\n"
+"help.text"
+msgid "<image src=\"cmd/lc_upsearch.svg\" id=\"img_id171642423451259\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id261642423451259\">Find Previous Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_upsearch.svg\" id=\"img_id171642423451259\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id261642423451259\">Ícone Localizar anterior</alt></image>"
+
+#. Tu26F
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id351642423451259\n"
+"help.text"
+msgid "Find Previous Icon"
+msgstr "Ícone Localizar anterior"
+
+#. CCfcg
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id941641581943416\n"
+"help.text"
+msgid "Find Next"
+msgstr "Localizar o próximo"
+
+#. gwMV9
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id261641581953287\n"
+"help.text"
+msgid "Moves the cursor and selects the next match of the search text."
+msgstr "Move o cursor e seleciona a próxima correspondência do texto pesquisado."
+
+#. PUsAY
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id111642423456841\n"
+"help.text"
+msgid "<image src=\"cmd/lc_downsearch.svg\" id=\"img_id111642423456841\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111642423456841\">Find Next Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_downsearch.svg\" id=\"img_id111642423456841\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111642423456841\">Ícone Localizar o próximo</alt></image>"
+
+#. kuiD9
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id111642423456842\n"
+"help.text"
+msgid "Find Next Icon"
+msgstr "Ícone Localizar o próximo"
+
+#. 5nZqX
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id81641582044927\n"
+"help.text"
+msgid "Find All"
+msgstr "Localizar todos"
+
+#. DFtSe
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id181641582056429\n"
+"help.text"
+msgid "Highlights all matches in the document."
+msgstr "Destaca todas as correspondências no documento."
+
+#. xFTTt
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id631641582107024\n"
+"help.text"
+msgid "Match Case"
+msgstr "Diferenciar maiúsculas de minúsculas"
+
+#. 42qsF
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id461641582121199\n"
+"help.text"
+msgid "Choose this option to perform case-sensitive search."
+msgstr "Escolha esta opção para realizar uma pesquisa com distinção entre maiúsculas e minúsculas."
+
+#. nhwRU
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id271641582528169\n"
+"help.text"
+msgid "Formatted Display"
+msgstr "Exibição formatada"
+
+#. Cd89c
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id571641582522939\n"
+"help.text"
+msgid "Performs the search considering the formatted value in a cell."
+msgstr "Realiza a pesquisa considerando o valor formatado em uma célula."
+
+#. L8K8f
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id171641582176913\n"
+"help.text"
+msgid "Find and Replace"
+msgstr "Localizar e substituir"
+
+#. cDswH
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id761641582194558\n"
+"help.text"
+msgid "Opens the <link href=\"text/swriter/guide/finding.xhp\">Find and Replace</link> dialog, which provides more options for searching the document."
+msgstr "Abra a caixa de diálogo <link href=\"text/swriter/guide/finding.xhp\">Localizar e substituir</link> que fornece mais opções para pesquisar o documento."
+
+#. rx3mH
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id171641582176913\n"
+"help.text"
+msgid "<image src=\"cmd/lc_searchdialog.svg\" id=\"img_id171641582176913\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171641582176913\">Find and Replace Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_searchdialog.svg\" id=\"img_id171641582176913\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171641582176913\">Ícone Localizar e substituir</alt></image>"
+
+#. BUQcH
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id171641582176943\n"
+"help.text"
+msgid "Find and Replace Icon"
+msgstr "Ícone Localizar e substituir"
+
+#. DBz3U
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Fontwork"
+msgstr "Fontwork"
+
+#. EwzqM
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1055A\n"
+"help.text"
+msgid "<link href=\"text/shared/fontwork_toolbar.xhp\">Fontwork</link>"
+msgstr "<link href=\"text/shared/fontwork_toolbar.xhp\">Fontwork</link>"
+
+#. GNY76
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1056A\n"
+"help.text"
+msgid "The Fontwork toolbar opens when you select a Fontwork object."
+msgstr "Quando você selecionar um objeto Fontwork, será aberta uma barra de ferramentas Fontwork."
+
+#. 9xBxj
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1056D\n"
+"help.text"
+msgid "Fontwork Gallery"
+msgstr "Galeria do Fontwork"
+
+#. A6ecD
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id81646926301557\n"
+"help.text"
+msgid "<image src=\"cmd/lc_fontworkgalleryfloater.svg\" id=\"img_id311646926301559\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id331646926301560\">Icon Fontwork Gallery</alt></image>"
+msgstr "<image src=\"cmd/lc_fontworkgalleryfloater.svg\" id=\"img_id311646926301559\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id331646926301560\">Ícone Galeria do Fontwork</alt></image>"
+
+#. zBxMN
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN10571\n"
+"help.text"
+msgid "Opens the Fontwork Gallery where you can select another preview. Click <emph>OK</emph> to apply the new set of properties to your Fontwork object."
+msgstr "Abre a Galeria do Fontwork, para selecionar outra visualização. Clique em <emph>OK</emph> para aplicar o novo conjunto de propriedades ao seu objeto Fontwork."
+
+#. nG6ME
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN10588\n"
+"help.text"
+msgid "Fontwork Shape"
+msgstr "Forma do Fontwork"
+
+#. PgQM4
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id51646926964588\n"
+"help.text"
+msgid "<image src=\"cmd/lc_fontwork.svg\" id=\"img_id801646926964589\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761646926964590\">Icon Fontwork Shape</alt></image>"
+msgstr "<image src=\"cmd/lc_fontwork.svg\" id=\"img_id801646926964589\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761646926964590\">Ícone Forma de Fontwork</alt></image>"
+
+#. CTe3i
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1058C\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the Fontwork Shape toolbar. Click a shape to apply the shape to all selected Fontwork objects.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre a barra de ferramentas Forma do Fontwork. Clique em uma forma para aplicá-la a todos os objetos Fontwork selecionados.</ahelp>"
+
+#. HTZ3F
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105A6\n"
+"help.text"
+msgid "Fontwork Same Letter Heights"
+msgstr "Mesmas alturas de letras no Fontwork"
+
+#. gBD67
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id501646927155677\n"
+"help.text"
+msgid "<image src=\"cmd/lc_fontworksameletterheights.svg\" id=\"img_id41646927155678\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id141646927155679\">Icon Fontwork Same Letter Height</alt></image>"
+msgstr "<image src=\"cmd/lc_fontworksameletterheights.svg\" id=\"img_id41646927155678\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id141646927155679\">Ícone Mesma altura de letra do Fontwork</alt></image>"
+
+#. dyVEY
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105AA\n"
+"help.text"
+msgid "<ahelp hid=\".\">Switches the letter height of the selected Fontwork objects from normal to the same height for all objects.</ahelp>"
+msgstr "<ahelp hid=\".\">Alterna a altura da letra dos objetos do Fontwork da normal para a mesma altura de todos os objetos.</ahelp>"
+
+#. CoXnr
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105C1\n"
+"help.text"
+msgid "Fontwork Alignment"
+msgstr "Alinhamento do Fontwork"
+
+#. dPegd
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id211646927242197\n"
+"help.text"
+msgid "<image src=\"cmd/lc_alignhorizontalcenter.svg\" id=\"img_id281646927242198\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id731646927242199\">Icon Fontwork Alignment</alt></image>"
+msgstr "<image src=\"cmd/lc_alignhorizontalcenter.svg\" id=\"img_id281646927242198\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id731646927242199\">Ícone Alinhamento do Fontwork</alt></image>"
+
+#. FvBdo
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105C5\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the Fontwork Alignment window.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre a janela Alinhamento do Fontwork.</ahelp>"
+
+#. mKkVN
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105DC\n"
+"help.text"
+msgid "Click to apply the alignment to the selected Fontwork objects."
+msgstr "Clique para aplicar o alinhamento aos objetos Fontwork selecionados."
+
+#. NSmjx
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105F3\n"
+"help.text"
+msgid "Fontwork Character Spacing"
+msgstr "Espaçamento de caracteres em Fontwork"
+
+#. uMC4D
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id251646927506111\n"
+"help.text"
+msgid "<image src=\"cmd/lc_spacing.svg\" id=\"img_id441646927506112\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821646927506113\">Icon Fontwork Character Spacing</alt></image>"
+msgstr "<image src=\"cmd/lc_spacing.svg\" id=\"img_id441646927506112\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821646927506113\">Ícone Espaçamento de caracteres do Fontwork</alt></image>"
+
+#. WLvKk
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id791646928579114\n"
+"help.text"
+msgid "Select the character spacing values to apply to the Fontwork object."
+msgstr "Selecione os valores de espaçamento de caracteres a aplicar ao objeto Fontwork."
+
+#. xERFF
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN10621\n"
+"help.text"
+msgid "<emph>Custom:</emph> Opens the Fontwork Character Spacing dialog where you can enter a new character spacing value."
+msgstr "<emph>Personalizado:</emph> abre a caixa de diálogo Espaçamento de caracteres em Fontwork, para inserir um novo valor de espaçamento de caracteres."
+
+#. sgFfF
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1063C\n"
+"help.text"
+msgid "<ahelp hid=\".\"><emph>Value:</emph> enter the Fontwork character spacing value.</ahelp>"
+msgstr "<ahelp hid=\".\"><emph>Valor:</emph> digite o valor de espaçamento de caracteres do Fontwork.</ahelp>"
+
+#. 2aGeB
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"hd_id981646929182163\n"
+"help.text"
+msgid "Toggle Extrusion"
+msgstr "Alternar extrusão"
+
+#. FcnBM
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id611646929193237\n"
+"help.text"
+msgid "<image src=\"cmd/lc_extrusiontoggle.png\" id=\"img_id951646929193238\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id211646929193239\">Icon Toggle Extrusion</alt></image>"
+msgstr "<image src=\"cmd/lc_extrusiontoggle.png\" id=\"img_id951646929193238\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id211646929193239\">Ícone Alternar extrusão</alt></image>"
+
+#. Dems2
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id191646929193241\n"
+"help.text"
+msgid "Switches the 3D effects on and off for the Fontwork objects."
+msgstr "Ativa e desativa os efeitos 3D dos objetos Fontwork selecionados."
+
+#. yEKhT
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"tit\n"
+"help.text"
+msgid "Help"
+msgstr "Ajuda"
+
+#. NncHM
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id3155364\n"
+"help.text"
+msgid "<link href=\"text/shared/main0108.xhp\">Help</link>"
+msgstr "<link href=\"text/shared/main0108.xhp\">Ajuda</link>"
+
+#. 2BAjw
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id3153990\n"
+"help.text"
+msgid "<ahelp hid=\".uno:HelpMenu\">The Help menu allows you to start and control the $[officename] Help system.</ahelp>"
+msgstr "<ahelp hid=\".uno:HelpMenu\">O menu da Ajuda permite iniciar e controlar o sistema de Ajuda do $[officename].</ahelp>"
+
+#. qpCaX
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id3147399\n"
+"help.text"
+msgid "$[officename] Help"
+msgstr "Ajuda do $[officename]"
+
+#. Bm7BG
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id3147576\n"
+"help.text"
+msgid "<ahelp hid=\".uno:HelpIndex\">Opens the main page of the $[officename] Help for the current application.</ahelp> You can scroll through the Help pages and you can search for index terms or any text."
+msgstr "<ahelp hid=\".uno:HelpIndex\">Abre a página principal da Ajuda do $[officename] para o aplicativo atual.</ahelp> Você pode percorrer as páginas da Ajuda e procurar por termos do índice ou por outro texto."
+
+#. SPpw7
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_idN1064A\n"
+"help.text"
+msgid "<image id=\"img_id1619006\" src=\"cmd/sc_helpindex.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id1619006\">Icon Help</alt></image>"
+msgstr "<image id=\"img_id1619006\" src=\"cmd/sc_helpindex.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id1619006\">Ícone Ajuda</alt></image>"
+
+#. iPjUH
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_idN10667\n"
+"help.text"
+msgid "%PRODUCTNAME Help"
+msgstr "Ajuda do %PRODUCTNAME"
+
+#. bhHQM
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id230120170827187813\n"
+"help.text"
+msgid "User Guides"
+msgstr "Guias do usuário"
+
+#. iGDAE
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id230120170827189453\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Documentation\">Opens the documentation page in the web browser, where users can download, read or purchase %PRODUCTNAME user guides, written by the community.</ahelp>"
+msgstr "<ahelp hid=\".uno:Documentation\">Abre a página da documentação no navegador web, onde usuários podem baixar, ler ou comprar guias de usuário do %PRODUCTNAME, escritas pela comunidade.</ahelp>"
+
+#. APWDa
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id230120170827196253\n"
+"help.text"
+msgid "Get Help Online"
+msgstr "Obter ajuda on-line"
+
+#. bRvuD
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id230120170827196850\n"
+"help.text"
+msgid "<ahelp hid=\".uno:QuestionAnswers\">Opens the community support page in the web browser.</ahelp> Use this page to ask questions on using %PRODUCTNAME. For professional support with service level agreement, refer to the <link href=\"https://www.documentfoundation.org/gethelp/support/\"><emph>page of professional %PRODUCTNAME support</emph></link>."
+msgstr "<ahelp hid=\".uno:QuestionAnswers\">Abre a página de suporte da comunidade no navegador web.</ahelp> Use esta página para fazer perguntas sobre o uso do %PRODUCTNAME. Para suporte profissional com acordo de nível de serviço, consulte o link <link href=\"https://www.documentfoundation.org/gethelp/support/\"><emph>página de suporte profissional do %PRODUCTNAME</emph></link>."
+
+#. mTBuv
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id2752763\n"
+"help.text"
+msgid "Send Feedback"
+msgstr "Enviar comentários"
+
+#. BSzm2
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id443534340\n"
+"help.text"
+msgid "<ahelp hid=\".uno:SendFeedback\">Opens a feedback form in the web browser, where users can report software bugs.</ahelp>"
+msgstr "<ahelp hid=\".uno:SendFeedback\">Abre uma janela de comentários no navegador, na qual os usuários podem reportar os erros encontrados no programa.</ahelp>"
+
+#. s2hmB
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id230120170903409011\n"
+"help.text"
+msgid "<link href=\"text/shared/01/profile_safe_mode.xhp\">Restart in Safe Mode</link>"
+msgstr "<link href=\"text/shared/01/profile_safe_mode.xhp\">Reiniciar em Modo de Segurança</link>"
+
+#. JEuaK
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id281120160939285779\n"
+"help.text"
+msgid "<ahelp hid=\".uno:SafeMode\">Safe mode is a mode where %PRODUCTNAME temporarily starts with a fresh user profile and disables hardware acceleration. It helps to restore a non-working %PRODUCTNAME instance.  </ahelp>"
+msgstr "<ahelp hid=\".uno:SafeMode\">O modo de segurança é um modo onde o %PRODUCTNAME temporariamente inicia com um novo perfil de usuário e desabilita a aceleração de hardware. Ele auxilia na restauração de uma instância não operacional do %PRODUCTNAME.</ahelp>"
+
+#. 4BvDS
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id561629934889067\n"
+"help.text"
+msgid "Get Involved"
+msgstr "Participe"
+
+#. B4y6k
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id501629934998665\n"
+"help.text"
+msgid "Opens the <link href=\"https://www.libreoffice.org/community/get-involved/\">community Get Involved page</link> in the web browser. The page describe areas of interest where you can collaborate with the %PRODUCTNAME community."
+msgstr "Abre a <link href=\"https://pt-br.libreoffice.org/comunidade/participe/\">página Participe!</link> no seu navegador internet. A página descreve as áreas de interesse em que você pode colaborar com a comunidade do  %PRODUCTNAME."
+
+#. YrMYp
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id431629934866702\n"
+"help.text"
+msgid "Donate to %PRODUCTNAME"
+msgstr "Doação ao projeto %PRODUCTNAME"
+
+#. xoFgE
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id691629934873388\n"
+"help.text"
+msgid "%PRODUCTNAME is Free Software and is made available free of charge."
+msgstr "O %PRODUCTNAME é um software livre e disponibilizado sem custos para você."
+
+#. GAMwn
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id651629934878405\n"
+"help.text"
+msgid "Your donation, which is purely optional, supports our worldwide community."
+msgstr "Sua doação, verdadeiramente opcional, apoia nossa comunidade mundial."
+
+#. vDfYC
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id611629934882669\n"
+"help.text"
+msgid "If you like the software, <link href=\"https://www.libreoffice.org/donate/\">please consider a donation</link>."
+msgstr "Se gostar do software <link href=\"https://www.libreoffice.org/donate/\">considere fazer uma doação</link>."
+
+#. sWFkG
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id4153881\n"
+"help.text"
+msgid "License Information"
+msgstr "Informações sobre a licença"
+
+#. NagBg
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id4144510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowLicense\">Displays the <emph>Licensing and Legal information</emph> dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShowLicense\">Exibe a caixa de diálogo de <emph>licenciamento e informações legais</emph>.</ahelp>"
+
+#. hzz6B
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id5153881\n"
+"help.text"
+msgid "%PRODUCTNAME Credits"
+msgstr "Créditos do %PRODUCTNAME"
+
+#. 26xSB
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id5144510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowLicense\">Displays the <emph>CREDITS.odt</emph> document which lists the names of individuals who have contributed to OpenOffice.org source code (and whose contributions were imported into %PRODUCTNAME) or %PRODUCTNAME since 2010-09-28.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShowLicense\">Exibe o documento <emph>CREDITS.odt</emph>, que lista o nome das pessoas que participaram no código fonte do OpenOffice.org (e importadas para o %PRODUCTNAME) ou no %PRODUCTNAME desde 28 de setembro de 2010.</ahelp>"
+
+#. F8BFu
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id2926419\n"
+"help.text"
+msgid "<link href=\"text/shared/01/online_update.xhp\">Check for Updates</link>"
+msgstr "<link href=\"text/shared/01/online_update.xhp\">Verificar se há atualizações</link>"
+
+#. XejZc
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id2783898\n"
+"help.text"
+msgid "<ahelp hid=\".\">Enable an Internet connection for %PRODUCTNAME. If you need a Proxy, check the %PRODUCTNAME Proxy settings in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Internet</emph>. Then choose <emph>Check for Updates</emph> to check for the availability of a newer version of your office suite.</ahelp>"
+msgstr "<ahelp hid=\".\">Ativa uma conexão internet para o %PRODUCTNAME. Se precisar de um Proxy,  verifique as definições de proxy do %PRODUCTNAME em <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferências</emph></caseinline><defaultinline><emph>Ferramentas - Opções </emph></defaultinline></switchinline><emph> - Internet</emph>. Escolha então <emph>Verificar atualizações</emph> para conferir a disponibilidade de uma nova versão da sua suíte de escritório.</ahelp>"
+
+#. JCKb7
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id3153881\n"
+"help.text"
+msgid "About $[officename]"
+msgstr "Sobre o $[officename]"
+
+#. nSkgE
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id3144510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:About\">Displays general program information such as version number and copyrights.</ahelp>"
+msgstr "<ahelp hid=\".uno:About\">Exibe informações gerais do programa, como o número da versão e os direitos autorais.</ahelp>"
+
+#. MT8bF
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"tit\n"
+"help.text"
+msgid "Standard Bar"
+msgstr "Barra Padrão"
+
+#. YMneF
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"hd_id3154186\n"
+"help.text"
+msgid "<link href=\"text/shared/main0201.xhp\">Standard Bar</link>"
+msgstr "<link href=\"text/shared/main0201.xhp\">Barra Padrão</link>"
+
+#. 7CoDc
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_id3145136\n"
+"help.text"
+msgid "<ahelp hid=\"RID_ENVTOOLBOX\">The <emph>Standard</emph> bar is available in every $[officename] application.</ahelp>"
+msgstr "<ahelp hid=\"RID_ENVTOOLBOX\">A barra <emph>Padrão</emph> está disponível em todas as aplicações do $[officename].</ahelp>"
+
+#. FHN8A
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"hd_id3166460\n"
+"help.text"
+msgid "<link href=\"text/shared/01/01020000.xhp\">Open File</link>"
+msgstr "<link href=\"text/shared/01/01020000.xhp\">Abrir arquivo</link>"
+
+#. qCdSB
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10661\n"
+"help.text"
+msgid "<link href=\"text/shared/01/01070000.xhp\">Save As</link>"
+msgstr "<link href=\"text/shared/01/01070000.xhp\">Salvar como</link>"
+
+#. 9WEoa
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN106A5\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06010000.xhp\">Spelling</link>"
+msgstr "<link href=\"text/shared/01/06010000.xhp\">Ortografia</link>"
+
+#. ZVSLP
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN1086E\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Insert Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Inserir gráfico</link>"
+
+#. MgdL8
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_id4964445\n"
+"help.text"
+msgid "Creates a chart in the current document."
+msgstr "Cria um gráfico no documento atual."
+
+#. 9jAur
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN1088E\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/12030100.xhp\">Sort Descending / Sort Ascending</link>"
+msgstr "<link href=\"text/scalc/01/12030100.xhp\">Colocar em ordem decrescente / Colocar em ordem crescente</link>"
+
+#. bzxXw
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108B1\n"
+"help.text"
+msgid "Sorts the selection from the highest to the lowest value, or from the lowest to the highest value using the column that contains the cursor."
+msgstr "Ordena a seleção do maior ao menor valor, ou do menor ao maior valor, utilizando a coluna que contém o cursor."
+
+#. nBBsD
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108BE\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Gráfico</link>"
+
+#. mH28o
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108EA\n"
+"help.text"
+msgid "Creates a chart in the current document."
+msgstr "Cria um gráfico no documento atual."
+
+#. JEF2H
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108C4\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171200.xhp\">Display Grid</link>"
+msgstr "<link href=\"text/shared/02/01171200.xhp\">Exibir grade</link>"
+
+#. JHY4h
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108D7\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Gráfico</link>"
+
+#. kzRJC
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10976\n"
+"help.text"
+msgid "Creates a chart in the current document."
+msgstr "Cria um gráfico no documento atual."
+
+#. DexEu
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN107D8\n"
+"help.text"
+msgid "<image id=\"img_id3153070\" src=\"cmd/sc_zoom.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153070\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153070\" src=\"cmd/sc_zoom.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153070\">Ícone</alt></image>"
+
+#. wcCfo
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN107F5\n"
+"help.text"
+msgid "Zoom"
+msgstr "Zoom"
+
+#. zYZRw
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10818\n"
+"help.text"
+msgid "What’s This?"
+msgstr "O que é isso?"
+
+#. UDDTK
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN1081E\n"
+"help.text"
+msgid "<ahelp hid=\".\">Enables extended help tips under the mouse pointer until the next click.</ahelp>"
+msgstr "<ahelp hid=\".\">Ativa as dicas de ajuda adicionais sobre o ponteiro do mouse até o próximo clique.</ahelp>"
+
+#. Hvhxs
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10855\n"
+"help.text"
+msgid "<image id=\"img_id3174230\" src=\"cmd/sc_extendedhelp.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3174230\">Icon “What’s This?”</alt></image>"
+msgstr "<image id=\"img_id3174230\" src=\"cmd/sc_extendedhelp.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3174230\">Ícone \"O que é isso?\"</alt></image>"
+
+#. KPZBD
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10873\n"
+"help.text"
+msgid "What’s This?"
+msgstr "O que é isso?"
+
+#. Xtuxp
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table Bar"
+msgstr "Barra Tabela"
+
+#. Cu754
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3145587\n"
+"help.text"
+msgid "<link href=\"text/shared/main0204.xhp\">Table Bar</link>"
+msgstr "<link href=\"text/shared/main0204.xhp\">Barra Tabela</link>"
+
+#. WByv5
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3154252\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Table</emph> Bar contains functions you need when working with tables. It appears when you move the cursor into a table.</ahelp>"
+msgstr "<ahelp hid=\".\">A barra <emph>Tabela</emph> contém funções necessárias se para trabalhar com tabelas. Ela aparece quando o cursor estiver dentro de uma tabela.</ahelp>"
+
+#. eCSur
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id319945759\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05210100.xhp\">Area Style / Filling</link>"
+msgstr "<link href=\"text/shared/01/05210100.xhp\">Estilo de área / Preenchimento</link>"
+
+#. GsoVm
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147592\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100100.xhp\">Merge Cells</link>"
+msgstr "<link href=\"text/shared/01/05100100.xhp\">Mesclar células</link>"
+
+#. KVWGF
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05110500.xhp\">Delete Row</link>"
+msgstr "<link href=\"text/swriter/01/05110500.xhp\">Excluir linha</link>"
+
+#. WddDC
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147231\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120500.xhp\">Delete Column</link>"
+msgstr "<link href=\"text/swriter/01/05120500.xhp\">Excluir coluna</link>"
+
+#. RhSva
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3134447820\n"
+"help.text"
+msgid "Table Design"
+msgstr "Modelo de Tabela"
+
+#. BufED
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id16200812240344\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableDesign\">Opens the Table Design. Double-click a preview to format the table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableDesign\">Abre os modelos de tabelas. Faça um clique duplo na visualização para formatar uma tabela.</ahelp>"
+
+#. P72mU
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3153752\n"
+"help.text"
+msgid "<image id=\"img_id3147292\" src=\"cmd/sc_tabledesign.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147292\">Icon</alt></image>"
+msgstr "<image id=\"img_id3147292\" src=\"cmd/sc_tabledesign.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147292\">Ícone</alt></image>"
+
+#. hVE8L
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3156429\n"
+"help.text"
+msgid "Table Design"
+msgstr "Modelos de tabela"
+
+#. hCDEC
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id947820\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/05090000m.xhp\">Table Properties</link>"
+msgstr "<link href=\"text/simpress/01/05090000m.xhp\">Propriedades da tabela</link>"
+
+#. usfD4
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"tit\n"
+"help.text"
+msgid "Status Bar in $[officename] Basic Documents"
+msgstr "Barra de status em documentos do $[officename] Basic"
+
+#. PUnxS
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id3148520\n"
+"help.text"
+msgid "<link href=\"text/shared/main0208.xhp\">Status Bar in $[officename] Basic Documents</link>"
+msgstr "<link href=\"text/shared/main0208.xhp\">Barra de status em documentos do $[officename] Basic</link>"
+
+#. TMY8Z
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id3154136\n"
+"help.text"
+msgid "The <emph>Status</emph> Bar displays information about the current $[officename] Basic document."
+msgstr "A <emph>Barra de status</emph> exibe informações sobre o documento atual do $[officename]."
+
+#. gDTEb
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table Data Bar"
+msgstr "Barra Dados da tabela"
+
+#. 8uZqF
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"hd_id3147102\n"
+"help.text"
+msgid "<link href=\"text/shared/main0212.xhp\">Table Data Bar</link>"
+msgstr "<link href=\"text/shared/main0212.xhp\">Barra Dados da tabela</link>"
+
+#. 2HEsY
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3153394\n"
+"help.text"
+msgid "<ahelp hid=\".\">Use the Table Data bar to control the data view. </ahelp>"
+msgstr "<ahelp hid=\".\">Utilize a barra Dados da tabela para controlar a exibição dos dados. </ahelp>"
+
+#. LyuDB
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3149346\n"
+"help.text"
+msgid "The filtered data view is active until you change or cancel the sorting or filtering criteria. If a filter is active, the <emph>Apply Filter</emph> icon on the <emph>Table Data</emph> bar is activated."
+msgstr "A exibição de dados filtrados permanece ativa até que você altere ou cancele os critérios de filtragem ou de ordenação. Se um filtro estiver ativo, o ícone <emph>Aplicar filtro</emph> na barra <emph>Dados da tabela</emph> estará ativado."
+
+#. CcwiY
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3147303\n"
+"help.text"
+msgid "<image id=\"img_id3153896\" src=\"cmd/sc_recsave.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3153896\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153896\" src=\"cmd/sc_recsave.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3153896\">Ícone</alt></image>"
+
+#. fzc6F
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3153360\n"
+"help.text"
+msgid "Save Record"
+msgstr "Salvar registro"
+
+#. 6ZrhE
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3145173\n"
+"help.text"
+msgid "<image id=\"img_id3154123\" src=\"cmd/sc_recundo.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3154123\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154123\" src=\"cmd/sc_recundo.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3154123\">Ícone</alt></image>"
+
+#. EzvWw
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3151382\n"
+"help.text"
+msgid "Undo: Data Input"
+msgstr "Desfazer: Entrada de dados"
+
+#. fYxNc
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN10744\n"
+"help.text"
+msgid "<link href=\"text/shared/02/12070000.xhp\">Data to Text</link>"
+msgstr "<link href=\"text/shared/02/12070000.xhp\">Dados para texto</link>"
+
+#. WLT8r
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN10753\n"
+"help.text"
+msgid "<ahelp hid=\".\">Inserts all fields of the marked record into the current document at the cursor position.</ahelp>"
+msgstr "<ahelp hid=\".\">Insere na posição do cursor todos os campos do registro marcado no documento atual.</ahelp>"
+
+#. 7e4xM
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN10780\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/mailmerge00.xhp\">Mail Merge</link>"
+msgstr "<link href=\"text/swriter/01/mailmerge00.xhp\">Mala direta</link>"
+
+#. DcDEf
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN1078F\n"
+"help.text"
+msgid "<ahelp hid=\".\">Starts the Mail Merge Wizard to create form letters.</ahelp>"
+msgstr "<ahelp hid=\".\">Inicia o Assistente de mala direta para criar cartas formulários.</ahelp>"
+
+#. 7wCKo
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"tit\n"
+"help.text"
+msgid "Form Navigation Bar"
+msgstr "Barra de ferramentas Formulário"
+
+#. cniHC
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"bm_id3157896\n"
+"help.text"
+msgid "<bookmark_value>toolbars; Form Navigation bar</bookmark_value><bookmark_value>Navigation bar;forms</bookmark_value><bookmark_value>sorting; data in forms</bookmark_value><bookmark_value>data; sorting in forms</bookmark_value><bookmark_value>forms;sorting data</bookmark_value>"
+msgstr "<bookmark_value>barras de ferramentas;barra de navegação de formulário</bookmark_value><bookmark_value>barra de navegação;formulários</bookmark_value><bookmark_value>ordenar;dados em formulários</bookmark_value><bookmark_value>dados;ordenar em formulários</bookmark_value><bookmark_value>formulários;ordenar dados</bookmark_value>"
+
+#. AJsK5
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3157896\n"
+"help.text"
+msgid "<link href=\"text/shared/main0213.xhp\">Form Navigation Bar</link>"
+msgstr "<link href=\"text/shared/main0213.xhp\">Barra Navegação de formulários</link>"
+
+#. WUXQ3
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154751\n"
+"help.text"
+msgid "The <emph>Form Navigation</emph> bar contains icons to edit a database table or to control the data view. The bar is displayed at the bottom of a document that contains fields that are linked to a database."
+msgstr "A <emph>barra de navegação</emph> contém ícones para editar uma tabela de banco de dados ou para controlar a exibição dos dados. Essa barra aparece na parte inferior de um documento que contém campos vinculados a um banco de dados."
+
+#. GSUgn
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3157958\n"
+"help.text"
+msgid "You can use the <emph>Form Navigation</emph> bar to move within records as well as to insert and to delete records. If data is saved in a form, the changes are transferred to the database. The <emph>Form Navigation</emph> bar also contains sort, filter, and search functions for data records."
+msgstr "Você pode utilizar a <emph>barra de navegação</emph> para mover-se pelos registros, bem como para inserir e excluir registros. Se os dados forem salvos em um formulário, as alterações serão transferidas para o banco de dados. A <emph>barra de navegação</emph> também contém funções para ordenar, filtrar e procurar registros de dados."
+
+#. nLEDn
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_idN10717\n"
+"help.text"
+msgid "You can use the Navigation bar icon on the <link href=\"text/shared/02/01170000.xhp\">More Controls </link> bar to add a Navigation bar to a form."
+msgstr "Você pode usar o ícone Barra de navegação na barra de ferramentas <link href=\"text/shared/02/01170000.xhp\">Funções de formulário</link> para adicionar uma barra de navegação a um formulário."
+
+#. qrGJo
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3157910\n"
+"help.text"
+msgid "The Navigation bar is only visible for forms connected to a database. In the <link href=\"text/sdatabase/04030000.xhp\">Design view</link> of a form, the Navigation bar is not available. See also <link href=\"text/shared/main0212.xhp\">Table Data bar</link>."
+msgstr "A barra de navegação só está visível para formulários conectados a um banco de dados. Na <link href=\"text/sdatabase/04030000.xhp\">exibição de edição</link> de um formulário, essa barra não está disponível. Consulte também <link href=\"text/shared/main0212.xhp\">Barra Tabela de banco de dados</link>."
+
+#. tqTbR
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3153880\n"
+"help.text"
+msgid "You can control the view of data with the sorting and filtering functions. Original tables are not changed."
+msgstr "Você pode controlar a exibição de dados com as funções de ordenação e filtragem. As tabelas originais não serão alteradas."
+
+#. X4S8m
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3153062\n"
+"help.text"
+msgid "The current sort order or filter is saved with the current document. If a filter is set, the <emph>Apply Filter</emph> icon on the <emph>Navigation</emph> bar is activated. Sorting and filtering features in the document can also be configured in the <emph>Form Properties</emph> dialog. (Choose <emph>Form Properties - Data</emph> - properties <link href=\"text/shared/02/01170203.xhp\"><emph>Sort</emph></link> and <link href=\"text/shared/02/01170203.xhp\"><emph>Filter</emph></link>)."
+msgstr "O filtro ou a ordenação atual é salvo com o documento atual. Se houver um filtro definido, o ícone <emph>Aplicar filtro</emph> na <emph>barra de navegação</emph> estará ativo. Os recursos de ordenação e filtro no documento também podem ser configurados na caixa de diálogo <emph>Propriedades do formulário</emph>. (Escolha <emph>Propriedades do formulário → Dados</emph> → Propriedades da <link href=\"text/shared/02/01170203.xhp\"><emph>Ordenação</emph></link> e <link href=\"text/shared/02/01170203.xhp\"><emph>Filtro</emph></link>)."
+
+#. ABJo3
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3149810\n"
+"help.text"
+msgid "If an SQL statement is the basis for a form (see <emph>Form Properties</emph> - tab <emph>Data</emph> - <link href=\"text/shared/02/01170203.xhp\"><emph>Data Source</emph></link>), then the filter and sort functions are only available when the SQL statement refers to only one table and is not written in the native SQL mode."
+msgstr "Se uma instrução SQL for a base para um formulário (veja <emph>Propriedades do formulário</emph> → aba <emph>Dados</emph> → <link href=\"text/shared/02/01170203.xhp\"><emph>Fonte de dados</emph></link>), as funções de filtragem e ordenação somente estarão disponíveis quando a instrução SQL se referir a uma única tabela e não estiver gravada no modo SQL nativo."
+
+#. CcBXr
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3156448\n"
+"help.text"
+msgid "<link href=\"text/shared/02/12100200.xhp\">Find Record</link>"
+msgstr "<link href=\"text/shared/02/12100200.xhp\">Localizar registro</link>"
+
+#. daKA6
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3153192\n"
+"help.text"
+msgid "Absolute Record"
+msgstr "Registro absoluto"
+
+#. j8vng
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3146922\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AbsoluteRecord\">Shows the number of the current record. Enter a number to go to the corresponding record.</ahelp>"
+msgstr "<ahelp hid=\".uno:AbsoluteRecord\">Mostra o número do registro atual. Insira um número para ir até o registro correspondente.</ahelp>"
+
+#. Ld8nZ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3153573\n"
+"help.text"
+msgid "First Record"
+msgstr "Primeiro registro"
+
+#. 4VXqZ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154013\n"
+"help.text"
+msgid "<image id=\"img_id3150010\" src=\"cmd/lc_firstrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150010\">Icon First Record</alt></image>"
+msgstr "<image id=\"img_id3150010\" src=\"cmd/lc_firstrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150010\">Ícone Primeiro registro</alt></image>"
+
+#. VCqM6
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3155308\n"
+"help.text"
+msgid "<ahelp hid=\".uno:FirstRecord\">Takes you to the first record.</ahelp>"
+msgstr "<ahelp hid=\".uno:FirstRecord\">Leva você ao primeiro registro.</ahelp>"
+
+#. aNBTD
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3154792\n"
+"help.text"
+msgid "Previous Record"
+msgstr "Registro anterior"
+
+#. AgQb3
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3145647\n"
+"help.text"
+msgid "<image id=\"img_id3147394\" src=\"cmd/lc_prevrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147394\">Icon Previous Record</alt>                        </image>"
+msgstr "<image id=\"img_id3147394\" src=\"cmd/lc_prevrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147394\">Ícone Registro anterior</alt></image>"
+
+#. gitqo
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3157846\n"
+"help.text"
+msgid "<ahelp hid=\".uno:PrevRecord\">Takes you to the previous record.</ahelp>"
+msgstr "<ahelp hid=\".uno:PrevRecord\">Leva você ao registro anterior.</ahelp>"
+
+#. AJswu
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3149121\n"
+"help.text"
+msgid "Next Record"
+msgstr "Próximo registro"
+
+#. ShvmR
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3146913\n"
+"help.text"
+msgid "<image id=\"img_id3150753\" src=\"cmd/lc_nextrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150753\">Icon Next Record</alt></image>"
+msgstr "<image id=\"img_id3150753\" src=\"cmd/lc_nextrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150753\">Ícone Próximo registro</alt></image>"
+
+#. BJBj8
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3148914\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NextRecord\">Takes you to the next record.</ahelp>"
+msgstr "<ahelp hid=\".uno:NextRecord\">Leva você ao próximo registro.</ahelp>"
+
+#. 6dE4g
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3148997\n"
+"help.text"
+msgid "Last Record"
+msgstr "Último registro"
+
+#. up7uJ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3155337\n"
+"help.text"
+msgid "<image id=\"img_id3163808\" src=\"cmd/lc_lastrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Icon Last Record</alt></image>"
+msgstr "<image id=\"img_id3163808\" src=\"cmd/lc_lastrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Ícone Último registro</alt></image>"
+
+#. 65BvC
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3151248\n"
+"help.text"
+msgid "<ahelp hid=\".uno:LastRecord\">Takes you to the last record.</ahelp>"
+msgstr "<ahelp hid=\".uno:LastRecord\">Leva você até o último registro.</ahelp>"
+
+#. aKiBF
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3149967\n"
+"help.text"
+msgid "New Record"
+msgstr "Novo registro"
+
+#. D8UvX
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3149735\n"
+"help.text"
+msgid "<image id=\"img_id3155578\" src=\"cmd/lc_newrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155578\">Icon New Record</alt></image>"
+msgstr "<image id=\"img_id3155578\" src=\"cmd/lc_newrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155578\">Ícone Novo registro</alt></image>"
+
+#. e4GJo
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3148460\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NewRecord\">Creates a new record.</ahelp>"
+msgstr "<ahelp hid=\".uno:NewRecord\">Cria um novo registro.</ahelp>"
+
+#. xhXB3
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3145231\n"
+"help.text"
+msgid "Save Record"
+msgstr "Salvar registro"
+
+#. aLCSc
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3150647\n"
+"help.text"
+msgid "<image id=\"img_id3150941\" src=\"cmd/lc_recsave.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150941\">Icon</alt></image>"
+msgstr "<image id=\"img_id3150941\" src=\"cmd/lc_recsave.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150941\">Ícone</alt></image>"
+
+#. Dbdf5
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3146808\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RecSave\">Saves a new data entry. The change is registered in the database.</ahelp>"
+msgstr "<ahelp hid=\".uno:RecSave\">Salva uma nova entrada de dados. A alteração é registrada no banco de dados.</ahelp>"
+
+#. pc8vm
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3158446\n"
+"help.text"
+msgid "Undo: Data entry"
+msgstr "Desfazer: Entrada de dados"
+
+#. AbFTp
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3166423\n"
+"help.text"
+msgid "<image id=\"img_id3156138\" src=\"cmd/lc_recundo.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156138\">Icon Undo Data Entry</alt></image>"
+msgstr "<image id=\"img_id3156138\" src=\"cmd/lc_recundo.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156138\">Ícone Desfazer entrada de dados</alt></image>"
+
+#. GAZ7t
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3151276\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RecUndo\">Allows you to undo a data entry.</ahelp>"
+msgstr "<ahelp hid=\".uno:RecUndo\">Permite que você desfaça uma entrada de dados.</ahelp>"
+
+#. BEGSZ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3153659\n"
+"help.text"
+msgid "Delete Record"
+msgstr "Excluir registro"
+
+#. QiWg2
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3145584\n"
+"help.text"
+msgid "<image id=\"img_id3166434\" src=\"cmd/lc_deleterecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3166434\">Icon Delete Record</alt></image>"
+msgstr "<image id=\"img_id3166434\" src=\"cmd/lc_deleterecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3166434\">Ícone Excluir registro</alt></image>"
+
+#. noMmE
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3148817\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DeleteRecord\">Deletes a record. A query needs to be confirmed before deleting.</ahelp>"
+msgstr "<ahelp hid=\".uno:DeleteRecord\">Exclui um registro. Uma consulta precisa ser confirmada antes da exclusão.</ahelp>"
+
+#. oon6s
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id161647003427601\n"
+"help.text"
+msgid "Refresh Control"
+msgstr "Atualizar controle"
+
+#. zuPjH
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id861647005853278\n"
+"help.text"
+msgid "<image src=\"cmd/lc_refreshformcontrol.svg\" id=\"img_id901647005853278\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id581647005853278\">Icon Refresh Control</alt></image>"
+msgstr "<image src=\"cmd/lc_refreshformcontrol.svg\" id=\"img_id901647005853278\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id581647005853278\">Ícone Atualizar controle</alt></image>"
+
+#. 8RmLu
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id811647005853278\n"
+"help.text"
+msgid "Refresh current control"
+msgstr "Atualizar controle atual"
+
+#. AqwfH
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3148599\n"
+"help.text"
+msgid "<link href=\"text/shared/02/12100100.xhp\">Sort</link>"
+msgstr "<link href=\"text/shared/02/12100100.xhp\">Ordenar</link>"
+
+#. oSJoq
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"tit\n"
+"help.text"
+msgid "Query Design Bar"
+msgstr "Barra Edição de consulta"
+
+#. Q6Prc
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3159176\n"
+"help.text"
+msgid "<link href=\"text/shared/main0214.xhp\">Query Design Bar</link>"
+msgstr "<link href=\"text/shared/main0214.xhp\">Barra Edição de consulta</link>"
+
+#. YwUQD
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3150085\n"
+"help.text"
+msgid "<ahelp hid=\".\">When creating or editing an SQL query, use the icons in the <emph>Query Design</emph> Bar to control the display of data.</ahelp>"
+msgstr "<ahelp hid=\".\">Ao criar ou editar consultas SQL, use os ícones na barra <emph>Edição da consulta</emph> para controlar a exibição de dados.</ahelp>"
+
+#. VXp6T
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3150276\n"
+"help.text"
+msgid "Depending on whether you have created the query or view in the <emph>Design</emph> or <emph>SQL</emph> tab page, the following icons appear:"
+msgstr "Se tiver criado a consulta ou exibição na página da guia <emph>Edição</emph> ou <emph>SQL</emph>, serão exibidos os seguintes ícones:"
+
+#. 56jjt
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3151384\n"
+"help.text"
+msgid "<link href=\"text/shared/02/14020100.xhp\">Add Tables</link>"
+msgstr "<link href=\"text/shared/02/14020100.xhp\">Adicionar tabelas</link>"
+
+#. FZFsy
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3151041\n"
+"help.text"
+msgid "The following icon is on the <emph>SQL</emph> tab page:"
+msgstr "O ícone a seguir estará na página da guia <emph>SQL</emph>:"
+
+#. uHP9A
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"tit\n"
+"help.text"
+msgid "Form Design Toolbar"
+msgstr "Barra de ferramentas Edição de formulário"
+
+#. BMAxN
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3148520\n"
+"help.text"
+msgid "<link href=\"text/shared/main0226.xhp\">Form Design Toolbar</link>"
+msgstr "<link href=\"text/shared/main0226.xhp\">Barra de ferramentas Edição de formulários</link>"
+
+#. r7rXm
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3155364\n"
+"help.text"
+msgid "The Form Design toolbar becomes visible as soon as you select a form object when working in the design mode."
+msgstr "A barra de ferramentas Edição de formulário aparece assim que selecionar um objeto de formulário no modo de edição."
+
+#. YJDCw
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3163802\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170400.xhp\">Add Field</link>"
+msgstr "<link href=\"text/shared/02/01170400.xhp\">Adicionar campo</link>"
+
+#. ibj9F
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3146815\n"
+"help.text"
+msgid "Automatic Control Focus"
+msgstr "Controle de foco automático"
+
+#. gg2Ag
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3150261\n"
+"help.text"
+msgid "<image id=\"img_id3149351\" src=\"cmd/sc_autocontrolfocus.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149351\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149351\" src=\"cmd/sc_autocontrolfocus.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149351\">Ícone</alt></image>"
+
+#. 5WaEw
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3109848\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AutoControlFocus\">If <emph>Automatic Control Focus</emph> is activated, the first form control will be selected when you open the document. If the button is not activated, the text will be selected after opening. The <link href=\"text/shared/02/01170300.xhp\">Tab Order</link> that you have specified determines which is the first form control.</ahelp>"
+msgstr "<ahelp hid=\".uno:AutoControlFocus\">Se a opção <emph>Controle de foco automático</emph> estiver ativada, o primeiro controle de formulário será selecionado ao abrir o documento. Se o botão não estiver ativado, o texto será selecionado após a abertura. A <link href=\"text/shared/02/01170300.xhp\">Ordem de tabulação</link> que você especificou determina qual é o primeiro controle de formulário.</ahelp>"
+
+#. QhszV
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3150398\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171200.xhp\">Display Grid</link>"
+msgstr "<link href=\"text/shared/02/01171200.xhp\">Exibir grade</link>"
+
+#. gtiLC
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3148798\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171300.xhp\">Snap to Grid</link>"
+msgstr "<link href=\"text/shared/02/01171300.xhp\">Alinhar à grade</link>"
+
+#. ph5uF
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3145419\n"
+"help.text"
+msgid "<ahelp hid=\".uno:GridUse\">Specifies that you can move objects only between grid points.</ahelp>"
+msgstr "<ahelp hid=\".uno:GridUse\">Especifica que você pode mover objetos somente entre pontos da grade.</ahelp>"
+
+#. VWNKD
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3148920\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171400.xhp\">Helplines While Moving</link>"
+msgstr "<link href=\"text/shared/02/01171400.xhp\">Guias ao mover</link>"
+
+#. 94V64
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit Points Bar"
+msgstr "Barra Editar pontos"
+
+#. VSwqX
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"bm_id3149987\n"
+"help.text"
+msgid "<bookmark_value>lines; editing points</bookmark_value><bookmark_value>curves; editing points</bookmark_value><bookmark_value>Edit Points bar</bookmark_value>"
+msgstr "<bookmark_value>linhas; editar pontos</bookmark_value><bookmark_value>curvas; editar pontos</bookmark_value><bookmark_value>barra Editar pontos</bookmark_value>"
+
+#. iFKff
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3149987\n"
+"help.text"
+msgid "<link href=\"text/shared/main0227.xhp\">Edit Points Bar</link>"
+msgstr "<link href=\"text/shared/main0227.xhp\">Barra Editar pontos</link>"
+
+#. N5vQq
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3150402\n"
+"help.text"
+msgid "The <emph>Edit Points </emph>Bar appears when you select a polygon object and click <emph>Edit Points</emph>."
+msgstr "A barra <emph>Editar pontos</emph> surge se selecionar um polígono e clicar em <emph>Editar pontos</emph>."
+
+#. SCdbw
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3144762\n"
+"help.text"
+msgid "The functions provided allow you to edit the points of a curve or an object converted to a curve. The following icons are available:"
+msgstr "As funções fornecidas permitem editar os pontos de uma curva ou de um objeto convertido em uma curva. Os seguintes ícones estão disponíveis:"
+
+#. EBpiU
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3153105\n"
+"help.text"
+msgid "Edit Points"
+msgstr "Editar pontos"
+
+#. w2P7j
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3159151\n"
+"help.text"
+msgid "The <link href=\"text/shared/01/05270000.xhp\"><emph>Edit Points</emph></link> icon allows you to activate or deactivate the edit mode for Bézier objects. In the edit mode, individual points of the drawing object can be selected."
+msgstr "O ícone <link href=\"text/shared/01/05270000.xhp\"><emph>Editar pontos</emph></link> permite ativar ou desativar o modo para objetos de Bézier. No modo de edição, pontos individuais do objeto de desenho podem ser selecionados."
+
+#. GtMer
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3145366\n"
+"help.text"
+msgid "<image id=\"img_id3153951\" src=\"cmd/lc_toggleobjectbeziermode.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153951\">Icon Edit Points</alt></image>"
+msgstr "<image id=\"img_id3153951\" src=\"cmd/lc_toggleobjectbeziermode.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153951\">Ícone Editar pontos</alt></image>"
+
+#. wNGCc
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3150105\n"
+"help.text"
+msgid "Edit Points"
+msgstr "Editar pontos"
+
+#. tj2MY
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3146976\n"
+"help.text"
+msgid "Move Points"
+msgstr "Mover pontos"
+
+#. FGTDm
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147435\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierMove\">Activates a mode in which you can move points.</ahelp> The mouse pointer displays a small empty square when resting on a point. Drag that point to another location. The curve on both sides of the point follows the movement; the section of the curve between the next points changes shape."
+msgstr "<ahelp hid=\".uno:BezierMove\">Ativa o modo no qual você pode mover os pontos.</ahelp> O ponteiro do mouse assume o formato de um pequeno quadrado quando é posicionado sobre um ponto. Arraste esse ponto para outro local. A curva nos dois lados do ponto acompanha o movimento e a seção da curva entre os pontos próximos muda de forma."
+
+#. aAAN6
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3149481\n"
+"help.text"
+msgid "Point at the curve between two points or within a closed curve and drag the mouse to shift the entire curve without distorting the form."
+msgstr "Aponte na curva entre dois pontos ou dentro de uma curva fechada e arraste o mouse para deslocar a curva inteira sem distorcer a forma."
+
+#. 2FrPH
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154096\n"
+"help.text"
+msgid "<image id=\"img_id3149377\" src=\"cmd/lc_beziermove.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149377\">Icon Move Points</alt></image>"
+msgstr "<image id=\"img_id3149377\" src=\"cmd/lc_beziermove.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149377\">Ícone Mover pontos</alt></image>"
+
+#. BFM7Z
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147397\n"
+"help.text"
+msgid "Move Points"
+msgstr "Mover pontos"
+
+#. bmQbX
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3150115\n"
+"help.text"
+msgid "Insert Points"
+msgstr "Inserir pontos"
+
+#. iDD7a
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3160478\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierInsert\">Activates the insert mode. This mode allows you to insert points.</ahelp> You can also move points, just as in the move mode. If, however, you click at the curve between two points and move the mouse a little while holding down the mouse button you insert a new point. The point is a smooth point, and the lines to the control points are parallel and remain so when moved."
+msgstr "<ahelp hid=\".uno:BezierInsert\">Ativa o modo de inserção, que permite inserir pontos.</ahelp> Você também pode mover pontos, exatamente como no modo de movimento. Contudo, se clicar na curva entre dois pontos e mover o mouse um pouco ao manter pressionado o botão do mouse, você inserirá um novo ponto. Este ponto é um ponto suave e as linhas para os pontos de controle são paralelas e permanecem dessa forma ao serem movidas."
+
+#. xbFcA
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3157846\n"
+"help.text"
+msgid "If you wish to create a corner point you must first insert either a smooth or a symmetrical point which is then converted to a corner point by using <emph>Corner Point</emph>."
+msgstr "Se desejar criar um ponto de canto, você precisa primeiro inserir um ponto de suavização ou um simétrico que então é convertido em um ponto de canto ao usar <emph>Ponto de canto</emph>."
+
+#. N35P4
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153838\n"
+"help.text"
+msgid "<image id=\"img_id3146969\" src=\"cmd/lc_bezierinsert.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146969\">Icon Insert Points</alt></image>"
+msgstr "<image id=\"img_id3146969\" src=\"cmd/lc_bezierinsert.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146969\">Ícone Inserir pontos</alt></image>"
+
+#. Dfg35
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153710\n"
+"help.text"
+msgid "Insert Points"
+msgstr "Inserir pontos"
+
+#. CcGFU
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3149020\n"
+"help.text"
+msgid "Delete Points"
+msgstr "Excluir pontos"
+
+#. EifkN
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148917\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierDelete\">Use the <emph>Delete Points</emph> icon to delete one or several selected points. If you wish to select several points click the appropriate points while holding down the Shift key.</ahelp>"
+msgstr "<ahelp hid=\".uno:BezierDelete\">Utilize o ícone <emph>Excluir pontos</emph> para apagar um ou vários pontos selecionados. Para selecionar vários pontos, mantenha pressionada a tecla Shift ao clicar em cada um deles.</ahelp>"
+
+#. tWtYC
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153766\n"
+"help.text"
+msgid "First select the points to be deleted, and then click this icon, or press Del."
+msgstr "Primeiro, selecione os pontos a serem excluídos e, em seguida, clique neste ícone ou pressione Del."
+
+#. 5FFCM
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147321\n"
+"help.text"
+msgid "<image id=\"img_id3146920\" src=\"cmd/lc_bezierdelete.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146920\">Icon Delete Points</alt></image>"
+msgstr "<image id=\"img_id3146920\" src=\"cmd/lc_bezierdelete.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146920\">Ícone Excluir pontos</alt></image>"
+
+#. 6i377
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3155961\n"
+"help.text"
+msgid "Delete Points"
+msgstr "Excluir pontos"
+
+#. DEFBD
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3147361\n"
+"help.text"
+msgid "Split Curve"
+msgstr "Dividir curva"
+
+#. xJMxs
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3151248\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierCutLine\">The<emph> Split Curve </emph>icon splits a curve. Select the point or points where you want to split the curve, then click the icon</ahelp>."
+msgstr "<ahelp hid=\".uno:BezierCutLine\">O ícone<emph> Dividir curva </emph>divide uma curva. Selecione um ou mais pontos em que deseja dividir a curva e clique no ícone</ahelp>."
+
+#. pHdF6
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153788\n"
+"help.text"
+msgid "<image id=\"img_id3148489\" src=\"cmd/lc_beziercutline.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148489\">Icon Split Curve</alt></image>"
+msgstr "<image id=\"img_id3148489\" src=\"cmd/lc_beziercutline.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148489\">Ícone Dividir curva</alt></image>"
+
+#. vmsiD
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3152581\n"
+"help.text"
+msgid "Split Curve"
+msgstr "Dividir curva"
+
+#. cBVZs
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3150345\n"
+"help.text"
+msgid "Convert To Curve"
+msgstr "Converter em curva"
+
+#. DNKmR
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148420\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierConvert\">Converts a curve into a straight line or converts a straight line into a curve.</ahelp> If you select a single point, the curve before the point will be converted. If two points are selected, the curve between both points will be converted. If you select more than two points, each time you click this icon, a different portion of the curve will be converted. If necessary, round points are converted into corner points and corner points are converted into round points."
+msgstr "<ahelp hid=\".uno:BezierConvert\">Converte uma curva em linha reta ou vice-versa.</ahelp> Se você selecionar um único ponto, a curva antes dele será convertida; se selecionar dois, a curva entre eles será convertida. Caso sejam selecionados mais de dois pontos, toda vez que você clicar neste ícone, outra parte da curva será convertida. Se necessário, pontos redondos serão convertidos em pontos de canto e vice-versa."
+
+#. 57eED
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3150304\n"
+"help.text"
+msgid "If a certain section of the curve is straight, the end points of the line have a maximum of one control point each. They cannot be modified to round points unless the straight line is converted back to a curve."
+msgstr "Se uma determinada seção da curva for reta, os pontos finais da linha terão no máximo um ponto de controle cada. Eles não podem ser transformados em pontos redondos a não ser que a linha reta seja novamente convertida em uma curva."
+
+#. L7FMu
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3158212\n"
+"help.text"
+msgid "<image id=\"img_id3149036\" src=\"cmd/lc_bezierconvert.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149036\">Icon Convert to Curve</alt></image>"
+msgstr "<image id=\"img_id3149036\" src=\"cmd/lc_bezierconvert.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149036\">Ícone Converter em curva</alt></image>"
+
+#. PtsWF
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3158445\n"
+"help.text"
+msgid "Convert To Curve"
+msgstr "Converter em curva"
+
+#. GJN2S
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3153199\n"
+"help.text"
+msgid "Corner Point"
+msgstr "Ponto de canto"
+
+#. UmXZR
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148460\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierEdge\">Converts the selected point or points into corner points.</ahelp> Corner points have two movable control points, which are independent from each other. A curved line, therefore, does not go straight through a corner point, but forms a corner."
+msgstr "<ahelp hid=\".uno:BezierEdge\">Converte em pontos de canto um ou mais pontos selecionados.</ahelp> Os pontos de canto têm dois pontos de controle móveis que são independentes um do outro. Por isso, uma linha curva não atravessa diretamente um ponto de canto, e sim o forma."
+
+#. nGTf9
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154576\n"
+"help.text"
+msgid "<image id=\"img_id3154201\" src=\"cmd/lc_bezieredge.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154201\">Icon Corner Point</alt></image>"
+msgstr "<image id=\"img_id3154201\" src=\"cmd/lc_bezieredge.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154201\">Ícone Ponto de canto</alt></image>"
+
+#. eLuKD
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3166429\n"
+"help.text"
+msgid "Corner Point"
+msgstr "Ponto de canto"
+
+#. qvsQR
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3166436\n"
+"help.text"
+msgid "Smooth Transition"
+msgstr "Transição suave"
+
+#. LVrmB
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3155510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierSmooth\">Converts a corner point or symmetrical point into a smooth point.</ahelp> Both control points of the corner point are aligned in parallel, and can only be moved simultaneously. The control points may differentiate in length, allowing you to vary the degree of curvature."
+msgstr "<ahelp hid=\".uno:BezierSmooth\">Converte um ponto de canto ou um ponto simétrico em um ponto de suavização.</ahelp> Os dois pontos de controle do ponto de canto devem estar alinhados em paralelo e ser movidos simultaneamente. Eles podem ter comprimentos diferentes, o que permitirá variar o grau de curvatura."
+
+#. DAXKE
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148813\n"
+"help.text"
+msgid "<image id=\"img_id3151183\" src=\"cmd/lc_beziersmooth.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151183\">Icon Smooth Transition</alt></image>"
+msgstr "<image id=\"img_id3151183\" src=\"cmd/lc_beziersmooth.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151183\">Ícone Transição suave</alt></image>"
+
+#. MLk9o
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154258\n"
+"help.text"
+msgid "Smooth Transition"
+msgstr "Transição suave"
+
+#. Q9GqB
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3159622\n"
+"help.text"
+msgid "Symmetric Transition"
+msgstr "Transição simétrica"
+
+#. fGgjS
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3155812\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierSymmetric\">This icon converts a corner point or a smooth point into a symmetrical point.</ahelp> Both control points of the corner point are aligned in parallel and have the same length. They can only be moved simultaneously and the degree of curvature is the same in both directions."
+msgstr "<ahelp hid=\".uno:BezierSymmetric\">Este ícone converte um ponto de canto ou um de suavização em um ponto simétrico.</ahelp> Os dois pontos de controle do ponto de canto devem estar alinhados em paralelo e ter o mesmo comprimento. Eles só podem ser movidos simultaneamente e o grau de curvatura deve ser o mesmo nas duas direções."
+
+#. DAqSZ
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153818\n"
+"help.text"
+msgid "<image id=\"img_id3159218\" src=\"cmd/lc_beziersymmetric.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159218\">Icon Symmetric Transition</alt></image>"
+msgstr "<image id=\"img_id3159218\" src=\"cmd/lc_beziersymmetric.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159218\">Ícone Transição simétrica</alt></image>"
+
+#. 2Byoz
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3146866\n"
+"help.text"
+msgid "Symmetric Transition"
+msgstr "Transição simétrica"
+
+#. DAS5H
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3146786\n"
+"help.text"
+msgid "Close Bézier"
+msgstr "Fechar Bézier"
+
+#. L7eHE
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3156032\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierClose\">Closes a line or a curve.</ahelp> A line is closed by connecting the last point with the first point, indicated by an enlarged square."
+msgstr "<ahelp hid=\".uno:BezierClose\">Fecha uma linha ou uma curva.</ahelp> Uma linha é fechada ao conectar o último ponto com o primeiro, que é indicado por um quadro aumentado."
+
+#. evNGB
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154344\n"
+"help.text"
+msgid "<image id=\"img_id3148607\" src=\"cmd/lc_bezierclose.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148607\">Icon Close Bézier</alt></image>"
+msgstr "<image id=\"img_id3148607\" src=\"cmd/lc_bezierclose.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148607\">Ícone Fechar Bézier</alt></image>"
+
+#. 29q2Q
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147070\n"
+"help.text"
+msgid "Close Bézier"
+msgstr "Fechar Bézier"
+
+#. bGzsc
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3156351\n"
+"help.text"
+msgid "Eliminate Points"
+msgstr "Eliminar pontos"
+
+#. Bk6z5
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3149441\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierEliminatePoints\">Marks the current point or the selected points for deletion.</ahelp> This happens in the event that the point is located on a straight line. If you convert a curve or a polygon with the <emph>Convert to Curve </emph>icon into a straight line or you change a curve with the mouse so that a point lies on the straight line, it is removed. The angle from which the point reduction is to take place <switchinline select=\"appl\"><caseinline select=\"DRAW\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\"><emph>%PRODUCTNAME Draw - Grid</emph></link> in the Options dialog box</caseinline><caseinline select=\"IMPRESS\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\"><emph>%PRODUCTNAME Impress - Grid</emph></link> in the Options dialog box</caseinline><defaultinline>is 15° by default.</defaultinline></switchinline>"
+msgstr "<ahelp hid=\".uno:BezierEliminatePoints\">Marca o ponto atual ou os pontos selecionados para exclusão.</ahelp> Isso ocorrerá se o ponto estiver localizado em uma linha reta. Se você converter uma curva ou um polígono com o ícone <emph>Converter em curva</emph> em uma linha reta ou alterar uma curva com o mouse de modo que um ponto fique na linha reta, ele será removido. O ângulo de onde o ponto de redução deverá começar <switchinline select=\"appl\"><caseinline select=\"DRAW\">pode ser definido escolhendo <link href=\"text/shared/optionen/01070300.xhp\"><emph>Ferramentas - Opções - %PRODUCTNAME Draw - Grade</emph></link></caseinline><caseinline select=\"IMPRESS\">pode ser definido escolhendo <link href=\"text/shared/optionen/01070300.xhp\"><emph>Ferramentas - Opções - %PRODUCTNAME Impress - Grade</emph></link></caseinline><defaultinline> é 15° por padrão.</defaultinline></switchinline>"
+
+#. RCPw8
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148970\n"
+"help.text"
+msgid "<image id=\"img_id3155385\" src=\"cmd/lc_beziereliminatepoints.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155385\">Icon Eliminate Points</alt></image>"
+msgstr "<image id=\"img_id3155385\" src=\"cmd/lc_beziereliminatepoints.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155385\">Ícone Eliminar pontos</alt></image>"
+
+#. vHE4T
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3152869\n"
+"help.text"
+msgid "Eliminate Points"
+msgstr "Eliminar pontos"
+
+#. 8AFz5
+#: main0400.xhp
+msgctxt ""
+"main0400.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Teclas de atalho"
+
+#. 7fYZK
+#: main0400.xhp
+msgctxt ""
+"main0400.xhp\n"
+"hd_id3149495\n"
+"help.text"
+msgid "<link href=\"text/shared/main0400.xhp\">Shortcut Keys</link>"
+msgstr "<link href=\"text/shared/main0400.xhp\">Teclas de atalho</link>"
+
+#. WPGJg
+#: main0400.xhp
+msgctxt ""
+"main0400.xhp\n"
+"par_id3150040\n"
+"help.text"
+msgid "This section contains descriptions of frequently used shortcut keys in $[officename]."
+msgstr "Esta seção contém descrições de teclas de atalho utilizadas com frequência no $[officename]."
+
+#. 8Fk6L
+#: main0500.xhp
+msgctxt ""
+"main0500.xhp\n"
+"tit\n"
+"help.text"
+msgid "Glossaries"
+msgstr "Glossários"
+
+#. CDvUF
+#: main0500.xhp
+msgctxt ""
+"main0500.xhp\n"
+"hd_id3156183\n"
+"help.text"
+msgid "<link href=\"text/shared/main0500.xhp\">Glossaries</link>"
+msgstr "<link href=\"text/shared/main0500.xhp\">Glossários</link>"
+
+#. dziDW
+#: main0500.xhp
+msgctxt ""
+"main0500.xhp\n"
+"par_id3157898\n"
+"help.text"
+msgid "This section provides a general glossary of technical terms used in $[officename], along with a list of Internet terms."
+msgstr "Esta seção oferece um glossário geral de termos técnicos usados no $[officename], junto com uma lista de termos da Internet."
+
+#. vAUtX
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"tit\n"
+"help.text"
+msgid "Java Platform Support"
+msgstr "Suporte à plataforma Java"
+
+#. Cwsus
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"hd_id3153089\n"
+"help.text"
+msgid "<link href=\"text/shared/main0650.xhp\">Java Platform Support</link>"
+msgstr "<link href=\"text/shared/main0650.xhp\">Suporte à plataforma Java</link>"
+
+#. dPzDx
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3152363\n"
+"help.text"
+msgid "$[officename] supports the Java platform for running applications and components based on the JavaBeans architecture."
+msgstr "O $[officename] oferece suporte à plataforma Java para a execução de aplicativos e componentes baseados na arquitetura JavaBeans."
+
+#. Bwg5V
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3154751\n"
+"help.text"
+msgid "For $[officename] to support the Java platform, you must install the Java 2 Runtime Environment software. When you installed $[officename], you automatically received the option to install these files if they were not yet installed. You can also install these files now if required."
+msgstr "Para que o $[officename] suporte a plataforma Java, deve-se instalar o software Java 2 Runtime Environment. Ao instalar o $[officename], a opção de instalação automática dos arquivos deste software lhe foram apresentadas caso estivessem faltando. Você também pode instalar estes arquivos agora se necessário."
+
+#. wFYWg
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3155338\n"
+"help.text"
+msgid "The Java platform support needs to be activated under $[officename] to run Java applications."
+msgstr "Para a execução de aplicativos Java, é preciso ativar o suporte à plataforma Java no $[officename]."
+
+#. H2Vk4
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3155892\n"
+"help.text"
+msgid "Enable Java platform support by choosing <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/java.xhp\"><emph>$[officename] - Advanced</emph></link>."
+msgstr "Ative o suporte à plataforma Java em <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME → Preferências</emph></caseinline><defaultinline><emph>Ferramentas → Opções…</emph></defaultinline></switchinline><emph> → </emph><link href=\"text/shared/optionen/java.xhp\"><emph>$[officename] → Avançado</emph></link>."
+
+#. NcDL4
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id9116183\n"
+"help.text"
+msgid "Before you can use a JDBC driver, you need to add its class path. Choose <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - %PRODUCTNAME - Advanced, and click the Class Path button. After you add the path information, restart %PRODUCTNAME."
+msgstr "Antes de utilizar um driver JDBC, você precisa adicionar seu caminho de classe. Escolha <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME → Preferências</caseinline><defaultinline>Ferramentas → Opções…</defaultinline></switchinline> → %PRODUCTNAME → Avançado, e clique no botão Caminho da classe. Após inserir a informação do caminho, reinicie o %PRODUCTNAME."
+
+#. ApwuB
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3153822\n"
+"help.text"
+msgid "Your modifications at the <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - $[officename] - Advanced</emph> tab page will be used even if the Java Virtual Machine (JVM) has been started already. After any modifications to the ClassPath you must restart $[officename]. The same is true for modifications under <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Internet - Proxy</emph>. Only the boxes \"HTTP Proxy\" and \"FTP Proxy\" and their ports do not require a restart—they will be evaluated when you click <emph>OK</emph>."
+msgstr "As alterações efetuadas em <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME → Preferências</emph></caseinline><defaultinline><emph>Ferramentas → Opções…</emph></defaultinline></switchinline><emph> → $[officename] → Avançado</emph> serão utilizadas mesmo que a máquina virtual Java (JVM) já esteja em execução. As alterações efetuadas no caminho da classe requerem o reinício do $[officename]. O mesmo é válido para as alterações efetuadas em <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME → Preferências</emph></caseinline><defaultinline><emph>Ferramentas → Opções…</emph></defaultinline></switchinline><emph> → Internet → Proxy</emph>. Apenas as opções \"Proxy HTTP\", \"Proxy FTP\" e respectivas portas não o exigem pois serão avaliadas ao clicar em <emph>OK</emph>."
+
+#. rFknA
+#: main0800.xhp
+msgctxt ""
+"main0800.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] and the Internet"
+msgstr "$[officename] e a Internet"
+
+#. QrCDK
+#: main0800.xhp
+msgctxt ""
+"main0800.xhp\n"
+"hd_id3153089\n"
+"help.text"
+msgid "<link href=\"text/shared/main0800.xhp\">$[officename] and the Internet</link>"
+msgstr "<link href=\"text/shared/main0800.xhp\">O $[officename] e a Internet</link>"
+
+#. C7HK8
+#: main0800.xhp
+msgctxt ""
+"main0800.xhp\n"
+"par_id3155150\n"
+"help.text"
+msgid "This section provides information on the subject of the Internet. An <link href=\"text/shared/00/00000002.xhp\">Internet glossary</link> explains the most important terms."
+msgstr "Esta seção oferece informações sobre a Internet. Um <link href=\"text/shared/00/00000002.xhp\">glossário da Internet</link> explica os termos mais importantes."
+
+#. vLYDy
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Media Playback Toolbar"
+msgstr "Barra de ferramentas Reprodução de mídia"
+
+#. 8f3GM
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"hd_id701655505104052\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/shared/mediaplay_toolbar.xhp\">Media Playback Toolbar</link></variable>"
+msgstr "<variable id=\"h1\"><link href=\"text/shared/mediaplay_toolbar.xhp\">Barra de ferramentas Reprodução de mídia</link></variable>"
+
+#. ELZkF
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"par_id821655505104055\n"
+"help.text"
+msgid "Open the Media Playback toolbar"
+msgstr "Abre a barra de ferramentas Reprodução de mídia"
+
+#. GpFS2
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"par_id411655505224585\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars - Media Playback</menuitem>."
+msgstr "Selecione <menuitem>Exibir - Barras de ferramentas - Reprodução de mídia</menuitem>."
+
+#. NJGJa
+#: need_help.xhp
+msgctxt ""
+"need_help.xhp\n"
+"tit\n"
+"help.text"
+msgid "We Need Your Help"
+msgstr "Necessitamos da sua ajuda"
+
+#. Pw8Hr
+#: need_help.xhp
+msgctxt ""
+"need_help.xhp\n"
+"hd_id1000010\n"
+"help.text"
+msgid "This help page needs further work for correctness and completion. Please join the LibreOffice project and help us out to write the missing information. Visit our <link href=\"https://documentation.libreoffice.org/en/join-community/update-help-contents\"><emph>web page on writing Help contents</emph></link>."
+msgstr "Esta página de ajuda necessita de melhorias. Integre a equipe do LibreOffice e ajude-nos a escrever as informações em falta. Acesse a <link href=\"https://documentation.libreoffice.org/en/join-community/update-help-contents\"><emph>página de ajuda</emph> para obter mais informações.</link>"
+
+#. fGrZx
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"tit\n"
+"help.text"
+msgid "Spacing"
+msgstr "Espaçamento"
+
+#. yQezt
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id411816022675979\n"
+"help.text"
+msgid "<link href=\"text/shared/submenu_spacing.xhp\">Spacing</link>"
+msgstr "<link href=\"text/shared/submenu_spacing.xhp\">Espaçamento</link>"
+
+#. 22dPh
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id398855439580084\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a submenu where you can choose text spacing commands.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre um submenu para escolher comandos específicos de espaçamento entre linhas.</ahelp>"
+
+#. 44Px9
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147573\n"
+"help.text"
+msgid "Increase Paragraph Spacing"
+msgstr "Aumentar espaçamento entre parágrafos"
+
+#. zhqwZ
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150695\n"
+"help.text"
+msgid "Increases the paragraph spacing above the selected paragraph."
+msgstr "Aumenta o espaço acima do parágrafo selecionado."
+
+#. zDRUC
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id261643820768225\n"
+"help.text"
+msgid "<image src=\"cmd/lc_paraspaceincrease.svg\" id=\"img_id901643820768226\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id831643820768227\">Icon Increase Paragraph Spacing</alt></image>"
+msgstr "<image src=\"cmd/lc_paraspaceincrease.svg\" id=\"img_id901643820768226\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id831643820768227\">Ícone Aumentar espaçamento entre parágrafos</alt></image>"
+
+#. D2RsS
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id131643820768228\n"
+"help.text"
+msgid "Increase Paragraph Spacing"
+msgstr "Aumentar espaçamento entre parágrafos"
+
+#. XCZUT
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147574\n"
+"help.text"
+msgid "Decrease Paragraph Spacing"
+msgstr "Diminuir o espaçamento entre parágrafos"
+
+#. EVYri
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150696\n"
+"help.text"
+msgid "Decreases the paragraph spacing above the selected paragraph."
+msgstr "Diminui o espaço acima do parágrafo selecionado."
+
+#. agf5h
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id791643820835491\n"
+"help.text"
+msgid "<image src=\"cmd/lc_paraspacedecrease.svg\" id=\"img_id391643820835492\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id551643820835493\">Icon Decrease Paragraph Spacing</alt></image>"
+msgstr "<image src=\"cmd/lc_paraspacedecrease.svg\" id=\"img_id391643820835492\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id551643820835493\">Ícone Diminuir o espaçamento entre parágrafos</alt></image>"
+
+#. DssS6
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id141643820835494\n"
+"help.text"
+msgid "Decrease Paragraph Spacing"
+msgstr "Diminuir o espaçamento entre parágrafos"
+
+#. EsHFP
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147575\n"
+"help.text"
+msgid "Increase Indent"
+msgstr "Aumentar recuo"
+
+#. BU6i9
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150697\n"
+"help.text"
+msgid "Increases the left indent of the current paragraph or cell content and sets it to the next default tab position. If several paragraphs are selected, the indentation of all selected paragraphs is increased."
+msgstr "Aumenta o recuo à esquerda do parágrafo atual ou conteúdo de célula e posiciona na próxima parada de tabulação. Se vários parágrafos forem selecionados, o recuo de todos os parágrafos selecionados aumenta."
+
+#. CFoDz
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id351643820903541\n"
+"help.text"
+msgid "<image src=\"cmd/lc_incrementindent.svg\" id=\"img_id161643820903542\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id981643820903543\">Icon Increase Indent</alt></image>"
+msgstr "<image src=\"cmd/lc_incrementindent.svg\" id=\"img_id161643820903542\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id981643820903543\">Ícone Aumentar recuo</alt></image>"
+
+#. c7WUp
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id841643820903544\n"
+"help.text"
+msgid "Increase Indent"
+msgstr "Aumentar recuo"
+
+#. YA8bT
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147576\n"
+"help.text"
+msgid "Decrease Indent"
+msgstr "Diminuir recuo"
+
+#. aSrjB
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150698\n"
+"help.text"
+msgid "Decreases the left indent of the current paragraph or cell content and sets it to the previous default tab position. If several paragraphs are selected, the indentation of all selected paragraphs is decreased."
+msgstr "Diminui o recuo esquerdo do parágrafo atual ou o conteúdo da célula e o define para a posição de tabulação padrão anterior. Se vários parágrafos forem selecionados, o recuo de todos os parágrafos selecionados será reduzido."
+
+#. XsV6q
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id191643820966566\n"
+"help.text"
+msgid "<image src=\"cmd/lc_decrementindent.svg\" id=\"img_id601643820966567\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id991643820966568\">Icon Decrease Indent</alt></image>"
+msgstr "<image src=\"cmd/lc_decrementindent.svg\" id=\"img_id601643820966567\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id991643820966568\">Ícone Diminuir recuo</alt></image>"
+
+#. wVZXB
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id201643820966569\n"
+"help.text"
+msgid "Decrease Indent"
+msgstr "Diminuir recuo"
+
+#. MVHBc
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text"
+msgstr "Texto"
+
+#. pVEBz
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id411816022675978\n"
+"help.text"
+msgid "<link href=\"text/shared/submenu_text.xhp\">Text</link>"
+msgstr "<link href=\"text/shared/submenu_text.xhp\">Texto</link>"
+
+#. UdmfU
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id398855439580083\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a submenu where you can choose text formatting commands.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre um submenu para escolher comandos específicos de formatação de texto.</ahelp>"
+
+#. JCTNH
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id893328657433073\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id0123200902243376\">Overline</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id0123200902243376\">Sobrelinha</link>"
+
+#. U9h8v
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id281953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#overline\" markup=\"ignore\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#overline\" markup=\"ignore\"/>"
+
+#. NLNGF
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id773632078996899\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3163714\">Shadow</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3163714\">Sombra</link>"
+
+#. hMRVP
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id873632078996899\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3147287\">Outline</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3147287\">Contorno</link>"
+
+#. br5DC
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id207025326941609\n"
+"help.text"
+msgid "Wrap Text"
+msgstr "Dispor texto"
+
+#. jBc2E
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id302484503842787\n"
+"help.text"
+msgid "<ahelp hid=\".\">Break text automatically at the right edges of the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".\">Insere uma quebra de texto automaticamente na borda direita das células selecionadas.</ahelp>"
+
+#. BqgSi
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id273587522269593\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0202.xhp#hd_id0122200903085320\">Increase Size</link>"
+msgstr "<link href=\"text/swriter/main0202.xhp#hd_id0122200903085320\">Aumentar tamanho</link>"
+
+#. GTjCT
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id511910578827551\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0202.xhp#hd_id012220090308532\">Decrease Size</link>"
+msgstr "<link href=\"text/swriter/main0202.xhp#hd_id012220090308532\">Diminuir tamanho</link>"
+
+#. WApc3
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id373587522269593\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Increase Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Aumentar tamanho</link>"
+
+#. AQANy
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id711910578827551\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Decrease Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Diminuir tamanho</link>"
+
+#. uzDFv
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id473587522269593\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Increase Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Aumentar tamanho</link>"
+
+#. GQ8Fj
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id611910578827551\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Decrease Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Diminuir tamanho</link>"
+
+#. wSRdX
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id172462591626807\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">UPPERCASE</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">MAIÚSCULAS</link>"
+
+#. sjNg6
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id381953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#uppercase\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#uppercase\"/>"
+
+#. FFVUb
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id935919548287354\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">lowercase</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">minúsculas</link>"
+
+#. ijGEm
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id481953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#lowercase\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#lowercase\"/>"
+
+#. zGBE2
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3147143\n"
+"help.text"
+msgid "Cycle Case"
+msgstr "Circular caixa"
+
+#. TSJfn
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3152372\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseRotateCase\">Cycles the case of the selected characters between Title Case, Sentence case, UPPERCASE and lowercase.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseRotateCase\">Alterna circularmente a caixa dos caracteres selecionados entre Palavras iniciando com maiúsculas, Frase iniciando com maiúscula, MAIÚSCULAS e minúsculas.</ahelp>"
+
+#. v24QT
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3147572\n"
+"help.text"
+msgid "Sentence case"
+msgstr "Frase iniciando com maiúscula"
+
+#. v3Cr9
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3150694\n"
+"help.text"
+msgid "<ahelp hid=\".\">Changes the first letter of the selected characters to an uppercase character.</ahelp>"
+msgstr "<ahelp hid=\".\">Muda a primeira letra dos caracteres selecionados para maiúscula.</ahelp>"
+
+#. JtsaD
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id640520497868661\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Capitalize Every Word</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Palavras iniciando com maiúsculas</link>"
+
+#. 3UGHA
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id581953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#capitalizeeveryword\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#capitalizeeveryword\"/>"
+
+#. Y9fn4
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3147521\n"
+"help.text"
+msgid "tOGGLE cASE"
+msgstr "aLTERNAR cAIXA"
+
+#. eb5K9
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3150623\n"
+"help.text"
+msgid "<ahelp hid=\".\">Toggles case of all selected characters.</ahelp>"
+msgstr "<ahelp hid=\".\">Alterna a caixa de todos os caracteres selecionados.</ahelp>"
+
+#. WNuFq
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id342778277179117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Small capitals</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Versaletes</link>"
+
+#. K6tXB
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id681953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+
+#. VXJzA
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id442778277179117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Small capitals</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Versaletes</link>"
+
+#. arEu2
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id781953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+
+#. KQxFn
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id542778277179117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Small capitals</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Versaletes</link>"
+
+#. okCcu
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id881953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+
+#. zo6cE
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3155392\n"
+"help.text"
+msgid "Half-width"
+msgstr "Meia largura"
+
+#. SEpmw
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3147088\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToHalfWidth\">Changes the selected Asian characters to half-width characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToHalfWidth\">Altera os caracteres asiáticos selecionados para caracteres de meia largura.</ahelp>"
+
+#. rA2DG
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3156113\n"
+"help.text"
+msgid "Full Width"
+msgstr "Largura inteira"
+
+#. Ep24G
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3154749\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToFullWidth\">Changes the selected Asian characters to full-width characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToFullWidth\">Altera os caracteres asiáticos selecionados para caracteres de largura normal.</ahelp>"
+
+#. dZCcC
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3152996\n"
+"help.text"
+msgid "Hiragana"
+msgstr "Hiragana"
+
+#. AB6ta
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3156156\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToHiragana\">Changes the selected Asian characters to Hiragana characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToHiragana\">Altera os caracteres asiáticos selecionados para caracteres Hiragana.</ahelp>"
+
+#. LNQLS
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3154173\n"
+"help.text"
+msgid "Katakana"
+msgstr "Katakana"
+
+#. QSxUp
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3146137\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToKatakana\">Changes the selected Asian characters to Katakana characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToKatakana\">Altera os caracteres asiáticos selecionados para caracteres Katakana.</ahelp>"

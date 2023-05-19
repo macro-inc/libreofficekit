@@ -1,0 +1,2348 @@
+#. extracted from helpcontent2/source/text/swriter/04
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-08-03 22:48+0000\n"
+"Last-Translator: HanV <han.velthuis@home.nl>\n"
+"Language-Team: Dutch <https://translations.documentfoundation.org/projects/libo_help-master/textswriter04/nl/>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1510322523.000000\n"
+
+#. brcGC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys for %PRODUCTNAME Writer"
+msgstr "Sneltoetsen voor %PRODUCTNAME Writer"
+
+#. AxYaC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3145763\n"
+"help.text"
+msgid "<bookmark_value>shortcut keys; in text documents</bookmark_value>         <bookmark_value>text documents; shortcut keys in</bookmark_value>"
+msgstr "<bookmark_value>sneltoetsen; in tekstdocumenten</bookmark_value>         <bookmark_value>tekstdocumenten; sneltoetsen in</bookmark_value>"
+
+#. C9cjF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145763\n"
+"help.text"
+msgid "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+msgstr "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Sneltoetsen voor <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+
+#. qbPEo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150491\n"
+"help.text"
+msgid "You can use shortcut keys to quickly perform common tasks in <item type=\"productname\">%PRODUCTNAME</item>. This section lists the default shortcut keys for <item type=\"productname\">%PRODUCTNAME</item> Writer."
+msgstr "U kunt sneltoetsen gebruiken om snel veelvoorkomende taken in <item type=\"productname\">%PRODUCTNAME</item> uit te voeren. In deze sectie worden de standaardsneltoetsen voor <item type=\"productname\">%PRODUCTNAME</item> Writer beschreven."
+
+#. WkpSD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145081\n"
+"help.text"
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys in <item type=\"productname\">%PRODUCTNAME</item></link>."
+msgstr "U kunt ook de <link href=\"text/shared/04/01010000.xhp\">algemene sneltoetsen voor <item type=\"productname\">%PRODUCTNAME</item></link> gebruiken."
+
+#. dQtdg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149800\n"
+"help.text"
+msgid "Function Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer"
+msgstr "Functietoetsen voor <item type=\"productname\">%PRODUCTNAME</item> Writer"
+
+#. 5DyzK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10663\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Sneltoetsen"
+
+#. DCeRU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10668\n"
+"help.text"
+msgid "Effect"
+msgstr "Effect"
+
+#. U2DxF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149486\n"
+"help.text"
+msgid "F2"
+msgstr "F2"
+
+#. aAAKw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3143274\n"
+"help.text"
+msgid "Formula Bar"
+msgstr "Formulebalk"
+
+#. 4ajxh
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149821\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+
+#. zp2mH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145774\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "Velden invoegen"
+
+#. oyxS4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155912\n"
+"help.text"
+msgid "F3"
+msgstr "F3"
+
+#. pjc6f
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155855\n"
+"help.text"
+msgid "Complete AutoText"
+msgstr "AutoTekst invullen"
+
+#. DC7Wg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147411\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+
+#. 5dp5A
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155060\n"
+"help.text"
+msgid "Edit AutoText"
+msgstr "AutoTekst bewerken"
+
+#. Fx4Z8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150097\n"
+"help.text"
+msgid "Shift+F4"
+msgstr "Shift+F4"
+
+#. MJFUJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153400\n"
+"help.text"
+msgid "Select next frame"
+msgstr "Volgend frame selecteren"
+
+#. KGiDG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149839\n"
+"help.text"
+msgid "Ctrl+Shift+F4"
+msgstr "Ctrl+Shift+F4"
+
+#. qUKWo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148847\n"
+"help.text"
+msgid "Open Data Source View"
+msgstr "Gegevensbronweergave openen"
+
+#. xz8HB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156096\n"
+"help.text"
+msgid "F5"
+msgstr "F5"
+
+#. EBCei
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156110\n"
+"help.text"
+msgid "Navigator on/off"
+msgstr "Navigator aan/uit"
+
+#. DAAVF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id451547122572675\n"
+"help.text"
+msgid "Shift+F5"
+msgstr "Shift+F5"
+
+#. E4Zqz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id191547122572675\n"
+"help.text"
+msgid "Moves the cursor to the position that it had when the document was last saved before it was last closed."
+msgstr "Verplaatst de cursor naar de positie waar die stond toen het document de laatste keer is opgeslagen."
+
+#. GEWBz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153118\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F5"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F5"
+
+#. rkGsE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149628\n"
+"help.text"
+msgid "Navigator on, go to page number"
+msgstr "Navigator aan, ga naar paginanummer"
+
+#. iBRGt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149647\n"
+"help.text"
+msgid "F7"
+msgstr "F7"
+
+#. ZKQnV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149957\n"
+"help.text"
+msgid "Spelling"
+msgstr "Spelling"
+
+#. BgpGm
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149601\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
+
+#. qG6qV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149850\n"
+"help.text"
+msgid "Thesaurus"
+msgstr "Synoniemenlijst"
+
+#. DU5pi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149869\n"
+"help.text"
+msgid "F8"
+msgstr "F8"
+
+#. T9Nam
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145096\n"
+"help.text"
+msgid "Extension mode"
+msgstr "Modus Extensie"
+
+#. 3cZrP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145116\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F8"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F8"
+
+#. iGigL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149593\n"
+"help.text"
+msgid "Field shadings on / off"
+msgstr "Veldarceringen aan/uit"
+
+#. XkDgU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156250\n"
+"help.text"
+msgid "Shift+F8"
+msgstr "Shift+F8"
+
+#. mZXDi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156264\n"
+"help.text"
+msgid "Additional selection mode"
+msgstr "Extra selectiemodus"
+
+#. zhxhj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id7121494\n"
+"help.text"
+msgid "Ctrl+Shift+F8"
+msgstr "Ctrl+Shift+F8"
+
+#. 2nhCf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id9048432\n"
+"help.text"
+msgid "Block selection mode"
+msgstr "Blokselectiemodus"
+
+#. DYGmM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145408\n"
+"help.text"
+msgid "F9"
+msgstr "F9"
+
+#. bvYwS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155306\n"
+"help.text"
+msgid "Update fields"
+msgstr "Velden bijwerken"
+
+#. CezLx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155324\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F9"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F9"
+
+#. yzufX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154404\n"
+"help.text"
+msgid "Show fields"
+msgstr "Veldnamen weergeven"
+
+#. eFmJa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154423\n"
+"help.text"
+msgid "Shift+F9"
+msgstr "Shift+F9"
+
+#. CCkAf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153375\n"
+"help.text"
+msgid "Calculate Table"
+msgstr "Tabel berekenen"
+
+#. NfVvA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153394\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F9"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F9"
+
+#. WVgrC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154865\n"
+"help.text"
+msgid "Update Input Fields and Input Lists"
+msgstr "Invoervelden en invoerlijsten bijwerken"
+
+#. YrFbX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155883\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F10"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F10"
+
+#. 4fbWp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148674\n"
+"help.text"
+msgid "Nonprinting Characters on/off"
+msgstr "Niet-afdrukbare tekens aan/uit"
+
+#. jZnN4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148693\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+T</caseinline><defaultinline>F11</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+T</caseinline><defaultinline>F11</defaultinline></switchinline>"
+
+#. vJsNC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149978\n"
+"help.text"
+msgid "Styles window on/off"
+msgstr "Venster Stijlen en opmaak aan/uit"
+
+#. icxpB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149997\n"
+"help.text"
+msgid "Shift+F11"
+msgstr "Shift+F11"
+
+#. wyAxo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155926\n"
+"help.text"
+msgid "Create Style"
+msgstr "Opmaakprofiel maken"
+
+#. ngPGJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id0905200802191980\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F11"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F11"
+
+#. 8GVhM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id0905200802192020\n"
+"help.text"
+msgid "Sets focus to Apply Style box"
+msgstr "Stelt focus in op het vak Opmaakprofiel toepassen"
+
+#. KbwAx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155945\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F11"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F11"
+
+#. Qa3bN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153020\n"
+"help.text"
+msgid "Update Style"
+msgstr "Opmaakprofiel bijwerken"
+
+#. L8FVh
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153039\n"
+"help.text"
+msgid "F12"
+msgstr "F12"
+
+#. jiXFc
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148959\n"
+"help.text"
+msgid "Toggle Ordered List"
+msgstr "Geordende lijst aan/uit"
+
+#. wAUBd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148979\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+
+#. Kudcw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153650\n"
+"help.text"
+msgid "Insert or edit Table"
+msgstr "Tabel invoegen of bewerken"
+
+#. GVNZX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152749\n"
+"help.text"
+msgid "Shift+F12"
+msgstr "Shift+F12"
+
+#. fkbSD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152763\n"
+"help.text"
+msgid "Toggle Unordered List"
+msgstr "Ongeordende lijst aan/uit"
+
+#. pneN5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153876\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F12"
+
+#. E9pG5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153901\n"
+"help.text"
+msgid "Ordered / Unordered List off"
+msgstr "Geordende/Ongeordende lijst uit"
+
+#. HyF9c
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147109\n"
+"help.text"
+msgid "Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer"
+msgstr "Sneltoetsen voor <item type=\"productname\">%PRODUCTNAME</item> Writer"
+
+#. gnAFp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10ACE\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Sneltoetsen"
+
+#. zzkBF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AD3\n"
+"help.text"
+msgid "Effect"
+msgstr "Effect"
+
+#. QqFdR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149785\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+
+#. NdbXK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150220\n"
+"help.text"
+msgid "Select All"
+msgstr "Alles selecteren"
+
+#. wPU8p
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150239\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+J"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+J"
+
+#. HV6WL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145219\n"
+"help.text"
+msgid "Justify"
+msgstr "Uitvullen"
+
+#. GGZ4z
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145238\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+D"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+D"
+
+#. LTHbC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150325\n"
+"help.text"
+msgid "Double Underline"
+msgstr "Dubbel onderstrepen"
+
+#. htUya
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148578\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+E"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+E"
+
+#. Sfbo5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148604\n"
+"help.text"
+msgid "Centered"
+msgstr "Gecentreerd"
+
+#. DSJ9D
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147016\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+H"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+H"
+
+#. uxDhp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147041\n"
+"help.text"
+msgid "Find and Replace"
+msgstr "Zoeken en vervangen"
+
+#. Brwcz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150940\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+P"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+P"
+
+#. EWHeR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150965\n"
+"help.text"
+msgid "Superscript"
+msgstr "Superscript"
+
+#. kgiDH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154363\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+L"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+L"
+
+#. HQ8KB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154389\n"
+"help.text"
+msgid "Align Left"
+msgstr "Links uitlijnen"
+
+#. yo8B2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150519\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+R"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+R"
+
+#. gG5yw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147519\n"
+"help.text"
+msgid "Align Right"
+msgstr "Rechts uitlijnen"
+
+#. nyNBV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147538\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+B"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+B"
+
+#. bQAbN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153587\n"
+"help.text"
+msgid "Subscript"
+msgstr "Subscript"
+
+#. 4H5vP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153606\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Shift+Z</caseinline><defaultinline>Ctrl+Y</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando+Shift+Z</caseinline><defaultinline>Ctrl+Y</defaultinline></switchinline>"
+
+#. 6Y4oN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151268\n"
+"help.text"
+msgid "Redo last action"
+msgstr "Laatste bewerking herhalen"
+
+#. okgdj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10D39\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+0 (zero)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+0 (nul)"
+
+#. 7uEYD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10D64\n"
+"help.text"
+msgid "Apply Text Body paragraph style"
+msgstr "Alinea-opmaakprofiel Tekst toepassen"
+
+#. dxC7K
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151287\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+1"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+1"
+
+#. oAKuu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153731\n"
+"help.text"
+msgid "Apply Heading 1 paragraph style"
+msgstr "Alinea-opmaakprofiel Kop 1 toepassen"
+
+#. 7CZcq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153751\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+2"
+
+#. iDPoL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150831\n"
+"help.text"
+msgid "Apply Heading 2 paragraph style"
+msgstr "Alinea-opmaakprofiel Kop 2 toepassen"
+
+#. Wa3tN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10DF8\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+3"
+
+#. rQRNS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10E23\n"
+"help.text"
+msgid "Apply Heading 3 paragraph style"
+msgstr "Alinea-opmaakprofiel Kop 3 toepassen"
+
+#. ZJCMC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN1550DF8\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+4"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+4"
+
+#. CgwGd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN5510E23\n"
+"help.text"
+msgid "Apply Heading 4 paragraph style"
+msgstr "Alinea-opmaakprofiel Kop 4 toepassen"
+
+#. z7MZx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150849\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+5"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+5"
+
+#. xTs6C
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146860\n"
+"help.text"
+msgid "Apply Heading 5 paragraph style"
+msgstr "Alinea-opmaakprofiel Kop 5 toepassen"
+
+#. yFEKq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146878\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + Plus Key(+)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + toets Plus (+)"
+
+#. AbV2S
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155403\n"
+"help.text"
+msgid "Calculates the selected text and copies the result to the clipboard."
+msgstr "Berekent de geselecteerde tekst en kopieert het resultaat naar het klembord."
+
+#. tZvnu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155432\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Hyphen(-)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+afbreekstreepje(-)"
+
+#. nwFUv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150712\n"
+"help.text"
+msgid "Soft hyphens; hyphenation set by you."
+msgstr "Zachte afbreekstreepjes; woordafbreking door u ingesteld."
+
+#. EFKvp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150732\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+minus sign (-)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+minteken (-)"
+
+#. bjRhb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148394\n"
+"help.text"
+msgid "Non-breaking hyphen (is not used for hyphenation)"
+msgstr "Hard koppelteken (wordt niet gebruikt voor woordafbreking)"
+
+#. GbHDz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148414\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+multiplication sign * (only on number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+vermenigvuldigingsteken * (alleen op numeriek toetsenblok)"
+
+#. Pjfzz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147302\n"
+"help.text"
+msgid "Run macro field"
+msgstr "Macroveld uitvoeren"
+
+#. PqbpK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147321\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Space"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Spatiebalk"
+
+#. wDzkE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150260\n"
+"help.text"
+msgid "Non-breaking spaces. Non-breaking spaces are not used for hyphenation and are not expanded if the text is justified."
+msgstr "Vaste spaties. Vaste spaties worden niet gebruikt voor woordafbreking en worden niet uitgebreid als de tekst uitgevuld wordt."
+
+#. xsddz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150281\n"
+"help.text"
+msgid "Shift+Enter"
+msgstr "Shift+Enter"
+
+#. Swrx8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150294\n"
+"help.text"
+msgid "Line break without paragraph change"
+msgstr "Regeleinde zonder een nieuwe alinea te beginnen"
+
+#. AFeET
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149422\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+
+#. AmExs
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149447\n"
+"help.text"
+msgid "Manual page break"
+msgstr "Handmatig einde"
+
+#. aABQP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146967\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Enter"
+
+#. smRgr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146993\n"
+"help.text"
+msgid "Column break in multicolumnar texts"
+msgstr "Kolomeinde in teksten met meerdere kolommen"
+
+#. 2r5ie
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152906\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
+
+#. A5Eck
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152932\n"
+"help.text"
+msgid "Inserting a new paragraph without numbering inside a list. Does not work when the cursor is at the end of the list."
+msgstr "Invoegen van een nieuwe alinea, zonder nummering, in een lijst . Dit werkt niet als de cursor aan het einde van de lijst staat."
+
+#. hyD6E
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153772\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
+
+#. g9FzE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153798\n"
+"help.text"
+msgid "Insert a new paragraph directly before or after a section or table."
+msgstr "Voeg een nieuwe alinea in, direct voor of na een sectie of tabel."
+
+#. D2Ddu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id9535524\n"
+"help.text"
+msgid "For sections, the cursor must be placed at the first or last character. For tables, the cursor must be placed at the first character of the first cell or the last character of the last cell."
+msgstr "Voor secties moet de cursor op het eerste of laatste teken worden geplaatst. Voor tabellen moet de cursor op het eerste teken van de eerste cel of het laatste teken van de laatste cel worden geplaatst."
+
+#. SAcMa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153818\n"
+"help.text"
+msgid "Arrow Left"
+msgstr "Pijl naar links"
+
+#. nkCM3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153930\n"
+"help.text"
+msgid "Move cursor to left"
+msgstr "Cursor naar links"
+
+#. jDhBr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153949\n"
+"help.text"
+msgid "Shift+Arrow Left"
+msgstr "Shift+pijl naar links"
+
+#. zPP4n
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153963\n"
+"help.text"
+msgid "Move cursor with selection to the left"
+msgstr "Selectie met cursor naar links uitbreiden"
+
+#. qkLD6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148631\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Left"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Pijl naar links"
+
+#. AfCys
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148656\n"
+"help.text"
+msgid "Go to beginning of word"
+msgstr "Naar begin van woord"
+
+#. rzufT
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154244\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow Left"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Pijl naar links"
+
+#. BZBdr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154270\n"
+"help.text"
+msgid "Selecting to the left word by word"
+msgstr "Woord voor woord naar links selecteren"
+
+#. aUTdg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153147\n"
+"help.text"
+msgid "Arrow Right"
+msgstr "Pijl naar rechts"
+
+#. fWN5N
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153161\n"
+"help.text"
+msgid "Move cursor to right"
+msgstr "Cursor naar rechts"
+
+#. 4CApH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153180\n"
+"help.text"
+msgid "Shift+Arrow Right"
+msgstr "Shift+pijl naar rechts"
+
+#. uCQXE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154048\n"
+"help.text"
+msgid "Move cursor with selection to the right"
+msgstr "Selectie met cursor naar rechts uitbreiden"
+
+#. eQLyD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154067\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Right"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Pijl naar rechts"
+
+#. FGKdD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154093\n"
+"help.text"
+msgid "Go to start of next word"
+msgstr "Ga naar begin van het volgende woord"
+
+#. zF2Zr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155272\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow Right"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Pijl naar rechts"
+
+#. weENC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155298\n"
+"help.text"
+msgid "Selecting to the right word by word"
+msgstr "Woord voor woord naar rechts selecteren"
+
+#. MMX3C
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154718\n"
+"help.text"
+msgid "Arrow Up"
+msgstr "Pijl omhoog"
+
+#. mMaCL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154731\n"
+"help.text"
+msgid "Move cursor up one line"
+msgstr "Verplaats de cursor één regel naar boven"
+
+#. NvAoA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154750\n"
+"help.text"
+msgid "Shift+Arrow Up"
+msgstr "Shift+pijl omhoog"
+
+#. DbihF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153199\n"
+"help.text"
+msgid "Selecting lines in an upwards direction"
+msgstr "Regels naar boven selecteren"
+
+#. VGz9r
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id6452528\n"
+"help.text"
+msgid "Ctrl+Arrow Up"
+msgstr "Ctrl+Pijl omhoog"
+
+#. 4FbU4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id1764275\n"
+"help.text"
+msgid "Move cursor to beginning of paragraph. Next keystroke moves cursor to beginning of previous paragraph"
+msgstr "Verplaats de cursor naar het begin van de alinea. Volgende toetsaanslag verplaatst cursor naar het begin van de vorige alinea"
+
+#. VEwNS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id778527\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>Shift+Pijl omhoog"
+
+#. Mvja7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id1797235\n"
+"help.text"
+msgid "Select to beginning of paragraph. Next keystroke extends selection to beginning of previous paragraph"
+msgstr "Selecteer tot aan het begin van de alinea. De volgende toetsaanslag breidt de selectie uit tot aan het begin van de voorafgaande alinea"
+
+#. cbSpN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153218\n"
+"help.text"
+msgid "Arrow Down"
+msgstr "Pijl omlaag"
+
+#. HE4wg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153232\n"
+"help.text"
+msgid "Move cursor down one line"
+msgstr "Cursor één regel naar beneden"
+
+#. PRQGC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153317\n"
+"help.text"
+msgid "Shift+Arrow Down"
+msgstr "Shift+omlaag"
+
+#. G2CEB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153331\n"
+"help.text"
+msgid "Selecting lines in a downward direction"
+msgstr "Regels selecteren naar beneden"
+
+#. PCFvK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id578936\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Pijl omlaag"
+
+#. dezro
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id6164433\n"
+"help.text"
+msgid "Move cursor to beginning of next paragraph."
+msgstr "Verplaats de cursor naar het begin van de volgende alinea"
+
+#. vB7xy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id7405011\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>Shift+Pijl omlaag"
+
+#. 4Ygc8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3729361\n"
+"help.text"
+msgid "Select to end of paragraph. Next keystroke extends selection to end of next paragraph"
+msgstr "Selecteer tot aan het einde van de alinea. De volgende toetsaanslag breidt de selectie uit tot aan het einde van de volgende alinea"
+
+#. d6Zee
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153351\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Left</caseinline><defaultinline>Home</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl naar links</caseinline><defaultinline>Home</defaultinline></switchinline>"
+
+#. FXCQV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154512\n"
+"help.text"
+msgid "Go to beginning of line"
+msgstr "Naar begin van regel"
+
+#. FYZDD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154531\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Left</caseinline><defaultinline>Home</defaultinline></switchinline>+Shift"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl naar links</caseinline><defaultinline>Home</defaultinline></switchinline>+Shift"
+
+#. MyZhF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154544\n"
+"help.text"
+msgid "Go and select to the beginning of a line"
+msgstr "Selecteer tot het begin van een regel"
+
+#. mJCQW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150972\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Right</caseinline><defaultinline>End</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl naar rechts</caseinline><defaultinline>End</defaultinline></switchinline>"
+
+#. MAucD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150986\n"
+"help.text"
+msgid "Go to end of line"
+msgstr "Naar einde van regel"
+
+#. EzStS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151005\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Right</caseinline><defaultinline>End</defaultinline></switchinline>+Shift"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl naar rechts</caseinline><defaultinline>End</defaultinline></switchinline>+Shift"
+
+#. qCDwe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151019\n"
+"help.text"
+msgid "Go and select to end of line"
+msgstr "Selecteren tot einde van regel"
+
+#. NqHFz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149371\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Up</caseinline><defaultinline>Ctrl+Home</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl omhoog</caseinline><defaultinline>Ctrl+Home</defaultinline></switchinline>"
+
+#. TyzSU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149396\n"
+"help.text"
+msgid "Go to start of document"
+msgstr "Naar begin van document"
+
+#. eTwJd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151030\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Up</caseinline><defaultinline>Ctrl+Home</defaultinline></switchinline>+Shift"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl omhoog</caseinline><defaultinline>Ctrl+Home</defaultinline></switchinline>+Shift"
+
+#. Soi4q
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151055\n"
+"help.text"
+msgid "Go and select text to start of document"
+msgstr "Selecteer tekst tot het begin van het document"
+
+#. 7BJiR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151075\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Down</caseinline><defaultinline>Ctrl+End</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl omlaag</caseinline><defaultinline>Ctrl+End</defaultinline></switchinline>"
+
+#. FVBec
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149732\n"
+"help.text"
+msgid "Go to end of document"
+msgstr "Naar einde van document"
+
+#. fSosH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149750\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Down</caseinline><defaultinline>Ctrl+End</defaultinline></switchinline>+Shift"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Pijl omlaag</caseinline><defaultinline>Ctrl+End</defaultinline></switchinline>+Shift"
+
+#. HD7Wn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147064\n"
+"help.text"
+msgid "Go and select text to end of document"
+msgstr "Selecteer tekst tot het einde van het document"
+
+#. udfmK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147083\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PageUp"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PageUp"
+
+#. AkRxs
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153826\n"
+"help.text"
+msgid "Switch cursor between text and header"
+msgstr "Schakelt de cursor tussen tekst en koptekst"
+
+#. 39Gyb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153846\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PageDown"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PageDown"
+
+#. Ge7rN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153872\n"
+"help.text"
+msgid "Switch cursor between text and footer"
+msgstr "Schakelt de cursor tussen tekst en voettekst"
+
+#. NSvPr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150889\n"
+"help.text"
+msgid "Insert"
+msgstr "Invoegen"
+
+#. QmwSr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150903\n"
+"help.text"
+msgid "Insert mode on/off"
+msgstr "Invoegmodus aan/uit"
+
+#. cCACa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150922\n"
+"help.text"
+msgid "PageUp"
+msgstr "PageUp"
+
+#. FKrcD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3157513\n"
+"help.text"
+msgid "Screen page up"
+msgstr "Scherm naar boven"
+
+#. MURLn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3157532\n"
+"help.text"
+msgid "Shift+PageUp"
+msgstr "Shift+PageUp"
+
+#. PHfEt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3157546\n"
+"help.text"
+msgid "Move up screen page with selection"
+msgstr "Selectie per schermpagina naar boven uitbreiden"
+
+#. tRtqA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152957\n"
+"help.text"
+msgid "PageDown"
+msgstr "PageDown"
+
+#. nE7dC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152970\n"
+"help.text"
+msgid "Move down screen page"
+msgstr "Scherm naar beneden"
+
+#. KskEK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152990\n"
+"help.text"
+msgid "Shift+PageDown"
+msgstr "Shift+PageDown"
+
+#. G9bD3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153004\n"
+"help.text"
+msgid "Move down screen page with selection"
+msgstr "Selectie per schermpagina naar beneden uitbreiden"
+
+#. C9GRC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148448\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Fn+Backspace</caseinline><defaultinline>Ctrl+Del</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie+Fn+Backspace</caseinline><defaultinline>Ctrl+Del</defaultinline></switchinline>"
+
+#. 9dS2G
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148474\n"
+"help.text"
+msgid "Delete text to end of word"
+msgstr "Tekst tot einde van woord verwijderen"
+
+#. QEhEF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151080\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Backspace"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Backspace"
+
+#. 3uHLP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151106\n"
+"help.text"
+msgid "Delete text to beginning of word"
+msgstr "Verwijder tekst tot begin van woord"
+
+#. o8aKW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id9959715\n"
+"help.text"
+msgid "In a list: delete an empty paragraph in front of the current paragraph"
+msgstr "In een lijst: verwijder een lege alinea vóór de huidige alinea"
+
+#. ghM3E
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151124\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Fn+Backspace</caseinline><defaultinline>Ctrl+Del</defaultinline></switchinline>+Shift"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando+Fn+Backspace</caseinline><defaultinline>Ctrl+Del</defaultinline></switchinline>+Shift"
+
+#. CFwv6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146919\n"
+"help.text"
+msgid "Delete text to end of sentence"
+msgstr "Verwijder tekst tot einde van zin"
+
+#. sMRuV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146937\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Backspace"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Backspace"
+
+#. m8Ajx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153532\n"
+"help.text"
+msgid "Delete text to beginning of sentence"
+msgstr "Tekst tot begin van zin verwijderen"
+
+#. rtD6M
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153551\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. AFUgU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153577\n"
+"help.text"
+msgid "Next suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Volgende suggestie met <link href=\"text/shared/01/06040600.xhp\">Automatische woordinvulling</link>"
+
+#. qDiED
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147360\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
+
+#. bVg3F
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147386\n"
+"help.text"
+msgid "Use previous suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Gebruik de vorige suggestie van <link href=\"text/shared/01/06040600.xhp\">Automatische woordinvulling</link>"
+
+#. BqeEo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3144447360\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+V"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+V"
+
+#. YNcAN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3144447386\n"
+"help.text"
+msgid "Paste the contents of the clipboard as unformatted text."
+msgstr "Plakt de inhoud van het klembord als niet opgemaakte tekst."
+
+#. 9qfif
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145382\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + double-click or <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + Shift + F10"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + dubbelklik of <switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + Shift + F10"
+
+#. MiU6g
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150379\n"
+"help.text"
+msgid "Use this combination to quickly dock or undock the Navigator, Styles window, or other windows"
+msgstr "Gebruik deze combinatie om de Navigator, het venster Stijlen en opmaak of andere vensters snel vast te zetten of te ontkoppelen"
+
+#. PDoHo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3150396\n"
+"help.text"
+msgid "<bookmark_value>headings; switching levels by keyboard</bookmark_value>      <bookmark_value>paragraphs; moving by keyboard</bookmark_value>"
+msgstr "<bookmark_value>koppen; tussen niveaus schakelen met toetsenbord</bookmark_value>      <bookmark_value>alinea's; verplaatsen met toetsenbord</bookmark_value>"
+
+#. E4EEB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150396\n"
+"help.text"
+msgid "Shortcut Keys for Paragraphs, List Paragraphs and Heading Levels"
+msgstr "Sneltoetsen voor alinea's, lijstalinea's en kopniveaus"
+
+#. AGgt5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN11694\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Sneltoetsen"
+
+#. EDGLD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN11699\n"
+"help.text"
+msgid "Effect"
+msgstr "Effect"
+
+#. SBqVR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153679\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Up Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht+Optie</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Pijl omhoog"
+
+#. beAnG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153693\n"
+"help.text"
+msgid "Move the active paragraph or selected paragraphs up one paragraph."
+msgstr "Verplaatst de huidige alinea of geselecteerde alinea's één alinea naar boven."
+
+#. F7h8g
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153712\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Down Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht+Optie</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Pijl omlaag"
+
+#. aqWc6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154639\n"
+"help.text"
+msgid "Move the active paragraph or selected paragraphs down one paragraph."
+msgstr "Verplaats de huidige alinea of geselecteerde alinea's één alinea naar beneden."
+
+#. nt4tL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154658\n"
+"help.text"
+msgid "Tab"
+msgstr "Tab"
+
+#. TRy7q
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154672\n"
+"help.text"
+msgid "<variable id=\"beginning\">With the cursor positioned in front of a heading or list paragraph:</variable> The heading in format \"Heading X\" (X = 1-9) is moved down one level in the outline. For list paragraphs, the list level is moved down one level."
+msgstr "<variable id=\"beginning\">Met de cursor voor een kop- of lijstalibea:</variable> De kop in opmaak \"Kop X\" (X = 1-9) wordt één niveau omlaag in de omtrek verplaatst. Voor lijstalinea's wordt het lijstniveau één niveau omlaag verplaatst."
+
+#. AuZkE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154695\n"
+"help.text"
+msgid "Shift+Tab"
+msgstr "Shift+Tab"
+
+#. GEFFQ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155346\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/04/01020000.xhp#beginning\"/> The heading in format \"Heading X\" (X = 2-10) is moved up one level in the outline. For list paragraphs, the list level is moved up one level."
+msgstr "<embedvar href=\"text/swriter/04/01020000.xhp#beginning\"/> De kop in het formaat \"Kop X\" (X = 2-10) wordt één niveau omhoog geschoven in de omtreklijn. Voor lijstalinea's wordt het lijstniveau één niveau omhoog geschoven."
+
+#. TL5GS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155369\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. 5Hhch
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3155395\n"
+"help.text"
+msgid "<bookmark_value>tab stops; before headings</bookmark_value>               <bookmark_value>headings; starting with tab stops</bookmark_value>"
+msgstr "<bookmark_value>tabstops; vóór koppen</bookmark_value>               <bookmark_value>koppen; beginnen met tabstops</bookmark_value>"
+
+#. omwgt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155395\n"
+"help.text"
+msgid "With the cursor placed anywhere in a heading or list paragraph: Increases the alignment for all headings. For list paragraphs, increases the alignment for all paragraphs in the same list."
+msgstr "Met de cursor ergens in een kop of lijstalinea geplaatst: Verhoogt de uitlijning voor alle koppen. Verhoogt voor lijstalinea's de uitlijning voor alle alinea's in dezelfde lijst."
+
+#. HKCQQ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id491655382453027\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
+
+#. pARCd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id71655381890029\n"
+"help.text"
+msgid "With the cursor placed anywhere in a heading or list paragraph: Decreases the alignment for all headings. For list paragraphs, decreases the alignment for all paragraphs in the same list."
+msgstr "Met de cursor ergens in een kop- of lijstalinea: Verkleint de uitlijning voor alle koppen. Verlaagt voor lijstalinea's de uitlijning voor alle alinea's in dezelfde lijst."
+
+#. wrjFD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id491655382900210\n"
+"help.text"
+msgid "To insert a tab at the beginning of a heading or list paragraph, use the <menuitem>Numbering followed by</menuitem> option in the <link href=\"text/shared/01/06050600.xhp\"><menuitem>Position</menuitem></link> tab in the <menuitem>Chapter Numbering</menuitem> or <menuitem>Bullets and Numbering</menuitem> dialog. Alternatively, a tab can be copied and then pasted at the beginning."
+msgstr "Gebruik de optie <menuitem>Nummering gevolgd door</menuitem> op het tabblad <link href=\"text/shared/01/06050600.xhp\"><menuitem>Positie</menuitem></link> van het dialoogvenster <menuitem>Hoofdstuknummering</menuitem> of <menuitem>Opsommingstekens en nummering</menuitem>, om een tab aan het begin van een kop of lijstalinea in te voegen. Ook kan er een tabblad worden gekopieerd en vervolgens aan het begin worden geplakt."
+
+#. Vp3wR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149180\n"
+"help.text"
+msgid "Shortcut Keys for Tables in <item type=\"productname\">%PRODUCTNAME</item> Writer"
+msgstr "Sneltoetsen voor tabellen in <item type=\"productname\">%PRODUCTNAME</item> Writer"
+
+#. C3yqA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155978\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Sneltoetsen"
+
+#. QxvDd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155991\n"
+"help.text"
+msgid "Effect"
+msgstr "Effect"
+
+#. TiSKB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156014\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+
+#. BfsVp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156048\n"
+"help.text"
+msgid "If the active cell is empty: selects the whole table. Otherwise: selects the contents of the active cell. Pressing again selects the entire table."
+msgstr "Als de actieve cel leeg is: selecteert de hele tabel. Anders: selecteert de inhoud van de actieve cel. Wanneer u nogmaals drukt, wordt de hele tabel geselecteerd."
+
+#. 9CzVw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156069\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home"
+
+#. eYN6q
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154285\n"
+"help.text"
+msgid "If the active cell is empty: goes to the beginning of the table. Otherwise: first press goes to beginning of the active cell, second press goes to beginning of the current table, third press goes to beginning of document."
+msgstr "Als de actieve cel leeg is: gaat naar het begin van de tabel. Anders: eerste druk op toets gaat naar begin van de actieve cel; tweede druk op toets gaat naar begin van huidige tabel; derde druk op toets gaat naar begin van document."
+
+#. WBHQy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154308\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+End"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+End"
+
+#. GRidi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154334\n"
+"help.text"
+msgid "If the active cell is empty: goes to the end of the table. Otherwise: first press goes to the end of the active cell, second press goes to the end of the current table, third press goes to the end of the document."
+msgstr "Als de actieve cel leeg is: gaat naar het einde van de tabel. Anders: eerste druk op toets gaat naar einde van de actieve cel; tweede druk op toets gaat naar einde van de huidige tabel; derde druk op toets gaat naar einde van het document."
+
+#. RGzSL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153255\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. 5hBac
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153281\n"
+"help.text"
+msgid "Inserts a tab stop (only in tables). Depending on the Window Manager in use, <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Tab may be used instead."
+msgstr "Voegt een tabstop in (alleen in tabellen). Afhankelijk van het gebruikte programma voor vensterbeheer, kan <switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>+Tab in plaats daarvan worden gebruikt."
+
+#. khtQJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154905\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Arrow Keys"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>+Pijltoetsen"
+
+#. AAFnm
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154931\n"
+"help.text"
+msgid "Increases/decreases the size of the column/row on the right/bottom cell edge"
+msgstr "Vergroot/verkleint de kolom/rij aan de rechterkant/onderkant van de cel"
+
+#. tZNBA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154951\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+Arrow Keys"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+Pijltoetsen"
+
+#. wFzxD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150772\n"
+"help.text"
+msgid "Increase/decrease the size of the column/row on the left/top cell edge"
+msgstr "Vergroot/verkleint de grootte van de kolom/rij aan de linkerkant/bovenkant van de cel"
+
+#. bvA38
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150793\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Arrow Keys"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie+Opdracht</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Pijltoetsen"
+
+#. cs4En
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150818\n"
+"help.text"
+msgid "Like <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>, but only the active cell is modified"
+msgstr "Net als <switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>, maar alleen de actieve cel wordt gewijzigd"
+
+#. jF3cF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154451\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+Arrow Keys"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie+Opdracht</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+Pijltoetsen"
+
+#. DEEkg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154477\n"
+"help.text"
+msgid "Like <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>, but only the active cell is modified"
+msgstr "Net als <switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>, maar alleen de actieve cel wordt gewijzigd"
+
+#. xGCUp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3155593\n"
+"help.text"
+msgid "<bookmark_value>removing; cell protection in text documents</bookmark_value>"
+msgstr "<bookmark_value>verwijderen; celbeveiliging in tekstdocumenten</bookmark_value>"
+
+#. XksMw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155593\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+T"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+T"
+
+#. 3AsRG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147474\n"
+"help.text"
+msgid "Removes cell protection from all selected tables. If no table is selected, then cell protection is removed from all of the tables in the document."
+msgstr "Verwijdert celbeveiliging van alle geselecteerde tabellen. Als er geen tabel geselecteerd is, wordt de celbeveiliging van alle tabellen in het document opgeheven."
+
+#. YXuHn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147496\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Del"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Del"
+
+#. DDBvE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149504\n"
+"help.text"
+msgid "If no whole cell is selected, the text from the cursor to the end of the current sentence is deleted. If the cursor is at the end of a cell, and no whole cell is selected, the contents of the next cell are deleted."
+msgstr "Als er geen hele cel geselecteerd is, wordt de tekst vanaf de cursor tot aan het eind van de huidige zin verwijderd. Als de cursor aan het eind van een cel staat en er geen hele cel is geselecteerd, wordt de inhoud van de volgende cel verwijderd."
+
+#. HPovX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id8539384\n"
+"help.text"
+msgid "If no whole cell is selected and the cursor is at the end of the table, the paragraph following the table will be deleted, unless it is the last paragraph in the document."
+msgstr "Als er geen hele cel geselecteerd is aan het einde van de tabel, wordt de alinea achter de tabel verwijderd, tenzij dit de laatste alinea is van het document."
+
+#. 5npCj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5891903\n"
+"help.text"
+msgid "If one or more cells are selected, the whole rows containing the selection will be deleted. If all rows are selected completely or partially, the entire table will be deleted."
+msgstr "Als er één of meer cellen zijn geselecteerd, worden de volledige rijen die de selectie bevatten verwijderd. Als alle rijen geheel of gedeeltelijk zijn geselecteerd, wordt de hele tabel verwijderd."
+
+#. cmFJv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149537\n"
+"help.text"
+msgid "Shortcut Keys for Moving and Resizing Frames, Graphics and Objects"
+msgstr "Sneltoetsen voor het verplaatsen en schalen van frames, afbeeldingen en objecten"
+
+#. xhxzZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149565\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Sneltoetsen"
+
+#. DqEaP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148993\n"
+"help.text"
+msgid "Effect"
+msgstr "Effect"
+
+#. zirpM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149010\n"
+"help.text"
+msgid "Esc"
+msgstr "Esc"
+
+#. 2Rxbk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149024\n"
+"help.text"
+msgid "Cursor is inside a frame and no text is selected: Escape selects the frame."
+msgstr "De cursor bevindt zich binnen een frame en geen tekst werd geselecteerd: de toets Esc selecteert de frame."
+
+#. 9B5YD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149039\n"
+"help.text"
+msgid "Frame is selected: Escape clears the cursor from the frame."
+msgstr "Frame werd geselecteerd: de toets Esc verwijdert de cursor uit de frame."
+
+#. aCq7z
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149054\n"
+"help.text"
+msgid "F2 or Enter or any key that produces a character on screen"
+msgstr "F2 of Enter of een andere toets die een teken op het scherm produceert"
+
+#. 3dnSh
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149890\n"
+"help.text"
+msgid "If a frame is selected: positions the cursor to the end of the text in the frame. If you press any key that produces a character on screen, and the document is in edit mode, the character is appended to the text."
+msgstr "Als een frame geselecteerd is: plaatst de cursor aan het einden van de tekst in het frame. Als u op eender welke toets drukt, die een teken toont,  en het document is in bewerkingsmodus, wordt het teken aan de tekst toegevoegd."
+
+#. EHxBu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149913\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Arrow Keys"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie</caseinline><defaultinline>Alt</defaultinline></switchinline>+Pijltoetsen"
+
+#. pTvHe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149939\n"
+"help.text"
+msgid "Move object."
+msgstr "Verplaats object."
+
+#. EAaKA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151200\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Arrow Keys"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie+Opdracht</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Pijltoetsen"
+
+#. e5FsB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151226\n"
+"help.text"
+msgid "Resizes by moving lower right corner."
+msgstr "Wijzigt de grootte door de rechterbenedenhoek te verplaatsen."
+
+#. frvDA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151246\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Shift+Arrow Keys"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Optie+Opdracht</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Shift+Pijltoetsen"
+
+#. RFfKH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150115\n"
+"help.text"
+msgid "Resizes by moving top left corner."
+msgstr "Wijzigt de grootte door de linkerbovenhoek te verplaatsen."
+
+#. iFGPj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150129\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opdracht</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. 8oD5k
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150154\n"
+"help.text"
+msgid "Selects the anchor of an object (in Edit Points mode)."
+msgstr "Selecteert het anker van een object (in de modus Punten bewerken)."

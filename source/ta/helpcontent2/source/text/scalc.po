@@ -1,0 +1,1664 @@
+#. extracted from helpcontent2/source/text/scalc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2017-05-12 16:54+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1494608066.000000\n"
+
+#. ZxQeC
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Welcome to the $[officename] Calc Help"
+msgstr "$[officename] கல்க் உதவிக்கு வருக"
+
+#. PqA2G
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3147338\n"
+"help.text"
+msgid "Welcome to the $[officename] Calc Help"
+msgstr "$[officename] கல்க் உதவிக்கு வருக"
+
+#. FATnT
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3153965\n"
+"help.text"
+msgid "How to Work With $[officename] Calc"
+msgstr "$[officename] கல்க்கை எவ்வாறு பயன்படுத்துவது"
+
+#. scHF2
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3147004\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04060100.xhp\">List of Functions by Category</link>"
+msgstr "<link href=\"text/scalc/01/04060100.xhp\">பகுக்கப்பட்ட செயலாற்றி பட்டியல்</link>"
+
+#. SBdpw
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3154659\n"
+"help.text"
+msgid "$[officename] Calc Menus, Toolbars, and Keys"
+msgstr "$[officename] கல்க் பட்டிகள், கருவிப்பட்டைகள், விசைகள்"
+
+#. aFUnY
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Menus"
+msgstr "பட்டிகள்"
+
+#. 9PhSp
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"hd_id3156023\n"
+"help.text"
+msgid "<variable id=\"main0100\"><link href=\"text/scalc/main0100.xhp\">Menus</link></variable>"
+msgstr "<variable id=\"main0100\"><link href=\"text/scalc/main0100.xhp\">பட்டிகள்</link></variable>"
+
+#. cbjYY
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"par_id3154760\n"
+"help.text"
+msgid "The following menu commands are available for spreadsheets."
+msgstr "பின்வரும் பட்டியின் கட்டளைகள் விரிதாள்களுக்குரியவை."
+
+#. PvGHJ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"tit\n"
+"help.text"
+msgid "File"
+msgstr "கோப்பு"
+
+#. t8CuN
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"hd_id3156023\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0101.xhp\">File</link>"
+msgstr "<link href=\"text/scalc/main0101.xhp\">கோப்பு</link>"
+
+#. k6sKj
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"par_id3151112\n"
+"help.text"
+msgid "<ahelp hid=\".\">These commands apply to the current document, create a document, open an existing document, or close the application.</ahelp>"
+msgstr ""
+
+#. 6hchv
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit"
+msgstr "தொகு"
+
+#. GvZ4W
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id3156023\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0102.xhp\">Edit</link>"
+msgstr "<link href=\"text/scalc/main0102.xhp\">தொகு</link>"
+
+#. cRq5f
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id3154758\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands for editing the contents of the current document.</ahelp>"
+msgstr "<ahelp hid=\".\">இந்தப் பட்டியானது, நடப்பு ஆவணத்தின் உள்ளடக்கங்களைத் தொகுப்பதற்கான கட்டளைகளைக் கொண்டுள்ளது.</ahelp>"
+
+#. TonwU
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id3146919\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02180000.xhp\">Links</link>"
+msgstr "<link href=\"text/shared/01/02180000.xhp\">தொடுப்புகள்</link>"
+
+#. dPatw
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id0914201502131542\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02200000.xhp\">Object</link>"
+msgstr "<link href=\"text/shared/01/02200000.xhp\">பொருள்</link>"
+
+#. zRW8E
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"tit\n"
+"help.text"
+msgid "View"
+msgstr "பார்வை"
+
+#. 9BgFL
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3151112\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0103.xhp\">View</link>"
+msgstr "<link href=\"text/scalc/main0103.xhp\">பார்வை</link>"
+
+#. Ecjbe
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id3149456\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands to control the on-screen display of the document, change the user interface and access the sidebar panels.</ahelp>"
+msgstr ""
+
+#. X7bcB
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_idN105AB\n"
+"help.text"
+msgid "Normal"
+msgstr "இயல்பான"
+
+#. s6GiY
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_idN105AF\n"
+"help.text"
+msgid "<ahelp hid=\".\">Displays the normal layout view of the sheet.</ahelp>"
+msgstr "<ahelp hid=\".\">தாளின் இயல்பான தளக்கோலத்தின் பார்வையைக் காட்சியளிக்கிறது.</ahelp>"
+
+#. tjNzu
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720151109097115\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/03100000.xhp\">Page Break</link>"
+msgstr "<link href=\"text/scalc/01/03100000.xhp\">பக்க முறிப்பு</link>"
+
+#. Hr8bk
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id10272015110909623\n"
+"help.text"
+msgid "View Grid lines"
+msgstr ""
+
+#. TvxiA
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720151147483554\n"
+"help.text"
+msgid "Toggle the visibility of grid lines for the current sheet."
+msgstr "நடப்புத் தாளுக்கானபின்னல் வரியின் கட்புலனாகுதன்மையை நிலைமாற்று."
+
+#. ZPjKe
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id033020170228348624\n"
+"help.text"
+msgid "Show Formula"
+msgstr ""
+
+#. KRDBb
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id03302017024610704\n"
+"help.text"
+msgid "Display the cell formula expression instead of the calculated result."
+msgstr ""
+
+#. N4CPL
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id241636195404363\n"
+"help.text"
+msgid "Comments"
+msgstr ""
+
+#. 2QmH5
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id101636195413295\n"
+"help.text"
+msgid "Display the <link href=\"text/shared/01/04050000.xhp\">cell comments</link> for the current spreadsheet document."
+msgstr ""
+
+#. 95G2n
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150908397549\n"
+"help.text"
+msgid "<link href=\"text/shared/01/gallery.xhp\">Gallery</link>"
+msgstr ""
+
+#. 8MsyZ
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720151147488697\n"
+"help.text"
+msgid "<embedvar href=\"text/scalc/01/04080000.xhp#function_list_title\"/>"
+msgstr ""
+
+#. oGJEy
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3125863\n"
+"help.text"
+msgid "<link href=\"text/shared/01/03010000.xhp\">Zoom</link>"
+msgstr "<link href=\"text/shared/01/03010000.xhp\">உருவளவு</link>"
+
+#. Dp7mC
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "நுழை"
+
+#. kQzbw
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3157909\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0104.xhp\">Insert</link>"
+msgstr "<link href=\"text/scalc/main0104.xhp\">நுழை</link>"
+
+#. S38tX
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id3153896\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Insert</emph> menu contains commands for inserting new elements, such as images, text boxes, object, media, cell names and much more into the current sheet.</ahelp>"
+msgstr ""
+
+#. 2stQM
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3146918\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">விளக்கப்படம்</link>"
+
+#. QKdUC
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id0302200904002496\n"
+"help.text"
+msgid "Inserts a chart."
+msgstr "ஒரு விளக்கப்படத்தை நுழை."
+
+#. YqHfD
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3147003\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">மிதக்கும் சட்டகம்</link>"
+
+#. mSQgW
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3156285\n"
+"help.text"
+msgid "<link href=\"text/shared/02/09070000.xhp\">Hyperlink</link>"
+msgstr "<link href=\"text/shared/02/09070000.xhp\">மீத்தொடுப்பு</link>"
+
+#. Acwm7
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3153726\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">சிறப்பு வரியுரு</link>"
+
+#. FvWya
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id761577295440343\n"
+"help.text"
+msgid "Date"
+msgstr ""
+
+#. kzxk7
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id11577295470732\n"
+"help.text"
+msgid "Inserts the current date in the cell."
+msgstr ""
+
+#. hvV2C
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id131577295445736\n"
+"help.text"
+msgid "Time"
+msgstr ""
+
+#. jTQVa
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id91577295463980\n"
+"help.text"
+msgid "Inserts the current time in the cell."
+msgstr ""
+
+#. CzRJY
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id621577296064493\n"
+"help.text"
+msgid "Field"
+msgstr ""
+
+#. 3EmAu
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id391577296078546\n"
+"help.text"
+msgid "Opens a submenu for selecting the date, sheet name or document title in the cell."
+msgstr ""
+
+#. JP4tR
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format"
+msgstr "வடிவூட்டு"
+
+#. ABAif
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3149669\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0105.xhp\">Format</link>"
+msgstr "<link href=\"text/scalc/main0105.xhp\">வடிவூட்டு</link>"
+
+#. CsMGr
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id3145171\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Format</emph> menu contains commands for formatting selected cells, <link href=\"text/shared/00/00000005.xhp#object\">objects</link>, and cell contents in your document.</ahelp>"
+msgstr ""
+
+#. KhDZu
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3154732\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/05020000.xhp\">Cells</link>"
+msgstr "<link href=\"text/scalc/01/05020000.xhp\">கலங்கள்</link>"
+
+#. V6AvZ
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3145748\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">வரியுரு</link>"
+
+#. KN9sa
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3154485\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">பத்தி</link>"
+
+#. 4uCuW
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3157980\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/05110000.xhp\">AutoFormat</link>"
+msgstr "<link href=\"text/scalc/01/05110000.xhp\">தானிவடிவூட்டம்</link>"
+
+#. 3Eg3G
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3159206\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/05120000.xhp\">Conditional Formatting</link>"
+msgstr "<link href=\"text/scalc/01/05120000.xhp\">நிபந்தனை வடிவூட்டல்</link>"
+
+#. tnar9
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3154703\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170100.xhp\">Control</link>"
+msgstr "<link href=\"text/shared/02/01170100.xhp\">கட்டுப்பாடு</link>"
+
+#. bReRT
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3147005\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170200.xhp\">Form</link>"
+msgstr "<link href=\"text/shared/02/01170200.xhp\">படிவம்</link>"
+
+#. r9nLs
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools"
+msgstr "கருவிகள்"
+
+#. eCZ2E
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3150769\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0106.xhp\">Tools</link>"
+msgstr "<link href=\"text/scalc/main0106.xhp\">கருவிகள்</link>"
+
+#. NwgnB
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"par_id3150440\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Tools</emph> menu contains commands to check spelling, to trace sheet references, to find mistakes and to define scenarios.</ahelp>"
+msgstr ""
+
+#. NkvRH
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"par_id3152576\n"
+"help.text"
+msgid "You can also create and assign macros and configure the look and feel of toolbars, menus, keyboard, and set the default options for $[officename] applications."
+msgstr "நீங்கள் பெருமங்களை உருவாக்கவும் ஒப்படைக்கவும் முடியும், கருவிப்பட்டைகள், பட்டிகள், விசைப்பலகை போன்றவற்றின் தோற்றத்தை உள்ளமைக்கவும் உணரவும் முடிவதோடு, $[officename] செயலிகளுக்கான முன்னிருப்புத் தேர்வுகளை அமைக்கவும் முடியும்."
+
+#. CVDY6
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3154015\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06040000.xhp\">AutoCorrect Options</link>"
+msgstr "<link href=\"text/shared/01/06040000.xhp\">தானிதிருத்தத் தேர்வுகள்</link>"
+
+#. aMGUB
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3148488\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02220000.xhp\">ImageMap</link>"
+msgstr ""
+
+#. XZgEZ
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3149122\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/06040000.xhp\">Goal Seek</link>"
+msgstr "<link href=\"text/scalc/01/06040000.xhp\">இலக்கு தேடல்</link>"
+
+#. xGGAp
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3155768\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/06050000.xhp\">Scenarios</link>"
+msgstr "<link href=\"text/scalc/01/06050000.xhp\">நிகழ்வோட்‌டங்கள்</link>"
+
+#. BoBWg
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3150086\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06140000.xhp\">Customize</link>"
+msgstr "<link href=\"text/shared/01/06140000.xhp\">தனிப்பயனாக்கு</link>"
+
+#. KRfJh
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"tit\n"
+"help.text"
+msgid "Window"
+msgstr "சாளரம்"
+
+#. XpBDW
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"hd_id3154758\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0107.xhp\">Window</link>"
+msgstr "<link href=\"text/scalc/main0107.xhp\">சாளரம்</link>"
+
+#. 9UWue
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains commands for manipulating and displaying document windows.</ahelp>"
+msgstr "<ahelp hid=\".\">ஆவணச் சாளரங்களைக் கையாதலுக்கான, காட்சியளிப்பதற்கான கட்டளைகளைக் கொண்டுள்ளது.</ahelp>"
+
+#. RHWHH
+#: main0112.xhp
+msgctxt ""
+"main0112.xhp\n"
+"tit\n"
+"help.text"
+msgid "Data"
+msgstr "தரவு"
+
+#. 84mGe
+#: main0112.xhp
+msgctxt ""
+"main0112.xhp\n"
+"hd_id3153254\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0112.xhp\">Data</link>"
+msgstr "<link href=\"text/scalc/main0112.xhp\">தரவு</link>"
+
+#. gxhqm
+#: main0112.xhp
+msgctxt ""
+"main0112.xhp\n"
+"par_id3147264\n"
+"help.text"
+msgid "<ahelp hid=\".\">Use the <emph>Data</emph> menu commands to edit the data in the current sheet. You can define ranges, sort and filter the data, calculate results, outline data, and create a pivot table.</ahelp>"
+msgstr "<ahelp hid=\".\">நடப்புத் தாளிலிள்ள தரவைத் தொகுக்க <emph>தரவு</emph> பட்டிக் கட்டளைகளைப் பயன்படுத்துக. நீங்கள் வீச்சுகளை வரையறுக்க முடியும், தரவை வரிசைபடுத்தவும் வடிகட்டவும் , முடிவுகளைக் கணக்கிட, தரவைத் திட்டவரையிட, சுழல் அட்டவணையை உருவாக்கவும் முடியும்.</ahelp>"
+
+#. vv687
+#: main0112.xhp
+msgctxt ""
+"main0112.xhp\n"
+"hd_id231633127579389\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/live_data_stream.xhp\">Streams</link>"
+msgstr ""
+
+#. efuyu
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sheet"
+msgstr "தாள்"
+
+#. 7eVaK
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"hd_id0906201507390173\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0116.xhp\">Sheet</link>"
+msgstr "<link href=\"text/scalc/main0116.xhp\">தாள்</link>"
+
+#. cLyep
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"par_id0906201507414091\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands to modify and manage a sheet and its elements.</ahelp>"
+msgstr "<ahelp hid=\".\"> இந்தப் பட்டி தாளையும் அதன் தனிமங்களையும் மாற்றியமைப்பதற்கான, நிர்வகிப்பதற்கான கட்டளைகளைக்  கொண்டுள்ளது.</ahelp>"
+
+#. vg558
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"par_id0906201507414191\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04030000.xhp\">Insert Rows</link>"
+msgstr "<link href=\"text/scalc/01/04030000.xhp\">நிரைகளை நுழை</link>"
+
+#. amygw
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"par_id0906201507414192\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04040000.xhp\">Insert Columns</link>"
+msgstr "<link href=\"text/scalc/01/04040000.xhp\">நிரல்களை நுழை</link>"
+
+#. Uszwv
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"hd_id3150792\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/02180000.xhp\">Move or Copy Sheet</link>"
+msgstr "<link href=\"text/scalc/01/02180000.xhp\">தாளை நகர்த்துக அல்லது நகலெடுக</link>"
+
+#. 6pEDF
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"hd_id3153968\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/05050300.xhp\">Show Sheet</link>"
+msgstr "<link href=\"text/scalc/01/05050300.xhp\">தாளைக் காட்டு</link>"
+
+#. UnAKB
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"hd_id3163708\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/02170000.xhp\">Delete Sheet</link>"
+msgstr "<link href=\"text/scalc/01/02170000.xhp\">தாளை அழி</link>"
+
+#. wbNHt
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"hd_id3163735308\n"
+"help.text"
+msgid "Sheet Tab Color"
+msgstr "தாள் கீற்று நிறம்"
+
+#. g7DYi
+#: main0116.xhp
+msgctxt ""
+"main0116.xhp\n"
+"hd_id3163733308\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06140500.xhp\">Sheet Events</link>"
+msgstr "<link href=\"text/shared/01/06140500.xhp\">தாள் நிகழ்வுகள்</link>"
+
+#. 5DRv5
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toolbars"
+msgstr "கருவிப்பட்டைகள்"
+
+#. eSP96
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"hd_id3154758\n"
+"help.text"
+msgid "<variable id=\"main0200\"><link href=\"text/scalc/main0200.xhp\">Toolbars</link></variable>"
+msgstr "<variable id=\"main0200\"><link href=\"text/scalc/main0200.xhp\">கருவிப்பட்டைகள்</link></variable>"
+
+#. yvzAm
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"par_id3148798\n"
+"help.text"
+msgid "This submenu lists the toolbars that are available in spreadsheets. This overview describes the default toolbar configuration for %PRODUCTNAME."
+msgstr ""
+
+#. XUCUB
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formatting Bar"
+msgstr "வடிவூட்டல் பட்டை"
+
+#. VzJEC
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3150448\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0202.xhp\">Formatting Bar</link>"
+msgstr "<link href=\"text/scalc/main0202.xhp\">வடிவூட்டல் பட்டை</link>"
+
+#. ayoCz
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3153897\n"
+"help.text"
+msgid "<ahelp hid=\"HID_SC_TOOLBOX_TABLE\">The <emph>Formatting</emph> bar contains basic commands for applying manually formatting.</ahelp>"
+msgstr "<ahelp hid=\"HID_SC_TOOLBOX_TABLE\"><emph>வடிவூட்டல்</emph> பட்டையானது, கைமுறையாக வடிவூட்டலை செயல்படுத்தலுக்கான அடிப்படை கட்டளைகளை கொண்டுள்ளது.</ahelp>"
+
+#. 7GEuZ
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3153160\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp\">Font Color</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp\">எழுத்துருவின் நிறம்</link>"
+
+#. H2aV6
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3150715\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05340300.xhp\">Align Left</link>"
+msgstr "<link href=\"text/shared/01/05340300.xhp\">இடது சீரமை</link>"
+
+#. XzJxt
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3155064\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05340300.xhp\">Align Center Horizontally</link>"
+msgstr "<link href=\"text/shared/01/05340300.xhp\"> நடுவைக் கிடைமட்டமாக சீரமை</link>"
+
+#. X4ZVV
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3150042\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05340300.xhp\">Align Right</link>"
+msgstr "<link href=\"text/shared/01/05340300.xhp\">வலது சீரமை</link>"
+
+#. T9Q2o
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3154703\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05340300.xhp\">Justify</link>"
+msgstr "<link href=\"text/shared/01/05340300.xhp\">நேர்த்தியாக்கு</link>"
+
+#. F7CTh
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3152986\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05340300.xhp\">Align Top</link>"
+msgstr "<link href=\"text/shared/01/05340300.xhp\">மேல் சீரமை</link>"
+
+#. tYBsN
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3153306\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05340300.xhp\">Align Center Vertically</link>"
+msgstr "<link href=\"text/shared/01/05340300.xhp\">நடுவைச் செங்குத்தாகச் சீரமை</link>"
+
+#. hGLD7
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3151240\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05340300.xhp\">Align Bottom</link>"
+msgstr "<link href=\"text/shared/01/05340300.xhp\">கீழ் சீரமை</link>"
+
+#. GFJrp
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN10843\n"
+"help.text"
+msgid "Number Format : Date"
+msgstr "எண் வடிவம்: தேதி"
+
+#. jPLVg
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN10847\n"
+"help.text"
+msgid "<ahelp hid=\".\">Applies the date format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".\">தேதி வடிவத்தைதேர்ந்த கலங்களுக்குச் செயல்படுத்தப்படுகிறது.</ahelp>"
+
+#. EpBYF
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN1085E\n"
+"help.text"
+msgid "Number Format: Exponential"
+msgstr "எண் வடிவமைப்பு: பன்மடிப்பு"
+
+#. aA3sM
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN10862\n"
+"help.text"
+msgid "<ahelp hid=\".\">Applies the exponential format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".\">தேர்ந்த கலங்களுக்குப் பன்மடி வடிவமைப்பைச் செயல்படுத்தப்படுகிறது.</ahelp>"
+
+#. 8BDJe
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN10871\n"
+"help.text"
+msgid "Additional icons"
+msgstr "கூடுதல் படவுருக்கள்"
+
+#. 9H9PE
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN10875\n"
+"help.text"
+msgid "If <link href=\"text/shared/00/00000005.xhp#ctl\">CTL</link> support is enabled, two additional icons are visible."
+msgstr "<link href=\"text/shared/00/00000005.xhp#ctl\">CTL</link> ஆதரவு செயல்படுத்தப்பட்டால், இரண்டு கூடுதல் படவுருக்கள் தென்படும்."
+
+#. Ft8vF
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN1088E\n"
+"help.text"
+msgid "Left-To-Right"
+msgstr "இடமிருந்து வலம்"
+
+#. vX3LE
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN1089C\n"
+"help.text"
+msgid "<image id=\"img_id8354747\" src=\"cmd/sc_paralefttoright.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8354747\">left to right icon</alt></image>"
+msgstr ""
+
+#. PJwTW
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN108BA\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ParaLeftToRight\">The text is entered from left to right.</ahelp>"
+msgstr "<ahelp hid=\".uno:ParaLeftToRight\">இடதிலிருந்து லலதுக்கு உரை உள்ளிட்டப்படுகிறது.</ahelp>"
+
+#. HfCDq
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN108D1\n"
+"help.text"
+msgid "Right-To-Left"
+msgstr "வலமிருந்து இடது"
+
+#. mfrZi
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN108DF\n"
+"help.text"
+msgid "<image id=\"img_id2405774\" src=\"cmd/sc_pararighttoleft.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2405774\">right to left icon</alt></image>"
+msgstr ""
+
+#. fjLD6
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN108FD\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ParaRightToLeft\">The text formatted in a complex text layout language is entered from right to left.</ahelp>"
+msgstr "<ahelp hid=\".uno:ParaRightToLeft\">சிக்கலான உரைத் தளக்கோலத்தில் வடிவூட்டிய உரையானது வலதிலிருந்து இடதுக்கு உள்ளிடப்படுகிறது.</ahelp>"
+
+#. NVkBC
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id192266\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Aligns the contents of the cell to the left.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">கலங்களின் உள்ளடக்கங்களை வலதுக்குச் சீரமைக்கிறது.</ahelp>"
+
+#. rfUHM
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id1998962\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Aligns the contents of the cell to the right.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">>கலங்களின் உள்ளடக்கங்களை இடதுக்குச் சீரமைக்கிறது.</ahelp>"
+
+#. ZdwVC
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id2376476\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Horizontally centers the contents of the cell.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">கலங்களின் உள்ளடக்கங்களைக் கிடைமட்டமாக நடுப்படுத்ததுகிறது.</ahelp>"
+
+#. bHQCG
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id349131\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Aligns the contents of the cell to the left and right cell borders.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">கலங்களின் உள்ளடக்கங்களை கல எல்லைகளுக்கு இடதாகவும் வலதாகவும் சீரமைக்கிறது.</ahelp>"
+
+#. GmxHK
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"tit\n"
+"help.text"
+msgid "Drawing Object Properties Bar"
+msgstr "வரை பொருள் பண்புகள் பட்டை"
+
+#. PZcPA
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3154346\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0203.xhp\">Drawing Object Properties Bar</link>"
+msgstr "<link href=\"text/scalc/main0203.xhp\">வரை பொருள் பண்புகள் பட்டை</link>"
+
+#. BHsxU
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"par_id3149656\n"
+"help.text"
+msgid "<ahelp hid=\"HID_SC_TOOLBOX_DRAW\">The <emph>Drawing Object Properties</emph> Bar for objects that you select in the sheet contains formatting and alignment commands.</ahelp>"
+msgstr "<ahelp hid=\"HID_SC_TOOLBOX_DRAW\"> <emph>வரை பொருள் பண்புகள்</emph> பட்டையானது, தாளில் நீங்கள் தேரும் பொருள்களுக்கான வடிவூட்டல், சீரமைப்புக் கட்டளைகளைக் கொண்டிருக்கிறது.</ahelp>"
+
+#. qe7FF
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3145748\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Style</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">வரி பாணி</link>"
+
+#. aFoMu
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3151073\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Width</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">வரி அகலம்</link>"
+
+#. MXcwv
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3153417\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Color</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">வரி நிறம்</link>"
+
+#. QEYq6
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3147338\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05210100.xhp\">Background Color</link>"
+msgstr "<link href=\"text/shared/01/05210100.xhp\">பின்புல நிறம்</link>"
+
+#. BgP3b
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text Formatting Bar"
+msgstr "உரை வடிவூட்டல் பட்டை"
+
+#. A2hAJ
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3156330\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0205.xhp\">Text Formatting Bar</link>"
+msgstr "<link href=\"text/scalc/main0205.xhp\">உரை வடிவூட்டல் பட்டை</link>"
+
+#. h55fM
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"par_id3151112\n"
+"help.text"
+msgid "<ahelp hid=\"HID_SC_TOOLBOX_DRTEXT\">The <emph>Text Formatting</emph> Bar that is displayed when the cursor is in a text object, such as a text box or a drawing object, contains formatting and alignment commands.</ahelp>"
+msgstr ""
+
+#. jnWok
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3148575\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp\">Font Color</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp\">எழுத்துருவின் நிறம்</link>"
+
+#. 4TNV9
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3154944\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030100.xhp\">Line Spacing: 1</link>"
+msgstr "<link href=\"text/shared/01/05030100.xhp\">வரி இடைவெளி: 1</link>"
+
+#. uqB4L
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3146969\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030100.xhp\">Line Spacing: 1.5</link>"
+msgstr "<link href=\"text/shared/01/05030100.xhp\">வரி இடைவெளியிடல்: 1.5</link>"
+
+#. QCyNt
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3153711\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030100.xhp\">Line Spacing: 2</link>"
+msgstr "<link href=\"text/shared/01/05030100.xhp\">வரி இடைவெளி: 2</link>"
+
+#. PFCrP
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147345\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030700.xhp\">Align Left</link>"
+msgstr "<link href=\"text/shared/01/05030700.xhp\">இடது சீரமை</link>"
+
+#. Mkhar
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3155337\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030700.xhp\">Centered</link>"
+msgstr "<link href=\"text/shared/01/05030700.xhp\">நடுவாக</link>"
+
+#. VyFNF
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147001\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030700.xhp\">Align Right</link>"
+msgstr "<link href=\"text/shared/01/05030700.xhp\">வலது சீரமை</link>"
+
+#. LKiD9
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3155115\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030700.xhp\">Justify</link>"
+msgstr "<link href=\"text/shared/01/05030700.xhp\">நேர்த்தியாக்கு</link>"
+
+#. 8QMDx
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3150202\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020500.xhp\">Superscript</link>"
+msgstr "<link href=\"text/shared/01/05020500.xhp\">மேலெழுத்து</link>"
+
+#. APeeB
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3155531\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020500.xhp\">Subscript</link>"
+msgstr "<link href=\"text/shared/01/05020500.xhp\">கீழெழுத்து</link>"
+
+#. DXoAZ
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3145387\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">வரியுரு</link>"
+
+#. cYecF
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3153067\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">பத்தி</link>"
+
+#. EDAGh
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula Bar"
+msgstr "சூத்திரப் பட்டை"
+
+#. SsMkQ
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"hd_id3147264\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0206.xhp\">Formula Bar</link>"
+msgstr "<link href=\"text/scalc/main0206.xhp\">வடிவூட்டல் பட்டை</link>"
+
+#. dnFAk
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"par_id3150400\n"
+"help.text"
+msgid "<ahelp hid=\"HID_SC_INPUTWIN\">Use this bar to enter formulas.</ahelp>"
+msgstr "<ahelp hid=\"HID_SC_INPUTWIN\">சூத்திரங்களை உள்ளிட இந்தப் பட்டையைப் பயன்படுத்துக.</ahelp>"
+
+#. CG7Dj
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"tit\n"
+"help.text"
+msgid "Status Bar"
+msgstr "நிலைப்பட்டை"
+
+#. xZZpr
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id3151385\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0208.xhp\">Status Bar</link>"
+msgstr "<link href=\"text/scalc/main0208.xhp\">நிலைப்பட்டை</link>"
+
+#. QDPFj
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id3149669\n"
+"help.text"
+msgid "The <emph>Status Bar</emph> displays information about the current sheet."
+msgstr "<emph>நிலைப்பட்டை</emph> நடப்புத் தாள் பற்றிய தகவலைக் காட்சியளிக்கிறது."
+
+#. nct5g
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id0821200911024321\n"
+"help.text"
+msgid "Digital Signature"
+msgstr "மின்னெண் கையொப்பம்"
+
+#. buUJc
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id0821200911024344\n"
+"help.text"
+msgid "See also <link href=\"text/shared/guide/digital_signatures.xhp\">Digital Signatures</link>."
+msgstr "<link href=\"text/shared/guide/digital_signatures.xhp\">எண்மிய கையொப்பங்கள்</link> ஐக் காண்க."
+
+#. iEc7h
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"tit\n"
+"help.text"
+msgid "Print Preview Bar"
+msgstr "அச்சு முன்னோட்டப் பட்டை"
+
+#. dJTLd
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3156023\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0210.xhp\">Print Preview Bar</link>"
+msgstr ""
+
+#. sMDPh
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3148663\n"
+"help.text"
+msgid "<ahelp hid=\"HID_SC_WIN_PREVIEW\">The <emph>Print Preview</emph> bar is displayed when you choose <emph>File - Print Preview</emph>.</ahelp>"
+msgstr ""
+
+#. FEZVG
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3147393\n"
+"help.text"
+msgid "Full Screen"
+msgstr "முழுத் திரை"
+
+#. c2cjB
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id460828\n"
+"help.text"
+msgid "Hides the menus and toolbars. To exit the full screen mode, click the <emph>Full Screen</emph> button."
+msgstr "பட்டிகளையும் கருவிப்பட்டைகளையும் மறைக்கிறது. முழுத் திரை முறையிலிருந்து வெளியேற, <emph>முழுத் திரை</emph> பொத்தானைச் சொடுக்குக."
+
+#. hCPa2
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3147394\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/05070000.xhp\">Format Page</link>"
+msgstr "<link href=\"text/scalc/01/05070000.xhp\">வடிவூட்டப் பக்கம்</link>"
+
+#. w9KJc
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3147494\n"
+"help.text"
+msgid "Margins"
+msgstr "ஓரங்கள்"
+
+#. cEsD4
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id460929\n"
+"help.text"
+msgid "Shows or hides margins of the page. Margins can be dragged by the mouse, and also can be set on <emph>Page</emph> tab of <emph>Page Style</emph> dialog."
+msgstr "பக்கத்தின் ஓரங்களைக் காட்டவோ மறைக்கவோ செய்க. ஓரங்கள் சுட்டெலியினால் இழுக்கப்பட முடியும், மேலும் <emph>பக்கப் பாணி</emph> உரையாடலிலுள்ள <emph>பக்கம்</emph> கீற்றையும் அமைக்க முடியும்."
+
+#. NsZqF
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3245494\n"
+"help.text"
+msgid "Scaling Factor"
+msgstr "அளத்தல் காரணி"
+
+#. YZA55
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id460939\n"
+"help.text"
+msgid "This slide defines a page scale for the printed spreadsheet. Scaling factor can be set on <emph>Sheet</emph> tab of <emph>Page Style</emph> dialog, too."
+msgstr "அச்சிட்ட விரிதாளுக்கான பக்க ஒப்பளவை படவில்லை வரையறுக்கிறது. அளத்தல் காரணியானது <emph>பக்கப் பாணி</emph> உரையாடலின் <emph>தாள்</emph> கீற்றிலும் அமைக்கப்பட முடியும்."
+
+#. GFMWr
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3147395\n"
+"help.text"
+msgid "Close Preview"
+msgstr "முன்னோட்டத்தை மூடு"
+
+#. kL6Ds
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id460829\n"
+"help.text"
+msgid "To exit the print preview, click the <emph>Close Preview</emph> button."
+msgstr "அச்சு முன்னோட்டத்திலிருந்து வெளியேற, <emph>முன்னோட்டத்தை மூடு</emph> பொத்தானைச் சொடுக்குக."
+
+#. kTaqi
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"tit\n"
+"help.text"
+msgid "Image Bar"
+msgstr "பிம்பப் பட்டை"
+
+#. MRMXs
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3153088\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0214.xhp\">Image Bar</link>"
+msgstr "<link href=\"text/scalc/main0214.xhp\">பிம்பப் பட்டை</link>"
+
+#. MnQUQ
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3153896\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Image</emph> bar is displayed when you insert or select an image in a sheet.</ahelp>"
+msgstr "<ahelp hid=\".\"> <emph>பிம்பம்</emph> பட்டையானது நீங்கள் தாளில் ஒரு பிம்பத்தை நுழைக்கும்பொழுது அல்லது தேரும்பொழுது காட்சியளிக்கப்படுகிறது.</ahelp>"
+
+#. JKNbf
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools Bar"
+msgstr "கருவிகள் பட்டை"
+
+#. qbY86
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"hd_id3143268\n"
+"help.text"
+msgid "<link href=\"text/scalc/main0218.xhp\">Tools Bar</link>"
+msgstr "<link href=\"text/scalc/main0218.xhp\">கருவிகள் பட்டை</link>"
+
+#. nSzQ3
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"par_id3151112\n"
+"help.text"
+msgid "<ahelp hid=\"HID_SC_TOOLBOX_TOOLS\">Use the Tools bar to access commonly used commands.</ahelp>"
+msgstr "<ahelp hid=\"HID_SC_TOOLBOX_TOOLS\"> பொதுவாகப் பயன்படுத்தப்படும் கட்டளைகளை அணுக கருவிகள் பட்டையைப் பயன்படுத்துக.</ahelp>"
+
+#. GFPLo
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"par_idN10610\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170000.xhp\">Controls</link>"
+msgstr "<link href=\"text/shared/02/01170000.xhp\">கட்டுப்பாடுகள்</link>"
+
+#. BZMKM
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"hd_id3154730\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06080000.xhp\">Choose Themes</link>"
+msgstr "<link href=\"text/scalc/02/06080000.xhp\">தோற்றக்கருக்களைத் தேர்ந்தெடுக</link>"
+
+#. 2mPEC
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"par_idN10690\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/12040300.xhp\">Advanced Filter</link>"
+msgstr "<link href=\"text/scalc/01/12040300.xhp\">மேம்பட்ட வடிகட்டி</link>"
+
+#. NgA6E
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"par_idN106A8\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/12090100.xhp\">Start</link>"
+msgstr "<link href=\"text/scalc/01/12090100.xhp\">தொடங்கு</link>"
+
+#. G2qFY
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"par_idN106C0\n"
+"help.text"
+msgid "<link href=\"text/shared/autopi/01150000.xhp\">Euro Converter</link>"
+msgstr "<link href=\"text/shared/autopi/01150000.xhp\">யூரோ நிலைமாற்றி</link>"
+
+#. Eu4wD
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"par_idN106D8\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04070100.xhp\">Define</link>"
+msgstr "<link href=\"text/scalc/01/04070100.xhp\">வரையறு</link>"
+
+#. jje43
+#: main0218.xhp
+msgctxt ""
+"main0218.xhp\n"
+"par_idN106F0\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/06040000.xhp\">Goal Seek</link>"
+msgstr "<link href=\"text/scalc/01/06040000.xhp\">இலக்குத் தேடல்</link>"
+
+#. Fky5g
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] Calc Features"
+msgstr "$[officename] கல்க் சிறப்பியல்புகள்"
+
+#. Xj2By
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3154758\n"
+"help.text"
+msgid "<variable id=\"main0503\"><link href=\"text/scalc/main0503.xhp\">$[officename] Calc Features</link></variable>"
+msgstr "<variable id=\"main0503\"><link href=\"text/scalc/main0503.xhp\">$[officename] கல்க் சிறப்பியல்புகள்</link></variable>"
+
+#. ztyoG
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3149457\n"
+"help.text"
+msgid "$[officename] Calc is a spreadsheet application that you can use to calculate, analyze, and manage your data. You can also import and modify Microsoft Excel spreadsheets."
+msgstr "$[officename] கல்க என்பது உங்களின் தரவுகளைக் கணக்கிட, பகுப்பாய்வு செய்ய, நிர்வகிக்க பயன்படுத்தும் விரிதாள் செயலியகும். நீங்கள் மைக்ரோசாப்ட் எக்செல் விரிதாள்களை இறக்குமதி செய்யவும் மாற்றியமைக்கவும் முடியும்."
+
+#. 6iQ5x
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3148797\n"
+"help.text"
+msgid "Calculations"
+msgstr "கணக்கீடுகள்"
+
+#. p3tZu
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145172\n"
+"help.text"
+msgid "$[officename] Calc provides you with <link href=\"text/scalc/01/04060100.xhp\">functions</link>, including statistical and banking functions, that you can use to create formulas to perform complex calculations on your data."
+msgstr "உங்கள் தரவிலுள்ள சிக்கலான கணக்கீடுகளைச் செய்வதற்கான சூத்திரங்களை உருவாக்குவதற்கு நீங்கள் பயன்படுத்தக்கூடிய புள்ளியியல், வங்கியியல் செயலாற்றிகள் உட்பட <link href=\"text/scalc/01/04060100.xhp\">செயலாற்றிகள்</link> உடன் $[officename] கல்க உங்களுக்கு வழங்குகிறது."
+
+#. QbkGw
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145271\n"
+"help.text"
+msgid "You can also use the <link href=\"text/scalc/01/04060000.xhp\">Function Wizard</link> to help you create your formulas."
+msgstr "உங்களின் சூத்திரங்களை உருவாக்க உதவும் <link href=\"text/scalc/01/04060000.xhp\">செயலாற்றி வழிகாட்டி</link> ஐயும் நீங்கள் பயன்படுத்தலாம்."
+
+#. jARFA
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3152596\n"
+"help.text"
+msgid "What-If Calculations"
+msgstr "என்ன - கணக்கீடுகளாக இருந்தால்"
+
+#. 4yrYj
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3156444\n"
+"help.text"
+msgid "An interesting feature is to be able to immediately view the results of changes made to one factor of calculations that are composed of several factors. For instance, you can see how changing the time period in a loan calculation affects the interest rates or repayment amounts. Furthermore, you can manage larger tables by using different predefined scenarios."
+msgstr "ஒரு சுவாரஸ்யமான சிறப்பியல்பானது,  பல காரணிகளை உருவாக்கும் கணக்கீட்டின் ஒரு காரணிக்குச் செய்யப்படும் மாற்றங்களின் முடிவுகளை  உடனடியாகப் பார்வையிட முடியும்.  உதாரணமாகக், கடன் கணக்கீட்டில்  கால கட்டத்தை மாற்றுவது வட்டி விகிதங்கள் மற்றும் கடனைத் திரும்பச் செலுத்தும் தொகைகளைப் பாதிப்பதை நீங்கள் பார்க்கலாம். மேலும், நீங்கள் பெரிய அட்டவணைகளை வெவ்வேறு முன்வரையறுத்த நிகழ்வோட்டங்களைப் பயன்படுத்தி நிர்வகிக்கலாம்."
+
+#. JRYyA
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3148576\n"
+"help.text"
+msgid "Database Functions"
+msgstr "தரவுத்தளச் செயலாற்றிகள்"
+
+#. 99gbx
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3154011\n"
+"help.text"
+msgid "Use spreadsheets to arrange, store, and filter your data."
+msgstr "உங்களின் தரவுகளை அடுக்க, சேர்த்து வை, வடிகட்ட விரிதாள்களைப் பயன்ப்டுத்துக."
+
+#. EgN7B
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3154942\n"
+"help.text"
+msgid "$[officename] Calc lets you drag-and-drop tables from databases, or lets you use a spreadsheet as a data source for creating form letters in $[officename] Writer."
+msgstr "நீங்கள் அட்டவணையிலிருந்து தரவுத்தளங்களை இழுத்துப் போடுவதற்கு $[officename] கல்க் உங்களை அனுமதிக்கிறது, அல்லது உங்களை $[officename] ரைட்டரில் கடிதங்களை உருவாக்குவதற்கான மூலமாக விரிதாளைப் பயன்படுத்த அனுமதிக்கிறது."
+
+#. GKCva
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3145800\n"
+"help.text"
+msgid "Arranging Data"
+msgstr "தரவை அடுக்குதல்"
+
+#. Bo5vg
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3154490\n"
+"help.text"
+msgid "With a few mouse-clicks, you can reorganize your spreadsheet to show or hide certain data ranges, or to format ranges according to special conditions, or to quickly calculate subtotals and totals."
+msgstr "சில சுட்டெலி சொடுக்குகளுடன், குறிப்பிட்ட தரவைக் காட்டவோ மறைக்கவோ , அல்லது சிறப்பு நிபந்தனைகள் அடிப்படையில் வீச்சுகளை வடிவூட்டுவதற்கு, அல்லது விரைவாக உட்கூட்டல்களையும் கூட்டல்களையும் கணக்கிட நீங்கள் மீண்டும் விரிதாளை ஒழுங்கமைக்கலாம்."
+
+#. JBCHF
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155601\n"
+"help.text"
+msgid "Dynamic Charts"
+msgstr "இயக்காற்றல் விளக்கப்படங்கள்"
+
+#. QEi8Q
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3149121\n"
+"help.text"
+msgid "$[officename] Calc lets you present spreadsheet data in dynamic charts that update automatically when the data changes."
+msgstr "$[officename] கல்க், விரிதாள் தரவை இயக்காற்றல் தரவு மாறும்போது தானாகவே புதுப்பிக்கும் விளக்கப்படங்களில் முன்வைக்க உங்களை அனுமதிக்கிறது."
+
+#. aFG9z
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3153707\n"
+"help.text"
+msgid "Opening and Saving Microsoft Files"
+msgstr "மைக்ரோசாப்ட் கோப்புகளைத் திறக்கிறக்கவும் சேமிக்கவும் செய்கிறது"
+
+#. Xz6yr
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3157867\n"
+"help.text"
+msgid "Use the $[officename] filters to convert Excel files, or to open and save in a variety of other <link href=\"text/shared/00/00000020.xhp\">formats</link>."
+msgstr "எக்செல் கோப்புகளுக்கு நிலைமாற்றுவதற்கோ பல்வேறு <link href=\"text/shared/00/00000020.xhp\">வடிவூட்டுகள்</link> இல் திறப்பதற்கும் சேமிப்பதற்கும் $[officename] வடிகட்டிகளைப் பயன்படுத்துக."

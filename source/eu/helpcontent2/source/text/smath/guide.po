@@ -1,0 +1,1295 @@
+#. extracted from helpcontent2/source/text/smath/guide
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-10-22 12:14+0000\n"
+"Last-Translator: Asier Sarasua Garmendia <asiersar@yahoo.com>\n"
+"Language-Team: Basque <https://translations.documentfoundation.org/projects/libo_help-master/textsmathguide/eu/>\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1531205973.000000\n"
+
+#. P9FEQ
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"tit\n"
+"help.text"
+msgid "Manually Aligning Formula Parts"
+msgstr "Formularen zati batzuk eskuz lerrokatzea"
+
+#. Dc94G
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"bm_id3156384\n"
+"help.text"
+msgid "<bookmark_value>aligning; characters in %PRODUCTNAME Math</bookmark_value><bookmark_value>formula parts; manually aligning</bookmark_value>"
+msgstr "<bookmark_value>lerrokatu; %PRODUCTNAME Matheko karaktereak</bookmark_value><bookmark_value>formulako zatiak; eskuz lerrokatzea</bookmark_value>"
+
+#. Yt2Lw
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"hd_id3156384\n"
+"help.text"
+msgid "<variable id=\"align\"><link href=\"text/smath/guide/align.xhp\">Manually Aligning Formula Parts</link></variable>"
+msgstr "<variable id=\"align\"><link href=\"text/smath/guide/align.xhp\">Formulako zati batzuk eskuz lerrokatzea</link></variable>"
+
+#. eUZmq
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"hd_id3154657\n"
+"help.text"
+msgid "How do you align characters in $[officename] Math quickly and easily?"
+msgstr "Nola lerrokatzen dira karaktereak $[officename] Mathen azkar eta erraz?"
+
+#. EJ2GY
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"par_id3150249\n"
+"help.text"
+msgid "To accomplish this, you must define empty groups and character strings. They do not require any space, but carry information that helps in the alignment process."
+msgstr "Horretarako, definitu talde hutsak eta karaktere-kateak Ez dute tarterik behar, lerrokatzeko prozesuan lagungarria den informazioa eraman baizik."
+
+#. BLcvk
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"par_id3153912\n"
+"help.text"
+msgid "To create empty groups, enter curly brackets <emph>{}</emph> in the Commands window. In the following example, the goal is to achieve a line break so that the plus signs are beneath one another, even though one less character is entered in the upper line:"
+msgstr "Talde hutsak sortzeko, sartu giltzak <emph>{}</emph> Komandoak leihoan. Hurrengo adibidean, helburua lerro-jauzi bat lortzea da plus ikurrak bat bestearen azpian ager daitezen, goiko lerroan karaktere bat gutxiago sartu arren:"
+
+#. wDfhJ
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"par_id3143229\n"
+"help.text"
+msgid "Empty character strings are a simple way to ensure that texts and formulas are left-aligned. They are defined using double inverted commas \"\" . Make sure you do not use any typographic inverted commas. Example:"
+msgstr "Karaktereen kate hutsak testuak eta formulak ezkerrean lerrokatzeko modu errazak dira. Komatxo bikoitzak \"\" erabiliz zehazten dira. Ez erabili komatxo tipografikorik. Hona hemen adibide bat:"
+
+#. C6Ky9
+#: align.xhp
+msgctxt ""
+"align.xhp\n"
+"par_id3153809\n"
+"help.text"
+msgid "\"A further example.\" newline a+b newline \"\"c-d"
+msgstr "\"Beste adibide bat.\" newline a+b newline \"\"c-d"
+
+#. WA2Pc
+#: attributes.xhp
+msgctxt ""
+"attributes.xhp\n"
+"tit\n"
+"help.text"
+msgid "Changing Default Attributes"
+msgstr "Atributu lehenetsiak aldatzea"
+
+#. 4DrY6
+#: attributes.xhp
+msgctxt ""
+"attributes.xhp\n"
+"bm_id3145792\n"
+"help.text"
+msgid "<bookmark_value>attributes; changing in $[officename] Math</bookmark_value><bookmark_value>font attributes;changing defaults</bookmark_value><bookmark_value>formatting;changing default attributes</bookmark_value><bookmark_value>defaults;changing default formatting</bookmark_value><bookmark_value>changing;default formatting</bookmark_value>"
+msgstr "<bookmark_value>atributuak; $[officename] Mathen aldatzea</bookmark_value><bookmark_value>letra-tipoaren atributuak;lehenetsiak aldatzea</bookmark_value><bookmark_value>formatua;atributu lehenetsiak aldatzea</bookmark_value><bookmark_value>lehenetsiak;formatu lehenetsia aldatzea</bookmark_value><bookmark_value>aldatu;formatu lehenetsia</bookmark_value>"
+
+#. tFymM
+#: attributes.xhp
+msgctxt ""
+"attributes.xhp\n"
+"hd_id3145792\n"
+"help.text"
+msgid "<variable id=\"attributes\"><link href=\"text/smath/guide/attributes.xhp\">Changing Default Attributes</link></variable>"
+msgstr "<variable id=\"attributes\"><link href=\"text/smath/guide/attributes.xhp\">Atributu lehenetsiak aldatzea</link></variable>"
+
+#. gAHnh
+#: attributes.xhp
+msgctxt ""
+"attributes.xhp\n"
+"hd_id3154484\n"
+"help.text"
+msgid "Can default formats in $[officename] Math be modified?"
+msgstr "$[officename] Matheko formatu lehenetsiak alda daitezke?"
+
+#. k9ADA
+#: attributes.xhp
+msgctxt ""
+"attributes.xhp\n"
+"par_id3148870\n"
+"help.text"
+msgid "Some parts of formulas are always formatted bold or italic by default."
+msgstr "Formuletako zati batzuk formatu lodia eta etzana edukitzen dute lehenespenez."
+
+#. 7A7Vi
+#: attributes.xhp
+msgctxt ""
+"attributes.xhp\n"
+"par_id3150210\n"
+"help.text"
+msgid "You can remove these attributes using \"nbold\" and \"nitalic\". Example:"
+msgstr "Atributu horiek kentzeko, erabili \"nbold\" eta \"nitalic\". Hona hemen adibide bat:"
+
+#. MCJxc
+#: attributes.xhp
+msgctxt ""
+"attributes.xhp\n"
+"par_id3149872\n"
+"help.text"
+msgid "In the second formula, the a is not italic. The b is bold. You cannot change the plus sign by this method."
+msgstr "Bigarren formulan a ez da etzana. b lodia da. Metodo horren bidez ezin duzu plus ikurra aldatu."
+
+#. oPuAE
+#: brackets.xhp
+msgctxt ""
+"brackets.xhp\n"
+"tit\n"
+"help.text"
+msgid "Merging Formula Parts in Brackets"
+msgstr "Formulen zatiak parentesietan batzea"
+
+#. bDPkX
+#: brackets.xhp
+msgctxt ""
+"brackets.xhp\n"
+"bm_id3152596\n"
+"help.text"
+msgid "<bookmark_value>brackets; merging formula parts</bookmark_value><bookmark_value>formula parts; merging</bookmark_value><bookmark_value>fractions in formulas</bookmark_value><bookmark_value>merging;formula parts</bookmark_value>"
+msgstr "<bookmark_value>parentesiak; formulako zatiak batzea</bookmark_value><bookmark_value>formulako zatiak; batzea</bookmark_value><bookmark_value>zatikiak formuletan</bookmark_value><bookmark_value>batu;formalako zatiak</bookmark_value>"
+
+#. vAkzZ
+#: brackets.xhp
+msgctxt ""
+"brackets.xhp\n"
+"hd_id3152596\n"
+"help.text"
+msgid "<variable id=\"brackets\"><link href=\"text/smath/guide/brackets.xhp\">Merging Formula Parts in Brackets</link></variable>"
+msgstr "<variable id=\"brackets\"><link href=\"text/smath/guide/brackets.xhp\">Formulen zatiak parentesietan batzea</link></variable>"
+
+#. z6zop
+#: brackets.xhp
+msgctxt ""
+"brackets.xhp\n"
+"hd_id3154511\n"
+"help.text"
+msgid "Inserting fractions into formulas"
+msgstr "Zatikiak formuletan txertatzea"
+
+#. jPtfJ
+#: brackets.xhp
+msgctxt ""
+"brackets.xhp\n"
+"par_id3146971\n"
+"help.text"
+msgid "In the case of a fraction whose numerator and denominator consist of a product, a sum, and so on, the values that belong together must be bracketed together."
+msgstr "Zenbakitzailea eta izendatzailea biderketa bat, batuketa bat eta abar dituen zatiki baten kasuan, talde bereko balioak parentesian elkarrekin jarri behar dira."
+
+#. 4bWFt
+#: brackets.xhp
+msgctxt ""
+"brackets.xhp\n"
+"par_id3149021\n"
+"help.text"
+msgid "Use the following syntax:"
+msgstr "Erabili honako sintaxia:"
+
+#. FX6mw
+#: brackets.xhp
+msgctxt ""
+"brackets.xhp\n"
+"par_id3154703\n"
+"help.text"
+msgid "or"
+msgstr "edo"
+
+#. x9te9
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"tit\n"
+"help.text"
+msgid "Applying Color to Formula Parts"
+msgstr "Kolorea aplikatzea formula-zatiei"
+
+#. F9aE8
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"bm_id3156384\n"
+"help.text"
+msgid "<bookmark_value>Color in formulas</bookmark_value>"
+msgstr "<bookmark_value>Kolorea formuletan</bookmark_value>"
+
+#. dBGoG
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"hd_id601641846107898\n"
+"help.text"
+msgid "<variable id=\"color\"><link href=\"text/smath/guide/color.xhp\">Applying Color to Formula Parts</link></variable>"
+msgstr "<variable id=\"color\"><link href=\"text/smath/guide/color.xhp\">Kolorea aplikatzea formula-zatiei</link></variable>"
+
+#. ckGgG
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id481641846189425\n"
+"help.text"
+msgid "Use the command <literal>color</literal> to apply color to the subsequent formula part."
+msgstr "Erabili <literal>color</literal> komandoa ondoren datorren formula-zati bati kolorea aplikatzeko."
+
+#. BnqGh
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id141641846432331\n"
+"help.text"
+msgid "The example below creates a formula where <emph>a</emph> is shown using the default color (black) and <emph>b</emph> is shown in red."
+msgstr "Beheko adibidean, <emph>a</emph> kolore lehenetsiarekin (beltza) eta <emph>b</emph> gorriz erakusten diren formula bat sortzen da."
+
+#. QBxDL
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id211641848286949\n"
+"help.text"
+msgid "Be aware that the <literal>color</literal> command only changes the color of the formula part that comes immediately after it. For example, in the formula below only <emph>b</emph> will be shown in red, whereas <emph>c</emph> will be shown in black."
+msgstr "Kontuan izan <literal>color</literal> komandoak haren ondoren dagoen formula-zatiaren kolorea soilik aldatzen duela. Adibidez, beheko formulan, <emph>b</emph> letra soilik erakutsiko da gorriz, eta <emph>c</emph> beltzez erakutsiko da."
+
+#. hLeFX
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641848475043\n"
+"help.text"
+msgid "Use braces to apply color to more parts of the formula. In the following example, <emph>b</emph> and <emph>c</emph> are shown in red."
+msgstr "Erabili giltzak kolorea formularen zati gehiagori aplikatzeko. Hurrengo adibidean, <emph>b</emph> eta <emph>c</emph>, biak erakusten dira gorriz."
+
+#. gLttS
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id651641851485699\n"
+"help.text"
+msgid "A list with predefined color names is available <link href=\"text/smath/guide/color.xhp#PredefinedColors\">here</link>."
+msgstr "Aurredefinitutako kolore-izenen zerrenda bat <link href=\"text/smath/guide/color.xhp#PredefinedColors\">hemen</link> dago eskuragarri."
+
+#. gQn7y
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"bm_id521641858375937\n"
+"help.text"
+msgid "<bookmark_value>RGB colors</bookmark_value>"
+msgstr "<bookmark_value>RGB koloreak</bookmark_value>"
+
+#. beAyt
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"hd_id831641851472401\n"
+"help.text"
+msgid "Using RGB colors"
+msgstr "RGB koloreak erabiltzea"
+
+#. tj2xF
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id701641851641673\n"
+"help.text"
+msgid "Use the command <literal>color rgb</literal> to apply colors using RGB (Red, Green, Blue) values."
+msgstr "Erabili <literal>color rgb</literal> komandoa RGB (gorria, berdea, urdina) metodoaren bidez koloreak aplikatzeko."
+
+#. eYWCg
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id941641851779414\n"
+"help.text"
+msgid "RGB values range between 0 and 255."
+msgstr "RGB balioak 0 eta 255 arteko barrutian daude."
+
+#. EFXpV
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"bm_id521641858372217\n"
+"help.text"
+msgid "<bookmark_value>Hex colors</bookmark_value>"
+msgstr "<bookmark_value>Kolore hamaseitarrak</bookmark_value>"
+
+#. mdvQM
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"hd_id901641851813499\n"
+"help.text"
+msgid "Using hex notation"
+msgstr "Notazio hamaseitarra erabiltzea"
+
+#. zLQWy
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id271641851832464\n"
+"help.text"
+msgid "Use the command <literal>color hex</literal> to apply colors using the hexadecimal notation."
+msgstr "Erabili <literal>color hex</literal> komandoa koloreak notazio hamaseitarraren bidez aplikatzeko."
+
+#. rPHnc
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"hd_id121641851982125\n"
+"help.text"
+msgid "Combining color with other commands"
+msgstr "Kolorea beste komando batzuekin konbinatzea"
+
+#. WiZz8
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id321641852002469\n"
+"help.text"
+msgid "It is possible to combine the color command with other commands as <literal>bold</literal>, <literal>italic</literal> or <literal>size</literal>."
+msgstr "Posible da kolore-komandoa beste komando batzuekin, adibidez <literal>bold</literal>, <literal>italic</literal> edo <literal>size</literal>, konbinatzea."
+
+#. qDEtC
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id521641852051767\n"
+"help.text"
+msgid "The example below writes <emph>var</emph> in bold blue:"
+msgstr "Hurrengo adibidean, <emph>var</emph> urdinez eta letra lodiz idazten da:"
+
+#. vSVUb
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id21641852173099\n"
+"help.text"
+msgid "To change color and font size, use <literal>color</literal> in combination with <literal>size</literal> and the desired font size."
+msgstr "Kolorea eta letra-tipoaren tamaina aldatzeko, erabili <literal>color</literal> eta <literal>size</literal> aldi berean."
+
+#. wEhmU
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"bm_id52164185802587\n"
+"help.text"
+msgid "<bookmark_value>List of predefined colors</bookmark_value>"
+msgstr "<bookmark_value>Aurredefinitutako koloreen zerrenda</bookmark_value>"
+
+#. wbRDh
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"hd_id621641846264365\n"
+"help.text"
+msgid "Predefined color names"
+msgstr "Aurredefinitutako koloreen izenak"
+
+#. FGJS8
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id911641846282038\n"
+"help.text"
+msgid "%PRODUCTNAME provides a set of predefined color names that can be used along with the <literal>color</literal> command."
+msgstr "%PRODUCTNAME aplikazioak <literal>color</literal> komandoarekin elkarrekin erabili daitezkeen kolore-izen aurredefinituen multzo bat eskaintzen du."
+
+#. auAPG
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id871641846833413\n"
+"help.text"
+msgid "Markup language"
+msgstr "Markaketa-lengoaia"
+
+#. Qf5tX
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id661641846833413\n"
+"help.text"
+msgid "Color"
+msgstr "Kolorea"
+
+#. Y4DMa
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id741641846833413\n"
+"help.text"
+msgid "Hex value"
+msgstr "Balio hamaseitarra"
+
+#. 3kWLW
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id741641846833014\n"
+"help.text"
+msgid "RGB values"
+msgstr "RGB balioak"
+
+#. 4Vu7A
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id951641846833413\n"
+"help.text"
+msgid "<literal>aqua</literal> or <literal>cyan</literal>"
+msgstr "<literal>aqua</literal> edo <literal>cyan</literal>"
+
+#. xcaVa
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846833413\n"
+"help.text"
+msgid "Aqua"
+msgstr "Ura"
+
+#. D73X6
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846830036\n"
+"help.text"
+msgid "Black"
+msgstr "Beltza"
+
+#. iGEDP
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846320113\n"
+"help.text"
+msgid "Blue"
+msgstr "Urdina"
+
+#. Umsp6
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846833363\n"
+"help.text"
+msgid "Coral"
+msgstr "Korala"
+
+#. YcrNE
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846833014\n"
+"help.text"
+msgid "Crimson"
+msgstr "Gorrimina"
+
+#. G6mfq
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id951641846830853\n"
+"help.text"
+msgid "<literal>fuchsia</literal> or <literal>magenta</literal>"
+msgstr "<literal>fuchsia</literal> edo <literal>magenta</literal>"
+
+#. DD2RU
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846800325\n"
+"help.text"
+msgid "Fuchsia"
+msgstr "Fuksia"
+
+#. WSeur
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id951641846830213\n"
+"help.text"
+msgid "<literal>gray</literal> or <literal>grey</literal>"
+msgstr "<literal>gray</literal> edo <literal>grey</literal>"
+
+#. gdQ5j
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846896513\n"
+"help.text"
+msgid "Gray"
+msgstr "Grisa"
+
+#. YCrBe
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846830214\n"
+"help.text"
+msgid "Green"
+msgstr "Berdea"
+
+#. Zqix6
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846836253\n"
+"help.text"
+msgid "Hot pink"
+msgstr "Arrosa beroa"
+
+#. 9oHjZ
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846812385\n"
+"help.text"
+msgid "Indigo"
+msgstr "Anila"
+
+#. X4Y45
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846835521\n"
+"help.text"
+msgid "Lavender"
+msgstr "Izpilikua"
+
+#. g5GKD
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846036523\n"
+"help.text"
+msgid "Lime"
+msgstr "Lima"
+
+#. kAo5q
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846833649\n"
+"help.text"
+msgid "Maroon"
+msgstr "Gorri iluna"
+
+#. n7uXk
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846837653\n"
+"help.text"
+msgid "Midnight"
+msgstr "Gauerdia"
+
+#. Ymn82
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846867458\n"
+"help.text"
+msgid "Navy"
+msgstr "Itsas urdina"
+
+#. aedBY
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846837663\n"
+"help.text"
+msgid "Olive"
+msgstr "Oliba"
+
+#. pNCBH
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846838053\n"
+"help.text"
+msgid "Orange"
+msgstr "Laranja"
+
+#. BGG7c
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846836041\n"
+"help.text"
+msgid "Orange red"
+msgstr "Bermiloia"
+
+#. opiDJ
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846833063\n"
+"help.text"
+msgid "Purple"
+msgstr "Purpura"
+
+#. 42wFB
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846833902\n"
+"help.text"
+msgid "Red"
+msgstr "Gorria"
+
+#. p5ox4
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846836613\n"
+"help.text"
+msgid "Sea green"
+msgstr "Itsas berdea"
+
+#. AF8R7
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641840569413\n"
+"help.text"
+msgid "Silver"
+msgstr "Zilarra"
+
+#. 8XVN7
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846896587\n"
+"help.text"
+msgid "Teal"
+msgstr "Urdin berdexka"
+
+#. KejUr
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846006745\n"
+"help.text"
+msgid "Violet"
+msgstr "Bioleta"
+
+#. pXf2z
+#: color.xhp
+msgctxt ""
+"color.xhp\n"
+"par_id841641846837556\n"
+"help.text"
+msgid "Yellow"
+msgstr "Horia"
+
+#. 3UYoM
+#: comment.xhp
+msgctxt ""
+"comment.xhp\n"
+"tit\n"
+"help.text"
+msgid "Entering Comments"
+msgstr "Iruzkinak sartzea"
+
+#. EpAyX
+#: comment.xhp
+msgctxt ""
+"comment.xhp\n"
+"bm_id3155961\n"
+"help.text"
+msgid "<bookmark_value>comments; entering in $[officename] Math</bookmark_value><bookmark_value>inserting;comments in $[officename] Math</bookmark_value>"
+msgstr "<bookmark_value>iruzkinak; $[officename] Mathen sartzea</bookmark_value><bookmark_value>txertatu; iruzkinak $[officename] Mathen</bookmark_value>"
+
+#. A9Yfc
+#: comment.xhp
+msgctxt ""
+"comment.xhp\n"
+"hd_id3155961\n"
+"help.text"
+msgid "<variable id=\"comment\"><link href=\"text/smath/guide/comment.xhp\">Entering Comments</link></variable>"
+msgstr "<variable id=\"comment\"><link href=\"text/smath/guide/comment.xhp\">Iruzkinak sartzea</link></variable>"
+
+#. CA8hE
+#: comment.xhp
+msgctxt ""
+"comment.xhp\n"
+"hd_id3154657\n"
+"help.text"
+msgid "How does one attach comments that don't appear in the document to a formula?"
+msgstr "Nola eransten zaizkie dokumentuan agertzen ez diren iruzkinak formulei?"
+
+#. sj3Gt
+#: comment.xhp
+msgctxt ""
+"comment.xhp\n"
+"par_id3149499\n"
+"help.text"
+msgid "A comment begins with a double percent sign <emph>%%</emph>, and extends to the next line-end character (Enter key). Everything that lies in between is ignored and is not printed out. If there are percent signs in the text, they are treated as part of the text."
+msgstr "Iruzkin batek hasieran ehuneko ikur bikoitza <emph>%%</emph> dauka, eta lerro amaierako hurrengo karakterera arte luzatzen da (⏎ tekla). Horren artean doan guztia ez da kontuan hartzen eta ez da inprimatzen. Ehunekoaren ikurrak badaude testuan, testuaren zati gisa tratatuko dira."
+
+#. 27yBP
+#: comment.xhp
+msgctxt ""
+"comment.xhp\n"
+"par_idN105D0\n"
+"help.text"
+msgid "Example:"
+msgstr "Hona hemen adibide bat:"
+
+#. CMAYs
+#: comment.xhp
+msgctxt ""
+"comment.xhp\n"
+"par_idN105D3\n"
+"help.text"
+msgid "a^2+b^2=c^2 %% Pythagorean theorem."
+msgstr "a^2+b^2=c^2 %% Pitagorasen teorema."
+
+#. PZSB7
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcuts ($[officename] Math Accessibility)"
+msgstr "Laster-teklak ($[officename] Math erabilerraztasuna)"
+
+#. rsGdv
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"bm_id3149018\n"
+"help.text"
+msgid "<bookmark_value>accessibility; $[officename] Math shortcuts</bookmark_value>"
+msgstr "<bookmark_value>erabilerraztasuna; $[officename] Matheko laster-teklak</bookmark_value>"
+
+#. pq9cU
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"hd_id3149018\n"
+"help.text"
+msgid "<variable id=\"keyboard\"><link href=\"text/smath/guide/keyboard.xhp\">Shortcuts ($[officename] Math Accessibility)</link></variable>"
+msgstr "<variable id=\"keyboard\"><link href=\"text/smath/guide/keyboard.xhp\">Laster-teklak ($[officename] Math erabilerraztasuna)</link></variable>"
+
+#. ZkpGA
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3150298\n"
+"help.text"
+msgid "You can control $[officename] Math without a mouse."
+msgstr "$[officename] Math sagurik gabe erabil dezakezu."
+
+#. dNEFC
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"hd_id3150343\n"
+"help.text"
+msgid "Inserting a Formula Directly"
+msgstr "Formulak zuzenean txertatzea"
+
+#. 3ztDF
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3154659\n"
+"help.text"
+msgid "If you want to insert a formula into a text document, and you already know the correct writing, you can proceed as follows:"
+msgstr "Testu-dokumentuan formula bat txertatu nahi baduzu eta idazkera zuzenean ezagutzen baduzu, honako hau egin dezakezu:"
+
+#. qoVM4
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3153818\n"
+"help.text"
+msgid "Write the formula into your text"
+msgstr "Idatzi formula testuan"
+
+#. dmJc9
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3153915\n"
+"help.text"
+msgid "Select the formula"
+msgstr "Hautatu formula"
+
+#. F2ipo
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3150213\n"
+"help.text"
+msgid "Choose the command <menuitem>Insert - OLE Object - Formula Object</menuitem>."
+msgstr "Aukeratu <menuitem>Txertatu - OLE objektua - Formula</menuitem> komandoa."
+
+#. aowxC
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"hd_id3154767\n"
+"help.text"
+msgid "Inserting a Formula using a Window"
+msgstr "Formula leihoaren bidez txertatzea"
+
+#. Jvobx
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3149875\n"
+"help.text"
+msgid "If you want to use the $[officename] Math interface to edit a formula, choose the command <menuitem>Insert - OLE Object - Formula Object</menuitem> without any text selected."
+msgstr "$[officename] Math interfazea erabili nahi baduzu formula bat editatzeko, aukeratu <menuitem>Txertatu - OLE objektua - Formula</menuitem> testurik hautatuta eduki gabe."
+
+#. sEBBM
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3150391\n"
+"help.text"
+msgid "The cursor waits in the Commands window and you can type the formula."
+msgstr "Kurtsorea Komandoak leihoan agertuko da eta formula idatz dezakezu."
+
+#. rvzhp
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3150537\n"
+"help.text"
+msgid "You can compose formulas using the Elements pane. Open it with the menu <emph>View - Elements</emph> if it is not already open."
+msgstr "'Elementuak' panelaren bidez formulak sor ditzakezu. Irekita ez badago, ireki <emph>Ikusi - Elementuak</emph> menuarekin."
+
+#. tfpCC
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3155625\n"
+"help.text"
+msgid "If the Elements pane is open, use F6 to switch from the Commands window to the Elements pane and back."
+msgstr "'Elementuak' panela irekita badago, erabili F6 tekla 'Komandoak' leihoa eta 'Elementuak' panela txandakatzeko."
+
+#. PxwLi
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"hd_id3154554\n"
+"help.text"
+msgid "Elements pane"
+msgstr "'Elementuak' panela"
+
+#. iKfcF
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"tit\n"
+"help.text"
+msgid "Working with Limits"
+msgstr "Limiteekin lan egitea"
+
+#. 6WSEC
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"bm_id8404492\n"
+"help.text"
+msgid "<bookmark_value>limits;in sums/integrals</bookmark_value><bookmark_value>integral limits</bookmark_value>"
+msgstr "<bookmark_value>limiteak;batuketetan/integraletan</bookmark_value><bookmark_value>integralen limiteak</bookmark_value>"
+
+#. jCWYY
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"hd_id1892147\n"
+"help.text"
+msgid "<variable id=\"limits\"><link href=\"text/smath/guide/limits.xhp\">Working with Limits</link></variable>"
+msgstr "<variable id=\"limits\"><link href=\"text/smath/guide/limits.xhp\">Limiteekin lan egitea</link></variable>"
+
+#. Gtt8e
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"hd_id9881893\n"
+"help.text"
+msgid "How can I define the limits in a Sum or Integral formula?"
+msgstr "Nola defini ditzaket limiteak batuketaren edo integralaren formula batean?"
+
+#. kFrLC
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id6504409\n"
+"help.text"
+msgid "You want to insert a summation formula like \"summation of s^k from k = 0 to n\" at the cursor in a Writer text document."
+msgstr "Batuketa-formula bat txertatu behar duzu Writerreko testu-dokumentu batean, kurtsorea dagoen lekuan; adibidez: \"s^k-ren batura, k = 0-tik n-ra\"."
+
+#. qAFch
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id1276589\n"
+"help.text"
+msgid "You see the Math input window and the Elements pane on the left."
+msgstr "Math sarrera-leihoa eta 'Elementuak' panela ezkerrean ikusiko dituzu."
+
+#. DZW2c
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id3283791\n"
+"help.text"
+msgid "From the list on the upper part of the Elements pane, select the <emph>Operators</emph> item."
+msgstr "'Elementuak' paneleko goiko aldeko zerrendatik, aukeratu <emph>Eragileak</emph> elementua."
+
+#. r8sVG
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id9734794\n"
+"help.text"
+msgid "In the lower part of the Elements pane, click the <emph>Sum</emph> icon."
+msgstr "'Elementuak' paneleko beheko aldean, sakatu <emph>Batuketa</emph> ikonoa."
+
+#. erGA9
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id9641712\n"
+"help.text"
+msgid "To enable lower and upper limits, click additionally the <emph>Upper and Lower Limits</emph> icon."
+msgstr "Beheko eta goiko mugak gaitzeko, egin klik <emph>Goiko eta beheko limiteak</emph> ikonoan."
+
+#. YxM8C
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id3304239\n"
+"help.text"
+msgid "In the input window, the first placeholder or marker is selected, and you can start to enter the lower limit:"
+msgstr "Sarreren leihoan, lehen leku-marka edo markatzailea hautatuta dago, eta beheko limitea sartzen has zaitezke:"
+
+#. szLNG
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id8471327\n"
+"help.text"
+msgid "Press F4 to advance to the next marker, and enter the upper limit:"
+msgstr "Sakatu F4 hurrengo markatzailera joateko, eta sartu goiko limitea:"
+
+#. Wh4vB
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id759300\n"
+"help.text"
+msgid "Press F4 to advance to the next marker, and enter the summand:"
+msgstr "Sakatu F4 hurrengo markatzailera joateko, eta sartu batugaia:"
+
+#. dJvvn
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id6756187\n"
+"help.text"
+msgid "Now the formula is complete. Click into your text document outside the formula to leave the formula editor."
+msgstr "Orain formula osatuta dago. Egin klik testu-dokumentuan, formulatik kanpo, formula-editoretik irteteko."
+
+#. bFFkA
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id9406414\n"
+"help.text"
+msgid "In the same way, you can enter an Integral formula with limits. When you click an icon from the Elements pane, the assigned text command is inserted in the input window. If you know the text commands, you can enter the commands directly in the input window."
+msgstr "Era berean, mugak dituen formula integral bat sar dezakezu. 'Elementuak' paneleko ikono batean klik egitean, esleitutako testu-komandoa sarrera-leihoan txertatuko da. Testu-komandoak ezagutzen badituzu, komandoak sarrera-leihoan zuzenean sar ditzakezu."
+
+#. VAoyi
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id1965697\n"
+"help.text"
+msgid "Click in the input window and enter the following line:"
+msgstr "Egin klik sarreren leihoan eta sartu lerro hau:"
+
+#. 7rRJW
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id4651020\n"
+"help.text"
+msgid "A small gap exists between f(x) and dx, which you can also enter using the Elements pane: select the <emph>Formats</emph> item from the list on the top, then the <emph>Small Gap</emph> icon."
+msgstr "f(x) eta dx artean tarte txiki bat dago, 'Elementuak' panela erabiliz ere sar dezakezuna: hautatu <emph>Formatua</emph> elementua goiko zerrendan, eta ondoren <emph>Tarte txikia</emph> ikonoa."
+
+#. FSWqq
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id3877071\n"
+"help.text"
+msgid "If you don't like the font of the letters f and x, choose <item type=\"menuitem\">Format - Fonts</item> and select other fonts. Click the <emph>Default</emph> button to use the new fonts as default from now on."
+msgstr "f eta x letren letra-tipoa atsegin ez baduzu, aukeratu <item type=\"menuitem\">Formatua – Letra-tipoak</item> eta hautatu beste letra-tipo batzuk. Egin klik <emph>Lehenetsia</emph> botoian hemendik aurrera letra-tipo berriak lehenetsi gisa erabiltzeko."
+
+#. KBUXj
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id3021332\n"
+"help.text"
+msgid "If you need the formula within a line of text, the limits increase the line height. You can choose <item type=\"menuitem\">Format - Text Mode</item> to place the limits besides the Sum or Integral symbol, which reduces the line height."
+msgstr "Formula testu-lerro baten barruan sartu nahi baduzu, limiteek lerroaren altuera handitzen dute. <item type=\"menuitem\">Formatua – Testu-modua</item> aukeratu dezakezu limiteak Batu edo Integrala ikurren alboan kokatzeko."
+
+#. FMfHG
+#: limits.xhp
+msgctxt ""
+"limits.xhp\n"
+"par_id260322\n"
+"help.text"
+msgid "<link href=\"text/smath/01/03090909.xhp\">Example of Integral and Sum ranges</link>"
+msgstr "<link href=\"text/smath/01/03090909.xhp\">Integrala eta Batu barrutien adibidea</link>"
+
+#. tfPe4
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"tit\n"
+"help.text"
+msgid "Instructions for Using $[officename] Math"
+msgstr "$[officename] Math erabiltzeko argibideak"
+
+#. FfhxL
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"bm_id3147341\n"
+"help.text"
+msgid "<bookmark_value>$[officename] Math;general instructions</bookmark_value><bookmark_value>instructions; $[officename] Math</bookmark_value><bookmark_value>Equation Editor, see $[officename] Math</bookmark_value>"
+msgstr "<bookmark_value>$[officename] Math;argibide orokorrak</bookmark_value><bookmark_value>argibideak; $[officename] Math</bookmark_value><bookmark_value>ekuazioen editorea; ikusi $[officename] Math</bookmark_value>"
+
+#. 4VuXB
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3147341\n"
+"help.text"
+msgid "<variable id=\"main\"><link href=\"text/smath/guide/main.xhp\">Instructions for Using $[officename] Math</link></variable>"
+msgstr "<variable id=\"main\"><link href=\"text/smath/guide/main.xhp\">$[officename] Math erabiltzeko argibideak</link></variable>"
+
+#. ArDuV
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3150199\n"
+"help.text"
+msgid "Entering and Editing Formulas"
+msgstr "Formulak sartzea eta editatzea"
+
+#. 74qEh
+#: newline.xhp
+msgctxt ""
+"newline.xhp\n"
+"tit\n"
+"help.text"
+msgid "Entering Line Breaks"
+msgstr "Lerro-jauziak sartzea"
+
+#. S8pTx
+#: newline.xhp
+msgctxt ""
+"newline.xhp\n"
+"bm_id1295205\n"
+"help.text"
+msgid "<bookmark_value>line breaks; in formulas</bookmark_value><bookmark_value>formulas;line breaks</bookmark_value><bookmark_value>wrapping text;in formulas</bookmark_value>"
+msgstr "<bookmark_value>lerro-jauziak; formuletan</bookmark_value><bookmark_value>formulak;lerro-jauziak</bookmark_value><bookmark_value>testua egokitzea;formuletan</bookmark_value>"
+
+#. HD6CM
+#: newline.xhp
+msgctxt ""
+"newline.xhp\n"
+"hd_id3146970\n"
+"help.text"
+msgid "<variable id=\"newline\"><link href=\"text/smath/guide/newline.xhp\">Entering Line Breaks</link></variable>"
+msgstr "<variable id=\"newline\"><link href=\"text/smath/guide/newline.xhp\">Lerro-jauziak sartzea</link></variable>"
+
+#. gLLUF
+#: newline.xhp
+msgctxt ""
+"newline.xhp\n"
+"hd_id3147339\n"
+"help.text"
+msgid "How to write formulas in $[officename] Math over two lines (with manual line break):"
+msgstr "$[officename] Mathen honela idazten dira bi lerrotako formulak (eskuzko lerro-jauziarekin):"
+
+#. hYDBe
+#: newline.xhp
+msgctxt ""
+"newline.xhp\n"
+"par_id3154702\n"
+"help.text"
+msgid "Create a line break by using the \"newline\" command. Everything coming after the line break is placed on the next line."
+msgstr "Sortu lerro-jauzi bat \"newline\" komandoa erabiliz. Lerro-jauziaren ondoren dagoen guztia hurrengo lerroan jartzen da."
+
+#. fhtKa
+#: parentheses.xhp
+msgctxt ""
+"parentheses.xhp\n"
+"tit\n"
+"help.text"
+msgid "Inserting Brackets"
+msgstr "Parentesiak txertatzea"
+
+#. CeDFE
+#: parentheses.xhp
+msgctxt ""
+"parentheses.xhp\n"
+"bm_id3153415\n"
+"help.text"
+msgid "<bookmark_value>brackets; inserting in %PRODUCTNAME Math</bookmark_value><bookmark_value>inserting;brackets</bookmark_value><bookmark_value>distances between brackets</bookmark_value>"
+msgstr "<bookmark_value>parentesiak; %PRODUCTNAME Mathen txertatzea</bookmark_value><bookmark_value>txertatu;parentesiak</bookmark_value><bookmark_value>parentesien arteko distantziak</bookmark_value>"
+
+#. AsaCy
+#: parentheses.xhp
+msgctxt ""
+"parentheses.xhp\n"
+"hd_id3153415\n"
+"help.text"
+msgid "<variable id=\"parentheses\"><link href=\"text/smath/guide/parentheses.xhp\">Inserting Brackets</link></variable>"
+msgstr "<variable id=\"parentheses\"><link href=\"text/smath/guide/parentheses.xhp\">Parentesiak txertatzea</link></variable>"
+
+#. cAGdF
+#: parentheses.xhp
+msgctxt ""
+"parentheses.xhp\n"
+"hd_id3150751\n"
+"help.text"
+msgid "In <item type=\"productname\">%PRODUCTNAME</item> Math, can brackets be shown separately so that the distance between them is freely definable?"
+msgstr "<item type=\"productname\">%PRODUCTNAME</item> Mathen, erakuts daitezke parentesiak bereizita eta beren artean libre definitutako distantziarekin?"
+
+#. L2fFP
+#: parentheses.xhp
+msgctxt ""
+"parentheses.xhp\n"
+"par_id3083281\n"
+"help.text"
+msgid "You can set individual brackets using \"left\" and \"right\", but the distance between the brackets will not be fixed, as they adapt to the argument. Nevertheless, there is a way to display brackets so that the distance between them is fixed. To accomplish this, place a \"\\\" (backslash) before the normal brackets. These brackets now behave like any other symbol and the alignment is the same as with other symbols:"
+msgstr "Parentesi indibidualak ezar ditzakezu \"left\" eta \"right\" erabiliz, baina parentesien arteko distantzia ez da finkoa izango, argumentura egokitzen baitira. Bestalde, badago modu bat parentesiak distantzia finkoarekin bistaratzeko. Horretarako, jarri alderantzizko barra (\"\\\") parentesi arruntaren aurrean. Parentesi horiek beste edozein ikur bezala arituko dira eta beste ikurrak bezala lerrokatzen dira:"
+
+#. AECF4
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"tit\n"
+"help.text"
+msgid "Entering Text"
+msgstr "Testua sartzea"
+
+#. FGbj6
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"bm_id3155962\n"
+"help.text"
+msgid "<bookmark_value>text strings; entering in $[officename] Math</bookmark_value><bookmark_value>direct text; entering in $[officename] Math</bookmark_value><bookmark_value>inserting;text in $[officename] Math</bookmark_value>"
+msgstr "<bookmark_value>testu-kateak; $[officename] Mathen sartzea </bookmark_value><bookmark_value>zuzeneko testua; $[officename] Mathen sartzea</bookmark_value><bookmark_value>txertatzea;testua $[officename] Mathen</bookmark_value>"
+
+#. 5ZHGm
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"hd_id5676442\n"
+"help.text"
+msgid "<variable id=\"text\"><link href=\"text/smath/guide/text.xhp\">Entering Text</link></variable>"
+msgstr "<variable id=\"text\"><link href=\"text/smath/guide/text.xhp\">Testua sartzea</link></variable>"
+
+#. FGjG4
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"hd_id8509170\n"
+"help.text"
+msgid "How to enter direct text strings that do not get interpreted?"
+msgstr "Nola sar ditzaket zuzeneko testu-kateak, interpretatuak izan ez daitezen?"
+
+#. 8AWkB
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"par_id337229\n"
+"help.text"
+msgid "Some text strings get interpreted as operators automatically. Sometimes this is not what you want. If you want to write W<emph>*</emph> (a letter with a superscripted asterisk), the asterisk will be interpreted as a multiplication operator. Enclose the direct text within double quotes or add spaceholders."
+msgstr "Testu-kate batzuk automatikoki eragile gisa interpretatzen dira. Batzuetan, ez da komeni hori egiterik. W<emph>*</emph> idatzi nahi baduzu(letra bat eta goi-indizean dagoen izartxo bat), izartxoa biderkaketaren eragile gisa interpretatuko da. Zuzeneko testua komatxo bikoitzen artean sartu behar duzu, edo zuriunea gehitu behar diozu."
+
+#. HCpMB
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"par_idN105D0\n"
+"help.text"
+msgid "Examples:"
+msgstr "Adibideak:"
+
+#. aKbTy
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"par_id521866\n"
+"help.text"
+msgid "An imported MathType formula contains the following string"
+msgstr "Inportatutako MathType formula batek kate hau dauka:"
+
+#. pgDrE
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"par_id755943\n"
+"help.text"
+msgid "If you have set up Math to convert imported MathType formulas (in <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - Load/Save - Microsoft Office), you see the formula with a placeholder instead of the asterisk."
+msgstr "Inportatutako MathType formulak bihurtzeko konfiguratu baduzu Math (<switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Hobespenak</caseinline><defaultinline>Tresnak - Aukerak </defaultinline></switchinline> - Kargatu/Gorde - Microsoft Office), formula leku-marka batekin agertuko da, izartxoarekin agertu beharrean."
+
+#. VXaga
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"par_id5988952\n"
+"help.text"
+msgid "Change {*} to {} * {} as in the following formula:"
+msgstr "{*} jarri {} * {} jarri beharrean, formula honetan bezala:"
+
+#. HGq8j
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"par_id4941557\n"
+"help.text"
+msgid "You can also use W^\"*\" to enter the character as direct text."
+msgstr "Halaber, W^\"*\" erabil dezakezu karakterea zuzeneko testu gisa sartzeko."
+
+#. qELLZ
+#: text.xhp
+msgctxt ""
+"text.xhp\n"
+"par_id9961851\n"
+"help.text"
+msgid "Some formulas start with an = sign. Use \"=\" to enter that character as direct text."
+msgstr "Formula batzuk = ikurrarekin hasten dira. Erabili \"=\" karaktere hori zuzeneko testu gisa sartzeko."

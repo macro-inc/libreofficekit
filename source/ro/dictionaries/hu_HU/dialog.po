@@ -1,0 +1,305 @@
+#. extracted from dictionaries/hu_HU/dialog
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2022-08-19 12:59+0000\n"
+"Last-Translator: Secară Cristian <cristi@secarica.ro>\n"
+"Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-master/dictionarieshu_hudialog/ro/>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1369355633.000000\n"
+
+#. jFVKx
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spelling\n"
+"property.text"
+msgid "Spelling"
+msgstr "Corectare ortografică"
+
+#. DrGWV
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"cap\n"
+"property.text"
+msgid "Capitalization"
+msgstr "Majusculizare"
+
+#. z3yr8
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"par\n"
+"property.text"
+msgid "Parentheses"
+msgstr "Paranteze"
+
+#. igaaQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"wordpart\n"
+"property.text"
+msgid "Word parts of compounds"
+msgstr "Părți de cuvinte compuse"
+
+#. L5Fo6
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"comma\n"
+"property.text"
+msgid "Comma usage"
+msgstr "Utilizarea virgulei"
+
+#. hgUiH
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"proofreading\n"
+"property.text"
+msgid "Proofreading"
+msgstr "Corectare"
+
+#. VPQmL
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"style\n"
+"property.text"
+msgid "Style checking"
+msgstr "Verificarea stilului"
+
+#. tALAw
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"compound\n"
+"property.text"
+msgid "Underline typo-like compound words"
+msgstr "Subliniază cuvintele compuse scrise greșit"
+
+#. sxQau
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"allcompound\n"
+"property.text"
+msgid "Underline all generated compound words"
+msgstr "Subliniază toate cuvintele compuse generate"
+
+#. FdR3D
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"grammar\n"
+"property.text"
+msgid "Possible mistakes"
+msgstr "Greșeli posibile"
+
+#. DPEKs
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"money\n"
+"property.text"
+msgid "Consistency of money amounts"
+msgstr "Consecvența sumelor de bani"
+
+#. 3uXGW
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"duplication\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Duplicare de cuvinte"
+
+#. Y2AD9
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup0\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Duplicare de cuvinte"
+
+#. gsa8G
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup\n"
+"property.text"
+msgid "Duplication within clauses"
+msgstr "Duplicare de cuvinte în clauze"
+
+#. NfAqF
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup2\n"
+"property.text"
+msgid "Duplication within sentences"
+msgstr "Duplicare de cuvinte în propoziții"
+
+#. MHboa
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dup3\n"
+"property.text"
+msgid "Allow previous checkings with affixes"
+msgstr "Permite verificări anterioare cu afixe"
+
+#. CBEZj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"numpart\n"
+"property.text"
+msgid "Thousand separation of numbers"
+msgstr "Separarea miilor în numere"
+
+#. BSBZA
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"typography\n"
+"property.text"
+msgid "Typography"
+msgstr "Tipografie"
+
+#. MGpiu
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"quot\n"
+"property.text"
+msgid "Quotation marks"
+msgstr "Ghilimele"
+
+#. x3GM2
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"apost\n"
+"property.text"
+msgid "Apostrophe"
+msgstr "Apostrof"
+
+#. kcfut
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"dash\n"
+"property.text"
+msgid "En dash"
+msgstr "En dash"
+
+#. qbUaJ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"elli\n"
+"property.text"
+msgid "Ellipsis"
+msgstr "Puncte de suspensie"
+
+#. CmffD
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"ligature\n"
+"property.text"
+msgid "Ligature suggestion"
+msgstr "Sugestii de ligatură"
+
+#. TwxSo
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"noligature\n"
+"property.text"
+msgid "Underline ligatures"
+msgstr "Subliniază ligaturile"
+
+#. rE4tQ
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"frac\n"
+"property.text"
+msgid "Fractions"
+msgstr "Fracții"
+
+#. UJKCj
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"thin\n"
+"property.text"
+msgid "Thin space"
+msgstr "Spațiu îngust"
+
+#. SZQdU
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces\n"
+"property.text"
+msgid "Double spaces"
+msgstr "Spații duble"
+
+#. FqzDS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"spaces2\n"
+"property.text"
+msgid "More spaces"
+msgstr "Mai multe spații"
+
+#. FVCTr
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"idx\n"
+"property.text"
+msgid "Indices"
+msgstr "Indici"
+
+#. E5PBN
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"minus\n"
+"property.text"
+msgid "Minus"
+msgstr "Minus"
+
+#. nrJ49
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"SI\n"
+"property.text"
+msgid "Measurements"
+msgstr "Măsurători"
+
+#. wAjsS
+#: hu_HU_en_US.properties
+msgctxt ""
+"hu_HU_en_US.properties\n"
+"hyphen\n"
+"property.text"
+msgid "Hyphenation of ambiguous words"
+msgstr "Despărțirea în silabe a cuvintelor ambigue"

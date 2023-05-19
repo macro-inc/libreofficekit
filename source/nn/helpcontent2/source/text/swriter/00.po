@@ -1,0 +1,2879 @@
+#. extracted from helpcontent2/source/text/swriter/00
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2022-11-22 14:11+0000\n"
+"Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
+"Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_help-master/textswriter00/nn/>\n"
+"Language: nn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1557262553.000000\n"
+
+#. E9tti
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"tit\n"
+"help.text"
+msgid "To access this function..."
+msgstr "Slik brukar du denne funksjonen …"
+
+#. GQ8bd
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"hd_id3156386\n"
+"help.text"
+msgid "<variable id=\"wie\">To access this function...</variable>"
+msgstr "<variable id=\"wie\">Slik brukar du denne funksjonen …</variable>"
+
+#. 3N95t
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3150253\n"
+"help.text"
+msgid "<image src=\"cmd/sc_wrapoff.png\" id=\"img_id3145389\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145389\">Wrap Off Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_wrapoff.png\" id=\"img_id3145389\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145389\">Ikon for linjebryting av</alt></image>"
+
+#. nv7mD
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3150211\n"
+"help.text"
+msgid "Wrap Off"
+msgstr "Tekstbryting av"
+
+#. Q8zEm
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3156397\n"
+"help.text"
+msgid "<image src=\"cmd/sc_wrapon.png\" id=\"img_id3149048\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149048\">Wrap On Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_wrapon.png\" id=\"img_id3149048\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149048\">Ikon for linjebryting på</alt></image>"
+
+#. nC6WC
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3147299\n"
+"help.text"
+msgid "Wrap On"
+msgstr "Tekstbryting på"
+
+#. qAnaB
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3154558\n"
+"help.text"
+msgid "<image src=\"cmd/sc_wrapthrough.png\" id=\"img_id3152999\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152999\">Wrap Through Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_wrapthrough.png\" id=\"img_id3152999\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152999\">Ikon</alt></image>"
+
+#. uVsbJ
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3153738\n"
+"help.text"
+msgid "Wrap Through"
+msgstr "Tekstflyt"
+
+#. d3MtU
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3148773\n"
+"help.text"
+msgid "<image src=\"res/sc06301.png\" id=\"img_id3149026\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149026\">Jump to Previous Script Icon</alt></image>"
+msgstr "<image src=\"res/sc06301.png\" id=\"img_id3149026\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149026\">Ikon for gå til førre skript</alt></image>"
+
+#. AHLxL
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3147174\n"
+"help.text"
+msgid "Jump to Previous Script"
+msgstr "Gå til førre skript"
+
+#. Ph3Fs
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3151265\n"
+"help.text"
+msgid "<image src=\"res/sc06300.png\" id=\"img_id3151272\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151272\"> Jump to Next Script Icon</alt></image>"
+msgstr "<image src=\"res/sc06300.png\" id=\"img_id3151272\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151272\"> Ikon for gå til neste skript</alt></image>"
+
+#. aewGi
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3150260\n"
+"help.text"
+msgid "Jump to Next Script"
+msgstr "Gå til neste skript"
+
+#. JfMLs
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id141655490294948\n"
+"help.text"
+msgid "On the <emph>Tools</emph> bar, click"
+msgstr "På <emph>Verktøylinja</emph> trykkjer du på"
+
+#. Fc3UH
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id841655490311116\n"
+"help.text"
+msgid "<image src=\"cmd/lc_hyphenate.svg\" id=\"img_id341655490311117\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id771655490311118\">Icon Hyphenation</alt></image>"
+msgstr "<image src=\"cmd/lc_hyphenate.svg\" id=\"img_id341655490311117\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id771655490311118\">Ikon orddeling</alt></image>"
+
+#. SZQQj
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id971655490311120\n"
+"help.text"
+msgid "Hyphenation"
+msgstr "Orddeling"
+
+#. X5cDM
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"tit\n"
+"help.text"
+msgid "File Menu"
+msgstr "«Fil»-menyen"
+
+#. 5oEzK
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"hd_id3149499\n"
+"help.text"
+msgid "File Menu"
+msgstr "«Fil»-menyen"
+
+#. q82FL
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3154487\n"
+"help.text"
+msgid "<variable id=\"exportdoc\">Menu <emph>File - Export</emph></variable>"
+msgstr "<variable id=\"exportdoc\">Menyen <emph>Fil → Eksporter</emph></variable>"
+
+#. 3vEGM
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3151242\n"
+"help.text"
+msgid "<variable id=\"sendenstarimpress\">Choose <emph>File - Send - Outline to Presentation</emph></variable>"
+msgstr "<variable id=\"sendenstarimpress\">Vel <emph>Fil → Send → Ein disposisjon til ein presentasjon</emph></variable>"
+
+#. FDUyb
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3153249\n"
+"help.text"
+msgid "<variable id=\"sendenclipboard\">Choose <emph>File - Send - Outline to Clipboard</emph></variable>"
+msgstr "<variable id=\"sendenclipboard\">Vel <emph>Fil → Send → Ein disposisjon til utklippstavla</emph></variable>"
+
+#. CmJgA
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3146962\n"
+"help.text"
+msgid "<variable id=\"sendenautoabstract\">Choose <emph>File - Send - Create AutoAbstract</emph></variable>"
+msgstr "<variable id=\"sendenautoabstract\">Vel <emph>Fil → Send → Lag autosamandrag</emph></variable>"
+
+#. HoUBv
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3156397\n"
+"help.text"
+msgid "<variable id=\"sendenpraeser\">Choose <emph>File - Send - AutoAbstract to Presentation</emph></variable>"
+msgstr "<variable id=\"sendenpraeser\">Vel <emph>Fil → Send → Autosamandrag til presentasjon</emph></variable>"
+
+#. houmq
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3147404\n"
+"help.text"
+msgid "<variable id=\"html\">Choose <emph>File - Send - Create HTML Document</emph></variable>"
+msgstr "<variable id=\"html\">Vel <emph>Fil → Send → Lag HTML-dokument</emph></variable>"
+
+#. XX296
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3149350\n"
+"help.text"
+msgid "Insert at least one address database field into a text document, then start printing the document. Answer \"Yes\" to the question whether you want to print a form letter."
+msgstr "Set inn minst eitt adressedatabasefelt i eit tekstdokument, og skriv deretter ut dokumentet. Svar «Ja» på spørsmålet om du vil skriva ut eit flettebrev."
+
+#. ByWBp
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3083448\n"
+"help.text"
+msgid "<image id=\"img_id3083452\" src=\"cmd/sc_mergedialog.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3083452\">Icon</alt></image>"
+msgstr "<image id=\"img_id3083452\" src=\"cmd/sc_mergedialog.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3083452\">Ikon</alt></image>"
+
+#. 3kcBU
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3149025\n"
+"help.text"
+msgid "Mail Merge"
+msgstr "Brevfletting"
+
+#. Cjh6J
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "«Rediger»-menyen"
+
+#. GRgvP
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"hd_id3150344\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "«Rediger»-menyen"
+
+#. MxzoA
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3154485\n"
+"help.text"
+msgid "Choose <emph>Tools - AutoText</emph>"
+msgstr "Vel <emph>Verktøy → Autotekst</emph>"
+
+#. CuxBv
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3151243\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Kommando</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + F3"
+
+#. 6LT7E
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3143228\n"
+"help.text"
+msgid "On the Insert toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. na7eb
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3149048\n"
+"help.text"
+msgid "<image id=\"img_id3156418\" src=\"cmd/sc_editglossary.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3156418\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156418\" src=\"cmd/sc_editglossary.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3156418\">Ikon</alt></image>"
+
+#. kqPGC
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150536\n"
+"help.text"
+msgid "AutoText"
+msgstr "Autotekst"
+
+#. F7ALF
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3149349\n"
+"help.text"
+msgid "<variable id=\"datenaust\">Choose <emph>Edit - Exchange Database</emph></variable>"
+msgstr "<variable id=\"datenaust\">Vel <emph>Rediger → Byt database</emph></variable>"
+
+#. DXxuu
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3146316\n"
+"help.text"
+msgid "<variable id=\"feldbefehl\">Choose <emph>Edit - Fields</emph></variable>"
+msgstr "<variable id=\"feldbefehl\">Vel <emph>Rediger → Felt</emph></variable>"
+
+#. t2xAY
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3154505\n"
+"help.text"
+msgid "<variable id=\"fussnote\">Choose <emph>Edit - Footnotes</emph></variable>"
+msgstr "<variable id=\"fussnote\">Vel <emph>Rediger → Fotnote</emph></variable>"
+
+#. AfaAC
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3153737\n"
+"help.text"
+msgid "Choose <emph>Edit - Reference - Index Entry...</emph>"
+msgstr "Vel <emph>Rediger → Referanse → Indeksoppføring</emph>"
+
+#. bntq3
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150928\n"
+"help.text"
+msgid "Open context menu - choose <emph>Index Entry</emph>"
+msgstr "Opna sprettoppmenyen og vel <emph>Stikkord</emph>"
+
+#. gBkCT
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3148769\n"
+"help.text"
+msgid "<variable id=\"bereiche\">Choose <emph>Format - Sections</emph></variable>"
+msgstr "<variable id=\"bereiche\">Vel <emph>Format → Bolkar</emph></variable>"
+
+#. Y3Vug
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3155990\n"
+"help.text"
+msgid "<variable id=\"autotextum\">Choose <emph>Tools - AutoText - AutoText - Rename</emph></variable>"
+msgstr "<variable id=\"autotextum\">Vel <emph>Verktøy → Autotekst → Autotekst → Endra namn</emph></variable>"
+
+#. B4EbE
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3147168\n"
+"help.text"
+msgid "<variable id=\"lit\">Choose <emph>Edit - Bibliography Entry</emph></variable>"
+msgstr "<variable id=\"lit\">Vel <emph>Rediger → Litteraturtilvising</emph></variable>"
+
+#. qG3yF
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3973204\n"
+"help.text"
+msgid "<variable id=\"selection_mode\">Choose <emph>Edit - Selection Mode</emph></variable>"
+msgstr "<variable id=\"selection_mode\">Vel <emph>Rediger → Merkingsmodus</emph></variable>"
+
+#. DLEkm
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3973244\n"
+"help.text"
+msgid "<variable id=\"direct_cursor\">Choose <emph>Edit - Direct Cursor Mode</emph></variable>"
+msgstr "<variable id=\"direct_cursor\">Vel <emph>Rediger → Modus for direkte skrivemerke</emph></variable>"
+
+#. cjzea
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"tit\n"
+"help.text"
+msgid "View Menu"
+msgstr "«Vis»-menyen"
+
+#. Wdbcy
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"hd_id3154656\n"
+"help.text"
+msgid "View Menu"
+msgstr "Vis-menyen"
+
+#. mQeVy
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149502\n"
+"help.text"
+msgid "<variable id=\"lineal\">Choose <menuitem>View - Rulers - Rulers</menuitem> </variable>"
+msgstr "<variable id=\"lineal\">Vel <menuitem>Vis → Linjal → Linjal</menuitem></variable>"
+
+#. 6RRMA
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3148871\n"
+"help.text"
+msgid "<variable id=\"textbegrenzungen\">Choose <menuitem>View - Text Boundaries</menuitem> </variable>"
+msgstr "<variable id=\"textbegrenzungen\">Vel <menuitem>Vis → Tekstgrenser</menuitem></variable>"
+
+#. nnySY
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3153248\n"
+"help.text"
+msgid "Choose <menuitem>View - Field Shadings</menuitem>"
+msgstr "Vel <menuitem>Vis → Feltskuggar</menuitem>"
+
+#. JRFUp
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3154763\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F8</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Cmd</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode> + F8</keycode>"
+
+#. wYngB
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149052\n"
+"help.text"
+msgid "Choose <menuitem>View - Field Names</menuitem>"
+msgstr "Vel <menuitem>Vis → Feltnamn</menuitem>."
+
+#. krDbj
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3151387\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F9</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Cmd</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode> + F9</keycode>"
+
+#. VgPmS
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3155625\n"
+"help.text"
+msgid "Choose <menuitem>View - Formatting Marks</menuitem>"
+msgstr "Vel <menuitem>Vis → Formateringsmerke</menuitem>"
+
+#. ZPf6L
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3145823\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F10</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Cmd</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode> +F10</keycode>"
+
+#. jRY7j
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3154508\n"
+"help.text"
+msgid "On Standard bar, click"
+msgstr "Når du er på standardlinja, vel"
+
+#. 9xqfr
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3150932\n"
+"help.text"
+msgid "<image id=\"img_id3150502\" src=\"cmd/sc_controlcodes.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150502\">Formatting Marks Icon</alt></image>"
+msgstr "<image id=\"img_id3150502\" src=\"cmd/sc_controlcodes.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150502\">Ikon for formateringsmerke</alt></image>"
+
+#. hqSje
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3153716\n"
+"help.text"
+msgid "Formatting Marks"
+msgstr "Formateringsmerke"
+
+#. LmXFe
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id401629894593714\n"
+"help.text"
+msgid "Choose <menuitem>View - Show Whitespace</menuitem>."
+msgstr "Vel <menuitem>Vis → Blankteikn</menuitem>."
+
+#. SuxGC
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id291629893774665\n"
+"help.text"
+msgid "<image src=\"cmd/lc_showwhitespace.svg\" id=\"img_id221629893774666\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id141629893774667\">Icon Show Whitespace </alt></image>"
+msgstr "<image src=\"cmd/lc_showwhitespace.svg\" id=\"img_id221629893774666\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id141629893774667\">Ikon Vis blankteikn </alt></image>"
+
+#. BEcch
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id311629893774668\n"
+"help.text"
+msgid "Show Whitespace"
+msgstr "Vis blankteikn"
+
+#. PM6tg
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149712\n"
+"help.text"
+msgid "Choose <menuitem>View - Web</menuitem>"
+msgstr "Vel <menuitem>Vis → Nett</menuitem>"
+
+#. 5Jnnn
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3154640\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar, enable"
+msgstr "På <emph>Verktøylinja</emph> slå på"
+
+#. UMkhu
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3150765\n"
+"help.text"
+msgid "<image id=\"img_id3147572\" src=\"cmd/lc_browseview.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147572\">Web Icon</alt></image>"
+msgstr "<image id=\"img_id3147572\" src=\"cmd/lc_browseview.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147572\">Ikon Web</alt></image>"
+
+#. ac6QE
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149291\n"
+"help.text"
+msgid "Web"
+msgstr "Vevoppsett"
+
+#. TZuSD
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3151176\n"
+"help.text"
+msgid "Choose <menuitem>View - Normal</menuitem>"
+msgstr "Vel <menuitem>Vis → Normal</menuitem>"
+
+#. xjXHF
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149808\n"
+"help.text"
+msgid "<variable id=\"hidden_para\">Choose <menuitem>View - Hidden Paragraphs</menuitem> </variable>"
+msgstr "<variable id=\"hidden_para\">Vel <menuitem>Vis → Gøymde avsnitt</menuitem> </variable>"
+
+#. yDXA6
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "«Set inn»-menyen"
+
+#. zv43y
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"hd_id3151242\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "«Set inn»-menyen"
+
+#. UsDBD
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149130\n"
+"help.text"
+msgid "<variable id=\"ManualBreak\">Choose <menuitem>Insert - More Breaks - Manual Break</menuitem></variable>"
+msgstr "<variable id=\"ManualBreak\">Vel <menuitem>Set inn → Fleire slag skift → Manuelt skift</menuitem></variable>"
+
+#. qv3kV
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id281601655468613\n"
+"help.text"
+msgid "<variable id=\"morebreaks\">Choose <menuitem>Insert - More Breaks</menuitem></variable>"
+msgstr "<variable id=\"morebreaks\">Vel <menuitem>Set inn → Fleire slag skift</menuitem></variable>"
+
+#. HX3xL
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154654\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Field</menuitem>"
+msgstr "Vel <menuitem>Set inn → Felt</menuitem>"
+
+#. 28cuG
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146966\n"
+"help.text"
+msgid "<variable id=\"fieldcontextmenu\" visibility=\"hidden\">Open context menu - choose <menuitem>Fields</menuitem> (inserted fields)</variable>"
+msgstr "<variable id=\"fieldcontextmenu\" visibility=\"hidden\">Opna sprettoppmenyen - cvel <menuitem>Felt</menuitem> (innsette felt)</variable>"
+
+#. TNXhr
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149053\n"
+"help.text"
+msgid "<variable id=\"feldbefehldatum\">Choose <menuitem>Insert - Field - Date</menuitem></variable>"
+msgstr "<variable id=\"feldbefehldatum\">Vel <menuitem>Set inn → Felt → Dato</menuitem></variable>"
+
+#. nKMHB
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151393\n"
+"help.text"
+msgid "<variable id=\"feldbefehluhrzeit\">Choose <menuitem>Insert - Field - Time</menuitem></variable>"
+msgstr "<variable id=\"feldbefehluhrzeit\">Vel <menuitem>Set inn → Felt → Klokkeslett</menuitem></variable>"
+
+#. WHhqc
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146325\n"
+"help.text"
+msgid "<variable id=\"feldbefehlseitennummer\">Choose <menuitem>Insert - Field - Page Number</menuitem></variable>"
+msgstr "<variable id=\"feldbefehlseitennummer\">Vel <menuitem>Set inn → Felt → Sidenummer</menuitem></variable>"
+
+#. DFTjZ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149356\n"
+"help.text"
+msgid "<variable id=\"pagecount_field\">Choose <menuitem>Insert - Field - Page Count</menuitem></variable>"
+msgstr "<variable id=\"feldbefehldatum\">Vel <menuitem>Set inn → Felt → Tal på sider</menuitem></variable>"
+
+#. 6qzDS
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153003\n"
+"help.text"
+msgid "<variable id=\"feldbefehlthema\">Choose <menuitem>Insert - Field - Subject</menuitem></variable>"
+msgstr "<variable id=\"feldbefehlthema\">Vel <menuitem>Set inn → Felt → Emne</menuitem></variable>"
+
+#. Q72uA
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150016\n"
+"help.text"
+msgid "<variable id=\"feldbefehltitel\">Choose <menuitem>Insert - Field - Title</menuitem></variable>"
+msgstr "<variable id=\"feldbefehldatum\">Vel <menuitem>Set inn → Felt → Tittel</menuitem></variable>"
+
+#. WhGex
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150564\n"
+"help.text"
+msgid "<variable id=\"feldbefehlautor\">Choose <menuitem>Insert - Field - First Author</menuitem></variable>"
+msgstr "<variable id=\"feldbefehlautor\">Vel <menuitem>Set inn → Felt → Første forfattar</menuitem></variable>"
+
+#. UEyYF
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148386\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Field - More Fields</menuitem>"
+msgstr "Vel <menuitem>Set inn → Felt → Fleire felt</menuitem>"
+
+#. 7Fiod
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155990\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + F2"
+
+#. ZEnEt
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147174\n"
+"help.text"
+msgid "On Insert toolbar, click"
+msgstr "På verktøylinja <emph>Set inn</emph>, trykk på"
+
+#. CBN2Y
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150760\n"
+"help.text"
+msgid "<image id=\"img_id3146959\" src=\"cmd/sc_insertfield.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3146959\">Icon</alt></image>"
+msgstr "<image id=\"img_id3146959\" src=\"cmd/sc_insertfield.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3146959\">Ikon</alt></image>"
+
+#. pZiTF
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153619\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "Set inn felt"
+
+#. C3Avr
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149295\n"
+"help.text"
+msgid "<variable id=\"felddokument\">Choose <emph>Insert - Field - More Fields - Document</emph> tab</variable>"
+msgstr "<variable id=\"felddokument\">Vel fana <emph>Set inn → Felt → Fleire felt → Dokument</emph></variable>"
+
+#. XrdXS
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154692\n"
+"help.text"
+msgid "Choose <emph>Insert - Field - More Fields - Cross-references</emph> tab"
+msgstr "Vel fana <emph>Set inn → Felt → Fleire felt → Kryssreferansar</emph>"
+
+#. UKFbV
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145411\n"
+"help.text"
+msgid "Choose <emph>Insert - Cross-reference</emph>"
+msgstr "Vel <emph>Set inn → Kryssreferanse</emph>"
+
+#. GJDk8
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147515\n"
+"help.text"
+msgid "<variable id=\"feldfunktionen\">Choose <emph>Insert - Field - More Fields - Functions</emph> tab</variable>"
+msgstr "<variable id=\"feldfunktionen\">Vel fana <emph>Set inn → Felt → Fleire felt → Funksjonar</emph></variable>"
+
+#. gzeof
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153581\n"
+"help.text"
+msgid "<variable id=\"felddokumentinfo\">Choose <emph>Insert - Field - More Fields - DocInformation</emph> tab</variable>"
+msgstr "<variable id=\"felddokumentinfo\">Vel fana <emph>Set inn → Felt → Fleire felt → Dokumentinformasjon</emph></variable>"
+
+#. ApGDC
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150710\n"
+"help.text"
+msgid "<variable id=\"feldvariablen\">Choose <emph>Insert - Field - More Fields - Variables</emph> tab</variable>"
+msgstr "<variable id=\"feldvariablen\">Vel fana <emph>Set inn → Felt → Fleire felt → Variablar</emph></variable>"
+
+#. 2GeFY
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3152945\n"
+"help.text"
+msgid "<variable id=\"felddatenbank\">Choose <emph>Insert - Field - More Fields - Database</emph> tab</variable>"
+msgstr "<variable id=\"felddatenbank\">Vel fana <emph>Set inn → Felt → Fleire felt → Database</emph></variable>"
+
+#. 4dGC3
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149810\n"
+"help.text"
+msgid "Choose <emph>Insert - Section</emph>"
+msgstr "Vel <emph>Set inn → Bolk</emph>"
+
+#. jpNCE
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150973\n"
+"help.text"
+msgid "Open <emph>Insert</emph> toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. WgGL9
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154569\n"
+"help.text"
+msgid "<image id=\"img_id3152952\" src=\"cmd/sc_insertsection.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152952\">Icon Section</alt></image>"
+msgstr "<image id=\"img_id3152952\" src=\"cmd/sc_insertsection.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152952\">Ikon Bolk</alt></image>"
+
+#. YVzDx
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150828\n"
+"help.text"
+msgid "Section"
+msgstr "Bolk"
+
+#. jyoQM
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155899\n"
+"help.text"
+msgid "<variable id=\"bereicheinbereich\">Choose <emph>Insert - Section - Section</emph> tab or choose <emph>Format - Sections</emph></variable>"
+msgstr "<variable id=\"bereicheinbereich\">Vel <emph>Set inn → Bolk → Bolk</emph> eller <emph>Format → Bolkar</emph></variable>"
+
+#. XuaYD
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154197\n"
+"help.text"
+msgid "<variable id=\"sectionindents\">Choose <menuitem>Insert > Section > Indents</menuitem> tab or choose <menuitem>Format > Sections</menuitem> - <widget>Options</widget> button - <emph>Indents</emph> tab</variable>"
+msgstr "<variable id=\"sectionindents\">Vel fana <menuitem>Set inn → Bolk → Innrykk</menuitem> eller vele <menuitem>Format → Bolk</menuitem> - knappen <widget>Innstillingar</widget> - fana <emph>Innrykk</emph></variable>"
+
+#. oCG8Q
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151322\n"
+"help.text"
+msgid "Choose <emph>Insert - Footnote and Endnote - Footnote or Endnote</emph>"
+msgstr "Vel <emph>Set inn → Fotnote og sluttnote → Fotnotar og sluttnotar</emph>"
+
+#. cExks
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155178\n"
+"help.text"
+msgid "Open context menu - choose <emph>Footnote/Endnote</emph> (inserted Footnote/Endnote)"
+msgstr "Opna sprettoppmenyen og vel <emph>Fotnote/sluttnote</emph> (på allereie innsette fot- og sluttnotar)"
+
+#. rHySW
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3143279\n"
+"help.text"
+msgid "Open <emph>Insert</emph> toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. hLQGy
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151261\n"
+"help.text"
+msgid "<image id=\"img_id3149099\" src=\"cmd/sc_insertfootnote.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3149099\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149099\" src=\"cmd/sc_insertfootnote.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3149099\">Ikon</alt></image>"
+
+#. VgB6H
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148968\n"
+"help.text"
+msgid "Insert Footnote Directly"
+msgstr "Set inn fotnote direkte"
+
+#. AfAPT
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147579\n"
+"help.text"
+msgid "<image id=\"img_id3147586\" src=\"cmd/sc_insertendnote.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3147586\">Icon</alt></image>"
+msgstr "<image id=\"img_id3147586\" src=\"cmd/sc_insertendnote.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3147586\">Ikon</alt></image>"
+
+#. YsSsR
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147076\n"
+"help.text"
+msgid "Insert Endnote Directly"
+msgstr "Set inn sluttnote direkte"
+
+#. cNyhQ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154385\n"
+"help.text"
+msgid "Choose <emph>Insert - Caption</emph>"
+msgstr "Vel <emph>Set inn → Bilettekst</emph>"
+
+#. V3onD
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153358\n"
+"help.text"
+msgid "Open context menu - choose <emph>Caption</emph>"
+msgstr "Opna sprettoppmenyen og vel <emph>Bilettekst</emph>"
+
+#. dzvpw
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156269\n"
+"help.text"
+msgid "Choose <emph>Insert - Caption - Options</emph>"
+msgstr "Vel <emph>Set inn → Bilettekst → Val</emph>"
+
+#. cp5Vm
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149169\n"
+"help.text"
+msgid "Open context menu - choose <emph>Caption - Options</emph>"
+msgstr "Opna sprettoppmenyen og vel <emph>Bilettekst → Val</emph>"
+
+#. NVLUa
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150587\n"
+"help.text"
+msgid "Choose <emph>Insert - Bookmark</emph>"
+msgstr "Vel <emph>Set inn → Bokmerke</emph>"
+
+#. 2Eb4B
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145785\n"
+"help.text"
+msgid "Open <emph>Insert</emph> toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. RByCZ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148884\n"
+"help.text"
+msgid "<image id=\"img_id3151369\" src=\"sw/res/nc20005.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3151369\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151369\" src=\"sw/res/nc20005.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3151369\">Ikon</alt></image>"
+
+#. A5qEq
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150689\n"
+"help.text"
+msgid "Bookmark"
+msgstr "Bokmerke"
+
+#. t5HbC
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150113\n"
+"help.text"
+msgid "<variable id=\"einfscript\">Choose <emph>Insert - Script</emph> (only HTML documents)</variable>"
+msgstr "<variable id=\"einfscript\">Vel <emph>Set inn → Skript</emph> (berre i HTML-dokument)</variable>"
+
+#. Ghd8y
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155866\n"
+"help.text"
+msgid "<variable id=\"verzeichnisseeinf\">Choose <emph>Insert - Table of Contents and Index</emph></variable>"
+msgstr "<variable id=\"verzeichnisseeinf\">Vel <emph>Set inn → Register/innhaldsliste</emph></variable>"
+
+#. DDBoM
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147471\n"
+"help.text"
+msgid "Choose <emph>Insert - Table of Contents and Index - Index Entry</emph>"
+msgstr "Vel <emph>Set inn → Innhaldsliste og register → Indeksoppføring</emph>"
+
+#. rUEg3
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147490\n"
+"help.text"
+msgid "Open <emph>Insert</emph> toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. hNdpk
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145131\n"
+"help.text"
+msgid "<image id=\"img_id3149551\" src=\"cmd/sc_insertindexesentry.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3149551\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149551\" src=\"cmd/sc_insertindexesentry.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3149551\">Ikon</alt></image>"
+
+#. F32jG
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150549\n"
+"help.text"
+msgid "Entry"
+msgstr "Stikkord"
+
+#. k7zqb
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149217\n"
+"help.text"
+msgid "<variable id=\"stichwortverzeichnisverz\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography</emph></variable>"
+msgstr "<variable id=\"stichwortverzeichnisverz\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi</emph></variable>"
+
+#. wGD6e
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156225\n"
+"help.text"
+msgid "<variable id=\"inhaltsverz\">Choose <emph>Insert - Table of Contents and Index - Bibliography Entry</emph></variable>"
+msgstr "<variable id=\"inhaltsverz\">Vel <emph>Set inn → Innhaldsliste og register → Litteraturtilvising</emph></variable>"
+
+#. Rx74c
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147745\n"
+"help.text"
+msgid "<variable id=\"benutzerverz\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography</emph></variable>"
+msgstr "<variable id=\"benutzerverz\">Vel <emph>Set inn → Innhaldsliste og register → Indeksoppføring</emph></variable>"
+
+#. fJApB
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146342\n"
+"help.text"
+msgid "<variable id=\"stichwortverzeichnisverz1\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab</variable>"
+msgstr "<variable id=\"stichwortverzeichnisverz1\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Register eller innhaldsliste → Type</emph></variable>"
+
+#. BMPH7
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147449\n"
+"help.text"
+msgid "<variable id=\"verz2\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (depending on the type)</variable>"
+msgstr "<variable id=\"verz2\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> (avhengig av kva type som er vald)</variable>"
+
+#. zzTXh
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149835\n"
+"help.text"
+msgid "<variable id=\"verz21\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (when Table of Contents is the selected type)</variable>"
+msgstr "<variable id=\"verz21\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> (når tabelliste er vald)</variable>"
+
+#. jz32s
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148855\n"
+"help.text"
+msgid "<variable id=\"verz22\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (when Alphabetical Index is the selected type)</variable>"
+msgstr "<variable id=\"verz22\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> (når alfabetisk register er vald)</variable>"
+
+#. V6XgJ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155575\n"
+"help.text"
+msgid "<variable id=\"verz23\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (when Illustration Index is the selected type)</variable>"
+msgstr "<variable id=\"verz23\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> (når illustrasjonsregister er vald)</variable>"
+
+#. zn7D3
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151080\n"
+"help.text"
+msgid "<variable id=\"verz24\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (when Index of Tables is the selected type)</variable>"
+msgstr "<variable id=\"verz24\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> (når tabelliste er vald)</variable>"
+
+#. tdxV5
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154777\n"
+"help.text"
+msgid "<variable id=\"verz25\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (when User-Defined is the selected type)</variable>"
+msgstr "<variable id=\"verz25\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> (når sjølvdefinert er vald)</variable>"
+
+#. GSF5s
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148448\n"
+"help.text"
+msgid "<variable id=\"verz26\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (when Table of Objects is the selected type)</variable>"
+msgstr "<variable id=\"verz26\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> (når objektliste er vald)</variable>"
+
+#. KpLVs
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145304\n"
+"help.text"
+msgid "<variable id=\"verz27\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph> tab (when Bibliography is the selected type)</variable>"
+msgstr "<variable id=\"verz27\">Vel <emph>Set inn → Register/innhaldsliste → Register/innhaldsliste → Type</emph> (når du har valt typen «Litteraturliste»)</variable>"
+
+#. qn5TV
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153295\n"
+"help.text"
+msgid "<variable id=\"verz28\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Type</emph>, mark \"Additional Styles\" check box and then click <emph>Assign styles</emph></variable>"
+msgstr "<variable id=\"verz28\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Type</emph> og merk av for «Tilleggsstilar» og trykk <emph>Tildel stilar</emph></variable>"
+
+#. t6h2G
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150173\n"
+"help.text"
+msgid "<variable id=\"verz3\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (depending on type selected)</variable>"
+msgstr "<variable id=\"verz3\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (avhengig av kva type som er vald)</variable>"
+
+#. xpBfB
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154725\n"
+"help.text"
+msgid "<variable id=\"verz31\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (when Table of Contents is the selected type)</variable>"
+msgstr "<variable id=\"verz31\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (når innhaldsliste er vald)</variable>"
+
+#. SC5Pb
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150448\n"
+"help.text"
+msgid "<variable id=\"verz32\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (when Alphabetical Index is the selected type)</variable>"
+msgstr "<variable id=\"verz32\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (når alfabetisk register er vald)</variable>"
+
+#. Ci8Fj
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156101\n"
+"help.text"
+msgid "<variable id=\"verz33\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (when Illustration Index is the selected type)</variable>"
+msgstr "<variable id=\"verz33\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (når illustrasjonsregister er vald)</variable>"
+
+#. KxEAf
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156125\n"
+"help.text"
+msgid "<variable id=\"verz34\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (when Index of Tables is the selected type)</variable>"
+msgstr "<variable id=\"verz34\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (når tabelliste er vald)</variable>"
+
+#. ghkXB
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153982\n"
+"help.text"
+msgid "<variable id=\"verz35\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (when User-Defined is the selected type)</variable>"
+msgstr "<variable id=\"verz35\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (når sjølvdefinert er vald)</variable>"
+
+#. Eup8R
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155597\n"
+"help.text"
+msgid "<variable id=\"verz36\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (when Table of Objects is the selected type)</variable>"
+msgstr "<variable id=\"verz36\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (når objektliste er vald)</variable>"
+
+#. X6HKC
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145625\n"
+"help.text"
+msgid "<variable id=\"verz37\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Entries</emph> tab (when Bibliography is the selected type)</variable>"
+msgstr "<variable id=\"verz37\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Oppføringar</emph> (når litteraturliste er vald)</variable>"
+
+#. dhV8C
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149767\n"
+"help.text"
+msgid "<variable id=\"litdef\">Choose <emph>Insert - Table of Contents and Index - Bibliography Entry</emph> and click <emph>Edit</emph></variable>"
+msgstr "<variable id=\"litdef\">Vel <emph>Set inn → Innhaldsliste og register → Litteraturtilvising</emph> og trykk <emph>Rediger</emph></variable>"
+
+#. cxegq
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150918\n"
+"help.text"
+msgid "<variable id=\"stichwortverzeichnisverz3\">Choose <emph>Insert - Table of Contents and Index - Table of Contents, Index or Bibliography - Styles</emph> tab</variable>"
+msgstr "<variable id=\"stichwortverzeichnisverz3\">Vel <emph>Set inn → Innhaldsliste og register → Innhaldsliste, register eller bibliografi → Stilar</emph></variable>"
+
+#. DDiWX
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149249\n"
+"help.text"
+msgid "<variable id=\"briefumschlag\">Choose <emph>Insert - Envelope</emph></variable>"
+msgstr "<variable id=\"briefumschlag\">Vel <emph>Set inn → Konvolutt</emph></variable>"
+
+#. 9V7Qa
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155087\n"
+"help.text"
+msgid "<variable id=\"umschlagb\">Choose <emph>Insert - Envelope - Envelope</emph> tab</variable>"
+msgstr "<variable id=\"umschlagb\">Vel <emph>Set inn → Konvolutt → Konvolutt</emph></variable>"
+
+#. HWGGy
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146955\n"
+"help.text"
+msgid "<variable id=\"formatbr\">Choose <emph>Insert - Envelope - Format</emph> tab</variable>"
+msgstr "<variable id=\"formatbr\">Vel <emph>Set inn → Konvolutt → Format</emph></variable>"
+
+#. HiwuJ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154342\n"
+"help.text"
+msgid "<variable id=\"druckerbr\">Choose <emph>Insert - Envelope - Printer</emph> tab</variable>"
+msgstr "<variable id=\"druckerbr\">Vel <emph>Set inn → Konvolutt → Skrivar</emph></variable>"
+
+#. RmDRv
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148781\n"
+"help.text"
+msgid "Choose <emph>Insert - Frame</emph>"
+msgstr "Vel <emph>Set inn → Ramme</emph>"
+
+#. Kqvsj
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150084\n"
+"help.text"
+msgid "Choose <emph>Format - Frame and Object - Properties</emph>"
+msgstr "Vel <emph>Format → Ramme og objekt → Eigenskapar</emph>."
+
+#. f4vSS
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150103\n"
+"help.text"
+msgid "Open <emph>Insert</emph> toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. 8jBbi
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149372\n"
+"help.text"
+msgid "<image id=\"img_id3149379\" src=\"cmd/sc_insertframe.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149379\">Icon Insert Frame</alt></image>"
+msgstr "<image id=\"img_id3149379\" src=\"cmd/sc_insertframe.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149379\">Ikon for innsetjing av ramme</alt></image>"
+
+#. 9WJAn
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151229\n"
+"help.text"
+msgid "Insert Frame Manually"
+msgstr "Set inn ramme manuelt"
+
+#. 48zNA
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154251\n"
+"help.text"
+msgid "Choose <emph>Table - Insert Table</emph>"
+msgstr "Vel <emph>Tabell → Set inn tabell</emph>."
+
+#. G4vMQ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153129\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + F12"
+
+#. pZRkv
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148817\n"
+"help.text"
+msgid "Open <emph>Insert</emph> toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. Fw7DE
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154620\n"
+"help.text"
+msgid "<image id=\"img_id3154627\" src=\"cmd/sc_grid.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3154627\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154627\" src=\"cmd/sc_grid.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3154627\">Ikon</alt></image>"
+
+#. 7XCPh
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147382\n"
+"help.text"
+msgid "Table"
+msgstr "Tabell"
+
+#. EJeBg
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149627\n"
+"help.text"
+msgid "<variable id=\"einfhorizlinie\">Choose <emph>Insert - Horizontal Rule</emph></variable>"
+msgstr "<variable id=\"einfhorizlinie\">Vel <emph>Set inn → Vassrett linje</emph></variable>"
+
+#. LePpP
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150661\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Text from File</menuitem>"
+msgstr "Vel <menuitem>Set inn → Tekst frå fil</menuitem>"
+
+#. Yk7M7
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150679\n"
+"help.text"
+msgid "Open <emph>Insert</emph> toolbar, click"
+msgstr "Når du er på verktøylinja <emph>Set inn</emph>, vel"
+
+#. VTF6u
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149959\n"
+"help.text"
+msgid "<image id=\"img_id3149966\" src=\"cmd/sc_insertdoc.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3149966\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149966\" src=\"cmd/sc_insertdoc.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3149966\">Ikon</alt></image>"
+
+#. e6VAk
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150599\n"
+"help.text"
+msgid "Text from File"
+msgstr "Tekst frå fil"
+
+#. 5exGw
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147267\n"
+"help.text"
+msgid "<variable id=\"kopfzeile\">Choose <emph>Insert - Header and Footer - Header</emph></variable>"
+msgstr "<variable id=\"kopfzeile\">Vel <emph>Set inn → Topp- og botntekst → Topptekst</emph></variable>"
+
+#. it9RJ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147290\n"
+"help.text"
+msgid "<variable id=\"fusszeile\">Choose <emph>Insert - Header and Footer - Footer</emph></variable>"
+msgstr "<variable id=\"fusszeile\">Vel <emph>Set inn → Topp- og botntekst → Botntekst</emph></variable>"
+
+#. p2LBA
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format Menu"
+msgstr "«Format»-menyen"
+
+#. Ziumz
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"hd_id3150758\n"
+"help.text"
+msgid "Format Menu"
+msgstr "«Format»-menyen"
+
+#. GA9eA
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153618\n"
+"help.text"
+msgid "Choose <emph>Format - Paragraph - Drop Caps</emph> tab."
+msgstr "Vel <emph>Format → Avsnitt → Innfeld forbokstav</emph>."
+
+#. iE5E9
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149294\n"
+"help.text"
+msgid "Choose <emph>View - Styles -</emph> open context menu <emph>Modify/New - Drop Caps</emph> tab."
+msgstr "Vel <emph>Vis - Stilar</emph>, opna sprettoppmenyen og vel fana <emph>Rediger → Innfelt forbokstav</emph>."
+
+#. JSAcg
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154697\n"
+"help.text"
+msgid "Choose <emph>Format - Paragraph - Text Flow</emph> tab."
+msgstr "Vel fana <emph>Format → Avsnitt → Tekstflyt</emph>."
+
+#. HGsyD
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154260\n"
+"help.text"
+msgid "Choose <emph>View - Styles -</emph> open context menu <emph>Modify/New - Text Flow</emph> tab."
+msgstr "Vel <emph>Vis → Stilar</emph>, opna sprettoppmenyen og vel <emph>Endra/ny → Tekstflyt</emph>."
+
+#. ANWP6
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154275\n"
+"help.text"
+msgid "Choose <emph>Edit - Find & Replace - Format - Text Flow</emph> tab."
+msgstr "Vel <emph>Rediger → Søk og byt ut → Fleire val → Format → Tekstflyt</emph>."
+
+#. YBRyA
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_idN10715\n"
+"help.text"
+msgid "Right-click a paragraph with style <literal>Text body</literal>. Choose <menuitem>Paragraph - Edit Style - Condition</menuitem> tab."
+msgstr "Høgreklikk på eit avsnitt med stilen <literal>Brødtekst</literal>. Vel fana <menuitem>Avsnitt → Rediger stil → Vilkår</menuitem>."
+
+#. 8fkUm
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id651578069976376\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>). Right-click any paragraph style. Choose <menuitem>New - Condition</menuitem> tab."
+msgstr "Vel <menuitem>Vis → Stilar</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command + T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>). Høgreklikk på ein avsnitssstil. Vel fana <menuitem>Ny(tt) → Vilkår</menuitem>."
+
+#. E4dAp
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id221579830516951\n"
+"help.text"
+msgid "Choose <menuitem>Styles - Load Styles from Template</menuitem>"
+msgstr "Vel <menuitem>Stilar → Last inn stilar frå mal</menuitem>"
+
+#. 26CFe
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id655978063576\n"
+"help.text"
+msgid "In the Styles window, do a long click on the <emph>Styles action</emph> icon on the top right. Choose <menuitem>Load Styles from Template</menuitem> from the submenu."
+msgstr "Gjer eit langt klikk på ikonet <emph>Stilhandlingar</emph> oppe til høgre i stilvindauget. Vel <menuitem>Last inn stilar frå mal</menuitem> på undermenyen."
+
+#. hcD58
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_idN10739\n"
+"help.text"
+msgid "Different ways to open <emph>Styles</emph> window:"
+msgstr "Ulike måtar for å opna <emph>>Stilar</emph>-vindauget:"
+
+#. HMrxV
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id51579866880596\n"
+"help.text"
+msgid "Press  <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command + T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>"
+
+#. Bkgcd
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id651578066376\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles</menuitem>"
+msgstr "Vel <menuitem>Vis → Stilar</menuitem>"
+
+#. rjCh2
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id651378063576\n"
+"help.text"
+msgid "Choose <menuitem>Styles - Manage Styles</menuitem>"
+msgstr "Vel <menuitem>Stilar → Handsam stilar</menuitem>"
+
+#. THBBY
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3152947\n"
+"help.text"
+msgid "Choose <menuitem>Format - Page Style</menuitem>."
+msgstr "Vel <menuitem>Format → Sidestil</menuitem>."
+
+#. ZE7hk
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153536\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) - choose Page Styles - open context menu for selected style - <emph>New/Modify</emph>."
+msgstr "Vel <menuitem>Vis → Stilar</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command + T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) –vel sidestilar – opna sprettoppmenyen (høgreklikk) for den valde stilen – <emph>Ny/Endra</emph>."
+
+#. 4fpCB
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154470\n"
+"help.text"
+msgid "Choose <menuitem>Format - Paragraph - Outline & List</menuitem> tab."
+msgstr "Vel fana <menuitem>Format → Avsnitt → Disposisjon og nummerering</menuitem>."
+
+#. q583F
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id231616224233651\n"
+"help.text"
+msgid "Right-click a paragraph, choose <menuitem>Paragraph - Paragraph - Outline & List</menuitem> tab."
+msgstr "Høgreklikk i eit avsnitt og vel fana <menuitem>Avsnitt → Avsnitt → Disposisjon og nummerering</menuitem>"
+
+#. ExS89
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id41616224423602\n"
+"help.text"
+msgid "Right-click a paragraph, choose <menuitem>Paragraph - Edit Style - Outline & List</menuitem> tab."
+msgstr "Høgreklikk i eit avsnitt og vel fana <menuitem>Avsnitt → Rediger stil → Disposisjon og nummerering</menuitem>"
+
+#. n5kFM
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154413\n"
+"help.text"
+msgid "Choose <menuitem>Styles - Edit Style - Outline & List</menuitem> tab (Paragraph Styles)."
+msgstr "Vel fana <menuitem>Stilar → Rediger stil → Disposisjon og nummerering</menuitem> (Avsnittsstilar)."
+
+#. oVPyS
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147525\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles -</menuitem> open context menu <menuitem>Modify/New - List & Numbering</menuitem> tab (Paragraph Styles)."
+msgstr "Vel fana <menuitem>Vis → Stilar</menuitem> og opna sprettoppmenyen <menuitem>Disposisjon og nummerering</menuitem>  (avsnittsstilar)."
+
+#. Rp3Q3
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3152960\n"
+"help.text"
+msgid "<variable id=\"spaltenber\">Choose <menuitem>Format - Sections - Options</menuitem> button.</variable>"
+msgstr "<variable id=\"spaltenber\">Vel knappen <menuitem>Format → Bolkar → Innstillingar</menuitem>.</variable>"
+
+#. w4TAg
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150836\n"
+"help.text"
+msgid "Choose <emph>Format - Page Style - Columns</emph> tab."
+msgstr "Vel fana <emph>Format → Sidestil → Spalter</emph>"
+
+#. xDwV2
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149298\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles</menuitem> - <emph>Page Styles</emph> - open context menu for selected page style - <menuitem>Modify/New - Columns</menuitem> tab."
+msgstr "Vel <menuitem>Vis → Stilar</menuitem> – <emph>Sidestilar</emph> – opna sprettoppmenyen for den valde sidestilen – fana <menuitem>Endra/Ny – Kolonnar</menuitem>."
+
+#. 9sMo7
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3151336\n"
+"help.text"
+msgid "Choose <emph>Insert - Frame - Frame - Columns</emph> tab."
+msgstr "Vel fana <emph>Set inn → Ramme → Ramme → Spalter</emph>."
+
+#. 9F5Bz
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149687\n"
+"help.text"
+msgid "Choose <emph>Format - Frame and Object - Properties - Columns</emph> tab."
+msgstr "Vel fana <emph>Format → Ramme og objekt → Eigenskapar → Kolonnar</emph>."
+
+#. EFe79
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3143276\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Section - Columns</menuitem> tab."
+msgstr "Vel fana <menuitem>Set inn → Bolk → Kolonnar</menuitem>."
+
+#. ZCfVD
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id461604680991423\n"
+"help.text"
+msgid "Choose <menuitem>Format - Section - </menuitem><widget>Options</widget> button - <menuitem>Columns</menuitem> tab."
+msgstr "Vel knappen <menuitem>Format → Bolkar –  </menuitem><widget>Innstillingar</widget> –  og fana <menuitem>Kolonnar</menuitem>."
+
+#. Gdf8J
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149817\n"
+"help.text"
+msgid "Choose <emph>Format - Page Style - Footnote</emph> tab."
+msgstr "Vel fana <emph>Format → Sidestil → Fotnote</emph>"
+
+#. CDmGU
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149109\n"
+"help.text"
+msgid "Choose <emph>View - Styles</emph> - open context menu <emph>Modify/New - Footnote</emph> tab."
+msgstr "Vel <emph>Vis → Stilar</emph>, opna sprettoppmenyen og vel fana <emph>Ny/Rediger → Fotnote</emph>."
+
+#. GpwGB
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148970\n"
+"help.text"
+msgid "Choose <emph>Insert - Section - Footnotes/Endnotes</emph> tab."
+msgstr "Vel <emph>Set inn → Bolk → Fotnotar/Sluttnotar</emph>."
+
+#. YyJMo
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147094\n"
+"help.text"
+msgid "Choose <emph>Format - Sections - Options</emph> button <emph>Footnotes/Endnotes</emph> tab."
+msgstr "Vel <emph>Format → Bolkar → Innstillingar</emph> og deretter fana <emph>Fot- og sluttnotar</emph>."
+
+#. f8wAM
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155140\n"
+"help.text"
+msgid "Choose <emph>View - Styles</emph> - open context menu <emph>Modify/New</emph> (for Paragraph Styles)."
+msgstr "Vel <emph>Vis → Stilar</emph>, opna sprettoppmenyen og vel <emph>Ny/Rediger</emph> (for avsnittsstilar)."
+
+#. bAmxC
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153356\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles</menuitem> or <menuitem>Styles - Manage Styles</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) to open Styles deck."
+msgstr "Vel <menuitem>Vis → Stilar</menuitem> eller <menuitem>Stilar → Handsam stilar</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Kommando + T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) for å opna stilpanelet."
+
+#. JPQQP
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id61610557667046\n"
+"help.text"
+msgid "Click on the Character Style icon at top of the deck, then select a character style."
+msgstr "Trykk på ikonet for teiknstilar øvst i panelet og vel så ein teiknstil."
+
+#. j5skL
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id501610557723109\n"
+"help.text"
+msgid "Right-click to open context menu and choose <menuitem>Modify/New</menuitem>."
+msgstr "Høgreklikk for å opna sprettoppmenyen og vel <menuitem>Endra/ny</menuitem>."
+
+#. SrKCw
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id61610556682785\n"
+"help.text"
+msgid "<image src=\"sw/res/sf01.png\" id=\"img_id301610556682785\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id881610556682785\">Character Style Icon</alt></image>"
+msgstr "<image src=\"sw/res/sf01.png\" id=\"img_id301610556682785\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id881610556682785\">Ikon Teiknstil</alt></image>"
+
+#. jFYz7
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id451610556682785\n"
+"help.text"
+msgid "Character Style icon"
+msgstr "Ikonet teiknstil"
+
+#. woQEB
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149179\n"
+"help.text"
+msgid "Choose <emph>View - Styles</emph> - open context menu <emph>Modify/New</emph> (for Frame Styles)."
+msgstr "Vel <emph>Vis→ Stilar</emph>, opna sprettoppmenyen og vel <emph>Ny/Rediger</emph> (for rammestilar)."
+
+#. LwHDD
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156364\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) - open context menu <menuitem>Modify/New</menuitem> (for List Styles)."
+msgstr "Vel <menuitem>Vis → Stilar</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Kommando + T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) – opna sprettoppmenyen (høgreklikk) <menuitem>Ny/Endra</menuitem> (for listestilar)."
+
+#. GnSG7
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3151370\n"
+"help.text"
+msgid "<variable id=\"while_typing\">Choose <menuitem>Tools - AutoCorrect - While Typing</menuitem>.</variable>"
+msgstr "<variable id=\"while_typing\">Vel <menuitem>Verktøy → Autoretting → Ved skriving</menuitem>.</variable>"
+
+#. EBrtG
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149538\n"
+"help.text"
+msgid "<variable id=\"autoformat1\">Choose <emph>Tools - AutoCorrect</emph>.</variable>"
+msgstr "<variable id=\"autoformat1\">Vel <emph>Verktøy → Autoretting</emph>.</variable>"
+
+#. 9gCAB
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150117\n"
+"help.text"
+msgid "<variable id=\"autoformat2\">Choose <emph>Tools - AutoCorrect - Apply</emph>.</variable>"
+msgstr "<variable id=\"autoformat2\">Vel <emph>Verktøy → Autoretting → Bruk</emph>.</variable>"
+
+#. ymEMr
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155870\n"
+"help.text"
+msgid "<variable id=\"autoformat3\">Choose <emph>Tools - AutoCorrect - Apply and Edit Changes</emph>.</variable>"
+msgstr "<variable id=\"autoformat3\">Vel <emph>Verktøy → Autoretting → Bruk og rediger endringar</emph>.</variable>"
+
+#. ZA54b
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147413\n"
+"help.text"
+msgid "<variable id=\"autoformattab\">Choose <emph>Table - AutoFormat Styles</emph> (with cursor in a table).</variable>"
+msgstr "<variable id=\"autoformattab\">Vel <emph>Tabell → Autoformater stilar</emph> (når skrivemerket er i ein tabell).</variable>"
+
+#. Uxeuc
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147484\n"
+"help.text"
+msgid "Choose <menuitem>Format - Image - Properties - Area</menuitem> tab."
+msgstr "Vel fana <menuitem>Format → Bilete → Eigenskapar → Område</menuitem>."
+
+#. H2Zb6
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149562\n"
+"help.text"
+msgid "On the <emph>Image</emph> bar (when images are selected), click"
+msgstr "Når du er på verktøylinja <emph>Bilete</emph> og bilete er valt, trykk på"
+
+#. nrAxh
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150557\n"
+"help.text"
+msgid "<image id=\"img_id3149214\" src=\"cmd/sc_framedialog.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149214\">Icon Graphics Properties</alt></image>"
+msgstr "<image id=\"img_id3149214\" src=\"cmd/sc_framedialog.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149214\">Ikon Eigenskapar</alt></image>"
+
+#. nQDmh
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147740\n"
+"help.text"
+msgid "Graphics Properties"
+msgstr "Bileteigenskapar"
+
+#. DNJWW
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3146337\n"
+"help.text"
+msgid "Choose <menuitem>Format - Image - Properties - Position and Size</menuitem> tab."
+msgstr "Vel fana <menuitem>Format → Bilete → Eigenskapar → Plassering og storleik</menuitem>."
+
+#. FCDbd
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149841\n"
+"help.text"
+msgid "Choose <menuitem>Format - Frame and Object - Properties - Position and Size</menuitem> tab."
+msgstr "Vel fana <menuitem>Format → Ramme og objekt → Eigenskapar → Plassering og storleik</menuitem>."
+
+#. 7WVGQ
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148856\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles - Frame Styles</menuitem> - open context menu <menuitem>Modify/New - Type</menuitem> tab."
+msgstr "Vel fana <menuitem>Vis → Stilar → Rammestilar</menuitem> – opna sprettoppmenyen <menuitem>Endra/Ny – Type</menuitem>."
+
+#. j5nXW
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147067\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Frame - Frame - Position and Size</menuitem> tab."
+msgstr "Vel fana <menuitem>Set inn → Ramme → Ramme → Plassering og storleik</menuitem>."
+
+#. GVNFT
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3151082\n"
+"help.text"
+msgid "Choose <emph>Format - Image - Properties - Wrap</emph> tab."
+msgstr "Vel fana <emph>Format → Bilete → Eigenskapar → Linjebryting</emph>."
+
+#. kboFg
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148437\n"
+"help.text"
+msgid "Choose <emph>Format - Frame and Object - Properties - Wrap</emph> tab."
+msgstr "Vel fana <emph>Format → Ramme og objekt → Eigenskapar → Linjebryting</emph>."
+
+#. AC2Dm
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150169\n"
+"help.text"
+msgid "Choose <emph>Insert - Frame - Frame - Wrap</emph> tab."
+msgstr "Vel <emph>Set inn → Ramme → Ramme → Linjebryting</emph>."
+
+#. fNikE
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153299\n"
+"help.text"
+msgid "Choose <emph>Format - Wrap - Edit - Wrap</emph> tab."
+msgstr "Vel fana <emph>Format → Tekstbryting → Rediger → Tekstbryting</emph>."
+
+#. uQtgx
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150454\n"
+"help.text"
+msgid "<variable id=\"kontureditor\">Choose <emph>Format - Wrap - Edit Contour</emph>.</variable>"
+msgstr "<variable id=\"kontureditor\">Vel <emph>Format → Tekstbryting → Rediger omriss</emph>.</variable>"
+
+#. qU4oE
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153984\n"
+"help.text"
+msgid "Choose <emph>Format - Image - Properties - Hyperlink</emph> tab."
+msgstr "Vel fana <emph>Format → Bilete → Eigenskapar → Hyperlenkje</emph>."
+
+#. AcwCD
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156130\n"
+"help.text"
+msgid "Choose <emph>Format - Frame and Object - Properties - Hyperlink</emph> tab."
+msgstr "Vel fana <emph>Format → Ramme og objekt → Eigenskapar → Hyperlenkje</emph>."
+
+#. ttao8
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145337\n"
+"help.text"
+msgid "Choose <emph>Insert - Frame - Frame - Hyperlink</emph> tab."
+msgstr "Vel <emph>Set inn → Ramme → Ramme → Hyperlenkje</emph>."
+
+#. W6yF8
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154724\n"
+"help.text"
+msgid "Choose <emph>Format - Image - Properties - Options</emph> tab."
+msgstr "Vel fana <emph>Format → Bilete → Eigenskapar → Val</emph>."
+
+#. BBix8
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145636\n"
+"help.text"
+msgid "Choose <emph>Format - Frame and Object - Properties - Options</emph> tab."
+msgstr "Vel fana <emph>Format → Ramme og objekt → Eigenskapar → Val</emph>."
+
+#. y6FeX
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149774\n"
+"help.text"
+msgid "Choose <menuitem>View - Styles</menuitem> - open context menu for selected <menuitem>Frame style</menuitem> - <menuitem>Modify/New - Options</menuitem> tab."
+msgstr "Vel fana <menuitem>Vis → Stilar</menuitem> – opna sprettoppmenyen for vald <menuitem>Rammestil</menuitem> – <menuitem>Endra/Ny - Val</menuitem>."
+
+#. 8DneW
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150922\n"
+"help.text"
+msgid "Choose <emph>Insert - Frame - Frame - Options</emph> tab."
+msgstr "Vel <emph>Set inn → Ramme → Ramme → Val</emph>."
+
+#. vcB57
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id31509223529635\n"
+"help.text"
+msgid "Right-click selected object, choose <menuitem>Properties - Options</menuitem> tab."
+msgstr "Høgreklikk på det valde objektet, vel fana <menuitem>Eigenskapar → Val</menuitem>."
+
+#. k2JDN
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155088\n"
+"help.text"
+msgid "<variable id=\"grafik1\">Choose <emph>Format - Image - Properties - Image</emph> tab.</variable>"
+msgstr "<variable id=\"grafik1\">Vel fana <emph>Format → Bilete → Eigenskapar → Bilete</emph>.</variable>"
+
+#. xKJtv
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3146938\n"
+"help.text"
+msgid "Choose <emph>Insert/Format - Image - Properties - Macro</emph> tab."
+msgstr "Vel <emph>Set inn/Format → Bilete → Eigenskapar → Makro</emph>."
+
+#. UA93M
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154323\n"
+"help.text"
+msgid "Choose <emph>Format - Frame and Object - Properties - Macro</emph> tab."
+msgstr "Vel <emph>Format → Ramme og objekt → Eigenskapar → Makro</emph>."
+
+#. RUiBn
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153238\n"
+"help.text"
+msgid "Choose <emph>Tools - AutoText - AutoText (button) - Macro</emph>."
+msgstr "Vel <emph>Verktøy → Autotekst → Autotekst (knapp) → Makro</emph>."
+
+#. xACw5
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148792\n"
+"help.text"
+msgid "Choose <menuitem>Tools - ImageMap</menuitem> - open context menu <emph>Macro</emph>."
+msgstr "Vel <menuitem>Rediger → Biletkart</menuitem> og opna sprettoppmenyen <emph>Makro</emph>."
+
+#. T5m7n
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150039\n"
+"help.text"
+msgid "Choose <emph>Format - Character - Hyperlink</emph> tab - <emph>Events</emph> button."
+msgstr "Vel <emph>Format → Teikn → Hyperlenkje</emph> og fana <emph>Hendingar</emph>."
+
+#. PfEZC
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155114\n"
+"help.text"
+msgid "<variable id=\"formattable\">Choose <menuitem>Table - Properties</menuitem>.</variable>"
+msgstr "<variable id=\"formattable\">Vel <menuitem>Tabell → Tabelleigenskapar</menuitem>.</variable>"
+
+#. 7rYXk
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id351656587408071\n"
+"help.text"
+msgid "On the <emph>Table</emph> bar (with cursor in table), click"
+msgstr "Klikk på <emph>Tabell</emph>-linja (med markøren i tabellen)."
+
+#. HBbyP
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id191656586861385\n"
+"help.text"
+msgid "<image src=\"cmd/lc_tabledialog.svg\" id=\"img_id101656586861385\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id201656586861385\">Table Properties Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_tabledialog.svg\" id=\"img_id101656586861385\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id201656586861385\">Ikon Tabelleigenskapar</alt></image>"
+
+#. aPEVQ
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id301656586861385\n"
+"help.text"
+msgid "Table Properties"
+msgstr "Tabelleigenskapar"
+
+#. TBJPz
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149377\n"
+"help.text"
+msgid "<variable id=\"tabauf\">Choose <emph>Table - Split Table</emph>.</variable>"
+msgstr "<variable id=\"tabauf\">Vel <emph>Tabell → Del tabell</emph>.</variable>"
+
+#. 2TCie
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155810\n"
+"help.text"
+msgid "<variable id=\"tabverb\">Choose <emph>Table - Merge Table</emph>.</variable>"
+msgstr "<variable id=\"tabverb\">Vel <emph>Tabell → Slå saman tabellar</emph>.</variable>"
+
+#. MVBHQ
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3151233\n"
+"help.text"
+msgid "<variable id=\"tabformat\">Choose <emph>Table - Properties - Table</emph> tab.</variable>"
+msgstr "<variable id=\"tabformat\">Vel fana <emph>Tabell → Eigenskapar→ Tabell</emph>.</variable>"
+
+#. GeJzw
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154255\n"
+"help.text"
+msgid "<variable id=\"spaltentab\">Choose <emph>Table - Properties - Columns</emph> tab.</variable>"
+msgstr "<variable id=\"spaltentab\">Vel fana <emph>Tabell → Eigenskapar→ Kolonnar</emph>.</variable>"
+
+#. Wza6u
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153140\n"
+"help.text"
+msgid "<variable id=\"tabelletextfluss\">Choose <emph>Table - Properties - Text Flow</emph> tab.</variable>"
+msgstr "<variable id=\"tabelletextfluss\">Vel fana <emph>Tabell → Eigenskapar → Tekstflyt</emph>.</variable>"
+
+#. VQGrF
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148823\n"
+"help.text"
+msgid "<variable id=\"zelle\">Right-click in a table, choose <emph>Cell</emph>.</variable>"
+msgstr "<variable id=\"zelle\">Høgreklikk i ein tabell og vel <emph>Celle</emph>.</variable>"
+
+#. GWSS4
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154351\n"
+"help.text"
+msgid "Choose <emph>Table - Merge Cells</emph>."
+msgstr "Vel <emph>Tabell → Slå saman celler</emph>."
+
+#. SKiuL
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154370\n"
+"help.text"
+msgid "On the <emph>Table</emph> bar, click"
+msgstr "På <emph>Tabellinja</emph> trykkjer du på"
+
+#. zy5vV
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153996\n"
+"help.text"
+msgid "<image id=\"img_id3154002\" src=\"cmd/sc_mergecells.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154002\">Icon Merge Cells</alt></image>"
+msgstr "<image id=\"img_id3154002\" src=\"cmd/sc_mergecells.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154002\">Ikon Slå saman celler</alt></image>"
+
+#. dpXBa
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150662\n"
+"help.text"
+msgid "Merge Cells"
+msgstr "Slå saman celler"
+
+#. Vzsnt
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154024\n"
+"help.text"
+msgid "Choose <emph>Table - Split Cells</emph>."
+msgstr "Vel <emph>Tabell → Del celler</emph>."
+
+#. wWCGz
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154042\n"
+"help.text"
+msgid "On the <emph>Table</emph> bar, click"
+msgstr "På <emph>Tabellinja</emph> trykkjer du på"
+
+#. 7E7fT
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147270\n"
+"help.text"
+msgid "<image id=\"img_id3147275\" src=\"cmd/sc_splitcell.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147275\">Icon Unmerge Cells</alt></image>"
+msgstr "<image id=\"img_id3147275\" src=\"cmd/sc_splitcell.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147275\">Ikon Splitt samanslegne celler</alt></image>"
+
+#. 7XaPo
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150616\n"
+"help.text"
+msgid "<switchinline select=\"appl\"><caseinline select=\"CALC\">Unmerge Cells</caseinline><defaultinline>Split Cells</defaultinline></switchinline>"
+msgstr "<switchinline select=\"appl\"><caseinline select=\"CALC\">Unmerge Cells</caseinline><defaultinline>Splitt celler</defaultinline></switchinline>"
+
+#. BGm4B
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149617\n"
+"help.text"
+msgid "<variable id=\"schtzenze\">In the context menu of a cell, choose <emph>Cell - Protect</emph>.</variable>"
+msgstr "<variable id=\"schtzenze\">Når du er på sprettoppmenyen for ei celle, vel <emph>Celle → Vern</emph>.</variable>"
+
+#. Lh5om
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150786\n"
+"help.text"
+msgid "In the context menu of a cell, choose <emph>Cell - Unprotect</emph>."
+msgstr "I sprettoppmenyen for ei celle, vel <emph>Celle → Opphev vern</emph>."
+
+#. JqhNZ
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145656\n"
+"help.text"
+msgid "Open context menu in <emph>Navigator</emph> for tables."
+msgstr "Opna sprettoppmenyen for tabellar i <emph>dokumentstrukturen</emph>"
+
+#. Eh3ud
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148716\n"
+"help.text"
+msgid "<variable id=\"zeile\">In the context menu of a cell, choose <emph>Row</emph>.</variable>"
+msgstr "<variable id=\"zeile\">Når du er i sprettoppmenyen for ei celle, vel <emph>Rad</emph></variable>"
+
+#. GXGax
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155345\n"
+"help.text"
+msgid "<variable id=\"hoehez\">In the context menu of a cell, choose <emph>Row - Height</emph>.</variable>"
+msgstr "<variable id=\"hoehez\">Når du er i sprettoppmenyen for ei celle, vel <emph>Rad → Høgd</emph>.</variable>"
+
+#. sa4Tg
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145095\n"
+"help.text"
+msgid "<variable id=\"selektierenz\">Choose <emph>Table - Select - Row</emph>.</variable>"
+msgstr "<variable id=\"selektierenz\">Vel <emph>Tabell → Vel → Rader</emph>.</variable>"
+
+#. e8qyf
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149573\n"
+"help.text"
+msgid "Choose <emph>Table - Delete - Rows</emph>."
+msgstr "Vel <emph>Tabell → Slett → Rader</emph>."
+
+#. fHaeJ
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149591\n"
+"help.text"
+msgid "On <emph>Table</emph> bar, click"
+msgstr "Når du er på verktøylinja <emph>Tabell</emph>, vel"
+
+#. UrDQE
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147555\n"
+"help.text"
+msgid "<image id=\"img_id3150361\" src=\"cmd/sc_deleterows.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150361\">Icon Delete Row</alt></image>"
+msgstr "<image id=\"img_id3150361\" src=\"cmd/sc_deleterows.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150361\">Ikon Slett rad</alt></image>"
+
+#. EfTgN
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156248\n"
+"help.text"
+msgid "Delete Row"
+msgstr "Slett rader"
+
+#. STSLi
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149383\n"
+"help.text"
+msgid "<variable id=\"spalte\">In the context menu of a cell, choose <emph>Column</emph>.</variable>"
+msgstr "<variable id=\"spalte\">Når du er på sprettoppmenyen for ei celle, vel <emph>Kolonne</emph>.</variable>"
+
+#. qqWGi
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149406\n"
+"help.text"
+msgid "<variable id=\"breites\">In the context menu of a cell, choose <emph>Column - Width</emph>.</variable>"
+msgstr "<variable id=\"breites\">Når du er på sprettoppmenyen for ei celle, vel <emph>Kolonne → Breidd</emph>.</variable>"
+
+#. zEgss
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153172\n"
+"help.text"
+msgid "<variable id=\"spaltesel\">Choose <emph>Table - Select - Column</emph>.</variable>"
+msgstr "<variable id=\"spaltesel\">Vel <emph>Tabell → Vel → Kolonnar</emph></variable>"
+
+#. wdeG7
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156296\n"
+"help.text"
+msgid "Choose <emph>Table - Insert - Columns</emph>."
+msgstr "Vel <emph>Tabell → Set inn → Kolonnar</emph>."
+
+#. vn9q8
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150794\n"
+"help.text"
+msgid "Choose <emph>Table - Insert - Rows</emph>."
+msgstr "Vel <emph>Tabell → Set inn → Rader</emph>."
+
+#. tVtsx
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150813\n"
+"help.text"
+msgid "On <emph>Table</emph> bar, click"
+msgstr "Når du er på verktøylinja <emph>Tabell</emph>, trykk på"
+
+#. tY9nN
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150279\n"
+"help.text"
+msgid "<image id=\"img_id3150286\" src=\"cmd/sc_insertcolumns.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150286\">Icon Insert Column</alt></image>"
+msgstr "<image id=\"img_id3150286\" src=\"cmd/sc_insertcolumns.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150286\">Ikon Set inn kolonne</alt></image>"
+
+#. jeDiz
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150872\n"
+"help.text"
+msgid "Insert Column"
+msgstr "Set inn kolonnar"
+
+#. oB4az
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150895\n"
+"help.text"
+msgid "<image id=\"img_id3150902\" src=\"cmd/sc_insertrows.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150902\">Icon Insert Row</alt></image>"
+msgstr "<image id=\"img_id3150902\" src=\"cmd/sc_insertrows.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150902\">Ikon Set inn rad</alt></image>"
+
+#. MFvHr
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149140\n"
+"help.text"
+msgid "Insert Row"
+msgstr "Set inn rader"
+
+#. BiyKv
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155310\n"
+"help.text"
+msgid "Choose <emph>Table - Delete - Columns</emph>."
+msgstr "Vel <emph>Tabell → Slett → Kolonnar</emph>."
+
+#. C2LDS
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155328\n"
+"help.text"
+msgid "On <emph>Table</emph> bar, click"
+msgstr "Når du er på verktøylinja <emph>Tabell</emph>, vel"
+
+#. dedvZ
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153600\n"
+"help.text"
+msgid "<image id=\"img_id3153607\" src=\"cmd/sc_deletecolumns.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153607\">Icon Delete Column</alt></image>"
+msgstr "<image id=\"img_id3153607\" src=\"cmd/sc_deletecolumns.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153607\">Ikon Slett kolonne</alt></image>"
+
+#. ro8Mr
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154423\n"
+"help.text"
+msgid "Delete Column"
+msgstr "Slett kolonnar"
+
+#. BNgAG
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156355\n"
+"help.text"
+msgid "Choose <emph>Format - Frame and Object - Properties</emph>."
+msgstr "Vel fana <emph>Format → Ramme og objekt → Eigenskapar</emph>."
+
+#. TR376
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3151276\n"
+"help.text"
+msgid "<image id=\"img_id3151283\" src=\"cmd/sc_framedialog.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151283\">Icon Object Properties</alt></image>"
+msgstr "<image id=\"img_id3151283\" src=\"cmd/sc_framedialog.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151283\">Ikon Objekteigenskapar</alt></image>"
+
+#. vpeBB
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145157\n"
+"help.text"
+msgid "Object Properties"
+msgstr "Objekteigenskapar"
+
+#. x5EDg
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3152973\n"
+"help.text"
+msgid "<image id=\"img_id3152980\" src=\"cmd/sc_framedialog.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152980\">Icon Frame Properties</alt></image>"
+msgstr "<image id=\"img_id3152980\" src=\"cmd/sc_framedialog.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152980\">Ikon Rammeeigenskapar</alt></image>"
+
+#. CZwgM
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147367\n"
+"help.text"
+msgid "Frame Properties"
+msgstr "Rammeeigenskapar"
+
+#. NAGGT
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150140\n"
+"help.text"
+msgid "Menu <emph>Format - Page Style </emph> - tab <emph>Text Grid</emph>, if Asian language support is enabled"
+msgstr "Menyen <emph>Format → Sidestil</emph> i fana <emph>Tekstrutenett</emph> dersom asiatisk språkstøtte er slått på"
+
+#. aFWLc
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "«Verktøy»-menyen"
+
+#. Fk94Q
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"hd_id3154279\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "«Verktøy»-menyen"
+
+#. vyuAB
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150710\n"
+"help.text"
+msgid "<variable id=\"silbentrennung\">Choose <emph>Tools - Language - Hyphenation</emph></variable>"
+msgstr "<variable id=\"silbentrennung\">Vel <emph>Verktøy → Språk → Orddeling</emph></variable>"
+
+#. DE6CF
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_idN105A1\n"
+"help.text"
+msgid "<variable id=\"wordcount\">Choose <emph>Tools - Word Count</emph></variable>"
+msgstr "<variable id=\"wordcount\">Vel <emph>Verktøy → Ordteljing</emph></variable>"
+
+#. TBACN
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154100\n"
+"help.text"
+msgid "<variable id=\"kapitelnumerierung\">Choose <emph>Tools - Chapter Numbering</emph></variable>"
+msgstr "<variable id=\"kapitelnumerierung\">Vel <emph>Verktøy → Kapittelnummerering</emph></variable>"
+
+#. KzJGt
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153530\n"
+"help.text"
+msgid "<variable id=\"kapitelnumerierung1\">Choose <emph>Tools - Chapter Numbering - Numbering</emph> tab</variable>"
+msgstr "<variable id=\"kapitelnumerierung1\">Vel fana <emph>Verktøy → Kapittelnummerering → Nummerering</emph></variable>"
+
+#. yEEDL
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3151321\n"
+"help.text"
+msgid "<variable id=\"zeilennumerierung\">Choose <emph>Tools - Line Numbering</emph> (not for HTML format)</variable>"
+msgstr "<variable id=\"zeilennumerierung\">Vel <emph>Verktøy → Linjenummerering</emph> (gjeld ikkje i HTML-dokument) </variable>"
+
+#. BJMF7
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154477\n"
+"help.text"
+msgid "<variable id=\"fussnoteneinstellung\">Choose <emph>Tools - Footnotes and Endnotes</emph></variable>"
+msgstr "<variable id=\"fussnoteneinstellung\">Vel <emph>Verktøy → Fotnotar og sluttnotar</emph></variable>"
+
+#. PDQMQ
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153669\n"
+"help.text"
+msgid "<variable id=\"fussnoten\">Choose <emph>Tools - Footnotes and Endnotes - Footnotes</emph> tab</variable>"
+msgstr "<variable id=\"fussnoten\">Vel fana <emph>Verktøy → Fotnotar og sluttnotar → Fotnotar</emph></variable>"
+
+#. YDkPi
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150972\n"
+"help.text"
+msgid "<variable id=\"endnoten\">Choose <emph>Tools - Footnotes and Endnotes - Endnotes</emph> tab</variable>"
+msgstr "<variable id=\"endnoten\">Vel fana <emph>Verktøy → Fotnotar og sluttnotar → Sluttnotar</emph></variable>"
+
+#. LFvpA
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3152963\n"
+"help.text"
+msgid "<variable id=\"texttabelle\">Choose <emph>Table - Convert - Text to Table</emph></variable>"
+msgstr "<variable id=\"texttabelle\">Vel <emph>Tabell → Gjer om → Tekst til tabell</emph></variable>"
+
+#. za5Js
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150833\n"
+"help.text"
+msgid "<variable id=\"sortieren\">Choose <emph>Tools - Sort</emph></variable>"
+msgstr "<variable id=\"sortieren\">Vel <emph>Verktøy → Sorter</emph></variable>"
+
+#. REM3P
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149692\n"
+"help.text"
+msgid "Choose <emph>Tools - Calculate</emph>"
+msgstr "Vel <emph>Verktøy → Rekn ut</emph>"
+
+#. pCNkM
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3159188\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + plus sign"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + plussteiknet"
+
+#. oTAC7
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3155174\n"
+"help.text"
+msgid "<variable id=\"aktualisieren\">Choose <emph>Tools - Update</emph></variable>"
+msgstr "<variable id=\"aktualisieren\">Vel <emph>Verktøy → Oppdater</emph></variable>"
+
+#. FzXCX
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3151330\n"
+"help.text"
+msgid "<variable id=\"seitenformatierung\">Choose <menuitem>Tools - Update - Page Formatting</menuitem></variable>"
+msgstr "<variable id=\"seitenformatierung\">Vel <menuitem>Verktøy → Oppdater → Sideformatering</menuitem></variable>"
+
+#. gnwPv
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149482\n"
+"help.text"
+msgid "<variable id=\"aktuellesverz\">Choose <emph>Tools - Update - Current Index</emph></variable>"
+msgstr "<variable id=\"aktuellesverz\">Vel <emph>Verktøy → Oppdater → Gjeldande register</emph></variable>"
+
+#. XTg6n
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149821\n"
+"help.text"
+msgid "<variable id=\"alleverz\">Choose <menuitem>Tools - Update - Indexes and Tables</menuitem></variable>"
+msgstr "<variable id=\"seitenformatierung\">Vel <menuitem>Verktøy → Oppdater → Register og innhaldslister</menuitem></variable>"
+
+#. w865X
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3151249\n"
+"help.text"
+msgid "<variable id=\"alles\">Choose <emph>Tools - Update - Update All </emph></variable>"
+msgstr "<variable id=\"alles\">Vel <emph>Verktøy → Oppdater → Oppdater alt</emph></variable>"
+
+#. vmmB6
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154839\n"
+"help.text"
+msgid "Choose <emph>Tools - Update - Fields </emph>"
+msgstr "Vel <emph>Verktøy → Oppdater → Felt</emph>"
+
+#. LVSKP
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3147090\n"
+"help.text"
+msgid "F9 key"
+msgstr "F9"
+
+#. bCN3R
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3148970\n"
+"help.text"
+msgid "<variable id=\"aktverknuepf\">Choose <emph>Tools - Update - Links</emph></variable>"
+msgstr "<variable id=\"aktverknuepf\">Vel <emph>Verktøy → Oppdater → Lenkjer</emph></variable>"
+
+#. 3hKeK
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3147220\n"
+"help.text"
+msgid "<variable id=\"adiagr\">Choose <menuitem>Tools - Update - Charts</menuitem></variable>"
+msgstr "<variable id=\"seitenformatierung\">Vel <menuitem>Verktøy → Oppdater → Diagram</menuitem></variable>"
+
+#. eFAoC
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id101630955770811\n"
+"help.text"
+msgid "<variable id=\"protectfield\">Choose <menuitem>Tools - Protect Document - Protect Fields</menuitem>.</variable>"
+msgstr "<variable id=\"protectfield\">Vel <menuitem> Verktøy → Vern dokument → Vern felt </menuitem>. </variable>"
+
+#. YhoGY
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id621630955775413\n"
+"help.text"
+msgid "<variable id=\"protecbookmarks\">Choose <menuitem>Tools - Protect Document - Protect Bookmarks</menuitem>.</variable>"
+msgstr "<variable id=\"protectfield\">Vel <menuitem> Verktøy → Vern dokument → Vern bokmerke </menuitem>. </variable>"
+
+#. DbjCa
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_idN10792\n"
+"help.text"
+msgid "Choose <emph>Tools - Mail Merge Wizard</emph>"
+msgstr "Vel <emph>Verktøy → Vegvisar for brevfletting</emph>"
+
+#. ZEDqa
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_idN107E6\n"
+"help.text"
+msgid "Click the <emph>Mail Merge</emph> icon on the <emph>Mail Merge</emph> bar:"
+msgstr "Trykk på ikonet <emph>Brevfletting</emph> på <emph>Brevflettingslinja</emph>:"
+
+#. hLXjy
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_idN107E7\n"
+"help.text"
+msgid "Click the <emph>Mail Merge</emph> icon on the <emph>Table Data</emph> bar:"
+msgstr "Trykk på ikonet <emph>Brevfletting</emph> på <emph>Tabelldata-linja</emph>:"
+
+#. jc5yA
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_idN10806\n"
+"help.text"
+msgid "<image id=\"img_id3083452\" src=\"cmd/sc_mergedialog.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3083452\">Icon</alt></image>"
+msgstr "<image id=\"img_id3083452\" src=\"cmd/sc_mergedialog.png\" width=\"0.2228in\" height=\"0.2228in\"><alt id=\"alt_id3083452\">Ikon</alt></image>"
+
+#. evE8T
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_idN10823\n"
+"help.text"
+msgid "Mail Merge"
+msgstr "Brevfletting"
+
+#. pwCa2
+#: stylesmenu.xhp
+msgctxt ""
+"stylesmenu.xhp\n"
+"tit\n"
+"help.text"
+msgid "The styles menu"
+msgstr "Stilmenyen"
+
+#. iteqY
+#: stylesmenu.xhp
+msgctxt ""
+"stylesmenu.xhp\n"
+"par_id941529884998705\n"
+"help.text"
+msgid "<variable id=\"ses\">Choose <emph>Styles - Edit Styles</emph></variable>."
+msgstr "<variable id=\"ses\">Vel <emph>Stilar → Rediger stilar</emph></variable>."
+
+#. fCjG9
+#: stylesmenu.xhp
+msgctxt ""
+"stylesmenu.xhp\n"
+"par_id511529885005747\n"
+"help.text"
+msgid "<variable id=\"sus\">Choose <menuitem>Styles - Update Selected Style</menuitem> or <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+ Shift+F11</keycode></variable>."
+msgstr "<variable id=\"sus\">Vel <menuitem>Stilar → Oppdater den merkte stilen</menuitem> eller <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Kommando</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode> + Shift + F11</keycode></variable>."
+
+#. JhWrU
+#: stylesmenu.xhp
+msgctxt ""
+"stylesmenu.xhp\n"
+"par_id411529885010612\n"
+"help.text"
+msgid "<variable id=\"sns\">Choose <menuitem>Styles - New Style from Selection</menuitem> or <keycode>Shift+F11</keycode></variable>."
+msgstr "<variable id=\"sns\">Vel <menuitem>Stilar → Ny stil frå utvalet</menuitem> eller <keycode>Shift + F11</keycode></variable>."
+
+#. esEJn
+#: stylesmenu.xhp
+msgctxt ""
+"stylesmenu.xhp\n"
+"par_id221529885015598\n"
+"help.text"
+msgid "<variable id=\"sls\">Choose <menuitem>Styles - Load Styles from Template</menuitem></variable>."
+msgstr "<variable id=\"sls\">Vel <menuitem>Stilar → Last inn stilar frå mal</menuitem></variable>."
+
+#. rjrJe
+#: stylesmenu.xhp
+msgctxt ""
+"stylesmenu.xhp\n"
+"par_id391529885020996\n"
+"help.text"
+msgid "<variable id=\"sms\">Choose <emph>Styles - Manage Styles</emph> or <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline></variable>."
+msgstr "<variable id=\"sms\">Vel <emph>Stilar → Handsam stilar</emph> eller <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Cmd + T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline></variable>."

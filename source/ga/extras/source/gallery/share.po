@@ -1,0 +1,107 @@
+#. extracted from extras/source/gallery/share
+msgid ""
+msgstr ""
+"Project-Id-Version: LO\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-21 18:06+0100\n"
+"PO-Revision-Date: 2020-08-15 22:35+0000\n"
+"Last-Translator: Seanán Ó Coistín <seananoc@gmail.com>\n"
+"Language-Team: Irish <https://weblate.documentfoundation.org/projects/libo_ui-master/extrassourcegalleryshare/ga/>\n"
+"Language: ga\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1526395055.000000\n"
+
+#. 88PiB
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"arrows_name\n"
+"LngText.text"
+msgid "Arrows"
+msgstr "Saigheada"
+
+#. Fcud3
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"backgrounds_name\n"
+"LngText.text"
+msgid "Backgrounds"
+msgstr "Cúlraí"
+
+#. apeRs
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"bullets_name\n"
+"LngText.text"
+msgid "Bullets"
+msgstr ""
+
+#. LddYM
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"bpmn_name\n"
+"LngText.text"
+msgid "BPMN"
+msgstr "BPMN"
+
+#. QY2xF
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"diagrams_name\n"
+"LngText.text"
+msgid "Diagrams"
+msgstr "Léaráidí"
+
+#. Hu7eP
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"flowchart_name\n"
+"LngText.text"
+msgid "Flow chart"
+msgstr "Sreabhchairt"
+
+#. mdGnB
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"icons_name\n"
+"LngText.text"
+msgid "Icons"
+msgstr "Deilbhíní"
+
+#. oQBvV
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"network_name\n"
+"LngText.text"
+msgid "Network"
+msgstr "Líonra"
+
+#. zEAoE
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"shapes_name\n"
+"LngText.text"
+msgid "Shapes"
+msgstr "Cruthanna"
+
+#. pjF4a
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"sounds_name\n"
+"LngText.text"
+msgid "Sounds"
+msgstr "Fuaimeanna"

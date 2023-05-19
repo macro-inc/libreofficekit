@@ -1,0 +1,215 @@
+#. extracted from scp2/source/impress
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2022-11-02 09:23+0000\n"
+"Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-master/scp2sourceimpress/tr/>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1429977784.000000\n"
+
+#. USjxN
+#: folderitem_impress.ulf
+msgctxt ""
+"folderitem_impress.ulf\n"
+"STR_FI_NAME_PRAESENTATION\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "Sunum"
+
+#. MaeYG
+#: folderitem_impress.ulf
+msgctxt ""
+"folderitem_impress.ulf\n"
+"STR_FI_TOOLTIP_IMPRESS\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using Impress."
+msgstr "Sunumları, slayt gösterilerini, toplantıları ve Web sayfalarını Impress ile oluşturabilir ve düzenleyebilirsiniz."
+
+#. 4XJxj
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_NAME_MODULE_PRG_IMPRESS\n"
+"LngText.text"
+msgid "%PRODUCTNAME Impress"
+msgstr "%PRODUCTNAME Impress"
+
+#. 44gb8
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_DESC_MODULE_PRG_IMPRESS\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using %PRODUCTNAME Impress."
+msgstr "Sunumları, slayt gösterilerini, toplantıları ve Web sayfalarını %PRODUCTNAME Impress ile oluşturabilir ve düzenleyebilirsiniz."
+
+#. 33n88
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_NAME_MODULE_PRG_IMPRESS_BIN\n"
+"LngText.text"
+msgid "Program Module"
+msgstr "Program Modülü"
+
+#. gfK75
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_DESC_MODULE_PRG_IMPRESS_BIN\n"
+"LngText.text"
+msgid "The application %PRODUCTNAME Impress"
+msgstr "%PRODUCTNAME Impress uygulaması"
+
+#. CsaFh
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_NAME_MODULE_PRG_IMPRESS_HELP\n"
+"LngText.text"
+msgid "%PRODUCTNAME Impress Help"
+msgstr "%PRODUCTNAME Impress Yardım"
+
+#. vAPBy
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_DESC_MODULE_PRG_IMPRESS_HELP\n"
+"LngText.text"
+msgid "Help about %PRODUCTNAME Impress"
+msgstr "%PRODUCTNAME Impress Yardım hakkında"
+
+#. Bg4eB
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_NEW\n"
+"LngText.text"
+msgid "&New"
+msgstr "&Yeni"
+
+#. A64Em
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_SO60_SHOW\n"
+"LngText.text"
+msgid "Show"
+msgstr "Göster"
+
+#. oR4ox
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_SO60_PRESENT\n"
+"LngText.text"
+msgid "%SXWFORMATNAME %SXWFORMATVERSION Presentation"
+msgstr "%SXWFORMATNAME %SXWFORMATVERSION Sunum"
+
+#. AFWjY
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_SO60_IMPRESS_TEMPLATE\n"
+"LngText.text"
+msgid "%SXWFORMATNAME %SXWFORMATVERSION Presentation Template"
+msgstr "%SXWFORMATNAME %SXWFORMATVERSION Sunum Şablonu"
+
+#. GbPTM
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_OO_PRESENT\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "OpenDocument Sunum"
+
+#. 6KPeW
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_OO_PRESENT_TEMPLATE\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "OpenDocument Sunum Şablonu"
+
+#. FPmTX
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_PRESENTATION_OLD\n"
+"LngText.text"
+msgid "Microsoft PowerPoint 97-2003 Presentation"
+msgstr "Microsoft PowerPoint 97-2003 Sunumu"
+
+#. XVGBP
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_SHOW\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Show"
+msgstr "Microsoft PowerPoint Gösterisi"
+
+#. c8FUE
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_PRESENTATION\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint Sunumu"
+
+#. krens
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_TEMPLATE_OLD\n"
+"LngText.text"
+msgid "Microsoft PowerPoint 97-2003 Template"
+msgstr "Microsoft PowerPoint 97-2003 Şablonu"
+
+#. DkZrz
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Template"
+msgstr "Microsoft PowerPoint Şablonu"
+
+#. n8qaR
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_UNIFORM_OFFICE_FORMAT_PRESENTATION\n"
+"LngText.text"
+msgid "Uniform Office Format Presentation"
+msgstr "Birleşik Ofis Biçim Sunumu"
+
+#. v6y5o
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_COMPUTER_GRAPHICS_METAFILE\n"
+"LngText.text"
+msgid "Computer Graphics Metafile"
+msgstr "Bilgisayar Grafiği Meta Dosyası"
+
+#. qajhp
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_KEYNOTE_PRESENTATION\n"
+"LngText.text"
+msgid "Apple Keynote"
+msgstr "Apple Keynote"

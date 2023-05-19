@@ -1,0 +1,1643 @@
+#. extracted from reportdesign/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-01-31 18:20+0100\n"
+"PO-Revision-Date: 2021-02-26 09:37+0000\n"
+"Last-Translator: Hossein <hossein.ir@gmail.com>\n"
+"Language-Team: Persian <https://translations.documentfoundation.org/projects/libo_ui-master/reportdesignmessages/fa/>\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1516044476.000000\n"
+
+#. FBVr9
+#: reportdesign/inc/stringarray.hrc:19
+msgctxt "RID_STR_FORCENEWPAGE_CONST"
+msgid "None"
+msgstr "هیچ‌کدام"
+
+#. 2VDzY
+#: reportdesign/inc/stringarray.hrc:20
+msgctxt "RID_STR_FORCENEWPAGE_CONST"
+msgid "Before Section"
+msgstr "قبل از بخش"
+
+#. BBUjQ
+#: reportdesign/inc/stringarray.hrc:21
+msgctxt "RID_STR_FORCENEWPAGE_CONST"
+msgid "After Section"
+msgstr "بعد از بخش"
+
+#. FjE6T
+#: reportdesign/inc/stringarray.hrc:22
+msgctxt "RID_STR_FORCENEWPAGE_CONST"
+msgid "Before & After Section"
+msgstr "قبل و بعد از بخش"
+
+#. FiMq7
+#: reportdesign/inc/stringarray.hrc:28
+msgctxt "RID_STR_GROUPKEEPTOGETHER_CONST"
+msgid "Per Page"
+msgstr "در هر صفحه"
+
+#. zemtQ
+#: reportdesign/inc/stringarray.hrc:29
+msgctxt "RID_STR_GROUPKEEPTOGETHER_CONST"
+msgid "Per Column"
+msgstr "در هر ستون"
+
+#. PCk4E
+#: reportdesign/inc/stringarray.hrc:35
+msgctxt "RID_STR_REPORTPRINTOPTION_CONST"
+msgid "All Pages"
+msgstr "تمام صفحات"
+
+#. GvoGV
+#: reportdesign/inc/stringarray.hrc:36
+msgctxt "RID_STR_REPORTPRINTOPTION_CONST"
+msgid "Not With Report Header"
+msgstr "بدون سرصفحهٔ گزارش"
+
+#. wchYh
+#: reportdesign/inc/stringarray.hrc:37
+msgctxt "RID_STR_REPORTPRINTOPTION_CONST"
+msgid "Not With Report Footer"
+msgstr "بدون پاصفحهٔ گزارش"
+
+#. uvfAP
+#: reportdesign/inc/stringarray.hrc:38
+msgctxt "RID_STR_REPORTPRINTOPTION_CONST"
+msgid "Not With Report Header/Footer"
+msgstr "بدون سرصفحه/پاصفحهٔ گزارش"
+
+#. ZC2oS
+#: reportdesign/inc/stringarray.hrc:44
+msgctxt "RID_STR_TYPE_CONST"
+msgid "Field or Formula"
+msgstr "میدان یا رابطه"
+
+#. gU579
+#: reportdesign/inc/stringarray.hrc:45
+msgctxt "RID_STR_TYPE_CONST"
+msgid "Function"
+msgstr "تابع"
+
+#. BG2gK
+#: reportdesign/inc/stringarray.hrc:46
+msgctxt "RID_STR_TYPE_CONST"
+msgid "Counter"
+msgstr "شمارش‌گر"
+
+#. kGCKF
+#: reportdesign/inc/stringarray.hrc:47
+msgctxt "RID_STR_TYPE_CONST"
+msgid "User defined Function"
+msgstr "تابع تعریف‌ شده توسط کاربر"
+
+#. BBiHn
+#: reportdesign/inc/stringarray.hrc:53
+msgctxt "RID_STR_BOOL"
+msgid "No"
+msgstr "نه"
+
+#. rdPYV
+#: reportdesign/inc/stringarray.hrc:54
+msgctxt "RID_STR_BOOL"
+msgid "Yes"
+msgstr "بله"
+
+#. xUuqy
+#: reportdesign/inc/stringarray.hrc:60
+msgctxt "RID_STR_KEEPTOGETHER_CONST"
+msgid "No"
+msgstr "نه"
+
+#. TDvKY
+#: reportdesign/inc/stringarray.hrc:61
+msgctxt "RID_STR_KEEPTOGETHER_CONST"
+msgid "Whole Group"
+msgstr "کل گروه"
+
+#. Hc5De
+#: reportdesign/inc/stringarray.hrc:62
+msgctxt "RID_STR_KEEPTOGETHER_CONST"
+msgid "With First Detail"
+msgstr "با اولین جزئیات"
+
+#. k2yjS
+#: reportdesign/inc/stringarray.hrc:68
+msgctxt "RID_STR_VERTICAL_ALIGN_CONST"
+msgid "Top"
+msgstr "بالا"
+
+#. VuRdH
+#: reportdesign/inc/stringarray.hrc:69
+msgctxt "RID_STR_VERTICAL_ALIGN_CONST"
+msgid "Middle"
+msgstr "میانه"
+
+#. 9LAvS
+#: reportdesign/inc/stringarray.hrc:70
+msgctxt "RID_STR_VERTICAL_ALIGN_CONST"
+msgid "Bottom"
+msgstr "پایین"
+
+#. fTFRa
+#: reportdesign/inc/stringarray.hrc:76
+msgctxt "RID_STR_PARAADJUST_CONST"
+msgid "Left"
+msgstr "چپ"
+
+#. 5nFGk
+#: reportdesign/inc/stringarray.hrc:77
+msgctxt "RID_STR_PARAADJUST_CONST"
+msgid "Right"
+msgstr "راست"
+
+#. Cvi3X
+#: reportdesign/inc/stringarray.hrc:78
+msgctxt "RID_STR_PARAADJUST_CONST"
+msgid "Block"
+msgstr "چهارگوش"
+
+#. zsB3C
+#: reportdesign/inc/stringarray.hrc:79
+msgctxt "RID_STR_PARAADJUST_CONST"
+msgid "Center"
+msgstr "مرکز"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_افزودن"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "ـاعمال"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "ـلغو"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "ـبستن"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_حذف"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_ویرایش"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_راهنما"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_جدید"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_خیر"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_تأیید"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_حذف"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_تنظیم دوباره"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_بلی"
+
+#. NaDFE
+#: reportdesign/inc/strings.hrc:25
+msgctxt "RID_STR_PROPPAGE_DEFAULT"
+msgid "General"
+msgstr "عمومی"
+
+#. TkocD
+#: reportdesign/inc/strings.hrc:26
+msgctxt "RID_STR_PROPPAGE_DATA"
+msgid "Data"
+msgstr "داده‌ها"
+
+#. 2NkGc
+#: reportdesign/inc/strings.hrc:27
+msgctxt "RID_STR_FORCENEWPAGE"
+msgid "Force New Page"
+msgstr "اجبار به صفحه جدید"
+
+#. MHbFf
+#: reportdesign/inc/strings.hrc:28
+msgctxt "RID_STR_NEWROWORCOL"
+msgid "New Row Or Column"
+msgstr "سطر یا ستون جدید"
+
+#. nCCC2
+#: reportdesign/inc/strings.hrc:29
+msgctxt "RID_STR_KEEPTOGETHER"
+msgid "Keep Together"
+msgstr "نگه‌داشتن کنار هم"
+
+#. pjADt
+#: reportdesign/inc/strings.hrc:30
+msgctxt "RID_STR_CANGROW"
+msgid "Can Grow"
+msgstr "می‌تواند بزرگ شود"
+
+#. sF9pD
+#: reportdesign/inc/strings.hrc:31
+msgctxt "RID_STR_CANSHRINK"
+msgid "Can Shrink"
+msgstr "می‌تواند کوچک شود"
+
+#. CMH5i
+#: reportdesign/inc/strings.hrc:32
+msgctxt "RID_STR_REPEATSECTION"
+msgid "Repeat Section"
+msgstr "تکرار بخش"
+
+#. ZLkdY
+#: reportdesign/inc/strings.hrc:33
+msgctxt "RID_STR_PRINTREPEATEDVALUES"
+msgid "Print repeated values"
+msgstr "چاپ مقادیر تکرار شده"
+
+#. 2BUiU
+#: reportdesign/inc/strings.hrc:34
+msgctxt "RID_STR_CONDITIONALPRINTEXPRESSION"
+msgid "Conditional Print Expression"
+msgstr "عبارات چاپ شرطی"
+
+#. FMCNM
+#: reportdesign/inc/strings.hrc:35
+msgctxt "RID_STR_STARTNEWCOLUMN"
+msgid "Start new column"
+msgstr "شروع ستون جدید"
+
+#. kzD6C
+#: reportdesign/inc/strings.hrc:36
+msgctxt "RID_STR_STARTNEWPAGE"
+msgid "Start new page"
+msgstr "شروع صفحه جدید"
+
+#. 3ranM
+#: reportdesign/inc/strings.hrc:37
+msgctxt "RID_STR_RESETPAGENUMBER"
+msgid "Reset page number"
+msgstr "بازنشانی شماره صفحه"
+
+#. 9vA38
+#: reportdesign/inc/strings.hrc:38
+msgctxt "RID_STR_CHARTTYPE"
+msgid "Chart type"
+msgstr "نوع نمودار"
+
+#. ZVJoV
+#: reportdesign/inc/strings.hrc:39
+msgctxt "RID_STR_PRINTWHENGROUPCHANGE"
+msgid "Print repeated value on group change"
+msgstr "مقدار تکراری را به هنگام تغییر گروه چاپ کنید"
+
+#. rh4Mf
+#: reportdesign/inc/strings.hrc:40
+msgctxt "RID_STR_VISIBLE"
+msgid "Visible"
+msgstr "قابل مشاهده"
+
+#. QKNiK
+#: reportdesign/inc/strings.hrc:41
+msgctxt "RID_STR_GROUPKEEPTOGETHER"
+msgid "Group keep together"
+msgstr "گروه نگه داشتن با هم"
+
+#. 8HQmJ
+#: reportdesign/inc/strings.hrc:42
+msgctxt "RID_STR_PAGEHEADEROPTION"
+msgid "Page header"
+msgstr "سرصفحه"
+
+#. rzwjM
+#: reportdesign/inc/strings.hrc:43
+msgctxt "RID_STR_PAGEFOOTEROPTION"
+msgid "Page footer"
+msgstr "پاورقی"
+
+#. eg94E
+#: reportdesign/inc/strings.hrc:44
+msgctxt "RID_STR_DEEPTRAVERSING"
+msgid "Deep traversing"
+msgstr "پیمایش عمقی"
+
+#. DxgFC
+#: reportdesign/inc/strings.hrc:45
+msgctxt "RID_STR_PREEVALUATED"
+msgid "Pre evaluation"
+msgstr "پیش ارزشیابی"
+
+#. Zhqid
+#: reportdesign/inc/strings.hrc:46
+msgctxt "RID_STR_POSITIONX"
+msgid "Position X"
+msgstr "موقعیت افقی"
+
+#. xvAJ8
+#: reportdesign/inc/strings.hrc:47
+msgctxt "RID_STR_POSITIONY"
+msgid "Position Y"
+msgstr "موقعیت عمودی"
+
+#. 7CmQE
+#: reportdesign/inc/strings.hrc:48
+msgctxt "RID_STR_WIDTH"
+msgid "Width"
+msgstr "عرض"
+
+#. GkcPB
+#: reportdesign/inc/strings.hrc:49
+msgctxt "RID_STR_HEIGHT"
+msgid "Height"
+msgstr "ارتفاع"
+
+#. bQvmF
+#: reportdesign/inc/strings.hrc:50
+msgctxt "RID_STR_AUTOGROW"
+msgid "Auto Grow"
+msgstr "رشد خودکار"
+
+#. nBghq
+#: reportdesign/inc/strings.hrc:51
+msgctxt "RID_STR_INITIALFORMULA"
+msgid "Initial value"
+msgstr "مقدار اولیه"
+
+#. zhBwj
+#: reportdesign/inc/strings.hrc:52
+msgctxt "RID_STR_PRESERVEIRI"
+msgid "Preserve as Link"
+msgstr "به عنوان پیوند حفظ شود"
+
+#. 8F4y9
+#: reportdesign/inc/strings.hrc:53
+msgctxt "RID_STR_FORMULA"
+msgid "Formula"
+msgstr "فرمول"
+
+#. t22cv
+#: reportdesign/inc/strings.hrc:54
+msgctxt "RID_STR_DATAFIELD"
+msgid "Data field"
+msgstr "فیلد داده"
+
+#. A22EF
+#: reportdesign/inc/strings.hrc:55
+msgctxt "RID_STR_FONT"
+msgid "Font"
+msgstr "قلم"
+
+#. AAcyy
+#: reportdesign/inc/strings.hrc:56
+msgctxt "RID_STR_BACKCOLOR"
+msgid "Background color"
+msgstr "رنگ پس‌زمینه"
+
+#. WGAAf
+#: reportdesign/inc/strings.hrc:57
+msgctxt "RID_STR_BACKTRANSPARENT"
+msgid "Background Transparent"
+msgstr "پس‌زمینه شفاف"
+
+#. AxENf
+#: reportdesign/inc/strings.hrc:58
+msgctxt "RID_STR_CONTROLBACKGROUNDTRANSPARENT"
+msgid "Background Transparent"
+msgstr "پس‌زمینه شفاف"
+
+#. aeQBV
+#: reportdesign/inc/strings.hrc:59
+msgctxt "RID_STR_OVERLAP_OTHER_CONTROL"
+msgid "This operation is not allowed. The control overlaps with another one."
+msgstr "این عمل مجاز نیست. این کنترل با کنترلی دیگر همپوشانی دارد."
+
+#. N7AAg
+#: reportdesign/inc/strings.hrc:60
+msgctxt "RID_STR_ILLEGAL_POSITION"
+msgid "This position can not be set. It is invalid."
+msgstr "این موقعیت قابل تعیین شدن نیست. چون نامعتبر است."
+
+#. R4v2R
+#: reportdesign/inc/strings.hrc:61
+msgctxt "RID_STR_SCOPE_GROUP"
+msgid "Group: %1"
+msgstr "گروه: %1"
+
+#. mnJ35
+#: reportdesign/inc/strings.hrc:62
+msgctxt "RID_STR_FORMULALIST"
+msgid "Function"
+msgstr "تابع"
+
+#. pMDy2
+#: reportdesign/inc/strings.hrc:63
+msgctxt "RID_STR_SCOPE"
+msgid "Scope"
+msgstr "میدان‌ دید"
+
+#. ia2WH
+#: reportdesign/inc/strings.hrc:64
+msgctxt "RID_STR_TYPE"
+msgid "Data Field Type"
+msgstr "نوع فیلد داده‌ای"
+
+#. zM78b
+#: reportdesign/inc/strings.hrc:65
+msgctxt "RID_STR_MASTERFIELDS"
+msgid "Link master fields"
+msgstr "پیوند فیلد‌های کنترل کننده"
+
+#. 5Kkka
+#: reportdesign/inc/strings.hrc:66
+msgctxt "RID_STR_DETAILFIELDS"
+msgid "Link slave fields"
+msgstr "پیوند فیلد‌های کنترل شونده"
+
+#. UX3NQ
+#: reportdesign/inc/strings.hrc:68
+msgctxt "RID_STR_DETAILLABEL"
+msgid "Chart"
+msgstr "نمودار"
+
+#. TbV7G
+#: reportdesign/inc/strings.hrc:69
+msgctxt "RID_STR_MASTERLABEL"
+msgid "Report"
+msgstr "گزارش"
+
+#. h8xm6
+#: reportdesign/inc/strings.hrc:70
+msgctxt "RID_STR_PREVIEW_COUNT"
+msgid "Preview Row(s)"
+msgstr "پیش‌نمایش سطر(ها)"
+
+#. keLPS
+#: reportdesign/inc/strings.hrc:71
+msgctxt "RID_STR_AREA"
+msgid "Area"
+msgstr "ناحیه"
+
+#. AGr73
+#: reportdesign/inc/strings.hrc:72
+msgctxt "RID_STR_MIMETYPE"
+msgid "Report Output Format"
+msgstr "قالب خروجی گزارش"
+
+#. c8N5w
+#: reportdesign/inc/strings.hrc:73
+msgctxt "RID_STR_VERTICALALIGN"
+msgid "Vert. Alignment"
+msgstr "ترازبندی عمودی"
+
+#. Nm4Tr
+#: reportdesign/inc/strings.hrc:74
+msgctxt "RID_STR_PARAADJUST"
+msgid "Horz. Alignment"
+msgstr "ترازبندی افقی"
+
+#. BkLfC
+#: reportdesign/inc/strings.hrc:75
+msgctxt "RID_STR_F_COUNTER"
+msgid "Counter"
+msgstr "شمارش‌گر"
+
+#. kAfz6
+#: reportdesign/inc/strings.hrc:76
+msgctxt "RID_STR_F_ACCUMULATION"
+msgid "Accumulation"
+msgstr "انباشت"
+
+#. D38SS
+#: reportdesign/inc/strings.hrc:77
+msgctxt "RID_STR_F_MINIMUM"
+msgid "Minimum"
+msgstr "حداقل"
+
+#. EyGC5
+#: reportdesign/inc/strings.hrc:78
+msgctxt "RID_STR_F_MAXIMUM"
+msgid "Maximum"
+msgstr "حداکثر"
+
+#. NtqMk
+#: reportdesign/inc/strings.hrc:80
+msgctxt "RID_STR_BRWTITLE_PROPERTIES"
+msgid "Properties: "
+msgstr "مشخصات: "
+
+#. FnkAZ
+#: reportdesign/inc/strings.hrc:81
+msgctxt "RID_STR_BRWTITLE_NO_PROPERTIES"
+msgid "No Control marked"
+msgstr "کنترلی علامت نخورده"
+
+#. aeAPC
+#: reportdesign/inc/strings.hrc:82
+msgctxt "RID_STR_BRWTITLE_MULTISELECT"
+msgid "Multiselection"
+msgstr "چندانتخابی"
+
+#. qT2Ed
+#: reportdesign/inc/strings.hrc:83
+msgctxt "RID_STR_PROPTITLE_IMAGECONTROL"
+msgid "Image Control"
+msgstr "کنترل تصویر"
+
+#. JAEb9
+#: reportdesign/inc/strings.hrc:84
+msgctxt "RID_STR_PROPTITLE_FIXEDTEXT"
+msgid "Label field"
+msgstr "فیلد برچسب"
+
+#. 2uQkB
+#: reportdesign/inc/strings.hrc:85
+msgctxt "RID_STR_PROPTITLE_FIXEDLINE"
+msgid "Line"
+msgstr "خط"
+
+#. DEn9D
+#: reportdesign/inc/strings.hrc:86
+msgctxt "RID_STR_PROPTITLE_FORMATTED"
+msgid "Formatted Field"
+msgstr "فیلد قالب‌بندی شده"
+
+#. aFQ9E
+#: reportdesign/inc/strings.hrc:87
+msgctxt "RID_STR_PROPTITLE_SHAPE"
+msgid "Shape"
+msgstr "شکل"
+
+#. DEMSF
+#: reportdesign/inc/strings.hrc:88
+msgctxt "RID_STR_PROPTITLE_REPORT"
+msgid "Report"
+msgstr "گزارش"
+
+#. D62CY
+#: reportdesign/inc/strings.hrc:89
+msgctxt "RID_STR_PROPTITLE_SECTION"
+msgid "Section"
+msgstr "بخش"
+
+#. CAy2F
+#: reportdesign/inc/strings.hrc:90
+msgctxt "RID_STR_PROPTITLE_FUNCTION"
+msgid "Function"
+msgstr "تابع"
+
+#. 3TAfY
+#: reportdesign/inc/strings.hrc:91
+msgctxt "RID_STR_PROPTITLE_GROUP"
+msgid "Group"
+msgstr "گروه"
+
+#. LyiPd
+#: reportdesign/inc/strings.hrc:92
+msgctxt "RID_STR_UNDO_CHANGEPOSITION"
+msgid "Change Object"
+msgstr "تغییر شیء"
+
+#. uQc7r
+#: reportdesign/inc/strings.hrc:93
+msgctxt "RID_STR_UNDO_MOVE_GROUP"
+msgid "Move Group(s)"
+msgstr "جابه‌جایی گروه(ها)"
+
+#. gZiiq
+#: reportdesign/inc/strings.hrc:94
+msgctxt "RID_STR_UNDO_CONDITIONAL_FORMATTING"
+msgid "Conditional Formatting"
+msgstr "قالب‌بندی شرطی"
+
+#. o9ZV6
+#: reportdesign/inc/strings.hrc:95
+msgctxt "RID_STR_UNDO_REMOVE_REPORTHEADERFOOTER"
+msgid "Remove report header / report footer"
+msgstr "حذف سرصفحه / پاورقی گزارش"
+
+#. iHU5A
+#: reportdesign/inc/strings.hrc:96
+msgctxt "RID_STR_UNDO_ADD_REPORTHEADERFOOTER"
+msgid "Add report header / report footer"
+msgstr "افزودن سرصفحه / پاورقی گزارش"
+
+#. EGhDu
+#. The # character is used for replacing
+#: reportdesign/inc/strings.hrc:98
+msgctxt "RID_STR_UNDO_PROPERTY"
+msgid "Change property '#'"
+msgstr "تغییر ویژگی '#'"
+
+#. MCQSy
+#: reportdesign/inc/strings.hrc:99
+msgctxt "RID_STR_UNDO_ADD_GROUP_HEADER"
+msgid "Add group header "
+msgstr "افزودن سرصفحه گروه "
+
+#. DgPmD
+#: reportdesign/inc/strings.hrc:100
+msgctxt "RID_STR_UNDO_REMOVE_GROUP_HEADER"
+msgid "Remove group header "
+msgstr "حذف سرصفحه گروه "
+
+#. DENjF
+#: reportdesign/inc/strings.hrc:101
+msgctxt "RID_STR_UNDO_ADD_GROUP_FOOTER"
+msgid "Add group footer "
+msgstr "افزودن پاورقی گروه "
+
+#. 5yiAd
+#: reportdesign/inc/strings.hrc:102
+msgctxt "RID_STR_UNDO_REMOVE_GROUP_FOOTER"
+msgid "Remove group footer "
+msgstr "حذف پاورقی گروه "
+
+#. nGU7F
+#: reportdesign/inc/strings.hrc:103
+msgctxt "RID_STR_UNDO_ADDFUNCTION"
+msgid "Add function"
+msgstr "افزودن تابع"
+
+#. zA6vD
+#: reportdesign/inc/strings.hrc:104
+msgctxt "STR_RPT_LABEL"
+msgid "~Report name"
+msgstr "نام ~گزارش"
+
+#. QeVn7
+#: reportdesign/inc/strings.hrc:105
+msgctxt "RID_STR_UNDO_REMOVE_GROUP"
+msgid "Delete Group"
+msgstr "حذف گروه"
+
+#. V8RZq
+#: reportdesign/inc/strings.hrc:106
+msgctxt "RID_STR_UNDO_APPEND_GROUP"
+msgid "Add Group"
+msgstr "افزودن گروه"
+
+#. RWFBC
+#: reportdesign/inc/strings.hrc:107
+msgctxt "RID_STR_UNDO_REMOVE_SELECTION"
+msgid "Delete Selection"
+msgstr "حذف انتخاب‌"
+
+#. MBJVB
+#: reportdesign/inc/strings.hrc:108
+msgctxt "RID_STR_UNDO_REMOVE_FUNCTION"
+msgid "Delete Function"
+msgstr "حذف تابع"
+
+#. DuX47
+#: reportdesign/inc/strings.hrc:109
+msgctxt "RID_STR_UNDO_CHANGE_SIZE"
+msgid "Change Size"
+msgstr "تغییر اندازه"
+
+#. vBNE4
+#: reportdesign/inc/strings.hrc:110
+msgctxt "RID_STR_UNDO_PASTE"
+msgid "Paste"
+msgstr "چسباندن"
+
+#. zFv2h
+#: reportdesign/inc/strings.hrc:111
+msgctxt "RID_STR_UNDO_INSERT_CONTROL"
+msgid "Insert Control"
+msgstr "درج کنترل"
+
+#. ParuK
+#: reportdesign/inc/strings.hrc:112
+msgctxt "RID_STR_UNDO_DELETE_CONTROL"
+msgid "Delete Control"
+msgstr "حذف کنترل"
+
+#. vRDAn
+#. Please try to avoid spaces in the name. It is used as a programmatic one.
+#: reportdesign/inc/strings.hrc:114
+msgctxt "RID_STR_GROUPHEADER"
+msgid "GroupHeader"
+msgstr "سرصفحه گروه"
+
+#. LseTq
+#. Please try to avoid spaces in the name. It is used as a programmatic one.
+#: reportdesign/inc/strings.hrc:116
+msgctxt "RID_STR_GROUPFOOTER"
+msgid "GroupFooter"
+msgstr "پاورقی گروه"
+
+#. NZ68L
+#: reportdesign/inc/strings.hrc:117
+msgctxt "RID_STR_FIELDSELECTION"
+msgid "Add field:"
+msgstr "افزودن فیلد:"
+
+#. eykyF
+#: reportdesign/inc/strings.hrc:118
+msgctxt "RID_STR_FILTER"
+msgid "Filter"
+msgstr "فیلتر"
+
+#. WNJaK
+#: reportdesign/inc/strings.hrc:119
+msgctxt "RID_STR_UNDO_ALIGNMENT"
+msgid "Change Alignment"
+msgstr "تغییر تراز‌بندی"
+
+#. Jy4P6
+#. # will be replaced with a name.
+#: reportdesign/inc/strings.hrc:121
+msgctxt "RID_STR_HEADER"
+msgid "# Header"
+msgstr "# سرصفحه"
+
+#. 9Zu4z
+#. # will be replaced with a name.";
+#: reportdesign/inc/strings.hrc:123
+msgctxt "RID_STR_FOOTER"
+msgid "# Footer"
+msgstr "# پاورقی"
+
+#. RqygD
+#: reportdesign/inc/strings.hrc:124
+msgctxt "RID_STR_IMPORT_GRAPHIC"
+msgid "Insert graphics"
+msgstr "درج نگاره"
+
+#. cT8od
+#: reportdesign/inc/strings.hrc:125
+msgctxt "RID_STR_DELETE"
+msgid "Delete"
+msgstr "حذف"
+
+#. J7Hz2
+#: reportdesign/inc/strings.hrc:126
+msgctxt "RID_STR_FUNCTION"
+msgid "Function"
+msgstr "تابع"
+
+#. 7asEU
+#: reportdesign/inc/strings.hrc:127
+msgctxt "RID_STR_COULD_NOT_CREATE_REPORT"
+msgid "An error occurred while creating the report."
+msgstr "خطایی در حین تولید گزارش رخ‌داد."
+
+#. wBbKp
+#: reportdesign/inc/strings.hrc:128
+msgctxt "RID_STR_CAUGHT_FOREIGN_EXCEPTION"
+msgid "An exception of type $type$ was caught."
+msgstr "استثنائی از نوع $type$ دریافت شد."
+
+#. bdtAq
+#: reportdesign/inc/strings.hrc:129
+msgctxt "RID_STR_UNDO_CHANGEFONT"
+msgid "Change font"
+msgstr "تغییر قلم"
+
+#. TrviL
+#: reportdesign/inc/strings.hrc:130
+msgctxt "RID_STR_UNDO_CHANGEPAGE"
+msgid "Change page attributes"
+msgstr "تغییر مشخصات صفحه"
+
+#. 4A4DL
+#: reportdesign/inc/strings.hrc:131
+msgctxt "RID_STR_PAGEHEADERFOOTER_INSERT"
+msgid "Insert Page Header/Footer"
+msgstr "درج سرصفحه/پاورقی برای صفحه"
+
+#. JZEaA
+#: reportdesign/inc/strings.hrc:132
+msgctxt "RID_STR_PAGEHEADERFOOTER_DELETE"
+msgid "Delete Page Header/Footer"
+msgstr "حذف سرصفحه/پاورقی از صفحه"
+
+#. zENVV
+#: reportdesign/inc/strings.hrc:133
+msgctxt "RID_STR_REPORTHEADERFOOTER_INSERT"
+msgid "Insert Report Header/Footer"
+msgstr "درج سرصفحه/پاورقی برای گزارش"
+
+#. cF5cE
+#: reportdesign/inc/strings.hrc:134
+msgctxt "RID_STR_REPORTHEADERFOOTER_DELETE"
+msgid "Delete Report Header/Footer"
+msgstr "حذف سرصفحه/پاورقی گزارش"
+
+#. YfLKD
+#: reportdesign/inc/strings.hrc:135
+msgctxt "RID_ERR_NO_COMMAND"
+msgid "The report can not be executed unless it is bound to content."
+msgstr "گزارش قابل اجرا نیست، مگر آن‌که به محتوا مقید شود."
+
+#. wbP7i
+#: reportdesign/inc/strings.hrc:136
+msgctxt "RID_ERR_NO_OBJECTS"
+msgid "The report can not be executed unless at least one object has been inserted."
+msgstr "گزارش قابل اجرا نیست، مگر آن‌که حداقل یک شیء درج شده باشد."
+
+#. bNM2S
+#: reportdesign/inc/strings.hrc:137
+msgctxt "RID_STR_UNDO_SHRINK"
+msgid "Shrink Section"
+msgstr "کوچک‌شدن بخش"
+
+#. 83WqS
+#: reportdesign/inc/strings.hrc:138
+msgctxt "RID_STR_DETAIL"
+msgid "Detail"
+msgstr "جزئیات"
+
+#. 6FsBt
+#: reportdesign/inc/strings.hrc:139
+msgctxt "RID_STR_PAGE_HEADER"
+msgid "Page Header"
+msgstr "سرآیند گزارش"
+
+#. VaKUs
+#: reportdesign/inc/strings.hrc:140
+msgctxt "RID_STR_PAGE_FOOTER"
+msgid "Page Footer"
+msgstr "ته‌آیند گزارش"
+
+#. yH4py
+#: reportdesign/inc/strings.hrc:141
+msgctxt "RID_STR_REPORT_HEADER"
+msgid "Report Header"
+msgstr "سرآیند گزارش"
+
+#. cgWUK
+#: reportdesign/inc/strings.hrc:142
+msgctxt "RID_STR_REPORT_FOOTER"
+msgid "Report Footer"
+msgstr "ته‌آیند گزارش"
+
+#. TsJeZ
+#: reportdesign/inc/strings.hrc:144
+msgctxt "STR_NUMBERED_CONDITION"
+msgid "Condition $number$"
+msgstr "شرط $number$"
+
+#. tpRys
+#: reportdesign/inc/strings.hrc:146
+msgctxt "STR_RPT_EXPRESSION"
+msgid "Field/Expression"
+msgstr "فیلد/عبارت"
+
+#. zcTFT
+#: reportdesign/inc/strings.hrc:147
+msgctxt "STR_RPT_PREFIXCHARS"
+msgid "Prefix Characters"
+msgstr "نویسه‌های پیشوندی"
+
+#. AGCRW
+#: reportdesign/inc/strings.hrc:148
+msgctxt "STR_RPT_YEAR"
+msgid "Year"
+msgstr "سال"
+
+#. fs5o2
+#: reportdesign/inc/strings.hrc:149
+msgctxt "STR_RPT_QUARTER"
+msgid "Quarter"
+msgstr "یک چهارم"
+
+#. AZuzT
+#: reportdesign/inc/strings.hrc:150
+msgctxt "STR_RPT_MONTH"
+msgid "Month"
+msgstr "ماه"
+
+#. ogzvv
+#: reportdesign/inc/strings.hrc:151
+msgctxt "STR_RPT_WEEK"
+msgid "Week"
+msgstr "هفته"
+
+#. RGT5s
+#: reportdesign/inc/strings.hrc:152
+msgctxt "STR_RPT_DAY"
+msgid "Day"
+msgstr "روز"
+
+#. gHUUp
+#: reportdesign/inc/strings.hrc:153
+msgctxt "STR_RPT_HOUR"
+msgid "Hour"
+msgstr "ساعت"
+
+#. TEKsE
+#: reportdesign/inc/strings.hrc:154
+msgctxt "STR_RPT_MINUTE"
+msgid "Minute"
+msgstr "دقیقه"
+
+#. dJxDM
+#: reportdesign/inc/strings.hrc:155
+msgctxt "STR_RPT_INTERVAL"
+msgid "Interval"
+msgstr "بازه"
+
+#. imASi
+#: reportdesign/inc/strings.hrc:156
+msgctxt "STR_RPT_HELP_FIELD"
+msgid "Select a field or type an expression to sort or group on."
+msgstr "یک فیلد و یا نوع عبارتی را که مرتب‌سازی و یا گروه‌بندی بر رویش انجام میشود انتخاب کنید."
+
+#. c5noL
+#: reportdesign/inc/strings.hrc:157
+msgctxt "STR_RPT_HELP_HEADER"
+msgid "Display a header for this group?"
+msgstr "نمایش سرصفحه برای این گروه؟"
+
+#. 2eKET
+#: reportdesign/inc/strings.hrc:158
+msgctxt "STR_RPT_HELP_FOOTER"
+msgid "Display a footer for this group?"
+msgstr "نمایش پاورقی برای این گروه؟"
+
+#. DNABi
+#: reportdesign/inc/strings.hrc:159
+msgctxt "STR_RPT_HELP_GROUPON"
+msgid "Select the value or range of values that starts a new group."
+msgstr "مقدار یا محدوده‌ای از مقادیر که گروه جدیدی را ایجاد می‌کنند انتخاب کنید."
+
+#. Rqnf4
+#: reportdesign/inc/strings.hrc:160
+msgctxt "STR_RPT_HELP_INTERVAL"
+msgid "Interval or number of characters to group on."
+msgstr "بازه یا تعداد نویسه‌های برای گروه‌بندی."
+
+#. Bd8BB
+#: reportdesign/inc/strings.hrc:161
+msgctxt "STR_RPT_HELP_KEEP"
+msgid "Keep group together on one page?"
+msgstr "گروه‌ها بر روی یک صفحه با هم نگه داشته شوند؟"
+
+#. 2FHLD
+#: reportdesign/inc/strings.hrc:162
+msgctxt "STR_RPT_HELP_SORT"
+msgid "Select ascending or descending sort order. Ascending means from A to Z or 0 to 9"
+msgstr "ترتیب مرتب سازی نزولی و یا صعودی را انتخاب کنید. مرتب‌سازی صعودی یعنی به ترتیب، حروف A تا Z و یا اعداد 0 تا 9"
+
+#. SwBtX
+#. The space after the word is no error. #PAGENUMBER# is a replacement and & must not be translated as well as "
+#: reportdesign/inc/strings.hrc:165
+msgctxt "STR_RPT_PN_PAGE"
+msgid "\"Page \" & #PAGENUMBER#"
+msgstr "«صفحه» & #PAGENUMBER#"
+
+#. 3GWzf
+#. The space before and after the word is no error. #PAGECOUNT# is a replacement and & must not be translated  as well as "
+#: reportdesign/inc/strings.hrc:167
+msgctxt "STR_RPT_PN_PAGE_OF"
+msgid " & \" of \" & #PAGECOUNT#"
+msgstr " & \" از \" & #PAGECOUNT#"
+
+#. mhBS2
+#: reportdesign/inc/strings.hrc:169
+msgctxt "RID_STR_FUNCTIONS"
+msgid "Functions"
+msgstr "توابع"
+
+#. bfw6P
+#: reportdesign/inc/strings.hrc:170
+msgctxt "RID_STR_GROUPS"
+msgid "Groups"
+msgstr "گروه‌ها"
+
+#. rXGES
+#: reportdesign/inc/strings.hrc:172
+msgctxt "RID_STR_GROUP_HEADER"
+msgid "Group Header"
+msgstr "سرآیند گروه"
+
+#. u85VE
+#: reportdesign/inc/strings.hrc:173
+msgctxt "RID_STR_GROUP_FOOTER"
+msgid "Group Footer"
+msgstr "ته‌آیند گروه"
+
+#. LaroG
+#: reportdesign/inc/strings.hrc:174
+msgctxt "RID_STR_ERROR_WRONG_ARGUMENT"
+msgid "You tried to set an illegal argument. Please have a look at '#1' for valid arguments."
+msgstr "شما تلاش کردید تا نشان‌وند غیرمجازی را تعیین کنید. لطفاً برای نشان‌وندهای معتبر نگاهی به «#1» بیاندازید."
+
+#. NcNG6
+#: reportdesign/inc/strings.hrc:175
+msgctxt "RID_STR_ARGUMENT_IS_NULL"
+msgid "The element is invalid."
+msgstr "عنصر نامعتبر است."
+
+#. DwGXm
+#: reportdesign/inc/strings.hrc:176
+msgctxt "RID_STR_FIXEDTEXT"
+msgid "Label field"
+msgstr "فیلد برچسب"
+
+#. sBC8f
+#: reportdesign/inc/strings.hrc:177
+msgctxt "RID_STR_FORMATTEDFIELD"
+msgid "Formatted field"
+msgstr "فیلد قالب‌بندی شده"
+
+#. ktd53
+#: reportdesign/inc/strings.hrc:178
+msgctxt "RID_STR_IMAGECONTROL"
+msgid "Image control"
+msgstr "کنترل تصویر"
+
+#. nkamB
+#: reportdesign/inc/strings.hrc:179
+msgctxt "RID_STR_REPORT"
+msgid "Report"
+msgstr "گزارش"
+
+#. JkdAe
+#: reportdesign/inc/strings.hrc:180
+msgctxt "RID_STR_SHAPE"
+msgid "Shape"
+msgstr "شکل"
+
+#. yhCqB
+#: reportdesign/inc/strings.hrc:181
+msgctxt "RID_STR_FIXEDLINE"
+msgid "Fixed line"
+msgstr "خط ثابت"
+
+#. vU6ev
+#: reportdesign/uiconfig/dbreport/ui/backgrounddialog.ui:8
+msgctxt "backgrounddialog|BackgroundDialog"
+msgid "Section Setup"
+msgstr "راه‌اندازی بخش"
+
+#. WCd2u
+#: reportdesign/uiconfig/dbreport/ui/backgrounddialog.ui:138
+msgctxt "backgrounddialog|background"
+msgid "Background"
+msgstr "پس‌زمینه"
+
+#. nvkDC
+#: reportdesign/uiconfig/dbreport/ui/chardialog.ui:8
+msgctxt "chardialog|CharDialog"
+msgid "Character Settings"
+msgstr "تنظیمات نویسه"
+
+#. v55EG
+#: reportdesign/uiconfig/dbreport/ui/chardialog.ui:138
+msgctxt "chardialog|font"
+msgid "Font"
+msgstr "قلم"
+
+#. TnnrC
+#: reportdesign/uiconfig/dbreport/ui/chardialog.ui:185
+msgctxt "chardialog|fonteffects"
+msgid "Font Effects"
+msgstr "جلوه‌های قلم"
+
+#. nvprJ
+#: reportdesign/uiconfig/dbreport/ui/chardialog.ui:233
+msgctxt "chardialog|position"
+msgid "Position"
+msgstr "موقعیت"
+
+#. LeDGQ
+#: reportdesign/uiconfig/dbreport/ui/chardialog.ui:281
+msgctxt "chardialog|asianlayout"
+msgid "Asian Layout"
+msgstr "طرح‌بندی آسیایی"
+
+#. EYvgK
+#: reportdesign/uiconfig/dbreport/ui/chardialog.ui:329
+msgctxt "chardialog|background"
+msgid "Background"
+msgstr "پس‌زمینه"
+
+#. g9KPD
+#: reportdesign/uiconfig/dbreport/ui/chardialog.ui:377
+msgctxt "chardialog|alignment"
+msgid "Alignment"
+msgstr "هم‌ترازی"
+
+#. 62SER
+#: reportdesign/uiconfig/dbreport/ui/condformatdialog.ui:10
+msgctxt "condformatdialog|CondFormat"
+msgid "Conditional Formatting"
+msgstr "قالب‌بندی شرطی"
+
+#. 4WAsE
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:53
+msgctxt "conditionwin|typeCombobox"
+msgid "Field Value Is"
+msgstr "مقدار میدان برابراست با"
+
+#. XswwG
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:54
+msgctxt "conditionwin|typeCombobox"
+msgid "Expression Is"
+msgstr "عبارت برابر است با"
+
+#. tLz9p
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:68
+msgctxt "conditionwin|opCombobox"
+msgid "between"
+msgstr "بین"
+
+#. QGFtw
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:69
+msgctxt "conditionwin|opCombobox"
+msgid "not between"
+msgstr "خارج از"
+
+#. KCvfG
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:70
+msgctxt "conditionwin|opCombobox"
+msgid "equal to"
+msgstr "برابر با"
+
+#. XBk96
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:71
+msgctxt "conditionwin|opCombobox"
+msgid "not equal to"
+msgstr "نامساوی با"
+
+#. A8PMD
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:72
+msgctxt "conditionwin|opCombobox"
+msgid "greater than"
+msgstr "بیشتر از"
+
+#. TxLHH
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:73
+msgctxt "conditionwin|opCombobox"
+msgid "less than"
+msgstr "کمتر از"
+
+#. pPq6D
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:74
+msgctxt "conditionwin|opCombobox"
+msgid "greater than or equal to"
+msgstr "بزرگتر یا مساوی با"
+
+#. a6U8p
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:75
+msgctxt "conditionwin|opCombobox"
+msgid "less than or equal to"
+msgstr "کوچکتر یا مساوی با"
+
+#. oyAfN
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:107
+msgctxt "conditionwin|lhsButton"
+msgid "..."
+msgstr "..."
+
+#. RpKdu
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:129
+msgctxt "conditionwin|andLabel"
+msgid "and"
+msgstr "و"
+
+#. RGmoC
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:160
+msgctxt "conditionwin|rhsButton"
+msgid "..."
+msgstr "..."
+
+#. aHp52
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:214
+msgctxt "conditionwin|ToolBoxItem1"
+msgid "Bold"
+msgstr "سیاه"
+
+#. xWJCf
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:226
+msgctxt "conditionwin|ToolBoxItem2"
+msgid "Italic"
+msgstr "ایتالیک"
+
+#. n9Rga
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:238
+msgctxt "conditionwin|ToolBoxItem3"
+msgid "Underline"
+msgstr "زیرخط"
+
+#. XeLfz
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:260
+msgctxt "conditionwin|ToolBoxItem4"
+msgid "Background Color"
+msgstr "رنگ پس‌زمینه"
+
+#. bF2Nt
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:272
+msgctxt "conditionwin|ToolBoxItem5"
+msgid "Font Color"
+msgstr "رنگ قلم"
+
+#. Cr7CD
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:284
+msgctxt "conditionwin|ToolBoxItem6"
+msgid "Character Formatting"
+msgstr "قالب‌بندی نویسه"
+
+#. PSCFe
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:365
+msgctxt "conditionwin|removeButton"
+msgid "-"
+msgstr "-"
+
+#. bpiWB
+#: reportdesign/uiconfig/dbreport/ui/conditionwin.ui:378
+msgctxt "conditionwin|addButton"
+msgid "+"
+msgstr "+"
+
+#. EDzgm
+#: reportdesign/uiconfig/dbreport/ui/datetimedialog.ui:8
+msgctxt "datetimedialog|DateTimeDialog"
+msgid "Date and Time"
+msgstr "تاریخ و زمان"
+
+#. XAGJR
+#: reportdesign/uiconfig/dbreport/ui/datetimedialog.ui:94
+msgctxt "datetimedialog|date"
+msgid "_Include Date"
+msgstr "_استفاده از تاریخ"
+
+#. rtFMB
+#: reportdesign/uiconfig/dbreport/ui/datetimedialog.ui:113
+msgctxt "datetimedialog|datelistbox_label"
+msgid "_Format:"
+msgstr "_قالب"
+
+#. DRAAK
+#: reportdesign/uiconfig/dbreport/ui/datetimedialog.ui:125
+msgctxt "datetimedialog|time"
+msgid "Include _Time"
+msgstr "استفاده از _زمان"
+
+#. jWoqY
+#: reportdesign/uiconfig/dbreport/ui/datetimedialog.ui:144
+msgctxt "datetimedialog|timelistbox_label"
+msgid "Fo_rmat:"
+msgstr "قا_لب:"
+
+#. Kf2vH
+#: reportdesign/uiconfig/dbreport/ui/floatingfield.ui:16
+msgctxt "floatingfield|FloatingField"
+msgid "Sorting and Grouping"
+msgstr "مرتب‌سازی و گروه‌بندی"
+
+#. qqmgv
+#: reportdesign/uiconfig/dbreport/ui/floatingfield.ui:62
+msgctxt "floatingfield|up"
+msgid "Sort Ascending"
+msgstr "مرتب‌سازی صعودی"
+
+#. BRZT9
+#: reportdesign/uiconfig/dbreport/ui/floatingfield.ui:74
+msgctxt "floatingfield|down"
+msgid "Sort Descending"
+msgstr "مرتب‌سازی نزولی"
+
+#. 8eQMV
+#: reportdesign/uiconfig/dbreport/ui/floatingfield.ui:86
+msgctxt "floatingfield|delete"
+msgid "Remove sorting"
+msgstr "حذف مرتب‌سازی"
+
+#. cC8Ep
+#: reportdesign/uiconfig/dbreport/ui/floatingfield.ui:108
+msgctxt "floatingfield|insert"
+msgid "Insert"
+msgstr "درج"
+
+#. AjmhK
+#: reportdesign/uiconfig/dbreport/ui/floatingfield.ui:168
+msgctxt "floatingfield|helptext"
+msgid "Highlight the fields to insert into the selected section of the template, then click Insert or press Enter."
+msgstr "فیلدهایی که باید در بخش مشخص‌شده قالب درج شود را پررنگ کنید، سپس روی دکمهٔ «درج» کلیک کرده یا دکمه Enter را بزنید."
+
+#. DCm75
+#: reportdesign/uiconfig/dbreport/ui/floatingnavigator.ui:19
+msgctxt "floatingnavigator|FloatingNavigator"
+msgid "Report navigator"
+msgstr "پیمایش‌گر گزارش"
+
+#. J7Adn
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:13
+msgctxt "floatingsort|FloatingSort"
+msgid "Sorting and Grouping"
+msgstr "مرتب‌سازی و گروه‌بندی"
+
+#. LRhtG
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:76
+msgctxt "floatingsort|label5"
+msgid "Group actions"
+msgstr "عملیات گروهی"
+
+#. p6yrj
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:96
+msgctxt "floatingsort|up"
+msgid "Move up"
+msgstr "حرکت به بالا"
+
+#. g5fDX
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:108
+msgctxt "floatingsort|down"
+msgid "Move down"
+msgstr "حرکت به پایین"
+
+#. 8DZyc
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:120
+msgctxt "floatingsort|delete"
+msgid "Delete"
+msgstr "حذف"
+
+#. Bwg2f
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:163
+msgctxt "floatingsort|label1"
+msgid "Groups"
+msgstr "گروه‌ها"
+
+#. GwcRE
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:196
+msgctxt "floatingsort|label6"
+msgid "Sorting"
+msgstr "مرتب‌سازی"
+
+#. CJ99e
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:210
+msgctxt "floatingsort|label7"
+msgid "Group Header"
+msgstr "سرآیند گروه"
+
+#. hwKPG
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:224
+msgctxt "floatingsort|label8"
+msgid "Group Footer"
+msgstr "ته‌آیند گروه"
+
+#. GWWsG
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:238
+msgctxt "floatingsort|label9"
+msgid "Group On"
+msgstr "گروه‌بندی بر روی"
+
+#. uqrrE
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:252
+msgctxt "floatingsort|label10"
+msgid "Group Interval"
+msgstr "فاصله گروهی"
+
+#. iFmvA
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:266
+msgctxt "floatingsort|label11"
+msgid "Keep Together"
+msgstr "نگه‌داشتن کنار هم"
+
+#. tQbGB
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:283
+msgctxt "floatingsort|sorting"
+msgid "Ascending"
+msgstr "صعودی"
+
+#. QHkHZ
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:284
+msgctxt "floatingsort|sorting"
+msgid "Descending"
+msgstr "نزولی"
+
+#. LsRSa
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:299
+msgctxt "floatingsort|header"
+msgid "Present"
+msgstr "موجود"
+
+#. vnGGe
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:300
+msgctxt "floatingsort|header"
+msgid "Not present"
+msgstr "موجود نیست"
+
+#. xUAEz
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:315
+msgctxt "floatingsort|keep"
+msgid "No"
+msgstr "نه"
+
+#. mdUnC
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:316
+msgctxt "floatingsort|keep"
+msgid "Whole Group"
+msgstr "کل گروه"
+
+#. uCpDA
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:317
+msgctxt "floatingsort|keep"
+msgid "With First Detail"
+msgstr "با اولین جزئیات"
+
+#. A9ESx
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:332
+msgctxt "floatingsort|footer"
+msgid "Present"
+msgstr "موجود"
+
+#. a5oHV
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:333
+msgctxt "floatingsort|footer"
+msgid "Not present"
+msgstr "موجود نیست"
+
+#. MYqZY
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:348
+msgctxt "floatingsort|group"
+msgid "Each Value"
+msgstr "هر یک از مقادیر"
+
+#. Aey2X
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:376
+msgctxt "floatingsort|label2"
+msgid "Properties"
+msgstr "مشخصات"
+
+#. K86y3
+#: reportdesign/uiconfig/dbreport/ui/floatingsort.ui:410
+msgctxt "floatingsort|label3"
+msgid "Help"
+msgstr "راهنما"
+
+#. R66EH
+#: reportdesign/uiconfig/dbreport/ui/groupsortmenu.ui:12
+msgctxt "groupsortmenu|delete"
+msgid "_Delete"
+msgstr "_حذف"
+
+#. qYJKV
+#: reportdesign/uiconfig/dbreport/ui/navigatormenu.ui:12
+msgctxt "navigatormenu|sorting"
+msgid "Sorting and Grouping..."
+msgstr "مرتب‌سازی و گروه‌بندی..."
+
+#. Sj8Wi
+#: reportdesign/uiconfig/dbreport/ui/navigatormenu.ui:26
+msgctxt "navigatormenu|page"
+msgid "Page Header/Footer..."
+msgstr "سرصفحه/پاصفحه..."
+
+#. dCNEo
+#: reportdesign/uiconfig/dbreport/ui/navigatormenu.ui:34
+msgctxt "navigatormenu|report"
+msgid "Report Header/Footer..."
+msgstr "سرصفحه/پاصفحه گزارش..."
+
+#. tDRkM
+#: reportdesign/uiconfig/dbreport/ui/navigatormenu.ui:48
+msgctxt "navigatormenu|function"
+msgid "New Function"
+msgstr "تابع جدید"
+
+#. iunNU
+#: reportdesign/uiconfig/dbreport/ui/navigatormenu.ui:62
+msgctxt "navigatormenu|properties"
+msgid "Properties..."
+msgstr "مشخصات..."
+
+#. b84af
+#: reportdesign/uiconfig/dbreport/ui/navigatormenu.ui:70
+msgctxt "navigatormenu|delete"
+msgid "_Delete"
+msgstr "_حذف"
+
+#. 7yvyd
+#: reportdesign/uiconfig/dbreport/ui/pagedialog.ui:8
+msgctxt "pagedialog|PageDialog"
+msgid "Page Setup"
+msgstr "تنظیمات صفحه"
+
+#. C2GxE
+#: reportdesign/uiconfig/dbreport/ui/pagedialog.ui:138
+msgctxt "pagedialog|page"
+msgid "Page"
+msgstr "صفحه"
+
+#. DNNCb
+#: reportdesign/uiconfig/dbreport/ui/pagedialog.ui:185
+msgctxt "pagedialog|background"
+msgid "Background"
+msgstr "پس‌زمینه"
+
+#. kKtvD
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:8
+msgctxt "pagenumberdialog|PageNumberDialog"
+msgid "Page Numbers"
+msgstr "شماره‌های صفحه"
+
+#. wt9iJ
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:99
+msgctxt "pagenumberdialog|pagen"
+msgid "_Page N"
+msgstr "_صفحه N"
+
+#. MpNXo
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:115
+msgctxt "pagenumberdialog|pagenofm"
+msgid "Page _N of M"
+msgstr "صفحه _N از M"
+
+#. 2wFXb
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:135
+msgctxt "pagenumberdialog|label1"
+msgid "Format"
+msgstr "قالب"
+
+#. wMBh7
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:167
+msgctxt "pagenumberdialog|toppage"
+msgid "_Top of Page (Header)"
+msgstr "_بالای صفحه (سرصفحه)"
+
+#. Bt5Xv
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:183
+msgctxt "pagenumberdialog|bottompage"
+msgid "_Bottom of Page (Footer)"
+msgstr "_پایین صفحه (پانویس)"
+
+#. eLQVW
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:203
+msgctxt "pagenumberdialog|label2"
+msgid "Position"
+msgstr "موقعیت"
+
+#. LMkGF
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:241
+msgctxt "pagenumberdialog|alignment"
+msgid "Left"
+msgstr "چپ"
+
+#. s4C48
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:242
+msgctxt "pagenumberdialog|alignment"
+msgid "Center"
+msgstr "مرکز"
+
+#. X9UuN
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:243
+msgctxt "pagenumberdialog|alignment"
+msgid "Right"
+msgstr "راست"
+
+#. NRhEj
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:255
+msgctxt "pagenumberdialog|alignment_label"
+msgid "_Alignment:"
+msgstr "_هم‌ترازی"
+
+#. yWyC7
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:267
+msgctxt "pagenumberdialog|shownumberonfirstpage"
+msgid "Show Number on First Page"
+msgstr "نمایش شماره در صفحه اول"
+
+#. B7qwT
+#: reportdesign/uiconfig/dbreport/ui/pagenumberdialog.ui:286
+msgctxt "pagenumberdialog|label3"
+msgid "General"
+msgstr "عمومی"

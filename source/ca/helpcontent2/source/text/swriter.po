@@ -1,0 +1,3457 @@
+#. extracted from helpcontent2/source/text/swriter
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-03-01 23:55+0000\n"
+"Last-Translator: Joan Montané <joan@montane.cat>\n"
+"Language-Team: Catalan <https://translations.documentfoundation.org/projects/libo_help-7-5/textswriter/ca/>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.15.2\n"
+"X-Language: ca\n"
+"X-POOTLE-MTIME: 1557994516.000000\n"
+
+#. x2qZ6
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Mail Merge Toolbar"
+msgstr "Barra d'eines Combinació de correu"
+
+#. 6B2FA
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"hd_id201703240024554113\n"
+"help.text"
+msgid "<link href=\"text/swriter/mailmergetoolbar.xhp\">Mail Merge Toolbar</link>"
+msgstr "<link href=\"text/swriter/mailmergetoolbar.xhp\">Barra d'eines Combinació de correu</link>"
+
+#. HJAAB
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_id201703240025596148\n"
+"help.text"
+msgid "The Mail Merge Toolbar contains commands for the final steps of the mail merge process."
+msgstr "La barra d'eines Combinació de correu conté ordres per a dur a terme els passos finals del procés de combinació de correu."
+
+#. 9Ecmk
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_id030820161754175468\n"
+"help.text"
+msgid "Go to menu <item type=\"menuitem\">View - Toolbars</item> and select <item type=\"menuitem\">Mail Merge</item>"
+msgstr "Aneu al menú <item type=\"menuitem\">Visualitza ▸ Barres d'eines</item> i seleccioneu <item type=\"menuitem\">Combinació de correu</item>"
+
+#. BxVvc
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10559\n"
+"help.text"
+msgid "(Recipient number)"
+msgstr "(Número de destinatari)"
+
+#. 7GUxk
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN1055A\n"
+"help.text"
+msgid "<ahelp hid=\".\">Enter the address record number of a recipient to preview the mail merge document for the recipient.</ahelp>"
+msgstr "<ahelp hid=\".\">Introduïu el número de registre de l'adreça del destinatari per a previsualitzar-ne el document de combinació de correu.</ahelp>"
+
+#. qhsJA
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10604\n"
+"help.text"
+msgid "<ahelp hid=\".\">Use the browse buttons to scroll through the address records.</ahelp>"
+msgstr "<ahelp hid=\".\">Utilitzeu els botons de navegació per a desplaçar-vos a través dels registres d'adreça.</ahelp>"
+
+#. AV749
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN1055D\n"
+"help.text"
+msgid "Exclude recipient"
+msgstr "Exclou el destinatari"
+
+#. RBXJC
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10561\n"
+"help.text"
+msgid "<ahelp hid=\".\">Excludes the current recipient from this mail merge.</ahelp>"
+msgstr "<ahelp hid=\".\">Exclou el destinatari actual d'aquesta combinació de correu.</ahelp>"
+
+#. TFyWt
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10564\n"
+"help.text"
+msgid "Edit Individual Documents"
+msgstr "Edita els documents individuals"
+
+#. Qm2ty
+#: mailmergetoolbar.xhp
+msgctxt ""
+"mailmergetoolbar.xhp\n"
+"par_idN10556\n"
+"help.text"
+msgid "<ahelp hid=\".\">Creates a single merged document with page breaks between each recipient.</ahelp> The names and the addresses of the recipients are contained in the document, which can be customized as needed."
+msgstr "<ahelp hid=\".\">Crea un únic document amb salts de pàgina entre cada destinatari.</ahelp> Els noms i les adreces dels destinataris són al document i es poden personalitzar en funció de les vostres necessitats."
+
+#. 5JFds
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Welcome to the $[officename] Writer Help"
+msgstr "Us donem la benvinguda a l'ajuda del $[officename] Writer"
+
+#. CsmWo
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3147233\n"
+"help.text"
+msgid "%PRODUCTNAME Writer Help"
+msgstr "Ajuda del %PRODUCTNAME Writer"
+
+#. 6ZEFS
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3147258\n"
+"help.text"
+msgid "Working With %PRODUCTNAME Writer"
+msgstr "Treball amb el %PRODUCTNAME Writer"
+
+#. QmbGy
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3149131\n"
+"help.text"
+msgid "Menus, Toolbars, and Keys"
+msgstr "Menús, barres d'eines i tecles"
+
+#. Z6Hed
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3149183\n"
+"help.text"
+msgid "Help about the Help"
+msgstr "Ajuda sobre l'ajuda"
+
+#. aFUnY
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Menus"
+msgstr "Menús"
+
+#. NZfEG
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"hd_id3147274\n"
+"help.text"
+msgid "<variable id=\"main0100\"><link href=\"text/swriter/main0100.xhp\">Menus</link></variable>"
+msgstr "<variable id=\"main0100\"><link href=\"text/swriter/main0100.xhp\">Menús</link></variable>"
+
+#. b6Ayw
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"par_id3149569\n"
+"help.text"
+msgid "The following section lists the help topics available for menus and dialogs."
+msgstr "La secció següent mostra una llista dels temes d'ajuda disponibles per als menús i els diàlegs."
+
+#. PvGHJ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"tit\n"
+"help.text"
+msgid "File"
+msgstr "Fitxer"
+
+#. 7tAqJ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"hd_id3147331\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0101.xhp\">File</link>"
+msgstr "<link href=\"text/swriter/main0101.xhp\">Fitxer</link>"
+
+#. FEPdm
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"par_id3147352\n"
+"help.text"
+msgid "<ahelp hid=\".\">These commands apply to the current document, create a document, open an existing document, or close the application.</ahelp>"
+msgstr "<ahelp hid=\".\">Aquestes ordres s'apliquen al document actual, creació d'un document, obertura d'un document existent, o tancament de l'aplicació.</ahelp>"
+
+#. 6hchv
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit"
+msgstr "Edita"
+
+#. eZ87D
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id3149610\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0102.xhp\">Edit</link>"
+msgstr "<link href=\"text/swriter/main0102.xhp\">Edita</link>"
+
+#. EXvjU
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id3149626\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands for editing the contents of the current document.</ahelp>"
+msgstr "<ahelp hid=\".\">Aquest menú conté ordres per a editar el contingut del document actual.</ahelp>"
+
+#. TV7tD
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id3147619\n"
+"help.text"
+msgid "Select Text"
+msgstr "Selecciona text"
+
+#. Hug2v
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id102920150120455108\n"
+"help.text"
+msgid "Go to Page"
+msgstr "Ves a la pàgina"
+
+#. GjSQM
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id102920150120456660\n"
+"help.text"
+msgid "Opens a dialog box to enter which page number should be shown. (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+G</keycode>)"
+msgstr "Obre un diàleg per introduir quin número de pàgina s'ha de mostrar. (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Ordre</keycode></caseinline><defaultinline><keycode> Ctrl</keycode></defaultinline></switchinline><keycode> +G </keycode>)"
+
+#. xFstf
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id11603124968334\n"
+"help.text"
+msgid "Comment"
+msgstr "Comentari"
+
+#. vcHKd
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id941603125587454\n"
+"help.text"
+msgid "Shows submenu that gives options to reply to comments from other users, resolve and delete comments."
+msgstr "Mostra el submenú que proporciona opcions per a respondre els comentaris d'altres usuaris, resoldre i suprimir comentaris."
+
+#. FDHX2
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id0914201501170124\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/02140000.xhp\">Fields</link>"
+msgstr "<link href=\"text/swriter/01/02140000.xhp\">Camps</link>"
+
+#. 5RCMR
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id0914201501170171\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02180000.xhp\">External Links</link>"
+msgstr "<link href=\"text/shared/01/02180000.xhp\">Enllaços externs</link>"
+
+#. YAajd
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id0914201502131542\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02200000.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/02200000.xhp\">Objecte OLE</link>"
+
+#. DhwSa
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id102920150120456626\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18130000.xhp\">Direct Cursor Mode</link>"
+msgstr "<link href=\"text/swriter/02/18130000.xhp\">Mode de cursor directe</link>"
+
+#. 96mxR
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id102920150120459176\n"
+"help.text"
+msgid "Allows a user to click at the beginning, middle, or end of any possible text line on a page and then begin typing."
+msgstr "Permet a un usuari fer clic al començament, al mig o al final de qualsevol línia de text d'una pàgina i aleshores començar a escriure-hi."
+
+#. zRW8E
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"tit\n"
+"help.text"
+msgid "View"
+msgstr "Visualitza"
+
+#. prCMC
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3147233\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0103.xhp\">View</link>"
+msgstr "<link href=\"text/swriter/main0103.xhp\">Visualitza</link>"
+
+#. VjZcs
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id3147249\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands to control the on-screen display of the document, change the user interface and access the sidebar panels.</ahelp>"
+msgstr "<ahelp hid=\".\">Aquest menú conté ordres per a controlar la presentació en pantalla del document, canviar la interfície d'usuari i accedir a les barres laterals.</ahelp>"
+
+#. VDkey
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150703473580\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/03130000.xhp\">Normal</link>"
+msgstr "<link href=\"text/swriter/01/03130000.xhp\">Normal</link>"
+
+#. QDRrz
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150703478401\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/03120000.xhp\">Web</link>"
+msgstr "<link href=\"text/swriter/01/03120000.xhp\">Web</link>"
+
+#. nRv2U
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150854015048\n"
+"help.text"
+msgid "Scrollbars"
+msgstr "Barres de desplaçament"
+
+#. DW3uE
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150854017277\n"
+"help.text"
+msgid "Show or hide the horizontal and vertical scroll bars that are used to change the viewable area of a document that doesn't fit within the window."
+msgstr "Mostra o amaga les barres de desplaçament horitzontal i vertical que s'usen per a canviar l'àrea visible d'un document que no cap a la finestra."
+
+#. Qcoew
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_idN10613\n"
+"help.text"
+msgid "Table Boundaries"
+msgstr "Límits de la taula"
+
+#. cWSmD
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_idN107CA\n"
+"help.text"
+msgid "Shows or hides the borders of table cells that have no set borders. The boundaries are only visible on screen and are not printed."
+msgstr "Mostra o amaga les vores de les cel·les de les taules que no tenen vores. Els límits només són visibles en la pantalla i no s'imprimeixen."
+
+#. BGHSk
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150854011929\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "Imatges i diagrames"
+
+#. rFzz3
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150854013292\n"
+"help.text"
+msgid "Show or hide graphical objects like images and charts within a document."
+msgstr "Mostra o amaga els objectes gràfics d'un document, com ara imatges i diagrames."
+
+#. ewZgE
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150854019880\n"
+"help.text"
+msgid "Comments"
+msgstr "Comentaris"
+
+#. hjPDz
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150854014989\n"
+"help.text"
+msgid "Show or hide a document's comments and replies to them."
+msgstr "Mostra o amaga els comentaris i respostes d'un document."
+
+#. EWoyn
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id981573492083329\n"
+"help.text"
+msgid "Resolved comments"
+msgstr "Comentaris resolts"
+
+#. 8FzFE
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id331573492076499\n"
+"help.text"
+msgid "Show or hide <link href=\"text/shared/01/04050000.xhp#resolvecomments\">resolved comments</link>."
+msgstr "Permet mostrar o amagar els <link href=\"text/shared/01/04050000.xhp#resolvecomments\">comentaris resolts</link>."
+
+#. KqRGM
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3147265\n"
+"help.text"
+msgid "<link href=\"text/shared/01/03010000.xhp\">Zoom</link>"
+msgstr "<link href=\"text/shared/01/03010000.xhp\">Escala</link>"
+
+#. Dp7mC
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Insereix"
+
+#. aZsCM
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3155341\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0104.xhp\">Insert</link>"
+msgstr "<link href=\"text/swriter/main0104.xhp\">Insereix</link>"
+
+#. TgA97
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id3155358\n"
+"help.text"
+msgid "<ahelp hid=\".\">The Insert menu contains commands for inserting new elements in your document. This includes images, media, charts, objects from other applications, hyperlink, comments, symbols, footnotes, and sections.</ahelp>"
+msgstr "<ahelp hid=\".\">El menú Insereix conté ordres per a inserir elements nous en el document. Això inclou imatges, contingut multimèdia, diagrames, objectes d'altres aplicacions, enllaços, comentaris, símbols, notes al peu i seccions.</ahelp>"
+
+#. paR8F
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id030420160850525240\n"
+"help.text"
+msgid "Page Break"
+msgstr "Salt de pàgina"
+
+#. 8z5Gv
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id030420160850533104\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertPagebreak\">Inserts a manual page break at the current cursor position and places the cursor at the beginning of the next page.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertPagebreak\">Insereix un salt de pàgina manual en la posició actual del cursor i posa el cursor a l'inici de la pàgina següent.</ahelp>"
+
+#. mLs8G
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3158442\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">Image</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Imatge</link>"
+
+#. Bj8mG
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3147788\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\">Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\">Secció</link>"
+
+#. f3j54
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3149428\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\">Text from File</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\">Text des d'un fitxer</link>"
+
+#. G4BAP
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id030720160706334584\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01140000.xhp#textbox_title\">Textbox</link>"
+msgstr "<link href=\"text/shared/02/01140000.xhp#textbox_title\">Quadre de text</link>"
+
+#. GFNXQ
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3147281\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\">Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\">Adreça d'interès</link>"
+
+#. Bed3E
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id030420161125315689\n"
+"help.text"
+msgid "Horizontal Line"
+msgstr "Línia horitzontal"
+
+#. 7pGUa
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id030420161125315647\n"
+"help.text"
+msgid "Inserts a horizontal line at the current cursor position."
+msgstr "Insereix una línia horitzontal en la posició actual del cursor."
+
+#. N6J2x
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3149865\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04070000.xhp\">Envelope</link>"
+msgstr "<link href=\"text/swriter/01/04070000.xhp\">Sobre</link>"
+
+#. JP4tR
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format"
+msgstr "Format"
+
+#. DTAbu
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3147820\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0105.xhp\">Format</link>"
+msgstr "<link href=\"text/swriter/main0105.xhp\">Format</link>"
+
+#. XVBUU
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id3147218\n"
+"help.text"
+msgid "<ahelp hid=\".uno:FormatMenu\">Contains commands for formatting the layout and the contents of your document.</ahelp>"
+msgstr "<ahelp hid=\".uno:FormatMenu\">Conté ordres per a formatar la disposició i els continguts del document.</ahelp>"
+
+#. zjGX9
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id551602974854459\n"
+"help.text"
+msgid "Align Text"
+msgstr "Alinea el text"
+
+#. 7FD3V
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id741602974888780\n"
+"help.text"
+msgid "Opens a submenu where you can align text and objects."
+msgstr "Obre un submenú des d'on podreu alinear text i objectes."
+
+#. Vsjn5
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3147261\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">Caràcter</link>"
+
+#. SjBAg
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3147286\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">Paràgraf</link>"
+
+#. 7iyia
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id951602975070826\n"
+"help.text"
+msgid "Lists"
+msgstr "Llistes"
+
+#. MKjWR
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id461602975083850\n"
+"help.text"
+msgid "Opens a submenu where you can modify the formatting of list paragraphs."
+msgstr "Obre un submenú on podeu modificar la formatació dels paràgrafs de la llista."
+
+#. aJdFV
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3145784\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06050000.xhp\">Bullets and Numbering</link>"
+msgstr "<link href=\"text/shared/01/06050000.xhp\">Pics i numeració</link>"
+
+#. E6Eut
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id871602976197055\n"
+"help.text"
+msgid "Title Page"
+msgstr "Portada"
+
+#. crAFH
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id471602976213270\n"
+"help.text"
+msgid "Opens a dialog where you can design a title page."
+msgstr "Obre un diàleg on podreu dissenyar una portada."
+
+#. QKypm
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id201602976343046\n"
+"help.text"
+msgid "Comments"
+msgstr "Comentaris"
+
+#. ercCs
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id61602976356685\n"
+"help.text"
+msgid "When comments are present, the character dialog is presented. Changes to font and font formatting are applied to all comments."
+msgstr "Quan hi ha comentaris, es presenta el diàleg de caràcters. Els canvis en la formatació i en la lletra tipogràfica s'apliquen a tots els comentaris."
+
+#. ZZgeT
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3145743\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05040500.xhp\">Columns</link>"
+msgstr "<link href=\"text/swriter/01/05040500.xhp\">Columnes</link>"
+
+#. xxsJP
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id11602979335965\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/watermark.xhp\">Watermark</link>"
+msgstr "<link href=\"text/swriter/01/watermark.xhp\">Marca d'aigua</link>"
+
+#. GWQbW
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3145717\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/02170000.xhp\">Sections</link>"
+msgstr "<link href=\"text/swriter/01/02170000.xhp\">Seccions</link>"
+
+#. G7ZKH
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3149935\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060000.xhp\">Image</link>"
+msgstr "<link href=\"text/swriter/01/05060000.xhp\">Imatge</link>"
+
+#. FUiBn
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id881602977719329\n"
+"help.text"
+msgid "Frame and Object"
+msgstr "Marc i objecte"
+
+#. hLVBp
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id951602977746649\n"
+"help.text"
+msgid "Opens a submenu to link and unlink frames, and edit properties of a selected frame."
+msgstr "Obre un submenú per enllaçar i desenllaçar marcs i, editar les propietats d'un marc seleccionat."
+
+#. JWALC
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id871602978482880\n"
+"help.text"
+msgid "Rotate or Flip"
+msgstr "Gira o capgira"
+
+#. BpkEj
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id561602978499640\n"
+"help.text"
+msgid "Opens a submenu where you can rotate or and flip a selected shape or image. Text boxes can only be rotated."
+msgstr "Obre un submenú on podeu girar o capgirar una forma o imatge seleccionada. Els quadres de text només es poden girar."
+
+#. r9nLs
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools"
+msgstr "Eines"
+
+#. EQ4r3
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3147241\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0106.xhp\">Tools</link>"
+msgstr "<link href=\"text/swriter/main0106.xhp\">Eines</link>"
+
+#. UNAzE
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"par_id3147258\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains spelling tools, redact options, mail merge wizard, macros, development tools, extension manager, as well as tools for configuring and customizing menus, and setting program preferences.</ahelp>"
+msgstr "<ahelp hid=\".\">Conté eines d'ortografia, paràmetres de veladura, l'auxiliar de combinació de correu, macros, eines per a desenvolupar-ne, el gestor d'extensions i opcions per a configurar i personalitzar els menús i les preferències del programa.</ahelp>"
+
+#. ipUs6
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id691612907136111\n"
+"help.text"
+msgid "<link href=\"text/shared/02/18030000.xhp\">Automatic Spell Checking</link>"
+msgstr "<link href=\"text/shared/02/18030000.xhp\">Comprovació automàtica de l'ortografia</link>"
+
+#. RFxpX
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3156150\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02220000.xhp\">ImageMap</link>"
+msgstr "<link href=\"text/shared/01/02220000.xhp\">Mapa d'imatge</link>"
+
+#. c786T
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id621628789958422\n"
+"help.text"
+msgid "<link href=\"text/shared/guide/redaction.xhp\">Redact</link>"
+msgstr "<link href=\"text/shared/guide/redaction.xhp\">Emmascara</link>"
+
+#. GvGzQ
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id231628790402002\n"
+"help.text"
+msgid "<link href=\"text/shared/guide/auto_redact.xhp\">Auto-Redact</link>"
+msgstr "<link href=\"text/shared/guide/auto_redact.xhp\">Emmascarament automàtic</link>"
+
+#. ww9WA
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3149965\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06060000.xhp\">Chapter Numbering</link>"
+msgstr "<link href=\"text/swriter/01/06060000.xhp\">Numeració d'encapçalaments</link>"
+
+#. NcNiN
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3145688\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06180000.xhp\">Line Numbering</link>"
+msgstr "<link href=\"text/swriter/01/06180000.xhp\">Numeració de línies</link>"
+
+#. WctnW
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3145713\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06080000.xhp\">Footnotes and Endnotes</link>"
+msgstr "<link href=\"text/swriter/01/06080000.xhp\">Notes al peu i notes finals</link>"
+
+#. PYr7Y
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id501612910204859\n"
+"help.text"
+msgid "<link href=\"text/shared/01/01110101.xhp\">Address Book Source</link>"
+msgstr "<link href=\"text/shared/01/01110101.xhp\">Font de la llibreta d'adreces</link>"
+
+#. CXTEr
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3147346\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06100000.xhp\">Sort</link>"
+msgstr "<link href=\"text/swriter/01/06100000.xhp\">Ordena</link>"
+
+#. jVFic
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3147406\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06140000.xhp\">Customize</link>"
+msgstr "<link href=\"text/shared/01/06140000.xhp\">Personalitza</link>"
+
+#. KRfJh
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"tit\n"
+"help.text"
+msgid "Window"
+msgstr "Finestra"
+
+#. GwCED
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"hd_id3147248\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0107.xhp\">Window</link>"
+msgstr "<link href=\"text/swriter/main0107.xhp\">Finestra</link>"
+
+#. uGDRi
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"par_id3147269\n"
+"help.text"
+msgid "<ahelp hid=\".uno:WindowList\" visibility=\"visible\">Contains commands for manipulating and displaying document windows.</ahelp>"
+msgstr "<ahelp hid=\".uno:WindowList\" visibility=\"visible\">Conté ordres per a manipular i visualitzar les finestres dels documents.</ahelp>"
+
+#. zC2qE
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table"
+msgstr "Taula"
+
+#. v6SF2
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10553\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0110.xhp\">Table</link>"
+msgstr "<link href=\"text/swriter/main0110.xhp\">Taula</link>"
+
+#. DunBb
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10563\n"
+"help.text"
+msgid "<ahelp hid=\".\">Shows commands to insert, edit, and delete a table and its elements inside a text document.</ahelp>"
+msgstr "<ahelp hid=\".\">Mostra ordres per a inserir, editar i suprimir una taula en un document de text.</ahelp>"
+
+#. jBnDR
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B5\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\">Insert Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\">Insereix una taula</link>"
+
+#. YCMVU
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B8\n"
+"help.text"
+msgid "Inserts a new table."
+msgstr "Insereix una taula nova."
+
+#. cwdAZ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105AB\n"
+"help.text"
+msgid "Insert"
+msgstr "Insereix"
+
+#. bYChy
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id881605975490097\n"
+"help.text"
+msgid "<variable id=\"submenu\">Opens a submenu with the following command options:</variable>"
+msgstr "<variable id=\"submenu\">Obre un submenú amb les opcions d'ordres següents:</variable>"
+
+#. dAYGb
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id71605976065472\n"
+"help.text"
+msgid "Rows Above"
+msgstr "Files amunt"
+
+#. ETuzB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id811605976075887\n"
+"help.text"
+msgid "Insert a row above the row where the cursor is currently placed."
+msgstr "Inseriu una fila a sobre de la fila on es troba actualment el cursor."
+
+#. 3B4Ea
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id621605976125265\n"
+"help.text"
+msgid "Rows Below"
+msgstr "Files a sota"
+
+#. sZV4E
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id701605976138113\n"
+"help.text"
+msgid "Insert a row below the row where the cursor is currently placed."
+msgstr "Inseriu una fila a sota de la fila on es troba actualment el cursor."
+
+#. KfmGG
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105E5\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120400.xhp\">Rows</link>"
+msgstr "<link href=\"text/swriter/01/05120400.xhp\">Files</link>"
+
+#. AN99u
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105E8\n"
+"help.text"
+msgid "Opens dialog box for inserting rows."
+msgstr "Obre el quadre de diàleg per inserir files."
+
+#. FedsM
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id841605976313559\n"
+"help.text"
+msgid "Columns Before"
+msgstr "Columnes abans"
+
+#. 7CVcf
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id531605976347665\n"
+"help.text"
+msgid "Inserts a column before the column where the cursor is currently placed."
+msgstr "Insereix una columna abans de la columna on hi ha el cursor actualment."
+
+#. UE3RA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id21605976318849\n"
+"help.text"
+msgid "Columns After"
+msgstr "Columnes després"
+
+#. fooJR
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id731605976350615\n"
+"help.text"
+msgid "Inserts a column after the column where the cursor is currently placed."
+msgstr "Insereix una columna després de la columna on hi ha el cursor actualment."
+
+#. GM6FW
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105CD\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120400.xhp\">Columns</link>"
+msgstr "<link href=\"text/swriter/01/05120400.xhp\">Columnes</link>"
+
+#. i3nKB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105D0\n"
+"help.text"
+msgid "Opens dialog box for inserting columns."
+msgstr "Obre el diàleg per a inserir columnes."
+
+#. ttkBa
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105AF\n"
+"help.text"
+msgid "Delete"
+msgstr "Suprimeix"
+
+#. mkgZ4
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1066A\n"
+"help.text"
+msgid "Rows"
+msgstr "Files"
+
+#. ADvQJ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10616\n"
+"help.text"
+msgid "Deletes the selected rows."
+msgstr "Suprimeix les files seleccionades."
+
+#. TdA3g
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1060D\n"
+"help.text"
+msgid "Columns"
+msgstr "Columnes"
+
+#. egcgE
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10610\n"
+"help.text"
+msgid "Deletes the selected columns."
+msgstr "Suprimeix les columnes seleccionades."
+
+#. QTm9i
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1063E\n"
+"help.text"
+msgid "Table"
+msgstr "Taula"
+
+#. 4ExJk
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1060A\n"
+"help.text"
+msgid "<ahelp hid=\".\">Deletes the current table.</ahelp>"
+msgstr "<ahelp hid=\".\">Suprimeix la taula actual.</ahelp>"
+
+#. vCbDT
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B3\n"
+"help.text"
+msgid "Select"
+msgstr "Selecciona"
+
+#. EKDPA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10635\n"
+"help.text"
+msgid "Cell"
+msgstr "Cel·la"
+
+#. gBmZP
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10638\n"
+"help.text"
+msgid "<ahelp hid=\".\">Selects the current cell.</ahelp>"
+msgstr "<ahelp hid=\".\">Selecciona la cel·la actual.</ahelp>"
+
+#. HmSyb
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1062F\n"
+"help.text"
+msgid "Row"
+msgstr "Fila"
+
+#. WCPpF
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10632\n"
+"help.text"
+msgid "Selects the current row."
+msgstr "Selecciona la fila actual."
+
+#. vk5ie
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10629\n"
+"help.text"
+msgid "Column"
+msgstr "Columna"
+
+#. zB3JC
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1062C\n"
+"help.text"
+msgid "Selects the current column."
+msgstr "Selecciona la columna actual."
+
+#. TA2Qc
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10623\n"
+"help.text"
+msgid "Table"
+msgstr "Taula"
+
+#. MsH9h
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10626\n"
+"help.text"
+msgid "<ahelp hid=\".\">Selects the current table.</ahelp>"
+msgstr "<ahelp hid=\".\">Selecciona la taula actual.</ahelp>"
+
+#. 5eQNa
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105FB\n"
+"help.text"
+msgid "Size"
+msgstr "Mida"
+
+#. C4FY8
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106E9\n"
+"help.text"
+msgid "Row Height"
+msgstr "Alçada de la fila"
+
+#. NE7NJ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106EC\n"
+"help.text"
+msgid "Opens the Row Height dialog where you can change the height of a row."
+msgstr "Obre un quadre de diàleg per canviar l'alçada d'una fila."
+
+#. zBhmB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id451605990864684\n"
+"help.text"
+msgid "<link href=\"text/shared/01/minimal_row_height.xhp\">Minimal Row Height</link>"
+msgstr "<link href=\"text/shared/01/minimal_row_height.xhp\">Alçada mínima de fila</link>"
+
+#. EF7XB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106EF\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05110200.xhp\">Optimal Row Height</link>"
+msgstr "<link href=\"text/swriter/01/05110200.xhp\">Alçada òptima de la fila</link>"
+
+#. FqtLY
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10706\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05110600m.xhp\">Distribute Rows Evenly</link>"
+msgstr "<link href=\"text/shared/01/05110600m.xhp\">Distribueix les files uniformement</link>"
+
+#. pTncP
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106B5\n"
+"help.text"
+msgid "Column Width"
+msgstr "Amplada de la columna"
+
+#. cuCmA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106B8\n"
+"help.text"
+msgid "Opens the Column Width dialog where you can change the width of a column."
+msgstr "Obre un quadre de diàleg per canviar l'amplada d'una columna."
+
+#. qi4p9
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id671605991381461\n"
+"help.text"
+msgid "<link href=\"text/shared/01/minimal_column_width.xhp\">Minimal Column Width</link>"
+msgstr "<link href=\"text/shared/01/minimal_column_width.xhp\">Amplada mínima de columna</link>"
+
+#. Y4m4U
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106BB\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120200.xhp\">Optimal Column Width</link>"
+msgstr "<link href=\"text/swriter/01/05120200.xhp\">Amplada òptima de la columna</link>"
+
+#. yEGjw
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN106D2\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05120600.xhp\">Distribute Columns Evenly</link>"
+msgstr "<link href=\"text/shared/01/05120600.xhp\">Distribueix les columnes uniformement</link>"
+
+#. ChNkP
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105B7\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100100.xhp\">Merge Cells</link>"
+msgstr "<link href=\"text/shared/01/05100100.xhp\">Fusiona les cel·les</link>"
+
+#. T8apK
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105BB\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100200.xhp\">Split Cells</link>"
+msgstr "<link href=\"text/shared/01/05100200.xhp\">Divideix les cel·les</link>"
+
+#. LCqxC
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id371605978330177\n"
+"help.text"
+msgid "Protect Cells"
+msgstr "Protegeix les cel·les"
+
+#. GHXsD
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id531605978352545\n"
+"help.text"
+msgid "Unprotect Cells"
+msgstr "Desprotegeix les cel·les"
+
+#. 5CFq9
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN105F7\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05150101.xhp\">AutoFormat Styles</link>"
+msgstr "<link href=\"text/swriter/01/05150101.xhp\">Estils de formatació automàtica</link>"
+
+#. KRMHM
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1060F\n"
+"help.text"
+msgid "Number Format"
+msgstr "Format numèric"
+
+#. xfWAX
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN107AC\n"
+"help.text"
+msgid "Opens <link href=\"text/shared/optionen/01040500.xhp\">a dialog</link> where you can specify the format of numbers in the table."
+msgstr "Obre un <link href=\"text/shared/optionen/01040500.xhp\">diàleg</link> per a indicar el format dels nombres d'una taula."
+
+#. z2HSC
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id931605978707761\n"
+"help.text"
+msgid "<link href=\"text/swriter/guide/number_date_conv.xhp\">Number Recognition</link>"
+msgstr "<link href=\"text/swriter/guide/number_date_conv.xhp\">Reconeixement de nombres</link>"
+
+#. CW8ME
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id511605978897703\n"
+"help.text"
+msgid "Toggles the setting for automatically recognizing numbers or dates that you enter into a table cell, converting them from text to an appropriate number format."
+msgstr "Alterna la configuració per a reconèixer automàticament els números o les dates que introduïu en una cel·la de la taula, convertint-los de text a un format numèric adequat."
+
+#. kz8tL
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id711630938569930\n"
+"help.text"
+msgid "Header Rows Repeat Across Pages"
+msgstr "Les línies de capçalera es repeteix a les pàgines"
+
+#. pV6gM
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id451630938722616\n"
+"help.text"
+msgid "Repeat a table heading on each new page that the table spans."
+msgstr "Repeteix un encapçalament de taula a cada pàgina nova que ocupi la taula."
+
+#. kXsZH
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"hd_id191630938574129\n"
+"help.text"
+msgid "Rows to Break Across Pages"
+msgstr ""
+
+#. iUmYL
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_id841630938899606\n"
+"help.text"
+msgid "Allows a page break or column break inside a row of the table. This option is not applied to the first row in a table if the <emph>Repeat Heading</emph> option is selected."
+msgstr "Permet un salt de pàgina o un salt de columna dins d'una fila de la taula. Aquesta opció no s'aplica a la primera fila d'una taula si l'opció <emph>Repeteix l'encapçalament</emph> està seleccionada."
+
+#. kwKdS
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10603\n"
+"help.text"
+msgid "Convert"
+msgstr "Converteix"
+
+#. SCAJt
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1074C\n"
+"help.text"
+msgid "Text to Table"
+msgstr "Text a taula"
+
+#. tAGig
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1074F\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog where you can convert the selected text to a table.</ahelp> Opens <link href=\"text/swriter/01/06090000.xhp\">a dialog</link> where you can convert the selected text to a table."
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Obre un diàleg on podeu convertir el text seleccionat en una taula.</ahelp> Obre <link href=\"text/swriter/01/06090000.xhp\">un diàleg</link> on podeu convertir el text seleccionat en una taula."
+
+#. C9Sn9
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10763\n"
+"help.text"
+msgid "Table to Text"
+msgstr "Taula a text"
+
+#. LAbdZ
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10766\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog where you can convert the current table to text.</ahelp> Opens <link href=\"text/swriter/01/06090000.xhp\">a dialog</link> where you can convert the current table to text."
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Obre un diàleg per a convertir la taula seleccionada en text.</ahelp> Obre un <link href=\"text/swriter/01/06090000.xhp\">diàleg</link> per a convertir la taula actual en text."
+
+#. Y4qBD
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN1092F\n"
+"help.text"
+msgid "Text Formula"
+msgstr "Fórmula de text"
+
+#. xLmxB
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10933\n"
+"help.text"
+msgid "Opens the <link href=\"text/swriter/main0214.xhp\">Formula bar</link> to enter or edit a formula."
+msgstr "Obre la <link href=\"text/swriter/main0214.xhp\">barra de fórmules</link> per a introduir o editar una fórmula."
+
+#. HAZVY
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10607\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06100000.xhp\">Sort</link>"
+msgstr "<link href=\"text/swriter/01/06100000.xhp\">Ordena</link>"
+
+#. YtQGA
+#: main0110.xhp
+msgctxt ""
+"main0110.xhp\n"
+"par_idN10617\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05090000.xhp\">Properties</link>"
+msgstr "<link href=\"text/swriter/01/05090000.xhp\">Propietats</link>"
+
+#. JcZa3
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"tit\n"
+"help.text"
+msgid "Styles (menu)"
+msgstr "Estils (menú)"
+
+#. uvGcE
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_idN10553\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0115.xhp\">Styles</link>"
+msgstr "<link href=\"text/swriter/main0115.xhp\">Estils</link>"
+
+#. Ew4ac
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_idN10563\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains commands to apply, create, edit, update, load, and manage <link href=\"text/swriter/01/05130000.xhp\">styles</link> in a text document.</ahelp>"
+msgstr "<ahelp hid=\".\">Conté ordres per a aplicar, crear, modificar, actualitzar, carregar i gestionar <link href=\"text/swriter/01/05130000.xhp\">estils</link> en un document de text.</ahelp>"
+
+#. gsPnE
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id121529878513674\n"
+"help.text"
+msgid "Text styles entries"
+msgstr "Entrades dels estils de text"
+
+#. DEUQy
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id411529878520742\n"
+"help.text"
+msgid "The entries includes most common paragraph, character and list styles. Click on the style to apply."
+msgstr "Les entrades inclouen els estils de paràgraf, caràcter i llista més comuns. Feu clic a l'estil per a aplicar-lo."
+
+#. RW2Mb
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id451529878529005\n"
+"help.text"
+msgid "You can customize the list of styles entries using menu <link href=\"text/shared/01/06140100.xhp\"><emph>Tools - Customize</emph></link>. Because custom styles belongs to the actual document, remember to store the customized menu in the document scope."
+msgstr "Podeu personalitzar la llista d'entrades d'estils utilitzant el menú <link href=\"text/shared/01/06140100.xhp\"><emph> Eines ▸ Personalitza</emph></link>. Com que els estils personalitzats pertanyen al document actual, recordeu d'emmagatzemar el menú personalitzat en l'àmbit del document."
+
+#. 7kWCz
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id991529881414793\n"
+"help.text"
+msgid "Edit Style"
+msgstr "Edita l'estil"
+
+#. yrGy9
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id111529881420452\n"
+"help.text"
+msgid "Opens the Paragraph Style dialog box of the current paragraph."
+msgstr "Obre el diàleg Estil de paràgraf per al paràgraf actual."
+
+#. uAA8T
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id111529881431158\n"
+"help.text"
+msgid "Update Selected Style"
+msgstr "Actualitza l'estil seleccionat"
+
+#. ZwMWW
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id971529881437377\n"
+"help.text"
+msgid "Update the paragraph style with the <link href=\"text/shared/00/00000005.xhp#Section7\">direct formatting</link> applied to the current paragraph."
+msgstr "Actualitza l'estil de paràgraf amb la <link href=\"text/shared/00/00000005.xhp#Section7\">formatació directa</link> aplicada al paràgraf actual."
+
+#. DdHfV
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id191529881446409\n"
+"help.text"
+msgid "New Style from Selection"
+msgstr "Estil nou a partir de la selecció"
+
+#. gYvit
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id331529881457275\n"
+"help.text"
+msgid "Adds a paragraph style with the settings of the current selection. You will be prompted to enter the style name."
+msgstr "Afegeix un estil de paràgraf amb els paràmetres de la selecció actual. Se us sol·licitarà el nom de l'estil."
+
+#. 8cXPR
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id351529881470044\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05170000.xhp\">Load Styles from Template</link>"
+msgstr "<link href=\"text/swriter/01/05170000.xhp\">Carrega els estils de la plantilla</link>"
+
+#. EycDZ
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id551529883682302\n"
+"help.text"
+msgid "<link href=\"text/swriter/guide/load_styles.xhp\">Import styles</link> from another document or template into the current document."
+msgstr "<link href=\"text/swriter/guide/load_styles.xhp\">Importa els estils</link> d'un altre document o plantilla al document actual."
+
+#. Fec4Z
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"hd_id361529881482828\n"
+"help.text"
+msgid "Manage Styles"
+msgstr "Gestiona els estils"
+
+#. Er7Gx
+#: main0115.xhp
+msgctxt ""
+"main0115.xhp\n"
+"par_id901529883673111\n"
+"help.text"
+msgid "Opens the <link href=\"text/swriter/01/05140000.xhp\">Styles deck</link> in the sidebar."
+msgstr "Obre el <link href=\"text/swriter/01/05140000.xhp\">Tauler d'estils</link> de la barra lateral."
+
+#. VmXct
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"tit\n"
+"help.text"
+msgid "Form Menu"
+msgstr "Menú Formulari"
+
+#. 3vYDT
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id111529755027117\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0120.xhp\">Form</link>"
+msgstr "<link href=\"text/swriter/main0120.xhp\">Formulari</link>"
+
+#. p36K7
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id991529755027118\n"
+"help.text"
+msgid "<variable id=\"form_intro\"><ahelp hid=\".\">Contains commands for activate form design mode, enable/disable control wizards and insert form controls in your document.</ahelp></variable>"
+msgstr "<variable id=\"form_intro\"><ahelp hid=\".\">Conté les ordres per a activar el mode de disseny de formularis, activar o desactivar els assistents de control i inserir controls de formulari en el document.</ahelp></variable>"
+
+#. AdXBE
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id551529758534136\n"
+"help.text"
+msgid "Design Mode"
+msgstr "Mode de disseny"
+
+#. BFekR
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id791529758540932\n"
+"help.text"
+msgid "Enable or disable form design mode."
+msgstr "Activa o desactiva el mode de disseny de formularis."
+
+#. g2jWn
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id121529758546072\n"
+"help.text"
+msgid "Control Wizards"
+msgstr "Auxiliars de controls"
+
+#. 8G87B
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id271529758552229\n"
+"help.text"
+msgid "Enable or disable control wizards."
+msgstr "Activa o desactiva els auxiliar de controls."
+
+#. CoDTS
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id571529784049416\n"
+"help.text"
+msgid "More fields"
+msgstr "Més camps"
+
+#. cQUuS
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id951529784060420\n"
+"help.text"
+msgid "Date, time, numerical, currency and pattern form fields."
+msgstr "Camps de formulari de data, hora, numèric, moneda i emmascarat."
+
+#. cFn9D
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"hd_id811529763403256\n"
+"help.text"
+msgid "Automatic Control Focus"
+msgstr "Focus de control automàtic"
+
+#. SKPin
+#: main0120.xhp
+msgctxt ""
+"main0120.xhp\n"
+"par_id281529763411414\n"
+"help.text"
+msgid "Enable or disable Automatic Control Focus"
+msgstr "Activa o desactiva el focus de control automàtic"
+
+#. 5DRv5
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toolbars"
+msgstr "Barres d'eines"
+
+#. GAURx
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"hd_id3145782\n"
+"help.text"
+msgid "<variable id=\"main0200\"><link href=\"text/swriter/main0200.xhp\">Toolbars</link></variable>"
+msgstr "<variable id=\"main0200\"><link href=\"text/swriter/main0200.xhp\">Barres d'eines</link></variable>"
+
+#. FURde
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"par_id3145481\n"
+"help.text"
+msgid "This section provides an overview of the toolbars available in $[officename] Writer. <embedvar href=\"text/shared/00/00000007.xhp#symbolleistenneu\"/>"
+msgstr "Aquesta secció ofereix una perspectiva general de les barres d'eines disponibles al $[officename] Writer. <embedvar href=\"text/shared/00/00000007.xhp#symbolleistenneu\"/>"
+
+#. XUCUB
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formatting Bar"
+msgstr "Barra de formatació"
+
+#. NemzY
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3154270\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0202.xhp\">Formatting Bar</link>"
+msgstr "<link href=\"text/swriter/main0202.xhp\">Barra de formatació</link>"
+
+#. nFs3x
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3147762\n"
+"help.text"
+msgid "The Formatting bar contains several text formatting functions."
+msgstr "La barra Format conté diverses funcions de formatació de text."
+
+#. 5SXPT
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3149593\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#FontColor\">Font Color</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#FontColor\">Color de la lletra</link>"
+
+#. 9sJ5w
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3149887\n"
+"help.text"
+msgid "Additional icons"
+msgstr "Icones addicionals"
+
+#. 9gZ3B
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id0122200903085320\n"
+"help.text"
+msgid "Increase Font"
+msgstr "Augmenta la lletra"
+
+#. ozD6J
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0122200903085371\n"
+"help.text"
+msgid "<ahelp hid=\".\">Increases the font size of the selected text.</ahelp>"
+msgstr "<ahelp hid=\".\">Augmenta la mida de la lletra del text seleccionat.</ahelp>"
+
+#. 3oD2m
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id012220090308532\n"
+"help.text"
+msgid "Reduce Font"
+msgstr "Redueix la lletra"
+
+#. 222dq
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id0122200903085351\n"
+"help.text"
+msgid "<ahelp hid=\".\">Reduces the font size of the selected text.</ahelp>"
+msgstr "<ahelp hid=\".\">Redueix la mida de la lletra del text seleccionat.</ahelp>"
+
+#. 63ssr
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3149900\n"
+"help.text"
+msgid "If <link href=\"text/shared/00/00000005.xhp#ctl\">CTL</link> support is enabled, two additional icons are visible."
+msgstr "Si la compatibilitat amb <link href=\"text/shared/00/00000005.xhp#ctl\">CTL</link> està habilitada, es mostren dues icones addicionals."
+
+#. gHFFH
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3149946\n"
+"help.text"
+msgid "Left-To-Right"
+msgstr "D'esquerra a dreta"
+
+#. 9tEuw
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN10784\n"
+"help.text"
+msgid "<image id=\"img_id8354747\" src=\"cmd/sc_paralefttoright.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8354747\">left to right icon</alt></image>"
+msgstr "<image id=\"img_id8354747\" src=\"cmd/sc_paralefttoright.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8354747\">icona d'esquerra a dreta</alt></image>"
+
+#. Xg9vt
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3149964\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ParaLeftToRight\">The text is entered from left to right.</ahelp>"
+msgstr "<ahelp hid=\".uno:ParaLeftToRight\">El text s'introdueix d'esquerra a dreta.</ahelp>"
+
+#. TRxZq
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3147300\n"
+"help.text"
+msgid "Right-To-Left"
+msgstr "De dreta a esquerra"
+
+#. iE56r
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_idN107DF\n"
+"help.text"
+msgid "<image id=\"img_id2405774\" src=\"cmd/sc_pararighttoleft.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2405774\">right to left icon</alt></image>"
+msgstr "<image id=\"img_id2405774\" src=\"cmd/sc_pararighttoleft.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2405774\">icona de dreta a esquerra</alt></image>"
+
+#. TMwGp
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3147625\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ParaRightToLeft\">The text formatted in a complex text layout language is entered from right to left.</ahelp>"
+msgstr "<ahelp hid=\".uno:ParaRightToLeft\">El text formatat en un llenguatge de disposició de text complexa s'introdueix de dreta a esquerra.</ahelp>"
+
+#. BdpWg
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"tit\n"
+"help.text"
+msgid "Image Bar"
+msgstr "Barra d'imatges"
+
+#. JdoFF
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3154263\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0203.xhp\">Image Bar</link>"
+msgstr "<link href=\"text/swriter/main0203.xhp\">Barra d'imatges</link>"
+
+#. Wsrvu
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"par_id3147756\n"
+"help.text"
+msgid "<ahelp hid=\"HID_GRAFIK_TOOLBOX\">The <emph>Image</emph> Bar contains functions for formatting and positioning selected bitmap graphics.</ahelp>"
+msgstr "<ahelp hid=\"HID_GRAFIK_TOOLBOX\">La barra <emph>Imatges</emph> conté funcions per formatar els gràfics de mapa de bits seleccionats i posicionar-los.</ahelp>"
+
+#. DDVSp
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3145606\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060300.xhp\">Flip Vertically</link>"
+msgstr "<link href=\"text/swriter/01/05060300.xhp\">Inverteix verticalment</link>"
+
+#. FrHx9
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3145639\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060300.xhp\">Flip Horizontally</link>"
+msgstr "<link href=\"text/swriter/01/05060300.xhp\">Inverteix horitzontalment</link>"
+
+#. WPFE9
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3145673\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060000.xhp\">Graphics Properties</link>"
+msgstr "<link href=\"text/swriter/01/05060000.xhp\">Propietats dels gràfics</link>"
+
+#. Xtuxp
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table Bar"
+msgstr "Barra Taula"
+
+#. bxaip
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3145587\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0204.xhp\">Table Bar</link>"
+msgstr "<link href=\"text/swriter/main0204.xhp\">Barra Taula</link>"
+
+#. RA9Tm
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3154252\n"
+"help.text"
+msgid "<ahelp hid=\"HID_TABLE_TOOLBOX\">The <emph>Table </emph>Bar contains functions you need when working with tables. It appears when you move the cursor into a table.</ahelp>"
+msgstr "<ahelp hid=\"HID_TABLE_TOOLBOX\">La barra <emph>Taula</emph> conté les funcions que necessiteu quan treballeu amb taules. La barra apareix quan moveu el cursor cap a una taula.</ahelp>"
+
+#. KVWGF
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05110500.xhp\">Delete Row</link>"
+msgstr "<link href=\"text/swriter/01/05110500.xhp\">Suprimeix la fila</link>"
+
+#. WddDC
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147231\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120500.xhp\">Delete Column</link>"
+msgstr "<link href=\"text/swriter/01/05120500.xhp\">Suprimeix la columna</link>"
+
+#. GsoVm
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147592\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100100.xhp\">Merge Cells</link>"
+msgstr "<link href=\"text/shared/01/05100100.xhp\">Combina les cel·les</link>"
+
+#. USPoA
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id943333820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05150101.xhp\">AutoFormat</link>"
+msgstr "<link href=\"text/swriter/01/05150101.xhp\">Formatació automàtica</link>"
+
+#. uGJzG
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id94007820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/06100000.xhp\">Sort</link>"
+msgstr "<link href=\"text/swriter/01/06100000.xhp\">Ordena</link>"
+
+#. BHJGW
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"tit\n"
+"help.text"
+msgid "Drawing Object Properties Bar"
+msgstr "Barra Propietats de l'objecte de dibuix"
+
+#. takRR
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3154275\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0205.xhp\">Drawing Object Properties Bar</link>"
+msgstr "<link href=\"text/swriter/main0205.xhp\">Barra Propietats de l'objecte de dibuix</link>"
+
+#. k6L2d
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"par_id3147578\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DRAW_TOOLBOX\">You can see the <emph>Drawing Object Properties</emph> bar in Writer and Calc. Select the menu View - Toolbars - Drawing Object Properties. The controls are enabled when a drawing object is selected. You see some different icons by default, whether the current document is a text document or a spreadsheet.</ahelp>"
+msgstr "<ahelp hid=\"HID_DRAW_TOOLBOX\">Podeu veure la barra <emph>Propietats de l'objecte de dibuix</emph> al Writer i al Calc. Seleccioneu el menú Visualitza ▸ Barres d'eines ▸ Propietats de l'objecte de dibuix. Els controls s'habiliten quan se selecciona un objete de dibuix. Per defecte, es mostren icones diferents si el document actual és un document de text o si és un full de càlcul.</ahelp>"
+
+#. Xzm88
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147784\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Style</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Estil de la línia</link>"
+
+#. sbQFC
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147818\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Width</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Amplada de la línia</link>"
+
+#. MAqKS
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147229\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Color</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Color de la línia</link>"
+
+#. rV8so
+#: main0205.xhp
+msgctxt ""
+"main0205.xhp\n"
+"hd_id3147280\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05210100.xhp\">Area Style/Filling</link>"
+msgstr "<link href=\"text/shared/01/05210100.xhp\">Estil/emplenament de l'àrea</link>"
+
+#. KevCA
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"tit\n"
+"help.text"
+msgid "Bullets and Numbering Bar"
+msgstr "Barra Pics i numeració"
+
+#. 6PVYG
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"hd_id3154256\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0206.xhp\">Bullets and Numbering Bar</link>"
+msgstr "<link href=\"text/swriter/main0206.xhp\">Barra Pics i numeració</link>"
+
+#. qVzcD
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"par_id3154277\n"
+"help.text"
+msgid "<ahelp hid=\"HID_NUM_TOOLBOX\">The <emph>Bullets and Numbering</emph> bar contains functions to modify the structure of list paragraphs, including changing their order and list level.</ahelp>"
+msgstr "<ahelp hid=\"HID_NUM_TOOLBOX\">La barra de <emph>Pics i numeració</emph> conté funcions que modifiquen l'estructura dels paràgrafs de la llista, com ara canviar-ne l'ordre i el nivell que tenen a la llista.</ahelp>"
+
+#. do6CG
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"tit\n"
+"help.text"
+msgid "Status Bar (Writer)"
+msgstr "Barra d'estat (Writer)"
+
+#. XSLaB
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id3153397\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0208.xhp\">Status Bar</link>"
+msgstr "<link href=\"text/swriter/main0208.xhp\">Barra d'estat</link>"
+
+#. ir7r2
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id3153414\n"
+"help.text"
+msgid "The Status Bar contains information about the current document and offers various buttons with special functions."
+msgstr "La barra d'estat conté informació sobre el document actual i diversos botons amb funcions especials."
+
+#. 2GQ64
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id9648731\n"
+"help.text"
+msgid "Language"
+msgstr "Llengua"
+
+#. 922NG
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id8193914\n"
+"help.text"
+msgid "<ahelp hid=\".\">Displays the language for the selected text. Click to open a menu where you can choose another language for the selected text or for the current paragraph.</ahelp>"
+msgstr "<ahelp hid=\".\">Mostra la llengua del text seleccionat. Feu clic per a obrir un menú on podeu triar una altra llengua per al text seleccionat o per al paràgraf actual.</ahelp>"
+
+#. ADEdD
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id221603808238822\n"
+"help.text"
+msgid "Choose <menuitem>None</menuitem>  to exclude the text from spellchecking and hyphenation."
+msgstr "Trieu <menuitem>Cap</menuitem> per a excloure el text de la verificació ortogràfica i la partició de mots."
+
+#. BrkYL
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id691603808343437\n"
+"help.text"
+msgid "Choose <menuitem>Reset to Default Language</menuitem>  to re-apply the default language for the selection or the paragraph."
+msgstr "Trieu <menuitem>Restableix a la llengua predeterminada</menuitem> per a tornar a aplicar la llengua predeterminada per a la selecció o el paràgraf."
+
+#. YLVnp
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id291603808357876\n"
+"help.text"
+msgid "Choose <menuitem>More</menuitem> to open the character formatting dialog with more options."
+msgstr "Trieu <menuitem>Més</menuitem> per a obrir el diàleg de formatació de caràcters amb més opcions."
+
+#. zeCHC
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id0821200911015962\n"
+"help.text"
+msgid "Digital Signature"
+msgstr "Signatura digital"
+
+#. HYMp2
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id0821200911015941\n"
+"help.text"
+msgid "Click to start digital signature process.  You must have a digital certificate to complete the process. See also <link href=\"text/shared/guide/digital_signatures.xhp\">Digital Signatures</link>."
+msgstr "Feu clic per a iniciar el procés de signatura digital. Heu de tenir un certificat digital per a completar el procés. Vegeu també <link href=\"text/shared/guide/digitalsignatures.xhp\">Signatures digitals </link>."
+
+#. DqFNG
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id8070314\n"
+"help.text"
+msgid "Zoom & View Layout"
+msgstr "Disposició de visualització i escala"
+
+#. p8GUN
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id7723929\n"
+"help.text"
+msgid "Three controls on the Writer Status Bar allow you to change the zoom and view layout of your text documents."
+msgstr "Hi ha tres controls a la barra d'estat del Writer que us permeten canviar l'escala i la disposició de la visualització dels documents de text."
+
+#. yMrhF
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id3666188\n"
+"help.text"
+msgid "<ahelp hid=\".\">The View Layout icons show from left to right: Single column mode. View mode with pages side by side. Book mode with two pages as in an open book.</ahelp>"
+msgstr "<ahelp hid=\".\">Les icones de disposició de la visualització mostren, d'esquerra a dreta: mode d'una sola columna; mode de visualització amb les pàgines una al costat de l'altra; mode de llibre amb dues pàgines, com un llibre obert.</ahelp>"
+
+#. yF8fU
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id8796349\n"
+"help.text"
+msgid "<ahelp hid=\".\">Drag the Zoom slider to the left to show more pages, drag to the right to zoom into a page and show a smaller area of the page.</ahelp>"
+msgstr "<ahelp hid=\".\">Arrossegueu el botó d'escala cap a l'esquerra per mostrar més pàgines; arrossegueu-lo cap a la dreta per ampliar una pàgina i mostrar una àrea més petita d'aquesta.</ahelp>"
+
+#. JxuXA
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"tit\n"
+"help.text"
+msgid "Print Preview Bar (Writer)"
+msgstr "Barra de previsualització d'impressió (Writer)"
+
+#. fuQ93
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3145783\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0210.xhp\">Print Preview</link>"
+msgstr "<link href=\"text/swriter/main0210.xhp\">Previsualització d'impressió</link>"
+
+#. nQ4Bj
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3154253\n"
+"help.text"
+msgid "The <emph>Print Preview</emph> Bar appears when you view the current document in the print preview mode."
+msgstr "La barra <emph>Previsualització d'impressió</emph> apareix quan es visualitza el document actual en el mode de previsualització d'impressió."
+
+#. AUxvw
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id801649977850317\n"
+"help.text"
+msgid "Jump to Specific Page"
+msgstr "Salta a una pàgina específica"
+
+#. 4KMx6
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id891649977865555\n"
+"help.text"
+msgid "To go to a specific page in the Print Preview, type the page number in the entry box, then press <keycode>Enter</keycode>."
+msgstr "Per a anar a una pàgina específica en la previsualització d'impressió, escriviu el número de pàgina en el quadre d'entrada, i després n<keycode>Retorn</keycode>."
+
+#. Qijav
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id121649334614450\n"
+"help.text"
+msgid "Print"
+msgstr "Imprimeix"
+
+#. E9beE
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id641649334677475\n"
+"help.text"
+msgid "Open the Print dialog."
+msgstr "Obre el diàleg d'impressió."
+
+#. SiGWE
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id581649332297923\n"
+"help.text"
+msgid "Close Preview"
+msgstr "Tanca la previsualització"
+
+#. JewxS
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id101649332370147\n"
+"help.text"
+msgid "Exit from Print Preview."
+msgstr "Surt de la previsualització d'impressió."
+
+#. vrBnP
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id91649332206811\n"
+"help.text"
+msgid "<image src=\"cmd/lc_closepreview.png\" id=\"img_id451649332206811\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id221649332206811\">Close Preview Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_closepreview.png\" id=\"img_id451649332206811\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id221649332206811\">Icona de tancament de previsualització</alt></image>"
+
+#. ZTPfH
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id661649332206811\n"
+"help.text"
+msgid "Close Preview"
+msgstr "Tanca la previsualització"
+
+#. WmU6L
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"tit\n"
+"help.text"
+msgid "Rulers"
+msgstr "Regles"
+
+#. wayxW
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3154201\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0213.xhp\">Rulers</link>"
+msgstr "<link href=\"text/swriter/main0213.xhp\">Regles</link>"
+
+#. V4yDp
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154218\n"
+"help.text"
+msgid "Rulers display the dimensions of the page, and the position of tabs, indents, borders and columns. You can modify all of these on the rulers using the mouse."
+msgstr "Els regles mostren les dimensions de la pàgina i la posició dels tabuladors, els sagnats, els marges i les columnes. Tots ells es poden modificar sobre els regles utilitzant el ratolí."
+
+#. BLa7m
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154239\n"
+"help.text"
+msgid "By double-clicking on the ruler, you can open the <emph>Paragraph</emph> dialog and assign <link href=\"text/shared/00/00000005.xhp#formatting\">direct paragraph formatting</link> for the current paragraph or all selected paragraphs."
+msgstr "En fer doble clic al regle, es pot obrir el diàleg del <emph>Paràgraf</emph> i assignar la <link href=\"text/shared/00/00000005.xhp#formatting\">formatació de paràgraf directa</link> al paràgraf actual o a tots els paràgrafs seleccionats."
+
+#. LqCV4
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula Bar"
+msgstr "Barra de fórmules"
+
+#. Fqyww
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3145782\n"
+"help.text"
+msgid "<variable id=\"releistename\"><link href=\"text/swriter/main0214.xhp\">Formula Bar</link></variable>"
+msgstr "<variable id=\"releistename\"><link href=\"text/swriter/main0214.xhp\">Barra de fórmules</link></variable>"
+
+#. aQsd3
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3154254\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Formula</emph> Bar allows you to create and insert calculations into a text document.</ahelp> To activate the <emph>Formula</emph> Bar, press F2."
+msgstr "<ahelp hid=\".\">La barra de <emph>fórmules</emph> us permet crear i inserir càlculs en un document de text.</ahelp> Per activar la barra de <emph>fórmules</emph>, premeu F2."
+
+#. NmvGn
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"tit\n"
+"help.text"
+msgid "Frame Bar"
+msgstr "Barra Marc"
+
+#. bXUUZ
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3154251\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0215.xhp\">Frame Bar</link>"
+msgstr "<link href=\"text/swriter/main0215.xhp\">Barra Marc</link>"
+
+#. BfA2A
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3154272\n"
+"help.text"
+msgid "<ahelp hid=\"HID_FRAME_TOOLBOX\">When a frame is selected, the <emph>Frame </emph>Bar provides the most important functions for formatting and positioning the frame.</ahelp>"
+msgstr "<ahelp hid=\"HID_FRAME_TOOLBOX\">En seleccionar un marc, la barra <emph>Marc</emph> ofereix les funcions més bàsiques per formatar-lo i posicionar-lo.</ahelp>"
+
+#. jAEEf
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3147403\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap Off</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Ajustament desactivat</link>"
+
+#. PJcEB
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3147419\n"
+"help.text"
+msgid "You can also choose this setting on the <emph>Wrap</emph> tab page."
+msgstr "També podeu triar aquest paràmetre a la pàgina de la pestanya <emph>Ajusta</emph>."
+
+#. VZiGB
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3153388\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap On</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Activa l'ajustament</link>"
+
+#. oCsKA
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3153405\n"
+"help.text"
+msgid "This icon represents the <emph>Page Wrap</emph> option on the <emph>Wrap</emph> tab page."
+msgstr "Aquesta icona representa l'opció <emph>Ajust de pàgina</emph> a la pàgina de la pestanya <emph>Ajusta</emph>."
+
+#. sHPGv
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3147782\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap Through</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Ajusta a la línia</link>"
+
+#. 3UyQZ
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"par_id3147799\n"
+"help.text"
+msgid "You can also define this setting on the <emph>Wrap</emph> tab page."
+msgstr "També podeu definir aquest paràmetre a la pàgina de la pestanya <emph>Ajusta</emph>."
+
+#. pDxUm
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3151285\n"
+"help.text"
+msgid "<link href=\"text/shared/02/02170000.xhp\">Background Color</link>"
+msgstr "<link href=\"text/shared/02/02170000.xhp\">Color de fons</link>"
+
+#. AQeQ3
+#: main0215.xhp
+msgctxt ""
+"main0215.xhp\n"
+"hd_id3151320\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\">Frame Properties</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\">Propietats del marc</link>"
+
+#. uXf8a
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"tit\n"
+"help.text"
+msgid "OLE Object Bar"
+msgstr "Barra d'objectes OLE"
+
+#. YCkLT
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3150726\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0216.xhp\">OLE Object Bar</link>"
+msgstr "<link href=\"text/swriter/main0216.xhp\">Barra d'objecte OLE</link>"
+
+#. phgBb
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3150746\n"
+"help.text"
+msgid "<ahelp hid=\"HID_OLE_TOOLBOX\">The <emph>OLE Object</emph> bar appears when objects are selected, and contains the most important functions for formatting and positioning objects.</ahelp>"
+msgstr "<ahelp hid=\"HID_OLE_TOOLBOX\">La barra <emph>Objecte OLE</emph> apareix quan se seleccionen objectes, i conté les funcions més importants per a formatar i posicionar objectes.</ahelp>"
+
+#. 2gbs5
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3153377\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">No Wrap</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Sense ajustament</link>"
+
+#. wKChQ
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3153394\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/01/05060200.xhp#keinumlauftext\"/> You can also choose this setting on the <emph>Wrap</emph> tab page."
+msgstr "<embedvar href=\"text/swriter/01/05060200.xhp#keinumlauftext\"/> També podeu triar aquests paràmetres a la pestanya <emph>Ajusta</emph>."
+
+#. f4XEc
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3147766\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Ajusta</link>"
+
+#. AAfik
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3147782\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/01/05060200.xhp#seitenumlauftext\"/> This icon corresponds to the <emph>Page Wrap</emph> option on the <emph>Wrap</emph> tab page."
+msgstr "<embedvar href=\"text/swriter/01/05060200.xhp#seitenumlauftext\"/> Aquesta icona correspon a l'opció <emph>Ajustament de la pàgina</emph> de la pestanya <emph>Ajusta</emph>."
+
+#. xdFRN
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3147824\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060200.xhp\">Wrap Through</link>"
+msgstr "<link href=\"text/swriter/01/05060200.xhp\">Ajusta a la línia</link>"
+
+#. BqZSu
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"par_id3147218\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/01/05060200.xhp#durchlauftext\"/> You can also achieve the same effect through the <emph>Wrap</emph> tab page."
+msgstr "<embedvar href=\"text/swriter/01/05060200.xhp#durchlauftext\"/> Podeu aconseguir el mateix efecte a través de la pestanya <emph>Ajusta</emph>."
+
+#. DjMnH
+#: main0216.xhp
+msgctxt ""
+"main0216.xhp\n"
+"hd_id3151208\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05080000.xhp\">Object Properties</link>"
+msgstr "<link href=\"text/swriter/01/05080000.xhp\">Propietats dels objectes</link>"
+
+#. rDkoy
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text Object Bar"
+msgstr "Barra Objecte de text"
+
+#. HFpcv
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3155366\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0220.xhp\">Text Object Bar</link>"
+msgstr "<link href=\"text/swriter/main0220.xhp\">Barra Objecte de text</link>"
+
+#. AkAcR
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"par_id3155386\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DRAW_TEXT_TOOLBOX\">Contains formatting commands for text that is contained in a draw object.</ahelp> The <emph>Text Object</emph> bar appears when you double-click inside a draw object."
+msgstr "<ahelp hid=\"HID_DRAW_TEXT_TOOLBOX\">Conté ordres de formatació per a text que està contingut en un objecte de dibuix.</ahelp> La barra <emph>Objecte de text</emph> apareix quan feu doble clic en un objecte de dibuix."
+
+#. MHQMu
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3153416\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020500.xhp\">Superscript</link>"
+msgstr "<link href=\"text/shared/01/05020500.xhp\">Superíndex</link>"
+
+#. 5Mshp
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3147787\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020500.xhp\">Subscript</link>"
+msgstr "<link href=\"text/shared/01/05020500.xhp\">Subíndex</link>"
+
+#. roADF
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3147265\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02090000.xhp\">Select All</link>"
+msgstr "<link href=\"text/shared/01/02090000.xhp\">Selecciona-ho tot</link>"
+
+#. ELb3R
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3145596\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">Caràcter</link>"
+
+#. 26W37
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"hd_id3145631\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">Paràgraf</link>"
+
+#. tvQDK
+#: main0220.xhp
+msgctxt ""
+"main0220.xhp\n"
+"par_id3145649\n"
+"help.text"
+msgid "Here you can define the indents, spacing, alignment and line spacing for the paragraph currently selected."
+msgstr "Aquí podeu definir els sagnats, l'espaiat, l'alineació i l'interlineat per al paràgraf que està seleccionat actualment."
+
+#. Exd7Q
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] Writer Features"
+msgstr "Funcions del $[officename] Writer"
+
+#. boS3k
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3154243\n"
+"help.text"
+msgid "<variable id=\"main0503\"><link href=\"text/swriter/main0503.xhp\">$[officename] Writer Features</link></variable>"
+msgstr "<variable id=\"main0503\"><link href=\"text/swriter/main0503.xhp\">Funcions del $[officename] Writer</link></variable>"
+
+#. DVNHm
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3154263\n"
+"help.text"
+msgid "$[officename] Writer lets you design and produce text documents that can include graphics, tables, or charts. You can then save the documents in a variety of formats, including the standardized OpenDocument format (ODF), Microsoft Word .doc format, or HTML. And you can easily export your document to the Portable Document Format (PDF)."
+msgstr "El $[officename] Writer us permet dissenyar i produir documents de text que poden incloure gràfics, taules o diagrames. Podeu desar els documents en una gran varietat de formats, incloent-hi el format estandarditzat OpenDocument (ODF), el .doc del Microsoft Word o l'HTML. També podeu exportar fàcilment el document al format de document portàtil (PDF)."
+
+#. 4BzDB
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3147755\n"
+"help.text"
+msgid "Writing"
+msgstr "Escriptura"
+
+#. puGo7
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147768\n"
+"help.text"
+msgid "$[officename] Writer lets you create both basic documents, such as memos, <link href=\"text/shared/guide/fax.xhp\">faxes</link>, letters , resumes and <link href=\"text/swriter/01/01150000.xhp\">merge documents</link>, as well as long and complex or multi-part documents, complete with bibliographies, reference tables and indexes."
+msgstr "El $[officename] Writer us permet crear documents bàsics, com ara memòries, <link href=\"text/shared/guide/fax.xhp\">faxos</link>, cartes i currículums, així com <link href=\"text/swriter/01/01150000.xhp\">combinar documents</link>, o bé documents llargs i complexos o amb múltiples parts, completats amb bibliografies, taules de referència i índexs."
+
+#. 7XkBL
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147797\n"
+"help.text"
+msgid "$[officename] Writer also includes such useful features as a <link href=\"text/shared/01/06010000.xhp\">spellchecker</link>, a <link href=\"text/swriter/guide/using_thesaurus.xhp\">thesaurus</link>, <link href=\"text/shared/01/06040000.xhp\">AutoCorrect</link>, and <link href=\"text/swriter/01/06030000.xhp\">hyphenation</link> as well as a variety of templates for almost every purpose. You can also create your own templates using the wizards."
+msgstr "El $[officename] Writer també inclou funcions molt pràctiques com ara un <link href=\"text/shared/01/06010000.xhp\">verificador ortogràfic</link>, un <link href=\"text/swriter/guide/using_thesaurus.xhp\">tesaurus</link>, <link href=\"text/shared/01/06040000.xhp\">correcció automàtica</link> i <link href=\"text/swriter/01/06030000.xhp\">partició de mots</link>, així com una gran varietat de plantilles per a la majoria de les necessitats. També podeu utilitzar els auxiliars per a crear les vostres pròpies plantilles."
+
+#. TCYhh
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3147225\n"
+"help.text"
+msgid "Designing and Structuring"
+msgstr "Disseny i estructura"
+
+#. ZnMXj
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147239\n"
+"help.text"
+msgid "$[officename] offers a wide variety of options to design documents. Use the <link href=\"text/swriter/01/05140000.xhp\">Styles window</link> to create, assign and modify styles for paragraphs, individual characters, frames and pages. In addition, the <link href=\"text/swriter/01/02110000.xhp\">Navigator</link> helps you to quickly move around inside your documents, lets you look at your document in an outline view, and keeps track of the objects that you have inserted into your document."
+msgstr "El $[officename] ofereix un ventall ampli d'opcions per a dissenyar documents. Utilitzeu la <link href=\"text/swriter/01/05140000.xhp\">finestra d'estils</link> per a crear, assignar i modificar estils de paràgraf, caràcters individuals, marcs i pàgines. A més, el <link href=\"text/swriter/01/02110000.xhp\">Navegador</link> us ajuda a moure-us ràpidament pels documents, us permet visualitzar el document en una visualització d'esquema i fa un seguiment dels objectes que heu inserit en el document."
+
+#. Pxysg
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3147272\n"
+"help.text"
+msgid "You can also create various <link href=\"text/swriter/01/04120000.xhp\">indexes and tables</link> in text documents. You can define the structure and appearance of the indexes and tables according to your individual needs. Live hyperlinks and bookmarks let you jump directly to the corresponding items in the text."
+msgstr "També podeu crear diversos <link href=\"text/swriter/01/04120000.xhp\">índexs i taules</link> en els documents de text. Podeu definir l'estructura i l'aparença dels índexs i de les taules d'acord amb les vostres necessitats. Els enllaços i les adreces d'interès operatius us permeten saltar directament a l'element corresponent dins del text."
+
+#. Ewjax
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3145596\n"
+"help.text"
+msgid "Desktop Publishing with $[officename] Writer"
+msgstr "Autoedició amb el $[officename] Writer"
+
+#. bGD8q
+#: main0503.xhp
+#, fuzzy
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145610\n"
+"help.text"
+msgid "$[officename] Writer contains numerous desktop publishing and drawing tools to assist you in creating professionally styled documents, such as brochures, newsletters and invitations. You can format your documents with multi-column layouts, <link href=\"text/swriter/guide/text_frame.xhp\">frames</link>, <link href=\"text/swriter/guide/insert_graphic.xhp\">graphics</link>, <link href=\"text/swriter/guide/table_insert.xhp\">tables</link>, and other objects."
+msgstr "El $[officename] Writer conté nombroses eines de publicació i de dibuix d'escriptori per ajudar-vos a crear documents d'estil professional com fullets butlletins butlletins i invitacions. Podeu formatar els vostres documents amb disposicions multicolumna marcs <link href=\"text/swriter/guide/textframe.xhp\">gràfics <link href=\"text/swriter/guide/insertgraphic.xhp\"></link> taules</link> <link href=\"text/swriter/guide/tableinsert.xhp\"></link> i altres objectes."
+
+#. EpFCE
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3145649\n"
+"help.text"
+msgid "Calculations"
+msgstr "Càlculs"
+
+#. pGSXF
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145663\n"
+"help.text"
+msgid "Text documents in $[officename] have an integrated <link href=\"text/swriter/main0214.xhp\">calculation function</link> that helps you execute sophisticated calculations or logical links. You can easily create a table in a text document in order to perform calculations."
+msgstr "Els documents de text del $[officename] tenen integrada una <link href=\"text/swriter/main0214.xhp\">funció de càlcul</link> que us ajuda a realitzar càlculs complexos o enllaços lògics. Us resultarà molt fàcil crear una taula en un document de text per tal de fer càlculs."
+
+#. jKeQK
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3151192\n"
+"help.text"
+msgid "Creating Drawings"
+msgstr "Creació de dibuixos"
+
+#. iHHaA
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3151206\n"
+"help.text"
+msgid "The $[officename] Writer <link href=\"text/shared/02/01140000.xhp\">drawing tool</link> lets you create drawings, graphics, legends, and other types of drawings directly in text documents."
+msgstr "L'<link href=\"text/shared/02/01140000.xhp\">eina de dibuix</link> del $[officename] Writer us permet crear dibuixos, gràfics, signes i altres tipus de dibuixos directament en els documents de text."
+
+#. 3GNE9
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3151229\n"
+"help.text"
+msgid "Inserting Graphics"
+msgstr "Inserció de gràfics"
+
+#. q9LTp
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3151243\n"
+"help.text"
+msgid "You can insert pictures with <link href=\"text/shared/00/00000020.xhp\">different formats</link> into a text document, including graphics with a JPG or GIF format. In addition, the <link href=\"text/shared/01/gallery.xhp\">Gallery</link> provides a collection of clipart graphics, and the <link href=\"text/shared/guide/fontwork.xhp\">Fontwork Gallery</link> creates stunning font effects."
+msgstr "Podeu inserir imatges amb <link href=\"text/shared/00/00000020.xhp\">formats diferents</link> dins d'un document de text, incloent-hi gràfics amb format JPG o GIF. A més, la <link href=\"text/shared/01/gallery.xhp\">Galeria</link> proporciona una col·lecció de gràfics predissenyats, i la <link href=\"text/shared/guide/fontwork.xhp\">Galeria Fontwork</link> crea efectes impressionants sobre els tipus de lletra."
+
+#. pNEHk
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155084\n"
+"help.text"
+msgid "Flexible Application Interface"
+msgstr "Interfície d'aplicació flexible"
+
+#. Fc9Cx
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3155098\n"
+"help.text"
+msgid "The program interface is designed so that you can configure it according to your preferences, including customizing icons and menus. You can position various program windows, such as the Styles window or the Navigator as floating windows anywhere on the screen. You can also <link href=\"text/shared/guide/autohide.xhp\">dock</link> some windows to the edge of the workspace."
+msgstr "La interfície de l'aplicació s'ha dissenyat de manera que la pugueu configurar d'acord amb les vostres preferències; podeu personalitzar les icones i els menús, entre d'altres. Podeu posicionar diverses finestres de l'aplicació, com ara la finestra d'estils o del Navegador, en qualsevol part de la pantalla. També podeu <link href=\"text/shared/guide/autohide.xhp\">acoblar</link> finestres al cantó de l'àrea de treball."
+
+#. AApwS
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155123\n"
+"help.text"
+msgid "Drag&Drop"
+msgstr "Arrossega i deixa anar"
+
+#. D3NCe
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3155137\n"
+"help.text"
+msgid "The <link href=\"text/shared/guide/dragdrop.xhp\">drag-and-drop</link> feature enables you to work quickly and efficiently with text documents in $[officename]. For example, you can drag-and-drop objects, such as graphics from the Gallery, from one location to another in the same document, or between open $[officename] documents."
+msgstr "La funció <link href=\"text/shared/guide/dragdrop.xhp\">arrossega i deixa anar</link> us permet treballar amb documents de text al $[officename] de manera ràpida i efectiva. Per exemple, podeu arrossegar i deixar anar objectes (com ara gràfics de la galeria) d'un lloc a un altre dins del mateix document, o entre documents del $[officename] oberts."
+
+#. D3wvZ
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155162\n"
+"help.text"
+msgid "Help Functions"
+msgstr "Funcions d'ajuda"
+
+#. BEBTR
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145675\n"
+"help.text"
+msgid "You can use the <link href=\"text/shared/05/00000110.xhp\">Help system</link> as a complete reference for $[officename] applications, including <link href=\"text/swriter/guide/main.xhp\">instructions</link> for simple and complex tasks."
+msgstr "Podeu utilitzar el <link href=\"text/shared/05/00000110.xhp\">sistema d'ajuda</link> com a referència completa per a les aplicacions del $[officename], que inclou <link href=\"text/swriter/guide/main.xhp\">instruccions</link> per dur a terme tasques simples i complexes."
+
+#. 98N4J
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Navigate Toolbar"
+msgstr ""
+
+#. CfHqE
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"bm_id131655501267679\n"
+"help.text"
+msgid "<bookmark_value>navigate forward</bookmark_value>    <bookmark_value>navigate backward</bookmark_value>"
+msgstr ""
+
+#. GfGdk
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"hd_id111655496106993\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/swriter/navigate_toolbar.xhp\">Navigate Toolbar</link></variable>"
+msgstr ""
+
+#. DRFce
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id451655496106996\n"
+"help.text"
+msgid "Open Navigate toolbar."
+msgstr ""
+
+#. FsFCu
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id921655501737088\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars - Navigation</menuitem>."
+msgstr ""
+
+#. CGzuK
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"hd_id271655497247655\n"
+"help.text"
+msgid "Navigate forward"
+msgstr ""
+
+#. JCuNM
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id81655499487679\n"
+"help.text"
+msgid "Jump to the next object."
+msgstr ""
+
+#. eQka2
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id791655500839247\n"
+"help.text"
+msgid "<image src=\"cmd/lc_nextrecord.svg\" id=\"img_id981655500839247\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id311655500839247\">Icon Forward</alt></image>"
+msgstr ""
+
+#. HLxC8
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id951655500839248\n"
+"help.text"
+msgid "Icon Forward"
+msgstr ""
+
+#. ihdNa
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"hd_id681655497252447\n"
+"help.text"
+msgid "Navigate backward"
+msgstr ""
+
+#. 3RAwT
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id701655499492679\n"
+"help.text"
+msgid "Jump to the previous object."
+msgstr ""
+
+#. oAeFc
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id381655500856490\n"
+"help.text"
+msgid "<image src=\"cmd/lc_prevrecord.svg\" id=\"img_id521655500856490\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id971655500856491\">Icon Back</alt></image>"
+msgstr ""
+
+#. 9ApJJ
+#: navigate_toolbar.xhp
+msgctxt ""
+"navigate_toolbar.xhp\n"
+"par_id41655500856491\n"
+"help.text"
+msgid "Icon Back"
+msgstr ""
+
+#. DNbRR
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Track Changes Toolbar"
+msgstr "Barra d'eines Seguiment de canvis"
+
+#. 6QbmX
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id671647012520594\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/swriter/track_changes_toolbar.xhp\">Track Changes Toolbar</link></variable>"
+msgstr "<variable id=\"h1\"><link href=\"text/swriter/track_changes_toolbar.xhp\">Barra d'eines Seguiment de canvis</link></variable>"
+
+#. 4XWe5
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id471647012520596\n"
+"help.text"
+msgid "Contains the commands that are available for tracking changes in your file."
+msgstr "Conté les ordres disponibles per a fer el seguiment de canvis al fitxer."
+
+#. iUjGN
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id261647012734234\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars - Track Changes</menuitem>."
+msgstr "Trieu <menuitem>Visualitza ▸ Barres d'eines ▸ Seguiment de canvis</menuitem>."
+
+#. T8AaM
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id221647013245370\n"
+"help.text"
+msgid "<image src=\"cmd/lc_showtrackedchanges.svg\" id=\"img_id801647013245371\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821647013245372\">Icon Show track changes</alt></image>"
+msgstr ""
+
+#. eBTMj
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id31647013245373\n"
+"help.text"
+msgid "Show track changes"
+msgstr ""
+
+#. FSoq4
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id791647013362400\n"
+"help.text"
+msgid "<image src=\"cmd/lc_trackchanges.svg\" id=\"img_id921647013362401\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id561647013362402\">Icon Record Changes</alt></image>"
+msgstr "<image src=\"cmd/lc_trackchanges.svg\" id=\"img_id921647013362401\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id561647013362402\">Icona Enregistra els canvis</alt></image>"
+
+#. BxM8k
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id781647013362404\n"
+"help.text"
+msgid "Record Changes"
+msgstr "Enregistra els canvis"
+
+#. R7EFt
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id731647013552967\n"
+"help.text"
+msgid "Previous Track Change"
+msgstr ""
+
+#. nxbjC
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id901647013566069\n"
+"help.text"
+msgid "<image src=\"cmd/lc_previoustrackedchange.svg\" id=\"img_id151647013566070\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id981647013566071\">Icon Previous track change</alt></image>"
+msgstr ""
+
+#. poJng
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id391647013566073\n"
+"help.text"
+msgid "Previous track change"
+msgstr ""
+
+#. v76PF
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id551647013674361\n"
+"help.text"
+msgid "Next Track Change"
+msgstr ""
+
+#. NyWdo
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id231647013679440\n"
+"help.text"
+msgid "<image src=\"cmd/lc_nexttrackedchange.svg\" id=\"img_id1001647013679441\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id971647013679442\">Icon Next track change</alt></image>"
+msgstr ""
+
+#. XE2LH
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id531647013679443\n"
+"help.text"
+msgid "Next track change"
+msgstr ""
+
+#. cniUB
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id421647013795427\n"
+"help.text"
+msgid "Accept Track Change"
+msgstr ""
+
+#. UgReW
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id1001647013785665\n"
+"help.text"
+msgid "<image src=\"cmd/lc_accepttrackedchange.svg\" id=\"img_id491647013785666\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id301647013785667\">Icon Accept Track Change</alt></image>"
+msgstr ""
+
+#. qe8kW
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id971647013785668\n"
+"help.text"
+msgid "Accept Track Change"
+msgstr ""
+
+#. 37qtQ
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id871647013918576\n"
+"help.text"
+msgid "Reject Track Change"
+msgstr ""
+
+#. Dw5dd
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id981647013912301\n"
+"help.text"
+msgid "<image src=\"cmd/lc_rejecttrackedchange.svg\" id=\"img_id931647013912302\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id811647013912303\">Icon Reject Track Change</alt></image>"
+msgstr ""
+
+#. D68WB
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id21647013912304\n"
+"help.text"
+msgid "Reject Track Change"
+msgstr ""
+
+#. DZWAf
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id991647014048136\n"
+"help.text"
+msgid "Accept All Tracked Changes"
+msgstr ""
+
+#. 6FjwL
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id161647014053976\n"
+"help.text"
+msgid "<image src=\"cmd/lc_acceptalltrackedchanges.svg\" id=\"img_id981647014053977\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761647014053978\">Icon Accept All Tracked Changes</alt></image>"
+msgstr ""
+
+#. B8Sna
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id701647014053979\n"
+"help.text"
+msgid "Accept All Tracked Changes"
+msgstr ""
+
+#. CxSzX
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id341647014115494\n"
+"help.text"
+msgid "Reject All Tracked Changes"
+msgstr ""
+
+#. Nh45F
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id891647014121791\n"
+"help.text"
+msgid "<image src=\"cmd/lc_rejectalltrackedchanges.svg\" id=\"img_id141647014121792\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id861647014121793\">Icon Reject All Tracked Changes</alt></image>"
+msgstr ""
+
+#. YAGs7
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id451647014121795\n"
+"help.text"
+msgid "Reject All Tracked Changes"
+msgstr ""
+
+#. aEELF
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id901647014258055\n"
+"help.text"
+msgid "Accept Track Change and select next one"
+msgstr ""
+
+#. vCCQp
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id511647014293796\n"
+"help.text"
+msgid "<image src=\"cmd/lc_accepttrackedchangetonext.svg\" id=\"img_id791647014293797\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id611647014293798\">Icon Accept Track Change and select next one</alt></image>"
+msgstr ""
+
+#. 2E2qH
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id851647014293800\n"
+"help.text"
+msgid "Accept Track Change and select next one"
+msgstr ""
+
+#. o2wCB
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"hd_id451647014408416\n"
+"help.text"
+msgid "Reject Track Change and select next one"
+msgstr ""
+
+#. LGqTK
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id971647014413668\n"
+"help.text"
+msgid "<image src=\"cmd/lc_rejecttrackedchangetonext.svg\" id=\"img_id631647014413669\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id661647014413670\">Icon Reject Track Change and select next one</alt></image>"
+msgstr ""
+
+#. h9smy
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id361647014413671\n"
+"help.text"
+msgid "Reject Track Change and select next one"
+msgstr ""
+
+#. s3jxf
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id721647014498850\n"
+"help.text"
+msgid "<image src=\"cmd/lc_accepttrackedchanges.svg\" id=\"img_id551647014498851\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381647014498852\">Icon Manage Track Changes</alt></image>"
+msgstr ""
+
+#. nyhMH
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id641647014498854\n"
+"help.text"
+msgid "Manage Track Changes"
+msgstr ""
+
+#. WAoEE
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id111647018300377\n"
+"help.text"
+msgid "<image src=\"cmd/lc_shownote.svg\" id=\"img_id271647018300378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id61647018300380\">Icon Insert Comment</alt></image>"
+msgstr "<image src=\"cmd/lc_shownote.svg\" id=\"img_id271647018300378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id61647018300380\">Icona Insereix un comentari</alt></image>"
+
+#. JRJZp
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id851647018300382\n"
+"help.text"
+msgid "Insert Comment"
+msgstr "Insereix un comentari"
+
+#. KxwHJ
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id411647015103299\n"
+"help.text"
+msgid "<image src=\"cmd/lc_commentchangetracking.svg\" id=\"img_id181647015103300\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381647015103301\">Icon Insert Track Change Comment</alt></image>"
+msgstr ""
+
+#. w43CP
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id611647015103302\n"
+"help.text"
+msgid "Insert Track Change Comment"
+msgstr ""
+
+#. vHtJD
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id481647015406606\n"
+"help.text"
+msgid "<image src=\"cmd/lc_protecttracechangemode.svg\" id=\"img_id591647015406607\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id311647015406608\">Icon Protect Changes</alt></image>"
+msgstr ""
+
+#. GrZBC
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id901647015406609\n"
+"help.text"
+msgid "Protect Changes"
+msgstr ""
+
+#. n4z84
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id611647015829636\n"
+"help.text"
+msgid "<image src=\"cmd/lc_comparedocuments.svg\" id=\"img_id31647015829637\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id691647015829638\">Icon Compare Document</alt></image>"
+msgstr ""
+
+#. RxYUx
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id441647015829640\n"
+"help.text"
+msgid "Compare Document"
+msgstr ""
+
+#. RMv9v
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id331647019044607\n"
+"help.text"
+msgid "<image src=\"cmd/lc_mergedocuments.svg\" id=\"img_id271647019044609\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id451647019044610\">Icon Merge Document</alt></image>"
+msgstr ""
+
+#. GPhfh
+#: track_changes_toolbar.xhp
+msgctxt ""
+"track_changes_toolbar.xhp\n"
+"par_id201647019044612\n"
+"help.text"
+msgid "Merge Document"
+msgstr ""

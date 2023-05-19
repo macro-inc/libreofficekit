@@ -1,0 +1,362 @@
+#. extracted from shell/source/win32/shlxthandler/res
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2018-01-15 19:20+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: brx\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1516044023.000000\n"
+
+#. nMHZG
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE%\n"
+"LngText.text"
+msgid "Title"
+msgstr "बिमुं"
+
+#. 7QBxh
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE_COLON%\n"
+"LngText.text"
+msgid "Title:"
+msgstr "बिमुं"
+
+#. UGL46
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT%\n"
+"LngText.text"
+msgid "Subject"
+msgstr "आयदा"
+
+#. Rqom8
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT_COLON%\n"
+"LngText.text"
+msgid "Subject:"
+msgstr "आयदा"
+
+#. BbVSy
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR%\n"
+"LngText.text"
+msgid "Author"
+msgstr "लिरगिरि"
+
+#. 6eSDz
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR_COLON%\n"
+"LngText.text"
+msgid "Author:"
+msgstr "लिरगिरि"
+
+#. nA6Zp
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS%\n"
+"LngText.text"
+msgid "Keywords"
+msgstr "गाहाय सोदोब"
+
+#. hJatc
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS_COLON%\n"
+"LngText.text"
+msgid "Keywords:"
+msgstr "गाहाय सोदोब"
+
+#. NyeBb
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS%\n"
+"LngText.text"
+msgid "Comments"
+msgstr "सुद' लिरथाय"
+
+#. tN79v
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS_COLON%\n"
+"LngText.text"
+msgid "Comments:"
+msgstr "सुद' लिरथाय"
+
+#. C7AUH
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PAGES%\n"
+"LngText.text"
+msgid "Pages"
+msgstr "बिखंफोर"
+
+#. vhAWA
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TABLES%\n"
+"LngText.text"
+msgid "Tables"
+msgstr "फारिलाइफोर"
+
+#. VNMuj
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%GRAPHICS%\n"
+"LngText.text"
+msgid "Images"
+msgstr "मुसुखाफोर"
+
+#. WePDJ
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OBJECTS%\n"
+"LngText.text"
+msgid "Objects"
+msgstr "मुवाफोर"
+
+#. CXU2C
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OLE_OBJECTS%\n"
+"LngText.text"
+msgid "OLE Objects"
+msgstr "OLE बेसाद"
+
+#. zATfj
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PARAGRAPHS%\n"
+"LngText.text"
+msgid "Paragraphs"
+msgstr "आनथोरफोर"
+
+#. S4c4V
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%WORDS%\n"
+"LngText.text"
+msgid "Words"
+msgstr "सोदोब"
+
+#. D4Ywc
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CHARACTERS%\n"
+"LngText.text"
+msgid "Characters"
+msgstr "हांखो"
+
+#. 8LRV5
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ROWS%\n"
+"LngText.text"
+msgid "Lines"
+msgstr "सारिफोर"
+
+#. UhaXY
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ORIGIN%\n"
+"LngText.text"
+msgid "Origin"
+msgstr "गुबै"
+
+#. eEVzH
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%VERSION%\n"
+"LngText.text"
+msgid "Version"
+msgstr "भारसन"
+
+#. CGpUh
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SHEETS%\n"
+"LngText.text"
+msgid "Sheets"
+msgstr "शिटफोर"
+
+#. 2okgs
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CELLS%\n"
+"LngText.text"
+msgid "Cells"
+msgstr "खथासाफोर"
+
+#. rgN97
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%STATISTICS_TITLE%\n"
+"LngText.text"
+msgid "Document Statistics"
+msgstr ""
+
+#. VsBfC
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUMMARY_TITLE%\n"
+"LngText.text"
+msgid "Summary"
+msgstr "गुबै राव:"
+
+#. MiuQD
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY%\n"
+"LngText.text"
+msgid "Property"
+msgstr "आखुथाय"
+
+#. mGZKg
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY_VALUE%\n"
+"LngText.text"
+msgid "Value"
+msgstr "बेसेन"
+
+#. TCEEW
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED%\n"
+"LngText.text"
+msgid "Modified"
+msgstr "सोलाय होबाय"
+
+#. YYD9t
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED_COLON%\n"
+"LngText.text"
+msgid "Modified:"
+msgstr "सोलाय होबाय:"
+
+#. vBE2F
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER%\n"
+"LngText.text"
+msgid "Revision number"
+msgstr "फोसाबनायनि अनजिमा"
+
+#. FXXNk
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER_COLON%\n"
+"LngText.text"
+msgid "Revision number:"
+msgstr "फोसाबनाय अनजिमा:"
+
+#. HdSaz
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME%\n"
+"LngText.text"
+msgid "Total editing time"
+msgstr "गासै सुजुनाय सम"
+
+#. snZkq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME_COLON%\n"
+"LngText.text"
+msgid "Total editing time:"
+msgstr "गासै सुजुनाय सम:"
+
+#. AuQLP
+#: shlxthdl.ulf
+#, fuzzy
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION%\n"
+"LngText.text"
+msgid "Description"
+msgstr "बेखेवनाय:"
+
+#. WESrR
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION_COLON%\n"
+"LngText.text"
+msgid "Description:"
+msgstr "बेखेवनाय:"
+
+#. RWroq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SIZE_COLON%\n"
+"LngText.text"
+msgid "Size:"
+msgstr "महर:"
+
+#. 3GFSY
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TYPE_COLON%\n"
+"LngText.text"
+msgid "Type:"
+msgstr "रोखोम:"

@@ -1,0 +1,3266 @@
+#. extracted from helpcontent2/source/text/sbasic/python
+msgid ""
+msgstr ""
+"Project-Id-Version: LibreOffice 7.5\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 21:45+0100\n"
+"PO-Revision-Date: 2022-11-03 22:07+0200\n"
+"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
+"Language-Team: sl.libreoffice.org\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Project-Style: openoffice\n"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Scripts"
+msgstr "Skripti v jeziku Python"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"bm_id491543348147708\n"
+"help.text"
+msgid "<bookmark_value>macros;Python scripts</bookmark_value>        <bookmark_value>Python;macros</bookmark_value>        <bookmark_value>scripts;Python</bookmark_value>"
+msgstr "<bookmark_value>makri;skripti v jeziku Python</bookmark_value><bookmark_value>Python;makri</bookmark_value><bookmark_value>skripti;Python</bookmark_value>"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3154232\n"
+"help.text"
+msgid "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\">%PRODUCTNAME Python Scripts Help</link></variable>"
+msgstr "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\">Pomoč %PRODUCTNAME za skripte v jeziku Python</link></variable>"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3153894\n"
+"help.text"
+msgid "%PRODUCTNAME provides an Application Programming Interface (API) that allows controlling the $[officename] components with different programming languages by using the $[officename] Software Development Kit (SDK). For more information about the $[officename] API and the Software Development Kit, visit <link href=\"https://api.libreoffice.org/\">https://api.libreoffice.org</link>"
+msgstr "%PRODUCTNAME nudi vmesnik za programiranje aplikacij (API), ki omogoča nadziranje komponent $[officename] v raznih programskih jezikih ob uporabi razvojnega paketa (SDK) za $[officename]. Za več informacij o API $[officename] in o razvojnem paketu obiščite <link href=\"https://api.libreoffice.org/\">https://api.libreoffice.org</link>"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3147226\n"
+"help.text"
+msgid "This help section explains the most common Python script functions for %PRODUCTNAME. For more in-depth information please refer to the <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> on the Wiki."
+msgstr "Ta razdelek pomoči razloži najpogostejše funkcije skriptnega jezika Python v %PRODUCTNAME. Za bolj poglobljene informacije si oglejte <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Vodnik za oblikovanje in razvoj programov v Pythonu</link> (v angl.) na wikiju."
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3146957\n"
+"help.text"
+msgid "Working with Python Scripts in %PRODUCTNAME"
+msgstr "Delo s skripti v jeziku Python v %PRODUCTNAME"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"N0102\n"
+"help.text"
+msgid "You can execute Python scripts choosing <menuitem>Tools - Macros - Run Macro</menuitem>. Editing scripts can be done with your preferred text editor. Python scripts are present in various locations detailed hereafter. You can refer to Programming examples for macros illustrating how to run the Python interactive console from %PRODUCTNAME."
+msgstr "Skripte Python lahko izvedete tako, da izberete <menuitem>Orodja – Makri – Zaženi makro</menuitem>. Urejanje skriptov lahko opravite s svojim priljubljenim urejevalnikom besedil. Skripti Python so prisotni na različnih lokacijah podrobneje v nadaljevanju. Za makre, ki ponazarjajo, kako zagnati interaktivno konzolo Python iz% PRODUCTNAME, si oglejte primere programiranja."
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id131568902936659\n"
+"help.text"
+msgid "The %PRODUCTNAME scripting framework for Python is optional on some GNU/Linux distributions. If it is installed, selecting <menuitem>Tools - Macros - Run Macro</menuitem> and checking <literal>Application Macros</literal> for the presence of <literal>HelloWorld – HelloWorldPython</literal> macro is sufficient. If absent, please refer to your distribution documentation in order to install the %PRODUCTNAME scripting framework for Python."
+msgstr "Skriptno ogrodje %PRODUCTNAME za Python v nekaterih distribucijah GNU/Linux ni obvezno. Če je nameščeno, izberite <menuitem>Orodja – Makri – Zaženi makro</menuitem> in v <literal>Makri programa</literal> preverite prisotnost makra <literal>HelloWorld – HelloWorldPython</literal>. Če manjka, v dokumentaciji za svojo distribucijo poiščite, kako namestite skriptno ogrodje za Python v %PRODUCTNAME."
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id901655365903313\n"
+"help.text"
+msgid "%PRODUCTNAME Python Modules"
+msgstr "Moduli Python %PRODUCTNAME"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id21655367848705\n"
+"help.text"
+msgid "<link href=\"text/sbasic/python/python_screen.xhp\"><literal>msgbox</literal> module</link>"
+msgstr "<link href=\"text/sbasic/python/python_screen.xhp\">Modul <literal>msgbox</literal></link>"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id801655368030968\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\"><literal>scriptforge</literal> module</link>"
+msgstr "<link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\">Modul <literal>scriptforge</literal></link>"
+
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id12655637848750\n"
+"help.text"
+msgid "<link href=\"text/sbasic/python/python_programming.xhp#uno\"><literal>uno</literal> module</link>"
+msgstr "<link href=\"text/sbasic/python/python_programming.xhp#uno\">Modul <literal>uno</literal></link>"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python to Basic"
+msgstr "Iz Pythona v Basic"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0330\n"
+"help.text"
+msgid "<bookmark_value>Python;Calling Basic</bookmark_value> <bookmark_value>ParamArray</bookmark_value>"
+msgstr "<bookmark_value>Python;klicanje Basica</bookmark_value><bookmark_value>ParamArray</bookmark_value>"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0331\n"
+"help.text"
+msgid "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\">Calling Basic Macros from Python</link></variable>"
+msgstr "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\">Klicanje makrov Basic s Pythonom</link></variable>"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0332\n"
+"help.text"
+msgid "You can call %PRODUCTNAME Basic macros from Python scripts, and notable features can be obtained in return such as:"
+msgstr "Makre %PRODUCTNAME Basic lahko kličete iz skriptov Python, s čimer pridobite pomembne funkcionalnosti, kot so:"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0333\n"
+"help.text"
+msgid "Simple logging facilities out of <literal>Access2Base</literal> library Trace console,"
+msgstr "enostavna zmožnost beleženja iz konzole Trace knjižnice <literal>Access2Base</literal>,"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0334\n"
+"help.text"
+msgid "<literal>InputBox</literal> and <literal>MsgBox</literal> screen I/O functions based on Basic to ease Python development,"
+msgstr "zaslonski V/I funkciji <literal>InputBox</literal> in <literal>MsgBox</literal>, ki temeljita na Basicu in poenostavita razvoj v Pythonu,"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0335\n"
+"help.text"
+msgid "<literal>Xray</literal> calls interrupting Python script execution to help inspect variables."
+msgstr "klici <literal>Xray</literal>, ki prekinjajo izvajanje skripta Python kot pomoč za proučevanje spremenljivk."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0336\n"
+"help.text"
+msgid "The %PRODUCTNAME Application Programming Interface (API) Scripting Framework supports inter-language script execution between Python and Basic, or other supported programming languages for that matter. Arguments can be passed back and forth across calls, provided that they represent primitive data types that both languages recognize, and assuming that the Scripting Framework converts them appropriately."
+msgstr "Ogrodje skriptov vmesnika programiranja %PRODUCTNAME API (angl. Application Programming Interface) podpira izvajanje skriptov med Pythonom in Basicom ter drugimi podprtimi programskimi jeziki. Argumente lahko podajate skozi klice, če gre za primitivne vrste podatkov, ki jih prepoznata oba jezika, in če jih ogrodje API ustrezno pretvori."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0337\n"
+"help.text"
+msgid "It is recommended to have knowledge of Python standard modules and %PRODUCTNAME API features prior to perform inter-language calls from Python to Basic, JavaScript or any other script engine."
+msgstr "Priporočeno je, da se uporabnik pred začetkom oblikovanja klicev iz Pythona v Basic, JavaScript ali drugi skriptni mehanizem pouči o standardnih modulih Python in funkcionalnostih %PRODUCTNAME API."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0338\n"
+"help.text"
+msgid "When running Python scripts from an Integrated Development Environment (IDE), the %PRODUCTNAME-embedded Basic engine may be absent. Avoid Python-to-%PRODUCTNAME Basic calls in such contexts. However Python environment and Universal Networks Objects (UNO) are fully available. Refer to <link href=\"text/sbasic/python/python_ide.xhp\">Setting Up an Integrated IDE for Python</link> for more information."
+msgstr "Ko poganjate skripte Python iz okolja IDE (Integrated Development Environment), morda pogon Basic, vgnezden v %PRODUCTNAME, ne bo na voljo. V tem primeru priporočamo, da se izognite sklicem iz Pythona v %PRODUCTNAME Basic. Kljub temu so okolje Python in predmeti UNO (Universal Networks Objects) na voljo. Za več informacij preberite <link href=\"text/sbasic/python/python_ide.xhp\">Nastavljanje integriranega IDE za Python</link>."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0339\n"
+"help.text"
+msgid "Retrieving %PRODUCTNAME Basic Scripts"
+msgstr "Pridobivanje skriptov %PRODUCTNAME Basic"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0340\n"
+"help.text"
+msgid "%PRODUCTNAME Basic macros can be personal, shared, or embedded in documents. In order to execute them, Python run time needs to be provided with Basic macro locations. Implementing the <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\">com.sun.star.script.provider.XScriptProvider</link> interface allows the retrieval of executable scripts:"
+msgstr "Makri %PRODUCTNAME Basic so lahko zasebni, v skupni rabi ali vdelani v dokumente. Za izvajanje je treba Pythonu navesti lokacije makrov Basic. Implementacija vmesnika <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\">com.sun.star.script.provider.XScriptProvider</link> omogoča pridobivanje izvajalnih skriptov:"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0341\n"
+"help.text"
+msgid "<bookmark_value>API;script.provider.MasterScriptProviderFactory: Retrieving Basic scripts</bookmark_value><bookmark_value>API;script.provider.XScript: Executing Basic scripts</bookmark_value><bookmark_value>API;XScriptProvider: Retrieving Basic scripts</bookmark_value>"
+msgstr "<bookmark_value>API;pridobivanje skriptov Basic s script.provider.MasterScriptProviderFactory</bookmark_value><bookmark_value>API;izvajanje skriptov Basic s script.provider.XScript</bookmark_value><bookmark_value>API;pridobivanje skriptov Basic z XScriptProvider</bookmark_value>"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0347\n"
+"help.text"
+msgid "'''Grab Basic script object before invocation.'''"
+msgstr "'''Zagrabi predmet skripta Basic pred priklicem.'''"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0363\n"
+"help.text"
+msgid "Executing %PRODUCTNAME Basic Scripts"
+msgstr "Izvajanje skriptov %PRODUCTNAME Basic"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0364ndx\n"
+"help.text"
+msgid "<bookmark_value>API;script.provider.XScript : Executing Basic scripts</bookmark_value>"
+msgstr "<bookmark_value>API;izvajanje skriptov Basic s script.provider.XScript</bookmark_value>"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0364\n"
+"help.text"
+msgid "The %PRODUCTNAME Software Development Kit (SDK) documentation for <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\">com.sun.star.script.provider.XScript</link> interface details the calling convention for inter-language calls. Invocation of functions requires three arrays:"
+msgstr "Dokumentacija za razvojni paket %PRODUCTNAME Software Development Kit (SDK) za vmesnik <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\">com.sun.star.script.provider.XScript</link> podrobno opisuje delovanje klicev med programskima jezikoma. Priklic funkcij zahteva tri matrike:"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0365\n"
+"help.text"
+msgid "the first lists the arguments of the called routine"
+msgstr "prvi izpiše seznam argumentov klicanega podprograma"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0366\n"
+"help.text"
+msgid "the second identifies modified arguments"
+msgstr "drugi identificira spremenjene argumente"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0367\n"
+"help.text"
+msgid "the third stores the return values"
+msgstr "tretji hrani vrnjene vrednosti"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0368\n"
+"help.text"
+msgid "Python Syntax"
+msgstr "Skladnja Pythona"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0372\n"
+"help.text"
+msgid "Examples of Personal or Shared Scripts"
+msgstr "Primeri osebnih skriptov in skriptov v skupni rabi"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0373\n"
+"help.text"
+msgid "Examples in <link href=\"text/sbasic/python/python_screen.xhp\">Input/Output to Screen</link> detail Python to Basic invocation calls. <link href=\"text/sbasic/python/python_document_events.xhp\">Monitoring Document Events</link> illustrates the usage of *args Python idiom to print a variable number of parameters to <literal>Access2Base</literal> logging console dialog."
+msgstr "Primeri v <link href=\"text/sbasic/python/python_screen.xhp\">Vhod/izhod na zaslon</link> podrobno izkazujejo klice iz Pythona v Basic. <link href=\"text/sbasic/python/python_document_events.xhp\">Spremljanje dogodkov dokumenta</link> ilustrira rabo idioma *args v Pythonu za izpis spremenljivega števila parametrov v pogovorno okno konzole beleženja <literal>Access2Base</literal>."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0374\n"
+"help.text"
+msgid "At time of development you can interrupt Python script execution using <link href=\"https://berma.pagesperso-orange.fr/index2.html\">Xray extension</link> in order to inspect properties and methods of UNO objects. The APSO extension debugger allows object introspection using either Xray either MRI extensions."
+msgstr "Med razvojem lahko prekinete izvajanje skripta Python z <link href=\"https://berma.pagesperso-orange.fr/index2.html\">razširitvijo Xray</link>, s katero preverite lastnosti in metode predmetov UNO. Razhroščevalnik razširitve APSO omogoča introspekcijo predmetov s pomočjo razširitve Xray ali MRI."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0378\n"
+"help.text"
+msgid "Examples of Embedded Scripts in Documents"
+msgstr "Primeri v dokumente vdelanih skriptov"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0379\n"
+"help.text"
+msgid "<literal>*args</literal>Python simplified syntax can be used in conjunction with %PRODUCTNAME Basic routines that accept a variable number of arguments. Below <literal>Print</literal> and <literal>SUM</literal> Python functions call their Basic <literal>Print</literal> and <literal>SUM</literal> counterparts, using aforementioned <literal>getBasicScript</literal> function. Exception handling is not detailed."
+msgstr "Poenostavljeno Pythonovo skladnjo <literal>*args</literal> lahko uporabite skupaj s podprogrami %PRODUCTNAME Basic, ki sprejmejo spremenljivo število argumentov. Pythonovi funkciji <literal>Print</literal> in <literal>SUM</literal> kličeta <literal>Print</literal> in <literal>SUM</literal> v Basicu z že omenjeno funkcijo <literal>getBasicScript</literal>. Izjeme niso podrobno obravnavane."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0384\n"
+"help.text"
+msgid "\"\"\"Outputs the specified strings or numeric expressions in a dialog box.\"\"\""
+msgstr "\"\"\"Izpiše določene nize ali številske izraze v pogovorno okno.\"\"\""
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0389\n"
+"help.text"
+msgid "\"\"\"SUM the specified number expression.\"\"\""
+msgstr "\"\"\"Sešteje navedene številske izraze.\"\"\""
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0402\n"
+"help.text"
+msgid "The %PRODUCTNAME Basic <literal>Print</literal> and <literal>SUM</literal> document-based routines accept a variable number of arguments. The <literal>Private</literal> or <literal>Public</literal> attributes have no effect. The arguments type checking is skipped for clarity."
+msgstr "Na dokumentu temelječi rutini %PRODUCTNAME Basic <literal>Print</literal> in <literal>SUM</literal> sprejmeta spremenljivo število argumentov. Atributa <literal>Private</literal> in <literal>Public</literal> nimata učinka. Preverjanje vrste argumentov je zaradi jasnosti preskočeno."
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0407\n"
+"help.text"
+msgid "''' Print item list of variable number '''"
+msgstr "''' Natisni seznam elementov spremenljivega obsega '''"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0408\n"
+"help.text"
+msgid "' all CStr() convertible args are accepted"
+msgstr "' sprejema vse pretvorljive argumente CStr()"
+
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0419\n"
+"help.text"
+msgid "''' SUM a variable list of numbers '''"
+msgstr "''' Vsota spremenljivega seznama števil '''"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"tit\n"
+"help.text"
+msgid "Opening a Dialog with Python"
+msgstr "Prikaz pogovornega okna s programsko kodo"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0334\n"
+"help.text"
+msgid "<bookmark_value>Python;dialogs</bookmark_value>        <bookmark_value>dialog box;Python</bookmark_value>        <bookmark_value>dialogs;Python</bookmark_value>"
+msgstr "<bookmark_value>Python;pogovorna okna</bookmark_value><bookmark_value>pogovorna okna;Python</bookmark_value>"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0336\n"
+"help.text"
+msgid "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\">Opening a Dialog with Python</link></variable>"
+msgstr "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\">Prikaz pogovornega okna s Pythonom</link></variable>"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0337\n"
+"help.text"
+msgid "%PRODUCTNAME static dialogs are created with the <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog editor</link> and are stored in varying places according to their personal (My Macros), shared (Application Macros) or document-embedded nature. In reverse, dynamic dialogs are constructed at runtime, from Basic or Python scripts, or using any other <link href=\"text/shared/guide/scripting.xhp\">%PRODUCTNAME supported language</link> for that matter. Opening static dialogs with Python is illustrated herewith. Exception handling and internationalization are omitted for clarity."
+msgstr "Statična pogovorna okna %PRODUCTNAME so ustvarjena z <link href=\"text/sbasic/guide/create_dialog.xhp\">urejevalnikom pogovornih oken</link> in se shranijo na različnih mestih glede na njihovo naravo: osebno (Moji makri), v skupni rabi (Makri programa) ali vdelani v dokumente. Obratno gledano so dinamična pogovorna okna zgrajena v času izvajanja iz skript v Basicu ali Pythonu ali z uporabo katerega koli drugega <link href=\"text/shared/guide/scripting.xhp\">v %PRODUCTNAME podprtega programskega jezika</link>. Odpiranje statičnih pogovornih oken s Pythonom je prikazano tukaj. Zaradi jasnosti so izjeme ravnanja in internacionalizacije izpuščene."
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0338\n"
+"help.text"
+msgid "My Macros or Application Macros dialogs"
+msgstr "Pogovorna okna Moji makri in Makri programa"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0339\n"
+"help.text"
+msgid "The examples below open <literal>Access2Base Trace</literal> console or the imported <literal>TutorialsDialog</literal> dialog with <menuitem>Tools - Macros - Run Macro</menuitem> menu:"
+msgstr "Primeri spodaj odprejo konzolo <literal>Access2Base Trace</literal> ali uvoženo pogovorno okno <literal>TutorialsDialog</literal> z menijem <menuitem>Orodja – Makri – Zaženi makro</menuitem>:"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0364\n"
+"help.text"
+msgid "Document embedded dialogs"
+msgstr "V dokument vdelana pogovorna okna"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0365\n"
+"help.text"
+msgid "The example below opens a newly edited <literal>Dialog1</literal> dialog from a document with <menuitem>Tools - Macros - Run Macro</menuitem> menu:"
+msgstr "Spodnji primer odpre novo urejeno pogovorno okno <literal>Dialog1</literal> iz dokumenta z ukazom <menuitem>Orodja – Makri – Zaženi makro</menuitem>:"
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0370\n"
+"help.text"
+msgid "\"\"\" Display a doc-based dialog \"\"\""
+msgstr "\"\"\" Prikaži pogovorno okno na osnovi dokumenta \"\"\""
+
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0381\n"
+"help.text"
+msgid "Refer to <literal>msgbox.py</literal> in <literal>{installation}/program/</literal> directory for Python dynamic dialog examples."
+msgstr "Za primere dinamičnih pogovornih oken Python si oglejte <literal>msgbox.py</literal> v mapi <literal>{namestitev}/program/</literal>."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"tit\n"
+"help.text"
+msgid "Monitoring Document Events"
+msgstr "Spremljanje dogodkov dokumenta"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0526\n"
+"help.text"
+msgid "<bookmark_value>Basic;Monitoring Document Events</bookmark_value>         <bookmark_value>Python;Monitoring Document Events</bookmark_value>         <bookmark_value>Access2Base;Console</bookmark_value>         <bookmark_value>Access2Base;Trace</bookmark_value>         <bookmark_value>API;document.DocumentEvent: Monitoring Document Event</bookmark_value>         <bookmark_value>API;document.XDocumentEventBroadcaster: Monitoring Document Event</bookmark_value>         <bookmark_value>API;document.XDocumentEventListener: Monitoring Document Event</bookmark_value>         <bookmark_value>API;lang.EventObject: Monitoring Document Event</bookmark_value>"
+msgstr "<bookmark_value>Basic;spremljanje dogodkov dokumenta</bookmark_value><bookmark_value>Python;spremljanje dogodkov dokumenta</bookmark_value><bookmark_value>Access2Base;konzola</bookmark_value><bookmark_value>Access2Base;sledenje</bookmark_value><bookmark_value>API;document.DocumentEvent: spremljanje dogodkov dokumenta</bookmark_value><bookmark_value>API;document.XDocumentEventBroadcaster: spremljanje dogodkov dokumenta</bookmark_value><bookmark_value>API;document.XDocumentEventListener: spremljanje dogodkov dokumenta</bookmark_value><bookmark_value>API;lang.EventObject: spremljanje dogodkov dokumenta</bookmark_value>"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0527\n"
+"help.text"
+msgid "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\">Listening to Document Events</link></variable>"
+msgstr "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\">Poslušanje dogodkov dokumenta</link></variable>"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id641630582314861\n"
+"help.text"
+msgid "Listening to document events can help in the following situations:"
+msgstr "Poslušanje dogodkov dokumenta je lahko v pomoč v sledečih situacijah:"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id431630582396327\n"
+"help.text"
+msgid "Identify a new document at opening time, as opposed to existing  ones, and perform a dedicated setup."
+msgstr "Identifikacija novega dokumenta ob njegovem odpiranju (za razliko od obstoječih) in opravljanje ciljnih namestitev."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id461630582396782\n"
+"help.text"
+msgid "Control the processing of document save, document copy, print or mailmerge requests."
+msgstr "Nadzor nad postopki shranjevanja in kopiranja dokumenta ter zahtevami po tiskanju ali spajanju dokumentov."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id631630582394790\n"
+"help.text"
+msgid "Recalculate table of contents, indexes or table entries of a Writer document when document is going to be closed"
+msgstr "Preračunavanje kazal ali vnosov tabele v dokumentu programa Writer, ko se bo dokument zaprl."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id601630582398998\n"
+"help.text"
+msgid "Import math Python packages before opening a Calc document. Release these packages when the document closes."
+msgstr "Uvoz paketov Python math pred odpiranjem dokumenta programa Calc. Sprostitev teh paketov, ko se dokument zapre."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0528\n"
+"help.text"
+msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\">assigning macros to events</link>, one can monitor events raised by %PRODUCTNAME documents. Application Programming Interface (API) broadcasters are responsible for calling event scripts. Unlike listeners that require to define all supported methods, even if unused, document monitors require only two methods next to hooked event scripts."
+msgstr "Poleg <link href=\"text/sbasic/shared/01040000.xhp\">dodeljevanja makrov dogodkom</link> lahko spremljamo dogodke, ki jih prožijo dokumenti %PRODUCTNAME. Oddajniki API (Application Programming Interface) so odgovorni za klicanje skriptov dogodkov. Za razliko od poslušalcev, ki zahtevajo določitev vseh podprtih metod, tudi če ostanejo neuporabljene, zahtevajo spremljevalniki dokumentov le dve metodi poleg skriptov, vezanih na dogodke."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0529\n"
+"help.text"
+msgid "Monitoring Document Events"
+msgstr "Spremljanje dogodkov dokumenta"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0530\n"
+"help.text"
+msgid "Monitoring is illustrated herewith for Basic and Python languages using object-oriented programming. Assigning <literal>OnLoad</literal> script, to the <menuitem>Open Document</menuitem> event, suffices to initiate and terminate document event monitoring. <menuitem>Tools - Customize</menuitem> menu <menuitem>Events</menuitem> tab is used to assign either scripts."
+msgstr "Spremljanje je tu ilustrirano z jezikoma Basic in Python z uporabo objektnega programiranja. Za dodeljevanje skripta <literal>OnLoad</literal> dogodku <menuitem>Open Document</menuitem> (Odpri dokument) zadostuje, da iniciirate in zaključite spremljanje dogodka dokumenta. Prek menijskega ukaza <menuitem>Orodja – Prilagodi</menuitem> in zavihka <menuitem>Dogodki</menuitem> lahko dodelite posamične skripte."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0531\n"
+"help.text"
+msgid "Intercepting events helps setting scripts pre- and post-conditions such as loading and unloading libraries or track script processing in the background. <literal>Access2Base.Trace</literal> module usage is illustrating that second context."
+msgstr "Prestrezanje dogodkov pomaga pri nastavljanju pred- in po-pogojev skriptov, kot je nalaganje in odlaganje knjižnic ali sledenje obdelovanja skripta v ozadju. Uporaba modula <literal>Access2Base.Trace</literal> ilustrira ta drugi kontekst."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0532\n"
+"help.text"
+msgid "With Python"
+msgstr "S Pythonom"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bm_id721622446590963\n"
+"help.text"
+msgid "<bookmark_value>API;frame.Desktop: Monitoring Document Event</bookmark_value>        <bookmark_value>API;script.provider.MasterScriptProviderFactory: Monitoring Document Event</bookmark_value>        <bookmark_value>API;script.provider.XScript: Monitoring Document Event</bookmark_value>"
+msgstr "<bookmark_value>API;frame.Desktop: spremljanje dogodkov dokumenta</bookmark_value><bookmark_value>API;script.provider.MasterScriptProviderFactory: spremljanje dogodkov dokumenta</bookmark_value><bookmark_value>API;script.provider.XScript: spremljanje dogodkov dokumenta</bookmark_value>"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0533\n"
+"help.text"
+msgid "Events monitoring starts from object instantiation and ultimately stops when Python releases the object. Raised events are reported using <literal>Access2Base</literal> console."
+msgstr "Sledenje dogodkom se prične z instanciranjem predmeta in se konča, ko Python predmet sprosti. Poročanje o povzročenih dogodkih poteka prek konzole <literal>Access2Base</literal>."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0534\n"
+"help.text"
+msgid "<literal>OnLoad</literal> and <literal>OnUnload</literal> events can be used to respectively set and unset Python programs path. They are described as <menuitem>Open document</menuitem> and <menuitem>Document closed</menuitem>."
+msgstr "Dogodke <literal>OnLoad</literal> in <literal>OnUnload</literal> lahko uporabimo za določitev oz. oddoločitev poti programov Python. Opisani sta kot <menuitem>Dokument odprt (ang. Open document)</menuitem> in <menuitem>Dokument zaprt (ang. Document closed)</menuitem>."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0544\n"
+"help.text"
+msgid "\"\"\" Monitor document events \"\"\""
+msgstr "\"\"\" Spremljaj dogodke dokumenta \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0546\n"
+"help.text"
+msgid "adapted from 'Python script to monitor OnSave event' at"
+msgstr "prilagojeno iz »Skript Python za spremljanje dogodka OnSave« v"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0550\n"
+"help.text"
+msgid "\"\"\" Document events monitor \"\"\""
+msgstr "\"\"\" Spremljevalnik dogodkov dokumenta \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0551\n"
+"help.text"
+msgid "''' report using Access2Base.Trace console OR"
+msgstr "''' poročaj z uporabo konzole Access2Base.Trace ALI"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0552\n"
+"help.text"
+msgid "report in 1st sheet, 1st column for Calc docs '''"
+msgstr "poročaj v 1. delovnem listu, 1. stolpcu v dokumentih Calc '''"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0558\n"
+"help.text"
+msgid "#self.row = 0  # uncomment for Calc documents only"
+msgstr "#self.row = 0  # odstrani znak komentarja le za dokumente Calc"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0560\n"
+"help.text"
+msgid "self.listen()  # Start monitoring doc. events"
+msgstr "self.listen()  # Začni spremljati dogodke dokumenta"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0569\n"
+"help.text"
+msgid "\"\"\" Output doc. events on 1st column of a Calc spreadsheet \"\"\""
+msgstr "\"\"\" Dogodki dokumenta se izpišejo v 1. stolpec preglednice Calc \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0575\n"
+"help.text"
+msgid "def listen(self, *args):  # OnLoad/OnNew at the earliest"
+msgstr "def listen(self, *args):  # Čimprej OnLoad/OnNew"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0576\n"
+"help.text"
+msgid "\"\"\" Start doc. events monitoring \"\"\""
+msgstr "\"\"\" Začni spremljati dogodke dokumenta \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0578\n"
+"help.text"
+msgid "Console.log(\"INFO\", \"Document events are being logged\", True)"
+msgstr "Console.log(\"INFO\", \"Dogodki dokumenta se beležijo\", True)"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0580\n"
+"help.text"
+msgid "def sleep(self, *args):  # OnUnload at the latest (optional)"
+msgstr "def sleep(self, *args):  # Čim kasneje OnUnload (neobvezno)"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0581\n"
+"help.text"
+msgid "\"\"\" Stop doc. events monitoring \"\"\""
+msgstr "\"\"\" Prenehaj spremljati dogodke dokumenta \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0583\n"
+"help.text"
+msgid "Console.log(\"INFO\", \"Document events have been logged\", True)"
+msgstr "Console.log(\"INFO\", \"Dogodki dokumenta so zabeleženi\", True)"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0587\n"
+"help.text"
+msgid "\"\"\" Intercepts all doc. events \"\"\""
+msgstr "\"\"\" Prestrezi vse dogodke dokumenta \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0588\n"
+"help.text"
+msgid "#self.setCell(event.Source, event.EventName) # only for Calc docs"
+msgstr "#self.setCell(event.Source, event.EventName) # samo za dokumente Calc"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0595\n"
+"help.text"
+msgid "\"\"\" Release all activities \"\"\""
+msgstr "\"\"\" Sprosti vse dejavnosti \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0601\n"
+"help.text"
+msgid "def OnLoad(*args):  # 'Open Document' event"
+msgstr "def OnLoad(*args):  # Dogodek »Odpri dokument«"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0602\n"
+"help.text"
+msgid "listener = UiDocument()  # Initiates listening"
+msgstr "listener = UiDocument()  # Inicializira poslušanje"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0604\n"
+"help.text"
+msgid "def OnUnload(*args):  # 'Document has been closed' event"
+msgstr "def OnUnload(*args):  # Dogodek »Dokument se je zaprl«"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0605\n"
+"help.text"
+msgid "pass  # (optional) performed when disposed"
+msgstr "pass  # (neobvezno) izvršeno, ko je zavržen"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0613\n"
+"help.text"
+msgid "(Back/Fore)ground console to report/log program execution."
+msgstr "konzola v ospredju/ozadju za poročanje/beleženje izvajanja programa."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0617\n"
+"help.text"
+msgid "\"\"\" Print free item list to console \"\"\""
+msgstr "\"\"\" Izpiši seznam prostih elementov v konzoli \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0622\n"
+"help.text"
+msgid "\"\"\" Append log message to console, optional user prompt \"\"\""
+msgstr "\"\"\" Pripni sporočilo dnevnika v konzolo, neobvezno pobaraj uporabnika \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0627\n"
+"help.text"
+msgid "\"\"\" Set log messages lower limit \"\"\""
+msgstr "\"\"\" Določi spodnjo mejo beleženja sporočil \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0632\n"
+"help.text"
+msgid "\"\"\" Display console content/dialog \"\"\""
+msgstr "\"\"\" Prikaži vsebino/pogovorno okno konzole \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0638\n"
+"help.text"
+msgid "''' Grab application-based Basic script '''"
+msgstr "''' Pograbi na programu temelječ skript v Basicu '''"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0647\n"
+"help.text"
+msgid "Mind the misspelled <literal>documentEventOccured</literal> method that inherits a typo from %PRODUCTNAME Application Programming Interface (API)."
+msgstr "Bodite pozorni na napačno črkovanje metode <literal>documentEventOccured</literal>, ki deduje tipkarsko napako iz vmesnika API %PRODUCTNAME."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0648\n"
+"help.text"
+msgid "<menuitem>Start application</menuitem> and <menuitem>Close application</menuitem> events can respectively be used to set and to unset Python path for user scripts or %PRODUCTNAME scripts. In a similar fashion, document based Python libraries or modules can be loaded and released using <menuitem>Open document</menuitem> and <menuitem>Document closed</menuitem> events. Refer to <link href=\"text/sbasic/python/python_import.xhp\">Importing Python Modules</link> for more information."
+msgstr "Dogodka <menuitem>Zaženi program (angl. Start application)</menuitem> in <menuitem>Zapri program (angl. Close application)</menuitem> lahko uporabljamo za določitev oz. preklic poti Pythona za skripte uporabnika ali %PRODUCTNAME. Na analogen način lahko knjižnice ali module Python na temelju dokumenta naložimo in sprostimo z uporabo dogodkov <menuitem>Odpri dokument (angl. Open document)</menuitem> in <menuitem>Zapri dokument (angl. Document closed)</menuitem>. Za podrobnosti glejte <link href=\"text/sbasic/python/python_import.xhp\">Uvažanje modulov Python</link>."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0649\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "Z %PRODUCTNAME Basicom"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bm_id591622446367707\n"
+"help.text"
+msgid "<bookmark_value>API;GlobalScope.BasicLibraries</bookmark_value>        <bookmark_value>Tools;Strings</bookmark_value>"
+msgstr "<bookmark_value>API;GlobalScope.BasicLibraries</bookmark_value><bookmark_value>orodja;nizi</bookmark_value>"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0650\n"
+"help.text"
+msgid "Using <menuitem>Tools - Customize</menuitem> menu <menuitem>Events</menuitem> tab, the <menuitem>Open document</menuitem> event fires a <literal>ConsoleLogger</literal> initialisation. <literal>_documentEventOccured</literal> routine - set by <literal>ConsoleLogger</literal> - serves as a unique entry point to trap all document events."
+msgstr "Ob uporabi menijskega ukaza <menuitem>Orodja – Prilagodi</menuitem> in nato zavihka <menuitem>Dogodki</menuitem> dogodek <menuitem>Odpri dokument</menuitem> sproži inicializacijo <literal>ConsoleLogger</literal>. Podprogram <literal>_documentEventOccured</literal>, ki ga vzpostavi <literal>ConsoleLogger</literal>, služi kot značilna vstopna točka za lovljenje vseh dogodkov dokumenta."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"hd_id421630510141729\n"
+"help.text"
+msgid "controller.Events module"
+msgstr "Modul controller.Events"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bas_id431630567378062\n"
+"help.text"
+msgid "Global _obj As Object ' controller.ConsoleLogger instance"
+msgstr "Global _obj As Object ' instanca controller.ConsoleLogger"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0655\n"
+"help.text"
+msgid "Sub OnLoad(evt As com.sun.star.document.DocumentEvent) ' >> Open Document <<"
+msgstr "Sub OnLoad(evt As com.sun.star.document.DocumentEvent) ' >> Odpri dokument <<"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bas_id371630509596674\n"
+"help.text"
+msgid "''' ConsoleLogger unique entry point '''"
+msgstr "''' Značilna vstopna točka ConsoleLogger '''"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"hd_id721630511986813\n"
+"help.text"
+msgid "controller.ConsoleLogger class module"
+msgstr "Modul razredov controller.ConsoleLogger"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id901630509435225\n"
+"help.text"
+msgid "Events monitoring starts from the moment a <literal>ConsoleLogger</literal> object is instantiated and ultimately stops upon document closure. <literal>StartAdapter</literal> routine loads necessary Basic libraries, while caught events are reported using <literal>Access2Base.Trace</literal> module."
+msgstr "Spremljanje dogodkov se prične s trenutkom, ko je inicializiran predmet <literal>ConsoleLogger</literal>, in se povsem konča ob zaprtju dokumenta. Podprogram <literal>StartAdapter</literal> naloži potrebne knjižnice Basic, medtem ko o ujetih dogodkih poroča z uporabo modula <literal>Access2Base.Trace</literal>."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0664\n"
+"help.text"
+msgid "' ADAPTER design pattern object to be instantiated in the \"Open Document\" event"
+msgstr "' predmet vzorca oblikovanja ADAPTER, ki bo instanciiran v dogodku »Odpri dokument«"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0666\n"
+"help.text"
+msgid "Private Const UI_NOPROMPT = False ' Set it to True to visualise documents events"
+msgstr "Private Const UI_NOPROMPT = False ' Nastavite na True, da vizualizira dogodke dokumenta"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0674\n"
+"help.text"
+msgid "' MEMBERS"
+msgstr "' ČLANI"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bas_id131630510956418\n"
+"help.text"
+msgid "Private _txtMsg As String ' text message to log in console"
+msgstr "Private _txtMsg As String ' besedilo sporočila za beleženje v konzoli"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0677\n"
+"help.text"
+msgid "' PROPERTIES"
+msgstr "' LASTNOSTI"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0679\n"
+"help.text"
+msgid "''' System-dependent filename '''"
+msgstr "''' Sistemsko-odvisno ime datoteke '''"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0686\n"
+"help.text"
+msgid "' METHODS"
+msgstr "' METODE"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0688\n"
+"help.text"
+msgid "''' Monitor document events '''"
+msgstr "''' Spremljaj dogodke dokumenta '''"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0701\n"
+"help.text"
+msgid "''' Initialize document events logging '''"
+msgstr "''' Inicializiraj beleženje dogodkov dokumenta '''"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0705\n"
+"help.text"
+msgid "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Document events are being logged\", UI_PROMPT)"
+msgstr "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Dogodki dokumenta se beležijo\", UI_PROMPT)"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0714\n"
+"help.text"
+msgid "''' Terminate document events logging '''"
+msgstr "''' Zaključi beleženje dogodkov dokumenta '''"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0717\n"
+"help.text"
+msgid "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Document events have been logged\", UI_PROMPT)"
+msgstr "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Dogodki dokumenta so zabeleženi\", UI_PROMPT)"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0719\n"
+"help.text"
+msgid "Access2Base.Trace.TraceConsole() ' Captured events dialog"
+msgstr "Access2Base.Trace.TraceConsole() ' Pogovorno okno zabeleženih dogodkov"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0722\n"
+"help.text"
+msgid "' EVENTS"
+msgstr "' DOGODKI"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0723\n"
+"help.text"
+msgid "' Your code for handled events goes here"
+msgstr "' Tukaj sledi vaša koda za obravnavane dogodke"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0724\n"
+"help.text"
+msgid "Mind the misspelled <literal>_documentEventOccured</literal> method that inherits a typo from %PRODUCTNAME Application Programming Interface (API)."
+msgstr "Bodite pozorni na napačno črkovanje metode <literal>documentEventOccured</literal>, ki deduje tipkarsko napako iz vmesnika API %PRODUCTNAME."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0725\n"
+"help.text"
+msgid "Discovering Documents Events"
+msgstr "Odkrivanje dogodkov dokumentov"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bm_id681622445958242\n"
+"help.text"
+msgid "<bookmark_value>API;frame.GlobalEventBroadcaster: Monitoring Document Event</bookmark_value>"
+msgstr "<bookmark_value>API;frame.GlobalEventBroadcaster: spremljanje dogodkov dokumenta</bookmark_value>"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0726\n"
+"help.text"
+msgid "The broadcaster API object provides the list of events it is responsible for:"
+msgstr "Predmet oddajalnika API ponuja seznam dogodkov, za katere je odgovoren:"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0727\n"
+"help.text"
+msgid "With Python"
+msgstr "S Pythonom"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0734\n"
+"help.text"
+msgid "\"\"\" Display document events \"\"\""
+msgstr "\"\"\" Pokaži dogodke dokumenta \"\"\""
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0736\n"
+"help.text"
+msgid "adapted from DisplayAvailableEvents() by A. Pitonyak"
+msgstr "prirejeno po DisplayAvailableEvents(), ki ga je napisal A. Pitonyak"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0747\n"
+"help.text"
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer (APSO)</link> extension is used to render events information on screen."
+msgstr "Razširitev <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">APSO (Alternative Python Script Organizer)</link> se uporablja za upodobitev podatkov o dogodkih na zaslonu."
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0748\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "Z %PRODUCTNAME Basicom"
+
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0750\n"
+"help.text"
+msgid "''' Display document events '''"
+msgstr "''' Pokaži dogodke dokumenta '''"
+
+#: python_examples.xhp
+msgctxt ""
+"python_examples.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python examples"
+msgstr "Primeri v Pythonu"
+
+#: python_examples.xhp
+msgctxt ""
+"python_examples.xhp\n"
+"bm_id20191031405\n"
+"help.text"
+msgid "<bookmark_value>Python;examples</bookmark_value>            <bookmark_value>Python;platform</bookmark_value>            <bookmark_value>Python;session</bookmark_value>            <bookmark_value>Python;screen input/output</bookmark_value>"
+msgstr "<bookmark_value>Python;primeri</bookmark_value><bookmark_value>Python;platforma</bookmark_value><bookmark_value>Python;seja</bookmark_value><bookmark_value>Python;zaslonski vhod/izhod</bookmark_value>"
+
+#: python_examples.xhp
+msgctxt ""
+"python_examples.xhp\n"
+"hd_id201901031407\n"
+"help.text"
+msgid "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\">Python programming examples</link></variable>"
+msgstr "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\">Primeri programov v Pythonu</link></variable>"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"tit\n"
+"help.text"
+msgid "Creating A Dialog Handler"
+msgstr "Ustvarjanje krmilnika pogovornega okna"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0664\n"
+"help.text"
+msgid "<bookmark_value>Basic;Dialog Handler</bookmark_value>         <bookmark_value>Python;Dialog Handler</bookmark_value>         <bookmark_value>Access2Base;dlgTrace</bookmark_value>         <bookmark_value>Access2Base;_DumpToFile</bookmark_value>         <bookmark_value>API;DialogProvider2</bookmark_value>         <bookmark_value>API;XDialogEventHandler</bookmark_value>"
+msgstr "<bookmark_value>Basic;krmilniki pogovornih oken</bookmark_value><bookmark_value>Python;krmilniki pogovornih oken</bookmark_value><bookmark_value>Access2Base;dlgTrace</bookmark_value><bookmark_value>Access2Base;_DumpToFile</bookmark_value><bookmark_value>API;DialogProvider2</bookmark_value><bookmark_value>API;XDialogEventHandler</bookmark_value>"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0665\n"
+"help.text"
+msgid "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\">Creating a Dialog Handler</link></variable>"
+msgstr "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\">Ustvarjanje krmilnikov pogovornih oken</link></variable>"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0666\n"
+"help.text"
+msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\">assigning macros to events</link> or <link href=\"text/sbasic/basic/python/python_listener\">creating event listeners</link>, one can use dialog handlers, whose principle is to define UNO keywords, or methods, that are mapped to events to watch for. The event handler is responsible for executing methods using the <literal>vnd.sun.star.UNO:<method_name></literal> protocol. Unlike listeners that require to define all supported methods, even if unused, dialog handlers require only two methods on top of intended control hook scripts."
+msgstr "Poleg <link href=\"text/sbasic/shared/01040000.xhp\">dodeljevanja makrov dogodkom</link> ali <link href=\"text/sbasic/basic/python/python_listener\">ustvarjanja poslušalcev dogodkov</link> lahko uporabljamo tudi krmilnike pogovornih oken, ki določajo ključne besede UNO ali metode in jih preslikajo na dogodke, ki jih poslušajo. Krmilnik dogodka je odgovoren za izvajanje metod s protokolom <literal>vnd.sun.star.UNO:<ime_metode></literal>. Medtem ko poslušalci dogodkov zahtevajo določitev vseh podprtih metod, tudi če niso uporabljene, zahtevajo krmilniki dogodkov le dve metodi poleg predvidenih skriptov nadzornih kljuk."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0667\n"
+"help.text"
+msgid "The advantages of this approach are:"
+msgstr "Prednosti takšnega pristopa so:"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0668\n"
+"help.text"
+msgid "It packs the code that handles event-driven macros,"
+msgstr "vsebuje kodo, ki obravnava z dogodki gnane makre,"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0669\n"
+"help.text"
+msgid "it decorrelates events from macros names which facilitates maintenance or updates, in particular when moving macros or modules."
+msgstr "odveže dogodke in imena makrov, kar poenostavlja vzdrževanje ali posodobitve, še posebej pri premikanju makrov ali modulov."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0670\n"
+"help.text"
+msgid "This mechanism is illustrated herewith for Basic and Python languages using an imported copy of <literal>Access2Base</literal> <literal>dlgTrace</literal> dialog. Exception handling and localisation are omitted for clarity."
+msgstr "V tem primeru je mehanizem za jezika Basic in Python predstavljen z uporabo uvožene kopije pogovornega okna <literal>Access2Base</literal> <literal>dlgTrace</literal>. Obravnava izjem in lokalizacija sta zavoljo jasnosti izpuščena."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0671\n"
+"help.text"
+msgid "Assigning Dialog methods"
+msgstr "Dodeljevanje metod pogovornemu oknu"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0672\n"
+"help.text"
+msgid "Export <literal>Access2Base</literal> <literal>dlgTrace</literal> dialog and import it into <literal>MyLib</literal> application library."
+msgstr "Izvozi pogovorno okno <literal>Access2Base</literal> <literal>dlgTrace</literal> in ga uvozi v knjižnico programa <literal>MyLib</literal>."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0673\n"
+"help.text"
+msgid "Inside the control properties pane of the <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog Editor</link>, use the Events tab to replace macro assignments by component assignments, and type in the intended method names:"
+msgstr "Na zavihku Dogodki v podoknu lastnosti kontrolnika v <link href=\"text/sbasic/guide/create_dialog.xhp\">Urejevalniku pogovornega okna</link> zamenjajte dodelitve makrov z dodelitvami komponent in vnesite imena predvidenih metod:"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0674\n"
+"help.text"
+msgid "Set <literal>Dump to file</literal> dialog button component method name to <literal>_dump2File</literal>"
+msgstr "Ime metode komponente gumba pogovornega okna <literal>Dump to file</literal> nastavite na <literal>_dump2File</literal>"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0675\n"
+"help.text"
+msgid "Optionally define <literal>txtTracelog</literal> key pressed and mouse button pressed events component method names as <literal>_openHelp</literal>"
+msgstr "Po potrebi lahko določite imena metod za komponente dogodkov pritisnjene tipke in pritisnjene tipke miške <literal>txtTracelog</literal> kot <literal>_openHelp</literal>"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0676\n"
+"help.text"
+msgid "Optionally define <literal>Ok</literal> button receiving focus event component method name as <literal>onOkHasfocus</literal>"
+msgstr "Po potrebi določite gumb <literal>V redu</literal>, ki prejme ime komponente metode dogodka prejema pozornosti kot <literal>onOkHasfocus</literal>"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0677\n"
+"help.text"
+msgid "Events assigned actions should mention the <literal>vnd.sun.star.UNO:</literal> protocol."
+msgstr "Dogodkom dodeljena dejanja morajo omenjati protokol <literal>vnd.sun.star.UNO:</literal>."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0678\n"
+"help.text"
+msgid "Creating the handler"
+msgstr "Ustvarjanje krmilnika"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0679\n"
+"help.text"
+msgid "<literal>createDialogWithHandler</literal> method of <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\">com.sun.star.awt.DialogProvider2</link> service is used to set the dialog and its handler. The handler is responsible for implementing <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\">com.sun.star.awt.XDialogEventHandler</link> interface."
+msgstr "Metoda <literal>createDialogWithHandler</literal> storitve <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\">com.sun.star.awt.DialogProvider2</link> se uporablja za določitev pogovornega okna in njegovega krmilnika. Krmilnik je odgovoren za implementacijo vmesnika <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\">com.sun.star.awt.XDialogEventHandler</link>."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0680\n"
+"help.text"
+msgid "All component method names must be explicitly declared when using a dialog handler."
+msgstr "Ko uporabljate krmilnik pogovornih oken, morajo biti imena vseh metod komponent eksplicitno deklarirana."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0681\n"
+"help.text"
+msgid "With Python"
+msgstr "S Pythonom"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0682\n"
+"help.text"
+msgid "In this example the dialog is located on the computer."
+msgstr "V tem primeru se pogovorno okno nahaja na računalniku."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0692\n"
+"help.text"
+msgid "\"\"\" Access2Base Console Handler \"\"\""
+msgstr "\"\"\" Krmilnik konzole Access2Base \"\"\""
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0693\n"
+"help.text"
+msgid "''' adapted from « Créer un dialogue avec gestionnaire d'événements » by JM Zambon"
+msgstr "''' prirejeno po »Créer un dialogue avec gestionnaire d’événements« avtorja JM Zambona"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0716\n"
+"help.text"
+msgid "\"\"\" Create a Dialog from its location \"\"\""
+msgstr "\"\"\" Ustvari pogovorno okno iz njegovega mesta \"\"\""
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0729\n"
+"help.text"
+msgid "''' Ugly MsgBox '''"
+msgstr "''' Grdi MsgBox '''"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0740\n"
+"help.text"
+msgid "As expected, <literal>onOkHasFocus</literal> missing method throws an exception."
+msgstr "Manjkajoča metoda <literal>onOkHasFocus</literal> pričakovano vrže izjemo."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0741\n"
+"help.text"
+msgid "Refer to <link href=\"text/sbasic/python/python_2_basic.xhp\">Python calls to %PRODUCTNAME Basic</link> page for <literal>getBasicScript</literal> routine description and for details about cross-language scripting execution."
+msgstr "Oglejte si <link href=\"text/sbasic/python/python_2_basic.xhp\">klice Pythona v %PRODUCTNAME Basic</link> za opis rutine <literal>Getbasicscript</literal> in podrobnosti o skriptnem izvajanju v več jezikih."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0742\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "Z %PRODUCTNAME Basicom"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0743\n"
+"help.text"
+msgid "In this example the dialog is embedded in a document, and can equally be located on the computer."
+msgstr "V tem primeru je pogovorno okno vdelano v dokument in ga je mogoče enakovredno poiskati v računalniku."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0751\n"
+"help.text"
+msgid "dp.Initialize(Array(ThisComponent)) ' if doc-embedded dialog"
+msgstr "dp.Initialize(Array(ThisComponent)) ' če je pogovorno okno vdelano v dokument"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0958c\n"
+"help.text"
+msgid "method As String) As Boolean"
+msgstr "method As String) As Boolean"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0770\n"
+"help.text"
+msgid "'dialog.endDialog(1) if computer-based dialog"
+msgstr "'dialog.endDialog(1) če je pogovorno okno na računalniku"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0779\n"
+"help.text"
+msgid "' adapted from « Créer un dialogue avec gestionnaire d'événements » by JM Zambon"
+msgstr "' prirejeno po »Créer un dialogue avec gestionnaire d’événements« avtorja JM Zambona"
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0781\n"
+"help.text"
+msgid "As expected, <literal>onOkHasFocus</literal> missing method throws an exception."
+msgstr "Manjkajoča metoda <literal>onOkHasFocus</literal> pričakovano vrže izjemo."
+
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0505\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/03132000.xhp\">CreateUnoListener Function</link>"
+msgstr "<link href=\"text/sbasic/shared/03132000.xhp\">Funkcija CreateUnoListener</link>"
+
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"tit\n"
+"help.text"
+msgid "IDE for Python"
+msgstr "Integrirano razvojno okolje za Python"
+
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"bm_id761543349138561\n"
+"help.text"
+msgid "<bookmark_value>APSO</bookmark_value>            <bookmark_value>Alternative Python Scripts Organizer</bookmark_value>            <bookmark_value>python;IDE - integrated development environment</bookmark_value>            <bookmark_value>python;editor</bookmark_value>"
+msgstr "<bookmark_value>APSO</bookmark_value><bookmark_value>Alternative Python Scripts Organizer</bookmark_value><bookmark_value>Python;integrirano razvojno okolje (IDE)</bookmark_value><bookmark_value>Python;urejevalnik</bookmark_value>"
+
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"hd_id151543348965464\n"
+"help.text"
+msgid "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\">Setting up an Integrated Development Environment (IDE) for Python</link></variable>"
+msgstr "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\">Nastavljanje integriranega razvojnega okolja (IDE) za Python</link></variable>"
+
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"par_id541543348965465\n"
+"help.text"
+msgid "Writing Python macros requires extra configuration steps to set an IDE of choice."
+msgstr "Pisanje makrov v Pythonu zahteva dodatne korake prilagoditev, da določite želeno razvijalno okolje (IDE)."
+
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"N0106\n"
+"help.text"
+msgid "Unlike Basic language macros development in %PRODUCTNAME, developing Python scripts for %PRODUCTNAME requires to configure an external Integrated Development Environment (IDE). Multiple IDEs are available that range from beginners to advanced Python coders. While using a Python IDE programmers benefit from numerous features such as syntax highlighting, code folding, class browsing, code completion, coding standard enforcement, test driven development, debugging, version control and many more. You can refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> on the Wiki for more in-depth information about the setup of a bridge between your IDE and a running instance %PRODUCTNAME."
+msgstr "Za razliko od razvoja makrov Basic v %PRODUCTNAME zahteva razvoj skriptov Python za %PRODUCTNAME, da prilagodite zunanje integrirano razvojno okolje (IDE). Na voljo je več IDE-jev, ki so namenjeni od začetnikov do naprednih programerjev v Pythonu. Z uporabo IDE za Python imajo programerji koristi od številnih funkcionalnosti, kot so poudarjanje skladnje, strnjevanje kode, brskanje po razredih, dokončanje kode, sledenje standardom kodiranja, razvoj na osnovi preizkušanja, razhroščevanje, nadzor različic in še veliko drugih. Obrnete se lahko na <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\"> Oblikovanje in razvoj programov Python</link> na wikiju, kjer najdete podrobnejše informacije o nastavitvi mostu med vašim IDE in zagnanim primerkom %PRODUCTNAME."
+
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"hd_id761544698669786\n"
+"help.text"
+msgid "The APSO Extension"
+msgstr "Razširitev APSO"
+
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"N0104\n"
+"help.text"
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer (APSO)</link> extension eases the edition of Python scripts, in particular when embedded in a document. Using APSO you can configure your preferred source code editor, start the integrated Python shell and debug Python scripts. Extensions exist that help inspect arbitrary UNO objects, refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> for additional details on such extensions."
+msgstr "Razširitev <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternativni organizator skriptov Python (APSO)</link> poenostavi izdajo skriptov Python, zlasti ko so vdelani v dokument. Z uporabo APSO lahko prilagodite želeni urejevalnik izvorne kode, zaženete integrirano lupino Pythona in razhroščujete skripte Python. Obstajajo razširitve, ki pomagajo preučevati arbitrarne predmete UNO, glejte <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Oblikovanje in razvoj programov v Pythonu</link> za podrobnosti o takih razširitvah."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Importing Modules"
+msgstr "Uvažanje modulov Python"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0461\n"
+"help.text"
+msgid "<bookmark_value>Python;import</bookmark_value>        <bookmark_value>Python;Modules</bookmark_value>        <bookmark_value>Python;pythonpath</bookmark_value>        <bookmark_value>PythonLibraries</bookmark_value>"
+msgstr "<bookmark_value>Python;uvoz</bookmark_value><bookmark_value>Python;moduli</bookmark_value><bookmark_value>Python;pythonpath</bookmark_value><bookmark_value>PythonLibraries</bookmark_value>"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0462\n"
+"help.text"
+msgid "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\">Importing Python Modules</link></variable>"
+msgstr "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\">Uvažanje modulov Python</link></variable>"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0463\n"
+"help.text"
+msgid "%PRODUCTNAME Python scripts come in three distinct flavors, they can be personal, shared or embedded in documents. They are stored in varying places described in <link href=\"text/sbasic/python/python_locations.xhp\">Python Scripts Organization and Location</link>. In order to import Python modules, their locations must be known from Python at run time."
+msgstr "Skripti Python v %PRODUCTNAME so treh različnih vrst: lahko so osebni, v skupni rabi ali vdelani v dokumente. Shranjeni so na različnih mestih, opisanih v <link href=\"text/sbasic/python/python_locations.xhp\">Organizacija in mesto skriptov v Pythonu</link>. Da bi uvozili module Python, morajo biti njihova mesta znana iz Pythona v času izvajanja."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0464\n"
+"help.text"
+msgid "This mechanism is illustrated for file system based modules and document based modules. Exception handling is omitted for clarity. The terms library or directory, scripts or modules are used interchangeably. A Python macro refers to a function inside a module."
+msgstr "Ta mehanizem je ponazorjen za datotečni sistem, ki temelji na modulih in na dokumentih temelječih modulih. Obravnavanje izjem je zaradi jasnosti izpuščeno. Izraza knjižnica ali mapa, skripte ali moduli so zamenljivo uporabljeni. Makro Python se nanaša na funkcijo znotraj modula."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0465\n"
+"help.text"
+msgid "Note that <literal><User Profile>/Scripts/python/pythonpath</literal> local directory is always explored when running a Python macro from <literal><User Profile>/Scripts/python</literal>."
+msgstr "Upoštevajte, da je krajevna mapa <literal><Uporabniški profil>/Scripts/Python/pythonpath</literal> vedno preiskana, ko zaganjate makro Python iz <literal><Uporabniški profil>/Scripts/Python</literal>."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0466\n"
+"help.text"
+msgid "File System module import"
+msgstr "Uvoz modula File System"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0467\n"
+"help.text"
+msgid "User or Shared Modules"
+msgstr "Uporabniški ali skupni moduli"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0468\n"
+"help.text"
+msgid "Personal & shared Python scripts can be imported once their directories are included in Python run time path. Refer to <link href=\"text/sbasic/python/python_session.xhp\">Getting session information</link> page for more details regarding omitted Session Class."
+msgstr "Osebni in skupni skripti Python lahko uvozite, ko so njihove mape vključene v zagonsko pot Pythona. Glejte stran <link href=\"text/sbasic/python/python_session.xhp\">Pridobivanje informacij o seji</link>za podrobnosti o izpuščenem razredu Session."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0473\n"
+"help.text"
+msgid "user_lib = Session().UserPythonScripts  # User scripts location"
+msgstr "user_lib = Session().UserPythonScripts  # Mesto skriptov uporabnika"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0475\n"
+"help.text"
+msgid "sys.path.insert(0, user_lib)  # Add to search path"
+msgstr "sys.path.insert(0, user_lib)  # Dodaj v pot iskanja"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0476\n"
+"help.text"
+msgid "import screen_io as ui  # 'screen_io.py' module resides in user_lib directory"
+msgstr "import screen_io as ui  # Modul ‘screen_io. py ' prebiva v mapi user_lib"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0477\n"
+"help.text"
+msgid "# Your code follows here"
+msgstr "# Tukaj sledi vaša koda"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0478\n"
+"help.text"
+msgid "This Python example exposes a local XSCRIPTCONTEXT variable to an imported module:"
+msgstr "Ta primer Python izpostavi lokalno spremenljivko XSCRIPTCONTEXT uvoznemu modulu:"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0483\n"
+"help.text"
+msgid "share_lib = Session.SharedPythonScripts()  # Shared scripts location"
+msgstr "share_lib = Session.SharedPythonScripts()  # Mesto skriptov v skupni rabi"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0485\n"
+"help.text"
+msgid "sys.path.insert(0, share_lib)  # Add to search path"
+msgstr "sys.path.insert(0, share_lib)  # Dodaj v iskalno pot"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0486\n"
+"help.text"
+msgid "from IDE_utils import ScriptContext  # 'IDE_utils.py' sits with shared Python scripts."
+msgstr "from IDE_utils import ScriptContext  # \"IDE_utils. py\" sedi s skupnimi skripti Python."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0488\n"
+"help.text"
+msgid "# Your code follows here"
+msgstr "# Tukaj sledi vaša koda"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0489\n"
+"help.text"
+msgid "Installation Modules for Applications"
+msgstr "Namestitveni moduli za programe"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0490\n"
+"help.text"
+msgid "Unlike personal and shared scripts, %PRODUCTNAME installation scripts can be imported any time. Next to <literal>uno</literal> & <literal>unohelper</literal> %PRODUCTNAME Python modules, other scripts present in <literal><installation_path>/program</literal> directory can be imported directly, such as the <literal>msgbox</literal> module."
+msgstr "Za razliko od osebnih in v skupnih skriptov lahko skripte za namestitev %PRODUCTNAME uvozite kadar koli. Poleg modulov %PRODUCTNAME Python <literal>uno</literal> in <literal>unohelper</literal> lahko druge skripte iz mape <literal><pot_namestitve>/program</literal> uvozite neposredno, kot npr. modul <literal>msgbox</literal>."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0491\n"
+"help.text"
+msgid "With Python shell:"
+msgstr "V lupini Pythona:"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0534\n"
+"help.text"
+msgid "Document Module Import"
+msgstr "Uvoz modula Document"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0535\n"
+"help.text"
+msgid "Importing a Python document embedded module is illustrated below. Error handling is not detailed. Python run time path is updated when document has been opened and before closure. Refer to <link href=\"text/sbasic/shared/01040000.xhp\">Event-Driven Macros</link> to learn how to associate Python macros to document events."
+msgstr "Uvažanje v dokument vdelanega modula Python je prikazano spodaj. Obravnavanje napak ni podrobno opisano. Pot izvajanja Pythona je posodobljena, ko je dokument odprt in preden ga zapremo. Če želite izvedeti, kako povezati makre Python za dokumentiranje dogodkov, glejte <link href=\"text/sbasic/shared/01040000.xhp\">makre, ki temeljijo na dogodku</link>."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0541\n"
+"help.text"
+msgid "\"\"\" Prepare Python modules import when doc. loaded \"\"\""
+msgstr "\"\"\" Pripravi uvoz modulov Python, ko se naloži dokument \"\"\""
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0542\n"
+"help.text"
+msgid "PythonLibraries.loadLibrary('lib/subdir')  # Add directory to search path"
+msgstr "PythonLibraries.loadLibrary('lib/subdir')  # Dodaj mapo v iskalno pot"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0543\n"
+"help.text"
+msgid "PythonLibraries.loadLibrary('my_gui', 'screen_io')  # Add dir. & import screen_io"
+msgstr "PythonLibraries.loadLibrary('my_gui', 'screen_io')  # Dodaj mapo in uvozi screen_io"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0546\n"
+"help.text"
+msgid "\"\"\" Cleanup PYTHON_PATH when doc. Gets closed \"\"\""
+msgstr "\"\"\" Počisti PYTHON_PATH, ko se dok. zapre \"\"\""
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0547\n"
+"help.text"
+msgid "PythonLibraries.unloadLibrary('my_gui')  # Python runtime path cleanup"
+msgstr "PythonLibraries.unloadLibrary(‘my_gui’)  # Čiščenje poti izvajanja Pythona"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0548\n"
+"help.text"
+msgid "# Note: imported modules remain loaded in this example."
+msgstr "# Opomba: uvoženi moduli ostanejo v tem primeru naloženi."
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0553\n"
+"help.text"
+msgid "\"\"\" Python library loader and module importer"
+msgstr "\"\"\" Nalagalnik knjižnic in uvoznik modulov Python"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0555\n"
+"help.text"
+msgid "adapted from 'Bibliothèque de fonctions' by Hubert Lambert"
+msgstr "prirejeno po »Bibliothèque de fonctions« avtorja Huberta Lamberta"
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0556\n"
+"help.text"
+msgid "at https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213 \"\"\""
+msgstr "na naslovu https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213 \"\"\""
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0558\n"
+"help.text"
+msgid "\"\"\" Check run time module list \"\"\""
+msgstr "\"\"\" Preveri seznam modulov ob izvajanju \"\"\""
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0561\n"
+"help.text"
+msgid "\"\"\" Check PYTHON_PATH content \"\"\""
+msgstr "\"\"\" Preveri vsebino PYTHON_PATH \"\"\""
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0564\n"
+"help.text"
+msgid "\"\"\" add directory to PYTHON_PATH, import named module \"\"\""
+msgstr "\"\"\" Dodaj mapo v PYTHON_PATH, uvozi imenovani modul \"\"\""
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0573\n"
+"help.text"
+msgid "\"\"\" remove directory from PYTHON_PATH \"\"\""
+msgstr "\"\"\" Odstrani mapo iz PYTHON_PATH \"\"\""
+
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0580\n"
+"help.text"
+msgid "Refer to <link href=\"text/sbasic/python/python_listener.xhp\">Creating a Python Listener</link> for examples of event-driven macros."
+msgstr "Za primere makrov, proženih z dogodki, glejte <link href=\"text/sbasic/python/python_listener.xhp\">Ustvarjanje poslušalca Python</link>."
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Listeners : Creating Event Listeners"
+msgstr "Ustvarjanje poslušalcev dogodkov v Pythonu"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0385\n"
+"help.text"
+msgid "<bookmark_value>Python;Event Listener</bookmark_value>         <bookmark_value>Python;createUnoListener</bookmark_value>         <bookmark_value>Basic;Event Listener</bookmark_value>         <bookmark_value>API;ActionEvent</bookmark_value>         <bookmark_value>API;DialogProvider</bookmark_value>         <bookmark_value>API;EventObject</bookmark_value>         <bookmark_value>API;ExecutableDialogResults</bookmark_value>         <bookmark_value>API;XActionListener</bookmark_value>"
+msgstr "<bookmark_value>Python;poslušalec dogodkov</bookmark_value><bookmark_value>Python;createUnoListener</bookmark_value><bookmark_value>Basic;poslušalec dogodkov</bookmark_value><bookmark_value>API;ActionEvent</bookmark_value><bookmark_value>API;DialogProvider</bookmark_value><bookmark_value>API;EventObject</bookmark_value><bookmark_value>API;ExecutableDialogResults</bookmark_value><bookmark_value>API;XActionListener</bookmark_value>"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0386\n"
+"help.text"
+msgid "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\">Creating Event Listeners</link></variable>"
+msgstr "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\">Ustvarjanje poslušalcev dogodkov</link></variable>"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0387\n"
+"help.text"
+msgid "Events raised by dialogs, documents, forms or graphical controls can be linked to macros, which is referred to as event-driven programming. The most common method to relate events to macros are the <literal>Events</literal> tab in <menuitem>Tools – Customize</menuitem> menu and the <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog Editor</link> Control properties pane from <menuitem>Tools - Macros – Organise Dialogs...</menuitem> menu."
+msgstr "Dogodki, ki jih prožijo pogovorna okna, dokumenti, obrazci ali grafični kontrolniki, so lahko povezani z makri, kar imenujemo programiranje na podlagi dogodkov. Najpogostejša načina za povezovanje dogodkov z makri sta prek zavihka <literal>Dogodki</literal> v meniju <menuitem>Orodja – Prilagodi</menuitem> in prek podokna Lastnosti kontrolnika v <link href=\"text/sbasic/guide/create_dialog.xhp\">Urejevalniku pogovornih oken</link> v meniju <menuitem>Orodja – Makri – Organiziraj pogovorna okna</menuitem>."
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0388\n"
+"help.text"
+msgid "Graphical artifacts, keyboard inputs, mouse moves and other man/machine interactions can be controlled using UNO listeners that watch for the user’s behavior. Listeners are dynamic program code alternatives to macro assignments. One may create as many UNO listeners as events to watch for. A single listener can also handle multiple user interface controls."
+msgstr "Grafični artefakti, vnosi prek tipkovnice, poteze miške in druge interakcije med človekom in strojem je mogoče nadzorovati z uporabo poslušalcev UNO, ki sledijo vedenju uporabnika. Poslušalci so alternativa dinamični programski kodi za dodelitev makrom. Eden lahko ustvari toliko poslušalcev UNO, kot je dogodkov, ki jih želi spremljati. En poslušalec lahko obravnava tudi več kontrolnikov uporabniškega vmesnika."
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0389\n"
+"help.text"
+msgid "Creating an event listener"
+msgstr "Ustvarjanje poslušalca dogodkov"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0390\n"
+"help.text"
+msgid "Listeners get attached to controls held in dialogs, as well as to document or form events. Listeners are also used when creating runtime dialogs or when adding controls to a dialog on the fly."
+msgstr "Poslušalci so priloženi kontrolnikom v pogovornih oknih, kot tudi dogodkom dokumentov ali obrazcev. Poslušalci se uporabljajo tudi pri ustvarjanju izvajalnih pogovornih oken ali pri sprotnem dodajanju kontrolnikov v pogovorno okno."
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0391\n"
+"help.text"
+msgid "This example creates a listener for <literal>Button1</literal> control of <literal>Dialog1</literal> dialog in <literal>Standard</literal> library."
+msgstr "Ta primer ustvari poslušalca za kontrolnik <literal>Gumb1</literal> pogovornega okna <literal>PogovornoOkno1</literal> iz knjižnice <literal>Standardno</literal>."
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0392\n"
+"help.text"
+msgid "With Python"
+msgstr "S Pythonom"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0405\n"
+"help.text"
+msgid "_MY_LABEL = 'Python listens..'"
+msgstr "_MY_LABEL = 'Python je prisluhnil ...'"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0417\n"
+"help.text"
+msgid "MsgBox(\"The user acknowledged the dialog.\")"
+msgstr "MsgBox(\"Uporabnik je potrdil pogovorno okno.\")"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0419\n"
+"help.text"
+msgid "MsgBox(\"The user canceled the dialog.\")"
+msgstr "MsgBox(\"Uporabnik je preklical pogovorno okno.\")"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0424\n"
+"help.text"
+msgid "\"\"\" Create a Dialog from its location \"\"\""
+msgstr "\"\"\" Ustvari pogovorno okno iz njegovega mesta \"\"\""
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0437\n"
+"help.text"
+msgid "\"\"\" Listen to & count button clicks \"\"\""
+msgstr "\"\"\" Poslušanje in štetje klikov gumbov \"\"\""
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0448\n"
+"help.text"
+msgid "def disposing(self, evt: EventObject):  # mandatory routine"
+msgstr "def disposing(self, evt: EventObject):  # obvezna rutina"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0457\n"
+"help.text"
+msgid "<emph>msgbox.py</emph> in <emph>{installation}/program/</emph> directory has some examples of button listeners."
+msgstr "<emph>msgBox.py</emph> in mapa <emph>{namestitev}/program/</emph> vsebujeta nekaj primerov poslušalcev gumbov."
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0458\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "Z %PRODUCTNAME Basicom"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0459d\n"
+"help.text"
+msgid "Const MY_LABEL = \"Basic listens..\""
+msgstr "Const MY_LABEL = \"Basic je prisluhnil ...«"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0478\n"
+"help.text"
+msgid "Case rc.OK : MsgBox \"The user acknowledged the dialog.\",, \"Basic\""
+msgstr "Case rc.OK : MsgBox \"Uporabnik je potrdil pogovorno okno.\",, \"Basic\""
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0479\n"
+"help.text"
+msgid "Case rc.CANCEL : MsgBox \"The user canceled the dialog.\",, \"Basic\""
+msgstr "Case rc.CANCEL : MsgBox \"Uporabnik je preklical pogovorno okno.\",, \"Basic\""
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0486\n"
+"help.text"
+msgid "''' Listen to & count button clicks '''"
+msgstr "''' Poslušanje in štetje klikov gumbov '''"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0496\n"
+"help.text"
+msgid "' your code goes here"
+msgstr "' vaša koda sodi sem"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0498\n"
+"help.text"
+msgid "Other Event Listeners"
+msgstr "Drugi poslušalci dogodkov"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0499\n"
+"help.text"
+msgid "Listeners are usually coded along with <link href=\"text/sbasic/python/python_dialogs.xhp\">dialog opening</link>. Numerous listener approaches are possible such as event handlers for dialogs or event monitors for documents or forms."
+msgstr "Poslušalci so običajno kodirani skupaj z <link href=\"text/sbasic/python/python_dialogs.xhp\">odpiranjem pogovornega okna</link>. Možni so številni pristopi glede poslušalca, kot so obravnalniki dogodkov za pogovorna okna ali spremljevalci dogodkov za dokumente in obrazce."
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0506\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060700.xhp\">Events mapping to objects</link>"
+msgstr "<link href=\"text/swriter/01/05060700.xhp\">Preslikovanje dogodkov v predmete</link>"
+
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0509\n"
+"help.text"
+msgid "See also <link href=\"text/sbasic/shared/01040000.xhp\">Document events</link>, <link href=\"text/shared/02/01170202.xhp\">Form events</link>."
+msgstr "Glejte tudi <link href=\"text/sbasic/shared/01040000.xhp\">Dogodki dokumenta</link> in <link href=\"text/shared/02/01170202.xhp\">Dogodki obrazca</link>."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Scripts Organization"
+msgstr "Organizacija skriptov v Pythonu"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id391543358231021\n"
+"help.text"
+msgid "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\">Python Scripts Organization and Location</link></variable>"
+msgstr "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\">Organizacija in mesto skriptov v Pythonu</link></variable>"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id481636114810038\n"
+"help.text"
+msgid "%PRODUCTNAME macros are grouped in module files, modules are usually grouped in library folders, and libraries are grouped in library containers although containers can contain modules too."
+msgstr "Makri %PRODUCTNAME so združeni v skupine v datotekah modulov, moduli so ponavadi združeni v mapah knjižnice, te pa so združene v vsebnikih knjižnic, čeprav lahko vsebniki vsebujejo tudi module."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id771543358231022\n"
+"help.text"
+msgid "A library is used as a major grouping for either an entire category of macros, or for an entire application. Modules usually split functionality, such as user interaction and calculations. Individual macros are subroutines and functions. The Figure below shows an example of the hierarchical structure of macro libraries in %PRODUCTNAME."
+msgstr "Knjižnica se uporablja kot osrednje mesto zbiranja za celotno kategorijo makrov ali za celoten program. Moduli se običajno delijo glede na funkcionalnost, kot je npr. interakcija z uporabnikom ali izračuni. Posamezni makri so podprogrami in funkcije. Spodnja slika prikazuje primer hierarhične strukture knjižnic makrov v %PRODUCTNAME."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id771636279690940\n"
+"help.text"
+msgid "<image src=\"media/helpimg/sbasic/Library-Container.svg\" id=\"img_id121636285791637\" width=\"8cm\" height=\"5.5cm\"><alt id=\"alt_id471636279690940\">Library Container diagram</alt></image>"
+msgstr "<image src=\"media/helpimg/sbasic/Library-Container.svg\" id=\"img_id121636285791637\" width=\"8cm\" height=\"5.5cm\"><alt id=\"alt_id471636279690940\">Diagram vsebina knjižnice</alt></image>"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id171636114787810\n"
+"help.text"
+msgid "<emph>Figure:</emph> Macro Library hierarchy"
+msgstr "<emph>Slika:</emph> hierarhija knjižnice makrov"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id801636114790638\n"
+"help.text"
+msgid "The containers are accessible in all %PRODUCTNAME programs through the user interface. Go to <menuitem>Tools > Macros > Organize Macros > Python</menuitem>, to open the Python Macros dialog."
+msgstr "Vsebniki so dosegljivi v vseh programih %PRODUCTNAME prek uporabniškega vmesnika. Izberite <menuitem>Orodja > Makri > Organiziraj makre > Python</menuitem>, da odprete pogovorno okno Makri Python."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id801636114808666\n"
+"help.text"
+msgid "Three library containers are shown in the Macro From list:"
+msgstr "Na seznamu Makro iz so prikazani trije vsebniki knjižnic:"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id321636114854594\n"
+"help.text"
+msgid "<emph>My Macros:</emph> personal macros available for the %PRODUCTNAME user"
+msgstr "<emph>Moji makri</emph>: osebni makri, ki so na voljo uporabniku %PRODUCTNAME."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id471636114847530\n"
+"help.text"
+msgid "<emph>Application Macros:</emph> system macros distributed with %PRODUCTNAME for every computer user"
+msgstr "<emph>Makri programa:</emph> sistemski makri, ki se namestijo skupaj z %PRODUCTNAME za vse uporabnike pisarniškega paketa."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id191636114858218\n"
+"help.text"
+msgid "<emph>Document macros:</emph>  every document can contain macro libraries available in that document for all users"
+msgstr "<emph>Makri dokumenta:</emph> vsak dokument lahko vsebuje knjižnice makrov, ki so na voljo v tem dokumentu za vse njegove uporabnike."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id911544049584458\n"
+"help.text"
+msgid "Python Script Locations"
+msgstr "Mesta skriptov v Pythonu"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id121551089455774\n"
+"help.text"
+msgid "Refer to <link href=\"text/sbasic/python/python_session.xhp\">Getting Session Information</link> in order to get programmatic access to Python script locations."
+msgstr "Oglejte si <link href=\"text/sbasic/python/python_session.xhp\">Pridobivanje informacij o seji</link>, da pridobite programski dostop do lokacij skriptov Python."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id591544049572647\n"
+"help.text"
+msgid "Application Macros"
+msgstr "Makri programa"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id261544049064421\n"
+"help.text"
+msgid "Existing macros in this location (container) were copied by the installation program and are available to every computer user, and any open document can access macros stored the container. You need administrative rights to store or edit macros here."
+msgstr "Obstoječe makre na tem mestu (vsebnik) je kopiral namestitveni program in so na voljo vsakemu uporabniku računalnika, vsak odprti dokument pa lahko dostopa do makrov, shranjenih v vsebniku. Za shranjevanje ali urejanje makrov na tem mestu potrebujete skrbniške pravice."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id861544210028670\n"
+"help.text"
+msgid "The %PRODUCTNAME  Macros container location in the file system depends on the operating system:"
+msgstr "Mesto vsebnika makrov %PRODUCTNAME v datotečnem sistemu je odvisno od operacijskega sistema:"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id191544210072242\n"
+"help.text"
+msgid "For <emph>Windows</emph>: <literal>{Installation}\\share\\Scripts\\python</literal>."
+msgstr "Za <emph>Windows</emph>: <literal>{namestitev}\\share\\Scripts\\python</literal>."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id61544210078654\n"
+"help.text"
+msgid "For <emph>Linux</emph> and <emph>macOS</emph>: <literal>{Installation}/share/Scripts/python</literal>."
+msgstr "Za <emph>Linux</emph> in <emph>macOS</emph>: <literal>{namestitev}/share/Scripts/python</literal>."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id861544049692222\n"
+"help.text"
+msgid "My Macros"
+msgstr "Moji makri"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id981544049055996\n"
+"help.text"
+msgid "This container is accessible only by the %PRODUCTNAME user. Any open document can access macros stored the container. Macros in this location are stored in the %PRODUCTNAME user profile."
+msgstr "Ta vsebnik je dostopen samo uporabniku %PRODUCTNAME. Vsak odprti dokument lahko dostopa do makrov, shranjenih v vsebniku. Makri na tem mestu so shranjeni v uporabniškem profilu %PRODUCTNAME."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id341544210187846\n"
+"help.text"
+msgid "The My Macros container location is in the user space and depends on the operating system:"
+msgstr "Mesto vsebnika Moji makri je v uporabniškem prostoru in je odvisno od operacijskega sistema:"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id381544210213190\n"
+"help.text"
+msgid "For <emph>Windows</emph>,<br/><literal>%APPDATA%\\LibreOffice\\4\\user\\Scripts\\python</literal>."
+msgstr "Za <emph>Windows</emph>:<br/><literal>%APPDATA%\\LibreOffice\\4\\user\\Scripts\\python</literal>"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id691544210219850\n"
+"help.text"
+msgid "For <emph>Linux</emph> and <emph>macOS</emph>,<br/><literal>$HOME/.config/libreoffice/4/user/Scripts/python</literal>."
+msgstr "Za <emph>Linux</emph> in <emph>macOS</emph>:<br/><literal>$HOME/.config/libreoffice/4/user/Scripts/python</literal>"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id101544049707712\n"
+"help.text"
+msgid "Document macros"
+msgstr "Makri v dokumentih"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id31544049046497\n"
+"help.text"
+msgid "Document macros are embedded in the document and are accessible only when the document is open."
+msgstr "Makri dokumenta so vdelani v dokument in dosegljivi le, ko je ta dokument odprt."
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id171544049715310\n"
+"help.text"
+msgid "Libraries, Modules and Macros"
+msgstr "Knjižnice, moduli in makri"
+
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id181544209916707\n"
+"help.text"
+msgid "Python macros can be organized in libraries, modules and macros. Use the Macro Library hierarchy as a guide when creating or installing new macros in module files, new module files in library folders or new library folders in containers."
+msgstr "Makre Python lahko organiziramo v knjižnice, module in makre. Uporabite hierarhijo knjižnice makrov kot vodilo pri ustvarjanju ali nameščanju novih makrov v datoteke modula, novih datotek modula v mape knjižnice ali novih map knjižnice v vsebnike."
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Platform class"
+msgstr "Pythonov razred Platform"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0508\n"
+"help.text"
+msgid "<bookmark_value>Platform;isLinux</bookmark_value>        <bookmark_value>Platform;isMacOsX</bookmark_value>        <bookmark_value>Platform;isWindows</bookmark_value>        <bookmark_value>Platform;ComputerName</bookmark_value>        <bookmark_value>Platform;OSName</bookmark_value>        <bookmark_value>API;ConfigurationAccess</bookmark_value>        <bookmark_value>Tools;GetRegistryContent</bookmark_value>"
+msgstr "<bookmark_value>razred Platform;isLinux</bookmark_value><bookmark_value>razred Platform;isMacOsX</bookmark_value><bookmark_value>razred Platform;isWindows</bookmark_value><bookmark_value>razred Platform;ComputerName</bookmark_value><bookmark_value>razred Platform;OSName</bookmark_value><bookmark_value>API;ConfigurationAccess</bookmark_value><bookmark_value>orodja;GetRegistryContent</bookmark_value>"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0509\n"
+"help.text"
+msgid "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\">Identifying the operating system</link></variable>"
+msgstr "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\">Prepoznavanje operacijskega sistema</link></variable>"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0510\n"
+"help.text"
+msgid "Identifying the operating system can be performed with Python or Basic language."
+msgstr "Prepoznavanje operacijskega sistema lahko izvedete z jezikom Python ali Basic."
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0511\n"
+"help.text"
+msgid "ComputerName property is solely available for Windows. Basic calls to Python macros help overcome %PRODUCTNAME Basic limitations."
+msgstr "%PRODUCTNAME Basicu manjka domorodno prepoznavanje macOS, medtem ko je lastnost ComputerName na voljo le v okoljih Windows. Klici Basica na makre Python pomagajo pri premoščanju takšnih omejitev."
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0512\n"
+"help.text"
+msgid "Using a Python class:"
+msgstr "Z uporabo razreda Python:"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0529\n"
+"help.text"
+msgid "Using a Basic classmodule:"
+msgstr "Uporaba razrednega modula Basic:"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"NO529b\n"
+"help.text"
+msgid "%PRODUCTNAME Basic lacks MacOS X native recognition. Platform identification is possible using %PRODUCTNAME Application Programming Interface (API)."
+msgstr "%PRODUCTNAME Basic ne prepozna sistema macOS. Identifikacija platforme je tako možna z uporabo programskega vmesnika API %PRODUCTNAME (angl. Application Programming Interface)."
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0451\n"
+"help.text"
+msgid "' Return platform name as \"MAC\", \"UNIX\", \"WIN\""
+msgstr "' Vrni ime platforme kot \"MAC\", \"UNIX\", \"WIN\""
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0551\n"
+"help.text"
+msgid "' Inferred from \"Tools.UCB.ShowHelperDialog\" function"
+msgstr "' Sklepanje po funkciji \"Tools.UCB.ShowHelperDialog\""
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0564\n"
+"help.text"
+msgid "Examples:"
+msgstr "Primeri:"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0565\n"
+"help.text"
+msgid "With Python"
+msgstr "S Pythonom"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0567\n"
+"help.text"
+msgid "<literal>>>> print(Platform().isMacOSX)  # object property</literal>"
+msgstr "<literal>>>> print(Platform().isMacOSX)  # lastnost predmeta</literal>"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0569\n"
+"help.text"
+msgid "<literal>>>> input(Platform().OSName)  # object property</literal>"
+msgstr "<literal>>>> input(Platform().OSName)  # lastnost predmeta</literal>"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0571\n"
+"help.text"
+msgid "From <menuitem>Tools – Macros - Run Macro...</menuitem> menu."
+msgstr "Izberite <menuitem>Orodja – Makri – Zaženi makro</menuitem>."
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0576\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "Z %PRODUCTNAME Basicom"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0578\n"
+"help.text"
+msgid "Dim p As New Platform ' instance of Platform class"
+msgstr "Dim p As New Platform ‘ instanca razreda Platform"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0579\n"
+"help.text"
+msgid "MsgBox p.isLinux ' object property"
+msgstr "MsgBox p.isLinux ‘ lastnost predmeta"
+
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0580\n"
+"help.text"
+msgid "Print p.isWindows, p.OSName ' object properties"
+msgstr "Print p.isWindows, p.OSName ‘ lastnosti predmeta"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Programming with Python"
+msgstr "Programiranje v Pythonu"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0218\n"
+"help.text"
+msgid "<bookmark_value>Python;Programming</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;Python</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;getComponentContext</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;getDesktop</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;getDocument</bookmark_value>      <bookmark_value>uno.py;getComponentContext</bookmark_value>      <bookmark_value>uno.py;getDesktop</bookmark_value>      <bookmark_value>uno.py;getDocument</bookmark_value>"
+msgstr "<bookmark_value>Python;programiranje</bookmark_value><bookmark_value>XSCRIPTCONTEXT;Python</bookmark_value><bookmark_value>XSCRIPTCONTEXT;getComponentContext</bookmark_value><bookmark_value>XSCRIPTCONTEXT;getDesktop</bookmark_value><bookmark_value>XSCRIPTCONTEXT;getDocument</bookmark_value><bookmark_value>uno.py;getComponentContext</bookmark_value><bookmark_value>uno.py;getDesktop</bookmark_value><bookmark_value>uno.py;getDocument</bookmark_value>"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"hd_id691546462755220\n"
+"help.text"
+msgid "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\">Programming with Python Scripts</link></variable>"
+msgstr "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\">Programiranje s skripti Python</link></variable>"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0220\n"
+"help.text"
+msgid "A Python macro is a function within a .py file, identified as a module. Unlike %PRODUCTNAME Basic and its dozen of <link href=\"text/sbasic/shared/uno_objects.xhp\">UNO objects functions or services</link>, Python macros use the <literal>XSCRIPTCONTEXT</literal> UNO single object, shared with JavaScript and BeanShell. The <literal>g_exportedScripts</literal> global tuple explicitly lists selectable macros from a module. Python modules hold autonomous code logic, and are independent from one another."
+msgstr "Makro Python je funkcija v datoteki. py, identificirana kot modul. Za razliko od %PRODUCTNAME Basica in njegovih ducat <link href=\"text/sbasic/shared/uno_objects.xhp\">funkcij ali storitev predmetov UNO</link> makri v Pythonu uporabljajo posamičen predmet UNO <literal>XSCRIPTCONTEXT</literal>, v skupni rabi z JavaScriptom ter BeanShellom. Globalna tupla <literal>g_exportedScripts</literal> izrecno našteva izbirne makre iz modula. Moduli Python imajo avtonomno logiko kode in so neodvisni drug od drugega."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0221\n"
+"help.text"
+msgid "XSCRIPTCONTEXT Global Variable"
+msgstr "Globalna spremenljivka XSCRIPTCONTEXT"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0222\n"
+"help.text"
+msgid "Genuine Basic UNO facilities can be inferred from <literal>XSCRIPTCONTEXT</literal> global variable. Refer to %PRODUCTNAME API for a complete <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\">description of XSCRIPTCONTEXT</link>. <literal>XSCRIPTCONTEXT</literal> methods summarize as:"
+msgstr "Izvirne zmožnosti Basic UNO je mogoče prevzeti iz globalne spremenljivke <literal>XSCRIPTCONTEXT</literal>. Glejte API %PRODUCTNAME za popoln <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\">opis XSCRIPTCONTEXT</link>. Metode <literal>XSCRIPTCONTEXT</literal> lahko povzamemo tako:"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0224\n"
+"help.text"
+msgid "Methods"
+msgstr "Metode"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0225\n"
+"help.text"
+msgid "Description"
+msgstr "Opis"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0226\n"
+"help.text"
+msgid "Mapped in Basic as"
+msgstr "Preslikano v Basic kot"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0228\n"
+"help.text"
+msgid "The document reference on which the script can operate."
+msgstr "Sklic dokumenta, na katerem lahko skript deluje."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0231\n"
+"help.text"
+msgid "The desktop reference on which the script can operate."
+msgstr "Sklic namizja, na katerem lahko skript deluje."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0234\n"
+"help.text"
+msgid "The component context which the script can use to create other uno components."
+msgstr "Kontekst komponente, ki ga skript lahko uporabi za ustvarjanje drugih komponent UNO."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0237\n"
+"help.text"
+msgid "<emph>HelloWorld</emph> and <emph>Capitalise</emph> installation shared scripts illustrate UNO-related macros making use of <literal>XSCRIPTCONTEXT</literal> global variable."
+msgstr "Ob namestitvi v skupno rabo podana skripta <emph>HelloWorld</emph> ter <emph>Capitalise</emph> sta ilustracija za Uno-sorodne makre, ki uporabljajo globalno spremenljivko <literal>XSCRIPTCONTEXT</literal>."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0238\n"
+"help.text"
+msgid "Python standard output file is not available when running Python macros from <menuitem>Tools - Macros - Run Macro</menuitem> menu. Refer to <emph>Input/Output to Screen</emph> for more information."
+msgstr "Standardna izhodna datoteka v Pythonu ni na voljo, ko zaženete makre Python makre prek menijskega ukaza <menuitem>Orodja – Makri – Zaženi makro</menuitem>. Za podrobnosti glejte <emph>Vhod/izhod prek zaslona</emph> ."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0239\n"
+"help.text"
+msgid "Module import"
+msgstr "Uvoz modulov"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0240\n"
+"help.text"
+msgid "<literal>XSCRIPTCONTEXT</literal> is not provided to imported modules."
+msgstr "<literal>XSCRIPTCONTEXT</literal> ni na voljo za uvožene module."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0241\n"
+"help.text"
+msgid "%PRODUCTNAME Basic libraries contain classes, routines and variables, Python modules contain classes, functions and variables. Common pieces of reusable Python or UNO features must be stored in <link href=\"text/sbasic/python/python_locations.xhp\">My macros</link> within <literal>(User Profile)/Scripts/python/pythonpath</literal>. Python libraries help organize modules in order to prevent module name collisions. Import <literal>uno.py</literal> inside shared modules."
+msgstr "Knjižnice %PRODUCTNAME Basic vsebujejo razrede, procedure in spremenljivke, moduli Python pa vsebujejo razrede, funkcije in spremenljivke. Skupne kose ponovno uporabnih funkcionalnosti Python ali UNO je potrebno shraniti v <link href=\"text/sbasic/python/python_locations.xhp\">Moje makre</link> v <literal><User Profile>/Scripts/python/pythonpath</literal>. Knjižnice Python so priročne za organizacijo modulov, da preprečite spore z imeni modulov. Uvozite <literal>uno.py</literal> v module za skupno rabo."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0242\n"
+"help.text"
+msgid "Genuine BASIC UNO facilities can be inferred using <literal>uno.py</literal> module. Use <link href=\"text/sbasic/python/python_shell.xhp\">Python interactive shell</link> to get a complete module description using <literal>dir()</literal> and <literal>help()</literal> Python commands."
+msgstr "Izvirne zmožnosti Basic UNO je mogoče prevzeti iz modula <literal>uno.py</literal>. Uporabite <link href=\"text/sbasic/python/python_shell.xhp\">interaktivno lupino Python</link> za popoln opis modula z ukazoma Python <literal>dir()</literal> in <literal>help()</literal>."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"bm_id391659034206678\n"
+"help.text"
+msgid "<bookmark_value>uno.py</bookmark_value>        <bookmark_value>uno.py;absolutize</bookmark_value>        <bookmark_value>uno.py;createUnoStruct</bookmark_value>        <bookmark_value>uno.py;fileUrlToSystemPath</bookmark_value>        <bookmark_value>uno.py;getClass</bookmark_value>        <bookmark_value>uno.py;getComponentContext</bookmark_value>        <bookmark_value>uno.py;Enum</bookmark_value>        <bookmark_value>uno.py;getConstantByName</bookmark_value>        <bookmark_value>uno.py;isInterface</bookmark_value>        <bookmark_value>uno.py;systemPathToFileUrl</bookmark_value>"
+msgstr "<bookmark_value>uno.py</bookmark_value><bookmark_value>uno.py;absolutize</bookmark_value><bookmark_value>uno.py;createUnoStruct</bookmark_value><bookmark_value>uno.py;fileUrlToSystemPath</bookmark_value><bookmark_value>uno.py;getClass</bookmark_value><bookmark_value>uno.py;getComponentContext</bookmark_value><bookmark_value>uno.py;Enum</bookmark_value><bookmark_value>uno.py;getConstantByName</bookmark_value><bookmark_value>uno.py;isInterface</bookmark_value><bookmark_value>uno.py;systemPathToFileUrl</bookmark_value>"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0244\n"
+"help.text"
+msgid "Functions"
+msgstr "Funkcije"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0245\n"
+"help.text"
+msgid "Description"
+msgstr "Opis"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0246\n"
+"help.text"
+msgid "Mapped in Basic as"
+msgstr "Preslikano v Basic kot"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0248\n"
+"help.text"
+msgid "Returns an absolute file url from the given urls."
+msgstr "Vrne absolutni URL datoteke iz danih URL-jev."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0251\n"
+"help.text"
+msgid "Creates a UNO struct or exception given by typeName."
+msgstr "Ustvari strukturo UNO ali izjemo, ki jo poda typeName."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0254\n"
+"help.text"
+msgid "Returns a system path."
+msgstr "Vrne sistemsko pot."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0257\n"
+"help.text"
+msgid "Returns the class of a concrete UNO exception, struct, or interface."
+msgstr "Vrne razred konkretne izjeme UNO, struct ali vmesnika (interface)."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0260\n"
+"help.text"
+msgid "Returns the UNO component context used to initialize the Python runtime."
+msgstr "Vrne kontekst komponente UNO, ki se uporablja za inicializacijo izvajalnika Python."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0264\n"
+"help.text"
+msgid "Looks up the value of an IDL constant by giving its explicit name."
+msgstr "Pridobi vrednost konstante IDL s podajanjem njenega izrecnega imena."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0265\n"
+"help.text"
+msgid "See API constant groups"
+msgstr "Glejte skupine konstant API-ja"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0267\n"
+"help.text"
+msgid "Returns True, when obj is a class of a UNO interface."
+msgstr "Vrne TRUE, ko je obj razred vmesnika UNO."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0270\n"
+"help.text"
+msgid "Returns a file URL for the given system path."
+msgstr "Vrne URL datoteke za dano sistemsko pot."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0272\n"
+"help.text"
+msgid "<emph>LibreLogo</emph> and <emph>TableSample</emph> installation shared scripts use <literal>uno.py</literal> module."
+msgstr "Ob namestitvi v skupno rabo podana skripta <emph>LibreLogo</emph> ter <emph>TableSample</emph> uporabljata modul <literal>uno.py</literal>."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0273\n"
+"help.text"
+msgid "More Python-Basic samples"
+msgstr "Dodani primeri Python/Basic"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0275\n"
+"help.text"
+msgid "Python UNO"
+msgstr "Python UNO"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0276\n"
+"help.text"
+msgid "Basic UNO features"
+msgstr "Funkcionalnosti UNO Basic"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0284\n"
+"help.text"
+msgid "See <link href=\"text/sbasic/python/python_dialogs.xhp\">Opening a Dialog</link>"
+msgstr "Glejte <link href=\"text/sbasic/python/python_dialogs.xhp\">Odpiranje pogovornega okna</link>."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0286\n"
+"help.text"
+msgid "See <link href=\"text/sbasic/python/python_listener.xhp\">Creating a Listener</link>"
+msgstr "Glejte <link href=\"text/sbasic/python/python_listener.xhp\">Ustvarjanje poslušalca</link>."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0288\n"
+"help.text"
+msgid "See UNO data types"
+msgstr "Glejte podatkovne vrste UNO"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N1297\n"
+"help.text"
+msgid "Importing an embedded Module"
+msgstr "Uvoz vdelanega modula"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N1298\n"
+"help.text"
+msgid "Similarly to %PRODUCTNAME Basic that supports browsing and dynamic loading of libraries, Python libraries can be explored and imported on demand. For more information on library containers, visit <link href=\"https://api.libreoffice.org/\">%PRODUCTNAME Application Programming Interface</link> (API) or download <link href=\"https://www.libreoffice.org/download/download/\">%PRODUCTNAME Software Development Kit</link> (SDK)."
+msgstr "Podobno kot %PRODUCTNAME Basic, ki podpira brskanje in dinamično nalaganje knjižnic, lahko knjižnice Python raziskujete in uvažate na zahtevo. Če želite več informacij o vsebnikih knjižnice, obiščite <link href=\"https://api.libreoffice.org/\">Programski vmesnik %PRODUCTNAME (API)</link> ali prenesite <link href=\"https://sl.libreoffice.org/prenosi/prenesi-libreoffice/\">Razvojni programski paket %PRODUCTNAME (SDK)</link>."
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N3299\n"
+"help.text"
+msgid "Importing a Python document embedded module is illustrated below, exception handling is not detailed:"
+msgstr "Uvažanje v dokument vdelanega modula Python je prikazano spodaj, ravnanje z izjemami ni podrobno opisano:"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0303\n"
+"help.text"
+msgid "\"\"\" load library and import module"
+msgstr "\"\"\" naloži knjižnico in uvozi modul"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0305\n"
+"help.text"
+msgid "Adapted from 'Bibliothèque de fonctions' by Hubert Lambert"
+msgstr "Prirejeno po »Bibliothèque de fonctions« avtorja Huberta Lamberta"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0306\n"
+"help.text"
+msgid "at https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213\"\"\""
+msgstr "na naslovu https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213\"\"\""
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0307\n"
+"help.text"
+msgid "doc = XSCRIPTCONTEXT.getDocument()  # current document"
+msgstr "doc = XSCRIPTCONTEXT.getDocument()  # trenutni dokument"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0310\n"
+"help.text"
+msgid "if not url in sys.path:  # add path if necessary"
+msgstr "if not url in sys.path:  # po potrebi dodaj pot"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0311\n"
+"help.text"
+msgid "sys.path.insert(0, url)  # doclib takes precedence"
+msgstr "sys.path.insert(0, url)  # doclib ima prednost"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0312\n"
+"help.text"
+msgid "if module_name:  # import if requested"
+msgstr "if module_name:  # uvozi, če je zahtevano"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0316\n"
+"help.text"
+msgid "ui = load_library(\"my_gui\",'screen_io')  # add <lib> path + import <module>"
+msgstr "ui = load_library(\"my_gui\",'screen_io')  # dodaj pot <lib> in uvozi <module>"
+
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0321\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/uno_objects.xhp\">Basic UNO Objects, Functions and Services</link>"
+msgstr "<link href=\"text/sbasic/shared/uno_objects.xhp\">Predmeti, funkcije in storitve UNO Basic</link>"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Screen Input/Output"
+msgstr "Vhod/izhod prek zaslona v Pythonu"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0433\n"
+"help.text"
+msgid "<bookmark_value>Python;InputBox</bookmark_value>        <bookmark_value>Python;MsgBox</bookmark_value>        <bookmark_value>Python;Print</bookmark_value>        <bookmark_value>API;script.provider.MasterScriptProvider: Screen Input/Output</bookmark_value>        <bookmark_value>API;script.provider.XScript: Screen Input/Output</bookmark_value>"
+msgstr "<bookmark_value>Python;InputBox</bookmark_value><bookmark_value>Python;MsgBox</bookmark_value><bookmark_value>Python;Print</bookmark_value><bookmark_value>API;zaslonski V/I s script.provider.MasterScriptProvider</bookmark_value><bookmark_value>API;zaslonski V/I s script.provider.XScript</bookmark_value>"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0434\n"
+"help.text"
+msgid "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\">Input/Output to Screen</link></variable>"
+msgstr "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\">Zaslonski vhod/izhod</link></variable>"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0435\n"
+"help.text"
+msgid "Python standard output file is not available when running Python macros from <menuitem>Tools – Macros - Run Macro</menuitem>... menu. Presenting the output of a module requires the Python interactive console. Features such as <literal>input()</literal>, <literal>print()</literal>, <literal>repr()</literal> and <literal>str()</literal> are available from the Python shell."
+msgstr "Standardna izhodna datoteka Pythona ni na voljo, ko zaženete makre Python prek menijskega ukaza <menuitem>Orodja – Makri - Zaženi makro</menuitem>. Za predstavljanje izhoda modula je potrebna interaktivna konzola Python. Funkcionalnosti, kot so <literal>input()</literal>, <literal>print()</literal>, <literal>repr()</literal> in <literal>str()</literal>, so na voljo v lupini Python."
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"msgbox_tip\n"
+"help.text"
+msgid "%PRODUCTNAME <literal>msgbox</literal> Python module proposes a <literal>msgbox()</literal> method that is illustrated in <link href=\"text/sbasic/python/python_handler.xhp\">Creating Event Listeners</link> and <link href=\"text/sbasic/python/python_handler.xhp\">Creating a dialog handler</link> example pages."
+msgstr "Modul Pythona <literal>msgbox</literal> v %PRODUCTNAME ponuja metodo <literal>msgbox()</literal>, ki je ilustrirana na straneh s primeri <link href=\"text/sbasic/python/python_handler.xhp\">Ustvarjanje poslušalcev dogodkov</link> in <link href=\"text/sbasic/python/python_handler.xhp\">Ustvarjanje ravnalnika pogovornega okna</link>."
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0437\n"
+"help.text"
+msgid "%PRODUCTNAME Basic proposes <literal>InputBox()</literal>, <literal>Msgbox()</literal> and <literal>Print()</literal> screen I/O functions. Python alternatives exist relying either on %PRODUCTNAME API Abstract Windowing Toolkit, either on Python to Basic function calls. The latter proposes a syntax that is intentionally close to that of Basic, and uses a Python module next to a Basic module. The API Scripting Framework is used to perform Basic, BeanShell, JavaScript and Python inter-languages function calls."
+msgstr "%PRODUCTNAME Basic ponuja za vhod/izhod prek zaslona funkcije <literal>InputBox()</literal>, <literal>Msgbox()</literal> in <literal>Print()</literal>. Obstajajo alternative Pythona, ki se zanašajo na Abstract Windowing Toolkit %PRODUCTNAME API, in sicer na klice funkcij Python ali Basic. Slednje ponuja skladnjo, namerno podobno tisti za Basic,in uporablja modul Python ob modulu Basic. Za izvajanje večjezikovnih klicev funkcij Basic, BeanShell, JavaScript in PythonSkriptno se uporablja ogrodje API Scripting Framework."
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0438\n"
+"help.text"
+msgid "Python syntax:"
+msgstr "Skladnja Pythona:"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0442\n"
+"help.text"
+msgid "Examples:"
+msgstr "Primeri:"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0449\n"
+"help.text"
+msgid "Installation:"
+msgstr "Namestitev:"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0450\n"
+"help.text"
+msgid "Copy <literal>screen_io</literal> Python module in <link href=\"text/sbasic/python/python_locations.xhp\">My macros</link> within <UserProfile>/Scripts/python/pythonpath,"
+msgstr "Kopirajte modul Python <literal>screen_io</literal> v <link href=\"text/sbasic/python/python_locations.xhp\">Mojih makrih</link> v <UporabniškiProfil>/Scripts/python/pythonpath,"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0451\n"
+"help.text"
+msgid "Copy <literal>uiScripts</literal> Basic module in <link href=\"text/sbasic/python/python_locations.xhp\">My macros</link> Standard Basic library,"
+msgstr "Kopirajte modul Basica <literal>uiScripts</literal>v standardno knjižnico Basica <link href=\"text/sbasic/python/python_locations.xhp\">Moji makri</link>,"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0452\n"
+"help.text"
+msgid "Restart %PRODUCTNAME."
+msgstr "Ponovno zaženite %PRODUCTNAME."
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0453\n"
+"help.text"
+msgid "<literal>screen_io</literal> Python module"
+msgstr "Modul Pythona <literal>screen_io</literal>"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0467\n"
+"help.text"
+msgid "\"\"\" Displays a dialog box containing a message and returns a value.\"\"\""
+msgstr "\"\"\" Pokaže pogovorno okno s sporočilom in vrne vrednost.\"\"\""
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0473\n"
+"help.text"
+msgid "\"\"\" Displays a prompt in a dialog box at which the user can enter text.\"\"\""
+msgstr "\"\"\" Pokaže poziv in pogovorno okno, v katerega lahko uporabnik vnese svoje besedilo.\"\"\""
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0479\n"
+"help.text"
+msgid "\"\"\"Outputs the specified strings or numeric expressions in a dialog box.\"\"\""
+msgstr "\"\"\"Izpiše določene nize ali številske izraze v pogovorno okno.\"\"\""
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"par_id161655364816553\n"
+"help.text"
+msgid "<literal>MsgBox</literal> and <literal>InputBox</literal> methods from the <link href=\"text/sbasic/shared/03/sf_basic.xhp\">Basic service</link> included in <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\"> the ScriptForge libraries</link> call directly their native Basic counterparts."
+msgstr "Metodi <literal>MsgBox</literal> in <literal>InputBox</literal> iz <link href=\"text/sbasic/shared/03/sf_basic.xhp\">storitve Basic</link>, vključene v <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\">knjižnice ScriptForge</link>, kličeta neposredno svoji domorodni istoimenski metodi v Basicu."
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0492\n"
+"help.text"
+msgid "<literal>uiScripts</literal> Basic module"
+msgstr "Modul Basica <literal>uiScripts</literal>"
+
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"tip_APSO\n"
+"help.text"
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer</link> (APSO) extension offers a msgbox() function out of its <literal>apso_utils</literal> module."
+msgstr "Razširitev <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer</link> (APSO) ponuja funkcijo msgbox() v svojem modulu <literal>apso_utils</literal>."
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python_Session : Session class"
+msgstr "Python_Session: razred Session"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0339\n"
+"help.text"
+msgid "<bookmark_value>Session;UserName</bookmark_value>        <bookmark_value>Session;SharedScripts</bookmark_value>        <bookmark_value>Session;SharedPythonScripts</bookmark_value>        <bookmark_value>Session;UserProfile</bookmark_value>        <bookmark_value>Session;UserScripts</bookmark_value>        <bookmark_value>Session;UserPythonScripts</bookmark_value>        <bookmark_value>API;PathSubstitution</bookmark_value>"
+msgstr "<bookmark_value>razred Session;UserName</bookmark_value><bookmark_value>razred Session;SharedScripts</bookmark_value><bookmark_value>razred Session;SharedPythonScripts</bookmark_value><bookmark_value>razred Session;UserProfile</bookmark_value><bookmark_value>razred Session;UserScripts</bookmark_value><bookmark_value>razred Session;UserPythonScripts</bookmark_value><bookmark_value>API;PathSubstitution</bookmark_value>"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0340\n"
+"help.text"
+msgid "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\">Getting Session Information</link></variable>"
+msgstr "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\">Pridobivanje informacij o seji</link></variable>"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0341\n"
+"help.text"
+msgid "Computing %PRODUCTNAME user profile and shared modules system file paths can be performed with Python or with Basic languages. BeanShell, Java, JavaScript and Python scripts locations can be derived from this information."
+msgstr "Izračunavanje poti sistemskih datotek uporabniškega profila in skupnih modulov %PRODUCTNAME je mogoče izvesti s programskima jezikoma Python in Basic. Iz teh informacij je moč razbrati mesta skriptov BeanShell, Java, JavaScript in Python."
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0343\n"
+"help.text"
+msgid "Examples:"
+msgstr "Primeri:"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0344\n"
+"help.text"
+msgid "With Python shell."
+msgstr "Z lupino Python."
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0346\n"
+"help.text"
+msgid "<literal>>>> print(Session.SharedPythonScripts())  # static method</literal>"
+msgstr "<literal>>>> print(Session.SharedPythonScripts())  # statična metoda</literal>"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0347\n"
+"help.text"
+msgid "<literal>>>> print(Session().UserName)  # object property</literal>"
+msgstr "<literal>>>> print(Session().UserName)  # lastnost predmeta</literal>"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0348\n"
+"help.text"
+msgid "<literal>>>> input(Session().UserProfile)  # object property</literal>"
+msgstr "<literal>>>> input(Session().UserProfile)  # lastnost predmeta</literal>"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0349\n"
+"help.text"
+msgid "From <menuitem>Tools – Macros - Run Macro</menuitem>... menu."
+msgstr "Izberite <menuitem>Orodja – Makri – Zaženi makro</menuitem>."
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0354\n"
+"help.text"
+msgid "ui.MsgBox(Session.Share(),title='Installation Share')  # static method"
+msgstr "ui.MsgBox(Session.Share(),title=‘Namestitvena mapa za skupno rabo’)  # statična metoda"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0355\n"
+"help.text"
+msgid "ui.Print(Session.SharedPythonScripts())  # static method"
+msgstr "ui.Print(Session.SharedPythonScripts())  # statična metoda"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0356\n"
+"help.text"
+msgid "s = Session()  # instance creation"
+msgstr "s = Session()  # ustvarjanje instance"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0357\n"
+"help.text"
+msgid "ui.MsgBox(s.UserName,title='Hello')  # object property"
+msgstr "ui.MsgBox(s.UserName,title=‘Pozdravljeni’)  # lastnost predmeta"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0358\n"
+"help.text"
+msgid "ui.Print(s.UserPythonScripts)  # object property"
+msgstr "ui.Print(s.UserPythonScripts)  # lastnost predmeta"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0360\n"
+"help.text"
+msgid "g_exportedScripts = (demo_session,)  # public macros"
+msgstr "g_exportedScripts = (demo_session,)  # javni makri"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0361\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic."
+msgstr "Z %PRODUCTNAME Basicom."
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0364\n"
+"help.text"
+msgid "Print \"Shared scripts location:\", s.SharedScripts"
+msgstr "Print \"Mesto skriptov v skupni rabi:\", s.SharedScripts"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0365\n"
+"help.text"
+msgid "MsgBox s.UserName,,\"Hello\""
+msgstr "MsgBox s.UserName,,\"Pozdravljeni\""
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0368\n"
+"help.text"
+msgid "Using COM/OLE and Visual Basic Scripting language."
+msgstr "Z uporabo COM/OLE in skriptnega jezika Visual Basic."
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0369\n"
+"help.text"
+msgid "' The service manager is always the entry point"
+msgstr "' Upravitelj storitev je vedno vstopna točka"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0370\n"
+"help.text"
+msgid "' If there is no office running then an office is started up"
+msgstr "' Če pisarniški paket ni zagnan, se s tem zažene"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0372\n"
+"help.text"
+msgid "' PathSubstitution service exhibits information to infer"
+msgstr "' Storitev PathSubstitution prikaže informacije, iz katerih pridobiva"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0373\n"
+"help.text"
+msgid "' <UserProfile|Share>/Scripts/python locations from"
+msgstr "' mesta iz <UporabniškiProfil|Share>/Scripts/python"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0381\n"
+"help.text"
+msgid "Python Session class:"
+msgstr "Razred Pythona Session:"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0401\n"
+"help.text"
+msgid "@property  # alternative to '$(username)' variable"
+msgstr "@property  # alternativa za spremenljivko '$(username)'"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0342\n"
+"help.text"
+msgid "Unlike Basic, pathname normalization is performed with Python inside Session class."
+msgstr "Za razliko od Basica se normalizacija imena poti izvede s Pythonom v okviru razreda Session."
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0412\n"
+"help.text"
+msgid "%PRODUCTNAME Basic Session class:"
+msgstr "Razred Session %PRODUCTNAME Basic:"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0417\n"
+"help.text"
+msgid "Private _ps As Object ' Private member"
+msgstr "Private _ps As Object ' Zasebni član"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0422\n"
+"help.text"
+msgid "End Sub ' Constructor"
+msgstr "End Sub ' Konstruktor"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0426\n"
+"help.text"
+msgid "End Sub ' Destructor"
+msgstr "End Sub ' Destruktor"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0439\n"
+"help.text"
+msgid "Public Property Get UserName() As String ' User account name"
+msgstr "Public Property Get UserName() As String ' Ime uporabniškega računa"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0443\n"
+"help.text"
+msgid "Public Property Get UserProfile() As String ' User profile system path"
+msgstr "Public Property Get UserProfile() As String ' Sistemska pot do uporabniškega profila"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0447\n"
+"help.text"
+msgid "Public Property Get UserScripts() As String ' User scripts system path"
+msgstr "Public Property Get UserScripts() As String ' Sistemska pot do uporabniških skriptov"
+
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0451\n"
+"help.text"
+msgid "Public Property Get UserPythonScripts() As String ' User Python scripts system path"
+msgstr "Public Property Get UserPythonScripts() As String ' Sistemska pot do uporabniških skriptov v Pythonu"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Interactive Shell"
+msgstr "Interaktivna lupina Python"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0117\n"
+"help.text"
+msgid "<bookmark_value>Python console</bookmark_value>        <bookmark_value>Python Interactive Shell</bookmark_value>        <bookmark_value>Python;Shell</bookmark_value>"
+msgstr "<bookmark_value>konzola Python</bookmark_value><bookmark_value>interaktivna lupina Python</bookmark_value><bookmark_value>Python;lupina</bookmark_value>"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0118\n"
+"help.text"
+msgid "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\">Running Python Interactive Console</link></variable>"
+msgstr "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\">Zagon interaktivne konzole Python</link></variable>"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0119\n"
+"help.text"
+msgid "The Python interactive console, also known as Python interpreter or Python shell, provides programmers with a quick way to execute commands and try out and test code without creating a file. UNO objects introspection as well as %PRODUCTNAME Python modules documentation can be obtained from the terminal."
+msgstr "Interaktivna konzola Python, znana tudi kot tolmač Pythona ali lupina Python, programerjem ponuja hitro pot do izvajanja ukazov in preizkušanja kode, ne da bi ustvarjali datoteko. Introspekcijo predmetov UNO ter dokumentacijo modulov %PRODUCTNAME Python lahko pridobite v terminalu."
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id851633601202270\n"
+"help.text"
+msgid "From a full-featured %PRODUCTNAME installed package, use either Basic or Python:"
+msgstr "V polno nameščenem pisarniškem paketu %PRODUCTNAME uporabite Basic ali Python:"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0121\n"
+"help.text"
+msgid "Using a Basic macro"
+msgstr "Uporaba makra v jeziku Basic"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0127\n"
+"help.text"
+msgid "Using a Python macro"
+msgstr "Uporaba makra v jeziku Python"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0141\n"
+"help.text"
+msgid "Example output"
+msgstr "Primer izhoda"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0142\n"
+"help.text"
+msgid "<image src=\"media/helpimg/python/python_interactive_console.png\" id=\"N0143\"><alt id=\"N0143\">Python Interactive Console</alt></image>"
+msgstr "<image src=\"media/helpimg/python/python_interactive_console.png\" id=\"N0143\"><alt id=\"N0143\">Interaktivna konzola Python</alt></image>"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"hd_id381633446811095\n"
+"help.text"
+msgid "Using the Terminal"
+msgstr "Uporaba terminala"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id801633601715910\n"
+"help.text"
+msgid "From a %PRODUCTNAME copy included in a GNU/Linux platform, use the terminal as shown:"
+msgstr "Iz kopije %PRODUCTNAME, vključene v platformo GNU/Linux, uporabite terminal, kot je prikazano spodaj:"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id531633444780190\n"
+"help.text"
+msgid "<literal>whereis</literal> or <literal>type</literal> terminal commands help locate Python interactive console:"
+msgstr "Ukaza v terminalu <literal>whereis</literal> in <literal>type</literal> pomagata poiskati interaktivno konzolo Python:"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"hd_id311633513620803\n"
+"help.text"
+msgid "Alternative console"
+msgstr "Nadomestna konzola"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id81632760673283\n"
+"help.text"
+msgid "Use <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-Python\">APSO extension</link> console as an alternative:"
+msgstr "Uporabite konzolo <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-Python\">razširitve APSO</link> (Alternative Python Script Organizer) kot alternativo:"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0144\n"
+"help.text"
+msgid "<image src=\"media/helpimg/python/python_shell.png\" id=\"N0144\"><alt id=\"N0144\">APSO console</alt></image>"
+msgstr "<image src=\"media/helpimg/python/python_shell.png\" id=\"N0144\"><alt id=\"N0144\">Konzola APSO</alt></image>"
+
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id351633599611244\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/03/sf_exception.xhp?#PythonShell\"><literal>PythonShell</literal></link> function in <link href=\"text/sbasic/shared/03/sf_exception.xhp\"><literal>ScriptForge.Exception</literal></link> service"
+msgstr "Funkcija <link href=\"text/sbasic/shared/03/sf_exception.xhp?#PythonShell\"><literal>PythonShell</literal></link> v storitvi <link href=\"text/sbasic/shared/03/sf_exception.xhp\"><literal>ScriptForge.Exception</literal></link>"

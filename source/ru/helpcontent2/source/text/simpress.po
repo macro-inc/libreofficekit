@@ -1,0 +1,2168 @@
+#. extracted from helpcontent2/source/text/simpress
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-12 17:02+0000\n"
+"Last-Translator: bormant <bormant@mail.ru>\n"
+"Language-Team: Russian <https://translations.documentfoundation.org/projects/libo_help-master/textsimpress/ru/>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.15.2\n"
+"X-POOTLE-MTIME: 1507118062.000000\n"
+
+#. GdQGG
+#: format_submenu_lists.xhp
+msgctxt ""
+"format_submenu_lists.xhp\n"
+"tit\n"
+"help.text"
+msgid "Lists"
+msgstr "Списки"
+
+#. fyBeH
+#: format_submenu_lists.xhp
+msgctxt ""
+"format_submenu_lists.xhp\n"
+"hd_id501649419524037\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/simpress/format_submenu_lists.xhp\">Lists</link></variable>"
+msgstr "<variable id=\"h1\"><link href=\"text/simpress/format_submenu_lists.xhp\">Списки</link></variable>"
+
+#. SNCBB
+#: format_submenu_lists.xhp
+msgctxt ""
+"format_submenu_lists.xhp\n"
+"par_id291649419524039\n"
+"help.text"
+msgid "For the selected paragraphs, adds numbering or bullets, edit the outline levels and move them up or down in the slide."
+msgstr "Для выбранных абзацев добавляет нумерацию или маркеры, редактирует уровни структуры и перемещает их вверх или вниз по слайду."
+
+#. 2Va4w
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Welcome to the $[officename] Impress Help"
+msgstr "Добро пожаловать в справку $[officename] Impress"
+
+#. ixjUU
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3150746\n"
+"help.text"
+msgid "Welcome to the $[officename] Impress Help"
+msgstr "Добро пожаловать в справку $[officename] Impress"
+
+#. hZu6C
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3153000\n"
+"help.text"
+msgid "How to Work With $[officename] Impress"
+msgstr "Как работать с $[officename] Impress"
+
+#. v5an7
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3149880\n"
+"help.text"
+msgid "$[officename] Impress Menus, Toolbars, and Keys"
+msgstr "Меню, панели инструментов и клавиши $[officename] Impress"
+
+#. aFUnY
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Menus"
+msgstr "Меню"
+
+#. ZQF48
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"hd_id3149664\n"
+"help.text"
+msgid "<variable id=\"main0100\"><link href=\"text/simpress/main0100.xhp\">Menus</link> </variable>"
+msgstr "<variable id=\"main0100\"><link href=\"text/simpress/main0100.xhp\">Меню</link></variable>"
+
+#. ESALm
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"par_id3150012\n"
+"help.text"
+msgid "The following section lists the help topics available for menus and dialogs."
+msgstr "В следующем разделе перечислены разделы справки, которые доступны для меню и диалоговых окон."
+
+#. PvGHJ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"tit\n"
+"help.text"
+msgid "File"
+msgstr "Файл"
+
+#. yTfpZ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"hd_id3153190\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0101.xhp\">File</link>"
+msgstr "<link href=\"text/simpress/main0101.xhp\">Файл</link>"
+
+#. fEmkG
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"par_id3154321\n"
+"help.text"
+msgid "<ahelp hid=\".\">These commands apply to the current document, create a document, open an existing document, or close the application.</ahelp>"
+msgstr "<ahelp hid=\".\">Эти команды применяются к текущему документу, созданию документа, открытию существующего документа или закрытию приложения.</ahelp>"
+
+#. zRW8E
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"tit\n"
+"help.text"
+msgid "View"
+msgstr "Вид"
+
+#. AG4of
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3150297\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0103.xhp\">View</link>"
+msgstr "<link href=\"text/simpress/main0103.xhp\">Вид</link>"
+
+#. H7Loj
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id3149378\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands to control the on-screen display of the document, change the user interface and access the sidebar panels.</ahelp>"
+msgstr "<ahelp hid=\".\">Это меню содержит команды для управления отображением документа на экране, изменения пользовательского интерфейса и доступа к боковым панелям.</ahelp>"
+
+#. sbbhw
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id110120150549176280\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/03120000.xhp\">Handout</link>"
+msgstr "<link href=\"text/simpress/01/03152000.xhp\">Тезис</link>"
+
+#. wa6UF
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720151244263489\n"
+"help.text"
+msgid "Object Moving Helplines"
+msgstr "Вспомогательные линии при перемещении объекта"
+
+#. wgqff
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720151246522815\n"
+"help.text"
+msgid "Comments"
+msgstr "Примечания"
+
+#. AHrm9
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150112252443\n"
+"help.text"
+msgid "Show or hide a presentation's annotations."
+msgstr "Показать или скрыть аннотации презентации"
+
+#. KxCDt
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720151246523444\n"
+"help.text"
+msgid "Master Background"
+msgstr "Фон мастера"
+
+#. DXFhq
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150112257941\n"
+"help.text"
+msgid "Toggle the visibility of a master slide's background to be used as the background of the current slide."
+msgstr "Переключает отображение фона мастер-слайда в качестве фона текущего слайда."
+
+#. zrUk5
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720151246521837\n"
+"help.text"
+msgid "Master Objects"
+msgstr "Объекты мастера"
+
+#. pXaYF
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id102720150112256473\n"
+"help.text"
+msgid "Toggle the visibility of a master slide's objects to appear on the current slide."
+msgstr "Переключает отображение объектов мастер-слайда на текущем слайде."
+
+#. cizmi
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id102720150908397549\n"
+"help.text"
+msgid "<link href=\"text/shared/01/gallery.xhp\">Clip Art Gallery</link>"
+msgstr "<link href=\"text/shared/01/gallery.xhp\">Галерея клип-арта</link>"
+
+#. dCeyT
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3149121\n"
+"help.text"
+msgid "<link href=\"text/shared/01/03010000.xhp\">Zoom</link>"
+msgstr "<link href=\"text/shared/01/03010000.xhp\">Масштаб</link>"
+
+#. Dp7mC
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Вставка"
+
+#. UswAF
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3153726\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0104.xhp\">Insert</link>"
+msgstr "<link href=\"text/simpress/main0104.xhp\">Вставка</link>"
+
+#. 9MaAn
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id3146971\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains the commands that are used to insert new elements into the document, for example, graphics, objects, special characters and other files.</ahelp>"
+msgstr "<ahelp hid=\".\">В этом меню содержатся команды, предназначенные для вставки новых элементов в документ, например, рисунков, объектов, специальных символов и файлов.</ahelp>"
+
+#. 2stQM
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3146918\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Диаграмма</link>"
+
+#. QKdUC
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_id0302200904002496\n"
+"help.text"
+msgid "Inserts a chart."
+msgstr "Вставляет диаграмму."
+
+#. D4RZD
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3145768\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/04080100.xhp\">Table</link>"
+msgstr "<link href=\"text/simpress/01/04080100.xhp\">Таблица</link>"
+
+#. YqHfD
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3147003\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Фрейм</link>"
+
+#. mSQgW
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3156285\n"
+"help.text"
+msgid "<link href=\"text/shared/02/09070000.xhp\">Hyperlink</link>"
+msgstr "<link href=\"text/shared/02/09070000.xhp\">Гиперссылка</link>"
+
+#. XNGME
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"hd_id3163726\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Выбор символа</link>"
+
+#. JdPCK
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_idN105C7\n"
+"help.text"
+msgid "Slide Number"
+msgstr "Номер слайда"
+
+#. dk5d2
+#: main0104.xhp
+msgctxt ""
+"main0104.xhp\n"
+"par_idN10609\n"
+"help.text"
+msgid "Adds the slide number or the page number."
+msgstr "Добавляет номер слайда или номер страницы."
+
+#. KRfJh
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"tit\n"
+"help.text"
+msgid "Window"
+msgstr "Окно"
+
+#. ALa7K
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"hd_id3153770\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0107.xhp\">Window</link>"
+msgstr "<link href=\"text/simpress/main0107.xhp\">Окно</link>"
+
+#. kPAHW
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"par_id3147435\n"
+"help.text"
+msgid "<ahelp hid=\".uno:WindowList\">Contains commands for manipulating and displaying document windows.</ahelp>"
+msgstr "<ahelp hid=\".uno:WindowList\">Содержит команды для управления окнами документов и их отображения.</ahelp>"
+
+#. 4YdgG
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"tit\n"
+"help.text"
+msgid "Modify"
+msgstr "Изменить"
+
+#. tUF2n
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"hd_id3154020\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0113.xhp\">Modify</link>"
+msgstr "<link href=\"text/simpress/main0113.xhp\">Изменить</link>"
+
+#. 366n5
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"par_id3154321\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains commands for modifying objects in your document.</ahelp>"
+msgstr "<ahelp hid=\".\">Содержит команды для изменения объектов в документе.</ahelp>"
+
+#. TdAB4
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"hd_id3153188\n"
+"help.text"
+msgid "<link href=\"text/shared/02/05090000.xhp\">Rotate</link>"
+msgstr "<link href=\"text/shared/02/05090000.xhp\">Повернуть</link>"
+
+#. 2Cp7F
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"par_id3149378\n"
+"help.text"
+msgid "Rotates the selected object(s)."
+msgstr "Поворачивает выбранные объекты."
+
+#. EUkSy
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"hd_id3153966\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05190000.xhp\">Name Object</link>"
+msgstr "<link href=\"text/shared/01/05190000.xhp\">Присвоить имя объекту</link>"
+
+#. b4djD
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"hd_id3154656\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05290100.xhp\">Group</link>"
+msgstr "<link href=\"text/shared/01/05290100.xhp\">Сгруппировать</link>"
+
+#. 2PFAU
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"hd_id3153484\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05290200.xhp\">Ungroup</link>"
+msgstr "<link href=\"text/shared/01/05290200.xhp\">Разгруппировать</link>"
+
+#. ixgft
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"hd_id3148870\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05290300.xhp\">Enter Group</link>"
+msgstr "<link href=\"text/shared/01/05290300.xhp\">Зайти в группу</link>"
+
+#. VTAAf
+#: main0113.xhp
+msgctxt ""
+"main0113.xhp\n"
+"hd_id3143233\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05290400.xhp\">Exit Group</link>"
+msgstr "<link href=\"text/shared/01/05290400.xhp\">Выход из группы</link>"
+
+#. s46iB
+#: main0114.xhp
+msgctxt ""
+"main0114.xhp\n"
+"tit\n"
+"help.text"
+msgid "Slide Show"
+msgstr "Показ слайдов"
+
+#. h6f3x
+#: main0114.xhp
+msgctxt ""
+"main0114.xhp\n"
+"hd_id3154011\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0114.xhp\">Slide Show</link>"
+msgstr "<link href=\"text/simpress/main0114.xhp\">Показ слайдов</link>"
+
+#. CxAVS
+#: main0114.xhp
+msgctxt ""
+"main0114.xhp\n"
+"par_id3145252\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains commands and options for running a presentation.</ahelp>"
+msgstr "<ahelp hid=\".\">Содержит команды и параметры для проведения презентации.</ahelp>"
+
+#. NPAGF
+#: main0114.xhp
+msgctxt ""
+"main0114.xhp\n"
+"hd_id3154510\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/06080000.xhp\">Slide Show Settings</link>"
+msgstr "<link href=\"text/simpress/01/06080000.xhp\">Параметры показа слайдов</link>"
+
+#. nk7DF
+#: main0114.xhp
+msgctxt ""
+"main0114.xhp\n"
+"hd_id3153486\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/06070000.xhp\">Interaction</link>"
+msgstr "<link href=\"text/simpress/01/06070000.xhp\">Взаимодействие</link>"
+
+#. Hyr2x
+#: main0114.xhp
+msgctxt ""
+"main0114.xhp\n"
+"par_idN10611\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/06060000.xhp\">Custom Animation</link>"
+msgstr "<link href=\"text/simpress/01/06060000.xhp\">Настройка анимации</link>"
+
+#. CdmoE
+#: main0114.xhp
+msgctxt ""
+"main0114.xhp\n"
+"hd_id3153711\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/06100000.xhp\">Custom Slide Show</link>"
+msgstr "<link href=\"text/simpress/01/06100000.xhp\">Настраиваемый показ слайдов</link>"
+
+#. 5DRv5
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toolbars"
+msgstr "Панели инструментов"
+
+#. GeHBb
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"hd_id3147434\n"
+"help.text"
+msgid "<variable id=\"main0200\"><link href=\"text/simpress/main0200.xhp\">Toolbars</link></variable>"
+msgstr "<variable id=\"main0200\"><link href=\"text/simpress/main0200.xhp\">Панели инструментов</link></variable>"
+
+#. 5KEzC
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"par_id31474099\n"
+"help.text"
+msgid "Add objects, including charts, spreadsheets, and images, to your document."
+msgstr "Добавьте в документ объекты, в том числе диаграммы, электронные таблицы и изображения."
+
+#. vXEq8
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"tit\n"
+"help.text"
+msgid "Line and Filling Bar"
+msgstr "Панель \"Линия и заливка\""
+
+#. fFFTq
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3149664\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0202.xhp\">Line and Filling Bar</link>"
+msgstr "<link href=\"text/simpress/main0202.xhp\">Панель \"Линия и заливка\"</link>"
+
+#. ircV9
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3153729\n"
+"help.text"
+msgid "<ahelp hid=\".\">The Line and Filling Bar contains commands and options that you can apply in the current view.</ahelp>"
+msgstr "<ahelp hid=\".\">Панель \"Линия и заливка\" содержит команды и параметры, применимые в текущем режиме.</ahelp>"
+
+#. 7ASCP
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3156382\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Style</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Стиль линии</link>"
+
+#. GDMdV
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3159184\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Width</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Толщина линии</link>"
+
+#. yn72z
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3150250\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05200100.xhp\">Line Color</link>"
+msgstr "<link href=\"text/shared/01/05200100.xhp\">Цвет линии</link>"
+
+#. ieN7C
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3148609\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05210100.xhp\">Area Style / Filling</link>"
+msgstr "<link href=\"text/shared/01/05210100.xhp\">Стиль/заливка области</link>"
+
+#. qXLpG
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text Formatting Bar"
+msgstr "Панель \"Форматирование текста\""
+
+#. k4Bz5
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3150010\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp\">Text Formatting Bar</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp\">Панель ''Форматирование текста''</link>"
+
+#. 9JJNQ
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"par_id3152597\n"
+"help.text"
+msgid "To display the <emph>Text Formatting</emph> Bar, place the cursor inside a text object."
+msgstr "Чтобы отобразить панель <emph>Форматирование текста</emph>, поместите курсор в текстовый объект."
+
+#. RDafD
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3151391\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp\">Font Color</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp\">Цвет шрифта</link>"
+
+#. sJH7p
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3154645\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">Символ</link>"
+
+#. mFYRw
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3149984\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">Абзац</link>"
+
+#. kZYjy
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3153619\n"
+"help.text"
+msgid "<switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><link href=\"text/shared/01/06050000.xhp\">Numbering Symbols</link></caseinline></switchinline>"
+msgstr "<switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><link href=\"text/shared/01/06050000.xhp\">Символы нумерации</link></caseinline></switchinline>"
+
+#. 6FwAa
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id0122200903104143\n"
+"help.text"
+msgid "Increase Font Size"
+msgstr "Увеличить размер шрифта"
+
+#. ALAG8
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"par_id0122200903104255\n"
+"help.text"
+msgid "<ahelp hid=\".\">Increases the font size of the selected text.</ahelp>"
+msgstr "<ahelp hid=\".\">Используется для увеличения размера шрифта для выделенного текста</ahelp>"
+
+#. esAuw
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id0122200903104228\n"
+"help.text"
+msgid "Decrease Font Size"
+msgstr "Уменьшить размер шрифта"
+
+#. AGSKe
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"par_id0122200903104247\n"
+"help.text"
+msgid "<ahelp hid=\".\">Reduces the font size of the selected text.</ahelp>"
+msgstr "<ahelp hid=\".\">Используется для уменьшения размера шрифта для выделенного текста.</ahelp>"
+
+#. 7MKtM
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"tit\n"
+"help.text"
+msgid "Slide View Bar"
+msgstr "Панель \"Слайды\""
+
+#. CiUcG
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3150010\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0204.xhp\">Slide View Bar</link>"
+msgstr "<link href=\"text/simpress/main0204.xhp\">Панель ''Слайды''</link>"
+
+#. XatZ7
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3146971\n"
+"help.text"
+msgid "<ahelp hid=\"dummy\">The <emph>Slide View</emph> bar opens with the Slide Sorter view.</ahelp>"
+msgstr "<ahelp hid=\"dummy\">Панель <emph>Слайды</emph> открывается вместе с представлением \"Сортировщик слайдов\".</ahelp>"
+
+#. CPTSt
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"tit\n"
+"help.text"
+msgid "Status Bar"
+msgstr "Строка состояния"
+
+#. AuiHU
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"hd_id3153768\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0206.xhp\">Status Bar</link>"
+msgstr "<link href=\"text/simpress/main0206.xhp\">Строка состояния</link>"
+
+#. xykEF
+#: main0206.xhp
+msgctxt ""
+"main0206.xhp\n"
+"par_id3154020\n"
+"help.text"
+msgid "The status bar displays information about your document, including the currently selected object. You can double-click some status bar items to open a related dialog window."
+msgstr "Строка состояния отображает информацию о документе, включая выбранный в данный момент объект. Можно дважды щёлкнуть некоторые элементы строки состояния для открытия связанного диалогового окна."
+
+#. D5pvR
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"tit\n"
+"help.text"
+msgid "Rulers"
+msgstr "Линейки"
+
+#. 3A6CF
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"bm_id3153191\n"
+"help.text"
+msgid "<bookmark_value>rulers; in presentations</bookmark_value><bookmark_value>origin of rulers</bookmark_value>"
+msgstr "<bookmark_value>линейки; в презентациях</bookmark_value><bookmark_value>начало отсчёта линеек</bookmark_value>"
+
+#. L9A6B
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"hd_id3153191\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0209.xhp\">Rulers</link>"
+msgstr "<link href=\"text/simpress/main0209.xhp\">Линейки</link>"
+
+#. CidBg
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3149666\n"
+"help.text"
+msgid "You can use vertical and horizontal rulers at the left and upper edges of the $[officename] Impress workspace to assist you in creating your slide. The sections of the rulers that cover the area of the slide are white."
+msgstr "В создании слайда помогают вертикальные и горизонтальные линейки на левой и верхней гранях рабочей области $[officename] Impress. Участки линеек, находящиеся в области слайда, белые."
+
+#. r9DKG
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3153963\n"
+"help.text"
+msgid "When you select an object, its dimensions are displayed on the rulers as gray double lines. To precisely resize the object, drag one of the double lines to a new location on the ruler."
+msgstr "Когда объект выбирается, его размеры отображаются на линейках серыми двойными линиями. Для точного изменения размера объекта переместите одну из двойных линий в новое положение на линейке."
+
+#. tPZfC
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3150206\n"
+"help.text"
+msgid "When you select a text object on a slide, indents and tabs are displayed on the horizontal ruler. To change the indent or tab settings for the text object, drag an indent or a tab marker to a new location on the ruler."
+msgstr "Если на слайде выбирается текстовый объект, на горизонтальной линейке отображаются отступы и позиции табуляции. Чтобы изменить параметры отступов или табуляции для текстового объекта, перетащите маркер отступа или табуляции в новое положение на линейке."
+
+#. mcRAk
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3150253\n"
+"help.text"
+msgid "You can also drag a <link href=\"text/simpress/01/04030000.xhp\">snap line</link> from a ruler to help you align objects on your slide. To insert a snap line using a ruler, drag the edge of a ruler into the slide."
+msgstr "Можно также перетащить <link href=\"text/simpress/01/04030000.xhp\">направляющую</link> с линейки для упрощения выравнивания объектов на слайде. Чтобы вставить направляющую с помощью линейки, перетащите край линейки на слайд."
+
+#. TY2DC
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3153820\n"
+"help.text"
+msgid "To show or hide the rulers, choose <link href=\"text/simpress/01/03060000.xhp\"><emph>View - Rulers</emph></link>."
+msgstr "Чтобы отобразить или скрыть линейки, выберите пункт меню <link href=\"text/simpress/01/03060000.xhp\"><emph>Вид - Линейка</emph></link>."
+
+#. kYDwa
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3148609\n"
+"help.text"
+msgid "To specify the measurement units for a ruler, right-click the ruler, and then choose a new unit from the list."
+msgstr "Чтобы указать единицы измерения для линейки, щёлкните линейку правой кнопкой мыши, затем выберите новую единицу из списка."
+
+#. 9SAnD
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3149129\n"
+"help.text"
+msgid "To change the origin (0 point) of the rulers, drag the intersection of the two rulers in the top left corner into the workspace. Vertical and horizontal guides appear. Continue to drag until the vertical and horizontal guides are where you want the new origin to be, and then release. To reset the origins of the rulers to the default values, double-click the intersection."
+msgstr "Чтобы изменить точку отсчёта (точку 0) линеек, перетащите пересечение двух линеек, расположенное в верхнем левом углу, в рабочую область. Появятся вертикальные и горизонтальные направляющие. Продолжайте перетаскивание вертикальных и горизонтальных направляющих до достижения нужной позиции точки отсчёта, затем отпустите кнопку мыши. Чтобы вернуть для точек отсчёта линеек значения по умолчанию, дважды щёлкните это пересечение."
+
+#. uPJ4a
+#: main0209.xhp
+msgctxt ""
+"main0209.xhp\n"
+"par_id3154651\n"
+"help.text"
+msgid "To change the slide margins, drag the edge of the white areas in the rulers."
+msgstr "Чтобы изменить поля слайда, перетащите границу белых областей на линейках."
+
+#. GtNCm
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"tit\n"
+"help.text"
+msgid "Drawing Bar"
+msgstr "Панель \"Рисование\""
+
+#. sdzeS
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3150342\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0210.xhp\">Drawing Bar</link>"
+msgstr "<link href=\"text/simpress/main0210.xhp\">Панель ''Рисование''</link>"
+
+#. sfxro
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3150202\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Drawing</emph> bar contains frequently used editing tools. Click the arrow next to an icon to open a toolbar that contains additional commands.</ahelp>"
+msgstr "<ahelp hid=\".\">Панель <emph>Рисунок</emph> содержит часто используемые средства редактирования. Щёлкните стрелку рядом со значком, чтобы открыть панель инструментов, которая содержит дополнительные команды.</ahelp>"
+
+#. k2kCs
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id31502029\n"
+"help.text"
+msgid "You can view the Drawing bar also from a text document or spreadsheet. The set of visible icons can be slightly different according to the current document type."
+msgstr "Панель \"Рисунок\" также можно отрыть из текстового документа или электронной таблицы. Набор видимых значков существенно отличается в зависимости от текущего типа документа."
+
+#. C3EJZ
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3155962\n"
+"help.text"
+msgid "Select"
+msgstr "Выделить"
+
+#. 4FwUb
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3148488\n"
+"help.text"
+msgid "To select an object on the current slide, click the <emph>Select</emph> tool (white arrow) on the Drawing bar, and then click the object."
+msgstr "Чтобы выделить объект на текущем слайде, щёлкните инструмент <emph>Выделить</emph> (белая стрелка) на панели \"Рисование\", а затем щёлкните этот объект."
+
+#. GVEUE
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3148610\n"
+"help.text"
+msgid "To select more than one object, hold down Shift while you click."
+msgstr "Чтобы выделить несколько объектов, удерживайте при выборе клавишу SHIFT."
+
+#. NbWE3
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3148699\n"
+"help.text"
+msgid "To select an object that is behind another object, hold <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>, and then click the object. To select the next underlying object in the stacking, hold <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>, and then click again. To return the selection to the previously selected object, hold down Shift + <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>, and then click."
+msgstr "Чтобы выбрать объект, расположенный за другим объектом, удерживайте клавишу <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>ALT</defaultinline></switchinline> и щёлкните по этому объекту. Чтобы выбрать следующий нижележащий объект в наборе, удерживайте клавишу <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>ALT</defaultinline></switchinline> и щёлкните снова. Чтобы вернуться к ранее выбранному объекту, удерживайте комбинацию клавиш SHIFT + <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>ALT</defaultinline></switchinline> и щёлкните снова."
+
+#. 4aToU
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3154651\n"
+"help.text"
+msgid "To add text to a selected object, double-click the object and type or enter your text."
+msgstr "Чтобы добавить текст к выделенному объекту, дважды щёлкните этот объект и введите текст."
+
+#. nKzEE
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3153812\n"
+"help.text"
+msgid "To remove a selection, click anywhere outside the selected object, or press Escape."
+msgstr "Чтобы снять выделение, щёлкните за пределами выделенного объекта или нажмите клавишу ESC."
+
+#. kvp4W
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN106B0\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10060000.xhp\">Rectangle</link>"
+msgstr "<link href=\"text/simpress/02/10060000.xhp\">Прямоугольник</link>"
+
+#. BgdH4
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN106C0\n"
+"help.text"
+msgid "Draws a filled rectangle where you drag in the current document. Click where you want to place a corner of the rectangle, and drag to the size you want. To draw a square, hold down Shift while you drag."
+msgstr "Рисует прямоугольник с заливкой в указанном месте документа. Щёлкните в месте, где будет находиться угол прямоугольника, и протащите мышь, чтобы получить прямоугольник нужного размера. Чтобы нарисовать квадрат, при перемещении мыши удерживайте нажатой клавишу SHIFT."
+
+#. 8q8av
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN106CD\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10070000.xhp\">Ellipse</link>"
+msgstr "<link href=\"text/simpress/02/10070000.xhp\">Эллипс</link>"
+
+#. AFZzm
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN106DD\n"
+"help.text"
+msgid "Draws a filled oval where you drag in the current document. Click where you want to draw the oval, and drag to the size you want. To draw a circle, hold down Shift while you drag."
+msgstr "Рисует эллипс с заливкой в указанном месте документа. Щёлкните в том месте, где нужно нарисовать эллипс, и протащите мышь, чтобы получить нужный размер. Чтобы нарисовать круг, при перемещении мыши удерживайте нажатой клавишу SHIFT."
+
+#. yBdjm
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN106EA\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10050000.xhp\">Text</link>"
+msgstr "<link href=\"text/simpress/02/10050000.xhp\">Текст</link>"
+
+#. EYzpZ
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN106FA\n"
+"help.text"
+msgid "Draws a text box where you click or drag in the current document. Click anywhere in the document, and then type or paste your text."
+msgstr "Создаёт текстовое поле в указанном месте текущего документа. Щёлкните кнопкой мыши в любом месте документа, а затем введите или вставьте текст."
+
+#. YjDX6
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN107C8\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10120000.xhp\">Lines and Arrows</link>"
+msgstr "<link href=\"text/simpress/02/10120000.xhp\">Линии и стрелки</link>"
+
+#. JqBX6
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN126D7\n"
+"help.text"
+msgid "Opens the Arrows toolbar to insert lines and arrows."
+msgstr "Откройте панель инструментов \"Стрелки\", чтобы вставить линии и стрелки."
+
+#. rKisP
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN10770\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05270000.xhp\">Points</link>"
+msgstr "<link href=\"text/shared/01/05270000.xhp\">Точки</link>"
+
+#. vBFHB
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN10780\n"
+"help.text"
+msgid "Enables you to edit points on your drawing."
+msgstr "Позволяет изменять точки на рисунке."
+
+#. Jmer7
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN10783\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10030200.xhp\">Gluepoints</link>"
+msgstr "<link href=\"text/simpress/02/10030200.xhp\">Точки соединения</link>"
+
+#. BY9EA
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN10793\n"
+"help.text"
+msgid "Enables you to edit gluepoints on your drawing."
+msgstr "Позволяет редактировать точки соединения на рисунке."
+
+#. wuKXu
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN10803\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Из файла</link>"
+
+#. zHJs8
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"hd_id3153078\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10030000.xhp\">Rotate</link>"
+msgstr "<link href=\"text/simpress/02/10030000.xhp\">Повернуть</link>"
+
+#. Tifz5
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_id3154556\n"
+"help.text"
+msgid "This tool is used to rotate the object."
+msgstr "Этот инструмент используется для вращения объекта."
+
+#. ATsdc
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN107FF\n"
+"help.text"
+msgid "<link href=\"text/sdraw/01/3dsettings_toolbar.xhp\">Extrusion On/Off</link>"
+msgstr "<link href=\"text/sdraw/01/3dsettings_toolbar.xhp\">Экструзия вкл./выкл.</link>"
+
+#. wXAyq
+#: main0210.xhp
+msgctxt ""
+"main0210.xhp\n"
+"par_idN1080F\n"
+"help.text"
+msgid "Switches the 3D effects on and off for the selected objects."
+msgstr "Включает и выключает трёхмерные эффекты для выделенных объектов."
+
+#. NXNKE
+#: main0211.xhp
+msgctxt ""
+"main0211.xhp\n"
+"tit\n"
+"help.text"
+msgid "Outline Bar"
+msgstr "Панель \"Структура\""
+
+#. ELj4j
+#: main0211.xhp
+msgctxt ""
+"main0211.xhp\n"
+"hd_id3154013\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0211.xhp\">Outline Bar</link>"
+msgstr "<link href=\"text/simpress/main0211.xhp\">Панель ''Структура''</link>"
+
+#. FxRYs
+#: main0211.xhp
+msgctxt ""
+"main0211.xhp\n"
+"par_id3145252\n"
+"help.text"
+msgid "<ahelp hid=\".\">In<emph> Outline View</emph>, the Outline bar contains frequently used editing tools.</ahelp> Click the arrow next to an icon to open a toolbar that contains additional commands."
+msgstr "<ahelp hid=\".\">В<emph> режиме структуры</emph> панель \"Структура\" содержит часто используемые инструменты редактирования.</ahelp> Щёлкните стрелку рядом со значком для открытия панели инструментов, содержащей дополнительные команды."
+
+#. rooxU
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"tit\n"
+"help.text"
+msgid "Slide Sorter Bar"
+msgstr "Панель \"Сортировщик слайдов\""
+
+#. LmDoY
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"hd_id3149664\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0212.xhp\">Slide Sorter Bar</link>"
+msgstr "<link href=\"text/simpress/main0212.xhp\">Панель \"Сортировщик слайдов\"</link>"
+
+#. MEAEC
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3146970\n"
+"help.text"
+msgid "<ahelp hid=\".\">In<emph> Slide Sorter</emph> view, the <emph>Slide Sorter</emph> bar can be used.</ahelp>"
+msgstr "<ahelp hid=\".\">В режиме <emph>Сортировщик слайдов</emph> можно использовать панель <emph>Сортировщик слайдов</emph>.</ahelp>"
+
+#. KDqCS
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"hd_id3153711\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/03130000.xhp\">Slide Show</link>"
+msgstr "<link href=\"text/simpress/01/03130000.xhp\">Показ слайдов</link>"
+
+#. fU9CM
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"tit\n"
+"help.text"
+msgid "Options Bar"
+msgstr "Панель \"Параметры\""
+
+#. QNFDY
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3150012\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0213.xhp\">Options Bar</link>"
+msgstr "<link href=\"text/simpress/main0213.xhp\">Панель ''Параметры''</link>"
+
+#. iiNJi
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3146971\n"
+"help.text"
+msgid "To display the <emph>Options Bar</emph>, choose <emph>View - Toolbars - Options</emph>."
+msgstr "Для отображения <emph>Панель настроек</emph>, выберите <emph>Вид - Панель инструментов - Настройка</emph>."
+
+#. DZxaw
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3148487\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171200.xhp\">Display Grid</link>"
+msgstr "<link href=\"text/shared/02/01171200.xhp\">Показать сетку</link>"
+
+#. HJ3HV
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3148700\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171400.xhp\">Helplines While Moving</link>"
+msgstr "<link href=\"text/shared/02/01171400.xhp\">Направляющие при перемещении</link>"
+
+#. wfkRG
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3149603\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171300.xhp\">Snap to Grid</link>"
+msgstr "<link href=\"text/shared/02/01171300.xhp\">Привязка к сетке</link>"
+
+#. eEiur
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3143233\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/13140000.xhp\">Snap to Snap Lines</link>"
+msgstr "<link href=\"text/simpress/02/13140000.xhp\">Привязка к направляющим</link>"
+
+#. CvsB7
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3146966\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/13150000.xhp\">Snap to Page Margins</link>"
+msgstr "<link href=\"text/simpress/02/13150000.xhp\">Привязка к полям страницы</link>"
+
+#. qDEAN
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3149051\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/13160000.xhp\">Snap to Object Border</link>"
+msgstr "<link href=\"text/simpress/02/13160000.xhp\">Привязка к границе объекта</link>"
+
+#. r2yAC
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3150392\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/13170000.xhp\">Snap to Object Points</link>"
+msgstr "<link href=\"text/simpress/02/13170000.xhp\">Привязка к узлам объекта</link>"
+
+#. znjpM
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3156401\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/13180000.xhp\">Allow Quick Editing</link>"
+msgstr "<link href=\"text/simpress/02/13180000.xhp\">Разрешить быструю правку</link>"
+
+#. eokVz
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3145823\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/13190000.xhp\">Select Text Area Only</link>"
+msgstr "<link href=\"text/simpress/02/13190000.xhp\">Выделение только области текста</link>"
+
+#. kTaqi
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"tit\n"
+"help.text"
+msgid "Image Bar"
+msgstr "Панель Изображение"
+
+#. rv7oB
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3151245\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0214.xhp\">Image Bar</link>"
+msgstr "<link href=\"text/simpress/main0214.xhp\">Панель Изображение</link>"
+
+#. m65F6
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3150543\n"
+"help.text"
+msgid "Use the <emph>Image</emph> bar to set the color, contrast, and brightness options for the selected graphic object(s)."
+msgstr "Используйте панель инструментов <emph>Изображение</emph> для установки параметров цвета, контраста и яркости для выделенных графических объектов."
+
+#. Zkaab
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] Impress Features"
+msgstr "Возможности $[officename] Impress"
+
+#. 3ciws
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3146119\n"
+"help.text"
+msgid "<variable id=\"main0503\"><link href=\"text/simpress/main0503.xhp\">$[officename] Impress Features</link></variable>"
+msgstr "<variable id=\"main0503\"><link href=\"text/simpress/main0503.xhp\">Возможности $[officename] Impress</link></variable>"
+
+#. ifaB7
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3151074\n"
+"help.text"
+msgid "$[officename] Impress lets you create professional slide shows that can include charts, drawing objects, text, multimedia and a variety of other items. If you want, you can even import and modify Microsoft PowerPoint presentations."
+msgstr "$[officename] Impress позволяет создавать профессиональные слайд-шоу, которые могут включать диаграммы, рисованные объекты, текст, мультимедиа и множество других элементов. При необходимости можно даже импортировать и изменять презентации Microsoft PowerPoint."
+
+#. bAxiz
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3149379\n"
+"help.text"
+msgid "For on-screen slide shows, animation, slide transitions and multimedia are a few of the techniques you can use to make your presentation more exciting."
+msgstr "Чтобы сделать экранные презентации более эффектными, можно использовать такие средства, как анимация, мультимедиа и переходы между слайдами."
+
+#. jKSma
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3154016\n"
+"help.text"
+msgid "Creating Vector Graphics"
+msgstr "Создание векторной графики"
+
+#. SHdFk
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3154485\n"
+"help.text"
+msgid "Many of the tools for creating vector graphics in $[officename] Draw are available in $[officename] Impress."
+msgstr "Многие инструменты для создания векторной графики из $[officename] Draw доступны и в $[officename] Impress."
+
+#. fEEfD
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3150208\n"
+"help.text"
+msgid "Creating Slides"
+msgstr "Создание слайдов"
+
+#. RCCha
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3153247\n"
+"help.text"
+msgid "$[officename] Impress provides you with templates to create professional-looking slides."
+msgstr "В $[officename] Impress включены шаблоны для создания слайдов профессионального качества."
+
+#. UGbcC
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3148610\n"
+"help.text"
+msgid "You can also assign a number of dynamic effects to your slides, including animation and transition effects."
+msgstr "Слайдам также возможно назначить несколько динамических эффектов, включая анимацию и эффекты при их смене."
+
+#. D4ctS
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3153820\n"
+"help.text"
+msgid "Creating Presentations"
+msgstr "Создание презентаций"
+
+#. cS3Au
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3153917\n"
+"help.text"
+msgid "Several views or pages are available when you design a slide show. For example, the Slide Sorter displays an overview of your slides in thumbnail form, while the Handout page contains both the slide and the text you want to distribute to the audience."
+msgstr "При создании слайд-шоу доступно несколько представлений или страниц. Например, Сортировщик слайдов отображает слайды в форме эскизов, в то время как на странице раздаточных материалов отображаются и слайд, и текст, который нужно предоставить аудитории."
+
+#. CRoEP
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3148608\n"
+"help.text"
+msgid "$[officename] Impress also lets you rehearse the timing of your slide show."
+msgstr "$[officename] Impress позволяет также прорепетировать показ слайдов с таймером."
+
+#. qqweR
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3154649\n"
+"help.text"
+msgid "Publishing Presentations"
+msgstr "Публикация презентаций"
+
+#. EcVzV
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3150046\n"
+"help.text"
+msgid "You can publish your slides on-screen, as handouts, or as HTML documents."
+msgstr "Можно опубликовать слайды в виде демонстрации на экране, раздаточных материалов или документа HTML."
+
+#. uk4z5
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3146965\n"
+"help.text"
+msgid "Giving Presentations"
+msgstr "Показ презентаций"
+
+#. TzAuK
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145114\n"
+"help.text"
+msgid "$[officename] Impress gives you the choice of running a slide show automatically or manually."
+msgstr "В $[officename] Impress можно выбрать автоматическую или ручную смену слайдов при показе."
+
+#. SjyhY
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit"
+msgstr "Правка"
+
+#. FUnyq
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"hd_id3153726\n"
+"help.text"
+msgid "<link href=\"text/simpress/main_edit.xhp\">Edit</link>"
+msgstr "<link href=\"text/simpress/main_edit.xhp\">Правка</link>"
+
+#. 4wDGi
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"par_id3151075\n"
+"help.text"
+msgid "<ahelp hid=\".\">This menu contains commands for editing the contents of the current document.</ahelp>"
+msgstr "<ahelp hid=\".\">Это меню содержит команды для редактирования содержимого текущего документа.</ahelp>"
+
+#. Fjb9W
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"hd_id3154649\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05270000.xhp\">Points</link>"
+msgstr "<link href=\"text/shared/01/05270000.xhp\">Точки</link>"
+
+#. 7vrGM
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"par_id3154766\n"
+"help.text"
+msgid "Switches the <emph>Edit Points</emph> mode on and off."
+msgstr "Включает и выключает режим <emph>Изменение геометрии</emph>."
+
+#. YfdVn
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"hd_id3145116\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10030200.xhp\">Gluepoints</link>"
+msgstr "<link href=\"text/simpress/02/10030200.xhp\">Точки соединения</link>"
+
+#. BQq7C
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"par_id3147403\n"
+"help.text"
+msgid "Switches the <emph>Edit Gluepoints</emph> mode on and off."
+msgstr ""
+
+#. Zibbx
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"hd_id3150396\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/02160000.xhp\">Fields</link>"
+msgstr "<link href=\"text/simpress/01/02160000.xhp\">Поля</link>"
+
+#. mvQEh
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"hd_id3149355\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02180000.xhp\">Links</link>"
+msgstr "<link href=\"text/shared/01/02180000.xhp\">Ссылки</link>"
+
+#. Ne3cE
+#: main_edit.xhp
+msgctxt ""
+"main_edit.xhp\n"
+"hd_id0914201502131542\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02200000.xhp\">Object</link>"
+msgstr "<link href=\"text/shared/01/02200000.xhp\">Объект</link>"
+
+#. XiyED
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format"
+msgstr "Формат"
+
+#. qXUAS
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id3152596\n"
+"help.text"
+msgid "<link href=\"text/simpress/main_format.xhp\">Format</link>"
+msgstr "<link href=\"text/simpress/main_format.xhp\">Формат</link>"
+
+#. GySd7
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"par_id3145801\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains commands for formatting the layout and the contents of your document.</ahelp>"
+msgstr ""
+
+#. EzBaC
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id951602975070826\n"
+"help.text"
+msgid "<link href=\"text/simpress/format_submenu_lists.xhp\">Lists</link>"
+msgstr "<link href=\"text/simpress/format_submenu_lists.xhp\">Списки</link>"
+
+#. FC8nb
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"par_id461602975083850\n"
+"help.text"
+msgid "Opens a submenu where you can modify the formatting of list paragraphs."
+msgstr "Открывает подменю, где можно изменить форматирование абзацев списка."
+
+#. vmbqC
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id451615217475502\n"
+"help.text"
+msgid "Styles"
+msgstr "Стили"
+
+#. bpU6u
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"par_id41615217505414\n"
+"help.text"
+msgid "Shows commands to edit, update, create, and manage styles."
+msgstr "Показывает команды для редактирования, обновления, создания и управления стилями."
+
+#. PgcT7
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id3147401\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020000.xhp\">Character</link>"
+msgstr "<link href=\"text/shared/01/05020000.xhp\">Символ</link>"
+
+#. MpiD6
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id3149941\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05030000.xhp\">Paragraph</link>"
+msgstr "<link href=\"text/shared/01/05030000.xhp\">Абзац</link>"
+
+#. SMbFw
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id3147299\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06050000.xhp\">Bullets and Numbering</link>"
+msgstr "<link href=\"text/shared/01/06050000.xhp\">Маркеры и нумерация</link>"
+
+#. LnFgm
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id801615217485302\n"
+"help.text"
+msgid "Table"
+msgstr "Таблица"
+
+#. ZH8Cz
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"par_id61615217563797\n"
+"help.text"
+msgid "Shows commands to format, edit, and delete a table and its elements."
+msgstr "Показывает команды для форматирования, редактирования, удаления таблиц и их элементов."
+
+#. iZgpC
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"hd_id401615217493429\n"
+"help.text"
+msgid "Image"
+msgstr "Изображение"
+
+#. RNZjn
+#: main_format.xhp
+msgctxt ""
+"main_format.xhp\n"
+"par_id901615217674598\n"
+"help.text"
+msgid "Shows commands to crop, edit, and manage images."
+msgstr "Показывает команды для обрезки, редактирования и управления изображениями."
+
+#. F98f9
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"tit\n"
+"help.text"
+msgid "Slide"
+msgstr "Слайд"
+
+#. BrzLC
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id0908201507475698\n"
+"help.text"
+msgid "<link href=\"text/simpress/main_slide.xhp\">Slide</link>"
+msgstr "<link href=\"text/simpress/main_slide.xhp\">Слайд</link>"
+
+#. QAk8D
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id0908201507482661\n"
+"help.text"
+msgid "This menu provides slide management and navigation commands."
+msgstr "Это меню предоставляет команды управления слайдами и навигации."
+
+#. XaqGZ
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id611615489755701\n"
+"help.text"
+msgid "Duplicate Slide"
+msgstr "Дублировать слайд"
+
+#. uJcAM
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id71615490370664\n"
+"help.text"
+msgid "Creates a copy of the currently selected slide."
+msgstr "Создаёт копию текущего выбранного слайда."
+
+#. Jtf2o
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id631615489785082\n"
+"help.text"
+msgid "Delete Slide"
+msgstr "Удалить слайд"
+
+#. FAJJ6
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id841615491193340\n"
+"help.text"
+msgid "Deletes the selected slide(s)."
+msgstr "Удаляет выбранные слайды."
+
+#. iZWVK
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id721615489786162\n"
+"help.text"
+msgid "Save Background Image"
+msgstr "Сохранить фоновое изображение"
+
+#. 8ydAh
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id841615491449943\n"
+"help.text"
+msgid "If the slide has a background image, this option allows the user to save the corresponding background image file."
+msgstr "Если у слайда есть фоновое изображение, этот параметр позволяет сохранить соответствующий файл фонового изображения."
+
+#. Bhh37
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id161615489786339\n"
+"help.text"
+msgid "Set Background Image"
+msgstr "Задать фоновое изображение"
+
+#. ekbFN
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id781615491497404\n"
+"help.text"
+msgid "Opens a File Picker to choose an image file to be set as the background of the current slide."
+msgstr "Открывает диалоговое окно выбора файла изображения, которое будет установлено в качестве фона текущего слайда."
+
+#. 92Pku
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id921615489787123\n"
+"help.text"
+msgid "New Master"
+msgstr "Создать мастер"
+
+#. kPJER
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id131615493790751\n"
+"help.text"
+msgid "Creates a new Master Slide. This function is only available in <emph>Master View</emph>."
+msgstr "Создаёт новый мастер-слайд. Эта функция доступна только в <emph>Режиме мастера</emph>."
+
+#. Vwom7
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id491615494190854\n"
+"help.text"
+msgid "To enter the Master View, go to <emph>View - Master Slide</emph>. To exit the Master View, go to <emph>View - Normal</emph>."
+msgstr "Чтобы войти в режим мастера, выберите <emph>Вид - Мастер-слайд</emph>. Чтобы выйти из режима мастера, выберите <emph>Вид - Обычный</emph>."
+
+#. HQQHh
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id421615489787299\n"
+"help.text"
+msgid "Delete Master"
+msgstr "Удалить мастер"
+
+#. EBxxM
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id661615494028415\n"
+"help.text"
+msgid "Deletes the currently selected Master Slide. This function is only available in <emph>Master View</emph>"
+msgstr "Удаляет текущий выбранный мастер-слайд. Эта функция доступна только в <emph>Режиме мастера</emph>."
+
+#. hXNB7
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id841615489787538\n"
+"help.text"
+msgid "Master Background"
+msgstr "Фон мастера"
+
+#. Kf3CF
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id921615494351365\n"
+"help.text"
+msgid "This option allows to show or hide the background image defined in the master slide."
+msgstr "Этот параметр позволяет отобразить или скрыть фоновое изображение, заданное на мастер-слайде."
+
+#. 9GSWp
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id621615489788132\n"
+"help.text"
+msgid "Master Objects"
+msgstr "Объекты мастера"
+
+#. wjDcS
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id541615494644223\n"
+"help.text"
+msgid "This option allows to show or hide objects defined in the master slide."
+msgstr "Этот параметр позволяет отображать или скрывать объекты, заданные на мастер-слайде."
+
+#. BVTEY
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id51615489788356\n"
+"help.text"
+msgid "Master Elements"
+msgstr "Поля мастера"
+
+#. GaTGo
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id111615494747246\n"
+"help.text"
+msgid "Displays a dialog box where the following elements from the master slide can be enabled or disabled:"
+msgstr "Отображает диалоговое окно, где можно включить или отключить следующие элементы мастер-слайда:"
+
+#. fvE2V
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id41615494861841\n"
+"help.text"
+msgid "Header"
+msgstr "Верхний колонтитул"
+
+#. xcmiq
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id321615494881187\n"
+"help.text"
+msgid "Date/Time"
+msgstr "Дата/Время"
+
+#. kfNdX
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id721615494891164\n"
+"help.text"
+msgid "Footer"
+msgstr "Нижний колонтитул"
+
+#. LLGmD
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id401615494904662\n"
+"help.text"
+msgid "Slide Number"
+msgstr "Номер слайда"
+
+#. sYXNP
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id851615489788586\n"
+"help.text"
+msgid "Show Slide"
+msgstr "Показать слайд"
+
+#. 6hQEB
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id321615495037553\n"
+"help.text"
+msgid "If a slide is hidden, this function makes it visible again."
+msgstr "Если слайд скрыт, эта функция снова делает его видимым."
+
+#. FFLV4
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id201615489788874\n"
+"help.text"
+msgid "Hide Slide"
+msgstr "Скрыть слайд"
+
+#. jdiSK
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id961615495104794\n"
+"help.text"
+msgid "If a slide is visible, this function hides it."
+msgstr "Если слайд виден, эта функция скрывает его."
+
+#. nV23n
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id121615489789140\n"
+"help.text"
+msgid "Rename Slide"
+msgstr "Переименовать слайд"
+
+#. GpHBE
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id901615495187958\n"
+"help.text"
+msgid "Opens a dialog box where a name can be set for the current slide."
+msgstr "Открывает диалоговое окно, где возможно задать имя для текущего слайда."
+
+#. D6GtH
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id551615489789347\n"
+"help.text"
+msgid "Jump to Last Edited Slide"
+msgstr "К последнему изменённому слайду"
+
+#. Snoa6
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id741615495336473\n"
+"help.text"
+msgid "Navigates to the last edited slide in the document."
+msgstr "Переход к последнему изменённому слайду в документе."
+
+#. FA3Ra
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id641615489789548\n"
+"help.text"
+msgid "Move"
+msgstr "Переместить"
+
+#. GBPvF
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id371615495363225\n"
+"help.text"
+msgid "Shows a list of move operations that can be applied to the current slide:"
+msgstr "Показывает список операций перемещения, которые можно применить к текущему слайду:"
+
+#. TF4iz
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id711615495448201\n"
+"help.text"
+msgid "<emph>Slide to Start:</emph> Moves the current slide to the first position."
+msgstr "<emph>Слайд в начало:</emph> Перемещает текущий слайд на первую позицию."
+
+#. uAt25
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id101615495452464\n"
+"help.text"
+msgid "<emph>Slide Up:</emph> Moves the current slide one position up in the presentation."
+msgstr "<emph>Слайд вверх:</emph> Перемещает текущий слайд на одну позицию вверх в презентации."
+
+#. PdEMy
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id761615495456499\n"
+"help.text"
+msgid "<emph>Slide Down:</emph> Moves the current slide one position down in the presentation."
+msgstr "<emph>Слайд вниз:</emph> Перемещает текущий слайд на одну позицию вниз в презентации."
+
+#. ESDFM
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id321615495459372\n"
+"help.text"
+msgid "<emph>Slide to End:</emph> Moves the current slide to the last position."
+msgstr "<emph>Слайд в конец:</emph> Перемещает текущий слайд на последнюю позицию."
+
+#. AsscG
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"hd_id301615489789755\n"
+"help.text"
+msgid "Navigate"
+msgstr "Навигация"
+
+#. 62VZA
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id941615558050553\n"
+"help.text"
+msgid "Shows a list of functions that can be used to navigate through the slides:"
+msgstr "Показывает список функций, которые можно использовать для навигации по слайдам:"
+
+#. Mdi6Y
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id381615558169403\n"
+"help.text"
+msgid "<emph>To First Slide:</emph> Selects the first slide in the presentation."
+msgstr "<emph>К первому слайду:</emph> Выбирает первый слайд в презентации."
+
+#. bYEak
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id131615558173437\n"
+"help.text"
+msgid "<emph>To Previous Slide:</emph> Navigates to the previous slide with respect to the currently selected slide."
+msgstr "<emph>К предыдущему слайду:</emph> Переход к предыдущему по отношению к выбранному в данный момент слайду."
+
+#. YXD3o
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id941615558176178\n"
+"help.text"
+msgid "<emph>To Next Slide:</emph> Navigates to the next slide with respect to the currently selected slide."
+msgstr "<emph>К следующему слайду:</emph> Переход к следующему по отношению к выбранному в данный момент слайду."
+
+#. dspAA
+#: main_slide.xhp
+msgctxt ""
+"main_slide.xhp\n"
+"par_id91615558179041\n"
+"help.text"
+msgid "<emph>To Last Slide:</emph> Selects the last slide in the presentation."
+msgstr "<emph>К последнему слайду:</emph> Выбирает последний слайд в презентации."
+
+#. rCA2e
+#: main_tools.xhp
+msgctxt ""
+"main_tools.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools"
+msgstr "Сервис"
+
+#. j8HBG
+#: main_tools.xhp
+msgctxt ""
+"main_tools.xhp\n"
+"hd_id3154017\n"
+"help.text"
+msgid "<link href=\"text/simpress/main_tools.xhp\">Tools</link>"
+msgstr "<link href=\"text/simpress/main_tools.xhp\">Сервис</link>"
+
+#. QCEeB
+#: main_tools.xhp
+msgctxt ""
+"main_tools.xhp\n"
+"par_id3155064\n"
+"help.text"
+msgid "<ahelp hid=\".\">Contains spelling tools, a gallery of object art that you can add to your document, as well as tools for configuring menus, and setting program preferences.</ahelp>"
+msgstr "<ahelp hid=\".\">Содержит инструменты проверки правописания, галерею объектов, которые возможно добавить в документ, а также инструменты для настройки меню и параметров программы.</ahelp>"
+
+#. NgjZ3
+#: main_tools.xhp
+msgctxt ""
+"main_tools.xhp\n"
+"hd_id3145590\n"
+"help.text"
+msgid "<link href=\"text/shared/01/02220000.xhp\">ImageMap</link>"
+msgstr "<link href=\"text/shared/01/02220000.xhp\">Сенсорное изображение</link>"
+
+#. Wk79g
+#: main_tools.xhp
+msgctxt ""
+"main_tools.xhp\n"
+"hd_id3153248\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06040000.xhp\">AutoCorrect Options</link>"
+msgstr "<link href=\"text/shared/01/06040000.xhp\">Параметры автозамены</link>"
+
+#. JFTcx
+#: main_tools.xhp
+msgctxt ""
+"main_tools.xhp\n"
+"hd_id3149130\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06140000.xhp\">Customize</link>"
+msgstr "<link href=\"text/shared/01/06140000.xhp\">Настройка</link>"
+
+#. A8xE3
+#: submenu_object_shape.xhp
+msgctxt ""
+"submenu_object_shape.xhp\n"
+"tit\n"
+"help.text"
+msgid "Textbox and Shape (Impress)"
+msgstr "Текстовое поле и фигура (Impress)"
+
+#. uygwP
+#: submenu_object_shape.xhp
+msgctxt ""
+"submenu_object_shape.xhp\n"
+"hd_id231615117568430\n"
+"help.text"
+msgid "<link href=\"text/simpress/submenu_object_shape.xhp\">Textbox and Shape</link>"
+msgstr "<link href=\"text/simpress/submenu_object_shape.xhp\">Текстовое поле и фигура</link>"
+
+#. aBtgV
+#: submenu_object_shape.xhp
+msgctxt ""
+"submenu_object_shape.xhp\n"
+"par_id111615131426235\n"
+"help.text"
+msgid "Opens a submenu to edit the properties of the selected textbox or shape."
+msgstr "Открывает подменю для редактирования свойств выбранного текстового поля или фигуры."

@@ -1,0 +1,611 @@
+#. extracted from sysui/desktop/share
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-21 18:06+0100\n"
+"PO-Revision-Date: 2022-12-25 13:16+0000\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
+"Language-Team: Kazakh <https://translations.documentfoundation.org/projects/libo_ui-master/sysuidesktopshare/kk/>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1463047981.000000\n"
+
+#. a9uCy
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document"
+msgstr "OpenOffice.org 1.0 мәтіндік құжаты"
+
+#. 9mfCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document Template"
+msgstr "OpenOffice.org 1.0 мәтіндік құжат үлгісі"
+
+#. hj5SQ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"master-document\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Master Document"
+msgstr "OpenOffice.org 1.0 құрамдас құжаты"
+
+#. 8tGE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"formula\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Formula"
+msgstr "OpenOffice.org 1.0 формуласы"
+
+#. iJFTG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation"
+msgstr "OpenOffice.org 1.0 презентациясы"
+
+#. CA7gZ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation Template"
+msgstr "OpenOffice.org 1.0 презентация үлгісі"
+
+#. AuLrq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing"
+msgstr "OpenOffice.org 1.0 суреті"
+
+#. sHiv9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing Template"
+msgstr "OpenOffice.org 1.0 сурет үлгісі"
+
+#. rSDA2
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet"
+msgstr "OpenOffice.org 1.0 электрондық кестесі"
+
+#. iUGdT
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet Template"
+msgstr "OpenOffice.org 1.0 электрондық кесте үлгісі"
+
+#. dup8a
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text\n"
+"LngText.text"
+msgid "OpenDocument Text"
+msgstr "OpenDocument Мәтіндік құжаты"
+
+#. Tvbts
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Text (Flat XML)"
+msgstr "OpenDocument мәтіндік құжаты (жалпақ XML)"
+
+#. 7rxHH
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-template\n"
+"LngText.text"
+msgid "OpenDocument Text Template"
+msgstr "OpenDocument мәтіндік құжаттың үлгісі"
+
+#. qGKKU
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document\n"
+"LngText.text"
+msgid "OpenDocument Master Document"
+msgstr "OpenDocument құрамдас құжаты"
+
+#. LDcMd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document-template\n"
+"LngText.text"
+msgid "OpenDocument Master Document Template"
+msgstr "OpenDocument құрамдас құжат үлгісі"
+
+#. xUvzk
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-formula\n"
+"LngText.text"
+msgid "OpenDocument Formula"
+msgstr "OpenDocument формуласы"
+
+#. QaoV9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "OpenDocument презентациясы"
+
+#. 7KXDa
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Presentation (Flat XML)"
+msgstr "OpenDocument презентациясы (жалпақ XML)"
+
+#. r5mkr
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-template\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "OpenDocument презентация үлгісі"
+
+#. ABKBq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing\n"
+"LngText.text"
+msgid "OpenDocument Drawing"
+msgstr "OpenDocument суреті"
+
+#. uAguG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Drawing (Flat XML)"
+msgstr "OpenDocument суреті (жалпақ XML)"
+
+#. nbGeB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-template\n"
+"LngText.text"
+msgid "OpenDocument Drawing Template"
+msgstr "OpenDocument суреттің үлгісі"
+
+#. ww4GY
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet"
+msgstr "OpenDocument электрондық кестесі"
+
+#. U6S6A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet (Flat XML)"
+msgstr "OpenDocument электрондық кестесі (жалпақ XML)"
+
+#. GRcE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-template\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet Template"
+msgstr "OpenDocument электрондық кесте үлгісі"
+
+#. FBzW7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-database\n"
+"LngText.text"
+msgid "OpenDocument Database"
+msgstr "OpenDocument дерекқоры"
+
+#. PHjCX
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-web-template\n"
+"LngText.text"
+msgid "HTML Document Template"
+msgstr "HTML құжатының үлгісі"
+
+#. z5v7A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"extension\n"
+"LngText.text"
+msgid "%PRODUCTNAME Extension"
+msgstr "%PRODUCTNAME кеңейтуі"
+
+#. yfXFW
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel электрондық кестесі"
+
+#. GFWsF
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint презентациясы"
+
+#. sXwCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word құжаты"
+
+#. N9WPd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document2\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word құжаты"
+
+#. jtBEd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel электрондық кестесі"
+
+#. YMdW5
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-template-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Excel электрондық кесте үлгісі"
+
+#. kg6D4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint презентациясы"
+
+#. 7TjD7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-template-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPoint презентация үлгісі"
+
+#. 9YtZo
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document-12\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word құжаты"
+
+#. PXrJC
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-template-12\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Word құжат үлгісі"
+
+#. EENV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint презентациясы"
+
+#. aBQW3
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-template\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPoint презентация үлгісі"
+
+#. CTtV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel электрондық кестесі"
+
+#. Dk7Bj
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-template\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Excel электрондық кесте үлгісі"
+
+#. So2PB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word құжаты"
+
+#. gHPAp
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-template\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Word құжат үлгісі"
+
+#. rJW59
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-binary-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel электрондық кестесі"
+
+#. 7HYTf
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"writer_Comment\n"
+"LngText.text"
+msgid "Create and edit text and graphics in letters, reports, documents and Web pages."
+msgstr "Хаттар, есептер, құжаттар және Web-беттердегі мәтін мен графиканы жасау және өңдеу."
+
+#. ZoKAh
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"impress_Comment\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meetings and Web pages."
+msgstr "Слайдшоулар, жиналыстар және веб-беттерге арналған презентацияларды жасау және өңдеу."
+
+#. 5y58d
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"draw_Comment\n"
+"LngText.text"
+msgid "Create and edit drawings, flow charts and logos."
+msgstr "Сызбалар, схемалар мен логотиптерді жасау және өңдеу."
+
+#. Ropmz
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"calc_Comment\n"
+"LngText.text"
+msgid "Perform calculations, analyze information and manage lists in spreadsheets."
+msgstr "Есептеулерді орындау, ақпаратты талдау және электрондық кестелердегі тізімдерді басқару."
+
+#. NRFDd
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"math_Comment\n"
+"LngText.text"
+msgid "Create and edit scientific formulas and equations."
+msgstr "Ғылыми формулалар мен теңдеулерді жасау және өңдеу."
+
+#. xABrj
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"base_Comment\n"
+"LngText.text"
+msgid "Manage databases, create queries and reports to track and manage your information."
+msgstr "Ақпаратыңызды бақылау және басқару үшін дерекқорларды басқару, сұраулар мен есептерді жасау."
+
+#. dLjP3
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"startcenter_Comment\n"
+"LngText.text"
+msgid "Launch applications to create text documents, spreadsheets, presentations, drawings, formulas, and databases, or open recently used documents."
+msgstr "Мәтіндік құжаттар, электрондық кестелер, презентациялар, сызбалар, формулалар және дерекқорларды жасау үшін қолданбаларды жөнелту немесе жуырда пайдаланылған құжаттарды ашу."
+
+#. asG2q
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"writer_GenericName\n"
+"LngText.text"
+msgid "Word Processor"
+msgstr "Мәтіндік процессор"
+
+#. asccy
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"impress_GenericName\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "Презентация"
+
+#. PAscF
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"calc_GenericName\n"
+"LngText.text"
+msgid "Spreadsheet"
+msgstr "Электрондық кесте"
+
+#. URsiw
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"base_GenericName\n"
+"LngText.text"
+msgid "Database Development"
+msgstr "Дерекқор"
+
+#. WiFDB
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"math_GenericName\n"
+"LngText.text"
+msgid "Formula Editor"
+msgstr "Формулалар түзеткіші"
+
+#. nVVgx
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"draw_GenericName\n"
+"LngText.text"
+msgid "Drawing Program"
+msgstr "Сурет салу бағдарламасы"
+
+#. LJuAW
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"startcenter_GenericName\n"
+"LngText.text"
+msgid "Office"
+msgstr "Офис"
+
+#. 5KBat
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"xsltfilter_GenericName\n"
+"LngText.text"
+msgid "XSLT based filters"
+msgstr "XSLT сүзгілері"
+
+#. qwzA2
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"writer_UnityQuickList\n"
+"LngText.text"
+msgid "New Document"
+msgstr "Құжатты жасау"
+
+#. UfbRG
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"impress_UnityQuickList\n"
+"LngText.text"
+msgid "New Presentation"
+msgstr "Жаңа презентация"
+
+#. 7EBht
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"calc_UnityQuickList\n"
+"LngText.text"
+msgid "New Spreadsheet"
+msgstr "Жаңа электрондық кесте"
+
+#. zeweB
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"base_UnityQuickList\n"
+"LngText.text"
+msgid "New Database"
+msgstr "Жаңа дерекқор"
+
+#. KmFBK
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"math_UnityQuickList\n"
+"LngText.text"
+msgid "New Formula"
+msgstr "Жаңа формула"
+
+#. f7T9D
+#: launcher.ulf
+msgctxt ""
+"launcher.ulf\n"
+"draw_UnityQuickList\n"
+"LngText.text"
+msgid "New Drawing"
+msgstr "Жаңа сурет"

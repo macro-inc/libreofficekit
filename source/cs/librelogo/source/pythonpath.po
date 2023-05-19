@@ -1,0 +1,1268 @@
+#. extracted from librelogo/source/pythonpath
+msgid ""
+msgstr ""
+"Project-Id-Version: LibO 40l10n\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2020-06-29 13:09+0200\n"
+"PO-Revision-Date: 2020-06-30 19:04+0000\n"
+"Last-Translator: Stanislav Horáček <stanislav.horacek@gmail.com>\n"
+"Language-Team: Czech <https://weblate.documentfoundation.org/projects/libo_ui-master/librelogosourcepythonpath/cs/>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 3.10.3\n"
+"X-POOTLE-MTIME: 1529770847.000000\n"
+
+#. tFoAo
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FORWARD\n"
+"property.text"
+msgid "forward|fd"
+msgstr "dopředu|do"
+
+#. CAynz
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"BACKWARD\n"
+"property.text"
+msgid "back|bk"
+msgstr "vzad|vz"
+
+#. C2vPo
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TURNLEFT\n"
+"property.text"
+msgid "left|turnleft|lt"
+msgstr "vlevo|vl"
+
+#. 77BZH
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TURNRIGHT\n"
+"property.text"
+msgid "right|turnright|rt"
+msgstr "vpravo|vp"
+
+#. CUWGq
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENUP\n"
+"property.text"
+msgid "penup|pu"
+msgstr "peronahoru|pn"
+
+#. FKDzL
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENDOWN\n"
+"property.text"
+msgid "pendown|pd"
+msgstr "perodolů|pd"
+
+#. BEiyw
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"HOME\n"
+"property.text"
+msgid "home"
+msgstr "domů"
+
+#. KpJ4z
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"POINT\n"
+"property.text"
+msgid "point"
+msgstr "bod|puntík"
+
+#. qKQFP
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"CIRCLE\n"
+"property.text"
+msgid "circle"
+msgstr "kruh"
+
+#. svw6Z
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ELLIPSE\n"
+"property.text"
+msgid "ellipse"
+msgstr "elipsa"
+
+#. MCmRf
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SQUARE\n"
+"property.text"
+msgid "square"
+msgstr "čtverec"
+
+#. C8wfs
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"RECTANGLE\n"
+"property.text"
+msgid "rectangle"
+msgstr "obdélník"
+
+#. amFfu
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"LABEL\n"
+"property.text"
+msgid "label"
+msgstr "text"
+
+#. 2fBcU
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENCOLOR\n"
+"property.text"
+msgid "pencolor|pencolour|linecolor|pc"
+msgstr "barvapera|barvačáry|bp"
+
+#. uZsBx
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ANY\n"
+"property.text"
+msgid "any"
+msgstr "libovolně|lib"
+
+#. WxpfM
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENWIDTH\n"
+"property.text"
+msgid "pensize|penwidth|linewidth|ps"
+msgstr "tloušťkapera|tloušťkačáry|tp"
+
+#. 2Zgzv
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENSTYLE\n"
+"property.text"
+msgid "penstyle|linestyle"
+msgstr "druhpera|druhčáry"
+
+#. L9YnA
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENJOINT\n"
+"property.text"
+msgid "penjoint|linejoint"
+msgstr "napojenípera|napojeníčáry"
+
+#. bhT9C
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENCAP\n"
+"property.text"
+msgid "pencap|linecap"
+msgstr "zakončenípera|zakončeníčáry"
+
+#. cEECN
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"NONE\n"
+"property.text"
+msgid "none"
+msgstr "žádné"
+
+#. f5mQa
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"BEVEL\n"
+"property.text"
+msgid "bevel"
+msgstr "šikmé"
+
+#. R4Z7i
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"MITER\n"
+"property.text"
+msgid "miter"
+msgstr "ostré"
+
+#. DX7nN
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ROUNDED\n"
+"property.text"
+msgid "round"
+msgstr "oblé"
+
+#. VSaRQ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SOLID\n"
+"property.text"
+msgid "solid"
+msgstr "plná"
+
+#. P6PxY
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"DASH\n"
+"property.text"
+msgid "dashed"
+msgstr "čárkovaná"
+
+#. NgY8n
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"DOTTED\n"
+"property.text"
+msgid "dotted"
+msgstr "tečkovaná"
+
+#. ti8oV
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"CLOSE\n"
+"property.text"
+msgid "close"
+msgstr "uzavři"
+
+#. btW32
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FILL\n"
+"property.text"
+msgid "fill"
+msgstr "vyplň"
+
+#. nGc2D
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FILLCOLOR\n"
+"property.text"
+msgid "fillcolor|fillcolour|fc"
+msgstr "barvavýplně|bv"
+
+#. PGzDC
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FILLTRANSPARENCY\n"
+"property.text"
+msgid "filltransparency"
+msgstr "průhlednostvýplně|průhlvýplně"
+
+#. rREgg
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PENTRANSPARENCY\n"
+"property.text"
+msgid "pentransparency|linetransparency"
+msgstr "průhlednostpera|průhlednostčáry|průhlpera|průhlčáry"
+
+#. aYZ9n
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FILLSTYLE\n"
+"property.text"
+msgid "fillstyle"
+msgstr "druhvýplně"
+
+#. Z2nMa
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FONTCOLOR\n"
+"property.text"
+msgid "fontcolor|textcolor|textcolour"
+msgstr "barvapísma|barvatextu"
+
+#. 3G7jg
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FONTTRANSPARENCY\n"
+"property.text"
+msgid "fonttransparency|texttransparency"
+msgstr "průhlednostpísma|průhlpísma|průhlednosttextu|průhltextu"
+
+#. EPJeZ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FONTHEIGHT\n"
+"property.text"
+msgid "fontsize|textsize|textheight"
+msgstr "velikostpísma|velikosttextu"
+
+#. amtRF
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FONTWEIGHT\n"
+"property.text"
+msgid "fontweight"
+msgstr "tloušťkapísma"
+
+#. Di9ys
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FONTSTYLE\n"
+"property.text"
+msgid "fontstyle"
+msgstr "stylpísma"
+
+#. YKYPa
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"BOLD\n"
+"property.text"
+msgid "bold"
+msgstr "tučné"
+
+#. Q2DmA
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ITALIC\n"
+"property.text"
+msgid "italic"
+msgstr "kurzíva"
+
+#. hC7sA
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"UPRIGHT\n"
+"property.text"
+msgid "upright|normal"
+msgstr "normální"
+
+#. nG5Yw
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"NORMAL\n"
+"property.text"
+msgid "normal"
+msgstr "normální"
+
+#. fQ9uy
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FONTFAMILY\n"
+"property.text"
+msgid "fontfamily"
+msgstr "druhpísma"
+
+#. Fu2PZ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"CLEARSCREEN\n"
+"property.text"
+msgid "clearscreen|cs"
+msgstr "smažobrazovku|so"
+
+#. 4eTcL
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TEXT\n"
+"property.text"
+msgid "text"
+msgstr "popisek"
+
+#. oJ8GF
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"HIDETURTLE\n"
+"property.text"
+msgid "hideturtle|ht|hideme"
+msgstr "skryjželvu|skryj|sž"
+
+#. pbRce
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SHOWTURTLE\n"
+"property.text"
+msgid "showturtle|st|showme"
+msgstr "ukažželvu|ukaž|už"
+
+#. iEgLZ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"POSITION\n"
+"property.text"
+msgid "position|pos|setpos"
+msgstr "pozice|poz|nastavpoz"
+
+#. ydeVD
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"HEADING\n"
+"property.text"
+msgid "heading|setheading|seth"
+msgstr "směr|nastavsměr"
+
+#. HpQLM
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PAGESIZE\n"
+"property.text"
+msgid "pagesize"
+msgstr "velikoststránky"
+
+#. 9iYXj
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"GROUP\n"
+"property.text"
+msgid "picture|pic"
+msgstr "obrázek|obr"
+
+#. HyJKJ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TO\n"
+"property.text"
+msgid "to"
+msgstr "příkaz"
+
+#. qMmGB
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"END\n"
+"property.text"
+msgid "end"
+msgstr "konec"
+
+#. tcxEM
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"STOP\n"
+"property.text"
+msgid "stop"
+msgstr "zastav"
+
+#. AqQAe
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"REPEAT\n"
+"property.text"
+msgid "repeat|forever"
+msgstr "opakuj|pořád"
+
+#. pA442
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"REPCOUNT\n"
+"property.text"
+msgid "repcount"
+msgstr "počítadlo|poč"
+
+#. NEdAp
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"BREAK\n"
+"property.text"
+msgid "break"
+msgstr "ukonči"
+
+#. ccxHX
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"CONTINUE\n"
+"property.text"
+msgid "continue"
+msgstr "pokračuj"
+
+#. 5ZmQX
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"WHILE\n"
+"property.text"
+msgid "while"
+msgstr "dokud"
+
+#. v4dsv
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FOR\n"
+"property.text"
+msgid "for"
+msgstr "pro"
+
+#. hUxfV
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"IN\n"
+"property.text"
+msgid "in"
+msgstr "z"
+
+#. r8rdq
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"IF\n"
+"property.text"
+msgid "if"
+msgstr "když"
+
+#. fFrZA
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"OUTPUT\n"
+"property.text"
+msgid "output"
+msgstr "výsledek"
+
+#. WHewy
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"LEFTSTRING\n"
+"property.text"
+msgid "“|‘"
+msgstr "„|\""
+
+#. dmm7x
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"RIGHTSTRING\n"
+"property.text"
+msgid "”|’"
+msgstr "“|\""
+
+#. rNpFP
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TRUE\n"
+"property.text"
+msgid "true"
+msgstr "pravda"
+
+#. bhF65
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FALSE\n"
+"property.text"
+msgid "false"
+msgstr "nepravda"
+
+#. 8QhvZ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"NOT\n"
+"property.text"
+msgid "not"
+msgstr "není"
+
+#. iW2Yh
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"AND\n"
+"property.text"
+msgid "and"
+msgstr "azároveň|az"
+
+#. B3QGc
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"OR\n"
+"property.text"
+msgid "or"
+msgstr "nebo"
+
+#. E9emy
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"INPUT\n"
+"property.text"
+msgid "input"
+msgstr "vstup"
+
+#. n3DWZ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PRINT\n"
+"property.text"
+msgid "print"
+msgstr "piš"
+
+#. LVNRT
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SLEEP\n"
+"property.text"
+msgid "sleep"
+msgstr "čekej"
+
+#. 9h7xn
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"GLOBAL\n"
+"property.text"
+msgid "global"
+msgstr "globální"
+
+#. BEhG8
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"RANDOM\n"
+"property.text"
+msgid "random"
+msgstr "náhodné"
+
+#. 7ety4
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"INT\n"
+"property.text"
+msgid "int"
+msgstr "celé"
+
+#. aXDnB
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FLOAT\n"
+"property.text"
+msgid "float"
+msgstr "desetinné"
+
+#. X7Xrx
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"STR\n"
+"property.text"
+msgid "str"
+msgstr "řetězec"
+
+#. xTjuZ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SQRT\n"
+"property.text"
+msgid "sqrt"
+msgstr "odmocnina"
+
+#. rCfuG
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"LOG10\n"
+"property.text"
+msgid "log10"
+msgstr "log10"
+
+#. hvSEG
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SIN\n"
+"property.text"
+msgid "sin"
+msgstr "sin"
+
+#. V37dC
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"COS\n"
+"property.text"
+msgid "cos"
+msgstr "cos"
+
+#. irCAi
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ROUND\n"
+"property.text"
+msgid "round"
+msgstr "oblé"
+
+#. mK7BU
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ABS\n"
+"property.text"
+msgid "abs"
+msgstr "absolutní"
+
+#. mMFnH
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"COUNT\n"
+"property.text"
+msgid "count"
+msgstr "počet"
+
+#. REzwU
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SET\n"
+"property.text"
+msgid "set"
+msgstr "množina"
+
+#. 2HJLi
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"RANGE\n"
+"property.text"
+msgid "range"
+msgstr "rozsah"
+
+#. 5v85t
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"LIST\n"
+"property.text"
+msgid "list"
+msgstr "seznam"
+
+#. WG9L8
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TUPLE\n"
+"property.text"
+msgid "tuple"
+msgstr "ntice"
+
+#. AwCpS
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SORTED\n"
+"property.text"
+msgid "sorted"
+msgstr "seřazeno"
+
+#. E3ZWb
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"RESUB\n"
+"property.text"
+msgid "sub"
+msgstr "nahraď"
+
+#. EQKA9
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"RESEARCH\n"
+"property.text"
+msgid "search"
+msgstr "hledej"
+
+#. 6qhHD
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"REFINDALL\n"
+"property.text"
+msgid "findall"
+msgstr "najdivše"
+
+#. K3QbE
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"MIN\n"
+"property.text"
+msgid "min"
+msgstr "min"
+
+#. jk5VB
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"MAX\n"
+"property.text"
+msgid "max"
+msgstr "max"
+
+#. UMhvT
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PI\n"
+"property.text"
+msgid "pi|π"
+msgstr "pi|π"
+
+#. 6iBXP
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"DECIMAL\n"
+"property.text"
+msgid "."
+msgstr ","
+
+#. jVbjB
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"DEG\n"
+"property.text"
+msgid "°"
+msgstr "°"
+
+#. qKdwN
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"HOUR\n"
+"property.text"
+msgid "h"
+msgstr "h"
+
+#. h63E5
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"MM\n"
+"property.text"
+msgid "mm"
+msgstr "mm"
+
+#. RRfTD
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"CM\n"
+"property.text"
+msgid "cm"
+msgstr "cm"
+
+#. hGRGr
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PT\n"
+"property.text"
+msgid "pt"
+msgstr "pt"
+
+#. NVaj5
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"INCH\n"
+"property.text"
+msgid "in|\""
+msgstr "in|\""
+
+#. uCFwP
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"INVISIBLE\n"
+"property.text"
+msgid "invisible"
+msgstr "neviditelná"
+
+#. DovQK
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"BLACK\n"
+"property.text"
+msgid "black"
+msgstr "černé"
+
+#. MGAxA
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SILVER\n"
+"property.text"
+msgid "silver"
+msgstr "stříbrná"
+
+#. 9LBUQ
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"GRAY\n"
+"property.text"
+msgid "gray|grey"
+msgstr "šedá"
+
+#. oAy3e
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"WHITE\n"
+"property.text"
+msgid "white"
+msgstr "bílá"
+
+#. GfsGA
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"MAROON\n"
+"property.text"
+msgid "maroon"
+msgstr "kaštanová"
+
+#. YhZ6h
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"RED\n"
+"property.text"
+msgid "red"
+msgstr "červená"
+
+#. DthAM
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PURPLE\n"
+"property.text"
+msgid "purple"
+msgstr "purpurová"
+
+#. Q44aX
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"FUCHSIA\n"
+"property.text"
+msgid "fuchsia|magenta"
+msgstr "magenta"
+
+#. gwpzS
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"GREEN\n"
+"property.text"
+msgid "green"
+msgstr "zelená"
+
+#. tLqpS
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"LIME\n"
+"property.text"
+msgid "lime"
+msgstr "žlutozelená"
+
+#. AQueV
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"OLIVE\n"
+"property.text"
+msgid "olive"
+msgstr "olivová"
+
+#. Xgbet
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"YELLOW\n"
+"property.text"
+msgid "yellow"
+msgstr "žlutá"
+
+#. J5atG
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"NAVY\n"
+"property.text"
+msgid "navy"
+msgstr "tmavomodrá"
+
+#. TX4g3
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"BLUE\n"
+"property.text"
+msgid "blue"
+msgstr "modrá"
+
+#. pDbAn
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TEAL\n"
+"property.text"
+msgid "teal"
+msgstr "zelenomodrá"
+
+#. GBgD2
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"AQUA\n"
+"property.text"
+msgid "aqua|cyan"
+msgstr "azurová"
+
+#. 5BkSB
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"PINK\n"
+"property.text"
+msgid "pink"
+msgstr "růžová"
+
+#. TZq8Z
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"TOMATO\n"
+"property.text"
+msgid "tomato"
+msgstr "cihlová"
+
+#. FKcUk
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ORANGE\n"
+"property.text"
+msgid "orange"
+msgstr "oranžová"
+
+#. 3EnvX
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"GOLD\n"
+"property.text"
+msgid "gold"
+msgstr "zlatá"
+
+#. xRupD
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"VIOLET\n"
+"property.text"
+msgid "violet"
+msgstr "fialová"
+
+#. TUvm5
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"SKYBLUE\n"
+"property.text"
+msgid "skyblue"
+msgstr "bleděmodrá"
+
+#. HsKEB
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"CHOCOLATE\n"
+"property.text"
+msgid "chocolate"
+msgstr "čokoládová"
+
+#. FSQCT
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"BROWN\n"
+"property.text"
+msgid "brown"
+msgstr "hnědá"
+
+#. PTgyD
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"LIBRELOGO\n"
+"property.text"
+msgid "LibreLogo"
+msgstr "LibreLogo"
+
+#. 8BZVa
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERROR\n"
+"property.text"
+msgid "Error (in line %s)"
+msgstr "Chyba (na řádku %s)"
+
+#. 4dBoE
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_ZERODIVISION\n"
+"property.text"
+msgid "Division by zero."
+msgstr "Dělení nulou."
+
+#. gjBf3
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_NAME\n"
+"property.text"
+msgid "Unknown name: “%s”."
+msgstr "Neznámý název: „%s“."
+
+#. oVW6Y
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_ARGUMENTS\n"
+"property.text"
+msgid "%s takes %s arguments (%s given)."
+msgstr "%s vyžaduje %s argumentů (předáno %s)."
+
+#. 9GTjj
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_BLOCK\n"
+"property.text"
+msgid "Error (extra or missing spaces at brackets?)"
+msgstr "Chyba (přebývající nebo chybějící mezery u závorek?)"
+
+#. xHSSL
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_KEY\n"
+"property.text"
+msgid "Unknown element: %s"
+msgstr "Neznámý prvek: %s"
+
+#. acBGX
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_INDEX\n"
+"property.text"
+msgid "Index out of range."
+msgstr "Index mimo rozsah."
+
+#. wtR3a
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_STOP\n"
+"property.text"
+msgid "Program terminated:"
+msgstr "Program ukončen:"
+
+#. YBhxX
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_MAXRECURSION\n"
+"property.text"
+msgid "maximum recursion depth (%d) exceeded."
+msgstr "překročena maximální hloubka rekurze (%d)."
+
+#. 8X5oD
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_MEMORY\n"
+"property.text"
+msgid "not enough memory."
+msgstr "nedostatek paměti."
+
+#. GqoAR
+#: LibreLogo_en_US.properties
+msgctxt ""
+"LibreLogo_en_US.properties\n"
+"ERR_NOTAPROGRAM\n"
+"property.text"
+msgid "Do you want to run this text document?"
+msgstr "Přejete si spustit tento textový dokument?"

@@ -1,0 +1,2096 @@
+#. extracted from filter/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 13:11+0100\n"
+"PO-Revision-Date: 2023-03-07 09:34+0000\n"
+"Last-Translator: Miloš Šrámek <msramek22@gmail.com>\n"
+"Language-Team: Slovak <https://translations.documentfoundation.org/projects/libo_ui-7-5/filtermessages/sk/>\n"
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.15.2\n"
+"X-POOTLE-MTIME: 1562264757.000000\n"
+
+#. 5AQgJ
+#: filter/inc/strings.hrc:27
+msgctxt "STR_UNKNOWN_APPLICATION"
+msgid "Unknown"
+msgstr "Neznáme"
+
+#. AP7oB
+#: filter/inc/strings.hrc:28
+msgctxt "STR_IMPORT_ONLY"
+msgid "import filter"
+msgstr "importný filter"
+
+#. 7vg82
+#: filter/inc/strings.hrc:29
+msgctxt "STR_IMPORT_EXPORT"
+msgid "import/export filter"
+msgstr "importovací/exportovací filter"
+
+#. q6Bc5
+#: filter/inc/strings.hrc:30
+msgctxt "STR_EXPORT_ONLY"
+msgid "export filter"
+msgstr "exportovací filter"
+
+#. AmATR
+#: filter/inc/strings.hrc:31
+msgctxt "STR_WARN_DELETE"
+msgid "Do you really want to delete the XML Filter '%s'? This action cannot be undone."
+msgstr "Určite chcete odstrániť XML filter '%s'? Tento krok nemôže byť vrátený."
+
+#. Vf3nz
+#: filter/inc/strings.hrc:32
+msgctxt "STR_ERROR_FILTER_NAME_EXISTS"
+msgid "An XML filter with the name '%s' already exists. Please enter a different name."
+msgstr "XML filter s týmto názvom '%s' už existuje. Prosím zadajte iný názov."
+
+#. e3U54
+#: filter/inc/strings.hrc:33
+msgctxt "STR_ERROR_TYPE_NAME_EXISTS"
+msgid "The name for the user interface '%s1' is already used by the XML filter '%s2'. Please enter a different name."
+msgstr "Názov používateľského rozhrania '%s1' už používa XML filter '%s2'. Prosím zadajte iný názov."
+
+#. Zt87T
+#: filter/inc/strings.hrc:34
+msgctxt "STR_ERROR_EXPORT_XSLT_NOT_FOUND"
+msgid "The XSLT for export cannot be found. Please enter a valid path."
+msgstr "XSLT súbor pre export nebol nájdený. Prosím zadajte platnú cestu."
+
+#. 7VkMt
+#: filter/inc/strings.hrc:35
+msgctxt "STR_ERROR_IMPORT_XSLT_NOT_FOUND"
+msgid "The XSLT for import cannot be found. Please enter a valid path."
+msgstr "XSLT súbor pre import nebol nájdený. Prosím zadajte platnú cestu."
+
+#. CLFJD
+#: filter/inc/strings.hrc:36
+msgctxt "STR_ERROR_IMPORT_TEMPLATE_NOT_FOUND"
+msgid "The given import template cannot be found. Please enter a valid path."
+msgstr "Zadaná šablóna nebola nájdená. Prosím zadajte platnú cestu."
+
+#. WMzvt
+#: filter/inc/strings.hrc:37
+msgctxt "STR_DEFAULT_FILTER_NAME"
+msgid "New Filter"
+msgstr "Nový filter"
+
+#. N3wHE
+#: filter/inc/strings.hrc:38
+msgctxt "STR_DEFAULT_UI_NAME"
+msgid "Untitled"
+msgstr "Bez názvu"
+
+#. VAMhi
+#: filter/inc/strings.hrc:39
+msgctxt "STR_UNDEFINED_FILTER"
+msgid "undefined filter"
+msgstr "nedefinovaný filter"
+
+#. tphDj
+#: filter/inc/strings.hrc:40
+msgctxt "STR_FILTER_HAS_BEEN_SAVED"
+msgid "The XML filter '%s' has been saved as package '%s'. "
+msgstr "XML filter '%s' bol uložený ako balík '%s'. "
+
+#. tJeU3
+#: filter/inc/strings.hrc:41
+msgctxt "STR_FILTERS_HAVE_BEEN_SAVED"
+msgid "%s XML filters have been saved in the package '%s'."
+msgstr "%s XML filtre boli uložené do balíka '%s'."
+
+#. ZULF4
+#: filter/inc/strings.hrc:42
+msgctxt "STR_FILTER_PACKAGE"
+msgid "XSLT filter package"
+msgstr "Balík XSLT filtrov"
+
+#. TAAAB
+#: filter/inc/strings.hrc:43
+msgctxt "STR_FILTER_INSTALLED"
+msgid "The XML filter '%s' has been installed successfully."
+msgstr "XML filter '%s' bol úspešne inštalovaný."
+
+#. SwDCV
+#: filter/inc/strings.hrc:44
+msgctxt "STR_FILTERS_INSTALLED"
+msgid "%s XML filters have been installed successfully."
+msgstr "%s XML filtre boli úspešne inštalované."
+
+#. dirBm
+#: filter/inc/strings.hrc:45
+msgctxt "STR_NO_FILTERS_FOUND"
+msgid "No XML filter could be installed because the package '%s' does not contain any XML filters."
+msgstr "Nebol nainštalovaný žiaden XML filter, pretože balík '%s' neobsahuje žiadne XML filtre."
+
+#. EifWe
+#: filter/inc/strings.hrc:46
+msgctxt "STR_XML_FILTER_LISTBOX"
+msgid "XML Filter List"
+msgstr "Zoznam filtrov XML"
+
+#. iUSBA
+#: filter/inc/strings.hrc:48
+msgctxt "T602FILTER_STR_IMPORT_DIALOG_TITLE"
+msgid "Settings for T602 import"
+msgstr "Nastavenia pre T602 import"
+
+#. BU2Mt
+#: filter/inc/strings.hrc:49
+msgctxt "T602FILTER_STR_ENCODING_LABEL"
+msgid "Encoding"
+msgstr "Kódovanie"
+
+#. j3aAG
+#: filter/inc/strings.hrc:50
+msgctxt "T602FILTER_STR_ENCODING_AUTO"
+msgid "Automatic"
+msgstr "Automatický"
+
+#. DuxTb
+#: filter/inc/strings.hrc:51
+msgctxt "T602FILTER_STR_ENCODING_CP852"
+msgid "CP852 (Latin2)"
+msgstr "CP852 (Latin2)"
+
+#. AfQyS
+#: filter/inc/strings.hrc:52
+msgctxt "T602FILTER_STR_ENCODING_CP895"
+msgid "CP895 (KEYB2CS, Kamenicky)"
+msgstr "CP895 (KEYB2CS, Kamenický)"
+
+#. 8NfvS
+#: filter/inc/strings.hrc:53
+msgctxt "T602FILTER_STR_ENCODING_KOI8CS2"
+msgid "KOI8 CS2"
+msgstr "KOI8 CS2"
+
+#. EWMCQ
+#: filter/inc/strings.hrc:54
+msgctxt "T602FILTER_STR_CYRILLIC_MODE"
+msgid "Mode for Russian language (Cyrillic)"
+msgstr "Vytvorené pre ruský jazyk (Azbuka)"
+
+#. mZVZv
+#: filter/inc/strings.hrc:55
+msgctxt "T602FILTER_STR_REFORMAT_TEXT"
+msgid "Reformat the text"
+msgstr "Preformátovať text"
+
+#. MGmYA
+#: filter/inc/strings.hrc:56
+msgctxt "T602FILTER_STR_DOT_COMMANDS"
+msgid "Display dot commands"
+msgstr "Zobraziť dot príkazy"
+
+#. c6Atq
+#: filter/inc/strings.hrc:57
+msgctxt "T602FILTER_STR_CANCEL_BUTTON"
+msgid "Cancel"
+msgstr "Zrušiť"
+
+#. Sjy7k
+#: filter/inc/strings.hrc:58
+msgctxt "T602FILTER_STR_OK_BUTTON"
+msgid "OK"
+msgstr "OK"
+
+#. AvaAH
+#: filter/inc/strings.hrc:60
+msgctxt "PDF_PROGRESS_BAR"
+msgid "Export as PDF"
+msgstr "Exportovať ako PDF"
+
+#. BGJB2
+#. strings used in encryption UI
+#. password dialog title
+#: filter/inc/strings.hrc:64
+msgctxt "STR_PDF_EXPORT_UDPWD"
+msgid "Set open password"
+msgstr "Zadať heslo na otváranie"
+
+#. GDvVE
+#. password dialog title
+#: filter/inc/strings.hrc:66
+msgctxt "STR_PDF_EXPORT_ODPWD"
+msgid "Set permission password"
+msgstr "Zadať heslo pre nastavenie oprávnení"
+
+#. FTpr4
+#: filter/inc/strings.hrc:67
+msgctxt "STR_WARN_PASSWORD_PDFA"
+msgid "PDF/A does not allow encryption. The exported PDF file will not be password protected."
+msgstr "PDF/A neumožňuje šifrovanie. Exportovaný PDF súbor nebude chránený heslom."
+
+#. XX5fd
+#: filter/inc/strings.hrc:68
+msgctxt "STR_WARN_TRANSP_PDFA_SHORT"
+msgid "PDF/A transparency"
+msgstr "PDF/A priehľadnosť"
+
+#. VGvbg
+#: filter/inc/strings.hrc:69
+msgctxt "STR_WARN_TRANSP_PDFA"
+msgid "PDF/A forbids transparency. A transparent object was painted opaque instead."
+msgstr "PDF/A nepovoľuje priehľadnosť. Priehľadný objekt bol preto nahradený nepriehľadným."
+
+#. siDaM
+#: filter/inc/strings.hrc:70
+msgctxt "STR_WARN_TRANSP_VERSION_SHORT"
+msgid "PDF version conflict"
+msgstr "Konflikt verzie PDF"
+
+#. VSCwD
+#: filter/inc/strings.hrc:71
+msgctxt "STR_WARN_TRANSP_VERSION"
+msgid "Transparency is not supported in PDF versions earlier than PDF 1.4. A transparent object was painted opaque instead"
+msgstr "Priehľadnosť nie je podporovaná v PDF verziách skorších ako PDF 1.4. Priehľadný objekt bol preto nahradený nepriehľadným"
+
+#. CyosP
+#: filter/inc/strings.hrc:72
+msgctxt "STR_WARN_FORMACTION_PDFA_SHORT"
+msgid "PDF/A form action"
+msgstr "PDF/A akcia formulára"
+
+#. N9Vug
+#: filter/inc/strings.hrc:73
+msgctxt "STR_WARN_FORMACTION_PDFA"
+msgid "A form control contained an action not supported by the PDF/A standard. The action was skipped"
+msgstr "Ovládací prvok formulára obsahoval akciu nepodporovanú v štandarde PDF/A. Táto akcia bola vynechaná"
+
+#. d2ndY
+#: filter/inc/strings.hrc:74
+msgctxt "STR_WARN_TRANSP_CONVERTED"
+msgid "Some objects were converted to an image in order to remove transparencies, because the target PDF format does not support transparencies. Possibly better results can be achieved if you remove the transparent objects before exporting."
+msgstr "Aby sa odstránila priehľadnosť, boli niektoré objekty prevedené na obrázky, pretože cieľový PDF formát nepodporuje priehľadnosť. Pravdepodobne dosiahnete lepší výsledok, ak odstránite priehľadné objekty pred exportovaním."
+
+#. qtCcB
+#: filter/inc/strings.hrc:75
+msgctxt "STR_WARN_TRANSP_CONVERTED_SHORT"
+msgid "Transparencies removed"
+msgstr "Priehľadnosti boli odstránené"
+
+#. UHmjA
+#: filter/inc/strings.hrc:76
+msgctxt "STR_ERR_SIGNATURE_FAILED"
+msgid "Signature generation failed"
+msgstr "Generovanie podpisu zlyhalo"
+
+#. wjBBo
+#: filter/inc/strings.hrc:77
+msgctxt "STR_ERR_PDF_EXPORT_ABORTED"
+msgid "PDF export aborted"
+msgstr "Exportovanie PDF bolo zrušené"
+
+#. eNaMA
+#. Progress bar status indicator when importing or exporting
+#: filter/inc/strings.hrc:80
+msgctxt "STR_FILTER_DOC_LOADING"
+msgid "Loading: "
+msgstr "Načítavanie: "
+
+#. 4YFQR
+#: filter/inc/strings.hrc:81
+msgctxt "STR_FILTER_DOC_SAVING"
+msgid "Saving: "
+msgstr "Ukladanie: "
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Pridať"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Použiť"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Zrušiť"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Zavrieť"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Zmazať"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Upraviť"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Pomocník"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Nový"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Nie"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_OK"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Odstrániť"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Resetovať"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "Á_no"
+
+#. AwX66
+#: filter/uiconfig/ui/pdfgeneralpage.ui:42
+msgctxt "pdfgeneralpage|all"
+msgid "_All"
+msgstr "_Všetko"
+
+#. QMgsn
+#: filter/uiconfig/ui/pdfgeneralpage.ui:52
+msgctxt "pdfgeneralpage|extended_tip|all"
+msgid "Exports all defined print ranges. If no print range is defined, exports the entire document."
+msgstr "Exportuje všetky určené tlačové oblasti. Pokiaľ nie je tlačová oblasť určená, exportuje sa celý dokument."
+
+#. NXztB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:64
+msgctxt "pdfgeneralpage|range"
+msgid "_Pages:"
+msgstr "_Strany:"
+
+#. ZdAZ9
+#: filter/uiconfig/ui/pdfgeneralpage.ui:78
+msgctxt "pdfgeneralpage|extended_tip|range"
+msgid "Exports the pages you type in the box."
+msgstr "Exportuje stránky, ktoré zadáte do poľa."
+
+#. WTSeS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:89
+msgctxt "pdfgeneralpage|selection"
+msgid "_Selection"
+msgstr "_Výber"
+
+#. RQeDb
+#: filter/uiconfig/ui/pdfgeneralpage.ui:99
+msgctxt "pdfgeneralpage|extended_tip|selection"
+msgid "Exports the current selection."
+msgstr "Exportuje aktuálny výber."
+
+#. qQrdx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:121
+msgctxt "pdfgeneralpage|extended_tip|pages"
+msgid "Exports the pages you type in the box."
+msgstr "Exportuje stránky, ktoré zadáte do poľa."
+
+#. tFeCH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:135
+msgctxt "pdfgeneralpage|slides"
+msgid "Slides:"
+msgstr "Snímky:"
+
+#. 9Cyn8
+#: filter/uiconfig/ui/pdfgeneralpage.ui:144
+msgctxt "pdfgeneralpage|viewpdf"
+msgid "_View PDF after export"
+msgstr "_Zobraziť PDF po exportovaní"
+
+#. mwuGG
+#: filter/uiconfig/ui/pdfgeneralpage.ui:153
+msgctxt "pdfgeneralpage|extended_tip|viewpdf"
+msgid "Open the exported document in the system default PDF viewer."
+msgstr "Otvoriť exportovaný dokument v predvolenom systémovom prehliadači PDF."
+
+#. aWj7F
+#: filter/uiconfig/ui/pdfgeneralpage.ui:168
+msgctxt "pdfgeneralpage|selectedsheets"
+msgid "_Selection/Selected sheet(s)"
+msgstr "Vý_ber/Vybrané hárky"
+
+#. MXtmZ
+#: filter/uiconfig/ui/pdfgeneralpage.ui:181
+msgctxt "pdfgeneralpage|label1"
+msgid "Range"
+msgstr "Rozsah"
+
+#. WbQ5j
+#: filter/uiconfig/ui/pdfgeneralpage.ui:211
+msgctxt "pdfgeneralpage|losslesscompress"
+msgid "_Lossless compression"
+msgstr "Bezstratová ko_mpresia"
+
+#. 9ut6Q
+#: filter/uiconfig/ui/pdfgeneralpage.ui:221
+msgctxt "pdfgeneralpage|extended_tip|losslesscompress"
+msgid "Selects a lossless compression of images. All pixels are preserved."
+msgstr "Zvolí pre obrázky bezstratovú kompresiu. Zachovajú sa všetky pixely."
+
+#. ccCL4
+#: filter/uiconfig/ui/pdfgeneralpage.ui:233
+msgctxt "pdfgeneralpage|reduceresolution"
+msgid "Reduce ima_ge resolution to:"
+msgstr "Znížiť _rozlíšenie obrázkov na:"
+
+#. bAtCV
+#: filter/uiconfig/ui/pdfgeneralpage.ui:245
+msgctxt "pdfgeneralpage|extended_tip|reduceresolution"
+msgid "Select to resample or down-size the images to a lower number of pixels per inch."
+msgstr "Znížením počtu pixelov na palec sa zmenší veľkosť obrázkov."
+
+#. XHeTx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:260
+msgctxt "pdfgeneralpage|resolution"
+msgid "75 DPI"
+msgstr "75 DPI"
+
+#. CXj4e
+#: filter/uiconfig/ui/pdfgeneralpage.ui:261
+msgctxt "pdfgeneralpage|resolution"
+msgid "150 DPI"
+msgstr "150 DPI"
+
+#. jZKqd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:262
+msgctxt "pdfgeneralpage|resolution"
+msgid "300 DPI"
+msgstr "300 DPI"
+
+#. GsMsK
+#: filter/uiconfig/ui/pdfgeneralpage.ui:263
+msgctxt "pdfgeneralpage|resolution"
+msgid "600 DPI"
+msgstr "600 DPI"
+
+#. 5yTAM
+#: filter/uiconfig/ui/pdfgeneralpage.ui:264
+msgctxt "pdfgeneralpage|resolution"
+msgid "1200 DPI"
+msgstr "1200 DPI"
+
+#. r6npH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:270
+msgctxt "pdfgeneralpage|comboboxtext-entry"
+msgid "75 DPI"
+msgstr "75 DPI"
+
+#. SkTeA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:279
+msgctxt "pdfgeneralpage|extended_tip|resolution"
+msgid "Select the target resolution for the images."
+msgstr "Vyberte nové rozlíšenie obrázkov."
+
+#. mEbKx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:303
+msgctxt "pdfgeneralpage|extended_tip|quality"
+msgid "Enter the quality level for JPEG compression."
+msgstr "Vyberte kvalitu kompresie JPEG."
+
+#. FP56V
+#: filter/uiconfig/ui/pdfgeneralpage.ui:325
+msgctxt "pdfgeneralpage|jpegcompress"
+msgid "_JPEG compression"
+msgstr "_JPEG kompresia"
+
+#. PZCPi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:335
+msgctxt "pdfgeneralpage|extended_tip|jpegcompress"
+msgid "Select a JPEG compression level. With a high quality level, almost all pixels are preserved. With a low quality level, some pixels are lost and artifacts are introduced, but file sizes are reduced."
+msgstr "Vyberte úroveň kompresie JPEG. Pri vyššej kvalite sa zachovajú takmer všetky pixely. Pri nižšej kvalite sa niektoré pixely stratia a vznikajú artefakty, ale zmenší sa veľkosť súboru."
+
+#. ST3Rc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:349
+msgctxt "pdfgeneralpage|label6"
+msgid "_Quality:"
+msgstr "_Kvalita:"
+
+#. cFwGA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:371
+msgctxt "pdfgeneralpage|label2"
+msgid "Images"
+msgstr "Obrázky"
+
+#. NwjSn
+#: filter/uiconfig/ui/pdfgeneralpage.ui:401
+msgctxt "pdfgeneralpage|watermark"
+msgid "Sign with _watermark"
+msgstr "Podpísať _vodoznakom"
+
+#. 2uMoT
+#: filter/uiconfig/ui/pdfgeneralpage.ui:410
+msgctxt "pdfgeneralpage|extended_tip|watermark"
+msgid "Add a centered, vertical, light green watermark text to the page background. The watermark is not part of the source document."
+msgstr "Na pozadie stránky pridať centrovaný vertikálny svetlozelený text vodoznaku. Vodoznak nie je súčasťou zdrojového dokumentu."
+
+#. L7AYx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:427
+msgctxt "pdfgeneralpage|extended_tip|watermarkentry"
+msgid "Insert the text for the watermark signature."
+msgstr "Zadajte text vodoznaku."
+
+#. JtBsL
+#: filter/uiconfig/ui/pdfgeneralpage.ui:439
+msgctxt "pdfgeneralpage|watermarklabel"
+msgid "Text:"
+msgstr "Text:"
+
+#. VfFZf
+#: filter/uiconfig/ui/pdfgeneralpage.ui:458
+msgctxt "pdfgeneralpage|label3"
+msgid "Watermark"
+msgstr "Vodoznak"
+
+#. 2hSjJ
+#: filter/uiconfig/ui/pdfgeneralpage.ui:500
+msgctxt "pdfgeneralpage|embed"
+msgid "Hybrid PDF (em_bed ODF file)"
+msgstr "Hybri_dné PDF (vložiť súbor ODF)"
+
+#. vzxG2
+#: filter/uiconfig/ui/pdfgeneralpage.ui:504
+msgctxt "pdfgeneralpage|embed|tooltip_text"
+msgid "Creates a PDF that is easily editable in %PRODUCTNAME"
+msgstr "Vytvorí PDF súbor, ktorý možno upravovať v %PRODUCTNAME"
+
+#. 3tDFv
+#: filter/uiconfig/ui/pdfgeneralpage.ui:510
+msgctxt "pdfgeneralpage|extended_tip|embed"
+msgid "This setting enables you to export the document as a .pdf file containing two file formats: PDF and ODF."
+msgstr "Toto nastavenie umožňuje exportovať dokument ako súbor .pdf, ktorý obsahuje dva formáty súboru: PDF a ODF."
+
+#. RAvA6
+#: filter/uiconfig/ui/pdfgeneralpage.ui:521
+msgctxt "pdfgeneralpage|tagged"
+msgid "_Tagged PDF (add document structure)"
+msgstr "_Značkované PDF (pridá údaje o štruktúre dokumentu)"
+
+#. cAm8Z
+#: filter/uiconfig/ui/pdfgeneralpage.ui:525
+msgctxt "pdfgeneralpage|tagged|tooltip_text"
+msgid "Includes a document's content structure information in a PDF"
+msgstr "Do PDF dokumentu pridá údaje o štruktúre"
+
+#. Btxot
+#: filter/uiconfig/ui/pdfgeneralpage.ui:531
+msgctxt "pdfgeneralpage|extended_tip|tagged"
+msgid "Select to write PDF tags. This can increase file size by huge amounts."
+msgstr "Zaškrtnite, či chcete exportovať tagy PDF. To môže výrazne zväčšiť veľkosť súboru."
+
+#. 6sDFd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:542
+msgctxt "pdfgeneralpage|forms"
+msgid "Create PDF for_m"
+msgstr "_Vytvoriť PDF formulár"
+
+#. 3Vg8V
+#: filter/uiconfig/ui/pdfgeneralpage.ui:546
+msgctxt "pdfgeneralpage|forms|tooltip_text"
+msgid "Creates a PDF with fields that can be filled out"
+msgstr "Vytvorí PDF súbor s poľami, ktoré možno vypĺňať"
+
+#. hmxuq
+#: filter/uiconfig/ui/pdfgeneralpage.ui:552
+msgctxt "pdfgeneralpage|extended_tip|forms"
+msgid "Choose to create a PDF form. This can be filled out and printed by the user of the PDF document."
+msgstr "Zaškrtnite, ak chcete vytvoriť PDF formulár. Tento formulár môže používateľ vyplniť a vytlačiť."
+
+#. B7zan
+#: filter/uiconfig/ui/pdfgeneralpage.ui:572
+msgctxt "pdfgeneralpage|allowdups"
+msgid "Allow duplicate field _names"
+msgstr "Povoliť rovnaké _názvy polí"
+
+#. D4MmM
+#: filter/uiconfig/ui/pdfgeneralpage.ui:581
+msgctxt "pdfgeneralpage|extended_tip|allowdups"
+msgid "Allows you to use the same field name for multiple fields in the generated PDF file. If disabled, field names will be exported using generated unique names."
+msgstr "Povolí vo vytváranom PDF použitie rovnakých názvov pre viac polí. Ak je vypnuté, pri exportovaní budú vytvorené jedinečné názvy polí."
+
+#. tkPCH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:597
+msgctxt "pdfgeneralpage|format"
+msgid "FDF"
+msgstr "FDF"
+
+#. rfzrh
+#: filter/uiconfig/ui/pdfgeneralpage.ui:598
+msgctxt "pdfgeneralpage|format"
+msgid "PDF"
+msgstr "PDF"
+
+#. S7caE
+#: filter/uiconfig/ui/pdfgeneralpage.ui:599
+msgctxt "pdfgeneralpage|format"
+msgid "HTML"
+msgstr "HTML"
+
+#. HUzsi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:600
+msgctxt "pdfgeneralpage|format"
+msgid "XML"
+msgstr "XML"
+
+#. xbYYC
+#: filter/uiconfig/ui/pdfgeneralpage.ui:604
+msgctxt "pdfgeneralpage|extended_tip|format"
+msgid "Select the format of submitting forms from within the PDF file."
+msgstr "Vyberte formát odoslania formulárov zo súboru PDF."
+
+#. ECLBB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:626
+msgctxt "pdfgeneralpage|label7"
+msgid "Submit _format:"
+msgstr "_Formát odosielania:"
+
+#. hedQy
+#: filter/uiconfig/ui/pdfgeneralpage.ui:657
+msgctxt "pdfgeneralpage|pdfa"
+msgid "Archive (P_DF/A, ISO 19005)"
+msgstr "Archívny PD_F/A, (ISO 19005)"
+
+#. qQjPA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:661
+msgctxt "pdfgeneralpage|pdfa|tooltip_text"
+msgid "Creates an ISO 19005-2 compliant PDF file, ideal for long-term document preservation"
+msgstr "Vytvorí PDF súbor podľa ISO 19005-2, ktorý je určený na dlhodobé uchovávanie dokumentov"
+
+#. Zhi5M
+#: filter/uiconfig/ui/pdfgeneralpage.ui:667
+msgctxt "pdfgeneralpage|extended_tip|pdfa"
+msgid "Converts to the PDF/A-2b or PDF/A-1b format. This is defined as an electronic document file format for long term preservation. All fonts that were used in the source document will be embedded into the generated PDF file. PDF tags will be written."
+msgstr "Skonvertuje dokument do formátu PDF/A-2b alebo PDF/A-1b. Tie sú definované ako formáty elektronických dokumentov určené na dlhodobé uchovanie. Do vytvoreného súboru PDF sa vložia všetky písma použité v zdrojovom dokumente a zapíšu sa tiež tagy PDF."
+
+#. jmaDc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:716
+msgctxt "pdfgeneralpage|pdfaversion"
+msgid "PDF_/A version:"
+msgstr "_Verzia PDF/A:"
+
+#. VQGHi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:748
+msgctxt "pdfgeneralpage|pdfua"
+msgid "Universal Accessibilit_y (PDF/UA)"
+msgstr "Un_iverzálne prístupné (PDF/UA)"
+
+#. 4B3FD
+#: filter/uiconfig/ui/pdfgeneralpage.ui:752
+msgctxt "pdfgeneralpage|pdfua|tooltip_text"
+msgid "Creates a universal accessibility-compliant PDF file that follows the requirements of PDF/UA (ISO 14289) specifications."
+msgstr "Vytvorí univerzálne prístupný súbor PDF spĺňajúci požiadavky štandardu PDF/UA (ISO 14289)."
+
+#. Birq5
+#: filter/uiconfig/ui/pdfgeneralpage.ui:758
+msgctxt "pdfgeneralpage|extended_tip|pdfua"
+msgid "Creates a universal accessibility-complying PDF file that follows the requirements of PDF/UA (ISO 14289) specifications."
+msgstr "Vytvorí univerzálne prístupný súbor PDF spĺňajúci požiadavky štandardu PDF/UA (ISO 14289)."
+
+#. Drqkd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:773
+msgctxt "pdfgeneralpage|label4"
+msgid "General"
+msgstr "Všeobecné"
+
+#. FQzGc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:802
+msgctxt "pdfgeneralpage|bookmarks"
+msgid "Export outl_ines"
+msgstr "_Exportovať osnovu"
+
+#. qw9My
+#: filter/uiconfig/ui/pdfgeneralpage.ui:811
+msgctxt "pdfgeneralpage|extended_tip|bookmarks"
+msgid "Select to export bookmarks of Writer documents as PDF bookmarks. Bookmarks are created for all outline paragraphs (Tools - Chapter Numbering) and for all table of contents entries for which you did assign hyperlinks in the source document."
+msgstr "Vyberte, ak chcete záložky dokumentu Writeru exportovať ako PDF záložky. Záložky sa vytvoria pre všetky odseky osnovy (Nástroje - Číslovanie kapitol) a pre všetky položky obsahu, ktorým boli v zdrojovom dokumente priradené hypertextové odkazy."
+
+#. kQbPh
+#: filter/uiconfig/ui/pdfgeneralpage.ui:822
+msgctxt "pdfgeneralpage|exportplaceholders"
+msgid "Expo_rt placeholders"
+msgstr "Exportovať zástupné znaky"
+
+#. T6RjA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:831
+msgctxt "pdfgeneralpage|extended_tip|exportplaceholders"
+msgid "Export the placeholders fields visual markings only. The exported placeholder is ineffective."
+msgstr "Exportujte len vizuálne označenie polí zástupných symbolov. Exportovaný zástupný symbol je neúčinný."
+
+#. P4kGd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:842
+msgctxt "pdfgeneralpage|comments"
+msgid "Comm_ents as PDF annotations"
+msgstr "_Poznámky ako PDF anotácia"
+
+#. SijbK
+#: filter/uiconfig/ui/pdfgeneralpage.ui:851
+msgctxt "pdfgeneralpage|extended_tip|comments"
+msgid "Select to export comments of Writer and Calc documents as PDF annotations."
+msgstr "Pri zaškrtnutí sa komentáre v dokumentoch Writeru a Calc exportujú ako poznámky PDF."
+
+#. y9evS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:862
+msgctxt "pdfgeneralpage|emptypages"
+msgid "Exp_ort automatically inserted blank pages"
+msgstr "Exp_ortovať automaticky vložené prázdne strany"
+
+#. Drp3w
+#: filter/uiconfig/ui/pdfgeneralpage.ui:871
+msgctxt "pdfgeneralpage|extended_tip|emptypages"
+msgid "If switched on, automatically inserted blank pages are exported to the PDF file. This is best if you are printing the pdf file double-sided. Example: In a book a chapter paragraph style is set to always start with an odd numbered page. If the previous chapter ends on an odd page, then an even numbered blank page is normally automatically inserted. This option controls whether to export that even numbered page or not."
+msgstr "Ak je povolené, do súboru PDF sa exportujú automaticky vložené prázdne strany. To je najvhodnejšie, ak tlačíte obojstranne. Príklad: V knihe je nadpis kapitoly nastavený tak, aby začínal na nepárne strane. Ak predchádzajúca kapitola končí na nepárnej strane, automaticky sa vloží prázdna párna strana. Táto voľba určuje, či sa má takáto strana exportovať."
+
+#. sHqKP
+#: filter/uiconfig/ui/pdfgeneralpage.ui:882
+msgctxt "pdfgeneralpage|usereferencexobject"
+msgid "Use reference XObjects"
+msgstr "Použiť odkazové XObject"
+
+#. avuEd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:891
+msgctxt "pdfgeneralpage|extended_tip|usereferencexobject"
+msgid "When the option is enabled, then the reference XObject markup is used:  viewers have to support this markup to show vector images. Otherwise a fallback bitmap is shown in the viewer."
+msgstr "Keď je táto možnosť povolená, použije sa referenčné značkovanie XObject: zobrazovací softvér musia toto značkovanie podporovať, aby mohol zobrazovať vektorové obrázky. V opačnom prípade sa v prehliadači zobrazí záložná bitmapa."
+
+#. 2K2cD
+#: filter/uiconfig/ui/pdfgeneralpage.ui:902
+msgctxt "pdfgeneralpage|hiddenpages"
+msgid "Export _hidden pages"
+msgstr "Exportovať _skryté strany"
+
+#. Gr5rf
+#: filter/uiconfig/ui/pdfgeneralpage.ui:911
+msgctxt "pdfgeneralpage|extended_tip|hiddenpages"
+msgid "Exports document hidden slides."
+msgstr "Exportuje skryté snímky dokumentu."
+
+#. ghuXR
+#: filter/uiconfig/ui/pdfgeneralpage.ui:922
+msgctxt "pdfgeneralpage|notes"
+msgid "Export _notes pages"
+msgstr "Exportovať stra_ny s poznámkami"
+
+#. hRjqL
+#: filter/uiconfig/ui/pdfgeneralpage.ui:931
+msgctxt "pdfgeneralpage|extended_tip|notes"
+msgid "Export also the Notes pages view at the end of the exported PDF presentation document."
+msgstr "Exportuje aj stránky s poznámkami a umiestni ich na koniec dokumentu PDF s exportovanou prezentáciou."
+
+#. BGvC2
+#: filter/uiconfig/ui/pdfgeneralpage.ui:942
+msgctxt "pdfgeneralpage|onlynotes"
+msgid "Export onl_y notes pages"
+msgstr "Exportovať _len strany s poznámkami"
+
+#. Mwnea
+#: filter/uiconfig/ui/pdfgeneralpage.ui:952
+msgctxt "pdfgeneralpage|extended_tip|onlynotes"
+msgid "Exports only the Notes page views."
+msgstr "Exportuje len stránky s poznámkami."
+
+#. MpRUp
+#: filter/uiconfig/ui/pdfgeneralpage.ui:963
+msgctxt "pdfgeneralpage|singlepagesheets"
+msgid "Whole sheet export"
+msgstr "Celý hárok na jednu stranu"
+
+#. jRGAS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:972
+msgctxt "pdfgeneralpage|extended_tip|singlepagessheets"
+msgid "Ignores each sheet’s paper size, print ranges and shown/hidden status and puts every sheet (even hidden sheets) on exactly one page, which is exactly as small or large as needed to fit the whole contents of the sheet."
+msgstr "Pre jednotlivé hárky ignoruje veľkosť papiera, oblasti tlače a stav zobrazený/skrytý a namiesto toho umiestni každý list (vrátane skrytých listov) na jedinú stranu, ktorá bude práve taká veľká, aby sa na ňu zmestil celý obsah hárku."
+
+#. DiBsa
+#: filter/uiconfig/ui/pdfgeneralpage.ui:983
+msgctxt "pdfgeneralpage|commentsinmargin"
+msgid "_Comments in margin"
+msgstr "_Komentáre na okrajoch"
+
+#. RpDqi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:992
+msgctxt "pdfgeneralpage|extended_tip|commentsinmargin"
+msgid "Select to export comments of Writer documents in the page margin."
+msgstr "Vyberte, ak chcete exportovať komentáre dokumentu Writera na okrajoch stránky."
+
+#. AcPTB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:1007
+msgctxt "pdfgeneralpage|label9"
+msgid "Structure"
+msgstr "Štruktúra"
+
+#. f7vgf
+#: filter/uiconfig/ui/pdflinkspage.ui:29
+msgctxt "pdflinkspage|export"
+msgid "Export outlines as named destinations"
+msgstr "Exportovať osnovu ako pomenované ciele"
+
+#. k27AB
+#: filter/uiconfig/ui/pdflinkspage.ui:37
+msgctxt "pdflinkspage|extended_tip|export"
+msgid "Enable the checkbox to export the names of objects in your document as valid bookmark targets. This allows you to link to those objects by name from other documents."
+msgstr "Ak chcete exportovať názvy objektov v dokumente ako platné ciele záložiek, začiarknite toto políčko. To vám umožňuje z iných dokumentov prepojiť tieto objekty podľa názvu."
+
+#. aCCLQ
+#: filter/uiconfig/ui/pdflinkspage.ui:48
+msgctxt "pdflinkspage|convert"
+msgid "_Convert document references to PDF targets"
+msgstr "_Previesť odkazy v dokumente na PDF ciele"
+
+#. FEokC
+#: filter/uiconfig/ui/pdflinkspage.ui:56
+msgctxt "pdflinkspage|extended_tip|convert"
+msgid "Enable this checkbox to convert the URLs referencing other ODF files to PDF files with the same name. In the referencing URLs the extensions .odt, .odp, .ods, .odg, and .odm are converted to the extension .pdf."
+msgstr "Zaškrtnutím povolíte konverziu URL odkazujúcich na súbory ODF na odkazy na súbory PDF s rovnakým názvom. V odkazujúcich URL sú prípony .odt, .odp, .ods, .odg, a .odm zmenené na príponu pdf."
+
+#. 6Lyp3
+#: filter/uiconfig/ui/pdflinkspage.ui:67
+msgctxt "pdflinkspage|exporturl"
+msgid "Export _URLs relative to file system"
+msgstr "Exportovať _URL relatívne k súborovému systému"
+
+#. RcdUF
+#: filter/uiconfig/ui/pdflinkspage.ui:75
+msgctxt "pdflinkspage|extended_tip|exporturl"
+msgid "Enable this checkbox to export URLs to other documents as relative URLs in the file system. See \"relative hyperlinks\" in the Help."
+msgstr "Zaškrtnutím povolíte export URL na iné dokumenty ako relatívne URL vzhľadom k súborovému systému. Viac informácií v pomocníkovi pod \"relatívne hypertextové odkazy\"."
+
+#. biumY
+#: filter/uiconfig/ui/pdflinkspage.ui:90
+msgctxt "pdflinkspage|label1"
+msgid "General"
+msgstr "Všeobecné"
+
+#. mGRBH
+#: filter/uiconfig/ui/pdflinkspage.ui:119
+msgctxt "pdflinkspage|default"
+msgid "Default mode"
+msgstr "Predvolený mód"
+
+#. bcgaz
+#: filter/uiconfig/ui/pdflinkspage.ui:128
+msgctxt "pdflinkspage|extended_tip|default"
+msgid "Links from your PDF document to other documents will be handled as it is specified in your operating system."
+msgstr "V dokumente PDF sa bude s odkazmi na iné dokumenty zaobchádzať tak, ako je to nastavené v operačnom systéme."
+
+#. DNRK8
+#: filter/uiconfig/ui/pdflinkspage.ui:139
+msgctxt "pdflinkspage|openpdf"
+msgid "Open with PDF reader application"
+msgstr "Otvoriť v aplikácii na čítanie PDF"
+
+#. gmzoA
+#: filter/uiconfig/ui/pdflinkspage.ui:148
+msgctxt "pdflinkspage|extended_tip|openpdf"
+msgid "Cross-document links are opened with the PDF reader application that currently shows the document. The PDF reader application must be able to handle the specified file type inside the hyperlink."
+msgstr "Odkazy na iné dokumenty budú otvárané prehliadačom PDF, v ktorom je zobrazený aktuálny dokument. Prehliadač PDF musí zobrazenie daného typu súboru uvedeného v hypertextovom odkaze podporovať."
+
+#. wPem9
+#: filter/uiconfig/ui/pdflinkspage.ui:159
+msgctxt "pdflinkspage|openinternet"
+msgid "Open _with Internet browser"
+msgstr "Otvoriť v _internetovom prehliadači"
+
+#. xfRr2
+#: filter/uiconfig/ui/pdflinkspage.ui:168
+msgctxt "pdflinkspage|extended_tip|openinternet"
+msgid "Cross-document links are opened with the Internet browser. The Internet browser must be able to handle the specified file type inside the hyperlink."
+msgstr "Odkazy na iné dokumenty budú otvárané vo webovom prehliadači. Webový prehliadač musí zobrazenie daného typu súboru uvedeného v hypertextovom odkaze podporovať."
+
+#. B9TGg
+#: filter/uiconfig/ui/pdflinkspage.ui:183
+msgctxt "pdflinkspage|label5"
+msgid "Cross-document Links"
+msgstr "Krížové odkazy medzi dokumentami"
+
+#. KmFGh
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:8
+msgctxt "pdfoptionsdialog|PdfOptionsDialog"
+msgid "PDF Options"
+msgstr "Možnosti PDF"
+
+#. BwbwB
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:41
+msgctxt "pdfoptionsdialog|ok"
+msgid "E_xport"
+msgstr "E_xportovať"
+
+#. Y2Mem
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:138
+msgctxt "pdfoptionsdialog|general"
+msgid "General"
+msgstr "Všeobecné"
+
+#. DMBHC
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:185
+msgctxt "pdfoptionsdialog|initialview"
+msgid "Initial View"
+msgstr "Úvodné zobrazenie"
+
+#. 35g8K
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:233
+msgctxt "pdfoptionsdialog|userinterface"
+msgid "User Interface"
+msgstr "Používateľské rozhranie"
+
+#. 3EStU
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:281
+msgctxt "pdfoptionsdialog|links"
+msgid "Links"
+msgstr "Odkazy"
+
+#. x4GVL
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:329
+msgctxt "pdfoptionsdialog|security"
+msgid "Security"
+msgstr "Bezpečnosť"
+
+#. Vmf6H
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:377
+msgctxt "pdfoptionsdialog|digitalsignatures"
+msgid "Digital Signatures"
+msgstr "Elektronické podpisy"
+
+#. 7p3sS
+#: filter/uiconfig/ui/pdfsecuritypage.ui:28
+msgctxt "pdfsecuritypage|setpassword"
+msgid "Set _Passwords…"
+msgstr "Zadať _heslá..."
+
+#. C9DhC
+#: filter/uiconfig/ui/pdfsecuritypage.ui:36
+msgctxt "pdfsecuritypage|extended_tip|setpassword"
+msgid "Click to open a dialog where you enter the passwords."
+msgstr "Kliknutím otvoríte dialógové okno na zadanie hesiel."
+
+#. 63szB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:55
+msgctxt "pdfsecuritypage|label5"
+msgid "Open password set"
+msgstr "Heslo na otváranie bolo zadané"
+
+#. 6ktYG
+#: filter/uiconfig/ui/pdfsecuritypage.ui:67
+msgctxt "pdfsecuritypage|label6"
+msgid "PDF document will be encrypted"
+msgstr "PDF dokument bude zašifrovaný"
+
+#. pTAZC
+#: filter/uiconfig/ui/pdfsecuritypage.ui:91
+msgctxt "pdfsecuritypage|label7"
+msgid "No open password set"
+msgstr "Heslo na otváranie nebolo zadané"
+
+#. fp3My
+#: filter/uiconfig/ui/pdfsecuritypage.ui:103
+msgctxt "pdfsecuritypage|label8"
+msgid "PDF document will not be encrypted"
+msgstr "PDF dokument nebude zašifrovaný"
+
+#. aHC6v
+#: filter/uiconfig/ui/pdfsecuritypage.ui:127
+msgctxt "pdfsecuritypage|label30"
+msgid "PDF document will not be encrypted due to PDF/A export."
+msgstr "PDF dokument nebude zašifrovaný kvôli exportovaniu do PDF/A."
+
+#. DsALB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:152
+msgctxt "pdfsecuritypage|label9"
+msgid "Permission password set"
+msgstr "Heslo na nastavenie oprávnení bolo zadané"
+
+#. hRJpp
+#: filter/uiconfig/ui/pdfsecuritypage.ui:164
+msgctxt "pdfsecuritypage|label11"
+msgid "PDF document will be restricted"
+msgstr "PDF dokument bude používať obmedzenia"
+
+#. L3oQx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:188
+msgctxt "pdfsecuritypage|label12"
+msgid "No permission password set"
+msgstr "Heslo na nastavenie oprávnení nebolo zadané"
+
+#. s3RBF
+#: filter/uiconfig/ui/pdfsecuritypage.ui:200
+msgctxt "pdfsecuritypage|label13"
+msgid "PDF document will be unrestricted"
+msgstr "PDF dokument nebude používať obmedzenia"
+
+#. 4jwu7
+#: filter/uiconfig/ui/pdfsecuritypage.ui:224
+msgctxt "pdfsecuritypage|label14"
+msgid "PDF document will not be restricted due to PDF/A export."
+msgstr "Práva v PDF dokumente nebudú kvôli exportovaniu do PDF/A obmedzené."
+
+#. 9CFqB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:244
+msgctxt "pdfsecuritypage|setpasswordstitle"
+msgid "Set Passwords"
+msgstr "Zadať heslá"
+
+#. FDKJa
+#: filter/uiconfig/ui/pdfsecuritypage.ui:259
+msgctxt "pdfsecuritypage|label2"
+msgid "File Encryption and Permission"
+msgstr "Šifrovanie súboru a oprávnenia"
+
+#. tWAWA
+#: filter/uiconfig/ui/pdfsecuritypage.ui:294
+msgctxt "pdfsecuritypage|printnone"
+msgid "_Not permitted"
+msgstr "_Nepovolené"
+
+#. R3Gvm
+#: filter/uiconfig/ui/pdfsecuritypage.ui:303
+msgctxt "pdfsecuritypage|extended_tip|printnone"
+msgid "Printing the document is not permitted."
+msgstr "Tlač dokumentu nie je povolená."
+
+#. kSfrd
+#: filter/uiconfig/ui/pdfsecuritypage.ui:314
+msgctxt "pdfsecuritypage|printlow"
+msgid "_Low resolution (150 dpi)"
+msgstr "Nízke roz_líšenie (150 dpi)"
+
+#. kB7dx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:323
+msgctxt "pdfsecuritypage|extended_tip|printlow"
+msgid "The document can only be printed in low resolution (150 dpi). Not all PDF readers honor this setting."
+msgstr "Dokument možno vytlačiť len v nízkom rozlíšení (150 dpi). Toto nastavenie niektoré prehliadače PDF ignorujú."
+
+#. CmQzT
+#: filter/uiconfig/ui/pdfsecuritypage.ui:334
+msgctxt "pdfsecuritypage|printhigh"
+msgid "_High resolution"
+msgstr "Vysoké rozlíše_nie"
+
+#. iBC7m
+#: filter/uiconfig/ui/pdfsecuritypage.ui:343
+msgctxt "pdfsecuritypage|extended_tip|printhigh"
+msgid "The document can be printed in high resolution."
+msgstr "Dokument možno vytlačiť vo vysokom rozlíšení."
+
+#. Gjpp4
+#: filter/uiconfig/ui/pdfsecuritypage.ui:358
+msgctxt "pdfsecuritypage|label1"
+msgid "Printing"
+msgstr "Tlačenie"
+
+#. C6BHs
+#: filter/uiconfig/ui/pdfsecuritypage.ui:387
+msgctxt "pdfsecuritypage|changenone"
+msgid "No_t permitted"
+msgstr "Nie je _povolené"
+
+#. McdCx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:396
+msgctxt "pdfsecuritypage|extended_tip|changenone"
+msgid "No changes of the content are permitted."
+msgstr "Zmeny obsahu nie sú povolené."
+
+#. Vt6Zn
+#: filter/uiconfig/ui/pdfsecuritypage.ui:407
+msgctxt "pdfsecuritypage|changeinsdel"
+msgid "_Inserting, deleting, and rotating pages"
+msgstr "Vkladan_ie, odstraňovanie a otáčanie strán"
+
+#. bpyjZ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:416
+msgctxt "pdfsecuritypage|extended_tip|changeinsdel"
+msgid "Only inserting, deleting, and rotating pages is permitted."
+msgstr "Je povolené len vkladanie, mazanie a otáčanie stránok."
+
+#. dAmDo
+#: filter/uiconfig/ui/pdfsecuritypage.ui:427
+msgctxt "pdfsecuritypage|changeform"
+msgid "_Filling in form fields"
+msgstr "Vypĺňanie polí _formulára"
+
+#. yXs9B
+#: filter/uiconfig/ui/pdfsecuritypage.ui:436
+msgctxt "pdfsecuritypage|extended_tip|changeform"
+msgid "Only filling in form fields is permitted."
+msgstr "Je povolené len vypĺňanie polí formulára."
+
+#. zGE7J
+#: filter/uiconfig/ui/pdfsecuritypage.ui:447
+msgctxt "pdfsecuritypage|changecomment"
+msgid "_Commenting, filling in form fields"
+msgstr "Poznámkovanie, vypĺň_anie polí formulára"
+
+#. aeLn4
+#: filter/uiconfig/ui/pdfsecuritypage.ui:456
+msgctxt "pdfsecuritypage|extended_tip|changecomment"
+msgid "Only commenting and filling in form fields is permitted."
+msgstr "Je povolené len komentovanie a vypĺňanie polí formulára."
+
+#. uP8VW
+#: filter/uiconfig/ui/pdfsecuritypage.ui:467
+msgctxt "pdfsecuritypage|changeany"
+msgid "_Any except extracting pages"
+msgstr "Všetky okrem _vynímania strán"
+
+#. 3RDPJ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:476
+msgctxt "pdfsecuritypage|extended_tip|changeany"
+msgid "All changes are permitted, except extracting pages."
+msgstr "Povolené sú všetky zmeny okrem vybrania stránok."
+
+#. vLxXJ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:491
+msgctxt "pdfsecuritypage|label3"
+msgid "Changes"
+msgstr "Zmeny"
+
+#. iJHWS
+#: filter/uiconfig/ui/pdfsecuritypage.ui:520
+msgctxt "pdfsecuritypage|enablecopy"
+msgid "Ena_ble copying of content"
+msgstr "Povo_liť kopírovanie obsahu"
+
+#. WJuNa
+#: filter/uiconfig/ui/pdfsecuritypage.ui:529
+msgctxt "pdfsecuritypage|extended_tip|enablecopy"
+msgid "Select to enable copying of content to the clipboard."
+msgstr "Povolí kopírovanie obsahu do schránky."
+
+#. 2EMgQ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:540
+msgctxt "pdfsecuritypage|enablea11y"
+msgid "Enable text access for acce_ssibility tools"
+msgstr "Povoliť prí_stup k textu pre nástroje prístupnosti"
+
+#. cQrBt
+#: filter/uiconfig/ui/pdfsecuritypage.ui:549
+msgctxt "pdfsecuritypage|extended_tip|enablea11y"
+msgid "Select to enable text access for accessibility tools."
+msgstr "Vyberte, ak chcete povoliť prístup k textu pre nástroje prístupnosti."
+
+#. 2hi53
+#: filter/uiconfig/ui/pdfsecuritypage.ui:564
+msgctxt "pdfsecuritypage|label4"
+msgid "Content"
+msgstr "Obsah"
+
+#. bDVGF
+#: filter/uiconfig/ui/pdfsignpage.ui:33
+msgctxt "pdfsignpage|label2"
+msgid "Use this certificate to digitally sign PDF documents:"
+msgstr "Na podpisovanie dokumentov PDF použiť tento certifikát:"
+
+#. EznHF
+#: filter/uiconfig/ui/pdfsignpage.ui:53
+msgctxt "pdfsignpage|extended_tip|cert"
+msgid "Allows you to select a certificate to be used for signing this PDF export."
+msgstr "Umožňuje vybrať certifikát, ktorý sa použije na podpísanie tohto PDF exportu."
+
+#. xgYD9
+#: filter/uiconfig/ui/pdfsignpage.ui:69
+msgctxt "pdfsignpage|select"
+msgid "Select..."
+msgstr "Vybrať..."
+
+#. UCtFh
+#: filter/uiconfig/ui/pdfsignpage.ui:76
+msgctxt "pdfsignpage|extended_tip|select"
+msgid "Opens the Select X.509 Certificate dialog."
+msgstr "Otvorí dialógové okno Vybrať certifikát X.509."
+
+#. zRUyK
+#: filter/uiconfig/ui/pdfsignpage.ui:88
+msgctxt "pdfsignpage|clear"
+msgid "_Clear"
+msgstr "_Zmazať"
+
+#. UQz9i
+#: filter/uiconfig/ui/pdfsignpage.ui:131
+msgctxt "pdfsignpage|extended_tip|password"
+msgid "Enter the password used for protecting the private key associated with the selected certificate."
+msgstr "Zadajte heslo použité na ochranu súkromného kľúča spojeného s vybraným certifikátom."
+
+#. 9NEtS
+#: filter/uiconfig/ui/pdfsignpage.ui:149
+msgctxt "pdfsignpage|extended_tip|location"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "Tieto tri polia vám umožňujú voliteľne zadať ďalšie informácie o digitálnom podpise, ktorý sa použije na súbor PDF (kde, kto a prečo bol vytvorený). Budú vložené do príslušných polí PDF a budú viditeľné pre všetkých, ktorí si prezerajú PDF. Ľubovolné alebo aj všetky z týchto troch polí môžu zostať prázdne."
+
+#. uVShK
+#: filter/uiconfig/ui/pdfsignpage.ui:167
+msgctxt "pdfsignpage|extended_tip|contact"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "Tieto tri polia vám umožňujú voliteľne zadať ďalšie informácie o digitálnom podpise, ktorý sa použije na súbor PDF (kde, kto a prečo bol vytvorený). Budú vložené do príslušných polí PDF a budú viditeľné pre všetkých, ktorí si prezerajú PDF. Ľubovolné alebo aj všetky z týchto troch polí môžu zostať prázdne."
+
+#. 5QBRv
+#: filter/uiconfig/ui/pdfsignpage.ui:185
+msgctxt "pdfsignpage|extended_tip|reason"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "Tieto tri polia vám umožňujú voliteľne zadať ďalšie informácie o digitálnom podpise, ktorý sa použije na súbor PDF (kde, kto a prečo bol vytvorený). Budú vložené do príslušných polí PDF a budú viditeľné pre všetkých, ktorí si prezerajú PDF. Ľubovolné alebo aj všetky z týchto troch polí môžu zostať prázdne."
+
+#. wHqcD
+#: filter/uiconfig/ui/pdfsignpage.ui:200
+msgctxt "pdfsignpage|tsa"
+msgid "None"
+msgstr "Žiadne"
+
+#. VMoF3
+#: filter/uiconfig/ui/pdfsignpage.ui:212
+msgctxt "pdfsignpage|label7"
+msgid "Certificate password:"
+msgstr "Heslo certifikátu:"
+
+#. Syow2
+#: filter/uiconfig/ui/pdfsignpage.ui:226
+msgctxt "pdfsignpage|label12"
+msgid "Location:"
+msgstr "Umiestnenie:"
+
+#. AQkj6
+#: filter/uiconfig/ui/pdfsignpage.ui:240
+msgctxt "pdfsignpage|label13"
+msgid "Contact information:"
+msgstr "Kontaktné informácie:"
+
+#. mvSG8
+#: filter/uiconfig/ui/pdfsignpage.ui:254
+msgctxt "pdfsignpage|label14"
+msgid "Reason:"
+msgstr "Dôvod:"
+
+#. Bbwq2
+#: filter/uiconfig/ui/pdfsignpage.ui:268
+msgctxt "pdfsignpage|label15"
+msgid "Time Stamp Authority:"
+msgstr "Autorita časových pečiatok:"
+
+#. YeAiB
+#: filter/uiconfig/ui/pdfsignpage.ui:290
+msgctxt "pdfsignpage|label1"
+msgid "Certificate"
+msgstr "Certifikát"
+
+#. 92sua
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:43
+msgctxt "pdfuserinterfacepage|center"
+msgid "_Center window on screen"
+msgstr "Zarovnať okno na stred o_brazovky"
+
+#. fGFCM
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:51
+msgctxt "pdfuserinterfacepage|extended_tip|center"
+msgid "Select to generate a PDF file that is shown in a reader window centered on screen."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý sa zobrazí v okne čítačky vycentrovanom na obrazovke."
+
+#. ZEPFF
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:62
+msgctxt "pdfuserinterfacepage|resize"
+msgid "_Resize window to initial page"
+msgstr "Zmeniť veľkosť okna podľa úvodnej st_ránky"
+
+#. 8RErB
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:70
+msgctxt "pdfuserinterfacepage|extended_tip|resize"
+msgid "Select to generate a PDF file that is shown in a window displaying the whole initial page."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý sa zobrazí v okne so zobrazením celej úvodnej stránky."
+
+#. crBwn
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:81
+msgctxt "pdfuserinterfacepage|open"
+msgid "_Open in full screen mode"
+msgstr "_Otvoriť na celej obrazovke"
+
+#. oWaHS
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:89
+msgctxt "pdfuserinterfacepage|extended_tip|open"
+msgid "Select to generate a PDF file that is shown in a full screen reader window in front of all other windows."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý sa zobrazí v okne čítačky na celú obrazovku pred všetkými ostatnými oknami."
+
+#. Cvzzi
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:100
+msgctxt "pdfuserinterfacepage|display"
+msgid "_Display document title"
+msgstr "Zobraziť názov _dokumentu"
+
+#. tdVmB
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:108
+msgctxt "pdfuserinterfacepage|extended_tip|display"
+msgid "Select to generate a PDF file that is shown with the document title in the reader's title bar."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý sa zobrazuje s názvom dokumentu v záhlaví čítačky."
+
+#. BtMjV
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:123
+msgctxt "pdfuserinterfacepage|label1"
+msgid "Window Options"
+msgstr "Možnosti okna"
+
+#. hZQVm
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:151
+msgctxt "pdfuserinterfacepage|toolbar"
+msgid "Hide _toolbar"
+msgstr "Skryť panel nás_trojov"
+
+#. eBE9L
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:159
+msgctxt "pdfuserinterfacepage|extended_tip|toolbar"
+msgid "Select to hide the reader's toolbar when the document is active."
+msgstr "Vyberte, ak chcete skryť panel s nástrojmi čítačky, keď je dokument aktívny."
+
+#. YLEgH
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:170
+msgctxt "pdfuserinterfacepage|menubar"
+msgid "Hide _menubar"
+msgstr "Skryť hlavné _menu"
+
+#. qBG8G
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:178
+msgctxt "pdfuserinterfacepage|extended_tip|menubar"
+msgid "Select to hide the reader's menu bar when the document is active."
+msgstr "Vyberte, ak chcete skryť panel ponuky čitateľa, keď je dokument aktívny."
+
+#. Aw2aq
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:189
+msgctxt "pdfuserinterfacepage|window"
+msgid "Hide _window controls"
+msgstr "Skryť ovládacie _prvky okna"
+
+#. EhwCr
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:197
+msgctxt "pdfuserinterfacepage|extended_tip|window"
+msgid "Select to hide the reader's controls when the document is active."
+msgstr "Vyberte, ak chcete skryť ovládacie prvky čítačky, keď je dokument aktívny."
+
+#. xm2Lh
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:212
+msgctxt "pdfuserinterfacepage|label2"
+msgid "User Interface Options"
+msgstr "Možnosti používateľského rozhrania"
+
+#. SwDno
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:239
+msgctxt "pdfuserinterfacepage|effects"
+msgid "_Use transition effects"
+msgstr "Použiť precho_dové efekty"
+
+#. BMEGm
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:247
+msgctxt "pdfuserinterfacepage|extended_tip|effects"
+msgid "Select to export Impress slide transition effects to respective PDF effects."
+msgstr "Vyberte, ak chcete exportovať efekty prechodu snímok Impress do zodpovedajúcich efektov PDF."
+
+#. JgwC9
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:262
+msgctxt "pdfuserinterfacepage|label3"
+msgid "Transitions"
+msgstr "Prechody"
+
+#. sUC8i
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:291
+msgctxt "pdfuserinterfacepage|allbookmarks"
+msgid "Show _All"
+msgstr "Zobraziť všetko"
+
+#. XLd4F
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:300
+msgctxt "pdfuserinterfacepage|extended_tip|allbookmarks"
+msgid "Select to show all bookmark levels when the reader opens the PDF file."
+msgstr "Vyberte, ak chcete, aby sa pri otvorení súboru PDF čítačkou zobrazili všetky úrovne záložiek."
+
+#. WzoF3
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:311
+msgctxt "pdfuserinterfacepage|visiblebookmark"
+msgid "_Visible levels:"
+msgstr "_Viditeľné úrovne:"
+
+#. FqQPa
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:323
+msgctxt "pdfuserinterfacepage|extended_tip|visiblebookmark"
+msgid "Select to show bookmark levels down to the selected level when the reader opens the PDF file."
+msgstr "Vyberte, ak chcete, aby sa pri otvorení súboru PDF čítačkou zobrazili úrovne záložiek až po vybranú úroveň."
+
+#. NEDWP
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:343
+msgctxt "pdfuserinterfacepage|extended_tip|visiblelevel"
+msgid "Select to show bookmark levels down to the selected level when the reader opens the PDF file."
+msgstr "Vyberte, ak chcete, aby sa pri otvorení súboru PDF čítačkou zobrazili úrovne záložiek až po vybranú úroveň."
+
+#. x4kjV
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:361
+msgctxt "pdfuserinterfacepage|label4"
+msgid "Collapse Outlines"
+msgstr "Skryť úrovne osnovy"
+
+#. ibYBv
+#: filter/uiconfig/ui/pdfviewpage.ui:48
+msgctxt "pdfviewpage|pageonly"
+msgid "_Page only"
+msgstr "Len _strana"
+
+#. NCgWy
+#: filter/uiconfig/ui/pdfviewpage.ui:57
+msgctxt "pdfviewpage|extended_tip|pageonly"
+msgid "Select to generate a PDF file that shows only the page contents."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje len obsah strán."
+
+#. d2FAh
+#: filter/uiconfig/ui/pdfviewpage.ui:68
+msgctxt "pdfviewpage|outline"
+msgid "Outl_ine and page"
+msgstr "_Osnova a strana"
+
+#. JAAHm
+#: filter/uiconfig/ui/pdfviewpage.ui:77
+msgctxt "pdfviewpage|extended_tip|outline"
+msgid "Select to generate a PDF file that shows a bookmarks palette and the page contents."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje záložky a obsah stránky."
+
+#. rT8gQ
+#: filter/uiconfig/ui/pdfviewpage.ui:88
+msgctxt "pdfviewpage|thumbs"
+msgid "_Thumbnails and page"
+msgstr "Náhľady a s_trana"
+
+#. gDHqJ
+#: filter/uiconfig/ui/pdfviewpage.ui:97
+msgctxt "pdfviewpage|extended_tip|thumbs"
+msgid "Select to generate a PDF file that shows a thumbnails palette and the page contents."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje miniatúry strán a obsah stránky."
+
+#. EgKos
+#: filter/uiconfig/ui/pdfviewpage.ui:116
+msgctxt "pdfviewpage|label4"
+msgid "Open on pa_ge:"
+msgstr "Otvoriť _na strane:"
+
+#. QrQ84
+#: filter/uiconfig/ui/pdfviewpage.ui:135
+msgctxt "pdfviewpage|extended_tip|page"
+msgid "Select to show the given page when the reader opens the PDF file."
+msgstr "Vyberte, ak chcete, aby sa zobrazila určená stránka, keď čítačka otvorí súbor PDF."
+
+#. MxznY
+#: filter/uiconfig/ui/pdfviewpage.ui:156
+msgctxt "pdfviewpage|label2"
+msgid "Panes"
+msgstr "Panely"
+
+#. jA3LD
+#: filter/uiconfig/ui/pdfviewpage.ui:185
+msgctxt "pdfviewpage|fitdefault"
+msgid "_Default"
+msgstr "_Predvolené"
+
+#. vQNHv
+#: filter/uiconfig/ui/pdfviewpage.ui:194
+msgctxt "pdfviewpage|extended_tip|fitdefault"
+msgid "Select to generate a PDF file that shows the page contents without zooming. If the reader software is configured to use a zoom factor by default, the page shows with that zoom factor."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje obsah bez zväčšenia. Ak je softvér čítačky nakonfigurovaný na predvolené použitie faktora zväčšenia, stránka sa zobrazí s týmto faktorom zväčšenia."
+
+#. kqho7
+#: filter/uiconfig/ui/pdfviewpage.ui:205
+msgctxt "pdfviewpage|fitwin"
+msgid "_Fit in window"
+msgstr "Prispôsobiť o_knu"
+
+#. Z6P6B
+#: filter/uiconfig/ui/pdfviewpage.ui:214
+msgctxt "pdfviewpage|extended_tip|fitwin"
+msgid "Select to generate a PDF file that shows the page zoomed to fit entirely into the reader's window."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje stranu zväčšenú tak, aby sa úplne zmestila do okna čítačky."
+
+#. gcStc
+#: filter/uiconfig/ui/pdfviewpage.ui:225
+msgctxt "pdfviewpage|fitwidth"
+msgid "Fit _width"
+msgstr "Prispôsobiť ší_rke"
+
+#. FkxYn
+#: filter/uiconfig/ui/pdfviewpage.ui:234
+msgctxt "pdfviewpage|extended_tip|fitwidth"
+msgid "Select to generate a PDF file that shows the page zoomed to fit the width of the reader's window."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje stránku zväčšenú tak, aby sa zmestila na šírku okna čítačky."
+
+#. V6kwp
+#: filter/uiconfig/ui/pdfviewpage.ui:245
+msgctxt "pdfviewpage|fitvis"
+msgid "Fit _visible"
+msgstr "Prispôsobiť _viditeľnému"
+
+#. EBBzj
+#: filter/uiconfig/ui/pdfviewpage.ui:254
+msgctxt "pdfviewpage|extended_tip|fitvis"
+msgid "Select to generate a PDF file that shows the text and graphics on the page zoomed to fit the reader's window."
+msgstr "Zvoľte pre vytvorenie PDF, ktoré zobrazuje stránky priblížené tak, aby zaplnili celú výšku okna prehliadača."
+
+#. NGpWy
+#: filter/uiconfig/ui/pdfviewpage.ui:271
+msgctxt "pdfviewpage|fitzoom"
+msgid "_Zoom factor:"
+msgstr "Faktor _mierky zobrazenia:"
+
+#. nQ4Du
+#: filter/uiconfig/ui/pdfviewpage.ui:283
+msgctxt "pdfviewpage|extended_tip|fitzoom"
+msgid "Select a given zoom factor when the reader opens the PDF file."
+msgstr "Vyberte faktor zväčšenia, ktorý sa použije, keď čítačka otvorí súbor PDF."
+
+#. BBoAW
+#: filter/uiconfig/ui/pdfviewpage.ui:304
+msgctxt "pdfviewpage|extended_tip|zoom"
+msgid "Select a given zoom factor when the reader opens the PDF file."
+msgstr "Vyberte faktor zväčšenia, ktorý sa použije, keď čítačka otvorí súbor PDF."
+
+#. LQKDP
+#: filter/uiconfig/ui/pdfviewpage.ui:325
+msgctxt "pdfviewpage|label3"
+msgid "Magnification"
+msgstr "Mierka zobrazenia"
+
+#. Eegkp
+#: filter/uiconfig/ui/pdfviewpage.ui:361
+msgctxt "pdfviewpage|defaultlayout"
+msgid "D_efault"
+msgstr "_Predvolené"
+
+#. CtGeC
+#: filter/uiconfig/ui/pdfviewpage.ui:370
+msgctxt "pdfviewpage|extended_tip|defaultlayout"
+msgid "Select to generate a PDF file that shows the pages according to the layout setting of the reader software."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje strany podľa nastavenia softvéru čítačky."
+
+#. QBpan
+#: filter/uiconfig/ui/pdfviewpage.ui:381
+msgctxt "pdfviewpage|singlelayout"
+msgid "_Single page"
+msgstr "Jedna _strana"
+
+#. 4PuqY
+#: filter/uiconfig/ui/pdfviewpage.ui:390
+msgctxt "pdfviewpage|extended_tip|singlelayout"
+msgid "Select to generate a PDF file that shows one page at a time."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje jednu stránku po druhej."
+
+#. whE6p
+#: filter/uiconfig/ui/pdfviewpage.ui:401
+msgctxt "pdfviewpage|contlayout"
+msgid "C_ontinuous"
+msgstr "_Súvislé"
+
+#. BRxps
+#: filter/uiconfig/ui/pdfviewpage.ui:410
+msgctxt "pdfviewpage|extended_tip|contlayout"
+msgid "Select to generate a PDF file that shows pages in a continuous vertical column."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje stránky v súvislom zvislom stĺpci."
+
+#. ALQRE
+#: filter/uiconfig/ui/pdfviewpage.ui:421
+msgctxt "pdfviewpage|contfacinglayout"
+msgid "Co_ntinuous facing"
+msgstr "Sú_visle po dvoch"
+
+#. YyCT7
+#: filter/uiconfig/ui/pdfviewpage.ui:430
+msgctxt "pdfviewpage|extended_tip|contfacinglayout"
+msgid "Select to generate a PDF file that shows pages side by side in a continuous column. For more than two pages, the first page is displayed on the right."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje stránky vedľa seba v súvislom stĺpci. V prípade viac ako dvoch strán je prvá strana zobrazená vpravo."
+
+#. 4DFBW
+#: filter/uiconfig/ui/pdfviewpage.ui:441
+msgctxt "pdfviewpage|firstonleft"
+msgid "First page is _left"
+msgstr "Prvá stra_na vľavo"
+
+#. xWdBk
+#: filter/uiconfig/ui/pdfviewpage.ui:450
+msgctxt "pdfviewpage|extended_tip|firstonleft"
+msgid "Select to generate a PDF file that shows pages side by side in a continuous column. For more than two pages, the first page is displayed on the left. You must enable support for complex text layout on Language settings - Languages in the Options dialog box."
+msgstr "Vyberte, ak chcete vygenerovať súbor PDF, ktorý zobrazuje stránky vedľa seba v súvislom stĺpci. V prípade viac ako dvoch strán je prvá strana je zobrazená vľavo. V Nastaveniach jazyka - Jazyky v dialógovom okne Možnosti musíte povoliť podporu komplexného rozloženia textu."
+
+#. sYKod
+#: filter/uiconfig/ui/pdfviewpage.ui:465
+msgctxt "pdfviewpage|label1"
+msgid "Page Layout"
+msgstr "Rozloženie strany"
+
+#. G43B5
+#: filter/uiconfig/ui/testxmlfilter.ui:8
+msgctxt "testxmlfilter|TestXMLFilterDialog"
+msgid "Test XML Filter: %s"
+msgstr "Testovací XML filter: %s"
+
+#. 93Aw7
+#: filter/uiconfig/ui/testxmlfilter.ui:88
+msgctxt "testxmlfilter|label3"
+msgid "XSLT for export"
+msgstr "XSLT pre exportovanie"
+
+#. 3EKij
+#: filter/uiconfig/ui/testxmlfilter.ui:101
+msgctxt "testxmlfilter|label4"
+msgid "Transform document"
+msgstr "Transformovať dokument"
+
+#. TZvm5
+#: filter/uiconfig/ui/testxmlfilter.ui:111
+msgctxt "testxmlfilter|exportbrowse"
+msgid "Browse..."
+msgstr "Prehliadať..."
+
+#. 6ZGrB
+#: filter/uiconfig/ui/testxmlfilter.ui:117
+msgctxt "testxmlfilter|extended_tip|exportbrowse"
+msgid "Locate the file that you want to apply the XML export filter to. The XML code of the transformed file is opened in your default XML editor after transformation."
+msgstr "Vyhľadajte súbor, na ktorý chcete použiť filter exportu XML. Po transformácii sa kód XML transformovaného súboru otvorí vo predvolenom editore XML."
+
+#. F8CJd
+#: filter/uiconfig/ui/testxmlfilter.ui:128
+msgctxt "testxmlfilter|currentdocument"
+msgid "Current Document"
+msgstr "Aktuálny dokument"
+
+#. GRXCc
+#: filter/uiconfig/ui/testxmlfilter.ui:134
+msgctxt "testxmlfilter|extended_tip|currentdocument"
+msgid "The front-most open file that matches the XML filter criteria will be used to test the filter. The current XML export filter transforms the file and the resulting XML code is displayed in the XML Filter output window."
+msgstr "Na otestovanie filtra sa použije prvý otvorený súbor, ktorý zodpovedá kritériám filtra XML. Aktuálny exportovací filter XML súbor transformuje a výsledný kód XML sa zobrazí vo výstupnom okne filtra XML."
+
+#. EPLxG
+#: filter/uiconfig/ui/testxmlfilter.ui:150
+msgctxt "testxmlfilter|extended_tip|exportxsltfile"
+msgid "Displays the file name of the XSLT filter that you entered on the Transformation tab page."
+msgstr "Zobrazuje názov súboru filtra XSLT, ktorý ste zadali na záložke Transformácia."
+
+#. 9HnMA
+#: filter/uiconfig/ui/testxmlfilter.ui:167
+msgctxt "testxmlfilter|extended_tip|currentfilename"
+msgid "Displays the file name of the document that you want to use to test the XSLT filter."
+msgstr "Zobrazuje názov súboru dokumentu, ktorý chcete použiť na testovanie filtra XSLT."
+
+#. b7FMe
+#: filter/uiconfig/ui/testxmlfilter.ui:186
+msgctxt "testxmlfilter|label1"
+msgid "Export"
+msgstr "Exportovať"
+
+#. ANpSQ
+#: filter/uiconfig/ui/testxmlfilter.ui:219
+msgctxt "testxmlfilter|label5"
+msgid "XSLT for import"
+msgstr "XSLT pre import"
+
+#. aWFtZ
+#: filter/uiconfig/ui/testxmlfilter.ui:229
+msgctxt "testxmlfilter|importbrowse"
+msgid "Browse..."
+msgstr "Prehliadať..."
+
+#. eR68F
+#: filter/uiconfig/ui/testxmlfilter.ui:235
+msgctxt "testxmlfilter|extended_tip|importbrowse"
+msgid "Opens a file selection dialog. The selected file is opened using the current XML import filter."
+msgstr "Otvára dialógové okno na výber súboru. Vybraný súbor sa otvorí pomocou aktuálneho filtra na import XML."
+
+#. RGb9P
+#: filter/uiconfig/ui/testxmlfilter.ui:246
+msgctxt "testxmlfilter|recentfile"
+msgid "Recent File"
+msgstr "Naposledy otvorený súbor"
+
+#. 2vFnT
+#: filter/uiconfig/ui/testxmlfilter.ui:252
+msgctxt "testxmlfilter|extended_tip|recentfile"
+msgid "Re-opens the document that was last opened with this dialog."
+msgstr "Znovu otvorí dokument, ktorý bol naposledy otvorený týmto dialógovým oknom."
+
+#. WRoGk
+#: filter/uiconfig/ui/testxmlfilter.ui:266
+msgctxt "testxmlfilter|templateimport"
+msgid "Template for import"
+msgstr "Šablóna pre import"
+
+#. 75GJD
+#: filter/uiconfig/ui/testxmlfilter.ui:281
+msgctxt "testxmlfilter|extended_tip|importxsltfile"
+msgid "Displays the file name of the XSLT filter that you entered on the Transformation tab page."
+msgstr "Zobrazuje názov súboru filtra XSLT, ktorý ste zadali na záložke Transformácia."
+
+#. UAfyw
+#: filter/uiconfig/ui/testxmlfilter.ui:292
+msgctxt "testxmlfilter|displaysource"
+msgid "Display source"
+msgstr "Zobraziť zdroj"
+
+#. CdCp5
+#: filter/uiconfig/ui/testxmlfilter.ui:300
+msgctxt "testxmlfilter|extended_tip|displaysource"
+msgid "Opens the XML source of the selected document in your default XML editor after importing."
+msgstr "Po importovaní otvorí zdroj XML vybraného dokumentu vo vašom predvolenom editore XML."
+
+#. AKfAy
+#: filter/uiconfig/ui/testxmlfilter.ui:314
+msgctxt "testxmlfilter|label6"
+msgid "Transform file"
+msgstr "Transformovať súbor"
+
+#. FdiNb
+#: filter/uiconfig/ui/testxmlfilter.ui:329
+msgctxt "testxmlfilter|extended_tip|importxslttemplate"
+msgid "Displays the file name of the template that you entered on the Transformation tab page."
+msgstr "Zobrazí názov súboru šablóny, ktorú ste zadali na záložke Transformácia."
+
+#. RHRHL
+#: filter/uiconfig/ui/testxmlfilter.ui:346
+msgctxt "testxmlfilter|extended_tip|recentfilename"
+msgid "Re-opens the document that was last opened with this dialog."
+msgstr "Znovu otvorí dokument, ktorý bol naposledy otvorený týmto dialógovým oknom."
+
+#. 4MaaP
+#: filter/uiconfig/ui/testxmlfilter.ui:368
+msgctxt "testxmlfilter|label2"
+msgid "Import"
+msgstr "Importovať"
+
+#. NsJor
+#: filter/uiconfig/ui/testxmlfilter.ui:399
+msgctxt "testxmlfilter|extended_tip|TestXMLFilterDialog"
+msgid "Tests the XSLT stylesheets used by the selected XML filter."
+msgstr "Testuje šablóny štýlov XSLT používané vybraným filtrom XML."
+
+#. DEJXN
+#: filter/uiconfig/ui/warnpdfdialog.ui:18
+msgctxt "warnpdfdialog|WarnPDFDialog"
+msgid "Problems During PDF Export"
+msgstr "Problémy počas exportovania do PDF"
+
+#. 2BpUz
+#: filter/uiconfig/ui/warnpdfdialog.ui:25
+msgctxt "warnpdfdialog|WarnPDFDialog"
+msgid "During PDF export the following problems occurred:"
+msgstr "Počas exportovania do PDF sa objavili nasledujúce problémy:"
+
+#. wG9NF
+#: filter/uiconfig/ui/xmlfiltersettings.ui:18
+msgctxt "xmlfiltersettings|XMLFilterSettingsDialog"
+msgid "XML Filter Settings"
+msgstr "Nastavenia XML filtra"
+
+#. x9LGg
+#: filter/uiconfig/ui/xmlfiltersettings.ui:41
+msgctxt "xmlfiltersettings|extended_tip|help"
+msgid "Displays the help page for this dialog."
+msgstr "Zobrazí stránku pomocníka pre toto dialógové okno."
+
+#. CmVSC
+#: filter/uiconfig/ui/xmlfiltersettings.ui:63
+msgctxt "xmlfiltersettings|extended_tip|close"
+msgid "Closes the dialog."
+msgstr "Zatvorí dialóg."
+
+#. VvrGU
+#: filter/uiconfig/ui/xmlfiltersettings.ui:110
+msgctxt "xmlfiltersettings|header_name"
+msgid "Name"
+msgstr "Meno"
+
+#. D6uZS
+#: filter/uiconfig/ui/xmlfiltersettings.ui:123
+msgctxt "xmlfiltersettings|header_type"
+msgid "Type"
+msgstr "Typ"
+
+#. A6qWH
+#: filter/uiconfig/ui/xmlfiltersettings.ui:134
+msgctxt "xmlfiltersettings|extended_tip|filterlist"
+msgid "Select one or more filters, then click one of the buttons."
+msgstr "Vyberte jeden alebo viac filtrov a potom kliknite na jedno z tlačidiel."
+
+#. VcMQo
+#: filter/uiconfig/ui/xmlfiltersettings.ui:156
+msgctxt "xmlfiltersettings|new"
+msgid "_New..."
+msgstr "_Nový..."
+
+#. upKZD
+#: filter/uiconfig/ui/xmlfiltersettings.ui:163
+msgctxt "xmlfiltersettings|extended_tip|new"
+msgid "Opens a dialog for creating a new filter."
+msgstr "Otvorí dialógové okno na vytvorenie nového filtra."
+
+#. W6Ju3
+#: filter/uiconfig/ui/xmlfiltersettings.ui:175
+msgctxt "xmlfiltersettings|edit"
+msgid "_Edit..."
+msgstr "_Upraviť..."
+
+#. GMxC8
+#: filter/uiconfig/ui/xmlfiltersettings.ui:182
+msgctxt "xmlfiltersettings|extended_tip|edit"
+msgid "Opens a dialog for editing the selected filter."
+msgstr "Otvorí dialógové okno na úpravu vybraného filtra."
+
+#. DAoSK
+#: filter/uiconfig/ui/xmlfiltersettings.ui:194
+msgctxt "xmlfiltersettings|test"
+msgid "_Test XSLTs..."
+msgstr "~Testovať XSLT..."
+
+#. mWGrq
+#: filter/uiconfig/ui/xmlfiltersettings.ui:201
+msgctxt "xmlfiltersettings|extended_tip|test"
+msgid "Opens a dialog for testing the selected filter."
+msgstr "Otvorí dialógové okno na overenie vybraného filtra."
+
+#. FE7Za
+#: filter/uiconfig/ui/xmlfiltersettings.ui:213
+msgctxt "xmlfiltersettings|delete"
+msgid "_Delete..."
+msgstr "_Odstrániť..."
+
+#. bDixG
+#: filter/uiconfig/ui/xmlfiltersettings.ui:220
+msgctxt "xmlfiltersettings|extended_tip|delete"
+msgid "Deletes the selected file after you confirm the dialog that follows."
+msgstr "Po potvrdení v nasledujúcom dialógovom okne odstráni vybraný súbor."
+
+#. DmuTA
+#: filter/uiconfig/ui/xmlfiltersettings.ui:232
+msgctxt "xmlfiltersettings|save"
+msgid "_Save as Package..."
+msgstr "~Uložiť ako balík..."
+
+#. tPh4b
+#: filter/uiconfig/ui/xmlfiltersettings.ui:239
+msgctxt "xmlfiltersettings|extended_tip|save"
+msgid "Displays a Save as dialog to save the selected file as an XSLT filter package (*.jar)."
+msgstr "Zobrazí dialógové okno Uložiť ako na uloženie vybraného súboru ako balíka filtra XSLT (* .jar)."
+
+#. CuahL
+#: filter/uiconfig/ui/xmlfiltersettings.ui:251
+msgctxt "xmlfiltersettings|open"
+msgid "_Open Package..."
+msgstr "~Otvoriť balík..."
+
+#. D3FRp
+#: filter/uiconfig/ui/xmlfiltersettings.ui:258
+msgctxt "xmlfiltersettings|extended_tip|open"
+msgid "Displays an Open dialog to open a filter from an XSLT filter package (*.jar)."
+msgstr "Zobrazí dialógové okno Otvoriť na otvorenie filtra z balíka filtra XSLT (* .jar)."
+
+#. bC6ha
+#: filter/uiconfig/ui/xmlfiltersettings.ui:290
+msgctxt "xmlfiltersettings|extended_tip|XMLFilterSettingsDialog"
+msgid "Opens the XML Filter Settings dialog, where you can create, edit, delete, and test filters to import and to export XML files."
+msgstr "Otvára dialógové okno Nastavenia filtra XML, kde môžete vytvárať, upravovať, mazať a testovať filtre na import a export súborov XML."
+
+#. rLZ5z
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:23
+msgctxt "xmlfiltertabpagegeneral|label2"
+msgid "_Filter name:"
+msgstr "Názov _filtra:"
+
+#. dreFh
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:37
+msgctxt "xmlfiltertabpagegeneral|label3"
+msgid "_Application:"
+msgstr "_Aplikácia:"
+
+#. yQmBY
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:51
+msgctxt "xmlfiltertabpagegeneral|label4"
+msgid "_Name of file type:"
+msgstr "_Názov typu súboru:"
+
+#. NB3Gy
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:65
+msgctxt "xmlfiltertabpagegeneral|label5"
+msgid "File _extension:"
+msgstr "P_rípona súboru:"
+
+#. fPxWA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:79
+msgctxt "xmlfiltertabpagegeneral|label6"
+msgid "Comment_s:"
+msgstr "Poz_námky:"
+
+#. rYNyn
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:100
+msgctxt "xmlfiltertabpagegeneral|extended_tip|filtername"
+msgid "Enter the name that you want to display in the list box of the XML Filter Settings dialog."
+msgstr "Zadajte názov, ktorý chcete zobraziť v zozname v dialógovom okne Nastavenie filtra XML."
+
+#. D5aZP
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:119
+msgctxt "xmlfiltertabpagegeneral|extended_tip|extension"
+msgid "Enter the file extension to use when you open a file without specifying a filter. The file extension is used to determine which filter to use."
+msgstr "Zadajte príponu súboru, ktorá sa má použiť, keď budete otvárať nový súbor bez zadaného filtra. Podľa tejto prípony sa vyberie príslušný filter."
+
+#. fZvBA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:138
+msgctxt "xmlfiltertabpagegeneral|extended_tip|interfacename"
+msgid "Enter the name that you want to display in the File type box in file dialogs."
+msgstr "Zadajte názov, ktorý chcete zobraziť v poli Typ súboru v dialógových oknách súborov."
+
+#. BFUsA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:162
+msgctxt "xmlfiltertabpagegeneral|extended_tip|application"
+msgid "Select the application that you want to use with the filter."
+msgstr "Vyberte aplikáciu, ktorú chcete s filtrom použiť."
+
+#. Gfrm2
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:186
+msgctxt "xmlfiltertabpagegeneral|extended_tip|description"
+msgid "Enter a comment (optional)."
+msgstr "Zadajte komentár (voliteľné)."
+
+#. G632R
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:206
+msgctxt "xmlfiltertabpagegeneral|extended_tip|XmlFilterTabPageGeneral"
+msgid "Enter or edit general information for an XML filter."
+msgstr "Zadajte alebo upravte všeobecné informácie pre filter XML."
+
+#. FhD2n
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:24
+msgctxt "xmlfiltertabpagetransformation|label2"
+msgid "_DocType:"
+msgstr "_DocType:"
+
+#. x2ex7
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:44
+msgctxt "xmlfiltertabpagetransformation|extended_tip|doc"
+msgid "Enter the DOCTYPE of the XML file."
+msgstr "Zadajte DOCTYPE súboru XML."
+
+#. J5c8A
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:57
+msgctxt "xmlfiltertabpagetransformation|label4"
+msgid "_XSLT for export:"
+msgstr "_XSLT pre exportovanie:"
+
+#. GwzvD
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:69
+msgctxt "xmlfiltertabpagetransformation|browseexport"
+msgid "Brows_e..."
+msgstr "Prehľa_dávať..."
+
+#. QLd25
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:76
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browseexport"
+msgid "Opens a file selection dialog."
+msgstr "Otvára dialógové okno na výber súboru."
+
+#. oZGZS
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:89
+msgctxt "xmlfiltertabpagetransformation|label5"
+msgid "XSLT _for import:"
+msgstr "XSLT pre _importovanie:"
+
+#. UNKTt
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:101
+msgctxt "xmlfiltertabpagetransformation|browseimport"
+msgid "B_rowse..."
+msgstr "P_rehľadávať..."
+
+#. TecWL
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:108
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browseimport"
+msgid "Opens a file selection dialog."
+msgstr "Otvára dialógové okno na výber súboru."
+
+#. 9nV9R
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:121
+msgctxt "xmlfiltertabpagetransformation|label6"
+msgid "Template for _import:"
+msgstr "Šab_lóna pre importovanie:"
+
+#. MNLtB
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:133
+msgctxt "xmlfiltertabpagetransformation|browsetemp"
+msgid "Browse..."
+msgstr "Prehliadať..."
+
+#. Dce3n
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:139
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browsetemp"
+msgid "Opens a file selection dialog."
+msgstr "Otvára dialógové okno na výber súboru."
+
+#. sjWgJ
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:162
+msgctxt "xmlfiltertabpagetransformation|extended_tip|xsltexport"
+msgid "If this is an export filter, enter the file name of the XSLT stylesheet that you want to use for exporting."
+msgstr "Ak ide o exportovací filter, zadajte názov súboru šablóny so štýlmi XSLT, ktorý chcete použiť na export."
+
+#. Xgroa
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:185
+msgctxt "xmlfiltertabpagetransformation|extended_tip|xsltimport"
+msgid "If this is an import filter, enter the file name of the XSLT stylesheet that you want to use for importing."
+msgstr "Ak ide o filter na importovanie, zadajte názov súboru šablóny so štýlmi XSLT, ktorý chcete na importovanie použiť."
+
+#. wRFNU
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:208
+msgctxt "xmlfiltertabpagetransformation|extended_tip|tempimport"
+msgid "Enter the name of the template that you want to use for importing. In the template, styles are defined to display XML tags."
+msgstr "Zadajte názov šablóny, ktorú chcete použiť na importovanie. V šablóne sú definované štýly na zobrazovanie XML značiek."
+
+#. XTDex
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:229
+msgctxt "xmlfiltertabpagetransformation|filtercb"
+msgid "The filter needs XSLT 2.0 processor"
+msgstr "Filter vyžaduje procesor XSLT 2.0"
+
+#. hDv78
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:244
+msgctxt "xmlfiltertabpagetransformation|extended_tip|XmlFilterTabPageTransformation"
+msgid "Enter or edit file information for an XML filter."
+msgstr "Zadajte alebo upravte informácie o súbore pre filter XML."
+
+#. MCfGg
+#: filter/uiconfig/ui/xsltfilterdialog.ui:8
+msgctxt "xsltfilterdialog|XSLTFilterDialog"
+msgid "XML Filter: %s"
+msgstr "XML Filter: %s"
+
+#. bCZh2
+#: filter/uiconfig/ui/xsltfilterdialog.ui:62
+msgctxt "xsltfilterdialog|extended_tip|help"
+msgid "Displays the help page for this dialog."
+msgstr "Zobrazí stránku pomocníka pre toto dialógové okno."
+
+#. Cvy2d
+#: filter/uiconfig/ui/xsltfilterdialog.ui:103
+msgctxt "xsltfilterdialog|general"
+msgid "General"
+msgstr "Všeobecné"
+
+#. peR3F
+#: filter/uiconfig/ui/xsltfilterdialog.ui:126
+msgctxt "xsltfilterdialog|transformation"
+msgid "Transformation"
+msgstr "Transformácia"
+
+#. WkALr
+#: filter/uiconfig/ui/xsltfilterdialog.ui:149
+msgctxt "xsltfilterdialog|extended_tip|XSLTFilterDialog"
+msgid "Opens a dialog for creating a new filter."
+msgstr "Otvorí dialógové okno na vytvorenie nového filtra."

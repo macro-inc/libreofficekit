@@ -1,0 +1,5132 @@
+#. extracted from instsetoo_native/inc_openoffice/windows/msi_languages
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-03-21 12:32+0100\n"
+"PO-Revision-Date: 2018-11-12 12:24+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: xh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1542025467.000000\n"
+
+#. tBfTE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_1\n"
+"LngText.text"
+msgid "Advertising application"
+msgstr "Kwaziswa inkqubo"
+
+#. CHEun
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_2\n"
+"LngText.text"
+msgid "Allocating registry space"
+msgstr "Kwabiwa isithuba sesisele"
+
+#. B6wJx
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_3\n"
+"LngText.text"
+msgid "Free space: [1]"
+msgstr "Isithuba esikhululekileyo: [1]"
+
+#. TBKEi
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_4\n"
+"LngText.text"
+msgid "Searching for installed applications"
+msgstr "Kukhangelwa iinkqubo ezifakiweyo"
+
+#. Ex3MU
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_5\n"
+"LngText.text"
+msgid "Property: [1], Signature: [2]"
+msgstr "Inkazelo ngeempawu: [1], Umtyibelo: [2]"
+
+#. adESV
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_6\n"
+"LngText.text"
+msgid "Binding executables"
+msgstr "Iimfezeko ezixhomekekayo"
+
+#. NV59M
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_7\n"
+"LngText.text"
+msgid "File: [1]"
+msgstr ""
+
+#. Cfu64
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_8\n"
+"LngText.text"
+msgid "Creating IIS Virtual Roots..."
+msgstr "Kudalwa IIS Iindawo Ezinamandla Ayelelanisiweyo..."
+
+#. oaPu2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_9\n"
+"LngText.text"
+msgid "Removing IIS Virtual Roots..."
+msgstr "Kususwa IIS Iindawo Ezinamandla Ayelelanisiweyo..."
+
+#. pQzsj
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_10\n"
+"LngText.text"
+msgid "Searching for qualifying products"
+msgstr ""
+
+#. BPDsf
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_11\n"
+"LngText.text"
+msgid "Computing space requirements"
+msgstr ""
+
+#. GkETA
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_12\n"
+"LngText.text"
+msgid "Computing space requirements"
+msgstr ""
+
+#. B79jy
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_13\n"
+"LngText.text"
+msgid "Creating folders"
+msgstr "Kudalwa iziqulathi zeefayili"
+
+#. xTTzj
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_14\n"
+"LngText.text"
+msgid "Folder: [1]"
+msgstr ""
+
+#. v6Lo5
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_15\n"
+"LngText.text"
+msgid "Creating shortcuts"
+msgstr "Kudalwa iindlela ezinqumlayo"
+
+#. HwKWh
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_16\n"
+"LngText.text"
+msgid "Shortcut: [1]"
+msgstr ""
+
+#. GeKVY
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_17\n"
+"LngText.text"
+msgid "Deleting services"
+msgstr "Kucinywa iinkonzo"
+
+#. WFKgC
+#: ActionTe.ulf
+#, fuzzy
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_18\n"
+"LngText.text"
+msgid "Service: [1]"
+msgstr "Inkonzo: [2]"
+
+#. DbLyC
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_19\n"
+"LngText.text"
+msgid "Creating duplicate files"
+msgstr "Kudalwa iifayili ezingamatwatse"
+
+#. j8xgQ
+#: ActionTe.ulf
+#, fuzzy
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_20\n"
+"LngText.text"
+msgid "File: [1],  Directory: [9],  Size: [6]"
+msgstr "Ifayili: [1], Uvimba weefayili: [9], Ubukhulu: [6]"
+
+#. jzS2H
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_21\n"
+"LngText.text"
+msgid "Computing space requirements"
+msgstr ""
+
+#. Bfgo2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_22\n"
+"LngText.text"
+msgid "Searching for related applications"
+msgstr "Kukhangelwa iinkqubo ezinonxulumano"
+
+#. aARc2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_23\n"
+"LngText.text"
+msgid "Found application"
+msgstr ""
+
+#. G3SFJ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_24\n"
+"LngText.text"
+msgid "Generating script operations for action:"
+msgstr "Kuyilwa iinkqubo zeskripti ukwenzela inyathelo:"
+
+#. s75yx
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_25\n"
+"LngText.text"
+msgid "[1]"
+msgstr ""
+
+#. cDFEG
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_26\n"
+"LngText.text"
+msgid "Copying files to the network"
+msgstr "Kukotshelwa iifayili kumsebenzi wothungelwano"
+
+#. GB7FF
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_27\n"
+"LngText.text"
+msgid "File: [1], Directory: [9], Size: [6]"
+msgstr "Ifayili: [1], Uvimba weefayili: [9], Ubukhulu: [6]"
+
+#. GGoFs
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_28\n"
+"LngText.text"
+msgid "Copying new files"
+msgstr "Kukotshwa iifayili ezintsha"
+
+#. rbcHA
+#: ActionTe.ulf
+#, fuzzy
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_29\n"
+"LngText.text"
+msgid "File: [1],  Directory: [9],  Size: [6]"
+msgstr "Ifayili: [1], Uvimba weefayili: [9], Ubukhulu: [6]"
+
+#. LF4Et
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_30\n"
+"LngText.text"
+msgid "Installing ODBC components"
+msgstr "Kufakwa iinxalenye ze-ODBC"
+
+#. WW3QQ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_31\n"
+"LngText.text"
+msgid "Installing new services"
+msgstr "Kufakwa iinkonzo ezintsha"
+
+#. WRGjc
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_32\n"
+"LngText.text"
+msgid "Service: [2]"
+msgstr "Inkonzo: [2]"
+
+#. vZ6wb
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_33\n"
+"LngText.text"
+msgid "Installing system catalog"
+msgstr "Kufakwa ikhathalogu yesixokelelwano"
+
+#. oxrKY
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_34\n"
+"LngText.text"
+msgid "File: [1],  Dependencies: [2]"
+msgstr "Ifayili: [1],  Izixhomekeki: [2]"
+
+#. 2DWPL
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_35\n"
+"LngText.text"
+msgid "Validating install"
+msgstr "Kufakwa isiqinisekiso sokunyaniseka"
+
+#. BGXEt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_36\n"
+"LngText.text"
+msgid "Evaluating launch conditions"
+msgstr "Kuvavanywa iimeko zokundulula"
+
+#. 5AK93
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_37\n"
+"LngText.text"
+msgid "Migrating feature states from related applications"
+msgstr "Uphawu lwemfuduso luchaza ukusuka kwiinkqubo ezinxulumeneyo"
+
+#. Ls7DK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_38\n"
+"LngText.text"
+msgid "Application: [1]"
+msgstr "Inkqubo: [1]"
+
+#. 2ZiCq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_39\n"
+"LngText.text"
+msgid "Moving files"
+msgstr "Kushenxiswa iifayili"
+
+#. FDfHk
+#: ActionTe.ulf
+#, fuzzy
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_40\n"
+"LngText.text"
+msgid "File: [1],  Directory: [9],  Size: [6]"
+msgstr "Ifayili: [1], Uvimba weefayili: [9], Ubukhulu: [6]"
+
+#. gBdsq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_41\n"
+"LngText.text"
+msgid "Patching files"
+msgstr "Kupetshwa iifayili"
+
+#. zjUzy
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_42\n"
+"LngText.text"
+msgid "File: [1],  Directory: [2],  Size: [3]"
+msgstr "Ifayili: [1],  Uvimba weefayili: [2],  Ubukhulu: [3]"
+
+#. 4z6Sr
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_43\n"
+"LngText.text"
+msgid "Updating component registration"
+msgstr "Kuhlaziywa ngokutsha ubhaliso lweenxalenye"
+
+#. cryBo
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_44\n"
+"LngText.text"
+msgid "Publishing qualified components"
+msgstr "Kupapashwa iinxalenye ezinemfanelo"
+
+#. PG64G
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_45\n"
+"LngText.text"
+msgid "Component ID: [1], Qualifier: [2]"
+msgstr ""
+
+#. 5UDAU
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_46\n"
+"LngText.text"
+msgid "Publishing product features"
+msgstr "Kupapashwa iimpawu zemveliso"
+
+#. R8Xuy
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_47\n"
+"LngText.text"
+msgid "Feature: [1]"
+msgstr ""
+
+#. jUrCF
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_48\n"
+"LngText.text"
+msgid "Publishing product information"
+msgstr "Kupapashwa ulwazi ngemveliso"
+
+#. Qi37u
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_49\n"
+"LngText.text"
+msgid "Registering class servers"
+msgstr "Kubhaliswa iiseva zodidi"
+
+#. SBCvZ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_50\n"
+"LngText.text"
+msgid "Class ID: [1]"
+msgstr ""
+
+#. haeRK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_51\n"
+"LngText.text"
+msgid "Registering COM+ Applications and Components"
+msgstr "Kubhaliswa Iinkqubo Neenxalenye ze-COM+"
+
+#. C88cP
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_52\n"
+"LngText.text"
+msgid "AppId: [1]{{, AppType: [2], Users: [3], RSN: [4]}}"
+msgstr "AppId: [1]{{, AppType: [2], Abasebenzisi: [3], RSN: [4]}}"
+
+#. uheTH
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_53\n"
+"LngText.text"
+msgid "Registering extension servers"
+msgstr "Kubhaliswa iiseva zesolulo"
+
+#. HD6QQ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_54\n"
+"LngText.text"
+msgid "Extension: [1]"
+msgstr ""
+
+#. YmEb9
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_55\n"
+"LngText.text"
+msgid "Registering fonts"
+msgstr "Kubhaliswa iifonti"
+
+#. CK6Kq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_56\n"
+"LngText.text"
+msgid "Font: [1]"
+msgstr ""
+
+#. 3vwAg
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_57\n"
+"LngText.text"
+msgid "Registering MIME info"
+msgstr "Kubhaliswa ulwazi nge-MIME"
+
+#. X9enX
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_58\n"
+"LngText.text"
+msgid "MIME Content Type: [1], Extension: [2]"
+msgstr ""
+
+#. CvWfG
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_59\n"
+"LngText.text"
+msgid "Registering product"
+msgstr "Kubhaliswa imveliso"
+
+#. WtwCe
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_60\n"
+"LngText.text"
+msgid "[1]"
+msgstr ""
+
+#. vdvW2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_61\n"
+"LngText.text"
+msgid "Registering program identifiers"
+msgstr "Kubhaliswa izichongi zenkqubo"
+
+#. AFmfn
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_62\n"
+"LngText.text"
+msgid "ProgID: [1]"
+msgstr ""
+
+#. TMjrn
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_63\n"
+"LngText.text"
+msgid "Registering type libraries"
+msgstr "Kubhaliswa iilayibrari zezimbo"
+
+#. NCuAr
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_64\n"
+"LngText.text"
+msgid "LibID: [1]"
+msgstr ""
+
+#. X4YAE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_65\n"
+"LngText.text"
+msgid "Registering user"
+msgstr "Kubhaliswa umsebenzisi"
+
+#. ZD2Y5
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_66\n"
+"LngText.text"
+msgid "[1]"
+msgstr ""
+
+#. ctaJ5
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_67\n"
+"LngText.text"
+msgid "Removing duplicated files"
+msgstr "Kususwa iifayili ezingamatwatse"
+
+#. eBkz6
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_68\n"
+"LngText.text"
+msgid "File: [1], Directory: [9]"
+msgstr ""
+
+#. ELyVt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_69\n"
+"LngText.text"
+msgid "Updating environment strings"
+msgstr ""
+
+#. 4xBWj
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_70\n"
+"LngText.text"
+msgid "Name: [1], Value: [2], Action [3]"
+msgstr ""
+
+#. iqqet
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_71\n"
+"LngText.text"
+msgid "Removing applications"
+msgstr "Kususwa iinkqubo"
+
+#. 4dJF2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_72\n"
+"LngText.text"
+msgid "Application: [1], Command line: [2]"
+msgstr "Inkqubo: [1], Umnxeba womyalelo: [2]"
+
+#. 8B5xT
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_73\n"
+"LngText.text"
+msgid "Removing files from previous installation"
+msgstr ""
+
+#. G7Cdp
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_74\n"
+"LngText.text"
+msgid "File: [1], Directory: [9]"
+msgstr ""
+
+#. 5AS3G
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_75\n"
+"LngText.text"
+msgid "Removing folders"
+msgstr "Kususwa iziqulathi zeefayili"
+
+#. LErXT
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_76\n"
+"LngText.text"
+msgid "Folder: [1]"
+msgstr ""
+
+#. Cd2AK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_77\n"
+"LngText.text"
+msgid "Removing INI file entries"
+msgstr "Kususwa amangeniso eefayili ze-INI"
+
+#. cuFzQ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_78\n"
+"LngText.text"
+msgid "File: [1],  Section: [2],  Key: [3], Value: [4]"
+msgstr ""
+
+#. 3RGHx
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_79\n"
+"LngText.text"
+msgid "Removing ODBC components"
+msgstr "Kususwa iinxalenye ze-ODBC"
+
+#. K6Grt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_80\n"
+"LngText.text"
+msgid "Removing system registry values"
+msgstr "Kususwa amaxabiso esisele sesixokelelwano"
+
+#. 3hm3S
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_81\n"
+"LngText.text"
+msgid "Key: [1], Name: [2]"
+msgstr "Iqhosha: [1], Igama: [2]"
+
+#. bhXbK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_82\n"
+"LngText.text"
+msgid "Removing shortcuts"
+msgstr "Kususwa iindlela ezinqumlayo"
+
+#. kBFGD
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_83\n"
+"LngText.text"
+msgid "Shortcut: [1]"
+msgstr ""
+
+#. A8hxh
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_84\n"
+"LngText.text"
+msgid "Searching for qualifying products"
+msgstr ""
+
+#. oDnBp
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_85\n"
+"LngText.text"
+msgid "Rolling back action:"
+msgstr "Inyathelo lokuqengqela emva:"
+
+#. KRvcf
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_86\n"
+"LngText.text"
+msgid "[1]"
+msgstr ""
+
+#. ZiXCE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_87\n"
+"LngText.text"
+msgid "Removing backup files"
+msgstr "Kususwa iifayili zogcino lokhuseleko"
+
+#. y3t5N
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_88\n"
+"LngText.text"
+msgid "File: [1]"
+msgstr ""
+
+#. h9m6Z
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_93\n"
+"LngText.text"
+msgid "Initializing ODBC directories"
+msgstr "Kundululwa oovimba beefayili ze-ODBC"
+
+#. KKcf7
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_94\n"
+"LngText.text"
+msgid "Starting services"
+msgstr "Kuqaliswa iinkonzo"
+
+#. RBA7T
+#: ActionTe.ulf
+#, fuzzy
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_95\n"
+"LngText.text"
+msgid "Service: [1]"
+msgstr "Inkonzo: [2]"
+
+#. cK4wt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_96\n"
+"LngText.text"
+msgid "Stopping services"
+msgstr "Kunqunyanyiswa iinkonzo"
+
+#. DigFd
+#: ActionTe.ulf
+#, fuzzy
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_97\n"
+"LngText.text"
+msgid "Service: [1]"
+msgstr "Inkonzo: [2]"
+
+#. 5G9eN
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_98\n"
+"LngText.text"
+msgid "Removing moved files"
+msgstr "Kususwa iifayili ezishenxisiweyo"
+
+#. eaJ8D
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_99\n"
+"LngText.text"
+msgid "File: [1], Directory: [9]"
+msgstr ""
+
+#. nKyi3
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_100\n"
+"LngText.text"
+msgid "Unpublishing Qualified Components"
+msgstr "Azipapashwa Iinxalenye Ezinemfanelo"
+
+#. Fj4CE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_101\n"
+"LngText.text"
+msgid "Component ID: [1], Qualifier: [2]"
+msgstr ""
+
+#. EE9Gk
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_102\n"
+"LngText.text"
+msgid "Unpublishing product features"
+msgstr "Azipapashwa iimpawu ngemveliso"
+
+#. 8YHS2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_103\n"
+"LngText.text"
+msgid "Feature: [1]"
+msgstr ""
+
+#. hJvGe
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_104\n"
+"LngText.text"
+msgid "Unpublishing product information"
+msgstr "Alupapashwa ulwazi ngemveliso"
+
+#. Nr5ET
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_105\n"
+"LngText.text"
+msgid "Unregister class servers"
+msgstr "Azibhaliswa iiseva zodidi"
+
+#. MHDqB
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_106\n"
+"LngText.text"
+msgid "Class ID: [1]"
+msgstr ""
+
+#. FFDdD
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_107\n"
+"LngText.text"
+msgid "Unregistering COM+ Applications and Components"
+msgstr "Azibhaliswa Iinkqubo Neenxalenye ze-COM+"
+
+#. fD6ta
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_108\n"
+"LngText.text"
+msgid "AppId: [1]{{, AppType: [2]}}"
+msgstr "AppId: [1]{{, AppType: [2]}}"
+
+#. pwfZN
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_109\n"
+"LngText.text"
+msgid "Unregistering extension servers"
+msgstr "Azibhaliswa iiseva zesolulo"
+
+#. xWBce
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_110\n"
+"LngText.text"
+msgid "Extension: [1]"
+msgstr ""
+
+#. DPuFZ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_111\n"
+"LngText.text"
+msgid "Unregistering fonts"
+msgstr "Azibhaliswa iifonti"
+
+#. 5rATm
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_112\n"
+"LngText.text"
+msgid "Font: [1]"
+msgstr ""
+
+#. 6rdig
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_113\n"
+"LngText.text"
+msgid "Unregistering MIME info"
+msgstr "Alubhaliswa ulwazi lwe-MIME"
+
+#. BPxD7
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_114\n"
+"LngText.text"
+msgid "MIME Content Type: [1], Extension: [2]"
+msgstr ""
+
+#. DceMG
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_115\n"
+"LngText.text"
+msgid "Unregistering program identifiers"
+msgstr "Azibhaliswa izichongi zenkqubo"
+
+#. azYBq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_116\n"
+"LngText.text"
+msgid "ProgID: [1]"
+msgstr ""
+
+#. mFnav
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_117\n"
+"LngText.text"
+msgid "Unregistering type libraries"
+msgstr "Azibhaliswa iilayibrari zohlobo"
+
+#. rL3Ao
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_118\n"
+"LngText.text"
+msgid "LibID: [1]"
+msgstr ""
+
+#. GHGDX
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_119\n"
+"LngText.text"
+msgid "Updating environment strings"
+msgstr ""
+
+#. VkdEw
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_120\n"
+"LngText.text"
+msgid "Name: [1], Value: [2], Action [3]"
+msgstr ""
+
+#. kXa3f
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_121\n"
+"LngText.text"
+msgid "Writing INI file values"
+msgstr "Kubhalwa amaxabiso eefayili ze-INI"
+
+#. zXBEs
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_122\n"
+"LngText.text"
+msgid "File: [1],  Section: [2],  Key: [3], Value: [4]"
+msgstr ""
+
+#. e6UkZ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_123\n"
+"LngText.text"
+msgid "Writing system registry values"
+msgstr "Kubhalwa amaxabiso esisele sesixokelelwano"
+
+#. MpBFH
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_124\n"
+"LngText.text"
+msgid "Key: [1], Name: [2], Value: [3]"
+msgstr "Iqhosha: [1], Igama: [2], Ixabiso: [3]"
+
+#. 8xyYY
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_3\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. 7mnKX
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_5\n"
+"LngText.text"
+msgid "&Look in:"
+msgstr ""
+
+#. w5WG7
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_6\n"
+"LngText.text"
+msgid "Browse to the destination folder."
+msgstr "Qwalasela isiqulathi seefayili ekujoliswe kuso."
+
+#. FrjD4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_7\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Change Current Destination Folder"
+msgstr ""
+
+#. 6cCLG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_9\n"
+"LngText.text"
+msgid "Create new folder|"
+msgstr "Dala isiqulathi seefayili esitsha|"
+
+#. DVAWB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_10\n"
+"LngText.text"
+msgid "OK"
+msgstr "Kulungile"
+
+#. B8hF9
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_12\n"
+"LngText.text"
+msgid "&Folder name:"
+msgstr "Igama l~esiqulathi seefayili"
+
+#. yQEAY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_13\n"
+"LngText.text"
+msgid "Up one level|"
+msgstr "Phezulu ngenqanaba elinye|"
+
+#. sGZLU
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_14\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. qGF5j
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_17\n"
+"LngText.text"
+msgid "&Change..."
+msgstr "~Guqula..."
+
+#. xU4Fr
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_18\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. 24KMD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_19\n"
+"LngText.text"
+msgid "Specify a network location for the server image of the product."
+msgstr "Xela indawo okuwo umsebenzi wothungelwano ukwenzela umfuziselo weseva yemveliso."
+
+#. NdeD8
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_20\n"
+"LngText.text"
+msgid "Enter the network location or click Change to browse to a location. Click Install to create a server image of [ProductName] at the specified network location or click Cancel to exit the wizard."
+msgstr "Ngenisa indawo okuyo umsebenzi wothungelwano okanye nqomfa kuTshintsha ukuze ukhangele indawo okuyo. Nqomfa kuFaka ukuze udale umfuziselo weseva we-[ProductName] kwindawo okuyo umsebenzi wothungelwano oxeliweyo okanye unqomfe uRhoxisa ukuze uphume kumthakathi."
+
+#. U7sr3
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_21\n"
+"LngText.text"
+msgid "{&MSSansBold8}Network Location"
+msgstr "{&MSSansBold8}Indawo Okuyo Umsebenzi Wothungelwano"
+
+#. FsBUg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_22\n"
+"LngText.text"
+msgid "&Install"
+msgstr ""
+
+#. FDxCc
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_23\n"
+"LngText.text"
+msgid "&Network location:"
+msgstr "&Indawo okuyo umsebenzi wothungelwano:"
+
+#. dXe9C
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_24\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. NBCnQ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_25\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. cvmU9
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_26\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. JzeGq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_27\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. 9Zq7E
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_28\n"
+"LngText.text"
+msgid "The Installation Wizard will create a server image of [ProductName] at a specified network location. To continue, click Next."
+msgstr "Umthakathi Wokufaka uya kudala umfuziselo weseva we-[ProductName] kwindawo okuyo umsebenzi wothungelwano. Ukuqhuba, nqomfa ku-Okulandelayo."
+
+#. 9bAbP
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_29\n"
+"LngText.text"
+msgid "&No"
+msgstr ""
+
+#. nkGKB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_30\n"
+"LngText.text"
+msgid "Are you sure you want to cancel [ProductName] installation?"
+msgstr "Ingaba uqinisekile ukuba ufuna ukurhoxisa ukufaka kwe-[ProductName]?"
+
+#. ZQcSE
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_31\n"
+"LngText.text"
+msgid "&Yes"
+msgstr "Ewe"
+
+#. 9A9e8
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_32\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. nXGc8
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_35\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. RDDi2
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_36\n"
+"LngText.text"
+msgid "{\\DialogDefault}{80}"
+msgstr ""
+
+#. acbEy
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_37\n"
+"LngText.text"
+msgid "&Organization:"
+msgstr "&Uququzelelo:"
+
+#. AdQkD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_38\n"
+"LngText.text"
+msgid "Please enter your information."
+msgstr "Nceda ngenisa iinkcukacha zakho."
+
+#. sD2L9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_39\n"
+"LngText.text"
+msgid "Install this application for:"
+msgstr "Faka le nkqubo ukwenzela:"
+
+#. 7ZdtP
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_40\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}User Information"
+msgstr ""
+
+#. 3cLPR
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_41\n"
+"LngText.text"
+msgid "{\\DialogDefault}{50}"
+msgstr ""
+
+#. QLsAy
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_42\n"
+"LngText.text"
+msgid "&User Name:"
+msgstr "&Igama Lomsebenzisi:"
+
+#. 62QZa
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_43\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. x5jEA
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_46\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. Vw7qG
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_49\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. jagos
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_50\n"
+"LngText.text"
+msgid "&Change..."
+msgstr "~Guqula..."
+
+#. kBVJV
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_51\n"
+"LngText.text"
+msgid "&Space"
+msgstr "&Isithuba"
+
+#. aBiAM
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_52\n"
+"LngText.text"
+msgid "Select the program features you want installed."
+msgstr "Khetha iimpawu zenkqubo ofuna ukuzifaka."
+
+#. Y4ci6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_53\n"
+"LngText.text"
+msgid "Click on an icon in the list below to change how a feature is installed."
+msgstr "Nqomfa kumqondiso wesiqulatho kuludwe olungezantsi ukuze kuguqulwe indlela olufakwa ngayo uphawu."
+
+#. w5AqN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_54\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Custom Setup"
+msgstr ""
+
+#. AnSJQ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_55\n"
+"LngText.text"
+msgid "Feature Description:"
+msgstr "Inkcazelo Ngophawu:"
+
+#. GsBZN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_56\n"
+"LngText.text"
+msgid "&Help"
+msgstr "&Uncedo"
+
+#. CHHQJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_57\n"
+"LngText.text"
+msgid "Install to:"
+msgstr "Faka apha:"
+
+#. WcE8h
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_58\n"
+"LngText.text"
+msgid "Multiline description of the currently selected item"
+msgstr "Inkcazelo yomnxeba unxazonke ngenqaku elikhethwe okwangoku"
+
+#. Mfmxu
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_59\n"
+"LngText.text"
+msgid "<selected feature path>"
+msgstr "<indlela yothungelwano yophawu olukhethiweyo>"
+
+#. yPciQ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_60\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. w8u5K
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_61\n"
+"LngText.text"
+msgid "Feature size"
+msgstr "Ubukhulu bophawu"
+
+#. 6VdJ4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_64\n"
+"LngText.text"
+msgid "Custom Setup allows you to selectively install program features."
+msgstr "Ummiselo Wokulungiselela ukuvumela ukuba ufake ngokuzikhethela iimpawu zenkqubo."
+
+#. NgAfY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_65\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Custom Setup Tips"
+msgstr ""
+
+#. 2sY6N
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_66\n"
+"LngText.text"
+msgid "Will not be installed."
+msgstr "Akusayi kufakwa."
+
+#. FAbBF
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_67\n"
+"LngText.text"
+msgid "Will be installed on first use. (Available only if the feature supports this option.)"
+msgstr "Kuya kufakwa ekusetyenzisweni kokuqala. (Kufumaneka kuphela xa uphawu lukuxhasa oku kukhethwayo.)"
+
+#. N5QGm
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_68\n"
+"LngText.text"
+msgid "This install state means the feature..."
+msgstr "Esi simo sokufaka kuthetha uphawu..."
+
+#. avGdu
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_69\n"
+"LngText.text"
+msgid "Will be completely installed to the local hard drive."
+msgstr "Kuya kufakwa ngokupheleleyo kwiqokobhe lekhompyutha yalapho."
+
+#. vqQkB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_70\n"
+"LngText.text"
+msgid "The icon next to the feature name indicates the install state of the feature. Click the icon to drop down the install state menu for each feature."
+msgstr "Umqondiso wesiqulatho okufutshane kwigama lophawu walatha isimosokufakwa kophawu. Nqomfa kumqondiso wesiqulatho ukuze ubeke isimo sokufaka semenyu ngophawu ngalunye."
+
+#. nABcc
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_71\n"
+"LngText.text"
+msgid "Will be installed to run from the network. (Available only if the feature supports this option.)"
+msgstr "Kuya kufakwa ukuze kuqhube ukusuka kumsebenzi wothungelwano. (Kukho kuphela xa uphawu luxhasa oku kukhethwayo.)"
+
+#. CB9Ew
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_72\n"
+"LngText.text"
+msgid "OK"
+msgstr "Kulungile"
+
+#. JoCqE
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_73\n"
+"LngText.text"
+msgid "Will have some subfeatures installed to the local hard drive. (Available only if the feature has subfeatures.)"
+msgstr "Kuya kuba nezinye zeempawu ezonganyelweyo ezifakelwayo kwisikhululo salapha seqokobhe lekhompyutha. (Kukho kuphela xa uphawu luneempawu ezonganyelweyo.)"
+
+#. 8EqWR
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_84\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. 8ebDJ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_87\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. UiECK
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_88\n"
+"LngText.text"
+msgid "&Change..."
+msgstr "~Guqula..."
+
+#. Cb4MG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_89\n"
+"LngText.text"
+msgid "Click Next to install to this folder, or click Change to install to a different folder."
+msgstr ""
+
+#. WQfEU
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_90\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Destination Folder"
+msgstr ""
+
+#. RgRB4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_91\n"
+"LngText.text"
+msgid "[INSTALLDIR]"
+msgstr "[FAKA UVIMBA WEEFAYILI]"
+
+#. zuiHv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_92\n"
+"LngText.text"
+msgid "Install [ProductName] to:"
+msgstr ""
+
+#. v9tFT
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_93\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. ESR8Q
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_96\n"
+"LngText.text"
+msgid "The disk space required for the installation of the selected features."
+msgstr "Isithuba se-disk esifunekayo ukwenzela ukufakwa kweempawu ezikhethiweyo."
+
+#. Gb3dX
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_97\n"
+"LngText.text"
+msgid "The highlighted volumes do not have enough disk space available for the currently selected features. You can remove files from the highlighted volumes, choose to install less features onto local drives, or select different destination drives."
+msgstr ""
+
+#. 6sUCB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_98\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Disk Space Requirements"
+msgstr ""
+
+#. ZairS
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_100\n"
+"LngText.text"
+msgid "OK"
+msgstr "Kulungile"
+
+#. qU2qs
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_103\n"
+"LngText.text"
+msgid "Some files that need to be updated are currently in use."
+msgstr "Ezinye iifayili ezifuna ukuhlaziywa ukufikelela namhla ziyasetyenziswa okwangoku."
+
+#. A8Gkz
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_104\n"
+"LngText.text"
+msgid "The following applications are using files that need to be updated by this setup. Close these applications and click Retry to continue."
+msgstr "Iinkqubo ezilandelayo zisebenzisa iifayili ezifuna ukuhlaziywa ngalo mmiselo. Zivale ezi nkqubo uze unqomfe kuPhinda Uzame ukuze uqhube."
+
+#. Fr3kC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_105\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Files in Use"
+msgstr ""
+
+#. EjFBo
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_106\n"
+"LngText.text"
+msgid "&Exit"
+msgstr "&Phuma"
+
+#. 9dh9B
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_107\n"
+"LngText.text"
+msgid "&Ignore"
+msgstr "Musa ukuhoya"
+
+#. BLBA4
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_108\n"
+"LngText.text"
+msgid "&Retry"
+msgstr "~Zama kwakhona"
+
+#. hiJJD
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_111\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. eEEjF
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_113\n"
+"LngText.text"
+msgid "&Look in:"
+msgstr ""
+
+#. Buuv5
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_114\n"
+"LngText.text"
+msgid "Browse to the destination folder."
+msgstr "Qwalasela isiqulathi seefayili ekujoliswe kuso."
+
+#. CNjbv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_115\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Change Current Destination Folder"
+msgstr ""
+
+#. vQeGg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_117\n"
+"LngText.text"
+msgid "Create New Folder|"
+msgstr "Dala Isiqulathi Seefayili Esitsha|"
+
+#. mnAFC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_118\n"
+"LngText.text"
+msgid "OK"
+msgstr "Kulungile"
+
+#. SjgH9
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_120\n"
+"LngText.text"
+msgid "&Folder name:"
+msgstr "Igama l~esiqulathi seefayili"
+
+#. aDXFg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_121\n"
+"LngText.text"
+msgid "Up One Level|"
+msgstr "Nyuka Ngenqanaba Elinye|"
+
+#. iKCGV
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_122\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. Md3NN
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_123\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. sFyBK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_124\n"
+"LngText.text"
+msgid "Build contributed in collaboration with the community by [Manufacturer]. For credits, see: https://www.documentfoundation.org"
+msgstr ""
+
+#. tLGPm
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_125\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. GiosA
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_126\n"
+"LngText.text"
+msgid "{&DialogHeading}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. wJD2b
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_127\n"
+"LngText.text"
+msgid "The Installation Wizard will install [ProductName] on your computer. To continue, click Next."
+msgstr "Umthakathi Wokufaka uya kufaka i-[ProductName] ekhompyutheni yakho. Ukuze uqhube, nqomfa ku-Okulandelayo."
+
+#. 7ENF5
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_128\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. QpmsW
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_131\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. NXHtk
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_132\n"
+"LngText.text"
+msgid "Please read the following license agreement carefully."
+msgstr "Nceda funda imvumelwano elandelayo yelayisensi ngokuqaphela."
+
+#. bTxvE
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_133\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}License Agreement"
+msgstr ""
+
+#. VmMs5
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_134\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. u4kep
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_135\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. QdNDB
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_138\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. DjCGz
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_139\n"
+"LngText.text"
+msgid "Modify, repair, or remove the program."
+msgstr "Hlenga-hlengisa, khanda, okanye susa inkqubo."
+
+#. d7dZD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_140\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Program Maintenance"
+msgstr ""
+
+#. w9y7B
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_141\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. nxx6Q
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_143\n"
+"LngText.text"
+msgid "Change which program features are installed. This option displays the Custom Selection dialog in which you can change the way features are installed."
+msgstr "Tshintsha naziphi iimpawu zenkqubo ezifakiweyo. Oku kukhethwayo kubonisa ingxoxo Yokukhetha Ukulungiselela apho unokutshintsha khona indlela ezifakwa ngayo iimpawu."
+
+#. asaNV
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_144\n"
+"LngText.text"
+msgid "Repair installation errors in the program. This option fixes missing or corrupt files, shortcuts, and registry entries."
+msgstr "Khanda iimposiso zokufaka kwinkqubo. Oku kukhethwayo kulungisa iifayili ezilahlekileyo okanye ezonakalisayo, iindlela ezinqumlayo, namangeniso ezisele."
+
+#. wqLBv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_145\n"
+"LngText.text"
+msgid "Remove [ProductName] from your computer."
+msgstr "Susa i-[ProductName] kwikhompyutha yakho."
+
+#. qCuEL
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_146\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. k5Zb8
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_147\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. CoQtN
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_148\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. 8goFR
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_149\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. A8B4y
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_150\n"
+"LngText.text"
+msgid "The Installation Wizard will allow you to modify, repair, or remove [ProductName]. To continue, click Next."
+msgstr "Umthakathi Wokufaka uya kukuvumela ukuhlenga-hlengisa, ukukhanda, okanye ukususa i-[ProductName]. Ukuze uqhube, nqomfa Okulandelayo."
+
+#. HFHZY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_153\n"
+"LngText.text"
+msgid "Disk space required for the installation exceeds available disk space."
+msgstr "Kufuneka isithuba kwi-disk kuba okufakwayo kungaphezulu kwisithuba se-disk esikhoyo."
+
+#. 6HE5N
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_154\n"
+"LngText.text"
+msgid "The highlighted volumes do not have enough disk space available for the currently selected features. You can remove files from the highlighted volumes, choose to install less features onto local drives, or select different destination drives."
+msgstr ""
+
+#. kJvPh
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_155\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Out of Disk Space"
+msgstr ""
+
+#. 4BEms
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_156\n"
+"LngText.text"
+msgid "{120}{70}{70}{70}{70}"
+msgstr "{120}{70}{70}{70}{70}"
+
+#. vEdLD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_157\n"
+"LngText.text"
+msgid "OK"
+msgstr "Kulungile"
+
+#. DeVCK
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_158\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. LPhBF
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_159\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. BpG2B
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_160\n"
+"LngText.text"
+msgid "&Update >"
+msgstr "&Ukuhlaziya ngokutsha >"
+
+#. 5Gm46
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_161\n"
+"LngText.text"
+msgid "{&DialogHeading}Welcome to the Patch for [ProductName]"
+msgstr ""
+
+#. wFLhj
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_162\n"
+"LngText.text"
+msgid "The Installation Wizard will install the Patch for [ProductName] on your computer. To continue, click Update."
+msgstr "Umthakathi Wokufaka uza kufaka iPetshi ukwenzela  i-[ProductName] ekhompyutheni yakho. Ukuze uqhube, nqomfa kuHlaziya Ngokutsha."
+
+#. RWU5F
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_163\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. F8CCC
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_166\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. vMkh5
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_167\n"
+"LngText.text"
+msgid "The wizard is ready to begin installation."
+msgstr "Umthakathi ulungele ukuqalisa ukufaka."
+
+#. XDfGL
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_168\n"
+"LngText.text"
+msgid "Click Install to begin the installation."
+msgstr "Nqomfa ku-Faka ukuze uqalise ukufaka."
+
+#. BxJmA
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_169\n"
+"LngText.text"
+msgid "If you want to review or change any of your installation settings, click Back. Click Cancel to exit the wizard."
+msgstr "Ukuba ufuna ukuphengulula okanye ukutshintsha nayiphi imimiselo yokufaka kwakho, nqomfa u-Emva. Nqomfa u-Rhoxisa ukuze uphume kumthakathi."
+
+#. tGr9B
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_170\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Ready to Modify the Program"
+msgstr ""
+
+#. a9B5F
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_171\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Ready to Repair the Program"
+msgstr ""
+
+#. 9e9VQ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_172\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Ready to Install the Program"
+msgstr ""
+
+#. y8BGp
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_173\n"
+"LngText.text"
+msgid "&Install"
+msgstr ""
+
+#. ExMxM
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_174\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. dfBGp
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_177\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. C6u3A
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_178\n"
+"LngText.text"
+msgid "You have chosen to remove the program from your system."
+msgstr "Ukhethe ukususa inkqubo kwisixokelelwano sakho."
+
+#. FxWU4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_179\n"
+"LngText.text"
+msgid "Click Remove to remove [ProductName] from your computer. After removal, this program will no longer be available for use."
+msgstr "Nqomfa kuSusa ukuze ususe i-[ProductName] ekhompyutheni yakho. Emva kokuyisusa, le nkqubo ayisayi kubakho kwakhona ukwenzela ukusetyenziswa."
+
+#. 8DNv6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_180\n"
+"LngText.text"
+msgid "If you want to review or change any settings, click Back."
+msgstr "Ukuba ufuna ukuphengulula okanye ukutshintsha nayiphi imimiselo, nqomfa ku-Emva."
+
+#. DgUgU
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_181\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Remove the Program"
+msgstr ""
+
+#. x4Thh
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_182\n"
+"LngText.text"
+msgid "&Remove"
+msgstr "&Susa"
+
+#. nQEWg
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_183\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. fEhDQ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_184\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. eZgPN
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_185\n"
+"LngText.text"
+msgid "&Finish"
+msgstr "Kugqityiwe"
+
+#. LGBn9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_186\n"
+"LngText.text"
+msgid "Your system has not been modified. To complete installation at another time, please run setup again."
+msgstr "Isixokelelwano sakho asihlenga-hlengiswanga. Ukuze ugqibe ukufaka ngelinye ixesha, nceda qhuba ummiselo kwakhona."
+
+#. 6eqB6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_187\n"
+"LngText.text"
+msgid "Click Finish to exit the wizard."
+msgstr ""
+
+#. qvUER
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_188\n"
+"LngText.text"
+msgid "You can either keep any existing installed elements on your system to continue this installation at a later time or you can restore your system to its original state prior to the installation."
+msgstr ""
+
+#. tCBSv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_189\n"
+"LngText.text"
+msgid "Click Restore or Continue Later to exit the wizard."
+msgstr ""
+
+#. EFyDT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_190\n"
+"LngText.text"
+msgid "{&DialogHeading}Installation Wizard Completed"
+msgstr ""
+
+#. 3yQtG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_191\n"
+"LngText.text"
+msgid "The wizard was interrupted before [ProductName] could be completely installed."
+msgstr ""
+
+#. fqKzK
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_192\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. 6A92U
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_193\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. eZD7L
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_197\n"
+"LngText.text"
+msgid "&Finish"
+msgstr "Kugqityiwe"
+
+#. QGZLT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_198\n"
+"LngText.text"
+msgid "{&DialogHeading}Installation Wizard Completed"
+msgstr ""
+
+#. HXdXy
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_199\n"
+"LngText.text"
+msgid "The Installation Wizard has successfully installed [ProductName]. Click Finish to exit the wizard."
+msgstr "Umthakathi Wokufaka uyifake ngempumelelo i-[ProductName]. Nqomfa kuKugqityiwe ukuze ukhuphe umthakathi."
+
+#. jYN9T
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_200\n"
+"LngText.text"
+msgid "The Installation Wizard has successfully uninstalled [ProductName]. Click Finish to exit the wizard."
+msgstr "Umthakathi Wokufaka uphumelele ukungayifaki i-[ProductName]. Nqomfa kuKugqityiwe ukuze ukhuphe umthakathi."
+
+#. bL7cn
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_204\n"
+"LngText.text"
+msgid "&Abort"
+msgstr "&Lahla"
+
+#. EEzac
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_205\n"
+"LngText.text"
+msgid "&Cancel"
+msgstr "&Rhoxisa"
+
+#. D6Bgs
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_207\n"
+"LngText.text"
+msgid "&Ignore"
+msgstr "Musa ukuhoya"
+
+#. n8Dw2
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_208\n"
+"LngText.text"
+msgid "&No"
+msgstr ""
+
+#. 5gmJX
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_209\n"
+"LngText.text"
+msgid "&OK"
+msgstr "&Kulungile"
+
+#. wQfcS
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_210\n"
+"LngText.text"
+msgid "&Retry"
+msgstr "~Zama kwakhona"
+
+#. DNgah
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_211\n"
+"LngText.text"
+msgid "&Yes"
+msgstr "Ewe"
+
+#. nq9vM
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_214\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. 7RMTN
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_215\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. ogHGJ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_216\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. AKDNL
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_217\n"
+"LngText.text"
+msgid "{&DialogHeading}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. GYEbK
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_218\n"
+"LngText.text"
+msgid "[ProductName] Setup is preparing the Installation Wizard which will guide you through the program setup process. Please wait."
+msgstr "Ukumiselwa kwe-[ProductName] kulungisa Umthakathi Wokufaka oya kukukhokela kuko konke ukuqhutywa kwenkqubo yokumisela. Nceda linda."
+
+#. ryhy8
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_219\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. khupb
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_220\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. ZEGaj
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_221\n"
+"LngText.text"
+msgid "&Finish"
+msgstr "Kugqityiwe"
+
+#. SrinA
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_222\n"
+"LngText.text"
+msgid "Your system has not been modified. To install this program at a later time, please run the installation again."
+msgstr "Isixokelelwano sakho asihlenga-hlengiswanga. Ukuze uyifake le nkqubo kwixesha lamva, nceda qhuba ugxumeko kwakhona."
+
+#. YUipC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_223\n"
+"LngText.text"
+msgid "Click Finish to exit the wizard."
+msgstr ""
+
+#. DnpKK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_224\n"
+"LngText.text"
+msgid "You can either keep any existing installed elements on your system to continue this installation at a later time or you can restore your system to its original state prior to the installation."
+msgstr ""
+
+#. GwDLG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_225\n"
+"LngText.text"
+msgid "Click Restore or Continue Later to exit the wizard."
+msgstr ""
+
+#. bV4co
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_226\n"
+"LngText.text"
+msgid "{&DialogHeading}Installation Wizard Completed"
+msgstr ""
+
+#. fCUfv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_227\n"
+"LngText.text"
+msgid "The wizard was interrupted before [ProductName] could be completely installed."
+msgstr ""
+
+#. CAs7p
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_228\n"
+"LngText.text"
+msgid "Progress done"
+msgstr "Ikho inkqubela eyenziweyo"
+
+#. nqDdG
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_230\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. TqEAe
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_233\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. DaXgT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_234\n"
+"LngText.text"
+msgid "The program features you selected are being installed."
+msgstr "Iimpawu zenkqubo ozikhethileyo ziyafakwa."
+
+#. S2Nsa
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_235\n"
+"LngText.text"
+msgid "The program features you selected are being uninstalled."
+msgstr "Iimpawu zenkqubo ozikhethileyo azifakwa."
+
+#. 93Mgi
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_236\n"
+"LngText.text"
+msgid "Please wait while the Installation Wizard installs [ProductName]. This may take several minutes."
+msgstr "Nceda linda lo gama Umthakathi Wokufaka efaka i-[ProductName]. Oku kusenokuthabatha imizuzu eliqela."
+
+#. UEXDT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_237\n"
+"LngText.text"
+msgid "Please wait while the Installation Wizard uninstalls [ProductName]. This may take several minutes."
+msgstr "Nceda linda lo gama Umthakathi Wokufaka engayifaki i-[ProductName]. Oku kusenokuthabatha imizuzu eliqela."
+
+#. nPNkd
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_238\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Installing [ProductName]"
+msgstr ""
+
+#. hwEMZ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_239\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Uninstalling [ProductName]"
+msgstr ""
+
+#. XuEFu
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_240\n"
+"LngText.text"
+msgid "Sec."
+msgstr "Imizuzwana"
+
+#. yevqc
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_241\n"
+"LngText.text"
+msgid "Status:"
+msgstr "Isimo:"
+
+#. SGeR9
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_242\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. oBDGq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_244\n"
+"LngText.text"
+msgid "Estimated time remaining:"
+msgstr "Ixesha eliqikelelwayo eliseleyo:"
+
+#. cDaEJ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_245\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. pkkrD
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_246\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. dFqxM
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_247\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. nFwFq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_248\n"
+"LngText.text"
+msgid "The Installation Wizard will complete the installation of [ProductName] on your computer. To continue, click Next."
+msgstr "Umthakathi Wokufaka uya kugqibezela ukufakwa kwe-[ProductName] ekhompyutheni yakho. Ukuze uqhube, nqomfa u-Okulandelayo."
+
+#. sGq9T
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_249\n"
+"LngText.text"
+msgid "The Installation Wizard will complete the suspended installation of [ProductName] on your computer. To continue, click Next."
+msgstr "Umthakathi Wokufaka uya kugqibezela ukufaka okuxhonyiweyo kwe-[ProductName] ekhompyutheni yakho. Ukuze uqhube, nqomfa ku-Okulandelayo."
+
+#. mff5H
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_250\n"
+"LngText.text"
+msgid "{&DialogHeading}Resuming the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. ryZBv
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_251\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. mh4Pd
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_254\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. FeYpb
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_255\n"
+"LngText.text"
+msgid "[ProductName] will be installed with the default components, including user interface languages and spelling dictionaries matching your current language settings."
+msgstr ""
+
+#. LWzoJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_256\n"
+"LngText.text"
+msgid "Choose which program features you want installed and where they will be installed. For example you can select user interface languages and spelling dictionaries."
+msgstr ""
+
+#. jcXxh
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_257\n"
+"LngText.text"
+msgid "Choose the setup type that best suits your needs."
+msgstr "Khetha isimbo sokumisela esizifanele kangangoko iimfuno zakho."
+
+#. kjm6y
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_258\n"
+"LngText.text"
+msgid "Please select a setup type."
+msgstr "Nceda khetha isimbo sokumisela."
+
+#. Gy4EE
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_259\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Setup Type"
+msgstr ""
+
+#. kv6GZ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_260\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. mXLvW
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_262\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< ~Emva"
+
+#. v4dTZ
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_265\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. SGa96
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_266\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "~Okulandelayo >"
+
+#. FDmsJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_269\n"
+"LngText.text"
+msgid "Repair or remove the program."
+msgstr "Khanda okanye susa inkqubo."
+
+#. d8DqG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_270\n"
+"LngText.text"
+msgid "&Microsoft Word Documents"
+msgstr "&Amaxwebhu e-Microsoft Word"
+
+#. 3XAYG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_271\n"
+"LngText.text"
+msgid "Microsoft &Excel Spreadsheets"
+msgstr "Ulungiselelo lweeseli ze-Microsoft &Excel"
+
+#. 5hGB9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_272\n"
+"LngText.text"
+msgid "Microsoft Po&werPoint Presentations"
+msgstr "Iingcaciso-miboniso ye-Microsoft Po&werPoint"
+
+#. pRq2A
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_273\n"
+"LngText.text"
+msgid "Microsoft &Visio Documents"
+msgstr ""
+
+#. EdtKg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_274\n"
+"LngText.text"
+msgid "Set [DEFINEDPRODUCT] to be the default application for Microsoft Office file types."
+msgstr ""
+
+#. BYWZ6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_275\n"
+"LngText.text"
+msgid "[ProductName] can be set as the default application to open Microsoft Office file types. This means, for instance, that if you double click on one of these files, [ProductName] will open it, not the program that opens it now."
+msgstr ""
+
+#. xMzmY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_278\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}File Type"
+msgstr ""
+
+#. gjEzM
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_300\n"
+"LngText.text"
+msgid "A version of [DEFINEDPRODUCT] [DEFINEDVERSION] was found by the [ProductName] Installation Wizard. This version will be updated."
+msgstr "Uguqulelo lwe- [DEFINEDPRODUCT] [DEFINEDVERSION] lufunyenwe Ngumncedi Wokuhlohla we-[ProductName]. Olu guqulelo luya kuhlaziywa."
+
+#. Dc9GW
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_301\n"
+"LngText.text"
+msgid "The destination folder specified below does not contain a [DEFINEDPRODUCT] [DEFINEDVERSION] version."
+msgstr "Isiqulathi seefayili ekujoliswe kuso nesixelwe ngezantsi asiqulethanga guqulelo lwe-[DEFINEDPRODUCT] [DEFINEDVERSION]."
+
+#. Kv9ED
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_302\n"
+"LngText.text"
+msgid "A newer [DEFINEDPRODUCT] [DEFINEDVERSION] has been found."
+msgstr "I-[DEFINEDPRODUCT] [DEFINEDVERSION] entsha kuneyesiqhelo ifunyenwe."
+
+#. F5CbH
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_303\n"
+"LngText.text"
+msgid "The version specified in the folder below cannot be updated."
+msgstr "Uguqulelo oluxelwe kwisiqulathi seefayili alukwazi kuhlaziywa."
+
+#. 5B3xC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_304\n"
+"LngText.text"
+msgid "Check the destination folder."
+msgstr "Qwalasela isiqulathi seefayili ekujoliswe kuso."
+
+#. 5VLAA
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_305\n"
+"LngText.text"
+msgid "To continue, click Next."
+msgstr "Ukuze uqhube, nqomfa "
+
+#. E5kBg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_306\n"
+"LngText.text"
+msgid "To select a different version, click Change. Otherwise click Cancel to abort the Installation Wizard."
+msgstr ""
+
+#. LFZCF
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_307\n"
+"LngText.text"
+msgid "To select a different folder, click Change."
+msgstr "Ukuze ukhethe isiqulathi seefayili esahlukileyo, nqomfa "
+
+#. VganB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_308\n"
+"LngText.text"
+msgid "Install [ProductName] to:"
+msgstr ""
+
+#. PmFh2
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_309\n"
+"LngText.text"
+msgid "If you are just trying out [ProductName], you probably don't want this to happen, so leave the boxes unchecked."
+msgstr ""
+
+#. R6e9P
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_317\n"
+"LngText.text"
+msgid "No languages have been selected for installation. Click OK, then select one or more languages for installation."
+msgstr ""
+
+#. D6uEq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_318\n"
+"LngText.text"
+msgid "No applications have been selected for installation. Click OK, then select one or more applications for installation."
+msgstr ""
+
+#. QEN5N
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_319\n"
+"LngText.text"
+msgid "Create a shortcut on desktop"
+msgstr ""
+
+#. cjkES
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_321\n"
+"LngText.text"
+msgid "Load [ProductName] during system start-up"
+msgstr ""
+
+#. BCN8y
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_322\n"
+"LngText.text"
+msgid "Some files that need to be updated are currently in use."
+msgstr "Ezinye iifayili ezifuna ukuhlaziywa ukufikelela namhla ziyasetyenziswa okwangoku."
+
+#. t27nK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_323\n"
+"LngText.text"
+msgid "The following applications are using files that need to be updated by this setup. You can let Installation Wizard close them and attempt to restart them, or reboot the system later to complete the setup."
+msgstr ""
+
+#. qDAnG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_324\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Files in Use"
+msgstr ""
+
+#. giWW4
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_325\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "&Rhoxisa"
+
+#. QE6Bs
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_326\n"
+"LngText.text"
+msgid "OK"
+msgstr "Kulungile"
+
+#. hRCs9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_327\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Attention!"
+msgstr ""
+
+#. 5eE5R
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_328\n"
+"LngText.text"
+msgid "The [ProductName] Help must be installed in the same directory as the program."
+msgstr ""
+
+#. jeyr7
+#: CustomAc.ulf
+msgctxt ""
+"CustomAc.ulf\n"
+"OOO_CUSTOMACTION_1\n"
+"LngText.text"
+msgid "A newer version of [ProductName] was found. To install an older version, the newer version needs to be removed first."
+msgstr "Kufunyenwe uguqulelo olutsha kunolwesiqhelo lwe-[ProductName]. Ukuze kuhlohlwe uguqulelo oludala, makushenxiswe kuqala uguqulelo olutsha kunolwesiqhelo."
+
+#. SjyhM
+#: CustomAc.ulf
+msgctxt ""
+"CustomAc.ulf\n"
+"OOO_CUSTOMACTION_2\n"
+"LngText.text"
+msgid "The same version of this product is already installed."
+msgstr "Sekuhlohlwe kwalona uguqulelo lwale mveliso."
+
+#. xCCKB
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_1\n"
+"LngText.text"
+msgid "{{Fatal error: }}"
+msgstr "{{Imposiso ebulalayo: }}"
+
+#. 9XH6r
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_2\n"
+"LngText.text"
+msgid "Error [1]."
+msgstr "Imposiso [1]."
+
+#. z5Dfb
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_3\n"
+"LngText.text"
+msgid "Warning [1]."
+msgstr "Isilumkiso [1]."
+
+#. UpPzE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_4\n"
+"LngText.text"
+msgid "Info [1]."
+msgstr "Ulwazi [1]."
+
+#. zJDLP
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_5\n"
+"LngText.text"
+msgid "Internal Error [1]. [2]{, [3]}{, [4]}"
+msgstr "Imposiso Yangaphakathi [1]. [2]{, [3]}{, [4]}"
+
+#. WabjJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_6\n"
+"LngText.text"
+msgid "{{Disk full: }}"
+msgstr "{{Izele i-disk: }}"
+
+#. CGr6b
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_7\n"
+"LngText.text"
+msgid "Action [Time]: [1]. [2]"
+msgstr "Inyathelo [Ixesha]: [1]. [2]"
+
+#. 9YYAk
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_8\n"
+"LngText.text"
+msgid "[ProductName]"
+msgstr "I-[ProductName]"
+
+#. rtN8R
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_9\n"
+"LngText.text"
+msgid "{[2]}{, [3]}{, [4]}"
+msgstr "{[2]}{, [3]}{, [4]}"
+
+#. myEAA
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_10\n"
+"LngText.text"
+msgid "Message type: [1], Argument: [2]"
+msgstr "Isimbo somyalezo: [1], Isiphumezi semiyalelo: [2]"
+
+#. uhHpF
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_11\n"
+"LngText.text"
+msgid "=== Logging started: [Date]  [Time] ==="
+msgstr "=== Ukungena kuqalisile: [Date]  [Time] ==="
+
+#. KmRsd
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_12\n"
+"LngText.text"
+msgid "=== Logging stopped: [Date]  [Time] ==="
+msgstr "=== Ukungena kunqunyanyisiwe: [Date]  [Time] ==="
+
+#. FjrMW
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_13\n"
+"LngText.text"
+msgid "Action start [Time]: [1]."
+msgstr "Ukuqaliswa kwenyathelo [Ixesha]: [1]."
+
+#. 5EEUh
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_14\n"
+"LngText.text"
+msgid "Action ended [Time]: [1]. Return value [2]."
+msgstr "Inyathelo liphelile [Time]: [1]. Ixabiso lokubuyela [2]."
+
+#. hJFdr
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_15\n"
+"LngText.text"
+msgid "Time remaining: {[1] minutes }{[2] seconds}"
+msgstr "Ixesha eliseleyo: {[1] imizuzu }{[2] imizuzwana}"
+
+#. MVEGn
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_16\n"
+"LngText.text"
+msgid "Out of memory. Shut down other applications before retrying."
+msgstr ""
+
+#. zFmaa
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_17\n"
+"LngText.text"
+msgid "Installer is no longer responding."
+msgstr "Umfaki akasaphenduli."
+
+#. sTwJ2
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_18\n"
+"LngText.text"
+msgid "Installer terminated prematurely."
+msgstr "Umfaki uyekiswe phambi kwexesha."
+
+#. ucF5A
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_19\n"
+"LngText.text"
+msgid "Please wait while Windows configures [ProductName]"
+msgstr "Nceda linda lo gama i-Windows ibumba i-[ProductName]"
+
+#. bzY5o
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_20\n"
+"LngText.text"
+msgid "Gathering required information..."
+msgstr "Kuqokelelwa ulwazi olufunekayo..."
+
+#. 5Fs2g
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_21\n"
+"LngText.text"
+msgid "Removing older versions of this application"
+msgstr "Kususwa iinguqulelo ezindala zale nkqubo"
+
+#. USAge
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_22\n"
+"LngText.text"
+msgid "Preparing to remove older versions of this application"
+msgstr "Kulungiselelwa ukususa iinguqulelo ezindala zale nkqubo"
+
+#. gnzzz
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_23\n"
+"LngText.text"
+msgid "{[ProductName] }Setup completed successfully."
+msgstr "Ukumiselwa {kwe-[ProductName] }kugqitywe ngempumelelo."
+
+#. 5BrkY
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_24\n"
+"LngText.text"
+msgid "{[ProductName] }Setup failed."
+msgstr "Ukumiselwa {kwe-[ProductName] } akuphumelelanga."
+
+#. yCcM6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_25\n"
+"LngText.text"
+msgid "Error reading from file: [2]. {{ System error [3].}}  Verify that the file exists and that you can access it."
+msgstr "Ukufundeka kwemposiso evela efayilini: [2]. {{ Imposiso yesixokelelwano [3].}}  Qinisekisa ukuba ifayili yinto ekhoyo kwaye unako ukufikelela kuyo."
+
+#. 68Tuw
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_26\n"
+"LngText.text"
+msgid "Cannot create the file [3].  A directory with this name already exists.  Cancel the installation and try installing to a different location."
+msgstr "Ifayili ayidaleki [3]. Uvimba weefayili onegama elileli selekhona. Rhoxisa ugxumeko uze uzame ukufaka kwindawo eyiyenye."
+
+#. azxrB
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_27\n"
+"LngText.text"
+msgid "Please insert the disk: [2]"
+msgstr "Nceda faka i-disk: [2]"
+
+#. EUfwF
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_28\n"
+"LngText.text"
+msgid "The installer has insufficient privileges to access this directory: [2].  The installation cannot continue.  Log on as an administrator or contact your system administrator."
+msgstr "Umfaki unamalungelo anganelanga okufikelela kulo vimba weefayili: [2]. Ukugxumeka akunakuqhuba. Ngena njengomlawuli okanye zidibanise nomlawuli wakho wesixokelelwano."
+
+#. FBYxG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_29\n"
+"LngText.text"
+msgid "Error writing to file [2].  Verify that you have access to that directory."
+msgstr "Ukubhaleka kwefayili okunemposiso [2].  Qinisekisa ukuba unako ukufikelela kuloo vimba weefayili."
+
+#. UbSyL
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_30\n"
+"LngText.text"
+msgid "Error reading from file [2].  Verify that the file exists and that you can access it."
+msgstr "Ukufundeka kwefayili okunemposiso [2]. Qinisekisa ukuba ifayili leyo yinto ekhoyo nokuba unako ukufikelela kuyo."
+
+#. AB6YZ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_31\n"
+"LngText.text"
+msgid "Another application has exclusive access to the file [2].  Please shut down all other applications, then click Retry."
+msgstr "Enye inkqubo inofikeleleko lwefayili  lwabakhethekileyo [2]. Nceda vala zonke ezinye iinkqubo, wandule ukunqomfa u-Phinda uzame."
+
+#. cBCXk
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_32\n"
+"LngText.text"
+msgid "There is not enough disk space to install the file [2].  Free some disk space and click Retry, or click Cancel to exit."
+msgstr "Akukho sithuba saneleyo kwi-disk sokufaka ifayili [2]. Khulula isithuba esithile kwi-disk wandule ukunqomfa u-Phinda uzame, okanye unqomfe u-Rhoxisa ukuze uphume."
+
+#. BTono
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_33\n"
+"LngText.text"
+msgid "Source file not found: [2].  Verify that the file exists and that you can access it."
+msgstr "Ifayili eyintsusa ayifunyanwanga: [2]. Qinisekisa ukuba ifayili le yinto ekhoyo kwaye unako ukufikelela kuyo."
+
+#. eTECb
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_34\n"
+"LngText.text"
+msgid "Error reading from file: [3]. {{ System error [2].}}  Verify that the file exists and that you can access it."
+msgstr "Ukufundeka kwefayili okunemposiso: [3]. {{ Imposiso yesixokelelwano [2].}} Qinisekisa ukuba ifayili le yinto ekhoyo kwaye unako ukufikelela kuyo."
+
+#. eHTZD
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_35\n"
+"LngText.text"
+msgid "Error writing to file: [3]. {{ System error [2].}}  Verify that you have access to that directory."
+msgstr "Ukubhaleka kwefayili okunemposiso: [3]. {{Imposiso yesixokelelwano [2].}} Qinisekisa ukuba unako ukufikelela kuloo vimba weefayili."
+
+#. f7AGu
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_36\n"
+"LngText.text"
+msgid "Source file not found{{(cabinet)}}: [2].  Verify that the file exists and that you can access it."
+msgstr "Ifayili eyintsusa ayifunyanwanga{{(okuthe phuhlu)}}: [2].  Qinisekisa ukuba ifayili leyo yinto ekhoyo kwaye unako ukufikelela kuyo."
+
+#. rdcGb
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_37\n"
+"LngText.text"
+msgid "Cannot create the directory [2].  A file with this name already exists.  Please rename or remove the file and click Retry, or click Cancel to exit."
+msgstr "Uvimba weefayili awudaleki [2]. Ifayili eneligama seyikhona. Nceda phinda unike elinye igama okanye susa ifayili uze unqomfe u-Phinda uzame, okanye nqomfa u-Rhoxisa ukuze uphume."
+
+#. oCgqE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_38\n"
+"LngText.text"
+msgid "The volume [2] is currently unavailable.  Please select another."
+msgstr "Umthamo [2] awukho okwangoku. Nceda khetha omnye."
+
+#. p8BUw
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_39\n"
+"LngText.text"
+msgid "The specified path [2] is unavailable."
+msgstr "Indlela yothungelwana exeliweyo [2] ayikho."
+
+#. WRSZ8
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_40\n"
+"LngText.text"
+msgid "Unable to write to the specified folder [2]."
+msgstr "Akukwazeki ukubhalela isiqulathi seefayili esixeliweyo [2]."
+
+#. bcJXd
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_41\n"
+"LngText.text"
+msgid "A network error occurred while attempting to read from the file [2]"
+msgstr "Kwenzeke imposiso yothungelwano xa bekuzanywa ukufunda okusefayilini [2]"
+
+#. LEUou
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_42\n"
+"LngText.text"
+msgid "An error occurred while attempting to create the directory [2]"
+msgstr "Kwenzeke imposiso xa bekuzanywa ukudala uvimba weefayili [2]"
+
+#. r7jLo
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_43\n"
+"LngText.text"
+msgid "A network error occurred while attempting to create the directory [2]"
+msgstr "Kwenzeke imposiso yomsebenzi wothungelwano xa bekuzanywa ukudala uvimba weefayili [2]"
+
+#. stYdV
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_44\n"
+"LngText.text"
+msgid "A network error occurred while attempting to open the source file cabinet [2]."
+msgstr "Kwenzeke imposiso xa bekuzanywa ukuvula okuthe phuhlu kwefayili eyintsusa [2]."
+
+#. usiDM
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_45\n"
+"LngText.text"
+msgid "The specified path is too long [2]."
+msgstr "Indlela yothungelwano exeliweyo inde kakhulu [2]."
+
+#. p5MdE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_46\n"
+"LngText.text"
+msgid "The Installer has insufficient privileges to modify the file [2]."
+msgstr "Umgxumeki unamalungelo anganelanga okuhlenga-hlengisa ifayili [2]."
+
+#. V5Kzx
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_47\n"
+"LngText.text"
+msgid "A portion of the path [2] exceeds the length allowed by the system."
+msgstr "Inxalenye yendlela yothungelwano [2] yogqitha ubude obuvumeleke kwisixokelelwano."
+
+#. aXaGC
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_48\n"
+"LngText.text"
+msgid "The path [2] contains words that are not valid in folders."
+msgstr "Indlela yothungelwano [2] iqulethe amagama angasebenziyo kwiziqulathi zeefayili."
+
+#. sWX9V
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_49\n"
+"LngText.text"
+msgid "The path [2] contains an invalid character."
+msgstr "Indlela yothungelwano [2] iqulethe umbhalo onjengonobumba ongasebenziyo."
+
+#. tGkEp
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_50\n"
+"LngText.text"
+msgid "[2] is not a valid short file name."
+msgstr "U-[2] akalogama elishunqulelweyo nelisebenzayo lefayili."
+
+#. ZHAnX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_51\n"
+"LngText.text"
+msgid "Error getting file security: [3] GetLastError: [2]"
+msgstr "Ukhuselo lwefayili yokufumana imposiso: [3] GetLastError: [2]"
+
+#. JFako
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_52\n"
+"LngText.text"
+msgid "Invalid Drive: [2]"
+msgstr "Isikhululo Esingasebenziyo: [2]"
+
+#. KrRDX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_53\n"
+"LngText.text"
+msgid "Error applying patch to file [2].  It has probably been updated by other means, and can no longer be modified by this patch.  For more information contact your patch vendor.  {{System Error: [3]}}"
+msgstr "Imposiso esebenzisa ipetshi kwifayili [2]. Mhlawumbi seyihlaziywe ngokutsha ngezinye iindlela, kwaye ayisakwazi kuphinda ihlenga-hlengiswe yile petshi. Ngolwazi oluthe chatha zidibanise nomthengisi weepetshi.  {{Imposiso Yesixokelelwano: [3]}}"
+
+#. 5A7BV
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_54\n"
+"LngText.text"
+msgid "Could not create key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Alikwazanga kudaleka iqhosha [2].  {{Imposiso yesixokelelwano [3].}} Qinisekisa ukuba unofikeleleko olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa bakho benkxaso."
+
+#. JZi8n
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_55\n"
+"LngText.text"
+msgid "Could not open key: [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Alikwazanga kuvuleka iqhosha: [2].  {{Imposiso yesixokelelwano [3].}} Qinisekisa ukuba unofikeleleko olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa bakho benkxaso."
+
+#. eAhfo
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_56\n"
+"LngText.text"
+msgid "Could not delete value [2] from key [3]. {{ System error [4].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Ixabiso alikwazanga kucinywa [2] eqhosheni [3].  {{ Imposiso yesixokelelwano [4].}}  Qinisekisa ukuba unofikeleleko olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa bakho benkxaso."
+
+#. Mgice
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_57\n"
+"LngText.text"
+msgid "Could not delete key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Iqhosha alikwazanga kucinywa [2]. {{ Imposiso yesixokelelwano [3].}}  Qinisekisa ukuba unofikeleleko olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa bakho benkxaso."
+
+#. e8pbi
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_58\n"
+"LngText.text"
+msgid "Could not read value [2] from key [3]. {{ System error [4].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Ixabiso alikwazanga kufundwa [2] eqhosheni [3]. {{ Imposiso yesixokelelwano [4].}}  Qinisekisa ukuba unofikelelo olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa bakho benkxaso."
+
+#. rAGhL
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_59\n"
+"LngText.text"
+msgid "Could not write value [2] to key [3]. {{ System error [4].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Ixabiso alikwazanga kubhalekeka [2] eqhosheni [3].  {{ Imposiso yesixokelelwano [4].}}  Qinisekisa ukuba unofikeleleko olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa benkxaso."
+
+#. AfbrT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_60\n"
+"LngText.text"
+msgid "Could not get value names for key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Amagama amaxabiso eqhosha [2] akafunyanwanga. {{ Imposiso yesixokelelwano [3].}}  Qinisekisa ukuba unofikeleleko olwaneleyo eqhosheni, okanye zidibanise nabaqeshwa bakho benkxaso."
+
+#. Hm5Sz
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_61\n"
+"LngText.text"
+msgid "Could not get sub key names for key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Amagama amaqhosha awonganyelweyo akafunyanwanga ukwenzela iqhosha [2]. {{ Imposiso yesixokelelwano [3].}}  Qinisekisa ukuba unofikeleleko olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa bakho benkxao. okanye zidibanise nabaqeshwa bakho benkaso."
+
+#. tcEko
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_62\n"
+"LngText.text"
+msgid "Could not read security information for key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Ulwazi ngokhuseleko alukwazanga kufundwa ukwenzela iqhosha [2]. {{ Imposiso yesixokelelwano [3].}}  Qinisekisa ukuba unofikeleleko olwaneleyo kwelo qhosha, okanye zidibanise nabaqeshwa bakho benkxaso."
+
+#. AVTnB
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_63\n"
+"LngText.text"
+msgid "Could not increase the available registry space. [2] KB of free registry space is required for the installation of this application."
+msgstr "Asikwazanga kwandiseka isithuba sesisele esikhoyo. Kufuneka i-[2] KB yesithuba esikhululekileyo sesisele ukuze kufakwe le nkqubo."
+
+#. yjQqT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_64\n"
+"LngText.text"
+msgid "Another installation is in progress. You must complete that installation before continuing this one."
+msgstr "Olunye ugxumeko luyaqhutywa. Kufuneka ugqibe olo gxumeko phambi kokuqhuba ngolu."
+
+#. sDFYT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_65\n"
+"LngText.text"
+msgid "Error accessing secured data. Please make sure the Windows Installer is configured properly and try the installation again."
+msgstr "Iinkcukacha zokhuselo zokuvavanya imposiso. Nceda qiniseka ukuba Umgxumeki we-Windows ubumbeke kakuhle wandule ukukuzama ukufaka kwakhona."
+
+#. 5AEAp
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_66\n"
+"LngText.text"
+msgid "User [2] has previously initiated an installation for product [3].  That user will need to run that installation again before using that product.  Your current installation will now continue."
+msgstr "Umsebenzisi [2] selendulule kwangaphambili ugxumeko lwemveliso [3]. Loo msebenzisi kuya kufuneka ukuba aqhube ugxumeko kwakhona phambi kokusebenzisa loo mveliso. Ugxumeko lwakho lwangoku luza kuqhuba ngoku."
+
+#. jsFda
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_67\n"
+"LngText.text"
+msgid "User [2] has previously initiated an installation for product [3].  That user will need to run that installation again before using that product."
+msgstr "Umsebenzisi [2] selendulule kwangaphambili ugxumeko lwemveliso [3]. Loo msebenzisi kufuneka aluqhube olo gxumeko kwakhona phambi kokusebenzisa loo mveliso."
+
+#. 4y8CN
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_68\n"
+"LngText.text"
+msgid "Out of disk space -- Volume: '[2]'; required space: [3] KB; available space: [4] KB.  Free some disk space and retry."
+msgstr "Siphelile isithuba kwi-disk -- Umthamo: '[2]'; sisithuba esifunekayo: [3] KB; sisithuba esikhoyo: [4] KB.  Khulula isithuba esithile kwi-disk wandule ukuphinda uzame."
+
+#. jeRkA
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_69\n"
+"LngText.text"
+msgid "Are you sure you want to cancel?"
+msgstr "Uqinisekile ukuba ufuna ukurhoxisa?"
+
+#. E4bTn
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_70\n"
+"LngText.text"
+msgid "The file [2][3] is being held in use {by the following process: Name: [4], ID: [5], Window Title: [6]}.  Close that application and retry."
+msgstr ""
+
+#. oF3Fv
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_71\n"
+"LngText.text"
+msgid "The product [2] is already installed, preventing the installation of this product.  The two products are incompatible."
+msgstr "Imveliso [2] seyifakiwe, kwaye ithintela ukufakwa kwale mveliso. Ezi mveliso zimbini azihambelani."
+
+#. s2orj
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_72\n"
+"LngText.text"
+msgid "Out of disk space -- Volume: [2]; required space: [3] KB; available space: [4] KB.  If rollback is disabled, enough space is available. Click Cancel to quit, Retry to check available disk space again, or Ignore to continue without rollback."
+msgstr "Siphelile isithuba kwi-disk - Umthamo: [2]; sisithuba esifunekayo: [3] KB; isithuba esikhoyo: [4] KB. Xa ukubuya umva kunokwaphulwa isakhono, siyanela isithuba esikhoyo. Nqomfa u-Rhoxisa ukuze uhambe, Phinda uzame ukuze uqwalasele isithuba esikhoyo kwi-disk kwakhona, okanye Ungakuhoyi ukuqhuba ngaphandle kokubuya umva."
+
+#. MCwyq
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_73\n"
+"LngText.text"
+msgid "Could not access network location [2]."
+msgstr "Ayifikelelekanga indawo yomsebenzi wothungelwano [2]."
+
+#. ELP3i
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_74\n"
+"LngText.text"
+msgid "The following applications should be closed before continuing the installation:"
+msgstr "Iinkqubo ezilandelayo mazivalwe phambi kokuqhuba ngogxumeko:"
+
+#. Bad4A
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_75\n"
+"LngText.text"
+msgid "Could not find any previously installed compliant products on the machine for installing this product."
+msgstr "Akufumanekanga naziphi iimveliso ezihambelanayo ezifakwe kwithuba langaphambili kumatshini wokufaka le mveliso."
+
+#. 7BqEv
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_76\n"
+"LngText.text"
+msgid "The key [2] is not valid.  Verify that you entered the correct key."
+msgstr "Iqhosha [2] alisebenzi. Qinisekisa ukuba ungenise iqhosha elichanekileyo."
+
+#. YqEBF
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_77\n"
+"LngText.text"
+msgid "The installer must restart your system before configuration of [2] can continue.  Click Yes to restart now or No if you plan to restart later."
+msgstr "Umgxumeki makaphinde aqalise isixokelelwano sakho phambi kokuqhuba kobumbeko lwesi-[2]. Nqomfa u-Ewe ukuze uqalise ngoku okanye u-Hayi xa unenjongo yokuqalisa kamva."
+
+#. veLrG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_78\n"
+"LngText.text"
+msgid "You must restart your system for the configuration changes made to [2] to take effect. Click Yes to restart now or No if you plan to restart later."
+msgstr "Kufuneka uphinde uqalise isixokelelwano sakho ukwenzela ukuqalisa kweenguquko zobumbeko ezenziwe ku-[2]. Nqomfa u-Ewe ukuba uqalisa ngoku okanye u-Hayi xa unenjongo yokuqalisa kamva."
+
+#. s3W2C
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_79\n"
+"LngText.text"
+msgid "An installation for [2] is currently suspended.  You must undo the changes made by that installation to continue.  Do you want to undo those changes?"
+msgstr "Ukufakwa kwe-[2] kusaxhonyiwe okwangoku. Kufuneka uziqhaqhe iinguquko ezenziwe lolwaa gxumeko ukuze luqhube. Ingaba ufuna ukuziqhaqha ezo nguquko?"
+
+#. q6oVY
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_80\n"
+"LngText.text"
+msgid "A previous installation for this product is in progress.  You must undo the changes made by that installation to continue.  Do you want to undo those changes?"
+msgstr "Ugxumeko lwangaphambili lwale mveliso luyaqhuba. Kufuneka uziqhaqhe iinguquko ezenziwe lolwaa gxumeko ukuze uqhube. Ingaba ufuna ukuziqhaqha ezo nguquko?"
+
+#. DnEz6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_81\n"
+"LngText.text"
+msgid "No valid source could be found for product [2].  The Windows Installer cannot continue."
+msgstr "Akukho ntsusa isebenzayo ithe yafunyanwa ngemveliso [2]. Umgxumeki we-Windows akanakuqhuba."
+
+#. yJVAH
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_82\n"
+"LngText.text"
+msgid "Installation operation completed successfully."
+msgstr "Umsebenzi wokufaka ugqitywe ngempumelelo."
+
+#. kWcs2
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_83\n"
+"LngText.text"
+msgid "Installation operation failed."
+msgstr "Umsebenzi wokufaka awuphumelelanga."
+
+#. NGB3n
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_84\n"
+"LngText.text"
+msgid "Product: [2] -- [3]"
+msgstr "Imveliso: [2] -- [3]"
+
+#. S2uCJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_85\n"
+"LngText.text"
+msgid "You may either restore your computer to its previous state or continue the installation later. Would you like to restore?"
+msgstr "Usenokubuyisela ikhompyutha yakho kwisimo sayo sangaphambili okanye uqhube kamva ngokufaka. Ingaba ufuna ukubuyisela?"
+
+#. nbuxg
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_86\n"
+"LngText.text"
+msgid "An error occurred while writing installation information to disk.  Check to make sure enough disk space is available, and click Retry, or Cancel to end the installation."
+msgstr "Kwenzeke imposiso xa kubhalwa iinkcukacha zokufaka kwi-disk. Qwalasela ukuze uqinisekise ukuba isithuba sanele kwi-disk, uze unqomfe u-Phinda uzame kwakhona, okanye Rhoxisa ude ufike ekupheleni kokufaka."
+
+#. RrjwL
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_87\n"
+"LngText.text"
+msgid "One or more of the files required to restore your computer to its previous state could not be found.  Restoration will not be possible."
+msgstr "Ifayili enye okanye ngaphezulu ebifuna ukuba ubuyisele ikhompyutha yakho kwisimo sayo sangaphambili ayikwazanga kufunyanwa. Ukubuyisela kwisimo sangaphambili akunakwenzeka."
+
+#. 2GGnJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_88\n"
+"LngText.text"
+msgid "[2] cannot install one of its required products. Contact your technical support group.  {{System Error: [3].}}"
+msgstr "U-[2] akakwazi kufaka enye yeemveliso ezifunekayo. Zidibanise neqela leengcaphephe zenkxaso.  {{Imposiso Yesixokelelwano: [3].}}"
+
+#. FAFxM
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_89\n"
+"LngText.text"
+msgid "The older version of [2] cannot be removed.  Contact your technical support group.  {{System Error [3].}}"
+msgstr "Uguqulelo oludala luka-[2] alukwazi kususwa. Zidibanise neqela leengcaphephe zenkxaso.  {{Imposiso Yesixokelelwano [3].}}"
+
+#. bqsp7
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_90\n"
+"LngText.text"
+msgid "The path [2] is not valid.  Please specify a valid path."
+msgstr "Indlela yothungelwano [2] ayisebenzi. Nceda xela indlela yothungelwano esebenzayo."
+
+#. BdQrc
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_91\n"
+"LngText.text"
+msgid "Out of memory. Shut down other applications before retrying."
+msgstr ""
+
+#. 3yp9Y
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_92\n"
+"LngText.text"
+msgid "There is no disk in drive [2]. Please insert one and click Retry, or click Cancel to go back to the previously selected volume."
+msgstr "Akukho disk kwisikhululo [2]. Nceda yifake uze unqomfe u-Phinda uzame, okanye nqomfa u-Rhoxisa ukuze ubuyele kumthamo obuwukhethe ngaphambili."
+
+#. TnfBJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_93\n"
+"LngText.text"
+msgid "There is no disk in drive [2]. Please insert one and click Retry, or click Cancel to return to the browse dialog and select a different volume."
+msgstr "Akukho disk kwisikhululo [2]. Nceda yifake uze unqomfe u-Phinda uzame, okanye nqomfa u-Rhoxisa ukuze ubuyele kwingxoxo yokukhangela wandule ukukhetha umthamo ongomnye."
+
+#. ESgwj
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_94\n"
+"LngText.text"
+msgid "The folder [2] does not exist.  Please enter a path to an existing folder."
+msgstr "Isiqulathi seefayili [2] asikho. Nceda ngenisa indlela yothungelwano kwisiqulathi seefayili esikhoyo."
+
+#. p7SAc
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_95\n"
+"LngText.text"
+msgid "You have insufficient privileges to read this folder."
+msgstr "Awanelanga amalungelo akho okufunda esi siqulathi seefayili."
+
+#. e7ts6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_96\n"
+"LngText.text"
+msgid "A valid destination folder for the installation could not be determined."
+msgstr "Isiqulathi seefayili esisebenzayo salapho kuyiwa khona ukwenzela ugxumeko asikwazanga kufunyaniswa."
+
+#. ZFVRn
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_97\n"
+"LngText.text"
+msgid "Error attempting to read from the source installation database: [2]."
+msgstr "Imposiso yokuzama ukufunda kwisiseko seenkcukacha zogxumeko oluyintsusa: [2]."
+
+#. BGgm9
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_98\n"
+"LngText.text"
+msgid "Scheduling reboot operation: Renaming file [2] to [3]. Must reboot to complete operation."
+msgstr "Kucwangciswa umsebenzi wokubuyisela ukusebenza: Kunikwa ngokutsha igama lefayili [2] ukuya ku-[3]. Kufuneka kubuyiselwe ukusebenza ukuze ugqitywe umsebenzi."
+
+#. mtjE3
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_99\n"
+"LngText.text"
+msgid "Scheduling reboot operation: Deleting file [2]. Must reboot to complete operation."
+msgstr "Kucwangciswa umsebenzi wokubuyisela ukusebenza: Kucinywa ifayili [2]. Kufuneka kubuyiselwe ukusebenza ukuze kugqitywe umsebenzi."
+
+#. iEw33
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_100\n"
+"LngText.text"
+msgid "Module [2] failed to register.  HRESULT [3].  Contact your support personnel."
+msgstr "Imodyuli [2] ayiphumelelanga ukubhalisa.  HRESULT [3]. Zidibanise nabaqeshwa bakho benkxaso."
+
+#. bECVQ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_101\n"
+"LngText.text"
+msgid "Module [2] failed to unregister.  HRESULT [3].  Contact your support personnel."
+msgstr "Imodyuli [2] ayiphumelelanga ukungabhalisi.  HRESULT [3]. Zidibanise nabaqeshwa bakho benkxaso."
+
+#. FWg3S
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_102\n"
+"LngText.text"
+msgid "Failed to cache package [2]. Error: [3]. Contact your support personnel."
+msgstr "Isilele ekugcineni ubekelelo kuvimba wethutyana [2]. Imposiso: [3]. Zidibanise nabaqeshwa bakho benkxaso."
+
+#. bKEyX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_103\n"
+"LngText.text"
+msgid "Could not register font [2].  Verify that you have sufficient permissions to install fonts, and that the system supports this font."
+msgstr "Ayikwazanga kubhalisa ifonti [2]. Qinisekisa ukuba uneemvume ezaneleyo zokufaka iifonti, kwaye nesixokelelwano sixhasa le fonti."
+
+#. G7bAP
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_104\n"
+"LngText.text"
+msgid "Could not unregister font [2]. Verify that you have sufficient permissions to remove fonts."
+msgstr "Ayikwazanga kungayibhalisi ifonti [2]. Qinisekisa ukuba uneemvume ezaneleyo zokususa iifonti."
+
+#. LmRtG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_105\n"
+"LngText.text"
+msgid "Could not create shortcut [2]. Verify that the destination folder exists and that you can access it."
+msgstr "Ayikwazanga kudala iindlela ezinqumlayo [2]. Qinisekisa ukuba isiqulathi seefayili salapho kuyiwa khona siyinto ekhoyo nokba unako ukufikelela kuso."
+
+#. QXqrx
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_106\n"
+"LngText.text"
+msgid "Could not remove shortcut [2]. Verify that the shortcut file exists and that you can access it."
+msgstr "Ayikwazanga kususa indlela enqumlayo [2]. Qinisekisa ukuba ifayili yendlela enqumlayo yinto ekhoyo kwaye unako ukufikelela kuyo."
+
+#. 3MqnE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_107\n"
+"LngText.text"
+msgid "Could not register type library for file [2].  Contact your support personnel."
+msgstr "Ayikwazanga kubhalisa isimbo selayibrari ukwenzela ifayili [2]. Zidibanise nabaqeshwa bakho benkxaso."
+
+#. jCuE6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_108\n"
+"LngText.text"
+msgid "Could not unregister type library for file [2].  Contact your support personnel."
+msgstr "Ayikwazanga kususa ukubhaliseka kwesimbo selayibrari ukwenzela ifayili [2]. Zidibanise nabaqeshwa benkxaso."
+
+#. 4pspZ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_109\n"
+"LngText.text"
+msgid "Could not update the INI file [2][3].  Verify that the file exists and that you can access it."
+msgstr "Ayikwazanga kuhlaziya ngokutsha ifayili ye-INI [2][3]. Qinisekisa ukuba ifayili yinto ekhoyo nokuba unako ukufikelela kuyo."
+
+#. dkhNT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_110\n"
+"LngText.text"
+msgid "Could not schedule file [2] to replace file [3] on reboot.  Verify that you have write permissions to file [3]."
+msgstr "Ayikwazanga kucwangcisa ifayili [2] ukuze ibe sendaweni yefayili [3] xa ivulwa kwakhona. Qinisekisa ukuba unazo iimvume zokubhala kwifayili [3]."
+
+#. DDg6R
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_111\n"
+"LngText.text"
+msgid "Error removing ODBC driver manager, ODBC error [2]: [3]. Contact your support personnel."
+msgstr "Umphathi wesikhululo we-ODBC osusa imposiso, imposiso ye-ODBC [2]: [3]. Zidibanise nabaqeshwa bakho benkxaso."
+
+#. FBn6s
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_112\n"
+"LngText.text"
+msgid "Error installing ODBC driver manager, ODBC error [2]: [3]. Contact your support personnel."
+msgstr "Umphathi wesikhululo we-ODBC ofaka imposiso, imposiso ye-ODBC [2]: [3]. Zidibanise nabaqeshwa bakho benkxaso."
+
+#. ebBpH
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_113\n"
+"LngText.text"
+msgid "Error removing ODBC driver [4], ODBC error [2]: [3]. Verify that you have sufficient privileges to remove ODBC drivers."
+msgstr "Isikhululo [4] se-ODBC esisusa imposiso, imposiso ye-ODBC [2]: [3]. Qinisekisa ukuba unamalungelo awaneleyo okususa izikhululo ze-ODBC."
+
+#. wWeik
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_114\n"
+"LngText.text"
+msgid "Error installing ODBC driver [4], ODBC error [2]: [3]. Verify that the file [4] exists and that you can access it."
+msgstr "Isikhululo [4] se-ODBC esifaka imposiso, imposiso ye-ODBC [2]: [3]. Qinisekisa ukuba ifayili [4] yinto ekhoyo kwaye unako ukufikelela kuyo."
+
+#. X7EWG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_115\n"
+"LngText.text"
+msgid "Error configuring ODBC data source [4], ODBC error [2]: [3]. Verify that the file [4] exists and that you can access it."
+msgstr "Intsusa yeenkcukacha [4] ebumba imposiso, imposiso ye-ODBC [2]: [3]. Qinisekisa ukuba ifayili [4] yinto ekhoyo kwaye unako ukufikelela kuyo."
+
+#. 6UdPx
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_116\n"
+"LngText.text"
+msgid "Service [2] ([3]) failed to start.  Verify that you have sufficient privileges to start system services."
+msgstr "Inkonzo [2] ([3]) ayiphumelelanga ukuqalisa. Qinisekisa ukuba unamalungelo awaneleyo okuqalisa iinkonzo zesixokelelwano."
+
+#. qEDkf
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_117\n"
+"LngText.text"
+msgid "Service [2] ([3]) could not be stopped.  Verify that you have sufficient privileges to stop system services."
+msgstr "Inkonzo [2] ([3]) ayikwazanga kunqunyanyiswa. Qinisekisa ukuba unamalungelo awaneleyo okunqumamisa iinkonzo zesixokelelwano."
+
+#. R8sJN
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_118\n"
+"LngText.text"
+msgid "Service [2] ([3]) could not be deleted.  Verify that you have sufficient privileges to remove system services."
+msgstr "Inkonzo [2] ([3]) ayikwazanga kucimeka. Qinisekisa ukuba unamalungelo awaneleyo okususa iinkonzo zesixokelelwano."
+
+#. 8vYFt
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_119\n"
+"LngText.text"
+msgid "Service [2] ([3]) could not be installed.  Verify that you have sufficient privileges to install system services."
+msgstr "Inkonzo [2] ([3]) ayikwazanga kufakeka. Qinisekisa ukuba unamalungelo awaneleyo okufaka iinkonzo zesixokelelwano."
+
+#. TFWVv
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_120\n"
+"LngText.text"
+msgid "Could not update environment variable [2].  Verify that you have sufficient privileges to modify environment variables."
+msgstr "Alikwazanga kuhlaziyeka ngokutsha ixabiso lemo engqongileyo [2]. Qinisekisa ukuba unamalungelo awaneleyo okuhlenga-hlengisa amaxabiso anokuguqulwa emo engqongileyo."
+
+#. pMovX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_121\n"
+"LngText.text"
+msgid "You do not have sufficient privileges to complete this installation for all users of the machine.  Log on as an administrator and then retry this installation."
+msgstr "Akunamalungelo awaneleyo okugqibezela olu gxumeko lwabo bonke abasebenzisi balo matshini. Ngena njengomlawuli wandule uphinda uzame kwakhona olu gxumeko."
+
+#. HdDZA
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_122\n"
+"LngText.text"
+msgid "Could not set file security for file [3]. Error: [2].  Verify that you have sufficient privileges to modify the security permissions for this file."
+msgstr "Ifayili yokhuseleko ayikwazanga kumiseleka ukwenzela ifayili [3]. Imposiso: [2]. Qinisekisa ukuba unamalungelo awaneleyo okuhlenga-hlengisa amalungelo okhuselo ukwenzela le fayili."
+
+#. GtDXr
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_123\n"
+"LngText.text"
+msgid "Component Services (COM+ 1.0) are not installed on this computer.  This installation requires Component Services in order to complete successfully.  Component Services are available on Windows 2000."
+msgstr "Iinkonzo Zenxalenye (COM+ 1.0) azifakwanga kule khompyutha. Olu gxumeko lufuna Iinkonzo Zenxalenye ukuze zigqibeke ngempumelelo. Iinkonzo Zenxalenye ziyafumaneka kwi-Windows 2000."
+
+#. 7AFuq
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_124\n"
+"LngText.text"
+msgid "Error registering COM+ application.  Contact your support personnel for more information."
+msgstr "Inkqubo ye-COM+ ebhalisa imposiso. Zidibanise nabaqeshwa bakho benkxaso ngolwazi olungaphaya kolu."
+
+#. yU8as
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_125\n"
+"LngText.text"
+msgid "Error unregistering COM+ application.  Contact your support personnel for more information."
+msgstr "Inkqubo ye-COM+ yokususa ukubhaliswa kwemposiso.  Zidibanise nabaqeshwa bakho benkxaso ngolwazi olungaphaya kolu."
+
+#. ewJEY
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_126\n"
+"LngText.text"
+msgid "The description for service '[2]' ([3]) could not be changed."
+msgstr "Inkcazelo yenkonzo '[2]' ([3]) ayikwazanga kuguquleka."
+
+#. BypXi
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_127\n"
+"LngText.text"
+msgid "The Windows Installer service cannot update the system file [2] because the file is protected by Windows.  You may need to update your operating system for this program to work correctly. {{Package version: [3], OS Protected version: [4]}}"
+msgstr "Inkonzo Yokufaka i-Windows ayikwazi kuhlaziya ifayili yesixokelelwano [2] kuba ifayili ikhuselwe yi-Windows.  Usenokufuna ukuhlaziya isixokelelwano sakho sokusebenza ukuze le nkqubo isebenze ngokuchanekileyo. {{Uguqulelo lokubekelela: [3], Uguqulelo Olukhuselweyo lwe-OS: [4]}}"
+
+#. BQQSh
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_128\n"
+"LngText.text"
+msgid "The Windows Installer service cannot update the protected Windows file [2]. {{Package version: [3], OS Protected version: [4], SFP Error: [5]}}"
+msgstr "Inkonzo Yokufaka i-Windows ayikwazi kuhlaziya ifayili ekhuselweyo ye-Windows [2]. {{Uguqulelo lobekelelo: [3], Uguqulelo Olukhuselweyo lwe-OS: [4], Imposiso ye-SFP: [5]}}"
+
+#. PAdiR
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_129\n"
+"LngText.text"
+msgid "This setup requires Internet Information Server 4.0 or higher for configuring IIS Virtual Roots. Please make sure that you have IIS 4.0 or higher."
+msgstr "Ukumiselwa kufuna iSeva Yolwazi Lothungelwano Ngekhompyutha 4.0 okanye ngaphezulu ukuze kubumbeke Imisebenzi Yamandla Yoyelelaniso IIS. Nceda qinisekisa ukuba une-IIS 4.0 okanye ngaphezulu."
+
+#. zyh9D
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_130\n"
+"LngText.text"
+msgid "This setup requires Administrator privileges for configuring IIS Virtual Roots."
+msgstr "Oku kumiselwa kufuna amalungelo Omlawuli ukuze kubumbeke Imisebenzi Yamandla Eyelelanisiweyo IIS."
+
+#. egG4o
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_131\n"
+"LngText.text"
+msgid "Installing a pre-requisite [2] failed. You might need to manually install it from Microsoft site to be able to run the product.[3]"
+msgstr ""
+
+#. oeCq9
+#: LaunchCo.ulf
+msgctxt ""
+"LaunchCo.ulf\n"
+"OOO_LAUNCH_1\n"
+"LngText.text"
+msgid "The Installation Wizard cannot be run properly because you are logged in as a user without sufficient administrator rights for this system."
+msgstr "Umthakathi Wogxumeko akakwazi kuqhutywa kakuhle kuba ungene njengomsebenzisi ongenamalungelo awaneleyo olawulo kwesi sixokelelwano."
+
+#. CmjDD
+#: LaunchCo.ulf
+msgctxt ""
+"LaunchCo.ulf\n"
+"OOO_LAUNCH_2\n"
+"LngText.text"
+msgid "[ProductName] cannot be installed on this Windows version. [WindowsMinVersionText] or newer is required."
+msgstr ""
+
+#. FDDBP
+#: LaunchCo.ulf
+msgctxt ""
+"LaunchCo.ulf\n"
+"OOO_LAUNCH_3\n"
+"LngText.text"
+msgid "To install [ProductName] on Windows 8.1, at least April 2014 update rollup (MS KB 2919355) must be installed."
+msgstr ""
+
+#. 9rCtE
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPCONTACTTEMPLATE\n"
+"LngText.text"
+msgid "LibreOffice Community"
+msgstr ""
+
+#. 7dQku
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPHELPLINKTEMPLATE\n"
+"LngText.text"
+msgid "https://www.libreoffice.org/get-help"
+msgstr ""
+
+#. bR9FC
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPURLINFOABOUTTEMPLATE\n"
+"LngText.text"
+msgid "https://www.libreoffice.org/"
+msgstr ""
+
+#. qAVKA
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPURLUPDATEINFOTEMPLATE\n"
+"LngText.text"
+msgid "https://www.libreoffice.org/download"
+msgstr ""
+
+#. kSGwn
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_NEW_DISPLAY_NAME\n"
+"LngText.text"
+msgid "~New"
+msgstr "~Okutsha"
+
+#. YyAaD
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_EDIT\n"
+"LngText.text"
+msgid "~Edit"
+msgstr "~Hlela"
+
+#. GVrFd
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_WORD_DOCUMENT\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Uxwebhu lwe-Microsoft Word"
+
+#. PX5sA
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_WORD_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft Word Template"
+msgstr "Isakhelo Seenkcukacha ze-Microsoft Word"
+
+#. 6EgWK
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_EXCEL_WORKSHEET\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Icwecwe Lokusebenzela le-Microsoft Excel"
+
+#. sz9Ca
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_EXCEL_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft Excel Template"
+msgstr "Isakhelo Seenkcukacha zeMicrosot Excel"
+
+#. nE65f
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_POWERPOINT_PRESENTATION\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Umboniso-nkcazelo we-Microsoft PowerPoint"
+
+#. qrDB4
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_POWERPOINT_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Template"
+msgstr "Isakhelo Seenkcukacha ze-Microsoft PowerPoint"
+
+#. AKnre
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_POWERPOINT_SHOW\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Show"
+msgstr "Umboniso we-MicrosoftPowerPoint"
+
+#. UGGXo
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_INSTALLATION_WIZARD\n"
+"LngText.text"
+msgid "Installation Wizard"
+msgstr ""
+
+#. 6Mr3P
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_1\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}&Modify"
+msgstr ""
+
+#. AGLAj
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_2\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Re&pair"
+msgstr ""
+
+#. wCZDY
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_3\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}&Remove"
+msgstr ""
+
+#. GGfjA
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_4\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}&Typical"
+msgstr ""
+
+#. e8DR4
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_5\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Cu&stom"
+msgstr ""
+
+#. WaaRd
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_6\n"
+"LngText.text"
+msgid "I &do not accept the terms in the license agreement"
+msgstr "Mna &asiyamkeli imigqaliselo ekwimvumelwano yelayisensi"
+
+#. uqyYS
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_7\n"
+"LngText.text"
+msgid "I &accept the terms in the license agreement"
+msgstr "Mna &ndiyayamkela imigqaliselo ekwimvumelwano yelayisensi"
+
+#. TUuwd
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_8\n"
+"LngText.text"
+msgid "&Anyone who uses this computer (all users)"
+msgstr "&Nabani osebenzisa le khompyutha (bonke abasebenzisi)"
+
+#. 8ymTL
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_9\n"
+"LngText.text"
+msgid "Only for &me ([USERNAME])"
+msgstr "Kwenzelwe mna &kuphela ([USERNAME])"
+
+#. FDe7x
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_10\n"
+"LngText.text"
+msgid "&Close the applications and attempt to restart them."
+msgstr ""
+
+#. T4DzH
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_11\n"
+"LngText.text"
+msgid "&Do not close applications. A reboot will be required to complete the setup."
+msgstr ""
+
+#. 94ZFb
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_1\n"
+"LngText.text"
+msgid "bytes"
+msgstr "imithamo yee-byte"
+
+#. jEifK
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_2\n"
+"LngText.text"
+msgid "GB"
+msgstr "GB"
+
+#. VwUAL
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_3\n"
+"LngText.text"
+msgid "KB"
+msgstr "KB"
+
+#. vgAjF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_4\n"
+"LngText.text"
+msgid "MB"
+msgstr "MB"
+
+#. r9k3a
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_5\n"
+"LngText.text"
+msgid "This feature will not be available."
+msgstr "Olu phawu alusayi kuba khona."
+
+#. r3Efh
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_6\n"
+"LngText.text"
+msgid "This feature will be installed when required."
+msgstr "Uphawu luya kufakwa xa lufunwa."
+
+#. 26Mpo
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_7\n"
+"LngText.text"
+msgid "This feature, and all subfeatures, will be installed to run from the CD."
+msgstr "Olu phawu,, nazo zonke iimpawu ezonganyelweyo, ziya kufakwa ziqhutywe zivela kwi-CD."
+
+#. bCeK7
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_8\n"
+"LngText.text"
+msgid "This feature, and all subfeatures, will be installed on local hard drive."
+msgstr "Olu phawu, nazo zonke iimpawu ezonganyelweyo, ziya kufakwa kwiqokobhe lekhompyutha lendawo leyo."
+
+#. pDASu
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_9\n"
+"LngText.text"
+msgid "This feature, and all subfeatures, will be installed to run from the network."
+msgstr "Olu phawu, nazo zonke iimpawu ezonganyelweyo, ziya kufakwa ziqhutywa zivela kumsebenzi wothungelwano."
+
+#. TxGgr
+#: UIText.ulf
+#, fuzzy
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_10\n"
+"LngText.text"
+msgid "This feature will be installed to run from CD."
+msgstr "Olu phawu luya kufakwa luqhutywe luvela kumsebenzi wothungelwano."
+
+#. GT8NC
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_11\n"
+"LngText.text"
+msgid "This feature will be installed on local hard drive."
+msgstr "Olu phawu luya kufakwa kwiqokobhe lekhompyutha laloo ndawo."
+
+#. AUGeW
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_12\n"
+"LngText.text"
+msgid "This feature will be installed to run from network."
+msgstr "Olu phawu luya kufakwa luqhutywe luvela kumsebenzi wothungelwano."
+
+#. 8CXdg
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_13\n"
+"LngText.text"
+msgid "Fldr|New Folder"
+msgstr "Fldr|Isiqulathi Seefayili Esitsha "
+
+#. 9V38D
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_14\n"
+"LngText.text"
+msgid "This feature will remain uninstalled."
+msgstr "Olu phawu luya kuhlala lungafakwanga."
+
+#. 9qKMG
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_15\n"
+"LngText.text"
+msgid "This feature will be set to be installed when required."
+msgstr "Olu phawu luya kumiselwa ukuze lufakwe xa lufuneka."
+
+#. o9isw
+#: UIText.ulf
+#, fuzzy
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_16\n"
+"LngText.text"
+msgid "This feature will be installed to run from CD."
+msgstr "Olu phawu luya kufakwa luqhutywe luvela kumsebenzi wothungelwano."
+
+#. DzJTi
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_17\n"
+"LngText.text"
+msgid "This feature will be installed on the local hard drive."
+msgstr "Olu phawu luya kufakwa kwisikhululo seqokobhe lekhompyutha sendawo leyo."
+
+#. cyGEM
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_18\n"
+"LngText.text"
+msgid "This feature will be installed to run from the network."
+msgstr "Olu phawu luya kufakwa luqhutywe ukusuka kumsebenzi wothungelwano."
+
+#. Qz6jp
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_19\n"
+"LngText.text"
+msgid "This feature will become unavailable."
+msgstr "Olu phawu luya kuba lungekho."
+
+#. EjtVV
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_20\n"
+"LngText.text"
+msgid "Will be installed when required."
+msgstr "Kuya kufakwa xa kufunwa."
+
+#. BVwPN
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_21\n"
+"LngText.text"
+msgid "This feature will be available to run from CD."
+msgstr "Olu phawu luya kubakho ukuze luqhutywe luvela kwi-CD."
+
+#. yejCc
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_22\n"
+"LngText.text"
+msgid "This feature will be installed on your local hard drive."
+msgstr "Olu phawu luya kufakwa kwiqokobhe lakho lekhompyutha lendawo leyo."
+
+#. NUAL8
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_23\n"
+"LngText.text"
+msgid "This feature will be available to run from the network."
+msgstr "Olu phawu luya kuba khona luqhutywe ukusuka kumsebenzi wothungelwano."
+
+#. KLMrs
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_24\n"
+"LngText.text"
+msgid "This feature will be uninstalled completely, and you won't be able to run it from CD."
+msgstr "Olu phawu luya kukhutshwa ngokungaphelelanga kugxumeko, kwaye akusayi kukwazi ukuluqhuba ukusuka kwi-CD."
+
+#. ATGde
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_25\n"
+"LngText.text"
+msgid "This feature was run from the CD but will be set to be installed when required."
+msgstr "Olu phawu lwaqhutywa luvela kwi-CD kodwa luya kumiselwa ukuze lufakwe xa lufunwa."
+
+#. Ce3o2
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_26\n"
+"LngText.text"
+msgid "This feature will continue to be run from the CD"
+msgstr "Olu phawu luya kuqhuba luqhutywe ukusuka kwi-CD"
+
+#. vtfBk
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_27\n"
+"LngText.text"
+msgid "This feature was run from the CD but will be installed on the local hard drive."
+msgstr "Olu phawu lwaqhutywa lusuka kwi-CD kodwa luya kufakwa kwiqokobhe lekhompyutha lendawo leyo."
+
+#. NTbAF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_28\n"
+"LngText.text"
+msgid "This feature frees up [1] on your hard drive."
+msgstr "Olu phawu luyazikhulula [1] kwiqokobhe lakho lekhompyutha."
+
+#. oJ7mG
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_29\n"
+"LngText.text"
+msgid "This feature requires [1] on your hard drive."
+msgstr "Olu phawu lufuna [1] kwiqokobhe lakho lekhompyutha."
+
+#. FBJDk
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_30\n"
+"LngText.text"
+msgid "Compiling cost for this feature..."
+msgstr "Iindleko zokuqukanisa ukwenzela olu phawu..."
+
+#. ELDvk
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_31\n"
+"LngText.text"
+msgid "This feature will be completely removed."
+msgstr "Olu phawu luya kususwa ngokupheleleyo."
+
+#. xdW8B
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_32\n"
+"LngText.text"
+msgid "This feature will be removed from your local hard drive but will be set to be installed when required."
+msgstr "Olu phawu luya kususwa kwiqokobhe lakho lekhompyutha lendawo leyo kodwa luya kumiselwa ukuba lufakwe xa lufunwa."
+
+#. MgAtM
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_33\n"
+"LngText.text"
+msgid "This feature will be removed from your local hard drive but will still be available to run from CD."
+msgstr "Olu phawu luya kususwa kwiqokobhe lakho lekhompyutha kodwa luya kuba lusekhona ukuze luqhutywe lusuka kwi-CD."
+
+#. cwcP2
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_34\n"
+"LngText.text"
+msgid "This feature will remain on your local hard drive."
+msgstr "Olu phawu luya kuhlala lukho kwiqokobhe lakho lekhompyutha lendawo leyo."
+
+#. VMpij
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_35\n"
+"LngText.text"
+msgid "This feature will be removed from your local hard drive, but will be still available to run from the network."
+msgstr "Olu phawu luya kususwa kwiqokobhe lakho lekhompyutha, kodwa luya kuba lusekhona luqhutywe ukusuka kumsebenzi wothungelwano."
+
+#. ryj7R
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_36\n"
+"LngText.text"
+msgid "This feature will be uninstalled completely, and you won't be able to run it from the network."
+msgstr "Olu phawu kususwa ugxumeko ngokupheleleyo, kwaye akusayi kukwazi ukuyiqhuba ukusuka kumsebenzi wothungelwano."
+
+#. ZGYT7
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_37\n"
+"LngText.text"
+msgid "This feature was run from the network but will be installed when required."
+msgstr "Olu phawu lwaqhutywa lusuka kumsebenzi wothungelwano kodwa luya kufakwa xa lufunwa."
+
+#. fDT9F
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_38\n"
+"LngText.text"
+msgid "This feature was run from the network but will be installed on the local hard drive."
+msgstr "Olu phawu luqhutywe lusuka kumsebenzi wothungelwano kodwa luya kufakwa kwiqokobhe lakho lekhompyutha lendawo leyo."
+
+#. bMoyv
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_39\n"
+"LngText.text"
+msgid "This feature will continue to be run from the network"
+msgstr "Olu phawu luya kuqhuba ngokusuka kumsebenzi wothungelwano"
+
+#. hVVmF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_40\n"
+"LngText.text"
+msgid "This feature frees up [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures free up [4] on your hard drive."
+msgstr "Olu phawu lukhulula [1] kwiqokobhe lakho lekhompyutha. Luneempawu ezonganyelweyo ezikhethiweyo [2] kwezi [3]. Iimpawu ezonganyelweyo zikhulula [4] kwiqokobhe lakho lekhompyutha."
+
+#. kQxfM
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_41\n"
+"LngText.text"
+msgid "This feature frees up [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures require [4] on your hard drive."
+msgstr "Olu phawu lukhulula ukufikelela [1] kwiqokobhe lakho lekhompyutha. Luneempawu ezonganyelweyo ezikhethiweyo [2] kwezi [3]. Iimpawu ezonganyelweyo zifuna [4] kwiqokobhe lakho lekhompyutha."
+
+#. 8N7Ea
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_42\n"
+"LngText.text"
+msgid "This feature requires [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures free up [4] on your hard drive."
+msgstr "Olu phawu lufuna [1] kwiqokobhe lakho lekhompyutha. Luneempawu ezonganyelweyo [2] kwezi [3]. Iimpawu ezonganyelweyo zikhulula [4] kwiqokobhe lakho lekhompyutha."
+
+#. LTMBw
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_43\n"
+"LngText.text"
+msgid "This feature requires [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures require [4] on your hard drive."
+msgstr "Olu phawu lufuna [1] kwiqokobhe lakho lekhompyutha. Luneempawu ezonganyelweyo ezikhethiweyo [2] kwezi [3]. Iimpawu ezonganyelweyo zifuna [4] kwiqokobhe lakho lekhompyutha."
+
+#. vmZfv
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_44\n"
+"LngText.text"
+msgid "Time remaining: {[1] min }[2] sec"
+msgstr "Ixesha eliseleyo: {[1] imizuzu }[2] imizuzwana"
+
+#. uFPAD
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_45\n"
+"LngText.text"
+msgid "Available"
+msgstr "Kukhona"
+
+#. DnBYF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_46\n"
+"LngText.text"
+msgid "Differences"
+msgstr "Iiyantlukwano"
+
+#. DLqGc
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_47\n"
+"LngText.text"
+msgid "Required"
+msgstr "Kuyafuneka"
+
+#. KqFNu
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_48\n"
+"LngText.text"
+msgid "Disk Size"
+msgstr "Ubukhulu Be-disk"
+
+#. 8WAqc
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_49\n"
+"LngText.text"
+msgid "Volume"
+msgstr "Umthamo"

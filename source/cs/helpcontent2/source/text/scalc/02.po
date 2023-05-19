@@ -1,0 +1,1196 @@
+#. extracted from helpcontent2/source/text/scalc/02
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2020-07-02 14:07+0000\n"
+"Last-Translator: Stanislav Horáček <stanislav.horacek@gmail.com>\n"
+"Language-Team: Czech <https://weblate.documentfoundation.org/projects/libo_help-master/textscalc02/cs/>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1547389530.000000\n"
+
+#. aSE5T
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Currency"
+msgstr "Formát čísla: měna"
+
+#. uC76y
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"hd_id3152892\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02130000.xhp\">Number format: Currency</link>"
+msgstr "<link href=\"text/scalc/02/02130000.xhp\">Formát čísla: měna</link>"
+
+#. mDBPb
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3148837\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Applies the default currency format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Aplikuje na vybrané buňky výchozí formát měny.</ahelp>"
+
+#. 2nsBF
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3155267\n"
+"help.text"
+msgid "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Currency Number Format Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Ikona Formát čísla: měna</alt></image>"
+
+#. KBVhJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3150214\n"
+"help.text"
+msgid "Number Format: Currency"
+msgstr "Formát čísla: měna"
+
+#. NGRbJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3146776\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Formát - Buňky - Čísla</link>."
+
+#. fjGg6
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Percent"
+msgstr "Formát čísla: procento"
+
+#. uZTmE
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02140000.xhp\">Number format: Percent</link>"
+msgstr "<link href=\"text/scalc/02/02140000.xhp\">Formát čísla: procento</link>"
+
+#. fzGGF
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155629\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatPercent\">Applies the percentage format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatPercent\">Použije formát procent na označené buňky.</ahelp>"
+
+#. AFCdX
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3153968\n"
+"help.text"
+msgid "<image id=\"img_id3150869\" src=\"cmd/sc_numberformatpercent.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150869\">Icon</alt></image>"
+msgstr "<image id=\"img_id3150869\" src=\"cmd/sc_numberformatpercent.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150869\">Ikona</alt></image>"
+
+#. CAFBw
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Number Format: Percent"
+msgstr "Formát čísla: procento"
+
+#. xrLA9
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"bm_id3149260\n"
+"help.text"
+msgid "<bookmark_value>percentage calculations</bookmark_value>"
+msgstr "<bookmark_value>výpočty procent</bookmark_value>"
+
+#. Rwuzn
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3149260\n"
+"help.text"
+msgid "You can also enter a percentage sign (%) after a number in a cell:"
+msgstr "Je též možné v buňce po číslu zadat znak procent (%):"
+
+#. LKtGp
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "1% corresponds to 0.01"
+msgstr "1 % odpovídá 0,01"
+
+#. CwAEt
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3145749\n"
+"help.text"
+msgid "1 + 16% corresponds to 116% or 1.16"
+msgstr "1 + 16 % odpovídá 116 % neboli 1,16"
+
+#. j7BsM
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3148575\n"
+"help.text"
+msgid "1%% corresponds to 0.0001"
+msgstr "1 %% odpovídá 0,0001"
+
+#. a8EDH
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3159153\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>"
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Formát - Buňky - Čísla</link>"
+
+#. bX9GB
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Default"
+msgstr "Formát čísla: výchozí"
+
+#. C4AsN
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"hd_id3149182\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02150000.xhp\">Number format: Default</link>"
+msgstr "<link href=\"text/scalc/02/02150000.xhp\">Formát čísla: výchozí</link>"
+
+#. CkVDA
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3163802\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Applies the default number format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Použije výchozí formát čísla na označené buňky</ahelp>"
+
+#. MpiW2
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<image src=\"cmd/sc_numberformatstandard.svg\" id=\"img_id3156024\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156024\">Icon Standard Format </alt></image>"
+msgstr "<image src=\"cmd/sc_numberformatstandard.svg\" id=\"img_id3156024\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156024\">Ikona Standardní formát </alt></image>"
+
+#. 7xorF
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3153361\n"
+"help.text"
+msgid "Number Format: Standard"
+msgstr "Formát čísla: standardní"
+
+#. 2JKys
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3154908\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Formát - Buňky - Čísla</link>."
+
+#. BhR4Z
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Formát čísla: přidat desetinné místo"
+
+#. BdJjx
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02160000.xhp\">Number Format: Add Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02160000.xhp\">Formát čísla: přidat desetinné místo</link>"
+
+#. jhPg6
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3150792\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatIncDecimals\">Adds one decimal place to the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatIncDecimals\">Přidá jedno desetinné místo k číslům v označených buňkách.</ahelp>"
+
+#. BuLUg
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3145787\n"
+"help.text"
+msgid "<image id=\"img_id3145271\" src=\"cmd/sc_numberformatincdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145271\">Icon Add Decimal Place</alt></image>"
+msgstr "<image id=\"img_id3145271\" src=\"cmd/sc_numberformatincdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145271\">Ikona Přidat desetinné místo</alt></image>"
+
+#. NDn3G
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3149262\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Formát čísla: přidat desetinné místo"
+
+#. JGSHw
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Formát čísla: odstranit desetinné místo"
+
+#. ixjiG
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"hd_id3149164\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02170000.xhp\">Number Format: Delete Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02170000.xhp\">Formát čísla: odstranit desetinné místo</link>"
+
+#. Eip8y
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3147264\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatDecDecimals\">Removes one decimal place from the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatDecDecimals\">Odebere jedno desetinné místo číslům v označených buňkách.</ahelp>"
+
+#. FCfMZ
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3145173\n"
+"help.text"
+msgid "<image id=\"img_id3153192\" src=\"cmd/sc_numberformatdecdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153192\">Icon Delete Decimal Place</alt></image>"
+msgstr "<image id=\"img_id3153192\" src=\"cmd/sc_numberformatdecdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153192\">Ikona Smazat desetinné místo</alt></image>"
+
+#. xCuwp
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3154686\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Formát čísla: odstranit desetinné místo"
+
+#. 89BHV
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Name Box"
+msgstr "Pole názvu"
+
+#. JJA9o
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"bm_id3156326\n"
+"help.text"
+msgid "<bookmark_value>formula bar; sheet area names</bookmark_value><bookmark_value>sheet area names</bookmark_value><bookmark_value>showing; cell references</bookmark_value><bookmark_value>cell references; showing</bookmark_value>"
+msgstr "<bookmark_value>lišta vzorců; názvy oblastí listu</bookmark_value><bookmark_value>názvy oblastí listu</bookmark_value><bookmark_value>zobrazení; adresa buňky</bookmark_value><bookmark_value>adresa buňky; zobrazení</bookmark_value>"
+
+#. ywEet
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"hd_id3156326\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06010000.xhp\">Name Box</link>"
+msgstr "<link href=\"text/scalc/02/06010000.xhp\">Pole jména</link>"
+
+#. bJypW
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3149656\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_POS\">Displays the reference for the current cell, the range of the selected cells, or the name of the area. You can also select a range of cells, and then type a name for that range into the <emph>Name Box</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_POS\">Zobrazuje adresu aktuální buňky, oblast označených buněk nebo název oblasti. Také je možné označit oblast buněk a potom do <emph>Pole jména</emph> zadat název této oblasti.</ahelp>"
+
+#. W3Br6
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3163710\n"
+"help.text"
+msgid "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Combo box sheet area</alt></image>"
+msgstr "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Pole se seznamem pro oblast listu</alt></image>"
+
+#. wFE7T
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3151118\n"
+"help.text"
+msgid "Name Box"
+msgstr "Pole jména"
+
+#. yH3c4
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3152596\n"
+"help.text"
+msgid "To jump to a particular cell, or to select a cell range, type the cell reference, or cell range reference in this box, for example, F1, or A1:C4. You can also enter full name of a sheet; the tooltip then changes to \"Go To Sheet\", and pressing Enter switches to that sheet."
+msgstr "Chcete-li přejít na určitou buňku nebo vybrat oblast buněk, zadejte do tohoto pole adresu buňky nebo adresu oblasti buněk, např. F1 nebo A1:C4. Můžete také zadat celý název listu. Tip se poté změní na „Přejít na list“ a stisknutím klávesy Enter se na tento list přepnete."
+
+#. VFke2
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sum"
+msgstr "Součet"
+
+#. oK8fx
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"bm_id3157909\n"
+"help.text"
+msgid "<bookmark_value>functions;sum function icon</bookmark_value>         <bookmark_value>formula bar;sum function</bookmark_value>         <bookmark_value>sum icon</bookmark_value>         <bookmark_value>AutoSum button, see sum icon</bookmark_value>"
+msgstr "<bookmark_value>funkce; ikona součtu</bookmark_value>         <bookmark_value>lišta vzorců;součet</bookmark_value>         <bookmark_value>ikona součtu</bookmark_value>         <bookmark_value>suma automaticky, viz ikona součtu</bookmark_value>"
+
+#. CiNzL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id3157909\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06030000.xhp\">Select Function</link>"
+msgstr "<link href=\"text/scalc/02/06030000.xhp\">Vybrat funkci</link>"
+
+#. KEkiG
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3150543\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_SUMME\">Insert a function of a cell range into the current cell. The function can be Sum, Average, Minimum, Maximum and Count. Click in a cell, click this icon, select the function in the drop down list and optionally adjust the cell range. Or select some cells into which the function value will be inserted, then click the icon. The function result is added at the bottom of the range.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_SUMME\">Vloží do aktuální buňky výsledek funkce pro oblast buněk. Touto funkcí může být součet, průměr, minimum, maximum nebo počet. Klepněte na buňku, poté na tuto ikonu, vyberte z rozbalovacího seznamu funkci a volitelně upravte oblast buněk. Nebo vyberte buňky, do kterých bude výsledek funkce vložen, a poté klepněte na tuto ikonu. Výsledek funkce se přidá za poslední dolní buňky vybrané oblasti.</ahelp>"
+
+#. KDxsW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Icon Select Function</alt></image>"
+msgstr "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Ikona Vybrat funkci</alt></image>"
+
+#. DaEgA
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3152577\n"
+"help.text"
+msgid "Select Function"
+msgstr "Vybrat funkci"
+
+#. SpBhw
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id161592658402954\n"
+"help.text"
+msgid "Select Function applied with no selected range"
+msgstr "Vybrat funkci bez vybrané oblasti"
+
+#. 59eGX
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3156444\n"
+"help.text"
+msgid "$[officename] automatically suggests a cell range, provided that the spreadsheet contains data. If the cell range already contains a function, you can combine it with the new one to yield the function applied to the range data. If the range contains filters, the Subtotal function is inserted instead of the selected function."
+msgstr "Pokud sešit obsahuje data, $[officename] navrhne oblast buněk automaticky. Pokud již oblast buněk obsahuje danou funkci, je možné ji zkombinovat s novou. Pokud oblast obsahuje filtry, místo vybrané funkce se vloží funkce Mezisoučet."
+
+#. vpnqf
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153189\n"
+"help.text"
+msgid "Click the <emph>Accept</emph> icon to use the formula displayed in the input line or <emph>Cancel</emph>."
+msgstr "Klepnutím na ikonu <emph>Přijmout</emph> se použije vzorec zadaný ve vstupním řádku, případně lze klepnout na <emph>Zrušit</emph>."
+
+#. TVD6h
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id231592663499228\n"
+"help.text"
+msgid "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Accept Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Ikona Přijmout</alt></image>"
+
+#. iHTEW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id481592663499228\n"
+"help.text"
+msgid "Accept"
+msgstr "Přijmout"
+
+#. VFj6u
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id311592663828848\n"
+"help.text"
+msgid "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Icon Cancel</alt></image>"
+msgstr "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Ikona Zrušit</alt></image>"
+
+#. 7xGcL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id431592663828848\n"
+"help.text"
+msgid "Cancel"
+msgstr "Zrušit"
+
+#. GPtKR
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id261592658395518\n"
+"help.text"
+msgid "Select Function applied on a selected range"
+msgstr "Vybrat funkci s vybranou oblastí"
+
+#. JPrPQ
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id911592658130888\n"
+"help.text"
+msgid "When the selected range has two or more rows, the function is calculated for each column. The results are placed in empty cells on the first available row below the range, one result per column."
+msgstr "Pokud obsahuje vybraná oblast dva či více řádků, funkce se vypočítá pro každý sloupec. Výsledky se umístí do prázdných buněk na prvním dostupném řádku pod oblastí, a to pro každý sloupec jeden výsledek."
+
+#. iHksB
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id991592658144387\n"
+"help.text"
+msgid "When the selected range has one row, the function result is placed in the first available cell on the right of the selected range."
+msgstr "Pokud obsahuje vybraná oblast jediný řádek, výsledek funkce se umístí do první dostupné buňky napravo od vybrané oblasti."
+
+#. NYGR7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Function"
+msgstr "Funkce"
+
+#. 9JFi8
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"bm_id3150084\n"
+"help.text"
+msgid "<bookmark_value>formula bar; functions</bookmark_value><bookmark_value>functions; formula bar icon</bookmark_value>"
+msgstr "<bookmark_value>lišta vzorců; funkce</bookmark_value><bookmark_value>funkce; lišta vzorců</bookmark_value>"
+
+#. ZGqd9
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"hd_id3150084\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06040000.xhp\">Function</link>"
+msgstr "<link href=\"text/scalc/02/06040000.xhp\">Funkce</link>"
+
+#. TnbLt
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_FUNC\">Adds a formula to the current cell. Click this icon, and then enter the formula in the <emph>Input line</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_FUNC\">Přidá vzorec do aktuální buňky. Klikněte na tuto ikonu a poté zadejte vzorec do <emph>vstupního řádku</emph>.</ahelp>"
+
+#. WH6iw
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153360\n"
+"help.text"
+msgid "This icon is only available when the <emph>Input line</emph> box is not active."
+msgstr "Ikona je dostupná jen pokud není <emph>Vstupní řádek</emph> aktivní."
+
+#. yAAo7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"sc/res/sc26049.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145785\" src=\"sc/res/sc26049.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3145785\">Ikona</alt></image>"
+
+#. ZjzSD
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153951\n"
+"help.text"
+msgid "Function"
+msgstr "Funkce"
+
+#. kC5QL
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Input line"
+msgstr "Vstupní řádka"
+
+#. Vteqe
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"hd_id3153821\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06050000.xhp\">Input line</link>"
+msgstr "<link href=\"text/scalc/02/06050000.xhp\">Vstupní řádka</link>"
+
+#. Dgf7D
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Zadejte vzorec, který chcete vložit do aktuální buňky. Také je možné klepnout na ikonu <link href=\"text/scalc/01/04060000.xhp\">Průvodce funkcí</link>, který vám pomůže s vkládáním funkcí do vzorce.</ahelp>"
+
+#. pBxxB
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cancel"
+msgstr "Zrušit"
+
+#. FRSZz
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"bm_id3154514\n"
+"help.text"
+msgid "<bookmark_value>formula bar; canceling inputs</bookmark_value><bookmark_value>functions; canceling input icon</bookmark_value>"
+msgstr "<bookmark_value>lišta vzorců; zrušení vstupu</bookmark_value><bookmark_value>funkce; zrušení vstupu</bookmark_value>"
+
+#. 4mACq
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"hd_id3154514\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06060000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/scalc/02/06060000.xhp\">Zrušit</link>"
+
+#. uafDY
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153823\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_CANCEL\">Clears the contents of the <emph>Input line</emph>, or cancels the changes that you made to an existing formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_CANCEL\">Vyčistí obsah <emph>Vstupní řádky</emph> nebo zruší změny provedené v aktuálním vzorci.</ahelp>"
+
+#. DjEeK
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3156281\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Ikonka</alt></image>"
+
+#. QZHAo
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153970\n"
+"help.text"
+msgid "Cancel"
+msgstr "Zrušit"
+
+#. i4LsJ
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Accept"
+msgstr "Přijmout"
+
+#. EG7Fb
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"bm_id3143267\n"
+"help.text"
+msgid "<bookmark_value>formula bar; accepting inputs</bookmark_value><bookmark_value>functions; accepting input icon</bookmark_value>"
+msgstr "<bookmark_value>lišta vzorců; přijetí vstupu</bookmark_value><bookmark_value>funkce; přijetí vstupu</bookmark_value>"
+
+#. EnHFH
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"hd_id3143267\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06070000.xhp\">Accept</link>"
+msgstr "<link href=\"text/scalc/02/06070000.xhp\">Přijmout</link>"
+
+#. BBvqG
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_OK\">Accepts the contents of the <emph>Input line</emph>, and then inserts the contents into the current cell.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_OK\">Přijme obsah <emph>Vstupní řádky</emph> a vloží její obsah do aktuální buňky.</ahelp>"
+
+#. D8cSd
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3150769\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Ikona</alt></image>"
+
+#. puh2n
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3125864\n"
+"help.text"
+msgid "Accept"
+msgstr "Přijmout"
+
+#. c7dbD
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Theme Selection"
+msgstr "Výběr motivu vzhledu"
+
+#. nuJj7
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"hd_id3153087\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06080000.xhp\">Theme Selection</link>"
+msgstr "<link href=\"text/scalc/02/06080000.xhp\">Výběr motivu vzhledu</link>"
+
+#. rVKiP
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3154515\n"
+"help.text"
+msgid "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Applies a formatting style to the selected cells.</ahelp></variable> The styles include font, border, and background color information."
+msgstr "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Použije na označené buňky styl formátování.</ahelp></variable> Styl obsahuje informace o písmu, ohraničení a barvě pozadí."
+
+#. SEmnU
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3155132\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Ikona</alt></image>"
+
+#. cgZs2
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3153953\n"
+"help.text"
+msgid "Choose Themes"
+msgstr "Zvolit motiv vzhledu"
+
+#. xWp4x
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3147127\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Click the formatting theme that you want to apply, and then click <emph>OK</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Klepněte na motiv vzhledu, který chcete použít, a poté klepněte na <emph>OK</emph>.</ahelp>"
+
+#. QCyEd
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Position in document"
+msgstr "Umístění v dokumentu"
+
+#. BNLiM
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"hd_id3145119\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08010000.xhp\">Position in document</link>"
+msgstr "<link href=\"text/scalc/02/08010000.xhp\">Umístění v dokumentu</link>"
+
+#. L7Xk5
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3147265\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatusDocPos\">Displays the number of the current sheet and the total number of sheets in the spreadsheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatusDocPos\">Zobrazí pořadí aktuálního listu vzhledem k celkovému počtu listů v sešitu.</ahelp>"
+
+#. X2Dv6
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Standard Formula, Date/Time, Error Warning"
+msgstr "Výchozí vzorec, Datum/čas, Chybová zpráva"
+
+#. fFadm
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"bm_id3147335\n"
+"help.text"
+msgid "<bookmark_value>formulas;status bar</bookmark_value>"
+msgstr "<bookmark_value>vzorce;stavový řádek</bookmark_value>"
+
+#. FVYfS
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"hd_id3147335\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08080000.xhp\">Standard Formula, Date/Time, Error Warning</link>"
+msgstr "<link href=\"text/scalc/02/08080000.xhp\">Výchozí vzorec, Datum/čas, Chybová zpráva</link>"
+
+#. gvyvx
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3150791\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StateTableCell\">Displays information about the current document. By default, the SUM of the contents of the selected cells is displayed.</ahelp>"
+msgstr "<ahelp hid=\".uno:StateTableCell\">Zobrazí informace o aktuálním dokumentu. Implicitně se zobrazuje součet obsahu označených buněk.</ahelp>"
+
+#. eCfVn
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3155061\n"
+"help.text"
+msgid "To change the default formula that is displayed, right-click the field, and then choose the formula that you want. The available formulas are: Average, count of values (COUNTA), count of numbers (COUNT), Maximum, Minimum, Sum, or None."
+msgstr "Chcete-li změnit implicitně zobrazovaný vzorec, klepněte pravým tlačítkem na pole a poté vyberte požadovaný vzorec. K dispozici jsou vzorce: Průměr, Počet hodnot (COUNTA), Počet čísel (COUNT), Maximum, Minimum, Součet nebo Nic."
+
+#. dC4rs
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3153969\n"
+"help.text"
+msgid "<link href=\"text/scalc/05/02140000.xhp\">Error codes</link>"
+msgstr "<link href=\"text/scalc/05/02140000.xhp\">Chybové kódy</link>"
+
+#. 2fX5w
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Přiblížit"
+
+#. kNqRX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"bm_id3148491\n"
+"help.text"
+msgid "<bookmark_value>page views; increasing scales</bookmark_value><bookmark_value>increasing scales in page view</bookmark_value><bookmark_value>zooming;enlarging page views</bookmark_value>"
+msgstr "<bookmark_value>pohled na stránku; zvětšení</bookmark_value><bookmark_value>zvětšení pohledu na stránku</bookmark_value><bookmark_value>lupa;zvětšení pohledu na stránku</bookmark_value><bookmark_value>přibližování;zvětšení pohledu na stránku</bookmark_value>"
+
+#. GESuX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"hd_id3148491\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10050000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/scalc/02/10050000.xhp\">Přiblížit</link>"
+
+#. Uq4Tv
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145069\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomIn\">Enlarges the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomIn\">Zvětší zobrazení aktuálního dokumentu. Aktuální míra přiblížení se zobrazuje ve <emph>stavovém řádku</emph>.</ahelp>"
+
+#. GBXen
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145171\n"
+"help.text"
+msgid "The maximum zoom factor is 400%."
+msgstr "Maximální míra přiblížení je 400 %."
+
+#. dD3H5
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3155854\n"
+"help.text"
+msgid "<image id=\"img_id3151116\" src=\"cmd/sc_zoomin.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151116\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151116\" src=\"cmd/sc_zoomin.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151116\">Ikona</alt></image>"
+
+#. GcJsA
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145273\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Přiblížit"
+
+#. XTPaZ
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Oddálit"
+
+#. P4mw7
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"bm_id3153561\n"
+"help.text"
+msgid "<bookmark_value>page views;reducing scales</bookmark_value><bookmark_value>zooming;reducing page views</bookmark_value>"
+msgstr "<bookmark_value>pohled na stránku;zmenšení</bookmark_value><bookmark_value>lupa;zmenšení pohledu na stránku</bookmark_value><bookmark_value>přibližování;zmenšení pohledu na stránku</bookmark_value>"
+
+#. Ffzbc
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"hd_id3153561\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10060000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/scalc/02/10060000.xhp\">Oddálit</link>"
+
+#. BgFbq
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3151246\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomOut\">Reduces the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomOut\">Zmenší zobrazení aktuálního dokumentu. Aktuální míra přiblížení se zobrazuje ve <emph>stavovém řádku</emph>.</ahelp>"
+
+#. Czu2U
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "The minimum zoom factor is 20%."
+msgstr "Minimální míra přiblížení je 20 %."
+
+#. DN9qj
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Ikona</alt></image>"
+
+#. rfG8A
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150440\n"
+"help.text"
+msgid "Zooming Out"
+msgstr "Oddálit"
+
+#. BwqAM
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Vložit"
+
+#. GADDh
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"bm_id3156329\n"
+"help.text"
+msgid "<bookmark_value>inserting; objects, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>vkládání; objekty, ikona na nástrojové liště</bookmark_value>"
+
+#. pM9zg
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/scalc/02/18010000.xhp\">Vložit</link>"
+
+#. UfEHG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3147336\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCtrl\">Click the arrow next to the icon to open the <emph>Insert </emph>toolbar, where you can add graphics and special characters to the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">Klepnutím na šipku vedle ikony bude otevřena nástrojová lišta <emph>Vložit </emph>, kde je možné do aktuálního listu vložit obrázky nebo speciální znaky.</ahelp>"
+
+#. DnSkt
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3148664\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Ikona na liště Nástroje:"
+
+#. Eaf8D
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Ikonka</alt></image>"
+
+#. sQ6Tc
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3146120\n"
+"help.text"
+msgid "Insert"
+msgstr "Vložit"
+
+#. ZVCSS
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3153188\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Máte na výběr z následujících ikon:"
+
+#. CCP2V
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id4283883\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Plovoucí rámec</link>"
+
+#. gdmkZ
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3149410\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Speciální znak</link>"
+
+#. FDin8
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3151117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Ze souboru</link>"
+
+#. UKJsG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3633533\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">Vzorec</link>"
+
+#. sCB8B
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Graf</link>"
+
+#. zc6Yi
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id7581408\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">Objekt OLE</link>"
+
+#. QMjWB
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Cells"
+msgstr "Vložit buňky"
+
+#. h3979
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"bm_id3150275\n"
+"help.text"
+msgid "<bookmark_value>inserting; cells, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>vkládání; buňky, ikona nástrojové lišty</bookmark_value>"
+
+#. RysCQ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18020000.xhp\">Insert Cells</link>"
+msgstr "<link href=\"text/scalc/02/18020000.xhp\">Vložit buňky</link>"
+
+#. iTWkf
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3156024\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsCellsCtrl\">Click the arrow next to the icon to open the <emph>Insert Cells </emph>toolbar, where you can insert cells, rows, and columns into the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsCellsCtrl\">Klepnutím na šipku vedle ikony bude otevřena nástrojová lišta <emph>Vložit buňky</emph>, kde je možné vkládat buňky, řádky a sloupce do aktuálního listu.</ahelp>"
+
+#. o7wEe
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Ikona na liště Nástroje:"
+
+#. eqHih
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Máte na výběr z následujících ikon:"
+
+#. JPhcE
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150439\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Down</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Vložit buňky dolů</link>"
+
+#. c3Xmu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3146119\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Right</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Vložit buňky vpravo</link>"
+
+#. XXyxu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153190\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Rows</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Řádky</link>"
+
+#. i4ifJ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153726\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Columns</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Sloupce</link>"

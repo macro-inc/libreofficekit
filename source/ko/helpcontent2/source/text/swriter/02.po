@@ -1,0 +1,4193 @@
+#. extracted from helpcontent2/source/text/swriter/02
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2018-04-19 05:47+0000\n"
+"Last-Translator: Jihui Choi <jihui.choi@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1524116831.000000\n"
+
+#. sqxGb
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toggle Ordered List"
+msgstr ""
+
+#. QF2ZL
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"hd_id3150220\n"
+"help.text"
+msgid "<variable id=\"numberingh1\"><link href=\"text/swriter/02/02110000.xhp\">Toggle Ordered List</link></variable>"
+msgstr ""
+
+#. ABQAW
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150240\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DefaultNumbering\">Adds or removes numbering from the selected paragraphs.</ahelp>"
+msgstr ""
+
+#. yGcX6
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id221649422095688\n"
+"help.text"
+msgid "To define the numbering format, choose <emph>Format - Bullets and Numbering</emph>. To display the <emph>Bullets and Numbering</emph> Bar, choose <emph>View - Toolbars - Bullets and Numbering</emph>."
+msgstr ""
+
+#. mLmDR
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150952\n"
+"help.text"
+msgid "Some of the bullets and numbering options are not available when working in the <link href=\"text/swriter/01/03120000.xhp\">Web Layout</link>."
+msgstr "일부 글머리 기호 및 번호 매기기 옵션은 <link href=\"text/swriter/01/03120000.xhp\">웹 레이아웃</link> 모드에서 사용할 수 없습니다."
+
+#. dwn77
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150502\n"
+"help.text"
+msgid "<image id=\"img_id3150508\" src=\"cmd/lc_defaultnumbering.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150508\">Toggle Ordered List Icon</alt></image>"
+msgstr ""
+
+#. yYfzC
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3147525\n"
+"help.text"
+msgid "Toggle Ordered List"
+msgstr ""
+
+#. AMB3E
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3147549\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06050000.xhp\">Bullets and Numbering</link>"
+msgstr "<link href=\"text/shared/01/06050000.xhp\">글머리 기호 및 번호 매기기</link>"
+
+#. vCvMN
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Link Frames"
+msgstr ""
+
+#. yDnvB
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"hd_id3148869\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/03210000.xhp\">Link Frames</link>"
+msgstr ""
+
+#. HhxBu
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3149873\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChainFrames\" visibility=\"visible\">Links the selected frame to the next frame.</ahelp> The text automatically flows from one frame to another."
+msgstr "<ahelp hid=\".uno:ChainFrames\" visibility=\"visible\">선택한 프레임을 다음 프레임에 연결합니다.</ahelp> 텍스트는 자동으로 한 프레임에서 다른 프레임으로 흐릅니다."
+
+#. tVMCL
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id721613395973296\n"
+"help.text"
+msgid "Choose <menuitem>Format - Frame and Object - Link Frames</menuitem>."
+msgstr ""
+
+#. VTeFM
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id531613396047070\n"
+"help.text"
+msgid "On the <emph>Format</emph> bar, click the <emph>Link Frames</emph> icon."
+msgstr ""
+
+#. BA5Cn
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<image src=\"cmd/sc_chainframes.png\" id=\"img_id3148771\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148771\">Icon Link Frames</alt></image>"
+msgstr ""
+
+#. kcF9p
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3149288\n"
+"help.text"
+msgid "Link Frames"
+msgstr "링크 프레임"
+
+#. 4BWgB
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Unlink Frames"
+msgstr "프레임 연결 해제"
+
+#. mBvuA
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"bm_id3151188\n"
+"help.text"
+msgid "<bookmark_value>frames;unlinking</bookmark_value><bookmark_value>unlinking frames</bookmark_value>"
+msgstr "<bookmark_value>프레임; 연결 해제</bookmark_value><bookmark_value>프레임 연결 해제</bookmark_value>"
+
+#. mDTZs
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"hd_id3151188\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/03220000.xhp\">Unlink Frames</link>"
+msgstr "<link href=\"text/swriter/02/03220000.xhp\">프레임 연결 해제</link>"
+
+#. DMdUB
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3145412\n"
+"help.text"
+msgid "<ahelp hid=\".uno:UnhainFrames\">Breaks the link between two frames.</ahelp> You can only break the link that extends from the selected frame to the target frame."
+msgstr "<ahelp hid=\".uno:UnhainFrames\">두 프레임 사이의 링크를 끊습니다.</ahelp> 선택한 프레임에서 대상 프레임으로 확장한 링크인 경우에만 끊을 수 있습니다."
+
+#. eDuj2
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3155903\n"
+"help.text"
+msgid "<image id=\"img_id3149687\" src=\"cmd/sc_unhainframes.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3149687\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149687\" src=\"cmd/sc_unhainframes.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3149687\" xml-lang=\"ko-KR\">아이콘</alt></image>"
+
+#. 9CrhG
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3155628\n"
+"help.text"
+msgid "Unlink Frames"
+msgstr "프레임 연결 해제"
+
+#. ytwBC
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Rows"
+msgstr "행 삽입"
+
+#. agDLU
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"bm_id3154838\n"
+"help.text"
+msgid "<bookmark_value>tables; inserting rows</bookmark_value><bookmark_value>rows; inserting in tables, using icon</bookmark_value>"
+msgstr "<bookmark_value>표; 행 삽입</bookmark_value><bookmark_value>행; 표에 삽입, 아이콘 사용</bookmark_value>"
+
+#. W9zgL
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"hd_id3154838\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04090000.xhp\">Insert Rows</link>"
+msgstr "<link href=\"text/swriter/02/04090000.xhp\">행 삽입</link>"
+
+#. 46DLZ
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3147407\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertRows\">Inserts one or more rows in the table, below the selection. You can insert more than one row by opening the dialog (choose <emph>Table - Insert - Rows</emph>), or by selecting more than one row before clicking the icon.</ahelp> The second method inserts rows of the same height as the originally selected rows."
+msgstr "<ahelp hid=\".uno:InsertRows\">표에서 선택 사항 아래에 행을 하나 이상 삽입합니다. 해당 대화 상자를 열거나(<emph>표 - 삽입 - 행</emph>) 해당 아이콘을 클릭하기 전에 행을 두 개 이상 선택하여 행을 두 개 이상 삽입할 수 있습니다.</ahelp> 두번째 방법을 사용하면 삽입된 행은 원래 선택한 행과 동일한 높이가 됩니다."
+
+#. xNXBv
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3151180\n"
+"help.text"
+msgid "<image id=\"img_id3151189\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151189\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151189\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151189\">아이콘</alt></image>"
+
+#. cUehP
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3149670\n"
+"help.text"
+msgid "Insert Row"
+msgstr "행 삽입"
+
+#. SDTyQ
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Column"
+msgstr "열 삽입"
+
+#. FQEcy
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"bm_id3152899\n"
+"help.text"
+msgid "<bookmark_value>tables; inserting columns in</bookmark_value><bookmark_value>columns; inserting in tables</bookmark_value>"
+msgstr "<bookmark_value>표; 열 삽입</bookmark_value><bookmark_value>열; 표에 삽입</bookmark_value>"
+
+#. TJe6s
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"hd_id3152899\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04100000.xhp\">Insert Column</link>"
+msgstr "<link href=\"text/swriter/02/04100000.xhp\">열 삽입</link>"
+
+#. K7GFa
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3145078\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertColumns\">Inserts one or more columns into the table, after the selection. You can insert several columns at the same time by opening the dialog (choose <emph>Table - Insert - Columns</emph>), or by selecting several columns before clicking the icon.</ahelp> If the latter method is used, the columns inserted will have the same relative width as the selected columns."
+msgstr "<ahelp hid=\".uno:InsertColumns\">표에서 선택 사항 다음에 열을 하나 이상 삽입합니다. 대화 상자를 열거나(<emph>표 - 삽입 - 열</emph> 선택) 해당 아이콘을 클릭하기 전에 여러 열을 선택하여 동시에 여러 열을 삽입할 수 있습니다.</ahelp> 두 번째 방법을 사용하면 삽입된 열은 원래 선택한 열과 동일한 상대 너비가 됩니다."
+
+#. BVL59
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3149691\n"
+"help.text"
+msgid "<image id=\"img_id3155174\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155174\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155174\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155174\">아이콘</alt></image>"
+
+#. NGX9F
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3149669\n"
+"help.text"
+msgid "Insert Column"
+msgstr "열 삽입"
+
+#. V8cm8
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Fixed"
+msgstr "표: 고정"
+
+#. pdkkr
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"hd_id3151187\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04220000.xhp\">Table: Fixed</link>"
+msgstr "<link href=\"text/swriter/02/04220000.xhp\">표: 고정</link>"
+
+#. ACJtt
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3151174\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeFix\" visibility=\"visible\">If this mode is active, changes to a line and/or column affect only the neighboring lines or columns in question.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeFix\" visibility=\"visible\">이 모드가 작동되면 행과 열에서의 변경이 그 옆에만 작용됩니다.</ahelp>"
+
+#. ds3eW
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3155896\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodefix.png\" id=\"img_id3155903\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155903\">Icon Table: Fixed</alt></image>"
+msgstr ""
+
+#. aRzgG
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3155066\n"
+"help.text"
+msgid "Table: Fixed"
+msgstr "표: 고정"
+
+#. feUuF
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Fixed, Proportional"
+msgstr "표: 고정, 비례"
+
+#. ovm4D
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"hd_id3147169\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04230000.xhp\">Table: Fixed, Proportional</link>"
+msgstr "<link href=\"text/swriter/02/04230000.xhp\">표: 고정, 비례</link>"
+
+#. TXCTY
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3145246\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeFixProp\" visibility=\"visible\">If this mode is active, changes to the line and/or column affect the entire table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeFixProp\" visibility=\"visible\">이 모드가 활성화되어 있으면 선 및/또는 열 변경이 전체 표에 영향을 미칩니다.</ahelp>"
+
+#. f7A4m
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3145087\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodefixprop.png\" id=\"img_id3156378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156378\">Icon Table: Fixed, Proportional</alt></image>"
+msgstr ""
+
+#. nSBPn
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3149497\n"
+"help.text"
+msgid "Table: Fixed, Proportional"
+msgstr "표: 고정, 비례"
+
+#. 9JRZE
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Variable"
+msgstr "표; 변수"
+
+#. wdjWM
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"hd_id3154501\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04240000.xhp\">Table: Variable</link>"
+msgstr "<link href=\"text/swriter/02/04240000.xhp\">표: 변수</link>"
+
+#. GKKgd
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3151182\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeVariable\" visibility=\"visible\">If this mode is active, changes to a line and/or column affect the size of the table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeVariable\" visibility=\"visible\">이 모드가 작동되면 행과 열에서의 변경에 따라 표 크기가 달라집니다.</ahelp>"
+
+#. 5oPk9
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3145415\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodevariable.png\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Icon Table: Variable</alt></image>"
+msgstr ""
+
+#. 6EZas
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Table: Variable"
+msgstr "표; 변수"
+
+#. 27FsC
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sum"
+msgstr "합계"
+
+#. WB2ER
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"hd_id3143232\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04250000.xhp\">Sum</link>"
+msgstr "<link href=\"text/swriter/02/04250000.xhp\">합계</link>"
+
+#. BycTx
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3146899\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AutoSum\">Activates the sum function. Note that the cursor must be in the cell where you want the sum to appear.</ahelp>"
+msgstr "<ahelp hid=\".uno:AutoSum\">합계 함수를 활성화합니다. 합계를 표시할 셀에 커서를 위치시켜야 합니다.</ahelp>"
+
+#. Rv2Fi
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3154504\n"
+"help.text"
+msgid "%PRODUCTNAME recognizes the cell range for the sum function as long as the cells are filled with numbers. Prior to entering the data, you must choose <menuitem>Table - Number Recognition</menuitem> to enable this feature."
+msgstr ""
+
+#. CmiXF
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3148771\n"
+"help.text"
+msgid "Click <emph>Apply</emph> to accept the sum formula as it appears in the entry line."
+msgstr "합계 수식을 입력 행에 표시된 것과 같이 적용하려면 <emph>적용</emph>을 클릭합니다."
+
+#. HnsKB
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3145418\n"
+"help.text"
+msgid "<image id=\"img_id3147512\" src=\"cmd/sc_autosum.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147512\">Icon</alt></image>"
+msgstr ""
+
+#. ZiCky
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3150750\n"
+"help.text"
+msgid "Sum"
+msgstr "합계"
+
+#. GqFYN
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "No List"
+msgstr ""
+
+#. QGkTU
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"hd_id3145822\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06040000.xhp\">No List</link>"
+msgstr ""
+
+#. MPBzT
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3154505\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RemoveBullets\" visibility=\"visible\">Removes numbering or bullets and list indenting for the current paragraph or selected paragraphs.</ahelp>"
+msgstr ""
+
+#. LDHCy
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "<image src=\"cmd/lc_removebullets.png\" id=\"img_id3145083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145083\">Icon No List</alt></image>"
+msgstr ""
+
+#. iNFhx
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "No List"
+msgstr ""
+
+#. 5FX23
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id811614270889392\n"
+"help.text"
+msgid "To preserve indenting, but remove bullet or number, place cursor at the beginning of the paragraph and press <keycode>Backspace</keycode>."
+msgstr ""
+
+#. ARLxg
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Demote Outline Level with Subpoints"
+msgstr ""
+
+#. JVsVH
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"hd_id3145826\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06070000.xhp\">Demote Outline Level with Subpoints</link>"
+msgstr ""
+
+#. eFSaF
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145241\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DecrementSubLevels\">Demotes the list of a list paragraph where the cursor is located and its subpoints to the next list level.</ahelp> Multiple list paragraphs can be selected. Demotes the outline level of a chapter heading where the cursor is located and all its subheadings to the next outline level. This command is active only when the cursor is positioned in a list paragraph or a chapter heading."
+msgstr ""
+
+#. EH6kY
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145084\n"
+"help.text"
+msgid "<image id=\"img_id3156376\" src=\"cmd/sc_decrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156376\">Icon Demote Outline Level with Subpoints</alt></image>"
+msgstr ""
+
+#. gUUUN
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145088\n"
+"help.text"
+msgid "Demote Outline Level With Subpoints"
+msgstr ""
+
+#. kG3Fb
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Promote Outline Level With Subpoints"
+msgstr ""
+
+#. Gkdat
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"hd_id3154507\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06080000.xhp\">Promote Outline Level With Subpoints</link>"
+msgstr ""
+
+#. KkHwc
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3151189\n"
+"help.text"
+msgid "<ahelp hid=\".uno:IncrementSubLevels\">Promotes the list level of a list paragraph where the cursor is located and its subpoints to the next list level.</ahelp> Multiple list paragraphs can be selected. Promotes the outline level of a chapter heading where the cursor is located and all its subheadings to the next outline level. This command is active only when the cursor is positioned in a list paragraph or chapter heading."
+msgstr ""
+
+#. 98iKX
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3145410\n"
+"help.text"
+msgid "<image id=\"img_id3145421\" src=\"cmd/sc_incrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145421\">Icon Promote Outline Level With Subpoints</alt></image>"
+msgstr ""
+
+#. BEMRR
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3145417\n"
+"help.text"
+msgid "Promote Outline Level With Subpoints"
+msgstr ""
+
+#. jPBGz
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Unnumbered Entry"
+msgstr "번호 없이 항목 삽입"
+
+#. SBEu5
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"hd_id3154505\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06090000.xhp\">Insert Unnumbered Entry</link>"
+msgstr "<link href=\"text/swriter/02/06090000.xhp\">번호 없이 항목 삽입</link>"
+
+#. WX5QJ
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3148775\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertNeutralParagraph\">Inserts a paragraph without numbering. The existing numbering will not be affected.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertNeutralParagraph\">번호를 매기지 않고 단락을 삽입합니다. 기존 번호 매기기는 영향을 받지 않을 것입니다.</ahelp>"
+
+#. L9LqK
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3156377\n"
+"help.text"
+msgid "<image id=\"img_id3156384\" src=\"cmd/sc_insertneutralparagraph.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156384\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156384\" src=\"cmd/sc_insertneutralparagraph.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156384\">아이콘</alt></image>"
+
+#. Ut87w
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3156381\n"
+"help.text"
+msgid "Insert Unnumbered Entry"
+msgstr "번호 없이 항목 삽입"
+
+#. D97qQ
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Move Item Up with Subpoints"
+msgstr ""
+
+#. AF9FJ
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"hd_id3147174\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06120000.xhp\">Move Item Up with Subpoints</link>"
+msgstr ""
+
+#. tHDTp
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "<ahelp hid=\".uno:MoveUpSubItems\" visibility=\"visible\">Moves a list paragraph where the cursor is located and its subpoints to before the previous list paragraph with the same list level. Moves a chapter heading where the cursor is located and all its subheadings and text to before the previous heading at the same outline level.</ahelp> You can also select and move more than one list paragraph or chapter heading. This command is only active when the cursor is positioned within a list paragraph or chapter heading."
+msgstr ""
+
+#. KVXUP
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3145083\n"
+"help.text"
+msgid "<image src=\"cmd/sc_moveupsubitems.svg\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Icon Move Up with Subpoints</alt></image>"
+msgstr ""
+
+#. SRDNE
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Move Item Up with Subpoints"
+msgstr ""
+
+#. 9tvuo
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Move Item Down with Subpoints"
+msgstr ""
+
+#. ByHPH
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"hd_id3154501\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06130000.xhp\">Move Item Down with Subpoints</link>"
+msgstr ""
+
+#. nLCpV
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3148770\n"
+"help.text"
+msgid "<ahelp hid=\".uno:MoveDownSubItems\" visibility=\"visible\">Moves a list paragraph where the cursor is located and its subpoints to after the following list paragraph with the same list level. Moves a chapter heading where the cursor is located and all its subheadings and text to after the following heading at the same outline level.</ahelp> You can also select and move more than one list paragraph or chapter heading. This command is only active when the cursor is positioned in a list paragraph or chapter heading."
+msgstr ""
+
+#. JX6PL
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3145086\n"
+"help.text"
+msgid "<image src=\"cmd/sc_movedownsubitems.svg\" id=\"img_id3156377\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156377\">Icon Move Down with Subpoints</alt></image>"
+msgstr ""
+
+#. PE4NZ
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Move Item Down with Subpoints"
+msgstr ""
+
+#. vLXu5
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Restart Numbering"
+msgstr "번호 매기기 다시 시작"
+
+#. HqgkP
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"hd_id3147171\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06140000.xhp\">Restart Numbering</link>"
+msgstr "<link href=\"text/swriter/02/06140000.xhp\">번호 매기기 새로 시작</link>"
+
+#. iwJHH
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145249\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberingStart\" visibility=\"visible\">Restarts list numbering from 1.</ahelp> This command is only active when the cursor is positioned within a list."
+msgstr ""
+
+#. 89Xm9
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id631616370838434\n"
+"help.text"
+msgid "Choose <menuitem>Format - Lists - Restart Numbering</menuitem>."
+msgstr ""
+
+#. fh5aw
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id31616370717930\n"
+"help.text"
+msgid "Place cursor in a list paragraph, right-click and choose <menuitem>List - Restart Numbering</menuitem>."
+msgstr ""
+
+#. bahpE
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id351616370727010\n"
+"help.text"
+msgid "On <link href=\"text/shared/01/06050000.xhp\"><emph>Bullets and Numbering</emph></link> bar, click"
+msgstr ""
+
+#. SLjuC
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145082\n"
+"help.text"
+msgid "<image src=\"cmd/sc_numberingstart.png\" id=\"img_id3145089\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145089\">Icon Restart Numbering</alt></image>"
+msgstr ""
+
+#. dPfnv
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145086\n"
+"help.text"
+msgid "Restart Numbering"
+msgstr "번호 매기기 다시 시작"
+
+#. DmEY6
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id761616370463787\n"
+"help.text"
+msgid "To remove the numbering restart, apply the command again in the paragraph where the numbering was restarted."
+msgstr ""
+
+#. yoUyg
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id261616371203225\n"
+"help.text"
+msgid "To restart numbering with a number greater than 1, right-click in the paragraph where you want to restart numbering, choose <menuitem>Paragraph - Paragraph - </menuitem><link href=\"text/swriter/01/05030800.xhp\">Outline & List</link> tab, select <menuitem>Restart numbering at this paragraph</menuitem> and enter the start number in <menuitem>Start with</menuitem>."
+msgstr ""
+
+#. qCdhk
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Number"
+msgstr "페이지 번호"
+
+#. WJ2wq
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"hd_id3145241\n"
+"help.text"
+msgid "Page Number"
+msgstr ""
+
+#. JTxYv
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3151184\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatePageNumber\">The current page number is displayed in this field of the status bar. A click opens \"Go to Page\", with which you can navigate in the document. A right-click shows all bookmarks in the document. Click a bookmark to position the text cursor at the bookmark location.</ahelp>"
+msgstr ""
+
+#. BinAk
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3145078\n"
+"help.text"
+msgid "The displayed page (x) and the total number of pages (y) are shown in the form <emph>Page x/y</emph> When you scroll through a document with the mouse, the page number is displayed when you release the mouse button. When you scroll using the right scrollbar, the page numbers are displayed as a Help tip. The page numbering format of the status bar and scrollbar is identical."
+msgstr "표시된 페이지 (x)와 문서의 전체 페이지 수 (y)가 <emph>페이지 x/y</emph>의 형태로 표시됩니다. 마우스를 사용하여 여러 페이지의 문서를 넘길 때에는 마우스 버튼에서 손을 떼면 페이지의 번호가 표시됩니다. 오른쪽 스크롤 막대를 사용하여 스크롤하면 페이지 번호가 도움말 팁으로 표시됩니다. 상태 표시줄과 스크롤 막대의 페이지 번호 매기기 서식은 동일합니다."
+
+#. Ywsr3
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3145417\n"
+"help.text"
+msgid "You can turn the <link href=\"text/swriter/01/02110000.xhp\">Navigator</link> display on or off by double-clicking the<emph> Page Number </emph>field."
+msgstr "<emph>페이지 번호</emph> 필드를 더블 클릭하여 <link href=\"text/swriter/01/02110000.xhp\">내비게이터</link> 표시를 설정하거나 해제할 수 있습니다."
+
+#. 7CeFv
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3149806\n"
+"help.text"
+msgid "To go to a specific page, enter the page number in the <emph>Page</emph> spin button in the Navigator and then press Enter."
+msgstr "내비게이터를 사용하여 특정한 페이지로 이동하려면 내비게이터의 <emph>쪽</emph> 회전 필드에 쪽 번호를 입력하고 입력 키를 누르십시오."
+
+#. NptAB
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3149095\n"
+"help.text"
+msgid "By pressing the shortcut keys Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F5, you switch to entering a page number. When you press Enter, the cursor moves to the selected page."
+msgstr "단축키 Shift + <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + F5를 눌러 페이지 번호 입력으로 전환할 수 있습니다. Enter 키를 누르면 커서가 선택한 페이지로 이동합니다."
+
+#. xw7kE
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Combined Display"
+msgstr "조합된 표시"
+
+#. xwbpK
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"hd_id3151186\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/08080000.xhp\">Combined Display</link>"
+msgstr "<link href=\"text/swriter/02/08080000.xhp\">조합된 표시</link>"
+
+#. RRcoi
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3151172\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatusBarFunc\" visibility=\"visible\">Displays current information about the active document.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatusBarFunc\" visibility=\"visible\">활성 문서에 대한 현재 정보를 표시합니다.</ahelp>"
+
+#. YJiwS
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3156375\n"
+"help.text"
+msgid "When the cursor is in a named section, the section name appears. When the cursor is in a table, the name of the table cell appears. The size of the object is shown when you edit frames or drawing objects."
+msgstr "커서가 이름이 지정된 구역에 있으면 구역 이름이 표시됩니다. 커서가 표 안에 있으면 표 셀의 이름이 표시됩니다. 프레임이나 그리기 개체를 편집할 때는 개체의 크기가 표시됩니다."
+
+#. Yw2PH
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3145416\n"
+"help.text"
+msgid "When the cursor is positioned within text, you can double-click this field to open the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. In this dialog, you can define a field to be inserted in your document at the current cursor position. When the cursor is positioned in a table, a double-click in this field will call the <emph>Table Format</emph> dialog. Depending on the object selected, you can call up a dialog to edit a section, a graphic object, a floating frame, an OLE object, direct numbering or the position and size of a drawing object."
+msgstr "커서가 텍스트 내에 있으면 이 필드를 두 번 눌러 <link href=\"text/swriter/01/04090000.xhp\"><emph>필드</emph></link> 대화 상자를 엽니다. 문서의 현재 커서 위치에 삽입할 필드를 이 대화 상자에서 지정합니다. 커서가 표에 있는 경우 이 필드를 더블 클릭하면 <emph>표 서식</emph> 대화 상자가 나타납니다. 선택한 개체에 따라 구역, 그림 개체, 부동 프레임, OLE 개체, 수동 번호 매기기 또는 그리기 개체의 위치와 크기를 편집할 수 있는 대화 상자를 표시할 수 있습니다."
+
+#. kdhmw
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom In"
+msgstr "확대"
+
+#. 3nMKp
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"hd_id3151173\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10010000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/swriter/02/10010000.xhp\">확대</link>"
+
+#. B6oDo
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3163866\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomPlus\" visibility=\"visible\">Zooms in to get a close-up view of the document.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomPlus\" visibility=\"visible\">확대하여 문서를 상세하게 봅니다.</ahelp>"
+
+#. Lkcqa
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3154572\n"
+"help.text"
+msgid "<image src=\"cmd/sc_zoomin.svg\" id=\"img_id3155895\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155895\">Icon Zoom In</alt></image>"
+msgstr ""
+
+#. pBveG
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3155892\n"
+"help.text"
+msgid "Zoom In"
+msgstr "확대"
+
+#. LrnbF
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "축소"
+
+#. CYW6C
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"hd_id3149870\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10020000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/swriter/02/10020000.xhp\">축소</link>"
+
+#. FPsvN
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3147401\n"
+"help.text"
+msgid "<ahelp hid=\".\">Zooms out to see more of the document at a reduced size.</ahelp>"
+msgstr "<ahelp hid=\".\">축소하여 작은 크기로 문서의 더 많은 부분을 봅니다.</ahelp>"
+
+#. MGnnw
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3148775\n"
+"help.text"
+msgid "<image id=\"img_id3150764\" src=\"cmd/sc_zoomout.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150764\">Zoom Out Icon</alt></image>"
+msgstr ""
+
+#. k3fKF
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "축소"
+
+#. 4jEhf
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Preview Zoom"
+msgstr "축소/확대 미리 보기"
+
+#. GJSJx
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"hd_id3147175\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10030000.xhp\">Preview Zoom</link>"
+msgstr "<link href=\"text/swriter/02/10030000.xhp\">축소/확대 미리 보기</link>"
+
+#. zWNEA
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<ahelp hid=\"HID_PVIEW_ZOOM_LB\">Determines the zoom level of the print preview.</ahelp>"
+msgstr "<ahelp hid=\"HID_PVIEW_ZOOM_LB\">미리 보기의 축소/확대 수준을 결정합니다.</ahelp>"
+
+#. FCDCs
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Single Page Preview"
+msgstr ""
+
+#. XUTbH
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"hd_id691649976425993\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10040000.xhp\">Single Page Preview</link>"
+msgstr ""
+
+#. 8ttBs
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id801649977112401\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowSinglePage\" visibility=\"visible\">Displays one page at a time in the Print Preview window.</ahelp>"
+msgstr ""
+
+#. iwFVN
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id331649976674083\n"
+"help.text"
+msgid "<image src=\"cmd/sc_showsinglepage.svg\" id=\"img_id921649976674083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id861649976674083\">Single Page Preview Icon</alt></image>"
+msgstr ""
+
+#. TgK95
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id161649976674083\n"
+"help.text"
+msgid "Single Page Preview"
+msgstr ""
+
+#. KSNCT
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Two Pages Preview"
+msgstr "미리보기: 두 페이지"
+
+#. 5xzdG
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"hd_id3145822\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10050000.xhp\">Two Pages Preview</link>"
+msgstr "<link href=\"text/swriter/02/10050000.xhp\">미리보기: 두 페이지</link>"
+
+#. JbPBQ
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3154504\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowTwoPages\" visibility=\"visible\">Displays two pages in the Print Preview window.</ahelp> Uneven numbers will always appear on the right side, even numbers on the left."
+msgstr "<ahelp hid=\".uno:ShowTwoPages\" visibility=\"visible\">페이지 미리보기 창에 두 개의 페이지를 표시합니다.</ahelp> 항상 홀수는 오른쪽에, 짝수는 왼쪽에 표시됩니다."
+
+#. 5xzpi
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3149292\n"
+"help.text"
+msgid "<image src=\"cmd/sc_showtwopages.png\" id=\"img_id3151170\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151170\">Icon Two Pages Preview</alt></image>"
+msgstr ""
+
+#. tb5KW
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3151168\n"
+"help.text"
+msgid "Two Pages Preview"
+msgstr "미리보기: 두 페이지"
+
+#. exrVU
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Multiple Pages Preview"
+msgstr "미리보기: 여러 페이지"
+
+#. GSkNm
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3147171\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10070000.xhp\">Multiple Pages Preview</link>"
+msgstr ""
+
+#. NhuBC
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3148771\n"
+"help.text"
+msgid "<ahelp hid=\".uno:PreviewZoom\">Defines the number of pages displayed on screen. Click the arrow next to the icon to open a grid to select the number of pages to be displayed as rows and columns in the preview.</ahelp>"
+msgstr "<ahelp hid=\".uno:PreviewZoom\">화면에 표시할 페이지 수를 지정합니다. 아이콘 옆에 있는 화살표를 눌러 격자를 연 후에 미리 보기에서 행과 열로 표시할 페이지 수를 선택합니다.</ahelp>"
+
+#. TDxzR
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3152738\n"
+"help.text"
+msgid "<image id=\"img_id3152744\" src=\"cmd/sc_showmultiplepages.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152744\">Icon Multiple Pages Preview</alt></image>"
+msgstr ""
+
+#. zUeSr
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149805\n"
+"help.text"
+msgid "Multiple Pages Preview"
+msgstr "미리보기: 여러 페이지"
+
+#. 68LCW
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3154573\n"
+"help.text"
+msgid "After clicking the <menuitem>Multiple Pages Preview</menuitem> icon,  move the mouse over the desired number of rows and columns."
+msgstr ""
+
+#. W4FH2
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id121649340192450\n"
+"help.text"
+msgid "More Options"
+msgstr ""
+
+#. ACeQB
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149822\n"
+"help.text"
+msgid "You can also choose settings by clicking <menuitem>More Options</menuitem> to open a new dialog, then use the two spin buttons to set the number of pages to be displayed."
+msgstr ""
+
+#. F9TJ2
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3149695\n"
+"help.text"
+msgid "Rows"
+msgstr "행"
+
+#. Bt9Yt
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149483\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/rows\">Defines the number of rows of pages.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/rows\">페이지의 행 수를 지정합니다.</ahelp>"
+
+#. D3EDZ
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3143274\n"
+"help.text"
+msgid "Columns"
+msgstr "열"
+
+#. 6HkQB
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149102\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/cols\">Defines the number of pages shown in columns.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/cols\">열에 표시되는 페이지 수를 지정합니다.</ahelp>"
+
+#. fn4C8
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Book preview"
+msgstr "책 미리 보기"
+
+#. q8XNf
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"bm_id9658192\n"
+"help.text"
+msgid "<bookmark_value>previews;book preview</bookmark_value><bookmark_value>book previews</bookmark_value>"
+msgstr "<bookmark_value>미리 보기;책 미리 보기</bookmark_value><bookmark_value>책 미리 보기</bookmark_value>"
+
+#. 68CcD
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10548\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10080000.xhp\">Book preview</link>"
+msgstr "<link href=\"text/swriter/02/10080000.xhp\">책 미리 보기</link>"
+
+#. eQo67
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN1054C\n"
+"help.text"
+msgid "<ahelp hid=\".\">Select to display the first page on the right side in the print preview.</ahelp> If not selected, the first page is displayed on the left side of the preview."
+msgstr ""
+
+#. sJbRH
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10635\n"
+"help.text"
+msgid "<image id=\"img_id8750572\" src=\"cmd/sc_showbookview.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8750572\">book preview icon</alt></image>"
+msgstr ""
+
+#. PDgVj
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10614\n"
+"help.text"
+msgid "Book Preview"
+msgstr "책 미리 보기"
+
+#. EyfbL
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Print page view"
+msgstr "페이지 보기 인쇄"
+
+#. CYSES
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"hd_id3152895\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10090000.xhp\">Print page view</link>"
+msgstr "<link href=\"text/swriter/02/10090000.xhp\">페이지 보기 인쇄</link>"
+
+#. zBqRk
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"par_id3149811\n"
+"help.text"
+msgid "<image id=\"img_id3154575\" src=\"cmd/sc_printpagepreview.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154575\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154575\" src=\"cmd/sc_printpagepreview.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154575\">아이콘</alt></image>"
+
+#. 9Wz63
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"par_id3154568\n"
+"help.text"
+msgid "Print page view"
+msgstr "페이지 보기 인쇄"
+
+#. n6W25
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cell Reference"
+msgstr "셀 참조"
+
+#. oisnp
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"hd_id3143228\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14010000.xhp\">Cell Reference</link>"
+msgstr "<link href=\"text/swriter/02/14010000.xhp\">셀 참조</link>"
+
+#. 44pDz
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"par_id3149052\n"
+"help.text"
+msgid "Displays the position of the cell cursor in a table."
+msgstr "표에서 셀 커서의 위치를 표시합니다."
+
+#. AGA9L
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula"
+msgstr "수식"
+
+#. AjuPD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"bm_id3149687\n"
+"help.text"
+msgid "<bookmark_value>formulas; in text documents</bookmark_value><bookmark_value>table formulas; in text documents</bookmark_value><bookmark_value>operators; in table formulas</bookmark_value><bookmark_value>statistical functions in tables</bookmark_value><bookmark_value>mathematical functions in tables</bookmark_value><bookmark_value>trigonometric functions in tables</bookmark_value><bookmark_value>pages;number of pages in table formulas</bookmark_value><bookmark_value>variables;document properties in table formulas</bookmark_value><bookmark_value>arithmetical operators in formulas</bookmark_value>"
+msgstr ""
+
+#. m828y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3149687\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14020000.xhp\">Formula</link>"
+msgstr "<link href=\"text/swriter/02/14020000.xhp\">수식</link>"
+
+#. fMazZ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3143270\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a submenu, from which you can insert a formula into the cell of a table.</ahelp> Place the cursor in a cell in the table or at the position in the document where you want the result to appear. Click the<emph> Formula </emph>icon and choose the desired formula from the submenu."
+msgstr "<ahelp hid=\".\">표의 셀에 수식을 삽입할 수 있는 하위 메뉴를 엽니다.</ahelp> 결과를 표시할 표의 셀이나 문서의 해당 위치에 커서를 놓습니다. <emph>수식</emph> 아이콘을 눌러 하위 메뉴에서 원하는 수식을 선택합니다."
+
+#. iCkcq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149096\n"
+"help.text"
+msgid "The formula appears in the input line. To specify a range of cells in a table, select the desired cells with the mouse. The corresponding cell references also appear in the input line. Enter additional parameters, as necessary, and click <emph>Apply</emph> to confirm your entry. You can also enter the formula directly if you know the appropriate syntax. This is necessary, for example, in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Insert Fields</emph></link> and <emph>Edit Fields</emph> dialogs."
+msgstr "수식이 입력줄에 표시됩니다. 표에서 셀 범위를 지정하려면 마우스를 사용하여 원하는 셀을 선택합니다. 해당 셀 참조도 입력줄에 표시됩니다. 필요한 경우 추가 매개 변수를 입력한 다음 <emph>적용</emph>을 눌러 입력을 확인합니다. 올바른 구문을 알고 있는 경우 수식을 직접 입력할 수도 있습니다. 이 기능은 <link href=\"text/swriter/01/04090000.xhp\"><emph>필드 삽입</emph></link>과 <emph>필드 편집</emph> 대화 상자 등에서 필요합니다."
+
+#. Nf9zE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id301663685328962\n"
+"help.text"
+msgid "Go to <menuitem>Table - Edit Formula</menuitem>."
+msgstr ""
+
+#. CDacX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id101599562003431\n"
+"help.text"
+msgid "In the Table toolbar, press the <emph>Insert or Edit Formula</emph> icon."
+msgstr ""
+
+#. akufr
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id621599564033048\n"
+"help.text"
+msgid "In a text document, press <keycode>F2</keycode>."
+msgstr ""
+
+#. cgzyx
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155142\n"
+"help.text"
+msgid "<image id=\"img_id3155148\" src=\"sw/res/sc20556.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155148\">Formula icon in Table toolbar</alt></image>"
+msgstr ""
+
+#. DbZyc
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150113\n"
+"help.text"
+msgid "Formula"
+msgstr "수식"
+
+#. D5MDw
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150691\n"
+"help.text"
+msgid "Summary of Formula Options"
+msgstr "수식 요소의 표"
+
+#. FcD7J
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3155858\n"
+"help.text"
+msgid "Basic Calculation Functions"
+msgstr "기본 수식 종류"
+
+#. E8BRA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id221599495805480\n"
+"help.text"
+msgid "Operation"
+msgstr ""
+
+#. 7KcQ9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id641599495805481\n"
+"help.text"
+msgid "Name"
+msgstr ""
+
+#. QywKU
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id121599495851064\n"
+"help.text"
+msgid "Example"
+msgstr ""
+
+#. 6VYWD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149565\n"
+"help.text"
+msgid "Addition"
+msgstr "덧셈"
+
+#. 4pWsP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149831\n"
+"help.text"
+msgid "Calculates the total."
+msgstr "합을 계산합니다."
+
+#. Kf7eZ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149845\n"
+"help.text"
+msgid "Example: <A1> + 8"
+msgstr "예: <A1> + 8"
+
+#. WGAhC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3156097\n"
+"help.text"
+msgid "Subtraction"
+msgstr "뺄셈"
+
+#. tFcef
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153122\n"
+"help.text"
+msgid "Calculates the difference."
+msgstr ""
+
+#. c9tdv
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153135\n"
+"help.text"
+msgid "Example: 10 - <B5>"
+msgstr "예: 10 - <B5>"
+
+#. 5fyhv
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149646\n"
+"help.text"
+msgid "Multiplication"
+msgstr "곱셈"
+
+#. 2HTL5
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154038\n"
+"help.text"
+msgid "MUL or *"
+msgstr "MUL 또는 *"
+
+#. CC9kx
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149965\n"
+"help.text"
+msgid "Calculates the product."
+msgstr "곱을 계산합니다."
+
+#. ZRwjP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149603\n"
+"help.text"
+msgid "Example: 7 MUL 9 displays 63"
+msgstr ""
+
+#. DWCXA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145096\n"
+"help.text"
+msgid "Division"
+msgstr "나눗셈"
+
+#. 6M5Fq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149570\n"
+"help.text"
+msgid "DIV or /"
+msgstr "DIV 또는 /"
+
+#. 7Ddva
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149592\n"
+"help.text"
+msgid "Calculates the quotient."
+msgstr ""
+
+#. ByDRp
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3156243\n"
+"help.text"
+msgid "Example: 100 DIV 15 displays 6.67"
+msgstr ""
+
+#. DdgLa
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3156260\n"
+"help.text"
+msgid "Basic Functions in the Submenu"
+msgstr "하위 메뉴의 기본 함수"
+
+#. xt4uW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id121599495989098\n"
+"help.text"
+msgid "Function"
+msgstr ""
+
+#. T7Ybo
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id901599495989100\n"
+"help.text"
+msgid "Name"
+msgstr ""
+
+#. 2fE5r
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id501599496006870\n"
+"help.text"
+msgid "Example"
+msgstr ""
+
+#. KwSwL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145185\n"
+"help.text"
+msgid "Sum"
+msgstr "합계"
+
+#. QD5ax
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155335\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sum\">Calculates the sum of the selected cells.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sum\">선택한 셀의 합계를 계산합니다.</ahelp>"
+
+#. 6AdeA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154411\n"
+"help.text"
+msgid "Example: SUM <A2:C2> displays the sum of the values in cells A2 to C2"
+msgstr "예: SUM <A2:C2>는 A2에서 C2까지의 셀에 있는 값의 합계를 표시합니다"
+
+#. uru7Q
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153381\n"
+"help.text"
+msgid "Round"
+msgstr "반올림"
+
+#. 4a69n
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145621\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/round\">Rounds a number to the specified decimal places.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/round\">지정한 소수점이하를 반올림합니다.</ahelp>"
+
+#. jhoL9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154862\n"
+"help.text"
+msgid "Example: 15.678 ROUND 2 displays 15.68"
+msgstr "예: 15,678 ROUND 2는 15,68을 나타냅니다"
+
+#. FkYje
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148687\n"
+"help.text"
+msgid "Percent"
+msgstr "백분율"
+
+#. kXxBq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155953\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/phd\">Calculates a percentage.</ahelp>"
+msgstr ""
+
+#. gefrq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149991\n"
+"help.text"
+msgid "Example: 10 + 15 PHD displays 10.15"
+msgstr "예: 10 + 15 PHD는 11,50을 나타냅니다"
+
+#. KeGBA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153016\n"
+"help.text"
+msgid "Square Root"
+msgstr "근"
+
+#. XCbNu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153062\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sqrt\">Calculates the square root.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sqrt\">제곱근을 계산합니다.</ahelp>"
+
+#. AuptV
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153882\n"
+"help.text"
+msgid "Example: SQRT 25 displays 5"
+msgstr ""
+
+#. yjTqm
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153909\n"
+"help.text"
+msgid "Power"
+msgstr "제곱"
+
+#. wFRf4
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149768\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/pow\">Calculates the power of a number.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/pow\">수의 제곱 값을 계산합니다.</ahelp>"
+
+#. B62mR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149789\n"
+"help.text"
+msgid "Example: 2 POW 8 displays 256"
+msgstr ""
+
+#. eCu3h
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150216\n"
+"help.text"
+msgid "Operators"
+msgstr "연산자"
+
+#. GzXyF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150244\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can insert various operators in your formula.</ahelp> Choose from the following functions:"
+msgstr ""
+
+#. uCpNp
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id61599496064739\n"
+"help.text"
+msgid "Operator"
+msgstr ""
+
+#. HCUeF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id611599496064740\n"
+"help.text"
+msgid "Name"
+msgstr ""
+
+#. CNZiw
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id461599496082741\n"
+"help.text"
+msgid "Example"
+msgstr ""
+
+#. kN6pM
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150316\n"
+"help.text"
+msgid "List Separator"
+msgstr "목록 구분자"
+
+#. 4BmKs
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150339\n"
+"help.text"
+msgid "|"
+msgstr "|"
+
+#. qw66D
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153099\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/|\">Separates the elements in a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/|\">목록의 요소를 구분합니다.</ahelp>"
+
+#. ufXPA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155817\n"
+"help.text"
+msgid "Example of using a list:"
+msgstr "목록 사용 예제:"
+
+#. 78gH2
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155830\n"
+"help.text"
+msgid "MIN 10|20|50|<C6>|<A2:B6>|20"
+msgstr "MIN 10|20|50|<C6>|<A2:B6>|20"
+
+#. Fob4h
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147012\n"
+"help.text"
+msgid "Equal"
+msgstr "같음"
+
+#. mVqP4
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147034\n"
+"help.text"
+msgid "EQ or =="
+msgstr "EQ 또는 =="
+
+#. WcTEB
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150936\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/eq\">Checks if selected values are equal.</ahelp> If they are unequal, the result is zero, otherwise 1 (true) appears."
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/eq\">선택한 값이 같은지 확인합니다.</ahelp> 같지 않으면 결과는 0이고 같으면 1(true)입니다."
+
+#. vuDKJ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150961\n"
+"help.text"
+msgid "Example: <A1> EQ 2 displays 1, if the content of A1 equals 2"
+msgstr ""
+
+#. b2AXc
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154370\n"
+"help.text"
+msgid "Not Equal"
+msgstr "같지 않음"
+
+#. jsDQ8
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150503\n"
+"help.text"
+msgid "NEQ or !="
+msgstr "NEQ 또는 !="
+
+#. rMcNe
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150526\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/neq\">Tests for inequality between selected values.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/neq\">선택한 값들의 상대적 크고 작음을 확인합니다.</ahelp>"
+
+#. STM3V
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147524\n"
+"help.text"
+msgid "Example: <A1> NEQ 2 displays 0 (wrong), if the content of A1 equals 2"
+msgstr ""
+
+#. FuXYL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147553\n"
+"help.text"
+msgid "Less than or Equal"
+msgstr "작거나 같음"
+
+#. m6G89
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153622\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/leq\">Tests for values less than or equal to a specified value.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/leq\">값이 지정한 값과 작거나 같은지 확인합니다.</ahelp>"
+
+#. FeJXs
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151280\n"
+"help.text"
+msgid "Example: <A1> LEQ 2 displays 1 (true), if the content of A1 is less than or equal to 2"
+msgstr ""
+
+#. 24FA3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153729\n"
+"help.text"
+msgid "Greater than or Equal"
+msgstr "크거나 같음"
+
+#. DKZmP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148876\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/geq\">Tests for values greater than or equal to a specified value.</ahelp>"
+msgstr ""
+
+#. pdd5D
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148898\n"
+"help.text"
+msgid "Example: <A1> GEQ 2 displays 1 (true), if the content of A1 is greater than or equal to 2"
+msgstr ""
+
+#. zEADu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150836\n"
+"help.text"
+msgid "Less"
+msgstr "작음"
+
+#. G4UeN
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/l\">Tests for values less than a specified value.</ahelp>"
+msgstr ""
+
+#. ZF7Jb
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155433\n"
+"help.text"
+msgid "Example: <A1> L 2 displays 1 (true), if the content of A1 is less than 2"
+msgstr ""
+
+#. R7RyE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150720\n"
+"help.text"
+msgid "Greater"
+msgstr "큼"
+
+#. ytwUF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147310\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/g\">Tests for values greater than a specified value.</ahelp>"
+msgstr ""
+
+#. UsxXH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147333\n"
+"help.text"
+msgid "Example: <A1> G 2 displays 1 (true), if the content of A1 is greater than 2"
+msgstr ""
+
+#. 9DyRz
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148408\n"
+"help.text"
+msgid "Boolean Or"
+msgstr "불리언 Or"
+
+#. guFCu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150274\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/or\">Tests for values matching the Boolean OR.</ahelp>"
+msgstr ""
+
+#. wmnDC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150297\n"
+"help.text"
+msgid "Example: 0 OR 0 displays 0 (false), anything else results in 1 (true)"
+msgstr "예: 0 OR 0은  0(false)을, 나머지는 모두 1(true)을 표시합니다"
+
+#. GNQAT
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149434\n"
+"help.text"
+msgid "Boolean X Or"
+msgstr "불리언 Xor"
+
+#. EQwEt
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3146980\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/xor\">Tests for values matching the Boolean exclusive OR.</ahelp>"
+msgstr ""
+
+#. N9cHQ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147003\n"
+"help.text"
+msgid "Example: 1 XOR 0 displays 1 (true)"
+msgstr "예: 1 XOR 0은 1(true)을 표시합니다"
+
+#. CNW42
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152925\n"
+"help.text"
+msgid "Boolean And"
+msgstr "불리언 And"
+
+#. x4HL7
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153792\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/and\">Tests for values matching the Boolean AND.</ahelp>"
+msgstr ""
+
+#. DFCfW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153814\n"
+"help.text"
+msgid "Example: 1 AND 2 displays 1 (true)"
+msgstr "예: 1 AND 2 는 1(true)을 표시합니다"
+
+#. a23Nq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153938\n"
+"help.text"
+msgid "Boolean Not"
+msgstr "불리언 Not"
+
+#. oEENQ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148633\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/not\">Tests for values matching the Boolean NOT.</ahelp>"
+msgstr ""
+
+#. r4fRG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148655\n"
+"help.text"
+msgid "Example: NOT 1 (true) displays 0 (false)"
+msgstr "예: NOT 1(true)은 0(false)을 표시합니다"
+
+#. 5JNFn
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3154240\n"
+"help.text"
+msgid "Statistical Functions"
+msgstr "통계 함수"
+
+#. CEssi
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154263\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can choose from the following statistical functions:</ahelp>"
+msgstr ""
+
+#. AeKzo
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id541599496194035\n"
+"help.text"
+msgid "Function"
+msgstr ""
+
+#. fLyDG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id481599496194036\n"
+"help.text"
+msgid "Name"
+msgstr ""
+
+#. z9BBL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id331599524563749\n"
+"help.text"
+msgid "Example"
+msgstr ""
+
+#. SimgP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153176\n"
+"help.text"
+msgid "Mean"
+msgstr "평균값"
+
+#. Gu59Y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154076\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/mean\">Calculates the arithmetic mean of the values in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/mean\">영역이나 목록에서 값의 산술적 평균을 계산합니다.</ahelp>"
+
+#. GjHGV
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145625\n"
+"help.text"
+msgid "Example: MEAN 10|30|20 displays 20"
+msgstr "예: MEAN 10|30|20 는 20,00을 표시합니다"
+
+#. TNZeD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145652\n"
+"help.text"
+msgid "Minimum Value"
+msgstr "최소값"
+
+#. 9CKG8
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155281\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/min\">Calculates the minimum value in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/min\">영역이나 목록에서 최소값을 구합니다.</ahelp>"
+
+#. F9J3k
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155304\n"
+"help.text"
+msgid "Example: MIN 10|30|20 displays 10"
+msgstr "예: MIN 10|30|20은 10,00을 표시합니다"
+
+#. G4CMT
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153993\n"
+"help.text"
+msgid "Maximum Value"
+msgstr "최대값"
+
+#. mCGfj
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154726\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/max\">Calculates the maximum value in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/max\">영역이나 목록에서 최대값을 구합니다.</ahelp>"
+
+#. fN5WF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154748\n"
+"help.text"
+msgid "Example: MAX 10|30|20 displays 30"
+msgstr ""
+
+#. 76riF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id21599557699262\n"
+"help.text"
+msgid "Product"
+msgstr ""
+
+#. 5caRN
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id671599563830630\n"
+"help.text"
+msgid "Calculates the product of the selected cells."
+msgstr ""
+
+#. bwMRb
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id631599557734781\n"
+"help.text"
+msgid "Example: PRODUCT <A2:C2> displays the product of the values in cells A2 to C2"
+msgstr ""
+
+#. DXVgk
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id31599557699262\n"
+"help.text"
+msgid "Count"
+msgstr ""
+
+#. 53YC3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id331599557734781\n"
+"help.text"
+msgid "Counts the number of non empty cells."
+msgstr ""
+
+#. hgQfG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id141599563739504\n"
+"help.text"
+msgid "Example: COUNT <A2:C2> displays the number of non empty cells in A2 to C2"
+msgstr ""
+
+#. SJ9rR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3153200\n"
+"help.text"
+msgid "Functions"
+msgstr ""
+
+#. gRWF7
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153226\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can choose from the following  functions:</ahelp>"
+msgstr ""
+
+#. CYmFE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id341599524600306\n"
+"help.text"
+msgid "Function"
+msgstr ""
+
+#. zUhbC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id521599524600307\n"
+"help.text"
+msgid "Name"
+msgstr ""
+
+#. S6FE9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id831599524616362\n"
+"help.text"
+msgid "Example"
+msgstr ""
+
+#. HmrvU
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145156\n"
+"help.text"
+msgid "Sine"
+msgstr "사인"
+
+#. CDWrS
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149530\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sin\">Calculates the sine in radians.</ahelp>"
+msgstr ""
+
+#. U8Mew
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153312\n"
+"help.text"
+msgid "Example: SIN (PI/2) displays 1"
+msgstr ""
+
+#. NvdMX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153340\n"
+"help.text"
+msgid "Cosine"
+msgstr "코사인"
+
+#. xBop9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154533\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/cos\">Calculates the cosine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/cos\">코사인 값을 라디언 단위로 계산합니다.</ahelp>"
+
+#. Kxyji
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154554\n"
+"help.text"
+msgid "Example: COS 1 displays 0.54"
+msgstr ""
+
+#. tpfdH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150989\n"
+"help.text"
+msgid "Tangent"
+msgstr "탄젠트"
+
+#. zaJcG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149369\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/tag\">Calculates the tangent in radians.</ahelp>"
+msgstr ""
+
+#. 4UG3b
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149391\n"
+"help.text"
+msgid "Example: TAN <A1>"
+msgstr "예: TAN <A1>"
+
+#. Es4fE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151032\n"
+"help.text"
+msgid "Arc Sine"
+msgstr "아크사인"
+
+#. CVzAA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150565\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/asin\">Calculates the arc sine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/asin\">아크사인 값을 라디언 단위로 계산합니다.</ahelp>"
+
+#. qoLYg
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150588\n"
+"help.text"
+msgid "Example: ASIN 1"
+msgstr "예: ASIN 1"
+
+#. 3mn7r
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150615\n"
+"help.text"
+msgid "Arc Cosine"
+msgstr "아크코사인"
+
+#. ZRyBG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149750\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/acos\">Calculates the arc cosine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/acos\">아크코사인 값을 라디언 단위로 계산합니다.</ahelp>"
+
+#. LnLqq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153833\n"
+"help.text"
+msgid "Example: ACOS 1"
+msgstr "예: ACOS 1"
+
+#. 8gRyA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153860\n"
+"help.text"
+msgid "Arc Tangent"
+msgstr "아크탄젠트"
+
+#. aEs7N
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147080\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/atan\">Calculates the arc tangent in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/atan\">아크탄젠트 값을 라디언 단위로 계산합니다.</ahelp>"
+
+#. bssFz
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147102\n"
+"help.text"
+msgid "Example: ATAN 1"
+msgstr "예: ATAN 1"
+
+#. bsPu3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id591599557967519\n"
+"help.text"
+msgid "Absolute value"
+msgstr ""
+
+#. 2tt8G
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id211593557987787\n"
+"help.text"
+msgid "Returns the absolute value of the number."
+msgstr ""
+
+#. jYyUX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id301599563956612\n"
+"help.text"
+msgid "Example: ABS -34 returns 34"
+msgstr ""
+
+#. zEe8j
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id591599557963519\n"
+"help.text"
+msgid "Sign"
+msgstr ""
+
+#. 8Y984
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id211599557987787\n"
+"help.text"
+msgid "Returns the algebraic sign of the number."
+msgstr ""
+
+#. wDJs9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id941599563922458\n"
+"help.text"
+msgid "Example: SIGN -23 returns -1"
+msgstr ""
+
+#. sHz7K
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150888\n"
+"help.text"
+msgid "Variables for document properties"
+msgstr "문서 속성에 대한 변수"
+
+#. bEyNW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150161\n"
+"help.text"
+msgid "The following document properties are also found under <emph>File - Properties - Statistics</emph>."
+msgstr "문서의 다음과 같은 속성은 <emph>파일 - 속성 - 통계</emph>에서도 볼 수 있습니다."
+
+#. jxf6E
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id901599524662588\n"
+"help.text"
+msgid "Name"
+msgstr ""
+
+#. vmA7Y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id741599524662589\n"
+"help.text"
+msgid "Description"
+msgstr ""
+
+#. Mehmy
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152954\n"
+"help.text"
+msgid "Number of characters in the document"
+msgstr "문서의 문자 수"
+
+#. knEJC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153005\n"
+"help.text"
+msgid "Number of words in the document"
+msgstr "문서의 단어 수"
+
+#. X5hJF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152738\n"
+"help.text"
+msgid "Number of paragraphs in the document"
+msgstr "문서의 단락 수"
+
+#. t5nqK
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148476\n"
+"help.text"
+msgid "Number of graphics in the document"
+msgstr "문서의 그래픽 수"
+
+#. Bdc8a
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Number of tables in the document"
+msgstr "문서의 표 수"
+
+#. zJGko
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151220\n"
+"help.text"
+msgid "Number of OLE objects in the document"
+msgstr "문서의 OLE-개체 수"
+
+#. QeCMR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3146926\n"
+"help.text"
+msgid "Total number of pages in the document"
+msgstr "문서의 총 쪽 수"
+
+#. akE2k
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3146944\n"
+"help.text"
+msgid "More Defined Values"
+msgstr "그 외 정의된 값"
+
+#. TUJRH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id981599524696609\n"
+"help.text"
+msgid "Description"
+msgstr ""
+
+#. gnbPF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id101599524696610\n"
+"help.text"
+msgid "Name"
+msgstr ""
+
+#. FFwhP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id731599524730168\n"
+"help.text"
+msgid "Value"
+msgstr ""
+
+#. 7QQ8G
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153562\n"
+"help.text"
+msgid "PI"
+msgstr "원주율"
+
+#. SqL4F
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147393\n"
+"help.text"
+msgid "Euler's constant"
+msgstr "오일러 수"
+
+#. GGtyF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145332\n"
+"help.text"
+msgid "True"
+msgstr "참"
+
+#. db4a5
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145378\n"
+"help.text"
+msgid "not equal to 0"
+msgstr "0과 같지 않은"
+
+#. nVven
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150362\n"
+"help.text"
+msgid "False"
+msgstr "거짓"
+
+#. qx5iP
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cancel"
+msgstr "취소"
+
+#. G2cUn
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"hd_id3149957\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14030000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/swriter/02/14030000.xhp\">취소</link>"
+
+#. 4Yz3J
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3149602\n"
+"help.text"
+msgid "<ahelp hid=\".\">Clears the contents of the input line and closes the formula bar.</ahelp>"
+msgstr "<ahelp hid=\".\">입력줄의 내용을 지우고, 수식 표시줄을 닫습니다.</ahelp>"
+
+#. kp7Vc
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3149574\n"
+"help.text"
+msgid "<image id=\"img_id3149580\" src=\"sw/res/sc20557.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149580\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149580\" src=\"sw/res/sc20557.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149580\">아이콘</alt></image>"
+
+#. 8UEDX
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3148855\n"
+"help.text"
+msgid "Cancel"
+msgstr "취소"
+
+#. USB9A
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Apply"
+msgstr "적용"
+
+#. FEwXA
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"hd_id3154834\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14040000.xhp\">Apply</link>"
+msgstr "<link href=\"text/swriter/02/14040000.xhp\">적용</link>"
+
+#. GcphZ
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3147173\n"
+"help.text"
+msgid "<ahelp hid=\".\">Transfers the contents of the input line into your document and closes the formula bar. The contents of the input line are inserted at the cursor position in the document.</ahelp>"
+msgstr "<ahelp hid=\".\">입력줄의 내용을 문서로 전송하고 수식 표시줄을 닫습니다. 입력줄의 내용이 문서의 커서 위치에 삽입됩니다.</ahelp>"
+
+#. YsphR
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3149286\n"
+"help.text"
+msgid "<image src=\"svx/res/nu01.png\" id=\"img_id3149291\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149291\">Icon Apply</alt></image>"
+msgstr ""
+
+#. nwkU8
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Apply"
+msgstr "적용"
+
+#. fq9ZR
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula Area"
+msgstr "수식 영역"
+
+#. 3s4xT
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"hd_id3155624\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14050000.xhp\">Formula Area</link>"
+msgstr "<link href=\"text/swriter/02/14050000.xhp\">수식 영역</link>"
+
+#. VRahE
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3154501\n"
+"help.text"
+msgid "<ahelp hid=\".\">Allows you to create a formula by typing it directly into the input line or by clicking the <emph>Formula</emph> icon to display the formulas in submenu.</ahelp>"
+msgstr "<ahelp hid=\".\">입력줄에 직접 수식을 입력하거나 <emph>수식</emph> 아이콘을 클릭하여 수식을 만들 수 있습니다.</ahelp>"
+
+#. evDCZ
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3151174\n"
+"help.text"
+msgid "<image src=\"media/helpimg/rechenlt.png\" id=\"img_id3156377\" localize=\"true\"><alt id=\"alt_id3156377\">Formula area with formula</alt></image>"
+msgstr "<image src=\"media/helpimg/rechenlt.png\" id=\"img_id3156377\" localize=\"true\"><alt id=\"alt_id3156377\">수식이 있는 수식 영역</alt></image>"
+
+#. 6GPdp
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3151178\n"
+"help.text"
+msgid "Formula Area"
+msgstr "수식 영역"
+
+#. BwqAM
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "삽입"
+
+#. 8PjuB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145824\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/swriter/02/18010000.xhp\">삽입</link>"
+
+#. Ha2Rw
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCtrl\">The toolbar contains various functions for inserting frames, graphics, tables, and other objects.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">이 도구 모음에는 프레임, 그림, 표, 기타 개체를 삽입할 수 있는 다양한 기능이 들어 있습니다.</ahelp>"
+
+#. kdTjb
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3149809\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "다음의 기능을 선택할 수 있습니다:"
+
+#. CFc4J
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3143272\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\">Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\">표</link>"
+
+#. Ru34K
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3150115\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\">Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\">구역</link>"
+
+#. wBBzU
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3154572\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\">Insert Frame Manually</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\">수동으로 프레임 삽입</link>"
+
+#. FisVt
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3151341\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">부동 프레임</link>"
+
+#. o6hwV
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3148974\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04030000.xhp\">Insert Footnote Directly</link>"
+msgstr "<link href=\"text/swriter/01/04030000.xhp\">각주 바로 삽입</link>"
+
+#. Tz7Fe
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3152773\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04030000.xhp\">Insert Endnote Directly</link>"
+msgstr "<link href=\"text/swriter/01/04030000.xhp\">미주 바로 삽입</link>"
+
+#. EosFy
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10777\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04050000.xhp\">Note</link>"
+msgstr "<link href=\"text/shared/01/04050000.xhp\">참고</link>"
+
+#. tnpLA
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10863\n"
+"help.text"
+msgid "Inserts a note at the current cursor position."
+msgstr "현재 커서 위치에 메모를 삽입합니다."
+
+#. nEVAw
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145262\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\">Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\">책갈피</link>"
+
+#. Pkov7
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3149098\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\">File</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\">파일</link>"
+
+#. SmDBe
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10772\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/02120000.xhp\">AutoText</link>"
+msgstr "<link href=\"text/swriter/01/02120000.xhp\">자동 텍스트</link>"
+
+#. AeZ5A
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145780\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">특수 문자</link>"
+
+#. DKTSB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10759\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">필드 삽입</link>"
+
+#. A5HwP
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN1077E\n"
+"help.text"
+msgid "Inserts a field at the current cursor position."
+msgstr "현재 커서 위치에 필드를 삽입합니다."
+
+#. evVAV
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10768\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170000.xhp\">Controls</link>"
+msgstr "<link href=\"text/shared/02/01170000.xhp\">콘트롤</link>"
+
+#. rDtXF
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN107ED\n"
+"help.text"
+msgid "The Controls icon opens a toolbar with the tools that you need to create an interactive form."
+msgstr "콘트롤 아이콘을 클릭하면 대화형 양식을 만드는 데 필요한 도구가 포함된 도구 모음이 열립니다."
+
+#. EA2Mi
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3155174\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">파일로부터</link>"
+
+#. BBUUT
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN106F4\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">수식</link>"
+
+#. sCB8B
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">차트</link>"
+
+#. MnQuB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id1586962\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">OLE 개체</link>"
+
+#. uDrd9
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN1076D\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04120200.xhp\">Insert Index</link>"
+msgstr "<link href=\"text/swriter/01/04120200.xhp\">색인 삽입</link>"
+
+#. WRsG4
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10814\n"
+"help.text"
+msgid "Inserts an index or a table of contents at the current cursor position."
+msgstr "색인이나 목차를 현재 커서 위치에 삽입합니다."
+
+#. SyhWA
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3155861\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04120100.xhp\">Entry</link>"
+msgstr "<link href=\"text/swriter/01/04120100.xhp\">항목</link>"
+
+#. nzTGs
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "필드 삽입"
+
+#. RGbK3
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"hd_id3153916\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030000.xhp\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/02/18030000.xhp\">필드 삽입</link>"
+
+#. VSSUW
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"par_id3147403\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Click to open the Fields dialog. Click the arrow next to the icon to open a submenu.</ahelp> Click to open the <link href=\"text/swriter/01/04090000.xhp\">Fields</link> dialog. Click the arrow next to the icon to open a submenu."
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">[필드] 대화 상자를 열려면 클릭합니다. 아이콘 옆의 화살표를 클릭하여 하위 메뉴를 엽니다.</ahelp> <link href=\"text/swriter/01/04090000.xhp\">필드</link> 대화 상자를 열려면 클릭합니다. 아이콘 옆의 화살표를 클릭하여 하위 메뉴를 엽니다."
+
+#. gthge
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"par_id3154503\n"
+"help.text"
+msgid "You can choose from the following functions:"
+msgstr "다음의 기능을 선택할 수 있습니다:"
+
+#. zyChg
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"hd_id3148566\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\">Other</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">기타</link>"
+
+#. UWFxy
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Date"
+msgstr "날짜"
+
+#. 8mad6
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"hd_id3151175\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030100.xhp\">Date</link>"
+msgstr "<link href=\"text/swriter/02/18030100.xhp\">날짜</link>"
+
+#. FfGqq
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"par_id3147511\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertDateField\">Inserts the current date as a field.</ahelp> The default date format is used, and the date is not automatically updated."
+msgstr "<ahelp hid=\".uno:InsertDateField\">현재 날짜를 필드로 삽입합니다.</ahelp> 기본 날짜 형식이 사용되므로 날짜를 자동으로 업데이트하지 않습니다."
+
+#. 6pFWk
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"par_id3151312\n"
+"help.text"
+msgid "If you would like to define a different date format, or have the date updated automatically, select <emph>Insert - Field - More Fields</emph> to insert a field command and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. The format of an existing date field can be modified at any time by choosing <link href=\"text/swriter/01/02140000.xhp\"><emph>Edit - Fields</emph></link>."
+msgstr "다른 날짜 형식을 지정하거나 날짜를 자동으로 업데이트하려면 <emph>삽입 - 필드 - 기타</emph>를 선택하여 필드 명령을 삽입하고 <link href=\"text/swriter/01/04090000.xhp\"><emph>필드</emph></link> 대화 상자에서 원하는 설정을 합니다. <link href=\"text/swriter/01/02140000.xhp\"><emph>편집 - 필드</emph></link>를 선택하여 언제든지 기존 날짜 필드의 서식을 수정할 수 있습니다."
+
+#. RfAPA
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Time"
+msgstr "시간"
+
+#. yxN2Q
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"bm_id3147174\n"
+"help.text"
+msgid "<bookmark_value>time fields;inserting</bookmark_value><bookmark_value>fields;inserting time</bookmark_value>"
+msgstr "<bookmark_value>시간 필드; 삽입</bookmark_value><bookmark_value>필드;시간 삽입</bookmark_value>"
+
+#. MekNF
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"hd_id3147174\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030200.xhp\">Time</link>"
+msgstr "<link href=\"text/swriter/02/18030200.xhp\">시간</link>"
+
+#. Uwk2Y
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTimeField\" visibility=\"visible\">Inserts the current time as a field.</ahelp> The time is taken directly from the system settings of your operating system. A fixed time format is applied, which cannot be updated by using the F9 function key."
+msgstr "<ahelp hid=\".uno:InsertTimeField\" visibility=\"visible\">현재 시간을 필드로 삽입합니다.</ahelp> 시간은 운영 체제의 시스템 설정에서 직접 가져옵니다. 고정 시간 표기 형식이 적용되므로 F9 키를 사용하여 업데이트할 수 없습니다."
+
+#. GjkbK
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "To assign a different time format, or adapt the actual time data, select <emph>Insert - Field - More Fields</emph> and make the desired changes in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. Additionally, you can modify the format of an inserted time field at any time by choosing <link href=\"text/swriter/01/02140000.xhp\"><emph>Edit - Fields</emph></link>."
+msgstr "다른 시간 표기 형식을 지정하거나 실제 시간 데이터를 조정하려면 <emph>삽입 - 필드 - 기타</emph>를 선택하고 <link href=\"text/swriter/01/04090000.xhp\"><emph>필드</emph></link> 대화 상자에서 원하는 내용을 변경합니다. 따라서 언제든지 <link href=\"text/swriter/01/02140000.xhp\"><emph>편집 - 필드</emph></link>를 선택하여 삽입된 시간 필드 서식을 수정할 수 있습니다."
+
+#. F5PB7
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Number"
+msgstr "페이지 번호"
+
+#. FRFVQ
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"hd_id3147173\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030300.xhp\">Page Number</link>"
+msgstr "<link href=\"text/swriter/02/18030300.xhp\">쪽 번호</link>"
+
+#. Eyxsj
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"par_id3150760\n"
+"help.text"
+msgid "<ahelp hid=\".\">Inserts the current page number as a field at the cursor position.</ahelp> The default setting is for it to use the <emph>Page Number</emph> character style."
+msgstr "<ahelp hid=\".\">커서 위치에 현재 페이지 번호를 필드로 삽입합니다.</ahelp> <emph>페이지 번호</emph> 문자 스타일을 기본 설정으로 사용합니다."
+
+#. M86DV
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"par_id3151175\n"
+"help.text"
+msgid "If you would like to define a different format or modify the page number, insert a field with <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. It is also possible to edit a field inserted with the <emph>Page Number</emph> command with <link href=\"text/swriter/01/02140000.xhp\"><emph>Edit - Fields</emph></link>. To change page numbers, read the <link href=\"text/swriter/guide/pagenumbers.xhp\"><emph>Page Numbers</emph></link> guide."
+msgstr "페이지 번호에 다른 형식을 지정하거나 수정하려면 <emph>삽입 - 필드 - 더 많은 필드</emph> 메뉴를 사용하여 필드를 삽입하고 <link href=\"text/swriter/01/04090000.xhp\"><emph>필드</emph></link> 대화 상자에서 원하는 설정을 지정합니다. <link href=\"text/swriter/01/02140000.xhp\"><emph>편집 - 필드</emph></link>에서 <emph>페이지 번호</emph> 명령을 사용하여 삽입된 필드를 편집할 수도 있습니다. 페이지 번호를 변경하려면 <link href=\"text/swriter/guide/pagenumbers.xhp\"><emph>페이지 번호</emph></link> 설명서를 참조하십시오."
+
+#. 6HY9G
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Count"
+msgstr "페이지 수"
+
+#. 5RK2v
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"hd_id3145828\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030400.xhp\">Page Count</link>"
+msgstr "<link href=\"text/swriter/02/18030400.xhp\">쪽 수</link>"
+
+#. Zq6RD
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id3148772\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertPageCountField\">Inserts as a field the total number of pages in the document.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertPageCountField\">문서의 총 페이지 수를 필드로 삽입합니다.</ahelp>"
+
+#. cjLgc
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id3149294\n"
+"help.text"
+msgid "The format of the field inserted using the <emph>Page Count</emph> command can be modified using the <link href=\"text/swriter/01/02140000.xhp\"><menuitem>Edit - Fields</menuitem></link> command."
+msgstr ""
+
+#. gHhp8
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id291613751393995\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090001.xhp\">Document Statistics Fields</link>"
+msgstr ""
+
+#. GRfFZ
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"tit\n"
+"help.text"
+msgid "Subject"
+msgstr "주제"
+
+#. DadAn
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"bm_id3147169\n"
+"help.text"
+msgid "<bookmark_value>subject fields</bookmark_value><bookmark_value>fields; subject</bookmark_value>"
+msgstr "<bookmark_value>주제 필드</bookmark_value><bookmark_value>필드; 주제</bookmark_value>"
+
+#. oFgCv
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"hd_id3147169\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030500.xhp\">Subject</link>"
+msgstr "<link href=\"text/swriter/02/18030500.xhp\">주제</link>"
+
+#. Sq7ra
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"par_id3152892\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTopicField\">Inserts the subject specified in the document properties as a field .</ahelp> This field displays the data entered in the <emph>Subject</emph> field under <emph>File - Properties - Description</emph>."
+msgstr "<ahelp hid=\".uno:InsertTopicField\">문서 속성에 지정한 주제를 필드로 삽입합니다.</ahelp> 이 필드는 <emph>파일 - 속성 - 설명</emph>의 <emph>제목</emph> 필드에 입력한 데이터를 표시합니다."
+
+#. C5Dwh
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"par_id3156380\n"
+"help.text"
+msgid "If you would like to insert a different document property as a field, select <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. The <emph>DocInformation</emph> category contains all of the fields shown in the document properties."
+msgstr "다른 문서 속성을 필드 명령으로 삽입하려면 <emph>삽입 - 필드 명령 - 그 외</emph> 명령어를 선택하고 <link href=\"text/swriter/01/04090000.xhp\"><emph>필드 명령</emph></link> 대화 상자에서 원하는대로 설정하십시오. <emph>문서 정보</emph> 탭에서는 사용 가능한 모든 필드 타입을 볼 수 있습니다."
+
+#. aFDKk
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"tit\n"
+"help.text"
+msgid "Title"
+msgstr "제목"
+
+#. 3Anmr
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"hd_id3154484\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030600.xhp\">Title</link>"
+msgstr "<link href=\"text/swriter/02/18030600.xhp\">제목</link>"
+
+#. 4fVi2
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"par_id3151392\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTitleField\">Inserts the title specified in the document properties as a field.</ahelp> This field displays the data entered in the <emph>Title</emph> field under <emph>File - Properties - Description</emph>."
+msgstr "<ahelp hid=\".uno:InsertTitleField\">문서 속성에 지정한 제목을 필드로 삽입합니다.</ahelp> 이 필드는 <emph>파일 - 속성 - 설명</emph>의 <emph>제목</emph> 필드에 입력한 데이터를 표시합니다."
+
+#. ejboP
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "If you would like to insert a different document property as a field, select <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\"><emph>Fields</emph></link> dialog. The <emph>DocInformation</emph> category contains all of the fields shown in the document properties."
+msgstr "다른 문서 속성을 필드 명령으로 삽입하려면 <emph>삽입 - 필드 명령 - 그 외</emph> 명령어를 선택하고 <link href=\"text/swriter/01/04090000.xhp\"><emph>필드 명령</emph></link> 대화 상자에서 원하는대로 설정하십시오. <emph>문서 정보</emph> 탭에서는 사용 가능한 모든 필드 타입을 볼 수 있습니다."
+
+#. XDZuz
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"tit\n"
+"help.text"
+msgid "First Author (field)"
+msgstr ""
+
+#. 6QDbK
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"hd_id3154505\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030700.xhp\">First Author (field)</link>"
+msgstr ""
+
+#. ape4m
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertAuthorField\">Inserts the name of the person who created the document here as a field.</ahelp> The field applies the entry made under <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01010100.xhp\"><emph>$[officename] - User data</emph></link>."
+msgstr "<ahelp hid=\".uno:InsertAuthorField\">문서 작성자의 이름을 필드로 삽입합니다.</ahelp> 필드에는 <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - 기본 설정</emph></caseinline><defaultinline><emph>도구 - 기본 설정</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01010100.xhp\"><emph>$[officename] - 사용자 데이터</emph></link>에서 작성한 내용이 적용됩니다."
+
+#. xEPBR
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "그림과 차트"
+
+#. JQmg6
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"bm_id3147167\n"
+"help.text"
+msgid "<bookmark_value>graphics;do not show</bookmark_value>  <bookmark_value>images;do not show</bookmark_value>  <bookmark_value>pictures;do not show</bookmark_value>"
+msgstr "<bookmark_value>그림;숨기기</bookmark_value><bookmark_value>이미지;숨기기</bookmark_value><bookmark_value>사진;숨기기</bookmark_value>"
+
+#. kASwh
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"hd_id3148568\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18120000.xhp\">Images and Charts</link>"
+msgstr "<link href=\"text/swriter/02/18120000.xhp\">그림과 차트</link>"
+
+#. gHWtd
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3147167\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Graphic\">If the <emph>Images and Charts</emph> icon on the <emph>Tools</emph> bar is activated, no graphics are displayed - only empty frames as placeholders.</ahelp>"
+msgstr "<ahelp hid=\".uno:Graphic\"><emph>도구</emph> 모음에 <emph>그림 표시/숨기기</emph> 아이콘이 활성화되어 있으면 그림이 표시되지 않고 빈 프레임만 자리 표시자로 표시됩니다.</ahelp>"
+
+#. cpSji
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "<image id=\"img_id3156379\" src=\"cmd/sc_graphic.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156379\">Icon Images and Charts</alt></image>"
+msgstr ""
+
+#. P95p4
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3154107\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "그림과 차트"
+
+#. QCRVC
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Direct Cursor Mode"
+msgstr "수동 삽입 모드"
+
+#. mt7Ns
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"bm_id3147167\n"
+"help.text"
+msgid "<bookmark_value>direct cursor; restriction</bookmark_value>"
+msgstr "<bookmark_value>직접 조정 커서; 제한</bookmark_value>"
+
+#. d9iZy
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"hd_id3147167\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18130000.xhp\">Direct Cursor Mode</link>"
+msgstr "<link href=\"text/swriter/02/18130000.xhp\">다이렉트 커서 표시/숨김</link>"
+
+#. Gxt3W
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShadowCursor\">Activates or deactivates the direct cursor.</ahelp>"
+msgstr ""
+
+#. qPByH
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id651655490756305\n"
+"help.text"
+msgid "You can specify the behavior of the direct cursor by choosing <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01040600.xhp\"><emph>%PRODUCTNAME Writer - Formatting Aids</emph></link>."
+msgstr ""
+
+#. 5c3tj
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151133\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar, click"
+msgstr ""
+
+#. CBw5G
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3147508\n"
+"help.text"
+msgid "<image id=\"img_id3154840\" src=\"cmd/lc_shadowcursor.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154840\">Icon Toggle Direct Cursor Mode</alt></image>"
+msgstr ""
+
+#. yboK5
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151310\n"
+"help.text"
+msgid "Toggle Direct Cursor Mode"
+msgstr "수동 삽입 모드 전환"
+
+#. kCFZu
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3154570\n"
+"help.text"
+msgid "The direct cursor allows you to click in any blank area of a page to place text, images, tables, frames, and other objects."
+msgstr "직접 조정 커서를 사용하면 페이지의 빈 영역을 눌러 텍스트 이미지, 표, 프레임 및 기타 개체를 놓을 수 있습니다."
+
+#. RwxaU
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3155902\n"
+"help.text"
+msgid "If you place the direct cursor approximately in the middle between the left and the right margin of a page or a table cell, the text you insert will be centered. Similarly, text is right-aligned when the direct cursor is placed on the right margin."
+msgstr "페이지나 표 셀의 왼쪽 여백과 오른쪽 여백 사이에서 직접 조정 커서를 대략 가운데에 두면 삽입하는 텍스트가 가운데에 맞추어집니다. 마찬가지로 직접 조정 커서가 오른쪽 여백에 있으면 텍스트가 오른쪽으로 정렬됩니다."
+
+#. 5miBP
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151255\n"
+"help.text"
+msgid "The AutoCorrect tool automatically removes empty paragraphs, tabs, and spaces that are inserted by the direct cursor. If you want to use the direct cursor, then disable the AutoCorrect tool."
+msgstr "자동 고침 도구는 직접 조정 커서가 삽입한 빈 단락, 탭, 공백을 자동으로 제거합니다. 직접 조정 커서를 사용하려면 자동 고침 도구를 비활성화합니다."
+
+#. ATnfu
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3148982\n"
+"help.text"
+msgid "The direct cursor sets tabs to position the cursor. If you change the tabs later. the position of the text on the page may change as well."
+msgstr "직접 조정 커서는 커서를 배치하기 위해 탭을 설정합니다. 탭을 나중에 변경하면 페이지에서 텍스트 위치도 변경됩니다."
+
+#. 58ib2
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Header"
+msgstr "머리글 삽입"
+
+#. pPEeo
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"hd_id3148769\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19010000.xhp\">Insert Header</link>"
+msgstr "<link href=\"text/swriter/02/19010000.xhp\">머리글 삽입</link>"
+
+#. 6B3Vb
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"par_id3151180\n"
+"help.text"
+msgid "<ahelp hid=\"FN_INSERT_HEADER\">Displays the header of an HTML document if headers are enabled on the <link href=\"text/shared/01/05040300.xhp\"><emph>Format - Page Style - Header</emph></link> tab page.</ahelp>"
+msgstr ""
+
+#. LveMa
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Footer"
+msgstr "바닥글 삽입"
+
+#. 2Wrpr
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"hd_id3145829\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19020000.xhp\">Insert Footer</link>"
+msgstr "<link href=\"text/swriter/02/19020000.xhp\">각주 삽입</link>"
+
+#. icuLz
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "<ahelp hid=\"FN_INSERT_FOOTER\">Displays the footer of an HTML document if footers are enabled on the <link href=\"text/shared/01/05040400.xhp\"><emph>Format - Page Style - Footer</emph></link> tab page.</ahelp>"
+msgstr ""
+
+#. phEfn
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "삽입"
+
+#. kskEB
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3147167\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19030000.xhp\">Insert</link>"
+msgstr "<link href=\"text/swriter/02/19030000.xhp\">삽입</link>"
+
+#. AAt9h
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3145241\n"
+"help.text"
+msgid "Click the arrow next to the icon to open a toolbar with various functions for inserting graphics, tables, documents, and special characters."
+msgstr "그래픽, 표, 문서 및 특수 문자를 삽입할 수 있는 다양한 기능의 도구 모음을 열려면 아이콘 옆의 화살표를 클릭합니다."
+
+#. TLGgk
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3151171\n"
+"help.text"
+msgid "<image id=\"img_id3151178\" src=\"cmd/sc_grid.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151178\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151178\" src=\"cmd/sc_grid.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151178\" xml-lang=\"ko-KR\">아이콘</alt></image>"
+
+#. MDRwB
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3149801\n"
+"help.text"
+msgid "Insert"
+msgstr "삽입"
+
+#. fA9Po
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3155898\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "다음의 기능을 선택할 수 있습니다:"
+
+#. dTEks
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3149689\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\">Insert single-column frame manually</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\">단일 열 프레임을 수동으로 삽입</link>"
+
+#. LBwvB
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3143278\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">파일로부터</link>"
+
+#. B5fHZ
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3149104\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\">Insert Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\">표 삽입</link>"
+
+#. oAuiE
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3151259\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\">Insert Document</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\">문서 삽입</link>"
+
+#. MSCDc
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3153643\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Insert Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">특수 문자 삽입</link>"
+
+#. uFcFn
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3152766\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\">Insert Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\">구역 삽입</link>"
+
+#. vBp8q
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3145774\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\">Insert Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\">책갈피 삽입</link>"
+
+#. J6RpX
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "필드 삽입"
+
+#. 95S32
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"hd_id3149286\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19040000.xhp\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/02/19040000.xhp\">필드 명령어 삽입</link>"
+
+#. 8sGAW
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"par_id3151173\n"
+"help.text"
+msgid "Click to open the <link href=\"text/swriter/01/04090000.xhp\">Fields</link> dialog. Click the arrow next to the icon and select the required field from the submenu."
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">필드</link> 대화 상자를 열려면 클릭합니다. 아이콘 옆의 화살표를 클릭하고 하위 메뉴에서 필수 필드를 선택합니다."
+
+#. 48CyU
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"par_id3154104\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "다음의 기능을 선택할 수 있습니다:"
+
+#. RcJ5e
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"hd_id3145248\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\">Other</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">기타</link>"
+
+#. FM5sf
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text Animation"
+msgstr "텍스트 애니메이션"
+
+#. iKFuD
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"hd_id3155626\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19050000.xhp\">Text Animation</link>"
+msgstr "<link href=\"text/swriter/02/19050000.xhp\">텍스트 애니메이션</link>"
+
+#. aDAnh
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"par_id3149286\n"
+"help.text"
+msgid "<image src=\"cmd/sc_text_marquee.png\" id=\"img_id3149292\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149292\">Icon Text Animation</alt></image>"
+msgstr ""
+
+#. Hp96F
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"par_id3149290\n"
+"help.text"
+msgid "Text Animation"
+msgstr "텍스트 애니메이션"
+
+#. RajEo
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"tit\n"
+"help.text"
+msgid "Add to List"
+msgstr ""
+
+#. mjGvU
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"bm_id1001616018043189\n"
+"help.text"
+msgid "<bookmark_value>Add to List</bookmark_value><bookmark_value>Lists;merging</bookmark_value>"
+msgstr ""
+
+#. GmGBb
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id711614068729277\n"
+"help.text"
+msgid "<variable id=\"addtolisth1\"><link href=\"text/swriter/02/add_to_list.xhp\">Add to List</link></variable>"
+msgstr ""
+
+#. kM6AJ
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id231614069215429\n"
+"help.text"
+msgid "Include selected paragraphs, whether a list item or not, as part of a list."
+msgstr ""
+
+#. pxcFF
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id151614079148636\n"
+"help.text"
+msgid "<variable id=\"howtogetaddtolist\">Choose <menuitem>Format - Lists - Add to List</menuitem></variable>."
+msgstr ""
+
+#. PUsxs
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id631614079159620\n"
+"help.text"
+msgid "Right-click a paragraph, choose <menuitem>List - Add to List</menuitem>."
+msgstr ""
+
+#. Zb43J
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id151615752168785\n"
+"help.text"
+msgid "<variable id=\"toolbar\">On <menuitem>Bullets and Numbering</menuitem> bar, click <emph>Add to List</emph> icon.</variable>"
+msgstr ""
+
+#. ViA36
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id651615752040364\n"
+"help.text"
+msgid "<image src=\"cmd/lc_continuenumbering.png\" id=\"img_id981615752040364\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761615752040364\">Add to List Icon</alt></image>"
+msgstr ""
+
+#. hxMDa
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id51615752040365\n"
+"help.text"
+msgid "Add to List"
+msgstr ""
+
+#. 6kruw
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id711616001147778\n"
+"help.text"
+msgid "The list labeling and indent formatting are applied to the selected paragraphs. The position of the paragraphs in the document does not change."
+msgstr ""
+
+#. L9RdM
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id441616017998739\n"
+"help.text"
+msgid "Add Consecutive List Entries to an Immediately Prior List"
+msgstr ""
+
+#. GJuBD
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id631616018294373\n"
+"help.text"
+msgid "Select one or more consecutive list entries, starting from the first entry, that you want to add to the immediately prior list."
+msgstr ""
+
+#. g9LRR
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id621616018340980\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#rightclick\"/>"
+msgstr ""
+
+#. p9hUv
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id811616018796902\n"
+"help.text"
+msgid "Use this procedure to combine two lists."
+msgstr ""
+
+#. pADj5
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id851614072896370\n"
+"help.text"
+msgid "Add Selected Paragraphs to a List"
+msgstr ""
+
+#. FGi4A
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id491615988072533\n"
+"help.text"
+msgid "Select paragraphs, whether in a list or not, to be added to a list."
+msgstr ""
+
+#. VEa3N
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id271615998908234\n"
+"help.text"
+msgid "For multiple selections, press and hold the <keycode> Ctrl</keycode> key after the first selection. Only one character needs to be selected in each paragraph to be added. The <keycode>Ctrl</keycode> key can be released without losing the selections, but must be pressed whenever clicking in the document to preserve the selection."
+msgstr ""
+
+#. Lshcb
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id551615985719902\n"
+"help.text"
+msgid "Press and hold the <keycode>Ctrl</keycode> key, select at least one character in the list, then release the <keycode> Ctrl</keycode> key."
+msgstr ""
+
+#. 3VT7j
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id901615999151001\n"
+"help.text"
+msgid "Do one of the following:"
+msgstr ""
+
+#. qPKKN
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id141615979735757\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#howtogetaddtolist\"/>"
+msgstr ""
+
+#. FADNr
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id961614073544958\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#toolbar\"/>"
+msgstr ""
+
+#. L2ZPB
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id161615999749854\n"
+"help.text"
+msgid "<variable id=\"rightclick\">Right-click anywhere in highlighted selection, choose <menuitem>List - Add to List</menuitem>.</variable>"
+msgstr ""
+
+#. qFmgS
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id861614074931979\n"
+"help.text"
+msgid "This procedure works for ordered and unordered lists."
+msgstr ""
+
+#. JsrhA
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"title\n"
+"help.text"
+msgid "Word Count Status Bar Field"
+msgstr "상태 표시줄의 단어 수 표시 필드"
+
+#. tBbnd
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"page_heading\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/word_count_stb.xhp\">Word Count Status Bar Field</link>"
+msgstr "<link href=\"text/swriter/02/word_count_stb.xhp\">상태 표시줄의 단어 수 표시 필드</link>"
+
+#. mEywX
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"hd_id3149687\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StateWordCount\">The number of words in the document and selection is displayed in this field of the status bar. A double-click opens the <link href=\"text/swriter/01/06040000.xhp\">word count dialog</link>, which shows extra document statistics.</ahelp>"
+msgstr "<ahelp hid=\".uno:StateWordCount\">문서나 선택한 영역의 단어 수를 상태 표시줄의 이 필드에 표시합니다. 이 필드를 더블 클릭하면 더 많은 문서 통계 정보가 담긴 <link href=\"text/swriter/01/06040000.xhp\">단어 수 대화 상자</link>가 열립니다.</ahelp>"
