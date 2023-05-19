@@ -1,0 +1,672 @@
+#. extracted from connectivity/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-07-06 20:18+0200\n"
+"PO-Revision-Date: 2022-07-15 17:09+0000\n"
+"Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
+"Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_ui-master/connectivitymessages/nn/>\n"
+"Language: nn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1536333048.000000\n"
+
+#. 9KHB8
+#. = common strings
+#: connectivity/inc/strings.hrc:25
+msgctxt "STR_NO_CONNECTION_GIVEN"
+msgid "No connection to the database exists."
+msgstr "Det finst ingen tilkoplingar til databasen."
+
+#. 72Mjc
+#: connectivity/inc/strings.hrc:26
+msgctxt "STR_WRONG_PARAM_INDEX"
+msgid "You tried to set a parameter at position “$pos$” but there is/are only “$count$” parameter(s) allowed. One reason may be that the property “ParameterNameSubstitution” is not set to TRUE in the data source."
+msgstr "Du prøvde å oppgje ein parameter ved plasseringa «$pos$», men det er berre mogleg å bruka «$count$»-parameter(ar). Ein av grunnane kan vera at eigenskapen «ParameterNameSubstitution» ikkje er sett til «TRUE» i datakjelda."
+
+#. 6FnrV
+#: connectivity/inc/strings.hrc:27
+msgctxt "STR_NO_INPUTSTREAM"
+msgid "The input stream was not set."
+msgstr "Innstraum (InputStream) er ikkje vald"
+
+#. PtsET
+#: connectivity/inc/strings.hrc:28
+msgctxt "STR_NO_ELEMENT_NAME"
+msgid "There is no element named “$name$”."
+msgstr "Det finst ingen element med namnet «$name$»"
+
+#. CWktu
+#: connectivity/inc/strings.hrc:29
+msgctxt "STR_INVALID_BOOKMARK"
+msgid "Invalid bookmark value"
+msgstr "Ugyldig bokmerkeverdi"
+
+#. VXSEP
+#: connectivity/inc/strings.hrc:30
+msgctxt "STR_PRIVILEGE_NOT_GRANTED"
+msgid "Privilege not granted: Only table privileges can be granted."
+msgstr "Retten er ikkje gjeven. Berre tabellrettar kan gjevast."
+
+#. DZf3v
+#: connectivity/inc/strings.hrc:31
+msgctxt "STR_PRIVILEGE_NOT_REVOKED"
+msgid "Privilege not revoked: Only table privileges can be revoked."
+msgstr "Retten er ikkje trekt tilbake. Berre tabellrettar kan trekkjast tilbake."
+
+#. qTZj7
+#: connectivity/inc/strings.hrc:32
+msgctxt "STR_ERRORMSG_SEQUENCE"
+msgid "Function sequence error."
+msgstr "Feil i funksjonsrekkjefølgja."
+
+#. scUDb
+#: connectivity/inc/strings.hrc:33
+msgctxt "STR_INVALID_INDEX"
+msgid "Invalid descriptor index."
+msgstr "Ugyldig skildringsindeks."
+
+#. YyBDi
+#: connectivity/inc/strings.hrc:34
+msgctxt "STR_UNSUPPORTED_FUNCTION"
+msgid "The driver does not support the function “$functionname$”."
+msgstr "Drivaren støttar ikkje funksjonen «$functionname$»."
+
+#. GW3L8
+#: connectivity/inc/strings.hrc:35
+msgctxt "STR_UNSUPPORTED_FEATURE"
+msgid "The driver does not support the functionality for “$featurename$”. It is not implemented."
+msgstr "Drivaren støttar ikkje funksjonen «$featurename$» fordi han ikkje er implementert."
+
+#. zXVCV
+#: connectivity/inc/strings.hrc:36
+msgctxt "STR_FORMULA_WRONG"
+msgid "The formula for TypeInfoSettings is wrong!"
+msgstr "Formelen for «TypeInfoSettings» er feil."
+
+#. vA6FB
+#: connectivity/inc/strings.hrc:37
+msgctxt "STR_STRING_LENGTH_EXCEEDED"
+msgid "The string “$string$” exceeds the maximum length of $maxlen$ characters when converted to the target character set “$charset$”."
+msgstr "Strengen «$string$» er større enn grensa på $maxlen$ teikn når han vert gjort om til teiknsettet «$charset$»."
+
+#. THhEu
+#: connectivity/inc/strings.hrc:38
+msgctxt "STR_CANNOT_CONVERT_STRING"
+msgid "The string “$string$” cannot be converted using the encoding “$charset$”."
+msgstr "Strengen «$string$» kan ikkje gjerast om til teiknkodinga «$charset$»."
+
+#. sSzsJ
+#: connectivity/inc/strings.hrc:39
+msgctxt "STR_URI_SYNTAX_ERROR"
+msgid "The connection URL is invalid."
+msgstr "Tilkoplingsadressa er ugyldig."
+
+#. aihGj
+#: connectivity/inc/strings.hrc:40
+msgctxt "STR_QUERY_TOO_COMPLEX"
+msgid "The query cannot be executed. It is too complex."
+msgstr "Kan ikkje utføra spørjinga. Ho er for komplisert."
+
+#. ADy4t
+#: connectivity/inc/strings.hrc:41
+msgctxt "STR_OPERATOR_TOO_COMPLEX"
+msgid "The query cannot be executed. The operator is too complex."
+msgstr "Kan ikkje utføra spørjinga. Operatoren er for kompleks."
+
+#. XZGaK
+#: connectivity/inc/strings.hrc:42
+msgctxt "STR_QUERY_INVALID_LIKE_COLUMN"
+msgid "The query cannot be executed. You cannot use “LIKE” with columns of this type."
+msgstr "Kan ikkje utføra spørjinga. Du kan ikkje bruka «LIKE» med slike kolonnar."
+
+#. SsqWz
+#: connectivity/inc/strings.hrc:43
+msgctxt "STR_QUERY_INVALID_LIKE_STRING"
+msgid "The query cannot be executed. “LIKE” can be used with a string argument only."
+msgstr "Kan ikkje utføra spørjinga. «LIKE» kan berre brukast i kombinasjon med eit strengargument."
+
+#. ZFFrf
+#: connectivity/inc/strings.hrc:44
+msgctxt "STR_QUERY_NOT_LIKE_TOO_COMPLEX"
+msgid "The query cannot be executed. The “NOT LIKE” condition is too complex."
+msgstr "Kan ikkje utføra spørjinga. Vilkåret «NOT LIKE» er for kompleks."
+
+#. AaZzs
+#: connectivity/inc/strings.hrc:45
+msgctxt "STR_QUERY_LIKE_WILDCARD"
+msgid "The query cannot be executed. The “LIKE” condition contains wildcard in the middle."
+msgstr "Kan ikkje utføra spørjinga. Vilkåret «LIKE» har jokerteikn i midten."
+
+#. GN6F9
+#: connectivity/inc/strings.hrc:46
+msgctxt "STR_QUERY_LIKE_WILDCARD_MANY"
+msgid "The query cannot be executed. The “LIKE” condition contains too many wildcards."
+msgstr "Kan ikkje utføra spørjinga. Vilkåret «LIKE» har for mange jokerteikn."
+
+#. LreLr
+#: connectivity/inc/strings.hrc:47
+msgctxt "STR_INVALID_COLUMNNAME"
+msgid "The column name “$columnname$” is not valid."
+msgstr "Kolonnenamnet «$columnname$» er ugyldig."
+
+#. FT3Zb
+#: connectivity/inc/strings.hrc:48
+msgctxt "STR_INVALID_COLUMN_SELECTION"
+msgid "The statement contains an invalid selection of columns."
+msgstr "Uttrykket inneheld eit ugyldig kolonneval."
+
+#. iLNAb
+#: connectivity/inc/strings.hrc:49
+msgctxt "STR_COULD_NOT_LOAD_FILE"
+msgid "The file $filename$ could not be loaded."
+msgstr "Klarte ikkje lesa inn fila $filename$."
+
+#. jq62z
+#: connectivity/inc/strings.hrc:50
+msgctxt "STR_LOAD_FILE_ERROR_MESSAGE"
+msgid ""
+"The attempt to load the file resulted in the following error message ($exception_type$):\n"
+"\n"
+"$error_message$"
+msgstr ""
+"Forsøket på å lesa inn fila gav den følgjande feilmeldinga ($exception_type$):\n"
+"\n"
+"$error_message$"
+
+#. sbrdS
+#. = the ado driver's resource strings
+#: connectivity/inc/strings.hrc:52
+msgctxt "STR_TYPE_NOT_CONVERT"
+msgid "The type could not be converted."
+msgstr "Klarte ikkje endra typen."
+
+#. 3L6uG
+#: connectivity/inc/strings.hrc:53
+msgctxt "STR_INVALID_COLUMN_DESCRIPTOR_ERROR"
+msgid "Could not append column: invalid column descriptor."
+msgstr "Klarte ikkje leggja til kolonnen: Ugyldig kolonneskildring."
+
+#. 4GMmY
+#: connectivity/inc/strings.hrc:54
+msgctxt "STR_INVALID_GROUP_DESCRIPTOR_ERROR"
+msgid "Could not create group: invalid object descriptor."
+msgstr "Klarte ikkje oppretta gruppa: Ugyldig gruppebeskriving."
+
+#. MDKgr
+#: connectivity/inc/strings.hrc:55
+msgctxt "STR_INVALID_INDEX_DESCRIPTOR_ERROR"
+msgid "Could not create index: invalid object descriptor."
+msgstr "Klarte ikkje oppretta indeksen: Ugyldig objektbeskriving."
+
+#. jPjxi
+#: connectivity/inc/strings.hrc:56
+msgctxt "STR_INVALID_KEY_DESCRIPTOR_ERROR"
+msgid "Could not create key: invalid object descriptor."
+msgstr "Klarte ikkje oppretta nøkkelen: Ugyldig objektbeskriving."
+
+#. jaDH3
+#: connectivity/inc/strings.hrc:57
+msgctxt "STR_INVALID_TABLE_DESCRIPTOR_ERROR"
+msgid "Could not create table: invalid object descriptor."
+msgstr "Klarte ikkje oppretta tabellen: Ugyldig objektbeskriving."
+
+#. utNzu
+#: connectivity/inc/strings.hrc:58
+msgctxt "STR_INVALID_USER_DESCRIPTOR_ERROR"
+msgid "Could not create user: invalid object descriptor."
+msgstr "Klarte ikkje oppretta brukaren: Ugyldig objektbeskriving."
+
+#. 4TE9R
+#: connectivity/inc/strings.hrc:59
+msgctxt "STR_INVALID_VIEW_DESCRIPTOR_ERROR"
+msgid "Could not create view: invalid object descriptor."
+msgstr "Klarte ikkje oppretta visinga: Ugyldig objektskildring."
+
+#. BrHQp
+#: connectivity/inc/strings.hrc:60
+msgctxt "STR_VIEW_NO_COMMAND_ERROR"
+msgid "Could not create view: no command object."
+msgstr "Klarte ikkje oppretta visinga: Kommandoobjekt mangler."
+
+#. F6ygP
+#: connectivity/inc/strings.hrc:61
+msgctxt "STR_NO_CONNECTION"
+msgid "The connection could not be created. Maybe the necessary data provider is not installed."
+msgstr "Klarte ikkje oppretta tilkoplinga. Det kan henda at den nødvendige dataleverandøren ikkje er installert."
+
+#. GRZEu
+#. dbase
+#: connectivity/inc/strings.hrc:63
+msgctxt "STR_COULD_NOT_DELETE_INDEX"
+msgid "The index could not be deleted. An unknown error while accessing the file system occurred."
+msgstr "Klarte ikkje sletta registeret. Det oppstod ein ukjend feil då filsystemet skulle brukast."
+
+#. JbDnu
+#: connectivity/inc/strings.hrc:64
+msgctxt "STR_ONL_ONE_COLUMN_PER_INDEX"
+msgid "The index could not be created. Only one column per index is allowed."
+msgstr "Klarte ikkje oppretta indeksen. Det er berre tillate med ein kolonne per indeks."
+
+#. rB3XE
+#: connectivity/inc/strings.hrc:65
+msgctxt "STR_COULD_NOT_CREATE_INDEX_NOT_UNIQUE"
+msgid "The index could not be created. The values are not unique."
+msgstr "Klarte ikkje oppretta indeksen. Verdiane er ikkje unike."
+
+#. f8DTu
+#: connectivity/inc/strings.hrc:66
+msgctxt "STR_COULD_NOT_CREATE_INDEX"
+msgid "The index could not be created. An unknown error appeared."
+msgstr "Klarte ikkje oppretta indeksen. Det oppstod ein ukjend feil."
+
+#. 9eEjK
+#: connectivity/inc/strings.hrc:67
+msgctxt "STR_COULD_NOT_CREATE_INDEX_NAME"
+msgid "The index could not be created. The file “$filename$” is used by another index."
+msgstr "Klarte ikkje oppretta indeksen. Fila «$filename$» er i bruk av ein annan indeks."
+
+#. GcK7B
+#: connectivity/inc/strings.hrc:68
+msgctxt "STR_COULD_NOT_CREATE_INDEX_KEYSIZE"
+msgid "The index could not be created. The size of the chosen column is too big."
+msgstr "Klarte ikkje oppretta indeksen. Den valde kolonnen er for stor."
+
+#. NGwFW
+#: connectivity/inc/strings.hrc:69
+msgctxt "STR_SQL_NAME_ERROR"
+msgid "The name “$name$” does not match SQL naming constraints."
+msgstr "Namnet «$name$» følgjer ikkje namneavgrensingane til SQL."
+
+#. wv2Cx
+#: connectivity/inc/strings.hrc:70
+msgctxt "STR_COULD_NOT_DELETE_FILE"
+msgid "The file $filename$ could not be deleted."
+msgstr "Klarte ikkje sletta fila $filename$."
+
+#. PiFvx
+#: connectivity/inc/strings.hrc:71
+msgctxt "STR_INVALID_COLUMN_TYPE"
+msgid "Invalid column type for column “$columnname$”."
+msgstr "Ugyldig kolonnetype for kolonnen «$columnname$»."
+
+#. wB2gE
+#: connectivity/inc/strings.hrc:72
+msgctxt "STR_INVALID_COLUMN_PRECISION"
+msgid "Invalid precision for column “$columnname$”."
+msgstr "Ugyldig presisering for kolonnen «$columnname$»."
+
+#. v67fT
+#: connectivity/inc/strings.hrc:73
+msgctxt "STR_INVALID_PRECISION_SCALE"
+msgid "Precision is less than scale for column “$columnname$”."
+msgstr "Storleiken er mindre enn kolonnestorleiken på «$columnname$»."
+
+#. J3KEu
+#: connectivity/inc/strings.hrc:74
+msgctxt "STR_INVALID_COLUMN_NAME_LENGTH"
+msgid "Invalid column name length for column “$columnname$”."
+msgstr "Ugyldig namnelengd på kolonnen «$columnname$»."
+
+#. ZQUww
+#: connectivity/inc/strings.hrc:75
+msgctxt "STR_DUPLICATE_VALUE_IN_COLUMN"
+msgid "Duplicate value found in column “$columnname$”."
+msgstr "Fann ein dobbeltoppført verdi i kolonnen «$columnname$»."
+
+#. zSeBJ
+#: connectivity/inc/strings.hrc:76
+msgctxt "STR_INVALID_COLUMN_DECIMAL_VALUE"
+msgid ""
+"The “$columnname$” column has been defined as a “Decimal” type, the maximum length is $precision$ characters (with $scale$ decimal places).\n"
+"\n"
+"The specified value “$value$” is longer than the number of digits allowed."
+msgstr ""
+"Kolonnen «$columnname$» er definert å vera av typen «desimal». Høgste tillatne lengd er $precision$ teikn (med $scale$ desimalplassar).\n"
+"\n"
+"Den oppgjevne verdien \"$value$ er lenger enn talet på tillatne siffer."
+
+#. M6CvC
+#: connectivity/inc/strings.hrc:77
+msgctxt "STR_COLUMN_NOT_ALTERABLE"
+msgid "The column “$columnname$” could not be altered. Maybe the file system is write-protected."
+msgstr "Klarte ikkje endra kolonnen «$columnname$». Kanskje er filsystemet skriveverna?"
+
+#. st6hA
+#: connectivity/inc/strings.hrc:78
+msgctxt "STR_INVALID_COLUMN_VALUE"
+msgid "The column “$columnname$” could not be updated. The value is invalid for that column."
+msgstr "Klarte ikkje oppdatera kolonnen «$columnname$». Verdien er ugyldig for denne kolonnen."
+
+#. 5rH5W
+#: connectivity/inc/strings.hrc:79
+msgctxt "STR_COLUMN_NOT_ADDABLE"
+msgid "The column “$columnname$” could not be added. Maybe the file system is write-protected."
+msgstr "Klarte ikkje leggja til kolonnen «$columnname$». Kanskje filsystemet er skriveverna?"
+
+#. B9ACk
+#: connectivity/inc/strings.hrc:80
+msgctxt "STR_COLUMN_NOT_DROP"
+msgid "The column at position “$position$” could not be dropped. Maybe the file system is write-protected."
+msgstr "Klarte ikkje utelata kolonnen på plasseringa «$position$». Kanskje filsystemet er skriveverna?"
+
+#. KfedE
+#: connectivity/inc/strings.hrc:81
+msgctxt "STR_TABLE_NOT_DROP"
+msgid "The table “$tablename$” could not be dropped. Maybe the file system is write-protected."
+msgstr "Klarte ikkje utelata tabellen «$tablename$». Kanskje filsystemet er skriveverna?"
+
+#. R3BGx
+#: connectivity/inc/strings.hrc:82
+msgctxt "STR_COULD_NOT_ALTER_TABLE"
+msgid "The table could not be altered."
+msgstr "Klarte ikkje endra tabellen."
+
+#. DijyA
+#: connectivity/inc/strings.hrc:83
+msgctxt "STR_INVALID_DBASE_FILE"
+msgid "The file “$filename$” is an invalid (or unrecognized) dBASE file."
+msgstr "Fila «$filename$» er ei ugyldig (eller ikkje attkjend) dBase-fil."
+
+#. LhHTA
+#. Evoab2
+#: connectivity/inc/strings.hrc:85
+msgctxt "STR_CANNOT_OPEN_BOOK"
+msgid "Cannot open Evolution address book."
+msgstr "Klarar ikkje opna Evolution-adressebok."
+
+#. sxbEF
+#: connectivity/inc/strings.hrc:86
+msgctxt "STR_SORT_BY_COL_ONLY"
+msgid "Can only sort by table columns."
+msgstr "Klarar berre sortera etter tabellkolonnar."
+
+#. 7R6eC
+#. File
+#: connectivity/inc/strings.hrc:88
+msgctxt "STR_QUERY_COMPLEX_COUNT"
+msgid "The query cannot be executed. It is too complex. Only “COUNT(*)” is supported."
+msgstr "Klarar ikkje utføra spørjinga. Ho er for kompleks. Berre «TAL.PÅ(*)» er støtta."
+
+#. PJivi
+#: connectivity/inc/strings.hrc:89
+msgctxt "STR_QUERY_INVALID_BETWEEN"
+msgid "The query cannot be executed. The “BETWEEN” arguments are not correct."
+msgstr "Klarar ikkje utføra spørjinga. «MELLOM»-argumentet er feil."
+
+#. CHRju
+#: connectivity/inc/strings.hrc:90
+msgctxt "STR_QUERY_FUNCTION_NOT_SUPPORTED"
+msgid "The query cannot be executed. The function is not supported."
+msgstr "Klarar ikkje utføra spørjinga. Funksjonen er ikkje støtta."
+
+#. mnc5r
+#: connectivity/inc/strings.hrc:91
+msgctxt "STR_TABLE_READONLY"
+msgid "The table cannot be changed. It is read only."
+msgstr "Tabellen kan ikkje endrast fordi han er skriveverna."
+
+#. TUUpf
+#: connectivity/inc/strings.hrc:92
+msgctxt "STR_DELETE_ROW"
+msgid "The row could not be deleted. The option “Display inactive records” is set."
+msgstr "Klarte ikkje sletta rada fordi «Display inactive records» er valt."
+
+#. TZTfv
+#: connectivity/inc/strings.hrc:93
+msgctxt "STR_ROW_ALREADY_DELETED"
+msgid "The row could not be deleted. It is already deleted."
+msgstr "Klarte ikkje sletta rada fordi ho allereie er sletta."
+
+#. NK9AX
+#: connectivity/inc/strings.hrc:94
+msgctxt "STR_QUERY_MORE_TABLES"
+msgid "The query cannot be executed. It contains more than one table."
+msgstr "Kan ikkje utføra spørjinga. Ho inneheld meir enn éin tabell."
+
+#. L4Ffm
+#: connectivity/inc/strings.hrc:95
+msgctxt "STR_QUERY_NO_TABLE"
+msgid "The query cannot be executed. It contains no valid table."
+msgstr "Kan ikkje utføra spørjinga. Ho inneheld ingen gyldige tabellar."
+
+#. 3KADk
+#: connectivity/inc/strings.hrc:96
+msgctxt "STR_QUERY_NO_COLUMN"
+msgid "The query cannot be executed. It contains no valid columns."
+msgstr "Kan ikkje utføra spørjinga. Ho inneheld ingen gyldige kolonnar."
+
+#. WcpZM
+#: connectivity/inc/strings.hrc:97
+msgctxt "STR_INVALID_PARA_COUNT"
+msgid "The count of the given parameter values does not match the parameters."
+msgstr "Talet i den valde parameterverdien stemmer ikkje med parametrane."
+
+#. CFcjS
+#: connectivity/inc/strings.hrc:98
+msgctxt "STR_NO_VALID_FILE_URL"
+msgid "The URL “$URL$” is not valid. A connection cannot be created."
+msgstr "Lenkja «$URL$» er ugyldig og sambandet kan ikkje opprettast."
+
+#. YFjkG
+#: connectivity/inc/strings.hrc:99
+msgctxt "STR_NO_CLASSNAME"
+msgid "The driver class “$classname$” could not be loaded."
+msgstr "Klarte ikkje lasta inn drivarklassen «$classname$»."
+
+#. jbnZZ
+#: connectivity/inc/strings.hrc:100
+msgctxt "STR_NO_JAVA"
+msgid "No Java installation could be found. Please check your installation."
+msgstr "Fann ingen javainstallasjon. Sjekk installasjonen."
+
+#. GdN4i
+#: connectivity/inc/strings.hrc:101
+msgctxt "STR_NO_RESULTSET"
+msgid "The execution of the query does not return a valid result set."
+msgstr "Spørjinga gjev ikkje noko gyldig resultatsett."
+
+#. JGxgF
+#: connectivity/inc/strings.hrc:102
+msgctxt "STR_NO_ROWCOUNT"
+msgid "The execution of the update statement does not affect any rows."
+msgstr "Køyringa av oppdateringsuttrykket påverkar ingen rader."
+
+#. yCACF
+#: connectivity/inc/strings.hrc:103
+msgctxt "STR_NO_CLASSNAME_PATH"
+msgid "The additional driver class path is “$classpath$”."
+msgstr "Adressa til den ekstra drivarklassen er «$classpath$»."
+
+#. sX2NM
+#: connectivity/inc/strings.hrc:104
+msgctxt "STR_UNKNOWN_PARA_TYPE"
+msgid "The type of parameter at position “$position$” is unknown."
+msgstr "Parametertypen på plasseringa «$position$» er ukjend."
+
+#. gSPCX
+#: connectivity/inc/strings.hrc:105
+msgctxt "STR_UNKNOWN_COLUMN_TYPE"
+msgid "The type of column at position “$position$” is unknown."
+msgstr "Kolonnetypen på plasseringa «$position$» er ukjend."
+
+#. 3FmFX
+#. KAB
+#: connectivity/inc/strings.hrc:107
+msgctxt "STR_PARA_ONLY_PREPARED"
+msgid "Parameters can appear only in prepared statements."
+msgstr "Ein kan berre leggja inn parametrar i førebudde uttrykk."
+
+#. CB7pj
+#. MACAB
+#: connectivity/inc/strings.hrc:109
+msgctxt "STR_NO_TABLE"
+msgid "No such table!"
+msgstr "Tabellen finst ikkje."
+
+#. LUQBc
+#: connectivity/inc/strings.hrc:110
+msgctxt "STR_NO_MAC_OS_FOUND"
+msgid "No suitable macOS installation was found."
+msgstr "Fann ingen passande MacOS-installasjon."
+
+#. HNSzq
+#. hsqldb
+#: connectivity/inc/strings.hrc:112
+msgctxt "STR_NO_STORAGE"
+msgid "The connection can not be established. No storage or URL was given."
+msgstr "Klarte ikkje oppretta tilkoplinga, fordi verken lagringsstad eller adresse er oppgjeve."
+
+#. SZSmZ
+#: connectivity/inc/strings.hrc:113
+msgctxt "STR_INVALID_FILE_URL"
+msgid "The given URL contains no valid local file system path. Please check the location of your database file."
+msgstr "Den oppgjevne adressa er ikkje ei gyldig adresse til det lokale filsystemet. Sjekk kvar databasefila di er lagra."
+
+#. MgCH9
+#: connectivity/inc/strings.hrc:114
+msgctxt "STR_NO_TABLE_CONTAINER"
+msgid "An error occurred while obtaining the connection’s table container."
+msgstr "Det oppstod ein feil ved oppretting av sambandet ved innhentinga av tabellbehaldaren."
+
+#. uxoGW
+#: connectivity/inc/strings.hrc:115
+msgctxt "STR_NO_TABLENAME"
+msgid "There is no table named “$tablename$”."
+msgstr "Det finst ingen tabell som heiter «$tablename$»."
+
+#. 3BxCF
+#: connectivity/inc/strings.hrc:116
+msgctxt "STR_NO_DOCUMENTUI"
+msgid "The provided DocumentUI is not allowed to be NULL."
+msgstr "Den oppgjevne «DocumentUI»-en kan ikkje vera «NULL»."
+
+#. VLEMM
+#: connectivity/inc/strings.hrc:117
+msgctxt "STR_ERROR_NEW_VERSION"
+msgid "The connection could not be established. The database was created by a newer version of %PRODUCTNAME."
+msgstr "Klarte ikkje setja opp sambandet. Databasen vart laga med ein nyare versjon av %PRODUCTNAME."
+
+#. 3BKTP
+#: connectivity/inc/strings.hrc:119
+msgctxt "STR_ROW_SET_OPERATION_VETOED"
+msgid "The record operation has been vetoed."
+msgstr "Opptaksoperasjonen er hindra."
+
+#. VEbfy
+#: connectivity/inc/strings.hrc:120
+msgctxt "STR_PARSER_CYCLIC_SUB_QUERIES"
+msgid "The statement contains a cyclic reference to one or more subqueries."
+msgstr "Uttrykket inneheld ein syklisk referanse til éi eller fleire delspørjingar."
+
+#. jDAGJ
+#: connectivity/inc/strings.hrc:121
+msgctxt "STR_DB_OBJECT_NAME_WITH_SLASHES"
+msgid "The name must not contain any slashes (“/”)."
+msgstr "Namnet kan ikkje innehalda skråstrekar («/»)."
+
+#. 5Te4k
+#: connectivity/inc/strings.hrc:122
+msgctxt "STR_DB_INVALID_SQL_NAME"
+msgid "$1$ is no SQL conform identifier."
+msgstr "$1$ er ikkje ein SQL stadfestingsidentifikator."
+
+#. kvvjL
+#: connectivity/inc/strings.hrc:123
+msgctxt "STR_DB_QUERY_NAME_WITH_QUOTES"
+msgid "Query names must not contain quote characters."
+msgstr "Spørjingar kan ikkje ha hermeteikn i namnet."
+
+#. oftHX
+#: connectivity/inc/strings.hrc:124
+msgctxt "STR_DB_OBJECT_NAME_IS_USED"
+msgid "The name “$1$” is already in use in the database."
+msgstr "Namnet «$1$» er brukt frå før i databasen."
+
+#. gD8xU
+#: connectivity/inc/strings.hrc:125
+msgctxt "STR_DB_NOT_CONNECTED"
+msgid "No connection to the database exists."
+msgstr "Det er inga tilkopling til databasen."
+
+#. Dpdod
+#: connectivity/inc/strings.hrc:126
+msgctxt "STR_AB_ADDRESSBOOK_NOT_FOUND"
+msgid "No $1$ exists."
+msgstr "$1$ er ikkje tilgjengeleg."
+
+#. e7kHo
+#: connectivity/inc/strings.hrc:127
+msgctxt "STR_DATA_CANNOT_SELECT_UNFILTERED"
+msgid "Unable to display the complete table content. Please apply a filter."
+msgstr "Klarar ikkje visa heile tabellinnhaldet. Du bør bruka eit filter."
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Legg til"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Bruk"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Avbryt"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Lukk"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Slett"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Rediger"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Hjelp"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Ny(tt)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Nei"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_OK"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Fjern"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Tilbakestill"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Ja"

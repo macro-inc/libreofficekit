@@ -1,0 +1,1907 @@
+#. extracted from helpcontent2/source/text/scalc/04
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-04-11 13:27+0000\n"
+"Last-Translator: Xosé <xosecalvo@gmail.com>\n"
+"Language-Team: Galician <https://translations.documentfoundation.org/projects/libo_help-master/textscalc04/gl/>\n"
+"Language: gl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1548193798.000000\n"
+
+#. NQkD7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys for Spreadsheets"
+msgstr "Teclas de atallo para follas de cálculo"
+
+#. DdGD4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3145801\n"
+"help.text"
+msgid "<bookmark_value>spreadsheets; shortcut keys in</bookmark_value>        <bookmark_value>shortcut keys; spreadsheets</bookmark_value>        <bookmark_value>sheet ranges; filling</bookmark_value>"
+msgstr "<bookmark_value>follas de cálculo; teclas de atallo en</bookmark_value><bookmark_value>teclas de atallo; follas de cálculo</bookmark_value><bookmark_value>intervalos de folla de cálculo; encher</bookmark_value>"
+
+#. qPZBx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145801\n"
+"help.text"
+msgid "<variable id=\"calc_keys\"><link href=\"text/scalc/04/01020000.xhp\">Shortcut Keys for Spreadsheets</link></variable>"
+msgstr "<variable id=\"calc_keys\"><link href=\"text/scalc/04/01020000.xhp\">Teclas de atallo para follas de cálculo</link></variable>"
+
+#. nwThC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155067\n"
+"help.text"
+msgid "To fill a selected cell range with the formula that you entered on the <emph>Input line</emph>, press <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter."
+msgstr "Para encher un intervalo de celas seleccionado coa fórmula introducida na <emph>liña de entrada</emph>, prema <switchinline select=\"sys\"><caseinline select=\"MAC\">Opcións</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter."
+
+#. RYfUJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153967\n"
+"help.text"
+msgid "To create a matrix in which all the cells contain the same information as what you entered on the <emph>Input line</emph>, press Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter. You cannot edit the components of the matrix."
+msgstr "Para crear unha matriz na que todas as celas conteñan a mesma información que a que se introduza na <emph>liña de entrada</emph>, prema Maiúsculas+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Intro. Non é posíbel editar os compoñentes da matriz."
+
+#. GFbcA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3166426\n"
+"help.text"
+msgid "To select multiple cells in different areas of a sheet, hold down <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> and drag in the different areas."
+msgstr "Para seleccionar varias celas en diferentes zonas dunha folla, manteña premida a tecla <switchinline select=\"sys\"><caseinline select=\"MAC\">Comando</caseinline><defaultinline>Ctrl</defaultinline></switchinline> e arrastre en cada unha das zonas."
+
+#. 3eEtd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150207\n"
+"help.text"
+msgid "To select multiple sheets in a spreadsheet, hold down <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>, and then click the name tabs at the lower edge of the workspace. To select only one sheet in a selection, hold down Shift, and then click the name tab of the sheet."
+msgstr "Para seleccionar varias follas dunha folla de cálculo, manteña premida a tecla <switchinline select=\"sys\"><caseinline select=\"MAC\">Comando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>, e despois prema nas lapelas co nome que están situadas no bordo inferior da zona de traballo. Para seleccionar só unha folla dunha selección, manteña premida a tecla Maiús e despois prema na lapela co nome da folla."
+
+#. DgYxH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3166432\n"
+"help.text"
+msgid "To insert a manual line break in a cell, click in the cell, and then press <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter."
+msgstr "Para inserir unha quebra de liña manual nunha cela, prema na cela e a seguir prema <switchinline select=\"sys\"><caseinline select=\"MAC\">Comando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Intro."
+
+#. GeePj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146978\n"
+"help.text"
+msgid "To delete the contents of selected cells, press Backspace. This opens the <link href=\"text/scalc/01/02150000.xhp\">Delete Contents</link> dialog, where you choose which contents of the cell you want to delete. To delete the contents of selected cells without a dialog, press the Delete key."
+msgstr "Para eliminar o contido das celas seleccionadas, prema Borrar para tras. Isto abre o cadro de diálogo <link href=\"text/scalc/01/02150000.xhp\">Eliminar contido</link>, onde pode escoller os contidos da cela que quere eliminar. Para eliminar o contido das celas seleccionadas sen o cadro de diálogo prema a tecla Suprimir."
+
+#. U7wer
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145386\n"
+"help.text"
+msgid "Navigating in Spreadsheets"
+msgstr "Navegar por follas de cálculo"
+
+#. 9zdut
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149407\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Teclas de atallo"
+
+#. 4j5yV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153815\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efecto</emph>"
+
+#. t9kZy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146871\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. 2DjmA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159093\n"
+"help.text"
+msgid "Moves the cursor to the first cell in the sheet (A1)."
+msgstr "Move o cursor á primeira cela da folla (A1)."
+
+#. eP4Fr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145073\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+End"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. GE2Wd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153283\n"
+"help.text"
+msgid "Moves the cursor to the last cell on the sheet that contains data."
+msgstr "Move o cursor até a última cela da folla que conteña datos."
+
+#. 4aZBF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149127\n"
+"help.text"
+msgid "Home"
+msgstr "Inicio"
+
+#. YUmpj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159205\n"
+"help.text"
+msgid "Moves the cursor to the first cell of the current row."
+msgstr "Move o cursor até a primeira cela da fila actual."
+
+#. BsKYJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149897\n"
+"help.text"
+msgid "End"
+msgstr "Fin"
+
+#. THrNt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155095\n"
+"help.text"
+msgid "Moves the cursor to the last cell that contains values in the current row."
+msgstr "Move o cursor para a derradeira cela da fila actual que conteña valores."
+
+#. FhvWD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id4149127\n"
+"help.text"
+msgid "Shift+Home"
+msgstr "Maiúsculas+Inicio"
+
+#. jKpFU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id4159205\n"
+"help.text"
+msgid "Selects cells from the current cell to the first cell of the current row."
+msgstr "Selecciona as celas desde a cela actual até a primeira cela da fila actual."
+
+#. dvr5t
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id4149897\n"
+"help.text"
+msgid "Shift+End"
+msgstr "Maiúsculas+Fin"
+
+#. CsAmu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id4155095\n"
+"help.text"
+msgid "Selects all cells from the current cell to the last cell that contains values in the current row."
+msgstr "Selecciona todas as celas desde a cela actual até a derradeira cela da fila actual que conteña valores."
+
+#. 8bBCM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id5149127\n"
+"help.text"
+msgid "Shift+Page Up"
+msgstr "Maiúsculas+Re Páx"
+
+#. cekU3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5159205\n"
+"help.text"
+msgid "Selects cells from the current cell up to one page in the current column or extends the existing selection one page up."
+msgstr "Selecciona as celas desde a cela actual unha páxina para arriba na columna actual ou estende a selección existente unha páxina para arriba."
+
+#. zAiRd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id5149897\n"
+"help.text"
+msgid "Shift+Page Down"
+msgstr "Maiúsculas+Av Páx"
+
+#. Zc5oJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5155095\n"
+"help.text"
+msgid "Selects cells from the current cell down to one page in the current column or extends the existing selection one page down."
+msgstr "Selecciona as celas desde a cela actual unha páxina para abaixo na columna actual ou estende a selección existente unha páxina para abaixo."
+
+#. CGrdr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id451550311052582\n"
+"help.text"
+msgid "Shift+Space"
+msgstr "Maiús+Espazo"
+
+#. RCDeC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id971550311052582\n"
+"help.text"
+msgid "Selects the current row or extends the existing selection to all respective rows."
+msgstr "Selecciona a fila actual ou estende a selección existente a todas as filas respectivas."
+
+#. FRMgL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id281550311052582\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Space"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Orde</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Espazo"
+
+#. zSmcn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id261550311052582\n"
+"help.text"
+msgid "Selects the current column or extends the existing selection to all respective columns."
+msgstr "Selecciona a columna actual ou estende a selección existente a todas as columnas respectivas."
+
+#. AErV8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id311550311052582\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Space"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Orde</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Maiús+Espazo"
+
+#. BUNZP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id851550311052582\n"
+"help.text"
+msgid "Selects all cells in the sheet."
+msgstr "Selecciona todas as celas da folla."
+
+#. dXFKv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3143220\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Left Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara á esquerda"
+
+#. ziZQj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154766\n"
+"help.text"
+msgid "Moves the cursor leftward to the start and end of cell blocks with data. If the cell to the left of the cursor is empty or the cell with the cursor is empty, the cursor moves leftward in the current row until it reaches the next cell with contents. If all cells in the same row to the left of the cursor are empty, the cursor moves to the first cell in the row."
+msgstr "Move o cursor para a esquerda até o inicio e o fin dos bloques de celas con datos. Se a cela á esquerda do cursor estiver baleira ou se a cela co cursor estiver baleira, o cursor móvese para a esquerda na fila actual até atinxir a seguinte cela con contido. Se todas as celas da mesma fila á esquerda do cursor estiveren baleiras, o cursor móvese para a primeira cela da fila."
+
+#. PgM3v
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153554\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Right Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara á dereita"
+
+#. WxdVv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155593\n"
+"help.text"
+msgid "Moves the cursor rightward to the start and end of cell blocks with data. If the cell to the right of the cursor is empty or the cell with the cursor is empty, the cursor moves rightward in the current row until it reaches the next cell with contents. If all cells in the same row to the right of the cursor are empty, the cursor moves to the last cell in the row."
+msgstr "Move o cursor para a dereita até o inicio e o fin dos bloques de celas con datos. Se a cela á dereita do cursor estiver baleira ou se a cela co cursor estiver baleira, o cursor móvese para a dereita na fila actual até atinxir a seguinte cela con contido. Se todas as celas da mesma fila á dereita do cursor estiveren baleiras, o cursor móvese para a derradeira cela da fila."
+
+#. R9tmv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149317\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Up Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción</caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a arriba"
+
+#. UV76n
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153076\n"
+"help.text"
+msgid "Moves the cursor upward to the start and end of cell blocks with data. If the cell above the cursor is empty or the cell with the cursor is empty, the cursor moves upward in the current column until it reaches the next cell with contents. If all cells in the same column above the cursor are empty, the cursor moves to the first cell in the column."
+msgstr "Move o cursor para arriba até o inicio e o fin dos bloques de celas con datos. Se a cela por riba do cursor estiver baleira ou se a cela co cursor estiver baleira, o cursor móvese para arriba na columna actual até atinxir a seguinte cela con contido. Se todas as celas da mesma columna por riba do cursor estiveren baleiras, o cursor móvese para a primeira cela da columna."
+
+#. EamtM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147250\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Down Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a abaixo"
+
+#. x95TY
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149054\n"
+"help.text"
+msgid "Moves the cursor downward to the start and end of cell blocks with data. If the cell below the cursor is empty or the cell with the cursor is empty, the cursor moves downward in the current column until it reaches the next cell with contents. If all cells in the same column below the cursor are empty, the cursor moves to the last cell in the column."
+msgstr "Move o cursor para abaixo até o inicio e o fin dos bloques de celas con datos. Se a cela por abaixo do cursor estiver baleira ou se a cela co cursor estiver baleira, o cursor móvese para abaixo na columna actual até atinxir a seguinte cela con contido. Se todas as celas da mesma columna por abaixo do cursor estiveren baleiras, o cursor móvese para a derradeira cela da columna."
+
+#. UQi4B
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148744\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara á esquerda"
+
+#. FwaRy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159258\n"
+"help.text"
+msgid "Selects all cells of the range created by the cursor movements using the <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Arrows</keycode> key combinations. If used to select rows and columns together, a rectangular cell range is selected. If the cursor is in an empty cell, the selection will stretch from the current cell up to the first cell with value in the direction of the arrow pressed."
+msgstr "Selecciona todas as celas do intervalo creado cos movementos do cursor empregando as combinacións de teclas <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Orde</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Frechas</keycode>. Ao empregalo para seleccionar filas e columnas xuntas, selecciónase un intervalo de celas rectangular. Se o cursor está nunha cela baleira, a selección esténdese desde a cela actual até a primeira cela cun valor na dirección da frecha premida."
+
+#. F95ji
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156399\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. S5nRM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145236\n"
+"help.text"
+msgid "Moves one sheet to the left."
+msgstr "Desprázase unha folla cara á esquerda."
+
+#. 6cFXE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149725\n"
+"help.text"
+msgid "In the print preview: Moves to the previous print page."
+msgstr "Na previsualización de páxina: desprázase á páxina de impresión anterior."
+
+#. gEiyB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147411\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Av Páx"
+
+#. DYMYx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150372\n"
+"help.text"
+msgid "Moves one sheet to the right."
+msgstr "Desprázase unha páxina cara á dereita."
+
+#. o2xPG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159120\n"
+"help.text"
+msgid "In the print preview: Moves to the next print page."
+msgstr "Na previsualización de páxina: desprázase á páxina de impresión seguintes"
+
+#. RBATr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146885\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. GYoY6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152976\n"
+"help.text"
+msgid "Moves one screen to the left."
+msgstr "Desprázase unha pantalla á esquerda."
+
+#. izdDB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149013\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. G9qzM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150477\n"
+"help.text"
+msgid "Moves one screen page to the right."
+msgstr "Desprázase unha pantalla á dereita."
+
+#. oVtdB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AFC\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. RBou4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10B00\n"
+"help.text"
+msgid "Adds the previous sheet to the current selection of sheets. If all the sheets in a spreadsheet are selected, this shortcut key combination only selects the previous sheet. Makes the previous sheet the current sheet."
+msgstr "Engade a folla anterior á selección actual de follas. Se están seleccionadas todas as follas dunha folla de cálculo, esta combinación de teclas de atallo só seleccionará a folla anterior. Activa a folla anterior en lugar da actual."
+
+#. c6GDa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10B03\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Av Páx"
+
+#. ZwywJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10B07\n"
+"help.text"
+msgid "Adds the next sheet to the current selection of sheets. If all the sheets in a spreadsheet are selected, this shortcut key combination only selects the next sheet. Makes the next sheet the current sheet."
+msgstr "Engade a seguinte folla á selección actual de follas. Se se seleccionan todas as follas dunha folla de cálculo, esta combinación de teclas de atallo só selecciona a seguinte folla. Activa a folla seguinte en lugar da actual."
+
+#. aErRL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145826\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ *"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. d5f9B
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148882\n"
+"help.text"
+msgid "where (*) is the multiplication sign on the numeric key pad"
+msgstr "onde (*) é o signo de multiplicación no teclado numérico"
+
+#. iaUDA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154847\n"
+"help.text"
+msgid "Selects the data range that contains the cursor. A range is a contiguous cell range that contains data and is bounded by empty row and columns."
+msgstr "Selecciona o intervalo de datos que contén o cursor. Un intervalo é un intervalo de celas contiguas que conteñen datos e que está rodeado de filas e columnas baleiras."
+
+#. 9Ae2w
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151233\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ /"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Alt</defaultinline></switchinline>+/"
+
+#. Kyj8C
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149949\n"
+"help.text"
+msgid "where (/) is the division sign on the numeric key pad"
+msgstr "onde (/) é o sinal de división no teclado numérico"
+
+#. WmCoM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150144\n"
+"help.text"
+msgid "Selects the matrix formula range that contains the cursor."
+msgstr "Selecciona o intervalo da fórmula de matriz que contén o cursor."
+
+#. MFam3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id8163396\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Plus key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. 6WSJE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id9901425\n"
+"help.text"
+msgid "Insert cells (as in menu Insert - Cells)"
+msgstr "Inserir celas (como no menú Inserir - Celas)"
+
+#. LSCN9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3389080\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Minus key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. 8NHAr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5104220\n"
+"help.text"
+msgid "Delete cells (as in menu Edit - Delete Cells)"
+msgstr "Eliminar celas (como no menú Editar - Eliminar celas)"
+
+#. ghA2J
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155825\n"
+"help.text"
+msgid "Enter (in a selected range)"
+msgstr "Introduza (nun intervalo seleccionado)"
+
+#. aFEgB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153935\n"
+"help.text"
+msgid "Moves the cursor down one cell in a selected range. To specify the direction that the cursor moves, choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc - General</emph> and change the option in <emph>Press Enter to move selection</emph>."
+msgstr "Baixa o cursor unha cela no intervalo seleccionado. Para indicar a dirección na que se move o cursor escolla <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferencias</emph></caseinline><defaultinline><emph>Ferramentas - Opcións</emph></defaultinline></switchinline><emph> - Calc do %PRODUCTNAME - Xeral</emph> e cambie a opción <emph>Prmer Intro para mover selección</emph>."
+
+#. DbRBy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id351630625364216\n"
+"help.text"
+msgid "Enter (after copying cell contents)"
+msgstr "Introduza (unha vez copiado o contido da cela)"
+
+#. 5PZQn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id681630625395135\n"
+"help.text"
+msgid "If cell contents have just been copied to the clipboard and no additional editing has been done in the current file, then pressing <keycode>Enter</keycode> will paste clipboard contents to the current cursor position."
+msgstr "Se o contido da cela se acaba de copiar ao portapapeis e non se fixeron máis cambios no ficheiro actual, premer <keycode>Intro</keycode> pega o contido do portapapeis na posición actual do cursor."
+
+#. 2MKS8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id521630625780621\n"
+"help.text"
+msgid "Shift+Enter"
+msgstr "Maiúculas+Intro"
+
+#. dAv3b
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id541630625783264\n"
+"help.text"
+msgid "If the clipboard contains cell contents and no editing has been done in the file, then <keycode>Shift+Enter</keycode> has the same behavior as <keycode>Enter</keycode> and pastes clipboard contents to the current cursor position."
+msgstr "Se o portapapeis contén contido de cela e non se fixo ningunha edición no ficheiro, <keycode>Maiúsculas+Intro</keycode> ten o mesmo comportamento que <keycode>Intro</keycode> e pega o contido do portapapeis na posición actual do cursor."
+
+#. so8sW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id921630625968749\n"
+"help.text"
+msgid "If no cells are selected, <keycode>Shift+Enter</keycode> moves the cursor to the opposite direction defined in the option <emph>Press Enter to move selection</emph> found in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc - General</emph>."
+msgstr "Se non hai celas seleccionadas, <keycode>Maiús+Intro</keycode> move o cursor nadirección oposta definida na opción <emph>Premer Intro para mover selección</emph>, que se atopa en <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferencias</emph></caseinline><defaultinline><emph>Ferramentas - Opcións</emph></defaultinline></switchinline><emph> - Calc do %PRODUCTNAME - Xeral</emph>."
+
+#. f4gCc
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id951630626229215\n"
+"help.text"
+msgid "If a range of cells is selected, <keycode>Shift+Enter</keycode> moves the cursor inside the current selection to the opposite direction defined in the option <emph>Press Enter to move selection</emph>."
+msgstr "Ao seleccionar un intervalo de celas, <keycode>Maiús+Intro</keycode>move o cursor dentro da selección actual na dirección oposta definida na opción <emph>Premer Intro para mover selección</emph>."
+
+#. ESQwM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5961180\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ ` (see note below this table)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. ZParU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id6407055\n"
+"help.text"
+msgid "Displays or hides the formulas instead of the values in all cells."
+msgstr "Mostra ou agocha as fórmulas no canto dos valores en todas as celas."
+
+#. WBh3X
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id8070314\n"
+"help.text"
+msgid "The ` key is located next to the \"1\" key on most English keyboards. If your keyboard does not show this key, you can assign another key: Choose Tools - Customize, click the Keyboard tab. Select the \"View\" category and the \"Toggle Formula\" function."
+msgstr "A tecla ' está situada a carón da tecla «1» na maioría dos teclados en inglés. Se o seu teclado non mostra esta tecla, pode asignar outra: Escolla Ferramentas - Personalizar, prema na lapela Teclado. Seleccione a categoría «Ver» e a función «Amosar fórmula»."
+
+#. De3Yx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3143661\n"
+"help.text"
+msgid "<bookmark_value>spreadsheets; duplicate</bookmark_value>      <bookmark_value>spreadsheets; quick rename</bookmark_value>"
+msgstr "<bookmark_value>follas de cálculo; duplicar</bookmark_value>      <bookmark_value>follas de cálculo; renomear rapidamente</bookmark_value>"
+
+#. AxVu3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id271637246984980\n"
+"help.text"
+msgid "Copying and Renaming Sheets"
+msgstr "Copiar e renomear follas"
+
+#. dNyPQ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id781637247029711\n"
+"help.text"
+msgid "The sheet tabs used to navigate between sheets can be clicked in combination with keyboard keys to perform the following operations:"
+msgstr "Pódense premer as lapelas das follas empregadas para navegar entre follas en combinación con teclas do teclado para realizar as operacións seguintes:"
+
+#. DDZy3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id741637247123788\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Teclas de atallo"
+
+#. ZB9vf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id731637247123788\n"
+"help.text"
+msgid "Effect"
+msgstr "Efecto"
+
+#. 9SNqY
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id211637247123788\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + Drag sheet tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Orde</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + Arrastrar a lapela da folla"
+
+#. F7Wju
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id981637247123788\n"
+"help.text"
+msgid "Creates a copy of the sheet whose tab was clicked. The copied sheet is placed at the position where the mouse button was released."
+msgstr "Crea unha copia da folla cuxa lapela se premeu. A folla copiada colócase na posición na que se solte o botón do rato."
+
+#. 4BauE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id211637247123024\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> + Click sheet tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción</caseinline><defaultinline>Alt</defaultinline></switchinline> + Premer lapela da folla"
+
+#. DqgFn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id981637247123114\n"
+"help.text"
+msgid "Makes the sheet name editable. Edit the sheet name and press <keycode>Enter</keycode> when finished."
+msgstr "Permite a edición do nome da folla. Edite o nome da folla e prema <keycode>Intro</keycode> ao rematar."
+
+#. TDGrd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148756\n"
+"help.text"
+msgid "Function Keys Used in Spreadsheets"
+msgstr "Teclas de función usadas en follas de cálculo"
+
+#. iZc4Z
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148581\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Teclas de atallo"
+
+#. q6YD5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152790\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efecto</emph>"
+
+#. 7B8Uu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154809\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F1"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. PMz3i
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145140\n"
+"help.text"
+msgid "Displays the comment that is attached to the current cell"
+msgstr "Mostra o comentario anexo á cela actual"
+
+#. NRB2f
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146142\n"
+"help.text"
+msgid "F2"
+msgstr "F2"
+
+#. BUfoX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148568\n"
+"help.text"
+msgid "With a cell selected, press F2 to open cell contents for editing. If the cell contains a formula, use arrow keys to navigate the sheet to easily enter range addresses into the formula."
+msgstr "Cunha cela seleccionada, prema F2 para abrir o contido da cela para editar. Se a cela contén unha fórmula, empregue as teclas de frecha para navegar pola folla e inserir facilmente enderezos de intervalo na fórmula."
+
+#. KPNsf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id381629750112725\n"
+"help.text"
+msgid "Press F2 again to enable the use of arrow keys to move the cursor in the formula text."
+msgstr "Prema F2 de novo para habilitar o uso das teclas de frecha para mover o cursor no texto da fórmula."
+
+#. YE2ga
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id481629750230372\n"
+"help.text"
+msgid "Each additional use of the F2 shortcut switches between the two states previously described."
+msgstr "Cada uso adicional do atallo F2 alterna entre os dous estados descritos anteriormente."
+
+#. Dzhco
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id461629750358215\n"
+"help.text"
+msgid "Some dialog boxes have input fields with a <emph>Shrink</emph> button. Pressing F2 with the cursor inside such field causes the <emph>Shrink</emph> command to be executed."
+msgstr "Algunhas caixas de diálogo teñen campos de entrada cun botón <emph>Encoller</emph>. Premer F2 co cursor dentro dun destes campos fai que se execute a orde <emph>Escoller </emph>."
+
+#. seNCx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146850\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. hdqjK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145162\n"
+"help.text"
+msgid "Opens the Function Wizard."
+msgstr "Abre o asistente de funcións"
+
+#. ppW28
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147366\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. uPqcZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155929\n"
+"help.text"
+msgid "Moves the cursor to the <emph>Input line</emph> where you can enter a formula for the current cell."
+msgstr "Despraza o cursor ata a <emph>Liña de entrada</emph>, onde pode introducir unha fórmula para a cela activa."
+
+#. hBwvr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153730\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. FiJzq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145245\n"
+"help.text"
+msgid "Opens the <emph>Define Names</emph> dialog."
+msgstr "Abre a caixa de diálogo <emph>Definir nomes</emph>."
+
+#. DF5mE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148768\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F4"
+msgstr "Maiús+<switchinline select=\"sys\"><caseinline select=\"MAC\">Comando</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F4"
+
+#. AiMqF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153047\n"
+"help.text"
+msgid "Shows or Hides the Database explorer."
+msgstr "Mostra ou oculta o explorador da base de datos."
+
+#. YA3xd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145353\n"
+"help.text"
+msgid "F4"
+msgstr "F4"
+
+#. 7GNxN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155620\n"
+"help.text"
+msgid "Rearranges the relative or absolute references (for example, A1, $A$1, $A1, A$1) in the input field."
+msgstr "Reordena as referencias relativas ou absolutas (por exemplo, A1, $A$1, $A1, A$1) no campo de entrada."
+
+#. oE5B2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156063\n"
+"help.text"
+msgid "F5"
+msgstr "F5"
+
+#. AB9fs
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149540\n"
+"help.text"
+msgid "Shows or hides the <emph>Navigator</emph>."
+msgstr "Mostra ou oculta o <emph>navegador</emph>."
+
+#. Qb9y9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148392\n"
+"help.text"
+msgid "Shift+F5"
+msgstr "Maiús+F5"
+
+#. EdNGE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150268\n"
+"help.text"
+msgid "Traces dependents."
+msgstr "Rastrexa dependentes."
+
+#. ytBaa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148430\n"
+"help.text"
+msgid "Shift+F9"
+msgstr "Maiús+F9"
+
+#. FWpeb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153179\n"
+"help.text"
+msgid "Traces precedents."
+msgstr "Rastrexa precedentes."
+
+#. uAxBV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150568\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F5"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. oTBgR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153551\n"
+"help.text"
+msgid "Moves the cursor from the <emph>Input line</emph> to the <emph>Sheet area</emph> box. You can also use Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+T."
+msgstr "Move o cursor desde a <emph>liña de entrada</emph> para a caixa <emph>Área da folla</emph>. Tamén pode empregar Maiús+<switchinline select=\"sys\"><caseinline select=\"MAC\">Orde</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+T"
+
+#. 6NRwR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155368\n"
+"help.text"
+msgid "F7"
+msgstr "F7"
+
+#. wEzCo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154871\n"
+"help.text"
+msgid "Checks spelling in the current sheet."
+msgstr "Verifica a ortografía na folla activa."
+
+#. Fobqn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150688\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. bJfnW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149781\n"
+"help.text"
+msgid "Opens the Thesaurus if the current cell contains text."
+msgstr "Abre o dicionario de sinónimos se a cela activa contén texto."
+
+#. xdDid
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156257\n"
+"help.text"
+msgid "F8"
+msgstr "F8"
+
+#. 7TksC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147482\n"
+"help.text"
+msgid "Turns additional selection mode on or off. In this mode, you can use the arrow keys to extend the selection. You can also click in another cell to extend the selection."
+msgstr "Activa e desactiva o modo selección adicional. Con este modo, pode usar as teclas de frecha para estender a selección. Tamén pode premer noutra cela para estender a selección."
+
+#. 7GjGR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154313\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F8"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. uQ2pe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150385\n"
+"help.text"
+msgid "Highlights cells containing values."
+msgstr "Realza as celas que conteñan valores."
+
+#. rQLdE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152479\n"
+"help.text"
+msgid "F9"
+msgstr "F9"
+
+#. gHTre
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3163827\n"
+"help.text"
+msgid "Recalculates changed formulas in the current sheet."
+msgstr "Recalcula as fórmulas cambiadas na folla actual."
+
+#. mrLpF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id9027069\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F9"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. iEeQr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id1729178\n"
+"help.text"
+msgid "Recalculates all formulas in all sheets."
+msgstr "Recalcula todas as fórmulas de todas as follas."
+
+#. 8sbVu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156300\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F9"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. bKMjk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154817\n"
+"help.text"
+msgid "Updates the selected chart."
+msgstr "Actualiza a gráfica seleccionada."
+
+#. VLV2J
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149279\n"
+"help.text"
+msgid "<switchinline select=\"sys\">              <caseinline select=\"MAC\">Command+T</caseinline>              <defaultinline>F11</defaultinline>            </switchinline>"
+msgstr "<switchinline select=\"sys\">              <caseinline select=\"MAC\">Orde+T</caseinline>              <defaultinline>F11</defaultinline>            </switchinline>"
+
+#. edNSJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150967\n"
+"help.text"
+msgid "Opens the <emph>Styles</emph> window where you can apply a formatting style to the contents of the cell or to the current sheet."
+msgstr "Abre a xanela <emph>Estilos</emph>, onde pode aplicar un estilo de formatado ao contido da cela ou á folla activa."
+
+#. jr8HD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156308\n"
+"help.text"
+msgid "Shift+F11"
+msgstr "Maiús+F11"
+
+#. ZEAFn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145209\n"
+"help.text"
+msgid "Creates a document template."
+msgstr "Crea un modelo de documento."
+
+#. imZDB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147622\n"
+"help.text"
+msgid "Shift<switchinline select=\"sys\"><caseinline select=\"MAC\">+Command</caseinline><defaultinline>+Ctrl</defaultinline></switchinline>+F11"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. pBFoe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153215\n"
+"help.text"
+msgid "Updates the templates."
+msgstr "Actualiza os modelos."
+
+#. YCqt2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150760\n"
+"help.text"
+msgid "F12"
+msgstr "F12"
+
+#. 4e6VH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156321\n"
+"help.text"
+msgid "Groups the selected data range."
+msgstr "Agrupa o intervalo de datos seleccionado."
+
+#. Si4Tz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146859\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. Zva97
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156128\n"
+"help.text"
+msgid "Ungroups the selected data range."
+msgstr "Desagrupa o intervalo de datos seleccionado."
+
+#. DPRGM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151264\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Down Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara á esquerda"
+
+#. wuQzk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153155\n"
+"help.text"
+msgid "Increases the height of current row (only in <link href=\"text/shared/optionen/01060800.xhp\">OpenOffice.org legacy compatibility mode</link>)."
+msgstr "Aumenta a altura da fila actual (só no <link href=\"text/shared/optionen/01060800.xhp\">modo de compatibilidade herdada do OpenOffice.org</link>)."
+
+#. v7V4h
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151297\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Up Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. hCAGz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155849\n"
+"help.text"
+msgid "Decreases the height of current row (only in <link href=\"text/shared/optionen/01060800.xhp\">OpenOffice.org legacy compatibility mode</link>)."
+msgstr "Reduce a altura da fila actual (só no <link href=\"text/shared/optionen/01060800.xhp\">modo de compatibilidade herdada do OpenOffice.org</link>)."
+
+#. CMCuV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155997\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Right Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara á esquerda"
+
+#. wPsAN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150256\n"
+"help.text"
+msgid "Increases the width of the current column."
+msgstr "Aumenta a largura da columna activa."
+
+#. 49fV4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154046\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Left Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara á esquerda"
+
+#. BvqE3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150155\n"
+"help.text"
+msgid "Decreases the width of the current column."
+msgstr "Reduce a largura da columna activa."
+
+#. YKEBG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149293\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+Arrow Key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara á esquerda"
+
+#. rBzCH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159180\n"
+"help.text"
+msgid "Optimizes the column width or row height based on the current cell."
+msgstr "Optimiza a largura da columna ou a altura da fila, baseándose na cela activa."
+
+#. sVJdH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156013\n"
+"help.text"
+msgid "Formatting Cells Using Shortcut Keys"
+msgstr "Formatar celas con teclas de atallo"
+
+#. tpkFF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153979\n"
+"help.text"
+msgid "The following cell formats can be applied with the keyboard:"
+msgstr "Os seguintes formatos de cela poden aplicarse co teclado:"
+
+#. 3357D
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147492\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Teclas de atallo"
+
+#. GB6qD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154305\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efecto</emph>"
+
+#. nKrcB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145669\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+1 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Re Páx"
+
+#. NoxhF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149197\n"
+"help.text"
+msgid "Open Format Cells dialog"
+msgstr "Abrir a caixa de diálogo Formatar as celas"
+
+#. XxnqH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145668\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+1 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a abaixo"
+
+#. xqALX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149196\n"
+"help.text"
+msgid "Two decimal places, thousands separator"
+msgstr "Dous decimais, separador de millares"
+
+#. 8ta7J
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155331\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+2 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a abaixo"
+
+#. NFJyj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150120\n"
+"help.text"
+msgid "Standard exponential format"
+msgstr "Formato exponencial estándar"
+
+#. oFm4G
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154932\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+3 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a abaixo"
+
+#. YHrPb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148822\n"
+"help.text"
+msgid "Standard date format"
+msgstr "Formato de data estándar"
+
+#. 8BFmW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148829\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+4 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a abaixo"
+
+#. FEzGK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159152\n"
+"help.text"
+msgid "Standard currency format"
+msgstr "Formato monetario estándar"
+
+#. EiJ83
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150776\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+5 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a abaixo"
+
+#. uTbpv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148800\n"
+"help.text"
+msgid "Standard percentage format (two decimal places)"
+msgstr "Formato de porcentaxe estándar (dous decimais)"
+
+#. e4pHb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3158407\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+6 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción </caseinline><defaultinline>Alt</defaultinline></switchinline> + Frecha cara a abaixo"
+
+#. t9jfU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148444\n"
+"help.text"
+msgid "Standard format"
+msgstr "Formato estándar"
+
+#. QFNee
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154205\n"
+"help.text"
+msgid "Using the pivot table"
+msgstr "Usar o piloto de datos"
+
+#. iDg7S
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id631581375238556\n"
+"help.text"
+msgid "The shortcut keys below are for the <emph>Pivot Table Layout</emph> dialog."
+msgstr "As teclas de atallo de abaixo son para o diálogo <emph>Disposición da táboa dinámica</emph>."
+
+#. dRGGD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN11326\n"
+"help.text"
+msgid "Keys"
+msgstr "Teclas"
+
+#. xKHGN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN1132C\n"
+"help.text"
+msgid "Effect"
+msgstr "Efecto"
+
+#. CYiCE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153577\n"
+"help.text"
+msgid "<keycode>Tab</keycode>"
+msgstr "<keycode>Tab</keycode>"
+
+#. EyvCk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147511\n"
+"help.text"
+msgid "Changes the focus by moving forwards through the areas and buttons of the dialog."
+msgstr "Modifica o foco movéndose cara a adiante polas áreas e os botóns da caixa de diálogo."
+
+#. nEd6M
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154266\n"
+"help.text"
+msgid "<keycode>Shift+Tab</keycode>"
+msgstr "<keycode>Maiús+Tab</keycode>"
+
+#. ESR2E
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155362\n"
+"help.text"
+msgid "Changes the focus by moving backwards through the areas and buttons of the dialog."
+msgstr "Modifica o foco movéndose cara a atrás polas áreas e botóns da caixa de diálogo."
+
+#. FoedZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148484\n"
+"help.text"
+msgid "<keycode>Up Arrow</keycode>"
+msgstr "<keycode>Frecha para arriba</keycode>"
+
+#. jWNGS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149152\n"
+"help.text"
+msgid "Moves the focus up one item in the current dialog area."
+msgstr "Despraza o foco un elemento cara a arriba na área activa da caixa de diálogo."
+
+#. GYukz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154273\n"
+"help.text"
+msgid "<keycode>Down Arrow</keycode>"
+msgstr "<keycode>Frecha para abaixo</keycode>"
+
+#. g3pGx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3158424\n"
+"help.text"
+msgid "Moves the focus down one item in the current dialog area."
+msgstr "Despraza o foco un elemento cara a abaixo na área activa da caixa de diálogo."
+
+#. uNDr8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148912\n"
+"help.text"
+msgid "<keycode>Left Arrow</keycode>"
+msgstr "<keycode>Frecha para a esquerda</keycode>"
+
+#. dEqdi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153238\n"
+"help.text"
+msgid "Moves the focus one item to the left in the current dialog area."
+msgstr "Despraza o foco un elemento cara á esquerda na área activa da caixa de diálogo."
+
+#. jqgGw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150712\n"
+"help.text"
+msgid "<keycode>Right Arrow</keycode>"
+msgstr "<keycode>Frecha para a dereita</keycode>"
+
+#. DKiGb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3166458\n"
+"help.text"
+msgid "Moves the focus one item to the right in the current dialog area."
+msgstr "Despraza o foco un elemento cara á dereita na área activa da caixa de diálogo."
+
+#. B6CEw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146947\n"
+"help.text"
+msgid "<keycode>Home</keycode>"
+msgstr "<keycode>Inicio</keycode>"
+
+#. 2myZF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153742\n"
+"help.text"
+msgid "Selects the first item in the current dialog area."
+msgstr "Selecciona o primeiro elemento na área de caixa de diálogo activa."
+
+#. PVgpY
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153387\n"
+"help.text"
+msgid "<keycode>End</keycode>"
+msgstr "<keycode>Fin</keycode>"
+
+#. RhFGF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153684\n"
+"help.text"
+msgid "Selects the last item in the current dialog area."
+msgstr "Selecciona o último elemento na área de caixa de diálogo actual."
+
+#. VLEGM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155584\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Option</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Row Fields\""
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Opción</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> e o carácter subliñado na etiqueta «Campos de fila»."
+
+#. cSthX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152949\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Row Fields\" area."
+msgstr "Copia ou move o campo actual para a área «Campos de fila»."
+
+#. qFSYZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3159269\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Column Fields\""
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Opción</caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> e o carácter subliñado na etiqueta «Campos de columna»."
+
+#. 5PHQg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149968\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Column Fields\" area."
+msgstr "Copia ou move o campo actual para a área «Campos de columna»."
+
+#. wGVoz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149923\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Option</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Data Fields\""
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Opción</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> e o carácter subliñado na etiqueta «Campos de datos»."
+
+#. LpaiM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148649\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Data Fields\" area."
+msgstr "Copia ou move o campo actual para a área «Campos de datos»."
+
+#. raCg3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149423\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Option</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Filters\""
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Opción</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> e o carácter sen subliñar na etiqueta «Filtros»."
+
+#. Dnys7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3144649\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Filters\" area."
+msgstr "Copia ou move o campo actual para a área «Filtros»."
+
+#. RBfHn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149418\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Up Arrow</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Orde</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Frecha para arriba</keycode>"
+
+#. 5sk3h
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154335\n"
+"help.text"
+msgid "Moves the current field up one place."
+msgstr "Despraza o campo activo un lugar cara a arriba."
+
+#. awZUE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148462\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Down Arrow</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Orde</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Frecha para abaixo</keycode>"
+
+#. eMbdi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154603\n"
+"help.text"
+msgid "Moves the current field down one place."
+msgstr "Despraza o campo activo un lugar cara a abaixo."
+
+#. aCgXn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145373\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Left Arrow</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Orde</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Frecha para a esquerda</keycode>"
+
+#. ZhhRj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151125\n"
+"help.text"
+msgid "Moves the current field one place to the left."
+msgstr "Despraza o campo activo un lugar cara á esquerda."
+
+#. wkTdy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150423\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Right Arrow</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Orde</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Frecha para a dereita</keycode>"
+
+#. hDqUA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153316\n"
+"help.text"
+msgid "Moves the current field one place to the right."
+msgstr "Despraza o campo activo un lugar cara á dereita."
+
+#. CjoEb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149519\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Home</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Orde</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Inicio</keycode>"
+
+#. SFdar
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149237\n"
+"help.text"
+msgid "Moves the current field to the first place."
+msgstr "Despraza o campo activo ata o primeiro lugar."
+
+#. 5QbLt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145310\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+End</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Orde</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Fin</keycode>"
+
+#. ZeXEZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153942\n"
+"help.text"
+msgid "Moves the current field to the last place."
+msgstr "Despraza o campo activo ata o último lugar."
+
+#. GdEkF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148418\n"
+"help.text"
+msgid "<keycode>Delete</keycode>"
+msgstr "<keycode>Eliminar</keycode>"
+
+#. sGFF8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159251\n"
+"help.text"
+msgid "Removes the current field from the area."
+msgstr "Elimina o campo activo da área."

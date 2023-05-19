@@ -1,0 +1,1355 @@
+#. extracted from basctl/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-07-06 20:18+0200\n"
+"PO-Revision-Date: 2022-07-08 10:43+0000\n"
+"Last-Translator: Po-Yen Huang <jeff@mail.ossii.com.tw>\n"
+"Language-Team: Chinese (Traditional) <https://translations.documentfoundation.org/projects/libo_ui-master/basctlmessages/zh_Hant/>\n"
+"Language: zh-TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1554781439.000000\n"
+
+#. fniWp
+#: basctl/inc/strings.hrc:25
+msgctxt "RID_STR_FILTER_ALLFILES"
+msgid "<All>"
+msgstr "<全部>"
+
+#. S2GR5
+#: basctl/inc/strings.hrc:26
+msgctxt "RID_STR_NOMODULE"
+msgid "< No Module >"
+msgstr "< 無模組 >"
+
+#. XoGeT
+#: basctl/inc/strings.hrc:27
+msgctxt "RID_STR_WRONGPASSWORD"
+msgid "Incorrect Password"
+msgstr "密碼無效"
+
+#. LGqtN
+#: basctl/inc/strings.hrc:28
+msgctxt "RID_STR_NOLIBINSTORAGE"
+msgid "The file does not contain any BASIC libraries"
+msgstr "這個檔案沒有 BASIC 函式庫"
+
+#. 3UEnC
+#: basctl/inc/strings.hrc:29
+msgctxt "RID_STR_BADSBXNAME"
+msgid "Invalid Name"
+msgstr "名稱無效"
+
+#. tYTFm
+#: basctl/inc/strings.hrc:30
+msgctxt "RID_STR_LIBNAMETOLONG"
+msgid "A library name can have up to 30 characters."
+msgstr "函式庫名稱最長不得超過 30 個字元。"
+
+#. hGBUF
+#: basctl/inc/strings.hrc:31
+msgctxt "RID_STR_ERRORCHOOSEMACRO"
+msgid "Macros from other documents are not accessible."
+msgstr "無法存取其他文件的巨集。"
+
+#. nqQPr
+#: basctl/inc/strings.hrc:32
+msgctxt "RID_STR_LIBISREADONLY"
+msgid "This library is read-only."
+msgstr "此函式庫是唯讀的。"
+
+#. 8DoDR
+#: basctl/inc/strings.hrc:33
+msgctxt "RID_STR_REPLACELIB"
+msgid "'XX' cannot be replaced."
+msgstr "無法取代「XX」。"
+
+#. ZrC8a
+#: basctl/inc/strings.hrc:34
+msgctxt "RID_STR_IMPORTNOTPOSSIBLE"
+msgid "'XX' cannot be added."
+msgstr "無法增加「XX」。"
+
+#. HEGQB
+#: basctl/inc/strings.hrc:35
+msgctxt "RID_STR_NOIMPORT"
+msgid "'XX' was not added."
+msgstr "沒有增加「XX」。"
+
+#. BEk6F
+#: basctl/inc/strings.hrc:36
+msgctxt "RID_STR_ENTERPASSWORD"
+msgid "Enter password for 'XX'"
+msgstr "為「XX」鍵入密碼"
+
+#. kQpnq
+#: basctl/inc/strings.hrc:37
+msgctxt "RID_STR_SBXNAMEALLREADYUSED"
+msgid "Name already exists"
+msgstr "名稱已經指定"
+
+#. JWDCy
+#: basctl/inc/strings.hrc:38
+msgctxt "RID_STR_SIGNED"
+msgid "(Signed)"
+msgstr "(已簽名)"
+
+#. 6ubXB
+#: basctl/inc/strings.hrc:39
+msgctxt "RID_STR_SBXNAMEALLREADYUSED2"
+msgid "Object with same name already exists"
+msgstr "物件已經存在"
+
+#. Gnb5H
+#: basctl/inc/strings.hrc:40
+msgctxt "RID_STR_CANNOTRUNMACRO"
+msgid ""
+"For security reasons, you cannot run this macro.\n"
+"\n"
+"For more information, check the security settings."
+msgstr ""
+"為了安全的原因，您不可以執行此巨集。\n"
+"\n"
+"如需更多資訊，請檢查安全設定。"
+
+#. FGWLw
+#: basctl/inc/strings.hrc:41
+msgctxt "RID_STR_SEARCHNOTFOUND"
+msgid "Search key not found"
+msgstr "沒有找到搜尋項目"
+
+#. ZJgvX
+#: basctl/inc/strings.hrc:42
+msgctxt "RID_STR_SEARCHFROMSTART"
+msgid "Search to last module complete. Continue at first module?"
+msgstr "已經搜尋至最後一個模組。您要從第一個模組開始搜尋？"
+
+#. 4yDcC
+#: basctl/inc/strings.hrc:43
+msgctxt "RID_STR_SEARCHREPLACES"
+msgid "Search key replaced XX times"
+msgstr "搜尋項目 XX 次取代"
+
+#. 85z2z
+#: basctl/inc/strings.hrc:44
+msgctxt "RID_STR_COULDNTREAD"
+msgid "The file could not be read"
+msgstr "無法讀取這個檔案"
+
+#. VSAAi
+#: basctl/inc/strings.hrc:45
+msgctxt "RID_STR_COULDNTWRITE"
+msgid "The file could not be saved"
+msgstr "無法儲存這個檔案"
+
+#. qgd4b
+#: basctl/inc/strings.hrc:46
+msgctxt "RID_STR_CANNOTCHANGENAMESTDLIB"
+msgid "The name of the default library cannot be changed."
+msgstr "無法變更這個預設函式庫的名稱。"
+
+#. EobDV
+#: basctl/inc/strings.hrc:47
+msgctxt "RID_STR_GENERATESOURCE"
+msgid "Generating source"
+msgstr "建立源檔"
+
+#. Re6Gc
+#: basctl/inc/strings.hrc:48
+msgctxt "RID_STR_FILENAME"
+msgid "File name:"
+msgstr "檔案名稱："
+
+#. zYyVi
+#: basctl/inc/strings.hrc:49
+msgctxt "RID_STR_APPENDLIBS"
+msgid "Import Libraries"
+msgstr "匯入函式庫"
+
+#. tasV7
+#: basctl/inc/strings.hrc:50
+msgctxt "RID_STR_QUERYDELMACRO"
+msgid "Do you want to delete the macro XX?"
+msgstr "是否要刪除這個巨集 XX？"
+
+#. Nw7mk
+#: basctl/inc/strings.hrc:51
+msgctxt "RID_STR_QUERYDELDIALOG"
+msgid "Do you want to delete the XX dialog?"
+msgstr "是否要刪除這個對話方塊 XX？"
+
+#. 3Vw9F
+#: basctl/inc/strings.hrc:52
+msgctxt "RID_STR_QUERYDELLIB"
+msgid "Do you want to delete the XX library?"
+msgstr "是否要刪除這個函式庫 XX？"
+
+#. x2D9Y
+#: basctl/inc/strings.hrc:53
+msgctxt "RID_STR_QUERYDELLIBREF"
+msgid "Do you want to delete the reference to the XX library?"
+msgstr "是否要刪除函式庫 XX 的參照？"
+
+#. oUGKc
+#: basctl/inc/strings.hrc:54
+msgctxt "RID_STR_QUERYDELMODULE"
+msgid "Do you want to delete the XX module?"
+msgstr "是否要刪除這個模組 XX？"
+
+#. Ctsr7
+#: basctl/inc/strings.hrc:55
+msgctxt "RID_STR_BASIC"
+msgid "BASIC"
+msgstr "BASIC"
+
+#. WMcJq
+#. Abbreviation for 'line'
+#: basctl/inc/strings.hrc:57
+msgctxt "RID_STR_LINE"
+msgid "Ln"
+msgstr "列"
+
+#. pKEQb
+#. Abbreviation for 'column'
+#: basctl/inc/strings.hrc:59
+msgctxt "RID_STR_COLUMN"
+msgid "Col"
+msgstr "欄"
+
+#. 86aZY
+#: basctl/inc/strings.hrc:60
+msgctxt "RID_STR_CANNOTCLOSE"
+msgid "The window cannot be closed while BASIC is running."
+msgstr "在 BASIC 程式運行時無法關閉視窗。"
+
+#. CUG7C
+#: basctl/inc/strings.hrc:61
+msgctxt "RID_STR_REPLACESTDLIB"
+msgid "The default library cannot be replaced."
+msgstr "無法取代這個預設函式庫。"
+
+#. eWwfN
+#: basctl/inc/strings.hrc:62
+msgctxt "RID_STR_REFNOTPOSSIBLE"
+msgid "Reference to 'XX' not possible."
+msgstr "無法參照「XX」。"
+
+#. A7sSq
+#: basctl/inc/strings.hrc:63
+msgctxt "RID_STR_WATCHNAME"
+msgid "Watch"
+msgstr "監看"
+
+#. 84TYn
+#: basctl/inc/strings.hrc:64
+msgctxt "RID_STR_STACKNAME"
+msgid "Call Stack"
+msgstr "呼叫堆疊"
+
+#. DBfyu
+#: basctl/inc/strings.hrc:65
+msgctxt "RID_STR_STDDIALOGNAME"
+msgid "Dialog"
+msgstr "對話方塊"
+
+#. hUHfi
+#: basctl/inc/strings.hrc:66
+msgctxt "RID_STR_NEWLIB"
+msgid "New Library"
+msgstr "新增函式庫"
+
+#. kisd2
+#: basctl/inc/strings.hrc:67
+msgctxt "RID_STR_NEWMOD"
+msgid "New Module"
+msgstr "新的模組"
+
+#. YeULe
+#: basctl/inc/strings.hrc:68
+msgctxt "RID_STR_NEWDLG"
+msgid "New Dialog"
+msgstr "新的對話方塊"
+
+#. jYa97
+#: basctl/inc/strings.hrc:69
+msgctxt "RID_STR_ALL"
+msgid "All"
+msgstr "全部"
+
+#. yF2LY
+#: basctl/inc/strings.hrc:70
+msgctxt "RID_STR_PAGE"
+msgid "Page"
+msgstr "頁"
+
+#. DHuFN
+#: basctl/inc/strings.hrc:71
+msgctxt "RID_STR_WILLSTOPPRG"
+msgid ""
+"You will have to restart the program after this edit.\n"
+"Continue?"
+msgstr ""
+"變更程式後必須重新啟動這個程式。\n"
+"是否繼續？"
+
+#. 4qWED
+#: basctl/inc/strings.hrc:72
+msgctxt "RID_STR_SEARCHALLMODULES"
+msgid "Do you want to replace the text in all active modules?"
+msgstr "您要取代在所有啟動模組中的文字？"
+
+#. FFBmA
+#: basctl/inc/strings.hrc:73
+msgctxt "RID_STR_REMOVEWATCH"
+msgid "Watch:"
+msgstr "監看："
+
+#. ndtng
+#: basctl/inc/strings.hrc:74
+msgctxt "RID_STR_STACK"
+msgid "Calls: "
+msgstr "呼叫： "
+
+#. wwfg3
+#: basctl/inc/strings.hrc:75
+msgctxt "RID_STR_USERMACROS"
+msgid "My Macros"
+msgstr "我的巨集"
+
+#. XenwN
+#: basctl/inc/strings.hrc:76
+msgctxt "RID_STR_USERDIALOGS"
+msgid "My Dialogs"
+msgstr "我的對話方塊"
+
+#. Mwj7u
+#: basctl/inc/strings.hrc:77
+msgctxt "RID_STR_USERMACROSDIALOGS"
+msgid "My Macros & Dialogs"
+msgstr "我的巨集與對話方塊"
+
+#. ej2KL
+#: basctl/inc/strings.hrc:78
+msgctxt "RID_STR_SHAREMACROS"
+msgid "Application Macros"
+msgstr "應用程式巨集"
+
+#. YcXKS
+#: basctl/inc/strings.hrc:79
+msgctxt "RID_STR_SHAREDIALOGS"
+msgid "Application Dialogs"
+msgstr "應用程式對話方塊"
+
+#. GFbe5
+#: basctl/inc/strings.hrc:80
+msgctxt "RID_STR_SHAREMACROSDIALOGS"
+msgid "Application Macros & Dialogs"
+msgstr "應用程式巨集與對話方塊"
+
+#. BAMA5
+#: basctl/inc/strings.hrc:81
+msgctxt "RID_STR_REMOVEWATCHTIP"
+msgid "Remove Watch"
+msgstr "移除監看"
+
+#. oUqF6
+#: basctl/inc/strings.hrc:82
+msgctxt "RID_STR_QUERYREPLACEMACRO"
+msgid "Do you want to overwrite the XX macro?"
+msgstr "您要覆寫 XX 巨集？"
+
+#. Tho9k
+#: basctl/inc/strings.hrc:83
+msgctxt "RID_STR_TRANSLATION_NOTLOCALIZED"
+msgid "<Not localized>"
+msgstr "<未本地化>"
+
+#. xQyRD
+#: basctl/inc/strings.hrc:84
+msgctxt "RID_STR_TRANSLATION_DEFAULT"
+msgid "[Default Language]"
+msgstr "[預設語言]"
+
+#. PqDTe
+#: basctl/inc/strings.hrc:85
+msgctxt "RID_STR_DOCUMENT_OBJECTS"
+msgid "Document Objects"
+msgstr "文件物件"
+
+#. N3DE8
+#: basctl/inc/strings.hrc:86
+msgctxt "RID_STR_USERFORMS"
+msgid "Forms"
+msgstr "表單"
+
+#. 4dGqP
+#: basctl/inc/strings.hrc:87
+msgctxt "RID_STR_NORMAL_MODULES"
+msgid "Modules"
+msgstr "模組"
+
+#. u87jq
+#: basctl/inc/strings.hrc:88
+msgctxt "RID_STR_CLASS_MODULES"
+msgid "Class Modules"
+msgstr "類別模組"
+
+#. 8gC8E
+#: basctl/inc/strings.hrc:89
+msgctxt "RID_STR_DLGIMP_CLASH_RENAME"
+msgid "Rename"
+msgstr "重新命名"
+
+#. FCqSS
+#: basctl/inc/strings.hrc:90
+msgctxt "RID_STR_DLGIMP_CLASH_REPLACE"
+msgid "Replace"
+msgstr "取代"
+
+#. 5EucM
+#: basctl/inc/strings.hrc:91
+msgctxt "RID_STR_DLGIMP_CLASH_TITLE"
+msgid "Dialog Import - Name already used"
+msgstr "對話方塊匯入 - 名稱已被使用"
+
+#. yG2bx
+#: basctl/inc/strings.hrc:92
+msgctxt "RID_STR_DLGIMP_CLASH_TEXT"
+msgid ""
+"The library already contains a dialog with the name:\n"
+"\n"
+"$(ARG1)\n"
+"\n"
+"Rename dialog to keep current dialog or replace existing dialog.\n"
+" "
+msgstr ""
+"函式庫已包含以下名稱的對話方塊：\n"
+"\n"
+"$(ARG1)\n"
+"\n"
+"重新命名對話方塊可保留目前的對話方塊，或取代現有的對話方塊。\n"
+" "
+
+#. FRQSJ
+#: basctl/inc/strings.hrc:93
+msgctxt "RID_STR_DLGIMP_MISMATCH_ADD"
+msgid "Add"
+msgstr "加入"
+
+#. inETw
+#: basctl/inc/strings.hrc:94
+msgctxt "RID_STR_DLGIMP_MISMATCH_OMIT"
+msgid "Omit"
+msgstr "省略"
+
+#. 227xE
+#: basctl/inc/strings.hrc:95
+msgctxt "RID_STR_DLGIMP_MISMATCH_TITLE"
+msgid "Dialog Import - Language Mismatch"
+msgstr "對話方塊匯入 - 語言不相符"
+
+#. zcJw8
+#: basctl/inc/strings.hrc:96
+msgctxt "RID_STR_DLGIMP_MISMATCH_TEXT"
+msgid ""
+"The dialog to be imported supports other languages than the target library.\n"
+"\n"
+"Add these languages to the library to keep additional language resources provided by the dialog or omit them to stay with the current library languages.\n"
+"\n"
+"Note: For languages not supported by the dialog the resources of the dialog's default language will be used.\n"
+" "
+msgstr ""
+"即將匯入的對話方塊支援與目標函式庫不同的語言。\n"
+"\n"
+"將這些語言增加至函式庫讓對話方塊提供其他語言資源，或省略這些語言並持續使用目前的函式庫語言。\n"
+"\n"
+"注意：若是對話方塊不支援的語言，則會使用對話方塊的預設語言資源。\n"
+" "
+
+#. FcvDu
+#: basctl/inc/strings.hrc:97
+msgctxt "RID_STR_PRINTDLG_PAGES"
+msgid "Pages:"
+msgstr "頁面："
+
+#. 4AR5D
+#: basctl/inc/strings.hrc:98
+msgctxt "RID_STR_PRINTDLG_PRINTALLPAGES"
+msgid "All ~Pages"
+msgstr "所有頁面(~P)"
+
+#. xfLXi
+#: basctl/inc/strings.hrc:99
+msgctxt "RID_STR_PRINTDLG_PRINTPAGES"
+msgid "Pa~ges:"
+msgstr "頁面(~G)："
+
+#. dALHq
+#: basctl/inc/strings.hrc:100
+msgctxt "RID_STR_CHOOSE"
+msgid "Choose"
+msgstr "選擇"
+
+#. edPrX
+#: basctl/inc/strings.hrc:101
+msgctxt "RID_STR_RUN"
+msgid "Run"
+msgstr "執行"
+
+#. DJbpA
+#: basctl/inc/strings.hrc:102
+msgctxt "RID_STR_RECORD"
+msgid "~Save"
+msgstr "儲存(~S)"
+
+#. 7Gzqz
+#: basctl/inc/strings.hrc:103
+msgctxt "RID_BASICIDE_OBJCAT"
+msgid "Object Catalog"
+msgstr "物件目錄"
+
+#. NtqMk
+#. Property Browser Headline ----------------------------------------------------------------
+#: basctl/inc/strings.hrc:105
+msgctxt "RID_STR_BRWTITLE_PROPERTIES"
+msgid "Properties: "
+msgstr "屬性： "
+
+#. FnkAZ
+#: basctl/inc/strings.hrc:106
+msgctxt "RID_STR_BRWTITLE_NO_PROPERTIES"
+msgid "No Control marked"
+msgstr "沒有標記控制項"
+
+#. aeAPC
+#: basctl/inc/strings.hrc:107
+msgctxt "RID_STR_BRWTITLE_MULTISELECT"
+msgid "Multiselection"
+msgstr "多重選取"
+
+#. GNZHF
+#: basctl/inc/strings.hrc:108
+msgctxt "RID_STR_DEF_LANG"
+msgid "[Default Language]"
+msgstr "[預設語言]"
+
+#. uf3Kt
+#: basctl/inc/strings.hrc:109
+msgctxt "RID_STR_CREATE_LANG"
+msgid "<Press 'Add' to create language resources>"
+msgstr "<請按「加入」以建立語言資源>"
+
+#. jnJoF
+#: basctl/inc/strings.hrc:110
+msgctxt "RID_STR_EXPORTPACKAGE"
+msgid "Export library as extension"
+msgstr "將函式庫匯出為擴充套件"
+
+#. SnKF3
+#: basctl/inc/strings.hrc:111
+msgctxt "RID_STR_EXPORTBASIC"
+msgid "Export as BASIC library"
+msgstr "匯出為 BASIC 函式庫"
+
+#. G6SqW
+#: basctl/inc/strings.hrc:112
+msgctxt "RID_STR_PACKAGE_BUNDLE"
+msgid "Extension"
+msgstr "擴充套件"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "加入(_A)"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "套用(_A)"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "取消(_C)"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "關閉(_C)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "刪除(_D)"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "編輯(_E)"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "說明(_H)"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "新增(_N)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "否(_N)"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "確定(_O)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "移除(_R)"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "重設(_R)"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "是(_Y)"
+
+#. PuxWj
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:26
+msgctxt "basicmacrodialog|BasicMacroDialog"
+msgid "BASIC Macros"
+msgstr "BASIC 巨集"
+
+#. tFg7s
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:43
+msgctxt "basicmacrodialog|run"
+msgid "Run"
+msgstr "執行"
+
+#. gokwe
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:52
+msgctxt "basicmacrodialog|extended_tip|ok"
+msgid "Runs or saves the current macro."
+msgstr "執行或儲存目前的巨集。"
+
+#. 6SWBt
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:156
+msgctxt "basicmacrodialog|extended_tip|macros"
+msgid "Lists the macros that are contained in the module selected in the Macro from list."
+msgstr "列出 [巨集的來源] 清單中已選取模組所包含的巨集。"
+
+#. 5TRqv
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:167
+msgctxt "basicmacrodialog|existingmacrosft"
+msgid "Existing Macros In:"
+msgstr "既有的巨集位在："
+
+#. 8Bfcg
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:230
+msgctxt "basicmacrodialog|extended_tip|libraries"
+msgid "Lists the libraries and the modules where you can open or save your macros. To save a macro with a particular document, open the document, and then open this dialog."
+msgstr "列出可以在其中開啟或儲存巨集的函式庫和模組。若要將巨集與特定的文件一起儲存，請開啟此文件，然後開啟此對話方塊。"
+
+#. Mfysc
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:246
+msgctxt "basicmacrodialog|macrofromft"
+msgid "Macro From"
+msgstr "巨集來自"
+
+#. Qth4v
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:262
+msgctxt "basicmacrodialog|macrotoft"
+msgid "Save Macro In"
+msgstr "儲存巨集於"
+
+#. AjFTi
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:299
+msgctxt "basicmacrodialog|extended_tip|macronameedit"
+msgid "Displays the name of the selected macro. To create or to change the name of a macro, enter a name here."
+msgstr "顯示所選巨集的名稱。若要建立或變更巨集的名稱，請在此輸入名稱。"
+
+#. BpDb6
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:308
+msgctxt "basicmacrodialog|libraryft1"
+msgid "Macro Name"
+msgstr "巨集名稱"
+
+#. izDZr
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:330
+msgctxt "basicmacrodialog|assign"
+msgid "Assign..."
+msgstr "指派..."
+
+#. qEaMG
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:337
+msgctxt "basicmacrodialog|extended_tip|assign"
+msgid "Opens the Customize dialog, where you can assign the selected macro to a menu command, a toolbar, or an event."
+msgstr "開啟 [自訂] 對話方塊，您可以在其中將選取的巨集指定到功能表指令、工具列或事件。"
+
+#. dxu7W
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:349
+msgctxt "basicmacrodialog|edit"
+msgid "Edit"
+msgstr "編輯"
+
+#. zrPXg
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:356
+msgctxt "basicmacrodialog|extended_tip|edit"
+msgid "Starts the Basic editor and opens the selected macro or dialog for editing."
+msgstr "啟動 Basic 編輯器並開啟選定的巨集或對話方塊以供編輯。"
+
+#. 9Uhec
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:368
+msgctxt "basicmacrodialog|delete"
+msgid "_Delete"
+msgstr "刪除(_D)"
+
+#. Mxvv8
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:375
+msgctxt "basicmacrodialog|extended_tip|delete"
+msgid "Creates a new macro, creates a new module or deletes the selected macro or selected module."
+msgstr "建立新巨集、建立新模組，或刪除選取的巨集或選取的模組。"
+
+#. XkqFC
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:387
+msgctxt "basicmacrodialog|new"
+msgid "_New"
+msgstr "新增(_N)"
+
+#. GN5Ft
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:394
+msgctxt "basicmacrodialog|extended_tip|new"
+msgid "Creates a new library."
+msgstr "建立新的函式庫。"
+
+#. Gh52t
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:406
+msgctxt "basicmacrodialog|organize"
+msgid "Organizer..."
+msgstr "統籌概覽..."
+
+#. 3L2hk
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:413
+msgctxt "basicmacrodialog|extended_tip|organize"
+msgid "Opens the Macro Organizer dialog, where you can add, edit, or delete existing macro modules, dialogs, and libraries."
+msgstr "開啟 [巨集統籌概覽] 對話方塊，您可以在其中新增、編輯或刪除現有的巨集模組、對話方塊和函式庫。"
+
+#. wAJj2
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:425
+msgctxt "basicmacrodialog|newlibrary"
+msgid "New Library"
+msgstr "新增函式庫"
+
+#. E5rdD
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:432
+msgctxt "basicmacrodialog|extended_tip|newlibrary"
+msgid "Saves the recorded macro in a new library."
+msgstr "以新函式庫儲存錄製的巨集。"
+
+#. 2xdsE
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:444
+msgctxt "basicmacrodialog|newmodule"
+msgid "New Module"
+msgstr "新模組"
+
+#. BrAwG
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:451
+msgctxt "basicmacrodialog|extended_tip|newmodule"
+msgid "Saves the recorded macro in a new module."
+msgstr "以新模組儲存錄製的巨集。"
+
+#. gMDg9
+#: basctl/uiconfig/basicide/ui/basicmacrodialog.ui:499
+msgctxt "basicmacrodialog|extended_tip|BasicMacroDialog"
+msgid "Opens a dialog to organize macros."
+msgstr "開啟對話方塊以管理巨集。"
+
+#. MDBgX
+#: basctl/uiconfig/basicide/ui/breakpointmenus.ui:12
+msgctxt "breakpointmenus|manage"
+msgid "Manage Breakpoints..."
+msgstr "管理中斷點..."
+
+#. 2ZNKn
+#: basctl/uiconfig/basicide/ui/breakpointmenus.ui:15
+msgctxt "breakpointmenus|extended_tip|manage"
+msgid "Specifies the options for breakpoints."
+msgstr "指定中斷點的選項。"
+
+#. faXzj
+#: basctl/uiconfig/basicide/ui/breakpointmenus.ui:28
+msgctxt "breakpointmenus|active"
+msgid "_Active"
+msgstr "作用中(_A)"
+
+#. GD2Yz
+#: basctl/uiconfig/basicide/ui/breakpointmenus.ui:32
+msgctxt "breakpointmenus|extended_tip|active"
+msgid "Activates or deactivates the current breakpoint."
+msgstr "啟動或關閉目前的中斷點。"
+
+#. FhiYE
+#: basctl/uiconfig/basicide/ui/breakpointmenus.ui:47
+msgctxt "breakpointmenus|properties"
+msgid "_Properties..."
+msgstr "屬性(_P)..."
+
+#. GEknG
+#: basctl/uiconfig/basicide/ui/breakpointmenus.ui:51
+msgctxt "breakpointmenus|extended_tip|properties"
+msgid "Specifies the options for breakpoints."
+msgstr "指定中斷點的選項。"
+
+#. G55tN
+#: basctl/uiconfig/basicide/ui/defaultlanguage.ui:30
+msgctxt "defaultlanguage|DefaultLanguageDialog"
+msgid "Set Default User Interface Language"
+msgstr "設定預設使用者介面語言"
+
+#. xYz56
+#: basctl/uiconfig/basicide/ui/defaultlanguage.ui:119
+msgctxt "defaultlanguage|defaultlabel"
+msgid "Default language:"
+msgstr "預設語言："
+
+#. C9ruF
+#: basctl/uiconfig/basicide/ui/defaultlanguage.ui:226
+msgctxt "defaultlanguage|checkedlabel"
+msgid "Available languages:"
+msgstr "可用語言："
+
+#. fBZNF
+#: basctl/uiconfig/basicide/ui/defaultlanguage.ui:264
+msgctxt "defaultlanguage|defined"
+msgid "Select a language to define the default user interface language. All currently present strings will be assigned to the resources created for the selected language."
+msgstr "請選取一語言來定義預設的使用者介面語言。目前呈現的所有字串都會換成由選取語言所建立的資源。"
+
+#. pk7Wj
+#: basctl/uiconfig/basicide/ui/defaultlanguage.ui:279
+msgctxt "defaultlanguage|added"
+msgid "Select languages to be added. Resources for these languages will be created in the library. Strings of the current default user interface language will be copied to these new resources by default."
+msgstr "選取要加入的語言。將在函式庫中建立這些語言的資源。預設情況下，目前的預設使用者介面語言的字串將會複製到這些新的資源中。"
+
+#. QWxzi
+#: basctl/uiconfig/basicide/ui/defaultlanguage.ui:294
+msgctxt "defaultlanguage|alttitle"
+msgid "Add User Interface Languages"
+msgstr "加入使用者介面語言"
+
+#. GCNcE
+#: basctl/uiconfig/basicide/ui/deletelangdialog.ui:7
+msgctxt "deletelangdialog|DeleteLangDialog"
+msgid "Delete Language Resources"
+msgstr "刪除語言資源"
+
+#. Upj8a
+#: basctl/uiconfig/basicide/ui/deletelangdialog.ui:14
+msgctxt "deletelangdialog|DeleteLangDialog"
+msgid "Do you want to delete the resources of the selected language(s)?"
+msgstr "您是否想要刪除所選語言的資源？"
+
+#. CThUw
+#: basctl/uiconfig/basicide/ui/deletelangdialog.ui:15
+msgctxt "deletelangdialog|DeleteLangDialog"
+msgid "You are about to delete the resources for the selected language(s). All user interface strings for this language(s) will be deleted."
+msgstr "您即將刪除所選語言的資源。所有此語言相關的使用者介面字串都將刪除。"
+
+#. gErRZ
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:41
+msgctxt "dialogpage|label1"
+msgid "Dialog:"
+msgstr "對話方塊："
+
+#. ECCc3
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:95
+msgctxt "dialogpage|extended_tip|library"
+msgid "Deletes the selected element or elements after confirmation."
+msgstr "刪除選取的元素或已確認要刪除的元素。"
+
+#. XAJ3E
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:128
+msgctxt "dialogpage|extended_tip|edit"
+msgid "Opens the Basic editor so that you can modify the selected library."
+msgstr "開啟 Basic 編輯器，這樣您就可以修改選定的函式庫。"
+
+#. n9VLU
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:140
+msgctxt "dialogpage|newmodule"
+msgid "_New..."
+msgstr "新增(_N)..."
+
+#. hfkr2
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:147
+msgctxt "dialogpage|extended_tip|newmodule"
+msgid "Opens the editor and creates a new module."
+msgstr "開啟編輯器並建立新模組。"
+
+#. kBzSW
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:160
+msgctxt "dialogpage|newdialog"
+msgid "_New..."
+msgstr "新增(_N)..."
+
+#. JR2oJ
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:182
+msgctxt "dialogpage|extended_tip|delete"
+msgid "Deletes the selected element or elements without requiring confirmation."
+msgstr "刪除一或多個選取的元素時不需要確認。"
+
+#. k64f4
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:195
+msgctxt "dialogpage|password"
+msgid "_Password..."
+msgstr "密碼(_P)..."
+
+#. FeCu5
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:202
+msgctxt "dialogpage|extended_tip|password"
+msgid "Assigns or edits the password for the selected library."
+msgstr "指派或編輯選取函式庫的密碼。"
+
+#. sHS7f
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:214
+msgctxt "dialogpage|import"
+msgid "_Import..."
+msgstr "匯入(_I)..."
+
+#. JAYC9
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:221
+msgctxt "dialogpage|extended_tip|import"
+msgid "Locate the Basic library that you want to add to the current list, and then click Open."
+msgstr "找到要新增至目前清單的 Basic 函式庫，然後點擊「開啟」。"
+
+#. ubE5G
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:233
+msgctxt "dialogpage|export"
+msgid "_Export..."
+msgstr "匯出(_E)..."
+
+#. weDhB
+#: basctl/uiconfig/basicide/ui/dialogpage.ui:259
+msgctxt "dialogpage|extended_tip|DialogPage"
+msgid "Lists the existing modules or dialogs."
+msgstr "列出既有的模組或對話視窗。"
+
+#. EGyCn
+#: basctl/uiconfig/basicide/ui/dockingwatch.ui:113
+msgctxt "dockingwatch|RID_STR_WATCHVARIABLE"
+msgid "Variable"
+msgstr "變數"
+
+#. QUHSf
+#: basctl/uiconfig/basicide/ui/dockingwatch.ui:125
+msgctxt "dockingwatch|RID_STR_WATCHVALUE"
+msgid "Value"
+msgstr "值"
+
+#. ik3CG
+#: basctl/uiconfig/basicide/ui/dockingwatch.ui:139
+msgctxt "dockingwatch|RID_STR_WATCHTYPE"
+msgid "Type"
+msgstr "類型"
+
+#. worE9
+#: basctl/uiconfig/basicide/ui/exportdialog.ui:8
+msgctxt "exportdialog|ExportDialog"
+msgid "Export Basic library"
+msgstr "匯出 Basic 函式庫"
+
+#. hvm9y
+#: basctl/uiconfig/basicide/ui/exportdialog.ui:90
+msgctxt "exportdialog|extension"
+msgid "Export as _extension"
+msgstr "匯出為擴充套件(_E)"
+
+#. pK9mG
+#: basctl/uiconfig/basicide/ui/exportdialog.ui:105
+msgctxt "exportdialog|basic"
+msgid "Export as BASIC library"
+msgstr "匯出為 BASIC 函式庫"
+
+#. foHKi
+#: basctl/uiconfig/basicide/ui/gotolinedialog.ui:8
+msgctxt "gotolinedialog|GotoLineDialog"
+msgid "Go to Line"
+msgstr "前往列號"
+
+#. GbpSc
+#: basctl/uiconfig/basicide/ui/gotolinedialog.ui:88
+msgctxt "gotolinedialog|area"
+msgid "_Line number:"
+msgstr "列號(_L)："
+
+#. C6VgC
+#: basctl/uiconfig/basicide/ui/importlibdialog.ui:22
+msgctxt "importlibdialog|ImportLibDialog"
+msgid "Import Libraries"
+msgstr "匯出函式庫"
+
+#. C8ny7
+#: basctl/uiconfig/basicide/ui/importlibdialog.ui:114
+msgctxt "importlibdialog|ref"
+msgid "Insert as reference (read-only)"
+msgstr "插入為參照 (唯讀)"
+
+#. iHJcm
+#: basctl/uiconfig/basicide/ui/importlibdialog.ui:122
+msgctxt "importlibdialog|extended_tip|ref"
+msgid "Adds the selected library as a read-only file. The library is reloaded each time you start the office suite."
+msgstr "將選定的函式庫新增為唯讀檔案。每次啟動辦公室套裝軟體時都會重新載入函式庫。"
+
+#. B9N7w
+#: basctl/uiconfig/basicide/ui/importlibdialog.ui:133
+msgctxt "importlibdialog|replace"
+msgid "Replace existing libraries"
+msgstr "取代既有函式庫"
+
+#. AyUpF
+#: basctl/uiconfig/basicide/ui/importlibdialog.ui:141
+msgctxt "importlibdialog|extended_tip|replace"
+msgid "Replaces a library that has the same name with the current library."
+msgstr "替代與目前函式庫具有相同名稱的函式庫。"
+
+#. GGb7Q
+#: basctl/uiconfig/basicide/ui/importlibdialog.ui:156
+msgctxt "importlibdialog|label1"
+msgid "Options"
+msgstr "選項"
+
+#. 7ZFMZ
+#: basctl/uiconfig/basicide/ui/importlibdialog.ui:263
+msgctxt "importlibdialog|extended_tip|ImportLibDialog"
+msgid "Enter a name or the path to the library that you want to append. You can also select a library from the list."
+msgstr "輸入想要附加之函式庫的名稱或路徑。您也可由清單中選取函式庫。"
+
+#. XdZ7e
+#: basctl/uiconfig/basicide/ui/libpage.ui:44
+msgctxt "libpage|label1"
+msgid "L_ocation:"
+msgstr "位置(_O)："
+
+#. JAxWt
+#: basctl/uiconfig/basicide/ui/libpage.ui:61
+msgctxt "libpage|extended_tip|location"
+msgid "Select the application or the document containing the macro libraries that you want to organize."
+msgstr "選取您想要組織整理的、包含巨集函式庫的應用程式或文件。"
+
+#. C4mjh
+#: basctl/uiconfig/basicide/ui/libpage.ui:89
+msgctxt "libpage|lingudictsft"
+msgid "_Library:"
+msgstr "函式庫(_L)："
+
+#. T2NUa
+#: basctl/uiconfig/basicide/ui/libpage.ui:153
+msgctxt "libpage|extended_tip|library"
+msgid "Deletes the selected element or elements after confirmation."
+msgstr "刪除選取的元素或已確認要刪除的元素。"
+
+#. EjFxw
+#: basctl/uiconfig/basicide/ui/libpage.ui:186
+msgctxt "libpage|extended_tip|edit"
+msgid "Opens the Basic editor so that you can modify the selected library."
+msgstr "開啟 Basic 編輯器，這樣您就可以修改選定的函式庫。"
+
+#. AjENj
+#: basctl/uiconfig/basicide/ui/libpage.ui:198
+msgctxt "libpage|password"
+msgid "_Password..."
+msgstr "密碼(_P)..."
+
+#. m79WV
+#: basctl/uiconfig/basicide/ui/libpage.ui:205
+msgctxt "libpage|extended_tip|password"
+msgid "Assigns or edits the password for the selected library."
+msgstr "為選取的函式庫指派或編輯密碼。"
+
+#. bzX6x
+#: basctl/uiconfig/basicide/ui/libpage.ui:217
+msgctxt "libpage|new"
+msgid "_New..."
+msgstr "新增(_N)..."
+
+#. Af6Jv
+#: basctl/uiconfig/basicide/ui/libpage.ui:224
+msgctxt "libpage|extended_tip|new"
+msgid "Creates a new library."
+msgstr "建立新的函式庫。"
+
+#. EBVPe
+#: basctl/uiconfig/basicide/ui/libpage.ui:237
+msgctxt "libpage|import"
+msgid "_Import..."
+msgstr "匯入(_I)..."
+
+#. hSWdE
+#: basctl/uiconfig/basicide/ui/libpage.ui:244
+msgctxt "libpage|extended_tip|import"
+msgid "Locate the Basic library that you want to add to the current list, and then click Open."
+msgstr "找到要新增至目前清單的 Basic 函式庫，然後點擊「開啟」。"
+
+#. GhHRH
+#: basctl/uiconfig/basicide/ui/libpage.ui:257
+msgctxt "libpage|export"
+msgid "_Export..."
+msgstr "匯出(_E)..."
+
+#. hMRJK
+#: basctl/uiconfig/basicide/ui/libpage.ui:279
+msgctxt "libpage|extended_tip|delete"
+msgid "Deletes the selected element or elements without requiring confirmation."
+msgstr "刪除一或多個選取的元素時不需要確認。"
+
+#. dfZKj
+#: basctl/uiconfig/basicide/ui/libpage.ui:305
+msgctxt "libpage|extended_tip|LibPage"
+msgid "Select the application or the document containing the macro libraries that you want to organize."
+msgstr "選取您想要組織整理的、包含巨集函式庫的應用程式或文件。"
+
+#. zrJTt
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:16
+msgctxt "managebreakpoints|ManageBreakpointsDialog"
+msgid "Manage Breakpoints"
+msgstr "管理中斷點"
+
+#. TvBmF
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:40
+msgctxt "managebreakpoints|extended_tip|new"
+msgid "Creates a breakpoint on the line number specified."
+msgstr "在指定的行號上建立一個中斷點。"
+
+#. CCDEi
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:60
+msgctxt "managebreakpoints|extended_tip|delete"
+msgid "Deletes the selected breakpoint."
+msgstr "刪除選取的中斷點。"
+
+#. PcuyN
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:143
+msgctxt "managebreakpoints|active"
+msgid "Active"
+msgstr "使用中"
+
+#. fqCCT
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:151
+msgctxt "managebreakpoints|extended_tip|active"
+msgid "Activates or deactivates the current breakpoint."
+msgstr "啟動或關閉目前的中斷點。"
+
+#. MUMSv
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:216
+msgctxt "managebreakpoints|extended_tip|entries"
+msgid "Enter the line number for a new breakpoint, then click New."
+msgstr "輸入新中斷點的行號，然後按一下 [新增]。"
+
+#. RVBS5
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:245
+msgctxt "managebreakpoints|extended_tip|pass"
+msgid "Specify the number of loops to perform before the breakpoint takes effect."
+msgstr "指定在中斷點生效前要執行的迴圈數。"
+
+#. VDCwR
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:258
+msgctxt "managebreakpoints|label2"
+msgid "Pass count:"
+msgstr "通過計數："
+
+#. 5dExG
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:279
+msgctxt "managebreakpoints|label1"
+msgid "Breakpoints"
+msgstr "中斷點"
+
+#. FGsQQ
+#: basctl/uiconfig/basicide/ui/managebreakpoints.ui:306
+msgctxt "managebreakpoints|extended_tip|ManageBreakpointsDialog"
+msgid "Specifies the options for breakpoints."
+msgstr "指定中斷點的選項。"
+
+#. M2Sx2
+#: basctl/uiconfig/basicide/ui/managelanguages.ui:16
+msgctxt "managelanguages|ManageLanguagesDialog"
+msgid "Manage User Interface Languages [$1]"
+msgstr "管理使用者介面語言 [$1]"
+
+#. h23XK
+#: basctl/uiconfig/basicide/ui/managelanguages.ui:81
+msgctxt "managelanguages|label1"
+msgid "Present languages:"
+msgstr "目前語言："
+
+#. eDZBN
+#: basctl/uiconfig/basicide/ui/managelanguages.ui:95
+msgctxt "managelanguages|label2"
+msgid "The default language is used if no localization for a user interface locale is present. Furthermore all strings from the default language are copied to resources of newly added languages."
+msgstr "如果沒有使用者介面的地域語言本地化內容，則會使用預設語言。此外，預設語言的所有字串將複製到新增語言的資源中。"
+
+#. WE7kt
+#: basctl/uiconfig/basicide/ui/managelanguages.ui:122
+msgctxt "managelanguages|add"
+msgid "Add..."
+msgstr "加入…"
+
+#. MqU2f
+#: basctl/uiconfig/basicide/ui/managelanguages.ui:150
+msgctxt "managelanguages|default"
+msgid "Default"
+msgstr "預設"
+
+#. aMjkJ
+#: basctl/uiconfig/basicide/ui/modulepage.ui:41
+msgctxt "modulepage|label1"
+msgid "M_odule:"
+msgstr "模組(_O)："
+
+#. fpUvr
+#: basctl/uiconfig/basicide/ui/modulepage.ui:95
+msgctxt "modulepage|extended_tip|library"
+msgid "Lists the existing macro libraries for the current application and any open documents."
+msgstr "列出目前應用程式與任何開啟文件的既有巨集函式庫。"
+
+#. C4ns2
+#: basctl/uiconfig/basicide/ui/modulepage.ui:128
+msgctxt "modulepage|extended_tip|edit"
+msgid "Opens the Basic editor so that you can modify the selected library."
+msgstr "開啟 Basic 編輯器，這樣您就可以修改選定的函式庫。"
+
+#. KjBGM
+#: basctl/uiconfig/basicide/ui/modulepage.ui:140
+msgctxt "modulepage|newmodule"
+msgid "_New..."
+msgstr "新增(_N)..."
+
+#. SGQMi
+#: basctl/uiconfig/basicide/ui/modulepage.ui:147
+msgctxt "modulepage|extended_tip|newmodule"
+msgid "Opens the editor and creates a new module."
+msgstr "開啟編輯器並建立新模組。"
+
+#. RakoP
+#: basctl/uiconfig/basicide/ui/modulepage.ui:160
+msgctxt "modulepage|newdialog"
+msgid "_New..."
+msgstr "新增(_N)..."
+
+#. AvaAy
+#: basctl/uiconfig/basicide/ui/modulepage.ui:167
+msgctxt "modulepage|extended_tip|newdialog"
+msgid "Lets you manage the macro libraries."
+msgstr "讓您管理巨集函式庫。"
+
+#. LeigB
+#: basctl/uiconfig/basicide/ui/modulepage.ui:187
+msgctxt "modulepage|extended_tip|delete"
+msgid "Creates a new macro, or deletes the selected macro."
+msgstr "建立新巨集，或刪除所選的巨集。"
+
+#. 5FC8g
+#: basctl/uiconfig/basicide/ui/modulepage.ui:200
+msgctxt "modulepage|password"
+msgid "_Password..."
+msgstr "密碼(_P)..."
+
+#. apZrB
+#: basctl/uiconfig/basicide/ui/modulepage.ui:207
+msgctxt "modulepage|extended_tip|password"
+msgid "Assigns or edits the password for the selected library."
+msgstr "為所選函式庫分配或編輯密碼。"
+
+#. EgCDE
+#: basctl/uiconfig/basicide/ui/modulepage.ui:219
+msgctxt "modulepage|import"
+msgid "_Import..."
+msgstr "匯入(_I)..."
+
+#. PEoED
+#: basctl/uiconfig/basicide/ui/modulepage.ui:226
+msgctxt "modulepage|extended_tip|import"
+msgid "Locate the Basic library that you want to add to the current list, and then click Open."
+msgstr "找到要新增至目前清單的 Basic 函式庫，然後點擊「開啟」。"
+
+#. GAYBh
+#: basctl/uiconfig/basicide/ui/modulepage.ui:238
+msgctxt "modulepage|export"
+msgid "_Export..."
+msgstr "匯出(_E)..."
+
+#. 9Z2WP
+#: basctl/uiconfig/basicide/ui/modulepage.ui:264
+msgctxt "modulepage|extended_tip|ModulePage"
+msgid "Lists the existing modules or dialogs."
+msgstr "列出既有的模組或對話框。"
+
+#. rCNTN
+#: basctl/uiconfig/basicide/ui/newlibdialog.ui:32
+msgctxt "newlibdialog|extended_tip|ok"
+msgid "Runs or saves the current macro."
+msgstr "執行或儲存目前巨集。"
+
+#. Skwd5
+#: basctl/uiconfig/basicide/ui/newlibdialog.ui:92
+msgctxt "newlibdialog|area"
+msgid "_Name:"
+msgstr "名稱(_N)："
+
+#. FWXXE
+#: basctl/uiconfig/basicide/ui/newlibdialog.ui:133
+msgctxt "newlibdialog|extended_tip|NewLibDialog"
+msgid "Enter a name for the new library or module."
+msgstr "輸入新函式庫或模組的名稱。"
+
+#. uVgXz
+#: basctl/uiconfig/basicide/ui/organizedialog.ui:8
+msgctxt "organizedialog|OrganizeDialog"
+msgid "Basic Macro Organizer"
+msgstr "Basic 巨集統籌概覽"
+
+#. 7cVSj
+#: basctl/uiconfig/basicide/ui/organizedialog.ui:111
+msgctxt "organizedialog|modules"
+msgid "Modules"
+msgstr "模組"
+
+#. fXFQr
+#: basctl/uiconfig/basicide/ui/organizedialog.ui:158
+msgctxt "organizedialog|dialogs"
+msgid "Dialogs"
+msgstr "對話方塊"
+
+#. f7Wxa
+#: basctl/uiconfig/basicide/ui/organizedialog.ui:206
+msgctxt "organizedialog|libraries"
+msgid "Libraries"
+msgstr "函式庫"
+
+#. gsjtC
+#: basctl/uiconfig/basicide/ui/sortmenu.ui:12
+msgctxt "sortmenu|macrosort"
+msgid "_Sorting"
+msgstr "排序(_S)"
+
+#. GCbAJ
+#: basctl/uiconfig/basicide/ui/sortmenu.ui:22
+msgctxt "sortmenu|alphabetically"
+msgid "_Alphabetically"
+msgstr "按字母排序(_A)"
+
+#. PBmML
+#: basctl/uiconfig/basicide/ui/sortmenu.ui:32
+msgctxt "sortmenu|properorder"
+msgid "_Proper order"
+msgstr "正確的順序(_P)"

@@ -1,0 +1,271 @@
+#. extracted from scp2/source/graphicfilter
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2020-04-27 15:55+0200\n"
+"PO-Revision-Date: 2014-05-15 16:20+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ve\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1400170824.000000\n"
+
+#. yNDcH
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT\n"
+"LngText.text"
+msgid "Image Filters"
+msgstr ""
+
+#. NGACu
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT\n"
+"LngText.text"
+msgid "Additional filters required to read alien image formats."
+msgstr ""
+
+#. AGhyB
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_ADOBE\n"
+"LngText.text"
+msgid "Adobe Photoshop Import Filter"
+msgstr ""
+
+#. 7g8wn
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_ADOBE\n"
+"LngText.text"
+msgid "Adobe Photoshop Import Filter"
+msgstr ""
+
+#. BuJNs
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_TGA\n"
+"LngText.text"
+msgid "TGA Import"
+msgstr "Tshiṱunḓi tsha TGA"
+
+#. sGasR
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_TGA\n"
+"LngText.text"
+msgid "TGA TrueVision TARGA Import Filter"
+msgstr "Sia ḽa Vhukuma ḽa TGA Fiḽitha ya u Ṱunda ya TARGA"
+
+#. 2eKBa
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_EPS\n"
+"LngText.text"
+msgid "EPS Import/Export Filter"
+msgstr "Tshiṱundi tsha EPS/Fiḽitha ya u Rumela"
+
+#. TYdEn
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_EPS\n"
+"LngText.text"
+msgid "Encapsulated Postscript Import/Export Filter"
+msgstr "Tshiṱundi tsha Postscript tsho Pfufhifhadzwaho/Fiḽitha ya u Rumela"
+
+#. MjpxH
+#: module_graphicfilter.ulf
+#, fuzzy
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_XPM\n"
+"LngText.text"
+msgid "XPM Export Filter"
+msgstr "Fiḽitha ya u Rumela ya SVG"
+
+#. E2iXD
+#: module_graphicfilter.ulf
+#, fuzzy
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_XPM\n"
+"LngText.text"
+msgid "XPM Export Filter"
+msgstr "Fiḽitha ya u Rumela ya SVG"
+
+#. NcCsf
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_PBMP\n"
+"LngText.text"
+msgid "Portable Bitmap Import/Export"
+msgstr "Tshiṱundi tsha Bitmap Ṱhukhu/Rumela"
+
+#. fEnkH
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_PBMP\n"
+"LngText.text"
+msgid "Portable Bitmap Import/Export Filters"
+msgstr "Tshiṱundi tsha Bitmap Ṱhukhu/Fiḽitha dza u Rumela"
+
+#. p4zwV
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_SUNRST\n"
+"LngText.text"
+msgid "SUN Rasterfile Import/Export"
+msgstr "Tshiṱundi tsha SUN ya Rasterfaela/Rumela"
+
+#. qws72
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_SUNRST\n"
+"LngText.text"
+msgid "SUN Rasterfile Import/Export Filters"
+msgstr "Tshiṱundi tsha SUN ya Rasterfaela/Filitha dza u Rumela"
+
+#. XNt5u
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_ACAD\n"
+"LngText.text"
+msgid "AutoCAD Import"
+msgstr "Tshiṱunḓi tsha AutoCAD"
+
+#. BaBAs
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_ACAD\n"
+"LngText.text"
+msgid "AutoCAD Import Filter"
+msgstr "Fiḽitha ya u Rumela ya AutoCAD"
+
+#. Ce6Le
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_KODAC\n"
+"LngText.text"
+msgid "Kodak Photo-CD Import"
+msgstr "Tshiṱundi tsha Photo-CD ya Kodak"
+
+#. rCMDw
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_KODAC\n"
+"LngText.text"
+msgid "Kodak Photo-CD Import Filter"
+msgstr "Fiḽitha ya u Ṱunḓa Kodak Photo-CD"
+
+#. bYCLv
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_MACPICT\n"
+"LngText.text"
+msgid "Mac-Pict Import/Export"
+msgstr "Tshiṱundi tsha Mac-Pict/Rumela"
+
+#. hZQqt
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_MACPICT\n"
+"LngText.text"
+msgid "Mac-Pict Import/Export Filters"
+msgstr "Tshiṱundi tsha Mac-Pict/Fiḽitha dza u Rumela"
+
+#. 7RyBK
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_OS2META\n"
+"LngText.text"
+msgid "OS/2 Metafile Import/Export"
+msgstr "Tshiṱundi tsha OS/2 Metafaela/Rumela"
+
+#. WfEjP
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_OS2META\n"
+"LngText.text"
+msgid "OS/2 Metafile Import/Export Filters"
+msgstr "Tshiṱundi tsha OS/2 Metafaela/Fiḽitha dza u Rumela"
+
+#. ARyAy
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_PCX\n"
+"LngText.text"
+msgid "PCX Import"
+msgstr "Tshiṱundi tsha PCX"
+
+#. NmYRD
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_PCX\n"
+"LngText.text"
+msgid "Z-Soft PCX Import"
+msgstr "Tshiṱunḓi tsha PCX ya Z-Soft"
+
+#. WHSoW
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_TIFF\n"
+"LngText.text"
+msgid "TIFF Import/Export"
+msgstr "Tshiṱundi tsha TIFF/Rumela"
+
+#. oUH68
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_TIFF\n"
+"LngText.text"
+msgid "TIFF Import and Export Filter"
+msgstr "Tshiṱundi Tsha TIFF na Fiḽitha ya u Rumela"
+
+#. AhuaC
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_NAME_MODULE_OPTIONAL_GRFFLT_SVG\n"
+"LngText.text"
+msgid "SVG Export"
+msgstr "Rumela SVG"
+
+#. FFAAR
+#: module_graphicfilter.ulf
+msgctxt ""
+"module_graphicfilter.ulf\n"
+"STR_DESC_MODULE_OPTIONAL_GRFFLT_SVG\n"
+"LngText.text"
+msgid "SVG Export Filter"
+msgstr "Fiḽitha ya u Rumela ya SVG"

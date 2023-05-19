@@ -1,0 +1,2106 @@
+#. extracted from helpcontent2/source/text/scalc/00
+msgid ""
+msgstr ""
+"Project-Id-Version: LibreOffice 7.5\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-04 10:20+0100\n"
+"PO-Revision-Date: 2022-11-19 15:06+0200\n"
+"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
+"Language-Team: sl.libreoffice.org\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Project-Style: openoffice\n"
+
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"tit\n"
+"help.text"
+msgid "To access this function..."
+msgstr "Za dostop do te funkcije ..."
+
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"hd_id3155535\n"
+"help.text"
+msgid "<variable id=\"wie\">To access this function...</variable>"
+msgstr "<variable id=\"wie\">Za dostop do te funkcije ...</variable>"
+
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_idN1056E\n"
+"help.text"
+msgid "<variable id=\"moreontop\">More explanations on top of this page.</variable>"
+msgstr "<variable id=\"moreontop\">Podrobnejša razlaga na vrhu strani.</variable>"
+
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_idN105AF\n"
+"help.text"
+msgid "<variable id=\"optional\">In the %PRODUCTNAME Calc functions, parameters marked as \"optional\" can be left out only when no parameter follows. For example, in a function with four parameters, where the last two parameters are marked as \"optional\", you can leave out parameter 4 or parameters 3 and 4, but you cannot leave out parameter 3 alone.</variable>"
+msgstr "<variable id=\"optional\">V funkcijah %PRODUCTNAME Calc lahko parametre, ki niso označeni kot »zahtevani«, izpustite le tedaj, ko ne sledi noben parameter. Če sta npr. za funkcijo s štirimi parametri prva dva označena kot »zahtevano«, lahko izpustite parameter 4 ali parametra 3 in 4, ne smete pa izpustiti zgolj parametra 3.</variable>"
+
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id9751884\n"
+"help.text"
+msgid "<variable id=\"codes\">Codes greater than 127 may depend on your system's character mapping (for example iso-8859-1, iso-8859-2, Windows-1252, Windows-1250), and hence may not be portable.</variable>"
+msgstr "<variable id=\"codes\">Kode, večje od 127, so lahko odvisne od sistemske kodne tabele znakov (npr. iso-8859-1, iso-8859-2, Windows-1252, Windows-1250), zato morda niso prenosljive.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "Meni Uredi"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"hd_id3147303\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "Meni Uredi"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3155555\n"
+"help.text"
+msgid "<variable id=\"kopffuss\">Choose <emph>Insert - Headers and Footers</emph>.</variable>"
+msgstr "<variable id=\"kopffuss\">Izberite <emph>Vstavi – Glave in noge</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3159233\n"
+"help.text"
+msgid "<variable id=\"bkopfzeile\">Choose <emph>Insert - Headers and Footers - Header and Footer</emph> tabs.</variable>"
+msgstr "<variable id=\"bkopfzeile\">Izberite <emph>Vstavi – Glave in noge</emph>, nato ustrezen zavihek Glava oz. Noga.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150443\n"
+"help.text"
+msgid "<variable id=\"bausfullen\">Choose <emph>Sheet - Fill Cells</emph>.</variable>"
+msgstr "<variable id=\"bausfullen\">Izberite <emph>Delovni list – Zapolni celice</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3143267\n"
+"help.text"
+msgid "<variable id=\"bausunten\">Choose <emph>Sheet - Fill Cells - Down</emph>.</variable>"
+msgstr "<variable id=\"bausunten\">Izberite <emph>Delovni list – Zapolni celice – Navzdol</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3153880\n"
+"help.text"
+msgid "<variable id=\"bausrechts\">Choose <emph>Sheet - Fill Cells - Right</emph>.</variable>"
+msgstr "<variable id=\"bausrechts\">Izberite <emph>Delovni list – Zapolni celice – Desno</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<variable id=\"bausoben\">Choose <emph>Sheet - Fill Cells - Up</emph>.</variable>"
+msgstr "<variable id=\"bausoben\">Izberite <emph>Delovni list – Zapolni celice – Navzgor</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3145068\n"
+"help.text"
+msgid "<variable id=\"bauslinks\">Choose <emph>Sheet - Fill Cells - Left</emph>.</variable>"
+msgstr "<variable id=\"bauslinks\">Izberite <emph>Delovni list – Zapolni celice – Levo</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150400\n"
+"help.text"
+msgid "<variable id=\"baustab\">Choose <emph>Sheet - Fill Cells - Sheets</emph>.</variable>"
+msgstr "<variable id=\"baustab\">Izberite <emph>Delovni list – Zapolni celice – Delovni listi</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3154910\n"
+"help.text"
+msgid "<variable id=\"bausreihe\">Choose <emph>Sheet - Fill Cells - Series</emph>.</variable>"
+msgstr "<variable id=\"bausreihe\">Izberite <emph>Delovni list – Zapolni celice – Nizi</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3154123\n"
+"help.text"
+msgid "Choose <emph>Sheet - Clear Cells</emph>."
+msgstr "Izberite <emph>Delovni list – Počisti celice</emph>."
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3145785\n"
+"help.text"
+msgid "Backspace"
+msgstr "Vračalka"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150011\n"
+"help.text"
+msgid "<variable id=\"bzelo\">Choose <emph>Sheet - Delete Cells</emph>.</variable>"
+msgstr "<variable id=\"bzelo\">Izberite <emph>Delovni list – Izbriši celice</emph>.</variable>"
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3153951\n"
+"help.text"
+msgid "Choose <emph>Sheet - Delete Sheet</emph>."
+msgstr "Izberite <emph>Delovni list – Izbriši delovni list</emph>."
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3155306\n"
+"help.text"
+msgid "Open context menu for a sheet tab."
+msgstr "Odprite kontekstni meni zavihka delovnega lista."
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3146119\n"
+"help.text"
+msgid "Choose <emph>Sheet - Move or Copy Sheet</emph>."
+msgstr "Izberite <emph>Delovni list – Premakni/kopiraj delovni list</emph>."
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3148645\n"
+"help.text"
+msgid "Open context menu for a sheet tab."
+msgstr "Odprite kontekstni meni zavihka delovnega lista."
+
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id831619443265443\n"
+"help.text"
+msgid "Choose <menuitem>Edit - Cell Protection</menuitem> to activate sheet protection with current cell protection settings."
+msgstr "Izberite <menuitem>Uredi – Zaščita celice</menuitem> za vklop zaščite delovnih listov s trenutnimi nastavitvami zaščite celic."
+
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"tit\n"
+"help.text"
+msgid "View Menu"
+msgstr "Meni Pogled"
+
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"hd_id3145673\n"
+"help.text"
+msgid "View Menu"
+msgstr "Meni Pogled"
+
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3150275\n"
+"help.text"
+msgid "<variable id=\"aspze\">Choose <emph>View - Column & Row Headers</emph>.</variable>"
+msgstr "<variable id=\"aspze\">Izberite <emph>Pogled – Glave stolpcev in vrstic</emph>.</variable>"
+
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3154514\n"
+"help.text"
+msgid "<variable id=\"awehe\">Choose <emph>View - Value Highlighting</emph>.</variable>"
+msgstr "<variable id=\"awehe\">Izberite <emph>Pogled – Poudarjanje vrednosti</emph>.</variable>"
+
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3148947\n"
+"help.text"
+msgid "<variable id=\"rechenleiste\">Choose <emph>View - Formula Bar</emph>.</variable>"
+msgstr "<variable id=\"rechenleiste\">Izberite <emph>Pogled – Vrstica za formule</emph>.</variable>"
+
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3148663\n"
+"help.text"
+msgid "<variable id=\"seumvo\">Choose <emph>View - Page Break</emph>.</variable>"
+msgstr "<variable id=\"seumvo\">Izberite <emph>Pogled – Prelom strani</emph>.</variable>"
+
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3155383\n"
+"help.text"
+msgid "<variable id=\"functionlist\">Choose <menuitem>View - Function List</menuitem>.</variable>"
+msgstr "<variable id=\"functionlist\">Izberite <menuitem>Pogled – Seznam funkcij</menuitem>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "Meni Vstavi"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"hd_id3149346\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "Meni Vstavi"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149784\n"
+"help.text"
+msgid "Choose <menuitem>Sheet - Insert Cells</menuitem>."
+msgstr "Izberite <menuitem>Delovni list – Vstavi celice</menuitem>."
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154514\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars</menuitem> and select the <emph>Insert Cells</emph> toolbar:"
+msgstr "Izberite <menuitem>Pogled – Orodne vrstice</menuitem> in izberite orodno vrstico <emph>Vstavi celice</emph>:"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149656\n"
+"help.text"
+msgid "<image id=\"img_id3154365\" src=\"cmd/sc_inscellsctrl.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154365\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154365\" src=\"cmd/sc_inscellsctrl.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154365\">Ikona</alt></image>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151041\n"
+"help.text"
+msgid "Insert Cells"
+msgstr "Vstavi celice"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145273\n"
+"help.text"
+msgid "<image id=\"img_id3145364\" src=\"cmd/sc_insertcellsdown.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145364\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145364\" src=\"cmd/sc_insertcellsdown.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145364\">Ikona</alt></image>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146985\n"
+"help.text"
+msgid "Insert Cells Down"
+msgstr "Vstavi celice spodaj"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3144766\n"
+"help.text"
+msgid "<image id=\"img_id3154942\" src=\"cmd/sc_insertcellsright.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154942\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154942\" src=\"cmd/sc_insertcellsright.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154942\">Ikona</alt></image>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145646\n"
+"help.text"
+msgid "Insert Cells Right"
+msgstr "Vstavi celice desno"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153838\n"
+"help.text"
+msgid "<image id=\"img_id3153710\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153710\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153710\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153710\">Ikona</alt></image>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150324\n"
+"help.text"
+msgid "Insert Rows"
+msgstr "Vstavi vrstice"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147363\n"
+"help.text"
+msgid "<image id=\"img_id3145232\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145232\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145232\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145232\">Ikona</alt></image>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155334\n"
+"help.text"
+msgid "Insert Columns"
+msgstr "Vstavi stolpce"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149033\n"
+"help.text"
+msgid "<variable id=\"eitab\">Choose <menuitem>Sheet - Insert Sheet</menuitem>.</variable>"
+msgstr "<variable id=\"eitab\">Izberite <menuitem>Delovni list – Vstavi delovni list</menuitem>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_idN1082F\n"
+"help.text"
+msgid "<variable id=\"eitabfile\">Choose <menuitem>Sheet - Insert Sheet from File</menuitem>.</variable>"
+msgstr "<variable id=\"eitabfile\">Izberite <menuitem>Delovni list – Vstavi delovni list iz datoteke</menuitem>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155115\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Function</menuitem>."
+msgstr "Izberite <menuitem>Vstavi – Funkcija</menuitem>."
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3152582\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Tipka Cmd</caseinline><defaultinline>Krmilka</defaultinline></switchinline>+F2"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153269\n"
+"help.text"
+msgid "On the <emph>Formula</emph> bar, click"
+msgstr "V vrstici <emph>Formula</emph> kliknite"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150515\n"
+"help.text"
+msgid "<image id=\"img_id3150884\" src=\"sw/res/sc20556.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3150884\">Icon</alt></image>"
+msgstr "<image id=\"img_id3150884\" src=\"sw/res/sc20556.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3150884\">Ikona</alt></image>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154370\n"
+"help.text"
+msgid "Function Wizard"
+msgstr "Čarovnik za funkcije"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156288\n"
+"help.text"
+msgid "<variable id=\"eikada\"><emph>Insert - Function</emph> - Category <emph>Database</emph></variable>"
+msgstr "<variable id=\"eikada\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Zbirka podatkov</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155809\n"
+"help.text"
+msgid "<variable id=\"eikadaze\"><emph>Insert - Function</emph> - Category <emph>Date & Time</emph></variable>"
+msgstr "<variable id=\"eikadaze\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Datum in čas</emph>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151334\n"
+"help.text"
+msgid "<variable id=\"eikafi\"><emph>Insert - Function</emph> - Category <emph>Financial</emph></variable>"
+msgstr "<variable id=\"eikafi\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Finance</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3159222\n"
+"help.text"
+msgid "<variable id=\"eikain\"><emph>Insert - Function</emph> - Category <emph>Information</emph></variable>"
+msgstr "<variable id=\"eikain\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Informacije</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3159173\n"
+"help.text"
+msgid "<variable id=\"logical\"><emph>Insert - Function</emph> - Category <emph>Logical</emph></variable>"
+msgstr "<variable id=\"logical\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Logika</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153914\n"
+"help.text"
+msgid "<variable id=\"eikama\"><emph>Insert - Function</emph> - Category <emph>Mathematical</emph></variable>"
+msgstr "<variable id=\"eikama\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Matematika</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150109\n"
+"help.text"
+msgid "<variable id=\"eikamatrix\"><emph>Insert - Function</emph> - Category <emph>Array</emph></variable>"
+msgstr "<variable id=\"eikamatrix\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Matrika</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3157978\n"
+"help.text"
+msgid "<variable id=\"eikasta\"><emph>Insert - Function</emph> - Category <emph>Statistical</emph></variable>"
+msgstr "<variable id=\"eikasta\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Statistika</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156016\n"
+"help.text"
+msgid "<variable id=\"eikatext\"><emph>Insert - Function</emph> - Category <emph>Text</emph></variable>"
+msgstr "<variable id=\"eikatext\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Besedilo</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147075\n"
+"help.text"
+msgid "<variable id=\"efefft\"><emph>Insert - Function</emph> - Category <emph>Spreadsheet</emph></variable>"
+msgstr "<variable id=\"efefft\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Preglednica</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154618\n"
+"help.text"
+msgid "<variable id=\"addin\"><emph>Insert - Function</emph> - Category <emph>Add-In</emph></variable>"
+msgstr "<variable id=\"addin\"><emph>Vstavi – Funkcija</emph> – Kategorija <emph>Dodatek</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154059\n"
+"help.text"
+msgid "<variable id=\"addinana\"><emph>Insert - Function</emph> - Category <emph>Add-In</emph></variable>"
+msgstr "<variable id=\"addinana\"><emph>Vstavit – Funkcijo</emph> – Kategorija <emph>Dodatek</emph></variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153250\n"
+"help.text"
+msgid "<variable id=\"einamen\">Choose <menuitem>Insert - Named Range or Expression</menuitem>.</variable>"
+msgstr "<variable id=\"einamen\">Izberite <menuitem>Vstavi – Imenovani obseg ali izraz</menuitem>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146776\n"
+"help.text"
+msgid "<variable id=\"eiextdata\">Choose <menuitem>Sheet - External Links</menuitem>.</variable>"
+msgstr "<variable id=\"eiextdata\">Izberite <menuitem>Delovni list – Zunanje povezave</menuitem>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3143222\n"
+"help.text"
+msgid "Choose <menuitem>Sheet - Named Ranges and Expressions - Define</menuitem>."
+msgstr "Izberite <menuitem>Delovni list – Imenovani obsegi in izrazi – Določi</menuitem>."
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149385\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Tipka Cmd</caseinline><defaultinline>Krmilka</defaultinline></switchinline>+F3"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145214\n"
+"help.text"
+msgid "<variable id=\"einaei\">Choose <menuitem>Sheet - Named Ranges and Expressions - Insert</menuitem>.</variable>"
+msgstr "<variable id=\"einaei\">Izberite <menuitem>Delovni list – Imenovani obsegi in izrazi – Vstavi</menuitem>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153558\n"
+"help.text"
+msgid "<variable id=\"einaueb\">Choose <menuitem>Sheet - Named Ranges and Expressions - Create</menuitem>.</variable>"
+msgstr "<variable id=\"einaueb\">Izberite <menuitem>Delovni list – Imenovani obsegi in izrazi – Ustvari</menuitem>.</variable>"
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153483\n"
+"help.text"
+msgid "<variable id=\"einabesch\">Choose <menuitem>Sheet - Named Ranges and Expressions - Labels</menuitem>.</variable>"
+msgstr "<variable id=\"einabesch\">Izberite <menuitem>Delovni list – Imenovani obsegi in izrazi – Oznake</menuitem>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format Menu"
+msgstr "Meni Oblika"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"hd_id3150769\n"
+"help.text"
+msgid "Format Menu"
+msgstr "Meni Oblika"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154685\n"
+"help.text"
+msgid "Choose <menuitem>Format - Cells</menuitem>."
+msgstr "Izberite <menuitem>Oblika – Celice</menuitem>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id61593556839601\n"
+"help.text"
+msgid "Press <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+1</keycode>."
+msgstr "Pritisnite kombinacijo tipk <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>tipka Cmd</keycode></caseinline><defaultinline><keycode>krmilka</keycode></defaultinline></switchinline><keycode>+1</keycode>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153194\n"
+"help.text"
+msgid "<variable id=\"fozelstz\">Choose <emph>Format - Cells - Cell Protection</emph> tab.</variable>"
+msgstr "<variable id=\"fozelstz\">Izberite <emph>Oblika – Celice</emph>, nato zavihek <emph>Zaščita celice</emph></variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155854\n"
+"help.text"
+msgid "<variable id=\"fozei\">Choose <emph>Format - Rows</emph>.</variable>"
+msgstr "<variable id=\"fozei\">Izberite <emph>Oblika – Vrstice</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150012\n"
+"help.text"
+msgid "<variable id=\"fozeiophoe\">Choose <emph>Format - Rows - Optimal Height</emph>.</variable>"
+msgstr "<variable id=\"fozeiophoe\">Izberite <emph>Oblika – Vrstice – Optimalna višina</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148645\n"
+"help.text"
+msgid "Choose <emph>Format - Rows - Hide</emph>."
+msgstr "Izberite <emph>Oblika – Vrstice – Skrij</emph>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153728\n"
+"help.text"
+msgid "Choose <emph>Format - Columns - Hide</emph>."
+msgstr "Izberite <emph>Oblika – Stolpci – Skrij</emph>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Choose <emph>Sheet - Hide Sheet</emph>."
+msgstr "Izberite <emph>Delovni list – Skrij delovni list</emph>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148576\n"
+"help.text"
+msgid "Choose <emph>Format - Rows - Show</emph>."
+msgstr "Izberite <emph>Oblika – Vrstice – Pokaži</emph>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156286\n"
+"help.text"
+msgid "Choose <emph>Format - Columns - Show</emph>."
+msgstr "Izberite <emph>Oblika – Stolpci – Pokaži</emph>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145645\n"
+"help.text"
+msgid "<variable id=\"fospa\">Choose <emph>Format - Columns</emph>.</variable>"
+msgstr "<variable id=\"fospa\">Izberite <emph>Oblika – Stolpci</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145252\n"
+"help.text"
+msgid "Choose <emph>Format - Columns - Optimal Width</emph>."
+msgstr "Izberite <emph>Oblika – Stolpci – Optimalna širina</emph>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3146971\n"
+"help.text"
+msgid "Double-click right column separator in column headers."
+msgstr "Dvokliknite ločilo desnega stolpca v glavah stolpca."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147362\n"
+"help.text"
+msgid "<variable id=\"fot\">Choose <emph>Sheet</emph>.</variable>"
+msgstr "<variable id=\"fot\">Izberite <emph>Delovni list</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3163805\n"
+"help.text"
+msgid "<variable id=\"fotu\">Choose <emph>Sheet - Rename Sheet</emph>.</variable>"
+msgstr "<variable id=\"fotu\">Izberite <emph>Delovni list – Preimenuj delovni list</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155333\n"
+"help.text"
+msgid "<variable id=\"fotenb\">Choose <emph>Sheet - Show Sheet</emph>.</variable>"
+msgstr "<variable id=\"fotenb\">Izberite <emph>Delovni list – Pokaži delovni list</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_idN1077A\n"
+"help.text"
+msgid "<variable id=\"foste\">Choose <emph>Format - Page Style</emph>.</variable>"
+msgstr "<variable id=\"foste\">Izberite <emph>Oblika – Slog strani</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155508\n"
+"help.text"
+msgid "<variable id=\"fostel\">Choose <emph>Format - Page Style - Sheet</emph> tab.</variable>"
+msgstr "<variable id=\"fostel\">Izberite <emph>Oblika – Slog strani</emph>, nato zavihek <emph>Delovni list</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150883\n"
+"help.text"
+msgid "<variable id=\"fodrbe\">Choose <emph>Format - Print Ranges</emph>.</variable>"
+msgstr "<variable id=\"fodrbe\">Izberite <emph>Oblika – Obsegi tiskanja</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156448\n"
+"help.text"
+msgid "<variable id=\"fodrfe\">Choose <emph>Format - Print Ranges - Define</emph>.</variable>"
+msgstr "<variable id=\"fodrfe\">Izberite <emph>Oblika – Obsegi tiskanja – Določi</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156290\n"
+"help.text"
+msgid "<variable id=\"fodrhin\">Choose <emph>Format - Print Ranges - Add</emph>.</variable>"
+msgstr "<variable id=\"fodrhin\">Izberite <emph>Oblika – Obseg tiskanja – Dodaj</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155812\n"
+"help.text"
+msgid "<variable id=\"fodbah\">Choose <emph>Format - Print Ranges - Clear</emph>.</variable>"
+msgstr "<variable id=\"fodbah\">Izberite <emph>Oblika – Obsegi tiskanja – Počisti</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153307\n"
+"help.text"
+msgid "<variable id=\"fodbbe\">Choose <emph>Format - Print Ranges - Edit</emph>.</variable>"
+msgstr "<variable id=\"fodbbe\">Izberite <emph>Oblika – Obsegi tiskanja – Uredi</emph>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154618\n"
+"help.text"
+msgid "<variable id=\"bedingte\">Choose <menuitem>Format - Conditional - Condition</menuitem>.</variable>"
+msgstr "<variable id=\"bedingte\">Izberite <menuitem>Oblika – Pogojno – Pogoj</menuitem>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id141663543112100\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "V vrstici <emph>Oblikovanje</emph> kliknite"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id1001663540244130\n"
+"help.text"
+msgid "<image src=\"cmd/lc_conditionalformatdialog.svg\" id=\"img_id461663540244131\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id201663540244132\">Icon Conditional Format - Condition</alt></image>"
+msgstr "<image src=\"cmd/lc_conditionalformatdialog.svg\" id=\"img_id461663540244131\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id201663540244132\">Ikona Pogojno – Pogoj</alt></image>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id151663540244134\n"
+"help.text"
+msgid "Conditional Format"
+msgstr "Pogojna oblika"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id31663542115011\n"
+"help.text"
+msgid "<variable id=\"conditionalcolorscale\">Choose <menuitem>Format - Conditional - Color Scale</menuitem></variable>"
+msgstr "<variable id=\"conditionalcolorscale\">Izberite <menuitem>Oblika – Pogojno – Barvna lestvica</menuitem>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id211663543104186\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "V vrstici <emph>Oblikovanje</emph> kliknite"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id431663540719713\n"
+"help.text"
+msgid "<image src=\"cmd/lc_colorscaleformatdialog.svg\" id=\"img_id551663540719714\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381663540719715\">Icon Color Scale</alt></image>"
+msgstr "<image src=\"cmd/lc_colorscaleformatdialog.svg\" id=\"img_id551663540719714\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381663540719715\">Ikona Barvna lestvica</alt></image>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id841663540719717\n"
+"help.text"
+msgid "Color Scale"
+msgstr "Barvna lestvica"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id491663542108169\n"
+"help.text"
+msgid "<variable id=\"conditionaldatabar\">Choose <menuitem>Format - Conditional - Data Bar</menuitem></variable>"
+msgstr "<variable id=\"conditionaldatabar\">Izberite <menuitem>Oblika – Pogojno – Podatkovni stolpec</menuitem>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id81663543094977\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "V vrstici <emph>Oblikovanje</emph> kliknite"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id301663541161943\n"
+"help.text"
+msgid "<image src=\"cmd/lc_databarformatdialog.svg\" id=\"img_id601663541161944\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id21663541161945\">Icon Data Bar</alt></image>"
+msgstr "<image src=\"cmd/lc_databarformatdialog.svg\" id=\"img_id601663541161944\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id21663541161945\">Ikona Podatkovni stolpec</alt></image>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id101663541161947\n"
+"help.text"
+msgid "Data Bar"
+msgstr "Podatkovni stolpec"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id851663542093712\n"
+"help.text"
+msgid "<variable id=\"conditionaliconset\">Choose <menuitem>Format - Conditional - Icon Set</menuitem></variable>"
+msgstr "<variable id=\"conditionaliconset\">Izberite <menuitem>Oblika – Pogojno – Nabor ikon</menuitem>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id501663543087343\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "V vrstici <emph>Oblikovanje</emph> kliknite"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id51663541228728\n"
+"help.text"
+msgid "<image src=\"cmd/lc_iconsetformatdialog.svg\" id=\"img_id511663541228729\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id261663541228730\">Icon Icon Set</alt></image>"
+msgstr "<image src=\"cmd/lc_iconsetformatdialog.svg\" id=\"img_id511663541228729\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id261663541228730\">Ikona Nabor ikon</alt></image>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id61663541228732\n"
+"help.text"
+msgid "Icon Set"
+msgstr "Nabor ikon"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id391663542070705\n"
+"help.text"
+msgid "<variable id=\"conditionaldate\">Choose <menuitem>Format - Conditional - Date</menuitem></variable>"
+msgstr "<variable id=\"conditionaldate\">Izberite <menuitem>Oblika – Pogojno – Datum</menuitem>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id351663543077670\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "V vrstici <emph>Oblikovanje</emph> kliknite"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id371663541317147\n"
+"help.text"
+msgid "<image src=\"cmd/lc_conddateformatdialog.svg\" id=\"img_id61663541317148\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id641663541317149\">Icon Date</alt></image>"
+msgstr "<image src=\"cmd/lc_conddateformatdialog.svg\" id=\"img_id61663541317148\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id641663541317149\">Ikona Datum</alt></image>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id121663541317151\n"
+"help.text"
+msgid "Date"
+msgstr "Datum"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id641663542045446\n"
+"help.text"
+msgid "<variable id=\"conditionalmanage\">Choose <menuitem>Format - Conditional - Manage</menuitem></variable>"
+msgstr "<variable id=\"conditionalmanage\">Izberite <menuitem>Oblika – Pogojno – Upravljaj</menuitem>.</variable>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153916\n"
+"help.text"
+msgid "Choose <emph>Format - AutoFormat Styles</emph>."
+msgstr "Izberite <emph>Oblika – Slogi samooblikovanja</emph>."
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154532\n"
+"help.text"
+msgid "On the <emph>Tools</emph> bar, click"
+msgstr "V vrstici <emph>Orodja</emph> kliknite"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149332\n"
+"help.text"
+msgid "<image id=\"img_id3156020\" src=\"cmd/sc_autoformat.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156020\">AutoFormat Styles Icon</alt></image>"
+msgstr "<image id=\"img_id3156020\" src=\"cmd/sc_autoformat.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156020\">Ikona Slogi samooblikovanja</alt></image>"
+
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154060\n"
+"help.text"
+msgid "AutoFormat"
+msgstr "Samooblikovanje"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "Meni Orodja"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"hd_id3147264\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "Meni Orodja"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150541\n"
+"help.text"
+msgid "<variable id=\"exdektv\">Choose <emph>Tools - Detective</emph>.</variable>"
+msgstr "<variable id=\"exdektv\">Izberite <emph>Orodja – Detektiv</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153194\n"
+"help.text"
+msgid "Choose <emph>Tools - Detective - Trace Precedents</emph>."
+msgstr "Izberite <emph>Orodja – Detektiv – Sledi predhodnikom</emph>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150447\n"
+"help.text"
+msgid "Shift+F9"
+msgstr "Dvigalka+F9"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154123\n"
+"help.text"
+msgid "<variable id=\"silbentrennungc\">Menu <emph>Tools - Language - Hyphenation</emph>.</variable>"
+msgstr "<variable id=\"silbentrennungc\">Meni <emph>Orodja – Jezik – Deljenje besed</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3145785\n"
+"help.text"
+msgid "<variable id=\"exdvore\">Choose <emph>Tools - Detective - Remove Precedents</emph>.</variable>"
+msgstr "<variable id=\"exdvore\">Izberite <emph>Orodja – Detektiv – Odstrani predhodnike</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "Choose <emph>Tools - Detective - Trace Dependents</emph>."
+msgstr "Izberite <emph>Orodja – Detektiv – Sledi odvisnike</emph>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153363\n"
+"help.text"
+msgid "Shift+F5"
+msgstr "Dvigalka+F5"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3146984\n"
+"help.text"
+msgid "<variable id=\"exdszne\">Choose <emph>Tools - Detective - Remove Dependents</emph>.</variable>"
+msgstr "<variable id=\"exdszne\">Izberite <emph>Orodja – Detektiv – Odstrani odvisnike</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154014\n"
+"help.text"
+msgid "<variable id=\"exdase\">Choose <emph>Tools - Detective - Remove All Traces</emph>.</variable>"
+msgstr "<variable id=\"exdase\">Izberite <emph>Orodja – Detektiv – Odstrani vse sledi</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153188\n"
+"help.text"
+msgid "<variable id=\"exdszfe\">Choose <emph>Tools - Detective - Trace Error</emph>.</variable>"
+msgstr "<variable id=\"exdszfe\">Izberite <emph>Orodja – Detektiv – Sledi napaki</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149410\n"
+"help.text"
+msgid "<variable id=\"fuellmodus\">Choose <emph>Tools - Detective - Fill Mode</emph>.</variable>"
+msgstr "<variable id=\"fuellmodus\">Izberite <emph>Orodja – Detektiv – Polnilni način</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3156284\n"
+"help.text"
+msgid "<variable id=\"dateneinkreisen\">Choose <emph>Tools - Detective - Mark Invalid Data</emph>.</variable>"
+msgstr "<variable id=\"dateneinkreisen\">Izberite <emph>Orodja – Detektiv – Označi neveljavne podatke</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153159\n"
+"help.text"
+msgid "<variable id=\"spurenaktualisieren\">Choose <emph>Tools - Detective - Refresh Traces</emph>.</variable>"
+msgstr "<variable id=\"spurenaktualisieren\">Izberite <emph>Orodja – Detektiv – Osveži sledi</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3147397\n"
+"help.text"
+msgid "<variable id=\"automatisch\">Choose <emph>Tools - Detective - AutoRefresh</emph>.</variable>"
+msgstr "<variable id=\"automatisch\">Izberite <emph>Orodja – Detektiv – Samodejno osveži</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154018\n"
+"help.text"
+msgid "<variable id=\"exzws\">Choose <emph>Tools - Goal Seek</emph>.</variable>"
+msgstr "<variable id=\"exzws\">Izberite <emph>Orodja – Iskanje cilja</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3269142\n"
+"help.text"
+msgid "<variable id=\"solver\">Choose <emph>Tools - Solver</emph>.</variable>"
+msgstr "<variable id=\"solver\">Izberite <emph>Orodja – Reševalec</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id8554338\n"
+"help.text"
+msgid "<variable id=\"solver_options\">Choose <emph>Tools - Solver</emph>, click <emph>Options</emph> button.</variable>"
+msgstr "<variable id=\"solver_options\">Izberite <emph>Orodja – Reševalec</emph>, gumb <emph>Možnosti</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3156277\n"
+"help.text"
+msgid "<variable id=\"exsze\">Choose <emph>Tools - Scenarios</emph>.</variable>"
+msgstr "<variable id=\"exsze\">Izberite <emph>Orodja – Scenariji</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id971647297529392\n"
+"help.text"
+msgid "<variable id=\"tools_forms\">Choose <emph>Tools - Forms</emph>.</variable>"
+msgstr "<variable id=\"tools_forms\">Izberite <emph>Orodja – Obrazci</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id371647273694433\n"
+"help.text"
+msgid "<variable id=\"share_spreadsheet\">Choose <menuitem>Tools - Share Spreadsheet</menuitem></variable>"
+msgstr "<variable id=\"share_spreadsheet\">Izberite <menuitem>Orodja – Preglednico v skupno rabo</menuitem>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149020\n"
+"help.text"
+msgid "<variable id=\"protect_sheet\">Choose <emph>Tools - Protect Sheet</emph>.</variable>"
+msgstr "<variable id=\"protect_sheet\">Izberite <emph>Orodja – Zaščiti delovni list</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154256\n"
+"help.text"
+msgid "<variable id=\"protect_spreadsheet\">Choose <emph>Tools - Protect Spreadsheet Structure</emph>.</variable>"
+msgstr "<variable id=\"protect_spreadsheet\">Izberite <emph>Orodja – Zaščiti strukturo preglednice</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3146919\n"
+"help.text"
+msgid "Choose <emph>Data - Calculate - Recalculate</emph>."
+msgstr "Izberite <emph>Podatki – Izračunaj – Ponovno izračunaj</emph>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149257\n"
+"help.text"
+msgid "Press <keycode>F9</keycode>"
+msgstr "Pritisnite tipko <keycode>F9</keycode>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3146919a\n"
+"help.text"
+msgid "Choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc - Formula</emph>."
+msgstr "Izberite <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME – Nastavitve</emph></caseinline><defaultinline><emph>Orodja – Možnosti</emph></defaultinline></switchinline><emph> – %PRODUCTNAME Calc – Formula</emph>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id891645217179561\n"
+"help.text"
+msgid "Choose <menuitem>Data - Calculate - Recalculate hard</menuitem>."
+msgstr "Izberite <menuitem>Podatki – Izračunaj – Ponovno izračunaj nepogojno</menuitem>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id21645217233263\n"
+"help.text"
+msgid "Press <keycode>Shift</keycode>+<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>+<keycode>F9</keycode>"
+msgstr "Pritisnite kombinacijo tipk <keycode>dvigalka+</keycode><switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Cmd</keycode></caseinline><defaultinline><keycode>krmilka</keycode></defaultinline></switchinline>+<keycode>F9</keycode>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id31645223233125\n"
+"help.text"
+msgid "Select a formula cell or a formula cell range and choose <menuitem>Data - Calculate - Formula to values</menuitem>"
+msgstr "Izberite celico s formulo ali obseg celic s formulami in izberite <menuitem>Podatki – Izračunaj – Formula v vrednost</menuitem>."
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150941\n"
+"help.text"
+msgid "<variable id=\"exatmb\">Choose <emph>Data - Calculate - AutoCalculate</emph>.</variable>"
+msgstr "<variable id=\"exatmb\">Izberite <emph>Podatki – Izračunaj – Samodejno izračunaj</emph>.</variable>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3151276\n"
+"help.text"
+msgid "<variable id=\"autoeingabe\">Choose <emph>Tools - AutoInput</emph>.</variable>"
+msgstr "<variable id=\"autoeingabe\">Izberite <emph>Orodja – Samodejni vnos</emph>.</variable>"
+
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"tit\n"
+"help.text"
+msgid "Window Menu"
+msgstr "Meni Okno"
+
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"hd_id3155628\n"
+"help.text"
+msgid "Window Menu"
+msgstr "Meni Okno"
+
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3147335\n"
+"help.text"
+msgid "<variable id=\"fete\">Choose <menuitem>View - Split Window</menuitem>.</variable>"
+msgstr "<variable id=\"fete\">Izberite <menuitem>Pogled – Razdeli okno</menuitem>.</variable>"
+
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3153663\n"
+"help.text"
+msgid "<variable id=\"fefix\">Choose <menuitem>View - Freeze Rows and Columns</menuitem>.</variable>"
+msgstr "<variable id=\"fefix\">Izberite <menuitem>Okno – Zamrzni vrstice in stolpce</menuitem>.</variable>"
+
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id631612313719480\n"
+"help.text"
+msgid "<variable id=\"freezefirstcol\">Choose <menuitem>View - Freeze Cells - Freeze First Column</menuitem></variable>"
+msgstr "<variable id=\"freezefirstcol\">Izberite <menuitem>Pogled – Zamrzni celice – Zamrzni prvi stolpec</menuitem>.</variable>"
+
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id251612313725513\n"
+"help.text"
+msgid "<variable id=\"freezefirstrow\">Choose <menuitem>View - Freeze Cells - Freeze First Row</menuitem></variable>"
+msgstr "<variable id=\"freezefirstrow\">Izberite <menuitem>Pogled – Zamrzni celice – Zamrzni prvo vrstico</menuitem>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"tit\n"
+"help.text"
+msgid "Data Menu"
+msgstr "Meni Podatki"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"hd_id3145136\n"
+"help.text"
+msgid "Data Menu"
+msgstr "Meni Podatki"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id8366954\n"
+"help.text"
+msgid "<variable id=\"text2columns\">Choose <emph>Data - Text to Columns</emph>.</variable>"
+msgstr "<variable id=\"text2columns\">Izberite <emph>Podatki – Besedilo v stolpce</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3147399\n"
+"help.text"
+msgid "<variable id=\"dbrbf\">Choose <emph>Data - Define Range</emph>.</variable>"
+msgstr "<variable id=\"dbrbf\">Izberite <emph>Podatki – Določi obseg</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145345\n"
+"help.text"
+msgid "<variable id=\"dbrba\">Choose <emph>Data - Select Range</emph>.</variable>"
+msgstr "<variable id=\"dbrba\">Izberite <emph>Podatki – Izberi obseg</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150443\n"
+"help.text"
+msgid "<variable id=\"dnsrt\">Choose <emph>Data - Sort...</emph>.</variable>"
+msgstr "<variable id=\"dnsrt\">Izberite <emph>Podatki – Razvrsti</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id641584647437810\n"
+"help.text"
+msgid "<variable id=\"datasortascending\">Choose <menuitem>Data - Sort Ascending</menuitem></variable>"
+msgstr "<variable id=\"datasortascending\">Izberite <menuitem>Podatki – Razvrsti naraščajoče</menuitem></variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id711584647447316\n"
+"help.text"
+msgid "<variable id=\"datasortdescending\">Choose <menuitem>Data - Sort Descending</menuitem></variable>"
+msgstr "<variable id=\"datasortdescending\">Izberite <menuitem>Podatki – Razvrsti padajoče</menuitem></variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148491\n"
+"help.text"
+msgid "Choose <emph>Data - Sort - Sort Criteria</emph> tab."
+msgstr "Izberite <emph>Podatki – Razvrsti</emph>, nato zavihek <emph>Pogoji razvrščanja</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154516\n"
+"help.text"
+msgid "<variable id=\"onthestandardbar\">On <emph>Standard</emph> bar, click</variable>"
+msgstr "<variable id=\"onthestandardbar\">V vrstici <emph>Standardno</emph> kliknite</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148663\n"
+"help.text"
+msgid "<image id=\"img_id3150543\" src=\"cmd/sc_sortup.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150543\">Icon Sort Ascending</alt></image>"
+msgstr "<image id=\"img_id3150543\" src=\"cmd/sc_sortup.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150543\">Ikona Razvrsti naraščajoče</alt></image>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "Sort Ascending"
+msgstr "Razvrsti naraščajoče"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153969\n"
+"help.text"
+msgid "<image id=\"img_id3125863\" src=\"cmd/sc_sortdown.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3125863\">Icon Sort Descending</alt></image>"
+msgstr "<image id=\"img_id3125863\" src=\"cmd/sc_sortdown.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3125863\">Ikona Razvrsti padajoče</alt></image>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145364\n"
+"help.text"
+msgid "Sort Descending"
+msgstr "Razvrsti padajoče"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146984\n"
+"help.text"
+msgid "<variable id=\"dnstot\">Choose <emph>Data - Sort - Options</emph> tab.</variable>"
+msgstr "<variable id=\"dnstot\">Izberite <emph>Podatki – Razvrsti</emph>, nato zavihek <emph>Možnosti</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155308\n"
+"help.text"
+msgid "<variable id=\"dnftr\">Choose <emph>Data - More Filters</emph>.</variable>"
+msgstr "<variable id=\"dnftr\">Izberite <emph>Podatki – Več filtrov</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148646\n"
+"help.text"
+msgid "Choose <emph>Data - AutoFilter</emph>."
+msgstr "Izberite <emph>Podatki – Samodejni filter</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3151113\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar or <emph>Table Data</emph> bar, click"
+msgstr "Odprite orodno vrstico <emph>Orodja</emph> ali <emph>Podatki tabele</emph> in kliknite"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145799\n"
+"help.text"
+msgid "<image id=\"img_id3149413\" src=\"cmd/sc_datafilterautofilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149413\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149413\" src=\"cmd/sc_datafilterautofilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149413\">Ikona</alt></image>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3149401\n"
+"help.text"
+msgid "AutoFilter"
+msgstr "Samodejni filter"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3156278\n"
+"help.text"
+msgid "<variable id=\"dnfspz\">Choose <emph>Data - More Filters - Advanced Filter...</emph> .</variable>"
+msgstr "<variable id=\"dnfspz\">Izberite <emph>Podatki – Več filtrov – Napredni filter</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153764\n"
+"help.text"
+msgid "Choose <emph>Data - More Filters - Standard Filter... - Options</emph> label."
+msgstr "Izberite <emph>Podatki – Več filtrov – Standardni filter ... – oznaka Možnosti</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155444\n"
+"help.text"
+msgid "Choose <emph>Data - More Filters - Advanced Filter... - Options</emph> label."
+msgstr "Izberite <emph>Podatki – Več filtrov – Napredni filter ... – oznaka Možnosti</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3156382\n"
+"help.text"
+msgid "Choose <emph>Data - More Filters - Reset Filter</emph>."
+msgstr "Izberite <emph>Podatki – Več filtrov – Ponastavi filter</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155961\n"
+"help.text"
+msgid "On <emph>Table Data</emph> bar, click <emph>Reset Filter/Sort</emph>."
+msgstr "V vrstici <emph>Podatki tabele</emph> kliknite <emph>Ponastavi filter/razvrščanje</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148485\n"
+"help.text"
+msgid "<image id=\"img_id3145792\" src=\"cmd/sc_removefilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145792\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145792\" src=\"cmd/sc_removefilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145792\">Ikona</alt></image>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3149207\n"
+"help.text"
+msgid "Reset Filter/Sort"
+msgstr "Ponastavi filter/razvrščanje"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3152778\n"
+"help.text"
+msgid "<variable id=\"dnaftas\">Choose <emph>Data - More Filter - Hide AutoFilter</emph>.</variable>"
+msgstr "<variable id=\"dnaftas\">Izberite <emph>Podatki – Več filtrov – Skrij samodejni filter</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3166424\n"
+"help.text"
+msgid "<variable id=\"dntegs\">Choose <emph>Data - Subtotals</emph>.</variable>"
+msgstr "<variable id=\"dntegs\">Izberite <emph>Podatki – Delne vsote</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154574\n"
+"help.text"
+msgid "<variable id=\"dntezd\">Choose <emph>Data - Subtotals - 1st, 2nd, 3rd Group</emph> tabs.</variable>"
+msgstr "<variable id=\"dntezd\">Izberite <emph>Podatki – Delne vsote</emph>, nato zavihke <emph>1. skupina, 2. skupina, 3. skupina</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3151277\n"
+"help.text"
+msgid "<variable id=\"dntopi\">Choose <emph>Data - Subtotals - Options</emph> tab.</variable>"
+msgstr "<variable id=\"dntopi\">Izberite <emph>Podatki – Delne vsote</emph>, nato zavihek <emph>Možnosti</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145133\n"
+"help.text"
+msgid "<variable id=\"datengueltig\">Choose <emph>Data - Validity</emph>.</variable>"
+msgstr "<variable id=\"datengueltig\">Izberite <emph>Podatki – Veljavnost</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3152992\n"
+"help.text"
+msgid "<variable id=\"datengueltigwerte\">Menu <emph>Data - Validity - Criteria</emph> tab.</variable>"
+msgstr "<variable id=\"datengueltigwerte\">Meni <emph>Podatki – Veljavnost</emph>, nato zavihek <emph>Pogoji</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150367\n"
+"help.text"
+msgid "<variable id=\"datengueltigeingabe\">Choose <emph>Data - Validity - Input Help</emph> tab.</variable>"
+msgstr "<variable id=\"datengueltigeingabe\">Izberite <emph>Podatki – Veljavnost</emph>, nato zavihek <emph>Pomoč pri vnosu</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154486\n"
+"help.text"
+msgid "<variable id=\"datengueltigfehler\">Choose <emph>Data - Validity - Error Alert</emph> tab.</variable>"
+msgstr "<variable id=\"datengueltigfehler\">Izberite <emph>Podatki – Veljavnost</emph>, nato zavihek <emph>Opozorilo o napaki</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146978\n"
+"help.text"
+msgid "<variable id=\"dnmfo\">Choose <emph>Data - Multiple Operations</emph>.</variable>"
+msgstr "<variable id=\"dnmfo\">Izberite <emph>Podatki – Večkratne operacije</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155809\n"
+"help.text"
+msgid "<variable id=\"dnksd\">Choose <emph>Data - Consolidate</emph>.</variable>"
+msgstr "<variable id=\"dnksd\">Izberite <emph>Podatki – Uskladitev</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148701\n"
+"help.text"
+msgid "<variable id=\"dngld\">Choose <emph>Data - Group and Outline</emph>.</variable>"
+msgstr "<variable id=\"dngld\">Izberite <emph>Podatki – Združi in oriši</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153815\n"
+"help.text"
+msgid "<variable id=\"dngda\">Choose <emph>Data - Group and Outline - Hide Details</emph>.</variable>"
+msgstr "<variable id=\"dngda\">Izberite <emph>Podatki – Združi in oriši – Skrij podrobnosti</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3159223\n"
+"help.text"
+msgid "<variable id=\"dngde\">Choose <emph>Data - Group and Outline - Show Details</emph>.</variable>"
+msgstr "<variable id=\"dngde\">Izberite <emph>Podatki – Združi in oriši – Pokaži podrobnosti</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146870\n"
+"help.text"
+msgid "Choose <emph>Data - Group and Outline - Group</emph>."
+msgstr "Izberite <emph>Podatki – Združi in oriši – Združi</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3144507\n"
+"help.text"
+msgid "F12"
+msgstr "F12"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3144772\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar, click"
+msgstr "V vrstici <emph>Orodja</emph> kliknite"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3149438\n"
+"help.text"
+msgid "<image id=\"img_id3153287\" src=\"cmd/sc_group.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153287\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153287\" src=\"cmd/sc_group.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153287\">Ikona</alt></image>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150214\n"
+"help.text"
+msgid "Group"
+msgstr "Združi"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146781\n"
+"help.text"
+msgid "Choose <emph>Data - Group and Outline - Ungroup</emph>."
+msgstr "Izberite <emph>Podatki – Združi in oriši – Razdruži</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150892\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Tipka Cmd</caseinline><defaultinline>Krmilka</defaultinline></switchinline>+F12"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155097\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar, click"
+msgstr "V vrstici <emph>Orodja</emph> kliknite"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150048\n"
+"help.text"
+msgid "<image id=\"img_id3155914\" src=\"cmd/sc_ungroup.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155914\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155914\" src=\"cmd/sc_ungroup.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155914\">Ikona</alt></image>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153555\n"
+"help.text"
+msgid "Ungroup"
+msgstr "Razdruži"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153008\n"
+"help.text"
+msgid "<variable id=\"dnglagl\">Choose <emph>Data - Group and Outline - AutoOutline</emph>.</variable>"
+msgstr "<variable id=\"dnglagl\">Izberite <emph>Podatki – Združi in oriši – Samodejno oriši</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154709\n"
+"help.text"
+msgid "<variable id=\"dnglef\">Choose <emph>Data - Group and Outline - Remove Outline</emph>.</variable>"
+msgstr "<variable id=\"dnglef\">Izberite <emph>Podatki – Združi in oriši – Odstrani oris</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id1774346\n"
+"help.text"
+msgid "<variable id=\"dngdrill\">Choose <emph>Data - Group and Outline - Show Details</emph> (for some pivot tables).</variable>"
+msgstr "<variable id=\"dngdrill\">Izberite <emph>Podatki – Združi in oriši – Pokaži podrobnosti</emph> (za nekatere vrtilne tabele).</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155759\n"
+"help.text"
+msgid "<variable id=\"dndtpt\">Choose <emph>Data - Pivot Table</emph>.</variable>"
+msgstr "<variable id=\"dndtpt\">Izberite <emph>Podatki – Vrtilna tabela</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154625\n"
+"help.text"
+msgid "<variable id=\"dndpa\">Choose <emph>Insert - Pivot Table</emph>.</variable>"
+msgstr "<variable id=\"dndpa\">Izberite <emph>Vstavi – Vrtilna tabela</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3147558\n"
+"help.text"
+msgid "<variable id=\"dndq\">Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Data source registered in $[officename]</emph>.</variable>"
+msgstr "<variable id=\"dndq\">Izberite <emph>Vstavi – Vrtilna tabela</emph>, v pogovornem oknu <emph>Izberi vir</emph> izberite možnost <emph>Vir podatkov, registriran v $[officename]</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153297\n"
+"help.text"
+msgid "Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Current selection</emph>."
+msgstr "Izberite <emph>Vstavi – Vrtilna tabela</emph>, v pogovornem oknu <emph>Izberi vir</emph> izberite možnost <emph>Trenuten izbor</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145118\n"
+"help.text"
+msgid "Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Data source registered in $[officename]</emph>, click <emph>OK</emph> to see <emph>Select Data Source</emph> dialog."
+msgstr "Izberite <emph>Vstavi – Vrtilna tabela</emph>, v pogovornem oknu <emph>Izberi vir</emph> izberite možnost <emph>Vir podatkov, registriran v $[officename]</emph>, kliknite <emph>V redu</emph> in prikaže se pogovorno okno <emph>Izberi vir podatkov</emph>."
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153294\n"
+"help.text"
+msgid "<variable id=\"dndpak\">Choose <emph>Data - Pivot Table - Refresh</emph>.</variable>"
+msgstr "<variable id=\"dndpak\">Izberite <emph>Podatki – Vrtilna tabela – Osveži</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3151344\n"
+"help.text"
+msgid "<variable id=\"dndploe\">Choose <emph>Data - Pivot Table - Delete</emph>.</variable>"
+msgstr "<variable id=\"dndploe\">Izberite <emph>Podatki – Vrtilna tabela – Izbriši</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150397\n"
+"help.text"
+msgid "<variable id=\"dndakt\">Choose <emph>Data - Refresh Range</emph>.</variable>"
+msgstr "<variable id=\"dndakt\">Izberite <emph>Podatki – Osveži obseg</emph>.</variable>"
+
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_idN10B8F\n"
+"help.text"
+msgid "<variable id=\"grouping\">Choose <emph>Data - Group and Outline - Group</emph>.</variable>"
+msgstr "<variable id=\"grouping\">Izberite <emph>Podatki – Združi in oriši – Združi</emph>.</variable>"
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"tit\n"
+"help.text"
+msgid "Available since release"
+msgstr "Na voljo od izdaje"
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551701041690\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.3."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 3.3."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041690\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.4."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 3.4."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041635\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.5."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 3.5."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041636\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.6."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 3.6."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041640\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.0."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 4.0."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041641\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.1."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 4.1."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041642\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.2."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 4.2."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041643\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.3."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 4.3."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041644\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.4."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 4.4."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041650\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.0."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 5.0."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041651\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.1."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 5.1."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041652\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.2."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 5.2."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041653\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.3."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 5.3."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041654\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.4."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 5.4."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041660\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.0."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 6.0."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041661\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.1."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 6.1."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041662\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.2."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 6.2."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041663\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.3."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 6.3."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041664\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.4."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 6.4."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041665\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 7.0."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 7.0."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041666\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 7.1."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 7.1."
+
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041667\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 7.2."
+msgstr "Ta funkcija je na voljo od %PRODUCTNAME 7.2."
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sheet Menu"
+msgstr "Meni Delovni list"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"hd_id160220162108024368\n"
+"help.text"
+msgid "Sheet Menu"
+msgstr "Meni Delovni list"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162106567373\n"
+"help.text"
+msgid "<variable id=\"insert_rows_above\">Choose <emph>Sheet - Insert Rows - Rows Above</emph>.</variable>"
+msgstr "<variable id=\"insert_rows_above\">Izberite <emph>Delovni list – Vstavi vrstice – Vrstice nad</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162109048207\n"
+"help.text"
+msgid "<variable id=\"insert_rows_below\">Choose <emph>Sheet - Insert Rows - Rows Below</emph>.</variable>"
+msgstr "<variable id=\"insert_rows_below\">Izberite <emph>Delovni list – Vstavi vrstice – Vrstice pod</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162107055028\n"
+"help.text"
+msgid "<variable id=\"insert_columns_left\">Choose <emph>Sheet - Insert Columns - Columns Before</emph>.</variable>"
+msgstr "<variable id=\"insert_columns_left\">Izberite <emph>Delovni list – Vstavi stolpce – Stolpci pred</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162109126013\n"
+"help.text"
+msgid "<variable id=\"insert_columns_right\">Choose <emph>Sheet - Insert Columns - Columns After</emph>.</variable>"
+msgstr "<variable id=\"insert_columns_right\">Izberite <emph>Delovni list – Vstavi stolpce – Stolpci za</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3149095\n"
+"help.text"
+msgid "<variable id=\"insert_page_break\">Choose <emph>Sheet - Insert Page Break</emph>.</variable>"
+msgstr "<variable id=\"insert_page_break\">Izberite <emph>Delovni list – Vstavi prelom strani</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3149398\n"
+"help.text"
+msgid "<variable id=\"insert_page_break_row\">Choose <emph>Sheet - Insert Page Break - Row Break</emph>.</variable>"
+msgstr "<variable id=\"insert_page_break_row\">Izberite <emph>Delovni list – Vstavi prelom strani – Prelom vrstice</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3150084\n"
+"help.text"
+msgid "<variable id=\"insert_page_break_column\">Choose <emph>Sheet - Insert Page Break - Column Break</emph>.</variable>"
+msgstr "<variable id=\"insert_page_break_column\">Izberite <emph>Delovni list – Vstavi prelom strani – Prelom stolpca</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3153093\n"
+"help.text"
+msgid "<variable id=\"delete_page_break\">Choose <emph>Sheet - Delete Page Break</emph>.</variable>"
+msgstr "<variable id=\"delete_page_break\">Izberite <emph>Delovni list – Izbriši prelom strani</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3153191\n"
+"help.text"
+msgid "<variable id=\"delete_page_break_row\">Choose <emph>Sheet - Delete Page Break - Row Break</emph>.</variable>"
+msgstr "<variable id=\"delete_page_break_row\">Izberite <emph>Delovni list – Izbriši prelom strani – Prelom vrstice</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3145645\n"
+"help.text"
+msgid "<variable id=\"delete_page_break_column\">Choose <emph>Sheet - Delete Page Break - Column Break</emph>.</variable>"
+msgstr "<variable id=\"delete_page_break_column\">Izberite <emph>Delovni list – Izbriši prelom strani – Prelom stolpca</emph>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id281631903136031\n"
+"help.text"
+msgid "<variable id=\"edit_comment\">Choose <menuitem>Sheet - Cell Comments - Edit Comment</menuitem></variable>"
+msgstr "<variable id=\"edit_comment\">Izberite <menuitem>Delovni list – Komentarji celice – Uredi komentar</menuitem>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id641631903140705\n"
+"help.text"
+msgid "<variable id=\"hide_comment\">Choose <menuitem>Sheet - Cell Comments - Hide Comment</menuitem></variable>"
+msgstr "<variable id=\"hide_comment\">Izberite <menuitem>Delovni list – Komentarji celice – Skrij komentar</menuitem>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id611631903144777\n"
+"help.text"
+msgid "<variable id=\"show_comment\">Choose <menuitem>Sheet - Cell Comments - Show Comment</menuitem></variable>"
+msgstr "<variable id=\"show_comment\">Izberite <menuitem>Delovni list – Komentarji celice – Pokaži komentar</menuitem>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id961631903149304\n"
+"help.text"
+msgid "<variable id=\"delete_comment\">Choose <menuitem>Sheet - Cell Comments - Delete Comment</menuitem></variable>"
+msgstr "<variable id=\"delete_comment\">Izberite <menuitem>Delovni list – Komentarji celice – Izbriši komentar</menuitem>.</variable>"
+
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id471631903160977\n"
+"help.text"
+msgid "<variable id=\"delete_all_comments\">Choose <menuitem>Sheet - Cell Comments - Delete All Comments</menuitem></variable>"
+msgstr "<variable id=\"delete_all_comments\">Izberite <menuitem>Delovni list – Komentarji celice – Izbriši vse komentarje</menuitem>.</variable>"

@@ -1,0 +1,2294 @@
+#. extracted from helpcontent2/source/text/simpress/04
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2021-11-14 09:36+0000\n"
+"Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_help-master/textsimpress04/tr/>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1520029957.000000\n"
+
+#. mYCYv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys for $[officename] Impress"
+msgstr "$[officename] Impress için Kısayol Tuşları"
+
+#. sHrEU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3150342\n"
+"help.text"
+msgid "<bookmark_value>shortcut keys; in presentations</bookmark_value><bookmark_value>presentations; shortcut keys</bookmark_value>"
+msgstr "<bookmark_value>kısayol tuşları; sunumlarda</bookmark_value><bookmark_value>sunumlar; kısayol tuşları</bookmark_value>"
+
+#. b9LNb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150342\n"
+"help.text"
+msgid "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\">Shortcut Keys for $[officename] Impress</link></variable>"
+msgstr "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\">$[officename] Impress için Kısayol Tuşları</link></variable>"
+
+#. zEQBA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145791\n"
+"help.text"
+msgid "The following is a list of shortcut keys for $[officename] Impress."
+msgstr "Aşağıdakiler $[officename] Impress için kısayol tuşlarının bir listesidir."
+
+#. Zzxcg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154658\n"
+"help.text"
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys</link> in $[officename]."
+msgstr "$[officename] uygulamasında <link href=\"text/shared/04/01010000.xhp\">genel kısayol tuşlarını da</link> kullanabilirsiniz."
+
+#. iVdKg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145386\n"
+"help.text"
+msgid "Function Keys for $[officename] Impress"
+msgstr "$[officename] Impress için Fonksiyon Tuşları"
+
+#. gBk2T
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151242\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#. DvWTw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148604\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efekt</emph>"
+
+#. SydBD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150214\n"
+"help.text"
+msgid "F2"
+msgstr "F2"
+
+#. NCmjE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154653\n"
+"help.text"
+msgid "Edit text."
+msgstr "Metni düzenle."
+
+#. DXA4a
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153811\n"
+"help.text"
+msgid "F3"
+msgstr "F3"
+
+#. Ua9a8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145116\n"
+"help.text"
+msgid "Enter Group."
+msgstr "Gruba Gir."
+
+#. ykphJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149052\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr ""
+
+#. gqgLd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147298\n"
+"help.text"
+msgid "Exit Group."
+msgstr "Gruptan Çık."
+
+#. fmKtU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3166468\n"
+"help.text"
+msgid "Shift+F3"
+msgstr "Shirt+F3"
+
+#. PAsf7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3157874\n"
+"help.text"
+msgid "Duplicate"
+msgstr "Eşini yarat"
+
+#. JEbZs
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149349\n"
+"help.text"
+msgid "F4"
+msgstr "F4"
+
+#. m3Ecz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150746\n"
+"help.text"
+msgid "Position and Size"
+msgstr "Konum ve Boyut"
+
+#. kxtEP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153036\n"
+"help.text"
+msgid "F5"
+msgstr "F5"
+
+#. BKBRu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153085\n"
+"help.text"
+msgid "View Slide Show."
+msgstr "Slayt gösterisini görüntüle."
+
+#. LtTDu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F5"
+msgstr ""
+
+#. cCpcB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN1078E\n"
+"help.text"
+msgid "Navigator"
+msgstr "Gezgin"
+
+#. MmFKa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150860\n"
+"help.text"
+msgid "F7"
+msgstr "F7"
+
+#. b9Ddk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154559\n"
+"help.text"
+msgid "Spelling"
+msgstr "İmla Denetimi"
+
+#. YoPUH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153004\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
+msgstr ""
+
+#. DPB8j
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147366\n"
+"help.text"
+msgid "Thesaurus"
+msgstr "Eşanlamlılar sözlüğü"
+
+#. AvAxy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155925\n"
+"help.text"
+msgid "F8"
+msgstr "F8"
+
+#. januy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149882\n"
+"help.text"
+msgid "Edit Points."
+msgstr "Noktaları Düzenle."
+
+#. 4MBAA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155439\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F8"
+msgstr ""
+
+#. u6nqu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148393\n"
+"help.text"
+msgid "Fit text to frame."
+msgstr "Metni çerçeveye uydur."
+
+#. CHtQM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155373\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+T</caseinline><defaultinline>F11</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+T</caseinline><defaultinline>F11</defaultinline></switchinline>"
+
+#. EKLBz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150470\n"
+"help.text"
+msgid "Styles"
+msgstr "Biçemler"
+
+#. kESvV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150962\n"
+"help.text"
+msgid "Shortcut Keys in Slide Shows"
+msgstr "Slayt Gösterisinde Kısayol Tuşları"
+
+#. BEFJo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147562\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#. NPkxB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151268\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efekt</emph>"
+
+#. WGd82
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154642\n"
+"help.text"
+msgid "Esc or -"
+msgstr ""
+
+#. n4adw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152934\n"
+"help.text"
+msgid "End presentation."
+msgstr "Son sunu."
+
+#. QzE6c
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153625\n"
+"help.text"
+msgid "Left click or Spacebar or Right arrow or Down arrow or Page Down or Enter or Return"
+msgstr ""
+
+#. 7hxGb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150262\n"
+"help.text"
+msgid "Play next effect (if any, else go to next slide)."
+msgstr "Bir sonraki efekti oynat (varsa, aksi halde sonraki slayta geç)."
+
+#. P9CXV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155848\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Down"
+
+#. E8DmS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149984\n"
+"help.text"
+msgid "Go to next slide without playing effects."
+msgstr "Efekti oynatmadan sonraki slayta geç."
+
+#. sVfoK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149290\n"
+"help.text"
+msgid "[number] + Enter"
+msgstr "[numara] + Enter"
+
+#. 9xoiR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149757\n"
+"help.text"
+msgid "Type a number of a slide and press Enter to go to the slide."
+msgstr "Slayta gitmek için bir slayt numarası yaz ve Enter'e bas."
+
+#. KNWDg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id7291787\n"
+"help.text"
+msgid "Right click or Left arrow or Up arrow or Page Up or Backspace"
+msgstr ""
+
+#. grY6a
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id945158\n"
+"help.text"
+msgid "Play previous effect again. If no previous effect exists on this slide, show previous slide."
+msgstr "Önceki efekti tekrar oynat. Eğer bu slaytta önceki efekt yoksa önceki slaydı göster."
+
+#. FiLQC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151172\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Seçenek</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Up"
+
+#. wo9Sq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153906\n"
+"help.text"
+msgid "Go to the previous slide without playing effects."
+msgstr "Efekti oynatmadan önceki slayta git."
+
+#. EsHgS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3158399\n"
+"help.text"
+msgid "Home"
+msgstr "Başlangıç"
+
+#. FtEV2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145412\n"
+"help.text"
+msgid "Jump to first slide in the slide show."
+msgstr "Slayt gösterisinde ilk slayta atla."
+
+#. 9zA2B
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154294\n"
+"help.text"
+msgid "End"
+msgstr "Son"
+
+#. 8ozKB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154258\n"
+"help.text"
+msgid "Jump to the last slide in the slide show."
+msgstr "Slayt gösterisinde son slayta atla."
+
+#. bMQBB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153580\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ Page Up"
+msgstr ""
+
+#. Lv4pq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150702\n"
+"help.text"
+msgid "Go to the previous slide."
+msgstr "Bir önceki slayta git."
+
+#. 6CkLx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152944\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ Page Down"
+msgstr ""
+
+#. 7m7d9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153690\n"
+"help.text"
+msgid "Go to the next slide."
+msgstr "Sonraki slayta git."
+
+#. xpSrD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149933\n"
+"help.text"
+msgid "B or ."
+msgstr "B veya ."
+
+#. h4hqX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154794\n"
+"help.text"
+msgid "Show black screen until next key or mouse wheel event."
+msgstr "Sonraki tuş veya fare  tekeri olayına kadar siyah ekran göster."
+
+#. k4KV2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153532\n"
+"help.text"
+msgid "W or ,"
+msgstr "W ya da ,"
+
+#. 3BbDy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150975\n"
+"help.text"
+msgid "Show white screen until next key or mouse wheel event."
+msgstr "Sonraki tuş veya fare tekeri olayına kadar beyaz ekran göster."
+
+#. CLAGZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154643\n"
+"help.text"
+msgid "P"
+msgstr ""
+
+#. B6AXE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152935\n"
+"help.text"
+msgid "Use mouse pointer as pen"
+msgstr ""
+
+#. rd5zq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154644\n"
+"help.text"
+msgid "E"
+msgstr ""
+
+#. DErwC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152936\n"
+"help.text"
+msgid "Erase all ink on slide"
+msgstr ""
+
+#. tV4qF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154652\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+msgstr ""
+
+#. XrKhx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152944\n"
+"help.text"
+msgid "Turn off pointer as pen mode"
+msgstr ""
+
+#. Hd6Y9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151313\n"
+"help.text"
+msgid "Shortcut Keys in the Normal View"
+msgstr "Normal Görünümde Kısayol Tuşları"
+
+#. CSTQF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150994\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#. 6KhZD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152960\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efekt</emph>"
+
+#. dqJDw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154472\n"
+"help.text"
+msgid "Plus(+) Key"
+msgstr "Artı (+) Tuşu"
+
+#. LWuid
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146125\n"
+"help.text"
+msgid "Zoom in."
+msgstr "Yakınlaştır."
+
+#. FqyBC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147526\n"
+"help.text"
+msgid "Minus(-) Key"
+msgstr "Eksi (-) Tuşu"
+
+#. EWbuD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154570\n"
+"help.text"
+msgid "Zoom out."
+msgstr "Uzaklaştır."
+
+#. kH9vC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153670\n"
+"help.text"
+msgid "Times(×) Key (number pad)"
+msgstr "Çarpma (x) Tuşu (numara takımı)"
+
+#. EABy7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150831\n"
+"help.text"
+msgid "Fit page in window."
+msgstr "Sayfayı pencereye uydur."
+
+#. EEKfz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148406\n"
+"help.text"
+msgid "Divide(÷) Key (number pad)"
+msgstr "Bölme (÷) Tuşu (numara takımı)"
+
+#. xuBQC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155902\n"
+"help.text"
+msgid "Zoom in on current selection."
+msgstr "Geçerli seçimi yakınlaştır."
+
+#. EExNC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154195\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+G"
+msgstr ""
+
+#. AUADM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151284\n"
+"help.text"
+msgid "Group selected objects."
+msgstr "Seçilen nesneleri grupla."
+
+#. dVb4N
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154127\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+A"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+A"
+
+#. eyxYp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151325\n"
+"help.text"
+msgid "Ungroup selected group."
+msgstr "Seçilen grupları çöz."
+
+#. DuC5s
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149309\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ click"
+msgstr ""
+
+#. KQA4e
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148996\n"
+"help.text"
+msgid "Enter a group, so that you can edit the individual objects of the group. Click outside the group to return to the normal view."
+msgstr "Bir grup girin ki grubun nesnelerini tek tek düzenleyebilesiniz. Normal görünüme dönmek için grubun dışında tıklayın."
+
+#. zYujp
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149485\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+K"
+msgstr ""
+
+#. GJwjM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151253\n"
+"help.text"
+msgid "Combine selected objects."
+msgstr "Seçilen nesneleri birleştir."
+
+#. iBe6x
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149104\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+K"
+msgstr ""
+
+#. Dwtqd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154834\n"
+"help.text"
+msgid "Split selected object. This combination only works on an object that was created by combining two or more objects."
+msgstr "Seçilen nesneyi ayır. Bu bileşim sadece iki veya daha fazla nesne birleştirilerek oluşturulan bir nesne üzerinde çalışmaktadır."
+
+#. 7ECpE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149784\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ Plus key"
+msgstr ""
+
+#. d2xxG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147088\n"
+"help.text"
+msgid "Bring to Front."
+msgstr "En Öne Getir."
+
+#. DiGJb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148972\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ Plus key"
+msgstr ""
+
+#. BxpBJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154900\n"
+"help.text"
+msgid "Bring Forward."
+msgstr "Bir öne getir."
+
+#. LWF3a
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149040\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ Minus key"
+msgstr ""
+
+#. t2wEB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147580\n"
+"help.text"
+msgid "Send Backward."
+msgstr "Geriye doğru gönder."
+
+#. KoDgA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148742\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ Minus key"
+msgstr ""
+
+#. ZSCZ4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152775\n"
+"help.text"
+msgid "Send to Back."
+msgstr "Geriye gönder."
+
+#. Dtxot
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3156192\n"
+"help.text"
+msgid "Shortcut Keys when Editing Text"
+msgstr "Metin Düzenlerken Kısayol Tuşları"
+
+#. KEgG2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3147326\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#. SqH3Y
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3155137\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efekt</emph>"
+
+#. Gbfhf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3155432\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Ctrl</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Hyphen(-)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Ctrl</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tire(-)"
+
+#. pGLBU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3150712\n"
+"help.text"
+msgid "Soft hyphens; hyphenation set by you."
+msgstr "Yumuşak kısa çizgiler; sizin ayarladığınız hecelere ayırma."
+
+#. uuUzt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3150732\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+minus sign (-)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+eksi işareti (-)"
+
+#. jLghS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3148394\n"
+"help.text"
+msgid "Non-breaking hyphen (is not used for hyphenation)"
+msgstr "Bölünmez çizgi (hecelere ayırmak için kullanılmaz)"
+
+#. 5kU8S
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3147321\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Space"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Boşluk tuşu"
+
+#. MCaBF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3150260\n"
+"help.text"
+msgid "Non-breaking spaces. Non-breaking spaces are not used for hyphenation and are not expanded if the text is justified."
+msgstr "Bölünmez boşluklar. Bölünmez boşluklar hecelere ayırmak için kullanılmazlar ve metin iki yana hizalanmışsa genişletilmezler."
+
+#. RJCFu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3150281\n"
+"help.text"
+msgid "Shift+Enter"
+msgstr "Shift+Enter"
+
+#. L2Rhf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3150294\n"
+"help.text"
+msgid "Line break without paragraph change"
+msgstr "Paragraf değiştirmeden satır kesmesi"
+
+#. SF8At
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3153818\n"
+"help.text"
+msgid "Arrow Left"
+msgstr "Sol Ok"
+
+#. AYMcz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3153930\n"
+"help.text"
+msgid "Move cursor to left"
+msgstr "İmleci sola kaydır"
+
+#. iBBKk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3153949\n"
+"help.text"
+msgid "Shift+Arrow Left"
+msgstr "Shift+Sol Ok"
+
+#. J7HBq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3153963\n"
+"help.text"
+msgid "Move cursor with selection to the left"
+msgstr "İmleci seçimle birlikte sola kaydır"
+
+#. HRyuq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3148631\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Left"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Sol Ok"
+
+#. YJeGn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3148656\n"
+"help.text"
+msgid "Go to beginning of word"
+msgstr "Kelimenin başına git"
+
+#. 9d7Gg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3154244\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow Left"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Sol Ok"
+
+#. FbDZC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3154270\n"
+"help.text"
+msgid "Selecting to the left word by word"
+msgstr "Sola doğru kelime kelime seçmek"
+
+#. A42FF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3153147\n"
+"help.text"
+msgid "Arrow Right"
+msgstr "Sağ Ok"
+
+#. KCQoy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3153161\n"
+"help.text"
+msgid "Move cursor to right"
+msgstr "İmleci sağa kaydır"
+
+#. nCxMf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3153180\n"
+"help.text"
+msgid "Shift+Arrow Right"
+msgstr "Shift+Sağ Ok"
+
+#. uJXNQ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3154048\n"
+"help.text"
+msgid "Move cursor with selection to the right"
+msgstr "İmleci seçimle birlikte sağa kaydır"
+
+#. hCGZ2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3154067\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Right"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Sağ Ok"
+
+#. U3LCj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3154093\n"
+"help.text"
+msgid "Go to start of next word"
+msgstr "Bir sonraki kelimenin başlangıcına git"
+
+#. FCBSx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3155272\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow Right"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Sağ Ok"
+
+#. 8AmET
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3155298\n"
+"help.text"
+msgid "Selecting to the right word by word"
+msgstr "Sağa doğru kelime kelime seçmek"
+
+#. pTFpP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3154718\n"
+"help.text"
+msgid "Arrow Up"
+msgstr "Yukarı Ok"
+
+#. NgGUH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3154731\n"
+"help.text"
+msgid "Move cursor up one line"
+msgstr "İmleci bir satır yukarı taşı"
+
+#. Ad9Pa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3154750\n"
+"help.text"
+msgid "Shift+Arrow Up"
+msgstr "Shift+Yukarı Ok"
+
+#. DVCG7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3153199\n"
+"help.text"
+msgid "Selecting lines in an upwards direction"
+msgstr "Satırları yukarı doğru seçmek"
+
+#. wu2Wi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii6452528\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Yukarı Ok"
+
+#. PqXLi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii1764275\n"
+"help.text"
+msgid "Move cursor to beginning of the previous paragraph"
+msgstr "İmleci bir önceki paragrafın başlangıcına taşımak"
+
+#. cgEWF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3153218\n"
+"help.text"
+msgid "Arrow Down"
+msgstr "Aşağı Ok"
+
+#. bQwvv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3153232\n"
+"help.text"
+msgid "Move cursor down one line"
+msgstr "İmleci bir alt satıra taşı"
+
+#. NKS62
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3153317\n"
+"help.text"
+msgid "Shift+Arrow Down"
+msgstr "Shift+Aşağı Ok"
+
+#. GCin3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3153331\n"
+"help.text"
+msgid "Selecting lines in a downward direction"
+msgstr "Satırları aşağı doğru seçmek"
+
+#. FjuCD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii578936\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Arrow Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Aşağı Ok"
+
+#. QkbRF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii6164433\n"
+"help.text"
+msgid "Move cursor to end of paragraph. Next keystroke move cursor to end of next paragraph"
+msgstr "İmleci paragrafın sonuna taşı. Bir sonraki tuş vuruşu imleci sıradaki paragrafın sonuna taşır."
+
+#. aAdnT
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3153351\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Left</caseinline><defaultinline>Home</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Left</caseinline><defaultinline>Home</defaultinline></switchinline>"
+
+#. tAogg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3154512\n"
+"help.text"
+msgid "Go to beginning of line"
+msgstr "Satırın başlangıcına git"
+
+#. LiJRC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3154531\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Shift+Arrow Left</caseinline><defaultinline>Shift+Home</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Shift+Sol Ok</caseinline><defaultinline>Shift+Home</defaultinline></switchinline>"
+
+#. b6sfV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3154544\n"
+"help.text"
+msgid "Go and select to the beginning of a line"
+msgstr "Satırın başlangıcına git ve seç"
+
+#. iE87b
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3150972\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Right</caseinline><defaultinline>End</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Sağ Ok</caseinline><defaultinline>End</defaultinline></switchinline>"
+
+#. eAD8p
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3150986\n"
+"help.text"
+msgid "Go to end of line"
+msgstr "Satırın sonuna git"
+
+#. fa7Em
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3151005\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Shift+Arrow Right</caseinline><defaultinline>Shift+End</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Shift+Sağ Ok</caseinline><defaultinline>Shift+End</defaultinline></switchinline>"
+
+#. ABpAb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3151019\n"
+"help.text"
+msgid "Go and select to end of line"
+msgstr "Satırın sonuna git ve seç"
+
+#. wEBa3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3149371\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Up</caseinline><defaultinline>Ctrl+Home</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Yukarı Ok</caseinline><defaultinline>Ctrl+Home</defaultinline></switchinline>"
+
+#. 8fhET
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3149396\n"
+"help.text"
+msgid "Go to start of text block in slide"
+msgstr "Slayttaki metin bloğunun başlangıcına git"
+
+#. AgD4a
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3151075\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Down</caseinline><defaultinline>Ctrl+End</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Aşağı Ok</caseinline><defaultinline>Ctrl+End</defaultinline></switchinline>"
+
+#. BWhN2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3149732\n"
+"help.text"
+msgid "Go to end of text block in slide"
+msgstr "Slayttaki metin bloğunun sonuna git"
+
+#. uVkW5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3148448\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Fn+Backspace</caseinline><defaultinline>Ctrl+Del</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Fn+Backspace</caseinline><defaultinline>Ctrl+Del</defaultinline></switchinline>"
+
+#. H4Rqg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3148474\n"
+"help.text"
+msgid "Delete text to end of word"
+msgstr "Kelimenin sonuna kadar metni sil"
+
+#. EgLtR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3151080\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Backspace"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Backspace"
+
+#. KbGnF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3151106\n"
+"help.text"
+msgid "Delete text to beginning of word"
+msgstr "Kelimenin başlangıcına kadar metni sil"
+
+#. dBGp4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii9959715\n"
+"help.text"
+msgid "In a list: delete an empty paragraph in front of the current paragraph"
+msgstr "Listede: mevcut paragrafın önündeki boş paragrafı sil"
+
+#. v29QH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3151124\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Fn</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Del"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Fn</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Del"
+
+#. bcZb5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3146919\n"
+"help.text"
+msgid "Delete text to end of sentence"
+msgstr "Cümlenin sonuna kadar metni sil"
+
+#. AiUze
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3146937\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Backspace"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Backspace"
+
+#. xMBDV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3153532\n"
+"help.text"
+msgid "Delete text to beginning of sentence"
+msgstr "Cümlenin başlangıcına kadar metni sil"
+
+#. KR7Dv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156192\n"
+"help.text"
+msgid "Shortcut Keys in $[officename] Impress"
+msgstr "$[officename] Impress için Kısayol Tuşları"
+
+#. MaLzD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147326\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#. PV8mW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155137\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efekt</emph>"
+
+#. YgRiu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153520\n"
+"help.text"
+msgid "Arrow key"
+msgstr "Ok tuşu"
+
+#. 9bGue
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147077\n"
+"help.text"
+msgid "Moves the selected object or the page view in the direction of the arrow."
+msgstr "Seçilen nesne veya sayfa görünümünü ok yönünde taşır."
+
+#. aS7Ae
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154384\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ Arrow Key"
+msgstr ""
+
+#. m9FiD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153279\n"
+"help.text"
+msgid "Move around in the page view."
+msgstr "Sayfa görünümü etrafında hareket ettirin."
+
+#. pwcBu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153354\n"
+"help.text"
+msgid "Shift + drag"
+msgstr "Shift + sürükle"
+
+#. csfEE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148650\n"
+"help.text"
+msgid "Constrains the movement of the selected object horizontally or vertically."
+msgstr "Seçilen nesnenin yatay veya dikey hareketlerini kısıtlar."
+
+#. qvf62
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154117\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ drag (with <link href=\"text/shared/optionen/01070500.xhp\">Copy when moving</link> option active)"
+msgstr ""
+
+#. Bwos6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150584\n"
+"help.text"
+msgid "Hold down <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> and drag an object to create a copy of the object."
+msgstr ""
+
+#. GEDhM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151304\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> Key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> Tuşu"
+
+#. mPqf2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156274\n"
+"help.text"
+msgid "Hold down <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> to draw or resize objects by dragging from the center of the object outward."
+msgstr "Nesneyi merkezden dışa doğru sürükleyerek çizmek veya yeniden boyutlandırmak için <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> tuşlarına basılı tutun."
+
+#. QNnLc
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147314\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> key+click"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>tuşu+tıkla"
+
+#. EwFvy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155122\n"
+"help.text"
+msgid "Select the object behind the currently selected object."
+msgstr "Halen seçili olan nesnenin arkasındaki nesneyi seç."
+
+#. CJqEo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149008\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+click"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+tıkla"
+
+#. CZHWi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156368\n"
+"help.text"
+msgid "Select the object in front of the currently selected object."
+msgstr "Halen seçili olan nesnenin önündeki nesneyi seç."
+
+#. 3mPFA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148879\n"
+"help.text"
+msgid "Shift+click"
+msgstr "Shift+tıkla"
+
+#. P8nhR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155908\n"
+"help.text"
+msgid "Select adjacent items or a text passage. Click at the start of a selection, move to the end of the selection, and then hold down Shift while you click."
+msgstr "Komşu ögeleri veya bir metin parçasını seçin. Seçimin başında tıklayın, seçimin sonuna hareket edin ve tıklarken Shift'i basılı tutun."
+
+#. EL4xV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149543\n"
+"help.text"
+msgid "Shift+drag (when resizing)"
+msgstr "Shift+sürükle (yeniden boyutlandırırken)"
+
+#. sQkaa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150689\n"
+"help.text"
+msgid "Hold down Shift while dragging to resize an object to maintain the proportions of the object."
+msgstr "Oranlarını koruyarak nesneyi yeniden boyutlandırmak için sürüklerken Shift tuşunu basılı tutun."
+
+#. cdzwa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150115\n"
+"help.text"
+msgid "Tab key"
+msgstr "Tab tuşu"
+
+#. VQpdu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155858\n"
+"help.text"
+msgid "Select objects in the order in which they were created."
+msgstr "Nesneleri oluşturulma sırasına göre seçin."
+
+#. 4ttnU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147475\n"
+"help.text"
+msgid "Shift+Tab"
+msgstr "Shift+Tab"
+
+#. FyVb4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153695\n"
+"help.text"
+msgid "Select objects in the reverse order in which they were created."
+msgstr "Nesneleri oluşturuldukları sıranın tersine seçin"
+
+#. PrAzG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147496\n"
+"help.text"
+msgid "Escape"
+msgstr "Vazgeç"
+
+#. MZDz7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146141\n"
+"help.text"
+msgid "Exit current mode."
+msgstr "Geçerli kipten çık."
+
+#. XRhoV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147615\n"
+"help.text"
+msgid "Enter"
+msgstr "Giriş"
+
+#. 84uvS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145119\n"
+"help.text"
+msgid "Activate a placeholder object in a new presentation (only if the frame is selected)."
+msgstr "Bir sunumdaki bir yer tutucu nesneyi etkinleştirir (sadece çerçeve seçilmişse)."
+
+#. BPZ6G
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145258\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+msgstr ""
+
+#. ToHSt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149563\n"
+"help.text"
+msgid "Moves to the next text object on the slide."
+msgstr "Slayttaki sonraki metin nesnesine taşır."
+
+#. XD2P9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146910\n"
+"help.text"
+msgid "If there are no text objects on the slide, or if you reached the last text object, a new slide is inserted after the current slide. The new slide uses the same layout as the current slide."
+msgstr "Eğer slaytta metin nesnesi yoksa veya son metin nesnesindeyseniz yeni bir slayt geçerli slayttan sonra eklenir. Yeni slayt geçerli slayt ile aynı düzeni kullanır."
+
+#. qBDGe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id4478286\n"
+"help.text"
+msgid "PageUp"
+msgstr "PageUp"
+
+#. dGPrv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id2616351\n"
+"help.text"
+msgid "Switch to the previous slide. No function on the first slide."
+msgstr "Önceki slayta geç. İlk slaytta çalışmaz."
+
+#. 2Mf5K
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id950956\n"
+"help.text"
+msgid "PageDown"
+msgstr "PageDown"
+
+#. DZRDT
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id4433423\n"
+"help.text"
+msgid "Switch to the next slide. No function on the last slide."
+msgstr "Sonraki slaytı aç. Son slayt üzerinde işlev yok."
+
+#. mUJoM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149138\n"
+"help.text"
+msgid "Navigating with the Keyboard in Slide Sorter and Slide Pane"
+msgstr ""
+
+#. 8SbTN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN110AA\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#. HxZKZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN110B0\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "<emph>Efekt</emph>"
+
+#. eqqG2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153254\n"
+"help.text"
+msgid "Home/End"
+msgstr "Home/End"
+
+#. YRAaf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153268\n"
+"help.text"
+msgid "Set the focus to the first/last slide."
+msgstr "Odaklanmayı ilk/son slayta ayarla."
+
+#. 6e3jn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154811\n"
+"help.text"
+msgid "Left/Right arrow keys or Page Up/Down"
+msgstr "Sol/Sağ ok tuşları ya da Sayfa Yukarı/Aşağı"
+
+#. TFbpU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145073\n"
+"help.text"
+msgid "Set the focus to the next/previous slide."
+msgstr "Odaklanmayı sonraki/önceki slayta ayarla."
+
+#. ECYGC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii7405011\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+PageDown"
+msgstr ""
+
+#. bG9BL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3729361\n"
+"help.text"
+msgid "Move selected slides down one position in Slide Sorter list. If you select multiple slides, they are moved together with the last selected slide in the list."
+msgstr ""
+
+#. LiNpn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii778527\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+PageUp"
+msgstr ""
+
+#. hDxiV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii1797235\n"
+"help.text"
+msgid "Move selected slides up one position.  If you select multiple slides, they are moved together with the first selected slide in the list."
+msgstr ""
+
+#. XsxyN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3149750\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+End"
+msgstr ""
+
+#. G8FUJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3151055\n"
+"help.text"
+msgid "Move selected slides to end of Slide Sorter list."
+msgstr ""
+
+#. 2zmmN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_ii3151030\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+Home"
+msgstr ""
+
+#. GkZA4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_ii3156825\n"
+"help.text"
+msgid "Move selected slides to start of Slide Sorter list."
+msgstr ""
+
+#. 9dpmN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145086\n"
+"help.text"
+msgid "Enter"
+msgstr "Giriş"
+
+#. LmXqV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3157548\n"
+"help.text"
+msgid "Change to Normal Mode with the active slide when in <emph>Slide Sorter</emph>.  Add a new slide when in <emph>Slide Pane</emph>."
+msgstr ""
+
+#. uKr5Q
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"tit\n"
+"help.text"
+msgid "Presenter Console Keyboard Shortcuts"
+msgstr "Sunum Paneli Klavye Kısayolları"
+
+#. 7nDJu
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"bm_id0921200912285678\n"
+"help.text"
+msgid "<bookmark_value>Presenter Console shortcuts</bookmark_value>"
+msgstr "<bookmark_value>Sunum Paneli Kısayolları</bookmark_value>"
+
+#. wYw58
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id0921201912165661\n"
+"help.text"
+msgid "Presenter Console Keyboard Shortcuts"
+msgstr "Sunum Paneli Klavye Kısayolları"
+
+#. 7Qknz
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921201912165656\n"
+"help.text"
+msgid "When running a slide show using the Presenter Console, you can use the following keys:"
+msgstr "Sunum Paneli ile bir slayt gösterisi yaparken şunları kullanabilirsiniz:"
+
+#. upQFL
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104028\n"
+"help.text"
+msgid "Action"
+msgstr "Eylem"
+
+#. X5p3v
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104093\n"
+"help.text"
+msgid "Key or Keys"
+msgstr "Tuş veya Tuşlar"
+
+#. Xx8Mt
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110418\n"
+"help.text"
+msgid "Next slide, or next effect"
+msgstr "Sonraki slayt ya da sonraki efekt"
+
+#. QxAjW
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104120\n"
+"help.text"
+msgid "Left click, right arrow, down arrow, spacebar, page down, enter, return"
+msgstr ""
+
+#. xVgqH
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104165\n"
+"help.text"
+msgid "Previous slide, or previous effect"
+msgstr "Önceki slayt ya da önceki efekt"
+
+#. vCcu4
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104115\n"
+"help.text"
+msgid "Right click, left arrow, up arrow, page up, backspace"
+msgstr ""
+
+#. EBm7C
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154643\n"
+"help.text"
+msgid "Use mouse pointer as pen"
+msgstr ""
+
+#. k6PJG
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152935\n"
+"help.text"
+msgid "'P'"
+msgstr ""
+
+#. dm9Mg
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154644\n"
+"help.text"
+msgid "Erase all ink on slide"
+msgstr ""
+
+#. X3mGG
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152936\n"
+"help.text"
+msgid "'E'"
+msgstr ""
+
+#. aTM8W
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104164\n"
+"help.text"
+msgid "First slide"
+msgstr "İlk slayt"
+
+#. HgTEt
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104148\n"
+"help.text"
+msgid "Home"
+msgstr "Başlangıç"
+
+#. GDsA9
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104221\n"
+"help.text"
+msgid "Last slide"
+msgstr "Son slayt"
+
+#. QtJ7s
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104277\n"
+"help.text"
+msgid "End"
+msgstr "Son"
+
+#. kGgCp
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104279\n"
+"help.text"
+msgid "Previous slide without effects"
+msgstr "Efektsiz önceki slayt"
+
+#. nDMaU
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110423\n"
+"help.text"
+msgid "Alt+Page Up"
+msgstr "Alt+Page Up"
+
+#. KiqUv
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110427\n"
+"help.text"
+msgid "Next slide without effects"
+msgstr "Efektsiz sonraki slayt"
+
+#. HzR2y
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104261\n"
+"help.text"
+msgid "Alt+Page Down"
+msgstr "Alt+Page Down"
+
+#. GHkCz
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104383\n"
+"help.text"
+msgid "Black/Unblack the screen"
+msgstr "Ekranı Karart/Karatma"
+
+#. pSuCv
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110431\n"
+"help.text"
+msgid "'B', '.'"
+msgstr "'B', '.'"
+
+#. DqXrk
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104311\n"
+"help.text"
+msgid "White/Unwhite the screen"
+msgstr "Ekranı Beyazlat/Beyazlatma"
+
+#. AvKhN
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104359\n"
+"help.text"
+msgid "'W', ','"
+msgstr "'W', ','"
+
+#. WNxZu
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104336\n"
+"help.text"
+msgid "End slide show"
+msgstr "Slayt gösterisini sonlandır"
+
+#. LjERt
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104419\n"
+"help.text"
+msgid "Esc, '-'"
+msgstr "Esc, '-'"
+
+#. avmEH
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104460\n"
+"help.text"
+msgid "Go to slide number"
+msgstr "Slayt numarasına git"
+
+#. dJDFn
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110440\n"
+"help.text"
+msgid "Number followed by Enter"
+msgstr "Sıradaki sayı için Enter"
+
+#. cp4q9
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104427\n"
+"help.text"
+msgid "Grow/Shrink size of notes font"
+msgstr "Not yazı tipi boyutunu küçült/büyüt"
+
+#. BNmzk
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104442\n"
+"help.text"
+msgid "'G', 'S'"
+msgstr "'G', 'S'"
+
+#. DcGFR
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104473\n"
+"help.text"
+msgid "Scroll notes up/down"
+msgstr "Notları aşağı/yukarı kaydır"
+
+#. UtJo5
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110459\n"
+"help.text"
+msgid "'A', 'Z'"
+msgstr "'A', 'Z'"
+
+#. 2k9f7
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110456\n"
+"help.text"
+msgid "Move caret in notes view backward/forward"
+msgstr "Şapka işaretini notlar içinde ileri/geri taşı"
+
+#. paqeH
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id092120090110457\n"
+"help.text"
+msgid "'H', 'L'"
+msgstr "'H', 'L'"
+
+#. GCG6r
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104566\n"
+"help.text"
+msgid "Show the Presenter Console"
+msgstr "Sunum Panelini Göster"
+
+#. Rb4AZ
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104544\n"
+"help.text"
+msgid "Ctrl-'1'"
+msgstr "Ctrl-'1'"
+
+#. GCS4u
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104535\n"
+"help.text"
+msgid "Show the Presentation Notes"
+msgstr "Sunum Notlarını Göster"
+
+#. QTGFH
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104680\n"
+"help.text"
+msgid "Ctrl-'2'"
+msgstr "Ctrl-'2'"
+
+#. Y6DcP
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104634\n"
+"help.text"
+msgid "Show the Slides Overview"
+msgstr "Slaytların Genel Görüntüsünü Göster"
+
+#. sxEj2
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id0921200901104632\n"
+"help.text"
+msgid "Ctrl-'3'"
+msgstr "Ctrl-'3'"
+
+#. JEaUD
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154651\n"
+"help.text"
+msgid "Switch Monitors"
+msgstr ""
+
+#. zVJEs
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152943\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'4'"
+msgstr ""
+
+#. eJrqE
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154652\n"
+"help.text"
+msgid "Turn off pointer as pen mode"
+msgstr ""
+
+#. yxpoN
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152944\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'A'"
+msgstr ""

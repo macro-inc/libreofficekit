@@ -1,0 +1,350 @@
+#. extracted from shell/source/win32/shlxthandler/res
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2023-01-09 03:15+0000\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
+"Language-Team: Kazakh <https://translations.documentfoundation.org/projects/libo_ui-master/shellsourcewin32shlxthandlerres/kk/>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1390026530.000000\n"
+
+#. nMHZG
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE%\n"
+"LngText.text"
+msgid "Title"
+msgstr "Атауы"
+
+#. 7QBxh
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE_COLON%\n"
+"LngText.text"
+msgid "Title:"
+msgstr "Атауы:"
+
+#. UGL46
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT%\n"
+"LngText.text"
+msgid "Subject"
+msgstr "Тақырып"
+
+#. Rqom8
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT_COLON%\n"
+"LngText.text"
+msgid "Subject:"
+msgstr "Тақырып:"
+
+#. BbVSy
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR%\n"
+"LngText.text"
+msgid "Author"
+msgstr "Автор"
+
+#. 6eSDz
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR_COLON%\n"
+"LngText.text"
+msgid "Author:"
+msgstr "Автор:"
+
+#. nA6Zp
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS%\n"
+"LngText.text"
+msgid "Keywords"
+msgstr "Кілттік сөздер"
+
+#. hJatc
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS_COLON%\n"
+"LngText.text"
+msgid "Keywords:"
+msgstr "Кілттік сөздері:"
+
+#. NyeBb
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS%\n"
+"LngText.text"
+msgid "Comments"
+msgstr "Түсіндірмелер"
+
+#. tN79v
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS_COLON%\n"
+"LngText.text"
+msgid "Comments:"
+msgstr "Түсіндірмелер:"
+
+#. C7AUH
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PAGES%\n"
+"LngText.text"
+msgid "Pages"
+msgstr "Беттер"
+
+#. vhAWA
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TABLES%\n"
+"LngText.text"
+msgid "Tables"
+msgstr "Кестелер"
+
+#. VNMuj
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%GRAPHICS%\n"
+"LngText.text"
+msgid "Images"
+msgstr "Суреттер"
+
+#. WePDJ
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OBJECTS%\n"
+"LngText.text"
+msgid "Objects"
+msgstr "Объекттер"
+
+#. CXU2C
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OLE_OBJECTS%\n"
+"LngText.text"
+msgid "OLE Objects"
+msgstr "OLE объекттері"
+
+#. zATfj
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PARAGRAPHS%\n"
+"LngText.text"
+msgid "Paragraphs"
+msgstr "Абзацтар"
+
+#. S4c4V
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%WORDS%\n"
+"LngText.text"
+msgid "Words"
+msgstr "Сөздер"
+
+#. D4Ywc
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CHARACTERS%\n"
+"LngText.text"
+msgid "Characters"
+msgstr "Таңбалар"
+
+#. 8LRV5
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ROWS%\n"
+"LngText.text"
+msgid "Lines"
+msgstr "Жол(дар)"
+
+#. UhaXY
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ORIGIN%\n"
+"LngText.text"
+msgid "Origin"
+msgstr "Қайнар көзі"
+
+#. eEVzH
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%VERSION%\n"
+"LngText.text"
+msgid "Version"
+msgstr "Нұсқасы"
+
+#. CGpUh
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SHEETS%\n"
+"LngText.text"
+msgid "Sheets"
+msgstr "Парақтар"
+
+#. 2okgs
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CELLS%\n"
+"LngText.text"
+msgid "Cells"
+msgstr "Ұяшықтар"
+
+#. rgN97
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%STATISTICS_TITLE%\n"
+"LngText.text"
+msgid "Document Statistics"
+msgstr "Құжат статистикасы"
+
+#. VsBfC
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUMMARY_TITLE%\n"
+"LngText.text"
+msgid "Summary"
+msgstr "Қорытындылар"
+
+#. MiuQD
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY%\n"
+"LngText.text"
+msgid "Property"
+msgstr "Қасиеті"
+
+#. mGZKg
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY_VALUE%\n"
+"LngText.text"
+msgid "Value"
+msgstr "Мәні"
+
+#. TCEEW
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED%\n"
+"LngText.text"
+msgid "Modified"
+msgstr "Өзгертілген"
+
+#. YYD9t
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED_COLON%\n"
+"LngText.text"
+msgid "Modified:"
+msgstr "Өзгертілген:"
+
+#. vBE2F
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER%\n"
+"LngText.text"
+msgid "Revision number"
+msgstr "Нұсқасы"
+
+#. FXXNk
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER_COLON%\n"
+"LngText.text"
+msgid "Revision number:"
+msgstr "Нұсқасы:"
+
+#. HdSaz
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME%\n"
+"LngText.text"
+msgid "Total editing time"
+msgstr "Түзетудің қосынды уақыты"
+
+#. snZkq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME_COLON%\n"
+"LngText.text"
+msgid "Total editing time:"
+msgstr "Түзетудің қосынды уақыты:"
+
+#. AuQLP
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION%\n"
+"LngText.text"
+msgid "Description"
+msgstr "Сипаттамасы"
+
+#. WESrR
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION_COLON%\n"
+"LngText.text"
+msgid "Description:"
+msgstr "Сипаттамасы:"
+
+#. RWroq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SIZE_COLON%\n"
+"LngText.text"
+msgid "Size:"
+msgstr "Өлшемі:"
+
+#. 3GFSY
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TYPE_COLON%\n"
+"LngText.text"
+msgid "Type:"
+msgstr "Түрі:"

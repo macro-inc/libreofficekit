@@ -1,0 +1,672 @@
+#. extracted from connectivity/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-07-06 20:18+0200\n"
+"PO-Revision-Date: 2022-07-08 10:43+0000\n"
+"Last-Translator: Po-Yen Huang <jeff@mail.ossii.com.tw>\n"
+"Language-Team: Chinese (Traditional) <https://translations.documentfoundation.org/projects/libo_ui-master/connectivitymessages/zh_Hant/>\n"
+"Language: zh-TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1536074413.000000\n"
+
+#. 9KHB8
+#. = common strings
+#: connectivity/inc/strings.hrc:25
+msgctxt "STR_NO_CONNECTION_GIVEN"
+msgid "No connection to the database exists."
+msgstr "不存在與該資料庫的連線。"
+
+#. 72Mjc
+#: connectivity/inc/strings.hrc:26
+msgctxt "STR_WRONG_PARAM_INDEX"
+msgid "You tried to set a parameter at position “$pos$” but there is/are only “$count$” parameter(s) allowed. One reason may be that the property “ParameterNameSubstitution” is not set to TRUE in the data source."
+msgstr "您試圖在「$pos$」位置設定參數，但僅允許使用「$count$」個參數。原因可能是資料來源中的「ParameterNameSubstitution」並未設定為 TRUE。"
+
+#. 6FnrV
+#: connectivity/inc/strings.hrc:27
+msgctxt "STR_NO_INPUTSTREAM"
+msgid "The input stream was not set."
+msgstr "未設定輸入串流。"
+
+#. PtsET
+#: connectivity/inc/strings.hrc:28
+msgctxt "STR_NO_ELEMENT_NAME"
+msgid "There is no element named “$name$”."
+msgstr "沒有名為「$name$」的元素。"
+
+#. CWktu
+#: connectivity/inc/strings.hrc:29
+msgctxt "STR_INVALID_BOOKMARK"
+msgid "Invalid bookmark value"
+msgstr "無效的書籤值"
+
+#. VXSEP
+#: connectivity/inc/strings.hrc:30
+msgctxt "STR_PRIVILEGE_NOT_GRANTED"
+msgid "Privilege not granted: Only table privileges can be granted."
+msgstr "未授予權限: 僅可授予表格權限。"
+
+#. DZf3v
+#: connectivity/inc/strings.hrc:31
+msgctxt "STR_PRIVILEGE_NOT_REVOKED"
+msgid "Privilege not revoked: Only table privileges can be revoked."
+msgstr "未撤銷權限: 僅可撤銷表格權限。"
+
+#. qTZj7
+#: connectivity/inc/strings.hrc:32
+msgctxt "STR_ERRORMSG_SEQUENCE"
+msgid "Function sequence error."
+msgstr "函式序列錯誤。"
+
+#. scUDb
+#: connectivity/inc/strings.hrc:33
+msgctxt "STR_INVALID_INDEX"
+msgid "Invalid descriptor index."
+msgstr "無效的描述元索引。"
+
+#. YyBDi
+#: connectivity/inc/strings.hrc:34
+msgctxt "STR_UNSUPPORTED_FUNCTION"
+msgid "The driver does not support the function “$functionname$”."
+msgstr "驅動程式並不支援函數「$functionname$」。"
+
+#. GW3L8
+#: connectivity/inc/strings.hrc:35
+msgctxt "STR_UNSUPPORTED_FEATURE"
+msgid "The driver does not support the functionality for “$featurename$”. It is not implemented."
+msgstr "驅動程式並不支援「$featurename$」的功能。其並未實作。"
+
+#. zXVCV
+#: connectivity/inc/strings.hrc:36
+msgctxt "STR_FORMULA_WRONG"
+msgid "The formula for TypeInfoSettings is wrong!"
+msgstr "TypeInfoSettings 的公式錯誤！"
+
+#. vA6FB
+#: connectivity/inc/strings.hrc:37
+msgctxt "STR_STRING_LENGTH_EXCEEDED"
+msgid "The string “$string$” exceeds the maximum length of $maxlen$ characters when converted to the target character set “$charset$”."
+msgstr "字串「$string$」在轉換為目標字元集「$charset$」時超過了 $maxlen$ 的字元的最大長度。"
+
+#. THhEu
+#: connectivity/inc/strings.hrc:38
+msgctxt "STR_CANNOT_CONVERT_STRING"
+msgid "The string “$string$” cannot be converted using the encoding “$charset$”."
+msgstr "字串「$string$」無法使用編碼「$charset$」進行轉換。"
+
+#. sSzsJ
+#: connectivity/inc/strings.hrc:39
+msgctxt "STR_URI_SYNTAX_ERROR"
+msgid "The connection URL is invalid."
+msgstr "無效的連線 URL。"
+
+#. aihGj
+#: connectivity/inc/strings.hrc:40
+msgctxt "STR_QUERY_TOO_COMPLEX"
+msgid "The query cannot be executed. It is too complex."
+msgstr "無法執行查詢。其太複雜了。"
+
+#. ADy4t
+#: connectivity/inc/strings.hrc:41
+msgctxt "STR_OPERATOR_TOO_COMPLEX"
+msgid "The query cannot be executed. The operator is too complex."
+msgstr "無法執行查詢。運算子太複雜了。"
+
+#. XZGaK
+#: connectivity/inc/strings.hrc:42
+msgctxt "STR_QUERY_INVALID_LIKE_COLUMN"
+msgid "The query cannot be executed. You cannot use “LIKE” with columns of this type."
+msgstr "無法執行查詢。您不能對此類型的欄位使用「LIKE」。"
+
+#. SsqWz
+#: connectivity/inc/strings.hrc:43
+msgctxt "STR_QUERY_INVALID_LIKE_STRING"
+msgid "The query cannot be executed. “LIKE” can be used with a string argument only."
+msgstr "無法執行查詢。「LIKE」僅能與字串參數一起使用。"
+
+#. ZFFrf
+#: connectivity/inc/strings.hrc:44
+msgctxt "STR_QUERY_NOT_LIKE_TOO_COMPLEX"
+msgid "The query cannot be executed. The “NOT LIKE” condition is too complex."
+msgstr "無法執行查詢。「NOT LIKE」條件太複雜了。"
+
+#. AaZzs
+#: connectivity/inc/strings.hrc:45
+msgctxt "STR_QUERY_LIKE_WILDCARD"
+msgid "The query cannot be executed. The “LIKE” condition contains wildcard in the middle."
+msgstr "無法執行查詢。「LIKE」條件中間包含萬用字元。"
+
+#. GN6F9
+#: connectivity/inc/strings.hrc:46
+msgctxt "STR_QUERY_LIKE_WILDCARD_MANY"
+msgid "The query cannot be executed. The “LIKE” condition contains too many wildcards."
+msgstr "無法執行查詢。「LIKE」條件太多萬用字元。"
+
+#. LreLr
+#: connectivity/inc/strings.hrc:47
+msgctxt "STR_INVALID_COLUMNNAME"
+msgid "The column name “$columnname$” is not valid."
+msgstr "欄位名稱「$columnname$」無效。"
+
+#. FT3Zb
+#: connectivity/inc/strings.hrc:48
+msgctxt "STR_INVALID_COLUMN_SELECTION"
+msgid "The statement contains an invalid selection of columns."
+msgstr "陳述式包含無效的欄選取區域。"
+
+#. iLNAb
+#: connectivity/inc/strings.hrc:49
+msgctxt "STR_COULD_NOT_LOAD_FILE"
+msgid "The file $filename$ could not be loaded."
+msgstr "無法載入檔案 $filename$。"
+
+#. jq62z
+#: connectivity/inc/strings.hrc:50
+msgctxt "STR_LOAD_FILE_ERROR_MESSAGE"
+msgid ""
+"The attempt to load the file resulted in the following error message ($exception_type$):\n"
+"\n"
+"$error_message$"
+msgstr ""
+"嘗試載入檔案會導致下列錯誤訊息 ($exception_type$)：\n"
+"\n"
+"$error_message$"
+
+#. sbrdS
+#. = the ado driver's resource strings
+#: connectivity/inc/strings.hrc:52
+msgctxt "STR_TYPE_NOT_CONVERT"
+msgid "The type could not be converted."
+msgstr "無法轉換類型。"
+
+#. 3L6uG
+#: connectivity/inc/strings.hrc:53
+msgctxt "STR_INVALID_COLUMN_DESCRIPTOR_ERROR"
+msgid "Could not append column: invalid column descriptor."
+msgstr "無法附加欄: 欄描述元無效。"
+
+#. 4GMmY
+#: connectivity/inc/strings.hrc:54
+msgctxt "STR_INVALID_GROUP_DESCRIPTOR_ERROR"
+msgid "Could not create group: invalid object descriptor."
+msgstr "無法建立群組: 物件描述元無效。"
+
+#. MDKgr
+#: connectivity/inc/strings.hrc:55
+msgctxt "STR_INVALID_INDEX_DESCRIPTOR_ERROR"
+msgid "Could not create index: invalid object descriptor."
+msgstr "無法建立索引：物件描述元無效。"
+
+#. jPjxi
+#: connectivity/inc/strings.hrc:56
+msgctxt "STR_INVALID_KEY_DESCRIPTOR_ERROR"
+msgid "Could not create key: invalid object descriptor."
+msgstr "無法建立關鍵字: 物件描述元無效。"
+
+#. jaDH3
+#: connectivity/inc/strings.hrc:57
+msgctxt "STR_INVALID_TABLE_DESCRIPTOR_ERROR"
+msgid "Could not create table: invalid object descriptor."
+msgstr "無法建立表格: 物件描述元無效。"
+
+#. utNzu
+#: connectivity/inc/strings.hrc:58
+msgctxt "STR_INVALID_USER_DESCRIPTOR_ERROR"
+msgid "Could not create user: invalid object descriptor."
+msgstr "無法建立使用者: 物件描述元無效。"
+
+#. 4TE9R
+#: connectivity/inc/strings.hrc:59
+msgctxt "STR_INVALID_VIEW_DESCRIPTOR_ERROR"
+msgid "Could not create view: invalid object descriptor."
+msgstr "無法建立檢視: 物件描述元無效。"
+
+#. BrHQp
+#: connectivity/inc/strings.hrc:60
+msgctxt "STR_VIEW_NO_COMMAND_ERROR"
+msgid "Could not create view: no command object."
+msgstr "無法建立檢視：無指令物件。"
+
+#. F6ygP
+#: connectivity/inc/strings.hrc:61
+msgctxt "STR_NO_CONNECTION"
+msgid "The connection could not be created. Maybe the necessary data provider is not installed."
+msgstr "無法建立連線。可能未安裝必要的資料提供程式。"
+
+#. GRZEu
+#. dbase
+#: connectivity/inc/strings.hrc:63
+msgctxt "STR_COULD_NOT_DELETE_INDEX"
+msgid "The index could not be deleted. An unknown error while accessing the file system occurred."
+msgstr "無法刪除索引。存取檔案系統時發生不明的錯誤。"
+
+#. JbDnu
+#: connectivity/inc/strings.hrc:64
+msgctxt "STR_ONL_ONE_COLUMN_PER_INDEX"
+msgid "The index could not be created. Only one column per index is allowed."
+msgstr "無法建立索引。僅允許每條索引對應一欄。"
+
+#. rB3XE
+#: connectivity/inc/strings.hrc:65
+msgctxt "STR_COULD_NOT_CREATE_INDEX_NOT_UNIQUE"
+msgid "The index could not be created. The values are not unique."
+msgstr "無法建立索引。它們不是唯一的值。"
+
+#. f8DTu
+#: connectivity/inc/strings.hrc:66
+msgctxt "STR_COULD_NOT_CREATE_INDEX"
+msgid "The index could not be created. An unknown error appeared."
+msgstr "無法建立索引。出現不明錯誤。"
+
+#. 9eEjK
+#: connectivity/inc/strings.hrc:67
+msgctxt "STR_COULD_NOT_CREATE_INDEX_NAME"
+msgid "The index could not be created. The file “$filename$” is used by another index."
+msgstr "無法製作索引。檔案「$filename$」已被其他索引使用。"
+
+#. GcK7B
+#: connectivity/inc/strings.hrc:68
+msgctxt "STR_COULD_NOT_CREATE_INDEX_KEYSIZE"
+msgid "The index could not be created. The size of the chosen column is too big."
+msgstr "無法建立索引。選擇的欄大小過大。"
+
+#. NGwFW
+#: connectivity/inc/strings.hrc:69
+msgctxt "STR_SQL_NAME_ERROR"
+msgid "The name “$name$” does not match SQL naming constraints."
+msgstr "名稱「$name$」不符合 SQL 命名約束。"
+
+#. wv2Cx
+#: connectivity/inc/strings.hrc:70
+msgctxt "STR_COULD_NOT_DELETE_FILE"
+msgid "The file $filename$ could not be deleted."
+msgstr "無法刪除檔案 $filename$。"
+
+#. PiFvx
+#: connectivity/inc/strings.hrc:71
+msgctxt "STR_INVALID_COLUMN_TYPE"
+msgid "Invalid column type for column “$columnname$”."
+msgstr "欄位「$columnname$」的欄位類型無效。"
+
+#. wB2gE
+#: connectivity/inc/strings.hrc:72
+msgctxt "STR_INVALID_COLUMN_PRECISION"
+msgid "Invalid precision for column “$columnname$”."
+msgstr "「$columnname$」欄位的精密度無效。"
+
+#. v67fT
+#: connectivity/inc/strings.hrc:73
+msgctxt "STR_INVALID_PRECISION_SCALE"
+msgid "Precision is less than scale for column “$columnname$”."
+msgstr "精密度小於「$columnname$」的尺度。"
+
+#. J3KEu
+#: connectivity/inc/strings.hrc:74
+msgctxt "STR_INVALID_COLUMN_NAME_LENGTH"
+msgid "Invalid column name length for column “$columnname$”."
+msgstr "「$columnname$」的欄位名稱長度無效。"
+
+#. ZQUww
+#: connectivity/inc/strings.hrc:75
+msgctxt "STR_DUPLICATE_VALUE_IN_COLUMN"
+msgid "Duplicate value found in column “$columnname$”."
+msgstr "在欄位「$columnname$」中發現重複值。"
+
+#. zSeBJ
+#: connectivity/inc/strings.hrc:76
+msgctxt "STR_INVALID_COLUMN_DECIMAL_VALUE"
+msgid ""
+"The “$columnname$” column has been defined as a “Decimal” type, the maximum length is $precision$ characters (with $scale$ decimal places).\n"
+"\n"
+"The specified value “$value$” is longer than the number of digits allowed."
+msgstr ""
+"「$columnname$」欄位已定義為「Decimal」類型，最大長度為 $precision$ 個字元（包含 $scale$ 個小數位數）。\n"
+"\n"
+"指定的「$value$」值長於允許的位數。"
+
+#. M6CvC
+#: connectivity/inc/strings.hrc:77
+msgctxt "STR_COLUMN_NOT_ALTERABLE"
+msgid "The column “$columnname$” could not be altered. Maybe the file system is write-protected."
+msgstr "無法修改「$columnname$」欄位。或許檔案系統是唯讀的。"
+
+#. st6hA
+#: connectivity/inc/strings.hrc:78
+msgctxt "STR_INVALID_COLUMN_VALUE"
+msgid "The column “$columnname$” could not be updated. The value is invalid for that column."
+msgstr "無法更新「$columnname$」欄位。該欄位的值無效。"
+
+#. 5rH5W
+#: connectivity/inc/strings.hrc:79
+msgctxt "STR_COLUMN_NOT_ADDABLE"
+msgid "The column “$columnname$” could not be added. Maybe the file system is write-protected."
+msgstr "無法新增「$columnname$」欄位。或許檔案系統是唯讀的。"
+
+#. B9ACk
+#: connectivity/inc/strings.hrc:80
+msgctxt "STR_COLUMN_NOT_DROP"
+msgid "The column at position “$position$” could not be dropped. Maybe the file system is write-protected."
+msgstr "無法刪除位置「$position$」的欄位。或許檔案系統是唯讀的。"
+
+#. KfedE
+#: connectivity/inc/strings.hrc:81
+msgctxt "STR_TABLE_NOT_DROP"
+msgid "The table “$tablename$” could not be dropped. Maybe the file system is write-protected."
+msgstr "表格「$tablename$」無法刪除。也許檔案系統是唯讀的。"
+
+#. R3BGx
+#: connectivity/inc/strings.hrc:82
+msgctxt "STR_COULD_NOT_ALTER_TABLE"
+msgid "The table could not be altered."
+msgstr "無法改變表格。"
+
+#. DijyA
+#: connectivity/inc/strings.hrc:83
+msgctxt "STR_INVALID_DBASE_FILE"
+msgid "The file “$filename$” is an invalid (or unrecognized) dBASE file."
+msgstr "檔案「$filename$」是無效（或無法識別）的 dBASE 檔案。"
+
+#. LhHTA
+#. Evoab2
+#: connectivity/inc/strings.hrc:85
+msgctxt "STR_CANNOT_OPEN_BOOK"
+msgid "Cannot open Evolution address book."
+msgstr "無法開啟 Evolution 通訊錄。"
+
+#. sxbEF
+#: connectivity/inc/strings.hrc:86
+msgctxt "STR_SORT_BY_COL_ONLY"
+msgid "Can only sort by table columns."
+msgstr "僅能依表格欄排序。"
+
+#. 7R6eC
+#. File
+#: connectivity/inc/strings.hrc:88
+msgctxt "STR_QUERY_COMPLEX_COUNT"
+msgid "The query cannot be executed. It is too complex. Only “COUNT(*)” is supported."
+msgstr "無法執行查詢。其太複雜了。僅支援「COUNT(*)」。"
+
+#. PJivi
+#: connectivity/inc/strings.hrc:89
+msgctxt "STR_QUERY_INVALID_BETWEEN"
+msgid "The query cannot be executed. The “BETWEEN” arguments are not correct."
+msgstr "無法執行查詢。「BETWEEN」引數不正確。"
+
+#. CHRju
+#: connectivity/inc/strings.hrc:90
+msgctxt "STR_QUERY_FUNCTION_NOT_SUPPORTED"
+msgid "The query cannot be executed. The function is not supported."
+msgstr "無法執行查詢。不支援函數。"
+
+#. mnc5r
+#: connectivity/inc/strings.hrc:91
+msgctxt "STR_TABLE_READONLY"
+msgid "The table cannot be changed. It is read only."
+msgstr "無法變更表格。其為唯讀。"
+
+#. TUUpf
+#: connectivity/inc/strings.hrc:92
+msgctxt "STR_DELETE_ROW"
+msgid "The row could not be deleted. The option “Display inactive records” is set."
+msgstr "無法刪除列。設定了「顯示不活躍的紀錄」選項。"
+
+#. TZTfv
+#: connectivity/inc/strings.hrc:93
+msgctxt "STR_ROW_ALREADY_DELETED"
+msgid "The row could not be deleted. It is already deleted."
+msgstr "無法刪除列。該列已被刪除。"
+
+#. NK9AX
+#: connectivity/inc/strings.hrc:94
+msgctxt "STR_QUERY_MORE_TABLES"
+msgid "The query cannot be executed. It contains more than one table."
+msgstr "無法執行查詢。其包含多於一個表格。"
+
+#. L4Ffm
+#: connectivity/inc/strings.hrc:95
+msgctxt "STR_QUERY_NO_TABLE"
+msgid "The query cannot be executed. It contains no valid table."
+msgstr "無法執行查詢。其不包含有效的表格。"
+
+#. 3KADk
+#: connectivity/inc/strings.hrc:96
+msgctxt "STR_QUERY_NO_COLUMN"
+msgid "The query cannot be executed. It contains no valid columns."
+msgstr "無法執行查詢。其不包含有效的欄位。"
+
+#. WcpZM
+#: connectivity/inc/strings.hrc:97
+msgctxt "STR_INVALID_PARA_COUNT"
+msgid "The count of the given parameter values does not match the parameters."
+msgstr "指定參數值的數量與參數不相符。"
+
+#. CFcjS
+#: connectivity/inc/strings.hrc:98
+msgctxt "STR_NO_VALID_FILE_URL"
+msgid "The URL “$URL$” is not valid. A connection cannot be created."
+msgstr "URL「$URL$」無效。無法建立連線。"
+
+#. YFjkG
+#: connectivity/inc/strings.hrc:99
+msgctxt "STR_NO_CLASSNAME"
+msgid "The driver class “$classname$” could not be loaded."
+msgstr "無法載入驅動程式類別「$classname$」。"
+
+#. jbnZZ
+#: connectivity/inc/strings.hrc:100
+msgctxt "STR_NO_JAVA"
+msgid "No Java installation could be found. Please check your installation."
+msgstr "沒有發現已安裝 Java。請檢查您的安裝。"
+
+#. GdN4i
+#: connectivity/inc/strings.hrc:101
+msgctxt "STR_NO_RESULTSET"
+msgid "The execution of the query does not return a valid result set."
+msgstr "執行的查詢並未回傳有效的結果集合。"
+
+#. JGxgF
+#: connectivity/inc/strings.hrc:102
+msgctxt "STR_NO_ROWCOUNT"
+msgid "The execution of the update statement does not affect any rows."
+msgstr "執行的更新陳述並未影響任何列。"
+
+#. yCACF
+#: connectivity/inc/strings.hrc:103
+msgctxt "STR_NO_CLASSNAME_PATH"
+msgid "The additional driver class path is “$classpath$”."
+msgstr "額外的驅動程式類別路徑為「$classpath$」。"
+
+#. sX2NM
+#: connectivity/inc/strings.hrc:104
+msgctxt "STR_UNKNOWN_PARA_TYPE"
+msgid "The type of parameter at position “$position$” is unknown."
+msgstr "位置「$position$」的引數類型未知。"
+
+#. gSPCX
+#: connectivity/inc/strings.hrc:105
+msgctxt "STR_UNKNOWN_COLUMN_TYPE"
+msgid "The type of column at position “$position$” is unknown."
+msgstr "位置「$position$」的欄位類型未知。"
+
+#. 3FmFX
+#. KAB
+#: connectivity/inc/strings.hrc:107
+msgctxt "STR_PARA_ONLY_PREPARED"
+msgid "Parameters can appear only in prepared statements."
+msgstr "參數僅能出現在預備陳述式中。"
+
+#. CB7pj
+#. MACAB
+#: connectivity/inc/strings.hrc:109
+msgctxt "STR_NO_TABLE"
+msgid "No such table!"
+msgstr "無此種表格！"
+
+#. LUQBc
+#: connectivity/inc/strings.hrc:110
+msgctxt "STR_NO_MAC_OS_FOUND"
+msgid "No suitable macOS installation was found."
+msgstr "找不到合適的 macOS 安裝。"
+
+#. HNSzq
+#. hsqldb
+#: connectivity/inc/strings.hrc:112
+msgctxt "STR_NO_STORAGE"
+msgid "The connection can not be established. No storage or URL was given."
+msgstr "無法建立連線。沒有給予貯藏空間或 URL。"
+
+#. SZSmZ
+#: connectivity/inc/strings.hrc:113
+msgctxt "STR_INVALID_FILE_URL"
+msgid "The given URL contains no valid local file system path. Please check the location of your database file."
+msgstr "指定的 URL 包含無效的本機檔案系統路徑。請檢查您的資料庫檔案位置。"
+
+#. MgCH9
+#: connectivity/inc/strings.hrc:114
+msgctxt "STR_NO_TABLE_CONTAINER"
+msgid "An error occurred while obtaining the connection’s table container."
+msgstr "擷取連線的表格容器時發生錯誤。"
+
+#. uxoGW
+#: connectivity/inc/strings.hrc:115
+msgctxt "STR_NO_TABLENAME"
+msgid "There is no table named “$tablename$”."
+msgstr "沒有名為「$tablename$」的表格。"
+
+#. 3BxCF
+#: connectivity/inc/strings.hrc:116
+msgctxt "STR_NO_DOCUMENTUI"
+msgid "The provided DocumentUI is not allowed to be NULL."
+msgstr "提供的 DocumentUI 不得為空值。"
+
+#. VLEMM
+#: connectivity/inc/strings.hrc:117
+msgctxt "STR_ERROR_NEW_VERSION"
+msgid "The connection could not be established. The database was created by a newer version of %PRODUCTNAME."
+msgstr "無法建立連線。該資料庫是由較新版的 %PRODUCTNAME 所建立。"
+
+#. 3BKTP
+#: connectivity/inc/strings.hrc:119
+msgctxt "STR_ROW_SET_OPERATION_VETOED"
+msgid "The record operation has been vetoed."
+msgstr "記錄作業已遭否決。"
+
+#. VEbfy
+#: connectivity/inc/strings.hrc:120
+msgctxt "STR_PARSER_CYCLIC_SUB_QUERIES"
+msgid "The statement contains a cyclic reference to one or more subqueries."
+msgstr "陳述包含對一個或多個子查詢的循環引用。"
+
+#. jDAGJ
+#: connectivity/inc/strings.hrc:121
+msgctxt "STR_DB_OBJECT_NAME_WITH_SLASHES"
+msgid "The name must not contain any slashes (“/”)."
+msgstr "名稱不能包含任何斜線 (“/”)。"
+
+#. 5Te4k
+#: connectivity/inc/strings.hrc:122
+msgctxt "STR_DB_INVALID_SQL_NAME"
+msgid "$1$ is no SQL conform identifier."
+msgstr "$1$ 不是符合 SQL 的識別碼。"
+
+#. kvvjL
+#: connectivity/inc/strings.hrc:123
+msgctxt "STR_DB_QUERY_NAME_WITH_QUOTES"
+msgid "Query names must not contain quote characters."
+msgstr "查詢名稱不得包含引號字元。"
+
+#. oftHX
+#: connectivity/inc/strings.hrc:124
+msgctxt "STR_DB_OBJECT_NAME_IS_USED"
+msgid "The name “$1$” is already in use in the database."
+msgstr "名稱「$1$」已在資料庫中使用。"
+
+#. gD8xU
+#: connectivity/inc/strings.hrc:125
+msgctxt "STR_DB_NOT_CONNECTED"
+msgid "No connection to the database exists."
+msgstr "資料庫連線不存在。"
+
+#. Dpdod
+#: connectivity/inc/strings.hrc:126
+msgctxt "STR_AB_ADDRESSBOOK_NOT_FOUND"
+msgid "No $1$ exists."
+msgstr "$1$ 不存在。"
+
+#. e7kHo
+#: connectivity/inc/strings.hrc:127
+msgctxt "STR_DATA_CANNOT_SELECT_UNFILTERED"
+msgid "Unable to display the complete table content. Please apply a filter."
+msgstr "無法顯示完整的表格內容。請套用篩選。"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "加入(_A)"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "套用(_A)"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "取消(_C)"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "關閉(_C)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "刪除(_D)"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "編輯(_E)"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "說明(_H)"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "新增(_N)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "否(_N)"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "確定(_O)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "移除(_R)"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "重設(_R)"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "是(_Y)"

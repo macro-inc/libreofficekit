@@ -1,0 +1,1196 @@
+#. extracted from helpcontent2/source/text/scalc/02
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2021-04-13 17:37+0000\n"
+"Last-Translator: Mihkel Tõnnov <mihhkel@gmail.com>\n"
+"Language-Team: Estonian <https://translations.documentfoundation.org/projects/libo_help-master/textscalc02/et/>\n"
+"Language: et\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1542196689.000000\n"
+
+#. aSE5T
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Currency"
+msgstr "Arvuvorming: raha"
+
+#. uC76y
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"hd_id3152892\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02130000.xhp\">Number format: Currency</link>"
+msgstr "<link href=\"text/scalc/02/02130000.xhp\">Arvuvorming: raha</link>"
+
+#. mDBPb
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3148837\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Applies the default currency format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Rakendab valitud lahtritele vaikimisi rahavormingu.</ahelp>"
+
+#. 2nsBF
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3155267\n"
+"help.text"
+msgid "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Currency Number Format Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Ikoon \"Arvuvorming: raha\"</alt></image>"
+
+#. KBVhJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3150214\n"
+"help.text"
+msgid "Number Format: Currency"
+msgstr "Arvuvorming: raha"
+
+#. NGRbJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3146776\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Vormindus - Lahtrid - Arvud</link>."
+
+#. fjGg6
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Percent"
+msgstr "Arvuvorming: protsent"
+
+#. uZTmE
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02140000.xhp\">Number format: Percent</link>"
+msgstr "<link href=\"text/scalc/02/02140000.xhp\">Arvuvorming: protsent</link>"
+
+#. fzGGF
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155629\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatPercent\">Applies the percentage format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatPercent\">Vormindab valitud lahtrites olevad arvud protsendina.</ahelp>"
+
+#. AFCdX
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3153968\n"
+"help.text"
+msgid "<image id=\"img_id3150869\" src=\"cmd/sc_numberformatpercent.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150869\">Icon</alt></image>"
+msgstr "<image id=\"img_id3150869\" src=\"cmd/sc_numberformatpercent.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150869\">Ikoon</alt></image>"
+
+#. CAFBw
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Number Format: Percent"
+msgstr "Arvuvorming: protsent"
+
+#. xrLA9
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"bm_id3149260\n"
+"help.text"
+msgid "<bookmark_value>percentage calculations</bookmark_value>"
+msgstr "<bookmark_value>protsendiarvutused</bookmark_value>"
+
+#. Rwuzn
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3149260\n"
+"help.text"
+msgid "You can also enter a percentage sign (%) after a number in a cell:"
+msgstr "Protsendimärgi (%) sisestamine lahtrisse arvu järele annab sama tulemuse:"
+
+#. LKtGp
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "1% corresponds to 0.01"
+msgstr "1% vastab arvule 0,01"
+
+#. CwAEt
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3145749\n"
+"help.text"
+msgid "1 + 16% corresponds to 116% or 1.16"
+msgstr "1 + 16% on sama, mis 116% või 1,16"
+
+#. j7BsM
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3148575\n"
+"help.text"
+msgid "1%% corresponds to 0.0001"
+msgstr "1%% vastab arvule 0,0001"
+
+#. a8EDH
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3159153\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>"
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Vormindus - Lahtrid - Arvud</link>"
+
+#. bX9GB
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Default"
+msgstr "Arvuvorming: vaikimisi"
+
+#. C4AsN
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"hd_id3149182\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02150000.xhp\">Number format: Default</link>"
+msgstr "<link href=\"text/scalc/02/02150000.xhp\">Arvu vorming: vaikeväärtus</link>"
+
+#. CkVDA
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3163802\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Applies the default number format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Rakendab valitud lahtritele vaikimisi arvuvormingu.</ahelp>"
+
+#. MpiW2
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<image src=\"cmd/sc_numberformatstandard.svg\" id=\"img_id3156024\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156024\">Icon Standard Format </alt></image>"
+msgstr "<image src=\"cmd/sc_numberformatstandard.svg\" id=\"img_id3156024\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156024\">Ikoon \"Standardvorming\"</alt></image>"
+
+#. 7xorF
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3153361\n"
+"help.text"
+msgid "Number Format: Standard"
+msgstr "Arvuvorming: standardne"
+
+#. 2JKys
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3154908\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Vormindus - Lahtrid - Arvud</link>."
+
+#. BhR4Z
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Arvuvorming: lisa kümnendkoht"
+
+#. BdJjx
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02160000.xhp\">Number Format: Add Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02160000.xhp\">Arvuvorming: lisa kümnendkoht</link>"
+
+#. jhPg6
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3150792\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatIncDecimals\">Adds one decimal place to the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatIncDecimals\">Lisab valitud lahtrites olevatele arvudele ühe kümnendkoha.</ahelp>"
+
+#. BuLUg
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3145787\n"
+"help.text"
+msgid "<image id=\"img_id3145271\" src=\"cmd/sc_numberformatincdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145271\">Icon Add Decimal Place</alt></image>"
+msgstr "<image id=\"img_id3145271\" src=\"cmd/sc_numberformatincdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145271\">Ikoon \"Lisa kümnendkoht\"</alt></image>"
+
+#. NDn3G
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3149262\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Arvuvorming: lisa kümnendkoht"
+
+#. JGSHw
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Arvuvorming: kustuta kümnendkoht"
+
+#. ixjiG
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"hd_id3149164\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02170000.xhp\">Number Format: Delete Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02170000.xhp\">Arvuvorming: kustuta kümnendkoht</link>"
+
+#. Eip8y
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3147264\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatDecDecimals\">Removes one decimal place from the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatDecDecimals\">Eemaldab valitud lahtrites olevatelt arvudelt ühe kümnendkoha.</ahelp>"
+
+#. FCfMZ
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3145173\n"
+"help.text"
+msgid "<image id=\"img_id3153192\" src=\"cmd/sc_numberformatdecdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153192\">Icon Delete Decimal Place</alt></image>"
+msgstr "<image id=\"img_id3153192\" src=\"cmd/sc_numberformatdecdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153192\">Ikoon \"Kustuta kümnendkoht\"</alt></image>"
+
+#. xCuwp
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3154686\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Arvuvorming: kustuta kümnendkoht"
+
+#. 89BHV
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Name Box"
+msgstr "Nime väli"
+
+#. JJA9o
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"bm_id3156326\n"
+"help.text"
+msgid "<bookmark_value>formula bar; sheet area names</bookmark_value><bookmark_value>sheet area names</bookmark_value><bookmark_value>showing; cell references</bookmark_value><bookmark_value>cell references; showing</bookmark_value>"
+msgstr "<bookmark_value>valemiriba;lehe alade nimed</bookmark_value><bookmark_value>lehe alade nimed</bookmark_value> <bookmark_value>kuvamine;lahtriviited</bookmark_value> <bookmark_value>lahtriviited;kuvamine</bookmark_value>"
+
+#. ywEet
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"hd_id3156326\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06010000.xhp\">Name Box</link>"
+msgstr "<link href=\"text/scalc/02/06010000.xhp\">Nime väli</link>"
+
+#. bJypW
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3149656\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_POS\">Displays the reference for the current cell, the range of the selected cells, or the name of the area. You can also select a range of cells, and then type a name for that range into the <emph>Name Box</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_POS\">Näitab aktiivse lahtri või valitud lahtrite vahemiku aadressi või ala nime. Nime andmiseks võib valida lahtrite vahemiku ja sisestada nime <emph>nime väljale</emph>.</ahelp>"
+
+#. W3Br6
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3163710\n"
+"help.text"
+msgid "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Combo box sheet area</alt></image>"
+msgstr "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Liitboks \"Lehe ala\"</alt></image>"
+
+#. wFE7T
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3151118\n"
+"help.text"
+msgid "Name Box"
+msgstr "Nime väli"
+
+#. yH3c4
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3152596\n"
+"help.text"
+msgid "To jump to a particular cell, or to select a cell range, type the cell reference, or cell range reference in this box, for example, F1, or A1:C4. You can also enter full name of a sheet; the tooltip then changes to \"Go To Sheet\", and pressing Enter switches to that sheet."
+msgstr "Kui sisestada väljale lahtri või lahtrite vahemiku aadress, näiteks F1 või A1:C4, saab vastavalt kas hüpata sellele lahtrile või valida sisestatud vahemiku. Samuti võib sisestada lehenime - kohtspikker kuvab siis \"Mine lehele\" ning Enteri vajutamine lülitub vastavale lehele."
+
+#. VFke2
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sum"
+msgstr "Summa"
+
+#. oK8fx
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"bm_id3157909\n"
+"help.text"
+msgid "<bookmark_value>functions;sum function icon</bookmark_value>         <bookmark_value>formula bar;sum function</bookmark_value>         <bookmark_value>sum icon</bookmark_value>         <bookmark_value>AutoSum button, see sum icon</bookmark_value>"
+msgstr "<bookmark_value>funktsioonid; summafunktsiooni ikoon</bookmark_value>         <bookmark_value>valemiriba; summafunktsioon</bookmark_value>         <bookmark_value>summa ikoon</bookmark_value>         <bookmark_value>Automaatsumma nupp, vt summaikoon</bookmark_value>"
+
+#. CiNzL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id3157909\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06030000.xhp\">Select Function</link>"
+msgstr "<link href=\"text/scalc/02/06030000.xhp\">Vali funktsioon</link>"
+
+#. KEkiG
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3150543\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_SUMME\">Insert a function of a cell range into the current cell. The function can be Sum, Average, Minimum, Maximum and Count. Click in a cell, click this icon, select the function in the drop down list and optionally adjust the cell range. Or select some cells into which the function value will be inserted, then click the icon. The function result is added at the bottom of the range.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_SUMME\">Lisab aktiivsesse lahtrisse lahtrite vahemiku funktsiooni (summa, keskmise, miinimumi, maksimumi või arvu). Klõpsa mõnel lahtril, seejärel klõpsa sellel nupul, vali ripploendist soovitud funktsioon ning vajadusel täpsusta vaadeldavat lahtrite vahemikku. Teise võimalusena võib valida lahtrid, millest funktsiooni väärtus arvutada, ja seejärel klõpsata sellel nupul. Funktsiooni tulemus sisestatakse siis valitud lahtrivahemiku alla.</ahelp>"
+
+#. KDxsW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Icon Select Function</alt></image>"
+msgstr "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Ikoon \"Vali funktsioon\"</alt></image>"
+
+#. DaEgA
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3152577\n"
+"help.text"
+msgid "Select Function"
+msgstr "Vali funktsioon"
+
+#. SpBhw
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id161592658402954\n"
+"help.text"
+msgid "Select Function applied with no selected range"
+msgstr "Käitumine kui vahemikku pole valitud"
+
+#. 59eGX
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3156444\n"
+"help.text"
+msgid "$[officename] automatically suggests a cell range, provided that the spreadsheet contains data. If the cell range already contains a function, you can combine it with the new one to yield the function applied to the range data. If the range contains filters, the Subtotal function is inserted instead of the selected function."
+msgstr "$[officename] pakub lahtrite vahemiku automaatselt, eeldusel, et arvutustabel sisaldab andmeid. Kui vahemik juba sisaldab mõnda funktsiooni, siis saab selle kombineerida lisatava funktsiooniga, saades vastuseks kogu vahemiku funktsiooni tulemuse. Kui vahemik sisaldab filtreid, siis kasutatakse valitud funktsiooni asemel funktsiooni Vahekokkuvõte."
+
+#. vpnqf
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153189\n"
+"help.text"
+msgid "Click the <emph>Accept</emph> icon to use the formula displayed in the input line or <emph>Cancel</emph>."
+msgstr "Klõpsa ikooni <emph>Nõus</emph>, et viia sisestusreal olev valem tabelisse, või <emph>Loobu</emph>."
+
+#. TVD6h
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id231592663499228\n"
+"help.text"
+msgid "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Accept Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Ikoon \"Nõus\"</alt></image>"
+
+#. iHTEW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id481592663499228\n"
+"help.text"
+msgid "Accept"
+msgstr "Nõus"
+
+#. VFj6u
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id311592663828848\n"
+"help.text"
+msgid "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Icon Cancel</alt></image>"
+msgstr "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Ikoon \"Loobu\"</alt></image>"
+
+#. 7xGcL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id431592663828848\n"
+"help.text"
+msgid "Cancel"
+msgstr "Loobu"
+
+#. GPtKR
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id261592658395518\n"
+"help.text"
+msgid "Select Function applied on a selected range"
+msgstr "Käitumine valitud vahemiku puhul"
+
+#. JPrPQ
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id911592658130888\n"
+"help.text"
+msgid "When the selected range has two or more rows, the function is calculated for each column. The results are placed in empty cells on the first available row below the range, one result per column."
+msgstr "Kui valitud vahemik sisaldab vähemalt kahte rida, arvutatakse funktsioon iga veeru jaoks. Tulemused sisestatakse tühjadesse lahtritesse esimeses vahemiku all saadaolevas reas, üks tulemus veeru kohta."
+
+#. iHksB
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id991592658144387\n"
+"help.text"
+msgid "When the selected range has one row, the function result is placed in the first available cell on the right of the selected range."
+msgstr "Kui valitud vahemik sisaldab ainult ühte rida, sisestatakse funktsiooni tulemus esimesse saadaolevasse lahtrisse vahemikust paremal."
+
+#. NYGR7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Function"
+msgstr "Funktsioon"
+
+#. 9JFi8
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"bm_id3150084\n"
+"help.text"
+msgid "<bookmark_value>formula bar; functions</bookmark_value><bookmark_value>functions; formula bar icon</bookmark_value>"
+msgstr "<bookmark_value>valemiriba;funktsioonid</bookmark_value><bookmark_value>funktsioonid;valemiriba</bookmark_value>"
+
+#. ZGqd9
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"hd_id3150084\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06040000.xhp\">Function</link>"
+msgstr "<link href=\"text/scalc/02/06040000.xhp\">Funktsioon</link>"
+
+#. TnbLt
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_FUNC\">Adds a formula to the current cell. Click this icon, and then enter the formula in the <emph>Input line</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_FUNC\">Lisab aktiivsesse lahtrisse valemi. Klõpsa sellel nupul ning kirjuta valem <emph>sisestusreale</emph>.</ahelp>"
+
+#. WH6iw
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153360\n"
+"help.text"
+msgid "This icon is only available when the <emph>Input line</emph> box is not active."
+msgstr "Ikoon on saadaval üksnes siis, kui <emph>sisestusrida</emph> ei ole aktiivne."
+
+#. yAAo7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"sc/res/sc26049.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145785\" src=\"sc/res/sc26049.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3145785\">Ikoon</alt></image>"
+
+#. ZjzSD
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153951\n"
+"help.text"
+msgid "Function"
+msgstr "Funktsioon"
+
+#. kC5QL
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Input line"
+msgstr "Sisestusrida"
+
+#. Vteqe
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"hd_id3153821\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06050000.xhp\">Input line</link>"
+msgstr "<link href=\"text/scalc/02/06050000.xhp\">Sisestusrida</link>"
+
+#. Dgf7D
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Siia saab sisestada valemi, mida soovid aktiivsesse lahtrisse lisada. Sisseehitatud funktsiooni lisamiseks valemisse võib klõpsata nupul <link href=\"text/scalc/01/04060000.xhp\">Funktsiooninõustaja</link>.</ahelp>"
+
+#. pBxxB
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cancel"
+msgstr "Loobu"
+
+#. FRSZz
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"bm_id3154514\n"
+"help.text"
+msgid "<bookmark_value>formula bar; canceling inputs</bookmark_value><bookmark_value>functions; canceling input icon</bookmark_value>"
+msgstr "<bookmark_value>valemiriba;sisestuse tühistamine</bookmark_value><bookmark_value>funktsioonid;sisestuse tühistamise ikoon</bookmark_value>"
+
+#. 4mACq
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"hd_id3154514\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06060000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/scalc/02/06060000.xhp\">Loobu</link>"
+
+#. uafDY
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153823\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_CANCEL\">Clears the contents of the <emph>Input line</emph>, or cancels the changes that you made to an existing formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_CANCEL\">Puhastab <emph>sisestusrea</emph> või tühistab olemasolevas valemis tehtud muudatused.</ahelp>"
+
+#. DjEeK
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3156281\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Ikoon</alt></image>"
+
+#. QZHAo
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153970\n"
+"help.text"
+msgid "Cancel"
+msgstr "Loobu"
+
+#. i4LsJ
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Accept"
+msgstr "Nõus"
+
+#. EG7Fb
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"bm_id3143267\n"
+"help.text"
+msgid "<bookmark_value>formula bar; accepting inputs</bookmark_value><bookmark_value>functions; accepting input icon</bookmark_value>"
+msgstr "<bookmark_value>valemiriba;sisestuse kinnitamine</bookmark_value><bookmark_value>funktsioonid;sisestuse kinnitamise ikoon</bookmark_value>"
+
+#. EnHFH
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"hd_id3143267\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06070000.xhp\">Accept</link>"
+msgstr "<link href=\"text/scalc/02/06070000.xhp\">Nõus</link>"
+
+#. BBvqG
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_OK\">Accepts the contents of the <emph>Input line</emph>, and then inserts the contents into the current cell.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_OK\">Kinnitab <emph>sisestusrea</emph> sisu ja paigutab selle aktiivsesse lahtrisse.</ahelp>"
+
+#. D8cSd
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3150769\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Ikoon</alt></image>"
+
+#. puh2n
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3125864\n"
+"help.text"
+msgid "Accept"
+msgstr "Nõus"
+
+#. c7dbD
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Theme Selection"
+msgstr "Teema valik"
+
+#. nuJj7
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"hd_id3153087\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06080000.xhp\">Theme Selection</link>"
+msgstr "<link href=\"text/scalc/02/06080000.xhp\">Teema valimine</link>"
+
+#. rVKiP
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3154515\n"
+"help.text"
+msgid "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Applies a formatting style to the selected cells.</ahelp></variable> The styles include font, border, and background color information."
+msgstr "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Rakendab valitud lahtritele vormindusstiili.</ahelp></variable> Stiil määrab fondi, äärised ja taustavärvi."
+
+#. SEmnU
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3155132\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Ikoon</alt></image>"
+
+#. cgZs2
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3153953\n"
+"help.text"
+msgid "Choose Themes"
+msgstr "Vali teema"
+
+#. xWp4x
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3147127\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Click the formatting theme that you want to apply, and then click <emph>OK</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Vali vorminduse teema, mida soovid kasutada ja vajuta nupule <emph>Sobib</emph>.</ahelp>"
+
+#. QCyEd
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Position in document"
+msgstr "Asukoht dokumendis"
+
+#. BNLiM
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"hd_id3145119\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08010000.xhp\">Position in document</link>"
+msgstr "<link href=\"text/scalc/02/08010000.xhp\">Asukoht dokumendis</link>"
+
+#. L7Xk5
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3147265\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatusDocPos\">Displays the number of the current sheet and the total number of sheets in the spreadsheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatusDocPos\">Näitab aktiivse lehe järjekorranumbrit ja lehtede koguarvu arvutustabelis.</ahelp>"
+
+#. X2Dv6
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Standard Formula, Date/Time, Error Warning"
+msgstr "Standardfunktsioon, Kuupäev/Kellaaeg, Veateade"
+
+#. fFadm
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"bm_id3147335\n"
+"help.text"
+msgid "<bookmark_value>formulas;status bar</bookmark_value>"
+msgstr "<bookmark_value>valemid; olekuriba</bookmark_value>"
+
+#. FVYfS
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"hd_id3147335\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08080000.xhp\">Standard Formula, Date/Time, Error Warning</link>"
+msgstr "<link href=\"text/scalc/02/08080000.xhp\">Standardfunktsioon, Kuupäev/Kellaaeg, Veateade</link>"
+
+#. gvyvx
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3150791\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StateTableCell\">Displays information about the current document. By default, the SUM of the contents of the selected cells is displayed.</ahelp>"
+msgstr "<ahelp hid=\".uno:StateTableCell\">Kuvab aktiivset dokumenti puudutavat teavet. Vaikimisi näidatakse valitud lahtrite sisu summat.</ahelp>"
+
+#. eCfVn
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3155061\n"
+"help.text"
+msgid "To change the default formula that is displayed, right-click the field, and then choose the formula that you want. The available formulas are: Average, count of values (COUNTA), count of numbers (COUNT), Maximum, Minimum, Sum, or None."
+msgstr "Vaikimisi määratud funktsiooni muutmiseks tuleb antud väljal teha parem klõps ning valida soovitud funktsioon. Võimalik on valida järgmisi funktsioone: keskmine, väärtuste arv (COUNTA), arvude arv (COUNT), maksimum, miinimum, summa või funktsiooni puudumine."
+
+#. dC4rs
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3153969\n"
+"help.text"
+msgid "<link href=\"text/scalc/05/02140000.xhp\">Error codes</link>"
+msgstr "<link href=\"text/scalc/05/02140000.xhp\">Veakoodid</link>"
+
+#. 2fX5w
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Suurenda"
+
+#. kNqRX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"bm_id3148491\n"
+"help.text"
+msgid "<bookmark_value>page views; increasing scales</bookmark_value><bookmark_value>increasing scales in page view</bookmark_value><bookmark_value>zooming;enlarging page views</bookmark_value>"
+msgstr "<bookmark_value>lehekülje vaade; mõõtkava suurendamine</bookmark_value><bookmark_value>mõõtkava suurendamine lehekülje vaates</bookmark_value><bookmark_value>suurendus; lehekülje vaate suurendamine</bookmark_value>"
+
+#. GESuX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"hd_id3148491\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10050000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/scalc/02/10050000.xhp\">Suurenda</link>"
+
+#. Uq4Tv
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145069\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomIn\">Enlarges the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomIn\">Suurendab aktiivse dokumendi kuva. Kehtivat suurendustegurit näidatakse <emph>Olekuribal</emph>.</ahelp>"
+
+#. GBXen
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145171\n"
+"help.text"
+msgid "The maximum zoom factor is 400%."
+msgstr "Suurim võimalik suurendus on 400%."
+
+#. dD3H5
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3155854\n"
+"help.text"
+msgid "<image id=\"img_id3151116\" src=\"cmd/sc_zoomin.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151116\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151116\" src=\"cmd/sc_zoomin.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151116\">Ikoon</alt></image>"
+
+#. GcJsA
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145273\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Suurenda"
+
+#. XTPaZ
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Vähenda"
+
+#. P4mw7
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"bm_id3153561\n"
+"help.text"
+msgid "<bookmark_value>page views;reducing scales</bookmark_value><bookmark_value>zooming;reducing page views</bookmark_value>"
+msgstr "<bookmark_value>lehekülje vaade; mõõtkava vähendamine</bookmark_value><bookmark_value>suurendus; lehekülje vaate vähendamine</bookmark_value>"
+
+#. Ffzbc
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"hd_id3153561\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10060000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/scalc/02/10060000.xhp\">Vähenda</link>"
+
+#. BgFbq
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3151246\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomOut\">Reduces the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomOut\">Vähendab aktiivse dokumendi kuva. Kehtivat suurendustegurit näidatakse <emph>Olekuribal</emph>.</ahelp>"
+
+#. Czu2U
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "The minimum zoom factor is 20%."
+msgstr "Vähim võimalik suurendustegur on 20%."
+
+#. DN9qj
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Ikoon</alt></image>"
+
+#. rfG8A
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150440\n"
+"help.text"
+msgid "Zooming Out"
+msgstr "Vähendamine"
+
+#. BwqAM
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Lisamine"
+
+#. GADDh
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"bm_id3156329\n"
+"help.text"
+msgid "<bookmark_value>inserting; objects, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>lisamine;objektid, tööriistariba nupp</bookmark_value>"
+
+#. pM9zg
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/scalc/02/18010000.xhp\">Lisamine</link>"
+
+#. UfEHG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3147336\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCtrl\">Click the arrow next to the icon to open the <emph>Insert </emph>toolbar, where you can add graphics and special characters to the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">Klõps nupu kõrval oleval noolel avab tööriistariba <emph>Lisamine</emph>, kus saab aktiivsele lehele lisada pilte ja erimärke.</ahelp>"
+
+#. DnSkt
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3148664\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Tööriistade riba ikoon:"
+
+#. Eaf8D
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Ikoon</alt></image>"
+
+#. sQ6Tc
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3146120\n"
+"help.text"
+msgid "Insert"
+msgstr "Lisamine"
+
+#. ZVCSS
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3153188\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Kasutada on järgmised ikoonid:"
+
+#. CCP2V
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id4283883\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Lahtine paneel</link>"
+
+#. gdmkZ
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3149410\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Erimärk</link>"
+
+#. FDin8
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3151117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Pilt</link>"
+
+#. UKJsG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3633533\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">Valem</link>"
+
+#. sCB8B
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Diagramm</link>"
+
+#. zc6Yi
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id7581408\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">OLE-objekt</link>"
+
+#. QMjWB
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Cells"
+msgstr "Lisa lahtrid"
+
+#. h3979
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"bm_id3150275\n"
+"help.text"
+msgid "<bookmark_value>inserting; cells, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>lisamine;lahtrid, tööriistariba ikoon</bookmark_value>"
+
+#. RysCQ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18020000.xhp\">Insert Cells</link>"
+msgstr "<link href=\"text/scalc/02/18020000.xhp\">Lisa lahtrid</link>"
+
+#. iTWkf
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3156024\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsCellsCtrl\">Click the arrow next to the icon to open the <emph>Insert Cells </emph>toolbar, where you can insert cells, rows, and columns into the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsCellsCtrl\">Klõps nupu kõrval asuval noolel avab tööriistariba <emph>Lahtrite lisamine</emph>, kus saab aktiivsele lehele lisada lahtreid, ridu ja veerge.</ahelp>"
+
+#. o7wEe
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Tööriistade riba ikoon:"
+
+#. eqHih
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Kasutada on järgmised ikoonid:"
+
+#. JPhcE
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150439\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Down</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Lisa lahtrid allapoole</link>"
+
+#. c3Xmu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3146119\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Right</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Lisa lahtrid paremale</link>"
+
+#. XXyxu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153190\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Rows</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Read</link>"
+
+#. i4ifJ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153726\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Columns</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Veerud</link>"

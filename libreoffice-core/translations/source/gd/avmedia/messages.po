@@ -1,0 +1,172 @@
+#. extracted from avmedia/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-02-18 12:16+0100\n"
+"PO-Revision-Date: 2022-08-19 12:58+0000\n"
+"Last-Translator: Michael Bauer <fios@akerbeltz.org>\n"
+"Language-Team: Gaelic <https://translations.documentfoundation.org/projects/libo_ui-master/avmediamessages/gd/>\n"
+"Language: gd\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : (n > 2 && n < 20) ? 2 : 3;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1512308721.000000\n"
+
+#. m6G23
+#: avmedia/inc/strings.hrc:24
+msgctxt "AVMEDIA_STR_ZOOM_50"
+msgid "50%"
+msgstr "50%"
+
+#. k2SKV
+#: avmedia/inc/strings.hrc:25
+msgctxt "AVMEDIA_STR_ZOOM_100"
+msgid "100%"
+msgstr "100%"
+
+#. yTBHR
+#: avmedia/inc/strings.hrc:26
+msgctxt "AVMEDIA_STR_ZOOM_200"
+msgid "200%"
+msgstr "200%"
+
+#. dBMvq
+#: avmedia/inc/strings.hrc:27
+msgctxt "AVMEDIA_STR_ZOOM_FIT"
+msgid "Scaled"
+msgstr "Air a sgèileadh"
+
+#. eRSnC
+#: avmedia/inc/strings.hrc:28
+msgctxt "AVMEDIA_STR_VOLUME"
+msgid "Volume"
+msgstr "Àirde na fuaime"
+
+#. o3hBG
+#: avmedia/inc/strings.hrc:29
+msgctxt "AVMEDIA_STR_POSITION"
+msgid "Position"
+msgstr "Ionad"
+
+#. 9aa7b
+#: avmedia/inc/strings.hrc:30
+msgctxt "AVMEDIA_STR_MEDIAPLAYER"
+msgid "Media Player"
+msgstr "Cluicheadair mheadhanan"
+
+#. BM7GB
+#: avmedia/inc/strings.hrc:31
+msgctxt "AVMEDIA_MEDIA_PATH"
+msgid "Media Path"
+msgstr "Slighe a’ mheadhain"
+
+#. JggdA
+#: avmedia/inc/strings.hrc:32
+msgctxt "AVMEDIA_MEDIA_PATH_DEFAULT"
+msgid "No Media Selected"
+msgstr "Cha deach meadhan a thaghadh"
+
+#. BFybF
+#: avmedia/inc/strings.hrc:33
+msgctxt "AVMEDIA_STR_INSERTMEDIA_DLG"
+msgid "Insert Audio or Video"
+msgstr "Cuir a-steach fuaim no video"
+
+#. AvVZ8
+#: avmedia/inc/strings.hrc:34
+msgctxt "AVMEDIA_STR_OPENMEDIA_DLG"
+msgid "Open Audio or Video"
+msgstr "Fosgail fuaim no video"
+
+#. FaT3C
+#: avmedia/inc/strings.hrc:35
+msgctxt "AVMEDIA_STR_ALL_MEDIAFILES"
+msgid "All audio and video files"
+msgstr "Gach faidhle fuaime 's video"
+
+#. oJnCV
+#: avmedia/inc/strings.hrc:36
+msgctxt "AVMEDIA_STR_ALL_FILES"
+msgid "All files"
+msgstr "A h-uile faidhle"
+
+#. QYcS3
+#: avmedia/inc/strings.hrc:37
+msgctxt "AVMEDIA_STR_ERR_URL"
+msgid "The format of the selected file is not supported."
+msgstr "Chan eil taic ann do dh'fhòrmat an fhaidhle a thagh thu."
+
+#. am3R5
+#: avmedia/inc/strings.hrc:38
+msgctxt "AVMEDIA_STR_ZOOM_TOOLTIP"
+msgid "View"
+msgstr "Seall"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Cuir ris"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "C_uir an sàs"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Sguir dheth"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Dùin"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "Sgua_b às"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Deasaich"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "Cobhai_r"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "Ù_r"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "Chan _eil"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "Ceart _ma-thà"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Thoir air falbh"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "At_h-shuidhich"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Tha"

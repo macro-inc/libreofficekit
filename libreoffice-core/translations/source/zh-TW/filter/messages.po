@@ -1,0 +1,2096 @@
+#. extracted from filter/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 13:11+0100\n"
+"PO-Revision-Date: 2022-12-08 11:41+0000\n"
+"Last-Translator: Po-Yen Huang <jeff@mail.ossii.com.tw>\n"
+"Language-Team: Chinese (Traditional) <https://translations.documentfoundation.org/projects/libo_ui-master/filtermessages/zh_Hant/>\n"
+"Language: zh-TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1554782006.000000\n"
+
+#. 5AQgJ
+#: filter/inc/strings.hrc:27
+msgctxt "STR_UNKNOWN_APPLICATION"
+msgid "Unknown"
+msgstr "不明"
+
+#. AP7oB
+#: filter/inc/strings.hrc:28
+msgctxt "STR_IMPORT_ONLY"
+msgid "import filter"
+msgstr "匯入篩選器"
+
+#. 7vg82
+#: filter/inc/strings.hrc:29
+msgctxt "STR_IMPORT_EXPORT"
+msgid "import/export filter"
+msgstr "匯入/匯出篩選器"
+
+#. q6Bc5
+#: filter/inc/strings.hrc:30
+msgctxt "STR_EXPORT_ONLY"
+msgid "export filter"
+msgstr "匯出篩選器"
+
+#. AmATR
+#: filter/inc/strings.hrc:31
+msgctxt "STR_WARN_DELETE"
+msgid "Do you really want to delete the XML Filter '%s'? This action cannot be undone."
+msgstr "您確定要刪除 XML 篩選器「%s」？此動作無法復原。"
+
+#. Vf3nz
+#: filter/inc/strings.hrc:32
+msgctxt "STR_ERROR_FILTER_NAME_EXISTS"
+msgid "An XML filter with the name '%s' already exists. Please enter a different name."
+msgstr "已存在名稱為「%s」的 XML 篩選器。請改輸入不同名稱。"
+
+#. e3U54
+#: filter/inc/strings.hrc:33
+msgctxt "STR_ERROR_TYPE_NAME_EXISTS"
+msgid "The name for the user interface '%s1' is already used by the XML filter '%s2'. Please enter a different name."
+msgstr "XML 篩選器「%s2」已被使者用介面名稱「%s1」使用。請改輸入不同名稱。"
+
+#. Zt87T
+#: filter/inc/strings.hrc:34
+msgctxt "STR_ERROR_EXPORT_XSLT_NOT_FOUND"
+msgid "The XSLT for export cannot be found. Please enter a valid path."
+msgstr "無法找到匯出用的 XSLT。請輸入有效的路徑。"
+
+#. 7VkMt
+#: filter/inc/strings.hrc:35
+msgctxt "STR_ERROR_IMPORT_XSLT_NOT_FOUND"
+msgid "The XSLT for import cannot be found. Please enter a valid path."
+msgstr "無法找到匯入用的 XSLT。請輸入有效的路徑。"
+
+#. CLFJD
+#: filter/inc/strings.hrc:36
+msgctxt "STR_ERROR_IMPORT_TEMPLATE_NOT_FOUND"
+msgid "The given import template cannot be found. Please enter a valid path."
+msgstr "找不到給定的匯入範本。請輸入有效的路徑。"
+
+#. WMzvt
+#: filter/inc/strings.hrc:37
+msgctxt "STR_DEFAULT_FILTER_NAME"
+msgid "New Filter"
+msgstr "新篩選器"
+
+#. N3wHE
+#: filter/inc/strings.hrc:38
+msgctxt "STR_DEFAULT_UI_NAME"
+msgid "Untitled"
+msgstr "未命名"
+
+#. VAMhi
+#: filter/inc/strings.hrc:39
+msgctxt "STR_UNDEFINED_FILTER"
+msgid "undefined filter"
+msgstr "未定義的篩選器"
+
+#. tphDj
+#: filter/inc/strings.hrc:40
+msgctxt "STR_FILTER_HAS_BEEN_SAVED"
+msgid "The XML filter '%s' has been saved as package '%s'. "
+msgstr "XML 篩選器「%s」已經另存為「%s」包裝。 "
+
+#. tJeU3
+#: filter/inc/strings.hrc:41
+msgctxt "STR_FILTERS_HAVE_BEEN_SAVED"
+msgid "%s XML filters have been saved in the package '%s'."
+msgstr "%s XML 篩選器已經存入「%s」包裝。"
+
+#. ZULF4
+#: filter/inc/strings.hrc:42
+msgctxt "STR_FILTER_PACKAGE"
+msgid "XSLT filter package"
+msgstr "XSLT 篩選器包裝"
+
+#. TAAAB
+#: filter/inc/strings.hrc:43
+msgctxt "STR_FILTER_INSTALLED"
+msgid "The XML filter '%s' has been installed successfully."
+msgstr "已經成功安裝 XML 篩選器「%s」。"
+
+#. SwDCV
+#: filter/inc/strings.hrc:44
+msgctxt "STR_FILTERS_INSTALLED"
+msgid "%s XML filters have been installed successfully."
+msgstr "已經成功安裝 %s XML 篩選器。"
+
+#. dirBm
+#: filter/inc/strings.hrc:45
+msgctxt "STR_NO_FILTERS_FOUND"
+msgid "No XML filter could be installed because the package '%s' does not contain any XML filters."
+msgstr "因爲包裝「%s」沒有包含任何 XML 篩選器，因此無法安裝 XML 篩選器。"
+
+#. EifWe
+#: filter/inc/strings.hrc:46
+msgctxt "STR_XML_FILTER_LISTBOX"
+msgid "XML Filter List"
+msgstr "XML 篩選器清單"
+
+#. iUSBA
+#: filter/inc/strings.hrc:48
+msgctxt "T602FILTER_STR_IMPORT_DIALOG_TITLE"
+msgid "Settings for T602 import"
+msgstr "T602 匯入的設定"
+
+#. BU2Mt
+#: filter/inc/strings.hrc:49
+msgctxt "T602FILTER_STR_ENCODING_LABEL"
+msgid "Encoding"
+msgstr "編碼"
+
+#. j3aAG
+#: filter/inc/strings.hrc:50
+msgctxt "T602FILTER_STR_ENCODING_AUTO"
+msgid "Automatic"
+msgstr "自動"
+
+#. DuxTb
+#: filter/inc/strings.hrc:51
+msgctxt "T602FILTER_STR_ENCODING_CP852"
+msgid "CP852 (Latin2)"
+msgstr "CP852 (拉丁2)"
+
+#. AfQyS
+#: filter/inc/strings.hrc:52
+msgctxt "T602FILTER_STR_ENCODING_CP895"
+msgid "CP895 (KEYB2CS, Kamenicky)"
+msgstr "CP895 (KEYB2CS, Kamenicky)"
+
+#. 8NfvS
+#: filter/inc/strings.hrc:53
+msgctxt "T602FILTER_STR_ENCODING_KOI8CS2"
+msgid "KOI8 CS2"
+msgstr "KOI8 CS2"
+
+#. EWMCQ
+#: filter/inc/strings.hrc:54
+msgctxt "T602FILTER_STR_CYRILLIC_MODE"
+msgid "Mode for Russian language (Cyrillic)"
+msgstr "俄文 (西里爾文) 模式"
+
+#. mZVZv
+#: filter/inc/strings.hrc:55
+msgctxt "T602FILTER_STR_REFORMAT_TEXT"
+msgid "Reformat the text"
+msgstr "重新設定文字格式"
+
+#. MGmYA
+#: filter/inc/strings.hrc:56
+msgctxt "T602FILTER_STR_DOT_COMMANDS"
+msgid "Display dot commands"
+msgstr "顯示點指令"
+
+#. c6Atq
+#: filter/inc/strings.hrc:57
+msgctxt "T602FILTER_STR_CANCEL_BUTTON"
+msgid "Cancel"
+msgstr "取消"
+
+#. Sjy7k
+#: filter/inc/strings.hrc:58
+msgctxt "T602FILTER_STR_OK_BUTTON"
+msgid "OK"
+msgstr "確定"
+
+#. AvaAH
+#: filter/inc/strings.hrc:60
+msgctxt "PDF_PROGRESS_BAR"
+msgid "Export as PDF"
+msgstr "匯出為 PDF"
+
+#. BGJB2
+#. strings used in encryption UI
+#. password dialog title
+#: filter/inc/strings.hrc:64
+msgctxt "STR_PDF_EXPORT_UDPWD"
+msgid "Set open password"
+msgstr "設定開啟密碼"
+
+#. GDvVE
+#. password dialog title
+#: filter/inc/strings.hrc:66
+msgctxt "STR_PDF_EXPORT_ODPWD"
+msgid "Set permission password"
+msgstr "設定授權密碼"
+
+#. FTpr4
+#: filter/inc/strings.hrc:67
+msgctxt "STR_WARN_PASSWORD_PDFA"
+msgid "PDF/A does not allow encryption. The exported PDF file will not be password protected."
+msgstr "PDF/A 不允許加密。匯出的 PDF 檔不會被密碼保護。"
+
+#. XX5fd
+#: filter/inc/strings.hrc:68
+msgctxt "STR_WARN_TRANSP_PDFA_SHORT"
+msgid "PDF/A transparency"
+msgstr "PDF/A 透明度"
+
+#. VGvbg
+#: filter/inc/strings.hrc:69
+msgctxt "STR_WARN_TRANSP_PDFA"
+msgid "PDF/A forbids transparency. A transparent object was painted opaque instead."
+msgstr "PDF/A 禁止使用透明度。透明物件已改用不透明方式繪製。"
+
+#. siDaM
+#: filter/inc/strings.hrc:70
+msgctxt "STR_WARN_TRANSP_VERSION_SHORT"
+msgid "PDF version conflict"
+msgstr "PDF 版本衝突"
+
+#. VSCwD
+#: filter/inc/strings.hrc:71
+msgctxt "STR_WARN_TRANSP_VERSION"
+msgid "Transparency is not supported in PDF versions earlier than PDF 1.4. A transparent object was painted opaque instead"
+msgstr "PDF 1.4 以前的 PDF 版本不支援透明度處理。透明物件已改用不透明方式繪製"
+
+#. CyosP
+#: filter/inc/strings.hrc:72
+msgctxt "STR_WARN_FORMACTION_PDFA_SHORT"
+msgid "PDF/A form action"
+msgstr "PDF/A 表單動作"
+
+#. N9Vug
+#: filter/inc/strings.hrc:73
+msgctxt "STR_WARN_FORMACTION_PDFA"
+msgid "A form control contained an action not supported by the PDF/A standard. The action was skipped"
+msgstr "有表單控制項包含 PDF/A 標準中不支援的動作。已略過該動作"
+
+#. d2ndY
+#: filter/inc/strings.hrc:74
+msgctxt "STR_WARN_TRANSP_CONVERTED"
+msgid "Some objects were converted to an image in order to remove transparencies, because the target PDF format does not support transparencies. Possibly better results can be achieved if you remove the transparent objects before exporting."
+msgstr "由於目標 PDF 格式不支援透明度的關係，有些物件已轉換成影像以除去透明度。若您在匯出前就移除透明物件，可能會得到更佳的結果。"
+
+#. qtCcB
+#: filter/inc/strings.hrc:75
+msgctxt "STR_WARN_TRANSP_CONVERTED_SHORT"
+msgid "Transparencies removed"
+msgstr "透明度已移除"
+
+#. UHmjA
+#: filter/inc/strings.hrc:76
+msgctxt "STR_ERR_SIGNATURE_FAILED"
+msgid "Signature generation failed"
+msgstr "簽章生成失敗"
+
+#. wjBBo
+#: filter/inc/strings.hrc:77
+msgctxt "STR_ERR_PDF_EXPORT_ABORTED"
+msgid "PDF export aborted"
+msgstr "PDF 匯出已中止"
+
+#. eNaMA
+#. Progress bar status indicator when importing or exporting
+#: filter/inc/strings.hrc:80
+msgctxt "STR_FILTER_DOC_LOADING"
+msgid "Loading: "
+msgstr "正在載入： "
+
+#. 4YFQR
+#: filter/inc/strings.hrc:81
+msgctxt "STR_FILTER_DOC_SAVING"
+msgid "Saving: "
+msgstr "正在儲存： "
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "加入(_A)"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "套用(_A)"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "取消(_C)"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "關閉(_C)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "刪除(_D)"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "編輯(_E)"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "說明(_H)"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "新增(_N)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "否(_N)"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "確定(_O)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "移除(_R)"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "重設(_R)"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "是(_Y)"
+
+#. AwX66
+#: filter/uiconfig/ui/pdfgeneralpage.ui:42
+msgctxt "pdfgeneralpage|all"
+msgid "_All"
+msgstr "全部(_A)"
+
+#. QMgsn
+#: filter/uiconfig/ui/pdfgeneralpage.ui:52
+msgctxt "pdfgeneralpage|extended_tip|all"
+msgid "Exports all defined print ranges. If no print range is defined, exports the entire document."
+msgstr "匯出所有定義的列印範圍。若沒有定義列印範圍，則匯出整份文件。"
+
+#. NXztB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:64
+msgctxt "pdfgeneralpage|range"
+msgid "_Pages:"
+msgstr "頁(_P)："
+
+#. ZdAZ9
+#: filter/uiconfig/ui/pdfgeneralpage.ui:78
+msgctxt "pdfgeneralpage|extended_tip|range"
+msgid "Exports the pages you type in the box."
+msgstr "匯出您在方框中輸入的頁面。"
+
+#. WTSeS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:89
+msgctxt "pdfgeneralpage|selection"
+msgid "_Selection"
+msgstr "所選內容(_S)"
+
+#. RQeDb
+#: filter/uiconfig/ui/pdfgeneralpage.ui:99
+msgctxt "pdfgeneralpage|extended_tip|selection"
+msgid "Exports the current selection."
+msgstr "匯出目前的選取內容。"
+
+#. qQrdx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:121
+msgctxt "pdfgeneralpage|extended_tip|pages"
+msgid "Exports the pages you type in the box."
+msgstr "匯出您在方框中輸入的頁面。"
+
+#. tFeCH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:135
+msgctxt "pdfgeneralpage|slides"
+msgid "Slides:"
+msgstr "投影片："
+
+#. 9Cyn8
+#: filter/uiconfig/ui/pdfgeneralpage.ui:144
+msgctxt "pdfgeneralpage|viewpdf"
+msgid "_View PDF after export"
+msgstr "匯出後檢視 PDF(_V)"
+
+#. mwuGG
+#: filter/uiconfig/ui/pdfgeneralpage.ui:153
+msgctxt "pdfgeneralpage|extended_tip|viewpdf"
+msgid "Open the exported document in the system default PDF viewer."
+msgstr "在系統預設的 PDF 檢視程式開啟匯出的文件。"
+
+#. aWj7F
+#: filter/uiconfig/ui/pdfgeneralpage.ui:168
+msgctxt "pdfgeneralpage|selectedsheets"
+msgid "_Selection/Selected sheet(s)"
+msgstr "所選範圍/選取工作表(_S)"
+
+#. MXtmZ
+#: filter/uiconfig/ui/pdfgeneralpage.ui:181
+msgctxt "pdfgeneralpage|label1"
+msgid "Range"
+msgstr "範圍"
+
+#. WbQ5j
+#: filter/uiconfig/ui/pdfgeneralpage.ui:211
+msgctxt "pdfgeneralpage|losslesscompress"
+msgid "_Lossless compression"
+msgstr "無損壓縮(_L)"
+
+#. 9ut6Q
+#: filter/uiconfig/ui/pdfgeneralpage.ui:221
+msgctxt "pdfgeneralpage|extended_tip|losslesscompress"
+msgid "Selects a lossless compression of images. All pixels are preserved."
+msgstr "選取影像的無損壓縮方式。保留所有像素。"
+
+#. ccCL4
+#: filter/uiconfig/ui/pdfgeneralpage.ui:233
+msgctxt "pdfgeneralpage|reduceresolution"
+msgid "Reduce ima_ge resolution to:"
+msgstr "將影像解析度降為：(_G)"
+
+#. bAtCV
+#: filter/uiconfig/ui/pdfgeneralpage.ui:245
+msgctxt "pdfgeneralpage|extended_tip|reduceresolution"
+msgid "Select to resample or down-size the images to a lower number of pixels per inch."
+msgstr "選取重新取樣，或是降低影像大小至較低的 PPI（每英吋像素數）。"
+
+#. XHeTx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:260
+msgctxt "pdfgeneralpage|resolution"
+msgid "75 DPI"
+msgstr "75 DPI"
+
+#. CXj4e
+#: filter/uiconfig/ui/pdfgeneralpage.ui:261
+msgctxt "pdfgeneralpage|resolution"
+msgid "150 DPI"
+msgstr "150 DPI"
+
+#. jZKqd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:262
+msgctxt "pdfgeneralpage|resolution"
+msgid "300 DPI"
+msgstr "300 DPI"
+
+#. GsMsK
+#: filter/uiconfig/ui/pdfgeneralpage.ui:263
+msgctxt "pdfgeneralpage|resolution"
+msgid "600 DPI"
+msgstr "600 DPI"
+
+#. 5yTAM
+#: filter/uiconfig/ui/pdfgeneralpage.ui:264
+msgctxt "pdfgeneralpage|resolution"
+msgid "1200 DPI"
+msgstr "1200 DPI"
+
+#. r6npH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:270
+msgctxt "pdfgeneralpage|comboboxtext-entry"
+msgid "75 DPI"
+msgstr "75 DPI"
+
+#. SkTeA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:279
+msgctxt "pdfgeneralpage|extended_tip|resolution"
+msgid "Select the target resolution for the images."
+msgstr "選取影像的目標解析度。"
+
+#. mEbKx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:303
+msgctxt "pdfgeneralpage|extended_tip|quality"
+msgid "Enter the quality level for JPEG compression."
+msgstr "輸入 JPEG 壓縮品質等級。"
+
+#. FP56V
+#: filter/uiconfig/ui/pdfgeneralpage.ui:325
+msgctxt "pdfgeneralpage|jpegcompress"
+msgid "_JPEG compression"
+msgstr "JPEG 壓縮(_J)"
+
+#. PZCPi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:335
+msgctxt "pdfgeneralpage|extended_tip|jpegcompress"
+msgid "Select a JPEG compression level. With a high quality level, almost all pixels are preserved. With a low quality level, some pixels are lost and artifacts are introduced, but file sizes are reduced."
+msgstr "選取 JPEG 壓縮等級。品質等級越高，越能保留所有像素。品質等級越低，會失去一些像素並產生瑕疵，但是能縮減檔案大小。"
+
+#. ST3Rc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:349
+msgctxt "pdfgeneralpage|label6"
+msgid "_Quality:"
+msgstr "品質(_Q)："
+
+#. cFwGA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:371
+msgctxt "pdfgeneralpage|label2"
+msgid "Images"
+msgstr "影像"
+
+#. NwjSn
+#: filter/uiconfig/ui/pdfgeneralpage.ui:401
+msgctxt "pdfgeneralpage|watermark"
+msgid "Sign with _watermark"
+msgstr "以水印簽署(_W)"
+
+#. 2uMoT
+#: filter/uiconfig/ui/pdfgeneralpage.ui:410
+msgctxt "pdfgeneralpage|extended_tip|watermark"
+msgid "Add a centered, vertical, light green watermark text to the page background. The watermark is not part of the source document."
+msgstr "在頁面背景新增置中、垂直、淺綠色的浮水印。浮水印不是原始文件的一部分。"
+
+#. L7AYx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:427
+msgctxt "pdfgeneralpage|extended_tip|watermarkentry"
+msgid "Insert the text for the watermark signature."
+msgstr "插入浮水印簽章的文字。"
+
+#. JtBsL
+#: filter/uiconfig/ui/pdfgeneralpage.ui:439
+msgctxt "pdfgeneralpage|watermarklabel"
+msgid "Text:"
+msgstr "文字："
+
+#. VfFZf
+#: filter/uiconfig/ui/pdfgeneralpage.ui:458
+msgctxt "pdfgeneralpage|label3"
+msgid "Watermark"
+msgstr "水印"
+
+#. 2hSjJ
+#: filter/uiconfig/ui/pdfgeneralpage.ui:500
+msgctxt "pdfgeneralpage|embed"
+msgid "Hybrid PDF (em_bed ODF file)"
+msgstr "混合式 PDF (內嵌 ODF 檔)(_B)"
+
+#. vzxG2
+#: filter/uiconfig/ui/pdfgeneralpage.ui:504
+msgctxt "pdfgeneralpage|embed|tooltip_text"
+msgid "Creates a PDF that is easily editable in %PRODUCTNAME"
+msgstr "建立可在 %PRODUCTNAME 中編輯的 PDF 檔"
+
+#. 3tDFv
+#: filter/uiconfig/ui/pdfgeneralpage.ui:510
+msgctxt "pdfgeneralpage|extended_tip|embed"
+msgid "This setting enables you to export the document as a .pdf file containing two file formats: PDF and ODF."
+msgstr "此設定讓您能將文件匯出為內含兩種格式的 .pdf 檔：PDF 和 ODF。"
+
+#. RAvA6
+#: filter/uiconfig/ui/pdfgeneralpage.ui:521
+msgctxt "pdfgeneralpage|tagged"
+msgid "_Tagged PDF (add document structure)"
+msgstr "標籤化 PDF (加入文件結構)(_T)"
+
+#. cAm8Z
+#: filter/uiconfig/ui/pdfgeneralpage.ui:525
+msgctxt "pdfgeneralpage|tagged|tooltip_text"
+msgid "Includes a document's content structure information in a PDF"
+msgstr "PDF 中包含文件的內容結構資訊"
+
+#. Btxot
+#: filter/uiconfig/ui/pdfgeneralpage.ui:531
+msgctxt "pdfgeneralpage|extended_tip|tagged"
+msgid "Select to write PDF tags. This can increase file size by huge amounts."
+msgstr "選取以寫入 PDF 標籤。這可能會大幅度擴增檔案大小。"
+
+#. 6sDFd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:542
+msgctxt "pdfgeneralpage|forms"
+msgid "Create PDF for_m"
+msgstr "建立 PDF 表單(_M)"
+
+#. 3Vg8V
+#: filter/uiconfig/ui/pdfgeneralpage.ui:546
+msgctxt "pdfgeneralpage|forms|tooltip_text"
+msgid "Creates a PDF with fields that can be filled out"
+msgstr "建立具有可填寫欄位的 PDF"
+
+#. hmxuq
+#: filter/uiconfig/ui/pdfgeneralpage.ui:552
+msgctxt "pdfgeneralpage|extended_tip|forms"
+msgid "Choose to create a PDF form. This can be filled out and printed by the user of the PDF document."
+msgstr "選擇以製作 PDF 表單。這能讓 PDF 文件的使用者填表並列印。"
+
+#. B7zan
+#: filter/uiconfig/ui/pdfgeneralpage.ui:572
+msgctxt "pdfgeneralpage|allowdups"
+msgid "Allow duplicate field _names"
+msgstr "允許重複的欄位名稱(_N)"
+
+#. D4MmM
+#: filter/uiconfig/ui/pdfgeneralpage.ui:581
+msgctxt "pdfgeneralpage|extended_tip|allowdups"
+msgid "Allows you to use the same field name for multiple fields in the generated PDF file. If disabled, field names will be exported using generated unique names."
+msgstr "允許您在生成的 PDF 檔中於多個欄位使用相同的欄位名稱。若停用，則欄位名稱會使用生成的獨一名稱匯出。"
+
+#. tkPCH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:597
+msgctxt "pdfgeneralpage|format"
+msgid "FDF"
+msgstr "FDF"
+
+#. rfzrh
+#: filter/uiconfig/ui/pdfgeneralpage.ui:598
+msgctxt "pdfgeneralpage|format"
+msgid "PDF"
+msgstr "PDF"
+
+#. S7caE
+#: filter/uiconfig/ui/pdfgeneralpage.ui:599
+msgctxt "pdfgeneralpage|format"
+msgid "HTML"
+msgstr "HTML"
+
+#. HUzsi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:600
+msgctxt "pdfgeneralpage|format"
+msgid "XML"
+msgstr "XML"
+
+#. xbYYC
+#: filter/uiconfig/ui/pdfgeneralpage.ui:604
+msgctxt "pdfgeneralpage|extended_tip|format"
+msgid "Select the format of submitting forms from within the PDF file."
+msgstr "選取以 PDF 檔提交表單的格式。"
+
+#. ECLBB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:626
+msgctxt "pdfgeneralpage|label7"
+msgid "Submit _format:"
+msgstr "提交格式(_F)："
+
+#. hedQy
+#: filter/uiconfig/ui/pdfgeneralpage.ui:657
+msgctxt "pdfgeneralpage|pdfa"
+msgid "Archive (P_DF/A, ISO 19005)"
+msgstr "封存檔 (P_DF/A, ISO 19005)"
+
+#. qQjPA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:661
+msgctxt "pdfgeneralpage|pdfa|tooltip_text"
+msgid "Creates an ISO 19005-2 compliant PDF file, ideal for long-term document preservation"
+msgstr "製作遵循 ISO 19005-2 標準的 PDF 檔，適合長期文件保存之用"
+
+#. Zhi5M
+#: filter/uiconfig/ui/pdfgeneralpage.ui:667
+msgctxt "pdfgeneralpage|extended_tip|pdfa"
+msgid "Converts to the PDF/A-2b or PDF/A-1b format. This is defined as an electronic document file format for long term preservation. All fonts that were used in the source document will be embedded into the generated PDF file. PDF tags will be written."
+msgstr "製作 PDF/A-2b 或 PDF/A-1b 格式。這是為了長期保存而定義的電子文件檔格式。所有來源文件中使用的字型都會內嵌至生成的 PDF 檔中。也會寫入 PDF 標籤。"
+
+#. jmaDc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:716
+msgctxt "pdfgeneralpage|pdfaversion"
+msgid "PDF_/A version:"
+msgstr "PDF/A 版本：(_/)"
+
+#. VQGHi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:748
+msgctxt "pdfgeneralpage|pdfua"
+msgid "Universal Accessibilit_y (PDF/UA)"
+msgstr "通用無障礙 (PDF/UA) (_Y)"
+
+#. 4B3FD
+#: filter/uiconfig/ui/pdfgeneralpage.ui:752
+msgctxt "pdfgeneralpage|pdfua|tooltip_text"
+msgid "Creates a universal accessibility-compliant PDF file that follows the requirements of PDF/UA (ISO 14289) specifications."
+msgstr "製作遵循 PDF/UA (ISO 14289) 無障礙輔助規格的 PDF 檔。"
+
+#. Birq5
+#: filter/uiconfig/ui/pdfgeneralpage.ui:758
+msgctxt "pdfgeneralpage|extended_tip|pdfua"
+msgid "Creates a universal accessibility-complying PDF file that follows the requirements of PDF/UA (ISO 14289) specifications."
+msgstr "製作遵循 PDF/UA (ISO 14289) 無障礙輔助規格的 PDF 檔。"
+
+#. Drqkd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:773
+msgctxt "pdfgeneralpage|label4"
+msgid "General"
+msgstr "一般"
+
+#. FQzGc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:802
+msgctxt "pdfgeneralpage|bookmarks"
+msgid "Export outl_ines"
+msgstr "匯出外框(_I)"
+
+#. qw9My
+#: filter/uiconfig/ui/pdfgeneralpage.ui:811
+msgctxt "pdfgeneralpage|extended_tip|bookmarks"
+msgid "Select to export bookmarks of Writer documents as PDF bookmarks. Bookmarks are created for all outline paragraphs (Tools - Chapter Numbering) and for all table of contents entries for which you did assign hyperlinks in the source document."
+msgstr "選取此選項可將 Writer 文件的書籤匯出為 PDF 書籤。將會所有大綱段落（「工具」→「章節編號」）以及您在原始文件中為其指派超連結的所有目錄項目建立書籤。"
+
+#. kQbPh
+#: filter/uiconfig/ui/pdfgeneralpage.ui:822
+msgctxt "pdfgeneralpage|exportplaceholders"
+msgid "Expo_rt placeholders"
+msgstr "匯出佔位提示項(_R)"
+
+#. T6RjA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:831
+msgctxt "pdfgeneralpage|extended_tip|exportplaceholders"
+msgid "Export the placeholders fields visual markings only. The exported placeholder is ineffective."
+msgstr "僅匯出佔位提示項欄位視覺標記。匯出的佔位提示項無效。"
+
+#. P4kGd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:842
+msgctxt "pdfgeneralpage|comments"
+msgid "Comm_ents as PDF annotations"
+msgstr "評註作為 PDF 註解"
+
+#. SijbK
+#: filter/uiconfig/ui/pdfgeneralpage.ui:851
+msgctxt "pdfgeneralpage|extended_tip|comments"
+msgid "Select to export comments of Writer and Calc documents as PDF annotations."
+msgstr "選取此選項可將 Writer 與 Calc 文件的評註匯出為 PDF 註解。"
+
+#. y9evS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:862
+msgctxt "pdfgeneralpage|emptypages"
+msgid "Exp_ort automatically inserted blank pages"
+msgstr "匯出自動插入的空白頁面(_O)"
+
+#. Drp3w
+#: filter/uiconfig/ui/pdfgeneralpage.ui:871
+msgctxt "pdfgeneralpage|extended_tip|emptypages"
+msgid "If switched on, automatically inserted blank pages are exported to the PDF file. This is best if you are printing the pdf file double-sided. Example: In a book a chapter paragraph style is set to always start with an odd numbered page. If the previous chapter ends on an odd page, then an even numbered blank page is normally automatically inserted. This option controls whether to export that even numbered page or not."
+msgstr "若開啟，將會自動插入空白頁面至匯出的 PDF 檔案中。若您要雙面列印 PDF 檔案，這會是最好的選擇。舉例來說：在一本書中，章節段落樣式被設定為總是從奇數頁開頭。若前一頁在奇數頁結尾，則通常會自動插入偶數空白頁。此選項控制了是否匯出該偶數頁。"
+
+#. sHqKP
+#: filter/uiconfig/ui/pdfgeneralpage.ui:882
+msgctxt "pdfgeneralpage|usereferencexobject"
+msgid "Use reference XObjects"
+msgstr "使用參照 XObject"
+
+#. avuEd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:891
+msgctxt "pdfgeneralpage|extended_tip|usereferencexobject"
+msgid "When the option is enabled, then the reference XObject markup is used:  viewers have to support this markup to show vector images. Otherwise a fallback bitmap is shown in the viewer."
+msgstr "若啟用此選項，將會使用參照 XObject 標記： 檢視程式必須支援此標記才會顯示向量圖。否則檢視程式會顯示備用的點陣圖。"
+
+#. 2K2cD
+#: filter/uiconfig/ui/pdfgeneralpage.ui:902
+msgctxt "pdfgeneralpage|hiddenpages"
+msgid "Export _hidden pages"
+msgstr "匯出隱藏頁(_H)"
+
+#. Gr5rf
+#: filter/uiconfig/ui/pdfgeneralpage.ui:911
+msgctxt "pdfgeneralpage|extended_tip|hiddenpages"
+msgid "Exports document hidden slides."
+msgstr "匯出文件隱藏的投影片。"
+
+#. ghuXR
+#: filter/uiconfig/ui/pdfgeneralpage.ui:922
+msgctxt "pdfgeneralpage|notes"
+msgid "Export _notes pages"
+msgstr "匯出備註頁(_N)"
+
+#. hRjqL
+#: filter/uiconfig/ui/pdfgeneralpage.ui:931
+msgctxt "pdfgeneralpage|extended_tip|notes"
+msgid "Export also the Notes pages view at the end of the exported PDF presentation document."
+msgstr "在匯出的 PDF 簡報文件的結尾同時匯出備註頁面檢視。"
+
+#. BGvC2
+#: filter/uiconfig/ui/pdfgeneralpage.ui:942
+msgctxt "pdfgeneralpage|onlynotes"
+msgid "Export onl_y notes pages"
+msgstr "僅匯出備註頁(_Y)"
+
+#. Mwnea
+#: filter/uiconfig/ui/pdfgeneralpage.ui:952
+msgctxt "pdfgeneralpage|extended_tip|onlynotes"
+msgid "Exports only the Notes page views."
+msgstr "僅匯出備註頁面檢視。"
+
+#. MpRUp
+#: filter/uiconfig/ui/pdfgeneralpage.ui:963
+msgctxt "pdfgeneralpage|singlepagesheets"
+msgid "Whole sheet export"
+msgstr "整張工作表匯出"
+
+#. jRGAS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:972
+msgctxt "pdfgeneralpage|extended_tip|singlepagessheets"
+msgid "Ignores each sheet’s paper size, print ranges and shown/hidden status and puts every sheet (even hidden sheets) on exactly one page, which is exactly as small or large as needed to fit the whole contents of the sheet."
+msgstr "忽略每個工作表的紙張大小、列印範圍與顯示／隱藏狀態，並將每個工作表（即使是隱藏的工作表也一樣）放在同一個頁面上，該頁面的大小剛好可放入工作表的所有內容。"
+
+#. DiBsa
+#: filter/uiconfig/ui/pdfgeneralpage.ui:983
+msgctxt "pdfgeneralpage|commentsinmargin"
+msgid "_Comments in margin"
+msgstr "在邊距上進行評註(_C)"
+
+#. RpDqi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:992
+msgctxt "pdfgeneralpage|extended_tip|commentsinmargin"
+msgid "Select to export comments of Writer documents in the page margin."
+msgstr "選取以匯出 Writer 文件在頁面邊距中的評註。"
+
+#. AcPTB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:1007
+msgctxt "pdfgeneralpage|label9"
+msgid "Structure"
+msgstr "結構"
+
+#. f7vgf
+#: filter/uiconfig/ui/pdflinkspage.ui:29
+msgctxt "pdflinkspage|export"
+msgid "Export outlines as named destinations"
+msgstr "將大綱匯出為已命名的目的地"
+
+#. k27AB
+#: filter/uiconfig/ui/pdflinkspage.ui:37
+msgctxt "pdflinkspage|extended_tip|export"
+msgid "Enable the checkbox to export the names of objects in your document as valid bookmark targets. This allows you to link to those objects by name from other documents."
+msgstr "啟用核取方塊以將您文件中的物件名稱匯出為有效的書籤目標。這讓您可以透過名稱從其他物件連結那些物件。"
+
+#. aCCLQ
+#: filter/uiconfig/ui/pdflinkspage.ui:48
+msgctxt "pdflinkspage|convert"
+msgid "_Convert document references to PDF targets"
+msgstr "將文件參照轉換為 PDF 目標(_C)"
+
+#. FEokC
+#: filter/uiconfig/ui/pdflinkspage.ui:56
+msgctxt "pdflinkspage|extended_tip|convert"
+msgid "Enable this checkbox to convert the URLs referencing other ODF files to PDF files with the same name. In the referencing URLs the extensions .odt, .odp, .ods, .odg, and .odm are converted to the extension .pdf."
+msgstr "啟用此核取方塊會將引用其他 ODF 檔案的 URL 轉換為相同名稱的 PDF 檔案。在引用的 URL 中，.odt、.odp、.ods、.odg 與 .odm 副檔名都會被轉換為 .pdf 副檔名。"
+
+#. 6Lyp3
+#: filter/uiconfig/ui/pdflinkspage.ui:67
+msgctxt "pdflinkspage|exporturl"
+msgid "Export _URLs relative to file system"
+msgstr "以相對的檔案系統關係匯出 _URL"
+
+#. RcdUF
+#: filter/uiconfig/ui/pdflinkspage.ui:75
+msgctxt "pdflinkspage|extended_tip|exporturl"
+msgid "Enable this checkbox to export URLs to other documents as relative URLs in the file system. See \"relative hyperlinks\" in the Help."
+msgstr "啟用此核取方塊可將到其他文件的 URL 匯出為檔案系統中的相對 URL。請見說明中的「相對超連結」。"
+
+#. biumY
+#: filter/uiconfig/ui/pdflinkspage.ui:90
+msgctxt "pdflinkspage|label1"
+msgid "General"
+msgstr "一般"
+
+#. mGRBH
+#: filter/uiconfig/ui/pdflinkspage.ui:119
+msgctxt "pdflinkspage|default"
+msgid "Default mode"
+msgstr "預設模式"
+
+#. bcgaz
+#: filter/uiconfig/ui/pdflinkspage.ui:128
+msgctxt "pdflinkspage|extended_tip|default"
+msgid "Links from your PDF document to other documents will be handled as it is specified in your operating system."
+msgstr "從您的 PDF 文件到其他文件的連結將會按照您作業系統中的狀況進行處理。"
+
+#. DNRK8
+#: filter/uiconfig/ui/pdflinkspage.ui:139
+msgctxt "pdflinkspage|openpdf"
+msgid "Open with PDF reader application"
+msgstr "以 PDF 閱讀器開啟"
+
+#. gmzoA
+#: filter/uiconfig/ui/pdflinkspage.ui:148
+msgctxt "pdflinkspage|extended_tip|openpdf"
+msgid "Cross-document links are opened with the PDF reader application that currently shows the document. The PDF reader application must be able to handle the specified file type inside the hyperlink."
+msgstr "跨文件連結可使用目前顯示文件的 PDF 閱讀程式開啟。PDF 閱讀應用程式必須能處理超連結內指定的檔案類型。"
+
+#. wPem9
+#: filter/uiconfig/ui/pdflinkspage.ui:159
+msgctxt "pdflinkspage|openinternet"
+msgid "Open _with Internet browser"
+msgstr "以網際網路瀏覽器開啟(_W)"
+
+#. xfRr2
+#: filter/uiconfig/ui/pdflinkspage.ui:168
+msgctxt "pdflinkspage|extended_tip|openinternet"
+msgid "Cross-document links are opened with the Internet browser. The Internet browser must be able to handle the specified file type inside the hyperlink."
+msgstr "跨文件連結可使用網際網路瀏覽器開啟。網際網路瀏覽器必須能處理超連結內指定的檔案類型。"
+
+#. B9TGg
+#: filter/uiconfig/ui/pdflinkspage.ui:183
+msgctxt "pdflinkspage|label5"
+msgid "Cross-document Links"
+msgstr "跨文件連結"
+
+#. KmFGh
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:8
+msgctxt "pdfoptionsdialog|PdfOptionsDialog"
+msgid "PDF Options"
+msgstr "PDF 選項"
+
+#. BwbwB
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:41
+msgctxt "pdfoptionsdialog|ok"
+msgid "E_xport"
+msgstr "匯出(_X)..."
+
+#. Y2Mem
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:138
+msgctxt "pdfoptionsdialog|general"
+msgid "General"
+msgstr "一般"
+
+#. DMBHC
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:185
+msgctxt "pdfoptionsdialog|initialview"
+msgid "Initial View"
+msgstr "初始檢視"
+
+#. 35g8K
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:233
+msgctxt "pdfoptionsdialog|userinterface"
+msgid "User Interface"
+msgstr "使用者介面"
+
+#. 3EStU
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:281
+msgctxt "pdfoptionsdialog|links"
+msgid "Links"
+msgstr "連結"
+
+#. x4GVL
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:329
+msgctxt "pdfoptionsdialog|security"
+msgid "Security"
+msgstr "安全性"
+
+#. Vmf6H
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:377
+msgctxt "pdfoptionsdialog|digitalsignatures"
+msgid "Digital Signatures"
+msgstr "數位簽章"
+
+#. 7p3sS
+#: filter/uiconfig/ui/pdfsecuritypage.ui:28
+msgctxt "pdfsecuritypage|setpassword"
+msgid "Set _Passwords…"
+msgstr "設定密碼(_P)..."
+
+#. C9DhC
+#: filter/uiconfig/ui/pdfsecuritypage.ui:36
+msgctxt "pdfsecuritypage|extended_tip|setpassword"
+msgid "Click to open a dialog where you enter the passwords."
+msgstr "點擊以開啟對話框，您可以在其中輸入密碼。"
+
+#. 63szB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:55
+msgctxt "pdfsecuritypage|label5"
+msgid "Open password set"
+msgstr "設定開啟密碼"
+
+#. 6ktYG
+#: filter/uiconfig/ui/pdfsecuritypage.ui:67
+msgctxt "pdfsecuritypage|label6"
+msgid "PDF document will be encrypted"
+msgstr "PDF 文件會加密"
+
+#. pTAZC
+#: filter/uiconfig/ui/pdfsecuritypage.ui:91
+msgctxt "pdfsecuritypage|label7"
+msgid "No open password set"
+msgstr "未設定開啟密碼"
+
+#. fp3My
+#: filter/uiconfig/ui/pdfsecuritypage.ui:103
+msgctxt "pdfsecuritypage|label8"
+msgid "PDF document will not be encrypted"
+msgstr "PDF 文件不會加密"
+
+#. aHC6v
+#: filter/uiconfig/ui/pdfsecuritypage.ui:127
+msgctxt "pdfsecuritypage|label30"
+msgid "PDF document will not be encrypted due to PDF/A export."
+msgstr "因為 PDF/A 匯出之故，PDF 文件不會加密。"
+
+#. DsALB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:152
+msgctxt "pdfsecuritypage|label9"
+msgid "Permission password set"
+msgstr "設定權限密碼"
+
+#. hRJpp
+#: filter/uiconfig/ui/pdfsecuritypage.ui:164
+msgctxt "pdfsecuritypage|label11"
+msgid "PDF document will be restricted"
+msgstr "PDF 文件會受限"
+
+#. L3oQx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:188
+msgctxt "pdfsecuritypage|label12"
+msgid "No permission password set"
+msgstr "未設定權限密碼"
+
+#. s3RBF
+#: filter/uiconfig/ui/pdfsecuritypage.ui:200
+msgctxt "pdfsecuritypage|label13"
+msgid "PDF document will be unrestricted"
+msgstr "PDF 文件不會受限"
+
+#. 4jwu7
+#: filter/uiconfig/ui/pdfsecuritypage.ui:224
+msgctxt "pdfsecuritypage|label14"
+msgid "PDF document will not be restricted due to PDF/A export."
+msgstr "因為 PDF/A 匯出之故，PDF 文件不會受限。"
+
+#. 9CFqB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:244
+msgctxt "pdfsecuritypage|setpasswordstitle"
+msgid "Set Passwords"
+msgstr "設定密碼"
+
+#. FDKJa
+#: filter/uiconfig/ui/pdfsecuritypage.ui:259
+msgctxt "pdfsecuritypage|label2"
+msgid "File Encryption and Permission"
+msgstr "檔案加密與權限"
+
+#. tWAWA
+#: filter/uiconfig/ui/pdfsecuritypage.ui:294
+msgctxt "pdfsecuritypage|printnone"
+msgid "_Not permitted"
+msgstr "不允許(_N)"
+
+#. R3Gvm
+#: filter/uiconfig/ui/pdfsecuritypage.ui:303
+msgctxt "pdfsecuritypage|extended_tip|printnone"
+msgid "Printing the document is not permitted."
+msgstr "不允許列印文件。"
+
+#. kSfrd
+#: filter/uiconfig/ui/pdfsecuritypage.ui:314
+msgctxt "pdfsecuritypage|printlow"
+msgid "_Low resolution (150 dpi)"
+msgstr "低解析度 (150 dpi)(_L)"
+
+#. kB7dx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:323
+msgctxt "pdfsecuritypage|extended_tip|printlow"
+msgid "The document can only be printed in low resolution (150 dpi). Not all PDF readers honor this setting."
+msgstr "只能以低解析度列印文件 (150 dpi)。並非所有的 PDF 閱讀程式都尊重此設定。"
+
+#. CmQzT
+#: filter/uiconfig/ui/pdfsecuritypage.ui:334
+msgctxt "pdfsecuritypage|printhigh"
+msgid "_High resolution"
+msgstr "高解析度(_H)"
+
+#. iBC7m
+#: filter/uiconfig/ui/pdfsecuritypage.ui:343
+msgctxt "pdfsecuritypage|extended_tip|printhigh"
+msgid "The document can be printed in high resolution."
+msgstr "可用高解析度列印文件。"
+
+#. Gjpp4
+#: filter/uiconfig/ui/pdfsecuritypage.ui:358
+msgctxt "pdfsecuritypage|label1"
+msgid "Printing"
+msgstr "列印"
+
+#. C6BHs
+#: filter/uiconfig/ui/pdfsecuritypage.ui:387
+msgctxt "pdfsecuritypage|changenone"
+msgid "No_t permitted"
+msgstr "不允許(_T)"
+
+#. McdCx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:396
+msgctxt "pdfsecuritypage|extended_tip|changenone"
+msgid "No changes of the content are permitted."
+msgstr "不允許更改內容。"
+
+#. Vt6Zn
+#: filter/uiconfig/ui/pdfsecuritypage.ui:407
+msgctxt "pdfsecuritypage|changeinsdel"
+msgid "_Inserting, deleting, and rotating pages"
+msgstr "可插入、刪除、旋轉頁面(_I)"
+
+#. bpyjZ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:416
+msgctxt "pdfsecuritypage|extended_tip|changeinsdel"
+msgid "Only inserting, deleting, and rotating pages is permitted."
+msgstr "僅允許插入、刪除與旋轉頁面。"
+
+#. dAmDo
+#: filter/uiconfig/ui/pdfsecuritypage.ui:427
+msgctxt "pdfsecuritypage|changeform"
+msgid "_Filling in form fields"
+msgstr "可填寫單欄位(_F)"
+
+#. yXs9B
+#: filter/uiconfig/ui/pdfsecuritypage.ui:436
+msgctxt "pdfsecuritypage|extended_tip|changeform"
+msgid "Only filling in form fields is permitted."
+msgstr "僅允許填寫表單欄位。"
+
+#. zGE7J
+#: filter/uiconfig/ui/pdfsecuritypage.ui:447
+msgctxt "pdfsecuritypage|changecomment"
+msgid "_Commenting, filling in form fields"
+msgstr "可加入評註、填寫表單欄位(_C)"
+
+#. aeLn4
+#: filter/uiconfig/ui/pdfsecuritypage.ui:456
+msgctxt "pdfsecuritypage|extended_tip|changecomment"
+msgid "Only commenting and filling in form fields is permitted."
+msgstr "僅允許評論與填寫表單欄位。"
+
+#. uP8VW
+#: filter/uiconfig/ui/pdfsecuritypage.ui:467
+msgctxt "pdfsecuritypage|changeany"
+msgid "_Any except extracting pages"
+msgstr "除擷取頁面以外的全部操作(_A)"
+
+#. 3RDPJ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:476
+msgctxt "pdfsecuritypage|extended_tip|changeany"
+msgid "All changes are permitted, except extracting pages."
+msgstr "除了擷取頁面以外，所有變更都允許。"
+
+#. vLxXJ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:491
+msgctxt "pdfsecuritypage|label3"
+msgid "Changes"
+msgstr "變更"
+
+#. iJHWS
+#: filter/uiconfig/ui/pdfsecuritypage.ui:520
+msgctxt "pdfsecuritypage|enablecopy"
+msgid "Ena_ble copying of content"
+msgstr "啟用內容複製功能(_B)"
+
+#. WJuNa
+#: filter/uiconfig/ui/pdfsecuritypage.ui:529
+msgctxt "pdfsecuritypage|extended_tip|enablecopy"
+msgid "Select to enable copying of content to the clipboard."
+msgstr "選取以將內容複製到剪貼簿。"
+
+#. 2EMgQ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:540
+msgctxt "pdfsecuritypage|enablea11y"
+msgid "Enable text access for acce_ssibility tools"
+msgstr "啟用輔助工具的文字存取(_S)"
+
+#. cQrBt
+#: filter/uiconfig/ui/pdfsecuritypage.ui:549
+msgctxt "pdfsecuritypage|extended_tip|enablea11y"
+msgid "Select to enable text access for accessibility tools."
+msgstr "選取以讓無障礙工具存取文字。"
+
+#. 2hi53
+#: filter/uiconfig/ui/pdfsecuritypage.ui:564
+msgctxt "pdfsecuritypage|label4"
+msgid "Content"
+msgstr "內容"
+
+#. bDVGF
+#: filter/uiconfig/ui/pdfsignpage.ui:33
+msgctxt "pdfsignpage|label2"
+msgid "Use this certificate to digitally sign PDF documents:"
+msgstr "使用此憑證來數位簽署 PDF 文件："
+
+#. EznHF
+#: filter/uiconfig/ui/pdfsignpage.ui:53
+msgctxt "pdfsignpage|extended_tip|cert"
+msgid "Allows you to select a certificate to be used for signing this PDF export."
+msgstr "讓您選取要用於簽署此 PDF 匯出的憑證。"
+
+#. xgYD9
+#: filter/uiconfig/ui/pdfsignpage.ui:69
+msgctxt "pdfsignpage|select"
+msgid "Select..."
+msgstr "選擇..."
+
+#. UCtFh
+#: filter/uiconfig/ui/pdfsignpage.ui:76
+msgctxt "pdfsignpage|extended_tip|select"
+msgid "Opens the Select X.509 Certificate dialog."
+msgstr "開啟「選取 X.509 憑證」對話方塊。"
+
+#. zRUyK
+#: filter/uiconfig/ui/pdfsignpage.ui:88
+msgctxt "pdfsignpage|clear"
+msgid "_Clear"
+msgstr "清除(_C)"
+
+#. UQz9i
+#: filter/uiconfig/ui/pdfsignpage.ui:131
+msgctxt "pdfsignpage|extended_tip|password"
+msgid "Enter the password used for protecting the private key associated with the selected certificate."
+msgstr "輸入要用於保護與所選憑證相關私鑰的密碼。"
+
+#. 9NEtS
+#: filter/uiconfig/ui/pdfsignpage.ui:149
+msgctxt "pdfsignpage|extended_tip|location"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "這三個欄位讓您可以選擇輸入關於要用於 PDF 的數位簽章的其他資訊（在哪裡、誰做的以及為什麼要製作）。其將會被嵌入到適當的欄位中，每個檢視 PDF 的人都可以看到。三個欄位的任一個都可以留空。"
+
+#. uVShK
+#: filter/uiconfig/ui/pdfsignpage.ui:167
+msgctxt "pdfsignpage|extended_tip|contact"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "這三個欄位讓您可以選擇輸入關於要用於 PDF 的數位簽章的其他資訊（在哪裡、誰做的以及為什麼要製作）。其將會被嵌入到適當的欄位中，每個檢視 PDF 的人都可以看到。三個欄位的任一個都可以留空。"
+
+#. 5QBRv
+#: filter/uiconfig/ui/pdfsignpage.ui:185
+msgctxt "pdfsignpage|extended_tip|reason"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "這三個欄位讓您可以選擇輸入關於要用於 PDF 的數位簽章的其他資訊（在哪裡、誰做的以及為什麼要製作）。其將會被嵌入到適當的欄位中，每個檢視 PDF 的人都可以看到。三個欄位的任一個都可以留空。"
+
+#. wHqcD
+#: filter/uiconfig/ui/pdfsignpage.ui:200
+msgctxt "pdfsignpage|tsa"
+msgid "None"
+msgstr "無"
+
+#. VMoF3
+#: filter/uiconfig/ui/pdfsignpage.ui:212
+msgctxt "pdfsignpage|label7"
+msgid "Certificate password:"
+msgstr "憑證密碼："
+
+#. Syow2
+#: filter/uiconfig/ui/pdfsignpage.ui:226
+msgctxt "pdfsignpage|label12"
+msgid "Location:"
+msgstr "位置："
+
+#. AQkj6
+#: filter/uiconfig/ui/pdfsignpage.ui:240
+msgctxt "pdfsignpage|label13"
+msgid "Contact information:"
+msgstr "聯絡資訊："
+
+#. mvSG8
+#: filter/uiconfig/ui/pdfsignpage.ui:254
+msgctxt "pdfsignpage|label14"
+msgid "Reason:"
+msgstr "原因："
+
+#. Bbwq2
+#: filter/uiconfig/ui/pdfsignpage.ui:268
+msgctxt "pdfsignpage|label15"
+msgid "Time Stamp Authority:"
+msgstr "時間戳記授權："
+
+#. YeAiB
+#: filter/uiconfig/ui/pdfsignpage.ui:290
+msgctxt "pdfsignpage|label1"
+msgid "Certificate"
+msgstr "憑證"
+
+#. 92sua
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:43
+msgctxt "pdfuserinterfacepage|center"
+msgid "_Center window on screen"
+msgstr "視窗置於螢幕中央(_C)"
+
+#. fGFCM
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:51
+msgctxt "pdfuserinterfacepage|extended_tip|center"
+msgid "Select to generate a PDF file that is shown in a reader window centered on screen."
+msgstr "選取以生成 PDF 檔案，然後將會顯示在畫面中央的閱讀程式視窗中。"
+
+#. ZEPFF
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:62
+msgctxt "pdfuserinterfacepage|resize"
+msgid "_Resize window to initial page"
+msgstr "將視窗大小調整為初始頁面大小(_R)"
+
+#. 8RErB
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:70
+msgctxt "pdfuserinterfacepage|extended_tip|resize"
+msgid "Select to generate a PDF file that is shown in a window displaying the whole initial page."
+msgstr "選取以生成 PDF 檔案，其會顯示在整個初始頁面的視窗中。"
+
+#. crBwn
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:81
+msgctxt "pdfuserinterfacepage|open"
+msgid "_Open in full screen mode"
+msgstr "以全螢幕模式開啟(_O)"
+
+#. oWaHS
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:89
+msgctxt "pdfuserinterfacepage|extended_tip|open"
+msgid "Select to generate a PDF file that is shown in a full screen reader window in front of all other windows."
+msgstr "選取以生成 PDF 檔案，其會顯示在所有其他視窗前的全螢幕閱讀程式視窗中。"
+
+#. Cvzzi
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:100
+msgctxt "pdfuserinterfacepage|display"
+msgid "_Display document title"
+msgstr "顯示文件標題(_D)"
+
+#. tdVmB
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:108
+msgctxt "pdfuserinterfacepage|extended_tip|display"
+msgid "Select to generate a PDF file that is shown with the document title in the reader's title bar."
+msgstr "選取以生成 PDF 檔案，其會在閱讀程式的標題列中顯示文件標題。"
+
+#. BtMjV
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:123
+msgctxt "pdfuserinterfacepage|label1"
+msgid "Window Options"
+msgstr "視窗選項"
+
+#. hZQVm
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:151
+msgctxt "pdfuserinterfacepage|toolbar"
+msgid "Hide _toolbar"
+msgstr "隱藏工具列(_T)"
+
+#. eBE9L
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:159
+msgctxt "pdfuserinterfacepage|extended_tip|toolbar"
+msgid "Select to hide the reader's toolbar when the document is active."
+msgstr "選取以在文件處於活躍狀態時隱藏閱讀程式的工具列。"
+
+#. YLEgH
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:170
+msgctxt "pdfuserinterfacepage|menubar"
+msgid "Hide _menubar"
+msgstr "隱藏選單列(_M)"
+
+#. qBG8G
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:178
+msgctxt "pdfuserinterfacepage|extended_tip|menubar"
+msgid "Select to hide the reader's menu bar when the document is active."
+msgstr "選取以在文件處於活躍狀態時隱藏閱讀程式的選單列。"
+
+#. Aw2aq
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:189
+msgctxt "pdfuserinterfacepage|window"
+msgid "Hide _window controls"
+msgstr "隱藏視窗控制項(_W)"
+
+#. EhwCr
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:197
+msgctxt "pdfuserinterfacepage|extended_tip|window"
+msgid "Select to hide the reader's controls when the document is active."
+msgstr "選取以在文件處於活躍狀態時隱藏閱讀程式的控制元件。"
+
+#. xm2Lh
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:212
+msgctxt "pdfuserinterfacepage|label2"
+msgid "User Interface Options"
+msgstr "使用者介面選項"
+
+#. SwDno
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:239
+msgctxt "pdfuserinterfacepage|effects"
+msgid "_Use transition effects"
+msgstr "使用轉場效果(_U)"
+
+#. BMEGm
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:247
+msgctxt "pdfuserinterfacepage|extended_tip|effects"
+msgid "Select to export Impress slide transition effects to respective PDF effects."
+msgstr "選取以將 Impress 的轉場效果匯出為對應的 PDF 效果。"
+
+#. JgwC9
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:262
+msgctxt "pdfuserinterfacepage|label3"
+msgid "Transitions"
+msgstr "轉場"
+
+#. sUC8i
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:291
+msgctxt "pdfuserinterfacepage|allbookmarks"
+msgid "Show _All"
+msgstr "顯示全部(_A)"
+
+#. XLd4F
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:300
+msgctxt "pdfuserinterfacepage|extended_tip|allbookmarks"
+msgid "Select to show all bookmark levels when the reader opens the PDF file."
+msgstr "選取以在閱讀程式開啟 PDF 檔案時顯示所有書籤層級。"
+
+#. WzoF3
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:311
+msgctxt "pdfuserinterfacepage|visiblebookmark"
+msgid "_Visible levels:"
+msgstr "可見層級：(_V)"
+
+#. FqQPa
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:323
+msgctxt "pdfuserinterfacepage|extended_tip|visiblebookmark"
+msgid "Select to show bookmark levels down to the selected level when the reader opens the PDF file."
+msgstr "選取以在閱讀程式開啟 PDF 檔案時顯示選定的書籤層級。"
+
+#. NEDWP
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:343
+msgctxt "pdfuserinterfacepage|extended_tip|visiblelevel"
+msgid "Select to show bookmark levels down to the selected level when the reader opens the PDF file."
+msgstr "選取以在閱讀程式開啟 PDF 檔案時顯示選定的書籤層級。"
+
+#. x4kjV
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:361
+msgctxt "pdfuserinterfacepage|label4"
+msgid "Collapse Outlines"
+msgstr "折疊大綱"
+
+#. ibYBv
+#: filter/uiconfig/ui/pdfviewpage.ui:48
+msgctxt "pdfviewpage|pageonly"
+msgid "_Page only"
+msgstr "只有頁面(_P)"
+
+#. NCgWy
+#: filter/uiconfig/ui/pdfviewpage.ui:57
+msgctxt "pdfviewpage|extended_tip|pageonly"
+msgid "Select to generate a PDF file that shows only the page contents."
+msgstr "選取以生成僅顯示頁面內容的 PDF 檔案。"
+
+#. d2FAh
+#: filter/uiconfig/ui/pdfviewpage.ui:68
+msgctxt "pdfviewpage|outline"
+msgid "Outl_ine and page"
+msgstr "大綱與頁面(_I)"
+
+#. JAAHm
+#: filter/uiconfig/ui/pdfviewpage.ui:77
+msgctxt "pdfviewpage|extended_tip|outline"
+msgid "Select to generate a PDF file that shows a bookmarks palette and the page contents."
+msgstr "選取以生成顯示書籤板與頁面內容的 PDF 檔案。"
+
+#. rT8gQ
+#: filter/uiconfig/ui/pdfviewpage.ui:88
+msgctxt "pdfviewpage|thumbs"
+msgid "_Thumbnails and page"
+msgstr "縮圖與頁面(_T)"
+
+#. gDHqJ
+#: filter/uiconfig/ui/pdfviewpage.ui:97
+msgctxt "pdfviewpage|extended_tip|thumbs"
+msgid "Select to generate a PDF file that shows a thumbnails palette and the page contents."
+msgstr "選取以生成顯示縮圖板與頁面內容的 PDF 檔案。"
+
+#. EgKos
+#: filter/uiconfig/ui/pdfviewpage.ui:116
+msgctxt "pdfviewpage|label4"
+msgid "Open on pa_ge:"
+msgstr "開啟頁數(_G)："
+
+#. QrQ84
+#: filter/uiconfig/ui/pdfviewpage.ui:135
+msgctxt "pdfviewpage|extended_tip|page"
+msgid "Select to show the given page when the reader opens the PDF file."
+msgstr "選取以在閱讀程式開啟 PDF 檔案時顯示指定的頁面。"
+
+#. MxznY
+#: filter/uiconfig/ui/pdfviewpage.ui:156
+msgctxt "pdfviewpage|label2"
+msgid "Panes"
+msgstr "窗格"
+
+#. jA3LD
+#: filter/uiconfig/ui/pdfviewpage.ui:185
+msgctxt "pdfviewpage|fitdefault"
+msgid "_Default"
+msgstr "預設(_D)"
+
+#. vQNHv
+#: filter/uiconfig/ui/pdfviewpage.ui:194
+msgctxt "pdfviewpage|extended_tip|fitdefault"
+msgid "Select to generate a PDF file that shows the page contents without zooming. If the reader software is configured to use a zoom factor by default, the page shows with that zoom factor."
+msgstr "選取以生成 PDF 檔案，其顯示時不會縮放頁面內容。如果閱讀程式被設定為預設使用特定的縮放倍數，那麼頁面就會以該縮放倍數顯示。"
+
+#. kqho7
+#: filter/uiconfig/ui/pdfviewpage.ui:205
+msgctxt "pdfviewpage|fitwin"
+msgid "_Fit in window"
+msgstr "符合視窗(_F)"
+
+#. Z6P6B
+#: filter/uiconfig/ui/pdfviewpage.ui:214
+msgctxt "pdfviewpage|extended_tip|fitwin"
+msgid "Select to generate a PDF file that shows the page zoomed to fit entirely into the reader's window."
+msgstr "選取以生成 PDF 檔案，其顯示頁面大小會完全符合閱讀程式的視窗大小。"
+
+#. gcStc
+#: filter/uiconfig/ui/pdfviewpage.ui:225
+msgctxt "pdfviewpage|fitwidth"
+msgid "Fit _width"
+msgstr "符合寬度(_W)"
+
+#. FkxYn
+#: filter/uiconfig/ui/pdfviewpage.ui:234
+msgctxt "pdfviewpage|extended_tip|fitwidth"
+msgid "Select to generate a PDF file that shows the page zoomed to fit the width of the reader's window."
+msgstr "選取以生成 PDF 檔案，其顯示頁面大小將符合閱讀程式的視窗寬度。"
+
+#. V6kwp
+#: filter/uiconfig/ui/pdfviewpage.ui:245
+msgctxt "pdfviewpage|fitvis"
+msgid "Fit _visible"
+msgstr "符合可視範圍(_V)"
+
+#. EBBzj
+#: filter/uiconfig/ui/pdfviewpage.ui:254
+msgctxt "pdfviewpage|extended_tip|fitvis"
+msgid "Select to generate a PDF file that shows the text and graphics on the page zoomed to fit the reader's window."
+msgstr "選取以產生 PDF 檔案，且頁面上的文字與圖形會縮放至適合閱讀程式視窗的大小。"
+
+#. NGpWy
+#: filter/uiconfig/ui/pdfviewpage.ui:271
+msgctxt "pdfviewpage|fitzoom"
+msgid "_Zoom factor:"
+msgstr "遠近調整係數(_Z)："
+
+#. nQ4Du
+#: filter/uiconfig/ui/pdfviewpage.ui:283
+msgctxt "pdfviewpage|extended_tip|fitzoom"
+msgid "Select a given zoom factor when the reader opens the PDF file."
+msgstr "選取閱讀程式開啟 PDF 檔案時的指定縮放倍數。"
+
+#. BBoAW
+#: filter/uiconfig/ui/pdfviewpage.ui:304
+msgctxt "pdfviewpage|extended_tip|zoom"
+msgid "Select a given zoom factor when the reader opens the PDF file."
+msgstr "選取閱讀程式開啟 PDF 檔案時的指定縮放倍數。"
+
+#. LQKDP
+#: filter/uiconfig/ui/pdfviewpage.ui:325
+msgctxt "pdfviewpage|label3"
+msgid "Magnification"
+msgstr "放大"
+
+#. Eegkp
+#: filter/uiconfig/ui/pdfviewpage.ui:361
+msgctxt "pdfviewpage|defaultlayout"
+msgid "D_efault"
+msgstr "預設(_E)"
+
+#. CtGeC
+#: filter/uiconfig/ui/pdfviewpage.ui:370
+msgctxt "pdfviewpage|extended_tip|defaultlayout"
+msgid "Select to generate a PDF file that shows the pages according to the layout setting of the reader software."
+msgstr "選取以生成根據閱讀程式軟體佈局設定顯示頁面的 PDF 檔案。"
+
+#. QBpan
+#: filter/uiconfig/ui/pdfviewpage.ui:381
+msgctxt "pdfviewpage|singlelayout"
+msgid "_Single page"
+msgstr "單頁(_S)"
+
+#. 4PuqY
+#: filter/uiconfig/ui/pdfviewpage.ui:390
+msgctxt "pdfviewpage|extended_tip|singlelayout"
+msgid "Select to generate a PDF file that shows one page at a time."
+msgstr "選取以生成一次顯示一頁的 PDF 檔案。"
+
+#. whE6p
+#: filter/uiconfig/ui/pdfviewpage.ui:401
+msgctxt "pdfviewpage|contlayout"
+msgid "C_ontinuous"
+msgstr "連續(_O)"
+
+#. BRxps
+#: filter/uiconfig/ui/pdfviewpage.ui:410
+msgctxt "pdfviewpage|extended_tip|contlayout"
+msgid "Select to generate a PDF file that shows pages in a continuous vertical column."
+msgstr "選取以生成以連續的垂直欄顯示頁面的 PDF 檔案。"
+
+#. ALQRE
+#: filter/uiconfig/ui/pdfviewpage.ui:421
+msgctxt "pdfviewpage|contfacinglayout"
+msgid "Co_ntinuous facing"
+msgstr "連續對開(_N)"
+
+#. YyCT7
+#: filter/uiconfig/ui/pdfviewpage.ui:430
+msgctxt "pdfviewpage|extended_tip|contfacinglayout"
+msgid "Select to generate a PDF file that shows pages side by side in a continuous column. For more than two pages, the first page is displayed on the right."
+msgstr "選取以生成在連續的欄中並排顯示頁面的 PDF 檔案。對於兩頁以上的部份，第一頁會顯示在右邊。"
+
+#. 4DFBW
+#: filter/uiconfig/ui/pdfviewpage.ui:441
+msgctxt "pdfviewpage|firstonleft"
+msgid "First page is _left"
+msgstr "第一頁置左(_L)"
+
+#. xWdBk
+#: filter/uiconfig/ui/pdfviewpage.ui:450
+msgctxt "pdfviewpage|extended_tip|firstonleft"
+msgid "Select to generate a PDF file that shows pages side by side in a continuous column. For more than two pages, the first page is displayed on the left. You must enable support for complex text layout on Language settings - Languages in the Options dialog box."
+msgstr "選取以生成在連續的欄中並排顯示頁面的 PDF 檔案。對於兩頁以上的部份，第一頁會顯示在左邊。您必須在選項對話方塊中的「語言設定」→「語言」啟用「複合文字版面配置」支援。"
+
+#. sYKod
+#: filter/uiconfig/ui/pdfviewpage.ui:465
+msgctxt "pdfviewpage|label1"
+msgid "Page Layout"
+msgstr "頁面的版面配置"
+
+#. G43B5
+#: filter/uiconfig/ui/testxmlfilter.ui:8
+msgctxt "testxmlfilter|TestXMLFilterDialog"
+msgid "Test XML Filter: %s"
+msgstr "測試 XML 篩選器：%s"
+
+#. 93Aw7
+#: filter/uiconfig/ui/testxmlfilter.ui:88
+msgctxt "testxmlfilter|label3"
+msgid "XSLT for export"
+msgstr "匯出用 XSLT"
+
+#. 3EKij
+#: filter/uiconfig/ui/testxmlfilter.ui:101
+msgctxt "testxmlfilter|label4"
+msgid "Transform document"
+msgstr "轉換文件"
+
+#. TZvm5
+#: filter/uiconfig/ui/testxmlfilter.ui:111
+msgctxt "testxmlfilter|exportbrowse"
+msgid "Browse..."
+msgstr "瀏覽..."
+
+#. 6ZGrB
+#: filter/uiconfig/ui/testxmlfilter.ui:117
+msgctxt "testxmlfilter|extended_tip|exportbrowse"
+msgid "Locate the file that you want to apply the XML export filter to. The XML code of the transformed file is opened in your default XML editor after transformation."
+msgstr "找到您要套用 XML 匯出過濾器的檔案。轉換後，將在您預設的 XML 編輯器開啟轉換後的 XML 代碼。"
+
+#. F8CJd
+#: filter/uiconfig/ui/testxmlfilter.ui:128
+msgctxt "testxmlfilter|currentdocument"
+msgid "Current Document"
+msgstr "目前文件"
+
+#. GRXCc
+#: filter/uiconfig/ui/testxmlfilter.ui:134
+msgctxt "testxmlfilter|extended_tip|currentdocument"
+msgid "The front-most open file that matches the XML filter criteria will be used to test the filter. The current XML export filter transforms the file and the resulting XML code is displayed in the XML Filter output window."
+msgstr "符合 XML 過濾器的最先打開的檔案將用於測試過濾器。目前的 XML 匯出過濾器將會轉換檔案，XML 結果代碼將會顯示在 XML 過濾器輸出視窗中。"
+
+#. EPLxG
+#: filter/uiconfig/ui/testxmlfilter.ui:150
+msgctxt "testxmlfilter|extended_tip|exportxsltfile"
+msgid "Displays the file name of the XSLT filter that you entered on the Transformation tab page."
+msgstr "顯示您在 [變換] 標籤頁中所輸入的 XSLT 篩選器的檔案名稱。"
+
+#. 9HnMA
+#: filter/uiconfig/ui/testxmlfilter.ui:167
+msgctxt "testxmlfilter|extended_tip|currentfilename"
+msgid "Displays the file name of the document that you want to use to test the XSLT filter."
+msgstr "顯示您要用於測試 XSLT 篩選器的文件之檔案名稱。"
+
+#. b7FMe
+#: filter/uiconfig/ui/testxmlfilter.ui:186
+msgctxt "testxmlfilter|label1"
+msgid "Export"
+msgstr "匯出"
+
+#. ANpSQ
+#: filter/uiconfig/ui/testxmlfilter.ui:219
+msgctxt "testxmlfilter|label5"
+msgid "XSLT for import"
+msgstr "匯入用 XSLT"
+
+#. aWFtZ
+#: filter/uiconfig/ui/testxmlfilter.ui:229
+msgctxt "testxmlfilter|importbrowse"
+msgid "Browse..."
+msgstr "瀏覽..."
+
+#. eR68F
+#: filter/uiconfig/ui/testxmlfilter.ui:235
+msgctxt "testxmlfilter|extended_tip|importbrowse"
+msgid "Opens a file selection dialog. The selected file is opened using the current XML import filter."
+msgstr "開啟檔案選取對話框。使用目前的 XML 匯入過濾器開啟選定的檔案。"
+
+#. RGb9P
+#: filter/uiconfig/ui/testxmlfilter.ui:246
+msgctxt "testxmlfilter|recentfile"
+msgid "Recent File"
+msgstr "最近的檔案"
+
+#. 2vFnT
+#: filter/uiconfig/ui/testxmlfilter.ui:252
+msgctxt "testxmlfilter|extended_tip|recentfile"
+msgid "Re-opens the document that was last opened with this dialog."
+msgstr "重新開啟此對話框最後開啟的文件。"
+
+#. WRoGk
+#: filter/uiconfig/ui/testxmlfilter.ui:266
+msgctxt "testxmlfilter|templateimport"
+msgid "Template for import"
+msgstr "匯入用範本"
+
+#. 75GJD
+#: filter/uiconfig/ui/testxmlfilter.ui:281
+msgctxt "testxmlfilter|extended_tip|importxsltfile"
+msgid "Displays the file name of the XSLT filter that you entered on the Transformation tab page."
+msgstr "顯示您在 [變換] 標籤頁中所輸入的 XSLT 篩選器的檔案名稱。"
+
+#. UAfyw
+#: filter/uiconfig/ui/testxmlfilter.ui:292
+msgctxt "testxmlfilter|displaysource"
+msgid "Display source"
+msgstr "顯示來源"
+
+#. CdCp5
+#: filter/uiconfig/ui/testxmlfilter.ui:300
+msgctxt "testxmlfilter|extended_tip|displaysource"
+msgid "Opens the XML source of the selected document in your default XML editor after importing."
+msgstr "匯入後，在您預設的 XML 編輯器中開啟選定文件的 XML 原始碼。"
+
+#. AKfAy
+#: filter/uiconfig/ui/testxmlfilter.ui:314
+msgctxt "testxmlfilter|label6"
+msgid "Transform file"
+msgstr "轉換檔案"
+
+#. FdiNb
+#: filter/uiconfig/ui/testxmlfilter.ui:329
+msgctxt "testxmlfilter|extended_tip|importxslttemplate"
+msgid "Displays the file name of the template that you entered on the Transformation tab page."
+msgstr "顯示您在「轉換」分頁上輸入的範本檔案名稱。"
+
+#. RHRHL
+#: filter/uiconfig/ui/testxmlfilter.ui:346
+msgctxt "testxmlfilter|extended_tip|recentfilename"
+msgid "Re-opens the document that was last opened with this dialog."
+msgstr "重新開啟此對話框最後開啟的文件。"
+
+#. 4MaaP
+#: filter/uiconfig/ui/testxmlfilter.ui:368
+msgctxt "testxmlfilter|label2"
+msgid "Import"
+msgstr "匯入"
+
+#. NsJor
+#: filter/uiconfig/ui/testxmlfilter.ui:399
+msgctxt "testxmlfilter|extended_tip|TestXMLFilterDialog"
+msgid "Tests the XSLT stylesheets used by the selected XML filter."
+msgstr "測試選取的 XML 篩選器所使用的 XSLT 樣式表。"
+
+#. DEJXN
+#: filter/uiconfig/ui/warnpdfdialog.ui:18
+msgctxt "warnpdfdialog|WarnPDFDialog"
+msgid "Problems During PDF Export"
+msgstr "PDF 匯出時發生問題"
+
+#. 2BpUz
+#: filter/uiconfig/ui/warnpdfdialog.ui:25
+msgctxt "warnpdfdialog|WarnPDFDialog"
+msgid "During PDF export the following problems occurred:"
+msgstr "PDF 匯出時遭遇下列問題："
+
+#. wG9NF
+#: filter/uiconfig/ui/xmlfiltersettings.ui:18
+msgctxt "xmlfiltersettings|XMLFilterSettingsDialog"
+msgid "XML Filter Settings"
+msgstr "XML 篩選器設定"
+
+#. x9LGg
+#: filter/uiconfig/ui/xmlfiltersettings.ui:41
+msgctxt "xmlfiltersettings|extended_tip|help"
+msgid "Displays the help page for this dialog."
+msgstr "顯示此對話框的說明頁面。"
+
+#. CmVSC
+#: filter/uiconfig/ui/xmlfiltersettings.ui:63
+msgctxt "xmlfiltersettings|extended_tip|close"
+msgid "Closes the dialog."
+msgstr "關閉對話方塊。"
+
+#. VvrGU
+#: filter/uiconfig/ui/xmlfiltersettings.ui:110
+msgctxt "xmlfiltersettings|header_name"
+msgid "Name"
+msgstr "名稱"
+
+#. D6uZS
+#: filter/uiconfig/ui/xmlfiltersettings.ui:123
+msgctxt "xmlfiltersettings|header_type"
+msgid "Type"
+msgstr "類型"
+
+#. A6qWH
+#: filter/uiconfig/ui/xmlfiltersettings.ui:134
+msgctxt "xmlfiltersettings|extended_tip|filterlist"
+msgid "Select one or more filters, then click one of the buttons."
+msgstr "選取一個或多個過濾器，然後點擊其中一個按鈕。"
+
+#. VcMQo
+#: filter/uiconfig/ui/xmlfiltersettings.ui:156
+msgctxt "xmlfiltersettings|new"
+msgid "_New..."
+msgstr "新增(_N)..."
+
+#. upKZD
+#: filter/uiconfig/ui/xmlfiltersettings.ui:163
+msgctxt "xmlfiltersettings|extended_tip|new"
+msgid "Opens a dialog for creating a new filter."
+msgstr "開啟用來建立新篩選器的對話方塊。"
+
+#. W6Ju3
+#: filter/uiconfig/ui/xmlfiltersettings.ui:175
+msgctxt "xmlfiltersettings|edit"
+msgid "_Edit..."
+msgstr "編輯(_E)..."
+
+#. GMxC8
+#: filter/uiconfig/ui/xmlfiltersettings.ui:182
+msgctxt "xmlfiltersettings|extended_tip|edit"
+msgid "Opens a dialog for editing the selected filter."
+msgstr "開啟用來編輯選定篩選器的對話方塊。"
+
+#. DAoSK
+#: filter/uiconfig/ui/xmlfiltersettings.ui:194
+msgctxt "xmlfiltersettings|test"
+msgid "_Test XSLTs..."
+msgstr "測試 XSL_T..."
+
+#. mWGrq
+#: filter/uiconfig/ui/xmlfiltersettings.ui:201
+msgctxt "xmlfiltersettings|extended_tip|test"
+msgid "Opens a dialog for testing the selected filter."
+msgstr "開啟用來測試選定篩選器的對話方塊。"
+
+#. FE7Za
+#: filter/uiconfig/ui/xmlfiltersettings.ui:213
+msgctxt "xmlfiltersettings|delete"
+msgid "_Delete..."
+msgstr "刪除(_D)..."
+
+#. bDixG
+#: filter/uiconfig/ui/xmlfiltersettings.ui:220
+msgctxt "xmlfiltersettings|extended_tip|delete"
+msgid "Deletes the selected file after you confirm the dialog that follows."
+msgstr "確認隨後的對話框後，刪除選定的檔案。"
+
+#. DmuTA
+#: filter/uiconfig/ui/xmlfiltersettings.ui:232
+msgctxt "xmlfiltersettings|save"
+msgid "_Save as Package..."
+msgstr "另存為包裹(_S)..."
+
+#. tPh4b
+#: filter/uiconfig/ui/xmlfiltersettings.ui:239
+msgctxt "xmlfiltersettings|extended_tip|save"
+msgid "Displays a Save as dialog to save the selected file as an XSLT filter package (*.jar)."
+msgstr "顯示將選定的檔案另存為 XSLT 過濾器包 (*.jar) 的「另存為」對話框。"
+
+#. CuahL
+#: filter/uiconfig/ui/xmlfiltersettings.ui:251
+msgctxt "xmlfiltersettings|open"
+msgid "_Open Package..."
+msgstr "開啟包裹(_O)..."
+
+#. D3FRp
+#: filter/uiconfig/ui/xmlfiltersettings.ui:258
+msgctxt "xmlfiltersettings|extended_tip|open"
+msgid "Displays an Open dialog to open a filter from an XSLT filter package (*.jar)."
+msgstr "顯示「開啟」對話框以從 XSLT 過濾器包 (*.jar) 開啟過濾器。"
+
+#. bC6ha
+#: filter/uiconfig/ui/xmlfiltersettings.ui:290
+msgctxt "xmlfiltersettings|extended_tip|XMLFilterSettingsDialog"
+msgid "Opens the XML Filter Settings dialog, where you can create, edit, delete, and test filters to import and to export XML files."
+msgstr "開啟「XML 過濾器設定」對話框，您可以在其中建立、編輯、刪除與測試用於匯入與匯出 XML 檔案的過濾器。"
+
+#. rLZ5z
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:23
+msgctxt "xmlfiltertabpagegeneral|label2"
+msgid "_Filter name:"
+msgstr "篩選器名稱(_F)："
+
+#. dreFh
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:37
+msgctxt "xmlfiltertabpagegeneral|label3"
+msgid "_Application:"
+msgstr "應用程式(_A)："
+
+#. yQmBY
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:51
+msgctxt "xmlfiltertabpagegeneral|label4"
+msgid "_Name of file type:"
+msgstr "檔案類型名稱(_N)："
+
+#. NB3Gy
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:65
+msgctxt "xmlfiltertabpagegeneral|label5"
+msgid "File _extension:"
+msgstr "副檔名(_E)："
+
+#. fPxWA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:79
+msgctxt "xmlfiltertabpagegeneral|label6"
+msgid "Comment_s:"
+msgstr "評註(_S)："
+
+#. rYNyn
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:100
+msgctxt "xmlfiltertabpagegeneral|extended_tip|filtername"
+msgid "Enter the name that you want to display in the list box of the XML Filter Settings dialog."
+msgstr "輸入 [XML 篩選設定] 對話方塊的清單方塊內所要顯示的名稱。"
+
+#. D5aZP
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:119
+msgctxt "xmlfiltertabpagegeneral|extended_tip|extension"
+msgid "Enter the file extension to use when you open a file without specifying a filter. The file extension is used to determine which filter to use."
+msgstr "輸入在未指定過濾器的情況下開啟檔案時要使用的副檔名。副檔名用於決定要使用的過濾器。"
+
+#. fZvBA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:138
+msgctxt "xmlfiltertabpagegeneral|extended_tip|interfacename"
+msgid "Enter the name that you want to display in the File type box in file dialogs."
+msgstr "輸入檔案對話方塊中的 [檔案類型] 方塊內所要顯示的名稱。"
+
+#. BFUsA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:162
+msgctxt "xmlfiltertabpagegeneral|extended_tip|application"
+msgid "Select the application that you want to use with the filter."
+msgstr "選取要與篩選配合使用的應用程式。"
+
+#. Gfrm2
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:186
+msgctxt "xmlfiltertabpagegeneral|extended_tip|description"
+msgid "Enter a comment (optional)."
+msgstr "輸入註解 (可選擇使用與否)。"
+
+#. G632R
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:206
+msgctxt "xmlfiltertabpagegeneral|extended_tip|XmlFilterTabPageGeneral"
+msgid "Enter or edit general information for an XML filter."
+msgstr "輸入或編輯 XML 篩選的一般資訊。"
+
+#. FhD2n
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:24
+msgctxt "xmlfiltertabpagetransformation|label2"
+msgid "_DocType:"
+msgstr "文件類型(_D)："
+
+#. x2ex7
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:44
+msgctxt "xmlfiltertabpagetransformation|extended_tip|doc"
+msgid "Enter the DOCTYPE of the XML file."
+msgstr "輸入 XML 檔案的 DOCTYPE。"
+
+#. J5c8A
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:57
+msgctxt "xmlfiltertabpagetransformation|label4"
+msgid "_XSLT for export:"
+msgstr "匯出用 _XSLT："
+
+#. GwzvD
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:69
+msgctxt "xmlfiltertabpagetransformation|browseexport"
+msgid "Brows_e..."
+msgstr "瀏覽(_E)..."
+
+#. QLd25
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:76
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browseexport"
+msgid "Opens a file selection dialog."
+msgstr "開啟檔案選取對話框。"
+
+#. oZGZS
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:89
+msgctxt "xmlfiltertabpagetransformation|label5"
+msgid "XSLT _for import:"
+msgstr "匯入用 XSLT(_F)："
+
+#. UNKTt
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:101
+msgctxt "xmlfiltertabpagetransformation|browseimport"
+msgid "B_rowse..."
+msgstr "瀏覽(_R)..."
+
+#. TecWL
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:108
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browseimport"
+msgid "Opens a file selection dialog."
+msgstr "開啟檔案選取對話框。"
+
+#. 9nV9R
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:121
+msgctxt "xmlfiltertabpagetransformation|label6"
+msgid "Template for _import:"
+msgstr "匯入用範本(_I)："
+
+#. MNLtB
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:133
+msgctxt "xmlfiltertabpagetransformation|browsetemp"
+msgid "Browse..."
+msgstr "瀏覽..."
+
+#. Dce3n
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:139
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browsetemp"
+msgid "Opens a file selection dialog."
+msgstr "開啟檔案選取對話框。"
+
+#. sjWgJ
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:162
+msgctxt "xmlfiltertabpagetransformation|extended_tip|xsltexport"
+msgid "If this is an export filter, enter the file name of the XSLT stylesheet that you want to use for exporting."
+msgstr "如果這是一個匯出篩選，則請輸入您要用於匯出的 XSLT 樣式表之檔案名稱。"
+
+#. Xgroa
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:185
+msgctxt "xmlfiltertabpagetransformation|extended_tip|xsltimport"
+msgid "If this is an import filter, enter the file name of the XSLT stylesheet that you want to use for importing."
+msgstr "如果這是一個匯入篩選，則請輸入您要用於匯入的 XSLT 樣式表之檔案名稱。"
+
+#. wRFNU
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:208
+msgctxt "xmlfiltertabpagetransformation|extended_tip|tempimport"
+msgid "Enter the name of the template that you want to use for importing. In the template, styles are defined to display XML tags."
+msgstr "輸入您要用於匯入的範本名稱。在範本中，定義了顯示 XML 標記的樣式。"
+
+#. XTDex
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:229
+msgctxt "xmlfiltertabpagetransformation|filtercb"
+msgid "The filter needs XSLT 2.0 processor"
+msgstr "本篩選器需要 XSLT 2.0 處理器"
+
+#. hDv78
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:244
+msgctxt "xmlfiltertabpagetransformation|extended_tip|XmlFilterTabPageTransformation"
+msgid "Enter or edit file information for an XML filter."
+msgstr "輸入和編輯 XML 篩選的檔案資訊。"
+
+#. MCfGg
+#: filter/uiconfig/ui/xsltfilterdialog.ui:8
+msgctxt "xsltfilterdialog|XSLTFilterDialog"
+msgid "XML Filter: %s"
+msgstr "XML 篩選器：%s"
+
+#. bCZh2
+#: filter/uiconfig/ui/xsltfilterdialog.ui:62
+msgctxt "xsltfilterdialog|extended_tip|help"
+msgid "Displays the help page for this dialog."
+msgstr "顯示此對話框的說明頁面。"
+
+#. Cvy2d
+#: filter/uiconfig/ui/xsltfilterdialog.ui:103
+msgctxt "xsltfilterdialog|general"
+msgid "General"
+msgstr "一般"
+
+#. peR3F
+#: filter/uiconfig/ui/xsltfilterdialog.ui:126
+msgctxt "xsltfilterdialog|transformation"
+msgid "Transformation"
+msgstr "轉換"
+
+#. WkALr
+#: filter/uiconfig/ui/xsltfilterdialog.ui:149
+msgctxt "xsltfilterdialog|extended_tip|XSLTFilterDialog"
+msgid "Opens a dialog for creating a new filter."
+msgstr "開啟用來建立新篩選器的對話方塊。"

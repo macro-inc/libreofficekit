@@ -1,0 +1,172 @@
+#. extracted from avmedia/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-02-18 12:16+0100\n"
+"PO-Revision-Date: 2022-07-04 16:15+0000\n"
+"Last-Translator: A S Alam <amanpreet.alam@gmail.com>\n"
+"Language-Team: Punjabi <https://translations.documentfoundation.org/projects/libo_ui-master/avmediamessages/pa/>\n"
+"Language: pa-IN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1514093975.000000\n"
+
+#. m6G23
+#: avmedia/inc/strings.hrc:24
+msgctxt "AVMEDIA_STR_ZOOM_50"
+msgid "50%"
+msgstr "50%"
+
+#. k2SKV
+#: avmedia/inc/strings.hrc:25
+msgctxt "AVMEDIA_STR_ZOOM_100"
+msgid "100%"
+msgstr "100%"
+
+#. yTBHR
+#: avmedia/inc/strings.hrc:26
+msgctxt "AVMEDIA_STR_ZOOM_200"
+msgid "200%"
+msgstr "200%"
+
+#. dBMvq
+#: avmedia/inc/strings.hrc:27
+msgctxt "AVMEDIA_STR_ZOOM_FIT"
+msgid "Scaled"
+msgstr "ਸਕੇਲ ਕੀਤਾ"
+
+#. eRSnC
+#: avmedia/inc/strings.hrc:28
+msgctxt "AVMEDIA_STR_VOLUME"
+msgid "Volume"
+msgstr "ਵਾਲਿਊਮ"
+
+#. o3hBG
+#: avmedia/inc/strings.hrc:29
+msgctxt "AVMEDIA_STR_POSITION"
+msgid "Position"
+msgstr "ਸਥਿਤੀ"
+
+#. 9aa7b
+#: avmedia/inc/strings.hrc:30
+msgctxt "AVMEDIA_STR_MEDIAPLAYER"
+msgid "Media Player"
+msgstr "ਮੀਡਿਆ ਵਾਜਾ"
+
+#. BM7GB
+#: avmedia/inc/strings.hrc:31
+msgctxt "AVMEDIA_MEDIA_PATH"
+msgid "Media Path"
+msgstr "ਮੀਡੀਆ ਪਾਥ"
+
+#. JggdA
+#: avmedia/inc/strings.hrc:32
+msgctxt "AVMEDIA_MEDIA_PATH_DEFAULT"
+msgid "No Media Selected"
+msgstr "ਕੋਈ ਮੀਡੀਆ ਨਹੀਂ ਚੁਣਿਆ ਗਿਆ"
+
+#. BFybF
+#: avmedia/inc/strings.hrc:33
+msgctxt "AVMEDIA_STR_INSERTMEDIA_DLG"
+msgid "Insert Audio or Video"
+msgstr "ਆਡੀਓ ਜਾਂ ਵੀਡੀਓ ਜੋੜੋ"
+
+#. AvVZ8
+#: avmedia/inc/strings.hrc:34
+msgctxt "AVMEDIA_STR_OPENMEDIA_DLG"
+msgid "Open Audio or Video"
+msgstr "ਆਡੀਓ ਜਾਂ ਵੀਡੀਓ ਖੋਲ੍ਹੋ"
+
+#. FaT3C
+#: avmedia/inc/strings.hrc:35
+msgctxt "AVMEDIA_STR_ALL_MEDIAFILES"
+msgid "All audio and video files"
+msgstr "ਸਭ ਆਡੀਓ ਤੇ ਵੀਡੀਓ ਫਾਇਲਾਂ"
+
+#. oJnCV
+#: avmedia/inc/strings.hrc:36
+msgctxt "AVMEDIA_STR_ALL_FILES"
+msgid "All files"
+msgstr "ਸਾਰਿਆ ਫਾਇਲਾ"
+
+#. QYcS3
+#: avmedia/inc/strings.hrc:37
+msgctxt "AVMEDIA_STR_ERR_URL"
+msgid "The format of the selected file is not supported."
+msgstr "ਚੁਣੀ ਫਾਇਲ ਦਾ ਫਾਰਮੈਟ ਸਹਾਇਕ ਹੈ।"
+
+#. am3R5
+#: avmedia/inc/strings.hrc:38
+msgctxt "AVMEDIA_STR_ZOOM_TOOLTIP"
+msgid "View"
+msgstr "ਵੇਖੋ"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "ਜੋੜੋ(_A)"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "ਲਾਗੂ ਕਰੋ(_A)"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "ਰੱਦ ਕਰੋ(_C)"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "ਬੰਦ ਕਰੋ(_C)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "ਹਟਾਓ(_D)"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "ਸੋਧੋ(_E)"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "ਮਦਦ(_H)"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "ਨਵਾਂ(_N)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "ਨਹੀਂ(_N)"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "ਠੀਕ(_O)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "ਹਟਾਓ(_R)"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "ਮੁੜ-ਸੈੱਟ ਕਰੋ(_R)"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "ਹਾਂ(_Y)"

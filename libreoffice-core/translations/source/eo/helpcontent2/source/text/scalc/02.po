@@ -1,0 +1,1196 @@
+#. extracted from helpcontent2/source/text/scalc/02
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2018-11-14 11:57+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: eo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1542196639.000000\n"
+
+#. aSE5T
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Currency"
+msgstr "Nombroformato: Valuto"
+
+#. uC76y
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"hd_id3152892\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02130000.xhp\">Number format: Currency</link>"
+msgstr "<link href=\"text/scalc/02/02130000.xhp\">Numera formato: Kurzo</link>"
+
+#. mDBPb
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3148837\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Applies the default currency format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Aplikas la aprioran valutan formaton al la elektitaj ĉeloj.</ahelp>"
+
+#. 2nsBF
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3155267\n"
+"help.text"
+msgid "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Currency Number Format Icon</alt></image>"
+msgstr ""
+
+#. KBVhJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3150214\n"
+"help.text"
+msgid "Number Format: Currency"
+msgstr "Numerformato: valuto"
+
+#. NGRbJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3146776\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr ""
+
+#. fjGg6
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Percent"
+msgstr "Numera formato: elcento"
+
+#. uZTmE
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02140000.xhp\">Number format: Percent</link>"
+msgstr "<link href=\"text/scalc/02/02140000.xhp\">Numera formato: elcento</link>"
+
+#. fzGGF
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155629\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatPercent\">Applies the percentage format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatPercent\">Aplikas la elcentan formaton al la elektitaj ĉeloj.</ahelp>"
+
+#. AFCdX
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3153968\n"
+"help.text"
+msgid "<image id=\"img_id3150869\" src=\"cmd/sc_numberformatpercent.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150869\">Icon</alt></image>"
+msgstr ""
+
+#. CAFBw
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Number Format: Percent"
+msgstr "Nombroformato: Elcentaĵo"
+
+#. xrLA9
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"bm_id3149260\n"
+"help.text"
+msgid "<bookmark_value>percentage calculations</bookmark_value>"
+msgstr "<bookmark_value>elcentaj kalkuloj</bookmark_value>"
+
+#. Rwuzn
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3149260\n"
+"help.text"
+msgid "You can also enter a percentage sign (%) after a number in a cell:"
+msgstr "Oni povas ankaŭ enmeti elcentan signumon (%) post numero en ĉelo:"
+
+#. LKtGp
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "1% corresponds to 0.01"
+msgstr "1% egalas al 0.01"
+
+#. CwAEt
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3145749\n"
+"help.text"
+msgid "1 + 16% corresponds to 116% or 1.16"
+msgstr "1 + 16% egalas al 116% aŭ 1.16"
+
+#. j7BsM
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3148575\n"
+"help.text"
+msgid "1%% corresponds to 0.0001"
+msgstr "1%% egalas al 0.0001"
+
+#. a8EDH
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3159153\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>"
+msgstr ""
+
+#. bX9GB
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Default"
+msgstr "Numerformato: Apriora"
+
+#. C4AsN
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"hd_id3149182\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02150000.xhp\">Number format: Default</link>"
+msgstr "<link href=\"text/scalc/02/02150000.xhp\">Numerformato: Apriora</link>"
+
+#. CkVDA
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3163802\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Applies the default number format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Aplikas la aprioran numerformaton al la elektitaj ĉeloj.</ahelp>"
+
+#. MpiW2
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<image src=\"cmd/sc_numberformatstandard.svg\" id=\"img_id3156024\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156024\">Icon Standard Format </alt></image>"
+msgstr ""
+
+#. 7xorF
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3153361\n"
+"help.text"
+msgid "Number Format: Standard"
+msgstr "Numerformato: Normala"
+
+#. 2JKys
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3154908\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr ""
+
+#. BhR4Z
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Numerformato: Enmeti unu dekuman pozicion"
+
+#. BdJjx
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02160000.xhp\">Number Format: Add Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02160000.xhp\">Numerformato: Enmeti unu dekuman pozicion</link>"
+
+#. jhPg6
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3150792\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatIncDecimals\">Adds one decimal place to the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatIncDecimals\">Enmetas unu dekuman pozicion al la numeroj en la elektitaj ĉeloj.</ahelp>"
+
+#. BuLUg
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3145787\n"
+"help.text"
+msgid "<image id=\"img_id3145271\" src=\"cmd/sc_numberformatincdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145271\">Icon Add Decimal Place</alt></image>"
+msgstr ""
+
+#. NDn3G
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3149262\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Numerformato: Enmeti unu dekuman pozicion"
+
+#. JGSHw
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Numerformato: Forigi unu dekuman pozicion"
+
+#. ixjiG
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"hd_id3149164\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02170000.xhp\">Number Format: Delete Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02170000.xhp\">Numerformato: Forigi unu dekuman pozicion</link>"
+
+#. Eip8y
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3147264\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatDecDecimals\">Removes one decimal place from the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatDecDecimals\">Forigas unu dekuman pozicion el la numeroj en la elektitaj ĉeloj.</ahelp>"
+
+#. FCfMZ
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3145173\n"
+"help.text"
+msgid "<image id=\"img_id3153192\" src=\"cmd/sc_numberformatdecdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153192\">Icon Delete Decimal Place</alt></image>"
+msgstr ""
+
+#. xCuwp
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3154686\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Numerformato: Forigi unu dekuman pozicion"
+
+#. 89BHV
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Name Box"
+msgstr ""
+
+#. JJA9o
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"bm_id3156326\n"
+"help.text"
+msgid "<bookmark_value>formula bar; sheet area names</bookmark_value><bookmark_value>sheet area names</bookmark_value><bookmark_value>showing; cell references</bookmark_value><bookmark_value>cell references; showing</bookmark_value>"
+msgstr "<bookmark_value>formula breto; foliregionaj nomoj</bookmark_value><bookmark_value>foliregionaj nomoj</bookmark_value><bookmark_value>vidigi; ĉelajn referencojn</bookmark_value><bookmark_value>cell ĉelajn referencojn; vidigi</bookmark_value>"
+
+#. ywEet
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"hd_id3156326\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06010000.xhp\">Name Box</link>"
+msgstr "<link href=\"text/scalc/02/06010000.xhp\">Noma kadro</link>"
+
+#. bJypW
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3149656\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_POS\">Displays the reference for the current cell, the range of the selected cells, or the name of the area. You can also select a range of cells, and then type a name for that range into the <emph>Name Box</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_POS\">Vidigas la referencon por la aktuala ĉelo, la amplekson de la elektitaj ĉeloj, aŭ la nomo de la regiono. Oni ankaŭ povas elekti grupon de ĉeloj, kaj tajpi nomon por tiu grupo en la <emph>Noma kadro</emph>.</ahelp>"
+
+#. W3Br6
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3163710\n"
+"help.text"
+msgid "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Combo box sheet area</alt></image>"
+msgstr "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Folia regiono de fallisto</alt></image>"
+
+#. wFE7T
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3151118\n"
+"help.text"
+msgid "Name Box"
+msgstr "Noma kesto"
+
+#. yH3c4
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3152596\n"
+"help.text"
+msgid "To jump to a particular cell, or to select a cell range, type the cell reference, or cell range reference in this box, for example, F1, or A1:C4. You can also enter full name of a sheet; the tooltip then changes to \"Go To Sheet\", and pressing Enter switches to that sheet."
+msgstr ""
+
+#. VFke2
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sum"
+msgstr "Sumo"
+
+#. oK8fx
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"bm_id3157909\n"
+"help.text"
+msgid "<bookmark_value>functions;sum function icon</bookmark_value>         <bookmark_value>formula bar;sum function</bookmark_value>         <bookmark_value>sum icon</bookmark_value>         <bookmark_value>AutoSum button, see sum icon</bookmark_value>"
+msgstr ""
+
+#. CiNzL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id3157909\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06030000.xhp\">Select Function</link>"
+msgstr ""
+
+#. KEkiG
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3150543\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_SUMME\">Insert a function of a cell range into the current cell. The function can be Sum, Average, Minimum, Maximum and Count. Click in a cell, click this icon, select the function in the drop down list and optionally adjust the cell range. Or select some cells into which the function value will be inserted, then click the icon. The function result is added at the bottom of the range.</ahelp>"
+msgstr ""
+
+#. KDxsW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Icon Select Function</alt></image>"
+msgstr ""
+
+#. DaEgA
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3152577\n"
+"help.text"
+msgid "Select Function"
+msgstr ""
+
+#. SpBhw
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id161592658402954\n"
+"help.text"
+msgid "Select Function applied with no selected range"
+msgstr ""
+
+#. 59eGX
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3156444\n"
+"help.text"
+msgid "$[officename] automatically suggests a cell range, provided that the spreadsheet contains data. If the cell range already contains a function, you can combine it with the new one to yield the function applied to the range data. If the range contains filters, the Subtotal function is inserted instead of the selected function."
+msgstr ""
+
+#. vpnqf
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153189\n"
+"help.text"
+msgid "Click the <emph>Accept</emph> icon to use the formula displayed in the input line or <emph>Cancel</emph>."
+msgstr ""
+
+#. TVD6h
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id231592663499228\n"
+"help.text"
+msgid "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Accept Icon</alt></image>"
+msgstr ""
+
+#. iHTEW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id481592663499228\n"
+"help.text"
+msgid "Accept"
+msgstr ""
+
+#. VFj6u
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id311592663828848\n"
+"help.text"
+msgid "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Icon Cancel</alt></image>"
+msgstr ""
+
+#. 7xGcL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id431592663828848\n"
+"help.text"
+msgid "Cancel"
+msgstr ""
+
+#. GPtKR
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id261592658395518\n"
+"help.text"
+msgid "Select Function applied on a selected range"
+msgstr ""
+
+#. JPrPQ
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id911592658130888\n"
+"help.text"
+msgid "When the selected range has two or more rows, the function is calculated for each column. The results are placed in empty cells on the first available row below the range, one result per column."
+msgstr ""
+
+#. iHksB
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id991592658144387\n"
+"help.text"
+msgid "When the selected range has one row, the function result is placed in the first available cell on the right of the selected range."
+msgstr ""
+
+#. NYGR7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Function"
+msgstr "Funkcio"
+
+#. 9JFi8
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"bm_id3150084\n"
+"help.text"
+msgid "<bookmark_value>formula bar; functions</bookmark_value><bookmark_value>functions; formula bar icon</bookmark_value>"
+msgstr "<bookmark_value>formula breto; funkcioj</bookmark_value><bookmark_value>funkcioj; bildsimbolo de formula breto</bookmark_value>"
+
+#. ZGqd9
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"hd_id3150084\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06040000.xhp\">Function</link>"
+msgstr "<link href=\"text/scalc/02/06040000.xhp\">Funkcio</link>"
+
+#. TnbLt
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_FUNC\">Adds a formula to the current cell. Click this icon, and then enter the formula in the <emph>Input line</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_FUNC\">Enmetas formulon en la aktualan ĉelon. Alklaku ĉi tiun bildsimbolon, kaj enmetu la formulon en la <emph>Eniga linio</emph>.</ahelp>"
+
+#. WH6iw
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153360\n"
+"help.text"
+msgid "This icon is only available when the <emph>Input line</emph> box is not active."
+msgstr "Ĉi tiu bildsimbolo disponeblas nur kiam la kadro <emph>Eniga linio</emph> estas kaŝita."
+
+#. yAAo7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"sc/res/sc26049.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr ""
+
+#. ZjzSD
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153951\n"
+"help.text"
+msgid "Function"
+msgstr "Funkcio"
+
+#. kC5QL
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Input line"
+msgstr "Eniga linio"
+
+#. Vteqe
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"hd_id3153821\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06050000.xhp\">Input line</link>"
+msgstr "<link href=\"text/scalc/02/06050000.xhp\">Eniga linio</link>"
+
+#. Dgf7D
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Enmetu la formulon deziratan en la aktualan ĉelon. Vi povas ankaŭ alklaki la bildsimbolon <link href=\"text/scalc/01/04060000.xhp\">Funkcia helpilo</link> por enmeti antaŭe difinitan funkcion en la formulon.</ahelp>"
+
+#. pBxxB
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cancel"
+msgstr "Rezigni"
+
+#. FRSZz
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"bm_id3154514\n"
+"help.text"
+msgid "<bookmark_value>formula bar; canceling inputs</bookmark_value><bookmark_value>functions; canceling input icon</bookmark_value>"
+msgstr "<bookmark_value>formula breto; rezigni eligaĵon</bookmark_value><bookmark_value>funkcioj; bildsimbolo rezigni eligaĵon</bookmark_value>"
+
+#. 4mACq
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"hd_id3154514\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06060000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/scalc/02/06060000.xhp\">Rezigni</link>"
+
+#. uafDY
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153823\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_CANCEL\">Clears the contents of the <emph>Input line</emph>, or cancels the changes that you made to an existing formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_CANCEL\">Forigas la enhavon de la <emph>Eniga linio</emph>, aŭ malfaras la ŝanĝojn kiujn vi faris al ekzistanta formulo.</ahelp>"
+
+#. DjEeK
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3156281\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Bildsimbolo</alt></image>"
+
+#. QZHAo
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153970\n"
+"help.text"
+msgid "Cancel"
+msgstr "Rezigni"
+
+#. i4LsJ
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Accept"
+msgstr "Akcepti"
+
+#. EG7Fb
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"bm_id3143267\n"
+"help.text"
+msgid "<bookmark_value>formula bar; accepting inputs</bookmark_value><bookmark_value>functions; accepting input icon</bookmark_value>"
+msgstr "<bookmark_value>formula breto; akcepti enigaĵon</bookmark_value><bookmark_value>funkcioj; bildsimbolo akcepti enigaĵon</bookmark_value>"
+
+#. EnHFH
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"hd_id3143267\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06070000.xhp\">Accept</link>"
+msgstr "<link href=\"text/scalc/02/06070000.xhp\">Akcepti</link>"
+
+#. BBvqG
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_OK\">Accepts the contents of the <emph>Input line</emph>, and then inserts the contents into the current cell.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_OK\">Akceptas la enhavon de la <emph>Eniga linio</emph>, kaj enmetas la enhavon en la aktualan ĉelon.</ahelp>"
+
+#. D8cSd
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3150769\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Bildsimbolo</alt></image>"
+
+#. puh2n
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3125864\n"
+"help.text"
+msgid "Accept"
+msgstr "Akcepti"
+
+#. c7dbD
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Theme Selection"
+msgstr "Elekto de etoso"
+
+#. nuJj7
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"hd_id3153087\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06080000.xhp\">Theme Selection</link>"
+msgstr "<link href=\"text/scalc/02/06080000.xhp\">Elekto de etoso</link>"
+
+#. rVKiP
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3154515\n"
+"help.text"
+msgid "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Applies a formatting style to the selected cells.</ahelp></variable> The styles include font, border, and background color information."
+msgstr "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Aplikas formatan stilon al la elektitaj ĉeloj.</ahelp></variable> La stiloj inkluzivas informon pri tiparo, bordero, kaj fona koloro."
+
+#. SEmnU
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3155132\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Bildsimbolo</alt></image>"
+
+#. cgZs2
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3153953\n"
+"help.text"
+msgid "Choose Themes"
+msgstr "Elekti etosojn"
+
+#. xWp4x
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3147127\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Click the formatting theme that you want to apply, and then click <emph>OK</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Alklaku la formatan etoson aplikotan, kaj alklaku je<emph>Akcepti</emph>.</ahelp>"
+
+#. QCyEd
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Position in document"
+msgstr "Loko en dokumento"
+
+#. BNLiM
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"hd_id3145119\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08010000.xhp\">Position in document</link>"
+msgstr "<link href=\"text/scalc/02/08010000.xhp\">Loko en dokumento</link>"
+
+#. L7Xk5
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3147265\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatusDocPos\">Displays the number of the current sheet and the total number of sheets in the spreadsheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatusDocPos\">Vidigas la numeron de la aktuala folio kaj la nombron da folioj en la kalkultabelo.</ahelp>"
+
+#. X2Dv6
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Standard Formula, Date/Time, Error Warning"
+msgstr "Normala formulo, Dato/Horo, Averto pri eraro"
+
+#. fFadm
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"bm_id3147335\n"
+"help.text"
+msgid "<bookmark_value>formulas;status bar</bookmark_value>"
+msgstr "<bookmark_value>formuloj;statobreto</bookmark_value>"
+
+#. FVYfS
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"hd_id3147335\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08080000.xhp\">Standard Formula, Date/Time, Error Warning</link>"
+msgstr "<link href=\"text/scalc/02/08080000.xhp\">Normala formulo, Dato/Horo, Averto pri eraro</link>"
+
+#. gvyvx
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3150791\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StateTableCell\">Displays information about the current document. By default, the SUM of the contents of the selected cells is displayed.</ahelp>"
+msgstr "<ahelp hid=\".uno:StateTableCell\">Vidigas informon pri la aktuala dokumento. Apriore, vidiĝas la SUMO de la enhavo de la elektitaj ĉeloj.</ahelp>"
+
+#. eCfVn
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3155061\n"
+"help.text"
+msgid "To change the default formula that is displayed, right-click the field, and then choose the formula that you want. The available formulas are: Average, count of values (COUNTA), count of numbers (COUNT), Maximum, Minimum, Sum, or None."
+msgstr "Por ŝanĝi la aprioran formulon vidigi, dekstre alklaku la kampon, kaj elektu la formulon deziratan. La disponeblaj formuloj estas: Mezumo, nombro da valoroj (NOMBRIA), nombro da valoroj (NOMBRO), Maksimumo, Minimumo, Sumo, aŭ Nenio."
+
+#. dC4rs
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3153969\n"
+"help.text"
+msgid "<link href=\"text/scalc/05/02140000.xhp\">Error codes</link>"
+msgstr "<link href=\"text/scalc/05/02140000.xhp\">Kodoj pri eraroj</link>"
+
+#. 2fX5w
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Zomi"
+
+#. kNqRX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"bm_id3148491\n"
+"help.text"
+msgid "<bookmark_value>page views; increasing scales</bookmark_value><bookmark_value>increasing scales in page view</bookmark_value><bookmark_value>zooming;enlarging page views</bookmark_value>"
+msgstr "<bookmark_value>paĝaj vidoj; pliigi skalojn</bookmark_value><bookmark_value>pliigi skalojn en paĝa vido</bookmark_value><bookmark_value>zomi;pligrandigi paĝajn vidojn</bookmark_value>"
+
+#. GESuX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"hd_id3148491\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10050000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/scalc/02/10050000.xhp\">Zomi</link>"
+
+#. Uq4Tv
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145069\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomIn\">Enlarges the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomIn\">Pligrandigas la ekranan vidigon de la aktuala dokumento. La aktuala zomfaktoro vidiĝas en la <emph>Stata breto</emph>.</ahelp>"
+
+#. GBXen
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145171\n"
+"help.text"
+msgid "The maximum zoom factor is 400%."
+msgstr "La maksimuma zomfaktoro estas 400%."
+
+#. dD3H5
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3155854\n"
+"help.text"
+msgid "<image id=\"img_id3151116\" src=\"cmd/sc_zoomin.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151116\">Icon</alt></image>"
+msgstr ""
+
+#. GcJsA
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145273\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Zomi"
+
+#. XTPaZ
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Malzomi"
+
+#. P4mw7
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"bm_id3153561\n"
+"help.text"
+msgid "<bookmark_value>page views;reducing scales</bookmark_value><bookmark_value>zooming;reducing page views</bookmark_value>"
+msgstr "<bookmark_value>paĝaj vidoj;malpliigi skalojn</bookmark_value><bookmark_value>zomi;malpliigi paĝajn vidojn</bookmark_value>"
+
+#. Ffzbc
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"hd_id3153561\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10060000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/scalc/02/10060000.xhp\">Malzomi</link>"
+
+#. BgFbq
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3151246\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomOut\">Reduces the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomOut\">Malpligrandigas la ekranan vidigon de la aktuala dokumento. La aktuala zomfaktoro vidiĝas en la <emph>Stata breto</emph>.</ahelp>"
+
+#. Czu2U
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "The minimum zoom factor is 20%."
+msgstr "La minimuma zomfaktoro estas 20%."
+
+#. DN9qj
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Bildsimbolo</alt></image>"
+
+#. rfG8A
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150440\n"
+"help.text"
+msgid "Zooming Out"
+msgstr "Malzomi"
+
+#. BwqAM
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Enmeti"
+
+#. GADDh
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"bm_id3156329\n"
+"help.text"
+msgid "<bookmark_value>inserting; objects, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>enmeti; objektoj, ilbreta bildsimbolo</bookmark_value>"
+
+#. pM9zg
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/scalc/02/18010000.xhp\">Enmeti</link>"
+
+#. UfEHG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3147336\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCtrl\">Click the arrow next to the icon to open the <emph>Insert </emph>toolbar, where you can add graphics and special characters to the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">Alklaku la sagon apud la bildsimbolo por malfermi la ilbreton<emph>Enmeti</emph>, kie vi povas enmeti bildojn kaj specialajn signojn al la aktuala folio.</ahelp>"
+
+#. DnSkt
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3148664\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Ilbreta bildsimbolo:"
+
+#. Eaf8D
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Bildsimbolo</alt></image>"
+
+#. sQ6Tc
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3146120\n"
+"help.text"
+msgid "Insert"
+msgstr "Enmeti"
+
+#. ZVCSS
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3153188\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Oni povas elekti la jenajn bildsimbolojn:"
+
+#. CCP2V
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id4283883\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Glita kadro</link>"
+
+#. gdmkZ
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3149410\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Speciala Signo</link>"
+
+#. FDin8
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3151117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">El dosiero</link>"
+
+#. UKJsG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3633533\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">Formulo</link>"
+
+#. sCB8B
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Diagramo</link>"
+
+#. zc6Yi
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id7581408\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">OLE-objekto</link>"
+
+#. QMjWB
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Cells"
+msgstr "Enmeti ĉelojn"
+
+#. h3979
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"bm_id3150275\n"
+"help.text"
+msgid "<bookmark_value>inserting; cells, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>enmeti; ccelojn, ilbreta bildsimbolo</bookmark_value>"
+
+#. RysCQ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18020000.xhp\">Insert Cells</link>"
+msgstr "<link href=\"text/scalc/02/18020000.xhp\">Enmeti ĉelojn</link>"
+
+#. iTWkf
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3156024\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsCellsCtrl\">Click the arrow next to the icon to open the <emph>Insert Cells </emph>toolbar, where you can insert cells, rows, and columns into the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsCellsCtrl\">Alklaku la sagon apud la bildsimbolo por malfermi la ilbreton <emph>Enmeti ĉelojn</emph>, kie vi povas enmeti ĉelojn, vicojn, kaj kolumnojn en la aktualan folion.</ahelp>"
+
+#. o7wEe
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Ilbreta bildsimbolo:"
+
+#. eqHih
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Oni povas elekti la jenajn bildsimbolojn:"
+
+#. JPhcE
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150439\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Down</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Enmeti ĉelojn malsupren</link>"
+
+#. c3Xmu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3146119\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Right</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Enmeti ĉelojn dekstren</link>"
+
+#. XXyxu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153190\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Rows</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Vicoj</link>"
+
+#. i4ifJ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153726\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Columns</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Kolumnoj</link>"

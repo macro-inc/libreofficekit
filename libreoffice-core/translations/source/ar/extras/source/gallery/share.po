@@ -1,0 +1,107 @@
+#. extracted from extras/source/gallery/share
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-21 18:06+0100\n"
+"PO-Revision-Date: 2022-02-16 08:40+0000\n"
+"Last-Translator: Riyadh Talal <riyadhtalal@gmail.com>\n"
+"Language-Team: Arabic <https://translations.documentfoundation.org/projects/libo_ui-master/extrassourcegalleryshare/ar/>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1519741474.000000\n"
+
+#. 88PiB
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"arrows_name\n"
+"LngText.text"
+msgid "Arrows"
+msgstr "أسهم"
+
+#. Fcud3
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"backgrounds_name\n"
+"LngText.text"
+msgid "Backgrounds"
+msgstr "خلفيات"
+
+#. apeRs
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"bullets_name\n"
+"LngText.text"
+msgid "Bullets"
+msgstr "نقطيات"
+
+#. LddYM
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"bpmn_name\n"
+"LngText.text"
+msgid "BPMN"
+msgstr "دلالات ونموذج عمليات الأعمال"
+
+#. QY2xF
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"diagrams_name\n"
+"LngText.text"
+msgid "Diagrams"
+msgstr "مخططات"
+
+#. Hu7eP
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"flowchart_name\n"
+"LngText.text"
+msgid "Flow chart"
+msgstr "مخطط انسيابي"
+
+#. mdGnB
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"icons_name\n"
+"LngText.text"
+msgid "Icons"
+msgstr "أيقونات"
+
+#. oQBvV
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"network_name\n"
+"LngText.text"
+msgid "Network"
+msgstr "شبكة"
+
+#. zEAoE
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"shapes_name\n"
+"LngText.text"
+msgid "Shapes"
+msgstr "أشكال"
+
+#. pjF4a
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"sounds_name\n"
+"LngText.text"
+msgid "Sounds"
+msgstr "أصوات"

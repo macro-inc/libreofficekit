@@ -1,0 +1,1115 @@
+#. extracted from helpcontent2/source/auxiliary
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2020-02-24 11:26+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
+"Language-Team: Esperanto <https://weblate.documentfoundation.org/projects/libo_help-master/auxiliary/eo/>\n"
+"Language: eo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1552334689.000000\n"
+
+#. fEEXD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07\n"
+"help_section.text"
+msgid "Macros and Scripting"
+msgstr "Makrooj kaj programado"
+
+#. pDA36
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0701\n"
+"node.text"
+msgid "%PRODUCTNAME BASIC"
+msgstr "%PRODUCTNAME BASIC"
+
+#. Ua99d
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Ĝenerala informo kaj uzado de uzinterfaco"
+
+#. ooCCn
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070102\n"
+"node.text"
+msgid "Command Reference"
+msgstr "Referenco pri komandoj"
+
+#. ZhxZF
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010202\n"
+"node.text"
+msgid "Functions, Statements and Operators"
+msgstr ""
+
+#. 3SEZD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010201\n"
+"node.text"
+msgid "Alphabetic List of Functions, Statements and Operators"
+msgstr ""
+
+#. jhVCB
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010205\n"
+"node.text"
+msgid "Advanced Basic Libraries"
+msgstr "Specialaj bazaj bibliotekoj"
+
+#. cFRyM
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010305\n"
+"node.text"
+msgid "ScriptForge Library"
+msgstr ""
+
+#. Vkt9E
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070103\n"
+"node.text"
+msgid "Guides"
+msgstr "Gvidiloj"
+
+#. f7k4A
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0702\n"
+"node.text"
+msgid "Python Scripts Help"
+msgstr ""
+
+#. pVb5g
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Ĝenerala informo kaj uzado de uzinterfaco"
+
+#. D6bPQ
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070202\n"
+"node.text"
+msgid "Programming with Python"
+msgstr ""
+
+#. Y4vuu
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070203\n"
+"node.text"
+msgid "Python Modules"
+msgstr ""
+
+#. JCHAg
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0703\n"
+"node.text"
+msgid "Script Development Tools"
+msgstr ""
+
+#. KsAjT
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08\n"
+"help_section.text"
+msgid "Spreadsheets (Calc)"
+msgstr "Kalkultabeloj (Kalkulilo)"
+
+#. DnZNf
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0801\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Ĝenerala informo kaj uzado de uzinterfaco"
+
+#. DdtJy
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0802\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Referenco pri ordonoj kaj menuoj"
+
+#. 8g9EE
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080201\n"
+"node.text"
+msgid "Menus"
+msgstr "Menuoj"
+
+#. jwFgp
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Ilobretoj"
+
+#. sHFhh
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0803\n"
+"node.text"
+msgid "Functions Types and Operators"
+msgstr "Funkcioj, tipoj kaj operacisimboloj"
+
+#. DSUE2
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0804\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Ŝargi, konservi, importi, eksporti kaj obskurigi"
+
+#. yRwiN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0805\n"
+"node.text"
+msgid "Formatting"
+msgstr "Aranĝado"
+
+#. 5wLkU
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0806\n"
+"node.text"
+msgid "Filtering and Sorting"
+msgstr "Filtri kaj ordigi"
+
+#. yCyBs
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0807\n"
+"node.text"
+msgid "Printing"
+msgstr "Presado"
+
+#. GTRoC
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0808\n"
+"node.text"
+msgid "Data Ranges"
+msgstr "Datumaj ampleksoj"
+
+#. cM3fi
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0809\n"
+"node.text"
+msgid "Pivot Table"
+msgstr "Pivota tabelo"
+
+#. ZBuq9
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08091\n"
+"node.text"
+msgid "Pivot Chart"
+msgstr "Pivota diagramo"
+
+#. RowUw
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0810\n"
+"node.text"
+msgid "Scenarios"
+msgstr "Scenaroj"
+
+#. NHiVG
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08101\n"
+"node.text"
+msgid "Subtotals"
+msgstr ""
+
+#. CzARM
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0811\n"
+"node.text"
+msgid "References"
+msgstr "Referencoj"
+
+#. ELC6F
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0812\n"
+"node.text"
+msgid "Viewing, Selecting, Copying"
+msgstr "Vidi, elekti, kopii"
+
+#. VFHig
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0813\n"
+"node.text"
+msgid "Formulas and Calculations"
+msgstr "Formuloj kaj kalkuloj"
+
+#. bCMSS
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0814\n"
+"node.text"
+msgid "Protection"
+msgstr "Protekto"
+
+#. m2Dpj
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Writing Calc Macros"
+msgstr ""
+
+#. vBXqp
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0816\n"
+"node.text"
+msgid "Miscellaneous"
+msgstr "Diversaj"
+
+#. 6Saoi
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"05\n"
+"help_section.text"
+msgid "Charts and Diagrams"
+msgstr "Diagramoj"
+
+#. gu6pZ
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"0501\n"
+"node.text"
+msgid "General Information"
+msgstr "Ĝenerala informo"
+
+#. Q5EUA
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"09\n"
+"help_section.text"
+msgid "Database Functionality (Base)"
+msgstr ""
+
+#. tLWiE
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"0901\n"
+"node.text"
+msgid "General Information"
+msgstr ""
+
+#. xU49Q
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11\n"
+"help_section.text"
+msgid "Drawings (Draw)"
+msgstr ""
+
+#. UcMAA
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr ""
+
+#. ZDeBD
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1102\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr ""
+
+#. kq7Az
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020201\n"
+"node.text"
+msgid "Menus"
+msgstr ""
+
+#. SFgJ7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr ""
+
+#. 9ojH7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1103\n"
+"node.text"
+msgid "Loading, Saving, Importing, and Exporting"
+msgstr ""
+
+#. fJYHX
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1104\n"
+"node.text"
+msgid "Formatting"
+msgstr ""
+
+#. HkVUY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1105\n"
+"node.text"
+msgid "Printing"
+msgstr ""
+
+#. G8GoF
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1106\n"
+"node.text"
+msgid "Effects"
+msgstr ""
+
+#. fd9tS
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1107\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr ""
+
+#. crdMY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1108\n"
+"node.text"
+msgid "Groups and Layers"
+msgstr ""
+
+#. G3s8n
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1109\n"
+"node.text"
+msgid "Text in Drawings"
+msgstr ""
+
+#. rxRmL
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1110\n"
+"node.text"
+msgid "Viewing"
+msgstr ""
+
+#. 4zaCG
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"01\n"
+"help_section.text"
+msgid "%PRODUCTNAME Installation"
+msgstr "Instalado de %PRODUCTNAME"
+
+#. 3EUAC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10\n"
+"help_section.text"
+msgid "Common Help Topics"
+msgstr "Oftaj helpaj temoj"
+
+#. 3GoWS
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1001\n"
+"node.text"
+msgid "General Information"
+msgstr "Ĝenerala informo"
+
+#. vFfKE
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1002\n"
+"node.text"
+msgid "%PRODUCTNAME and Microsoft Office"
+msgstr "%PRODUCTNAME kaj Microsoft Office"
+
+#. GBR3F
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1004\n"
+"node.text"
+msgid "%PRODUCTNAME Options"
+msgstr "%PRODUCTNAME-ebloj"
+
+#. d4gAD
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1005\n"
+"node.text"
+msgid "Wizards"
+msgstr "Asistantoj"
+
+#. aXMeh
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100501\n"
+"node.text"
+msgid "Letter Wizard"
+msgstr "Letera Asistanto"
+
+#. 6qzVL
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100502\n"
+"node.text"
+msgid "Fax Wizard"
+msgstr "Faksa Asistanto"
+
+#. GMiKt
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100504\n"
+"node.text"
+msgid "Agenda Wizard"
+msgstr "Tagorda Asistanto"
+
+#. gvsML
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100506\n"
+"node.text"
+msgid "HTML Export Wizard"
+msgstr "HTML-eksporta Asistanto"
+
+#. 8tHJK
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100510\n"
+"node.text"
+msgid "Document Converter Wizard"
+msgstr "Asistanto pri konverti dokumentojn"
+
+#. zhnAF
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1006\n"
+"node.text"
+msgid "Configuring %PRODUCTNAME"
+msgstr "Agordado de %PRODUCTNAME"
+
+#. 2rp8T
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1007\n"
+"node.text"
+msgid "Working with the User Interface"
+msgstr "Labori per la uzinterfaco"
+
+#. mFuDH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10071\n"
+"node.text"
+msgid "Digital Signatures"
+msgstr "Ciferecaj subskriboj"
+
+#. drtXn
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1008\n"
+"node.text"
+msgid "Printing, Faxing, Sending"
+msgstr "Presi, faksi, sendi"
+
+#. ZJbym
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1009\n"
+"node.text"
+msgid "Drag & Drop"
+msgstr "Ŝovi kaj demeti"
+
+#. DFzj6
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1010\n"
+"node.text"
+msgid "Copy and Paste"
+msgstr "Kopii kaj alglui"
+
+#. hQXmX
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1012\n"
+"node.text"
+msgid "Charts and Diagrams"
+msgstr "Diagramoj"
+
+#. GVohQ
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1013\n"
+"node.text"
+msgid "Load, Save, Import, Export, PDF"
+msgstr "Ŝarĝi, konservi, importi, eksporti, PDF"
+
+#. Ty8Du
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1014\n"
+"node.text"
+msgid "Links and References"
+msgstr "Ligiloj kaj referencoj"
+
+#. nDFsH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1015\n"
+"node.text"
+msgid "Document Version Tracking"
+msgstr "Mastrumi dokumentajn versiojn"
+
+#. AnvYc
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1016\n"
+"node.text"
+msgid "Labels and Business Cards"
+msgstr "Etikedoj kaj nomkartoj"
+
+#. tEYBw
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1018\n"
+"node.text"
+msgid "Inserting External Data"
+msgstr "Enigi eksterajn datumojn"
+
+#. X2KH4
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1019\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Aŭtomataj funkcioj"
+
+#. EGqAp
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1020\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Serĉi kaj anstataŭigi"
+
+#. 4GGhC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1021\n"
+"node.text"
+msgid "Guides"
+msgstr "Manlibroj"
+
+#. BjDNf
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04\n"
+"help_section.text"
+msgid "Presentations (Impress)"
+msgstr "Prezentaĵoj (Prezentilo)"
+
+#. hBFX8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0401\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Ĝenerala informo kaj uzado de uzinterfaco"
+
+#. XaGTA
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0402\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Referenco pri ordonoj kaj menuoj"
+
+#. ADAgH
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020101\n"
+"node.text"
+msgid "Menus"
+msgstr "Menuoj"
+
+#. fqLWR
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020102\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Ilobretoj"
+
+#. fiLDS
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0403\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Ŝargi, konservi, importi, eksporti kaj obskurigi"
+
+#. jMBsp
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0404\n"
+"node.text"
+msgid "Formatting"
+msgstr "Aranĝado"
+
+#. HtUGZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0405\n"
+"node.text"
+msgid "Printing"
+msgstr "Presado"
+
+#. FxREt
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0406\n"
+"node.text"
+msgid "Effects"
+msgstr "Efektoj"
+
+#. RX5V8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0407\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "Objektoj, grafikoj, kaj bitbildoj"
+
+#. aDbFG
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0409\n"
+"node.text"
+msgid "Text in Presentations"
+msgstr ""
+
+#. s8GCo
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0410\n"
+"node.text"
+msgid "Viewing"
+msgstr "Vidoj"
+
+#. Lo4YZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0411\n"
+"node.text"
+msgid "Slide Shows"
+msgstr "Vidigi prezentaĵon"
+
+#. m5CkC
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"03\n"
+"help_section.text"
+msgid "Formulas (Math)"
+msgstr "Formuloj (Formulilo)"
+
+#. kAkAL
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0301\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Ĝenerala informo kaj uzado de uzinterfaco"
+
+#. 3BZ8j
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"030101\n"
+"node.text"
+msgid "%PRODUCTNAME Formula Elements"
+msgstr ""
+
+#. V99im
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0302\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Referenco pri ordonoj kaj menuoj"
+
+#. CGoih
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0303\n"
+"node.text"
+msgid "Working with Formulas"
+msgstr "Labori per formuloj"
+
+#. FxCSV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"02\n"
+"help_section.text"
+msgid "Text Documents (Writer)"
+msgstr "Tekstaj dokumentoj (Verkilo)"
+
+#. jWyEV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Ĝenerala informo kaj uzado de uzinterfaco"
+
+#. mT2iu
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0202\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Referenco pri ordonoj kaj menuoj"
+
+#. 4RREa
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020201\n"
+"node.text"
+msgid "Menus"
+msgstr "Menuoj"
+
+#. SQkvD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Ilobretoj"
+
+#. AExWW
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0210\n"
+"node.text"
+msgid "Navigating Text Documents"
+msgstr "Navigi en tekstaj dokumentoj"
+
+#. hjKKD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0212\n"
+"node.text"
+msgid "Formatting Text Documents"
+msgstr "Formati tekstajn dokumentojn"
+
+#. 6gFto
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"021201\n"
+"node.text"
+msgid "Templates and Styles"
+msgstr "Ŝablonoj kaj stiloj"
+
+#. 7BQES
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0204\n"
+"node.text"
+msgid "Graphics in Text Documents"
+msgstr "Grafikoj en tekstaj dokumentoj"
+
+#. QsiTB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0205\n"
+"node.text"
+msgid "Tables in Text Documents"
+msgstr "Tabeloj en tekstaj dokumentoj"
+
+#. Xx5Fp
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0206\n"
+"node.text"
+msgid "Objects in Text Documents"
+msgstr "Objektoj en tekstaj dokumentoj"
+
+#. 47SjN
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0207\n"
+"node.text"
+msgid "Sections and Frames in Text Documents"
+msgstr "Sekcioj kaj kadroj en tekstaj dokumentoj"
+
+#. E2N9E
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0208\n"
+"node.text"
+msgid "Tables of Contents and Indexes"
+msgstr "Tabeloj de enhavo kaj indeksoj"
+
+#. yi6ro
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0209\n"
+"node.text"
+msgid "Fields in Text Documents"
+msgstr "Kampoj en tekstaj dokumentoj"
+
+#. ZgfjA
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0211\n"
+"node.text"
+msgid "Calculating in Text Documents"
+msgstr "Kalkuli en tekstaj dokumentoj"
+
+#. wVGdF
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0213\n"
+"node.text"
+msgid "Special Text Elements"
+msgstr "Specialaj tekstaj elementoj"
+
+#. FxdVR
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0214\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Aŭtomataj funkcioj"
+
+#. hi36Q
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0215\n"
+"node.text"
+msgid "Numbering and Lists"
+msgstr "Numerado kaj listoj"
+
+#. 2FPcB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0216\n"
+"node.text"
+msgid "Spellchecking, Thesaurus, and Languages"
+msgstr "Literumada kontrolo, tezaŭro, kaj lingvoj"
+
+#. vDffD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0218\n"
+"node.text"
+msgid "Troubleshooting Tips"
+msgstr "Problemsolvaj konsiletoj"
+
+#. qLMLk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0219\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Ŝargi, konservi, importi, eksporti kaj obskurigi"
+
+#. 8GC4J
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0220\n"
+"node.text"
+msgid "Master Documents"
+msgstr "Ĉefaj dokumentoj"
+
+#. wbJh4
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0221\n"
+"node.text"
+msgid "Links and References"
+msgstr "Ligiloj kaj referencoj"
+
+#. vHzyn
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0222\n"
+"node.text"
+msgid "Printing"
+msgstr "Presado"
+
+#. F4LCk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0223\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Serĉi kaj anstataŭigi"
+
+#. CYQr2
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"06\n"
+"help_section.text"
+msgid "HTML Documents (Writer Web)"
+msgstr "HTML-dokumentoj (Verkilo por la reto)"

@@ -1,0 +1,268 @@
+#. extracted from writerperfect/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-03-23 11:46+0100\n"
+"PO-Revision-Date: 2021-02-15 15:38+0000\n"
+"Last-Translator: Cheng-Chia Tseng <pswo10680@gmail.com>\n"
+"Language-Team: Chinese (Traditional) <https://translations.documentfoundation.org/projects/libo_ui-master/writerperfectmessages/zh_Hant/>\n"
+"Language: zh-TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1527867937.000000\n"
+
+#. DXXuk
+#: writerperfect/inc/strings.hrc:14
+msgctxt "STR_ENCODING_DIALOG_TITLE"
+msgid "Import file"
+msgstr "匯入檔案"
+
+#. NCpDZ
+#: writerperfect/inc/strings.hrc:15
+msgctxt "STR_ENCODING_DIALOG_TITLE_MSMULTIPLAN"
+msgid "Import MS Multiplan for DOS file"
+msgstr "匯入 MS Multiplan for DOS 檔"
+
+#. 9QaFD
+#: writerperfect/inc/strings.hrc:16
+msgctxt "STR_ENCODING_DIALOG_TITLE_MSWORKS"
+msgid "Import MS Works file"
+msgstr "匯入 MS Works 檔"
+
+#. AGNp8
+#: writerperfect/inc/strings.hrc:17
+msgctxt "STR_ENCODING_DIALOG_TITLE_MSWRITE"
+msgid "Import MS Write file"
+msgstr "匯入 MS Write 檔"
+
+#. YFuS7
+#: writerperfect/inc/strings.hrc:18
+msgctxt "STR_ENCODING_DIALOG_TITLE_DOSWORD"
+msgid "Import MS Word for DOS file"
+msgstr "匯入 MS Word for DOS 檔"
+
+#. A3kjQ
+#: writerperfect/inc/strings.hrc:19
+msgctxt "STR_ENCODING_DIALOG_TITLE_LOTUS"
+msgid "Import Lotus file"
+msgstr "匯入 Lotus 檔"
+
+#. 7ngKL
+#: writerperfect/inc/strings.hrc:20
+msgctxt "STR_ENCODING_DIALOG_TITLE_SYMPHONY"
+msgid "Import Symphony file"
+msgstr "匯入 Symphony 檔"
+
+#. Dp6Zj
+#: writerperfect/inc/strings.hrc:21
+msgctxt "STR_ENCODING_DIALOG_TITLE_QUATTROPRO"
+msgid "Import Quattro Pro file"
+msgstr "匯入 Quattro Pro 檔"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "加入(_A)"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "套用(_A)"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "取消(_C)"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "關閉(_C)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "刪除(_D)"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "編輯(_E)"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "說明(_H)"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "新增(_N)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "否(_N)"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "確定(_O)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "移除(_R)"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "重設(_R)"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "是(_Y)"
+
+#. MZYvQ
+#: writerperfect/uiconfig/ui/exportepub.ui:9
+msgctxt "exportepub|EpubDialog"
+msgid "EPUB Export"
+msgstr "EPUB 匯出"
+
+#. 2ADpr
+#: writerperfect/uiconfig/ui/exportepub.ui:112
+msgctxt "exportepub|versionft"
+msgid "Version:"
+msgstr "版本："
+
+#. 5uGCs
+#: writerperfect/uiconfig/ui/exportepub.ui:129
+msgctxt "exportepub|epub3"
+msgid "EPUB 3.0"
+msgstr "EPUB 3.0"
+
+#. EyGCH
+#: writerperfect/uiconfig/ui/exportepub.ui:130
+msgctxt "exportepub|epub2"
+msgid "EPUB 2.0"
+msgstr "EPUB 2.0"
+
+#. yVSHE
+#: writerperfect/uiconfig/ui/exportepub.ui:146
+msgctxt "exportepub|splitpage"
+msgid "Page break"
+msgstr "分頁"
+
+#. u8EWu
+#: writerperfect/uiconfig/ui/exportepub.ui:147
+msgctxt "exportepub|splitheading"
+msgid "Heading"
+msgstr "標題"
+
+#. 6nDti
+#: writerperfect/uiconfig/ui/exportepub.ui:160
+msgctxt "exportepub|splitft"
+msgid "Split method:"
+msgstr "切分方式："
+
+#. DvEkf
+#: writerperfect/uiconfig/ui/exportepub.ui:174
+msgctxt "exportepub|layoutft"
+msgid "Layout method:"
+msgstr "版面配置方式："
+
+#. Jxiwx
+#: writerperfect/uiconfig/ui/exportepub.ui:191
+msgctxt "exportepub|layoutreflowable"
+msgid "Reflowable"
+msgstr "文字流可變動"
+
+#. QANvp
+#: writerperfect/uiconfig/ui/exportepub.ui:192
+msgctxt "exportepub|layoutfixed"
+msgid "Fixed"
+msgstr "固定"
+
+#. CeRQ4
+#: writerperfect/uiconfig/ui/exportepub.ui:207
+msgctxt "exportepub|generalft"
+msgid "General"
+msgstr "一般"
+
+#. ET3pr
+#: writerperfect/uiconfig/ui/exportepub.ui:244
+msgctxt "exportepub|identifierft"
+msgid "Identifier:"
+msgstr "識別碼："
+
+#. GFADK
+#: writerperfect/uiconfig/ui/exportepub.ui:258
+msgctxt "exportepub|titleft"
+msgid "Title:"
+msgstr "題名："
+
+#. 4UDMh
+#: writerperfect/uiconfig/ui/exportepub.ui:272
+msgctxt "exportepub|authorft"
+msgid "Author:"
+msgstr "作者："
+
+#. U4wuu
+#: writerperfect/uiconfig/ui/exportepub.ui:286
+msgctxt "exportepub|dateft"
+msgid "Date:"
+msgstr "日期："
+
+#. B5NKD
+#: writerperfect/uiconfig/ui/exportepub.ui:300
+msgctxt "exportepub|languageft"
+msgid "Language:"
+msgstr "語言："
+
+#. MRBgx
+#: writerperfect/uiconfig/ui/exportepub.ui:381
+msgctxt "exportepub|metadataft"
+msgid "Metadata"
+msgstr "中介資料"
+
+#. swAre
+#: writerperfect/uiconfig/ui/exportepub.ui:417
+msgctxt "exportepub|coverimageft"
+msgid "Cover image:"
+msgstr "封面影像："
+
+#. qSviq
+#: writerperfect/uiconfig/ui/exportepub.ui:442
+msgctxt "exportepub|coverbutton"
+msgid "Browse..."
+msgstr "瀏覽..."
+
+#. 3tfAE
+#: writerperfect/uiconfig/ui/exportepub.ui:456
+msgctxt "exportepub|mediadirft"
+msgid "Media directory:"
+msgstr "媒體目錄："
+
+#. jBQqe
+#: writerperfect/uiconfig/ui/exportepub.ui:481
+msgctxt "exportepub|mediabutton"
+msgid "Browse..."
+msgstr "瀏覽..."
+
+#. yFjyH
+#: writerperfect/uiconfig/ui/exportepub.ui:497
+msgctxt "exportepub|customizeft"
+msgid "Customize"
+msgstr "自訂"
+
+#. DCscf
+#: writerperfect/uiconfig/ui/wpftencodingdialog.ui:67
+msgctxt "wpftencodingdialog|label"
+msgid "_Character set:"
+msgstr "字元集(_C)："

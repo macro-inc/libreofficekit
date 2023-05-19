@@ -1,0 +1,99 @@
+#. extracted from oox/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-07-04 18:05+0200\n"
+"PO-Revision-Date: 2022-07-12 03:34+0000\n"
+"Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
+"Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_ui-master/ooxmessages/nn/>\n"
+"Language: nn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+
+#. C5e9E
+#: oox/inc/strings.hrc:15
+msgctxt "STR_DIAGRAM_TITLE"
+msgid "Chart Title"
+msgstr "Diagramtittel"
+
+#. 3YeSC
+#: oox/inc/strings.hrc:16
+msgctxt "STR_DIAGRAM_AXISTITLE"
+msgid "Axis Title"
+msgstr "Aksetittel"
+
+#. p8GEE
+#: oox/inc/strings.hrc:17
+msgctxt "STR_SLIDE_NAME"
+msgid "Slide"
+msgstr "Lysbilete"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Legg til"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Bruk"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Avbryt"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Lukk"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Slett"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Rediger"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Hjelp"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Ny(tt)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Nei"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_OK"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Fjern"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Tilbakestill"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Ja"

@@ -1,0 +1,557 @@
+#. extracted from fpicker/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-06-09 11:50+0200\n"
+"PO-Revision-Date: 2022-06-06 17:37+0000\n"
+"Last-Translator: Po-Yen Huang <jeff@mail.ossii.com.tw>\n"
+"Language-Team: Chinese (Traditional) <https://translations.documentfoundation.org/projects/libo_ui-master/fpickermessages/zh_Hant/>\n"
+"Language: zh-TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1538499032.000000\n"
+
+#. SJGCw
+#: fpicker/inc/strings.hrc:24
+msgctxt "STR_EXPLORERFILE_OPEN"
+msgid "Open"
+msgstr "開啟"
+
+#. xNMsi
+#: fpicker/inc/strings.hrc:25
+msgctxt "STR_EXPLORERFILE_SAVE"
+msgid "Save as"
+msgstr "另存為"
+
+#. gseq9
+#: fpicker/inc/strings.hrc:26
+msgctxt "STR_EXPLORERFILE_BUTTONSAVE"
+msgid "~Save"
+msgstr "儲存(~S)"
+
+#. tpvKy
+#: fpicker/inc/strings.hrc:27
+msgctxt "STR_PATHNAME"
+msgid "~Path:"
+msgstr "路徑(~P)："
+
+#. 9PVSK
+#: fpicker/inc/strings.hrc:28
+msgctxt "STR_PATHSELECT"
+msgid "Select path"
+msgstr "選取路徑"
+
+#. ykCyy
+#: fpicker/inc/strings.hrc:29
+msgctxt "STR_BUTTONSELECT"
+msgid "~Select"
+msgstr "選取(~S)"
+
+#. zBr7H
+#: fpicker/inc/strings.hrc:30
+msgctxt "STR_PREVIEW"
+msgid "File Preview"
+msgstr "檔案預覽"
+
+#. AGj3z
+#: fpicker/inc/strings.hrc:31
+msgctxt "STR_DEFAULT_DIRECTORY"
+msgid "My Documents"
+msgstr "我的文件"
+
+#. 99gqd
+#: fpicker/inc/strings.hrc:32
+msgctxt "RID_FILEOPEN_NOTEXISTENTFILE"
+msgid ""
+"The file $name$ does not exist.\n"
+"Make sure you have entered the correct file name."
+msgstr ""
+"這個檔案 $name$ 不存在。\n"
+"請檢查輸入的檔案名稱是否正確。"
+
+#. CahDV
+#: fpicker/inc/strings.hrc:33
+msgctxt "STR_SVT_NEW_FOLDER"
+msgid "Folder"
+msgstr "資料夾"
+
+#. o5hFk
+#: fpicker/inc/strings.hrc:34
+msgctxt "STR_SVT_NOREMOVABLEDEVICE"
+msgid ""
+"No removable storage device detected.\n"
+"Make sure it is plugged in properly and try again."
+msgstr ""
+"未偵測到可移除的儲存裝置。\n"
+"請確定裝置已正確插接後再重新嘗試。"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "加入(_A)"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "套用(_A)"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "取消(_C)"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "關閉(_C)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "刪除(_D)"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "編輯(_E)"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "說明(_H)"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "新增(_N)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "否(_N)"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "確定(_O)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "移除(_R)"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "重設(_R)"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "是(_Y)"
+
+#. D3iME
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:129
+msgctxt "explorerfiledialog|connect_to_server"
+msgid "Servers..."
+msgstr "伺服器..."
+
+#. ZqDfr
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:133
+msgctxt "explorerfiledialog|connect_to_server|tooltip_text"
+msgid "Connect To Server"
+msgstr "連線至伺服器"
+
+#. kaDnz
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:137
+msgctxt "explorerfiledialog|connect_to_server-atkobject"
+msgid "Connect To Server"
+msgstr "連線至伺服器"
+
+#. e8DSB
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:193
+msgctxt "explorerfiledialog|new_folder|tooltip_text"
+msgid "Create New Folder"
+msgstr "建立新資料夾"
+
+#. Lyb7g
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:199
+msgctxt "explorerfiledialog|new_folder-atkobject"
+msgid "Create New Folder"
+msgstr "建立新資料夾"
+
+#. X5SYh
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:261
+msgctxt "explorerfiledialog|places"
+msgid "Places"
+msgstr "位置"
+
+#. CnQhU
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:296
+msgctxt "explorerfiledialog|add"
+msgid "Add current folder to Places"
+msgstr "新增目前資料夾至「位置」"
+
+#. wP2nq
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:311
+msgctxt "explorerfiledialog|add"
+msgid "Remove selected folder from Places"
+msgstr "從「位置」移除選定的資料夾"
+
+#. Upnsg
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:365
+msgctxt "explorerfiledialog|name"
+msgid "Name"
+msgstr "名稱"
+
+#. CGq9e
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:385
+msgctxt "explorerfiledialog|type"
+msgid "Type"
+msgstr "類型"
+
+#. wDiXd
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:399
+msgctxt "explorerfiledialog|size"
+msgid "Size"
+msgstr "大小"
+
+#. CDqza
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:413
+msgctxt "explorerfiledialog|date"
+msgid "Date modified"
+msgstr "修改日期"
+
+#. vQEZt
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:495
+msgctxt "explorerfiledialog|open"
+msgid "_Open"
+msgstr "開啟(_O)"
+
+#. JnE2t
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:542
+msgctxt "explorerfiledialog|play"
+msgid "_Play"
+msgstr "播放(_P)"
+
+#. dWNqZ
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:580
+msgctxt "explorerfiledialog|file_name_label"
+msgid "File _name:"
+msgstr "檔案名稱(_N)："
+
+#. 9cjFB
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:606
+msgctxt "explorerfiledialog|file_type_label"
+msgid "File _type:"
+msgstr "檔案類型(_T)："
+
+#. quCXH
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:670
+msgctxt "explorerfiledialog|readonly"
+msgid "_Read-only"
+msgstr "唯讀(_R)"
+
+#. hm2xy
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:693
+msgctxt "explorerfiledialog|password"
+msgid "Save with password"
+msgstr "使用密碼儲存"
+
+#. 8EYcB
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:706
+msgctxt "explorerfiledialog|extension"
+msgid "_Automatic file name extension"
+msgstr "自動加上副檔名(_A)"
+
+#. 2CgAZ
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:719
+msgctxt "explorerfiledialog|options"
+msgid "Edit _filter settings"
+msgstr "編輯篩選器設定(_F)"
+
+#. 6XqLj
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:746
+msgctxt "explorerfiledialog|gpgencrypt"
+msgid "Encrypt with GPG key"
+msgstr "以 GPG 金鑰加密"
+
+#. 2ZWy2
+#: fpicker/uiconfig/ui/foldernamedialog.ui:8
+msgctxt "foldernamedialog|FolderNameDialog"
+msgid "Folder Name"
+msgstr "資料夾名稱"
+
+#. neJna
+#: fpicker/uiconfig/ui/foldernamedialog.ui:86
+msgctxt "foldernamedialog|label2"
+msgid "Na_me:"
+msgstr "名稱(_M)："
+
+#. uiXuE
+#: fpicker/uiconfig/ui/foldernamedialog.ui:116
+msgctxt "foldernamedialog|label1"
+msgid "Create New Folder"
+msgstr "建立新資料夾"
+
+#. UB9xb
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:61
+msgctxt "remotefilesdialog|edit_service"
+msgid "_Add service"
+msgstr "新增服務(_A)"
+
+#. kF4BR
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:69
+msgctxt "remotefilesdialog|edit_service"
+msgid "_Edit service"
+msgstr "編輯服務(_E)"
+
+#. 8Xguy
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:77
+msgctxt "remotefilesdialog|delete_service"
+msgid "_Delete service"
+msgstr "刪除服務(_D)"
+
+#. pVchs
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:85
+msgctxt "remotefilesdialog|change_password"
+msgid "_Change password"
+msgstr "變更密碼(_C)"
+
+#. RnU7Z
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:93
+msgctxt "remotefilesdialog|RemoteFilesDialog"
+msgid "Remote Files"
+msgstr "遠端檔案"
+
+#. FA4UT
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:142
+msgctxt "remotefilesdialog|open"
+msgid "_Open"
+msgstr "開啟(_O)"
+
+#. uGwr4
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:175
+msgctxt "remotefilesdialog|label1"
+msgid "Service:"
+msgstr "服務："
+
+#. cwNkT
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:203
+msgctxt "remotefilesdialog|add_service_btn"
+msgid "_Manage services"
+msgstr "管理服務(_M)"
+
+#. Jnndg
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:253
+msgctxt "remotefilesdialog|list_view|tooltip_text"
+msgid "List view"
+msgstr "列表檢視"
+
+#. xxBtB
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:268
+msgctxt "remotefilesdialog|icon_view|tooltip_text"
+msgid "Icon view"
+msgstr "圖示檢視"
+
+#. 6CiqC
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:284
+msgctxt "remotefilesdialog|new_folder|tooltip_text"
+msgid "Create New Folder"
+msgstr "建立新資料夾"
+
+#. aXDaC
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:389
+msgctxt "remotefilesdialog|name"
+msgid "Name"
+msgstr "名稱"
+
+#. qRHnF
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:409
+msgctxt "remotefilesdialog|size"
+msgid "Size"
+msgstr "大小"
+
+#. qeF3r
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:423
+msgctxt "remotefilesdialog|date"
+msgid "Date modified"
+msgstr "修改日期"
+
+#. cGNWD
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:499
+msgctxt "remotefilesdialog|filterLabel"
+msgid "Filter"
+msgstr "篩選"
+
+#. rCVer
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:513
+msgctxt "remotefilesdialog|nameLabel"
+msgid "File name"
+msgstr "檔案名稱"
+
+#. GUWMA
+#: include/fpicker/strings.hrc:14
+msgctxt "STR_SVT_FILEPICKER_AUTO_EXTENSION"
+msgid "~Automatic file name extension"
+msgstr "自動加上副檔名(~A)"
+
+#. 2DxYf
+#: include/fpicker/strings.hrc:15
+msgctxt "STR_SVT_FILEPICKER_PASSWORD"
+msgid "Save with pass~word"
+msgstr "使用密碼儲存(~W)"
+
+#. UysiP
+#. dear loplugins, please don't remove this constant, it will be used in follow-up commits
+#: include/fpicker/strings.hrc:17
+msgctxt "STR_SVT_FILEPICKER_GPGENCRYPT"
+msgid "Encrypt with ~GPG key"
+msgstr "以 ~GPG 金鑰加密"
+
+#. LWkae
+#: include/fpicker/strings.hrc:18
+msgctxt "STR_SVT_FILEPICKER_FILTER_OPTIONS"
+msgid "~Edit filter settings"
+msgstr "編輯篩選設定(~E)"
+
+#. k7Sdb
+#: include/fpicker/strings.hrc:19
+msgctxt "STR_SVT_FILEPICKER_READONLY"
+msgid "~Read-only"
+msgstr "唯讀(~R)"
+
+#. 7VhDp
+#: include/fpicker/strings.hrc:20
+msgctxt "STR_SVT_FILEPICKER_INSERT_AS_LINK"
+msgid "~Link"
+msgstr "連結(~L)"
+
+#. dFf6y
+#: include/fpicker/strings.hrc:21
+msgctxt "STR_SVT_FILEPICKER_SHOW_PREVIEW"
+msgid "Pr~eview"
+msgstr "預覽(~E)"
+
+#. uu7VW
+#: include/fpicker/strings.hrc:22
+msgctxt "STR_SVT_FILEPICKER_PLAY"
+msgid "~Play"
+msgstr "放映(~P)"
+
+#. ReGYn
+#: include/fpicker/strings.hrc:23
+msgctxt "STR_SVT_FILEPICKER_VERSION"
+msgid "~Version:"
+msgstr "版本(~V)："
+
+#. nuKha
+#: include/fpicker/strings.hrc:24
+msgctxt "STR_SVT_FILEPICKER_TEMPLATES"
+msgid "S~tyles:"
+msgstr "樣式(~T)："
+
+#. emrjD
+#: include/fpicker/strings.hrc:25
+msgctxt "STR_SVT_FILEPICKER_IMAGE_TEMPLATE"
+msgid "Style:"
+msgstr "樣式："
+
+#. TNmc2
+#: include/fpicker/strings.hrc:26
+msgctxt "STR_SVT_FILEPICKER_IMAGE_ANCHOR"
+msgid "A~nchor:"
+msgstr "錨定(~N)："
+
+#. JvMvb
+#: include/fpicker/strings.hrc:27
+msgctxt "STR_SVT_FILEPICKER_SELECTION"
+msgid "~Selection"
+msgstr "選取(~S)"
+
+#. VEgEJ
+#: include/fpicker/strings.hrc:28
+msgctxt "STR_SVT_FILEPICKER_FILTER_TITLE"
+msgid "File ~type:"
+msgstr "檔案類型(~T)："
+
+#. 7Mozz
+#: include/fpicker/strings.hrc:29
+msgctxt "STR_SVT_FOLDERPICKER_DEFAULT_TITLE"
+msgid "Select Path"
+msgstr "選擇路徑"
+
+#. GtMEC
+#: include/fpicker/strings.hrc:30
+msgctxt "STR_SVT_FOLDERPICKER_DEFAULT_DESCRIPTION"
+msgid "Please select a folder."
+msgstr "請選擇一個資料夾。"
+
+#. 7pThC
+#: include/fpicker/strings.hrc:31
+msgctxt "STR_SVT_ALREADYEXISTOVERWRITE"
+msgid ""
+"A file named \"$filename$\" already exists.\n"
+"\n"
+"Do you want to replace it?"
+msgstr ""
+"已經存在一份名為「$filename$」的檔案。\n"
+"\n"
+"您是否要取代它？"
+
+#. t4wDh
+#: include/fpicker/strings.hrc:32
+msgctxt "STR_SVT_ALREADYEXISTOVERWRITE_SECONDARY"
+msgid "The file already exists in \"$dirname$\". Replacing it will overwrite its contents."
+msgstr "檔案已存在於「$dirname$」。替換它會覆寫其內容。"
+
+#. cBvCB
+#: include/fpicker/strings.hrc:33
+msgctxt "STR_SVT_ALLFORMATS"
+msgid "All Formats"
+msgstr "所有格式"
+
+#. z6Eo3
+#: include/fpicker/strings.hrc:34
+msgctxt "STR_SVT_DELETESERVICE"
+msgid ""
+"Are you sure you want to delete the service?\n"
+"\"$servicename$\""
+msgstr ""
+"您確定要刪除該服務嗎？\n"
+"「$servicename$」"
+
+#. KegFE
+#: include/fpicker/strings.hrc:35
+msgctxt "STR_SVT_ROOTLABEL"
+msgid "Root"
+msgstr "Root"
+
+#. sWRTd
+#: include/fpicker/strings.hrc:36
+msgctxt "STR_FILTERNAME_ALL"
+msgid "All files"
+msgstr "所有檔案"
+
+#. FBggE
+#: include/fpicker/strings.hrc:37
+msgctxt "STR_FILEDLG_OPEN"
+msgid "Open"
+msgstr "開啟"
+
+#. wJYsA
+#: include/fpicker/strings.hrc:38
+msgctxt "STR_FILEDLG_TYPE"
+msgid "File ~type"
+msgstr "檔案類型(~T)"
+
+#. EEBg4
+#: include/fpicker/strings.hrc:39
+msgctxt "STR_FILEDLG_SAVE"
+msgid "Save"
+msgstr "儲存"

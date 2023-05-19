@@ -1,0 +1,989 @@
+#. extracted from helpcontent2/source/text/sdraw/01
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-11-23 10:27+0000\n"
+"Last-Translator: Olivier Hallot <olivier.hallot@libreoffice.org>\n"
+"Language-Team: Portuguese (Brazil) <https://translations.documentfoundation.org/projects/libo_help-master/textsdraw01/pt_BR/>\n"
+"Language: pt-BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1557942453.000000\n"
+
+#. ybhKD
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "3D-Settings"
+msgstr "Configurações 3D"
+
+#. FEwmD
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN1055A\n"
+"help.text"
+msgid "<variable id=\"3dtoolbar\"><link href=\"text/sdraw/01/3dsettings_toolbar.xhp\">3D-Settings</link></variable>"
+msgstr "<variable id=\"3dtoolbar\"><link href=\"text/sdraw/01/3dsettings_toolbar.xhp\">Configurações 3D</link></variable>"
+
+#. ZZxLB
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN1056A\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>3D Settings</emph> toolbar controls properties of selected 3D objects.</ahelp>"
+msgstr "<ahelp hid=\".\">As propriedades dos controles da barra de ferramentas <emph>Configurações 3D</emph> dos objetos 3D selecionados.</ahelp>"
+
+#. dmJSB
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10575\n"
+"help.text"
+msgid "Extrusion On/Off"
+msgstr "Ativar / Desativar extrusão"
+
+#. FovPY
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10579\n"
+"help.text"
+msgid "<ahelp hid=\".\">Switches the 3D effects on and off for the selected objects.</ahelp>"
+msgstr "<ahelp hid=\".\">Ativa ou desativa os efeitos 3D dos objetos selecionados.</ahelp>"
+
+#. xLK3k
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id891592603243551\n"
+"help.text"
+msgid "<image src=\"cmd/lc_extrusiontoggle.png\" id=\"img_id681592603243552\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id241592603243553\">Icon Extrusion On/Off</alt></image>"
+msgstr "<image src=\"cmd/lc_extrusiontoggle.png\" id=\"img_id681592603243552\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id241592603243553\">Icon Ativar/desativar Extrusão</alt></image>"
+
+#. D7KNd
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id241592603243554\n"
+"help.text"
+msgid "Extrusion On/Off"
+msgstr "Ativar / Desativar extrusão"
+
+#. DCtCL
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10590\n"
+"help.text"
+msgid "Tilt Down"
+msgstr "Inclinar para baixo"
+
+#. DPBMs
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10594\n"
+"help.text"
+msgid "<ahelp hid=\".\">Tilts the selected object downwards by five degrees.</ahelp>"
+msgstr "<ahelp hid=\".\">Inclina cinco graus para baixo o objeto selecionado.</ahelp>"
+
+#. d4yN5
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id551592603809179\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusiontiltdown.svg\" id=\"img_id671592603809180\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id741592603809181\">Icon Tilt Down</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusiontiltdown.svg\" id=\"img_id671592603809180\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id741592603809181\">Ícone Inclinar para baixo</alt></image>"
+
+#. LkCGC
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id771592603809183\n"
+"help.text"
+msgid "Tilt Down"
+msgstr "Inclinar para baixo"
+
+#. EBVNf
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN105AB\n"
+"help.text"
+msgid "Tilt Up"
+msgstr "Inclinar para cima"
+
+#. 7wLkh
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN105AF\n"
+"help.text"
+msgid "<ahelp hid=\".\">Tilts the selected object upwards by five degrees.</ahelp>"
+msgstr "<ahelp hid=\".\">Inclina cinco graus para cima o objeto selecionado.</ahelp>"
+
+#. Qk9TG
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id481592603969031\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusiontiltup.svg\" id=\"img_id871592603969032\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381592603969033\">Icon Tilt Up</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusiontiltup.svg\" id=\"img_id871592603969032\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381592603969033\">Ícone inclinar para cima</alt></image>"
+
+#. Kb2ce
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id641592603969035\n"
+"help.text"
+msgid "Tilt Up"
+msgstr "Inclinar para cima"
+
+#. eY4A6
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN105C6\n"
+"help.text"
+msgid "Tilt Left"
+msgstr "Inclinar para a esquerda"
+
+#. 7jGNr
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN105CA\n"
+"help.text"
+msgid "<ahelp hid=\".\">Tilts the selected object left by five degrees.</ahelp>"
+msgstr "<ahelp hid=\".\">Inclina cinco graus para a esquerda o objeto selecionado.</ahelp>"
+
+#. 58eJK
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id311592604038423\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusiontiltleft.svg\" id=\"img_id211592604038423\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id231592604038424\">Icon Tilt Left</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusiontiltleft.svg\" id=\"img_id211592604038423\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id231592604038424\">Ícone inclinar para esquerda</alt></image>"
+
+#. 2ArXv
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id301592604038426\n"
+"help.text"
+msgid "Tilt Left"
+msgstr "Inclinar para a esquerda"
+
+#. EWcBG
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN105E1\n"
+"help.text"
+msgid "Tilt Right"
+msgstr "Inclinar para a direita"
+
+#. ZixBw
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN105E5\n"
+"help.text"
+msgid "<ahelp hid=\".\">Tilts the selected object right by five degrees.</ahelp>"
+msgstr "<ahelp hid=\".\">Inclina cinco graus para a direita o objeto selecionado.</ahelp>"
+
+#. CfWCi
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id191592604069769\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusiontiltright.svg\" id=\"img_id791592604069770\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id711592604069771\">Icon Tilt Right</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusiontiltright.svg\" id=\"img_id791592604069770\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id711592604069771\">Ícone inclinar para direita</alt></image>"
+
+#. LSozy
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id601592604069773\n"
+"help.text"
+msgid "Tilt Right"
+msgstr "Inclinar para a direita"
+
+#. DCn4A
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN105FC\n"
+"help.text"
+msgid "Depth"
+msgstr "Profundidade"
+
+#. 5wPta
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10600\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the Extrusion Depth window.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre a janela Profundidade da extrusão.</ahelp>"
+
+#. 5xzg2
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10617\n"
+"help.text"
+msgid "Select an extrusion depth."
+msgstr "Selecione uma profundidade de extrusão."
+
+#. gp4Cq
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id121592604250109\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusiondepthfloater.svg\" id=\"img_id501592604250110\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761592604250111\">Icon Depth</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusiondepthfloater.svg\" id=\"img_id501592604250110\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761592604250111\">Ícone Profundidade</alt></image>"
+
+#. HjyAq
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id181592604250112\n"
+"help.text"
+msgid "Depth"
+msgstr "Profundidade"
+
+#. 76ESK
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10632\n"
+"help.text"
+msgid "<ahelp hid=\".\">Enter an extrusion depth.</ahelp>"
+msgstr "<ahelp hid=\".\">Insira uma profundidade de extrusão.</ahelp>"
+
+#. vUCa4
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN1064C\n"
+"help.text"
+msgid "Direction"
+msgstr "Direção"
+
+#. SBj3W
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10650\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the <emph>Extrusion Direction</emph> window.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre a janela <emph>Direção da extrusão</emph>.</ahelp>"
+
+#. FqYRJ
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id161592604418035\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusiondirectionfloater.svg\" id=\"img_id881592604418036\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821592604418037\">Icon Direction</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusiondirectionfloater.svg\" id=\"img_id881592604418036\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821592604418037\">Ícone Direção</alt></image>"
+
+#. kEkLU
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id731592604418039\n"
+"help.text"
+msgid "Direction"
+msgstr "Direção"
+
+#. tRGKu
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10667\n"
+"help.text"
+msgid "<ahelp hid=\".\">Select a direction.</ahelp>"
+msgstr "<ahelp hid=\".\">Selecione uma direção.</ahelp>"
+
+#. 6Vjig
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10698\n"
+"help.text"
+msgid "Select a perspective or parallel extrusion method."
+msgstr "Selecione um método de extrusão em perspectiva ou em paralelo."
+
+#. nbfX9
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN106B3\n"
+"help.text"
+msgid "Lighting"
+msgstr "Iluminação"
+
+#. i5XyM
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN106B7\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the <emph>Extrusion Lighting</emph> window.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre a janela <emph>Iluminação da extrusão</emph>.</ahelp>"
+
+#. 7dUyo
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id931592604484908\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusionlightingfloater.svg\" id=\"img_id931592604484909\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id791592604484910\">Icon Lighting</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusionlightingfloater.svg\" id=\"img_id931592604484909\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id791592604484910\">Ícone Iluminação</alt></image>"
+
+#. wpUZa
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id941592604484912\n"
+"help.text"
+msgid "Lighting"
+msgstr "Iluminação"
+
+#. WHpbb
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN106C6\n"
+"help.text"
+msgid "Select a lighting direction."
+msgstr "Selecione uma direção de iluminação."
+
+#. Q7KCQ
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN106E1\n"
+"help.text"
+msgid "Select a lighting intensity."
+msgstr "Selecione uma intensidade de iluminação."
+
+#. jfJdG
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN106FC\n"
+"help.text"
+msgid "Surface"
+msgstr "Superfície"
+
+#. nEFL7
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10700\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the <emph>Extrusion Surface</emph> window.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre a janela <emph>Superfície da extrusão</emph>.</ahelp>"
+
+#. aCv4d
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id471592604538812\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusionsurfacefloater.svg\" id=\"img_id531592604538813\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id301592604538814\">Icon Surface</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusionsurfacefloater.svg\" id=\"img_id531592604538813\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id301592604538814\">Ícone Superfície</alt></image>"
+
+#. LnAxS
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id611592604538816\n"
+"help.text"
+msgid "Surface"
+msgstr "Superfície"
+
+#. ASvxW
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10717\n"
+"help.text"
+msgid "Select a surface material or a wireframe display."
+msgstr "Selecione um material de superfície ou exibição em aramado."
+
+#. EACGj
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10732\n"
+"help.text"
+msgid "3D Color"
+msgstr "Cor 3D"
+
+#. TLZ97
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_idN10736\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the <emph>Extrusion Color</emph> toolbar.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre a barra de ferramentas <emph>Cor da extrusão</emph>.</ahelp>"
+
+#. XRrSC
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id311592604646572\n"
+"help.text"
+msgid "<image src=\"cmd/sc_extrusion3dcolor.svg\" id=\"img_id321592604646573\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id691592604646574\">Icon Color</alt></image>"
+msgstr "<image src=\"cmd/sc_extrusion3dcolor.svg\" id=\"img_id321592604646573\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id691592604646574\">Ícone Cor</alt></image>"
+
+#. 9rzGT
+#: 3dsettings_toolbar.xhp
+msgctxt ""
+"3dsettings_toolbar.xhp\n"
+"par_id921592604646576\n"
+"help.text"
+msgid "Color"
+msgstr "Cor"
+
+#. eGs9G
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"tit\n"
+"help.text"
+msgid "Consolidate Text Boxes"
+msgstr "Consolidar caixas de texto"
+
+#. e3z7C
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"bm_id371623524099696\n"
+"help.text"
+msgid "<bookmark_value>text box consolidation</bookmark_value><bookmark_value>join PDF lines;text box consolidation</bookmark_value><bookmark_value>combine text box;text box consolidation</bookmark_value><bookmark_value>combine text frames;text box consolidation</bookmark_value>"
+msgstr "<bookmark_value>consolidar caixas de texto</bookmark_value><bookmark_value>juntar linhas PDF;consolidar caixas de texto</bookmark_value><bookmark_value>combinar caixas de texto;consolidar caixas de texto</bookmark_value><bookmark_value>combinar quadros de texto;consolidar caixas de texto</bookmark_value>"
+
+#. naVUY
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"hd_id861623510996086\n"
+"help.text"
+msgid "<link href=\"text/sdraw/01/consolidatetext.xhp\">Text Box Consolidation</link>"
+msgstr "<link href=\"text/sdraw/01/consolidatetext.xhp\">Consolidar caixas de texto</link>"
+
+#. zsb7F
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id441623510996088\n"
+"help.text"
+msgid "<variable id=\"textboxconsolidationv1\"><ahelp hid=\".\">Combine two or more selected text boxes into one.</ahelp></variable>"
+msgstr "<variable id=\"textboxconsolidationv1\"><ahelp hid=\".\">Combina duas ou mais caixas de texto selecionadas em uma só.</ahelp></variable>"
+
+#. uDEkt
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id111623511334889\n"
+"help.text"
+msgid "Select two or more text boxes and either"
+msgstr "Selecione duas ou mais caixas de texto e siga um dos procedimentos abaixo:"
+
+#. eopFe
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id711623512060597\n"
+"help.text"
+msgid "Choose menu <menuitem>Shape - Consolidate Text</menuitem>."
+msgstr "Escolha o menu <menuitem>Forma - Consolidar texto</menuitem>."
+
+#. m5F3B
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id501623512080240\n"
+"help.text"
+msgid "Open context menu and choose <menuitem>Consolidate Text</menuitem>."
+msgstr "Abra o menu de contexto e selecione <menuitem>Consolidar texto</menuitem>."
+
+#. rWDAq
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id61623512950690\n"
+"help.text"
+msgid "Text box consolidation joins several text boxes into a bigger text box, enabling text reflow inside the resulting box."
+msgstr "A consolidação de caixas de texto agrupa várias caixas de texto numa caixa maior, permitindo refluir o texto dentro da caixa resultante."
+
+#. pnfVs
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id141623511540551\n"
+"help.text"
+msgid "<emph>Consolidate text</emph> command is specially useful for editing PDF documents with %PRODUCTNAME Draw."
+msgstr "O comando <emph>Consolidar texto</emph> é muito útil para editar documentos PDF com o %PRODUCTNAME Draw."
+
+#. UBCV5
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id471623513979583\n"
+"help.text"
+msgid "The function inspects the text fragments to see if they end in sentence-ending punctuation. If not, then the next text box's content is appended to it instead of starting a new paragraph. You must afterwards fix up paragraphing, and set paragraph properties."
+msgstr "A função inspeciona os fragmentos de texto para verificar se terminam com a pontuação de fim de oração. Senão, então o conteúdo da próxima caixa de texto é adicionado em vez de começar um novo parágrafo. Deve-se em seguida corrigir o parágrafo e definir suas propriedades."
+
+#. vdwPx
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"hd_id381623516529280\n"
+"help.text"
+msgid "Remarks"
+msgstr "Observações"
+
+#. 5rXDq
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id211623513189855\n"
+"help.text"
+msgid "The resulting text box is inserted into the current layer."
+msgstr "A caixa de texto resultante é inserida na camada ativa."
+
+#. xPr6s
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id61623516556624\n"
+"help.text"
+msgid "If the single text box objects are named, the resulting text box is unnamed."
+msgstr "Se as caixas de texto individuais tiverem nomes, a caixa resultante não terá."
+
+#. WddHJ
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id611623516624688\n"
+"help.text"
+msgid "Title and description of the single text boxes are lost."
+msgstr "O título e descrição das caixas de texto individuais serão perdidos."
+
+#. TKkEa
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id281623513291901\n"
+"help.text"
+msgid "The previous text box objects are deleted after consolidation."
+msgstr "As caixas de texto anteriores à consolidação serão excluídas depois de consolidadas."
+
+#. bGEES
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id531623515498932\n"
+"help.text"
+msgid "Consolidation of lists requires attention to restore the list layout that has been affected by the position of the punctuation. This includes the case of numbering of style \"1.\", where the resulting list items are split after the dot."
+msgstr "A consolidação de listas requer atenção para restabelecer o leiaute de lista que foi afetado pela posição da pontuação. Isto inclui o caso da numeração do estilo \"1.\", onde os itens da lista resultante são divididos depois do ponto."
+
+#. VwP6B
+#: consolidatetext.xhp
+msgctxt ""
+"consolidatetext.xhp\n"
+"par_id931623525360411\n"
+"help.text"
+msgid "For better results, combine adjacent text boxes with similar paragraph formatting. Character formatting inside the text boxes is preserved. Combining text boxes with different paragraph styles (headings, list and more) will require manual intervention to restore the original text layout."
+msgstr "Para melhores resultados, combine textos adjacentes com formatação de parágrafo similares. A formatação de caracteres dentro das caixas de texto é preservada. Combinar caixas de texto com estilos de parágrafo diferentes (títulos, listas e outros) demanda intervenção manual para restabelecer o leiaute original do texto."
+
+#. 4JVcT
+#: delete_page.xhp
+msgctxt ""
+"delete_page.xhp\n"
+"tit\n"
+"help.text"
+msgid "Delete Page"
+msgstr "Excluir página"
+
+#. E6HqB
+#: delete_page.xhp
+msgctxt ""
+"delete_page.xhp\n"
+"hd_id3150202\n"
+"help.text"
+msgid "<link href=\"text/sdraw/01/delete_page.xhp\">Delete Page</link>"
+msgstr "<link href=\"text/sdraw/01/delete_page.xhp\">Excluir página</link>"
+
+#. bZsV9
+#: delete_page.xhp
+msgctxt ""
+"delete_page.xhp\n"
+"par_id3152988\n"
+"help.text"
+msgid "Delete the current page."
+msgstr "Exclui a página atual."
+
+#. G6pqH
+#: duplicate_page.xhp
+msgctxt ""
+"duplicate_page.xhp\n"
+"tit\n"
+"help.text"
+msgid "Duplicate Page"
+msgstr "Duplicar página"
+
+#. epDEA
+#: duplicate_page.xhp
+msgctxt ""
+"duplicate_page.xhp\n"
+"hd_id3148576\n"
+"help.text"
+msgid "<link href=\"text/sdraw/01/duplicate_page.xhp\">Duplicate Page</link>"
+msgstr "<link href=\"text/sdraw/01/duplicate_page.xhp\">Duplicar página</link>"
+
+#. iyueQ
+#: duplicate_page.xhp
+msgctxt ""
+"duplicate_page.xhp\n"
+"par_id3153190\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DuplicatePage\" visibility=\"visible\">Inserts a copy of the current page after the current page.</ahelp>"
+msgstr "<ahelp hid=\".uno:DuplicatePage\" visibility=\"visible\">Insere uma cópia da página atual.</ahelp>"
+
+#. 2LJK2
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Layer"
+msgstr "Inserir camada"
+
+#. xqDxE
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"bm_id3156329\n"
+"help.text"
+msgid "<bookmark_value>renaming layers</bookmark_value><bookmark_value>layers; renaming</bookmark_value><bookmark_value>layers; insert</bookmark_value><bookmark_value>layers; modify</bookmark_value><bookmark_value>modify layer</bookmark_value><bookmark_value>insert layer</bookmark_value>"
+msgstr "<bookmark_value>renomear camadas</bookmark_value><bookmark_value>camadas; renomear</bookmark_value><bookmark_value>camadas; inserir</bookmark_value><bookmark_value>camadas; modificar</bookmark_value><bookmark_value>modificar camada</bookmark_value><bookmark_value>inserir camada</bookmark_value>"
+
+#. Vig6p
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id3151074\n"
+"help.text"
+msgid "Insert or Modify Layer"
+msgstr "Inserir ou Modificar camada"
+
+#. eTGPC
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id3153415\n"
+"help.text"
+msgid "<variable id=\"ebenetext\"><ahelp hid=\".uno:InsertLayer\">Inserts a new layer or modify a layer in the document. Layers are only available in Draw, not in Impress. </ahelp></variable>"
+msgstr "<variable id=\"ebenetext\"><ahelp hid=\".uno:InsertLayer\">Insere ou modifica nova camada no documento. Camadas estão disponíveis apenas no Draw, não no Impress.</ahelp></variable>"
+
+#. 5FLFs
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id3150205\n"
+"help.text"
+msgid "To select a layer, click the corresponding tab at the bottom of the workspace."
+msgstr "Para selecionar uma camada, clique na aba correspondente embaixo da área do documento."
+
+#. G6GnT
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id3145588\n"
+"help.text"
+msgid "Name"
+msgstr "Nome"
+
+#. Xba5E
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id3149404\n"
+"help.text"
+msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/name\">Enter a name for the new layer. To rename the layer, enter the new name.</ahelp>"
+msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/name\">Digite um nome para a nova camada. Para renomear a camada, digite o novo nome.</ahelp>"
+
+#. HkHgM
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id761667238910931\n"
+"help.text"
+msgid "To rename the layer directly, right-click the layer tab at the bottom, select <menuitem>Rename Layer</menuitem> in the context menu and enter the new name in the tab."
+msgstr "Para renomear a camada diretamente, com o botão direito clique na aba abaixo, selecione <menuitem>Renomear camada</menuitem> no menu de contexto e digite o novo nome na aba."
+
+#. ADN49
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id641596204028276\n"
+"help.text"
+msgid "Title"
+msgstr "Título"
+
+#. waSME
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id271596204273624\n"
+"help.text"
+msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/title\">Enter the title of the layer.</ahelp>"
+msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/title\">Insira um título para a camada.</ahelp>"
+
+#. GGy5s
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id791596204033460\n"
+"help.text"
+msgid "Description"
+msgstr "Descrição"
+
+#. q5F9X
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id471596204283656\n"
+"help.text"
+msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/textview\">Enter a description of the layer.</ahelp>"
+msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/textview\">Insira uma descrição da camada.</ahelp>"
+
+#. WHLCC
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id3153820\n"
+"help.text"
+msgid "Layer Properties"
+msgstr "Propriedades da camada"
+
+#. Fn6ms
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id3151240\n"
+"help.text"
+msgid "Set the properties for the layer."
+msgstr "Define as propriedades para a camada."
+
+#. xaExU
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id3149945\n"
+"help.text"
+msgid "Visible"
+msgstr "Visível"
+
+#. BUVvY
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id3157980\n"
+"help.text"
+msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/visible\">Show or hide the layer.</ahelp>"
+msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/visible\">Mostra ou oculta a camada.</ahelp>"
+
+#. bDH5Q
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id3153246\n"
+"help.text"
+msgid "Printable"
+msgstr "Imprimível"
+
+#. PCYTg
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id3154762\n"
+"help.text"
+msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/printable\">When printing, print or ignore this particular layer.</ahelp>"
+msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/printable\">Ao imprimir, ignore ou imprime a camada.</ahelp>"
+
+#. Ayzcc
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"hd_id3146965\n"
+"help.text"
+msgid "Locked"
+msgstr "Trancado"
+
+#. PAuXA
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id3149876\n"
+"help.text"
+msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/locked\">Prevent elements on the layer from being edited.</ahelp>"
+msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/locked\">Impede que os elementos da camada sejam editados.</ahelp>"
+
+#. rHpaX
+#: navigate_page.xhp
+msgctxt ""
+"navigate_page.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Navigation"
+msgstr "Navegação entre páginas"
+
+#. 5My2A
+#: navigate_page.xhp
+msgctxt ""
+"navigate_page.xhp\n"
+"hd_id341566156032976\n"
+"help.text"
+msgid "<link href=\"text/sdraw/01/navigate_page.xhp\">Page Navigation</link>"
+msgstr "<link href=\"text/sdraw/01/navigate_page.xhp\">Navegação entre páginas</link>"
+
+#. eMTew
+#: navigate_page.xhp
+msgctxt ""
+"navigate_page.xhp\n"
+"par_id581566156032977\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a sub-menu for page navigation.</ahelp>"
+msgstr "<ahelp hid=\".\">Abre um submenu para navegar entre páginas.</ahelp>"
+
+#. XRJhq
+#: new_page.xhp
+msgctxt ""
+"new_page.xhp\n"
+"tit\n"
+"help.text"
+msgid "New Page"
+msgstr "Nova página"
+
+#. XnEYp
+#: new_page.xhp
+msgctxt ""
+"new_page.xhp\n"
+"hd_id3150202\n"
+"help.text"
+msgid "<link href=\"text/sdraw/01/new_page.xhp\">New Page</link>"
+msgstr "<link href=\"text/sdraw/01/new_page.xhp\">Nova página</link>"
+
+#. DfCDK
+#: new_page.xhp
+msgctxt ""
+"new_page.xhp\n"
+"par_id3152988\n"
+"help.text"
+msgid "Inserts a blank page after the selected page."
+msgstr "Insere uma página em branco depois da página selecionada."
+
+#. PvXKR
+#: page_properties.xhp
+msgctxt ""
+"page_properties.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page"
+msgstr "Página"
+
+#. tCfzk
+#: page_properties.xhp
+msgctxt ""
+"page_properties.xhp\n"
+"hd_id231556821873595\n"
+"help.text"
+msgid "Page"
+msgstr "Página"
+
+#. NggBy
+#: page_properties.xhp
+msgctxt ""
+"page_properties.xhp\n"
+"par_id571556821811542\n"
+"help.text"
+msgid "<variable id=\"seiteeintext\"><ahelp hid=\".uno:PageSetup\" visibility=\"visible\">Sets page orientation, page margins, background and other layout options.</ahelp></variable>"
+msgstr "<variable id=\"seiteeintext\"><ahelp hid=\".uno:PageSetup\" visibility=\"visible\">Define a orientação da página, as margens da página, o plano de fundo e outras opções de leiaute.</ahelp></variable>"
+
+#. QdVmE
+#: page_properties.xhp
+msgctxt ""
+"page_properties.xhp\n"
+"par_id691556822054550\n"
+"help.text"
+msgid "To change the background of all of the pages in the active file, select a background, click <emph>OK</emph> and click <emph>Yes</emph> in the <emph>Page Properties</emph> dialog."
+msgstr "Para alterar o plano de fundo de todas as páginas no arquivo ativo, selecione um plano de fundo, clique em <emph>OK</emph> e, em seguida, clique em <emph>Sim</emph> na caixa de diálogo <emph>Propriedades da página</emph>."
+
+#. DA7cH
+#: rename_page.xhp
+msgctxt ""
+"rename_page.xhp\n"
+"tit\n"
+"help.text"
+msgid "Rename Page"
+msgstr "Renomear página"
+
+#. SmjbJ
+#: rename_page.xhp
+msgctxt ""
+"rename_page.xhp\n"
+"hd_id301566092814709\n"
+"help.text"
+msgid "<link href=\"text/sdraw/01/rename_page.xhp\">Rename Page</link>"
+msgstr "<link href=\"text/sdraw/01/rename_page.xhp\">Renomear página</link>"
+
+#. FHcgw
+#: rename_page.xhp
+msgctxt ""
+"rename_page.xhp\n"
+"par_id511566092814710\n"
+"help.text"
+msgid "<variable id=\"rename_page\"><ahelp hid=\".\">Set a new name for the page.</ahelp></variable>"
+msgstr "<variable id=\"rename_page\"><ahelp hid=\".\">Define um novo nome para a página.</ahelp></variable>"
+
+#. GDjU6
+#: rename_page.xhp
+msgctxt ""
+"rename_page.xhp\n"
+"hd_id901566134453327\n"
+"help.text"
+msgid "Name"
+msgstr "Nome"
+
+#. vJ65G
+#: rename_page.xhp
+msgctxt ""
+"rename_page.xhp\n"
+"par_id371566134462398\n"
+"help.text"
+msgid "Enter the new name of the page."
+msgstr "Insira o novo nome da página."

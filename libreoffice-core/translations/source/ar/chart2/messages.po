@@ -1,0 +1,5632 @@
+#. extracted from chart2/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-11-22 14:43+0100\n"
+"PO-Revision-Date: 2022-07-04 16:16+0000\n"
+"Last-Translator: Riyadh Talal <riyadhtalal@gmail.com>\n"
+"Language-Team: Arabic <https://translations.documentfoundation.org/projects/libo_ui-master/chart2messages/ar/>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1540149325.000000\n"
+
+#. NCRDD
+#: chart2/inc/chart.hrc:18
+msgctxt "tp_ChartType|liststore1"
+msgid "Bar"
+msgstr "شريط"
+
+#. YpLZF
+#: chart2/inc/chart.hrc:19
+msgctxt "tp_ChartType|liststore1"
+msgid "Cylinder"
+msgstr "أسطوانة"
+
+#. VLXhh
+#: chart2/inc/chart.hrc:20
+msgctxt "tp_ChartType|liststore1"
+msgid "Cone"
+msgstr "مخروط"
+
+#. xsWC2
+#: chart2/inc/chart.hrc:21
+msgctxt "tp_ChartType|liststore1"
+msgid "Pyramid"
+msgstr "هرم"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "أ_ضف"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "ط_بّق"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "أل‍_‍غ"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "أغل_ق"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "اح_ذف"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "ح_رّر"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "م_ساعدة"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_جديد"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_كلا"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_حسنا"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "أ_زِل"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "ت_صفير"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_نعم"
+
+#. v9sqX
+#: chart2/inc/strings.hrc:24
+msgctxt "STR_DLG_CHART_WIZARD"
+msgid "Chart Wizard"
+msgstr "مرشد المخطط البياني"
+
+#. HCEG9
+#: chart2/inc/strings.hrc:25
+msgctxt "STR_DLG_SMOOTH_LINE_PROPERTIES"
+msgid "Smooth Lines"
+msgstr "خطوط متجانسة"
+
+#. qxGHJ
+#: chart2/inc/strings.hrc:26
+msgctxt "STR_DLG_STEPPED_LINE_PROPERTIES"
+msgid "Stepped Lines"
+msgstr "خطوط درجيّة"
+
+#. LcVWV
+#: chart2/inc/strings.hrc:27
+msgctxt "STR_DLG_REMOVE_DATA_TABLE"
+msgid "This chart currently contains an internal data table. Do you want to proceed, deleting the internal data table, and set a new data range?"
+msgstr "يحتوي هذا الرسم البياني على جدول بيانات داخلي حاليا. أتريد المتابعة وحذف جدول البيانات الداخلي، وثم ضبط مجال بيانات جديد؟"
+
+#. E2JCT
+#: chart2/inc/strings.hrc:28
+msgctxt "STR_PAGE_CHARTTYPE"
+msgid "Chart Type"
+msgstr "نوع الرّسم البيانيّ"
+
+#. GFDEv
+#: chart2/inc/strings.hrc:29
+msgctxt "STR_PAGE_DATA_RANGE"
+msgid "Data Range"
+msgstr "مجال البيانات"
+
+#. uxZuD
+#: chart2/inc/strings.hrc:30
+msgctxt "STR_PAGE_CHART_ELEMENTS"
+msgid "Chart Elements"
+msgstr "عناصر الرّسم البيانيّ"
+
+#. sDxQz
+#: chart2/inc/strings.hrc:31
+msgctxt "STR_PAGE_LINE"
+msgid "Line"
+msgstr "الخط"
+
+#. EoKxj
+#: chart2/inc/strings.hrc:32
+msgctxt "STR_PAGE_BORDER"
+msgid "Borders"
+msgstr "الحدود"
+
+#. 2suvG
+#: chart2/inc/strings.hrc:33
+msgctxt "STR_PAGE_AREA"
+msgid "Area"
+msgstr "منطقة"
+
+#. 3sDYn
+#: chart2/inc/strings.hrc:34
+msgctxt "STR_PAGE_TRANSPARENCY"
+msgid "Transparency"
+msgstr "الشفافية"
+
+#. tESet
+#: chart2/inc/strings.hrc:35
+msgctxt "STR_PAGE_FONT"
+msgid "Font"
+msgstr "الخط"
+
+#. ByYYG
+#: chart2/inc/strings.hrc:36
+msgctxt "STR_PAGE_FONT_EFFECTS"
+msgid "Font Effects"
+msgstr "تأثيرات الخطّ"
+
+#. YydEQ
+#: chart2/inc/strings.hrc:37
+msgctxt "STR_PAGE_NUMBERS"
+msgid "Numbers"
+msgstr "الأرقام"
+
+#. nTFNm
+#: chart2/inc/strings.hrc:38
+msgctxt "STR_PAGE_POSITION"
+msgid "Position"
+msgstr "الموضع"
+
+#. iTeHp
+#: chart2/inc/strings.hrc:39
+msgctxt "STR_PAGE_LAYOUT"
+msgid "Layout"
+msgstr "مخطط"
+
+#. 4Gz8K
+#: chart2/inc/strings.hrc:40
+msgctxt "STR_PAGE_OPTIONS"
+msgid "Options"
+msgstr "خيارات"
+
+#. RCGEN
+#: chart2/inc/strings.hrc:41
+msgctxt "STR_PAGE_SCALE"
+msgid "Scale"
+msgstr "حجّم"
+
+#. QR25P
+#: chart2/inc/strings.hrc:42
+msgctxt "STR_PAGE_POSITIONING"
+msgid "Positioning"
+msgstr "التموضُع"
+
+#. omcEo
+#: chart2/inc/strings.hrc:43
+msgctxt "STR_PAGE_TRENDLINE_TYPE"
+msgid "Type"
+msgstr "النّوع"
+
+#. EvFoA
+#: chart2/inc/strings.hrc:44
+msgctxt "STR_PAGE_XERROR_BARS"
+msgid "X Error Bars"
+msgstr "أشرطة خطأ س"
+
+#. NKDFm
+#: chart2/inc/strings.hrc:45
+msgctxt "STR_PAGE_YERROR_BARS"
+msgid "Y Error Bars"
+msgstr "أشرطة خطأ ص"
+
+#. mjAwD
+#: chart2/inc/strings.hrc:46
+msgctxt "STR_PAGE_ALIGNMENT"
+msgid "Alignment"
+msgstr "المحاذاة"
+
+#. hXbmP
+#: chart2/inc/strings.hrc:47
+msgctxt "STR_PAGE_PERSPECTIVE"
+msgid "Perspective"
+msgstr "المنظور"
+
+#. 7RHre
+#: chart2/inc/strings.hrc:48
+msgctxt "STR_PAGE_APPEARANCE"
+msgid "Appearance"
+msgstr "المظهر"
+
+#. mvWu8
+#: chart2/inc/strings.hrc:49
+msgctxt "STR_PAGE_ILLUMINATION"
+msgid "Illumination"
+msgstr "الإضاءة"
+
+#. YBnCa
+#: chart2/inc/strings.hrc:50
+msgctxt "STR_PAGE_ASIAN"
+msgid "Asian Typography"
+msgstr "طباعة آسيوية"
+
+#. 6xo4a
+#: chart2/inc/strings.hrc:51
+msgctxt "STR_OBJECT_AVERAGE_LINE_WITH_PARAMETERS"
+msgid "Mean value line with value %AVERAGE_VALUE and standard deviation %STD_DEVIATION"
+msgstr "سطر القيمة المتوسّطة بالقيمة %AVERAGE_VALUE والانحراف المعياريّ %STD_DEVIATION"
+
+#. eP9wF
+#: chart2/inc/strings.hrc:52
+msgctxt "STR_OBJECT_AXIS"
+msgid "Axis"
+msgstr "محور"
+
+#. jNgVd
+#: chart2/inc/strings.hrc:53
+msgctxt "STR_OBJECT_AXIS_X"
+msgid "X Axis"
+msgstr "المحور س"
+
+#. cA4xe
+#: chart2/inc/strings.hrc:54
+msgctxt "STR_OBJECT_AXIS_Y"
+msgid "Y Axis"
+msgstr "المحور ص"
+
+#. ZXErW
+#: chart2/inc/strings.hrc:55
+msgctxt "STR_OBJECT_AXIS_Z"
+msgid "Z Axis"
+msgstr "المحور ع"
+
+#. qkJUd
+#: chart2/inc/strings.hrc:56
+msgctxt "STR_OBJECT_SECONDARY_X_AXIS"
+msgid "Secondary X Axis"
+msgstr "المحور س الثّانويّ"
+
+#. YHCbM
+#: chart2/inc/strings.hrc:57
+msgctxt "STR_OBJECT_SECONDARY_Y_AXIS"
+msgid "Secondary Y Axis"
+msgstr "المحور ص الثّانويّ"
+
+#. natrx
+#: chart2/inc/strings.hrc:58
+msgctxt "STR_OBJECT_AXES"
+msgid "Axes"
+msgstr "المحاور"
+
+#. FE87Y
+#: chart2/inc/strings.hrc:59
+msgctxt "STR_OBJECT_GRIDS"
+msgid "Grids"
+msgstr "الشبكات"
+
+#. zyanU
+#: chart2/inc/strings.hrc:60
+msgctxt "STR_OBJECT_GRID"
+msgid "Grid"
+msgstr "الشبكة"
+
+#. pEwe5
+#: chart2/inc/strings.hrc:61
+msgctxt "STR_OBJECT_GRID_MAJOR_X"
+msgid "X Axis Major Grid"
+msgstr "شبكة المحور س الرئيسية"
+
+#. ETsPn
+#: chart2/inc/strings.hrc:62
+msgctxt "STR_OBJECT_GRID_MAJOR_Y"
+msgid "Y Axis Major Grid"
+msgstr "شبكة المحور ص الرئيسية"
+
+#. SonFW
+#: chart2/inc/strings.hrc:63
+msgctxt "STR_OBJECT_GRID_MAJOR_Z"
+msgid "Z Axis Major Grid"
+msgstr "شبكة المحور ع الرئيسية"
+
+#. sBgvb
+#: chart2/inc/strings.hrc:64
+msgctxt "STR_OBJECT_GRID_MINOR_X"
+msgid "X Axis Minor Grid"
+msgstr "شبكة المحور س الثانوية"
+
+#. 3YcEK
+#: chart2/inc/strings.hrc:65
+msgctxt "STR_OBJECT_GRID_MINOR_Y"
+msgid "Y Axis Minor Grid"
+msgstr "شبكة المحور ص الثانوية"
+
+#. hkZQA
+#: chart2/inc/strings.hrc:66
+msgctxt "STR_OBJECT_GRID_MINOR_Z"
+msgid "Z Axis Minor Grid"
+msgstr "شبكة المحور ع الثانوية"
+
+#. HRr84
+#: chart2/inc/strings.hrc:67
+msgctxt "STR_OBJECT_LEGEND"
+msgid "Legend"
+msgstr "مفتاح الرسم"
+
+#. BKrVD
+#: chart2/inc/strings.hrc:68
+msgctxt "STR_OBJECT_TITLE"
+msgid "Title"
+msgstr "عنوان"
+
+#. daY6i
+#: chart2/inc/strings.hrc:69
+msgctxt "STR_OBJECT_TITLES"
+msgid "Titles"
+msgstr "العناوين"
+
+#. HPrwf
+#: chart2/inc/strings.hrc:70
+msgctxt "STR_OBJECT_TITLE_MAIN"
+msgid "Main Title"
+msgstr "العنوان الرّئيسيّ"
+
+#. 3HPz3
+#: chart2/inc/strings.hrc:71
+msgctxt "STR_OBJECT_TITLE_SUB"
+msgid "Subtitle"
+msgstr "العنوان الفرعيّ"
+
+#. eZE2v
+#: chart2/inc/strings.hrc:72
+msgctxt "STR_OBJECT_TITLE_X_AXIS"
+msgid "X Axis Title"
+msgstr "عنوان المحور س"
+
+#. uqBii
+#: chart2/inc/strings.hrc:73
+msgctxt "STR_OBJECT_TITLE_Y_AXIS"
+msgid "Y Axis Title"
+msgstr "عنوان المحور ص"
+
+#. 37EU5
+#: chart2/inc/strings.hrc:74
+msgctxt "STR_OBJECT_TITLE_Z_AXIS"
+msgid "Z Axis Title"
+msgstr "عنوان المحور ع"
+
+#. QmoDH
+#: chart2/inc/strings.hrc:75
+msgctxt "STR_OBJECT_TITLE_SECONDARY_X_AXIS"
+msgid "Secondary X Axis Title"
+msgstr "عنوان المحور س الثّانويّ"
+
+#. F7NWG
+#: chart2/inc/strings.hrc:76
+msgctxt "STR_OBJECT_TITLE_SECONDARY_Y_AXIS"
+msgid "Secondary Y Axis Title"
+msgstr "عنوان المحور ص الثّانويّ"
+
+#. AtLNM
+#: chart2/inc/strings.hrc:77
+msgctxt "STR_OBJECT_LABEL"
+msgid "Label"
+msgstr "لصيقة"
+
+#. ag7pg
+#: chart2/inc/strings.hrc:78
+msgctxt "STR_OBJECT_DATALABELS"
+msgid "Data Labels"
+msgstr "لصائق البيانات"
+
+#. ts3Cj
+#: chart2/inc/strings.hrc:79
+msgctxt "STR_OBJECT_DATAPOINT"
+msgid "Data Point"
+msgstr "نقطة بيانات"
+
+#. EnsUx
+#: chart2/inc/strings.hrc:80
+msgctxt "STR_OBJECT_DATAPOINTS"
+msgid "Data Points"
+msgstr "نقاط بيانات"
+
+#. CqWnU
+#: chart2/inc/strings.hrc:81
+msgctxt "STR_OBJECT_LEGEND_SYMBOL"
+msgid "Legend Key"
+msgstr "مفتاح الرسم"
+
+#. jNwC8
+#: chart2/inc/strings.hrc:82
+msgctxt "STR_OBJECT_DATASERIES"
+msgid "Data Series"
+msgstr "سلسلة بيانات"
+
+#. Zf7DA
+#: chart2/inc/strings.hrc:83
+msgctxt "STR_OBJECT_DATASERIES_PLURAL"
+msgid "Data Series"
+msgstr "سلسلة بيانات"
+
+#. 3G9WG
+#: chart2/inc/strings.hrc:84
+msgctxt "STR_OBJECT_CURVE"
+msgid "Trend Line"
+msgstr "خطّ اتّجاه"
+
+#. 8miGx
+#: chart2/inc/strings.hrc:85
+msgctxt "STR_OBJECT_CURVES"
+msgid "Trend Lines"
+msgstr "خطوط اتّجاه"
+
+#. ESVL6
+#: chart2/inc/strings.hrc:86
+msgctxt "STR_OBJECT_CURVE_WITH_PARAMETERS"
+msgid "Trend line %FORMULA with accuracy R² = %RSQUARED"
+msgstr "خط التوجّه %FORMULA بالدّقّة R² = %RSQUARED"
+
+#. DrVz3
+#: chart2/inc/strings.hrc:87
+msgctxt "STR_OBJECT_MOVING_AVERAGE_WITH_PARAMETERS"
+msgid "Moving average trend line with period = %PERIOD"
+msgstr "خطّ اتّجاه متوسّط متنقّل بالفترة = %PERIOD"
+
+#. mcMQC
+#: chart2/inc/strings.hrc:88
+msgctxt "STR_OBJECT_AVERAGE_LINE"
+msgid "Mean Value Line"
+msgstr "سطر القيمة المتوسطة"
+
+#. RLMNC
+#: chart2/inc/strings.hrc:89
+msgctxt "STR_OBJECT_CURVE_EQUATION"
+msgid "Equation"
+msgstr "معادلة"
+
+#. apx4j
+#: chart2/inc/strings.hrc:90
+msgctxt "STR_OBJECT_ERROR_BARS_X"
+msgid "X Error Bars"
+msgstr "أشرطة خطأ س"
+
+#. BUEbq
+#: chart2/inc/strings.hrc:91
+msgctxt "STR_OBJECT_ERROR_BARS_Y"
+msgid "Y Error Bars"
+msgstr "أشرطة خطأ ص"
+
+#. tQCpv
+#: chart2/inc/strings.hrc:92
+msgctxt "STR_OBJECT_ERROR_BARS_Z"
+msgid "Z Error Bars"
+msgstr "أشرطة خطأ ع"
+
+#. bz4Dw
+#: chart2/inc/strings.hrc:93
+msgctxt "STR_OBJECT_STOCK_LOSS"
+msgid "Stock Loss"
+msgstr "خسارة الأسهم"
+
+#. AFE2t
+#: chart2/inc/strings.hrc:94
+msgctxt "STR_OBJECT_STOCK_GAIN"
+msgid "Stock Gain"
+msgstr "ربحيّة الأسهم"
+
+#. Y5Qif
+#: chart2/inc/strings.hrc:95
+msgctxt "STR_OBJECT_PAGE"
+msgid "Chart Area"
+msgstr "منطقة الرسم البياني"
+
+#. J9m2k
+#: chart2/inc/strings.hrc:96
+msgctxt "STR_OBJECT_DIAGRAM"
+msgid "Chart"
+msgstr "الرّسم البيانيّ"
+
+#. oRCev
+#: chart2/inc/strings.hrc:97
+msgctxt "STR_OBJECT_DIAGRAM_WALL"
+msgid "Chart Wall"
+msgstr "جدار الرّسم البيانيّ"
+
+#. meV4E
+#: chart2/inc/strings.hrc:98
+msgctxt "STR_OBJECT_DIAGRAM_FLOOR"
+msgid "Chart Floor"
+msgstr "أرضيّة الرّسم البيانيّ"
+
+#. AHV4D
+#: chart2/inc/strings.hrc:99
+msgctxt "STR_OBJECT_SHAPE"
+msgid "Drawing Object"
+msgstr "كائن رسم"
+
+#. dNCXG
+#: chart2/inc/strings.hrc:100
+msgctxt "STR_TIP_DATASERIES"
+msgid "Data Series '%SERIESNAME'"
+msgstr "سلسلة البيانات '%SERIESNAME'"
+
+#. LDsiQ
+#: chart2/inc/strings.hrc:101
+msgctxt "STR_TIP_DATAPOINT_INDEX"
+msgid "Data Point %POINTNUMBER"
+msgstr "مؤشّر البيانات %POINTNUMBER"
+
+#. 6C6HT
+#: chart2/inc/strings.hrc:102
+msgctxt "STR_TIP_DATAPOINT_VALUES"
+msgid "Values: %POINTVALUES"
+msgstr "القيم: %POINTVALUES"
+
+#. rCVeF
+#: chart2/inc/strings.hrc:103
+msgctxt "STR_TIP_DATAPOINT"
+msgid "Data Point %POINTNUMBER, data series %SERIESNUMBER, values: %POINTVALUES"
+msgstr "مؤشّر البيانات %POINTNUMBER، سلسلة البيانات %SERIESNUMBER، القيم: %POINTVALUES"
+
+#. eKDAq
+#: chart2/inc/strings.hrc:104
+msgctxt "STR_STATUS_DATAPOINT_MARKED"
+msgid "Data point %POINTNUMBER in data series %SERIESNUMBER selected, values: %POINTVALUES"
+msgstr "مؤشّر البيانات %POINTNUMBER في سلسلة البيانات %SERIESNUMBER المحددة، القيم: %POINTVALUES"
+
+#. iKkhv
+#: chart2/inc/strings.hrc:105
+msgctxt "STR_STATUS_OBJECT_MARKED"
+msgid "%OBJECTNAME selected"
+msgstr "%OBJECTNAME محدّد/محدّدة"
+
+#. vyJED
+#: chart2/inc/strings.hrc:106
+msgctxt "STR_STATUS_PIE_SEGMENT_EXPLODED"
+msgid "Pie exploded by %PERCENTVALUE percent"
+msgstr "شطيرة منفجرة بالنّسبة %PERCENTVALUE"
+
+#. FbGFr
+#: chart2/inc/strings.hrc:107
+msgctxt "STR_OBJECT_FOR_SERIES"
+msgid "%OBJECTNAME for Data Series '%SERIESNAME'"
+msgstr "%OBJECTNAME لسلسلة البيانات '%SERIESNAME'"
+
+#. VVB54
+#: chart2/inc/strings.hrc:108
+msgctxt "STR_OBJECT_FOR_ALL_SERIES"
+msgid "%OBJECTNAME for all Data Series"
+msgstr "%OBJECTNAME لكلّ سلاسل البيانات"
+
+#. Ahjrv
+#: chart2/inc/strings.hrc:109
+msgctxt "STR_ACTION_EDIT_CHARTTYPE"
+msgid "Edit chart type"
+msgstr "تحرير نوع الرّسم البيانيّ"
+
+#. zSLvA
+#: chart2/inc/strings.hrc:110
+msgctxt "STR_ACTION_EDIT_DATA_RANGES"
+msgid "Edit data ranges"
+msgstr "تحرير مجالات البيانات"
+
+#. RmtWN
+#: chart2/inc/strings.hrc:111
+msgctxt "STR_ACTION_EDIT_3D_VIEW"
+msgid "Edit 3D view"
+msgstr "تحرير منظور ثلاثيّ الأبعاد"
+
+#. REBbR
+#: chart2/inc/strings.hrc:112
+msgctxt "STR_ACTION_EDIT_CHART_DATA"
+msgid "Edit chart data"
+msgstr "تحرير بيانات الرّسم البيانيّ"
+
+#. Y7hDD
+#: chart2/inc/strings.hrc:113
+msgctxt "STR_ACTION_TOGGLE_LEGEND"
+msgid "Legend on/off"
+msgstr "اعرض/أخفِ مفتاح الرسم"
+
+#. fnfBr
+#: chart2/inc/strings.hrc:114
+msgctxt "STR_ACTION_TOGGLE_GRID_HORZ"
+msgid "Horizontal grid major/major&minor/off"
+msgstr "الشبكة الأفقية الأساسي/الأساسي والفرعي/بلا"
+
+#. jZDDr
+#: chart2/inc/strings.hrc:115
+msgctxt "STR_ACTION_TOGGLE_GRID_VERTICAL"
+msgid "Vertical grid major/major&minor/off"
+msgstr "الشبكة الرأسية الأساسي/الأساسي والفرعي/بلا"
+
+#. bZzzZ
+#: chart2/inc/strings.hrc:116
+msgctxt "STR_ACTION_SCALE_TEXT"
+msgid "Scale Text"
+msgstr "تحجيم النّصّ"
+
+#. wJ7wY
+#: chart2/inc/strings.hrc:117
+msgctxt "STR_ACTION_REARRANGE_CHART"
+msgid "Automatic Layout"
+msgstr "تخطيط آليّ"
+
+#. j4xMg
+#: chart2/inc/strings.hrc:118
+msgctxt "STR_ACTION_NOTPOSSIBLE"
+msgid "This function cannot be completed with the selected objects."
+msgstr "لا يمكن إكمال هذه الدّالة بالكائنات المحدّدة."
+
+#. GaEzn
+#: chart2/inc/strings.hrc:119
+msgctxt "STR_ACTION_EDIT_TEXT"
+msgid "Edit text"
+msgstr "تحرير النّصّ"
+
+#. EVDVA
+#: chart2/inc/strings.hrc:120
+msgctxt "STR_COLUMN_LABEL"
+msgid "Column %COLUMNNUMBER"
+msgstr "العمود %COLUMNNUMBER"
+
+#. dmCD9
+#: chart2/inc/strings.hrc:121
+msgctxt "STR_ROW_LABEL"
+msgid "Row %ROWNUMBER"
+msgstr "الصّفّ %ROWNUMBER"
+
+#. fVS6E
+#: chart2/inc/strings.hrc:122
+msgctxt "STR_DATA_ROLE_LABEL"
+msgid "Name"
+msgstr "الاسم"
+
+#. ozAB8
+#: chart2/inc/strings.hrc:123
+msgctxt "STR_DATA_ROLE_X"
+msgid "X-Values"
+msgstr "قيم س"
+
+#. FgGiW
+#: chart2/inc/strings.hrc:124
+msgctxt "STR_DATA_ROLE_Y"
+msgid "Y-Values"
+msgstr "قيم ص"
+
+#. vzYAg
+#: chart2/inc/strings.hrc:125
+msgctxt "STR_DATA_ROLE_SIZE"
+msgid "Bubble Sizes"
+msgstr "أحجام الفقّاعات"
+
+#. pMGL4
+#: chart2/inc/strings.hrc:126
+msgctxt "STR_DATA_ROLE_X_ERROR"
+msgid "X-Error-Bars"
+msgstr "أشرطة أخطاء س"
+
+#. c9oCh
+#: chart2/inc/strings.hrc:127
+msgctxt "STR_DATA_ROLE_X_ERROR_POSITIVE"
+msgid "Positive X-Error-Bars"
+msgstr "أشرطة أخطاء س الموجبة"
+
+#. uTsVM
+#: chart2/inc/strings.hrc:128
+msgctxt "STR_DATA_ROLE_X_ERROR_NEGATIVE"
+msgid "Negative X-Error-Bars"
+msgstr "أشرطة أخطاء س السّالبة"
+
+#. RZaBP
+#: chart2/inc/strings.hrc:129
+msgctxt "STR_DATA_ROLE_Y_ERROR"
+msgid "Y-Error-Bars"
+msgstr "أشرطة أخطاء ص"
+
+#. ZFFKK
+#: chart2/inc/strings.hrc:130
+msgctxt "STR_DATA_ROLE_Y_ERROR_POSITIVE"
+msgid "Positive Y-Error-Bars"
+msgstr "أشرطة أخطاء ص الموجبة"
+
+#. pZ3af
+#: chart2/inc/strings.hrc:131
+msgctxt "STR_DATA_ROLE_Y_ERROR_NEGATIVE"
+msgid "Negative Y-Error-Bars"
+msgstr "أشرطة أخطاء ص السّالبة"
+
+#. SD2nd
+#: chart2/inc/strings.hrc:132
+msgctxt "STR_DATA_ROLE_FIRST"
+msgid "Open Values"
+msgstr "قيم مفتوحة"
+
+#. fySNC
+#: chart2/inc/strings.hrc:133
+msgctxt "STR_DATA_ROLE_LAST"
+msgid "Close Values"
+msgstr "قيم مغلقة"
+
+#. j5tve
+#: chart2/inc/strings.hrc:134
+msgctxt "STR_DATA_ROLE_MIN"
+msgid "Low Values"
+msgstr "قيم منخفضة"
+
+#. kr9Ta
+#: chart2/inc/strings.hrc:135
+msgctxt "STR_DATA_ROLE_MAX"
+msgid "High Values"
+msgstr "قيم مرتفعة"
+
+#. bK6ee
+#: chart2/inc/strings.hrc:136
+msgctxt "STR_DATA_ROLE_CATEGORIES"
+msgid "Categories"
+msgstr "الفئات"
+
+#. yL7QE
+#: chart2/inc/strings.hrc:137
+msgctxt "STR_DATA_UNNAMED_SERIES"
+msgid "Series"
+msgstr "سلسلة"
+
+#. EgbkL
+#: chart2/inc/strings.hrc:138
+msgctxt "STR_DATA_UNNAMED_SERIES_WITH_INDEX"
+msgid "Series%NUMBER"
+msgstr "السلسلة%NUMBER"
+
+#. E2YZH
+#: chart2/inc/strings.hrc:139
+msgctxt "STR_DATA_SELECT_RANGE_FOR_SERIES"
+msgid "Select Range for %VALUETYPE of %SERIESNAME"
+msgstr "حدد مجالا لـ %VALUETYPE من %SERIESNAME"
+
+#. pBSSc
+#: chart2/inc/strings.hrc:140
+msgctxt "STR_DATA_SELECT_RANGE_FOR_CATEGORIES"
+msgid "Select Range for Categories"
+msgstr "حدد المجال للفئات"
+
+#. brKa4
+#: chart2/inc/strings.hrc:141
+msgctxt "STR_DATA_SELECT_RANGE_FOR_DATALABELS"
+msgid "Select Range for data labels"
+msgstr "حدد المجال للصائق البيانات"
+
+#. EDFdH
+#: chart2/inc/strings.hrc:142
+msgctxt "STR_DATA_EDITOR_INCORRECT_INPUT"
+msgid ""
+"Your last input is incorrect.\n"
+"Ignore this change and close the dialog?"
+msgstr ""
+"إدخالك الأخير خاطئ.\n"
+"أأتجاهل هذا التّغيير وأغلق الحوار؟"
+
+#. Vx6bG
+#: chart2/inc/strings.hrc:143
+msgctxt "STR_TEXT_DIRECTION_LTR"
+msgid "Left-to-right"
+msgstr "من اليسار إلى اليمين"
+
+#. WoDyW
+#: chart2/inc/strings.hrc:144
+msgctxt "STR_TEXT_DIRECTION_RTL"
+msgid "Right-to-left"
+msgstr "من اليمين إلى اليسار"
+
+#. dtE2L
+#: chart2/inc/strings.hrc:145
+msgctxt "STR_TEXT_DIRECTION_SUPER"
+msgid "Use superordinate object settings"
+msgstr "استخدم إعدادات الكائن الرئيسي"
+
+#. GtGu4
+#: chart2/inc/strings.hrc:146
+msgctxt "STR_PROPERTY_ROLE_FILLCOLOR"
+msgid "Fill Color"
+msgstr "لون التعبئة"
+
+#. bzDDY
+#: chart2/inc/strings.hrc:147
+msgctxt "STR_PROPERTY_ROLE_BORDERCOLOR"
+msgid "Border Color"
+msgstr "لون الحدّ"
+
+#. KSB4c
+#: chart2/inc/strings.hrc:148
+msgctxt "STR_DATA_TABLE"
+msgid "Data Table"
+msgstr ""
+
+#. TuRxr
+#: chart2/inc/strings.hrc:150
+msgctxt "STR_CONTROLTEXT_ERROR_BARS_FROM_DATA"
+msgid "From Data Table"
+msgstr "من جدول البيانات"
+
+#. aPEDY
+#: chart2/inc/strings.hrc:151
+msgctxt "STR_REGRESSION_LINEAR"
+msgid "Linear"
+msgstr "خطّيّ"
+
+#. nD8ay
+#: chart2/inc/strings.hrc:152
+msgctxt "STR_REGRESSION_LOG"
+msgid "Logarithmic"
+msgstr "لوغارثميّ"
+
+#. CotSJ
+#: chart2/inc/strings.hrc:153
+msgctxt "STR_REGRESSION_EXP"
+msgid "Exponential"
+msgstr "أُسّيّ"
+
+#. HqBJV
+#: chart2/inc/strings.hrc:154
+msgctxt "STR_REGRESSION_POWER"
+msgid "Power"
+msgstr "الأس"
+
+#. dBiUj
+#: chart2/inc/strings.hrc:155
+msgctxt "STR_REGRESSION_POLYNOMIAL"
+msgid "Polynomial"
+msgstr "متعددة حدود"
+
+#. FWi4g
+#: chart2/inc/strings.hrc:156
+msgctxt "STR_REGRESSION_MOVING_AVERAGE"
+msgid "Moving average"
+msgstr "معدّل التحرّك"
+
+#. psj3B
+#: chart2/inc/strings.hrc:157
+msgctxt "STR_REGRESSION_MEAN"
+msgid "Mean"
+msgstr "متوسط"
+
+#. C8FVd
+#: chart2/inc/strings.hrc:159
+msgctxt "STR_TYPE_COLUMN"
+msgid "Column"
+msgstr "عمود"
+
+#. SWPnA
+#: chart2/inc/strings.hrc:160
+msgctxt "STR_TYPE_BAR"
+msgid "Bar"
+msgstr "شريط"
+
+#. xUnpz
+#: chart2/inc/strings.hrc:161
+msgctxt "STR_TYPE_AREA"
+msgid "Area"
+msgstr "منطقة"
+
+#. bqxBm
+#: chart2/inc/strings.hrc:162
+msgctxt "STR_TYPE_PIE"
+msgid "Pie"
+msgstr "فطيرة"
+
+#. GGwEH
+#: chart2/inc/strings.hrc:163
+msgctxt "STR_PIE_EXPLODED"
+msgid "Exploded Pie Chart"
+msgstr "مخطط فطيرة بيانيّ منفجر"
+
+#. gxFtf
+#: chart2/inc/strings.hrc:164
+msgctxt "STR_DONUT_EXPLODED"
+msgid "Exploded Donut Chart"
+msgstr "مخطط فطيرة بيانيّ مشطّر"
+
+#. nsoQ2
+#: chart2/inc/strings.hrc:165
+msgctxt "STR_DONUT"
+msgid "Donut"
+msgstr "فطيرة"
+
+#. 7HjEG
+#: chart2/inc/strings.hrc:166
+msgctxt "STR_TYPE_LINE"
+msgid "Line"
+msgstr "الخط"
+
+#. Miu8E
+#: chart2/inc/strings.hrc:167
+msgctxt "STR_TYPE_XY"
+msgid "XY (Scatter)"
+msgstr "س‏‌ص (الانتشار)"
+
+#. LBFRX
+#: chart2/inc/strings.hrc:168
+msgctxt "STR_POINTS_AND_LINES"
+msgid "Points and Lines"
+msgstr "نقاط وخطوط"
+
+#. fjka7
+#: chart2/inc/strings.hrc:169
+msgctxt "STR_POINTS_ONLY"
+msgid "Points Only"
+msgstr "نقاط فقط"
+
+#. Sz53v
+#: chart2/inc/strings.hrc:170
+msgctxt "STR_LINES_ONLY"
+msgid "Lines Only"
+msgstr "خطوط فقط"
+
+#. AAEA2
+#: chart2/inc/strings.hrc:171
+msgctxt "STR_LINES_3D"
+msgid "3D Lines"
+msgstr "خطوط ثلاثيّة الأبعاد"
+
+#. ABjEg
+#: chart2/inc/strings.hrc:172
+msgctxt "STR_TYPE_COMBI_COLUMN_LINE"
+msgid "Column and Line"
+msgstr "عمود وخطّ"
+
+#. nVKfC
+#: chart2/inc/strings.hrc:173
+msgctxt "STR_LINE_COLUMN"
+msgid "Columns and Lines"
+msgstr "أعمدة وخطوط"
+
+#. QkQSa
+#: chart2/inc/strings.hrc:174
+msgctxt "STR_LINE_STACKEDCOLUMN"
+msgid "Stacked Columns and Lines"
+msgstr "أعمدة وسطور مكدسة"
+
+#. HGKEx
+#: chart2/inc/strings.hrc:175
+msgctxt "STR_TYPE_NET"
+msgid "Net"
+msgstr "شبكة"
+
+#. BKUc4
+#: chart2/inc/strings.hrc:176
+msgctxt "STR_TYPE_STOCK"
+msgid "Stock"
+msgstr "أصول"
+
+#. oG4gw
+#: chart2/inc/strings.hrc:177
+msgctxt "STR_STOCK_1"
+msgid "Stock Chart 1"
+msgstr "مخطط أصول 1"
+
+#. pSzDo
+#: chart2/inc/strings.hrc:178
+msgctxt "STR_STOCK_2"
+msgid "Stock Chart 2"
+msgstr "مخطط أصول 2"
+
+#. aEFDu
+#: chart2/inc/strings.hrc:179
+msgctxt "STR_STOCK_3"
+msgid "Stock Chart 3"
+msgstr "مخطط أصول 3"
+
+#. jZqox
+#: chart2/inc/strings.hrc:180
+msgctxt "STR_STOCK_4"
+msgid "Stock Chart 4"
+msgstr "مخطط أصول 4"
+
+#. DNBgg
+#: chart2/inc/strings.hrc:181
+msgctxt "STR_NORMAL"
+msgid "Normal"
+msgstr "عادي"
+
+#. EfGVL
+#: chart2/inc/strings.hrc:182
+msgctxt "STR_STACKED"
+msgid "Stacked"
+msgstr "مكدّس"
+
+#. wqtzw
+#: chart2/inc/strings.hrc:183
+msgctxt "STR_PERCENT"
+msgid "Percent Stacked"
+msgstr "نسبة مئوية مكدّسة"
+
+#. 52UGB
+#: chart2/inc/strings.hrc:184
+msgctxt "STR_DEEP"
+msgid "Deep"
+msgstr "عميق"
+
+#. dxfuQ
+#: chart2/inc/strings.hrc:185
+msgctxt "STR_FILLED"
+msgid "Filled"
+msgstr "مملوء"
+
+#. rC5nu
+#: chart2/inc/strings.hrc:186
+msgctxt "STR_TYPE_BUBBLE"
+msgid "Bubble"
+msgstr "فقاعة"
+
+#. N9tXx
+#: chart2/inc/strings.hrc:187
+msgctxt "STR_BUBBLE_1"
+msgid "Bubble Chart"
+msgstr "مخطط فقاعة"
+
+#. AjPsf
+#: chart2/inc/strings.hrc:189
+msgctxt "STR_INVALID_NUMBER"
+msgid "Numbers are required. Check your input."
+msgstr "الأرقام مطلوبة. تحقّق من إدخالك."
+
+#. ofh4V
+#: chart2/inc/strings.hrc:190
+msgctxt "STR_STEP_GT_ZERO"
+msgid "The major interval requires a positive number. Check your input."
+msgstr "تتطلب الفترة الرئيسية عددا موجبا. افحص ما أدخلت."
+
+#. EBJjR
+#: chart2/inc/strings.hrc:191
+msgctxt "STR_BAD_LOGARITHM"
+msgid "The logarithmic scale requires positive numbers. Check your input."
+msgstr "يتطلب المقياس اللوغاريتمي أعدادا موجبة. افحص ما أدخلت."
+
+#. K8BCB
+#: chart2/inc/strings.hrc:192
+msgctxt "STR_MIN_GREATER_MAX"
+msgid "The minimum must be lower than the maximum. Check your input."
+msgstr "يجب أن تكون القيمة الدنيا أقلّ من القيمة العليا. تحقّق من إدخالك."
+
+#. oBR4x
+#: chart2/inc/strings.hrc:193
+msgctxt "STR_INVALID_INTERVALS"
+msgid "The major interval needs to be greater than the minor interval. Check your input."
+msgstr "يتوجب أن يكون الفاصل الرئيسي أكبر من الفاصل الثانوي. راجع البيانات المدخلة."
+
+#. ZvDEh
+#: chart2/inc/strings.hrc:194
+msgctxt "STR_INVALID_TIME_UNIT"
+msgid "The major and minor interval need to be greater or equal to the resolution. Check your input."
+msgstr "يتوجب أن يكون الفاصل الرئيسي أكبر من أو يساوي الحل. راجع البيانات المدخلة."
+
+#. VVVyQ
+#: chart2/uiconfig/ui/3dviewdialog.ui:8
+msgctxt "3dviewdialog|3DViewDialog"
+msgid "3D View"
+msgstr "منظور ثلاثيّ الأبعاد"
+
+#. 3aACC
+#: chart2/uiconfig/ui/chardialog.ui:8
+msgctxt "chardialog|CharDialog"
+msgid "Character"
+msgstr "المحرف"
+
+#. v55EG
+#: chart2/uiconfig/ui/chardialog.ui:135
+msgctxt "chardialog|font"
+msgid "Font"
+msgstr "الخط"
+
+#. TnnrC
+#: chart2/uiconfig/ui/chardialog.ui:182
+msgctxt "chardialog|fonteffects"
+msgid "Font Effects"
+msgstr "تأثيرات الخطّ"
+
+#. nvprJ
+#: chart2/uiconfig/ui/chardialog.ui:230
+msgctxt "chardialog|position"
+msgid "Position"
+msgstr "الموضع"
+
+#. vuzAY
+#: chart2/uiconfig/ui/chartdatadialog.ui:8
+msgctxt "chartdatadialog|ChartDataDialog"
+msgid "Data Table"
+msgstr "جدول البيانات"
+
+#. ywdAz
+#: chart2/uiconfig/ui/chartdatadialog.ui:72
+msgctxt "chartdatadialog|InsertRow"
+msgid "Insert Row"
+msgstr "أدرج صفًّا"
+
+#. 8ijLs
+#: chart2/uiconfig/ui/chartdatadialog.ui:77
+msgctxt "chartdatadialog|extended_tip|InsertRow"
+msgid "Inserts a new row below the current row."
+msgstr "يدرج صفا جديدا أسفل الصف الحالي."
+
+#. DDsFz
+#: chart2/uiconfig/ui/chartdatadialog.ui:89
+msgctxt "chartdatadialog|InsertColumn"
+msgid "Insert Series"
+msgstr "أدرج سلسلة"
+
+#. EjHBF
+#: chart2/uiconfig/ui/chartdatadialog.ui:94
+msgctxt "chartdatadialog|extended_tip|InsertColumn"
+msgid "Inserts a new data series after the current column."
+msgstr "يدرج سلسلة بيانات جديدة بعد العمود الحالي."
+
+#. KuFy7
+#: chart2/uiconfig/ui/chartdatadialog.ui:106
+msgctxt "chartdatadialog|InsertTextColumn"
+msgid "Insert Text Column"
+msgstr "أدرج عمودًا نصّيًّا"
+
+#. tVACy
+#: chart2/uiconfig/ui/chartdatadialog.ui:111
+msgctxt "chartdatadialog|extended_tip|InsertTextColumn"
+msgid "Inserts a new text column after the current column for hierarchical axes descriptions."
+msgstr ""
+
+#. 4JgTE
+#: chart2/uiconfig/ui/chartdatadialog.ui:123
+msgctxt "chartdatadialog|RemoveRow"
+msgid "Delete Row"
+msgstr "احذف الصّفّ"
+
+#. DVMcX
+#: chart2/uiconfig/ui/chartdatadialog.ui:128
+msgctxt "chartdatadialog|extended_tip|RemoveRow"
+msgid "Deletes the current row. It is not possible to delete the label row."
+msgstr ""
+
+#. JCBmW
+#: chart2/uiconfig/ui/chartdatadialog.ui:140
+msgctxt "chartdatadialog|RemoveColumn"
+msgid "Delete Series"
+msgstr "احذف السّلسلة"
+
+#. mSCiJ
+#: chart2/uiconfig/ui/chartdatadialog.ui:145
+msgctxt "chartdatadialog|extended_tip|RemoveColumn"
+msgid "Deletes the current series or text column. It is not possible to delete the first text column."
+msgstr ""
+
+#. MUkk3
+#: chart2/uiconfig/ui/chartdatadialog.ui:167
+msgctxt "chartdatadialog|MoveLeftColumn"
+msgid "Move Series Left"
+msgstr "انقل السلسلة لليسار"
+
+#. V7UUB
+#: chart2/uiconfig/ui/chartdatadialog.ui:172
+msgctxt "chartdatadialog|extended_tip|MoveLeftColumn"
+msgid "Switches the current column with its neighbor at the left."
+msgstr ""
+
+#. DfxQy
+#: chart2/uiconfig/ui/chartdatadialog.ui:184
+msgctxt "chartdatadialog|MoveRightColumn"
+msgid "Move Series Right"
+msgstr "انقل السلسلة لليمين"
+
+#. JxZC8
+#: chart2/uiconfig/ui/chartdatadialog.ui:189
+msgctxt "chartdatadialog|extended_tip|MoveRightColumn"
+msgid "Switches the current column with its neighbor at the right."
+msgstr ""
+
+#. EkxKw
+#: chart2/uiconfig/ui/chartdatadialog.ui:201
+msgctxt "chartdatadialog|MoveUpRow"
+msgid "Move Row Up"
+msgstr "انقل الصف لأعلى"
+
+#. DnZTt
+#: chart2/uiconfig/ui/chartdatadialog.ui:206
+msgctxt "chartdatadialog|extended_tip|MoveUpRow"
+msgid "Switches the current row with its neighbor above."
+msgstr ""
+
+#. TvbuK
+#: chart2/uiconfig/ui/chartdatadialog.ui:218
+msgctxt "chartdatadialog|MoveDownRow"
+msgid "Move Row Down"
+msgstr "انقل الصف لأسفل"
+
+#. u8jmj
+#: chart2/uiconfig/ui/chartdatadialog.ui:223
+msgctxt "chartdatadialog|extended_tip|MoveDownRow"
+msgid "Switches the current row with its neighbor below."
+msgstr ""
+
+#. rRJDK
+#: chart2/uiconfig/ui/chartdatadialog.ui:357
+msgctxt "chartdatadialog|extended_tip|ChartDataDialog"
+msgid "Opens the Data Table dialog where you can edit the chart data."
+msgstr "تفتح علبة حوار جدول البيانات عندما يمكنك تعديل بيانات الرسم البياني"
+
+#. KbkRw
+#: chart2/uiconfig/ui/charttypedialog.ui:8
+msgctxt "charttypedialog|ChartTypeDialog"
+msgid "Chart Type"
+msgstr "نوع الرّسم البيانيّ"
+
+#. 9AVY7
+#: chart2/uiconfig/ui/datarangedialog.ui:8
+msgctxt "datarangedialog|DataRangeDialog"
+msgid "Data Ranges"
+msgstr "مجالات البيانات"
+
+#. PqEvS
+#: chart2/uiconfig/ui/datarangedialog.ui:125
+msgctxt "datarangedialog|range"
+msgid "Data Range"
+msgstr "مجال البيانات"
+
+#. YmqFB
+#: chart2/uiconfig/ui/datarangedialog.ui:172
+msgctxt "datarangedialog|series"
+msgid "Data Series"
+msgstr "سلاسل بيانات"
+
+#. H6ezZ
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:13
+msgctxt "dlg_DataLabel|dlg_DataLabels"
+msgid "Data Labels for all Data Series"
+msgstr "لصائق بيانات كلّ سلاسل البيانات"
+
+#. EEEgE
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:107
+msgctxt "dlg_DataLabel|CB_VALUE_AS_NUMBER"
+msgid "Value as _number"
+msgstr ""
+
+#. sDLeD
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:115
+msgctxt "dlg_DataLabel|extended_tip|CB_VALUE_AS_NUMBER"
+msgid "Displays the absolute values of the data points."
+msgstr "اظهار القيمة المطلقة لنقاط قيم البيانات"
+
+#. 7zFS6
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:126
+msgctxt "dlg_DataLabel|CB_VALUE_AS_PERCENTAGE"
+msgid "Value as _percentage"
+msgstr ""
+
+#. 5Hp8E
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:134
+msgctxt "dlg_DataLabel|extended_tip|CB_VALUE_AS_PERCENTAGE"
+msgid "Displays the percentage of the data points in each column."
+msgstr "اظهار النسبة المئوية لنقاط البيانات في كل عمود"
+
+#. h3skj
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:145
+msgctxt "dlg_DataLabel|CB_CATEGORY"
+msgid "_Category"
+msgstr "الصن_ف"
+
+#. oJGQF
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:153
+msgctxt "dlg_DataLabel|extended_tip|CB_CATEGORY"
+msgid "Shows the data point text labels."
+msgstr "يُظهِر لصائق النص لنقاط البيانات."
+
+#. u5FBJ
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:164
+msgctxt "dlg_DataLabel|CB_SYMBOL"
+msgid "_Legend key"
+msgstr ""
+
+#. 7WADc
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:172
+msgctxt "dlg_DataLabel|extended_tip|CB_SYMBOL"
+msgid "Displays the legend icons next to each data point label."
+msgstr "إظهار الإيقونات بجانب كل نقاط بيانات الصيغ"
+
+#. BA3kD
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:183
+msgctxt "dlg_DataLabel|CB_WRAP_TEXT"
+msgid "Auto text _wrap"
+msgstr "لف الن_ص آليا"
+
+#. bFd8g
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:197
+msgctxt "dlg_DataLabel|PB_NUMBERFORMAT"
+msgid "Number _format..."
+msgstr "_نسق العدد..."
+
+#. yHa5z
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:205
+msgctxt "dlg_DataLabel|extended_tip|PB_NUMBERFORMAT"
+msgid "Opens a dialog to select the number format."
+msgstr "اظهار علبة حوار  لاختيار شكل الرقم"
+
+#. cFD6D
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:216
+msgctxt "dlg_DataLabel|PB_PERCENT_NUMBERFORMAT"
+msgid "Percentage f_ormat..."
+msgstr "ن_سق النّسبة المئويّة..."
+
+#. Wj42y
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:224
+msgctxt "dlg_DataLabel|extended_tip|PB_PERCENT_NUMBERFORMAT"
+msgid "Opens a dialog to select the percentage format."
+msgstr "اظهار علبة حوار لاختيار شكل النسبة المئوية"
+
+#. ETbFx
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:237
+msgctxt "dlg_DataLabel|CT_LABEL_DIAL"
+msgid "ABCD"
+msgstr "أبجد"
+
+#. 69qZL
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:250
+msgctxt "dlg_DataLabel|STR_DLG_NUMBERFORMAT_FOR_PERCENTAGE_VALUE"
+msgid "Number Format for Percentage Value"
+msgstr "نسق الأعداد لقيمة النّسبة المئويّة"
+
+#. DhnMn
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:259
+msgctxt "dlg_DataLabel|CB_DATA_SERIES_NAME"
+msgid "_Series name"
+msgstr ""
+
+#. 8bEui
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:267
+msgctxt "dlg_DataLabel|extended_tip|CB_DATA_SERIES_NAME"
+msgid "Shows the data series name in the label."
+msgstr ""
+
+#. mFeMA
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:288
+msgctxt "dlg_DataLabel|label1"
+msgid "Text Attributes"
+msgstr "صفات النص"
+
+#. FDBQW
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:322
+msgctxt "dlg_DataLabel|FT_LABEL_PLACEMENT"
+msgid "Place_ment"
+msgstr "المكا_ن"
+
+#. RBvRC
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:338
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Best fit"
+msgstr "أفضل ملائمة"
+
+#. CFGTS
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:339
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Center"
+msgstr "وسط"
+
+#. kxNDG
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:340
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Above"
+msgstr "أعلى"
+
+#. dnhiD
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:341
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Top left"
+msgstr "أعلى اليسار"
+
+#. TGuEk
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:342
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Left"
+msgstr "يسار"
+
+#. eUxTR
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:343
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Bottom left"
+msgstr "أسفل يساراً"
+
+#. CGQj7
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:344
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Below"
+msgstr "أسفل"
+
+#. UJ7uQ
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:345
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Bottom right"
+msgstr "أدنى اليمين"
+
+#. nEFuG
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:346
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Right"
+msgstr "يمين"
+
+#. NQCGE
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:347
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Top right"
+msgstr "أعلى اليمين"
+
+#. UagUt
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:348
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Inside"
+msgstr "بالداخل"
+
+#. y25DL
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:349
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Outside"
+msgstr "بالخارج"
+
+#. 3HjyB
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:350
+msgctxt "dlg_DataLabel|liststorePLACEMENT"
+msgid "Near origin"
+msgstr "قرب الأصل"
+
+#. TMEug
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:354
+msgctxt "dlg_DataLabel|extended_tip|LB_LABEL_PLACEMENT"
+msgid "Selects the placement of data labels relative to the objects."
+msgstr "اختيار تموضع صيغ البيانات المتعلقة بالمواد"
+
+#. NvbuM
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:367
+msgctxt "dlg_DataLabel|FT_TEXT_SEPARATOR"
+msgid "_Separator"
+msgstr "ال_فاصل"
+
+#. m8qsr
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:383
+msgctxt "dlg_DataLabel|liststoreSEPARATOR"
+msgid "Space"
+msgstr "مسافة"
+
+#. d6M3S
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:384
+msgctxt "dlg_DataLabel|liststoreSEPARATOR"
+msgid "Comma"
+msgstr "الفاصلة"
+
+#. HUBkD
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:385
+msgctxt "dlg_DataLabel|liststoreSEPARATOR"
+msgid "Semicolon"
+msgstr "الفاصلة المنقوطة"
+
+#. 3CaCX
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:386
+msgctxt "dlg_DataLabel|liststoreSEPARATOR"
+msgid "New line"
+msgstr "السّطر الجديد"
+
+#. CAtwB
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:387
+msgctxt "dlg_DataLabel|liststoreSEPARATOR"
+msgid "Period"
+msgstr "مرحلة"
+
+#. 8Z3DJ
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:391
+msgctxt "dlg_DataLabel|extended_tip|LB_TEXT_SEPARATOR"
+msgid "Selects the separator between multiple text strings for the same object."
+msgstr "اختيار المسافة الفاصلة بين مجموعة من السلاسل النصية في نفس الموضوع"
+
+#. oEFpN
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:406
+msgctxt "dlg_DataLabel|label1"
+msgid "Attribute Options"
+msgstr "خيارات الصفة"
+
+#. gE7CA
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:458
+msgctxt "dlg_DataLabel|extended_tip|CT_DIAL"
+msgid "Click in the dial to set the text orientation for the data labels."
+msgstr "انقر في التزويل لتعيّن اتجاه النص للصائق البيانات."
+
+#. MjCoG
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:479
+msgctxt "dlg_DataLabel|extended_tip|NF_LABEL_DEGREES"
+msgid "Enter the counterclockwise rotation angle for the data labels."
+msgstr "ادخل زاوية اتجاه الدوران عكس اتجاه عقارب الساعة لصيغ البيانات"
+
+#. Jhjwb
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:493
+msgctxt "dlg_DataLabel|FT_LABEL_DEGREES"
+msgid "_Degrees"
+msgstr "_درجة"
+
+#. vtVy2
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:518
+msgctxt "dlg_DataLabel|FT_LABEL_TEXTDIR"
+msgid "Te_xt direction"
+msgstr "اتّجاه النّ_صّ"
+
+#. tjcHp
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:535
+msgctxt "dlg_DataLabel|extended_tip|LB_LABEL_TEXTDIR"
+msgid "Specify the text direction for a paragraph that uses complex text layout (CTL). This feature is only available if complex text layout support is enabled."
+msgstr "حدّد اتجاه النص للفقرة التي تحوي عدة اتجاهات للكتابة. هذه الخاصية مفعّلة فقط إذا كان دعم نسق النصوص المركبة مفعّل."
+
+#. xpAEz
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:558
+msgctxt "dlg_DataLabel|label2"
+msgid "Rotate Text"
+msgstr "دوّر النّصّ"
+
+#. NpD8D
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:587
+msgctxt "dlg_DataLabel|CB_CUSTOM_LEADER_LINES"
+msgid "_Connect displaced data labels to data points"
+msgstr "_توصيل  صيغ البيانات المنفصلة بنقاط البيانات"
+
+#. MJdmK
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:595
+msgctxt "dlg_DataLabel|extended_tip|CB_CUSTOM_LEADER_LINES"
+msgid "Draws a line connecting the data labels to the data points"
+msgstr ""
+
+#. UKVF9
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:611
+msgctxt "dlg_DataLabel|label3"
+msgid "Leader Lines"
+msgstr "الأسطر الرئيسية"
+
+#. 2cE35
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:641
+msgctxt "dlg_DataLabel|extended_tip|dlg_DataLabel"
+msgid "Opens the Data Labels dialog, which enables you to set the data labels."
+msgstr ""
+
+#. bt7D7
+#: chart2/uiconfig/ui/dlg_DataLabel.ui:660
+msgctxt "dlg_DataLabel|extended_tip|dlg_DataLabels"
+msgid "Opens the Data Labels dialog, which enables you to set the data labels."
+msgstr "فتح علبة حوار لصيغ البيانات، و التي تسمح بتعديل إعداداتها"
+
+#. XbRRD
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:8
+msgctxt "dlg_InsertDataTable|dlg_InsertDataTable"
+msgid "Data Table"
+msgstr ""
+
+#. SBrCL
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:85
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show data table"
+msgstr ""
+
+#. y4rFB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:119
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr ""
+
+#. GstZR
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:135
+msgctxt "dlg_InsertDataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr ""
+
+#. KAzDB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:151
+msgctxt "dlg_InsertDataTable|outlineCB"
+msgid "Show outline"
+msgstr ""
+
+#. bm6hN
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:167
+msgctxt "dlg_InsertDataTable|keysCB"
+msgid "Show keys"
+msgstr ""
+
+#. JpXPi
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:187
+msgctxt "dlg_InsertDataTable|dataTablePropertiesLabel"
+msgid "Data Table Properties"
+msgstr ""
+
+#. 3GUtp
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:28
+msgctxt "dlg_InsertErrorBars|dlg_InsertErrorBars"
+msgid "Legend"
+msgstr "مفتاح الرسم"
+
+#. 9Wf9T
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:124
+msgctxt "dlg_InsertErrorBars|RB_NONE"
+msgid "_None"
+msgstr "_بلا"
+
+#. pvfsb
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:133
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_NONE"
+msgid "Does not show any error bars."
+msgstr "لا تُظهر أي شريط خطأ"
+
+#. sMZoy
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:145
+msgctxt "dlg_InsertErrorBars|RB_CONST"
+msgid "_Constant Value"
+msgstr "قيمة _ثابتة"
+
+#. oDzF5
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:154
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_CONST"
+msgid "Displays constant values that you specify in the Parameters area."
+msgstr "إظهار قيم ثابتة التي تحددها من منطقة الإعدادات"
+
+#. UzxQQ
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:166
+msgctxt "dlg_InsertErrorBars|RB_PERCENT"
+msgid "_Percentage"
+msgstr "ن_سبة مئويّة"
+
+#. bGDm2
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:175
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_PERCENT"
+msgid "Displays a percentage. The display refers to the corresponding data point. Set the percentage in the Parameters area."
+msgstr "إظهار النسبة المئوية. الإظهار يرجع لنقاط البيانات المماثلة لها. حدد النسبة المئوية من منطقة الإعدادات."
+
+#. tSBH9
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:200
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_FUNCTION"
+msgid "Select a function to calculate the error bars."
+msgstr "اختر دالة لحساب أخطاء الشريط"
+
+#. fkUNn
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:215
+msgctxt "dlg_InsertErrorBars|liststoreFUNCTION"
+msgid "Standard Error"
+msgstr "خطأ قياسي"
+
+#. zpc6d
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:216
+msgctxt "dlg_InsertErrorBars|liststoreFUNCTION"
+msgid "Standard Deviation"
+msgstr "الانحراف المعياري"
+
+#. wA6LE
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:217
+msgctxt "dlg_InsertErrorBars|liststoreFUNCTION"
+msgid "Variance"
+msgstr "التباين"
+
+#. UASm3
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:218
+msgctxt "dlg_InsertErrorBars|liststoreFUNCTION"
+msgid "Error Margin"
+msgstr "هامش الخطأ"
+
+#. vqTAT
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:222
+msgctxt "dlg_InsertErrorBars|extended_tip|LB_FUNCTION"
+msgid "Select a function to calculate the error bars."
+msgstr "اختر دالة لحساب أخطاء الشريط"
+
+#. Z5yGF
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:241
+msgctxt "dlg_InsertErrorBars|RB_RANGE"
+msgid "Cell _Range"
+msgstr "م_جال الخلية"
+
+#. Vm5iS
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:250
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_RANGE"
+msgid "Click Cell Range and then specify a cell range from which to take the positive and negative error bar values."
+msgstr "انقر على مجال الخلية ثم حدد مجال خلية الذي من خلاله تأخذ قيم شريط الخطأ الإيجابي و السلبي."
+
+#. vdvVR
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:266
+msgctxt "dlg_InsertErrorBars|label1"
+msgid "Error Category"
+msgstr "صنف الخطأ"
+
+#. oZaa3
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:296
+msgctxt "dlg_InsertErrorBars|RB_BOTH"
+msgid "Positive _and Negative"
+msgstr "الموجب _والسّالب"
+
+#. aAhky
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:305
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_BOTH"
+msgid "Shows positive and negative error bars."
+msgstr "إظهار شريط الأخطاء الإيجابي و السلبي"
+
+#. jJw8Y
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:316
+msgctxt "dlg_InsertErrorBars|RB_POSITIVE"
+msgid "Pos_itive"
+msgstr "المو_جب"
+
+#. yXXuP
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:325
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_POSITIVE"
+msgid "Shows only positive error bars."
+msgstr "إظهار شريط الأخطاء الموجب فقط"
+
+#. 6YgbM
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:336
+msgctxt "dlg_InsertErrorBars|RB_NEGATIVE"
+msgid "Ne_gative"
+msgstr "ال_سّالب"
+
+#. KsYHq
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:345
+msgctxt "dlg_InsertErrorBars|extended_tip|RB_NEGATIVE"
+msgid "Shows only negative error bars."
+msgstr "إظهار شريط الأخطاء السالب فقط"
+
+#. fkKQH
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:393
+msgctxt "dlg_InsertErrorBars|label2"
+msgid "Error Indicator"
+msgstr "مؤشّر الخطأ"
+
+#. WWuZ8
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:437
+msgctxt "dlg_InsertErrorBars|FT_POSITIVE"
+msgid "P_ositive (+)"
+msgstr "الموج_ب (+)"
+
+#. EHq4d
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:456
+msgctxt "dlg_InsertErrorBars|extended_tip|MF_POSITIVE"
+msgid "Enter the value to add to the displayed value as the positive error value."
+msgstr "أدخل القيمة لإضافة القيمة الظاهرة كخطأ قيمة موجبة."
+
+#. SUBEs
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:475
+msgctxt "dlg_InsertErrorBars|extended_tip|ED_RANGE_POSITIVE"
+msgid "Enter the address range from where to get the positive error values. Use the Shrink button to select the range from a sheet."
+msgstr "أدخل مجال العنوان الذي منه تؤخذ قيم الأخطاء الموجبة. استعمل زر التمديد لتحديد المجال من ورقة."
+
+#. 5FfdH
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:490
+msgctxt "dlg_InsertErrorBars|IB_RANGE_POSITIVE|tooltip_text"
+msgid "Select data range"
+msgstr "حدّد مجال البيانات"
+
+#. JYk3c
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:495
+msgctxt "dlg_InsertErrorBars|extended_tip|IB_RANGE_POSITIVE"
+msgid "Click a button to shrink the dialog, then use the mouse to select the cell range in the spreadsheet. Click the button again to restore the dialog to full size."
+msgstr "انقر على زر لتمديد الحوار، ثم استخدم الفأرة لتحديد مجال الخلية في الورقة. انقر على الزر مرة ثانية لإعادة الحوار لحجمه الطبيعي."
+
+#. K9wAk
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:521
+msgctxt "dlg_InsertErrorBars|FT_NEGATIVE"
+msgid "_Negative (-)"
+msgstr "السّال_ب (-)"
+
+#. Hzr6X
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:540
+msgctxt "dlg_InsertErrorBars|extended_tip|MF_NEGATIVE"
+msgid "Enter the value to subtract from the displayed value as the negative error value."
+msgstr "ادخل القيمة لطرحها من القيمة الظاهرة كقيمة خطأ سالبة."
+
+#. DTR5D
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:559
+msgctxt "dlg_InsertErrorBars|extended_tip|ED_RANGE_NEGATIVE"
+msgid "Enter the address range from where to get the negative error values. Use the Shrink button to select the range from a sheet."
+msgstr "أدخل مجال العنوان الذي تؤخذ منه قيم الخطأ السالبة. استخدم زر التمديد لتحديد المجال من ورقة."
+
+#. jsckc
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:574
+msgctxt "dlg_InsertErrorBars|IB_RANGE_NEGATIVE|tooltip_text"
+msgid "Select data range"
+msgstr "حدّد نطاق البيانات"
+
+#. mEwUr
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:579
+msgctxt "dlg_InsertErrorBars|extended_tip|IB_RANGE_NEGATIVE"
+msgid "Click a button to shrink the dialog, then use the mouse to select the cell range in the spreadsheet. Click the button again to restore the dialog to full size."
+msgstr "انقر على زر لتمديد الحوار، ثم استخدم الفأرة لتحديد مجال الخلية في الورقة. انقر على الزر مرة ثانية لإعادة الحوار لحجمه الطبيعي."
+
+#. GZS6d
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:598
+msgctxt "dlg_InsertErrorBars|CB_SYN_POS_NEG"
+msgid "Same value for both"
+msgstr "نفس القيمة لكليهما"
+
+#. wTppD
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:606
+msgctxt "dlg_InsertErrorBars|extended_tip|CB_SYN_POS_NEG"
+msgid "Enable to use the positive error values also as negative error values. You can only change the value of the \"Positive (+)\" box. That value gets copied to the \"Negative (-)\" box automatically."
+msgstr "قم بالتفعيل لتستخدم قيم الخطأ الموجبة كقيم خطأ سالبة. يُمكنك فقط تحويل قيم 'موجب (+)' من الصندوق. هاته القيم ستُنسخ لصندوق 'سالب (-)' آلياً."
+
+#. ogVMg
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:622
+msgctxt "dlg_InsertErrorBars|label3"
+msgid "Parameters"
+msgstr "المتغيرات الوسيطة"
+
+#. MXxxE
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:639
+msgctxt "dlg_InsertErrorBars|STR_DATA_SELECT_RANGE_FOR_POSITIVE_ERRORBARS"
+msgid "Select Range for Positive Error Bars"
+msgstr "حدّد نطاق أشرطة الخطأ الموجبة"
+
+#. ixAQm
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:650
+msgctxt "dlg_InsertErrorBars|STR_DATA_SELECT_RANGE_FOR_NEGATIVE_ERRORBARS"
+msgid "Select Range for Negative Error Bars"
+msgstr "حدّد نطاق أشرطة الخطأ السّالبة"
+
+#. 68LFy
+#: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:661
+msgctxt "dlg_InsertErrorBars|STR_CONTROLTEXT_ERROR_BARS_FROM_DATA"
+msgid "From Data Table"
+msgstr "من جدول البيانات"
+
+#. 3G3Jo
+#: chart2/uiconfig/ui/dlg_InsertLegend.ui:8
+msgctxt "dlg_InsertLegend|dlg_InsertLegend"
+msgid "Legend"
+msgstr "مفتاح الرسم"
+
+#. TQUNp
+#: chart2/uiconfig/ui/dlg_InsertLegend.ui:102
+msgctxt "dlg_InsertLegend|show"
+msgid "_Display legend"
+msgstr "ا_عرض مفتاح الرسم"
+
+#. BbrEG
+#: chart2/uiconfig/ui/dlg_InsertLegend.ui:124
+msgctxt "dlg_InsertLegend|left"
+msgid "_Left"
+msgstr "الي_سار"
+
+#. EdZ7j
+#: chart2/uiconfig/ui/dlg_InsertLegend.ui:139
+msgctxt "dlg_InsertLegend|right"
+msgid "_Right"
+msgstr "الي_مين"
+
+#. PoZ9R
+#: chart2/uiconfig/ui/dlg_InsertLegend.ui:154
+msgctxt "dlg_InsertLegend|top"
+msgid "_Top"
+msgstr "الأ_على"
+
+#. Uvcht
+#: chart2/uiconfig/ui/dlg_InsertLegend.ui:169
+msgctxt "dlg_InsertLegend|bottom"
+msgid "_Bottom"
+msgstr "الأس_فل"
+
+#. bxdb5
+#: chart2/uiconfig/ui/dlg_InsertLegend.ui:195
+msgctxt "dlg_InsertLegend|TXT_POSITION"
+msgid "Position"
+msgstr "الموضع"
+
+#. FAEct
+#: chart2/uiconfig/ui/insertaxisdlg.ui:8
+msgctxt "insertaxisdlg|InsertAxisDialog"
+msgid "Axes"
+msgstr "المحاور"
+
+#. 4Drc8
+#: chart2/uiconfig/ui/insertaxisdlg.ui:102
+msgctxt "insertaxisdlg|primaryX"
+msgid "_X axis"
+msgstr "المحور _س"
+
+#. QyAAw
+#: chart2/uiconfig/ui/insertaxisdlg.ui:110
+msgctxt "insertaxisdlg|extended_tip|primaryX"
+msgid "Displays the X axis as a line with subdivisions."
+msgstr "اظهار  محور 'س' كخط مع التقسيمات."
+
+#. XeWVu
+#: chart2/uiconfig/ui/insertaxisdlg.ui:122
+msgctxt "insertaxisdlg|primaryY"
+msgid "_Y axis"
+msgstr "المحور _ص"
+
+#. 8ZzUp
+#: chart2/uiconfig/ui/insertaxisdlg.ui:130
+msgctxt "insertaxisdlg|extended_tip|primaryY"
+msgid "Displays the Y axis as a line with subdivisions."
+msgstr "اظهار  محور 'ع' كخط مع التقسيمات."
+
+#. FoAXW
+#: chart2/uiconfig/ui/insertaxisdlg.ui:142
+msgctxt "insertaxisdlg|primaryZ"
+msgid "_Z axis"
+msgstr "المحور _ع"
+
+#. DgjxB
+#: chart2/uiconfig/ui/insertaxisdlg.ui:150
+msgctxt "insertaxisdlg|extended_tip|primaryZ"
+msgid "Displays the Z axis as a line with subdivisions."
+msgstr "اظهار  محور 'ص' كخط مع التقسيمات."
+
+#. YZ7GG
+#: chart2/uiconfig/ui/insertaxisdlg.ui:167
+msgctxt "insertaxisdlg|label1"
+msgid "Axes"
+msgstr "المحاور"
+
+#. WEUFf
+#: chart2/uiconfig/ui/insertaxisdlg.ui:198
+msgctxt "insertaxisdlg|secondaryX"
+msgid "X _axis"
+msgstr "ال_محور س"
+
+#. JGQhE
+#: chart2/uiconfig/ui/insertaxisdlg.ui:206
+msgctxt "insertaxisdlg|extended_tip|secondaryX"
+msgid "Displays a secondary X axis in the chart."
+msgstr "اظهار محور 'س' ثانوي في الرسم البياني."
+
+#. 598Gk
+#: chart2/uiconfig/ui/insertaxisdlg.ui:218
+msgctxt "insertaxisdlg|secondaryY"
+msgid "Y ax_is"
+msgstr "الم_حور ص"
+
+#. trDFK
+#: chart2/uiconfig/ui/insertaxisdlg.ui:226
+msgctxt "insertaxisdlg|extended_tip|secondaryY"
+msgid "The major axis and the secondary axis can have different scaling. For example, you can scale one axis to 2 in. and the other to 1.5 in. "
+msgstr "يُمكن للمحور الرئيسي و الثانوي أن يكونا بمقياسين مختلفين. مثال: يُمكن وضغ مقياس 2 بوصة للمحور الأول، و 1.5 بوصة للثاني. "
+
+#. CAFjD
+#: chart2/uiconfig/ui/insertaxisdlg.ui:238
+msgctxt "insertaxisdlg|secondaryZ"
+msgid "Z axi_s"
+msgstr "المح_ور ع"
+
+#. 2LQwV
+#: chart2/uiconfig/ui/insertaxisdlg.ui:258
+msgctxt "insertaxisdlg|label2"
+msgid "Secondary Axes"
+msgstr "المحاور الثّانويّة"
+
+#. 7yEDE
+#: chart2/uiconfig/ui/insertaxisdlg.ui:290
+msgctxt "insertaxisdlg|extended_tip|InsertAxisDialog"
+msgid "Specifies the axes to be displayed in the chart."
+msgstr "تعيين المحور ليظهر في الرسم البياني."
+
+#. 2eGKS
+#: chart2/uiconfig/ui/insertgriddlg.ui:8
+msgctxt "insertgriddlg|InsertGridDialog"
+msgid "Grids"
+msgstr "الشّبكات"
+
+#. adEgJ
+#: chart2/uiconfig/ui/insertgriddlg.ui:102
+msgctxt "insertgriddlg|primaryX"
+msgid "_X axis"
+msgstr "المحور _س"
+
+#. TeVcH
+#: chart2/uiconfig/ui/insertgriddlg.ui:110
+msgctxt "insertgriddlg|extended_tip|primaryX"
+msgid "Adds gridlines to the X axis of the chart."
+msgstr "إضافة شبكة التخطيط لمحور 'س' بالرسم البياني."
+
+#. FEBZW
+#: chart2/uiconfig/ui/insertgriddlg.ui:122
+msgctxt "insertgriddlg|primaryY"
+msgid "_Y axis"
+msgstr "المحور _ص"
+
+#. 6SmKJ
+#: chart2/uiconfig/ui/insertgriddlg.ui:130
+msgctxt "insertgriddlg|extended_tip|primaryY"
+msgid "Adds gridlines to the Y axis of the chart."
+msgstr "إضافة شبكة التخطيط لمحور 'ع' بالرسم البياني."
+
+#. XEXTu
+#: chart2/uiconfig/ui/insertgriddlg.ui:142
+msgctxt "insertgriddlg|primaryZ"
+msgid "_Z axis"
+msgstr "المحور _ع"
+
+#. bF4Eb
+#: chart2/uiconfig/ui/insertgriddlg.ui:150
+msgctxt "insertgriddlg|extended_tip|primaryZ"
+msgid "Adds gridlines to the Z axis of the chart."
+msgstr "إضافة شبكة التخطيط لمحور 'ص' بالرسم البياني."
+
+#. 9QbAA
+#: chart2/uiconfig/ui/insertgriddlg.ui:167
+msgctxt "insertgriddlg|label1"
+msgid "Major Grids"
+msgstr "الشّبكات الرّئيسيّة"
+
+#. wqXds
+#: chart2/uiconfig/ui/insertgriddlg.ui:198
+msgctxt "insertgriddlg|secondaryX"
+msgid "X _axis"
+msgstr "ال_محور س"
+
+#. cfAUn
+#: chart2/uiconfig/ui/insertgriddlg.ui:206
+msgctxt "insertgriddlg|extended_tip|secondaryX"
+msgid "Adds gridlines that subdivide the X axis into smaller sections."
+msgstr "إضافة شبكة مخططة التي تقسّم محور 'س' إلى أجزاء أصغر."
+
+#. PkzaY
+#: chart2/uiconfig/ui/insertgriddlg.ui:218
+msgctxt "insertgriddlg|secondaryY"
+msgid "Y ax_is"
+msgstr "الم_حور ص"
+
+#. a3asH
+#: chart2/uiconfig/ui/insertgriddlg.ui:226
+msgctxt "insertgriddlg|extended_tip|secondaryY"
+msgid "Adds gridlines that subdivide the Y axis into smaller sections."
+msgstr "إضافة شبكة مخططة التي تقسّم محور 'ع' إلى أجزاء أصغر."
+
+#. CcCG8
+#: chart2/uiconfig/ui/insertgriddlg.ui:238
+msgctxt "insertgriddlg|secondaryZ"
+msgid "Z axi_s"
+msgstr "المح_ور ع"
+
+#. hcj99
+#: chart2/uiconfig/ui/insertgriddlg.ui:246
+msgctxt "insertgriddlg|extended_tip|secondaryZ"
+msgid "Adds gridlines that subdivide the Z axis into smaller sections."
+msgstr "إضافة شبكة مخططة التي تقسّم محور 'ص' إلى أجزاء أصغر."
+
+#. QBQD4
+#: chart2/uiconfig/ui/insertgriddlg.ui:263
+msgctxt "insertgriddlg|label2"
+msgid "Minor Grids"
+msgstr "الشّبكات الثّانويّة"
+
+#. URB9E
+#: chart2/uiconfig/ui/insertgriddlg.ui:295
+msgctxt "insertgriddlg|extended_tip|InsertGridDialog"
+msgid "You can divide the axes into sections by assigning gridlines to them. This allows you to get a better overview of the chart, especially if you are working with large charts."
+msgstr "يُمكنك تقسيم المحور لأجزاء أصغر بسحب الشبكة المخططة إليهم. هذا يُمكّنك من الحصول على رؤية أوضح للمخطط البياني. خصوصاً إذا كنت تعمل مع مخطط بياني ضخم."
+
+#. rqADt
+#: chart2/uiconfig/ui/inserttitledlg.ui:8
+msgctxt "inserttitledlg|InsertTitleDialog"
+msgid "Titles"
+msgstr "العناوين"
+
+#. pAKf8
+#: chart2/uiconfig/ui/inserttitledlg.ui:92
+msgctxt "inserttitledlg|labelMainTitle"
+msgid "_Title"
+msgstr "ال_عنوان"
+
+#. ZBgRn
+#: chart2/uiconfig/ui/inserttitledlg.ui:106
+msgctxt "inserttitledlg|labelSubTitle"
+msgid "_Subtitle"
+msgstr "الع_نوان الفرعيّ"
+
+#. aCRZ7
+#: chart2/uiconfig/ui/inserttitledlg.ui:125
+msgctxt "inserttitledlg|extended_tip|maintitle"
+msgid "Enter the desired title for the chart."
+msgstr "أدخل عنوان الرسم البياني الذي ترغب فيه."
+
+#. 5eiq7
+#: chart2/uiconfig/ui/inserttitledlg.ui:143
+msgctxt "inserttitledlg|extended_tip|subtitle"
+msgid "Enter the desired subtitle for the chart."
+msgstr "أدخل العنوان الفرعي الذي تُريده للرسم البياني."
+
+#. y8KiH
+#: chart2/uiconfig/ui/inserttitledlg.ui:178
+msgctxt "inserttitledlg|labelPrimaryXaxis"
+msgid "_X axis"
+msgstr "المحور _س"
+
+#. RhsUT
+#: chart2/uiconfig/ui/inserttitledlg.ui:192
+msgctxt "inserttitledlg|labelPrimaryYaxis"
+msgid "_Y axis"
+msgstr "المحور _ص"
+
+#. ypJFt
+#: chart2/uiconfig/ui/inserttitledlg.ui:206
+msgctxt "inserttitledlg|labelPrimaryZaxis"
+msgid "_Z axis"
+msgstr "المحور _ع"
+
+#. qz8WP
+#: chart2/uiconfig/ui/inserttitledlg.ui:225
+msgctxt "inserttitledlg|extended_tip|primaryXaxis"
+msgid "Enter the desired title for the X axis of the chart."
+msgstr "أدخل العنوان الذي تُريده لمحور 'س' من المخطط البياني."
+
+#. 3m5Dk
+#: chart2/uiconfig/ui/inserttitledlg.ui:243
+msgctxt "inserttitledlg|extended_tip|primaryYaxis"
+msgid "Enter the desired title for the Y axis of the chart."
+msgstr "أدخل العنوان الذي تُريده لمحور 'ع' من الرسم البياني."
+
+#. PY2EU
+#: chart2/uiconfig/ui/inserttitledlg.ui:261
+msgctxt "inserttitledlg|extended_tip|primaryZaxis"
+msgid "Enter the desired title for the Z axis of the chart."
+msgstr "أدخل العنوان الذي تريده لمحور ص من الرسم البياني."
+
+#. aHvzY
+#: chart2/uiconfig/ui/inserttitledlg.ui:276
+msgctxt "inserttitledlg|Axe"
+msgid "Axes"
+msgstr "المحاور"
+
+#. 8XRFP
+#: chart2/uiconfig/ui/inserttitledlg.ui:308
+msgctxt "inserttitledlg|labelSecondaryXAxis"
+msgid "X _axis"
+msgstr "ال_محور س"
+
+#. Tq7G9
+#: chart2/uiconfig/ui/inserttitledlg.ui:322
+msgctxt "inserttitledlg|labelSecondaryYAxis"
+msgid "Y ax_is"
+msgstr "الم_حور ص"
+
+#. EsHDi
+#: chart2/uiconfig/ui/inserttitledlg.ui:341
+msgctxt "inserttitledlg|extended_tip|secondaryXaxis"
+msgid "Enter the desired secondary title for the X axis of the chart."
+msgstr "أدخل العنوان الثانوي الذي تُريده لمحور 'س' من الرسم البياني."
+
+#. bnwti
+#: chart2/uiconfig/ui/inserttitledlg.ui:359
+msgctxt "inserttitledlg|extended_tip|secondaryYaxis"
+msgid "Enter the desired secondary title for the Y axis of the chart."
+msgstr "أدخل العنوان الثانوي الذي تُريده لمحور 'ع' من الرسم البياني."
+
+#. XvJwD
+#: chart2/uiconfig/ui/inserttitledlg.ui:374
+msgctxt "inserttitledlg|label2"
+msgid "Secondary Axes"
+msgstr "المحاور الثّانويّة"
+
+#. Y96AE
+#: chart2/uiconfig/ui/inserttitledlg.ui:406
+msgctxt "inserttitledlg|extended_tip|InsertTitleDialog"
+msgid "Opens a dialog to enter or modify the titles in a chart."
+msgstr "فتح علبة حوار لإدخال أو تعديل العناوين في المخطط البياني."
+
+#. 23FsQ
+#: chart2/uiconfig/ui/paradialog.ui:8
+msgctxt "paradialog|ParagraphDialog"
+msgid "Paragraph"
+msgstr "الفقرة"
+
+#. 6xRiy
+#: chart2/uiconfig/ui/paradialog.ui:135
+msgctxt "paradialog|labelTP_PARA_STD"
+msgid "Indents & Spacing"
+msgstr "الإزاحات والتباعد"
+
+#. PRo68
+#: chart2/uiconfig/ui/paradialog.ui:182
+msgctxt "paradialog|labelTP_PARA_ALIGN"
+msgid "Alignment"
+msgstr "المحاذاة"
+
+#. EB5A9
+#: chart2/uiconfig/ui/paradialog.ui:231
+msgctxt "paradialog|labelTP_PARA_ASIAN"
+msgid "Asian Typography"
+msgstr "طباعة آسيوية"
+
+#. BzbWJ
+#: chart2/uiconfig/ui/paradialog.ui:279
+msgctxt "paradialog|labelTP_TABULATOR"
+msgid "Tabs"
+msgstr "تبويبات"
+
+#. jEDem
+#: chart2/uiconfig/ui/sidebaraxis.ui:24
+msgctxt "sidebaraxis|checkbutton_show_label"
+msgid "Show labels"
+msgstr "أظهر اللصائق"
+
+#. 52BFU
+#: chart2/uiconfig/ui/sidebaraxis.ui:40
+msgctxt "sidebaraxis|checkbutton_reverse"
+msgid "Reverse direction"
+msgstr "اعكس الاتّجاه"
+
+#. hABaw
+#: chart2/uiconfig/ui/sidebaraxis.ui:58
+msgctxt "sidebaraxis|label1"
+msgid "_Label position:"
+msgstr "مكان الل_صيقة:"
+
+#. JpV6N
+#: chart2/uiconfig/ui/sidebaraxis.ui:73
+msgctxt "sidebaraxis|comboboxtext_label_position"
+msgid "Near Axis"
+msgstr "قرب المحور"
+
+#. HEMNB
+#: chart2/uiconfig/ui/sidebaraxis.ui:74
+msgctxt "sidebaraxis|comboboxtext_label_position"
+msgid "Near Axis (other side)"
+msgstr "قرب المحور (الجانب الآخر)"
+
+#. BE2dT
+#: chart2/uiconfig/ui/sidebaraxis.ui:75
+msgctxt "sidebaraxis|comboboxtext_label_position"
+msgid "Outside start"
+msgstr "بداية من الخارج"
+
+#. rH94z
+#: chart2/uiconfig/ui/sidebaraxis.ui:76
+msgctxt "sidebaraxis|comboboxtext_label_position"
+msgid "Outside end"
+msgstr "نهاية من الخارج"
+
+#. 69LSe
+#: chart2/uiconfig/ui/sidebaraxis.ui:90
+msgctxt "sidebaraxis|label2"
+msgid "_Text orientation:"
+msgstr "ا_تجاه النص:"
+
+#. vkhjB
+#: chart2/uiconfig/ui/sidebarelements.ui:25
+msgctxt "sidebarelements|l"
+msgid "Titles"
+msgstr "العناوين"
+
+#. Bqqg6
+#: chart2/uiconfig/ui/sidebarelements.ui:38
+msgctxt "sidebarelements|checkbutton_title"
+msgid "Title"
+msgstr "العنوان"
+
+#. HttnZ
+#: chart2/uiconfig/ui/sidebarelements.ui:71
+msgctxt "sidebarelements|checkbutton_subtitle"
+msgid "Subtitle"
+msgstr "العنوان الفرعيّ"
+
+#. UVbZR
+#: chart2/uiconfig/ui/sidebarelements.ui:108
+msgctxt "sidebarelements|label_legen"
+msgid "Legend"
+msgstr "مفتاح الرسم"
+
+#. dB6pP
+#: chart2/uiconfig/ui/sidebarelements.ui:121
+msgctxt "sidebarelements|checkbutton_legend"
+msgid "Show legend"
+msgstr "إظهار العنوان"
+
+#. XxG3r
+#: chart2/uiconfig/ui/sidebarelements.ui:125
+msgctxt "sidebarelements|checkbutton_legend|tooltip_text"
+msgid "Show Legend"
+msgstr "اعرض مفتاح الرسم"
+
+#. N9Vw3
+#: chart2/uiconfig/ui/sidebarelements.ui:141
+msgctxt "sidebarelements|comboboxtext_legend"
+msgid "Right"
+msgstr "يمين"
+
+#. XWGfH
+#: chart2/uiconfig/ui/sidebarelements.ui:142
+msgctxt "sidebarelements|comboboxtext_legend"
+msgid "Top"
+msgstr "أعلى"
+
+#. AYbfc
+#: chart2/uiconfig/ui/sidebarelements.ui:143
+msgctxt "sidebarelements|comboboxtext_legend"
+msgid "Bottom"
+msgstr "أسفل"
+
+#. Hdrnv
+#: chart2/uiconfig/ui/sidebarelements.ui:144
+msgctxt "sidebarelements|comboboxtext_legend"
+msgid "Left"
+msgstr "يسار"
+
+#. WxtCZ
+#: chart2/uiconfig/ui/sidebarelements.ui:154
+msgctxt "sidebarelements|checkbutton_no_overlay"
+msgid "Show the legend without overlapping the chart"
+msgstr "إظهار العنوان من دون التداخل مع الرسم البياني"
+
+#. ScLEM
+#: chart2/uiconfig/ui/sidebarelements.ui:175
+msgctxt "sidebarelements|label_axes"
+msgid "Axes"
+msgstr "المحاور"
+
+#. Am6Gz
+#: chart2/uiconfig/ui/sidebarelements.ui:188
+msgctxt "sidebarelements|checkbutton_x_axis"
+msgid "X axis"
+msgstr "المحور س"
+
+#. iMXPp
+#: chart2/uiconfig/ui/sidebarelements.ui:203
+msgctxt "sidebarelements|checkbutton_y_axis"
+msgid "Y axis"
+msgstr "المحور ص"
+
+#. A35cf
+#: chart2/uiconfig/ui/sidebarelements.ui:218
+msgctxt "sidebarelements|checkbutton_z_axis"
+msgid "Z axis"
+msgstr "المحور ع"
+
+#. GoJDH
+#: chart2/uiconfig/ui/sidebarelements.ui:233
+msgctxt "sidebarelements|checkbutton_2nd_x_axis"
+msgid "2nd X axis"
+msgstr "المحور س الثاني"
+
+#. bGsCM
+#: chart2/uiconfig/ui/sidebarelements.ui:247
+msgctxt "sidebarelements|checkbutton_2nd_y_axis"
+msgid "2nd Y axis"
+msgstr "المحور ص الثاني"
+
+#. P5gxx
+#: chart2/uiconfig/ui/sidebarelements.ui:261
+msgctxt "sidebarelements|checkbutton_x_axis_title"
+msgid "X axis title"
+msgstr "عنوان المحور س"
+
+#. vF4oS
+#: chart2/uiconfig/ui/sidebarelements.ui:276
+msgctxt "sidebarelements|checkbutton_y_axis_title"
+msgid "Y axis title"
+msgstr "عنوان المحور ص"
+
+#. RZFAU
+#: chart2/uiconfig/ui/sidebarelements.ui:291
+msgctxt "sidebarelements|checkbutton_z_axis_title"
+msgid "Z axis title"
+msgstr "عنوان المحور ع"
+
+#. nsoDZ
+#: chart2/uiconfig/ui/sidebarelements.ui:306
+msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
+msgid "2nd X axis title"
+msgstr "عنوان المحور س الثاني"
+
+#. yDNuy
+#: chart2/uiconfig/ui/sidebarelements.ui:320
+msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
+msgid "2nd Y axis title"
+msgstr "عنوان المحور ص الثاني"
+
+#. yeE2v
+#: chart2/uiconfig/ui/sidebarelements.ui:339
+msgctxt "sidebarelements|label_gri"
+msgid "Gridlines"
+msgstr "خطوط شبكة"
+
+#. RL8AA
+#: chart2/uiconfig/ui/sidebarelements.ui:352
+msgctxt "sidebarelements|checkbutton_gridline_horizontal_major"
+msgid "Horizontal major"
+msgstr "الأساسي الأفقي"
+
+#. FYBSZ
+#: chart2/uiconfig/ui/sidebarelements.ui:367
+msgctxt "sidebarelements|checkbutton_gridline_vertical_major"
+msgid "Vertical major"
+msgstr "الأساسي الرأسي"
+
+#. VCTTS
+#: chart2/uiconfig/ui/sidebarelements.ui:382
+msgctxt "sidebarelements|checkbutton_gridline_horizontal_minor"
+msgid "Horizontal minor"
+msgstr "الثانوي الأفقي"
+
+#. QDFEZ
+#: chart2/uiconfig/ui/sidebarelements.ui:397
+msgctxt "sidebarelements|checkbutton_gridline_vertical_minor"
+msgid "Vertical minor"
+msgstr "الثانوي الرأسي"
+
+#. uacDo
+#: chart2/uiconfig/ui/sidebarelements.ui:419
+msgctxt "sidebarelements|text_title"
+msgid "Title"
+msgstr "العنوان"
+
+#. jXGDE
+#: chart2/uiconfig/ui/sidebarelements.ui:432
+msgctxt "sidebarelements|text_subtitle"
+msgid "Subtitle"
+msgstr "العنوان الفرعي"
+
+#. zszn2
+#: chart2/uiconfig/ui/sidebarelements.ui:445
+msgctxt "sidebarelements|placement_label"
+msgid "_Placement:"
+msgstr "ال_مكان:"
+
+#. SCPM4
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:48
+msgctxt "sidebarerrorbar|label2"
+msgid "Category:"
+msgstr "الصنف:"
+
+#. 8Pb84
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:63
+msgctxt "sidebarerrorbar|comboboxtext_type"
+msgid "Constant"
+msgstr "الثابت"
+
+#. Lz8Lo
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:64
+msgctxt "sidebarerrorbar|comboboxtext_type"
+msgid "Percentage"
+msgstr "النسبة المئوية"
+
+#. Ap367
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:65
+msgctxt "sidebarerrorbar|comboboxtext_type"
+msgid "Cell Range or Data Table"
+msgstr "مجال الخلية أو جدول البيانات"
+
+#. Lqw6L
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:66
+msgctxt "sidebarerrorbar|comboboxtext_type"
+msgid "Standard deviation"
+msgstr "الانحراف المعياري"
+
+#. qUL78
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:67
+msgctxt "sidebarerrorbar|comboboxtext_type"
+msgid "Standard error"
+msgstr "خطأ قياسي"
+
+#. KUCgB
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:68
+msgctxt "sidebarerrorbar|comboboxtext_type"
+msgid "Variance"
+msgstr "التباين"
+
+#. QDwJu
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:69
+msgctxt "sidebarerrorbar|comboboxtext_type"
+msgid "Error margin"
+msgstr "هامش الخطأ"
+
+#. US82z
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:82
+msgctxt "sidebarerrorbar|label3"
+msgid "Positive (+):"
+msgstr "الموجب (+):"
+
+#. NJdbG
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:94
+msgctxt "sidebarerrorbar|label4"
+msgid "Negative (-):"
+msgstr "السّالب (-):"
+
+#. GBewc
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
+msgctxt "sidebarerrorbar|spinbutton_pos"
+msgid "0.00"
+msgstr "٠٫٠٠"
+
+#. e3GvR
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:119
+msgctxt "sidebarerrorbar|spinbutton_neg"
+msgid "0.00"
+msgstr "٠٫٠٠"
+
+#. 34Vax
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:139
+msgctxt "sidebarerrorbar|radiobutton_positive_negative|tooltip_text"
+msgid "Positive and Negative"
+msgstr "الموجب و السّالب"
+
+#. gETvJ
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:156
+msgctxt "sidebarerrorbar|radiobutton_positive|tooltip_text"
+msgid "Positive"
+msgstr "الموجب"
+
+#. 3Ur2d
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:173
+msgctxt "sidebarerrorbar|radiobutton_negative|tooltip_text"
+msgid "Negative"
+msgstr "السّالب"
+
+#. iCPU4
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:196
+msgctxt "sidebarerrorbar|label5"
+msgid "Indicator"
+msgstr "المؤشر"
+
+#. qJBsd
+#: chart2/uiconfig/ui/sidebarseries.ui:38
+msgctxt "sidebarseries|checkbutton_label"
+msgid "Show data labels"
+msgstr "اعرض لصيقات البيانات"
+
+#. Dk3GN
+#: chart2/uiconfig/ui/sidebarseries.ui:56
+msgctxt "sidebarseries|comboboxtext_label"
+msgid "Above"
+msgstr "بالأعلى"
+
+#. e4znD
+#: chart2/uiconfig/ui/sidebarseries.ui:57
+msgctxt "sidebarseries|comboboxtext_label"
+msgid "Below"
+msgstr "بالأسفل"
+
+#. CWwzt
+#: chart2/uiconfig/ui/sidebarseries.ui:58
+msgctxt "sidebarseries|comboboxtext_label"
+msgid "Center"
+msgstr "وسط"
+
+#. osWVq
+#: chart2/uiconfig/ui/sidebarseries.ui:59
+msgctxt "sidebarseries|comboboxtext_label"
+msgid "Outside"
+msgstr "بالخارج"
+
+#. U3N4S
+#: chart2/uiconfig/ui/sidebarseries.ui:60
+msgctxt "sidebarseries|comboboxtext_label"
+msgid "Inside"
+msgstr "بالداخل"
+
+#. pAmg7
+#: chart2/uiconfig/ui/sidebarseries.ui:61
+msgctxt "sidebarseries|comboboxtext_label"
+msgid "Near origin"
+msgstr "قرب الأصل"
+
+#. erC9C
+#: chart2/uiconfig/ui/sidebarseries.ui:71
+msgctxt "sidebarseries|checkbutton_trendline"
+msgid "Show trendline"
+msgstr "اعرض خط الاتجاه"
+
+#. FFPa2
+#: chart2/uiconfig/ui/sidebarseries.ui:92
+msgctxt "sidebarseries|label1"
+msgid "Error Bars"
+msgstr "أشرطة الخطأ"
+
+#. bXUND
+#: chart2/uiconfig/ui/sidebarseries.ui:105
+msgctxt "sidebarseries|checkbutton_y_error"
+msgid "Y error bars"
+msgstr "أشرطة خطأ ص"
+
+#. zK6DE
+#: chart2/uiconfig/ui/sidebarseries.ui:121
+msgctxt "sidebarseries|checkbutton_x_error"
+msgid "X error bars"
+msgstr "أشرطة خطأ س"
+
+#. qE5HF
+#: chart2/uiconfig/ui/sidebarseries.ui:142
+msgctxt "sidebarseries|axis_label"
+msgid "Align Series to Axis"
+msgstr "محاذاة السلاسل للمحور"
+
+#. fvnkG
+#: chart2/uiconfig/ui/sidebarseries.ui:157
+msgctxt "sidebarseries|label_series_tmpl"
+msgid "Data series '%1'"
+msgstr "سلسلة البيانات ’%1‘"
+
+#. vhdnt
+#: chart2/uiconfig/ui/sidebarseries.ui:173
+msgctxt "sidebarseries|radiobutton_primary_axis"
+msgid "Primary Y axis"
+msgstr "محور ص الأساسيّ"
+
+#. VPWVq
+#: chart2/uiconfig/ui/sidebarseries.ui:189
+msgctxt "sidebarseries|radiobutton_secondary_axis"
+msgid "Secondary Y axis"
+msgstr "محور ص الثّانويّ"
+
+#. BsC9D
+#: chart2/uiconfig/ui/sidebarseries.ui:218
+msgctxt "sidebarseries|label_box"
+msgid "P_lacement:"
+msgstr "الم_كان:"
+
+#. mZfrk
+#: chart2/uiconfig/ui/sidebartype.ui:74
+msgctxt "sidebartype|3dlook"
+msgid "_3D Look"
+msgstr "_مظهر ثلاثي الأبعاد"
+
+#. mjrkY
+#: chart2/uiconfig/ui/sidebartype.ui:90
+msgctxt "sidebartype|3dscheme"
+msgid "Simple"
+msgstr "بسيط"
+
+#. urfc7
+#: chart2/uiconfig/ui/sidebartype.ui:91
+msgctxt "sidebartype|3dscheme"
+msgid "Realistic"
+msgstr "واقعي"
+
+#. gYXXE
+#: chart2/uiconfig/ui/sidebartype.ui:105
+msgctxt "sidebartype|shapeft"
+msgid "Sh_ape"
+msgstr "شك_ل"
+
+#. B6KS5
+#: chart2/uiconfig/ui/sidebartype.ui:153
+msgctxt "sidebartype|stack"
+msgid "_Stack series"
+msgstr ""
+
+#. KaS7Z
+#: chart2/uiconfig/ui/sidebartype.ui:170
+msgctxt "sidebartype|linetypeft"
+msgid "_Line type"
+msgstr "_شكل الخط"
+
+#. Hqc3N
+#: chart2/uiconfig/ui/sidebartype.ui:183
+msgctxt "sidebartype|linetype"
+msgid "Straight"
+msgstr "مستقيم"
+
+#. EB58Z
+#: chart2/uiconfig/ui/sidebartype.ui:184
+msgctxt "sidebartype|linetype"
+msgid "Smooth"
+msgstr "سلس"
+
+#. qLn3k
+#: chart2/uiconfig/ui/sidebartype.ui:185
+msgctxt "sidebartype|linetype"
+msgid "Stepped"
+msgstr "متدرج"
+
+#. jKDXh
+#: chart2/uiconfig/ui/sidebartype.ui:195
+msgctxt "sidebartype|properties"
+msgid "Properties..."
+msgstr "الخصائص..."
+
+#. xW9CQ
+#: chart2/uiconfig/ui/sidebartype.ui:207
+msgctxt "sidebartype|sort"
+msgid "_Sort by X values"
+msgstr "_ترتيب حسب قيم 'س'"
+
+#. thu3G
+#: chart2/uiconfig/ui/sidebartype.ui:223
+msgctxt "sidebartype|nolinesft"
+msgid "_Number of lines"
+msgstr "_عدد الأسطر"
+
+#. Yau6n
+#: chart2/uiconfig/ui/sidebartype.ui:282
+msgctxt "sidebartype|ontop"
+msgid "On top"
+msgstr "أعلى"
+
+#. f2J43
+#: chart2/uiconfig/ui/sidebartype.ui:298
+msgctxt "sidebartype|percent"
+msgid "Percent"
+msgstr "نسبة مئوية"
+
+#. iDSaa
+#: chart2/uiconfig/ui/sidebartype.ui:314
+msgctxt "sidebartype|deep"
+msgid "Deep"
+msgstr "عميق"
+
+#. Ledzw
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:22
+msgctxt "smoothlinesdlg|SmoothLinesDialog"
+msgid "Smooth Lines"
+msgstr "خطوط متجانسة"
+
+#. vmRbz
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:114
+msgctxt "smoothlinesdlg|TypeLabel"
+msgid "Line _Type:"
+msgstr "_نوع الخطّ:"
+
+#. Nkqhi
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:131
+msgctxt "smoothlinesdlg|SplineTypeComboBox"
+msgid "Cubic spline"
+msgstr "خط تكعيبي تقريبي"
+
+#. LTCVw
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:132
+msgctxt "smoothlinesdlg|SplineTypeComboBox"
+msgid "B-spline"
+msgstr ""
+
+#. EJdNq
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:136
+msgctxt "smoothlinesdlg|extended_tip|SplineTypeComboBox"
+msgid "Apply a line curve model."
+msgstr "تطبيق نموذج الخط المنحني"
+
+#. eecxc
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:167
+msgctxt "smoothlinesdlg|ResolutionLabel"
+msgid "_Resolution:"
+msgstr "المي_ز:"
+
+#. AdG5v
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:181
+msgctxt "smoothlinesdlg|PolynomialsLabel"
+msgid "_Degree of polynomials:"
+msgstr "درجة متعددات الحدود"
+
+#. X35yY
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:199
+msgctxt "smoothlinesdlg|extended_tip|ResolutionSpinbutton"
+msgid "Set the resolution."
+msgstr "ضبط الإضاءة."
+
+#. a4btg
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:217
+msgctxt "smoothlinesdlg|extended_tip|PolynomialsSpinButton"
+msgid "Set the degree of the polynomials."
+msgstr "ضبط درجة متعددات الحدود."
+
+#. YECJR
+#: chart2/uiconfig/ui/smoothlinesdlg.ui:249
+msgctxt "smoothlinesdlg|extended_tip|SmoothLinesDialog"
+msgid "Apply a line curve model."
+msgstr "تطبيق نموذج الخط المائل."
+
+#. RyJg5
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:128
+msgctxt "steppedlinesdlg|step_start_rb"
+msgid "_Start with horizontal line"
+msgstr "اب_دأ مع الخط الأفقي"
+
+#. Zcr4L
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:137
+msgctxt "steppedlinesdlg|extended_tip|step_start_rb"
+msgid "Start with horizontal line and step up vertically at the end."
+msgstr "ابدأ مع الخط الأفقي و تقدم شاقوليا للأمام."
+
+#. iJCAt
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:148
+msgctxt "steppedlinesdlg|step_center_x_rb"
+msgid "Step at the _horizontal mean"
+msgstr "تقدم على ال_متوسط الأفقي"
+
+#. D5DGL
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:157
+msgctxt "steppedlinesdlg|extended_tip|step_center_x_rb"
+msgid "Start to step up vertically and end with horizontal line."
+msgstr "ابدا التقدم شاقوليا و انته بالخط الأفقي."
+
+#. vtGik
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:168
+msgctxt "steppedlinesdlg|step_end_rb"
+msgid "_End with horizontal line"
+msgstr "انته مع الخط الأفقي"
+
+#. nGAhe
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:177
+msgctxt "steppedlinesdlg|extended_tip|step_end_rb"
+msgid "Start with horizontal line, step up vertically in the middle of the X values and end with horizontal line."
+msgstr "ابدا مع الخط الأفقي، تقدم شاقوليا في الوسط لقيم 'س' و انته مع الخط الأفقي"
+
+#. X3536
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:188
+msgctxt "steppedlinesdlg|step_center_y_rb"
+msgid "Step to the _vertical mean"
+msgstr ""
+
+#. S528C
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:197
+msgctxt "steppedlinesdlg|extended_tip|step_center_y_rb"
+msgid "Start to step up vertically to the middle of the Y values, draw a horizontal line and finish by stepping vertically to the end."
+msgstr "ابدأ بالتقدم شاقوليا حتى المنتصف مع قيم 'ع'، ارسم خط أفقي و انته بالتقدم شاقوليا للنهاية."
+
+#. oDDMr
+#: chart2/uiconfig/ui/steppedlinesdlg.ui:223
+msgctxt "steppedlinesdlg|label2"
+msgid "Type of Stepping"
+msgstr "نوع الدّرجيّة"
+
+#. K2DaE
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:43
+msgctxt "titlerotationtabpage|extended_tip|OrientDegree"
+msgid "Allows you to manually enter the orientation angle."
+msgstr "تسمح لك بإدخالزاوية الإتجاه يدويا."
+
+#. ViJ9k
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:57
+msgctxt "titlerotationtabpage|degreeL"
+msgid "_Degrees"
+msgstr "_درجة"
+
+#. tv9xJ
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:92
+msgctxt "titlerotationtabpage|stackedCB"
+msgid "Ve_rtically stacked"
+msgstr "مترا_صة رأسيًا"
+
+#. VGDph
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:101
+msgctxt "titlerotationtabpage|extended_tip|stackedCB"
+msgid "Assigns vertical text orientation for cell contents."
+msgstr "تطبيق الإتجاه الشاقولي للنص لمحتوى الخلية."
+
+#. 3BaMa
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:113
+msgctxt "titlerotationtabpage|labelABCD"
+msgid "ABCD"
+msgstr "أبجد"
+
+#. dAHWb
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:130
+msgctxt "titlerotationtabpage|textdirL"
+msgid "Te_xt direction:"
+msgstr "اتّجاه النّ_صّ:"
+
+#. i5UYm
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:144
+msgctxt "titlerotationtabpage|extended_tip|textdirLB"
+msgid "Specify the text direction for a paragraph that uses complex text layout (CTL). This feature is only available if complex text layout support is enabled."
+msgstr "حدد اتجاه النص لفقرة تستعمل اتجاه كتابة مركّب. هذه الخاصية متاحة فقط إذا كان دعم اتجاه الكتابة المركّب مفعّل."
+
+#. 9cDiw
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:163
+msgctxt "titlerotationtabpage|extended_tip|dialCtrl"
+msgid "Clicking anywhere on the wheel defines the variable text orientation."
+msgstr "النقر في أي مكان من العجلة يضبط اتجاه النص المتغيّر."
+
+#. syx89
+#: chart2/uiconfig/ui/titlerotationtabpage.ui:178
+msgctxt "titlerotationtabpage|labelTextOrient"
+msgid "Text Orientation"
+msgstr "اتّجاه النّصّ"
+
+#. CDDxo
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:20
+msgctxt "tp_3D_SceneAppearance|FT_SCHEME"
+msgid "Sche_me"
+msgstr "الم_خطّط"
+
+#. 4uCgf
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:36
+msgctxt "tp_3D_SceneAppearance|liststoreSCHEME"
+msgid "Simple"
+msgstr "بسيط"
+
+#. uVRvv
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:37
+msgctxt "tp_3D_SceneAppearance|liststoreSCHEME"
+msgid "Realistic"
+msgstr "واقعي"
+
+#. tFKjs
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:38
+msgctxt "tp_3D_SceneAppearance|liststoreSCHEME"
+msgid "Custom"
+msgstr "مخصص"
+
+#. raML6
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:42
+msgctxt "tp_3D_SceneAppearance|extended_tip|LB_SCHEME"
+msgid "Select a scheme from the list box, or click any of the check boxes below."
+msgstr "حدّد مخطط من القائمة المسندلة. أو أنقر في أحد صناديق الخيارات هنا."
+
+#. EyGsf
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:78
+msgctxt "tp_3D_SceneAppearance|CB_SHADING"
+msgid "_Shading"
+msgstr "_تظليل"
+
+#. W68hV
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:86
+msgctxt "tp_3D_SceneAppearance|extended_tip|CB_SHADING"
+msgid "Applies Gouraud shading if marked, or flat shading if unmarked."
+msgstr ""
+
+#. SMFrD
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:98
+msgctxt "tp_3D_SceneAppearance|CB_OBJECTLINES"
+msgid "_Object borders"
+msgstr "حدود ال_كائن"
+
+#. CQjGV
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:106
+msgctxt "tp_3D_SceneAppearance|extended_tip|CB_OBJECTLINES"
+msgid "Shows borders around the areas by setting the line style to Solid."
+msgstr "إظهار الحدود حول المناطق بإعداد نمط الخط لصلب."
+
+#. CpWRj
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:118
+msgctxt "tp_3D_SceneAppearance|CB_ROUNDEDEDGE"
+msgid "_Rounded edges"
+msgstr "حوافّ م_دوّرة"
+
+#. c5pNB
+#: chart2/uiconfig/ui/tp_3D_SceneAppearance.ui:126
+msgctxt "tp_3D_SceneAppearance|extended_tip|CB_ROUNDEDEDGE"
+msgid "Edges are rounded by 5%."
+msgstr "الحواف مستديرة بـ 5 بالمئة."
+
+#. U5CTF
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:37
+msgctxt "tp_3D_SceneGeometry|CBX_RIGHT_ANGLED_AXES"
+msgid "_Right-angled axes"
+msgstr "محاور يمينية الزاوية"
+
+#. QxmLn
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:45
+msgctxt "tp_3D_SceneGeometry|extended_tip|CBX_RIGHT_ANGLED_AXES"
+msgid "If Right-angled axes is enabled, you can rotate the chart contents only in X and Y direction, that is, parallel to the chart borders. Right-angled axes is enabled by default for newly created 3D charts. Pie and Donut charts do not support right-angled axes."
+msgstr ""
+"إذا كانت المحاور يمينية الدوران مفعلّة، يُمكنك تدوير محتوى المخطط البياني فقط في اتجاه 'س' و 'ع'، هذا مُوازٍ لحدود المخطط البياني.\n"
+"المحاور يمينية الدوران مفعّلة بشكل افتراضي للمخططات ثلاثية الأبعاد المستجدّة. مخططات الفطيرة و الدونات لا تدعم محاور الدوران اليمينية."
+
+#. y8Tyg
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:59
+msgctxt "tp_3D_SceneGeometry|FT_X_ROTATION"
+msgid "_X rotation"
+msgstr "دوران _س"
+
+#. TJ2Xp
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:73
+msgctxt "tp_3D_SceneGeometry|FT_Y_ROTATION"
+msgid "_Y rotation"
+msgstr "دوران _ص"
+
+#. UTAG5
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:87
+msgctxt "tp_3D_SceneGeometry|FT_Z_ROTATION"
+msgid "_Z rotation"
+msgstr "دوران _ع"
+
+#. ZC8ZQ
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:99
+msgctxt "tp_3D_SceneGeometry|CBX_PERSPECTIVE"
+msgid "_Perspective"
+msgstr "من_ظور"
+
+#. xyePC
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:110
+msgctxt "tp_3D_SceneGeometry|extended_tip|CBX_PERSPECTIVE"
+msgid "Mark the Perspective box to view the chart as through a camera lens. Use the spin button to set the percentage. With a high percentage nearer objects look bigger than more distant objects."
+msgstr "قم بتعليم صندوق المنظور لرؤية المخطط البياني لرؤيته كما يبدو من عدسة كاميرا. استخدم زر التدوير لضبط النسبة المئوية. بالنسب المئوية العالية الأشياء القريبة ستبدو أكبر من الأشياء البعيدة."
+
+#. mdPAi
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:131
+msgctxt "tp_3D_SceneGeometry|MTR_FLD_PERSPECTIVE-atkobject"
+msgid "Perspective"
+msgstr "المنظور"
+
+#. JECHC
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:132
+msgctxt "tp_3D_SceneGeometry|extended_tip|MTR_FLD_PERSPECTIVE"
+msgid "Mark the Perspective box to view the chart as through a camera lens. Use the spin button to set the percentage. With a high percentage nearer objects look bigger than more distant objects."
+msgstr "قم بتعليم صندوق النظور لرؤية الشكل البياني من منظور عدسة الكاميرا. استخدم زر الدوران لضبط النسبة المئوية. مع النسب المئوية العالية الأشياء القريبة ستبدو أكبر من الأشياء البعيدة."
+
+#. PP8jT
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:150
+msgctxt "tp_3D_SceneGeometry|extended_tip|MTR_FLD_Z_ROTATION"
+msgid "Sets the rotation of the chart on the z axis. The preview responds to the new settings."
+msgstr "ضبط دوران المخطط البياني في محور 'ص'. الرؤية تكون الإعدادات الجديدة."
+
+#. AyMWn
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:168
+msgctxt "tp_3D_SceneGeometry|extended_tip|MTR_FLD_Y_ROTATION"
+msgid "Sets the rotation of the chart on the y axis. The preview responds to the new settings."
+msgstr "ضبط دوران المخطط البياني في محور 'ع'. الرؤية تكون بالإعدادات الجديدة."
+
+#. EGS4B
+#: chart2/uiconfig/ui/tp_3D_SceneGeometry.ui:186
+msgctxt "tp_3D_SceneGeometry|extended_tip|MTR_FLD_X_ROTATION"
+msgid "Sets the rotation of the chart on the x axis. The preview responds to the new settings."
+msgstr "ضبط دوران المخطط البياني في محور 'س'. الرؤية تكون بالإعدادات الجديدة."
+
+#. RGQDC
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:92
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_1|tooltip_text"
+msgid "Light source 1"
+msgstr "مصدر الضّوء 1"
+
+#. EQb5g
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:97
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_1"
+msgid "Click to enable or disable the specular light source with highlights."
+msgstr "انقر لتفعيل أو تعطيل مصدر مسلاط الضوء."
+
+#. bwfDH
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:111
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_2|tooltip_text"
+msgid "Light source 2"
+msgstr "مصدر الضّوء 2"
+
+#. jkJM8
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:116
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_2"
+msgid "Click to enable or disable the uniform light source."
+msgstr "انقر لتفعيل أو تعطيل مصدر الضوء الموحّد."
+
+#. uMVDV
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:130
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_3|tooltip_text"
+msgid "Light source 3"
+msgstr "مصدر الضّوء 3"
+
+#. ZEUk7
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:135
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_3"
+msgid "Click to enable or disable the uniform light source."
+msgstr "انقر لتفعيل أو تعطيل مصدر الضوء الموحد."
+
+#. 6CBDG
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:149
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_4|tooltip_text"
+msgid "Light source 4"
+msgstr "مصدر الضّوء 4"
+
+#. X5ZD3
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:154
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_4"
+msgid "Click to enable or disable the uniform light source."
+msgstr "انقر لتفعيل أو تعطيل مصدر الضوء الموحّد."
+
+#. Hf5Du
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:168
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_5|tooltip_text"
+msgid "Light source 5"
+msgstr "مصدر الضّوء 5"
+
+#. mUPX4
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:173
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_5"
+msgid "Click to enable or disable the uniform light source."
+msgstr "انقر لتفعيل أو تعطيل مصدر الضوء الموحّد."
+
+#. T7qDZ
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:187
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_6|tooltip_text"
+msgid "Light source 6"
+msgstr "مصدر الضّوء 6"
+
+#. AAkx2
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:192
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_6"
+msgid "Click to enable or disable the uniform light source."
+msgstr "انقر لتفعيل أو تعطيل مصدر الضوء الموحّد."
+
+#. mSsDD
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:206
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_7|tooltip_text"
+msgid "Light source 7"
+msgstr "مصدر الضّوء 7"
+
+#. Rh9Hz
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:211
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_7"
+msgid "Click to enable or disable the uniform light source."
+msgstr "انقر لتفعيل أو تعطيل مصدر الضوء الموحّد."
+
+#. wY5CR
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:225
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHT_8|tooltip_text"
+msgid "Light source 8"
+msgstr "مصدر الضّوء 8"
+
+#. EbsUA
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:230
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHT_8"
+msgid "Click to enable or disable the uniform light source."
+msgstr "انقر لتفعيل أو تعطيل مصدر الضوء الموحّد."
+
+#. DwEDc
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:264
+msgctxt "tp_3D_SceneIllumination|extended_tip|LB_LIGHTSOURCE"
+msgid "Select a color for the selected light source."
+msgstr "حدّد لون خاص بمصدر الضوء المُحدّد."
+
+#. gfdAB
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:279
+msgctxt "tp_3D_SceneIllumination|BTN_LIGHTSOURCE_COLOR|tooltip_text"
+msgid "Select a color using the color dialog"
+msgstr "اختر لونًا باستخدام حوار الألوان"
+
+#. JnBhP
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:283
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_LIGHTSOURCE_COLOR"
+msgid "Select a color using the color dialog."
+msgstr "استخدم علبة الحوار لتحديد لون."
+
+#. mgXyK
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:306
+msgctxt "tp_3D_SceneIllumination|FT_LIGHTSOURCE"
+msgid "_Light Source"
+msgstr "مصدر ال_ضوء"
+
+#. WssJA
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:348
+msgctxt "tp_3D_SceneIllumination|extended_tip|LB_AMBIENTLIGHT"
+msgid "Select a color for the ambient light."
+msgstr "حدّد لون خاص بالضوء المحيط."
+
+#. NpAu7
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:363
+msgctxt "tp_3D_SceneIllumination|BTN_AMBIENT_COLOR|tooltip_text"
+msgid "Select a color using the color dialog"
+msgstr "اختر لونًا باستخدام حوار الألوان"
+
+#. 943Za
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:367
+msgctxt "tp_3D_SceneIllumination|extended_tip|BTN_AMBIENT_COLOR"
+msgid "Select a color using the color dialog."
+msgstr "استخدم علبة الحوار لتحديد لون."
+
+#. LFMGL
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:383
+msgctxt "tp_3D_SceneIllumination|FT_AMBIENTLIGHT"
+msgid "_Ambient Light"
+msgstr "الضوء المحي_ط"
+
+#. snUGf
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:427
+msgctxt "tp_3D_SceneIllumination|CTL_LIGHT_PREVIEW|tooltip_text"
+msgid "Light Preview"
+msgstr "معاينة الضوء"
+
+#. tQBhd
+#: chart2/uiconfig/ui/tp_3D_SceneIllumination.ui:485
+msgctxt "tp_3D_SceneIllumination|extended_tip|tp_3D_SceneIllumination"
+msgid "Set the light sources for the 3D view."
+msgstr "حدد مصادر الضوء للمشاهد ثلاثية الأبعاد."
+
+#. XRVrG
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:44
+msgctxt "tp_AxisPositions|FT_CROSSES_OTHER_AXIS_AT"
+msgid "_Cross other axis at"
+msgstr "أُعبر المحاور الأخرى عند"
+
+#. Z734o
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:60
+msgctxt "tp_AxisPositions|LB_CROSSES_OTHER_AXIS_AT"
+msgid "Start"
+msgstr "بدء"
+
+#. u6i7J
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:61
+msgctxt "tp_AxisPositions|LB_CROSSES_OTHER_AXIS_AT"
+msgid "End"
+msgstr "إنهاء"
+
+#. vAUzq
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:62
+msgctxt "tp_AxisPositions|LB_CROSSES_OTHER_AXIS_AT"
+msgid "Value"
+msgstr "القيمة"
+
+#. 5CSqT
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:63
+msgctxt "tp_AxisPositions|LB_CROSSES_OTHER_AXIS_AT"
+msgid "Category"
+msgstr "الصنف"
+
+#. eKYhk
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:67
+msgctxt "tp_AxisPositions|extended_tip|LB_CROSSES_OTHER_AXIS_AT"
+msgid "Select where to cross the other axis: at start, at end, at a specified value, or at a category."
+msgstr "حدد أين ستقطع المحور الآخر: عند البداية، عند النهاية، عند قيمة محدّدة، أو عند فئة."
+
+#. FwCEp
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:86
+msgctxt "tp_AxisPositions|extended_tip|EDT_CROSSES_OTHER_AXIS_AT"
+msgid "Enter the value where the axis line should cross the other axis."
+msgstr "أدخل القيمة حيث خط المحور يقطع المحور الآخر."
+
+#. AnLbY
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:110
+msgctxt "tp_AxisPositions|extended_tip|EDT_CROSSES_OTHER_AXIS_AT_CATEGORY"
+msgid "Select the category where the axis line should cross the other axis."
+msgstr "حدد الفئة حيث خط المحور يقطع المحور الآخر."
+
+#. VYVhe
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:129
+msgctxt "tp_AxisPositions|CB_AXIS_BETWEEN_CATEGORIES"
+msgid "Axis _between categories"
+msgstr "محور _بين الفئات"
+
+#. bW7T9
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:147
+msgctxt "tp_AxisPositions|TXT_AXIS_LINE"
+msgid "Axis Line"
+msgstr "خطّ المحور"
+
+#. 5ezBt
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:177
+msgctxt "tp_AxisPositions|RB_ON"
+msgid "_On tick marks"
+msgstr "عل_ى علامات التأشير"
+
+#. FaKJZ
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:186
+msgctxt "tp_AxisPositions|extended_tip|RB_ON"
+msgid "Specifies that the axis is positioned on the first/last tickmarks. This makes the data points visual representation begin/end at the value axis."
+msgstr "تُشير إلى أن المحور متموضع على أول/آخر علامة. هذا يجعل العرض المرئي لنقاط البيانات يبدأ/ينتهي عند قيمة المحور."
+
+#. gSFeZ
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:197
+msgctxt "tp_AxisPositions|RB_BETWEEN"
+msgid "_Between tick marks"
+msgstr "_بين علامات التأشير"
+
+#. BSx2x
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:206
+msgctxt "tp_AxisPositions|extended_tip|RB_BETWEEN"
+msgid "Specifies that the axis is positioned between the tickmarks. This makes the data points visual representation begin/end at a distance from the value axis."
+msgstr "تُشير أن المحور متموضع على أول/آخر علامة. هذا يجعل العرض المرئي لنقاط البيانات  يبدأ/ينتهي عند قيمة المحور."
+
+#. ExBDm
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:221
+msgctxt "tp_AxisPositions|TXT_POSITION"
+msgid "Position Axis"
+msgstr "موقع المحور"
+
+#. 5AGbD
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:258
+msgctxt "tp_AxisPositions|FT_PLACE_LABELS"
+msgid "_Place labels"
+msgstr "مو_ضع اللصائق"
+
+#. GDk2L
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:274
+msgctxt "tp_AxisPositions|LB_PLACE_LABELS"
+msgid "Near axis"
+msgstr "قرب المحور"
+
+#. ZWQzB
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:275
+msgctxt "tp_AxisPositions|LB_PLACE_LABELS"
+msgid "Near axis (other side)"
+msgstr "قرب المحور (الجانب الآخر)"
+
+#. j3GGm
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:276
+msgctxt "tp_AxisPositions|LB_PLACE_LABELS"
+msgid "Outside start"
+msgstr "بدأ للخارج"
+
+#. mGDNr
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:277
+msgctxt "tp_AxisPositions|LB_PLACE_LABELS"
+msgid "Outside end"
+msgstr "نهاية للخارج"
+
+#. ChAqv
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:281
+msgctxt "tp_AxisPositions|extended_tip|LB_PLACE_LABELS"
+msgid "Select where to place the labels: near axis, near axis (other side), outside start, or outside end."
+msgstr "حدد أين ستضع الصيغ: بجانب المحور، بجانب المحور (الجهة الأخرى)، بدء للخارج، انهاء للخارج."
+
+#. DUNn4
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:306
+msgctxt "tp_AxisPositions|FT_AXIS_LABEL_DISTANCE"
+msgid "_Distance"
+msgstr "الم_سافة"
+
+#. Hkjze
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:343
+msgctxt "tp_AxisPositions|TXT_FL_LABELS"
+msgid "Labels"
+msgstr "اللصائق"
+
+#. YBk4g
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:382
+msgctxt "tp_AxisPositions|FT_MAJOR"
+msgid "Major:"
+msgstr "أعلى:"
+
+#. G8MEU
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:398
+msgctxt "tp_AxisPositions|FT_MINOR"
+msgid "Minor:"
+msgstr "أدنى:"
+
+#. UN6Pr
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:412
+msgctxt "tp_AxisPositions|CB_TICKS_INNER"
+msgid "_Inner"
+msgstr "_داخلي"
+
+#. DpVNk
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:423
+msgctxt "tp_AxisPositions|extended_tip|CB_TICKS_INNER"
+msgid "Specifies that marks are placed on the inner side of the axis."
+msgstr "تحدد أن العلامات موضوعة في الجهة الداخلية للمحور."
+
+#. EhLxm
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:434
+msgctxt "tp_AxisPositions|CB_TICKS_OUTER"
+msgid "_Outer"
+msgstr "_خارجي"
+
+#. DGWEb
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:445
+msgctxt "tp_AxisPositions|extended_tip|CB_TICKS_OUTER"
+msgid "Specifies that marks are placed on the outer side of the axis."
+msgstr "تحدد بأن العلامات موضوعة في الجهة الخارجية للمحور."
+
+#. RJXic
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:456
+msgctxt "tp_AxisPositions|CB_MINOR_INNER"
+msgid "I_nner"
+msgstr "_داخلي"
+
+#. jbRx3
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:467
+msgctxt "tp_AxisPositions|extended_tip|CB_MINOR_INNER"
+msgid "Specifies that minor interval marks are placed on the inner side of the axis."
+msgstr "تُشير أن العلامة البينية الدُنا موضوعة بالجهة الداخلية للمحور."
+
+#. nBCFJ
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:478
+msgctxt "tp_AxisPositions|CB_MINOR_OUTER"
+msgid "O_uter"
+msgstr "خار_جي"
+
+#. JAi2f
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:489
+msgctxt "tp_AxisPositions|extended_tip|CB_MINOR_OUTER"
+msgid "Specifies that minor interval marks are placed on the outer side of the axis."
+msgstr "تُشير بأن العلامات البينية الدُنيا موضوعة على الجهة الخارجية للمحور."
+
+#. XWuxR
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:514
+msgctxt "tp_AxisPositions|FT_PLACE_TICKS"
+msgid "Place _marks"
+msgstr "موضع ال_علامات"
+
+#. mvGBB
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:530
+msgctxt "tp_AxisPositions|LB_PLACE_TICKS"
+msgid "At labels"
+msgstr "عند اللصائق"
+
+#. dGAYz
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:531
+msgctxt "tp_AxisPositions|LB_PLACE_TICKS"
+msgid "At axis"
+msgstr "عند المحور"
+
+#. TJAJB
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:532
+msgctxt "tp_AxisPositions|LB_PLACE_TICKS"
+msgid "At axis and labels"
+msgstr "عند المحور واللصائق"
+
+#. tED2r
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:536
+msgctxt "tp_AxisPositions|extended_tip|LB_PLACE_TICKS"
+msgid "Select where to place the marks: at labels, at axis, or at axis and labels."
+msgstr "اختر مكان العلامات: عند الصيغ، عند المحور، أو عند المحور و الصيغ."
+
+#. jK9rf
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:559
+msgctxt "tp_AxisPositions|TXT_FL_TICKS"
+msgid "Interval Marks"
+msgstr "علامات الفترات"
+
+#. 4Jp7G
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:589
+msgctxt "tp_AxisPositions|CB_MAJOR_GRID"
+msgid "Show major _grid"
+msgstr "اعرض ال_شبكة الرئيسية"
+
+#. 7c2Hs
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:603
+msgctxt "tp_AxisPositions|CB_MINOR_GRID"
+msgid "_Show minor grid"
+msgstr "ا_عرض الشبكة الثانوية"
+
+#. Dp5Ar
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:617
+msgctxt "tp_AxisPositions|PB_MAJOR_GRID"
+msgid "Mo_re..."
+msgstr "أ_كثر..."
+
+#. k5VQQ
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:630
+msgctxt "tp_AxisPositions|PB_MINOR_GRID"
+msgid "Mor_e..."
+msgstr "أك_ثر..."
+
+#. 7eDLK
+#: chart2/uiconfig/ui/tp_AxisPositions.ui:647
+msgctxt "tp_AxisPositions|label2"
+msgid "Grids"
+msgstr "الشّبكات"
+
+#. CUoe3
+#: chart2/uiconfig/ui/tp_ChartType.ui:48
+msgctxt "tp_ChartType|FT_CAPTION_FOR_WIZARD"
+msgid "Choose a Chart Type"
+msgstr "اختر نوع الرّسم البيانيّ"
+
+#. wBFXQ
+#: chart2/uiconfig/ui/tp_ChartType.ui:94
+msgctxt "tp_ChartType|extended_tip|subtype"
+msgid "Select a sub type of the basic chart type."
+msgstr "اختر نوع فرعي لنوع المخطط البياني الرئيسي."
+
+#. FSf6b
+#: chart2/uiconfig/ui/tp_ChartType.ui:123
+msgctxt "tp_ChartType|3dlook"
+msgid "_3D Look"
+msgstr "مظهر ال_ثّلاثيّ الأبعاد"
+
+#. EB95g
+#: chart2/uiconfig/ui/tp_ChartType.ui:133
+msgctxt "tp_ChartType|extended_tip|3dlook"
+msgid "Enables a 3D look for the data values."
+msgstr "يُفعّل منظر ثلاثي الأبعاد لقيم البيانات."
+
+#. FprGw
+#: chart2/uiconfig/ui/tp_ChartType.ui:147
+msgctxt "tp_ChartType|3dscheme"
+msgid "Simple"
+msgstr "بسيط"
+
+#. pKhfX
+#: chart2/uiconfig/ui/tp_ChartType.ui:148
+msgctxt "tp_ChartType|3dscheme"
+msgid "Realistic"
+msgstr "واقعي"
+
+#. zZxWG
+#: chart2/uiconfig/ui/tp_ChartType.ui:155
+msgctxt "tp_ChartType|extended_tip|3dscheme"
+msgid "Select the type of 3D look."
+msgstr "اختر شكل المظهر ثلاثي الأبعاد."
+
+#. FxHfq
+#: chart2/uiconfig/ui/tp_ChartType.ui:173
+msgctxt "tp_ChartType|shapeft"
+msgid "Sh_ape"
+msgstr "ال_شّكل"
+
+#. CCA3V
+#: chart2/uiconfig/ui/tp_ChartType.ui:216
+msgctxt "tp_ChartType|extended_tip|shape"
+msgid "Select a shape from the list."
+msgstr "اختر شكل من القائمة."
+
+#. G2u4D
+#: chart2/uiconfig/ui/tp_ChartType.ui:241
+msgctxt "tp_ChartType|stack"
+msgid "_Stack series"
+msgstr "سلاسل مكدّسة"
+
+#. h8wCq
+#: chart2/uiconfig/ui/tp_ChartType.ui:248
+msgctxt "tp_ChartType|extended_tip|stack"
+msgid "Displays stacked series for Line charts."
+msgstr "اظهار السلاسل المتكدسة لخط الرسم البياني."
+
+#. KfD2L
+#: chart2/uiconfig/ui/tp_ChartType.ui:266
+msgctxt "tp_ChartType|ontop"
+msgid "On top"
+msgstr "لأعلى"
+
+#. DY854
+#: chart2/uiconfig/ui/tp_ChartType.ui:274
+msgctxt "tp_ChartType|extended_tip|ontop"
+msgid "Stack series display values on top of each other."
+msgstr "السلاسل المتكدسة تُظهر قيم فوق بعضها."
+
+#. C7JxK
+#: chart2/uiconfig/ui/tp_ChartType.ui:285
+msgctxt "tp_ChartType|percent"
+msgid "Percent"
+msgstr "نسبة مئوية"
+
+#. EVNAR
+#: chart2/uiconfig/ui/tp_ChartType.ui:293
+msgctxt "tp_ChartType|extended_tip|percent"
+msgid "Stack series display values as percent."
+msgstr "السلاسل المتكدسة تُظهر القيم كنسب مئوية."
+
+#. ijuPy
+#: chart2/uiconfig/ui/tp_ChartType.ui:304
+msgctxt "tp_ChartType|deep"
+msgid "Deep"
+msgstr "عميق"
+
+#. etF2p
+#: chart2/uiconfig/ui/tp_ChartType.ui:331
+msgctxt "tp_ChartType|linetypeft"
+msgid "_Line type"
+msgstr "نوع ال_خطّ"
+
+#. RbyB4
+#: chart2/uiconfig/ui/tp_ChartType.ui:345
+msgctxt "tp_ChartType|linetype"
+msgid "Straight"
+msgstr "مستقيم"
+
+#. dG5tv
+#: chart2/uiconfig/ui/tp_ChartType.ui:346
+msgctxt "tp_ChartType|linetype"
+msgid "Smooth"
+msgstr "متجانس"
+
+#. uHHpu
+#: chart2/uiconfig/ui/tp_ChartType.ui:347
+msgctxt "tp_ChartType|linetype"
+msgid "Stepped"
+msgstr "درجيّ"
+
+#. G3eDR
+#: chart2/uiconfig/ui/tp_ChartType.ui:351
+msgctxt "tp_ChartType|extended_tip|linetype"
+msgid "Choose the type of line to draw."
+msgstr "اختر شكل خط لرسمه."
+
+#. JqNUv
+#: chart2/uiconfig/ui/tp_ChartType.ui:362
+msgctxt "tp_ChartType|properties"
+msgid "Properties..."
+msgstr "الخصائص..."
+
+#. EnymX
+#: chart2/uiconfig/ui/tp_ChartType.ui:368
+msgctxt "tp_ChartType|extended_tip|properties"
+msgid "Opens a dialog to set the line or curve properties."
+msgstr "يفتح علبة حوار  لإعداد خصائص خط المنحنى."
+
+#. KzGZQ
+#: chart2/uiconfig/ui/tp_ChartType.ui:385
+msgctxt "tp_ChartType|sort"
+msgid "_Sort by X values"
+msgstr "ا_فرز بقيم س"
+
+#. tbgi3
+#: chart2/uiconfig/ui/tp_ChartType.ui:392
+msgctxt "tp_ChartType|extended_tip|sort"
+msgid "Connects points by ascending X values, even if the order of values is different, in an XY scatter diagram."
+msgstr "ربط النقاط عبر تصعيد قيم 'س'، حتى لو ترتيب القيم مختلف في الرسم البياني المبعثر 'س ع'"
+
+#. CmGat
+#: chart2/uiconfig/ui/tp_ChartType.ui:411
+msgctxt "tp_ChartType|nolinesft"
+msgid "_Number of lines"
+msgstr "_عدد الخطوط"
+
+#. bBgDJ
+#: chart2/uiconfig/ui/tp_ChartType.ui:431
+msgctxt "tp_ChartType|extended_tip|nolines"
+msgid "Set the number of lines for the Column and Line chart type."
+msgstr "حدّد عدد الأسطر للعمود و نوع خط الرسم البياني."
+
+#. M2sxB
+#: chart2/uiconfig/ui/tp_ChartType.ui:499
+msgctxt "tp_ChartType|extended_tip|charttype"
+msgid "Select a basic chart type."
+msgstr "اختر نوع الرسم البياني القاعدي."
+
+#. UGk4x
+#: chart2/uiconfig/ui/tp_DataLabel.ui:39
+msgctxt "tp_DataLabel|CB_VALUE_AS_NUMBER"
+msgid "Value as _number"
+msgstr ""
+
+#. uGdoi
+#: chart2/uiconfig/ui/tp_DataLabel.ui:47
+msgctxt "tp_DataLabel|extended_tip|CB_VALUE_AS_NUMBER"
+msgid "Displays the absolute values of the data points."
+msgstr "اظهار القيمة المطلقة لنقاط القيم."
+
+#. QFsau
+#: chart2/uiconfig/ui/tp_DataLabel.ui:58
+msgctxt "tp_DataLabel|CB_VALUE_AS_PERCENTAGE"
+msgid "Value as _percentage"
+msgstr ""
+
+#. FcaPo
+#: chart2/uiconfig/ui/tp_DataLabel.ui:66
+msgctxt "tp_DataLabel|extended_tip|CB_VALUE_AS_PERCENTAGE"
+msgid "Displays the percentage of the data points in each column."
+msgstr "اظهار النسبة المئوية لنقاط البيانات في كل عمود."
+
+#. k4iPb
+#: chart2/uiconfig/ui/tp_DataLabel.ui:77
+msgctxt "tp_DataLabel|CB_CATEGORY"
+msgid "_Category"
+msgstr "الصن_ف"
+
+#. EZXZX
+#: chart2/uiconfig/ui/tp_DataLabel.ui:85
+msgctxt "tp_DataLabel|extended_tip|CB_CATEGORY"
+msgid "Shows the data point text labels."
+msgstr "يُظهِر لصائق النص لنقاط البيانات."
+
+#. Y6NXz
+#: chart2/uiconfig/ui/tp_DataLabel.ui:96
+msgctxt "tp_DataLabel|CB_SYMBOL"
+msgid "_Legend key"
+msgstr ""
+
+#. Bm8gp
+#: chart2/uiconfig/ui/tp_DataLabel.ui:104
+msgctxt "tp_DataLabel|extended_tip|CB_SYMBOL"
+msgid "Displays the legend icons next to each data point label."
+msgstr "اظهر الإيقونات بجانب كل صيغة نقطة بيانات."
+
+#. K3uFN
+#: chart2/uiconfig/ui/tp_DataLabel.ui:115
+msgctxt "tp_DataLabel|CB_WRAP_TEXT"
+msgid "Auto text _wrap"
+msgstr "لف الن_ص آليا"
+
+#. tgNDD
+#: chart2/uiconfig/ui/tp_DataLabel.ui:129
+msgctxt "tp_DataLabel|PB_NUMBERFORMAT"
+msgid "Number _format..."
+msgstr "_نسق العدد..."
+
+#. nzq24
+#: chart2/uiconfig/ui/tp_DataLabel.ui:137
+msgctxt "tp_DataLabel|extended_tip|PB_NUMBERFORMAT"
+msgid "Opens a dialog to select the number format."
+msgstr "فتح علبة حوار لاختيار شكل الرقم."
+
+#. PYC2b
+#: chart2/uiconfig/ui/tp_DataLabel.ui:148
+msgctxt "tp_DataLabel|PB_PERCENT_NUMBERFORMAT"
+msgid "Percentage f_ormat..."
+msgstr "ن_سق النّسبة المئويّة..."
+
+#. 3wD3x
+#: chart2/uiconfig/ui/tp_DataLabel.ui:156
+msgctxt "tp_DataLabel|extended_tip|PB_PERCENT_NUMBERFORMAT"
+msgid "Opens a dialog to select the percentage format."
+msgstr "فتح علبة حوار لاختيار شكل النسبة المئوية."
+
+#. gFELD
+#: chart2/uiconfig/ui/tp_DataLabel.ui:169
+msgctxt "tp_DataLabel|CT_LABEL_DIAL"
+msgid "ABCD"
+msgstr "أبجد"
+
+#. PNGYD
+#: chart2/uiconfig/ui/tp_DataLabel.ui:182
+msgctxt "tp_DataLabel|STR_DLG_NUMBERFORMAT_FOR_PERCENTAGE_VALUE"
+msgid "Number Format for Percentage Value"
+msgstr "نسق الأعداد لقيمة النّسبة المئويّة"
+
+#. hxBUr
+#: chart2/uiconfig/ui/tp_DataLabel.ui:191
+msgctxt "tp_DataLabel|CB_DATA_SERIES_NAME"
+msgid "_Series name"
+msgstr ""
+
+#. 3tWYv
+#: chart2/uiconfig/ui/tp_DataLabel.ui:199
+msgctxt "tp_DataLabel|extended_tip|CB_DATA_SERIES_NAME"
+msgid "Shows the data series name in the label."
+msgstr ""
+
+#. 3BZrx
+#: chart2/uiconfig/ui/tp_DataLabel.ui:220
+msgctxt "tp_DataLabel|label1"
+msgid "Text Attributes"
+msgstr "صفات النص"
+
+#. 2MNGz
+#: chart2/uiconfig/ui/tp_DataLabel.ui:254
+msgctxt "tp_DataLabel|FT_LABEL_PLACEMENT"
+msgid "Place_ment"
+msgstr "المكا_ن"
+
+#. L2MYb
+#: chart2/uiconfig/ui/tp_DataLabel.ui:270
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Best fit"
+msgstr "أفضل ملائمة"
+
+#. ba7eW
+#: chart2/uiconfig/ui/tp_DataLabel.ui:271
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Center"
+msgstr "وسط"
+
+#. nW5vs
+#: chart2/uiconfig/ui/tp_DataLabel.ui:272
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Above"
+msgstr "أعلى"
+
+#. gW9Aa
+#: chart2/uiconfig/ui/tp_DataLabel.ui:273
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Top left"
+msgstr "أعلى اليسار"
+
+#. UQBcJ
+#: chart2/uiconfig/ui/tp_DataLabel.ui:274
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Left"
+msgstr "يسار"
+
+#. CVw6x
+#: chart2/uiconfig/ui/tp_DataLabel.ui:275
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Bottom left"
+msgstr "أسفل يساراً"
+
+#. EF7Qb
+#: chart2/uiconfig/ui/tp_DataLabel.ui:276
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Below"
+msgstr "أسفل"
+
+#. bdAYf
+#: chart2/uiconfig/ui/tp_DataLabel.ui:277
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Bottom right"
+msgstr "أدنى اليمين"
+
+#. kHGEs
+#: chart2/uiconfig/ui/tp_DataLabel.ui:278
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Right"
+msgstr "يمين"
+
+#. GFkmP
+#: chart2/uiconfig/ui/tp_DataLabel.ui:279
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Top right"
+msgstr "أعلى اليمين"
+
+#. KFZhx
+#: chart2/uiconfig/ui/tp_DataLabel.ui:280
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Inside"
+msgstr "بالداخل"
+
+#. BJm6w
+#: chart2/uiconfig/ui/tp_DataLabel.ui:281
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Outside"
+msgstr "بالخارج"
+
+#. XGkMi
+#: chart2/uiconfig/ui/tp_DataLabel.ui:282
+msgctxt "tp_DataLabel|liststorePLACEMENT"
+msgid "Near origin"
+msgstr "قرب الأصل"
+
+#. vq2Bf
+#: chart2/uiconfig/ui/tp_DataLabel.ui:286
+msgctxt "tp_DataLabel|extended_tip|LB_LABEL_PLACEMENT"
+msgid "Selects the placement of data labels relative to the objects."
+msgstr "اختيار موضوع صيغ البيانات المتعلقة بالمواضيع"
+
+#. GqA8C
+#: chart2/uiconfig/ui/tp_DataLabel.ui:299
+msgctxt "tp_DataLabel|FT_TEXT_SEPARATOR"
+msgid "_Separator"
+msgstr "ال_فاصل"
+
+#. oPhGH
+#: chart2/uiconfig/ui/tp_DataLabel.ui:315
+msgctxt "tp_DataLabel|liststoreSEPARATOR"
+msgid "Space"
+msgstr "مسافة"
+
+#. fR4fG
+#: chart2/uiconfig/ui/tp_DataLabel.ui:316
+msgctxt "tp_DataLabel|liststoreSEPARATOR"
+msgid "Comma"
+msgstr "الفاصلة"
+
+#. 5baF4
+#: chart2/uiconfig/ui/tp_DataLabel.ui:317
+msgctxt "tp_DataLabel|liststoreSEPARATOR"
+msgid "Semicolon"
+msgstr "الفاصلة المنقوطة"
+
+#. 8MGkQ
+#: chart2/uiconfig/ui/tp_DataLabel.ui:318
+msgctxt "tp_DataLabel|liststoreSEPARATOR"
+msgid "New line"
+msgstr "السّطر الجديد"
+
+#. bpmiF
+#: chart2/uiconfig/ui/tp_DataLabel.ui:319
+msgctxt "tp_DataLabel|liststoreSEPARATOR"
+msgid "Period"
+msgstr "فترة"
+
+#. jjR8u
+#: chart2/uiconfig/ui/tp_DataLabel.ui:323
+msgctxt "tp_DataLabel|extended_tip|LB_TEXT_SEPARATOR"
+msgid "Selects the separator between multiple text strings for the same object."
+msgstr "اختيار المسافة البينية بين مجموعة من النصوص لنفس الموضوع."
+
+#. mFEKm
+#: chart2/uiconfig/ui/tp_DataLabel.ui:338
+msgctxt "tp_DataLabel|label1"
+msgid "Attribute Options"
+msgstr "خيارات الصفة"
+
+#. avLCL
+#: chart2/uiconfig/ui/tp_DataLabel.ui:390
+msgctxt "tp_DataLabel|extended_tip|CT_DIAL"
+msgid "Click in the dial to set the text orientation for the data labels."
+msgstr "انقر في التزويل لتعيّن اتجاه النص للصائق البيانات."
+
+#. eKwUH
+#: chart2/uiconfig/ui/tp_DataLabel.ui:411
+msgctxt "tp_DataLabel|extended_tip|NF_LABEL_DEGREES"
+msgid "Enter the counterclockwise rotation angle for the data labels."
+msgstr "ادخال زاوية الدوران عكس اتجاه دوران عقارب الساعة لصيغ البيانات."
+
+#. VArif
+#: chart2/uiconfig/ui/tp_DataLabel.ui:425
+msgctxt "tp_DataLabel|FT_LABEL_DEGREES"
+msgid "_Degrees"
+msgstr "_درجة"
+
+#. zdP7E
+#: chart2/uiconfig/ui/tp_DataLabel.ui:450
+msgctxt "tp_DataLabel|FT_LABEL_TEXTDIR"
+msgid "Te_xt direction"
+msgstr "اتّجاه النّ_صّ"
+
+#. MYXZo
+#: chart2/uiconfig/ui/tp_DataLabel.ui:467
+msgctxt "tp_DataLabel|extended_tip|LB_LABEL_TEXTDIR"
+msgid "Specify the text direction for a paragraph that uses complex text layout (CTL). This feature is only available if complex text layout support is enabled."
+msgstr "حدّد اتجاه النص للفقرة التي تحوي عدة اتجاهات للكتابة. هذه الخاصية مفعّلة فقط إذا كان دعم نسق النصوص المركبة مفعّل."
+
+#. PKnKk
+#: chart2/uiconfig/ui/tp_DataLabel.ui:490
+msgctxt "tp_DataLabel|label2"
+msgid "Rotate Text"
+msgstr "دوّر النّصّ"
+
+#. wBzcx
+#: chart2/uiconfig/ui/tp_DataLabel.ui:519
+msgctxt "tp_DataLabel|CB_CUSTOM_LEADER_LINES"
+msgid "_Connect displaced data labels to data points"
+msgstr "_توصيل صيغ البيانات المنفصلة بنقاط البيانات"
+
+#. BXobT
+#: chart2/uiconfig/ui/tp_DataLabel.ui:527
+msgctxt "tp_DataLabel|extended_tip|CB_CUSTOM_LEADER_LINES"
+msgid "Draws a line connecting the data labels to the data points"
+msgstr ""
+
+#. MBFBB
+#: chart2/uiconfig/ui/tp_DataLabel.ui:543
+msgctxt "tp_DataLabel|label3"
+msgid "Leader Lines"
+msgstr "الأسطر الرئيسية"
+
+#. iDheE
+#: chart2/uiconfig/ui/tp_DataLabel.ui:573
+msgctxt "tp_DataLabel|extended_tip|tp_DataLabel"
+msgid "Opens the Data Labels dialog, which enables you to set the data labels."
+msgstr "فتح علبة حوار لصيغ البيانات، و التي تسمح بتعديل إعداداتها."
+
+#. rXE7B
+#: chart2/uiconfig/ui/tp_DataPointOption.ui:37
+msgctxt "tp_DataPointOption|CB_LEGEND_ENTRY_HIDDEN"
+msgid "Hide legend entry"
+msgstr "إخفاء الوصف"
+
+#. k2s9H
+#: chart2/uiconfig/ui/tp_DataPointOption.ui:45
+msgctxt "tp_DataPointOption|extended_tip|CB_LEGEND_ENTRY_HIDDEN"
+msgid "Do not show legend entry for the selected data series or data point."
+msgstr "عدم اظهار الوصف لسلسلة البيانات أو نقاط البيانات."
+
+#. DUQwA
+#: chart2/uiconfig/ui/tp_DataPointOption.ui:61
+msgctxt "tp_DataPointOption|label1"
+msgid "Legend Entry"
+msgstr "الوصف"
+
+#. A2dFx
+#: chart2/uiconfig/ui/tp_DataSource.ui:18
+msgctxt "tp_DataSource|imageIMB_RANGE_CAT|tooltip_text"
+msgid "Select data range"
+msgstr "حدّد نطاق البيانات"
+
+#. kEnRN
+#: chart2/uiconfig/ui/tp_DataSource.ui:24
+msgctxt "tp_DataSource|imageIMB_RANGE_MAIN|tooltip_text"
+msgid "Select data range"
+msgstr "حدّد نطاق البيانات"
+
+#. 2iNp6
+#: chart2/uiconfig/ui/tp_DataSource.ui:73
+msgctxt "tp_DataSource|FT_SERIES"
+msgid "Data _series:"
+msgstr "_سلاسل البيانات:"
+
+#. oFoeg
+#: chart2/uiconfig/ui/tp_DataSource.ui:116
+msgctxt "tp_DataSource|extended_tip|LB_SERIES"
+msgid "Shows a list of all data series in the chart. Click an entry to view and edit that data series. Click Add to insert a new series into the list after the selected entry."
+msgstr "اظهار لائحة بسلاسل البيانات في الرسم البياني. انقر على أحد المدخلات لرؤية و تعديل سلاسل البيانات. انقر على إضافة لإدخال سلاسل جديدة في اللائحة بعد المُدخل المُختار."
+
+#. rqABh
+#: chart2/uiconfig/ui/tp_DataSource.ui:137
+msgctxt "tp_DataSource|BTN_ADD"
+msgid "_Add"
+msgstr "أ_ضف"
+
+#. AExBB
+#: chart2/uiconfig/ui/tp_DataSource.ui:145
+msgctxt "tp_DataSource|extended_tip|BTN_ADD"
+msgid "Adds a new entry below the current entry in the Data Series list. If an entry is selected, the new data series gets the same chart type."
+msgstr "يُضيف مُدخل جديد أسفل المدخل الحالي في لائحة سلسلة البيانات. إذا تم تحديد مُدخل معيّن، سلسلة البيانات الجديدة تكون بنفس شكل الرسم البياني."
+
+#. dCyXA
+#: chart2/uiconfig/ui/tp_DataSource.ui:163
+msgctxt "tp_DataSource|BTN_UP-atkobject"
+msgid "Up"
+msgstr "أعلى"
+
+#. GTEK3
+#: chart2/uiconfig/ui/tp_DataSource.ui:164
+msgctxt "tp_DataSource|extended_tip|BTN_UP"
+msgid "Moves up the selected entry in the Data Series list."
+msgstr "يرفع المُدخل المحدّد في لائحة سلاسل البيانات لأعلى."
+
+#. 3v9x2
+#: chart2/uiconfig/ui/tp_DataSource.ui:175
+msgctxt "tp_DataSource|BTN_REMOVE"
+msgid "_Remove"
+msgstr "أ_زل"
+
+#. BDDwm
+#: chart2/uiconfig/ui/tp_DataSource.ui:183
+msgctxt "tp_DataSource|extended_tip|BTN_REMOVE"
+msgid "Removes the selected entry from the Data Series list."
+msgstr "يحذف المُدخل المحدّد  من لائحة سلسلة البيانات."
+
+#. MkZNf
+#: chart2/uiconfig/ui/tp_DataSource.ui:201
+msgctxt "tp_DataSource|BTN_DOWN-atkobject"
+msgid "Down"
+msgstr "أسفل"
+
+#. 558EK
+#: chart2/uiconfig/ui/tp_DataSource.ui:202
+msgctxt "tp_DataSource|extended_tip|BTN_DOWN"
+msgid "Moves down the selected entry in the Data Series list."
+msgstr "ينقل مُدخل لائحة سلسلة البيانات المحدّد لأسفل."
+
+#. mC5Ge
+#: chart2/uiconfig/ui/tp_DataSource.ui:244
+msgctxt "tp_DataSource|FT_ROLE"
+msgid "_Data ranges:"
+msgstr "نطاقات الب_يانات:"
+
+#. ZB6Dv
+#: chart2/uiconfig/ui/tp_DataSource.ui:297
+msgctxt "tp_DataSource|extended_tip|LB_ROLE"
+msgid "Shows all the data ranges used by the data series that is selected in the Data Series list box. Each data range shows the role name and the source range address."
+msgstr "اظهار كل مجال البيانات المستخدم من سلاسل البيانات المحدّدة في صندوق لائحة سلاسل البيانات. كل مجال بيانات يُظهر اسم الدور و مصدر عنوان المجال."
+
+#. qRMfs
+#: chart2/uiconfig/ui/tp_DataSource.ui:312
+msgctxt "tp_DataSource|FT_RANGE"
+msgid "Ran_ge for %VALUETYPE"
+msgstr "ن_طاق %VALUETYPE"
+
+#. M2BSw
+#: chart2/uiconfig/ui/tp_DataSource.ui:338
+msgctxt "tp_DataSource|extended_tip|EDT_RANGE"
+msgid "Shows the source range address from the second column of the Data Range list box. You can change the range in the text box or by dragging in the document. To minimize this dialog while you select the data range in Calc, click the Select data range button."
+msgstr "اظهار مصدر عنوان المجال من العمود الثاني من صندوق لائحة  مجال البيانات. يُمكنك تغيير المجال في صندوق النص أو بسحبه للمستند. لتصغير علبة الحوار الحالية أثناء تحديدك لمجال البيانات من الصفحة، انقر على زر اختيار مجال البيانات."
+
+#. CwKet
+#: chart2/uiconfig/ui/tp_DataSource.ui:356
+msgctxt "tp_DataSource|extended_tip|IMB_RANGE_MAIN"
+msgid "Shows the source range address from the second column of the Data Range list box. You can change the range in the text box or by dragging in the document. To minimize this dialog while you select the data range in Calc, click the Select data range button."
+msgstr "اظهار مصدر عنوان المجال من العمود الثاني من صندوق لائحة  مجال البيانات. يُمكنك تغيير المجال في صندوق النص أو بسحبه للمستند. لتصغير علبة الحوار الحالية أثناء تحديدك لمجال البيانات من الصفحة، انقر على زر اختيار مجال البيانات."
+
+#. FX2CF
+#: chart2/uiconfig/ui/tp_DataSource.ui:381
+msgctxt "tp_DataSource|FT_CATEGORIES"
+msgid "_Categories"
+msgstr "ال_فئات"
+
+#. EiwXn
+#: chart2/uiconfig/ui/tp_DataSource.ui:395
+msgctxt "tp_DataSource|FT_DATALABELS"
+msgid "Data _labels"
+msgstr "ل_صائق البيانات"
+
+#. ogTbE
+#: chart2/uiconfig/ui/tp_DataSource.ui:426
+msgctxt "tp_DataSource|extended_tip|EDT_CATEGORIES"
+msgid "Shows the source range address of the categories (the texts you can see on the x-axis of a category chart). For an XY-chart, the text box contains the source range of the data labels which are displayed for the data points. To minimize this dialog while you select the data range in Calc, click the Select data range button."
+msgstr "يُظهِر عنوان مجال المصدر للأصناف (النصوص التي يُمكنك رؤيتها على محور 'س' لصنف المخطط البياني): لمخطط بياني 'س ع'، صندوق النص يحتوي على مصدر مجال صيغ البيانات التي تظهر لنقاط البيانات. لتصغير علبة الحوار الحالية أثناء تحديدك لمجال البيانات من الصفحة، انقر على زر اختيار مجال البيانات."
+
+#. EYFEo
+#: chart2/uiconfig/ui/tp_DataSource.ui:444
+msgctxt "tp_DataSource|extended_tip|IMB_RANGE_CAT"
+msgid "Shows the source range address of the categories (the texts you can see on the x-axis of a category chart). For an XY-chart, the text box contains the source range of the data labels which are displayed for the data points. To minimize this dialog while you select the data range in Calc, click the Select data range button."
+msgstr "يُظهِر عنوان مجال المصدر للأصناف (النصوص التي يُمكنك رؤيتها على محور 'س' لصنف المخطط البياني): لمخطط بياني 'س ع'، صندوق النص يحتوي على مصدر مجال صيغ البيانات التي تظهر لنقاط البيانات. لتصغير علبة الحوار الحالية أثناء تحديدك لمجال البيانات من الصفحة، انقر على زر اختيار مجال البيانات."
+
+#. YwALA
+#: chart2/uiconfig/ui/tp_DataSource.ui:481
+msgctxt "tp_DataSource|FT_CAPTION_FOR_WIZARD"
+msgid "Customize Data Ranges for Individual Data Series"
+msgstr "خصّص نطاقات البيانات لسلاسل البيانات"
+
+#. JGgFh
+#: chart2/uiconfig/ui/tp_DataTable.ui:33
+msgctxt "tp_DataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr ""
+
+#. EzGM5
+#: chart2/uiconfig/ui/tp_DataTable.ui:49
+msgctxt "tp_DataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr ""
+
+#. ZTAZY
+#: chart2/uiconfig/ui/tp_DataTable.ui:65
+msgctxt "tp_DataTable|outlineCB"
+msgid "Show outline"
+msgstr ""
+
+#. kPDNa
+#: chart2/uiconfig/ui/tp_DataTable.ui:81
+msgctxt "tp_DataTable|keysCB"
+msgid "Show keys"
+msgstr ""
+
+#. fybMv
+#: chart2/uiconfig/ui/tp_DataTable.ui:101
+msgctxt "tp_axisLabel|textflowL"
+msgid "Data Table Properties"
+msgstr ""
+
+#. tGqhN
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:53
+msgctxt "tp_ErrorBars|RB_NONE"
+msgid "_None"
+msgstr "_بلا"
+
+#. YVhm9
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:64
+msgctxt "tp_ErrorBars|extended_tip|RB_NONE"
+msgid "Does not show any error bars."
+msgstr "لا يُظهر أي شريط أخطاء."
+
+#. Cq44D
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:76
+msgctxt "tp_ErrorBars|RB_CONST"
+msgid "_Constant Value"
+msgstr "قيمة _ثابتة"
+
+#. Aetuh
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:87
+msgctxt "tp_ErrorBars|extended_tip|RB_CONST"
+msgid "Displays constant values that you specify in the Parameters area."
+msgstr "إظهار قيم ثابتة التي تحددها من منطقة الإعدادات."
+
+#. Njqok
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:99
+msgctxt "tp_ErrorBars|RB_PERCENT"
+msgid "_Percentage"
+msgstr "ن_سبة مئويّة"
+
+#. kqgrm
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:110
+msgctxt "tp_ErrorBars|extended_tip|RB_PERCENT"
+msgid "Displays a percentage. The display refers to the corresponding data point. Set the percentage in the Parameters area."
+msgstr "إظهار النسبة المئوية. الإظهار يرجع لنقاط البيانات المماثلة لها. حدد النسبة المئوية من منطقة الإعدادات."
+
+#. qCQY8
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:137
+msgctxt "tp_ErrorBars|extended_tip|RB_FUNCTION"
+msgid "Select a function to calculate the error bars."
+msgstr "اختر دالة لتحسب شريط الأخطاء."
+
+#. GnXao
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:152
+msgctxt "tp_ErrorBars|liststoreFUNCTION"
+msgid "Standard Error"
+msgstr "خطأ قياسي"
+
+#. SQ3rE
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:153
+msgctxt "tp_ErrorBars|liststoreFUNCTION"
+msgid "Standard Deviation"
+msgstr "الانحراف المعياري"
+
+#. GagXt
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:154
+msgctxt "tp_ErrorBars|liststoreFUNCTION"
+msgid "Variance"
+msgstr "التباين"
+
+#. Siyxd
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:155
+msgctxt "tp_ErrorBars|liststoreFUNCTION"
+msgid "Error Margin"
+msgstr "هامش الخطأ"
+
+#. j6oTg
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:159
+msgctxt "tp_ErrorBars|extended_tip|LB_FUNCTION"
+msgid "Select a function to calculate the error bars."
+msgstr "اختر دالة تقوم بحساب شريط الخطأ."
+
+#. AbhAQ
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:178
+msgctxt "tp_ErrorBars|RB_RANGE"
+msgid "Cell _Range"
+msgstr "ن_طاق الخلايا"
+
+#. x3uW3
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:189
+msgctxt "tp_ErrorBars|extended_tip|RB_RANGE"
+msgid "Click Cell Range and then specify a cell range from which to take the positive and negative error bar values."
+msgstr "انقر على مجال الخلية ثم حدد مجال خلية الذي من خلاله تأخذ شريط قيم الخطأ الموجب و السالب."
+
+#. 9Y8Vo
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:205
+msgctxt "tp_ErrorBars|label1"
+msgid "Error Category"
+msgstr "صنف الخطأ"
+
+#. q8qXd
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:236
+msgctxt "tp_ErrorBars|RB_BOTH"
+msgid "Positive _and Negative"
+msgstr "الموجب _والسّالب"
+
+#. LDszs
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:247
+msgctxt "tp_ErrorBars|extended_tip|RB_BOTH"
+msgid "Shows positive and negative error bars."
+msgstr "إظهار شريط الأخطاء الموجب و السالب."
+
+#. 6F78D
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:258
+msgctxt "tp_ErrorBars|RB_POSITIVE"
+msgid "Pos_itive"
+msgstr "المو_جب"
+
+#. oSnnp
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:269
+msgctxt "tp_ErrorBars|extended_tip|RB_POSITIVE"
+msgid "Shows only positive error bars."
+msgstr "إظهار شريط الأخطاء الموجب فقط."
+
+#. jdFbj
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:280
+msgctxt "tp_ErrorBars|RB_NEGATIVE"
+msgid "Ne_gative"
+msgstr "ال_سّالب"
+
+#. DvqJN
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:291
+msgctxt "tp_ErrorBars|extended_tip|RB_NEGATIVE"
+msgid "Shows only negative error bars."
+msgstr "إظهار شريط الأخطاء السالب فقط."
+
+#. D4Aou
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:339
+msgctxt "tp_ErrorBars|label2"
+msgid "Error Indicator"
+msgstr "مؤشّر الخطأ"
+
+#. haTNd
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:383
+msgctxt "tp_ErrorBars|FT_POSITIVE"
+msgid "P_ositive (+)"
+msgstr "الموج_ب (+)"
+
+#. 7bDeP
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:402
+msgctxt "tp_ErrorBars|extended_tip|MF_POSITIVE"
+msgid "Enter the value to add to the displayed value as the positive error value."
+msgstr "أدخل القيمة لإضافتها للقيمة الظاهرة كخطأ قيمة موجبة."
+
+#. D5XCD
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:421
+msgctxt "tp_ErrorBars|extended_tip|ED_RANGE_POSITIVE"
+msgid "Enter the address range from where to get the positive error values. Use the Shrink button to select the range from a sheet."
+msgstr "أدخل مجال العنوان من أين تأخذ قيم الخطأ الموجبة. استخدم زر التمديد لتحديد المجال من الورقة."
+
+#. rGBRC
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:436
+msgctxt "tp_ErrorBars|IB_RANGE_POSITIVE|tooltip_text"
+msgid "Select data range"
+msgstr "حدّد نطاق البيانات"
+
+#. QYRko
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:441
+msgctxt "tp_ErrorBars|extended_tip|IB_RANGE_POSITIVE"
+msgid "Click a button to shrink the dialog, then use the mouse to select the cell range in the spreadsheet. Click the button again to restore the dialog to full size."
+msgstr "انقر على زر لتمديد الحوار، ثم استخدم الفأرة لتحديد مجال الخلية في الورقة. انقر على الزر مرة ثانية لإعادة الحوار لحجمه الطبيعي."
+
+#. C5ZdQ
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:467
+msgctxt "tp_ErrorBars|FT_NEGATIVE"
+msgid "_Negative (-)"
+msgstr "السّال_ب (-)"
+
+#. TAAD2
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:486
+msgctxt "tp_ErrorBars|extended_tip|MF_NEGATIVE"
+msgid "Enter the value to subtract from the displayed value as the negative error value."
+msgstr "ادخل القيمة لطرحها من القيمة الظاهرة كقيمة خطأ سالبة."
+
+#. S8d3Y
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:504
+msgctxt "tp_ErrorBars|extended_tip|ED_RANGE_NEGATIVE"
+msgid "Enter the address range from where to get the negative error values. Use the Shrink button to select the range from a sheet."
+msgstr "أدخل مجال العنوان الذي تؤخذ منه قيم الخطأ السالبة. استخدم زر التمديد لتحديد المجال من ورقة."
+
+#. EVG7h
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:519
+msgctxt "tp_ErrorBars|IB_RANGE_NEGATIVE|tooltip_text"
+msgid "Select data range"
+msgstr "حدّد نطاق البيانات"
+
+#. oEACZ
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:524
+msgctxt "tp_ErrorBars|extended_tip|IB_RANGE_NEGATIVE"
+msgid "Click a button to shrink the dialog, then use the mouse to select the cell range in the spreadsheet. Click the button again to restore the dialog to full size."
+msgstr "انقر على زر لتمديد الحوار، ثم استخدم الفأرة لتحديد مجال الخلية في الورقة. انقر على الزر مرة ثانية لإعادة الحوار لحجمه الطبيعي."
+
+#. wdsax
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:543
+msgctxt "tp_ErrorBars|CB_SYN_POS_NEG"
+msgid "Same value for both"
+msgstr "نفس القيمة لكليهما"
+
+#. DvgLw
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:551
+msgctxt "tp_ErrorBars|extended_tip|CB_SYN_POS_NEG"
+msgid "Enable to use the positive error values also as negative error values. You can only change the value of the \"Positive (+)\" box. That value gets copied to the \"Negative (-)\" box automatically."
+msgstr "قم بالتفعيل لتستخدم قيم الخطأ الموجبة كقيم خطأ سالبة. يُمكنك فقط تحويل قيم 'موجب (+)' من الصندوق. هاته القيم ستُنسخ لصندوق 'سالب (-)' آلياً."
+
+#. BEj3C
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:567
+msgctxt "tp_ErrorBars|label3"
+msgid "Parameters"
+msgstr "المتغيرات الوسيطة"
+
+#. XxRKD
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:584
+msgctxt "tp_ErrorBars|STR_DATA_SELECT_RANGE_FOR_POSITIVE_ERRORBARS"
+msgid "Select Range for Positive Error Bars"
+msgstr "حدّد نطاق أشرطة الخطأ الموجبة"
+
+#. FXjsk
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:595
+msgctxt "tp_ErrorBars|STR_DATA_SELECT_RANGE_FOR_NEGATIVE_ERRORBARS"
+msgid "Select Range for Negative Error Bars"
+msgstr "حدّد نطاق أشرطة الخطأ السّالبة"
+
+#. AAfgS
+#: chart2/uiconfig/ui/tp_ErrorBars.ui:606
+msgctxt "tp_ErrorBars|STR_CONTROLTEXT_ERROR_BARS_FROM_DATA"
+msgid "From Data Table"
+msgstr "من جدول البيانات"
+
+#. C9QvS
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:27
+msgctxt "tp_LegendPosition|left"
+msgid "_Left"
+msgstr "الي_سار"
+
+#. 98N4N
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:36
+msgctxt "tp_LegendPosition|extended_tip|left"
+msgid "Positions the legend at the left of the chart."
+msgstr "وضع الوصف أسفل الرسم البياني."
+
+#. WGGa8
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:47
+msgctxt "tp_LegendPosition|right"
+msgid "_Right"
+msgstr "الي_مين"
+
+#. BgNsc
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:56
+msgctxt "tp_LegendPosition|extended_tip|right"
+msgid "Positions the legend at the right of the chart."
+msgstr "وضع الوصف عند يمين الرسم البياني."
+
+#. aURZs
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:67
+msgctxt "tp_LegendPosition|top"
+msgid "_Top"
+msgstr "الأ_على"
+
+#. GppCU
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:76
+msgctxt "tp_LegendPosition|extended_tip|top"
+msgid "Positions the legend at the top of the chart."
+msgstr "وضع الوصف أعلى الرسم البياني."
+
+#. 9WgFV
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:87
+msgctxt "tp_LegendPosition|bottom"
+msgid "_Bottom"
+msgstr "الأس_فل"
+
+#. dvBdX
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:96
+msgctxt "tp_LegendPosition|extended_tip|bottom"
+msgid "Positions the legend at the bottom of the chart."
+msgstr "وضع الوصف أسفل الرسم البياني."
+
+#. z84pQ
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:111
+msgctxt "tp_LegendPosition|TXT_POSITION"
+msgid "Position"
+msgstr "الموضع"
+
+#. 6teoB
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:142
+msgctxt "tp_LegendPosition|FT_LEGEND_TEXTDIR"
+msgid "Te_xt direction"
+msgstr "اتّجاه النّ_صّ"
+
+#. PSPoQ
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:158
+msgctxt "tp_LegendPosition|extended_tip|LB_LEGEND_TEXTDIR"
+msgid "Specify the text direction for a paragraph that uses complex text layout (CTL). This feature is only available if complex text layout support is enabled."
+msgstr "حدّد اتجاه النص للفقرة التي تحوي عدة اتجاهات للكتابة. هذه الخاصية مفعّلة فقط إذا كان دعم نسق النصوص المركبة مفعّل."
+
+#. sUDkC
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:174
+msgctxt "tp_LegendPosition|TXT_ORIENTATION"
+msgid "Text Orientation"
+msgstr "اتّجاه النّصّ"
+
+#. VsH8A
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:203
+msgctxt "tp_LegendPosition|CB_NO_OVERLAY"
+msgid "Show the legend without overlapping the chart"
+msgstr "إظهار العنوان من دون التداخل مع الرسم البياني"
+
+#. yi8AX
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:211
+msgctxt "tp_LegendPosition|extended_tip|CB_NO_OVERLAY"
+msgid "Specifies whether the legend should overlap the chart."
+msgstr "يُحدّد إذا ما كان الوصف يتداخل مع الرسم البياني."
+
+#. 82yue
+#: chart2/uiconfig/ui/tp_LegendPosition.ui:227
+msgctxt "tp_LegendPosition|TXT_OVERLAY"
+msgid "Overlay"
+msgstr "تراكب"
+
+#. 8783D
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:24
+msgctxt "tp_PolarOptions|CB_CLOCKWISE"
+msgid "_Clockwise direction"
+msgstr "اتّجاه _مع عقارب السّاعة"
+
+#. GikR7
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:34
+msgctxt "tp_PolarOptions|extended_tip|CB_CLOCKWISE"
+msgid "The default direction in which the pieces of a pie chart are ordered is counterclockwise. Enable the Clockwise direction checkbox to draw the pieces in opposite direction."
+msgstr "الاتجاه الافتراضي للقطع المجزأة للرسم البياني المطلوب هو عكس اتجاه عقارب الساعة. قم بتفعيل اتجاه عقارب الساعة لترسم عكس الإتجاه."
+
+#. ATHCu
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:43
+msgctxt "tp_PolarOptions|label1"
+msgid "Orientation"
+msgstr "الاتجاه"
+
+#. mEJCE
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:79
+msgctxt "tp_PolarOptions|extended_tip|CT_ANGLE_DIAL"
+msgid "Drag the small dot along the circle or click any position on the circle to set the starting angle of a pie or donut chart. The starting angle is the mathematical angle position where the first piece is drawn. The value of 90 degrees draws the first piece at the 12 o'clock position. A value of 0 degrees starts at the 3 o'clock position."
+msgstr "قم بسحب النقطة الصغيرة للدائرة أو انقر في أي مكان من الدائرة لتحدد زاوية البدء للرسم البياني. زاوية بداية الدوران هي موضع الزاوية الرياضي حيثُ تُرسم القطعة الأولى. القيمة 90 درجة ترسم القطعة الأولى عند الساعة 12. الزاوية 0 تبدأ عند الساعة 3."
+
+#. EEVTg
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:99
+msgctxt "tp_PolarOptions|extended_tip|NF_STARTING_ANGLE"
+msgid "Enter the starting angle between 0 and 359 degrees. You can also click the arrows to change the displayed value."
+msgstr "أدخل الزاوية البادئة بين 0 و 359 درجة. يُمكنك أيضا أن تنقر السهم لتبديل القيم."
+
+#. prqEa
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:113
+msgctxt "tp_PolarOptions|FT_ROTATION_DEGREES"
+msgid "_Degrees"
+msgstr "_درجة"
+
+#. iHLKn
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:130
+msgctxt "tp_PolarOptions|label2"
+msgid "Starting Angle"
+msgstr "زاوية البدء"
+
+#. 5zEew
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:152
+msgctxt "tp_PolarOptions|CB_INCLUDE_HIDDEN_CELLS_POLAR"
+msgid "Include _values from hidden cells"
+msgstr "ضمّن ال_قيم من الخلايا المخفيّة"
+
+#. F5FTp
+#: chart2/uiconfig/ui/tp_PolarOptions.ui:166
+msgctxt "tp_PolarOptions|label3"
+msgid "Plot Options"
+msgstr "خيارات التخطيط"
+
+#. tHATu
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:8
+msgctxt "tp_RangeChooser|imageIB_RANGE|tooltip_text"
+msgid "Select data range"
+msgstr "حدّد نطاق البيانات"
+
+#. 4zh42
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:28
+msgctxt "tp_RangeChooser|FT_CAPTION_FOR_WIZARD"
+msgid "Choose a Data Range"
+msgstr "اختر نطاق بيانات"
+
+#. g2XVd
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:50
+msgctxt "tp_RangeChooser|FT_RANGE"
+msgid "_Data range:"
+msgstr "ن_طاق البيانات:"
+
+#. WKLi7
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:69
+msgctxt "tp_RangeChooser|extended_tip|ED_RANGE"
+msgid "Enter the data range that you want to include in your chart. To minimize this dialog while you select the data range in Calc, click the Select data range button."
+msgstr "أدخل مجال البيانات الذي تُريد أن يتضمنّه رسمك البياني. لتصغير علبة الحوار عندما تحدد مجال البيانات في الورقة. انقر على زر تحديد مجال البيانات."
+
+#. FyVoD
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:83
+msgctxt "tp_RangeChooser|IB_RANGE|tooltip_text"
+msgid "Select data range"
+msgstr "حدد حدود البيانات"
+
+#. FVivY
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:88
+msgctxt "tp_RangeChooser|extended_tip|IB_RANGE"
+msgid "Enter the data range that you want to include in your chart. To minimize this dialog while you select the data range in Calc, click the Select data range button."
+msgstr "أدخل مجال البيانات الذي تُريد أن يتضمنّه رسمك البياني. لتصغير علبة الحوار عندما تحدد مجال البيانات في الورقة. انقر على زر تحديد مجال البيانات."
+
+#. RGGHE
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:105
+msgctxt "tp_RangeChooser|RB_DATAROWS"
+msgid "Data series in _rows"
+msgstr "سلسلة البيانات في _صفوف"
+
+#. w6DuB
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:114
+msgctxt "tp_RangeChooser|extended_tip|RB_DATAROWS"
+msgid "Data series get their data from consecutive rows in the selected range. For scatter charts, the first data series will contain x-values for all series. All other data series are used as y-values, one for each series."
+msgstr "سلاسل البيانات تأخذ بياناتها من الأعمدة المتعاقبة للمجال المحدد. للمخطط المشتت، أول بيانات السلاسل تحتوي قيم 'س' لكل السلاسل. كل بيانات السلاسل الأخرى تستخدم كقيم 'ع'. واحدة لكل سلسلة."
+
+#. wSDqF
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:125
+msgctxt "tp_RangeChooser|RB_DATACOLS"
+msgid "Data series in _columns"
+msgstr "سلسلة البيانات في أع_مدة"
+
+#. RfFZF
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:134
+msgctxt "tp_RangeChooser|extended_tip|RB_DATACOLS"
+msgid "Data series get their data from consecutive columns in the selected range. For scatter charts, the first data column will contain x-values for all series. All other data columns are used as y-values, one for each series."
+msgstr "سلاسل البيانات تأخذ بياناتها من الأعمدة المتعاقبة للمجال المحدد. للمخطط المشتت، بيانات أول عمود تحتوي قيم 'س' لكل السلاسل. كل بيانات السلاسل الأخرى تستخدم كقيم 'ع'. واحدة لكل سلسلة."
+
+#. CExLY
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:145
+msgctxt "tp_RangeChooser|CB_FIRST_ROW_ASLABELS"
+msgid "_First row as label"
+msgstr "أ_وّل صفّ كلصيقة"
+
+#. HviBv
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:153
+msgctxt "tp_RangeChooser|extended_tip|CB_FIRST_ROW_ASLABELS"
+msgid "For data series in columns: The first row in the range is used as names for data series. For data series in rows: The first row in the range is used as categories. The remaining rows comprise the data series. If this check box is not selected, all rows are data series."
+msgstr ""
+"لسلاسل البيانات في الأعمدة: السطر الأول في المجال سيُستخدم كعنوان لبيانات السلاسل.\n"
+"لسلاسل البيانات في الأسطر: العمود الأول في المجال سيُستخدم كفئات.\n"
+"الأسطر الباقية تتضمن بيانات للسلسلة. إذا لم يكُن هذا الصندوق مؤشراً. كل الأسطر هي سلاسل بيانات."
+
+#. ER2D7
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:164
+msgctxt "tp_RangeChooser|CB_FIRST_COLUMN_ASLABELS"
+msgid "F_irst column as label"
+msgstr "أوّل ع_مود كلصيقة"
+
+#. tTAhH
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:172
+msgctxt "tp_RangeChooser|extended_tip|CB_FIRST_COLUMN_ASLABELS"
+msgid "For data series in columns: The first column in the range is used as names for data series. For data series in rows: The first column in the range is used as categories. The remaining columns comprise the data columns. If this check box is not selected, all columns are data columns."
+msgstr ""
+"لسلاسل البيانات في الأعمدة: السطر الأول في المجال سيُستخدم كعنوان لبيانات السلاسل.\n"
+"لسلاسل البيانات في الأسطر: العمود الأول في المجال سيُستخدم كفئات.\n"
+"الأسطر الباقية تتضمن بيانات للسلسلة. إذا لم يكُن هذا الصندوق مؤشراً. كل الأسطر هي سلاسل بيانات."
+
+#. k9TMD
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:193
+msgctxt "tp_RangeChooser|CB_TIME_BASED"
+msgid "Time based charting"
+msgstr "رسم بياني قائم على الوقت"
+
+#. iuxE5
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:244
+msgctxt "tp_RangeChooser|label1"
+msgid "Start Table Index"
+msgstr "فهرس بداية الجدول"
+
+#. dnmDQ
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:257
+msgctxt "tp_RangeChooser|label2"
+msgid "End Table Index"
+msgstr "نهاية فهرس الجدول"
+
+#. FcYeD
+#: chart2/uiconfig/ui/tp_RangeChooser.ui:275
+msgctxt "tp_RangeChooser|STR_PAGE_DATA_RANGE"
+msgid "Data Range"
+msgstr "نطاق البيانات"
+
+#. YfF4A
+#: chart2/uiconfig/ui/tp_Scale.ui:55
+msgctxt "tp_Scale|CBX_REVERSE"
+msgid "_Reverse direction"
+msgstr "ا_عكس الاتّجاه"
+
+#. DNJFK
+#: chart2/uiconfig/ui/tp_Scale.ui:63
+msgctxt "tp_Scale|extended_tip|CBX_REVERSE"
+msgid "Defines where the lower and where the higher values are displayed at the axis. The unchecked state is the mathematical direction."
+msgstr "حدّد أين القيم الأعلى و الأدنى الظاهرة في المحور. الحالة غير المؤشرة هي الإتجاه الرياضي."
+
+#. qBbBL
+#: chart2/uiconfig/ui/tp_Scale.ui:75
+msgctxt "tp_Scale|CBX_LOGARITHM"
+msgid "_Logarithmic scale"
+msgstr "_مقياس لوغاريتمي"
+
+#. 3wDMa
+#: chart2/uiconfig/ui/tp_Scale.ui:83
+msgctxt "tp_Scale|extended_tip|CBX_LOGARITHM"
+msgid "Specifies that you want the axis to be subdivided logarithmically."
+msgstr "تُحدّد بأنك تُريد تقسيم المحور لوغاريتميا."
+
+#. 2B5CL
+#: chart2/uiconfig/ui/tp_Scale.ui:102
+msgctxt "tp_Scale|TXT_AXIS_TYPE"
+msgid "T_ype"
+msgstr "ال_نوع"
+
+#. D6Bre
+#: chart2/uiconfig/ui/tp_Scale.ui:118
+msgctxt "tp_Scale|LB_AXIS_TYPE"
+msgid "Automatic"
+msgstr "تلقائي"
+
+#. TCiZu
+#: chart2/uiconfig/ui/tp_Scale.ui:119
+msgctxt "tp_Scale|LB_AXIS_TYPE"
+msgid "Text"
+msgstr "النص"
+
+#. vAAUB
+#: chart2/uiconfig/ui/tp_Scale.ui:120
+msgctxt "tp_Scale|LB_AXIS_TYPE"
+msgid "Date"
+msgstr "التاريخ"
+
+#. 8YZhv
+#: chart2/uiconfig/ui/tp_Scale.ui:124
+msgctxt "tp_Scale|extended_tip|LB_AXIS_TYPE"
+msgid "For some types of axes, you can select to format an axis as text or date, or to detect the type automatically."
+msgstr "بالنسبة لبعض أصناف المحاور، يمكنك تحديد شكل المحور كتاريخ أو نص، أو اكتشاف النوع آليا."
+
+#. Vf7vB
+#: chart2/uiconfig/ui/tp_Scale.ui:159
+msgctxt "tp_Scale|TXT_MIN"
+msgid "_Minimum"
+msgstr "الأ_دنى"
+
+#. XUKzj
+#: chart2/uiconfig/ui/tp_Scale.ui:173
+msgctxt "tp_Scale|TXT_MAX"
+msgid "Ma_ximum"
+msgstr "القيمة ال_عليا"
+
+#. 4jRuB
+#: chart2/uiconfig/ui/tp_Scale.ui:185
+msgctxt "tp_Scale|CBX_AUTO_MIN"
+msgid "_Automatic"
+msgstr "_تلقائي"
+
+#. Bx5Co
+#: chart2/uiconfig/ui/tp_Scale.ui:199
+msgctxt "tp_Scale|CBX_AUTO_MAX"
+msgid "A_utomatic"
+msgstr "_تلقائي"
+
+#. 2Kb67
+#: chart2/uiconfig/ui/tp_Scale.ui:221
+msgctxt "tp_Scale|extended_tip|EDT_MIN"
+msgid "Defines the minimum value for the beginning of the axis."
+msgstr "حدّد القيمة الدنيا لبداية المحور."
+
+#. AvhE9
+#: chart2/uiconfig/ui/tp_Scale.ui:240
+msgctxt "tp_Scale|extended_tip|EDT_MAX"
+msgid "Defines the maximum value for the end of the axis."
+msgstr "حدّد القيمة الكبرى لنهاية المحور."
+
+#. TsHtd
+#: chart2/uiconfig/ui/tp_Scale.ui:265
+msgctxt "tp_Scale|TXT_TIME_RESOLUTION"
+msgid "R_esolution"
+msgstr "المي_ز"
+
+#. DwrAu
+#: chart2/uiconfig/ui/tp_Scale.ui:281
+msgctxt "tp_Scale|DATE-RESOLUTION"
+msgid "Days"
+msgstr ""
+
+#. NL9uN
+#: chart2/uiconfig/ui/tp_Scale.ui:282
+msgctxt "tp_Scale|DATE-RESOLUTION"
+msgid "Months"
+msgstr ""
+
+#. BfyLg
+#: chart2/uiconfig/ui/tp_Scale.ui:283
+msgctxt "tp_Scale|DATE-RESOLUTION"
+msgid "Years"
+msgstr ""
+
+#. WUANc
+#: chart2/uiconfig/ui/tp_Scale.ui:287
+msgctxt "tp_Scale|extended_tip|LB_TIME_RESOLUTION"
+msgid "Resolution can be set to show days, months, or years as interval steps."
+msgstr "يُمكن ضبط الوضوح لتُظهر الأيام، الأشهر، أو الأعوام كمراحل متقطعة."
+
+#. ezN7c
+#: chart2/uiconfig/ui/tp_Scale.ui:299
+msgctxt "tp_Scale|CBX_AUTO_TIME_RESOLUTION"
+msgid "Automat_ic"
+msgstr "تلقا_ئي"
+
+#. DbJt9
+#: chart2/uiconfig/ui/tp_Scale.ui:328
+msgctxt "tp_Scale|TXT_STEP_MAIN"
+msgid "Ma_jor interval"
+msgstr "الفاصل الأع_ظمي"
+
+#. AtZ6D
+#: chart2/uiconfig/ui/tp_Scale.ui:358
+msgctxt "tp_Scale|extended_tip|MT_MAIN_DATE_STEP"
+msgid "Major interval can be set to show a certain number of days, months, or years."
+msgstr "الفاصل الرئيسي يُكمن إعداده ليُظهِر عدد أيام، أشهر، سنوات محدد."
+
+#. yyPFB
+#: chart2/uiconfig/ui/tp_Scale.ui:373 chart2/uiconfig/ui/tp_Scale.ui:515
+msgctxt "tp_Scale|liststoreDATE"
+msgid "Days"
+msgstr "أيام"
+
+#. 8xKtE
+#: chart2/uiconfig/ui/tp_Scale.ui:374 chart2/uiconfig/ui/tp_Scale.ui:516
+msgctxt "tp_Scale|liststoreDATE"
+msgid "Months"
+msgstr "شهور"
+
+#. WRUy8
+#: chart2/uiconfig/ui/tp_Scale.ui:375 chart2/uiconfig/ui/tp_Scale.ui:517
+msgctxt "tp_Scale|liststoreDATE"
+msgid "Years"
+msgstr "سنوات"
+
+#. BD5BE
+#: chart2/uiconfig/ui/tp_Scale.ui:379
+msgctxt "tp_Scale|extended_tip|LB_MAIN_TIME_UNIT"
+msgid "Major interval can be set to show a certain number of days, months, or years."
+msgstr "الفاصل الرئيسي يُكمن إعداده ليُظهِر عدد أيام، أشهر، سنوات محدد."
+
+#. a2Gjv
+#: chart2/uiconfig/ui/tp_Scale.ui:406
+msgctxt "tp_Scale|extended_tip|EDT_STEP_MAIN"
+msgid "Defines the interval for the main division of the axes."
+msgstr "يُحدّد الفاصل للمقطع الرئيسي للمحور."
+
+#. UMEd3
+#: chart2/uiconfig/ui/tp_Scale.ui:425
+msgctxt "tp_Scale|CBX_AUTO_STEP_MAIN"
+msgid "Au_tomatic"
+msgstr "تل_قائي"
+
+#. Pv5GU
+#: chart2/uiconfig/ui/tp_Scale.ui:459
+msgctxt "tp_Scale|TXT_STEP_HELP"
+msgid "Minor inter_val"
+msgstr "الفاصل الأ_صغري"
+
+#. WMGqg
+#: chart2/uiconfig/ui/tp_Scale.ui:473
+msgctxt "tp_Scale|TXT_STEP_HELP_COUNT"
+msgid "Minor inter_val count"
+msgstr "عدّاد الفاصل الأدنى"
+
+#. c9m8j
+#: chart2/uiconfig/ui/tp_Scale.ui:500
+msgctxt "tp_Scale|extended_tip|MT_STEPHELP"
+msgid "Defines the interval for the subdivision of the axes."
+msgstr "يحدّد الفاصل لتجزئات المحور."
+
+#. snFL6
+#: chart2/uiconfig/ui/tp_Scale.ui:521
+msgctxt "tp_Scale|extended_tip|LB_HELP_TIME_UNIT"
+msgid "Minor interval can be set to show a certain number of days, months, or years."
+msgstr "الفاصل الأدنى يُمكن ضبطه لاظهار أيام، أشهر، سنوات محددة."
+
+#. X8FAK
+#: chart2/uiconfig/ui/tp_Scale.ui:533
+msgctxt "tp_Scale|CBX_AUTO_STEP_HELP"
+msgid "Aut_omatic"
+msgstr "تلقا_ئي"
+
+#. GAKPN
+#: chart2/uiconfig/ui/tp_Scale.ui:562
+msgctxt "tp_Scale|TXT_ORIGIN"
+msgid "Re_ference value"
+msgstr "القيمة المرجعية"
+
+#. HbRqw
+#: chart2/uiconfig/ui/tp_Scale.ui:582
+msgctxt "tp_Scale|extended_tip|EDT_ORIGIN"
+msgid "Specifies at which position to display the values along the axis."
+msgstr "تحديد عند أي موضع تظهر القيم على المحور."
+
+#. Dj9GB
+#: chart2/uiconfig/ui/tp_Scale.ui:594
+msgctxt "tp_Scale|CBX_AUTO_ORIGIN"
+msgid "Automat_ic"
+msgstr "تلقائ_ي"
+
+#. Z35M3
+#: chart2/uiconfig/ui/tp_Scale.ui:602
+msgctxt "tp_Scale|extended_tip|CBX_AUTO_ORIGIN"
+msgid "You must first deselect the Automatic option in order to modify the values."
+msgstr "في البدء يجب أن تقوم بنزع تحديد الخيار التلقائي لتتمكن من تعديل القيم."
+
+#. wqR5C
+#: chart2/uiconfig/ui/tp_Scale.ui:625
+msgctxt "tp_Scale|FL_SCALE"
+msgid "Scale"
+msgstr "حجّم"
+
+#. YK66G
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:38
+msgctxt "tp_SeriesToAxis|RBT_OPT_AXIS_1"
+msgid "Primary Y axis"
+msgstr "محور ص الأساسيّ"
+
+#. ApXPx
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:47
+msgctxt "tp_SeriesToAxis|extended_tip|RBT_OPT_AXIS_1"
+msgid "This option is active as default. All data series are aligned to the primary Y axis."
+msgstr "هذه الخاصية مفعّلة افتراضيا. كل بيانات السلاسل يتم محاذاتها لمحور 'ع' الرئيسي."
+
+#. aZ7G8
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:59
+msgctxt "tp_SeriesToAxis|RBT_OPT_AXIS_2"
+msgid "Secondary Y axis"
+msgstr "محور ص الثّانويّ"
+
+#. nTQUy
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:68
+msgctxt "tp_SeriesToAxis|extended_tip|RBT_OPT_AXIS_2"
+msgid "Changes the scaling of the Y axis. This axis is only visible when at least one data series is assigned to it and the axis view is active."
+msgstr "قم بغيير المقيارس لمحور 'ع'، هذا المحور مرئي فقط اذا فقط تم ربط ببيان واحد على الأقل و تم تقعيل الرؤية."
+
+#. hV3cT
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:84
+msgctxt "tp_SeriesToAxis|label1"
+msgid "Align Data Series to"
+msgstr "حاذِ سلسلة البيانات إلى"
+
+#. GAF6S
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:123
+msgctxt "tp_SeriesToAxis|FT_GAP"
+msgid "_Spacing"
+msgstr "ال_تّباعد"
+
+#. 27wWb
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:136
+msgctxt "tp_SeriesToAxis|FT_OVERLAP"
+msgid "_Overlap"
+msgstr ""
+
+#. NKaBT
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:153
+msgctxt "tp_SeriesToAxis|extended_tip|MT_GAP"
+msgid "Defines the spacing between the columns in percent."
+msgstr "حدّد التباعد بين الأعمدة بالنسبة المئوية."
+
+#. 8E3zD
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:170
+msgctxt "tp_SeriesToAxis|extended_tip|MT_OVERLAP"
+msgid "Defines the necessary settings for overlapping data series."
+msgstr ""
+
+#. uV5Dn
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:188
+msgctxt "tp_SeriesToAxis|CB_BARS_SIDE_BY_SIDE"
+msgid "Show _bars side by side"
+msgstr "اعرض الأ_شرطة جنبًا إلى جنب"
+
+#. U5ruY
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:197
+msgctxt "tp_SeriesToAxis|extended_tip|CB_BARS_SIDE_BY_SIDE"
+msgid "The bars from different data series are shown as if they were attached only to one axis."
+msgstr ""
+
+#. b7cbo
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:209
+msgctxt "tp_SeriesToAxis|CB_CONNECTOR"
+msgid "Connection lines"
+msgstr "خطوط الاتصال"
+
+#. 42zFb
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:218
+msgctxt "tp_SeriesToAxis|extended_tip|CB_CONNECTOR"
+msgid "For \"stacked\" and \"percent\" column (vertical bar) charts, mark this check box to connect the column layers that belong together with lines."
+msgstr ""
+
+#. VHcU3
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:234
+msgctxt "tp_SeriesToAxis|label2"
+msgid "Settings"
+msgstr "إعدادات"
+
+#. zaB5V
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:272
+msgctxt "tp_SeriesToAxis|FT_MISSING_VALUES"
+msgid "Plot missing values"
+msgstr ""
+
+#. fqYSM
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:282
+msgctxt "tp_SeriesToAxis|RB_DONT_PAINT"
+msgid "_Leave gap"
+msgstr "ا_ترك فجوة"
+
+#. CFmcS
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:291
+msgctxt "tp_SeriesToAxis|extended_tip|RB_DONT_PAINT"
+msgid "For a missing value, no data will be shown. This is the default for chart types Column, Bar, Line, Net."
+msgstr ""
+
+#. ZvtoD
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:302
+msgctxt "tp_SeriesToAxis|RB_ASSUME_ZERO"
+msgid "_Assume zero"
+msgstr "ا_عتبرها صفرًا"
+
+#. y6EGH
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:311
+msgctxt "tp_SeriesToAxis|extended_tip|RB_ASSUME_ZERO"
+msgid "For a missing value, the y-value will be shown as zero. This is the default for chart type Area."
+msgstr ""
+
+#. 8rLB4
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:322
+msgctxt "tp_SeriesToAxis|RB_CONTINUE_LINE"
+msgid "_Continue line"
+msgstr "وا_صِل الخط"
+
+#. 2HArG
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:331
+msgctxt "tp_SeriesToAxis|extended_tip|RB_CONTINUE_LINE"
+msgid "For a missing value, the interpolation from the neighbor values will be shown. This is the default for chart type XY."
+msgstr ""
+
+#. Nw9LX
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:355
+msgctxt "tp_SeriesToAxis|CB_INCLUDE_HIDDEN_CELLS"
+msgid "Include _values from hidden cells"
+msgstr "ضمّن ال_قيم من الخلايا المخفيّة"
+
+#. vEDHo
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:364
+msgctxt "tp_SeriesToAxis|extended_tip|CB_INCLUDE_HIDDEN_CELLS"
+msgid "Check to also show values of currently hidden cells within the source cell range."
+msgstr ""
+
+#. LvZ8x
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:380
+msgctxt "tp_SeriesToAxis|label3"
+msgid "Plot Options"
+msgstr "خيارات التخطيط"
+
+#. gRgPX
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:409
+msgctxt "tp_SeriesToAxis|CB_LEGEND_ENTRY_HIDDEN"
+msgid "Hide legend entry"
+msgstr ""
+
+#. GFmDA
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:417
+msgctxt "tp_SeriesToAxis|extended_tip|CB_LEGEND_ENTRY_HIDDEN"
+msgid "Do not show legend entry for the selected data series or data point."
+msgstr ""
+
+#. q8CTC
+#: chart2/uiconfig/ui/tp_SeriesToAxis.ui:433
+msgctxt "tp_SeriesToAxis|label4"
+msgid "Legend Entry"
+msgstr ""
+
+#. FsWAE
+#: chart2/uiconfig/ui/tp_Trendline.ui:56
+msgctxt "tp_Trendline|linear"
+msgid "_Linear"
+msgstr "_خطّيّ"
+
+#. jir3B
+#: chart2/uiconfig/ui/tp_Trendline.ui:65
+msgctxt "tp_Trendline|extended_tip|linear"
+msgid "A linear trend line is shown."
+msgstr ""
+
+#. u3nKx
+#: chart2/uiconfig/ui/tp_Trendline.ui:76
+msgctxt "tp_Trendline|logarithmic"
+msgid "L_ogarithmic"
+msgstr "لو_غارثميّ"
+
+#. AZT5a
+#: chart2/uiconfig/ui/tp_Trendline.ui:85
+msgctxt "tp_Trendline|extended_tip|logarithmic"
+msgid "A logarithmic trend line is shown."
+msgstr ""
+
+#. fPNok
+#: chart2/uiconfig/ui/tp_Trendline.ui:96
+msgctxt "tp_Trendline|exponential"
+msgid "_Exponential"
+msgstr "أُ_سّي"
+
+#. gufBS
+#: chart2/uiconfig/ui/tp_Trendline.ui:105
+msgctxt "tp_Trendline|extended_tip|exponential"
+msgid "An exponential trend line is shown."
+msgstr ""
+
+#. a6FDp
+#: chart2/uiconfig/ui/tp_Trendline.ui:116
+msgctxt "tp_Trendline|power"
+msgid "Po_wer"
+msgstr "_الأس"
+
+#. sU36A
+#: chart2/uiconfig/ui/tp_Trendline.ui:125
+msgctxt "tp_Trendline|extended_tip|power"
+msgid "A power trend line is shown."
+msgstr ""
+
+#. QCeGG
+#: chart2/uiconfig/ui/tp_Trendline.ui:191
+msgctxt "tp_Trendline|polynomial"
+msgid "_Polynomial"
+msgstr ""
+
+#. f9EeD
+#: chart2/uiconfig/ui/tp_Trendline.ui:200
+msgctxt "tp_Trendline|extended_tip|polynomial"
+msgid "A polynomial trend line is shown with a given degree."
+msgstr ""
+
+#. mGkUE
+#: chart2/uiconfig/ui/tp_Trendline.ui:213
+msgctxt "tp_Trendline|label3"
+msgid "Degree"
+msgstr "الدرجة"
+
+#. HwBsk
+#: chart2/uiconfig/ui/tp_Trendline.ui:218
+msgctxt "tp_Trendline|extended_tip|label3"
+msgid "Degree of polynomial trend line."
+msgstr ""
+
+#. EAkKg
+#: chart2/uiconfig/ui/tp_Trendline.ui:236
+msgctxt "tp_Trendline|extended_tip|degree"
+msgid "Degree of polynomial trend line."
+msgstr ""
+
+#. BkiE2
+#: chart2/uiconfig/ui/tp_Trendline.ui:258
+msgctxt "tp_Trendline|movingAverage"
+msgid "_Moving Average"
+msgstr "معدّل ال_تحرّك"
+
+#. F5WMz
+#: chart2/uiconfig/ui/tp_Trendline.ui:267
+msgctxt "tp_Trendline|extended_tip|movingAverage"
+msgid "A moving average trend line is shown with a given period."
+msgstr ""
+
+#. ZvFov
+#: chart2/uiconfig/ui/tp_Trendline.ui:280
+msgctxt "tp_Trendline|label4"
+msgid "Period"
+msgstr "الفترة"
+
+#. akCwy
+#: chart2/uiconfig/ui/tp_Trendline.ui:285
+msgctxt "tp_Trendline|extended_tip|label4"
+msgid "Number of points to calculate average of moving average trend line."
+msgstr ""
+
+#. g3mex
+#: chart2/uiconfig/ui/tp_Trendline.ui:304
+msgctxt "tp_Trendline|extended_tip|period"
+msgid "Number of points to calculate average of moving average trend line."
+msgstr ""
+
+#. QLnAh
+#: chart2/uiconfig/ui/tp_Trendline.ui:317
+msgctxt "tp_Trendline|label10"
+msgid "_Type"
+msgstr "ال_نوع"
+
+#. P6TjC
+#: chart2/uiconfig/ui/tp_Trendline.ui:322
+msgctxt "tp_Trendline|extended_tip|label10"
+msgid "How the trend line is calculated."
+msgstr ""
+
+#. GWKEC
+#: chart2/uiconfig/ui/tp_Trendline.ui:336
+msgctxt "tp_Trendline|liststore_moving_type"
+msgid "Prior"
+msgstr ""
+
+#. ZxUZe
+#: chart2/uiconfig/ui/tp_Trendline.ui:337
+msgctxt "tp_Trendline|liststore_moving_type"
+msgid "Central"
+msgstr ""
+
+#. 4CBxe
+#: chart2/uiconfig/ui/tp_Trendline.ui:338
+msgctxt "tp_Trendline|liststore_moving_type"
+msgid "Averaged Abscissa"
+msgstr ""
+
+#. ptaCA
+#: chart2/uiconfig/ui/tp_Trendline.ui:379
+msgctxt "tp_Trendline|label1"
+msgid "Regression Type"
+msgstr "نوع الانحدار"
+
+#. mNh7m
+#: chart2/uiconfig/ui/tp_Trendline.ui:412
+msgctxt "tp_Trendline|label7"
+msgid "Extrapolate Forward"
+msgstr ""
+
+#. 4HshA
+#: chart2/uiconfig/ui/tp_Trendline.ui:418
+msgctxt "tp_Trendline|extended_tip|label7"
+msgid "Trend line is extrapolated for higher x-values."
+msgstr ""
+
+#. tUrKr
+#: chart2/uiconfig/ui/tp_Trendline.ui:431
+msgctxt "tp_Trendline|label8"
+msgid "Extrapolate Backward"
+msgstr ""
+
+#. tEfNE
+#: chart2/uiconfig/ui/tp_Trendline.ui:437
+msgctxt "tp_Trendline|extended_tip|label8"
+msgid "Trend line is extrapolated for lower x-values."
+msgstr ""
+
+#. BGkFJ
+#: chart2/uiconfig/ui/tp_Trendline.ui:476
+msgctxt "tp_Trendline|setIntercept"
+msgid "Force _Intercept"
+msgstr ""
+
+#. ZJUti
+#: chart2/uiconfig/ui/tp_Trendline.ui:487
+msgctxt "tp_Trendline|extended_tip|setIntercept"
+msgid "For linear, polynomial and exponential trend lines, intercept value is forced to a given value."
+msgstr ""
+
+#. CSHNm
+#: chart2/uiconfig/ui/tp_Trendline.ui:498
+msgctxt "tp_Trendline|showEquation"
+msgid "Show E_quation"
+msgstr "اعرض الم_عادلة"
+
+#. nXrm7
+#: chart2/uiconfig/ui/tp_Trendline.ui:506
+msgctxt "tp_Trendline|extended_tip|showEquation"
+msgid "Shows the trend line equation next to the trend line."
+msgstr ""
+
+#. cA58s
+#: chart2/uiconfig/ui/tp_Trendline.ui:518
+msgctxt "tp_Trendline|showCorrelationCoefficient"
+msgid "Show _Coefficient of Determination (R²)"
+msgstr ""
+
+#. CCyCH
+#: chart2/uiconfig/ui/tp_Trendline.ui:526
+msgctxt "tp_Trendline|extended_tip|showCorrelationCoefficient"
+msgid "Shows the coefficient of determination next to the trend line."
+msgstr ""
+
+#. 2S6og
+#: chart2/uiconfig/ui/tp_Trendline.ui:540
+msgctxt "tp_Trendline|label5"
+msgid "Trendline _Name"
+msgstr "ا_سم خط الاتجاه"
+
+#. GasKo
+#: chart2/uiconfig/ui/tp_Trendline.ui:546
+msgctxt "tp_Trendline|extended_tip|label5"
+msgid "Name of trend line in legend."
+msgstr ""
+
+#. FBT3Y
+#: chart2/uiconfig/ui/tp_Trendline.ui:563
+msgctxt "tp_Trendline|extended_tip|entry_name"
+msgid "Name of trend line in legend."
+msgstr ""
+
+#. C4C6e
+#: chart2/uiconfig/ui/tp_Trendline.ui:586
+msgctxt "tp_Trendline|extended_tip|interceptValue"
+msgid "Value of intercept if it is forced."
+msgstr ""
+
+#. GEKL2
+#: chart2/uiconfig/ui/tp_Trendline.ui:599
+msgctxt "tp_Trendline|label6"
+msgid "_X Variable Name"
+msgstr "اسم المتغيّر _س"
+
+#. 99kQL
+#: chart2/uiconfig/ui/tp_Trendline.ui:605
+msgctxt "tp_Trendline|extended_tip|label6"
+msgid "Name of X variable in trend line equation."
+msgstr ""
+
+#. Fz8b3
+#: chart2/uiconfig/ui/tp_Trendline.ui:622
+msgctxt "tp_Trendline|extended_tip|entry_Xname"
+msgid "Name of X variable in trend line equation."
+msgstr ""
+
+#. GDQuF
+#: chart2/uiconfig/ui/tp_Trendline.ui:635
+msgctxt "tp_Trendline|label9"
+msgid "_Y Variable Name"
+msgstr "اسم المتغيّر _ص"
+
+#. 2PBW3
+#: chart2/uiconfig/ui/tp_Trendline.ui:641
+msgctxt "tp_Trendline|extended_tip|label9"
+msgid "Name of Y variable in trend line equation."
+msgstr ""
+
+#. WHNXu
+#: chart2/uiconfig/ui/tp_Trendline.ui:658
+msgctxt "tp_Trendline|extended_tip|entry_Yname"
+msgid "Name of Y variable in trend line equation."
+msgstr ""
+
+#. 9WeUe
+#: chart2/uiconfig/ui/tp_Trendline.ui:679
+msgctxt "tp_Trendline|label2"
+msgid "Options"
+msgstr "خيارات"
+
+#. ntcUA
+#: chart2/uiconfig/ui/tp_axisLabel.ui:19
+msgctxt "tp_axisLabel|showlabelsCB"
+msgid "Sho_w labels"
+msgstr "أ_ظهر اللصائق"
+
+#. Xr5zw
+#: chart2/uiconfig/ui/tp_axisLabel.ui:28
+msgctxt "tp_axisLabel|extended_tip|showlabelsCB"
+msgid "Specifies whether to show or hide the axis labels."
+msgstr ""
+
+#. HFhGL
+#: chart2/uiconfig/ui/tp_axisLabel.ui:62
+msgctxt "tp_axisLabel|tile"
+msgid "_Tile"
+msgstr "ال_عنوان"
+
+#. cmjFi
+#: chart2/uiconfig/ui/tp_axisLabel.ui:71
+msgctxt "tp_axisLabel|extended_tip|tile"
+msgid "Arranges numbers on the axis side by side."
+msgstr ""
+
+#. tHrCD
+#: chart2/uiconfig/ui/tp_axisLabel.ui:83
+msgctxt "tp_axisLabel|odd"
+msgid "St_agger odd"
+msgstr ""
+
+#. Q8h6B
+#: chart2/uiconfig/ui/tp_axisLabel.ui:92
+msgctxt "tp_axisLabel|extended_tip|odd"
+msgid "Staggers numbers on the axis, even numbers lower than odd numbers."
+msgstr ""
+
+#. tByen
+#: chart2/uiconfig/ui/tp_axisLabel.ui:104
+msgctxt "tp_axisLabel|even"
+msgid "Stagger _even"
+msgstr ""
+
+#. a6qBM
+#: chart2/uiconfig/ui/tp_axisLabel.ui:113
+msgctxt "tp_axisLabel|extended_tip|even"
+msgid "Stagger numbers on the axis, odd numbers lower than even numbers."
+msgstr ""
+
+#. 2JwY3
+#: chart2/uiconfig/ui/tp_axisLabel.ui:125
+msgctxt "tp_axisLabel|auto"
+msgid "A_utomatic"
+msgstr "_تلقائي"
+
+#. fj3Rq
+#: chart2/uiconfig/ui/tp_axisLabel.ui:134
+msgctxt "tp_axisLabel|extended_tip|auto"
+msgid "Automatically arranges numbers on the axis."
+msgstr ""
+
+#. bFH6L
+#: chart2/uiconfig/ui/tp_axisLabel.ui:150
+msgctxt "tp_axisLabel|orderL"
+msgid "Order"
+msgstr "التّرتيب"
+
+#. GMtbb
+#: chart2/uiconfig/ui/tp_axisLabel.ui:181
+msgctxt "tp_axisLabel|overlapCB"
+msgid "O_verlap"
+msgstr "الترا_كب"
+
+#. zwgui
+#: chart2/uiconfig/ui/tp_axisLabel.ui:189
+msgctxt "tp_axisLabel|extended_tip|overlapCB"
+msgid "Specifies that the text in cells may overlap other cells."
+msgstr ""
+
+#. AYpQ8
+#: chart2/uiconfig/ui/tp_axisLabel.ui:201
+msgctxt "tp_axisLabel|breakCB"
+msgid "_Break"
+msgstr "ا_كسر"
+
+#. eBwTo
+#: chart2/uiconfig/ui/tp_axisLabel.ui:209
+msgctxt "tp_axisLabel|extended_tip|breakCB"
+msgid "Allows a text break."
+msgstr ""
+
+#. 4EwR7
+#: chart2/uiconfig/ui/tp_axisLabel.ui:225
+msgctxt "tp_axisLabel|textflowL"
+msgid "Text Flow"
+msgstr "انسياب النص"
+
+#. exWTH
+#: chart2/uiconfig/ui/tp_axisLabel.ui:281
+msgctxt "tp_axisLabel|extended_tip|OrientDegree"
+msgid "Allows you to manually enter the orientation angle."
+msgstr ""
+
+#. 5teDt
+#: chart2/uiconfig/ui/tp_axisLabel.ui:295
+msgctxt "tp_axisLabel|degreeL"
+msgid "_Degrees"
+msgstr "_درجة"
+
+#. jFKoF
+#: chart2/uiconfig/ui/tp_axisLabel.ui:330
+msgctxt "tp_axisLabel|stackedCB"
+msgid "Ve_rtically stacked"
+msgstr "م_كدسة رأسيًا"
+
+#. ra62A
+#: chart2/uiconfig/ui/tp_axisLabel.ui:339
+msgctxt "tp_axisLabel|extended_tip|stackedCB"
+msgid "Assigns vertical text orientation for cell contents."
+msgstr ""
+
+#. JBz5H
+#: chart2/uiconfig/ui/tp_axisLabel.ui:351
+msgctxt "tp_axisLabel|labelABCD"
+msgid "ABCD"
+msgstr "أبجد"
+
+#. PE6RQ
+#: chart2/uiconfig/ui/tp_axisLabel.ui:368
+msgctxt "tp_axisLabel|textdirL"
+msgid "Te_xt direction:"
+msgstr "اتّجاه النّ_صّ:"
+
+#. YUAjA
+#: chart2/uiconfig/ui/tp_axisLabel.ui:382
+msgctxt "tp_axisLabel|extended_tip|textdirLB"
+msgid "Specify the text direction for a paragraph that uses complex text layout (CTL). This feature is only available if complex text layout support is enabled."
+msgstr ""
+
+#. NxsBh
+#: chart2/uiconfig/ui/tp_axisLabel.ui:401
+msgctxt "tp_axisLabel|extended_tip|dialCtrl"
+msgid "Clicking anywhere on the wheel defines the variable text orientation."
+msgstr ""
+
+#. 3WhzS
+#: chart2/uiconfig/ui/tp_axisLabel.ui:416
+msgctxt "tp_axisLabel|labelTextOrient"
+msgid "Text Orientation"
+msgstr "اتّجاه النّصّ"
+
+#. tCfsY
+#: chart2/uiconfig/ui/wizelementspage.ui:40
+msgctxt "wizelementspage|labelPrimaryXaxis"
+msgid "_X axis"
+msgstr "المحور _س"
+
+#. LtEdA
+#: chart2/uiconfig/ui/wizelementspage.ui:54
+msgctxt "wizelementspage|labelPrimaryYaxis"
+msgid "_Y axis"
+msgstr "المحور _ص"
+
+#. tVeNC
+#: chart2/uiconfig/ui/wizelementspage.ui:68
+msgctxt "wizelementspage|labelPrimaryZaxis"
+msgid "_Z axis"
+msgstr "المحور _ع"
+
+#. 7qRfe
+#: chart2/uiconfig/ui/wizelementspage.ui:87
+msgctxt "wizelementspage|extended_tip|primaryXaxis"
+msgid "Enter a label for the x-axis (horizontal)."
+msgstr ""
+
+#. 4vThc
+#: chart2/uiconfig/ui/wizelementspage.ui:105
+msgctxt "wizelementspage|extended_tip|primaryYaxis"
+msgid "Enter a label for the y-axis (vertical)."
+msgstr ""
+
+#. 7zPH5
+#: chart2/uiconfig/ui/wizelementspage.ui:123
+msgctxt "wizelementspage|extended_tip|primaryZaxis"
+msgid "Enter a label for the z-axis. This option is only available for three-dimensional charts."
+msgstr ""
+
+#. Qpj9H
+#: chart2/uiconfig/ui/wizelementspage.ui:136
+msgctxt "wizelementspage|labelMainTitle"
+msgid "_Title"
+msgstr "ال_عنوان"
+
+#. nPAjY
+#: chart2/uiconfig/ui/wizelementspage.ui:150
+msgctxt "wizelementspage|labelSubTitle"
+msgid "_Subtitle"
+msgstr "الع_نوان الفرعيّ"
+
+#. CWmMQ
+#: chart2/uiconfig/ui/wizelementspage.ui:169
+msgctxt "wizelementspage|extended_tip|maintitle"
+msgid "Enter a title for your chart."
+msgstr ""
+
+#. eNDvd
+#: chart2/uiconfig/ui/wizelementspage.ui:187
+msgctxt "wizelementspage|extended_tip|subtitle"
+msgid "Enter a subtitle for your chart."
+msgstr ""
+
+#. GJ7pJ
+#: chart2/uiconfig/ui/wizelementspage.ui:200
+msgctxt "wizelementspage|labelSecondaryXAxis"
+msgid "X _axis"
+msgstr "ال_محور س"
+
+#. bBRgE
+#: chart2/uiconfig/ui/wizelementspage.ui:214
+msgctxt "wizelementspage|labelSecondaryYAxis"
+msgid "Y ax_is"
+msgstr "الم_حور ص"
+
+#. NGoMT
+#: chart2/uiconfig/ui/wizelementspage.ui:233
+msgctxt "wizelementspage|extended_tip|secondaryXaxis"
+msgid "Enter a label for the secondary x-axis. This option is only available for charts that support a secondary x-axis."
+msgstr ""
+
+#. E6Y7y
+#: chart2/uiconfig/ui/wizelementspage.ui:269
+msgctxt "wizelementspage|show"
+msgid "_Display legend"
+msgstr "ا_عرض مفتاح الرسم"
+
+#. QWAen
+#: chart2/uiconfig/ui/wizelementspage.ui:277
+msgctxt "wizelementspage|extended_tip|show"
+msgid "Specifies whether to display a legend for the chart."
+msgstr ""
+
+#. ejdzz
+#: chart2/uiconfig/ui/wizelementspage.ui:295
+msgctxt "wizelementspage|left"
+msgid "_Left"
+msgstr "الي_سار"
+
+#. tGgc2
+#: chart2/uiconfig/ui/wizelementspage.ui:304
+msgctxt "wizelementspage|extended_tip|left"
+msgid "Positions the legend at the left of the chart."
+msgstr ""
+
+#. EjE6h
+#: chart2/uiconfig/ui/wizelementspage.ui:315
+msgctxt "wizelementspage|right"
+msgid "_Right"
+msgstr "الي_مين"
+
+#. rvAN8
+#: chart2/uiconfig/ui/wizelementspage.ui:324
+msgctxt "wizelementspage|extended_tip|right"
+msgid "Positions the legend at the right of the chart."
+msgstr ""
+
+#. LnxgC
+#: chart2/uiconfig/ui/wizelementspage.ui:335
+msgctxt "wizelementspage|top"
+msgid "_Top"
+msgstr "الأ_على"
+
+#. Ehv3g
+#: chart2/uiconfig/ui/wizelementspage.ui:344
+msgctxt "wizelementspage|extended_tip|top"
+msgid "Positions the legend at the top of the chart."
+msgstr ""
+
+#. GD2qS
+#: chart2/uiconfig/ui/wizelementspage.ui:355
+msgctxt "wizelementspage|bottom"
+msgid "_Bottom"
+msgstr "الأس_فل"
+
+#. NCp3E
+#: chart2/uiconfig/ui/wizelementspage.ui:364
+msgctxt "wizelementspage|extended_tip|bottom"
+msgid "Positions the legend at the bottom of the chart."
+msgstr ""
+
+#. REBEt
+#: chart2/uiconfig/ui/wizelementspage.ui:391
+msgctxt "wizelementspage|Axe"
+msgid "Choose Titles, Legend, and Grid Settings"
+msgstr "اختر إعدادات العناوين ومفتاح الرسم والشبكة"
+
+#. wp2DC
+#: chart2/uiconfig/ui/wizelementspage.ui:421
+msgctxt "wizelementspage|x"
+msgid "X axis"
+msgstr "المحور س"
+
+#. KbejV
+#: chart2/uiconfig/ui/wizelementspage.ui:429
+msgctxt "wizelementspage|extended_tip|x"
+msgid "Displays grid lines that are perpendicular to the x-axis."
+msgstr ""
+
+#. KPGMU
+#: chart2/uiconfig/ui/wizelementspage.ui:440
+msgctxt "wizelementspage|y"
+msgid "Y ax_is"
+msgstr "الم_حور ص"
+
+#. Nivye
+#: chart2/uiconfig/ui/wizelementspage.ui:448
+msgctxt "wizelementspage|extended_tip|y"
+msgid "Displays grid lines that are perpendicular to the y-axis."
+msgstr ""
+
+#. G65v4
+#: chart2/uiconfig/ui/wizelementspage.ui:459
+msgctxt "wizelementspage|z"
+msgid "Z axi_s"
+msgstr "المح_ور ع"
+
+#. uVwTv
+#: chart2/uiconfig/ui/wizelementspage.ui:467
+msgctxt "wizelementspage|extended_tip|z"
+msgid "Displays grid lines that are perpendicular to the z-axis. This option is only available for three-dimensional charts."
+msgstr ""
+
+#. wNqwZ
+#: chart2/uiconfig/ui/wizelementspage.ui:482
+msgctxt "wizelementspage|label2"
+msgid "Display Grids"
+msgstr "اعرض الشّبكات"

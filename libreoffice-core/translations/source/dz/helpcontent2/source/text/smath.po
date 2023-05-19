@@ -1,0 +1,557 @@
+#. extracted from helpcontent2/source/text/smath
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2018-11-12 13:28+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: dz\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1542029315.000000\n"
+
+#. yKBT5
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Welcome to the $[officename] Math Help"
+msgstr "$[officename]ཨང་རྩིས་གྲོགས་རམ་ལུ་འབྱོན་པ་ལེགས་སོ།"
+
+#. RKjEE
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3148868\n"
+"help.text"
+msgid "Welcome to the $[officename] Math Help"
+msgstr "$[officename]ཨང་རྩིས་གྲོགས་རམ་ལུ་འབྱོན་པ་ལེགས་སོ།"
+
+#. 9EweT
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3153915\n"
+"help.text"
+msgid "How to Work With $[officename] Math"
+msgstr "$[officename]ཨང་རྩིས་གྲོགས་རམ་དང་གཅིག་ཁར་ལཱ་ག་དེ་སྦེ་འབད་ནི་ཨིན་ན།"
+
+#. NqF3B
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3143229\n"
+"help.text"
+msgid "<link href=\"text/smath/01/03091500.xhp\">Formula Reference Tables</link>"
+msgstr "<link href=\"text/smath/01/03091500.xhp\">མན་ངག་གཞི་བསྟུན་ཐིག་ཁྲམ་</link>"
+
+#. mEUPE
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3153808\n"
+"help.text"
+msgid "$[officename] Math Menus, Toolbars, and Keys"
+msgstr "$[officename] ཨང་རྩིས་དཀར་ཆག་ ལག་ཆས་ཕྲ་རིང་དང་ལྡེ་མིག་ཚུ།"
+
+#. LMBFS
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3143269\n"
+"help.text"
+msgid "Have a look at <link href=\"https://www.dmaths.org\">www.dmaths.org</link> for a set of additional %PRODUCTNAME Math icons and macros."
+msgstr ""
+
+#. aFUnY
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Menus"
+msgstr "དཀར་ཆག"
+
+#. QoCY3
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"hd_id3149021\n"
+"help.text"
+msgid "<variable id=\"main0100\"><link href=\"text/smath/main0100.xhp\">Menus</link></variable>"
+msgstr "<variable id=\"main0100\"><link href=\"text/smath/main0100.xhp\">དཀར་ཆག་</link></variable>"
+
+#. Bmi2e
+#: main0100.xhp
+msgctxt ""
+"main0100.xhp\n"
+"par_id3154702\n"
+"help.text"
+msgid "The menu bar contains all the commands for working with $[officename] Math. It contains a list of all the available operators as well as the commands for editing, viewing, arranging, formatting and printing formula documents and the objects contained in them. Most of the menu commands are only available when you are creating or editing a formula."
+msgstr "དཀར་ཆག་ཕྲ་རིང་ནང་  $[officename]ཨང་རྩིས་དང་གཅིག་ཁར་ལཱ་འབད་ནིའི་དོན་ལུ་ བརྡ་བཀོད་ཚུ་ཆ་མཉམ་ཡོདཔ་ཨིན། འདི་ནང་ཡོད་པའི་བཀོལ་སྤྱོད་པ་ཚུ་གི་ཐོ་ཡིག་ཅིག་ཡོད་པའི་ཁར་ ཞུན་དག་དང་སྟོན་ནི་དེ་ལས་བདེ་ཞིབ་དང་མན་ངག་ཡིག་ཆ་ཚུ་རྩ་སྒྲིག་དང་དཔར་བསྐྲུན་འབད་ནི་ ད་རུང་གཞན་ཡང་ ནང་ན་ཡོད་པའི་དངོས་པོའི་དོན་ལུ་བརྡ་བཀོད་ཚུ་ཡང་ཡོདཔ་ཨིན། ཁྱོད་ཀྱིས་མན་ངག་གསར་བསྐྲུན་ ཡང་ན་ ཞུན་དག་འབད་བའི་སྐབས་ལུ་ དཀར་ཆ་བརྡ་བཀོད་མང་ཤོས་ར་འཐོབ་ཚུགསཔ་ཨིན།"
+
+#. PvGHJ
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"tit\n"
+"help.text"
+msgid "File"
+msgstr "ཡིག་སྣོད།"
+
+#. AmMPG
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"hd_id3149018\n"
+"help.text"
+msgid "<link href=\"text/smath/main0101.xhp\">File</link>"
+msgstr "<link href=\"text/smath/main0101.xhp\">ཡིག་སྣོད་</link>"
+
+#. yPAfq
+#: main0101.xhp
+msgctxt ""
+"main0101.xhp\n"
+"par_id3155959\n"
+"help.text"
+msgid "This menu contains the general commands for working with formula documents, such as create, open, save and print."
+msgstr ""
+
+#. 6hchv
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit"
+msgstr "ཞུན་དག"
+
+#. wF988
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"hd_id3156385\n"
+"help.text"
+msgid "<link href=\"text/smath/main0102.xhp\">Edit</link>"
+msgstr "<link href=\"text/smath/main0102.xhp\">ཞུན་དག་</link>"
+
+#. pTQDn
+#: main0102.xhp
+msgctxt ""
+"main0102.xhp\n"
+"par_id3145790\n"
+"help.text"
+msgid "The commands in this menu are used to edit formulas. In addition to basic commands, (for example, copying contents) there are functions specific to $[officename] Math such as searching for placeholders or errors."
+msgstr "དཀར་ཆག་འདི་ནང་ཡོད་པའི་བརྡ་བཀོད་ཚུ་ངན་ངག་ཞུན་དག་འབད་ནི་གི་དོན་ལུ་ལག་ལེན་འཐབ་ཨིན། གཞི་རིམ་བརྡ་བཀོད་ཀྱི་ཁ་སྐོང་ལུ་ (དཔེར་ན་ ནང་དོན་འདྲ་བཤུས་བརྐྱབ་ནི་)ས་གནས་འཛིན་མི་ ཡང་ན་ འཛོལ་བ་ཚུ་འཚོལ་ཞིབ་འབད་ནི་བཟུམ་སྦེ་ $[officename]ཨང་རྩིས་ལུ་དམིགས་བསལ་གྱི་ལས་འགན་ཚུ་ཡོད།"
+
+#. zRW8E
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"tit\n"
+"help.text"
+msgid "View"
+msgstr "མཐོང་སྣང་།"
+
+#. 2EqUT
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3155064\n"
+"help.text"
+msgid "<link href=\"text/smath/main0103.xhp\">View</link>"
+msgstr "<link href=\"text/smath/main0103.xhp\">མཐོང་སྣང་</link>"
+
+#. WFo3v
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"par_id3147338\n"
+"help.text"
+msgid "Sets the display scale and defines which elements you want to be visible. Most of the commands that you can enter into the <emph>Commands</emph> window can also be accessed through a mouse click if you have already opened the Elements pane with <link href=\"text/smath/01/03090000.xhp\"><menuitem>View - Elements</menuitem></link>."
+msgstr ""
+
+#. 4C4gL
+#: main0103.xhp
+msgctxt ""
+"main0103.xhp\n"
+"hd_id3150205\n"
+"help.text"
+msgid "<link href=\"text/shared/01/03010000.xhp\">Zoom</link>"
+msgstr "<link href=\"text/shared/01/03010000.xhp\">རྒྱས་ཟུམ་</link>"
+
+#. JP4tR
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format"
+msgstr "རྩ་སྒྲིག"
+
+#. FFWFC
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3149121\n"
+"help.text"
+msgid "<link href=\"text/smath/main0105.xhp\">Format</link>"
+msgstr "<link href=\"text/smath/main0105.xhp\">རྩ་སྒྲིག་</link>"
+
+#. DXDBJ
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"par_id3149018\n"
+"help.text"
+msgid "This menu contains commands needed to format formulas."
+msgstr "དཀར་ཆག་འདི་ནང་ རྩ་སྒྲིག་མན་ངག་ལུ་དགོ་པའི་བརྡ་བཀོད་ཚུ་ཡོདཔ་ཨིན།"
+
+#. G9yVX
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3156385\n"
+"help.text"
+msgid "<link href=\"text/smath/01/05010000.xhp\">Fonts</link>"
+msgstr "<link href=\"text/smath/01/05010000.xhp\">ཡིག་གཟུགས་ཚུ་</link>"
+
+#. drsmP
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3154656\n"
+"help.text"
+msgid "<link href=\"text/smath/01/05020000.xhp\">Font Size</link>"
+msgstr "<link href=\"text/smath/01/05020000.xhp\">ཡིག་གཟུགས་ཚད་</link>"
+
+#. mb375
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3154484\n"
+"help.text"
+msgid "<link href=\"text/smath/01/05030000.xhp\">Spacing</link>"
+msgstr "<link href=\"text/smath/01/05030000.xhp\">བར་སྟོང་བཞག་ཐངས།</link>"
+
+#. J6TmW
+#: main0105.xhp
+msgctxt ""
+"main0105.xhp\n"
+"hd_id3151242\n"
+"help.text"
+msgid "<link href=\"text/smath/01/05040000.xhp\">Alignment</link>"
+msgstr "<link href=\"text/smath/01/05040000.xhp\">ཕྲང་སྒྲིག་</link>"
+
+#. r9nLs
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools"
+msgstr "ལག་ཆས་ཚུ།"
+
+#. aDeFk
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3149019\n"
+"help.text"
+msgid "<link href=\"text/smath/main0106.xhp\">Tools</link>"
+msgstr "<link href=\"text/smath/main0106.xhp\">ལག་ཆས་ཚུ་</link>"
+
+#. Y7EE7
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"par_id3155959\n"
+"help.text"
+msgid "Use this menu to open and edit the symbol catalog, or import an external formula as a data file or via clipboard. The program interface can be adjusted to meet your requirements. You can also change the program options."
+msgstr "བརྡ་མཚོན་ཐོ་གཞུང་འདི་ཁ་ཕྱེ་ནི་དང་ཞུན་དག་འབད་ནི་གི་དོན་ལུ་ དཀར་ཆ་འདི་ལག་ལེན་འཐབ་ ཡང་ན་ ཕྱི་ཁའི་མན་ངག་འདི་གནད་སྡུད་ཡིག་སྣོད་ཅིག་སྦེ་ནང་འདྲེན་འབད། ཁྱོད་ཀྱི་དགོས་མཁོ་ཚུ་འགྲུབ་ནི་ལུ་ ལས་རིམ་གྱི་ངོས་འདྲ་བ་འདི་བདེ་སྒྲིག་འབད་ཚུགས། དེ་མ་ཚད་ ལས་རིམ་གདམ་ཁ་ཚུ་ཡང་བསྒྱུར་བཅོས་འབད་ཚུགས།"
+
+#. FTLiB
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3150206\n"
+"help.text"
+msgid "<link href=\"text/smath/01/06020000.xhp#importfile\">Import Formula</link>"
+msgstr "<link href=\"text/smath/01/06020000.xhp\">མན་ངག་ནང་འདྲེན་འབད་</link>"
+
+#. Nya8t
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3150207\n"
+"help.text"
+msgid "<link href=\"text/smath/01/06020000.xhp#importclipboard\">Import MathML from Clipboard</link>"
+msgstr ""
+
+#. 8HWG3
+#: main0106.xhp
+msgctxt ""
+"main0106.xhp\n"
+"hd_id3145385\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06140000.xhp\">Customize</link>"
+msgstr "<link href=\"text/shared/01/06140000.xhp\">སྲོལ་སྒྲིག་འབད་</link>"
+
+#. KRfJh
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"tit\n"
+"help.text"
+msgid "Window"
+msgstr "སྒོ་སྒྲིག"
+
+#. Eb4Wf
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"hd_id3155066\n"
+"help.text"
+msgid "<link href=\"text/smath/main0107.xhp\">Window</link>"
+msgstr "<link href=\"text/smath/main0107.xhp\">སྒོ་སྒྲིག་</link>"
+
+#. Zoq2R
+#: main0107.xhp
+msgctxt ""
+"main0107.xhp\n"
+"par_id3147339\n"
+"help.text"
+msgid "In the Window menu, you can open a new window and see the document list."
+msgstr "སྒོ་སྒྲིག་དཀར་ཆག་ནང་ ཁྱོད་ཀྱིས་སྒོ་སྒྲིག་གསརཔ་ཅིག་ཁ་ཕྱེ་ཚུགསཔ་དང་ཡིག་ཆའི་ཐོ་ཡིག་མཐོང་ཚུགས།"
+
+#. 5DRv5
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toolbars"
+msgstr "ལག་ཆས་ཕྲ་རིང་ཚུ་།"
+
+#. yetfd
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"hd_id3149121\n"
+"help.text"
+msgid "<variable id=\"main0200\"><link href=\"text/smath/main0200.xhp\">Toolbars</link></variable>"
+msgstr "<variable id=\"main0200\"><link href=\"text/smath/main0200.xhp\">ལག་ཆས་ཕྲ་རིང་ཚུ་</link></variable>"
+
+#. oxgE6
+#: main0200.xhp
+msgctxt ""
+"main0200.xhp\n"
+"par_id3147338\n"
+"help.text"
+msgid "The default toolbars available when working with an activated formula document in $[officename] Math are described here. You can customize the toolbars to meet your requirements by moving, deleting or adding new icons."
+msgstr "$[officename]ཨང་རྩིས་ནང་  ཤུགས་ལྡན་ཡོད་པའི་མན་ངག་ཡིག་ཆ་དང་ཅི་ཁར་ལཱ་འབད་བའི་བསྒང་   སྔོན་སྒྲིག་ལག་ཆས་ཕྲ་རིང་ཐོབ་ཚུགས་ཡོད་མི་ཚུ་  ནཱ་ལུ་བཤད་དེ་ཡོད།  ཁྱོད་རའི་དགོས་མཁོ་ཚུ་ལུ་འཛོམས་ནི་ལུ་   ངོས་དཔར་ཚུ་  སྤོ་བཤུད་འབད་ནི་   བཏོན་གཏང་ནི་དང་  ཁ་སྐོང་བརྐྱབ་ཐོག་ལས་  ཁྱོད་ཀྱིས་  ལག་ཆས་ཕྲ་རིང་ཚུ་སྲོལ་སྒྲིག་འབད་བཏུབ་ཨིན།"
+
+#. CBJ97
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"tit\n"
+"help.text"
+msgid "Status Bar"
+msgstr "གནས་ཚད་ཕྲ་རིང་།"
+
+#. FT8DF
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"hd_id3150749\n"
+"help.text"
+msgid "<link href=\"text/smath/main0202.xhp\">Status Bar</link>"
+msgstr "<link href=\"text/smath/main0202.xhp\">གནས་ཚད་ཕྲ་རིང་</link>"
+
+#. XAbu3
+#: main0202.xhp
+msgctxt ""
+"main0202.xhp\n"
+"par_id3083278\n"
+"help.text"
+msgid "The status bar displays information about the active document."
+msgstr "གནས་ཚད་ཕྲ་རིང་གིས་ ཤུགས་ལྡན་གྱི་ཡིག་ཆའི་སྐོར་ལས་བརྡ་དོན་བཀྲམ་སྟོན་འབདཝ་ཨིན།"
+
+#. f5CrW
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools Bar"
+msgstr "ལག་ཆས་ཕྲ་རིང་།"
+
+#. GDG9G
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3149123\n"
+"help.text"
+msgid "<link href=\"text/smath/main0203.xhp\">Tools Bar</link>"
+msgstr "<link href=\"text/smath/main0203.xhp\">ལག་ཆས་ཕྲ་རིང་</link>"
+
+#. b2SG3
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"par_id3147338\n"
+"help.text"
+msgid "The Tools bar contains frequently used functions."
+msgstr "ལག་ཆས་ཕྲ་རིང་ནང་ འཕྲལ་འཕྲལ་རང་ལག་ལེན་འཐབ་ཡོད་པའི་ལས་འགན་ཚུ་ཡོདཔ་ཨིན།"
+
+#. HfVpE
+#: main0203.xhp
+msgctxt ""
+"main0203.xhp\n"
+"hd_id3151242\n"
+"help.text"
+msgid "<link href=\"text/smath/02/03010000.xhp\">Formula Cursor</link>"
+msgstr "<link href=\"text/smath/02/03010000.xhp\">མན་ངག་འོད་རྟགས་</link>"
+
+#. 8sU9J
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] Math Features"
+msgstr "$[officename] ཨང་རྩིས་ཁྱད་རྣམ་ཚུ།"
+
+#. 8NjEC
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3155064\n"
+"help.text"
+msgid "<variable id=\"main0503\"><link href=\"text/smath/main0503.xhp\">$[officename] Math Features</link></variable>"
+msgstr "<variable id=\"main0503\"><link href=\"text/smath/main0503.xhp\">$[officename] ཨང་རྩིས་ཁྱད་རྣམ་ཚུ་</link></variable>"
+
+#. nAB9q
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3156386\n"
+"help.text"
+msgid "This section contains an overview of some of the important functions and capabilities that $[officename] Math offers."
+msgstr "དབྱེ་ཚན་འདི་ནང་ $[officename]ཨང་རྩིས་ཀྱིས་བྱིན་པའི་གལ་ཅན་ལས་འགན་ལ་ལོ་ཅིག་གི་སྤྱི་མཐོང་དང་ལྕོགས་གྲུབ་ཚུ་ཡོདཔ་ཨིན།"
+
+#. CBatK
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3148486\n"
+"help.text"
+msgid "$[officename] Math provides numerous operators, functions and formatting assistants to help you create formulas. These are all listed in a selection window, in which you can click the required element with the mouse to insert the object into your work. There is an exhaustive <link href=\"text/smath/01/03091500.xhp\">reference</link> list and numerous <link href=\"text/smath/01/03090900.xhp\">samples</link> contained in the Help."
+msgstr "$[officename] ཨང་རྩིས་ཀྱིས་ ཁྱོད་ཀྱིས་མན་ངག་གསར་བསྐྲུན་འབད་ནིའི་གྲོགས་རམ་གྱི་དོན་ལུ་ བཀོལ་སྤྱོད་པ་སྣ་ཚོགས་དང་ལས་འགན་དེ་ལས་རྩ་སྒྲིག་ལས་རོགས་ཚུ་བྱིནམ་ཨིན། དེ་ཚུ་ཆ་མཉམ་ར་སེལ་འཐུའི་སྒོ་སྒྲིག་ཅིག་ནང་ཐོ་ཡིག་བཀོད་དེ་ཡོད་ དེ་ཡང་ ཁྱོད་རའི་ལཱ་ནང་དངོས་པོ་བཙུགས་ནིའི་དོན་ལུ་ མའུསི་གི་ཐོག་ལས་དགོ་པའི་ཆ་ཤས་ལུ་ཨེབ་གཏང་འབད་ཚུགས།  དེ་ནང་ རྫོགས་ནི་ཡོད་པའི་<link href=\"text/smath/01/03091500.xhp\">གཞི་བསྟུན་</link> ཐོ་ཡིག་དང་ གྲོགས་རམ་ནང་<link href=\"text/smath/01/03090900.xhp\">དཔེ་ཚད་</link>སྣ་ཚོགས་ཚུ་ཡོདཔ་ཨིན། ."
+
+#. dA2Fo
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3150207\n"
+"help.text"
+msgid "Creating a Formula"
+msgstr "མན་ངག་ཅིག་གསར་བསྐྲུན་འབད་དོ།"
+
+#. A6AtR
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145386\n"
+"help.text"
+msgid "As with charts and images, formulas are created as objects within a document. Inserting a formula into a document automatically starts $[officename] Math. You can create, edit and format the formula using a large selection of predefined symbols and functions."
+msgstr "དཔེ་རིས་དང་གཟུགས་བརྙན་ཚུ་གི་ཐོག་ལས་ མན་ངག་ཚུ་དངོས་པོ་བཟུམ་སྦེ་ཡིག་ཆ་ནང་ལུ་གསར་བསྐྲུན་འབད་ཡི། ཡིག་ཆ་ནང་ལུ་མན་ངག་ཅིག་བཙུགས་མི་འདི་གིས་ $[officename]ཨང་རྩིས་ རང་བཞིན་གྱིས་འགོ་བཙུགསཔ་ཨིན། ཁྱོད་ཀྱིས་ སྔ་གོང་ལས་ངེས་འཛིན་འབད་ཡོད་པའི་བརྡ་མཚོན་སེལ་འཐུ་སྦོམ་དང་ལས་འགན་ཚུ་ལག་ལེན་འཐབ་པའི་ཐོག་ལས་ གསར་བསྐྲུན་དང་ཞུན་དག་དེ་ལས་རྩ་སྒྲིག་འབད་ཚུགས།"
+
+#. 6nhjN
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3153916\n"
+"help.text"
+msgid "Typing a Formula Directly"
+msgstr "མན་ངག་ཅིག་ཐད་ཀར་དུ་ཡིག་དཔར་རྐྱབ་དོ།"
+
+#. 9EtAj
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3150213\n"
+"help.text"
+msgid "If you are familiar with the $[officename] Math language, you can also type a formula directly into the document. For example, type this formula into a text document: \"a sup 2 + b sup 2 = c sup 2\". Select this text and choose <emph>Insert - Object - Formula</emph>. The text will be converted into a formatted formula."
+msgstr "$[officename] ཨང་རྩིས་སྐད་ཡིག་དང་འབྲེལ་བ་ཡོད་པ་ཅིན་ ཁྱོད་ཀྱིས་ཡིག་ཆའི་ནང་ལུ་ མན་ངག་ཐད་ཀར་དུ་ཡིག་དཔར་བརྐྱབ་ཚུགས། དཔེར་ན་ མན་ངག་འདི་ཚིག་ཡིག་ཡིག་ཆ་་ནང་ཡིག་དཔར་རྐྱབས་:\"a sup 2 + b sup 2 = c sup 2\". ཚིག་ཡིག་འདི་སེལ་འཐུ་འབད་ཞིནམ་ལས་ <emph>བཙུགས་ - དངོས་པོ་ - མན་ངག་</emph>གདམས། ཚིག་ཡིག་འདི་ རྩ་སྒྲིག་འབད་ཡོད་པའི་མན་ངག་ནང་གཞི་བསྒྱུར་འབད་འོང་།"
+
+#. 5HQmG
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3146325\n"
+"help.text"
+msgid "Formulas cannot be calculated in $[officename] Math because it is a formula editor (for writing and showing formulas) and not a calculation program. Use spreadsheets to calculate formulas, or for simple calculations use the text document calculation function."
+msgstr "མན་ངག་ཚུ་  $[officename]ཨང་རྩིས་ནང་རྩིས་བཏོན་མི་ཚུགས་ ག་ཅི་སྦེ་ཟེར་བ་ཅིན་ འདི་མན་ངག་ཞུན་དགཔ་(མན་ངག་བྲིས་ནི་དང་སྟོན་ནིའི་དོན་ལུ་)དང་རྩིས་ལས་ལས་རིམ་མེན། མན་ངག་ཚུ་རྩིས་བཏོན་ནིའི་དོན་ལུ་ ཤོག་ཁྲམ་ལག་ལེན་འཐབ་ ཡང་ན་ འཇམ་སམ་རྩིས་ལས་ཨིན་པ་ཅིན་ ཚིག་ཡིག་ཡིག་ཆའི་རྩིས་ལས་ལས་འགན་འདི་ ལག་ལེན་འཐབ།"
+
+#. t7dDL
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3145829\n"
+"help.text"
+msgid "Creating a Formula in the Commands Window"
+msgstr "བརྡ་བཀོད་སྒོ་སྒྲིག་ནང་ མན་ངག་ཅིག་གསར་བསྐྲུན་འབད་དོ།"
+
+#. H9URC
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3153001\n"
+"help.text"
+msgid "<ahelp hid=\"HID_SMA_COMMAND_WIN_EDIT\">Use the $[officename] Math Commands window to enter and edit formulas. As you make entries in the Commands window, you see the results in the document.</ahelp> To maintain an overview when creating long and complicated formulas, use the Formula Cursor on the Tools bar. When this function is activated, the cursor location within the Commands window is also shown in the text window."
+msgstr "<ahelp hid=\"HID_SMA_COMMAND_WIN_EDIT\">མན་ངག་ཐོ་འགོད་དང་ཞུན་དག་འབད་ནིའི་དོན་ལས་ $[officename] ཨང་རྩིས་བརྡ་བཀོད་ཚུ་ལག་ལེན་འཐབ། ཁྱོད་ཀྱིས་ བརྡ་བཀོད་སྒོ་སྒྲིག་ནང་ཐོ་འགོད་འབད་ཡོདཔ་ལས་ ཡིག་ཆ་ནང་གྲུབ་འབྲས་ཚུ་མཐོང་ཚུགས། </ahelp>མན་ངག་ཐུང་ཀུ་དང་གོ་དཀའ་བ་ཚུ་གསར་བསྐྲུན་འབད་བའི་སྐབས་ལུ་ སྤྱི་མཐོང་རྒྱུན་སྐྱོང་གི་དོན་ལུ་ ལག་ཆས་ཕྲ་རིང་གུ་ མན་ངག་འོད་རྟགས་འདི་ལག་ལེན་འཐབ། ལས་འགན་འདི་ཤུགས་ལྡན་བཟོ་ཞིནམ་ལས་ བརྡ་བཀོད་སྒོ་སྒྲིག་ནང་ཡོད་མི་འོད་རྟགས་ཀྱི་གནས་ཁོངས་འདི་ཡང་ ཚིག་ཡིག་སྒོ་སྒྲིག་ནང་ལུ་སྟོན་འོང་།"
+
+#. k4vP7
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3150014\n"
+"help.text"
+msgid "Individual Symbols"
+msgstr "ངོ་རྐྱང་བརྡ་མཚོན་ཚུ།"
+
+#. NLLoA
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3145246\n"
+"help.text"
+msgid "You can create your own symbols and import characters from other fonts. You can add new symbols to the basic catalog of $[officename] Math symbols, or create your own special catalogs. Numerous special characters are also available."
+msgstr "ཁྱོད་ཀྱིས་ཁྱོད་རའི་བརྡ་མཚོན་གསར་བསྐྲུན་འབད་བཏུབ་དང་ཡིག་གཟུགས་གཞན་ནང་ལས་ཡིག་འབྲུ་ཚུ་ནང་འདྲེན་འབད་བཏུབ་ཨིན། དེ་ལས་གཞན་ཡང་ ཁྱོད་ཀྱིས་ $[officename] ཨང་རྩིས་བརྡ་མཚོན་གྱི་གཞི་རིམ་ཐོ་གཞུང་ལུ་ བརྡ་མཚོན་གསརཔ་ཁ་སྐོང་འབད་བཏུབ་ ཡངན་ ཁྱོད་རའི་དམིགས་བསལ་གྱི་ཐོ་གཞུང་འདི་གསར་བསྐྲུན་འབད། དམིགས་བསལ་གྱི་ཡིག་འབྲུ་སྣ་ཚོགས་ཚུ་ཡང་ཡོདཔ་ཨིན།"
+
+#. DGZdm
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"hd_id3148392\n"
+"help.text"
+msgid "Formulas in Context"
+msgstr "སྐབས་དོན་ནང་མན་ངག་ཚུ།"
+
+#. a7dCq
+#: main0503.xhp
+msgctxt ""
+"main0503.xhp\n"
+"par_id3148774\n"
+"help.text"
+msgid "To make working with formulas easier, use the context menus, which can be called up with a right mouse click. This applies especially to the Commands window. This context menu contains all the commands that are found in the Elements pane, and also operators, and so on, which can be inserted into your formula by mouse-click without having to key them into the Commands window."
+msgstr ""

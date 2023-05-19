@@ -1,0 +1,1197 @@
+#. extracted from helpcontent2/source/text/scalc/02
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-01-13 19:38+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
+"Language-Team: Catalan <https://translations.documentfoundation.org/projects/libo_help-master/textscalc02/ca/>\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-Language: ca\n"
+"X-POOTLE-MTIME: 1549686895.000000\n"
+
+#. aSE5T
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Currency"
+msgstr "Format del nombre: Moneda"
+
+#. uC76y
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"hd_id3152892\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02130000.xhp\">Number format: Currency</link>"
+msgstr "<link href=\"text/scalc/02/02130000.xhp\">Format del nombre: Moneda</link>"
+
+#. mDBPb
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3148837\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Applies the default currency format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatCurrency\" visibility=\"visible\">Aplica el format de moneda per defecte a les cel·les seleccionades.</ahelp>"
+
+#. 2nsBF
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3155267\n"
+"help.text"
+msgid "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Currency Number Format Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Icona de format numèric de moneda</alt></image>"
+
+#. KBVhJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3150214\n"
+"help.text"
+msgid "Number Format: Currency"
+msgstr "Format del nombre: Moneda"
+
+#. NGRbJ
+#: 02130000.xhp
+msgctxt ""
+"02130000.xhp\n"
+"par_id3146776\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Format ▸ Cel·les ▸ Nombres</link>."
+
+#. fjGg6
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Percent"
+msgstr "Format del nombre: Percentatge"
+
+#. uZTmE
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02140000.xhp\">Number format: Percent</link>"
+msgstr "<link href=\"text/scalc/02/02140000.xhp\">Format del nombre: Percentatge</link>"
+
+#. fzGGF
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155629\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatPercent\">Applies the percentage format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatPercent\">Aplica el format de percentatge a les cel·les seleccionades.</ahelp>"
+
+#. AFCdX
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3153968\n"
+"help.text"
+msgid "<image id=\"img_id3150869\" src=\"cmd/sc_numberformatpercent.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150869\">Icon</alt></image>"
+msgstr "<image id=\"img_id3150869\" src=\"cmd/sc_numberformatpercent.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150869\">Icona</alt></image>"
+
+#. CAFBw
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Number Format: Percent"
+msgstr "Format del nombre: Percentatge"
+
+#. xrLA9
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"bm_id3149260\n"
+"help.text"
+msgid "<bookmark_value>percentage calculations</bookmark_value>"
+msgstr "<bookmark_value>càlcul de percentatges</bookmark_value>"
+
+#. Rwuzn
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3149260\n"
+"help.text"
+msgid "You can also enter a percentage sign (%) after a number in a cell:"
+msgstr "També podeu introduir un signe de percentatge (%) després del nombre en una cel·la:"
+
+#. LKtGp
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "1% corresponds to 0.01"
+msgstr "1% correspon a 0,01"
+
+#. CwAEt
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3145749\n"
+"help.text"
+msgid "1 + 16% corresponds to 116% or 1.16"
+msgstr "1 + 16% correspon a 116% o a 1,16"
+
+#. j7BsM
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3148575\n"
+"help.text"
+msgid "1%% corresponds to 0.0001"
+msgstr "1%% correspon a 0,0001"
+
+#. a8EDH
+#: 02140000.xhp
+msgctxt ""
+"02140000.xhp\n"
+"par_id3159153\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>"
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Format ▸ Cel·les ▸ Nombres</link>"
+
+#. bX9GB
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number format: Default"
+msgstr "Format del nombre: Per defecte"
+
+#. C4AsN
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"hd_id3149182\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02150000.xhp\">Number format: Default</link>"
+msgstr "<link href=\"text/scalc/02/02150000.xhp\">Format del nombre: Per defecte</link>"
+
+#. CkVDA
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3163802\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Applies the default number format to the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Aplica el format de nombre per defecte a les cel·les seleccionades.</ahelp>"
+
+#. MpiW2
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<image src=\"cmd/sc_numberformatstandard.svg\" id=\"img_id3156024\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156024\">Icon Standard Format </alt></image>"
+msgstr "<image src=\"cmd/sc_numberformatstandard.svg\" id=\"img_id3156024\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156024\">Icona de format estàndard</alt></image>"
+
+#. 7xorF
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3153361\n"
+"help.text"
+msgid "Number Format: Standard"
+msgstr "Format del nombre: Estàndard"
+
+#. 2JKys
+#: 02150000.xhp
+msgctxt ""
+"02150000.xhp\n"
+"par_id3154908\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Format ▸ Cel·les ▸ Nombres</link>."
+
+#. BhR4Z
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Format del nombre: Afegeix un lloc decimal"
+
+#. BdJjx
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02160000.xhp\">Number Format: Add Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02160000.xhp\">Format del nombre: Afegeix un lloc decimal</link>"
+
+#. jhPg6
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3150792\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatIncDecimals\">Adds one decimal place to the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatIncDecimals\">Afegeix un lloc decimal als nombres de les cel·les seleccionades.</ahelp>"
+
+#. BuLUg
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3145787\n"
+"help.text"
+msgid "<image id=\"img_id3145271\" src=\"cmd/sc_numberformatincdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145271\">Icon Add Decimal Place</alt></image>"
+msgstr "<image id=\"img_id3145271\" src=\"cmd/sc_numberformatincdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145271\">Icona Afegir posició decimal</alt></image>"
+
+#. NDn3G
+#: 02160000.xhp
+msgctxt ""
+"02160000.xhp\n"
+"par_id3149262\n"
+"help.text"
+msgid "Number Format: Add Decimal Place"
+msgstr "Format del nombre: Afegeix un lloc decimal"
+
+#. JGSHw
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Format del nombre: Suprimeix un lloc decimal"
+
+#. ixjiG
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"hd_id3149164\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/02170000.xhp\">Number Format: Delete Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02170000.xhp\">Format del nombre: Suprimeix un lloc decimal</link>"
+
+#. Eip8y
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3147264\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberFormatDecDecimals\">Removes one decimal place from the numbers in the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatDecDecimals\">Suprimeix un lloc decimal dels nombres a les cel·les seleccionades.</ahelp>"
+
+#. FCfMZ
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3145173\n"
+"help.text"
+msgid "<image id=\"img_id3153192\" src=\"cmd/sc_numberformatdecdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153192\">Icon Delete Decimal Place</alt></image>"
+msgstr "<image id=\"img_id3153192\" src=\"cmd/sc_numberformatdecdecimals.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153192\">Icona Suprimir posició decimal</alt></image>"
+
+#. xCuwp
+#: 02170000.xhp
+msgctxt ""
+"02170000.xhp\n"
+"par_id3154686\n"
+"help.text"
+msgid "Number Format: Delete Decimal Place"
+msgstr "Format del nombre: Suprimeix un lloc decimal"
+
+#. 89BHV
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Name Box"
+msgstr "Quadre de noms"
+
+#. JJA9o
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"bm_id3156326\n"
+"help.text"
+msgid "<bookmark_value>formula bar; sheet area names</bookmark_value><bookmark_value>sheet area names</bookmark_value><bookmark_value>showing; cell references</bookmark_value><bookmark_value>cell references; showing</bookmark_value>"
+msgstr "<bookmark_value>barra de fórmules; noms de les àrees del full</bookmark_value><bookmark_value>noms de les àrees del full</bookmark_value><bookmark_value>mostrar; referències de les cel·les</bookmark_value><bookmark_value> referències de les cel·les; mostrar</bookmark_value>"
+
+#. ywEet
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"hd_id3156326\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06010000.xhp\">Name Box</link>"
+msgstr "<link href=\"text/scalc/02/06010000.xhp\">Quadre  de noms</link>"
+
+#. bJypW
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3149656\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_POS\">Displays the reference for the current cell, the range of the selected cells, or the name of the area. You can also select a range of cells, and then type a name for that range into the <emph>Name Box</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_POS\">Mostra la referència de la cel·la actual, l'interval de les cel·les seleccionades o el nom de l'àrea. També podeu seleccionar un interval de cel·les, i llavors escriure un nom al <emph>Quadre de noms</emph>.</ahelp>"
+
+#. W3Br6
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3163710\n"
+"help.text"
+msgid "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Combo box sheet area</alt></image>"
+msgstr "<image id=\"img_id3152576\" src=\"media/helpimg/calcein.png\" width=\"1.2398inch\" height=\"0.2398inch\" localize=\"true\"><alt id=\"alt_id3152576\">Àrea del full del quadre combinat</alt></image>"
+
+#. wFE7T
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3151118\n"
+"help.text"
+msgid "Name Box"
+msgstr "Quadre de noms"
+
+#. yH3c4
+#: 06010000.xhp
+msgctxt ""
+"06010000.xhp\n"
+"par_id3152596\n"
+"help.text"
+msgid "To jump to a particular cell, or to select a cell range, type the cell reference, or cell range reference in this box, for example, F1, or A1:C4. You can also enter full name of a sheet; the tooltip then changes to \"Go To Sheet\", and pressing Enter switches to that sheet."
+msgstr "Per a saltar a una cel·la en particular, o per a seleccionar un interval de cel·les, escriviu la referència de la cel·la, o la referència a l'interval de cel·les, en aquest quadre. Per exemple, F1, o A1:C4. També podeu introduir el nom d'un full; l'indicador aleshores canvia a «Ves al full», i prémer Retorn canvia a aquest full."
+
+#. VFke2
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sum"
+msgstr "Suma"
+
+#. oK8fx
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"bm_id3157909\n"
+"help.text"
+msgid "<bookmark_value>functions;sum function icon</bookmark_value>         <bookmark_value>formula bar;sum function</bookmark_value>         <bookmark_value>sum icon</bookmark_value>         <bookmark_value>AutoSum button, see sum icon</bookmark_value>"
+msgstr "<bookmark_value>funcions; icona de la funció de suma</bookmark_value>         <bookmark_value>barra de fórmules;funció de suma</bookmark_value>         <bookmark_value>icona de suma</bookmark_value>         <bookmark_value>botó Suma automàtica, vegeu icona de suma</bookmark_value>"
+
+#. CiNzL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id3157909\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06030000.xhp\">Select Function</link>"
+msgstr "<link href=\"text/scalc/02/06030000.xhp\">Seleccioneu una funció</link>"
+
+#. KEkiG
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3150543\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_SUMME\">Insert a function of a cell range into the current cell. The function can be Sum, Average, Minimum, Maximum and Count. Click in a cell, click this icon, select the function in the drop down list and optionally adjust the cell range. Or select some cells into which the function value will be inserted, then click the icon. The function result is added at the bottom of the range.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_SUMME\">Insereix una funció d'un interval de cel·les en la cel·la actual. La funció pot ser Suma, Mitjana, Mínim Màxim o Compta. Feu clic en una cel·la, després en aquesta icona, seleccioneu la funció en la llista desplegable i, opcionalment, ajusteu l'interval de cel·les. O seleccioneu algunes cel·les en les quals s'inserirà el valor de la funció, i després feu clic a la icona. El resultat de la funció s'afegeix a la part inferior de l'interval.</ahelp>"
+
+#. KDxsW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Icon Select Function</alt></image>"
+msgstr "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Icona de Seleccionar una funció</alt></image>"
+
+#. DaEgA
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3152577\n"
+"help.text"
+msgid "Select Function"
+msgstr "Selecciona una funció"
+
+#. SpBhw
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id161592658402954\n"
+"help.text"
+msgid "Select Function applied with no selected range"
+msgstr "Selecciona una funció aplicada sense indicar un interval"
+
+#. 59eGX
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3156444\n"
+"help.text"
+msgid "$[officename] automatically suggests a cell range, provided that the spreadsheet contains data. If the cell range already contains a function, you can combine it with the new one to yield the function applied to the range data. If the range contains filters, the Subtotal function is inserted instead of the selected function."
+msgstr "El $[officename] suggereix automàticament un interval de cel·les, sempre que el full de càlcul contingui dades. Si l'interval de cel·les ja conté una funció, podeu combinar-la amb la nova per a produir la funció aplicada a les dades de l'interval. Si l'interval conté filtres, s'insereix la funció Subtotal en lloc de la funció seleccionada."
+
+#. vpnqf
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id3153189\n"
+"help.text"
+msgid "Click the <emph>Accept</emph> icon to use the formula displayed in the input line or <emph>Cancel</emph>."
+msgstr "Feu clic a la icona <emph>Accepta</emph> per a utilitzar la fórmula que es mostra en la línia d'entrada o <emph>Cancel·la</emph>."
+
+#. TVD6h
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id231592663499228\n"
+"help.text"
+msgid "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Accept Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Icona Accepta</alt></image>"
+
+#. iHTEW
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id481592663499228\n"
+"help.text"
+msgid "Accept"
+msgstr "Accepta"
+
+#. VFj6u
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id311592663828848\n"
+"help.text"
+msgid "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Icon Cancel</alt></image>"
+msgstr "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Icona Cancel·la</alt></image>"
+
+#. 7xGcL
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id431592663828848\n"
+"help.text"
+msgid "Cancel"
+msgstr "Cancel·la"
+
+#. GPtKR
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"hd_id261592658395518\n"
+"help.text"
+msgid "Select Function applied on a selected range"
+msgstr "Seleccioneu la funció aplicada en un interval seleccionat"
+
+#. JPrPQ
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id911592658130888\n"
+"help.text"
+msgid "When the selected range has two or more rows, the function is calculated for each column. The results are placed in empty cells on the first available row below the range, one result per column."
+msgstr "Si l'interval seleccionat té dues o més files, la funció es calcula per a cada columna. Els resultats es col·loquen en cel·les buides a la primera fila disponible per sota de l'interval, un resultat per columna."
+
+#. iHksB
+#: 06030000.xhp
+msgctxt ""
+"06030000.xhp\n"
+"par_id991592658144387\n"
+"help.text"
+msgid "When the selected range has one row, the function result is placed in the first available cell on the right of the selected range."
+msgstr "Si l'interval seleccionat té una fila, el resultat de la funció es col·loca en la primera cel·la disponible a la dreta de l'interval seleccionat."
+
+#. NYGR7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Function"
+msgstr "Funció"
+
+#. 9JFi8
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"bm_id3150084\n"
+"help.text"
+msgid "<bookmark_value>formula bar; functions</bookmark_value><bookmark_value>functions; formula bar icon</bookmark_value>"
+msgstr "<bookmark_value>barra de fórmules; funcions</bookmark_value><bookmark_value>funcions; icona de la barra de fórmules</bookmark_value>"
+
+#. ZGqd9
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"hd_id3150084\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06040000.xhp\">Function</link>"
+msgstr "<link href=\"text/scalc/02/06040000.xhp\">Funció</link>"
+
+#. TnbLt
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_FUNC\">Adds a formula to the current cell. Click this icon, and then enter the formula in the <emph>Input line</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_FUNC\">Afegeix una fórmula a la cel·la actual. Feu clic en aquesta icona, i després entreu a la <emph>línia d'entrada</emph>.</ahelp>"
+
+#. WH6iw
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153360\n"
+"help.text"
+msgid "This icon is only available when the <emph>Input line</emph> box is not active."
+msgstr "Aquesta icona només és visible quan el quadre <emph>Línia d'entrada</emph> no és actiu."
+
+#. yAAo7
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"sc/res/sc26049.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145785\" src=\"sc/res/sc26049.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3145785\">Icona</alt></image>"
+
+#. ZjzSD
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3153951\n"
+"help.text"
+msgid "Function"
+msgstr "Funció"
+
+#. kC5QL
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Input line"
+msgstr "Línia d'entrada"
+
+#. Vteqe
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"hd_id3153821\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06050000.xhp\">Input line</link>"
+msgstr "<link href=\"text/scalc/02/06050000.xhp\">Línia d'entrada</link>"
+
+#. Dgf7D
+#: 06050000.xhp
+msgctxt ""
+"06050000.xhp\n"
+"par_id3155922\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Introduïu la fórmula que voleu afegir a la cel·la actual. També podeu fer clic a la icona de l'<link href=\"text/scalc/01/04060000.xhp\">Auxiliar de fórmules</link> per a inserir una funció predefinida a la fórmula.</ahelp>"
+
+#. pBxxB
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cancel"
+msgstr "Cancel·la"
+
+#. FRSZz
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"bm_id3154514\n"
+"help.text"
+msgid "<bookmark_value>formula bar; canceling inputs</bookmark_value><bookmark_value>functions; canceling input icon</bookmark_value>"
+msgstr "<bookmark_value>barra de fórmules; cancel·lació d'entrades</bookmark_value><bookmark_value>funcions; icona de cancel·lació d'entrades</bookmark_value>"
+
+#. 4mACq
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"hd_id3154514\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06060000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/scalc/02/06060000.xhp\">Cancel·la</link>"
+
+#. uafDY
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153823\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_CANCEL\">Clears the contents of the <emph>Input line</emph>, or cancels the changes that you made to an existing formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_CANCEL\">Esborra el contingut de la <emph>Línia d'entrada</emph>, o bé cancel·la els canvis que heu fet a la fórmula existent.</ahelp>"
+
+#. DjEeK
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3156281\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu02.png\" width=\"0.2228inch\" height=\"0.2228inch\"><alt id=\"alt_id3156422\">Icona</alt></image>"
+
+#. QZHAo
+#: 06060000.xhp
+msgctxt ""
+"06060000.xhp\n"
+"par_id3153970\n"
+"help.text"
+msgid "Cancel"
+msgstr "Cancel·la"
+
+#. i4LsJ
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Accept"
+msgstr "Accepta"
+
+#. EG7Fb
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"bm_id3143267\n"
+"help.text"
+msgid "<bookmark_value>formula bar; accepting inputs</bookmark_value><bookmark_value>functions; accepting input icon</bookmark_value>"
+msgstr "<bookmark_value>barra de fórmules; acceptar entrades</bookmark_value><bookmark_value>funcions; icona d'acceptació d'entrades</bookmark_value>"
+
+#. EnHFH
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"hd_id3143267\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06070000.xhp\">Accept</link>"
+msgstr "<link href=\"text/scalc/02/06070000.xhp\">Accepta</link>"
+
+#. BBvqG
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<ahelp hid=\"HID_INSWIN_OK\">Accepts the contents of the <emph>Input line</emph>, and then inserts the contents into the current cell.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_OK\">Accepta els continguts de la <emph>Línia d'entrada</emph>, i després insereix els continguts a la cel·la actual.</ahelp>"
+
+#. D8cSd
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3150769\n"
+"help.text"
+msgid "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156422\" src=\"svx/res/nu01.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3156422\">Icona</alt></image>"
+
+#. puh2n
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3125864\n"
+"help.text"
+msgid "Accept"
+msgstr "Accepta"
+
+#. c7dbD
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Theme Selection"
+msgstr "Selecció del tema"
+
+#. nuJj7
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"hd_id3153087\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/06080000.xhp\">Theme Selection</link>"
+msgstr "<link href=\"text/scalc/02/06080000.xhp\">Selecció de temes</link>"
+
+#. rVKiP
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3154515\n"
+"help.text"
+msgid "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Applies a formatting style to the selected cells.</ahelp></variable> The styles include font, border, and background color information."
+msgstr "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Aplica un estil de formatació a les cel·les seleccionades.</ahelp></variable> Els estils inclouen la informació de la lletra tipogràfica, la vora i el color de fons."
+
+#. SEmnU
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3155132\n"
+"help.text"
+msgid "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145785\" src=\"cmd/sc_choosedesign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145785\">Icona</alt></image>"
+
+#. cgZs2
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3153953\n"
+"help.text"
+msgid "Choose Themes"
+msgstr "Seleccioneu els temes"
+
+#. xWp4x
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3147127\n"
+"help.text"
+msgid "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Click the formatting theme that you want to apply, and then click <emph>OK</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_DLGSTYLES_LISTBOX\">Feu clic al tema de formatació que vulgueu aplicar, i després feu clic a <emph>D'acord</emph>.</ahelp>"
+
+#. QCyEd
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Position in document"
+msgstr "Posició en el document"
+
+#. BNLiM
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"hd_id3145119\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08010000.xhp\">Position in document</link>"
+msgstr "<link href=\"text/scalc/02/08010000.xhp\">Posició en el document</link>"
+
+#. L7Xk5
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3147265\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatusDocPos\">Displays the number of the current sheet and the total number of sheets in the spreadsheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatusDocPos\">Mostra el número del full actual i el total de fulls al full de càlcul.</ahelp>"
+
+#. X2Dv6
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Standard Formula, Date/Time, Error Warning"
+msgstr "Fórmula estàndard, Data/Hora, Avís d'error"
+
+#. fFadm
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"bm_id3147335\n"
+"help.text"
+msgid "<bookmark_value>formulas;status bar</bookmark_value>"
+msgstr "<bookmark_value>fórmules;barra d'estat</bookmark_value>"
+
+#. FVYfS
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"hd_id3147335\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/08080000.xhp\">Standard Formula, Date/Time, Error Warning</link>"
+msgstr "<link href=\"text/scalc/02/08080000.xhp\">Fórmula estàndard, Data/Hora, Avís d'error</link>"
+
+#. gvyvx
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3150791\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StateTableCell\">Displays information about the current document. By default, the SUM of the contents of the selected cells is displayed.</ahelp>"
+msgstr "<ahelp hid=\".uno:StateTableCell\">Mostra informació sobre el document actual. Per defecte, es mostra la suma dels continguts de les cel·les seleccionades.</ahelp>"
+
+#. eCfVn
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3155061\n"
+"help.text"
+msgid "To change the default formula that is displayed, right-click the field, and then choose the formula that you want. The available formulas are: Average, count of values (COUNTA), count of numbers (COUNT), Maximum, Minimum, Sum, or None."
+msgstr "Per canviar la fórmula que es mostra per defecte, feu un clic amb el botó dret al camp, i després trieu la fórmula que vulgueu. Les fórmules disponibles són: Mitjana, Recompte de valors (COMPTAA), Recompte numèric (COMPTA), Màxim, Mínim, Suma o Cap."
+
+#. dC4rs
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3153969\n"
+"help.text"
+msgid "<link href=\"text/scalc/05/02140000.xhp\">Error codes</link>"
+msgstr "<link href=\"text/scalc/05/02140000.xhp\">Codis d'error</link>"
+
+#. 2fX5w
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Apropa"
+
+#. kNqRX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"bm_id3148491\n"
+"help.text"
+msgid "<bookmark_value>page views; increasing scales</bookmark_value><bookmark_value>increasing scales in page view</bookmark_value><bookmark_value>zooming;enlarging page views</bookmark_value>"
+msgstr "<bookmark_value>visualització de la pàgina; augment de l'escala</bookmark_value><bookmark_value>augment de l'escala en la visualització de la pàgina</bookmark_value><bookmark_value>aplicació de zoom;ampliar la visualització de la pàgina</bookmark_value>"
+
+#. GESuX
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"hd_id3148491\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10050000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/scalc/02/10050000.xhp\">Amplia</link>"
+
+#. Uq4Tv
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145069\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomIn\">Enlarges the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomIn\">Amplia la visualització de la pantalla del document actual. El factor d'ampliació actual es mostra a la <emph>barra d'estat</emph>.</ahelp>"
+
+#. GBXen
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145171\n"
+"help.text"
+msgid "The maximum zoom factor is 400%."
+msgstr "El factor d'ampliació màxim és del 400%."
+
+#. dD3H5
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3155854\n"
+"help.text"
+msgid "<image id=\"img_id3151116\" src=\"cmd/sc_zoomin.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151116\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151116\" src=\"cmd/sc_zoomin.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151116\">Icona</alt></image>"
+
+#. GcJsA
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3145273\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Apropa"
+
+#. XTPaZ
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Allunya"
+
+#. P4mw7
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"bm_id3153561\n"
+"help.text"
+msgid "<bookmark_value>page views;reducing scales</bookmark_value><bookmark_value>zooming;reducing page views</bookmark_value>"
+msgstr "<bookmark_value>visualització de la pàgina; reducció de l'escala</bookmark_value><bookmark_value>aplicació de zoom;reducció de la visualització de la pàgina</bookmark_value>"
+
+#. Ffzbc
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"hd_id3153561\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/10060000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/scalc/02/10060000.xhp\">Redueix</link>"
+
+#. BgFbq
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3151246\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomOut\">Reduces the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomOut\">Redueix la visualització de pantalla del document actual. El factor de reducció es mostra a la <emph>barra d'estat</emph>.</ahelp>"
+
+#. Czu2U
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "The minimum zoom factor is 20%."
+msgstr "El factor de reducció mínim és del 20%."
+
+#. DN9qj
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3153770\n"
+"help.text"
+msgid "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155131\" src=\"cmd/sc_zoomout.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155131\">Icona</alt></image>"
+
+#. rfG8A
+#: 10060000.xhp
+msgctxt ""
+"10060000.xhp\n"
+"par_id3150440\n"
+"help.text"
+msgid "Zooming Out"
+msgstr "Reducció"
+
+#. BwqAM
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Insereix"
+
+#. GADDh
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"bm_id3156329\n"
+"help.text"
+msgid "<bookmark_value>inserting; objects, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>inserció; objectes, icona de la barra d'eines</bookmark_value>"
+
+#. pM9zg
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3156329\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/scalc/02/18010000.xhp\">Insereix</link>"
+
+#. UfEHG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3147336\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCtrl\">Click the arrow next to the icon to open the <emph>Insert </emph>toolbar, where you can add graphics and special characters to the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">Feu clic a la fletxa que hi ha al costat de la icona per a obrir la barra d'eines <emph>Insereix</emph>, on podeu afegir gràfics i caràcters especials al full actual.</ahelp>"
+
+#. DnSkt
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3148664\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Icona de la barra d'eines:"
+
+#. Eaf8D
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156423\" src=\"cmd/sc_insertgraphic.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156423\">Icona</alt></image>"
+
+#. sQ6Tc
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3146120\n"
+"help.text"
+msgid "Insert"
+msgstr "Insereix"
+
+#. ZVCSS
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3153188\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Podeu seleccionar les icones següents:"
+
+#. CCP2V
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id4283883\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Marc flotant</link>"
+
+#. gdmkZ
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3149410\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Caràcter especial</link>"
+
+#. FDin8
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3151117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Des d'un fitxer</link>"
+
+#. UKJsG
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3633533\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">Fórmula</link>"
+
+#. sCB8B
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Diagrama</link>"
+
+#. zc6Yi
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id7581408\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">Objecte OLE</link>"
+
+#. QMjWB
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Cells"
+msgstr "Insereix cel·les"
+
+#. h3979
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"bm_id3150275\n"
+"help.text"
+msgid "<bookmark_value>inserting; cells, toolbar icon</bookmark_value>"
+msgstr "<bookmark_value>inserció; cel·les, icona de la barra d'eines</bookmark_value>"
+
+#. RysCQ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150275\n"
+"help.text"
+msgid "<link href=\"text/scalc/02/18020000.xhp\">Insert Cells</link>"
+msgstr "<link href=\"text/scalc/02/18020000.xhp\">Insereix cel·les</link>"
+
+#. iTWkf
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3156024\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsCellsCtrl\">Click the arrow next to the icon to open the <emph>Insert Cells </emph>toolbar, where you can insert cells, rows, and columns into the current sheet.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsCellsCtrl\">Feu clic a la fletxa al costat de la icona per a obrir la barra d'eines <emph>Insereix cel·les</emph>, la qual us permet inserir cel·les, files i columnes al full actual.</ahelp>"
+
+#. o7wEe
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150398\n"
+"help.text"
+msgid "Tools bar icon:"
+msgstr "Icona de la barra d'eines:"
+
+#. eqHih
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "You can select the following icons:"
+msgstr "Podeu seleccionar les icones següents:"
+
+#. JPhcE
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3150439\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Down</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Insereix cel·les cap avall</link>"
+
+#. c3Xmu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3146119\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Right</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Insereix cel·les cap a la dreta</link>"
+
+#. XXyxu
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153190\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Rows</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Files</link>"
+
+#. i4ifJ
+#: 18020000.xhp
+msgctxt ""
+"18020000.xhp\n"
+"hd_id3153726\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Columns</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Columnes</link>"

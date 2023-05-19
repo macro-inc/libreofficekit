@@ -1,0 +1,3032 @@
+#. extracted from helpcontent2/source/text/sdraw/guide
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-02 12:20+0000\n"
+"Last-Translator: Mihail Balabanov <m.balabanov@gmail.com>\n"
+"Language-Team: Bulgarian <https://translations.documentfoundation.org/projects/libo_help-master/textsdrawguide/bg/>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1547852731.000000\n"
+
+#. cZbDh
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"tit\n"
+"help.text"
+msgid "Arranging, Aligning and Distributing Objects"
+msgstr "Подреждане, подравняване и разпределяне на обекти"
+
+#. Be455
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"hd_id3149656\n"
+"help.text"
+msgid "<variable id=\"align_arrange\"><link href=\"text/sdraw/guide/align_arrange.xhp\">Arranging, Aligning and Distributing Objects</link></variable>"
+msgstr "<variable id=\"align_arrange\"><link href=\"text/sdraw/guide/align_arrange.xhp\">Подреждане, подравняване и разпределяне на обекти</link></variable>"
+
+#. cXAFa
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"bm_id3125863\n"
+"help.text"
+msgid "<bookmark_value>arranging; objects (guide)</bookmark_value><bookmark_value>objects;aligning</bookmark_value><bookmark_value>distributing draw objects</bookmark_value><bookmark_value>aligning;draw objects</bookmark_value>"
+msgstr "<bookmark_value>подреждане; обекти (помощни)</bookmark_value><bookmark_value>обекти;подравняване</bookmark_value><bookmark_value>разпределяне на чертожни обекти</bookmark_value><bookmark_value>подравняване;чертожни обекти</bookmark_value>"
+
+#. vmh3j
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"hd_id3125863\n"
+"help.text"
+msgid "Arranging Objects"
+msgstr "Подреждане на обекти"
+
+#. RawJc
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3153727\n"
+"help.text"
+msgid "Each object that you place in your document is successively stacked on the preceding object. To re-arrange the stacking order of a selected object, proceed as follows."
+msgstr "Обектите, които добавяте в документа, се наслояват последователно върху предишните. За да промените реда на подреждане на избран обект, направете следното."
+
+#. 7er4p
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN107D5\n"
+"help.text"
+msgid "Click the object whose position you want to change."
+msgstr "Щракнете върху обекта, чиято позиция желаете да промените."
+
+#. C9vEK
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3150327\n"
+"help.text"
+msgid "Choose <item type=\"menuitem\">Shape - Arrange</item> to bring up the context menu and choose one of the arrange options:"
+msgstr "Изберете <item type=\"menuitem\">Фигура - Подреждане</item>, за да отворите подменюто, и изберете една от възможностите за подредба:"
+
+#. CuUcp
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN107E6\n"
+"help.text"
+msgid "<emph>Bring to Front</emph> places the object on top of all other objects"
+msgstr "<emph>Изнасяне отпред</emph> слага обекта пред всички други обекти"
+
+#. BVaSC
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN107EC\n"
+"help.text"
+msgid "<emph>Bring Forward</emph> places the object one place forward in the stack of objects"
+msgstr "<emph>Преместване напред</emph> премества обекта с едно място напред в подредбата"
+
+#. VwV66
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN107F2\n"
+"help.text"
+msgid "<emph>Send Backward</emph> places the object one place back in the stack of objects"
+msgstr "<emph>Преместване назад</emph> премества обекта с едно място назад в стека с обекти"
+
+#. ssNCJ
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN107F8\n"
+"help.text"
+msgid "<emph>Send to Back</emph> places the object behind all other objects"
+msgstr "<emph>Изнасяне отзад</emph> слага обекта зад всички други обекти"
+
+#. C4LrR
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN107FE\n"
+"help.text"
+msgid "<emph>Behind Object</emph> places the object behind another object that you select"
+msgstr "<emph>Зад обект</emph> слага обекта зад друг обект, който сте избрали"
+
+#. iSskT
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"hd_id3155766\n"
+"help.text"
+msgid "Arranging an Object Behind Another Object"
+msgstr "Подреждане на обект зад друг обект"
+
+#. CvgeS
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN10811\n"
+"help.text"
+msgid "Click the object whose position you want to change."
+msgstr "Щракнете върху обекта, чиято позиция желаете да промените."
+
+#. B8MAR
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3154253\n"
+"help.text"
+msgid "Choose <item type=\"menuitem\">Shape - Arrange</item> to open the context menu and choose <emph>Behind Object</emph>. The mouse pointer changes to a hand."
+msgstr "Изберете <item type=\"menuitem\">Фигура - Подреждане</item>, за да отворите подменюто, и изберете <emph>Зад обекта</emph>. Показалецът на мишката ще се превърне в ръка."
+
+#. nJDrE
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3149126\n"
+"help.text"
+msgid "Click the object behind which you want to place the selected object."
+msgstr "Щракнете върху обекта, зад който желаете да сложите избрания обект."
+
+#. wWeF3
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"hd_id3145789\n"
+"help.text"
+msgid "Reversing The Stacking Order of Two Objects"
+msgstr "Размяна на два обекта в подредбата на обектите"
+
+#. CsWMA
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3154022\n"
+"help.text"
+msgid "Shift-click both objects to select them."
+msgstr "Щракнете със задържан Shift върху двата обекта, за да ги изберете."
+
+#. mfu4B
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3155114\n"
+"help.text"
+msgid "Choose <item type=\"menuitem\">Shape - Arrange</item> to open the context menu and choose <emph>Reverse</emph>."
+msgstr "Изберете <item type=\"menuitem\">Фигура - Подреждане</item>, за да отворите подменюто, и изберете <emph>Размяна</emph>."
+
+#. D8jUy
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"hd_id3166425\n"
+"help.text"
+msgid "Aligning Objects"
+msgstr "Подравняване на обекти"
+
+#. fuvKT
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3152994\n"
+"help.text"
+msgid "The <emph>Alignment</emph> function enables you to align objects relative to each other or relative to the page."
+msgstr "Функцията <emph>Подравняване</emph> Ви позволява да подравнявате обекти един спрямо друг или спрямо страницата."
+
+#. tdBWC
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN108A3\n"
+"help.text"
+msgid "Select an object to align it to the page or select multiple objects to align them relative to each other."
+msgstr "Изберете обект, за да го подравните спрямо страницата, или изберете няколко обекта, за да ги подравните един спрямо друг."
+
+#. sBGnF
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN108A7\n"
+"help.text"
+msgid "Choose <item type=\"menuitem\">Shape - Align Objects</item> and select one of the alignment options."
+msgstr "Изберете <item type=\"menuitem\">Фигура - Подравняване на обекти</item> и изберете някоя от възможностите за подравняване."
+
+#. ygENZ
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN108AE\n"
+"help.text"
+msgid "Distributing Objects"
+msgstr "Разпределяне на обекти"
+
+#. r48WD
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3151390\n"
+"help.text"
+msgid "If you select three or more objects in Draw, you can also use the <link href=\"text/shared/01/05360000.xhp\"><emph>Distribute selection</emph></link> command to distribute the vertical and horizontal spacing evenly between the objects."
+msgstr "Ако изберете три или повече обекта в Draw, можете да използвате командата <link href=\"text/shared/01/05360000.xhp\"><emph>Разпределяне на селекцията</emph></link>, за да разпределите хоризонталното и вертикалното разстояние между обектите."
+
+#. R9tTg
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN108CE\n"
+"help.text"
+msgid "Select three or more objects to be distributed."
+msgstr "Изберете три или повече обекта, за да ги разпределите."
+
+#. 92QKq
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN108D2\n"
+"help.text"
+msgid "Choose <item type=\"menuitem\">Shape - Distribution</item>."
+msgstr "Изберете <item type=\"menuitem\">Фигура - Разпределяне</item>."
+
+#. faA9D
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_idN108DA\n"
+"help.text"
+msgid "Select the horizontal and vertical distribution option and click <emph>OK</emph>."
+msgstr "Изберете хоризонтално или вертикално разпределяне и натиснете <emph>OK</emph>."
+
+#. cSeG5
+#: align_arrange.xhp
+msgctxt ""
+"align_arrange.xhp\n"
+"par_id3150535\n"
+"help.text"
+msgid "Selected objects are distributed evenly along the horizontal or vertical axis. The two outermost objects are used as reference points and do not move when the <emph>Distribution</emph> command is applied."
+msgstr "Избраните обекти ще се разпределят равномерно по хоризонтала или вертикала. Когато се прилага командата <emph>Разпределяне</emph>, двата най-раздалечени обекта се използват като отправни точки и не се местят."
+
+#. gpE73
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"tit\n"
+"help.text"
+msgid "Defining Custom Colors"
+msgstr "Задаване на цветове по избор"
+
+#. XqCrJ
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"bm_id3149263\n"
+"help.text"
+msgid "<bookmark_value>colors; defining</bookmark_value>       <bookmark_value>user-defined colors</bookmark_value>       <bookmark_value>custom colors</bookmark_value>"
+msgstr "<bookmark_value>цветове; задаване</bookmark_value> <bookmark_value>потребителски цветове</bookmark_value> <bookmark_value>цветове по избор</bookmark_value>"
+
+#. JFGD3
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"hd_id3149263\n"
+"help.text"
+msgid "<variable id=\"color_define\"><link href=\"text/sdraw/guide/color_define.xhp\">Defining Custom Colors</link></variable>"
+msgstr "<variable id=\"color_define\"><link href=\"text/sdraw/guide/color_define.xhp\">Задаване на цветове по избор</link></variable>"
+
+#. EWGDk
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id3154511\n"
+"help.text"
+msgid "Define custom colors and add them to the <emph>Custom</emph> color palette."
+msgstr "Задайте цветове по избор и ги добавете в палитрата <emph>По избор</emph>."
+
+#. PWNkJ
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"hd_id3155600\n"
+"help.text"
+msgid "To define a custom color"
+msgstr "За да зададете цвят по избор"
+
+#. EzcHh
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id3150327\n"
+"help.text"
+msgid "Choose <emph>Format - Area</emph>, click the <emph>Area</emph> tab and press the <emph>Color</emph> button. A table of the predefined palette colors is displayed."
+msgstr "Изберете <emph>Форматиране - Област</emph>, щракнете върху раздела <emph>Област</emph> и натиснете бутона <emph>Цвят</emph>. Ще се покаже таблица с предварително дефинирани цветове."
+
+#. 5WDjt
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id3154657\n"
+"help.text"
+msgid "Custom colors are saved in the <emph>Custom</emph> color palette."
+msgstr "Персонализираните цветове се записват в палитрата <emph>По избор</emph>."
+
+#. DEBQ8
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id3166425\n"
+"help.text"
+msgid "Click a color in the table that is similar to the one you want to define. You can select the similar color from any of the available color palettes in the <emph>Colors</emph> area on the left or the <emph>Recent colors</emph> in the list below the color table. The color appears in the <emph>New</emph> preview box to the right of the dialog."
+msgstr "Щракнете върху цвят в таблицата, който е подобен на желания. Можете да изберете подобния цвят от която и да е от наличните палитри в областта <emph>Цветове</emph> отляво или в списъка <emph>Последни цветове</emph> под таблицата с цветове. Цветът ще се появи в полето за мостра <emph>Нов</emph> в дясната част на прозореца."
+
+#. 3B2BX
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id41522705652544\n"
+"help.text"
+msgid "Click the <emph>Pick</emph> button to open the <link href=\"text/shared/optionen/01010501.xhp\">Pick a Color</link> dialog."
+msgstr "Щракнете върху бутона <emph>Посочване</emph>, за да отворите диалоговия прозорец <link href=\"text/shared/optionen/01010501.xhp\">Избор на цвят</link>."
+
+#. 69QAE
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id4979705\n"
+"help.text"
+msgid "%PRODUCTNAME uses only the RGB color model for printing in color. The RGB values of the selected color are displayed below the preview boxes."
+msgstr "%PRODUCTNAME използва за цветен печат само цветовия модел RGB. Стойностите за RGB на избрания цвят се показват под мострите."
+
+#. ou3sQ
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id691522706451849\n"
+"help.text"
+msgid "Press the <emph>Add</emph> button to add the custom color to the <emph>Custom</emph> color palette. A dialog box asking to enter a color name appears. Enter a unique name for the new color within all color names existing in the <emph>Custom</emph> color palette."
+msgstr "Натиснете бутона <emph>Добавяне</emph>, за да добавите зададения цвят в палитрата <emph>По избор</emph>. Ще се покаже диалогов прозорец, в който да наименувате цвета. Въведете име за новия цвят, което да е уникално в рамките на палитрата <emph>По избор</emph>."
+
+#. E9Gho
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id701522707038880\n"
+"help.text"
+msgid "To remove a color from the <emph>Custom</emph> color palette, select the <emph>Custom</emph> color palette in the <emph>Colors</emph> area, select the color to be deleted and click <emph>Delete</emph>."
+msgstr "За да премахнете цвят от палитрата <emph>По избор</emph>, изберете тази палитра в областта <emph>Цветове</emph>, изберете ненужния цвят и щракнете върху <emph>Изтриване</emph>."
+
+#. beB2R
+#: color_define.xhp
+msgctxt ""
+"color_define.xhp\n"
+"par_id3145236\n"
+"help.text"
+msgid "<link href=\"text/shared/01/03170000.xhp\">Color bar</link>"
+msgstr "<link href=\"text/shared/01/03170000.xhp\">Лента Цвят</link>"
+
+#. twEGx
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"tit\n"
+"help.text"
+msgid "Combining Objects and Constructing Shapes"
+msgstr "Комбиниране на обекти и изграждане на фигури"
+
+#. 5vtFm
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"bm_id3156443\n"
+"help.text"
+msgid "<bookmark_value>combining; draw objects</bookmark_value><bookmark_value>merging; draw objects</bookmark_value><bookmark_value>connecting; draw objects</bookmark_value><bookmark_value>draw objects; combining</bookmark_value><bookmark_value>intersecting draw objects</bookmark_value><bookmark_value>polygons; intersecting/subtracting/merging</bookmark_value><bookmark_value>subtracting polygons</bookmark_value><bookmark_value>constructing shapes</bookmark_value>"
+msgstr "<bookmark_value>комбиниране; графични обекти</bookmark_value><bookmark_value>обединение; на графични обекти</bookmark_value><bookmark_value>свързване; графични обекти</bookmark_value><bookmark_value>графични обекти; комбиниране</bookmark_value><bookmark_value>сечение на графични обекти</bookmark_value><bookmark_value>многоъгълници; сечение/разлика/обединение</bookmark_value><bookmark_value>изваждане на многоъгълници</bookmark_value><bookmark_value>построяване на фигури</bookmark_value>"
+
+#. mXzkf
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3156443\n"
+"help.text"
+msgid "<variable id=\"combine_etc\"><link href=\"text/sdraw/guide/combine_etc.xhp\">Combining Objects and Constructing Shapes</link> </variable>"
+msgstr "<variable id=\"combine_etc\"><link href=\"text/sdraw/guide/combine_etc.xhp\">Комбиниране на обекти и създаване на фигури</link></variable>"
+
+#. CgsxL
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3149020\n"
+"help.text"
+msgid "Combined drawing objects act as grouped objects, except that you cannot enter the group to edit the individual objects."
+msgstr "Комбинираните обекти се държат като групирани, с изключение на това, че не можете да влезете в групата и да ги редактирате индивидуално."
+
+#. UpuY6
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3154659\n"
+"help.text"
+msgid "You can only combine 2D objects."
+msgstr "Можете да комбинирате само двуизмерни обекти."
+
+#. BSs4D
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3150344\n"
+"help.text"
+msgid "To combine 2D objects:"
+msgstr "За да комбинирате двуизмерни обекти:"
+
+#. R5BDg
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3166428\n"
+"help.text"
+msgid "Select two or more 2D objects."
+msgstr "Изберете два или повече двуизмерни обекта."
+
+#. LZcTU
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3145587\n"
+"help.text"
+msgid "Choose <emph>Shape - Combine</emph>."
+msgstr "Изберете <emph>Фигура - Комбиниране</emph>."
+
+#. rhgSt
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3146978\n"
+"help.text"
+msgid "Unlike groups, a combined object takes on the properties of the lowermost object in the stacking order. You can split apart combined objects, but the original object properties are lost."
+msgstr "За разлика от групите, комбинираните обекти приемат свойствата на най-задния обект в подредбата. Можете да разделите обекти, които са били комбинирани, но оригиналните им свойства ще бъдат изгубени."
+
+#. hApF9
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3155088\n"
+"help.text"
+msgid "When you combine objects, holes appear where the objects overlap."
+msgstr "Когато комбинирате обекти, на местата, където те се застъпват, се появяват дупки."
+
+#. GFmdU
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3156019\n"
+"help.text"
+msgid "<image id=\"img_id3157978\" src=\"media/helpimg/kombi1.png\" width=\"8.3646inch\" height=\"2.5inch\"><alt id=\"alt_id3157978\">Illustration for combining objects</alt></image>"
+msgstr "<image id=\"img_id3157978\" src=\"media/helpimg/kombi1.png\" width=\"8.3646inch\" height=\"2.5inch\"><alt id=\"alt_id3157978\">Пример за комбиниране на обекти</alt></image>"
+
+#. nKm5v
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3153249\n"
+"help.text"
+msgid "In the illustration, the uncombined objects are on the left and the combined objects on the right."
+msgstr "Отляво на илюстрацията са показани некомбинираните обекти, а отдясно - комбинираните."
+
+#. FFRim
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3159229\n"
+"help.text"
+msgid "Constructing Shapes"
+msgstr "Построяване на фигури"
+
+#. PQX6S
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3150049\n"
+"help.text"
+msgid "You can construct shapes by applying the <link href=\"text/simpress/01/13180000.xhp\"><emph>Shapes</emph></link> <emph>- Merge, Subtract and Intersect</emph> commands to two or more drawing objects."
+msgstr "Можете да построявате фигури чрез командите <link href=\"text/simpress/01/13180000.xhp\"><emph>Фигури</emph></link><emph> - Обединение, Разлика и Сечение</emph> на два или повече обекта."
+
+#. ZciiC
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3147403\n"
+"help.text"
+msgid "Shape commands only work on 2D objects."
+msgstr "Командите за фигури могат да се прилагат само върху двуизмерни обекти."
+
+#. Ac4WC
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3150539\n"
+"help.text"
+msgid "Constructed shapes take on the properties of the lowermost object in the stacking order."
+msgstr "Създадените фигури приемат свойствата на най-задния обект в подредбата."
+
+#. AxTYj
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3156402\n"
+"help.text"
+msgid "To construct a shape:"
+msgstr "За да построите фигура:"
+
+#. 3oZFf
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3157874\n"
+"help.text"
+msgid "Select two or more 2D objects."
+msgstr "Изберете два или повече двуизмерни обекта."
+
+#. CdHwU
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3150650\n"
+"help.text"
+msgid "Choose <emph>Shape</emph> and one of the following:"
+msgstr "Изберете <emph>Фигура</emph> и едно от следните:"
+
+#. KwAnN
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3145829\n"
+"help.text"
+msgid "<emph>Merge</emph>"
+msgstr "<emph>Обединение</emph>"
+
+#. sZzhM
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3154680\n"
+"help.text"
+msgid "<emph>Subtract</emph>"
+msgstr "<emph>Разлика</emph>"
+
+#. 9APE9
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3153034\n"
+"help.text"
+msgid "<emph>Intersect</emph>."
+msgstr "<emph>Сечение</emph>."
+
+#. bMdUM
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3145144\n"
+"help.text"
+msgid "Shape Commands"
+msgstr "Команди за фигури"
+
+#. uCFAF
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3153931\n"
+"help.text"
+msgid "In the following illustrations, the original objects are on the left and the modified shapes on the right."
+msgstr "В следващите илюстрации оригиналните обекти са показани отляво, а променените - отдясно."
+
+#. Zyb77
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3149950\n"
+"help.text"
+msgid "Shapes - Merge"
+msgstr "Фигури - Обединение"
+
+#. 7DDCQ
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3148585\n"
+"help.text"
+msgid "<image id=\"img_id3145593\" src=\"media/helpimg/formvers.png\" width=\"3.4791inch\" height=\"1.3126inch\"><alt id=\"alt_id3145593\">Illustration for merging shapes</alt></image>"
+msgstr "<image id=\"img_id3145593\" src=\"media/helpimg/formvers.png\" width=\"3.4791inch\" height=\"1.3126inch\"><alt id=\"alt_id3145593\">Пример за сливане на фигури</alt></image>"
+
+#. eG7wD
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3150001\n"
+"help.text"
+msgid "Adds the area of the selected objects to the area of the lowermost object in the stacking order."
+msgstr "Прибавя площта на избраните обекти към тази на най-долния обект в подредбата."
+
+#. EiBAS
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3153002\n"
+"help.text"
+msgid "Shapes - Subtract"
+msgstr "Фигури - Разлика"
+
+#. DFWbE
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3150338\n"
+"help.text"
+msgid "<image id=\"img_id3154505\" src=\"media/helpimg/formsubt.png\" width=\"3.4689inch\" height=\"1.3126inch\"><alt id=\"alt_id3154505\">Illustration for subtracting shapes</alt></image>"
+msgstr "<image id=\"img_id3154505\" src=\"media/helpimg/formsubt.png\" width=\"3.4689inch\" height=\"1.3126inch\"><alt id=\"alt_id3154505\">Пример за изваждане на фигури</alt></image>"
+
+#. DAcuC
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3150022\n"
+"help.text"
+msgid "Subtracts the area of the selected objects from the area of the lowermost object in the stacking order."
+msgstr "Изважда площта на избраните обекти от тази на най-долния обект в подредбата."
+
+#. dQD4h
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"hd_id3147370\n"
+"help.text"
+msgid "Shapes - Intersect"
+msgstr "Фигури - Сечение"
+
+#. NB9tU
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3150570\n"
+"help.text"
+msgid "<image id=\"img_id3150658\" src=\"media/helpimg/formschn.png\" width=\"3.4272inch\" height=\"1.302inch\"><alt id=\"alt_id3150658\">Illustration for intersecting shapes</alt></image>"
+msgstr "<image id=\"img_id3150658\" src=\"media/helpimg/formschn.png\" width=\"3.4272inch\" height=\"1.302inch\"><alt id=\"alt_id3150658\">Пример за сечение на фигури</alt></image>"
+
+#. Zb4c7
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3157972\n"
+"help.text"
+msgid "The overlapping area of the selected objects creates the new shape."
+msgstr "Застъпващите се области на избраните обекти образуват новата фигура."
+
+#. Sva6t
+#: combine_etc.xhp
+msgctxt ""
+"combine_etc.xhp\n"
+"par_id3151020\n"
+"help.text"
+msgid "The area outside the overlap is removed."
+msgstr "Областта извън застъпването се премахва."
+
+#. AEZcB
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cross-Fading Two Objects"
+msgstr "Преливане между два обекта"
+
+#. a3jA4
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"bm_id3150715\n"
+"help.text"
+msgid "<bookmark_value>draw objects; cross-fading two objects</bookmark_value><bookmark_value>cross-fading; two draw objects</bookmark_value>"
+msgstr "<bookmark_value>графични обекти; преливане между два обекта</bookmark_value><bookmark_value>преливане; между два графични обекта</bookmark_value>"
+
+#. CdpRk
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"hd_id3150715\n"
+"help.text"
+msgid "<variable id=\"cross_fading\"><link href=\"text/sdraw/guide/cross_fading.xhp\">Cross-Fading Two Objects</link></variable>"
+msgstr "<variable id=\"cross_fading\"><link href=\"text/sdraw/guide/cross_fading.xhp\">Преливане между два обекта</link></variable>"
+
+#. kxr3E
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3154754\n"
+"help.text"
+msgid "Cross-fading creates shapes and distributes them by uniform increments between two drawing objects."
+msgstr "Преливането създава междинни фигури и ги подрежда равномерно между двата избрани обекта."
+
+#. EHAqP
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3155112\n"
+"help.text"
+msgid "The cross-fading command is only available in $[officename] Draw. You can, however, copy and paste cross-faded objects into $[officename] Impress."
+msgstr "Командата Преливане е налична само в $[officename] Draw. Можете обаче да копирате и поставите преливащи обекти в $[officename] Impress."
+
+#. DCDGA
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"hd_id3149209\n"
+"help.text"
+msgid "To cross-fade two objects:"
+msgstr "За да прелеете два обекта:"
+
+#. svAGr
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3150370\n"
+"help.text"
+msgid "Hold down Shift and click each object."
+msgstr "Задръжте натиснат клавиша Shift и щракнете върху всеки от обектите."
+
+#. Dfyf6
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3166428\n"
+"help.text"
+msgid "Choose <emph>Shape - Cross-fading</emph>."
+msgstr "Изберете <emph>Фигура - Преливане</emph>."
+
+#. dmA2i
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3156450\n"
+"help.text"
+msgid "Enter a value to specify the number of objects between the start and end of the cross-fade in the <emph>Increments</emph> box."
+msgstr "Въведете стойност, за да определите броя обекти между началото и края на преливането в полето <emph>Стъпки</emph>."
+
+#. 9pKW6
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3149405\n"
+"help.text"
+msgid "Click <emph>OK</emph>."
+msgstr "Натиснете <emph>OK</emph>."
+
+#. FEyjM
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3151240\n"
+"help.text"
+msgid "A group containing the two original objects and the specified number (increments) of cross-faded objects is displayed."
+msgstr "Ще се появи група, съдържаща двата оригинални обекта и зададения брой междинни обекти (стъпки)."
+
+#. aBrFX
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3159203\n"
+"help.text"
+msgid "<image id=\"img_id3150210\" src=\"media/helpimg/ueberblenden.png\" width=\"74.88mm\" height=\"65.62mm\"><alt id=\"alt_id3150210\">Illustration for crossfading</alt></image>"
+msgstr "<image id=\"img_id3150210\" src=\"media/helpimg/ueberblenden.png\" width=\"74.88mm\" height=\"65.62mm\"><alt id=\"alt_id3150210\">Пример за преливане</alt></image>"
+
+#. cev8y
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3154766\n"
+"help.text"
+msgid "You can edit the individual objects of a group by selecting the group and pressing F3. Press <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3 to exit the group editing mode."
+msgstr "Можете да редактирате отделните обекти в група, като я изберете и натиснете F3. Натиснете <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3, за да излезете от режима на редактиране на група."
+
+#. TQGju
+#: cross_fading.xhp
+msgctxt ""
+"cross_fading.xhp\n"
+"par_id3155760\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/02150000.xhp\">Editing - Cross-fading</link>"
+msgstr "<link href=\"text/simpress/01/02150000.xhp\">Редактиране - Преливане</link>"
+
+#. uUD48
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"tit\n"
+"help.text"
+msgid "Drawing Sectors and Segments"
+msgstr "Чертане на сектори и сегменти"
+
+#. CEEGe
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"bm_id3146974\n"
+"help.text"
+msgid "<bookmark_value>sectors of circles/ellipses</bookmark_value><bookmark_value>segments of circles/ellipses</bookmark_value><bookmark_value>circle segments</bookmark_value><bookmark_value>ellipses; segments</bookmark_value><bookmark_value>drawing; sectors and segments</bookmark_value>"
+msgstr "<bookmark_value>сектори от окръжности/елипси</bookmark_value><bookmark_value>сегменти от окръжности/елипси</bookmark_value><bookmark_value>сегменти от окръжности</bookmark_value><bookmark_value>елипси; сегменти</bookmark_value><bookmark_value>чертане; сектори и сегменти</bookmark_value>"
+
+#. 3q4aR
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"hd_id3146974\n"
+"help.text"
+msgid "<variable id=\"draw_sector\"><link href=\"text/sdraw/guide/draw_sector.xhp\">Drawing Sectors and Segments</link></variable>"
+msgstr "<variable id=\"draw_sector\"><link href=\"text/sdraw/guide/draw_sector.xhp\">Чертане на сектори и сегменти</link></variable>"
+
+#. Zq2MQ
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3147396\n"
+"help.text"
+msgid "The <emph>Ellipse</emph> toolbar contains tools for drawing ellipses and circles. You can also draw segments and sectors of circles and ellipses."
+msgstr "Лентата <emph>Елипса</emph> съдържа инструменти за чертане на елипси и окръжности, както и на сегменти и сектори от окръжности и елипси."
+
+#. fawyC
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"hd_id3151075\n"
+"help.text"
+msgid "To draw a sector of a circle or an ellipse:"
+msgstr "За да начертаете сектор от окръжност или елипса:"
+
+#. RRvtT
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3155335\n"
+"help.text"
+msgid "Open the <emph>Ellipses</emph> toolbar and click one of the <emph>Circle Pie</emph> or <emph>Ellipse Pie</emph> icons <image id=\"img_id3155768\" src=\"cmd/sc_circlepie_unfilled.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3155768\">Icon</alt></image>. The mouse pointer changes to a cross hair with a small icon of a sector."
+msgstr "Отворете лентата с инструменти <emph>Елипси</emph> и щракнете върху иконата <emph>Кръгов сектор</emph> или <emph>Елиптичен сектор</emph> <image id=\"img_id3155768\" src=\"cmd/sc_circlepie_unfilled.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3155768\">Икона</alt></image>. Показалецът на мишката ще се превърне в кръстче с малка икона - сектор."
+
+#. ukJy5
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3150199\n"
+"help.text"
+msgid "Position the pointer at the edge of the circle you want to draw and drag to create the circle."
+msgstr "Поставете показалеца в края на окръжността, която желаете да начертаете, и го плъзнете, за да създадете окръжност."
+
+#. uGdL9
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3148868\n"
+"help.text"
+msgid "To create a circle by dragging from the center, press <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> while dragging."
+msgstr "За да създадете окръжност чрез плъзгане откъм центъра й, задръжте <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>, докато плъзгате."
+
+#. UUQDC
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3145361\n"
+"help.text"
+msgid "Release the mouse button when the circle has reached the size you want. A line corresponding to the circle radius appears in the circle."
+msgstr "Отпуснете бутона на мишката, когато окръжността достигне желания размер. В нея ще се появи линия, съответстваща на радиуса й."
+
+#. rtAjM
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3149872\n"
+"help.text"
+msgid "Position the pointer where you want to place the first boundary of the sector and click."
+msgstr "Поставете показалеца на мястото, където желаете да бъде първата граница на сектора, и щракнете."
+
+#. y8EFu
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3157871\n"
+"help.text"
+msgid "As the radius line that follows the pointer is constrained to the circle boundaries, you can click anywhere in the document."
+msgstr "Тъй като линията на радиуса, която следва показалеца, е ограничена във вътрешността на кръга, можете да щракнете на произволно място в документа."
+
+#. qFPkT
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3146874\n"
+"help.text"
+msgid "Position the pointer where you want to place the second boundary of the sector and click. The completed sector is displayed."
+msgstr "Поставете показалеца на мястото, където желаете да бъде втората граница на сектора, и щракнете. Ще се появи завършеният сектор."
+
+#. QGWL2
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3148581\n"
+"help.text"
+msgid "To draw a segment of a circle or ellipse, follow the steps for creating a sector based on a circle."
+msgstr "За да начертаете сегмент от окръжност или елипса, следвайте стъпките за създаване на сектор от окръжност."
+
+#. mmgkF
+#: draw_sector.xhp
+msgctxt ""
+"draw_sector.xhp\n"
+"par_id3153084\n"
+"help.text"
+msgid "To draw an arc based on an ellipse, choose one of the arc icons and follow the same steps for creating a sector based on a circle."
+msgstr "За да начертаете дъга от елипса, изберете някоя от иконите за дъга и следвайте същите стъпки, както за дъга от окръжност."
+
+#. Frzkq
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"tit\n"
+"help.text"
+msgid "Duplicating Objects"
+msgstr "Дублиране на обекти"
+
+#. EJQJE
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"bm_id3145750\n"
+"help.text"
+msgid "<bookmark_value>doubling draw objects</bookmark_value><bookmark_value>draw objects; duplicating</bookmark_value><bookmark_value>duplicating draw objects</bookmark_value><bookmark_value>multiplying draw objects</bookmark_value>"
+msgstr "<bookmark_value>дублиране на графични обекти</bookmark_value><bookmark_value>графични обекти; дублиране</bookmark_value><bookmark_value>размножаване на графични обекти</bookmark_value><bookmark_value>повтаряне на графични обекти</bookmark_value>"
+
+#. tC9aU
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"hd_id3145750\n"
+"help.text"
+msgid "<variable id=\"duplicate_object\"><link href=\"text/sdraw/guide/duplicate_object.xhp\">Duplicating Objects</link></variable>"
+msgstr "<variable id=\"duplicate_object\"><link href=\"text/sdraw/guide/duplicate_object.xhp\">Дублиране на обекти</link></variable>"
+
+#. rxVAA
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3149400\n"
+"help.text"
+msgid "You can create duplicate or multiple copies of an object. The copies can be identical or can differ in size, color, orientation and location."
+msgstr "Можете да създадете дубликат или множество копия на обект. Те могат да бъдат еднакви или да се различават по размер, цвят, ориентация и местоположение."
+
+#. oJbsL
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3153415\n"
+"help.text"
+msgid "The following example creates a stack of coins by making multiple copies of a single ellipse."
+msgstr "Следващият пример показва оформянето на купчинка монети чрез създаване на няколко копия на една елипса."
+
+#. xFdfE
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3149129\n"
+"help.text"
+msgid "Use the <emph>Ellipse</emph> tool to draw a solid yellow ellipse."
+msgstr "С инструмента <emph>Елипса</emph> начертайте елипса, запълнена с жълто."
+
+#. EDqRb
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3149209\n"
+"help.text"
+msgid "Select the ellipse and choose <emph>Edit - Duplicate</emph>."
+msgstr "Щракнете върху елипсата и изберете <emph>Редактиране - Дублиране</emph>."
+
+#. SzCeR
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3145585\n"
+"help.text"
+msgid "Enter 12 as <emph>Number of copies.</emph>"
+msgstr "Въведете 12 в полето <emph>Брой копия</emph>."
+
+#. GwMQB
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3151192\n"
+"help.text"
+msgid "Enter a negative value for the <emph>Width</emph> and <emph>Height</emph> so that the coins decrease in size as you go up the stack."
+msgstr "Въведете отрицателни стойности в полетата <emph>Ширина</emph> и <emph>Височина</emph>, така че размерът на монетите да намалява към върха на купчинката."
+
+#. mKgZB
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3151387\n"
+"help.text"
+msgid "To define a color transition for the coins, select different colors in the <emph>Start</emph> and <emph>End</emph> boxes. The <emph>Start</emph> color is applied to the object that you are duplicating."
+msgstr "За да зададете преливане на цветовете на монетите, изберете различни цветове в полетата <emph>Начало</emph> и <emph>Край</emph>. Цветът в <emph>Начало</emph> се прилага върху обекта, който дублирате."
+
+#. f4d5R
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3149947\n"
+"help.text"
+msgid "Click <emph>OK</emph> to create the duplicates."
+msgstr "Натиснете <emph>OK</emph>, за да създадете дубликатите."
+
+#. gjaqf
+#: duplicate_object.xhp
+msgctxt ""
+"duplicate_object.xhp\n"
+"par_id3153935\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/02120000.xhp\">Edit - Duplicate</link>"
+msgstr "<link href=\"text/simpress/01/02120000.xhp\">Редактиране - Дублиране</link>"
+
+#. CEHEf
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"tit\n"
+"help.text"
+msgid "Replacing Colors"
+msgstr "Заместване на цветове"
+
+#. 5vq7z
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"bm_id3147436\n"
+"help.text"
+msgid "<bookmark_value>eyedropper tool</bookmark_value><bookmark_value>colors; replacing</bookmark_value><bookmark_value>replacing;colors in bitmaps</bookmark_value><bookmark_value>metafiles;replacing colors</bookmark_value><bookmark_value>bitmaps;replacing colors</bookmark_value><bookmark_value>GIF images;replacing colors</bookmark_value>"
+msgstr "<bookmark_value>пипета</bookmark_value><bookmark_value>цветове; замяна</bookmark_value><bookmark_value>замяна;цветове в растерни изображения</bookmark_value><bookmark_value>метафайлове;замяна на цветове</bookmark_value><bookmark_value>растерни изображения;замяна на цветове</bookmark_value><bookmark_value>GIF изображения;замяна на цветове</bookmark_value>"
+
+#. 5F3a9
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"hd_id3147436\n"
+"help.text"
+msgid "<variable id=\"eyedropper\"><link href=\"text/sdraw/guide/eyedropper.xhp\">Replacing Colors</link></variable>"
+msgstr "<variable id=\"eyedropper\"><link href=\"text/sdraw/guide/eyedropper.xhp\">Заместване на цветове</link></variable>"
+
+#. 6nnwD
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3156286\n"
+"help.text"
+msgid "You can replace colors in bitmaps with the <emph>Color Replacer</emph> tool."
+msgstr "С инструмента <emph>Замяна на цветове</emph> можете да заменяте цветове в растерни изображения."
+
+#. ArA6H
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3154704\n"
+"help.text"
+msgid "Up to four colors can be replaced at once."
+msgstr "Наведнъж могат да бъдат заменени до четири цвята."
+
+#. DmAhB
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3147344\n"
+"help.text"
+msgid "You can also use the <emph>Transparency</emph> option to replace the transparent areas of an image with a color."
+msgstr "Можете да използвате опцията <emph>Прозрачност</emph>, за да замените прозрачните области от картина с цвят."
+
+#. Ze6JL
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3148488\n"
+"help.text"
+msgid "Similarly, you can use the <emph>Color Replacer</emph> to make a color on your image transparent."
+msgstr "По подобен начин можете да използвате инструмента <emph>Замяна на цветове</emph>, за да направите цвят от изображението прозрачен."
+
+#. ecY64
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"hd_id3150205\n"
+"help.text"
+msgid "To replace colors with the Color Replacer tool"
+msgstr "За да замените цветове с инструмента Замяна на цветове"
+
+#. vr8bG
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3154656\n"
+"help.text"
+msgid "Ensure that the image you are using is a bitmap (for example, BMP, GIF, JPG, or PNG) or a metafile (for example, WMF)."
+msgstr "Уверете се, че изображението е растерно (например във формат BMP, GIF, JPG или PNG) или метафайл (например WMF)."
+
+#. TAeSM
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3150202\n"
+"help.text"
+msgid "Choose <emph>Tools - Color Replacer</emph>."
+msgstr "Изберете <emph>Инструменти - Замяна на цветове</emph>."
+
+#. gyRmY
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3155531\n"
+"help.text"
+msgid "Click the Color Replacer icon and position the mouse pointer over the color you want to replace in the image. The color appears in the box next to the icon."
+msgstr "Натиснете бутона Замяна на цветове и посочете с мишката цвета, който желаете да заместите в картината. Цветът се появява в кутийката до иконката."
+
+#. tpTWi
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3152985\n"
+"help.text"
+msgid "Click the color in the image. The color appears in the first <emph>Source color</emph> box and the check box next to the color is selected."
+msgstr "Щракнете върху цвят в изображението. Цветът ще се покаже в първото поле <emph>Изходен цвят</emph> и в полето срещу него ще се появи отметка."
+
+#. ZKeEk
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3148866\n"
+"help.text"
+msgid "In the <emph>Replace with</emph> box, select the new color."
+msgstr "Изберете новия цвят в полето <emph>Замяна с</emph>."
+
+#. ZZDJu
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3145362\n"
+"help.text"
+msgid "This replaces all occurrences of the <emph>Source color</emph> in the image."
+msgstr "Така ще замените всички срещания на цвета от полето <emph>Изходен цвят</emph> в изображението."
+
+#. JM5GC
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3151191\n"
+"help.text"
+msgid "If you want to replace another color while the dialog is open, select the check box in front of <emph>Source color</emph> in the next row and repeat steps 3 to 5."
+msgstr "Ако желаете да замените друг цвят, докато диалоговият прозорец е отворен, отметнете полето срещу <emph>Изходен цвят</emph> на следващия ред и повторете стъпки от 3 до 5."
+
+#. um4MR
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3149876\n"
+"help.text"
+msgid "Click <emph>Replace</emph>."
+msgstr "Натиснете <emph>Замяна</emph>."
+
+#. FEATG
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3157871\n"
+"help.text"
+msgid "If you want to expand or contract the color selection area, increase or decrease the tolerance of the <emph>Color Replacer</emph> tool and repeat your selection."
+msgstr "Ако желаете да разширите или стесните избраната по цвят област, увеличете или намалете толеранса на инструмента <emph>Замяна на цветове</emph> и повторете избора."
+
+#. kVa8o
+#: eyedropper.xhp
+msgctxt ""
+"eyedropper.xhp\n"
+"par_id3146878\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06030000.xhp\">Color Replacer</link>"
+msgstr "<link href=\"text/shared/01/06030000.xhp\">Замяна на цветове</link>"
+
+#. eY2vA
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"tit\n"
+"help.text"
+msgid "Creating Gradient Fills"
+msgstr "Създаване на градиентни запълвания"
+
+#. T4kWB
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"bm_id3150792\n"
+"help.text"
+msgid "<bookmark_value>gradients; applying and defining</bookmark_value><bookmark_value>editing;gradients</bookmark_value><bookmark_value>defining;gradients</bookmark_value><bookmark_value>custom gradients</bookmark_value><bookmark_value>transparency;adjusting</bookmark_value>"
+msgstr "<bookmark_value>градиенти; прилагане и задаване</bookmark_value><bookmark_value>редактиране;градиенти</bookmark_value><bookmark_value>задаване;градиенти</bookmark_value><bookmark_value>потребителски градиенти</bookmark_value><bookmark_value>прозрачност;настройване</bookmark_value>"
+
+#. 87fLQ
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"hd_id3150792\n"
+"help.text"
+msgid "<variable id=\"gradient\"><link href=\"text/sdraw/guide/gradient.xhp\">Creating Gradient Fills</link> </variable>"
+msgstr "<variable id=\"gradient\"><link href=\"text/sdraw/guide/gradient.xhp\">Създаване на преливащи запълвания</link></variable>"
+
+#. PpcyF
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3154012\n"
+"help.text"
+msgid "A gradient fill is an incremental blend of two different colors, or shades of the same color, that you can apply to a drawing object."
+msgstr "Градиентното запълване представлява постепенно преливане между два цвята или нюанси на един цвят, с което можете да запълните графичен обект."
+
+#. dSZ6i
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"hd_id3147436\n"
+"help.text"
+msgid "To apply a gradient:"
+msgstr "За да приложите градиент:"
+
+#. KiLft
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3146974\n"
+"help.text"
+msgid "Select a drawing object."
+msgstr "Изберете графичен обект."
+
+#. ysaPv
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3154491\n"
+"help.text"
+msgid "Choose <emph>Format - Area</emph> and select <emph>Gradient</emph> as the <emph>Fill</emph> type."
+msgstr "Изберете <emph>Форматиране - Област</emph> и изберете <emph>градиент</emph> като тип на <emph>запълване</emph>."
+
+#. sKFWJ
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3153415\n"
+"help.text"
+msgid "Select a gradient style from the list and click <emph>OK</emph>."
+msgstr "Изберете стил на градиент от списъка и натиснете <emph>OK</emph>."
+
+#. EHKGx
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"hd_id3154702\n"
+"help.text"
+msgid "Creating Custom Gradients"
+msgstr "Създаване на градиенти по избор"
+
+#. B2vaE
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3145791\n"
+"help.text"
+msgid "You can define your own gradients and modify existing gradients, as well as save and load a list of gradient files."
+msgstr "Можете да задавате ваши градиенти и да променяте съществуващите, както и да записвате файлове със списъци от градиенти."
+
+#. zBYmy
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"hd_id3145384\n"
+"help.text"
+msgid "To create a custom gradient:"
+msgstr "За да създадете градиент по избор:"
+
+#. XtEuo
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3151242\n"
+"help.text"
+msgid "Choose <emph>Format - Area</emph> and click the <emph>Gradients</emph> tab."
+msgstr "Изберете <emph>Форматиране - Област</emph> и изберете раздела <emph>Градиенти</emph>."
+
+#. YvFEJ
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3150046\n"
+"help.text"
+msgid "Select a gradient from the list to use as the basis for your new gradient and click <emph>Add</emph>."
+msgstr "Изберете от списъка градиент, който ще послужи за основа на новия, и натиснете <emph>Добавяне</emph>."
+
+#. 7GYMG
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3145116\n"
+"help.text"
+msgid "Type a name for the gradient in the text box and click <emph>OK</emph>."
+msgstr "Въведете име за градиента в текстовото поле и натиснете <emph>OK</emph>."
+
+#. b2ViM
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id6535843\n"
+"help.text"
+msgid "The name appears at the end of the gradient list and is selected for editing."
+msgstr "Името се появява в списъка с градиенти и се избира за редактиране."
+
+#. YXqDN
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3150391\n"
+"help.text"
+msgid "Set the gradient properties and click <emph>Modify</emph> to save the gradient."
+msgstr "Задайте свойствата на градиента и натиснете <emph>Промяна</emph>, за да го запазите."
+
+#. yAcgt
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3156396\n"
+"help.text"
+msgid "Click <emph>OK.</emph>"
+msgstr "Натиснете <emph>OK</emph>"
+
+#. y7fAD
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"hd_id3149947\n"
+"help.text"
+msgid "Using Gradients and Transparency"
+msgstr "Използване на градиенти и прозрачност"
+
+#. GzsKF
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3157905\n"
+"help.text"
+msgid "You can adjust the properties of a gradient as well as the transparency of a drawing object with your mouse."
+msgstr "Можете да настройвате свойствата на градиент и прозрачността на графичен обект с мишката."
+
+#. V2GgK
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"hd_id3150653\n"
+"help.text"
+msgid "To adjust the gradient of a drawing object:"
+msgstr "За да настроите градиента на графичен обект:"
+
+#. CKrAA
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3154844\n"
+"help.text"
+msgid "Select a drawing object with the gradient that you want to modify."
+msgstr "Изберете обект с градиента, който желаете да редактирате."
+
+#. gseyv
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3145592\n"
+"help.text"
+msgid "Choose <emph>Format - Area</emph> and click the <emph>Gradients</emph> tab."
+msgstr "Изберете <emph>Форматиране - Област</emph> и изберете раздела <emph>Градиенти</emph>."
+
+#. BGDBn
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_idN107BE\n"
+"help.text"
+msgid "Adjust the values for the gradient to suit your needs and click <emph>OK</emph>."
+msgstr "Настройте стойностите за градиента според изискванията си и натиснете <emph>OK</emph>."
+
+#. VEbFT
+#: gradient.xhp
+msgctxt ""
+"gradient.xhp\n"
+"par_id3150659\n"
+"help.text"
+msgid "To adjust the transparency of an object, select the object, choose <emph>Format - Area</emph> and click the <emph>Transparency</emph> tab."
+msgstr "За да настроите прозрачността на обект, изберете го, после изберете <emph>Форматиране - Област</emph> и отворете раздела <emph>Прозрачност</emph>."
+
+#. KE8fj
+#: graphic_insert.xhp
+msgctxt ""
+"graphic_insert.xhp\n"
+"tit\n"
+"help.text"
+msgid "Inserting Graphics"
+msgstr "Вмъкване на картинки"
+
+#. kGBzE
+#: graphic_insert.xhp
+msgctxt ""
+"graphic_insert.xhp\n"
+"bm_id3156443\n"
+"help.text"
+msgid "<bookmark_value>pictures; inserting</bookmark_value><bookmark_value>images; inserting</bookmark_value><bookmark_value>files; inserting pictures</bookmark_value><bookmark_value>inserting;pictures</bookmark_value>"
+msgstr "<bookmark_value>картинки; вмъкване</bookmark_value><bookmark_value>картинки; вмъкване</bookmark_value><bookmark_value>файлове; вмъкване на картинки</bookmark_value><bookmark_value>вмъкване;картинки</bookmark_value>"
+
+#. NGCwH
+#: graphic_insert.xhp
+msgctxt ""
+"graphic_insert.xhp\n"
+"hd_id3156443\n"
+"help.text"
+msgid "<variable id=\"graphic_insert\"><link href=\"text/sdraw/guide/graphic_insert.xhp\">Inserting Pictures</link></variable>"
+msgstr "<variable id=\"graphic_insert\"><link href=\"text/sdraw/guide/graphic_insert.xhp\">Вмъкване на картинки</link></variable>"
+
+#. tGsxU
+#: graphic_insert.xhp
+msgctxt ""
+"graphic_insert.xhp\n"
+"par_id3155600\n"
+"help.text"
+msgid "Choose <emph>Insert - Image</emph>."
+msgstr "Изберете <emph>Вмъкване - Изображение</emph>."
+
+#. PUNGQ
+#: graphic_insert.xhp
+msgctxt ""
+"graphic_insert.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Locate the image you want to insert. Select the <emph>Link</emph> check box to insert only a link to the image. If you want to see the image before you insert it, select <emph>Preview</emph>."
+msgstr "Намерете изображението, което искате да вмъкнете. Отметнете полето <emph>Връзка</emph>, за да вмъкнете само връзка към изображението. За да видите изображението, преди да го вмъкнете, изберете <emph>Мостра</emph>."
+
+#. APuTg
+#: graphic_insert.xhp
+msgctxt ""
+"graphic_insert.xhp\n"
+"par_id3155764\n"
+"help.text"
+msgid "After you insert a linked image, do not change the name of the source image or move the source image to another directory."
+msgstr "След като сте вмъкнали свързаното изображение, не трябва да преименувате изображението – източник или да го местите в друга директория."
+
+#. sGcHZ
+#: graphic_insert.xhp
+msgctxt ""
+"graphic_insert.xhp\n"
+"par_id3150044\n"
+"help.text"
+msgid "Click <emph>Open</emph> to insert the image."
+msgstr "Щракнете върху <emph>Отваряне</emph>, за да вмъкнете изображението."
+
+#. C9Faj
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"tit\n"
+"help.text"
+msgid "Grouping Objects"
+msgstr "Групиране на обекти"
+
+#. rVAaE
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"bm_id3150793\n"
+"help.text"
+msgid "<bookmark_value>grouping; draw objects</bookmark_value><bookmark_value>draw objects; grouping</bookmark_value>"
+msgstr "<bookmark_value>групиране; графични обекти</bookmark_value><bookmark_value>графични обекти; групиране</bookmark_value>"
+
+#. 62Dsm
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"hd_id3150793\n"
+"help.text"
+msgid "<variable id=\"groups\"><link href=\"text/sdraw/guide/groups.xhp\">Grouping Objects</link></variable>"
+msgstr "<variable id=\"groups\"><link href=\"text/sdraw/guide/groups.xhp\">Групиране на обекти</link></variable>"
+
+#. ZBEaH
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3153728\n"
+"help.text"
+msgid "You can combine several objects into a group so that they act as a single object. You can move and transform all objects in a group as a single unit. You can also change the properties (for example, line size, fill color) of all objects in a group as a whole or for individual objects in a group. Groups can be temporary or assigned:"
+msgstr "Можете да обедините няколко обекта в група, така че да се държат като един обект. Можете да местите и преобразувате всички обекти в групата като едно цяло. Също така можете да променяте свойствата (например дебелина на линията и запълващ цвят) на всички обекти в групата като цяло или индивидуално за всеки обект в групата. Групите могат да бъдат временни или приписани:"
+
+#. WWeYC
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3147434\n"
+"help.text"
+msgid "Temporary - group only lasts as long as all of the combined objects are selected."
+msgstr "временни - групирането трае само докато комбинираните обекти са избрани;"
+
+#. CVj6T
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3154490\n"
+"help.text"
+msgid "Assigned - group lasts until it is ungrouped through a menu command."
+msgstr "приписани - групата трае, докато бъде разгрупирана чрез команда от меню."
+
+#. DmwjH
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3145252\n"
+"help.text"
+msgid "Groups can also be grouped in other groups. Actions applied to a group do not affect the relative position of the individual objects to each other in the group."
+msgstr "Групите могат да бъдат групирани в други групи. Действията, приложени върху група, не влияят върху относителните позиции на отделните обекти в нея един спрямо друг."
+
+#. m5GTv
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"hd_id3150716\n"
+"help.text"
+msgid "To group objects:"
+msgstr "За да групирате обекти:"
+
+#. pdLV8
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3149018\n"
+"help.text"
+msgid "<image id=\"img_id3145643\" src=\"cmd/sc_formatgroup.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3145643\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145643\" src=\"cmd/sc_formatgroup.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3145643\">Икона</alt></image>"
+
+#. 9Skiw
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3147346\n"
+"help.text"
+msgid "Select the objects you want to group and choose <emph>Shape - Group - Group</emph>."
+msgstr "Изберете обектите, които искате да групирате, и изберете <emph>Фигура - Групиране - Групиране</emph>."
+
+#. AYfMA
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3148485\n"
+"help.text"
+msgid "For example, you can group all of the objects in a company logo to move and resize the logo as a single object."
+msgstr "Например, можете да групирате всички обекти, съставляващи емблема на фирма, за да местите и преоразмерявате емблемата като самостоятелен обект."
+
+#. kB7hM
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3147002\n"
+"help.text"
+msgid "After you have grouped objects, selecting any part of the group selects the entire group."
+msgstr "След като сте групирали обектите, изборането на която и да е част от групата избира цялата група."
+
+#. CTTCD
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"hd_id3150205\n"
+"help.text"
+msgid "Selecting Objects in a Group"
+msgstr "Избиране на обекти в група"
+
+#. bedSZ
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3150370\n"
+"help.text"
+msgid "<image id=\"img_id3155376\" src=\"cmd/sc_entergroup.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3155376\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155376\" src=\"cmd/sc_entergroup.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3155376\">Икона</alt></image>"
+
+#. HrJDA
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3156450\n"
+"help.text"
+msgid "You can select single objects in a group by entering the group. Double-click a group to enter it and click on the object to select it. You can also add or delete objects to and from a group in this mode. The objects that are not part of the group are grayed out."
+msgstr "Можете да избирате отделни обекти от група, като влезете в групата. Щракнете двукратно върху групата, за да влезете в нея и щракнете върху обекта, който желаете да изберете. В този режим можете също да добавяте или изтривате обекти от група. Обектите, които не са част от групата, са показани в сиво."
+
+#. QTExY
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3151239\n"
+"help.text"
+msgid "<image id=\"img_id3155264\" src=\"cmd/sc_leavegroup.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3155264\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155264\" src=\"cmd/sc_leavegroup.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3155264\">Икона</alt></image>"
+
+#. ZBWCE
+#: groups.xhp
+msgctxt ""
+"groups.xhp\n"
+"par_id3150213\n"
+"help.text"
+msgid "To exit a group, double-click anywhere outside it."
+msgstr "За да излезете от група, щракнете двукратно извън нея."
+
+#. FTtCf
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"tit\n"
+"help.text"
+msgid "Connecting Lines"
+msgstr "Свързване на линии"
+
+#. 7UcvY
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"bm_id3145799\n"
+"help.text"
+msgid "<bookmark_value>draw objects; connecting lines to</bookmark_value><bookmark_value>connecting; lines</bookmark_value><bookmark_value>lines; connecting objects</bookmark_value><bookmark_value>areas; from connected lines</bookmark_value>"
+msgstr "<bookmark_value>графични обекти; свързване на линии към</bookmark_value><bookmark_value>свързване; линии</bookmark_value><bookmark_value>линии; свързване на обекти</bookmark_value><bookmark_value>области; от свързани линии</bookmark_value>"
+
+#. 9v7a8
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"hd_id3145799\n"
+"help.text"
+msgid "<variable id=\"join_objects\"><link href=\"text/sdraw/guide/join_objects.xhp\">Connecting Lines</link></variable>"
+msgstr "<variable id=\"join_objects\"><link href=\"text/sdraw/guide/join_objects.xhp\">Свързване на линии</link></variable>"
+
+#. FUYtU
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"par_id3154512\n"
+"help.text"
+msgid "When you connect lines, lines are drawn between neighboring endpoints."
+msgstr "Когато свързвате линии, между съседните им краища се рисуват нови линии."
+
+#. V9J7h
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"hd_id3150752\n"
+"help.text"
+msgid "To connect lines:"
+msgstr "За да свържете линии:"
+
+#. jYDcD
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"par_id3153714\n"
+"help.text"
+msgid "Select two or more lines."
+msgstr "Изберете две или повече линии."
+
+#. UAfTT
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"par_id3156383\n"
+"help.text"
+msgid "Right-click and choose <emph>Shape - Connect</emph>."
+msgstr "Щракнете с десния бутон и изберете <emph>Фигура - Свързване</emph>."
+
+#. 8E32A
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"par_id3149257\n"
+"help.text"
+msgid "To create a closed object, right-click a line and choose <emph>Close Object</emph>."
+msgstr "За да създадете затворен обект, щракнете с десния бутон на мишката върху линия и изберете <emph>Затваряне на обект</emph>."
+
+#. ZfCk8
+#: join_objects.xhp
+msgctxt ""
+"join_objects.xhp\n"
+"par_id3150363\n"
+"help.text"
+msgid "You can only use the <emph>Close Object</emph> command on connected lines, <emph>Freeform Lines </emph>and unfilled <emph>Curves</emph>."
+msgstr "Командата <emph>Затваряне на обект</emph> може да се ползва само върху свързани линии, ръчно рисувани линии (инструмент <emph>Рисувана крива</emph>) и незапълнени криви (инструмент <emph>Крива</emph>)."
+
+#. tsRYv
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"tit\n"
+"help.text"
+msgid "Assembling 3D Objects"
+msgstr "Сглобяване на триизмерни обекти"
+
+#. zKevj
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"bm_id3154014\n"
+"help.text"
+msgid "<bookmark_value>3D objects; assembling</bookmark_value><bookmark_value>assembled objects in 3D</bookmark_value><bookmark_value>combining;3D objects</bookmark_value><bookmark_value>joining;3D objects</bookmark_value>"
+msgstr "<bookmark_value>триизмерни обекти; сглобяване</bookmark_value><bookmark_value>сглобяване на триизмерни обекти</bookmark_value><bookmark_value>комбиниране;триизмерни обекти</bookmark_value><bookmark_value>обединяване;триизмерни обекти</bookmark_value>"
+
+#. KA2cc
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"hd_id3156442\n"
+"help.text"
+msgid "<variable id=\"join_objects3d\"><link href=\"text/sdraw/guide/join_objects3d.xhp\">Assembling 3D Objects</link></variable>"
+msgstr "<variable id=\"join_objects3d\"><link href=\"text/sdraw/guide/join_objects3d.xhp\">Сглобяване на триизмерни обекти</link></variable>"
+
+#. spQiu
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3145251\n"
+"help.text"
+msgid "3D objects that each form a 3D scene can be combined into a single 3D scene."
+msgstr "Триизмерните обекти, всеки от които представлява триизмерна сцена, могат да бъдат комбинирани в една триизмерна сцена."
+
+#. Cn8Mu
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"hd_id3150042\n"
+"help.text"
+msgid "To combine 3D objects:"
+msgstr "За да комбинирате триизмерни обекти:"
+
+#. aicit
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3154702\n"
+"help.text"
+msgid "Insert a 3D object from the <emph>3D Objects</emph> toolbar (for example, a cube)."
+msgstr "Вмъкнете триизмерен обект от лентата <emph>Триизмерни тела</emph> (например куб)."
+
+#. JcNRn
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3155335\n"
+"help.text"
+msgid "Insert a second slightly larger 3D object (for example, a sphere)."
+msgstr "Вмъкнете втори, малко по-голям триизмерен обект (например кълбо)."
+
+#. nKo5g
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3148488\n"
+"help.text"
+msgid "Select the second 3D object (sphere) and choose <emph>Edit - Cut</emph>."
+msgstr "Изберете втория триизмерен обект (кълбото) и изберете <emph>Редактиране - Изрязване</emph>."
+
+#. TUtH4
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3149211\n"
+"help.text"
+msgid "Double-click the first object (cube) to enter its group."
+msgstr "Щракнете двукратно върху първия обект (куба), за да влезете в групата му."
+
+#. hEAys
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3154652\n"
+"help.text"
+msgid "Choose <emph>Edit - Paste</emph>. Both objects are now part of the same group. If you want, you can edit the individual objects or change their position within the group."
+msgstr "Изберете <emph>Редактиране - Поставяне</emph>. Двата обекта вече са част от една и съща група. Ако желаете, можете индивидуално да редактирате обекти или да променяте тяхната позиция в групата."
+
+#. AbqoS
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3155376\n"
+"help.text"
+msgid "Double-click outside the group to exit the group."
+msgstr "Щракнете двукратно извън групата, за да излезете от нея."
+
+#. taiS2
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3148606\n"
+"help.text"
+msgid "You cannot intersect or subtract 3D objects."
+msgstr "Не можете да построявате сечение или разлика на триизмерни обекти."
+
+#. HRRBq
+#: join_objects3d.xhp
+msgctxt ""
+"join_objects3d.xhp\n"
+"par_id3154537\n"
+"help.text"
+msgid "<link href=\"text/simpress/02/10090000.xhp\">Objects in 3D</link>"
+msgstr "<link href=\"text/simpress/02/10090000.xhp\">Триизмерни обекти</link>"
+
+#. F8CG3
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys for Drawing Objects"
+msgstr "Клавишни комбинации за обекти"
+
+#. WaKgD
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"bm_id3155628\n"
+"help.text"
+msgid "<bookmark_value>accessibility; %PRODUCTNAME Draw</bookmark_value><bookmark_value>draw objects; text entry mode</bookmark_value><bookmark_value>text entry mode for draw objects</bookmark_value>"
+msgstr "<bookmark_value>достъпност; %PRODUCTNAME Draw</bookmark_value><bookmark_value>графични обекти; въвеждане в текстов режим</bookmark_value><bookmark_value>текстов режим за въвеждане на графични обекти</bookmark_value>"
+
+#. UtEww
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"hd_id3155628\n"
+"help.text"
+msgid "<variable id=\"keyboard\"><link href=\"text/sdraw/guide/keyboard.xhp\">Shortcut Keys for Drawing Objects</link></variable>"
+msgstr "<variable id=\"keyboard\"><link href=\"text/sdraw/guide/keyboard.xhp\">Клавишни комбинации за графични обекти</link></variable>"
+
+#. A6rs7
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3148663\n"
+"help.text"
+msgid "You can create and edit drawing objects using the keyboard."
+msgstr "Можете да създавате и редактирате обекти чрез клавиатурата."
+
+#. YVvQs
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"hd_id3125863\n"
+"help.text"
+msgid "To Create and Edit a Drawing Object"
+msgstr "За да създадете и редактирате обект"
+
+#. iCmHN
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3153188\n"
+"help.text"
+msgid "Press <item type=\"keycode\">F6</item> to navigate to the <emph>Drawing</emph> bar."
+msgstr "Натиснете <item type=\"keycode\">F6</item>, за да активирате лентата <emph>Рисунка</emph>."
+
+#. 8Jf2p
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3146971\n"
+"help.text"
+msgid "Press the <item type=\"keycode\">Right</item> arrow key until you reach the toolbar icon of a drawing tool."
+msgstr "Натискайте клавиша <item type=\"keycode\">Стрелка надясно</item>, докато достигнете желания инструмент от лентата."
+
+#. FEfKD
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_idN106CD\n"
+"help.text"
+msgid "If there is an arrow next to the icon, the drawing tool opens a sub toolbar. Press the <item type=\"keycode\">Up</item> or <item type=\"keycode\">Down</item> arrow key to open the sub toolbar, then press the <item type=\"keycode\">Right</item> or <item type=\"keycode\">Left</item> key to select an icon."
+msgstr "Ако до иконата е показана стрелка, значи има подинструменти. Натиснете клавиша <item type=\"keycode\">Стрелка нагоре</item> или <item type=\"keycode\">Стрелка надолу</item>, за да отворите подинструмените, след което натискайте <item type=\"keycode\">Стрелка надясно</item> или <item type=\"keycode\">Стрелка наляво</item> за да изберете икона."
+
+#. k2yNu
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3147338\n"
+"help.text"
+msgid "Press <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Enter</item>."
+msgstr "Натиснете <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Enter</item>."
+
+#. cTDYF
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3154705\n"
+"help.text"
+msgid "The object is created at the center of the current document."
+msgstr "Обектът ще бъде създаден в центъра на текущия документ."
+
+#. Mnyk2
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3155962\n"
+"help.text"
+msgid "To return to the document, press <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+F6</item>."
+msgstr "За да се върнете към документа, натиснете <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+F6</item>."
+
+#. gQRPD
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3155062\n"
+"help.text"
+msgid "You can use the arrow keys to position the object where you want. To choose a command from the context menu for the object, press <item type=\"keycode\">Shift+F10</item>."
+msgstr "Можете да използвате клавишите със стрелки, за да позиционирате обекта, където желаете. За да изберете команда от контекстното меню за обекта, натиснете <item type=\"keycode\">Shift+F10</item>."
+
+#. g7CqK
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"hd_id3150306\n"
+"help.text"
+msgid "To Select an Object"
+msgstr "За да изберете обект"
+
+#. qppkC
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3152990\n"
+"help.text"
+msgid "Press <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+F6</item> to enter the document."
+msgstr "Натиснете <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+F6</item>, за да влезете в документа."
+
+#. auKsz
+#: keyboard.xhp
+msgctxt ""
+"keyboard.xhp\n"
+"par_id3145587\n"
+"help.text"
+msgid "Press <item type=\"keycode\">Tab</item> until you reach the object you want to select."
+msgstr "Натискайте <item type=\"keycode\">Tab</item>, докато не достигнете до обекта, който желаете да изберете."
+
+#. JLNwQ
+#: layer_move.xhp
+msgctxt ""
+"layer_move.xhp\n"
+"tit\n"
+"help.text"
+msgid "Moving Objects to a Different Layer"
+msgstr "Преместване на обекти в друг слой"
+
+#. VnzC4
+#: layer_move.xhp
+msgctxt ""
+"layer_move.xhp\n"
+"bm_id3150752\n"
+"help.text"
+msgid "<bookmark_value>objects; moving in layers</bookmark_value><bookmark_value>layers; moving objects</bookmark_value><bookmark_value>moving; between layers</bookmark_value>"
+msgstr "<bookmark_value>обекти; преместване в друг слой</bookmark_value><bookmark_value>слоеве; преместване на обекти</bookmark_value><bookmark_value>преместване; между слоеве</bookmark_value>"
+
+#. mvFri
+#: layer_move.xhp
+msgctxt ""
+"layer_move.xhp\n"
+"hd_id3150752\n"
+"help.text"
+msgid "<variable id=\"layer_move\"><link href=\"text/sdraw/guide/layer_move.xhp\">Moving Objects to a Different Layer</link></variable>"
+msgstr "<variable id=\"layer_move\"><link href=\"text/sdraw/guide/layer_move.xhp\">Преместване на обекти в друг слой</link></variable>"
+
+#. GPgv9
+#: layer_move.xhp
+msgctxt ""
+"layer_move.xhp\n"
+"par_idN10622\n"
+"help.text"
+msgid "Drawings in %PRODUCTNAME Draw support layers."
+msgstr "В рисунките на %PRODUCTNAME Draw се поддържат слоеве."
+
+#. LugPR
+#: layer_move.xhp
+msgctxt ""
+"layer_move.xhp\n"
+"par_id3148488\n"
+"help.text"
+msgid "Click and hold the object until its edges flash."
+msgstr "Щракнете и задръжте върху обекта, докато очертанията му примигнат."
+
+#. Fd8FL
+#: layer_move.xhp
+msgctxt ""
+"layer_move.xhp\n"
+"par_id3145587\n"
+"help.text"
+msgid "Drag the object to the name tab of the layer you want to move it to."
+msgstr "Плъзнете обекта върху името на слоя, в който желаете да го преместите."
+
+#. JKcGu
+#: layer_move.xhp
+msgctxt ""
+"layer_move.xhp\n"
+"par_id3148868\n"
+"help.text"
+msgid "Release the object."
+msgstr "Пуснете обекта."
+
+#. ueWyB
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"tit\n"
+"help.text"
+msgid "Inserting Layers"
+msgstr "Вмъкване на слоеве"
+
+#. aJEDz
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"bm_id3148797\n"
+"help.text"
+msgid "<bookmark_value>layers; inserting and editing</bookmark_value><bookmark_value>inserting; layers</bookmark_value><bookmark_value>changing;layer properties</bookmark_value>"
+msgstr "<bookmark_value>слоеве; вмъкване и редактиране</bookmark_value><bookmark_value>вмъкване; слоеве</bookmark_value><bookmark_value>промяна;свойства на слоеве</bookmark_value>"
+
+#. pC5uR
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"hd_id3148797\n"
+"help.text"
+msgid "<variable id=\"layer_new\"><link href=\"text/sdraw/guide/layer_new.xhp\">Inserting Layers</link></variable>"
+msgstr "<variable id=\"layer_new\"><link href=\"text/sdraw/guide/layer_new.xhp\">Вмъкване на слоеве</link></variable>"
+
+#. q2YZP
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_idN10614\n"
+"help.text"
+msgid "Drawings in %PRODUCTNAME Draw support layers."
+msgstr "В рисунките на %PRODUCTNAME Draw се поддържат слоеве."
+
+#. ekzqb
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_idN10643\n"
+"help.text"
+msgid "Right-click the layer tab area at the bottom."
+msgstr "Щракнете с десния бутон върху областта с имена на слоеве в долната част на работната площ."
+
+#. Zgqbq
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_id3153418\n"
+"help.text"
+msgid "Choose <emph>Insert Layer</emph>."
+msgstr "Изберете <emph>Вмъкване на слой</emph>."
+
+#. KF4eN
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_id3155068\n"
+"help.text"
+msgid "Type a name for the layer in the <emph>Name </emph>box."
+msgstr "Въведете име за слоя в полето <emph>Име</emph>."
+
+#. CBEHF
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_id3156382\n"
+"help.text"
+msgid "In the <emph>Properties</emph>area, set the options for the layer."
+msgstr "В областта <emph>Свойства</emph> задайте настройките за слоя."
+
+#. vvWmv
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_id3153964\n"
+"help.text"
+msgid "Click <emph>OK</emph>. The new layer automatically becomes the active layer."
+msgstr "Натиснете <emph>OK</emph>. Новият слой автоматично ще стане текущ."
+
+#. zmf3H
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_id3154658\n"
+"help.text"
+msgid "To change the properties of a layer, click the name tab of the layer, and then choose <emph>Format - Layer</emph>."
+msgstr "За да промените свойствата на слой, щракнете върху етикета с името му и изберете <emph>Форматиране - Слой</emph>."
+
+#. pcp3u
+#: layer_new.xhp
+msgctxt ""
+"layer_new.xhp\n"
+"par_id3153814\n"
+"help.text"
+msgid "You cannot change the name of or delete a predefined <item type=\"productname\">%PRODUCTNAME</item> Draw layer."
+msgstr "Не можете да преименувате или изтриете някой от предварително дефинираните слоеве на <item type=\"productname\">%PRODUCTNAME</item> Draw."
+
+#. ogEXM
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"tit\n"
+"help.text"
+msgid "Working With Layers"
+msgstr "Работа със слоеве"
+
+#. XdCXD
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"bm_id3154013\n"
+"help.text"
+msgid "<bookmark_value>layers;working with</bookmark_value><bookmark_value>locking layers</bookmark_value><bookmark_value>hiding;layers</bookmark_value><bookmark_value>unlocking layers</bookmark_value><bookmark_value>showing;hidden layers</bookmark_value><bookmark_value>selecting;layers</bookmark_value>"
+msgstr "<bookmark_value>слоеве;работа с</bookmark_value><bookmark_value>заключване на слоеве</bookmark_value><bookmark_value>скриване;слоеве</bookmark_value><bookmark_value>отключване на слоеве</bookmark_value><bookmark_value>показване;скрити слоеве</bookmark_value><bookmark_value>избиране;слоеве</bookmark_value>"
+
+#. heiR5
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"hd_id3154013\n"
+"help.text"
+msgid "<variable id=\"layer_tipps\"><link href=\"text/sdraw/guide/layer_tipps.xhp\">Working With Layers</link></variable>"
+msgstr "<variable id=\"layer_tipps\"><link href=\"text/sdraw/guide/layer_tipps.xhp\">Работа със слоеве</link></variable>"
+
+#. DG6Fg
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_idN10706\n"
+"help.text"
+msgid "Drawings in %PRODUCTNAME Draw support layers."
+msgstr "В рисунките на %PRODUCTNAME Draw се поддържат слоеве."
+
+#. rt4CH
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"hd_id3154018\n"
+"help.text"
+msgid "Selecting a layer"
+msgstr "Избиране на слой"
+
+#. ymWHd
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3154484\n"
+"help.text"
+msgid "To select a layer, click the name tab of the layer at the bottom of the workspace."
+msgstr "За да изберете слой, щракнете върху етикета с името му в долната част на работната площ."
+
+#. Eu6FM
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_idN10767\n"
+"help.text"
+msgid "To edit the properties of a layer, double-click a layer tab."
+msgstr "За да редактирате свойствата на слой, щракнете двукратно върху етикета с името му."
+
+#. gpeRK
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"hd_id3155445\n"
+"help.text"
+msgid "Hiding layers"
+msgstr "Скриване на слоеве"
+
+#. 58ZDz
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3154702\n"
+"help.text"
+msgid "Select a layer, and then choose <emph>Format - Layer</emph>."
+msgstr "Изберете слой, после изберете <emph>Форматиране - Слой</emph>."
+
+#. GExfg
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3145587\n"
+"help.text"
+msgid "In the <emph>Properties </emph>area, clear the <emph>Visible </emph>check box."
+msgstr "В областта <emph>Свойства</emph> изчистете отметката от полето <emph>Видим</emph>."
+
+#. S94G3
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3153912\n"
+"help.text"
+msgid "Click <emph>OK</emph>."
+msgstr "Натиснете <emph>OK</emph>."
+
+#. SYd53
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3154762\n"
+"help.text"
+msgid "In the name tab of the layer, the text color of the name changes to blue."
+msgstr "Текстът в етикета с името на слоя ще стане син."
+
+#. QE9VM
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3156396\n"
+"help.text"
+msgid "You can make a layer visible or invisible by clicking on its tab while holding down the Shift key."
+msgstr "Можете да направите слой видим или невидим, като щракнете върху етикета с името му със задържан клавиш Shift."
+
+#. oLGAc
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"hd_id3146322\n"
+"help.text"
+msgid "Showing hidden layers"
+msgstr "Показване на скрити слоеве"
+
+#. gPBRz
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3157871\n"
+"help.text"
+msgid "Select a hidden layer, and then choose <emph>Format - Layer</emph>."
+msgstr "Изберете скрит слой, после изберете <emph>Форматиране - Слой</emph>."
+
+#. Hp7EC
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3149352\n"
+"help.text"
+msgid "In the <emph>Properties </emph>area, select the <emph>Visible </emph>check box."
+msgstr "В областта <emph>Свойства</emph> отметнете полето <emph>Видим</emph>."
+
+#. sRuDf
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3153036\n"
+"help.text"
+msgid "Click <emph>OK</emph>."
+msgstr "Натиснете <emph>OK</emph>."
+
+#. eteBC
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"hd_id3154554\n"
+"help.text"
+msgid "Locking layers"
+msgstr "Заключване на слоеве"
+
+#. ngA9B
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3150864\n"
+"help.text"
+msgid "Select a layer, and then choose <emph>Format - Layer</emph>."
+msgstr "Изберете слой, после изберете <emph>Форматиране - Слой</emph>."
+
+#. kAd4B
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3150336\n"
+"help.text"
+msgid "In the <emph>Properties</emph> area, select the <emph>Locked </emph>check box."
+msgstr "В областта <emph>Свойства</emph> отметнете полето <emph>Заключен</emph>."
+
+#. VggNV
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3153730\n"
+"help.text"
+msgid "Click <emph>OK</emph>."
+msgstr "Натиснете <emph>OK</emph>."
+
+#. FzHMk
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3149883\n"
+"help.text"
+msgid "You cannot edit objects on a locked layer."
+msgstr "Обектите в заключен слой не могат да бъдат редактирани."
+
+#. LQxDq
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"hd_id3145244\n"
+"help.text"
+msgid "Unlocking layers"
+msgstr "Отключване на слоеве"
+
+#. 9RDhe
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3145354\n"
+"help.text"
+msgid "Select a locked layer, and then choose <emph>Format - Layer</emph>."
+msgstr "Изберете заключен слой, после изберете <emph>Форматиране - Слой</emph>."
+
+#. xzL5o
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3148393\n"
+"help.text"
+msgid "In the <emph>Properties</emph> area, clear the <emph>Locked </emph>check box."
+msgstr "В областта <emph>Свойства</emph> изчистете отметката от полето <emph>Заключен</emph>."
+
+#. JaFMq
+#: layer_tipps.xhp
+msgctxt ""
+"layer_tipps.xhp\n"
+"par_id3150467\n"
+"help.text"
+msgid "Click <emph>OK</emph>."
+msgstr "Натиснете <emph>OK</emph>."
+
+#. mWSnc
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"tit\n"
+"help.text"
+msgid "About Layers"
+msgstr "Относно слоевете"
+
+#. S84VT
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"bm_id3149018\n"
+"help.text"
+msgid "<bookmark_value>layers; definition</bookmark_value>"
+msgstr "<bookmark_value>слоеве; определение</bookmark_value>"
+
+#. Au8rW
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"hd_id3149018\n"
+"help.text"
+msgid "<variable id=\"layers\"><link href=\"text/sdraw/guide/layers.xhp\">About Layers</link></variable>"
+msgstr "<variable id=\"layers\"><link href=\"text/sdraw/guide/layers.xhp\">Относно слоевете</link></variable>"
+
+#. RPAJU
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3146313\n"
+"help.text"
+msgid "Layers allow you to assemble elements on a page that are related. Think of layers as individual workspaces that you can hide from view, hide from printing, or lock."
+msgstr "Слоевете ви позволяват да групирате взаимосвързани елементи върху страницата. Може да мислите за тях като за отделни работни площи, които могат да се скриват, да се пропускат при печатане и да се заключват."
+
+#. 4kcNU
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id7036957\n"
+"help.text"
+msgid "Layers do not determine the stacking order of objects on your page, except for the <emph>Controls</emph> layer which is always in front of other layers."
+msgstr "Слоевете не определят реда на изобразяване на обектите върху страницата, с изключение на слоя <emph>Контроли</emph>, който винаги е пред останалите слоеве."
+
+#. kTBs7
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id1614734\n"
+"help.text"
+msgid "The stacking order of objects on your page is determined by the sequence in which you add the objects. You can rearrange the stacking order by <item type=\"menuitem\">Shape - Arrange</item>."
+msgstr "Редът на изобразяване на обектите върху страницата се определя от реда, в който ги добавяте. Можете да промените този ред чрез <item type=\"menuitem\">Фигура - Подреждане</item>."
+
+#. iH5qN
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id398876\n"
+"help.text"
+msgid "The areas on a layer that do not contain objects are transparent."
+msgstr "Областите от даден слой, които не съдържат обекти, са прозрачни."
+
+#. J8FdX
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3146962\n"
+"help.text"
+msgid "$[officename] Draw provides three default layers:"
+msgstr "$[officename] Draw предлага три слоя по подразбиране:"
+
+#. 5GCok
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3153073\n"
+"help.text"
+msgid "Layout"
+msgstr "Оформление"
+
+#. RNyhU
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3149053\n"
+"help.text"
+msgid "Controls"
+msgstr "Контроли"
+
+#. GdLDG
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3150391\n"
+"help.text"
+msgid "Dimension Lines"
+msgstr "Размерни линии"
+
+#. Xy8FC
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3156397\n"
+"help.text"
+msgid "You cannot delete or rename the default layers. You can add your own layers by <item type=\"menuitem\">Insert - Layer</item>."
+msgstr "Не можете да изтриете или преименувате подразбираните слоеве. Можете да добавяте ваши собствени слоеве чрез <item type=\"menuitem\">Вмъкване - Слой</item>."
+
+#. VXoqD
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3150534\n"
+"help.text"
+msgid "The <emph>Layout</emph> layer is the default workspace. The <emph>Layout</emph> layer determines the location of title, text, and object placeholders on your page."
+msgstr "Слоят <emph>Оформление</emph> представлява подразбираната работна площ. Той определя местоположението на запазените места за заглавието, текста и обектите в страницата."
+
+#. rZDu2
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3150742\n"
+"help.text"
+msgid "The <emph>Controls</emph> layer can be used for buttons that have been assigned an action, but that should not be printed. Set the layer's properties to not printable. Objects on the <emph>Controls</emph> layer are always in front of objects on other layers."
+msgstr "Слоят <emph>Контроли</emph> може да се използва за бутони, на които са приписани действия, но не трябва да се печатат. Забранете отпечатването на слоя в свойствата му. Обектите от слоя <emph>Контроли</emph> винаги са пред обектите от други слоеве."
+
+#. GigUQ
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3153085\n"
+"help.text"
+msgid "The <emph>Dimension Lines</emph> layer is where you draw, for example, the dimension lines. By switching the layer to show or hide, you can easily switch these lines on and off."
+msgstr "Слоят <emph>Размерни линии</emph> служи за чертане на помощни елементи като размерни линии. Превключвайки видимостта му, лесно можете да скривате и показвате тези елементи."
+
+#. zDY7B
+#: layers.xhp
+msgctxt ""
+"layers.xhp\n"
+"par_id3154507\n"
+"help.text"
+msgid "You can lock a layer to protect its contents, or hide a layer and its contents from view or from printing. When you add a new layer to a page, the layer is added to all of the pages in your document. However, when you add an object to a layer, it is only added to the current page. If you want the object to appear on all of the pages, add the object to the master page (<menuitem>View - Master</menuitem>)."
+msgstr "Можете да заключите слой, за да защитите съдържанието му, както и да скриете слой и съдържанието му от разглеждане или печатане. Когато добавите нов слой към една страница, той се добавя към всички страници в документа. Когато обаче добавите обект към слой, обектът се добавя само в текущата страница. Ако желаете обектът да се появи във всички страници, добавете го в страницата образец (<menuitem>Изглед - Образец</menuitem>)."
+
+#. r9Yst
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"tit\n"
+"help.text"
+msgid "Instructions for Using $[officename] Draw"
+msgstr "Указания за работа с $[officename] Draw"
+
+#. aTz4K
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"bm_id3146119\n"
+"help.text"
+msgid "<bookmark_value>Draw instructions</bookmark_value><bookmark_value>instructions; $[officename] Draw</bookmark_value><bookmark_value>Howtos for Draw</bookmark_value>"
+msgstr "<bookmark_value>Draw, указания за</bookmark_value><bookmark_value>указания; $[officename] Draw</bookmark_value><bookmark_value>Draw, ръководства за</bookmark_value>"
+
+#. vBjxV
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3146119\n"
+"help.text"
+msgid "<variable id=\"main\"><link href=\"text/sdraw/guide/main.xhp\">Instructions for Using $[officename] Draw</link></variable>"
+msgstr "<variable id=\"main\"><link href=\"text/sdraw/guide/main.xhp\">Указания за работа с $[officename] Draw</link></variable>"
+
+#. VFDJC
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3143218\n"
+"help.text"
+msgid "Editing and Grouping Objects"
+msgstr "Редактиране и групиране на обекти"
+
+#. 6pbcB
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3149018\n"
+"help.text"
+msgid "Editing Colors and Textures"
+msgstr "Редактиране на цветове и текстури"
+
+#. wxkbK
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3150043\n"
+"help.text"
+msgid "Editing Text"
+msgstr "Редактиране на текст"
+
+#. FAs5U
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3147003\n"
+"help.text"
+msgid "Working with Layers"
+msgstr "Работа със слоеве"
+
+#. ADpJr
+#: main.xhp
+msgctxt ""
+"main.xhp\n"
+"hd_id3145585\n"
+"help.text"
+msgid "Miscellaneous"
+msgstr "Разни"
+
+#. cu3A2
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"tit\n"
+"help.text"
+msgid "Rotating Objects"
+msgstr "Въртене на обекти"
+
+#. xaMBR
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"bm_id3154684\n"
+"help.text"
+msgid "<bookmark_value>rotating; draw objects</bookmark_value><bookmark_value>draw objects; rotating</bookmark_value><bookmark_value>pivot points of draw objects</bookmark_value><bookmark_value>skewing draw objects</bookmark_value>"
+msgstr "<bookmark_value>въртене; графични обекти</bookmark_value><bookmark_value>графични обекти; въртене</bookmark_value><bookmark_value>опорни точки на графични обекти</bookmark_value><bookmark_value>накланяне на графични обекти</bookmark_value>"
+
+#. 5MCPs
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"hd_id3154684\n"
+"help.text"
+msgid "<variable id=\"rotate_object\"><link href=\"text/sdraw/guide/rotate_object.xhp\">Rotating Objects</link></variable>"
+msgstr "<variable id=\"rotate_object\"><link href=\"text/sdraw/guide/rotate_object.xhp\">Въртене на обекти</link></variable>"
+
+#. GSWgX
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id3149262\n"
+"help.text"
+msgid "You can rotate an object around its default pivot point (center point) or a pivot point that you designate."
+msgstr "Можете да въртите обект около неговата подразбирана опорна точка (центъра му), или около зададена от Вас опорна точка."
+
+#. ZGoP9
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id3146975\n"
+"help.text"
+msgid "<image id=\"img_id3154729\" src=\"cmd/sc_toggleobjectrotatemode.png\" width=\"0.564cm\" height=\"0.564cm\"><alt id=\"alt_id3154729\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154729\" src=\"cmd/sc_toggleobjectrotatemode.png\" width=\"0.564cm\" height=\"0.564cm\"><alt id=\"alt_id3154729\">Икона</alt></image>"
+
+#. GoxPE
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id3150716\n"
+"help.text"
+msgid "Select the object you want to rotate. On the <emph>Transformations</emph> toolbar in $[officename] Draw or on the <emph>Drawing</emph> bar in $[officename] Impress, click the <emph>Rotate</emph> icon."
+msgstr "Изберете обекта, който искате да завъртите. В лентата <emph>Преобразувания</emph> в $[officename] Draw или <emph>Рисунка</emph> в $[officename] Impress щракнете върху иконата <emph>Въртене</emph>."
+
+#. MLBay
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id3149021\n"
+"help.text"
+msgid "Move the pointer to a corner handle so that the pointer changes to a rotate symbol. Drag the handle to rotate the object."
+msgstr "Поставете показалеца върху ъглов манипулатор, така че да се превърне в символ за въртене. Плъзгайте манипулатора, за да въртите обекта."
+
+#. TrVS9
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id0930200803002335\n"
+"help.text"
+msgid "Hold down the Shift key to restrict the rotation to multiples of 15 degrees."
+msgstr "Задръжте клавиша Shift натиснат, за да ограничите въртенето до ъгли, кратни на 15 градуса"
+
+#. 7nDAL
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id0930200803002463\n"
+"help.text"
+msgid "Right-click the object to open the context menu. Choose <menuitem>Position and Size - Rotation</menuitem> to enter an exact rotation value."
+msgstr "Щракнете с десния бутон върху обекта, за да отворите контекстното меню. Изберете <menuitem>Позиция и размер - Завъртане</menuitem>, за да въведете точна стойност за завъртане."
+
+#. G5NAB
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id3155962\n"
+"help.text"
+msgid "<image id=\"img_id3154023\" src=\"media/helpimg/rotieren.png\" width=\"5.424cm\" height=\"3.916cm\"><alt id=\"alt_id3154023\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154023\" src=\"media/helpimg/rotieren.png\" width=\"5.424cm\" height=\"3.916cm\"><alt id=\"alt_id3154023\">Икона</alt></image>"
+
+#. FrzvS
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id3166424\n"
+"help.text"
+msgid "To change the pivot point, drag the small circle in the center of the object to a new location."
+msgstr "За да промените опорната точка, плъзнете кръгчето от центъра на обекта на друго място."
+
+#. 7Sjf8
+#: rotate_object.xhp
+msgctxt ""
+"rotate_object.xhp\n"
+"par_id3159236\n"
+"help.text"
+msgid "To skew the object vertically or horizontally, drag one of the side handles."
+msgstr "За да наклоните обекта вертикално или хоризонтално, издърпайте някой от страничните манипулатори."
+
+#. SFGmo
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"tit\n"
+"help.text"
+msgid "Adding Text"
+msgstr "Добавяне на текст"
+
+#. aaiFD
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"bm_id3153144\n"
+"help.text"
+msgid "<bookmark_value>text box</bookmark_value><bookmark_value>inserting;text box</bookmark_value><bookmark_value>copying;text from other documents</bookmark_value><bookmark_value>pasting;text from other documents</bookmark_value><bookmark_value>legends; drawings</bookmark_value>"
+msgstr "<bookmark_value>текстово поле</bookmark_value><bookmark_value>вмъкване;текстово поле</bookmark_value><bookmark_value>копиране;текст от други документи</bookmark_value><bookmark_value>поставяне;текст от други документи</bookmark_value><bookmark_value>легенди;рисунки</bookmark_value>"
+
+#. eENQR
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"hd_id3153144\n"
+"help.text"
+msgid "<variable id=\"text_enter\"><link href=\"text/sdraw/guide/text_enter.xhp\">Adding Text</link></variable>"
+msgstr "<variable id=\"text_enter\"><link href=\"text/sdraw/guide/text_enter.xhp\">Добавяне на текст</link></variable>"
+
+#. xpJuT
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3145750\n"
+"help.text"
+msgid "There are several types of text you can add to a drawing or presentation:"
+msgstr "В рисунка или презентация можете да добавяте няколко вида текст:"
+
+#. pQVkX
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10824\n"
+"help.text"
+msgid "Text in a text box"
+msgstr "Текст в текстова рамка"
+
+#. rB9jp
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10828\n"
+"help.text"
+msgid "Text that changes character size to fill the frame size"
+msgstr "текст, в който размерът на знаците се променя, за да се запълни изцяло рамката"
+
+#. J6Rc8
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN1082C\n"
+"help.text"
+msgid "Text that is added to any drawing object by double-clicking the object"
+msgstr "текст, добавен в графичен обект чрез двукратно щракване върху него"
+
+#. RLtii
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10830\n"
+"help.text"
+msgid "Text that is copied from a Writer document"
+msgstr "текст, копиран от документ на Write"
+
+#. LM9hj
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10834\n"
+"help.text"
+msgid "Text that is inserted from a text document or HTML document"
+msgstr "Текст, вмъкнат от текстов документ или документ на HTML"
+
+#. vZGF3
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"hd_id3150202\n"
+"help.text"
+msgid "Adding a Text Box"
+msgstr "Добавяне на текстово поле"
+
+#. tkEEf
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3155266\n"
+"help.text"
+msgid "Click the <emph>Text</emph> icon<image id=\"img_id3156450\" src=\"cmd/sc_text.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3156450\">Icon</alt></image> and move the mouse pointer to where you want to enter the text box."
+msgstr "Щракнете върху иконата <emph>Текст</emph> <image id=\"img_id3156450\" src=\"cmd/sc_text.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3156450\">икона</alt></image> и поставете показалеца на мишката на мястото, където искате да въведете текстовото поле."
+
+#. dLN6f
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3149052\n"
+"help.text"
+msgid "Drag a text box to the size you want in your document."
+msgstr "Плъзнете показалеца, за да оформите текстово поле с желания размер в документа."
+
+#. ACFJ7
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3151194\n"
+"help.text"
+msgid "Type or paste your text into the text box."
+msgstr "Въведете или поставете желания текст в текстовото поле."
+
+#. qLSZv
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3145118\n"
+"help.text"
+msgid "Double-click the text to edit it or to format text properties, such as font size or font color. Click the border of the text box to edit the object properties, such as border color or arranging in front or behind other objects."
+msgstr "Щракнете двукратно върху текста, за да го редактирате или да зададете форматиращите му свойства, например размер и цвят на шрифта. Щракнете върху очертанието на текстовия обект, за да редактирате свойствата на обекта, например цвят на канта или подреждане пред или зад останалите обекти."
+
+#. CutFB
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"hd_id3150437\n"
+"help.text"
+msgid "Fitting Text to Frames"
+msgstr "Напасване на текст към рамки"
+
+#. tPaD9
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3146877\n"
+"help.text"
+msgid "Create a text box as described in the steps above."
+msgstr "Създайте текстово поле по описаните по-горе стъпки."
+
+#. Q8BAz
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN108A3\n"
+"help.text"
+msgid "With the text object selected, choose <emph>Format - Text</emph>. The <emph>Text</emph> dialog opens."
+msgstr "Докато текстовият обект е избран, изберете <emph>Форматиране - Текст</emph>. Ще се отвори диалоговият прозорец <emph>Текст</emph>."
+
+#. D7Jw2
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN108AF\n"
+"help.text"
+msgid "On the <emph>Text</emph> tab page, clear the <emph>Fit height to text</emph> checkbox, then select the <emph>Fit to frame</emph> checkbox. Click <emph>OK</emph>."
+msgstr "В раздела <emph>Текст</emph> изчистете полето <emph>Височина според текста</emph>, после отметнете <emph>Побиране в рамката</emph>. Натиснете <emph>OK</emph>."
+
+#. j28Ed
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id0610200902133994\n"
+"help.text"
+msgid "Now you can resize the text box to change the size and shape of the text characters."
+msgstr "Сега можете да промените размера на текстовото поле, за да смените размера и формата на текстовите знаци."
+
+#. qefTB
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"hd_id3155955\n"
+"help.text"
+msgid "Text Tied to a Graphic"
+msgstr "Текст, обвързан с графика"
+
+#. AVBRi
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10917\n"
+"help.text"
+msgid "You can add text to any graphic after double-clicking the graphic."
+msgstr "Можете да добавите текст към всяка графика, като като щракнете двукратно върху нея."
+
+#. i9bRF
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id1827448\n"
+"help.text"
+msgid "To determine the position of the text, use the settings in <emph>Format - Text</emph>."
+msgstr "За да определите позицията на текста, използвайте настройките във <emph>Форматиране - Текст</emph>."
+
+#. gifR8
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3147366\n"
+"help.text"
+msgid "For example, click the arrow next to the <emph>Callouts</emph> icon<image id=\"img_id3154508\" src=\"cmd/sc_calloutshapes.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154508\">Icon</alt></image> to open the Callouts toolbar."
+msgstr "Например, щракнете върху стрелката до иконата <emph>Изнесени означения</emph> <image id=\"img_id3154508\" src=\"cmd/sc_calloutshapes.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154508\">икона</alt></image>, за да отворите лентата „Изнесени означения“."
+
+#. TBBEa
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN108FD\n"
+"help.text"
+msgid "Select a callout and move the mouse pointer to where you want the callout to start."
+msgstr "Изберете изнесено означение и поставете показалеца на мишката там, където искате да започва означението."
+
+#. yWMZf
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id3150272\n"
+"help.text"
+msgid "Drag to draw the callout."
+msgstr "Плъзнете, за да начертаете означението."
+
+#. LACCd
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_id1978514\n"
+"help.text"
+msgid "Enter the text."
+msgstr "Въведете текста."
+
+#. C9fwC
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN1091A\n"
+"help.text"
+msgid "Copying Text"
+msgstr "Копиране на текст"
+
+#. Jma6G
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10921\n"
+"help.text"
+msgid "Select the text in your Writer document."
+msgstr "Изберете текста от документа в Writer."
+
+#. 9TSZh
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10925\n"
+"help.text"
+msgid "Copy the text to the clipboard (<emph>Edit - Copy</emph>)."
+msgstr "Копирайте текста в клипборда (<emph>Редактиране - Копиране</emph>)."
+
+#. xXHnT
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN1092D\n"
+"help.text"
+msgid "Click the page or slide where you want to paste the text."
+msgstr "Щракнете в страницата или кадъра, където искате да поставите текста."
+
+#. GCpCF
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10931\n"
+"help.text"
+msgid "Paste the text using <emph>Edit - Paste</emph> or <emph>Edit - Paste special</emph>."
+msgstr "Поставете текста с <emph>Редактиране - Поставяне</emph> или <emph>Редактиране - Специално поставяне</emph>."
+
+#. xHxJp
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN1093C\n"
+"help.text"
+msgid "Using <emph>Paste special</emph>, you can choose the text format to be pasted. Depending on formats, you can copy different text attributes."
+msgstr "При <emph>Специално поставяне</emph> можете да изберете формата на текста, който ще бъде поставен. В зависимост от избрания формат можете да копирате различни атрибути на текста."
+
+#. CwhNW
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN1093F\n"
+"help.text"
+msgid "Importing Text"
+msgstr "Импортиране на текст"
+
+#. bCEdY
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10946\n"
+"help.text"
+msgid "Click the page or slide where you want to import the text."
+msgstr "Щракнете в страницата или кадъра, където искате да импортирате текста."
+
+#. dRzar
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN1094A\n"
+"help.text"
+msgid "Choose <emph>Insert - File</emph>."
+msgstr "Изберете <emph>Вмъкване - Файл</emph>."
+
+#. oWEEr
+#: text_enter.xhp
+msgctxt ""
+"text_enter.xhp\n"
+"par_idN10952\n"
+"help.text"
+msgid "Select a text file (*.txt) or an HTML file and click <emph>Insert</emph>. The <emph>Insert Text</emph> dialog opens. Click <emph>OK</emph> to insert the text."
+msgstr "Изберете текстов файл (*.txt) или файл на HTML и натиснете <emph>Вмъкване</emph>. Ще се отвори диалоговият прозорец <emph>Вмъкване на текст</emph>. Натиснете <emph>OK</emph>, за да вмъкнете текста."

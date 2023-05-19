@@ -1,0 +1,532 @@
+#. extracted from dictionaries/pt_BR/dialog
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-09-10 23:11+0200\n"
+"PO-Revision-Date: 2022-12-19 14:09+0000\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
+"Language-Team: Kazakh <https://translations.documentfoundation.org/projects/libo_ui-master/dictionariespt_brdialog/kk/>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1554998592.000000\n"
+
+#. Bshz7
+#: OptionsDialog.xcu
+msgctxt ""
+"OptionsDialog.xcu\n"
+"..OptionsDialog.Nodes.LanguageSettings\n"
+"Label\n"
+"value.text"
+msgid "Language Settings"
+msgstr "Тіл баптаулары"
+
+#. BnABt
+#: OptionsDialog.xcu
+msgctxt ""
+"OptionsDialog.xcu\n"
+"..OptionsDialog.Nodes.LanguageSettings.Leaves.org.openoffice.lightproof.pt_BR\n"
+"Label\n"
+"value.text"
+msgid "Grammar Checking (Portuguese)"
+msgstr "Грамматиканы тексеру (португал)"
+
+#. UbDte
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spelling\n"
+"property.text"
+msgid "Grammar checking"
+msgstr "Грамматиканы тексеру"
+
+#. Y3GdR
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_grammar\n"
+"property.text"
+msgid "Identify use of grave accent"
+msgstr "Гравис қолданылуын тану"
+
+#. y47wU
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"grammar\n"
+"property.text"
+msgid "Grave accent"
+msgstr "Гравис"
+
+#. KTKVL
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_cap\n"
+"property.text"
+msgid "Check missing capitalization of sentences."
+msgstr "Сөйлемдердегі жоқ болып тұрған бас әріптерді тексеру."
+
+#. czHGi
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"cap\n"
+"property.text"
+msgid "Capitalization"
+msgstr "Бас әріптер"
+
+#. 6q87h
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_dup\n"
+"property.text"
+msgid "Check repeated words."
+msgstr "Қайталанатын сөздерді тексеру."
+
+#. vFbJC
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"dup\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Сөздерді қайталау"
+
+#. CkE8A
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_pair\n"
+"property.text"
+msgid "Check missing or extra parentheses and quotation marks."
+msgstr "Жоқ немесе артық жақшалар мен тырнақшаларды тексеру."
+
+#. DWaBt
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"pair\n"
+"property.text"
+msgid "Parentheses"
+msgstr "Жақшалар"
+
+#. EJA3T
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"punctuation\n"
+"property.text"
+msgid "Punctuation"
+msgstr "Пунктуация"
+
+#. GfJce
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_spaces\n"
+"property.text"
+msgid "Check single spaces between words."
+msgstr "Сөздер арасындағы бірлік бос аралықтарды тексеру."
+
+#. 2Cz8d
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spaces\n"
+"property.text"
+msgid "Word spacing"
+msgstr "Сөздер арасындағы бос аралықтар"
+
+#. jh9qT
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_mdash\n"
+"property.text"
+msgid "Force unspaced em dash instead of spaced en dash."
+msgstr "Бос аралықпен қосылған қысқа сызықша орнына ұзын сызықша, бос аралықсыз."
+
+#. QUZwx
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"mdash\n"
+"property.text"
+msgid "Em-dash"
+msgstr "Ұзын сызықшалар"
+
+#. ijU9H
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_ndash\n"
+"property.text"
+msgid "Force spaced en dash instead of unspaced em dash."
+msgstr "Бос аралықсыз ұзын сызықша орнына қысқа сызықша, бос аралықпен."
+
+#. tyEkH
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"ndash\n"
+"property.text"
+msgid "En-dash"
+msgstr "Қысқа сызықшалар"
+
+#. ZQhno
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_quotation\n"
+"property.text"
+msgid "Check double quotation marks: \"x\" → “x”"
+msgstr "Қос тырнақшаны тексеру: \"x\" → “x”"
+
+#. bC8RD
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"quotation\n"
+"property.text"
+msgid "Quotation marks"
+msgstr "Тырнақшалар"
+
+#. CARTv
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_times\n"
+"property.text"
+msgid "Check true multiplication sign: 5x5 → 5×5"
+msgstr "Көбейту таңбасын тексеру: 5x5 → 5×5"
+
+#. Y5eQr
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"times\n"
+"property.text"
+msgid "Multiplication sign"
+msgstr "Көбейту белгісі"
+
+#. ykeAk
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_spaces2\n"
+"property.text"
+msgid "Check single spaces between sentences."
+msgstr "Сөйлемдер арасындағы дара бос аралықтарды тексеру."
+
+#. uHT7U
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spaces2\n"
+"property.text"
+msgid "Sentence spacing"
+msgstr "Сөйлемдер арасындағы аралықтар"
+
+#. WEAJJ
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_spaces3\n"
+"property.text"
+msgid "Check more than two extra space characters between words and sentences."
+msgstr "Сөздер және сөйлемдер арасындағы бірден көп бос аралықтарды тексеру."
+
+#. XbDmT
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"spaces3\n"
+"property.text"
+msgid "More spaces"
+msgstr "Бірнеше бос аралықтар"
+
+#. Fthsx
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_minus\n"
+"property.text"
+msgid "Change hyphen characters to real minus signs."
+msgstr "Тасымалдау таңбаларын дефистермен алмастыру."
+
+#. VNuhF
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"minus\n"
+"property.text"
+msgid "Minus sign"
+msgstr "Дефистер"
+
+#. nvi9G
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_apostrophe\n"
+"property.text"
+msgid "Change typewriter apostrophe, single quotation marks and correct double primes."
+msgstr "Апостроф, бірлік тырнақшаны алмастыру, қос жайды түзету."
+
+#. Daynz
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"apostrophe\n"
+"property.text"
+msgid "Apostrophes"
+msgstr "Апострофтар"
+
+#. MEi4w
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_ellipsis\n"
+"property.text"
+msgid "Change three dots with ellipsis."
+msgstr "Үш нүктені көп нүктемен алмастыру."
+
+#. ngM8A
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"ellipsis\n"
+"property.text"
+msgid "Ellipsis"
+msgstr "Көп нүктелер"
+
+#. 5dkwv
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"others\n"
+"property.text"
+msgid "Others"
+msgstr "Басқалар"
+
+#. ifGmB
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_metric\n"
+"property.text"
+msgid "Identify redundant terms: \"criar novo\", \"subir para cima\", \"beco sem saída\", \"regra geral\"."
+msgstr "Артық терминдерді анықтау: \"criar novo\", \"subir para cima\", \"beco sem saída\", \"regra geral\"."
+
+#. EgY9b
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"metric\n"
+"property.text"
+msgid "Pleonasms"
+msgstr "Плеоназмдар"
+
+#. wAFVA
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_gerund\n"
+"property.text"
+msgid "Inadequate use of gerund: \"estarei trabalhando\", \"vou estar fazendo\"."
+msgstr "Герундийдің қате қолданылуы: \"estarei trabalhando\", \"vou estar fazendo\"."
+
+#. 3cDKm
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"gerund\n"
+"property.text"
+msgid "Gerundisms"
+msgstr "Герундизмдер"
+
+#. eJcDX
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_nonmetric\n"
+"property.text"
+msgid "Ugly or unpleasant sound: \"por cada\"."
+msgstr "Әдемі емес немесе жағымсыз дыбыс: \"por cada\"."
+
+#. Bidr9
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"nonmetric\n"
+"property.text"
+msgid "Cacophonous sound"
+msgstr "Какофонды дыбыс"
+
+#. funWi
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_paronimo\n"
+"property.text"
+msgid "Words that are pronounced or written in a similar way but which have different lexical meanings."
+msgstr "Айтылуы немесе жазылуы ұқсас, бірақ лексикалық мағыналары әртүрлі сөздер."
+
+#. ua58D
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"paronimo\n"
+"property.text"
+msgid "Paronyms"
+msgstr "Паронимдер"
+
+#. nJ4AT
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_composto\n"
+"property.text"
+msgid "Compound words written separatedly: \"auto escola\", \"sub contratado\"."
+msgstr "Бөлек жазылған күрделі сөздер: \"auto escola\", \"sub contratado\"."
+
+#. 5TS3y
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"composto\n"
+"property.text"
+msgid "Compound terms"
+msgstr "Құрама терминдер"
+
+#. RM535
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_malmau\n"
+"property.text"
+msgid "Use of \"mal\" or \"mau\"."
+msgstr "\"mal\" немесе \"mau\" қолдану."
+
+#. SwvCV
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"malmau\n"
+"property.text"
+msgid "\"Mal\" or \"Mau\""
+msgstr "\"Mal\" немесе \"Mau\""
+
+#. pC8xk
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_aha\n"
+"property.text"
+msgid "Use of há or a."
+msgstr "\"há\" немесе \"a\" қолдану."
+
+#. HGVSj
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"aha\n"
+"property.text"
+msgid "\"Há\" or \"a\""
+msgstr "\"Há\" немесе \"a\""
+
+#. cBTLG
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_meiameio\n"
+"property.text"
+msgid "Use of \"meia\" or \"meio\"."
+msgstr "\"meia\" немесе \"meio\" қолдану."
+
+#. RxzDW
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"meiameio\n"
+"property.text"
+msgid "\"Meia\" or \"meio\""
+msgstr "\"Meia\" немесе \"meio\""
+
+#. bNA4x
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_verbo\n"
+"property.text"
+msgid "Check verbal agreement."
+msgstr "Ауызша келісімді тексеру."
+
+#. Ekweu
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"verbo\n"
+"property.text"
+msgid "Verbal agreement"
+msgstr "Ауызша келісім"
+
+#. wRBb9
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_pronominal\n"
+"property.text"
+msgid "Position that personal pronouns occupy in relation to the verb."
+msgstr "Етістікке қатысты тұлғалы есімдіктердің алатын орны."
+
+#. FHPjP
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"pronominal\n"
+"property.text"
+msgid "Pronominal placement"
+msgstr "Есімдіктердің орналасуы"
+
+#. iiTDb
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_pronome\n"
+"property.text"
+msgid "Use of pronoun."
+msgstr "Есімдікті қолдану."
+
+#. ETD6e
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"pronome\n"
+"property.text"
+msgid "Use of pronouns"
+msgstr "Есімдіктерді қолдану"
+
+#. szSVE
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"hlp_porque\n"
+"property.text"
+msgid "Check for \"porque\", \"por que\", \"porquê\" and \"por quê\"."
+msgstr "\"porque\", \"por que\", \"porquê\" және \"por quê\" тексеру."
+
+#. 7QjsH
+#: pt_BR_en_US.properties
+msgctxt ""
+"pt_BR_en_US.properties\n"
+"porque\n"
+"property.text"
+msgid "Use of \"porquê\""
+msgstr "\"porquê\" қолдану"

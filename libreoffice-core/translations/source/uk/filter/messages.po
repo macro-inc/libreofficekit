@@ -1,0 +1,2096 @@
+#. extracted from filter/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-12-07 13:11+0100\n"
+"PO-Revision-Date: 2023-02-07 15:34+0000\n"
+"Last-Translator: Євген Кондратюк <lachend@gmail.com>\n"
+"Language-Team: Ukrainian <https://translations.documentfoundation.org/projects/libo_ui-master/filtermessages/uk/>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.15.2\n"
+"X-POOTLE-MTIME: 1562230682.000000\n"
+
+#. 5AQgJ
+#: filter/inc/strings.hrc:27
+msgctxt "STR_UNKNOWN_APPLICATION"
+msgid "Unknown"
+msgstr "Невідомо"
+
+#. AP7oB
+#: filter/inc/strings.hrc:28
+msgctxt "STR_IMPORT_ONLY"
+msgid "import filter"
+msgstr "Фільтр імпорту"
+
+#. 7vg82
+#: filter/inc/strings.hrc:29
+msgctxt "STR_IMPORT_EXPORT"
+msgid "import/export filter"
+msgstr "фільтр імпорту/експорту"
+
+#. q6Bc5
+#: filter/inc/strings.hrc:30
+msgctxt "STR_EXPORT_ONLY"
+msgid "export filter"
+msgstr "фільтр експорту"
+
+#. AmATR
+#: filter/inc/strings.hrc:31
+msgctxt "STR_WARN_DELETE"
+msgid "Do you really want to delete the XML Filter '%s'? This action cannot be undone."
+msgstr "Ви дійсно хочете видалити фільтр XML '%s'? Цю дію буде неможливо скасувати."
+
+#. Vf3nz
+#: filter/inc/strings.hrc:32
+msgctxt "STR_ERROR_FILTER_NAME_EXISTS"
+msgid "An XML filter with the name '%s' already exists. Please enter a different name."
+msgstr "XML фільтр з назвою '%s' вже існує. Введіть іншу назву."
+
+#. e3U54
+#: filter/inc/strings.hrc:33
+msgctxt "STR_ERROR_TYPE_NAME_EXISTS"
+msgid "The name for the user interface '%s1' is already used by the XML filter '%s2'. Please enter a different name."
+msgstr "Назва для інтерфейсу користувача «%s1» вже використовується XML-фільтром «%s2». Ведіть іншу назву."
+
+#. Zt87T
+#: filter/inc/strings.hrc:34
+msgctxt "STR_ERROR_EXPORT_XSLT_NOT_FOUND"
+msgid "The XSLT for export cannot be found. Please enter a valid path."
+msgstr "XSLT для експорту не знайдено. Введіть правильний шлях."
+
+#. 7VkMt
+#: filter/inc/strings.hrc:35
+msgctxt "STR_ERROR_IMPORT_XSLT_NOT_FOUND"
+msgid "The XSLT for import cannot be found. Please enter a valid path."
+msgstr "XSLT для імпорту не знайдено. Введіть правильний шлях до файлу."
+
+#. CLFJD
+#: filter/inc/strings.hrc:36
+msgctxt "STR_ERROR_IMPORT_TEMPLATE_NOT_FOUND"
+msgid "The given import template cannot be found. Please enter a valid path."
+msgstr "Вказаний шаблон для імпорту не знайдено. Введіть правильний шлях."
+
+#. WMzvt
+#: filter/inc/strings.hrc:37
+msgctxt "STR_DEFAULT_FILTER_NAME"
+msgid "New Filter"
+msgstr "Новий фільтр"
+
+#. N3wHE
+#: filter/inc/strings.hrc:38
+msgctxt "STR_DEFAULT_UI_NAME"
+msgid "Untitled"
+msgstr "Без назви"
+
+#. VAMhi
+#: filter/inc/strings.hrc:39
+msgctxt "STR_UNDEFINED_FILTER"
+msgid "undefined filter"
+msgstr "невизначений фільтр"
+
+#. tphDj
+#: filter/inc/strings.hrc:40
+msgctxt "STR_FILTER_HAS_BEEN_SAVED"
+msgid "The XML filter '%s' has been saved as package '%s'. "
+msgstr "Фільтр XML '%s' був збережений у пакеті '%s'. "
+
+#. tJeU3
+#: filter/inc/strings.hrc:41
+msgctxt "STR_FILTERS_HAVE_BEEN_SAVED"
+msgid "%s XML filters have been saved in the package '%s'."
+msgstr "%s Фільтр XML були збережені у пакеті '%s'."
+
+#. ZULF4
+#: filter/inc/strings.hrc:42
+msgctxt "STR_FILTER_PACKAGE"
+msgid "XSLT filter package"
+msgstr "Пакет фільтрів XSLT"
+
+#. TAAAB
+#: filter/inc/strings.hrc:43
+msgctxt "STR_FILTER_INSTALLED"
+msgid "The XML filter '%s' has been installed successfully."
+msgstr "Фільтр XML '%s' був успішно встановлений."
+
+#. SwDCV
+#: filter/inc/strings.hrc:44
+msgctxt "STR_FILTERS_INSTALLED"
+msgid "%s XML filters have been installed successfully."
+msgstr "%s XML фільтри успішно встановлено."
+
+#. dirBm
+#: filter/inc/strings.hrc:45
+msgctxt "STR_NO_FILTERS_FOUND"
+msgid "No XML filter could be installed because the package '%s' does not contain any XML filters."
+msgstr "XML фільтр не може бути встановлений, оскільки пакет \"%s\" не містить жодного XML-фільтра."
+
+#. EifWe
+#: filter/inc/strings.hrc:46
+msgctxt "STR_XML_FILTER_LISTBOX"
+msgid "XML Filter List"
+msgstr "Список фільтрів XML"
+
+#. iUSBA
+#: filter/inc/strings.hrc:48
+msgctxt "T602FILTER_STR_IMPORT_DIALOG_TITLE"
+msgid "Settings for T602 import"
+msgstr "параметри для імпорту T602"
+
+#. BU2Mt
+#: filter/inc/strings.hrc:49
+msgctxt "T602FILTER_STR_ENCODING_LABEL"
+msgid "Encoding"
+msgstr "Кодування"
+
+#. j3aAG
+#: filter/inc/strings.hrc:50
+msgctxt "T602FILTER_STR_ENCODING_AUTO"
+msgid "Automatic"
+msgstr "Автоматично"
+
+#. DuxTb
+#: filter/inc/strings.hrc:51
+msgctxt "T602FILTER_STR_ENCODING_CP852"
+msgid "CP852 (Latin2)"
+msgstr "CP852 (Latin2)"
+
+#. AfQyS
+#: filter/inc/strings.hrc:52
+msgctxt "T602FILTER_STR_ENCODING_CP895"
+msgid "CP895 (KEYB2CS, Kamenicky)"
+msgstr "CP895 (KEYB2CS, Каменицькі)"
+
+#. 8NfvS
+#: filter/inc/strings.hrc:53
+msgctxt "T602FILTER_STR_ENCODING_KOI8CS2"
+msgid "KOI8 CS2"
+msgstr "KOI8 CS2"
+
+#. EWMCQ
+#: filter/inc/strings.hrc:54
+msgctxt "T602FILTER_STR_CYRILLIC_MODE"
+msgid "Mode for Russian language (Cyrillic)"
+msgstr "Режим для російської мови (кирилиця)"
+
+#. mZVZv
+#: filter/inc/strings.hrc:55
+msgctxt "T602FILTER_STR_REFORMAT_TEXT"
+msgid "Reformat the text"
+msgstr "Переформатувати текст"
+
+#. MGmYA
+#: filter/inc/strings.hrc:56
+msgctxt "T602FILTER_STR_DOT_COMMANDS"
+msgid "Display dot commands"
+msgstr "Відображати \"крапка\"-команди"
+
+#. c6Atq
+#: filter/inc/strings.hrc:57
+msgctxt "T602FILTER_STR_CANCEL_BUTTON"
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. Sjy7k
+#: filter/inc/strings.hrc:58
+msgctxt "T602FILTER_STR_OK_BUTTON"
+msgid "OK"
+msgstr "Гаразд"
+
+#. AvaAH
+#: filter/inc/strings.hrc:60
+msgctxt "PDF_PROGRESS_BAR"
+msgid "Export as PDF"
+msgstr "Експорт у PDF"
+
+#. BGJB2
+#. strings used in encryption UI
+#. password dialog title
+#: filter/inc/strings.hrc:64
+msgctxt "STR_PDF_EXPORT_UDPWD"
+msgid "Set open password"
+msgstr "Пароль для відкриття"
+
+#. GDvVE
+#. password dialog title
+#: filter/inc/strings.hrc:66
+msgctxt "STR_PDF_EXPORT_ODPWD"
+msgid "Set permission password"
+msgstr "Пароль для обмеження доступу"
+
+#. FTpr4
+#: filter/inc/strings.hrc:67
+msgctxt "STR_WARN_PASSWORD_PDFA"
+msgid "PDF/A does not allow encryption. The exported PDF file will not be password protected."
+msgstr "Режим PDF/A не підтримує шифрування. Файл PDF не буде захищено паролем."
+
+#. XX5fd
+#: filter/inc/strings.hrc:68
+msgctxt "STR_WARN_TRANSP_PDFA_SHORT"
+msgid "PDF/A transparency"
+msgstr "Прозорість PDF/A"
+
+#. VGvbg
+#: filter/inc/strings.hrc:69
+msgctxt "STR_WARN_TRANSP_PDFA"
+msgid "PDF/A forbids transparency. A transparent object was painted opaque instead."
+msgstr "PDF/A забороняє прозорість. Прозорий об'єкт натомість відображатиметься непрозорим."
+
+#. siDaM
+#: filter/inc/strings.hrc:70
+msgctxt "STR_WARN_TRANSP_VERSION_SHORT"
+msgid "PDF version conflict"
+msgstr "Конфлікт версій PDF"
+
+#. VSCwD
+#: filter/inc/strings.hrc:71
+msgctxt "STR_WARN_TRANSP_VERSION"
+msgid "Transparency is not supported in PDF versions earlier than PDF 1.4. A transparent object was painted opaque instead"
+msgstr "Прозорість не підтримується PDF у версіях раніше ніж PDF 1.4.  Прозорий об'єкт натомість відображатиметься непрозорим."
+
+#. CyosP
+#: filter/inc/strings.hrc:72
+msgctxt "STR_WARN_FORMACTION_PDFA_SHORT"
+msgid "PDF/A form action"
+msgstr "Дія форми PDF/A"
+
+#. N9Vug
+#: filter/inc/strings.hrc:73
+msgctxt "STR_WARN_FORMACTION_PDFA"
+msgid "A form control contained an action not supported by the PDF/A standard. The action was skipped"
+msgstr "Елемент форми містить дію,що не підтримується стандартом PDF/A. Дію пропущено"
+
+#. d2ndY
+#: filter/inc/strings.hrc:74
+msgctxt "STR_WARN_TRANSP_CONVERTED"
+msgid "Some objects were converted to an image in order to remove transparencies, because the target PDF format does not support transparencies. Possibly better results can be achieved if you remove the transparent objects before exporting."
+msgstr "Деякі об'єкти буде конвертовано в зображення без підтримки прозорості, оскільки використовуваний формат PDF не дозволяє цього. Можливо, результат буде кращим, якщо перед експортом прибрати прозорість об'єкта."
+
+#. qtCcB
+#: filter/inc/strings.hrc:75
+msgctxt "STR_WARN_TRANSP_CONVERTED_SHORT"
+msgid "Transparencies removed"
+msgstr "Прозорість видалено"
+
+#. UHmjA
+#: filter/inc/strings.hrc:76
+msgctxt "STR_ERR_SIGNATURE_FAILED"
+msgid "Signature generation failed"
+msgstr "Помилка перевірки підпису"
+
+#. wjBBo
+#: filter/inc/strings.hrc:77
+msgctxt "STR_ERR_PDF_EXPORT_ABORTED"
+msgid "PDF export aborted"
+msgstr "Перерваний експорт у PDF"
+
+#. eNaMA
+#. Progress bar status indicator when importing or exporting
+#: filter/inc/strings.hrc:80
+msgctxt "STR_FILTER_DOC_LOADING"
+msgid "Loading: "
+msgstr "Завантаження: "
+
+#. 4YFQR
+#: filter/inc/strings.hrc:81
+msgctxt "STR_FILTER_DOC_SAVING"
+msgid "Saving: "
+msgstr "Збереження: "
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Додати"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Застосувати"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Скасувати"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Закрити"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "В_идалити"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Зміни"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Довідка"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Створити"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Ні"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_ОК"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "В_идалити"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Скинути"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Так"
+
+#. AwX66
+#: filter/uiconfig/ui/pdfgeneralpage.ui:42
+msgctxt "pdfgeneralpage|all"
+msgid "_All"
+msgstr "_Усе"
+
+#. QMgsn
+#: filter/uiconfig/ui/pdfgeneralpage.ui:52
+msgctxt "pdfgeneralpage|extended_tip|all"
+msgid "Exports all defined print ranges. If no print range is defined, exports the entire document."
+msgstr "Експорт усіх призначених областей друку. Якщо таких нема, то експорт усього документа."
+
+#. NXztB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:64
+msgctxt "pdfgeneralpage|range"
+msgid "_Pages:"
+msgstr "_Сторінки:"
+
+#. ZdAZ9
+#: filter/uiconfig/ui/pdfgeneralpage.ui:78
+msgctxt "pdfgeneralpage|extended_tip|range"
+msgid "Exports the pages you type in the box."
+msgstr "Експорт вказаних сторінок."
+
+#. WTSeS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:89
+msgctxt "pdfgeneralpage|selection"
+msgid "_Selection"
+msgstr "_Вибране"
+
+#. RQeDb
+#: filter/uiconfig/ui/pdfgeneralpage.ui:99
+msgctxt "pdfgeneralpage|extended_tip|selection"
+msgid "Exports the current selection."
+msgstr "Експорт поточного виділення."
+
+#. qQrdx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:121
+msgctxt "pdfgeneralpage|extended_tip|pages"
+msgid "Exports the pages you type in the box."
+msgstr "Експорт вказаних сторінок."
+
+#. tFeCH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:135
+msgctxt "pdfgeneralpage|slides"
+msgid "Slides:"
+msgstr "Слайди:"
+
+#. 9Cyn8
+#: filter/uiconfig/ui/pdfgeneralpage.ui:144
+msgctxt "pdfgeneralpage|viewpdf"
+msgid "_View PDF after export"
+msgstr "_Переглянути PDF після експорту"
+
+#. mwuGG
+#: filter/uiconfig/ui/pdfgeneralpage.ui:153
+msgctxt "pdfgeneralpage|extended_tip|viewpdf"
+msgid "Open the exported document in the system default PDF viewer."
+msgstr "Відкрити експортований документ у системному засобі перегляду PDF."
+
+#. aWj7F
+#: filter/uiconfig/ui/pdfgeneralpage.ui:168
+msgctxt "pdfgeneralpage|selectedsheets"
+msgid "_Selection/Selected sheet(s)"
+msgstr "_Вибране/вибрані аркуші"
+
+#. MXtmZ
+#: filter/uiconfig/ui/pdfgeneralpage.ui:181
+msgctxt "pdfgeneralpage|label1"
+msgid "Range"
+msgstr "Діапазон"
+
+#. WbQ5j
+#: filter/uiconfig/ui/pdfgeneralpage.ui:211
+msgctxt "pdfgeneralpage|losslesscompress"
+msgid "_Lossless compression"
+msgstr "_Стиснення без втрати якості"
+
+#. 9ut6Q
+#: filter/uiconfig/ui/pdfgeneralpage.ui:221
+msgctxt "pdfgeneralpage|extended_tip|losslesscompress"
+msgid "Selects a lossless compression of images. All pixels are preserved."
+msgstr "Вибір компресії зображень без втрат. Усі пікселі зберігаються."
+
+#. ccCL4
+#: filter/uiconfig/ui/pdfgeneralpage.ui:233
+msgctxt "pdfgeneralpage|reduceresolution"
+msgid "Reduce ima_ge resolution to:"
+msgstr "Зменшити розді_льність до:"
+
+#. bAtCV
+#: filter/uiconfig/ui/pdfgeneralpage.ui:245
+msgctxt "pdfgeneralpage|extended_tip|reduceresolution"
+msgid "Select to resample or down-size the images to a lower number of pixels per inch."
+msgstr "Оберіть цей пункт для зменшення рівня компресії або розміру зображення з меншою кількістю пікселів на дюйм."
+
+#. XHeTx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:260
+msgctxt "pdfgeneralpage|resolution"
+msgid "75 DPI"
+msgstr "75 т/д"
+
+#. CXj4e
+#: filter/uiconfig/ui/pdfgeneralpage.ui:261
+msgctxt "pdfgeneralpage|resolution"
+msgid "150 DPI"
+msgstr "150 т/д"
+
+#. jZKqd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:262
+msgctxt "pdfgeneralpage|resolution"
+msgid "300 DPI"
+msgstr "300 т/д"
+
+#. GsMsK
+#: filter/uiconfig/ui/pdfgeneralpage.ui:263
+msgctxt "pdfgeneralpage|resolution"
+msgid "600 DPI"
+msgstr "600 т/д"
+
+#. 5yTAM
+#: filter/uiconfig/ui/pdfgeneralpage.ui:264
+msgctxt "pdfgeneralpage|resolution"
+msgid "1200 DPI"
+msgstr "1200 т/д"
+
+#. r6npH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:270
+msgctxt "pdfgeneralpage|comboboxtext-entry"
+msgid "75 DPI"
+msgstr "75 т/д"
+
+#. SkTeA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:279
+msgctxt "pdfgeneralpage|extended_tip|resolution"
+msgid "Select the target resolution for the images."
+msgstr "Оберіть бажану роздільну здатність для зображень."
+
+#. mEbKx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:303
+msgctxt "pdfgeneralpage|extended_tip|quality"
+msgid "Enter the quality level for JPEG compression."
+msgstr "Оберіть рівень якості для стиснення JPEG."
+
+#. FP56V
+#: filter/uiconfig/ui/pdfgeneralpage.ui:325
+msgctxt "pdfgeneralpage|jpegcompress"
+msgid "_JPEG compression"
+msgstr "_Стиснення JPEG"
+
+#. PZCPi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:335
+msgctxt "pdfgeneralpage|extended_tip|jpegcompress"
+msgid "Select a JPEG compression level. With a high quality level, almost all pixels are preserved. With a low quality level, some pixels are lost and artifacts are introduced, but file sizes are reduced."
+msgstr "Оберіть рівень компресії JPEG. На рівнях високої якості зберігаються майже всі пікселі. На рівнях низької якості деякі пікселі втрачаються і з'являються артефакти, але розміри файлів зменшуються."
+
+#. ST3Rc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:349
+msgctxt "pdfgeneralpage|label6"
+msgid "_Quality:"
+msgstr "_Якість:"
+
+#. cFwGA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:371
+msgctxt "pdfgeneralpage|label2"
+msgid "Images"
+msgstr "Зображення"
+
+#. NwjSn
+#: filter/uiconfig/ui/pdfgeneralpage.ui:401
+msgctxt "pdfgeneralpage|watermark"
+msgid "Sign with _watermark"
+msgstr "Позначити з _водяним знаком"
+
+#. 2uMoT
+#: filter/uiconfig/ui/pdfgeneralpage.ui:410
+msgctxt "pdfgeneralpage|extended_tip|watermark"
+msgid "Add a centered, vertical, light green watermark text to the page background. The watermark is not part of the source document."
+msgstr "Додати відцентрований вертикальний світло-зелений текст водяного знака до фону сторінки. Водяний знак не є частиною вихідного документа."
+
+#. L7AYx
+#: filter/uiconfig/ui/pdfgeneralpage.ui:427
+msgctxt "pdfgeneralpage|extended_tip|watermarkentry"
+msgid "Insert the text for the watermark signature."
+msgstr "Вставити текст підпису водяного знака."
+
+#. JtBsL
+#: filter/uiconfig/ui/pdfgeneralpage.ui:439
+msgctxt "pdfgeneralpage|watermarklabel"
+msgid "Text:"
+msgstr "Текст:"
+
+#. VfFZf
+#: filter/uiconfig/ui/pdfgeneralpage.ui:458
+msgctxt "pdfgeneralpage|label3"
+msgid "Watermark"
+msgstr "Водяний знак"
+
+#. 2hSjJ
+#: filter/uiconfig/ui/pdfgeneralpage.ui:500
+msgctxt "pdfgeneralpage|embed"
+msgid "Hybrid PDF (em_bed ODF file)"
+msgstr "Гібридний PDF (вб_удований файл ODF)"
+
+#. vzxG2
+#: filter/uiconfig/ui/pdfgeneralpage.ui:504
+msgctxt "pdfgeneralpage|embed|tooltip_text"
+msgid "Creates a PDF that is easily editable in %PRODUCTNAME"
+msgstr "Створює PDF, який легко редагувати в %PRODUCTNAME"
+
+#. 3tDFv
+#: filter/uiconfig/ui/pdfgeneralpage.ui:510
+msgctxt "pdfgeneralpage|extended_tip|embed"
+msgid "This setting enables you to export the document as a .pdf file containing two file formats: PDF and ODF."
+msgstr "Цей параметр дозволяє Вам експортувати документ як .pdf файл, що містить два файлових формати: PDF та ODF."
+
+#. RAvA6
+#: filter/uiconfig/ui/pdfgeneralpage.ui:521
+msgctxt "pdfgeneralpage|tagged"
+msgid "_Tagged PDF (add document structure)"
+msgstr "_Тегований PDF (додає структуру документа)"
+
+#. cAm8Z
+#: filter/uiconfig/ui/pdfgeneralpage.ui:525
+msgctxt "pdfgeneralpage|tagged|tooltip_text"
+msgid "Includes a document's content structure information in a PDF"
+msgstr "Включає інформацію про структуру вмісту документа у PDF"
+
+#. Btxot
+#: filter/uiconfig/ui/pdfgeneralpage.ui:531
+msgctxt "pdfgeneralpage|extended_tip|tagged"
+msgid "Select to write PDF tags. This can increase file size by huge amounts."
+msgstr "Оберіть, щоб записувати теги PDF. Це може значно збільшити розмір файлу."
+
+#. 6sDFd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:542
+msgctxt "pdfgeneralpage|forms"
+msgid "Create PDF for_m"
+msgstr "Створити _форму PDF"
+
+#. 3Vg8V
+#: filter/uiconfig/ui/pdfgeneralpage.ui:546
+msgctxt "pdfgeneralpage|forms|tooltip_text"
+msgid "Creates a PDF with fields that can be filled out"
+msgstr "Створює PDF з полями, які заповнюються"
+
+#. hmxuq
+#: filter/uiconfig/ui/pdfgeneralpage.ui:552
+msgctxt "pdfgeneralpage|extended_tip|forms"
+msgid "Choose to create a PDF form. This can be filled out and printed by the user of the PDF document."
+msgstr "Відмітьте, щоб створити форму PDF. Її можна буде заповнити та роздрукувати."
+
+#. B7zan
+#: filter/uiconfig/ui/pdfgeneralpage.ui:572
+msgctxt "pdfgeneralpage|allowdups"
+msgid "Allow duplicate field _names"
+msgstr "Дозволити дублікати полів імен"
+
+#. D4MmM
+#: filter/uiconfig/ui/pdfgeneralpage.ui:581
+msgctxt "pdfgeneralpage|extended_tip|allowdups"
+msgid "Allows you to use the same field name for multiple fields in the generated PDF file. If disabled, field names will be exported using generated unique names."
+msgstr "Дозволяє Вам використовувати одну назву поля для багатьох полів у згенерованому файлі PDF. Якщо вимкнено, назви полів будуть експортовані з використанням унікальних згенерованих назв."
+
+#. tkPCH
+#: filter/uiconfig/ui/pdfgeneralpage.ui:597
+msgctxt "pdfgeneralpage|format"
+msgid "FDF"
+msgstr "FDF"
+
+#. rfzrh
+#: filter/uiconfig/ui/pdfgeneralpage.ui:598
+msgctxt "pdfgeneralpage|format"
+msgid "PDF"
+msgstr "PDF"
+
+#. S7caE
+#: filter/uiconfig/ui/pdfgeneralpage.ui:599
+msgctxt "pdfgeneralpage|format"
+msgid "HTML"
+msgstr "HTML"
+
+#. HUzsi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:600
+msgctxt "pdfgeneralpage|format"
+msgid "XML"
+msgstr "XML"
+
+#. xbYYC
+#: filter/uiconfig/ui/pdfgeneralpage.ui:604
+msgctxt "pdfgeneralpage|extended_tip|format"
+msgid "Select the format of submitting forms from within the PDF file."
+msgstr "Виберіть формат подання форм із файлу PDF."
+
+#. ECLBB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:626
+msgctxt "pdfgeneralpage|label7"
+msgid "Submit _format:"
+msgstr "Надіслати _формат:"
+
+#. hedQy
+#: filter/uiconfig/ui/pdfgeneralpage.ui:657
+msgctxt "pdfgeneralpage|pdfa"
+msgid "Archive (P_DF/A, ISO 19005)"
+msgstr "Архів (P_DF/A, ISO 19005)"
+
+#. qQjPA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:661
+msgctxt "pdfgeneralpage|pdfa|tooltip_text"
+msgid "Creates an ISO 19005-2 compliant PDF file, ideal for long-term document preservation"
+msgstr "Створює сумісний із ISO 19005-2 файл PDF, ідеальний для довгострокового збереження документа"
+
+#. Zhi5M
+#: filter/uiconfig/ui/pdfgeneralpage.ui:667
+msgctxt "pdfgeneralpage|extended_tip|pdfa"
+msgid "Converts to the PDF/A-2b or PDF/A-1b format. This is defined as an electronic document file format for long term preservation. All fonts that were used in the source document will be embedded into the generated PDF file. PDF tags will be written."
+msgstr "Перетворює у PDF/A-2b або PDF/A-1b формат. Це формат файлу електронного документа, призначеного для тривалого зберігання. Всі шрифти, використані в початковому документі, будуть вбудовані у згенерований файл PDF. Будуть записані теги PDF ."
+
+#. jmaDc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:716
+msgctxt "pdfgeneralpage|pdfaversion"
+msgid "PDF_/A version:"
+msgstr "Версія PDF_/A"
+
+#. VQGHi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:748
+msgctxt "pdfgeneralpage|pdfua"
+msgid "Universal Accessibilit_y (PDF/UA)"
+msgstr "Універсальна _доступність (PDF/UA)"
+
+#. 4B3FD
+#: filter/uiconfig/ui/pdfgeneralpage.ui:752
+msgctxt "pdfgeneralpage|pdfua|tooltip_text"
+msgid "Creates a universal accessibility-compliant PDF file that follows the requirements of PDF/UA (ISO 14289) specifications."
+msgstr "Створює універсально сумісний PDF-файл, який відповідає вимогам специфікацій PDF/UA (ISO 14289)."
+
+#. Birq5
+#: filter/uiconfig/ui/pdfgeneralpage.ui:758
+msgctxt "pdfgeneralpage|extended_tip|pdfua"
+msgid "Creates a universal accessibility-complying PDF file that follows the requirements of PDF/UA (ISO 14289) specifications."
+msgstr "Створює універсальний PDF-файл, який відповідає вимогам специфікацій PDF/UA (ISO 14289)."
+
+#. Drqkd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:773
+msgctxt "pdfgeneralpage|label4"
+msgid "General"
+msgstr "Загальні"
+
+#. FQzGc
+#: filter/uiconfig/ui/pdfgeneralpage.ui:802
+msgctxt "pdfgeneralpage|bookmarks"
+msgid "Export outl_ines"
+msgstr "Експорт с_труктури"
+
+#. qw9My
+#: filter/uiconfig/ui/pdfgeneralpage.ui:811
+msgctxt "pdfgeneralpage|extended_tip|bookmarks"
+msgid "Select to export bookmarks of Writer documents as PDF bookmarks. Bookmarks are created for all outline paragraphs (Tools - Chapter Numbering) and for all table of contents entries for which you did assign hyperlinks in the source document."
+msgstr "Експортуйте закладки документів Writer як закладки PDF. Закладки створюються для всіх абзаців структури (Засоби - Нумерація розділів) та для всіх елементів змісту, яким Ви призначили посилання у початковому документі."
+
+#. kQbPh
+#: filter/uiconfig/ui/pdfgeneralpage.ui:822
+msgctxt "pdfgeneralpage|exportplaceholders"
+msgid "Expo_rt placeholders"
+msgstr "Експо_ртувати заповнювачі"
+
+#. T6RjA
+#: filter/uiconfig/ui/pdfgeneralpage.ui:831
+msgctxt "pdfgeneralpage|extended_tip|exportplaceholders"
+msgid "Export the placeholders fields visual markings only. The exported placeholder is ineffective."
+msgstr "Експортувати лише візуальні позначки полів-заповнювачів. Експортований заповнювач є неефективним."
+
+#. P4kGd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:842
+msgctxt "pdfgeneralpage|comments"
+msgid "Comm_ents as PDF annotations"
+msgstr "Ком_ентарі як анотації PDF"
+
+#. SijbK
+#: filter/uiconfig/ui/pdfgeneralpage.ui:851
+msgctxt "pdfgeneralpage|extended_tip|comments"
+msgid "Select to export comments of Writer and Calc documents as PDF annotations."
+msgstr "Позначте, щоб експортувати коментарі документів Writer і Calc як анотації PDF."
+
+#. y9evS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:862
+msgctxt "pdfgeneralpage|emptypages"
+msgid "Exp_ort automatically inserted blank pages"
+msgstr "Експ_ортувати автоматично вставлені порожні сторінки"
+
+#. Drp3w
+#: filter/uiconfig/ui/pdfgeneralpage.ui:871
+msgctxt "pdfgeneralpage|extended_tip|emptypages"
+msgid "If switched on, automatically inserted blank pages are exported to the PDF file. This is best if you are printing the pdf file double-sided. Example: In a book a chapter paragraph style is set to always start with an odd numbered page. If the previous chapter ends on an odd page, then an even numbered blank page is normally automatically inserted. This option controls whether to export that even numbered page or not."
+msgstr "Якщо ввімкнено, автоматично вставлені порожні сторінки експортуються до файлу PDF. Краще використовувати цей параметр, якщо друк файлу PDF іде двостороннім. Приклад: у книзі стиль параграфа розділу завжди починається з непарної нумерації сторінки. Якщо попередній розділ закінчується непарною сторінкою, то, як правило, автоматично вставляється парна порожня сторінка. Цей параметр визначає, чи експортувати цю парну сторінку чи ні."
+
+#. sHqKP
+#: filter/uiconfig/ui/pdfgeneralpage.ui:882
+msgctxt "pdfgeneralpage|usereferencexobject"
+msgid "Use reference XObjects"
+msgstr "Використовувати посилання XObjects"
+
+#. avuEd
+#: filter/uiconfig/ui/pdfgeneralpage.ui:891
+msgctxt "pdfgeneralpage|extended_tip|usereferencexobject"
+msgid "When the option is enabled, then the reference XObject markup is used:  viewers have to support this markup to show vector images. Otherwise a fallback bitmap is shown in the viewer."
+msgstr "Коли цей параметр увімкнено, використовується посилальна розмітка XObject: переглядачі повинні підтримувати цю розмітку, щоб показувати векторні зображення. В іншому випадку у засобі перегляду відображається резервна растрова карта."
+
+#. 2K2cD
+#: filter/uiconfig/ui/pdfgeneralpage.ui:902
+msgctxt "pdfgeneralpage|hiddenpages"
+msgid "Export _hidden pages"
+msgstr "Експортувати приховані сторінки"
+
+#. Gr5rf
+#: filter/uiconfig/ui/pdfgeneralpage.ui:911
+msgctxt "pdfgeneralpage|extended_tip|hiddenpages"
+msgid "Exports document hidden slides."
+msgstr "Експортує приховані слайди документа."
+
+#. ghuXR
+#: filter/uiconfig/ui/pdfgeneralpage.ui:922
+msgctxt "pdfgeneralpage|notes"
+msgid "Export _notes pages"
+msgstr "Експортувати примітки до сторінок"
+
+#. hRjqL
+#: filter/uiconfig/ui/pdfgeneralpage.ui:931
+msgctxt "pdfgeneralpage|extended_tip|notes"
+msgid "Export also the Notes pages view at the end of the exported PDF presentation document."
+msgstr "Експортувати також вигляд сторінок \"Примітки\" в кінці експортованого документа презентації PDF."
+
+#. BGvC2
+#: filter/uiconfig/ui/pdfgeneralpage.ui:942
+msgctxt "pdfgeneralpage|onlynotes"
+msgid "Export onl_y notes pages"
+msgstr "Експортувати лише _примітки до сторінок"
+
+#. Mwnea
+#: filter/uiconfig/ui/pdfgeneralpage.ui:952
+msgctxt "pdfgeneralpage|extended_tip|onlynotes"
+msgid "Exports only the Notes page views."
+msgstr "Експортує лише вигляд сторінок \"Примітки\"."
+
+#. MpRUp
+#: filter/uiconfig/ui/pdfgeneralpage.ui:963
+msgctxt "pdfgeneralpage|singlepagesheets"
+msgid "Whole sheet export"
+msgstr "Експорт на одну сторінку"
+
+#. jRGAS
+#: filter/uiconfig/ui/pdfgeneralpage.ui:972
+msgctxt "pdfgeneralpage|extended_tip|singlepagessheets"
+msgid "Ignores each sheet’s paper size, print ranges and shown/hidden status and puts every sheet (even hidden sheets) on exactly one page, which is exactly as small or large as needed to fit the whole contents of the sheet."
+msgstr "Ігнорує розмір паперу кожного аркуша, діапазони друку та статус видимості/прихованості і розміщує кожен аркуш (навіть приховані аркуші) на одній сторінці, яка є настільки маленькою або великою, наскільки це потрібно для того, щоб вмістити весь вміст на аркуші."
+
+#. DiBsa
+#: filter/uiconfig/ui/pdfgeneralpage.ui:983
+msgctxt "pdfgeneralpage|commentsinmargin"
+msgid "_Comments in margin"
+msgstr "_Коментарі на полях"
+
+#. RpDqi
+#: filter/uiconfig/ui/pdfgeneralpage.ui:992
+msgctxt "pdfgeneralpage|extended_tip|commentsinmargin"
+msgid "Select to export comments of Writer documents in the page margin."
+msgstr "Виберіть для експорту коментарі документів Writer на полях сторінок."
+
+#. AcPTB
+#: filter/uiconfig/ui/pdfgeneralpage.ui:1007
+msgctxt "pdfgeneralpage|label9"
+msgid "Structure"
+msgstr "Структура"
+
+#. f7vgf
+#: filter/uiconfig/ui/pdflinkspage.ui:29
+msgctxt "pdflinkspage|export"
+msgid "Export outlines as named destinations"
+msgstr "Експорт структури як названих місць призначень"
+
+#. k27AB
+#: filter/uiconfig/ui/pdflinkspage.ui:37
+msgctxt "pdflinkspage|extended_tip|export"
+msgid "Enable the checkbox to export the names of objects in your document as valid bookmark targets. This allows you to link to those objects by name from other documents."
+msgstr "Позначте цей пункт, щоб експортувати назви об’єктів у документі як дійсні закладки. Це дозволяє посилатися на назви цих об’єктів з інших документів."
+
+#. aCCLQ
+#: filter/uiconfig/ui/pdflinkspage.ui:48
+msgctxt "pdflinkspage|convert"
+msgid "_Convert document references to PDF targets"
+msgstr "_Перетворити посилання документа у цілі PDF"
+
+#. FEokC
+#: filter/uiconfig/ui/pdflinkspage.ui:56
+msgctxt "pdflinkspage|extended_tip|convert"
+msgid "Enable this checkbox to convert the URLs referencing other ODF files to PDF files with the same name. In the referencing URLs the extensions .odt, .odp, .ods, .odg, and .odm are converted to the extension .pdf."
+msgstr "Відмітьте цей прапорець, щоб конвертувати URL, які посилаються на інші ODF файли, – у PDF файли з тією ж назвою. В URL посилань  розширення  .odt, .odp, .ods, .odg і .odm перетворюються у розширення .pdf."
+
+#. 6Lyp3
+#: filter/uiconfig/ui/pdflinkspage.ui:67
+msgctxt "pdflinkspage|exporturl"
+msgid "Export _URLs relative to file system"
+msgstr "Експортувати _URL стосовно файлової системи"
+
+#. RcdUF
+#: filter/uiconfig/ui/pdflinkspage.ui:75
+msgctxt "pdflinkspage|extended_tip|exporturl"
+msgid "Enable this checkbox to export URLs to other documents as relative URLs in the file system. See \"relative hyperlinks\" in the Help."
+msgstr "Активуйте цей прапорець, щоб експортувати URL'и на інші документи як відносні URL'и файлової системи. Шукайте \"відносні посилання\" у розділі Довідка."
+
+#. biumY
+#: filter/uiconfig/ui/pdflinkspage.ui:90
+msgctxt "pdflinkspage|label1"
+msgid "General"
+msgstr "Загальні"
+
+#. mGRBH
+#: filter/uiconfig/ui/pdflinkspage.ui:119
+msgctxt "pdflinkspage|default"
+msgid "Default mode"
+msgstr "Типовий режим"
+
+#. bcgaz
+#: filter/uiconfig/ui/pdflinkspage.ui:128
+msgctxt "pdflinkspage|extended_tip|default"
+msgid "Links from your PDF document to other documents will be handled as it is specified in your operating system."
+msgstr "Посилання Вашого документа PDF на інші документи оброблятимуться так, як це вказано у Вашій операційній системі."
+
+#. DNRK8
+#: filter/uiconfig/ui/pdflinkspage.ui:139
+msgctxt "pdflinkspage|openpdf"
+msgid "Open with PDF reader application"
+msgstr "Відкрити з програмою читання PDF"
+
+#. gmzoA
+#: filter/uiconfig/ui/pdflinkspage.ui:148
+msgctxt "pdflinkspage|extended_tip|openpdf"
+msgid "Cross-document links are opened with the PDF reader application that currently shows the document. The PDF reader application must be able to handle the specified file type inside the hyperlink."
+msgstr "Міждокументні посилання відкриваються за допомогою програми читання PDF, яка наразі відображає документ. Програма для читання PDF повинна бути здатною обробляти вказаний тип файлу всередині гіперпосилання."
+
+#. wPem9
+#: filter/uiconfig/ui/pdflinkspage.ui:159
+msgctxt "pdflinkspage|openinternet"
+msgid "Open _with Internet browser"
+msgstr "Відкрити _переглядачем Інтернету"
+
+#. xfRr2
+#: filter/uiconfig/ui/pdflinkspage.ui:168
+msgctxt "pdflinkspage|extended_tip|openinternet"
+msgid "Cross-document links are opened with the Internet browser. The Internet browser must be able to handle the specified file type inside the hyperlink."
+msgstr "Міждокументні посилання відкриваються за допомогою Інтернет-браузера. Браузер повинен бути здатен обробляти вказаний тип файлу всередині гіперпосилання."
+
+#. B9TGg
+#: filter/uiconfig/ui/pdflinkspage.ui:183
+msgctxt "pdflinkspage|label5"
+msgid "Cross-document Links"
+msgstr "Перехресні посилання"
+
+#. KmFGh
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:8
+msgctxt "pdfoptionsdialog|PdfOptionsDialog"
+msgid "PDF Options"
+msgstr "Параметри PDF"
+
+#. BwbwB
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:41
+msgctxt "pdfoptionsdialog|ok"
+msgid "E_xport"
+msgstr "Е_кспорт"
+
+#. Y2Mem
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:138
+msgctxt "pdfoptionsdialog|general"
+msgid "General"
+msgstr "Загальні"
+
+#. DMBHC
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:185
+msgctxt "pdfoptionsdialog|initialview"
+msgid "Initial View"
+msgstr "Початковий вид"
+
+#. 35g8K
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:233
+msgctxt "pdfoptionsdialog|userinterface"
+msgid "User Interface"
+msgstr "Інтерфейс користувача"
+
+#. 3EStU
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:281
+msgctxt "pdfoptionsdialog|links"
+msgid "Links"
+msgstr "Посилання"
+
+#. x4GVL
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:329
+msgctxt "pdfoptionsdialog|security"
+msgid "Security"
+msgstr "Безпека"
+
+#. Vmf6H
+#: filter/uiconfig/ui/pdfoptionsdialog.ui:377
+msgctxt "pdfoptionsdialog|digitalsignatures"
+msgid "Digital Signatures"
+msgstr "Цифрові підписи"
+
+#. 7p3sS
+#: filter/uiconfig/ui/pdfsecuritypage.ui:28
+msgctxt "pdfsecuritypage|setpassword"
+msgid "Set _Passwords…"
+msgstr "Установка _паролів…"
+
+#. C9DhC
+#: filter/uiconfig/ui/pdfsecuritypage.ui:36
+msgctxt "pdfsecuritypage|extended_tip|setpassword"
+msgid "Click to open a dialog where you enter the passwords."
+msgstr "Натисніть, щоб відкрити діалог для введення паролів."
+
+#. 63szB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:55
+msgctxt "pdfsecuritypage|label5"
+msgid "Open password set"
+msgstr "Відкрити набір паролів"
+
+#. 6ktYG
+#: filter/uiconfig/ui/pdfsecuritypage.ui:67
+msgctxt "pdfsecuritypage|label6"
+msgid "PDF document will be encrypted"
+msgstr "Документ PDF буде зашифрований"
+
+#. pTAZC
+#: filter/uiconfig/ui/pdfsecuritypage.ui:91
+msgctxt "pdfsecuritypage|label7"
+msgid "No open password set"
+msgstr "Немає відкритого набору паролів"
+
+#. fp3My
+#: filter/uiconfig/ui/pdfsecuritypage.ui:103
+msgctxt "pdfsecuritypage|label8"
+msgid "PDF document will not be encrypted"
+msgstr "Документ PDF буде зашифрований"
+
+#. aHC6v
+#: filter/uiconfig/ui/pdfsecuritypage.ui:127
+msgctxt "pdfsecuritypage|label30"
+msgid "PDF document will not be encrypted due to PDF/A export."
+msgstr "Документ PDF не буде зашифрований через експорт PDF/A."
+
+#. DsALB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:152
+msgctxt "pdfsecuritypage|label9"
+msgid "Permission password set"
+msgstr "Пароль для прав задано"
+
+#. hRJpp
+#: filter/uiconfig/ui/pdfsecuritypage.ui:164
+msgctxt "pdfsecuritypage|label11"
+msgid "PDF document will be restricted"
+msgstr "PDF документ буде обмежений"
+
+#. L3oQx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:188
+msgctxt "pdfsecuritypage|label12"
+msgid "No permission password set"
+msgstr "Не задано пароль для прав"
+
+#. s3RBF
+#: filter/uiconfig/ui/pdfsecuritypage.ui:200
+msgctxt "pdfsecuritypage|label13"
+msgid "PDF document will be unrestricted"
+msgstr "PDF документ не буде обмежений"
+
+#. 4jwu7
+#: filter/uiconfig/ui/pdfsecuritypage.ui:224
+msgctxt "pdfsecuritypage|label14"
+msgid "PDF document will not be restricted due to PDF/A export."
+msgstr "PDF документ не буде обмежений через експорт у PDF/A"
+
+#. 9CFqB
+#: filter/uiconfig/ui/pdfsecuritypage.ui:244
+msgctxt "pdfsecuritypage|setpasswordstitle"
+msgid "Set Passwords"
+msgstr "Установка паролів"
+
+#. FDKJa
+#: filter/uiconfig/ui/pdfsecuritypage.ui:259
+msgctxt "pdfsecuritypage|label2"
+msgid "File Encryption and Permission"
+msgstr "Шифрування і дозволи файлу"
+
+#. tWAWA
+#: filter/uiconfig/ui/pdfsecuritypage.ui:294
+msgctxt "pdfsecuritypage|printnone"
+msgid "_Not permitted"
+msgstr "_Не дозволено"
+
+#. R3Gvm
+#: filter/uiconfig/ui/pdfsecuritypage.ui:303
+msgctxt "pdfsecuritypage|extended_tip|printnone"
+msgid "Printing the document is not permitted."
+msgstr "Друк документа не дозволено."
+
+#. kSfrd
+#: filter/uiconfig/ui/pdfsecuritypage.ui:314
+msgctxt "pdfsecuritypage|printlow"
+msgid "_Low resolution (150 dpi)"
+msgstr "Низька _роздільність (150 т/д)"
+
+#. kB7dx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:323
+msgctxt "pdfsecuritypage|extended_tip|printlow"
+msgid "The document can only be printed in low resolution (150 dpi). Not all PDF readers honor this setting."
+msgstr "Документ можна надрукувати лише з низькою роздільністю (150 dpi). Не всі PDF-оглядачі розуміють це налаштування."
+
+#. CmQzT
+#: filter/uiconfig/ui/pdfsecuritypage.ui:334
+msgctxt "pdfsecuritypage|printhigh"
+msgid "_High resolution"
+msgstr "_Висока роздільність"
+
+#. iBC7m
+#: filter/uiconfig/ui/pdfsecuritypage.ui:343
+msgctxt "pdfsecuritypage|extended_tip|printhigh"
+msgid "The document can be printed in high resolution."
+msgstr "Документ можна надрукувати з високою роздільністю."
+
+#. Gjpp4
+#: filter/uiconfig/ui/pdfsecuritypage.ui:358
+msgctxt "pdfsecuritypage|label1"
+msgid "Printing"
+msgstr "Друк"
+
+#. C6BHs
+#: filter/uiconfig/ui/pdfsecuritypage.ui:387
+msgctxt "pdfsecuritypage|changenone"
+msgid "No_t permitted"
+msgstr "Недозволено"
+
+#. McdCx
+#: filter/uiconfig/ui/pdfsecuritypage.ui:396
+msgctxt "pdfsecuritypage|extended_tip|changenone"
+msgid "No changes of the content are permitted."
+msgstr "Зміна вмісту не дозволена."
+
+#. Vt6Zn
+#: filter/uiconfig/ui/pdfsecuritypage.ui:407
+msgctxt "pdfsecuritypage|changeinsdel"
+msgid "_Inserting, deleting, and rotating pages"
+msgstr "_Вставка, вилучення і поворот сторінок"
+
+#. bpyjZ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:416
+msgctxt "pdfsecuritypage|extended_tip|changeinsdel"
+msgid "Only inserting, deleting, and rotating pages is permitted."
+msgstr "Дозволено лише вставку, видалення і обернення сторінок."
+
+#. dAmDo
+#: filter/uiconfig/ui/pdfsecuritypage.ui:427
+msgctxt "pdfsecuritypage|changeform"
+msgid "_Filling in form fields"
+msgstr "_Заповнення полів у формі"
+
+#. yXs9B
+#: filter/uiconfig/ui/pdfsecuritypage.ui:436
+msgctxt "pdfsecuritypage|extended_tip|changeform"
+msgid "Only filling in form fields is permitted."
+msgstr "Дозволено лише заповнення полів форми."
+
+#. zGE7J
+#: filter/uiconfig/ui/pdfsecuritypage.ui:447
+msgctxt "pdfsecuritypage|changecomment"
+msgid "_Commenting, filling in form fields"
+msgstr "_Коментування, заповнення полів у формі"
+
+#. aeLn4
+#: filter/uiconfig/ui/pdfsecuritypage.ui:456
+msgctxt "pdfsecuritypage|extended_tip|changecomment"
+msgid "Only commenting and filling in form fields is permitted."
+msgstr "Дозволено лише коментування і заповнення полів форми."
+
+#. uP8VW
+#: filter/uiconfig/ui/pdfsecuritypage.ui:467
+msgctxt "pdfsecuritypage|changeany"
+msgid "_Any except extracting pages"
+msgstr "_Будь-які крім витягнутих сторінок"
+
+#. 3RDPJ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:476
+msgctxt "pdfsecuritypage|extended_tip|changeany"
+msgid "All changes are permitted, except extracting pages."
+msgstr "Всі зміни дозволено, крім вилучення сторінок."
+
+#. vLxXJ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:491
+msgctxt "pdfsecuritypage|label3"
+msgid "Changes"
+msgstr "Зміни"
+
+#. iJHWS
+#: filter/uiconfig/ui/pdfsecuritypage.ui:520
+msgctxt "pdfsecuritypage|enablecopy"
+msgid "Ena_ble copying of content"
+msgstr "Увімкн_ути копіювання вмісту"
+
+#. WJuNa
+#: filter/uiconfig/ui/pdfsecuritypage.ui:529
+msgctxt "pdfsecuritypage|extended_tip|enablecopy"
+msgid "Select to enable copying of content to the clipboard."
+msgstr "Виберіть, щоб увімкнути копіювання вмісту в буфер обміну."
+
+#. 2EMgQ
+#: filter/uiconfig/ui/pdfsecuritypage.ui:540
+msgctxt "pdfsecuritypage|enablea11y"
+msgid "Enable text access for acce_ssibility tools"
+msgstr "Увімкнути текстовий доступ для засобів доступності"
+
+#. cQrBt
+#: filter/uiconfig/ui/pdfsecuritypage.ui:549
+msgctxt "pdfsecuritypage|extended_tip|enablea11y"
+msgid "Select to enable text access for accessibility tools."
+msgstr "Виберіть, щоб увімкнути доступ до тексту для засобів доступності."
+
+#. 2hi53
+#: filter/uiconfig/ui/pdfsecuritypage.ui:564
+msgctxt "pdfsecuritypage|label4"
+msgid "Content"
+msgstr "Вміст"
+
+#. bDVGF
+#: filter/uiconfig/ui/pdfsignpage.ui:33
+msgctxt "pdfsignpage|label2"
+msgid "Use this certificate to digitally sign PDF documents:"
+msgstr "Використовувати цей сертифікат для цифрових підписів PDF документів:"
+
+#. EznHF
+#: filter/uiconfig/ui/pdfsignpage.ui:53
+msgctxt "pdfsignpage|extended_tip|cert"
+msgid "Allows you to select a certificate to be used for signing this PDF export."
+msgstr "Дозволяє вибрати сертифікат, який використовуватиметься для підписання цього експорту PDF."
+
+#. xgYD9
+#: filter/uiconfig/ui/pdfsignpage.ui:69
+msgctxt "pdfsignpage|select"
+msgid "Select..."
+msgstr "Вибрати…"
+
+#. UCtFh
+#: filter/uiconfig/ui/pdfsignpage.ui:76
+msgctxt "pdfsignpage|extended_tip|select"
+msgid "Opens the Select X.509 Certificate dialog."
+msgstr "Відкриває діалогове вікно «Виберіть сертифікат X.509»."
+
+#. zRUyK
+#: filter/uiconfig/ui/pdfsignpage.ui:88
+msgctxt "pdfsignpage|clear"
+msgid "_Clear"
+msgstr "О_чистити"
+
+#. UQz9i
+#: filter/uiconfig/ui/pdfsignpage.ui:131
+msgctxt "pdfsignpage|extended_tip|password"
+msgid "Enter the password used for protecting the private key associated with the selected certificate."
+msgstr "Введіть пароль для захисту приватного ключа, пов'язаного з вибраним сертифікатом."
+
+#. 9NEtS
+#: filter/uiconfig/ui/pdfsignpage.ui:149
+msgctxt "pdfsignpage|extended_tip|location"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "Ці три поля дозволяють ввести додаткову інформацію про цифровий підпис, який буде застосовано до PDF-файлу (де, ким і для чого він був зроблений). Вона буде вписана у відповідні поля PDF і буде видимою для всіх, хто переглядає PDF. Кожне або всі три поля можуть бути порожніми."
+
+#. uVShK
+#: filter/uiconfig/ui/pdfsignpage.ui:167
+msgctxt "pdfsignpage|extended_tip|contact"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "Ці три поля дозволяють ввести додаткову інформацію про цифровий підпис, який буде застосовано до PDF-файлу (де, ким і для чого він був зроблений). Вона буде вписана у відповідні поля PDF і буде видимою для всіх, хто переглядає PDF. Кожне або всі три поля можуть бути порожніми."
+
+#. 5QBRv
+#: filter/uiconfig/ui/pdfsignpage.ui:185
+msgctxt "pdfsignpage|extended_tip|reason"
+msgid "These three fields allow you to optionally enter additional information about the digital signature that will be applied to the PDF (Where, by whom and why it was made). It will be embedded in the appropriate PDF fields and will be visible to anyone viewing the PDF. Each or all of the three fields may be left blank."
+msgstr "Ці три поля дозволяють ввести додаткову інформацію про цифровий підпис, який буде застосовано до PDF-файлу (де, ким і для чого він був зроблений). Вона буде вписана у відповідні поля PDF і буде видимою для всіх, хто переглядає PDF. Кожне або всі три поля можуть бути порожніми."
+
+#. wHqcD
+#: filter/uiconfig/ui/pdfsignpage.ui:200
+msgctxt "pdfsignpage|tsa"
+msgid "None"
+msgstr "Нічого"
+
+#. VMoF3
+#: filter/uiconfig/ui/pdfsignpage.ui:212
+msgctxt "pdfsignpage|label7"
+msgid "Certificate password:"
+msgstr "Пароль сертифікату:"
+
+#. Syow2
+#: filter/uiconfig/ui/pdfsignpage.ui:226
+msgctxt "pdfsignpage|label12"
+msgid "Location:"
+msgstr "Розташування:"
+
+#. AQkj6
+#: filter/uiconfig/ui/pdfsignpage.ui:240
+msgctxt "pdfsignpage|label13"
+msgid "Contact information:"
+msgstr "Інформація про контакт:"
+
+#. mvSG8
+#: filter/uiconfig/ui/pdfsignpage.ui:254
+msgctxt "pdfsignpage|label14"
+msgid "Reason:"
+msgstr "Причина:"
+
+#. Bbwq2
+#: filter/uiconfig/ui/pdfsignpage.ui:268
+msgctxt "pdfsignpage|label15"
+msgid "Time Stamp Authority:"
+msgstr "Джерело часових міток:"
+
+#. YeAiB
+#: filter/uiconfig/ui/pdfsignpage.ui:290
+msgctxt "pdfsignpage|label1"
+msgid "Certificate"
+msgstr "Сертифікат"
+
+#. 92sua
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:43
+msgctxt "pdfuserinterfacepage|center"
+msgid "_Center window on screen"
+msgstr "_Центрувати вікно на екрані"
+
+#. fGFCM
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:51
+msgctxt "pdfuserinterfacepage|extended_tip|center"
+msgid "Select to generate a PDF file that is shown in a reader window centered on screen."
+msgstr "Виберіть, щоб створити файл PDF, який виводиться у вікні переглядача, розташованому в центрі екрана."
+
+#. ZEPFF
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:62
+msgctxt "pdfuserinterfacepage|resize"
+msgid "_Resize window to initial page"
+msgstr "_Припасувати вікно до початкової сторінки"
+
+#. 8RErB
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:70
+msgctxt "pdfuserinterfacepage|extended_tip|resize"
+msgid "Select to generate a PDF file that is shown in a window displaying the whole initial page."
+msgstr "Виберіть, щоб створити файл PDF, який виводиться у вікні, що показує всю початкову сторінку."
+
+#. crBwn
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:81
+msgctxt "pdfuserinterfacepage|open"
+msgid "_Open in full screen mode"
+msgstr "_Відкрити в режимі на весь екран"
+
+#. oWaHS
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:89
+msgctxt "pdfuserinterfacepage|extended_tip|open"
+msgid "Select to generate a PDF file that is shown in a full screen reader window in front of all other windows."
+msgstr "Виберіть, щоб створити PDF-файл, який виводиться у повноекранному вікні пергглядача перед усіма іншими вікнами."
+
+#. Cvzzi
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:100
+msgctxt "pdfuserinterfacepage|display"
+msgid "_Display document title"
+msgstr "_Показати назву документа"
+
+#. tdVmB
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:108
+msgctxt "pdfuserinterfacepage|extended_tip|display"
+msgid "Select to generate a PDF file that is shown with the document title in the reader's title bar."
+msgstr "Виберіть, щоб створити файл PDF, який виводиться із заголовком документа в рядку заголовка переглядача."
+
+#. BtMjV
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:123
+msgctxt "pdfuserinterfacepage|label1"
+msgid "Window Options"
+msgstr "Параметри вікна"
+
+#. hZQVm
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:151
+msgctxt "pdfuserinterfacepage|toolbar"
+msgid "Hide _toolbar"
+msgstr "Приховати панель інструментів"
+
+#. eBE9L
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:159
+msgctxt "pdfuserinterfacepage|extended_tip|toolbar"
+msgid "Select to hide the reader's toolbar when the document is active."
+msgstr "Виберіть, щоб приховати панель інструментів переглядача, коли документ активний."
+
+#. YLEgH
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:170
+msgctxt "pdfuserinterfacepage|menubar"
+msgid "Hide _menubar"
+msgstr "Приховати меню"
+
+#. qBG8G
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:178
+msgctxt "pdfuserinterfacepage|extended_tip|menubar"
+msgid "Select to hide the reader's menu bar when the document is active."
+msgstr "Виберіть, щоб приховати панель меню переглядача, коли документ активний."
+
+#. Aw2aq
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:189
+msgctxt "pdfuserinterfacepage|window"
+msgid "Hide _window controls"
+msgstr "Приховати _елементи керування вікном"
+
+#. EhwCr
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:197
+msgctxt "pdfuserinterfacepage|extended_tip|window"
+msgid "Select to hide the reader's controls when the document is active."
+msgstr "Виберіть, щоб приховати елементи керування переглядача, коли документ активний."
+
+#. xm2Lh
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:212
+msgctxt "pdfuserinterfacepage|label2"
+msgid "User Interface Options"
+msgstr "Параметри інтерфейсу користувача"
+
+#. SwDno
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:239
+msgctxt "pdfuserinterfacepage|effects"
+msgid "_Use transition effects"
+msgstr "_Використовувати ефекти переходу"
+
+#. BMEGm
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:247
+msgctxt "pdfuserinterfacepage|extended_tip|effects"
+msgid "Select to export Impress slide transition effects to respective PDF effects."
+msgstr "Виберіть, щоб експортувати ефекти переходу слайдів Impress у відповідні ефекти PDF."
+
+#. JgwC9
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:262
+msgctxt "pdfuserinterfacepage|label3"
+msgid "Transitions"
+msgstr "Переходи"
+
+#. sUC8i
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:291
+msgctxt "pdfuserinterfacepage|allbookmarks"
+msgid "Show _All"
+msgstr "Показати _все"
+
+#. XLd4F
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:300
+msgctxt "pdfuserinterfacepage|extended_tip|allbookmarks"
+msgid "Select to show all bookmark levels when the reader opens the PDF file."
+msgstr "Виберіть, щоб показати всі рівні закладок, коли файл PDF відкрито для перегляду."
+
+#. WzoF3
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:311
+msgctxt "pdfuserinterfacepage|visiblebookmark"
+msgid "_Visible levels:"
+msgstr "Видимі _рівні:"
+
+#. FqQPa
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:323
+msgctxt "pdfuserinterfacepage|extended_tip|visiblebookmark"
+msgid "Select to show bookmark levels down to the selected level when the reader opens the PDF file."
+msgstr "Виберіть, щоб показувати закладки до вибраного рівня, коли файл PDF відкрито для перегляду."
+
+#. NEDWP
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:343
+msgctxt "pdfuserinterfacepage|extended_tip|visiblelevel"
+msgid "Select to show bookmark levels down to the selected level when the reader opens the PDF file."
+msgstr "Виберіть, щоб показувати закладки до вибраного рівня, коли файл PDF відкрито для перегляду."
+
+#. x4kjV
+#: filter/uiconfig/ui/pdfuserinterfacepage.ui:361
+msgctxt "pdfuserinterfacepage|label4"
+msgid "Collapse Outlines"
+msgstr "Згорнути структуру"
+
+#. ibYBv
+#: filter/uiconfig/ui/pdfviewpage.ui:48
+msgctxt "pdfviewpage|pageonly"
+msgid "_Page only"
+msgstr "_Лише сторінка"
+
+#. NCgWy
+#: filter/uiconfig/ui/pdfviewpage.ui:57
+msgctxt "pdfviewpage|extended_tip|pageonly"
+msgid "Select to generate a PDF file that shows only the page contents."
+msgstr "Оберіть цей пункт, щоб згенерувати файл PDF, який показує лише вміст сторінки."
+
+#. d2FAh
+#: filter/uiconfig/ui/pdfviewpage.ui:68
+msgctxt "pdfviewpage|outline"
+msgid "Outl_ine and page"
+msgstr "Ст_руктура і сторінка"
+
+#. JAAHm
+#: filter/uiconfig/ui/pdfviewpage.ui:77
+msgctxt "pdfviewpage|extended_tip|outline"
+msgid "Select to generate a PDF file that shows a bookmarks palette and the page contents."
+msgstr "Вибір цього пункту згенерує файл PDF, який показуватиме палітру закладок та вміст сторінок."
+
+#. rT8gQ
+#: filter/uiconfig/ui/pdfviewpage.ui:88
+msgctxt "pdfviewpage|thumbs"
+msgid "_Thumbnails and page"
+msgstr "_Мініатюра і сторінка"
+
+#. gDHqJ
+#: filter/uiconfig/ui/pdfviewpage.ui:97
+msgctxt "pdfviewpage|extended_tip|thumbs"
+msgid "Select to generate a PDF file that shows a thumbnails palette and the page contents."
+msgstr "Вибір цього пункту згенерує файл PDF, який показуватиме палітру мініатюр та вміст сторінок."
+
+#. EgKos
+#: filter/uiconfig/ui/pdfviewpage.ui:116
+msgctxt "pdfviewpage|label4"
+msgid "Open on pa_ge:"
+msgstr "Відкрити на ст_орінці:"
+
+#. QrQ84
+#: filter/uiconfig/ui/pdfviewpage.ui:135
+msgctxt "pdfviewpage|extended_tip|page"
+msgid "Select to show the given page when the reader opens the PDF file."
+msgstr "Виберіть, щоб показати дану сторінку, коли програма відкриє файл PDF."
+
+#. MxznY
+#: filter/uiconfig/ui/pdfviewpage.ui:156
+msgctxt "pdfviewpage|label2"
+msgid "Panes"
+msgstr "Панелі"
+
+#. jA3LD
+#: filter/uiconfig/ui/pdfviewpage.ui:185
+msgctxt "pdfviewpage|fitdefault"
+msgid "_Default"
+msgstr "_Типово"
+
+#. vQNHv
+#: filter/uiconfig/ui/pdfviewpage.ui:194
+msgctxt "pdfviewpage|extended_tip|fitdefault"
+msgid "Select to generate a PDF file that shows the page contents without zooming. If the reader software is configured to use a zoom factor by default, the page shows with that zoom factor."
+msgstr "Вибір цього пункту згенерує файл PDF, який показуватиме вміст сторінки без масштабування. Якщо програма-читач PDF налаштована на певний коефіцієнт масштабування при відкритті файлу, сторінка буде показана із цим масштабуванням."
+
+#. kqho7
+#: filter/uiconfig/ui/pdfviewpage.ui:205
+msgctxt "pdfviewpage|fitwin"
+msgid "_Fit in window"
+msgstr "_Припасувати до вікна"
+
+#. Z6P6B
+#: filter/uiconfig/ui/pdfviewpage.ui:214
+msgctxt "pdfviewpage|extended_tip|fitwin"
+msgid "Select to generate a PDF file that shows the page zoomed to fit entirely into the reader's window."
+msgstr "Виберіть, щоб створити PDF-файл, який показує сторінку збільшеною так, щоб вона повністю помістилася у вікні переглядача."
+
+#. gcStc
+#: filter/uiconfig/ui/pdfviewpage.ui:225
+msgctxt "pdfviewpage|fitwidth"
+msgid "Fit _width"
+msgstr "Припасувати за шириною"
+
+#. FkxYn
+#: filter/uiconfig/ui/pdfviewpage.ui:234
+msgctxt "pdfviewpage|extended_tip|fitwidth"
+msgid "Select to generate a PDF file that shows the page zoomed to fit the width of the reader's window."
+msgstr "Виберіть, щоб створити PDF-файл, який показує сторінку збільшеною відповідно до ширини вікна зчитувача."
+
+#. V6kwp
+#: filter/uiconfig/ui/pdfviewpage.ui:245
+msgctxt "pdfviewpage|fitvis"
+msgid "Fit _visible"
+msgstr "Заповнити видиме"
+
+#. EBBzj
+#: filter/uiconfig/ui/pdfviewpage.ui:254
+msgctxt "pdfviewpage|extended_tip|fitvis"
+msgid "Select to generate a PDF file that shows the text and graphics on the page zoomed to fit the reader's window."
+msgstr "Відмітьте, щоб створити PDF-файл, який показує текст і графіку на сторінці, збільшені відповідно до вікна оглядача."
+
+#. NGpWy
+#: filter/uiconfig/ui/pdfviewpage.ui:271
+msgctxt "pdfviewpage|fitzoom"
+msgid "_Zoom factor:"
+msgstr "_Множник масштабу:"
+
+#. nQ4Du
+#: filter/uiconfig/ui/pdfviewpage.ui:283
+msgctxt "pdfviewpage|extended_tip|fitzoom"
+msgid "Select a given zoom factor when the reader opens the PDF file."
+msgstr "Виберіть коефіцієнт масштабування під час відкриття файла PDF."
+
+#. BBoAW
+#: filter/uiconfig/ui/pdfviewpage.ui:304
+msgctxt "pdfviewpage|extended_tip|zoom"
+msgid "Select a given zoom factor when the reader opens the PDF file."
+msgstr "Виберіть коефіцієнт масштабування під час відкриття файла PDF."
+
+#. LQKDP
+#: filter/uiconfig/ui/pdfviewpage.ui:325
+msgctxt "pdfviewpage|label3"
+msgid "Magnification"
+msgstr "Збільшення"
+
+#. Eegkp
+#: filter/uiconfig/ui/pdfviewpage.ui:361
+msgctxt "pdfviewpage|defaultlayout"
+msgid "D_efault"
+msgstr "Т_ипово"
+
+#. CtGeC
+#: filter/uiconfig/ui/pdfviewpage.ui:370
+msgctxt "pdfviewpage|extended_tip|defaultlayout"
+msgid "Select to generate a PDF file that shows the pages according to the layout setting of the reader software."
+msgstr "Виберіть цей пункт, щоб згенерувати файл PDF, який показуватиме сторінки відповідно до шаблону налаштувань оглядача PDF."
+
+#. QBpan
+#: filter/uiconfig/ui/pdfviewpage.ui:381
+msgctxt "pdfviewpage|singlelayout"
+msgid "_Single page"
+msgstr "_Одна сторінка"
+
+#. 4PuqY
+#: filter/uiconfig/ui/pdfviewpage.ui:390
+msgctxt "pdfviewpage|extended_tip|singlelayout"
+msgid "Select to generate a PDF file that shows one page at a time."
+msgstr "Виберіть, щоб створити файл PDF, який відображає одну сторінку за раз."
+
+#. whE6p
+#: filter/uiconfig/ui/pdfviewpage.ui:401
+msgctxt "pdfviewpage|contlayout"
+msgid "C_ontinuous"
+msgstr "Не_перервно"
+
+#. BRxps
+#: filter/uiconfig/ui/pdfviewpage.ui:410
+msgctxt "pdfviewpage|extended_tip|contlayout"
+msgid "Select to generate a PDF file that shows pages in a continuous vertical column."
+msgstr "Виберіть, щоб створити файл PDF, який відображає сторінки у неперервному вертикальному стовпці."
+
+#. ALQRE
+#: filter/uiconfig/ui/pdfviewpage.ui:421
+msgctxt "pdfviewpage|contfacinglayout"
+msgid "Co_ntinuous facing"
+msgstr "Ст_річка попарно"
+
+#. YyCT7
+#: filter/uiconfig/ui/pdfviewpage.ui:430
+msgctxt "pdfviewpage|extended_tip|contfacinglayout"
+msgid "Select to generate a PDF file that shows pages side by side in a continuous column. For more than two pages, the first page is displayed on the right."
+msgstr "Виберіть, щоб створити файл PDF, який показує сторінки поруч у неперервному стовпці. Для більш ніж двох сторінок перша сторінка зображена праворуч."
+
+#. 4DFBW
+#: filter/uiconfig/ui/pdfviewpage.ui:441
+msgctxt "pdfviewpage|firstonleft"
+msgid "First page is _left"
+msgstr "Перша сторінка _зліва"
+
+#. xWdBk
+#: filter/uiconfig/ui/pdfviewpage.ui:450
+msgctxt "pdfviewpage|extended_tip|firstonleft"
+msgid "Select to generate a PDF file that shows pages side by side in a continuous column. For more than two pages, the first page is displayed on the left. You must enable support for complex text layout on Language settings - Languages in the Options dialog box."
+msgstr "Виберіть, щоб створити файл PDF, який показує сторінки поруч у неперервному стовпці. Для більш ніж двох сторінок перша сторінка буде показана зліва. Ви повинні ввімкнути підтримку складних систем писемності в «Параметри мови - Мови» вікна Параметри."
+
+#. sYKod
+#: filter/uiconfig/ui/pdfviewpage.ui:465
+msgctxt "pdfviewpage|label1"
+msgid "Page Layout"
+msgstr "Формат сторінки"
+
+#. G43B5
+#: filter/uiconfig/ui/testxmlfilter.ui:8
+msgctxt "testxmlfilter|TestXMLFilterDialog"
+msgid "Test XML Filter: %s"
+msgstr "Тестовий фільтр XML: %s"
+
+#. 93Aw7
+#: filter/uiconfig/ui/testxmlfilter.ui:88
+msgctxt "testxmlfilter|label3"
+msgid "XSLT for export"
+msgstr "XSLT для експорту"
+
+#. 3EKij
+#: filter/uiconfig/ui/testxmlfilter.ui:101
+msgctxt "testxmlfilter|label4"
+msgid "Transform document"
+msgstr "Перетворити документ"
+
+#. TZvm5
+#: filter/uiconfig/ui/testxmlfilter.ui:111
+msgctxt "testxmlfilter|exportbrowse"
+msgid "Browse..."
+msgstr "Огляд…"
+
+#. 6ZGrB
+#: filter/uiconfig/ui/testxmlfilter.ui:117
+msgctxt "testxmlfilter|extended_tip|exportbrowse"
+msgid "Locate the file that you want to apply the XML export filter to. The XML code of the transformed file is opened in your default XML editor after transformation."
+msgstr "Вкажіть розташування файлу, до якого Ви хотіли б застосувати фільтр експорту XML. Після трансформації код XML трансформованого файлу буде відкрито у типовому редакторі XML."
+
+#. F8CJd
+#: filter/uiconfig/ui/testxmlfilter.ui:128
+msgctxt "testxmlfilter|currentdocument"
+msgid "Current Document"
+msgstr "Поточний документ"
+
+#. GRXCc
+#: filter/uiconfig/ui/testxmlfilter.ui:134
+msgctxt "testxmlfilter|extended_tip|currentdocument"
+msgid "The front-most open file that matches the XML filter criteria will be used to test the filter. The current XML export filter transforms the file and the resulting XML code is displayed in the XML Filter output window."
+msgstr "Для перевірки фільтра буде використаний перший відкритий файл, який відповідає критеріям XML-фільтра. Поточний XML-фільтр експорту перетворює файл, і отриманий XML-код відображається у вихідному вікні XML-фільтра."
+
+#. EPLxG
+#: filter/uiconfig/ui/testxmlfilter.ui:150
+msgctxt "testxmlfilter|extended_tip|exportxsltfile"
+msgid "Displays the file name of the XSLT filter that you entered on the Transformation tab page."
+msgstr "Показує назву фільтра XSLT, введену на вкладці Перетворення."
+
+#. 9HnMA
+#: filter/uiconfig/ui/testxmlfilter.ui:167
+msgctxt "testxmlfilter|extended_tip|currentfilename"
+msgid "Displays the file name of the document that you want to use to test the XSLT filter."
+msgstr "Відображає ім'я файлу документа, який буде використовуватись для перевірки фільтра XSLT."
+
+#. b7FMe
+#: filter/uiconfig/ui/testxmlfilter.ui:186
+msgctxt "testxmlfilter|label1"
+msgid "Export"
+msgstr "Експорт"
+
+#. ANpSQ
+#: filter/uiconfig/ui/testxmlfilter.ui:219
+msgctxt "testxmlfilter|label5"
+msgid "XSLT for import"
+msgstr "XSLT для імпорту"
+
+#. aWFtZ
+#: filter/uiconfig/ui/testxmlfilter.ui:229
+msgctxt "testxmlfilter|importbrowse"
+msgid "Browse..."
+msgstr "Огляд…"
+
+#. eR68F
+#: filter/uiconfig/ui/testxmlfilter.ui:235
+msgctxt "testxmlfilter|extended_tip|importbrowse"
+msgid "Opens a file selection dialog. The selected file is opened using the current XML import filter."
+msgstr "Відкриває діалог вибору файлу. Вибраний файл відкривається з використанням вибраного фільтра імпорту XML."
+
+#. RGb9P
+#: filter/uiconfig/ui/testxmlfilter.ui:246
+msgctxt "testxmlfilter|recentfile"
+msgid "Recent File"
+msgstr "Останній файл"
+
+#. 2vFnT
+#: filter/uiconfig/ui/testxmlfilter.ui:252
+msgctxt "testxmlfilter|extended_tip|recentfile"
+msgid "Re-opens the document that was last opened with this dialog."
+msgstr "Відкриває останній відкритий у цьому діалозі документ."
+
+#. WRoGk
+#: filter/uiconfig/ui/testxmlfilter.ui:266
+msgctxt "testxmlfilter|templateimport"
+msgid "Template for import"
+msgstr "Шаблон для імпорту"
+
+#. 75GJD
+#: filter/uiconfig/ui/testxmlfilter.ui:281
+msgctxt "testxmlfilter|extended_tip|importxsltfile"
+msgid "Displays the file name of the XSLT filter that you entered on the Transformation tab page."
+msgstr "Показує назву фільтра XSLT, введену на вкладці Перетворення."
+
+#. UAfyw
+#: filter/uiconfig/ui/testxmlfilter.ui:292
+msgctxt "testxmlfilter|displaysource"
+msgid "Display source"
+msgstr "Показати джерело"
+
+#. CdCp5
+#: filter/uiconfig/ui/testxmlfilter.ui:300
+msgctxt "testxmlfilter|extended_tip|displaysource"
+msgid "Opens the XML source of the selected document in your default XML editor after importing."
+msgstr "Після імпортування відкриває в типовому XML-редакторі XML-джерело вибраного документа."
+
+#. AKfAy
+#: filter/uiconfig/ui/testxmlfilter.ui:314
+msgctxt "testxmlfilter|label6"
+msgid "Transform file"
+msgstr "Перетворити файл"
+
+#. FdiNb
+#: filter/uiconfig/ui/testxmlfilter.ui:329
+msgctxt "testxmlfilter|extended_tip|importxslttemplate"
+msgid "Displays the file name of the template that you entered on the Transformation tab page."
+msgstr "Показує назву шаблона, введену на вкладці Перетворення."
+
+#. RHRHL
+#: filter/uiconfig/ui/testxmlfilter.ui:346
+msgctxt "testxmlfilter|extended_tip|recentfilename"
+msgid "Re-opens the document that was last opened with this dialog."
+msgstr "Відкриває останній відкритий у цьому діалозі документ."
+
+#. 4MaaP
+#: filter/uiconfig/ui/testxmlfilter.ui:368
+msgctxt "testxmlfilter|label2"
+msgid "Import"
+msgstr "Імпорт"
+
+#. NsJor
+#: filter/uiconfig/ui/testxmlfilter.ui:399
+msgctxt "testxmlfilter|extended_tip|TestXMLFilterDialog"
+msgid "Tests the XSLT stylesheets used by the selected XML filter."
+msgstr "Перевіряє таблиці стилів XSLT, що використовуються вибраним фільтром XML."
+
+#. DEJXN
+#: filter/uiconfig/ui/warnpdfdialog.ui:18
+msgctxt "warnpdfdialog|WarnPDFDialog"
+msgid "Problems During PDF Export"
+msgstr "Помилки при експорті PDF"
+
+#. 2BpUz
+#: filter/uiconfig/ui/warnpdfdialog.ui:25
+msgctxt "warnpdfdialog|WarnPDFDialog"
+msgid "During PDF export the following problems occurred:"
+msgstr "Помилки при експорті PDF:"
+
+#. wG9NF
+#: filter/uiconfig/ui/xmlfiltersettings.ui:18
+msgctxt "xmlfiltersettings|XMLFilterSettingsDialog"
+msgid "XML Filter Settings"
+msgstr "Параметри фільтрів XML"
+
+#. x9LGg
+#: filter/uiconfig/ui/xmlfiltersettings.ui:41
+msgctxt "xmlfiltersettings|extended_tip|help"
+msgid "Displays the help page for this dialog."
+msgstr "Показує сторінку довідки для цього діалогового вікна."
+
+#. CmVSC
+#: filter/uiconfig/ui/xmlfiltersettings.ui:63
+msgctxt "xmlfiltersettings|extended_tip|close"
+msgid "Closes the dialog."
+msgstr "Закриває діалогове вікно."
+
+#. VvrGU
+#: filter/uiconfig/ui/xmlfiltersettings.ui:110
+msgctxt "xmlfiltersettings|header_name"
+msgid "Name"
+msgstr "Назва"
+
+#. D6uZS
+#: filter/uiconfig/ui/xmlfiltersettings.ui:123
+msgctxt "xmlfiltersettings|header_type"
+msgid "Type"
+msgstr "Тип"
+
+#. A6qWH
+#: filter/uiconfig/ui/xmlfiltersettings.ui:134
+msgctxt "xmlfiltersettings|extended_tip|filterlist"
+msgid "Select one or more filters, then click one of the buttons."
+msgstr "Виберіть один або кілька фільтрів, а потім натисніть одну з кнопок."
+
+#. VcMQo
+#: filter/uiconfig/ui/xmlfiltersettings.ui:156
+msgctxt "xmlfiltersettings|new"
+msgid "_New..."
+msgstr "_Створити..."
+
+#. upKZD
+#: filter/uiconfig/ui/xmlfiltersettings.ui:163
+msgctxt "xmlfiltersettings|extended_tip|new"
+msgid "Opens a dialog for creating a new filter."
+msgstr "Відкриває діалогове вікно для створення нового фільтру."
+
+#. W6Ju3
+#: filter/uiconfig/ui/xmlfiltersettings.ui:175
+msgctxt "xmlfiltersettings|edit"
+msgid "_Edit..."
+msgstr "_Змінити..."
+
+#. GMxC8
+#: filter/uiconfig/ui/xmlfiltersettings.ui:182
+msgctxt "xmlfiltersettings|extended_tip|edit"
+msgid "Opens a dialog for editing the selected filter."
+msgstr "Відкриває діалогове вікно для редагування вибраного фільтра."
+
+#. DAoSK
+#: filter/uiconfig/ui/xmlfiltersettings.ui:194
+msgctxt "xmlfiltersettings|test"
+msgid "_Test XSLTs..."
+msgstr "_Перевірити XSLTs..."
+
+#. mWGrq
+#: filter/uiconfig/ui/xmlfiltersettings.ui:201
+msgctxt "xmlfiltersettings|extended_tip|test"
+msgid "Opens a dialog for testing the selected filter."
+msgstr "Відкриває діалогове вікно для перевірки вибраного фільтра."
+
+#. FE7Za
+#: filter/uiconfig/ui/xmlfiltersettings.ui:213
+msgctxt "xmlfiltersettings|delete"
+msgid "_Delete..."
+msgstr "В_илучити…"
+
+#. bDixG
+#: filter/uiconfig/ui/xmlfiltersettings.ui:220
+msgctxt "xmlfiltersettings|extended_tip|delete"
+msgid "Deletes the selected file after you confirm the dialog that follows."
+msgstr "Видаляє вибраний файл після підтвердження в діалозі."
+
+#. DmuTA
+#: filter/uiconfig/ui/xmlfiltersettings.ui:232
+msgctxt "xmlfiltersettings|save"
+msgid "_Save as Package..."
+msgstr "З~берегти як пакунок..."
+
+#. tPh4b
+#: filter/uiconfig/ui/xmlfiltersettings.ui:239
+msgctxt "xmlfiltersettings|extended_tip|save"
+msgid "Displays a Save as dialog to save the selected file as an XSLT filter package (*.jar)."
+msgstr "Виводить діалогове вікно Зберегти як , щоб зберегти вибраний файл як пакунок фільтра XSLT (*.jar)."
+
+#. CuahL
+#: filter/uiconfig/ui/xmlfiltersettings.ui:251
+msgctxt "xmlfiltersettings|open"
+msgid "_Open Package..."
+msgstr "~Відкрити пакет..."
+
+#. D3FRp
+#: filter/uiconfig/ui/xmlfiltersettings.ui:258
+msgctxt "xmlfiltersettings|extended_tip|open"
+msgid "Displays an Open dialog to open a filter from an XSLT filter package (*.jar)."
+msgstr "Виводить діалогове вікно Відкрити , щоб відкрити фільтр з пакунка фільтра XSLT (*.jar)."
+
+#. bC6ha
+#: filter/uiconfig/ui/xmlfiltersettings.ui:290
+msgctxt "xmlfiltersettings|extended_tip|XMLFilterSettingsDialog"
+msgid "Opens the XML Filter Settings dialog, where you can create, edit, delete, and test filters to import and to export XML files."
+msgstr "Відкриває діалогове вікно Параметри фільтра XML, де Ви можете створювати, редагувати, видаляти та перевіряти фільтри для імпорту та експорту файлів XML."
+
+#. rLZ5z
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:23
+msgctxt "xmlfiltertabpagegeneral|label2"
+msgid "_Filter name:"
+msgstr "_Назва фільтра:"
+
+#. dreFh
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:37
+msgctxt "xmlfiltertabpagegeneral|label3"
+msgid "_Application:"
+msgstr "_Програма:"
+
+#. yQmBY
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:51
+msgctxt "xmlfiltertabpagegeneral|label4"
+msgid "_Name of file type:"
+msgstr "_Назва типу файлу:"
+
+#. NB3Gy
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:65
+msgctxt "xmlfiltertabpagegeneral|label5"
+msgid "File _extension:"
+msgstr "Роз_ширення файлу:"
+
+#. fPxWA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:79
+msgctxt "xmlfiltertabpagegeneral|label6"
+msgid "Comment_s:"
+msgstr "Коментар_і:"
+
+#. rYNyn
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:100
+msgctxt "xmlfiltertabpagegeneral|extended_tip|filtername"
+msgid "Enter the name that you want to display in the list box of the XML Filter Settings dialog."
+msgstr "Введіть назву, яку потрібно відобразити у вікні списку діалогового вікна Параметри фільтра XML."
+
+#. D5aZP
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:119
+msgctxt "xmlfiltertabpagegeneral|extended_tip|extension"
+msgid "Enter the file extension to use when you open a file without specifying a filter. The file extension is used to determine which filter to use."
+msgstr "Введіть розширення файлу, яке буде використовуватися під час відкриття файлу без вказання фільтру. Розширення файлу використовується для задіяння певного фільтру."
+
+#. fZvBA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:138
+msgctxt "xmlfiltertabpagegeneral|extended_tip|interfacename"
+msgid "Enter the name that you want to display in the File type box in file dialogs."
+msgstr "Введіть назву, яка буде показана у полі Тип файлу в діалогових вікнах файлу."
+
+#. BFUsA
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:162
+msgctxt "xmlfiltertabpagegeneral|extended_tip|application"
+msgid "Select the application that you want to use with the filter."
+msgstr "Виберіть застосунок, який потрібно використовувати спільно з фільтром."
+
+#. Gfrm2
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:186
+msgctxt "xmlfiltertabpagegeneral|extended_tip|description"
+msgid "Enter a comment (optional)."
+msgstr "Напишіть коментар (не обов'язково)."
+
+#. G632R
+#: filter/uiconfig/ui/xmlfiltertabpagegeneral.ui:206
+msgctxt "xmlfiltertabpagegeneral|extended_tip|XmlFilterTabPageGeneral"
+msgid "Enter or edit general information for an XML filter."
+msgstr "Введіть або змініть загальні відомості про фільтр XML."
+
+#. FhD2n
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:24
+msgctxt "xmlfiltertabpagetransformation|label2"
+msgid "_DocType:"
+msgstr "_Тип документа:"
+
+#. x2ex7
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:44
+msgctxt "xmlfiltertabpagetransformation|extended_tip|doc"
+msgid "Enter the DOCTYPE of the XML file."
+msgstr "Введіть тип документа файлу XML."
+
+#. J5c8A
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:57
+msgctxt "xmlfiltertabpagetransformation|label4"
+msgid "_XSLT for export:"
+msgstr "_XSLT для експорту:"
+
+#. GwzvD
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:69
+msgctxt "xmlfiltertabpagetransformation|browseexport"
+msgid "Brows_e..."
+msgstr "Огля_д…"
+
+#. QLd25
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:76
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browseexport"
+msgid "Opens a file selection dialog."
+msgstr "Відкриває діалогове вікно вибору файлу."
+
+#. oZGZS
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:89
+msgctxt "xmlfiltertabpagetransformation|label5"
+msgid "XSLT _for import:"
+msgstr "XSLT дл_я імпорту:"
+
+#. UNKTt
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:101
+msgctxt "xmlfiltertabpagetransformation|browseimport"
+msgid "B_rowse..."
+msgstr "О_гляд…"
+
+#. TecWL
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:108
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browseimport"
+msgid "Opens a file selection dialog."
+msgstr "Відкриває діалогове вікно вибору файлу."
+
+#. 9nV9R
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:121
+msgctxt "xmlfiltertabpagetransformation|label6"
+msgid "Template for _import:"
+msgstr "Шаблон для _імпорту:"
+
+#. MNLtB
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:133
+msgctxt "xmlfiltertabpagetransformation|browsetemp"
+msgid "Browse..."
+msgstr "Огляд…"
+
+#. Dce3n
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:139
+msgctxt "xmlfiltertabpagetransformation|extended_tip|browsetemp"
+msgid "Opens a file selection dialog."
+msgstr "Відкриває діалогове вікно вибору файлу."
+
+#. sjWgJ
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:162
+msgctxt "xmlfiltertabpagetransformation|extended_tip|xsltexport"
+msgid "If this is an export filter, enter the file name of the XSLT stylesheet that you want to use for exporting."
+msgstr "Якщо це фільтр експорту, введіть назву файлу таблиці стилів XSLT, яку Ви бажаєте використати для експорту."
+
+#. Xgroa
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:185
+msgctxt "xmlfiltertabpagetransformation|extended_tip|xsltimport"
+msgid "If this is an import filter, enter the file name of the XSLT stylesheet that you want to use for importing."
+msgstr "Якщо це фільтр імпорту, введіть назву файлу таблиці стилів XSLT, яку Ви бажаєте використати для імпорту."
+
+#. wRFNU
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:208
+msgctxt "xmlfiltertabpagetransformation|extended_tip|tempimport"
+msgid "Enter the name of the template that you want to use for importing. In the template, styles are defined to display XML tags."
+msgstr "Введіть назву шаблона, який буде використовуватись для імпорту. В цьому шаблоні стилі визначені для показу тегів XML."
+
+#. XTDex
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:229
+msgctxt "xmlfiltertabpagetransformation|filtercb"
+msgid "The filter needs XSLT 2.0 processor"
+msgstr "Фільтр вимагає процесора XSLT 2.0"
+
+#. hDv78
+#: filter/uiconfig/ui/xmlfiltertabpagetransformation.ui:244
+msgctxt "xmlfiltertabpagetransformation|extended_tip|XmlFilterTabPageTransformation"
+msgid "Enter or edit file information for an XML filter."
+msgstr "Введіть або змініть відомості про файл фільтру XML."
+
+#. MCfGg
+#: filter/uiconfig/ui/xsltfilterdialog.ui:8
+msgctxt "xsltfilterdialog|XSLTFilterDialog"
+msgid "XML Filter: %s"
+msgstr "Фільтр XML: %s"
+
+#. bCZh2
+#: filter/uiconfig/ui/xsltfilterdialog.ui:62
+msgctxt "xsltfilterdialog|extended_tip|help"
+msgid "Displays the help page for this dialog."
+msgstr "Показує сторінку довідки для цього діалогового вікна."
+
+#. Cvy2d
+#: filter/uiconfig/ui/xsltfilterdialog.ui:103
+msgctxt "xsltfilterdialog|general"
+msgid "General"
+msgstr "Загальні"
+
+#. peR3F
+#: filter/uiconfig/ui/xsltfilterdialog.ui:126
+msgctxt "xsltfilterdialog|transformation"
+msgid "Transformation"
+msgstr "Перетворення"
+
+#. WkALr
+#: filter/uiconfig/ui/xsltfilterdialog.ui:149
+msgctxt "xsltfilterdialog|extended_tip|XSLTFilterDialog"
+msgid "Opens a dialog for creating a new filter."
+msgstr "Відкриває діалогове вікно для створення нового фільтру."
