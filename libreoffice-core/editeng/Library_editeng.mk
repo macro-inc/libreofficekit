@@ -46,6 +46,7 @@ $(eval $(call gb_Library_add_exception_objects,editeng,\
     editeng/source/accessibility/AccessibleSelectionBase \
     editeng/source/accessibility/AccessibleStaticTextBase \
     editeng/source/accessibility/AccessibleStringWrap \
+    editeng/source/uno/unoedprx \
 ))
 endif
 
@@ -115,7 +116,6 @@ $(eval $(call gb_Library_add_exception_objects,editeng,\
     editeng/source/rtf/rtfitem \
     editeng/source/rtf/svxrtf \
     editeng/source/uno/unoedhlp \
-    editeng/source/uno/unoedprx \
     editeng/source/uno/unoedsrc \
     editeng/source/uno/unofdesc \
     editeng/source/uno/unofield \

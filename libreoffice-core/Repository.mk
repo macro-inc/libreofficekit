@@ -408,7 +408,6 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 	fps_office \
 	for \
 	forui \
-	frm \
 	fsstorage \
 	fwk \
     $(call gb_Helper_optionals_or,HELPTOOLS XMLHELP,helplinker) \
@@ -472,7 +471,7 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 	ucptdoc1 \
 	unordf \
 	unoxml \
-	updatefeed \
+	$(if $(ENABLE_WASM_STRIP_PINGUSER),,updatefeed) \
 	utl \
 	uui \
 	$(call gb_Helper_optional,SCRIPTING, \
@@ -493,9 +492,6 @@ $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,ooo, \
 		wininetbe1 \
 	) \
 	$(if $(filter $(OS),MACOSX), \
-		$(if $(ENABLE_MACOSX_SANDBOX),, \
-			AppleRemote \
-		) \
 		fps_aqua \
 	) \
 ))
@@ -509,7 +505,7 @@ $(eval $(call gb_Helper_register_plugins_for_install,OOOLIBS,ooo, \
     sdui \
     $(if $(ENABLE_GEN),vclplug_gen) \
     $(if $(filter $(OS),WNT),vclplug_win) \
-    $(if $(filter $(OS),MACOSX),vclplug_osx) \
+    $(if $(DISABLE_GUI),,$(if $(filter $(OS),MACOSX),vclplug_osx)) \
 ))
 
 $(eval $(call gb_Helper_register_libraries_for_install,OOOLIBS,postgresqlsdbc, \
@@ -1176,7 +1172,6 @@ $(eval $(call gb_Helper_register_mos,\
 	flt \
 	for \
 	$(call gb_Helper_optional,DESKTOP,fps) \
-	frm \
 	fwk \
 	oox \
 	pcr \

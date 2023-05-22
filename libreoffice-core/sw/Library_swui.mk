@@ -57,8 +57,7 @@ $(eval $(call gb_Library_use_libraries,swui,\
     cppu \
     cppuhelper \
     cui \
-    $(call gb_Helper_optional,DBCONNECTIVITY, \
-        dbtools) \
+	dbtools \
     editeng \
     i18nlangtag \
     i18nutil \
@@ -169,7 +168,6 @@ $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/utlui/swrenamexnameddlg \
 ))
 
-ifneq (,$(filter DBCONNECTIVITY,$(BUILD_TYPE)))
 $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/dbui/addresslistdialog \
     sw/source/ui/dbui/createaddresslistdialog \
@@ -185,6 +183,5 @@ $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/dbui/mmresultdialogs \
     sw/source/ui/dbui/selectdbtabledialog \
 ))
-endif
 
 # vim: set noet sw=4 ts=4:

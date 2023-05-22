@@ -56,8 +56,7 @@ $(eval $(call gb_Library_use_libraries,sw,\
     comphelper \
     cppu \
     cppuhelper \
-    $(call gb_Helper_optional,DBCONNECTIVITY, \
-        dbtools) \
+        dbtools \
     docmodel \
     drawinglayercore \
     drawinglayer \
@@ -813,14 +812,12 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/wrtsh/wrtundo \
 ))
 
-ifneq (,$(filter DBCONNECTIVITY,$(BUILD_TYPE)))
 $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/dbui/dbtree \
     sw/source/uibase/dbui/mailmergetoolbarcontrols \
 ))
 
 $(eval $(call gb_Library_add_componentimpl,sw,mailmerge))
-endif
 
 $(eval $(call gb_SdiTarget_SdiTarget,sw/sdi/swslots,sw/sdi/swriter))
 

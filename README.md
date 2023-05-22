@@ -65,7 +65,7 @@ export DEVELOPER_DIR=/Applications/Xcode13.4.1.app/Contents/Developer
 - Install dependencies using MacPorts:
 
 ```shell
-sudo port install nasm autoconf automake gperf gpatch flex bison
+sudo port install nasm autoconf automake gperf gpatch flex bison gmake
 ```
 
 Before running any build commands, you may have to adjust your path to prefer the `port`-installed versions (such as make):
