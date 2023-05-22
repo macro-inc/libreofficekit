@@ -17,4 +17,10 @@ $(eval $(call gb_UnpackedTarball_add_patches,pixman,\
 	external/cairo/pixman/pixman-wasm.patch \
 ))
 
+ifeq ($(OS),MACOSX)
+$(eval $(call gb_UnpackedTarball_add_patches,pixman,\
+	external/cairo/pixman/pixman-arm64-macos.patch.1 \
+))
+endif
+
 # vim: set noet sw=4 ts=4:
