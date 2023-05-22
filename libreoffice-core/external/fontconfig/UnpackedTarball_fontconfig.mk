@@ -19,4 +19,10 @@ $(eval $(call gb_UnpackedTarball_add_patches,fontconfig,\
 	external/fontconfig/ubsan.patch \
 ))
 
+ifeq ($(OS),MACOSX)
+$(eval $(call gb_UnpackedTarball_add_patches,fontconfig,\
+	external/fontconfig/fontconfig-macos.patch.1 \
+))
+endif
+
 # vim: set noet sw=4 ts=4:
