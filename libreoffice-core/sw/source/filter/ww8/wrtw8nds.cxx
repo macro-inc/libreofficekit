@@ -101,6 +101,7 @@
 #include <ndole.hxx>
 
 #include <cstdio>
+#include <../../core/text/macro_internal.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::i18n;
@@ -1430,7 +1431,7 @@ int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
                         // If the hyperlink is one of our custom ones we want to unset the style of the hyperlink and break early before adding the hyperlink attributes to the document
                         const SwFormatINetFormat *rINet = static_cast< const SwFormatINetFormat* >( pItem );
                         OUString aDestinationURL = rINet->GetValue();
-                        if(aDestinationURL.startsWith(m_rExport.AttrOutput().termUrl) || aDestinationURL.startsWith(m_rExport.AttrOutput().termRefUrl) || aDestinationURL.startsWith(m_rExport.AttrOutput().sectionUrl) || aDestinationURL.startsWith(m_rExport.AttrOutput().sectionRefUrl)){
+                        if(macro_internal::isTemporaryURL(aDestinationURL)){
                             break;
                         }
                         if ( nPos == pHt->GetStart() )

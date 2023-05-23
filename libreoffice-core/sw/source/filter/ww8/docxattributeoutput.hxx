@@ -47,6 +47,7 @@
 
 #include <com/sun/star/table/BorderLine2.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
+#include <../../core/text/macro_internal.hxx>
 
 class SwGrfNode;
 class SdrObject;

@@ -147,10 +147,6 @@ private:
     OUString ConvertURL( const OUString& rUrl, bool bAbsoluteOut );
 
 public:
-    OUString termUrl = "term://";
-    OUString termRefUrl = "termref://";
-    OUString sectionUrl = "section://";
-    OUString sectionRefUrl = "sectionref://";
     /// Export the state of RTL/CJK.
     virtual void RTLAndCJKState( bool bIsRTL, sal_uInt16 nScript ) = 0;
 

@@ -160,6 +160,7 @@
 
 #include <toolkit/helper/vclunohelper.hxx>
 #include <unicode/regex.h>
+#include <../../core/text/macro_internal.hxx>
 
 using ::editeng::SvxBorderLine;
 
@@ -8669,7 +8670,7 @@ void DocxAttributeOutput::TextINetFormat( const SwFormatINetFormat& rLink )
     OUString aDestinationURL = rLink.GetValue();
 
     // Ignore styling if the hyperlink is one of ours
-    if(aDestinationURL.startsWith(termUrl) || aDestinationURL.startsWith(termRefUrl) || aDestinationURL.startsWith(sectionUrl) || aDestinationURL.startsWith(sectionRefUrl)){
+    if(macro_internal::isTemporaryURL(aDestinationURL)){
         return;
     }
     if (!aStyleId.isEmpty() && !aStyleId.equalsIgnoreAsciiCase("DefaultStyle"))
