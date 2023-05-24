@@ -41,6 +41,7 @@ ifeq ($(OS),WNT)
 $(eval $(call gb_UnpackedTarball_add_patches,cairo,\
 	external/cairo/cairo/cairo.windows.patch.1 \
 ))
+$(eval $(call gb_UnpackedTarball_add_file,cairo,.,external/cairo/cairo/config.h))
 endif
 
 # To be applied only when ENABLE_ANDROID_LOK is not defined
@@ -50,7 +51,7 @@ $(eval $(call gb_UnpackedTarball_add_patches,cairo,\
 ))
 endif
 
-ifneq (,$(filter ANDROID iOS,$(OS)))
+ifneq (,$(filter ANDROID iOS WNT,$(OS)))
 $(eval $(call gb_UnpackedTarball_add_file,cairo,.,external/cairo/cairo/dummy_pkg_config))
 endif
 

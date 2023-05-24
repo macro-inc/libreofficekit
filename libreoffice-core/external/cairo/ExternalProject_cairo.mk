@@ -61,10 +61,10 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 			CFLAGS="$(CFLAGS) $(call gb_ExternalProject_get_build_flags,cairo) $(ZLIB_CFLAGS)" \
 			LDFLAGS="$(call gb_ExternalProject_get_link_flags,cairo)" \
 			) \
-		$(if $(filter ANDROID iOS,$(OS)),PKG_CONFIG=./dummy_pkg_config) \
+		$(if $(filter ANDROID iOS WNT,$(OS)),PKG_CONFIG=./dummy_pkg_config) \
 		LIBS="$(ZLIB_LIBS)" \
 		$(if $(filter -fsanitize=%,$(LDFLAGS)),LDFLAGS="$(LDFLAGS) -fuse-ld=bfd") \
-		pixman_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,pixman)/pixman -pthread" \
+		pixman_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,pixman)/pixman $(if $(filter WNT,$(OS)),,-pthread)" \
 		pixman_LIBS="-L$(call gb_UnpackedTarball_get_dir,pixman)/pixman/.libs -lpixman-1 \
 			$(if $(filter LINUX,$(OS)),-Wl$(COMMA)-z$(COMMA)origin \
 					-Wl$(COMMA)-rpath$(COMMA)\\\$$\$$ORIGIN) \
@@ -76,7 +76,7 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 		$(if $(SYSTEM_FREETYPE),,FREETYPE_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,freetype)/include") \
 		$(if $(SYSTEM_FONTCONFIG),,FONTCONFIG_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,fontconfig)") \
 		$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
-		$(if $(filter WNT,$(OS)),--disable-shared,$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static)) \
+		$(if $(filter WNT,$(OS)),--disable-shared ax_cv_c_float_words_bigendian=no ac_cv_c_bigendian=no --disable-quartz,$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static)) \
 		$(if $(filter EMSCRIPTEN ANDROID iOS,$(OS)),--disable-xlib --disable-xcb,$(if $(filter TRUE,$(DISABLE_GUI)),--disable-xlib --disable-xcb,--enable-xlib --enable-xcb)) \
 		$(if $(filter iOS,$(OS)),--enable-quartz --enable-quartz-font) \
 		--disable-valgrind \
