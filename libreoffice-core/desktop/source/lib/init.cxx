@@ -1121,6 +1121,7 @@ static void doc_setGraphicSelection (LibreOfficeKitDocument* pThis,
 static void doc_resetSelection (LibreOfficeKitDocument* pThis);
 static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCommand);
 static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx);
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput);
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis,
                                     int nTilePixelWidth,
                                     int nTilePixelHeight,
@@ -1309,6 +1310,7 @@ LibLODocument_Impl::LibLODocument_Impl(const uno::Reference <css::lang::XCompone
         m_pDocumentClass->resetSelection = doc_resetSelection;
         m_pDocumentClass->getCommandValues = doc_getCommandValues;
         m_pDocumentClass->gotoOutline = doc_gotoOutline;
+        m_pDocumentClass->saveToMemory = doc_saveToMemory;
         m_pDocumentClass->setClientZoom = doc_setClientZoom;
         m_pDocumentClass->setClientVisibleArea = doc_setClientVisibleArea;
         m_pDocumentClass->setOutlineState = doc_setOutlineState;
@@ -5889,6 +5891,65 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
     pDoc->gotoOutline(aJsonWriter, idx);
 
     return aJsonWriter.extractData();
+}
+
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
+{
+    comphelper::ProfileZone aZone("doc_saveToMemory");
+    OUString filterName("writer8");
+
+    SolarMutexGuard aGuard;
+    SetLastExceptionMsg();
+    try
+    {
+        LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
+
+        if(!pDocument)
+        {
+            SetLastExceptionMsg("Unable to static_cast LibreOfficeKitDocument* to LibLODocument_Impl*");
+            return -1;
+        }
+
+        uno::Reference<frame::XStorable> xStorable(pDocument->mxComponent, uno::UNO_QUERY_THROW);
+
+        SvMemoryStream aOutStream;
+        uno::Reference<io::XOutputStream> xOut = new utl::OOutputStreamWrapper(aOutStream);
+
+        utl::MediaDescriptor aMediaDescriptor;
+        SAL_WARN("doc_saveToMemory", doc_getDocumentType(pThis));
+        switch (doc_getDocumentType(pThis))
+        {
+            case LOK_DOCTYPE_TEXT:
+                aMediaDescriptor["FilterName"] <<= filterName;
+                break;
+            default:
+                SAL_WARN("lok", "Failed to save to in-memory stream: Document type is not supported");
+        }
+        aMediaDescriptor["OutputStream"] <<= xOut;
+
+        xStorable->storeToURL("private:stream", aMediaDescriptor.getAsConstPropertyValueList());
+        // TODO: malloc is leaky, use a callback to pass the outstream and size and create the array buffer
+        if (pOutput)
+        {
+            const size_t nOutputSize = aOutStream.GetEndOfData();
+
+            *pOutput = static_cast<char*>(malloc(nOutputSize));
+            if (*pOutput)
+            {
+                SAL_WARN("doc_saveToMemory", "I have pOutput");
+                SAL_WARN("doc_saveToMemory", nOutputSize);
+                std::memcpy(*pOutput, aOutStream.GetData(), nOutputSize);
+                return nOutputSize;
+            }
+        }
+    }
+    catch (const uno::Exception& exception)
+    {
+        css::uno::Any exAny( cppu::getCaughtException() );
+        SetLastExceptionMsg(exception.Message);
+        SAL_WARN("lok", "Failed to to in-memory stream: " + exceptionToString(exAny));
+    }
+    return 0;
 }
 
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis, int nTilePixelWidth, int nTilePixelHeight,

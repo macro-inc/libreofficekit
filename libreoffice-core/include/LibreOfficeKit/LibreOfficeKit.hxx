@@ -497,6 +497,16 @@ public:
     }
 
     /**
+     * Saves the document to a memory buffer
+     * @param pOutput the data of the file
+     * @return size_t the size of the data
+    */
+    size_t saveToMemory(char** pOutput)
+    {
+        return mpDoc->pClass->saveToMemory(mpDoc,pOutput);
+    }
+
+    /**
      * Save the client's view so that we can compute the right zoom level
      * for the mouse events. This only affects CALC.
      * @param nTilePixelWidth - tile width in pixels

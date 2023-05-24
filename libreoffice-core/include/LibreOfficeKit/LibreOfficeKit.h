@@ -254,6 +254,9 @@ struct _LibreOfficeKitDocumentClass
     /// @see lok::Document::gotoOutline().
     char* (*gotoOutline) (LibreOfficeKitDocument* pThis, int idx);
 
+    /// @see lok::Document::saveToMemory().
+    size_t (*saveToMemory) (LibreOfficeKitDocument* pThis, char** pOutput);
+
     /// @see lok::Document::setClientZoom().
     void (*setClientZoom) (LibreOfficeKitDocument* pThis,
             int nTilePixelWidth,
