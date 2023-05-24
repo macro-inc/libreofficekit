@@ -396,7 +396,9 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/app/help \
     vcl/source/app/i18nhelp \
     vcl/source/app/idle \
+    $(if $(filter-out WNT,$(OS)), \
     vcl/source/app/salplug \
+    ) \
     vcl/source/app/salusereventlist \
     vcl/source/app/salvtables \
     vcl/source/app/scheduler \
@@ -603,10 +605,6 @@ endif # USING_X11
 
 ifeq ($(DISABLE_GUI),TRUE)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
-$(if $(filter WNT,$(OS)), \
-    vcl/source/opengl/DeviceInfo \
-    vcl/win/dummies \
-) \
 $(if $(filter-out WNT,$(OS)), \
     vcl/unx/generic/printer/jobdata \
     vcl/unx/generic/printer/ppdparser \
@@ -753,6 +751,7 @@ endif
 ifeq ($(OS),WNT)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/opengl/win/WinDeviceInfo \
+    vcl/win/dummies \
     $(if $(filter-out TRUE,$(DISABLE_GUI)), \
       vcl/source/app/salplug \
     ) \

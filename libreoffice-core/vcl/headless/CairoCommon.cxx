@@ -18,7 +18,6 @@
  */
 
 #include <headless/CairoCommon.hxx>
-#include <dlfcn.h>
 #include <vcl/BitmapTools.hxx>
 #include <svdata.hxx>
 #include <tools/helpers.hxx>
