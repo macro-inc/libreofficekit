@@ -141,8 +141,8 @@ diff -urN expat.org/build/expat.vcxproj.filters expat/build/expat.vcxproj.filter
 diff -ur expat.org/build/expat_config.h expat/build/expat_config.h
 --- expat.org/build/expat_config.h	2022-12-22 16:06:34.019304500 +0800
 +++ expat/build/expat_config.h	2022-12-22 16:08:26.120796500 +0800
-@@ -14,58 +14,52 @@
- /* #undef HAVE_ARC4RANDOM_BUF */
+@@ -17,58 +17,52 @@
+ #define HAVE_ARC4RANDOM_BUF 1
  
  /* Define to 1 if you have the <dlfcn.h> header file. */
 -#define HAVE_DLFCN_H 1
@@ -217,7 +217,7 @@ diff -ur expat.org/build/expat_config.h expat/build/expat_config.h
  
  /* Name of package */
  #define PACKAGE "expat"
-@@ -91,7 +85,7 @@
+@@ -94,7 +88,7 @@
  /* Define to 1 if all of the C90 standard headers exist (not just the ones
     required in a freestanding environment). This macro is provided for
     backward compatibility; new code need not use it. */
@@ -225,13 +225,13 @@ diff -ur expat.org/build/expat_config.h expat/build/expat_config.h
 +#define STDC_HEADERS
  
  /* Version number of package */
- #define VERSION "2.4.9"
-@@ -117,13 +111,18 @@
+ #define VERSION "2.5.0"
+@@ -120,13 +114,18 @@
  #define XML_CONTEXT_BYTES 1024
  
  /* Define to include code reading entropy from `/dev/urandom'. */
 -#define XML_DEV_URANDOM 1
-+// #define XML_DEV_URANDOM 1
++//#define XML_DEV_URANDOM 1
  
  /* Define to make parameter entity parsing functionality available. */
 -#define XML_DTD 1
