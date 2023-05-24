@@ -655,7 +655,6 @@ namespace sw::mark
         }
         assert(pMark && "MarkManager::makeMark(..) - Mark was not created.");
 
-        SAL_WARN("MAKE_MARK::ID", &typeid(pMark));
         if(pMark->GetMarkPos() != pMark->GetMarkStart())
             pMark->Swap();
 
