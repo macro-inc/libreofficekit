@@ -1392,8 +1392,13 @@ int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
             {
                 case RES_TXTATR_INETFMT:
                     pEnd = pHt->End();
+                    // We are at the end of the URL
                     if (nPos == *pEnd && nPos != pHt->GetStart())
                     {
+                        const SwFormatINetFormat *rINet = static_cast< const SwFormatINetFormat* >( pItem );
+                        OUString aDestinationURL = rINet->GetValue();
+                        if(macro_internal::isTemporaryURL(aDestinationURL))
+                            break;
                         if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len()))
                             --nRet;
                     }
@@ -1427,26 +1432,24 @@ int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
             switch ( pItem->Which() )
             {
                 case RES_TXTATR_INETFMT:
+                    if ( nPos == pHt->GetStart() )
                     {
                         // If the hyperlink is one of our custom ones we want to unset the style of the hyperlink and break early before adding the hyperlink attributes to the document
                         const SwFormatINetFormat *rINet = static_cast< const SwFormatINetFormat* >( pItem );
                         OUString aDestinationURL = rINet->GetValue();
-                        if(macro_internal::isTemporaryURL(aDestinationURL)){
+                        if(macro_internal::isTemporaryURL(aDestinationURL))
                             break;
-                        }
-                        if ( nPos == pHt->GetStart() )
-                        {
-                            if ( m_rExport.AttrOutput().StartURL( rINet->GetValue(), rINet->GetTargetFrame() ) )
-                                ++nRet;
-                        }
-                        pEnd = pHt->End();
-                        if (nPos == *pEnd && nPos == pHt->GetStart())
-                        {   // special case: empty must be handled here
-                            if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len()))
-                                --nRet;
-                        }
-                        break;
+                        if ( m_rExport.AttrOutput().StartURL( rINet->GetValue(), rINet->GetTargetFrame() ) )
+                            ++nRet;
                     }
+                    pEnd = pHt->End();
+                    if (nPos == *pEnd && nPos == pHt->GetStart())
+                    {   // special case: empty must be handled here
+                        if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len())){
+                            --nRet;
+                        }
+                    }
+                    break;
                 case RES_TXTATR_REFMARK:
                     if ( nPos == pHt->GetStart() )
                     {
@@ -1973,6 +1976,7 @@ bool MSWordExportBase::GetBookmarks( const SwTextNode& rNd, sal_Int32 nStt,
     SwNodeOffset nNd = rNd.GetIndex( );
 
     const sal_Int32 nMarks = pMarkAccess->getAllMarksCount();
+
     for ( sal_Int32 i = 0; i < nMarks; i++ )
     {
         IMark* pMark = pMarkAccess->getAllMarksBegin()[i];
@@ -2007,6 +2011,7 @@ bool MSWordExportBase::GetBookmarks( const SwTextNode& rNd, sal_Int32 nStt,
 
             if ( bIsStartOk || bIsEndOk )
             {
+
                 rArr.push_back( pMark );
             }
         }
