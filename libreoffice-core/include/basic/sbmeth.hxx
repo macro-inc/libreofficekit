@@ -48,7 +48,9 @@ class BASIC_DLLPUBLIC SbMethod : public SbxMethod
     BASIC_DLLPRIVATE SbMethod( const SbMethod& );
     virtual bool LoadData( SvStream&, sal_uInt16 ) override;
     virtual bool StoreData( SvStream& ) const override;
+#if HAVE_FEATURE_SCRIPTING
     virtual ~SbMethod() override;
+#endif
 
 public:
     SBX_DECL_PERSIST_NODATA(SBXID_BASICMETHOD,2);

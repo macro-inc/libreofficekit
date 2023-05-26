@@ -132,6 +132,9 @@ $(eval $(call gb_Library_add_exception_objects,sb,\
 	basic/source/sbx/sbxvar \
 ))
 
+
+ifneq ($(filter SCRIPTING,$(BUILD_TYPE)),)
+
 ifeq ($(OS),WNT)
 $(eval $(call gb_Library_use_system_win32_libs,sb,\
 	oleaut32 \
@@ -155,6 +158,14 @@ $(eval $(call gb_Library_add_exception_objects,sb,\
 	basic/source/runtime/dllmgr-none \
 ))
 endif
+endif
+
+else
+
+$(eval $(call gb_Library_add_exception_objects,sb,\
+	basic/source/runtime/dllmgr-none \
+))
+
 endif
 
 # vim: set noet sw=4 ts=4:

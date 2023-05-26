@@ -106,8 +106,10 @@ public:
                                 maObjShells;
     std::unique_ptr<SfxBasicManagerHolder>
                                 pBasicManager;
+#if HAVE_FEATURE_SCRIPTING
     std::unique_ptr<SfxBasicManagerCreationListener>
                                 pBasMgrListener;
+#endif
     SfxViewFrame*               pViewFrame;
     std::optional<SfxSlotPool>  pSlotPool;
     std::optional<SfxDispatcher>

@@ -22,6 +22,7 @@
 #include <sal/config.h>
 #include <comphelper/errcode.hxx>
 #include <memory>
+#include <config_features.h>
 
 class SbxArray;
 class SbxVariable;
@@ -33,7 +34,7 @@ public:
 
     SbiDllMgr();
 
-#if defined(_WIN32) && !defined(_ARM64_)
+#if HAVE_FEATURE_SCRIPTING && defined(_WIN32) && !defined(_ARM64_)
     ~SbiDllMgr();
 #endif
 
@@ -44,7 +45,7 @@ public:
     void FreeDll(OUString const & library);
 
 private:
-#if defined(_WIN32) && !defined(_ARM64_)
+#if HAVE_FEATURE_SCRIPTING && defined(_WIN32) && !defined(_ARM64_)
     struct Impl;
 
     std::unique_ptr< Impl > impl_;

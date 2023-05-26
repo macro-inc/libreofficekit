@@ -62,27 +62,32 @@ class BASIC_DLLPUBLIC StarBASIC final : public SbxObject
     BASIC_DLLPRIVATE bool               RTError( ErrCode, const OUString& rMsg, sal_Int32, sal_Int32, sal_Int32 );
     BASIC_DLLPRIVATE BasicDebugFlags    BreakPoint( sal_Int32 nLine, sal_Int32 nCol1, sal_Int32 nCol2 );
     BASIC_DLLPRIVATE BasicDebugFlags    StepPoint( sal_Int32 nLine, sal_Int32 nCol1, sal_Int32 nCol2 );
+#if HAVE_FEATURE_SCRIPTING
     virtual bool LoadData( SvStream&, sal_uInt16 ) override;
     virtual bool StoreData( SvStream& ) const override;
+#endif
     bool             ErrorHdl();
     BasicDebugFlags  BreakHdl();
+#if HAVE_FEATURE_SCRIPTING
     virtual ~StarBASIC() override;
-
+#endif
 public:
 
     SBX_DECL_PERSIST_NODATA(SBXID_BASIC,1);
-
+#if HAVE_FEATURE_SCRIPTING
     StarBASIC( StarBASIC* pParent = nullptr, bool bIsDocBasic = false );
+#endif
 
     // #51727 SetModified overridden so that the Modified-State is
         // not delivered to Parent.
+#if HAVE_FEATURE_SCRIPTING
     virtual void SetModified( bool ) override;
 
     virtual void    Insert( SbxVariable* ) override;
     using SbxObject::Remove;
     virtual void    Remove( SbxVariable* ) override;
     virtual void    Clear() override;
-
+#endif
     // Compiler-Interface
     SbModule*       MakeModule( const OUString& rName, const OUString& rSrc );
     SbModule*       MakeModule( const OUString& rName, const css::script::ModuleInfo& mInfo, const OUString& rSrc );
@@ -96,9 +101,10 @@ public:
     static OUString GetErrorMsg();
     static sal_Int32 GetErl();
 
+#if HAVE_FEATURE_SCRIPTING
     virtual SbxVariable* Find( const OUString&, SbxClassType ) override;
     virtual bool Call( const OUString&, SbxArray* = nullptr ) override;
-
+#endif
     SbModules&      GetModules() { return pModules; }
     SbxObject*      GetRtl()     { return pRtl.get();     }
     SbModule*       FindModule( std::u16string_view );

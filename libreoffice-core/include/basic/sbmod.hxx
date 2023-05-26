@@ -63,9 +63,13 @@ protected:
     css::uno::Reference< css::script::XInvocation > mxWrapper;
     OUString            aOUSource;
     OUString            aComment;
+#if HAVE_FEATURE_SCRIPTING
     std::unique_ptr<SbiImage> pImage;        // the Image
+#endif
     SbiBreakpoints*     pBreaks;       // Breakpoints
+#if HAVE_FEATURE_SCRIPTING
     std::unique_ptr<SbClassData> pClassData;
+#endif
     bool mbVBASupport; // Option VBASupport
     bool mbCompat; // Option Compatible
     sal_Int32 mnType;
@@ -93,7 +97,9 @@ protected:
     SAL_DLLPRIVATE virtual bool LoadCompleted() override;
     SAL_DLLPRIVATE virtual void Notify( SfxBroadcaster& rBC, const SfxHint& rHint ) override;
     SAL_DLLPRIVATE void handleProcedureProperties( SfxBroadcaster& rBC, const SfxHint& rHint );
+#if HAVE_FEATURE_SCRIPTING
     virtual ~SbModule() override;
+#endif
     bool IsOptionCompatible() const override { return mbCompat; }
 
 public:

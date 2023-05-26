@@ -43,6 +43,7 @@ using ::com::sun::star::uno::XInterface;
 
 static BasicDLL* pBasic = nullptr;
 
+#if HAVE_FEATURE_SCRIPTING
 class SfxBasicManagerCreationListener : public ::basic::BasicManagerCreationListener
 {
 private:
@@ -68,6 +69,7 @@ void SfxBasicManagerCreationListener::onBasicManagerCreated( const Reference< XM
     if ( _rxForDocument == nullptr )
         m_rAppData.OnApplicationBasicManagerCreated( _rBasicManager );
 }
+#endif
 
 SfxAppData_Impl::SfxAppData_Impl()
     : pPool(nullptr)
@@ -75,7 +77,9 @@ SfxAppData_Impl::SfxAppData_Impl()
     , nDocModalMode(0)
     , nRescheduleLocks(0)
     , pBasicManager( new SfxBasicManagerHolder )
+#if HAVE_FEATURE_SCRIPTING
     , pBasMgrListener( new SfxBasicManagerCreationListener( *this ) )
+#endif
     , pViewFrame( nullptr )
     , bDowning( true )
     , bInQuit( false )
