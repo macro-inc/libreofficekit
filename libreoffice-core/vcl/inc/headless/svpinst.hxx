@@ -35,16 +35,12 @@
 #include <queue>
 
 #if defined(_WIN32)
-
-#ifndef timeval
 #include <chrono>
 // timeval conflicts with the winsock.h implementation, so _timeval is used in its place
-typedef struct timeval {
+typedef struct _timeval {
     long tv_sec;
     long tv_usec;
-} timeval;
-#define WIN_TIMEVAL_SHIM 1
-#endif
+} _timeval;
 
 #else // !_WIN32
 # include <sys/time.h>
@@ -110,7 +106,11 @@ public:
 // (Wakeup is only called by SvpSalTimer and SvpSalFrame)
 class VCL_DLLPUBLIC SvpSalInstance : public SalGenericInstance, public SalUserEventList
 {
+#ifdef _WIN32
+    _timeval                m_aTimeout;
+#else
     timeval                 m_aTimeout;
+#endif
     sal_uLong               m_nTimeoutMS;
     oslThreadIdentifier     m_MainThread;
 
