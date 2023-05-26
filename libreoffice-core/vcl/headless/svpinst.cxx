@@ -24,17 +24,6 @@
 
 #if defined(_WIN32)
 #include <process.h>
-
-#ifndef timeval
-#include <chrono>
-// timeval conflicts with the winsock.h implementation, so _timeval is used in its place
-typedef struct timeval {
-    long tv_sec;
-    long tv_usec;
-} timeval;
-#define WIN_TIMEVAL_SHIM 1
-#endif
-
 #else
 #include <pthread.h>
 #include <sys/time.h>
@@ -67,21 +56,21 @@ typedef struct timeval {
 #include <svdata.hxx>
 // FIXME: remove when we re-work the svp mainloop
 #ifdef WIN_TIMEVAL_SHIM
-inline bool operator >= ( const timeval &t1, const timeval &t2 )
+bool operator >= ( const timeval &t1, const timeval &t2 )
 {
     if( t1.tv_sec == t2.tv_sec )
         return t1.tv_usec >= t2.tv_usec;
     return t1.tv_sec > t2.tv_sec;
 }
 
-inline bool operator > ( const timeval &t1, const timeval &t2 )
+bool operator > ( const timeval &t1, const timeval &t2 )
 {
     if( t1.tv_sec == t2.tv_sec )
         return t1.tv_usec > t2.tv_usec;
     return t1.tv_sec > t2.tv_sec;
 }
 
-inline timeval &operator -= ( timeval &t1, const timeval &t2 )
+timeval &operator -= ( timeval &t1, const timeval &t2 )
 {
     if( t1.tv_usec < t2.tv_usec )
     {
@@ -93,7 +82,7 @@ inline timeval &operator -= ( timeval &t1, const timeval &t2 )
     return t1;
 }
 
-inline timeval &operator += ( timeval &t1, sal_uIntPtr t2 )
+timeval &operator += ( timeval &t1, sal_uIntPtr t2 )
 {
     t1.tv_sec  += t2 / 1000;
     t1.tv_usec += (t2 % 1000) * 1000;
@@ -105,9 +94,9 @@ inline timeval &operator += ( timeval &t1, sal_uIntPtr t2 )
     return t1;
 }
 
-inline timeval operator - ( const timeval &t1, const timeval &t2 )
+timeval operator - ( const timeval &t1, const timeval &t2 )
 {
-    _timeval t0 = t1;
+    timeval t0 = t1;
     t0 -= t2;
     return t0;
 }
@@ -217,11 +206,8 @@ bool SvpSalInstance::CheckTimeout( bool bExecuteTimers )
     bool bRet = false;
     if( m_aTimeout.tv_sec ) // timer is started
     {
-#ifdef _WIN32
-        _timeval aTimeOfDay;
-#else
         timeval aTimeOfDay;
-#endif
+
         gettimeofday( &aTimeOfDay, nullptr );
         if( aTimeOfDay >= m_aTimeout )
         {
@@ -598,11 +584,7 @@ void SvpSalInstance::StopTimer()
 
 void SvpSalInstance::StartTimer( sal_uInt64 nMS )
 {
-#ifdef _WIN32
-    _timeval aPrevTimeout (m_aTimeout);
-#else
     timeval aPrevTimeout (m_aTimeout);
-#endif
     gettimeofday (&m_aTimeout, nullptr);
 
     m_nTimeoutMS  = nMS;
