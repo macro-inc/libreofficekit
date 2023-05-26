@@ -91,10 +91,11 @@ public:
     virtual bool            AddTempDevFont( vcl::font::PhysicalFontCollection*,
                                             const OUString& rFileURL,
                                             const OUString& rFontName ) override;
-
+#ifndef _WIN32
     virtual std::unique_ptr<GenericSalLayout>
                             GetTextLayout(int nFallbackLevel) override;
     virtual void            DrawTextLayout( const GenericSalLayout& ) override;
+#endif
 
     virtual SystemGraphicsData GetGraphicsData() const override;
 

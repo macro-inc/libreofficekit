@@ -111,6 +111,7 @@ void GenPspGraphics::GetResolution( sal_Int32 &rDPIX, sal_Int32 &rDPIY )
 #endif
 }
 
+#ifndef _WIN32
 namespace {
 
 class PspSalLayout : public GenericSalLayout
@@ -158,8 +159,8 @@ void GenPspGraphics::DrawTextLayout(const GenericSalLayout& rLayout)
     int nStart = 0;
     while (rLayout.GetNextGlyph(&pGlyph, aPos, nStart))
         m_pPrinterGfx->DrawGlyph(Point(aPos.getX(), aPos.getY()), *pGlyph);
-    (void)rLayout;
 }
+#endif
 
 FontCharMapRef GenPspGraphics::GetFontCharMap() const
 {
