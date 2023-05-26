@@ -1136,6 +1136,17 @@ public:
     }
 
     /**
+     * Loads a document from an array buffer
+     * @param data the array buffer of the files contents
+     * @param size the size of the array buffer
+     * @return XTextDocument
+    */
+    void* loadFromMemory(char *data, size_t size)
+    {
+        return mpThis->pClass->loadFromMemory(mpThis, data, size);
+    }
+
+    /**
      * Debugging tool for triggering a dump of internal state.
      *
      * LibreOfficeKit can get into an unhelpful state at run-time when

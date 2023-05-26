@@ -126,6 +126,9 @@ struct _LibreOfficeKitClass
 
     void* (*getXComponentContext) (LibreOfficeKit* pThis);
 
+    /// @see lok::Office::loadFromMemory().
+    void* (*loadFromMemory) (LibreOfficeKit* pThis, char *data, size_t size);
+
     UnoV8 uno_v8;
 };
 

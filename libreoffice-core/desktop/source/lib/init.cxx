@@ -7,6 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "comphelper/seqstream.hxx"
 #include "lib/unov8.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>
@@ -2407,6 +2408,8 @@ static void lo_dumpState(LibreOfficeKit* pThis, const char* pOptions, char** pSt
 
 static void* lo_getXComponentContext(LibreOfficeKit* pThis);
 
+static void* lo_loadFromMemory(LibreOfficeKit* pThis, char *data, size_t size);
+
 LibLibreOffice_Impl::LibLibreOffice_Impl()
     : m_pOfficeClass( gOfficeClass.lock() )
     , maThread(nullptr)
@@ -2435,6 +2438,7 @@ LibLibreOffice_Impl::LibLibreOffice_Impl()
         m_pOfficeClass->setOption = lo_setOption;
         m_pOfficeClass->dumpState = lo_dumpState;
         m_pOfficeClass->getXComponentContext = lo_getXComponentContext;
+        m_pOfficeClass->loadFromMemory = lo_loadFromMemory;
         unov8_init(m_pOfficeClass->uno_v8);
 
         gOfficeClass = m_pOfficeClass;
@@ -4422,6 +4426,40 @@ static void lo_setOption(LibreOfficeKit* /*pThis*/, const char *pOption, const c
     }
 }
 
+static void* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t size)
+{
+    if (!xContext.is())
+    {
+        SAL_WARN("lok", "ComponentContext is not available");
+        return nullptr;
+    }
+
+    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(xContext);
+
+    if (!xComponentLoader.is())
+    {
+        SAL_WARN("lok", "ComponentLoader is not available");
+        return nullptr;
+    }
+
+    auto aData = Sequence<sal_Int8>(reinterpret_cast<const sal_Int8*>(data), size);
+
+    uno::Reference<io::XInputStream> aInputStream(new comphelper::SequenceInputStream(aData));
+
+    utl::MediaDescriptor aMediaDescriptor;
+    aMediaDescriptor["FilterName"] <<= OUString("writer8"); // just hardcode this for now
+    aMediaDescriptor["InputStream"] <<= aInputStream;
+
+    uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL("private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
+
+    if (!xComponent.is()) {
+        SAL_WARN("lok", "Could not load in memory doc");
+        return nullptr;
+    }
+
+    return xComponent.get();
+}
+
 static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, char** pState)
 {
     if (!pState)
@@ -5928,7 +5966,7 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
         aMediaDescriptor["OutputStream"] <<= xOut;
 
         xStorable->storeToURL("private:stream", aMediaDescriptor.getAsConstPropertyValueList());
-        // TODO: malloc is leaky, use a callback to pass the outstream and size and create the array buffer
+
         if (pOutput)
         {
             const size_t nOutputSize = aOutStream.GetEndOfData();
