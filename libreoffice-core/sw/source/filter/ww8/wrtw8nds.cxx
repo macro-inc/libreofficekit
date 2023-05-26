@@ -101,6 +101,7 @@
 #include <ndole.hxx>
 
 #include <cstdio>
+#include <../../core/text/macro_internal.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::i18n;
@@ -1377,6 +1378,7 @@ void AttributeOutputBase::TOXMark( const SwTextNode& rNode, const SwTOXMark& rAt
 int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
 {
     int nRet = 0;
+
     if ( const SwpHints* pTextAttrs = rNd.GetpSwpHints() )
     {
         m_rExport.m_aCurrentCharPropStarts.push( nPos );
@@ -1390,8 +1392,13 @@ int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
             {
                 case RES_TXTATR_INETFMT:
                     pEnd = pHt->End();
+                    // We are at the end of the URL
                     if (nPos == *pEnd && nPos != pHt->GetStart())
                     {
+                        const SwFormatINetFormat *rINet = static_cast< const SwFormatINetFormat* >( pItem );
+                        OUString aDestinationURL = rINet->GetValue();
+                        if(macro_internal::isTemporaryURL(aDestinationURL))
+                            break;
                         if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len()))
                             --nRet;
                     }
@@ -1416,24 +1423,31 @@ int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
             if (nPos < pHt->GetAnyEnd())
                 break; // sorted by end
         }
+
         for ( size_t i = 0; i < pTextAttrs->Count(); ++i )
         {
             const SwTextAttr* pHt = pTextAttrs->Get(i);
             const SfxPoolItem* pItem = &pHt->GetAttr();
+
             switch ( pItem->Which() )
             {
                 case RES_TXTATR_INETFMT:
                     if ( nPos == pHt->GetStart() )
                     {
+                        // If the hyperlink is one of our custom ones we want to unset the style of the hyperlink and break early before adding the hyperlink attributes to the document
                         const SwFormatINetFormat *rINet = static_cast< const SwFormatINetFormat* >( pItem );
+                        OUString aDestinationURL = rINet->GetValue();
+                        if(macro_internal::isTemporaryURL(aDestinationURL))
+                            break;
                         if ( m_rExport.AttrOutput().StartURL( rINet->GetValue(), rINet->GetTargetFrame() ) )
                             ++nRet;
                     }
                     pEnd = pHt->End();
                     if (nPos == *pEnd && nPos == pHt->GetStart())
                     {   // special case: empty must be handled here
-                        if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len()))
+                        if (m_rExport.AttrOutput().EndURL(nPos == rNd.Len())){
                             --nRet;
+                        }
                     }
                     break;
                 case RES_TXTATR_REFMARK:
@@ -1962,6 +1976,7 @@ bool MSWordExportBase::GetBookmarks( const SwTextNode& rNd, sal_Int32 nStt,
     SwNodeOffset nNd = rNd.GetIndex( );
 
     const sal_Int32 nMarks = pMarkAccess->getAllMarksCount();
+
     for ( sal_Int32 i = 0; i < nMarks; i++ )
     {
         IMark* pMark = pMarkAccess->getAllMarksBegin()[i];
@@ -1996,6 +2011,7 @@ bool MSWordExportBase::GetBookmarks( const SwTextNode& rNd, sal_Int32 nStt,
 
             if ( bIsStartOk || bIsEndOk )
             {
+
                 rArr.push_back( pMark );
             }
         }

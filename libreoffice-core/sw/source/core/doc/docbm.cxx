@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include "txatbase.hxx"
 #include <memory>
 #include <utility>
 
@@ -48,6 +49,7 @@
 #include <libxml/xmlstring.h>
 #include <libxml/xmlwriter.h>
 #include <comphelper/lok.hxx>
+
 
 constexpr OUStringLiteral S_ANNOTATION_BOOKMARK = u"____";
 
@@ -663,8 +665,25 @@ namespace sw::mark
         // insert any dummy chars before inserting into sorted vectors
         pMark->InitDoc(m_rDoc, eMode, pSepPos);
 
+        if (eType == IDocumentMarkAccess::MarkType::UNO_BOOKMARK){
+            if ( const SwpHints* pTextAttrs = rPaM.GetNode().GetTextNode()->GetpSwpHints() ) {
+                for (size_t i = 0; i < pTextAttrs->Count(); ++i) {
+                    const SwTextAttr* pHt = pTextAttrs->GetSortedByEnd(i);
+                    const SfxPoolItem* pItem = &pHt->GetAttr();
+                    if(pItem->Which() == RES_TXTATR_INETFMT) {
+                        const SwFormatINetFormat *rINet = static_cast< const SwFormatINetFormat* >( pItem );
+                        OUString aDestinationURL = rINet->GetValue();
+                        // TODO: Link macro_internal properly
+                        if(aDestinationURL.startsWith("term://") || aDestinationURL.startsWith("termref://") || aDestinationURL.startsWith("section://") || aDestinationURL.startsWith("sectionref://"))
+                            return pMark.release();
+                    }
+                }
+            }
+        }
+
         // register mark
         lcl_InsertMarkSorted(m_vAllMarks, pMark.get());
+
         switch(eType)
         {
             case IDocumentMarkAccess::MarkType::BOOKMARK:
