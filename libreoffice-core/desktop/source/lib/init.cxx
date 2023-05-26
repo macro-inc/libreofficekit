@@ -5974,8 +5974,6 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
             *pOutput = static_cast<char*>(malloc(nOutputSize));
             if (*pOutput)
             {
-                SAL_WARN("doc_saveToMemory", "I have pOutput");
-                SAL_WARN("doc_saveToMemory", nOutputSize);
                 std::memcpy(*pOutput, aOutStream.GetData(), nOutputSize);
                 return nOutputSize;
             }
