@@ -164,7 +164,11 @@ public:
 
     virtual void            GetPrinterQueueInfo( ImplPrnQueueList* pList ) override;
     virtual void            GetPrinterQueueState( SalPrinterQueueInfo* pInfo ) override;
+#ifdef _WIN32
+    virtual OUString        GetDefaultPrinter() { return OUString(); }
+#else
     virtual OUString        GetDefaultPrinter() override;
+#endif
     virtual void            PostPrintersChanged() override;
 
     // SalTimer

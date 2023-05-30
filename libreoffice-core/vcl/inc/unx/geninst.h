@@ -60,7 +60,9 @@ public:
     virtual std::unique_ptr<SalPrinter> CreatePrinter  ( SalInfoPrinter* pInfoPrinter ) override;
     virtual void                GetPrinterQueueInfo    ( ImplPrnQueueList* pList ) override;
     virtual void                GetPrinterQueueState   ( SalPrinterQueueInfo* pInfo ) override;
+#if !defined(_WIN32)
     virtual OUString            GetDefaultPrinter() override;
+#endif
     virtual void                PostPrintersChanged() = 0;
     virtual void                updatePrinterUpdate() override;
     virtual void                jobStartedPrinterUpdate() override;

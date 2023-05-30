@@ -752,9 +752,7 @@ ifeq ($(OS),WNT)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/opengl/win/WinDeviceInfo \
     vcl/win/dummies \
-    $(if $(filter-out TRUE,$(DISABLE_GUI)), \
-      vcl/source/app/salplug \
-    ) \
+    vcl/source/app/salplug \
     vcl/win/app/fileregistration \
 ))
 

@@ -25,15 +25,7 @@
 #if defined(_WIN32)
 #include <process.h>
 
-#ifndef timeval
 #include <chrono>
-// timeval conflicts with the winsock.h implementation, so _timeval is used in its place
-typedef struct timeval {
-    long tv_sec;
-    long tv_usec;
-} timeval;
-#define WIN_TIMEVAL_SHIM 1
-#endif
 
 #else
 #include <pthread.h>
@@ -66,22 +58,22 @@ typedef struct timeval {
 #include <salframe.hxx>
 #include <svdata.hxx>
 // FIXME: remove when we re-work the svp mainloop
-#ifdef WIN_TIMEVAL_SHIM
-inline bool operator >= ( const timeval &t1, const timeval &t2 )
+#if defined(_WIN32)
+bool operator >= ( const _timeval &t1, const _timeval &t2 )
 {
     if( t1.tv_sec == t2.tv_sec )
         return t1.tv_usec >= t2.tv_usec;
     return t1.tv_sec > t2.tv_sec;
 }
 
-inline bool operator > ( const timeval &t1, const timeval &t2 )
+bool operator > ( const _timeval &t1, const _timeval &t2 )
 {
     if( t1.tv_sec == t2.tv_sec )
         return t1.tv_usec > t2.tv_usec;
     return t1.tv_sec > t2.tv_sec;
 }
 
-inline timeval &operator -= ( timeval &t1, const timeval &t2 )
+_timeval &operator -= ( _timeval &t1, const _timeval &t2 )
 {
     if( t1.tv_usec < t2.tv_usec )
     {
@@ -93,7 +85,7 @@ inline timeval &operator -= ( timeval &t1, const timeval &t2 )
     return t1;
 }
 
-inline timeval &operator += ( timeval &t1, sal_uIntPtr t2 )
+_timeval &operator += ( _timeval &t1, sal_uIntPtr t2 )
 {
     t1.tv_sec  += t2 / 1000;
     t1.tv_usec += (t2 % 1000) * 1000;
@@ -105,7 +97,7 @@ inline timeval &operator += ( timeval &t1, sal_uIntPtr t2 )
     return t1;
 }
 
-inline timeval operator - ( const timeval &t1, const timeval &t2 )
+_timeval operator - ( const _timeval &t1, const _timeval &t2 )
 {
     _timeval t0 = t1;
     t0 -= t2;
@@ -136,8 +128,8 @@ do { \
 #define DBG_TESTSVPYIELDMUTEX() ((void)0)
 #endif
 
-#ifdef WIN_TIMEVAL_SHIM
-int gettimeofday(timeval* tp, void* /*tzp*/) {
+#if defined(_WIN32)
+int gettimeofday(_timeval* tp, void* /*tzp*/) {
   namespace sc = std::chrono;
   sc::system_clock::duration d = sc::system_clock::now().time_since_epoch();
   sc::seconds s = sc::duration_cast<sc::seconds>(d);
@@ -488,7 +480,11 @@ bool SvpSalInstance::ImplYield(bool bWait, bool bHandleAllCurrentEvents)
     {
         if (m_aTimeout.tv_sec) // Timer is started.
         {
+#ifdef _WIN32
+            _timeval Timeout;
+#else
             timeval Timeout;
+#endif
             // determine remaining timeout.
             gettimeofday (&Timeout, nullptr);
             if (m_aTimeout > Timeout)

@@ -27,6 +27,7 @@
 #include <vcl/vclenum.hxx>
 
 #include "displayconnectiondispatch.hxx"
+#include "rtl/ustring.hxx"
 
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/ui/dialogs/XFilePicker2.hpp>
@@ -126,7 +127,11 @@ public:
 
     virtual void            GetPrinterQueueInfo( ImplPrnQueueList* pList ) = 0;
     virtual void            GetPrinterQueueState( SalPrinterQueueInfo* pInfo ) = 0;
+#ifdef _WIN32
+    virtual OUString        GetDefaultPrinter() { return OUString(); }
+#else
     virtual OUString        GetDefaultPrinter() = 0;
+#endif
 
     // SalTimer
     virtual SalTimer*       CreateSalTimer() = 0;

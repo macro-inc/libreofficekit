@@ -28,11 +28,6 @@ std::unique_ptr<SalPrinter> SvpSalInstance::CreatePrinter( SalInfoPrinter* /* pI
     return nullptr;
 }
 
-OUString SvpSalInstance::GetDefaultPrinter()
-{
-    return OUString();
-}
-
 void SvpSalInstance::PostPrintersChanged()
 {
 }
@@ -59,11 +54,6 @@ void SvpSalInstance::GetPrinterQueueState( SalPrinterQueueInfo* /* pInfo */ )
 std::unique_ptr<SalPrinter> SalGenericInstance::CreatePrinter( SalInfoPrinter* /* pInfoPrinter */ )
 {
     return nullptr;
-}
-
-OUString SalGenericInstance::GetDefaultPrinter()
-{
-    return OUString();
 }
 
 void SalGenericInstance::PostPrintersChanged()
